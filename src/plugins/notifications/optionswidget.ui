@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>425</width>
-    <height>123</height>
+    <height>150</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -24,43 +24,11 @@
        <number>5</number>
       </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QCheckBox" name="chbEnableRosterIcons">
-          <property name="text">
-           <string>Roster</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="chbEnablePopupWindows">
-          <property name="text">
-           <string>Popup</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="chbEnableTrayIcons">
-          <property name="text">
-           <string>Tray</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="chbEnableSounds">
-          <property name="text">
-           <string>Sound</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="chbEnableAutoActivate">
-          <property name="text">
-           <string>Activate</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QCheckBox" name="chbEnableAlerts">
+        <property name="text">
+         <string>Enable alerts in task bar</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="chbExpandRosterGroups">
@@ -107,6 +75,52 @@
            </size>
           </property>
          </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QCheckBox" name="chbEnableRosterIcons">
+          <property name="text">
+           <string>Roster</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chbEnablePopupWindows">
+          <property name="text">
+           <string>Popup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chbEnableTrayIcons">
+          <property name="text">
+           <string>Tray</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chbEnableSounds">
+          <property name="text">
+           <string>Sound</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chbEnableAutoActivate">
+          <property name="text">
+           <string>Activate</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

@@ -195,6 +195,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 		IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
 		if (!contactJid.resource().isEmpty())
 		{
+			QWidget *widgetToAlert = NULL;
 			if (AMessage.type() == Message::GroupChat)
 			{
 				if (!AMessage.body().isEmpty() && !isActive() && !AMessage.isDelayed())
@@ -218,6 +219,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
 				}
+				widgetToAlert = this;
 			}
 			else if (!AMessage.body().isEmpty())
 			{
@@ -233,6 +235,11 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
 				}
+				widgetToAlert = window!=NULL ? window->instance() : NULL;
+			}
+			if (notify.kinds & INotification::PopupWindow)
+			{
+				WidgetManager::alertWidget(widgetToAlert);
 			}
 		}
 		else

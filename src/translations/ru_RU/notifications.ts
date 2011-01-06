@@ -112,5 +112,9 @@
         <source> seconds</source>
         <translation> секунд</translation>
     </message>
+    <message>
+        <source>Enable alerts in task bar</source>
+        <translation>Включить уведомления в панели задач</translation>
+    </message>
 </context>
 </TS>

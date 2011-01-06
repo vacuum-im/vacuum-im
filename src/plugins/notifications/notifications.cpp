@@ -157,6 +157,7 @@ bool Notifications::initSettings()
 	Options::setDefaultValue(OPV_NOTIFICATIONS_TRAYICON,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_TRAYACTION,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_AUTOACTIVATE,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_ENABLEALERTS,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPTIMEOUT,8);
@@ -550,6 +551,7 @@ void Notifications::onActionNotifyActivated(bool)
 void Notifications::onOptionsOpened()
 {
 	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_SOUND));
+	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_ENABLEALERTS));
 }
 
 void Notifications::onOptionsChanged(const OptionsNode &ANode)
@@ -557,6 +559,10 @@ void Notifications::onOptionsChanged(const OptionsNode &ANode)
 	if (ANode.path() == OPV_NOTIFICATIONS_SOUND)
 	{
 		FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, ANode.value().toBool() ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
+	}
+	else if (ANode.path() == OPV_NOTIFICATIONS_ENABLEALERTS)
+	{
+		WidgetManager::setWidgetAlertEnabled(ANode.value().toBool());
 	}
 }
 

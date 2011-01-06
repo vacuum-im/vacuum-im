@@ -10,6 +10,7 @@
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
+#include <definitions/messagedataroles.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/actiongroups.h>
 #include <definitions/resources.h>
@@ -34,6 +35,7 @@
 #include <interfaces/iavatars.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <utils/widgetmanager.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include "usercontextmenu.h"

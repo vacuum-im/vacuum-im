@@ -27,6 +27,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
+#include <utils/widgetmanager.h>
 #include <utils/options.h>
 #include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"

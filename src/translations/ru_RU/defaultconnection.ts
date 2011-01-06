@@ -12,10 +12,6 @@
         <translation>Порт:</translation>
     </message>
     <message>
-        <source>Ignore SSL errors</source>
-        <translation>Игнорировать ошибки SSL</translation>
-    </message>
-    <message>
         <source>Use legacy SSL connection</source>
         <translation>Использовать устаревшее SSL подключение</translation>
     </message>

@@ -9,6 +9,7 @@
 #include <definitions/rosterlabelorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
+#include <definitions/messagedataroles.h>
 #include <definitions/actiongroups.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -24,6 +25,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <utils/widgetmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/shortcuts.h>
 
