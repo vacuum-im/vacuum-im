@@ -480,6 +480,10 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 				int notifyId = FNotifications->appendNotification(notify);
 				FStreamNotify.insert(AStream->streamId(),notifyId);
 			}
+			if (notify.kinds & INotification::PopupWindow)
+			{
+				WidgetManager::alertWidget(dialog);
+			}
 		}
 	}
 

@@ -135,6 +135,7 @@
 #define OPV_NOTIFICATIONS_TRAYICON                      "notifications.tray-icon"
 #define OPV_NOTIFICATIONS_TRAYACTION                    "notifications.tray-action"
 #define OPV_NOTIFICATIONS_AUTOACTIVATE                  "notifications.auto-activate"
+#define OPV_NOTIFICATIONS_ENABLEALERTS                  "notifications.enable-alerts"
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
 #define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"

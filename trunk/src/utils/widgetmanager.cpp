@@ -15,6 +15,11 @@
 	#define MESSAGE_SOURCE_PAGER          2
 #endif //Q_WS_X11
 
+namespace WidgetManagerData 
+{
+	static bool isAlertEnabled = true;
+};
+
 class WindowSticker : 
 	public QObject
 {
@@ -180,6 +185,22 @@ void WidgetManager::setWindowSticky( QWidget *AWindow, bool ASticky )
 	Q_UNUSED(AWindow);
 	Q_UNUSED(ASticky);
 #endif
+}
+
+void WidgetManager::alertWidget(QWidget *AWidget)
+{
+	if (AWidget!=NULL && isWidgetAlertEnabled())
+		QApplication::alert(AWidget);
+}
+
+bool WidgetManager::isWidgetAlertEnabled()
+{
+	return WidgetManagerData::isAlertEnabled;
+}
+
+void WidgetManager::setWidgetAlertEnabled(bool AEnabled)
+{
+	WidgetManagerData::isAlertEnabled = AEnabled;
 }
 
 Qt::Alignment WidgetManager::windowAlignment(const QWidget *AWindow)

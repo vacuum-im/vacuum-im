@@ -203,6 +203,13 @@ INotification NormalMessageHandler::notification(INotifications *ANotifications,
 		notify.data.insert(NDR_SOUND_FILE,SDF_NORMAL_MHANDLER_MESSAGE);
 	}
 
+	if (notify.kinds & INotification::PopupWindow)
+	{
+		IMessageWindow *window = FActiveMessages.key(AMessage.data(MDR_MESSAGE_ID).toInt());
+		if (window)
+			WidgetManager::alertWidget(window->instance());
+	}
+
 	return notify;
 }
 

@@ -1,5 +1,7 @@
 #include "chatmessagehandler.h"
 
+#include <QApplication>
+
 #define HISTORY_MESSAGES          10
 #define HISTORY_TIME_PAST         5
 
@@ -234,6 +236,13 @@ INotification ChatMessageHandler::notification(INotifications *ANotifications, c
 		notify.data.insert(NDR_POPUP_TITLE,name);
 		notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 		notify.data.insert(NDR_SOUND_FILE,SDF_CHAT_MHANDLER_MESSAGE);
+	}
+	
+	if (notify.kinds & INotification::PopupWindow)
+	{
+		IChatWindow *window = FActiveMessages.key(AMessage.data(MDR_MESSAGE_ID).toInt());
+		if (window)
+			WidgetManager::alertWidget(window->instance());
 	}
 
 	return notify;
