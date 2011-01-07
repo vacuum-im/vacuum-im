@@ -9,7 +9,7 @@
 TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 {
 	ui.setupUi(this);
-	setAttribute(Qt::WA_DeleteOnClose,true);
+	setAttribute(Qt::WA_DeleteOnClose,false);
 
 	ui.twtTabs->widget(0)->deleteLater();
 	ui.twtTabs->removeTab(0);
@@ -31,13 +31,19 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	menuButton->setMenu(FWindowMenu);
 	ui.twtTabs->setCornerWidget(menuButton);
 
-	initialize();
-	loadWindowStateAndGeometry();
 	createActions();
+	loadWindowStateAndGeometry();
+
+	FOptionsNode = Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId);
+	onOptionsChanged(FOptionsNode.node("tabs-closable"));
+	onOptionsChanged(FOptionsNode.node("tabs-bottom"));
+	onOptionsChanged(FOptionsNode.node("show-indices"));
+	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT));
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
-	connect(ui.twtTabs,SIGNAL(tabCloseRequested(int)),SLOT(onTabCloseRequested(int)));
 	connect(ui.twtTabs,SIGNAL(tabMoved(int,int)),SLOT(onTabMoved(int,int)));
+	connect(ui.twtTabs,SIGNAL(tabCloseRequested(int)),SLOT(onTabCloseRequested(int)));
 }
 
 TabWindow::~TabWindow()
@@ -109,7 +115,7 @@ void TabWindow::detachPage(ITabWindowPage *APage)
 void TabWindow::removePage(ITabWindowPage *APage)
 {
 	int index = ui.twtTabs->indexOf(APage->instance());
-	if (index >=0)
+	if (index >= 0)
 	{
 		ui.twtTabs->removeTab(index);
 		APage->instance()->close();
@@ -118,6 +124,7 @@ void TabWindow::removePage(ITabWindowPage *APage)
 		disconnect(APage->instance(),SIGNAL(windowClose()),this,SLOT(onTabPageClose()));
 		disconnect(APage->instance(),SIGNAL(windowChanged()),this,SLOT(onTabPageChanged()));
 		disconnect(APage->instance(),SIGNAL(windowDestroyed()),this,SLOT(onTabPageDestroyed()));
+		updateTabs(index,ui.twtTabs->count()-1);
 		emit pageRemoved(APage);
 		if (ui.twtTabs->count() == 0)
 			close();
@@ -134,13 +141,6 @@ void TabWindow::clear()
 		else
 			ui.twtTabs->removeTab(0);
 	}
-}
-
-void TabWindow::initialize()
-{
-	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_SHOW_INDICES));
-	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),
-			SLOT(onOptionsChanged(const OptionsNode &)));
 }
 
 void TabWindow::createActions()
@@ -210,6 +210,13 @@ void TabWindow::createActions()
 	FWindowMenu->addAction(FTabsBottom,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FTabsBottom,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
+	FShowIndices = new Action(FWindowMenu);
+	FShowIndices->setText(tr("Show Tabs Indices"));
+	FShowIndices->setCheckable(true);
+	FShowIndices->setShortcutId(SCT_TABWINDOW_TABSINDICES);
+	FWindowMenu->addAction(FShowIndices,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
+	connect(FShowIndices,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
 	FSetAsDefault = new Action(FWindowMenu);
 	FSetAsDefault->setText(tr("Use as Default Tab Window"));
 	FSetAsDefault->setCheckable(true);
@@ -223,13 +230,17 @@ void TabWindow::createActions()
 	FWindowMenu->addAction(FRenameWindow,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FRenameWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
+	FCloseWindow = new Action(FWindowMenu);
+	FCloseWindow->setText(tr("Close Tab Window"));
+	FCloseWindow->setShortcutId(SCT_TABWINDOW_CLOSEWINDOW);
+	FWindowMenu->addAction(FCloseWindow,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
+	connect(FCloseWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
 	FDeleteWindow = new Action(FWindowMenu);
 	FDeleteWindow->setText(tr("Delete Tab Window"));
 	FDeleteWindow->setShortcutId(SCT_TABWINDOW_DELETEWINDOW);
 	FWindowMenu->addAction(FDeleteWindow,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FDeleteWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-
-	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT));
 }
 
 void TabWindow::saveWindowStateAndGeometry()
@@ -241,8 +252,6 @@ void TabWindow::saveWindowStateAndGeometry()
 			Options::setFileValue(saveState(),"messages.tabwindows.window.state",FWindowId.toString());
 			Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
 		}
-		Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabsClosable(),"tabs-closable");
-		Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).setValue(ui.twtTabs->tabPosition()==QTabWidget::South,"tabs-bottom");
 	}
 }
 
@@ -256,8 +265,6 @@ void TabWindow::loadWindowStateAndGeometry()
 				setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
 			restoreState(Options::fileValue("messages.tabwindows.window.state",FWindowId.toString()).toByteArray());
 		}
-		ui.twtTabs->setTabsClosable(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-closable").toBool());
-		ui.twtTabs->setTabPosition(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString()).value("tabs-bottom").toBool() ? QTabWidget::South : QTabWidget::North);
 	}
 }
 
@@ -277,30 +284,31 @@ void TabWindow::updateTab(int AIndex)
 	QWidget *widget = ui.twtTabs->widget(AIndex);
 	if (widget)
 	{
-		ui.twtTabs->setTabIcon(AIndex,widget->windowIcon());
 		QString tabText;
-		if (FShowTabIndices)
-			tabText = tr("%1. %2", "First is tab index, second is tab name")
-					  .arg(QString::number(AIndex+1)).arg(widget->windowIconText());
+		if (FShowIndices->isChecked() && AIndex<10)
+			tabText = tr("%1) %2", "First is tab index, second is tab name").arg(QString::number((AIndex+1) % 10)).arg(widget->windowIconText());
 		else
 			tabText = widget->windowIconText();
 		ui.twtTabs->setTabText(AIndex,tabText);
+		ui.twtTabs->setTabIcon(AIndex,widget->windowIcon());
 	}
 }
 
-void TabWindow::onTabMoved(int from, int to)
+void TabWindow::updateTabs(int AFrom, int ATo)
 {
-	if (!FShowTabIndices)
-		return;
-
-	int first = qMin(from, to);
-	int last = qMax(from, to);
-	for (int tab=first; tab<=last; tab++)
+	for (int tab=AFrom; tab<=ATo; tab++)
 		updateTab(tab);
 }
 
-void TabWindow::onTabChanged(int /*AIndex*/)
+void TabWindow::onTabMoved(int AFrom, int ATo)
 {
+	if (FShowIndices->isChecked())
+		updateTabs(qMin(AFrom,ATo),qMax(AFrom,ATo));
+}
+
+void TabWindow::onTabChanged(int AIndex)
+{
+	Q_UNUSED(AIndex);
 	updateWindow();
 	emit currentPageChanged(currentPage());
 }
@@ -381,11 +389,20 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 		FSetAsDefault->setChecked(FWindowId==ANode.value().toString());
 		FDeleteWindow->setVisible(!FSetAsDefault->isChecked());
 	}
-	else if (ANode.path() == OPV_MESSAGES_TABWINDOWS_SHOW_INDICES)
+	else if (FOptionsNode.childPath(ANode) == "tabs-closable")
 	{
-		FShowTabIndices = ANode.value().toBool();
-		for (int tab=0; tab<ui.twtTabs->count(); tab++)
-			updateTab(tab);
+		FShowCloseButtons->setChecked(ANode.value().toBool());
+		ui.twtTabs->setTabsClosable(ANode.value().toBool());
+	}
+	else if (FOptionsNode.childPath(ANode) == "tabs-bottom")
+	{
+		FTabsBottom->setChecked(ANode.value().toBool());
+		ui.twtTabs->setTabPosition(ANode.value().toBool() ? QTabWidget::South : QTabWidget::North);
+	}
+	else if (FOptionsNode.childPath(ANode) == "show-indices")
+	{
+		FShowIndices->setChecked(ANode.value().toBool());
+		updateTabs(0,ui.twtTabs->count()-1);
 	}
 }
 
@@ -421,11 +438,15 @@ void TabWindow::onActionTriggered(bool)
 	}
 	else if (action == FShowCloseButtons)
 	{
-		ui.twtTabs->setTabsClosable(action->isChecked());
+		FOptionsNode.node("tabs-closable").setValue(action->isChecked());
 	}
 	else if (action == FTabsBottom)
 	{
-		ui.twtTabs->setTabPosition(action->isChecked() ? QTabWidget::South : QTabWidget::North);
+		FOptionsNode.node("tabs-bottom").setValue(action->isChecked());
+	}
+	else if (action == FShowIndices)
+	{
+		FOptionsNode.node("show-indices").setValue(action->isChecked());
 	}
 	else if (action == FSetAsDefault)
 	{
@@ -436,6 +457,10 @@ void TabWindow::onActionTriggered(bool)
 		QString name = QInputDialog::getText(this,tr("Rename Tab Window"),tr("Tab window name:"),QLineEdit::Normal,FMessageWidgets->tabWindowName(FWindowId));
 		if (!name.isEmpty())
 			FMessageWidgets->setTabWindowName(FWindowId,name);
+	}
+	else if (action == FCloseWindow)
+	{
+		close();
 	}
 	else if (action == FDeleteWindow)
 	{

@@ -42,14 +42,14 @@ signals:
 	void windowChanged();
 	void windowDestroyed();
 protected:
-	void initialize();
 	void createActions();
 	void saveWindowStateAndGeometry();
 	void loadWindowStateAndGeometry();
 	void updateWindow();
 	void updateTab(int AIndex);
+	void updateTabs(int AFrom, int ATo);
 protected slots:
-	void onTabMoved(int from, int to);
+	void onTabMoved(int AFrom, int ATo);
 	void onTabChanged(int AIndex);
 	void onTabCloseRequested(int AIndex);
 	void onTabPageShow();
@@ -75,13 +75,16 @@ private:
 	Action *FDetachWindow;
 	Action *FShowCloseButtons;
 	Action *FTabsBottom;
+	Action *FShowIndices;
 	Action *FSetAsDefault;
 	Action *FRenameWindow;
+	Action *FCloseWindow;
 	Action *FDeleteWindow;
 private:
 	bool FShowTabIndices;
 private:
 	QUuid FWindowId;
+	OptionsNode FOptionsNode;
 };
 
 #endif // TABWINDOW_H
