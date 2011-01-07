@@ -132,38 +132,56 @@ QString Emoticons::keyByUrl(const QUrl &AUrl) const
 void Emoticons::createIconsetUrls()
 {
 	FUrlByKey.clear();
-   FKeyByUrl.clear();
+	FKeyByUrl.clear();
 	foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
 	{
 		IconStorage *storage = FStorages.value(substorage);
 		if (storage)
 		{
-         QHash<QString, QString> fileFirstKey;
-         foreach(QString key, storage->fileFirstKeys())
-            fileFirstKey.insert(storage->fileFullName(key), key);
+			QHash<QString, QString> fileFirstKey;
+			foreach(QString key, storage->fileFirstKeys())
+				fileFirstKey.insert(storage->fileFullName(key), key);
 
 			foreach(QString key, storage->fileKeys())
 			{
 				if (!FUrlByKey.contains(key)) 
-            {
-               QString file = storage->fileFullName(key);
-               QUrl url = QUrl::fromLocalFile(file);
-               FUrlByKey.insert(key,url);
-               FKeyByUrl.insert(url.toString(),fileFirstKey.value(file));
-            }
+				{
+					QString file = storage->fileFullName(key);
+					QUrl url = QUrl::fromLocalFile(file);
+					FUrlByKey.insert(key,url);
+					FKeyByUrl.insert(url.toString(),fileFirstKey.value(file));
+				}
 			}
 		}
 	}
+}
+
+bool Emoticons::isWordBoundary(const QString &AText) const
+{
+	return !AText.isEmpty() ? AText.at(0).isSpace() : true;
 }
 
 void Emoticons::replaceTextToImage(QTextDocument *ADocument) const
 {
 	for (QHash<QString, QUrl>::const_iterator it = FUrlByKey.constBegin(); it!= FUrlByKey.constEnd(); it++)
 	{
-		for (QTextCursor cursor = ADocument->find(it.key()); !cursor.isNull();  cursor = ADocument->find(it.key(),cursor))
+		QRegExp smile(QString("(^|\\s)(%1)(\\s|$)").arg(QRegExp::escape(it.key())));
+		for (QTextCursor cursor = ADocument->find(smile); !cursor.isNull();  cursor = ADocument->find(smile,cursor))
 		{
 			ADocument->addResource(QTextDocument::ImageResource,it.value(),QImage(it.value().toLocalFile()));
+
+			bool startSpace = cursor.selectedText().startsWith(" ");
+			bool endSpace = cursor.selectedText().endsWith(" ");
+			if (startSpace)
+			{
+				cursor.insertText(" ");
+			}
 			cursor.insertImage(it.value().toString());
+			if (endSpace)
+			{
+				cursor.insertText(" ");
+				cursor.setPosition(cursor.position()-1);
+			}
 		}
 	}
 }
@@ -178,8 +196,25 @@ void Emoticons::replaceImageToText(QTextDocument *ADocument) const
 			QString key = FKeyByUrl.value(cursor.charFormat().toImageFormat().name());
 			if (!key.isEmpty())
 			{
+				cursor.removeSelectedText();
+				
+				if (cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor,1))
+				{
+					bool space = !isWordBoundary(cursor.selectedText());
+					cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor,1);
+					if (space)
+						cursor.insertText(" ");
+				}
+
 				cursor.insertText(key);
-				cursor.insertText(" ");
+
+				if (cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,1))
+				{
+					bool space = !isWordBoundary(cursor.selectedText());
+					cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor,1);
+					if (space)
+						cursor.insertText(" ");
+				}
 			}
 		}
 	}
@@ -302,10 +337,7 @@ void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconK
 			{
 				QTextEdit *editor = widget->textEdit();
 				editor->document()->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
-				editor->textCursor().beginEditBlock();
 				editor->textCursor().insertImage(url.toString());
-				editor->textCursor().insertText(" ");
-				editor->textCursor().endEditBlock();
 				editor->setFocus();
 			}
 		}
@@ -353,4 +385,5 @@ void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 		createIconsetUrls();
 	}
 }
+
 Q_EXPORT_PLUGIN2(plg_emoticons, Emoticons)

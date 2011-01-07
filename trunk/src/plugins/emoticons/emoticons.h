@@ -54,6 +54,7 @@ public:
 	virtual QString keyByUrl(const QUrl &AUrl) const;
 protected:
 	void createIconsetUrls();
+	bool isWordBoundary(const QString &AText) const;
 	void replaceTextToImage(QTextDocument *ADocument) const;
 	void replaceImageToText(QTextDocument *ADocument) const;
 	SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);
