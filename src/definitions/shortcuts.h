@@ -68,6 +68,21 @@
 //MessageArchive
 #define   SCTG_MESSAGEWINDOWS_HISTORY                              "message-windows.history-window"
 
+//MessageWidgets
+#define SCTG_TABWINDOW                                             "tab-window"
+#define   SCT_TABWINDOW_NEXTTAB                                    "tab-window.next-tab"
+#define   SCT_TABWINDOW_PREVTAB                                    "tab-window.prev-tab"
+#define   SCT_TABWINDOW_CLOSETAB                                   "tab-window.close-tab"
+#define   SCT_TABWINDOW_DETACHTAB                                  "tab-window.detach-tab"
+#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							             "tab-window.show-close-buttons"
+#define   SCT_TABWINDOW_TABSBOTTOM                                 "tab-window.show-tabs-at-bottom"
+#define   SCT_TABWINDOW_TABSINDICES                                "tab-window.show-tabs-indices"
+#define   SCT_TABWINDOW_SETASDEFAULT                               "tab-window.set-as-default"
+#define   SCT_TABWINDOW_RENAMEWINDOW                               "tab-window.rename-window"
+#define   SCT_TABWINDOW_CLOSEWINDOW                                "tab-window.close-window"
+#define   SCT_TABWINDOW_DELETEWINDOW                               "tab-window.delete-window"
+#define   SCT_TABWINDOW_QUICKTAB                                   "tab-window.quick-tabs.tab%1"
+
 //ServiceDiscovery
 #define SCTG_DISCOWINDOW                                           "discovery-window"
 #define   SCT_DISCOWINDOW_BACK                                     "discovery-window.back"
@@ -122,18 +137,5 @@
 #define   SCT_ROSTERVIEW_GATELOGOUT                                "roster-view.gate-logout"
 //Annotations
 #define   SCT_ROSTERVIEW_EDITANNOTATION                            "roster-view.edit-annotation"
-
-//MessageWidgets
-#define SCTG_TABWINDOW                                             "tab-window"
-#define   SCT_TABWINDOW_NEXTTAB                                    "tab-window.next-tab"
-#define   SCT_TABWINDOW_PREVTAB                                    "tab-window.prev-tab"
-#define   SCT_TABWINDOW_CLOSETAB                                   "tab-window.close-tab"
-#define   SCT_TABWINDOW_DETACHTAB                                  "tab-window.detach-tab"
-#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							             "tab-window.show-close-buttons"
-#define   SCT_TABWINDOW_TABSBOTTOM                                 "tab-window.show-tabs-at-bottom"
-#define   SCT_TABWINDOW_SETASDEFAULT                               "tab-window.set-as-default"
-#define   SCT_TABWINDOW_RENAMEWINDOW                               "tab-window.rename-window"
-#define   SCT_TABWINDOW_DELETEWINDOW                               "tab-window.delete-window"
-#define   SCT_TABWINDOW_QUICKTAB                                   "tab-window.quick-tabs.tab%1"
 
 #endif // DEF_SHORTCUTS_H

@@ -55,10 +55,6 @@
         <translation>Показывать информацию о контакте в окне чата</translation>
     </message>
     <message>
-        <source>Show tab indices</source>
-        <translation>Показывать номера вкладок</translation>
-    </message>
-    <message>
         <source>Save status messages to history</source>
         <translation>Сохранять статусные сообщения в истории</translation>
     </message>
@@ -150,6 +146,24 @@
         <source>Ctrl+Up</source>
         <comment>Edit previous message</comment>
         <translation>Ctrl+Up</translation>
+    </message>
+    <message>
+        <source>Ctrl+W</source>
+        <comment>Close tab</comment>
+        <translation>Ctrl+W</translation>
+    </message>
+    <message>
+        <source>Show tabs indices</source>
+        <translation>Показывать номера вкладок</translation>
+    </message>
+    <message>
+        <source>Close tab window</source>
+        <translation>Закрыть окно со вкладками</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close tab window</comment>
+        <translation>Esc</translation>
     </message>
 </context>
 <context>
@@ -314,13 +328,21 @@
         <translation>Вы уверены что хотите удалить это окно со вкладками?</translation>
     </message>
     <message>
-        <source>%1. %2</source>
-        <comment>First is tab index, second is tab name</comment>
-        <translation>%1. %2</translation>
-    </message>
-    <message>
         <source>Show Tabs at Bottom of the Window</source>
         <translation>Показывать вкладки внизу окна</translation>
+    </message>
+    <message>
+        <source>Show Tabs Indices</source>
+        <translation>Показывать номера вкладок</translation>
+    </message>
+    <message>
+        <source>Close Tab Window</source>
+        <translation>Закрыть окно</translation>
+    </message>
+    <message>
+        <source>%1) %2</source>
+        <comment>First is tab index, second is tab name</comment>
+        <translation>%1) %2</translation>
     </message>
 </context>
 <context>
