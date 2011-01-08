@@ -115,7 +115,7 @@ private:
 	QList<IChatWindow *> FWindows;
 	QMultiMap<IChatWindow *,int> FActiveMessages;
 	QMap<IViewWidget *, WindowStatus> FWindowStatus;
-	QMap<IChatWindow *, QTimer *> FWindowTimers;
+	QMap<IChatWindow *, QTimer *> FDestroyTimers;
 };
 
 #endif // CHATMESSAGEHANDLER_H

@@ -233,6 +233,7 @@ private:
 	bool FDestroyOnChatClosed;
 	QList<int> FActiveMessages;
 	QList<IChatWindow *> FChatWindows;
+	QMap<IChatWindow *, QTimer *> FDestroyTimers;
 	QMultiMap<IChatWindow *,int> FActiveChatMessages;
 	QMap<int, IDataDialogWidget *> FDataFormMessages;
 	QHash<IMultiUser *, UserStatus> FUserStatus;

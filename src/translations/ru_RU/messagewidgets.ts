@@ -218,6 +218,18 @@
         <source>Minimum input field lines:</source>
         <translation>Минимальное число строк в поле ввода:</translation>
     </message>
+    <message>
+        <source>Clean chat windows after closing in </source>
+        <translation>Очищать окна чата после закрытия через</translation>
+    </message>
+    <message>
+        <source> minutes</source>
+        <translation> минут</translation>
+    </message>
+    <message>
+        <source>(0 - do not clean)</source>
+        <translation>(0 - не очищать)</translation>
+    </message>
 </context>
 <context>
     <name>ReceiversWidget</name>
