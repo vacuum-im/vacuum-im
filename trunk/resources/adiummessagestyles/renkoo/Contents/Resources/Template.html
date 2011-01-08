@@ -224,17 +224,17 @@
 			var range = document.createRange();
 			range.selectNode(chat);
 			var documentFragment = range.createContextualFragment(html);
-            var myFrag = chat.appendChild(documentFragment);
-            var frag = document.getElementById("insert").parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
-            
-            try {
-                var fader = new Fadomatic(frag, 9, 0, 0, 95);
-            } catch(e) {
-                trace(e);
-            }
-            fader.fadeIn();
-            
-			alignChat(true);
+			var myFrag = chat.appendChild(documentFragment);
+
+			alignChat(shouldScroll);
+
+			var frag = document.getElementById("insert").parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+			try {
+					var fader = new Fadomatic(frag, 9, 0, 0, 95);
+					fader.fadeIn();
+			} catch(e) {
+					trace(e);
+			}
 		}
 		
 		
@@ -254,7 +254,7 @@
 			insert.parentNode.replaceChild(newNode,insert);
 			var els = pointer.getElementsByTagName("div");
 
-			alignChat(true);
+			alignChat(shouldScroll);
 		}
 		
 		
@@ -343,7 +343,7 @@
 		}
 		
 		function windowDidResize() {
-			alignChat(true/*nearBottom()*/); //nearBottom buggy with inavtive tabs
+			alignChat(nearBottom());
 		}
 		
 		window.onresize = windowDidResize;
