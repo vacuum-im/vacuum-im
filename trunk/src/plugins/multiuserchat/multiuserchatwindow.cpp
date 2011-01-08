@@ -1531,15 +1531,15 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 				showStatusMessage(enterMessage);
 			}
 		}
-		else if (Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
+		else
 		{
 			UserStatus &userStatus = FUserStatus[AUser];
-			if (userStatus.lastStatusShow != AStatus+show)
+			if (Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool() && userStatus.lastStatusShow!=AStatus+show)
 			{
-				userStatus.lastStatusShow = AStatus+show;
 				statusMessage = tr("%1 changed status to [%2] %3").arg(AUser->nickName()).arg(show).arg(AStatus);
 				showStatusMessage(statusMessage);
 			}
+			userStatus.lastStatusShow = AStatus+show;
 		}
 		showStatusCodes(AUser->nickName(),FMultiChat->statusCodes());
 		setToolTipForUser(AUser);
@@ -1556,7 +1556,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 					enterMessage = tr("%1 <%2> has left the room").arg(AUser->nickName()).arg(realJid);
 				else
 					enterMessage = tr("%1 has left the room").arg(AUser->nickName());
-				if (AStatus.isEmpty() && Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
+				if (!AStatus.isEmpty() && Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
 					enterMessage += " - " + AStatus.trimmed();
 				showStatusMessage(enterMessage);
 			}

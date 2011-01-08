@@ -459,7 +459,7 @@ void ChatMessageHandler::onMessageReady()
 
 void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
 {
-	if ((AField & (IInfoWidget::ContactStatus|IInfoWidget::ContactName))>0)
+	if (AField==IInfoWidget::ContactStatus || AField==IInfoWidget::ContactName)
 	{
 		IInfoWidget *widget = qobject_cast<IInfoWidget *>(sender());
 		IChatWindow *window = widget!=NULL ? findWindow(widget->streamJid(),widget->contactJid()) : NULL;
@@ -467,17 +467,17 @@ void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const
 		{
 			Jid streamJid = window->streamJid();
 			Jid contactJid = window->contactJid();
-			if (AField == IInfoWidget::ContactStatus && Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool())
+			if (AField == IInfoWidget::ContactStatus)
 			{
 				QString status = AValue.toString();
 				QString show = FStatusChanger ? FStatusChanger->nameByShow(widget->field(IInfoWidget::ContactShow).toInt()) : QString::null;
 				WindowStatus &wstatus = FWindowStatus[window->viewWidget()];
-				if (wstatus.lastStatusShow != status+show)
+				if (Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool() && wstatus.lastStatusShow!=status+show)
 				{
-					wstatus.lastStatusShow = status+show;
 					QString message = tr("%1 changed status to [%2] %3").arg(widget->field(IInfoWidget::ContactName).toString()).arg(show).arg(status);
 					showStyledStatus(window,message);
 				}
+				wstatus.lastStatusShow = status+show;
 			}
 			updateWindow(window);
 		}
