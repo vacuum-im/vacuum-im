@@ -1573,11 +1573,20 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 	IChatWindow *window = findChatWindow(AUser->contactJid());
 	if (window)
 	{
-		if (!enterMessage.isEmpty())
-			showChatStatus(window,enterMessage);
-		if (!statusMessage.isEmpty())
-			showChatStatus(window,statusMessage);
-		updateChatWindow(window);
+		if (FUsers.contains(AUser) || !FDestroyTimers.contains(window))
+		{
+			if (!enterMessage.isEmpty())
+				showChatStatus(window,enterMessage);
+			if (!statusMessage.isEmpty())
+				showChatStatus(window,statusMessage);
+			window->infoWidget()->setField(IInfoWidget::ContactShow,AShow);
+			window->infoWidget()->setField(IInfoWidget::ContactStatus,AStatus);
+			updateChatWindow(window);
+		}
+		else
+		{
+			window->instance()->deleteLater();
+		}
 	}
 }
 
@@ -1787,7 +1796,7 @@ void MultiUserChatWindow::onWindowActivated()
 void MultiUserChatWindow::onChatMessageReady()
 {
 	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
-	if (window && FMultiChat->isOpen())
+	if (window && FMultiChat->isOpen() && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
 	{
 		Message message;
 		message.setType(Message::Chat).setTo(window->contactJid().eFull());
@@ -1809,14 +1818,35 @@ void MultiUserChatWindow::onChatWindowActivated()
 {
 	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
 	if (window)
+	{
 		removeActiveChatMessages(window);
+		if (FDestroyTimers.contains(window))
+			delete FDestroyTimers.take(window);
+	}
 }
 
 void MultiUserChatWindow::onChatWindowClosed()
 {
 	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
-	if (FChatWindows.contains(window) && !FMultiChat->userByNick(window->contactJid().resource()))
+	if (FMultiChat->userByNick(window->contactJid().resource()) != NULL)
+	{
+		int destroyTimeout = Options::node(OPV_MESSAGES_CLEANCHATTIMEOUT).value().toInt();
+		if (destroyTimeout > 0)
+		{
+			if (!FDestroyTimers.contains(window))
+			{
+				QTimer *timer = new QTimer;
+				timer->setSingleShot(true);
+				connect(timer,SIGNAL(timeout()),window->instance(),SLOT(deleteLater()));
+				FDestroyTimers.insert(window,timer);
+			}
+			FDestroyTimers[window]->start(destroyTimeout*60*1000);
+		}
+	}
+	else
+	{
 		window->instance()->deleteLater();
+	}
 }
 
 void MultiUserChatWindow::onChatWindowDestroyed()
@@ -1825,6 +1855,8 @@ void MultiUserChatWindow::onChatWindowDestroyed()
 	if (FChatWindows.contains(window))
 	{
 		removeActiveChatMessages(window);
+		if (FDestroyTimers.contains(window))
+			delete FDestroyTimers.take(window);
 		FChatWindows.removeAt(FChatWindows.indexOf(window));
 		FWindowStatus.remove(window->viewWidget());
 		emit chatWindowDestroyed(window);

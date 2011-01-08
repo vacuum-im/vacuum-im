@@ -5,8 +5,6 @@
 #define HISTORY_MESSAGES          10
 #define HISTORY_TIME_PAST         5
 
-#define DESTROYWINDOW_TIMEOUT     30*60*1000
-
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
@@ -490,8 +488,8 @@ void ChatMessageHandler::onWindowActivated()
 	if (window)
 	{
 		removeActiveMessages(window);
-		if (FWindowTimers.contains(window))
-			delete FWindowTimers.take(window);
+		if (FDestroyTimers.contains(window))
+			delete FDestroyTimers.take(window);
 	}
 }
 
@@ -500,14 +498,18 @@ void ChatMessageHandler::onWindowClosed()
 	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
 	if (window)
 	{
-		if (!FWindowTimers.contains(window))
+		int destroyTimeout = Options::node(OPV_MESSAGES_CLEANCHATTIMEOUT).value().toInt();
+		if (destroyTimeout > 0)
 		{
-			QTimer *timer = new QTimer;
-			timer->setSingleShot(true);
-			connect(timer,SIGNAL(timeout()),window->instance(),SLOT(deleteLater()));
-			FWindowTimers.insert(window,timer);
+			if (!FDestroyTimers.contains(window))
+			{
+				QTimer *timer = new QTimer;
+				timer->setSingleShot(true);
+				connect(timer,SIGNAL(timeout()),window->instance(),SLOT(deleteLater()));
+				FDestroyTimers.insert(window,timer);
+			}
+			FDestroyTimers[window]->start(destroyTimeout*60*1000);
 		}
-		FWindowTimers[window]->start(DESTROYWINDOW_TIMEOUT);
 	}
 }
 
@@ -517,8 +519,8 @@ void ChatMessageHandler::onWindowDestroyed()
 	if (FWindows.contains(window))
 	{
 		removeActiveMessages(window);
-		if (FWindowTimers.contains(window))
-			delete FWindowTimers.take(window);
+		if (FDestroyTimers.contains(window))
+			delete FDestroyTimers.take(window);
 		FWindows.removeAt(FWindows.indexOf(window));
 		FWindowStatus.remove(window->viewWidget());
 	}

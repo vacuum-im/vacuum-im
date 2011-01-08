@@ -81,6 +81,7 @@
 #define OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS           "messages.info-widget-max-status-chars"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
+#define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
 #define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
