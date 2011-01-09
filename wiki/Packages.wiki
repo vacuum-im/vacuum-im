@@ -1,0 +1,40 @@
+#summary Список репозиториев с пакетами vacuum-im.
+
+= ArchLinux =
+
+== vacuum ==
+http://aur.archlinux.org/packages.php?ID=34088
+
+== vacuum-svn ==
+http://aur.archlinux.org/packages.php?ID=32402
+
+= Debian =
+http://www.notesalexp.org/
+
+= Gentoo =
+https://code.google.com/p/rion-overlay/source/browse/net-im/vacuum/
+
+Подключение:
+
+Добавить оверлей *rion* в *layman*, об использовании последнего читать там:
+
+http://www.gentoo.org/proj/en/overlays/userguide.xml
+
+http://en.gentoo-wiki.com/wiki/Layman
+
+_Не обязательно использовать весь оверлей, можно сделать символические ссылки на нужные пакеты в свой._
+
+= Ubuntu =
+== Karmic, Lucid, Maverick ==
+https://launchpad.net/~uni/+archive/ppa
+
+Подключение:
+{{{
+sudo add-apt-repository ppa:uni/ppa
+}}}
+
+== Jaunty ==
+http://www.notesalexp.org/
+
+= Прочие =
+http://jawiki.ru/Vacuum#Linux.2FUnix-like_.D0.9E.D0.A1
