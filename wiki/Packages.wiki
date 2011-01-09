@@ -1,12 +1,12 @@
 #summary Список источников пакетов vacuum-im.
-<wiki:toc max_depth="2" />
+<wiki:toc max_depth="1" />
 
 = Arch Linux =
 
-== vacuum ==
+== vacuum (stable) ==
 http://aur.archlinux.org/packages.php?ID=34088
 
-== vacuum-svn ==
+== vacuum-svn (unstable, vcs) ==
 http://aur.archlinux.org/packages.php?ID=32402
 
 = Debian =
@@ -35,16 +35,12 @@ https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
 https://code.google.com/p/vacuum-im/downloads/list?q=Package:Pardus
 
 = Ubuntu =
-== Karmic, Lucid, Maverick ==
 https://launchpad.net/~uni/+archive/ppa
 
 Подключение:
 {{{
 sudo add-apt-repository ppa:uni/ppa
 }}}
-
-== Jaunty ==
-http://www.notesalexp.org/
 
 = Прочие =
 http://jawiki.ru/Vacuum#Linux.2FUnix-like_.D0.9E.D0.A1
