@@ -1,6 +1,7 @@
 #summary Список репозиториев с пакетами vacuum-im.
+<wiki:toc max_depth="2" />
 
-= ArchLinux =
+= Arch Linux =
 
 == vacuum ==
 http://aur.archlinux.org/packages.php?ID=34088
