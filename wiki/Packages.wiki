@@ -31,6 +31,14 @@ _Не обязательно использовать весь оверлей, �
 = Mandriva =
 https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
 
+= openSUSE =
+
+== vacuum (stable) ==
+https://build.opensuse.org/package/show?package=vacuum-im&project=home%3AEGDFree
+
+== vacuum-git (unstable, vcs) ==
+https://build.opensuse.org/package/show?package=vacuum-im-git&project=home%3AEGDFree
+
 = Pardus =
 https://code.google.com/p/vacuum-im/downloads/list?q=Package:Pardus
 
