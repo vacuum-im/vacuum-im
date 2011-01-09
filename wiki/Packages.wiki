@@ -12,6 +12,9 @@ http://aur.archlinux.org/packages.php?ID=32402
 = Debian =
 http://www.notesalexp.org/
 
+= FreeBSD =
+http://www.freshports.org/net-im/vacuum-im
+
 = Gentoo =
 https://code.google.com/p/rion-overlay/source/browse/net-im/vacuum/
 
