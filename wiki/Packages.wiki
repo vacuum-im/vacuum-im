@@ -1,4 +1,4 @@
-#summary Список репозиториев с пакетами vacuum-im.
+#summary Список источников пакетов vacuum-im.
 <wiki:toc max_depth="2" />
 
 = Arch Linux =
@@ -27,6 +27,12 @@ http://www.gentoo.org/proj/en/overlays/userguide.xml
 http://en.gentoo-wiki.com/wiki/Layman
 
 _Не обязательно использовать весь оверлей, можно сделать символические ссылки на нужные пакеты в свой._
+
+= Mandriva =
+https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
+
+= Pardus =
+https://code.google.com/p/vacuum-im/downloads/list?q=Package:Pardus
 
 = Ubuntu =
 == Karmic, Lucid, Maverick ==
