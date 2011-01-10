@@ -5,6 +5,8 @@
 #define SCTG_GLOBAL                                                "global"
 //MainWindow
 #define   SCT_GLOBAL_SHOWROSTER                                    "global.show-roster"
+//ShortcutManager
+#define   SCT_GLOBAL_HIDEALLWIDGETS                                "global.hide-all-widgets"
 
 //PluginManager
 #define SCTG_APPLICATION                                           "application"
