@@ -25,6 +25,7 @@ QWidget *ShortcutOptionsDelegate::createEditor(QWidget *AParent, const QStyleOpt
 	{
 		QLineEdit *editor = new QLineEdit(AParent);
 		editor->installEventFilter(FFilter);
+		editor->grabKeyboard();
 		return editor;
 	}
 	return NULL;
