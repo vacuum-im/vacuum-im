@@ -132,39 +132,46 @@ bool SASLAuth::start(const QDomElement &AElem)
 {
 	if (AElem.tagName()=="mechanisms")
 	{
-		FChallengeStep = 0;
-		QDomElement mechElem = AElem.firstChildElement("mechanism");
-		while (!mechElem.isNull())
+		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
-			QString mechanism = mechElem.text();
-			if (mechanism == "DIGEST-MD5")
+			FChallengeStep = 0;
+			QDomElement mechElem = AElem.firstChildElement("mechanism");
+			while (!mechElem.isNull())
 			{
-				Stanza auth("auth");
-				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
-				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-				FXmppStream->sendStanza(auth);
-				return true;
+				QString mechanism = mechElem.text();
+				if (mechanism == "DIGEST-MD5")
+				{
+					Stanza auth("auth");
+					auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
+					FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+					FXmppStream->sendStanza(auth);
+					return true;
+				}
+				else if (mechanism == "PLAIN")
+				{
+					QByteArray resp;
+					resp.append('\0').append(FXmppStream->streamJid().prepared().eNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
+					Stanza auth("auth");
+					auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
+					auth.element().appendChild(auth.createTextNode(resp.toBase64()));
+					FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+					FXmppStream->sendStanza(auth);
+					return true;
+				}
+				else if (mechanism == "ANONYMOUS")
+				{
+					Stanza auth("auth");
+					auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
+					FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+					FXmppStream->sendStanza(auth);
+					return true;
+				}
+				mechElem = mechElem.nextSiblingElement("mechanism");
 			}
-			else if (mechanism == "PLAIN")
-			{
-				QByteArray resp;
-				resp.append('\0').append(FXmppStream->streamJid().prepared().eNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
-				Stanza auth("auth");
-				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
-				auth.element().appendChild(auth.createTextNode(resp.toBase64()));
-				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-				FXmppStream->sendStanza(auth);
-				return true;
-			}
-			else if (mechanism == "ANONYMOUS")
-			{
-				Stanza auth("auth");
-				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
-				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-				FXmppStream->sendStanza(auth);
-				return true;
-			}
-			mechElem = mechElem.nextSiblingElement("mechanism");
+		}
+		else
+		{
+			emit error(tr("Secure connection is not established"));
 		}
 	}
 	deleteLater();

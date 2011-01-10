@@ -99,6 +99,7 @@ void Account::onXmppStreamClosed()
 	{
 		FXmppStream->setStreamJid(streamJid());
 		FXmppStream->setPassword(password());
+		FXmppStream->setEncryptionRequired(FOptionsNode.node("require-encryption").value().toBool());
 	}
 }
 
@@ -115,6 +116,10 @@ void Account::onOptionsChanged(const OptionsNode &ANode)
 			else if (FOptionsNode.node("password") == ANode)
 			{
 				FXmppStream->setPassword(Options::decrypt(ANode.value().toByteArray()).toString());
+			}
+			else if (FOptionsNode.node("require-encryption") == ANode)
+			{
+				FXmppStream->setEncryptionRequired(ANode.value().toBool());
 			}
 		}
 		emit optionsChanged(ANode);

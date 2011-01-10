@@ -4,6 +4,7 @@
 //Node = ON_ACCOUNTS"::<AccountId>
 #define OWO_ACCOUNT_OPTIONS                       500
 #define OWO_ACCOUNT_CONNECTION                    600
+#define OWO_ACCOUNT_REQUIRE_ENCRYPTION            700
 #define OWO_ACCOUNT_REGISTER                      800
 #define OWO_ACCOUNT_STATUS                        900
 #define OWO_ACCOUNT_BOOKMARKS                     1000

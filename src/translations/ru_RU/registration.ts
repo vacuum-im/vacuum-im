@@ -73,6 +73,10 @@
         <source>Registration rejected by user</source>
         <translation>Регистрация отменена пользователем</translation>
     </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Защищенное подключение не установлено</translation>
+    </message>
 </context>
 <context>
     <name>Registration</name>

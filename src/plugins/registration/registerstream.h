@@ -6,6 +6,7 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>
+#include <interfaces/iconnectionmanager.h>
 #include <utils/widgetmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>

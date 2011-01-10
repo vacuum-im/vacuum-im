@@ -55,25 +55,32 @@ bool IqAuth::start(const QDomElement &AElem)
 {
 	if (AElem.tagName()=="auth")
 	{
-		Stanza auth("iq");
-		auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("auth");
-		QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
-		query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().prepared().eNode()));
-		QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8();
-		QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
+		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
+		{
+			Stanza auth("iq");
+			auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("auth");
+			QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
+			query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().prepared().eNode()));
+			QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8();
+			QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
 
-		// GOOGLE HACK - sending plain text password
-		QString domain = FXmppStream->streamJid().domain().toLower();
-		if (FXmppStream->connection()->isEncrypted() && (domain=="googlemail.com" || domain=="gmail.com"))
-			query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->password()));
+			// GOOGLE HACK - sending plain text password
+			QString domain = FXmppStream->streamJid().domain().toLower();
+			if (FXmppStream->connection()->isEncrypted() && (domain=="googlemail.com" || domain=="gmail.com"))
+				query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->password()));
+			else
+				query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
+
+			query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
+
+			FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+			FXmppStream->sendStanza(auth);
+			return true;
+		}
 		else
-			query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
-
-		query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
-
-		FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-		FXmppStream->sendStanza(auth);
-		return true;
+		{
+			emit error(tr("Secure connection is not established"));
+		}
 	}
 	deleteLater();
 	return false;

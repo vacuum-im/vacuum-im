@@ -4,6 +4,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
+#include <interfaces/iconnectionmanager.h>
 #include <utils/errorhandler.h>
 #include <utils/stanza.h>
 

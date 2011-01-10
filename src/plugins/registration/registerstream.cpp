@@ -108,12 +108,19 @@ bool RegisterStream::start(const QDomElement &AElem)
 {
 	if (AElem.tagName()=="register" && !FXmppStream->password().isEmpty())
 	{
-		Stanza reg("iq");
-		reg.setType("get").setId("getReg");
-		reg.addElement("query",NS_JABBER_REGISTER);
-		FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
-		FXmppStream->sendStanza(reg);
-		return true;
+		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
+		{
+			Stanza reg("iq");
+			reg.setType("get").setId("getReg");
+			reg.addElement("query",NS_JABBER_REGISTER);
+			FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+			FXmppStream->sendStanza(reg);
+			return true;
+		}
+		else
+		{
+			emit error(tr("Secure connection is not established"));
+		}
 	}
 	deleteLater();
 	return false;
