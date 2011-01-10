@@ -8,6 +8,7 @@
 #define OPV_ACCOUNT_ACTIVE                              "accounts.account.active"
 #define OPV_ACCOUNT_STREAMJID                           "accounts.account.streamJid"
 #define OPV_ACCOUNT_PASSWORD                            "accounts.account.password"
+#define OPV_ACCOUNT_REQUIREENCRYPTION                   "accounts.account.require-encryption"
 // ConnectionManager
 #define OPV_ACCOUNT_CONNECTION_ITEM                     "accounts.account.connection"
 #define OPV_ACCOUNT_CONNECTION_TYPE                     "accounts.account.connection-type"
@@ -26,7 +27,7 @@
 // MessageArchiver
 #define OPV_ACCOUNT_ARCHIVEREPLICATION                  "accounts.account.archive-replication"
 // BookMarks
-#define OPV_ACCOUNT_IGNORE_AUTOJOIN                     "accounts.account.ignore-autojoin"
+#define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
 
 // Console
 #define OPV_CONSOLE_ROOT                                "console"

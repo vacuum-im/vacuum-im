@@ -50,6 +50,8 @@ public:
 	virtual void setPassword(const QString &APassword);
 	virtual QString defaultLang() const;
 	virtual void setDefaultLang(const QString &ADefLang);
+	virtual bool isEncryptionRequired() const;
+	virtual void setEncryptionRequired(bool ARequire);
 	virtual IConnection *connection() const;
 	virtual void setConnection(IConnection *AConnection);
 	virtual bool isKeepAliveTimerActive() const;
@@ -109,6 +111,7 @@ private:
 	QMultiMap<int, IXmppStanzaHadler *> FStanzaHandlers;
 private:
 	bool FOpen;
+	bool FEncrypt;
 	Jid FStreamJid;
 	Jid FOfflineJid;
 	QString FStreamId;

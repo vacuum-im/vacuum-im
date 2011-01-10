@@ -7,6 +7,10 @@
         <source>Wrong SASL authentication response</source>
         <translation>Неверный ответ во время SASL авторизации</translation>
     </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Защищенное подключение не установлено</translation>
+    </message>
 </context>
 <context>
     <name>SASLBind</name>

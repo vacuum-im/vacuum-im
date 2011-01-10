@@ -145,7 +145,7 @@ bool BookMarks::initObjects()
 
 bool BookMarks::initSettings()
 {
-	Options::setDefaultValue(OPV_ACCOUNT_IGNORE_AUTOJOIN, false);
+	Options::setDefaultValue(OPV_ACCOUNT_IGNOREAUTOJOIN, false);
 	return true;
 }
 

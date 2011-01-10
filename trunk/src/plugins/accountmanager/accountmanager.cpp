@@ -60,13 +60,13 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool AccountManager::initSettings()
 {
+	Options::setDefaultValue(OPV_ACCOUNT_REQUIREENCRYPTION, true);
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode miscNode = { ONO_ACCOUNTS, OPN_ACCOUNTS, tr("Accounts"), MNI_ACCOUNT_LIST };
-		FOptionsManager->insertOptionsDialogNode(miscNode);
+		IOptionsDialogNode accountsNode = { ONO_ACCOUNTS, OPN_ACCOUNTS, tr("Accounts"), MNI_ACCOUNT_LIST };
+		FOptionsManager->insertOptionsDialogNode(accountsNode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
-
 	return true;
 }
 
@@ -77,9 +77,15 @@ QMultiMap<int, IOptionsWidget *> AccountManager::optionsWidgets(const QString &A
 	{
 		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 		if (ANodeId == OPN_ACCOUNTS)
+		{
 			widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountsOptions(this,AParent));
+		}
 		else if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
-			widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountOptions(this,nodeTree.at(1),AParent));
+		{
+			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+			widgets.insertMulti(OWO_ACCOUNT_OPTIONS,new AccountOptions(this,nodeTree.at(1),AParent));
+			widgets.insertMulti(OWO_ACCOUNT_REQUIRE_ENCRYPTION,FOptionsManager->optionsNodeWidget(aoptions.node("require-encryption"),tr("Require a secure connection"),AParent));
+		}
 	}
 	return widgets;
 }

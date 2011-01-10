@@ -9,6 +9,7 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 	FXmppStreams = AXmppStreams;
 
 	FOpen = false;
+	FEncrypt = true;
 	FStreamJid = AStreamJid;
 	FConnection = NULL;
 	FStreamState = SS_OFFLINE;
@@ -176,23 +177,37 @@ void XmppStream::setStreamJid(const Jid &AJid)
 
 QString XmppStream::password() const
 {
-	if (FPassword.isEmpty() && FStreamState == SS_FEATURES)
+	if (FPassword.isEmpty() && FStreamState==SS_FEATURES)
 		return FSessionPassword;
 	return FPassword;
 }
 
 void XmppStream::setPassword(const QString &APassword)
 {
-	FPassword = APassword;
+	if (FStreamState == SS_OFFLINE)
+		FPassword = APassword;
 }
+
 QString XmppStream::defaultLang() const
 {
 	return FDefLang;
 }
 
-void XmppStream::setDefaultLang( const QString &ADefLang )
+void XmppStream::setDefaultLang(const QString &ADefLang)
 {
-	FDefLang = ADefLang;
+	if (FStreamState == SS_OFFLINE)
+		FDefLang = ADefLang;
+}
+
+bool XmppStream::isEncryptionRequired() const
+{
+	return FEncrypt;
+}
+
+void XmppStream::setEncryptionRequired(bool ARequire)
+{
+	if (FStreamState == SS_OFFLINE)
+		FEncrypt = ARequire;
 }
 
 IConnection *XmppStream::connection() const
@@ -315,10 +330,17 @@ void XmppStream::processFeatures()
 	}
 	if (!started)
 	{
-		FOpen = true;
-		FStreamState = SS_ONLINE;
-		removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
-		emit opened();
+		if (!isEncryptionRequired() || connection()->isEncrypted())
+		{
+			FOpen = true;
+			FStreamState = SS_ONLINE;
+			removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
+			emit opened();
+		}
+		else
+		{
+			abort(tr("Secure connection is not established"));
+		}
 	}
 }
 

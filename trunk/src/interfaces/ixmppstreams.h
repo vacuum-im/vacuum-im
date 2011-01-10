@@ -65,6 +65,8 @@ public:
 	virtual void setPassword(const QString &APassword) =0;
 	virtual QString defaultLang() const =0;
 	virtual void setDefaultLang(const QString &ADefLang) =0;
+	virtual bool isEncryptionRequired() const =0;
+	virtual void setEncryptionRequired(bool ARequire) =0;
 	virtual IConnection *connection() const =0;
 	virtual void setConnection(IConnection *AConnection) =0;
 	virtual bool isKeepAliveTimerActive() const =0;

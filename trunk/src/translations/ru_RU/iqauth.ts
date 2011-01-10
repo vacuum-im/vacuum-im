@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru_RU" sourcelanguage="en">
 <context>
+    <name>IqAuth</name>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Защищенное подключение не установлено</translation>
+    </message>
+</context>
+<context>
     <name>IqAuthPlugin</name>
     <message>
         <source>Query Authentication</source>
