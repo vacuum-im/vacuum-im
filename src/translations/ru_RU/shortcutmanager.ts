@@ -15,6 +15,10 @@
         <source>Shortcuts</source>
         <translation>Горячие клавиши</translation>
     </message>
+    <message>
+        <source>Hide all windows</source>
+        <translation>Спрятать все окна</translation>
+    </message>
 </context>
 <context>
     <name>ShortcutOptionsWidget</name>

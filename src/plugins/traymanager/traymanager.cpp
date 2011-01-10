@@ -12,7 +12,7 @@ TrayManager::TrayManager()
 	FBlinkTimer.setInterval(500);
 	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimer()));
 	connect(&FTrayIcon,SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-	        SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
+		SLOT(onActivated(QSystemTrayIcon::ActivationReason)));
 	connect(&FTrayIcon,SIGNAL(messageClicked()), SIGNAL(messageClicked()));
 }
 
@@ -48,11 +48,36 @@ bool TrayManager::startPlugin()
 }
 
 //ITrayManager
+QIcon TrayManager::currentIcon() const
+{
+	return FCurIcon;
+}
+
+QString TrayManager::currentToolTip() const
+{
+	return FTrayIcon.toolTip();
+}
+
+int TrayManager::currentNotify() const
+{
+	return FCurNotifyId;
+}
+
+QIcon TrayManager::mainIcon() const
+{
+	return FMainIcon;
+}
+
 void TrayManager::setMainIcon(const QIcon &AIcon)
 {
 	FMainIcon = AIcon;
 	if (FCurNotifyId == 0)
 		setTrayIcon(FMainIcon,FMainToolTip,false);
+}
+
+QString TrayManager::mainToolTip() const
+{
+	return FTrayIcon.toolTip();
 }
 
 void TrayManager::setMainToolTip(const QString &AToolTip)
@@ -62,14 +87,23 @@ void TrayManager::setMainToolTip(const QString &AToolTip)
 		setTrayIcon(FMainIcon,FMainToolTip,false);
 }
 
-void TrayManager::showMessage(const QString &ATitle, const QString &AMessage,
-                              QSystemTrayIcon::MessageIcon AIcon, int ATimeout)
+bool TrayManager::isTrayIconVisible() const
+{
+	return FTrayIcon.isVisible();
+}
+
+void TrayManager::setTrayIconVisible(bool AVisible)
+{
+	FTrayIcon.setVisible(AVisible);
+}
+
+void TrayManager::showMessage(const QString &ATitle, const QString &AMessage, QSystemTrayIcon::MessageIcon AIcon, int ATimeout)
 {
 	FTrayIcon.showMessage(ATitle,AMessage,AIcon,ATimeout);
 	emit messageShown(ATitle,AMessage,AIcon,ATimeout);
 }
 
-void TrayManager::addAction(Action *AAction, int AGroup /*= DEFAULT_ACTION_GROUP*/, bool ASort /*= false*/)
+void TrayManager::addAction(Action *AAction, int AGroup, bool ASort)
 {
 	FContextMenu->addAction(AAction,AGroup,ASort);
 }
