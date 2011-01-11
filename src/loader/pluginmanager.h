@@ -15,6 +15,7 @@
 #include <definitions/resources.h>
 #include <definitions/version.h>
 #include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>

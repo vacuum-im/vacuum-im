@@ -9,7 +9,7 @@
 
 struct Shortcuts::ShortcutsData
 {
-	QHash<QString, QString> groups;
+	QHash<QString, QPair<QString,int> > groups;
 	QHash<QString, Descriptor> shortcuts;
 	QMap<QObject *, QString> objectShortcutsId;
 	QMap<QShortcut *, QString> widgetShortcutsId;
@@ -31,16 +31,21 @@ QList<QString> Shortcuts::groups()
 	return d->groups.keys();
 }
 
-QString Shortcuts::groupDescription( const QString &AId )
+int Shortcuts::groupOrder(const QString &AId)
 {
-	return d->groups.value(AId);
+	return d->groups.value(AId).second;
 }
 
-void Shortcuts::declareGroup(const QString &AId, const QString &ADescription)
+QString Shortcuts::groupDescription(const QString &AId)
+{
+	return d->groups.value(AId).first;
+}
+
+void Shortcuts::declareGroup(const QString &AId, const QString &ADescription, int AOrder)
 {
 	if (!AId.isEmpty() && !ADescription.isEmpty())
 	{
-		d->groups.insert(AId,ADescription);
+		d->groups.insert(AId,qMakePair<QString,int>(ADescription,AOrder));
 		emit instance()->groupDeclared(AId);
 	}
 }

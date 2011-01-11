@@ -11,6 +11,8 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 		return true;
 	else if (!leftHasChild && rightHasChild)
 		return false;
+	else if (leftHasChild && rightHasChild)
+		return ALeft.data(MDR_SORTROLE).toInt() < ARight.data(MDR_SORTROLE).toInt();
 
 	return QSortFilterProxyModel::lessThan(ALeft,ARight);
 }
@@ -116,6 +118,7 @@ QStandardItem *ShortcutOptionsWidget::createTreeRow(const QString &AId, QStandar
 		QString actionText = AGroup ? Shortcuts::groupDescription(AId) : QString::null;
 		itemAction = new QStandardItem(!actionText.isEmpty() ? actionText : actionName);
 		itemAction->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+		itemAction->setData(AGroup ? Shortcuts::groupOrder(AId) : 0, MDR_SORTROLE);
 
 		QStandardItem *itemKey = new QStandardItem;
 		itemKey->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);

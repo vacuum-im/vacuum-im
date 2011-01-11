@@ -19,6 +19,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/serviceicons.h>
 #include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>

@@ -8,6 +8,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
 #include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>

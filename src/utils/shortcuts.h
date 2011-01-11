@@ -33,8 +33,9 @@ public:
 public:
 	static Shortcuts *instance();
 	static QList<QString> groups();
+	static int groupOrder(const QString &AId);
 	static QString groupDescription(const QString &AId);
-	static void declareGroup(const QString &AId, const QString &ADescription);
+	static void declareGroup(const QString &AId, const QString &ADescription, int AOrder);
 	static QList<QString> shortcuts();
 	static Descriptor shortcutDescriptor(const QString &AId);
 	static void declareShortcut(const QString &AId, const QString &ADescription, const QKeySequence &ADefaultKey, Context AContext = WindowShortcut);

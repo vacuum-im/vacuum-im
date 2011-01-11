@@ -17,6 +17,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
