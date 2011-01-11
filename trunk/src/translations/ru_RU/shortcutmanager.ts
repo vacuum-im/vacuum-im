@@ -16,8 +16,8 @@
         <translation>Горячие клавиши</translation>
     </message>
     <message>
-        <source>Hide all windows</source>
-        <translation>Спрятать все окна</translation>
+        <source>Hide all windows, tray icon and notifications</source>
+        <translation>Спрятать все окна, иконку в трее и уведомления</translation>
     </message>
 </context>
 <context>

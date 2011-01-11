@@ -53,7 +53,7 @@ bool ShortcutManager::initConnections(IPluginManager *APluginManager, int &AInit
 
 bool ShortcutManager::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_GLOBAL_HIDEALLWIDGETS,tr("Hide all windows"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
+	Shortcuts::declareShortcut(SCT_GLOBAL_HIDEALLWIDGETS,tr("Hide all windows, tray icon and notifications"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
 	return true;
 }
 
@@ -168,6 +168,9 @@ void ShortcutManager::onOptionsOpened()
 
 void ShortcutManager::onOptionsClosed()
 {
+	if (FAllHidden)
+		showHiddenWidgets();
+
 	OptionsNode options = Options::node(OPV_SHORTCUTS);
 	foreach(QString shortcutId, Shortcuts::shortcuts())
 	{
