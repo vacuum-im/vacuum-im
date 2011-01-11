@@ -228,7 +228,7 @@ bool MultiUserChatPlugin::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->addAction(FChatMenu->menuAction(),AG_TMTM_MULTIUSERCHAT,true);
+		FTrayManager->contextMenu()->addAction(FChatMenu->menuAction(),AG_TMTM_MULTIUSERCHAT,true);
 	}
 
 	if (FNotifications)

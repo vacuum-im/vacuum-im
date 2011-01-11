@@ -189,7 +189,7 @@ bool StatusChanger::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->addAction(FMainMenu->menuAction(),AG_TMTM_STATUSCHANGER,true);
+		FTrayManager->contextMenu()->addAction(FMainMenu->menuAction(),AG_TMTM_STATUSCHANGER,true);
 	}
 
 	if (FNotifications)
@@ -768,7 +768,7 @@ void StatusChanger::updateMainMenu()
 	FMainMenu->menuAction()->setEnabled(!FCurrentStatus.isEmpty());
 
 	if (FTrayManager)
-		FTrayManager->setMainIcon(iconByShow(statusItemShow(statusId)));
+		FTrayManager->setIcon(iconByShow(statusItemShow(statusId)));
 }
 
 void StatusChanger::updateTrayToolTip()
@@ -786,7 +786,7 @@ void StatusChanger::updateTrayToolTip()
 			trayToolTip += tr("%1 - %2").arg(account->name()).arg(statusItemName(it.value()));
 			it++;
 		}
-		FTrayManager->setMainToolTip(trayToolTip);
+		FTrayManager->setToolTip(trayToolTip);
 	}
 }
 

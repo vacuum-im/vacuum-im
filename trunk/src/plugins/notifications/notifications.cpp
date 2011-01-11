@@ -136,9 +136,9 @@ bool Notifications::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->addAction(FActivateAll,AG_TMTM_NOTIFICATIONS,false);
-		FTrayManager->addAction(FRemoveAll,AG_TMTM_NOTIFICATIONS,false);
-		FTrayManager->addAction(FNotifyMenu->menuAction(),AG_TMTM_NOTIFICATIONS,false);
+		FTrayManager->contextMenu()->addAction(FActivateAll,AG_TMTM_NOTIFICATIONS,false);
+		FTrayManager->contextMenu()->addAction(FRemoveAll,AG_TMTM_NOTIFICATIONS,false);
+		FTrayManager->contextMenu()->addAction(FNotifyMenu->menuAction(),AG_TMTM_NOTIFICATIONS,false);
 	}
 
 	if (FMainWindowPlugin)
@@ -243,7 +243,11 @@ int Notifications::appendNotification(const INotification &ANotification)
 		{
 			if (!showNotifyByHandler(INotification::TrayIcon,notifyId,notifyRecord.notification))
 			{
-				notifyRecord.trayId = FTrayManager->appendNotify(icon,toolTip,true);
+				ITrayNotify notify;
+				notify.blink = true;
+				notify.icon = icon;
+				notify.toolTip = toolTip;
+				notifyRecord.trayId = FTrayManager->appendNotify(notify);
 			}
 		}
 

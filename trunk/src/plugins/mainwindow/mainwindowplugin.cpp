@@ -86,7 +86,7 @@ bool MainWindowPlugin::initObjects()
 		action->setText(tr("Show roster"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool)));
-		FTrayManager->addAction(action,AG_TMTM_MAINWINDOW,true);
+		FTrayManager->contextMenu()->addAction(action,AG_TMTM_MAINWINDOW,true);
 	}
 
 	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_HIDEROSTER,FMainWindow);
@@ -191,7 +191,7 @@ void MainWindowPlugin::onProfileRenamed(const QString &AProfile, const QString &
 
 void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
-	if (ANotifyId==0 && AReason==QSystemTrayIcon::Trigger)
+	if (ANotifyId<=0 && AReason==QSystemTrayIcon::Trigger)
 	{
 		if (FMainWindow->isActive() || qAbs(FActivationChanged.msecsTo(QTime::currentTime())) < qApp->doubleClickInterval())
 			FMainWindow->close();
