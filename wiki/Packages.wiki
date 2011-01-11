@@ -33,11 +33,22 @@ https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
 
 = openSUSE =
 
-== vacuum (stable) ==
-https://build.opensuse.org/package/show?package=vacuum-im&project=home%3AEGDFree
+https://build.opensuse.org/project/show?project=home%3AEGDFree
 
-== vacuum-git (unstable, vcs) ==
-https://build.opensuse.org/package/show?package=vacuum-im-git&project=home%3AEGDFree
+Подключение:
+
+Замените версию дистрибутива на нужную (доступны: *openSUSE_11.2*, *openSUSE_11.3*, *openSUSE_Factory*) и выполните:
+{{{
+sudo zypper ar -f http://download.opensuse.org/repositories/home:/EGDFree/openSUSE_11.3/ vacuum-im
+}}}
+== vacuum-im (stable) ==
+{{{
+sudo zypper in vacuum-im = 1.0.2
+}}}
+== vacuum-im (unstable, vcs) ==
+{{{
+sudo zypper in vacuum-im
+}}}
 
 = Pardus =
 https://code.google.com/p/vacuum-im/downloads/list?q=Package:Pardus
