@@ -151,7 +151,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 
 bool ServiceDiscovery::initObjects()
 {
-	Shortcuts::declareGroup(SCTG_DISCOWINDOW,tr("Service discovery window"));
+	Shortcuts::declareGroup(SCTG_DISCOWINDOW,tr("Service discovery window"),SGO_DISCOWINDOW);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_BACK,tr("Move back"),QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_FORWARD,tr("Move forward"),QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_DISCOVER,tr("Discover item"),QKeySequence::UnknownKey);

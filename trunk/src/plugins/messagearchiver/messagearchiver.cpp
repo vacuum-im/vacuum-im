@@ -205,9 +205,9 @@ bool MessageArchiver::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR, tr("Require Off-The-Record session"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR, tr("Terminate Off-The-Record session"), QKeySequence::UnknownKey);
 
-	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_HISTORY, tr("History window"));
+	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_HISTORY, tr("History window"), SGO_MESSAGEWINDOWS_HISTORY);
 
-	Shortcuts::declareGroup(SCTG_HISTORYWINDOW, tr("History window"));
+	Shortcuts::declareGroup(SCTG_HISTORYWINDOW, tr("History window"), SGO_HISTORYWINDOW);
 	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPNONE, tr("Group by nothing"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYDATE, tr("Group by date"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYCONTACT, tr("Group by contact"), QKeySequence::UnknownKey);

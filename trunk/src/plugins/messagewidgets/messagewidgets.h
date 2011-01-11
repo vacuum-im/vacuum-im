@@ -10,6 +10,7 @@
 #include <definitions/viewurlhandlerorders.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>

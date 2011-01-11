@@ -9,6 +9,7 @@
 #define MDR_SHORTCUTID              Qt::UserRole+1
 #define MDR_ACTIVE_KEYSEQUENCE      Qt::UserRole+2
 #define MDR_DEFAULT_KEYSEQUENCE     Qt::UserRole+3
+#define MDR_SORTROLE                Qt::UserRole+4
 
 class ShortcutOptionsDelegate : 
 	public QStyledItemDelegate

@@ -648,9 +648,9 @@ void PluginManager::createMenuActions()
 
 void PluginManager::declareShortcuts()
 {
-	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global"));
+	Shortcuts::declareGroup(SCTG_GLOBAL, tr("Global"), SGO_GLOBAL);
 
-	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application"));
+	Shortcuts::declareGroup(SCTG_APPLICATION, tr("Application"), SGO_APPLICATION);
 	Shortcuts::declareShortcut(SCT_APP_ABOUTQT, tr("Show information about Qt"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
 	Shortcuts::declareShortcut(SCT_APP_ABOUTPROGRAM, tr("Show information about client"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
 	Shortcuts::declareShortcut(SCT_APP_SETUPPLUGINS, tr("Show setup plugins dialog"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);

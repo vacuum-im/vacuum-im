@@ -71,7 +71,7 @@ bool MainWindowPlugin::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_GLOBAL_SHOWROSTER,tr("Show roster"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
 
-	Shortcuts::declareGroup(SCTG_MAINWINDOW, tr("Main window"));
+	Shortcuts::declareGroup(SCTG_MAINWINDOW, tr("Main window"), SGO_MAINWINDOW);
 	Shortcuts::declareShortcut(SCT_MAINWINDOW_HIDEROSTER,tr("Hide roster"),tr("Esc","Hide roster"));
 
 	Action *action = new Action(this);
