@@ -70,6 +70,7 @@ https://launchpad.net/~uni/+archive/ppa
 == Подключение ==
 {{{
 sudo add-apt-repository ppa:uni/ppa
+sudo apt-get update
 }}}
 
 == Установка ==
