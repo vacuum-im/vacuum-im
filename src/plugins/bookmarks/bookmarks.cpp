@@ -130,7 +130,7 @@ bool BookMarks::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->addAction(FBookMarksMenu->menuAction(),AG_TMTM_BOOKMARKS,true);
+		FTrayManager->contextMenu()->addAction(FBookMarksMenu->menuAction(),AG_TMTM_BOOKMARKS,true);
 	}
 	if (FMainWindowPlugin)
 	{

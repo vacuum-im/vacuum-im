@@ -640,7 +640,7 @@ void PluginManager::createMenuActions()
 		}
 
 		if (trayManager)
-			trayManager->addAction(pluginsDialog,AG_TMTM_PLUGINMANAGER,true);
+			trayManager->contextMenu()->addAction(pluginsDialog,AG_TMTM_PLUGINMANAGER,true);
 	}
 	else
 		onShowSetupPluginsDialog(false);

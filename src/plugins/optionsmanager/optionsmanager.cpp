@@ -102,8 +102,8 @@ bool OptionsManager::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->addAction(FChangeProfileAction,AG_TMTM_OPTIONS,true);
-		FTrayManager->addAction(FShowOptionsDialogAction,AG_TMTM_OPTIONS,true);
+		FTrayManager->contextMenu()->addAction(FChangeProfileAction,AG_TMTM_OPTIONS,true);
+		FTrayManager->contextMenu()->addAction(FShowOptionsDialogAction,AG_TMTM_OPTIONS,true);
 	}
 
 	return true;

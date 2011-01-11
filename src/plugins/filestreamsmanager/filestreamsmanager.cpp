@@ -77,7 +77,7 @@ bool FileStreamsManager::initObjects()
 		if (FMainWindowPlugin)
 			FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);
 		if (FTrayManager)
-			FTrayManager->addAction(action, AG_TMTM_FILESTREAMSMANAGER, true);
+			FTrayManager->contextMenu()->addAction(action, AG_TMTM_FILESTREAMSMANAGER, true);
 	}
 	return true;
 }

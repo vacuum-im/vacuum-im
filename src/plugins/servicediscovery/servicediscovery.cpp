@@ -179,7 +179,7 @@ bool ServiceDiscovery::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->addAction(FDiscoMenu->menuAction(),AG_TMTM_DISCOVERY,true);
+		FTrayManager->contextMenu()->addAction(FDiscoMenu->menuAction(),AG_TMTM_DISCOVERY,true);
 	}
 
 	if (FMainWindowPlugin)
