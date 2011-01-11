@@ -84,6 +84,10 @@ bool WindowSticker::eventFilter(QObject *AWatched, QEvent *AEvent)
 	{
 		FCurWindow = NULL;
 	}
+	else if (AEvent->type() == QEvent::WindowStateChange)
+	{
+		FCurWindow = NULL;
+	}
 	else if (AWatched==FCurWindow && AEvent->type()==QEvent::Move)
 	{
 		const int delta = 15;
