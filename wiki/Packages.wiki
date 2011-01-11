@@ -18,7 +18,7 @@ http://www.freshports.org/net-im/vacuum-im
 = Gentoo =
 https://code.google.com/p/rion-overlay/source/browse/net-im/vacuum/
 
-Подключение:
+== Подключение ==
 
 Добавить оверлей *rion* в *layman*, об использовании последнего читать там:
 
@@ -28,6 +28,11 @@ http://en.gentoo-wiki.com/wiki/Layman
 
 _Не обязательно использовать весь оверлей, можно сделать символические ссылки на нужные пакеты в свой._
 
+== Установка ==
+{{{
+emerge -Dva net-im/vacuum
+}}}
+
 = Mandriva =
 https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
 
@@ -35,17 +40,23 @@ https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
 
 https://build.opensuse.org/project/show?project=home%3AEGDFree
 
-Подключение:
+== Подключение ==
 
 Замените версию дистрибутива на нужную (доступны: *openSUSE_11.2*, *openSUSE_11.3*, *openSUSE_Factory*) и выполните:
+
+=== vacuum-im (stable) ===
+Для получения текущей стабильной версии:
 {{{
-sudo zypper ar -f http://download.opensuse.org/repositories/home:/EGDFree/openSUSE_11.3/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im/openSUSE_11.3/ vacuum-im
 }}}
-== vacuum-im (stable) ==
+
+=== vacuum-im (unstable, vcs) ===
+Для получения новейшей версии из git-репозитория разработки:
 {{{
-sudo zypper in vacuum-im = 1.0.2
+sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im:/git/openSUSE_11.3/ vacuum-im
 }}}
-== vacuum-im (unstable, vcs) ==
+
+== Установка ==
 {{{
 sudo zypper in vacuum-im
 }}}
@@ -56,9 +67,14 @@ https://code.google.com/p/vacuum-im/downloads/list?q=Package:Pardus
 = Ubuntu =
 https://launchpad.net/~uni/+archive/ppa
 
-Подключение:
+== Подключение ==
 {{{
 sudo add-apt-repository ppa:uni/ppa
+}}}
+
+== Установка ==
+{{{
+sudo apt-get install vacuum
 }}}
 
 = Прочие =
