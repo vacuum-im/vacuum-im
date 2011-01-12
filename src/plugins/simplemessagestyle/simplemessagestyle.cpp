@@ -2,7 +2,6 @@
 
 #include <QDir>
 #include <QFile>
-#include <QTimer>
 #include <QScrollBar>
 #include <QTextFrame>
 #include <QTextCursor>
@@ -35,6 +34,11 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QObject *APare
 	initStyleSettings();
 	loadTemplates();
 	loadSenderColors();
+
+	FScrollTimer.setSingleShot(true);
+	FScrollTimer.setInterval(100);
+	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
+
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 }
 
@@ -143,7 +147,6 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 		wstatus.lastKind = AOptions.kind;
 		wstatus.lastId = AOptions.senderId;
 		wstatus.lastTime = AOptions.time;
-		wstatus.scrollStarted = AOptions.noScroll;
 
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
@@ -407,16 +410,16 @@ void SimpleMessageStyle::initStyleSettings()
 
 bool SimpleMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
-	if (AEvent->type()==QEvent::Resize)
+	if (AEvent->type() == QEvent::Resize)
 	{
 		StyleViewer *view = qobject_cast<StyleViewer *>(AWatched);
 		if (FWidgetStatus.contains(view))
 		{
-			WidgetStatus &status = FWidgetStatus[view];
-			if (!status.scrollStarted && view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum())
+			WidgetStatus &wstatus = FWidgetStatus[view];
+			if (!wstatus.scrollStarted && view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum())
 			{
-				status.scrollStarted = true;
-				QTimer::singleShot(100,this,SLOT(onScrollAfterResize()));
+				wstatus.scrollStarted = true;
+				FScrollTimer.start();
 			}
 		}
 	}
@@ -433,11 +436,11 @@ void SimpleMessageStyle::onScrollAfterResize()
 {
 	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); it++)
 	{
-		if (it.value().scrollStarted)
+		if (it->scrollStarted)
 		{
 			QScrollBar *scrollBar = ((StyleViewer *)it.key())->verticalScrollBar();
 			scrollBar->setSliderPosition(scrollBar->maximum());
-			it.value().scrollStarted = false;
+			it->scrollStarted = false;
 		}
 	}
 }
@@ -446,6 +449,7 @@ void SimpleMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWid
 {
 	if (AStyle!=this && FWidgetStatus.contains(AWidget))
 	{
+		AWidget->removeEventFilter(this);
 		FWidgetStatus.remove(AWidget);
 		emit widgetRemoved(AWidget);
 	}
