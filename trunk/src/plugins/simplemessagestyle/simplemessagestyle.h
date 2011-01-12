@@ -2,6 +2,7 @@
 #define SIMPLEMESSAGESTYLE_H
 
 #include <QList>
+#include <QTimer>
 #include <definitions/resources.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/filestorage.h>
@@ -97,6 +98,7 @@ protected slots:
 	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
 	void onStyleWidgetDestroyed(QObject *AObject);
 private:
+	QTimer FScrollTimer;
 	bool FCombineConsecutive;
 	bool FAllowCustomBackground;
 private:

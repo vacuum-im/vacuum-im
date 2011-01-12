@@ -2,6 +2,7 @@
 #define ADIUMMESSAGESTYLE_H
 
 #include <QList>
+#include <QTimer>
 #include <QWebView>
 #include <definitions/resources.h>
 #include <interfaces/imessagestyles.h>
@@ -99,6 +100,7 @@ public:
 		int lastKind;
 		QString lastId;
 		QDateTime lastTime;
+		bool scrollStarted;
 	};
 public:
 	AdiumMessageStyle(const QString &AStylePath, QObject *AParent);
@@ -140,10 +142,17 @@ protected:
 	void loadTemplates();
 	void loadSenderColors();
 	void initStyleSettings();
+protected:
+	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onLinkClicked(const QUrl &AUrl);
+	void onScrollAfterResize();
 	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
 	void onStyleWidgetDestroyed(QObject *AObject);
+private:
+	QTimer FScrollTimer;
+	bool FCombineConsecutive;
+	bool FAllowCustomBackground;
 private:
 	QString FTopicHTML;
 	QString FStatusHTML;
@@ -156,9 +165,6 @@ private:
 	QString FOut_NextContentHTML;
 	QString FOut_ContextHTML;
 	QString FOut_NextContextHTML;
-private:
-	bool FCombineConsecutive;
-	bool FAllowCustomBackground;
 private:
 	QString FResourcePath;
 	QList<QString> FVariants;

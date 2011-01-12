@@ -3,61 +3,41 @@
 <head>
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<base href="%@">
-	<script type="text/ecmascript" defer="defer">
+	<script type="text/javascript" defer="defer">
 		// NOTE:
 		// Any percent signs in this file must be escaped!
 		// Use two escape signs (%%) to display it, this is passed through a format call!
+		
+		function appendHTML(html) {
+			var node = document.getElementById("Chat");
+			var range = document.createRange();
+			range.selectNode(node);
+			var documentFragment = range.createContextualFragment(html);
+			node.appendChild(documentFragment);
+		}
 
 		//Appending new content to the message view
 		function appendMessage(html) {
 			var shouldScroll = nearBottom();
-
-			//Remove any existing insertion point
-			var insert = document.getElementById("insert");
-			if(insert) 
-				insert.parentNode.removeChild(insert);
-
-			//Append the new message to the bottom of our chat block
-			var chat = document.getElementById("Chat");
-			var range = document.createRange();
-			range.selectNode(chat);
-			var documentFragment = range.createContextualFragment(html);
-			chat.appendChild(documentFragment);
-
+			appendMessageNoScroll(html);
 			alignChat(shouldScroll);
 		}
-		function appendMessageNoScroll(html) {
-			//Remove any existing insertion point
+		
+		function appendMessageNoScroll(html) {			
+			//Remove the current insertion point
 			var insert = document.getElementById("insert");
 			if(insert) 
 				insert.parentNode.removeChild(insert);
-
-			//Append the new message to the bottom of our chat block
-			var chat = document.getElementById("Chat");
-			var range = document.createRange();
-			range.selectNode(chat);
-			var documentFragment = range.createContextualFragment(html);
-			chat.appendChild(documentFragment);
+			
+			appendHTML(html);
 		}
+		
 		function appendNextMessage(html){
 			var shouldScroll = nearBottom();
-
-			//Locate the insertion point
-			var insert = document.getElementById("insert");
-			if(insert){
-				//make new node
-				var range = document.createRange();
-				range.selectNode(insert.parentNode);
-				var newNode = range.createContextualFragment(html);
-
-				//swap
-				insert.parentNode.replaceChild(newNode,insert);
-
-				alignChat(shouldScroll);
-			} else {
-				appendMessage(html);
-			}
+			appendNextMessageNoScroll(html);
+			alignChat(shouldScroll);
 		}
+		
 		function appendNextMessageNoScroll(html){
 			//Locate the insertion point
 			var insert = document.getElementById("insert");
@@ -73,6 +53,7 @@
 				appendMessageNoScroll(html);
 			}
 		}
+
 		function replaceLastMessage(html){
 			shouldScroll = nearBottom();
 
@@ -81,20 +62,17 @@
 			var insert = document.getElementById("insert");
 			if(insert){
 				var parentNode = insert.parentNode;
-				var lastMessage = insert.previousSibling;
 				parentNode.removeChild(insert);
-				parentNode.removeChild(lastMessage);
+				var lastMessage = document.getElementById("Chat").lastChild;
+				document.getElementById("Chat").removeChild(lastMessage);
 			}
 
 			//Now append the message itself
-			var range = document.createRange();
-			var chat = document.getElementById("Chat");
-			range.selectNode(chat);
-			documentFragment = range.createContextualFragment(html);
-			chat.appendChild(documentFragment);
+			appendHTML(html);
 
 			alignChat(shouldScroll);
 		}
+
 		//Auto-scroll to bottom.  Use nearBottom to determine if a scrollToBottom is desired.
 		function nearBottom() {
 			return ( document.body.scrollTop >= ( document.body.offsetHeight - ( window.innerHeight * 1.2 ) ) );
@@ -117,36 +95,58 @@
 			head.appendChild( documentFragment );
 		}
 
-		//Swap an image with its alt-tag text on click, or expand/unexpand an attached image
-		document.onclick = imageCheck;
-		function imageCheck() {
-			var shouldScroll = nearBottom();
+		/* Converts emoticon images to textual emoticons; all emoticons in message if alt is held */
+		document.onclick = function imageCheck() {
 			var node = event.target;
-			if(node.tagName.toLowerCase() == 'img' && !client.zoomImage(node) && node.alt) {
-				var a = document.createElement('a');
-				a.setAttribute('onclick', 'imageSwap(this)');
-				a.setAttribute('src', node.getAttribute('src'));
-				a.className = node.className;
-				var text = document.createTextNode(node.alt);
-				a.appendChild(text);
-				node.parentNode.replaceChild(a, node);
+			if (node.tagName.toLowerCase() != 'img')
+				return;
+				
+			imageSwap(node, false);
+		}
+		
+		/* Converts textual emoticons to images if textToImagesFlag is true, otherwise vice versa */
+		function imageSwap(node, textToImagesFlag) {
+			var shouldScroll = nearBottom();
+			
+			var images = [node];
+			if (event.altKey) {
+				while (node.id != "Chat" && node.parentNode.id != "Chat")
+					node = node.parentNode;
+				images = node.querySelectorAll(textToImagesFlag ? "a" : "img");
 			}
+			
+			for (var i = 0; i < images.length; i++) {
+				textToImagesFlag ? textToImage(images[i]) : imageToText(images[i]);
+			}
+			
 			alignChat(shouldScroll);
 		}
 
-		function imageSwap(node) {
-			var shouldScroll = nearBottom();
-
+		function textToImage(node) {
+			if (!node.getAttribute("isEmoticon"))
+				return;
 			//Swap the image/text
 			var img = document.createElement('img');
 			img.setAttribute('src', node.getAttribute('src'));
 			img.setAttribute('alt', node.firstChild.nodeValue);
 			img.className = node.className;
 			node.parentNode.replaceChild(img, node);
-
-			alignChat(shouldScroll);
 		}
-
+		
+		function imageToText(node)
+		{
+			if (client.zoomImage(node) || !node.alt)
+				return;
+			var a = document.createElement('a');
+			a.setAttribute('onclick', 'imageSwap(this, true)');
+			a.setAttribute('src', node.getAttribute('src'));
+			a.setAttribute('isEmoticon', true);
+			a.className = node.className;
+			var text = document.createTextNode(node.alt);
+			a.appendChild(text);
+			node.parentNode.replaceChild(a, node);
+		}
+		
 		//Align our chat to the bottom of the window.  If true is passed, view will also be scrolled down
 		function alignChat(shouldScroll) {
 			var windowHeight = window.innerHeight;
@@ -165,11 +165,9 @@
 			if (shouldScroll) scrollToBottom();
 		}
 
-		function windowDidResize(){
-			alignChat(true/*nearBottom()*/); //nearBottom buggy with inactive tabs
-		}
-
-		window.onresize = windowDidResize;
+		//window.onresize = function windowDidResize(){
+		//	alignChat(true/*nearBottom()*/); //nearBottom buggy with inactive tabs
+		//}
 	</script>
 
 	<style type="text/css">

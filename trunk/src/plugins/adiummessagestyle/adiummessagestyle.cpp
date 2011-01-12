@@ -21,11 +21,11 @@
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
 
 #define APPEND_MESSAGE_WITH_SCROLL          "checkIfScrollToBottomIsNeeded(); appendMessage(\"%1\"); scrollToBottomIfNeeded();"
-#define APPEND_NEXT_MESSAGE_WITH_SCROLL	    "checkIfScrollToBottomIsNeeded(); appendNextMessage(\"%1\"); scrollToBottomIfNeeded();"
+#define APPEND_NEXT_MESSAGE_WITH_SCROLL     "checkIfScrollToBottomIsNeeded(); appendNextMessage(\"%1\"); scrollToBottomIfNeeded();"
 #define APPEND_MESSAGE                      "appendMessage(\"%1\");"
 #define APPEND_NEXT_MESSAGE                 "appendNextMessage(\"%1\");"
 #define APPEND_MESSAGE_NO_SCROLL            "appendMessageNoScroll(\"%1\");"
-#define	APPEND_NEXT_MESSAGE_NO_SCROLL       "appendNextMessageNoScroll(\"%1\");"
+#define APPEND_NEXT_MESSAGE_NO_SCROLL       "appendNextMessageNoScroll(\"%1\");"
 #define REPLACE_LAST_MESSAGE                "replaceLastMessage(\"%1\");"
 
 #define TOPIC_MAIN_DIV	                    "<div id=\"topic\"></div>"
@@ -53,6 +53,11 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QObject *AParent
 	initStyleSettings();
 	loadTemplates();
 	loadSenderColors();
+
+	FScrollTimer.setSingleShot(true);
+	FScrollTimer.setInterval(100);
+	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
+
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 }
 
@@ -109,6 +114,8 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 		if (!FWidgetStatus.contains(AWidget))
 		{
 			FWidgetStatus[view].lastKind = -1;
+			FWidgetStatus[view].scrollStarted = false;
+			view->installEventFilter(this);
 			connect(view,SIGNAL(linkClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
 			connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
 			emit widgetAdded(AWidget);
@@ -309,7 +316,7 @@ void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOpt
 	AHtml.replace("%incomingColor%",AOptions.extended.value(MSO_CONTACT_COLOR).toString());
 	AHtml.replace("%serviceIconPath%", AOptions.extended.value(MSO_SERVICE_ICON_PATH).toString());
 	AHtml.replace("%serviceIconImg%", QString("<img class=\"serviceIcon\" src=\"%1\">")
-	              .arg(AOptions.extended.value(MSO_SERVICE_ICON_PATH,"outgoing_icon.png").toString()));
+		.arg(AOptions.extended.value(MSO_SERVICE_ICON_PATH,"outgoing_icon.png").toString()));
 
 	QString background;
 	if (FAllowCustomBackground)
@@ -494,7 +501,6 @@ void AdiumMessageStyle::escapeStringForScript(QString &AText) const
 QString AdiumMessageStyle::scriptForAppendContent(bool ASameSender, bool ANoScroll) const
 {
 	QString script;
-
 	if (version() >= 4)
 	{
 		if (ANoScroll)
@@ -577,16 +583,49 @@ void AdiumMessageStyle::initStyleSettings()
 	FAllowCustomBackground = !FInfo.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
 }
 
+bool AdiumMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)
+{
+	if (AEvent->type() == QEvent::Resize)
+	{
+		StyleViewer *view = qobject_cast<StyleViewer *>(AWatched);
+		if (FWidgetStatus.contains(view))
+		{
+			WidgetStatus &wstatus = FWidgetStatus[view];
+			QWebFrame *frame = view->page()->mainFrame();
+			if (!wstatus.scrollStarted && frame->scrollBarValue(Qt::Vertical)==frame->scrollBarMaximum(Qt::Vertical))
+			{
+				wstatus.scrollStarted = true;
+				FScrollTimer.start();
+			}
+		}
+	}
+	return QObject::eventFilter(AWatched,AEvent);
+}
+
 void AdiumMessageStyle::onLinkClicked(const QUrl &AUrl)
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(sender());
 	emit urlClicked(view,AUrl);
 }
 
+void AdiumMessageStyle::onScrollAfterResize()
+{
+	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); it++)
+	{
+		if (it->scrollStarted)
+		{
+			QWebFrame *frame = ((StyleViewer *)it.key())->page()->mainFrame();
+			frame->setScrollBarValue(Qt::Vertical,frame->scrollBarMaximum(Qt::Vertical));
+			it->scrollStarted = false;
+		}
+	}
+}
+
 void AdiumMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget)
 {
 	if (AStyle!=this && FWidgetStatus.contains(AWidget))
 	{
+		AWidget->removeEventFilter(this);
 		FWidgetStatus.remove(AWidget);
 		emit widgetRemoved(AWidget);
 	}
