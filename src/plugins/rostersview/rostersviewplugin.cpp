@@ -303,7 +303,7 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 {
 	QAbstractItemModel *curModel = FRostersView->model();
 	int rows = curModel!=NULL ? curModel->rowCount(AParent) : -1;
-	if (rows > 0)
+	if (rows >= 0)
 	{
 		if (AParent.isValid())
 			loadExpandState(AParent);
@@ -412,8 +412,6 @@ void RostersViewPlugin::onViewModelChanged(QAbstractItemModel *AModel)
 
 void RostersViewPlugin::onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
 {
-	if (AStart == 0)
-		loadExpandState(AParent);
 	for (int row=AStart; row<=AEnd; row++)
 		restoreExpandState(AParent.child(row,0));
 }
