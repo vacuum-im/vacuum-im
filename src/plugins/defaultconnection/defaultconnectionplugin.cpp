@@ -121,7 +121,7 @@ void DefaultConnectionPlugin::onConnectionAboutToConnect()
 void DefaultConnectionPlugin::onConnectionSSLErrorsOccured(const QList<QSslError> &AErrors)
 {
 	DefaultConnection *connection = qobject_cast<DefaultConnection*>(sender());
-	if (connection && connection->peerCertificate().isValid())
+	if (connection && !connection->peerCertificate().isNull())
 	{
 		QString domain = connection->option(IDefaultConnection::COR_DOMAINE).toString();
 		QSslCertificate peerCert = connection->peerCertificate();
