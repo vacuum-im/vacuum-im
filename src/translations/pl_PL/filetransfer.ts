@@ -83,6 +83,10 @@
         <source>File &apos;%1&apos; successfully received.</source>
         <translation>Plik &apos;%1&apos; został pobrany.</translation>
     </message>
+    <message>
+        <source>Send file</source>
+        <translation>Wyślij plik</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

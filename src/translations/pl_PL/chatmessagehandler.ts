@@ -20,10 +20,6 @@
         <translation>%1 - rozmowa</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Rozmowa</translation>
-    </message>
-    <message>
         <source>%1 changed status to [%2] %3</source>
         <translation>%1 zmienił(a) status na [%2] %3</translation>
     </message>
@@ -34,6 +30,19 @@
     <message>
         <source>Clear Chat Window</source>
         <translation>Wyczyść okno rozmowy</translation>
+    </message>
+    <message>
+        <source>Clear window</source>
+        <translation>Wyczyść okno</translation>
+    </message>
+    <message>
+        <source>Open chat dialog</source>
+        <translation>Otwórz okno rozmowy</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Open chat dialog</comment>
+        <translation>Return</translation>
     </message>
 </context>
 </TS>

@@ -336,6 +336,91 @@
         <source>Messages Archive Preferences</source>
         <translation>Ustawienia archiwum wiadomości</translation>
     </message>
+    <message>
+        <source>Show history</source>
+        <translation>Pokaż historię</translation>
+    </message>
+    <message>
+        <source>Ctrl+H</source>
+        <comment>Show history</comment>
+        <translation>Ctrl+H</translation>
+    </message>
+    <message>
+        <source>Enable message logging</source>
+        <translation>Włącz zapis historii</translation>
+    </message>
+    <message>
+        <source>Disable message logging</source>
+        <translation>Wyłącz zapis historii</translation>
+    </message>
+    <message>
+        <source>Require Off-The-Record session</source>
+        <translation>Wymagaj sesji trybu poufnego OTR</translation>
+    </message>
+    <message>
+        <source>Terminate Off-The-Record session</source>
+        <translation>Zakończ sesję trybu poufnego OTR</translation>
+    </message>
+    <message>
+        <source>History window</source>
+        <translation>Okno historii</translation>
+    </message>
+    <message>
+        <source>Group by nothing</source>
+        <translation>Bez grupowania</translation>
+    </message>
+    <message>
+        <source>Group by date</source>
+        <translation>Grupuj wg daty</translation>
+    </message>
+    <message>
+        <source>Group by contact</source>
+        <translation>Grupuj wg kontaktu</translation>
+    </message>
+    <message>
+        <source>Group by date and contact</source>
+        <translation>Grupuj wg daty i kontaktu</translation>
+    </message>
+    <message>
+        <source>Group by contact and date</source>
+        <translation>Grupuj wg kontaktu i daty</translation>
+    </message>
+    <message>
+        <source>Expand All</source>
+        <translation>Rozwiń wszystko</translation>
+    </message>
+    <message>
+        <source>Collapse All</source>
+        <translation>Zwiń wszystko</translation>
+    </message>
+    <message>
+        <source>Auto select archive</source>
+        <translation>Automatycznie wybieraj archiwum</translation>
+    </message>
+    <message>
+        <source>Select local archive</source>
+        <translation>Wybierz archiwum lokalne</translation>
+    </message>
+    <message>
+        <source>Select server archive</source>
+        <translation>Wybierz archiwum na serwerze</translation>
+    </message>
+    <message>
+        <source>Filter by contact</source>
+        <translation>Filtruj wg kontaktu</translation>
+    </message>
+    <message>
+        <source>Change conversation subject</source>
+        <translation>Zmien temat rozmowy</translation>
+    </message>
+    <message>
+        <source>Remove conversation</source>
+        <translation>Usuń rozmowę</translation>
+    </message>
+    <message>
+        <source>Reload conversations</source>
+        <translation>Odśwież rozmowę</translation>
+    </message>
 </context>
 <context>
     <name>ViewHistoryWindow</name>

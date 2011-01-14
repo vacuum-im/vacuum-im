@@ -39,8 +39,16 @@
         <translation>Pozwala innym modułom na umieszczanie swoich elementów w głównym oknie</translation>
     </message>
     <message>
+        <source>Main window</source>
+        <translation>Okno główne</translation>
+    </message>
+    <message>
+        <source>Hide roster</source>
+        <translation>Ukryj listę kontaktów</translation>
+    </message>
+    <message>
         <source>Esc</source>
-        <comment>Close Roster</comment>
+        <comment>Hide roster</comment>
         <translation>Esc</translation>
     </message>
 </context>
