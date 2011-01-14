@@ -12,12 +12,8 @@
         <translation>Port:</translation>
     </message>
     <message>
-        <source>Use SSL connection</source>
-        <translation>Używaj połączenia SSL</translation>
-    </message>
-    <message>
-        <source>Ignore SSL errors</source>
-        <translation>Ignoruj błędy SSL</translation>
+        <source>Use legacy SSL connection</source>
+        <translation>Użyj starszego połączenia SSL</translation>
     </message>
 </context>
 <context>
@@ -36,6 +32,74 @@
     <message>
         <source>Default Connection</source>
         <translation>Domyślne połączenie</translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation>Organizacja: %1</translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation>Zakład: %1</translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation>Kraj: %1</translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation>Rejon: %1</translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation>Stan/Prowincja: %1</translation>
+    </message>
+    <message>
+        <source>Common Name: %1</source>
+        <translation>Nazwa Ogólna: %1</translation>
+    </message>
+    <message>
+        <source>Issuer Organization: %1</source>
+        <translation>Organizacja Emitenta: %1</translation>
+    </message>
+    <message>
+        <source>Issuer Unit Name: %1</source>
+        <translation>Zakład Emitenta: %1</translation>
+    </message>
+    <message>
+        <source>Issuer Country: %1</source>
+        <translation>Kraj Emitenta: %1</translation>
+    </message>
+    <message>
+        <source>Issuer Locality: %1</source>
+        <translation>Rejon Emitenta: %1</translation>
+    </message>
+    <message>
+        <source>Issuer State/Province: %1</source>
+        <translation>Stan/Prowincja Emitenta: %1</translation>
+    </message>
+    <message>
+        <source>Issuer Common Name: %1</source>
+        <translation>Ogólna Nazwa Emitenta: %1</translation>
+    </message>
+    <message>
+        <source>SSL Authentication Error</source>
+        <translation>Błąd autoryzacji SSL</translation>
+    </message>
+    <message>
+        <source>Unable to validate the connection to %1 due to errors:</source>
+        <translation>Nie można połączyc się z %1 z powodu błędów:</translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation>Połącz</translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation>Rozłącz</translation>
+    </message>
+    <message>
+        <source>Trust this certificate</source>
+        <translation>Ufaj temu certyfikatowi</translation>
     </message>
 </context>
 </TS>

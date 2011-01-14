@@ -31,6 +31,10 @@
         <source>Connection timed out</source>
         <translation>Upłynął czas połączenia</translation>
     </message>
+    <message>
+        <source>File size unexpectedly changed</source>
+        <translation>Niespodziewana zmiana rozmiaru pliku</translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsManager</name>
@@ -53,6 +57,10 @@
     <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Pozwala na rozpoczęcie przesyłania plików pomiędzy dwoma jednostkami XMPP</translation>
+    </message>
+    <message>
+        <source>Show file transfers</source>
+        <translation>Pokaż transfery plików</translation>
     </message>
 </context>
 <context>
