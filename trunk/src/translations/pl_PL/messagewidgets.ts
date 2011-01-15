@@ -55,12 +55,124 @@
         <translation>Pokaż informacje o kontakcie w oknie rozmów</translation>
     </message>
     <message>
-        <source>Show tab indices</source>
+        <source>Save status messages to history</source>
+        <translation>Zapisuj zmiany statusu w historii</translation>
+    </message>
+    <message>
+        <source>Tab window</source>
+        <translation>Okno z zakładkami</translation>
+    </message>
+    <message>
+        <source>Close tab</source>
+        <translation>Zamknij zakładkę</translation>
+    </message>
+    <message>
+        <source>Ctrl+W</source>
+        <comment>Close tab</comment>
+        <translation>Ctrl+W</translation>
+    </message>
+    <message>
+        <source>Detach tab to separate window</source>
+        <translation>Odłącz zakładke jako samodzielne okno</translation>
+    </message>
+    <message>
+        <source>Next tab</source>
+        <translation>Następna zakładka</translation>
+    </message>
+    <message>
+        <source>Previous tab</source>
+        <translation>Poprzednia zakładka</translation>
+    </message>
+    <message>
+        <source>Set tabs closable</source>
+        <translation>Zakładki z możliwością ich zamknięcia</translation>
+    </message>
+    <message>
+        <source>Show tabs at bottom</source>
+        <translation>Zakładni na dole</translation>
+    </message>
+    <message>
+        <source>Show tabs indices</source>
         <translation>Pokazuj numer zakładki</translation>
     </message>
     <message>
-        <source>Save status messages to history</source>
-        <translation>Zapisuj zmiany statusu w historii</translation>
+        <source>Rename tab window</source>
+        <translation>Zmień nazwę okna z zakładkami</translation>
+    </message>
+    <message>
+        <source>Close tab window</source>
+        <translation>Zamknij okno z zakładkami</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close tab window</comment>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Delete tab window</source>
+        <translation>Usuń okno z zakładkami</translation>
+    </message>
+    <message>
+        <source>Use as default tab window</source>
+        <translation>Używaj jako domyślne okno z zakładkami</translation>
+    </message>
+    <message>
+        <source>Alt+%1</source>
+        <comment>Show tab</comment>
+        <translation>Alt+%1</translation>
+    </message>
+    <message>
+        <source>Message windows</source>
+        <translation>Okna wiadomości</translation>
+    </message>
+    <message>
+        <source>Edit next message</source>
+        <translation>Edytuj następna wiadomość</translation>
+    </message>
+    <message>
+        <source>Ctrl+Down</source>
+        <comment>Edit next message</comment>
+        <translation>Ctrl+&apos;strzałka w dół&apos;</translation>
+    </message>
+    <message>
+        <source>Edit previous message</source>
+        <translation>Edytuj poprzednią wiadomość</translation>
+    </message>
+    <message>
+        <source>Ctrl+Up</source>
+        <comment>Edit previous message</comment>
+        <translation>Ctrl+&apos;strzałka w górę&apos;</translation>
+    </message>
+    <message>
+        <source>Chat window</source>
+        <translation>Okno rozmowy</translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation>Wyślij wiadomość</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send message</comment>
+        <translation>Return</translation>
+    </message>
+    <message>
+        <source>Message window</source>
+        <translation>Okno wiadomości</translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send message</comment>
+        <translation>Ctrl+Return</translation>
+    </message>
+    <message>
+        <source>Close message window</source>
+        <translation>Zamknij okno wiadomości</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close message window</comment>
+        <translation>Esc</translation>
     </message>
 </context>
 <context>
@@ -112,12 +224,20 @@
 <context>
     <name>MessengerOptionsClass</name>
     <message>
-        <source>Send message key sequence:</source>
-        <translation>Kombinacja klawiszy, aby wysłać wiadomość:</translation>
-    </message>
-    <message>
         <source>Minimum input field lines:</source>
         <translation>Minimalna liczba wierszy pola wpisywania wiadomości:</translation>
+    </message>
+    <message>
+        <source>Clean chat windows after closing in </source>
+        <translation>Czyść rozmowy po zamknięciu okna po upłynięciu</translation>
+    </message>
+    <message>
+        <source> minutes</source>
+        <translation> minut</translation>
+    </message>
+    <message>
+        <source>(0 - do not clean)</source>
+        <translation>(0 - nie czyść)</translation>
     </message>
 </context>
 <context>
@@ -181,18 +301,6 @@
 <context>
     <name>TabWindow</name>
     <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Close Tab</source>
         <translation>Zamknij zakładkę</translation>
     </message>
@@ -241,13 +349,21 @@
         <translation>Na pewno chcesz skasować to okno z zakładkam?</translation>
     </message>
     <message>
-        <source>Show Tabs at Bootom of the Window</source>
-        <translation>Pokazuj zakładki na dole</translation>
+        <source>Show Tabs at Bottom of the Window</source>
+        <translation>Pokazuj zakładki na dole okna</translation>
     </message>
     <message>
-        <source>%1. %2</source>
+        <source>Show Tabs Indices</source>
+        <translation>Pokazuj numer zakładki</translation>
+    </message>
+    <message>
+        <source>Close Tab Window</source>
+        <translation>Zamknij okno z zakładkami</translation>
+    </message>
+    <message>
+        <source>%1) %2</source>
         <comment>First is tab index, second is tab name</comment>
-        <translation>%1. %2</translation>
+        <translation>%1) %2</translation>
     </message>
 </context>
 <context>
