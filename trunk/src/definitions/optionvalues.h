@@ -91,6 +91,7 @@
 #define OPV_MESSAGES_TABWINDOW_TABSCLOSABLE             "messages.tab-windows.window.tabs-closable"
 #define OPV_MESSAGES_TABWINDOW_TABSBOTTOM               "messages.tab-windows.window.tabs-bottom"
 #define OPV_MESSAGES_TABWINDOW_SHOWINDICES              "messages.tab-windows.window.show-indices"
+#define OPV_MESSAGES_TABWINDOW_REMOVETABSONCLOSE        "messages.tab-windows.window.remove-tabs-on-close"
 // Emoticons
 #define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
 // ChatStates

@@ -365,6 +365,10 @@
         <comment>First is tab index, second is tab name</comment>
         <translation>%1) %2</translation>
     </message>
+    <message>
+        <source>Remove all tabs on window close</source>
+        <translation>Закрывать все вкладки при закрытии окна</translation>
+    </message>
 </context>
 <context>
     <name>TabWindowClass</name>
