@@ -422,6 +422,8 @@ void MultiUserChatWindow::initialize()
 	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
 		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
 
 void MultiUserChatWindow::connectMultiChat()
@@ -1391,9 +1393,18 @@ bool MultiUserChatWindow::event(QEvent *AEvent)
 
 void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 {
-	if (!FShownDetached)
-		loadWindowGeometry();
-	FShownDetached = isWindow();
+	if (isWindow())
+	{
+		if (!FShownDetached)
+			loadWindowGeometry();
+		FShownDetached = true;
+		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+	}
+	else
+	{
+		FShownDetached = false;
+		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+	}
 	QMainWindow::showEvent(AEvent);
 	if (FUsersListWidth < 0)
 		FUsersListWidth = ui.sprHSplitter->sizes().value(ui.sprHSplitter->indexOf(ui.ltvUsers));
@@ -2079,4 +2090,12 @@ void MultiUserChatWindow::onAccountOptionsChanged(const OptionsNode &ANode)
 	IAccount *account = qobject_cast<IAccount *>(sender());
 	if (account && account->optionsNode().childPath(ANode) == "name")
 		ui.lblAccount->setText(ANode.value().toString());
+}
+
+void MultiUserChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
+	{
+		closeWindow();
+	}
 }

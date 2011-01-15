@@ -85,6 +85,11 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, IPluginManager
 	FGroupKind = GK_CONTACT;
 	FSource = AS_AUTO;
 
+	Action *closeAction = new Action(this);
+	closeAction->setShortcutId(SCT_HISTORYWINDOW_CLOSEWINDOW);
+	connect(closeAction,SIGNAL(triggered()),SLOT(close()));
+	addAction(closeAction);
+
 	QToolBar *groupsToolBar = this->addToolBar("Groups Tools");
 	FCollectionTools = new ToolBarChanger(groupsToolBar);
 	ui.wdtCollectionTools->setLayout(new QVBoxLayout);

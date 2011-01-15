@@ -159,6 +159,7 @@ bool ServiceDiscovery::initObjects()
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWDISCOINFO,tr("Show discovery info"),QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_ADDCONTACT,tr("Add item to roster"),QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWVCARD,tr("Show vCard"),tr("Ctrl+I","Show vCard"));
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_CLOSEWINDOW,tr("Close discovery window"),tr("Esc","Close discovery window"));
 
 	FDiscoMenu = new Menu;
 	FDiscoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);

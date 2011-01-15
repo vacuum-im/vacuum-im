@@ -134,6 +134,7 @@ void ChatWindow::initialize()
 	}
 
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
 
 void ChatWindow::saveWindowGeometry()
@@ -184,9 +185,18 @@ bool ChatWindow::event(QEvent *AEvent)
 
 void ChatWindow::showEvent(QShowEvent *AEvent)
 {
-	if (!FShownDetached && isWindow())
-		loadWindowGeometry();
-	FShownDetached = isWindow();
+	if (isWindow())
+	{
+		if (!FShownDetached)
+			loadWindowGeometry();
+		FShownDetached = true;
+		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+	}
+	else
+	{
+		FShownDetached = false;
+		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+	}
 	QMainWindow::showEvent(AEvent);
 	FEditWidget->textEdit()->setFocus();
 	emit windowActivated();
@@ -235,5 +245,13 @@ void ChatWindow::onOptionsChanged(const OptionsNode &ANode)
 	else if (ANode.path() == OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS)
 	{
 		FInfoWidget->setField(IInfoWidget::ContactStatus,FInfoWidget->field(IInfoWidget::ContactStatus));
+	}
+}
+
+void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
+	{
+		closeWindow();
 	}
 }

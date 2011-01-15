@@ -165,6 +165,15 @@
         <comment>Close tab window</comment>
         <translation>Esc</translation>
     </message>
+    <message>
+        <source>Close message window</source>
+        <translation>Закрыть окно сообщений</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close message window</comment>
+        <translation>Esc</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

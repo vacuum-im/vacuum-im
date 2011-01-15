@@ -27,8 +27,8 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
-#include <utils/widgetmanager.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"
 #include "usercontextmenu.h"
@@ -182,6 +182,7 @@ protected slots:
 	void onUserItemActivated(const QModelIndex &AIndex);
 	void onStatusIconsChanged();
 	void onAccountOptionsChanged(const OptionsNode &ANode);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	Ui::MultiUserChatWindowClass ui;
 private:

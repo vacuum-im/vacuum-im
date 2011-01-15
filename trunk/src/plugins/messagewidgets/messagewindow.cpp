@@ -195,6 +195,8 @@ void MessageWindow::initialize()
 			}
 		}
 	}
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
 
 void MessageWindow::saveWindowGeometry()
@@ -239,9 +241,18 @@ bool MessageWindow::event(QEvent *AEvent)
 
 void MessageWindow::showEvent(QShowEvent *AEvent)
 {
-	if (!FShownDetached && isWindow())
-		loadWindowGeometry();
-	FShownDetached = isWindow();
+	if (isWindow())
+	{
+		if (!FShownDetached)
+			loadWindowGeometry();
+		FShownDetached = true;
+		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+	}
+	else
+	{
+		FShownDetached = false;
+		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
+	}
 	QMainWindow::showEvent(AEvent);
 	if (FMode == WriteMode)
 		FEditWidget->textEdit()->setFocus();
@@ -317,4 +328,12 @@ void MessageWindow::onReceiversChanged(const Jid &AReceiver)
 	foreach(Jid contactJid,FReceiversWidget->receivers())
 		receiversStr += QString("%1; ").arg(FReceiversWidget->receiverName(contactJid));
 	ui.lblReceivers->setText(receiversStr);
+}
+
+void MessageWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
+	{
+		closeWindow();
+	}
 }
