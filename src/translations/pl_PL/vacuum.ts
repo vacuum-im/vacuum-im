@@ -53,6 +53,26 @@
         <source>Plugins directory not found</source>
         <translation>Nie znaleziono folderu wtyczek</translation>
     </message>
+    <message>
+        <source>Global</source>
+        <translation>Globalne</translation>
+    </message>
+    <message>
+        <source>Application</source>
+        <translation>Program</translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation>Pokaż informacje o Qt</translation>
+    </message>
+    <message>
+        <source>Show information about client</source>
+        <translation>Pokaż informacje o kliencie</translation>
+    </message>
+    <message>
+        <source>Show setup plugins dialog</source>
+        <translation>Pokaż okno ustawień wtyczek</translation>
+    </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>

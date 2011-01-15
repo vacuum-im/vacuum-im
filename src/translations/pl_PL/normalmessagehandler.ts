@@ -52,8 +52,13 @@
         <translation>Fw: %1</translation>
     </message>
     <message>
-        <source>Message</source>
-        <translation>Wiadomość</translation>
+        <source>Send message</source>
+        <translation>Wyślij wiadomość</translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send message</comment>
+        <translation>Ctrl+Return</translation>
     </message>
 </context>
 </TS>

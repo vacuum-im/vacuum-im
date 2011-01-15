@@ -1,45 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="pl_PL" sourcelanguage="en">
 <context>
     <name>ShortcutManager</name>
     <message>
         <source>Shortcut Manager</source>
-        <translation type="unfinished"></translation>
+        <translation>Menedżer skrótów klawiaturowych</translation>
     </message>
     <message>
         <source>Allows to setup user defined shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozwala na definiowanie skrótów klawiaturowych przez użytkownika</translation>
     </message>
     <message>
         <source>Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Skróty</translation>
+    </message>
+    <message>
+        <source>Hide all windows, tray icon and notifications</source>
+        <translation>Ukryj wszystkie okna, ikonę powiadomień i alerty</translation>
     </message>
 </context>
 <context>
     <name>ShortcutOptionsWidget</name>
     <message>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Czynność</translation>
     </message>
     <message>
         <source>Shortcut</source>
-        <translation type="unfinished"></translation>
+        <translation>Skrót</translation>
     </message>
 </context>
 <context>
     <name>ShortcutOptionsWidgetClass</name>
     <message>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Domyślne</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyczyść</translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć domyślne</translation>
     </message>
 </context>
 </TS>

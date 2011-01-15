@@ -73,6 +73,10 @@
         <source>Registration rejected by user</source>
         <translation>Rejestracja odrzucona przez użytkownika</translation>
     </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Brak możliwości bezpiecznego połączenia</translation>
+    </message>
 </context>
 <context>
     <name>Registration</name>

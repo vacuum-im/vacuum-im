@@ -66,5 +66,17 @@
         <source>Sort contacts by status</source>
         <translation>Sortuj kontakty według statusu</translation>
     </message>
+    <message>
+        <source>Copy contact JID to clipboard</source>
+        <translation>Kopiuj JID kontaktu do schowka</translation>
+    </message>
+    <message>
+        <source>Copy contact name to clipboard</source>
+        <translation>Kopiuj nazwę kontaktu do schowka</translation>
+    </message>
+    <message>
+        <source>Copy contact status to clipboard</source>
+        <translation>Kopiuj status kontaktu do schowka</translation>
+    </message>
 </context>
 </TS>
