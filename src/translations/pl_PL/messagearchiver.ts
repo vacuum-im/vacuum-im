@@ -421,6 +421,15 @@
         <source>Reload conversations</source>
         <translation>Odśwież rozmowę</translation>
     </message>
+    <message>
+        <source>Close history window</source>
+        <translation>Zamknij okno historii</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close history window</comment>
+        <translation>Esc</translation>
+    </message>
 </context>
 <context>
     <name>ViewHistoryWindow</name>
