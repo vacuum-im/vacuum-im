@@ -267,13 +267,13 @@ void AdiumMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
 	}
 }
 
-QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOptions) const
+QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOptions)
 {
-	bool usingCustomTemplate = true;
+	FUsingCustomTemplate = true;
 	QString htmlFileName = FResourcePath+"/Template.html";
 	if (!QFile::exists(htmlFileName))
 	{
-		usingCustomTemplate = false;
+		FUsingCustomTemplate = false;
 		htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
 	}
 
@@ -293,7 +293,7 @@ QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOption
 		variant = QDir::cleanPath(QString("Variants/%1.css").arg(variant));
 
 		html.replace(html.indexOf("%@"),2,QUrl::fromLocalFile(FResourcePath).toString()+"/");
-		if (!usingCustomTemplate || version()>=3)
+		if (!FUsingCustomTemplate || version()>=3)
 			html.replace(html.indexOf("%@"),2, version()>=3 ? "@import url( \"main.css\" );" : "");
 		html.replace(html.indexOf("%@"),2,variant);
 		html.replace(html.indexOf("%@"),2,headerHTML);
@@ -501,7 +501,7 @@ void AdiumMessageStyle::escapeStringForScript(QString &AText) const
 QString AdiumMessageStyle::scriptForAppendContent(bool ASameSender, bool ANoScroll) const
 {
 	QString script;
-	if (version() >= 4)
+	if (!FUsingCustomTemplate && version() >= 4)
 	{
 		if (ANoScroll)
 			script = (FCombineConsecutive && ASameSender ? APPEND_NEXT_MESSAGE_NO_SCROLL : APPEND_MESSAGE_NO_SCROLL);
@@ -521,7 +521,10 @@ QString AdiumMessageStyle::scriptForAppendContent(bool ASameSender, bool ANoScro
 	}
 	else
 	{
-		script = (ASameSender ? APPEND_NEXT_MESSAGE_WITH_SCROLL : APPEND_MESSAGE_WITH_SCROLL);
+		if (FUsingCustomTemplate)
+			script = (ASameSender ? APPEND_NEXT_MESSAGE_WITH_SCROLL : APPEND_MESSAGE_WITH_SCROLL);
+		else
+			script = (ASameSender ? APPEND_NEXT_MESSAGE : APPEND_MESSAGE);
 	}
 	return script;
 }
