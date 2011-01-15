@@ -41,6 +41,11 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	FCurrentStep = -1;
 	FStreamJid = AStreamJid;
 
+	Action *closeAction = new Action(this);
+	closeAction->setShortcutId(SCT_DISCOWINDOW_CLOSEWINDOW);
+	connect(closeAction,SIGNAL(triggered()),SLOT(close()));
+	addAction(closeAction);
+
 	FToolBarChanger = new ToolBarChanger(ui.tlbToolBar);
 
 	FActionsBarChanger = new ToolBarChanger(new QToolBar(this));

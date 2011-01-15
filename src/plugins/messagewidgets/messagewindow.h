@@ -10,6 +10,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/istatusicons.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include <utils/errorhandler.h>
 #include <utils/widgetmanager.h>
 #include "ui_messagewindow.h"
@@ -85,6 +86,7 @@ protected slots:
 	void onForwardButtonClicked();
 	void onChatButtonClicked();
 	void onReceiversChanged(const Jid &AReceiver);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	Ui::MessageWindowClass ui;
 private:

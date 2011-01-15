@@ -29,13 +29,14 @@
 
 //MainWindow
 #define SCTG_MAINWINDOW                                            "main-window"
-#define   SCT_MAINWINDOW_HIDEROSTER                                "main-window.hide-roster"
+#define   SCT_MAINWINDOW_CLOSEWINDOW                               "main-window.close-window"
 //RostersView
 #define   SCT_MAINWINDOW_TOGGLEOFFLINE                             "main-window.toggle-offline"
 
 //MessageWidgets
 #define SCTG_MESSAGEWINDOWS                                        "message-windows"
 #define   SCT_MESSAGEWINDOWS_QUOTE                                 "message-windows.quote"
+#define   SCT_MESSAGEWINDOWS_CLOSEWINDOW                           "message-windows.close-window"
 #define   SCT_MESSAGEWINDOWS_EDITPREVMESSAGE                       "message-windows.edit-prev-message"
 #define   SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE                       "message-windows.edit-next-message"
 //FileTransfer
@@ -76,7 +77,7 @@
 #define   SCT_TABWINDOW_PREVTAB                                    "tab-window.prev-tab"
 #define   SCT_TABWINDOW_CLOSETAB                                   "tab-window.close-tab"
 #define   SCT_TABWINDOW_DETACHTAB                                  "tab-window.detach-tab"
-#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							             "tab-window.show-close-buttons"
+#define   SCT_TABWINDOW_SHOWCLOSEBUTTTONS							       "tab-window.show-close-buttons"
 #define   SCT_TABWINDOW_TABSBOTTOM                                 "tab-window.show-tabs-at-bottom"
 #define   SCT_TABWINDOW_TABSINDICES                                "tab-window.show-tabs-indices"
 #define   SCT_TABWINDOW_SETASDEFAULT                               "tab-window.set-as-default"
@@ -94,6 +95,7 @@
 #define   SCT_DISCOWINDOW_SHOWDISCOINFO                            "discovery-window.show-disco-info"
 #define   SCT_DISCOWINDOW_ADDCONTACT                               "discovery-window.add-contact"
 #define   SCT_DISCOWINDOW_SHOWVCARD                                "discovery-window.show-vcard"
+#define   SCT_DISCOWINDOW_CLOSEWINDOW                              "discovery-window.close-window"
 
 //MessageArchive
 #define SCTG_HISTORYWINDOW                                         "history-window"
@@ -111,6 +113,7 @@
 #define   SCT_HISTORYWINDOW_RENAMECOLLECTION                       "history-window.rename-collection"
 #define   SCT_HISTORYWINDOW_REMOVECOLLECTION                       "history-window.remove-collection"
 #define   SCT_HISTORYWINDOW_RELOADCOLLECTIONS                      "history-window.reload-collections"
+#define   SCT_HISTORYWINDOW_CLOSEWINDOW                            "history-window.close-window"
 
 //RosterView
 #define SCTG_ROSTERVIEW                                            "roster-view"

@@ -421,6 +421,15 @@
         <source>History window</source>
         <translation>Окно истории</translation>
     </message>
+    <message>
+        <source>Close history window</source>
+        <translation>Закрыть окно истории</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close history window</comment>
+        <translation>Esc</translation>
+    </message>
 </context>
 <context>
     <name>ViewHistoryWindow</name>

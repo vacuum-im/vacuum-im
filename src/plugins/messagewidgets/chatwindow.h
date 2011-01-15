@@ -8,6 +8,7 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istatuschanger.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
 #include "ui_chatwindow.h"
 
@@ -62,6 +63,7 @@ protected slots:
 	void onMessageReady();
 	void onStreamJidChanged(const Jid &ABefore);
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	Ui::ChatWindowClass ui;
 private:

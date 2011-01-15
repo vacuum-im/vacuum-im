@@ -72,7 +72,7 @@ bool MainWindowPlugin::initObjects()
 	Shortcuts::declareShortcut(SCT_GLOBAL_SHOWROSTER,tr("Show roster"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
 
 	Shortcuts::declareGroup(SCTG_MAINWINDOW, tr("Main window"), SGO_MAINWINDOW);
-	Shortcuts::declareShortcut(SCT_MAINWINDOW_HIDEROSTER,tr("Hide roster"),tr("Esc","Hide roster"));
+	Shortcuts::declareShortcut(SCT_MAINWINDOW_CLOSEWINDOW,tr("Hide roster"),tr("Esc","Hide roster"));
 
 	Action *action = new Action(this);
 	action->setText(tr("Quit"));
@@ -89,7 +89,7 @@ bool MainWindowPlugin::initObjects()
 		FTrayManager->contextMenu()->addAction(action,AG_TMTM_MAINWINDOW,true);
 	}
 
-	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_HIDEROSTER,FMainWindow);
+	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_CLOSEWINDOW,FMainWindow);
 
 	return true;
 }
@@ -211,7 +211,7 @@ void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		showMainWindow();
 	}
-	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_HIDEROSTER)
+	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CLOSEWINDOW)
 	{
 		FMainWindow->close();
 	}

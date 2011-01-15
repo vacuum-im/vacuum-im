@@ -68,6 +68,7 @@ bool MessageWidgets::initObjects()
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS, tr("Message windows"), SGO_MESSAGEWINDOWS);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_QUOTE, tr("Quote selected text"), QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW, tr("Close message window"), tr("Esc","Close message window"));
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE, tr("Edit next message"), tr("Ctrl+Down","Edit next message"), Shortcuts::WidgetShortcut);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE, tr("Edit previous message"), tr("Ctrl+Up","Edit previous message"), Shortcuts::WidgetShortcut);
 	

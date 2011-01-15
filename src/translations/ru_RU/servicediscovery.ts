@@ -239,5 +239,14 @@
         <comment>Show vCard</comment>
         <translation>Ctrl+I</translation>
     </message>
+    <message>
+        <source>Close discovery window</source>
+        <translation>Закрыть окно обзора сервисов</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close discovery window</comment>
+        <translation>Esc</translation>
+    </message>
 </context>
 </TS>
