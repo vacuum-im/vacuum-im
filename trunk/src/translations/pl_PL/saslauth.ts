@@ -7,6 +7,10 @@
         <source>Wrong SASL authentication response</source>
         <translation>Zła odpowiedź podczas autoryzacji SASL</translation>
     </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Brak możliwości bezpiecznego połączenia</translation>
+    </message>
 </context>
 <context>
     <name>SASLBind</name>

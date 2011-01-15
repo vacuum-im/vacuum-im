@@ -31,6 +31,14 @@
         <source>Enable/Disable notifications sound</source>
         <translation>Włącz/wyłącz dźwięk powiadomień</translation>
     </message>
+    <message>
+        <source>Activate all notifications</source>
+        <translation>Aktywuj wszystkie powiadomienia</translation>
+    </message>
+    <message>
+        <source>Remove all notifications</source>
+        <translation>Usuń wszystkie powiadomienia</translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
@@ -103,6 +111,10 @@
     <message>
         <source> seconds</source>
         <translation>sekund</translation>
+    </message>
+    <message>
+        <source>Enable alerts in task bar</source>
+        <translation>Umożliwia alerty w pasku zadań</translation>
     </message>
 </context>
 </TS>

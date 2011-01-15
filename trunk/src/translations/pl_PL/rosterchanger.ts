@@ -194,10 +194,6 @@
         <translation>Odmów</translation>
     </message>
     <message>
-        <source>Rename...</source>
-        <translation>Zmien nazwę...</translation>
-    </message>
-    <message>
         <source>Copy to group</source>
         <translation>Kopiuj do grupy</translation>
     </message>
@@ -264,6 +260,50 @@
     <message>
         <source>Auto unsubscribe contacts</source>
         <translation>Automatycznie cofaj autoryzację</translation>
+    </message>
+    <message>
+        <source>Ins</source>
+        <comment>Add contact</comment>
+        <translation>Ins</translation>
+    </message>
+    <message>
+        <source>Rename contact/group</source>
+        <translation>Zmień nazwę kontaktu/grupy</translation>
+    </message>
+    <message>
+        <source>F2</source>
+        <comment>Rename contact/group</comment>
+        <translation>F2</translation>
+    </message>
+    <message>
+        <source>Remove contact/group from group</source>
+        <translation>Usuń kontakt/grupę z grupy</translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from group</comment>
+        <translation>Del</translation>
+    </message>
+    <message>
+        <source>Remove contact/group from roster</source>
+        <translation>Usuń kontakt/grupę z listy kontaktów</translation>
+    </message>
+    <message>
+        <source>Shift+Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation>Shift+Del</translation>
+    </message>
+    <message>
+        <source>Blank Group</source>
+        <translation>Pusta grupa</translation>
+    </message>
+    <message>
+        <source>Add contact...</source>
+        <translation>Dodaj kontakt...</translation>
+    </message>
+    <message>
+        <source>Roster management</source>
+        <translation>Zarządzanie listą kontaktów</translation>
     </message>
 </context>
 <context>

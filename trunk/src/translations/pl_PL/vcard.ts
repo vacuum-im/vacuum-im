@@ -217,20 +217,29 @@
 <context>
     <name>VCardPlugin</name>
     <message>
-        <source>vCard Manager</source>
-        <translation>Menedżer vCard</translation>
-    </message>
-    <message>
         <source>Allows to obtain personal contact information</source>
         <translation>Pozwala na uzyskanie informacji osobistych o kontakcie</translation>
     </message>
     <message>
-        <source>vCard</source>
-        <translation>vCard</translation>
-    </message>
-    <message>
         <source>Supports the requesting of the personal contact information</source>
         <translation>Obsługa informacji osobistych o kontakcie</translation>
+    </message>
+    <message>
+        <source>Visit Card Manager</source>
+        <translation>Menedżer wizytówek vCard</translation>
+    </message>
+    <message>
+        <source>Show vCard</source>
+        <translation>Pokaż wizytówkę</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
+        <source>Visit Card</source>
+        <translation>Wizytówka</translation>
     </message>
 </context>
 </TS>

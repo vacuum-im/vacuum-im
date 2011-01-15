@@ -202,5 +202,51 @@
         <source>Categoty: %1; Type: %2</source>
         <translation>Kategoria: %1; Typ: %2</translation>
     </message>
+    <message>
+        <source>Service discovery window</source>
+        <translation>Okno właściwości serwisu</translation>
+    </message>
+    <message>
+        <source>Move back</source>
+        <translation>Do tyłu</translation>
+    </message>
+    <message>
+        <source>Move forward</source>
+        <translation>Do przodu</translation>
+    </message>
+    <message>
+        <source>Discover item</source>
+        <translation>Właściwości elementu</translation>
+    </message>
+    <message>
+        <source>Reload items</source>
+        <translation>Odśwież elementy</translation>
+    </message>
+    <message>
+        <source>Show discovery info</source>
+        <translation>Pokaż odkryte informacje</translation>
+    </message>
+    <message>
+        <source>Add item to roster</source>
+        <translation>Dodaj element do listy kontaktów</translation>
+    </message>
+    <message>
+        <source>Show vCard</source>
+        <translation>Pokaż wizytówkę vCard</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
+        <source>Close discovery window</source>
+        <translation>Zamknij odkryte informacje</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close discovery window</comment>
+        <translation>Esc</translation>
+    </message>
 </context>
 </TS>
