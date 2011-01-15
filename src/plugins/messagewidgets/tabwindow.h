@@ -76,6 +76,7 @@ private:
 	Action *FShowCloseButtons;
 	Action *FTabsBottom;
 	Action *FShowIndices;
+	Action *FRemoveTabsOnClose;
 	Action *FSetAsDefault;
 	Action *FRenameWindow;
 	Action *FCloseWindow;

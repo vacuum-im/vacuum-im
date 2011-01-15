@@ -38,6 +38,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	onOptionsChanged(FOptionsNode.node("tabs-closable"));
 	onOptionsChanged(FOptionsNode.node("tabs-bottom"));
 	onOptionsChanged(FOptionsNode.node("show-indices"));
+	onOptionsChanged(FOptionsNode.node("remove-tabs-on-close"));
 	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
@@ -127,7 +128,7 @@ void TabWindow::removePage(ITabWindowPage *APage)
 		updateTabs(index,ui.twtTabs->count()-1);
 		emit pageRemoved(APage);
 		if (ui.twtTabs->count() == 0)
-			close();
+			deleteLater();
 	}
 }
 
@@ -216,6 +217,12 @@ void TabWindow::createActions()
 	FShowIndices->setShortcutId(SCT_TABWINDOW_TABSINDICES);
 	FWindowMenu->addAction(FShowIndices,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
 	connect(FShowIndices,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
+	FRemoveTabsOnClose = new Action(FWindowMenu);
+	FRemoveTabsOnClose->setText(tr("Remove all tabs on window close"));
+	FRemoveTabsOnClose->setCheckable(true);
+	FWindowMenu->addAction(FRemoveTabsOnClose,AG_MWTW_MWIDGETS_WINDOW_OPTIONS);
+	connect(FRemoveTabsOnClose,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FSetAsDefault = new Action(FWindowMenu);
 	FSetAsDefault->setText(tr("Use as Default Tab Window"));
@@ -404,6 +411,11 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 		FShowIndices->setChecked(ANode.value().toBool());
 		updateTabs(0,ui.twtTabs->count()-1);
 	}
+	else if (FOptionsNode.childPath(ANode) == "remove-tabs-on-close")
+	{
+		FRemoveTabsOnClose->setChecked(ANode.value().toBool());
+		setAttribute(Qt::WA_DeleteOnClose,ANode.value().toBool());
+	}
 }
 
 void TabWindow::onActionTriggered(bool)
@@ -447,6 +459,10 @@ void TabWindow::onActionTriggered(bool)
 	else if (action == FShowIndices)
 	{
 		FOptionsNode.node("show-indices").setValue(action->isChecked());
+	}
+	else if (action == FRemoveTabsOnClose)
+	{
+		FOptionsNode.node("remove-tabs-on-close").setValue(action->isChecked());
 	}
 	else if (action == FSetAsDefault)
 	{

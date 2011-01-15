@@ -21,8 +21,9 @@ void MessageWidgets::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -96,6 +97,7 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSBOTTOM,false);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_SHOWINDICES,false);
+	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_REMOVETABSONCLOSE,false);
 
 	if (FOptionsManager)
 	{
