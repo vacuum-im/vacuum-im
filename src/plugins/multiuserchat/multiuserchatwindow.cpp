@@ -63,7 +63,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 
 	ui.ltvUsers->setModel(FUsersProxy);
 	ui.ltvUsers->viewport()->installEventFilter(this);
-	connect(ui.ltvUsers,SIGNAL(activated(const QModelIndex &)),SLOT(onUserItemActivated(const QModelIndex &)));
+	connect(ui.ltvUsers,SIGNAL(doubleClicked(const QModelIndex &)),SLOT(onUserItemDoubleClicked(const QModelIndex &)));
 
 	ui.sprHSplitter->installEventFilter(this);
 	connect(ui.sprHSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onHorizontalSplitterMoved(int,int)));
@@ -2069,7 +2069,7 @@ void MultiUserChatWindow::onConfigFormDialogAccepted()
 		FMultiChat->sendConfigForm(FDataForms->dataSubmit(dialog->formWidget()->userDataForm()));
 }
 
-void MultiUserChatWindow::onUserItemActivated(const QModelIndex &AIndex)
+void MultiUserChatWindow::onUserItemDoubleClicked(const QModelIndex &AIndex)
 {
 	IMultiUser *user = FUsers.key(FUsersModel->itemFromIndex(FUsersProxy->mapToSource(AIndex)));
 	if (user)
