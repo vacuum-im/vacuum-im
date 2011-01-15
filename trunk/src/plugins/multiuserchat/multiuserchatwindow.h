@@ -47,7 +47,6 @@ struct UserStatus
 	QString lastStatusShow;
 };
 
-
 class MultiUserChatWindow :
 			public QMainWindow,
 			public IMultiUserChatWindow,
@@ -179,7 +178,7 @@ protected slots:
 	void onAffiliationListDialogAccepted();
 	void onConfigFormDialogAccepted();
 protected slots:
-	void onUserItemActivated(const QModelIndex &AIndex);
+	void onUserItemDoubleClicked(const QModelIndex &AIndex);
 	void onStatusIconsChanged();
 	void onAccountOptionsChanged(const OptionsNode &ANode);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
