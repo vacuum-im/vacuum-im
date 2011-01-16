@@ -1,6 +1,7 @@
 #include "emoticons.h"
 
 #include <QSet>
+#include <QChar>
 #include <QTextBlock>
 
 #define DEFAULT_ICONSET                 "kolobok_dark"
@@ -170,16 +171,18 @@ void Emoticons::replaceTextToImage(QTextDocument *ADocument) const
 		{
 			ADocument->addResource(QTextDocument::ImageResource,it.value(),QImage(it.value().toLocalFile()));
 
-			bool startSpace = cursor.selectedText().startsWith(" ");
-			bool endSpace = cursor.selectedText().endsWith(" ");
-			if (startSpace)
-			{
-				cursor.insertText(" ");
-			}
+			QString text = cursor.selectedText();
+			QChar startChar = !text.isEmpty() ? text.at(0) : QChar();
+			QChar endChar = !text.isEmpty() ? text.at(text.length()-1) : QChar();
+
+			if (startChar.isSpace())
+				cursor.insertText(startChar);
+
 			cursor.insertImage(it.value().toString());
-			if (endSpace)
+
+			if (endChar.isSpace())
 			{
-				cursor.insertText(" ");
+				cursor.insertText(endChar);
 				cursor.setPosition(cursor.position()-1);
 			}
 		}
