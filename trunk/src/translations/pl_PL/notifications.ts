@@ -110,11 +110,11 @@
     </message>
     <message>
         <source> seconds</source>
-        <translation>sekund</translation>
+        <translation> sekund</translation>
     </message>
     <message>
         <source>Enable alerts in task bar</source>
-        <translation>Umożliwia alerty w pasku zadań</translation>
+        <translation>Pokazuj alerty w pasku zadań</translation>
     </message>
 </context>
 </TS>

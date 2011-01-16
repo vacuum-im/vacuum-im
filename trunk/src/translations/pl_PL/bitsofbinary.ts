@@ -13,11 +13,11 @@
     </message>
     <message>
         <source>Allows other modules to receive or send a small amount of binary data in XMPP stanza</source>
-        <translation>Pozwala innym modułom wysłać lub odebrać małą ilość danych binarnych w bloku XMPP</translation>
+        <translation>Pozwala innym modułom wysłać lub odebrać pakiety danych binarnych w blokach XMPP</translation>
     </message>
     <message>
         <source>Supports the exchange of a small amount of binary data in XMPP stanza</source>
-        <translation>Obsługa wymiany małej ilości danych binarnych w blokach XMPP</translation>
+        <translation>Obsługa wymiany pakietów danych binarnych w blokach XMPP</translation>
     </message>
 </context>
 </TS>

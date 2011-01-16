@@ -411,7 +411,7 @@
     </message>
     <message>
         <source>Change conversation subject</source>
-        <translation>Zmien temat rozmowy</translation>
+        <translation>Zmień temat rozmowy</translation>
     </message>
     <message>
         <source>Remove conversation</source>
