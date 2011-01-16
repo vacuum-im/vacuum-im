@@ -132,7 +132,7 @@
     <message>
         <source>Ctrl+Down</source>
         <comment>Edit next message</comment>
-        <translation>Ctrl+&apos;strzałka w dół&apos;</translation>
+        <translation>Ctrl+Down</translation>
     </message>
     <message>
         <source>Edit previous message</source>
@@ -141,7 +141,7 @@
     <message>
         <source>Ctrl+Up</source>
         <comment>Edit previous message</comment>
-        <translation>Ctrl+&apos;strzałka w górę&apos;</translation>
+        <translation>Ctrl+Up</translation>
     </message>
     <message>
         <source>Chat window</source>
