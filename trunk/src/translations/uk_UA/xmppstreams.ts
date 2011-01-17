@@ -27,6 +27,10 @@
         <source>Connection closed unexpectedly</source>
         <translation>З’єднання несподівано завершено</translation>
     </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XmppStreams</name>

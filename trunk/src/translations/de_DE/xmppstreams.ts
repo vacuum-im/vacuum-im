@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="de_DE" sourcelanguage="en">
 <context>
     <name>XmppStream</name>
     <message>
@@ -25,6 +25,10 @@
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure connection is not established</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

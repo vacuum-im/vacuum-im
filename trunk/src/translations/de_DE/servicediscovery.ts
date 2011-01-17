@@ -202,5 +202,51 @@
         <source>Categoty: %1; Type: %2</source>
         <translation>Kategorie: %1; Typ: %2</translation>
     </message>
+    <message>
+        <source>Service discovery window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discover item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reload items</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show discovery info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add item to roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show vCard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close discovery window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close discovery window</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

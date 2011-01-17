@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="de_DE" sourcelanguage="en">
 <context>
     <name>AboutBox</name>
     <message>
@@ -51,6 +51,26 @@
     </message>
     <message>
         <source>About the program</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Application</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show information about Qt</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show information about client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show setup plugins dialog</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

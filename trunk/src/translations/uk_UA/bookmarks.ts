@@ -23,6 +23,10 @@
         <source>Disable autojoin to conferences</source>
         <translation>Не входити автоматично до конференцій</translation>
     </message>
+    <message>
+        <source>Edit bookmark</source>
+        <translation type="unfinished">Редагувати закладку</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

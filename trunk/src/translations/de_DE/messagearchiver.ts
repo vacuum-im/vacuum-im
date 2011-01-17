@@ -336,6 +336,100 @@
         <source>Messages Archive Preferences</source>
         <translation>Nachrichten Archivierungs Einstellungen</translation>
     </message>
+    <message>
+        <source>Show history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+H</source>
+        <comment>Show history</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable message logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable message logging</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Require Off-The-Record session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Terminate Off-The-Record session</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group by nothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group by date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group by contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group by date and contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Group by contact and date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand All</source>
+        <translation type="unfinished">Alle ausklappen</translation>
+    </message>
+    <message>
+        <source>Collapse All</source>
+        <translation type="unfinished">Alle einklappen</translation>
+    </message>
+    <message>
+        <source>Auto select archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select local archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select server archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter by contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change conversation subject</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove conversation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reload conversations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close history window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close history window</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ViewHistoryWindow</name>

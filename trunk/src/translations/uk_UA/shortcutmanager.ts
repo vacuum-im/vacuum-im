@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="uk_UA" sourcelanguage="en">
 <context>
     <name>ShortcutManager</name>
     <message>
@@ -13,6 +13,10 @@
     </message>
     <message>
         <source>Shortcuts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide all windows, tray icon and notifications</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

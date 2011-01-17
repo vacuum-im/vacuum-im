@@ -15,5 +15,9 @@
         <source>Invalid response</source>
         <translation>Некоректна відповідь</translation>
     </message>
+    <message>
+        <source>Supports the exchange of a small amount of binary data in XMPP stanza</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

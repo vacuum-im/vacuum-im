@@ -516,6 +516,60 @@ Check values and try again</source>
         <source>Leave all hidden conferences</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Multi-user chat window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change nick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change topic</source>
+        <translation type="unfinished">Ändere Thema</translation>
+    </message>
+    <message>
+        <source>Setup conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave the conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Leave the conference</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show users connections/disconnections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show users status changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save status messages to history</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -884,32 +938,28 @@ Check values and try again</source>
         <translation>Verlasse Raum</translation>
     </message>
     <message>
-        <source>Ctrl+F4</source>
-        <translation>Ctrl+F4</translation>
-    </message>
-    <message>
-        <source>%1 &lt;%2&gt; has joined the room. %3</source>
-        <translation>%1 &lt;%2&gt; hat den Raum betreten. %3</translation>
-    </message>
-    <message>
-        <source>%1 has joined the room. %2</source>
-        <translation>%1 hat den Raum betreten. %2</translation>
-    </message>
-    <message>
-        <source>%1 &lt;%2&gt; has left the room. %3</source>
-        <translation>%1 &lt;%2&gt; hat den Raum verlassen. %3</translation>
-    </message>
-    <message>
-        <source>%1 has left the room. %2</source>
-        <translation>%1 hat den Raum verlassen. %2</translation>
-    </message>
-    <message>
         <source>Mention message in conference: %1</source>
         <translation>Erinnerungsnachricht in Konferenz: %1</translation>
     </message>
     <message>
         <source>Mention in conference</source>
         <translation>Erinnerung in Konferenz</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has joined the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 has joined the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has left the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 has left the room</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

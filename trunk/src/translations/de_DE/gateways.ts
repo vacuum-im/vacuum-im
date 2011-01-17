@@ -54,10 +54,6 @@
         <translation>Ausloggen</translation>
     </message>
     <message>
-        <source>Log In</source>
-        <translation>Einloggen</translation>
-    </message>
-    <message>
         <source>Keep connection</source>
         <translation>Verbindung aufrechterhalten</translation>
     </message>
@@ -80,6 +76,14 @@
     <message>
         <source>Supports the adding of the contact by the username of the legacy system</source>
         <translation>Unterstützt das Hinzufügen von Kontakten via des Benutzernamen des Legacy Systems</translation>
+    </message>
+    <message>
+        <source>Login on transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logout from transport</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -19,6 +19,10 @@
         <source>Modify account</source>
         <translation>Змінити обліковий запис</translation>
     </message>
+    <message>
+        <source>Require a secure connection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AccountOptions</name>

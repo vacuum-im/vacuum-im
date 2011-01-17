@@ -194,10 +194,6 @@
         <translation>Abweisen</translation>
     </message>
     <message>
-        <source>Rename...</source>
-        <translation>Umbenennen...</translation>
-    </message>
-    <message>
         <source>Copy to group</source>
         <translation>Zu Gruppe kopieren</translation>
     </message>
@@ -264,6 +260,50 @@
     <message>
         <source>Auto unsubscribe contacts</source>
         <translation type="unfinished">Automatisches Austragen</translation>
+    </message>
+    <message>
+        <source>Ins</source>
+        <comment>Add contact</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename contact/group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F2</source>
+        <comment>Rename contact/group</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove contact/group from group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
+        <comment>Remove contact/group from group</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove contact/group from roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Shift+Del</source>
+        <comment>Remove contact/group from roster</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Blank Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add contact...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Roster management</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

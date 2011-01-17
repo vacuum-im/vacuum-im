@@ -19,6 +19,10 @@
         <source>Allows to create and manage Jabber accounts</source>
         <translation>ErmÃ¶glicht das Erstellen und verwalten von Jabber Konten</translation>
     </message>
+    <message>
+        <source>Require a secure connection</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>AccountOptions</name>

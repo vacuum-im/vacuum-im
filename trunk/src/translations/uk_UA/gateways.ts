@@ -54,10 +54,6 @@
         <translation>Відключити</translation>
     </message>
     <message>
-        <source>Log In</source>
-        <translation>Підключити</translation>
-    </message>
-    <message>
         <source>Keep connection</source>
         <translation>Підтримувати з’єднаня</translation>
     </message>
@@ -80,6 +76,14 @@
     <message>
         <source>Supports the adding of the contact by the username of the legacy system</source>
         <translation>Підтрімуе додавання контакту по імені користувача шншої системи</translation>
+    </message>
+    <message>
+        <source>Login on transport</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Logout from transport</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

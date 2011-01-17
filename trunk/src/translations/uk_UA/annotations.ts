@@ -19,6 +19,10 @@
         <source>Annotation:</source>
         <translation>Коментар:</translation>
     </message>
+    <message>
+        <source>Edit annotation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditNoteDialog</name>
