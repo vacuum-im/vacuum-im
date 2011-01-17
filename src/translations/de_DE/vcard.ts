@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="de_DE" sourcelanguage="en">
 <context>
     <name>EditItemDialogClass</name>
     <message>
@@ -44,6 +44,18 @@
     </message>
     <message>
         <source>Phone:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Service unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to publish vCard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to update vCard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -205,19 +217,28 @@
 <context>
     <name>VCardPlugin</name>
     <message>
-        <source>vCard Manager</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Allows to obtain personal contact information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>vCard</source>
+        <source>Supports the requesting of the personal contact information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Supports the requesting of the personal contact information</source>
+        <source>Visit Card Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show vCard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visit Card</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

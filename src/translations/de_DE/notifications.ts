@@ -31,6 +31,14 @@
         <source>Enable/Disable notifications sound</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Activate all notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
@@ -94,6 +102,18 @@
     </message>
     <message>
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable alerts in task bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> seconds</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

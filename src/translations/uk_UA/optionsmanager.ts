@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="uk_UA" sourcelanguage="en_GB">
+<TS version="2.0" language="uk_UA" sourcelanguage="en">
 <context>
     <name>EditProfilesDialog</name>
     <message>
@@ -181,6 +181,14 @@
     <message>
         <source>Options</source>
         <translation>Настройки</translation>
+    </message>
+    <message>
+        <source>Show change profile dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show options dialog</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

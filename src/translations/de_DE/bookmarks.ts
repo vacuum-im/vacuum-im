@@ -23,6 +23,10 @@
         <source>Disable autojoin to conferences</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Edit bookmark</source>
+        <translation type="unfinished">Lesezeichen bearbeiten</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

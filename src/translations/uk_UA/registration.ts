@@ -73,6 +73,10 @@
         <source>Registration rejected by user</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Registration</name>

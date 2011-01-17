@@ -27,6 +27,14 @@
         <source>Data transmission terminated by remote user</source>
         <translation>Передача данних перервана віддаленим користувачем</translation>
     </message>
+    <message>
+        <source>File size unexpectedly changed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsManager</name>
@@ -49,6 +57,10 @@
     <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
         <translation>Дозволяе инійіювати потік для передачі файлів між двома XMPP сутностями</translation>
+    </message>
+    <message>
+        <source>Show file transfers</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -75,6 +87,10 @@
     <message>
         <source>Acceptable Data Streams</source>
         <translation>Дозволені потоки данних</translation>
+    </message>
+    <message>
+        <source>Group downloads by sender</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

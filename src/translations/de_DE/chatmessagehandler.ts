@@ -20,10 +20,6 @@
         <translation>%1 - Chat</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Chat</translation>
-    </message>
-    <message>
         <source>%1 changed status to [%2] %3</source>
         <translation>%1 hat den Status auf [%2] %3 geändert</translation>
     </message>
@@ -33,6 +29,19 @@
     </message>
     <message>
         <source>Clear Chat Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open chat dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Open chat dialog</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

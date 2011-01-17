@@ -46,6 +46,18 @@
         <source>Reload</source>
         <translation>Поновити</translation>
     </message>
+    <message>
+        <source>Service unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to publish vCard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to update vCard</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VCardDialogClass</name>
@@ -205,20 +217,29 @@
 <context>
     <name>VCardPlugin</name>
     <message>
-        <source>vCard</source>
-        <translation>vCard</translation>
-    </message>
-    <message>
-        <source>vCard Manager</source>
-        <translation>Менеджер vCard</translation>
-    </message>
-    <message>
         <source>Allows to obtain personal contact information</source>
         <translation>Дозволяе отримувати особисту інформацію про контакт</translation>
     </message>
     <message>
         <source>Supports the requesting of the personal contact information</source>
         <translation>Підтримуе запроси особистої інформації про контакт</translation>
+    </message>
+    <message>
+        <source>Visit Card Manager</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show vCard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visit Card</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

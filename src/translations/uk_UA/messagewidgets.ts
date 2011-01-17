@@ -55,11 +55,123 @@
         <translation>Показувати інформацію про контакт в вікні чату</translation>
     </message>
     <message>
-        <source>Show tab indices</source>
-        <translation>Показувати вкладки з індексами</translation>
+        <source>Save status messages to history</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save status messages to history</source>
+        <source>Tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+W</source>
+        <comment>Close tab</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Detach tab to separate window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set tabs closable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show tabs at bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show tabs indices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close tab window</comment>
+        <translation type="unfinished">Esc</translation>
+    </message>
+    <message>
+        <source>Delete tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use as default tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+%1</source>
+        <comment>Show tab</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close message window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close message window</comment>
+        <translation type="unfinished">Esc</translation>
+    </message>
+    <message>
+        <source>Edit next message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Down</source>
+        <comment>Edit next message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit previous message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Up</source>
+        <comment>Edit previous message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Chat window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <comment>Send message</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -112,12 +224,20 @@
 <context>
     <name>MessengerOptionsClass</name>
     <message>
-        <source>Send message key sequence:</source>
-        <translation>Комбінація клавіш для відправки повідомлення:</translation>
-    </message>
-    <message>
         <source>Minimum input field lines:</source>
         <translation>Мінімалне число строк в полі вводу:</translation>
+    </message>
+    <message>
+        <source>Clean chat windows after closing in </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>(0 - do not clean)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -181,18 +301,6 @@
 <context>
     <name>TabWindow</name>
     <message>
-        <source>Esc</source>
-        <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Ctrl+Tab</source>
-        <translation>Ctrl+Tab</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+Tab</source>
-        <translation>Ctrl+Shift+Tab</translation>
-    </message>
-    <message>
         <source>Close Tab</source>
         <translation>Закрити вкладку</translation>
     </message>
@@ -241,13 +349,25 @@
         <translation>Ви впевнені що хочете видалити це вікно з вкладками?</translation>
     </message>
     <message>
-        <source>Show Tabs at Bootom of the Window</source>
-        <translation>Показувати вкладки внизу вікна</translation>
+        <source>Show Tabs at Bottom of the Window</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1. %2</source>
+        <source>Show Tabs Indices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all tabs on window close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Tab Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1) %2</source>
         <comment>First is tab index, second is tab name</comment>
-        <translation>%1. %2</translation>
+        <translation type="unfinished">%1. %2 {1)?}</translation>
     </message>
 </context>
 <context>

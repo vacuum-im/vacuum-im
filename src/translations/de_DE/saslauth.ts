@@ -7,6 +7,10 @@
         <source>Wrong SASL authentication response</source>
         <translation>Falsche SASL Authentifizierungsantwort</translation>
     </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SASLBind</name>

@@ -12,12 +12,8 @@
         <translation>Port:</translation>
     </message>
     <message>
-        <source>Use SSL connection</source>
-        <translation>Benutze SSL Verbindung</translation>
-    </message>
-    <message>
-        <source>Ignore SSL errors</source>
-        <translation>SSL Fehler ignorieren</translation>
+        <source>Use legacy SSL connection</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -35,6 +31,74 @@
     </message>
     <message>
         <source>Default Connection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common Name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Issuer Organization: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Issuer Unit Name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Issuer Country: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Issuer Locality: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Issuer State/Province: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Issuer Common Name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSL Authentication Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to validate the connection to %1 due to errors:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Trust this certificate</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

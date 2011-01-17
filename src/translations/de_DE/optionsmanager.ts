@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="de_DE" sourcelanguage="en">
 <context>
     <name>EditProfilesDialog</name>
     <message>
@@ -180,6 +180,14 @@
     </message>
     <message>
         <source>Auto run on system startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show change profile dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show options dialog</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

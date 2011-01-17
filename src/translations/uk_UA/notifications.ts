@@ -31,6 +31,14 @@
         <source>Enable/Disable notifications sound</source>
         <translation>Включити/Виключити звук сповіщень</translation>
     </message>
+    <message>
+        <source>Activate all notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
@@ -102,6 +110,10 @@
     </message>
     <message>
         <source> seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable alerts in task bar</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

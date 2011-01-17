@@ -56,6 +56,29 @@
     </message>
 </context>
 <context>
+    <name>RegisterStream</name>
+    <message>
+        <source>Registration on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Registration</name>
     <message>
         <source>Registration</source>
@@ -102,14 +125,6 @@
         <translation>Voller Name</translation>
     </message>
     <message>
-        <source>First Name</source>
-        <translation>Vorname</translation>
-    </message>
-    <message>
-        <source>Last Name</source>
-        <translation>Nachname</translation>
-    </message>
-    <message>
         <source>Email Address</source>
         <translation>E-mail</translation>
     </message>
@@ -134,12 +149,20 @@
         <translation>Telefon</translation>
     </message>
     <message>
-        <source>Your Web Paqe</source>
-        <translation>Webseite</translation>
-    </message>
-    <message>
         <source>Supports the registration</source>
         <translation>Unterstützt die Registrierung</translation>
+    </message>
+    <message>
+        <source>Given Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your Web Page</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

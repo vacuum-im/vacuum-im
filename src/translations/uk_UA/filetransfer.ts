@@ -71,6 +71,22 @@
         <source>Automatically remove finished transfers</source>
         <translation>Автоматично видаляти завершені передачі</translation>
     </message>
+    <message>
+        <source>Send file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to start file transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully sent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully received.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

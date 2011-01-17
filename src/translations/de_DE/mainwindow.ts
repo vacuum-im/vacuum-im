@@ -39,8 +39,16 @@
         <translation>Erlaubt anderen Modulen ihre Widgets im Hauptfenster zu platzieren</translation>
     </message>
     <message>
+        <source>Main window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Esc</source>
-        <comment>Close Roster</comment>
+        <comment>Hide roster</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

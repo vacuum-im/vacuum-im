@@ -19,6 +19,10 @@
         <source>Allows to add comments to the contacts in the roster</source>
         <translation>Erlaubt das Hinzufügen von Kommentaren für Kontakte im Roster</translation>
     </message>
+    <message>
+        <source>Edit annotation</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditNoteDialog</name>

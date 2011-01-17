@@ -528,6 +528,48 @@ Check values and try again</source>
         <source>Save status messages to history</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Multi-user chat window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Send message</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change nick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change topic</source>
+        <translation type="unfinished">Змінити тему</translation>
+    </message>
+    <message>
+        <source>Setup conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Leave the conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Q</source>
+        <comment>Leave the conference</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -896,32 +938,28 @@ Check values and try again</source>
         <translation>Выйти з кімнати</translation>
     </message>
     <message>
-        <source>Ctrl+F4</source>
-        <translation>Ctrl+F4</translation>
-    </message>
-    <message>
-        <source>%1 &lt;%2&gt; has joined the room. %3</source>
-        <translation>%1 &lt;%2&gt; приєднався до кімнати. %3</translation>
-    </message>
-    <message>
-        <source>%1 has joined the room. %2</source>
-        <translation>%1 приеднався до кімнати. %2</translation>
-    </message>
-    <message>
-        <source>%1 &lt;%2&gt; has left the room. %3</source>
-        <translation>%1 &lt;%2&gt; вийшов з кімнати. %3</translation>
-    </message>
-    <message>
-        <source>%1 has left the room. %2</source>
-        <translation>%1 вийшов з кімнати. %2</translation>
-    </message>
-    <message>
         <source>Mention message in conference: %1</source>
         <translation>Повідомлення з звертанням в конференції: %1</translation>
     </message>
     <message>
         <source>Mention in conference</source>
         <translation>Звертання у конференції</translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has joined the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 has joined the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 &lt;%2&gt; has left the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 has left the room</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

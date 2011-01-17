@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" sourcelanguage="en">
+<TS version="2.0" language="de_DE" sourcelanguage="en">
 <context>
     <name>FileTransfer</name>
     <message>
@@ -69,6 +69,22 @@
     </message>
     <message>
         <source>File transfer canceled: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to start file transfer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully sent.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File &apos;%1&apos; successfully received.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
