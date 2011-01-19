@@ -1,5 +1,7 @@
 #include "shortcutmanager.h"
 
+#include <QMessageBox>
+#include <QInputDialog>
 #include <QApplication>
 
 ShortcutManager::ShortcutManager()
@@ -86,72 +88,99 @@ QMultiMap<int, IOptionsWidget *> ShortcutManager::optionsWidgets(const QString &
 
 void ShortcutManager::hideAllWidgets()
 {
-	foreach(QWidget *widget, QApplication::topLevelWidgets())
+	if (FOptionsManager==NULL || FOptionsManager->isOpened())
 	{
-		if (!widget->isHidden())
+		foreach(QWidget *widget, QApplication::topLevelWidgets())
 		{
-			QPointer<QWidget> pwidget = widget;
-			widget->hide();
-			FHiddenWidgets.append(pwidget);
+			if (!widget->isHidden())
+			{
+				QPointer<QWidget> pwidget = widget;
+				widget->hide();
+				FHiddenWidgets.append(pwidget);
+			}
 		}
+		if (FTrayManager && FTrayManager->isTrayIconVisible())
+		{
+			FTrayHidden = true;
+			FTrayManager->setTrayIconVisible(false);
+		}
+		if (FNotifications)
+		{
+			FNotifyHidden = 0;
+			if (Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool())
+			{
+				FNotifyHidden |= INotification::PopupWindow;
+				Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(false);
+			}
+			if (Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool())
+			{
+				FNotifyHidden |= INotification::PlaySound;
+				Options::node(OPV_NOTIFICATIONS_SOUND).setValue(false);
+			}
+			if (Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool())
+			{
+				FNotifyHidden |= INotification::AutoActivate;
+				Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(false);
+			}
+		}
+		FAllHidden = true;
 	}
-	if (FTrayManager && FTrayManager->isTrayIconVisible())
-	{
-		FTrayHidden = true;
-		FTrayManager->setTrayIconVisible(false);
-	}
-	if (FNotifications)
-	{
-		FNotifyHidden = 0;
-		if (Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool())
-		{
-			FNotifyHidden |= INotification::PopupWindow;
-			Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(false);
-		}
-		if (Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool())
-		{
-			FNotifyHidden |= INotification::PlaySound;
-			Options::node(OPV_NOTIFICATIONS_SOUND).setValue(false);
-		}
-		if (Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool())
-		{
-			FNotifyHidden |= INotification::AutoActivate;
-			Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(false);
-		}
-	}
-	FAllHidden = true;
 }
 
-void ShortcutManager::showHiddenWidgets()
+void ShortcutManager::showHiddenWidgets(bool ACheckPassword)
 {
-	foreach(const QPointer<QWidget> &pwidget, FHiddenWidgets)
+	static bool blocked = false;
+	if (!blocked)
 	{
-		if (!pwidget.isNull())
-			pwidget->show();
-	}
-	if (FTrayManager && FTrayHidden)
-	{
-		FTrayHidden = false;
-		FTrayManager->setTrayIconVisible(true);
-	}
-	if (FNotifications)
-	{
-		if (FNotifyHidden & INotification::PopupWindow)
+		blocked = true;
+
+		QString password;
+		QString profile = FOptionsManager->currentProfile();
+		QString title = QString("%1 - %2").arg(CLIENT_NAME).arg(profile);
+
+		if (ACheckPassword && FOptionsManager!=NULL && FOptionsManager->isOpened() && !FOptionsManager->checkProfilePassword(profile,password))
 		{
-			Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(true);
+			password = QInputDialog::getText(NULL,title,tr("Enter profile password:"),QLineEdit::Password);
 		}
-		if (FNotifyHidden & INotification::PlaySound)
+
+		if (!ACheckPassword || FOptionsManager==NULL || FOptionsManager->checkProfilePassword(profile,password))
 		{
-			Options::node(OPV_NOTIFICATIONS_SOUND).setValue(true);
+			foreach(const QPointer<QWidget> &pwidget, FHiddenWidgets)
+			{
+				if (!pwidget.isNull())
+					pwidget->show();
+			}
+			if (FTrayManager && FTrayHidden)
+			{
+				FTrayHidden = false;
+				FTrayManager->setTrayIconVisible(true);
+			}
+			if (FNotifications)
+			{
+				if (FNotifyHidden & INotification::PopupWindow)
+				{
+					Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(true);
+				}
+				if (FNotifyHidden & INotification::PlaySound)
+				{
+					Options::node(OPV_NOTIFICATIONS_SOUND).setValue(true);
+				}
+				if (FNotifyHidden & INotification::AutoActivate)
+				{
+					Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(true);
+				}
+				FNotifyHidden = 0;
+			}
+			FHiddenWidgets.clear();
+			FAllHidden = false;
 		}
-		if (FNotifyHidden & INotification::AutoActivate)
+		else if (!password.isEmpty())
 		{
-			Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(true);
+			QMessageBox::critical(NULL,title,tr("Wrong profile password!"));
 		}
-		FNotifyHidden = 0;
+
+		blocked = false;
 	}
-	FHiddenWidgets.clear();
-	FAllHidden = false;
 }
 
 void ShortcutManager::onOptionsOpened()
@@ -169,7 +198,7 @@ void ShortcutManager::onOptionsOpened()
 void ShortcutManager::onOptionsClosed()
 {
 	if (FAllHidden)
-		showHiddenWidgets();
+		showHiddenWidgets(false);
 
 	OptionsNode options = Options::node(OPV_SHORTCUTS);
 	foreach(QString shortcutId, Shortcuts::shortcuts())

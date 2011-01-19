@@ -19,6 +19,14 @@
         <source>Hide all windows, tray icon and notifications</source>
         <translation>Спрятать все окна, иконку в трее и уведомления</translation>
     </message>
+    <message>
+        <source>Enter profile password:</source>
+        <translation>Введите пароль к профилю:</translation>
+    </message>
+    <message>
+        <source>Wrong profile password!</source>
+        <translation>Неверный пароль профиля!</translation>
+    </message>
 </context>
 <context>
     <name>ShortcutOptionsWidget</name>
