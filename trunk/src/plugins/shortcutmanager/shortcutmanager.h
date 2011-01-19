@@ -2,6 +2,7 @@
 #define SHORTCUTMANAGER_H
 
 #include <QPointer>
+#include <definitions/version.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
 #include <definitions/optionnodes.h>
@@ -40,7 +41,7 @@ public:
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
 	void hideAllWidgets();
-	void showHiddenWidgets();
+	void showHiddenWidgets(bool ACheckPassword = true);
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
