@@ -174,6 +174,7 @@ protected slots:
 	void onNickMenuActionTriggered(bool);
 	void onToolBarActionTriggered(bool);
 	void onRoomUtilsActionTriggered(bool);
+	void onClearChatWindowActionTriggered(bool);
 	void onDataFormMessageDialogAccepted();
 	void onAffiliationListDialogAccepted();
 	void onConfigFormDialogAccepted();

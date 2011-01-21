@@ -286,7 +286,7 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_CLEAR_CHAT);
 			clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
 			connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearWindowAction(bool)));
-			window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_CWTBW_CLEAR_CHAT);
+			window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_MWTBW_CLEAR_WINDOW);
 
 			if (FRostersView && FRostersModel)
 			{
