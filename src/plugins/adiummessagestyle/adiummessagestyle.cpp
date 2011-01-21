@@ -113,10 +113,13 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 	{
 		if (!FWidgetStatus.contains(AWidget))
 		{
-			FWidgetStatus[view].lastKind = -1;
-			FWidgetStatus[view].scrollStarted = false;
+			WidgetStatus &wstatus = FWidgetStatus[view];
+			wstatus.ready = false;
+			wstatus.lastKind = -1;
+			wstatus.scrollStarted = false;
 			view->installEventFilter(this);
 			connect(view,SIGNAL(linkClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
+			connect(view,SIGNAL(loadFinished(bool)),SLOT(onStyleWidgetLoadFinished(bool)));
 			connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
 			emit widgetAdded(AWidget);
 		}
@@ -127,10 +130,10 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 
 		if (AClean)
 		{
+			FWidgetStatus[view].ready = false;
 			QString html = makeStyleTemplate(AOptions);
 			fillStyleKeywords(html,AOptions);
 			view->setHtml(html);
-			QApplication::processEvents(QEventLoop::ExcludeSocketNotifiers|QEventLoop::ExcludeUserInputEvents);
 		}
 		else
 		{
@@ -160,13 +163,18 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		if (AOptions.kind == IMessageContentOptions::Topic)
 			html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
 
-		escapeStringForScript(html);
-		view->page()->mainFrame()->evaluateJavaScript(scriptForAppendContent(sameSender,AOptions.noScroll).arg(html));
-
 		WidgetStatus &wstatus = FWidgetStatus[AWidget];
 		wstatus.lastKind = AOptions.kind;
 		wstatus.lastId = AOptions.senderId;
 		wstatus.lastTime = AOptions.time;
+
+		escapeStringForScript(html);
+		QString script = scriptForAppendContent(sameSender,AOptions.noScroll).arg(html);
+
+		if (wstatus.ready)
+			view->page()->mainFrame()->evaluateJavaScript(script);
+		else
+			wstatus.pending.append(script);
 
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
@@ -618,6 +626,7 @@ void AdiumMessageStyle::onScrollAfterResize()
 		if (it->scrollStarted)
 		{
 			QWebFrame *frame = ((StyleViewer *)it.key())->page()->mainFrame();
+			frame->evaluateJavaScript("alignChat(false);");
 			frame->setScrollBarValue(Qt::Vertical,frame->scrollBarMaximum(Qt::Vertical));
 			it->scrollStarted = false;
 		}
@@ -638,4 +647,19 @@ void AdiumMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
 {
 	FWidgetStatus.remove((QWidget *)AObject);
 	emit widgetRemoved((QWidget *)AObject);
+}
+
+void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
+{
+	Q_UNUSED(AOk);
+	StyleViewer *view = qobject_cast<StyleViewer *>(sender());
+	if (view)
+	{
+		WidgetStatus &wstatus = FWidgetStatus[view];
+		foreach(QString script, wstatus.pending)
+			view->page()->mainFrame()->evaluateJavaScript(script);
+		view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
+		wstatus.ready = true;
+		wstatus.pending.clear();
+	}
 }

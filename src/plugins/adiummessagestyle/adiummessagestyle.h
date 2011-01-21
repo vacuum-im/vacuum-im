@@ -97,10 +97,12 @@ public:
 		ImageScale
 	};
 	struct WidgetStatus {
+		bool ready;
 		int lastKind;
 		QString lastId;
 		QDateTime lastTime;
 		bool scrollStarted;
+		QList<QString> pending;
 	};
 public:
 	AdiumMessageStyle(const QString &AStylePath, QObject *AParent);
@@ -148,6 +150,7 @@ protected slots:
 	void onLinkClicked(const QUrl &AUrl);
 	void onScrollAfterResize();
 	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
+	void onStyleWidgetLoadFinished(bool AOk);
 	void onStyleWidgetDestroyed(QObject *AObject);
 private:
 	QTimer FScrollTimer;
