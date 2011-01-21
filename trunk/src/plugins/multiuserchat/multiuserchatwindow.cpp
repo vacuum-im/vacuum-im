@@ -525,7 +525,7 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FClearChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
 	FClearChat->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CLEARWINDOW);
 	connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FClearChat,AG_MUTM_MULTIUSERCHAT_COMMON,false);
+	FToolBarWidget->toolBarChanger()->insertAction(FClearChat,TBG_MWTBW_CLEAR_WINDOW);
 
 	FChangeSubject = new Action(FToolsMenu);
 	FChangeSubject->setText(tr("Change topic"));
@@ -1327,6 +1327,13 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 			FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
 			updateChatWindow(window);
 
+			Action *clearAction = new Action(window->instance());
+			clearAction->setText(tr("Clear chat window"));
+			clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
+			clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
+			connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearChatWindowActionTriggered(bool)));
+			window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_MWTBW_CLEAR_WINDOW);
+
 			UserContextMenu *menu = new UserContextMenu(this,window);
 			menu->menuAction()->setIcon(RSR_STORAGE_MENUICONS, MNI_MUC_USER_MENU);
 			QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(menu->menuAction(),TBG_CWTBW_USER_TOOLS);
@@ -2045,6 +2052,21 @@ void MultiUserChatWindow::onRoomUtilsActionTriggered(bool)
 	else if (action == FSetAffilOwner)
 	{
 		FMultiChat->setAffiliation(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_OWNER);
+	}
+}
+
+void MultiUserChatWindow::onClearChatWindowActionTriggered(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	IChatWindow *window = action!=NULL ? qobject_cast<IChatWindow *>(action->parent()) : NULL;
+	if (window)
+	{
+		IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
+		if (style!=NULL)
+		{
+			IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+			style->changeOptions(window->viewWidget()->styleWidget(),soptions,true);
+		}
 	}
 }
 
