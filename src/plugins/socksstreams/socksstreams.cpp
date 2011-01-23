@@ -109,7 +109,7 @@ QString SocksStreams::methodName() const
 
 QString SocksStreams::methodDescription() const
 {
-	return tr("Data is transfered out-band over TCP or UDP connection");
+	return tr("Data is transferred out-band over TCP or UDP connection");
 }
 
 IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid,

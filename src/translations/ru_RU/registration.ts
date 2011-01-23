@@ -12,10 +12,6 @@
         <translation>Ожидание ответа от хоста...</translation>
     </message>
     <message>
-        <source>Error: Can`t send request to host.</source>
-        <translation>Ошибка: невозможно отправить запрос на хост.</translation>
-    </message>
-    <message>
         <source>Do you really want to remove registration from %1?</source>
         <translation>Вы действительно хотите удалить регистрацию на %1?</translation>
     </message>
@@ -38,6 +34,10 @@
     <message>
         <source>Requested operation failed: %1</source>
         <translation>Запрошенная операция выполнена с ошибкой: %1</translation>
+    </message>
+    <message>
+        <source>Error: Can&apos;t send request to host.</source>
+        <translation>Ошибка: Невозможно отправить запрос на хост.</translation>
     </message>
 </context>
 <context>

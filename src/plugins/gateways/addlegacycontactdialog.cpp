@@ -44,7 +44,7 @@ void AddLegacyContactDialog::requestPrompt()
 	if (!FRequestId.isEmpty())
 		ui.lblDescription->setText(tr("Waiting for host response ..."));
 	else
-		ui.lblDescription->setText(tr("Error: Can`t send request to host."));
+		ui.lblDescription->setText(tr("Error: Can't send request to host."));
 	ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
 }
 
@@ -58,7 +58,7 @@ void AddLegacyContactDialog::requestUserJid()
 		if (!FRequestId.isEmpty())
 			ui.lblDescription->setText(tr("Waiting for host response ..."));
 		else
-			ui.lblDescription->setText(tr("Error: Can`t send request to host."));
+			ui.lblDescription->setText(tr("Error: Can't send request to host."));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
 	}
 }

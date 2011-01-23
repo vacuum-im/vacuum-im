@@ -294,10 +294,6 @@ Check values and try again</source>
         <translation>%1 от %2</translation>
     </message>
     <message>
-        <source>I`am too busy right now</source>
-        <translation>Я слишком занят сейчас</translation>
-    </message>
-    <message>
         <source>Decline invite</source>
         <translation>Отклонить приглашение</translation>
     </message>
@@ -570,6 +566,10 @@ Check values and try again</source>
         <source>Ctrl+Q</source>
         <comment>Leave the conference</comment>
         <translation>Ctrl+Q</translation>
+    </message>
+    <message>
+        <source>I&apos;m too busy right now</source>
+        <translation>Я слишком занят сейчас</translation>
     </message>
 </context>
 <context>

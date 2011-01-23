@@ -35,10 +35,6 @@
         <translation>Начало отправки станзы пользователя...</translation>
     </message>
     <message>
-        <source>User stanza sended.</source>
-        <translation>Станза пользователя отправлена.</translation>
-    </message>
-    <message>
         <source>Stanza is not well formed.</source>
         <translation>Станза не верно сформирована.</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Enter context name</source>
         <translation>Введите имя контекста</translation>
+    </message>
+    <message>
+        <source>User stanza sent.</source>
+        <translation>Станза пользователя отправлена.</translation>
     </message>
 </context>
 <context>
@@ -102,7 +102,7 @@
         <translation>Отправить</translation>
     </message>
     <message>
-        <source>Hilight XML</source>
+        <source>Highlight XML</source>
         <translation>Подсвечивать XML</translation>
     </message>
 </context>

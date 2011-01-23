@@ -235,7 +235,7 @@
          <item>
           <widget class="QCheckBox" name="chbHilightXML">
            <property name="text">
-            <string>Hilight XML</string>
+            <string>Highlight XML</string>
            </property>
            <property name="tristate">
             <bool>true</bool>

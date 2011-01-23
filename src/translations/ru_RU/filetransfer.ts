@@ -179,10 +179,6 @@
         <translation>От:</translation>
     </message>
     <message>
-        <source>Transfered %1 of %2.</source>
-        <translation>Передано %1 из %2.</translation>
-    </message>
-    <message>
         <source>Speed %1.</source>
         <translation>Скорость %1.</translation>
     </message>
@@ -213,6 +209,10 @@
     <message>
         <source>If you want to start download from the beginning press &apos;Retry&apos;</source>
         <translation>Если хотите заново загрузить весь файл, нажмите &apos;Повторить&apos;</translation>
+    </message>
+    <message>
+        <source>Transferred %1 of %2.</source>
+        <translation>Передано %1 из %2.</translation>
     </message>
 </context>
 <context>

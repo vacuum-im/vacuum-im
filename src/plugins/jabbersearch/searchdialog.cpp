@@ -118,7 +118,7 @@ void SearchDialog::requestFields()
 	}
 	else
 	{
-		ui.lblInstructions->setText(tr("Error: Can`t send request to host."));
+		ui.lblInstructions->setText(tr("Error: Can't send request to host."));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Cancel);
 	}
 }
@@ -149,7 +149,7 @@ void SearchDialog::requestResult()
 		}
 		else
 		{
-			ui.lblInstructions->setText(tr("Error: Can`t send request to host."));
+			ui.lblInstructions->setText(tr("Error: Can't send request to host."));
 			ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 		}
 	}

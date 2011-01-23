@@ -36,8 +36,8 @@
         <translation>Ожидание ответа хоста ...</translation>
     </message>
     <message>
-        <source>Error: Can`t send request to host.</source>
-        <translation>Ошибка: невозможно отправить запрос на хост.</translation>
+        <source>Error: Can&apos;t send request to host.</source>
+        <translation>Ошибка: Невозможно отправить запрос на хост.</translation>
     </message>
 </context>
 <context>

@@ -531,7 +531,7 @@ void StatusChanger::createDefaultStatus()
 	status.code = STATUS_AWAY;
 	status.name = nameByShow(IPresence::Away);
 	status.show = IPresence::Away;
-	status.text = tr("I`am away from my desk");
+	status.text = tr("I'm away from my desk");
 	status.priority = 20;
 	FStatusItems.insert(status.code,status);
 	createStatusActions(status.code);

@@ -77,7 +77,7 @@ void RegisterDialog::doRegister()
 	if (!FRequestId.isEmpty())
 		ui.lblInstuctions->setText(tr("Waiting for host response ..."));
 	else
-		ui.lblInstuctions->setText(tr("Error: Can`t send request to host."));
+		ui.lblInstuctions->setText(tr("Error: Can't send request to host."));
 	ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
 }
 
@@ -189,7 +189,7 @@ void RegisterDialog::onDialogButtonsClicked(QAbstractButton *AButton)
 		if (!FRequestId.isEmpty())
 			ui.lblInstuctions->setText(tr("Waiting for host response ..."));
 		else
-			ui.lblInstuctions->setText(tr("Error: Can`t send request to host."));
+			ui.lblInstuctions->setText(tr("Error: Can't send request to host."));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Cancel);
 	}
 	else if (button == QDialogButtonBox::Retry)

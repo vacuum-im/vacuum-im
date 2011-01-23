@@ -226,7 +226,7 @@ void ConsoleWidget::onSendXMLClicked()
 			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
 				if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->currentText())
 					stream->sendStanza(stanza);
-			ui.tedConsole->append("<b>"+tr("User stanza sended.")+"</b><br>");
+			ui.tedConsole->append("<b>"+tr("User stanza sent.")+"</b><br>");
 		}
 		else
 		{
