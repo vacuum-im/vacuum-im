@@ -58,6 +58,18 @@
         <source>Failed to update vCard</source>
         <translation>Не удалось обновить vCard</translation>
     </message>
+    <message>
+        <source>&lt;Unset&gt;</source>
+        <translation>&lt;Не установлен&gt;</translation>
+    </message>
+    <message>
+        <source>Male</source>
+        <translation>Мужской</translation>
+    </message>
+    <message>
+        <source>Female</source>
+        <translation>Женский</translation>
+    </message>
 </context>
 <context>
     <name>VCardDialogClass</name>
@@ -104,14 +116,6 @@
     <message>
         <source>Gender</source>
         <translation>Пол</translation>
-    </message>
-    <message>
-        <source>Male</source>
-        <translation>Мужской</translation>
-    </message>
-    <message>
-        <source>Female</source>
-        <translation>Женский</translation>
     </message>
     <message>
         <source>Occupation</source>

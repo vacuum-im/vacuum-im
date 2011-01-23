@@ -205,19 +205,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="editable">
-            <bool>true</bool>
-           </property>
-           <item>
-            <property name="text">
-             <string>Male</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Female</string>
-            </property>
-           </item>
           </widget>
          </item>
         </layout>

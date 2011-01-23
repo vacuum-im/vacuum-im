@@ -16,6 +16,10 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 
 	FSaveClisked = false;
 
+	ui.cmbGender->addItem(tr("<Unset>"),QString(""));
+	ui.cmbGender->addItem(tr("Male"),QString(VCARD_GENDER_MALE));
+	ui.cmbGender->addItem(tr("Female"),QString(VCARD_GENDER_FEMALE));
+
 	if (FStreamJid && FContactJid)
 		ui.btbButtons->setStandardButtons(QDialogButtonBox::Save|QDialogButtonBox::Close);
 	else
@@ -89,7 +93,8 @@ void VCardDialog::updateDialog()
 	ui.dedBirthday->setReadOnly(readOnly);
 	ui.dedBirthday->setEnabled(!readOnly || birthday.isValid());
 	ui.dedBirthday->setCalendarPopup(!readOnly);
-	ui.cmbGender->lineEdit()->setText(FVCard->value(VVN_GENDER));
+	int genderIndex = ui.cmbGender->findData(FVCard->value(VVN_GENDER),Qt::UserRole,Qt::MatchExactly);
+	ui.cmbGender->setCurrentIndex(genderIndex>=0 ? genderIndex : 0);
 	ui.cmbGender->setEnabled(!readOnly);
 	ui.lneMarital->setText(FVCard->value(VVN_MARITAL_STATUS));
 	ui.lneMarital->setReadOnly(readOnly);
@@ -178,7 +183,7 @@ void VCardDialog::updateVCard()
 		FVCard->setValueForTags(VVN_BIRTHDAY,ui.dedBirthday->date().toString(Qt::ISODate));
 	else
 		FVCard->setValueForTags(VVN_BIRTHDAY,"");
-	FVCard->setValueForTags(VVN_GENDER,ui.cmbGender->currentText());
+	FVCard->setValueForTags(VVN_GENDER,ui.cmbGender->itemData(ui.cmbGender->currentIndex()).toString());
 	FVCard->setValueForTags(VVN_MARITAL_STATUS,ui.lneMarital->text());
 	FVCard->setValueForTags(VVN_TITLE,ui.lneTitle->text());
 	FVCard->setValueForTags(VVN_ORG_UNIT,ui.lneDepartment->text());
