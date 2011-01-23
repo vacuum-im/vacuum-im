@@ -180,8 +180,7 @@ void AddContactDialog::onDialogAccepted()
 	}
 	else if (!contactJid().isEmpty())
 	{
-		QMessageBox::warning(this,FStreamJid.bare(),
-		                     tr("Can`t add contact '<b>%1</b>' because it is not a valid Jaber ID").arg(contactJid().hBare()));
+		QMessageBox::warning(this,FStreamJid.bare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(contactJid().hBare()));
 	}
 }
 

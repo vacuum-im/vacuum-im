@@ -47,10 +47,6 @@
         <translation>Ожидание ответа хоста ...</translation>
     </message>
     <message>
-        <source>Error: Can`t send request to host.</source>
-        <translation>Ошибка: невозможно отправить данные на хост.</translation>
-    </message>
-    <message>
         <source>Disco info</source>
         <translation>Информация</translation>
     </message>
@@ -65,6 +61,10 @@
     <message>
         <source>Requested operation failed: %1</source>
         <translation>Запрошенная операция завершилась с ошибкой: %1</translation>
+    </message>
+    <message>
+        <source>Error: Can&apos;t send request to host.</source>
+        <translation>Ошибка: Невозможно отправить запрос на хост.</translation>
     </message>
 </context>
 <context>

@@ -20,10 +20,6 @@
         <translation>Неверные параметры профиля</translation>
     </message>
     <message>
-        <source>Invalid stream initiation responce</source>
-        <translation>Неверный ответ на запрос инициализации потока</translation>
-    </message>
-    <message>
         <source>Data Streams Initiation</source>
         <translation>Инициализация потоков данных</translation>
     </message>
@@ -46,6 +42,10 @@
     <message>
         <source>Supports the initiating of the custom stream of data between two XMPP entities</source>
         <translation>Поддерживает инициализацию произвольного потока данных между двумя XMPP сущностями</translation>
+    </message>
+    <message>
+        <source>Invalid stream initiation response</source>
+        <translation>Неверный ответ на запрос инициализации потока</translation>
     </message>
 </context>
 <context>

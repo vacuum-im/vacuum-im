@@ -274,13 +274,13 @@ void StreamDialog::onStreamSpeedChanged()
 	if (FFileStream->streamState() == IFileStream::Transfering)
 	{
 		ui.pgbPrgress->setValue(curPercentPosition());
-		ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition()))
+		ui.lblProgress->setText(tr("Transferred %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition()))
 		                        + " " + tr("Speed %1.").arg(sizeName(FFileStream->speed())+tr("/sec")));
 	}
 	else if (FFileStream->fileSize() > 0)
 	{
 		ui.pgbPrgress->setValue(curPercentPosition());
-		ui.lblProgress->setText(tr("Transfered %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())));
+		ui.lblProgress->setText(tr("Transferred %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())));
 	}
 	else
 	{

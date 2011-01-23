@@ -155,7 +155,7 @@ void CommandDialog::executeAction(const QString &AAction)
 		}
 		else
 		{
-			ui.lblInfo->setText(tr("Error: Can`t send request to host."));
+			ui.lblInfo->setText(tr("Error: Can't send request to host."));
 			ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 		}
 	}

@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="twtVCard">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -309,7 +309,7 @@
      </widget>
      <widget class="QWidget" name="tabAdress">
       <attribute name="title">
-       <string>Adress</string>
+       <string>Address</string>
       </attribute>
       <layout class="QHBoxLayout" name="lotAdress">
        <property name="margin">

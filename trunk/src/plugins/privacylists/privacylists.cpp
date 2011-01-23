@@ -165,13 +165,13 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 					}
 
 					int stanzas = denyedStanzas(ritem,privacyList(AStreamJid,activeList(AStreamJid)));
-					bool denyed = (stanzas & IPrivacyRule::PresencesOut)>0;
-					if (denyed && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
+					bool denied = (stanzas & IPrivacyRule::PresencesOut)>0;
+					if (denied && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
 						presence->sendPresence(ritem.itemJid,IPresence::Offline,"",0);
 						FOfflinePresences[AStreamJid]+=ritem.itemJid;
 					}
-					else if (!denyed && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
+					else if (!denied && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
 						if (ritem.subscription==SUBSCRIPTION_BOTH || ritem.subscription==SUBSCRIPTION_FROM)
 							presence->sendPresence(ritem.itemJid,presence->show(),presence->status(),presence->priority());
@@ -180,9 +180,9 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 
 					if (directionIn)
 					{
-						denyed = (stanzas & IPrivacyRule::AnyStanza)>0;
-						if (FLabeledContacts.value(AStreamJid).contains(ritem.itemJid)!=denyed)
-							setPrivacyLabel(AStreamJid,ritem.itemJid,denyed);
+						denied = (stanzas & IPrivacyRule::AnyStanza)>0;
+						if (FLabeledContacts.value(AStreamJid).contains(ritem.itemJid)!=denied)
+							setPrivacyLabel(AStreamJid,ritem.itemJid,denied);
 					}
 				}
 
@@ -550,7 +550,7 @@ void PrivacyLists::setAutoPrivacy(const Jid &AStreamJid, const QString &AAutoLis
 
 int PrivacyLists::denyedStanzas(const IRosterItem &AItem, const IPrivacyList &AList) const
 {
-	int denyed = 0;
+	int denied = 0;
 	int allowed = 0;
 	foreach(IPrivacyRule rule, AList.rules)
 	{
@@ -576,25 +576,25 @@ int PrivacyLists::denyedStanzas(const IRosterItem &AItem, const IPrivacyList &AL
 		}
 
 		if (rule.action == PRIVACY_ACTION_DENY)
-			denyed |= stanzas & (~allowed);
+			denied |= stanzas & (~allowed);
 		else
-			allowed |= stanzas & (~denyed);
+			allowed |= stanzas & (~denied);
 	}
-	return denyed;
+	return denied;
 }
 
 QHash<Jid,int> PrivacyLists::denyedContacts(const Jid &AStreamJid, const IPrivacyList &AList, int AFilter) const
 {
-	QHash<Jid,int> denyed;
+	QHash<Jid,int> denied;
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
 	foreach(IRosterItem ritem,ritems)
 	{
 		int stanzas = denyedStanzas(ritem,AList);
 		if ((stanzas & AFilter) > 0)
-			denyed[ritem.itemJid] = stanzas;
+			denied[ritem.itemJid] = stanzas;
 	}
-	return denyed;
+	return denied;
 }
 
 QString PrivacyLists::activeList(const Jid &AStreamJid, bool APending) const
@@ -1023,8 +1023,8 @@ void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
 	if (presence)
 	{
-		QSet<Jid> denyed = denyedContacts(AStreamJid,AAutoList,IPrivacyRule::PresencesOut).keys().toSet();
-		QSet<Jid> online = FOfflinePresences.value(AStreamJid) - denyed;
+		QSet<Jid> denied = denyedContacts(AStreamJid,AAutoList,IPrivacyRule::PresencesOut).keys().toSet();
+		QSet<Jid> online = FOfflinePresences.value(AStreamJid) - denied;
 		if (presence->isOpen())
 		{
 			foreach(Jid contactJid, online)
@@ -1044,8 +1044,8 @@ void PrivacyLists::sendOfflinePresences(const Jid &AStreamJid, const IPrivacyLis
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
 	if (presence)
 	{
-		QSet<Jid> denyed = denyedContacts(AStreamJid,AAutoList,IPrivacyRule::PresencesOut).keys().toSet();
-		QSet<Jid> offline = denyed - FOfflinePresences.value(AStreamJid);
+		QSet<Jid> denied = denyedContacts(AStreamJid,AAutoList,IPrivacyRule::PresencesOut).keys().toSet();
+		QSet<Jid> offline = denied - FOfflinePresences.value(AStreamJid);
 		if (presence->isOpen())
 		{
 			foreach(Jid contactJid, offline)
@@ -1080,9 +1080,9 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 {
 	if (FRostersModel)
 	{
-		QSet<Jid> denyed = denyedContacts(AStreamJid,privacyList(AStreamJid,activeList(AStreamJid))).keys().toSet();
-		QSet<Jid> deny = denyed - FLabeledContacts.value(AStreamJid);
-		QSet<Jid> allow = FLabeledContacts.value(AStreamJid) - denyed;
+		QSet<Jid> denied = denyedContacts(AStreamJid,privacyList(AStreamJid,activeList(AStreamJid))).keys().toSet();
+		QSet<Jid> deny = denied - FLabeledContacts.value(AStreamJid);
+		QSet<Jid> allow = FLabeledContacts.value(AStreamJid) - denied;
 
 		foreach(Jid contactJid, deny) {
 			setPrivacyLabel(AStreamJid,contactJid,true); }
@@ -1318,10 +1318,10 @@ void PrivacyLists::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMu
 		ritem.itemJid = contactJid;
 		int stanzas = denyedStanzas(ritem,privacyList(streamJid,activeList(streamJid)));
 		QString toolTip = tr("<b>Privacy settings:</b>") +"<br>";
-		toolTip += tr("- queries: %1").arg((stanzas & IPrivacyRule::Queries) >0             ? tr("<b>denyed</b>") : tr("allowed")) + "<br>";
-		toolTip += tr("- messages: %1").arg((stanzas & IPrivacyRule::Messages) >0           ? tr("<b>denyed</b>") : tr("allowed")) + "<br>";
-		toolTip += tr("- presences in: %1").arg((stanzas & IPrivacyRule::PresencesIn) >0    ? tr("<b>denyed</b>") : tr("allowed")) + "<br>";
-		toolTip += tr("- presences out: %1").arg((stanzas & IPrivacyRule::PresencesOut) >0  ? tr("<b>denyed</b>") : tr("allowed"));
+		toolTip += tr("- queries: %1").arg((stanzas & IPrivacyRule::Queries) >0             ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
+		toolTip += tr("- messages: %1").arg((stanzas & IPrivacyRule::Messages) >0           ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
+		toolTip += tr("- presences in: %1").arg((stanzas & IPrivacyRule::PresencesIn) >0    ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
+		toolTip += tr("- presences out: %1").arg((stanzas & IPrivacyRule::PresencesOut) >0  ? tr("<b>denied</b>") : tr("allowed"));
 		AToolTips.insertMulti(RTTO_PRIVACY,toolTip);
 	}
 }

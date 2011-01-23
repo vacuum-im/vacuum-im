@@ -876,7 +876,7 @@ void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
 			Stanza &mstanza = decline.stanza();
 			QDomElement declElem = mstanza.addElement("x",NS_MUC_USER).appendChild(mstanza.createElement("decline")).toElement();
 			declElem.setAttribute("to",fields.fromJid.eFull());
-			QString reason = tr("I`am too busy right now");
+			QString reason = tr("I'm too busy right now");
 			reason = QInputDialog::getText(inviteDialog,tr("Decline invite"),tr("Enter a reason"),QLineEdit::Normal,reason);
 			if (!reason.isEmpty())
 				declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));

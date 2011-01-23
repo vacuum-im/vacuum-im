@@ -138,10 +138,6 @@
         <translation>Дом. страница</translation>
     </message>
     <message>
-        <source>Adress</source>
-        <translation>Адрес</translation>
-    </message>
-    <message>
         <source>Home</source>
         <translation>Домашний</translation>
     </message>
@@ -216,6 +212,10 @@
     <message>
         <source>Marital status</source>
         <translation>Семейное положение</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Адрес</translation>
     </message>
 </context>
 <context>

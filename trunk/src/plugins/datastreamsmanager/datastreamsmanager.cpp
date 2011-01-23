@@ -215,7 +215,7 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 			}
 			else if (sprofile)
 			{
-				sprofile->dataStreamError(sid,tr("Invalid stream initiation responce"));
+				sprofile->dataStreamError(sid,tr("Invalid stream initiation response"));
 			}
 		}
 		else if (sprofile)
@@ -391,15 +391,15 @@ bool DataStreamsManger::acceptStream(const QString &AStreamId, const QString &AM
 		int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,params.features.fields);
 		if (sprofile && index>=0 && FDataForms->isOptionValid(params.features.fields.at(index).options,AMethodNS))
 		{
-			Stanza responce("iq");
-			responce.setTo(params.contactJid.eFull()).setType("result").setId(params.requestId);
-			QDomElement siElem = responce.addElement("si",NS_STREAM_INITIATION);
-			if (sprofile->responceDataStream(AStreamId,responce))
+			Stanza response("iq");
+			response.setTo(params.contactJid.eFull()).setType("result").setId(params.requestId);
+			QDomElement siElem = response.addElement("si",NS_STREAM_INITIATION);
+			if (sprofile->responceDataStream(AStreamId,response))
 			{
-				QDomElement negElem = siElem.appendChild(responce.createElement("feature",NS_FEATURENEG)).toElement();
+				QDomElement negElem = siElem.appendChild(response.createElement("feature",NS_FEATURENEG)).toElement();
 				params.features.fields[index].value = AMethodNS;
 				FDataForms->xmlForm(FDataForms->dataSubmit(params.features),negElem);
-				if (FStanzaProcessor->sendStanzaOut(params.streamJid,responce))
+				if (FStanzaProcessor->sendStanzaOut(params.streamJid,response))
 				{
 					FStreams.remove(AStreamId);
 					return true;

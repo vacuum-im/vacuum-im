@@ -270,10 +270,6 @@
         <translation>- запросы: %1</translation>
     </message>
     <message>
-        <source>&lt;b&gt;denyed&lt;/b&gt;</source>
-        <translation>&lt;b&gt;запрещено&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>allowed</source>
         <translation>разрешено</translation>
     </message>
@@ -292,6 +288,10 @@
     <message>
         <source>Allows to block unwanted contacts</source>
         <translation>Позволяет блокировать нежелательные контакты</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;denied&lt;/b&gt;</source>
+        <translation>&lt;b&gt;запрещено&lt;/b&gt;</translation>
     </message>
 </context>
 </TS>

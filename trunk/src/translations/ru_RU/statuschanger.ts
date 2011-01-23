@@ -16,10 +16,6 @@
         <translation>Неверное имя статуса</translation>
     </message>
     <message>
-        <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; allready exists</source>
-        <translation>Статус с именем &apos;&lt;b&gt;%1&lt;/b&gt;&apos; уже присутствует</translation>
-    </message>
-    <message>
         <source>Can&apos;t delete status</source>
         <translation>Невозможно удалить статус</translation>
     </message>
@@ -38,6 +34,10 @@
     <message>
         <source>You are assured that wish to remove a status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
         <translation>Вы уверены, что хотите удалить статус &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
+    </message>
+    <message>
+        <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; already exists</source>
+        <translation>Статус с именем &apos;&lt;b&gt;%1&lt;/b&gt;&apos; уже присутствует</translation>
     </message>
 </context>
 <context>
@@ -157,10 +157,6 @@ You can set status class for additional statuses defined by you.</source>
         <translation>Поболтать</translation>
     </message>
     <message>
-        <source>I`am away from my desk</source>
-        <translation>Отошёл</translation>
-    </message>
-    <message>
         <source>Not available</source>
         <translation>Не доступен</translation>
     </message>
@@ -207,6 +203,10 @@ You can set status class for additional statuses defined by you.</source>
     <message>
         <source>Auto reconnect if disconnected</source>
         <translation>Автоматически восстанавливать соединение</translation>
+    </message>
+    <message>
+        <source>I&apos;m away from my desk</source>
+        <translation>Отошёл</translation>
     </message>
 </context>
 </TS>

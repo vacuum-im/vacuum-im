@@ -48,12 +48,12 @@
         <translation>Контакт &lt;b&gt;%1&lt;/b&gt; уже существует.</translation>
     </message>
     <message>
-        <source>Can`t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jaber ID</source>
-        <translation>Невозможно добавить контакт &apos;&lt;b&gt;%1&lt;/b&gt;&apos;, т.к. он не является правильным JID</translation>
-    </message>
-    <message>
         <source>* nested group delimiter - &apos;%1&apos;</source>
         <translation>* разделитель вложенных групп - &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Can&apos;t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jabber ID</source>
+        <translation>Невозможно добавить контакт  &apos;&lt;b&gt;%1&lt;/b&gt;&apos;, т.к. он не является правильным Jabber ID</translation>
     </message>
 </context>
 <context>

@@ -1346,7 +1346,7 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
 			foreach(IDiscoIdentity identity, dinfo.identity)
 				if (identity.category != DIC_CLIENT)
-					AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Categoty: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
+					AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
 		}
 	}
 }

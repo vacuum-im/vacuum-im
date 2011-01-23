@@ -324,7 +324,7 @@ void ErrorHandler::init()
 		addErrorItem("resource-constraint",     WAIT,   500, qApp->translate("ErrorHandler", "Resource Constraint"));
 		addErrorItem("undefined-condition",     CANCEL, 500, qApp->translate("ErrorHandler", "Undefined Condition"));
 		addErrorItem("feature-not-implemented", CANCEL, 501, qApp->translate("ErrorHandler", "Not Implemented"));
-		addErrorItem("remoute-server-error",    CANCEL, 502, qApp->translate("ErrorHandler", "Remoute Server Error"));
+		addErrorItem("remote-server-error",     CANCEL, 502, qApp->translate("ErrorHandler", "Remote Server Error"));
 		addErrorItem("service-unavailable",     CANCEL, 503, qApp->translate("ErrorHandler", "Service Unavailable"));
 		addErrorItem("remote-server-timeout",   WAIT,   504, qApp->translate("ErrorHandler", "Remote Server timeout"));
 		addErrorItem("disconnected",            CANCEL, 510, qApp->translate("ErrorHandler", "Disconnected"));

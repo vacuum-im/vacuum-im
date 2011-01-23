@@ -155,10 +155,6 @@
         <translation>Обзорная информация</translation>
     </message>
     <message>
-        <source>Categoty: %1; Type: %2</source>
-        <translation>Категория: %1; Тип: %2</translation>
-    </message>
-    <message>
         <source>Entity Capabilities</source>
         <translation>Возможности объекта</translation>
     </message>
@@ -247,6 +243,10 @@
         <source>Esc</source>
         <comment>Close discovery window</comment>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Category: %1; Type: %2</source>
+        <translation>Категория: %1; Тип: %2</translation>
     </message>
 </context>
 </TS>
