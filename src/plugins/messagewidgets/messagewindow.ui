@@ -20,9 +20,6 @@
    <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
    <layout class="QVBoxLayout">
     <property name="margin">
      <number>2</number>
@@ -33,9 +30,6 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="tabMessage">
-       <property name="autoFillBackground">
-        <bool>true</bool>
-       </property>
        <attribute name="title">
         <string>Message</string>
        </attribute>

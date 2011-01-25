@@ -19,9 +19,6 @@
    </property>
    <item>
     <widget class="QFrame" name="frmWindowFrame">
-     <property name="autoFillBackground">
-      <bool>true</bool>
-     </property>
      <property name="frameShape">
       <enum>QFrame::Box</enum>
      </property>
