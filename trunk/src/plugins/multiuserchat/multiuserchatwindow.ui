@@ -11,9 +11,6 @@
    </rect>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
      <number>3</number>
