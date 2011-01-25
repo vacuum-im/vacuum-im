@@ -109,7 +109,7 @@ public:
 	virtual QString status() const =0;
 	virtual int errorCode() const =0;
 	virtual void setPresence(int AShow, const QString &AStatus) =0;
-	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = "") =0;
+	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
 	virtual bool requestVoice() =0;
 	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason) =0;
 	//Moderator
@@ -117,8 +117,8 @@ public:
 	virtual void setSubject(const QString &ASubject) =0;
 	virtual void sendDataFormMessage(const IDataForm &AForm) =0;
 	//Administrator
-	virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = "") =0;
-	virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = "") =0;
+	virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null) =0;
+	virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null) =0;
 	virtual bool requestAffiliationList(const QString &AAffiliation) =0;
 	virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList) =0;
 	//Owner
