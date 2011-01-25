@@ -31,34 +31,35 @@ public:
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
 	//IMultiUserChar
-	virtual Jid streamJid() const { return FStreamJid; }
-	virtual Jid roomJid() const { return FRoomJid; }
+	virtual Jid streamJid() const;
+	virtual Jid roomJid() const;
 	virtual bool isOpen() const;
-	virtual bool autoPresence() const { return FAutoPresence; }
+	virtual bool autoPresence() const;
 	virtual void setAutoPresence(bool AAuto);
-	virtual QList<int> statusCodes() const { return FStatusCodes; }
+	virtual QList<int> statusCodes() const;
 	virtual bool isUserPresent(const Jid &AContactJid) const;
-	virtual IMultiUser *mainUser() const { return FMainUser; }
+	virtual IMultiUser *mainUser() const;
 	virtual IMultiUser *userByNick(const QString &ANick) const;
 	virtual QList<IMultiUser *> allUsers() const;
 	//Occupant
-	virtual QString nickName() const { return FNickName; }
+	virtual QString nickName() const;
 	virtual void setNickName(const QString &ANick);
-	virtual QString password() const { return FPassword; }
+	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
-	virtual int show() const { return FShow; }
-	virtual QString status() const { return FStatus; }
+	virtual int show() const;
+	virtual QString status() const;
+	virtual int errorCode() const;
 	virtual void setPresence(int AShow, const QString &AStatus);
-	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = "");
+	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null);
 	virtual bool requestVoice();
 	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason);
 	//Moderator
-	virtual QString subject() const { return FSubject; }
+	virtual QString subject() const;
 	virtual void setSubject(const QString &ASubject);
 	virtual void sendDataFormMessage(const IDataForm &AForm);
 	//Administrator
-	virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = "");
-	virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = "");
+	virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null);
+	virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null);
 	virtual bool requestAffiliationList(const QString &AAffiliation);
 	virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList);
 	//Owner
@@ -133,6 +134,7 @@ private:
 	Jid FStreamJid;
 	Jid FRoomJid;
 	int FShow;
+	int FErrorCode;
 	QString FStatus;
 	QString FSubject;
 	QString FNickName;

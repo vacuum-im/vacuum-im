@@ -1510,8 +1510,25 @@ void MultiUserChatWindow::onChatError(const QString &AMessage)
 
 void MultiUserChatWindow::onChatClosed()
 {
-	FDestroyOnChatClosed ? deleteLater() : showStatusMessage(tr("Disconnected"));
-	updateWindow();
+	if (!FDestroyOnChatClosed)
+	{
+		if (FMultiChat->show()==IPresence::Error && 
+			FMultiChat->errorCode()==ErrorHandler::CONFLICT && 
+			!FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
+		{
+			FMultiChat->setNickName(FMultiChat->nickName()+"/"+FMultiChat->streamJid().resource());
+			FEnterRoom->trigger();
+		}
+		else
+		{
+			showStatusMessage(tr("Disconnected"));
+		}
+		updateWindow();
+	}
+	else
+	{
+		deleteLater();
+	}
 }
 
 void MultiUserChatWindow::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)

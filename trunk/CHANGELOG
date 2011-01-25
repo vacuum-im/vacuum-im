@@ -24,6 +24,7 @@ LEGEND
   [*] Added ability to search for contacts in the roster by the group name
   [*] Added support for older versions of the message history protocol, when the time of message was stored in seconds from the beginning of the conversation
   [*] Added ability to disable the establishing of unprotected connection to the server
+  [*] Added auto-adding resource to the nick in the conference if your nickname is already taken
   [-] When converting smileys into the text instead of the first key an arbitrary one was inserted
   [-] Contacts list window could be displayed outside the visible screen area
   [-] The roster window was closed by clicking on the tray even if it was inactive

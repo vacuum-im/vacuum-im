@@ -107,6 +107,7 @@ public:
 	virtual void setPassword(const QString &APassword) =0;
 	virtual int show() const =0;
 	virtual QString status() const =0;
+	virtual int errorCode() const =0;
 	virtual void setPresence(int AShow, const QString &AStatus) =0;
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = "") =0;
 	virtual bool requestVoice() =0;
