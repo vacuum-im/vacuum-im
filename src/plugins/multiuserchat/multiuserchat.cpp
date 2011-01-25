@@ -26,6 +26,7 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FNickName = ANickName;
 	FPassword = APassword;
 	FShow = IPresence::Offline;
+	FErrorCode = -1;
 
 	initialize();
 }
@@ -175,9 +176,24 @@ void MultiUserChat::stanzaRequestTimeout(const Jid &AStreamJid, const QString &A
 	}
 }
 
+Jid MultiUserChat::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid MultiUserChat::roomJid() const
+{
+	return FRoomJid;
+}
+
 bool MultiUserChat::isOpen() const
 {
 	return FMainUser!=NULL;
+}
+
+bool MultiUserChat::autoPresence() const
+{
+	return FAutoPresence;
 }
 
 void MultiUserChat::setAutoPresence(bool AAuto)
@@ -188,6 +204,11 @@ void MultiUserChat::setAutoPresence(bool AAuto)
 		if (FPresence && FAutoPresence)
 			setPresence(FPresence->show(),FPresence->status());
 	}
+}
+
+QList<int> MultiUserChat::statusCodes() const
+{
+	return FStatusCodes;
 }
 
 bool MultiUserChat::isUserPresent(const Jid &AContactJid) const
@@ -202,6 +223,11 @@ bool MultiUserChat::isUserPresent(const Jid &AContactJid) const
 	return false;
 }
 
+IMultiUser *MultiUserChat::mainUser() const
+{
+	return FMainUser;
+}
+
 IMultiUser *MultiUserChat::userByNick(const QString &ANick) const
 {
 	return FUsers.value(ANick,NULL);
@@ -213,6 +239,11 @@ QList<IMultiUser *> MultiUserChat::allUsers() const
 	foreach(MultiUser *user, FUsers)
 		result.append(user);
 	return result;
+}
+
+QString MultiUserChat::nickName() const
+{
+	return FNickName;
 }
 
 void MultiUserChat::setNickName(const QString &ANick)
@@ -231,9 +262,29 @@ void MultiUserChat::setNickName(const QString &ANick)
 		FNickName = ANick;
 }
 
+QString MultiUserChat::password() const
+{
+	return FPassword;
+}
+
 void MultiUserChat::setPassword(const QString &APassword)
 {
 	FPassword = APassword;
+}
+
+int MultiUserChat::show() const
+{
+	return FShow;
+}
+
+QString MultiUserChat::status() const
+{
+	return FStatus;
+}
+
+int MultiUserChat::errorCode() const
+{
+	return FErrorCode;
 }
 
 void MultiUserChat::setPresence(int AShow, const QString &AStatus)
@@ -270,6 +321,7 @@ void MultiUserChat::setPresence(int AShow, const QString &AStatus)
 
 		if (!isOpen() && AShow!=IPresence::Offline && AShow!=IPresence::Error)
 		{
+			FErrorCode = -1;
 			QDomElement xelem = presence.addElement("x",NS_MUC);
 			if (!FPassword.isEmpty())
 				xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));
@@ -354,6 +406,11 @@ bool MultiUserChat::inviteContact(const Jid &AContactJid, const QString &AReason
 			return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
 	}
 	return false;
+}
+
+QString MultiUserChat::subject() const
+{
+	return FSubject;
 }
 
 void MultiUserChat::setSubject(const QString &ASubject)
@@ -745,7 +802,10 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			delete user;
 		}
 		else
+		{
+			FErrorCode = err.code();
 			closeChat(IPresence::Error,err.message());
+		}
 
 		accepted = true;
 	}
