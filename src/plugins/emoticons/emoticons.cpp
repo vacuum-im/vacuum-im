@@ -15,7 +15,7 @@ Emoticons::Emoticons()
 
 Emoticons::~Emoticons()
 {
-
+	clearTreeItem(&FRootTreeItem);
 }
 
 void Emoticons::pluginInfo(IPluginInfo *APluginInfo)
@@ -134,6 +134,7 @@ void Emoticons::createIconsetUrls()
 {
 	FUrlByKey.clear();
 	FKeyByUrl.clear();
+	clearTreeItem(&FRootTreeItem);
 	foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
 	{
 		IconStorage *storage = FStorages.value(substorage);
@@ -151,9 +152,40 @@ void Emoticons::createIconsetUrls()
 					QUrl url = QUrl::fromLocalFile(file);
 					FUrlByKey.insert(key,url);
 					FKeyByUrl.insert(url.toString(),fileFirstKey.value(file));
+					createTreeItem(key,url);
 				}
 			}
 		}
+	}
+}
+
+void Emoticons::createTreeItem(const QString &AKey, const QUrl &AUrl)
+{
+	EmoticonTreeItem *item = &FRootTreeItem;
+	for (int i=0; i<AKey.size(); i++)
+	{
+		QChar itemChar = AKey.at(i);
+		if (!item->childs.contains(itemChar))
+		{
+			EmoticonTreeItem *childItem = new EmoticonTreeItem;
+			item->childs.insert(itemChar,childItem);
+			item = childItem;
+		}
+		else
+		{
+			item = item->childs.value(itemChar);
+		}
+	}
+	item->url = AUrl;
+}
+
+void Emoticons::clearTreeItem(EmoticonTreeItem *AItem) const
+{
+	foreach(QChar itemChar, AItem->childs.keys())
+	{
+		EmoticonTreeItem *childItem = AItem->childs.take(itemChar);
+		clearTreeItem(childItem);
+		delete childItem;
 	}
 }
 
@@ -164,27 +196,48 @@ bool Emoticons::isWordBoundary(const QString &AText) const
 
 void Emoticons::replaceTextToImage(QTextDocument *ADocument) const
 {
-	for (QHash<QString, QUrl>::const_iterator it = FUrlByKey.constBegin(); it!= FUrlByKey.constEnd(); it++)
+	if (!FRootTreeItem.childs.isEmpty())
 	{
-		QRegExp smile(QString("(^|\\s)(%1)(\\s|$)").arg(QRegExp::escape(it.key())));
-		for (QTextCursor cursor = ADocument->find(smile); !cursor.isNull();  cursor = ADocument->find(smile,cursor))
+		QTextCursor cursor(ADocument);
+		while (cursor.position() < ADocument->characterCount()-1)
 		{
-			ADocument->addResource(QTextDocument::ImageResource,it.value(),QImage(it.value().toLocalFile()));
-
-			QString text = cursor.selectedText();
-			QChar startChar = !text.isEmpty() ? text.at(0) : QChar();
-			QChar endChar = !text.isEmpty() ? text.at(text.length()-1) : QChar();
-
-			if (startChar.isSpace())
-				cursor.insertText(startChar);
-
-			cursor.insertImage(it.value().toString());
-
-			if (endChar.isSpace())
+			int basePos = cursor.position();
+			bool startSearch = !cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor,1);
+			if (!startSearch && cursor.selectedText().at(0).isSpace())
 			{
-				cursor.insertText(endChar);
-				cursor.setPosition(cursor.position()-1);
+				startSearch = true;
+				cursor.movePosition(QTextCursor::NextCharacter);
 			}
+			if (startSearch)
+			{
+				const EmoticonTreeItem *item = &FRootTreeItem;
+				while (item)
+				{
+					bool stop = !cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+					QString text = cursor.selectedText();
+					if (!text.isEmpty())
+					{
+						QChar lastChar = text.at(text.size()-1);
+						if (!item->url.isEmpty() && (stop || lastChar.isSpace()))
+						{
+							if (!ADocument->resource(QTextDocument::ImageResource,item->url).isValid())
+								cursor.insertImage(QImage(item->url.toLocalFile()),item->url.toString());
+							else
+								cursor.insertImage(item->url.toString());
+							if (!stop)
+								cursor.insertText(lastChar);
+							stop = true;
+							basePos = cursor.position()-1;
+						}
+						item = !stop && item!=NULL ? item->childs.value(lastChar) : NULL;
+					}
+					else
+					{
+						item = NULL;
+					}
+				}
+			}
+			cursor.setPosition(basePos+1);
 		}
 	}
 }
