@@ -154,7 +154,10 @@ void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
 void importOptionNode(OptionsNode &ANode, const QDomElement &AFromElem)
 {
 	if (AFromElem.hasAttribute("type"))
-		ANode.setValue(stringToVariant(findChildText(AFromElem).data(), (QVariant::Type)AFromElem.attribute("type").toInt()));
+	{
+		QString stringValue = findChildText(AFromElem).data();
+		ANode.setValue(stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)AFromElem.attribute("type").toInt()));
+	}
 	else
 		ANode.setValue(QVariant());
 
@@ -415,7 +418,10 @@ QVariant OptionsNode::value(const QString &APath, const QString &ANSpace) const
 	if (APath.isEmpty())
 	{
 		if (d->node.hasAttribute("type"))
-			return stringToVariant(findChildText(d->node).data(), (QVariant::Type)d->node.attribute("type").toInt());
+		{
+			QString stringValue = findChildText(d->node).data();
+			return stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)d->node.attribute("type").toInt());
+		}
 		return Options::defaultValue(path());
 	}
 	return node(APath,ANSpace).value();
