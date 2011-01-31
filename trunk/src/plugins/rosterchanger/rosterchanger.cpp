@@ -218,7 +218,7 @@ void RosterChanger::rosterDragLeave(const QDragLeaveEvent *AEvent)
 bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
 {
 	int hoverType = AIndex.data(RDR_TYPE).toInt();
-	if (AEvent->dropAction()!=Qt::IgnoreAction && (DragGroups.contains(hoverType) || hoverType==RIT_STREAM_ROOT))
+	if ((AEvent->dropAction() & Qt::CopyAction|Qt::MoveAction)>0 && (DragGroups.contains(hoverType) || hoverType==RIT_STREAM_ROOT))
 	{
 		Jid hoverStreamJid = AIndex.data(RDR_STREAM_JID).toString();
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(hoverStreamJid) : NULL;
@@ -234,43 +234,53 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 
 			if (!isNewContact && (hoverStreamJid && indexStreamJid))
 			{
-				Action *copyAction = new Action(AMenu);
-				copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
-				copyAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
-				copyAction->setData(ADR_TO_GROUP,AIndex.data(RDR_GROUP));
-
-				Action *moveAction = new Action(AMenu);
-				moveAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
-				moveAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
-				moveAction->setData(ADR_TO_GROUP,AIndex.data(RDR_GROUP));
-
-				if (indexType == RIT_CONTACT)
+				if (AEvent->dropAction() == Qt::CopyAction)
 				{
-					copyAction->setText(tr("Copy contact"));
-					copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
-					connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyContactToGroup(bool)));
-					AMenu->addAction(copyAction,AG_DEFAULT,true);
-
-					moveAction->setText(tr("Move contact"));
-					moveAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
-					moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
-					connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveContactToGroup(bool)));
-					AMenu->addAction(moveAction,AG_DEFAULT,true);
+					Action *copyAction = new Action(AMenu);
+					copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
+					copyAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
+					copyAction->setData(ADR_TO_GROUP,AIndex.data(RDR_GROUP));
+					if (indexType == RIT_CONTACT)
+					{
+						copyAction->setText(tr("Copy contact"));
+						copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+						connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyContactToGroup(bool)));
+						AMenu->addAction(copyAction,AG_DEFAULT,true);
+					}
+					else
+					{
+						copyAction->setText(tr("Copy group"));
+						copyAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+						connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyGroupToGroup(bool)));
+						AMenu->addAction(copyAction,AG_DEFAULT,true);
+					}
+					AMenu->setDefaultAction(copyAction);
+					return true;
 				}
-				else
+				else if (AEvent->dropAction() == Qt::MoveAction)
 				{
-					copyAction->setText(tr("Copy group"));
-					copyAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
-					connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyGroupToGroup(bool)));
-					AMenu->addAction(copyAction,AG_DEFAULT,true);
-
-					moveAction->setText(tr("Move group"));
-					moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
-					connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveGroupToGroup(bool)));
-					AMenu->addAction(moveAction,AG_DEFAULT,true);
+					Action *moveAction = new Action(AMenu);
+					moveAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
+					moveAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
+					moveAction->setData(ADR_TO_GROUP,AIndex.data(RDR_GROUP));
+					if (indexType == RIT_CONTACT)
+					{
+						moveAction->setText(tr("Move contact"));
+						moveAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+						moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+						connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveContactToGroup(bool)));
+						AMenu->addAction(moveAction,AG_DEFAULT,true);
+					}
+					else
+					{
+						moveAction->setText(tr("Move group"));
+						moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+						connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveGroupToGroup(bool)));
+						AMenu->addAction(moveAction,AG_DEFAULT,true);
+					}
+					AMenu->setDefaultAction(moveAction);
+					return true;
 				}
-				AMenu->setDefaultAction(AEvent->dropAction()==Qt::MoveAction ? moveAction : copyAction);
-				return true;
 			}
 			else
 			{
