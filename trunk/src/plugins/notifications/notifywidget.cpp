@@ -18,9 +18,9 @@ NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Q
 	setFocusPolicy(Qt::NoFocus);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 
-	QPalette pallete = ui.frmWindowFrame->palette();
+	QPalette pallete = palette();
 	pallete.setColor(QPalette::Window, pallete.color(QPalette::Base));
-	ui.frmWindowFrame->setPalette(pallete);
+	setPalette(pallete);
 
 	FYPos = -1;
 	FAnimateStep = -1;
