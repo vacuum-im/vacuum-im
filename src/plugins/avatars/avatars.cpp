@@ -15,7 +15,7 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-#define AVATAR_IMAGE_TYPE         "jpeg"
+#define AVATAR_IMAGE_TYPE         "png"
 #define AVATAR_IQ_TIMEOUT         30000
 
 #define UNKNOWN_AVATAR            QString::null

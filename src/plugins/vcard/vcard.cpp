@@ -5,7 +5,7 @@
 #include <QBuffer>
 #include <QImageReader>
 
-#define DEFAUL_IMAGE_FORMAT       "jpeg"
+#define DEFAUL_IMAGE_FORMAT       "png"
 
 VCard::VCard(const Jid &AContactJid, VCardPlugin *APlugin) : QObject(APlugin)
 {
