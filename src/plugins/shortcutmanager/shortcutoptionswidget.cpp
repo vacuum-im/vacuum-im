@@ -22,6 +22,8 @@ ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent
 	ui.setupUi(this);
 	createTreeModel();
 
+	FBlockChangesCheck = 0;
+
 	FSortModel.setSourceModel(&FModel);
 	FSortModel.setSortLocaleAware(true);
 	FSortModel.setSortCaseSensitivity(Qt::CaseInsensitive);
@@ -33,6 +35,10 @@ ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent
 	ui.trvShortcuts->header()->setResizeMode(COL_KEY,QHeaderView::ResizeToContents);
 	ui.trvShortcuts->sortByColumn(COL_NAME,Qt::AscendingOrder);
 	ui.trvShortcuts->expandAll();
+
+	FConflictTimer.setInterval(0);
+	FConflictTimer.setSingleShot(true);
+	connect(&FConflictTimer,SIGNAL(timeout()),SLOT(onShowConflictsTimerTimeout()));
 
 	connect(ui.pbtDefault,SIGNAL(clicked()),SLOT(onDefaultClicked()));
 	connect(ui.pbtClear,SIGNAL(clicked()),SLOT(onClearClicked()));
@@ -52,16 +58,16 @@ void ShortcutOptionsWidget::apply()
 {
 	foreach(QString shortcut, Shortcuts::shortcuts())
 	{
-		QStandardItem *action = FShortcutItem.value(shortcut);
-		if (action)
+		QStandardItem *nameItem = FShortcutItem.value(shortcut);
+		if (nameItem)
 		{
 			Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
-			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
-			QKeySequence activeKey = qvariant_cast<QKeySequence>(key->data(MDR_ACTIVE_KEYSEQUENCE));
+			QStandardItem *keyItem = nameItem->parent()->child(nameItem->row(),COL_KEY);
+			QKeySequence activeKey = qvariant_cast<QKeySequence>(keyItem->data(MDR_ACTIVE_KEYSEQUENCE));
 			if (descriptor.activeKey != activeKey)
 			{
 				Shortcuts::updateShortcut(shortcut, activeKey);
-				onModelItemChanged(action);
+				FConflictTimer.start();
 			}
 		}
 	}
@@ -72,13 +78,13 @@ void ShortcutOptionsWidget::reset()
 {
 	foreach(QString shortcut, Shortcuts::shortcuts())
 	{
-		QStandardItem *action = FShortcutItem.value(shortcut);
-		if (action)
+		QStandardItem *nameItem = FShortcutItem.value(shortcut);
+		if (nameItem)
 		{
 			Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
-			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
-			key->setText(descriptor.activeKey.toString(QKeySequence::NativeText));
-			key->setData(descriptor.activeKey,MDR_ACTIVE_KEYSEQUENCE);
+			QStandardItem *keyItem = nameItem->parent()->child(nameItem->row(),COL_KEY);
+			keyItem->setText(descriptor.activeKey.toString(QKeySequence::NativeText));
+			keyItem->setData(descriptor.activeKey,MDR_ACTIVE_KEYSEQUENCE);
 		}
 	}
 	emit childReset();
@@ -95,40 +101,47 @@ void ShortcutOptionsWidget::createTreeModel()
 		Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 		if (!descriptor.description.isEmpty())
 		{
-			QStandardItem *action = createTreeRow(shortcut,FModel.invisibleRootItem(),false);
-			action->setText(descriptor.description);
+			QStandardItem *nameItem = createTreeRow(shortcut,FModel.invisibleRootItem(),false);
+			nameItem->setText(descriptor.description);
 
-			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
-			key->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsEditable);
-			key->setData(shortcut,MDR_SHORTCUTID);
-			key->setData(descriptor.defaultKey,MDR_DEFAULT_KEYSEQUENCE);
+			QStandardItem *keyItem = nameItem->parent()->child(nameItem->row(),COL_KEY);
+			keyItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsEditable);
+			keyItem->setData(shortcut,MDR_SHORTCUTID);
+			keyItem->setData(descriptor.defaultKey,MDR_DEFAULT_KEYSEQUENCE);
 		}
+	}
+
+	foreach(QString shortcut, Shortcuts::globalShortcuts())
+	{
+		QStandardItem *nameItem = FShortcutItem.value(shortcut);
+		if (nameItem)
+			FGlobalItems.append(nameItem);
 	}
 }
 
 QStandardItem *ShortcutOptionsWidget::createTreeRow(const QString &AId, QStandardItem *AParent, bool AGroup)
 {
-	QStandardItem *itemAction = FShortcutItem.value(AId);
-	if (itemAction == NULL)
+	QStandardItem *nameItem = FShortcutItem.value(AId);
+	if (nameItem == NULL)
 	{
 		int dotIndex = AId.lastIndexOf('.');
 		QString actionName = dotIndex>0 ? AId.mid(dotIndex+1) : AId;
 		QString actionPath = dotIndex>0 ? AId.left(dotIndex) : QString::null;
 		
 		QString actionText = AGroup ? Shortcuts::groupDescription(AId) : QString::null;
-		itemAction = new QStandardItem(!actionText.isEmpty() ? actionText : actionName);
-		itemAction->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-		itemAction->setData(AGroup ? Shortcuts::groupOrder(AId) : 0, MDR_SORTROLE);
+		nameItem = new QStandardItem(!actionText.isEmpty() ? actionText : actionName);
+		nameItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+		nameItem->setData(AGroup ? Shortcuts::groupOrder(AId) : 0, MDR_SORTROLE);
 
-		QStandardItem *itemKey = new QStandardItem;
-		itemKey->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+		QStandardItem *keyItem = new QStandardItem;
+		keyItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 
 		QStandardItem *parentItem = !actionPath.isEmpty() ? createTreeRow(actionPath,AParent,true) : AParent;
-		parentItem->appendRow(QList<QStandardItem *>() << itemAction << itemKey);
+		parentItem->appendRow(QList<QStandardItem *>() << nameItem << keyItem);
 
-		FShortcutItem.insert(AId,itemAction);
+		FShortcutItem.insert(AId,nameItem);
 	}
-	return itemAction;
+	return nameItem;
 }
 
 void ShortcutOptionsWidget::setItemRed(QStandardItem *AItem, bool ARed) const
@@ -143,26 +156,17 @@ void ShortcutOptionsWidget::setItemBold(QStandardItem *AItem, bool ABold) const
 	AItem->setFont(font);
 }
 
-bool ShortcutOptionsWidget::isGlobalKeyFailed(const QString &AId, const QKeySequence &ANewKey) const
-{
-	if (Shortcuts::globalShortcuts().contains(AId) && !ANewKey.isEmpty())
-	{
-		return !Shortcuts::isGlobalShortcutActive(AId) && Shortcuts::shortcutDescriptor(AId).activeKey==ANewKey;
-	}
-	return false;
-}
-
 void ShortcutOptionsWidget::onDefaultClicked()
 {
 	QStandardItem *item = FModel.itemFromIndex(FSortModel.mapToSource(ui.trvShortcuts->currentIndex()));
-	QStandardItem *action = item!=NULL && item->parent()!=NULL ? item->parent()->child(item->row(),COL_NAME) : NULL;
-	QString shortcut = FShortcutItem.key(action);
+	QStandardItem *nameItem = item!=NULL && item->parent()!=NULL ? item->parent()->child(item->row(),COL_NAME) : NULL;
+	QString shortcut = FShortcutItem.key(nameItem);
 	if (Shortcuts::shortcuts().contains(shortcut))
 	{
 		Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
-		QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
-		key->setText(descriptor.defaultKey.toString(QKeySequence::NativeText));
-		key->setData(descriptor.defaultKey,MDR_ACTIVE_KEYSEQUENCE);
+		QStandardItem *keyItem = nameItem->parent()->child(nameItem->row(),COL_KEY);
+		keyItem->setText(descriptor.defaultKey.toString(QKeySequence::NativeText));
+		keyItem->setData(descriptor.defaultKey,MDR_ACTIVE_KEYSEQUENCE);
 	}
 	ui.trvShortcuts->setFocus();
 }
@@ -170,13 +174,13 @@ void ShortcutOptionsWidget::onDefaultClicked()
 void ShortcutOptionsWidget::onClearClicked()
 {
 	QStandardItem *item = FModel.itemFromIndex(FSortModel.mapToSource(ui.trvShortcuts->currentIndex()));
-	QStandardItem *action = item!=NULL && item->parent()!=NULL ? item->parent()->child(item->row(),COL_NAME) : NULL;
-	QString shortcut = FShortcutItem.key(action);
+	QStandardItem *nameItem = item!=NULL && item->parent()!=NULL ? item->parent()->child(item->row(),COL_NAME) : NULL;
+	QString shortcut = FShortcutItem.key(nameItem);
 	if (Shortcuts::shortcuts().contains(shortcut))
 	{
-		QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
-		key->setText(QString::null);
-		key->setData(QKeySequence(QKeySequence::UnknownKey),MDR_ACTIVE_KEYSEQUENCE);
+		QStandardItem *keyItem = nameItem->parent()->child(nameItem->row(),COL_KEY);
+		keyItem->setText(QString::null);
+		keyItem->setData(QKeySequence(QKeySequence::UnknownKey),MDR_ACTIVE_KEYSEQUENCE);
 	}
 	ui.trvShortcuts->setFocus();
 }
@@ -185,54 +189,81 @@ void ShortcutOptionsWidget::onRestoreDefaultsClicked()
 {
 	foreach(QString shortcut, Shortcuts::shortcuts())
 	{
-		QStandardItem *action = FShortcutItem.value(shortcut);
-		if (action)
+		QStandardItem *nameItem = FShortcutItem.value(shortcut);
+		if (nameItem)
 		{
 			Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
-			QStandardItem *key = action->parent()->child(action->row(),COL_KEY);
-			key->setText(descriptor.defaultKey.toString(QKeySequence::NativeText));
-			key->setData(descriptor.defaultKey,MDR_ACTIVE_KEYSEQUENCE);
+			QStandardItem *keyItem = nameItem->parent()->child(nameItem->row(),COL_KEY);
+			keyItem->setText(descriptor.defaultKey.toString(QKeySequence::NativeText));
+			keyItem->setData(descriptor.defaultKey,MDR_ACTIVE_KEYSEQUENCE);
 		}
 	}
 	ui.trvShortcuts->setFocus();
 }
 
-void ShortcutOptionsWidget::onModelItemChanged(QStandardItem *AItem)
+void ShortcutOptionsWidget::onShowConflictsTimerTimeout()
 {
-	static bool blocked = false;
-	QStandardItem *action = AItem->parent()!=NULL ? AItem->parent()->child(AItem->row(),COL_NAME) : NULL;
-	QStandardItem *key = AItem->parent()!=NULL ? AItem->parent()->child(AItem->row(),COL_KEY) : NULL;
-	if (!blocked && action!=NULL && key!=NULL)
-	{
-		blocked = true;
+	FBlockChangesCheck++;
 
-		QMap<QKeySequence, int> keyCount;
-		for (int row=0; row<AItem->parent()->rowCount(); row++)
+	for (QMap<QStandardItem *, QKeySequence>::const_iterator it=FItemKeys.constBegin(); it!=FItemKeys.constEnd(); it++)
+	{
+		bool conflict = false;
+
+		QList<QStandardItem *> sameItems = FItemKeys.keys(it.value());
+		if (!FGlobalItems.contains(it.key()))
 		{
-			QKeySequence childKey = AItem->parent()->child(row,COL_KEY)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
-			keyCount[childKey]++;
+			for(int i=0; !conflict && i<FGlobalItems.count(); i++)
+				conflict = FItemKeys.value(FGlobalItems.at(i)) == it.value();
 		}
-		for (int row=0; row<AItem->parent()->rowCount(); row++)
+		else
 		{
-			QKeySequence childKey = AItem->parent()->child(row,COL_KEY)->data(MDR_ACTIVE_KEYSEQUENCE).toString();
-			bool conflict = !childKey.isEmpty() && keyCount.value(childKey)>1;
-			setItemRed(AItem->parent()->child(row,COL_NAME),conflict);
-			setItemRed(AItem->parent()->child(row,COL_KEY),conflict);
+			QString shortcut = FShortcutItem.key(it.key());
+			conflict = sameItems.count()>1;
+			conflict |= !Shortcuts::isGlobalShortcutActive(shortcut) && Shortcuts::shortcutDescriptor(shortcut).activeKey==it.value();
 		}
 		
-		if (isGlobalKeyFailed(key->data(MDR_SHORTCUTID).toString(),key->data(MDR_ACTIVE_KEYSEQUENCE).toString()))
+		for(int i=0; !conflict && i<sameItems.count(); i++)
+			conflict = sameItems.at(i)!=it.key() && sameItems.at(i)->parent()==it.key()->parent();
+
+		setItemRed(it.key(),conflict);
+		setItemRed(it.key()->parent()->child(it.key()->row(),COL_KEY),conflict);
+	}
+
+	FBlockChangesCheck--;
+}
+
+void ShortcutOptionsWidget::onModelItemChanged(QStandardItem *AItem)
+{
+	QStandardItem *nameItem = AItem->parent()!=NULL ? AItem->parent()->child(AItem->row(),COL_NAME) : NULL;
+	QStandardItem *keyItem = AItem->parent()!=NULL ? AItem->parent()->child(AItem->row(),COL_KEY) : NULL;
+	if (FBlockChangesCheck<=0 && nameItem!=NULL && keyItem!=NULL)
+	{
+		FBlockChangesCheck++;
+
+		QKeySequence oldKey = FItemKeys.value(nameItem);
+		QKeySequence newKey = keyItem->data(MDR_ACTIVE_KEYSEQUENCE).toString();
+		if (oldKey != newKey)
 		{
-			setItemRed(action,true);
-			setItemRed(key,true);
+			if (newKey.isEmpty())
+			{
+				FItemKeys.remove(nameItem);
+				setItemRed(nameItem,false);
+				setItemRed(keyItem,false);
+			}
+			else
+			{
+				FItemKeys.insert(nameItem,newKey);
+			}
+
+			bool notDefault = keyItem->data(MDR_ACTIVE_KEYSEQUENCE).toString()!=keyItem->data(MDR_DEFAULT_KEYSEQUENCE).toString();
+			setItemBold(nameItem, notDefault);
+			setItemBold(keyItem, notDefault);
+			
+			FConflictTimer.start();
+			emit modified();
 		}
 
-		bool notDefault = key->data(MDR_ACTIVE_KEYSEQUENCE).toString()!=key->data(MDR_DEFAULT_KEYSEQUENCE).toString();
-		setItemBold(action, notDefault);
-		setItemBold(key, notDefault);
-
-		blocked = false;
-
-		emit modified();
+		FBlockChangesCheck--;
 	}
 }
 
