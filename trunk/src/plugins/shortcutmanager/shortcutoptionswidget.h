@@ -1,6 +1,7 @@
 #ifndef SHORTCUTOPTIONSWIDGET_H
 #define SHORTCUTOPTIONSWIDGET_H
 
+#include <QTimer>
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
@@ -38,19 +39,23 @@ protected:
 	QStandardItem *createTreeRow(const QString &AId, QStandardItem *AParent, bool AGroup);
 	void setItemRed(QStandardItem *AItem, bool ARed) const;
 	void setItemBold(QStandardItem *AItem, bool ABold) const;
-	bool isGlobalKeyFailed(const QString &AId, const QKeySequence &ANewKey) const;
 protected slots:
 	void onDefaultClicked();
 	void onClearClicked();
 	void onRestoreDefaultsClicked();
+	void onShowConflictsTimerTimeout();
 	void onModelItemChanged(QStandardItem *AItem);
 	void onIndexDoubleClicked(const QModelIndex &AIndex);
 private:
 	Ui::ShortcutOptionsWidgetClass ui;
 private:
+	int FBlockChangesCheck;
+	QTimer FConflictTimer;
 	QStandardItemModel FModel;
 	SortFilterProxyModel FSortModel;
+	QList<QStandardItem *> FGlobalItems;
 	QHash<QString, QStandardItem *> FShortcutItem;
+	QMap<QStandardItem *, QKeySequence> FItemKeys;
 };
 
 #endif // SHORTCUTOPTIONSWIDGET_H
