@@ -15,7 +15,7 @@ class ReceiversWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IReceiversWidget);
 public:
-	ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid);
+	ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, QWidget *AParent);
 	~ReceiversWidget();
 	virtual QWidget *instance() { return this; }
 	virtual const Jid &streamJid() const { return FStreamJid; }

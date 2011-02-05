@@ -1,6 +1,6 @@
 #include "menubarwidget.h"
 
-MenuBarWidget::MenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+MenuBarWidget::MenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) : QMenuBar(AParent)
 {
 	FInfoWidget = AInfo;
 	FViewWidget = AView;

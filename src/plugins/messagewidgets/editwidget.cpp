@@ -8,7 +8,7 @@
 
 #define MAX_BUFFERED_MESSAGES     10
 
-EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
+EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	ui.medEditor->setAcceptRichText(true);

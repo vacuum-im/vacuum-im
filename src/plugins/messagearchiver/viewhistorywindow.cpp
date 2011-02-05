@@ -278,12 +278,12 @@ void ViewHistoryWindow::initialize(IPluginManager *APluginManager)
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			FViewWidget = FMessageWidgets->newViewWidget(FStreamJid,FStreamJid);
-			FMessagesTools = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,NULL,NULL);
 			ui.wdtMessages->setLayout(new QVBoxLayout);
 			ui.wdtMessages->layout()->setMargin(0);
-			ui.wdtMessages->layout()->addWidget(FMessagesTools->instance());
+			FViewWidget = FMessageWidgets->newViewWidget(FStreamJid,FStreamJid,ui.wdtMessages);
 			ui.wdtMessages->layout()->addWidget(FViewWidget->instance());
+			FMessagesTools = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,NULL,NULL,ui.wdtMessages);
+			ui.wdtMessages->layout()->addWidget(FMessagesTools->instance());
 		}
 	}
 

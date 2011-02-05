@@ -130,59 +130,59 @@ bool MessageWidgets::viewUrlOpen(IViewWidget* APage, const QUrl &AUrl, int AOrde
 	return QDesktopServices::openUrl(AUrl);
 }
 
-IInfoWidget *MessageWidgets::newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid)
+IInfoWidget *MessageWidgets::newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
 {
-	IInfoWidget *widget = new InfoWidget(this,AStreamJid,AContactJid);
+	IInfoWidget *widget = new InfoWidget(this,AStreamJid,AContactJid,AParent);
 	FCleanupHandler.add(widget->instance());
 	emit infoWidgetCreated(widget);
 	return widget;
 }
 
-IViewWidget *MessageWidgets::newViewWidget(const Jid &AStreamJid, const Jid &AContactJid)
+IViewWidget *MessageWidgets::newViewWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
 {
-	IViewWidget *widget = new ViewWidget(this,AStreamJid,AContactJid);
+	IViewWidget *widget = new ViewWidget(this,AStreamJid,AContactJid,AParent);
 	connect(widget->instance(),SIGNAL(urlClicked(const QUrl &)),SLOT(onViewWidgetUrlClicked(const QUrl &)));
 	FCleanupHandler.add(widget->instance());
 	emit viewWidgetCreated(widget);
 	return widget;
 }
 
-IEditWidget *MessageWidgets::newEditWidget(const Jid &AStreamJid, const Jid &AContactJid)
+IEditWidget *MessageWidgets::newEditWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
 {
-	IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid);
+	IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid,AParent);
 	FCleanupHandler.add(widget->instance());
 	emit editWidgetCreated(widget);
 	return widget;
 }
 
-IReceiversWidget *MessageWidgets::newReceiversWidget(const Jid &AStreamJid)
+IReceiversWidget *MessageWidgets::newReceiversWidget(const Jid &AStreamJid, QWidget *AParent)
 {
-	IReceiversWidget *widget = new ReceiversWidget(this,AStreamJid);
+	IReceiversWidget *widget = new ReceiversWidget(this,AStreamJid,AParent);
 	FCleanupHandler.add(widget->instance());
 	emit receiversWidgetCreated(widget);
 	return widget;
 }
 
-IMenuBarWidget *MessageWidgets::newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+IMenuBarWidget *MessageWidgets::newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent)
 {
-	IMenuBarWidget *widget = new MenuBarWidget(AInfo,AView,AEdit,AReceivers);
+	IMenuBarWidget *widget = new MenuBarWidget(AInfo,AView,AEdit,AReceivers,AParent);
 	FCleanupHandler.add(widget->instance());
 	emit menuBarWidgetCreated(widget);
 	return widget;
 }
 
-IToolBarWidget *MessageWidgets::newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+IToolBarWidget *MessageWidgets::newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent)
 {
-	IToolBarWidget *widget = new ToolBarWidget(AInfo,AView,AEdit,AReceivers);
+	IToolBarWidget *widget = new ToolBarWidget(AInfo,AView,AEdit,AReceivers,AParent);
 	FCleanupHandler.add(widget->instance());
 	insertQuoteAction(widget);
 	emit toolBarWidgetCreated(widget);
 	return widget;
 }
 
-IStatusBarWidget *MessageWidgets::newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+IStatusBarWidget *MessageWidgets::newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent)
 {
-	IStatusBarWidget *widget = new StatusBarWidget(AInfo,AView,AEdit,AReceivers);
+	IStatusBarWidget *widget = new StatusBarWidget(AInfo,AView,AEdit,AReceivers,AParent);
 	FCleanupHandler.add(widget->instance());
 	emit statusBarWidgetCreated(widget);
 	return widget;

@@ -54,13 +54,13 @@ public:
 	virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
 	//IMessageWidgets
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
-	virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid);
-	virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid);
-	virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid);
-	virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid);
-	virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
-	virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
-	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
+	virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
+	virtual IViewWidget *newViewWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
+	virtual IEditWidget *newEditWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
+	virtual IReceiversWidget *newReceiversWidget(const Jid &AStreamJid, QWidget *AParent);
+	virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
+	virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
+	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	virtual QList<IMessageWindow *> messageWindows() const;
 	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const;

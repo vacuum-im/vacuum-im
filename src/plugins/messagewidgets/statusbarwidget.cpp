@@ -1,6 +1,6 @@
 #include "statusbarwidget.h"
 
-StatusBarWidget::StatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+StatusBarWidget::StatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) : QStatusBar(AParent)
 {
 	FInfoWidget = AInfo;
 	FViewWidget = AView;

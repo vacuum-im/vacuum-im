@@ -16,7 +16,7 @@ class ViewWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IViewWidget);
 public:
-	ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid);
+	ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
 	~ViewWidget();
 	virtual QWidget *instance() { return this; }
 	virtual const Jid &streamJid() const { return FStreamJid; }

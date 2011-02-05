@@ -14,34 +14,34 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FContactJid = AContactJid;
 	FShownDetached = false;
 
-	FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid);
 	ui.wdtInfo->setLayout(new QVBoxLayout);
 	ui.wdtInfo->layout()->setMargin(0);
+	FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid,ui.wdtInfo);
 	ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
 	onOptionsChanged(Options::node(OPV_MESSAGES_SHOWINFOWIDGET));
 
-	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
 	ui.wdtView->setLayout(new QVBoxLayout);
 	ui.wdtView->layout()->setMargin(0);
+	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid,ui.wdtView);
 	ui.wdtView->layout()->addWidget(FViewWidget->instance());
 
-	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
-	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
 	ui.wdtEdit->setLayout(new QVBoxLayout);
 	ui.wdtEdit->layout()->setMargin(0);
+	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid,ui.wdtEdit);
+	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
 	ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
 	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 
-	FMenuBarWidget = FMessageWidgets->newMenuBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
-	setMenuBar(FMenuBarWidget->instance());
-
-	FToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
-	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
 	ui.wdtToolBar->setLayout(new QVBoxLayout);
 	ui.wdtToolBar->layout()->setMargin(0);
+	FToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL,ui.wdtToolBar);
+	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
 	ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
 
-	FStatusBarWidget = FMessageWidgets->newStatusBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL);
+	FMenuBarWidget = FMessageWidgets->newMenuBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL,this);
+	setMenuBar(FMenuBarWidget->instance());
+
+	FStatusBarWidget = FMessageWidgets->newStatusBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL,this);
 	setStatusBar(FStatusBarWidget->instance());
 
 	initialize();
