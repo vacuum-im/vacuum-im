@@ -17,7 +17,7 @@ class InfoWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IInfoWidget);
 public:
-	InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid);
+	InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, QWidget *AParent);
 	~InfoWidget();
 	virtual QWidget *instance() { return this; }
 	virtual const Jid &streamJid() const;

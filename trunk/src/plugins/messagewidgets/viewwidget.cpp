@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QTextDocumentFragment>
 
-ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid)
+ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	setAcceptDrops(true);

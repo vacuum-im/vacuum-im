@@ -11,7 +11,7 @@ class ToolBarWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IToolBarWidget);
 public:
-	ToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
+	ToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	~ToolBarWidget();
 	virtual QToolBar *instance() { return this; }
 	virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }

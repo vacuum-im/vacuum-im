@@ -464,31 +464,31 @@ void MultiUserChatWindow::createMessageWidgets()
 {
 	if (FMessageWidgets)
 	{
-		FViewWidget = FMessageWidgets->newViewWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
 		ui.wdtView->setLayout(new QVBoxLayout);
-		ui.wdtView->layout()->addWidget(FViewWidget->instance());
 		ui.wdtView->layout()->setMargin(0);
+		FViewWidget = FMessageWidgets->newViewWidget(FMultiChat->streamJid(),FMultiChat->roomJid(),ui.wdtView);
+		ui.wdtView->layout()->addWidget(FViewWidget->instance());
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
-		FEditWidget = FMessageWidgets->newEditWidget(FMultiChat->streamJid(),FMultiChat->roomJid());
-		FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE);
 		ui.wdtEdit->setLayout(new QVBoxLayout);
-		ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
 		ui.wdtEdit->layout()->setMargin(0);
+		FEditWidget = FMessageWidgets->newEditWidget(FMultiChat->streamJid(),FMultiChat->roomJid(),ui.wdtEdit);
+		FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE);
+		ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
 		connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 		connect(FEditWidget->instance(),SIGNAL(messageAboutToBeSend()),SLOT(onMessageAboutToBeSend()));
 		connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onEditWidgetKeyEvent(QKeyEvent *,bool &)));
 
-		FMenuBarWidget = FMessageWidgets->newMenuBarWidget(NULL,FViewWidget,FEditWidget,NULL);
-		setMenuBar(FMenuBarWidget->instance());
-
-		FToolBarWidget = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,FEditWidget,NULL);
 		ui.wdtToolBar->setLayout(new QVBoxLayout);
-		ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
 		ui.wdtToolBar->layout()->setMargin(0);
+		FToolBarWidget = FMessageWidgets->newToolBarWidget(NULL,FViewWidget,FEditWidget,NULL,ui.wdtToolBar);
+		ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
 		FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
 
-		FStatusBarWidget = FMessageWidgets->newStatusBarWidget(NULL,FViewWidget,FEditWidget,NULL);
+		FMenuBarWidget = FMessageWidgets->newMenuBarWidget(NULL,FViewWidget,FEditWidget,NULL,this);
+		setMenuBar(FMenuBarWidget->instance());
+
+		FStatusBarWidget = FMessageWidgets->newStatusBarWidget(NULL,FViewWidget,FEditWidget,NULL,this);
 		setStatusBar(FStatusBarWidget->instance());
 	}
 }

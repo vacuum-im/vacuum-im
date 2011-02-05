@@ -11,7 +11,7 @@ class StatusBarWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IStatusBarWidget);
 public:
-	StatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
+	StatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	~StatusBarWidget();
 	virtual QStatusBar *instance() { return this; }
 	virtual StatusBarChanger *statusBarChanger() const { return FStatusBarChanger; }

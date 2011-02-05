@@ -3,7 +3,7 @@
 #include <QMovie>
 #include <QImageReader>
 
-InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
+InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 

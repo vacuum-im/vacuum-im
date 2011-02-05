@@ -1,6 +1,6 @@
 #include "toolbarwidget.h"
 
-ToolBarWidget::ToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers)
+ToolBarWidget::ToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) : QToolBar(AParent)
 {
 	FInfoWidget = AInfo;
 	FViewWidget = AView;

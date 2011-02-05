@@ -11,7 +11,7 @@ class MenuBarWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IMenuBarWidget);
 public:
-	MenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers);
+	MenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	~MenuBarWidget();
 	virtual QMenuBar *instance() { return this; }
 	virtual MenuBarChanger *menuBarChanger() const { return FMenuBarChanger; }

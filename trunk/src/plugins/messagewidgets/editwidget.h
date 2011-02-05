@@ -17,7 +17,7 @@ class EditWidget :
 	Q_OBJECT;
 	Q_INTERFACES(IEditWidget);
 public:
-	EditWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid);
+	EditWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
 	~EditWidget();
 	virtual QWidget *instance() { return this; }
 	virtual const Jid &streamJid() const;

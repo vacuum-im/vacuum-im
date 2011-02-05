@@ -16,34 +16,30 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 	FContactJid = AContactJid;
 	FCurrentThreadId = QUuid::createUuid().toString();
 
-	FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid);
-	ui.wdtInfo->setLayout(new QVBoxLayout(ui.wdtInfo));
-	ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
-	ui.wdtInfo->layout()->setMargin(0);
-
-	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid);
-
-	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid);
-	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
-	FEditWidget->setSendButtonVisible(false);
-	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
-
-	FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid);
+	FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid,ui.wdtTabs);
 	connect(FReceiversWidget->instance(),SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
 	connect(FReceiversWidget->instance(),SIGNAL(receiverRemoved(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
 	FReceiversWidget->addReceiver(FContactJid);
 
-	FViewToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,NULL,NULL);
-	FViewToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-
-	FEditToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,NULL,FEditWidget,NULL);
-	FEditToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-
-	ui.wdtToolBar->setLayout(new QVBoxLayout(ui.wdtToolBar));
-	ui.wdtToolBar->layout()->setMargin(0);
+	ui.wdtInfo->setLayout(new QVBoxLayout(ui.wdtInfo));
+	ui.wdtInfo->layout()->setMargin(0);
+	FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid,ui.wdtInfo);
+	ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
 
 	ui.wdtMessage->setLayout(new QVBoxLayout(ui.wdtMessage));
 	ui.wdtMessage->layout()->setMargin(0);
+	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid,ui.wdtMessage);
+	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid,ui.wdtMessage);
+	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
+	FEditWidget->setSendButtonVisible(false);
+	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+
+	ui.wdtToolBar->setLayout(new QVBoxLayout(ui.wdtToolBar));
+	ui.wdtToolBar->layout()->setMargin(0);
+	FViewToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,NULL,NULL,ui.wdtToolBar);
+	FViewToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
+	FEditToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,NULL,FEditWidget,NULL,ui.wdtToolBar);
+	FEditToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
 
 	connect(ui.pbtSend,SIGNAL(clicked()),SLOT(onSendButtonClicked()));
 	connect(ui.pbtReply,SIGNAL(clicked()),SLOT(onReplyButtonClicked()));
