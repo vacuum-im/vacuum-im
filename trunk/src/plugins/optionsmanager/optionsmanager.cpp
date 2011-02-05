@@ -145,6 +145,8 @@ QMultiMap<int, IOptionsWidget *> OptionsManager::optionsWidgets(const QString &A
 	{
 #ifdef Q_WS_WIN
 		widgets.insertMulti(OWO_MISC_AUTOSTART, optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent));
+#else
+		Q_UNUSED(AParent);
 #endif
 	}
 	return widgets;

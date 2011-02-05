@@ -218,7 +218,7 @@ void RosterChanger::rosterDragLeave(const QDragLeaveEvent *AEvent)
 bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
 {
 	int hoverType = AIndex.data(RDR_TYPE).toInt();
-	if ((AEvent->dropAction() & Qt::CopyAction|Qt::MoveAction)>0 && (DragGroups.contains(hoverType) || hoverType==RIT_STREAM_ROOT))
+	if ((AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0 && (DragGroups.contains(hoverType) || hoverType==RIT_STREAM_ROOT))
 	{
 		Jid hoverStreamJid = AIndex.data(RDR_STREAM_JID).toString();
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(hoverStreamJid) : NULL;
