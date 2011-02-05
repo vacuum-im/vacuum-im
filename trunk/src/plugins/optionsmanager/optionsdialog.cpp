@@ -77,7 +77,7 @@ void OptionsDialog::showNode(const QString &ANodeId)
 
 QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 {
-	QWidget *nodeWidget = new QWidget;
+	QWidget *nodeWidget = new QWidget(ui.scaScroll);
 	nodeWidget->setLayout(new QVBoxLayout);
 	nodeWidget->layout()->setMargin(5);
 
