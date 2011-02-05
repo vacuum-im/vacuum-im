@@ -137,7 +137,6 @@ void MainWindowPlugin::showMainWindow()
 
 void MainWindowPlugin::correctWindowPosition()
 {
-	static const int delta = 20;
 	QRect windowRect = FMainWindow->geometry();
 	QRect screenRect = qApp->desktop()->availableGeometry(FMainWindow);
 	if (!screenRect.isEmpty() && !windowRect.isEmpty())
