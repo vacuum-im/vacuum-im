@@ -1,5 +1,7 @@
 #include "captchaforms.h"
 
+#include <QTextDocument>
+
 #define SHC_MESSAGE_CAPTCHA         "/message/captcha[@xmlns='" NS_CAPTCHA_FORMS "']"
 
 #define ACCEPT_CHALLENGE_TIMEOUT    30000
@@ -278,7 +280,7 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
 			notify.data.insert(NDR_POPUP_CAPTION, tr("CAPTCHA Challenge"));
-			notify.data.insert(NDR_POPUP_TEXT, tr("You have received the CAPTCHA challenge"));
+			notify.data.insert(NDR_POPUP_HTML,Qt::escape(tr("You have received the CAPTCHA challenge")));
 			FChallengeNotify.insert(FNotifications->appendNotification(notify),FDataForms->fieldValue("challenge", AChallenge.dialog->formWidget()->dataForm().fields).toString());
 			return;
 		}

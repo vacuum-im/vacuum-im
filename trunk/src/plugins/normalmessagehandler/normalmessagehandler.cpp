@@ -199,8 +199,18 @@ INotification NormalMessageHandler::notification(INotifications *ANotifications,
 		notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(AMessage.from()));
 		notify.data.insert(NDR_POPUP_CAPTION, tr("Message received"));
 		notify.data.insert(NDR_POPUP_TITLE,name);
-		notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 		notify.data.insert(NDR_SOUND_FILE,SDF_NORMAL_MHANDLER_MESSAGE);
+
+		if (FMessageProcessor)
+		{
+			QTextDocument doc;
+			FMessageProcessor->messageToText(&doc,AMessage);
+			notify.data.insert(NDR_POPUP_HTML,getDocumentBody(doc));
+		}
+		else
+		{
+			notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
+		}
 	}
 
 	if (notify.kinds & INotification::PopupWindow)

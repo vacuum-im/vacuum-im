@@ -892,8 +892,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
 			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
 			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
-			notify.data.insert(NDR_POPUP_TEXT,APresence->status());
-			notify.data.insert(NDR_POPUP_TEXT,APresence->status());
+			notify.data.insert(NDR_POPUP_HTML,Qt::escape(APresence->status()));
 			notify.data.insert(NDR_SOUND_FILE,SDF_SCHANGER_CONNECTION_ERROR);
 			FNotifyId.insert(APresence,FNotifications->appendNotification(notify));
 		}
