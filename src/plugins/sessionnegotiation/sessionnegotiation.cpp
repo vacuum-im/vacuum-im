@@ -1,6 +1,7 @@
 #include "sessionnegotiation.h"
 
 #include <QUuid>
+#include <QTextDocument>
 #include <QCryptographicHash>
 
 #define SHC_STANZA_SESSION            "/message/feature[@xmlns='"NS_FEATURENEG"']"
@@ -859,8 +860,8 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Session negotiation"));
 				notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(ASession.streamJid,ASession.contactJid));
 				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
-				notify.data.insert(NDR_POPUP_TEXT, notify.data.value(NDR_TOOLTIP));
-				notify.data.insert(NDR_SOUND_FILE, notify.data.value(NDR_TOOLTIP));
+				notify.data.insert(NDR_POPUP_HTML, Qt::escape(notify.data.value(NDR_TOOLTIP).toString()));
+				notify.data.insert(NDR_SOUND_FILE, SDF_SNEGOTIATION_REQUEST);
 				int notifyId = FNotifications->appendNotification(notify);
 				FDialogByNotify.insert(notifyId,dialog);
 			}

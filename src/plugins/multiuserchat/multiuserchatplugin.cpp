@@ -469,7 +469,7 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
 			notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
 			notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
 			notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));
-			notify.data.insert(NDR_POPUP_TEXT,notify.data.value(NDR_TOOLTIP));
+			notify.data.insert(NDR_POPUP_HTML,Qt::escape(notify.data.value(NDR_TOOLTIP).toString()));
 			notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
 		}
 	}

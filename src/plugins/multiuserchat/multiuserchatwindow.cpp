@@ -216,8 +216,8 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 					}
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
-					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
+
 				}
 				widgetToAlert = this;
 			}
@@ -232,13 +232,22 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 					notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
 					notify.data.insert(NDR_POPUP_CAPTION,tr("Private message"));
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
-					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
 				}
 				widgetToAlert = window!=NULL ? window->instance() : NULL;
 			}
 			if (notify.kinds & INotification::PopupWindow)
 			{
+				if (FMessageProcessor)
+				{
+					QTextDocument doc;
+					FMessageProcessor->messageToText(&doc,AMessage);
+					notify.data.insert(NDR_POPUP_HTML,getDocumentBody(doc));
+				}
+				else
+				{
+					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
+				}
 				WidgetManager::alertWidget(widgetToAlert);
 			}
 		}
@@ -253,7 +262,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Data form received"));
 				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(FMultiChat->streamJid(),contactJid));
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(contactJid));
-				notify.data.insert(NDR_POPUP_TEXT,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text());
+				notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text()));
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_DATA_MESSAGE);
 			}
 		}
