@@ -113,8 +113,8 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 	{
 		if (!FWidgetStatus.contains(AWidget))
 		{
+			AClean = true;
 			WidgetStatus &wstatus = FWidgetStatus[view];
-			wstatus.ready = false;
 			wstatus.lastKind = -1;
 			wstatus.scrollStarted = false;
 			view->installEventFilter(this);
@@ -130,9 +130,11 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 
 		if (AClean)
 		{
-			FWidgetStatus[view].ready = false;
+			WidgetStatus &wstatus = FWidgetStatus[view];
+			wstatus.ready = false;
 			QString html = makeStyleTemplate(AOptions);
 			fillStyleKeywords(html,AOptions);
+			wstatus.styleTemplate = html;
 			view->setHtml(html);
 		}
 		else
@@ -651,15 +653,27 @@ void AdiumMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
 
 void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 {
-	Q_UNUSED(AOk);
 	StyleViewer *view = qobject_cast<StyleViewer *>(sender());
 	if (view)
 	{
 		WidgetStatus &wstatus = FWidgetStatus[view];
-		foreach(QString script, wstatus.pending)
-			view->page()->mainFrame()->evaluateJavaScript(script);
-		view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
-		wstatus.ready = true;
-		wstatus.pending.clear();
+		if (AOk)
+		{
+			foreach(QString script, wstatus.pending)
+				view->page()->mainFrame()->evaluateJavaScript(script);
+			view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
+			wstatus.ready = true;
+			wstatus.pending.clear();
+			wstatus.styleTemplate.clear();
+		}
+		else if (!wstatus.styleTemplate.isEmpty())
+		{
+			view->setHtml(wstatus.styleTemplate);
+			wstatus.styleTemplate.clear();
+		}
+		else
+		{
+			view->setHtml("Style Template Load Error!");
+		}
 	}
 }
