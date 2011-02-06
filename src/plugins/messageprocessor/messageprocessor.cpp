@@ -321,6 +321,7 @@ QString MessageProcessor::prepareBodyForReceive(const QString &AString) const
 	QString result = Qt::escape(AString);
 	result.replace('\n',"<br>");
 	result.replace("  ","&nbsp; ");
+	result.replace('\t',"&nbsp; &nbsp; ");
 	return result;
 }
 
