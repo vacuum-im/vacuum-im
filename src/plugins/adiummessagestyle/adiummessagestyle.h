@@ -102,6 +102,7 @@ public:
 		QString lastId;
 		QDateTime lastTime;
 		bool scrollStarted;
+		QString styleTemplate;
 		QList<QString> pending;
 	};
 public:
