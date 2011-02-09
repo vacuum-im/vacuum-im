@@ -119,7 +119,7 @@ bool PrivacyLists::initObjects()
 
 bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FSHIPrivacy.value(AStreamJid)==AHandlerId && (AStanza.from().isEmpty() || (AStreamJid && AStanza.from())))
+	if (FSHIPrivacy.value(AStreamJid)==AHandlerId && AStreamJid==AStanza.from())
 	{
 		QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_PRIVACY);
 		QDomElement listElem = queryElem.firstChildElement("list");

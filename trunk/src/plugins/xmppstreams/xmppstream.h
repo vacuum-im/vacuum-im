@@ -79,7 +79,7 @@ protected:
 	void processFeatures();
 	bool startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem);
 	bool processDataHandlers(QByteArray &AData, bool ADataOut);
-	bool processStanzaHandlers(Stanza &AStanza, bool AElementOut);
+	bool processStanzaHandlers(Stanza &AStanza, bool AStanzaOut);
 	qint64 sendData(QByteArray AData);
 	QByteArray receiveData(qint64 ABytes);
 protected slots:
