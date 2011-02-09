@@ -70,7 +70,7 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		else
 			return false;
 
-		if (!AStanza.from().isEmpty() && AStreamJid != AStanza.from())
+		if (AStreamJid != AStanza.from())
 		{
 			Jid fromJid = AStanza.from();
 

@@ -35,7 +35,7 @@ bool Roster::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASta
 {
 	if (AHandlerId == FSHIRosterPush)
 	{
-		if (isOpen() && (AStanza.from().isEmpty() || (AStreamJid && AStanza.from())))
+		if (isOpen() && AStreamJid==AStanza.from())
 		{
 			AAccept = true;
 			processItemsElement(AStanza.firstElement("query",NS_JABBER_ROSTER),false);

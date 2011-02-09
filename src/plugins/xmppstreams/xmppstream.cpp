@@ -381,15 +381,20 @@ bool XmppStream::processDataHandlers(QByteArray &AData, bool ADataOut)
 	return hooked;
 }
 
-bool XmppStream::processStanzaHandlers(Stanza &AStanza, bool AElementOut)
+bool XmppStream::processStanzaHandlers(Stanza &AStanza, bool AStanzaOut)
 {
 	bool hooked = false;
 	QMapIterator<int, IXmppStanzaHadler *> it(FStanzaHandlers);
-	if (!AElementOut)
-		it.toBack();
-	while (!hooked && (AElementOut ? it.hasNext() : it.hasPrevious()))
+	if (!AStanzaOut)
 	{
-		if (AElementOut)
+		if (AStanza.from().isEmpty() || Jid(FStreamJid.bare())==AStanza.from())
+			AStanza.setFrom(FStreamJid.eFull());
+		AStanza.setTo(FStreamJid.eFull());
+		it.toBack();
+	}
+	while (!hooked && (AStanzaOut ? it.hasNext() : it.hasPrevious()))
+	{
+		if (AStanzaOut)
 		{
 			it.next();
 			hooked = it.value()->xmppStanzaOut(this, AStanza, it.key());

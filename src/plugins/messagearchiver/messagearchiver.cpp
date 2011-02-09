@@ -299,7 +299,7 @@ bool MessageArchiver::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Sta
 		Message message(AStanza);
 		processMessage(AStreamJid,message,false);
 	}
-	else if (FSHIPrefs.value(AStreamJid)==AHandlerId && (AStanza.from().isEmpty() || Jid(AStreamJid.domain())==AStanza.from()))
+	else if (FSHIPrefs.value(AStreamJid)==AHandlerId && AStreamJid==AStanza.from())
 	{
 		QDomElement prefElem = AStanza.firstElement("pref",FNamespaces.value(AStreamJid));
 		applyArchivePrefs(AStreamJid,prefElem);

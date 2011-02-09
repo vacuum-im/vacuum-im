@@ -48,10 +48,6 @@ bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 {
 	if (AOrder == XSHO_STANZAPROCESSOR)
 	{
-		if (AStanza.from().isEmpty())
-			AStanza.setFrom(AXmppStream->streamJid().eFull());
-		AStanza.setTo(AXmppStream->streamJid().eFull());
-
 		if (!sendStanzaIn(AXmppStream->streamJid(),AStanza))
 		{
 			if (AStanza.canReplyError())
