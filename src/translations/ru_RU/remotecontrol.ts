@@ -132,10 +132,6 @@
         <translation>Входящие передачи файлов</translation>
     </message>
     <message>
-        <source>%1 (%2 bytes) from %3</source>
-        <translation>%1 (%2 байт) от %3</translation>
-    </message>
-    <message>
         <source>There are no pending file transfers</source>
         <translation>Нет непринятых входящих передач файлов</translation>
     </message>
@@ -158,6 +154,34 @@
     <message>
         <source>Set options</source>
         <translation>Изменить настройки</translation>
+    </message>
+    <message>
+        <source>Forward unread messages</source>
+        <translation>Переслать непрочитанные сообщения</translation>
+    </message>
+    <message>
+        <source>%1 (%2 bytes) from &apos;%3&apos;</source>
+        <translation>%1 (%2 байт) от &apos;%3&apos;</translation>
+    </message>
+    <message>
+        <source>List of unread messages</source>
+        <translation>Список непрочитанных сообщений</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n message(s) from &apos;%1&apos;</source>
+        <translation>
+            <numerusform>%n сообщение от &apos;%1&apos;</numerusform>
+            <numerusform>%n сообщения от &apos;%1&apos;</numerusform>
+            <numerusform>%n сообщений от &apos;%1&apos;</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>There are no unread messages</source>
+        <translation>Непрочитанные сообщения отсутствуют</translation>
+    </message>
+    <message>
+        <source>A list of unread messages</source>
+        <translation>Список непрочитанных сообщений</translation>
     </message>
 </context>
 </TS>

@@ -65,7 +65,10 @@ QString Stanza::attribute(const QString &AName) const
 
 Stanza &Stanza::setAttribute(const QString &AName, const QString &AValue)
 {
-	d->FDoc.documentElement().setAttribute(AName,AValue);
+	if (!AValue.isEmpty())
+		d->FDoc.documentElement().setAttribute(AName,AValue);
+	else
+		d->FDoc.documentElement().removeAttribute(AName);
 	return *this;
 }
 
