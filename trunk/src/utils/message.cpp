@@ -182,7 +182,7 @@ Message &Message::setType(MessageType AType)
 
 bool Message::isDelayed() const
 {
-	return !d->FStanza.firstElement("x","urn:xmpp:delay").isNull() || !d->FStanza.firstElement("x","jabber:x:delay").isNull();
+	return !d->FStanza.firstElement("delay","urn:xmpp:delay").isNull() || !d->FStanza.firstElement("x","jabber:x:delay").isNull();
 }
 
 QDateTime Message::dateTime() const
@@ -196,11 +196,11 @@ Message &Message::setDateTime(const QDateTime &ADateTime, bool ADelayed)
 	if (ADelayed)
 	{
 		d->FStanza.detach();
-		QDomElement elem = d->FStanza.firstElement("x","urn:xmpp:delay");
+		QDomElement elem = d->FStanza.firstElement("delay","urn:xmpp:delay");
 		if (elem.isNull())
 			QDomElement elem = d->FStanza.firstElement("x","jabber:x:delay");
 		if (elem.isNull())
-			elem = d->FStanza.addElement("x","urn:xmpp:delay");
+			elem = d->FStanza.addElement("delay","urn:xmpp:delay");
 		elem.setAttribute("stamp",DateTime(ADateTime).toX85UTC());
 	}
 	return *this;

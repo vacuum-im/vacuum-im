@@ -83,4 +83,6 @@
 #define NS_PUBSUB_EVENT                         "http://jabber.org/protocol/pubsub#event"
 #define NS_PUBSUB_OWNER                         "http://jabber.org/protocol/pubsub#owner"
 
+#define NS_ADDRESS                              "http://jabber.org/protocol/address"
+
 #endif

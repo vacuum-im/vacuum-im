@@ -2,6 +2,7 @@
 #define DEF_STANZAHANDLERORDERS_H
 
 //Message In
+#define SHO_MI_REMOTECONTROL          10
 #define SHO_MI_CAPTCHAFORMS           300
 #define SHO_MI_CHATSTATES             500
 #define SHO_MI_MULTIUSERCHAT          500

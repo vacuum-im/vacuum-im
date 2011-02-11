@@ -11,21 +11,30 @@
 #define COMMAND_NODE_LEAVE_MUC          COMMAND_NODE_ROOT"#leave-groupchats"
 #define COMMAND_NODE_ACCEPT_FILES       COMMAND_NODE_ROOT"#accept-files"
 #define COMMAND_NODE_SET_OPTIONS        COMMAND_NODE_ROOT"#set-options"
+#define COMMAND_NODE_FORWARD_MESSAGES   COMMAND_NODE_ROOT"#forward"
 
 #define FIELD_STATUS                    "status"
+#define FIELD_STATUS_MESSAGE            "status-message"
+#define FIELD_STATUS_PRIORITY           "status-priority"
 #define FIELD_GROUPCHATS                "groupchats"
 #define FIELD_FILES                     "files"
+#define FIELD_MESSAGES                  "messages"
 #define FIELD_SOUNDS                    "sounds"
 #define FIELD_AUTO_MSG                  "auto-msg"
 #define FIELD_AUTO_FILES                "auto-files"
 #define FIELD_AUTO_AUTH                 "auto-auth"
+#define FIELD_AUTO_OFFLINE              "auto-offline"
+
+#define SHC_MESSAGE_ADDRESS             "/message/addresses[@xmlns='" NS_ADDRESS "']/address[@type='ofrom']"
 
 struct OptionsFormItem
 {
+	OptionsFormItem(QString ANode = QString::null, QString ALabel = QString::null) {
+		node = ANode;
+		label = ALabel;
+	}
 	QString node;
 	QString label;
-
-	OptionsFormItem(QString ANode = QString(), QString ALabel = QString()) : node(ANode), label(ALabel) {}
 };
 
 QMap<QString, OptionsFormItem> optionItems;
@@ -37,6 +46,9 @@ RemoteControl::RemoteControl()
 	FMUCPlugin = NULL;
 	FDataForms = NULL;
 	FFileStreamManager = NULL;
+	FMessageProcessor = NULL;
+	FNotifications = NULL;
+	FStanzaProcessor = NULL;
 }
 
 RemoteControl::~RemoteControl()
@@ -63,52 +75,90 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FCommands = qobject_cast<ICommands *>(plugin->instance());
 	}
+	
 	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
 	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 	}
+	
 	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
 	if (plugin)
 	{
 		FMUCPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
 	}
+	
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 	}
+	
 	plugin = APluginManager->pluginInterface("IFileStreamsManager").value(0,NULL);
 	if (plugin)
 	{
 		FFileStreamManager = qobject_cast<IFileStreamsManager *>(plugin->instance());
 	}
+	
+	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
+	if (plugin)
+	{
+		FNotifications = qobject_cast<INotifications *>(plugin->instance());
+	}
+
 	return (FCommands!=NULL && FDataForms!=NULL);
 }
 
 bool RemoteControl::initObjects()
 {
-	if (FCommands != NULL)
+	if (FCommands)
 	{
 		FCommands->insertServer(COMMAND_NODE_PING, this);
-		if (FStatusChanger != NULL)
+		FCommands->insertServer(COMMAND_NODE_SET_OPTIONS, this);
+		if (FStatusChanger)
 		{
 			FCommands->insertServer(COMMAND_NODE_SET_STATUS, this);
 			FCommands->insertServer(COMMAND_NODE_SET_MAIN_STATUS, this);
 		}
-		if (FMUCPlugin != NULL)
+		if (FMUCPlugin)
 		{
 			FCommands->insertServer(COMMAND_NODE_LEAVE_MUC, this);
 		}
-		if (FFileStreamManager != NULL)
+		if (FFileStreamManager)
 		{
 			FCommands->insertServer(COMMAND_NODE_ACCEPT_FILES, this);
 		}
-		FCommands->insertServer(COMMAND_NODE_SET_OPTIONS, this);
+		if (FMessageProcessor && FStanzaProcessor)
+		{
+			FCommands->insertServer(COMMAND_NODE_FORWARD_MESSAGES, this);
+		}
 	}
-	if (FDataForms != NULL)
+
+	if (FDataForms)
 	{
 		FDataForms->insertLocalizer(this, DATA_FORM_REMOTECONTROL);
+	}
+
+	if (FStanzaProcessor)
+	{
+		IStanzaHandle handle;
+		handle.order = SHO_MI_REMOTECONTROL;
+		handle.direction = IStanzaHandle::DirectionIn;
+		handle.handler = this;
+		handle.conditions.append(SHC_MESSAGE_ADDRESS);
+		FSHIMessageForward = FStanzaProcessor->insertStanzaHandle(handle);
 	}
 
 	optionItems.clear();
@@ -128,6 +178,23 @@ bool RemoteControl::initSettings()
 bool RemoteControl::startPlugin()
 {
 	return true;
+}
+
+bool RemoteControl::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+	Q_UNUSED(AAccept);
+	if (AHandleId == FSHIMessageForward)
+	{
+		if (AStreamJid && AStanza.from())
+		{
+			QDomElement addressElem = AStanza.firstElement("addresses",NS_ADDRESS).firstChildElement("address");
+			while(!addressElem.isNull() && addressElem.attribute("type")!="ofrom")
+				addressElem = addressElem.nextSiblingElement("address");
+			if (!addressElem.isNull() && addressElem.hasAttribute("jid"))
+				AStanza.setFrom(addressElem.attribute("jid"));
+		}
+	}
+	return false;
 }
 
 bool RemoteControl::isCommandPermitted(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode) const
@@ -150,6 +217,8 @@ QString RemoteControl::commandName(const QString &ANode) const
 		return tr("Accept pending file transfers");
 	if (ANode == COMMAND_NODE_SET_OPTIONS)
 		return tr("Set options");
+	if (ANode == COMMAND_NODE_FORWARD_MESSAGES)
+		return tr("Forward unread messages");
 	return QString::null;
 }
 
@@ -174,6 +243,9 @@ bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 
 		if (ARequest.node == COMMAND_NODE_SET_OPTIONS)
 			return processSetOptions(ARequest);
+
+		if (ARequest.node == COMMAND_NODE_FORWARD_MESSAGES)
+			return processForwardMessages(ARequest);
 	}
 	return false;
 }
@@ -214,6 +286,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		field.type = DATAFIELD_TYPE_LISTMULTI;
 		field.var = FIELD_GROUPCHATS;
 		field.label = tr("A list of joined conferences");
+		field.value = QVariant();
 		field.required = true;
 
 		IDataOption opt;
@@ -229,17 +302,18 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 
 		if (field.options.isEmpty())
 		{
+			result.status = COMMAND_STATUS_COMPLETED;
+			result.form = IDataForm();
+
 			ICommandNote note;
 			note.type = COMMAND_NOTE_INFO;
 			note.message = tr("This entity is not joined to any conferences");
 			result.notes.append(note);
-			result.status = COMMAND_STATUS_COMPLETED;
-			result.form = IDataForm();
 		}
 		else
 		{
-			result.form.fields.append(field);
 			result.status = COMMAND_STATUS_EXECUTING;
+			result.form.fields.append(field);
 			result.actions.append(COMMAND_ACTION_COMPLETE);
 		}
 		return FCommands->sendCommandResult(result);
@@ -352,7 +426,6 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 	ICommandResult result = FCommands->prepareResult(ARequest);
 	if (ARequest.action == COMMAND_ACTION_EXECUTE && ARequest.form.fields.isEmpty())
 	{
-		result.status = COMMAND_STATUS_EXECUTING;
 		result.sessionId = QUuid::createUuid().toString();
 		result.form.type = DATAFORM_TYPE_FORM;
 		result.form.title = commandName(ARequest.node);
@@ -367,6 +440,7 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 		field.type = DATAFIELD_TYPE_LISTMULTI;
 		field.var = FIELD_FILES;
 		field.label = tr("Pending file transfers");
+		field.value = QVariant();
 		field.required = true;
 
 		IDataOption opt;
@@ -375,7 +449,8 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 			if (stream->streamKind() == IFileStream::ReceiveFile &&
 				stream->streamState() == IFileStream::Creating)
 			{
-				opt.label = tr("%1 (%2 bytes) from %3").arg(stream->fileName()).arg(stream->fileSize()).arg(stream->contactJid().bare());
+				QString name = FNotifications!=NULL ? FNotifications->contactName(stream->streamJid(),stream->contactJid()) : stream->contactJid().bare();
+				opt.label = tr("%1 (%2 bytes) from '%3'").arg(stream->fileName()).arg(stream->fileSize()).arg(name);
 				opt.value = stream->streamId();
 				field.options.append(opt);
 			}
@@ -383,15 +458,17 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 
 		if(field.options.isEmpty())
 		{
+			result.status = COMMAND_STATUS_COMPLETED;
+			result.form = IDataForm();
+
 			ICommandNote note;
 			note.type = COMMAND_NOTE_INFO;
 			note.message = tr("There are no pending file transfers");
 			result.notes.append(note);
-			result.status = COMMAND_STATUS_COMPLETED;
-			result.form = IDataForm();
 		}
 		else
 		{
+			result.status = COMMAND_STATUS_EXECUTING;
 			result.form.fields.append(field);
 			result.actions.append(COMMAND_ACTION_COMPLETE);
 		}
@@ -464,11 +541,119 @@ bool RemoteControl::processSetOptions(const ICommandRequest &ARequest)
 	{
 		foreach(IDataField field, ARequest.form.fields)
 		{
-			if (optionItems.contains(field.var) &&
-				Options::node(optionItems[field.var].node).value().toBool() != field.value.toBool())
+			if (optionItems.contains(field.var) && Options::node(optionItems[field.var].node).value().toBool() != field.value.toBool())
 			{
 				Options::node(optionItems[field.var].node).setValue(field.value.toBool());
 			}
+		}
+		result.status = COMMAND_STATUS_COMPLETED;
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action == COMMAND_ACTION_CANCEL)
+	{
+		result.status = COMMAND_STATUS_CANCELED;
+		return FCommands->sendCommandResult(result);
+	}
+	return false;
+}
+
+bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
+{
+	ICommandResult result = FCommands->prepareResult(ARequest);
+	if (ARequest.action == COMMAND_ACTION_EXECUTE && ARequest.form.fields.isEmpty())
+	{
+		result.status = COMMAND_STATUS_EXECUTING;
+		result.sessionId = QUuid::createUuid().toString();
+		result.form.type = DATAFORM_TYPE_FORM;
+		result.form.title = commandName(ARequest.node);
+
+		IDataField field;
+		field.type = DATAFIELD_TYPE_HIDDEN;
+		field.var = "FORM_TYPE";
+		field.value = DATA_FORM_REMOTECONTROL;
+		field.required = false;
+		result.form.fields.append(field);
+
+		field.type = DATAFIELD_TYPE_LISTMULTI;
+		field.var = FIELD_MESSAGES;
+		field.label = tr("List of unread messages");
+		field.value = QVariant();
+		field.required = true;
+
+		QMap<Jid, int> unread;
+		foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,Jid(),Message::Normal|Message::Chat|Message::Headline))
+		{
+			Message message = FMessageProcessor->messageById(messageId);
+			if (!message.from().isEmpty() && ARequest.contactJid!=message.from() && !message.body().isEmpty())
+			{
+				unread[message.from()]++;
+			}
+		}
+
+		for (QMap<Jid, int>::const_iterator it=unread.constBegin(); it!=unread.constEnd(); it++)
+		{
+			IDataOption opt;
+
+			QString name = FNotifications!=NULL ? FNotifications->contactName(ARequest.streamJid,it.key()) : it.key().bare();
+			if (!it.key().resource().isEmpty())
+				name += "/" + it.key().resource();
+
+			opt.label = tr("%n message(s) from '%1'","",it.value()).arg(name);
+			opt.value = it.key().eFull();
+			field.options.append(opt);
+		}
+
+		if(field.options.isEmpty())
+		{
+			result.status = COMMAND_STATUS_COMPLETED;
+			result.form = IDataForm();
+
+			ICommandNote note;
+			note.type = COMMAND_NOTE_INFO;
+			note.message = tr("There are no unread messages");
+			result.notes.append(note);
+		}
+		else
+		{
+			result.status = COMMAND_STATUS_EXECUTING;
+			result.form.fields.append(field);
+			result.actions.append(COMMAND_ACTION_COMPLETE);
+		}
+
+		return FCommands->sendCommandResult(result);
+	}
+	else if (ARequest.action==COMMAND_ACTION_COMPLETE || ARequest.action==COMMAND_ACTION_EXECUTE)
+	{
+		int index = (FDataForms != NULL) ? FDataForms->fieldIndex(FIELD_MESSAGES, ARequest.form.fields) : -1;
+		if (index >= 0)
+		{
+			foreach(QString senderJid, ARequest.form.fields.value(index).value.toStringList())
+			{
+				foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,senderJid,Message::Normal|Message::Chat|Message::Headline))
+				{
+					Message message = FMessageProcessor->messageById(messageId);
+					message.detach();
+					message.setFrom(QString::null);
+					message.setTo(ARequest.contactJid.eFull());
+					message.setDateTime(message.dateTime(),true);
+					
+					QDomElement addresses = message.stanza().firstElement("addresses",NS_ADDRESS);
+					if (!addresses.isNull())
+						addresses.parentNode().removeChild(addresses);
+					addresses = message.stanza().addElement("addresses",NS_ADDRESS);
+					QDomElement address = addresses.appendChild(message.stanza().createElement("address")).toElement();
+					address.setAttribute("type","ofrom");
+					address.setAttribute("jid",senderJid);
+
+					if (FStanzaProcessor->sendStanzaOut(ARequest.streamJid,message.stanza()))
+						FMessageProcessor->removeMessage(messageId);
+				}
+			}
+			result.status = COMMAND_STATUS_COMPLETED;
+		}
+		else
+		{
+			result.status = COMMAND_STATUS_CANCELED;
 		}
 		return FCommands->sendCommandResult(result);
 	}
@@ -485,23 +670,24 @@ IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
 	IDataFormLocale locale;
 	if (AFormType == DATA_FORM_REMOTECONTROL)
 	{
-		locale.fields["auto-auth"].label = tr("Whether to automatically authorize subscription requests");
-		locale.fields["auto-files"].label = tr("Whether to automatically accept file transfers");
-		locale.fields["auto-msg"].label = tr("Whether to automatically open new messages");
-		locale.fields["auto-offline"].label = tr("Whether to automatically go offline when idle");
-		locale.fields["sounds"].label = tr("Whether to play sounds");
-		locale.fields["files"].label = tr("A list of pending file transfers");
-		locale.fields["groupchats"].label = tr("A list of joined conferences");
-		locale.fields["status"].label = tr("A presence or availability status");
-		locale.fields["status-message"].label = tr("The status message text");
-		locale.fields["status-priority"].label = tr("The new priority for the client");
-		locale.fields["status"].options["chat"].label = tr("Chat");
-		locale.fields["status"].options["online"].label = tr("Online");
-		locale.fields["status"].options["away"].label = tr("Away");
-		locale.fields["status"].options["xa"].label = tr("Extended Away");
-		locale.fields["status"].options["dnd"].label = tr("Do Not Disturb");
-		locale.fields["status"].options["invisible"].label = tr("Invisible");
-		locale.fields["status"].options["offline"].label = tr("Offline");
+		locale.fields[FIELD_AUTO_AUTH].label = tr("Whether to automatically authorize subscription requests");
+		locale.fields[FIELD_AUTO_FILES].label = tr("Whether to automatically accept file transfers");
+		locale.fields[FIELD_AUTO_MSG].label = tr("Whether to automatically open new messages");
+		locale.fields[FIELD_AUTO_OFFLINE].label = tr("Whether to automatically go offline when idle");
+		locale.fields[FIELD_SOUNDS].label = tr("Whether to play sounds");
+		locale.fields[FIELD_FILES].label = tr("A list of pending file transfers");
+		locale.fields[FIELD_MESSAGES].label = tr("A list of unread messages");
+		locale.fields[FIELD_GROUPCHATS].label = tr("A list of joined conferences");
+		locale.fields[FIELD_STATUS].label = tr("A presence or availability status");
+		locale.fields[FIELD_STATUS_MESSAGE].label = tr("The status message text");
+		locale.fields[FIELD_STATUS_PRIORITY].label = tr("The new priority for the client");
+		locale.fields[FIELD_STATUS].options["chat"].label = tr("Chat");
+		locale.fields[FIELD_STATUS].options["online"].label = tr("Online");
+		locale.fields[FIELD_STATUS].options["away"].label = tr("Away");
+		locale.fields[FIELD_STATUS].options["xa"].label = tr("Extended Away");
+		locale.fields[FIELD_STATUS].options["dnd"].label = tr("Do Not Disturb");
+		locale.fields[FIELD_STATUS].options["invisible"].label = tr("Invisible");
+		locale.fields[FIELD_STATUS].options["offline"].label = tr("Offline");
 	}
 	return locale;
 }
