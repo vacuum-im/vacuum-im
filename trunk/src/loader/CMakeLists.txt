@@ -11,8 +11,15 @@ include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
 set(QT_USE_QTXML YES)
 include(${QT_USE_FILE})
 
+set(VER_STRING "" CACHE STRING "This string will be appended to program version (defaults to SVN revision number)")
+
+if (VER_STRING STREQUAL "")
 execute_process(COMMAND svnversion -n -c "${CMAKE_SOURCE_DIR}"
 	OUTPUT_VARIABLE SVN_REVISION)
+else (VER_STRING STREQUAL "")
+	set(SVN_REVISION "0:${VER_STRING}") # see PluginManager::revision()
+endif (VER_STRING STREQUAL "")
+
 if (NOT (SVN_REVISION STREQUAL ""))
 	file(REMOVE "svninfo.h")
 	file(WRITE "svninfo.h" "#define SVN_REVISION \"${SVN_REVISION}\"\n")
