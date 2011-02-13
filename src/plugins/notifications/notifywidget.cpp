@@ -17,15 +17,17 @@
 QList<NotifyWidget *> NotifyWidget::FWidgets;
 QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
 
-NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint)
+NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
 {
 	ui.setupUi(this);
 	setFocusPolicy(Qt::NoFocus);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 
-	QPalette pallete = palette();
+	QPalette pallete = ui.frmWindowFrame->palette();
 	pallete.setColor(QPalette::Window, pallete.color(QPalette::Base));
-	setPalette(pallete);
+	ui.frmWindowFrame->setPalette(pallete);
+	ui.frmWindowFrame->setAutoFillBackground(true);
+	ui.frmWindowFrame->setAttribute(Qt::WA_TransparentForMouseEvents,true);
 
 	FYPos = -1;
 	FAnimateStep = -1;
@@ -59,7 +61,6 @@ NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Q
 		}
 		ui.ntbText->setHtml(text);
 		ui.ntbText->setContentsMargins(0,0,0,0);
-		ui.ntbText->setAutoFillBackground(false);
 		ui.ntbText->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 		ui.ntbText->setMaxHeight(ui.ntbText->fontMetrics().height()*MAX_TEXT_LINES + (ui.ntbText->frameWidth() + qRound(ui.ntbText->document()->documentMargin()))*2);
 

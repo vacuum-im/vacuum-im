@@ -14,6 +14,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->widget(0)->deleteLater();
 	ui.twtTabs->removeTab(0);
 	ui.twtTabs->setMovable(true);
+	ui.twtTabs->setDocumentMode(true);
 
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
