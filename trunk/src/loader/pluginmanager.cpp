@@ -24,7 +24,7 @@
 #  define SVN_DATE                  ""
 #else
 #  define SVN_DATE                  ""
-#  define SVN_REVISION              "0:0"
+#  define SVN_REVISION              "0"
 #endif
 
 #if defined(Q_WS_WIN)
