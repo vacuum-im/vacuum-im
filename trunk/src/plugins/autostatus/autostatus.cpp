@@ -225,6 +225,8 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 		{
 			foreach(Jid streamJid, FStreamStatus.keys())
 				FStatusChanger->setStreamStatus(streamJid, FStreamStatus.take(streamJid));
+			foreach(Jid streamJid, FStatusChanger->statusStreams(FAutoStatusId))
+				FStatusChanger->setStreamStatus(streamJid,STATUS_MAIN_ID);
 			FStatusChanger->removeStatusItem(FAutoStatusId);
 			FAutoStatusId = STATUS_NULL_ID;
 		}
