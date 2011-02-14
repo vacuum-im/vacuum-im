@@ -69,7 +69,7 @@ QString PluginManager::version() const
 
 QString PluginManager::revision() const
 {
-	static const QString rev = QString(SVN_REVISION).contains(':') ? QString(SVN_REVISION).split(':').value(1) : QString("0");
+	static const QString rev = QString(SVN_REVISION).contains(':') ? QString(SVN_REVISION).split(':').value(1) : QString(SVN_REVISION);
 	return rev;
 }
 

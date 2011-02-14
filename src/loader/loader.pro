@@ -16,7 +16,9 @@ win32:RC_FILE      = loader.rc
 macx:ICON          = ../../vacuum.icns
 
 #SVN Info
-SVN_REVISION=$$system(svnversion -n -c ./../../)
+isEmpty(SVN_REVISION) {
+  SVN_REVISION=$$system(svnversion -n -c ./../../)
+}
 win32 {
   exists(svninfo.h):system(del svninfo.h)
   !isEmpty(SVN_REVISION):system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
