@@ -57,6 +57,7 @@ protected:
 	void showPrevBufferedMessage();
 protected slots:
 	void onSendButtonCliked(bool);
+	void onShortcutUpdated(const QString &AId);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onContentsChanged(int APosition, int ARemoved, int AAdded);
@@ -69,8 +70,9 @@ private:
 	int FBufferPos;
 	Jid FStreamJid;
 	Jid FContactJid;
-	QString FShortcutId;
 	QList<QString> FBuffer;
+	QString FSendShortcutId;
+	QKeySequence FSendShortcut;
 };
 
 #endif // EDITWIDGET_H
