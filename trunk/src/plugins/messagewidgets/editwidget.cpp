@@ -32,6 +32,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
+	connect(Shortcuts::instance(),SIGNAL(shortcutUpdated(const QString &)),SLOT(onShortcutUpdated(const QString &)));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 }
 
@@ -117,19 +118,20 @@ void EditWidget::setMinimumLines(int ALines)
 
 QString EditWidget::sendShortcut() const
 {
-	return FShortcutId;
+	return FSendShortcutId;
 }
 
 void EditWidget::setSendShortcut(const QString &AShortcutId)
 {
-	if (FShortcutId != AShortcutId)
+	if (FSendShortcutId != AShortcutId)
 	{
-		if (!FShortcutId.isEmpty())
-			Shortcuts::removeWidgetShortcut(FShortcutId,ui.medEditor);
-		FShortcutId = AShortcutId;
-		if (!FShortcutId.isEmpty())
-			Shortcuts::insertWidgetShortcut(FShortcutId,ui.medEditor);
-		emit sendShortcutChanged(FShortcutId);
+		if (!FSendShortcutId.isEmpty())
+			Shortcuts::removeWidgetShortcut(FSendShortcutId,ui.medEditor);
+		FSendShortcutId = AShortcutId;
+		if (!FSendShortcutId.isEmpty())
+			Shortcuts::insertWidgetShortcut(FSendShortcutId,ui.medEditor);
+		onShortcutUpdated(FSendShortcutId);
+		emit sendShortcutChanged(FSendShortcutId);
 	}
 }
 
@@ -159,7 +161,15 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 	if (AWatched==ui.medEditor && AEvent->type()==QEvent::KeyPress)
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-		emit keyEventReceived(keyEvent,hooked);
+		if (FSendShortcut[0] == keyEvent->key()+keyEvent->modifiers())
+		{
+			hooked = true;
+			onShortcutActivated(FSendShortcutId,ui.medEditor);
+		}
+		else
+		{
+			emit keyEventReceived(keyEvent,hooked);
+		}
 	}
 	else if (AWatched==ui.medEditor && AEvent->type()==QEvent::ShortcutOverride)
 	{
@@ -216,9 +226,15 @@ void EditWidget::onSendButtonCliked(bool)
 	sendMessage();
 }
 
+void EditWidget::onShortcutUpdated(const QString &AId)
+{
+	if (AId == FSendShortcutId)
+		FSendShortcut = Shortcuts::shortcutDescriptor(AId).activeKey;
+}
+
 void EditWidget::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (AId==FShortcutId && AWidget==ui.medEditor)
+	if (AId==FSendShortcutId && AWidget==ui.medEditor)
 	{
 		sendMessage();
 	}
