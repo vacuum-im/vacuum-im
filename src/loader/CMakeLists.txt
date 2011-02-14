@@ -20,11 +20,11 @@ else (VER_STRING STREQUAL "")
 	set(SVN_REVISION "0:${VER_STRING}") # see PluginManager::revision()
 endif (VER_STRING STREQUAL "")
 
-if (NOT (SVN_REVISION STREQUAL ""))
+if (NOT (SVN_REVISION STREQUAL "" OR SVN_REVISION STREQUAL "exported"))
 	file(REMOVE "svninfo.h")
 	file(WRITE "svninfo.h" "#define SVN_REVISION \"${SVN_REVISION}\"\n")
 	add_definitions(-DSVNINFO)
-endif (NOT (SVN_REVISION STREQUAL ""))
+endif (NOT (SVN_REVISION STREQUAL "" OR SVN_REVISION STREQUAL "exported"))
 
 if (WIN32)
 	if (MINGW)
