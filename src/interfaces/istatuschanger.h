@@ -28,6 +28,7 @@ public:
 	virtual Menu *streamMenu(const Jid &AStreamJid) const =0;
 	virtual int mainStatus() const =0;
 	virtual void setMainStatus(int AStatusId) =0;
+	virtual QList<Jid> statusStreams(int AStatusId) const =0;
 	virtual int streamStatus(const Jid &AStreamJid) const =0;
 	virtual void setStreamStatus(const Jid &AStreamJid, int AStatusId) =0;
 	virtual QString statusItemName(int AStatusId) const =0;

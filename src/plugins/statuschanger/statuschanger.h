@@ -72,6 +72,7 @@ public:
 	virtual Menu *streamMenu(const Jid &AStreamJid) const;
 	virtual int mainStatus() const;
 	virtual void setMainStatus(int AStatusId);
+	virtual QList<Jid> statusStreams(int AStatusId) const;
 	virtual int streamStatus(const Jid &AStreamJid) const;
 	virtual void setStreamStatus(const Jid &AStreamJid, int AStatusId);
 	virtual QString statusItemName(int AStatusId) const;

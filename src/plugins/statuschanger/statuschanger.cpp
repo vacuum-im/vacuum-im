@@ -269,6 +269,19 @@ void StatusChanger::setMainStatus(int AStatusId)
 	setStreamStatus(Jid(), AStatusId);
 }
 
+QList<Jid> StatusChanger::statusStreams(int AStatusId) const
+{
+	QList<Jid> streams;
+	QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin();
+	while (it!=FCurrentStatus.constEnd())
+	{
+		if (it.value() == AStatusId)
+			streams.append(it.key()->streamJid());
+		it++;
+	}
+	return streams;
+}
+
 int StatusChanger::streamStatus(const Jid &AStreamJid) const
 {
 	QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin();
