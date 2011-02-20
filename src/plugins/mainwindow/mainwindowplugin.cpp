@@ -97,8 +97,6 @@ bool MainWindowPlugin::initObjects()
 bool MainWindowPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_MAINWINDOW_SHOW,true);
-	Options::setDefaultValue(OPV_MAINWINDOW_SIZE,QSize(200,500));
-	Options::setDefaultValue(OPV_MAINWINDOW_POSITION,QPoint(0,0));
 	return true;
 }
 
@@ -125,14 +123,16 @@ void MainWindowPlugin::updateTitle()
 
 void MainWindowPlugin::showMainWindow()
 {
-	FMainWindow->show();
-	if (!FAligned)
+	if (!Options::isNull())
 	{
-		FAligned = true;
-		WidgetManager::alignWindow(FMainWindow,(Qt::Alignment)Options::node(OPV_MAINWINDOW_ALIGN).value().toInt());
+		WidgetManager::showActivateRaiseWindow(FMainWindow);
+		if (!FAligned)
+		{
+			FAligned = true;
+			WidgetManager::alignWindow(FMainWindow,(Qt::Alignment)Options::node(OPV_MAINWINDOW_ALIGN).value().toInt());
+		}
+		correctWindowPosition();
 	}
-	correctWindowPosition();
-	WidgetManager::showActivateRaiseWindow(FMainWindow);
 }
 
 void MainWindowPlugin::correctWindowPosition()
@@ -164,8 +164,8 @@ bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
 void MainWindowPlugin::onOptionsOpened()
 {
 	FAligned = false;
-	FMainWindow->resize(Options::node(OPV_MAINWINDOW_SIZE).value().toSize());
-	FMainWindow->move(Options::node(OPV_MAINWINDOW_POSITION).value().toPoint());
+	if (!FMainWindow->restoreGeometry(Options::fileValue("mainwindow.geometry").toByteArray()))
+		FMainWindow->setGeometry(WidgetManager::alignGeometry(QSize(200,500),FMainWindow,Qt::AlignRight|Qt::AlignBottom));
 	if (Options::node(OPV_MAINWINDOW_SHOW).value().toBool())
 		showMainWindow();
 	updateTitle();
@@ -173,10 +173,9 @@ void MainWindowPlugin::onOptionsOpened()
 
 void MainWindowPlugin::onOptionsClosed()
 {
+	Options::setFileValue(FMainWindow->saveGeometry(),"mainwindow.geometry");
 	Options::node(OPV_MAINWINDOW_SHOW).setValue(FMainWindow->isVisible());
-	Options::node(OPV_MAINWINDOW_SIZE).setValue(FMainWindow->size());
 	Options::node(OPV_MAINWINDOW_ALIGN).setValue((int)WidgetManager::windowAlignment(FMainWindow));
-	Options::node(OPV_MAINWINDOW_POSITION).setValue(FMainWindow->pos());
 	updateTitle();
 	FMainWindow->close();
 }

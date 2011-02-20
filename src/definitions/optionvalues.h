@@ -70,9 +70,7 @@
 
 // MainWindow
 #define OPV_MAINWINDOW_SHOW                             "mainwindow.show"
-#define OPV_MAINWINDOW_SIZE                             "mainwindow.size"
 #define OPV_MAINWINDOW_ALIGN                            "mainwindow.align"
-#define OPV_MAINWINDOW_POSITION                         "mainwindow.position"
 
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"
