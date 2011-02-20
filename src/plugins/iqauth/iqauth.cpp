@@ -15,20 +15,58 @@ IqAuth::~IqAuth()
 
 bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE && AStanza.id()=="auth")
+	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
 	{
-		FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
-		if (AStanza.type() == "result")
+		if (AStanza.id() == "getIqAuth")
 		{
-			deleteLater();
-			emit finished(false);
+			if (AStanza.type() == "result")
+			{
+				Stanza auth("iq");
+				auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("setIqAuth");
+				QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
+				query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().prepared().eNode()));
+				query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
+
+				QDomElement reqElem = AStanza.firstElement("query",NS_JABBER_IQ_AUTH);
+				if (!reqElem.firstChildElement("digest").isNull())
+				{
+					QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8();
+					QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
+					query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
+					FXmppStream->sendStanza(auth);
+				}
+				else if (!reqElem.firstChildElement("password").isNull() && FXmppStream->connection()->isEncrypted())
+				{
+					query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->password()));
+					FXmppStream->sendStanza(auth);
+				}
+				else if (!reqElem.firstChildElement("password").isNull())
+				{
+					emit error(tr("Server requested plain text password over insecure connection"));
+				}
+			}
+			else if (AStanza.type() == "error")
+			{
+				ErrorHandler err(AStanza.element());
+				emit error(err.message());
+			}
+			return true;
 		}
-		else if (AStanza.type() == "error")
+		else if (AStanza.id() == "setIqAuth")
 		{
-			ErrorHandler err(AStanza.element());
-			emit error(err.message());
+			FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+			if (AStanza.type() == "result")
+			{
+				deleteLater();
+				emit finished(false);
+			}
+			else if (AStanza.type() == "error")
+			{
+				ErrorHandler err(AStanza.element());
+				emit error(err.message());
+			}
+			return true;
 		}
-		return true;
 	}
 	return false;
 }
@@ -57,24 +95,11 @@ bool IqAuth::start(const QDomElement &AElem)
 	{
 		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
-			Stanza auth("iq");
-			auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("auth");
-			QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
-			query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().prepared().eNode()));
-			QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8();
-			QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
-
-			// GOOGLE HACK - sending plain text password
-			QString domain = FXmppStream->streamJid().domain().toLower();
-			if (FXmppStream->connection()->isEncrypted() && (domain=="googlemail.com" || domain=="gmail.com"))
-				query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->password()));
-			else
-				query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
-
-			query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
-
-			FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-			FXmppStream->sendStanza(auth);
+			Stanza request("iq");
+			request.setType("get").setId("getIqAuth");
+			request.addElement("query",NS_JABBER_IQ_AUTH).appendChild(request.createElement("username")).appendChild(request.createTextNode(FXmppStream->streamJid().node()));
+			FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+			FXmppStream->sendStanza(request);
 			return true;
 		}
 		else
