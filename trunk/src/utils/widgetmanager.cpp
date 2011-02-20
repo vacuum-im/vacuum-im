@@ -229,18 +229,24 @@ Qt::Alignment WidgetManager::windowAlignment(const QWidget *AWindow)
 
 void WidgetManager::alignWindow(QWidget *AWindow, Qt::Alignment AAlign)
 {
+#ifndef Q_WS_X11
 	if (AAlign > 0)
 	{
 		QRect frameRect = AWindow->frameGeometry();
 		QRect windowRect = AWindow->geometry();
-		QRect rect = alignGeometry(frameRect.size(),AWindow,(Qt::Alignment)AAlign);
+		QRect rect = alignGeometry(frameRect.size(),AWindow,AAlign);
 		rect.adjust(windowRect.left()-frameRect.left(),windowRect.top()-frameRect.top(),windowRect.right()-frameRect.right(),windowRect.bottom()-frameRect.bottom());
 		AWindow->setGeometry(rect);
 	}
+#else
+	Q_UNUSED(AWindow);
+	Q_UNUSED(AAlign);
+#endif
 }
 
 QRect WidgetManager::alignGeometry(const QSize &ASize, const QWidget *AWidget, Qt::Alignment AAlign)
 {
 	QRect availRect = AWidget!=NULL ? QApplication::desktop()->availableGeometry(AWidget) : QApplication::desktop()->availableGeometry();
-	return QStyle::alignedRect(Qt::LeftToRight,AAlign,ASize.boundedTo(availRect.size()),availRect);
+	Qt::LayoutDirection direction = AWidget!=NULL ? AWidget->layoutDirection() : QApplication::layoutDirection();
+	return QStyle::alignedRect(direction,AAlign,ASize.boundedTo(availRect.size()),availRect);
 }
