@@ -28,8 +28,9 @@ void Emoticons::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
 }
 
-bool Emoticons::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool Emoticons::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 	{
@@ -130,6 +131,73 @@ QString Emoticons::keyByUrl(const QUrl &AUrl) const
 	return FKeyByUrl.value(AUrl.toString());
 }
 
+QMap<int, QString> Emoticons::findTextEmoticons(const QTextDocument *ADocument, int AStartPos, int ALength) const
+{
+	QMap<int,QString> emoticons;
+	QTextBlock block = ADocument->findBlock(AStartPos);
+	int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
+	while (block.isValid() && block.position()<stopPos)
+	{
+		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+		{
+			QTextFragment fragment = it.fragment();
+			if (fragment.length()>0 && fragment.position()<stopPos)
+			{
+				bool searchStarted = true;
+				QString searchText = fragment.text();
+				for (int keyPos=0; keyPos<searchText.length(); keyPos++)
+				{
+					searchStarted = searchStarted || searchText.at(keyPos).isSpace();
+					if (searchStarted && !searchText.at(keyPos).isSpace())
+					{
+						int keyLength = 0;
+						const EmoticonTreeItem *item = &FRootTreeItem;
+						while (item && keyLength<=searchText.length()-keyPos && fragment.position()+keyPos+keyLength<=stopPos)
+						{
+							const QChar nextChar = keyPos+keyLength<searchText.length() ? searchText.at(keyPos+keyLength) : QChar(' ');
+							if (!item->url.isEmpty() && nextChar.isSpace())
+							{
+								emoticons.insert(fragment.position()+keyPos,searchText.mid(keyPos,keyLength));
+								keyPos += keyLength-1;
+								item = NULL;
+							}
+							else
+							{
+								keyLength++;
+								item = item->childs.value(nextChar);
+							}
+						}
+						searchStarted = false;
+					}
+				}
+			}
+		}
+		block = block.next();
+	}
+	return emoticons;
+}
+
+QMap<int, QString> Emoticons::findImageEmoticons(const QTextDocument *ADocument, int AStartPos, int ALength) const
+{
+	QMap<int,QString> emoticons;
+	QTextBlock block = ADocument->findBlock(AStartPos);
+	int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
+	while (block.isValid() && block.position()<stopPos)
+	{
+		for (QTextBlock::iterator it = block.begin(); !it.atEnd() && it.fragment().position()<stopPos; it++)
+		{
+			if (it.fragment().charFormat().isImageFormat())
+			{
+				QString key = FKeyByUrl.value(it.fragment().charFormat().toImageFormat().name());
+				if (!key.isEmpty() && it.fragment().length()==1)
+					emoticons.insert(it.fragment().position(),key);
+			}
+		}
+		block = block.next();
+	}
+	return emoticons;
+}
+
 void Emoticons::createIconsetUrls()
 {
 	FUrlByKey.clear();
@@ -194,85 +262,73 @@ bool Emoticons::isWordBoundary(const QString &AText) const
 	return !AText.isEmpty() ? AText.at(0).isSpace() : true;
 }
 
-void Emoticons::replaceTextToImage(QTextDocument *ADocument) const
+void Emoticons::replaceTextToImage(QTextDocument *ADocument, int AStartPos, int ALength) const
 {
-	if (!FRootTreeItem.childs.isEmpty())
+	QMap<int,QString> emoticons = findTextEmoticons(ADocument,AStartPos,ALength);
+	if (!emoticons.isEmpty())
 	{
+		int posOffset = 0;
 		QTextCursor cursor(ADocument);
-		while (cursor.position() < ADocument->characterCount()-1)
+		cursor.beginEditBlock();
+		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); it++)
 		{
-			int basePos = cursor.position();
-			bool startSearch = !cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor,1);
-			if (!startSearch && cursor.selectedText().at(0).isSpace())
+			QUrl url = FUrlByKey.value(it.value());
+			if (!url.isEmpty())
 			{
-				startSearch = true;
-				cursor.movePosition(QTextCursor::NextCharacter);
+				cursor.setPosition(it.key()-posOffset);
+				cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it->length());
+				if (!ADocument->resource(QTextDocument::ImageResource,url).isValid())
+					cursor.insertImage(QImage(url.toLocalFile()),url.toString());
+				else
+					cursor.insertImage(url.toString());
+				posOffset += it->length()-1;
 			}
-			if (startSearch)
-			{
-				const EmoticonTreeItem *item = &FRootTreeItem;
-				while (item)
-				{
-					bool stop = !cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
-					QString text = cursor.selectedText();
-					if (!text.isEmpty())
-					{
-						QChar lastChar = text.at(text.size()-1);
-						if (!item->url.isEmpty() && (stop || lastChar.isSpace()))
-						{
-							if (!ADocument->resource(QTextDocument::ImageResource,item->url).isValid())
-								cursor.insertImage(QImage(item->url.toLocalFile()),item->url.toString());
-							else
-								cursor.insertImage(item->url.toString());
-							if (!stop)
-								cursor.insertText(lastChar);
-							stop = true;
-							basePos = cursor.position()-1;
-						}
-						item = !stop && item!=NULL ? item->childs.value(lastChar) : NULL;
-					}
-					else
-					{
-						item = NULL;
-					}
-				}
-			}
-			cursor.setPosition(basePos+1);
 		}
+		cursor.endEditBlock();
 	}
 }
 
-void Emoticons::replaceImageToText(QTextDocument *ADocument) const
+void Emoticons::replaceImageToText(QTextDocument *ADocument, int AStartPos, int ALength) const
 {
-	static const QString imageChar = QString(QChar::ObjectReplacementCharacter);
-	for (QTextCursor cursor = ADocument->find(imageChar); !cursor.isNull();  cursor = ADocument->find(imageChar,cursor))
+	QMap<int,QString> emoticons = findImageEmoticons(ADocument,AStartPos,ALength);
+	if (!emoticons.isEmpty())
 	{
-		if (cursor.charFormat().isImageFormat())
+		int posOffset = 0;
+		QTextCursor cursor(ADocument);
+		cursor.beginEditBlock();
+		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); it++)
 		{
-			QString key = FKeyByUrl.value(cursor.charFormat().toImageFormat().name());
-			if (!key.isEmpty())
+			cursor.setPosition(it.key()+posOffset);
+			cursor.deleteChar();
+			posOffset--;
+
+			if (cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor,1))
 			{
-				cursor.removeSelectedText();
-				
-				if (cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor,1))
+				bool space = !isWordBoundary(cursor.selectedText());
+				cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor,1);
+				if (space)
 				{
-					bool space = !isWordBoundary(cursor.selectedText());
-					cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor,1);
-					if (space)
-						cursor.insertText(" ");
-				}
-
-				cursor.insertText(key);
-
-				if (cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,1))
-				{
-					bool space = !isWordBoundary(cursor.selectedText());
-					cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor,1);
-					if (space)
-						cursor.insertText(" ");
+					posOffset++;
+					cursor.insertText(" ");
 				}
 			}
+
+			cursor.insertText(it.value());
+			posOffset += it->length();
+
+			if (cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,1))
+			{
+				bool space = !isWordBoundary(cursor.selectedText());
+				cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor,1);
+				if (space)
+				{
+					posOffset++;
+					cursor.insertText(" ");
+				}
+			}
+
 		}
+		cursor.endEditBlock();
 	}
 }
 
