@@ -1,7 +1,6 @@
 #ifndef EMOTICONS_H
 #define EMOTICONS_H
 
-#include <QMap>
 #include <QHash>
 #include <QStringList>
 #include <definitions/actiongroups.h>
@@ -58,13 +57,15 @@ public:
 	virtual QList<QString> activeIconsets() const;
 	virtual QUrl urlByKey(const QString &AKey) const;
 	virtual QString keyByUrl(const QUrl &AUrl) const;
+	virtual QMap<int, QString> findTextEmoticons(const QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
+	virtual QMap<int, QString> findImageEmoticons(const QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
 protected:
 	void createIconsetUrls();
 	void createTreeItem(const QString &AKey, const QUrl &AUrl);
 	void clearTreeItem(EmoticonTreeItem *AItem) const;
 	bool isWordBoundary(const QString &AText) const;
-	void replaceTextToImage(QTextDocument *ADocument) const;
-	void replaceImageToText(QTextDocument *ADocument) const;
+	void replaceTextToImage(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
+	void replaceImageToText(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
 	SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);
 	void insertSelectIconMenu(const QString &ASubStorage);
 	void removeSelectIconMenu(const QString &ASubStorage);
