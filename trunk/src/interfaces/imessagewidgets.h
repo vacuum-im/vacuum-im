@@ -103,6 +103,7 @@ protected:
 	virtual void autoResizeChanged(bool AResize) =0;
 	virtual void minimumLinesChanged(int ALines) =0;
 	virtual void sendShortcutChanged(const QString &AShortcutId) =0;
+	virtual void contentsChanged(int APosition, int ARemoved, int AAdded) =0;
 };
 
 class IReceiversWidget
@@ -271,7 +272,13 @@ public:
 class IViewUrlHandler
 {
 public:
-	virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder) =0;
+	virtual bool viewUrlOpen(int AOrder, IViewWidget *AWidget, const QUrl &AUrl) =0;
+};
+
+class IEditContentsHandler
+{
+public:
+	virtual void editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded) =0;
 };
 
 class IMessageWidgets
@@ -305,8 +312,11 @@ public:
 	virtual void insertViewDropHandler(IViewDropHandler *AHandler) =0;
 	virtual void removeViewDropHandler(IViewDropHandler *AHandler) =0;
 	virtual QMultiMap<int, IViewUrlHandler *> viewUrlHandlers() const =0;
-	virtual void insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder) =0;
-	virtual void removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder) =0;
+	virtual void insertViewUrlHandler(int AOrder, IViewUrlHandler *AHandler) =0;
+	virtual void removeViewUrlHandler(int AOrder, IViewUrlHandler *AHandler) =0;
+	virtual QMultiMap<int, IEditContentsHandler *> editContentsHandlers() const =0;
+	virtual void insertEditContentsHandler(int AOrder, IEditContentsHandler *AHandler) =0;
+	virtual void removeEditContentsHandler( int AOrder, IEditContentsHandler *AHandler) =0;
 protected:
 	virtual void infoWidgetCreated(IInfoWidget *AInfoWidget) =0;
 	virtual void viewWidgetCreated(IViewWidget *AViewWidget) =0;
@@ -326,8 +336,10 @@ protected:
 	virtual void tabWindowDestroyed(ITabWindow *AWindow) =0;
 	virtual void viewDropHandlerInserted(IViewDropHandler *AHandler) =0;
 	virtual void viewDropHandlerRemoved(IViewDropHandler *AHandler) =0;
-	virtual void viewUrlHandlerInserted(IViewUrlHandler *AHandler, int AOrder) =0;
-	virtual void viewUrlHandlerRemoved(IViewUrlHandler *AHandler, int AOrder) =0;
+	virtual void viewUrlHandlerInserted(int AOrder, IViewUrlHandler *AHandler) =0;
+	virtual void viewUrlHandlerRemoved(int AOrder, IViewUrlHandler *AHandler) =0;
+	virtual void editContentsHandlerInserted(int AOrder, IEditContentsHandler *AHandler) =0;
+	virtual void editContentsHandlerRemoved(int AOrder, IEditContentsHandler *AHandler) =0;
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
@@ -343,6 +355,7 @@ Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
+Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.0")
 
 #endif

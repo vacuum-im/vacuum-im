@@ -44,7 +44,6 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		if (FMessageWidgets)
 		{
 			connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
-			connect(FMessageWidgets->instance(),SIGNAL(editWidgetCreated(IEditWidget *)),SLOT(onEditWidgetCreated(IEditWidget *)));
 		}
 	}
 
@@ -65,6 +64,10 @@ bool Emoticons::initObjects()
 	if (FMessageProcessor)
 	{
 		FMessageProcessor->insertMessageWriter(this,MWO_EMOTICONS);
+	}
+	if (FMessageWidgets)
+	{
+		FMessageWidgets->insertEditContentsHandler(ECHO_EMOTICONS_IMAGE2TEXT,this);
 	}
 	return true;
 }
@@ -106,6 +109,43 @@ QMultiMap<int, IOptionsWidget *> Emoticons::optionsWidgets(const QString &ANodeI
 		widgets.insertMulti(OWO_EMOTICONS, new EmoticonsOptions(this,AParent));
 	}
 	return widgets;
+}
+
+void Emoticons::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+{
+	Q_UNUSED(ARemoved);
+	if (AOrder==ECHO_EMOTICONS_IMAGE2TEXT && AAdded>0)
+	{
+		if (AWidget->textFormatEnabled())
+		{
+			QList<QUrl> urlList = FUrlByKey.values();
+			QTextBlock block = AWidget->document()->findBlock(APosition);
+			while (block.isValid() && block.position()<=APosition+AAdded)
+			{
+				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+				{
+					QTextFragment fragment = it.fragment();
+					if (fragment.charFormat().isImageFormat())
+					{
+						QUrl url = fragment.charFormat().toImageFormat().name();
+						if (AWidget->document()->resource(QTextDocument::ImageResource,url).isNull())
+						{
+							if (urlList.contains(url))
+							{
+								AWidget->document()->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
+								AWidget->document()->markContentsDirty(fragment.position(),fragment.length());
+							}
+						}
+					}
+				}
+				block = block.next();
+			}
+		}
+		else
+		{
+			AAdded += replaceImageToText(AWidget->document(),APosition,AAdded);
+		}
+	}
 }
 
 QList<QString> Emoticons::activeIconsets() const
@@ -262,12 +302,12 @@ bool Emoticons::isWordBoundary(const QString &AText) const
 	return !AText.isEmpty() ? AText.at(0).isSpace() : true;
 }
 
-void Emoticons::replaceTextToImage(QTextDocument *ADocument, int AStartPos, int ALength) const
+int Emoticons::replaceTextToImage(QTextDocument *ADocument, int AStartPos, int ALength) const
 {
+	int posOffset = 0;
 	QMap<int,QString> emoticons = findTextEmoticons(ADocument,AStartPos,ALength);
 	if (!emoticons.isEmpty())
 	{
-		int posOffset = 0;
 		QTextCursor cursor(ADocument);
 		cursor.beginEditBlock();
 		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); it++)
@@ -286,14 +326,15 @@ void Emoticons::replaceTextToImage(QTextDocument *ADocument, int AStartPos, int 
 		}
 		cursor.endEditBlock();
 	}
+	return posOffset;
 }
 
-void Emoticons::replaceImageToText(QTextDocument *ADocument, int AStartPos, int ALength) const
+int Emoticons::replaceImageToText(QTextDocument *ADocument, int AStartPos, int ALength) const
 {
+	int posOffset = 0;
 	QMap<int,QString> emoticons = findImageEmoticons(ADocument,AStartPos,ALength);
 	if (!emoticons.isEmpty())
 	{
-		int posOffset = 0;
 		QTextCursor cursor(ADocument);
 		cursor.beginEditBlock();
 		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); it++)
@@ -330,6 +371,7 @@ void Emoticons::replaceImageToText(QTextDocument *ADocument, int AStartPos, int 
 		}
 		cursor.endEditBlock();
 	}
+	return posOffset;
 }
 
 SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWidget *AParent)
@@ -399,42 +441,6 @@ void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 	}
 }
 
-void Emoticons::onEditWidgetCreated(IEditWidget *AEditWidget)
-{
-	connect(AEditWidget->textEdit()->document(),SIGNAL(contentsChange(int,int,int)),SLOT(onEditWidgetContentsChanged(int,int,int)));
-}
-
-void Emoticons::onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded)
-{
-	Q_UNUSED(ARemoved);
-	if (AAdded>0)
-	{
-		QTextDocument *doc = qobject_cast<QTextDocument *>(sender());
-		QList<QUrl> urlList = FUrlByKey.values();
-		QTextBlock block = doc->findBlock(APosition);
-		while (block.isValid() && block.position()<=APosition+AAdded)
-		{
-			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
-			{
-				QTextFragment fragment = it.fragment();
-				if (fragment.charFormat().isImageFormat())
-				{
-					QUrl url = fragment.charFormat().toImageFormat().name();
-					if (doc->resource(QTextDocument::ImageResource,url).isNull())
-					{
-						if (urlList.contains(url))
-						{
-							doc->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
-							doc->markContentsDirty(fragment.position(),fragment.length());
-						}
-					}
-				}
-			}
-			block = block.next();
-		}
-	}
-}
-
 void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconKey)
 {
 	Q_UNUSED(ASubStorage);
@@ -448,8 +454,37 @@ void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconK
 			if (!url.isEmpty())
 			{
 				QTextEdit *editor = widget->textEdit();
-				editor->document()->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
-				editor->textCursor().insertImage(url.toString());
+				QTextCursor cursor = editor->textCursor();
+				cursor.beginEditBlock();
+
+				if (cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor,1))
+				{
+					bool space = !isWordBoundary(cursor.selectedText());
+					cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::MoveAnchor,1);
+					if (space)
+						cursor.insertText(" ");
+				}
+				
+				if (widget->textFormatEnabled())
+				{
+					if (!editor->document()->resource(QTextDocument::ImageResource,url).isValid())
+						editor->document()->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
+					cursor.insertImage(url.toString());
+				}
+				else
+				{
+					cursor.insertText(AIconKey);
+				}
+
+				if (cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,1))
+				{
+					bool space = !isWordBoundary(cursor.selectedText());
+					cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::MoveAnchor,1);
+					if (space)
+						cursor.insertText(" ");
+				}
+
+				cursor.endEditBlock();
 				editor->setFocus();
 			}
 		}

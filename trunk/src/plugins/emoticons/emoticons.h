@@ -6,6 +6,7 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/messagewriterorders.h>
+#include <definitions/editcontentshandlerorders.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
@@ -33,10 +34,11 @@ class Emoticons :
 	public IPlugin,
 	public IEmoticons,
 	public IMessageWriter,
-	public IOptionsHolder
+	public IOptionsHolder,
+	public IEditContentsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsHolder);
+	Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsHolder IEditContentsHandler);
 public:
 	Emoticons();
 	~Emoticons();
@@ -53,6 +55,8 @@ public:
 	virtual void writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	//IEditContentsHandler
+	virtual void editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IEmoticons
 	virtual QList<QString> activeIconsets() const;
 	virtual QUrl urlByKey(const QString &AKey) const;
@@ -64,16 +68,14 @@ protected:
 	void createTreeItem(const QString &AKey, const QUrl &AUrl);
 	void clearTreeItem(EmoticonTreeItem *AItem) const;
 	bool isWordBoundary(const QString &AText) const;
-	void replaceTextToImage(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
-	void replaceImageToText(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
+	int replaceTextToImage(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
+	int replaceImageToText(QTextDocument *ADocument, int AStartPos=0, int ALength=-1) const;
 	SelectIconMenu *createSelectIconMenu(const QString &ASubStorage, QWidget *AParent);
 	void insertSelectIconMenu(const QString &ASubStorage);
 	void removeSelectIconMenu(const QString &ASubStorage);
 protected slots:
 	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
 	void onToolBarWidgetDestroyed(QObject *AObject);
-	void onEditWidgetCreated(IEditWidget *AEditWidget);
-	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onIconSelected(const QString &ASubStorage, const QString &AIconKey);
 	void onSelectIconMenuDestroyed(QObject *AObject);
 	void onOptionsOpened();

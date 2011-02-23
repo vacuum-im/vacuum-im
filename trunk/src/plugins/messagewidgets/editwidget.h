@@ -48,6 +48,7 @@ signals:
 	void autoResizeChanged(bool AResize);
 	void minimumLinesChanged(int ALines);
 	void sendShortcutChanged(const QString &AShortcutId);
+	void contentsChanged(int APosition, int ARemoved, int AAdded);
 protected:
 	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected:
