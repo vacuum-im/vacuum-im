@@ -18,6 +18,17 @@ struct Shortcuts::ShortcutsData
 };
 Shortcuts::ShortcutsData *Shortcuts::d = new Shortcuts::ShortcutsData;
 
+QKeySequence correctKeySequence(const QKeySequence &AKey)
+{
+#ifdef Q_WS_WIN
+	if ((AKey[0] & ~Qt::KeyboardModifierMask) == Qt::Key_Backtab)
+	{
+		return QKeySequence(Qt::Key_Tab | (AKey[0] & Qt::KeyboardModifierMask));
+	}
+#endif
+	return AKey;
+}
+
 Shortcuts *Shortcuts::instance()
 {
 	static Shortcuts *inst = NULL;
@@ -200,7 +211,7 @@ void Shortcuts::updateObject(QObject *AObject)
 			if (action && !deskWidget->actions().contains(action))
 				deskWidget->addAction(action);
 		}
-		AObject->setProperty("shortcut", descriptor.activeKey);
+		AObject->setProperty("shortcut", correctKeySequence(descriptor.activeKey));
 		AObject->setProperty("shortcutContext", convertContext(descriptor.context));
 	}
 	else if (AObject)
@@ -219,7 +230,7 @@ void Shortcuts::updateObject(QObject *AObject)
 void Shortcuts::updateWidget(QShortcut *AShortcut)
 {
 	Descriptor descriptor = d->shortcuts.value(d->widgetShortcutsId.value(AShortcut));
-	AShortcut->setKey(descriptor.activeKey);
+	AShortcut->setKey(correctKeySequence(descriptor.activeKey));
 	AShortcut->setContext(convertContext(descriptor.context));
 }
 
