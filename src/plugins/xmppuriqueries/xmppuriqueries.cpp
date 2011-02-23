@@ -36,12 +36,12 @@ bool XmppUriQueries::initObjects()
 {
 	if (FMessageWidgets)
 	{
-		FMessageWidgets->insertViewUrlHandler(this, VUHO_XMPPURIQUERIES);
+		FMessageWidgets->insertViewUrlHandler(VUHO_XMPPURIQUERIES, this);
 	}
 	return true;
 }
 
-bool XmppUriQueries::viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder)
+bool XmppUriQueries::viewUrlOpen(int AOrder, IViewWidget *AWidget, const QUrl &AUrl)
 {
 	if (AOrder == VUHO_XMPPURIQUERIES)
 		return openXmppUri(AWidget->streamJid(), AUrl);

@@ -8,6 +8,7 @@
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/viewurlhandlerorders.h>
+#include <definitions/editcontentshandlerorders.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/shortcuts.h>
 #include <definitions/shortcutgrouporders.h>
@@ -33,10 +34,11 @@ class MessageWidgets :
 			public IPlugin,
 			public IMessageWidgets,
 			public IOptionsHolder,
-			public IViewUrlHandler
+			public IViewUrlHandler,
+			public IEditContentsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IViewUrlHandler);
+	Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IViewUrlHandler IEditContentsHandler);
 public:
 	MessageWidgets();
 	~MessageWidgets();
@@ -51,7 +53,9 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IViewUrlHandler
-	virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
+	virtual bool viewUrlOpen(int AOrder, IViewWidget *AWidget, const QUrl &AUrl);
+	//IEditContentsHandler
+	virtual void editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IMessageWidgets
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
@@ -80,8 +84,11 @@ public:
 	virtual void insertViewDropHandler(IViewDropHandler *AHandler);
 	virtual void removeViewDropHandler(IViewDropHandler *AHandler);
 	virtual QMultiMap<int, IViewUrlHandler *> viewUrlHandlers() const;
-	virtual void insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder);
-	virtual void removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder);
+	virtual void insertViewUrlHandler(int AOrder, IViewUrlHandler *AHandler);
+	virtual void removeViewUrlHandler(int AOrder, IViewUrlHandler *AHandler);
+	virtual QMultiMap<int, IEditContentsHandler *> editContentsHandlers() const;
+	virtual void insertEditContentsHandler(int AOrder, IEditContentsHandler *AHandler);
+	virtual void removeEditContentsHandler(int AOrder, IEditContentsHandler *AHandler);
 signals:
 	void infoWidgetCreated(IInfoWidget *AInfoWidget);
 	void viewWidgetCreated(IViewWidget *AViewWidget);
@@ -101,14 +108,17 @@ signals:
 	void tabWindowDestroyed(ITabWindow *AWindow);
 	void viewDropHandlerInserted(IViewDropHandler *AHandler);
 	void viewDropHandlerRemoved(IViewDropHandler *AHandler);
-	void viewUrlHandlerInserted(IViewUrlHandler *AHandler, int AOrder);
-	void viewUrlHandlerRemoved(IViewUrlHandler *AHandler, int AOrder);
+	void viewUrlHandlerInserted(int AOrder, IViewUrlHandler *AHandler);
+	void viewUrlHandlerRemoved(int AOrder, IViewUrlHandler *AHandler);
+	void editContentsHandlerInserted(int AOrder, IEditContentsHandler *AHandler);
+	void editContentsHandlerRemoved(int AOrder, IEditContentsHandler *AHandler);
 protected:
 	void insertQuoteAction(IToolBarWidget *AWidget);
 	void deleteWindows();
 	void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
 	void onViewWidgetUrlClicked(const QUrl &AUrl);
+	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onQuoteActionTriggered(bool);
 	void onMessageWindowDestroyed();
 	void onChatWindowDestroyed();
@@ -131,6 +141,7 @@ private:
 	QMap<QString, QUuid> FPageWindows;
 	QList<IViewDropHandler *> FViewDropHandlers;
 	QMultiMap<int,IViewUrlHandler *> FViewUrlHandlers;
+	QMultiMap<int,IEditContentsHandler *> FEditContentsHandlers;
 };
 
 #endif // MESSAGEWIDGETS_H

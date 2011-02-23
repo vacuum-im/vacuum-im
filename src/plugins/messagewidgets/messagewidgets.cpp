@@ -1,5 +1,10 @@
 #include "messagewidgets.h"
 
+#include <QPair>
+#include <QTextBlock>
+#include <QTextCursor>
+#include <QTextDocument>
+
 MessageWidgets::MessageWidgets()
 {
 	FPluginManager = NULL;
@@ -79,7 +84,10 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_NORMAL, tr("Message window"), SGO_MESSAGEWINDOWS_NORMAL);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
 
-	insertViewUrlHandler(this,VUHO_MESSAGEWIDGETS_DEFAULT);
+	insertViewUrlHandler(VUHO_MESSAGEWIDGETS_DEFAULT,this);
+	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_FORMAT,this);
+	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_IMAGES,this);
+
 	return true;
 }
 
@@ -123,11 +131,64 @@ QMultiMap<int, IOptionsWidget *> MessageWidgets::optionsWidgets(const QString &A
 	return widgets;
 }
 
-bool MessageWidgets::viewUrlOpen(IViewWidget* APage, const QUrl &AUrl, int AOrder)
+bool MessageWidgets::viewUrlOpen(int AOrder, IViewWidget* APage, const QUrl &AUrl)
 {
 	Q_UNUSED(APage);
 	Q_UNUSED(AOrder);
 	return QDesktopServices::openUrl(AUrl);
+}
+
+void MessageWidgets::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+{
+	Q_UNUSED(ARemoved);
+	if (!AWidget->textFormatEnabled() && AAdded>0)
+	{
+		QTextCharFormat emptyFormat;
+		QList< QPair<int,int> > formats;
+		QTextBlock block = AWidget->document()->findBlock(APosition);
+		while (block.isValid() && block.position()<=APosition+AAdded)
+		{
+			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+			{
+				QTextCharFormat textFormat = it.fragment().charFormat();
+				if (textFormat.isImageFormat())
+				{
+					if (AOrder == ECHO_MESSAGEWIDGETS_IMAGES)
+						formats.append(qMakePair(it.fragment().position(),it.fragment().length()));
+				}
+				else if (textFormat != emptyFormat)
+				{
+					if (AOrder == ECHO_MESSAGEWIDGETS_FORMAT)
+						formats.append(qMakePair(it.fragment().position(),it.fragment().length()));
+				}
+			}
+			block = block.next();
+		}
+
+		if (!formats.isEmpty())
+		{
+			int posOffset = 0;
+			QTextCursor cursor(AWidget->document());
+			cursor.beginEditBlock();
+			for (int i=0; i<formats.count(); i++)
+			{
+				const QPair<int,int> &format = formats.at(i);
+				cursor.setPosition(format.first-posOffset);
+				cursor.setPosition(format.first-posOffset+format.second,QTextCursor::KeepAnchor);
+				if (AOrder == ECHO_MESSAGEWIDGETS_IMAGES)
+				{
+					posOffset += cursor.selectedText().length();
+					cursor.removeSelectedText();
+				}
+				else if (AOrder == ECHO_MESSAGEWIDGETS_FORMAT)
+				{
+					cursor.setCharFormat(emptyFormat);
+				}
+			}
+			cursor.endEditBlock();
+			AAdded -= posOffset;
+		}
+	}
 }
 
 IInfoWidget *MessageWidgets::newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
@@ -150,6 +211,7 @@ IViewWidget *MessageWidgets::newViewWidget(const Jid &AStreamJid, const Jid &ACo
 IEditWidget *MessageWidgets::newEditWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
 {
 	IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid,AParent);
+	connect(widget->instance(),SIGNAL(contentsChanged(int, int, int)),SLOT(onEditWidgetContentsChanged(int, int, int)));
 	FCleanupHandler.add(widget->instance());
 	emit editWidgetCreated(widget);
 	return widget;
@@ -376,21 +438,44 @@ QMultiMap<int, IViewUrlHandler *> MessageWidgets::viewUrlHandlers() const
 	return FViewUrlHandlers;
 }
 
-void MessageWidgets::insertViewUrlHandler(IViewUrlHandler *AHandler, int AOrder)
+void MessageWidgets::insertViewUrlHandler(int AOrder, IViewUrlHandler *AHandler)
 {
 	if (!FViewUrlHandlers.values(AOrder).contains(AHandler))
 	{
 		FViewUrlHandlers.insertMulti(AOrder,AHandler);
-		emit viewUrlHandlerInserted(AHandler,AOrder);
+		emit viewUrlHandlerInserted(AOrder,AHandler);
 	}
 }
 
-void MessageWidgets::removeViewUrlHandler(IViewUrlHandler *AHandler, int AOrder)
+void MessageWidgets::removeViewUrlHandler(int AOrder, IViewUrlHandler *AHandler)
 {
 	if (FViewUrlHandlers.values(AOrder).contains(AHandler))
 	{
 		FViewUrlHandlers.remove(AOrder,AHandler);
-		emit viewUrlHandlerRemoved(AHandler,AOrder);
+		emit viewUrlHandlerRemoved(AOrder,AHandler);
+	}
+}
+
+QMultiMap<int, IEditContentsHandler *> MessageWidgets::editContentsHandlers() const
+{
+	return FEditContentsHandlers;
+}
+
+void MessageWidgets::insertEditContentsHandler(int AOrder, IEditContentsHandler *AHandler)
+{
+	if (!FEditContentsHandlers.values(AOrder).contains(AHandler))
+	{
+		FEditContentsHandlers.insertMulti(AOrder,AHandler);
+		emit editContentsHandlerInserted(AOrder,AHandler);
+	}
+}
+
+void MessageWidgets::removeEditContentsHandler(int AOrder, IEditContentsHandler *AHandler)
+{
+	if (FEditContentsHandlers.values(AOrder).contains(AHandler))
+	{
+		FEditContentsHandlers.remove(AOrder,AHandler);
+		emit editContentsHandlerRemoved(AOrder,AHandler);
 	}
 }
 
@@ -432,8 +517,20 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
 	if (widget)
 	{
 		for (QMap<int,IViewUrlHandler *>::const_iterator it = FViewUrlHandlers.constBegin(); it!=FViewUrlHandlers.constEnd(); it++)
-			if (it.value()->viewUrlOpen(widget,AUrl,it.key()))
+			if (it.value()->viewUrlOpen(it.key(),widget,AUrl))
 				break;
+	}
+}
+
+void MessageWidgets::onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded)
+{
+	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
+	if (widget)
+	{
+		widget->document()->blockSignals(true);
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); it++)
+			it.value()->editContentsChanged(it.key(),widget,APosition,ARemoved,AAdded);
+		widget->document()->blockSignals(false);
 	}
 }
 

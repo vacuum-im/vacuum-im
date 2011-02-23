@@ -26,7 +26,7 @@ public:
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IViewUrlHandler
-	virtual bool viewUrlOpen(IViewWidget *AWidget, const QUrl &AUrl, int AOrder);
+	virtual bool viewUrlOpen(int AOrder, IViewWidget *AWidget, const QUrl &AUrl);
 	//IXmppUriQueries
 	virtual bool openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const;
 	virtual void insertUriHandler(IXmppUriHandler *AHandler, int AOrder);

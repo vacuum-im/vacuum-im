@@ -1,10 +1,6 @@
 #include "editwidget.h"
 
-#include <QPair>
 #include <QKeyEvent>
-#include <QTextBlock>
-#include <QTextCursor>
-#include <QTextDocument>
 
 #define MAX_BUFFERED_MESSAGES     10
 
@@ -262,35 +258,5 @@ void EditWidget::onOptionsChanged(const OptionsNode &ANode)
 
 void EditWidget::onContentsChanged(int APosition, int ARemoved, int AAdded)
 {
-	Q_UNUSED(ARemoved);
-	if (!FFormatEnabled && AAdded>0)
-	{
-		QTextCharFormat emptyFormat;
-		QList< QPair<int,int> > formats;
-		QTextBlock block = ui.medEditor->document()->findBlock(APosition);
-		while (block.isValid() && block.position()<=APosition+AAdded)
-		{
-			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
-			{
-				QTextCharFormat textFormat = it.fragment().charFormat();
-				if (!textFormat.isImageFormat() && textFormat!=emptyFormat)
-					formats.append(qMakePair(it.fragment().position(),it.fragment().length()));
-			}
-			block = block.next();
-		}
-
-		if (!formats.isEmpty())
-		{
-			QTextCursor cursor(ui.medEditor->document());
-			cursor.beginEditBlock();
-			for (int i=0; i<formats.count(); i++)
-			{
-				const QPair<int,int> &format = formats.at(i);
-				cursor.setPosition(format.first);
-				cursor.setPosition(format.first + format.second, QTextCursor::KeepAnchor);
-				cursor.setCharFormat(emptyFormat);
-			}
-			cursor.endEditBlock();
-		}
-	}
+	emit contentsChanged(APosition,ARemoved,AAdded);
 }
