@@ -1,1 +1,0 @@
-tsupdate.bat uk_UA

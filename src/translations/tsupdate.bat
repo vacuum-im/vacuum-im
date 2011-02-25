@@ -1,6 +1,6 @@
 @echo off
 
-if '%1'=='' (set LANG=??_??) ELSE (set LANG=%1)
+if '%1'=='' (set LANG=??) ELSE (set LANG=%1)
 
 set TS_DIR=.
 set UTILS_DIR=../utils

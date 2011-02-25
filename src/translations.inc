@@ -1,11 +1,11 @@
-TRANS_LANGS  = ru_RU pl_PL de_DE uk_UA
+TRANS_LANGS  = ru pl de uk
 
 FIRST_TARGET = $$member(TARGET,0)
 TRANSLATIONS = \
-	$${TRANS_SOURCE_ROOT}/translations/ru_RU/$${FIRST_TARGET}.ts \
-	$${TRANS_SOURCE_ROOT}/translations/pl_PL/$${FIRST_TARGET}.ts \
-	$${TRANS_SOURCE_ROOT}/translations/de_DE/$${FIRST_TARGET}.ts \
-	$${TRANS_SOURCE_ROOT}/translations/uk_UA/$${FIRST_TARGET}.ts 
+	$${TRANS_SOURCE_ROOT}/translations/ru/$${FIRST_TARGET}.ts \
+	$${TRANS_SOURCE_ROOT}/translations/pl/$${FIRST_TARGET}.ts \
+	$${TRANS_SOURCE_ROOT}/translations/de/$${FIRST_TARGET}.ts \
+	$${TRANS_SOURCE_ROOT}/translations/uk/$${FIRST_TARGET}.ts 
 
 
 #Building Translations
