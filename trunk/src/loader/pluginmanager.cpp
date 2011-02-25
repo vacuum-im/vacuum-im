@@ -281,7 +281,7 @@ void PluginManager::loadPlugins()
 	QDir dir(QApplication::applicationDirPath());
 	if (dir.cd(PLUGINS_DIR))
 	{
-		QString tsDir = QDir::cleanPath(QDir(QApplication::applicationDirPath()).absoluteFilePath(TRANSLATIONS_DIR "/" + QLocale().name()));
+		QString tsDir = QDir::cleanPath(QDir(QApplication::applicationDirPath()).absoluteFilePath(TRANSLATIONS_DIR "/" + QLocale().name().left(2)));
 		loadCoreTranslations(tsDir);
 
 		QStringList files = dir.entryList(QDir::Files);
@@ -509,8 +509,10 @@ void PluginManager::loadCoreTranslations(const QString &ADir)
 	if (FUtilsTranslator->load("vacuumutils",ADir))
 		qApp->installTranslator(FUtilsTranslator);
 
-	if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)) || FQtTranslator->load("qt_"+QLocale().name(),ADir))
+	if (FQtTranslator->load("qt_"+QLocale().name(),ADir))
 		qApp->installTranslator(FQtTranslator);
+   else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+      qApp->installTranslator(FQtTranslator);
 }
 
 bool PluginManager::isPluginEnabled(const QString &AFile) const

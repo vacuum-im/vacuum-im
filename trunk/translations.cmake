@@ -1,8 +1,8 @@
 set(LOCALIZED_LANGS
-	"ru_RU"
-	"pl_PL"
-	"de_DE"
-	"uk_UA"
+	"ru"
+	"pl"
+	"de"
+	"uk"
 )
 
 macro(set_enabled_langs langs)
@@ -36,13 +36,15 @@ endmacro(process_lang_options)
 
 macro(lang_display_name outvar langname)
 	set(${outvar} "")
-	if (${langname} STREQUAL "ru_RU")
+	if (${langname} STREQUAL "ru")
 		set(${outvar} "Russian")
-	elseif (${langname} STREQUAL "pl_PL")
+	elseif (${langname} STREQUAL "pl")
 		set(${outvar} "Polish")
-	elseif (${langname} STREQUAL "uk_UA")
+	elseif (${langname} STREQUAL "uk")
 		set(${outvar} "Ukrainian")
-	endif (${langname} STREQUAL "ru_RU")
+	elseif (${langname} STREQUAL "de")
+		set(${outvar} "German")
+	endif (${langname} STREQUAL "ru")
 endmacro(lang_display_name)
 
 set(LUPDATE_OPTS -no-obsolete -locations none -source-language en)
