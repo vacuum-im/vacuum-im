@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>The are %1 field(s) with invalid values:&lt;br&gt;</source>
-        <translation>Знайдено %1 полей із некоректними значеннями:&lt;br&gt;</translation>
+        <translation>Знайдено %1 полів із некоректними значеннями:&lt;br&gt;</translation>
     </message>
     <message>
         <source>Do you want to continue with invalid values?</source>
@@ -52,11 +52,11 @@
     </message>
     <message>
         <source>Allows other modules to process and display the form with the data intended for user</source>
-        <translation>Дозволяє іншим модулям обробляти та відображати форми з даними</translation>
+        <translation>Дозволяє іншим модулям обробляти та показувати форми з даними</translation>
     </message>
     <message>
         <source>Supports the processing and displaying of the forms with the data</source>
-        <translation>Підтримує обробку та відображення форм із даними</translation>
+        <translation>Підтримує обробку та перегляд форм із даними</translation>
     </message>
     <message>
         <source>Supports the validating of the data entered in the form</source>

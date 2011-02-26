@@ -52,11 +52,11 @@
     </message>
     <message>
         <source>Failed to publish vCard</source>
-        <translation>Не вдалось опублікувати вкард</translation>
+        <translation>Не вдалось опублікувати vCard</translation>
     </message>
     <message>
         <source>Failed to update vCard</source>
-        <translation>Не вдалось поновити вкард</translation>
+        <translation>Не вдалось поновити vCard</translation>
     </message>
     <message>
         <source>&lt;Unset&gt;</source>
@@ -79,11 +79,11 @@
     </message>
     <message>
         <source>Full name</source>
-        <translation>Повне ім’я</translation>
+        <translation>Повне ім&apos;я</translation>
     </message>
     <message>
         <source>First name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Middle name</source>
@@ -95,7 +95,7 @@
     </message>
     <message>
         <source>Nick name</source>
-        <translation>Нік</translation>
+        <translation>Прізвисько</translation>
     </message>
     <message>
         <source>Jabber Id</source>
@@ -226,7 +226,7 @@
     </message>
     <message>
         <source>Supports the requesting of the personal contact information</source>
-        <translation>Підтримує запит персональноЇ інформації контакту</translation>
+        <translation>Підтримує запит персональної інформації контакту</translation>
     </message>
     <message>
         <source>Visit Card Manager</source>

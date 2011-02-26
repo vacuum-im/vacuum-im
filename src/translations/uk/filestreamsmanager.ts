@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Waiting for a response to send a file request</source>
-        <translation>Очікування відповіді на запит відправки файлу</translation>
+        <translation>Очікування відповіді на запит надсилання файлу</translation>
     </message>
     <message>
         <source>Data transmission</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Connection timed out</source>
-        <translation>Перевищено час встановлення з’єднання</translation>
+        <translation>Перевищено час встановлення з&apos;єднання</translation>
     </message>
     <message>
         <source>File size unexpectedly changed</source>
@@ -97,7 +97,7 @@
     <name>FileStreamsWindow</name>
     <message>
         <source>File Name</source>
-        <translation>Ім’я файлу</translation>
+        <translation>Ім&apos;я файлу</translation>
     </message>
     <message>
         <source>State</source>

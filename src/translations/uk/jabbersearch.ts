@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>First Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Last Name</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Nickname</source>
-        <translation>Нік</translation>
+        <translation>Прізвисько</translation>
     </message>
     <message>
         <source>Email Address</source>
@@ -71,7 +71,7 @@
     <name>SearchDialogClass</name>
     <message>
         <source>First:</source>
-        <translation>Ім’я:</translation>
+        <translation>Ім&apos;я:</translation>
     </message>
     <message>
         <source>Last:</source>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Nick:</source>
-        <translation>Нік:</translation>
+        <translation>Прізвисько:</translation>
     </message>
     <message>
         <source>Email:</source>
@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>First</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Last</source>
@@ -99,7 +99,7 @@
     </message>
     <message>
         <source>Nick</source>
-        <translation>Нік</translation>
+        <translation>Прізвисько</translation>
     </message>
     <message>
         <source>EMail</source>

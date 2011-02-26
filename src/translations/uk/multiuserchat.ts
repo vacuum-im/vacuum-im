@@ -68,7 +68,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Nick:</source>
-        <translation>Нік:</translation>
+        <translation>Прізвисько:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -135,7 +135,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Room configuration submit failed.</source>
-        <translation>Не вдалось підтвердити конфигурацію кімнати.</translation>
+        <translation>Не вдалось підтвердити конфігурацію кімнати.</translation>
     </message>
     <message>
         <source>Room destruction request was sent.</source>
@@ -202,7 +202,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>A room that a user cannot enter without being on the member list</source>
-        <translation>Кімната, в яку не можуть зайти ті, хто не включений до списку участників</translation>
+        <translation>Кімната, в яку не можуть зайти ті, хто не включений до списку учасників</translation>
     </message>
     <message>
         <source>Moderated room</source>
@@ -214,7 +214,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Non-anonymous room</source>
-        <translation>Неанонімна кімната</translation>
+        <translation>Не анонімна кімната</translation>
     </message>
     <message>
         <source>A room in which an occupant&apos;s full JID is exposed to all other occupants</source>
@@ -226,7 +226,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>A room that anyone may enter without being on the member list</source>
-        <translation>Кімната, в яку кожен может зайти, не будучи в списку учасників</translation>
+        <translation>Кімната, в яку кожен може зайти, не будучи в списку учасників</translation>
     </message>
     <message>
         <source>Password-protected room</source>
@@ -234,7 +234,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>A room that a user cannot enter without first providing the correct password</source>
-        <translation>Кімната, в яку користувач может зайти, тільки після надання правильного паролю</translation>
+        <translation>Кімната, в яку користувач може зайти, тільки після надання правильного паролю</translation>
     </message>
     <message>
         <source>Persistent room</source>
@@ -242,7 +242,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>A room that is not destroyed if the last occupant exits</source>
-        <translation>Кімната, яка не видаляєтся після виходу останнього користувача</translation>
+        <translation>Кімната, яка не видаляється після виходу останнього користувача</translation>
     </message>
     <message>
         <source>Public room</source>
@@ -262,11 +262,11 @@ Check values and try again</source>
     </message>
     <message>
         <source>Temporary room</source>
-        <translation>Тимчасова кімата</translation>
+        <translation>Тимчасова кімната</translation>
     </message>
     <message>
         <source>A room that is destroyed if the last occupant exits</source>
-        <translation>Кімната, яка видаляется після виходу останнього користувача</translation>
+        <translation>Кімната, яка видаляється після виходу останнього користувача</translation>
     </message>
     <message>
         <source>Unmoderated room</source>
@@ -282,7 +282,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>A room that anyone is allowed to enter without first providing the correct password</source>
-        <translation>Кімната, в яку користувач может зайти, без надання правильного паролю</translation>
+        <translation>Кімната, в яку користувач може зайти, без надання правильного паролю</translation>
     </message>
     <message>
         <source>Invite to</source>
@@ -318,7 +318,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>First Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Last Name</source>
@@ -326,7 +326,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Desired Nickname</source>
-        <translation>Бажаний нік</translation>
+        <translation>Бажаний прізвисько</translation>
     </message>
     <message>
         <source>Your URL</source>
@@ -374,7 +374,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Password is Required to Enter?</source>
-        <translation>Зробіти кімнату захищену паролем?</translation>
+        <translation>Зробити кімнату захищену паролем?</translation>
     </message>
     <message>
         <source>Make Room Persistent?</source>
@@ -426,7 +426,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>LDAP Group</source>
-        <translation>Группа LDAP</translation>
+        <translation>Група LDAP</translation>
     </message>
     <message>
         <source>URL for Archived Discussion Logs</source>
@@ -434,7 +434,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Current Number of Occupants in Room</source>
-        <translation>Поточна кількість участників в кімнаті</translation>
+        <translation>Поточна кількість учасників в кімнаті</translation>
     </message>
     <message>
         <source>Current Subject or Discussion Topic in Room</source>
@@ -458,7 +458,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Room Nickname</source>
-        <translation>Нік у кімнаті</translation>
+        <translation>Прізвисько у кімнаті</translation>
     </message>
     <message>
         <source>Grant Voice?</source>
@@ -470,11 +470,11 @@ Check values and try again</source>
     </message>
     <message>
         <source>Allow visitors to send status text in presence updates?</source>
-        <translation>Дозволити гостям вставляти текcт статуса в повідомлення про присутність?</translation>
+        <translation>Дозволити гостям вставляти текcт статусу в повідомлення про присутність?</translation>
     </message>
     <message>
         <source>Allow visitors to change nickname?</source>
-        <translation>Дозволити гостям міняти нік?</translation>
+        <translation>Дозволити гостям міняти прізвисько?</translation>
     </message>
     <message>
         <source>Default occupants as participants?</source>
@@ -543,7 +543,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Change nick</source>
-        <translation>Змінити нік</translation>
+        <translation>Змінити прізвисько</translation>
     </message>
     <message>
         <source>Change topic</source>
@@ -603,7 +603,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Change room nick</source>
-        <translation>Змінити нік</translation>
+        <translation>Змінити прізвисько</translation>
     </message>
     <message>
         <source>Change topic</source>
@@ -719,7 +719,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 has been removed from the room because the room has been changed to members-only</source>
-        <translation>%1 був видалений з кімнати через встановлення статусу &quot;тілько для учасників&quot;</translation>
+        <translation>%1 був видалений з кімнати через встановлення статусу &quot;тільки для учасників&quot;</translation>
     </message>
     <message>
         <source>%1 is being removed from the room because of a system shutdown</source>
@@ -731,15 +731,15 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 is not valid contact JID</source>
-        <translation>%1 не являєтся правильним JID</translation>
+        <translation>%1 не являється правильним JID</translation>
     </message>
     <message>
         <source>%1 is not valid room JID</source>
-        <translation>%1 не являєтся правильним JID кімнати</translation>
+        <translation>%1 не являється правильним JID кімнати</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation>Від’єднаний</translation>
+        <translation>Від&apos;єднаний</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -767,7 +767,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 changed nick to %2</source>
-        <translation>%1 змінив нік на %2</translation>
+        <translation>%1 змінив прізвисько на %2</translation>
     </message>
     <message>
         <source>Subject: %1</source>
@@ -815,11 +815,11 @@ Check values and try again</source>
     </message>
     <message>
         <source>Change nick name</source>
-        <translation>Змінити нік</translation>
+        <translation>Змінити прізвисько</translation>
     </message>
     <message>
         <source>Enter your new nick name in room %1</source>
-        <translation>Введіть ваш новий нік в кімнаті %1</translation>
+        <translation>Введіть ваш новий прізвисько в кімнаті %1</translation>
     </message>
     <message>
         <source>Change subject</source>
@@ -903,13 +903,13 @@ Check values and try again</source>
  /nick &lt;newnick&gt; 
  /leave [comment] 
  /topic &lt;foo&gt;</source>
-        <translation>Список команд що підтримуются:
- /ban &lt;нік&gt; [комментар] 
- /invite &lt;jid&gt; [комментар] 
+        <translation>Список команд що підтримуються:
+ /ban &lt;прізвисько&gt; [коментар] 
+ /invite &lt;jid&gt; [коментар] 
  /join &lt;кімната&gt; [пароль] 
- /kick &lt;нік&gt; [комментар] 
- /msg &lt;нік&gt; &lt;повідомлення&gt; 
- /nick &lt;новый_нік&gt; 
+ /kick &lt;прізвисько&gt; [коментар] 
+ /msg &lt;прізвисько&gt; &lt;повідомлення&gt; 
+ /nick &lt;новий_прізвисько&gt; 
  /leave [коментар] 
  /topic &lt;тема&gt;</translation>
     </message>

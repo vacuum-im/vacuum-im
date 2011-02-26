@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Enter your username and new password.</source>
-        <translation>Ведіть ваше ім’я користувача і новыи пароль.</translation>
+        <translation>Ведіть ваше ім&apos;я користувача і новий пароль.</translation>
     </message>
     <message>
         <source>You are successfully registered at %1</source>
@@ -37,14 +37,14 @@
     </message>
     <message>
         <source>Error: Can&apos;t send request to host.</source>
-        <translation>Помилка: неможливо відіслати запрос на хост.</translation>
+        <translation>Помилка: неможливо відіслати запит на хост.</translation>
     </message>
 </context>
 <context>
     <name>RegisterDialogClass</name>
     <message>
         <source>Username:</source>
-        <translation>Ім’я користувача:</translation>
+        <translation>Ім&apos;я користувача:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Secure connection is not established</source>
-        <translation>Захищене з’єднання не встановлено</translation>
+        <translation>Захищене з&apos;єднання не встановлено</translation>
     </message>
 </context>
 <context>
@@ -106,11 +106,11 @@
     </message>
     <message>
         <source>Account Name</source>
-        <translation>Ім’я Аккаунту</translation>
+        <translation>Ім&apos;я аккаунту</translation>
     </message>
     <message>
         <source>Nickname</source>
-        <translation>Нік</translation>
+        <translation>Прізвисько</translation>
     </message>
     <message>
         <source>Password</source>
@@ -118,7 +118,7 @@
     </message>
     <message>
         <source>Full Name</source>
-        <translation>Повне ім’я</translation>
+        <translation>Повне ім&apos;я</translation>
     </message>
     <message>
         <source>Email Address</source>
@@ -146,7 +146,7 @@
     </message>
     <message>
         <source>Allows to register on the Jabber servers and services</source>
-        <translation>Дозволяє реєеструватись на джаббер-серверах та сервісах</translation>
+        <translation>Дозволяє реєструватись на джаббер-серверах та сервісах</translation>
     </message>
     <message>
         <source>Supports the registration</source>
@@ -154,7 +154,7 @@
     </message>
     <message>
         <source>Given Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Family Name</source>

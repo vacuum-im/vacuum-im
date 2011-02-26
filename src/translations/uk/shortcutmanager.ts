@@ -9,15 +9,15 @@
     </message>
     <message>
         <source>Allows to setup user defined shortcuts</source>
-        <translation>Дозволяе налаштовувати контекстне меню</translation>
+        <translation>Дозволяє налаштовувати контекстне меню</translation>
     </message>
     <message>
         <source>Shortcuts</source>
-        <translation>котекстне меню</translation>
+        <translation>Контекстне меню</translation>
     </message>
     <message>
         <source>Hide all windows, tray icon and notifications</source>
-        <translation>Сховати ус вікна значки трею та повідомлення</translation>
+        <translation>Сховати усі вікна значки трею та повідомлення</translation>
     </message>
     <message>
         <source>Enter profile password:</source>
@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation>Стандартні установки</translation>
+        <translation>Стандартні налаштування</translation>
     </message>
 </context>
 </TS>

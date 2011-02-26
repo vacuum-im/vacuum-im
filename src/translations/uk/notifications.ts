@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Pending Notifications</source>
-        <translation>Очікуючі сповіщення</translation>
+        <translation>Сповіщення, що очікують</translation>
     </message>
     <message>
         <source>Notifications Manager</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Allows other modules to notify the user of the events</source>
-        <translation>Дозволяє іншим модулям сповіщувати користувача про події, що сталися</translation>
+        <translation>Дозволяє іншим модулям сповіщати користувача про події, що сталися</translation>
     </message>
     <message>
         <source>Enable/Disable notifications sound</source>
@@ -44,7 +44,7 @@
     <name>NotifyKindsWidgetClass</name>
     <message>
         <source>Roster</source>
-        <translation>Контакт-лист</translation>
+        <translation>Ростер</translation>
     </message>
     <message>
         <source>Popup</source>
@@ -98,7 +98,7 @@
     </message>
     <message>
         <source>Expand contact groups in roster</source>
-        <translation>Розкривати группи контакта в ростері</translation>
+        <translation>Розкривати групи контакту в ростері</translation>
     </message>
     <message>
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>

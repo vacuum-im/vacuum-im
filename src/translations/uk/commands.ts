@@ -60,7 +60,7 @@
     </message>
     <message>
         <source>The data form did not provide one or more required fields</source>
-        <translation>У формі не заповнено одне або кілька обов’язкових полів</translation>
+        <translation>У формі не заповнено одне або кілька обов&apos;язкових полів</translation>
     </message>
     <message>
         <source>Specified session not present</source>

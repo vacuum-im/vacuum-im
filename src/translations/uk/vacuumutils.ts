@@ -65,7 +65,7 @@
     </message>
     <message>
         <source>Request Timeout</source>
-        <translation>Вичерпаний час виконання запросу</translation>
+        <translation>Вичерпаний час виконання запиту</translation>
     </message>
     <message>
         <source>Conflict</source>

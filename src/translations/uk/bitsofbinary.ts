@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Allows other modules to receive or send a small amount of binary data in XMPP stanza</source>
-        <translation>Дозволяє іншим модулям отримувати та відправляти невеликі об’єми бінарних даних</translation>
+        <translation>Дозволяє іншим модулям отримувати та відправляти невеликі об&apos;єми бінарних даних</translation>
     </message>
     <message>
         <source>Supports the exchange of a small amount of binary data in XMPP stanza</source>

@@ -31,7 +31,7 @@
     </message>
     <message>
         <source>Default Connection</source>
-        <translation>Стандартне з’єднання</translation>
+        <translation>Стандартне з&apos;єднання</translation>
     </message>
     <message>
         <source>Organization: %1</source>
@@ -79,7 +79,7 @@
     </message>
     <message>
         <source>Issuer Common Name: %1</source>
-        <translation>Загальне ім’я емітента: %1</translation>
+        <translation>Загальне ім&apos;я емітента: %1</translation>
     </message>
     <message>
         <source>SSL Authentication Error</source>

@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Select font family and size</source>
-        <translation>Виберіть фришт</translation>
+        <translation>Виберіть шрифт</translation>
     </message>
     <message>
         <source>Select background image</source>

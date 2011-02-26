@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>Negotiate session requests</source>
-        <translation>Запити установки сесії</translation>
+        <translation>Запити встановлення сесії</translation>
     </message>
     <message>
         <source>Negotiate Session</source>
-        <translation>Узгодити сессію</translation>
+        <translation>Узгодити сесію</translation>
     </message>
     <message>
         <source>Terminate Session</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Allow multiple sessions?</source>
-        <translation>Дозволити багатокористувальні сесії?</translation>
+        <translation>Дозволити декілька сесій?</translation>
     </message>
     <message>
         <source>Session negotiation</source>
@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>Do you accept this session settings?</source>
-        <translation>Ви згідні з настройками сесії?</translation>
+        <translation>Ви згодні з настройками сесії?</translation>
     </message>
     <message>
         <source>Renegotiate this session?</source>
@@ -101,11 +101,11 @@
     </message>
     <message>
         <source>Allows to set the session between two entities, which explains the rules of the exchange of XMPP stanzas</source>
-        <translation>Дозволяе встановлювати сесію між двома сутностями, що визначають правила обміну XMPP строфами</translation>
+        <translation>Дозволяє встановлювати сесію між двома сутностями, що визначають правила обміну XMPP строфами</translation>
     </message>
     <message>
         <source>Supports the negotiating of the stanza session between two XMPP entities</source>
-        <translation>Підтримуе ініціалізіцію сесії строф між двома XMPP сутностями</translation>
+        <translation>Підтримує ініціалізацію сесії строф між двома XMPP сутностями</translation>
     </message>
 </context>
 </TS>

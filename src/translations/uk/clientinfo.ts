@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Allows to send and receive information about the version of the application, the local time and the last activity of contact</source>
-        <translation>Дозволяє отримувати та відсилати інформацію про версію програмного забезпечення, локальний час та останню активність</translation>
+        <translation>Дозволяє отримувати та надсилати інформацію про версію програмного забезпечення, локальний час та останню активність</translation>
     </message>
     <message>
         <source>Supports the exchanging of the information about the application version</source>
@@ -65,7 +65,7 @@
     </message>
     <message>
         <source>Idle Time</source>
-        <translation>Час простоювання</translation>
+        <translation>Час простою</translation>
     </message>
     <message>
         <source>Share information about OS version</source>
@@ -88,7 +88,7 @@
     </message>
     <message>
         <source>Name:</source>
-        <translation>Ім’я:</translation>
+        <translation>Ім&apos;я:</translation>
     </message>
     <message>
         <source>Version:</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
         <source>Idle Time</source>
-        <translation>Час простоювання</translation>
+        <translation>Час простою</translation>
     </message>
     <message>
         <source>Uptime:</source>
@@ -152,7 +152,7 @@
     </message>
     <message>
         <source>Not available</source>
-        <translation>Не доступно</translation>
+        <translation>Недоступно</translation>
     </message>
     <message>
         <source>%1y</source>

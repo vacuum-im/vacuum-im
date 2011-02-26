@@ -28,11 +28,11 @@
     </message>
     <message>
         <source>Allows other modules to use standard widgets for messaging</source>
-        <translation>Дозволяє іншим модулям вікористовувати стандартні віджети для обміну повідомленнями</translation>
+        <translation>Дозволяє іншим модулям використовувати стандартні віджети для обміну повідомленнями</translation>
     </message>
     <message>
         <source>Quote selected text</source>
-        <translation>Цитувати виділенний текст</translation>
+        <translation>Цитувати виділений текст</translation>
     </message>
     <message>
         <source>Tab Window</source>
@@ -44,7 +44,7 @@
     </message>
     <message>
         <source>Show status changes in chat windows</source>
-        <translation>Показувати зміну статуса в вікні чату</translation>
+        <translation>Показувати зміну статусу в вікні чату</translation>
     </message>
     <message>
         <source>Auto resize input field</source>
@@ -248,7 +248,7 @@
     </message>
     <message>
         <source>Not in Roster</source>
-        <translation>Не в контакт-листі</translation>
+        <translation>Не в ростері</translation>
     </message>
     <message>
         <source>Contact</source>
@@ -264,7 +264,7 @@
     </message>
     <message>
         <source>Blank group</source>
-        <translation>Загальна группа</translation>
+        <translation>Загальна група</translation>
     </message>
     <message>
         <source>My Resources</source>
@@ -276,7 +276,7 @@
     </message>
     <message>
         <source>Enter valid contact jid:</source>
-        <translation>Ввдіть корректний JID:</translation>
+        <translation>Введіть коректний JID:</translation>
     </message>
 </context>
 <context>
@@ -334,7 +334,7 @@
     </message>
     <message>
         <source>Rename Tab Window</source>
-        <translation>Переіменувати вікно</translation>
+        <translation>Перейменувати вікно</translation>
     </message>
     <message>
         <source>Delete Tab Window</source>

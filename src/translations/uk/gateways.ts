@@ -55,15 +55,15 @@
     </message>
     <message>
         <source>Keep connection</source>
-        <translation>Підтримувати з’єднання</translation>
+        <translation>Підтримувати з&apos;єднання</translation>
     </message>
     <message>
         <source>Resolve nick names</source>
-        <translation>Визначити всі ніки</translation>
+        <translation>Визначити всі прізвиська</translation>
     </message>
     <message>
         <source>Resolve nick name</source>
-        <translation>Визначити нік</translation>
+        <translation>Визначити прізвисько</translation>
     </message>
     <message>
         <source>Use instead of</source>

@@ -5,15 +5,15 @@
     <name>EditStatusDialog</name>
     <message>
         <source>Enter status name</source>
-        <translation>Ведіть ім’я статуса</translation>
+        <translation>Введіть ім&apos;я статусу</translation>
     </message>
     <message>
         <source>Status name:</source>
-        <translation>Ім’я статуса:</translation>
+        <translation>Ім&apos;я статусу:</translation>
     </message>
     <message>
         <source>Wrong status name</source>
-        <translation>Невірне ім’я статуса</translation>
+        <translation>Невірне ім&apos;я статусу</translation>
     </message>
     <message>
         <source>Can&apos;t delete status</source>
@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; already exists</source>
-        <translation>Статус з ім’ям  &apos;&lt;b&gt;%1&lt;/b&gt;&apos;  уже існує</translation>
+        <translation>Статус з ім&apos;ям  &apos;&lt;b&gt;%1&lt;/b&gt;&apos;  уже існує</translation>
     </message>
 </context>
 <context>
@@ -56,11 +56,11 @@
     </message>
     <message>
         <source>Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Status name displayed in status change menu</source>
-        <translation>Ім’я статусу, що відображаеться в меню зміни статусу</translation>
+        <translation>Ім&apos;я статусу, що показується в меню зміни статусу</translation>
     </message>
     <message>
         <source>Message</source>
@@ -103,7 +103,7 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Priority</source>
@@ -162,7 +162,7 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation>Відключенний</translation>
+        <translation>Відключений</translation>
     </message>
     <message>
         <source>%1 - %2</source>
@@ -198,11 +198,11 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Auto connect on startup</source>
-        <translation>Автопідключення при старті</translation>
+        <translation>Авто-підключення при старті</translation>
     </message>
     <message>
         <source>Auto reconnect if disconnected</source>
-        <translation>Автоматично відновлювати з’єднання</translation>
+        <translation>Автоматично відновлювати з&apos;єднання</translation>
     </message>
     <message>
         <source>I&apos;m away from my desk</source>

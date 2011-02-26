@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Send File</source>
-        <translation>Відіслати файл</translation>
+        <translation>Надіслати файл</translation>
     </message>
     <message>
         <source>File transfer completed</source>
@@ -25,11 +25,11 @@
     </message>
     <message>
         <source>Completed transferring file: %1</source>
-        <translation>Завершена передача файлу : %1</translation>
+        <translation>Передачу файлу: %1 завершено</translation>
     </message>
     <message>
         <source>Canceled transferring file: %1</source>
-        <translation>Відмінена передача файлу: %1</translation>
+        <translation>Передачу файлу: %1 відмінено</translation>
     </message>
     <message>
         <source>File transfer canceled: %1</source>
@@ -37,11 +37,11 @@
     </message>
     <message>
         <source>Auto sending file: %1</source>
-        <translation>Автоматична відправка файлу: %1</translation>
+        <translation>Автоматичне надсилання файлу: %1</translation>
     </message>
     <message>
         <source>File sending is started automatically</source>
-        <translation>Відправка файлу запущена автоматично</translation>
+        <translation>Надсилання файлу запущено автоматично</translation>
     </message>
     <message>
         <source>Auto receiving file: %1</source>
@@ -136,11 +136,11 @@
     </message>
     <message>
         <source>A file with this name already exists. Do you want to remove existing file?</source>
-        <translation>Файл з таким ім’ям уже існує. Хочете видалити існуючий файл?</translation>
+        <translation>Файл з таким ім&apos;ям уже існує. Хочете видалити існуючий файл?</translation>
     </message>
     <message>
         <source>Select file to send</source>
-        <translation>Виберіть файл для відправки</translation>
+        <translation>Виберіть файл для надсилання</translation>
     </message>
     <message>
         <source>Unable to send request for file transfer, check settings and try again!</source>
@@ -184,7 +184,7 @@
     </message>
     <message>
         <source>Selected data stream is not available</source>
-        <translation>Вибранний потік даних недоступний</translation>
+        <translation>Вибраний потік даних недоступний</translation>
     </message>
     <message>
         <source>Please select at least one data stream</source>
@@ -196,11 +196,11 @@
     </message>
     <message>
         <source>A file with this name, but a smaller size already exists.</source>
-        <translation>Файл с таким іменем, але з меньшим розміром уже існує.</translation>
+        <translation>Файл з таким іменем, але меншим розміром уже існує.</translation>
     </message>
     <message>
         <source>If you want to change file name press &apos;Cancel&apos;</source>
-        <translation>Якщо хочете змінити ім’я файлу, натисніть &apos;Скасувати&apos;</translation>
+        <translation>Якщо хочете змінити ім&apos;я файлу, натисніть &apos;Скасувати&apos;</translation>
     </message>
     <message>
         <source>If you want to download the rest of file press &apos;Yes&apos;</source>

@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Enter list name:</source>
-        <translation>Введіть ім’я списку:</translation>
+        <translation>Введіть ім&apos;я списку:</translation>
     </message>
     <message>
         <source>Remove Privacy List</source>
@@ -93,7 +93,7 @@
     </message>
     <message>
         <source>&lt;any stanza&gt;</source>
-        <translation>будь-який станз</translation>
+        <translation>&lt;будь-яка строфа&gt;</translation>
     </message>
     <message>
         <source>none</source>

@@ -5,11 +5,11 @@
     <name>ConnectionManager</name>
     <message>
         <source>Connection Manager</source>
-        <translation>Диспетчер з’єднань</translation>
+        <translation>Диспетчер з&apos;єднань</translation>
     </message>
     <message>
         <source>Allows to use different types of connections to a Jabber server</source>
-        <translation>Дозволяє використовувати різні типи з’єднань</translation>
+        <translation>Дозволяє використовувати різні типи з&apos;єднань</translation>
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>
@@ -24,11 +24,11 @@
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Connection</source>
-        <translation>З’єднання</translation>
+        <translation>З&apos;єднання</translation>
     </message>
     <message>
         <source>Connection:</source>
-        <translation>З’єднання:</translation>
+        <translation>З&apos;єднання:</translation>
     </message>
 </context>
 <context>
@@ -54,7 +54,7 @@
     </message>
     <message>
         <source>Name:</source>
-        <translation>Ім’я:</translation>
+        <translation>Ім&apos;я:</translation>
     </message>
     <message>
         <source>Type:</source>
@@ -78,7 +78,7 @@
     </message>
     <message>
         <source>Default Proxy:</source>
-        <translation>Прокси за замовчуванням:</translation>
+        <translation>Проксі за замовчуванням:</translation>
     </message>
     <message>
         <source>Add</source>
@@ -93,7 +93,7 @@
     <name>ProxySettingsWidget</name>
     <message>
         <source>&lt;Default Proxy&gt;</source>
-        <translation>&lt;Прокси за замовчуванням&gt;</translation>
+        <translation>&lt;Проксі за замовчуванням&gt;</translation>
     </message>
 </context>
 <context>

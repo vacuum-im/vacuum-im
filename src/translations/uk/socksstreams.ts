@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Port Forwarding</source>
-        <translation>Перенаправленння портів</translation>
+        <translation>Перенаправлення портів</translation>
     </message>
     <message>
         <source>Host:</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>Use account connection proxy settings</source>
-        <translation>Використовувати настройки проксі з аккаунта</translation>
+        <translation>Використовувати настройки проксі з аккаунту</translation>
     </message>
     <message>
         <source>Listening port:</source>
@@ -72,7 +72,7 @@
     </message>
     <message>
         <source>Remote client cant connect to given hosts</source>
-        <translation>Віддалений кліент не зміг підключитись до отриманих хостів</translation>
+        <translation>Віддалений клієнт не зміг підключитись до отриманих хостів</translation>
     </message>
     <message>
         <source>Failed to activate stream</source>
