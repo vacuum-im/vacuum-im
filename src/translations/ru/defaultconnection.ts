@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Issuer State/Province: %1</source>
-        <translation>Штат/Провиция эмитента: %1</translation>
+        <translation>Штат/Провинция эмитента: %1</translation>
     </message>
     <message>
         <source>Issuer Common Name: %1</source>
