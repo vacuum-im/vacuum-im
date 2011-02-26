@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation>Дозволяє створювати закладки для конференцій та вебсторінок</translation>
+        <translation>Дозволяє створювати закладки для конференцій та веб-сторінок</translation>
     </message>
     <message>
         <source>Append to bookmarks</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
         <source>Field &apos;Name&apos; should not be empty</source>
-        <translation>Поле &quot;Ім’я&quot; не може бути порожнім</translation>
+        <translation>Поле &quot;Ім&apos;я&quot; не може бути порожнім</translation>
     </message>
     <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
@@ -55,7 +55,7 @@
     </message>
     <message>
         <source>Name:</source>
-        <translation>Ім’я:</translation>
+        <translation>Ім&apos;я:</translation>
     </message>
     <message>
         <source>Conference bookmark</source>
@@ -67,7 +67,7 @@
     </message>
     <message>
         <source>Nick:</source>
-        <translation>Нік:</translation>
+        <translation>Прізвисько:</translation>
     </message>
     <message>
         <source>Password:</source>
@@ -113,7 +113,7 @@
     </message>
     <message>
         <source>Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>JID/URL</source>
@@ -121,7 +121,7 @@
     </message>
     <message>
         <source>Nick</source>
-        <translation>Нік</translation>
+        <translation>Прізвисько</translation>
     </message>
     <message>
         <source>Add</source>

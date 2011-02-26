@@ -29,14 +29,14 @@
     </message>
     <message>
         <source>Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
 </context>
 <context>
     <name>RostersViewPlugin</name>
     <message>
         <source>Roster</source>
-        <translation>Контакт-лист</translation>
+        <translation>Ростер</translation>
     </message>
     <message>
         <source>Show/Hide offline contacts</source>
@@ -44,11 +44,11 @@
     </message>
     <message>
         <source>Roster View</source>
-        <translation>Відображення ростеру</translation>
+        <translation>Перегляд ростеру</translation>
     </message>
     <message>
         <source>Displays a hierarchical roster&apos;s model</source>
-        <translation>Відображае ієрархічну модель ростеру</translation>
+        <translation>Відображає ієрархічну модель ростеру</translation>
     </message>
     <message>
         <source>Show offline contact</source>
@@ -72,7 +72,7 @@
     </message>
     <message>
         <source>Copy contact name to clipboard</source>
-        <translation>Скопіювати ім’я контакту до буфера обміну</translation>
+        <translation>Скопіювати ім&apos;я контакту до буфера обміну</translation>
     </message>
     <message>
         <source>Copy contact status to clipboard</source>

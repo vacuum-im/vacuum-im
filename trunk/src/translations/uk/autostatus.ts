@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Status changed automatically to &apos;away&apos;</source>
-        <translation>Статус автоматично змінено на &quot;відсутній&quot;</translation>
+        <translation>Статус автоматично змінено на &apos;відсутній&apos;</translation>
     </message>
     <message>
         <source>Auto Status</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Allows to change the status in accordance with the time of inactivity</source>
-        <translation>Дозволяє автоматично змінювати статус залежно від часу простоювання</translation>
+        <translation>Дозволяє автоматично змінювати статус залежно від часу простою</translation>
     </message>
 </context>
 <context>
@@ -52,7 +52,7 @@
     </message>
     <message>
         <source>   #(&lt;format&gt;) - time you are idle for</source>
-        <translation>   #(&lt;format&gt;) - тривалість простоювання</translation>
+        <translation>   #(&lt;format&gt;) - тривалість простою</translation>
     </message>
     <message>
         <source>Date Format:</source>
@@ -160,7 +160,7 @@
     </message>
     <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
-        <translation>   Статус змінено на &apos;відсутній&apos; о %(hh:mm:ss) внаслідок простоювання протягом #(mm) хвилин #(ss) секунд починаючи з $(hh:mm:ss)</translation>
+        <translation>   Статус змінено на &apos;відсутній&apos; о %(hh:mm:ss) внаслідок простою протягом #(mm) хвилин #(ss) секунд починаючи з $(hh:mm:ss)</translation>
     </message>
 </context>
 <context>

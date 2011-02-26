@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Secure connection is not established</source>
-        <translation>Безпечне з&apos;єднання не встановленно</translation>
+        <translation>Безпечне з&apos;єднання не встановлено</translation>
     </message>
 </context>
 <context>

@@ -5,85 +5,85 @@
     <name>AddLegacyContactDialog</name>
     <message>
         <source>Add Legacy User to %1</source>
-        <translation>Додати користувача через транспорт - %1</translation>
+        <translation>Dodaj użytkownika poprzez transport - %1</translation>
     </message>
     <message>
         <source>Waiting for host response ...</source>
-        <translation>Очікування відповіді хоста ...</translation>
+        <translation>Oczekuję na odpowiedź hosta...</translation>
     </message>
     <message>
         <source>Contact ID:</source>
-        <translation>Контакт:</translation>
+        <translation>Kontakt:</translation>
     </message>
     <message>
         <source>Jabber ID for %1 is %2</source>
-        <translation>Jabber ID для %1 - %2</translation>
+        <translation>Jabber ID dla %1 - %2</translation>
     </message>
     <message>
         <source>Received Jabber ID is not valid</source>
-        <translation>Отриманий невірний Jabber ID</translation>
+        <translation>Otrzymany Jabber ID nie jest poprawny</translation>
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation>Запитувана операцію завершено з помилкою: %1</translation>
+        <translation>Żądana operacja nie powiodła się z powodu błędu: %1</translation>
     </message>
     <message>
         <source>Error: Can&apos;t send request to host.</source>
-        <translation>Помилка: Неможливо відіслати запит на хост.</translation>
+        <translation>Błąd: Nie można wysłać żądania do serwera.</translation>
     </message>
 </context>
 <context>
     <name>AddLegacyContactDialogClass</name>
     <message>
         <source>Contact ID:</source>
-        <translation>Контакт:</translation>
+        <translation>Kontakt:</translation>
     </message>
 </context>
 <context>
     <name>Gateways</name>
     <message>
         <source>Gateway Interaction</source>
-        <translation>Взаємодія з транспортами</translation>
+        <translation>Interakcje z transportem</translation>
     </message>
     <message>
         <source>Add Legacy User</source>
-        <translation>Додати користувача</translation>
+        <translation>Dodaj użytkownika</translation>
     </message>
     <message>
         <source>Log Out</source>
-        <translation>Відключити</translation>
+        <translation>Wyloguj się</translation>
     </message>
     <message>
         <source>Keep connection</source>
-        <translation>Підтримувати з’єднання</translation>
+        <translation>Podtrzymuj połączenie</translation>
     </message>
     <message>
         <source>Resolve nick names</source>
-        <translation>Визначити всі ніки</translation>
+        <translation>Zidentyfikuj wszystkie nicki</translation>
     </message>
     <message>
         <source>Resolve nick name</source>
-        <translation>Визначити нік</translation>
+        <translation>Zidentyfikuj nick</translation>
     </message>
     <message>
         <source>Use instead of</source>
-        <translation>Використовувати замість</translation>
+        <translation>Użyj zamiast</translation>
     </message>
     <message>
         <source>Allows to simplify the interaction with transports to other IM systems</source>
-        <translation>Дозволяє спростити взаємодію з транспортами в інші IM-системи</translation>
+        <translation>Pozwala na uproszczenie interakcji z transportami do innych systemów IM</translation>
     </message>
     <message>
         <source>Supports the adding of the contact by the username of the legacy system</source>
-        <translation>Підтримує додавання контакту по імені користувача іншої системи</translation>
+        <translation>Obsługa dodawania kontaktu do użytkownika innego systemu</translation>
     </message>
     <message>
         <source>Login on transport</source>
-        <translation>Підключитися до транспорту</translation>
+        <translation>Loguj się do transportu</translation>
     </message>
     <message>
         <source>Logout from transport</source>
-        <translation>Відключитися від транспорту</translation>
+        <translation>Wyloguj sie z transportu</translation>
     </message>
 </context>
 </TS>

@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>%1 не являєтся корректним JID, або уже існує</translation>
+        <translation>%1 не являється коректним JID, або уже існує</translation>
     </message>
 </context>
 <context>
@@ -96,7 +96,7 @@
     </message>
     <message>
         <source>Auto archiving:</source>
-        <translation>Авторежим:</translation>
+        <translation>Авто-режим:</translation>
     </message>
     <message>
         <source>Enable auto archiving</source>
@@ -262,7 +262,7 @@
     </message>
     <message>
         <source>Negotiating off the record (OTR) session ...</source>
-        <translation>Встановлюется сесія з забороною збереження історії (ЗЗІ) ...</translation>
+        <translation>Встановлюєтеся сесія з забороною збереження історії (ЗЗІ) ...</translation>
     </message>
     <message>
         <source>years</source>
@@ -527,7 +527,7 @@
     </message>
     <message>
         <source>Local archive</source>
-        <translation>Локальный архів</translation>
+        <translation>Локальний архів</translation>
     </message>
     <message>
         <source>Server archive</source>

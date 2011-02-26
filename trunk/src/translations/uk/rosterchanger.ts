@@ -5,11 +5,11 @@
     <name>AddContactDialog</name>
     <message>
         <source>Please, authorize me to your presence.</source>
-        <translation>Будь-ласка, авторизуйте мене.</translation>
+        <translation>Будь ласка, авторизуйте мене.</translation>
     </message>
     <message>
         <source>Add contact - %1</source>
-        <translation>Додати конакт - %1</translation>
+        <translation>Додати контакт - %1</translation>
     </message>
     <message>
         <source>Chat</source>
@@ -37,11 +37,11 @@
     </message>
     <message>
         <source>Nick</source>
-        <translation>Нік</translation>
+        <translation>Прізвисько</translation>
     </message>
     <message>
         <source>Resolve nick name</source>
-        <translation>Визначити нік</translation>
+        <translation>Визначити прізвисько</translation>
     </message>
     <message>
         <source>Contact &lt;b&gt;%1&lt;/b&gt; already exists.</source>
@@ -60,7 +60,7 @@
     <name>AddContactDialogClass</name>
     <message>
         <source>Nick:</source>
-        <translation>Нік:</translation>
+        <translation>Прізвисько:</translation>
     </message>
     <message>
         <source>Group:</source>
@@ -99,7 +99,7 @@
     </message>
     <message>
         <source>This group</source>
-        <translation>В цю группу</translation>
+        <translation>В цю групу</translation>
     </message>
     <message>
         <source>Create new...</source>
@@ -159,7 +159,7 @@
     </message>
     <message>
         <source>Remove from roster</source>
-        <translation>Видалити з контакт-листа</translation>
+        <translation>Видалити з ростеру</translation>
     </message>
     <message>
         <source>Remove group</source>
@@ -179,11 +179,11 @@
     </message>
     <message>
         <source>Rename contact</source>
-        <translation>Переіменувати контакт</translation>
+        <translation>Перейменувати контакт</translation>
     </message>
     <message>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation>Введіть ім’я для: &lt;b&gt;%1&lt;/b&gt;</translation>
+        <translation>Введіть ім&apos;я для: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Create new group</source>
@@ -191,7 +191,7 @@
     </message>
     <message>
         <source>Enter group name:</source>
-        <translation>Введіть ім’я групы:</translation>
+        <translation>Введіть ім&apos;я групи:</translation>
     </message>
     <message>
         <source>Remove contact</source>
@@ -203,11 +203,11 @@
     </message>
     <message>
         <source>Rename group</source>
-        <translation>Переіменувати групу</translation>
+        <translation>Перейменувати групу</translation>
     </message>
     <message>
         <source>Enter new group name:</source>
-        <translation>Введіть нове ім’я групы:</translation>
+        <translation>Введіть нове ім&apos;я групи:</translation>
     </message>
     <message>
         <source>You are assured that wish to remove %1 contact(s) from roster?</source>
@@ -215,7 +215,7 @@
     </message>
     <message>
         <source>You are now subscribed for %1 presence.</source>
-        <translation>%1 авторизував вас на отримання статуса.</translation>
+        <translation>%1 авторизував вас на отримання статусу.</translation>
     </message>
     <message>
         <source>Add contact</source>
@@ -239,7 +239,7 @@
     </message>
     <message>
         <source>Unsubscribe from contact presence</source>
-        <translation>Відписатись від отримання статусу контакта</translation>
+        <translation>Відписатись від отримання статусу контакту</translation>
     </message>
     <message>
         <source>You are assured that wish to unsubscribe from a contact &lt;b&gt;%1&lt;/b&gt; presence?</source>
@@ -247,7 +247,7 @@
     </message>
     <message>
         <source>Roster Editor</source>
-        <translation>Редактор ростера</translation>
+        <translation>Редактор ростеру</translation>
     </message>
     <message>
         <source>Allows to edit roster</source>
@@ -341,7 +341,7 @@
     <name>SubscriptionDialogClass</name>
     <message>
         <source>Add user to contact list</source>
-        <translation>Додати користувача у контакт-лист</translation>
+        <translation>Додати користувача у ростеру</translation>
     </message>
     <message>
         <source>Authorize presence subscription</source>

@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>A list of pending file transfers</source>
-        <translation>Список очікуючих передач файлів</translation>
+        <translation>Список передач файлів, що очікують</translation>
     </message>
     <message>
         <source>A presence or availability status</source>
@@ -125,7 +125,7 @@
     </message>
     <message>
         <source>Accept pending file transfers</source>
-        <translation>Прийняти очікуючі передачі файлів</translation>
+        <translation>Прийняти передачі файлів, що очікують</translation>
     </message>
     <message>
         <source>Pending file transfers</source>
@@ -149,7 +149,7 @@
     </message>
     <message>
         <source>Automatically Authorize Contacts</source>
-        <translation>Автоматично Авторизовувати Контакти</translation>
+        <translation>Автоматично Авторизувати Контакти</translation>
     </message>
     <message>
         <source>Set options</source>
@@ -170,9 +170,9 @@
     <message numerus="yes">
         <source>%n message(s) from &apos;%1&apos;</source>
         <translation>
-            <numerusform>%n повідомлення від &amp;apos;%1&amp;apos;</numerusform>
-            <numerusform>%n повідомлень від &amp;apos;%1&amp;apos;</numerusform>
-            <numerusform>%n повідомлень від &amp;apos;%1&amp;apos;</numerusform>
+            <numerusform>%n повідомлення від &amp;amp;apos;%1&amp;amp;apos;</numerusform>
+            <numerusform>%n повідомлень від &amp;amp;apos;%1&amp;amp;apos;</numerusform>
+            <numerusform>%n повідомлень від &amp;amp;apos;%1&amp;amp;apos;</numerusform>
         </translation>
     </message>
     <message>

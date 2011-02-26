@@ -41,15 +41,15 @@
     </message>
     <message>
         <source>Allows to set and display avatars</source>
-        <translation>Дозволяє встановлювати та відображати аватари</translation>
+        <translation>Дозволяє встановлювати та показувати аватари</translation>
     </message>
     <message>
         <source>Show avatars</source>
-        <translation>Відобразити аватари</translation>
+        <translation>Показувати аватари</translation>
     </message>
     <message>
         <source>Show empty avatars</source>
-        <translation>Відобразити відсутні аватари</translation>
+        <translation>Показати відсутні аватари</translation>
     </message>
 </context>
 </TS>

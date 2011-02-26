@@ -19,7 +19,7 @@
     <name>PluginManager</name>
     <message>
         <source>Duplicate plugin uuid</source>
-        <translation>Дублюючий uuid плагіну</translation>
+        <translation>Дублікат  uuid плагіну</translation>
     </message>
     <message>
         <source>Wrong plugin interface</source>
@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>About the program</source>
-        <translation>Про Программу</translation>
+        <translation>Про Програму</translation>
     </message>
     <message>
         <source>Plugins directory not found</source>
@@ -86,11 +86,11 @@
     </message>
     <message>
         <source>Restart Application</source>
-        <translation>Перезапуск программи</translation>
+        <translation>Перезапуск програми</translation>
     </message>
     <message>
         <source>Settings saved. Do you want to restart application?</source>
-        <translation>Налаштування збережені. Ви хочете перезапустити программу?</translation>
+        <translation>Налаштування збережені. Ви хочете перезапустити програму?</translation>
     </message>
 </context>
 <context>

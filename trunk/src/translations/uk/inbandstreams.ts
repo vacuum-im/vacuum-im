@@ -35,7 +35,7 @@
     <name>InBandStream</name>
     <message>
         <source>Stream destroyed</source>
-        <translation>Підключення видаленно</translation>
+        <translation>Підключення видалене</translation>
     </message>
     <message>
         <source>Malformed data packet</source>
@@ -70,7 +70,7 @@
     </message>
     <message>
         <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
-        <translation>Підтримує ініціалізацію внутрішньоканалного потоку даних між двома XMPP-сутностями</translation>
+        <translation>Підтримує ініціалізацію внутрішньоканального потоку даних між двома XMPP-сутностями</translation>
     </message>
 </context>
 </TS>

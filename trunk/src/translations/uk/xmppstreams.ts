@@ -5,7 +5,7 @@
     <name>XmppStream</name>
     <message>
         <source>Password request</source>
-        <translation>Запрос паролю</translation>
+        <translation>Запит паролю</translation>
     </message>
     <message>
         <source>Enter password for &lt;b&gt;%1&lt;/b&gt;</source>
@@ -13,30 +13,30 @@
     </message>
     <message>
         <source>Connection not specified</source>
-        <translation>З’єднання не визначене</translation>
+        <translation>З&apos;єднання не визначене</translation>
     </message>
     <message>
         <source>XMPP connection timed out</source>
-        <translation>Перевищений час установки XMPP з’єднання</translation>
+        <translation>Перевищений час установки XMPP з&apos;єднання</translation>
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation>Не вдалось запустити з’єднання</translation>
+        <translation>Не вдалось запустити з&apos;єднання</translation>
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
-        <translation>З’єднання несподівано завершено</translation>
+        <translation>З&apos;єднання несподівано завершено</translation>
     </message>
     <message>
         <source>Secure connection is not established</source>
-        <translation>Захищене з’єднання не встановлено</translation>
+        <translation>Захищене з&apos;єднання не встановлено</translation>
     </message>
 </context>
 <context>
     <name>XmppStreams</name>
     <message>
         <source>Bad Request Format</source>
-        <translation>Невірний формат запросу</translation>
+        <translation>Невірний формат запиту</translation>
     </message>
     <message>
         <source>Bad Namespace Prefix</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>Connection timeout</source>
-        <translation>перевищено час очікування з’єднання</translation>
+        <translation>перевищено час очікування з&apos;єднання</translation>
     </message>
     <message>
         <source>Host Gone</source>
@@ -92,7 +92,7 @@
     </message>
     <message>
         <source>Remote Connection Failed</source>
-        <translation>Збій віддаленого з’єднання</translation>
+        <translation>Збій віддаленого з&apos;єднання</translation>
     </message>
     <message>
         <source>Resource Constraint</source>

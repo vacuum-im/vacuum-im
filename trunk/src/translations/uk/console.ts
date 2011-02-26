@@ -32,7 +32,7 @@
     </message>
     <message>
         <source>Start sending user stanza...</source>
-        <translation>Початок відправки введеної станзи...</translation>
+        <translation>Початок надсилання введеної станзи...</translation>
     </message>
     <message>
         <source>Stanza is not well formed.</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>Enter context name</source>
-        <translation>Введіть ім’я контексту</translation>
+        <translation>Введіть ім&apos;я контексту</translation>
     </message>
     <message>
         <source>User stanza sent.</source>

@@ -5,11 +5,11 @@
     <name>DataStreamsManger</name>
     <message>
         <source>Data Streams Manager</source>
-        <translation>Менеджер потоків данних</translation>
+        <translation>Менеджер потоків даних</translation>
     </message>
     <message>
         <source>None of the available streams are acceptable</source>
-        <translation>Жодне з запропонованіх підключень не прийнятне</translation>
+        <translation>Жодне з запропонованих підключень не прийнятне</translation>
     </message>
     <message>
         <source>The profile is not understood or invalid</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Data Streams Initiation</source>
-        <translation>Ініціалізація потоків данних</translation>
+        <translation>Ініціалізація потоків даних</translation>
     </message>
     <message>
         <source>Stream with same ID already exists</source>
@@ -56,7 +56,7 @@
     </message>
     <message>
         <source>Enter profile name:</source>
-        <translation>Введіть ім’я профілю:</translation>
+        <translation>Введіть ім&apos;я профілю:</translation>
     </message>
     <message>
         <source>Delete Profile</source>
@@ -64,14 +64,14 @@
     </message>
     <message>
         <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Ви дійсно хочете видалити діючий профіль потоків данних?</translation>
+        <translation>Ви дійсно хочете видалити поточний профіль потоків даних?</translation>
     </message>
 </context>
 <context>
     <name>DataStreamsOptionsClass</name>
     <message>
         <source>Data Streams Profiles</source>
-        <translation>Профілі потоків данних</translation>
+        <translation>Профілі потоків даних</translation>
     </message>
     <message>
         <source>Profile:</source>

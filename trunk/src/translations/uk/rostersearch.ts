@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Name</source>
-        <translation>Ім’я</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Status</source>

@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Enter profile name:</source>
-        <translation>Введіть ім’я профілю:</translation>
+        <translation>Введіть ім&apos;я профілю:</translation>
     </message>
     <message>
         <source>Profile Password</source>
@@ -45,7 +45,7 @@
     </message>
     <message>
         <source>Enter new profile password:</source>
-        <translation>Введіть новий пароль профІлю:</translation>
+        <translation>Введіть новий пароль профілю:</translation>
     </message>
     <message>
         <source>Failed to change profile password</source>
@@ -61,7 +61,7 @@
     </message>
     <message>
         <source>Enter new name for profile:</source>
-        <translation>Введіть нове ім’я профілю:</translation>
+        <translation>Введіть нове ім&apos;я профілю:</translation>
     </message>
     <message>
         <source>Failed to rename profile</source>
@@ -115,7 +115,7 @@
     </message>
     <message>
         <source>This profile is now blocked by another program</source>
-        <translation>Цей профіль зараз заблокований іншою программою</translation>
+        <translation>Цей профіль зараз заблокований іншою програмою</translation>
     </message>
     <message>
         <source>Wrong Password</source>
@@ -153,14 +153,14 @@
     </message>
     <message>
         <source>Options are absent</source>
-        <translation>Опціїї відсутні</translation>
+        <translation>Опції відсутні</translation>
     </message>
 </context>
 <context>
     <name>OptionsManager</name>
     <message>
         <source>Options Manager</source>
-        <translation>Менеджер настроєк</translation>
+        <translation>Менеджер налаштувань</translation>
     </message>
     <message>
         <source>Allows to save, load and manage user preferences</source>

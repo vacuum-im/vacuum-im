@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Require a secure connection</source>
-        <translation>Потребує захищеного з’єднання</translation>
+        <translation>Потребує захищеного з&apos;єднання</translation>
     </message>
 </context>
 <context>
@@ -44,7 +44,7 @@
     </message>
     <message>
         <source>Some options of account &apos;%1&apos; will be applied after disconnect</source>
-        <translation>Деякі налаштування облікового запису &apos;%1&apos; будуть змінені після роз’єднання</translation>
+        <translation>Деякі налаштування облікового запису &apos;%1&apos; будуть змінені після роз&apos;єднання</translation>
     </message>
 </context>
 <context>

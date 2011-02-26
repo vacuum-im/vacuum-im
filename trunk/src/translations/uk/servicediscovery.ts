@@ -28,7 +28,7 @@
     </message>
     <message>
         <source>Name</source>
-        <translation>І’мя</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Features:</source>
@@ -51,7 +51,7 @@
     <name>DiscoItemsModel</name>
     <message>
         <source>Name</source>
-        <translation>І’мя</translation>
+        <translation>Ім&apos;я</translation>
     </message>
     <message>
         <source>Jid</source>
@@ -156,7 +156,7 @@
     </message>
     <message>
         <source>Entity Capabilities</source>
-        <translation>Можливості об’єкту</translation>
+        <translation>Можливості об&apos;єкту</translation>
     </message>
     <message>
         <source>Allows to receive information about Jabber entities</source>
@@ -188,7 +188,7 @@
     </message>
     <message>
         <source>Supports the publishing of the discovery items</source>
-        <translation>Підтримує публикацію обзорних елементів</translation>
+        <translation>Підтримує публікацію оглядових елементів</translation>
     </message>
     <message>
         <source>Supports the caching of the discovery information</source>
@@ -196,7 +196,7 @@
     </message>
     <message>
         <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-        <translation>Підтримуе відображення джаббер ідентифікаторів з забороненими символами</translation>
+        <translation>Підтримує перегляд джаббер ідентифікаторів з забороненими символами</translation>
     </message>
     <message>
         <source>Service discovery window</source>

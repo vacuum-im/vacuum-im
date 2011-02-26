@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Allows to use different styles to display messages</source>
-        <translation>Дозволяє викоритстовувати різні стилі для відображення повідомлень</translation>
+        <translation>Дозволяє використовувати різні стилі для перегляду повідомлень</translation>
     </message>
 </context>
 <context>
@@ -52,11 +52,11 @@
     </message>
     <message>
         <source>Message body line 1</source>
-        <translation>Тіло повідомлення, строка 1</translation>
+        <translation>Тіло повідомлення, рядок 1</translation>
     </message>
     <message>
         <source>Message body line 2</source>
-        <translation>Тіло повідомлення, строка 2</translation>
+        <translation>Тіло повідомлення, рядок 2</translation>
     </message>
     <message>
         <source>Incoming history message</source>

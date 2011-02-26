@@ -5,11 +5,11 @@
     <name>IqAuth</name>
     <message>
         <source>Secure connection is not established</source>
-        <translation>Захищене з’єднання не встановлено</translation>
+        <translation>Захищене з&apos;єднання не встановлено</translation>
     </message>
     <message>
         <source>Server requested plain text password over insecure connection</source>
-        <translation>Сервер запитує простий текстовий пароль через незахищене з’єднання</translation>
+        <translation>Сервер запитує простий текстовий пароль через незахищене з&apos;єднання</translation>
     </message>
 </context>
 <context>
