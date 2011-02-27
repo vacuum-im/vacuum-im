@@ -278,20 +278,26 @@ void PluginManager::saveSettings()
 
 void PluginManager::loadPlugins()
 {
-	QDir dir(QApplication::applicationDirPath());
-	if (dir.cd(PLUGINS_DIR))
+	QDir pluginsDir(QApplication::applicationDirPath());
+	if (pluginsDir.cd(PLUGINS_DIR))
 	{
-		QString tsDir = QDir::cleanPath(QDir(QApplication::applicationDirPath()).absoluteFilePath(TRANSLATIONS_DIR "/" + QLocale().name().left(2)));
-		loadCoreTranslations(tsDir);
+		QString tsDirPath;
+		QString localeName = QLocale().name();
+		QDir appDir(QApplication::applicationDirPath());
+		if (appDir.exists(TRANSLATIONS_DIR "/" + localeName))
+			tsDirPath = QDir::cleanPath(appDir.absoluteFilePath(TRANSLATIONS_DIR "/" + localeName));
+		else if (appDir.exists(TRANSLATIONS_DIR "/" + localeName.left(2)))
+			tsDirPath = QDir::cleanPath(appDir.absoluteFilePath(TRANSLATIONS_DIR "/" + localeName.left(2)));
+		loadCoreTranslations(tsDirPath);
 
-		QStringList files = dir.entryList(QDir::Files);
+		QStringList files = pluginsDir.entryList(QDir::Files);
 		removePluginsInfo(files);
 
 		foreach (QString file, files)
 		{
 			if (QLibrary::isLibrary(file) && isPluginEnabled(file))
 			{
-				QPluginLoader *loader = new QPluginLoader(dir.absoluteFilePath(file),this);
+				QPluginLoader *loader = new QPluginLoader(pluginsDir.absoluteFilePath(file),this);
 				if (loader->load())
 				{
 					IPlugin *plugin = qobject_cast<IPlugin *>(loader->instance());
@@ -307,15 +313,18 @@ void PluginManager::loadPlugins()
 							pluginItem.info = new IPluginInfo;
 							pluginItem.translator =  NULL;
 
-							QTranslator *translator = new QTranslator(loader);
-							QString tsFile = file.mid(LIB_PREFIX_SIZE,file.lastIndexOf('.')-LIB_PREFIX_SIZE);
-							if (translator->load(tsFile,tsDir))
+							if (!tsDirPath.isEmpty())
 							{
-								qApp->installTranslator(translator);
-								pluginItem.translator = translator;
+								QTranslator *translator = new QTranslator(loader);
+								QString tsFile = file.mid(LIB_PREFIX_SIZE,file.lastIndexOf('.')-LIB_PREFIX_SIZE);
+								if (translator->load(tsFile,tsDirPath))
+								{
+									qApp->installTranslator(translator);
+									pluginItem.translator = translator;
+								}
+								else
+									delete translator;
 							}
-							else
-								delete translator;
 
 							plugin->pluginInfo(pluginItem.info);
 							savePluginInfo(file, pluginItem.info).setAttribute("uuid", uid.toString());
@@ -503,16 +512,23 @@ QList<QUuid> PluginManager::getConflicts(const QUuid AUuid) const
 
 void PluginManager::loadCoreTranslations(const QString &ADir)
 {
-	if (FLoaderTranslator->load("vacuum",ADir))
-		qApp->installTranslator(FLoaderTranslator);
+	if (!ADir.isEmpty())
+	{
+		if (FQtTranslator->load("qt_"+QLocale().name(),ADir))
+			qApp->installTranslator(FQtTranslator);
+		else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+			qApp->installTranslator(FQtTranslator);
 
-	if (FUtilsTranslator->load("vacuumutils",ADir))
-		qApp->installTranslator(FUtilsTranslator);
+		if (FLoaderTranslator->load("vacuum",ADir))
+			qApp->installTranslator(FLoaderTranslator);
 
-	if (FQtTranslator->load("qt_"+QLocale().name(),ADir))
+		if (FUtilsTranslator->load("vacuumutils",ADir))
+			qApp->installTranslator(FUtilsTranslator);
+	}
+	else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
+	{
 		qApp->installTranslator(FQtTranslator);
-   else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-      qApp->installTranslator(FQtTranslator);
+	}
 }
 
 bool PluginManager::isPluginEnabled(const QString &AFile) const
