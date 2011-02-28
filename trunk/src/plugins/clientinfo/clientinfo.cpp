@@ -157,7 +157,6 @@ bool ClientInfo::initObjects()
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
-		FDiscovery->insertDiscoHandler(this);
 		FDiscovery->insertFeatureHandler(NS_JABBER_VERSION,this,DFO_DEFAULT);
 		FDiscovery->insertFeatureHandler(NS_JABBER_LAST,this,DFO_DEFAULT);
 		FDiscovery->insertFeatureHandler(NS_XMPP_TIME,this,DFO_DEFAULT);
@@ -344,50 +343,6 @@ IDataFormLocale ClientInfo::dataFormLocale(const QString &AFormType)
 		locale.fields[FORM_FIELD_OS_VERSION].label = tr("OS Version");
 	}
 	return locale;
-}
-
-void ClientInfo::fillDiscoItems(IDiscoItems &ADiscoItems)
-{
-	Q_UNUSED(ADiscoItems);
-}
-
-void ClientInfo::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
-{
-	if (ADiscoInfo.node.isEmpty())
-	{
-		IDataForm form;
-		form.type = DATAFORM_TYPE_RESULT;
-
-		IDataField ftype;
-		ftype.required = false;
-		ftype.var  = "FORM_TYPE";
-		ftype.type = DATAFIELD_TYPE_HIDDEN;
-		ftype.value = DATA_FORM_SOFTWAREINFO;
-		form.fields.append(ftype);
-
-		IDataField soft;
-		soft.required = false;
-		soft.var   = FORM_FIELD_SOFTWARE;
-		soft.value = CLIENT_NAME;
-		form.fields.append(soft);
-
-		IDataField soft_ver;
-		soft_ver.required = false;
-		soft_ver.var   = FORM_FIELD_SOFTWARE_VERSION;
-		soft_ver.value = CLIENT_VERSION;
-		form.fields.append(soft_ver);
-
-		if (Options::node(OPV_MISC_SHAREOSVERSION).value().toBool())
-		{
-			IDataField os;
-			os.required = false;
-			os.var = FORM_FIELD_OS;
-			os.value = osVersion();
-			form.fields.append(os);
-		}
-
-		ADiscoInfo.extensions.append(form);
-	}
 }
 
 bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
