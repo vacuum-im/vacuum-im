@@ -63,11 +63,10 @@ class ClientInfo :
 			public IStanzaHandler,
 			public IStanzaRequestOwner,
 			public IDataLocalizer,
-			public IDiscoHandler,
 			public IDiscoFeatureHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IClientInfo IOptionsHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoHandler IDiscoFeatureHandler);
+	Q_INTERFACES(IPlugin IClientInfo IOptionsHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
 public:
 	ClientInfo();
 	~ClientInfo();
@@ -88,9 +87,6 @@ public:
 	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
 	//IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
-	//IDiscoHandler
-	virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
-	virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
 	//IDiscoFeatureHandler
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
