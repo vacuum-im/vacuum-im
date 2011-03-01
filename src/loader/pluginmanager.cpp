@@ -181,6 +181,7 @@ void PluginManager::restart()
 		createMenuActions();
 		declareShortcuts();
 		startPlugins();
+		FBlockedPlugins.clear();
 	}
 	else
 		QTimer::singleShot(0,this,SLOT(restart()));
