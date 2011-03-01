@@ -11,6 +11,7 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FRoster = NULL;
 	FPresence = NULL;
 	FAvatars = NULL;
+	FStatusChanger = NULL;
 
 	FMessageWidgets = AMessageWidgets;
 	FStreamJid = AStreamJid;
@@ -236,6 +237,12 @@ void InfoWidget::initialize()
 			connect(FAvatars->instance(),SIGNAL(avatarChanged(const Jid &)),SLOT(onAvatarChanged(const Jid &)));
 		}
 	}
+
+	plugin = FMessageWidgets->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
+	if (plugin)
+	{
+		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+	}
 }
 
 void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
@@ -262,6 +269,7 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 		ui.lblName->setVisible(isFieldVisible(AField));
 		break;
 	}
+	case ContactShow:
 	case ContactStatus:
 	{
 		QString status = field(AField).toString();
@@ -269,6 +277,13 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 		int maxStatusChars = Options::node(OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS).value().toInt();
 		if (maxStatusChars>0 && status.length() > maxStatusChars)
 			status = status.left(maxStatusChars) + "...";
+		
+		if (FStatusChanger)
+		{
+			int show = field(ContactShow).toInt();
+			status = QString("[%1]").arg(FStatusChanger->nameByShow(show))+ " " +status;
+		}
+
 		ui.lblStatus->setText(status);
 		ui.lblStatus->setVisible(isFieldVisible(AField) && !status.isEmpty());
 		break;

@@ -7,6 +7,7 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/iavatars.h>
+#include <interfaces/istatuschanger.h>
 #include <utils/options.h>
 #include "ui_infowidget.h"
 
@@ -53,6 +54,7 @@ private:
 	IRoster *FRoster;
 	IPresence *FPresence;
 	IAvatars *FAvatars;
+	IStatusChanger *FStatusChanger;
 	IMessageWidgets *FMessageWidgets;
 private:
 	int FAutoFields;
