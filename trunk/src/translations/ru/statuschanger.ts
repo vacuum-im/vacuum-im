@@ -118,11 +118,11 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Offline</source>
-        <translation>Не в сети</translation>
+        <translation>Отключён</translation>
     </message>
     <message>
         <source>Online</source>
-        <translation>В сети</translation>
+        <translation>Доступен</translation>
     </message>
     <message>
         <source>Chat</source>
@@ -158,7 +158,7 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Not available</source>
-        <translation>Не доступен</translation>
+        <translation>Недоступен</translation>
     </message>
     <message>
         <source>Disconnected</source>
