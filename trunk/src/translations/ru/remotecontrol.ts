@@ -64,34 +64,6 @@
         <translation>Новый приоритет для клиента</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Готов общаться</translation>
-    </message>
-    <message>
-        <source>Online</source>
-        <translation>В сети</translation>
-    </message>
-    <message>
-        <source>Away</source>
-        <translation>Ушёл</translation>
-    </message>
-    <message>
-        <source>Extended Away</source>
-        <translation>Ушёл надолго</translation>
-    </message>
-    <message>
-        <source>Do Not Disturb</source>
-        <translation>Не беспокоить</translation>
-    </message>
-    <message>
-        <source>Invisible</source>
-        <translation>Невидимый</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Не в сети</translation>
-    </message>
-    <message>
         <source>Leave conferences</source>
         <translation>Выйти из конференций</translation>
     </message>

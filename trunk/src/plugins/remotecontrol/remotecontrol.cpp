@@ -681,13 +681,16 @@ IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
 		locale.fields[FIELD_STATUS].label = tr("A presence or availability status");
 		locale.fields[FIELD_STATUS_MESSAGE].label = tr("The status message text");
 		locale.fields[FIELD_STATUS_PRIORITY].label = tr("The new priority for the client");
-		locale.fields[FIELD_STATUS].options["chat"].label = tr("Chat");
-		locale.fields[FIELD_STATUS].options["online"].label = tr("Online");
-		locale.fields[FIELD_STATUS].options["away"].label = tr("Away");
-		locale.fields[FIELD_STATUS].options["xa"].label = tr("Extended Away");
-		locale.fields[FIELD_STATUS].options["dnd"].label = tr("Do Not Disturb");
-		locale.fields[FIELD_STATUS].options["invisible"].label = tr("Invisible");
-		locale.fields[FIELD_STATUS].options["offline"].label = tr("Offline");
+		if (FStatusChanger)
+		{
+			locale.fields[FIELD_STATUS].options["online"].label = FStatusChanger->nameByShow(IPresence::Online);
+			locale.fields[FIELD_STATUS].options["chat"].label = FStatusChanger->nameByShow(IPresence::Chat);
+			locale.fields[FIELD_STATUS].options["away"].label = FStatusChanger->nameByShow(IPresence::Away);
+			locale.fields[FIELD_STATUS].options["xa"].label = FStatusChanger->nameByShow(IPresence::ExtendedAway);
+			locale.fields[FIELD_STATUS].options["dnd"].label = FStatusChanger->nameByShow(IPresence::DoNotDisturb);
+			locale.fields[FIELD_STATUS].options["invisible"].label = FStatusChanger->nameByShow(IPresence::Invisible);
+			locale.fields[FIELD_STATUS].options["offline"].label = FStatusChanger->nameByShow(IPresence::Offline);
+		}
 	}
 	return locale;
 }
