@@ -55,6 +55,7 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AIni
 		if (FNotifications)
 		{
 			connect(FNotifications->instance(),SIGNAL(notificationActivated(int)), SLOT(onNotificationActivated(int)));
+			connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)), SLOT(onNotificationRemoved(int)));
 		}
 	}
 
@@ -296,7 +297,6 @@ void MessageProcessor::unNotifyMessage(int AMessageId)
 		{
 			int notifyId = FNotifyId2MessageId.key(AMessageId);
 			FNotifications->removeNotification(notifyId);
-			FNotifyId2MessageId.remove(notifyId);
 		}
 		emit messageUnNotified(AMessageId);
 	}
@@ -387,6 +387,11 @@ void MessageProcessor::onNotificationActivated(int ANotifyId)
 {
 	if (FNotifyId2MessageId.contains(ANotifyId))
 		showMessage(FNotifyId2MessageId.value(ANotifyId));
+}
+
+void MessageProcessor::onNotificationRemoved(int ANotifyId)
+{
+	FNotifyId2MessageId.remove(ANotifyId);
 }
 
 Q_EXPORT_PLUGIN2(plg_messageprocessor, MessageProcessor)

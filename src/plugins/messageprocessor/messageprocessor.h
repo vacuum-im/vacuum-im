@@ -75,6 +75,7 @@ protected slots:
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onNotificationActivated(int ANotifyId);
+	void onNotificationRemoved(int ANotifyId);
 private:
 	IXmppStreams *FXmppStreams;
 	INotifications *FNotifications;

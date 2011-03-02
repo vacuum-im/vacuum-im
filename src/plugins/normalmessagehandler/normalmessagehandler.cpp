@@ -158,10 +158,18 @@ bool NormalMessageHandler::checkMessage(int AOrder, const Message &AMessage)
 
 bool NormalMessageHandler::showMessage(int AMessageId)
 {
-	Message message = FMessageProcessor->messageById(AMessageId);
-	Jid streamJid = message.to();
-	Jid contactJid = message.from();
-	return openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,message.type());
+	IMessageWindow *window = FActiveMessages.key(AMessageId);
+	if (!window)
+	{
+		Message message = FMessageProcessor->messageById(AMessageId);
+		return openWindow(MHO_NORMALMESSAGEHANDLER,message.to(),message.from(),message.type());
+	}
+	else
+	{
+		window->showWindow();
+		return true;
+	}
+	return false;
 }
 
 bool NormalMessageHandler::receiveMessage(int AMessageId)
