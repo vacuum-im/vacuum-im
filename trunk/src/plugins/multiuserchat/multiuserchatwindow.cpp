@@ -122,6 +122,35 @@ bool MultiUserChatWindow::checkMessage(int AOrder, const Message &AMessage)
 	return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
 }
 
+bool MultiUserChatWindow::showMessage(int AMessageId)
+{
+	if (FDataFormMessages.contains(AMessageId))
+	{
+		IDataDialogWidget *dialog = FDataFormMessages.take(AMessageId);
+		if (dialog)
+		{
+			dialog->instance()->show();
+			FMessageProcessor->removeMessage(AMessageId);
+			return true;
+		}
+	}
+	else if (FActiveChatMessages.values().contains(AMessageId))
+	{
+		IChatWindow *window = FActiveChatMessages.key(AMessageId);
+		if (window)
+		{
+			window->showWindow();
+			return true;
+		}
+	}
+	else
+	{
+		Message message = FMessageProcessor->messageById(AMessageId);
+		return openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type());
+	}
+	return false;
+}
+
 bool MultiUserChatWindow::receiveMessage(int AMessageId)
 {
 	bool notify = false;
@@ -156,6 +185,8 @@ bool MultiUserChatWindow::receiveMessage(int AMessageId)
 				if (!window->isActive())
 				{
 					notify = true;
+					if (FDestroyTimers.contains(window))
+						delete FDestroyTimers.take(window);
 					FActiveChatMessages.insertMulti(window, AMessageId);
 					updateChatWindow(window);
 					updateListItem(contactJid);
@@ -164,26 +195,6 @@ bool MultiUserChatWindow::receiveMessage(int AMessageId)
 		}
 	}
 	return notify;
-}
-
-bool MultiUserChatWindow::showMessage(int AMessageId)
-{
-	if (FDataFormMessages.contains(AMessageId))
-	{
-		IDataDialogWidget *dialog = FDataFormMessages.take(AMessageId);
-		if (dialog)
-		{
-			dialog->instance()->show();
-			FMessageProcessor->removeMessage(AMessageId);
-			return true;
-		}
-	}
-	else
-	{
-		Message message = FMessageProcessor->messageById(AMessageId);
-		return openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type());
-	}
-	return false;
 }
 
 INotification MultiUserChatWindow::notification(INotifications *ANotifications, const Message &AMessage)
@@ -1872,10 +1883,10 @@ void MultiUserChatWindow::onChatWindowActivated()
 void MultiUserChatWindow::onChatWindowClosed()
 {
 	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
-	if (FMultiChat->userByNick(window->contactJid().resource()) != NULL)
+	if (window && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
 	{
 		int destroyTimeout = Options::node(OPV_MESSAGES_CLEANCHATTIMEOUT).value().toInt();
-		if (destroyTimeout > 0)
+		if (destroyTimeout>0 && !FActiveChatMessages.contains(window))
 		{
 			if (!FDestroyTimers.contains(window))
 			{
@@ -1887,7 +1898,7 @@ void MultiUserChatWindow::onChatWindowClosed()
 			FDestroyTimers[window]->start(destroyTimeout*60*1000);
 		}
 	}
-	else
+	else if (window && !FActiveChatMessages.contains(window))
 	{
 		window->instance()->deleteLater();
 	}

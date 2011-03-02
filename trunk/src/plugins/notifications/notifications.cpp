@@ -509,20 +509,22 @@ void Notifications::onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId)
 void Notifications::onRosterNotifyRemoved(IRosterIndex *AIndex, int ANotifyId)
 {
 	Q_UNUSED(AIndex);
-	removeNotification(notifyIdByRosterId(ANotifyId));
+	int notifyId = notifyIdByRosterId(ANotifyId);
+	if (FNotifyRecords.contains(notifyId))
+		FNotifyRecords[notifyId].rosterId = 0;
 }
 
 void Notifications::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
 {
 	if (AReason == QSystemTrayIcon::Trigger)
-	{
 		activateNotification(notifyIdByTrayId(ANotifyId));
-	}
 }
 
 void Notifications::onTrayNotifyRemoved(int ANotifyId)
 {
-	removeNotification(notifyIdByTrayId(ANotifyId));
+	int notifyId = notifyIdByTrayId(ANotifyId);
+	if (FNotifyRecords.contains(notifyId))
+		FNotifyRecords[notifyId].trayId = 0;
 }
 
 void Notifications::onWindowNotifyActivated()

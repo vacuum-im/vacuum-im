@@ -189,10 +189,18 @@ bool ChatMessageHandler::checkMessage(int AOrder, const Message &AMessage)
 
 bool ChatMessageHandler::showMessage(int AMessageId)
 {
-	Message message = FMessageProcessor->messageById(AMessageId);
-	Jid streamJid = message.to();
-	Jid contactJid = message.from();
-	return openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,message.type());
+	IChatWindow *window = FActiveMessages.key(AMessageId);
+	if (!window)
+	{
+		Message message = FMessageProcessor->messageById(AMessageId);
+		return openWindow(MHO_CHATMESSAGEHANDLER,message.to(),message.from(),message.type());
+	}
+	else
+	{
+		window->showWindow();
+		return true;
+	}
+	return false;
 }
 
 bool ChatMessageHandler::receiveMessage(int AMessageId)
@@ -206,6 +214,8 @@ bool ChatMessageHandler::receiveMessage(int AMessageId)
 		if (!window->isActive())
 		{
 			notify = true;
+			if (FDestroyTimers.contains(window))
+				delete FDestroyTimers.take(window);
 			FActiveMessages.insertMulti(window, AMessageId);
 			updateWindow(window);
 		}
@@ -509,7 +519,7 @@ void ChatMessageHandler::onWindowClosed()
 	if (window)
 	{
 		int destroyTimeout = Options::node(OPV_MESSAGES_CLEANCHATTIMEOUT).value().toInt();
-		if (destroyTimeout > 0)
+		if (destroyTimeout>0 && !FActiveMessages.contains(window))
 		{
 			if (!FDestroyTimers.contains(window))
 			{
@@ -615,7 +625,7 @@ void ChatMessageHandler::onPresenceReceived(IPresence *APresence, const IPresenc
 		{
 			if (!fullWindow)
 				bareWindow->setContactJid(AItem.itemJid);
-			else
+			else if (!FActiveMessages.contains(bareWindow))
 				bareWindow->instance()->deleteLater();
 		}
 
