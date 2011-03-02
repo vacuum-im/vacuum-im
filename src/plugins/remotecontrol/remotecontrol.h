@@ -8,6 +8,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/icommands.h>
 #include <interfaces/istatuschanger.h>
+#include <interfaces/ipresence.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/ifilestreamsmanager.h>
