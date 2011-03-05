@@ -1,6 +1,7 @@
 #ifndef PLUGINMANAGER_H
 #define PLUGINMANAGER_H
 
+#include <QDir>
 #include <QHash>
 #include <QPointer>
 #include <QTranslator>
@@ -72,7 +73,7 @@ protected:
 	bool checkDependences(const QUuid AUuid) const;
 	bool checkConflicts(const QUuid AUuid) const;
 	QList<QUuid> getConflicts(const QUuid AUuid) const;
-	void loadCoreTranslations(const QString &ADir);
+	void loadCoreTranslations(const QDir &ADir, const QString &ALocaleName);
 protected:
 	bool isPluginEnabled(const QString &AFile) const;
 	QDomElement savePluginInfo(const QString &AFile, const IPluginInfo *AInfo);
