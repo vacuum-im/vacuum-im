@@ -75,6 +75,7 @@ protected slots:
 	void onEditBookmarksActionTriggered(bool);
 	void onEditBookmarksDialogDestroyed();
 	void onAccountOptionsChanged(const OptionsNode &ANode);
+	void onStartTimerTimeout();
 private:
 	IPrivateStorage *FStorage;
 	IPresencePlugin *FPresencePlugin;
@@ -89,8 +90,10 @@ private:
 	Menu *FBookMarksMenu;
 	QMap<Jid, Menu *> FStreamMenu;
 private:
+	QTimer FStartTimer;
 	QMap<Jid, QList<IBookMark> > FBookMarks;
 	QMap<Jid, EditBookmarksDialog *> FDialogs;
+	QMultiMap<Jid, IBookMark> FPendingBookMarks;
 };
 
 #endif // BOOKMARKS_H
