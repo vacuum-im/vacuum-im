@@ -12,6 +12,9 @@
 #define ADR_DISCO_NAME          Action::DR_Parametr4
 #define ADR_GROUP_SHIFT         Action::DR_Parametr1
 
+#define FIRST_START_TIMEOUT     1000
+#define NEXT_START_TIMEOUT      500
+
 BookMarks::BookMarks()
 {
 	FStorage = NULL;
@@ -25,6 +28,9 @@ BookMarks::BookMarks()
 	FOptionsManager = NULL;
 
 	FBookMarksMenu = NULL;
+
+	FStartTimer.setSingleShot(true);
+	connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
 }
 
 BookMarks::~BookMarks()
@@ -242,7 +248,8 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 		{
 			if (AShowWindow)
 				window->showWindow();
-			window->multiUserChat()->setAutoPresence(true);
+			if (!window->multiUserChat()->isOpen())
+				window->multiUserChat()->setAutoPresence(true);
 		}
 	}
 	else if (!ABookmark.url.isEmpty())
@@ -261,6 +268,7 @@ void BookMarks::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)
 		delete FDialogs.take(AStreamJid);
 		delete FStreamMenu.take(AStreamJid);
 		FBookMarks.remove(AStreamJid);
+		FPendingBookMarks.remove(AStreamJid);
 		updateBookmarksMenu();
 	}
 	else
@@ -326,7 +334,10 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
 				bookmark.password = elem.firstChildElement("password").text();
 				streamBookmarks.append(bookmark);
 				if (bookmark.autojoin && !ignoreAutoJoin)
-					startBookmark(AStreamJid,bookmark,false);
+				{
+					FPendingBookMarks.insertMulti(AStreamJid,bookmark);
+					FStartTimer.start(FIRST_START_TIMEOUT);
+			}
 			}
 			else if (elem.tagName() == "url")
 			{
@@ -360,6 +371,7 @@ void BookMarks::onStorageDataRemoved(const QString &AId, const Jid &AStreamJid, 
 		{
 			qDeleteAll(FStreamMenu[AStreamJid]->groupActions(AG_BMM_BOOKMARKS_ITEMS));
 			FBookMarks[AStreamJid].clear();
+			FPendingBookMarks.remove(AStreamJid);
 		}
 		updateBookmarksMenu();
 		emit bookmarksUpdated(AId,AStreamJid,AElement);
@@ -506,6 +518,17 @@ void BookMarks::onAccountOptionsChanged(const OptionsNode &ANode)
 	IAccount *account = qobject_cast<IAccount *>(sender());
 	if (account && account->isActive() && account->optionsNode().childPath(ANode)=="name" &&  FStreamMenu.contains(account->xmppStream()->streamJid()))
 		FStreamMenu[account->xmppStream()->streamJid()]->setTitle(ANode.value().toString());
+}
+
+void BookMarks::onStartTimerTimeout()
+{
+	QMultiMap<Jid, IBookMark>::iterator it = FPendingBookMarks.begin();
+	if (it != FPendingBookMarks.end())
+	{
+		startBookmark(it.key(),it.value(),false);
+		FPendingBookMarks.erase(it);
+		FStartTimer.start(NEXT_START_TIMEOUT);
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_bookmarks, BookMarks)
