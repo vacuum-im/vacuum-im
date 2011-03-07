@@ -159,6 +159,7 @@ protected:
 	QString collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const DateTime &AStart) const;
 	QStringList findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
 	IArchiveHeader loadCollectionHeader(const QString &AFileName) const;
+	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
 	CollectionWriter *newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
