@@ -52,7 +52,7 @@ private:
 	Jid FStreamJid;
 	QPixmap FLogo;
 	QPixmap FPhoto;
-	bool FSaveClisked;
+	bool FSaveClicked;
 };
 
 #endif // VCARDDIALOG_H
