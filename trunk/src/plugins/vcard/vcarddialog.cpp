@@ -14,7 +14,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	FStreamJid = AStreamJid;
 	FVCardPlugin = AVCardPlugin;
 
-	FSaveClisked = false;
+	FSaveClicked = false;
 
 	ui.cmbGender->addItem(tr("<Unset>"),QString(""));
 	ui.cmbGender->addItem(tr("Male"),QString(VCARD_GENDER_MALE));
@@ -250,7 +250,7 @@ void VCardDialog::onVCardUpdated()
 
 void VCardDialog::onVCardPublished()
 {
-	if (!FSaveClisked)
+	if (!FSaveClicked)
 	{
 		ui.btbButtons->setEnabled(true);
 		ui.twtVCard->setEnabled(true);
@@ -265,10 +265,10 @@ void VCardDialog::onVCardError(const QString &AError)
 {
 	QMessageBox::critical(this,tr("vCard error"),tr("vCard request or publish failed.<br>%1").arg(Qt::escape(AError)));
 
-	if (!FSaveClisked)
+	if (!FSaveClicked)
 		deleteLater();
 
-	FSaveClisked = false;
+	FSaveClicked = false;
 	ui.twtVCard->setEnabled(true);
 	ui.btbButtons->setEnabled(true);
 }
@@ -413,7 +413,7 @@ void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 		{
 			ui.btbButtons->setEnabled(false);
 			ui.twtVCard->setEnabled(false);
-			FSaveClisked = true;
+			FSaveClicked = true;
 		}
 		else
 		{

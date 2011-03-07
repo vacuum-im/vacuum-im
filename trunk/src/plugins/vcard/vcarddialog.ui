@@ -17,7 +17,10 @@
    <item>
     <widget class="QTabWidget" name="twtVCard">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
+     </property>
+     <property name="documentMode">
+      <bool>true</bool>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="title">
@@ -793,6 +796,13 @@
     </widget>
    </item>
    <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QDialogButtonBox" name="btbButtons"/>
    </item>
   </layout>
@@ -818,8 +828,8 @@
   <tabstop>cmbGender</tabstop>
   <tabstop>lneMarital</tabstop>
   <tabstop>lneTitle</tabstop>
-  <tabstop>lneDepartment</tabstop>
   <tabstop>lneCompany</tabstop>
+  <tabstop>lneDepartment</tabstop>
   <tabstop>lneRole</tabstop>
   <tabstop>lneHomePage</tabstop>
   <tabstop>lneHomeStreet</tabstop>
@@ -832,6 +842,20 @@
   <tabstop>lneWorkState</tabstop>
   <tabstop>lneWorkZip</tabstop>
   <tabstop>lneWorkCountry</tabstop>
+  <tabstop>ltwEmails</tabstop>
+  <tabstop>ltwPhones</tabstop>
+  <tabstop>tlbEmailAdd</tabstop>
+  <tabstop>tlbEmailDelete</tabstop>
+  <tabstop>tlbPhoneAdd</tabstop>
+  <tabstop>tlbPhoneDelete</tabstop>
+  <tabstop>tlbPhotoSave</tabstop>
+  <tabstop>tlbPhotoLoad</tabstop>
+  <tabstop>tlbPhotoClear</tabstop>
+  <tabstop>tlbLogoSave</tabstop>
+  <tabstop>tlbLogoLoad</tabstop>
+  <tabstop>tlbLogoClear</tabstop>
+  <tabstop>tedComments</tabstop>
+  <tabstop>btbButtons</tabstop>
  </tabstops>
  <resources/>
  <connections/>
