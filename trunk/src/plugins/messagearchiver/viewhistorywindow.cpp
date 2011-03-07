@@ -258,6 +258,7 @@ void ViewHistoryWindow::reload()
 	FRemoveRequests.clear();
 	FRequestList.clear();
 	FCollections.clear();
+	updateHeaderInfoWidget(IArchiveHeader());
 	processRequests(createRequests(FFilter));
 	FInvalidateTimer.start();
 }
@@ -310,7 +311,9 @@ QList<IArchiveHeader> ViewHistoryWindow::indexHeaders(const QModelIndex &AIndex)
 		IArchiveHeader header;
 		header.with = AIndex.data(HDR_HEADER_WITH).toString();
 		header.start = AIndex.data(HDR_HEADER_START).toDateTime();
+		header.subject = AIndex.data(HDR_HEADER_SUBJECT).toString();
 		header.threadId = AIndex.data(HDR_HEADER_THREAD).toString();
+		header.version = AIndex.data(HDR_HEADER_VERSION).toInt();
 		headers.append(header);
 	}
 
@@ -607,6 +610,11 @@ void ViewHistoryWindow::updateHeaderItem(const IArchiveHeader &AHeader)
 		else
 			itemName->setToolTip(AHeader.with.hFull());
 	}
+	
+	int currentIndex = FCurrentHeaders.indexOf(AHeader);
+	if (currentIndex >= 0)
+		FCurrentHeaders[currentIndex] = AHeader;
+	updateHeaderInfoWidget(AHeader);
 }
 
 void ViewHistoryWindow::removeCustomItem(QStandardItem *AItem)
@@ -650,7 +658,6 @@ void ViewHistoryWindow::setMessageStyle()
 			FViewWidget->setMessageStyle(style,soptions);
 		else if (style)
 			style->changeOptions(FViewWidget->styleWidget(),soptions);
-		ui.lblCollectionInfo->setText(tr("No conversation selected"));
 	}
 }
 
@@ -708,11 +715,8 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 		{
 			setViewOptions(ACollection);
 			setMessageStyle();
+			updateHeaderInfoWidget(ACollection.header);
 			FViewWidget->setContactJid(ACollection.header.with);
-			QString infoString = tr("Conversation with <b>%1</b> started at %2").arg(Qt::escape(contactName(ACollection.header.with))).arg(ACollection.header.start.toString());
-			if (!ACollection.header.subject.isEmpty())
-				infoString += "<br><i>"+tr("Subject: %1").arg(Qt::escape(ACollection.header.subject))+"</i>";
-			ui.lblCollectionInfo->setText(infoString);
 		}
 
 		IMessageContentOptions options;
@@ -800,6 +804,21 @@ void ViewHistoryWindow::updateFilterWidgets()
 	ui.dedStart->setDate(FFilter.start.isValid() ? FFilter.start.date() : MINIMUM_DATETIME.date());
 	ui.dedEnd->setDate(FFilter.end.isValid() ? FFilter.end.date() : MAXIMUM_DATETIME.date());
 	ui.lneSearch->setText(FFilter.body.pattern());
+}
+
+void ViewHistoryWindow::updateHeaderInfoWidget(const IArchiveHeader &AHeader)
+{
+	if (FCurrentHeaders.count()==1 && FCurrentHeaders.at(0)==AHeader)
+	{
+		QString infoString = tr("Conversation with <b>%1</b> started at %2").arg(Qt::escape(contactName(AHeader.with))).arg(AHeader.start.toString());
+		if (!AHeader.subject.isEmpty())
+			infoString += "<br><i>"+tr("Subject: %1").arg(Qt::escape(AHeader.subject))+"</i>";
+		ui.lblCollectionInfo->setText(infoString);
+	}
+	else
+	{
+		ui.lblCollectionInfo->setText(tr("No conversation selected"));
+	}
 }
 
 void ViewHistoryWindow::clearModel()
@@ -1080,6 +1099,7 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
 					else if (FCollectionRequests.key(header).isEmpty())
 					{
 						setMessageStyle();
+						updateHeaderInfoWidget(header);
 						if (loadServerCollection(header))
 							showNotification(tr("Loading messages from server..."));
 						else
@@ -1096,6 +1116,7 @@ void ViewHistoryWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
 			else
 			{
 				setMessageStyle();
+				updateHeaderInfoWidget(IArchiveHeader());
 				FFilterBy->setEnabled(false);
 				FRename->setEnabled(false);
 			}
@@ -1182,7 +1203,7 @@ void ViewHistoryWindow::onHeaderActionTriggered(bool)
 	else if (action == FRename)
 	{
 		bool ok;
-		QString subject = QInputDialog::getText(this,tr("Enter new collection subject"),tr("Subject:"),QLineEdit::Normal,FCurrentHeaders.at(0).subject,&ok);
+		QString subject = QInputDialog::getText(this,tr("Enter new collection subject"),tr("Subject:"),QLineEdit::Normal,FCurrentHeaders.value(0).subject,&ok);
 		if (ok)
 		{
 			if (FArchiver->isSupported(FStreamJid,NS_ARCHIVE_MANUAL))

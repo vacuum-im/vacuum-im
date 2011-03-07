@@ -98,6 +98,7 @@ protected:
 	void processCollection(const IArchiveCollection &ACollection, bool AAppend = false);
 	void insertContact(const Jid &AContactJid);
 	void updateFilterWidgets();
+	void updateHeaderInfoWidget(const IArchiveHeader &AHeader);
 	void clearModel();
 	void rebuildModel();
 	void createGroupKindMenu();
@@ -143,6 +144,11 @@ private:
 	Menu *FSourceMenu;
 	ToolBarChanger *FCollectionTools;
 private:
+	QMap<QString,IArchiveHeader> FRenameRequests;
+	QMap<QString,IArchiveHeader> FRemoveRequests;
+	QMap<QString,IArchiveRequest> FHeaderRequests;
+	QMap<QString,IArchiveHeader> FCollectionRequests;
+private:
 	int FSource;
 	int FGroupKind;
 	Jid FStreamJid;
@@ -151,10 +157,6 @@ private:
 	ViewOptions FViewOptions;
 	QList<IArchiveRequest> FRequestList;
 	QList<IArchiveHeader> FCurrentHeaders;
-	QMap<QString,IArchiveHeader> FRenameRequests;
-	QMap<QString,IArchiveHeader> FRemoveRequests;
-	QMap<QString,IArchiveRequest> FHeaderRequests;
-	QMap<QString,IArchiveHeader> FCollectionRequests;
 	QMap<IArchiveHeader,IArchiveCollection> FCollections;
 };
 

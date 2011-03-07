@@ -1199,7 +1199,7 @@ bool MessageArchiver::hasLocalCollection(const Jid &AStreamJid, const IArchiveHe
 
 bool MessageArchiver::saveLocalCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, bool AAppend)
 {
-	if (ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	if (ACollection.header.with.isValid() && ACollection.header.start.isValid() && !findCollectionWriter(AStreamJid,ACollection.header))
 	{
 		IArchiveCollection collection = loadLocalCollection(AStreamJid,ACollection.header);
 		bool modified = collection.header == ACollection.header;
@@ -1275,7 +1275,7 @@ IArchiveCollection MessageArchiver::loadLocalCollection(const Jid &AStreamJid, c
 
 bool MessageArchiver::removeLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
 {
-	delete findCollectionWriter(AStreamJid,AHeader.with,AHeader.threadId);
+	delete findCollectionWriter(AStreamJid,AHeader);
 	QString fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
 	if (QFile::remove(fileName))
 	{
@@ -1754,6 +1754,15 @@ IArchiveHeader MessageArchiver::loadCollectionHeader(const QString &AFileName) c
 	return header;
 }
 
+CollectionWriter *MessageArchiver::findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const
+{
+	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AHeader.with);
+	foreach(CollectionWriter *writer, writers)
+		if (writer->header() == AHeader)
+			return writer;
+	return NULL;
+}
+
 CollectionWriter *MessageArchiver::findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const
 {
 	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AWith);
@@ -1765,7 +1774,8 @@ CollectionWriter *MessageArchiver::findCollectionWriter(const Jid &AStreamJid, c
 
 CollectionWriter *MessageArchiver::newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader)
 {
-	if (AHeader.with.isValid() && AHeader.start.isValid())
+	CollectionWriter *writer = findCollectionWriter(AStreamJid,AHeader);
+	if (!writer && AHeader.with.isValid() && AHeader.start.isValid())
 	{
 		QString  fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
 		CollectionWriter *writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
@@ -1782,7 +1792,7 @@ CollectionWriter *MessageArchiver::newCollectionWriter(const Jid &AStreamJid, co
 		}
 		return writer;
 	}
-	return NULL;
+	return writer;
 }
 
 void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const
