@@ -341,7 +341,7 @@
     <name>SubscriptionDialogClass</name>
     <message>
         <source>Add user to contact list</source>
-        <translation>Додати користувача у ростеру</translation>
+        <translation>Додати користувача до ростеру</translation>
     </message>
     <message>
         <source>Authorize presence subscription</source>
