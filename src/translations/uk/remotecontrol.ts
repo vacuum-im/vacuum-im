@@ -64,34 +64,6 @@
         <translation>Новий пріоритет для клієнта</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
-    </message>
-    <message>
-        <source>Online</source>
-        <translation>Онлайн</translation>
-    </message>
-    <message>
-        <source>Away</source>
-        <translation>Відсутній</translation>
-    </message>
-    <message>
-        <source>Extended Away</source>
-        <translation>Недоступний</translation>
-    </message>
-    <message>
-        <source>Do Not Disturb</source>
-        <translation>Не турбувати</translation>
-    </message>
-    <message>
-        <source>Invisible</source>
-        <translation>Невидимий</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Оффлайн</translation>
-    </message>
-    <message>
         <source>Leave conferences</source>
         <translation>Залишити конференцію</translation>
     </message>
@@ -172,7 +144,7 @@
         <translation>
             <numerusform>%n повідомлення від &amp;amp;apos;%1&amp;amp;apos;</numerusform>
             <numerusform>%n повідомлень від &amp;amp;apos;%1&amp;amp;apos;</numerusform>
-            <numerusform>%n повідомлень від &amp;amp;apos;%1&amp;amp;apos;</numerusform>
+            <numerusform>%n повідомлення(ень) від &amp;amp;apos;%1&amp;amp;apos;</numerusform>
         </translation>
     </message>
     <message>

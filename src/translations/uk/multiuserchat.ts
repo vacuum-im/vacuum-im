@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Entered item JID is not valid or already exists.</source>
-        <translation>Введений JID невірний або уже існуе.</translation>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Wrong item JID</source>

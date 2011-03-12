@@ -85,11 +85,11 @@
     </message>
     <message>
         <source>Set desirable session settings.</source>
-        <translation>Встановити бажані настройки сесії.</translation>
+        <translation>Встановити бажані налаштування сесії.</translation>
     </message>
     <message>
         <source>Do you accept this session settings?</source>
-        <translation>Ви згодні з настройками сесії?</translation>
+        <translation>Ви згодні з налаштуваннями сесії?</translation>
     </message>
     <message>
         <source>Renegotiate this session?</source>

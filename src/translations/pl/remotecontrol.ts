@@ -64,34 +64,6 @@
         <translation>Nowy priorytet dla klienta</translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation>Chętnie porozmawiam</translation>
-    </message>
-    <message>
-        <source>Online</source>
-        <translation>W sieci</translation>
-    </message>
-    <message>
-        <source>Away</source>
-        <translation>Odszedłem</translation>
-    </message>
-    <message>
-        <source>Extended Away</source>
-        <translation>Odszedłem na dłużej</translation>
-    </message>
-    <message>
-        <source>Do Not Disturb</source>
-        <translation>Nie przeszkadzaj</translation>
-    </message>
-    <message>
-        <source>Invisible</source>
-        <translation>Niewidoczny</translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation>Poza siecią</translation>
-    </message>
-    <message>
         <source>Leave conferences</source>
         <translation>Opuść konferencję</translation>
     </message>

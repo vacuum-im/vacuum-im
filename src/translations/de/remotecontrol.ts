@@ -64,34 +64,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Chat</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Online</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Away</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Extended Away</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Do Not Disturb</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Invisible</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Offline</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Leave conferences</source>
         <translation></translation>
     </message>

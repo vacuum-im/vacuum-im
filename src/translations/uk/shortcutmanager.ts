@@ -5,15 +5,15 @@
     <name>ShortcutManager</name>
     <message>
         <source>Shortcut Manager</source>
-        <translation>Менеджер контекстного меню</translation>
+        <translation>Менеджер гарячих клавіш</translation>
     </message>
     <message>
         <source>Allows to setup user defined shortcuts</source>
-        <translation>Дозволяє налаштовувати контекстне меню</translation>
+        <translation>Дозволяє налаштовувати гарячі клавіші</translation>
     </message>
     <message>
         <source>Shortcuts</source>
-        <translation>Контекстне меню</translation>
+        <translation>Гарячі клавіші</translation>
     </message>
     <message>
         <source>Hide all windows, tray icon and notifications</source>
@@ -36,7 +36,7 @@
     </message>
     <message>
         <source>Shortcut</source>
-        <translation>Контекстне меню</translation>
+        <translation>Гаряча клавіша</translation>
     </message>
 </context>
 <context>
