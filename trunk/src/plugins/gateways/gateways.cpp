@@ -1,11 +1,11 @@
 #include "gateways.h"
 
-#define GATEWAY_TIMEOUT       30000
+#define GATEWAY_TIMEOUT           30000
 
-#define ADR_STREAM_JID        Action::DR_StreamJid
-#define ADR_SERVICE_JID       Action::DR_Parametr1
-#define ADR_NEW_SERVICE_JID   Action::DR_Parametr2
-#define ADR_LOG_IN            Action::DR_Parametr3
+#define ADR_STREAM_JID            Action::DR_StreamJid
+#define ADR_SERVICE_JID           Action::DR_Parametr1
+#define ADR_NEW_SERVICE_JID       Action::DR_Parametr2
+#define ADR_LOG_IN                Action::DR_Parametr3
 
 #define PSN_GATEWAYS_KEEP         "vacuum:gateways:keep"
 #define PSN_GATEWAYS_SUBSCRIBE    "vacuum:gateways:subscribe"
@@ -246,17 +246,17 @@ void Gateways::resolveNickName(const Jid &AStreamJid, const Jid &AContactJid)
 	{
 		if (FVCardPlugin->hasVCard(ritem.itemJid))
 		{
-         static const QList<QString> nickFields = QList<QString>() << VVN_NICKNAME << VVN_FULL_NAME << VVN_GIVEN_NAME << VVN_FAMILY_NAME;
+			static const QList<QString> nickFields = QList<QString>() << VVN_NICKNAME << VVN_FULL_NAME << VVN_GIVEN_NAME << VVN_FAMILY_NAME;
 			IVCard *vcard = FVCardPlugin->vcard(ritem.itemJid);
-         foreach(QString field, nickFields)
-         {
-            QString nick = vcard->value(field);
-            if (!nick.isEmpty())
-            {
-               roster->renameItem(ritem.itemJid,nick);
-               break;
-            }
-         }
+			foreach(QString field, nickFields)
+			{
+				QString nick = vcard->value(field);
+				if (!nick.isEmpty())
+				{
+					roster->renameItem(ritem.itemJid,nick);
+					break;
+				}
+			}
 			vcard->unlock();
 		}
 		else
@@ -515,18 +515,18 @@ void Gateways::onResolveActionTriggered(bool)
 		Jid serviceJid = action->data(ADR_SERVICE_JID).toString();
 		if (serviceJid.node().isEmpty())
 		{
-         IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
 			foreach(Jid contactJid, serviceContacts(streamJid,serviceJid))
-         {
-            IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
-            if (ritem.isValid && ritem.name.trimmed().isEmpty())
-               resolveNickName(streamJid,contactJid);
-         }
+			{
+				IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
+				if (ritem.isValid && ritem.name.trimmed().isEmpty())
+					resolveNickName(streamJid,contactJid);
+			}
 		}
 		else
-      {
-         resolveNickName(streamJid,serviceJid);
-      }
+		{
+			resolveNickName(streamJid,serviceJid);
+		}
 	}
 }
 
@@ -664,19 +664,21 @@ void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_JID).toString();
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
-      IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
+		IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
 		if (FVCardPlugin && ritem.isValid && roster->isOpen())
 		{
-         if (ritem.name.trimmed().isEmpty() || AIndex->type()==RIT_AGENT)
-         {
-            Action *action = new Action(AMenu);
-            action->setText(contactJid.node().isEmpty() ? tr("Resolve nick names") : tr("Resolve nick name"));
-            action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
-            action->setData(ADR_STREAM_JID,streamJid.full());
-            action->setData(ADR_SERVICE_JID,contactJid.full());
-            connect(action,SIGNAL(triggered(bool)),SLOT(onResolveActionTriggered(bool)));
-            AMenu->addAction(action,AG_RVCM_GATEWAYS_RESOLVE,true);
-         }
+			bool showResolve = AIndex->type()==RIT_AGENT && !serviceContacts(streamJid,contactJid).isEmpty();
+			showResolve |= AIndex->type()==RIT_CONTACT && (ritem.name.trimmed().isEmpty() || streamServices(streamJid).contains(contactJid.domain()));
+			if (showResolve)
+			{
+				Action *action = new Action(AMenu);
+				action->setText(AIndex->type()==RIT_AGENT ? tr("Resolve nick names") : tr("Resolve nick name"));
+				action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
+				action->setData(ADR_STREAM_JID,streamJid.full());
+				action->setData(ADR_SERVICE_JID,contactJid.full());
+				connect(action,SIGNAL(triggered(bool)),SLOT(onResolveActionTriggered(bool)));
+				AMenu->addAction(action,AG_RVCM_GATEWAYS_RESOLVE,true);
+			}
 		}
 	}
 }
@@ -849,8 +851,7 @@ void Gateways::onVCardError(const Jid &AContactJid, const QString &AError)
 
 void Gateways::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
 {
-	connect(AWindow->instance(),SIGNAL(indexContextMenu(const QModelIndex &, Menu *)),
-	        SLOT(onDiscoItemContextMenu(const QModelIndex &, Menu *)));
+	connect(AWindow->instance(),SIGNAL(indexContextMenu(const QModelIndex &, Menu *)),SLOT(onDiscoItemContextMenu(const QModelIndex &, Menu *)));
 }
 
 void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
