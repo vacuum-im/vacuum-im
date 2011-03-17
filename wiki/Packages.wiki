@@ -42,18 +42,18 @@ https://build.opensuse.org/project/show?project=home%3AEGDFree
 
 == Подключение ==
 
-Замените версию дистрибутива на нужную (доступны: *openSUSE_11.2*, *openSUSE_11.3*, *openSUSE_Factory*) и выполните:
+Замените версию дистрибутива на нужную (доступны: *openSUSE_11.2*, *openSUSE_11.3*, *openSUSE_11.4*, *openSUSE_Factory*) и выполните:
 
 === vacuum-im (stable) ===
 Для получения текущей стабильной версии:
 {{{
-sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im/openSUSE_11.3/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im/openSUSE_11.4/ vacuum-im
 }}}
 
 === vacuum-im (unstable, vcs) ===
 Для получения новейшей версии из git-репозитория разработки:
 {{{
-sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im:/git/openSUSE_11.3/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im:/git/openSUSE_11.4/ vacuum-im
 }}}
 
 == Установка ==
