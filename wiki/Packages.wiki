@@ -1,6 +1,15 @@
 #summary Список источников пакетов vacuum-im.
 <wiki:toc max_depth="1" />
 
+
+= AgiliaLinux =
+http://packages.agilialinux.ru/search.php?lname=vacuum-im
+
+== Установка ==
+{{{
+mpkg-install vacuum-im
+}}}
+
 = Arch Linux =
 
 == vacuum (stable) ==
