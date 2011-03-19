@@ -2,7 +2,7 @@
 <wiki:toc max_depth="1" />
 
 
-= AgiliaLinux =
+= Agilia =
 http://packages.agilialinux.ru/search.php?lname=vacuum-im
 
 == Установка ==
