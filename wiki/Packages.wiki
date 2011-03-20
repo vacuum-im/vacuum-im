@@ -10,6 +10,10 @@ http://packages.agilialinux.ru/search.php?lname=vacuum-im
 mpkg-install vacuum-im
 }}}
 
+= ALT Linux =
+
+http://prometheus.altlinux.org/en/Sisyphus/srpms/vacuum-im
+
 = Arch Linux =
 
 == vacuum (stable) ==
