@@ -30,6 +30,7 @@ http://www.notesalexp.org/
 http://koji.russianfedora.ru/koji/packageinfo?packageID=100
 
 == Подключение ==
+_Пользователям russianfedora делать не нужно_
 {{{
 su -c 'yum localinstall --nogpgcheck http://mirror.yandex.ru/fedora/russianfedora/russianfedora/free/fedora/russianfedora-free-release-stable.noarch.rpm'
 }}}
