@@ -25,6 +25,20 @@ http://aur.archlinux.org/packages.php?ID=32402
 = Debian =
 http://www.notesalexp.org/
 
+= Fedora =
+
+http://koji.russianfedora.ru/koji/packageinfo?packageID=100
+
+== Подключение ==
+{{{
+su -c 'yum localinstall --nogpgcheck http://mirror.yandex.ru/fedora/russianfedora/russianfedora/free/fedora/russianfedora-free-release-stable.noarch.rpm'
+}}}
+
+== Установка ==
+{{{
+yum install vacuum
+}}}
+
 = FreeBSD =
 http://www.freshports.org/net-im/vacuum-im
 
