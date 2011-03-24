@@ -1,7 +1,7 @@
 #include "jid.h"
 
 #include <QTextDocument>
-#include <thirdparty/idn/stringprep.h>
+#include <stringprep.h>
 
 QList<QChar> EscChars = QList<QChar>()       << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40; // << 0x5c;
 QList<QString> EscStrings = QList<QString>() <<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40"; //<<"\\5c";

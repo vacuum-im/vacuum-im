@@ -21,6 +21,14 @@ set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating
 add_lang_options()
 
 find_library(SYSTEM_ZLIB_FOUND z)
+find_library(SYSTEM_IDN_FOUND idn)
+find_library(SYSTEM_MINIZIP_FOUND minizip)
+find_library(SYSTEM_QTLOCKEDFILE_FOUND QtSolutions_LockedFile-2.4)
+if (SYSTEM_QTLOCKEDFILE_FOUND)
+	set(QTLOCKEDFILE_LIB "${SYSTEM_QTLOCKEDFILE_FOUND}")
+else (SYSTEM_QTLOCKEDFILE_FOUND)
+	set(QTLOCKEDFILE_LIB qtlockedfile)
+endif (SYSTEM_QTLOCKEDFILE_FOUND)
 
 if ("${LANGS}" STREQUAL "")
 	process_lang_options()
