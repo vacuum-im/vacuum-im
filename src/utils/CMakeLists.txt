@@ -16,6 +16,9 @@ link_directories("${CMAKE_BINARY_DIR}/libs")
 include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 include(FindX11)
 include_directories(AFTER ${X11_INCLUDE_DIR})
+if (NOT SYSTEM_IDN_FOUND)
+	include_directories("${CMAKE_SOURCE_DIR}/src/thirdparty/idn")
+endif (NOT SYSTEM_IDN_FOUND)
 
 add_translations(TRANSLATIONS "${TARGET_UTILS}" ${SOURCES})
 add_library(${TARGET_UTILS} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
@@ -23,11 +26,26 @@ set_target_properties(${TARGET_UTILS} PROPERTIES
 	VERSION "${VERSION_UTILS}"
 	SOVERSION "${VERSION_UTILS_ABI}")
 
+set(ADD_LIBS qxtglobalshortcut idle)
 if (SYSTEM_ZLIB_FOUND)
-	set(ADD_LIBS qxtglobalshortcut idn minizip idle "${SYSTEM_ZLIB_FOUND}")
+	list(APPEND ADD_LIBS "${SYSTEM_ZLIB_FOUND}")
 else (SYSTEM_ZLIB_FOUND)
-	set(ADD_LIBS qxtglobalshortcut idn minizip idle zlib)
+	list(APPEND ADD_LIBS zlib)
 endif (SYSTEM_ZLIB_FOUND)
+
+if (SYSTEM_IDN_FOUND)
+	list(APPEND ADD_LIBS "${SYSTEM_IDN_FOUND}")
+else (SYSTEM_IDN_FOUND)
+	list(APPEND ADD_LIBS idn)
+endif (SYSTEM_IDN_FOUND)
+
+if (SYSTEM_MINIZIP_FOUND)
+	list(APPEND ADD_LIBS "${SYSTEM_MINIZIP_FOUND}")
+else (SYSTEM_MINIZIP_FOUND)
+	list(APPEND ADD_LIBS minizip)
+	include_directories("${CMAKE_SOURCE_DIR}/src/thirdparty")
+endif (SYSTEM_MINIZIP_FOUND)
+
 
 if (X11_Xscreensaver_FOUND)
 	message(STATUS "Found Xscreensaver: ${X11_Xscreensaver_LIB}")

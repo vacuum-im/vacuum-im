@@ -23,12 +23,16 @@
 #include <utils/action.h>
 #include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
-#include <thirdparty/qtlockedfile/qtlockedfile.h>
 #include "logindialog.h"
 #include "editprofilesdialog.h"
 #include "optionswidget.h"
 #include "optionsheader.h"
 #include "optionsdialog.h"
+#ifdef USE_SYSTEM_QTLOCKEDFILE
+#	include <QtSolutions/qtlockedfile.h>
+#else // USE_SYSTEM_QTLOCKEDFILE
+#	include <thirdparty/qtlockedfile/qtlockedfile.h>
+#endif // USE_SYSTEM_QTLOCKEDFILE
 
 
 class OptionsManager :
