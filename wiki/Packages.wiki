@@ -90,8 +90,16 @@ sudo zypper in vacuum-im
 }}}
 
 = Pardus =
-https://code.google.com/p/vacuum-im/downloads/list?q=Package:Pardus
 
+== Подключение ==
+{{{
+sudo pisi add-repo pardususer.de http://pakete.pardususer.de/pardus-2011/`arch`/pisi-index.xml.xz
+}}}
+
+== Установка ==
+{{{
+sudo pisi install vacuum
+}}}
 = Ubuntu =
 https://launchpad.net/~uni/+archive/ppa
 
