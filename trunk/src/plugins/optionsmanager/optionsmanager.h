@@ -28,11 +28,12 @@
 #include "optionswidget.h"
 #include "optionsheader.h"
 #include "optionsdialog.h"
+
 #ifdef USE_SYSTEM_QTLOCKEDFILE
 #	include <QtSolutions/qtlockedfile.h>
-#else // USE_SYSTEM_QTLOCKEDFILE
+#else
 #	include <thirdparty/qtlockedfile/qtlockedfile.h>
-#endif // USE_SYSTEM_QTLOCKEDFILE
+#endif
 
 
 class OptionsManager :
