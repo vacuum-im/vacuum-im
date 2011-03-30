@@ -43,7 +43,6 @@ if (SYSTEM_MINIZIP_FOUND)
 	list(APPEND ADD_LIBS "${SYSTEM_MINIZIP_FOUND}")
 else (SYSTEM_MINIZIP_FOUND)
 	list(APPEND ADD_LIBS minizip)
-	include_directories("${CMAKE_SOURCE_DIR}/src/thirdparty")
 endif (SYSTEM_MINIZIP_FOUND)
 
 

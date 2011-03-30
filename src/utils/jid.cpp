@@ -1,7 +1,12 @@
 #include "jid.h"
 
 #include <QTextDocument>
-#include <stringprep.h>
+
+#ifdef USE_SYSTEM_IDN
+#	include <stringprep.h>
+#else
+#	include <thirdparty/idn/stringprep.h>
+#endif
 
 QList<QChar> EscChars = QList<QChar>()       << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40; // << 0x5c;
 QList<QString> EscStrings = QList<QString>() <<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40"; //<<"\\5c";
@@ -9,14 +14,14 @@ QHash<QString,Jid> JidCache = QHash<QString,Jid>();
 
 QString stringPrepare(const Stringprep_profile *AProfile, const QString &AString)
 {
-   QByteArray buffer = AString.toUtf8();
-   if (!buffer.isEmpty() && buffer.size()<1024)
-   {
-      buffer.reserve(1024);
-      if (stringprep(buffer.data(),buffer.capacity(),(Stringprep_profile_flags)0, AProfile) == STRINGPREP_OK)
-         return QString::fromUtf8(buffer.constData());
-   }
-   return QString::null;
+	QByteArray buffer = AString.toUtf8();
+	if (!buffer.isEmpty() && buffer.size()<1024)
+	{
+		buffer.reserve(1024);
+		if (stringprep(buffer.data(),buffer.capacity(),(Stringprep_profile_flags)0, AProfile) == STRINGPREP_OK)
+			return QString::fromUtf8(buffer.constData());
+	}
+	return QString::null;
 }
 
 JidData::JidData()

@@ -5,7 +5,12 @@
 #include <definitions/xmppdatahandlerorders.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
-#include <zlib.h>
+
+#ifdef USE_SYSTEM_ZLIB
+#	include <zlib.h>
+#else
+#	include <thirdparty/zlib/zlib.h>
+#endif
 
 class Compression :
 			public QObject,
