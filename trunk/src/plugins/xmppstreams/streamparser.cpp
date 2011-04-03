@@ -1,9 +1,10 @@
 #include "streamparser.h"
 
+#include <QMap>
+
 StreamParser::StreamParser(QObject *AParent) : QObject(AParent)
 {
-	FReader.addExtraNamespaceDeclaration(QXmlStreamNamespaceDeclaration("ns20","strange-yandex-bug-20"));
-	FReader.addExtraNamespaceDeclaration(QXmlStreamNamespaceDeclaration("ns21","strange-yandex-bug-21"));
+	restart();
 }
 
 StreamParser::~StreamParser()
@@ -22,29 +23,23 @@ void StreamParser::parseData(const QByteArray &AData)
 		if (FReader.isStartDocument())
 		{
 			FLevel = 0;
-			FLevelNS.clear();
-			FLevelNS.push(NS_JABBER_CLIENT);
 		}
 		else if (FReader.isStartElement())
 		{
-			QString nsURI = FReader.namespaceUri().toString();
-			QString elemName = FReader.qualifiedName().toString();
-			QDomElement newElement = FLevelNS.top()!=nsURI ? doc.createElementNS(nsURI,elemName) : doc.createElement(elemName);
-			FLevelNS.push(nsURI);
-
+			QMap<QString, QString> attributes;
 			foreach(QXmlStreamAttribute attribute, FReader.attributes())
-			{
-				QString attrNS = attribute.namespaceUri().toString();
-				if (attrNS.isEmpty())
-					newElement.setAttribute(attribute.name().toString(),attribute.value().toString());
-				else
-					newElement.setAttributeNS(attrNS,attribute.qualifiedName().toString(),attribute.value().toString());
-			}
+				attributes.insert(attribute.qualifiedName().toString(), attribute.value().toString());
+
+			QString nsURI = attributes.take("xmlns");
+			QString elemName = FReader.qualifiedName().toString();
+
+			QDomElement newElement = !nsURI.isEmpty() ? doc.createElementNS(nsURI,elemName) : doc.createElement(elemName);
+			for (QMap<QString, QString>::const_iterator it = attributes.constBegin(); it!=attributes.constEnd(); it++)
+				newElement.setAttribute(it.key(),it.value());
 
 			FLevel++;
 			if (FLevel == 1)
 			{
-				FLevelNS.pop();
 				emit opened(newElement);
 			}
 			else if (FLevel == 2)
@@ -72,7 +67,6 @@ void StreamParser::parseData(const QByteArray &AData)
 				emit element(FRootElem);
 			else if (FLevel > 1)
 				FCurrentElem = FCurrentElem.parentNode().toElement();
-			FLevelNS.pop();
 		}
 	}
 
@@ -85,4 +79,5 @@ void StreamParser::parseData(const QByteArray &AData)
 void StreamParser::restart()
 {
 	FReader.clear();
+	FReader.setNamespaceProcessing(false);
 }
