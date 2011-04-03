@@ -6,6 +6,11 @@ LEGEND
   [-] Bug fix
 
 
+
+------
+  [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
+
+
 v1.1.0
 ------
   [!] Added new plugin for remote controlling
@@ -40,6 +45,7 @@ v1.1.0
   [-] When closing the connection initiated by the server vacuum does not generate an error and re-reconnection was not started
   [-] Notification of arrival of the new message would not occur if the chat window was closed by clicking on the Windows taskbar
   [-] By transfer of the rest of a file after connection breakage already obtained data could be rubbed clean by zero
+
 
 v1.0.2
 ------
