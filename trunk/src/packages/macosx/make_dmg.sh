@@ -69,15 +69,14 @@ function process_binary {
 	echo -e "$tab Processing" `basename $binary`
 	
 	if [ -f "$binary" ]; then
-		for str1 in `otool -LX "$binary" | grep Qt`; do
-			for str in `basename "$str1" | grep Qt`; do
-				if [ `basename $binary` != $str ]; then
-					local l="$str.framework/Versions/4/$str"
-					echo -e "$tab\t Resolving dependency: $str"
-					install_name_tool -change "$SYS_FW_DIR/$l" "$DYLD_PREFIX/$l" "$binary"
-					process_lib "$l" "$tab\t"
-				fi
-			done;
+		for str1 in `otool -LX "$binary" | grep $SYS_FW_DIR | cut -d " " -f 1`; do
+			local str=`basename "$str1"`
+			if [ `basename $binary` != $str ]; then
+				local l="$str.framework/Versions/4/$str"
+				echo -e "$tab\t Resolving dependency: $str"
+				install_name_tool -change "$SYS_FW_DIR/$l" "$DYLD_PREFIX/$l" "$binary"
+				process_lib "$l" "$tab\t"
+			fi
 		done;
 		echo -e "$tab Processed" `basename $binary`
 	else
