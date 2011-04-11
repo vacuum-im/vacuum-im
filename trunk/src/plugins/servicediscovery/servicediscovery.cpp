@@ -284,6 +284,17 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 
 			EntityCapabilities oldCaps = FEntityCaps.value(AStreamJid).value(contactJid);
 			bool capsChanged = !capsElem.isNull() && (oldCaps.ver!=newCaps.ver || oldCaps.node!=newCaps.node);
+
+			// Some gates can send back presence from your or another connection with EntityCaps!!!
+			// So we should ignore entity caps from all agents
+			if (!capsElem.isNull() && contactJid.node().isEmpty())
+			{
+				newCaps.node.clear();
+				newCaps.ver.clear();
+				newCaps.hash.clear();
+				capsChanged = true;
+			}
+
 			if (capsElem.isNull() || capsChanged)
 			{
 				if (hasEntityCaps(newCaps))
