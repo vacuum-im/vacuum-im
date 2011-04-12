@@ -9,6 +9,7 @@ project(loader CXX)
 
 include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
 set(QT_USE_QTXML YES)
+set(QT_USE_QTMAIN YES)
 include(${QT_USE_FILE})
 
 set(VER_STRING "" CACHE STRING "This string will be appended to program version (defaults to SVN revision number)")
