@@ -53,6 +53,10 @@ else (X11_Xscreensaver_FOUND)
 	message(STATUS "Xscreensaver not found")
 endif (X11_Xscreensaver_FOUND)
 
+if (APPLE)
+	list(APPEND ADD_LIBS "-framework Carbon")
+endif (APPLE)
+
 target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
 target_link_libraries(${TARGET_UTILS} ${QT_LIBRARIES} ${ADD_LIBS})
 
