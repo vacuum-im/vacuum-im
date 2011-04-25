@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Complete</source>
-        <translation>Завершено</translation>
+        <translation>Завершить</translation>
     </message>
     <message>
         <source>Command execution completed.</source>
