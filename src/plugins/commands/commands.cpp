@@ -41,8 +41,9 @@ void Commands::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
 	if (plugin)
 	{
