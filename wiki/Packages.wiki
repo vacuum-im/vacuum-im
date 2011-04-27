@@ -75,7 +75,7 @@ https://build.opensuse.org/project/show?project=home%3AEGDFree
 === vacuum-im (stable) ===
 Для получения текущей стабильной версии:
 {{{
-sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im/openSUSE_11.4/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/network/openSUSE_11.4/ vacuum-im
 }}}
 
 === vacuum-im (unstable, vcs) ===
