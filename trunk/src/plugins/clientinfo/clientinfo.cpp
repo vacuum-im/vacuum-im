@@ -9,6 +9,12 @@
 # include <sys/utsname.h>
 #endif
 
+#if defined(Q_WS_HAIKU)
+#include <Path.h>
+#include <AppFileInfo.h>
+#include <FindDirectory.h>
+#endif
+
 #define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
 #define SHC_LAST_ACTIVITY               "/iq[@type='get']/query[@xmlns='" NS_JABBER_LAST "']"
 #define SHC_ENTITY_TIME                 "/iq[@type='get']/time[@xmlns='" NS_XMPP_TIME "']"
@@ -522,6 +528,35 @@ QString ClientInfo::osVersion() const
 			osver = "Windows (unknown)";
 			break;
 		}
+#elif defined(Q_WS_HAIKU)
+		QString strVersion("Haiku");
+		BPath path;
+		if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) {
+		path.Append("libbe.so");
+
+		BAppFileInfo appFileInfo;
+		version_info versionInfo;
+		BFile file;
+		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
+			&& appFileInfo.SetTo(&file) == B_OK
+			&& appFileInfo.GetVersionInfo(&versionInfo, 
+				B_APP_VERSION_KIND) == B_OK
+			&& versionInfo.short_info[0] != '\0')
+				strVersion = versionInfo.short_info;
+		}
+
+		utsname uname_info;
+		if (uname(&uname_info) == 0) {
+		osver = uname_info.sysname;
+		long revision = 0;
+		if (sscanf(uname_info.version, "r%ld", &revision) == 1) {
+			char version[16];
+			snprintf(version, sizeof(version), "%ld", revision);
+			osver += " ( " + strVersion + " Rev. ";
+			osver += version;
+			osver += ")";
+		}
+	}
 #else
 		osver = "Unknown";
 #endif

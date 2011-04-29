@@ -21,7 +21,7 @@ LIBS              += -L../libs
 LIBS              += -lzlib -lidn -lminizip -lqxtglobalshortcut -lidle
 macx {
   QMAKE_LFLAGS    += -framework Carbon
-} else:unix {
+} else:unix:!haiku {
   LIBS            += -lXss
   CONFIG          += x11
 } else:win32 {
