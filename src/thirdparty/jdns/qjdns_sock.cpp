@@ -44,8 +44,14 @@
 # include <arpa/inet.h>
 #endif
 
+#ifdef Q_OS_HAIKU
+# include <netinet6/in6.h>
+#endif
+
+
 #ifndef QT_NO_IPV6
 # define HAVE_IPV6
+#ifndef Q_OS_HAIKU
 # ifndef s6_addr
 #  define IPPROTO_IPV6 41
    struct in6_addr
@@ -59,6 +65,7 @@
    };
 #  define s6_addr _S6_un._S6_u8
 # endif
+# endif
 # ifndef IPV6_JOIN_GROUP
 #  define IPV6_JOIN_GROUP 12
 #  define IPV6_MULTICAST_HOPS 10
@@ -69,7 +76,6 @@
    };
 # endif
 #endif
-
 static int get_last_error()
 {
 	int x;

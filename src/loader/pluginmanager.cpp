@@ -38,6 +38,10 @@
 #  define ENV_APP_DATA              "HOME"
 #  define DIR_APP_DATA              APPLICATION_NAME
 #  define PATH_APP_DATA             "Library/Application Support/"DIR_APP_DATA
+#elif defined(Q_WS_HAIKU)
+#  define ENV_APP_DATA              "APPDATA"
+#  define DIR_APP_DATA              APPLICATION_NAME
+#  define PATH_APP_DATA             ORGANIZATION_NAME"/"DIR_APP_DATA
 #endif
 
 #if defined(Q_WS_WIN)

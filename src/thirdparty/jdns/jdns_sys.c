@@ -706,7 +706,7 @@ static int my_res_init()
 //   specify the platforms that have __res_state_ext
 //#ifdef __res_state_ext
 #if defined(JDNS_OS_MAC) || defined(JDNS_OS_FREEBSD) || \
-    defined(JDNS_OS_NETBSD) || defined (JDNS_OS_SOLARIS)
+    defined(JDNS_OS_NETBSD) || defined (JDNS_OS_SOLARIS) || defined(__HAIKU__)
 # define USE_EXTEXT
 #endif
 
