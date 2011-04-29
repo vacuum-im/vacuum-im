@@ -44,22 +44,12 @@ yum install vacuum
 http://www.freshports.org/net-im/vacuum-im
 
 = Gentoo =
-https://code.google.com/p/rion-overlay/source/browse/net-im/vacuum/
 
-== Подключение ==
+Доступно в portage:
+http://packages.gentoo.org/package/net-im/vacuum
 
-Добавить оверлей *rion* в *layman*, об использовании последнего читать там:
-
-http://www.gentoo.org/proj/en/overlays/userguide.xml
-
-http://en.gentoo-wiki.com/wiki/Layman
-
-_Не обязательно использовать весь оверлей, можно сделать символические ссылки на нужные пакеты в свой._
-
-== Установка ==
-{{{
-emerge -Dva net-im/vacuum
-}}}
+Дополнительные плагины есть в оверлее *rion*:
+https://code.google.com/p/rion-overlay/source/browse/net-im/
 
 = Mandriva =
 https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
