@@ -1,6 +1,7 @@
 #include "chatmessagehandler.h"
 
 #include <QApplication>
+#include <definitions/optionnodes.h>
 
 #define HISTORY_MESSAGES          10
 #define HISTORY_TIME_PAST         5
@@ -127,6 +128,12 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+	{
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
+
 	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
 }
 
@@ -149,6 +156,23 @@ bool ChatMessageHandler::initObjects()
 		FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
 	}
 	return true;
+}
+
+bool ChatMessageHandler::initSettings()
+{
+	Options::setDefaultValue(OPV_MESSAGES_LOAD_HISTORY, true);
+	if (FOptionsManager)
+		FOptionsManager->insertOptionsHolder(this);
+}
+
+QMultiMap<int, IOptionsWidget *> ChatMessageHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	{
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_LOAD_HISTORY),tr("Load messages from history in new chat windows"),AParent));
+	}
+	return widgets;
 }
 
 bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
@@ -316,7 +340,9 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 				button->setPopupMode(QToolButton::InstantPopup);
 			}
 			setMessageStyle(window);
-			showHistory(window);
+			bool loadHistory = Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool();
+			if (loadHistory)
+				showHistory(window);
 		}
 		else
 			window = findWindow(AStreamJid,AContactJid);
