@@ -44,5 +44,9 @@
         <source>Clear window</source>
         <translation>Wyczyść okno</translation>
     </message>
+    <message>
+        <source>Load messages from history in new chat windows</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

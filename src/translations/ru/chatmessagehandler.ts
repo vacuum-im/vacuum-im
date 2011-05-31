@@ -44,5 +44,9 @@
         <source>Clear window</source>
         <translation>Очистить окно</translation>
     </message>
+    <message>
+        <source>Load messages from history in new chat windows</source>
+        <translation>Загружать предыдущие сообщения при открытии окна чата</translation>
+    </message>
 </context>
 </TS>
