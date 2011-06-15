@@ -163,6 +163,7 @@ bool ChatMessageHandler::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_LOAD_HISTORY, true);
 	if (FOptionsManager)
 		FOptionsManager->insertOptionsHolder(this);
+	return true;
 }
 
 QMultiMap<int, IOptionsWidget *> ChatMessageHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
