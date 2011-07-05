@@ -202,7 +202,7 @@ int ChatStates::sessionInit(const IStanzaSession &ASession, IDataForm &ARequest)
 	chatstates.type = DATAFIELD_TYPE_LISTSINGLE;
 	chatstates.required = false;
 
-	bool enabled = isEnabled(Jid(),ASession.contactJid);
+	bool enabled = isEnabled(Jid::null,ASession.contactJid);
 	if (enabled)
 	{
 		IDataOption maysend;
@@ -253,7 +253,7 @@ int ChatStates::sessionAccept(const IStanzaSession &ASession, const IDataForm &A
 				options.append(ARequest.fields.at(index).options.at(i).value);
 
 			int status = permitStatus(ASession.contactJid);
-			bool enabled = isEnabled(Jid(),ASession.contactJid);
+			bool enabled = isEnabled(Jid::null,ASession.contactJid);
 			if ((!enabled && !options.contains(SFV_MUSTNOT_SEND)) || (status==IChatStates::StatusEnable && !options.contains(SFV_MAY_SEND)))
 			{
 				ASubmit.pages[0].fieldrefs.append(NS_CHATSTATES);
@@ -266,7 +266,7 @@ int ChatStates::sessionAccept(const IStanzaSession &ASession, const IDataForm &A
 		{
 			QString value = ARequest.fields.at(index).value.toString();
 			int status = permitStatus(ASession.contactJid);
-			bool enabled = isEnabled(Jid(),ASession.contactJid);
+			bool enabled = isEnabled(Jid::null,ASession.contactJid);
 			if ((!enabled && value==SFV_MAY_SEND) || (status==IChatStates::StatusEnable && value==SFV_MUSTNOT_SEND))
 			{
 				ASubmit.pages[0].fieldrefs.append(NS_CHATSTATES);
@@ -381,7 +381,7 @@ void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
 {
 	if (permitStatus(AContactJid) != AStatus)
 	{
-		bool oldEnabled = isEnabled(Jid(),AContactJid);
+		bool oldEnabled = isEnabled(Jid::null,AContactJid);
 
 		Jid bareJid = AContactJid.bare();
 		if (AStatus==IChatStates::StatusDisable)
@@ -397,7 +397,7 @@ void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
 			FPermitStatus.remove(bareJid);
 		}
 
-		if (!oldEnabled && isEnabled(Jid(),AContactJid))
+		if (!oldEnabled && isEnabled(Jid::null,AContactJid))
 			resetSupported(AContactJid);
 
 		emit permitStatusChanged(bareJid,AStatus);

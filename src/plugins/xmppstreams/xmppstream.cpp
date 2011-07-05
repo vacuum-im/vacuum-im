@@ -1,6 +1,7 @@
 #include "xmppstream.h"
 
 #include <QInputDialog>
+#include <QTextDocument>
 
 #define KEEP_ALIVE_TIMEOUT          30000
 
@@ -86,10 +87,7 @@ bool XmppStream::open()
 	{
 		bool hasPassword = !FPassword.isEmpty() || !FSessionPassword.isEmpty();
 		if (!hasPassword)
-		{
-			FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(FStreamJid.hBare()),
-			                   QLineEdit::Password,FSessionPassword,&hasPassword,Qt::Dialog);
-		}
+			FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.bare())),QLineEdit::Password,FSessionPassword,&hasPassword,Qt::Dialog);
 
 		if (hasPassword)
 		{
@@ -457,7 +455,7 @@ void XmppStream::onConnectionDisconnected()
 	if (FOfflineJid.isValid())
 	{
 		setStreamJid(FOfflineJid);
-		FOfflineJid = Jid();
+		FOfflineJid = Jid::null;
 	}
 }
 

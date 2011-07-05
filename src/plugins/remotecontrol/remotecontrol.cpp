@@ -581,7 +581,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		field.required = true;
 
 		QMap<Jid, int> unread;
-		foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,Jid(),Message::Normal|Message::Chat|Message::Headline))
+		foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,Jid::null,Message::Normal|Message::Chat|Message::Headline))
 		{
 			Message message = FMessageProcessor->messageById(messageId);
 			if (!message.from().isEmpty() && ARequest.contactJid!=message.from() && !message.body().isEmpty())

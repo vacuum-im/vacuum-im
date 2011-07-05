@@ -226,7 +226,7 @@ bool MessageArchiver::initObjects()
 
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H","Show history"),Shortcuts::WidgetShortcut);
 
-	QString dirPath = collectionDirPath(Jid(),Jid());
+	QString dirPath = collectionDirPath(Jid::null,Jid::null);
 	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
 	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
 	{
@@ -1291,7 +1291,7 @@ IArchiveModifications MessageArchiver::loadLocalModifications(const Jid &AStream
 	IArchiveModifications modifs;
 	modifs.startTime = AStart.toUTC();
 
-	QString dirPath = collectionDirPath(AStreamJid,Jid());
+	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 	if (!dirPath.isEmpty() && AStreamJid.isValid() && AStart.isValid())
 	{
 		QFile log(dirPath+"/"LOG_FILE_NAME);
@@ -1931,7 +1931,7 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 
 bool MessageArchiver::saveLocalModofication(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const
 {
-	QString dirPath = collectionDirPath(AStreamJid,Jid());
+	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 	if (!dirPath.isEmpty() && AStreamJid.isValid() && AHeader.with.isValid() && AHeader.start.isValid())
 	{
 		QFile log(dirPath+"/"LOG_FILE_NAME);
@@ -1956,7 +1956,7 @@ Replicator *MessageArchiver::insertReplicator(const Jid &AStreamJid)
 {
 	if (isSupported(AStreamJid,NS_ARCHIVE_MANAGE) && !FReplicators.contains(AStreamJid))
 	{
-		QString dirPath = collectionDirPath(AStreamJid,Jid());
+		QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 		if (AStreamJid.isValid() && !dirPath.isEmpty())
 		{
 			Replicator *replicator = new Replicator(this,AStreamJid,dirPath,this);
@@ -2390,7 +2390,7 @@ bool MessageArchiver::isOTRStanzaSession(const Jid &AStreamJid, const Jid &ACont
 
 void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	QString dirPath = collectionDirPath(AStreamJid,Jid());
+	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 	if (AStreamJid.isValid() && !dirPath.isEmpty())
 	{
 		QDomDocument sessions;
@@ -2419,7 +2419,7 @@ void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid 
 
 void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId)
 {
-	QString dirPath = collectionDirPath(AStreamJid,Jid());
+	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 	if (AStreamJid.isValid() && !dirPath.isEmpty())
 	{
 		QFile file(dirPath+"/"SESSIONS_FILE_NAME);
@@ -2464,7 +2464,7 @@ void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const Q
 
 void MessageArchiver::removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const
 {
-	QString dirPath = collectionDirPath(AStreamJid,Jid());
+	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 	if (AStreamJid.isValid() && !dirPath.isEmpty())
 	{
 		QDomDocument sessions;
@@ -2866,7 +2866,7 @@ void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 		{
 			if (identity.category==CATEGORY_GATEWAY && !identity.type.isEmpty())
 			{
-				QString dirPath = collectionDirPath(Jid(),Jid());
+				QString dirPath = collectionDirPath(Jid::null,Jid::null);
 				QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
 				if (!dirPath.isEmpty() && gateways.open(QFile::WriteOnly|QFile::Append|QFile::Text))
 				{

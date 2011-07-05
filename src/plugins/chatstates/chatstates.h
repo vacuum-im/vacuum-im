@@ -87,7 +87,7 @@ signals:
 protected:
 	bool isSendingPossible(const Jid &AStreamJid, const Jid &AContactJid) const;
 	void sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid, int AState) const;
-	void resetSupported(const Jid &AContactJid = Jid());
+	void resetSupported(const Jid &AContactJid = Jid::null);
 	void setSupported(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported);
 	void setUserState(const Jid &AStreamJid, const Jid &AContactJid, int AState);
 	void setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int AState, bool ASend = true);

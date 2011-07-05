@@ -48,7 +48,7 @@ public:
 	virtual bool setPresence(int AShow, const QString &AStatus, int APriority) =0;
 	virtual bool sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
 	virtual IPresenceItem presenceItem(const Jid &AItemJid) const =0;
-	virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid()) const =0;
+	virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid::null) const =0;
 protected:
 	virtual void opened() =0;
 	virtual void changed(int AShow, const QString &AStatus, int APriority) =0;

@@ -382,7 +382,7 @@ IPrivacyRule PrivacyLists::autoListRule(const Jid &AContactJid, const QString &A
 
 IPrivacyRule PrivacyLists::autoListRule(const QString &AGroup, const QString &AAutoList) const
 {
-	IPrivacyRule rule = autoListRule(Jid(),AAutoList);
+	IPrivacyRule rule = autoListRule(Jid::null,AAutoList);
 	rule.type = PRIVACY_TYPE_GROUP;
 	rule.value = AGroup;
 	return rule;

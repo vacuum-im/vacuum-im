@@ -575,7 +575,7 @@ QStandardItem *ViewHistoryWindow::createHeaderItem(const IArchiveHeader &AHeader
 	if (FStatusIcons)
 		itemName->setIcon(FStatusIcons->iconByJidStatus(AHeader.with,IPresence::Online,SUBSCRIPTION_BOTH,false));
 
-	QString itemToolTip = AHeader.with.hFull();
+	QString itemToolTip = Qt::escape(AHeader.with.full());
 	if (!AHeader.subject.isEmpty())
 		itemToolTip += "<hr>" + Qt::escape(AHeader.subject);
 	itemName->setToolTip(itemToolTip);
@@ -606,9 +606,9 @@ void ViewHistoryWindow::updateHeaderItem(const IArchiveHeader &AHeader)
 		itemName->setData(AHeader.threadId,HDR_HEADER_THREAD);
 		itemName->setData(AHeader.version,HDR_HEADER_VERSION);
 		if (!AHeader.subject.isEmpty())
-			itemName->setToolTip(QString("%1 <br> %2").arg(AHeader.with.hFull()).arg(Qt::escape(AHeader.subject)));
+			itemName->setToolTip(QString("%1 <br> %2").arg(Qt::escape(AHeader.with.full())).arg(Qt::escape(AHeader.subject)));
 		else
-			itemName->setToolTip(AHeader.with.hFull());
+			itemName->setToolTip(Qt::escape(AHeader.with.full()));
 	}
 	
 	int currentIndex = FCurrentHeaders.indexOf(AHeader);

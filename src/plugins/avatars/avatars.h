@@ -78,7 +78,7 @@ signals:
 protected:
 	QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
 	void updatePresence(const Jid &AStreamJid) const;
-	void updateDataHolder(const Jid &AContactJid = Jid());
+	void updateDataHolder(const Jid &AContactJid = Jid::null);
 	bool updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bool AFromVCard);
 	bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
 protected slots:

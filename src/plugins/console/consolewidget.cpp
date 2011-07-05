@@ -182,7 +182,7 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 
 			int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
 			FTimePoint = QTime::currentTime();
-			QString caption = (ASended ? sended : received).arg(AXmppStream->streamJid().hFull()).arg(FTimePoint.toString()).arg(delta);
+			QString caption = (ASended ? sended : received).arg(Qt::escape(AXmppStream->streamJid().full())).arg(FTimePoint.toString()).arg(delta);
 			ui.tedConsole->append(caption);
 
 			QString xml = stanza.toString(2);

@@ -266,7 +266,7 @@ int StatusChanger::mainStatus() const
 
 void StatusChanger::setMainStatus(int AStatusId)
 {
-	setStreamStatus(Jid(), AStatusId);
+	setStreamStatus(Jid::null, AStatusId);
 }
 
 QList<Jid> StatusChanger::statusStreams(int AStatusId) const
@@ -658,7 +658,7 @@ void StatusChanger::createStatusActions(int AStatusId)
 {
 	int group = AStatusId > STATUS_MAX_STANDART_ID ? AG_SCSM_STATUSCHANGER_CUSTOM_STATUS : AG_SCSM_STATUSCHANGER_DEFAULT_STATUS;
 
-	FMainMenu->addAction(createStatusAction(AStatusId,Jid(),FMainMenu),group,true);
+	FMainMenu->addAction(createStatusAction(AStatusId,Jid::null,FMainMenu),group,true);
 	for (QMap<IPresence *, Menu *>::const_iterator it = FStreamMenu.constBegin(); it!=FStreamMenu.constEnd(); it++)
 		it.value()->addAction(createStatusAction(AStatusId,it.key()->streamJid(),it.value()),group,true);
 }
@@ -688,11 +688,9 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 
 		Menu *sMenu = new Menu(FMainMenu);
 		if (account)
-		{
 			sMenu->setTitle(account->name());
-		}
 		else
-			sMenu->setTitle(APresence->streamJid().hFull());
+			sMenu->setTitle(APresence->streamJid().full());
 		FStreamMenu.insert(APresence,sMenu);
 
 		QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin();

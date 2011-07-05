@@ -1138,7 +1138,7 @@ void MultiUserChatWindow::showUserMessage(const Message &AMessage, const QString
 		if (user)
 			options.senderIcon = FMessageStyles->userIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
 		else
-			options.senderIcon = FMessageStyles->userIcon(Jid(),IPresence::Offline,SUBSCRIPTION_BOTH,false);
+			options.senderIcon = FMessageStyles->userIcon(Jid::null,IPresence::Offline,SUBSCRIPTION_BOTH,false);
 	}
 
 	if (FMultiChat->nickName()!=ANick)
@@ -1196,7 +1196,7 @@ void MultiUserChatWindow::updateWindow()
 	setWindowIconText(roomName);
 	setWindowTitle(tr("%1 - Conference").arg(roomName));
 
-	ui.lblRoom->setText(QString("<big><b>%1</b></big> - %2").arg(FMultiChat->roomJid().hFull()).arg(Qt::escape(FMultiChat->nickName())));
+	ui.lblRoom->setText(QString("<big><b>%1</b></big> - %2").arg(Qt::escape(FMultiChat->roomJid().full())).arg(Qt::escape(FMultiChat->nickName())));
 
 	emit windowChanged();
 }
@@ -1719,7 +1719,7 @@ void MultiUserChatWindow::onMessageReceived(const QString &ANick, const Message 
 
 void MultiUserChatWindow::onInviteDeclined(const Jid &AContactJid, const QString &AReason)
 {
-	QString nick = AContactJid && roomJid() ? AContactJid.resource() : AContactJid.hFull();
+	QString nick = AContactJid && roomJid() ? AContactJid.resource() : AContactJid.full();
 	showStatusMessage(tr("%1 has declined your invite to this room. %2").arg(nick).arg(AReason),IMessageContentOptions::Notification);
 }
 

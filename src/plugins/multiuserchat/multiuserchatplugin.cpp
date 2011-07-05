@@ -432,7 +432,7 @@ bool MultiUserChatPlugin::showMessage(int AMessageId)
 		fields.password = inviteElem.firstChildElement("password").text();
 
 		QString reason = inviteElem.firstChildElement("reason").text();
-		QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(roomJid.hBare()).arg(fromJid.hFull()).arg(Qt::escape(reason));
+		QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(Qt::escape(roomJid.bare())).arg(Qt::escape(fromJid.full())).arg(Qt::escape(reason));
 		msg+="<br><br>";
 		msg+=tr("Do you want to join this conference?");
 
@@ -797,7 +797,7 @@ void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *A
 	{
 		if (AIndex->type() == RIT_STREAM_ROOT)
 		{
-			Action *action = createJoinAction(AIndex->data(RDR_JID).toString(),Jid(),AMenu);
+			Action *action = createJoinAction(AIndex->data(RDR_JID).toString(),Jid::null,AMenu);
 			AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT,true);
 		}
 	}
