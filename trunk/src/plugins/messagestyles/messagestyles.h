@@ -48,8 +48,8 @@ public:
 	virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const;
 	//Other functions
 	virtual QString userAvatar(const Jid &AContactJid) const;
-	virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const;
-	virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const;
+	virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;
+	virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;
 	virtual QString userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const;
 	virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const;
 signals:

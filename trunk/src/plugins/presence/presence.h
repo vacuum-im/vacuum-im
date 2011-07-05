@@ -33,7 +33,7 @@ public:
 	virtual bool setPresence(int AShow, const QString &AStatus, int APriority);
 	virtual bool sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
 	virtual IPresenceItem presenceItem(const Jid &AItemJid) const { return FItems.value(AItemJid); }
-	virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid()) const;
+	virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid::null) const;
 signals:
 	void opened();
 	void changed(int AShow, const QString &AStatus, int APriority);

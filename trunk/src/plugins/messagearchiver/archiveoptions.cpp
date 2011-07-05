@@ -305,7 +305,7 @@ void ArchiveOptions::onAddItemPrefClicked()
 	}
 	else if (!itemJid.isEmpty())
 	{
-		QMessageBox::warning(this,tr("Unacceptable item JID"),tr("'%1' is not valid JID or already exists").arg(itemJid.hFull()));
+		QMessageBox::warning(this,tr("Unacceptable item JID"),tr("'%1' is not valid JID or already exists").arg(Qt::escape(itemJid.full())));
 	}
 }
 

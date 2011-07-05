@@ -175,12 +175,12 @@ void AddContactDialog::onDialogAccepted()
 		}
 		else
 		{
-			QMessageBox::information(NULL,FStreamJid.full(),tr("Contact <b>%1</b> already exists.").arg(contactJid().hBare()));
+			QMessageBox::information(NULL,FStreamJid.full(),tr("Contact <b>%1</b> already exists.").arg(Qt::escape(contactJid().bare())));
 		}
 	}
 	else if (!contactJid().isEmpty())
 	{
-		QMessageBox::warning(this,FStreamJid.bare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(contactJid().hBare()));
+		QMessageBox::warning(this,FStreamJid.bare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(Qt::escape(contactJid().bare())));
 	}
 }
 

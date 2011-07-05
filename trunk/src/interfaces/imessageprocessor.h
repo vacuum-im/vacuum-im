@@ -35,7 +35,7 @@ public:
 	virtual void showMessage(int AMessageId) =0;
 	virtual void removeMessage(int AMessageId) =0;
 	virtual Message messageById(int AMessageId) const =0;
-	virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid(), int AMesTypes = Message::AnyType) =0;
+	virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid::null, int AMesTypes = Message::AnyType) =0;
 	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = "") const =0;
 	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = "") const =0;
 	virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) const =0;
