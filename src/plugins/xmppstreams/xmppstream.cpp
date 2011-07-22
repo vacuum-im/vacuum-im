@@ -85,6 +85,8 @@ bool XmppStream::open()
 {
 	if (FConnection && FStreamState==SS_OFFLINE)
 	{
+		FErrorString.clear();
+
 		bool hasPassword = !FPassword.isEmpty() || !FSessionPassword.isEmpty();
 		if (!hasPassword)
 			FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.bare())),QLineEdit::Password,FSessionPassword,&hasPassword,Qt::Dialog);
