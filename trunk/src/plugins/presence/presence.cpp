@@ -75,12 +75,16 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			Jid fromJid = AStanza.from();
 
 			IPresenceItem &pitem = FItems[fromJid];
+			IPresenceItem before = pitem;
+
 			pitem.isValid = true;
 			pitem.itemJid = fromJid;
 			pitem.show = show;
 			pitem.priority = priority;
 			pitem.status = status;
-			emit received(pitem);
+
+			if (pitem != before)
+				emit received(pitem);
 
 			if (show == Offline)
 				FItems.remove(fromJid);

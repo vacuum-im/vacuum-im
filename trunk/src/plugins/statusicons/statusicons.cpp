@@ -162,7 +162,7 @@ QVariant StatusIcons::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
 	if (ARole == Qt::DecorationRole)
 	{
-		Jid contactJid = AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 		if (contactJid.isValid())
 		{
 			int show = AIndex->data(RDR_SHOW).toInt();
@@ -432,8 +432,8 @@ void StatusIcons::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 {
 	if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
 	{
-		updateCustomIconMenu(QRegExp::escape(AIndex->data(RDR_BARE_JID).toString()));
-		FCustomIconMenu->setIcon(iconByJidStatus(AIndex->data(RDR_JID).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
+		updateCustomIconMenu(QRegExp::escape(AIndex->data(RDR_PREP_BARE_JID).toString()));
+		FCustomIconMenu->setIcon(iconByJidStatus(AIndex->data(RDR_FULL_JID).toString(),IPresence::Online,SUBSCRIPTION_BOTH,false));
 		AMenu->addAction(FCustomIconMenu->menuAction(),AG_RVCM_STATUSICONS,true);
 	}
 }

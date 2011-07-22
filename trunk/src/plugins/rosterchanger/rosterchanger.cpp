@@ -230,7 +230,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 
 			int indexType = indexData.value(RDR_TYPE).toInt();
 			Jid indexStreamJid = indexData.value(RDR_STREAM_JID).toString();
-			bool isNewContact = indexType==RIT_CONTACT && !roster->rosterItem(indexData.value(RDR_BARE_JID).toString()).isValid;
+			bool isNewContact = indexType==RIT_CONTACT && !roster->rosterItem(indexData.value(RDR_PREP_BARE_JID).toString()).isValid;
 
 			if (!isNewContact && (hoverStreamJid && indexStreamJid))
 			{
@@ -243,7 +243,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 					if (indexType == RIT_CONTACT)
 					{
 						copyAction->setText(tr("Copy contact"));
-						copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+						copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
 						connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyContactToGroup(bool)));
 						AMenu->addAction(copyAction,AG_DEFAULT,true);
 					}
@@ -266,7 +266,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 					if (indexType == RIT_CONTACT)
 					{
 						moveAction->setText(tr("Move contact"));
-						moveAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+						moveAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
 						moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
 						connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveContactToGroup(bool)));
 						AMenu->addAction(moveAction,AG_DEFAULT,true);
@@ -292,7 +292,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 				if (indexType == RIT_CONTACT)
 				{
 					copyAction->setText(isNewContact ? tr("Add contact") : tr("Copy contact"));
-					copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_BARE_JID));
+					copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
 					copyAction->setData(ADR_NICK,indexData.value(RDR_NAME));
 					connect(copyAction,SIGNAL(triggered(bool)),SLOT(onAddContactToGroup(bool)));
 					AMenu->addAction(copyAction,AG_DEFAULT,true);
@@ -561,7 +561,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 		if (ABlankGroup)
 		{
 			Action *blankGroupAction = new Action(menu);
-			blankGroupAction->setText(FRostersModel!=NULL ? FRostersModel->blankGroupName() : tr("Blank Group"));
+			blankGroupAction->setText(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_BLANK) : tr("Blank Group"));
 			blankGroupAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_GROUP);
 			blankGroupAction->setData(AData);
 			blankGroupAction->setData(ADR_TO_GROUP,QVariant(QString("")));
@@ -623,7 +623,7 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		if (AId == SCT_ROSTERVIEW_ADDCONTACT)
 		{
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
-			IRosterItem ritem = roster!=NULL ? roster->rosterItem(index.data(RDR_BARE_JID).toString()) : IRosterItem();
+			IRosterItem ritem = roster!=NULL ? roster->rosterItem(index.data(RDR_PREP_BARE_JID).toString()) : IRosterItem();
 			bool showDialog = itemType==RIT_GROUP || itemType==RIT_STREAM_ROOT;
 			showDialog = showDialog || (!ritem.isValid && (itemType==RIT_CONTACT || itemType==RIT_AGENT));
 			IAddContactDialog *dialog = showDialog ? showAddContactDialog(streamJid) : NULL;
@@ -632,7 +632,7 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 				if (itemType == RIT_GROUP)
 					dialog->setGroup(index.data(RDR_GROUP).toString());
 				else if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
-					dialog->setContactJid(index.data(RDR_BARE_JID).toString());
+					dialog->setContactJid(index.data(RDR_PREP_BARE_JID).toString());
 			}
 		}
 		else if (AId == SCT_ROSTERVIEW_RENAME)
@@ -640,31 +640,31 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			if (itemType == RIT_GROUP)
 				renameGroup(streamJid,index.data(RDR_GROUP).toString());
 			else if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
-				renameContact(streamJid,index.data(RDR_BARE_JID).toString(),index.data(RDR_NAME).toString());
+				renameContact(streamJid,index.data(RDR_PREP_BARE_JID).toString(),index.data(RDR_NAME).toString());
 		}
 		else if (AId == SCT_ROSTERVIEW_REMOVEFROMGROUP)
 		{
 			if (itemType == RIT_GROUP)
 				removeGroup(streamJid,index.data(RDR_GROUP).toString());
 			else if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
-				removeContactFromGroup(streamJid,index.data(RDR_BARE_JID).toString(),index.data(RDR_GROUP).toString());
+				removeContactFromGroup(streamJid,index.data(RDR_PREP_BARE_JID).toString(),index.data(RDR_GROUP).toString());
 		}
 		else if (AId == SCT_ROSTERVIEW_REMOVEFROMROSTER)
 		{
 			if (itemType == RIT_GROUP)
 				removeGroupContacts(streamJid,index.data(RDR_GROUP).toString());
 			else if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
-				removeContactFromRoster(streamJid,index.data(RDR_BARE_JID).toString());
+				removeContactFromRoster(streamJid,index.data(RDR_PREP_BARE_JID).toString());
 		}
 		else if (AId == SCT_ROSTERVIEW_SUBSCRIBE)
 		{
 			if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
-				contactSubscription(streamJid,index.data(RDR_BARE_JID).toString(),IRoster::Subscribe);
+				contactSubscription(streamJid,index.data(RDR_PREP_BARE_JID).toString(),IRoster::Subscribe);
 		}
 		else if (AId == SCT_ROSTERVIEW_UNSUBSCRIBE)
 		{
 			if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
-				contactSubscription(streamJid,index.data(RDR_BARE_JID).toString(),IRoster::Unsubscribe);
+				contactSubscription(streamJid,index.data(RDR_PREP_BARE_JID).toString(),IRoster::Unsubscribe);
 		}
 	}
 }
@@ -676,13 +676,13 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 	if (roster && roster->isOpen())
 	{
 		int itemType = AIndex->data(RDR_TYPE).toInt();
-		IRosterItem ritem = roster->rosterItem(AIndex->data(RDR_BARE_JID).toString());
+		IRosterItem ritem = roster->rosterItem(AIndex->data(RDR_PREP_BARE_JID).toString());
 		if (itemType == RIT_STREAM_ROOT)
 		{
 			Action *action = new Action(AMenu);
 			action->setText(tr("Add contact..."));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-			action->setData(ADR_STREAM_JID,AIndex->data(RDR_JID));
+			action->setData(ADR_STREAM_JID,AIndex->data(RDR_FULL_JID));
 			action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
 			AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
@@ -696,7 +696,7 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 			QHash<int,QVariant> data;
 			data.insert(ADR_STREAM_JID,streamJid);
-			data.insert(ADR_CONTACT_JID,AIndex->data(RDR_BARE_JID).toString());
+			data.insert(ADR_CONTACT_JID,AIndex->data(RDR_PREP_BARE_JID).toString());
 
 			Menu *subsMenu = new Menu(AMenu);
 			subsMenu->setTitle(tr("Subscription"));
@@ -798,7 +798,7 @@ void RosterChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 				action->setText(tr("Add contact..."));
 				action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
 				action->setData(ADR_STREAM_JID,streamJid);
-				action->setData(ADR_CONTACT_JID,AIndex->data(RDR_JID));
+				action->setData(ADR_CONTACT_JID,AIndex->data(RDR_FULL_JID));
 				action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
 				AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
@@ -978,12 +978,12 @@ void RosterChanger::removeContactFromRoster(const Jid &AStreamJid, const Jid &AC
 		}
 		else if (FRostersModel)
 		{
-			QMultiHash<int, QVariant> data;
-			data.insert(RDR_TYPE,RIT_CONTACT);
-			data.insert(RDR_TYPE,RIT_AGENT);
-			data.insert(RDR_BARE_JID,AContactJid.pBare());
+			QMultiMap<int, QVariant> findData;
+			findData.insert(RDR_TYPE,RIT_CONTACT);
+			findData.insert(RDR_TYPE,RIT_AGENT);
+			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 			IRosterIndex *streamIndex = FRostersModel->streamRoot(AStreamJid);
-			foreach(IRosterIndex *index, streamIndex->findChild(data,true))
+			foreach(IRosterIndex *index, streamIndex->findChilds(findData,true))
 				FRostersModel->removeRosterIndex(index);
 		}
 	}

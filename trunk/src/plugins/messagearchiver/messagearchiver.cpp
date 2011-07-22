@@ -2691,7 +2691,7 @@ void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			{
 				IArchiveFilter filter;
 				if (indexType != RIT_STREAM_ROOT)
-					filter.with = index.data(RDR_JID).toString();
+					filter.with = index.data(RDR_FULL_JID).toString();
 				filter.start = QDateTime::currentDateTime().addMonths(-1);
 				showArchiveWindow(index.data(RDR_STREAM_JID).toString(),filter,indexType==RIT_STREAM_ROOT ? IArchiveWindow::GK_CONTACT : IArchiveWindow::GK_NO_GROUPS);
 			}
@@ -2704,7 +2704,7 @@ void MessageArchiver::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu
 	if (AIndex->type()==RIT_STREAM_ROOT || AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 		Menu *menu = createContextMenu(streamJid,AIndex->type()==RIT_STREAM_ROOT ? contactJid : contactJid.bare(),AMenu);
 		if (menu)
 			AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);

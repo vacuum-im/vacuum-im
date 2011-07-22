@@ -198,7 +198,7 @@ bool ChatMessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
 	if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 		return openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat);
 	}
 	return false;
@@ -615,7 +615,7 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(index.data(RDR_STREAM_JID).toString()) : NULL;
 			if (presence && presence->isOpen() && ChatActionTypes.contains(index.data(RDR_TYPE).toInt()))
 			{
-				openWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_JID).toString(),Message::Chat);
+				openWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString(),Message::Chat);
 			}
 		}
 	}
@@ -626,7 +626,7 @@ void ChatMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AM
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
-		Jid contactJid = AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 		if (ChatActionTypes.contains(AIndex->type()))
 		{
 			Action *action = new Action(AMenu);

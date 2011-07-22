@@ -797,7 +797,7 @@ void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *A
 	{
 		if (AIndex->type() == RIT_STREAM_ROOT)
 		{
-			Action *action = createJoinAction(AIndex->data(RDR_JID).toString(),Jid::null,AMenu);
+			Action *action = createJoinAction(AIndex->data(RDR_FULL_JID).toString(),Jid::null,AMenu);
 			AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT,true);
 		}
 	}

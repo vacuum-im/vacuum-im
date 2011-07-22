@@ -219,7 +219,7 @@ bool FileTransfer::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
 {
 	Q_UNUSED(AEvent);
-	return AHover.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover.data(RDR_STREAM_JID).toString(), AHover.data(RDR_JID).toString());
+	return AHover.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover.data(RDR_STREAM_JID).toString(), AHover.data(RDR_FULL_JID).toString());
 }
 
 void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
@@ -235,7 +235,7 @@ bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, const QModelIndex 
 		action->setText(tr("Send File"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILETRANSFER_SEND);
 		action->setData(ADR_STREAM_JID,AIndex.data(RDR_STREAM_JID).toString());
-		action->setData(ADR_CONTACT_JID,AIndex.data(RDR_JID).toString());
+		action->setData(ADR_CONTACT_JID,AIndex.data(RDR_FULL_JID).toString());
 		action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().first().toLocalFile());
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
 		AMenu->addAction(action, AG_DEFAULT, true);
@@ -742,7 +742,7 @@ void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			int indexType = index.data(RDR_TYPE).toInt();
 			if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
 			{
-				sendFile(index.data(RDR_STREAM_JID).toString(),index.data(RDR_JID).toString());
+				sendFile(index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString());
 			}
 		}
 	}

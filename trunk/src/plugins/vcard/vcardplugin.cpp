@@ -336,7 +336,7 @@ void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			int indexType = index.data(RDR_TYPE).toInt();
 			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
 			{
-				showVCardDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_BARE_JID).toString());
+				showVCardDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_PREP_BARE_JID).toString());
 			}
 		}
 	}
@@ -350,7 +350,7 @@ void VCardPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 		action->setText(tr("Show vCard"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
 		action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-		action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_JID).toString()).bare());
+		action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_FULL_JID).toString()).bare());
 		action->setShortcutId(SCT_ROSTERVIEW_SHOWVCARD);
 		AMenu->addAction(action,AG_RVCM_VCARD,true);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));

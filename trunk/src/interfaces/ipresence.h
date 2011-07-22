@@ -19,6 +19,12 @@ struct IPresenceItem
 	int show;
 	int priority;
 	QString status;
+	bool operator==(const IPresenceItem &AOther) const {
+		return itemJid==AOther.itemJid && show==AOther.show && priority==AOther.priority && status==AOther.status;
+	}
+	bool operator!=(const IPresenceItem &AOther) const {
+		return !operator==(AOther);
+	}
 };
 
 class IPresence

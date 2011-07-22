@@ -27,7 +27,6 @@ class IRosterIndex
 public:
 	virtual QObject *instance() =0;
 	virtual int type() const =0;
-	virtual QString id() const =0;
 	virtual IRosterIndex *parentIndex() const =0;
 	virtual void setParentIndex(IRosterIndex *AIndex) =0;
 	virtual int row() const =0;
@@ -44,8 +43,8 @@ public:
 	virtual QVariant data(int ARole) const =0;
 	virtual QMap<int, QVariant> data() const =0;
 	virtual void setData(int ARole, const QVariant &) =0;
-	virtual QList<IRosterIndex *> findChild(const QMultiHash<int, QVariant> AData, bool ASearchInChilds = false) const =0;
-	virtual bool removeOnLastChildRemoved() const=0;
+	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const =0;
+	virtual bool removeOnLastChildRemoved() const =0;
 	virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
 	virtual bool removeChildsOnRemoved() const =0;
 	virtual void setRemoveChildsOnRemoved(bool ARemove) =0;
@@ -69,23 +68,20 @@ public:
 	virtual IRosterIndex *addStream(const Jid &AStreamJid) =0;
 	virtual QList<Jid> streams() const =0;
 	virtual void removeStream(const Jid &AStreamJid) =0;
-	virtual IRosterIndex *streamRoot(const Jid &AStreamJid) const =0;
 	virtual IRosterIndex *rootIndex() const =0;
-	virtual IRosterIndex *createRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) =0;
-	virtual IRosterIndex *createGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) =0;
+	virtual IRosterIndex *streamRoot(const Jid &AStreamJid) const =0;
+	virtual IRosterIndex *createRosterIndex(int AType, IRosterIndex *AParent) =0;
+	virtual IRosterIndex *findGroupIndex(int AType, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const =0;
+	virtual IRosterIndex *createGroupIndex(int AType, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) =0;
 	virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent) =0;
 	virtual void removeRosterIndex(IRosterIndex *AIndex) =0;
 	virtual QList<IRosterIndex *> getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false) =0;
-	virtual IRosterIndex *findRosterIndex(int AType, const QString &AId, IRosterIndex *AParent) const =0;
-	virtual IRosterIndex *findGroup(const QString &AName, const QString &AGroupDelim, int AType, IRosterIndex *AParent) const =0;
-	virtual void insertDefaultDataHolder(IRosterDataHolder *ADataHolder) =0;
-	virtual void removeDefaultDataHolder(IRosterDataHolder *ADataHolder) =0;
 	virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) const =0;
 	virtual IRosterIndex *rosterIndexByModelIndex(const QModelIndex &AIndex) const =0;
-	virtual QString blankGroupName() const =0;
-	virtual QString agentsGroupName() const =0;
-	virtual QString myResourcesGroupName() const =0;
-	virtual QString notInRosterGroupName() const =0;
+	virtual QString singleGroupName(int AType) const =0;
+	virtual void registerSingleGroup(int AType, const QString &AName) =0;
+	virtual void insertDefaultDataHolder(IRosterDataHolder *ADataHolder) =0;
+	virtual void removeDefaultDataHolder(IRosterDataHolder *ADataHolder) =0;
 protected:
 	virtual void streamAdded(const Jid &AStreamJid) =0;
 	virtual void streamRemoved(const Jid &AStreamJid) =0;

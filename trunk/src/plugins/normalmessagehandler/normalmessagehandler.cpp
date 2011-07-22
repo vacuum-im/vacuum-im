@@ -501,7 +501,7 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
 			if (presence && presence->isOpen() && MessageActionTypes.contains(index.data(RDR_TYPE).toInt()))
 			{
-				Jid contactJid = index.data(RDR_JID).toString();
+				Jid contactJid = index.data(RDR_FULL_JID).toString();
 				openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal);
 
 				QString group = index.data(RDR_TYPE).toInt()==RIT_GROUP ? index.data(RDR_GROUP).toString() : QString::null;
@@ -524,7 +524,7 @@ void NormalMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *
 	{
 		if (MessageActionTypes.contains(AIndex->type()))
 		{
-			Jid contactJid = AIndex->data(RDR_JID).toString();
+			Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 			Action *action = new Action(AMenu);
 			action->setText(tr("Send message"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);

@@ -303,14 +303,14 @@ QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
 	if (ARole == RDR_AVATAR_IMAGE)
 	{
-		QImage avatar = avatarImage(AIndex->data(RDR_JID).toString());
+		QImage avatar = avatarImage(AIndex->data(RDR_FULL_JID).toString());
 		if (avatar.isNull() && FShowEmptyAvatars)
 			avatar = FEmptyAvatar;
 		return avatar;
 	}
 	else if (ARole == RDR_AVATAR_HASH)
 	{
-		return avatarHash(AIndex->data(RDR_JID).toString());
+		return avatarHash(AIndex->data(RDR_FULL_JID).toString());
 	}
 	return QVariant();
 }
@@ -474,12 +474,12 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 {
 	if (FRostersModel)
 	{
-		QMultiHash<int,QVariant> findData;
+		QMultiMap<int,QVariant> findData;
 		foreach(int type, rosterDataTypes())
 			findData.insert(RDR_TYPE,type);
 		if (!AContactJid.isEmpty())
-			findData.insert(RDR_BARE_JID,AContactJid.pBare());
-		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData,true);
+			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
+		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
 		foreach (IRosterIndex *index, indexes)
 		{
 			emit rosterDataChanged(index,RDR_AVATAR_HASH);
@@ -601,7 +601,7 @@ void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
 	if (FRostersViewPlugin &&  rosterDataTypes().contains(AIndex->type()))
 	{
-		Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
+		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		if (!FVCardAvatars.contains(contactJid))
 			onVCardChanged(contactJid);
 		if (FAvatarsVisible)
@@ -641,7 +641,7 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 		picture->setTitle(tr("Custom picture"));
 		picture->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CHANGE);
 
-		Jid contactJid = AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 		Action *setup = new Action(picture);
 		setup->setText(tr("Set custom picture"));
 		setup->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CUSTOM);
@@ -763,10 +763,10 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 		{
 			if (FAvatarsVisible)
 			{
-				QMultiHash<int,QVariant> findData;
+				QMultiMap<int,QVariant> findData;
 				foreach(int type, rosterDataTypes())
 					findData.insertMulti(RDR_TYPE,type);
-				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData, true);
+				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData, true);
 
 				FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_AVATAR_IMAGE, RDR_AVATAR_IMAGE);
 				foreach (IRosterIndex *index, indexes)
