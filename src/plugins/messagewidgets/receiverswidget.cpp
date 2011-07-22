@@ -156,7 +156,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiver(const Jid &AReceiver, const QStrin
 		contactItem->setIcon(0,FStatusIcons->iconByJid(FStreamJid,AReceiver));
 		contactItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
 		contactItem->setData(0,RDR_TYPE,RIT_CONTACT);
-		contactItem->setData(0,RDR_JID,AReceiver.full());
+		contactItem->setData(0,RDR_FULL_JID,AReceiver.full());
 		contactItem->setData(0,RDR_NAME,AName);
 		FContactItems.insert(AReceiver,contactItem);
 	}
@@ -232,7 +232,7 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int /*AColu
 
 	if (AItem->data(0,RDR_TYPE).toInt() == RIT_CONTACT)
 	{
-		Jid contactJid = AItem->data(0,RDR_JID).toString();
+		Jid contactJid = AItem->data(0,RDR_FULL_JID).toString();
 		if (AItem->checkState(0) == Qt::Checked && !FReceivers.contains(contactJid))
 		{
 			FReceivers.append(contactJid);

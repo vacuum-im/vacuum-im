@@ -421,7 +421,7 @@ bool ServiceDiscovery::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	if (AIndex->type()==RIT_AGENT && FSelfCaps.contains(streamJid))
 	{
-		showDiscoItems(streamJid,AIndex->data(RDR_JID).toString(),QString::null);
+		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
 	}
 	return false;
 }
@@ -1323,7 +1323,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMen
 	if (itype == RIT_STREAM_ROOT || itype == RIT_CONTACT || itype == RIT_AGENT || itype == RIT_MY_RESOURCE)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = itype == RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
+		Jid contactJid = itype == RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
 
 		if (FSelfCaps.contains(streamJid))
 		{
@@ -1351,7 +1351,7 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
 	if (ALabelId == RLID_DISPLAY)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
 		if (hasDiscoInfo(streamJid,contactJid))
 		{
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);

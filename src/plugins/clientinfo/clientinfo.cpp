@@ -848,7 +848,7 @@ void ClientInfo::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
 		if (presence && presence->xmppStream()->isOpen())
 		{
-			Jid contactJid = AIndex->data(RDR_JID).toString();
+			Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 			int show = AIndex->data(RDR_SHOW).toInt();
 			QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(streamJid,contactJid).features : QStringList();
 			if (show != IPresence::Offline && show != IPresence::Error && !features.contains(NS_JABBER_VERSION))
@@ -869,7 +869,7 @@ void ClientInfo::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMult
 {
 	if (ALabelId == RLID_DISPLAY)
 	{
-		Jid contactJid = AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 
 		if (hasSoftwareInfo(contactJid))
 			AToolTips.insert(RTTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(Qt::escape(softwareName(contactJid))).arg(Qt::escape(softwareVersion(contactJid))));

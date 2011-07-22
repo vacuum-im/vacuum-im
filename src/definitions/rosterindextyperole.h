@@ -18,12 +18,11 @@ enum RosterIndexTypes {
 enum RosterIndexDataRoles {
 	RDR_ANY_ROLE = 32,
 	RDR_TYPE,
-	RDR_INDEX_ID,
 	//XMPP Roles
 	RDR_STREAM_JID,
-	RDR_JID,
-	RDR_PJID,
-	RDR_BARE_JID,
+	RDR_FULL_JID,
+	RDR_PREP_FULL_JID,
+	RDR_PREP_BARE_JID,
 	RDR_NAME,
 	RDR_GROUP,
 	RDR_SHOW,

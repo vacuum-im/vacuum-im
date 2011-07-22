@@ -30,6 +30,12 @@ struct IRosterItem
 	QString subscription;
 	QString ask;
 	QSet<QString> groups;
+	bool operator==(const IRosterItem &AOther) const {
+		return itemJid==AOther.itemJid && name==AOther.name && groups==AOther.groups && subscription==AOther.subscription && ask==AOther.ask;
+	}
+	bool operator!=(const IRosterItem &AOther) const {
+		return !operator==(AOther);
+	}
 };
 
 class IRoster 

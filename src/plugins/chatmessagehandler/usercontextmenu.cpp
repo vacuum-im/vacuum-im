@@ -26,7 +26,7 @@ bool UserContextMenu::isAcceptedIndex(IRosterIndex *AIndex)
 {
 	if (AIndex!=NULL && FChatWindow->streamJid()==AIndex->data(RDR_STREAM_JID).toString())
 	{
-		Jid indexJid = AIndex->data(RDR_PJID).toString();
+		Jid indexJid = AIndex->data(RDR_PREP_FULL_JID).toString();
 		if (FChatWindow->contactJid() == indexJid)
 			return true;
 		if (indexJid.resource().isEmpty() && (FChatWindow->contactJid() && indexJid))
@@ -43,7 +43,7 @@ void UserContextMenu::updateMenu()
 		if (name.isEmpty())
 			name = FChatWindow->contactJid().bare();
 
-		Jid jid = FRosterIndex->data(RDR_PJID).toString();
+		Jid jid = FRosterIndex->data(RDR_PREP_FULL_JID).toString();
 		if (!jid.resource().isEmpty())
 			name += "/" + jid.resource();
 
@@ -81,7 +81,7 @@ void UserContextMenu::onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole)
 {
 	if (AIndex == FRosterIndex)
 	{
-		if (ARole == RDR_PJID)
+		if (ARole == RDR_PREP_FULL_JID)
 		{
 			if (isAcceptedIndex(AIndex))
 				updateMenu();
@@ -93,7 +93,7 @@ void UserContextMenu::onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole)
 			updateMenu();
 		}
 	}
-	else if (FRosterIndex==NULL && ARole==RDR_PJID && isAcceptedIndex(AIndex))
+	else if (FRosterIndex==NULL && ARole==RDR_PREP_FULL_JID && isAcceptedIndex(AIndex))
 	{
 		FRosterIndex = AIndex;
 		updateMenu();

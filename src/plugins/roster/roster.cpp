@@ -472,6 +472,8 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 				if (subs==SUBSCRIPTION_BOTH || subs==SUBSCRIPTION_TO || subs==SUBSCRIPTION_FROM || subs==SUBSCRIPTION_NONE)
 				{
 					IRosterItem &ritem = FRosterItems[itemJid];
+					IRosterItem before = ritem;
+
 					ritem.isValid = true;
 					ritem.itemJid = itemJid;
 					ritem.name = itemElem.attribute("name");
@@ -488,7 +490,8 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 					}
 					ritem.groups = allItemGroups;
 
-					emit received(ritem);
+					if (ritem != before)
+						emit received(ritem);
 				}
 				else if (subs == SUBSCRIPTION_REMOVE)
 				{

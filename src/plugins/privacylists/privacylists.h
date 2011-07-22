@@ -19,11 +19,11 @@
 #include "editlistsdialog.h"
 
 class PrivacyLists :
-			public QObject,
-			public IPlugin,
-			public IPrivacyLists,
-			public IStanzaHandler,
-			public IStanzaRequestOwner
+	public QObject,
+	public IPlugin,
+	public IPrivacyLists,
+	public IStanzaHandler,
+	public IStanzaRequestOwner
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPrivacyLists IStanzaHandler IStanzaRequestOwner);
@@ -102,6 +102,7 @@ protected slots:
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
 	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onUpdateCreatedRosterIndexes();
 	void onShowEditListsDialog(bool);
 	void onSetActiveListByAction(bool);
 	void onSetDefaultListByAction(bool);
@@ -120,8 +121,6 @@ private:
 	IRosterPlugin *FRosterPlugin;
 	IPresencePlugin *FPresencePlugin;
 private:
-	int FRosterLabelId;
-	QTimer FApplyAutoListsTimer;
 	QHash<Jid,int> FSHIPrivacy;
 	QHash<Jid,int> FSHIRosterIn;
 	QHash<Jid,int> FSHIRosterOut;
@@ -131,6 +130,10 @@ private:
 	QHash<QString, QString> FDefaultRequests;
 	QHash<QString, QString> FRemoveRequests;
 	QHash<Jid, QStringList > FStreamRequests;
+private:
+	int FRosterLabelId;
+	QTimer FApplyAutoListsTimer;
+	QList<IRosterIndex *> FCreatedRosterIndexes;
 	QHash<Jid, QString> FApplyAutoLists;
 	QHash<Jid, QSet<Jid> > FOfflinePresences;
 	QHash<Jid, QString> FActiveLists;

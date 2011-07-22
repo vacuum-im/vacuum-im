@@ -604,11 +604,11 @@ void RostersView::clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu)
 {
 	if (AIndex!=NULL && AMenu!=NULL)
 	{
-		if (!AIndex->data(RDR_JID).toString().isEmpty())
+		if (!AIndex->data(RDR_FULL_JID).toString().isEmpty())
 		{
 			Action *action = new Action(AMenu);
 			action->setText(tr("Jabber ID"));
-			action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_JID));
+			action->setData(ADR_CLIPBOARD_DATA, AIndex->data(RDR_FULL_JID));
 			action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 			AMenu->addAction(action, AG_DEFAULT, true);
@@ -642,13 +642,13 @@ void RostersView::updateStatusText(IRosterIndex *AIndex)
 	QList<IRosterIndex *> indexes;
 	if (AIndex == NULL)
 	{
-		QMultiHash<int,QVariant> findData;
-		foreach(int type, statusTypes)
-			findData.insert(RDR_TYPE,type);
 		IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->rootIndex() : NULL;
 		if (streamRoot)
 		{
-			indexes = streamRoot->findChild(findData,true);
+			QMultiMap<int,QVariant> findData;
+			foreach(int type, statusTypes)
+				findData.insert(RDR_TYPE,type);
+			indexes = streamRoot->findChilds(findData,true);
 			indexes.append(streamRoot);
 		}
 	}
@@ -1041,7 +1041,7 @@ void RostersView::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMul
 		if (!name.isEmpty())
 			AToolTips.insert(RTTO_CONTACT_NAME, Qt::escape(name));
 
-		QString jid = AIndex->data(RDR_JID).toString();
+		QString jid = AIndex->data(RDR_FULL_JID).toString();
 		if (!jid.isEmpty())
 			AToolTips.insert(RTTO_CONTACT_JID, Qt::escape(jid));
 
@@ -1137,8 +1137,8 @@ void RostersView::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	QModelIndex index = currentIndex();
 	if (AId==SCT_ROSTERVIEW_COPYJID && AWidget==this)
 	{
-		if (!index.data(RDR_JID).toString().isEmpty())
-			QApplication::clipboard()->setText(index.data(RDR_JID).toString());
+		if (!index.data(RDR_FULL_JID).toString().isEmpty())
+			QApplication::clipboard()->setText(index.data(RDR_FULL_JID).toString());
 	}
 	else if (AId==SCT_ROSTERVIEW_COPYNAME && AWidget==this)
 	{

@@ -576,7 +576,7 @@ void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			if (index.data(RDR_TYPE).toInt() == RIT_AGENT)
 			{
 				Jid streamJid = index.data(RDR_STREAM_JID).toString();
-				Jid serviceJid = index.data(RDR_BARE_JID).toString();
+				Jid serviceJid = index.data(RDR_PREP_BARE_JID).toString();
 				bool logIn = AId==SCT_ROSTERVIEW_GATELOGIN;
 				if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
 					setKeepConnection(streamJid,serviceJid,logIn);
@@ -628,7 +628,7 @@ void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 			action->setText(tr("Login on transport"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
 			action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
+			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_PREP_BARE_JID));
 			action->setData(ADR_LOG_IN,true);
 			action->setShortcutId(SCT_ROSTERVIEW_GATELOGIN);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
@@ -638,7 +638,7 @@ void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 			action->setText(tr("Logout from transport"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
 			action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
+			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_PREP_BARE_JID));
 			action->setData(ADR_LOG_IN,false);
 			action->setShortcutId(SCT_ROSTERVIEW_GATELOGOUT);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
@@ -650,9 +650,9 @@ void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 				action->setText(tr("Keep connection"));
 				action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_KEEP_CONNECTION);
 				action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-				action->setData(ADR_SERVICE_JID,AIndex->data(RDR_BARE_JID));
+				action->setData(ADR_SERVICE_JID,AIndex->data(RDR_PREP_BARE_JID));
 				action->setCheckable(true);
-				action->setChecked(FKeepConnections.contains(streamJid,AIndex->data(RDR_BARE_JID).toString()));
+				action->setChecked(FKeepConnections.contains(streamJid,AIndex->data(RDR_PREP_BARE_JID).toString()));
 				connect(action,SIGNAL(triggered(bool)),SLOT(onKeepActionTriggered(bool)));
 				AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
 			}
@@ -662,7 +662,7 @@ void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 	if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->data(RDR_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
 		IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
 		if (FVCardPlugin && ritem.isValid && roster->isOpen())

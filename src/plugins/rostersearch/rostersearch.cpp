@@ -91,7 +91,7 @@ bool RosterSearch::initObjects()
 
 	insertSearchField(RDR_NAME,tr("Name"));
 	insertSearchField(RDR_STATUS,tr("Status"));
-	insertSearchField(RDR_JID,tr("Jabber ID"));
+	insertSearchField(RDR_FULL_JID,tr("Jabber ID"));
 	insertSearchField(RDR_GROUP,tr("Group"));
 
 	return true;
