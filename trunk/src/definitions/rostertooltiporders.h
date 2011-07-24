@@ -8,6 +8,7 @@
 #define RTTO_CONTACT_JID                  220
 #define RTTO_CONTACT_PRIORITY             230
 #define RTTO_CONTACT_SUBSCRIPTION         240
+#define RTTO_BIRTHDAY_NOTIFY              270
 #define RTTO_DISCO_IDENTITY               300
 #define RTTO_SOFTWARE_INFO                400
 #define RTTO_LAST_ACTIVITY                500

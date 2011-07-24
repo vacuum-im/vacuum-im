@@ -19,6 +19,9 @@
 #define MNI_AVATAR_CUSTOM               "avatarCustom"
 #define MNI_AVATAR_EMPTY                "avatarEmpty"
 
+//BirthdayReminder
+#define MNI_BIRTHDAY_NOTIFY             "birthdayreminderNotify"
+
 //Bookmarks
 #define MNI_BOOKMARKS                   "bookmarks"
 #define MNI_BOOKMARKS_ADD               "bookmarksAdd"

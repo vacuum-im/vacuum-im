@@ -245,3 +245,7 @@ source_lang = ru
 file_filter = <lang>/chatstates.ts
 source_lang = ru
 
+[vacuum-im.birthdayreminder]
+file_filter = <lang>/birthdayreminder.ts
+source_lang = ru
+
