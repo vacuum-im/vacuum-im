@@ -1,6 +1,9 @@
 #ifndef DEF_SOUNDFILES_H
 #define DEF_SOUNDFILES_H
 
+//BirthdayReminder
+#define SDF_BITHDAY_NOTIFY                "birthdayreminderNotify"
+
 //ChatMessagehandler
 #define SDF_CHAT_MHANDLER_MESSAGE         "chatmessagehandlerMessage"
 

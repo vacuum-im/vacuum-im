@@ -8,6 +8,7 @@ LEGEND
 
 
 ------
+  [!] Added new plugin for notifications about birthdays
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
 
 

@@ -25,6 +25,7 @@
 #define RLO_SUBSCRIBTION                          RLAP_LEFT_TOP + 300
 #define RLO_DISPLAY                               RLAP_LEFT_TOP + 500
 
+#define RLO_BIRTHDAY_NOTIFY                       RLAP_RIGHT_TOP + 200
 #define RLO_PRIVACY                               RLAP_RIGHT_TOP + 300
 #define RLO_CONNECTION_ENCRYPTED                  RLAP_RIGHT_TOP + 500
 

@@ -12,5 +12,6 @@
 #define NNT_SUBSCRIPTION_REQUEST      "SubscriptionRequest"
 #define NNT_SESSION_NEGOTIATION       "SessionNegotiation"
 #define NNT_CONNECTION_ERROR          "ConnectionError"
+#define NNT_BIRTHDAY                  "Birthday"
 
 #endif // DEF_NOTIFICATIONTYPES_H
