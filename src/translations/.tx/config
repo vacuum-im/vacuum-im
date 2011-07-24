@@ -6,8 +6,8 @@ source_lang = ru
 file_filter = <lang>/messageprocessor.ts
 source_lang = ru
 
-[vacuum-im.bitsofbinaryts]
-file_filter = <lang>/bitsofbinary.ts
+[vacuum-im.dataformsts]
+file_filter = <lang>/dataforms.ts
 source_lang = ru
 
 [vacuum-im.shortcutmanagerts]
@@ -18,8 +18,8 @@ source_lang = ru
 file_filter = <lang>/captchaforms.ts
 source_lang = ru
 
-[vacuum-im.rosterts]
-file_filter = <lang>/roster.ts
+[vacuum-im.vacuumts]
+file_filter = <lang>/vacuum.ts
 source_lang = ru
 
 [vacuum-im.emoticonsts]
@@ -36,10 +36,6 @@ source_lang = ru
 
 [vacuum-im.xmppuriqueriests]
 file_filter = <lang>/xmppuriqueries.ts
-source_lang = ru
-
-[vacuum-im.connectionmanagerts]
-file_filter = <lang>/connectionmanager.ts
 source_lang = ru
 
 [vacuum-im.starttlsts]
@@ -121,12 +117,16 @@ source_lang = ru
 file_filter = <lang>/optionsmanager.ts
 source_lang = ru
 
-[vacuum-im.dataformsts]
-file_filter = <lang>/dataforms.ts
+[vacuum-im.bitsofbinaryts]
+file_filter = <lang>/bitsofbinary.ts
 source_lang = ru
 
 [vacuum-im.vacuumutilsts]
 file_filter = <lang>/vacuumutils.ts
+source_lang = ru
+
+[vacuum-im.annotationsts]
+file_filter = <lang>/annotations.ts
 source_lang = ru
 
 [vacuum-im.privatestoragets]
@@ -157,8 +157,8 @@ source_lang = ru
 file_filter = <lang>/presence.ts
 source_lang = ru
 
-[vacuum-im.messagewidgetsts]
-file_filter = <lang>/messagewidgets.ts
+[vacuum-im.messagearchiverts]
+file_filter = <lang>/messagearchiver.ts
 source_lang = ru
 
 [vacuum-im.bookmarksts]
@@ -181,16 +181,16 @@ source_lang = ru
 file_filter = <lang>/datastreamsmanager.ts
 source_lang = ru
 
-[vacuum-im.vacuumts]
-file_filter = <lang>/vacuum.ts
+[vacuum-im.rosterts]
+file_filter = <lang>/roster.ts
 source_lang = ru
 
 [vacuum-im.autostatusts]
 file_filter = <lang>/autostatus.ts
 source_lang = ru
 
-[vacuum-im.annotationsts]
-file_filter = <lang>/annotations.ts
+[vacuum-im.compressts]
+file_filter = <lang>/compress.ts
 source_lang = ru
 
 [vacuum-im.registrationts]
@@ -213,12 +213,12 @@ source_lang = ru
 file_filter = <lang>/rostersearch.ts
 source_lang = ru
 
-[vacuum-im.messagearchiverts]
-file_filter = <lang>/messagearchiver.ts
+[vacuum-im.messagewidgetsts]
+file_filter = <lang>/messagewidgets.ts
 source_lang = ru
 
-[vacuum-im.compressts]
-file_filter = <lang>/compress.ts
+[vacuum-im.connectionmanagerts]
+file_filter = <lang>/connectionmanager.ts
 source_lang = ru
 
 [vacuum-im.servicediscoveryts]
@@ -229,8 +229,12 @@ source_lang = ru
 file_filter = <lang>/chatmessagehandler.ts
 source_lang = ru
 
-[vacuum-im.commandsts]
-file_filter = <lang>/commands.ts
+[vacuum-im.chatstatests]
+file_filter = <lang>/chatstates.ts
+source_lang = ru
+
+[vacuum-im.birthdayreminderts]
+file_filter = <lang>/birthdayreminder.ts
 source_lang = ru
 
 [vacuum-im.statusiconsts]
@@ -241,11 +245,7 @@ source_lang = ru
 file_filter = <lang>/filetransfer.ts
 source_lang = ru
 
-[vacuum-im.chatstatests]
-file_filter = <lang>/chatstates.ts
-source_lang = ru
-
-[vacuum-im.birthdayreminder]
-file_filter = <lang>/birthdayreminder.ts
+[vacuum-im.commandsts]
+file_filter = <lang>/commands.ts
 source_lang = ru
 
