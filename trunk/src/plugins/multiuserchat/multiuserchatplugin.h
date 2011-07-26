@@ -53,14 +53,14 @@ struct InviteFields {
 };
 
 class MultiUserChatPlugin :
-			public QObject,
-			public IPlugin,
-			public IMultiUserChatPlugin,
-			public IXmppUriHandler,
-			public IDiscoFeatureHandler,
-			public IMessageHandler,
-			public IDataLocalizer,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IMultiUserChatPlugin,
+	public IXmppUriHandler,
+	public IDiscoFeatureHandler,
+	public IMessageHandler,
+	public IDataLocalizer,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsHolder);
@@ -88,8 +88,8 @@ public:
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool receiveMessage(int AMessageId);
 	virtual bool showMessage(int AMessageId);
-	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
-	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
+	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
+	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IMultiUserChatPlugin
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);

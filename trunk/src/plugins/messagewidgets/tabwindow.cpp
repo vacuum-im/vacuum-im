@@ -62,7 +62,8 @@ void TabWindow::showWindow()
 
 void TabWindow::showMinimizedWindow()
 {
-	showMinimized();
+	if (!isVisible())
+		showMinimized();
 }
 
 QUuid TabWindow::windowId() const
@@ -87,14 +88,15 @@ int TabWindow::tabPageCount() const
 
 ITabPage *TabWindow::tabPage(int AIndex) const
 {
-	return qobject_cast<ITabPage *>(ui.twtTabs->widget(AIndex));
+	QWidget *page = ui.twtTabs->widget(AIndex);
+	return qobject_cast<ITabPage *>(page);
 }
 
 void TabWindow::addTabPage(ITabPage *APage)
 {
 	if (!hasTabPage(APage))
 	{
-		int index = ui.twtTabs->addTab(APage->instance(),APage->instance()->windowTitle());
+		int index = ui.twtTabs->addTab(APage->instance(),APage->tabPageIcon(),APage->tabPageCaption());
 		connect(APage->instance(),SIGNAL(tabPageShow()),SLOT(onTabPageShow()));
 		connect(APage->instance(),SIGNAL(tabPageShowMinimized()),SLOT(onTabPageShowMinimized()));
 		connect(APage->instance(),SIGNAL(tabPageClose()),SLOT(onTabPageClose()));
@@ -344,7 +346,7 @@ void TabWindow::onTabChanged(int AIndex)
 
 void TabWindow::onTabCloseRequested(int AIndex)
 {
-	removeTabPage(qobject_cast<ITabPage *>(ui.twtTabs->widget(AIndex)));
+	removeTabPage(tabPage(AIndex));
 }
 
 void TabWindow::onTabPageShow()
@@ -465,8 +467,10 @@ void TabWindow::onActionTriggered(bool)
 		{
 			ITabPage *page = currentTabPage();
 			removeTabPage(page);
-			ITabWindow *window = FMessageWidgets->openTabWindow(FMessageWidgets->appendTabWindow(name));
+
+			ITabWindow *window = FMessageWidgets->newTabWindow(FMessageWidgets->appendTabWindow(name));
 			window->addTabPage(page);
+			window->showWindow();
 		}
 	}
 	else if (action == FShowCloseButtons)
@@ -512,7 +516,8 @@ void TabWindow::onActionTriggered(bool)
 		ITabPage *page = currentTabPage();
 		removeTabPage(page);
 
-		ITabWindow *window = FMessageWidgets->openTabWindow(action->data(ADR_TABWINDOWID).toString());
+		ITabWindow *window = FMessageWidgets->newTabWindow(action->data(ADR_TABWINDOWID).toString());
 		window->addTabPage(page);
+		window->showWindow();
 	}
 }

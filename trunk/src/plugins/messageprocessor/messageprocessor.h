@@ -10,11 +10,11 @@
 #include <interfaces/istanzaprocessor.h>
 
 class MessageProcessor :
-			public QObject,
-			public IPlugin,
-			public IMessageProcessor,
-			public IMessageWriter,
-			public IStanzaHandler
+	public QObject,
+	public IPlugin,
+	public IMessageProcessor,
+	public IMessageWriter,
+	public IStanzaHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageProcessor IMessageWriter IStanzaHandler);
@@ -41,9 +41,9 @@ public:
 	virtual void removeMessage(int AMessageId);
 	virtual Message messageById(int AMessageId) const;
 	virtual QList<int> messages(const Jid &AStreamJid, const Jid &AFromJid = Jid::null, int AMesTypes = Message::AnyType);
-	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = "") const;
-	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = "") const;
-	virtual bool openWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType) const;
+	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = QString::null) const;
+	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = QString::null) const;
+	virtual bool createMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode) const;
 	virtual void insertMessageHandler(IMessageHandler *AHandler, int AOrder);
 	virtual void removeMessageHandler(IMessageHandler *AHandler, int AOrder);
 	virtual void insertMessageWriter(IMessageWriter *AWriter, int AOrder);

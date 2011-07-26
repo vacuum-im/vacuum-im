@@ -124,11 +124,11 @@ void SubscriptionDialog::onToolBarActionTriggered( bool )
 	{
 		if (action == FShowChat)
 		{
-			FMessageProcessor->openWindow(FStreamJid,FContactJid,Message::Chat);
+			FMessageProcessor->createMessageWindow(FStreamJid,FContactJid,Message::Chat,IMessageHandler::SM_SHOW);
 		}
 		else if (action == FSendMessage)
 		{
-			FMessageProcessor->openWindow(FStreamJid,FContactJid,Message::Normal);
+			FMessageProcessor->createMessageWindow(FStreamJid,FContactJid,Message::Normal,IMessageHandler::SM_SHOW);
 		}
 		else if (action == FShowVCard)
 		{

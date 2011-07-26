@@ -314,7 +314,7 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const =0;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName) =0;
 	virtual QList<ITabWindow *> tabWindows() const =0;
-	virtual ITabWindow *openTabWindow(const QUuid &AWindowId) =0;
+	virtual ITabWindow *newTabWindow(const QUuid &AWindowId) =0;
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const =0;
 	virtual void assignTabWindowPage(ITabPage *APage) =0;
 	virtual QList<IViewDropHandler *> viewDropHandlers() const =0;
