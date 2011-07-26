@@ -4,10 +4,6 @@
 <context>
     <name>RostersModel</name>
     <message>
-        <source>Blank Group</source>
-        <translation>Загальна група</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Агенти</translation>
     </message>
@@ -26,6 +22,10 @@
     <message>
         <source>Creates a hierarchical model for display roster</source>
         <translation>Створює ієрархічну модель для перегляду ростеру</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

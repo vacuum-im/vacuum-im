@@ -247,7 +247,7 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 		if (window)
 		{
 			if (AShowWindow)
-				window->showWindow();
+				window->showTabPage();
 			if (!window->multiUserChat()->isOpen())
 				window->multiUserChat()->setAutoPresence(true);
 		}

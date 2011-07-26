@@ -361,13 +361,12 @@
         <translation></translation>
     </message>
     <message>
-        <source>%1) %2</source>
-        <comment>First is tab index, second is tab name</comment>
+        <source>Remove all tabs on window close</source>
         <translation></translation>
     </message>
     <message>
-        <source>Remove all tabs on window close</source>
-        <translation></translation>
+        <source>%1) %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

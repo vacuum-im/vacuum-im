@@ -14,8 +14,8 @@
 #include "ui_tabwindow.h"
 
 class TabWindow :
-			public QMainWindow,
-			public ITabWindow
+	public QMainWindow,
+	public ITabWindow
 {
 	Q_OBJECT;
 	Q_INTERFACES(ITabWindow);
@@ -24,21 +24,23 @@ public:
 	~TabWindow();
 	virtual QMainWindow *instance() { return this; }
 	virtual void showWindow();
+	virtual void showMinimizedWindow();
 	virtual QUuid windowId() const;
 	virtual QString windowName() const;
 	virtual Menu *windowMenu() const;
-	virtual void addPage(ITabWindowPage *APage);
-	virtual bool hasPage(ITabWindowPage *APage) const;
-	virtual ITabWindowPage *currentPage() const;
-	virtual void setCurrentPage(ITabWindowPage *APage);
-	virtual void detachPage(ITabWindowPage *APage);
-	virtual void removePage(ITabWindowPage *APage);
-	virtual void clear();
+	virtual int tabPageCount() const;
+	virtual ITabPage *tabPage(int AIndex) const;
+	virtual void addTabPage(ITabPage *APage);
+	virtual bool hasTabPage(ITabPage *APage) const;
+	virtual ITabPage *currentTabPage() const;
+	virtual void setCurrentTabPage(ITabPage *APage);
+	virtual void detachTabPage(ITabPage *APage);
+	virtual void removeTabPage(ITabPage *APage);
 signals:
-	void pageAdded(ITabWindowPage *APage);
-	void currentPageChanged(ITabWindowPage *APage);
-	void pageRemoved(ITabWindowPage *APage);
-	void pageDetached(ITabWindowPage *APage);
+	void currentTabPageChanged(ITabPage *APage);
+	void tabPageAdded(ITabPage *APage);
+	void tabPageRemoved(ITabPage *APage);
+	void tabPageDetached(ITabPage *APage);
 	void windowChanged();
 	void windowDestroyed();
 protected:
@@ -46,6 +48,7 @@ protected:
 	void saveWindowStateAndGeometry();
 	void loadWindowStateAndGeometry();
 	void updateWindow();
+	void clearTabs();
 	void updateTab(int AIndex);
 	void updateTabs(int AFrom, int ATo);
 protected slots:
@@ -53,6 +56,7 @@ protected slots:
 	void onTabChanged(int AIndex);
 	void onTabCloseRequested(int AIndex);
 	void onTabPageShow();
+	void onTabPageShowMinimized();
 	void onTabPageClose();
 	void onTabPageChanged();
 	void onTabPageDestroyed();
@@ -81,8 +85,6 @@ private:
 	Action *FRenameWindow;
 	Action *FCloseWindow;
 	Action *FDeleteWindow;
-private:
-	bool FShowTabIndices;
 private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;

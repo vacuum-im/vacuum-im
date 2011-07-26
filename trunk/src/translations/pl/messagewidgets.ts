@@ -361,13 +361,12 @@
         <translation>Zamknij okno z zakładkami</translation>
     </message>
     <message>
-        <source>%1) %2</source>
-        <comment>First is tab index, second is tab name</comment>
-        <translation>%1) %2</translation>
-    </message>
-    <message>
         <source>Remove all tabs on window close</source>
         <translation>Pozamykaj wszystkie zakładki wraz z zamknięciem okna</translation>
+    </message>
+    <message>
+        <source>%1) %2</source>
+        <translation type="unfinished">%1) %2</translation>
     </message>
 </context>
 <context>

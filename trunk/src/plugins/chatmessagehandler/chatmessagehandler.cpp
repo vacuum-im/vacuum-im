@@ -185,7 +185,7 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
 		{
 			IChatWindow *window = getWindow(AStreamJid, AContactJid);
 			window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
-			window->showWindow();
+			window->showTabPage();
 			return true;
 		}
 	}
@@ -222,7 +222,7 @@ bool ChatMessageHandler::showMessage(int AMessageId)
 	}
 	else
 	{
-		window->showWindow();
+		window->showTabPage();
 		return true;
 	}
 	return false;
@@ -236,7 +236,7 @@ bool ChatMessageHandler::receiveMessage(int AMessageId)
 	if (window)
 	{
 		showStyledMessage(window,message);
-		if (!window->isActive())
+		if (!window->isActiveTabPage())
 		{
 			notify = true;
 			if (FDestroyTimers.contains(window))
@@ -299,7 +299,7 @@ bool ChatMessageHandler::openWindow(int AOrder, const Jid &AStreamJid, const Jid
 		IChatWindow *window = getWindow(AStreamJid,AContactJid);
 		if (window)
 		{
-			window->showWindow();
+			window->showTabPage();
 			return true;
 		}
 	}
@@ -318,9 +318,9 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 			connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(IInfoWidget::InfoField, const QVariant &)),
 				SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
-			connect(window->instance(),SIGNAL(windowActivated()),SLOT(onWindowActivated()));
-			connect(window->instance(),SIGNAL(windowClosed()),SLOT(onWindowClosed()));
-			connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
+			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
+			connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onWindowClosed()));
+			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
 
 			FWindows.append(window);
 			FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
@@ -368,7 +368,7 @@ void ChatMessageHandler::updateWindow(IChatWindow *AWindow)
 		icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
 
 	QString contactName = AWindow->infoWidget()->field(IInfoWidget::ContactName).toString();
-	AWindow->updateWindow(icon,contactName,tr("%1 - Chat").arg(contactName));
+	AWindow->updateWindow(icon,contactName,tr("%1 - Chat").arg(contactName),QString::null);
 }
 
 void ChatMessageHandler::removeActiveMessages(IChatWindow *AWindow)

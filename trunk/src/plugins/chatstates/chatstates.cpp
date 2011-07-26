@@ -617,9 +617,9 @@ void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 	widget->setPopupMode(QToolButton::InstantPopup);
 
 	FChatByEditor.insert(AWindow->editWidget()->textEdit(),AWindow);
-	connect(AWindow->instance(),SIGNAL(windowActivated()),SLOT(onChatWindowActivated()));
+	connect(AWindow->instance(),SIGNAL(tabPageActivated()),SLOT(onChatWindowActivated()));
+	connect(AWindow->instance(),SIGNAL(tabPageClosed()),SLOT(onChatWindowClosed()));
 	connect(AWindow->editWidget()->textEdit(),SIGNAL(textChanged()),SLOT(onChatWindowTextChanged()));
-	connect(AWindow->instance(),SIGNAL(windowClosed()),SLOT(onChatWindowClosed()));
 }
 
 void ChatStates::onChatWindowActivated()
@@ -672,7 +672,7 @@ void ChatStates::onUpdateSelfStates()
 		{
 			ChatParams &params = FChatParams[window->streamJid()][window->contactJid()];
 			uint timePassed = QDateTime::currentDateTime().toTime_t() - params.selfLastActive;
-			if (params.selfState==IChatStates::StateActive && window->isActive())
+			if (params.selfState==IChatStates::StateActive && window->isActiveTabPage())
 			{
 				setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
 			}

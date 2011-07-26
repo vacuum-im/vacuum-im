@@ -313,7 +313,7 @@ bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString 
 		if (!chatWindow)
 			showJoinMultiChatDialog(AStreamJid,ADiscoInfo.contactJid,QString::null,QString::null);
 		else
-			chatWindow->showWindow();
+			chatWindow->showTabPage();
 		return true;
 	}
 	return false;
@@ -533,7 +533,7 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 		chatWindow = new MultiUserChatWindow(this,chat);
 		WidgetManager::setWindowSticky(chatWindow->instance(),true);
 		connect(chatWindow->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
-		connect(chatWindow->instance(),SIGNAL(windowDestroyed()),SLOT(onMultiChatWindowDestroyed()));
+		connect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
 		insertChatAction(chatWindow);
 		FChatWindows.append(chatWindow);
 		emit multiChatWindowCreated(chatWindow);
@@ -780,7 +780,7 @@ void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
 		if (!window->instance()->isVisible())
-			window->showWindow();
+			window->showTabPage();
 }
 
 void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
@@ -808,7 +808,7 @@ void MultiUserChatPlugin::onChatActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	IMultiUserChatWindow *window = FChatActions.key(action,NULL);
 	if (window)
-		window->showWindow();
+		window->showTabPage();
 }
 
 void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)

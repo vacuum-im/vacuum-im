@@ -161,7 +161,7 @@ protected:
 };
 
 class IMultiUserChatWindow :
-			public ITabWindowPage
+	public ITabPage
 {
 public:
 	//virtual QMainWindow *instance() =0;
@@ -178,7 +178,6 @@ public:
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
 protected:
-	virtual void windowClosed() =0;
 	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
 	virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
