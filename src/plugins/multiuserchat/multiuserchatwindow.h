@@ -48,21 +48,26 @@ struct UserStatus
 };
 
 class MultiUserChatWindow :
-			public QMainWindow,
-			public IMultiUserChatWindow,
-			public IMessageHandler
+	public QMainWindow,
+	public IMultiUserChatWindow,
+	public IMessageHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMultiUserChatWindow ITabWindowPage IMessageHandler);
+	Q_INTERFACES(IMultiUserChatWindow ITabPage IMessageHandler);
 public:
 	MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
-	virtual bool isActive() const;
-	virtual void showWindow();
-	virtual void closeWindow();
+	virtual bool isActiveTabPage() const;
+	virtual void assignTabPage();
+	virtual void showTabPage();
+	virtual void showMinimizedTabPage();
+	virtual void closeTabPage();
+	virtual QIcon tabPageIcon() const;
+	virtual QString tabPageCaption() const;
+	virtual QString tabPageToolTip() const;
 	//IMessageHandler
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool showMessage(int AMessageId);
@@ -84,14 +89,16 @@ public:
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
 signals:
 	//ITabWindowPage
-	void windowShow();
-	void windowClose();
-	void windowChanged();
-	void windowActivated();
-	void windowDeactivated();
-	void windowDestroyed();
+	void tabPageAssign();
+	void tabPageShow();
+	void tabPageShowMinimized();
+	void tabPageClose();
+	void tabPageClosed();
+	void tabPageChanged();
+	void tabPageActivated();
+	void tabPageDeactivated();
+	void tabPageDestroyed();
 	//IMultiUserChatWindow
-	void windowClosed();
 	void chatWindowCreated(IChatWindow *AWindow);
 	void chatWindowDestroyed(IChatWindow *AWindow);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
@@ -232,6 +239,7 @@ private:
 	int FUsersListWidth;
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
+	QString FTabPageToolTip;
 	QList<int> FActiveMessages;
 	QList<IChatWindow *> FChatWindows;
 	QMap<IChatWindow *, QTimer *> FDestroyTimers;

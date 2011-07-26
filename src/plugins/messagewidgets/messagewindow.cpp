@@ -58,7 +58,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 
 MessageWindow::~MessageWindow()
 {
-	emit windowDestroyed();
+	emit tabPageDestroyed();
 	delete FInfoWidget->instance();
 	delete FViewWidget->instance();
 	delete FEditWidget->instance();
@@ -72,7 +72,7 @@ QString MessageWindow::tabPageId() const
 	return "MessageWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
-bool MessageWindow::isActive() const
+bool MessageWindow::isActiveTabPage() const
 {
 	const QWidget *widget = this;
 	while (widget->parentWidget())
@@ -80,20 +80,51 @@ bool MessageWindow::isActive() const
 	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
-void MessageWindow::showWindow()
+void MessageWindow::assignTabPage()
+{
+	if (isWindow() && !isVisible())
+		FMessageWidgets->assignTabWindowPage(this);
+	else
+		emit tabPageAssign();
+}
+
+void MessageWindow::showTabPage()
 {
 	if (isWindow())
 		WidgetManager::showActivateRaiseWindow(this);
 	else
-		emit windowShow();
+		emit tabPageShow();
 }
 
-void MessageWindow::closeWindow()
+void MessageWindow::showMinimizedTabPage()
+{
+	if (isWindow() && !isVisible())
+		showMinimized();
+	else
+		emit tabPageShowMinimized();
+}
+
+void MessageWindow::closeTabPage()
 {
 	if (isWindow())
 		close();
 	else
-		emit windowClose();
+		emit tabPageClose();
+}
+
+QIcon MessageWindow::tabPageIcon() const
+{
+	return windowIcon();
+}
+
+QString MessageWindow::tabPageCaption() const
+{
+	return windowIconText();
+}
+
+QString MessageWindow::tabPageToolTip() const
+{
+	return FTabPageToolTip;
 }
 
 void MessageWindow::setContactJid(const Jid &AContactJid)
@@ -216,23 +247,24 @@ void MessageWindow::loadWindowGeometry()
 	}
 }
 
-void MessageWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle)
+void MessageWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)
 {
 	setWindowIcon(AIcon);
-	setWindowIconText(AIconText);
+	setWindowIconText(ACaption);
 	setWindowTitle(ATitle);
-	emit windowChanged();
+	FTabPageToolTip = AToolTip;
+	emit tabPageChanged();
 }
 
 bool MessageWindow::event(QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::WindowActivate)
 	{
-		emit windowActivated();
+		emit tabPageActivated();
 	}
 	else if (AEvent->type() == QEvent::WindowDeactivate)
 	{
-		emit windowDeactivated();
+		emit tabPageDeactivated();
 	}
 	return QMainWindow::event(AEvent);
 }
@@ -251,10 +283,12 @@ void MessageWindow::showEvent(QShowEvent *AEvent)
 		FShownDetached = false;
 		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
+
 	QMainWindow::showEvent(AEvent);
 	if (FMode == WriteMode)
 		FEditWidget->textEdit()->setFocus();
-	emit windowActivated();
+	if (isActiveTabPage())
+		emit tabPageActivated();
 }
 
 void MessageWindow::closeEvent(QCloseEvent *AEvent)
@@ -262,8 +296,7 @@ void MessageWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
-	emit windowDeactivated();
-	emit windowClosed();
+	emit tabPageClosed();
 }
 
 void MessageWindow::onStreamJidChanged(const Jid &ABefore)
@@ -332,6 +365,6 @@ void MessageWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 	{
-		closeWindow();
+		closeTabPage();
 	}
 }

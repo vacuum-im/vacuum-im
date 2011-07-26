@@ -13,20 +13,25 @@
 #include "ui_chatwindow.h"
 
 class ChatWindow :
-			public QMainWindow,
-			public IChatWindow
+	public QMainWindow,
+	public IChatWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(IChatWindow ITabWindowPage);
+	Q_INTERFACES(IChatWindow ITabPage);
 public:
 	ChatWindow(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid);
 	virtual ~ChatWindow();
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
-	virtual bool isActive() const;
-	virtual void showWindow();
-	virtual void closeWindow();
+	virtual bool isActiveTabPage() const;
+	virtual void assignTabPage();
+	virtual void showTabPage();
+	virtual void showMinimizedTabPage();
+	virtual void closeTabPage();
+	virtual QIcon tabPageIcon() const;
+	virtual QString tabPageCaption() const;
+	virtual QString tabPageToolTip() const;
 	//IChatWindow
 	virtual const Jid &streamJid() const { return FStreamJid; }
 	virtual const Jid &contactJid() const { return FContactJid; }
@@ -37,20 +42,22 @@ public:
 	virtual IMenuBarWidget *menuBarWidget() const { return FMenuBarWidget; }
 	virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
 	virtual IStatusBarWidget *statusBarWidget() const { return FStatusBarWidget; }
-	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
+	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	//ITabWindowPage
-	void windowShow();
-	void windowClose();
-	void windowChanged();
-	void windowActivated();
-	void windowDeactivated();
-	void windowDestroyed();
+	void tabPageAssign();
+	void tabPageShow();
+	void tabPageShowMinimized();
+	void tabPageClose();
+	void tabPageClosed();
+	void tabPageChanged();
+	void tabPageActivated();
+	void tabPageDeactivated();
+	void tabPageDestroyed();
 	//IChatWindow
 	void messageReady();
 	void streamJidChanged(const Jid &ABefore);
 	void contactJidChanged(const Jid &ABefore);
-	void windowClosed();
 protected:
 	void initialize();
 	void saveWindowGeometry();
@@ -80,6 +87,7 @@ private:
 	Jid FStreamJid;
 	Jid FContactJid;
 	bool FShownDetached;
+	QString FTabPageToolTip;
 };
 
 #endif // CHATWINDOW_H

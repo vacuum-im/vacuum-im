@@ -292,7 +292,7 @@ IChatWindow *MessageWidgets::newChatWindow(const Jid &AStreamJid, const Jid &ACo
 		window = new ChatWindow(this,AStreamJid,AContactJid);
 		FChatWindows.append(window);
 		WidgetManager::setWindowSticky(window->instance(),true);
-		connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
+		connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onChatWindowDestroyed()));
 		FCleanupHandler.add(window->instance());
 		emit chatWindowCreated(window);
 		return window;
@@ -379,7 +379,7 @@ ITabWindow *MessageWidgets::openTabWindow(const QUuid &AWindowId)
 		window = new TabWindow(this,AWindowId);
 		FTabWindows.append(window);
 		WidgetManager::setWindowSticky(window->instance(),true);
-		connect(window->instance(),SIGNAL(pageAdded(ITabWindowPage *)),SLOT(onTabWindowPageAdded(ITabWindowPage *)));
+		connect(window->instance(),SIGNAL(tabPageAdded(ITabPage *)),SLOT(onTabWindowPageAdded(ITabPage *)));
 		connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onTabWindowDestroyed()));
 		emit tabWindowCreated(window);
 	}
@@ -395,7 +395,7 @@ ITabWindow *MessageWidgets::findTabWindow(const QUuid &AWindowId) const
 	return NULL;
 }
 
-void MessageWidgets::assignTabWindowPage(ITabWindowPage *APage)
+void MessageWidgets::assignTabWindowPage(ITabPage *APage)
 {
 	if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
 	{
@@ -406,7 +406,7 @@ void MessageWidgets::assignTabWindowPage(ITabWindowPage *APage)
 		if (!availWindows.contains(windowId))
 			windowId = availWindows.value(0);
 		ITabWindow *window = openTabWindow(windowId);
-		window->addPage(APage);
+		window->addTabPage(APage);
 	}
 }
 
@@ -576,7 +576,7 @@ void MessageWidgets::onChatWindowDestroyed()
 	}
 }
 
-void MessageWidgets::onTabWindowPageAdded(ITabWindowPage *APage)
+void MessageWidgets::onTabWindowPageAdded(ITabPage *APage)
 {
 	ITabWindow *window = qobject_cast<ITabWindow *>(sender());
 	if (window)

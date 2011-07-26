@@ -68,7 +68,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	ui.sprHSplitter->installEventFilter(this);
 	connect(ui.sprHSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onHorizontalSplitterMoved(int,int)));
 
-	connect(this,SIGNAL(windowActivated()),SLOT(onWindowActivated()));
+	connect(this,SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
 }
 
 MultiUserChatWindow::~MultiUserChatWindow()
@@ -81,7 +81,7 @@ MultiUserChatWindow::~MultiUserChatWindow()
 		FMessageProcessor->removeMessageHandler(this,MHO_MULTIUSERCHAT_GROUPCHAT);
 
 	saveWindowState();
-	emit windowDestroyed();
+	emit tabPageDestroyed();
 }
 
 QString MultiUserChatWindow::tabPageId() const
@@ -89,7 +89,7 @@ QString MultiUserChatWindow::tabPageId() const
 	return "MessageWindow|"+streamJid().pBare()+"|"+roomJid().pBare();
 }
 
-bool MultiUserChatWindow::isActive() const
+bool MultiUserChatWindow::isActiveTabPage() const
 {
 	const QWidget *widget = this;
 	while (widget->parentWidget())
@@ -97,23 +97,53 @@ bool MultiUserChatWindow::isActive() const
 	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
-void MultiUserChatWindow::showWindow()
+void MultiUserChatWindow::assignTabPage()
 {
 	if (FMessageWidgets && isWindow() && !QMainWindow::isVisible())
 		FMessageWidgets->assignTabWindowPage(this);
+	else
+		emit tabPageAssign();
+}
 
+void MultiUserChatWindow::showTabPage()
+{
+	assignTabPage();
 	if (isWindow())
 		WidgetManager::showActivateRaiseWindow(this);
 	else
-		emit windowShow();
+		emit tabPageShow();
 }
 
-void MultiUserChatWindow::closeWindow()
+void MultiUserChatWindow::showMinimizedTabPage()
+{
+	assignTabPage();
+	if (isWindow() && !isVisible())
+		showMinimized();
+	else
+		emit tabPageShowMinimized();
+}
+
+void MultiUserChatWindow::closeTabPage()
 {
 	if (isWindow())
 		close();
 	else
-		emit windowClose();
+		emit tabPageClose();
+}
+
+QIcon MultiUserChatWindow::tabPageIcon() const
+{
+	return windowIcon();
+}
+
+QString MultiUserChatWindow::tabPageCaption() const
+{
+	return windowIconText();
+}
+
+QString MultiUserChatWindow::tabPageToolTip() const
+{
+	return FTabPageToolTip;
 }
 
 bool MultiUserChatWindow::checkMessage(int AOrder, const Message &AMessage)
@@ -139,7 +169,7 @@ bool MultiUserChatWindow::showMessage(int AMessageId)
 		IChatWindow *window = FActiveChatMessages.key(AMessageId);
 		if (window)
 		{
-			window->showWindow();
+			window->showTabPage();
 			return true;
 		}
 	}
@@ -170,7 +200,7 @@ bool MultiUserChatWindow::receiveMessage(int AMessageId)
 		}
 		else if (message.type() == Message::GroupChat)
 		{
-			if (!isActive())
+			if (!isActiveTabPage())
 			{
 				notify = true;
 				FActiveMessages.append(AMessageId);
@@ -182,7 +212,7 @@ bool MultiUserChatWindow::receiveMessage(int AMessageId)
 			IChatWindow *window = getChatWindow(contactJid);
 			if (window)
 			{
-				if (!window->isActive())
+				if (!window->isActiveTabPage())
 				{
 					notify = true;
 					if (FDestroyTimers.contains(window))
@@ -209,7 +239,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 			QWidget *widgetToAlert = NULL;
 			if (AMessage.type() == Message::GroupChat)
 			{
-				if (!AMessage.body().isEmpty() && !isActive() && !AMessage.isDelayed())
+				if (!AMessage.body().isEmpty() && !isActiveTabPage() && !AMessage.isDelayed())
 				{
 					if (isMentionMessage(AMessage))
 					{
@@ -235,7 +265,7 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 			else if (!AMessage.body().isEmpty())
 			{
 				IChatWindow *window = findChatWindow(AMessage.from());
-				if (window == NULL || !window->isActive())
+				if (window == NULL || !window->isActiveTabPage())
 				{
 					notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
 					notify.type = NNT_MUC_MESSAGE_PRIVATE;
@@ -288,7 +318,7 @@ bool MultiUserChatWindow::openWindow(int AOrder, const Jid &AStreamJid, const Ji
 	{
 		if (AType == Message::GroupChat)
 		{
-			showWindow();
+			showTabPage();
 		}
 		else
 		{
@@ -343,7 +373,7 @@ IChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
 {
 	IChatWindow *window = getChatWindow(AContactJid);
 	if (window)
-		window->showWindow();
+		window->showTabPage();
 	return window;
 }
 
@@ -366,7 +396,7 @@ void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
 
 void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 {
-	closeWindow();
+	closeTabPage();
 
 	FDestroyOnChatClosed = true;
 	if (FMultiChat->isOpen())
@@ -1198,7 +1228,7 @@ void MultiUserChatWindow::updateWindow()
 
 	ui.lblRoom->setText(QString("<big><b>%1</b></big> - %2").arg(Qt::escape(FMultiChat->roomJid().full())).arg(Qt::escape(FMultiChat->nickName())));
 
-	emit windowChanged();
+	emit tabPageChanged();
 }
 
 void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
@@ -1331,9 +1361,9 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 		if (window)
 		{
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onChatMessageReady()));
-			connect(window->instance(),SIGNAL(windowActivated()),SLOT(onChatWindowActivated()));
-			connect(window->instance(),SIGNAL(windowClosed()),SLOT(onChatWindowClosed()));
-			connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onChatWindowDestroyed()));
+			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onChatWindowActivated()));
+			connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onChatWindowClosed()));
+			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onChatWindowDestroyed()));
 
 			window->infoWidget()->setFieldAutoUpdated(IInfoWidget::ContactName,false);
 			window->infoWidget()->setField(IInfoWidget::ContactName,user->nickName());
@@ -1389,8 +1419,8 @@ void MultiUserChatWindow::updateChatWindow(IChatWindow *AWindow)
 		icon = FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),"",false);
 
 	QString contactName = AWindow->infoWidget()->field(IInfoWidget::ContactName).toString();
-	QString tabTitle = QString("[%1]").arg(contactName);
-	AWindow->updateWindow(icon,tabTitle,tr("%1 - Private chat").arg(tabTitle));
+	QString caption = QString("[%1]").arg(contactName);
+	AWindow->updateWindow(icon,caption,tr("%1 - Private chat").arg(caption),QString::null);
 }
 
 bool MultiUserChatWindow::event(QEvent *AEvent)
@@ -1409,11 +1439,11 @@ bool MultiUserChatWindow::event(QEvent *AEvent)
 	}
 	else if (AEvent->type() == QEvent::WindowActivate)
 	{
-		emit windowActivated();
+		emit tabPageActivated();
 	}
 	else if (AEvent->type() == QEvent::WindowDeactivate)
 	{
-		emit windowDeactivated();
+		emit tabPageDeactivated();
 	}
 	return QMainWindow::event(AEvent);
 }
@@ -1437,7 +1467,8 @@ void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 		FUsersListWidth = ui.sprHSplitter->sizes().value(ui.sprHSplitter->indexOf(ui.ltvUsers));
 	if (FEditWidget)
 		FEditWidget->textEdit()->setFocus();
-	emit windowActivated();
+	if (isActiveTabPage())
+		emit tabPageActivated();
 }
 
 void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
@@ -1445,8 +1476,7 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
-	emit windowDeactivated();
-	emit windowClosed();
+	emit tabPageClosed();
 }
 
 bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
@@ -2155,6 +2185,6 @@ void MultiUserChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidg
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 	{
-		closeWindow();
+		closeTabPage();
 	}
 }

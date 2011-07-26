@@ -166,7 +166,7 @@ bool NormalMessageHandler::showMessage(int AMessageId)
 	}
 	else
 	{
-		window->showWindow();
+		window->showTabPage();
 		return true;
 	}
 	return false;
@@ -278,7 +278,7 @@ IMessageWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Ji
 
 void NormalMessageHandler::showWindow(IMessageWindow *AWindow)
 {
-	AWindow->showWindow();
+	AWindow->showTabPage();
 }
 
 void NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
@@ -317,10 +317,10 @@ void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 	else if (FStatusIcons)
 		icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
 
-	QString title = tr("Composing message");
+	QString caption = tr("Composing message");
 	if (AWindow->mode() == IMessageWindow::ReadMode)
-		title = tr("%1 - Message").arg(AWindow->infoWidget()->field(IInfoWidget::ContactName).toString());
-	AWindow->updateWindow(icon,title,title);
+		caption = tr("%1 - Message").arg(AWindow->infoWidget()->field(IInfoWidget::ContactName).toString());
+	AWindow->updateWindow(icon,caption,caption,QString::null);
 	AWindow->setNextCount(FActiveMessages.count(AWindow));
 }
 
@@ -398,7 +398,7 @@ void NormalMessageHandler::onMessageReady()
 				if (FActiveMessages.contains(window))
 					showNextMessage(window);
 				else
-					window->closeWindow();
+					window->closeTabPage();
 			}
 		}
 	}

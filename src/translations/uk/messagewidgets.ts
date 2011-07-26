@@ -361,13 +361,12 @@
         <translation>Закрити вікно вкладки</translation>
     </message>
     <message>
-        <source>%1) %2</source>
-        <comment>First is tab index, second is tab name</comment>
-        <translation>%1) %2</translation>
-    </message>
-    <message>
         <source>Remove all tabs on window close</source>
         <translation>Видалити всі вкладки при закритті вікна</translation>
+    </message>
+    <message>
+        <source>%1) %2</source>
+        <translation type="unfinished">%1) %2</translation>
     </message>
 </context>
 <context>

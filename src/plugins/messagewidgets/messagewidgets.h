@@ -79,7 +79,7 @@ public:
 	virtual QList<ITabWindow *> tabWindows() const;
 	virtual ITabWindow *openTabWindow(const QUuid &AWindowId);
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
-	virtual void assignTabWindowPage(ITabWindowPage *APage);
+	virtual void assignTabWindowPage(ITabPage *APage);
 	virtual QList<IViewDropHandler *> viewDropHandlers() const;
 	virtual void insertViewDropHandler(IViewDropHandler *AHandler);
 	virtual void removeViewDropHandler(IViewDropHandler *AHandler);
@@ -122,7 +122,7 @@ protected slots:
 	void onQuoteActionTriggered(bool);
 	void onMessageWindowDestroyed();
 	void onChatWindowDestroyed();
-	void onTabWindowPageAdded(ITabWindowPage *APage);
+	void onTabWindowPageAdded(ITabPage *APage);
 	void onTabWindowDestroyed();
 	void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
 	void onStreamRemoved(IXmppStream *AXmppStream);
