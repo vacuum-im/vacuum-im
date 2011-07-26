@@ -449,7 +449,7 @@ bool MultiUserChatPlugin::showMessage(int AMessageId)
 	return true;
 }
 
-INotification MultiUserChatPlugin::notification(INotifications *ANotifications, const Message &AMessage)
+INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications, const Message &AMessage)
 {
 	INotification notify;
 	QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
@@ -476,12 +476,13 @@ INotification MultiUserChatPlugin::notification(INotifications *ANotifications, 
 	return notify;
 }
 
-bool MultiUserChatPlugin::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+bool MultiUserChatPlugin::createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AStreamJid);
 	Q_UNUSED(AContactJid);
 	Q_UNUSED(AType);
+	Q_UNUSED(AShowMode);
 	return false;
 }
 

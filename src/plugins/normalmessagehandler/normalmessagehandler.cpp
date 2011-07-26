@@ -141,7 +141,7 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 				window->setThreadId(AParams.value("thread"));
 			window->setSubject(AParams.value("subject"));
 			window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
-			showWindow(window);
+			window->showTabPage();
 			return true;
 		}
 	}
@@ -162,7 +162,7 @@ bool NormalMessageHandler::showMessage(int AMessageId)
 	if (!window)
 	{
 		Message message = FMessageProcessor->messageById(AMessageId);
-		return openWindow(MHO_NORMALMESSAGEHANDLER,message.to(),message.from(),message.type());
+		return createMessageWindow(MHO_NORMALMESSAGEHANDLER,message.to(),message.from(),Message::Normal,IMessageHandler::SM_SHOW);
 	}
 	else
 	{
@@ -188,7 +188,7 @@ bool NormalMessageHandler::receiveMessage(int AMessageId)
 	return true;
 }
 
-INotification NormalMessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
+INotification NormalMessageHandler::notifyMessage(INotifications *ANotifications, const Message &AMessage)
 {
 	IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
 	QIcon icon =  storage->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
@@ -231,13 +231,19 @@ INotification NormalMessageHandler::notification(INotifications *ANotifications,
 	return notify;
 }
 
-bool NormalMessageHandler::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType /*AType*/)
+bool NormalMessageHandler::createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
 	Q_UNUSED(AOrder);
+	Q_UNUSED(AType);
 	IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
 	if (window)
 	{
-		showWindow(window);
+		if (AShowMode == IMessageHandler::SM_ASSIGN)
+			window->assignTabPage();
+		else if (AShowMode == IMessageHandler::SM_SHOW)
+			window->showTabPage();
+		else if (AShowMode == IMessageHandler::SM_MINIMIZED)
+			window->showMinimizedTabPage();
 		return true;
 	}
 	return false;
@@ -274,11 +280,6 @@ IMessageWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Ji
 		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
 			return window;
 	return NULL;
-}
-
-void NormalMessageHandler::showWindow(IMessageWindow *AWindow)
-{
-	AWindow->showTabPage();
 }
 
 void NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
@@ -448,7 +449,7 @@ void NormalMessageHandler::onShowChatWindow()
 {
 	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
 	if (FMessageProcessor && window)
-		FMessageProcessor->openWindow(window->streamJid(),window->contactJid(),Message::Chat);
+		FMessageProcessor->createMessageWindow(window->streamJid(),window->contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
 }
 
 void NormalMessageHandler::onWindowDestroyed()
@@ -478,7 +479,7 @@ void NormalMessageHandler::onShowWindowAction(bool)
 	{
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-		openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal);
+		createMessageWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW);
 
 		QString group = action->data(ADR_GROUP).toString();
 		if (!group.isEmpty())
@@ -502,7 +503,7 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 			if (presence && presence->isOpen() && MessageActionTypes.contains(index.data(RDR_TYPE).toInt()))
 			{
 				Jid contactJid = index.data(RDR_FULL_JID).toString();
-				openWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal);
+				createMessageWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW);
 
 				QString group = index.data(RDR_TYPE).toInt()==RIT_GROUP ? index.data(RDR_GROUP).toString() : QString::null;
 				if (!group.isEmpty())

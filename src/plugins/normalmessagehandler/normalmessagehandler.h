@@ -30,10 +30,10 @@
 #include <utils/shortcuts.h>
 
 class NormalMessageHandler :
-			public QObject,
-			public IPlugin,
-			public IMessageHandler,
-			public IXmppUriHandler
+	public QObject,
+	public IPlugin,
+	public IMessageHandler,
+	public IXmppUriHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler);
@@ -54,12 +54,11 @@ public:
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool showMessage(int AMessageId);
 	virtual bool receiveMessage(int AMessageId);
-	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
-	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
+	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
+	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 protected:
 	IMessageWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	IMessageWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
-	void showWindow(IMessageWindow *AWindow);
 	void showNextMessage(IMessageWindow *AWindow);
 	void loadActiveMessages(IMessageWindow *AWindow);
 	void updateWindow(IMessageWindow *AWindow);

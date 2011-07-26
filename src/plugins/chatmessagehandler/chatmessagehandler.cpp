@@ -199,7 +199,7 @@ bool ChatMessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
-		return openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat);
+		return createMessageWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat,IMessageHandler::SM_SHOW);
 	}
 	return false;
 }
@@ -218,7 +218,7 @@ bool ChatMessageHandler::showMessage(int AMessageId)
 	if (!window)
 	{
 		Message message = FMessageProcessor->messageById(AMessageId);
-		return openWindow(MHO_CHATMESSAGEHANDLER,message.to(),message.from(),message.type());
+		return createMessageWindow(MHO_CHATMESSAGEHANDLER,message.to(),message.from(),Message::Chat,IMessageHandler::SM_SHOW);
 	}
 	else
 	{
@@ -248,7 +248,7 @@ bool ChatMessageHandler::receiveMessage(int AMessageId)
 	return notify;
 }
 
-INotification ChatMessageHandler::notification(INotifications *ANotifications, const Message &AMessage)
+INotification ChatMessageHandler::notifyMessage(INotifications *ANotifications, const Message &AMessage)
 {
 	IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
 	QIcon icon = storage->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
@@ -291,7 +291,7 @@ INotification ChatMessageHandler::notification(INotifications *ANotifications, c
 	return notify;
 }
 
-bool ChatMessageHandler::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+bool ChatMessageHandler::createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
 	Q_UNUSED(AOrder);
 	if (AType == Message::Chat)
@@ -299,7 +299,12 @@ bool ChatMessageHandler::openWindow(int AOrder, const Jid &AStreamJid, const Jid
 		IChatWindow *window = getWindow(AStreamJid,AContactJid);
 		if (window)
 		{
-			window->showTabPage();
+			if (AShowMode == IMessageHandler::SM_ASSIGN)
+				window->assignTabPage();
+			else if (AShowMode == IMessageHandler::SM_SHOW)
+				window->showTabPage();
+			else if (AShowMode == IMessageHandler::SM_MINIMIZED)
+				window->showMinimizedTabPage();
 			return true;
 		}
 	}
@@ -586,7 +591,7 @@ void ChatMessageHandler::onShowWindowAction(bool)
 	{
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-		openWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat);
+		createMessageWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat,IMessageHandler::SM_SHOW);
 	}
 }
 
@@ -615,7 +620,7 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(index.data(RDR_STREAM_JID).toString()) : NULL;
 			if (presence && presence->isOpen() && ChatActionTypes.contains(index.data(RDR_TYPE).toInt()))
 			{
-				openWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString(),Message::Chat);
+				createMessageWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
 			}
 		}
 	}

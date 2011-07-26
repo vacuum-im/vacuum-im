@@ -176,7 +176,7 @@ bool MultiUserChatWindow::showMessage(int AMessageId)
 	else
 	{
 		Message message = FMessageProcessor->messageById(AMessageId);
-		return openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type());
+		return createMessageWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type(),IMessageHandler::SM_SHOW);
 	}
 	return false;
 }
@@ -227,7 +227,7 @@ bool MultiUserChatWindow::receiveMessage(int AMessageId)
 	return notify;
 }
 
-INotification MultiUserChatWindow::notification(INotifications *ANotifications, const Message &AMessage)
+INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications, const Message &AMessage)
 {
 	INotification notify;
 	if (AMessage.type() != Message::Error)
@@ -311,18 +311,32 @@ INotification MultiUserChatWindow::notification(INotifications *ANotifications, 
 	return notify;
 }
 
-bool MultiUserChatWindow::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
+bool MultiUserChatWindow::createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
 	Q_UNUSED(AOrder);
 	if ((streamJid() == AStreamJid) && (roomJid() && AContactJid))
 	{
 		if (AType == Message::GroupChat)
 		{
-			showTabPage();
+			if (AShowMode == IMessageHandler::SM_ASSIGN)
+				assignTabPage();
+			else if (AShowMode == IMessageHandler::SM_SHOW)
+				showTabPage();
+			else if (AShowMode == IMessageHandler::SM_MINIMIZED)
+				showMinimizedTabPage();
 		}
 		else
 		{
-			openChatWindow(AContactJid);
+			IChatWindow *window = getChatWindow(AContactJid);
+			if (window)
+			{
+				if (AShowMode == IMessageHandler::SM_ASSIGN)
+					window->assignTabPage();
+				else if (AShowMode == IMessageHandler::SM_SHOW)
+					window->showTabPage();
+				else if (AShowMode == IMessageHandler::SM_MINIMIZED)
+					window->showMinimizedTabPage();
+			}
 		}
 		return true;
 	}
@@ -371,10 +385,8 @@ IMultiUserChat *MultiUserChatWindow::multiUserChat() const
 
 IChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
 {
-	IChatWindow *window = getChatWindow(AContactJid);
-	if (window)
-		window->showTabPage();
-	return window;
+	createMessageWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),AContactJid,Message::Chat,IMessageHandler::SM_SHOW);
+	return findChatWindow(AContactJid);
 }
 
 IChatWindow *MultiUserChatWindow::findChatWindow(const Jid &AContactJid) const
@@ -2162,7 +2174,7 @@ void MultiUserChatWindow::onUserItemDoubleClicked(const QModelIndex &AIndex)
 {
 	IMultiUser *user = FUsers.key(FUsersModel->itemFromIndex(FUsersProxy->mapToSource(AIndex)));
 	if (user)
-		openWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),user->contactJid(),Message::Chat);
+		createMessageWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),user->contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
 }
 
 void MultiUserChatWindow::onStatusIconsChanged()

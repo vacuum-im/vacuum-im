@@ -30,12 +30,12 @@
 #include "messengeroptions.h"
 
 class MessageWidgets :
-			public QObject,
-			public IPlugin,
-			public IMessageWidgets,
-			public IOptionsHolder,
-			public IViewUrlHandler,
-			public IEditContentsHandler
+	public QObject,
+	public IPlugin,
+	public IMessageWidgets,
+	public IOptionsHolder,
+	public IViewUrlHandler,
+	public IEditContentsHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IViewUrlHandler IEditContentsHandler);
@@ -77,7 +77,7 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName);
 	virtual QList<ITabWindow *> tabWindows() const;
-	virtual ITabWindow *openTabWindow(const QUuid &AWindowId);
+	virtual ITabWindow *newTabWindow(const QUuid &AWindowId);
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
 	virtual void assignTabWindowPage(ITabPage *APage);
 	virtual QList<IViewDropHandler *> viewDropHandlers() const;
