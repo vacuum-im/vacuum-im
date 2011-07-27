@@ -106,7 +106,7 @@ protected:
 	virtual void rosterRemoved(IRoster *ARoster) =0;
 };
 
-Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.0")
-Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.0")
+Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.1")
+Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.1")
 
 #endif
