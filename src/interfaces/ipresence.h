@@ -87,7 +87,7 @@ protected:
 	virtual void presenceRemoved(IPresence *APresence) =0;
 };
 
-Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.0")
-Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.0")
+Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.1")
+Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.1")
 
 #endif  //IPRESENCE_H

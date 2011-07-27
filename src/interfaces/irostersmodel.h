@@ -98,7 +98,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IRosterDataHolder,"Vacuum.Plugin.IRosterDataHolder/1.0");
-Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.0");
-Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.0");
+Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.1");
+Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.1");
 
 #endif
