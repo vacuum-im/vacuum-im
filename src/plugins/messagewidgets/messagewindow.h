@@ -35,6 +35,8 @@ public:
 	virtual QIcon tabPageIcon() const;
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
+	virtual ITabPageNotifier *tabPageNotifier() const;
+	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
 	//IMessageWindow
 	virtual const Jid &streamJid() const { return FStreamJid; }
 	virtual const Jid &contactJid() const { return FContactJid; }
@@ -68,6 +70,7 @@ signals:
 	void tabPageActivated();
 	void tabPageDeactivated();
 	void tabPageDestroyed();
+	void tabPageNotifierChanged();
 	//IMessageWindow
 	void showNextMessage();
 	void replyMessage();
@@ -103,6 +106,7 @@ private:
 	IReceiversWidget *FReceiversWidget;
 	IToolBarWidget *FViewToolBarWidget;
 	IToolBarWidget *FEditToolBarWidget;
+	ITabPageNotifier *FTabPageNotifier;
 private:
 	IMessageWidgets *FMessageWidgets;
 private:

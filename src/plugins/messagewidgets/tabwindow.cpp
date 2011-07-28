@@ -4,6 +4,7 @@
 #include <QInputDialog>
 #include <QSignalMapper>
 
+#define BLINK_INTERVAL              500
 #define ADR_TABWINDOWID             Action::DR_Parametr1
 
 TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
@@ -31,6 +32,12 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	FWindowMenu = new Menu(menuButton);
 	menuButton->setMenu(FWindowMenu);
 	ui.twtTabs->setCornerWidget(menuButton);
+
+	FBlinkVisible = true;
+	FBlinkTimer.setSingleShot(false);
+	FBlinkTimer.setInterval(BLINK_INTERVAL);
+	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTabNotifyTimerTimeout()));
+	FBlinkTimer.start();
 
 	createActions();
 	loadWindowStateAndGeometry();
@@ -102,8 +109,13 @@ void TabWindow::addTabPage(ITabPage *APage)
 		connect(APage->instance(),SIGNAL(tabPageClose()),SLOT(onTabPageClose()));
 		connect(APage->instance(),SIGNAL(tabPageChanged()),SLOT(onTabPageChanged()));
 		connect(APage->instance(),SIGNAL(tabPageDestroyed()),SLOT(onTabPageDestroyed()));
-		updateTab(index);
+
+		if (APage->tabPageNotifier())
+			connect(APage->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onTabPageNotifierActiveNotifyChanged(int)));
+		connect(APage->instance(),SIGNAL(tabPageNotifierChanged()),SLOT(onTabPageNotifierChanged()));
+		
 		updateWindow();
+		updateTab(index);
 		emit tabPageAdded(APage);
 	}
 }
@@ -148,6 +160,11 @@ void TabWindow::removeTabPage(ITabPage *APage)
 		disconnect(APage->instance(),SIGNAL(tabPageClose()),this,SLOT(onTabPageClose()));
 		disconnect(APage->instance(),SIGNAL(tabPageChanged()),this,SLOT(onTabPageChanged()));
 		disconnect(APage->instance(),SIGNAL(tabPageDestroyed()),this,SLOT(onTabPageDestroyed()));
+
+		if (APage->tabPageNotifier())
+			disconnect(APage->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onTabPageNotifierActiveNotifyChanged(int)));
+		disconnect(APage->instance(),SIGNAL(tabPageNotifierChanged()),this,SLOT(onTabPageNotifierChanged()));
+
 		updateTabs(index,ui.twtTabs->count()-1);
 		emit tabPageRemoved(APage);
 
@@ -314,14 +331,37 @@ void TabWindow::updateTab(int AIndex)
 	ITabPage *page = tabPage(AIndex);
 	if (page)
 	{
-		QString tabText;
+		QIcon tabIcon = page->tabPageIcon();
+		QString tabCaption = page->tabPageCaption();
+		QString tabToolTip = page->tabPageToolTip();
+
+		if (page->tabPageNotifier() && page->tabPageNotifier()->activeNotify()>0)
+		{
+			static QIcon emptyIcon;
+			if (emptyIcon.isNull())
+			{
+				QPixmap pixmap(ui.twtTabs->iconSize());
+				pixmap.fill(QColor(0,0,0,0));
+				emptyIcon.addPixmap(pixmap);
+			}
+
+			ITabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
+			if (!notify.icon.isNull())
+				tabIcon = notify.icon;
+			if (notify.blink && !FBlinkVisible)
+				tabIcon = emptyIcon;
+			if (!notify.caption.isNull())
+				tabCaption = notify.caption;
+			if (!notify.toolTip.isNull())
+				tabToolTip = notify.toolTip;
+		}
+
 		if (FShowIndices->isChecked() && AIndex<10)
-			tabText = tr("%1) %2").arg(QString::number((AIndex+1) % 10)).arg(page->tabPageCaption());
-		else
-			tabText = page->tabPageCaption();
-		ui.twtTabs->setTabText(AIndex,tabText);
-		ui.twtTabs->setTabIcon(AIndex,page->tabPageIcon());
-		ui.twtTabs->setTabToolTip(AIndex,page->tabPageToolTip());
+			tabCaption = tr("%1) %2").arg(QString::number((AIndex+1) % 10)).arg(tabCaption);
+
+		ui.twtTabs->setTabIcon(AIndex,tabIcon);
+		ui.twtTabs->setTabText(AIndex,tabCaption);
+		ui.twtTabs->setTabToolTip(AIndex,tabToolTip);
 	}
 }
 
@@ -375,15 +415,35 @@ void TabWindow::onTabPageChanged()
 	if (page)
 	{
 		int index = ui.twtTabs->indexOf(page->instance());
-		updateTab(index);
 		if (index == ui.twtTabs->currentIndex())
 			updateWindow();
+		updateTab(index);
 	}
 }
 
 void TabWindow::onTabPageDestroyed()
 {
 	removeTabPage(qobject_cast<ITabPage *>(sender()));
+}
+
+void TabWindow::onTabPageNotifierChanged()
+{
+	ITabPage *page = qobject_cast<ITabPage *>(sender());
+	if (page && page->tabPageNotifier()!=NULL)
+		connect(page->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),SLOT(onTabPageNotifierActiveNotifyChanged(int)));
+}
+
+void TabWindow::onTabPageNotifierActiveNotifyChanged(int ANotifyId)
+{
+	Q_UNUSED(ANotifyId);
+	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
+	if (notifier)
+	{
+		int index = ui.twtTabs->indexOf(notifier->tabPage()->instance());
+		if (index == ui.twtTabs->currentIndex())
+			updateWindow();
+		updateTab(index);
+	}
 }
 
 void TabWindow::onTabWindowAppended(const QUuid &AWindowId, const QString &AName)
@@ -519,5 +579,20 @@ void TabWindow::onActionTriggered(bool)
 		ITabWindow *window = FMessageWidgets->newTabWindow(action->data(ADR_TABWINDOWID).toString());
 		window->addTabPage(page);
 		window->showWindow();
+	}
+}
+
+void TabWindow::onBlinkTabNotifyTimerTimeout()
+{
+	FBlinkVisible = !FBlinkVisible;
+	for (int index=0; index<tabPageCount(); index++)
+	{
+		ITabPage *page = tabPage(index);
+		if (page && page->tabPageNotifier() && page->tabPageNotifier()->activeNotify()>0)
+		{
+			ITabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
+			if (notify.blink && !notify.icon.isNull())
+				updateTab(index);
+		}
 	}
 }

@@ -16,6 +16,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 	FContactJid = AContactJid;
 	FCurrentThreadId = QUuid::createUuid().toString();
 
+	FTabPageNotifier = NULL;
 	ui.wdtTabs->setDocumentMode(true);
 
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid,ui.wdtTabs);
@@ -125,6 +126,22 @@ QString MessageWindow::tabPageCaption() const
 QString MessageWindow::tabPageToolTip() const
 {
 	return FTabPageToolTip;
+}
+
+ITabPageNotifier *MessageWindow::tabPageNotifier() const
+{
+	return FTabPageNotifier;
+}
+
+void MessageWindow::setTabPageNotifier( ITabPageNotifier *ANotifier )
+{
+	if (FTabPageNotifier != ANotifier)
+	{
+		if (FTabPageNotifier)
+			delete FTabPageNotifier->instance();
+		FTabPageNotifier = ANotifier;
+		emit tabPageNotifierChanged();
+	}
 }
 
 void MessageWindow::setContactJid(const Jid &AContactJid)

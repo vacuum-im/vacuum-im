@@ -32,6 +32,8 @@ public:
 	virtual QIcon tabPageIcon() const;
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
+	virtual ITabPageNotifier *tabPageNotifier() const;
+	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
 	//IChatWindow
 	virtual const Jid &streamJid() const { return FStreamJid; }
 	virtual const Jid &contactJid() const { return FContactJid; }
@@ -54,6 +56,7 @@ signals:
 	void tabPageActivated();
 	void tabPageDeactivated();
 	void tabPageDestroyed();
+	void tabPageNotifierChanged();
 	//IChatWindow
 	void messageReady();
 	void streamJidChanged(const Jid &ABefore);
@@ -83,6 +86,7 @@ private:
 	IMenuBarWidget *FMenuBarWidget;
 	IToolBarWidget *FToolBarWidget;
 	IStatusBarWidget *FStatusBarWidget;
+	ITabPageNotifier *FTabPageNotifier;
 private:
 	Jid FStreamJid;
 	Jid FContactJid;

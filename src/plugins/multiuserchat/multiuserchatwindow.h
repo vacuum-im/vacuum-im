@@ -68,6 +68,8 @@ public:
 	virtual QIcon tabPageIcon() const;
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
+	virtual ITabPageNotifier *tabPageNotifier() const;
+	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
 	//IMessageHandler
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool showMessage(int AMessageId);
@@ -98,6 +100,7 @@ signals:
 	void tabPageActivated();
 	void tabPageDeactivated();
 	void tabPageDestroyed();
+	void tabPageNotifierChanged();
 	//IMultiUserChatWindow
 	void chatWindowCreated(IChatWindow *AWindow);
 	void chatWindowDestroyed(IChatWindow *AWindow);
@@ -208,6 +211,7 @@ private:
 	IMenuBarWidget *FMenuBarWidget;
 	IToolBarWidget *FToolBarWidget;
 	IStatusBarWidget *FStatusBarWidget;
+	ITabPageNotifier *FTabPageNotifier;
 private:
 	Menu *FToolsMenu;
 	Action *FChangeNick;

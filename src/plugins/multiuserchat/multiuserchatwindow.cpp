@@ -39,6 +39,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FMenuBarWidget = NULL;
 	FToolBarWidget = NULL;
 	FStatusBarWidget = NULL;
+	FTabPageNotifier = NULL;
 	FShownDetached = false;
 	FDestroyOnChatClosed = false;
 	FUsersListWidth = -1;
@@ -144,6 +145,22 @@ QString MultiUserChatWindow::tabPageCaption() const
 QString MultiUserChatWindow::tabPageToolTip() const
 {
 	return FTabPageToolTip;
+}
+
+ITabPageNotifier *MultiUserChatWindow::tabPageNotifier() const
+{
+	return FTabPageNotifier;
+}
+
+void MultiUserChatWindow::setTabPageNotifier(ITabPageNotifier *ANotifier)
+{
+	if (FTabPageNotifier != ANotifier)
+	{
+		if (FTabPageNotifier)
+			delete FTabPageNotifier->instance();
+		FTabPageNotifier = ANotifier;
+		emit tabPageNotifierChanged();
+	}
 }
 
 bool MultiUserChatWindow::checkMessage(int AOrder, const Message &AMessage)

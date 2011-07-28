@@ -250,6 +250,14 @@ IStatusBarWidget *MessageWidgets::newStatusBarWidget(IInfoWidget *AInfo, IViewWi
 	return widget;
 }
 
+ITabPageNotifier *MessageWidgets::newTabPageNotifier(ITabPage *ATabPage)
+{
+	ITabPageNotifier *notifier = new TabPageNotifier(ATabPage);
+	FCleanupHandler.add(notifier->instance());
+	emit tabPageNotifierCreated(notifier);
+	return notifier;
+}
+
 QList<IMessageWindow *> MessageWidgets::messageWindows() const
 {
 	return FMessageWindows;
