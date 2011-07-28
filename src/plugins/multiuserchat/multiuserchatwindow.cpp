@@ -813,12 +813,13 @@ void MultiUserChatWindow::insertStaticUserContextActions(Menu *AMenu, IMultiUser
 
 void MultiUserChatWindow::saveWindowState()
 {
-	Options::setFileValue(ui.sprHSplitter->saveState(),"muc.mucwindow.hsplitter-state",tabPageId());
+	if (FUsersListWidth > 0)
+		Options::setFileValue(FUsersListWidth,"muc.mucwindow.users-list-width",tabPageId());
 }
 
 void MultiUserChatWindow::loadWindowState()
 {
-	ui.sprHSplitter->restoreState(Options::fileValue("muc.mucwindow.hsplitter-state",tabPageId()).toByteArray());
+	FUsersListWidth = Options::fileValue("muc.mucwindow.users-list-width",tabPageId()).toInt();
 }
 
 void MultiUserChatWindow::saveWindowGeometry()
@@ -1492,8 +1493,6 @@ void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
 	QMainWindow::showEvent(AEvent);
-	if (FUsersListWidth < 0)
-		FUsersListWidth = ui.sprHSplitter->sizes().value(ui.sprHSplitter->indexOf(ui.ltvUsers));
 	if (FEditWidget)
 		FEditWidget->textEdit()->setFocus();
 	if (isActiveTabPage())
