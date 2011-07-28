@@ -158,6 +158,36 @@ public:
 	virtual IReceiversWidget *receiversWidget() const =0;
 };
 
+struct ITabPageNotify
+{
+	ITabPageNotify() {
+		priority = -1;
+		blink = true;
+	}
+	int priority;
+	bool blink;
+	QIcon icon;
+	QString caption;
+	QString toolTip;
+};
+
+class ITabPage;
+class ITabPageNotifier
+{
+public:
+	virtual QObject *instance() =0;
+	virtual ITabPage *tabPage() const =0;
+	virtual int activeNotify() const =0;
+	virtual QList<int> notifies() const =0;
+	virtual ITabPageNotify notifyById(int ANotifyId) const =0;
+	virtual int insertNotify(const ITabPageNotify &ANotify) =0;
+	virtual void removeNotify(int ANotifyId) =0;
+protected:
+	virtual void notifyInserted(int ANotifyId) =0;
+	virtual void notifyRemoved(int ANotifyId) =0;
+	virtual void activeNotifyChanged(int ANotifyId) =0;
+};
+
 class ITabPage
 {
 public:
@@ -171,6 +201,8 @@ public:
 	virtual QIcon tabPageIcon() const =0;
 	virtual QString tabPageCaption() const =0;
 	virtual QString tabPageToolTip() const =0;
+	virtual ITabPageNotifier *tabPageNotifier() const =0;
+	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier) =0;
 protected:
 	virtual void tabPageAssign() =0;
 	virtual void tabPageShow() =0;
@@ -181,6 +213,7 @@ protected:
 	virtual void tabPageActivated() =0;
 	virtual void tabPageDeactivated() =0;
 	virtual void tabPageDestroyed() =0;
+	virtual void tabPageNotifierChanged() =0;
 };
 
 class ITabWindow
@@ -302,6 +335,7 @@ public:
 	virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
 	virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
+	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage) = 0;
 	virtual QList<IMessageWindow *> messageWindows() const =0;
 	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
@@ -334,6 +368,7 @@ protected:
 	virtual void menuBarWidgetCreated(IMenuBarWidget *AMenuBarWidget) =0;
 	virtual void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget) =0;
 	virtual void statusBarWidgetCreated(IStatusBarWidget *AStatusBarWidget) =0;
+	virtual void tabPageNotifierCreated(ITabPageNotifier *ANotifier) =0;
 	virtual void messageWindowCreated(IMessageWindow *AWindow) =0;
 	virtual void messageWindowDestroyed(IMessageWindow *AWindow) =0;
 	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
@@ -358,13 +393,14 @@ Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
 Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")
 Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
 Q_DECLARE_INTERFACE(IStatusBarWidget,"Vacuum.Plugin.IStatusBarWidget/1.0")
-Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.1")
-Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.1")
-Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.1")
-Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.1")
+Q_DECLARE_INTERFACE(ITabPageNotifier,"Vacuum.Plugin.ITabPageNotifier/1.0")
+Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.2")
+Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.2")
+Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.2")
+Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.0")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.1")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.2")
 
 #endif // IMESSAGEWIDGETS_H

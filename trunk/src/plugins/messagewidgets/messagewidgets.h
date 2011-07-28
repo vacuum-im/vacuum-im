@@ -28,6 +28,7 @@
 #include "chatwindow.h"
 #include "tabwindow.h"
 #include "messengeroptions.h"
+#include "tabpagenotifier.h"
 
 class MessageWidgets :
 	public QObject,
@@ -65,6 +66,7 @@ public:
 	virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
+	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage);
 	virtual QList<IMessageWindow *> messageWindows() const;
 	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -97,6 +99,7 @@ signals:
 	void menuBarWidgetCreated(IMenuBarWidget *AMenuBarWidget);
 	void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget);
 	void statusBarWidgetCreated(IStatusBarWidget *AStatusBarWidget);
+	void tabPageNotifierCreated(ITabPageNotifier *ANotifier);
 	void messageWindowCreated(IMessageWindow *AWindow);
 	void messageWindowDestroyed(IMessageWindow *AWindow);
 	void chatWindowCreated(IChatWindow *AWindow);

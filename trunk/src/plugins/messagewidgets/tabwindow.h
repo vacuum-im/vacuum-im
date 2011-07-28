@@ -1,6 +1,7 @@
 #ifndef TABWINDOW_H
 #define TABWINDOW_H
 
+#include <QTimer>
 #include <QMainWindow>
 #include <QPushButton>
 #include <definitions/optionvalues.h>
@@ -60,11 +61,14 @@ protected slots:
 	void onTabPageClose();
 	void onTabPageChanged();
 	void onTabPageDestroyed();
+	void onTabPageNotifierChanged();
+	void onTabPageNotifierActiveNotifyChanged(int ANotifyId);
 	void onTabWindowAppended(const QUuid &AWindowId, const QString &AName);
 	void onTabWindowNameChanged(const QUuid &AWindowId, const QString &AName);
 	void onTabWindowDeleted(const QUuid &AWindowId);
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onActionTriggered(bool);
+	void onBlinkTabNotifyTimerTimeout();
 private:
 	Ui::TabWindowClass ui;
 private:
@@ -88,6 +92,9 @@ private:
 private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;
+private:
+	bool FBlinkVisible;
+	QTimer FBlinkTimer;
 };
 
 #endif // TABWINDOW_H

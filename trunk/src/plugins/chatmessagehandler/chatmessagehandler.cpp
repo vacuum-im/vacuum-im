@@ -320,6 +320,8 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 		if (window)
 		{
 			window->infoWidget()->autoUpdateFields();
+			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
+
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 			connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(IInfoWidget::InfoField, const QVariant &)),
 				SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
@@ -330,6 +332,7 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			FWindows.append(window);
 			FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
 			updateWindow(window);
+			setMessageStyle(window);
 
 			Action *clearAction = new Action(window->instance());
 			clearAction->setText(tr("Clear Chat Window"));
@@ -345,9 +348,8 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 				QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(menu->menuAction(),TBG_CWTBW_USER_TOOLS);
 				button->setPopupMode(QToolButton::InstantPopup);
 			}
-			setMessageStyle(window);
-			bool loadHistory = Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool();
-			if (loadHistory)
+
+			if (Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool())
 				showHistory(window);
 		}
 		else

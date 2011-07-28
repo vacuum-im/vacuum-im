@@ -15,6 +15,8 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FContactJid = AContactJid;
 	FShownDetached = false;
 
+	FTabPageNotifier = NULL;
+
 	ui.wdtInfo->setLayout(new QVBoxLayout);
 	ui.wdtInfo->layout()->setMargin(0);
 	FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid,ui.wdtInfo);
@@ -119,6 +121,22 @@ QString ChatWindow::tabPageCaption() const
 QString ChatWindow::tabPageToolTip() const
 {
 	return FTabPageToolTip;
+}
+
+ITabPageNotifier *ChatWindow::tabPageNotifier() const
+{
+	return FTabPageNotifier;
+}
+
+void ChatWindow::setTabPageNotifier(ITabPageNotifier *ANotifier)
+{
+	if (FTabPageNotifier != ANotifier)
+	{
+		if (FTabPageNotifier)
+			delete FTabPageNotifier->instance();
+		FTabPageNotifier = ANotifier;
+		emit tabPageNotifierChanged();
+	}
 }
 
 void ChatWindow::setContactJid(const Jid &AContactJid)
