@@ -27,6 +27,10 @@
         <source>Send chat state notifications</source>
         <translation>Отправлять уведомления об активности в чате</translation>
     </message>
+    <message>
+        <source>Typing...</source>
+        <translation>Печатает...</translation>
+    </message>
 </context>
 <context>
     <name>StateWidget</name>

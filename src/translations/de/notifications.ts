@@ -39,6 +39,22 @@
         <source>Remove all notifications</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Enable alerts in task bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand contact groups in roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show minimized window on notification</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
@@ -97,23 +113,11 @@
         <translation>Aktivieren</translation>
     </message>
     <message>
-        <source>Expand contact groups in roster</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
         <translation></translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enable alerts in task bar</source>
         <translation></translation>
     </message>
 </context>

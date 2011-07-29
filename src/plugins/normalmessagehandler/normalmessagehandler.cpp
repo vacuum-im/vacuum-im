@@ -212,6 +212,8 @@ INotification NormalMessageHandler::notifyMessage(INotifications *ANotifications
 		IMessageWindow *window = FActiveMessages.key(AMessage.data(MDR_MESSAGE_ID).toInt());
 		if (window)
 		{
+			if (Options::node(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED).value().toBool())
+				window->showMinimizedTabPage();
 			notify.data.insert(NDR_ALERT_WIDGET,(int)window->instance());
 			notify.data.insert(NDR_TABPAGE_OBJECT,(int)window->instance());
 			notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_NEW_MESSAGE);

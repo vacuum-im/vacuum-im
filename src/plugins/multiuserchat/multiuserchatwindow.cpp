@@ -253,12 +253,12 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 		IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
 		if (!contactJid.resource().isEmpty())
 		{
-			QWidget *widgetToAlert = NULL;
+			ITabPage *page = NULL;
 			if (AMessage.type() == Message::GroupChat)
 			{
 				if (!AMessage.body().isEmpty() && !isActiveTabPage() && !AMessage.isDelayed())
 				{
-					widgetToAlert = this;
+					page = this;
 					if (isMentionMessage(AMessage))
 					{
 						notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_MENTION);
@@ -283,7 +283,7 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 				IChatWindow *window = findChatWindow(AMessage.from());
 				if (window == NULL || !window->isActiveTabPage())
 				{
-					widgetToAlert = window->instance();
+					page = window;
 					notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
 					notify.type = NNT_MUC_MESSAGE_PRIVATE;
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
@@ -306,10 +306,12 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
 				}
 			}
-			if (widgetToAlert)
+			if (page)
 			{
-				notify.data.insert(NDR_ALERT_WIDGET,(int)widgetToAlert);
-				notify.data.insert(NDR_TABPAGE_OBJECT,(int)widgetToAlert);
+				if (Options::node(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED).value().toBool())
+					page->showMinimizedTabPage();
+				notify.data.insert(NDR_ALERT_WIDGET,(int)page->instance());
+				notify.data.insert(NDR_TABPAGE_OBJECT,(int)page->instance());
 				notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_NEW_MESSAGE);
 				notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
 			}

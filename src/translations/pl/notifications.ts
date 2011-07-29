@@ -39,6 +39,22 @@
         <source>Remove all notifications</source>
         <translation>Usuń wszystkie powiadomienia</translation>
     </message>
+    <message>
+        <source>Enable alerts in task bar</source>
+        <translation>Pokazuj alerty w pasku zadań</translation>
+    </message>
+    <message>
+        <source>Expand contact groups in roster</source>
+        <translation>Rozwiń grupy na liście kontaktów</translation>
+    </message>
+    <message>
+        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
+        <translation>Wyłącz dźwięk jeśli ustawiony jest status &apos;Nie przeszkadzaj&apos;</translation>
+    </message>
+    <message>
+        <source>Show minimized window on notification</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
@@ -97,24 +113,12 @@
         <translation>Aktywuj</translation>
     </message>
     <message>
-        <source>Expand contact groups in roster</source>
-        <translation>Rozwiń grupy na liście kontaktów</translation>
-    </message>
-    <message>
-        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation>Wyłącz dźwięk jeśli ustawiony jest status &apos;Nie przeszkadzaj&apos;</translation>
-    </message>
-    <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
         <translation>Czas pokazywania wyskakujących okienek (0-zawsze widoczne):</translation>
     </message>
     <message>
         <source> seconds</source>
         <translation> sekund</translation>
-    </message>
-    <message>
-        <source>Enable alerts in task bar</source>
-        <translation>Pokazuj alerty w pasku zadań</translation>
     </message>
 </context>
 </TS>
