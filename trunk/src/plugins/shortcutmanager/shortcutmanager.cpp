@@ -114,7 +114,7 @@ void ShortcutManager::hideAllWidgets()
 			}
 			if (Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool())
 			{
-				FNotifyHidden |= INotification::PlaySound;
+				FNotifyHidden |= INotification::SoundPlay;
 				Options::node(OPV_NOTIFICATIONS_SOUND).setValue(false);
 			}
 			if (Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool())
@@ -161,7 +161,7 @@ void ShortcutManager::showHiddenWidgets(bool ACheckPassword)
 				{
 					Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(true);
 				}
-				if (FNotifyHidden & INotification::PlaySound)
+				if (FNotifyHidden & INotification::SoundPlay)
 				{
 					Options::node(OPV_NOTIFICATIONS_SOUND).setValue(true);
 				}

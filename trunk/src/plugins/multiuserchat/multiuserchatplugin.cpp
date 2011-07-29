@@ -233,20 +233,20 @@ bool MultiUserChatPlugin::initObjects()
 
 	if (FNotifications)
 	{
-		uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
-		uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+		ushort kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
+		ushort kindDefs = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay;
 		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_INVITE,OWO_NOTIFICATIONS_MUC_MESSAGE_INVITE,tr("Invite chat messages"),kindMask,kindDefs);
 
-		kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
-		kindDefs = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+		kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::AutoActivate;
+		kindDefs = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify;
 		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_PRIVATE,OWO_NOTIFICATIONS_MUC_MESSAGE_PRIVATE,tr("Private conference messages"),kindMask,kindDefs);
 
-		kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
-		kindDefs = INotification::TrayIcon|INotification::PlaySound;
+		kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify;
+		kindDefs = INotification::TrayNotify|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify;
 		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_GROUPCHAT,OWO_NOTIFICATIONS_MUC_MESSAGE_GROUPCHAT,tr("Conference messages"),kindMask,kindDefs);
 
-		kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
-		kindDefs = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
+		kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::AutoActivate;
+		kindDefs = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify;
 		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_MENTION,OWO_NOTIFICATIONS_MUC_MESSAGE_MENTION,tr("Mention in conference"),kindMask,kindDefs);
 	}
 
@@ -465,7 +465,7 @@ INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications,
 			notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
 			notify.data.insert(NDR_STREAM_JID,AMessage.to());
 			notify.data.insert(NDR_CONTACT_JID,fromJid.full());
-			notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
+			notify.data.insert(NDR_ROSTER_ORDER,RLO_MESSAGE);
 			notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
 			notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
 			notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));

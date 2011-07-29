@@ -258,6 +258,7 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 			{
 				if (!AMessage.body().isEmpty() && !isActiveTabPage() && !AMessage.isDelayed())
 				{
+					widgetToAlert = this;
 					if (isMentionMessage(AMessage))
 					{
 						notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_MENTION);
@@ -275,15 +276,14 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
-
 				}
-				widgetToAlert = this;
 			}
 			else if (!AMessage.body().isEmpty())
 			{
 				IChatWindow *window = findChatWindow(AMessage.from());
 				if (window == NULL || !window->isActiveTabPage())
 				{
+					widgetToAlert = window->instance();
 					notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
 					notify.type = NNT_MUC_MESSAGE_PRIVATE;
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
@@ -292,7 +292,6 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
 				}
-				widgetToAlert = window!=NULL ? window->instance() : NULL;
 			}
 			if (notify.kinds & INotification::PopupWindow)
 			{
@@ -306,7 +305,13 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 				{
 					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
 				}
-				WidgetManager::alertWidget(widgetToAlert);
+			}
+			if (widgetToAlert)
+			{
+				notify.data.insert(NDR_ALERT_WIDGET,(int)widgetToAlert);
+				notify.data.insert(NDR_TABPAGE_OBJECT,(int)widgetToAlert);
+				notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_NEW_MESSAGE);
+				notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
 			}
 		}
 		else
@@ -1247,10 +1252,10 @@ void MultiUserChatWindow::showHistory()
 
 void MultiUserChatWindow::updateWindow()
 {
-	if (FActiveMessages.isEmpty())
-		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_CONFERENCE,0,0,"windowIcon");
-	else
+	if (isWindow() && !FActiveMessages.isEmpty())
 		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_MESSAGE,0,0,"windowIcon");
+	else
+		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_CONFERENCE,0,0,"windowIcon");
 
 	QString roomName = tr("%1 (%2)").arg(FMultiChat->roomJid().node()).arg(FUsers.count());
 	setWindowIconText(roomName);
@@ -1390,6 +1395,8 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 		window = FMessageWidgets!=NULL ? FMessageWidgets->newChatWindow(streamJid(),AContactJid) : NULL;
 		if (window)
 		{
+			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
+
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onChatMessageReady()));
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onChatWindowActivated()));
 			connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onChatWindowClosed()));
@@ -1443,7 +1450,7 @@ void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
 void MultiUserChatWindow::updateChatWindow(IChatWindow *AWindow)
 {
 	QIcon icon;
-	if (FActiveChatMessages.contains(AWindow))
+	if (AWindow->instance()->isWindow() && FActiveChatMessages.contains(AWindow))
 		icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE);
 	else if (FStatusIcons)
 		icon = FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),"",false);

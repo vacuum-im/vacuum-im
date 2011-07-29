@@ -11,25 +11,32 @@
 struct INotification 
 {
 	enum NotifyKinds {
-		RosterIcon    = 0x01,
-		PopupWindow   = 0x02,
-		TrayIcon      = 0x04,
-		TrayAction    = 0x08,
-		PlaySound     = 0x10,
-		AutoActivate  = 0x20
+		RosterNotify          = 0x0001,
+		PopupWindow           = 0x0002,
+		TrayNotify            = 0x0004,
+		TrayAction            = 0x0008,
+		SoundPlay             = 0x0010,
+		AlertWidget           = 0x0020,
+		TabPageNotify         = 0x0040,
+		AutoActivate          = 0x8000
+	};
+	enum NotifyFlags {
+		RemoveInvisible       = 0x0001
 	};
 	INotification() {
-		kinds = 0; 
+		kinds = 0;
+		flags = RemoveInvisible;
 	}
-	uchar kinds;
 	QString type;
+	ushort kinds;
+	ushort flags;
 	QMap<int, QVariant> data;
 };
 
 class INotificationHandler
 {
 public:
-	virtual bool showNotification(int AOrder, uchar AKind, int ANotifyId, const INotification &ANotification) =0;
+	virtual bool showNotification(int AOrder, ushort AKind, int ANotifyId, const INotification &ANotification) =0;
 };
 
 class INotifications 
@@ -41,9 +48,9 @@ public:
 	virtual int appendNotification(const INotification &ANotification) =0;
 	virtual void activateNotification(int ANotifyId) =0;
 	virtual void removeNotification(int ANotifyId) =0;
-	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, uchar AKindMask, uchar ADefault) =0;
-	virtual uchar notificationKinds(const QString &AType) const =0;
-	virtual void setNotificationKinds(const QString &AType, uchar AKinds) =0;
+	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, ushort AKindMask, ushort ADefault) =0;
+	virtual ushort notificationKinds(const QString &AType) const =0;
+	virtual void setNotificationKinds(const QString &AType, ushort AKinds) =0;
 	virtual void removeNotificationType(const QString &AType) =0;
 	virtual void insertNotificationHandler(int AOrder, INotificationHandler *AHandler) =0;
 	virtual void removeNotificationHandler(int AOrder, INotificationHandler *AHandler) =0;
@@ -59,7 +66,7 @@ protected:
 	virtual void notificationHandlerRemoved(int AOrder, INotificationHandler *AHandler) =0;
 };
 
-Q_DECLARE_INTERFACE(INotificationHandler,"Vacuum.Plugin.INotificationHandler/1.0")
-Q_DECLARE_INTERFACE(INotifications,"Vacuum.Plugin.INotifications/1.0")
+Q_DECLARE_INTERFACE(INotificationHandler,"Vacuum.Plugin.INotificationHandler/1.1")
+Q_DECLARE_INTERFACE(INotifications,"Vacuum.Plugin.INotifications/1.1")
 
 #endif //INOTIFICATIONS_H

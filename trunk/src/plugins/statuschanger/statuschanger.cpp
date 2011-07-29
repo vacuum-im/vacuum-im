@@ -194,8 +194,8 @@ bool StatusChanger::initObjects()
 
 	if (FNotifications)
 	{
-		uchar kindMask = INotification::PopupWindow|INotification::PlaySound;
-		uchar kindDefs = INotification::PopupWindow|INotification::PlaySound;
+		ushort kindMask = INotification::PopupWindow|INotification::SoundPlay;
+		ushort kindDefs = INotification::PopupWindow|INotification::SoundPlay;
 		FNotifications->registerNotificationType(NNT_CONNECTION_ERROR,OWO_NOTIFICATIONS_CONNECTION_ERROR,tr("Connection errors"),kindMask,kindDefs);
 	}
 

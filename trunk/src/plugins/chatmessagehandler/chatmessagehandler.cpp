@@ -97,8 +97,8 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
 		if (notifications)
 		{
-			uchar kindMask = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
-			uchar kindDefs = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
+			ushort kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::AutoActivate;
+			ushort kindDefs = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify;
 			notifications->registerNotificationType(NNT_CHAT_MESSAGE,OWO_NOTIFICATIONS_CHAT_MESSAGE,tr("Chat Messages"),kindMask,kindDefs);
 		}
 	}
@@ -263,11 +263,20 @@ INotification ChatMessageHandler::notifyMessage(INotifications *ANotifications, 
 		notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
 		notify.data.insert(NDR_STREAM_JID,AMessage.to());
 		notify.data.insert(NDR_CONTACT_JID,AMessage.from());
-		notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
+		notify.data.insert(NDR_ROSTER_ORDER,RLO_MESSAGE);
 		notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(AMessage.from()));
 		notify.data.insert(NDR_POPUP_CAPTION, tr("Message received"));
 		notify.data.insert(NDR_POPUP_TITLE,name);
 		notify.data.insert(NDR_SOUND_FILE,SDF_CHAT_MHANDLER_MESSAGE);
+
+		IChatWindow *window = FActiveMessages.key(AMessage.data(MDR_MESSAGE_ID).toInt());
+		if (window)
+		{
+			notify.data.insert(NDR_ALERT_WIDGET,(int)window->instance());
+			notify.data.insert(NDR_TABPAGE_OBJECT,(int)window->instance());
+			notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_NEW_MESSAGE);
+			notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
+		}
 
 		if (FMessageProcessor)
 		{
@@ -281,13 +290,6 @@ INotification ChatMessageHandler::notifyMessage(INotifications *ANotifications, 
 		}
 	}
 	
-	if (notify.kinds & INotification::PopupWindow)
-	{
-		IChatWindow *window = FActiveMessages.key(AMessage.data(MDR_MESSAGE_ID).toInt());
-		if (window)
-			WidgetManager::alertWidget(window->instance());
-	}
-
 	return notify;
 }
 
@@ -369,7 +371,7 @@ IChatWindow *ChatMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AC
 void ChatMessageHandler::updateWindow(IChatWindow *AWindow)
 {
 	QIcon icon;
-	if (FActiveMessages.contains(AWindow))
+	if (AWindow->instance()->isWindow() && FActiveMessages.contains(AWindow))
 		icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
 	else if (FStatusIcons)
 		icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());

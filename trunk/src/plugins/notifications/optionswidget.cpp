@@ -25,9 +25,9 @@ OptionsWidget::~OptionsWidget()
 
 void OptionsWidget::apply()
 {
-	Options::node(OPV_NOTIFICATIONS_ROSTERICON).setValue(ui.chbEnableRosterIcons->isChecked());
+	Options::node(OPV_NOTIFICATIONS_ROSTERNOTIFY).setValue(ui.chbEnableRosterIcons->isChecked());
 	Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(ui.chbEnablePopupWindows->isChecked());
-	Options::node(OPV_NOTIFICATIONS_TRAYICON).setValue(ui.chbEnableTrayIcons->isChecked());
+	Options::node(OPV_NOTIFICATIONS_TRAYNOTIFY).setValue(ui.chbEnableTrayIcons->isChecked());
 	Options::node(OPV_NOTIFICATIONS_SOUND).setValue(ui.chbEnableSounds->isChecked());
 	Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(ui.chbEnableAutoActivate->isChecked());
 	Options::node(OPV_NOTIFICATIONS_ENABLEALERTS).setValue(ui.chbEnableAlerts->isChecked());
@@ -39,9 +39,9 @@ void OptionsWidget::apply()
 
 void OptionsWidget::reset()
 {
-	ui.chbEnableRosterIcons->setChecked(Options::node(OPV_NOTIFICATIONS_ROSTERICON).value().toBool());
+	ui.chbEnableRosterIcons->setChecked(Options::node(OPV_NOTIFICATIONS_ROSTERNOTIFY).value().toBool());
 	ui.chbEnablePopupWindows->setChecked(Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool());
-	ui.chbEnableTrayIcons->setChecked(Options::node(OPV_NOTIFICATIONS_TRAYICON).value().toBool());
+	ui.chbEnableTrayIcons->setChecked(Options::node(OPV_NOTIFICATIONS_TRAYNOTIFY).value().toBool());
 	ui.chbEnableSounds->setChecked(Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool());
 	ui.chbEnableAutoActivate->setChecked(Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool());
 	ui.chbEnableAlerts->setChecked(Options::node(OPV_NOTIFICATIONS_ENABLEALERTS).value().toBool());

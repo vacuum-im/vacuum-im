@@ -127,8 +127,8 @@ bool FileTransfer::initObjects()
 	}
 	if (FNotifications)
 	{
-		uchar kindMask = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
-		uchar kindDefs = INotification::RosterIcon|INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
+		ushort kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AutoActivate;
+		ushort kindDefs = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AutoActivate;
 		FNotifications->registerNotificationType(NNT_FILETRANSFER,OWO_NOTIFICATIONS_FILETRANSFER,tr("File Transfer"),kindMask,kindDefs);
 	}
 	if (FFileManager)
@@ -441,7 +441,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 			case IFileStream::Transfering:
 				if (ANewStream)
 				{
-					notify.kinds &= ~INotification::TrayIcon;
+					notify.kinds &= ~INotification::TrayNotify;
 					if (AStream->streamKind() == IFileStream::SendFile)
 					{
 						notify.data.insert(NDR_TOOLTIP,tr("Auto sending file: %1").arg(file));
@@ -472,6 +472,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 			default:
 				notify.kinds = 0;
 			}
+			notify.data.insert(NDR_ALERT_WIDGET,(int)qobject_cast<QWidget *>(dialog));
 
 			if (notify.kinds > 0)
 			{
@@ -479,10 +480,6 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 					FNotifications->removeNotification(FStreamNotify.value(AStream->streamId()));
 				int notifyId = FNotifications->appendNotification(notify);
 				FStreamNotify.insert(AStream->streamId(),notifyId);
-			}
-			if (notify.kinds & INotification::PopupWindow)
-			{
-				WidgetManager::alertWidget(dialog);
 			}
 		}
 	}

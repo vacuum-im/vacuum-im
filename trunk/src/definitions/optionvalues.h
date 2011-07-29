@@ -133,17 +133,19 @@
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
 #define OPV_NOTIFICATIONS_SOUND                         "notifications.sound"
-#define OPV_NOTIFICATIONS_ROSTERICON                    "notifications.roster-icon"
+#define OPV_NOTIFICATIONS_ROSTERNOTIFY                  "notifications.roster-notify"
 #define OPV_NOTIFICATIONS_POPUPWINDOW                   "notifications.popup-window"
-#define OPV_NOTIFICATIONS_TRAYICON                      "notifications.tray-icon"
+#define OPV_NOTIFICATIONS_TRAYNOTIFY                    "notifications.tray-notify"
 #define OPV_NOTIFICATIONS_TRAYACTION                    "notifications.tray-action"
+#define OPV_NOTIFICATIONS_ALERTWIDGET                   "notifications.alert-widget"
+#define OPV_NOTIFICATIONS_TABPAGENOTIFY                 "notifications.tab-page-notify"
 #define OPV_NOTIFICATIONS_AUTOACTIVATE                  "notifications.auto-activate"
 #define OPV_NOTIFICATIONS_ENABLEALERTS                  "notifications.enable-alerts"
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
 #define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
 #define OPV_NOTIFICATIONS_SOUND_COMMAND                 "notifications.sound-command"
-#define OPV_NOTIFICATIONS_NOTIFICATIONTYPE_ITEM         "notifications.notification-type"
+#define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
 
 // ConnectionManager
 #define OPV_PROXY_ROOT                                  "proxy"

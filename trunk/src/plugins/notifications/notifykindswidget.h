@@ -7,13 +7,13 @@
 #include "ui_notifykindswidget.h"
 
 class NotifyKindsWidget :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);
 public:
-	NotifyKindsWidget(INotifications *ANotifications, const QString &AId, const QString &ATitle, uchar AKindMask, QWidget *AParent);
+	NotifyKindsWidget(INotifications *ANotifications, const QString &AId, const QString &ATitle, ushort AKindMask, QWidget *AParent);
 	~NotifyKindsWidget();
 	virtual QWidget* instance() { return this; }
 public slots:
