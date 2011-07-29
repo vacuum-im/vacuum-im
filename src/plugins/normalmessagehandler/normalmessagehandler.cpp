@@ -265,7 +265,7 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 			connect(window->instance(),SIGNAL(replyMessage()),SLOT(onReplyMessage()));
 			connect(window->instance(),SIGNAL(forwardMessage()),SLOT(onForwardMessage()));
 			connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onShowChatWindow()));
-			connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onWindowDestroyed()));
+			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
 			FWindows.append(window);
 			loadActiveMessages(window);
 			showNextMessage(window);
