@@ -10,6 +10,7 @@ LEGEND
 ------
   [!] Added new plugin for notifications about birthdays
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
+  [*] Notice of user activity in the chat duplicated on the chat tab
 
 
 v1.1.0
