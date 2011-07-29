@@ -10,6 +10,9 @@
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/tabpagenotifypriorities.h>
 #include <definitions/sessionnegotiatororders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ichatstates.h>
@@ -20,9 +23,11 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/idataforms.h>
+#include <interfaces/inotifications.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/imultiuserchat.h>
 #include <utils/options.h>
+#include <utils/iconstorage.h>
 #include "statewidget.h"
 
 struct ChatParams
@@ -30,23 +35,25 @@ struct ChatParams
 	ChatParams() {
 		userState = IChatStates::StateUnknown;
 		selfState = IChatStates::StateUnknown;
+		notifyId = 0;
 		selfLastActive = 0;
 		canSendStates = false;
 	}
 	int userState;
 	int selfState;
+	int notifyId;
 	uint selfLastActive;
 	bool canSendStates;
 };
 
 class ChatStates :
-			public QObject,
-			public IPlugin,
-			public IChatStates,
-			public IStanzaHandler,
-			public IArchiveHandler,
-			public IOptionsHolder,
-			public ISessionNegotiator
+	public QObject,
+	public IPlugin,
+	public IChatStates,
+	public IStanzaHandler,
+	public IArchiveHandler,
+	public IOptionsHolder,
+	public ISessionNegotiator
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsHolder ISessionNegotiator);
@@ -91,6 +98,7 @@ protected:
 	void setSupported(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported);
 	void setUserState(const Jid &AStreamJid, const Jid &AContactJid, int AState);
 	void setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int AState, bool ASend = true);
+	void notifyUserState(const Jid &AStreamJid, const Jid &AContactJid);
 	void registerDiscoFeatures();
 protected slots:
 	void onPresenceOpened(IPresence *APresence);
@@ -116,6 +124,7 @@ private:
 	IServiceDiscovery *FDiscovery;
 	IMessageArchiver *FMessageArchiver;
 	IDataForms *FDataForms;
+	INotifications *FNotifications;
 	ISessionNegotiation *FSessionNegotiation;
 	IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
