@@ -3,6 +3,7 @@
 
 #include <QTimer>
 #include <QSound>
+#include <QPointer>
 #include <definitions/notificationdataroles.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
@@ -24,6 +25,7 @@
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
+#include <interfaces/imessagewidgets.h>
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
@@ -37,30 +39,31 @@ struct NotifyRecord
 	NotifyRecord() {
 		trayId=0;
 		rosterId=0;
-		widget=NULL;
-		action=NULL;
+		tabPageId=0;
 	}
 	int trayId;
 	int rosterId;
-	Action *action;
-	NotifyWidget *widget;
+	int tabPageId;
 	INotification notification;
+	QPointer<Action> trayAction;
+	QPointer<QObject> tabPageNotifier;
+	QPointer<NotifyWidget> popupWidget;
 };
 
 struct TypeRecord 
 {
 	int optionsOrder;
 	QString title;
-	uchar kinds;
-	uchar defaults;
-	uchar kindMask;
+	ushort kinds;
+	ushort defaults;
+	ushort kindMask;
 };
 
 class Notifications :
-			public QObject,
-			public IPlugin,
-			public INotifications,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public INotifications,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin INotifications IOptionsHolder);
@@ -84,9 +87,9 @@ public:
 	virtual void activateNotification(int ANotifyId);
 	virtual void removeNotification(int ANotifyId);
 	//Kind options for notificators
-	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, uchar AKindMask, uchar ADefault);
-	virtual uchar notificationKinds(const QString &AType) const;
-	virtual void setNotificationKinds(const QString &AType, uchar AKinds);
+	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, ushort AKindMask, ushort ADefault);
+	virtual ushort notificationKinds(const QString &AType) const;
+	virtual void setNotificationKinds(const QString &AType, ushort AKinds);
 	virtual void removeNotificationType(const QString &AType);
 	//Notification Handlers
 	virtual void insertNotificationHandler(int AOrder, INotificationHandler *AHandler);
@@ -106,7 +109,8 @@ protected:
 	int notifyIdByRosterId(int ARosterId) const;
 	int notifyIdByTrayId(int ATrayId) const;
 	int notifyIdByWidget(NotifyWidget *AWidget) const;
-	bool showNotifyByHandler(uchar AKind, int ANotifyId, const INotification &ANotification) const;
+	bool showNotifyByHandler(ushort AKind, int ANotifyId, const INotification &ANotification) const;
+	void removeInvisibleNotification(int ANotifyId);
 protected slots:
 	void onActivateDelayedActivations();
 	void onSoundOnOffActionTriggered(bool);

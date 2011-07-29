@@ -103,8 +103,8 @@ bool SessionNegotiation::initObjects()
 	}
 	if (FNotifications)
 	{
-		uchar kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
-		uchar kindDefs = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+		ushort kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
+		ushort kindDefs = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay;
 		FNotifications->registerNotificationType(NNT_SESSION_NEGOTIATION,OWO_NOTIFICATIONS_SESSION_NEGOTIATION,tr("Negotiate session requests"),kindMask,kindDefs);
 	}
 	if (FDataForms)

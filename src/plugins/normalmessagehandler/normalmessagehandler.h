@@ -9,6 +9,7 @@
 #include <definitions/rosterlabelorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
+#include <definitions/tabpagenotifypriorities.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/actiongroups.h>
 #include <definitions/resources.h>

@@ -78,8 +78,8 @@ bool CaptchaForms::initObjects()
 	}
 	if (FNotifications)
 	{
-		uchar kindMask = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
-		uchar kindDefs = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
+		ushort kindMask = INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AutoActivate;
+		ushort kindDefs = INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay;
 		FNotifications->registerNotificationType(NNT_CAPTCHA_REQUEST,OWO_NOTIFICATIONS_CAPTCHA_REQUEST,tr("CAPTCHA Challenges"),kindMask,kindDefs);
 	}
 	return true;

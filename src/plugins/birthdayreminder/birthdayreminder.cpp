@@ -119,7 +119,7 @@ bool BirthdayReminder::initObjects()
 {
 	if (FNotifications)
 	{
-		uchar kindMask = INotification::PopupWindow|INotification::PlaySound;
+		ushort kindMask = INotification::PopupWindow|INotification::SoundPlay;
 		FNotifications->registerNotificationType(NNT_BIRTHDAY,OWO_NOTIFICATIONS_BIRTHDAY,tr("Birthdays"),kindMask,kindMask);
 	}
 	if (FRostersViewPlugin)
@@ -230,7 +230,7 @@ void BirthdayReminder::onShowNotificationTimer()
 	{
 		INotification notify;
 		notify.kinds = FNotifications->notificationKinds(NNT_BIRTHDAY);
-		if ((notify.kinds & (INotification::PopupWindow|INotification::PlaySound))>0)
+		if ((notify.kinds & (INotification::PopupWindow|INotification::SoundPlay))>0)
 		{
 			updateBirthdaysStates();
 			notify.type = NNT_BIRTHDAY;

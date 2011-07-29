@@ -127,8 +127,8 @@ bool RosterChanger::initObjects()
 
 	if (FNotifications)
 	{
-		uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
-		uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+		ushort kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
+		ushort kindDefs = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay;
 		FNotifications->registerNotificationType(NNT_SUBSCRIPTION_REQUEST,OWO_NOTIFICATIONS_SUBSCRIPTION_REQUEST,tr("Subscription requests"),kindMask,kindDefs);
 	}
 	if (FRostersView)
@@ -1124,7 +1124,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 		notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AContactJid)));
 		notify.data.insert(NDR_STREAM_JID,ARoster->streamJid().full());
 		notify.data.insert(NDR_CONTACT_JID,AContactJid.full());
-		notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_SUBSCRIBTION);
+		notify.data.insert(NDR_ROSTER_ORDER,RLO_SUBSCRIBTION);
 		notify.data.insert(NDR_POPUP_CAPTION, tr("Subscription message"));
 		notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(ARoster->streamJid(),AContactJid));
 		notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(AContactJid));
