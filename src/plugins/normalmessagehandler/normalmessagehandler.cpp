@@ -214,8 +214,8 @@ INotification NormalMessageHandler::notifyMessage(INotifications *ANotifications
 		{
 			if (Options::node(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED).value().toBool())
 				window->showMinimizedTabPage();
-			notify.data.insert(NDR_ALERT_WIDGET,(int)window->instance());
-			notify.data.insert(NDR_TABPAGE_OBJECT,(int)window->instance());
+			notify.data.insert(NDR_ALERT_WIDGET,(qint64)window->instance());
+			notify.data.insert(NDR_TABPAGE_OBJECT,(qint64)window->instance());
 			notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_NEW_MESSAGE);
 			notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
 		}
