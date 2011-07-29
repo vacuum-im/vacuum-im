@@ -16,6 +16,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/shortcuts.h>
+#include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>

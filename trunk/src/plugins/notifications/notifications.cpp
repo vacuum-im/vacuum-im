@@ -51,7 +51,7 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 		if (FTrayManager)
 		{
 			connect(FTrayManager->instance(),SIGNAL(notifyActivated(int, QSystemTrayIcon::ActivationReason)),
-			        SLOT(onTrayNotifyActivated(int, QSystemTrayIcon::ActivationReason)));
+				SLOT(onTrayNotifyActivated(int, QSystemTrayIcon::ActivationReason)));
 			connect(FTrayManager->instance(),SIGNAL(notifyRemoved(int)),SLOT(onTrayNotifyRemoved(int)));
 		}
 	}
@@ -63,9 +63,9 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyActivated(IRosterIndex *, int)),
-			        SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
+				SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyRemovedByIndex(IRosterIndex *, int)),
-			        SLOT(onRosterNotifyRemoved(IRosterIndex *, int)));
+				SLOT(onRosterNotifyRemoved(IRosterIndex *, int)));
 		}
 	}
 
@@ -151,7 +151,7 @@ bool Notifications::initObjects()
 
 bool Notifications::initSettings()
 {
-	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUND,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_ENABLESOUND,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_ROSTERNOTIFY,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPWINDOW,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_TRAYNOTIFY,true);
@@ -163,7 +163,8 @@ bool Notifications::initSettings()
 	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPTIMEOUT,8);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUND_COMMAND,QString("aplay"));
+	Options::setDefaultValue(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUNDCOMMAND,QString("aplay"));
 
 	if (FOptionsManager)
 	{
@@ -179,6 +180,10 @@ QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &AN
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_NOTIFICATIONS)
 	{
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_ENABLEALERTS),tr("Enable alerts in task bar"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED),tr("Show minimized window on notification"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new OptionsWidget(this, AParent));
 		foreach(QString id, FTypeRecords.keys())
 		{
@@ -269,7 +274,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	}
 
 	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) &&
-		Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool() && (record.notification.kinds & INotification::SoundPlay)>0)
+		Options::node(OPV_NOTIFICATIONS_ENABLESOUND).value().toBool() && (record.notification.kinds & INotification::SoundPlay)>0)
 	{
 		if (!showNotifyByHandler(INotification::SoundPlay,notifyId,record.notification))
 		{
@@ -286,7 +291,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 #ifdef Q_WS_X11
 				else
 				{
-					QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUND_COMMAND).value().toString(),QStringList()<<soundFile);
+					QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND).value().toString(),QStringList()<<soundFile);
 				}
 #endif
 			}
@@ -532,7 +537,7 @@ void Notifications::onActivateDelayedActivations()
 
 void Notifications::onSoundOnOffActionTriggered(bool)
 {
-	OptionsNode node = Options::node(OPV_NOTIFICATIONS_SOUND);
+	OptionsNode node = Options::node(OPV_NOTIFICATIONS_ENABLESOUND);
 	node.setValue(!node.value().toBool());
 }
 
@@ -610,13 +615,13 @@ void Notifications::onActionNotifyActivated(bool)
 
 void Notifications::onOptionsOpened()
 {
-	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_SOUND));
+	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_ENABLESOUND));
 	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_ENABLEALERTS));
 }
 
 void Notifications::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_NOTIFICATIONS_SOUND)
+	if (ANode.path() == OPV_NOTIFICATIONS_ENABLESOUND)
 	{
 		FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, ANode.value().toBool() ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
 	}

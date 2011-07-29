@@ -132,7 +132,7 @@
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
-#define OPV_NOTIFICATIONS_SOUND                         "notifications.sound"
+#define OPV_NOTIFICATIONS_ENABLESOUND                   "notifications.enable-sound"
 #define OPV_NOTIFICATIONS_ROSTERNOTIFY                  "notifications.roster-notify"
 #define OPV_NOTIFICATIONS_POPUPWINDOW                   "notifications.popup-window"
 #define OPV_NOTIFICATIONS_TRAYNOTIFY                    "notifications.tray-notify"
@@ -144,7 +144,8 @@
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
 #define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
-#define OPV_NOTIFICATIONS_SOUND_COMMAND                 "notifications.sound-command"
+#define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
+#define OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED         "notifications.tabpage-show-minimized"
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
 
 // ConnectionManager

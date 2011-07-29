@@ -24,6 +24,7 @@
 #define OWO_HISTORY                               500
 
 //Node = ON_NOTIFICATIONS
+#define OWO_NOTIFICATIONS_EXTENDED                50
 #define OWO_NOTIFICATIONS_COMMON                  100
 #define OWO_NOTIFICATIONS_CHAT_MESSAGE            200
 #define OWO_NOTIFICATIONS_NORMAL_MESSAGE          250
@@ -38,7 +39,6 @@
 #define OWO_NOTIFICATIONS_CAPTCHA_REQUEST         600
 #define OWO_NOTIFICATIONS_SESSION_NEGOTIATION     650
 #define OWO_NOTIFICATIONS_CONNECTION_ERROR        700
-
 
 //Node = ON_MISC
 #define OWO_MISC_CLIENTINFO                       300

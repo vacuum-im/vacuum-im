@@ -39,6 +39,22 @@
         <source>Remove all notifications</source>
         <translation>Видалити всі сповіщення</translation>
     </message>
+    <message>
+        <source>Enable alerts in task bar</source>
+        <translation>Ввімкнути сповіщення на панелі задач</translation>
+    </message>
+    <message>
+        <source>Expand contact groups in roster</source>
+        <translation>Розкривати групи контакту в ростері</translation>
+    </message>
+    <message>
+        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
+        <translation>Відключати звуки, коли встановлений статус &apos;Не турбувати&apos;</translation>
+    </message>
+    <message>
+        <source>Show minimized window on notification</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyKindsWidgetClass</name>
@@ -97,24 +113,12 @@
         <translation>Відкрити</translation>
     </message>
     <message>
-        <source>Expand contact groups in roster</source>
-        <translation>Розкривати групи контакту в ростері</translation>
-    </message>
-    <message>
-        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation>Відключати звуки, коли встановлений статус &apos;Не турбувати&apos;</translation>
-    </message>
-    <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
         <translation>Час показу вигульку (0 - завжди показувати):</translation>
     </message>
     <message>
         <source> seconds</source>
         <translation> секунд</translation>
-    </message>
-    <message>
-        <source>Enable alerts in task bar</source>
-        <translation>Ввімкнути сповіщення на панелі задач</translation>
     </message>
 </context>
 </TS>
