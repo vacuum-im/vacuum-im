@@ -302,7 +302,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::AlertWidget,notifyId,record.notification))
 		{
-			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_ALERT_WIDGET).toInt());
+			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_ALERT_WIDGET).toLongLong());
 			if (widget)
 				WidgetManager::alertWidget(widget);
 		}
@@ -312,7 +312,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::TabPageNotify,notifyId,record.notification))
 		{
-			ITabPage *page = qobject_cast<ITabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_OBJECT).toInt());
+			ITabPage *page = qobject_cast<ITabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_OBJECT).toLongLong());
 			if (page && page->tabPageNotifier())
 			{
 				ITabPageNotify notify;

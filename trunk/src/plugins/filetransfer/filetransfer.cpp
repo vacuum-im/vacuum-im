@@ -472,7 +472,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 			default:
 				notify.kinds = 0;
 			}
-			notify.data.insert(NDR_ALERT_WIDGET,(int)qobject_cast<QWidget *>(dialog));
+			notify.data.insert(NDR_ALERT_WIDGET,(qint64)qobject_cast<QWidget *>(dialog));
 
 			if (notify.kinds > 0)
 			{
