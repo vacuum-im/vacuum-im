@@ -271,7 +271,7 @@ IMessageWindow *MessageWidgets::newMessageWindow(const Jid &AStreamJid, const Ji
 		window = new MessageWindow(this,AStreamJid,AContactJid,AMode);
 		FMessageWindows.append(window);
 		WidgetManager::setWindowSticky(window->instance(),true);
-		connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onMessageWindowDestroyed()));
+		connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMessageWindowDestroyed()));
 		FCleanupHandler.add(window->instance());
 		emit messageWindowCreated(window);
 		return window;
