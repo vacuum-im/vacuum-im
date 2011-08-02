@@ -86,9 +86,8 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
 		return RLID_NULL;
 
 	QHash<int,QRect> rectHash = drawIndex(NULL,AOption,AIndex);
-	QHash<int,QRect>::const_iterator it = rectHash.constBegin();
-	for (; it != rectHash.constEnd(); it++)
-		if (it.value().contains(APoint))
+	for (QHash<int,QRect>::const_iterator it = rectHash.constBegin(); it != rectHash.constEnd(); it++)
+		if (it->contains(APoint))
 			return it.key();
 
 	return RLID_DISPLAY;
@@ -239,7 +238,7 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
 
 void RosterIndexDelegate::drawLabelItem(QPainter *APainter, const QStyleOptionViewItemV4 &AOption, const LabelItem &ALabel) const
 {
-	if (ALabel.rect.isEmpty() || ALabel.value.isNull() || ((ALabel.flags&IRostersView::LabelBlink)>0 && !FShowBlinkLabels))
+	if (ALabel.rect.isEmpty() || ALabel.value.isNull() || ((ALabel.flags&IRostersLabel::Blink)>0 && !FShowBlinkLabels))
 		return;
 
 	APainter->setClipRect(ALabel.rect);
@@ -356,9 +355,9 @@ QStyleOptionViewItemV4 RosterIndexDelegate::indexFooterOptions(const QStyleOptio
 {
 	QStyleOptionViewItemV4 option = AOption;
 
-	option.font.setPointSize(option.font.pointSize()-1);
 	option.font.setBold(false);
 	option.font.setItalic(true);
+	option.font.setPointSize(option.font.pointSize()-1);
 
 	option.fontMetrics = QFontMetrics(option.font);
 
@@ -369,32 +368,28 @@ QList<LabelItem> RosterIndexDelegate::itemLabels(const QModelIndex &AIndex) cons
 {
 	QList<LabelItem> labels;
 
-	QList<QVariant> labelIds = AIndex.data(RDR_LABEL_ID).toList();
-	QList<QVariant> labelOrders = AIndex.data(RDR_LABEL_ORDERS).toList();
-	QList<QVariant> labelFlags = AIndex.data(RDR_LABEL_FLAGS).toList();
-	QList<QVariant> labelValues = AIndex.data(RDR_LABEL_VALUES).toList();
-
-	for (int i = 0; i < labelOrders.count(); i++)
+	RostersLabelItems rlItems = AIndex.data(RDR_LABEL_ITEMS).value<RostersLabelItems>();
+	for (RostersLabelItems::const_iterator it = rlItems.constBegin(); it != rlItems.constEnd(); it++)
 	{
 		LabelItem label;
-		label.id = labelIds.at(i).toInt();
-		label.order = labelOrders.at(i).toInt();
-		label.flags = labelFlags.at(i).toInt();
-		label.value = labelValues.at(i).type()==QVariant::Int ? AIndex.data(labelValues.at(i).toInt()) : labelValues.at(i);
+		label.id = it.key();
+		label.order = it->order;
+		label.flags = it->flags;
+		label.value = it->value.type()==QVariant::Int ? AIndex.data(it->value.toInt()) : it->value;
 		labels.append(label);
 	}
 
 	LabelItem decoration;
 	decoration.id = RLID_DECORATION;
 	decoration.order = RLO_DECORATION;
-	decoration.flags = 0;
+	decoration.flags = AIndex.data(RDR_DECORATION_FLAGS).toInt();
 	decoration.value = AIndex.data(Qt::DecorationRole);
 	labels.append(decoration);
 
 	LabelItem display;
 	display.id = RLID_DISPLAY;
 	display.order = RLO_DISPLAY;
-	display.flags = 0;
+	display.flags = AIndex.data(RDR_DISPLAY_FLAGS).toInt();;
 	display.value = AIndex.data(Qt::DisplayRole);
 	labels.append(display);
 

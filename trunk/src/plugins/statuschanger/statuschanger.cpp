@@ -182,8 +182,13 @@ bool StatusChanger::initObjects()
 
 	if (FRostersViewPlugin)
 	{
+		IRostersLabel label;
+		label.order = RLO_CONNECTING;
+		label.flags = IRostersLabel::Blink;
+		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
+		FConnectingLabel = FRostersViewPlugin->rostersView()->registerLabel(label);
+
 		FRostersView = FRostersViewPlugin->rostersView();
-		FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING),IRostersView::LabelBlink);
 		connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)), SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 	}
 
@@ -818,7 +823,7 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 	{
 		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
 		if (index)
-			FRostersView->insertIndexLabel(FConnectingLabel,index);
+			FRostersView->insertLabel(FConnectingLabel,index);
 	}
 }
 
@@ -828,7 +833,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 	{
 		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
 		if (index)
-			FRostersView->removeIndexLabel(FConnectingLabel,index);
+			FRostersView->removeLabel(FConnectingLabel,index);
 	}
 }
 

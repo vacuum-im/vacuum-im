@@ -5,6 +5,7 @@
 #include <definitions/actiongroups.h>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
+#include <definitions/rosternotifyorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>

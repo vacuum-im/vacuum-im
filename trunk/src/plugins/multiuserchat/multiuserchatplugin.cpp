@@ -465,7 +465,9 @@ INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications,
 			notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
 			notify.data.insert(NDR_STREAM_JID,AMessage.to());
 			notify.data.insert(NDR_CONTACT_JID,fromJid.full());
-			notify.data.insert(NDR_ROSTER_ORDER,RLO_MESSAGE);
+			notify.data.insert(NDR_ROSTER_ORDER,RNO_MUC_INVITE);
+			notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
+			notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
 			notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
 			notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
 			notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));

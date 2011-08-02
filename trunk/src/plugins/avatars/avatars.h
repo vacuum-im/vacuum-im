@@ -118,7 +118,7 @@ private:
 	bool FShowEmptyAvatars;
 	QMap<Jid, QString> FCustomPictures;
 private:
-	int FRosterLabelId;
+	int FAvatarLabelId;
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
 	QMap<Jid, QString> FStreamAvatars;

@@ -21,8 +21,6 @@
 #define RLO_DECORATION                            RLAP_LEFT_CENTER + 500
 
 #define RLO_CONNECTING                            RLAP_LEFT_TOP + 100
-#define RLO_MESSAGE                               RLAP_LEFT_TOP + 200
-#define RLO_SUBSCRIBTION                          RLAP_LEFT_TOP + 300
 #define RLO_DISPLAY                               RLAP_LEFT_TOP + 500
 
 #define RLO_BIRTHDAY_NOTIFY                       RLAP_RIGHT_TOP + 200

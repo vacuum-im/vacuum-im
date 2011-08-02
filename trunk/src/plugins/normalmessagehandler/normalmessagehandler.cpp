@@ -203,7 +203,9 @@ INotification NormalMessageHandler::notifyMessage(INotifications *ANotifications
 		notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
 		notify.data.insert(NDR_STREAM_JID,AMessage.to());
 		notify.data.insert(NDR_CONTACT_JID,AMessage.from());
-		notify.data.insert(NDR_ROSTER_ORDER,RLO_MESSAGE);
+		notify.data.insert(NDR_ROSTER_ORDER,RNO_NORMALMESSAGE);
+		notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
+		notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
 		notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(AMessage.from()));
 		notify.data.insert(NDR_POPUP_CAPTION, tr("Message received"));
 		notify.data.insert(NDR_POPUP_TITLE,name);

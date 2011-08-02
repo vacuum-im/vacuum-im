@@ -115,8 +115,8 @@ protected slots:
 	void onActivateDelayedActivations();
 	void onSoundOnOffActionTriggered(bool);
 	void onTrayActionTriggered(bool);
-	void onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId);
-	void onRosterNotifyRemoved(IRosterIndex *AIndex, int ANotifyId);
+	void onRosterNotifyActivated(int ANotifyId);
+	void onRosterNotifyRemoved(int ANotifyId);
 	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
 	void onTrayNotifyRemoved(int ANotifyId);
 	void onWindowNotifyActivated();

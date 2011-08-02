@@ -8,6 +8,7 @@
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterclickhookerorders.h>
+#include <definitions/rosternotifyorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/tabpagenotifypriorities.h>
