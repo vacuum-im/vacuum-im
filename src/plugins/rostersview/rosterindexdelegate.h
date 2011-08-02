@@ -7,9 +7,11 @@
 #include <definitions/rosterindextyperole.h>
 #include <interfaces/irostersview.h>
 
+typedef QMap<int, IRostersLabel> RostersLabelItems;
+Q_DECLARE_METATYPE(RostersLabelItems);
+
 struct LabelItem
 {
-	LabelItem() { id = -1; order = 0; flags = 0; }
 	int id;
 	int order;
 	int flags;

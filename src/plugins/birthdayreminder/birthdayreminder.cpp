@@ -124,7 +124,10 @@ bool BirthdayReminder::initObjects()
 	}
 	if (FRostersViewPlugin)
 	{
-		FBirthdayLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_BIRTHDAY_NOTIFY,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY));
+		IRostersLabel label;
+		label.order = RLO_BIRTHDAY_NOTIFY;
+		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
+		FBirthdayLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;
 }
@@ -205,7 +208,7 @@ bool BirthdayReminder::updateBirthdayState(const Jid &AContactJid)
 		findData.insert(RDR_TYPE,RIT_CONTACT);
 		findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		foreach (IRosterIndex *index, FRostersModel->rootIndex()->findChilds(findData,true))
-			FRostersViewPlugin->rostersView()->insertIndexLabel(FBirthdayLabelId,index);
+			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,index);
 	}
 
 	return notify;
@@ -288,7 +291,7 @@ void BirthdayReminder::onRosterIndexInserted(IRosterIndex *AIndex)
 	if (FRostersViewPlugin && AIndex->type() == RIT_CONTACT)
 	{
 		if (FUpcomingBirthdays.contains(AIndex->data(RDR_PREP_BARE_JID).toString()))
-			FRostersViewPlugin->rostersView()->insertIndexLabel(FBirthdayLabelId,AIndex);
+			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,AIndex);
 	}
 }
 

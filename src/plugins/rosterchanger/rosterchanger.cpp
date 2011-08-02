@@ -1124,7 +1124,9 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 		notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AContactJid)));
 		notify.data.insert(NDR_STREAM_JID,ARoster->streamJid().full());
 		notify.data.insert(NDR_CONTACT_JID,AContactJid.full());
-		notify.data.insert(NDR_ROSTER_ORDER,RLO_SUBSCRIBTION);
+		notify.data.insert(NDR_ROSTER_ORDER,RNO_SUBSCRIPTION);
+		notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
+		notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
 		notify.data.insert(NDR_POPUP_CAPTION, tr("Subscription message"));
 		notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(ARoster->streamJid(),AContactJid));
 		notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(AContactJid));

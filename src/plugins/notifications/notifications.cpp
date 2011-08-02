@@ -62,10 +62,10 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyActivated(IRosterIndex *, int)),
-				SLOT(onRosterNotifyActivated(IRosterIndex *, int)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyRemovedByIndex(IRosterIndex *, int)),
-				SLOT(onRosterNotifyRemoved(IRosterIndex *, int)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyActivated(int)),
+				SLOT(onRosterNotifyActivated(int)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyRemoved(int)),
+				SLOT(onRosterNotifyRemoved(int)));
 		}
 	}
 
@@ -222,13 +222,23 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
+			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
 			Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
 			Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
-			int order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
-			int flags = IRostersView::LabelBlink|IRostersView::LabelVisible;
-			flags = flags | (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool() ? IRostersView::LabelExpandParents : 0);
-			QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,true);
-			record.rosterId = FRostersViewPlugin->rostersView()->appendNotify(indexes,order,icon,toolTip,flags);
+			QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,createIndex);
+			if (!indexes.isEmpty())
+			{
+				IRostersNotify rnotify;
+				rnotify.icon = icon;
+				rnotify.order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
+				rnotify.flags = record.notification.data.value(NDR_ROSTER_FLAGS).toInt();
+				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool())
+					rnotify.flags |= IRostersLabel::ExpandParents;
+				rnotify.timeout = record.notification.data.value(NDR_ROSTER_TIMEOUT).toInt();
+				rnotify.footer = record.notification.data.value(NDR_ROSTER_FOOTER).toString();
+				rnotify.background = record.notification.data.value(NDR_ROSTER_BACKGROUND).value<QBrush>();
+				record.rosterId = FRostersViewPlugin->rostersView()->insertNotify(rnotify,indexes);
+			}
 		}
 	}
 
@@ -556,18 +566,19 @@ void Notifications::onTrayActionTriggered(bool)
 	}
 }
 
-void Notifications::onRosterNotifyActivated(IRosterIndex *AIndex, int ANotifyId)
+void Notifications::onRosterNotifyActivated(int ANotifyId)
 {
-	Q_UNUSED(AIndex);
 	activateNotification(notifyIdByRosterId(ANotifyId));
 }
 
-void Notifications::onRosterNotifyRemoved(IRosterIndex *AIndex, int ANotifyId)
+void Notifications::onRosterNotifyRemoved(int ANotifyId)
 {
-	Q_UNUSED(AIndex);
 	int notifyId = notifyIdByRosterId(ANotifyId);
 	if (FNotifyRecords.contains(notifyId))
+	{
 		FNotifyRecords[notifyId].rosterId = 0;
+		removeInvisibleNotification(notifyId);
+	}
 }
 
 void Notifications::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
@@ -580,7 +591,10 @@ void Notifications::onTrayNotifyRemoved(int ANotifyId)
 {
 	int notifyId = notifyIdByTrayId(ANotifyId);
 	if (FNotifyRecords.contains(notifyId))
+	{
 		FNotifyRecords[notifyId].trayId = 0;
+		removeInvisibleNotification(notifyId);
+	}
 }
 
 void Notifications::onWindowNotifyActivated()

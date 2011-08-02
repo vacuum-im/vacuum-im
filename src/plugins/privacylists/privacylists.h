@@ -131,7 +131,7 @@ private:
 	QHash<QString, QString> FRemoveRequests;
 	QHash<Jid, QStringList > FStreamRequests;
 private:
-	int FRosterLabelId;
+	int FPrivacyLabelId;
 	QTimer FApplyAutoListsTimer;
 	QList<IRosterIndex *> FCreatedRosterIndexes;
 	QHash<Jid, QString> FApplyAutoLists;

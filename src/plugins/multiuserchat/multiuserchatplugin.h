@@ -7,6 +7,7 @@
 #include <definitions/dataformtypes.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterlabelorders.h>
+#include <definitions/rosternotifyorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/messagehandlerorders.h>
 #include <definitions/resources.h>
