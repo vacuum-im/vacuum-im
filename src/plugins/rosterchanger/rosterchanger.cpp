@@ -127,8 +127,8 @@ bool RosterChanger::initObjects()
 
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
-		ushort kindDefs = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay;
+		ushort kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
+		ushort kindDefs = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized;
 		FNotifications->registerNotificationType(NNT_SUBSCRIPTION_REQUEST,OWO_NOTIFICATIONS_SUBSCRIPTION_REQUEST,tr("Subscription requests"),kindMask,kindDefs);
 	}
 	if (FRostersView)
@@ -1111,6 +1111,19 @@ void RosterChanger::removeGroupContacts(const Jid &AStreamJid, const QString &AG
 	}
 }
 
+bool RosterChanger::eventFilter(QObject *AObject, QEvent *AEvent)
+{
+	if (AEvent->type() == QEvent::WindowActivate)
+	{
+		if (FNotifications)
+		{
+			int notifyId = FNotifyDialog.key(qobject_cast<SubscriptionDialog *>(AObject));
+			FNotifications->removeNotification(notifyId);
+		}
+	}
+	return QObject::eventFilter(AObject,AEvent);
+}
+
 void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJid, int ASubsType, const QString &AMessage)
 {
 	INotification notify;
@@ -1147,7 +1160,12 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 				if (FNotifications)
 				{
 					if (notify.kinds > 0)
+					{
+						dialog->installEventFilter(this);
+						 notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog);
+						notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog);
 						notifyId = FNotifications->appendNotification(notify);
+					}
 				}
 				else
 				{
@@ -1302,7 +1320,7 @@ void RosterChanger::onNotificationActivated(int ANotifyId)
 	{
 		SubscriptionDialog *dialog = FNotifyDialog.value(ANotifyId);
 		if (dialog)
-			dialog->show();
+		WidgetManager::showActivateRaiseWindow(dialog);
 		FNotifications->removeNotification(ANotifyId);
 	}
 }

@@ -55,9 +55,13 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 	{
-		connect(plugin->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
-		connect(plugin->instance(), SIGNAL(aboutToClose(IXmppStream *)), SLOT(onStreamAboutToClose(IXmppStream *)));
-		connect(plugin->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		if (xmppStreams)
+		{
+			connect(xmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
+			connect(xmppStreams->instance(), SIGNAL(aboutToClose(IXmppStream *)), SLOT(onStreamAboutToClose(IXmppStream *)));
+			connect(xmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -76,8 +80,7 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
-			        SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
 		}
 	}
 
@@ -103,8 +106,8 @@ bool SessionNegotiation::initObjects()
 	}
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
-		ushort kindDefs = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay;
+		ushort kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
+		ushort kindDefs = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized;
 		FNotifications->registerNotificationType(NNT_SESSION_NEGOTIATION,OWO_NOTIFICATIONS_SESSION_NEGOTIATION,tr("Negotiate session requests"),kindMask,kindDefs);
 	}
 	if (FDataForms)
@@ -838,6 +841,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 		if (!dialog)
 		{
 			dialog = FDataForms->dialogWidget(ARequest,NULL);
+			dialog->instance()->installEventFilter(this);
 			IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog->instance(),MNI_SNEGOTIATION,0,0,"windowIcon");
 			dialog->dialogButtons()->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 			connect(dialog->instance(),SIGNAL(accepted()),SLOT(onAcceptDialogAccepted()));
@@ -846,9 +850,11 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 			FDialogs[ASession.streamJid].insert(ASession.contactJid,dialog);
 		}
 		else
+		{
 			dialog->setForm(ARequest);
+		}
 
-		if (FNotifications && !dialog->instance()->isVisible())
+		if (FNotifications && !dialog->instance()->isActiveWindow())
 		{
 			INotification notify;
 			notify.kinds = FNotifications->notificationKinds(NNT_SESSION_NEGOTIATION);
@@ -862,12 +868,16 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
 				notify.data.insert(NDR_POPUP_HTML, Qt::escape(notify.data.value(NDR_TOOLTIP).toString()));
 				notify.data.insert(NDR_SOUND_FILE, SDF_SNEGOTIATION_REQUEST);
+				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
+				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());
 				int notifyId = FNotifications->appendNotification(notify);
 				FDialogByNotify.insert(notifyId,dialog);
 			}
 		}
 		else
+		{
 			dialog->instance()->show();
+		}
 	}
 }
 
@@ -1013,6 +1023,19 @@ IStanzaSession &SessionNegotiation::dialogSession(IDataDialogWidget *ADialog)
 	return FSessions[""][""];
 }
 
+bool SessionNegotiation::eventFilter(QObject *AObject, QEvent *AEvent)
+{
+	if (AEvent->type() == QEvent::WindowActivate)
+	{
+		if (FNotifications)
+		{
+			int notifyId = FDialogByNotify.key(qobject_cast<IDataDialogWidget *>(AObject));
+			FNotifications->removeNotification(notifyId);
+		}
+	}
+	return QObject::eventFilter(AObject,AEvent);
+}
+
 void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor && FDataForms)
@@ -1062,7 +1085,7 @@ void SessionNegotiation::onNotificationActivated(int ANotifyId)
 	{
 		IDataDialogWidget *dialog = FDialogByNotify.take(ANotifyId);
 		if (dialog)
-			dialog->instance()->show();
+		WidgetManager::showActivateRaiseWindow(dialog->instance());
 		FNotifications->removeNotification(ANotifyId);
 	}
 }

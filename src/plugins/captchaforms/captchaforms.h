@@ -17,6 +17,7 @@
 #include <interfaces/istanzaprocessor.h>
 #include <utils/errorhandler.h>
 #include <utils/iconstorage.h>
+#include <utils/widgetmanager.h>
 
 struct ChallengeItem
 {
@@ -68,6 +69,8 @@ protected:
 	void notifyChallenge(const ChallengeItem &AChallenge);
 	QString findChallenge(IDataDialogWidget *ADialog) const;
 	QString findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const;
+protected:
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);

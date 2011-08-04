@@ -94,9 +94,11 @@ protected:
 	void insertToolBarAction(IToolBarWidget *AWidget);
 	void removeToolBarAction(IToolBarWidget *AWidget);
 	QList<IToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
-	StreamDialog *createStreamDialog(IFileStream *ASession);
+	StreamDialog *getStreamDialog(IFileStream *ASession);
 	IFileStream *createStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind);
 	QString dirNameByUserName(const QString &AUserName) const;
+protected:
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamStateChanged();
 	void onStreamDestroyed();

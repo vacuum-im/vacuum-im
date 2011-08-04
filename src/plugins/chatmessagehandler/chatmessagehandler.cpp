@@ -97,8 +97,8 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
 		if (notifications)
 		{
-			ushort kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::AutoActivate;
-			ushort kindDefs = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify;
+			ushort kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+			ushort kindDefs = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
 			notifications->registerNotificationType(NNT_CHAT_MESSAGE,OWO_NOTIFICATIONS_CHAT_MESSAGE,tr("Chat Messages"),kindMask,kindDefs);
 		}
 	}
@@ -274,12 +274,11 @@ INotification ChatMessageHandler::notifyMessage(INotifications *ANotifications, 
 		IChatWindow *window = FActiveMessages.key(AMessage.data(MDR_MESSAGE_ID).toInt());
 		if (window)
 		{
-			if (Options::node(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED).value().toBool())
-				window->showMinimizedTabPage();
 			notify.data.insert(NDR_ALERT_WIDGET,(qint64)window->instance());
-			notify.data.insert(NDR_TABPAGE_OBJECT,(qint64)window->instance());
+			notify.data.insert(NDR_TABPAGE_WIDGET,(qint64)window->instance());
 			notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_NEW_MESSAGE);
 			notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
+			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)window->instance());
 		}
 
 		if (FMessageProcessor)

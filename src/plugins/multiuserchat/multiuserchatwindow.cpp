@@ -308,12 +308,11 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 			}
 			if (page)
 			{
-				if (Options::node(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED).value().toBool())
-					page->showMinimizedTabPage();
 				notify.data.insert(NDR_ALERT_WIDGET,(qint64)page->instance());
-				notify.data.insert(NDR_TABPAGE_OBJECT,(qint64)page->instance());
+				notify.data.insert(NDR_TABPAGE_WIDGET,(qint64)page->instance());
 				notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_NEW_MESSAGE);
 				notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
+				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)page->instance());
 			}
 		}
 		else
