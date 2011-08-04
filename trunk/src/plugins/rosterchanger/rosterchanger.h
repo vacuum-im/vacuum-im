@@ -28,6 +28,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/shortcuts.h>
+#include <utils/widgetmanager.h>
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
 
@@ -105,6 +106,8 @@ protected:
 	void moveGroupToGroup(const Jid &AStreamJid, const QString &AGroup, const QString &AGroupTo) const;
 	void removeGroup(const Jid &AStreamJid, const QString &AGroup) const;
 	void removeGroupContacts(const Jid &AStreamJid, const QString &AGroup) const;
+protected:
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onReceiveSubscription(IRoster *ARoster, const Jid &AContactJid, int ASubsType, const QString &AMessage);
 	//Operations on subscription

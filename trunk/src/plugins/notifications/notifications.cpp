@@ -163,7 +163,7 @@ bool Notifications::initSettings()
 	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPTIMEOUT,8);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_SHOWMINIMIZED,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUNDCOMMAND,QString("aplay"));
 
 	if (FOptionsManager)
@@ -183,7 +183,7 @@ QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &AN
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_ENABLEALERTS),tr("Enable alerts in task bar"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED),tr("Show minimized window on notification"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_SHOWMINIMIZED),tr("Show minimized window on notification"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new OptionsWidget(this, AParent));
 		foreach(QString id, FTypeRecords.keys())
 		{
@@ -308,6 +308,22 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
+	if (Options::node(OPV_NOTIFICATIONS_SHOWMINIMIZED).value().toBool() && (record.notification.kinds & INotification::ShowMinimized)>0)
+	{
+		if (!showNotifyByHandler(INotification::ShowMinimized,notifyId,record.notification))
+		{
+			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_SHOWMINIMIZED_WIDGET).toLongLong());
+			if (widget)
+			{
+				ITabPage *page = qobject_cast<ITabPage *>(widget);
+				if (page)
+					page->showMinimizedTabPage();
+				else if (widget->isWindow() && !widget->isVisible())
+					widget->showMinimized();
+			}
+		}
+	}
+
 	if (Options::node(OPV_NOTIFICATIONS_ALERTWIDGET).value().toBool() && (record.notification.kinds & INotification::AlertWidget)>0)
 	{
 		if (!showNotifyByHandler(INotification::AlertWidget,notifyId,record.notification))
@@ -322,7 +338,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::TabPageNotify,notifyId,record.notification))
 		{
-			ITabPage *page = qobject_cast<ITabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_OBJECT).toLongLong());
+			ITabPage *page = qobject_cast<ITabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_WIDGET).toLongLong());
 			if (page && page->tabPageNotifier())
 			{
 				ITabPageNotify notify;

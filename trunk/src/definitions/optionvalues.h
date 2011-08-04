@@ -139,13 +139,13 @@
 #define OPV_NOTIFICATIONS_TRAYACTION                    "notifications.tray-action"
 #define OPV_NOTIFICATIONS_ALERTWIDGET                   "notifications.alert-widget"
 #define OPV_NOTIFICATIONS_TABPAGENOTIFY                 "notifications.tab-page-notify"
+#define OPV_NOTIFICATIONS_SHOWMINIMIZED                 "notifications.show-minimized"
 #define OPV_NOTIFICATIONS_AUTOACTIVATE                  "notifications.auto-activate"
 #define OPV_NOTIFICATIONS_ENABLEALERTS                  "notifications.enable-alerts"
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
 #define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
 #define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
-#define OPV_NOTIFICATIONS_TABPAGE_SHOWMINIMIZED         "notifications.tabpage-show-minimized"
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
 
 // ConnectionManager

@@ -20,6 +20,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/inotifications.h>
+#include <utils/widgetmanager.h>
 
 class SessionNegotiation :
 			public QObject,
@@ -87,6 +88,8 @@ protected:
 	IDataForm clearForm(const IDataForm &AForm) const;
 	QStringList unsubmitedFields(const IDataForm &ARequest, const IDataForm &ASubmit, bool ARequired) const;
 	IStanzaSession &dialogSession(IDataDialogWidget *ADialog);
+protected:
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem);

@@ -559,7 +559,7 @@ void ChatStates::notifyUserState(const Jid &AStreamJid, const Jid &AContactJid)
 					notify.data.insert(NDR_CONTACT_JID, AContactJid.full());
 					notify.data.insert(NDR_ICON, IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATSTATES_COMPOSING));
 					notify.data.insert(NDR_TOOLTIP,tr("Typing..."));
-					notify.data.insert(NDR_TABPAGE_OBJECT,(qint64)window->instance());
+					notify.data.insert(NDR_TABPAGE_WIDGET,(qint64)window->instance());
 					notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_CHATSTATE_TYPING);
 					notify.data.insert(NDR_TABPAGE_ICONBLINK,false);
 					params.notifyId = FNotifications->appendNotification(notify);

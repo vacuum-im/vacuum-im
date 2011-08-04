@@ -18,6 +18,7 @@ struct INotification
 		SoundPlay             = 0x0010,
 		AlertWidget           = 0x0020,
 		TabPageNotify         = 0x0040,
+		ShowMinimized         = 0x0080,
 		AutoActivate          = 0x8000
 	};
 	enum NotifyFlags {
