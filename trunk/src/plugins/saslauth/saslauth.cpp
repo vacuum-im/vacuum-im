@@ -1,38 +1,54 @@
 #include "saslauth.h"
 
-#include <stdlib.h>
 #include <QMultiHash>
 #include <QStringList>
 #include <QCryptographicHash>
 
-static QMultiHash<QString, QString> parseChallenge(const QString &AChallenge)
+#define AUTH_PLAIN        "PLAIN"
+#define AUTH_ANONYMOUS    "ANONYMOUS"
+#define AUTH_DIGEST_MD5   "DIGEST-MD5"
+
+static QMap<QByteArray, QByteArray> parseChallenge(const QByteArray &AChallenge)
 {
-	QMultiHash<QString, QString> hash;
-	QStringList params = AChallenge.split(',',QString::SkipEmptyParts);
-	QStringList param;
-	QString value;
-	for (int i = 0;i<params.count();i++)
+	QMap<QByteArray, QByteArray> map;
+	QList<QByteArray> paramsList = AChallenge.split(',');
+	for (int i = 0; i<paramsList.count(); i++)
 	{
-		param = params.at(i).split('=');
-		if (param.count() == 2)
+		QByteArray param = paramsList.at(i).trimmed();
+		int delimIndex = param.indexOf('=');
+		QByteArray key = param.left(delimIndex);
+		QByteArray value = param.right(param.length()-delimIndex-1);
+		if (value.startsWith('"'))
 		{
-			value = param.at(1);
-			if (value.endsWith('"'))
-				value.remove(0,1).chop(1);
-			hash.insert(param.at(0),value);
+			value.remove(0,1).chop(1);
+			value.replace("\\\"", "\"");
+			value.replace("\\\\", "\\"); 
 		}
+		map.insert(key,value);
 	}
-	return hash;
+	return map;
 }
 
-static QByteArray getRespValue(const QByteArray &realm, const QByteArray &user, const QByteArray &pass,const QByteArray &nonce,
-                               const QByteArray &cnonce, const QByteArray &nc, const QByteArray &qop, const QByteArray &uri,
-                               const QByteArray &auth)
+static QByteArray serializeResponse(const QMap<QByteArray, QByteArray> &AResponse)
 {
-	QByteArray yHash =  QCryptographicHash::hash(user+':'+realm+':'+pass,QCryptographicHash::Md5);
-	QByteArray a1Hash = QCryptographicHash::hash(yHash+':'+nonce+':'+cnonce,QCryptographicHash::Md5);
-	QByteArray a2Hash = QCryptographicHash::hash(auth+':'+uri,QCryptographicHash::Md5);
-	QByteArray value =  QCryptographicHash::hash(a1Hash.toHex()+':'+nonce+':'+nc+':'+cnonce+':'+qop+':'+a2Hash.toHex(),QCryptographicHash::Md5);
+	QByteArray response;
+	foreach (const QByteArray &key, AResponse.keys())
+	{
+		QByteArray value = AResponse[key];
+		value.replace("\\", "\\\\");
+		value.replace("\"", "\\\"");
+		response.append(key + "=\"" + value + "\",");
+	}
+	response.chop(1);
+	return response;
+}
+
+static QByteArray getResponseValue(const QMap<QByteArray, QByteArray> &AResponse, const QString &APassword)
+{
+	QByteArray secret = QCryptographicHash::hash(AResponse.value("username")+':'+AResponse.value("realm")+':'+APassword.toUtf8(),QCryptographicHash::Md5);
+	QByteArray a1Hex = QCryptographicHash::hash(secret+':'+AResponse.value("nonce")+':'+AResponse.value("cnonce"),QCryptographicHash::Md5).toHex();
+	QByteArray a2Hex = QCryptographicHash::hash("AUTHENTICATE:"+AResponse.value("digest-uri"),QCryptographicHash::Md5).toHex();
+	QByteArray value = QCryptographicHash::hash(a1Hex+':'+AResponse.value("nonce")+':'+AResponse.value("nc")+':'+AResponse.value("cnonce")+':'+AResponse.value("qop")+':'+a2Hex,QCryptographicHash::Md5);
 	return value.toHex();
 }
 
@@ -57,31 +73,28 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			if (FChallengeStep == 0)
 			{
 				FChallengeStep++;
-				QString chl = QByteArray::fromBase64(AStanza.element().text().toAscii());
-				QMultiHash<QString, QString> params = parseChallenge(chl);
+				QMap<QByteArray, QByteArray> challengeMap = parseChallenge(QByteArray::fromBase64(AStanza.element().text().toAscii()));
 
-				QString realm = params.value("realm");
-				if (realm.isEmpty())
-					realm = FXmppStream->streamJid().pDomain();
-				QString user = FXmppStream->streamJid().prepared().eNode();
-				QString pass = FXmppStream->password();
-				QString nonce = params.value("nonce");
+				QMap<QByteArray, QByteArray> responseMap;
 				QByteArray randBytes(32,' ');
 				for (int i=0; i<31; i++)
 					randBytes[i] = (char) (256.0 * qrand() / (RAND_MAX + 1.0));
-				QString cnonce = randBytes.toBase64();
-				QString nc = "00000001";
-				QString qop = params.value("qop");
-				QString uri = "xmpp/" + FXmppStream->streamJid().pDomain();
-				QByteArray respValue = getRespValue(realm.toUtf8(),user.toUtf8(),pass.toUtf8(),nonce.toAscii(),
-				                                    cnonce.toAscii(),nc.toAscii(),qop.toAscii(), uri.toAscii(), "AUTHENTICATE");
-
-				QString resp = "username=\"%1\",realm=\"%2\",nonce=\"%3\",cnonce=\"%4\",nc=%5,qop=%6,digest-uri=\"%7\",response=%8,charset=utf-8";
-				resp = resp.arg(user.toUtf8().data()).arg(realm).arg(nonce).arg(cnonce).arg(nc).arg(qop).arg(uri).arg(respValue.data());
+				responseMap["cnonce"] = randBytes.toBase64();
+				if (challengeMap.contains("realm"))
+					responseMap["realm"] = challengeMap.value("realm");
+				else
+					responseMap["realm"] = FXmppStream->streamJid().pDomain().toUtf8();
+				responseMap["username"] = FXmppStream->streamJid().prepared().eNode().toUtf8();
+				responseMap["nonce"] = challengeMap.value("nonce");
+				responseMap["nc"] = "00000001";
+				responseMap["qop"] = challengeMap.value("qop");
+				responseMap["digest-uri"] = QString("xmpp/%1").arg(FXmppStream->streamJid().pDomain()).toUtf8();
+				responseMap["charset"] = "utf-8";
+				responseMap["response"] = getResponseValue(responseMap,FXmppStream->password());
 
 				Stanza response("response");
 				response.setAttribute("xmlns",NS_FEATURE_SASL);
-				response.element().appendChild(response.createTextNode(resp.toAscii().toBase64()));
+				response.element().appendChild(response.createTextNode(serializeResponse(responseMap).toBase64()));
 				FXmppStream->sendStanza(response);
 			}
 			else if (FChallengeStep == 1)
@@ -135,38 +148,42 @@ bool SASLAuth::start(const QDomElement &AElem)
 		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
 			FChallengeStep = 0;
+
+			QList<QString> mechList;
 			QDomElement mechElem = AElem.firstChildElement("mechanism");
 			while (!mechElem.isNull())
 			{
-				QString mechanism = mechElem.text();
-				if (mechanism == "DIGEST-MD5")
-				{
-					Stanza auth("auth");
-					auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
-					FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-					FXmppStream->sendStanza(auth);
-					return true;
-				}
-				else if (mechanism == "PLAIN")
-				{
-					QByteArray resp;
-					resp.append('\0').append(FXmppStream->streamJid().prepared().eNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
-					Stanza auth("auth");
-					auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
-					auth.element().appendChild(auth.createTextNode(resp.toBase64()));
-					FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-					FXmppStream->sendStanza(auth);
-					return true;
-				}
-				else if (mechanism == "ANONYMOUS")
-				{
-					Stanza auth("auth");
-					auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",mechanism);
-					FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
-					FXmppStream->sendStanza(auth);
-					return true;
-				}
+				mechList.append(mechElem.text());
 				mechElem = mechElem.nextSiblingElement("mechanism");
+			}
+
+			if (mechList.contains(AUTH_DIGEST_MD5))
+			{
+				Stanza auth("auth");
+				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",AUTH_DIGEST_MD5);
+				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+				FXmppStream->sendStanza(auth);
+				return true;
+			}
+			else if (mechList.contains(AUTH_PLAIN))
+			{
+				QByteArray resp;
+				resp.append('\0').append(FXmppStream->streamJid().prepared().eNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
+
+				Stanza auth("auth");
+				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",AUTH_PLAIN);
+				auth.element().appendChild(auth.createTextNode(resp.toBase64()));
+				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+				FXmppStream->sendStanza(auth);
+				return true;
+			}
+			else if (mechList.contains(AUTH_ANONYMOUS))
+			{
+				Stanza auth("auth");
+				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",AUTH_ANONYMOUS);
+				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+				FXmppStream->sendStanza(auth);
+				return true;
 			}
 		}
 		else

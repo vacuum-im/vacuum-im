@@ -12,6 +12,7 @@ LEGEND
   [+] Added ability to show a minimized window with the message when notification received
   [*] Notice of user activity in the chat duplicated on the chat tab
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
+  [-] Fixed bug in Digest-MD5 authorization for which was not possible to log on some servers
 
 
 v1.1.0
