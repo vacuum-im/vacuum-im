@@ -66,6 +66,14 @@ QString ChatWindow::tabPageId() const
 	return "ChatWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
+bool ChatWindow::isVisibleTabPage() const
+{
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return widget->isVisible();
+}
+
 bool ChatWindow::isActiveTabPage() const
 {
 	const QWidget *widget = this;

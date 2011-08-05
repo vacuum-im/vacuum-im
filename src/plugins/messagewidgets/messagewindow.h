@@ -27,6 +27,7 @@ public:
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
+	virtual bool isVisibleTabPage() const;
 	virtual bool isActiveTabPage() const;
 	virtual void assignTabPage();
 	virtual void showTabPage();

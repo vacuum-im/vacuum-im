@@ -783,14 +783,14 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-		if (!window->instance()->isVisible())
-			window->showTabPage();
+		if (!window->isVisibleTabPage())
+			window->assignTabPage();
 }
 
 void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-		if (!window->instance()->isVisible())
+		if (!window->isVisibleTabPage())
 			window->exitAndDestroy(QString::null);
 }
 
