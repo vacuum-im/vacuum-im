@@ -193,6 +193,7 @@ class ITabPage
 public:
 	virtual QWidget *instance() =0;
 	virtual QString tabPageId() const =0;
+	virtual bool isVisibleTabPage() const =0;
 	virtual bool isActiveTabPage() const =0;
 	virtual void assignTabPage() =0;
 	virtual void showTabPage() =0;
@@ -394,7 +395,7 @@ Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")
 Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
 Q_DECLARE_INTERFACE(IStatusBarWidget,"Vacuum.Plugin.IStatusBarWidget/1.0")
 Q_DECLARE_INTERFACE(ITabPageNotifier,"Vacuum.Plugin.ITabPageNotifier/1.0")
-Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.2")
+Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.3")
 Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.2")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.2")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")

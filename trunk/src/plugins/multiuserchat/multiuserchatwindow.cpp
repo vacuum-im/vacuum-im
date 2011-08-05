@@ -90,6 +90,14 @@ QString MultiUserChatWindow::tabPageId() const
 	return "MessageWindow|"+streamJid().pBare()+"|"+roomJid().pBare();
 }
 
+bool MultiUserChatWindow::isVisibleTabPage() const
+{
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return widget->isVisible();
+}
+
 bool MultiUserChatWindow::isActiveTabPage() const
 {
 	const QWidget *widget = this;
