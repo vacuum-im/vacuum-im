@@ -254,6 +254,8 @@ void BirthdayReminder::onShowNotificationTimer()
 
 				if (daysLeft==NOTIFY_WITHIN_DAYS || daysLeft==NOTIFY_WITHIN_DAYS/2 || daysLeft==0)
 					notify.data.insert(NDR_POPUP_TIMEOUT,0);
+				else
+					notify.data.remove(NDR_POPUP_TIMEOUT);
 
 				FNotifiedContacts.append(contactJid);
 				FNotifies.insert(FNotifications->appendNotification(notify),contactJid);
