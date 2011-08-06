@@ -26,11 +26,11 @@
 #define AG_RVCM_ARCHIVER                                        500
 #define AG_RVCM_DISCOVERY                                       500
 #define AG_RVCM_ROSTERSVIEW_CLIPBOARD                           500
-#define AG_RVCM_RCHANGER                                        700
-#define AG_RVCM_PRIVACYLISTS                                    700
-#define AG_RVCM_STATUSICONS                                     700
+#define AG_RVCM_PRIVACYLISTS                                    500
+#define AG_RVCM_STATUSICONS                                     500
+#define AG_RVCM_GATEWAYS_RESOLVE                                500
 #define AG_RVCM_ACCOUNTMANAGER                                  700
-#define AG_RVCM_GATEWAYS_RESOLVE                                700
+#define AG_RVCM_RCHANGER                                        700
 #define AG_RVCM_VCARD                                           900
 
 //TrayManager - TrayMenu

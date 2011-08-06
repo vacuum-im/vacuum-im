@@ -192,7 +192,6 @@
 
 //RosterChanger
 #define MNI_RCHANGER_ADD_CONTACT        "rchangerAddContact"
-#define MNI_RCHANGER_MANAGEMENT         "rchangerManagment"
 #define MNI_RCHANGER_GROUP              "rchangerGroup"
 #define MNI_RCHANGER_ROOT_GROUP         "rchangerRootGroup"
 #define MNI_RCHANGER_THIS_GROUP         "rchangerThisGroup"

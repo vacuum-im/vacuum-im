@@ -301,10 +301,6 @@
         <source>Blank Group</source>
         <translation>Пуста група</translation>
     </message>
-    <message>
-        <source>Roster management</source>
-        <translation>Управління ростером</translation>
-    </message>
 </context>
 <context>
     <name>SubscriptionDialog</name>

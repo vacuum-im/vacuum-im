@@ -301,10 +301,6 @@
         <source>Blank Group</source>
         <translation></translation>
     </message>
-    <message>
-        <source>Roster management</source>
-        <translation></translation>
-    </message>
 </context>
 <context>
     <name>SubscriptionDialog</name>
