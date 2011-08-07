@@ -784,7 +784,7 @@ void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
 		if (!window->isVisibleTabPage())
-			window->assignTabPage();
+			window->showTabPage();
 }
 
 void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
