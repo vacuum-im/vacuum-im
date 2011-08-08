@@ -24,6 +24,7 @@ NotifyOptionsWidget::NotifyOptionsWidget(INotifications *ANotifications, QWidget
 {
 	ui.setupUi(this);
 	FNotifications = ANotifications;
+	FBlockChangesCheck = 0;
 
 	createTreeModel();
 
