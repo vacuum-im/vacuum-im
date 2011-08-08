@@ -125,6 +125,7 @@ void NotifyOptionsWidget::createTreeModel()
 						kindEnableItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 						kindEnableItem->setTextAlignment(Qt::AlignCenter);
 						kindEnableItem->setCheckable(true);
+						kindEnableItem->setCheckState(Qt::PartiallyChecked);
 
 						FKindItems.insert(KindsList[index].kind,kindEnableItem);
 						FModel.invisibleRootItem()->appendRow(QList<QStandardItem *>() << kindNameItem << kindEnableItem);
@@ -140,6 +141,7 @@ void NotifyOptionsWidget::createTreeModel()
 					typeEnableItem->setData(KindsList[index].kind,MDR_KIND);
 					typeEnableItem->setTextAlignment(Qt::AlignCenter);
 					typeEnableItem->setCheckable(true);
+					typeEnableItem->setCheckState(Qt::PartiallyChecked);
 
 					FTypeItems.insertMulti(typeId,typeEnableItem);
 					kindNameItem->appendRow(QList<QStandardItem *>() << typeNameItem << typeEnableItem);
