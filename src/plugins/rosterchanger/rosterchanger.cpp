@@ -127,9 +127,12 @@ bool RosterChanger::initObjects()
 
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
-		ushort kindDefs = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized;
-		FNotifications->registerNotificationType(NNT_SUBSCRIPTION_REQUEST,OWO_NOTIFICATIONS_SUBSCRIPTION_REQUEST,tr("Subscription requests"),kindMask,kindDefs);
+		INotificationType notifyType;
+		notifyType.order = NTO_SUBSCRIPTION_REQUEST;
+		notifyType.title = tr("When receiving authorization request");
+		notifyType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
+		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_SUBSCRIPTION_REQUEST,notifyType);
 	}
 	if (FRostersView)
 	{
@@ -1122,7 +1125,7 @@ void RosterChanger::onReceiveSubscription(IRoster *ARoster, const Jid &AContactJ
 		notify.kinds =  FNotifications->notificationKinds(NNT_SUBSCRIPTION_REQUEST);
 		if (ASubsType != IRoster::Subscribe)
 			notify.kinds = (notify.kinds & INotification::PopupWindow);
-		notify.type = NNT_SUBSCRIPTION_REQUEST;
+		notify.typeId = NNT_SUBSCRIPTION_REQUEST;
 		notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RCHANGER_SUBSCRIBTION));
 		notify.data.insert(NDR_TOOLTIP,tr("Subscription message from %1").arg(FNotifications->contactName(ARoster->streamJid(),AContactJid)));
 		notify.data.insert(NDR_STREAM_JID,ARoster->streamJid().full());

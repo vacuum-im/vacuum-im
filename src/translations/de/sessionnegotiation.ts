@@ -8,10 +8,6 @@
         <translation>Sitzungsaushandlung</translation>
     </message>
     <message>
-        <source>Negotiate session requests</source>
-        <translation>Sitzungsanfragen aushandeln</translation>
-    </message>
-    <message>
         <source>Negotiate Session</source>
         <translation>Sitzung aushandeln</translation>
     </message>
@@ -106,6 +102,10 @@
     <message>
         <source>Supports the negotiating of the stanza session between two XMPP entities</source>
         <translation>Unterstützt die Aushandlung von Stanza Sitzungen zwischen zwei XMPP Existenzen</translation>
+    </message>
+    <message>
+        <source>When receiving session negotiation request</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

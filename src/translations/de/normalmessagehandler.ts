@@ -4,10 +4,6 @@
 <context>
     <name>NormalMessageHandler</name>
     <message>
-        <source>Single Messages</source>
-        <translation>Einzelne Nachrichten</translation>
-    </message>
-    <message>
         <source>Message from %1</source>
         <translation>Nachricht von %1</translation>
     </message>
@@ -59,6 +55,10 @@
         <source>Ctrl+Return</source>
         <comment>Send message</comment>
         <translation></translation>
+    </message>
+    <message>
+        <source>When receiving new single message</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

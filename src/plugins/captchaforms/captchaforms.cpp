@@ -78,9 +78,12 @@ bool CaptchaForms::initObjects()
 	}
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
-		ushort kindDefs = INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized;
-		FNotifications->registerNotificationType(NNT_CAPTCHA_REQUEST,OWO_NOTIFICATIONS_CAPTCHA_REQUEST,tr("CAPTCHA Challenges"),kindMask,kindDefs);
+		INotificationType notifyType;
+		notifyType.order = NTO_CAPTCHA_REQUEST;
+		notifyType.title = tr("When receiving a CAPTCHA challenge");
+		notifyType.kindMask = INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
+		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_CAPTCHA_REQUEST,notifyType);
 	}
 	return true;
 }
@@ -276,7 +279,7 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 		if (notify.kinds > 0)
 		{
 			Jid contactJid = FDataForms->fieldValue("from", AChallenge.dialog->formWidget()->dataForm().fields).toString();
-			notify.type = NNT_CAPTCHA_REQUEST;
+			notify.typeId = NNT_CAPTCHA_REQUEST;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CAPTCHAFORMS));
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));

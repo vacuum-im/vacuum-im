@@ -127,9 +127,12 @@ bool FileTransfer::initObjects()
 	}
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
-		ushort kindDefs = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized;
-		FNotifications->registerNotificationType(NNT_FILETRANSFER,OWO_NOTIFICATIONS_FILETRANSFER,tr("File Transfer"),kindMask,kindDefs);
+		INotificationType notifyType;
+		notifyType.order = NTO_FILETRANSFER_NOTIFY;
+		notifyType.title = tr("When receiving a prompt to accept the file");
+		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
+		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_FILETRANSFER,notifyType);
 	}
 	if (FFileManager)
 	{
@@ -420,7 +423,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 
 			INotification notify;
 			notify.kinds = FNotifications->notificationKinds(NNT_FILETRANSFER);
-			notify.type = NNT_FILETRANSFER;
+			notify.typeId = NNT_FILETRANSFER;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(AStream->streamKind()==IFileStream::SendFile ? MNI_FILETRANSFER_SEND : MNI_FILETRANSFER_RECEIVE));
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AStream->streamJid(),AStream->contactJid()));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(AStream->contactJid()));

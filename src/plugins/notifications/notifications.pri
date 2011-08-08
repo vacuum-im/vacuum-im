@@ -1,16 +1,13 @@
 FORMS = notifywidget.ui \
-        optionswidget.ui \
-        notifykindswidget.ui
+        notifyoptionswidget.ui
 
 HEADERS = notifications.h \
           notifywidget.h \
-          optionswidget.h \
-          notifykindswidget.h \
+          notifyoptionswidget.h \
           notifytextbrowser.h
 
 SOURCES = notifications.cpp \
           notifywidget.cpp \
-          optionswidget.cpp \
-          notifykindswidget.cpp \
+          notifyoptionswidget.cpp \
           notifytextbrowser.cpp
 

@@ -9,6 +9,7 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>

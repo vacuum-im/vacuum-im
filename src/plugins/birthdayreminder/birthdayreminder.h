@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/optionwidgetorders.h>
+#include <definitions/notificationtypeorders.h>
 #include <definitions/soundfiles.h>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>

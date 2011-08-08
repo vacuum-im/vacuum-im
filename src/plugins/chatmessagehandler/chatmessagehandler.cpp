@@ -97,9 +97,12 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
 		if (notifications)
 		{
-			ushort kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-			ushort kindDefs = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
-			notifications->registerNotificationType(NNT_CHAT_MESSAGE,OWO_NOTIFICATIONS_CHAT_MESSAGE,tr("Chat Messages"),kindMask,kindDefs);
+			INotificationType notifyType;
+			notifyType.order = NTO_CHATHANDLER_MESSAGE;
+			notifyType.title = tr("When receiving new chat message");
+			notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+			notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+			notifications->registerNotificationType(NNT_CHAT_MESSAGE,notifyType);
 		}
 	}
 
@@ -258,7 +261,7 @@ INotification ChatMessageHandler::notifyMessage(INotifications *ANotifications, 
 	notify.kinds = ANotifications->notificationKinds(NNT_CHAT_MESSAGE);
 	if (notify.kinds > 0)
 	{
-		notify.type = NNT_CHAT_MESSAGE;
+		notify.typeId = NNT_CHAT_MESSAGE;
 		notify.data.insert(NDR_ICON,icon);
 		notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
 		notify.data.insert(NDR_STREAM_JID,AMessage.to());

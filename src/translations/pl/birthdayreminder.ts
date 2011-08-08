@@ -12,10 +12,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Birthdays</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Birthday remind</source>
         <translation type="unfinished"></translation>
     </message>
@@ -46,6 +42,10 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>When reminding of upcoming birthdays</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

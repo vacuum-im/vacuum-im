@@ -12,10 +12,6 @@
         <translation>Напоминать о днях рождения ваших друзей</translation>
     </message>
     <message>
-        <source>Birthdays</source>
-        <translation>Дни рождения</translation>
-    </message>
-    <message>
         <source>Birthday remind</source>
         <translation>Напоминание о дне рождения</translation>
     </message>
@@ -46,6 +42,10 @@
             <numerusform>%1 исполняется %n года</numerusform>
             <numerusform>%1 исполняется %n лет</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>When reminding of upcoming birthdays</source>
+        <translation>При напоминании о наступающем дне рождения</translation>
     </message>
 </context>
 </TS>

@@ -270,14 +270,14 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 					if (isMentionMessage(AMessage))
 					{
 						notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_MENTION);
-						notify.type = NNT_MUC_MESSAGE_MENTION;
+						notify.typeId = NNT_MUC_MESSAGE_MENTION;
 						notify.data.insert(NDR_TOOLTIP,tr("Mention message in conference: %1").arg(contactJid.node()));
 						notify.data.insert(NDR_POPUP_CAPTION,tr("Mention in conference"));
 					}
 					else
 					{
 						notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_GROUPCHAT);
-						notify.type = NNT_MUC_MESSAGE_GROUPCHAT;
+						notify.typeId = NNT_MUC_MESSAGE_GROUPCHAT;
 						notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
 						notify.data.insert(NDR_POPUP_CAPTION,tr("Conference message"));
 					}
@@ -293,7 +293,7 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 				{
 					page = window;
 					notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
-					notify.type = NNT_MUC_MESSAGE_PRIVATE;
+					notify.typeId = NNT_MUC_MESSAGE_PRIVATE;
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 					notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
 					notify.data.insert(NDR_POPUP_CAPTION,tr("Private message"));
@@ -328,7 +328,7 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 			if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
 			{
 				notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
-				notify.type = NNT_MUC_MESSAGE_PRIVATE;
+				notify.typeId = NNT_MUC_MESSAGE_PRIVATE;
 				notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_DATA_MESSAGE));
 				notify.data.insert(NDR_TOOLTIP,tr("Data form received from: %1").arg(contactJid.node()));
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Data form received"));

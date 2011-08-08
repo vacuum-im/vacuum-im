@@ -11,6 +11,7 @@
 #include <definitions/rosternotifyorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
 #include <definitions/tabpagenotifypriorities.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/vcardvaluenames.h>
