@@ -199,9 +199,12 @@ bool StatusChanger::initObjects()
 
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::PopupWindow|INotification::SoundPlay;
-		ushort kindDefs = INotification::PopupWindow|INotification::SoundPlay;
-		FNotifications->registerNotificationType(NNT_CONNECTION_ERROR,OWO_NOTIFICATIONS_CONNECTION_ERROR,tr("Connection errors"),kindMask,kindDefs);
+		INotificationType notifyType;
+		notifyType.order = NTO_CONNECTION_ERROR;
+		notifyType.title = tr("On loss of connection to the server");
+		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
+		notifyType.kindDefs = notifyType.kindMask;
+		FNotifications->registerNotificationType(NNT_CONNECTION_ERROR,notifyType);
 	}
 
 	return true;
@@ -903,7 +906,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 		notify.kinds = FNotifications->notificationKinds(NNT_CONNECTION_ERROR);
 		if (notify.kinds > 0)
 		{
-			notify.type = NNT_CONNECTION_ERROR;
+			notify.typeId = NNT_CONNECTION_ERROR;
 			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon());
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
 			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());

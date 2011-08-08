@@ -113,10 +113,6 @@ You can set status class for additional statuses defined by you.</source>
 <context>
     <name>StatusChanger</name>
     <message>
-        <source>Connection errors</source>
-        <translation>Помилки підключення</translation>
-    </message>
-    <message>
         <source>Offline</source>
         <translation>Не в мережі</translation>
     </message>
@@ -207,6 +203,10 @@ You can set status class for additional statuses defined by you.</source>
     <message>
         <source>I&apos;m away from my desk</source>
         <translation>Далеко від клавіатури</translation>
+    </message>
+    <message>
+        <source>On loss of connection to the server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

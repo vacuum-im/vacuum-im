@@ -40,10 +40,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Enable alerts in task bar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation type="unfinished"></translation>
     </message>
@@ -51,32 +47,59 @@
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>NotifyOptionsWidget</name>
     <message>
-        <source>Show minimized window on notification</source>
+        <source>Display a notification in your roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in popup window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in tray</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in tray context menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play sound at the notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlight the corresponding window in the taskbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the corresponding window minimized in the taskbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Immediately activate the notification</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>NotifyKindsWidgetClass</name>
+    <name>NotifyOptionsWidgetClass</name>
     <message>
-        <source>Roster</source>
-        <translation>Roster</translation>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Popup</source>
-        <translation>Popup</translation>
+        <source> seconds</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Tray</source>
-        <translation>Tray</translation>
-    </message>
-    <message>
-        <source>Sound</source>
-        <translation>Sound</translation>
-    </message>
-    <message>
-        <source>Activate</source>
-        <translation>Aktivieren</translation>
+        <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -84,41 +107,6 @@
     <message>
         <source>Notification</source>
         <translation>Benachrichtigung</translation>
-    </message>
-</context>
-<context>
-    <name>OptionsWidgetClass</name>
-    <message>
-        <source>Common notification options</source>
-        <translation>Allgemeine Benachrichtigungsoptionen</translation>
-    </message>
-    <message>
-        <source>Roster</source>
-        <translation>Roster</translation>
-    </message>
-    <message>
-        <source>Popup</source>
-        <translation>Popup</translation>
-    </message>
-    <message>
-        <source>Tray</source>
-        <translation>Tray</translation>
-    </message>
-    <message>
-        <source>Sound</source>
-        <translation>Sound</translation>
-    </message>
-    <message>
-        <source>Activate</source>
-        <translation>Aktivieren</translation>
-    </message>
-    <message>
-        <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation></translation>
     </message>
 </context>
 </TS>

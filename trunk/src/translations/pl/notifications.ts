@@ -40,10 +40,6 @@
         <translation>Usuń wszystkie powiadomienia</translation>
     </message>
     <message>
-        <source>Enable alerts in task bar</source>
-        <translation>Pokazuj alerty w pasku zadań</translation>
-    </message>
-    <message>
         <source>Expand contact groups in roster</source>
         <translation>Rozwiń grupy na liście kontaktów</translation>
     </message>
@@ -51,32 +47,59 @@
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
         <translation>Wyłącz dźwięk jeśli ustawiony jest status &apos;Nie przeszkadzaj&apos;</translation>
     </message>
+</context>
+<context>
+    <name>NotifyOptionsWidget</name>
     <message>
-        <source>Show minimized window on notification</source>
+        <source>Display a notification in your roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in popup window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in tray</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in tray context menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play sound at the notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlight the corresponding window in the taskbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display a notification in tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show the corresponding window minimized in the taskbar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Immediately activate the notification</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>NotifyKindsWidgetClass</name>
+    <name>NotifyOptionsWidgetClass</name>
     <message>
-        <source>Roster</source>
-        <translation>Lista kontaktów</translation>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation type="unfinished">Czas pokazywania wyskakujących okienek (0-zawsze widoczne):</translation>
     </message>
     <message>
-        <source>Popup</source>
-        <translation>Wyskakujące okno</translation>
+        <source> seconds</source>
+        <translation type="unfinished"> sekund</translation>
     </message>
     <message>
-        <source>Tray</source>
-        <translation>Zasobnik systemowy</translation>
-    </message>
-    <message>
-        <source>Sound</source>
-        <translation>Dźwięk</translation>
-    </message>
-    <message>
-        <source>Activate</source>
-        <translation>Aktywuj</translation>
+        <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -84,41 +107,6 @@
     <message>
         <source>Notification</source>
         <translation>Powiadomienia</translation>
-    </message>
-</context>
-<context>
-    <name>OptionsWidgetClass</name>
-    <message>
-        <source>Common notification options</source>
-        <translation>Ogólne ustawienia powiadomień</translation>
-    </message>
-    <message>
-        <source>Roster</source>
-        <translation>Lista kontaktów</translation>
-    </message>
-    <message>
-        <source>Popup</source>
-        <translation>Wyskakujące okno</translation>
-    </message>
-    <message>
-        <source>Tray</source>
-        <translation>Zasobnik systemowy</translation>
-    </message>
-    <message>
-        <source>Sound</source>
-        <translation>Dźwięk</translation>
-    </message>
-    <message>
-        <source>Activate</source>
-        <translation>Aktywuj</translation>
-    </message>
-    <message>
-        <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation>Czas pokazywania wyskakujących okienek (0-zawsze widoczne):</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekund</translation>
     </message>
 </context>
 </TS>

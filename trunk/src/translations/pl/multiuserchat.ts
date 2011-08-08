@@ -154,18 +154,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Dołącz do konferencji</translation>
     </message>
     <message>
-        <source>Invite chat messages</source>
-        <translation>Zaproszenie do konferencji</translation>
-    </message>
-    <message>
-        <source>Private conference messages</source>
-        <translation>Prywatne wiadomości na konferencji</translation>
-    </message>
-    <message>
-        <source>Conference messages</source>
-        <translation>Wiadomości w konferencji</translation>
-    </message>
-    <message>
         <source>You are invited to the conference %1</source>
         <translation>Zostałeś zaproszony na konferencję %1</translation>
     </message>
@@ -502,10 +490,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Obsługa konferencji z wieloma uczestnikami</translation>
     </message>
     <message>
-        <source>Mention in conference</source>
-        <translation>Wspomniano Ciebie na konferencji</translation>
-    </message>
-    <message>
         <source>Leave all hidden conferences</source>
         <translation>Opuść wszystkie ukryte konferencje</translation>
     </message>
@@ -570,6 +554,22 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     <message>
         <source>I&apos;m too busy right now</source>
         <translation>Jestem teraz zbyt zajęty</translation>
+    </message>
+    <message>
+        <source>When receiving an invitation to the conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When receiving a new private message in conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When referring to you at the conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>When receiving a new message in conference</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -119,8 +119,12 @@ bool BirthdayReminder::initObjects()
 {
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::PopupWindow|INotification::SoundPlay;
-		FNotifications->registerNotificationType(NNT_BIRTHDAY,OWO_NOTIFICATIONS_BIRTHDAY,tr("Birthdays"),kindMask,kindMask);
+		INotificationType notifyType;
+		notifyType.order = NTO_BIRTHDAY_NOTIFY;
+		notifyType.title = tr("When reminding of upcoming birthdays");
+		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
+		notifyType.kindDefs = notifyType.kindMask;
+		FNotifications->registerNotificationType(NNT_BIRTHDAY,notifyType);
 	}
 	if (FRostersViewPlugin)
 	{
@@ -236,7 +240,7 @@ void BirthdayReminder::onShowNotificationTimer()
 		if ((notify.kinds & (INotification::PopupWindow|INotification::SoundPlay))>0)
 		{
 			updateBirthdaysStates();
-			notify.type = NNT_BIRTHDAY;
+			notify.typeId = NNT_BIRTHDAY;
 			QSet<Jid> notifyList = FUpcomingBirthdays.keys().toSet() - FNotifiedContacts.toSet();
 			foreach(Jid contactJid, notifyList)
 			{

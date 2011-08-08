@@ -31,8 +31,7 @@
 #include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
 #include "notifywidget.h"
-#include "optionswidget.h"
-#include "notifykindswidget.h"
+#include "notifyoptionswidget.h"
 
 struct NotifyRecord 
 {
@@ -52,11 +51,8 @@ struct NotifyRecord
 
 struct TypeRecord 
 {
-	int optionsOrder;
-	QString title;
 	ushort kinds;
-	ushort defaults;
-	ushort kindMask;
+	INotificationType type;
 };
 
 class Notifications :
@@ -86,11 +82,13 @@ public:
 	virtual int appendNotification(const INotification &ANotification);
 	virtual void activateNotification(int ANotifyId);
 	virtual void removeNotification(int ANotifyId);
-	//Kind options for notificators
-	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, ushort AKindMask, ushort ADefault);
-	virtual ushort notificationKinds(const QString &AType) const;
-	virtual void setNotificationKinds(const QString &AType, ushort AKinds);
-	virtual void removeNotificationType(const QString &AType);
+	//Kind options for notification types
+	virtual void registerNotificationType(const QString &ATypeId, const INotificationType &AType);
+	virtual QList<QString> notificationTypes() const;
+	virtual INotificationType notificationType(const QString &ATypeId) const;
+	virtual ushort notificationKinds(const QString &ATypeId) const;
+	virtual void setNotificationKinds(const QString &ATypeId, ushort AKinds);
+	virtual void removeNotificationType(const QString &ATypeId);
 	//Notification Handlers
 	virtual void insertNotificationHandler(int AOrder, INotificationHandler *AHandler);
 	virtual void removeNotificationHandler(int AOrder, INotificationHandler *AHandler);

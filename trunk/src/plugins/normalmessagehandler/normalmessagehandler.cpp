@@ -84,9 +84,12 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
 		if (notifications)
 		{
-			ushort kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-			ushort kindDefs = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
-			notifications->registerNotificationType(NNT_NORMAL_MESSAGE,OWO_NOTIFICATIONS_NORMAL_MESSAGE,tr("Single Messages"),kindMask,kindDefs);
+			INotificationType notifyType;
+			notifyType.order = NTO_NORMALHANDLER_MESSAGE;
+			notifyType.title = tr("When receiving new single message");
+			notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+			notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+			notifications->registerNotificationType(NNT_NORMAL_MESSAGE,notifyType);
 		}
 	}
 
@@ -198,7 +201,7 @@ INotification NormalMessageHandler::notifyMessage(INotifications *ANotifications
 	notify.kinds = ANotifications->notificationKinds(NNT_NORMAL_MESSAGE);
 	if (notify.kinds > 0)
 	{
-		notify.type = NNT_NORMAL_MESSAGE;
+		notify.typeId = NNT_NORMAL_MESSAGE;
 		notify.data.insert(NDR_ICON,icon);
 		notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
 		notify.data.insert(NDR_STREAM_JID,AMessage.to());

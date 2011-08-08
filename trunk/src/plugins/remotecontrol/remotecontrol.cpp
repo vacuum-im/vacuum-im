@@ -162,8 +162,8 @@ bool RemoteControl::initObjects()
 	}
 
 	optionItems.clear();
-	optionItems[FIELD_SOUNDS] = OptionsFormItem(OPV_NOTIFICATIONS_ENABLESOUND, tr("Play sounds"));
-	optionItems[FIELD_AUTO_MSG] = OptionsFormItem(OPV_NOTIFICATIONS_AUTOACTIVATE, tr("Automatically Open New Messages"));
+	optionItems[FIELD_SOUNDS] = OptionsFormItem(QString(OPV_NOTIFICATIONS_KINDENABLED_ITEM"[%1]").arg(INotification::SoundPlay), tr("Play sounds"));
+	optionItems[FIELD_AUTO_MSG] = OptionsFormItem(QString(OPV_NOTIFICATIONS_KINDENABLED_ITEM"[%1]").arg(INotification::AutoActivate), tr("Automatically Open New Messages"));
 	optionItems[FIELD_AUTO_FILES] = OptionsFormItem(OPV_FILETRANSFER_AUTORECEIVE, tr("Automatically Accept File Transfers"));
 	optionItems[FIELD_AUTO_AUTH] = OptionsFormItem(OPV_ROSTER_AUTOSUBSCRIBE, tr("Automatically Authorize Contacts"));
 

@@ -106,9 +106,12 @@ bool SessionNegotiation::initObjects()
 	}
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
-		ushort kindDefs = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized;
-		FNotifications->registerNotificationType(NNT_SESSION_NEGOTIATION,OWO_NOTIFICATIONS_SESSION_NEGOTIATION,tr("Negotiate session requests"),kindMask,kindDefs);
+		INotificationType notifyType;
+		notifyType.order = NTO_SESSION_NEGOTIATION;
+		notifyType.title = tr("When receiving session negotiation request");
+		notifyType.kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
+		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_SESSION_NEGOTIATION,notifyType);
 	}
 	if (FDataForms)
 	{
@@ -860,7 +863,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 			notify.kinds = FNotifications->notificationKinds(NNT_SESSION_NEGOTIATION);
 			if (notify.kinds > 0)
 			{
-				notify.type = NNT_SESSION_NEGOTIATION;
+				notify.typeId = NNT_SESSION_NEGOTIATION;
 				notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION));
 				notify.data.insert(NDR_TOOLTIP,tr("Session negotiation - %1").arg(ASession.contactJid.full()));
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Session negotiation"));

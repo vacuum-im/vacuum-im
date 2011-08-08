@@ -3,6 +3,7 @@
 #include <QProcess>
 #include <QVBoxLayout>
 
+#define UNDEFINED_KINDS    0xFFFF
 #define ADR_NOTIFYID       Action::DR_Parametr1
 
 Notifications::Notifications()
@@ -151,19 +152,11 @@ bool Notifications::initObjects()
 
 bool Notifications::initSettings()
 {
-	Options::setDefaultValue(OPV_NOTIFICATIONS_ENABLESOUND,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_ROSTERNOTIFY,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPWINDOW,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_TRAYNOTIFY,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_TRAYACTION,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_ALERTWIDGET,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_TABPAGENOTIFY,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_AUTOACTIVATE,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_ENABLEALERTS,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPTIMEOUT,8);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_SHOWMINIMIZED,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,0);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_KINDENABLED_ITEM,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUNDCOMMAND,QString("aplay"));
 
 	if (FOptionsManager)
@@ -180,17 +173,9 @@ QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &AN
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_NOTIFICATIONS)
 	{
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_ENABLEALERTS),tr("Enable alerts in task bar"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_SHOWMINIMIZED),tr("Show minimized window on notification"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new OptionsWidget(this, AParent));
-		foreach(QString id, FTypeRecords.keys())
-		{
-			TypeRecord typeRecord = FTypeRecords.value(id);
-			if (!typeRecord.title.isEmpty())
-				widgets.insertMulti(typeRecord.optionsOrder, new NotifyKindsWidget(this,id,typeRecord.title,typeRecord.kindMask,AParent));
-		}
+		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new NotifyOptionsWidget(this,AParent));
 	}
 	return widgets;
 }
@@ -217,8 +202,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 	QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
 	QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
 
-	if (FRostersModel && FRostersViewPlugin && Options::node(OPV_NOTIFICATIONS_ROSTERNOTIFY).value().toBool() &&
-		(record.notification.kinds & INotification::RosterNotify)>0)
+	if (FRostersModel && FRostersViewPlugin && (record.notification.kinds & INotification::RosterNotify)>0 &&
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::RosterNotify)).value().toBool())
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
@@ -242,7 +227,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool() && (record.notification.kinds & INotification::PopupWindow)>0)
+	if ((record.notification.kinds & INotification::PopupWindow)>0 && 
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::PopupWindow)).value().toBool())
 	{
 		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
@@ -256,7 +242,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 
 	if (FTrayManager)
 	{
-		if (Options::node(OPV_NOTIFICATIONS_TRAYNOTIFY).value().toBool() && (record.notification.kinds & INotification::TrayNotify)>0)
+		if ((record.notification.kinds & INotification::TrayNotify)>0 &&
+			Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::TrayNotify)).value().toBool())
 		{
 			if (!showNotifyByHandler(INotification::TrayNotify,notifyId,record.notification))
 			{
@@ -268,8 +255,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 			}
 		}
 
-		if (!toolTip.isEmpty() && Options::node(OPV_NOTIFICATIONS_TRAYACTION).value().toBool() &&
-		    (record.notification.kinds & INotification::TrayAction)>0)
+		if (!toolTip.isEmpty() && (record.notification.kinds & INotification::TrayAction)>0 &&
+			Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::TrayAction)).value().toBool())
 		{
 			if (!showNotifyByHandler(INotification::TrayAction,notifyId,record.notification))
 			{
@@ -283,8 +270,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) &&
-		Options::node(OPV_NOTIFICATIONS_ENABLESOUND).value().toBool() && (record.notification.kinds & INotification::SoundPlay)>0)
+	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) && (record.notification.kinds & INotification::SoundPlay)>0 &&
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::SoundPlay)).value().toBool())
 	{
 		if (!showNotifyByHandler(INotification::SoundPlay,notifyId,record.notification))
 		{
@@ -308,7 +295,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (Options::node(OPV_NOTIFICATIONS_SHOWMINIMIZED).value().toBool() && (record.notification.kinds & INotification::ShowMinimized)>0)
+	if ((record.notification.kinds & INotification::ShowMinimized)>0 && 
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::ShowMinimized)).value().toBool())
 	{
 		if (!showNotifyByHandler(INotification::ShowMinimized,notifyId,record.notification))
 		{
@@ -324,7 +312,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (Options::node(OPV_NOTIFICATIONS_ALERTWIDGET).value().toBool() && (record.notification.kinds & INotification::AlertWidget)>0)
+	if ((record.notification.kinds & INotification::AlertWidget)>0 && 
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AlertWidget)).value().toBool())
 	{
 		if (!showNotifyByHandler(INotification::AlertWidget,notifyId,record.notification))
 		{
@@ -334,7 +323,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (Options::node(OPV_NOTIFICATIONS_TABPAGENOTIFY).value().toBool() && (record.notification.kinds & INotification::TabPageNotify)>0)
+	if ((record.notification.kinds & INotification::TabPageNotify)>0 && 
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::TabPageNotify)).value().toBool())
 	{
 		if (!showNotifyByHandler(INotification::TabPageNotify,notifyId,record.notification))
 		{
@@ -352,7 +342,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 		
-	if (Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool() && (record.notification.kinds & INotification::AutoActivate)>0)
+	if ((record.notification.kinds & INotification::AutoActivate)>0 &&
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AutoActivate)).value().toBool())
 	{
 		FDelayedActivations.append(notifyId);
 		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
@@ -417,46 +408,52 @@ void Notifications::removeNotification(int ANotifyId)
 	}
 }
 
-void Notifications::registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, ushort AKindMask, ushort ADefault)
+void Notifications::registerNotificationType(const QString &ATypeId, const INotificationType &AType)
 {
-	if (!FTypeRecords.contains(AType))
+	if (!FTypeRecords.contains(ATypeId))
 	{
 		TypeRecord typeRecord;
-		typeRecord.optionsOrder = AOptionsOrder;
-		typeRecord.title = ATitle;
-		typeRecord.kinds = 0xFFFF;
-		typeRecord.defaults = ADefault;
-		typeRecord.kindMask = AKindMask;
-		FTypeRecords.insert(AType,typeRecord);
+		typeRecord.kinds = UNDEFINED_KINDS;
+		typeRecord.type = AType;
+		FTypeRecords.insert(ATypeId,typeRecord);
 	}
 }
 
-ushort Notifications::notificationKinds(const QString &AType) const
+QList<QString> Notifications::notificationTypes() const
 {
-	if (FTypeRecords.contains(AType))
+	return FTypeRecords.keys();
+}
+
+INotificationType Notifications::notificationType(const QString &ATypeId) const
+{
+	return FTypeRecords.value(ATypeId).type;
+}
+
+ushort Notifications::notificationKinds(const QString &ATypeId) const
+{
+	if (FTypeRecords.contains(ATypeId))
 	{
-		TypeRecord &typeRecord = FTypeRecords[AType];
-		if (typeRecord.kinds == 0xFFFF)
-			typeRecord.kinds = Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,AType).value().toInt() ^ typeRecord.defaults;
+		TypeRecord &typeRecord = FTypeRecords[ATypeId];
+		if (typeRecord.kinds == UNDEFINED_KINDS)
+			typeRecord.kinds = Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).value().toInt() ^ typeRecord.type.kindDefs;
 		return typeRecord.kinds;
 	}
-	return 0xFFFF;
+	return 0;
 }
 
-void Notifications::setNotificationKinds(const QString &AType, ushort AKinds)
+void Notifications::setNotificationKinds(const QString &ATypeId, ushort AKinds)
 {
-	if (FTypeRecords.contains(AType))
+	if (FTypeRecords.contains(ATypeId))
 	{
-		TypeRecord &typeRecord = FTypeRecords[AType];
-		typeRecord.kinds = AKinds & typeRecord.kindMask;
-		Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,AType).setValue(typeRecord.kinds ^ typeRecord.defaults);
+		TypeRecord &typeRecord = FTypeRecords[ATypeId];
+		typeRecord.kinds = AKinds & typeRecord.type.kindMask;
+		Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).setValue(typeRecord.kinds ^ typeRecord.type.kindDefs);
 	}
 }
 
-void Notifications::removeNotificationType(const QString &AType)
+void Notifications::removeNotificationType(const QString &ATypeId)
 {
-	FTypeRecords.remove(AType);
-	Options::node(OPV_NOTIFICATIONS_ROOT).removeChilds("type-kinds.type",AType);
+	FTypeRecords.remove(ATypeId);
 }
 
 void Notifications::insertNotificationHandler(int AOrder, INotificationHandler *AHandler)
@@ -563,7 +560,7 @@ void Notifications::onActivateDelayedActivations()
 
 void Notifications::onSoundOnOffActionTriggered(bool)
 {
-	OptionsNode node = Options::node(OPV_NOTIFICATIONS_ENABLESOUND);
+	OptionsNode node = Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::SoundPlay));
 	node.setValue(!node.value().toBool());
 }
 
@@ -645,19 +642,22 @@ void Notifications::onActionNotifyActivated(bool)
 
 void Notifications::onOptionsOpened()
 {
-	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_ENABLESOUND));
-	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_ENABLEALERTS));
+	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::SoundPlay)));
+	onOptionsChanged(Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AlertWidget)));
 }
 
 void Notifications::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_NOTIFICATIONS_ENABLESOUND)
+	if (Options::cleanNSpaces(ANode.path()) == OPV_NOTIFICATIONS_KINDENABLED_ITEM)
 	{
-		FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, ANode.value().toBool() ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
-	}
-	else if (ANode.path() == OPV_NOTIFICATIONS_ENABLEALERTS)
-	{
-		WidgetManager::setWidgetAlertEnabled(ANode.value().toBool());
+		if (ANode.nspace().toInt() == INotification::SoundPlay)
+		{
+			FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, ANode.value().toBool() ? MNI_NOTIFICATIONS_SOUND_ON : MNI_NOTIFICATIONS_SOUND_OFF);
+		}
+		else if (ANode.nspace().toInt() == INotification::AlertWidget)
+		{
+			WidgetManager::setWidgetAlertEnabled(ANode.value().toBool());
+		}
 	}
 }
 

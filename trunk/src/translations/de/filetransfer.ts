@@ -87,6 +87,10 @@
         <source>Send file</source>
         <translation></translation>
     </message>
+    <message>
+        <source>When receiving a prompt to accept the file</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>

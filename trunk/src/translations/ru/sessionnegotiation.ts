@@ -8,10 +8,6 @@
         <translation>Согласование сессии</translation>
     </message>
     <message>
-        <source>Negotiate session requests</source>
-        <translation>Запросы установки сессии</translation>
-    </message>
-    <message>
         <source>Negotiate Session</source>
         <translation>Согласовать сессию</translation>
     </message>
@@ -106,6 +102,10 @@
     <message>
         <source>Supports the negotiating of the stanza session between two XMPP entities</source>
         <translation>Поддерживает инициализацию сессии строф между двумя XMPP сущностями</translation>
+    </message>
+    <message>
+        <source>When receiving session negotiation request</source>
+        <translation>При получении запроса установки сессии</translation>
     </message>
 </context>
 </TS>

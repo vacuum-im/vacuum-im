@@ -48,5 +48,9 @@
         <source>Load messages from history in new chat windows</source>
         <translation>Завантажувати попередні повідомлення при відкритті вікна чату</translation>
     </message>
+    <message>
+        <source>When receiving new chat message</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

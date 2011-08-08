@@ -113,10 +113,6 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
 <context>
     <name>StatusChanger</name>
     <message>
-        <source>Connection errors</source>
-        <translation>Błędy połączenia</translation>
-    </message>
-    <message>
         <source>Offline</source>
         <translation>Poza siecią</translation>
     </message>
@@ -207,6 +203,10 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
     <message>
         <source>I&apos;m away from my desk</source>
         <translation>Odszedłem od komputera</translation>
+    </message>
+    <message>
+        <source>On loss of connection to the server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

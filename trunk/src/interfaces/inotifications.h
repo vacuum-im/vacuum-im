@@ -28,10 +28,23 @@ struct INotification
 		kinds = 0;
 		flags = RemoveInvisible;
 	}
-	QString type;
+	QString typeId;
 	ushort kinds;
 	ushort flags;
 	QMap<int, QVariant> data;
+};
+
+struct INotificationType
+{
+	INotificationType() {
+		order = 0;
+		kindMask = 0;
+		kindDefs = 0;
+	}
+	int order;
+	QString title;
+	ushort kindMask;
+	ushort kindDefs;
 };
 
 class INotificationHandler
@@ -49,10 +62,12 @@ public:
 	virtual int appendNotification(const INotification &ANotification) =0;
 	virtual void activateNotification(int ANotifyId) =0;
 	virtual void removeNotification(int ANotifyId) =0;
-	virtual void registerNotificationType(const QString &AType, int AOptionsOrder, const QString &ATitle, ushort AKindMask, ushort ADefault) =0;
-	virtual ushort notificationKinds(const QString &AType) const =0;
-	virtual void setNotificationKinds(const QString &AType, ushort AKinds) =0;
-	virtual void removeNotificationType(const QString &AType) =0;
+	virtual void registerNotificationType(const QString &ATypeId, const INotificationType &AType) =0;
+	virtual QList<QString> notificationTypes() const =0;
+	virtual INotificationType notificationType(const QString &ATypeId) const =0;
+	virtual ushort notificationKinds(const QString &ATypeId) const =0;
+	virtual void setNotificationKinds(const QString &ATypeId, ushort AKinds) =0;
+	virtual void removeNotificationType(const QString &ATypeId) =0;
 	virtual void insertNotificationHandler(int AOrder, INotificationHandler *AHandler) =0;
 	virtual void removeNotificationHandler(int AOrder, INotificationHandler *AHandler) =0;
 	virtual QImage contactAvatar(const Jid &AContactJid) const =0;
@@ -68,6 +83,6 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(INotificationHandler,"Vacuum.Plugin.INotificationHandler/1.1")
-Q_DECLARE_INTERFACE(INotifications,"Vacuum.Plugin.INotifications/1.1")
+Q_DECLARE_INTERFACE(INotifications,"Vacuum.Plugin.INotifications/1.2")
 
 #endif //INOTIFICATIONS_H

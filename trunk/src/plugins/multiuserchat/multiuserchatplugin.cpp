@@ -233,21 +233,33 @@ bool MultiUserChatPlugin::initObjects()
 
 	if (FNotifications)
 	{
-		ushort kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
-		ushort kindDefs = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay;
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_INVITE,OWO_NOTIFICATIONS_MUC_MESSAGE_INVITE,tr("Invite chat messages"),kindMask,kindDefs);
+		INotificationType inviteType;
+		inviteType.order = NTO_MUC_INVITE_MESSAGE;
+		inviteType.title = tr("When receiving an invitation to the conference");
+		inviteType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
+		inviteType.kindDefs = inviteType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_INVITE,inviteType);
 
-		kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-		kindDefs = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_PRIVATE,OWO_NOTIFICATIONS_MUC_MESSAGE_PRIVATE,tr("Private conference messages"),kindMask,kindDefs);
+		INotificationType privateType;
+		privateType.order = NTO_MUC_PRIVATE_MESSAGE;
+		privateType.title = tr("When receiving a new private message in conference");
+		privateType.kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+		privateType.kindDefs = privateType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_PRIVATE,privateType);
 
-		kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
-		kindDefs = INotification::TrayNotify|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify;
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_GROUPCHAT,OWO_NOTIFICATIONS_MUC_MESSAGE_GROUPCHAT,tr("Conference messages"),kindMask,kindDefs);
+		INotificationType groupchatType;
+		groupchatType.order = NTO_MUC_GROUPCHAT_MESSAGE;
+		groupchatType.title = tr("When receiving a new message in conference");
+		groupchatType.kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
+		groupchatType.kindDefs = groupchatType.kindMask & ~(INotification::PopupWindow|INotification::ShowMinimized|INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_GROUPCHAT,groupchatType);
 
-		kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-		kindDefs = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_MENTION,OWO_NOTIFICATIONS_MUC_MESSAGE_MENTION,tr("Mention in conference"),kindMask,kindDefs);
+		INotificationType mentionType;
+		mentionType.order = NTO_MUC_MENTION_MESSAGE;
+		mentionType.title = tr("When referring to you at the conference");
+		mentionType.kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+		mentionType.kindDefs = mentionType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_MENTION,mentionType);
 	}
 
 	if (FXmppUriQueries)
@@ -460,7 +472,7 @@ INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications,
 		if (notify.kinds > 0)
 		{
 			Jid fromJid = inviteElem.attribute("from");
-			notify.type = NNT_MUC_MESSAGE_INVITE;
+			notify.typeId = NNT_MUC_MESSAGE_INVITE;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
 			notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
 			notify.data.insert(NDR_STREAM_JID,AMessage.to());

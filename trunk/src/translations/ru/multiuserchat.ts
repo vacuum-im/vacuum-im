@@ -154,18 +154,6 @@ Check values and try again</source>
         <translation>Войти в конференцию</translation>
     </message>
     <message>
-        <source>Invite chat messages</source>
-        <translation>Приглашение в конференцию</translation>
-    </message>
-    <message>
-        <source>Private conference messages</source>
-        <translation>Личные сообщения в конференции</translation>
-    </message>
-    <message>
-        <source>Conference messages</source>
-        <translation>Сообщения в конференции</translation>
-    </message>
-    <message>
         <source>You are invited to the conference %1</source>
         <translation>Вы приглашены в конференцию %1</translation>
     </message>
@@ -502,10 +490,6 @@ Check values and try again</source>
         <translation>Поддерживает многопользовательские конференции</translation>
     </message>
     <message>
-        <source>Mention in conference</source>
-        <translation>Обращение в конференции</translation>
-    </message>
-    <message>
         <source>Leave all hidden conferences</source>
         <translation>Покинуть все скрытые конференции</translation>
     </message>
@@ -570,6 +554,22 @@ Check values and try again</source>
     <message>
         <source>I&apos;m too busy right now</source>
         <translation>Я слишком занят сейчас</translation>
+    </message>
+    <message>
+        <source>When receiving an invitation to the conference</source>
+        <translation>При получении приглашения в конференцию</translation>
+    </message>
+    <message>
+        <source>When receiving a new private message in conference</source>
+        <translation>При получении нового личного сообщения в конференции</translation>
+    </message>
+    <message>
+        <source>When referring to you at the conference</source>
+        <translation>При обращении к Вам в конференции</translation>
+    </message>
+    <message>
+        <source>When receiving a new message in conference</source>
+        <translation>При получении нового сообщения в конференции</translation>
     </message>
 </context>
 <context>

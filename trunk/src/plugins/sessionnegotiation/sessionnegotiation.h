@@ -8,10 +8,10 @@
 #include <definitions/rosterlabelorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
-#include <definitions/optionwidgetorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/idataforms.h>
