@@ -97,7 +97,7 @@ private:
 private:
 	QMap<Jid, VCardItem> FVCards;
 	QMap<QString, Jid> FVCardRequestId;
-	QMap<QString, QString> FVCardPublishId;
+	QMap<QString, Jid> FVCardPublishId;
 	QMap<QString, Stanza> FVCardPublishStanza;
 	QMap<Jid, VCardDialog *> FVCardDialogs;
 };

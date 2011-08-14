@@ -68,7 +68,7 @@
     </message>
     <message>
         <source>Play sound at the notification</source>
-        <translation>Проигрывать звук уведомлеия</translation>
+        <translation>Проигрывать звук уведомления</translation>
     </message>
     <message>
         <source>Highlight the corresponding window in the taskbar</source>

@@ -106,7 +106,6 @@ protected:
 	void removeStatusActions(int AStatusId);
 	void createStreamMenu(IPresence *APresence);
 	void updateStreamMenu(IPresence *APresence);
-	void removeStreamMenu(IPresence *APresence);
 	int visibleMainStatusId() const;
 	void updateMainMenu();
 	void updateTrayToolTip();
