@@ -168,7 +168,6 @@ void VCardPlugin::stanzaRequestTimeout(const Jid &AStreamJid, const QString &ASt
 	}
 	else if (FVCardPublishId.contains(AStanzaId))
 	{
-		FVCardPublishStanza.remove(AStanzaId);
 		ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
 		emit vcardError(FVCardPublishId.take(AStanzaId),err.message());
 	}

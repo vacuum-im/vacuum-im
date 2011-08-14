@@ -733,20 +733,6 @@ void StatusChanger::updateStreamMenu(IPresence *APresence)
 		mAction->setVisible(FCurrentStatus.value(APresence) != STATUS_MAIN_ID);
 }
 
-void StatusChanger::removeStreamMenu(IPresence *APresence)
-{
-	if (FStreamMenu.contains(APresence))
-	{
-		FMainStatusActions.remove(APresence);
-		FCurrentStatus.remove(APresence);
-		FConnectStatus.remove(APresence);
-		FLastOnlineStatus.remove(APresence);
-		FPendingReconnect.remove(APresence);
-		removeTempStatus(APresence);
-		delete FStreamMenu.take(APresence);
-	}
-}
-
 int StatusChanger::visibleMainStatusId() const
 {
 	int statusId = STATUS_OFFLINE;
@@ -921,9 +907,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 void StatusChanger::removeStatusNotification(IPresence *APresence)
 {
 	if (FNotifications && FNotifyId.contains(APresence))
-	{
 		FNotifications->removeNotification(FNotifyId.take(APresence));
-	}
 }
 
 void StatusChanger::onSetStatusByAction(bool)
@@ -1010,7 +994,15 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 	}
 
 	removeStatusNotification(APresence);
-	removeStreamMenu(APresence);
+	removeTempStatus(APresence);
+
+	FMainStatusStreams -= APresence;
+	FMainStatusActions.remove(APresence);
+	FCurrentStatus.remove(APresence);
+	FConnectStatus.remove(APresence);
+	FLastOnlineStatus.remove(APresence);
+	FPendingReconnect.remove(APresence);
+	delete FStreamMenu.take(APresence);
 
 	if (FStreamMenu.count() == 1)
 		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
