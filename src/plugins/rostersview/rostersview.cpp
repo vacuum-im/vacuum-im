@@ -1115,6 +1115,7 @@ void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
 {
 	FIndexLabels.remove(AIndex);
 	FIndexNotifies.remove(AIndex);
+	FActiveNotifies.remove(AIndex);
 	FNotifyUpdates -= AIndex;
 }
 
