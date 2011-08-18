@@ -31,6 +31,7 @@
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/textmanager.h>
 #include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"
 #include "usercontextmenu.h"
@@ -176,6 +177,8 @@ protected slots:
 	void onMessageReady();
 	void onMessageAboutToBeSend();
 	void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
+	void onViewContextQuoteActionTriggered(bool);
+	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
 	void onWindowActivated();
 	void onChatMessageReady();
 	void onChatWindowActivated();

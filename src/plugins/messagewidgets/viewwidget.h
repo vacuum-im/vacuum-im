@@ -7,6 +7,7 @@
 #include <QDragLeaveEvent>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
+#include <utils/textmanager.h>
 #include "ui_viewwidget.h"
 
 class ViewWidget :
@@ -29,11 +30,13 @@ public:
 	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions);
 	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions);
 	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
+	virtual void contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
 signals:
 	void streamJidChanged(const Jid &ABefore);
 	void contactJidChanged(const Jid &ABefore);
 	void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
 	void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions);
+	void viewContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
 	void urlClicked(const QUrl &AUrl) const;
 protected:
 	void initialize();
@@ -45,6 +48,7 @@ protected:
 protected slots:
 	void onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions);
 	void onUrlClicked(QWidget *AWidget, const QUrl &AUrl);
+	void onCustomContextMenuRequested(const QPoint &APosition);
 private:
 	Ui::ViewWidgetClass ui;
 private:

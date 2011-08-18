@@ -6,7 +6,6 @@
 #include <QDateTime>
 #include <QStringList>
 #include <QSharedData>
-#include <QTextDocument>
 #include "utilsexport.h"
 #include "stanza.h"
 #include "datetime.h"
@@ -81,7 +80,5 @@ private:
 
 Q_DECLARE_METATYPE(Message);
 #define MESSAGE_METATYPE_ID qMetaTypeId<Message>()
-
-UTILS_EXPORT QString getDocumentBody(const QTextDocument &ADocument);
 
 #endif // MESSAGE_H

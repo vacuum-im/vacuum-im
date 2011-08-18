@@ -57,7 +57,7 @@ NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Q
 			cursor.movePosition(QTextCursor::End,QTextCursor::KeepAnchor);
 			cursor.removeSelectedText();
 			cursor.insertText("...");
-			text = getDocumentBody(doc);
+			text = TextManager::getDocumentBody(doc);
 		}
 		ui.ntbText->setHtml(text);
 		ui.ntbText->setContentsMargins(0,0,0,0);

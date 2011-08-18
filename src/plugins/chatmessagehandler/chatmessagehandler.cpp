@@ -1,7 +1,6 @@
 #include "chatmessagehandler.h"
 
 #include <QApplication>
-#include <definitions/optionnodes.h>
 
 #define HISTORY_MESSAGES          10
 #define HISTORY_TIME_PAST         5
@@ -288,7 +287,7 @@ INotification ChatMessageHandler::notifyMessage(INotifications *ANotifications, 
 		{
 			QTextDocument doc;
 			FMessageProcessor->messageToText(&doc,AMessage);
-			notify.data.insert(NDR_POPUP_HTML,getDocumentBody(doc));
+			notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
 		}
 		else
 		{

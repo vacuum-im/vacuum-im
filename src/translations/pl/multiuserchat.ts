@@ -962,5 +962,9 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <source>%1 has left the room</source>
         <translation>%1 opuścił pokój</translation>
     </message>
+    <message>
+        <source>Quote selected text</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

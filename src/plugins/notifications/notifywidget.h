@@ -8,6 +8,7 @@
 #include <interfaces/inotifications.h>
 #include <utils/message.h>
 #include <utils/options.h>
+#include <utils/textmanager.h>
 #include "ui_notifywidget.h"
 
 class NotifyWidget :

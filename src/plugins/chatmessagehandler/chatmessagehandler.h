@@ -20,6 +20,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/shortcuts.h>
+#include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/toolbargroups.h>
@@ -42,6 +43,7 @@
 #include <utils/widgetmanager.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/textmanager.h>
 #include "usercontextmenu.h"
 
 struct WindowStatus

@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
+    <name>ChatWindow</name>
+    <message>
+        <source>Quote selected text</source>
+        <translation>Цитировать выделенный текст</translation>
+    </message>
+</context>
+<context>
     <name>EditWidgetClass</name>
     <message>
         <source>Send</source>
@@ -173,6 +180,26 @@
         <source>Esc</source>
         <comment>Close message window</comment>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+    <message>
+        <source>Send mail</source>
+        <translation>Отправить письмо</translation>
+    </message>
+    <message>
+        <source>Open link</source>
+        <translation>Открыть ссылку</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Копировать адрес</translation>
+    </message>
+    <message>
+        <source>Search on Google &apos;%1&apos;</source>
+        <translation>Искать в Google &apos;%1&apos;</translation>
     </message>
 </context>
 <context>

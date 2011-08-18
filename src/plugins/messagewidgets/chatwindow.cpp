@@ -26,6 +26,8 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.wdtView->setLayout(new QVBoxLayout);
 	ui.wdtView->layout()->setMargin(0);
 	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid,ui.wdtView);
+	connect(FViewWidget->instance(),SIGNAL(viewContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)),
+		SLOT(onViewWidgetContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)));
 	ui.wdtView->layout()->addWidget(FViewWidget->instance());
 
 	ui.wdtEdit->setLayout(new QVBoxLayout);
@@ -312,5 +314,26 @@ void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 	{
 		closeTabPage();
+	}
+}
+
+void ChatWindow::onViewContextQuoteActionTriggered(bool)
+{
+	QTextDocumentFragment fragment = viewWidget()->messageStyle()->selection(viewWidget()->styleWidget());
+	TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
+	editWidget()->textEdit()->setFocus();
+}
+
+void ChatWindow::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
+{
+	Q_UNUSED(APosition);
+	if (!ASelection.toPlainText().trimmed().isEmpty())
+	{
+		Action *quoteAction = new Action(AMenu);
+		quoteAction->setText(tr("Quote selected text"));
+		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
+		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
+		connect(quoteAction,SIGNAL(triggered(bool)),SLOT(onViewContextQuoteActionTriggered(bool)));
+		AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
 	}
 }

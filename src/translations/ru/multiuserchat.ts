@@ -962,5 +962,9 @@ Check values and try again</source>
         <source>%1 has left the room</source>
         <translation>%1 вышел из комнаты</translation>
     </message>
+    <message>
+        <source>Quote selected text</source>
+        <translation>Цитировать выделенный текст</translation>
+    </message>
 </context>
 </TS>

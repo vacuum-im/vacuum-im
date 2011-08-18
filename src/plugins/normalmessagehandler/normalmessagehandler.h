@@ -30,6 +30,7 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/widgetmanager.h>
 #include <utils/errorhandler.h>
+#include <utils/textmanager.h>
 #include <utils/shortcuts.h>
 
 class NormalMessageHandler :
