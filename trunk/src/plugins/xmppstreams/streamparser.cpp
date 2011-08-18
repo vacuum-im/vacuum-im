@@ -31,8 +31,10 @@ void StreamParser::parseData(const QByteArray &AData)
 				attributes.insert(attribute.qualifiedName().toString(), attribute.value().toString());
 
 			QString nsURI = attributes.take("xmlns");
-			QString elemName = FReader.qualifiedName().toString();
+			if (!FReader.prefix().isEmpty())
+				nsURI = attributes.take("xmlns:"+FReader.prefix().toString());
 
+			QString elemName = FReader.qualifiedName().toString();
 			QDomElement newElement = !nsURI.isEmpty() ? doc.createElementNS(nsURI,elemName) : doc.createElement(elemName);
 			for (QMap<QString, QString>::const_iterator it = attributes.constBegin(); it!=attributes.constEnd(); it++)
 				newElement.setAttribute(it.key(),it.value());
