@@ -228,7 +228,7 @@ INotification NormalMessageHandler::notifyMessage(INotifications *ANotifications
 		{
 			QTextDocument doc;
 			FMessageProcessor->messageToText(&doc,AMessage);
-			notify.data.insert(NDR_POPUP_HTML,getDocumentBody(doc));
+			notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
 		}
 		else
 		{

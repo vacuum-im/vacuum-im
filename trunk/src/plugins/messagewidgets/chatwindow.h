@@ -1,6 +1,9 @@
 #ifndef CHATWINDOW_H
 #define CHATWINDOW_H
 
+#include <definitions/actiongroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
 #include <definitions/optionvalues.h>
 #include <definitions/messagedataroles.h>
@@ -9,6 +12,7 @@
 #include <interfaces/istatuschanger.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/textmanager.h>
 #include <utils/widgetmanager.h>
 #include "ui_chatwindow.h"
 
@@ -75,6 +79,8 @@ protected slots:
 	void onStreamJidChanged(const Jid &ABefore);
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+	void onViewContextQuoteActionTriggered(bool);
+	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
 private:
 	Ui::ChatWindowClass ui;
 private:

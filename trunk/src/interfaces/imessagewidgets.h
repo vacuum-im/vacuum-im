@@ -63,11 +63,13 @@ public:
 	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
 	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
+	virtual void contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu) =0;
 protected:
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 	virtual void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions) =0;
+	virtual void viewContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu) =0;
 	virtual void urlClicked(const QUrl &AUrl) const =0;
 };
 
@@ -388,7 +390,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
-Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.0")
+Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.1")
 Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.0")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
 Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")
@@ -402,6 +404,6 @@ Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.0")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.2")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.3")
 
 #endif // IMESSAGEWIDGETS_H

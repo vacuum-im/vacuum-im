@@ -3,6 +3,7 @@
 
 #include <QDesktopServices>
 #include <QObjectCleanupHandler>
+#include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
@@ -17,6 +18,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/textmanager.h>
 #include "infowidget.h"
 #include "editwidget.h"
 #include "viewwidget.h"
@@ -121,6 +123,10 @@ protected:
 	void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
 	void onViewWidgetUrlClicked(const QUrl &AUrl);
+	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
+	void onViewContextCopyActionTriggered(bool);
+	void onViewContextUrlActionTriggered(bool);
+	void onViewContextSearchActionTriggered(bool);
 	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onQuoteActionTriggered(bool);
 	void onMessageWindowDestroyed();

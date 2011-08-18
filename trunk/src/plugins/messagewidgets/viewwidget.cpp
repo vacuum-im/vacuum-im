@@ -71,6 +71,7 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 			disconnect(before->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
 				this, SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
 			disconnect(before->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),this,SLOT(onUrlClicked(QWidget *, const QUrl &)));
+			disconnect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),this,SLOT(onCustomContextMenuRequested(const QPoint &)));
 			ui.wdtViewer->layout()->removeWidget(FStyleWidget);
 			FStyleWidget->deleteLater();
 			FStyleWidget = NULL;
@@ -78,6 +79,8 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 		if (FMessageStyle)
 		{
 			FStyleWidget = FMessageStyle->createWidget(AOptions,ui.wdtViewer);
+			FStyleWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+			connect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onCustomContextMenuRequested(const QPoint &)));
 			connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
 				SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
 			connect(FMessageStyle->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),SLOT(onUrlClicked(QWidget *, const QUrl &)));
@@ -121,7 +124,12 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 		}
 	}
 
-	appendHtml(getDocumentBody(doc),options);
+	appendHtml(TextManager::getDocumentBody(doc),options);
+}
+
+void ViewWidget::contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
+{
+	emit viewContextMenu(APosition,ASelection,AMenu);
 }
 
 void ViewWidget::initialize()
@@ -202,4 +210,17 @@ void ViewWidget::onUrlClicked(QWidget *AWidget, const QUrl &AUrl)
 {
 	if (AWidget == FStyleWidget)
 		emit urlClicked(AUrl);
+}
+
+void ViewWidget::onCustomContextMenuRequested(const QPoint &APosition)
+{
+	Menu *menu = new Menu(this);
+	menu->setAttribute(Qt::WA_DeleteOnClose, true);
+
+	contextMenuForView(APosition,FMessageStyle->selection(FStyleWidget),menu);
+
+	if (!menu->isEmpty())
+		menu->popup(FStyleWidget->mapToGlobal(APosition));
+	else
+		delete menu;
 }

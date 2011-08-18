@@ -8,7 +8,6 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 #include <QTextDocumentFragment>
-#include <utils/message.h>
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
 
@@ -363,7 +362,7 @@ QString SimpleMessageStyle::prepareMessage(const QString &AHtml, const IMessageC
 		doc.setHtml(AHtml);
 		QTextCursor cursor(&doc);
 		cursor.insertHtml(QString("<i>*&nbsp;%1</i>&nbsp;").arg(AOptions.senderName));
-		return getDocumentBody(doc);
+		return TextManager::getDocumentBody(doc);
 	}
 	return AHtml;
 }

@@ -307,7 +307,7 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 				{
 					QTextDocument doc;
 					FMessageProcessor->messageToText(&doc,AMessage);
-					notify.data.insert(NDR_POPUP_HTML,getDocumentBody(doc));
+					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
 				}
 				else
 				{
@@ -560,6 +560,8 @@ void MultiUserChatWindow::createMessageWidgets()
 		ui.wdtView->setLayout(new QVBoxLayout);
 		ui.wdtView->layout()->setMargin(0);
 		FViewWidget = FMessageWidgets->newViewWidget(FMultiChat->streamJid(),FMultiChat->roomJid(),ui.wdtView);
+		connect(FViewWidget->instance(),SIGNAL(viewContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)),
+			SLOT(onViewWidgetContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)));
 		ui.wdtView->layout()->addWidget(FViewWidget->instance());
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
@@ -1914,6 +1916,27 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 		}
 
 		AHooked = true;
+	}
+}
+
+void MultiUserChatWindow::onViewContextQuoteActionTriggered(bool)
+{
+	QTextDocumentFragment fragment = viewWidget()->messageStyle()->selection(viewWidget()->styleWidget());
+	TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
+	editWidget()->textEdit()->setFocus();
+}
+
+void MultiUserChatWindow::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
+{
+	Q_UNUSED(APosition);
+	if (!ASelection.toPlainText().trimmed().isEmpty())
+	{
+		Action *quoteAction = new Action(AMenu);
+		quoteAction->setText(tr("Quote selected text"));
+		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
+		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
+		connect(quoteAction,SIGNAL(triggered(bool)),SLOT(onViewContextQuoteActionTriggered(bool)));
+		AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
 	}
 }
 
