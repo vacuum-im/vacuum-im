@@ -50,7 +50,7 @@ QString TextManager::getTextFragmentHref(const QTextDocumentFragment &AFragment)
 	return href;
 }
 
-void TextManager::insertQuotedFragment(QTextCursor &ACursor, const QTextDocumentFragment &AFragment)
+void TextManager::insertQuotedFragment(QTextCursor ACursor, const QTextDocumentFragment &AFragment)
 {
 	if (!AFragment.isEmpty())
 	{

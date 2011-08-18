@@ -11,7 +11,7 @@ class UTILS_EXPORT TextManager
 public:
 	static QString getDocumentBody(const QTextDocument &ADocument);
 	static QString getTextFragmentHref(const QTextDocumentFragment &AFragment);
-	static void insertQuotedFragment(QTextCursor &ACursor, const QTextDocumentFragment &AFragment);
+	static void insertQuotedFragment(QTextCursor ACursor, const QTextDocumentFragment &AFragment);
 };
 
 #endif // TEXTMANAGER_H
