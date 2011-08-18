@@ -248,7 +248,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			Stanza reply = AStanza.replyError(ditems.error.condition,EHN_DEFAULT,ditems.error.code,ditems.error.message);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
 		}
-		else if (!ditems.items.isEmpty())
+		else
 		{
 			AAccept = true;
 			Stanza reply("iq");
