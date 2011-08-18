@@ -334,7 +334,6 @@ void XmppStream::processFeatures()
 		{
 			FOpen = true;
 			FStreamState = SS_ONLINE;
-			removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
 			emit opened();
 		}
 		else
