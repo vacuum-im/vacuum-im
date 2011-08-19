@@ -11,6 +11,7 @@
 #include <definitions/shortcuts.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
+#include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
 #include "ui_tabwindow.h"
 
@@ -39,6 +40,7 @@ public:
 	virtual void removeTabPage(ITabPage *APage);
 signals:
 	void currentTabPageChanged(ITabPage *APage);
+	void tabPageMenuRequested(ITabPage *APage, Menu *AMenu);
 	void tabPageAdded(ITabPage *APage);
 	void tabPageRemoved(ITabPage *APage);
 	void tabPageDetached(ITabPage *APage);
@@ -56,6 +58,7 @@ protected slots:
 	void onTabMoved(int AFrom, int ATo);
 	void onTabChanged(int AIndex);
 	void onTabCloseRequested(int AIndex);
+	void onTabMenuRequested(int AIndex);
 	void onTabPageShow();
 	void onTabPageShowMinimized();
 	void onTabPageClose();
@@ -63,11 +66,11 @@ protected slots:
 	void onTabPageDestroyed();
 	void onTabPageNotifierChanged();
 	void onTabPageNotifierActiveNotifyChanged(int ANotifyId);
-	void onTabWindowAppended(const QUuid &AWindowId, const QString &AName);
 	void onTabWindowNameChanged(const QUuid &AWindowId, const QString &AName);
-	void onTabWindowDeleted(const QUuid &AWindowId);
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onActionTriggered(bool);
+	void onTabMenuActionTriggered(bool);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onBlinkTabNotifyTimerTimeout();
 private:
 	Ui::TabWindowClass ui;
@@ -75,12 +78,8 @@ private:
 	IMessageWidgets *FMessageWidgets;
 private:
 	Menu *FWindowMenu;
-	Menu *FJoinMenu;
-	Action *FCloseTab;
 	Action *FNextTab;
 	Action *FPrevTab;
-	Action *FNewTab;
-	Action *FDetachWindow;
 	Action *FShowCloseButtons;
 	Action *FTabsBottom;
 	Action *FShowIndices;

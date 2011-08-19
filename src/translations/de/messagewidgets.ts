@@ -201,6 +201,15 @@
         <source>Search on Google &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Close other tabs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+W</source>
+        <comment>Close other tabs</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -393,6 +402,10 @@
     </message>
     <message>
         <source>%1) %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close Other Tabs</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

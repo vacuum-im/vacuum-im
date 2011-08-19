@@ -201,6 +201,15 @@
         <source>Search on Google &apos;%1&apos;</source>
         <translation>Искать в Google &apos;%1&apos;</translation>
     </message>
+    <message>
+        <source>Close other tabs</source>
+        <translation>Закрыть другие вкладки</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+W</source>
+        <comment>Close other tabs</comment>
+        <translation>Ctrl+Shift+W</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
@@ -385,7 +394,7 @@
     </message>
     <message>
         <source>Close Tab Window</source>
-        <translation>Закрыть окно</translation>
+        <translation>Закрыть окно со вкладками</translation>
     </message>
     <message>
         <source>Remove all tabs on window close</source>
@@ -394,6 +403,10 @@
     <message>
         <source>%1) %2</source>
         <translation>%1) %2</translation>
+    </message>
+    <message>
+        <source>Close Other Tabs</source>
+        <translation>Закрыть другие вкладки</translation>
     </message>
 </context>
 <context>
