@@ -6,4 +6,6 @@ set(HEADERS "aboutbox.h"
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})
 qt4_wrap_ui(UI_HEADERS ${UIS})
-qt4_add_resources(RC_SOURCES "loader.rc")
+if (NOT MSVC)
+	qt4_add_resources(RC_SOURCES "loader.rc")
+endif (NOT MSVC)

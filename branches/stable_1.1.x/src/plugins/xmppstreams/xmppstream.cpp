@@ -84,6 +84,8 @@ bool XmppStream::open()
 {
 	if (FConnection && FStreamState==SS_OFFLINE)
 	{
+		FErrorString.clear();
+
 		bool hasPassword = !FPassword.isEmpty() || !FSessionPassword.isEmpty();
 		if (!hasPassword)
 		{
@@ -334,7 +336,6 @@ void XmppStream::processFeatures()
 		{
 			FOpen = true;
 			FStreamState = SS_ONLINE;
-			removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
 			emit opened();
 		}
 		else

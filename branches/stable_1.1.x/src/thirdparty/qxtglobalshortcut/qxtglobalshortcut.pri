@@ -9,6 +9,8 @@ win32 {
   SOURCES += qxtglobalshortcut_win.cpp
 } else:macx {
   SOURCES += qxtglobalshortcut_mac.cpp
+} else:haiku {
+  SOURCES += qxtglobalshortcut_haiku.cpp
 } else {
   SOURCES += qxtglobalshortcut_x11.cpp
 }

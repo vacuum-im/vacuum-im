@@ -45,9 +45,13 @@ public:
     bool unsetShortcut();
 
     static bool error;
+#ifndef Q_WS_MAC
     static int ref;
     static QAbstractEventDispatcher::EventFilter prevEventFilter;
     static bool eventFilter(void* message);
+#endif // Q_WS_MAC
+
+    static void activateShortcut(quint32 nativeKey, quint32 nativeMods);
 
 private:
     static quint32 nativeKeycode(Qt::Key keycode);
@@ -55,7 +59,6 @@ private:
 
     static bool registerShortcut(quint32 nativeKey, quint32 nativeMods);
     static bool unregisterShortcut(quint32 nativeKey, quint32 nativeMods);
-    static void activateShortcut(quint32 nativeKey, quint32 nativeMods);
 
     static QHash<QPair<quint32, quint32>, QxtGlobalShortcut*> shortcuts;
 };

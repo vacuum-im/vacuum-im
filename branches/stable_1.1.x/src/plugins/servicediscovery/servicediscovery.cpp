@@ -248,7 +248,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			Stanza reply = AStanza.replyError(ditems.error.condition,EHN_DEFAULT,ditems.error.code,ditems.error.message);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
 		}
-		else if (!ditems.items.isEmpty())
+		else
 		{
 			AAccept = true;
 			Stanza reply("iq");
@@ -284,6 +284,17 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 
 			EntityCapabilities oldCaps = FEntityCaps.value(AStreamJid).value(contactJid);
 			bool capsChanged = !capsElem.isNull() && (oldCaps.ver!=newCaps.ver || oldCaps.node!=newCaps.node);
+
+			// Some gates can send back presence from your or another connection with EntityCaps!!!
+			// So we should ignore entity caps from all agents
+			if (!capsElem.isNull() && contactJid.node().isEmpty())
+			{
+				newCaps.node.clear();
+				newCaps.ver.clear();
+				newCaps.hash.clear();
+				capsChanged = true;
+			}
+
 			if (capsElem.isNull() || capsChanged)
 			{
 				if (hasEntityCaps(newCaps))
@@ -490,9 +501,9 @@ QIcon ServiceDiscovery::identityIcon(const QList<IDiscoIdentity> &AIdentity) con
 	IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
 	for (int i=0; icon.isNull() && i<AIdentity.count(); i++)
 	{
-		icon = storage->getIcon(AIdentity.at(i).category.toLower() +"/"+ AIdentity.at(i).type.toLower());
+		icon = storage->getIcon(AIdentity.at(i).category +"/"+ AIdentity.at(i).type);
 		if (icon.isNull())
-			icon = storage->getIcon(AIdentity.at(i).category.toLower());
+			icon = storage->getIcon(AIdentity.at(i).category);
 	}
 	if (icon.isNull())
 		icon = storage->getIcon(SRI_SERVICE);
@@ -746,8 +757,8 @@ void ServiceDiscovery::discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &A
 	while (!elem.isNull())
 	{
 		IDiscoIdentity identity;
-		identity.category = elem.attribute("category");
-		identity.type = elem.attribute("type");
+		identity.category = elem.attribute("category").toLower();
+		identity.type = elem.attribute("type").toLower();
 		identity.lang = elem.attribute("lang");
 		identity.name = elem.attribute("name");
 		AInfo.identity.append(identity);
@@ -758,7 +769,7 @@ void ServiceDiscovery::discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &A
 	elem = AElem.firstChildElement("feature");
 	while (!elem.isNull())
 	{
-		QString feature = elem.attribute("var");
+		QString feature = elem.attribute("var").toLower();
 		if (!feature.isEmpty() && !AInfo.features.contains(feature))
 			AInfo.features.append(feature);
 		elem = elem.nextSiblingElement("feature");

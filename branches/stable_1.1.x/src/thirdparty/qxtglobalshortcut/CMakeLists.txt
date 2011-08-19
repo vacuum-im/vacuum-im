@@ -8,6 +8,8 @@ include(${QT_USE_FILE})
 
 if (APPLE)
 	set(SOURCES ${SOURCES} "qxtglobalshortcut_mac.cpp")
+elseif (HAIKU)
+	set(SOURCES ${SOURCES} "qxtglobalshortcut_haiku.cpp")
 elseif (UNIX)
 	set(SOURCES ${SOURCES} "qxtglobalshortcut_x11.cpp")
 	include(FindX11)
