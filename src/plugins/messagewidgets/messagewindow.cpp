@@ -16,7 +16,6 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 	FContactJid = AContactJid;
 	FCurrentThreadId = QUuid::createUuid().toString();
 
-	FTabPageNotifier = NULL;
 	ui.wdtTabs->setDocumentMode(true);
 
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid,ui.wdtTabs);
@@ -59,7 +58,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 
 MessageWindow::~MessageWindow()
 {
-	emit tabPageDestroyed();
+	emit windowDestroyed();
 	delete FInfoWidget->instance();
 	delete FViewWidget->instance();
 	delete FEditWidget->instance();
@@ -73,15 +72,7 @@ QString MessageWindow::tabPageId() const
 	return "MessageWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
-bool MessageWindow::isVisibleTabPage() const
-{
-	const QWidget *widget = this;
-	while (widget->parentWidget())
-		widget = widget->parentWidget();
-	return widget->isVisible();
-}
-
-bool MessageWindow::isActiveTabPage() const
+bool MessageWindow::isActive() const
 {
 	const QWidget *widget = this;
 	while (widget->parentWidget())
@@ -89,67 +80,20 @@ bool MessageWindow::isActiveTabPage() const
 	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
-void MessageWindow::assignTabPage()
-{
-	if (isWindow() && !isVisible())
-		FMessageWidgets->assignTabWindowPage(this);
-	else
-		emit tabPageAssign();
-}
-
-void MessageWindow::showTabPage()
+void MessageWindow::showWindow()
 {
 	if (isWindow())
 		WidgetManager::showActivateRaiseWindow(this);
 	else
-		emit tabPageShow();
+		emit windowShow();
 }
 
-void MessageWindow::showMinimizedTabPage()
-{
-	if (isWindow() && !isVisible())
-		showMinimized();
-	else
-		emit tabPageShowMinimized();
-}
-
-void MessageWindow::closeTabPage()
+void MessageWindow::closeWindow()
 {
 	if (isWindow())
 		close();
 	else
-		emit tabPageClose();
-}
-
-QIcon MessageWindow::tabPageIcon() const
-{
-	return windowIcon();
-}
-
-QString MessageWindow::tabPageCaption() const
-{
-	return windowIconText();
-}
-
-QString MessageWindow::tabPageToolTip() const
-{
-	return FTabPageToolTip;
-}
-
-ITabPageNotifier *MessageWindow::tabPageNotifier() const
-{
-	return FTabPageNotifier;
-}
-
-void MessageWindow::setTabPageNotifier( ITabPageNotifier *ANotifier )
-{
-	if (FTabPageNotifier != ANotifier)
-	{
-		if (FTabPageNotifier)
-			delete FTabPageNotifier->instance();
-		FTabPageNotifier = ANotifier;
-		emit tabPageNotifierChanged();
-	}
+		emit windowClose();
 }
 
 void MessageWindow::setContactJid(const Jid &AContactJid)
@@ -272,24 +216,23 @@ void MessageWindow::loadWindowGeometry()
 	}
 }
 
-void MessageWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)
+void MessageWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle)
 {
 	setWindowIcon(AIcon);
-	setWindowIconText(ACaption);
+	setWindowIconText(AIconText);
 	setWindowTitle(ATitle);
-	FTabPageToolTip = AToolTip;
-	emit tabPageChanged();
+	emit windowChanged();
 }
 
 bool MessageWindow::event(QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::WindowActivate)
 	{
-		emit tabPageActivated();
+		emit windowActivated();
 	}
 	else if (AEvent->type() == QEvent::WindowDeactivate)
 	{
-		emit tabPageDeactivated();
+		emit windowDeactivated();
 	}
 	return QMainWindow::event(AEvent);
 }
@@ -308,12 +251,10 @@ void MessageWindow::showEvent(QShowEvent *AEvent)
 		FShownDetached = false;
 		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
-
 	QMainWindow::showEvent(AEvent);
 	if (FMode == WriteMode)
 		FEditWidget->textEdit()->setFocus();
-	if (isActiveTabPage())
-		emit tabPageActivated();
+	emit windowActivated();
 }
 
 void MessageWindow::closeEvent(QCloseEvent *AEvent)
@@ -321,7 +262,8 @@ void MessageWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
-	emit tabPageClosed();
+	emit windowDeactivated();
+	emit windowClosed();
 }
 
 void MessageWindow::onStreamJidChanged(const Jid &ABefore)
@@ -390,6 +332,6 @@ void MessageWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 	{
-		closeTabPage();
+		closeWindow();
 	}
 }

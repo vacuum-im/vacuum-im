@@ -5,11 +5,9 @@
 #include <definitions/actiongroups.h>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosternotifyorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
@@ -29,7 +27,6 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/shortcuts.h>
-#include <utils/widgetmanager.h>
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
 
@@ -107,8 +104,6 @@ protected:
 	void moveGroupToGroup(const Jid &AStreamJid, const QString &AGroup, const QString &AGroupTo) const;
 	void removeGroup(const Jid &AStreamJid, const QString &AGroup) const;
 	void removeGroupContacts(const Jid &AStreamJid, const QString &AGroup) const;
-protected:
-	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onReceiveSubscription(IRoster *ARoster, const Jid &AContactJid, int ASubsType, const QString &AMessage);
 	//Operations on subscription

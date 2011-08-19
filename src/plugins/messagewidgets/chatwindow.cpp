@@ -6,7 +6,6 @@
 ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
 	ui.setupUi(this);
-	setAttribute(Qt::WA_DeleteOnClose, false);
 
 	FStatusChanger = NULL;
 	FMessageWidgets = AMessageWidgets;
@@ -14,8 +13,6 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FStreamJid = AStreamJid;
 	FContactJid = AContactJid;
 	FShownDetached = false;
-
-	FTabPageNotifier = NULL;
 
 	ui.wdtInfo->setLayout(new QVBoxLayout);
 	ui.wdtInfo->layout()->setMargin(0);
@@ -26,8 +23,6 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.wdtView->setLayout(new QVBoxLayout);
 	ui.wdtView->layout()->setMargin(0);
 	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid,ui.wdtView);
-	connect(FViewWidget->instance(),SIGNAL(viewContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)),
-		SLOT(onViewWidgetContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)));
 	ui.wdtView->layout()->addWidget(FViewWidget->instance());
 
 	ui.wdtEdit->setLayout(new QVBoxLayout);
@@ -54,7 +49,7 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
 ChatWindow::~ChatWindow()
 {
-	emit tabPageDestroyed();
+	emit windowDestroyed();
 	delete FInfoWidget->instance();
 	delete FViewWidget->instance();
 	delete FEditWidget->instance();
@@ -68,15 +63,7 @@ QString ChatWindow::tabPageId() const
 	return "ChatWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
 }
 
-bool ChatWindow::isVisibleTabPage() const
-{
-	const QWidget *widget = this;
-	while (widget->parentWidget())
-		widget = widget->parentWidget();
-	return widget->isVisible();
-}
-
-bool ChatWindow::isActiveTabPage() const
+bool ChatWindow::isActive() const
 {
 	const QWidget *widget = this;
 	while (widget->parentWidget())
@@ -84,69 +71,23 @@ bool ChatWindow::isActiveTabPage() const
 	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
-void ChatWindow::assignTabPage()
+void ChatWindow::showWindow()
 {
 	if (isWindow() && !isVisible())
 		FMessageWidgets->assignTabWindowPage(this);
-	else
-		emit tabPageAssign();
-}
 
-void ChatWindow::showTabPage()
-{
-	assignTabPage();
 	if (isWindow())
 		WidgetManager::showActivateRaiseWindow(this);
 	else
-		emit tabPageShow();
+		emit windowShow();
 }
 
-void ChatWindow::showMinimizedTabPage()
-{
-	assignTabPage();
-	if (isWindow() && !isVisible())
-		showMinimized();
-	else
-		emit tabPageShowMinimized();
-}
-
-void ChatWindow::closeTabPage()
+void ChatWindow::closeWindow()
 {
 	if (isWindow())
 		close();
 	else
-		emit tabPageClose();
-}
-
-QIcon ChatWindow::tabPageIcon() const
-{
-	return windowIcon();
-}
-
-QString ChatWindow::tabPageCaption() const
-{
-	return windowIconText();
-}
-
-QString ChatWindow::tabPageToolTip() const
-{
-	return FTabPageToolTip;
-}
-
-ITabPageNotifier *ChatWindow::tabPageNotifier() const
-{
-	return FTabPageNotifier;
-}
-
-void ChatWindow::setTabPageNotifier(ITabPageNotifier *ANotifier)
-{
-	if (FTabPageNotifier != ANotifier)
-	{
-		if (FTabPageNotifier)
-			delete FTabPageNotifier->instance();
-		FTabPageNotifier = ANotifier;
-		emit tabPageNotifierChanged();
-	}
+		emit windowClose();
 }
 
 void ChatWindow::setContactJid(const Jid &AContactJid)
@@ -162,13 +103,12 @@ void ChatWindow::setContactJid(const Jid &AContactJid)
 	}
 }
 
-void ChatWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)
+void ChatWindow::updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle)
 {
 	setWindowIcon(AIcon);
-	setWindowIconText(ACaption);
+	setWindowIconText(AIconText);
 	setWindowTitle(ATitle);
-	FTabPageToolTip = AToolTip;
-	emit tabPageChanged();
+	emit windowChanged();
 }
 
 void ChatWindow::initialize()
@@ -234,11 +174,11 @@ bool ChatWindow::event(QEvent *AEvent)
 	}
 	else if (AEvent->type() == QEvent::WindowActivate)
 	{
-		emit tabPageActivated();
+		emit windowActivated();
 	}
 	else if (AEvent->type() == QEvent::WindowDeactivate)
 	{
-		emit tabPageDeactivated();
+		emit windowDeactivated();
 	}
 	return QMainWindow::event(AEvent);
 }
@@ -257,11 +197,9 @@ void ChatWindow::showEvent(QShowEvent *AEvent)
 		FShownDetached = false;
 		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
-
 	QMainWindow::showEvent(AEvent);
 	FEditWidget->textEdit()->setFocus();
-	if (isActiveTabPage())
-		emit tabPageActivated();
+	emit windowActivated();
 }
 
 void ChatWindow::closeEvent(QCloseEvent *AEvent)
@@ -269,7 +207,8 @@ void ChatWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
-	emit tabPageClosed();
+	emit windowDeactivated();
+	emit windowClosed();
 }
 
 void ChatWindow::onMessageReady()
@@ -313,27 +252,6 @@ void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 	{
-		closeTabPage();
-	}
-}
-
-void ChatWindow::onViewContextQuoteActionTriggered(bool)
-{
-	QTextDocumentFragment fragment = viewWidget()->messageStyle()->selection(viewWidget()->styleWidget());
-	TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
-	editWidget()->textEdit()->setFocus();
-}
-
-void ChatWindow::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
-{
-	Q_UNUSED(APosition);
-	if (!ASelection.toPlainText().trimmed().isEmpty())
-	{
-		Action *quoteAction = new Action(AMenu);
-		quoteAction->setText(tr("Quote selected text"));
-		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
-		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
-		connect(quoteAction,SIGNAL(triggered(bool)),SLOT(onViewContextQuoteActionTriggered(bool)));
-		AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
+		closeWindow();
 	}
 }

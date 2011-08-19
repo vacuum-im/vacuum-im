@@ -35,6 +35,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FLabel->setWordWrap(true);
 		FLabel->setTextFormat(Qt::PlainText);
 		layout()->addWidget(FLabel);
+		FField.value = FField.label.isEmpty() ? FField.value : FField.label;
 	}
 	else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
 	{
@@ -166,7 +167,7 @@ QVariant DataFieldWidget::value() const
 	}
 	else if (FField.type == DATAFIELD_TYPE_FIXED)
 	{
-		return FField.value;
+		return FLabel->text();
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDSINGLE)
 	{
@@ -231,11 +232,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	}
 	else if (FField.type == DATAFIELD_TYPE_FIXED)
 	{
-		QString text = FField.label;
-		QString prefix = !text.isEmpty() ? QString("\n   ") :  QString("\n");
-		foreach(QString line, AValue.toStringList())
-			text += !text.isEmpty() ? prefix + line : line;
-		FLabel->setText(text);
+		FLabel->setText(AValue.toString());
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDSINGLE)
 	{

@@ -182,13 +182,8 @@ bool StatusChanger::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_CONNECTING;
-		label.flags = IRostersLabel::Blink;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
-		FConnectingLabel = FRostersViewPlugin->rostersView()->registerLabel(label);
-
 		FRostersView = FRostersViewPlugin->rostersView();
+		FConnectingLabel = FRostersView->createIndexLabel(RLO_CONNECTING,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING),IRostersView::LabelBlink);
 		connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)), SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 	}
 
@@ -199,12 +194,9 @@ bool StatusChanger::initObjects()
 
 	if (FNotifications)
 	{
-		INotificationType notifyType;
-		notifyType.order = NTO_CONNECTION_ERROR;
-		notifyType.title = tr("On loss of connection to the server");
-		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
-		notifyType.kindDefs = notifyType.kindMask;
-		FNotifications->registerNotificationType(NNT_CONNECTION_ERROR,notifyType);
+		uchar kindMask = INotification::PopupWindow|INotification::PlaySound;
+		uchar kindDefs = INotification::PopupWindow|INotification::PlaySound;
+		FNotifications->registerNotificationType(NNT_CONNECTION_ERROR,OWO_NOTIFICATIONS_CONNECTION_ERROR,tr("Connection errors"),kindMask,kindDefs);
 	}
 
 	return true;
@@ -274,7 +266,7 @@ int StatusChanger::mainStatus() const
 
 void StatusChanger::setMainStatus(int AStatusId)
 {
-	setStreamStatus(Jid::null, AStatusId);
+	setStreamStatus(Jid(), AStatusId);
 }
 
 QList<Jid> StatusChanger::statusStreams(int AStatusId) const
@@ -666,7 +658,7 @@ void StatusChanger::createStatusActions(int AStatusId)
 {
 	int group = AStatusId > STATUS_MAX_STANDART_ID ? AG_SCSM_STATUSCHANGER_CUSTOM_STATUS : AG_SCSM_STATUSCHANGER_DEFAULT_STATUS;
 
-	FMainMenu->addAction(createStatusAction(AStatusId,Jid::null,FMainMenu),group,true);
+	FMainMenu->addAction(createStatusAction(AStatusId,Jid(),FMainMenu),group,true);
 	for (QMap<IPresence *, Menu *>::const_iterator it = FStreamMenu.constBegin(); it!=FStreamMenu.constEnd(); it++)
 		it.value()->addAction(createStatusAction(AStatusId,it.key()->streamJid(),it.value()),group,true);
 }
@@ -696,9 +688,11 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 
 		Menu *sMenu = new Menu(FMainMenu);
 		if (account)
+		{
 			sMenu->setTitle(account->name());
+		}
 		else
-			sMenu->setTitle(APresence->streamJid().full());
+			sMenu->setTitle(APresence->streamJid().hFull());
 		FStreamMenu.insert(APresence,sMenu);
 
 		QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin();
@@ -731,6 +725,20 @@ void StatusChanger::updateStreamMenu(IPresence *APresence)
 	Action *mAction = FMainStatusActions.value(APresence);
 	if (mAction)
 		mAction->setVisible(FCurrentStatus.value(APresence) != STATUS_MAIN_ID);
+}
+
+void StatusChanger::removeStreamMenu(IPresence *APresence)
+{
+	if (FStreamMenu.contains(APresence))
+	{
+		FMainStatusActions.remove(APresence);
+		FCurrentStatus.remove(APresence);
+		FConnectStatus.remove(APresence);
+		FLastOnlineStatus.remove(APresence);
+		FPendingReconnect.remove(APresence);
+		removeTempStatus(APresence);
+		delete FStreamMenu.take(APresence);
+	}
 }
 
 int StatusChanger::visibleMainStatusId() const
@@ -812,7 +820,7 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 	{
 		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
 		if (index)
-			FRostersView->insertLabel(FConnectingLabel,index);
+			FRostersView->insertIndexLabel(FConnectingLabel,index);
 	}
 }
 
@@ -822,7 +830,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 	{
 		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
 		if (index)
-			FRostersView->removeLabel(FConnectingLabel,index);
+			FRostersView->removeIndexLabel(FConnectingLabel,index);
 	}
 }
 
@@ -892,7 +900,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 		notify.kinds = FNotifications->notificationKinds(NNT_CONNECTION_ERROR);
 		if (notify.kinds > 0)
 		{
-			notify.typeId = NNT_CONNECTION_ERROR;
+			notify.type = NNT_CONNECTION_ERROR;
 			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon());
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
 			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
@@ -907,7 +915,9 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 void StatusChanger::removeStatusNotification(IPresence *APresence)
 {
 	if (FNotifications && FNotifyId.contains(APresence))
+	{
 		FNotifications->removeNotification(FNotifyId.take(APresence));
+	}
 }
 
 void StatusChanger::onSetStatusByAction(bool)
@@ -994,15 +1004,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 	}
 
 	removeStatusNotification(APresence);
-	removeTempStatus(APresence);
-
-	FMainStatusStreams -= APresence;
-	FMainStatusActions.remove(APresence);
-	FCurrentStatus.remove(APresence);
-	FConnectStatus.remove(APresence);
-	FLastOnlineStatus.remove(APresence);
-	FPendingReconnect.remove(APresence);
-	delete FStreamMenu.take(APresence);
+	removeStreamMenu(APresence);
 
 	if (FStreamMenu.count() == 1)
 		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);

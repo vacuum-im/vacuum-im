@@ -233,33 +233,21 @@ bool MultiUserChatPlugin::initObjects()
 
 	if (FNotifications)
 	{
-		INotificationType inviteType;
-		inviteType.order = NTO_MUC_INVITE_MESSAGE;
-		inviteType.title = tr("When receiving an invitation to the conference");
-		inviteType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
-		inviteType.kindDefs = inviteType.kindMask & ~(INotification::AutoActivate);
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_INVITE,inviteType);
+		uchar kindMask = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+		uchar kindDefs = INotification::RosterIcon|INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_INVITE,OWO_NOTIFICATIONS_MUC_MESSAGE_INVITE,tr("Invite chat messages"),kindMask,kindDefs);
 
-		INotificationType privateType;
-		privateType.order = NTO_MUC_PRIVATE_MESSAGE;
-		privateType.title = tr("When receiving a new private message in conference");
-		privateType.kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-		privateType.kindDefs = privateType.kindMask & ~(INotification::AutoActivate);
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_PRIVATE,privateType);
+		kindMask = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+		kindDefs = INotification::TrayIcon|INotification::TrayAction|INotification::PopupWindow|INotification::PlaySound;
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_PRIVATE,OWO_NOTIFICATIONS_MUC_MESSAGE_PRIVATE,tr("Private conference messages"),kindMask,kindDefs);
 
-		INotificationType groupchatType;
-		groupchatType.order = NTO_MUC_GROUPCHAT_MESSAGE;
-		groupchatType.title = tr("When receiving a new message in conference");
-		groupchatType.kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
-		groupchatType.kindDefs = groupchatType.kindMask & ~(INotification::PopupWindow|INotification::ShowMinimized|INotification::AutoActivate);
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_GROUPCHAT,groupchatType);
+		kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
+		kindDefs = INotification::TrayIcon|INotification::PlaySound;
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_GROUPCHAT,OWO_NOTIFICATIONS_MUC_MESSAGE_GROUPCHAT,tr("Conference messages"),kindMask,kindDefs);
 
-		INotificationType mentionType;
-		mentionType.order = NTO_MUC_MENTION_MESSAGE;
-		mentionType.title = tr("When referring to you at the conference");
-		mentionType.kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-		mentionType.kindDefs = mentionType.kindMask & ~(INotification::AutoActivate);
-		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_MENTION,mentionType);
+		kindMask = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound|INotification::AutoActivate;
+		kindDefs = INotification::TrayIcon|INotification::PopupWindow|INotification::PlaySound;
+		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_MENTION,OWO_NOTIFICATIONS_MUC_MESSAGE_MENTION,tr("Mention in conference"),kindMask,kindDefs);
 	}
 
 	if (FXmppUriQueries)
@@ -325,7 +313,7 @@ bool MultiUserChatPlugin::execDiscoFeature(const Jid &AStreamJid, const QString 
 		if (!chatWindow)
 			showJoinMultiChatDialog(AStreamJid,ADiscoInfo.contactJid,QString::null,QString::null);
 		else
-			chatWindow->showTabPage();
+			chatWindow->showWindow();
 		return true;
 	}
 	return false;
@@ -444,7 +432,7 @@ bool MultiUserChatPlugin::showMessage(int AMessageId)
 		fields.password = inviteElem.firstChildElement("password").text();
 
 		QString reason = inviteElem.firstChildElement("reason").text();
-		QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(Qt::escape(roomJid.bare())).arg(Qt::escape(fromJid.full())).arg(Qt::escape(reason));
+		QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(roomJid.hBare()).arg(fromJid.hFull()).arg(Qt::escape(reason));
 		msg+="<br><br>";
 		msg+=tr("Do you want to join this conference?");
 
@@ -461,7 +449,7 @@ bool MultiUserChatPlugin::showMessage(int AMessageId)
 	return true;
 }
 
-INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications, const Message &AMessage)
+INotification MultiUserChatPlugin::notification(INotifications *ANotifications, const Message &AMessage)
 {
 	INotification notify;
 	QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
@@ -472,14 +460,12 @@ INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications,
 		if (notify.kinds > 0)
 		{
 			Jid fromJid = inviteElem.attribute("from");
-			notify.typeId = NNT_MUC_MESSAGE_INVITE;
+			notify.type = NNT_MUC_MESSAGE_INVITE;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
 			notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
 			notify.data.insert(NDR_STREAM_JID,AMessage.to());
 			notify.data.insert(NDR_CONTACT_JID,fromJid.full());
-			notify.data.insert(NDR_ROSTER_ORDER,RNO_MUC_INVITE);
-			notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
-			notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
+			notify.data.insert(NDR_ROSTER_NOTIFY_ORDER,RLO_MESSAGE);
 			notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
 			notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
 			notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));
@@ -490,13 +476,12 @@ INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications,
 	return notify;
 }
 
-bool MultiUserChatPlugin::createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
+bool MultiUserChatPlugin::openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AStreamJid);
 	Q_UNUSED(AContactJid);
 	Q_UNUSED(AType);
-	Q_UNUSED(AShowMode);
 	return false;
 }
 
@@ -546,10 +531,9 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 	{
 		IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword);
 		chatWindow = new MultiUserChatWindow(this,chat);
-		chatWindow->setTabPageNotifier(FMessageWidgets!=NULL ? FMessageWidgets->newTabPageNotifier(chatWindow) : NULL);
 		WidgetManager::setWindowSticky(chatWindow->instance(),true);
 		connect(chatWindow->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
-		connect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
+		connect(chatWindow->instance(),SIGNAL(windowDestroyed()),SLOT(onMultiChatWindowDestroyed()));
 		insertChatAction(chatWindow);
 		FChatWindows.append(chatWindow);
 		emit multiChatWindowCreated(chatWindow);
@@ -795,14 +779,14 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 void MultiUserChatPlugin::onShowAllRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-		if (!window->isVisibleTabPage())
-			window->showTabPage();
+		if (!window->instance()->isVisible())
+			window->showWindow();
 }
 
 void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
-		if (!window->isVisibleTabPage())
+		if (!window->instance()->isVisible())
 			window->exitAndDestroy(QString::null);
 }
 
@@ -813,7 +797,7 @@ void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *A
 	{
 		if (AIndex->type() == RIT_STREAM_ROOT)
 		{
-			Action *action = createJoinAction(AIndex->data(RDR_FULL_JID).toString(),Jid::null,AMenu);
+			Action *action = createJoinAction(AIndex->data(RDR_JID).toString(),Jid(),AMenu);
 			AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT,true);
 		}
 	}
@@ -824,7 +808,7 @@ void MultiUserChatPlugin::onChatActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	IMultiUserChatWindow *window = FChatActions.key(action,NULL);
 	if (window)
-		window->showTabPage();
+		window->showWindow();
 }
 
 void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)

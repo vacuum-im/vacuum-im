@@ -153,6 +153,18 @@ Check values and try again</source>
         <translation>Konferenz beitreten</translation>
     </message>
     <message>
+        <source>Invite chat messages</source>
+        <translation>Chat Einladungsnachricht</translation>
+    </message>
+    <message>
+        <source>Private conference messages</source>
+        <translation>Private Konferenz Nachrichten</translation>
+    </message>
+    <message>
+        <source>Conference messages</source>
+        <translation>Konferenz Nachrichten</translation>
+    </message>
+    <message>
         <source>You are invited to the conference %1</source>
         <translation>Sie wurden zur Konferenz %1 eingeladen</translation>
     </message>
@@ -489,6 +501,10 @@ Check values and try again</source>
         <translation>Unterstützt die Multibenutzer Konferenzen</translation>
     </message>
     <message>
+        <source>Mention in conference</source>
+        <translation>Erwähnung in Konferenz</translation>
+    </message>
+    <message>
         <source>Leave all hidden conferences</source>
         <translation></translation>
     </message>
@@ -553,22 +569,6 @@ Check values and try again</source>
     <message>
         <source>I&apos;m too busy right now</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>When receiving an invitation to the conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When receiving a new private message in conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When referring to you at the conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>When receiving a new message in conference</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -960,10 +960,6 @@ Check values and try again</source>
     <message>
         <source>%1 has left the room</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Quote selected text</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

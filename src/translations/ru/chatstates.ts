@@ -27,14 +27,6 @@
         <source>Send chat state notifications</source>
         <translation>Отправлять уведомления об активности в чате</translation>
     </message>
-    <message>
-        <source>When contact is typing the message for you</source>
-        <translation>Когда контакт набирает сообщение для Вас</translation>
-    </message>
-    <message>
-        <source>Typing a message...</source>
-        <translation>Набирает сообщение...</translation>
-    </message>
 </context>
 <context>
     <name>StateWidget</name>

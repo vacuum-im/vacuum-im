@@ -39,6 +39,63 @@
         <source>Remove all notifications</source>
         <translation>Видалити всі сповіщення</translation>
     </message>
+</context>
+<context>
+    <name>NotifyKindsWidgetClass</name>
+    <message>
+        <source>Roster</source>
+        <translation>Ростер</translation>
+    </message>
+    <message>
+        <source>Popup</source>
+        <translation>Вигульк</translation>
+    </message>
+    <message>
+        <source>Tray</source>
+        <translation>Трей</translation>
+    </message>
+    <message>
+        <source>Sound</source>
+        <translation>Звук</translation>
+    </message>
+    <message>
+        <source>Activate</source>
+        <translation>Відкрити</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyWidget</name>
+    <message>
+        <source>Notification</source>
+        <translation>Сповіщення</translation>
+    </message>
+</context>
+<context>
+    <name>OptionsWidgetClass</name>
+    <message>
+        <source>Common notification options</source>
+        <translation>Загальні налаштування сповіщень</translation>
+    </message>
+    <message>
+        <source>Roster</source>
+        <translation>Ростер</translation>
+    </message>
+    <message>
+        <source>Popup</source>
+        <translation>Вигульк</translation>
+    </message>
+    <message>
+        <source>Tray</source>
+        <translation>Трей</translation>
+    </message>
+    <message>
+        <source>Sound</source>
+        <translation>Звук</translation>
+    </message>
+    <message>
+        <source>Activate</source>
+        <translation>Відкрити</translation>
+    </message>
     <message>
         <source>Expand contact groups in roster</source>
         <translation>Розкривати групи контакту в ростері</translation>
@@ -47,66 +104,17 @@
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
         <translation>Відключати звуки, коли встановлений статус &apos;Не турбувати&apos;</translation>
     </message>
-</context>
-<context>
-    <name>NotifyOptionsWidget</name>
-    <message>
-        <source>Display a notification in your roster</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display a notification in popup window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display a notification in tray</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display a notification in tray context menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Play sound at the notification</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Highlight the corresponding window in the taskbar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Display a notification in tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show the corresponding window minimized in the taskbar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Immediately activate the notification</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>NotifyOptionsWidgetClass</name>
     <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation type="unfinished">Час показу вигульку (0 - завжди показувати):</translation>
+        <translation>Час показу вигульку (0 - завжди показувати):</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="unfinished"> секунд</translation>
+        <translation> секунд</translation>
     </message>
     <message>
-        <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>NotifyWidget</name>
-    <message>
-        <source>Notification</source>
-        <translation>Сповіщення</translation>
+        <source>Enable alerts in task bar</source>
+        <translation>Ввімкнути сповіщення на панелі задач</translation>
     </message>
 </context>
 </TS>

@@ -8,11 +8,8 @@
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterclickhookerorders.h>
-#include <definitions/rosternotifyorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/actiongroups.h>
@@ -20,7 +17,6 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/shortcuts.h>
-#include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/toolbargroups.h>
@@ -31,7 +27,6 @@
 #include <interfaces/imessagestyles.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/inotifications.h>
-#include <interfaces/ioptionsmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
@@ -43,7 +38,6 @@
 #include <utils/widgetmanager.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
-#include <utils/textmanager.h>
 #include "usercontextmenu.h"
 
 struct WindowStatus
@@ -54,15 +48,14 @@ struct WindowStatus
 };
 
 class ChatMessageHandler :
-	public QObject,
-	public IPlugin,
-	public IMessageHandler,
-	public IXmppUriHandler,
-	public IRostersClickHooker,
-	public IOptionsHolder
+			public QObject,
+			public IPlugin,
+			public IMessageHandler,
+			public IXmppUriHandler,
+			public IRostersClickHooker
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker IXmppUriHandler IOptionsHolder);
+	Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker IXmppUriHandler);
 public:
 	ChatMessageHandler();
 	~ChatMessageHandler();
@@ -72,7 +65,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings();
+	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
@@ -82,10 +75,8 @@ public:
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool showMessage(int AMessageId);
 	virtual bool receiveMessage(int AMessageId);
-	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
-	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
-	// IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
+	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 protected:
 	IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
@@ -120,7 +111,6 @@ private:
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
 	IXmppUriQueries *FXmppUriQueries;
-	IOptionsManager *FOptionsManager;
 private:
 	QList<IChatWindow *> FWindows;
 	QMultiMap<IChatWindow *,int> FActiveMessages;

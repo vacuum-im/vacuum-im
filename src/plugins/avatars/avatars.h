@@ -78,7 +78,7 @@ signals:
 protected:
 	QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
 	void updatePresence(const Jid &AStreamJid) const;
-	void updateDataHolder(const Jid &AContactJid = Jid::null);
+	void updateDataHolder(const Jid &AContactJid = Jid());
 	bool updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bool AFromVCard);
 	bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
 protected slots:
@@ -118,7 +118,7 @@ private:
 	bool FShowEmptyAvatars;
 	QMap<Jid, QString> FCustomPictures;
 private:
-	int FAvatarLabelId;
+	int FRosterLabelId;
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
 	QMap<Jid, QString> FStreamAvatars;

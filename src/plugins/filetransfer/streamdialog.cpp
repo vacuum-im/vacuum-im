@@ -36,7 +36,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 		ui.lblContactLabel->setText(tr("From:"));
 	}
 
-	ui.lblContact->setText(Qt::escape(FFileStream->contactJid().full()));
+	ui.lblContact->setText(FFileStream->contactJid().hFull());
 
 	if (AFileStream->streamState() == IFileStream::Creating)
 	{

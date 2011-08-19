@@ -19,9 +19,6 @@
 #define MNI_AVATAR_CUSTOM               "avatarCustom"
 #define MNI_AVATAR_EMPTY                "avatarEmpty"
 
-//BirthdayReminder
-#define MNI_BIRTHDAY_NOTIFY             "birthdayreminderNotify"
-
 //Bookmarks
 #define MNI_BOOKMARKS                   "bookmarks"
 #define MNI_BOOKMARKS_ADD               "bookmarksAdd"
@@ -192,6 +189,7 @@
 
 //RosterChanger
 #define MNI_RCHANGER_ADD_CONTACT        "rchangerAddContact"
+#define MNI_RCHANGER_MANAGEMENT         "rchangerManagment"
 #define MNI_RCHANGER_GROUP              "rchangerGroup"
 #define MNI_RCHANGER_ROOT_GROUP         "rchangerRootGroup"
 #define MNI_RCHANGER_THIS_GROUP         "rchangerThisGroup"

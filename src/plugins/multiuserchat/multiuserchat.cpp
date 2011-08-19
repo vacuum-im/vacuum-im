@@ -429,8 +429,9 @@ void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
 	{
 		Message message;
 		message.setTo(FRoomJid.eBare());
-		QDomElement elem = message.stanza().element();
-		FDataForms->xmlForm(AForm,elem);
+		Stanza &mstanza = message.stanza();
+		QDomElement queryElem = mstanza.addElement("query",NS_MUC_OWNER).toElement();
+		FDataForms->xmlForm(AForm,queryElem);
 		bool submited = false;
 		if (FMessageProcessor)
 			submited = FMessageProcessor->sendMessage(FStreamJid,message);

@@ -4,19 +4,7 @@
 #include <QInputDialog>
 #include <QSignalMapper>
 
-#define ADR_TAB_INDEX               Action::DR_Parametr1
-#define ADR_TAB_MENU_ACTION         Action::DR_Parametr2
-
-#define BLINK_INTERVAL              500
 #define ADR_TABWINDOWID             Action::DR_Parametr1
-
-enum TabMenuActions {
-	CloseTabAction,
-	CloseOtherTabsAction,
-	DetachTabAction,
-	JoinTabAction,
-	NewTabWindowAction
-};
 
 TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 {
@@ -30,8 +18,11 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
+	connect(FMessageWidgets->instance(),SIGNAL(tabWindowAppended(const QUuid &, const QString &)),
+		SLOT(onTabWindowAppended(const QUuid &, const QString &)));
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),
 		SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
+	connect(FMessageWidgets->instance(),SIGNAL(tabWindowDeleted(const QUuid &)),SLOT(onTabWindowDeleted(const QUuid &)));
 
 	QPushButton *menuButton = new QPushButton(ui.twtTabs);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(menuButton,MNI_MESSAGEWIDGETS_TAB_MENU);
@@ -41,20 +32,8 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	menuButton->setMenu(FWindowMenu);
 	ui.twtTabs->setCornerWidget(menuButton);
 
-	FBlinkVisible = true;
-	FBlinkTimer.setSingleShot(false);
-	FBlinkTimer.setInterval(BLINK_INTERVAL);
-	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTabNotifyTimerTimeout()));
-	FBlinkTimer.start();
-
 	createActions();
 	loadWindowStateAndGeometry();
-
-	Shortcuts::insertWidgetShortcut(SCT_TABWINDOW_CLOSETAB,this);
-	Shortcuts::insertWidgetShortcut(SCT_TABWINDOW_CLOSEOTHERTABS,this);
-	Shortcuts::insertWidgetShortcut(SCT_TABWINDOW_DETACHTAB,this);
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),
-		SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	FOptionsNode = Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId);
 	onOptionsChanged(FOptionsNode.node("tabs-closable"));
@@ -67,12 +46,11 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
 	connect(ui.twtTabs,SIGNAL(tabMoved(int,int)),SLOT(onTabMoved(int,int)));
 	connect(ui.twtTabs,SIGNAL(tabCloseRequested(int)),SLOT(onTabCloseRequested(int)));
-	connect(ui.twtTabs,SIGNAL(tabMenuRequested(int)),SLOT(onTabMenuRequested(int)));
 }
 
 TabWindow::~TabWindow()
 {
-	clearTabs();
+	clear();
 	saveWindowStateAndGeometry();
 	emit windowDestroyed();
 }
@@ -80,12 +58,6 @@ TabWindow::~TabWindow()
 void TabWindow::showWindow()
 {
 	WidgetManager::showActivateRaiseWindow(this);
-}
-
-void TabWindow::showMinimizedWindow()
-{
-	if (!isVisible())
-		showMinimized();
 }
 
 QUuid TabWindow::windowId() const
@@ -103,88 +75,73 @@ Menu *TabWindow::windowMenu() const
 	return FWindowMenu;
 }
 
-int TabWindow::tabPageCount() const
+void TabWindow::addPage(ITabWindowPage *APage)
 {
-	return ui.twtTabs->count();
-}
-
-ITabPage *TabWindow::tabPage(int AIndex) const
-{
-	QWidget *page = ui.twtTabs->widget(AIndex);
-	return qobject_cast<ITabPage *>(page);
-}
-
-void TabWindow::addTabPage(ITabPage *APage)
-{
-	if (!hasTabPage(APage))
+	if (ui.twtTabs->indexOf(APage->instance()) < 0)
 	{
-		int index = ui.twtTabs->addTab(APage->instance(),APage->tabPageIcon(),APage->tabPageCaption());
-		connect(APage->instance(),SIGNAL(tabPageShow()),SLOT(onTabPageShow()));
-		connect(APage->instance(),SIGNAL(tabPageShowMinimized()),SLOT(onTabPageShowMinimized()));
-		connect(APage->instance(),SIGNAL(tabPageClose()),SLOT(onTabPageClose()));
-		connect(APage->instance(),SIGNAL(tabPageChanged()),SLOT(onTabPageChanged()));
-		connect(APage->instance(),SIGNAL(tabPageDestroyed()),SLOT(onTabPageDestroyed()));
-
-		if (APage->tabPageNotifier())
-			connect(APage->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onTabPageNotifierActiveNotifyChanged(int)));
-		connect(APage->instance(),SIGNAL(tabPageNotifierChanged()),SLOT(onTabPageNotifierChanged()));
-		
-		updateWindow();
+		int index = ui.twtTabs->addTab(APage->instance(),APage->instance()->windowTitle());
+		connect(APage->instance(),SIGNAL(windowShow()),SLOT(onTabPageShow()));
+		connect(APage->instance(),SIGNAL(windowClose()),SLOT(onTabPageClose()));
+		connect(APage->instance(),SIGNAL(windowChanged()),SLOT(onTabPageChanged()));
+		connect(APage->instance(),SIGNAL(windowDestroyed()),SLOT(onTabPageDestroyed()));
 		updateTab(index);
-		emit tabPageAdded(APage);
+		updateWindow();
+		emit pageAdded(APage);
 	}
 }
 
-bool TabWindow::hasTabPage(ITabPage *APage) const
+bool TabWindow::hasPage(ITabWindowPage *APage) const
 {
-	return APage!=NULL && ui.twtTabs->indexOf(APage->instance()) >= 0;
+	return ui.twtTabs->indexOf(APage->instance()) >= 0;
 }
 
-ITabPage *TabWindow::currentTabPage() const
+ITabWindowPage *TabWindow::currentPage() const
 {
-	return qobject_cast<ITabPage *>(ui.twtTabs->currentWidget());
+	return qobject_cast<ITabWindowPage *>(ui.twtTabs->currentWidget());
 }
 
-void TabWindow::setCurrentTabPage(ITabPage *APage)
+void TabWindow::setCurrentPage(ITabWindowPage *APage)
 {
-	if (APage)
-		ui.twtTabs->setCurrentWidget(APage->instance());
+	ui.twtTabs->setCurrentWidget(APage->instance());
 }
 
-void TabWindow::detachTabPage(ITabPage *APage)
+void TabWindow::detachPage(ITabWindowPage *APage)
 {
-	if (hasTabPage(APage))
-	{
-		removeTabPage(APage);
-		APage->instance()->show();
-		if (APage->instance()->x()<=0 || APage->instance()->y()<0)
-			APage->instance()->move(0,0);
-		emit tabPageDetached(APage);
-	}
+	removePage(APage);
+	APage->instance()->show();
+	if (APage->instance()->x()<=0 || APage->instance()->y()<0)
+		APage->instance()->move(0,0);
+	emit pageDetached(APage);
 }
 
-void TabWindow::removeTabPage(ITabPage *APage)
+void TabWindow::removePage(ITabWindowPage *APage)
 {
-	int index = APage!=NULL ? ui.twtTabs->indexOf(APage->instance()) : -1;
+	int index = ui.twtTabs->indexOf(APage->instance());
 	if (index >= 0)
 	{
 		ui.twtTabs->removeTab(index);
 		APage->instance()->close();
 		APage->instance()->setParent(NULL);
-		disconnect(APage->instance(),SIGNAL(tabPageShow()),this,SLOT(onTabPageShow()));
-		disconnect(APage->instance(),SIGNAL(tabPageClose()),this,SLOT(onTabPageClose()));
-		disconnect(APage->instance(),SIGNAL(tabPageChanged()),this,SLOT(onTabPageChanged()));
-		disconnect(APage->instance(),SIGNAL(tabPageDestroyed()),this,SLOT(onTabPageDestroyed()));
-
-		if (APage->tabPageNotifier())
-			disconnect(APage->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onTabPageNotifierActiveNotifyChanged(int)));
-		disconnect(APage->instance(),SIGNAL(tabPageNotifierChanged()),this,SLOT(onTabPageNotifierChanged()));
-
+		disconnect(APage->instance(),SIGNAL(windowShow()),this,SLOT(onTabPageShow()));
+		disconnect(APage->instance(),SIGNAL(windowClose()),this,SLOT(onTabPageClose()));
+		disconnect(APage->instance(),SIGNAL(windowChanged()),this,SLOT(onTabPageChanged()));
+		disconnect(APage->instance(),SIGNAL(windowDestroyed()),this,SLOT(onTabPageDestroyed()));
 		updateTabs(index,ui.twtTabs->count()-1);
-		emit tabPageRemoved(APage);
-
+		emit pageRemoved(APage);
 		if (ui.twtTabs->count() == 0)
 			deleteLater();
+	}
+}
+
+void TabWindow::clear()
+{
+	while (ui.twtTabs->count() > 0)
+	{
+		ITabWindowPage *page = qobject_cast<ITabWindowPage *>(ui.twtTabs->widget(0));
+		if (page)
+			removePage(page);
+		else
+			ui.twtTabs->removeTab(0);
 	}
 }
 
@@ -213,6 +170,31 @@ void TabWindow::createActions()
 	FPrevTab->setShortcutId(SCT_TABWINDOW_PREVTAB);
 	FWindowMenu->addAction(FPrevTab,AG_MWTW_MWIDGETS_TAB_ACTIONS);
 	connect(FPrevTab,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
+	FCloseTab = new Action(FWindowMenu);
+	FCloseTab->setText(tr("Close Tab"));
+	FCloseTab->setShortcutId(SCT_TABWINDOW_CLOSETAB);
+	FWindowMenu->addAction(FCloseTab,AG_MWTW_MWIDGETS_TAB_ACTIONS);
+	connect(FCloseTab,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
+	FDetachWindow = new Action(FWindowMenu);
+	FDetachWindow->setText(tr("Detach to Separate Window"));
+	FDetachWindow->setShortcutId(SCT_TABWINDOW_DETACHTAB);
+	FWindowMenu->addAction(FDetachWindow,AG_MWTW_MWIDGETS_TAB_ACTIONS);
+	connect(FDetachWindow,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+
+	FJoinMenu = new Menu(FWindowMenu);
+	FJoinMenu->setTitle(tr("Join to"));
+	FWindowMenu->addAction(FJoinMenu->menuAction(),AG_MWTW_MWIDGETS_TAB_ACTIONS);
+
+	foreach(QUuid windowId,FMessageWidgets->tabWindowList())
+		if (windowId!=FWindowId)
+			onTabWindowAppended(windowId, FMessageWidgets->tabWindowName(windowId));
+
+	FNewTab = new Action(FJoinMenu);
+	FNewTab->setText(tr("New Tab Window"));
+	FJoinMenu->addAction(FNewTab,AG_DEFAULT+1);
+	connect(FNewTab,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 
 	FShowCloseButtons = new Action(FWindowMenu);
 	FShowCloseButtons->setText(tr("Tabs Closable"));
@@ -296,62 +278,27 @@ void TabWindow::loadWindowStateAndGeometry()
 
 void TabWindow::updateWindow()
 {
-	ITabPage *page = currentTabPage();
-	if (page)
+	QWidget *widget = ui.twtTabs->currentWidget();
+	if (widget)
 	{
-		setWindowIcon(page->tabPageIcon());
-		setWindowTitle(page->tabPageCaption() + " - " + windowName());
+		setWindowIcon(widget->windowIcon());
+		setWindowTitle(widget->windowTitle()+" - "+windowName());
 		emit windowChanged();
-	}
-}
-void TabWindow::clearTabs()
-{
-	while (ui.twtTabs->count() > 0)
-	{
-		ITabPage *page = qobject_cast<ITabPage *>(ui.twtTabs->widget(0));
-		if (page)
-			removeTabPage(page);
-		else
-			ui.twtTabs->removeTab(0);
 	}
 }
 
 void TabWindow::updateTab(int AIndex)
 {
-	ITabPage *page = tabPage(AIndex);
-	if (page)
+	QWidget *widget = ui.twtTabs->widget(AIndex);
+	if (widget)
 	{
-		QIcon tabIcon = page->tabPageIcon();
-		QString tabCaption = page->tabPageCaption();
-		QString tabToolTip = page->tabPageToolTip();
-
-		if (page->tabPageNotifier() && page->tabPageNotifier()->activeNotify()>0)
-		{
-			static QIcon emptyIcon;
-			if (emptyIcon.isNull())
-			{
-				QPixmap pixmap(ui.twtTabs->iconSize());
-				pixmap.fill(QColor(0,0,0,0));
-				emptyIcon.addPixmap(pixmap);
-			}
-
-			ITabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
-			if (!notify.icon.isNull())
-				tabIcon = notify.icon;
-			if (notify.blink && !FBlinkVisible)
-				tabIcon = emptyIcon;
-			if (!notify.caption.isNull())
-				tabCaption = notify.caption;
-			if (!notify.toolTip.isNull())
-				tabToolTip = notify.toolTip;
-		}
-
+		QString tabText;
 		if (FShowIndices->isChecked() && AIndex<10)
-			tabCaption = tr("%1) %2").arg(QString::number((AIndex+1) % 10)).arg(tabCaption);
-
-		ui.twtTabs->setTabIcon(AIndex,tabIcon);
-		ui.twtTabs->setTabText(AIndex,tabCaption);
-		ui.twtTabs->setTabToolTip(AIndex,tabToolTip);
+			tabText = tr("%1) %2", "First is tab index, second is tab name").arg(QString::number((AIndex+1) % 10)).arg(widget->windowIconText());
+		else
+			tabText = widget->windowIconText();
+		ui.twtTabs->setTabText(AIndex,tabText);
+		ui.twtTabs->setTabIcon(AIndex,widget->windowIcon());
 	}
 }
 
@@ -371,147 +318,76 @@ void TabWindow::onTabChanged(int AIndex)
 {
 	Q_UNUSED(AIndex);
 	updateWindow();
-	emit currentTabPageChanged(currentTabPage());
+	emit currentPageChanged(currentPage());
 }
 
 void TabWindow::onTabCloseRequested(int AIndex)
 {
-	removeTabPage(tabPage(AIndex));
-}
-
-void TabWindow::onTabMenuRequested(int AIndex)
-{
-	Menu *menu = new Menu(this);
-	menu->setAttribute(Qt::WA_DeleteOnClose, true);
-
-	if (AIndex >= 0)
-	{
-		Action *tabClose = new Action(menu);
-		tabClose->setText(tr("Close Tab"));
-		tabClose->setData(ADR_TAB_INDEX, AIndex);
-		tabClose->setData(ADR_TAB_MENU_ACTION, CloseTabAction);
-		tabClose->setShortcutId(SCT_TABWINDOW_CLOSETAB);
-		connect(tabClose,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
-		menu->addAction(tabClose,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
-
-		Action *otherClose = new Action(menu);
-		otherClose->setText(tr("Close Other Tabs"));
-		otherClose->setData(ADR_TAB_INDEX, AIndex);
-		otherClose->setData(ADR_TAB_MENU_ACTION, CloseOtherTabsAction);
-		otherClose->setShortcutId(SCT_TABWINDOW_CLOSEOTHERTABS);
-		otherClose->setEnabled(ui.twtTabs->count()>1);
-		connect(otherClose,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
-		menu->addAction(otherClose,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
-
-		Action *detachTab = new Action(menu);
-		detachTab->setText(tr("Detach to Separate Window"));
-		detachTab->setData(ADR_TAB_MENU_ACTION, DetachTabAction);
-		detachTab->setShortcutId(SCT_TABWINDOW_DETACHTAB);
-		menu->addAction(detachTab,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
-		connect(detachTab,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
-
-		Menu *joinTab = new Menu(menu);
-		joinTab->setTitle(tr("Join to"));
-		menu->addAction(joinTab->menuAction(),AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
-
-		foreach(QUuid id,FMessageWidgets->tabWindowList())
-		{
-			if (id != FWindowId)
-			{
-				Action *action = new Action(joinTab);
-				action->setText(FMessageWidgets->tabWindowName(id));
-				action->setData(ADR_TABWINDOWID,id.toString());
-				action->setData(ADR_TAB_MENU_ACTION, JoinTabAction);
-				joinTab->addAction(action);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
-			}
-		}
-
-		Action *newWindow = new Action(joinTab);
-		newWindow->setText(tr("New Tab Window"));
-		newWindow->setData(ADR_TAB_MENU_ACTION, NewTabWindowAction);
-		joinTab->addAction(newWindow,AG_DEFAULT+1);
-		connect(newWindow,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
-	}
-	else
-	{
-		Action *windowClose = new Action(menu);
-		windowClose->setText(tr("Close Tab Window"));
-		windowClose->setShortcutId(SCT_TABWINDOW_CLOSEWINDOW);
-		connect(windowClose,SIGNAL(triggered()),SLOT(close()));
-		menu->addAction(windowClose,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
-	}
-
-	emit tabPageMenuRequested(tabPage(AIndex),menu);
-
-	if (!menu->isEmpty())
-		menu->popup(QCursor::pos());
-	else
-		delete menu;
+	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(ui.twtTabs->widget(AIndex));
+	if (page)
+		removePage(page);
 }
 
 void TabWindow::onTabPageShow()
 {
-	ITabPage *page = qobject_cast<ITabPage *>(sender());
+	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(sender());
 	if (page)
 	{
-		setCurrentTabPage(page);
+		setCurrentPage(page);
 		showWindow();
 	}
 }
 
-void TabWindow::onTabPageShowMinimized()
-{
-	showMinimizedWindow();
-}
-
 void TabWindow::onTabPageClose()
 {
-	removeTabPage(qobject_cast<ITabPage *>(sender()));
+	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(sender());
+	if (page)
+		removePage(page);
 }
 
 void TabWindow::onTabPageChanged()
 {
-	ITabPage *page = qobject_cast<ITabPage *>(sender());
+	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(sender());
 	if (page)
 	{
 		int index = ui.twtTabs->indexOf(page->instance());
+		updateTab(index);
 		if (index == ui.twtTabs->currentIndex())
 			updateWindow();
-		updateTab(index);
 	}
 }
 
 void TabWindow::onTabPageDestroyed()
 {
-	removeTabPage(qobject_cast<ITabPage *>(sender()));
+	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(sender());
+	if (page)
+		removePage(page);
 }
 
-void TabWindow::onTabPageNotifierChanged()
+void TabWindow::onTabWindowAppended(const QUuid &AWindowId, const QString &AName)
 {
-	ITabPage *page = qobject_cast<ITabPage *>(sender());
-	if (page && page->tabPageNotifier()!=NULL)
-		connect(page->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),SLOT(onTabPageNotifierActiveNotifyChanged(int)));
-}
-
-void TabWindow::onTabPageNotifierActiveNotifyChanged(int ANotifyId)
-{
-	Q_UNUSED(ANotifyId);
-	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
-	if (notifier)
-	{
-		int index = ui.twtTabs->indexOf(notifier->tabPage()->instance());
-		if (index == ui.twtTabs->currentIndex())
-			updateWindow();
-		updateTab(index);
-	}
+	Action *action = new Action(FJoinMenu);
+	action->setText(AName);
+	action->setData(ADR_TABWINDOWID,AWindowId.toString());
+	FJoinMenu->addAction(action,AG_DEFAULT);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 }
 
 void TabWindow::onTabWindowNameChanged(const QUuid &AWindowId, const QString &AName)
 {
-	Q_UNUSED(AName);
 	if (AWindowId == FWindowId)
 		updateWindow();
+
+	foreach(Action *action, FJoinMenu->groupActions(AG_DEFAULT))
+		if (AWindowId == action->data(ADR_TABWINDOWID).toString())
+			action->setText(AName);
+}
+
+void TabWindow::onTabWindowDeleted(const QUuid &AWindowId)
+{
+	foreach(Action *action, FJoinMenu->groupActions(AG_DEFAULT))
+		if (AWindowId == action->data(ADR_TABWINDOWID).toString())
+			FJoinMenu->removeAction(action);
 }
 
 void TabWindow::onOptionsChanged(const OptionsNode &ANode)
@@ -546,13 +422,32 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 void TabWindow::onActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
-	if (action == FNextTab)
+	if (action == FCloseTab)
+	{
+		removePage(currentPage());
+	}
+	else if (action == FNextTab)
 	{
 		ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
 	}
 	else if (action == FPrevTab)
 	{
 		ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
+	}
+	else if (action == FDetachWindow)
+	{
+		detachPage(currentPage());
+	}
+	else if (action == FNewTab)
+	{
+		QString name = QInputDialog::getText(this,tr("New Tab Window"),tr("Tab window name:"));
+		if (!name.isEmpty())
+		{
+			ITabWindowPage *page = currentPage();
+			removePage(page);
+			ITabWindow *window = FMessageWidgets->openTabWindow(FMessageWidgets->appendTabWindow(name));
+			window->addPage(page);
+		}
 	}
 	else if (action == FShowCloseButtons)
 	{
@@ -587,91 +482,17 @@ void TabWindow::onActionTriggered(bool)
 	else if (action == FDeleteWindow)
 	{
 		if (QMessageBox::question(this,tr("Delete Tab Window"),tr("Are you sure you want to delete this tab window?"),
-			QMessageBox::Ok|QMessageBox::Cancel) == QMessageBox::Ok)
+		                          QMessageBox::Ok|QMessageBox::Cancel) == QMessageBox::Ok)
 		{
 			FMessageWidgets->deleteTabWindow(FWindowId);
 		}
 	}
-}
-
-void TabWindow::onTabMenuActionTriggered(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
+	else if (FJoinMenu->groupActions(AG_DEFAULT).contains(action))
 	{
-		ITabPage *page = tabPage(action->data(ADR_TAB_INDEX).toInt());
-		int tabAction = action->data(ADR_TAB_MENU_ACTION).toInt();
-		if (tabAction == CloseTabAction)
-		{
-			removeTabPage(page);
-		}
-		else if (tabAction == CloseOtherTabsAction)
-		{
-			int index = action->data(ADR_TAB_INDEX).toInt();
-			while (index+1 < ui.twtTabs->count())
-				onTabCloseRequested(index+1);
-			for (int i=0; i<index; i++)
-				onTabCloseRequested(0);
-		}
-		else if (tabAction == DetachTabAction)
-		{
-			detachTabPage(page);
-		}
-		else if (tabAction == NewTabWindowAction)
-		{
-			QString name = QInputDialog::getText(this,tr("New Tab Window"),tr("Tab window name:"));
-			if (!name.isEmpty())
-			{
-				ITabWindow *window = FMessageWidgets->newTabWindow(FMessageWidgets->appendTabWindow(name));
-				removeTabPage(page);
-				window->addTabPage(page);
-				window->showWindow();
-			}
-		}
-		else if (tabAction == JoinTabAction)
-		{
-			ITabWindow *window = FMessageWidgets->newTabWindow(action->data(ADR_TABWINDOWID).toString());
-			removeTabPage(page);
-			window->addTabPage(page);
-			window->showWindow();
-		}
-	}
-}
+		ITabWindowPage *page = currentPage();
+		removePage(page);
 
-void TabWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (AWidget == this)
-	{
-		if (AId == SCT_TABWINDOW_CLOSETAB)
-		{
-			removeTabPage(currentTabPage());
-		}
-		else if (AId == SCT_TABWINDOW_CLOSEOTHERTABS)
-		{
-			int index = ui.twtTabs->currentIndex();
-			while (index+1 < ui.twtTabs->count())
-				onTabCloseRequested(index+1);
-			for (int i=0; i<index; i++)
-				onTabCloseRequested(0);
-		}
-		else if (AId == SCT_TABWINDOW_DETACHTAB)
-		{
-			detachTabPage(currentTabPage());
-		}
-	}
-}
-
-void TabWindow::onBlinkTabNotifyTimerTimeout()
-{
-	FBlinkVisible = !FBlinkVisible;
-	for (int index=0; index<tabPageCount(); index++)
-	{
-		ITabPage *page = tabPage(index);
-		if (page && page->tabPageNotifier() && page->tabPageNotifier()->activeNotify()>0)
-		{
-			ITabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
-			if (notify.blink && !notify.icon.isNull())
-				updateTab(index);
-		}
+		ITabWindow *window = FMessageWidgets->openTabWindow(action->data(ADR_TABWINDOWID).toString());
+		window->addPage(page);
 	}
 }

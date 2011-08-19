@@ -4,7 +4,7 @@ TARGET         = idle
 TEMPLATE       = lib
 CONFIG        += staticlib warn_off
 DESTDIR        = ../../libs
-unix:!macx:!haiku {
+unix:!macx {
   DEFINES     += HAVE_XSS
 }
 include(idle.pri)

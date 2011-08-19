@@ -87,10 +87,6 @@
         <source>Send file</source>
         <translation>Wyślij plik</translation>
     </message>
-    <message>
-        <source>When receiving a prompt to accept the file</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>StreamDialog</name>

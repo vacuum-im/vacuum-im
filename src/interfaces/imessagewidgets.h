@@ -63,13 +63,11 @@ public:
 	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
 	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
-	virtual void contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu) =0;
 protected:
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 	virtual void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions) =0;
-	virtual void viewContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu) =0;
 	virtual void urlClicked(const QUrl &AUrl) const =0;
 };
 
@@ -160,63 +158,21 @@ public:
 	virtual IReceiversWidget *receiversWidget() const =0;
 };
 
-struct ITabPageNotify
-{
-	ITabPageNotify() {
-		priority = -1;
-		blink = true;
-	}
-	int priority;
-	bool blink;
-	QIcon icon;
-	QString caption;
-	QString toolTip;
-};
-
-class ITabPage;
-class ITabPageNotifier
-{
-public:
-	virtual QObject *instance() =0;
-	virtual ITabPage *tabPage() const =0;
-	virtual int activeNotify() const =0;
-	virtual QList<int> notifies() const =0;
-	virtual ITabPageNotify notifyById(int ANotifyId) const =0;
-	virtual int insertNotify(const ITabPageNotify &ANotify) =0;
-	virtual void removeNotify(int ANotifyId) =0;
-protected:
-	virtual void notifyInserted(int ANotifyId) =0;
-	virtual void notifyRemoved(int ANotifyId) =0;
-	virtual void activeNotifyChanged(int ANotifyId) =0;
-};
-
-class ITabPage
+class ITabWindowPage
 {
 public:
 	virtual QWidget *instance() =0;
 	virtual QString tabPageId() const =0;
-	virtual bool isVisibleTabPage() const =0;
-	virtual bool isActiveTabPage() const =0;
-	virtual void assignTabPage() =0;
-	virtual void showTabPage() =0;
-	virtual void showMinimizedTabPage() =0;
-	virtual void closeTabPage() =0;
-	virtual QIcon tabPageIcon() const =0;
-	virtual QString tabPageCaption() const =0;
-	virtual QString tabPageToolTip() const =0;
-	virtual ITabPageNotifier *tabPageNotifier() const =0;
-	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier) =0;
+	virtual bool isActive() const =0;
+	virtual void showWindow() =0;
+	virtual void closeWindow() =0;
 protected:
-	virtual void tabPageAssign() =0;
-	virtual void tabPageShow() =0;
-	virtual void tabPageShowMinimized() =0;
-	virtual void tabPageClose() =0;
-	virtual void tabPageClosed() =0;
-	virtual void tabPageChanged() =0;
-	virtual void tabPageActivated() =0;
-	virtual void tabPageDeactivated() =0;
-	virtual void tabPageDestroyed() =0;
-	virtual void tabPageNotifierChanged() =0;
+	virtual void windowShow() =0;
+	virtual void windowClose() =0;
+	virtual void windowChanged() =0;
+	virtual void windowActivated() =0;
+	virtual void windowDeactivated() =0;
+	virtual void windowDestroyed() =0;
 };
 
 class ITabWindow
@@ -224,30 +180,26 @@ class ITabWindow
 public:
 	virtual QMainWindow *instance() = 0;
 	virtual void showWindow() =0;
-	virtual void showMinimizedWindow() =0;
 	virtual QUuid windowId() const =0;
 	virtual QString windowName() const =0;
 	virtual Menu *windowMenu() const =0;
-	virtual int tabPageCount() const =0;
-	virtual ITabPage *tabPage(int AIndex) const =0;
-	virtual void addTabPage(ITabPage *APage) =0;
-	virtual bool hasTabPage(ITabPage *APage) const=0;
-	virtual ITabPage *currentTabPage() const =0;
-	virtual void setCurrentTabPage(ITabPage *APage) =0;
-	virtual void detachTabPage(ITabPage *APage) =0;
-	virtual void removeTabPage(ITabPage *APage) =0;
+	virtual void addPage(ITabWindowPage *APage) =0;
+	virtual bool hasPage(ITabWindowPage *APage) const=0;
+	virtual ITabWindowPage *currentPage() const =0;
+	virtual void setCurrentPage(ITabWindowPage *APage) =0;
+	virtual void detachPage(ITabWindowPage *APage) =0;
+	virtual void removePage(ITabWindowPage *APage) =0;
 protected:
-	virtual void currentTabPageChanged(ITabPage *APage) =0;
-	virtual void tabPageMenuRequested(ITabPage *APage, Menu *AMenu) =0;
-	virtual void tabPageAdded(ITabPage *APage) =0;
-	virtual void tabPageRemoved(ITabPage *APage) =0;
-	virtual void tabPageDetached(ITabPage *APage) =0;
+	virtual void pageAdded(ITabWindowPage *APage) =0;
+	virtual void currentPageChanged(ITabWindowPage *APage) =0;
+	virtual void pageRemoved(ITabWindowPage *APage) =0;
+	virtual void pageDetached(ITabWindowPage *APage) =0;
 	virtual void windowChanged() =0;
 	virtual void windowDestroyed() =0;
 };
 
 class IChatWindow :
-	public ITabPage
+			public ITabWindowPage
 {
 public:
 	virtual const Jid &streamJid() const =0;
@@ -259,15 +211,16 @@ public:
 	virtual IMenuBarWidget *menuBarWidget() const =0;
 	virtual IToolBarWidget *toolBarWidget() const =0;
 	virtual IStatusBarWidget *statusBarWidget() const =0;
-	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
+	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 protected:
 	virtual void messageReady() =0;
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
+	virtual void windowClosed() =0;
 };
 
 class IMessageWindow :
-	public ITabPage
+			public ITabWindowPage
 {
 public:
 	enum Mode {
@@ -295,7 +248,7 @@ public:
 	virtual void setThreadId(const QString &AThreadId) =0;
 	virtual int nextCount() const =0;
 	virtual void setNextCount(int ACount) =0;
-	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
+	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle) =0;
 protected:
 	virtual void showNextMessage() =0;
 	virtual void replyMessage() =0;
@@ -304,6 +257,7 @@ protected:
 	virtual void messageReady() =0;
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
+	virtual void windowClosed() =0;
 };
 
 class IViewDropHandler
@@ -339,7 +293,6 @@ public:
 	virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
 	virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
-	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage) = 0;
 	virtual QList<IMessageWindow *> messageWindows() const =0;
 	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
@@ -352,9 +305,9 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const =0;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName) =0;
 	virtual QList<ITabWindow *> tabWindows() const =0;
-	virtual ITabWindow *newTabWindow(const QUuid &AWindowId) =0;
+	virtual ITabWindow *openTabWindow(const QUuid &AWindowId) =0;
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const =0;
-	virtual void assignTabWindowPage(ITabPage *APage) =0;
+	virtual void assignTabWindowPage(ITabWindowPage *APage) =0;
 	virtual QList<IViewDropHandler *> viewDropHandlers() const =0;
 	virtual void insertViewDropHandler(IViewDropHandler *AHandler) =0;
 	virtual void removeViewDropHandler(IViewDropHandler *AHandler) =0;
@@ -372,7 +325,6 @@ protected:
 	virtual void menuBarWidgetCreated(IMenuBarWidget *AMenuBarWidget) =0;
 	virtual void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget) =0;
 	virtual void statusBarWidgetCreated(IStatusBarWidget *AStatusBarWidget) =0;
-	virtual void tabPageNotifierCreated(ITabPageNotifier *ANotifier) =0;
 	virtual void messageWindowCreated(IMessageWindow *AWindow) =0;
 	virtual void messageWindowDestroyed(IMessageWindow *AWindow) =0;
 	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
@@ -391,20 +343,19 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
-Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.1")
+Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.0")
 Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.0")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
 Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")
 Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
 Q_DECLARE_INTERFACE(IStatusBarWidget,"Vacuum.Plugin.IStatusBarWidget/1.0")
-Q_DECLARE_INTERFACE(ITabPageNotifier,"Vacuum.Plugin.ITabPageNotifier/1.0")
-Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.3")
-Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.3")
-Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.2")
-Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
+Q_DECLARE_INTERFACE(ITabWindowPage,"Vacuum.Plugin.ITabWindowPage/1.0")
+Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.0")
+Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.0")
+Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.0")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.3")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.0")
 
-#endif // IMESSAGEWIDGETS_H
+#endif

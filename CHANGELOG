@@ -6,18 +6,6 @@ LEGEND
   [-] Bug fix
 
 
-
-------
-  [!] Added new plugin for notifications about birthdays
-  [+] Added ability to show a minimized window with the message when notification received
-  [*] Notice of user activity in the chat duplicated on the chat tab
-  [*] Added new types of notifications and changed the way of their settings
-  [*] Added context menu for tabs in tabwindow
-  [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
-  [-] Fixed bug in Digest-MD5 authorization for which was not possible to log on some servers
-  [-] When leaving the hidden conferences also closed the conference on non-active tabs
-
-
 v1.1.0
 ------
   [!] Added new plugin for remote controlling
@@ -52,7 +40,6 @@ v1.1.0
   [-] When closing the connection initiated by the server vacuum does not generate an error and re-reconnection was not started
   [-] Notification of arrival of the new message would not occur if the chat window was closed by clicking on the Windows taskbar
   [-] By transfer of the rest of a file after connection breakage already obtained data could be rubbed clean by zero
-
 
 v1.0.2
 ------

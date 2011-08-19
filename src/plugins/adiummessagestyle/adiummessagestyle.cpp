@@ -14,6 +14,7 @@
 #include <QDomDocument>
 #include <QApplication>
 #include <QTextDocument>
+#include <utils/message.h>
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
@@ -546,7 +547,7 @@ QString AdiumMessageStyle::prepareMessage(const QString &AHtml, const IMessageCo
 		doc.setHtml(AHtml);
 		QTextCursor cursor(&doc);
 		cursor.insertHtml(QString("<i>*&nbsp;%1</i>&nbsp;").arg(AOptions.senderName));
-		return TextManager::getDocumentBody(doc);
+		return getDocumentBody(doc);
 	}
 	return AHtml;
 }

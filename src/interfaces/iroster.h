@@ -30,12 +30,6 @@ struct IRosterItem
 	QString subscription;
 	QString ask;
 	QSet<QString> groups;
-	bool operator==(const IRosterItem &AOther) const {
-		return itemJid==AOther.itemJid && name==AOther.name && groups==AOther.groups && subscription==AOther.subscription && ask==AOther.ask;
-	}
-	bool operator!=(const IRosterItem &AOther) const {
-		return !operator==(AOther);
-	}
 };
 
 class IRoster 
@@ -106,7 +100,7 @@ protected:
 	virtual void rosterRemoved(IRoster *ARoster) =0;
 };
 
-Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.1")
-Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.1")
+Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.0")
+Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.0")
 
 #endif

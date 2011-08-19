@@ -1,9 +1,6 @@
 #ifndef CHATWINDOW_H
 #define CHATWINDOW_H
 
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
 #include <definitions/optionvalues.h>
 #include <definitions/messagedataroles.h>
@@ -12,33 +9,24 @@
 #include <interfaces/istatuschanger.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
-#include <utils/textmanager.h>
 #include <utils/widgetmanager.h>
 #include "ui_chatwindow.h"
 
 class ChatWindow :
-	public QMainWindow,
-	public IChatWindow
+			public QMainWindow,
+			public IChatWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(IChatWindow ITabPage);
+	Q_INTERFACES(IChatWindow ITabWindowPage);
 public:
 	ChatWindow(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid);
 	virtual ~ChatWindow();
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
-	virtual bool isVisibleTabPage() const;
-	virtual bool isActiveTabPage() const;
-	virtual void assignTabPage();
-	virtual void showTabPage();
-	virtual void showMinimizedTabPage();
-	virtual void closeTabPage();
-	virtual QIcon tabPageIcon() const;
-	virtual QString tabPageCaption() const;
-	virtual QString tabPageToolTip() const;
-	virtual ITabPageNotifier *tabPageNotifier() const;
-	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
+	virtual bool isActive() const;
+	virtual void showWindow();
+	virtual void closeWindow();
 	//IChatWindow
 	virtual const Jid &streamJid() const { return FStreamJid; }
 	virtual const Jid &contactJid() const { return FContactJid; }
@@ -49,23 +37,20 @@ public:
 	virtual IMenuBarWidget *menuBarWidget() const { return FMenuBarWidget; }
 	virtual IToolBarWidget *toolBarWidget() const { return FToolBarWidget; }
 	virtual IStatusBarWidget *statusBarWidget() const { return FStatusBarWidget; }
-	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
+	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
 	//ITabWindowPage
-	void tabPageAssign();
-	void tabPageShow();
-	void tabPageShowMinimized();
-	void tabPageClose();
-	void tabPageClosed();
-	void tabPageChanged();
-	void tabPageActivated();
-	void tabPageDeactivated();
-	void tabPageDestroyed();
-	void tabPageNotifierChanged();
+	void windowShow();
+	void windowClose();
+	void windowChanged();
+	void windowActivated();
+	void windowDeactivated();
+	void windowDestroyed();
 	//IChatWindow
 	void messageReady();
 	void streamJidChanged(const Jid &ABefore);
 	void contactJidChanged(const Jid &ABefore);
+	void windowClosed();
 protected:
 	void initialize();
 	void saveWindowGeometry();
@@ -79,8 +64,6 @@ protected slots:
 	void onStreamJidChanged(const Jid &ABefore);
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onViewContextQuoteActionTriggered(bool);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
 private:
 	Ui::ChatWindowClass ui;
 private:
@@ -93,12 +76,10 @@ private:
 	IMenuBarWidget *FMenuBarWidget;
 	IToolBarWidget *FToolBarWidget;
 	IStatusBarWidget *FStatusBarWidget;
-	ITabPageNotifier *FTabPageNotifier;
 private:
 	Jid FStreamJid;
 	Jid FContactJid;
 	bool FShownDetached;
-	QString FTabPageToolTip;
 };
 
 #endif // CHATWINDOW_H

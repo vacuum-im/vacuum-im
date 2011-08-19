@@ -3,7 +3,6 @@
 
 #include <QDesktopServices>
 #include <QObjectCleanupHandler>
-#include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
@@ -18,7 +17,6 @@
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
-#include <utils/textmanager.h>
 #include "infowidget.h"
 #include "editwidget.h"
 #include "viewwidget.h"
@@ -30,15 +28,14 @@
 #include "chatwindow.h"
 #include "tabwindow.h"
 #include "messengeroptions.h"
-#include "tabpagenotifier.h"
 
 class MessageWidgets :
-	public QObject,
-	public IPlugin,
-	public IMessageWidgets,
-	public IOptionsHolder,
-	public IViewUrlHandler,
-	public IEditContentsHandler
+			public QObject,
+			public IPlugin,
+			public IMessageWidgets,
+			public IOptionsHolder,
+			public IViewUrlHandler,
+			public IEditContentsHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IViewUrlHandler IEditContentsHandler);
@@ -68,7 +65,6 @@ public:
 	virtual IMenuBarWidget *newMenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	virtual IToolBarWidget *newToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
-	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage);
 	virtual QList<IMessageWindow *> messageWindows() const;
 	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -81,9 +77,9 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName);
 	virtual QList<ITabWindow *> tabWindows() const;
-	virtual ITabWindow *newTabWindow(const QUuid &AWindowId);
+	virtual ITabWindow *openTabWindow(const QUuid &AWindowId);
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
-	virtual void assignTabWindowPage(ITabPage *APage);
+	virtual void assignTabWindowPage(ITabWindowPage *APage);
 	virtual QList<IViewDropHandler *> viewDropHandlers() const;
 	virtual void insertViewDropHandler(IViewDropHandler *AHandler);
 	virtual void removeViewDropHandler(IViewDropHandler *AHandler);
@@ -101,7 +97,6 @@ signals:
 	void menuBarWidgetCreated(IMenuBarWidget *AMenuBarWidget);
 	void toolBarWidgetCreated(IToolBarWidget *AToolBarWidget);
 	void statusBarWidgetCreated(IStatusBarWidget *AStatusBarWidget);
-	void tabPageNotifierCreated(ITabPageNotifier *ANotifier);
 	void messageWindowCreated(IMessageWindow *AWindow);
 	void messageWindowDestroyed(IMessageWindow *AWindow);
 	void chatWindowCreated(IChatWindow *AWindow);
@@ -123,15 +118,11 @@ protected:
 	void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
 	void onViewWidgetUrlClicked(const QUrl &AUrl);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
-	void onViewContextCopyActionTriggered(bool);
-	void onViewContextUrlActionTriggered(bool);
-	void onViewContextSearchActionTriggered(bool);
 	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onQuoteActionTriggered(bool);
 	void onMessageWindowDestroyed();
 	void onChatWindowDestroyed();
-	void onTabWindowPageAdded(ITabPage *APage);
+	void onTabWindowPageAdded(ITabWindowPage *APage);
 	void onTabWindowDestroyed();
 	void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
 	void onStreamRemoved(IXmppStream *AXmppStream);

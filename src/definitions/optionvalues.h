@@ -94,8 +94,6 @@
 #define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
-// ChatMessageHandler
-#define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
 
 // MultiUserChat
 #define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"
@@ -132,12 +130,18 @@
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
+#define OPV_NOTIFICATIONS_SOUND                         "notifications.sound"
+#define OPV_NOTIFICATIONS_ROSTERICON                    "notifications.roster-icon"
+#define OPV_NOTIFICATIONS_POPUPWINDOW                   "notifications.popup-window"
+#define OPV_NOTIFICATIONS_TRAYICON                      "notifications.tray-icon"
+#define OPV_NOTIFICATIONS_TRAYACTION                    "notifications.tray-action"
+#define OPV_NOTIFICATIONS_AUTOACTIVATE                  "notifications.auto-activate"
+#define OPV_NOTIFICATIONS_ENABLEALERTS                  "notifications.enable-alerts"
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
 #define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
-#define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
-#define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
-#define OPV_NOTIFICATIONS_KINDENABLED_ITEM              "notifications.kind-enabled.kind"
+#define OPV_NOTIFICATIONS_SOUND_COMMAND                 "notifications.sound-command"
+#define OPV_NOTIFICATIONS_NOTIFICATIONTYPE_ITEM         "notifications.notification-type"
 
 // ConnectionManager
 #define OPV_PROXY_ROOT                                  "proxy"

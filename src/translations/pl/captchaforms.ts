@@ -8,6 +8,10 @@
         <translation>Formularze CAPTCHA</translation>
     </message>
     <message>
+        <source>CAPTCHA Challenges</source>
+        <translation>Żądania CAPTCHA</translation>
+    </message>
+    <message>
         <source>CAPTCHA Challenge - %1</source>
         <translation>Żądanie CAPTCHA - %1</translation>
     </message>
@@ -54,10 +58,6 @@
     <message>
         <source>Allows to undergo tests on humanity without the use of browser</source>
         <translation>Pozwala przejść testy na ludzkiego operatora bez użycia przeglądarki</translation>
-    </message>
-    <message>
-        <source>When receiving a CAPTCHA challenge</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

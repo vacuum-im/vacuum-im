@@ -162,8 +162,8 @@ bool RemoteControl::initObjects()
 	}
 
 	optionItems.clear();
-	optionItems[FIELD_SOUNDS] = OptionsFormItem(QString(OPV_NOTIFICATIONS_KINDENABLED_ITEM"[%1]").arg(INotification::SoundPlay), tr("Play sounds"));
-	optionItems[FIELD_AUTO_MSG] = OptionsFormItem(QString(OPV_NOTIFICATIONS_KINDENABLED_ITEM"[%1]").arg(INotification::AutoActivate), tr("Automatically Open New Messages"));
+	optionItems[FIELD_SOUNDS] = OptionsFormItem(OPV_NOTIFICATIONS_SOUND, tr("Play sounds"));
+	optionItems[FIELD_AUTO_MSG] = OptionsFormItem(OPV_NOTIFICATIONS_AUTOACTIVATE, tr("Automatically Open New Messages"));
 	optionItems[FIELD_AUTO_FILES] = OptionsFormItem(OPV_FILETRANSFER_AUTORECEIVE, tr("Automatically Accept File Transfers"));
 	optionItems[FIELD_AUTO_AUTH] = OptionsFormItem(OPV_ROSTER_AUTOSUBSCRIBE, tr("Automatically Authorize Contacts"));
 
@@ -581,7 +581,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		field.required = true;
 
 		QMap<Jid, int> unread;
-		foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,Jid::null,Message::Normal|Message::Chat|Message::Headline))
+		foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,Jid(),Message::Normal|Message::Chat|Message::Headline))
 		{
 			Message message = FMessageProcessor->messageById(messageId);
 			if (!message.from().isEmpty() && ARequest.contactJid!=message.from() && !message.body().isEmpty())

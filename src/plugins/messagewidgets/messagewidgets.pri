@@ -20,8 +20,7 @@ HEADERS = messagewidgets.h \
           messagewindow.h \
           tabwidget.h \
           tabwindow.h \
-	  messengeroptions.h \
-          tabpagenotifier.h
+	  messengeroptions.h
 
 SOURCES = messagewidgets.cpp \
           messageeditor.cpp \
@@ -36,5 +35,4 @@ SOURCES = messagewidgets.cpp \
           messagewindow.cpp \
           tabwidget.cpp \
           tabwindow.cpp \
-          messengeroptions.cpp \
-          tabpagenotifier.cpp
+          messengeroptions.cpp

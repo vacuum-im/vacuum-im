@@ -16,28 +16,20 @@
 #include "ui_messagewindow.h"
 
 class MessageWindow :
-	public QMainWindow,
-	public IMessageWindow
+			public QMainWindow,
+			public IMessageWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageWindow ITabPage);
+	Q_INTERFACES(IMessageWindow ITabWindowPage);
 public:
 	MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode);
 	virtual ~MessageWindow();
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
-	virtual bool isVisibleTabPage() const;
-	virtual bool isActiveTabPage() const;
-	virtual void assignTabPage();
-	virtual void showTabPage();
-	virtual void showMinimizedTabPage();
-	virtual void closeTabPage();
-	virtual QIcon tabPageIcon() const;
-	virtual QString tabPageCaption() const;
-	virtual QString tabPageToolTip() const;
-	virtual ITabPageNotifier *tabPageNotifier() const;
-	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
+	virtual bool isActive() const;
+	virtual void showWindow();
+	virtual void closeWindow();
 	//IMessageWindow
 	virtual const Jid &streamJid() const { return FStreamJid; }
 	virtual const Jid &contactJid() const { return FContactJid; }
@@ -59,19 +51,15 @@ public:
 	virtual void setThreadId(const QString &AThreadId);
 	virtual int nextCount() const { return FNextCount; }
 	virtual void setNextCount(int ACount);
-	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
+	virtual void updateWindow(const QIcon &AIcon, const QString &AIconText, const QString &ATitle);
 signals:
 	//ITabWindowPage
-	void tabPageAssign();
-	void tabPageShow();
-	void tabPageShowMinimized();
-	void tabPageClose();
-	void tabPageClosed();
-	void tabPageChanged();
-	void tabPageActivated();
-	void tabPageDeactivated();
-	void tabPageDestroyed();
-	void tabPageNotifierChanged();
+	void windowShow();
+	void windowClose();
+	void windowChanged();
+	void windowActivated();
+	void windowDeactivated();
+	void windowDestroyed();
 	//IMessageWindow
 	void showNextMessage();
 	void replyMessage();
@@ -80,6 +68,7 @@ signals:
 	void messageReady();
 	void streamJidChanged(const Jid &ABefore);
 	void contactJidChanged(const Jid &ABefore);
+	void windowClosed();
 protected:
 	void initialize();
 	void saveWindowGeometry();
@@ -107,7 +96,6 @@ private:
 	IReceiversWidget *FReceiversWidget;
 	IToolBarWidget *FViewToolBarWidget;
 	IToolBarWidget *FEditToolBarWidget;
-	ITabPageNotifier *FTabPageNotifier;
 private:
 	IMessageWidgets *FMessageWidgets;
 private:
@@ -116,7 +104,6 @@ private:
 	Jid FStreamJid;
 	Jid FContactJid;
 	bool FShownDetached;
-	QString FTabPageToolTip;
 	QString FCurrentThreadId;
 };
 

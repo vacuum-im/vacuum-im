@@ -5,9 +5,9 @@
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/dataformtypes.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icaptchaforms.h>
@@ -17,7 +17,6 @@
 #include <interfaces/istanzaprocessor.h>
 #include <utils/errorhandler.h>
 #include <utils/iconstorage.h>
-#include <utils/widgetmanager.h>
 
 struct ChallengeItem
 {
@@ -69,8 +68,6 @@ protected:
 	void notifyChallenge(const ChallengeItem &AChallenge);
 	QString findChallenge(IDataDialogWidget *ADialog) const;
 	QString findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const;
-protected:
-	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);

@@ -19,12 +19,6 @@ struct IPresenceItem
 	int show;
 	int priority;
 	QString status;
-	bool operator==(const IPresenceItem &AOther) const {
-		return itemJid==AOther.itemJid && show==AOther.show && priority==AOther.priority && status==AOther.status;
-	}
-	bool operator!=(const IPresenceItem &AOther) const {
-		return !operator==(AOther);
-	}
 };
 
 class IPresence
@@ -54,7 +48,7 @@ public:
 	virtual bool setPresence(int AShow, const QString &AStatus, int APriority) =0;
 	virtual bool sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
 	virtual IPresenceItem presenceItem(const Jid &AItemJid) const =0;
-	virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid::null) const =0;
+	virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid()) const =0;
 protected:
 	virtual void opened() =0;
 	virtual void changed(int AShow, const QString &AStatus, int APriority) =0;
@@ -87,7 +81,7 @@ protected:
 	virtual void presenceRemoved(IPresence *APresence) =0;
 };
 
-Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.1")
-Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.1")
+Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.0")
+Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.0")
 
 #endif  //IPRESENCE_H

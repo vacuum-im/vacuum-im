@@ -9,8 +9,6 @@
 #include <definitions/actiongroups.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
 #include <definitions/soundfiles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -31,7 +29,6 @@
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
-#include <utils/textmanager.h>
 #include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"
 #include "usercontextmenu.h"
@@ -51,35 +48,27 @@ struct UserStatus
 };
 
 class MultiUserChatWindow :
-	public QMainWindow,
-	public IMultiUserChatWindow,
-	public IMessageHandler
+			public QMainWindow,
+			public IMultiUserChatWindow,
+			public IMessageHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMultiUserChatWindow ITabPage IMessageHandler);
+	Q_INTERFACES(IMultiUserChatWindow ITabWindowPage IMessageHandler);
 public:
 	MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
 	virtual QMainWindow *instance() { return this; }
 	//ITabWindowPage
 	virtual QString tabPageId() const;
-	virtual bool isVisibleTabPage() const;
-	virtual bool isActiveTabPage() const;
-	virtual void assignTabPage();
-	virtual void showTabPage();
-	virtual void showMinimizedTabPage();
-	virtual void closeTabPage();
-	virtual QIcon tabPageIcon() const;
-	virtual QString tabPageCaption() const;
-	virtual QString tabPageToolTip() const;
-	virtual ITabPageNotifier *tabPageNotifier() const;
-	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
+	virtual bool isActive() const;
+	virtual void showWindow();
+	virtual void closeWindow();
 	//IMessageHandler
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool showMessage(int AMessageId);
 	virtual bool receiveMessage(int AMessageId);
-	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
-	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
+	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 	//IMultiUserChatWindow
 	virtual Jid streamJid() const;
 	virtual Jid roomJid() const;
@@ -95,17 +84,14 @@ public:
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
 signals:
 	//ITabWindowPage
-	void tabPageAssign();
-	void tabPageShow();
-	void tabPageShowMinimized();
-	void tabPageClose();
-	void tabPageClosed();
-	void tabPageChanged();
-	void tabPageActivated();
-	void tabPageDeactivated();
-	void tabPageDestroyed();
-	void tabPageNotifierChanged();
+	void windowShow();
+	void windowClose();
+	void windowChanged();
+	void windowActivated();
+	void windowDeactivated();
+	void windowDestroyed();
 	//IMultiUserChatWindow
+	void windowClosed();
 	void chatWindowCreated(IChatWindow *AWindow);
 	void chatWindowDestroyed(IChatWindow *AWindow);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
@@ -177,8 +163,6 @@ protected slots:
 	void onMessageReady();
 	void onMessageAboutToBeSend();
 	void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
-	void onViewContextQuoteActionTriggered(bool);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
 	void onWindowActivated();
 	void onChatMessageReady();
 	void onChatWindowActivated();
@@ -217,7 +201,6 @@ private:
 	IMenuBarWidget *FMenuBarWidget;
 	IToolBarWidget *FToolBarWidget;
 	IStatusBarWidget *FStatusBarWidget;
-	ITabPageNotifier *FTabPageNotifier;
 private:
 	Menu *FToolsMenu;
 	Action *FChangeNick;
@@ -249,7 +232,6 @@ private:
 	int FUsersListWidth;
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
-	QString FTabPageToolTip;
 	QList<int> FActiveMessages;
 	QList<IChatWindow *> FChatWindows;
 	QMap<IChatWindow *, QTimer *> FDestroyTimers;

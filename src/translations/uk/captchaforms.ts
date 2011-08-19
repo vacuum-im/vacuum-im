@@ -8,6 +8,10 @@
         <translation>Запити CAPTCHA</translation>
     </message>
     <message>
+        <source>CAPTCHA Challenges</source>
+        <translation>Запити CAPTCHA</translation>
+    </message>
+    <message>
         <source>CAPTCHA Challenge - %1</source>
         <translation>Запит CAPTCHA - %1</translation>
     </message>
@@ -54,10 +58,6 @@
     <message>
         <source>Allows to undergo tests on humanity without the use of browser</source>
         <translation>Дозволяє відповідати на запити CAPTCHA без необхідності використання браузера</translation>
-    </message>
-    <message>
-        <source>When receiving a CAPTCHA challenge</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

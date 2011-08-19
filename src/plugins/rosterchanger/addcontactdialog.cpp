@@ -175,12 +175,12 @@ void AddContactDialog::onDialogAccepted()
 		}
 		else
 		{
-			QMessageBox::information(NULL,FStreamJid.full(),tr("Contact <b>%1</b> already exists.").arg(Qt::escape(contactJid().bare())));
+			QMessageBox::information(NULL,FStreamJid.full(),tr("Contact <b>%1</b> already exists.").arg(contactJid().hBare()));
 		}
 	}
 	else if (!contactJid().isEmpty())
 	{
-		QMessageBox::warning(this,FStreamJid.bare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(Qt::escape(contactJid().bare())));
+		QMessageBox::warning(this,FStreamJid.bare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(contactJid().hBare()));
 	}
 }
 
@@ -191,11 +191,11 @@ void AddContactDialog::onToolBarActionTriggered(bool)
 	{
 		if (action == FShowChat)
 		{
-			FMessageProcessor->createMessageWindow(FStreamJid,contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
+			FMessageProcessor->openWindow(FStreamJid,contactJid(),Message::Chat);
 		}
 		else if (action == FSendMessage)
 		{
-			FMessageProcessor->createMessageWindow(FStreamJid,contactJid(),Message::Normal,IMessageHandler::SM_SHOW);
+			FMessageProcessor->openWindow(FStreamJid,contactJid(),Message::Normal);
 		}
 		else if (action == FShowVCard)
 		{

@@ -82,6 +82,10 @@
 <context>
     <name>RosterChanger</name>
     <message>
+        <source>Subscription requests</source>
+        <translation>Abo Anfragen</translation>
+    </message>
+    <message>
         <source>%1 wants to subscribe to your presence.</source>
         <translation>%1 will Ihre Präsenz abonieren.</translation>
     </message>
@@ -298,8 +302,8 @@
         <translation></translation>
     </message>
     <message>
-        <source>When receiving authorization request</source>
-        <translation type="unfinished"></translation>
+        <source>Roster management</source>
+        <translation></translation>
     </message>
 </context>
 <context>

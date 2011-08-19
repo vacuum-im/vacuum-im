@@ -10,14 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef _ZLIB_H
-#  ifdef USE_SYSTEM_ZLIB
-#    include <zlib.h>
-#  else
-#    include <thirdparty/zlib/zlib.h>
-#  endif
-#endif
-
+#include "zlib.h"
 #include "ioapi.h"
 
 

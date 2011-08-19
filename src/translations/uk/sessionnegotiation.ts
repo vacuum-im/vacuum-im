@@ -8,6 +8,10 @@
         <translation>Узгодження сесії</translation>
     </message>
     <message>
+        <source>Negotiate session requests</source>
+        <translation>Запити встановлення сесії</translation>
+    </message>
+    <message>
         <source>Negotiate Session</source>
         <translation>Узгодити сесію</translation>
     </message>
@@ -102,10 +106,6 @@
     <message>
         <source>Supports the negotiating of the stanza session between two XMPP entities</source>
         <translation>Підтримує ініціалізацію сесії строф між двома XMPP сутностями</translation>
-    </message>
-    <message>
-        <source>When receiving session negotiation request</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -1,2 +1,4 @@
 TEMPLATE          = subdirs
-SUBDIRS           = zlib minizip idn qtlockedfile qxtglobalshortcut idle
+SUBDIRS           = minizip idn qtlockedfile qxtglobalshortcut idle
+win32: SUBDIRS   += zlib
+macx:  SUBDIRS   += zlib

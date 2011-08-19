@@ -53,7 +53,7 @@ private:
 private:
 	bool FAllHidden;
 	bool FTrayHidden;
-	ushort FNotifyHidden;
+	uchar FNotifyHidden;
 	QList< QPointer<QWidget> > FHiddenWidgets;
 };
 

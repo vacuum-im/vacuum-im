@@ -32,7 +32,7 @@ Avatars::Avatars()
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
 
-	FAvatarLabelId = -1;
+	FRosterLabelId = -1;
 	FAvatarsVisible = false;
 	FShowEmptyAvatars = true;
 	FAvatarSize = QSize(32,32);
@@ -303,14 +303,14 @@ QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
 	if (ARole == RDR_AVATAR_IMAGE)
 	{
-		QImage avatar = avatarImage(AIndex->data(RDR_FULL_JID).toString());
+		QImage avatar = avatarImage(AIndex->data(RDR_JID).toString());
 		if (avatar.isNull() && FShowEmptyAvatars)
 			avatar = FEmptyAvatar;
 		return avatar;
 	}
 	else if (ARole == RDR_AVATAR_HASH)
 	{
-		return avatarHash(AIndex->data(RDR_FULL_JID).toString());
+		return avatarHash(AIndex->data(RDR_JID).toString());
 	}
 	return QVariant();
 }
@@ -474,12 +474,12 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 {
 	if (FRostersModel)
 	{
-		QMultiMap<int,QVariant> findData;
+		QMultiHash<int,QVariant> findData;
 		foreach(int type, rosterDataTypes())
 			findData.insert(RDR_TYPE,type);
 		if (!AContactJid.isEmpty())
-			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
-		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
+			findData.insert(RDR_BARE_JID,AContactJid.pBare());
+		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData,true);
 		foreach (IRosterIndex *index, indexes)
 		{
 			emit rosterDataChanged(index,RDR_AVATAR_HASH);
@@ -601,11 +601,11 @@ void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
 	if (FRostersViewPlugin &&  rosterDataTypes().contains(AIndex->type()))
 	{
-		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
+		Jid contactJid = AIndex->data(RDR_BARE_JID).toString();
 		if (!FVCardAvatars.contains(contactJid))
 			onVCardChanged(contactJid);
 		if (FAvatarsVisible)
-			FRostersViewPlugin->rostersView()->insertLabel(FAvatarLabelId, AIndex);
+			FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, AIndex);
 	}
 }
 
@@ -641,7 +641,7 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 		picture->setTitle(tr("Custom picture"));
 		picture->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CHANGE);
 
-		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+		Jid contactJid = AIndex->data(RDR_JID).toString();
 		Action *setup = new Action(picture);
 		setup->setText(tr("Set custom picture"));
 		setup->setIcon(RSR_STORAGE_MENUICONS,MNI_AVATAR_CUSTOM);
@@ -663,15 +663,15 @@ void Avatars::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
 
 void Avatars::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-	if ((ALabelId == RLID_DISPLAY || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->type()))
+	if ((ALabelId == RLID_DISPLAY || ALabelId == FRosterLabelId) && rosterDataTypes().contains(AIndex->type()))
 	{
 		QString hash = AIndex->data(RDR_AVATAR_HASH).toString();
 		if (hasAvatar(hash))
 		{
 			QString fileName = avatarFileName(hash);
 			QSize imageSize = QImageReader(fileName).size();
-			if (ALabelId!=FAvatarLabelId && (imageSize.height()>64 || imageSize.width()>64))
-				imageSize.scale(QSize(64,64), Qt::KeepAspectRatio);
+         if (ALabelId!=FRosterLabelId && (imageSize.height()>64 || imageSize.width()>64))
+			   imageSize.scale(QSize(64,64), Qt::KeepAspectRatio);
 			QString avatarMask = "<img src='%1' width=%2 height=%3 />";
 			AToolTips.insert(RTTO_AVATAR_IMAGE,avatarMask.arg(fileName).arg(imageSize.width()).arg(imageSize.height()));
 		}
@@ -763,23 +763,19 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 		{
 			if (FAvatarsVisible)
 			{
-				QMultiMap<int,QVariant> findData;
+				QMultiHash<int,QVariant> findData;
 				foreach(int type, rosterDataTypes())
 					findData.insertMulti(RDR_TYPE,type);
-				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData, true);
+				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChild(findData, true);
 
-				IRostersLabel label;
-				label.order = RLO_AVATAR_IMAGE;
-				label.value = RDR_AVATAR_IMAGE;
-				FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
-
+				FRosterLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_AVATAR_IMAGE, RDR_AVATAR_IMAGE);
 				foreach (IRosterIndex *index, indexes)
-					FRostersViewPlugin->rostersView()->insertLabel(FAvatarLabelId, index);
+					FRostersViewPlugin->rostersView()->insertIndexLabel(FRosterLabelId, index);
 			}
 			else
 			{
-				FRostersViewPlugin->rostersView()->destroyLabel(FAvatarLabelId);
-				FAvatarLabelId = -1;
+				FRostersViewPlugin->rostersView()->destroyIndexLabel(FRosterLabelId);
+				FRosterLabelId = -1;
 				FAvatarImages.clear();
 			}
 		}

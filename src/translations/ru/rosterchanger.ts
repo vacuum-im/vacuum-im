@@ -82,6 +82,10 @@
 <context>
     <name>RosterChanger</name>
     <message>
+        <source>Subscription requests</source>
+        <translation>Запросы авторизации</translation>
+    </message>
+    <message>
         <source>%1 wants to subscribe to your presence.</source>
         <translation>%1 хочет подписаться на ваш статус.</translation>
     </message>
@@ -298,8 +302,8 @@
         <translation>Общая группа</translation>
     </message>
     <message>
-        <source>When receiving authorization request</source>
-        <translation>При получении запроса авторизации</translation>
+        <source>Roster management</source>
+        <translation>Управление контакт-листом</translation>
     </message>
 </context>
 <context>

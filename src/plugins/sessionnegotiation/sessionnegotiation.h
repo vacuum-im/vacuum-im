@@ -8,10 +8,10 @@
 #include <definitions/rosterlabelorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
+#include <definitions/optionwidgetorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/idataforms.h>
@@ -20,7 +20,6 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/inotifications.h>
-#include <utils/widgetmanager.h>
 
 class SessionNegotiation :
 			public QObject,
@@ -88,8 +87,6 @@ protected:
 	IDataForm clearForm(const IDataForm &AForm) const;
 	QStringList unsubmitedFields(const IDataForm &ARequest, const IDataForm &ASubmit, bool ARequired) const;
 	IStanzaSession &dialogSession(IDataDialogWidget *ADialog);
-protected:
-	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem);

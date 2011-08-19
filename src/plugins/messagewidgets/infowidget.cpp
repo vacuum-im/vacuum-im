@@ -262,9 +262,9 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 
 		IRosterItem ritem = FRoster ? FRoster->rosterItem(FContactJid) : IRosterItem();
 		if (isFiledAutoUpdated(AField) && ritem.name.isEmpty())
-			ui.lblName->setText(Qt::escape(FContactJid.full()));
+			ui.lblName->setText(FContactJid.hFull());
 		else
-			ui.lblName->setText(QString("<big><b>%1</b></big> - %2").arg(Qt::escape(name)).arg(Qt::escape(FContactJid.full())));
+			ui.lblName->setText(QString("<big><b>%1</b></big> - %2").arg(Qt::escape(name)).arg(FContactJid.hFull()));
 
 		ui.lblName->setVisible(isFieldVisible(AField));
 		break;

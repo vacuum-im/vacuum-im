@@ -14,7 +14,6 @@
 #include <definitions/rosterfootertextorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
@@ -106,6 +105,7 @@ protected:
 	void removeStatusActions(int AStatusId);
 	void createStreamMenu(IPresence *APresence);
 	void updateStreamMenu(IPresence *APresence);
+	void removeStreamMenu(IPresence *APresence);
 	int visibleMainStatusId() const;
 	void updateMainMenu();
 	void updateTrayToolTip();

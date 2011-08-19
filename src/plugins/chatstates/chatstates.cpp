@@ -29,7 +29,6 @@ ChatStates::ChatStates()
 	FDiscovery = NULL;
 	FMessageArchiver = NULL;
 	FDataForms = NULL;
-	FNotifications = NULL;
 	FSessionNegotiation = NULL;
 	FMultiUserChatPlugin = NULL;
 
@@ -131,12 +130,6 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
-	if (plugin)
-	{
-		FNotifications = qobject_cast<INotifications *>(plugin->instance());
-	}
-
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -157,15 +150,6 @@ bool ChatStates::initObjects()
 	if (FSessionNegotiation && FDataForms)
 	{
 		FSessionNegotiation->insertNegotiator(this,SNO_DEFAULT);
-	}
-	if (FNotifications)
-	{
-		INotificationType notifyType;
-		notifyType.order = NTO_CHATSTATE_NOTIFY;
-		notifyType.title = tr("When contact is typing the message for you");
-		notifyType.kindMask = INotification::TabPageNotify;
-		notifyType.kindDefs = notifyType.kindMask;
-		FNotifications->registerNotificationType(NID_CHATSTATE_TYPING,notifyType);
 	}
 	return true;
 }
@@ -218,7 +202,7 @@ int ChatStates::sessionInit(const IStanzaSession &ASession, IDataForm &ARequest)
 	chatstates.type = DATAFIELD_TYPE_LISTSINGLE;
 	chatstates.required = false;
 
-	bool enabled = isEnabled(Jid::null,ASession.contactJid);
+	bool enabled = isEnabled(Jid(),ASession.contactJid);
 	if (enabled)
 	{
 		IDataOption maysend;
@@ -269,7 +253,7 @@ int ChatStates::sessionAccept(const IStanzaSession &ASession, const IDataForm &A
 				options.append(ARequest.fields.at(index).options.at(i).value);
 
 			int status = permitStatus(ASession.contactJid);
-			bool enabled = isEnabled(Jid::null,ASession.contactJid);
+			bool enabled = isEnabled(Jid(),ASession.contactJid);
 			if ((!enabled && !options.contains(SFV_MUSTNOT_SEND)) || (status==IChatStates::StatusEnable && !options.contains(SFV_MAY_SEND)))
 			{
 				ASubmit.pages[0].fieldrefs.append(NS_CHATSTATES);
@@ -282,7 +266,7 @@ int ChatStates::sessionAccept(const IStanzaSession &ASession, const IDataForm &A
 		{
 			QString value = ARequest.fields.at(index).value.toString();
 			int status = permitStatus(ASession.contactJid);
-			bool enabled = isEnabled(Jid::null,ASession.contactJid);
+			bool enabled = isEnabled(Jid(),ASession.contactJid);
 			if ((!enabled && value==SFV_MAY_SEND) || (status==IChatStates::StatusEnable && value==SFV_MUSTNOT_SEND))
 			{
 				ASubmit.pages[0].fieldrefs.append(NS_CHATSTATES);
@@ -397,7 +381,7 @@ void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
 {
 	if (permitStatus(AContactJid) != AStatus)
 	{
-		bool oldEnabled = isEnabled(Jid::null,AContactJid);
+		bool oldEnabled = isEnabled(Jid(),AContactJid);
 
 		Jid bareJid = AContactJid.bare();
 		if (AStatus==IChatStates::StatusDisable)
@@ -413,7 +397,7 @@ void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
 			FPermitStatus.remove(bareJid);
 		}
 
-		if (!oldEnabled && isEnabled(Jid::null,AContactJid))
+		if (!oldEnabled && isEnabled(Jid(),AContactJid))
 			resetSupported(AContactJid);
 
 		emit permitStatusChanged(bareJid,AStatus);
@@ -523,7 +507,6 @@ void ChatStates::setUserState(const Jid &AStreamJid, const Jid &AContactJid, int
 		{
 			params.userState = AState;
 			emit userChatStateChanged(AStreamJid,AContactJid,AState);
-			notifyUserState(AStreamJid,AContactJid);
 		}
 	}
 }
@@ -540,40 +523,6 @@ void ChatStates::setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int
 			if (ASend)
 				sendStateMessage(AStreamJid,AContactJid,AState);
 			emit selfChatStateChanged(AStreamJid,AContactJid,AState);
-		}
-	}
-}
-
-void ChatStates::notifyUserState(const Jid &AStreamJid, const Jid &AContactJid)
-{
-	if (FNotifications)
-	{
-		ChatParams &params = FChatParams[AStreamJid][AContactJid];
-		if (params.userState==IChatStates::StateComposing && params.notifyId<=0)
-		{
-			IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
-			if (window)
-			{
-				INotification notify;
-				notify.kinds = FNotifications->notificationKinds(NID_CHATSTATE_TYPING);
-				if (notify.kinds > 0)
-				{
-					notify.typeId = NID_CHATSTATE_TYPING;
-					notify.data.insert(NDR_STREAM_JID, AStreamJid.full());
-					notify.data.insert(NDR_CONTACT_JID, AContactJid.full());
-					notify.data.insert(NDR_ICON, IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATSTATES_COMPOSING));
-					notify.data.insert(NDR_TOOLTIP,tr("Typing a message..."));
-					notify.data.insert(NDR_TABPAGE_WIDGET,(qint64)window->instance());
-					notify.data.insert(NDR_TABPAGE_PRIORITY,TPNP_CHATSTATE_TYPING);
-					notify.data.insert(NDR_TABPAGE_ICONBLINK,false);
-					params.notifyId = FNotifications->appendNotification(notify);
-				}
-			}
-		}
-		else if (params.userState!=IChatStates::StateComposing && params.notifyId>0)
-		{
-			FNotifications->removeNotification(params.notifyId);
-			params.notifyId = 0;
 		}
 	}
 }
@@ -668,9 +617,9 @@ void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 	widget->setPopupMode(QToolButton::InstantPopup);
 
 	FChatByEditor.insert(AWindow->editWidget()->textEdit(),AWindow);
-	connect(AWindow->instance(),SIGNAL(tabPageActivated()),SLOT(onChatWindowActivated()));
-	connect(AWindow->instance(),SIGNAL(tabPageClosed()),SLOT(onChatWindowClosed()));
+	connect(AWindow->instance(),SIGNAL(windowActivated()),SLOT(onChatWindowActivated()));
 	connect(AWindow->editWidget()->textEdit(),SIGNAL(textChanged()),SLOT(onChatWindowTextChanged()));
+	connect(AWindow->instance(),SIGNAL(windowClosed()),SLOT(onChatWindowClosed()));
 }
 
 void ChatStates::onChatWindowActivated()
@@ -723,7 +672,7 @@ void ChatStates::onUpdateSelfStates()
 		{
 			ChatParams &params = FChatParams[window->streamJid()][window->contactJid()];
 			uint timePassed = QDateTime::currentDateTime().toTime_t() - params.selfLastActive;
-			if (params.selfState==IChatStates::StateActive && window->isActiveTabPage())
+			if (params.selfState==IChatStates::StateActive && window->isActive())
 			{
 				setSelfState(window->streamJid(),window->contactJid(),IChatStates::StateActive);
 			}

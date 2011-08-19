@@ -87,10 +87,8 @@ bool ConnectionManager::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_CONNECTION_ENCRYPTED;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
-		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
+		QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
+		FEncryptedLabelId = FRostersViewPlugin->rostersView()->createIndexLabel(RLO_CONNECTION_ENCRYPTED,icon);
 	}
 	return true;
 }
@@ -289,7 +287,7 @@ void ConnectionManager::onStreamOpened(IXmppStream *AXmppStream)
 		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
 		IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->streamJid()) : NULL;
 		if (index!=NULL)
-			FRostersViewPlugin->rostersView()->insertLabel(FEncryptedLabelId,index);
+			FRostersViewPlugin->rostersView()->insertIndexLabel(FEncryptedLabelId,index);
 	}
 }
 
@@ -300,7 +298,7 @@ void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
 		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
 		IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->streamJid()) : NULL;
 		if (index!=NULL)
-			FRostersViewPlugin->rostersView()->removeLabel(FEncryptedLabelId,index);
+			FRostersViewPlugin->rostersView()->removeIndexLabel(FEncryptedLabelId,index);
 	}
 }
 

@@ -27,14 +27,6 @@
         <source>Send chat state notifications</source>
         <translation></translation>
     </message>
-    <message>
-        <source>When contact is typing the message for you</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Typing a message...</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>StateWidget</name>

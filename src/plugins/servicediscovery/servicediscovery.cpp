@@ -248,7 +248,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			Stanza reply = AStanza.replyError(ditems.error.condition,EHN_DEFAULT,ditems.error.code,ditems.error.message);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
 		}
-		else
+		else if (!ditems.items.isEmpty())
 		{
 			AAccept = true;
 			Stanza reply("iq");
@@ -284,17 +284,6 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 
 			EntityCapabilities oldCaps = FEntityCaps.value(AStreamJid).value(contactJid);
 			bool capsChanged = !capsElem.isNull() && (oldCaps.ver!=newCaps.ver || oldCaps.node!=newCaps.node);
-
-			// Some gates can send back presence from your or another connection with EntityCaps!!!
-			// So we should ignore entity caps from all agents
-			if (!capsElem.isNull() && contactJid.node().isEmpty())
-			{
-				newCaps.node.clear();
-				newCaps.ver.clear();
-				newCaps.hash.clear();
-				capsChanged = true;
-			}
-
 			if (capsElem.isNull() || capsChanged)
 			{
 				if (hasEntityCaps(newCaps))
@@ -421,7 +410,7 @@ bool ServiceDiscovery::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	if (AIndex->type()==RIT_AGENT && FSelfCaps.contains(streamJid))
 	{
-		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
+		showDiscoItems(streamJid,AIndex->data(RDR_JID).toString(),QString::null);
 	}
 	return false;
 }
@@ -501,9 +490,9 @@ QIcon ServiceDiscovery::identityIcon(const QList<IDiscoIdentity> &AIdentity) con
 	IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
 	for (int i=0; icon.isNull() && i<AIdentity.count(); i++)
 	{
-		icon = storage->getIcon(AIdentity.at(i).category +"/"+ AIdentity.at(i).type);
+		icon = storage->getIcon(AIdentity.at(i).category.toLower() +"/"+ AIdentity.at(i).type.toLower());
 		if (icon.isNull())
-			icon = storage->getIcon(AIdentity.at(i).category);
+			icon = storage->getIcon(AIdentity.at(i).category.toLower());
 	}
 	if (icon.isNull())
 		icon = storage->getIcon(SRI_SERVICE);
@@ -757,8 +746,8 @@ void ServiceDiscovery::discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &A
 	while (!elem.isNull())
 	{
 		IDiscoIdentity identity;
-		identity.category = elem.attribute("category").toLower();
-		identity.type = elem.attribute("type").toLower();
+		identity.category = elem.attribute("category");
+		identity.type = elem.attribute("type");
 		identity.lang = elem.attribute("lang");
 		identity.name = elem.attribute("name");
 		AInfo.identity.append(identity);
@@ -769,7 +758,7 @@ void ServiceDiscovery::discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &A
 	elem = AElem.firstChildElement("feature");
 	while (!elem.isNull())
 	{
-		QString feature = elem.attribute("var").toLower();
+		QString feature = elem.attribute("var");
 		if (!feature.isEmpty() && !AInfo.features.contains(feature))
 			AInfo.features.append(feature);
 		elem = elem.nextSiblingElement("feature");
@@ -1323,7 +1312,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMen
 	if (itype == RIT_STREAM_ROOT || itype == RIT_CONTACT || itype == RIT_AGENT || itype == RIT_MY_RESOURCE)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = itype == RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
+		Jid contactJid = itype == RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
 
 		if (FSelfCaps.contains(streamJid))
 		{
@@ -1351,7 +1340,7 @@ void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId,
 	if (ALabelId == RLID_DISPLAY)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
+		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_JID).toString()).domain() : AIndex->data(RDR_JID).toString();
 		if (hasDiscoInfo(streamJid,contactJid))
 		{
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);

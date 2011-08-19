@@ -59,4 +59,3 @@ SUBDIRS += xmppuriqueries
 SUBDIRS += remotecontrol
 SUBDIRS += pepmanager
 SUBDIRS += shortcutmanager 
-SUBDIRS += birthdayreminder 

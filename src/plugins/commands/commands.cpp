@@ -41,9 +41,8 @@ void Commands::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool Commands::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
 	if (plugin)
 	{
@@ -95,19 +94,19 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 bool Commands::initObjects()
 {
 	ErrorHandler::addErrorItem("malformed-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Can not understand the specified action"),NS_COMMANDS);
+	                           tr("Can not understand the specified action"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("bad-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Can not accept the specified action"),NS_COMMANDS);
+	                           tr("Can not accept the specified action"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("bad-locale",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Can not accept the specified language/locale"),NS_COMMANDS);
+	                           tr("Can not accept the specified language/locale"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("bad-payload",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("The data form did not provide one or more required fields"),NS_COMMANDS);
+	                           tr("The data form did not provide one or more required fields"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("bad-sessionid",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Specified session not present"),NS_COMMANDS);
+	                           tr("Specified session not present"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("session-expired",ErrorHandler::CANCEL,ErrorHandler::NOT_ALLOWED,
-		tr("Specified session is no longer active"),NS_COMMANDS);
+	                           tr("Specified session is no longer active"),NS_COMMANDS);
 	ErrorHandler::addErrorItem("forbidden", ErrorHandler::AUTH, ErrorHandler::FORBIDDEN,
-		tr("Forbidden"));
+	                           tr("Forbidden"));
 
 	if (FDiscovery)
 	{
@@ -545,7 +544,9 @@ void Commands::onStreamOpened(IXmppStream *AXmppStream)
 void Commands::onStreamClosed(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
+	{
 		FStanzaProcessor->removeStanzaHandle(FSHICommands.take(AXmppStream->streamJid()));
+	}
 	FCommands.remove(AXmppStream->streamJid());
 	FOnlineAgents.remove(AXmppStream->streamJid());
 }

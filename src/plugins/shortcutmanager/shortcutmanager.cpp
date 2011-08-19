@@ -107,30 +107,20 @@ void ShortcutManager::hideAllWidgets()
 		if (FNotifications)
 		{
 			FNotifyHidden = 0;
-			if (Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::PopupWindow)).value().toBool())
+			if (Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).value().toBool())
 			{
 				FNotifyHidden |= INotification::PopupWindow;
-				Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::PopupWindow)).setValue(false);
+				Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(false);
 			}
-			if (Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::SoundPlay)).value().toBool())
+			if (Options::node(OPV_NOTIFICATIONS_SOUND).value().toBool())
 			{
-				FNotifyHidden |= INotification::SoundPlay;
-				Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::SoundPlay)).setValue(false);
+				FNotifyHidden |= INotification::PlaySound;
+				Options::node(OPV_NOTIFICATIONS_SOUND).setValue(false);
 			}
-			if (Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AlertWidget)).value().toBool())
-			{
-				FNotifyHidden |= INotification::AlertWidget;
-				Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AlertWidget)).setValue(false);
-			}
-			if (Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::ShowMinimized)).value().toBool())
-			{
-				FNotifyHidden |= INotification::ShowMinimized;
-				Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::ShowMinimized)).setValue(false);
-			}
-			if (Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AutoActivate)).value().toBool())
+			if (Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).value().toBool())
 			{
 				FNotifyHidden |= INotification::AutoActivate;
-				Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AutoActivate)).setValue(false);
+				Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(false);
 			}
 		}
 		FAllHidden = true;
@@ -169,23 +159,15 @@ void ShortcutManager::showHiddenWidgets(bool ACheckPassword)
 			{
 				if (FNotifyHidden & INotification::PopupWindow)
 				{
-					Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::PopupWindow)).setValue(true);
+					Options::node(OPV_NOTIFICATIONS_POPUPWINDOW).setValue(true);
 				}
-				if (FNotifyHidden & INotification::SoundPlay)
+				if (FNotifyHidden & INotification::PlaySound)
 				{
-					Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::SoundPlay)).setValue(true);
-				}
-				if (FNotifyHidden & INotification::AlertWidget)
-				{
-					Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AlertWidget)).setValue(true);
-				}
-				if (FNotifyHidden & INotification::ShowMinimized)
-				{
-					Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::ShowMinimized)).setValue(true);
+					Options::node(OPV_NOTIFICATIONS_SOUND).setValue(true);
 				}
 				if (FNotifyHidden & INotification::AutoActivate)
 				{
-					Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AutoActivate)).setValue(true);
+					Options::node(OPV_NOTIFICATIONS_AUTOACTIVATE).setValue(true);
 				}
 				FNotifyHidden = 0;
 			}

@@ -18,8 +18,7 @@ HEADERS  = utilsexport.h \
            widgetmanager.h \
            options.h \
            shortcuts.h \
-           systemmanager.h \
-           textmanager.h
+           systemmanager.h
           
 
 SOURCES  = jid.cpp \
@@ -41,5 +40,4 @@ SOURCES  = jid.cpp \
            widgetmanager.cpp \
            options.cpp \
            shortcuts.cpp \
-           systemmanager.cpp \
-           textmanager.cpp
+           systemmanager.cpp

@@ -11,7 +11,6 @@
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/resources.h>
@@ -95,11 +94,9 @@ protected:
 	void insertToolBarAction(IToolBarWidget *AWidget);
 	void removeToolBarAction(IToolBarWidget *AWidget);
 	QList<IToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
-	StreamDialog *getStreamDialog(IFileStream *ASession);
+	StreamDialog *createStreamDialog(IFileStream *ASession);
 	IFileStream *createStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind);
 	QString dirNameByUserName(const QString &AUserName) const;
-protected:
-	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamStateChanged();
 	void onStreamDestroyed();

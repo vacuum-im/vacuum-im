@@ -107,8 +107,8 @@ public:
 	virtual IMessageStyleOptions styleOptions(const OptionsNode &ANode, int AMessageType) const =0;
 	virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;
 	virtual QString userAvatar(const Jid &AContactJid) const =0;
-	virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const =0;
-	virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const =0;
+	virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const =0;
+	virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid()) const =0;
 	virtual QString userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const =0;
 	virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const =0;
 protected:
@@ -117,6 +117,6 @@ protected:
 
 Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.0")
 Q_DECLARE_INTERFACE(IMessageStylePlugin,"Vacuum.Plugin.IMessageStylePlugin/1.0")
-Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.1")
+Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.0")
 
 #endif

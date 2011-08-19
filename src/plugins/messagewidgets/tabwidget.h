@@ -11,13 +11,10 @@ public:
 	TabWidget(QWidget *AParent = NULL);
 	~TabWidget();
 signals:
-	void tabMoved(int AFrom, int ATo);
-	void tabMenuRequested(int AIndex);
+	void tabMoved(int from, int to);
 protected:
 	void mousePressEvent(QMouseEvent *AEvent);
 	void mouseReleaseEvent(QMouseEvent *AEvent);
-protected slots:
-	void onTabBarContextMenuRequested(const QPoint &APos);
 private:
 	int FPressedTabIndex;
 };

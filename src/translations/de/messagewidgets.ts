@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de" sourcelanguage="en">
 <context>
-    <name>ChatWindow</name>
-    <message>
-        <source>Quote selected text</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>EditWidgetClass</name>
     <message>
         <source>Send</source>
@@ -180,35 +173,6 @@
         <source>Esc</source>
         <comment>Close message window</comment>
         <translation></translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send mail</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open link</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Copy address</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Search on Google &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close other tabs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+W</source>
-        <comment>Close other tabs</comment>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -397,16 +361,13 @@
         <translation></translation>
     </message>
     <message>
-        <source>Remove all tabs on window close</source>
+        <source>%1) %2</source>
+        <comment>First is tab index, second is tab name</comment>
         <translation></translation>
     </message>
     <message>
-        <source>%1) %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close Other Tabs</source>
-        <translation type="unfinished"></translation>
+        <source>Remove all tabs on window close</source>
+        <translation></translation>
     </message>
 </context>
 <context>

@@ -14,7 +14,7 @@ ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APlu
 
 	initialize(APluginManager);
 	createActions();
-	onEditWidgetContactJidChanged(Jid::null);
+	onEditWidgetContactJidChanged(Jid());
 }
 
 ChatWindowMenu::~ChatWindowMenu()

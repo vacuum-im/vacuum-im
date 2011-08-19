@@ -78,12 +78,9 @@ bool CaptchaForms::initObjects()
 	}
 	if (FNotifications)
 	{
-		INotificationType notifyType;
-		notifyType.order = NTO_CAPTCHA_REQUEST;
-		notifyType.title = tr("When receiving a CAPTCHA challenge");
-		notifyType.kindMask = INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
-		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
-		FNotifications->registerNotificationType(NNT_CAPTCHA_REQUEST,notifyType);
+		uchar kindMask = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound|INotification::AutoActivate;
+		uchar kindDefs = INotification::PopupWindow|INotification::TrayIcon|INotification::TrayAction|INotification::PlaySound;
+		FNotifications->registerNotificationType(NNT_CAPTCHA_REQUEST,OWO_NOTIFICATIONS_CAPTCHA_REQUEST,tr("CAPTCHA Challenges"),kindMask,kindDefs);
 	}
 	return true;
 }
@@ -104,7 +101,6 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 				item.challenger = AStanza.from();
 				item.dialog = FDataForms->dialogWidget(FDataForms->localizeForm(form), NULL);
 				item.dialog->setAllowInvalid(false);
-				item.dialog->instance()->installEventFilter(this);
 				IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(item.dialog->instance(),MNI_CAPTCHAFORMS,0,0,"windowIcon");
 				item.dialog->instance()->setWindowTitle(tr("CAPTCHA Challenge - %1").arg(FDataForms->fieldValue("from",form.fields).toString()));
 				connect(item.dialog->instance(),SIGNAL(accepted()),SLOT(onChallengeDialogAccepted()));
@@ -279,14 +275,12 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 		if (notify.kinds > 0)
 		{
 			Jid contactJid = FDataForms->fieldValue("from", AChallenge.dialog->formWidget()->dataForm().fields).toString();
-			notify.typeId = NNT_CAPTCHA_REQUEST;
+			notify.type = NNT_CAPTCHA_REQUEST;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CAPTCHAFORMS));
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
 			notify.data.insert(NDR_POPUP_CAPTION, tr("CAPTCHA Challenge"));
 			notify.data.insert(NDR_POPUP_HTML,Qt::escape(tr("You have received the CAPTCHA challenge")));
-			notify.data.insert(NDR_ALERT_WIDGET,(qint64)AChallenge.dialog->instance());
-			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)AChallenge.dialog->instance());
 			FChallengeNotify.insert(FNotifications->appendNotification(notify),FDataForms->fieldValue("challenge", AChallenge.dialog->formWidget()->dataForm().fields).toString());
 			return;
 		}
@@ -319,19 +313,6 @@ QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJi
 		}
 	}
 	return QString::null;
-}
-
-bool CaptchaForms::eventFilter(QObject *AObject, QEvent *AEvent)
-{
-	if (AEvent->type() == QEvent::WindowActivate)
-	{
-		if (FNotifications)
-		{
-         QString cid = findChallenge(qobject_cast<IDataDialogWidget *>(AObject));
-			FNotifications->removeNotification(FChallengeNotify.key(cid));
-		}
-	}
-	return QObject::eventFilter(AObject,AEvent);
 }
 
 void CaptchaForms::onStreamOpened(IXmppStream *AXmppStream)
@@ -395,7 +376,7 @@ void CaptchaForms::onNotificationActivated(int ANotifyId)
 	QString cid = FChallengeNotify.value(ANotifyId);
 	if (FChallenges.contains(cid))
 	{
-		WidgetManager::showActivateRaiseWindow(FChallenges.value(cid).dialog->instance());
+		FChallenges.value(cid).dialog->instance()->show();
 		FNotifications->removeNotification(ANotifyId);
 	}
 }

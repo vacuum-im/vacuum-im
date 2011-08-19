@@ -1,7 +1,6 @@
 #ifndef TABWINDOW_H
 #define TABWINDOW_H
 
-#include <QTimer>
 #include <QMainWindow>
 #include <QPushButton>
 #include <definitions/optionvalues.h>
@@ -11,13 +10,12 @@
 #include <definitions/shortcuts.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
-#include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
 #include "ui_tabwindow.h"
 
 class TabWindow :
-	public QMainWindow,
-	public ITabWindow
+			public QMainWindow,
+			public ITabWindow
 {
 	Q_OBJECT;
 	Q_INTERFACES(ITabWindow);
@@ -26,24 +24,21 @@ public:
 	~TabWindow();
 	virtual QMainWindow *instance() { return this; }
 	virtual void showWindow();
-	virtual void showMinimizedWindow();
 	virtual QUuid windowId() const;
 	virtual QString windowName() const;
 	virtual Menu *windowMenu() const;
-	virtual int tabPageCount() const;
-	virtual ITabPage *tabPage(int AIndex) const;
-	virtual void addTabPage(ITabPage *APage);
-	virtual bool hasTabPage(ITabPage *APage) const;
-	virtual ITabPage *currentTabPage() const;
-	virtual void setCurrentTabPage(ITabPage *APage);
-	virtual void detachTabPage(ITabPage *APage);
-	virtual void removeTabPage(ITabPage *APage);
+	virtual void addPage(ITabWindowPage *APage);
+	virtual bool hasPage(ITabWindowPage *APage) const;
+	virtual ITabWindowPage *currentPage() const;
+	virtual void setCurrentPage(ITabWindowPage *APage);
+	virtual void detachPage(ITabWindowPage *APage);
+	virtual void removePage(ITabWindowPage *APage);
+	virtual void clear();
 signals:
-	void currentTabPageChanged(ITabPage *APage);
-	void tabPageMenuRequested(ITabPage *APage, Menu *AMenu);
-	void tabPageAdded(ITabPage *APage);
-	void tabPageRemoved(ITabPage *APage);
-	void tabPageDetached(ITabPage *APage);
+	void pageAdded(ITabWindowPage *APage);
+	void currentPageChanged(ITabWindowPage *APage);
+	void pageRemoved(ITabWindowPage *APage);
+	void pageDetached(ITabWindowPage *APage);
 	void windowChanged();
 	void windowDestroyed();
 protected:
@@ -51,35 +46,33 @@ protected:
 	void saveWindowStateAndGeometry();
 	void loadWindowStateAndGeometry();
 	void updateWindow();
-	void clearTabs();
 	void updateTab(int AIndex);
 	void updateTabs(int AFrom, int ATo);
 protected slots:
 	void onTabMoved(int AFrom, int ATo);
 	void onTabChanged(int AIndex);
 	void onTabCloseRequested(int AIndex);
-	void onTabMenuRequested(int AIndex);
 	void onTabPageShow();
-	void onTabPageShowMinimized();
 	void onTabPageClose();
 	void onTabPageChanged();
 	void onTabPageDestroyed();
-	void onTabPageNotifierChanged();
-	void onTabPageNotifierActiveNotifyChanged(int ANotifyId);
+	void onTabWindowAppended(const QUuid &AWindowId, const QString &AName);
 	void onTabWindowNameChanged(const QUuid &AWindowId, const QString &AName);
+	void onTabWindowDeleted(const QUuid &AWindowId);
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onActionTriggered(bool);
-	void onTabMenuActionTriggered(bool);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onBlinkTabNotifyTimerTimeout();
 private:
 	Ui::TabWindowClass ui;
 private:
 	IMessageWidgets *FMessageWidgets;
 private:
 	Menu *FWindowMenu;
+	Menu *FJoinMenu;
+	Action *FCloseTab;
 	Action *FNextTab;
 	Action *FPrevTab;
+	Action *FNewTab;
+	Action *FDetachWindow;
 	Action *FShowCloseButtons;
 	Action *FTabsBottom;
 	Action *FShowIndices;
@@ -89,11 +82,10 @@ private:
 	Action *FCloseWindow;
 	Action *FDeleteWindow;
 private:
+	bool FShowTabIndices;
+private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;
-private:
-	bool FBlinkVisible;
-	QTimer FBlinkTimer;
 };
 
 #endif // TABWINDOW_H

@@ -136,7 +136,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 		IMultiUserChatWindow *chatWindow = FChatPlugin->getMultiChatWindow(FStreamJid,roomJid,nick,password);
 		if (chatWindow)
 		{
-			chatWindow->showTabPage();
+			chatWindow->showWindow();
 			chatWindow->multiUserChat()->setAutoPresence(true);
 		}
 

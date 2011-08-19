@@ -7,18 +7,15 @@
 #include <definitions/messagehandlerorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterlabelorders.h>
-#include <definitions/rosternotifyorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/actiongroups.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/shortcuts.h>
-#include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
@@ -30,14 +27,13 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/widgetmanager.h>
 #include <utils/errorhandler.h>
-#include <utils/textmanager.h>
 #include <utils/shortcuts.h>
 
 class NormalMessageHandler :
-	public QObject,
-	public IPlugin,
-	public IMessageHandler,
-	public IXmppUriHandler
+			public QObject,
+			public IPlugin,
+			public IMessageHandler,
+			public IXmppUriHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler);
@@ -58,11 +54,12 @@ public:
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool showMessage(int AMessageId);
 	virtual bool receiveMessage(int AMessageId);
-	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
-	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual INotification notification(INotifications *ANotifications, const Message &AMessage);
+	virtual bool openWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType);
 protected:
 	IMessageWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	IMessageWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	void showWindow(IMessageWindow *AWindow);
 	void showNextMessage(IMessageWindow *AWindow);
 	void loadActiveMessages(IMessageWindow *AWindow);
 	void updateWindow(IMessageWindow *AWindow);

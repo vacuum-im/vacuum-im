@@ -26,11 +26,11 @@
 #define AG_RVCM_ARCHIVER                                        500
 #define AG_RVCM_DISCOVERY                                       500
 #define AG_RVCM_ROSTERSVIEW_CLIPBOARD                           500
-#define AG_RVCM_PRIVACYLISTS                                    500
-#define AG_RVCM_STATUSICONS                                     500
-#define AG_RVCM_GATEWAYS_RESOLVE                                500
-#define AG_RVCM_ACCOUNTMANAGER                                  700
 #define AG_RVCM_RCHANGER                                        700
+#define AG_RVCM_PRIVACYLISTS                                    700
+#define AG_RVCM_STATUSICONS                                     700
+#define AG_RVCM_ACCOUNTMANAGER                                  700
+#define AG_RVCM_GATEWAYS_RESOLVE                                700
 #define AG_RVCM_VCARD                                           900
 
 //TrayManager - TrayMenu
@@ -56,9 +56,6 @@
 #define AG_MWTW_MWIDGETS_TAB_ACTIONS                            500
 #define AG_MWTW_MWIDGETS_WINDOW_OPTIONS                         800
 
-//MessageWidgets - TabWindowTabMenu
-#define AG_MWTWTM_MWIDGETS_TAB_ACTIONS                          500
-
 //MultiuserChat - MultiUserContextMenu
 #define AG_MUCM_ROSTERCHANGER                                   500
 #define AG_MUCM_CLIENTINFO                                      500
@@ -78,11 +75,5 @@
 #define AG_BMM_BOOKMARKS_STREAMS                                500
 #define AG_BMM_BOOKMARKS_ITEMS                                  700
 #define AG_BBM_BOOKMARKS_TOOLS                                  900
-
-//ViewWidget - ContextMenu
-#define AG_VWCM_MESSAGEWIDGETS_URL                              300
-#define AG_VWCM_MESSAGEWIDGETS_COPY                             500
-#define AG_VWCM_MESSAGEWIDGETS_QUOTE                            500
-#define AG_VWCM_MESSAGEWIDGETS_SEARCH                           700
 
 #endif

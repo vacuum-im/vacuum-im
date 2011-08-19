@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>ChatWindow</name>
-    <message>
-        <source>Quote selected text</source>
-        <translation>Цитировать выделенный текст</translation>
-    </message>
-</context>
-<context>
     <name>EditWidgetClass</name>
     <message>
         <source>Send</source>
@@ -180,35 +173,6 @@
         <source>Esc</source>
         <comment>Close message window</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Copy</source>
-        <translation>Копировать</translation>
-    </message>
-    <message>
-        <source>Send mail</source>
-        <translation>Отправить письмо</translation>
-    </message>
-    <message>
-        <source>Open link</source>
-        <translation>Открыть ссылку</translation>
-    </message>
-    <message>
-        <source>Copy address</source>
-        <translation>Копировать адрес</translation>
-    </message>
-    <message>
-        <source>Search on Google &apos;%1&apos;</source>
-        <translation>Искать в Google &apos;%1&apos;</translation>
-    </message>
-    <message>
-        <source>Close other tabs</source>
-        <translation>Закрыть другие вкладки</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+W</source>
-        <comment>Close other tabs</comment>
-        <translation>Ctrl+Shift+W</translation>
     </message>
 </context>
 <context>
@@ -394,19 +358,16 @@
     </message>
     <message>
         <source>Close Tab Window</source>
-        <translation>Закрыть окно со вкладками</translation>
+        <translation>Закрыть окно</translation>
+    </message>
+    <message>
+        <source>%1) %2</source>
+        <comment>First is tab index, second is tab name</comment>
+        <translation>%1) %2</translation>
     </message>
     <message>
         <source>Remove all tabs on window close</source>
         <translation>Закрывать все вкладки при закрытии окна</translation>
-    </message>
-    <message>
-        <source>%1) %2</source>
-        <translation>%1) %2</translation>
-    </message>
-    <message>
-        <source>Close Other Tabs</source>
-        <translation>Закрыть другие вкладки</translation>
     </message>
 </context>
 <context>

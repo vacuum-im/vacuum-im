@@ -33,9 +33,6 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
 CommandDialog::~CommandDialog()
 {
 	FCommands->removeClient(this);
-	delete FPrevButton;
-	delete FNextButton;
-	delete FCompleteButton;
 }
 
 bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
@@ -49,7 +46,7 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
 
 		if (!AResult.form.type.isEmpty())
 		{
-			IDataForm form = FDataForms->localizeForm(AResult.form);
+			IDataForm form = FDataForms!=NULL ? FDataForms->localizeForm(AResult.form) : AResult.form;
 			FCurrentForm = FDataForms->formWidget(form,ui.wdtForm);
 			if (!form.title.isEmpty())
 				setWindowTitle(form.title);
