@@ -1,6 +1,10 @@
 #include "unzipfile.h"
 
-#include <thirdparty/minizip/unzip.h>
+#ifdef USE_SYSTEM_MINIZIP
+#	include <minizip/unzip.h>
+#else
+#	include <thirdparty/minizip/unzip.h>
+#endif
 
 struct UnzipFileData::ZippedFile {
 	QString name;

@@ -25,7 +25,6 @@ private:
 	QDomElement FRootElem;
 	QDomElement FCurrentElem;
 	QXmlStreamReader FReader;
-	QStack<QString> FLevelNS;
 };
 
 #endif // STREAMPARSER_H

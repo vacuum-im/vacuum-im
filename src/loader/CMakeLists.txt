@@ -9,6 +9,7 @@ project(loader CXX)
 
 include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
 set(QT_USE_QTXML YES)
+set(QT_USE_QTMAIN YES)
 include(${QT_USE_FILE})
 
 set(VER_STRING "" CACHE STRING "This string will be appended to program version (defaults to SVN revision number)")
@@ -47,12 +48,12 @@ target_link_libraries(${TARGET_LOADER} ${TARGET_UTILS} ${QT_LIBRARIES})
 install(TARGETS ${TARGET_LOADER}
 	RUNTIME	DESTINATION "${INSTALL_BINS}"
 	COMPONENT ${TARGET_LOADER})
-if (UNIX AND NOT APPLE)
+if (UNIX AND NOT APPLE AND NOT HAIKU)
 	install(FILES "${CMAKE_SOURCE_DIR}/resources/menuicons/shared/vacuum.png"
 		DESTINATION "${INSTALL_RES_DIR}/pixmaps")
 	install(FILES "${CMAKE_SOURCE_DIR}/src/packages/linux/vacuum.desktop"
 		DESTINATION "${INSTALL_RES_DIR}/applications")
-endif (UNIX AND NOT APPLE)
+endif (UNIX AND NOT APPLE AND NOT HAIKU)
 
 cpack_add_component(${TARGET_LOADER}
 	DISPLAY_NAME "Loader"

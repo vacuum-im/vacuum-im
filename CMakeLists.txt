@@ -21,6 +21,26 @@ set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating
 add_lang_options()
 
 find_library(SYSTEM_ZLIB_FOUND z)
+find_library(SYSTEM_IDN_FOUND idn)
+find_library(SYSTEM_MINIZIP_FOUND minizip)
+find_library(SYSTEM_QTLOCKEDFILE_FOUND QtSolutions_LockedFile-2.4)
+
+if (SYSTEM_ZLIB_FOUND)
+	add_definitions(-DUSE_SYSTEM_ZLIB)
+endif (SYSTEM_ZLIB_FOUND)
+
+if (SYSTEM_IDN_FOUND)
+	add_definitions(-DUSE_SYSTEM_IDN)
+endif (SYSTEM_IDN_FOUND)
+
+if (SYSTEM_MINIZIP_FOUND)
+	add_definitions(-DUSE_SYSTEM_MINIZIP)
+endif (SYSTEM_MINIZIP_FOUND)
+
+if (SYSTEM_QTLOCKEDFILE_FOUND)
+	add_definitions(-DUSE_SYSTEM_QTLOCKEDFILE)
+endif (SYSTEM_QTLOCKEDFILE_FOUND)
+
 
 if ("${LANGS}" STREQUAL "")
 	process_lang_options()
@@ -29,7 +49,7 @@ else ("${LANGS}" STREQUAL "")
 endif ("${LANGS}" STREQUAL "")
 
 if (INSTALL_DOCS)
-	install(FILES "AUTHORS" "CHANGELOG" "README" "COPYING"
+	install(FILES "AUTHORS" "CHANGELOG" "README" "COPYING" "TRANSLATORS"
 		DESTINATION "${INSTALL_DOCUMENTS}")
 endif (INSTALL_DOCS)
 

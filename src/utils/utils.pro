@@ -7,26 +7,27 @@ VERSION            = $$VERSION_UTILS
 CONFIG            += dll
 QT                += xml
 DEFINES           += UTILS_DLL QXT_STATIC
-LIBS              += -L../libs
-LIBS              += -lidn -lminizip -lqxtglobalshortcut -lidle
-macx {
-  LIBS            += -lzlib
-  QMAKE_LFLAGS    += -framework Carbon
-  INCLUDEPATH     += ../thirdparty/zlib
-} else:unix {
-  LIBS            += -lz -lXss
-  CONFIG          += x11
-} else:win32 {
-  LIBS            += -lzlib -luser32
-  INCLUDEPATH     += ../thirdparty/zlib
-}
+
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
+
+DESTDIR            = ../libs
 win32 {
   DLLDESTDIR       = ..\\..
   QMAKE_DISTCLEAN += $${DLLDESTDIR}\\$${TARGET}.dll
 }
-DESTDIR            = ../libs
+
+LIBS              += -L../libs
+LIBS              += -lzlib -lidn -lminizip -lqxtglobalshortcut -lidle
+macx {
+  QMAKE_LFLAGS    += -framework Carbon
+} else:unix:!haiku {
+  LIBS            += -lXss
+  CONFIG          += x11
+} else:win32 {
+  LIBS            += -luser32
+}
+
 include(utils.pri)
 
 #Translation
