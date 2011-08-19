@@ -56,6 +56,9 @@
 #define AG_MWTW_MWIDGETS_TAB_ACTIONS                            500
 #define AG_MWTW_MWIDGETS_WINDOW_OPTIONS                         800
 
+//MessageWidgets - TabWindowTabMenu
+#define AG_MWTWTM_MWIDGETS_TAB_ACTIONS                          500
+
 //MultiuserChat - MultiUserContextMenu
 #define AG_MUCM_ROSTERCHANGER                                   500
 #define AG_MUCM_CLIENTINFO                                      500

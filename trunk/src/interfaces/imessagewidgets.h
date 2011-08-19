@@ -238,6 +238,7 @@ public:
 	virtual void removeTabPage(ITabPage *APage) =0;
 protected:
 	virtual void currentTabPageChanged(ITabPage *APage) =0;
+	virtual void tabPageMenuRequested(ITabPage *APage, Menu *AMenu) =0;
 	virtual void tabPageAdded(ITabPage *APage) =0;
 	virtual void tabPageRemoved(ITabPage *APage) =0;
 	virtual void tabPageDetached(ITabPage *APage) =0;
@@ -398,7 +399,7 @@ Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
 Q_DECLARE_INTERFACE(IStatusBarWidget,"Vacuum.Plugin.IStatusBarWidget/1.0")
 Q_DECLARE_INTERFACE(ITabPageNotifier,"Vacuum.Plugin.ITabPageNotifier/1.0")
 Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.3")
-Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.2")
+Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.3")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.2")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
