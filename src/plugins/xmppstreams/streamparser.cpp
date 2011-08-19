@@ -26,18 +26,15 @@ void StreamParser::parseData(const QByteArray &AData)
 		}
 		else if (FReader.isStartElement())
 		{
-			QMap<QString, QString> attributes;
+			QDomElement newElement = doc.createElementNS(FReader.namespaceUri().toString(),FReader.qualifiedName().toString());
 			foreach(QXmlStreamAttribute attribute, FReader.attributes())
-				attributes.insert(attribute.qualifiedName().toString(), attribute.value().toString());
-
-			QString nsURI = attributes.take("xmlns");
-			if (!FReader.prefix().isEmpty())
-				nsURI = attributes.take("xmlns:"+FReader.prefix().toString());
-
-			QString elemName = FReader.qualifiedName().toString();
-			QDomElement newElement = !nsURI.isEmpty() ? doc.createElementNS(nsURI,elemName) : doc.createElement(elemName);
-			for (QMap<QString, QString>::const_iterator it = attributes.constBegin(); it!=attributes.constEnd(); it++)
-				newElement.setAttribute(it.key(),it.value());
+			{
+				QString attrNs = attribute.namespaceUri().toString();
+				if (!attrNs.isEmpty())
+					newElement.setAttributeNS(attrNs,attribute.qualifiedName().toString(),attribute.value().toString());
+				else
+					newElement.setAttribute(attribute.qualifiedName().toString(),attribute.value().toString());
+			}
 
 			FLevel++;
 			if (FLevel == 1)
@@ -81,5 +78,5 @@ void StreamParser::parseData(const QByteArray &AData)
 void StreamParser::restart()
 {
 	FReader.clear();
-	FReader.setNamespaceProcessing(false);
+	FReader.setNamespaceProcessing(true);
 }
