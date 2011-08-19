@@ -583,8 +583,10 @@ void MessageWidgets::onViewContextCopyActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
+		QString html = action->data(ADR_CONTEXT_DATA).toString();
 		QMimeData *data = new QMimeData;
-		data->setHtml(action->data(ADR_CONTEXT_DATA).toString());
+		data->setHtml(html);
+		data->setText(QTextDocumentFragment::fromHtml(html).toPlainText());
 		QApplication::clipboard()->setMimeData(data);
 	}
 }
