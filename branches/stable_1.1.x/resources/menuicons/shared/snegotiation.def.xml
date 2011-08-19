@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>snegotiation</key>
+    <object mime="image/png">snegotiation.png</object>
+  </icon>
+  <icon>
+    <key>snegotiationInit</key>
+    <object mime="image/png">snegotiationinit.png</object>
+  </icon>
+  <icon>
+    <key>snegotiationTerminate</key>
+    <object mime="image/png">snegotiationterminate.png</object>
+  </icon>
+</icondef>

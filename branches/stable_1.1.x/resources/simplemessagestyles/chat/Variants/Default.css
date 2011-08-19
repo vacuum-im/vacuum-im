@@ -1,0 +1,56 @@
+.xxxwrapper 
+{
+  border-style		:none;
+  font-size		:medium;
+  margin-top		:5px;
+}
+
+.xxxmessage
+{
+  white-space		:pre-wrap;
+  padding-left		:10px;
+}
+
+.xxxsender
+{
+  white-space		:nowrap;
+  font-weight		:bold;
+}
+
+.xxxtime 
+{
+  white-space		:nowrap;
+  font-size             :small;
+  color			:gray;
+}
+
+.xxxtopic
+{
+  padding-left		:15px;
+  padding-right		:15px;
+}
+
+.consecutive
+{
+  margin-top		:0px;
+}
+
+.status .xxxmessage
+{
+  color			:darkgreen;
+}
+
+.notification .xxxmessage
+{
+  color			:darkblue;
+}
+
+.event .xxxmessage
+{
+  color			:darkred;
+}
+
+.mention .xxxmessage
+{
+  background-color	:mistyrose;
+}
