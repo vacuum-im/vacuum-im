@@ -4,7 +4,7 @@
 ;--------------------------------
 
 ; Program Version
-!define PROGRAM_VERSION     "1.1.0"
+!define PROGRAM_VERSION     "1.1.1"
 
 ; Install Folder
 !define PROGRAM_FOLDER      "Vacuum-IM"
@@ -77,6 +77,7 @@ Section "VacuumIM (required)"
   ; Visual Studio redistribute files
   File "${PROGRAM_BIN_FOLDER}\msvcr90.dll"
   File "${PROGRAM_BIN_FOLDER}\msvcp90.dll"
+  File "${PROGRAM_BIN_FOLDER}\msvcm90.dll"
   File "${PROGRAM_BIN_FOLDER}\Microsoft.VC90.CRT.manifest"
 	
   ; MinGW redistribute files
