@@ -1,7 +1,7 @@
 <project>
     <shortName>vacuum</shortName>
     <fullName>Vacuum-IM</fullName>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
     <installerFilename>${product_shortname}_${product_version}_${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <readmeFile>../../../README</readmeFile>
     <licenseFile>../../../COPYING</licenseFile>
@@ -86,6 +86,9 @@
                         </distributionFile>
                         <distributionFile>
                             <origin>../../../msvcp90.dll</origin>
+                        </distributionFile>
+                        <distributionFile>
+                            <origin>../../../msvcm90.dll</origin>
                         </distributionFile>
                         <distributionFile>
                             <origin>../../../Microsoft.VC90.CRT.manifest</origin>
