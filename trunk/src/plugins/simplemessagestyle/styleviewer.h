@@ -10,6 +10,8 @@ class StyleViewer :
 public:
 	StyleViewer(QWidget *AParent);
 	~StyleViewer();
+protected:
+   void mouseReleaseEvent(QMouseEvent *AEvent);
 };
 
 #endif // STYLEVIEWER_H
