@@ -1,9 +1,14 @@
 #include "rostersearch.h"
 
+#include <QKeyEvent>
+
 RosterSearch::RosterSearch()
 {
 	FRostersViewPlugin = NULL;
 	FMainWindow = NULL;
+
+	FSearchStarted = false;
+	FLastShowOffline = false;
 
 	FSearchEdit = NULL;
 	FFieldsMenu = NULL;
@@ -57,8 +62,9 @@ void RosterSearch::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(MAINWINDOW_UUID);
 }
 
-bool RosterSearch::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool RosterSearch::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
@@ -89,6 +95,12 @@ bool RosterSearch::initObjects()
 		FMainWindow->instance()->insertToolBarBreak(FSearchToolBarChanger->toolBar());
 	}
 
+	if (FRostersViewPlugin)
+	{
+		FRostersViewPlugin->rostersView()->insertClickHooker(RCHO_ROSTERSEARCH,this);
+		FRostersViewPlugin->rostersView()->insertKeyHooker(RKHO_ROSTERSEARCH,this);
+	}
+
 	insertSearchField(RDR_NAME,tr("Name"));
 	insertSearchField(RDR_STATUS,tr("Status"));
 	insertSearchField(RDR_FULL_JID,tr("Jabber ID"));
@@ -104,18 +116,94 @@ bool RosterSearch::initSettings()
 	return true;
 }
 
+bool RosterSearch::rosterIndexClicked(int AOrder, IRosterIndex *AIndex)
+{
+	Q_UNUSED(AIndex);
+	if (AOrder == RCHO_ROSTERSEARCH)
+	{
+		if (!searchPattern().isEmpty())
+		{
+			setSearchPattern(QString::null);
+			startSearch();
+		}
+	}
+	return false;
+}
+
+bool RosterSearch::rosterKeyPressed(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent)
+{
+	Q_UNUSED(AIndex);
+	if (AOrder == RKHO_ROSTERSEARCH)
+	{
+		if ((AEvent->modifiers() & ~Qt::ShiftModifier)==0)
+		{
+			QChar key = !AEvent->text().isEmpty() ? AEvent->text().at(0) : QChar();
+			if (key.isLetterOrNumber() || key.isPunct())
+				return true;
+		}
+	}
+	return false;
+}
+
+bool RosterSearch::rosterKeyReleased(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent)
+{
+	Q_UNUSED(AIndex);
+	if (AOrder == RKHO_ROSTERSEARCH)
+	{
+		if ((AEvent->modifiers() & ~Qt::ShiftModifier)==0)
+		{
+			QChar key = !AEvent->text().isEmpty() ? AEvent->text().at(0) : QChar();
+			if (key.isLetterOrNumber() || key.isPunct())
+			{
+				if (!isSearchEnabled())
+				{
+					setSearchEnabled(true);
+					FSearchEdit->setText(AEvent->text().trimmed());
+				}
+				else
+				{
+					FSearchEdit->setText(FSearchEdit->text()+AEvent->text().trimmed());
+				}
+				FSearchEdit->setFocus();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 void RosterSearch::startSearch()
 {
-	setFilterRegExp(FSearchEdit->text());
+	setFilterRegExp(searchPattern());
 	invalidate();
 	if (FRostersViewPlugin)
-		FRostersViewPlugin->restoreExpandState();
+	{
+		if (!searchPattern().isEmpty())
+		{
+			if (!FSearchStarted)
+			{
+				FLastShowOffline = Options::node(OPV_ROSTER_SHOWOFFLINE).value().toBool();
+				Options::node(OPV_ROSTER_SHOWOFFLINE).setValue(true);
+				FRostersViewPlugin->rostersView()->instance()->expandAll();
+			}
+			FSearchStarted = true;
+		}
+		else
+		{
+			if (FSearchStarted)
+			{
+				FRostersViewPlugin->startRestoreExpandState();
+				Options::node(OPV_ROSTER_SHOWOFFLINE).setValue(FLastShowOffline);
+			}
+			FSearchStarted = false;
+		}
+	}
 	emit searchResultUpdated();
 }
 
 QString RosterSearch::searchPattern() const
 {
-	return filterRegExp().pattern();
+	return FSearchEdit->text();
 }
 
 void RosterSearch::setSearchPattern(const QString &APattern)
@@ -205,29 +293,29 @@ bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 		case RIT_CONTACT:
 		case RIT_AGENT:
 		case RIT_MY_RESOURCE:
-		{
-			bool accept = true;
-			foreach(int dataField, FFieldActions.keys())
 			{
-				if (isSearchFieldEnabled(dataField))
+				bool accept = true;
+				foreach(int dataField, FFieldActions.keys())
 				{
-					accept = false;
-					if (filterRegExp().indexIn(index.data(dataField).toString())>=0)
-						return true;
+					if (isSearchFieldEnabled(dataField))
+					{
+						accept = false;
+						if (filterRegExp().indexIn(index.data(dataField).toString())>=0)
+							return true;
+					}
 				}
+				return accept;
 			}
-			return accept;
-		}
 		case RIT_GROUP:
 		case RIT_GROUP_AGENTS:
 		case RIT_GROUP_BLANK:
 		case RIT_GROUP_NOT_IN_ROSTER:
-		{
-			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-				if (filterAcceptsRow(childRow,index))
-					return true;
-			return false;
-		}
+			{
+				for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+					if (filterAcceptsRow(childRow,index))
+						return true;
+				return false;
+			}
 		}
 	}
 	return true;

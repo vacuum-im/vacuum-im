@@ -8,6 +8,8 @@
 #include <definitions/toolbargroups.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterproxyorders.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/rosterkeyhookerorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
@@ -22,10 +24,12 @@
 class RosterSearch :
 			public QSortFilterProxyModel,
 			public IPlugin,
-			public IRosterSearch
+			public IRosterSearch,
+			public IRostersClickHooker,
+			public IRostersKeyHooker
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRosterSearch);
+	Q_INTERFACES(IPlugin IRosterSearch IRostersClickHooker IRostersKeyHooker);
 public:
 	RosterSearch();
 	~RosterSearch();
@@ -37,6 +41,11 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
+	//IRostersClickHooker
+	virtual bool rosterIndexClicked(int AOrder, IRosterIndex *AIndex);
+	//IRostersKeyHooker
+	virtual bool rosterKeyPressed(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent);
+	virtual bool rosterKeyReleased(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent);
 	//IRosterSearch
 	virtual void startSearch();
 	virtual QString searchPattern() const;
@@ -68,6 +77,8 @@ private:
 	IMainWindow *FMainWindow;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
+	bool FSearchStarted;
+	bool FLastShowOffline;
 	Menu *FFieldsMenu;
 	QTimer FEditTimeout;
 	Action *FEnableAction;
