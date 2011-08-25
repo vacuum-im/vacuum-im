@@ -137,6 +137,7 @@ bool RosterChanger::initObjects()
 	if (FRostersView)
 	{
 		FRostersView->insertDragDropHandler(this);
+		FRostersView->insertEditHandler(REHO_ROSTERCHANGER_RENAME,this);
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_ADDCONTACT,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_RENAME,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFROMGROUP,FRostersView->instance());
@@ -315,6 +316,84 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 		}
 	}
 	return false;
+}
+
+bool RosterChanger::rosterEditStart(int ADataRole, const QModelIndex &AIndex) const
+{
+	int type = AIndex.data(RDR_TYPE).toInt();
+	if (ADataRole==RDR_NAME && (type==RIT_CONTACT || type==RIT_AGENT || type==RIT_GROUP))
+	{
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AIndex.data(RDR_STREAM_JID).toString()) : NULL;
+		return (roster && roster->isOpen());
+	}
+	return false;
+}
+
+QWidget *RosterChanger::rosterEditEditor(int ADataRole, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	Q_UNUSED(AOption);
+	Q_UNUSED(AIndex);
+	if (ADataRole == RDR_NAME)
+	{
+		QLineEdit *editor = new QLineEdit(AParent);
+		editor->setFrame(false);
+		return editor;
+	}
+	return NULL;
+}
+
+void RosterChanger::rosterEditLoadData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const
+{
+	if (ADataRole == RDR_NAME)
+	{
+		QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
+		if (editor)
+			editor->setText(AIndex.data(RDR_NAME).toString());
+	}
+}
+
+void RosterChanger::rosterEditSaveData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const
+{
+	int type = AIndex.data(RDR_TYPE).toInt();
+	if (ADataRole==RDR_NAME && type==RIT_GROUP)
+	{
+		QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
+		QString newName = editor!=NULL ? editor->text().trimmed() : QString::null;
+		if (!newName.isEmpty() && AIndex.data(RDR_NAME).toString()!=newName)
+		{
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AIndex.data(RDR_STREAM_JID).toString()) : NULL;
+			if (roster && roster->isOpen())
+			{
+				QString fullName = AIndex.data(RDR_GROUP).toString();
+				fullName.chop(AIndex.data(RDR_NAME).toString().size());
+				fullName += newName;
+				roster->renameGroup(AIndex.data(RDR_GROUP).toString(),fullName);
+			}
+		}
+	}
+	else if (ADataRole==RDR_NAME && (type==RIT_CONTACT || type==RIT_AGENT))
+	{
+		QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
+		QString newName = editor!=NULL ? editor->text().trimmed() : QString::null;
+		if (!newName.isEmpty() && AIndex.data(RDR_NAME).toString()!=newName)
+		{
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AIndex.data(RDR_STREAM_JID).toString()) : NULL;
+			if (roster && roster->isOpen())
+				roster->renameItem(AIndex.data(RDR_PREP_BARE_JID).toString(),newName);
+		}
+	}
+}
+
+void RosterChanger::rosterEditGeometry(int ADataRole, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	if (ADataRole == RDR_NAME)
+	{
+		QRect rect = FRostersView->labelRect(RLID_DISPLAY_EDIT,AIndex);
+		if (rect.isValid())
+			AEditor->setGeometry(rect);
+		else
+			AEditor->setGeometry(AOption.rect);
+	}
 }
 
 bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
@@ -640,10 +719,14 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		}
 		else if (AId == SCT_ROSTERVIEW_RENAME)
 		{
-			if (itemType == RIT_GROUP)
-				renameGroup(streamJid,index.data(RDR_GROUP).toString());
-			else if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
-				renameContact(streamJid,index.data(RDR_PREP_BARE_JID).toString(),index.data(RDR_NAME).toString());
+			IRosterIndex *rindex = FRostersView->rostersModel()!=NULL ? FRostersView->rostersModel()->rosterIndexByModelIndex(FRostersView->mapToModel(FRostersView->instance()->currentIndex())) : NULL;
+			if (rindex==NULL || !FRostersView->editRosterIndex(RDR_NAME,rindex))
+			{
+				if (itemType == RIT_GROUP)
+					renameGroup(streamJid,index.data(RDR_GROUP).toString());
+				else if (itemType==RIT_CONTACT || itemType==RIT_AGENT)
+					renameContact(streamJid,index.data(RDR_PREP_BARE_JID).toString(),index.data(RDR_NAME).toString());
+			}
 		}
 		else if (AId == SCT_ROSTERVIEW_REMOVEFROMGROUP)
 		{
@@ -1221,7 +1304,32 @@ void RosterChanger::onRenameContact(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-		renameContact(action->data(ADR_STREAM_JID).toString(),action->data(ADR_CONTACT_JID).toString(),action->data(ADR_NICK).toString());
+	{
+		QString streamJid = action->data(ADR_STREAM_JID).toString();
+		IRoster *roster = FRosterPlugin ? FRosterPlugin->getRoster(streamJid) : NULL;
+		if (roster && roster->isOpen())
+		{
+			bool editInRoster = false;
+			Jid contactJid = action->data(ADR_CONTACT_JID).toString();
+			if (FRostersView && FRostersView->instance()->isActiveWindow() && FRostersView->rostersModel())
+			{
+				QString group = action->data(ADR_GROUP).toString();
+				QList<IRosterIndex *> indexes = FRostersView->rostersModel()->getContactIndexList(streamJid,contactJid);
+				foreach(IRosterIndex *index, indexes)
+				{
+					if (index->data(RDR_GROUP).toString() == group)
+					{
+						editInRoster = FRostersView->editRosterIndex(RDR_NAME,index);
+						break;
+					}
+				}
+			}
+			if (!editInRoster)
+			{
+				renameContact(streamJid,contactJid,action->data(ADR_NICK).toString());
+			}
+		}
+	}
 }
 
 void RosterChanger::onCopyContactToGroup(bool)
@@ -1263,7 +1371,26 @@ void RosterChanger::onRenameGroup(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-		renameGroup(action->data(ADR_STREAM_JID).toString(),action->data(ADR_GROUP).toString());
+	{
+		QString streamJid = action->data(ADR_STREAM_JID).toString();
+		IRoster *roster = FRosterPlugin ? FRosterPlugin->getRoster(streamJid) : NULL;
+		if (roster && roster->isOpen())
+		{
+			bool editInRoster = false;
+			QString group = action->data(ADR_GROUP).toString();
+			if (FRostersView && FRostersView->instance()->isActiveWindow() && FRostersView->rostersModel())
+			{
+				IRosterIndex *sroot = FRostersView->rostersModel()->streamRoot(roster->streamJid());
+				IRosterIndex *index = FRostersView->rostersModel()->findGroupIndex(RIT_GROUP,group,roster->groupDelimiter(),sroot);
+				if (index)
+					editInRoster = FRostersView->editRosterIndex(RDR_NAME,index);
+			}
+			if (!editInRoster)
+			{
+				renameGroup(streamJid,group);
+			}
+		}
+	}
 }
 
 void RosterChanger::onCopyGroupToGroup(bool)

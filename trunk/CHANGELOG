@@ -14,6 +14,7 @@ LEGEND
   [*] Added new types of notifications and changed the way of their settings
   [*] Added context menu for tabs in tabwindow
   [*] Search for contact-list starts automatically, just start typing the word
+  [*] Added ability to rename contacts and groups directly in the contact list
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
   [-] Fixed bug in Digest-MD5 authorization for which was not possible to log on some servers
   [-] When leaving the hidden conferences also closed the conference on non-active tabs
