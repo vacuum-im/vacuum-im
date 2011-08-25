@@ -92,7 +92,7 @@ public:
 	virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
 	virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
 	//IRostersClickHooker
-	virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
+	virtual bool rosterIndexClicked(int AOrder, IRosterIndex *AIndex);
 	//IServiceDiscovery
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = "") const;

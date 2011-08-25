@@ -69,6 +69,9 @@ public:
 	//--ClickHookers
 	virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker);
 	virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker);
+	//--KeyHookers
+	virtual void insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker);
+	virtual void removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker);
 	//--DragDrop
 	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler);
 	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler);
@@ -123,6 +126,8 @@ protected:
 	void mousePressEvent(QMouseEvent *AEvent);
 	void mouseMoveEvent(QMouseEvent *AEvent);
 	void mouseReleaseEvent(QMouseEvent *AEvent);
+	void keyPressEvent(QKeyEvent *AEvent);
+	void keyReleaseEvent(QKeyEvent *AEvent);
 	void dropEvent(QDropEvent *AEvent);
 	void dragEnterEvent(QDragEnterEvent *AEvent);
 	void dragMoveEvent(QDragMoveEvent *AEvent);
@@ -159,6 +164,7 @@ private:
 	QMap<IRosterIndex *, int> FActiveNotifies;
 	QMultiMap<IRosterIndex *, int> FIndexNotifies;
 private:
+	QMultiMap<int, IRostersKeyHooker *> FKeyHookers;
 	QMultiMap<int, IRostersClickHooker *> FClickHookers;
 private:
 	RosterIndexDelegate *FRosterIndexDelegate;
