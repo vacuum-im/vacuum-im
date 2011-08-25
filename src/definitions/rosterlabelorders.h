@@ -2,11 +2,12 @@
 #define DEF_ROSTERLABELORDERS_H
 
 //Идентификаторы стандартных лэйблов
-#define RLID_FOOTER_TEXT                          -5
-#define RLID_DISPLAY                              -4
-#define RLID_DECORATION                           -3
-#define RLID_INDICATORBRANCH                      -2
 #define RLID_NULL                                 -1
+#define RLID_INDICATORBRANCH                      -2
+#define RLID_DECORATION                           -3
+#define RLID_DISPLAY                              -4
+#define RLID_FOOTER_TEXT                          -5
+#define RLID_DISPLAY_EDIT                         -6
 
 //Лэйбл выравнивается слева по центру
 #define RLAP_LEFT_CENTER                          00000

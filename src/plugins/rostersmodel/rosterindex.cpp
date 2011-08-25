@@ -6,7 +6,7 @@ RosterIndex::RosterIndex(int AType)
 {
 	FParentIndex = NULL;
 	setData(RDR_TYPE,AType);
-	FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	FFlags = (Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 	FRemoveOnLastChildRemoved = true;
 	FRemoveChildsOnRemoved = true;
 	FDestroyOnParentRemoved = true;

@@ -2,7 +2,7 @@
 #define ROSTERINDEXDELEGATE_H
 
 #include <QStyle>
-#include <QAbstractItemDelegate>
+#include <QStyledItemDelegate>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <interfaces/irostersview.h>
@@ -24,7 +24,7 @@ struct LabelItem
 };
 
 class RosterIndexDelegate :
-			public QAbstractItemDelegate
+			public QStyledItemDelegate
 {
 	Q_OBJECT;
 public:
@@ -33,10 +33,16 @@ public:
 	//QAbstractItemDelegate
 	virtual void paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	virtual QSize sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual QWidget *createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual void setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const;
+	virtual void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
+	virtual void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	//RosterIndexDelegate
+	void setShowBlinkLabels(bool AShow);
+	IRostersEditHandler *editHandler() const;
+	void setEditHandler(int ADataRole, IRostersEditHandler *AHandler);
 	int labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	QRect labelRect(int ALabelId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-	void setShowBlinkLabels(bool AShow);
 protected:
 	QHash<int,QRect> drawIndex(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	void drawLabelItem(QPainter *APainter, const QStyleOptionViewItemV4 &AOption, const LabelItem &ALabel) const;
@@ -55,6 +61,8 @@ private:
 	QIcon::State getIconState(QStyle::State AState) const;
 private:
 	bool FShowBlinkLabels;
+	int FEditRole;
+	IRostersEditHandler *FEditHandler;
 private:
 	static const int spacing = 2;
 };

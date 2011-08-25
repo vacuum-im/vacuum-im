@@ -42,6 +42,7 @@ public:
 	virtual bool repaintRosterIndex(IRosterIndex *AIndex);
 	virtual void expandIndexParents(IRosterIndex *AIndex);
 	virtual void expandIndexParents(const QModelIndex &AIndex);
+	virtual bool editRosterIndex(int ADataRole, IRosterIndex *AIndex);
 	//--ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual QList<QAbstractProxyModel *> proxyModels() const;
@@ -75,6 +76,9 @@ public:
 	//--DragDrop
 	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler);
 	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler);
+	//--EditHandlers
+	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler);
+	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler);
 	//--FooterText
 	virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex);
 	virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
@@ -100,8 +104,6 @@ signals:
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
 	void notifyRemoved(int ANotifyId);
-	void dragDropHandlerInserted(IRostersDragDropHandler *AHandler);
-	void dragDropHandlerRemoved(IRostersDragDropHandler *AHandler);
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 public:
@@ -113,12 +115,14 @@ protected:
 	QString intId2StringId(int AIntId) const;
 	void removeLabels();
 	void setDropIndicatorRect(const QRect &ARect);
+	IRostersEditHandler *findEditHandler(int ADataRole, const QModelIndex &AIndex) const;
 protected:
 	//QTreeView
 	void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
 	//QAbstractItemView
 	bool viewportEvent(QEvent *AEvent);
 	void resizeEvent(QResizeEvent *AEvent);
+	bool edit(const QModelIndex &AIndex, EditTrigger ATrigger, QEvent *AEvent);
 	//QWidget
 	void paintEvent(QPaintEvent *AEvent);
 	void contextMenuEvent(QContextMenuEvent *AEvent);
@@ -132,6 +136,9 @@ protected:
 	void dragEnterEvent(QDragEnterEvent *AEvent);
 	void dragMoveEvent(QDragMoveEvent *AEvent);
 	void dragLeaveEvent(QDragLeaveEvent *AEvent);
+protected slots:
+	//QAbstractItemView
+	void closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint);
 protected slots:
 	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
@@ -166,6 +173,7 @@ private:
 private:
 	QMultiMap<int, IRostersKeyHooker *> FKeyHookers;
 	QMultiMap<int, IRostersClickHooker *> FClickHookers;
+	QMultiMap<int, IRostersEditHandler *> FEditHandlers;
 private:
 	RosterIndexDelegate *FRosterIndexDelegate;
 	QMultiMap<int, QAbstractProxyModel *> FProxyModels;

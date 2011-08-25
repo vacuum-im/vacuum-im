@@ -237,6 +237,24 @@ void RostersView::expandIndexParents(const QModelIndex &AIndex)
 	}
 }
 
+bool RostersView::editRosterIndex(int ADataRole, IRosterIndex *AIndex)
+{
+	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)) : QModelIndex();
+	if (index.isValid() && state()==NoState)
+	{
+		IRostersEditHandler *handler = index.isValid() ? findEditHandler(ADataRole,index) : NULL;
+		if (handler)
+		{
+			FRosterIndexDelegate->setEditHandler(ADataRole,handler);
+			if (edit(index,AllEditTriggers,NULL))
+				return true;
+			else
+				FRosterIndexDelegate->setEditHandler(0,NULL);
+		}
+	}
+	return false;
+}
+
 void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 {
 	if (AProxyModel && !FProxyModels.values().contains(AProxyModel))
@@ -578,7 +596,8 @@ void RostersView::removeNotify(int ANotifyId)
 
 void RostersView::insertClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
-	FClickHookers.insertMulti(AOrder,AHooker);
+	if (AHooker)
+		FClickHookers.insertMulti(AOrder,AHooker);
 }
 
 void RostersView::removeClickHooker(int AOrder, IRostersClickHooker *AHooker)
@@ -588,7 +607,8 @@ void RostersView::removeClickHooker(int AOrder, IRostersClickHooker *AHooker)
 
 void RostersView::insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
 {
-	FKeyHookers.insertMulti(AOrder,AHooker);
+	if (AHooker)
+		FKeyHookers.insertMulti(AOrder,AHooker);
 }
 
 void RostersView::removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
@@ -599,19 +619,24 @@ void RostersView::removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
 void RostersView::insertDragDropHandler(IRostersDragDropHandler *AHandler)
 {
 	if (!FDragDropHandlers.contains(AHandler))
-	{
 		FDragDropHandlers.append(AHandler);
-		emit dragDropHandlerInserted(AHandler);
-	}
 }
 
 void RostersView::removeDragDropHandler(IRostersDragDropHandler *AHandler)
 {
 	if (FDragDropHandlers.contains(AHandler))
-	{
-		FDragDropHandlers.removeAt(FDragDropHandlers.indexOf(AHandler));
-		emit dragDropHandlerRemoved(AHandler);
-	}
+		FDragDropHandlers.removeAll(AHandler);
+}
+
+void RostersView::insertEditHandler(int AOrder, IRostersEditHandler *AHandler)
+{
+	if (AHandler)
+		FEditHandlers.insertMulti(AOrder,AHandler);
+}
+
+void RostersView::removeEditHandler(int AOrder, IRostersEditHandler *AHandler)
+{
+	FEditHandlers.remove(AOrder,AHandler);
 }
 
 void RostersView::insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex)
@@ -787,6 +812,14 @@ void RostersView::setDropIndicatorRect(const QRect &ARect)
 	}
 }
 
+IRostersEditHandler *RostersView::findEditHandler(int ADataRole, const QModelIndex &AIndex) const
+{
+	for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); it++)
+		if (it.value()->rosterEditStart(ADataRole,AIndex))
+			return it.value();
+	return NULL;
+}
+
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
 {
 	Q_UNUSED(APainter);
@@ -827,6 +860,13 @@ void RostersView::resizeEvent(QResizeEvent *AEvent)
 	if (model() && model()->columnCount()>0)
 		header()->resizeSection(0,AEvent->size().width());
 	QTreeView::resizeEvent(AEvent);
+}
+
+bool RostersView::edit(const QModelIndex &AIndex, EditTrigger ATrigger, QEvent *AEvent)
+{
+	if (FRosterIndexDelegate->editHandler() != NULL)
+		return QTreeView::edit(AIndex,ATrigger,AEvent);
+	return false;
 }
 
 void RostersView::paintEvent(QPaintEvent *AEvent)
@@ -991,7 +1031,7 @@ void RostersView::keyPressEvent(QKeyEvent *AEvent)
 {
 	bool hooked = false;
 	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(currentIndex())) : NULL;
-	if (index)
+	if (index && state()==NoState)
 	{
 		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
 		while (!hooked && it!=FKeyHookers.constEnd())
@@ -1010,7 +1050,7 @@ void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
 {
 	bool hooked = false;
 	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(currentIndex())) : NULL;
-	if (index)
+	if (index && state()==NoState)
 	{
 		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
 		while (!hooked && it!=FKeyHookers.constEnd())
@@ -1104,6 +1144,12 @@ void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)
 		handler->rosterDragLeave(AEvent);
 	stopAutoScroll();
 	setDropIndicatorRect(QRect());
+}
+
+void RostersView::closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint)
+{
+	FRosterIndexDelegate->setEditHandler(0,NULL);
+	QTreeView::closeEditor(AEditor,AHint);
 }
 
 void RostersView::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
