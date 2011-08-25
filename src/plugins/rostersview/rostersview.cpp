@@ -586,6 +586,16 @@ void RostersView::removeClickHooker(int AOrder, IRostersClickHooker *AHooker)
 	FClickHookers.remove(AOrder,AHooker);
 }
 
+void RostersView::insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
+{
+	FKeyHookers.insertMulti(AOrder,AHooker);
+}
+
+void RostersView::removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
+{
+	FKeyHookers.remove(AOrder,AHooker);
+}
+
 void RostersView::insertDragDropHandler(IRostersDragDropHandler *AHandler)
 {
 	if (!FDragDropHandlers.contains(AHandler))
@@ -876,7 +886,7 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 					QMultiMap<int,IRostersClickHooker *>::const_iterator it = FClickHookers.constBegin();
 					while (!accepted && it!=FClickHookers.constEnd())
 					{
-						accepted = it.value()->rosterIndexClicked(index,it.key());
+						accepted = it.value()->rosterIndexClicked(it.key(),index);
 						it++;
 					}
 					emit labelDoubleClicked(index,labelId,accepted);
@@ -975,6 +985,44 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 	FPressedIndex = QModelIndex();
 
 	QTreeView::mouseReleaseEvent(AEvent);
+}
+
+void RostersView::keyPressEvent(QKeyEvent *AEvent)
+{
+	bool hooked = false;
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(currentIndex())) : NULL;
+	if (index)
+	{
+		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
+		while (!hooked && it!=FKeyHookers.constEnd())
+		{
+			hooked = it.value()->rosterKeyPressed(it.key(),index,AEvent);
+			it++;
+		}
+	}
+	if (!hooked)
+	{
+		QTreeView::keyPressEvent(AEvent);
+	}
+}
+
+void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
+{
+	bool hooked = false;
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(currentIndex())) : NULL;
+	if (index)
+	{
+		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
+		while (!hooked && it!=FKeyHookers.constEnd())
+		{
+			hooked = it.value()->rosterKeyReleased(it.key(),index,AEvent);
+			it++;
+		}
+	}
+	if (!hooked)
+	{
+		QTreeView::keyReleaseEvent(AEvent);
+	}
 }
 
 void RostersView::dropEvent(QDropEvent *AEvent)

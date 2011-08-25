@@ -415,7 +415,7 @@ void ServiceDiscovery::fillDiscoItems(IDiscoItems &ADiscoItems)
 	Q_UNUSED(ADiscoItems);
 }
 
-bool ServiceDiscovery::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
+bool ServiceDiscovery::rosterIndexClicked(int AOrder, IRosterIndex *AIndex)
 {
 	Q_UNUSED(AOrder);
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();

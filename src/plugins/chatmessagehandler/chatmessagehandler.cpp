@@ -194,7 +194,7 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
 	return false;
 }
 
-bool ChatMessageHandler::rosterIndexClicked(IRosterIndex *AIndex, int AOrder)
+bool ChatMessageHandler::rosterIndexClicked(int AOrder, IRosterIndex *AIndex)
 {
 	Q_UNUSED(AOrder);
 	if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)

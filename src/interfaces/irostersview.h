@@ -49,7 +49,14 @@ struct IRostersNotify
 class IRostersClickHooker
 {
 public:
-	virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder) =0;
+	virtual bool rosterIndexClicked(int AOrder, IRosterIndex *AIndex) =0;
+};
+
+class IRostersKeyHooker
+{
+public:
+	virtual bool rosterKeyPressed(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent) =0;
+	virtual bool rosterKeyReleased(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent) =0;
 };
 
 class IRostersDragDropHandler
@@ -99,6 +106,9 @@ public:
 	//--ClickHookers
 	virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
 	virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
+	//--KeyHookers
+	virtual void insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker) =0;
+	virtual void removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker) =0;
 	//--DragDrop
 	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler) =0;
 	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler) =0;
@@ -140,7 +150,8 @@ public:
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
 };
 
-Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.0");
+Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.1");
+Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.0");
 Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.0");
 Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.1");
 Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.1");

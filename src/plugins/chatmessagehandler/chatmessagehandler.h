@@ -77,7 +77,7 @@ public:
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IRostersClickHooker
-	virtual bool rosterIndexClicked(IRosterIndex *AIndex, int AOrder);
+	virtual bool rosterIndexClicked(int AOrder, IRosterIndex *AIndex);
 	//IMessageHandler
 	virtual bool checkMessage(int AOrder, const Message &AMessage);
 	virtual bool showMessage(int AMessageId);
