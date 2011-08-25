@@ -27,7 +27,7 @@ void TabWidget::mouseReleaseEvent(QMouseEvent *AEvent)
 	int index = tabBar()->tabAt(AEvent->pos());
 	if (index>=0 && index==FPressedTabIndex)
 	{
-		if (AEvent->button() == Qt::MiddleButton)
+		if (AEvent->button() == Qt::MidButton)
 		{
 			emit tabCloseRequested(index);
 		}
