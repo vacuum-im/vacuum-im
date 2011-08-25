@@ -6,7 +6,7 @@
 
 #define BRANCH_WIDTH  12
 
-RosterIndexDelegate::RosterIndexDelegate(QObject *AParent) : QAbstractItemDelegate(AParent)
+RosterIndexDelegate::RosterIndexDelegate(QObject *AParent) : QStyledItemDelegate(AParent)
 {
 	FShowBlinkLabels = true;
 }
@@ -80,6 +80,48 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption, const Q
 	return hint;
 }
 
+QWidget *RosterIndexDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	if (FEditHandler)
+		return FEditHandler->rosterEditEditor(FEditRole,AParent,AOption,AIndex);
+	return NULL;
+}
+
+void RosterIndexDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
+{
+	if (FEditHandler)
+		FEditHandler->rosterEditLoadData(FEditRole,AEditor,AIndex);
+}
+
+void RosterIndexDelegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
+{
+	Q_UNUSED(AModel);
+	if (FEditHandler)
+		FEditHandler->rosterEditSaveData(FEditRole,AEditor,AIndex);
+}
+
+void RosterIndexDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	if (FEditHandler)
+		FEditHandler->rosterEditGeometry(FEditRole,AEditor,AOption,AIndex);
+}
+
+void RosterIndexDelegate::setShowBlinkLabels(bool AShow)
+{
+	FShowBlinkLabels = AShow;
+}
+
+IRostersEditHandler *RosterIndexDelegate::editHandler() const
+{
+	return FEditHandler;
+}
+
+void RosterIndexDelegate::setEditHandler(int ADataRole, IRostersEditHandler *AHandler)
+{
+	FEditRole = ADataRole;
+	FEditHandler = AHandler;
+}
+
 int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
 	if (!AOption.rect.contains(APoint))
@@ -96,11 +138,6 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
 QRect RosterIndexDelegate::labelRect(int ALabelId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
 	return drawIndex(NULL,AOption,AIndex).value(ALabelId);
-}
-
-void RosterIndexDelegate::setShowBlinkLabels(bool AShow)
-{
-	FShowBlinkLabels = AShow;
 }
 
 QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
@@ -228,6 +265,13 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
 		if (APainter)
 			drawLabelItem(APainter,indexFooterOptions(option),label);
 		rectHash.insert(label.id,label.rect);
+	}
+
+	if (rectHash.contains(RLID_DISPLAY))
+	{
+		QRect rect = rectHash.value(RLID_DISPLAY);
+		rect.setWidth(middleTop.width());
+		rectHash.insert(RLID_DISPLAY_EDIT,rect);
 	}
 
 	if (APainter)
@@ -486,3 +530,4 @@ QIcon::State RosterIndexDelegate::getIconState(QStyle::State AState) const
 {
 	return AState & QStyle::State_Open ? QIcon::On : QIcon::Off;
 }
+
