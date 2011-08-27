@@ -9,6 +9,8 @@
 RosterIndexDelegate::RosterIndexDelegate(QObject *AParent) : QStyledItemDelegate(AParent)
 {
 	FShowBlinkLabels = true;
+	FEditRole = 0;
+	FEditHandler = NULL;
 }
 
 RosterIndexDelegate::~RosterIndexDelegate()
