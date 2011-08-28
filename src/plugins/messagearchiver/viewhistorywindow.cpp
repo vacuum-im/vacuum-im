@@ -165,6 +165,21 @@ ViewHistoryWindow::~ViewHistoryWindow()
 	emit windowDestroyed(this);
 }
 
+const Jid &ViewHistoryWindow::streamJid() const
+{
+	return FStreamJid;
+}
+
+ToolBarChanger *ViewHistoryWindow::collectionTools() const
+{
+	return FCollectionTools;
+}
+
+ToolBarChanger *ViewHistoryWindow::messagesTools() const
+{
+	return FMessagesTools->toolBarChanger();
+}
+
 bool ViewHistoryWindow::isHeaderAccepted(const IArchiveHeader &AHeader) const
 {
 	Jid gateFilter = FArchiver->gateJid(FFilter.with);
@@ -214,6 +229,11 @@ QStandardItem *ViewHistoryWindow::findHeaderItem(const IArchiveHeader &AHeader, 
 	return NULL;
 }
 
+int ViewHistoryWindow::groupKind() const
+{
+	return FGroupKind;
+}
+
 void ViewHistoryWindow::setGroupKind(int AGroupKind)
 {
 	foreach (Action *action, FGroupKindMenu->groupActions())
@@ -224,6 +244,11 @@ void ViewHistoryWindow::setGroupKind(int AGroupKind)
 		rebuildModel();
 		emit groupKindChanged(AGroupKind);
 	}
+}
+
+int ViewHistoryWindow::archiveSource() const
+{
+	return FSource;
 }
 
 void ViewHistoryWindow::setArchiveSource(int ASource)
@@ -237,6 +262,11 @@ void ViewHistoryWindow::setArchiveSource(int ASource)
 		reload();
 		emit archiveSourceChanged(ASource);
 	}
+}
+
+const IArchiveFilter &ViewHistoryWindow::filter() const
+{
+	return FFilter;
 }
 
 void ViewHistoryWindow::setFilter(const IArchiveFilter &AFilter)
