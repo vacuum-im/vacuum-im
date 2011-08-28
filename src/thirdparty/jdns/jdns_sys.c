@@ -706,7 +706,8 @@ static int my_res_init()
 //   specify the platforms that have __res_state_ext
 //#ifdef __res_state_ext
 #if defined(JDNS_OS_MAC) || defined(JDNS_OS_FREEBSD) || \
-    defined(JDNS_OS_NETBSD) || defined (JDNS_OS_SOLARIS) || defined(__HAIKU__)
+    defined(JDNS_OS_NETBSD) || defined (JDNS_OS_SOLARIS) || \
+	defined(__HAIKU__) || defined (JDNS_OS_OPENBSD)
 # define USE_EXTEXT
 #endif
 
@@ -732,12 +733,18 @@ static jdns_dnsparams_t *dnsparams_get_unixsys()
 		return params;
 
 	// nameservers - ipv6
-	for(n = 0; n < MAXNS && n < RESVAR._u._ext.nscount; ++n)
+#if defined(JDNS_OS_OPENBSD)
+	for(n = 0; n < MAXNS && n < RESVAR.nscount; ++n)
+#else
+ 	for(n = 0; n < MAXNS && n < RESVAR._u._ext.nscount; ++n)
+#endif
 	{
 		jdns_address_t *addr;
 		struct sockaddr_in6 *sa6;
 
-#ifdef USE_EXTEXT
+#if defined(JDNS_OS_OPENBSD)
+		sa6 = (struct sockaddr_in6 *)(_res_ext.nsaddr_list + n);
+#elif defined(USE_EXTEXT)
 		sa6 = ((struct sockaddr_in6 *)RESVAR._u._ext.ext) + n;
 #else
 		sa6 = RESVAR._u._ext.nsaddrs[n];
