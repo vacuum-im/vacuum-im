@@ -37,3 +37,13 @@
 	color: darkred;
 }
 
+.date_separator .xxxtime
+{
+	color: transparent;
+}
+
+.date_separator .xxxmessage
+{
+	color: darkCyan;
+}
+

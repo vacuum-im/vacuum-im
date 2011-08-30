@@ -498,8 +498,8 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 			if (window)
 			{
 				IMessageContentOptions options;
-				options.kind = IMessageContentOptions::Status;
-				options.type |= IMessageContentOptions::Event;
+				options.kind = IMessageContentOptions::KindStatus;
+				options.type |= IMessageContentOptions::TypeEvent;
 				options.direction = IMessageContentOptions::DirectionIn;
 				options.time = QDateTime::currentDateTime();
 				window->viewWidget()->appendText(note,options);

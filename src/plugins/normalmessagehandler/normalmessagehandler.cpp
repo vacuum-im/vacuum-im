@@ -347,9 +347,9 @@ void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageC
 {
 	AOptions.senderColor = "blue";
 	AOptions.senderId = AWindow->contactJid().full();
-	AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid(),AWindow->contactJid()));
-	AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->contactJid());
-	AOptions.senderIcon = FMessageStyles->userIcon(AWindow->streamJid(),AWindow->contactJid());
+	AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()));
+	AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->contactJid());
+	AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 }
 
 void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Message &AMessage)
@@ -373,13 +373,13 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 		QString html = tr("<b>The message with a error code %1 is received</b>").arg(err.code());
 		html += "<p style='color:red;'>"+Qt::escape(err.message())+"</p>";
 		html += "<hr>";
-		options.kind = IMessageContentOptions::Message;
+		options.kind = IMessageContentOptions::KindMessage;
 		AWindow->viewWidget()->appendHtml(html,options);
 	}
 
-	options.kind = IMessageContentOptions::Topic;
+	options.kind = IMessageContentOptions::KindTopic;
 	AWindow->viewWidget()->appendText(tr("Subject: %1").arg(!AMessage.subject().isEmpty() ? AMessage.subject() : tr("<no subject>")),options);
-	options.kind = IMessageContentOptions::Message;
+	options.kind = IMessageContentOptions::KindMessage;
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 

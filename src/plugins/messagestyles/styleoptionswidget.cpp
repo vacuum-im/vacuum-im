@@ -89,20 +89,20 @@ void StyleOptionsWidget::createViewContent()
 		IMessageContentOptions o_options;
 
 		i_options.noScroll = true;
-		i_options.kind = IMessageContentOptions::Message;
+		i_options.kind = IMessageContentOptions::KindMessage;
 		i_options.direction = IMessageContentOptions::DirectionIn;
 		i_options.senderId = "remote";
 		i_options.senderName = tr("Receiver");
 		i_options.senderColor = "blue";
-		i_options.senderIcon = FMessageStyles->userIcon(i_options.senderId,IPresence::Chat,SUBSCRIPTION_BOTH,false);
+		i_options.senderIcon = FMessageStyles->contactIcon(i_options.senderId,IPresence::Chat,SUBSCRIPTION_BOTH,false);
 
 		o_options.noScroll = true;
-		o_options.kind = IMessageContentOptions::Message;
+		o_options.kind = IMessageContentOptions::KindMessage;
 		o_options.direction = IMessageContentOptions::DirectionOut;
 		o_options.senderId = "myself";
 		o_options.senderName = tr("Sender");
 		o_options.senderColor = "red";
-		o_options.senderIcon = FMessageStyles->userIcon(i_options.senderId,IPresence::Online,SUBSCRIPTION_BOTH,false);
+		o_options.senderIcon = FMessageStyles->contactIcon(i_options.senderId,IPresence::Online,SUBSCRIPTION_BOTH,false);
 
 		if (curMessageType==Message::Normal || curMessageType==Message::Headline || curMessageType==Message::Error)
 		{
@@ -112,17 +112,17 @@ void StyleOptionsWidget::createViewContent()
 			if (curMessageType == Message::Error)
 			{
 				i_options.senderName.clear();
-				i_options.kind = IMessageContentOptions::Message;
+				i_options.kind = IMessageContentOptions::KindMessage;
 				QString html = "<b>"+tr("The message with a error code %1 is received").arg(999)+"</b>";
 				html += "<p style='color:red;'>"+tr("Error description")+"</p>";
 				html += "<hr>";
 				FActiveStyle->appendContent(FActiveView,html,i_options);
 			}
 
-			i_options.kind = IMessageContentOptions::Topic;
+			i_options.kind = IMessageContentOptions::KindTopic;
 			FActiveStyle->appendContent(FActiveView,tr("Subject: Message subject"),i_options);
 
-			i_options.kind = IMessageContentOptions::Message;
+			i_options.kind = IMessageContentOptions::KindMessage;
 			FActiveStyle->appendContent(FActiveView,tr("Message body line 1")+"<br>"+tr("Message body line 2"),i_options);
 		}
 		else if (curMessageType==Message::Chat || curMessageType==Message::GroupChat)
@@ -133,58 +133,86 @@ void StyleOptionsWidget::createViewContent()
 				o_options.senderColor.clear();
 			}
 
-			i_options.type = IMessageContentOptions::History;
 			i_options.time = QDateTime::currentDateTime().addDays(-1);
-			i_options.timeFormat = FMessageStyles->timeFormat(i_options.time);
+			i_options.type = IMessageContentOptions::TypeHistory;
+			if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+			{
+				i_options.timeFormat = " ";
+				i_options.kind = IMessageContentOptions::KindStatus;
+				i_options.status = IMessageContentOptions::StatusDateSeparator;
+				FActiveStyle->appendContent(FActiveView,FMessageStyles->dateSeparator(i_options.time.date()),i_options);
+			}
+
+			i_options.kind = IMessageContentOptions::KindMessage;
+			i_options.status = IMessageContentOptions::StatusEmpty;
+			if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+				i_options.timeFormat = FMessageStyles->timeFormat(i_options.time,i_options.time);
+			else
+				i_options.timeFormat = FMessageStyles->timeFormat(i_options.time);
 			FActiveStyle->appendContent(FActiveView,tr("Incoming history message"),i_options);
 
 			i_options.time = QDateTime::currentDateTime().addDays(-1).addSecs(80);
 			FActiveStyle->appendContent(FActiveView,tr("Incoming history consecutive message"),i_options);
 
-			i_options.kind = IMessageContentOptions::Status;
+			i_options.kind = IMessageContentOptions::KindStatus;
 			FActiveStyle->appendContent(FActiveView,tr("Incoming status message"),i_options);
 
-			o_options.type = IMessageContentOptions::History;
+			o_options.type = IMessageContentOptions::TypeHistory;
 			o_options.time = QDateTime::currentDateTime().addDays(-1).addSecs(100);
-			o_options.timeFormat = FMessageStyles->timeFormat(o_options.time);
+			if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+				o_options.timeFormat = FMessageStyles->timeFormat(o_options.time,o_options.time);
+			else
+				o_options.timeFormat = FMessageStyles->timeFormat(o_options.time);
 			FActiveStyle->appendContent(FActiveView,tr("Outgoing history message"),o_options);
 
-			o_options.kind = IMessageContentOptions::Status;
+			o_options.kind = IMessageContentOptions::KindStatus;
 			FActiveStyle->appendContent(FActiveView,tr("Outgoing status message"),o_options);
 
+			i_options.type = 0;
+			i_options.time = QDateTime::currentDateTime();
+			if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+			{
+				i_options.timeFormat = " ";
+				i_options.kind = IMessageContentOptions::KindStatus;
+				i_options.status = IMessageContentOptions::StatusDateSeparator;
+				FActiveStyle->appendContent(FActiveView,FMessageStyles->dateSeparator(i_options.time.date()),i_options);
+			}
+
+			i_options.status = IMessageContentOptions::StatusEmpty;
+			if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+				i_options.timeFormat = FMessageStyles->timeFormat(i_options.time,i_options.time);
+			else
+				i_options.timeFormat = FMessageStyles->timeFormat(i_options.time);
 			if (curMessageType==Message::GroupChat)
 			{
-				i_options.kind = IMessageContentOptions::Topic;
-				i_options.type = 0;
-				i_options.time = QDateTime::currentDateTime();
-				i_options.timeFormat = FMessageStyles->timeFormat(i_options.time);
+				i_options.kind = IMessageContentOptions::KindTopic;
 				FActiveStyle->appendContent(FActiveView,tr("Groupchat topic"),i_options);
 			}
 
-			i_options.time = QDateTime::currentDateTime();
-			i_options.timeFormat = FMessageStyles->timeFormat(i_options.time);
-			i_options.kind = IMessageContentOptions::Message;
-			i_options.type = 0;
+			i_options.kind = IMessageContentOptions::KindMessage;
 			FActiveStyle->appendContent(FActiveView,tr("Incoming message"),i_options);
 
-			i_options.type = IMessageContentOptions::Event;
-			i_options.kind = IMessageContentOptions::Status;
+			i_options.type = IMessageContentOptions::TypeEvent;
+			i_options.kind = IMessageContentOptions::KindStatus;
 			FActiveStyle->appendContent(FActiveView,tr("Incoming event"),i_options);
 
-			i_options.type = IMessageContentOptions::Notification;
+			i_options.type = IMessageContentOptions::TypeNotification;
 			FActiveStyle->appendContent(FActiveView,tr("Incoming notification"),i_options);
 
 			if (curMessageType==Message::GroupChat)
 			{
-				i_options.kind = IMessageContentOptions::Message;
-				i_options.type = IMessageContentOptions::Mention;
+				i_options.kind = IMessageContentOptions::KindMessage;
+				i_options.type = IMessageContentOptions::TypeMention;
 				FActiveStyle->appendContent(FActiveView,tr("Incoming mention message"),i_options);
 			}
 
-			o_options.time = QDateTime::currentDateTime();
-			o_options.timeFormat = FMessageStyles->timeFormat(o_options.time);
-			o_options.kind = IMessageContentOptions::Message;
 			o_options.type = 0;
+			o_options.time = QDateTime::currentDateTime();
+			if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+				o_options.timeFormat = FMessageStyles->timeFormat(o_options.time,o_options.time);
+			else
+				o_options.timeFormat = FMessageStyles->timeFormat(o_options.time);
+			o_options.kind = IMessageContentOptions::KindMessage;
 			FActiveStyle->appendContent(FActiveView,tr("Outgoing message"),o_options);
 
 			o_options.time = QDateTime::currentDateTime().addSecs(5);

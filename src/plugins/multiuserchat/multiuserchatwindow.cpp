@@ -219,7 +219,7 @@ bool MultiUserChatWindow::receiveMessage(int AMessageId)
 			IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
 			IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
 			connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
-			showStatusMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::Notification);
+			showStatusMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::TypeNotification);
 			FDataFormMessages.insert(AMessageId,dialog);
 			notify = true;
 		}
@@ -857,6 +857,30 @@ void MultiUserChatWindow::loadWindowGeometry()
 	}
 }
 
+void MultiUserChatWindow::showDateSeparator(IViewWidget *AView, const QDateTime &ADateTime)
+{
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+	{
+		QDate sepDate = ADateTime.date();
+		WindowStatus &wstatus = FWindowStatus[AView];
+		if (FMessageStyles && sepDate.isValid() && wstatus.lastDateSeparator!=sepDate)
+		{
+			IMessageContentOptions options;
+			options.kind = IMessageContentOptions::KindStatus;
+			if (wstatus.createTime > ADateTime)
+				options.type |= IMessageContentOptions::TypeHistory;
+			options.status = IMessageContentOptions::StatusDateSeparator;
+			options.direction = IMessageContentOptions::DirectionIn;
+			options.time.setDate(sepDate);
+			options.time.setTime(QTime(0,0));
+			options.timeFormat = " ";
+			options.noScroll = true;
+			wstatus.lastDateSeparator = sepDate;
+			AView->appendText(FMessageStyles->dateSeparator(sepDate),options);
+		}
+	}
+}
+
 bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int> &ACodes)
 {
 	bool shown = false;
@@ -864,47 +888,47 @@ bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int>
 	{
 		if (ACodes.contains(MUC_SC_NON_ANONYMOUS))
 		{
-			showStatusMessage(tr("Any occupant is allowed to see the user's full JID"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("Any occupant is allowed to see the user's full JID"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_AFFIL_CHANGED))
 		{
-			showStatusMessage(tr("%1 affiliation changed while not in the room").arg(ANick),IMessageContentOptions::Notification);
+			showStatusMessage(tr("%1 affiliation changed while not in the room").arg(ANick),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_CONFIG_CHANGED))
 		{
-			showStatusMessage(tr("Room configuration change has occurred"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("Room configuration change has occurred"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_NOW_LOGGING_ENABLED))
 		{
-			showStatusMessage(tr("Room logging is now enabled"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("Room logging is now enabled"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_NOW_LOGGING_DISABLED))
 		{
-			showStatusMessage(tr("Room logging is now disabled"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("Room logging is now disabled"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_NOW_NON_ANONYMOUS))
 		{
-			showStatusMessage(tr("The room is now non-anonymous"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("The room is now non-anonymous"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_NOW_SEMI_ANONYMOUS))
 		{
-			showStatusMessage(tr("The room is now semi-anonymous"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("The room is now semi-anonymous"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_NOW_FULLY_ANONYMOUS))
 		{
-			showStatusMessage(tr("The room is now fully-anonymous"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("The room is now fully-anonymous"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_ROOM_CREATED))
 		{
-			showStatusMessage(tr("A new room has been created"),IMessageContentOptions::Notification);
+			showStatusMessage(tr("A new room has been created"),IMessageContentOptions::TypeNotification);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_NICK_CHANGED))
@@ -925,17 +949,17 @@ bool MultiUserChatWindow::showStatusCodes(const QString &ANick, const QList<int>
 		}
 		if (ACodes.contains(MUC_SC_AFFIL_CHANGE))
 		{
-			showStatusMessage(tr("%1 has been removed from the room because of an affiliation change").arg(ANick),IMessageContentOptions::Event);
+			showStatusMessage(tr("%1 has been removed from the room because of an affiliation change").arg(ANick),IMessageContentOptions::TypeEvent);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_MEMBERS_ONLY))
 		{
-			showStatusMessage(tr("%1 has been removed from the room because the room has been changed to members-only").arg(ANick),IMessageContentOptions::Event);
+			showStatusMessage(tr("%1 has been removed from the room because the room has been changed to members-only").arg(ANick),IMessageContentOptions::TypeEvent);
 			shown = true;
 		}
 		if (ACodes.contains(MUC_SC_SYSTEM_SHUTDOWN))
 		{
-			showStatusMessage(tr("%1 is being removed from the room because of a system shutdown").arg(ANick),IMessageContentOptions::Event);
+			showStatusMessage(tr("%1 is being removed from the room because of a system shutdown").arg(ANick),IMessageContentOptions::TypeEvent);
 			shown = true;
 		}
 	}
@@ -1050,7 +1074,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		if (FMultiChat->userByNick(nick))
 			FMultiChat->setRole(nick,MUC_ROLE_NONE,parts.join(" "));
 		else
-			showStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageContentOptions::Notification);
+			showStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 		hasCommand = true;
 	}
 	else if (AText.startsWith("/ban "))
@@ -1061,7 +1085,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		if (FMultiChat->userByNick(nick))
 			FMultiChat->setAffiliation(nick,MUC_AFFIL_OUTCAST,parts.join(" "));
 		else
-			showStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageContentOptions::Notification);
+			showStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 		hasCommand = true;
 	}
 	else if (AText.startsWith("/invite "))
@@ -1072,7 +1096,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		if (userJid.isValid())
 			FMultiChat->inviteContact(userJid,parts.join(" "));
 		else
-			showStatusMessage(tr("%1 is not valid contact JID").arg(userJid.full()),IMessageContentOptions::Notification);
+			showStatusMessage(tr("%1 is not valid contact JID").arg(userJid.full()),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 		hasCommand = true;
 	}
 	else if (AText.startsWith("/join "))
@@ -1086,7 +1110,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 			FChatPlugin->showJoinMultiChatDialog(streamJid(),roomJid,FMultiChat->nickName(),parts.join(" "));
 		}
 		else
-			showStatusMessage(tr("%1 is not valid room JID").arg(roomJid.full()),IMessageContentOptions::Notification);
+			showStatusMessage(tr("%1 is not valid room JID").arg(roomJid.full()),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 		hasCommand = true;
 	}
 	else if (AText.startsWith("/msg "))
@@ -1101,7 +1125,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 			FMultiChat->sendMessage(message,nick);
 		}
 		else
-			showStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageContentOptions::Notification);
+			showStatusMessage(tr("User %1 is not present in the conference").arg(nick),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 		hasCommand = true;
 	}
 	else if (AText.startsWith("/nick "))
@@ -1139,7 +1163,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 									" /msg <roomnick> <foo> \n"
 									" /nick <newnick> \n"
 									" /leave [comment] \n"
-									" /topic <foo>"),IMessageContentOptions::Notification);
+									" /topic <foo>"),IMessageContentOptions::TypeNotification);
 		hasCommand = true;
 	}
 	return hasCommand;
@@ -1160,6 +1184,7 @@ void MultiUserChatWindow::setMessageStyle()
 		{
 			IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
 			FViewWidget->setMessageStyle(style,soptions);
+			FWindowStatus[FViewWidget].lastDateSeparator = QDate();
 		}
 	}
 }
@@ -1167,67 +1192,71 @@ void MultiUserChatWindow::setMessageStyle()
 void MultiUserChatWindow::showTopic(const QString &ATopic)
 {
 	IMessageContentOptions options;
-	options.kind = IMessageContentOptions::Topic;
-	options.type |= IMessageContentOptions::Groupchat;
+	options.kind = IMessageContentOptions::KindTopic;
+	options.type |= IMessageContentOptions::TypeGroupchat;
 	options.direction = IMessageContentOptions::DirectionIn;
 
 	options.time = QDateTime::currentDateTime();
-	options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
+	options.timeFormat = FMessageStyles->timeFormat(options.time);
 
+	showDateSeparator(FViewWidget,options.time);
 	FViewWidget->appendText(ATopic,options);
 }
 
-void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AContentType)
+void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AType, int AStatus)
 {
 	IMessageContentOptions options;
+	options.kind = IMessageContentOptions::KindStatus;
+	options.type |= AType;
+	options.status = AStatus;
 	options.direction = IMessageContentOptions::DirectionIn;
-	options.kind = IMessageContentOptions::Status;
-	options.type |= AContentType;
 
 	options.time = QDateTime::currentDateTime();
-	options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
+	options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	if (FMessageArchiver && Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS).value().toBool())
 		FMessageArchiver->saveNote(FMultiChat->streamJid(), FMultiChat->roomJid(), AMessage);
 
+	showDateSeparator(FViewWidget,options.time);
 	FViewWidget->appendText(AMessage,options);
 }
 
 void MultiUserChatWindow::showUserMessage(const Message &AMessage, const QString &ANick)
 {
 	IMessageContentOptions options;
-	options.kind = IMessageContentOptions::Message;
-	options.type |= IMessageContentOptions::Groupchat;
+	options.kind = IMessageContentOptions::KindMessage;
+	options.type |= IMessageContentOptions::TypeGroupchat;
 
 	options.time = AMessage.dateTime();
-	options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	if (AMessage.isDelayed())
-		options.type |= IMessageContentOptions::History;
+		options.type |= IMessageContentOptions::TypeHistory;
 
 	options.senderName = Qt::escape(ANick);
 	options.senderId = options.senderName;
 
-	if (FMessageStyles!=NULL)
-	{
-		IMultiUser *user = FMultiChat->nickName()!=ANick ? FMultiChat->userByNick(ANick) : FMultiChat->mainUser();
-		if (user)
-			options.senderIcon = FMessageStyles->userIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
-		else
-			options.senderIcon = FMessageStyles->userIcon(Jid::null,IPresence::Offline,SUBSCRIPTION_BOTH,false);
-	}
+	IMultiUser *user = FMultiChat->nickName()!=ANick ? FMultiChat->userByNick(ANick) : FMultiChat->mainUser();
+	if (user)
+		options.senderIcon = FMessageStyles->contactIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
+	else
+		options.senderIcon = FMessageStyles->contactIcon(Jid::null,IPresence::Offline,SUBSCRIPTION_BOTH,false);
 
-	if (FMultiChat->nickName()!=ANick)
+	if (FMultiChat->nickName() != ANick)
 	{
 		options.direction = IMessageContentOptions::DirectionIn;
 		if (isMentionMessage(AMessage))
-			options.type |= IMessageContentOptions::Mention;
+			options.type |= IMessageContentOptions::TypeMention;
 	}
 	else
 	{
 		options.direction = IMessageContentOptions::DirectionOut;
 	}
 
+	showDateSeparator(FViewWidget,options.time);
 	FViewWidget->appendMessage(AMessage,options);
 }
 
@@ -1307,6 +1336,7 @@ void MultiUserChatWindow::setChatMessageStyle(IChatWindow *AWindow)
 		IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
 		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
 		AWindow->viewWidget()->setMessageStyle(style,soptions);
+		FWindowStatus[AWindow->viewWidget()].lastDateSeparator = QDate();
 	}
 }
 
@@ -1314,7 +1344,7 @@ void MultiUserChatWindow::fillChatContentOptions(IChatWindow *AWindow, IMessageC
 {
 	IMultiUser *user = AOptions.direction==IMessageContentOptions::DirectionIn ? FMultiChat->userByNick(AWindow->contactJid().resource()) : FMultiChat->mainUser();
 	if (user)
-		AOptions.senderIcon = FMessageStyles->userIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
+		AOptions.senderIcon = FMessageStyles->contactIcon(user->contactJid(),user->data(MUDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
 
 	if (AOptions.direction == IMessageContentOptions::DirectionIn)
 	{
@@ -1329,33 +1359,39 @@ void MultiUserChatWindow::fillChatContentOptions(IChatWindow *AWindow, IMessageC
 	AOptions.senderId = AOptions.senderName;
 }
 
-void MultiUserChatWindow::showChatStatus(IChatWindow *AWindow, const QString &AMessage)
+void MultiUserChatWindow::showChatStatus(IChatWindow *AWindow, const QString &AMessage, int AStatus)
 {
 	IMessageContentOptions options;
-	options.kind = IMessageContentOptions::Status;
+	options.kind = IMessageContentOptions::KindStatus;
+	options.status = AStatus;
 	options.direction = IMessageContentOptions::DirectionIn;
 
 	options.time = QDateTime::currentDateTime();
 	options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	fillChatContentOptions(AWindow,options);
+	showDateSeparator(AWindow->viewWidget(),options.time);
 	AWindow->viewWidget()->appendText(AMessage,options);
 }
 
 void MultiUserChatWindow::showChatMessage(IChatWindow *AWindow, const Message &AMessage)
 {
 	IMessageContentOptions options;
-	options.kind = IMessageContentOptions::Message;
+	options.kind = IMessageContentOptions::KindMessage;
 
 	options.time = AMessage.dateTime();
-	options.timeFormat = FMessageStyles->timeFormat(options.time);
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	options.direction = AWindow->contactJid()!=AMessage.to() ? IMessageContentOptions::DirectionIn : IMessageContentOptions::DirectionOut;
 
 	if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_PAST)
-		options.type |= IMessageContentOptions::History;
+		options.type |= IMessageContentOptions::TypeHistory;
 
 	fillChatContentOptions(AWindow,options);
+	showDateSeparator(AWindow->viewWidget(),options.time);
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
@@ -1596,12 +1632,12 @@ void MultiUserChatWindow::onChatOpened()
 
 void MultiUserChatWindow::onChatNotify(const QString &ANotify)
 {
-	showStatusMessage(tr("Notify: %1").arg(ANotify),IMessageContentOptions::Notification);
+	showStatusMessage(tr("Notify: %1").arg(ANotify),IMessageContentOptions::TypeNotification);
 }
 
 void MultiUserChatWindow::onChatError(const QString &AMessage)
 {
-	showStatusMessage(tr("Error: %1").arg(AMessage),IMessageContentOptions::Notification);
+	showStatusMessage(tr("Error: %1").arg(AMessage),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 }
 
 void MultiUserChatWindow::onChatClosed()
@@ -1617,7 +1653,7 @@ void MultiUserChatWindow::onChatClosed()
 		}
 		else
 		{
-			showStatusMessage(tr("Disconnected"));
+			showStatusMessage(tr("Disconnected"),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusOffline);
 		}
 		updateWindow();
 	}
@@ -1659,7 +1695,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 					enterMessage = tr("%1 has joined the room").arg(AUser->nickName());
 				if (!AStatus.isEmpty() && Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
 					enterMessage += QString(" - [%1] %2").arg(show).arg(AStatus);
-				showStatusMessage(enterMessage);
+				showStatusMessage(enterMessage,IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusJoined);
 			}
 		}
 		else
@@ -1689,7 +1725,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 					enterMessage = tr("%1 has left the room").arg(AUser->nickName());
 				if (!AStatus.isEmpty() && Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS).value().toBool())
 					enterMessage += " - " + AStatus.trimmed();
-				showStatusMessage(enterMessage);
+				showStatusMessage(enterMessage,IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusLeft);
 			}
 		}
 		FUsers.remove(AUser);
@@ -1707,7 +1743,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 		if (FUsers.contains(AUser) || !FDestroyTimers.contains(window))
 		{
 			if (!enterMessage.isEmpty())
-				showChatStatus(window,enterMessage);
+				showChatStatus(window,enterMessage,AShow!=IPresence::Offline && AShow!=IPresence::Error ? IMessageContentOptions::StatusJoined : IMessageContentOptions::StatusLeft);
 			if (!statusMessage.isEmpty())
 				showChatStatus(window,statusMessage);
 			window->infoWidget()->setField(IInfoWidget::ContactShow,AShow);
@@ -1726,13 +1762,13 @@ void MultiUserChatWindow::onUserDataChanged(IMultiUser *AUser, int ARole, const 
 	if (ARole == MUDR_ROLE)
 	{
 		if (AAfter!=MUC_ROLE_NONE && ABefore!=MUC_ROLE_NONE)
-			showStatusMessage(tr("%1 role changed from %2 to %3").arg(AUser->nickName()).arg(ABefore.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
+			showStatusMessage(tr("%1 role changed from %2 to %3").arg(AUser->nickName()).arg(ABefore.toString()).arg(AAfter.toString()),IMessageContentOptions::TypeEvent);
 		highlightUserRole(AUser);
 	}
 	else if (ARole == MUDR_AFFILIATION)
 	{
 		if (FUsers.contains(AUser))
-			showStatusMessage(tr("%1 affiliation changed from %2 to %3").arg(AUser->nickName()).arg(ABefore.toString()).arg(AAfter.toString()),IMessageContentOptions::Event);
+			showStatusMessage(tr("%1 affiliation changed from %2 to %3").arg(AUser->nickName()).arg(ABefore.toString()).arg(AAfter.toString()),IMessageContentOptions::TypeEvent);
 		highlightUserAffiliation(AUser);
 	}
 }
@@ -1757,7 +1793,7 @@ void MultiUserChatWindow::onUserNickChanged(IMultiUser *AUser, const QString &AO
 	if (AUser == FMultiChat->mainUser())
 		updateWindow();
 
-	showStatusMessage(tr("%1 changed nick to %2").arg(AOldNick).arg(ANewNick),IMessageContentOptions::Event);
+	showStatusMessage(tr("%1 changed nick to %2").arg(AOldNick).arg(ANewNick),IMessageContentOptions::TypeEvent);
 }
 
 void MultiUserChatWindow::onPresenceChanged(int AShow, const QString &AStatus)
@@ -1796,7 +1832,7 @@ void MultiUserChatWindow::onMessageReceived(const QString &ANick, const Message 
 void MultiUserChatWindow::onInviteDeclined(const Jid &AContactJid, const QString &AReason)
 {
 	QString nick = AContactJid && roomJid() ? AContactJid.resource() : AContactJid.full();
-	showStatusMessage(tr("%1 has declined your invite to this room. %2").arg(nick).arg(AReason),IMessageContentOptions::Notification);
+	showStatusMessage(tr("%1 has declined your invite to this room. %2").arg(nick).arg(AReason),IMessageContentOptions::TypeNotification);
 }
 
 void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser)
@@ -1806,7 +1842,7 @@ void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &ARea
 	showStatusMessage(tr("%1 has been kicked from the room%2. %3")
 		.arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
 		.arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
-		.arg(AReason), IMessageContentOptions::Event);
+		.arg(AReason), IMessageContentOptions::TypeEvent);
 }
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)
@@ -1816,7 +1852,7 @@ void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &ARea
 	showStatusMessage(tr("%1 has been banned from the room%2. %3")
 		.arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
 		.arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
-		.arg(AReason), IMessageContentOptions::Event);
+		.arg(AReason), IMessageContentOptions::TypeEvent);
 }
 
 void MultiUserChatWindow::onAffiliationListReceived(const QString &AAffiliation, const QList<IMultiUserListItem> &AList)
@@ -1851,7 +1887,7 @@ void MultiUserChatWindow::onConfigFormReceived(const IDataForm &AForm)
 
 void MultiUserChatWindow::onRoomDestroyed(const QString &AReason)
 {
-	showStatusMessage(tr("This room was destroyed by owner. %1").arg(AReason),IMessageContentOptions::Event);
+	showStatusMessage(tr("This room was destroyed by owner. %1").arg(AReason),IMessageContentOptions::TypeEvent);
 }
 
 void MultiUserChatWindow::onMessageReady()

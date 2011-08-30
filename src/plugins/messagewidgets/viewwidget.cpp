@@ -113,13 +113,13 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 
 	// "/me" command
 	IMessageContentOptions options = AOptions;
-	if (AOptions.kind==IMessageContentOptions::Message && !AOptions.senderName.isEmpty())
+	if (AOptions.kind==IMessageContentOptions::KindMessage && !AOptions.senderName.isEmpty())
 	{
 		QTextCursor cursor(&doc);
 		cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,4);
 		if (cursor.selectedText() == "/me ")
 		{
-			options.kind = IMessageContentOptions::MeCommand;
+			options.kind = IMessageContentOptions::KindMeCommand;
 			cursor.removeSelectedText();
 		}
 	}
@@ -200,10 +200,10 @@ void ViewWidget::dragLeaveEvent(QDragLeaveEvent *AEvent)
 		handler->viewDragLeave(this, AEvent);
 }
 
-void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AMessage, const IMessageContentOptions &AOptions)
+void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
 {
 	if (AWidget == FStyleWidget)
-		emit contentAppended(AMessage,AOptions);
+		emit contentAppended(AHtml,AOptions);
 }
 
 void ViewWidget::onUrlClicked(QWidget *AWidget, const QUrl &AUrl)

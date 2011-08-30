@@ -96,6 +96,8 @@
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
 // ChatMessageHandler
 #define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
+//MessageStyles
+#define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
 
 // MultiUserChat
 #define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"

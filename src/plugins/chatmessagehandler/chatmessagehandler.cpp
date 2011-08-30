@@ -173,7 +173,7 @@ QMultiMap<int, IOptionsWidget *> ChatMessageHandler::optionsWidgets(const QStrin
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_LOAD_HISTORY),tr("Load messages from history in new chat windows"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_LOADHISTORY,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_LOAD_HISTORY),tr("Load messages from history in new chat windows"),AParent));
 	}
 	return widgets;
 }
@@ -337,7 +337,7 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
 
 			FWindows.append(window);
-			FWindowStatus[window->viewWidget()].createTime = QDateTime::currentDateTime();
+			FWindowStatus[window].createTime = QDateTime::currentDateTime();
 			updateWindow(window);
 			setMessageStyle(window);
 
@@ -405,7 +405,7 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 		request.with = AWindow->contactJid().bare();
 		request.order = Qt::DescendingOrder;
 
-		WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
+		WindowStatus &wstatus = FWindowStatus[AWindow];
 		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) < HISTORY_TIME_PAST)
 		{
 			request.count = HISTORY_MESSAGES;
@@ -442,6 +442,7 @@ void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 	{
 		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
 		AWindow->viewWidget()->setMessageStyle(style,soptions);
+		FWindowStatus[AWindow].lastDateSeparator = QDate();
 	}
 } 
 
@@ -450,9 +451,9 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageConten
 	if (AOptions.direction == IMessageContentOptions::DirectionIn)
 	{
 		AOptions.senderId = AWindow->contactJid().full();
-		AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid(),AWindow->contactJid()));
-		AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->contactJid());
-		AOptions.senderIcon = FMessageStyles->userIcon(AWindow->streamJid(),AWindow->contactJid());
+		AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()));
+		AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->contactJid());
+		AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 		AOptions.senderColor = "blue";
 	}
 	else
@@ -461,10 +462,34 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageConten
 		if (AWindow->streamJid() && AWindow->contactJid())
 			AOptions.senderName = Qt::escape(!AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource() : AWindow->streamJid().node());
 		else
-			AOptions.senderName = Qt::escape(FMessageStyles->userName(AWindow->streamJid()));
-		AOptions.senderAvatar = FMessageStyles->userAvatar(AWindow->streamJid());
-		AOptions.senderIcon = FMessageStyles->userIcon(AWindow->streamJid());
+			AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid()));
+		AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->streamJid());
+		AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid());
 		AOptions.senderColor = "red";
+	}
+}
+
+void ChatMessageHandler::showDateSeparator(IChatWindow *AWindow, const QDateTime &ADateTime)
+{
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+	{
+		QDate sepDate = ADateTime.date();
+		WindowStatus &wstatus = FWindowStatus[AWindow];
+		if (FMessageStyles && sepDate.isValid() && wstatus.lastDateSeparator!=sepDate)
+		{
+			IMessageContentOptions options;
+			options.kind = IMessageContentOptions::KindStatus;
+			if (wstatus.createTime > ADateTime)
+				options.type |= IMessageContentOptions::TypeHistory;
+			options.status = IMessageContentOptions::StatusDateSeparator;
+			options.direction = IMessageContentOptions::DirectionIn;
+			options.time.setDate(sepDate);
+			options.time.setTime(QTime(0,0));
+			options.timeFormat = " ";
+			options.noScroll = true;
+			wstatus.lastDateSeparator = sepDate;
+			AWindow->viewWidget()->appendText(FMessageStyles->dateSeparator(sepDate),options);
+		}
 	}
 }
 
@@ -474,29 +499,34 @@ void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &A
 		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
 
 	IMessageContentOptions options;
-	options.kind = IMessageContentOptions::Status;
+	options.kind = IMessageContentOptions::KindStatus;
 	options.time = QDateTime::currentDateTime();
 	options.timeFormat = FMessageStyles->timeFormat(options.time);
 	options.direction = IMessageContentOptions::DirectionIn;
 	fillContentOptions(AWindow,options);
+	showDateSeparator(AWindow,options.time);
 	AWindow->viewWidget()->appendText(AMessage,options);
 }
 
 void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &AMessage)
 {
 	IMessageContentOptions options;
-	options.kind = IMessageContentOptions::Message;
+	options.kind = IMessageContentOptions::KindMessage;
 	options.time = AMessage.dateTime();
-	options.timeFormat = FMessageStyles->timeFormat(options.time);
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
 	if (AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid() != AMessage.to() : !(AWindow->contactJid() && AMessage.to()))
 		options.direction = IMessageContentOptions::DirectionIn;
 	else
 		options.direction = IMessageContentOptions::DirectionOut;
 
-	if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_PAST)
-		options.type |= IMessageContentOptions::History;
+	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_PAST)
+		options.type |= IMessageContentOptions::TypeHistory;
 
 	fillContentOptions(AWindow,options);
+	showDateSeparator(AWindow,options.time);
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
@@ -530,7 +560,7 @@ void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const
 			{
 				QString status = AValue.toString();
 				QString show = FStatusChanger ? FStatusChanger->nameByShow(widget->field(IInfoWidget::ContactShow).toInt()) : QString::null;
-				WindowStatus &wstatus = FWindowStatus[window->viewWidget()];
+				WindowStatus &wstatus = FWindowStatus[window];
 				if (Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool() && wstatus.lastStatusShow!=status+show)
 				{
 					QString message = tr("%1 changed status to [%2] %3").arg(widget->field(IInfoWidget::ContactName).toString()).arg(show).arg(status);
@@ -583,7 +613,7 @@ void ChatMessageHandler::onWindowDestroyed()
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);
 		FWindows.removeAt(FWindows.indexOf(window));
-		FWindowStatus.remove(window->viewWidget());
+		FWindowStatus.remove(window);
 	}
 }
 

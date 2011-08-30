@@ -48,3 +48,13 @@
 {
 	background-color: #f0f0f0;
 }
+
+.date_separator .xxxmessage
+{
+	color: darkCyan;
+}
+
+.date_separator .xxxtime
+{
+	color: transparent;
+}
