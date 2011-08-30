@@ -22,30 +22,51 @@ struct IMessageStyleOptions
 struct IMessageContentOptions
 {
 	enum ContentKind {
-		Message,
-		Status,
-		Topic,
-		MeCommand
+		KindMessage,
+		KindStatus,
+		KindTopic,
+		KindMeCommand
 	};
 	enum ContentType {
-		Groupchat       =0x01,
-		History         =0x02,
-		Event           =0x04,
-		Mention         =0x08,
-		Notification    =0x10
+		TypeEmpty           =0x00,
+		TypeGroupchat       =0x01,
+		TypeHistory         =0x02,
+		TypeEvent           =0x04,
+		TypeMention         =0x08,
+		TypeNotification    =0x10
+	};
+	enum ContentStatus {
+		StatusEmpty,
+		StatusOnline,
+		StatusOffline,
+		StatusAway,
+		StatusAwayMessage,
+		StatusReturnAway,
+		StatusIdle,
+		StatusReturnIdle,
+		StatusDateSeparator,
+		StatusJoined,
+		StatusLeft,
+		StatusError,
+		StatusTimeout,
+		StatusEncryption,
+		StatusFileTransferBegan,
+		StatusFileTransferComplete
 	};
 	enum ContentDirection {
 		DirectionIn,
 		DirectionOut
 	};
 	IMessageContentOptions() { 
-		kind = Message;
-		type = 0;
+		kind = KindMessage;
+		type = TypeEmpty;
+		status = StatusEmpty;
 		direction = DirectionIn;
 		noScroll = false;
 	}
 	int kind;
 	int type;
+	int status;
 	int direction;
 	bool noScroll;
 	QDateTime time;
@@ -106,17 +127,18 @@ public:
 	virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions) const =0;
 	virtual IMessageStyleOptions styleOptions(const OptionsNode &ANode, int AMessageType) const =0;
 	virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const =0;
-	virtual QString userAvatar(const Jid &AContactJid) const =0;
-	virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const =0;
-	virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const =0;
-	virtual QString userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const =0;
-	virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const =0;
+	virtual QString contactAvatar(const Jid &AContactJid) const =0;
+	virtual QString contactName(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const =0;
+	virtual QString contactIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const =0;
+	virtual QString contactIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const =0;
+	virtual QString dateSeparator(const QDate &ADate, const QDate &ACurDate = QDate::currentDate()) const =0;
+	virtual QString timeFormat(const QDateTime &ATime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const =0;
 protected:
 	virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 
-Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.0")
-Q_DECLARE_INTERFACE(IMessageStylePlugin,"Vacuum.Plugin.IMessageStylePlugin/1.0")
-Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.1")
+Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.1")
+Q_DECLARE_INTERFACE(IMessageStylePlugin,"Vacuum.Plugin.IMessageStylePlugin/1.1")
+Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.2")
 
 #endif

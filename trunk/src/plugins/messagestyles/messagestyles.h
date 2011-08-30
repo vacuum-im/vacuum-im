@@ -47,11 +47,12 @@ public:
 	virtual IMessageStyleOptions styleOptions(const OptionsNode &ANode, int AMessageType) const;
 	virtual IMessageStyleOptions styleOptions(int AMessageType, const QString &AContext = QString::null) const;
 	//Other functions
-	virtual QString userAvatar(const Jid &AContactJid) const;
-	virtual QString userName(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;
-	virtual QString userIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;
-	virtual QString userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const;
-	virtual QString timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const;
+	virtual QString contactAvatar(const Jid &AContactJid) const;
+	virtual QString contactName(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;
+	virtual QString contactIcon(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;
+	virtual QString contactIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const;
+	virtual QString dateSeparator(const QDate &ADate, const QDate &ACurDate = QDate::currentDate()) const;
+	virtual QString timeFormat(const QDateTime &ATime, const QDateTime &ACurTime = QDateTime::currentDateTime()) const;
 signals:
 	void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const;
 protected:

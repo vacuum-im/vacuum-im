@@ -239,8 +239,8 @@ void ChatWindowMenu::onRequestFailed(const QString &AId, const QString &AError)
 		if (FToolBarWidget->viewWidget() != NULL)
 		{
 			IMessageContentOptions options;
-			options.kind = IMessageContentOptions::Status;
-			options.type |= IMessageContentOptions::Event;
+			options.kind = IMessageContentOptions::KindStatus;
+			options.type |= IMessageContentOptions::TypeEvent;
 			options.direction = IMessageContentOptions::DirectionIn;
 			options.time = QDateTime::currentDateTime();
 			FToolBarWidget->viewWidget()->appendText(tr("Changing archive preferences failed: %1").arg(AError),options);

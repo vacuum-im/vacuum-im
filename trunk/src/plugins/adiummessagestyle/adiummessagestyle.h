@@ -56,7 +56,7 @@
 #define MSSK_TIMED_OUT                      "timed_out"
 #define MSSK_ENCRYPTION                     "encryption"
 #define MSSK_FILETRANSFER_BEGAN             "fileTransferBegan"
-#define MSSK_FILETRANSFER_CONPLETE          "fileTransferComplete"
+#define MSSK_FILETRANSFER_COMPLETE          "fileTransferComplete"
 
 //Message Style Options
 #define MSO_STYLE_ID                        "styleId"

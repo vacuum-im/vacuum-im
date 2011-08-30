@@ -51,6 +51,7 @@ struct WindowStatus
 	QDateTime startTime;
 	QDateTime createTime;
 	QString lastStatusShow;
+	QDate lastDateSeparator;
 };
 
 class ChatMessageHandler :
@@ -94,6 +95,7 @@ protected:
 	void showHistory(IChatWindow *AWindow);
 	void setMessageStyle(IChatWindow *AWindow);
 	void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void showDateSeparator(IChatWindow *AWindow, const QDateTime &ADateTime);
 	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage);
 	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
@@ -124,8 +126,8 @@ private:
 private:
 	QList<IChatWindow *> FWindows;
 	QMultiMap<IChatWindow *,int> FActiveMessages;
-	QMap<IViewWidget *, WindowStatus> FWindowStatus;
 	QMap<IChatWindow *, QTimer *> FDestroyTimers;
+	QMap<IChatWindow *, WindowStatus> FWindowStatus;
 };
 
 #endif // CHATMESSAGEHANDLER_H

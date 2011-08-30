@@ -70,6 +70,8 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool MessageStyles::initSettings()
 {
+	Options::setDefaultValue(OPV_MESSAGES_SHOWDATESEPARATORS,true);
+
 	if (FOptionsManager)
 	{
 		IOptionsDialogNode dnode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, tr("Message Styles"), MNI_MESSAGE_STYLES };
@@ -85,6 +87,10 @@ QMultiMap<int, IOptionsWidget *> MessageStyles::optionsWidgets(const QString &AN
 	if (ANodeId == OPN_MESSAGE_STYLES && !FStylePlugins.isEmpty())
 	{
 		widgets.insertMulti(OWO_MESSAGE_STYLES, new StyleOptionsWidget(this,AParent));
+	}
+	else if (ANodeId == OPN_MESSAGES)
+	{
+		widgets.insertMulti(OWO_MESSAGES_SHOWDATESEPARATORS,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWDATESEPARATORS),tr("Show date separators in chat window"),AParent));
 	}
 	return widgets;
 }
@@ -134,12 +140,12 @@ IMessageStyleOptions MessageStyles::styleOptions(int AMessageType, const QString
 	return styleOptions(node,AMessageType);
 }
 
-QString MessageStyles::userAvatar(const Jid &AContactJid) const
+QString MessageStyles::contactAvatar(const Jid &AContactJid) const
 {
 	return FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(AContactJid)) : QString::null;
 }
 
-QString MessageStyles::userName(const Jid &AStreamJid, const Jid &AContactJid) const
+QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	QString name;
 	if (!AContactJid.isValid())
@@ -178,7 +184,7 @@ QString MessageStyles::userName(const Jid &AStreamJid, const Jid &AContactJid) c
 	return name;
 }
 
-QString MessageStyles::userIcon(const Jid &AStreamJid, const Jid &AContactJid) const
+QString MessageStyles::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	if (FStatusIcons)
 	{
@@ -193,7 +199,7 @@ QString MessageStyles::userIcon(const Jid &AStreamJid, const Jid &AContactJid) c
 	return QString::null;
 }
 
-QString MessageStyles::userIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const
+QString MessageStyles::contactIcon(const Jid &AContactJid, int AShow, const QString &ASubscription, bool AAsk) const
 {
 	if (FStatusIcons)
 	{
@@ -204,9 +210,27 @@ QString MessageStyles::userIcon(const Jid &AContactJid, int AShow, const QString
 	return QString::null;
 }
 
-QString MessageStyles::timeFormat(const QDateTime &AMessageTime, const QDateTime &ACurTime) const
+QString MessageStyles::dateSeparator(const QDate &ADate, const QDate &ACurDate) const
 {
-	int daysDelta = AMessageTime.daysTo(ACurTime);
+	static const QList<QString> mnames = QList<QString>() << tr("January") << tr("February") <<  tr("March") <<  tr("April")
+		<< tr("May") << tr("June") << tr("July") << tr("August") << tr("September") << tr("October") << tr("November") << tr("December");
+	static const QList<QString> dnames = QList<QString>() << tr("Monday") << tr("Tuesday") <<  tr("Wednesday") <<  tr("Thursday")
+		<< tr("Friday") << tr("Saturday") << tr("Sunday");
+
+	QString text;
+	if (ADate == ACurDate)
+		text = ADate.toString(tr("%1, %2 dd")).arg(tr("Today")).arg(mnames.value(ADate.month()-1));
+	else if (ADate.year() == ACurDate.year())
+		text = ADate.toString(tr("%1, %2 dd")).arg(dnames.value(ADate.dayOfWeek()-1)).arg(mnames.value(ADate.month()-1));
+	else
+		text = ADate.toString(tr("%1, %2 dd, yyyy")).arg(dnames.value(ADate.dayOfWeek()-1)).arg(mnames.value(ADate.month()-1));
+
+	return text;
+}
+
+QString MessageStyles::timeFormat(const QDateTime &ATime, const QDateTime &ACurTime) const
+{
+	int daysDelta = ATime.daysTo(ACurTime);
 	if (daysDelta > 365)
 		return tr("d MMM yyyy hh:mm");
 	else if (daysDelta > 0)

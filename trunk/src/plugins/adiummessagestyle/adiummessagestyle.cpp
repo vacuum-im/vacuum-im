@@ -161,7 +161,7 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		QString html = makeContentTemplate(AOptions,sameSender);
 		fillContentKeywords(html,AOptions,sameSender);
 		html.replace("%message%",prepareMessage(AHtml,AOptions));
-		if (AOptions.kind == IMessageContentOptions::Topic)
+		if (AOptions.kind == IMessageContentOptions::KindTopic)
 			html.replace("%topic%",QString(TOPIC_INDIVIDUAL_WRAPPER).arg(AHtml));
 
 		WidgetStatus &wstatus = FWidgetStatus[AWidget];
@@ -248,7 +248,7 @@ bool AdiumMessageStyle::isSameSender(QWidget *AWidget, const IMessageContentOpti
 {
 	if (!FCombineConsecutive)
 		return false;
-	if (AOptions.kind != IMessageContentOptions::Message)
+	if (AOptions.kind != IMessageContentOptions::KindMessage)
 		return false;
 	if (AOptions.senderId.isEmpty())
 		return false;
@@ -364,21 +364,21 @@ void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOpt
 QString AdiumMessageStyle::makeContentTemplate(const IMessageContentOptions &AOptions, bool ASameSender) const
 {
 	QString html;
-	if (false && AOptions.kind == IMessageContentOptions::Topic && !FTopicHTML.isEmpty())
+	if (false && AOptions.kind == IMessageContentOptions::KindTopic && !FTopicHTML.isEmpty())
 	{
 		html = FTopicHTML;
 	}
-	else if (AOptions.kind == IMessageContentOptions::Status && !FStatusHTML.isEmpty())
+	else if (AOptions.kind == IMessageContentOptions::KindStatus && !FStatusHTML.isEmpty())
 	{
 		html = FStatusHTML;
 	}
-	else if (AOptions.kind==IMessageContentOptions::MeCommand && (!FMeCommandHTML.isEmpty() || !FStatusHTML.isEmpty()))
+	else if (AOptions.kind==IMessageContentOptions::KindMeCommand && (!FMeCommandHTML.isEmpty() || !FStatusHTML.isEmpty()))
 	{
 		html = !FMeCommandHTML.isEmpty() ? FMeCommandHTML : FStatusHTML;
 	}
 	else
 	{
-		if (AOptions.type & IMessageContentOptions::History)
+		if (AOptions.type & IMessageContentOptions::TypeHistory)
 		{
 			if (AOptions.direction == IMessageContentOptions::DirectionIn)
 				html = ASameSender ? FIn_NextContextHTML : FIn_ContextHTML;
@@ -399,34 +399,68 @@ QString AdiumMessageStyle::makeContentTemplate(const IMessageContentOptions &AOp
 
 void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageContentOptions &AOptions, bool ASameSender) const
 {
-	bool isDirectionIn = AOptions.direction == IMessageContentOptions::DirectionIn;
+	bool isDirectionIn = AOptions.direction==IMessageContentOptions::DirectionIn;
 
 	QStringList messageClasses;
 	if (FCombineConsecutive && ASameSender)
 		messageClasses << MSMC_CONSECUTIVE;
-
-	if (AOptions.kind==IMessageContentOptions::MeCommand)
+	
+	if (AOptions.kind==IMessageContentOptions::KindMeCommand)
 		messageClasses << (!FMeCommandHTML.isEmpty() ? MSMC_MECOMMAND : MSMC_STATUS);
-	else if (AOptions.kind == IMessageContentOptions::Status)
+	else if (AOptions.kind == IMessageContentOptions::KindStatus)
 		messageClasses << MSMC_STATUS;
 	else
 		messageClasses << MSMC_MESSAGE;
-
-	if (AOptions.type & IMessageContentOptions::Groupchat)
-		messageClasses << MSMC_GROUPCHAT;
-	if (AOptions.type & IMessageContentOptions::History)
-		messageClasses << MSMC_HISTORY;
-	if (AOptions.type & IMessageContentOptions::Event)
-		messageClasses << MSMC_EVENT;
-	if (AOptions.type & IMessageContentOptions::Mention)
-		messageClasses << MSMC_MENTION;
-	if (AOptions.type & IMessageContentOptions::Notification)
-		messageClasses << MSMC_NOTIFICATION;
-
+	
 	if (isDirectionIn)
 		messageClasses << MSMC_INCOMING;
 	else
 		messageClasses << MSMC_OUTGOING;
+	
+	if (AOptions.type & IMessageContentOptions::TypeGroupchat)
+		messageClasses << MSMC_GROUPCHAT;
+	if (AOptions.type & IMessageContentOptions::TypeHistory)
+		messageClasses << MSMC_HISTORY;
+	if (AOptions.type & IMessageContentOptions::TypeEvent)
+		messageClasses << MSMC_EVENT;
+	if (AOptions.type & IMessageContentOptions::TypeMention)
+		messageClasses << MSMC_MENTION;
+	if (AOptions.type & IMessageContentOptions::TypeNotification)
+		messageClasses << MSMC_NOTIFICATION;
+
+	QString messageStatus;
+	if (AOptions.status == IMessageContentOptions::StatusOnline)
+		messageStatus = MSSK_ONLINE;
+	else if (AOptions.status == IMessageContentOptions::StatusOffline)
+		messageStatus = MSSK_OFFLINE;
+	else if (AOptions.status == IMessageContentOptions::StatusAway)
+		messageStatus = MSSK_AWAY;
+	else if (AOptions.status == IMessageContentOptions::StatusAwayMessage)
+		messageStatus = MSSK_AWAY_MESSAGE;
+	else if (AOptions.status == IMessageContentOptions::StatusReturnAway)
+		messageStatus = MSSK_RETURN_AWAY;
+	else if (AOptions.status == IMessageContentOptions::StatusIdle)
+		messageStatus = MSSK_IDLE;
+	else if (AOptions.status == IMessageContentOptions::StatusReturnIdle)
+		messageStatus = MSSK_RETURN_IDLE;
+	else if (AOptions.status == IMessageContentOptions::StatusDateSeparator)
+		messageStatus = MSSK_DATE_SEPARATOR;
+	else if (AOptions.status == IMessageContentOptions::StatusJoined)
+		messageStatus = MSSK_CONTACT_JOINED;
+	else if (AOptions.status == IMessageContentOptions::StatusLeft)
+		messageStatus = MSSK_CONTACT_LEFT;
+	else if (AOptions.status == IMessageContentOptions::StatusError)
+		messageStatus = MSSK_ERROR;
+	else if (AOptions.status == IMessageContentOptions::StatusTimeout)
+		messageStatus = MSSK_TIMED_OUT;
+	else if (AOptions.status == IMessageContentOptions::StatusEncryption)
+		messageStatus = MSSK_ENCRYPTION;
+	else if (AOptions.status == IMessageContentOptions::StatusFileTransferBegan)
+		messageStatus = MSSK_FILETRANSFER_BEGAN;
+	else if (AOptions.status == IMessageContentOptions::StatusFileTransferComplete)
+		messageStatus = MSSK_FILETRANSFER_COMPLETE;
+	if (!messageStatus.isEmpty())
+		messageClasses << messageStatus;
 
 	AHtml.replace("%messageClasses%", messageClasses.join(" "));
 
@@ -461,9 +495,9 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 		if (!scolorRegExp.cap(0).isEmpty())
 			AHtml.replace(pos, scolorRegExp.cap(0).length(), sColor);
 
-	if (AOptions.kind == IMessageContentOptions::Status)
+	if (AOptions.kind == IMessageContentOptions::KindStatus)
 	{
-		AHtml.replace("%status%","");
+		AHtml.replace("%status%",messageStatus);
 		AHtml.replace("%statusSender%",AOptions.senderName);
 	}
 	else
@@ -540,7 +574,7 @@ QString AdiumMessageStyle::scriptForAppendContent(bool ASameSender, bool ANoScro
 
 QString AdiumMessageStyle::prepareMessage(const QString &AHtml, const IMessageContentOptions &AOptions) const
 {
-	if (AOptions.kind==IMessageContentOptions::MeCommand && FMeCommandHTML.isEmpty())
+	if (AOptions.kind==IMessageContentOptions::KindMeCommand && FMeCommandHTML.isEmpty())
 	{
 		QTextDocument doc;
 		doc.setHtml(AHtml);

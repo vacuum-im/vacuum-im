@@ -68,7 +68,7 @@ protected:
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
-	virtual void contentAppended(const QString &AMessage, const IMessageContentOptions &AOptions) =0;
+	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 	virtual void viewContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu) =0;
 	virtual void urlClicked(const QUrl &AUrl) const =0;
 };

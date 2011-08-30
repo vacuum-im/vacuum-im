@@ -668,13 +668,13 @@ void ViewHistoryWindow::setViewOptions(const IArchiveCollection &ACollection)
 
 	if (FMessageStyles && !FViewOptions.isGroupchat)
 	{
-		FViewOptions.selfName = Qt::escape(FMessageStyles->userName(FStreamJid));
-		FViewOptions.selfAvatar = FMessageStyles->userAvatar(FStreamJid);
+		FViewOptions.selfName = Qt::escape(FMessageStyles->contactName(FStreamJid));
+		FViewOptions.selfAvatar = FMessageStyles->contactAvatar(FStreamJid);
 		if (!ACollection.header.with.resource().isEmpty() && ACollection.header.with.pDomain().startsWith("conference."))
 			FViewOptions.contactName = Qt::escape(ACollection.header.with.resource());
 		else
 			FViewOptions.contactName = Qt::escape(FArchiver->gateNick(FStreamJid,ACollection.header.with));
-		FViewOptions.contactAvatar = FMessageStyles->userAvatar(ACollection.header.with);
+		FViewOptions.contactAvatar = FMessageStyles->contactAvatar(ACollection.header.with);
 	}
 }
 
@@ -696,7 +696,7 @@ void ViewHistoryWindow::showNotification(const QString &AMessage)
 	if (FMessageWidgets)
 	{
 		IMessageContentOptions options;
-		options.kind = IMessageContentOptions::Status;
+		options.kind = IMessageContentOptions::KindStatus;
 		options.direction = IMessageContentOptions::DirectionIn;
 		options.time = QDateTime::currentDateTime();
 		options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
@@ -760,7 +760,7 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 			if (messageIt!=ACollection.messages.constEnd() && (noteIt==ACollection.notes.constEnd() || messageIt->dateTime()<noteIt.key()))
 			{
 				options.type = 0;
-				options.kind = IMessageContentOptions::Message;
+				options.kind = IMessageContentOptions::KindMessage;
 				options.time = messageIt->dateTime();
 				options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time) : QString::null;
 				Jid senderJid = !messageIt->from().isEmpty() ? messageIt->from() : FStreamJid;
@@ -768,7 +768,7 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 				if (FViewOptions.isGroupchat)
 				{
 					options.direction = IMessageContentOptions::DirectionIn;
-					options.type |= IMessageContentOptions::Groupchat;
+					options.type |= IMessageContentOptions::TypeGroupchat;
 					options.senderName = Qt::escape(senderJid.resource());
 					options.senderId = options.senderName;
 				}
@@ -794,7 +794,7 @@ void ViewHistoryWindow::processCollection(const IArchiveCollection &ACollection,
 			}
 			else if (noteIt != ACollection.notes.constEnd())
 			{
-				options.kind = IMessageContentOptions::Status;
+				options.kind = IMessageContentOptions::KindStatus;
 				options.type = 0;
 				options.senderId = QString::null;
 				options.senderName = QString::null;

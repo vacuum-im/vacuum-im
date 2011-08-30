@@ -54,3 +54,13 @@
 {
   background-color	:mistyrose;
 }
+
+.date_separator .xxxmessage
+{
+  color			:darkCyan;
+}
+
+.date_separator .xxxtime
+{
+  color                 :transparent;
+}

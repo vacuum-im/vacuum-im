@@ -43,6 +43,7 @@ struct WindowStatus
 {
 	QDateTime startTime;
 	QDateTime createTime;
+	QDate lastDateSeparator;
 };
 
 struct UserStatus
@@ -121,6 +122,7 @@ protected:
 	void loadWindowState();
 	void saveWindowGeometry();
 	void loadWindowGeometry();
+	void showDateSeparator(IViewWidget *AView, const QDateTime &ADateTime);
 	bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
 	void highlightUserRole(IMultiUser *AUser);
 	void highlightUserAffiliation(IMultiUser *AUser);
@@ -130,7 +132,7 @@ protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMessageStyle();
 	void showTopic(const QString &ATopic);
-	void showStatusMessage(const QString &AMessage, int AContentType=0);
+	void showStatusMessage(const QString &AMessage, int AType=0, int AStatus=0);
 	void showUserMessage(const Message &AMessage, const QString &ANick);
 	void showHistory();
 	void updateWindow();
@@ -139,7 +141,7 @@ protected:
 protected:
 	void setChatMessageStyle(IChatWindow *AWindow);
 	void fillChatContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
-	void showChatStatus(IChatWindow *AWindow, const QString &AMessage);
+	void showChatStatus(IChatWindow *AWindow, const QString &AMessage, int AStatus=0);
 	void showChatMessage(IChatWindow *AWindow, const Message &AMessage);
 	void showChatHistory(IChatWindow *AWindow);
 	IChatWindow *getChatWindow(const Jid &AContactJid);

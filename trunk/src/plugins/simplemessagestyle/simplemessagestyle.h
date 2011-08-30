@@ -31,6 +31,23 @@
 #define MSMC_MENTION                        "mention"
 #define MSMC_MECOMMAND                      "me_command"
 
+//Message Style Status Keywords
+#define MSSK_ONLINE                         "online"
+#define MSSK_OFFLINE                        "offline"
+#define MSSK_AWAY                           "away"
+#define MSSK_AWAY_MESSAGE                   "away_message"
+#define MSSK_RETURN_AWAY                    "return_away"
+#define MSSK_IDLE                           "idle"
+#define MSSK_RETURN_IDLE                    "return_idle"
+#define MSSK_DATE_SEPARATOR                 "date_separator"
+#define MSSK_CONTACT_JOINED                 "contact_joined"
+#define MSSK_CONTACT_LEFT                   "contact_left"
+#define MSSK_ERROR                          "error"
+#define MSSK_TIMED_OUT                      "timed_out"
+#define MSSK_ENCRYPTION                     "encryption"
+#define MSSK_FILETRANSFER_BEGAN             "fileTransferBegan"
+#define MSSK_FILETRANSFER_COMPLETE          "fileTransferComplete"
+
 //Message Style Options
 #define MSO_STYLE_ID                        "styleId"
 #define MSO_VARIANT                         "variant"
