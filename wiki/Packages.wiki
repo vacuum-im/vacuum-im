@@ -91,9 +91,20 @@ sudo pisi add-repo pardususer.de http://pakete.pardususer.de/pardus-2011/`arch`/
 sudo pisi install vacuum
 }}}
 = Ubuntu =
+
+== Vacuum-IM (stable) ==
+https://launchpad.net/~uni/+archive/vacuum-im
+
+=== Подключение ===
+{{{
+sudo add-apt-repository ppa:uni/vacuum-im
+sudo apt-get update
+}}}
+
+== Vacuum-IM (unstable) ==
 https://launchpad.net/~uni/+archive/ppa
 
-== Подключение ==
+=== Подключение ===
 {{{
 sudo add-apt-repository ppa:uni/ppa
 sudo apt-get update
