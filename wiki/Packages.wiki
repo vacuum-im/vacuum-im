@@ -60,7 +60,7 @@ https://build.opensuse.org/project/show?project=home%3AEGDFree
 
 == Подключение ==
 
-Замените версию дистрибутива на нужную (доступны: *openSUSE_11.2*, *openSUSE_11.3*, *openSUSE_11.4*, *openSUSE_Factory*) и выполните:
+Замените версию дистрибутива на нужную (доступны: *openSUSE_11.3*, *openSUSE_11.4*, *openSUSE_Factory*) и выполните:
 
 === vacuum-im (stable) ===
 Для получения текущей стабильной версии:
@@ -88,7 +88,7 @@ sudo pisi add-repo pardususer.de http://pakete.pardususer.de/pardus-2011/`arch`/
 
 == Установка ==
 {{{
-sudo pisi install vacuum
+sudo pisi install vacuum-im
 }}}
 = Ubuntu =
 
