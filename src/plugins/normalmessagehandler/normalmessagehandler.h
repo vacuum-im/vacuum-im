@@ -69,6 +69,7 @@ protected:
 	void setMessageStyle(IMessageWindow *AWindow);
 	void fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const;
 	void showStyledMessage(IMessageWindow *AWindow, const Message &AMessage);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onMessageReady();
 	void onShowNextMessage();
@@ -79,7 +80,8 @@ protected slots:
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:

@@ -4,6 +4,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterindextyperole.h>
+#include <definitions/rosterlabelorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -28,7 +29,10 @@
 
 struct VCardItem
 {
-	VCardItem() { vcard = NULL; locks = 0; }
+	VCardItem() {
+		vcard = NULL;
+		locks = 0;
+	}
 	VCard *vcard;
 	int locks;
 };
@@ -77,7 +81,7 @@ protected:
 	void registerDiscoFeatures();
 protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onShowVCardDialogByAction(bool);
 	void onShowVCardDialogByChatWindowAction(bool);

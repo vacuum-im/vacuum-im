@@ -116,9 +116,15 @@ bool RosterSearch::initSettings()
 	return true;
 }
 
-bool RosterSearch::rosterIndexClicked(int AOrder, IRosterIndex *AIndex)
+bool RosterSearch::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
 {
-	Q_UNUSED(AIndex);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	return false;
+}
+
+bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+{
+	Q_UNUSED(AIndex); Q_UNUSED(AEvent);
 	if (AOrder == RCHO_ROSTERSEARCH)
 	{
 		if (!searchPattern().isEmpty())
@@ -130,9 +136,9 @@ bool RosterSearch::rosterIndexClicked(int AOrder, IRosterIndex *AIndex)
 	return false;
 }
 
-bool RosterSearch::rosterKeyPressed(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent)
+bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent)
 {
-	Q_UNUSED(AIndex);
+	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
 	{
 		if ((AEvent->modifiers() & ~Qt::ShiftModifier)==0)
@@ -145,9 +151,9 @@ bool RosterSearch::rosterKeyPressed(int AOrder, IRosterIndex *AIndex, QKeyEvent 
 	return false;
 }
 
-bool RosterSearch::rosterKeyReleased(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent)
+bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent)
 {
-	Q_UNUSED(AIndex);
+	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
 	{
 		if ((AEvent->modifiers() & ~Qt::ShiftModifier)==0)

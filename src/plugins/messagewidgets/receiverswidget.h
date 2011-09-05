@@ -6,6 +6,7 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/istatusicons.h>
+#include <interfaces/irostersmodel.h>
 #include "ui_receiverswidget.h"
 
 class ReceiversWidget :
@@ -49,6 +50,7 @@ private:
 	IRoster *FRoster;
 	IPresence *FPresence;
 	IStatusIcons *FStatusIcons;
+	IRostersModel *FRostersModel;
 private:
 	Jid FStreamJid;
 	QList<Jid> FReceivers;

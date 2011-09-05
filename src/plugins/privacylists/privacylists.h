@@ -81,8 +81,8 @@ protected:
 	QString loadPrivacyLists(const Jid &AStreamJid);
 	Menu *createPrivacyMenu(Menu *AMenu) const;
 	void createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *AMenu) const;
-	void createAutoPrivacyContactActions(const Jid &AStreamJid, const Jid &AContactJid, Menu *AMenu) const;
-	void createAutoPrivacyGroupActions(const Jid &AStreamJid, const QString &AGroup, Menu *AMenu) const;
+	void createAutoPrivacyContactActions(const Jid &AStreamJid, const QStringList &AContacts, Menu *AMenu) const;
+	void createAutoPrivacyGroupActions(const Jid &AStreamJid, const QStringList &AGroups, Menu *AMenu) const;
 	Menu *createSetActiveMenu(const Jid &AStreamJid, const QList<IPrivacyList> &ALists, Menu *AMenu) const;
 	Menu *createSetDefaultMenu(const Jid &AStreamJid, const QList<IPrivacyList> &ALists, Menu *AMenu) const;
 	bool isMatchedJid(const Jid &AMask, const Jid &AJid) const;
@@ -90,6 +90,7 @@ protected:
 	void sendOfflinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList);
 	void setPrivacyLabel(const Jid &AStreamJid, const Jid &AContactJid, bool AVisible);
 	void updatePrivacyLabels(const Jid &AStreamJid);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onListAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList);
 	void onListChanged(const Jid &AStreamJid, const QString &AList);
@@ -99,9 +100,10 @@ protected slots:
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
 	void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
-	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onUpdateCreatedRosterIndexes();
 	void onShowEditListsDialog(bool);
 	void onSetActiveListByAction(bool);

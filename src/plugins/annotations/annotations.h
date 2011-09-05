@@ -79,9 +79,9 @@ protected slots:
 	void onPrivateStorageClosed(const Jid &AStreamJid);
 	void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-	void onRosterIndexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu);
-	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onCopyToClipboardActionTriggered(bool);
 	void onEditNoteActionTriggered(bool);
 	void onEditNoteDialogDestroyed();

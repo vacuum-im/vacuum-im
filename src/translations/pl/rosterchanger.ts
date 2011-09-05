@@ -206,10 +206,6 @@
         <translation>Wprowadź nową nazwę grupy:</translation>
     </message>
     <message>
-        <source>You are assured that wish to remove %1 contact(s) from roster?</source>
-        <translation>Jesteś pewien, że chcesz usunąć %1 kontakt(y/ów) z rostera?</translation>
-    </message>
-    <message>
         <source>You are now subscribed for %1 presence.</source>
         <translation>%1 autoryzował ciebie do otrzymywania jego statusu.</translation>
     </message>
@@ -300,6 +296,14 @@
     <message>
         <source>When receiving authorization request</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>You are assured that wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from roster?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

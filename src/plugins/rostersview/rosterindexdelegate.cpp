@@ -131,7 +131,7 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
 
 	QHash<int,QRect> rectHash = drawIndex(NULL,AOption,AIndex);
 	for (QHash<int,QRect>::const_iterator it = rectHash.constBegin(); it != rectHash.constEnd(); it++)
-		if (it->contains(APoint))
+		if (it.key()!=RLID_DISPLAY_EDIT && it->contains(APoint))
 			return it.key();
 
 	return RLID_DISPLAY;

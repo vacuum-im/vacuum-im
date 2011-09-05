@@ -60,7 +60,11 @@ void UserContextMenu::updateMenu()
 void UserContextMenu::onAboutToShow()
 {
 	if (FRosterIndex)
-		FRostersView->contextMenuForIndex(FRosterIndex,RLID_DISPLAY,this);
+	{
+		QList<IRosterIndex *> indexes;
+		indexes.append(FRosterIndex);
+		FRostersView->contextMenuForIndex(indexes,RLID_DISPLAY,this);
+	}
 }
 
 void UserContextMenu::onAboutToHide()

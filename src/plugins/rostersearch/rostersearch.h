@@ -42,10 +42,11 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IRostersClickHooker
-	virtual bool rosterIndexClicked(int AOrder, IRosterIndex *AIndex);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
 	//IRostersKeyHooker
-	virtual bool rosterKeyPressed(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent);
-	virtual bool rosterKeyReleased(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent);
+	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent);
+	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent);
 	//IRosterSearch
 	virtual void startSearch();
 	virtual QString searchPattern() const;

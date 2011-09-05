@@ -101,8 +101,10 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
-				SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -481,6 +483,31 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 	}
 }
 
+bool Gateways::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
+{
+	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
+	if (!ASelected.isEmpty())
+	{
+		int singleType = -1;
+		Jid singleStream;
+		foreach(IRosterIndex *index, ASelected)
+		{
+			int indexType = index->type();
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
+			if (!acceptTypes.contains(indexType))
+				return false;
+			else if (singleType!=-1 && singleType!=indexType)
+				return false;
+			else if(!singleStream.isEmpty() && singleStream!=streamJid)
+				return false;
+			singleType = indexType;
+			singleStream = streamJid;
+		}
+		return true;
+	}
+	return false;
+}
+
 void Gateways::onAddLegacyUserActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
@@ -497,12 +524,14 @@ void Gateways::onLogActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		Jid serviceJid = action->data(ADR_SERVICE_JID).toString();
 		bool logIn = action->data(ADR_LOG_IN).toBool();
-		if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
-			setKeepConnection(streamJid,serviceJid,logIn);
-		sendLogPresence(streamJid,serviceJid,logIn);
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		foreach(Jid serviceJid, action->data(ADR_SERVICE_JID).toStringList())
+		{
+			if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
+				setKeepConnection(streamJid,serviceJid,logIn);
+			sendLogPresence(streamJid,serviceJid,logIn);
+		}
 	}
 }
 
@@ -512,20 +541,22 @@ void Gateways::onResolveActionTriggered(bool)
 	if (action)
 	{
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		Jid serviceJid = action->data(ADR_SERVICE_JID).toString();
-		if (serviceJid.node().isEmpty())
+		foreach(Jid serviceJid, action->data(ADR_SERVICE_JID).toStringList())
 		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
-			foreach(Jid contactJid, serviceContacts(streamJid,serviceJid))
+			if (serviceJid.node().isEmpty())
 			{
-				IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
-				if (ritem.isValid && ritem.name.trimmed().isEmpty())
-					resolveNickName(streamJid,contactJid);
+				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
+				foreach(Jid contactJid, serviceContacts(streamJid,serviceJid))
+				{
+					IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
+					if (ritem.isValid && ritem.name.trimmed().isEmpty())
+						resolveNickName(streamJid,contactJid);
+				}
 			}
-		}
-		else
-		{
-			resolveNickName(streamJid,serviceJid);
+			else
+			{
+				resolveNickName(streamJid,serviceJid);
+			}
 		}
 	}
 }
@@ -535,17 +566,24 @@ void Gateways::onKeepActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
+		bool saveKeepStorage = false;
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		Jid serviceJid = action->data(ADR_SERVICE_JID).toString();
-		if (FPrivateStorageKeep.contains(streamJid) && FPrivateStorageKeep.value(streamJid).contains(serviceJid)!=action->isChecked())
+		foreach(Jid serviceJid, action->data(ADR_SERVICE_JID).toStringList())
 		{
-			if (action->isChecked())
-				FPrivateStorageKeep[streamJid] += serviceJid;
-			else
-				FPrivateStorageKeep[streamJid] -= serviceJid;
+			if (FPrivateStorageKeep.contains(streamJid) && FPrivateStorageKeep.value(streamJid).contains(serviceJid)!=action->isChecked())
+			{
+				if (action->isChecked())
+					FPrivateStorageKeep[streamJid] += serviceJid;
+				else
+					FPrivateStorageKeep[streamJid] -= serviceJid;
+				saveKeepStorage = true;
+			}
+			setKeepConnection(streamJid,serviceJid,action->isChecked());
+		}
+		if (saveKeepStorage)
+		{
 			savePrivateStorageKeep(streamJid);
 		}
-		setKeepConnection(streamJid,serviceJid,action->isChecked());
 	}
 }
 
@@ -572,112 +610,152 @@ void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_GATELOGIN || AId == SCT_ROSTERVIEW_GATELOGOUT)
 		{
-			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
-			if (index.data(RDR_TYPE).toInt() == RIT_AGENT)
+			foreach(IRosterIndex *index, FRostersViewPlugin->rostersView()->selectedRosterIndexes())
 			{
-				Jid streamJid = index.data(RDR_STREAM_JID).toString();
-				Jid serviceJid = index.data(RDR_PREP_BARE_JID).toString();
-				bool logIn = AId==SCT_ROSTERVIEW_GATELOGIN;
-				if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
-					setKeepConnection(streamJid,serviceJid,logIn);
-				sendLogPresence(streamJid,serviceJid,logIn);
+				if (index->type() == RIT_AGENT)
+				{
+					Jid streamJid = index->data(RDR_STREAM_JID).toString();
+					Jid serviceJid = index->data(RDR_PREP_BARE_JID).toString();
+					bool logIn = AId==SCT_ROSTERVIEW_GATELOGIN;
+					if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
+						setKeepConnection(streamJid,serviceJid,logIn);
+					sendLogPresence(streamJid,serviceJid,logIn);
+				}
 			}
 		}
 	}
 }
 
-void Gateways::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void Gateways::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
-	if (AIndex->type() == RIT_STREAM_ROOT)
-	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-		if (FDiscovery && presence && presence->isOpen())
-		{
-			Menu *addUserMenu = new Menu(AMenu);
-			addUserMenu->setTitle(tr("Add Legacy User"));
-			addUserMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_ADD_CONTACT);
+	AAccepted = AAccepted || isSelectionAccepted(ASelected);
+}
 
-			foreach(IPresenceItem pitem, presence->presenceItems())
+void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+{
+	if (ALabelId == RLID_DISPLAY)
+	{
+		if (AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
+		{
+			IRosterIndex *index = AIndexes.first();
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+			if (FDiscovery && presence && presence->isOpen())
 			{
-				if (pitem.show!=IPresence::Error && pitem.itemJid.node().isEmpty() && FDiscovery->discoInfo(streamJid,pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
+				Menu *addUserMenu = new Menu(AMenu);
+				addUserMenu->setTitle(tr("Add Legacy User"));
+				addUserMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_ADD_CONTACT);
+
+				foreach(IPresenceItem pitem, presence->presenceItems())
 				{
-					Action *action = new Action(addUserMenu);
-					action->setText(pitem.itemJid.full());
-					action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,pitem.itemJid) : QIcon());
+					if (pitem.show!=IPresence::Error && pitem.itemJid.node().isEmpty() && FDiscovery->discoInfo(streamJid,pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
+					{
+						Action *action = new Action(addUserMenu);
+						action->setText(pitem.itemJid.full());
+						action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,pitem.itemJid) : QIcon());
+						action->setData(ADR_STREAM_JID,streamJid.full());
+						action->setData(ADR_SERVICE_JID,pitem.itemJid.full());
+						connect(action,SIGNAL(triggered(bool)),SLOT(onAddLegacyUserActionTriggered(bool)));
+						addUserMenu->addAction(action,AG_DEFAULT,true);
+					}
+				}
+
+				if (!addUserMenu->isEmpty())
+					AMenu->addAction(addUserMenu->menuAction(), AG_RVCM_GATEWAYS_ADD_LEGACY_USER, true);
+				else
+					delete addUserMenu;
+			}
+		}
+		
+		if (isSelectionAccepted(AIndexes))
+		{
+			int indexType = AIndexes.first()->type();
+			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
+			if (indexType == RIT_AGENT)
+			{
+				IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+				if (presence && presence->isOpen())
+				{
+					QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
+					
+					Action *action = new Action(AMenu);
+					action->setText(tr("Login on transport"));
+					action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
 					action->setData(ADR_STREAM_JID,streamJid.full());
-					action->setData(ADR_SERVICE_JID,pitem.itemJid.full());
-					connect(action,SIGNAL(triggered(bool)),SLOT(onAddLegacyUserActionTriggered(bool)));
-					addUserMenu->addAction(action,AG_DEFAULT,true);
+					action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+					action->setData(ADR_LOG_IN,true);
+					action->setShortcutId(SCT_ROSTERVIEW_GATELOGIN);
+					connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
+					AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
+
+					action = new Action(AMenu);
+					action->setText(tr("Logout from transport"));
+					action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
+					action->setData(ADR_STREAM_JID,streamJid.full());
+					action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+					action->setData(ADR_LOG_IN,false);
+					action->setShortcutId(SCT_ROSTERVIEW_GATELOGOUT);
+					connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
+					AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
+
+					if (FPrivateStorageKeep.contains(streamJid))
+					{
+						int checks = 0;
+						foreach(IRosterIndex *index, AIndexes)
+						{
+							if (FKeepConnections.contains(streamJid,index->data(RDR_PREP_BARE_JID).toString()))
+								checks |= 0x01;
+							else
+								checks |= 0x02;
+						}
+
+						Action *action = new Action(AMenu);
+						action->setText(tr("Keep connection"));
+						action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_KEEP_CONNECTION);
+						action->setData(ADR_STREAM_JID,streamJid.full());
+						action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+						action->setCheckable(true);
+						action->setChecked(checks == 0x01);
+						action->setVisible(checks != 0x03);
+						connect(action,SIGNAL(triggered(bool)),SLOT(onKeepActionTriggered(bool)));
+						AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
+					}
 				}
 			}
-
-			if (!addUserMenu->isEmpty())
-				AMenu->addAction(addUserMenu->menuAction(), AG_RVCM_GATEWAYS_ADD_LEGACY_USER, true);
-			else
-				delete addUserMenu;
-		}
-	}
-	else if (AIndex->type() == RIT_AGENT)
-	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-		if (presence && presence->isOpen())
-		{
-			Action *action = new Action(AMenu);
-			action->setText(tr("Login on transport"));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
-			action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_PREP_BARE_JID));
-			action->setData(ADR_LOG_IN,true);
-			action->setShortcutId(SCT_ROSTERVIEW_GATELOGIN);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-			AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
-
-			action = new Action(AMenu);
-			action->setText(tr("Logout from transport"));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
-			action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-			action->setData(ADR_SERVICE_JID,AIndex->data(RDR_PREP_BARE_JID));
-			action->setData(ADR_LOG_IN,false);
-			action->setShortcutId(SCT_ROSTERVIEW_GATELOGOUT);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-			AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
-
-			if (FPrivateStorageKeep.contains(streamJid))
+			
+			if (indexType == RIT_CONTACT || indexType == RIT_AGENT)
 			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Keep connection"));
-				action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_KEEP_CONNECTION);
-				action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-				action->setData(ADR_SERVICE_JID,AIndex->data(RDR_PREP_BARE_JID));
-				action->setCheckable(true);
-				action->setChecked(FKeepConnections.contains(streamJid,AIndex->data(RDR_PREP_BARE_JID).toString()));
-				connect(action,SIGNAL(triggered(bool)),SLOT(onKeepActionTriggered(bool)));
-				AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
-			}
-		}
-	}
+				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
+				if (FVCardPlugin && roster && roster->isOpen())
+				{
+					bool showResolve = true;
+					for(int i=0; showResolve && i<AIndexes.count(); i++)
+					{
+						IRosterIndex *index = AIndexes.at(i);
+						if (indexType == RIT_CONTACT)
+						{
+							IRosterItem ritem = roster->rosterItem(index->data(RDR_PREP_BARE_JID).toString());
+							showResolve = ritem.name.trimmed().isEmpty() || streamServices(streamJid).contains(ritem.itemJid.domain());
+						}
+						else
+						{
+							showResolve = !serviceContacts(streamJid,index->data(RDR_PREP_BARE_JID).toString()).isEmpty();
+						}
+					}
 
-	if (AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
-	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
-		IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
-		if (FVCardPlugin && ritem.isValid && roster->isOpen())
-		{
-			bool showResolve = AIndex->type()==RIT_AGENT && !serviceContacts(streamJid,contactJid).isEmpty();
-			showResolve |= AIndex->type()==RIT_CONTACT && (ritem.name.trimmed().isEmpty() || streamServices(streamJid).contains(contactJid.domain()));
-			if (showResolve)
-			{
-				Action *action = new Action(AMenu);
-				action->setText(AIndex->type()==RIT_AGENT ? tr("Resolve nick names") : tr("Resolve nick name"));
-				action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
-				action->setData(ADR_STREAM_JID,streamJid.full());
-				action->setData(ADR_SERVICE_JID,contactJid.full());
-				connect(action,SIGNAL(triggered(bool)),SLOT(onResolveActionTriggered(bool)));
-				AMenu->addAction(action,AG_RVCM_GATEWAYS_RESOLVE,true);
+					if (showResolve)
+					{
+						QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
+
+						Action *action = new Action(AMenu);
+						action->setText(indexType==RIT_AGENT ? tr("Resolve nick names") : tr("Resolve nick name"));
+						action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
+						action->setData(ADR_STREAM_JID,streamJid.full());
+						action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+						connect(action,SIGNAL(triggered(bool)),SLOT(onResolveActionTriggered(bool)));
+						AMenu->addAction(action,AG_RVCM_GATEWAYS_RESOLVE,true);
+					}
+				}
 			}
 		}
 	}

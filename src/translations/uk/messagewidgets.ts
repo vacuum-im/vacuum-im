@@ -299,10 +299,6 @@
         <translation>Агенти</translation>
     </message>
     <message>
-        <source>Blank group</source>
-        <translation>Загальна група</translation>
-    </message>
-    <message>
         <source>My Resources</source>
         <translation>Мої ресурси</translation>
     </message>
@@ -313,6 +309,10 @@
     <message>
         <source>Enter valid contact jid:</source>
         <translation>Введіть коректний JID:</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
