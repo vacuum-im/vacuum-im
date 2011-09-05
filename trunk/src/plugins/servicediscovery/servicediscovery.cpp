@@ -124,7 +124,17 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			FRostersView = FRostersViewPlugin->rostersView();
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
@@ -169,13 +179,9 @@ bool ServiceDiscovery::initObjects()
 	registerFeatures();
 	insertDiscoHandler(this);
 
-	if (FRostersViewPlugin)
+	if (FRostersView)
 	{
-		FRostersView = FRostersViewPlugin->rostersView();
 		FRostersView->insertClickHooker(RCHO_SERVICEDISCOVERY,this);
-		connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
-		connect(FRostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-		        SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
 	}
 
 	if (FTrayManager)
@@ -415,9 +421,15 @@ void ServiceDiscovery::fillDiscoItems(IDiscoItems &ADiscoItems)
 	Q_UNUSED(ADiscoItems);
 }
 
-bool ServiceDiscovery::rosterIndexClicked(int AOrder, IRosterIndex *AIndex)
+bool ServiceDiscovery::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	return false;
+}
+
+bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	if (AIndex->type()==RIT_AGENT && FSelfCaps.contains(streamJid))
 	{
@@ -1317,36 +1329,39 @@ void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMu
 	AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
 }
 
-void ServiceDiscovery::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	int itype = AIndex->type();
-	if (itype == RIT_STREAM_ROOT || itype == RIT_CONTACT || itype == RIT_AGENT || itype == RIT_MY_RESOURCE)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = itype == RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
-
-		if (FSelfCaps.contains(streamJid))
+		int indexType = AIndexes.first()->type();
+		if (indexType == RIT_STREAM_ROOT || indexType == RIT_CONTACT || indexType == RIT_AGENT || indexType == RIT_MY_RESOURCE)
 		{
-			Action *action = createDiscoInfoAction(streamJid, contactJid, QString::null, AMenu);
-			AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
+			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
+			Jid contactJid = indexType!=RIT_STREAM_ROOT ? AIndexes.first()->data(RDR_FULL_JID).toString() : streamJid.domain();
 
-			if (itype == RIT_STREAM_ROOT || itype == RIT_AGENT)
+			if (FSelfCaps.contains(streamJid))
 			{
-				action = createDiscoItemsAction(streamJid, contactJid, QString::null, AMenu);
+				Action *action = createDiscoInfoAction(streamJid, contactJid, QString::null, AMenu);
 				AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
-			}
-		}
 
-		IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
-		foreach(QString feature, dinfo.features)
-		{
-			foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
-				AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
+				if (indexType == RIT_STREAM_ROOT || indexType == RIT_AGENT)
+				{
+					action = createDiscoItemsAction(streamJid, contactJid, QString::null, AMenu);
+					AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
+				}
+			}
+
+			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
+			foreach(QString feature, dinfo.features)
+			{
+				foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
+					AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
+			}
 		}
 	}
 }
 
-void ServiceDiscovery::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
 	if (ALabelId == RLID_DISPLAY)
 	{

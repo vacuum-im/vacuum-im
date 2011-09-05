@@ -12,6 +12,7 @@
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/rosterindextyperole.h>
+#include <definitions/rosterlabelorders.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/resources.h>
@@ -171,7 +172,7 @@ protected:
 	bool processMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	void openHistoryOptionsNode(const Jid &AStreamJid);
 	void closeHistoryOptionsNode(const Jid &AStreamJid);
-	Menu *createContextMenu(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) const;
+	Menu *createContextMenu(const Jid &AStreamJid, const QStringList &AContacts, QWidget *AParent) const;
 	void registerDiscoFeatures();
 	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
 	bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -183,6 +184,7 @@ protected:
 	void startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId);
 	void cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError);
 	void renegotiateStanzaSessions(const Jid &AStreamJid) const;
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
@@ -193,7 +195,8 @@ protected slots:
 	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onSetMethodAction(bool);
 	void onSetItemPrefsAction(bool);

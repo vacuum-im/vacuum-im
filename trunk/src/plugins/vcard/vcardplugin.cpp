@@ -36,8 +36,9 @@ void VCardPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
@@ -61,7 +62,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		if (FRostersViewPlugin)
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -327,7 +329,7 @@ void VCardPlugin::registerDiscoFeatures()
 
 void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersView && AWidget==FRostersView->instance())
+	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
 	{
 		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
 		{
@@ -341,18 +343,22 @@ void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	}
 }
 
-void VCardPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void VCardPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (AIndex->type() == RIT_STREAM_ROOT || AIndex->type() == RIT_CONTACT || AIndex->type() == RIT_AGENT)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
-		Action *action = new Action(AMenu);
-		action->setText(tr("Show vCard"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-		action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID));
-		action->setData(ADR_CONTACT_JID,Jid(AIndex->data(RDR_FULL_JID).toString()).bare());
-		action->setShortcutId(SCT_ROSTERVIEW_SHOWVCARD);
-		AMenu->addAction(action,AG_RVCM_VCARD,true);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
+		IRosterIndex *index = AIndexes.first();
+		if (index->type() == RIT_STREAM_ROOT || index->type() == RIT_CONTACT || index->type() == RIT_AGENT)
+		{
+			Action *action = new Action(AMenu);
+			action->setText(tr("Show vCard"));
+			action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+			action->setData(ADR_STREAM_JID,index->data(RDR_STREAM_JID));
+			action->setData(ADR_CONTACT_JID,Jid(index->data(RDR_FULL_JID).toString()).bare());
+			action->setShortcutId(SCT_ROSTERVIEW_SHOWVCARD);
+			AMenu->addAction(action,AG_RVCM_VCARD,true);
+			connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
+		}
 	}
 }
 

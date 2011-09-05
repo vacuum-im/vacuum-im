@@ -92,7 +92,8 @@ public:
 	virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
 	virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
 	//IRostersClickHooker
-	virtual bool rosterIndexClicked(int AOrder, IRosterIndex *AIndex);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
 	//IServiceDiscovery
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = "") const;
@@ -165,8 +166,8 @@ protected slots:
 	void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onShowDiscoInfoByAction(bool);
 	void onShowDiscoItemsByAction(bool);
 	void onDiscoInfoWindowDestroyed(QObject *AObject);

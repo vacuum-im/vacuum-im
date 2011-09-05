@@ -43,6 +43,10 @@ public:
 	virtual void expandIndexParents(IRosterIndex *AIndex);
 	virtual void expandIndexParents(const QModelIndex &AIndex);
 	virtual bool editRosterIndex(int ADataRole, IRosterIndex *AIndex);
+	virtual bool hasMultiSelection() const;
+	virtual QList<IRosterIndex *> selectedRosterIndexes() const;
+	virtual void selectRosterIndex(IRosterIndex *AIndex);
+	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> ARoles, int AUniqueRole=-1) const;
 	//--ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual QList<QAbstractProxyModel *> proxyModels() const;
@@ -83,9 +87,9 @@ public:
 	virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex);
 	virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
 	//--ContextMenu
-	virtual void contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
+	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	//--ClipboardMenu
-	virtual void clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu);
+	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 signals:
 	void modelAboutToBeSeted(IRostersModel *AModel);
 	void modelSeted(IRostersModel *AModel);
@@ -95,12 +99,12 @@ signals:
 	void proxyModelRemoved(QAbstractProxyModel *AProxyModel);
 	void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
 	void viewModelChanged(QAbstractItemModel *AModel);
-	void indexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-	void indexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu);
-	void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu);
-	void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-	void labelClicked(IRosterIndex *AIndex, int ALabelId);
-	void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted);
+	void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
+	void indexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void indexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void indexClicked(IRosterIndex *AIndex, int ALabelId);
+	void indexDoubleClicked(IRosterIndex *AIndex, int ALabelId);
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
 	void notifyRemoved(int ANotifyId);
@@ -140,8 +144,9 @@ protected slots:
 	//QAbstractItemView
 	void closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint);
 protected slots:
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+   void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 	void onCopyToClipboardActionTriggered(bool);
 	void onIndexInserted(IRosterIndex *AIndex);
 	void onIndexDestroyed(IRosterIndex *AIndex);

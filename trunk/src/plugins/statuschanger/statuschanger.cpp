@@ -47,8 +47,9 @@ void StatusChanger::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(PRESENCE_UUID);
 }
 
-bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
 	{
@@ -56,11 +57,11 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 		if (FPresencePlugin)
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceAdded(IPresence *)),
-			        SLOT(onPresenceAdded(IPresence *)));
+				SLOT(onPresenceAdded(IPresence *)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),
-			        SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
+				SLOT(onPresenceChanged(IPresence *, int, const QString &, int)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),
-			        SLOT(onPresenceRemoved(IPresence *)));
+				SLOT(onPresenceRemoved(IPresence *)));
 		}
 	}
 
@@ -81,7 +82,15 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			FRostersView = FRostersViewPlugin->rostersView();
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
 	if (plugin)
@@ -90,7 +99,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 		if (FRostersModel)
 		{
 			connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),
-			        SLOT(onStreamJidChanged(const Jid &, const Jid &)));
+				SLOT(onStreamJidChanged(const Jid &, const Jid &)));
 		}
 	}
 
@@ -101,7 +110,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &/*AInit
 		if (FAccountManager)
 		{
 			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),
-			        SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+				SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 		}
 	}
 
@@ -188,8 +197,6 @@ bool StatusChanger::initObjects()
 		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
 		FConnectingLabel = FRostersViewPlugin->rostersView()->registerLabel(label);
 
-		FRostersView = FRostersViewPlugin->rostersView();
-		connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)), SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 	}
 
 	if (FTrayManager)
@@ -1034,11 +1041,11 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 		action->setData(ADR_STREAMJID,AAfter.full());
 }
 
-void StatusChanger::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (AIndex->data(RDR_TYPE).toInt() == RIT_STREAM_ROOT)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1 && AIndexes.first()->data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
 	{
-		Menu *menu = streamMenu(AIndex->data(RDR_STREAM_JID).toString());
+		Menu *menu = streamMenu(AIndexes.first()->data(RDR_STREAM_JID).toString());
 		if (menu)
 		{
 			Action *action = new Action(AMenu);

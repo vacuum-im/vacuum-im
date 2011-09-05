@@ -112,7 +112,8 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -194,9 +195,15 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
 	return false;
 }
 
-bool ChatMessageHandler::rosterIndexClicked(int AOrder, IRosterIndex *AIndex)
+bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AOrder);	Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	return false;
+}
+
+bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
@@ -651,7 +658,7 @@ void ChatMessageHandler::onClearWindowAction(bool)
 
 void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersView && AWidget==FRostersView->instance())
+	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
 	{
 		if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
 		{
@@ -664,23 +671,26 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 		}
 	}
 }
-void ChatMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-	if (presence && presence->isOpen())
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
-		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
-		if (ChatActionTypes.contains(AIndex->type()))
+		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
+		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+		if (presence && presence->isOpen())
 		{
-			Action *action = new Action(AMenu);
-			action->setText(tr("Open chat dialog"));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
-			action->setData(ADR_STREAM_JID,streamJid.full());
-			action->setData(ADR_CONTACT_JID,contactJid.full());
-			action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
-			AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
+			Jid contactJid = AIndexes.first()->data(RDR_FULL_JID).toString();
+			if (ChatActionTypes.contains(AIndexes.first()->type()))
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Open chat dialog"));
+				action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
+				action->setData(ADR_STREAM_JID,streamJid.full());
+				action->setData(ADR_CONTACT_JID,contactJid.full());
+				action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
+				AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
+			}
 		}
 	}
 }

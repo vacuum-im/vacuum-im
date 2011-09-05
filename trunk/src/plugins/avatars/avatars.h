@@ -81,13 +81,15 @@ protected:
 	void updateDataHolder(const Jid &AContactJid = Jid::null);
 	bool updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bool AFromVCard);
 	bool updateIqAvatar(const Jid &AContactJid, const QString &AHash);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onVCardChanged(const Jid &AContactJid);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
-	void onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onSetAvatarByAction(bool);
 	void onClearAvatarByAction(bool);
 	void onIconStorageChanged();

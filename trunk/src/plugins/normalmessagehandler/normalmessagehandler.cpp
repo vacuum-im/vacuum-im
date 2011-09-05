@@ -4,7 +4,8 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_GROUP                 Action::DR_Parametr3
 
-static const QList<int> MessageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+static const QList<int> MessageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK
+  << RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 
 NormalMessageHandler::NormalMessageHandler()
 {
@@ -100,7 +101,10 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -383,6 +387,39 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
+bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
+{
+	static const QList<int> groupTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_AGENTS 
+		<< RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER;
+	static const QList<int> contactTypes =  QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+	if (!ASelected.isEmpty())
+	{
+		Jid singleStream;
+		bool hasGroups = false;
+		bool hasContacts = false;
+		foreach(IRosterIndex *index, ASelected)
+		{
+			int indexType = index->type();
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
+			if (!MessageActionTypes.contains(indexType))
+				return false;
+			else if(!singleStream.isEmpty() && singleStream!=streamJid)
+				return false;
+			else if (indexType==RIT_STREAM_ROOT && ASelected.count()>1)
+				return false;
+			else if (hasGroups && !groupTypes.contains(indexType))
+				return false;
+			else if (hasContacts && !contactTypes.contains(indexType))
+				return false;
+			singleStream = streamJid;
+			hasGroups = hasGroups || groupTypes.contains(indexType);
+			hasContacts = hasContacts || contactTypes.contains(indexType);
+		}
+		return true;
+	}
+	return false;
+}
+
 void NormalMessageHandler::onMessageReady()
 {
 	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
@@ -485,16 +522,20 @@ void NormalMessageHandler::onShowWindowAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
+		QStringList contacts = action->data(ADR_CONTACT_JID).toStringList();
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-		createMessageWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW);
-
-		QString group = action->data(ADR_GROUP).toString();
-		if (!group.isEmpty())
+		Jid contactJid = contacts.count()==1 ? contacts.first() : QString::null;
+		if (createMessageWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW))
 		{
 			IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
 			if (window)
-				window->receiversWidget()->addReceiversGroup(group);
+			{
+				foreach(QString group, action->data(ADR_GROUP).toStringList())
+					window->receiversWidget()->addReceiversGroup(group);
+
+				foreach(QString contactJid, action->data(ADR_CONTACT_JID).toStringList())
+					window->receiversWidget()->addReceiver(contactJid);
+			}
 		}
 	}
 }
@@ -503,45 +544,74 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 {
 	if (FRostersView && AWidget==FRostersView->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_SHOWNORMALDIALOG)
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
+		if (AId == SCT_ROSTERVIEW_SHOWNORMALDIALOG && isSelectionAccepted(indexes))
 		{
-			QModelIndex index = FRostersView->instance()->currentIndex();
-			Jid streamJid = index.data(RDR_STREAM_JID).toString();
+			Jid streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-			if (presence && presence->isOpen() && MessageActionTypes.contains(index.data(RDR_TYPE).toInt()))
+			if (presence && presence->isOpen())
 			{
-				Jid contactJid = index.data(RDR_FULL_JID).toString();
-				createMessageWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW);
+				QStringList groups;
+				QStringList contacts;
+				foreach(IRosterIndex *index, indexes)
+				{
+					if (index->type() == RIT_GROUP)
+						groups.append(index->data(RDR_GROUP).toString());
+					else if (index->type()>=RIT_GROUP_BLANK && index->type()<=RIT_GROUP_AGENTS)
+						groups.append(FRostersView->rostersModel()->singleGroupName(index->type()));
+					else if (index->type() != RIT_STREAM_ROOT)
+						contacts.append(index->data(RDR_FULL_JID).toString());
+				}
 
-				QString group = index.data(RDR_TYPE).toInt()==RIT_GROUP ? index.data(RDR_GROUP).toString() : QString::null;
-				if (!group.isEmpty())
+				Jid contactJid = contacts.count()==1 ? contacts.first() : QString::null;
+				if (createMessageWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW))
 				{
 					IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
 					if (window)
-						window->receiversWidget()->addReceiversGroup(group);
+					{
+						foreach(QString group, groups)
+							window->receiversWidget()->addReceiversGroup(group);
+
+						foreach(QString contactJid, contacts)
+							window->receiversWidget()->addReceiver(contactJid);
+					}
 				}
 			}
 		}
 	}
 }
 
-void NormalMessageHandler::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void NormalMessageHandler::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
-	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
-	if (presence && presence->isOpen())
+	AAccepted = AAccepted || isSelectionAccepted(ASelected);
+}
+
+void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+{
+	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
 	{
-		if (MessageActionTypes.contains(AIndex->type()))
+		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
+		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+		if (presence && presence->isOpen())
 		{
-			Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+			QStringList groups;
+			QStringList contacts;
+			foreach(IRosterIndex *index, AIndexes)
+			{
+				if (index->type() == RIT_GROUP)
+					groups.append(index->data(RDR_GROUP).toString());
+				else if (index->type()>=RIT_GROUP_BLANK && index->type()<=RIT_GROUP_AGENTS)
+					groups.append(FRostersView->rostersModel()->singleGroupName(index->type()));
+				else if (index->type() != RIT_STREAM_ROOT)
+					contacts.append(index->data(RDR_FULL_JID).toString());
+			}
+
 			Action *action = new Action(AMenu);
 			action->setText(tr("Send message"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
 			action->setData(ADR_STREAM_JID,streamJid.full());
-			if (AIndex->type() == RIT_GROUP)
-				action->setData(ADR_GROUP,AIndex->data(RDR_GROUP));
-			else if (AIndex->type() != RIT_STREAM_ROOT)
-				action->setData(ADR_CONTACT_JID,contactJid.full());
+			action->setData(ADR_GROUP,groups);
+			action->setData(ADR_CONTACT_JID,contacts);
 			action->setShortcutId(SCT_ROSTERVIEW_SHOWNORMALDIALOG);
 			AMenu->addAction(action,AG_RVCM_NORMALMESSAGEHANDLER,true);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));

@@ -75,10 +75,12 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		if (FRostersViewPlugin)
 		{
 			IRostersView *rostersView = FRostersViewPlugin->rostersView();
-			connect(rostersView->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
-			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(IRosterIndex *, Menu *)),SLOT(onRosterIndexClipboardMenu(IRosterIndex *, Menu *)));
-			connect(rostersView->instance(),SIGNAL(labelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-				SLOT(onRosterLabelToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+			connect(rostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, Menu *)),
+				SLOT(onRosterIndexClipboardMenu(const QList<IRosterIndex *> &, Menu *)));
+			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
 		}
 	}
 
@@ -353,7 +355,7 @@ void Annotations::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARost
 
 void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance() && !FRostersViewPlugin->rostersView()->hasMultiSelection())
 	{
 		if (AId == SCT_ROSTERVIEW_EDITANNOTATION)
 		{
@@ -366,28 +368,32 @@ void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	}
 }
 
-void Annotations::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-	Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
-	if (rosterDataTypes().contains(AIndex->type()) && isEnabled(streamJid) && contactJid.isValid())
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
-		Action *action = new Action(AMenu);
-		action->setText(tr("Annotation"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_ANNOTATIONS);
-		action->setData(ADR_STREAMJID,streamJid.full());
-		action->setData(ADR_CONTACTJID,contactJid.bare());
-		action->setShortcutId(SCT_ROSTERVIEW_EDITANNOTATION);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onEditNoteActionTriggered(bool)));
-		AMenu->addAction(action,AG_RVCM_ANNOTATIONS,true);
+		IRosterIndex *index = AIndexes.first();
+		Jid streamJid = index->data(RDR_STREAM_JID).toString();
+		Jid contactJid = index->data(RDR_PREP_BARE_JID).toString();
+		if (rosterDataTypes().contains(index->type()) && isEnabled(streamJid) && contactJid.isValid())
+		{
+			Action *action = new Action(AMenu);
+			action->setText(tr("Annotation"));
+			action->setIcon(RSR_STORAGE_MENUICONS,MNI_ANNOTATIONS);
+			action->setData(ADR_STREAMJID,streamJid.full());
+			action->setData(ADR_CONTACTJID,contactJid.bare());
+			action->setShortcutId(SCT_ROSTERVIEW_EDITANNOTATION);
+			connect(action,SIGNAL(triggered(bool)),SLOT(onEditNoteActionTriggered(bool)));
+			AMenu->addAction(action,AG_RVCM_ANNOTATIONS,true);
+		}
 	}
 }
 
-void Annotations::onRosterIndexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu)
+void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu)
 {
-	if (rosterDataTypes().contains(AIndex->type()))
+	if (AIndexes.count()==1 && rosterDataTypes().contains(AIndexes.first()->type()))
 	{
-		QString note = annotation(AIndex->data(RDR_STREAM_JID).toString(), AIndex->data(RDR_FULL_JID).toString());
+		QString note = annotation(AIndexes.first()->data(RDR_STREAM_JID).toString(), AIndexes.first()->data(RDR_FULL_JID).toString());
 		if (!note.isEmpty())
 		{
 			Action *action = new Action(AMenu);
@@ -399,7 +405,7 @@ void Annotations::onRosterIndexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu)
 	}
 }
 
-void Annotations::onRosterLabelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
 	if (ALabelId==RLID_DISPLAY && rosterDataTypes().contains(AIndex->type()))
 	{

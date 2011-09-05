@@ -299,10 +299,6 @@
         <translation>Transporty</translation>
     </message>
     <message>
-        <source>Blank group</source>
-        <translation>Grupa główna</translation>
-    </message>
-    <message>
         <source>My Resources</source>
         <translation>Moje zasoby</translation>
     </message>
@@ -313,6 +309,10 @@
     <message>
         <source>Enter valid contact jid:</source>
         <translation>Wprowadź poprawny JID:</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

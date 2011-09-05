@@ -10,6 +10,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/actiongroups.h>
 #include <definitions/menuicons.h>
+#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -75,10 +76,12 @@ protected:
 	void loadStorages();
 	void clearStorages();
 	void startStatusIconsChanged();
-	void updateCustomIconMenu(const QString &APattern);
+	void updateCustomIconMenu(const QStringList &APatterns);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onStatusIconsChangedTimer();
-	void onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onOptionsOpened();
 	void onOptionsClosed();

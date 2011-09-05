@@ -111,6 +111,10 @@ void ReceiversWidget::initialize()
 	if (plugin)
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 
+	plugin = FMessageWidgets->pluginManager()->pluginInterface("IRostersModel").value(0,NULL);
+	if (plugin)
+		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+
 	if (FRoster && FPresence)
 		createRosterTree();
 }
@@ -181,9 +185,9 @@ void ReceiversWidget::createRosterTree()
 	{
 		QSet<QString> groups;
 		if (ritem.itemJid.node().isEmpty())
-			groups.insert(tr("Agents"));
+			groups.insert(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_AGENTS) : tr("Agents"));
 		else if (ritem.groups.isEmpty())
-			groups.insert(tr("Blank group"));
+			groups.insert(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_BLANK) : tr("Without Groups"));
 		else
 			groups = ritem.groups;
 
@@ -212,7 +216,7 @@ void ReceiversWidget::createRosterTree()
 	QList<IPresenceItem> myResources = FPresence->presenceItems(FStreamJid);
 	foreach(IPresenceItem pitem, myResources)
 	{
-		QTreeWidgetItem *groupItem = getReceiversGroup(tr("My Resources"));
+		QTreeWidgetItem *groupItem = getReceiversGroup(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_MY_RESOURCES) : tr("My Resources"));
 		QString name = pitem.itemJid.resource();
 		QTreeWidgetItem *contactItem = getReceiver(pitem.itemJid,name,groupItem);
 		contactItem->setCheckState(0, Qt::Unchecked);

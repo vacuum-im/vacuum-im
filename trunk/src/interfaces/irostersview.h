@@ -1,8 +1,10 @@
 #ifndef IROSTERSVIEW_H
 #define IROSTERSVIEW_H
 
+#include <QMap>
 #include <QVariant>
 #include <QTreeView>
+#include <QStringList>
 #include <QAbstractProxyModel>
 #include <interfaces/irostersmodel.h>
 #include <utils/menu.h>
@@ -49,14 +51,15 @@ struct IRostersNotify
 class IRostersClickHooker
 {
 public:
-	virtual bool rosterIndexClicked(int AOrder, IRosterIndex *AIndex) =0;
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent) =0;
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent) =0;
 };
 
 class IRostersKeyHooker
 {
 public:
-	virtual bool rosterKeyPressed(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent) =0;
-	virtual bool rosterKeyReleased(int AOrder, IRosterIndex *AIndex, QKeyEvent *AEvent) =0;
+	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent) =0;
+	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent) =0;
 };
 
 class IRostersDragDropHandler
@@ -90,6 +93,10 @@ public:
 	virtual void expandIndexParents(IRosterIndex *AIndex) =0;
 	virtual void expandIndexParents(const QModelIndex &AIndex) =0;
 	virtual bool editRosterIndex(int ADataRole, IRosterIndex *AIndex) =0;
+	virtual bool hasMultiSelection() const =0;
+	virtual QList<IRosterIndex *> selectedRosterIndexes() const =0;
+	virtual void selectRosterIndex(IRosterIndex * AIndex) = 0;
+	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> ARoles, int AUniqueRole=-1) const =0;
 	//--ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder) =0;
 	virtual QList<QAbstractProxyModel *> proxyModels() const =0;
@@ -130,9 +137,9 @@ public:
 	virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex) =0;
 	virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
 	//--ContextMenu
-	virtual void contextMenuForIndex(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
+	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu) =0;
 	//--ClipboardMenu
-	virtual void clipboardMenuForIndex(IRosterIndex *AIndex, Menu *AMenu) =0;
+	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
 protected:
 	virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
 	virtual void modelSeted(IRostersModel *AIndex) =0;
@@ -142,12 +149,12 @@ protected:
 	virtual void proxyModelRemoved(QAbstractProxyModel *AProxyModel) =0;
 	virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel) =0;
 	virtual void viewModelChanged(QAbstractItemModel *AModel) =0;
-	virtual void indexContextMenu(IRosterIndex *AIndex, Menu *AMenu) =0;
-	virtual void indexClipboardMenu(IRosterIndex *AIndex, Menu *AMenu) =0;
-	virtual void labelContextMenu(IRosterIndex *AIndex, int ALabelId, Menu *AMenu) =0;
-	virtual void labelToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
-	virtual void labelClicked(IRosterIndex *AIndex, int ALabelId) =0;
-	virtual void labelDoubleClicked(IRosterIndex *AIndex, int ALabelId, bool &AAccepted) =0;
+	virtual void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted) =0;
+	virtual void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
+	virtual void indexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu) =0;
+	virtual void indexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
+	virtual void indexClicked(IRosterIndex *AIndex, int ALabelId) =0;
+	virtual void indexDoubleClicked(IRosterIndex *AIndex, int ALabelId) =0;
 	virtual void notifyInserted(int ANotifyId) =0;
 	virtual void notifyActivated(int ANotifyId) =0;
 	virtual void notifyRemoved(int ANotifyId) =0;
@@ -162,11 +169,11 @@ public:
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
 };
 
-Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.1");
-Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.0");
+Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.2");
+Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.1");
 Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.0");
 Q_DECLARE_INTERFACE(IRostersEditHandler,"Virtus.Plugin.IRostersEditHandler/1.0")
-Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.2");
-Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.2");
+Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.3");
+Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.3");
 
 #endif //IROSTERSVIEW_H

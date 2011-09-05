@@ -24,8 +24,10 @@ void AccountManager::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
-bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool AccountManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
@@ -47,8 +49,8 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &/*AIni
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
-			        SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -252,12 +254,11 @@ void AccountManager::onAccountOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
-void AccountManager::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void AccountManager::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (AIndex->data(RDR_TYPE).toInt() == RIT_STREAM_ROOT)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
 	{
-		QString streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		IAccount *account = accountByStream(streamJid);
+		IAccount *account = accountByStream(AIndexes.first()->data(RDR_STREAM_JID).toString());
 		if (account)
 		{
 			Action *action = new Action(AMenu);

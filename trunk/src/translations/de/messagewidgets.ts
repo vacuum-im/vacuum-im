@@ -299,10 +299,6 @@
         <translation>Agenten</translation>
     </message>
     <message>
-        <source>Blank group</source>
-        <translation>Leere Gruppe</translation>
-    </message>
-    <message>
         <source>My Resources</source>
         <translation>Meine Resourcen</translation>
     </message>
@@ -313,6 +309,10 @@
     <message>
         <source>Enter valid contact jid:</source>
         <translation>Gültige Kontakt JID eingeben:</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

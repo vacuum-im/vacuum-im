@@ -107,6 +107,11 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/
 		if (plugin)
 		{
 			FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+			if (FRostersViewPlugin)
+			{
+				connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+					SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			}
 		}
 
 		plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
@@ -211,12 +216,6 @@ bool MultiUserChatPlugin::initObjects()
 		action->setShortcutId(SCT_APP_MUC_LEAVEHIDDEN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onLeaveHiddenRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
-	}
-
-	if (FRostersViewPlugin)
-	{
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(IRosterIndex *, Menu *)),
-			SLOT(onRosterIndexContextMenu(IRosterIndex *, Menu *)));
 	}
 
 	if (FMainWindowPlugin)
@@ -806,15 +805,19 @@ void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
 			window->exitAndDestroy(QString::null);
 }
 
-void MultiUserChatPlugin::onRosterIndexContextMenu(IRosterIndex *AIndex, Menu *AMenu)
+void MultiUserChatPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	int show = AIndex->data(RDR_SHOW).toInt();
-	if (show!=IPresence::Offline && show!=IPresence::Error)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
-		if (AIndex->type() == RIT_STREAM_ROOT)
+		IRosterIndex *index = AIndexes.first();
+		if (index->type() == RIT_STREAM_ROOT)
 		{
-			Action *action = createJoinAction(AIndex->data(RDR_FULL_JID).toString(),Jid::null,AMenu);
-			AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT,true);
+			int show = index->data(RDR_SHOW).toInt();
+			if (show!=IPresence::Offline && show!=IPresence::Error)
+			{
+				Action *action = createJoinAction(index->data(RDR_FULL_JID).toString(),Jid::null,AMenu);
+				AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT,true);
+			}
 		}
 	}
 }

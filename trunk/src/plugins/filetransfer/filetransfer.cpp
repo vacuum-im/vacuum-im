@@ -749,7 +749,7 @@ void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 
 void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance() && !FRostersViewPlugin->rostersView()->hasMultiSelection())
 	{
 		if (AId == SCT_ROSTERVIEW_SENDFILE)
 		{

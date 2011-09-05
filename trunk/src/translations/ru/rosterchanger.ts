@@ -206,10 +206,6 @@
         <translation>Введите новое имя группы:</translation>
     </message>
     <message>
-        <source>You are assured that wish to remove %1 contact(s) from roster?</source>
-        <translation>Вы уверены, что хотите удалить %1 контакт(ов) из контакт-листа?</translation>
-    </message>
-    <message>
         <source>You are now subscribed for %1 presence.</source>
         <translation>%1 авторизовал вас на получение статуса.</translation>
     </message>
@@ -300,6 +296,14 @@
     <message>
         <source>When receiving authorization request</source>
         <translation>При получении запроса авторизации</translation>
+    </message>
+    <message numerus="yes">
+        <source>You are assured that wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from roster?</source>
+        <translation>
+            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контакт&lt;/b&gt; из списка контактов?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контакта&lt;/b&gt; из списка контактов?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контактов&lt;/b&gt; из списка контактов?</numerusform>
+        </translation>
     </message>
 </context>
 <context>
