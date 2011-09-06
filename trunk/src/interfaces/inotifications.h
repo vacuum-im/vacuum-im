@@ -42,6 +42,7 @@ struct INotificationType
 		kindDefs = 0;
 	}
 	int order;
+	QIcon icon;
 	QString title;
 	ushort kindMask;
 	ushort kindDefs;

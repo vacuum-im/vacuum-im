@@ -133,6 +133,7 @@ bool RosterChanger::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_SUBSCRIPTION_REQUEST;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RCHANGER_SUBSCRIBTION);
 		notifyType.title = tr("When receiving authorization request");
 		notifyType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);

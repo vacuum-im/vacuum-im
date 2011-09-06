@@ -98,6 +98,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		{
 			INotificationType notifyType;
 			notifyType.order = NTO_CHATHANDLER_MESSAGE;
+			notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
 			notifyType.title = tr("When receiving new chat message");
 			notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 			notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);

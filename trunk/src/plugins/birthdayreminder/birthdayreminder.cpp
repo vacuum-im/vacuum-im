@@ -121,6 +121,7 @@ bool BirthdayReminder::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_BIRTHDAY_NOTIFY;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
 		notifyType.title = tr("When reminding of upcoming birthdays");
 		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
 		notifyType.kindDefs = notifyType.kindMask;

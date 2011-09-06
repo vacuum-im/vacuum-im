@@ -80,6 +80,7 @@ bool CaptchaForms::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_CAPTCHA_REQUEST;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CAPTCHAFORMS);
 		notifyType.title = tr("When receiving a CAPTCHA challenge");
 		notifyType.kindMask = INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);

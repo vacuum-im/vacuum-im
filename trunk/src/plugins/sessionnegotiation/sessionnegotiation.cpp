@@ -108,6 +108,7 @@ bool SessionNegotiation::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_SESSION_NEGOTIATION;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION);
 		notifyType.title = tr("When receiving session negotiation request");
 		notifyType.kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);

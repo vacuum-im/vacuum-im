@@ -129,6 +129,7 @@ bool FileTransfer::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_FILETRANSFER_NOTIFY;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_FILETRANSFER_RECEIVE);
 		notifyType.title = tr("When receiving a prompt to accept the file");
 		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);

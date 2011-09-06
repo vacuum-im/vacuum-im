@@ -162,6 +162,7 @@ bool ChatStates::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_CHATSTATE_NOTIFY;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATSTATES_COMPOSING);
 		notifyType.title = tr("When contact is typing the message for you");
 		notifyType.kindMask = INotification::TabPageNotify;
 		notifyType.kindDefs = notifyType.kindMask;
