@@ -87,6 +87,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		{
 			INotificationType notifyType;
 			notifyType.order = NTO_NORMALHANDLER_MESSAGE;
+			notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
 			notifyType.title = tr("When receiving new single message");
 			notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 			notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);

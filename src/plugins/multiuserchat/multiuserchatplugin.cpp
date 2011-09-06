@@ -234,6 +234,7 @@ bool MultiUserChatPlugin::initObjects()
 	{
 		INotificationType inviteType;
 		inviteType.order = NTO_MUC_INVITE_MESSAGE;
+		inviteType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE);
 		inviteType.title = tr("When receiving an invitation to the conference");
 		inviteType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AutoActivate;
 		inviteType.kindDefs = inviteType.kindMask & ~(INotification::AutoActivate);
@@ -241,6 +242,7 @@ bool MultiUserChatPlugin::initObjects()
 
 		INotificationType privateType;
 		privateType.order = NTO_MUC_PRIVATE_MESSAGE;
+		privateType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE);
 		privateType.title = tr("When receiving a new private message in conference");
 		privateType.kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		privateType.kindDefs = privateType.kindMask & ~(INotification::AutoActivate);
@@ -248,6 +250,7 @@ bool MultiUserChatPlugin::initObjects()
 
 		INotificationType groupchatType;
 		groupchatType.order = NTO_MUC_GROUPCHAT_MESSAGE;
+		groupchatType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_MESSAGE);
 		groupchatType.title = tr("When receiving a new message in conference");
 		groupchatType.kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized;
 		groupchatType.kindDefs = groupchatType.kindMask & ~(INotification::PopupWindow|INotification::ShowMinimized|INotification::AutoActivate);
@@ -255,6 +258,7 @@ bool MultiUserChatPlugin::initObjects()
 
 		INotificationType mentionType;
 		mentionType.order = NTO_MUC_MENTION_MESSAGE;
+		mentionType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_MESSAGE);
 		mentionType.title = tr("When referring to you at the conference");
 		mentionType.kindMask = INotification::TrayNotify|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		mentionType.kindDefs = mentionType.kindMask & ~(INotification::AutoActivate);

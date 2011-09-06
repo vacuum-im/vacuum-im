@@ -135,6 +135,7 @@ void NotifyOptionsWidget::createTreeModel()
 					QStandardItem *typeNameItem = new QStandardItem(notifyType.title);
 					typeNameItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 					typeNameItem->setData(notifyType.order,MDR_SORT);
+					typeNameItem->setIcon(notifyType.icon);
 
 					QStandardItem *typeEnableItem = new QStandardItem;
 					typeEnableItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
