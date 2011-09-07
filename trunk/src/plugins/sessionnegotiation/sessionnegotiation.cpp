@@ -80,7 +80,8 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
 
@@ -1054,8 +1055,9 @@ void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
 	}
 }
 
-void SessionNegotiation::onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem)
+void SessionNegotiation::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
+	Q_UNUSED(ABefore);
 	if (AItem.show == IPresence::Offline || AItem.show == IPresence::Error)
 	{
 		terminateSession(APresence->streamJid(),AItem.itemJid);

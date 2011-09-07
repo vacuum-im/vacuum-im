@@ -59,7 +59,7 @@ protected slots:
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onVCardReceived(const Jid &AContactJid);
-	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem);
+	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onOptionsOpened();
 	void onOptionsClosed();
 private:

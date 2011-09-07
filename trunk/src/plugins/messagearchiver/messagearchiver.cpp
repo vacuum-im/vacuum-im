@@ -1167,7 +1167,7 @@ Jid MessageArchiver::gateJid(const Jid &AContactJid) const
 
 QString MessageArchiver::gateNick(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster)
 	{
 		Jid gcontactJid = gateJid(AContactJid.bare());

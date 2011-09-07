@@ -59,8 +59,8 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 		if (FRosterPlugin)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemRemoved(IRoster *, const IRosterItem &)),
-				SLOT(onRosterItemRemoved(IRoster *, const IRosterItem &)));
+			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
@@ -341,13 +341,14 @@ void Annotations::onPrivateStorageClosed(const Jid &AStreamJid)
 	updateDataHolder(AStreamJid,curAnnotations);
 }
 
-void Annotations::onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem)
+void Annotations::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
 {
-	if (isEnabled(ARoster->streamJid()))
+	Q_UNUSED(ABefore);
+	if (AItem.subscription==SUBSCRIPTION_REMOVE && isEnabled(ARoster->streamJid()))
 	{
-		if (!annotation(ARoster->streamJid(),ARosterItem.itemJid).isEmpty())
+		if (!annotation(ARoster->streamJid(),AItem.itemJid).isEmpty())
 		{
-			setAnnotation(ARoster->streamJid(),ARosterItem.itemJid,"");
+			setAnnotation(ARoster->streamJid(),AItem.itemJid,QString::null);
 			saveAnnotations(ARoster->streamJid());
 		}
 	}

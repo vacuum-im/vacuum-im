@@ -65,6 +65,7 @@ public:
 	virtual void saveRosterItems(const QString &AFileName) const =0;
 	virtual void loadRosterItems(const QString &AFileName) =0;
 	//Operations  on subscription
+	virtual QSet<Jid> subscriptionRequests() const =0;
 	virtual void sendSubscription(const Jid &AItemJid, int ASubsType, const QString &AText = QString()) =0;
 	//Operations on items
 	virtual void renameItem(const Jid &AItemJid, const QString &AName) =0;
@@ -78,9 +79,9 @@ public:
 	virtual void removeGroup(const QString &AGroup) =0;
 protected:
 	virtual void opened() =0;
-	virtual void received(const IRosterItem &ARosterItem) =0;
-	virtual void removed(const IRosterItem &ARosterItem) =0;
-	virtual void subscription(const Jid &AItemJid, int ASubsType, const QString &AText) =0;
+	virtual void itemReceived(const IRosterItem &ARosterItem, const IRosterItem &ABefore) =0;
+	virtual void subscriptionSent(const Jid &AItemJid, int ASubsType, const QString &AText) =0;
+	virtual void subscriptionReceived(const Jid &AItemJid, int ASubsType, const QString &AText) =0;
 	virtual void closed() =0;
 	virtual void streamJidAboutToBeChanged(const Jid &AAfter) =0;
 	virtual void streamJidChanged(const Jid &ABefore) =0;
@@ -90,23 +91,23 @@ class IRosterPlugin
 {
 public:
 	virtual QObject *instance() =0;
-	virtual IRoster *addRoster(IXmppStream *AXmppStream) =0;
-	virtual IRoster *getRoster(const Jid &AStreamJid) const =0;
+	virtual IRoster *getRoster(IXmppStream *AXmppStream) =0;
+	virtual IRoster *findRoster(const Jid &AStreamJid) const =0;
 	virtual QString rosterFileName(const Jid &AStreamJid) const =0;
 	virtual void removeRoster(IXmppStream *AXmppStream) =0;
 protected:
 	virtual void rosterAdded(IRoster *ARoster) =0;
 	virtual void rosterOpened(IRoster *ARoster) =0;
-	virtual void rosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem) =0;
-	virtual void rosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem) =0;
-	virtual void rosterSubscription(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText) =0;
+	virtual void rosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore) =0;
+	virtual void rosterSubscriptionSent(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText) =0;
+	virtual void rosterSubscriptionReceived(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText) =0;
 	virtual void rosterClosed(IRoster *ARoster) =0;
 	virtual void rosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter) =0;
 	virtual void rosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore) =0;
 	virtual void rosterRemoved(IRoster *ARoster) =0;
 };
 
-Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.1")
-Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.1")
+Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.2")
+Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.2")
 
 #endif

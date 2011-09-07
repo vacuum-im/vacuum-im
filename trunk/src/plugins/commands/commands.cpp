@@ -81,7 +81,8 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
 
@@ -584,27 +585,28 @@ void Commands::onDiscoItemsReceived(const IDiscoItems &AItems)
 	}
 }
 
-void Commands::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
+void Commands::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	if (FDiscovery && APresence->isOpen() && APresenceItem.itemJid.node().isEmpty())
+	Q_UNUSED(ABefore);
+	if (FDiscovery && APresence->isOpen() && AItem.itemJid.node().isEmpty())
 	{
-		if (FDiscovery->discoInfo(APresence->streamJid(),APresenceItem.itemJid).features.contains(NS_COMMANDS))
+		if (FDiscovery->discoInfo(APresence->streamJid(),AItem.itemJid).features.contains(NS_COMMANDS))
 		{
 			QList<Jid> &online = FOnlineAgents[APresence->streamJid()];
-			if (APresenceItem.show==IPresence::Offline || APresenceItem.show==IPresence::Error)
+			if (AItem.show==IPresence::Offline || AItem.show==IPresence::Error)
 			{
-				if (online.contains(APresenceItem.itemJid))
+				if (online.contains(AItem.itemJid))
 				{
-					online.removeAll(APresenceItem.itemJid);
-					FDiscovery->requestDiscoItems(APresence->streamJid(),APresenceItem.itemJid,NS_COMMANDS);
+					online.removeAll(AItem.itemJid);
+					FDiscovery->requestDiscoItems(APresence->streamJid(),AItem.itemJid,NS_COMMANDS);
 				}
 			}
 			else
 			{
-				if (!online.contains(APresenceItem.itemJid))
+				if (!online.contains(AItem.itemJid))
 				{
-					online.append(APresenceItem.itemJid);
-					FDiscovery->requestDiscoItems(APresence->streamJid(),APresenceItem.itemJid,NS_COMMANDS);
+					online.append(AItem.itemJid);
+					FDiscovery->requestDiscoItems(APresence->streamJid(),AItem.itemJid,NS_COMMANDS);
 				}
 			}
 		}

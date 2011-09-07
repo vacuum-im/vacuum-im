@@ -40,11 +40,13 @@ public:
 	virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
 	virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
 	virtual void setItems(const QList<IRosterItem> &AItems);
-	virtual void sendSubscription(const Jid &AItemJid, int AType, const QString &AText = QString());
 	virtual void removeItem(const Jid &AItemJid);
 	virtual void removeItems(const QList<IRosterItem> &AItems);
 	virtual void saveRosterItems(const QString &AFileName) const;
 	virtual void loadRosterItems(const QString &AFileName);
+	//Operations  on subscription
+	virtual QSet<Jid> subscriptionRequests() const;
+	virtual void sendSubscription(const Jid &AItemJid, int AType, const QString &AText = QString());
 	//Operations on items
 	virtual void renameItem(const Jid &AItemJid, const QString &AName);
 	virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroup);
@@ -57,15 +59,14 @@ public:
 	virtual void removeGroup(const QString &AGroup);
 signals:
 	void opened();
-	void received(const IRosterItem &ARosterItem);
-	void removed(const IRosterItem &ARosterItem);
-	void subscription(const Jid &AItemJid, int ASubsType, const QString &AText);
+	void itemReceived(const IRosterItem &ARosterItem, const IRosterItem &ABefore);
+	void subscriptionSent(const Jid &AItemJid, int ASubsType, const QString &AText);
+	void subscriptionReceived(const Jid &AItemJid, int ASubsType, const QString &AText);
 	void closed();
 	void streamJidAboutToBeChanged(const Jid &AAfter);
 	void streamJidChanged(const Jid &ABefore);
 protected:
 	void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
-	void removeRosterItem(const Jid &AItemJid);
 	void requestGroupDelimiter();
 	void setGroupDelimiter(const QString &ADelimiter);
 	void requestRosterItems();
@@ -81,14 +82,16 @@ private:
 	IXmppStream *FXmppStream;
 	IStanzaProcessor *FStanzaProcessor;
 private:
-	bool FOpened;
-	bool FVerSupported;
 	int FSHIRosterPush;
 	int FSHISubscription;
 	QString FOpenRequestId;
 	QString FDelimRequestId;
-	QString FGroupDelim;
+private:
+	bool FOpened;
+	bool FVerSupported;
 	QString FRosterVer;
+	QString FGroupDelim;
+	QSet<Jid> FSubscriptionRequests;
 	QHash<Jid, IRosterItem> FRosterItems;
 };
 

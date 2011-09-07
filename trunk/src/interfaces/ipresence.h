@@ -58,8 +58,8 @@ public:
 protected:
 	virtual void opened() =0;
 	virtual void changed(int AShow, const QString &AStatus, int APriority) =0;
-	virtual void received(const IPresenceItem &APresenceItem) =0;
-	virtual void sent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
+	virtual void itemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore) =0;
+	virtual void directSent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
 	virtual void aboutToClose(int AShow, const QString &AStatus) =0;
 	virtual void closed() =0;
 };
@@ -68,8 +68,8 @@ class IPresencePlugin
 {
 public:
 	virtual QObject *instance() =0;
-	virtual IPresence *addPresence(IXmppStream *AXmppStream) =0;
-	virtual IPresence *getPresence(const Jid &AStreamJid) const =0;
+	virtual IPresence *getPresence(IXmppStream *AXmppStream) =0;
+	virtual IPresence *findPresence(const Jid &AStreamJid) const =0;
 	virtual bool isContactOnline(const Jid &AContactJid) const =0;
 	virtual QList<Jid> contactsOnline() const =0;
 	virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const =0;
@@ -80,14 +80,14 @@ protected:
 	virtual void presenceAdded(IPresence *APresence) =0;
 	virtual void presenceOpened(IPresence *APresence) =0;
 	virtual void presenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority) =0;
-	virtual void presenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem) =0;
-	virtual void presenceSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity) =0;
+	virtual void presenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore) =0;
+	virtual void presenceDirectSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity) =0;
 	virtual void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus) =0;
 	virtual void presenceClosed(IPresence *APresence) =0;
 	virtual void presenceRemoved(IPresence *APresence) =0;
 };
 
-Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.1")
-Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.1")
+Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.2")
+Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.2")
 
 #endif  //IPRESENCE_H

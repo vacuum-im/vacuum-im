@@ -26,8 +26,8 @@ public:
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IPresencePlugin
-	virtual IPresence *addPresence(IXmppStream *AXmppStream);
-	virtual IPresence *getPresence(const Jid &AStreamJid) const;
+	virtual IPresence *getPresence(IXmppStream *AXmppStream);
+	virtual IPresence *findPresence(const Jid &AStreamJid) const;
 	virtual bool isContactOnline(const Jid &AContactJid) const { return FContactPresences.contains(AContactJid); }
 	virtual QList<Jid> contactsOnline() const { return FContactPresences.keys(); }
 	virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const { return FContactPresences.value(AContactJid).toList(); }
@@ -38,16 +38,16 @@ signals:
 	void presenceAdded(IPresence *APresence);
 	void presenceOpened(IPresence *APresence);
 	void presenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriotity);
-	void presenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
-	void presenceSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity);
+	void presenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
+	void presenceDirectSent(IPresence *APresence, const Jid &AContactJid, int AShow, const QString &AStatus, int APriotity);
 	void presenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
 	void presenceClosed(IPresence *APresence);
 	void presenceRemoved(IPresence *APresence);
 protected slots:
 	void onPresenceOpened();
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
-	void onPresenceReceived(const IPresenceItem &APresenceItem);
-	void onPresenceSent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
+	void onPresenceItemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore);
+	void onPresenceDirectSent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
 	void onPresenceAboutToClose(int AShow, const QString &AStatus);
 	void onPresenceClosed();
 	void onPresenceDestroyed(QObject *AObject);

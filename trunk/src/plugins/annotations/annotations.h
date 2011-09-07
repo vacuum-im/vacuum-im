@@ -77,7 +77,7 @@ protected slots:
 	void onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onPrivateStorageClosed(const Jid &AStreamJid);
-	void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
+	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);

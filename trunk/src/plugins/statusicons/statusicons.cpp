@@ -312,12 +312,12 @@ QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 
 QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	int show = presence!=NULL ? presence->presenceItem(AContactJid).show : IPresence::Offline;
 
 	bool ask = false;
 	QString subscription = SUBSCRIPTION_NONE;
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster)
 	{
 		IRosterItem ritem = roster->rosterItem(AContactJid);

@@ -92,7 +92,7 @@ protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
-	void onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem);
+	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onStreamAboutToClose(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onNotificationActivated(int ANotifyId);

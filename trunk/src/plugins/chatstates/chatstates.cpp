@@ -81,8 +81,8 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		if (FPresencePlugin)
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
-				SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
 		}
 	}
@@ -612,8 +612,9 @@ void ChatStates::onPresenceOpened(IPresence *APresence)
 	FChatParams[APresence->streamJid()].clear();
 }
 
-void ChatStates::onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem)
+void ChatStates::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
+	Q_UNUSED(ABefore);
 	if (AItem.show==IPresence::Offline || AItem.show==IPresence::Error)
 	{
 		if (userChatState(APresence->streamJid(),AItem.itemJid) != IChatStates::StateUnknown)

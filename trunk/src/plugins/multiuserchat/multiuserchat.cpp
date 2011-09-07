@@ -851,7 +851,7 @@ void MultiUserChat::initialize()
 		IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (presencePlugin)
 		{
-			FPresence = presencePlugin->getPresence(FStreamJid);
+			FPresence = presencePlugin->findPresence(FStreamJid);
 			if (FPresence)
 			{
 				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),

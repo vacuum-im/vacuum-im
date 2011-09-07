@@ -519,7 +519,7 @@ void FileTransfer::autoStartStream(IFileStream *AStream)
 	{
 		if (!QFile::exists(AStream->fileName()))
 		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStream->streamJid()) : NULL;
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStream->streamJid()) : NULL;
 			if (roster && roster->rosterItem(AStream->contactJid()).isValid)
 				AStream->startStream(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString());
 		}
