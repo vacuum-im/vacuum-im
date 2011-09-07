@@ -211,7 +211,7 @@ bool Registration::execDiscoFeature(const Jid &AStreamJid, const QString &AFeatu
 
 Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if ( presence && presence->isOpen() && AFeature == NS_JABBER_REGISTER)
 	{
 		Menu *regMenu = new Menu(AParent);
@@ -372,7 +372,7 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
 
 bool Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
 		RegisterDialog *dialog = new RegisterDialog(this,FDataForms,AStreamJid,AServiceJid,AOperation,AParent);

@@ -467,7 +467,7 @@ QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 
 void Avatars::updatePresence(const Jid &AStreamJid) const
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 		presence->setPresence(presence->show(),presence->status(),presence->priority());
 }

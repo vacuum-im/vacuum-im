@@ -32,8 +32,8 @@ class ISubscriptionDialog
 {
 public:
 	virtual QDialog *instance() =0;
-	virtual const Jid &streamJid() const =0;
-	virtual const Jid &contactJid() const =0;
+	virtual Jid streamJid() const =0;
+	virtual Jid contactJid() const =0;
 	virtual QVBoxLayout *actionsLayout() const =0;
 	virtual ToolBarChanger *toolBarChanger() const =0;
 protected:
@@ -58,7 +58,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IAddContactDialog,"Vacuum.Plugin.IAddContactDialog/1.0")
-Q_DECLARE_INTERFACE(ISubscriptionDialog,"Vacuum.Plugin.ISubscriptionDialog/1.0")
+Q_DECLARE_INTERFACE(ISubscriptionDialog,"Vacuum.Plugin.ISubscriptionDialog/1.1")
 Q_DECLARE_INTERFACE(IRosterChanger,"Vacuum.Plugin.IRosterChanger/1.0")
 
 #endif

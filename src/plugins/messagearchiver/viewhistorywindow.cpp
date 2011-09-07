@@ -298,7 +298,8 @@ void ViewHistoryWindow::initialize(IPluginManager *APluginManager)
 	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0);
 	if (plugin)
 	{
-		FRoster = qobject_cast<IRosterPlugin *>(plugin->instance())->getRoster(FStreamJid);
+		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		FRoster = rosterPlugin!=NULL ? rosterPlugin->findRoster(FStreamJid) : NULL;
 		if (FRoster)
 			connect(FRoster->xmppStream()->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
 	}

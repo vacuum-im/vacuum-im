@@ -38,13 +38,33 @@ SubscriptionDialog::~SubscriptionDialog()
 	emit dialogDestroyed();
 }
 
+Jid SubscriptionDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid SubscriptionDialog::contactJid() const
+{
+	return FContactJid;
+}
+
+QVBoxLayout *SubscriptionDialog::actionsLayout() const
+{
+	return ui.lytActionsLayout;
+}
+
+ToolBarChanger *SubscriptionDialog::toolBarChanger() const
+{
+	return FToolBarChanger;
+}
+
 void SubscriptionDialog::initialize(IPluginManager *APluginManager)
 {
 	IPlugin *plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
 	{
 		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		FRoster = rosterPlugin!=NULL ? rosterPlugin->getRoster(FStreamJid) : NULL;
+		FRoster = rosterPlugin!=NULL ? rosterPlugin->findRoster(FStreamJid) : NULL;
 		if (FRoster && FRoster->rosterItem(FContactJid).isValid)
 		{
 			ui.rbtAddToRoster->setEnabled(false);
@@ -136,3 +156,4 @@ void SubscriptionDialog::onToolBarActionTriggered( bool )
 		}
 	}
 }
+

@@ -373,7 +373,7 @@ bool ClientInfo::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature
 
 Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
 		if (AFeature == NS_JABBER_VERSION)
@@ -578,7 +578,7 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
 				contactName = FDiscovery!=NULL ? FDiscovery->discoInfo(AStreamJid,AContactJid).identity.value(0).name : AContactJid.domain();
 			if (FRosterPlugin)
 			{
-				IRoster *roster = FRosterPlugin->getRoster(AStreamJid);
+				IRoster *roster = FRosterPlugin->findRoster(AStreamJid);
 				if (roster)
 				{
 					IRosterItem ritem = roster->rosterItem(AContactJid);
@@ -848,7 +848,7 @@ void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes,
 		if (index->type() == RIT_CONTACT || index->type() == RIT_AGENT || index->type() == RIT_MY_RESOURCE)
 		{
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 			{
 				Jid contactJid = index->data(RDR_FULL_JID).toString();

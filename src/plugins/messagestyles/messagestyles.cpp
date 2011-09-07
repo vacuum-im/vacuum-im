@@ -169,7 +169,7 @@ QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid
 	}
 	else
 	{
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 		name = roster!=NULL ? roster->rosterItem(AContactJid).name : QString::null;
 	}
 

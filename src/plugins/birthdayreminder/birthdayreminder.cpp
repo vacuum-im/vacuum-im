@@ -71,8 +71,8 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 		if (FRosterPlugin)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &)),
-				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &)));
+			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
@@ -169,7 +169,7 @@ Jid BirthdayReminder::findContactStream(const Jid &AContactJid) const
 	{
 		foreach(Jid streamJid, FRostersModel->streams())
 		{
-			IRoster *roster = FRosterPlugin->getRoster(streamJid);
+			IRoster *roster = FRosterPlugin->findRoster(streamJid);
 			if (roster && roster->rosterItem(AContactJid).isValid)
 				return streamJid;
 		}
@@ -277,7 +277,7 @@ void BirthdayReminder::onNotificationActivated(int ANotifyId)
 		{
 			Jid contactJid = FNotifies.value(ANotifyId);
 			Jid streamJid = findContactStream(contactJid);
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 			QList<IPresenceItem> presences = presence!=NULL ? presence->presenceItems(contactJid) : QList<IPresenceItem>();
 			FMessageProcessor->createMessageWindow(streamJid, !presences.isEmpty() ? presences.first().itemJid : contactJid, Message::Chat, IMessageHandler::SM_SHOW);
 		}
@@ -332,10 +332,10 @@ void BirthdayReminder::onVCardReceived(const Jid &AContactJid)
 	}
 }
 
-void BirthdayReminder::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem)
+void BirthdayReminder::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
 {
 	Q_UNUSED(ARoster);
-	if (FVCardPlugin && FVCardPlugin->hasVCard(AItem.itemJid))
+	if (!ABefore.isValid && FVCardPlugin && FVCardPlugin->hasVCard(AItem.itemJid))
 	{
 		IVCard *vcard = FVCardPlugin->vcard(AItem.itemJid);
 		setContactBithday(AItem.itemJid,DateTime(vcard->value(VVN_BIRTHDAY)).dateTime().date());

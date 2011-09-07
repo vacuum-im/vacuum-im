@@ -89,8 +89,8 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
-			        SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
 
@@ -100,8 +100,8 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 		if (FRosterPlugin)
 		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &)),
-			        SLOT(onRosterItemReceived(IRoster *, const IRosterItem &)));
+			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
@@ -112,9 +112,9 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 		if (FMultiUserChatPlugin)
 		{
 			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserChatCreated(IMultiUserChat *)),
-			        SLOT(onMultiUserChatCreated(IMultiUserChat *)));
+				SLOT(onMultiUserChatCreated(IMultiUserChat *)));
 			connect(FMultiUserChatPlugin->instance(),SIGNAL(multiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)),
-			        SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
+				SLOT(onMultiUserContextMenu(IMultiUserChatWindow *, IMultiUser *, Menu *)));
 		}
 	}
 
@@ -1205,7 +1205,7 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 	requestDiscoInfo(AXmppStream->streamJid(),streamDomane);
 	requestDiscoItems(AXmppStream->streamJid(),streamDomane);
 
-	IRoster *roster = FRosterPlugin->getRoster(AXmppStream->streamJid());
+	IRoster *roster = FRosterPlugin->findRoster(AXmppStream->streamJid());
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
 	foreach(IRosterItem ritem, ritems)
 	{
@@ -1254,29 +1254,31 @@ void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
 	FDiscoInfo.remove(AXmppStream->streamJid());
 }
 
-void ServiceDiscovery::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
+void ServiceDiscovery::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	if (APresenceItem.show==IPresence::Offline || APresenceItem.show==IPresence::Error)
+	Q_UNUSED(ABefore);
+	if (AItem.show==IPresence::Offline || AItem.show==IPresence::Error)
 	{
-		if (!APresenceItem.itemJid.node().isEmpty())
+		if (!AItem.itemJid.node().isEmpty())
 		{
 			DiscoveryRequest request;
 			request.streamJid = APresence->streamJid();
-			request.contactJid = APresenceItem.itemJid;
+			request.contactJid = AItem.itemJid;
 			removeQueuedRequest(request);
-			removeDiscoInfo(APresence->streamJid(),APresenceItem.itemJid);
+			removeDiscoInfo(APresence->streamJid(),AItem.itemJid);
 		}
-		FEntityCaps[APresence->streamJid()].remove(APresenceItem.itemJid);
+		FEntityCaps[APresence->streamJid()].remove(AItem.itemJid);
 	}
 }
 
-void ServiceDiscovery::onRosterItemReceived(IRoster *ARoster, const IRosterItem &ARosterItem)
+void ServiceDiscovery::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
 {
-	if (ARosterItem.itemJid.node().isEmpty() && ARoster->isOpen() && !hasDiscoInfo(ARoster->streamJid(), ARosterItem.itemJid))
+	Q_UNUSED(ABefore);
+	if (AItem.subscription!=SUBSCRIPTION_REMOVE && AItem.itemJid.node().isEmpty() && ARoster->isOpen() && !hasDiscoInfo(ARoster->streamJid(), AItem.itemJid))
 	{
 		DiscoveryRequest request;
 		request.streamJid = ARoster->streamJid();
-		request.contactJid = ARosterItem.itemJid;
+		request.contactJid = AItem.itemJid;
 		appendQueuedRequest(QUEUE_REQUEST_START,request);
 	}
 }
@@ -1443,7 +1445,7 @@ void ServiceDiscovery::onSelfCapsChanged()
 		if (myCaps.ver != newVer)
 		{
 			myCaps.ver = newVer;
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 				presence->setPresence(presence->show(),presence->status(),presence->priority());
 		}

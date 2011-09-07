@@ -247,7 +247,7 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
 
 void JabberSearch::showSearchDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (presence && presence->isOpen())
 	{
 		SearchDialog *dialog = new SearchDialog(this,FPluginManager,AStreamJid,AServiceJid,AParent);

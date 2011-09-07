@@ -23,10 +23,10 @@ public:
 	~SubscriptionDialog();
 	//ISubscriptionDialog
 	virtual QDialog *instance() { return this; }
-	virtual const Jid &streamJid() const { return FStreamJid; }
-	virtual const Jid &contactJid() const { return FContactJid; }
-	virtual QVBoxLayout *actionsLayout() const { return ui.lytActionsLayout; }
-	virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
+	virtual Jid streamJid() const;
+	virtual Jid contactJid() const;
+	virtual QVBoxLayout *actionsLayout() const;
+	virtual ToolBarChanger *toolBarChanger() const;
 signals:
 	void dialogDestroyed();
 protected:

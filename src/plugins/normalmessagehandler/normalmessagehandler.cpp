@@ -74,8 +74,8 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
-				SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
 
@@ -549,7 +549,7 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 		if (AId == SCT_ROSTERVIEW_SHOWNORMALDIALOG && isSelectionAccepted(indexes))
 		{
 			Jid streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 			{
 				QStringList groups;
@@ -592,7 +592,7 @@ void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> 
 	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
 	{
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 		if (presence && presence->isOpen())
 		{
 			QStringList groups;
@@ -620,9 +620,10 @@ void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> 
 	}
 }
 
-void NormalMessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem)
+void NormalMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	IMessageWindow *messageWindow = findWindow(APresence->streamJid(),APresenceItem.itemJid);
+	Q_UNUSED(ABefore);
+	IMessageWindow *messageWindow = findWindow(APresence->streamJid(),AItem.itemJid);
 	if (messageWindow)
 		updateWindow(messageWindow);
 }

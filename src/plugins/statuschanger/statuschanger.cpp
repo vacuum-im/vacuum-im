@@ -1021,14 +1021,14 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 
 void StatusChanger::onRosterOpened(IRoster *ARoster)
 {
-	IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
+	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
 	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
 }
 
 void StatusChanger::onRosterClosed(IRoster *ARoster)
 {
-	IPresence *presence = FPresencePlugin->getPresence(ARoster->streamJid());
+	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
 	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
 }

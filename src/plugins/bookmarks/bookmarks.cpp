@@ -431,7 +431,7 @@ void BookMarks::onAddRoomBookmarkActionTriggered(bool)
 		IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(action->parent());
 		if (window)
 		{
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(window->streamJid()) : NULL;
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(window->streamJid()) : NULL;
 			if (presence && presence->isOpen())
 			{
 				QList<IBookMark> bookmarkList = bookmarks(window->streamJid());

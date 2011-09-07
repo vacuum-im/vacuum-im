@@ -102,7 +102,7 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
 	if (plugin)
 	{
 		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		FRoster = rosterPlugin!=NULL ? rosterPlugin->getRoster(FStreamJid) : NULL;
+		FRoster = rosterPlugin!=NULL ? rosterPlugin->findRoster(FStreamJid) : NULL;
 		if (FRoster)
 		{
 			ui.cmbGroup->addItems(FRoster->groups().toList());

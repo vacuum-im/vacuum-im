@@ -37,8 +37,8 @@ public:
 signals:
 	void opened();
 	void changed(int AShow, const QString &AStatus, int APriority);
-	void received(const IPresenceItem &APresenceItem);
-	void sent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
+	void itemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore);
+	void directSent(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority);
 	void aboutToClose(int AShow, const QString &AStatus);
 	void closed();
 protected:

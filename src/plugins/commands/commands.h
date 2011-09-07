@@ -80,7 +80,7 @@ protected slots:
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
 	void onDiscoItemsReceived(const IDiscoItems &AItems);
-	void onPresenceReceived(IPresence *APresence, const IPresenceItem &APresenceItem);
+	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onExecuteActionTriggered(bool);
 	void onRequestActionTriggered(bool);
 private:

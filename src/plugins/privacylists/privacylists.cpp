@@ -151,7 +151,7 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 	}
 	else if (FSHIRosterIn.value(AStreamJid)==AHandlerId || FSHIRosterOut.value(AStreamJid)==AHandlerId)
 	{
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 		if (presence && presence->isOpen() && !activeList(AStreamJid).isEmpty())
 		{
 			bool directionIn = FSHIRosterIn.value(AStreamJid)==AHandlerId;
@@ -451,7 +451,7 @@ void PrivacyLists::setAutoListed(const Jid &AStreamJid, const QString &AGroup, c
 				setAutoListed(AStreamJid,AGroup,PRIVACY_LIST_IGNORE,false);
 			}
 
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 			QStringList groups = roster!=NULL ? (roster->groups()<<AGroup).toList() : QStringList(AGroup);
 			QString groupWithDelim = roster!=NULL ? AGroup + roster->groupDelimiter() : AGroup;
 			qSort(groups);
@@ -593,7 +593,7 @@ int PrivacyLists::denyedStanzas(const IRosterItem &AItem, const IPrivacyList &AL
 QHash<Jid,int> PrivacyLists::denyedContacts(const Jid &AStreamJid, const IPrivacyList &AList, int AFilter) const
 {
 	QHash<Jid,int> denied;
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
+	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
 	foreach(IRosterItem ritem,ritems)
 	{
@@ -799,7 +799,7 @@ QDialog *PrivacyLists::showEditListsDialog(const Jid &AStreamJid, QWidget *APare
 	{
 		if (!dialog)
 		{
-			dialog = new EditListsDialog(this,FRosterPlugin!= NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL, AStreamJid,AParent);
+			dialog = new EditListsDialog(this,FRosterPlugin!= NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL, AStreamJid,AParent);
 			connect(dialog,SIGNAL(destroyed(const Jid &)),SLOT(onEditListsDialogDestroyed(const Jid &)));
 			FEditListsDialogs.insert(AStreamJid,dialog);
 		}
@@ -1048,8 +1048,8 @@ bool PrivacyLists::isMatchedJid(const Jid &AMask, const Jid &AJid) const
 
 void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList)
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(AStreamJid) : NULL;
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (presence)
 	{
 		QSet<Jid> denied = denyedContacts(AStreamJid,AAutoList,IPrivacyRule::PresencesOut).keys().toSet();
@@ -1070,7 +1070,7 @@ void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList
 
 void PrivacyLists::sendOfflinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList)
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(AStreamJid) : NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (presence)
 	{
 		QSet<Jid> denied = denyedContacts(AStreamJid,AAutoList,IPrivacyRule::PresencesOut).keys().toSet();
@@ -1366,7 +1366,7 @@ void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMu
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 		IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
 		ritem.itemJid = contactJid;
 		int stanzas = denyedStanzas(ritem,privacyList(streamJid,activeList(streamJid)));
@@ -1388,7 +1388,7 @@ void PrivacyLists::onUpdateCreatedRosterIndexes()
 		if (!activeList(streamJid).isEmpty())
 		{
 			Jid contactJid = index->data(RDR_FULL_JID).toString();
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->getRoster(streamJid) : NULL;
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 			IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
 			ritem.itemJid = contactJid;
 			if ((denyedStanzas(ritem,privacyList(streamJid,activeList(streamJid))) & IPrivacyRule::AnyStanza)>0)

@@ -96,14 +96,16 @@ signals:
 	void addContactDialogCreated(IAddContactDialog *ADialog);
 	void subscriptionDialogCreated(ISubscriptionDialog *ADialog);
 protected:
-	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
+	QList<int> findNotifies(const Jid &AStreamJid, const Jid &AContactJid) const;
+	void removeObsoleteNotifies(const Jid &AStreamJid, const Jid &AContactJid, int ASubsType, bool ASent);
 	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,bool ANewGroup, bool ARootGroup, bool ABlank, const char *ASlot, Menu *AParent);
 	SubscriptionDialog *findSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const;
 	SubscriptionDialog *createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QStringList indexesRoleList(const QList<IRosterIndex *> &AIndexes, int ARole, bool AUnique) const;
 protected:
-	void contactsSubscription(const Jid &AStreamJid, const QStringList &AContacts, int ASubsc);
+	void changeContactsSubscription(const Jid &AStreamJid, const QStringList &AContacts, int ASubsc);
 	void sendSubscription(const Jid &AStreamJid, const QStringList &AContacts, int ASubsc) const;
 	void addContactToGroup(const Jid &AStreamJid, const Jid &AContactJid, const QString &AGroup) const;
 	void renameContact(const Jid &AStreamJid, const Jid &AContactJid, const QString &AOldName) const;
@@ -120,10 +122,11 @@ protected:
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
-	void onReceiveSubscription(IRoster *ARoster, const Jid &AContactJid, int ASubsType, const QString &AMessage);
 	//Operations on subscription
-	void onContactsSubscription(bool);
 	void onSendSubscription(bool);
+	void onChangeContactsSubscription(bool);
+	void onSubscriptionSent(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
+	void onSubscriptionReceived(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AMessage);
 	//Operations on contacts
 	void onAddContactToGroup(bool);
 	void onRenameContact(bool);
@@ -140,7 +143,7 @@ protected slots:
 	void onRemoveGroupsContacts(bool);
 protected slots:
 	void onShowAddContactDialog(bool);
-	void onRosterItemRemoved(IRoster *ARoster, const IRosterItem &ARosterItem);
+	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onRosterClosed(IRoster *ARoster);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -159,7 +162,9 @@ private:
 	IXmppUriQueries *FXmppUriQueries;
 	IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
-	QMap<int, SubscriptionDialog *> FNotifyDialog;
+	QMap<int, int> FNotifySubsType;
+	QList<SubscriptionDialog *> FSubsDialogs;
+	QMap<int, SubscriptionDialog *> FNotifySubsDialog;
 	QMap<Jid, QMap<Jid, AutoSubscription> > FAutoSubscriptions;
 };
 

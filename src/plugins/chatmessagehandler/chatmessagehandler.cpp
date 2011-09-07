@@ -81,8 +81,8 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(presenceReceived(IPresence *, const IPresenceItem &)),
-				SLOT(onPresenceReceived(IPresence *, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 		}
 	}
 
@@ -664,7 +664,7 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 		if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
 		{
 			QModelIndex index = FRostersView->instance()->currentIndex();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(index.data(RDR_STREAM_JID).toString()) : NULL;
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index.data(RDR_STREAM_JID).toString()) : NULL;
 			if (presence && presence->isOpen() && ChatActionTypes.contains(index.data(RDR_TYPE).toInt()))
 			{
 				createMessageWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
@@ -677,7 +677,7 @@ void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &A
 	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->getPresence(streamJid) : NULL;
+		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 		if (presence && presence->isOpen())
 		{
 			Jid contactJid = AIndexes.first()->data(RDR_FULL_JID).toString();
@@ -696,8 +696,9 @@ void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &A
 	}
 }
 
-void ChatMessageHandler::onPresenceReceived(IPresence *APresence, const IPresenceItem &AItem)
+void ChatMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
+	Q_UNUSED(ABefore);
 	if (!AItem.itemJid.resource().isEmpty() && AItem.show!=IPresence::Offline && AItem.show!=IPresence::Error)
 	{
 		IChatWindow *fullWindow = findWindow(APresence->streamJid(),AItem.itemJid);
