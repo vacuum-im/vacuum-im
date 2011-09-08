@@ -2,11 +2,14 @@
 
 #include <QKeyEvent>
 
+#define EDIT_TIMEOUT     300
+
 RosterSearch::RosterSearch()
 {
 	FRostersViewPlugin = NULL;
 	FMainWindow = NULL;
 
+	FAutoEnabled = false;
 	FSearchStarted = false;
 	FLastShowOffline = false;
 
@@ -15,7 +18,7 @@ RosterSearch::RosterSearch()
 	FSearchToolBarChanger = NULL;
 
 	FEditTimeout.setSingleShot(true);
-	FEditTimeout.setInterval(1000);
+	FEditTimeout.setInterval(EDIT_TIMEOUT);
 	connect(&FEditTimeout,SIGNAL(timeout()),SLOT(onEditTimedOut()));
 
 	setDynamicSortFilter(false);
@@ -127,10 +130,9 @@ bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QM
 	Q_UNUSED(AIndex); Q_UNUSED(AEvent);
 	if (AOrder == RCHO_ROSTERSEARCH)
 	{
-		if (!searchPattern().isEmpty())
+		if (!searchPattern().isEmpty() && AIndex->childCount()==0)
 		{
 			setSearchPattern(QString::null);
-			startSearch();
 		}
 	}
 	return false;
@@ -163,8 +165,9 @@ bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AI
 			{
 				if (!isSearchEnabled())
 				{
-					setSearchEnabled(true);
 					FSearchEdit->setText(AEvent->text().trimmed());
+					setSearchEnabled(true);
+					FAutoEnabled = true;
 				}
 				else
 				{
@@ -180,11 +183,16 @@ bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AI
 
 void RosterSearch::startSearch()
 {
-	setFilterRegExp(searchPattern());
-	invalidate();
+	QString pattern = searchPattern();
+	if (filterRegExp().pattern() != pattern)
+	{
+		setFilterRegExp(pattern);
+		invalidate();
+	}
+
 	if (FRostersViewPlugin)
 	{
-		if (!searchPattern().isEmpty())
+		if (isSearchEnabled() && !pattern.isEmpty())
 		{
 			if (!FSearchStarted)
 			{
@@ -202,8 +210,15 @@ void RosterSearch::startSearch()
 				Options::node(OPV_ROSTER_SHOWOFFLINE).setValue(FLastShowOffline);
 			}
 			FSearchStarted = false;
+
+			if (FAutoEnabled)
+			{
+				setSearchEnabled(false);
+				FRostersViewPlugin->rostersView()->instance()->viewport()->setFocus();
+			}
 		}
 	}
+
 	emit searchResultUpdated();
 }
 
@@ -225,6 +240,7 @@ bool RosterSearch::isSearchEnabled() const
 
 void RosterSearch::setSearchEnabled(bool AEnabled)
 {
+	FAutoEnabled = false;
 	FEnableAction->setChecked(AEnabled);
 	if (FRostersViewPlugin)
 	{
@@ -234,6 +250,8 @@ void RosterSearch::setSearchEnabled(bool AEnabled)
 			FRostersViewPlugin->rostersView()->removeProxyModel(this);
 	}
 	FSearchToolBarChanger->toolBar()->setVisible(AEnabled);
+
+	startSearch();
 	emit searchStateChanged(AEnabled);
 }
 

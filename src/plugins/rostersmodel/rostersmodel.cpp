@@ -355,7 +355,7 @@ IRosterIndex *RostersModel::rosterIndexByModelIndex(const QModelIndex &AIndex) c
 
 QString RostersModel::singleGroupName(int AType) const
 {
-	return FSingleGroups.contains(AType) ? FSingleGroups.value(AType) : FSingleGroups.value(RIT_GROUP_BLANK);
+	return FSingleGroups.value(AType);
 }
 
 void RostersModel::registerSingleGroup(int AType, const QString &AName)
