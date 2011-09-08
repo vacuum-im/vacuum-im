@@ -78,6 +78,7 @@ private:
 	IMainWindow *FMainWindow;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
+	bool FAutoEnabled;
 	bool FSearchStarted;
 	bool FLastShowOffline;
 	Menu *FFieldsMenu;
