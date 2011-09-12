@@ -357,7 +357,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
 		//Удаляем подписку у старого транспорта
 		if (ritemOld.isValid && !ARemove)
-			FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,"",true);
+			FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,QString::null,true);
 
 		//Добавляем контакты нового транспорта и удаляем старые
 		QList<IRosterItem> newItems, oldItems, curItems;
@@ -901,7 +901,7 @@ void Gateways::onKeepTimerTimeout()
 					const QList<IPresenceItem> pitems = presence->presenceItems(service);
 					if (pitems.isEmpty() || pitems.at(0).show==IPresence::Error)
 					{
-						presence->sendPresence(service,IPresence::Offline,"",0);
+						presence->sendPresence(service,IPresence::Offline,QString::null,0);
 						presence->sendPresence(service,presence->show(),presence->status(),presence->priority());
 					}
 				}

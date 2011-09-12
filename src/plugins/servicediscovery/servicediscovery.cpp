@@ -316,7 +316,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 					DiscoveryRequest request;
 					request.streamJid = AStreamJid;
 					request.contactJid = contactJid;
-					//request.node = !newCaps.hash.isEmpty() ? newCaps.node+"#"+newCaps.ver : "";
+					//request.node = !newCaps.hash.isEmpty() ? newCaps.node+"#"+newCaps.ver : QString::null;
 					appendQueuedRequest(QUEUE_REQUEST_START,request);
 				}
 				if (!capsElem.isNull() && !newCaps.node.isEmpty() && !newCaps.ver.isEmpty())
@@ -446,7 +446,7 @@ IDiscoInfo ServiceDiscovery::selfDiscoInfo(const Jid &AStreamJid, const QString 
 
 	const EntityCapabilities myCaps = FSelfCaps.value(AStreamJid);
 	QString capsNode = QString("%1#%2").arg(myCaps.node).arg(myCaps.ver);
-	dinfo.node = ANode!=capsNode ? ANode : "";
+	dinfo.node = ANode!=capsNode ? ANode : QString::null;
 
 	foreach(IDiscoHandler *handler, FDiscoHandlers)
 		handler->fillDiscoInfo(dinfo);
@@ -966,7 +966,7 @@ QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AFo
 	}
 
 	QString hashString = ACaps.hash.isEmpty() ? ACaps.node+ACaps.ver : ACaps.ver+ACaps.hash;
-	hashString += AForJid ? ACaps.entityJid.pFull() : "";
+	hashString += AForJid ? ACaps.entityJid.pFull() : QString::null;
 	QString fileName = QCryptographicHash::hash(hashString.toUtf8(),QCryptographicHash::Md5).toHex().toLower() + ".xml";
 	return dir.absoluteFilePath(fileName);
 }
@@ -1087,7 +1087,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 				iforms++;
 			}
 		}
-		hashList.append("");
+		hashList.append(QString::null);
 		QByteArray hashData = hashList.join("<").toUtf8();
 		return QCryptographicHash::hash(hashData, AHash==CAPS_HASH_SHA1 ? QCryptographicHash::Sha1 : QCryptographicHash::Md5).toBase64();
 	}
@@ -1123,7 +1123,7 @@ void ServiceDiscovery::insertStreamMenu(const Jid &AStreamJid)
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_SDISCOVERY_DISCOVER);
 	action->setData(ADR_STREAMJID,AStreamJid.full());
 	action->setData(ADR_CONTACTJID,AStreamJid.domain());
-	action->setData(ADR_NODE,QString(""));
+	action->setData(ADR_NODE,QString());
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowDiscoItemsByAction(bool)));
 	FDiscoMenu->addAction(action,AG_DEFAULT,true);
 	FDiscoMenu->setEnabled(true);

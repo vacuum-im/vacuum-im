@@ -47,7 +47,7 @@ void RegisterDialog::resetDialog()
 		FCurrentForm->instance()->deleteLater();
 		FCurrentForm = NULL;
 	}
-	ui.lblInstuctions->setText("");
+	ui.lblInstuctions->setText(QString::null);
 	ui.lneUserName->setVisible(false);
 	ui.lblUserName->setVisible(false);
 	ui.lnePassword->setVisible(false);

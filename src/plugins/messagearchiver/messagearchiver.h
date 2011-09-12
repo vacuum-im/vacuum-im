@@ -109,7 +109,7 @@ public:
 	virtual void removeArchiveHandler(IArchiveHandler *AHandler, int AOrder);
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
-	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = "");
+	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null);
 	//Local Archive
 	virtual Jid gateJid(const Jid &AContactJid) const;
 	virtual QString gateNick(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -126,10 +126,10 @@ public:
 	virtual bool isReplicationEnabled(const Jid &AStreamJid) const;
 	virtual void setReplicationEnabled(const Jid &AStreamJid, bool AEnabled);
 	virtual QString saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
-	virtual QString loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = "");
-	virtual QString loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = "");
+	virtual QString loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null);
+	virtual QString loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null);
 	virtual QString removeServerCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false);
-	virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = "");
+	virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null);
 signals:
 	void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto);
 	void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);

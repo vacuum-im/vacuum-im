@@ -146,7 +146,7 @@ StatusOptionsWidget::StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChange
 	ui.tbwRules->setItemDelegate(new Delegate(FStatusChanger,ui.tbwRules));
 
 	ui.tbwRules->setColumnCount(4);
-	ui.tbwRules->setHorizontalHeaderLabels(QStringList() << "" << tr("Time") << tr("Status") << tr("Text"));
+	ui.tbwRules->setHorizontalHeaderLabels(QStringList() << QString::null << tr("Time") << tr("Status") << tr("Text"));
 
 	ui.tbwRules->sortItems(COL_TIME);
 	ui.tbwRules->horizontalHeader()->setResizeMode(COL_ENABLED,QHeaderView::ResizeToContents);

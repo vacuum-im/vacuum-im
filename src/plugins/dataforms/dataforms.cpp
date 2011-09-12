@@ -199,7 +199,7 @@ IDataTable DataForms::dataTable(const QDomElement &ATableElem) const
 		{
 			QStringList rowValues;
 			for (int i=0; i<columnVars.count(); i++)
-				rowValues.append("");
+				rowValues.append(QString::null);
 			QDomElement fieldElem = itemElem.firstChildElement("field");
 			while (!fieldElem.isNull())
 			{

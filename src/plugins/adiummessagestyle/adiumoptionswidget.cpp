@@ -180,7 +180,7 @@ void AdiumOptionsWidget::onBackgroundColorChanged(int AIndex)
 
 void AdiumOptionsWidget::onSetImageClicked()
 {
-	QString fileName = QFileDialog::getOpenFileName(this, tr("Select background image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Select background image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 	if (!fileName.isEmpty())
 	{
 		FStyleOptions.extended.insert(MSO_BG_IMAGE_FILE,fileName);

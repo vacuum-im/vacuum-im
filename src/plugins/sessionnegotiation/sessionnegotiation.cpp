@@ -1025,7 +1025,7 @@ IStanzaSession &SessionNegotiation::dialogSession(IDataDialogWidget *ADialog)
 	foreach(Jid streamJid, FDialogs.keys())
 		if (FDialogs.value(streamJid).values().contains(ADialog))
 			return FSessions[streamJid][FDialogs.value(streamJid).key(ADialog)];
-	return FSessions[""][""];
+	return FSessions[Jid::null][Jid::null];
 }
 
 bool SessionNegotiation::eventFilter(QObject *AObject, QEvent *AEvent)

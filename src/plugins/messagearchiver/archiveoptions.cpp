@@ -220,8 +220,8 @@ void ArchiveOptions::apply()
 				}
 				else
 				{
-					prefs.itemPrefs[itemJid].otr = "";
-					prefs.itemPrefs[itemJid].save = "";
+					prefs.itemPrefs[itemJid].otr = QString::null;
+					prefs.itemPrefs[itemJid].save = QString::null;
 				}
 			}
 		}

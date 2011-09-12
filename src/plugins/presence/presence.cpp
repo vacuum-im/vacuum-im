@@ -137,7 +137,7 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 		switch (AShow)
 		{
 		case Online:
-			show = "";
+			show = QString::null;
 			break;
 		case Chat:
 			show = "chat";
@@ -152,10 +152,10 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 			show = "xa";
 			break;
 		case Invisible:
-			show="";
+			show = QString::null;
 			break;
 		case Offline:
-			show="";
+			show = QString::null;
 			break;
 		default:
 			return false;
@@ -231,7 +231,7 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 		switch (AShow)
 		{
 		case Online:
-			show = "";
+			show = QString::null;
 			break;
 		case Chat:
 			show = "chat";
@@ -246,10 +246,10 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 			show = "xa";
 			break;
 		case Invisible:
-			show="";
+			show = QString::null;
 			break;
 		case Offline:
-			show="";
+			show = QString::null;
 			break;
 		default:
 			return false;

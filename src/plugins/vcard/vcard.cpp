@@ -144,8 +144,8 @@ void VCard::setLogoImage(const QImage &AImage, const QByteArray &AFormat)
 	}
 	else
 	{
-		setValueForTags(VVN_LOGO_TYPE,"");
-		setValueForTags(VVN_LOGO_VALUE,"");
+		setValueForTags(VVN_LOGO_TYPE,QString::null);
+		setValueForTags(VVN_LOGO_VALUE,QString::null);
 	}
 	FLogo = AImage;
 }
@@ -164,8 +164,8 @@ void VCard::setPhotoImage(const QImage &AImage, const QByteArray &AFormat)
 	}
 	else
 	{
-		setValueForTags(VVN_PHOTO_TYPE,"");
-		setValueForTags(VVN_PHOTO_VALUE,"");
+		setValueForTags(VVN_PHOTO_TYPE,QString::null);
+		setValueForTags(VVN_PHOTO_VALUE,QString::null);
 	}
 	FPhoto = AImage;
 }
@@ -237,7 +237,7 @@ QString VCard::formatToType(const QByteArray &AFormat) const
 {
 	if (!AFormat.isEmpty())
 		return QString("image/%1").arg(AFormat.toLower().data());
-	return QString();
+	return QString::null;
 }
 
 QDomElement VCard::createElementByName(const QString AName, const QStringList &ATags,

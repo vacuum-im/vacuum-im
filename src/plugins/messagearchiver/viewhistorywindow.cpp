@@ -151,7 +151,7 @@ ViewHistoryWindow::ViewHistoryWindow(IMessageArchiver *AArchiver, IPluginManager
 	setMessageStyle();
 
 	QIcon icon = FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AStreamJid,IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon();
-	ui.cmbContact->addItem(icon,tr(" <All contacts> "),QString(""));
+	ui.cmbContact->addItem(icon,tr(" <All contacts> "),QString());
 
 	if (!restoreGeometry(Options::fileValue("history.viewhistorywindow.geometry",FStreamJid.pBare()).toByteArray()))
 		setGeometry(WidgetManager::alignGeometry(QSize(640,640),this));

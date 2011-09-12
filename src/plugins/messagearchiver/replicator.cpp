@@ -33,7 +33,7 @@ Replicator::Replicator(IMessageArchiver *AArchiver, const Jid &AStreamJid, const
 
 	if (loadStatus())
 	{
-		FReplicationLast = "";
+		FReplicationLast = QString::null;
 		FReplicationStart = FReplicationPoint.isValid() ? FReplicationPoint : DateTime("1970-01-01T00:00:00Z");
 		setEnabled(true);
 	}

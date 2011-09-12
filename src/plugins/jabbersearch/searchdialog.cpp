@@ -94,7 +94,7 @@ void SearchDialog::resetDialog()
 		FCurrentForm = NULL;
 	}
 	ui.tbwResult->clear();
-	ui.lblInstructions->setText("");
+	ui.lblInstructions->setText(QString::null);
 	ui.lblFirst->setVisible(false);
 	ui.lneFirst->setVisible(false);
 	ui.lblLast->setVisible(false);
@@ -305,7 +305,7 @@ void SearchDialog::onToolBarActionTriggered(bool)
 		Action *action = qobject_cast<Action *>(sender());
 		if (action == FDiscoInfo)
 		{
-			FDiscovery->showDiscoInfo(FStreamJid,item.itemJid,"",this);
+			FDiscovery->showDiscoInfo(FStreamJid,item.itemJid,QString::null,this);
 		}
 		else if (action == FAddContact)
 		{

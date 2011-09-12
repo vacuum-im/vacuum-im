@@ -208,7 +208,7 @@ bool StatusChanger::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_CONNECTION_ERROR;
-		notifyType.icon = FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon();
+		notifyType.icon = FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon();
 		notifyType.title = tr("On loss of connection to the server");
 		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
 		notifyType.kindDefs = notifyType.kindMask;
@@ -397,7 +397,7 @@ QString StatusChanger::statusItemName(int AStatusId) const
 {
 	if (FStatusItems.contains(AStatusId))
 		return FStatusItems.value(AStatusId).name;
-	return QString();
+	return QString::null;
 }
 
 int StatusChanger::statusItemShow(int AStatusId) const
@@ -411,7 +411,7 @@ QString StatusChanger::statusItemText(int AStatusId) const
 {
 	if (FStatusItems.contains(AStatusId))
 		return FStatusItems.value(AStatusId).text;
-	return QString();
+	return QString::null;
 }
 
 int StatusChanger::statusItemPriority(int AStatusId) const
@@ -510,7 +510,7 @@ void StatusChanger::removeStatusItem(int AStatusId)
 
 QIcon StatusChanger::iconByShow(int AShow) const
 {
-	return FStatusIcons != NULL ? FStatusIcons->iconByStatus(AShow,"",false) : QIcon();
+	return FStatusIcons != NULL ? FStatusIcons->iconByStatus(AShow,QString::null,false) : QIcon();
 }
 
 QString StatusChanger::nameByShow(int AShow) const
@@ -901,7 +901,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 		if (notify.kinds > 0)
 		{
 			notify.typeId = NNT_CONNECTION_ERROR;
-			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,"","") : QIcon());
+			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon());
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
 			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
 			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));

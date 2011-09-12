@@ -338,7 +338,7 @@ Action *MultiUserChatPlugin::createDiscoFeatureAction(const Jid &AStreamJid, con
 {
 	if (AFeature == NS_MUC)
 	{
-		if (FDiscovery && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,"")>=0)
+		if (FDiscovery && FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,QString::null)>=0)
 		{
 			Action *action = createJoinAction(AStreamJid,ADiscoInfo.contactJid,AParent);
 			return action;
@@ -765,7 +765,7 @@ void MultiUserChatPlugin::onStreamRemoved(IXmppStream *AXmppStream)
 	QList<IMultiUserChatWindow *> chatWindows = FChatWindows;
 	foreach(IMultiUserChatWindow *chatWindow, chatWindows)
 		if (chatWindow->streamJid() == AXmppStream->streamJid())
-			chatWindow->exitAndDestroy("",0);
+			chatWindow->exitAndDestroy(QString::null,0);
 
 	QList<QMessageBox *> inviteDialogs = FInviteDialogs.keys();
 	foreach(QMessageBox * inviteDialog,inviteDialogs)
@@ -790,7 +790,7 @@ void MultiUserChatPlugin::onJoinActionTriggered(bool)
 		QString nick = action->data(ADR_NICK).toString();
 		QString password = action->data(ADR_PASSWORD).toString();
 		Jid streamJid = action->data(Action::DR_StreamJid).toString();
-		Jid roomJid(room,host,"");
+		Jid roomJid(room,host,QString::null);
 		showJoinMultiChatDialog(streamJid,roomJid,nick,password);
 	}
 }
@@ -890,7 +890,7 @@ void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
 		InviteFields fields = FInviteDialogs.take(inviteDialog);
 		if (AResult == QMessageBox::Yes)
 		{
-			showJoinMultiChatDialog(fields.streamJid,fields.roomJid,"",fields.password);
+			showJoinMultiChatDialog(fields.streamJid,fields.roomJid,QString::null,fields.password);
 		}
 		else if (AResult == QMessageBox::No)
 		{

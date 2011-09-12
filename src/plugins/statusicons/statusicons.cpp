@@ -383,7 +383,7 @@ void StatusIcons::loadStorages()
 		QString name = storage->option(STORAGE_NAME);
 		Action *action = new Action(FCustomIconMenu);
 		action->setCheckable(true);
-		action->setIcon(storage->getIcon(iconKeyByStatus(IPresence::Online,"",false)));
+		action->setIcon(storage->getIcon(iconKeyByStatus(IPresence::Online,QString::null,false)));
 		action->setText(!name.isEmpty() ? name : substorage);
 		action->setData(ADR_SUBSTORAGE,substorage);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));

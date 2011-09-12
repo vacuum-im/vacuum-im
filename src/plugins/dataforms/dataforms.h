@@ -67,7 +67,7 @@ public:
 	virtual IDataForm localizeForm(const IDataForm &AForm) const;
 	virtual IDataLocalizer *dataLocalizer(const QString &AFormType) const;
 	virtual void insertLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField);
-	virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField = "");
+	virtual void removeLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField = QString::null);
 	//Data actions
 	virtual int fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const;
 	virtual QVariant fieldValue(const QString &AVar, const QList<IDataField> &AFields) const;

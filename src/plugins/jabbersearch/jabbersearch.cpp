@@ -214,7 +214,7 @@ QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 		FRequests.append(request.id());
 		return request.id();
 	}
-	return QString();
+	return QString::null;
 }
 
 QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASubmit)
@@ -242,7 +242,7 @@ QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASu
 		FSubmits.append(submit.id());
 		return submit.id();
 	}
-	return QString();
+	return QString::null;
 }
 
 void JabberSearch::showSearchDialog(const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent)

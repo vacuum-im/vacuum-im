@@ -22,8 +22,8 @@ EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster,
 	FRoster = ARoster;
 	FStreamJid = AStreamJid;
 
-	ui.cmbActive->addItem(tr("<None>"),"");
-	ui.cmbDefault->addItem(tr("<None>"),"");
+	ui.cmbActive->addItem(tr("<None>"),QString());
+	ui.cmbDefault->addItem(tr("<None>"),QString());
 
 	ui.cmbType->addItem(tr("jid"),PRIVACY_TYPE_JID);
 	ui.cmbType->addItem(tr("group"),PRIVACY_TYPE_GROUP);
@@ -540,18 +540,20 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 		}
 		ui.cmbValue->setEditable(true);
 		ui.cmbValue->blockSignals(false);
-		ui.cmbValue->setEditText("");
+		ui.cmbValue->setEditText(QString::null);
 	}
 }
 
-void EditListsDialog::onCurrentListItemChanged(QListWidgetItem *ACurrent, QListWidgetItem * /*APrevious*/)
+void EditListsDialog::onCurrentListItemChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious)
 {
-	FListName = ACurrent!=NULL ? ACurrent->data(DR_NAME).toString() : "";
+	Q_UNUSED(APrevious);
+	FListName = ACurrent!=NULL ? ACurrent->data(DR_NAME).toString() : QString::null;
 	updateListRules();
 }
 
-void EditListsDialog::onCurrentRuleItemChanged(QListWidgetItem *ACurrent, QListWidgetItem * /*APrevious*/)
+void EditListsDialog::onCurrentRuleItemChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious)
 {
+	Q_UNUSED(APrevious);
 	FRuleIndex = ACurrent!=NULL ? ACurrent->data(DR_INDEX).toInt() : -1;
 	updateRuleCondition();
 }

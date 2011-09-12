@@ -42,7 +42,7 @@ QString ReceiversWidget::receiverName(const Jid &AReceiver) const
 	QTreeWidgetItem *contactItem = FContactItems.value(AReceiver,NULL);
 	if (contactItem)
 		return contactItem->data(0,RDR_NAME).toString();
-	return QString();
+	return QString::null;
 }
 
 void ReceiversWidget::addReceiversGroup(const QString &AGroup)
@@ -131,7 +131,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiversGroup(const QString &AGroup)
 		QTreeWidgetItem *groupItem = FGroupItems.value(curGroup,NULL);
 		if (groupItem == NULL)
 		{
-			QStringList columns = QStringList() << ' '+subGroup << "";
+			QStringList columns = QStringList() << ' '+subGroup << QString::null;
 			groupItem = new QTreeWidgetItem(parentGroupItem,columns);
 			groupItem->setCheckState(0,parentGroupItem->checkState(0));
 			groupItem->setForeground(0,Qt::blue);

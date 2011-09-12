@@ -286,7 +286,7 @@ IRosterIndex *RostersModel::createGroupIndex(int AType, const QString &AGroup, c
 		while (i < groupTree.count())
 		{
 			childGroupIndex = createRosterIndex(AType, groupIndex);
-			childGroupIndex->setData(RDR_GROUP, !FSingleGroups.contains(AType) ? group : QVariant(QString("")));
+			childGroupIndex->setData(RDR_GROUP, !FSingleGroups.contains(AType) ? group : QString::null);
 			childGroupIndex->setData(RDR_NAME, groupTree.at(i));
 			insertRosterIndex(childGroupIndex, groupIndex);
 			groupIndex = childGroupIndex;

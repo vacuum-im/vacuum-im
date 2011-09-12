@@ -486,9 +486,9 @@ void BookMarks::onAddDiscoBookmarkActionTriggered(bool)
 
 			IBookMark bookmark;
 			bookmark.name = "XMPP: ";
-			bookmark.name += !discoName.isEmpty() ? discoName + " | " : "";
+			bookmark.name += !discoName.isEmpty() ? discoName + " | " : QString::null;
 			bookmark.name += discoJid;
-			bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : "";
+			bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : QString::null;
 			bookmark.url = url.toString().replace("?disco=;","?disco;");
 			if (execEditBookmarkDialog(&bookmark,NULL) == QDialog::Accepted)
 				addBookmark(streamJid,bookmark);

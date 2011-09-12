@@ -118,7 +118,7 @@ void ConsoleWidget::saveContext(const QUuid &AContextId)
 {
 	OptionsNode node = Options::node(OPV_CONSOLE_CONTEXT_ITEM, AContextId.toString());
 
-	node.setValue(QString(ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->currentText() : ""),"streamjid");
+	node.setValue(ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->currentText() : QString::null,"streamjid");
 
 	QStringList conditions;
 	for (int i=0; i<ui.ltwConditions->count(); i++)
@@ -167,7 +167,7 @@ void ConsoleWidget::hidePasswords(QString &AXml) const
 
 void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
 {
-	Jid streamJid = ui.cmbStreamJid->currentIndex() > 0 ? ui.cmbStreamJid->itemText(ui.cmbStreamJid->currentIndex()) : "";
+	Jid streamJid = ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemText(ui.cmbStreamJid->currentIndex()) : QString::null;
 	if (streamJid.isEmpty() || streamJid==AXmppStream->streamJid())
 	{
 		Stanza stanza(AElem);

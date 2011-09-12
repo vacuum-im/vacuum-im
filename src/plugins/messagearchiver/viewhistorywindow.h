@@ -78,8 +78,8 @@ protected:
 	QList<IArchiveHeader> indexHeaders(const QModelIndex &AIndex) const;
 	QList<IArchiveRequest> createRequests(const IArchiveFilter &AFilter) const;
 	void divideRequests(const QList<IArchiveRequest> &ARequests, QList<IArchiveRequest> &ALocal, QList<IArchiveRequest> &AServer) const;
-	bool loadServerHeaders(const IArchiveRequest &ARequest, const QString &AAfter = "");
-	bool loadServerCollection(const IArchiveHeader &AHeader, const QString &AAfter = "");
+	bool loadServerHeaders(const IArchiveRequest &ARequest, const QString &AAfter = QString::null);
+	bool loadServerCollection(const IArchiveHeader &AHeader, const QString &AAfter = QString::null);
 	QString contactName(const Jid &AContactJid, bool ABare = false) const;
 	QStandardItem *findChildItem(int ARole, const QVariant &AValue, QStandardItem *AParent) const;
 	QStandardItem *createSortItem(const QVariant &ASortData);
