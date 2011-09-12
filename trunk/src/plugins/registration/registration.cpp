@@ -311,7 +311,7 @@ QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServ
 		FSendRequests.append(reg.id());
 		return reg.id();
 	}
-	return QString();
+	return QString::null;
 }
 
 QString Registration::sendUnregiterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
@@ -324,7 +324,7 @@ QString Registration::sendUnregiterRequest(const Jid &AStreamJid, const Jid &ASe
 		FSubmitRequests.append(unreg.id());
 		return unreg.id();
 	}
-	return QString();
+	return QString::null;
 }
 
 QString Registration::sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid,
@@ -340,7 +340,7 @@ QString Registration::sendChangePasswordRequest(const Jid &AStreamJid, const Jid
 		FSubmitRequests.append(change.id());
 		return change.id();
 	}
-	return QString();
+	return QString::null;
 }
 
 QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit)
@@ -367,7 +367,7 @@ QString Registration::sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &A
 		FSubmitRequests.append(submit.id());
 		return submit.id();
 	}
-	return QString();
+	return QString::null;
 }
 
 bool Registration::showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent)

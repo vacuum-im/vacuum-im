@@ -691,7 +691,7 @@ int MessageArchiver::sessionApply(const IStanzaSession &ASession)
 	if (FDataForms && isReady(ASession.streamJid))
 	{
 		int index = FDataForms->fieldIndex(SFP_LOGGING,ASession.form.fields);
-		QString sessionValue = index>=0 ? ASession.form.fields.at(index).value.toString() : "";
+		QString sessionValue = index>=0 ? ASession.form.fields.at(index).value.toString() : QString::null;
 		if (itemPrefs.otr==ARCHIVE_OTR_REQUIRE && sessionValue==SFV_MAY_LOGGING)
 		{
 			result = ISessionNegotiator::Cancel;
@@ -1074,8 +1074,8 @@ QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid
 		else
 		{
 			IArchiveStreamPrefs prefs;
-			prefs.itemPrefs[AItemJid].otr = "";
-			prefs.itemPrefs[AItemJid].save = "";
+			prefs.itemPrefs[AItemJid].otr = QString::null;
+			prefs.itemPrefs[AItemJid].save = QString::null;
 			return setArchivePrefs(AStreamJid,prefs);
 		}
 	}
@@ -1146,7 +1146,7 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const
 			IArchiveHeader header;
 			header.with = AItemJid;
 			header.start = QDateTime::currentDateTime();
-			header.subject = "";
+			header.subject = QString::null;
 			header.threadId = AThreadId;
 			header.version = 0;
 			writer = newCollectionWriter(AStreamJid,header);

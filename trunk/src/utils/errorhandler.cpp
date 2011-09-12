@@ -282,19 +282,19 @@ int ErrorHandler::codeByCondition(const QString &ACondition, const QString &ANsU
 QString ErrorHandler::coditionByCode(int ACode, const QString &ANsURI)
 {
 	ErrorItem *item = itemByCode(ACode,ANsURI);
-	return item != NULL ? item->condition : QString();
+	return item != NULL ? item->condition : QString::null;
 }
 
 QString ErrorHandler::meaningByCode(int ACode, const QString &ANsURI)
 {
 	ErrorItem *item = itemByCode(ACode,ANsURI);
-	return item != NULL ? item->meaning : QString();
+	return item != NULL ? item->meaning : QString::null;
 }
 
 QString ErrorHandler::meaningByCondition(const QString &ACondition, const QString &ANsURI)
 {
 	ErrorItem *item = itemByCondition(ACondition,ANsURI);
-	return item != NULL ? item->meaning : QString();
+	return item != NULL ? item->meaning : QString::null;
 }
 
 void ErrorHandler::init()

@@ -87,7 +87,7 @@ bool FileStreamsManager::initSettings()
 	QStringList availMethods = FDataManager!=NULL ? FDataManager->methods() : QStringList();
 	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QDir::homePath()+"/"+tr("Downloads"));
 	Options::setDefaultValue(OPV_FILESTREAMS_GROUPBYSENDER,false);
-	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,QString(availMethods.contains(NS_SOCKS5_BYTESTREAMS) ? NS_SOCKS5_BYTESTREAMS : ""));
+	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,availMethods.contains(NS_SOCKS5_BYTESTREAMS) ? QString(NS_SOCKS5_BYTESTREAMS) : QString::null);
 	Options::setDefaultValue(OPV_FILESTREAMS_ACCEPTABLEMETHODS,availMethods);
 
 	if (FOptionsManager)

@@ -16,7 +16,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 
 	FSaveClicked = false;
 
-	ui.cmbGender->addItem(tr("<Unset>"),QString(""));
+	ui.cmbGender->addItem(tr("<Unset>"),QString());
 	ui.cmbGender->addItem(tr("Male"),QString(VCARD_GENDER_MALE));
 	ui.cmbGender->addItem(tr("Female"),QString(VCARD_GENDER_FEMALE));
 
@@ -182,7 +182,7 @@ void VCardDialog::updateVCard()
 	if (ui.dedBirthday->date() > ui.dedBirthday->minimumDate())
 		FVCard->setValueForTags(VVN_BIRTHDAY,ui.dedBirthday->date().toString(Qt::ISODate));
 	else
-		FVCard->setValueForTags(VVN_BIRTHDAY,"");
+		FVCard->setValueForTags(VVN_BIRTHDAY,QString::null);
 	FVCard->setValueForTags(VVN_GENDER,ui.cmbGender->itemData(ui.cmbGender->currentIndex()).toString());
 	FVCard->setValueForTags(VVN_MARITAL_STATUS,ui.lneMarital->text());
 	FVCard->setValueForTags(VVN_TITLE,ui.lneTitle->text());
@@ -282,7 +282,7 @@ void VCardDialog::onPhotoSaveClicked()
 {
 	if (!FPhoto.isNull())
 	{
-		QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+		QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 		if (!filename.isEmpty())
 			FPhoto.save(filename);
 	}
@@ -290,7 +290,7 @@ void VCardDialog::onPhotoSaveClicked()
 
 void VCardDialog::onPhotoLoadClicked()
 {
-	QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+	QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 	if (!filename.isEmpty())
 	{
 		QImage image(filename);
@@ -308,7 +308,7 @@ void VCardDialog::onLogoSaveClicked()
 {
 	if (!FLogo.isNull())
 	{
-		QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+		QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 		if (!filename.isEmpty())
 			FLogo.save(filename);
 	}
@@ -316,7 +316,7 @@ void VCardDialog::onLogoSaveClicked()
 
 void VCardDialog::onLogoLoadClicked()
 {
-	QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),"",tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+	QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 	if (!filename.isEmpty())
 	{
 		QImage image(filename);
@@ -333,7 +333,7 @@ void VCardDialog::onLogoClearClicked()
 void VCardDialog::onEmailAddClicked()
 {
 	static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
-	EditItemDialog dialog("",QStringList(),emailTagList,this);
+	EditItemDialog dialog(QString::null,QStringList(),emailTagList,this);
 	dialog.setLabelText(tr("EMail:"));
 	if (dialog.exec() == QDialog::Accepted && !dialog.value().isEmpty()
 	    && ui.ltwEmails->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
@@ -368,7 +368,7 @@ void VCardDialog::onEmailItemActivated(QListWidgetItem *AItem)
 void VCardDialog::onPhoneAddClicked()
 {
 	static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
-	EditItemDialog dialog("",QStringList(),phoneTagList,this);
+	EditItemDialog dialog(QString::null,QStringList(),phoneTagList,this);
 	dialog.setLabelText(tr("Phone:"));
 	if (dialog.exec() == QDialog::Accepted && !dialog.value().isEmpty()
 	    && ui.ltwPhones->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())

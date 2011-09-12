@@ -71,7 +71,7 @@ void AddLegacyContactDialog::onPromptReceived(const QString &AId, const QString 
 		ui.lblPrompt->setVisible(true);
 		ui.lblPrompt->setText(!APrompt.isEmpty() ? APrompt : tr("Contact ID:"));
 		ui.lnePrompt->setVisible(true);
-		ui.lnePrompt->setText("");
+		ui.lnePrompt->setText(QString::null);
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 	}
 }

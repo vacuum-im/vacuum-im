@@ -467,7 +467,7 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 	//AHtml.replace("%messageDirection%", AOptions.isAlignLTR ? "ltr" : "rtl" );
 	AHtml.replace("%senderStatusIcon%",AOptions.senderIcon);
 	AHtml.replace("%shortTime%", Qt::escape(AOptions.time.toString(tr("hh:mm"))));
-	AHtml.replace("%service%","");
+	AHtml.replace("%service%",QString::null);
 
 	QString avatar = AOptions.senderAvatar;
 	if (!QFile::exists(avatar))
@@ -505,7 +505,7 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 		AHtml.replace("%senderScreenName%",AOptions.senderId);
 		AHtml.replace("%sender%",AOptions.senderName);
 		AHtml.replace("%senderDisplayName%",AOptions.senderName);
-		AHtml.replace("%senderPrefix%","");
+		AHtml.replace("%senderPrefix%",QString::null);
 
 		QString rgbaColor;
 		QColor bgColor(AOptions.textBGColor);

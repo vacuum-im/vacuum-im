@@ -684,7 +684,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 			curGroupAction->setText(tr("Root"));
 			curGroupAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ROOT_GROUP);
 			curGroupAction->setData(AData);
-			curGroupAction->setData(ADR_TO_GROUP,QVariant(QString("")));
+			curGroupAction->setData(ADR_TO_GROUP,QString());
 			connect(curGroupAction,SIGNAL(triggered(bool)),ASlot);
 			menu->addAction(curGroupAction,AG_RVCM_RCHANGER+1);
 		}
@@ -706,7 +706,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 			blankGroupAction->setText(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_BLANK) : tr("Blank Group"));
 			blankGroupAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_GROUP);
 			blankGroupAction->setData(AData);
-			blankGroupAction->setData(ADR_TO_GROUP,QVariant(QString("")));
+			blankGroupAction->setData(ADR_TO_GROUP,QString());
 			connect(blankGroupAction,SIGNAL(triggered(bool)),ASlot);
 			menu->addAction(blankGroupAction,AG_RVCM_RCHANGER-1);
 		}

@@ -175,7 +175,7 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 					bool denied = (stanzas & IPrivacyRule::PresencesOut)>0;
 					if (denied && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
-						presence->sendPresence(ritem.itemJid,IPresence::Offline,"",0);
+						presence->sendPresence(ritem.itemJid,IPresence::Offline,QString::null,0);
 						FOfflinePresences[AStreamJid]+=ritem.itemJid;
 					}
 					else if (!denied && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
@@ -549,8 +549,8 @@ void PrivacyLists::setAutoPrivacy(const Jid &AStreamJid, const QString &AAutoLis
 		else
 		{
 			FApplyAutoLists.remove(AStreamJid);
-			setDefaultList(AStreamJid,"");
-			setActiveList(AStreamJid,"");
+			setDefaultList(AStreamJid,QString::null);
+			setActiveList(AStreamJid,QString::null);
 		}
 	}
 }
@@ -636,7 +636,7 @@ QString PrivacyLists::setActiveList(const Jid &AStreamJid, const QString &AList)
 			return set.id();
 		}
 	}
-	return QString();
+	return QString::null;
 }
 
 QString PrivacyLists::defaultList(const Jid &AStreamJid, bool APending) const
@@ -669,7 +669,7 @@ QString PrivacyLists::setDefaultList(const Jid &AStreamJid, const QString &AList
 			return set.id();
 		}
 	}
-	return QString();
+	return QString::null;
 }
 
 IPrivacyList PrivacyLists::privacyList(const Jid &AStreamJid, const QString &AList, bool APending) const
@@ -723,7 +723,7 @@ QString PrivacyLists::loadPrivacyList(const Jid &AStreamJid, const QString &ALis
 			return load.id();
 		}
 	}
-	return QString();
+	return QString::null;
 }
 
 QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList &AList)
@@ -771,7 +771,7 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
 		else
 			return QString("");
 	}
-	return QString();
+	return QString::null;
 }
 
 QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AList)
@@ -789,7 +789,7 @@ QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AL
 			return remove.id();
 		}
 	}
-	return QString();
+	return QString::null;
 }
 
 QDialog *PrivacyLists::showEditListsDialog(const Jid &AStreamJid, QWidget *AParent)
@@ -817,11 +817,11 @@ QString PrivacyLists::loadPrivacyLists(const Jid &AStreamJid)
 		load.addElement("query",NS_JABBER_PRIVACY);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,PRIVACY_TIMEOUT))
 		{
-			FLoadRequests.insert(load.id(),"");
+			FLoadRequests.insert(load.id(),QString::null);
 			return load.id();
 		}
 	}
-	return QString();
+	return QString::null;
 }
 
 Menu *PrivacyLists::createPrivacyMenu(Menu *AMenu) const
@@ -862,7 +862,7 @@ void PrivacyLists::createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *A
 		action->setText(tr("Disable privacy lists"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_DISABLE);
 		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_LISTNAME,"");
+		action->setData(ADR_LISTNAME,QString());
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetAutoPrivacyByAction(bool)));
 		AMenu->addAction(action,AG_DEFAULT,false);
 	}
@@ -985,7 +985,7 @@ Menu *PrivacyLists::createSetActiveMenu(const Jid &AStreamJid, const QList<IPriv
 
 	Action *action = new Action(amenu);
 	action->setData(ADR_STREAM_JID,AStreamJid.full());
-	action->setData(ADR_LISTNAME,"");
+	action->setData(ADR_LISTNAME,QString());
 	action->setCheckable(true);
 	action->setChecked(alist.isEmpty());
 	action->setText(tr("<None>"));
@@ -1017,7 +1017,7 @@ Menu *PrivacyLists::createSetDefaultMenu(const Jid &AStreamJid, const QList<IPri
 
 	Action *action = new Action(dmenu);
 	action->setData(ADR_STREAM_JID,AStreamJid.full());
-	action->setData(ADR_LISTNAME,"");
+	action->setData(ADR_LISTNAME,QString());
 	action->setCheckable(true);
 	action->setChecked(dlist.isEmpty());
 	action->setText(tr("<None>"));
@@ -1078,7 +1078,7 @@ void PrivacyLists::sendOfflinePresences(const Jid &AStreamJid, const IPrivacyLis
 		if (presence->isOpen())
 		{
 			foreach(Jid contactJid, offline)
-				presence->sendPresence(contactJid,IPresence::Offline,"",0);
+				presence->sendPresence(contactJid,IPresence::Offline,QString::null,0);
 		}
 		FOfflinePresences[AStreamJid] += offline;
 	}

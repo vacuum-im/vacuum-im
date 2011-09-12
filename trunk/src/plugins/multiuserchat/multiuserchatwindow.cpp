@@ -1104,11 +1104,9 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString roomName = parts.takeFirst();
-		Jid roomJid(roomName,FMultiChat->roomJid().domain(),"");
+		Jid roomJid(roomName,FMultiChat->roomJid().domain(),QString::null);
 		if (roomJid.isValid())
-		{
 			FChatPlugin->showJoinMultiChatDialog(streamJid(),roomJid,FMultiChat->nickName(),parts.join(" "));
-		}
 		else
 			showStatusMessage(tr("%1 is not valid room JID").arg(roomJid.full()),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 		hasCommand = true;
@@ -1316,7 +1314,7 @@ void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
 		if (FActiveChatMessages.contains(window))
 			userItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 		else if (FStatusIcons)
-			userItem->setIcon(FStatusIcons->iconByJidStatus(AContactJid,user->data(MUDR_SHOW).toInt(),"",false));
+			userItem->setIcon(FStatusIcons->iconByJidStatus(AContactJid,user->data(MUDR_SHOW).toInt(),QString::null,false));
 	}
 }
 
@@ -1500,7 +1498,7 @@ void MultiUserChatWindow::updateChatWindow(IChatWindow *AWindow)
 	if (AWindow->instance()->isWindow() && FActiveChatMessages.contains(AWindow))
 		icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE);
 	else if (FStatusIcons)
-		icon = FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),"",false);
+		icon = FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),QString::null,false);
 
 	QString contactName = AWindow->infoWidget()->field(IInfoWidget::ContactName).toString();
 	QString caption = QString("[%1]").arg(contactName);
@@ -1811,8 +1809,8 @@ void MultiUserChatWindow::onSubjectChanged(const QString &ANick, const QString &
 
 void MultiUserChatWindow::onServiceMessageReceived(const Message &AMessage)
 {
-	if (!showStatusCodes("",FMultiChat->statusCodes()) && !AMessage.body().isEmpty())
-		onMessageReceived("",AMessage);
+	if (!showStatusCodes(QString::null,FMultiChat->statusCodes()) && !AMessage.body().isEmpty())
+		onMessageReceived(QString::null,AMessage);
 }
 
 void MultiUserChatWindow::onMessageReceived(const QString &ANick, const Message &AMessage)
@@ -2171,7 +2169,7 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 		if (FMultiChat->isOpen())
 		{
 			bool ok = false;
-			QString reason = QInputDialog::getText(this,tr("Destroying room"),tr("Enter a reason:"),QLineEdit::Normal,"",&ok);
+			QString reason = QInputDialog::getText(this,tr("Destroying room"),tr("Enter a reason:"),QLineEdit::Normal,QString::null,&ok);
 			if (ok)
 				FMultiChat->destroyRoom(reason);
 		}
@@ -2184,7 +2182,7 @@ void MultiUserChatWindow::onRoomUtilsActionTriggered(bool)
 	if (action == FSetRoleNode)
 	{
 		bool ok;
-		QString reason = QInputDialog::getText(this,tr("Kick reason"),tr("Enter reason for kick"),QLineEdit::Normal,"",&ok);
+		QString reason = QInputDialog::getText(this,tr("Kick reason"),tr("Enter reason for kick"),QLineEdit::Normal,QString::null,&ok);
 		if (ok)
 			FMultiChat->setRole(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_ROLE_NONE,reason);
 	}
@@ -2207,7 +2205,7 @@ void MultiUserChatWindow::onRoomUtilsActionTriggered(bool)
 	else if (action == FSetAffilOutcast)
 	{
 		bool ok;
-		QString reason = QInputDialog::getText(this,tr("Ban reason"),tr("Enter reason for ban"),QLineEdit::Normal,"",&ok);
+		QString reason = QInputDialog::getText(this,tr("Ban reason"),tr("Enter reason for ban"),QLineEdit::Normal,QString::null,&ok);
 		if (ok)
 			FMultiChat->setAffiliation(FModeratorUtilsMenu->menuAction()->data(ADR_USER_NICK).toString(),MUC_AFFIL_OUTCAST,reason);
 	}

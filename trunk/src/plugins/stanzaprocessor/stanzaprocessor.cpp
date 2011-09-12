@@ -191,8 +191,8 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 		if (ACondition[pos] == '[')
 		{
 			pos++;
-			QString attrName = "";
-			QString attrValue = "";
+			QString attrName;
+			QString attrValue;
 			while (pos<ACondition.count() && ACondition[pos] != ']')
 			{
 				if (ACondition[pos] == '@')
@@ -228,7 +228,7 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 		{
 			QString attrName = attrNames.at(attr);
 			QList<QString> attrValues = attributes.values(attrName);
-			bool attrBlankValue = attrValues.contains("");
+			bool attrBlankValue = attrValues.contains(QString::null);
 			bool elemHasAttr;
 			QString elemAttrValue;
 			if (elem.hasAttribute(attrName))

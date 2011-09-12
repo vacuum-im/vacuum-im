@@ -185,7 +185,7 @@ QVariant DataFieldWidget::value() const
 			return FComboBox->itemData(FComboBox->currentIndex()).toString();
 		else if (FField.validate.method == DATAVALIDATE_METHOD_OPEN)
 			return FComboBox->lineEdit()->text();
-		return QString();
+		return QString::null;
 	}
 	else if (FField.type == DATAFIELD_TYPE_LISTMULTI)
 	{

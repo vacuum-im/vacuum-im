@@ -148,7 +148,7 @@ void DiscoInfoWindow::onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWi
 	if (ACurrent)
 		ui.lblFeatureDesc->setText(ACurrent->data(Qt::UserRole+1).toString());
 	else
-		ui.lblFeatureDesc->setText("");
+		ui.lblFeatureDesc->setText(QString::null);
 	ui.lblFeatureDesc->setMinimumHeight(ui.lblFeatureDesc->height());
 }
 
