@@ -1182,8 +1182,8 @@ void MultiUserChatWindow::setMessageStyle()
 		{
 			IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
 			FViewWidget->setMessageStyle(style,soptions);
-			FWindowStatus[FViewWidget].lastDateSeparator = QDate();
 		}
+		FWindowStatus[FViewWidget].lastDateSeparator = QDate();
 	}
 }
 
