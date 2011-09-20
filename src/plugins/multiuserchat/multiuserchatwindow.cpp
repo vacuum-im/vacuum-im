@@ -1918,35 +1918,35 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 		QTextCursor cursor = textEdit->textCursor();
 		cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
 
-		QList<QString> nicks;
+		QList<IMultiUser *> users;
 		QString nickStarts = cursor.selectedText().toLower();
 
 		foreach(IMultiUser *user, FUsers.keys())
 		{
 			if (user != FMultiChat->mainUser())
 				if (nickStarts.isEmpty() || user->nickName().toLower().startsWith(nickStarts))
-					nicks.append(user->nickName());
+					users.append(user);
 		}
 
-		if (nicks.count() > 1)
+		if (users.count() > 1)
 		{
 			Menu *nickMenu = new Menu(this);
 			nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);
-			foreach(QString nick, nicks)
+			foreach(IMultiUser *user, users)
 			{
 				Action *action = new Action(nickMenu);
-				action->setText(nick);
-				action->setIcon(FUsers.value(FMultiChat->userByNick(nick))->icon());
-				action->setData(ADR_USER_NICK,nick);
+				action->setText(user->nickName());
+				action->setIcon(FUsers.value(user)->icon());
+				action->setData(ADR_USER_NICK,user->nickName());
 				connect(action,SIGNAL(triggered(bool)),SLOT(onNickMenuActionTriggered(bool)));
 				nickMenu->addAction(action,AG_DEFAULT,true);
 			}
 			nickMenu->popup(textEdit->viewport()->mapToGlobal(textEdit->cursorRect().topLeft()));
 		}
-		else if (!nicks.isEmpty())
+		else if (!users.isEmpty())
 		{
 			QString sufix = cursor.atBlockStart() ? ": " : " ";
-			cursor.insertText(nicks.first() + sufix);
+			cursor.insertText(users.first()->nickName() + sufix);
 		}
 
 		AHooked = true;
