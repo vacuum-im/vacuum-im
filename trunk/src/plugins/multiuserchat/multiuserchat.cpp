@@ -736,19 +736,22 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			if (FStatusCodes.contains(MUC_SC_NICK_CHANGED))       //ChangeNick
 			{
 				QString newNick = itemElem.attribute("nick");
-				if (!FUsers.contains(newNick))
+				if (!newNick.isEmpty())
 				{
-					applyPresence = false;
-					FUsers.remove(fromNick);
-					FUsers.insert(newNick,user);
-				}
-				user->setNickName(newNick);
-				emit userNickChanged(user,fromNick,newNick);
+					if (!FUsers.contains(newNick))
+					{
+						applyPresence = false;
+						FUsers.remove(fromNick);
+						FUsers.insert(newNick,user);
+					}
+					user->setNickName(newNick);
+					emit userNickChanged(user,fromNick,newNick);
 
-				if (user == FMainUser)
-				{
-					FNickName = newNick;
-					setPresence(FShow,FStatus);
+					if (user == FMainUser)
+					{
+						FNickName = newNick;
+						setPresence(FShow,FStatus);
+					}
 				}
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_KICKED))   //User kicked
