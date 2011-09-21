@@ -25,6 +25,7 @@
 //MultiChatWindow - ToolBarWidget
 #define TBG_MCWTBW_BOOKMARKS                                    10200
 #define TBG_MCWTBW_ROOM_TOOLS                                   10900
+#define TBG_MCWTBW_ROOM_ENTER                                   10990
 #define TBG_MCWTBW_ROOM_EXIT                                    11000
 
 //SeriveDiscovery - DiscoItemsWindow

@@ -116,8 +116,6 @@ protected:
 	void createMessageWidgets();
 	void createStaticRoomActions();
 	void updateStaticRoomActions();
-	void createStaticUserContextActions();
-	void insertStaticUserContextActions(Menu *AMenu, IMultiUser *AUser);
 	void saveWindowState();
 	void loadWindowState();
 	void saveWindowGeometry();
@@ -191,7 +189,9 @@ protected slots:
 protected slots:
 	void onNickMenuActionTriggered(bool);
 	void onToolBarActionTriggered(bool);
-	void onRoomUtilsActionTriggered(bool);
+	void onOpenChatWindowActionTriggered(bool);
+	void onChangeUserRoleActionTriggeted(bool);
+	void onChangeUserAffiliationActionTriggered(bool);
 	void onClearChatWindowActionTriggered(bool);
 	void onDataFormMessageDialogAccepted();
 	void onAffiliationListDialogAccepted();
@@ -221,6 +221,9 @@ private:
 	IStatusBarWidget *FStatusBarWidget;
 	ITabPageNotifier *FTabPageNotifier;
 private:
+	Action *FEnterRoom;
+	Action *FExitRoom;
+private:
 	Menu *FToolsMenu;
 	Action *FChangeNick;
 	Action *FInviteContact;
@@ -233,20 +236,6 @@ private:
 	Action *FOwnersList;
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
-	Action *FEnterRoom;
-	Menu *FModeratorUtilsMenu;
-	Action *FSetRoleNode;
-	Action *FSetAffilOutcast;
-	Menu *FChangeRole;
-	Action *FSetRoleVisitor;
-	Action *FSetRoleParticipant;
-	Action *FSetRoleModerator;
-	Menu *FChangeAffiliation;
-	Action *FSetAffilNone;
-	Action *FSetAffilMember;
-	Action *FSetAffilAdmin;
-	Action *FSetAffilOwner;
-	Action *FExitRoom;
 private:
 	int FUsersListWidth;
 	bool FShownDetached;

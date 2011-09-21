@@ -60,6 +60,7 @@
 #define AG_MWTWTM_MWIDGETS_TAB_ACTIONS                          500
 
 //MultiuserChat - MultiUserContextMenu
+#define AG_MUCM_MULTIUSERCHAT_PRIVATE                           200
 #define AG_MUCM_ROSTERCHANGER                                   500
 #define AG_MUCM_CLIENTINFO                                      500
 #define AG_MUCM_VCARD                                           500
@@ -72,7 +73,6 @@
 //MultiUserChat - MultiUserToolsMenu
 #define AG_MUTM_MULTIUSERCHAT_COMMON                            300
 #define AG_MUTM_MULTIUSERCHAT_TOOLS                             500
-#define AG_MUTM_MULTIUSERCHAT_EXIT                              1000
 
 //Bookmarks - BookmarksMenu
 #define AG_BMM_BOOKMARKS_STREAMS                                500

@@ -647,10 +647,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Zniszcz pokój</translation>
     </message>
     <message>
-        <source>Room Utilities</source>
-        <translation>Narzędzia</translation>
-    </message>
-    <message>
         <source>Kick user</source>
         <translation>Wyrzuć</translation>
     </message>
@@ -964,6 +960,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>Quote selected text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open chat dialog</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
