@@ -647,10 +647,6 @@ Check values and try again</source>
         <translation>Уничтожить комнату</translation>
     </message>
     <message>
-        <source>Room Utilities</source>
-        <translation>Утилиты комнаты</translation>
-    </message>
-    <message>
         <source>Kick user</source>
         <translation>Выгнать</translation>
     </message>
@@ -965,6 +961,10 @@ Check values and try again</source>
     <message>
         <source>Quote selected text</source>
         <translation>Цитировать выделенный текст</translation>
+    </message>
+    <message>
+        <source>Open chat dialog</source>
+        <translation>Открыть диалог чата</translation>
     </message>
 </context>
 </TS>

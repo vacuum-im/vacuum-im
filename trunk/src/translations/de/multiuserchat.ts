@@ -646,10 +646,6 @@ Check values and try again</source>
         <translation>Raum löschen</translation>
     </message>
     <message>
-        <source>Room Utilities</source>
-        <translation>Raum Tools</translation>
-    </message>
-    <message>
         <source>Kick user</source>
         <translation>Benutzer kicken</translation>
     </message>
@@ -963,6 +959,10 @@ Check values and try again</source>
     </message>
     <message>
         <source>Quote selected text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open chat dialog</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
