@@ -108,18 +108,21 @@ void XmppStream::close()
 {
 	if (FConnection && FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
-		setStreamState(SS_DISCONNECTING);
-		if (FConnection->isOpen())
+		if (FStreamState != SS_DISCONNECTING)
 		{
-			emit aboutToClose();
-			QByteArray data = "</stream:stream>";
-			if (!processDataHandlers(data,true))
-				FConnection->write(data);
-			FKeepAliveTimer.start(DISCONNECT_TIMEOUT);
-		}
-		else
-		{
-			FConnection->disconnectFromHost();
+			setStreamState(SS_DISCONNECTING);
+			if (FConnection->isOpen())
+			{
+				emit aboutToClose();
+				QByteArray data = "</stream:stream>";
+				if (!processDataHandlers(data,true))
+					FConnection->write(data);
+				FKeepAliveTimer.start(DISCONNECT_TIMEOUT);
+			}
+			else
+			{
+				FConnection->disconnectFromHost();
+			}
 		}
 	}
 	else
@@ -132,9 +135,12 @@ void XmppStream::abort(const QString &AError)
 {
 	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
-		setStreamState(SS_ERROR);
-		FErrorString = AError;
-		emit error(AError);
+		if (FStreamState != SS_DISCONNECTING)
+		{
+			setStreamState(SS_ERROR);
+			FErrorString = AError;
+			emit error(AError);
+		}
 		FConnection->disconnectFromHost();
 	}
 }

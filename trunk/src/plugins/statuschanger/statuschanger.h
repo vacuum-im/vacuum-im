@@ -133,12 +133,14 @@ protected slots:
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onProfileOpened(const QString &AProfile);
+	void onShutdownStarted();
 	void onReconnectTimer();
 	void onEditStatusAction(bool);
 	void onModifyStatusAction(bool);
 	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
 	void onNotificationActivated(int ANotifyId);
 private:
+	IPluginManager *FPluginManager;
 	IPresencePlugin *FPresencePlugin;
 	IRosterPlugin *FRosterPlugin;
 	IMainWindowPlugin *FMainWindowPlugin;
@@ -158,6 +160,7 @@ private:
 private:
 	int FConnectingLabel;
 	IPresence *FChangingPresence;
+	QList<IPresence *> FShutdownList;
 	QMap<int, StatusItem> FStatusItems;
 	QSet<IPresence *> FMainStatusStreams;
 	QMap<IPresence *, int> FLastOnlineStatus;
