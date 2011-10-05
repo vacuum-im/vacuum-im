@@ -312,7 +312,7 @@ void StanzaProcessor::removeStanzaRequest(const QString &AStanzaId)
 
 void StanzaProcessor::onStreamCreated(IXmppStream *AXmppStream)
 {
-	AXmppStream->insertXmppStanzaHandler(this, XSHO_STANZAPROCESSOR);
+	AXmppStream->insertXmppStanzaHandler(XSHO_STANZAPROCESSOR,this);
 }
 
 void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
@@ -337,7 +337,7 @@ void StanzaProcessor::onStreamClosed(IXmppStream *AXmppStream)
 
 void StanzaProcessor::onStreamDestroyed(IXmppStream *AXmppStream)
 {
-	AXmppStream->removeXmppStanzaHandler(this, XSHO_STANZAPROCESSOR);
+	AXmppStream->removeXmppStanzaHandler(XSHO_STANZAPROCESSOR,this);
 }
 
 void StanzaProcessor::onStanzaRequestTimeout()

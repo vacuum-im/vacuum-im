@@ -3,6 +3,7 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppfeaturepluginorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>

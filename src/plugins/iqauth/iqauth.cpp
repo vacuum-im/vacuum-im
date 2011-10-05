@@ -9,7 +9,7 @@ IqAuth::IqAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 
 IqAuth::~IqAuth()
 {
-	FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 	emit featureDestroyed();
 }
 
@@ -30,14 +30,14 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 				QDomElement reqElem = AStanza.firstElement("query",NS_JABBER_IQ_AUTH);
 				if (!reqElem.firstChildElement("digest").isNull())
 				{
-					QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->password().toUtf8();
+					QByteArray shaData = FXmppStream->streamId().toUtf8()+FXmppStream->getSessionPassword().toUtf8();
 					QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
 					query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
 					FXmppStream->sendStanza(auth);
 				}
 				else if (!reqElem.firstChildElement("password").isNull() && FXmppStream->connection()->isEncrypted())
 				{
-					query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->password()));
+					query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->getSessionPassword()));
 					FXmppStream->sendStanza(auth);
 				}
 				else if (!reqElem.firstChildElement("password").isNull())
@@ -54,7 +54,7 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 		}
 		else if (AStanza.id() == "setIqAuth")
 		{
-			FXmppStream->removeXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			if (AStanza.type() == "result")
 			{
 				deleteLater();
@@ -98,7 +98,7 @@ bool IqAuth::start(const QDomElement &AElem)
 			Stanza request("iq");
 			request.setType("get").setId("getIqAuth");
 			request.addElement("query",NS_JABBER_IQ_AUTH).appendChild(request.createElement("username")).appendChild(request.createTextNode(FXmppStream->streamJid().node()));
-			FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			FXmppStream->sendStanza(request);
 			return true;
 		}
@@ -145,7 +145,8 @@ bool IqAuthPlugin::initObjects()
 {
 	if (FXmppStreams)
 	{
-		FXmppStreams->registerXmppFeature(this, NS_FEATURE_IQAUTH, XFO_IQAUTH);
+		FXmppStreams->registerXmppFeature(XFO_IQAUTH,NS_FEATURE_IQAUTH);
+		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_IQAUTH,this);
 	}
 	return true;
 }

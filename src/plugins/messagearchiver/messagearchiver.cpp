@@ -506,7 +506,7 @@ void MessageArchiver::stanzaRequestTimeout(const Jid &AStreamJid, const QString 
 	{
 		FPrefsAutoRequests.remove(AStanzaId);
 	}
-	else if (FPrefsAutoRequests.contains(AStanzaId))
+	else if (FPrefsRemoveRequests.contains(AStanzaId))
 	{
 		FPrefsRemoveRequests.remove(AStanzaId);
 	}

@@ -10,7 +10,7 @@ RegisterStream::RegisterStream(IDataForms *ADataForms, IXmppStream *AXmppStream)
 
 RegisterStream::~RegisterStream()
 {
-	FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 	emit featureDestroyed();
 }
 
@@ -39,7 +39,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 						int passFiled = FDataForms->fieldIndex("password",form.fields);
 						if (passFiled >= 0)
 						{
-							form.fields[passFiled].value = FXmppStream->password();
+							form.fields[passFiled].value = FXmppStream->getSessionPassword();
 							form.fields[passFiled].type = DATAFIELD_TYPE_HIDDEN;
 						}
 
@@ -64,7 +64,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 					if (!queryElem.firstChildElement("username").isNull())
 						querySubmit.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->streamJid().eNode()));
 					if (!queryElem.firstChildElement("password").isNull())
-						querySubmit.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->password()));
+						querySubmit.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->getSessionPassword()));
 					if (!queryElem.firstChildElement("key").isNull())
 						querySubmit.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AStanza.firstElement("query").attribute("key")));
 					FXmppStream->sendStanza(submit);
@@ -79,7 +79,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 		}
 		else if (AStanza.id() == "setReg")
 		{
-			FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			if (AStanza.type() == "result")
 			{
 				deleteLater();
@@ -106,14 +106,14 @@ bool RegisterStream::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, in
 
 bool RegisterStream::start(const QDomElement &AElem)
 {
-	if (AElem.tagName()=="register" && !FXmppStream->password().isEmpty())
+	if (AElem.tagName()=="register")
 	{
 		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
 			Stanza reg("iq");
 			reg.setType("get").setId("getReg");
 			reg.addElement("query",NS_JABBER_REGISTER);
-			FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			FXmppStream->sendStanza(reg);
 			return true;
 		}

@@ -19,79 +19,85 @@ void XmppStreams::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
+bool XmppStreams::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+{
+	Q_UNUSED(APluginManager); Q_UNUSED(AInitOrder);
+	return true;
+}
+
 bool XmppStreams::initObjects()
 {
 	ErrorHandler::addErrorItem("bad-format", ErrorHandler::MODIFY,
-	                           ErrorHandler::BAD_REQUEST, tr("Bad Request Format"), NS_XMPP_STREAMS);
+		ErrorHandler::BAD_REQUEST, tr("Bad Request Format"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("bad-namespace-prefix", ErrorHandler::MODIFY,
-	                           ErrorHandler::BAD_REQUEST, tr("Bad Namespace Prefix"), NS_XMPP_STREAMS);
+		ErrorHandler::BAD_REQUEST, tr("Bad Namespace Prefix"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("conflict", ErrorHandler::MODIFY,
-	                           ErrorHandler::CONFLICT, tr("Conflict"), NS_XMPP_STREAMS);
+		ErrorHandler::CONFLICT, tr("Conflict"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("connection-timeout", ErrorHandler::CANCEL,
-	                           ErrorHandler::DISCONNECTED, tr("Connection timeout"), NS_XMPP_STREAMS);
+		ErrorHandler::DISCONNECTED, tr("Connection timeout"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("host-gone", ErrorHandler::WAIT,
-	                           ErrorHandler::GONE, tr("Host Gone"), NS_XMPP_STREAMS);
+		ErrorHandler::GONE, tr("Host Gone"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("host-unknown", ErrorHandler::CANCEL,
-	                           ErrorHandler::REMOTE_SERVER_NOT_FOUND, tr("Host Unknown"), NS_XMPP_STREAMS);
+		ErrorHandler::REMOTE_SERVER_NOT_FOUND, tr("Host Unknown"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("improper-addressing", ErrorHandler::MODIFY,
-	                           ErrorHandler::JID_MALFORMED, tr("Improper Addressing"), NS_XMPP_STREAMS);
+		ErrorHandler::JID_MALFORMED, tr("Improper Addressing"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("internal-server-error", ErrorHandler::CANCEL,
-	                           ErrorHandler::INTERNAL_SERVER_ERROR, tr("Internal Server Error"), NS_XMPP_STREAMS);
+		ErrorHandler::INTERNAL_SERVER_ERROR, tr("Internal Server Error"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("invalid-from", ErrorHandler::MODIFY,
-	                           ErrorHandler::JID_MALFORMED, tr("Invalid From"), NS_XMPP_STREAMS);
+		ErrorHandler::JID_MALFORMED, tr("Invalid From"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("invalid-id", ErrorHandler::MODIFY,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Id"), NS_XMPP_STREAMS);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Id"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("invalid-namespace", ErrorHandler::MODIFY,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Namespace"), NS_XMPP_STREAMS);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Namespace"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("invalid-xml", ErrorHandler::MODIFY,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Invalid XML"), NS_XMPP_STREAMS);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Invalid XML"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("not-authorized", ErrorHandler::AUTH,
-	                           ErrorHandler::NOT_AUTHORIZED, tr("Not Authorized"), NS_XMPP_STREAMS);
+		ErrorHandler::NOT_AUTHORIZED, tr("Not Authorized"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("policy-violation", ErrorHandler::AUTH,
-	                           ErrorHandler::FORBIDDEN, tr("Policy Violation"), NS_XMPP_STREAMS);
+		ErrorHandler::FORBIDDEN, tr("Policy Violation"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("remote-connection-failed", ErrorHandler::CANCEL,
-	                           ErrorHandler::REMOTE_SERVER_NOT_FOUND, tr("Remote Connection Failed"), NS_XMPP_STREAMS);
+		ErrorHandler::REMOTE_SERVER_NOT_FOUND, tr("Remote Connection Failed"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("resource-constraint", ErrorHandler::CANCEL,
-	                           ErrorHandler::RESOURCE_CONSTRAINT, tr("Resource Constraint"), NS_XMPP_STREAMS);
+		ErrorHandler::RESOURCE_CONSTRAINT, tr("Resource Constraint"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("restricted-xml",
-	                           ErrorHandler::MODIFY, ErrorHandler::NOT_ACCEPTABLE, tr("Restricted XML"), NS_XMPP_STREAMS);
+		ErrorHandler::MODIFY, ErrorHandler::NOT_ACCEPTABLE, tr("Restricted XML"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("see-other-host", ErrorHandler::MODIFY,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("See Other Host"), NS_XMPP_STREAMS);
+		ErrorHandler::NOT_ACCEPTABLE, tr("See Other Host"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("system-shutdown", ErrorHandler::CANCEL,
-	                           ErrorHandler::DISCONNECTED, tr("System Shutdown"), NS_XMPP_STREAMS);
+		ErrorHandler::DISCONNECTED, tr("System Shutdown"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("undefined-condition", ErrorHandler::CANCEL,
-	                           ErrorHandler::UNDEFINED_CONDITION, tr("Undefined Condition"), NS_XMPP_STREAMS);
+		ErrorHandler::UNDEFINED_CONDITION, tr("Undefined Condition"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("unsupported-encoding", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Unsupported Encoding"), NS_XMPP_STREAMS);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Unsupported Encoding"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("unsupported-stanza-type", ErrorHandler::CANCEL,
-	                           ErrorHandler::FEATURE_NOT_IMPLEMENTED, tr("Unsupported Stanza Type"), NS_XMPP_STREAMS);
+		ErrorHandler::FEATURE_NOT_IMPLEMENTED, tr("Unsupported Stanza Type"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("unsupported-version", ErrorHandler::CANCEL,
-	                           ErrorHandler::FEATURE_NOT_IMPLEMENTED, tr("Unsupported Version"), NS_XMPP_STREAMS);
+		ErrorHandler::FEATURE_NOT_IMPLEMENTED, tr("Unsupported Version"), NS_XMPP_STREAMS);
 
 	ErrorHandler::addErrorItem("xml-not-well-formed", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("XML Not Well Formed"), NS_XMPP_STREAMS);
+		ErrorHandler::NOT_ACCEPTABLE, tr("XML Not Well Formed"), NS_XMPP_STREAMS);
 
 	return true;
 }
@@ -162,29 +168,31 @@ void XmppStreams::destroyXmppStream(const Jid &AStreamJid)
 		delete stream->instance();
 }
 
-QList<QString> XmppStreams::xmppFeaturesOrdered() const
+QList<QString> XmppStreams::xmppFeatures() const
 {
 	return FFeatureOrders.values();
 }
 
-IXmppFeaturesPlugin *XmppStreams::xmppFeaturePlugin(const QString &AFeatureNS) const
+void XmppStreams::registerXmppFeature(int AOrder, const QString &AFeatureNS)
 {
-	return FFeatures.value(AFeatureNS,NULL);
+	if (!AFeatureNS.isEmpty() && !FFeatureOrders.values().contains(AFeatureNS))
+	{
+		FFeatureOrders.insertMulti(AOrder,AFeatureNS);
+		emit xmppFeatureRegistered(AOrder,AFeatureNS);
+	}
 }
 
-void XmppStreams::registerXmppFeature(IXmppFeaturesPlugin *AFeaturePlugin, const QString &AFeatureNS, int AOrder)
+QList<IXmppFeaturesPlugin *> XmppStreams::xmppFeaturePlugins(const QString &AFeatureNS) const
 {
-	if (AFeaturePlugin && !FFeatures.contains(AFeatureNS))
+	return FFeaturePlugins.value(AFeatureNS).values();
+}
+
+void XmppStreams::registerXmppFeaturePlugin(int AOrder, const QString &AFeatureNS, IXmppFeaturesPlugin *AFeaturePlugin)
+{
+	if (AFeaturePlugin && !AFeatureNS.isEmpty())
 	{
-		FFeatures.insert(AFeatureNS,AFeaturePlugin);
-		FFeatureOrders.insertMulti(AOrder, AFeatureNS);
-		emit featureRegistered(AFeaturePlugin,AFeatureNS,AOrder);
-	}
-	else if (!AFeaturePlugin && FFeatures.contains(AFeatureNS))
-	{
-		FFeatures.remove(AFeatureNS);
-		FFeatureOrders.remove(FFeatureOrders.key(AFeatureNS), AFeatureNS);
-		emit featureRegistered(AFeaturePlugin,AFeatureNS,AOrder);
+		FFeaturePlugins[AFeatureNS].insertMulti(AOrder,AFeaturePlugin);
+		emit xmppFeaturePluginRegistered(AOrder,AFeatureNS,AFeaturePlugin);
 	}
 }
 

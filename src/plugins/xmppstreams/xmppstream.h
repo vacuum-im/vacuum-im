@@ -2,8 +2,10 @@
 #define XMPPSTREAM_H
 
 #include <QTimer>
+#include <QMutex>
 #include <QMultiMap>
 #include <QDomDocument>
+#include <QInputDialog>
 #include <definitions/namespaces.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
@@ -48,6 +50,7 @@ public:
 	virtual void setStreamJid(const Jid &AJid);
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
+	virtual QString getSessionPassword(bool AAskIfNeed = true);
 	virtual QString defaultLang() const;
 	virtual void setDefaultLang(const QString &ADefLang);
 	virtual bool isEncryptionRequired() const;
@@ -57,10 +60,10 @@ public:
 	virtual bool isKeepAliveTimerActive() const;
 	virtual void setKeepAliveTimerActive(bool AActive);
 	virtual qint64 sendStanza(Stanza &AStanza);
-	virtual void insertXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
-	virtual void removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder);
-	virtual void insertXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder);
-	virtual void removeXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder);
+	virtual void insertXmppDataHandler(int AOrder, IXmppDataHandler *AHandler);
+	virtual void removeXmppDataHandler(int AOrder, IXmppDataHandler *AHandler);
+	virtual void insertXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler);
+	virtual void removeXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler);
 signals:
 	void opened();
 	void aboutToClose();
@@ -69,14 +72,15 @@ signals:
 	void jidAboutToBeChanged(const Jid &AAfter);
 	void jidChanged(const Jid &ABefore);
 	void connectionChanged(IConnection *AConnection);
-	void dataHandlerInserted(IXmppDataHandler *AHandler, int AOrder);
-	void dataHandlerRemoved(IXmppDataHandler *AHandler, int AOrder);
-	void stanzaHandlerInserted(IXmppStanzaHadler *AHandler, int AOrder);
-	void stanzaHandlerRemoved(IXmppStanzaHadler *AHandler, int AOrder);
+	void dataHandlerInserted(int AOrder, IXmppDataHandler *AHandler);
+	void dataHandlerRemoved(int AOrder, IXmppDataHandler *AHandler);
+	void stanzaHandlerInserted(int AOrder, IXmppStanzaHadler *AHandler);
+	void stanzaHandlerRemoved(int AOrder, IXmppStanzaHadler *AHandler);
 	void streamDestroyed();
 protected:
 	void startStream();
 	void processFeatures();
+	void setStreamState(StreamState AState);
 	bool startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem);
 	bool processDataHandlers(QByteArray &AData, bool ADataOut);
 	bool processStanzaHandlers(Stanza &AStanza, bool AStanzaOut);
@@ -105,7 +109,7 @@ private:
 private:
 	QDomElement FServerFeatures;
 	QList<QString>	FAvailFeatures;
-	QList<IXmppFeature *>	FActiveFeatures;
+	QList<IXmppFeature *> FActiveFeatures;
 private:
 	QMultiMap<int, IXmppDataHandler *> FDataHandlers;
 	QMultiMap<int, IXmppStanzaHadler *> FStanzaHandlers;
@@ -116,12 +120,15 @@ private:
 	Jid FOfflineJid;
 	QString FStreamId;
 	QString FPassword;
-	QString FSessionPassword;
 	QString FDefLang;
 	QString FErrorString;
 	StreamParser FParser;
 	QTimer FKeepAliveTimer;
 	StreamState FStreamState;
+private:
+	QMutex FPasswordMutex;
+	QString FSessionPassword;
+	QInputDialog *FPasswordDialog;
 };
 
 #endif // XMPPSTREAM_H

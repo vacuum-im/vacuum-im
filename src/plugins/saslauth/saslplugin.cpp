@@ -38,31 +38,35 @@ bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 bool SASLPlugin::initObjects()
 {
 	ErrorHandler::addErrorItem("aborted", ErrorHandler::CANCEL,
-	                           ErrorHandler::FORBIDDEN, tr("Authorization Aborted"),NS_FEATURE_SASL);
+		ErrorHandler::FORBIDDEN, tr("Authorization Aborted"),NS_FEATURE_SASL);
 
 	ErrorHandler::addErrorItem("incorrect-encoding", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Incorrect Encoding"),NS_FEATURE_SASL);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Incorrect Encoding"),NS_FEATURE_SASL);
 
 	ErrorHandler::addErrorItem("invalid-authzid", ErrorHandler::CANCEL,
-	                           ErrorHandler::FORBIDDEN, tr("Invalid Authzid"),NS_FEATURE_SASL);
+		ErrorHandler::FORBIDDEN, tr("Invalid Authzid"),NS_FEATURE_SASL);
 
 	ErrorHandler::addErrorItem("invalid-mechanism", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Mechanism"),NS_FEATURE_SASL);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Mechanism"),NS_FEATURE_SASL);
 
 	ErrorHandler::addErrorItem("mechanism-too-weak", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Mechanism Too Weak"),NS_FEATURE_SASL);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Mechanism Too Weak"),NS_FEATURE_SASL);
 
 	ErrorHandler::addErrorItem("not-authorized", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_AUTHORIZED, tr("Not Authorized"),NS_FEATURE_SASL);
+		ErrorHandler::NOT_AUTHORIZED, tr("Not Authorized"),NS_FEATURE_SASL);
 
 	ErrorHandler::addErrorItem("temporary-auth-failure", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_AUTHORIZED, tr("Temporary Auth Failure"),NS_FEATURE_SASL);
+		ErrorHandler::NOT_AUTHORIZED, tr("Temporary Auth Failure"),NS_FEATURE_SASL);
 
 	if (FXmppStreams)
 	{
-		FXmppStreams->registerXmppFeature(this,NS_FEATURE_SASL,XFO_SASL);
-		FXmppStreams->registerXmppFeature(this,NS_FEATURE_BIND,XFO_BIND);
-		FXmppStreams->registerXmppFeature(this,NS_FEATURE_SESSION,XFO_SESSION);
+		FXmppStreams->registerXmppFeature(XFO_SASL,NS_FEATURE_SASL);
+		FXmppStreams->registerXmppFeature(XFO_BIND,NS_FEATURE_BIND);
+		FXmppStreams->registerXmppFeature(XFO_SESSION,NS_FEATURE_SESSION);
+
+		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_SASL,this);
+		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_BIND,this);
+		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_SESSION,this);
 	}
 	return true;
 }
@@ -126,7 +130,7 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
 
 void SASLPlugin::onXmppStreamCreated(IXmppStream *AXmppStream)
 {
-	AXmppStream->insertXmppStanzaHandler(this, XSHO_SASL_VERSION);
+	AXmppStream->insertXmppStanzaHandler(XSHO_SASL_VERSION,this);
 }
 
 void SASLPlugin::onFeatureDestroyed()

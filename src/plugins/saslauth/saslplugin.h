@@ -3,6 +3,7 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppfeaturepluginorders.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>

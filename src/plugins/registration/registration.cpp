@@ -75,7 +75,8 @@ bool Registration::initObjects()
 {
 	if (FXmppStreams)
 	{
-		FXmppStreams->registerXmppFeature(this, NS_FEATURE_REGISTER, XFO_REGISTER);
+		FXmppStreams->registerXmppFeature(XFO_REGISTER,NS_FEATURE_REGISTER);
+		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_REGISTER,this);
 	}
 	if (FDiscovery)
 	{

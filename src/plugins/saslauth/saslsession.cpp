@@ -7,7 +7,7 @@ SASLSession::SASLSession(IXmppStream *AXmppStream) : QObject(AXmppStream->instan
 
 SASLSession::~SASLSession()
 {
-	FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 	emit featureDestroyed();
 }
 
@@ -45,7 +45,7 @@ bool SASLSession::start(const QDomElement &AElem)
 		Stanza session("iq");
 		session.setType("set").setId("session");
 		session.addElement("session",NS_FEATURE_SESSION);
-		FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+		FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		FXmppStream->sendStanza(session);
 		return true;
 	}

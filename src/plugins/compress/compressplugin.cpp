@@ -39,7 +39,8 @@ bool CompressPlugin::initObjects()
 
 	if (FXmppStreams)
 	{
-		FXmppStreams->registerXmppFeature(this,NS_FEATURE_COMPRESS,XFO_COMPRESS);
+		FXmppStreams->registerXmppFeature(XFO_COMPRESS,NS_FEATURE_COMPRESS);
+		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_COMPRESS,this);
 	}
 
 	return true;
