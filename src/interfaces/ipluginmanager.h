@@ -41,6 +41,7 @@ public:
 	virtual QString version() const =0;
 	virtual QString revision() const =0;
 	virtual QDateTime revisionDate() const =0;
+	virtual bool isShutingDown() const =0;
 	virtual QString homePath() const =0;
 	virtual void setHomePath(const QString &APath) =0;
 	virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry) =0;
@@ -52,11 +53,14 @@ public:
 public slots:
 	virtual void quit() =0;
 	virtual void restart() =0;
+	virtual void delayShutdown() =0;
+	virtual void continueShutdown() =0;
 protected:
 	virtual void aboutToQuit() =0;
+	virtual void shutdownStarted() =0;
 };
 
 Q_DECLARE_INTERFACE(IPlugin,"Vacuum.Core.IPlugin/1.0")
-Q_DECLARE_INTERFACE(IPluginManager,"Vacuum.Core.IPluginManager/1.0")
+Q_DECLARE_INTERFACE(IPluginManager,"Vacuum.Core.IPluginManager/1.1")
 
 #endif

@@ -62,6 +62,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	return true;
@@ -174,10 +175,14 @@ void MainWindowPlugin::onOptionsOpened()
 void MainWindowPlugin::onOptionsClosed()
 {
 	Options::setFileValue(FMainWindow->saveGeometry(),"mainwindow.geometry");
-	Options::node(OPV_MAINWINDOW_SHOW).setValue(FMainWindow->isVisible());
 	Options::node(OPV_MAINWINDOW_ALIGN).setValue((int)WidgetManager::windowAlignment(FMainWindow));
 	updateTitle();
 	FMainWindow->close();
+}
+
+void MainWindowPlugin::onShutdownStarted()
+{
+	Options::node(OPV_MAINWINDOW_SHOW).setValue(FMainWindow->isVisible());
 }
 
 void MainWindowPlugin::onProfileRenamed(const QString &AProfile, const QString &ANewName)

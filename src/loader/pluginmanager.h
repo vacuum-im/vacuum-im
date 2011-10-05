@@ -27,6 +27,12 @@
 #include "setuppluginsdialog.h"
 #include "aboutbox.h"
 
+enum ShutdownKind {
+	SK_WORK,
+	SK_QUIT,
+	SK_RESTART
+};
+
 struct PluginItem
 {
 	IPlugin *plugin;
@@ -48,6 +54,7 @@ public:
 	virtual QString version() const;
 	virtual QString revision() const;
 	virtual QDateTime revisionDate() const;
+	virtual bool isShutingDown() const;
 	virtual QString homePath() const;
 	virtual void setHomePath(const QString &APath);
 	virtual void setLocale(QLocale::Language ALanguage, QLocale::Country ACountry);
@@ -59,14 +66,21 @@ public:
 public slots:
 	virtual void quit();
 	virtual void restart();
+	virtual void delayShutdown();
+	virtual void continueShutdown();
 signals:
 	void aboutToQuit();
+	void shutdownStarted();
 protected:
 	void loadSettings();
 	void saveSettings();
 	void loadPlugins();
 	bool initPlugins();
 	void startPlugins();
+protected:
+	void startShutdown();
+	void finishShutdown();
+	void closeTopLevelWidgets();
 protected:
 	void removePluginItem(const QUuid &AUuid, const QString &AError);
 	void unloadPlugin(const QUuid &AUuid, const QString &AError = QString::null);
@@ -87,9 +101,14 @@ protected slots:
 	void onShowSetupPluginsDialog(bool);
 	void onSetupPluginsDialogAccepted();
 	void onShowAboutBoxDialog();
+	void onShutdownTimerTimeout();
 private:
 	QPointer<AboutBox> FAboutDialog;
 	QPointer<SetupPluginsDialog> FPluginsDialog;
+private:
+	int FShutdownKind;
+	int FShutdownDelayCount;
+	QTimer FShutdownTimer;
 private:
 	QString FDataPath;
 	QDomDocument FPluginsSetup;

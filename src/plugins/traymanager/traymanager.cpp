@@ -41,7 +41,10 @@ void TrayManager::pluginInfo(IPluginInfo *APluginInfo)
 bool TrayManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
+
 	FPluginManager = APluginManager;
+	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
+
 	return true;
 }
 
@@ -206,6 +209,11 @@ void TrayManager::onBlinkTimerTimeout()
 		FBlinkTimer.start(BLINK_INVISIBLE_TIME);
 	}
 	FIconHidden = !FIconHidden;
+}
+
+void TrayManager::onShutdownStarted()
+{
+	FSystemIcon.hide();
 }
 
 Q_EXPORT_PLUGIN2(plg_traymanager, TrayManager)
