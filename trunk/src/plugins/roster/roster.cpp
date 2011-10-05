@@ -591,19 +591,19 @@ void Roster::setStanzaHandlers()
 	shandle.conditions.append(SHC_PRESENCE);
 	FSHISubscription = FStanzaProcessor->insertStanzaHandle(shandle);
 
-	FXmppStream->insertXmppStanzaHandler(this,XSHO_XMPP_FEATURE);
+	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 }
 
 void Roster::removeStanzaHandlers()
 {
 	FStanzaProcessor->removeStanzaHandle(FSHIRosterPush);
 	FStanzaProcessor->removeStanzaHandle(FSHISubscription);
-	FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 }
 
 void Roster::onStreamOpened()
 {
-	FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 	requestGroupDelimiter();
 }
 
@@ -616,7 +616,7 @@ void Roster::onStreamClosed()
 	}
 	FVerSupported = false;
 	FSubscriptionRequests.clear();
-	FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 }
 
 void Roster::onStreamJidAboutToBeChanged(const Jid &AAfter)

@@ -11,8 +11,8 @@ Compression::Compression(IXmppStream *AXmppStream) : QObject(AXmppStream->instan
 Compression::~Compression()
 {
 	stopZlib();
-	FXmppStream->removeXmppDataHandler(this, XDHO_FEATURE_COMPRESS);
-	FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+	FXmppStream->removeXmppDataHandler(XDHO_FEATURE_COMPRESS,this);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 	emit featureDestroyed();
 }
 
@@ -38,10 +38,10 @@ bool Compression::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AO
 {
 	if (AXmppStream==FXmppStream && AOrder==XSHO_XMPP_FEATURE)
 	{
-		FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+		FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		if (AStanza.tagName() == "compressed")
 		{
-			FXmppStream->insertXmppDataHandler(this, XDHO_FEATURE_COMPRESS);
+			FXmppStream->insertXmppDataHandler(XDHO_FEATURE_COMPRESS,this);
 			emit finished(true);
 		}
 		else if (AStanza.tagName() == "failure")
@@ -80,7 +80,7 @@ bool Compression::start(const QDomElement &AElem)
 					Stanza compress("compress");
 					compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
 					compress.addElement("method").appendChild(compress.createTextNode("zlib"));
-					FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+					FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 					FXmppStream->sendStanza(compress);
 					return true;
 				}

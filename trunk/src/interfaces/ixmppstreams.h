@@ -63,6 +63,7 @@ public:
 	virtual void setStreamJid(const Jid &AStreamJid) =0;
 	virtual QString password() const =0;
 	virtual void setPassword(const QString &APassword) =0;
+	virtual QString getSessionPassword(bool AAskIfNeed = true) =0;
 	virtual QString defaultLang() const =0;
 	virtual void setDefaultLang(const QString &ADefLang) =0;
 	virtual bool isEncryptionRequired() const =0;
@@ -72,10 +73,10 @@ public:
 	virtual bool isKeepAliveTimerActive() const =0;
 	virtual void setKeepAliveTimerActive(bool AActive) =0;
 	virtual qint64 sendStanza(Stanza &AStanza) =0;
-	virtual void insertXmppDataHandler(IXmppDataHandler *AHandler, int AOrder) =0;
-	virtual void removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder) =0;
-	virtual void insertXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder) =0;
-	virtual void removeXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder) =0;
+	virtual void insertXmppDataHandler(int AOrder, IXmppDataHandler *AHandler) =0;
+	virtual void removeXmppDataHandler(int AOrder, IXmppDataHandler *AHandler) =0;
+	virtual void insertXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler) =0;
+	virtual void removeXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler) =0;
 protected:
 	virtual void opened() =0;
 	virtual void aboutToClose() =0;
@@ -84,10 +85,10 @@ protected:
 	virtual void jidAboutToBeChanged(const Jid &AAfter) =0;
 	virtual void jidChanged(const Jid &ABefore) =0;
 	virtual void connectionChanged(IConnection *AConnection) =0;
-	virtual void dataHandlerInserted(IXmppDataHandler *AHandler, int AOrder) =0;
-	virtual void dataHandlerRemoved(IXmppDataHandler *AHandler, int AOrder) =0;
-	virtual void stanzaHandlerInserted(IXmppStanzaHadler *AHandler, int AOrder) =0;
-	virtual void stanzaHandlerRemoved(IXmppStanzaHadler *AHandler, int AOrder) =0;
+	virtual void dataHandlerInserted(int AOrder, IXmppDataHandler *AHandler) =0;
+	virtual void dataHandlerRemoved(int AOrder, IXmppDataHandler *AHandler) =0;
+	virtual void stanzaHandlerInserted(int AOrder, IXmppStanzaHadler *AHandler) =0;
+	virtual void stanzaHandlerRemoved(int AOrder, IXmppStanzaHadler *AHandler) =0;
 	virtual void streamDestroyed() =0;
 };
 
@@ -102,9 +103,10 @@ public:
 	virtual void addXmppStream(IXmppStream *AXmppStream) =0;
 	virtual void removeXmppStream(IXmppStream *AXmppStream) =0;
 	virtual void destroyXmppStream(const Jid &AStreamJid) =0;
-	virtual QList<QString> xmppFeaturesOrdered() const = 0;
-	virtual IXmppFeaturesPlugin *xmppFeaturePlugin(const QString &AFeatureNS) const =0;
-	virtual void registerXmppFeature(IXmppFeaturesPlugin *AFeaturePlugin, const QString &AFeatureNS, int AOrder) =0;
+	virtual QList<QString> xmppFeatures() const = 0;
+	virtual void registerXmppFeature(int AOrder, const QString &AFeatureNS) =0;
+	virtual QList<IXmppFeaturesPlugin *> xmppFeaturePlugins(const QString &AFeatureNS) const =0;
+	virtual void registerXmppFeaturePlugin(int AOrder, const QString &AFeatureNS, IXmppFeaturesPlugin *AFeaturePlugin) =0;
 protected:
 	virtual void created(IXmppStream *AXmppStream) =0;
 	virtual void added(IXmppStream *AXmppStream) =0;
@@ -117,14 +119,15 @@ protected:
 	virtual void connectionChanged(IXmppStream *AXmppStream, IConnection *AConnection) =0;
 	virtual void removed(IXmppStream *AXmppStream) =0;
 	virtual void streamDestroyed(IXmppStream *AXmppStream) =0;
-	virtual void featureRegistered(IXmppFeaturesPlugin *AFeaturePlugin, const QString &AFeatureNS, int AOrder) =0;
+	virtual void xmppFeatureRegistered(int AOrder, const QString &AFeatureNS) =0;
+	virtual void xmppFeaturePluginRegistered(int AOrder, const QString &AFeatureNS, IXmppFeaturesPlugin *AFeaturePlugin) =0;
 };
 
 Q_DECLARE_INTERFACE(IXmppDataHandler,"Vacuum.Plugin.IXmppDataHandler/1.0");
 Q_DECLARE_INTERFACE(IXmppStanzaHadler,"Vacuum.Plugin.IXmppStanzaHadler/1.0");
 Q_DECLARE_INTERFACE(IXmppFeature,"Vacuum.Plugin.IXmppFeature/1.0");
 Q_DECLARE_INTERFACE(IXmppFeaturesPlugin,"Vacuum.Plugin.IXmppFeaturesPlugin/1.0");
-Q_DECLARE_INTERFACE(IXmppStream, "Vacuum.Plugin.IXmppStream/1.0")
-Q_DECLARE_INTERFACE(IXmppStreams,"Vacuum.Plugin.IXmppStreams/1.0")
+Q_DECLARE_INTERFACE(IXmppStream, "Vacuum.Plugin.IXmppStream/1.1")
+Q_DECLARE_INTERFACE(IXmppStreams,"Vacuum.Plugin.IXmppStreams/1.1")
 
 #endif

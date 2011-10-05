@@ -324,7 +324,7 @@ QString BitsOfBinary::contentFileName(const QString &AContentId) const
 
 void BitsOfBinary::onXmppStreamCreated(IXmppStream *AXmppStream)
 {
-	AXmppStream->insertXmppStanzaHandler(this,XSHO_BITSOFBINARY);
+	AXmppStream->insertXmppStanzaHandler(XSHO_BITSOFBINARY,this);
 }
 
 Q_EXPORT_PLUGIN2(plg_bitsofbinary, BitsOfBinary)

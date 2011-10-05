@@ -34,7 +34,8 @@ bool StartTLSPlugin::initObjects()
 {
 	if (FXmppStreams)
 	{
-		FXmppStreams->registerXmppFeature(this,NS_FEATURE_STARTTLS,XFO_STARTTLS);
+		FXmppStreams->registerXmppFeature(XFO_STARTTLS,NS_FEATURE_STARTTLS);
+		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_STARTTLS,this);
 	}
 	return true;
 }

@@ -22,7 +22,7 @@ public:
 	//IPlugin
 	virtual QUuid pluginUuid() const { return XMPPSTREAMS_UUID;}
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
-	virtual bool initConnections(IPluginManager * /*APluginManager*/, int &/*AInitOrder*/) { return true; }
+	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
@@ -34,9 +34,10 @@ public:
 	virtual void addXmppStream(IXmppStream *AXmppStream);
 	virtual void removeXmppStream(IXmppStream *AXmppStream);
 	virtual void destroyXmppStream(const Jid &AJid);
-	virtual QList<QString> xmppFeaturesOrdered() const;
-	virtual IXmppFeaturesPlugin *xmppFeaturePlugin(const QString &AFeatureNS) const;
-	virtual void registerXmppFeature(IXmppFeaturesPlugin *AFeaturePlugin, const QString &AFeatureNS, int AOrder);
+	virtual QList<QString> xmppFeatures() const;
+	virtual void registerXmppFeature(int AOrder, const QString &AFeatureNS);
+	virtual QList<IXmppFeaturesPlugin *> xmppFeaturePlugins(const QString &AFeatureNS) const;
+	virtual void registerXmppFeaturePlugin(int AOrder, const QString &AFeatureNS, IXmppFeaturesPlugin *AFeaturePlugin);
 signals:
 	void created(IXmppStream *AXmppStream);
 	void added(IXmppStream *AXmppStream);
@@ -49,7 +50,8 @@ signals:
 	void connectionChanged(IXmppStream *AXmppStream, IConnection *AConnection);
 	void removed(IXmppStream *AXmppStream);
 	void streamDestroyed(IXmppStream *AXmppStream);
-	void featureRegistered(IXmppFeaturesPlugin *AFeaturePlugin, const QString &AFeatureNS, int AOrder);
+	void xmppFeatureRegistered(int AOrder, const QString &AFeatureNS);
+	void xmppFeaturePluginRegistered(int AOrder, const QString &AFeatureNS, IXmppFeaturesPlugin *AFeaturePlugin);
 protected slots:
 	void onStreamOpened();
 	void onStreamAboutToClose();
@@ -63,7 +65,7 @@ private:
 	QList<IXmppStream *> FStreams;
 	QList<IXmppStream *> FActiveStreams;
 	QMultiMap<int, QString> FFeatureOrders;
-	QMap<QString, IXmppFeaturesPlugin *> FFeatures;
+	QMap<QString, QMultiMap<int, IXmppFeaturesPlugin *> > FFeaturePlugins;
 };
 
 #endif // XMPPSTREAMS_H

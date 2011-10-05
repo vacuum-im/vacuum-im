@@ -1,6 +1,5 @@
 #include "xmppstream.h"
 
-#include <QInputDialog>
 #include <QTextDocument>
 
 #define KEEP_ALIVE_TIMEOUT          30000
@@ -14,6 +13,7 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 	FStreamJid = AStreamJid;
 	FConnection = NULL;
 	FStreamState = SS_OFFLINE;
+	FPasswordDialog = NULL;
 
 	connect(&FParser,SIGNAL(opened(QDomElement)), SLOT(onParserOpened(QDomElement)));
 	connect(&FParser,SIGNAL(element(QDomElement)), SLOT(onParserElement(QDomElement)));
@@ -41,7 +41,7 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 		if (FStreamState==SS_INITIALIZE && AStanza.element().nodeName()=="stream:stream")
 		{
 			FStreamId = AStanza.id();
-			FStreamState = SS_FEATURES;
+			setStreamState(SS_FEATURES);
 			if (VersionParser(AStanza.element().attribute("version","0.0")) < VersionParser(1,0))
 			{
 				Stanza stanza("stream:features");
@@ -54,7 +54,7 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 		else if (FStreamState==SS_FEATURES && AStanza.element().nodeName()=="stream:features")
 		{
 			FServerFeatures = AStanza.element().cloneNode(true).toElement();
-			FAvailFeatures = FXmppStreams->xmppFeaturesOrdered();
+			FAvailFeatures = FXmppStreams->xmppFeatures();
 			processFeatures();
 			return true;
 		}
@@ -86,22 +86,14 @@ bool XmppStream::open()
 	if (FConnection && FStreamState==SS_OFFLINE)
 	{
 		FErrorString.clear();
-
-		bool hasPassword = !FPassword.isEmpty() || !FSessionPassword.isEmpty();
-		if (!hasPassword)
-			FSessionPassword = QInputDialog::getText(NULL,tr("Password request"),tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.bare())),QLineEdit::Password,FSessionPassword,&hasPassword,Qt::Dialog);
-
-		if (hasPassword)
+		if (FConnection->connectToHost())
 		{
-			if (FConnection->connectToHost())
-			{
-				FStreamState = SS_CONNECTING;
-				return true;
-			}
-			else
-			{
-				abort(tr("Failed to start connection"));
-			}
+			setStreamState(SS_CONNECTING);
+			return true;
+		}
+		else
+		{
+			abort(tr("Failed to start connection"));
 		}
 	}
 	else if (!FConnection)
@@ -115,7 +107,7 @@ void XmppStream::close()
 {
 	if (FConnection && FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
-		FStreamState = SS_DISCONNECTING;
+		setStreamState(SS_DISCONNECTING);
 		if (FConnection->isOpen())
 		{
 			emit aboutToClose();
@@ -128,7 +120,7 @@ void XmppStream::close()
 	}
 	else
 	{
-		FStreamState = SS_OFFLINE;
+		setStreamState(SS_OFFLINE);
 	}
 }
 
@@ -136,7 +128,7 @@ void XmppStream::abort(const QString &AError)
 {
 	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
-		FStreamState = SS_ERROR;
+		setStreamState(SS_ERROR);
 		FErrorString = AError;
 		emit error(AError);
 		FConnection->disconnectFromHost();
@@ -177,15 +169,39 @@ void XmppStream::setStreamJid(const Jid &AJid)
 
 QString XmppStream::password() const
 {
-	if (FPassword.isEmpty() && FStreamState==SS_FEATURES)
-		return FSessionPassword;
 	return FPassword;
 }
 
 void XmppStream::setPassword(const QString &APassword)
 {
 	if (FStreamState == SS_OFFLINE)
+	{
+		if (!APassword.isEmpty())
+			FSessionPassword.clear();
 		FPassword = APassword;
+	}
+}
+
+QString XmppStream::getSessionPassword(bool AAskIfNeed)
+{
+	if (AAskIfNeed && FStreamState!=SS_ONLINE && FPassword.isEmpty() && FSessionPassword.isEmpty() && FPasswordMutex.tryLock())
+	{
+		bool isActive = isKeepAliveTimerActive();
+		setKeepAliveTimerActive(false);
+
+		FPasswordDialog = new QInputDialog(NULL,Qt::Dialog);
+		FPasswordDialog->setWindowTitle(tr("Password request"));
+		FPasswordDialog->setLabelText(tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.bare())));
+		FPasswordDialog->setTextEchoMode(QLineEdit::Password);
+		if (FPasswordDialog->exec() == QDialog::Accepted)
+			FSessionPassword = FPasswordDialog->textValue();
+		FPasswordDialog->deleteLater();
+		FPasswordDialog = NULL;
+
+		setKeepAliveTimerActive(isActive);
+		FPasswordMutex.unlock();
+	}
+	return !FSessionPassword.isEmpty() ? FSessionPassword : FPassword;
 }
 
 QString XmppStream::defaultLang() const
@@ -258,39 +274,39 @@ qint64 XmppStream::sendStanza(Stanza &AStanza)
 	return -1;
 }
 
-void XmppStream::insertXmppDataHandler(IXmppDataHandler *AHandler, int AOrder)
+void XmppStream::insertXmppDataHandler(int AOrder, IXmppDataHandler *AHandler)
 {
 	if (AHandler && !FDataHandlers.contains(AOrder, AHandler))
 	{
 		FDataHandlers.insertMulti(AOrder, AHandler);
-		emit dataHandlerInserted(AHandler, AOrder);
+		emit dataHandlerInserted(AOrder,AHandler);
 	}
 }
 
-void XmppStream::removeXmppDataHandler(IXmppDataHandler *AHandler, int AOrder)
+void XmppStream::removeXmppDataHandler(int AOrder, IXmppDataHandler *AHandler)
 {
 	if (FDataHandlers.contains(AOrder, AHandler))
 	{
 		FDataHandlers.remove(AOrder, AHandler);
-		emit dataHandlerRemoved(AHandler, AOrder);
+		emit dataHandlerRemoved(AOrder,AHandler);
 	}
 }
 
-void XmppStream::insertXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder)
+void XmppStream::insertXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler)
 {
 	if (AHandler && !FStanzaHandlers.contains(AOrder, AHandler))
 	{
 		FStanzaHandlers.insertMulti(AOrder, AHandler);
-		emit stanzaHandlerInserted(AHandler, AOrder);
+		emit stanzaHandlerInserted(AOrder, AHandler);
 	}
 }
 
-void XmppStream::removeXmppStanzaHandler(IXmppStanzaHadler *AHandler, int AOrder)
+void XmppStream::removeXmppStanzaHandler(int AOrder, IXmppStanzaHadler *AHandler)
 {
 	if (FStanzaHandlers.contains(AOrder, AHandler))
 	{
 		FStanzaHandlers.remove(AOrder, AHandler);
-		emit stanzaHandlerRemoved(AHandler, AOrder);
+		emit stanzaHandlerRemoved(AOrder, AHandler);
 	}
 }
 
@@ -307,7 +323,7 @@ void XmppStream::startStream()
 	if (!FDefLang.isEmpty())
 		root.setAttribute("xml:lang",FDefLang);
 
-	FStreamState = SS_INITIALIZE;
+	setStreamState(SS_INITIALIZE);
 	Stanza stanza(doc.documentElement());
 	if (!processStanzaHandlers(stanza,true))
 	{
@@ -333,7 +349,7 @@ void XmppStream::processFeatures()
 		if (!isEncryptionRequired() || connection()->isEncrypted())
 		{
 			FOpen = true;
-			FStreamState = SS_ONLINE;
+			setStreamState(SS_ONLINE);
 			emit opened();
 		}
 		else
@@ -343,17 +359,31 @@ void XmppStream::processFeatures()
 	}
 }
 
+void XmppStream::setStreamState(StreamState AState)
+{
+	if (FPasswordDialog)
+		FPasswordDialog->reject();
+	FStreamState = AState;
+}
+
 bool XmppStream::startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem)
 {
-	IXmppFeature *feature = FXmppStreams->xmppFeaturePlugin(AFeatureNS)->newXmppFeature(AFeatureNS, this);
-	if (feature)
+	foreach(IXmppFeaturesPlugin *plugin, FXmppStreams->xmppFeaturePlugins(AFeatureNS))
 	{
-		FActiveFeatures.append(feature);
-		connect(feature->instance(),SIGNAL(finished(bool)),SLOT(onFeatureFinished(bool)));
-		connect(feature->instance(),SIGNAL(error(const QString &)),SLOT(onFeatureError(const QString &)));
-		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
-		connect(this,SIGNAL(closed()),feature->instance(),SLOT(deleteLater()));
-		return feature->start(AFeatureElem);
+		IXmppFeature *feature = plugin->newXmppFeature(AFeatureNS, this);
+		if (feature && feature->start(AFeatureElem))
+		{
+			FActiveFeatures.append(feature);
+			connect(feature->instance(),SIGNAL(finished(bool)),SLOT(onFeatureFinished(bool)));
+			connect(feature->instance(),SIGNAL(error(const QString &)),SLOT(onFeatureError(const QString &)));
+			connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
+			connect(this,SIGNAL(closed()),feature->instance(),SLOT(deleteLater()));
+			return true;
+		}
+		else if (feature)
+		{
+			feature->instance()->deleteLater();
+		}
 	}
 	return false;
 }
@@ -424,7 +454,7 @@ QByteArray XmppStream::receiveData(qint64 ABytes)
 
 void XmppStream::onConnectionConnected()
 {
-	insertXmppStanzaHandler(this,XSHO_XMPP_STREAM);
+	insertXmppStanzaHandler(XSHO_XMPP_STREAM,this);
 	startStream();
 }
 
@@ -448,9 +478,9 @@ void XmppStream::onConnectionDisconnected()
 	if (FStreamState != SS_DISCONNECTING)
 		abort(tr("Connection closed unexpectedly"));
 
-	FStreamState = SS_OFFLINE;
+	setStreamState(SS_OFFLINE);
 	setKeepAliveTimerActive(false);
-	removeXmppStanzaHandler(this,XSHO_XMPP_STREAM);
+	removeXmppStanzaHandler(XSHO_XMPP_STREAM,this);
 	emit closed();
 
 	if (FOfflineJid.isValid())

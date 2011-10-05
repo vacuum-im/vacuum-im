@@ -60,7 +60,7 @@ SASLAuth::SASLAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 
 SASLAuth::~SASLAuth()
 {
-	FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 	emit featureDestroyed();
 }
 
@@ -90,7 +90,7 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 				responseMap["qop"] = challengeMap.value("qop");
 				responseMap["digest-uri"] = QString("xmpp/%1").arg(FXmppStream->streamJid().pDomain()).toUtf8();
 				responseMap["charset"] = "utf-8";
-				responseMap["response"] = getResponseValue(responseMap,FXmppStream->password());
+				responseMap["response"] = getResponseValue(responseMap,FXmppStream->getSessionPassword());
 
 				Stanza response("response");
 				response.setAttribute("xmlns",NS_FEATURE_SASL);
@@ -107,7 +107,7 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 		}
 		else
 		{
-			FXmppStream->removeXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			if (AStanza.tagName() == "success")
 			{
 				deleteLater();
@@ -161,19 +161,19 @@ bool SASLAuth::start(const QDomElement &AElem)
 			{
 				Stanza auth("auth");
 				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",AUTH_DIGEST_MD5);
-				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+				FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 				FXmppStream->sendStanza(auth);
 				return true;
 			}
 			else if (mechList.contains(AUTH_PLAIN))
 			{
 				QByteArray resp;
-				resp.append('\0').append(FXmppStream->streamJid().prepared().eNode().toUtf8()).append('\0').append(FXmppStream->password().toUtf8());
+				resp.append('\0').append(FXmppStream->streamJid().prepared().eNode().toUtf8()).append('\0').append(FXmppStream->getSessionPassword().toUtf8());
 
 				Stanza auth("auth");
 				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",AUTH_PLAIN);
 				auth.element().appendChild(auth.createTextNode(resp.toBase64()));
-				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+				FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 				FXmppStream->sendStanza(auth);
 				return true;
 			}
@@ -181,7 +181,7 @@ bool SASLAuth::start(const QDomElement &AElem)
 			{
 				Stanza auth("auth");
 				auth.setAttribute("xmlns",NS_FEATURE_SASL).setAttribute("mechanism",AUTH_ANONYMOUS);
-				FXmppStream->insertXmppStanzaHandler(this, XSHO_XMPP_FEATURE);
+				FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 				FXmppStream->sendStanza(auth);
 				return true;
 			}
