@@ -63,7 +63,7 @@ bool Emoticons::initObjects()
 {
 	if (FMessageProcessor)
 	{
-		FMessageProcessor->insertMessageWriter(this,MWO_EMOTICONS);
+		FMessageProcessor->insertMessageWriter(MWO_EMOTICONS,this);
 	}
 	if (FMessageWidgets)
 	{
@@ -85,7 +85,7 @@ bool Emoticons::initSettings()
 	return true;
 }
 
-void Emoticons::writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
+void Emoticons::writeTextToMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
 	Q_UNUSED(AMessage);
 	Q_UNUSED(ALang);
@@ -93,7 +93,7 @@ void Emoticons::writeMessage(int AOrder, Message &AMessage, QTextDocument *ADocu
 		replaceImageToText(ADocument);
 }
 
-void Emoticons::writeText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
+void Emoticons::writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
 	Q_UNUSED(AMessage);
 	Q_UNUSED(ALang);

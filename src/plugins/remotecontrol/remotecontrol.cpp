@@ -250,6 +250,36 @@ bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 	return false;
 }
 
+IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
+{
+	IDataFormLocale locale;
+	if (AFormType == DATA_FORM_REMOTECONTROL)
+	{
+		locale.fields[FIELD_AUTO_AUTH].label = tr("Whether to automatically authorize subscription requests");
+		locale.fields[FIELD_AUTO_FILES].label = tr("Whether to automatically accept file transfers");
+		locale.fields[FIELD_AUTO_MSG].label = tr("Whether to automatically open new messages");
+		locale.fields[FIELD_AUTO_OFFLINE].label = tr("Whether to automatically go offline when idle");
+		locale.fields[FIELD_SOUNDS].label = tr("Whether to play sounds");
+		locale.fields[FIELD_FILES].label = tr("A list of pending file transfers");
+		locale.fields[FIELD_MESSAGES].label = tr("A list of unread messages");
+		locale.fields[FIELD_GROUPCHATS].label = tr("A list of joined conferences");
+		locale.fields[FIELD_STATUS].label = tr("A presence or availability status");
+		locale.fields[FIELD_STATUS_MESSAGE].label = tr("The status message text");
+		locale.fields[FIELD_STATUS_PRIORITY].label = tr("The new priority for the client");
+		if (FStatusChanger)
+		{
+			locale.fields[FIELD_STATUS].options["online"].label = FStatusChanger->nameByShow(IPresence::Online);
+			locale.fields[FIELD_STATUS].options["chat"].label = FStatusChanger->nameByShow(IPresence::Chat);
+			locale.fields[FIELD_STATUS].options["away"].label = FStatusChanger->nameByShow(IPresence::Away);
+			locale.fields[FIELD_STATUS].options["xa"].label = FStatusChanger->nameByShow(IPresence::ExtendedAway);
+			locale.fields[FIELD_STATUS].options["dnd"].label = FStatusChanger->nameByShow(IPresence::DoNotDisturb);
+			locale.fields[FIELD_STATUS].options["invisible"].label = FStatusChanger->nameByShow(IPresence::Invisible);
+			locale.fields[FIELD_STATUS].options["offline"].label = FStatusChanger->nameByShow(IPresence::Offline);
+		}
+	}
+	return locale;
+}
+
 bool RemoteControl::processPing(const ICommandRequest &ARequest)
 {
 	if (ARequest.action == COMMAND_ACTION_EXECUTE)
@@ -581,13 +611,10 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		field.required = true;
 
 		QMap<Jid, int> unread;
-		foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,Jid::null,Message::Normal|Message::Chat|Message::Headline))
+		foreach(Message message, notifiedMessages())
 		{
-			Message message = FMessageProcessor->messageById(messageId);
-			if (!message.from().isEmpty() && ARequest.contactJid!=message.from() && !message.body().isEmpty())
-			{
+			if (ARequest.contactJid != message.from())
 				unread[message.from()]++;
-			}
 		}
 
 		for (QMap<Jid, int>::const_iterator it=unread.constBegin(); it!=unread.constEnd(); it++)
@@ -629,9 +656,8 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		{
 			foreach(QString senderJid, ARequest.form.fields.value(index).value.toStringList())
 			{
-				foreach(int messageId, FMessageProcessor->messages(ARequest.streamJid,senderJid,Message::Normal|Message::Chat|Message::Headline))
+				foreach(Message  message, notifiedMessages(senderJid))
 				{
-					Message message = FMessageProcessor->messageById(messageId);
 					message.detach();
 					message.setFrom(QString::null);
 					message.setTo(ARequest.contactJid.eFull());
@@ -645,8 +671,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 					address.setAttribute("type","ofrom");
 					address.setAttribute("jid",senderJid);
 
-					if (FStanzaProcessor->sendStanzaOut(ARequest.streamJid,message.stanza()))
-						FMessageProcessor->removeMessage(messageId);
+					FStanzaProcessor->sendStanzaOut(ARequest.streamJid,message.stanza());
 				}
 			}
 			result.status = COMMAND_STATUS_COMPLETED;
@@ -665,34 +690,22 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 	return false;
 }
 
-IDataFormLocale RemoteControl::dataFormLocale(const QString &AFormType)
+QList<Message> RemoteControl::notifiedMessages(const Jid &AContactJid) const
 {
-	IDataFormLocale locale;
-	if (AFormType == DATA_FORM_REMOTECONTROL)
+	QList<Message> messages;
+	foreach(int messageId, FMessageProcessor->notifiedMessages())
 	{
-		locale.fields[FIELD_AUTO_AUTH].label = tr("Whether to automatically authorize subscription requests");
-		locale.fields[FIELD_AUTO_FILES].label = tr("Whether to automatically accept file transfers");
-		locale.fields[FIELD_AUTO_MSG].label = tr("Whether to automatically open new messages");
-		locale.fields[FIELD_AUTO_OFFLINE].label = tr("Whether to automatically go offline when idle");
-		locale.fields[FIELD_SOUNDS].label = tr("Whether to play sounds");
-		locale.fields[FIELD_FILES].label = tr("A list of pending file transfers");
-		locale.fields[FIELD_MESSAGES].label = tr("A list of unread messages");
-		locale.fields[FIELD_GROUPCHATS].label = tr("A list of joined conferences");
-		locale.fields[FIELD_STATUS].label = tr("A presence or availability status");
-		locale.fields[FIELD_STATUS_MESSAGE].label = tr("The status message text");
-		locale.fields[FIELD_STATUS_PRIORITY].label = tr("The new priority for the client");
-		if (FStatusChanger)
+		Message message = FMessageProcessor->notifiedMessage(messageId);
+		if(message.data(MDR_MESSAGE_DIRECTION).toInt() == IMessageProcessor::MessageIn)
 		{
-			locale.fields[FIELD_STATUS].options["online"].label = FStatusChanger->nameByShow(IPresence::Online);
-			locale.fields[FIELD_STATUS].options["chat"].label = FStatusChanger->nameByShow(IPresence::Chat);
-			locale.fields[FIELD_STATUS].options["away"].label = FStatusChanger->nameByShow(IPresence::Away);
-			locale.fields[FIELD_STATUS].options["xa"].label = FStatusChanger->nameByShow(IPresence::ExtendedAway);
-			locale.fields[FIELD_STATUS].options["dnd"].label = FStatusChanger->nameByShow(IPresence::DoNotDisturb);
-			locale.fields[FIELD_STATUS].options["invisible"].label = FStatusChanger->nameByShow(IPresence::Invisible);
-			locale.fields[FIELD_STATUS].options["offline"].label = FStatusChanger->nameByShow(IPresence::Offline);
+			if (message.type()!=Message::Error && !message.body().isEmpty())
+			{
+				if (AContactJid.isEmpty() || AContactJid==message.from())
+					messages.append(message);
+			}
 		}
 	}
-	return locale;
+	return messages;
 }
 
 Q_EXPORT_PLUGIN2(plg_remotecontrol, RemoteControl)

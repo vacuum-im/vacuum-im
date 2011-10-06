@@ -9,7 +9,6 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 
 	FMessageWidgets = AMessageWidgets;
 
-	FMode = AMode;
 	FNextCount = 0;
 	FShownDetached = false;
 	FStreamJid = AStreamJid;
@@ -22,6 +21,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(FStreamJid,ui.wdtTabs);
 	connect(FReceiversWidget->instance(),SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
 	connect(FReceiversWidget->instance(),SIGNAL(receiverRemoved(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
+	ui.wdtTabs->addTab(FReceiversWidget->instance(),FReceiversWidget->instance()->windowIconText());
 	FReceiversWidget->addReceiver(FContactJid);
 
 	ui.wdtInfo->setLayout(new QVBoxLayout(ui.wdtInfo));
@@ -53,7 +53,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 	initialize();
 
 	setCurrentTabWidget(ui.tabMessage);
-	setMode(FMode);
+	setMode(AMode);
 	setNextCount(FNextCount);
 }
 
