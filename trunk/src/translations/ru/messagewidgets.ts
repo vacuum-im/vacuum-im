@@ -215,7 +215,7 @@
     <name>MessageWindow</name>
     <message>
         <source>Next - %1</source>
-        <translation>Следующий - %1</translation>
+        <translation>Следующее - %1</translation>
     </message>
     <message>
         <source>Close</source>

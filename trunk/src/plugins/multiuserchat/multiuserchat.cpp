@@ -6,8 +6,8 @@
 #define MUC_IQ_TIMEOUT      30000
 #define MUC_LIST_TIMEOUT    60000
 
-MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid,
-                             const QString &ANickName, const QString &APassword, QObject *AParent) : QObject(AParent)
+MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, 
+									  const QString &ANickName, const QString &APassword, QObject *AParent) : QObject(AParent)
 {
 	FPresence = NULL;
 	FDataForms = NULL;
@@ -53,12 +53,13 @@ bool MultiUserChat::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanz
 		AAccept = true;
 		if (AHandlerId == FSHIPresence)
 		{
-			return processPresence(AStanza);
+			processPresence(AStanza);
 		}
 		else if (AHandlerId == FSHIMessage)
 		{
-			return processMessage(AStanza);
+			processMessage(AStanza);
 		}
+		return true;
 	}
 	return false;
 }
@@ -174,6 +175,18 @@ void MultiUserChat::stanzaRequestTimeout(const Jid &AStreamJid, const QString &A
 		emit chatError(tr("Changes in list of %1s may not be accepted: %2").arg(affiliation).arg(err.message()));
 		FAffilListRequests.remove(AStanzaId);
 	}
+}
+
+bool MultiUserChat::messageReadWrite(int AOrder, const Jid &AStreamJid, Message &AMessage, int ADirection)
+{
+	if (AOrder==MEO_MULTIUSERCHAT && ADirection==IMessageProcessor::MessageIn && AStreamJid==FStreamJid)
+	{
+		if (FRoomJid && AMessage.from())
+		{
+			return processMessage(AMessage.stanza());
+		}
+	}
+	return false;
 }
 
 Jid MultiUserChat::streamJid() const
@@ -336,31 +349,32 @@ bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
 {
 	if (isOpen())
 	{
-		Message message = AMessage;
 		Jid toJid = FRoomJid;
 		toJid.setResource(AToNick);
+
+		Message message = AMessage;
 		message.setTo(toJid.eFull());
-		if (AToNick.isEmpty())
-			message.setType(Message::GroupChat);
+		message.setType(AToNick.isEmpty() ? Message::GroupChat : Message::Chat);
 
 		if (FMessageProcessor == NULL)
 		{
-			emit messageSend(message);
-			if (FStanzaProcessor->sendStanzaOut(FStreamJid, message.stanza()))
+			if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(FStreamJid, message.stanza()))
 			{
 				emit messageSent(message);
 				return true;
 			}
 		}
 		else
-			return FMessageProcessor->sendMessage(FStreamJid,message);
+		{
+			return FMessageProcessor->sendMessage(FStreamJid,message,IMessageProcessor::MessageOut);
+		}
 	}
 	return false;
 }
 
 bool MultiUserChat::requestVoice()
 {
-	if (isOpen() && FMainUser->data(MUDR_ROLE).toString() == MUC_ROLE_VISITOR)
+	if (FStanzaProcessor && isOpen() && FMainUser->data(MUDR_ROLE).toString() == MUC_ROLE_VISITOR)
 	{
 		Message message;
 		message.setTo(FRoomJid.eBare());
@@ -380,17 +394,14 @@ bool MultiUserChat::requestVoice()
 		fieldElem.setAttribute("label","Requested role");
 		fieldElem.appendChild(mstanza.createElement("value")).appendChild(mstanza.createTextNode(MUC_ROLE_PARTICIPANT));
 
-		if (FMessageProcessor)
-			return FMessageProcessor->sendMessage(FStreamJid,message);
-		else if (FStanzaProcessor)
-			return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
+		return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
 	}
 	return false;
 }
 
 bool MultiUserChat::inviteContact(const Jid &AContactJid, const QString &AReason)
 {
-	if (isOpen() && AContactJid.isValid())
+	if (FStanzaProcessor && isOpen() && AContactJid.isValid())
 	{
 		Message message;
 		message.setTo(FRoomJid.eBare());
@@ -401,10 +412,7 @@ bool MultiUserChat::inviteContact(const Jid &AContactJid, const QString &AReason
 		if (!AReason.isEmpty())
 			invElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(AReason));
 
-		if (FMessageProcessor)
-			return FMessageProcessor->sendMessage(FStreamJid,message);
-		else if (FStanzaProcessor)
-			return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
+		return FStanzaProcessor->sendStanzaOut(FStreamJid, mstanza);
 	}
 	return false;
 }
@@ -416,28 +424,23 @@ QString MultiUserChat::subject() const
 
 void MultiUserChat::setSubject(const QString &ASubject)
 {
-	if (isOpen())
+	if (FStanzaProcessor && isOpen())
 	{
 		Message message;
-		message.setSubject(ASubject);
-		sendMessage(message);
+		message.setTo(FRoomJid.eBare()).setType(Message::GroupChat).setSubject(ASubject);
+		FStanzaProcessor->sendStanzaOut(FStreamJid,message.stanza());
 	}
 }
 
 void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
 {
-	if (FDataForms && isOpen())
+	if (FStanzaProcessor && FDataForms && isOpen())
 	{
 		Message message;
 		message.setTo(FRoomJid.eBare());
 		QDomElement elem = message.stanza().element();
 		FDataForms->xmlForm(AForm,elem);
-		bool submited = false;
-		if (FMessageProcessor)
-			submited = FMessageProcessor->sendMessage(FStreamJid,message);
-		else if (FStanzaProcessor)
-			submited = FStanzaProcessor->sendStanzaRequest(this,FStreamJid,message.stanza(),0);
-		if (submited)
+		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,message.stanza(),0))
 			emit dataFormMessageSent(AForm);
 	}
 }
@@ -481,7 +484,9 @@ void MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffilia
 bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
 {
 	if (FAffilListRequests.values().contains(AAffiliation))
+	{
 		return true;
+	}
 	else if (FStanzaProcessor && isOpen() && AAffiliation!=MUC_AFFIL_NONE)
 	{
 		Stanza iq("iq");
@@ -494,7 +499,9 @@ bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
 			return true;
 		}
 		else
+		{
 			emit chatError(tr("Failed to send request for list of %1s.").arg(AAffiliation));
+		}
 	}
 	return false;
 }
@@ -589,13 +596,10 @@ bool MultiUserChat::destroyRoom(const QString &AReason)
 	return false;
 }
 
-void MultiUserChat::prepareMessageForReceive(Message &AMessage)
-{
-	Q_UNUSED(AMessage);
-}
-
 bool MultiUserChat::processMessage(const Stanza &AStanza)
 {
+	bool hooked = true;
+
 	Jid fromJid = AStanza.from();
 	QString fromNick = fromJid.resource();
 
@@ -607,13 +611,7 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 	}
 
 	Message message(AStanza);
-	if (FMessageProcessor == NULL)
-	{
-		prepareMessageForReceive(message);
-		emit messageReceive(fromNick,message);
-	}
-
-	if (AStanza.type() == "error")
+	if (AStanza.type()=="error")
 	{
 		ErrorHandler err(AStanza.element());
 		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.message()) : err.message());
@@ -633,20 +631,33 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 			emit inviteDeclined(contactJid,reason);
 		}
 		else if (!AStanza.firstElement("x",NS_JABBER_DATA).isNull())
-			emit dataFormMessageReceived(message);
+		{
+			if (FMessageProcessor == NULL)
+				emit dataFormMessageReceived(message);
+			else
+				hooked = false;
+		}
 		else
+		{
 			emit serviceMessageReceived(message);
+		}
 	}
 	else if (!message.body().isEmpty())
-		emit messageReceived(fromNick,message);
+	{
+		if (FMessageProcessor == NULL)
+			emit messageReceived(fromNick,message);
+		else
+			hooked = false;
+	}
 
 	FStatusCodes.clear();
-	return true;
+	return hooked;
 }
 
 bool MultiUserChat::processPresence(const Stanza &AStanza)
 {
 	bool accepted = false;
+
 	Jid fromJid = AStanza.from();
 	QString fromNick = fromJid.resource();
 
@@ -700,7 +711,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			if (!FUsers.contains(fromNick))
 			{
 				connect(user->instance(),SIGNAL(dataChanged(int,const QVariant &, const QVariant &)),
-				        SLOT(onUserDataChanged(int,const QVariant &, const QVariant &)));
+					SLOT(onUserDataChanged(int,const QVariant &, const QVariant &)));
 				FUsers.insert(fromNick,user);
 			}
 
@@ -808,6 +819,8 @@ void MultiUserChat::initialize()
 	if (plugin)
 	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+		if (FMessageProcessor)
+			FMessageProcessor->insertMessageEditor(MEO_MULTIUSERCHAT,this);
 	}
 
 	plugin = FChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
@@ -843,10 +856,8 @@ void MultiUserChat::initialize()
 			FPresence = presencePlugin->findPresence(FStreamJid);
 			if (FPresence)
 			{
-				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),
-				        SLOT(onPresenceChanged(int, const QString &, int)));
-				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),
-				        SLOT(onPresenceAboutToClose(int , const QString &)));
+				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
+				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),SLOT(onPresenceAboutToClose(int , const QString &)));
 			}
 		}
 	}
@@ -869,14 +880,6 @@ void MultiUserChat::initialize()
 	plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-
-	if (FMessageProcessor)
-	{
-		connect(FMessageProcessor->instance(),SIGNAL(messageReceive(Message &)),SLOT(onMessageReceive(Message &)));
-		connect(FMessageProcessor->instance(),SIGNAL(messageReceived(const Message &)),SLOT(onMessageReceived(const Message &)));
-		connect(FMessageProcessor->instance(),SIGNAL(messageSend(Message &)),SLOT(onMessageSend(Message &)));
-		connect(FMessageProcessor->instance(),SIGNAL(messageSent(const Message &)),SLOT(onMessageSent(const Message &)));
-	}
 }
 
 void MultiUserChat::closeChat(int AShow, const QString &AStatus)
@@ -905,34 +908,6 @@ void MultiUserChat::closeChat(int AShow, const QString &AStatus)
 	emit presenceChanged(FShow,FStatus);
 
 	emit chatClosed();
-}
-
-void MultiUserChat::onMessageReceive(Message &AMessage)
-{
-	Jid fromJid = AMessage.from();
-	if (FRoomJid && fromJid)
-	{
-		prepareMessageForReceive(AMessage);
-		emit messageReceive(fromJid.resource(), AMessage);
-	}
-}
-
-void MultiUserChat::onMessageReceived(const Message &AMessage)
-{
-	if ( (FRoomJid && AMessage.from()) && (FStreamJid == AMessage.to()) )
-		processMessage(AMessage.stanza());
-}
-
-void MultiUserChat::onMessageSend(Message &AMessage)
-{
-	if (FRoomJid && AMessage.to())
-		emit messageSend(AMessage);
-}
-
-void MultiUserChat::onMessageSent(const Message &AMessage)
-{
-	if (FRoomJid && AMessage.to())
-		emit messageSent(AMessage);
 }
 
 void MultiUserChat::onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter)

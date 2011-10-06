@@ -172,7 +172,7 @@ bool MultiUserChatPlugin::initObjects()
 
 	if (FMessageProcessor)
 	{
-		FMessageProcessor->insertMessageHandler(this,MHO_MULTIUSERCHAT_INVITE);
+		FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT_INVITE,this);
 	}
 
 	if (FDataForms)
@@ -420,80 +420,87 @@ IDataFormLocale MultiUserChatPlugin::dataFormLocale(const QString &AFormType)
 	return locale;
 }
 
-bool MultiUserChatPlugin::checkMessage(int AOrder, const Message &AMessage)
+bool MultiUserChatPlugin::messageCheck(int AOrder, const Message &AMessage, int ADirection)
 {
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AOrder); Q_UNUSED(ADirection);
 	return !AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite").isNull();
 }
 
-bool MultiUserChatPlugin::receiveMessage(int AMessageId)
+bool MultiUserChatPlugin::messageDisplay(const Message &AMessage, int ADirection)
 {
-	FActiveInvites.append(AMessageId);
-	return true;
+	Q_UNUSED(AMessage);
+	return ADirection == IMessageProcessor::MessageIn;
 }
 
-bool MultiUserChatPlugin::showMessage(int AMessageId)
-{
-	Message message = FMessageProcessor->messageById(AMessageId);
-	QDomElement inviteElem = message.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
-	Jid roomJid = message.from();
-	Jid fromJid = inviteElem.attribute("from");
-	if (roomJid.isValid() && fromJid.isValid())
-	{
-		InviteFields fields;
-		fields.streamJid = message.to();
-		fields.roomJid = roomJid;
-		fields.fromJid  = fromJid;
-		fields.password = inviteElem.firstChildElement("password").text();
-
-		QString reason = inviteElem.firstChildElement("reason").text();
-		QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(Qt::escape(roomJid.bare())).arg(Qt::escape(fromJid.full())).arg(Qt::escape(reason));
-		msg+="<br><br>";
-		msg+=tr("Do you want to join this conference?");
-
-		QMessageBox *inviteDialog = new QMessageBox(QMessageBox::Question,tr("Invite"),msg,QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore);
-		inviteDialog->setAttribute(Qt::WA_DeleteOnClose,true);
-		inviteDialog->setEscapeButton(QMessageBox::Ignore);
-		inviteDialog->setModal(false);
-		connect(inviteDialog,SIGNAL(finished(int)),SLOT(onInviteDialogFinished(int)));
-		FInviteDialogs.insert(inviteDialog,fields);
-		inviteDialog->show();
-	}
-	FActiveInvites.removeAt(FActiveInvites.indexOf(AMessageId ));
-	FMessageProcessor->removeMessage(AMessageId);
-	return true;
-}
-
-INotification MultiUserChatPlugin::notifyMessage(INotifications *ANotifications, const Message &AMessage)
+INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
-	Jid roomJid = AMessage.from();
-	if (!multiChatWindow(AMessage.to(),roomJid))
+	if (ADirection == IMessageProcessor::MessageIn)
 	{
-		notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_INVITE);
-		if (notify.kinds > 0)
+		QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
+		Jid roomJid = AMessage.from();
+		if (!multiChatWindow(AMessage.to(),roomJid))
 		{
-			Jid fromJid = inviteElem.attribute("from");
-			notify.typeId = NNT_MUC_MESSAGE_INVITE;
-			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
-			notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
-			notify.data.insert(NDR_STREAM_JID,AMessage.to());
-			notify.data.insert(NDR_CONTACT_JID,fromJid.full());
-			notify.data.insert(NDR_ROSTER_ORDER,RNO_MUC_INVITE);
-			notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
-			notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
-			notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
-			notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
-			notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));
-			notify.data.insert(NDR_POPUP_HTML,Qt::escape(notify.data.value(NDR_TOOLTIP).toString()));
-			notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
+			notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_INVITE);
+			if (notify.kinds > 0)
+			{
+				Jid fromJid = inviteElem.attribute("from");
+				notify.typeId = NNT_MUC_MESSAGE_INVITE;
+				notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
+				notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.bare()));
+				notify.data.insert(NDR_STREAM_JID,AMessage.to());
+				notify.data.insert(NDR_CONTACT_JID,fromJid.full());
+				notify.data.insert(NDR_ROSTER_ORDER,RNO_MUC_INVITE);
+				notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
+				notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
+				notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
+				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
+				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));
+				notify.data.insert(NDR_POPUP_HTML,Qt::escape(notify.data.value(NDR_TOOLTIP).toString()));
+				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
+				FActiveInvites.insert(AMessage.data(MDR_MESSAGE_ID).toInt(),AMessage);
+			}
 		}
 	}
 	return notify;
 }
 
-bool MultiUserChatPlugin::createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
+bool MultiUserChatPlugin::messageShowWindow(int AMessageId)
+{
+	if (FActiveInvites.contains(AMessageId))
+	{
+		Message message = FActiveInvites.take(AMessageId);
+		QDomElement inviteElem = message.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
+		Jid roomJid = message.from();
+		Jid fromJid = inviteElem.attribute("from");
+		if (roomJid.isValid() && fromJid.isValid())
+		{
+			InviteFields fields;
+			fields.streamJid = message.to();
+			fields.roomJid = roomJid;
+			fields.fromJid  = fromJid;
+			fields.password = inviteElem.firstChildElement("password").text();
+
+			QString reason = inviteElem.firstChildElement("reason").text();
+			QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(Qt::escape(roomJid.bare())).arg(Qt::escape(fromJid.full())).arg(Qt::escape(reason));
+			msg += "<br><br>";
+			msg += tr("Do you want to join this conference?");
+
+			QMessageBox *inviteDialog = new QMessageBox(QMessageBox::Question,tr("Invite"),msg,QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore);
+			inviteDialog->setAttribute(Qt::WA_DeleteOnClose,true);
+			inviteDialog->setEscapeButton(QMessageBox::Ignore);
+			inviteDialog->setModal(false);
+			connect(inviteDialog,SIGNAL(finished(int)),SLOT(onInviteDialogFinished(int)));
+			FInviteDialogs.insert(inviteDialog,fields);
+			inviteDialog->show();
+		}
+		FMessageProcessor->removeMessageNotify(AMessageId);
+		return true;
+	}
+	return false;
+}
+
+bool MultiUserChatPlugin::messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AStreamJid);
@@ -772,12 +779,14 @@ void MultiUserChatPlugin::onStreamRemoved(IXmppStream *AXmppStream)
 		if (FInviteDialogs.value(inviteDialog).streamJid == AXmppStream->streamJid())
 			inviteDialog->done(QMessageBox::Ignore);
 
-	for (int i=0; i<FActiveInvites.count();i++)
-		if (AXmppStream->streamJid() == FMessageProcessor->messageById(FActiveInvites.at(i)).to())
+	foreach(int messageId, FActiveInvites.keys())
+	{
+		if (AXmppStream->streamJid() == FActiveInvites.value(messageId).to())
 		{
-			FMessageProcessor->removeMessage(FActiveInvites.at(i));
-			FActiveInvites.removeAt(i--);
+			FActiveInvites.remove(messageId);
+			FMessageProcessor->removeMessageNotify(messageId);
 		}
+	}
 }
 
 void MultiUserChatPlugin::onJoinActionTriggered(bool)
@@ -903,7 +912,7 @@ void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
 			reason = QInputDialog::getText(inviteDialog,tr("Decline invite"),tr("Enter a reason"),QLineEdit::Normal,reason);
 			if (!reason.isEmpty())
 				declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
-			FMessageProcessor->sendMessage(fields.streamJid,decline);
+			FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::MessageOut);
 		}
 	}
 }

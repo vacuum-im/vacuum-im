@@ -3,6 +3,7 @@
 
 #define NORMALMESSAGEHANDLER_UUID "{8592e3c3-ef5e-42a9-91c9-faf1ed9a91cc}"
 
+#include <QQueue>
 #include <QMultiMap>
 #include <definitions/messagehandlerorders.h>
 #include <definitions/rosterindextyperole.h>
@@ -55,17 +56,17 @@ public:
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IMessageHandler
-	virtual bool checkMessage(int AOrder, const Message &AMessage);
-	virtual bool showMessage(int AMessageId);
-	virtual bool receiveMessage(int AMessageId);
-	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
-	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
+	virtual bool messageDisplay(const Message &AMessage, int ADirection);
+	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
+	virtual bool messageShowWindow(int AMessageId);
+	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 protected:
 	IMessageWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	IMessageWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
-	void showNextMessage(IMessageWindow *AWindow);
-	void loadActiveMessages(IMessageWindow *AWindow);
+	bool showNextMessage(IMessageWindow *AWindow);
 	void updateWindow(IMessageWindow *AWindow);
+	void removeNotifiedMessages(IMessageWindow *AWindow);
 	void setMessageStyle(IMessageWindow *AWindow);
 	void fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const;
 	void showStyledMessage(IMessageWindow *AWindow, const Message &AMessage);
@@ -76,6 +77,7 @@ protected slots:
 	void onReplyMessage();
 	void onForwardMessage();
 	void onShowChatWindow();
+	void onWindowActivated();
 	void onWindowDestroyed();
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
@@ -94,8 +96,8 @@ private:
 	IXmppUriQueries *FXmppUriQueries;
 private:
 	QList<IMessageWindow *> FWindows;
-	QMap<IMessageWindow *, Message> FLastMessages;
-	QMultiMap<IMessageWindow *, int> FActiveMessages;
+	QMultiMap<IMessageWindow *, int> FNotifiedMessages;
+	QMap<IMessageWindow *, QQueue<Message> > FMessageQueue;
 };
 
 #endif // NORMALMESSAGEHANDLER_H

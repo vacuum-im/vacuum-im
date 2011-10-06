@@ -80,7 +80,7 @@ MultiUserChatWindow::~MultiUserChatWindow()
 		delete window->instance();
 
 	if (FMessageProcessor)
-		FMessageProcessor->removeMessageHandler(this,MHO_MULTIUSERCHAT_GROUPCHAT);
+		FMessageProcessor->removeMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
 
 	saveWindowState();
 	emit tabPageDestroyed();
@@ -172,93 +172,74 @@ void MultiUserChatWindow::setTabPageNotifier(ITabPageNotifier *ANotifier)
 	}
 }
 
-bool MultiUserChatWindow::checkMessage(int AOrder, const Message &AMessage)
+bool MultiUserChatWindow::messageCheck(int AOrder, const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AOrder);
-	return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
-}
-
-bool MultiUserChatWindow::showMessage(int AMessageId)
-{
-	if (FDataFormMessages.contains(AMessageId))
-	{
-		IDataDialogWidget *dialog = FDataFormMessages.take(AMessageId);
-		if (dialog)
-		{
-			dialog->instance()->show();
-			FMessageProcessor->removeMessage(AMessageId);
-			return true;
-		}
-	}
-	else if (FActiveChatMessages.values().contains(AMessageId))
-	{
-		IChatWindow *window = FActiveChatMessages.key(AMessageId);
-		if (window)
-		{
-			window->showTabPage();
-			return true;
-		}
-	}
+	if (ADirection == IMessageProcessor::MessageIn)
+		return (streamJid() == AMessage.to()) && (roomJid() && AMessage.from());
 	else
-	{
-		Message message = FMessageProcessor->messageById(AMessageId);
-		return createMessageWindow(MHO_MULTIUSERCHAT_GROUPCHAT,message.to(),message.from(),message.type(),IMessageHandler::SM_SHOW);
-	}
-	return false;
+		return (streamJid() == AMessage.from()) && (roomJid() && AMessage.to());
 }
 
-bool MultiUserChatWindow::receiveMessage(int AMessageId)
+bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection)
 {
-	bool notify = false;
-	Message message = FMessageProcessor->messageById(AMessageId);
-	Jid contactJid = message.from();
-
-	if (message.type() != Message::Error)
+	bool displayed = false;
+	if (AMessage.type() != Message::Error)
 	{
-		if (contactJid.resource().isEmpty() && !message.stanza().firstElement("x",NS_JABBER_DATA).isNull())
+		if (ADirection == IMessageProcessor::MessageIn)
 		{
-			IDataForm form = FDataForms->dataForm(message.stanza().firstElement("x",NS_JABBER_DATA));
-			IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
-			connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
-			showStatusMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::TypeNotification);
-			FDataFormMessages.insert(AMessageId,dialog);
-			notify = true;
-		}
-		else if (message.type() == Message::GroupChat)
-		{
-			if (!isActiveTabPage())
+			Jid contactJid = AMessage.from();
+			if (contactJid.resource().isEmpty() && !AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
 			{
-				notify = true;
-				FActiveMessages.append(AMessageId);
-				updateWindow();
+				displayed = true;
+				IDataForm form = FDataForms->dataForm(AMessage.stanza().firstElement("x",NS_JABBER_DATA));
+				IDataDialogWidget *dialog = FDataForms->dialogWidget(form,this);
+				connect(dialog->instance(),SIGNAL(accepted()),SLOT(onDataFormMessageDialogAccepted()));
+				showStatusMessage(tr("Data form received: %1").arg(form.title),IMessageContentOptions::TypeNotification);
+				FDataFormMessages.insert(AMessage.data(MDR_MESSAGE_ID).toInt(),dialog);
+			}
+			else if (AMessage.type()==Message::GroupChat || contactJid.resource().isEmpty())
+			{
+				if (!AMessage.body().isEmpty())
+				{
+					displayed = true;
+					showUserMessage(AMessage,contactJid.resource());
+				}
+			}
+			else if (!AMessage.body().isEmpty())
+			{
+				IChatWindow *window = getChatWindow(contactJid);
+				if (window)
+				{
+					displayed = true;
+					showChatMessage(window,AMessage);
+				}
 			}
 		}
-		else
+		else if (ADirection == IMessageProcessor::MessageOut)
 		{
-			IChatWindow *window = getChatWindow(contactJid);
-			if (window)
+			Jid contactJid = AMessage.to();
+			if (!contactJid.resource().isEmpty() && !AMessage.body().isEmpty())
 			{
-				if (!window->isActiveTabPage())
+				IChatWindow *window = getChatWindow(contactJid);
+				if (window)
 				{
-					notify = true;
-					if (FDestroyTimers.contains(window))
-						delete FDestroyTimers.take(window);
-					FActiveChatMessages.insertMulti(window, AMessageId);
-					updateChatWindow(window);
-					updateListItem(contactJid);
+					displayed = true;
+					showChatMessage(window,AMessage);
 				}
 			}
 		}
 	}
-	return notify;
+	return displayed;
 }
 
-INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications, const Message &AMessage)
+INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	if (AMessage.type() != Message::Error)
+	if (ADirection==IMessageProcessor::MessageIn && AMessage.type()!=Message::Error)
 	{
 		Jid contactJid = AMessage.from();
+		int messageId = AMessage.data(MDR_MESSAGE_ID).toInt();
 		IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
 		if (!contactJid.resource().isEmpty())
 		{
@@ -285,12 +266,15 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
+
+					FActiveMessages.append(messageId);
+					updateWindow();
 				}
 			}
 			else if (!AMessage.body().isEmpty())
 			{
-				IChatWindow *window = findChatWindow(AMessage.from());
-				if (window == NULL || !window->isActiveTabPage())
+				IChatWindow *window = getChatWindow(AMessage.from());
+				if (window && !window->isActiveTabPage())
 				{
 					page = window;
 					notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
@@ -300,6 +284,12 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 					notify.data.insert(NDR_POPUP_CAPTION,tr("Private message"));
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.node()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
+
+					if (FDestroyTimers.contains(window))
+						delete FDestroyTimers.take(window);
+					FActiveChatMessages.insertMulti(window, messageId);
+					updateChatWindow(window);
+					updateListItem(contactJid);
 				}
 			}
 			if (notify.kinds & INotification::PopupWindow)
@@ -324,9 +314,10 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)page->instance());
 			}
 		}
-		else
+		else if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
 		{
-			if (!AMessage.stanza().firstElement("x",NS_JABBER_DATA).isNull())
+			IDataDialogWidget *dialog = FDataFormMessages.value(messageId);
+			if (dialog && !dialog->instance()->isActiveWindow())
 			{
 				notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
 				notify.typeId = NNT_MUC_MESSAGE_PRIVATE;
@@ -337,13 +328,43 @@ INotification MultiUserChatWindow::notifyMessage(INotifications *ANotifications,
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(contactJid));
 				notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text()));
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_DATA_MESSAGE);
+				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
+				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());
 			}
 		}
 	}
 	return notify;
 }
 
-bool MultiUserChatWindow::createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
+bool MultiUserChatWindow::messageShowWindow(int AMessageId)
+{
+	if (FActiveMessages.contains(AMessageId))
+	{
+		showTabPage();
+	}
+	else if (FActiveChatMessages.values().contains(AMessageId))
+	{
+		IChatWindow *window = FActiveChatMessages.key(AMessageId);
+		if (window)
+		{
+			window->showTabPage();
+			return true;
+		}
+	}
+	else if (FDataFormMessages.contains(AMessageId))
+	{
+		IDataDialogWidget *dialog = FDataFormMessages.take(AMessageId);
+		if (dialog)
+		{
+			dialog->instance()->show();
+			FMessageProcessor->removeMessageNotify(AMessageId);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool MultiUserChatWindow::messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
 	Q_UNUSED(AOrder);
 	if ((streamJid() == AStreamJid) && (roomJid() && AContactJid))
@@ -417,7 +438,7 @@ IMultiUserChat *MultiUserChatWindow::multiUserChat() const
 
 IChatWindow *MultiUserChatWindow::openChatWindow(const Jid &AContactJid)
 {
-	createMessageWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),AContactJid,Message::Chat,IMessageHandler::SM_SHOW);
+	messageShowWindow(MHO_MULTIUSERCHAT_GROUPCHAT,streamJid(),AContactJid,Message::Chat,IMessageHandler::SM_SHOW);
 	return findChatWindow(AContactJid);
 }
 
@@ -593,9 +614,7 @@ void MultiUserChatWindow::initialize()
 	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
 		if (FMessageProcessor)
-		{
-			FMessageProcessor->insertMessageHandler(this,MHO_MULTIUSERCHAT_GROUPCHAT);
-		}
+			FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
 	}
 
 	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageStyles").value(0,NULL);
@@ -636,8 +655,6 @@ void MultiUserChatWindow::connectMultiChat()
 		SLOT(onSubjectChanged(const QString &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(serviceMessageReceived(const Message &)),
 		SLOT(onServiceMessageReceived(const Message &)));
-	connect(FMultiChat->instance(),SIGNAL(messageReceived(const QString &, const Message &)),
-		SLOT(onMessageReceived(const QString &, const Message &)));
 	connect(FMultiChat->instance(),SIGNAL(inviteDeclined(const Jid &, const QString &)),
 		SLOT(onInviteDeclined(const Jid &, const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(userKicked(const QString &, const QString &, const QString &)),
@@ -1331,7 +1348,7 @@ void MultiUserChatWindow::removeActiveMessages()
 {
 	if (FMessageProcessor)
 		foreach(int messageId, FActiveMessages)
-			FMessageProcessor->removeMessage(messageId);
+			FMessageProcessor->removeMessageNotify(messageId);
 	FActiveMessages.clear();
 	updateWindow();
 }
@@ -1494,7 +1511,7 @@ void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
 	{
 		if (FMessageProcessor)
 			foreach(int messageId, FActiveChatMessages.values(AWindow))
-				FMessageProcessor->removeMessage(messageId);
+				FMessageProcessor->removeMessageNotify(messageId);
 		FActiveChatMessages.remove(AWindow);
 		updateChatWindow(AWindow);
 		updateListItem(AWindow->contactJid());
@@ -1818,22 +1835,8 @@ void MultiUserChatWindow::onSubjectChanged(const QString &ANick, const QString &
 
 void MultiUserChatWindow::onServiceMessageReceived(const Message &AMessage)
 {
-	if (!showStatusCodes(QString::null,FMultiChat->statusCodes()) && !AMessage.body().isEmpty())
-		onMessageReceived(QString::null,AMessage);
-}
-
-void MultiUserChatWindow::onMessageReceived(const QString &ANick, const Message &AMessage)
-{
-	if (AMessage.type() == Message::GroupChat || ANick.isEmpty())
-	{
-		showUserMessage(AMessage,ANick);
-	}
-	else
-	{
-		IChatWindow *window = getChatWindow(AMessage.from());
-		if (window)
-			showChatMessage(window,AMessage);
-	}
+	if (!showStatusCodes(QString::null,FMultiChat->statusCodes()))
+		messageDisplay(AMessage,IMessageProcessor::MessageIn);
 }
 
 void MultiUserChatWindow::onInviteDeclined(const Jid &AContactJid, const QString &AReason)
@@ -2002,10 +2005,7 @@ void MultiUserChatWindow::onChatMessageReady()
 			message.setBody(window->editWidget()->document()->toPlainText());
 
 		if (!message.body().isEmpty() && FMultiChat->sendMessage(message,window->contactJid().resource()))
-		{
-			showChatMessage(window,message);
 			window->editWidget()->clearEditor();
-		}
 	}
 }
 
@@ -2292,4 +2292,3 @@ void MultiUserChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidg
 		closeTabPage();
 	}
 }
-

@@ -81,18 +81,18 @@ public:
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
 	//IMessageHandler
-	virtual bool checkMessage(int AOrder, const Message &AMessage);
-	virtual bool showMessage(int AMessageId);
-	virtual bool receiveMessage(int AMessageId);
-	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
-	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
+	virtual bool messageDisplay(const Message &AMessage, int ADirection);
+	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
+	virtual bool messageShowWindow(int AMessageId);
+	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	// IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
 	IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	void updateWindow(IChatWindow *AWindow);
-	void removeActiveMessages(IChatWindow *AWindow);
+	void removeNotifiedMessages(IChatWindow *AWindow);
 	void showHistory(IChatWindow *AWindow);
 	void setMessageStyle(IChatWindow *AWindow);
 	void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
@@ -126,8 +126,8 @@ private:
 	IOptionsManager *FOptionsManager;
 private:
 	QList<IChatWindow *> FWindows;
-	QMultiMap<IChatWindow *,int> FActiveMessages;
 	QMap<IChatWindow *, QTimer *> FDestroyTimers;
+	QMultiMap<IChatWindow *, int> FNotifiedMessages;
 	QMap<IChatWindow *, WindowStatus> FWindowStatus;
 };
 

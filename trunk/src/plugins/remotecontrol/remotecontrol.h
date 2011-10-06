@@ -3,6 +3,7 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/dataformtypes.h>
+#include <definitions/messagedataroles.h>
 #include <definitions/stanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
@@ -46,13 +47,15 @@ public:
 	virtual bool receiveCommandRequest(const ICommandRequest &ARequest);
 	// IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
-private:
+protected:
 	bool processPing(const ICommandRequest &ARequest);
 	bool processLeaveMUC(const ICommandRequest &ARequest);
 	bool processSetStatus(const ICommandRequest &ARequest);
 	bool processFileTransfers(const ICommandRequest &ARequest);
 	bool processSetOptions(const ICommandRequest &ARequest);
 	bool processForwardMessages(const ICommandRequest &ARequest);
+protected:
+	QList<Message> notifiedMessages(const Jid &AContactJid = Jid::null) const;
 private:
 	ICommands *FCommands;
 	IStatusChanger *FStatusChanger;
@@ -64,6 +67,7 @@ private:
 	INotifications *FNotifications;
 private:
 	int FSHIMessageForward;
+	QMap<int, Message> FNotifiedMessages;
 };
 
 #endif // REMOTECONTROL_H

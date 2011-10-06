@@ -76,11 +76,11 @@ public:
 	virtual ITabPageNotifier *tabPageNotifier() const;
 	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
 	//IMessageHandler
-	virtual bool checkMessage(int AOrder, const Message &AMessage);
-	virtual bool showMessage(int AMessageId);
-	virtual bool receiveMessage(int AMessageId);
-	virtual INotification notifyMessage(INotifications *ANotifications, const Message &AMessage);
-	virtual bool createMessageWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
+	virtual bool messageDisplay(const Message &AMessage, int ADirection);
+	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
+	virtual bool messageShowWindow(int AMessageId);
+	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IMultiUserChatWindow
 	virtual Jid streamJid() const;
 	virtual Jid roomJid() const;
@@ -163,7 +163,6 @@ protected slots:
 	void onPresenceChanged(int AShow, const QString &AStatus);
 	void onSubjectChanged(const QString &ANick, const QString &ASubject);
 	void onServiceMessageReceived(const Message &AMessage);
-	void onMessageReceived(const QString &ANick, const Message &AMessage);
 	void onInviteDeclined(const Jid &AContactJid, const QString &AReason);
 	//Moderator
 	void onUserKicked(const QString &ANick, const QString &AReason, const QString &AByUser);

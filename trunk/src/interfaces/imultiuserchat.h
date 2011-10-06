@@ -138,10 +138,8 @@ protected:
 	virtual void userNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick) =0;
 	virtual void presenceChanged(int AShow, const QString &AStatus) =0;
 	virtual void serviceMessageReceived(const Message &AMessage) =0;
-	virtual void messageReceive(const QString &ANick, Message &AMessage) =0;
-	virtual void messageReceived(const QString &ANick, const Message &AMessage) =0;
-	virtual void messageSend(Message &AMessage) =0;
 	virtual void messageSent(const Message &AMessage) =0;
+	virtual void messageReceived(const QString &ANick, const Message &AMessage) =0;
 	virtual void inviteDeclined(const Jid &AContactJid, const QString &AReason) =0;
 	//Moderator
 	virtual void subjectChanged(const QString &ANick, const QString &ASubject) =0;
@@ -206,7 +204,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
-Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.0")
+Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.1")
 Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.1")
 Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.1")
 
