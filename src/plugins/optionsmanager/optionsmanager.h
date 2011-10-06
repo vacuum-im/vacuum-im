@@ -102,7 +102,7 @@ protected:
 	void importOldSettings();
 protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
-	void onOptionsDialogClosed();
+	void onOptionsDialogApplied();
 	void onChangeProfileByAction(bool);
 	void onShowOptionsDialogByAction(bool);
 	void onLoginDialogRejected();
