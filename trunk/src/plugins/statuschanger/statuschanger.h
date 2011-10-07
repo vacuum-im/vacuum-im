@@ -160,6 +160,7 @@ private:
 private:
 	int FConnectingLabel;
 	IPresence *FChangingPresence;
+   QSet<IPresence *> FFastReconnect;
 	QList<IPresence *> FShutdownList;
 	QMap<int, StatusItem> FStatusItems;
 	QSet<IPresence *> FMainStatusStreams;

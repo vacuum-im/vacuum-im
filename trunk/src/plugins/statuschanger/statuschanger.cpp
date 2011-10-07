@@ -640,6 +640,7 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 				FRostersView->insertFooterText(FTO_ROSTERSVIEW_STATUS,APresence->status(),index);
 			if (!FNotifyId.contains(APresence))
 				insertStatusNotification(APresence);
+         FFastReconnect -= APresence;
 		}
 		else
 		{
@@ -846,7 +847,7 @@ void StatusChanger::autoReconnect(IPresence *APresence)
 		int statusShow = statusItemShow(statusId);
 		if (statusShow!=IPresence::Offline && statusShow!=IPresence::Error)
 		{
-			const int reconSecs = 30;
+         int reconSecs = FFastReconnect.contains(APresence) ? 1 : 30;
 			FPendingReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(reconSecs),statusId));
 			QTimer::singleShot(reconSecs*1000+100,this,SLOT(onReconnectTimer()));
 		}
@@ -988,6 +989,11 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 			removeConnectingLabel(APresence);
 			FConnectStatus.remove(APresence);
 		}
+
+      if (AShow!= IPresence::Offline && AShow!=IPresence::Error)
+         FFastReconnect += APresence;
+      else
+         FFastReconnect -= APresence;
 	}
 }
 
@@ -1007,6 +1013,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 	removeStatusNotification(APresence);
 	removeTempStatus(APresence);
 
+   FFastReconnect -= APresence;
 	FMainStatusStreams -= APresence;
 	FMainStatusActions.remove(APresence);
 	FCurrentStatus.remove(APresence);
