@@ -640,7 +640,7 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 				FRostersView->insertFooterText(FTO_ROSTERSVIEW_STATUS,APresence->status(),index);
 			if (!FNotifyId.contains(APresence))
 				insertStatusNotification(APresence);
-         FFastReconnect -= APresence;
+			FFastReconnect -= APresence;
 		}
 		else
 		{
@@ -847,7 +847,7 @@ void StatusChanger::autoReconnect(IPresence *APresence)
 		int statusShow = statusItemShow(statusId);
 		if (statusShow!=IPresence::Offline && statusShow!=IPresence::Error)
 		{
-         int reconSecs = FFastReconnect.contains(APresence) ? 1 : 30;
+			int reconSecs = FFastReconnect.contains(APresence) ? 1 : 30;
 			FPendingReconnect.insert(APresence,QPair<QDateTime,int>(QDateTime::currentDateTime().addSecs(reconSecs),statusId));
 			QTimer::singleShot(reconSecs*1000+100,this,SLOT(onReconnectTimer()));
 		}
@@ -990,10 +990,10 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 			FConnectStatus.remove(APresence);
 		}
 
-      if (AShow!= IPresence::Offline && AShow!=IPresence::Error)
-         FFastReconnect += APresence;
-      else
-         FFastReconnect -= APresence;
+		if (AShow!= IPresence::Offline && AShow!=IPresence::Error)
+			FFastReconnect += APresence;
+		else
+			FFastReconnect -= APresence;
 	}
 }
 
@@ -1013,7 +1013,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 	removeStatusNotification(APresence);
 	removeTempStatus(APresence);
 
-   FFastReconnect -= APresence;
+	FFastReconnect -= APresence;
 	FMainStatusStreams -= APresence;
 	FMainStatusActions.remove(APresence);
 	FCurrentStatus.remove(APresence);
@@ -1026,7 +1026,7 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
 
 	updateMainMenu();
-   updateTrayToolTip();
+	updateTrayToolTip();
 }
 
 void StatusChanger::onRosterOpened(IRoster *ARoster)
