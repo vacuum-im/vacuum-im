@@ -552,17 +552,16 @@ void ChatMessageHandler::onMessageReady()
 
 void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
 {
-	if (AField==IInfoWidget::ContactStatus || AField==IInfoWidget::ContactName)
+	Q_UNUSED(AValue);
+	if (AField==IInfoWidget::ContactShow || AField==IInfoWidget::ContactStatus || AField==IInfoWidget::ContactName)
 	{
 		IInfoWidget *widget = qobject_cast<IInfoWidget *>(sender());
 		IChatWindow *window = widget!=NULL ? findWindow(widget->streamJid(),widget->contactJid()) : NULL;
 		if (window)
 		{
-			Jid streamJid = window->streamJid();
-			Jid contactJid = window->contactJid();
-			if (AField == IInfoWidget::ContactStatus)
+			if (AField==IInfoWidget::ContactShow || AField==IInfoWidget::ContactStatus)
 			{
-				QString status = AValue.toString();
+				QString status = widget->field(IInfoWidget::ContactStatus).toString();
 				QString show = FStatusChanger ? FStatusChanger->nameByShow(widget->field(IInfoWidget::ContactShow).toInt()) : QString::null;
 				WindowStatus &wstatus = FWindowStatus[window];
 				if (Options::node(OPV_MESSAGES_SHOWSTATUS).value().toBool() && wstatus.lastStatusShow!=status+show)
