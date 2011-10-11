@@ -41,12 +41,24 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &AInitOrde
 	if (plugin)
 	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		if (FPresencePlugin)
+		{
+			connect(FPresencePlugin->instance(),SIGNAL(presenceChanged(IPresence *, int, const QString &, int)),
+				SLOT(onPresenceChanged(IPresence *, int , const QString &, int)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
 	{
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		if (FRosterPlugin)
+		{
+			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
@@ -165,14 +177,7 @@ QVariant StatusIcons::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
 	if (ARole == Qt::DecorationRole)
 	{
-		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
-		if (contactJid.isValid())
-		{
-			int show = AIndex->data(RDR_SHOW).toInt();
-			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
-			bool ask = !AIndex->data(RDR_ASK).toString().isEmpty();
-			return iconByJidStatus(contactJid,show,subscription,ask);
-		}
+		return iconByJid(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString());
 	}
 	return QVariant();
 }
@@ -312,20 +317,28 @@ QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 
 QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
-	int show = presence!=NULL ? presence->presenceItem(AContactJid).show : IPresence::Offline;
-
 	bool ask = false;
+	int show = IPresence::Offline;
 	QString subscription = SUBSCRIPTION_NONE;
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-	if (roster)
+
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	if (AStreamJid == AContactJid)
 	{
-		IRosterItem ritem = roster->rosterItem(AContactJid);
-		if (ritem.isValid)
-		{
-			subscription = ritem.subscription;
-			ask = !ritem.ask.isEmpty();
-		}
+		subscription = SUBSCRIPTION_BOTH;
+		show = presence!=NULL ? presence->show() : show;
+	}
+	else if (AStreamJid && AContactJid)
+	{
+		subscription = SUBSCRIPTION_BOTH;
+		show = presence!=NULL ? presence->presenceItem(AContactJid).show : show;
+	}
+	else
+	{
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+		IRosterItem ritem = roster!=NULL ? roster->rosterItem(AContactJid) : IRosterItem();
+		ask = !ritem.ask.isEmpty();
+		subscription = ritem.subscription;
+		show = presence!=NULL ? presence->presenceItem(AContactJid).show : show;
 	}
 	return iconKeyByStatus(show,subscription,ask);
 }
@@ -444,6 +457,32 @@ void StatusIcons::onStatusIconsChangedTimer()
 	emit statusIconsChanged();
 	emit rosterDataChanged(NULL,Qt::DecorationRole);
 	FStatusIconsChangedStarted = false;
+}
+
+void StatusIcons::onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority)
+{
+	Q_UNUSED(AShow); Q_UNUSED(AStatus); Q_UNUSED(APriority);
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
+	if (index)
+		emit rosterDataChanged(index,Qt::DecorationRole);
+}
+
+void StatusIcons::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
+{
+	if (FRostersModel && (AItem.subscription!=ABefore.subscription || AItem.ask!=ABefore.ask))
+	{
+		foreach (IRosterIndex *index, FRostersModel->getContactIndexList(ARoster->streamJid(),AItem.itemJid))
+			emit rosterDataChanged(index,Qt::DecorationRole);
+	}
+}
+
+void StatusIcons::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
+{
+	if (FRostersModel && AItem.show!=ABefore.show)
+	{
+		foreach (IRosterIndex *index, FRostersModel->getContactIndexList(APresence->streamJid(),AItem.itemJid))
+			emit rosterDataChanged(index,Qt::DecorationRole);
+	}
 }
 
 void StatusIcons::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
