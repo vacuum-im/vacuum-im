@@ -68,6 +68,11 @@ https://build.opensuse.org/project/show?project=home%3AEGDFree
 sudo zypper ar -f  http://download.opensuse.org/repositories/network/openSUSE_11.4/ vacuum-im
 }}}
 
+Если используется Tumbleweed:
+{{{
+sudo zypper ar -f http://download.opensuse.org/repositories/openSUSE:/Tumbleweed/standard/ vacuum-im
+}}}
+
 === vacuum-im (unstable, vcs) ===
 Для получения новейшей версии из git-репозитория разработки:
 {{{
