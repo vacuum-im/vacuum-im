@@ -330,14 +330,13 @@ void InfoWidget::onAccountChanged(const OptionsNode &ANode)
 
 void InfoWidget::onRosterItemReceived(const IRosterItem &AItem, const IRosterItem &ABefore)
 {
-	Q_UNUSED(ABefore);
-	if (isFiledAutoUpdated(ContactName) && (AItem.itemJid && FContactJid))
+	if (isFiledAutoUpdated(ContactName) && (AItem.itemJid && FContactJid) && AItem.name!=ABefore.name)
 		autoUpdateField(ContactName);
 }
 
 void InfoWidget::onPresenceItemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	if (AItem.itemJid==FContactJid && (AItem.show!=ABefore.show && AItem.status!=ABefore.status))
+	if (AItem.itemJid==FContactJid && (AItem.show!=ABefore.show || AItem.status!=ABefore.status))
 	{
 		if (isFiledAutoUpdated(ContactShow))
 			setField(ContactShow,AItem.show);
