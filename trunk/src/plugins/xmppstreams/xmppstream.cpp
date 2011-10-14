@@ -27,11 +27,8 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 
 XmppStream::~XmppStream()
 {
-	close();
-
-	foreach(IXmppFeature *feature, FActiveFeatures.toSet())
-		delete feature->instance();
-
+	abort(tr("XMPP stream destroyed"));
+	clearActiveFeatures();
 	emit streamDestroyed();
 }
 
@@ -369,6 +366,13 @@ void XmppStream::processFeatures()
 	}
 }
 
+void XmppStream::clearActiveFeatures()
+{
+	foreach(IXmppFeature *feature, FActiveFeatures.toSet())
+		delete feature->instance();
+	FActiveFeatures.clear();
+}
+
 void XmppStream::setStreamState(StreamState AState)
 {
 	if (FPasswordDialog)
@@ -493,6 +497,7 @@ void XmppStream::onConnectionDisconnected()
 	removeXmppStanzaHandler(XSHO_XMPP_STREAM,this);
 	emit closed();
 
+	clearActiveFeatures();
 	if (FOfflineJid.isValid())
 	{
 		setStreamJid(FOfflineJid);

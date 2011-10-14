@@ -80,6 +80,7 @@ signals:
 protected:
 	void startStream();
 	void processFeatures();
+	void clearActiveFeatures();
 	void setStreamState(StreamState AState);
 	bool startFeature(const QString &AFeatureNS, const QDomElement &AFeatureElem);
 	bool processDataHandlers(QByteArray &AData, bool ADataOut);

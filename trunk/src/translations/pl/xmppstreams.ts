@@ -31,6 +31,10 @@
         <source>Secure connection is not established</source>
         <translation>Brak możliwości bezpiecznego połączenia</translation>
     </message>
+    <message>
+        <source>XMPP stream destroyed</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>XmppStreams</name>
