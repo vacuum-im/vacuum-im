@@ -19,6 +19,31 @@ MultiUser::~MultiUser()
 
 }
 
+Jid MultiUser::roomJid() const
+{
+	return FRoomJid;
+}
+
+Jid MultiUser::contactJid() const
+{
+	return FContactJid;
+}
+
+QString MultiUser::nickName() const
+{
+	return FNickName;
+}
+
+QString MultiUser::role() const
+{
+	return data(MUDR_ROLE).toString();
+}
+
+QString MultiUser::affiliation() const
+{
+	return data(MUDR_AFFILIATION).toString();
+}
+
 QVariant MultiUser::data(int ARole) const
 {
 	return FData.value(ARole);

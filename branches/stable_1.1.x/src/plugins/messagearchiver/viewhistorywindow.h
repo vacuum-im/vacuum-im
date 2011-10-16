@@ -51,17 +51,17 @@ public:
 	ViewHistoryWindow(IMessageArchiver *AArchiver, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent = NULL);
 	~ViewHistoryWindow();
 	virtual QMainWindow *instance() { return this; }
-	virtual const Jid &streamJid() const { return FStreamJid; }
-	virtual ToolBarChanger *collectionTools() const { return FCollectionTools; }
-	virtual ToolBarChanger *messagesTools() const { return FMessagesTools->toolBarChanger(); }
+	virtual const Jid &streamJid() const;
+	virtual ToolBarChanger *collectionTools() const;
+	virtual ToolBarChanger *messagesTools() const;
 	virtual bool isHeaderAccepted(const IArchiveHeader &AHeader) const;
 	virtual QList<IArchiveHeader> currentHeaders() const;
 	virtual QStandardItem *findHeaderItem(const IArchiveHeader &AHeader, QStandardItem *AParent = NULL) const;
-	virtual int groupKind() const { return FGroupKind; }
+	virtual int groupKind() const;
 	virtual void setGroupKind(int AGroupKind);
-	virtual int archiveSource() const {return FSource; }
+	virtual int archiveSource() const;
 	virtual void setArchiveSource(int ASource);
-	virtual const IArchiveFilter &filter() const { return FFilter; }
+	virtual const IArchiveFilter &filter() const;
 	virtual void setFilter(const IArchiveFilter &AFilter);
 	virtual void reload();
 signals:
