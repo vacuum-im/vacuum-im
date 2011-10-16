@@ -238,7 +238,7 @@ IRosterIndex *RostersModel::createRosterIndex(int AType, IRosterIndex *AParent)
 
 IRosterIndex *RostersModel::findGroupIndex(int AType, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const
 {
-	QString groupPath = AGroup.isEmpty() ? singleGroupName(AType) : AGroup;
+	QString groupPath = getGroupName(AType,AGroup);
 	QList<QString> groupTree = groupPath.split(AGroupDelim,QString::SkipEmptyParts);
 
 	IRosterIndex *groupIndex = AParent;
@@ -261,7 +261,7 @@ IRosterIndex *RostersModel::createGroupIndex(int AType, const QString &AGroup, c
 	IRosterIndex *groupIndex = findGroupIndex(AType,AGroup,AGroupDelim,AParent);
 	if (!groupIndex)
 	{
-		QString groupPath = AGroup.isEmpty() ? singleGroupName(AType) : AGroup;
+		QString groupPath = getGroupName(AType,AGroup);
 		QList<QString> groupTree = groupPath.split(AGroupDelim,QString::SkipEmptyParts);
 
 		int i = 0;
@@ -360,7 +360,7 @@ QString RostersModel::singleGroupName(int AType) const
 
 void RostersModel::registerSingleGroup(int AType, const QString &AName)
 {
-	if (!FSingleGroups.contains(AType))
+	if (!FSingleGroups.contains(AType) && !AName.trimmed().isEmpty())
 		FSingleGroups.insert(AType,AName);
 }
 
@@ -436,6 +436,15 @@ void RostersModel::insertChangedIndex(IRosterIndex *AIndex)
 void RostersModel::removeChangedIndex(IRosterIndex *AIndex)
 {
 	FChangedIndexes -= AIndex;
+}
+
+QString RostersModel::getGroupName(int AType, const QString &AGroup) const
+{
+	if (FSingleGroups.contains(AType))
+		return singleGroupName(AType);
+	else if (AGroup.isEmpty())
+		return singleGroupName(RIT_GROUP_BLANK);
+	return AGroup;
 }
 
 QList<IRosterIndex *> RostersModel::findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, bool ABare, IRosterIndex *AParent) const
