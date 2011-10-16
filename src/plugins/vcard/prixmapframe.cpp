@@ -23,6 +23,7 @@ QPixmap PrixmapFrame::pixmap() const
 void PrixmapFrame::setPixmap(const QPixmap &APixmap)
 {
 	FPixmap = APixmap;
+	update();
 }
 
 QSize PrixmapFrame::sizeHint() const

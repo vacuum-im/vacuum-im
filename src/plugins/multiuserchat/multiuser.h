@@ -11,21 +11,22 @@ class MultiUser :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMultiUser);
+	friend class MultiUserChat;
 public:
 	MultiUser(const Jid &ARoomJid, const QString &ANickName, QObject *AParent);
 	~MultiUser();
 	virtual QObject *instance() { return this; }
-	virtual Jid roomJid() const { return FRoomJid; }
-	virtual Jid contactJid() const { return FContactJid; }
-	virtual QString nickName() const { return FNickName; }
-	virtual QString role() const { return data(MUDR_ROLE).toString(); }
-	virtual QString affiliation() const { return data(MUDR_AFFILIATION).toString(); }
+	virtual Jid roomJid() const;
+	virtual Jid contactJid() const;
+	virtual QString nickName() const;
+	virtual QString role() const;
+	virtual QString affiliation() const;
 	virtual QVariant data(int ARole) const;
 	virtual void setData(int ARole, const QVariant &AValue);
-public:
-	void setNickName(const QString &ANickName);
 signals:
 	void dataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
+protected:
+	void setNickName(const QString &ANickName);
 private:
 	Jid FRoomJid;
 	Jid FContactJid;

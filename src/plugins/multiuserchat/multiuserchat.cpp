@@ -250,16 +250,15 @@ void MultiUserChat::setNickName(const QString &ANick)
 {
 	if (isOpen())
 	{
-		if (userByNick(ANick) == NULL)
-		{
-			Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
-			Stanza presence("presence");
-			presence.setTo(userJid.eFull());
-			FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
-		}
+		Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
+		Stanza presence("presence");
+		presence.setTo(userJid.eFull());
+		FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
 	}
 	else
+	{
 		FNickName = ANick;
+	}
 }
 
 QString MultiUserChat::password() const
@@ -312,10 +311,12 @@ void MultiUserChat::setPresence(int AShow, const QString &AStatus)
 			showText = "xa";
 			break;
 		}
+
 		if (AShow == IPresence::Offline || AShow == IPresence::Error || AShow == IPresence::Invisible)
 			presence.setType("unavailable");
 		else if (!showText.isEmpty())
 			presence.addElement("show").appendChild(presence.createTextNode(showText));
+
 		if (!AStatus.isEmpty())
 			presence.addElement("status").appendChild(presence.createTextNode(AStatus));
 
@@ -615,7 +616,7 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 	if (AStanza.type() == "error")
 	{
 		ErrorHandler err(AStanza.element());
-		emit chatError(err.message());
+		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.message()) : err.message());
 	}
 	else if (message.type() == Message::GroupChat && !message.stanza().firstElement("subject").isNull())
 	{
@@ -735,16 +736,23 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			if (FStatusCodes.contains(MUC_SC_NICK_CHANGED))       //ChangeNick
 			{
 				QString newNick = itemElem.attribute("nick");
-				FUsers.remove(fromNick);
-				FUsers.insert(newNick,user);
-				user->setNickName(newNick);
-				emit userNickChanged(user,fromNick,newNick);
-				if (user == FMainUser)
+				if (!newNick.isEmpty())
 				{
-					FNickName = newNick;
-					setPresence(FShow,FStatus);
+					if (!FUsers.contains(newNick))
+					{
+						applyPresence = false;
+						FUsers.remove(fromNick);
+						FUsers.insert(newNick,user);
+					}
+					user->setNickName(newNick);
+					emit userNickChanged(user,fromNick,newNick);
+
+					if (user == FMainUser)
+					{
+						FNickName = newNick;
+						setPresence(FShow,FStatus);
+					}
 				}
-				applyPresence = false;
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_KICKED))   //User kicked
 			{
@@ -786,26 +794,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	else if (AStanza.type() == "error")
 	{
 		ErrorHandler err(AStanza.element());
-		MultiUser *user = FUsers.value(fromNick);
-		if (user)
-		{
-			user->setData(MUDR_SHOW,IPresence::Error);
-			user->setData(MUDR_STATUS,err.message());
-			emit userPresence(user,IPresence::Error,err.message());
-		}
-		emit chatError(err.message());
-
-		if (fromNick != FNickName)
-		{
-			FUsers.remove(fromNick);
-			delete user;
-		}
-		else
-		{
-			FErrorCode = err.code();
-			closeChat(IPresence::Error,err.message());
-		}
-
+		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.message()) : err.message());
 		accepted = true;
 	}
 
