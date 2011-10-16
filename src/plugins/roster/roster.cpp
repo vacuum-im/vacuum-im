@@ -508,7 +508,9 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 					QDomElement groupElem = itemElem.firstChildElement("group");
 					while (!groupElem.isNull())
 					{
-						allItemGroups += groupElem.text();
+						QString group = groupElem.text();
+						if (!group.trimmed().isEmpty())
+							allItemGroups += group;
 						groupElem = groupElem.nextSiblingElement("group");
 					}
 					ritem.groups = allItemGroups;

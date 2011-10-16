@@ -74,6 +74,7 @@ protected:
 	void insertDefaultDataHolders(IRosterIndex *AIndex);
 	void insertChangedIndex(IRosterIndex *AIndex);
 	void removeChangedIndex(IRosterIndex *AIndex);
+	QString getGroupName(int AType, const QString &AGroup) const;
 	QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, bool ABare, IRosterIndex *AParent = NULL) const;
 protected slots:
 	void onAccountShown(IAccount *AAccount);
