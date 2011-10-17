@@ -138,30 +138,20 @@ void Compression::stopZlib()
 
 void Compression::processData(QByteArray &AData, bool ADataOut)
 {
-	if (AData.size()>0)
+	if (AData.size() > 0)
 	{
-		z_streamp zstream;
-		int (*zfunc) OF((z_streamp strm, int flush));
-		if (ADataOut)
-		{
-			zstream = &FDefStruc;
-			zfunc = deflate;
-		}
-		else
-		{
-			zstream = &FInfStruc;
-			zfunc = inflate;
-		}
-
 		int ret;
 		int dataPosOut = 0;
+
+		z_streamp zstream = ADataOut ? &FDefStruc : &FInfStruc;
 		zstream->avail_in = AData.size();
 		zstream->next_in = (Bytef *)(AData.constData());
+
 		do
 		{
 			zstream->avail_out = FOutBuffer.capacity() - dataPosOut;
 			zstream->next_out = (Bytef *)(FOutBuffer.data() + dataPosOut);
-			ret = zfunc(zstream,Z_SYNC_FLUSH);
+			ret = ADataOut ? deflate(zstream,Z_SYNC_FLUSH) : inflate(zstream,Z_SYNC_FLUSH);
 			switch (ret)
 			{
 			case Z_OK:
