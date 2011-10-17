@@ -41,6 +41,10 @@ MultiUserChat::~MultiUserChat()
 		FStanzaProcessor->removeStanzaHandle(FSHIPresence);
 		FStanzaProcessor->removeStanzaHandle(FSHIMessage);
 	}
+	if (FMessageProcessor)
+	{
+		FMessageProcessor->removeMessageEditor(MEO_MULTIUSERCHAT,this);
+	}
 	emit chatDestroyed();
 }
 
