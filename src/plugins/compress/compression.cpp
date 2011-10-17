@@ -173,7 +173,7 @@ void Compression::processData(QByteArray &AData, bool ADataOut)
 				emit error(tr("Invalid compression level"));
 				break;
 			case Z_DATA_ERROR:
-				emit error(tr("invalid or incomplete deflate data"));
+				emit error(tr("Invalid or incomplete deflate data"));
 				break;
 			case Z_MEM_ERROR:
 				emit error(tr("Out of memory for Zlib"));
@@ -181,6 +181,8 @@ void Compression::processData(QByteArray &AData, bool ADataOut)
 			case Z_VERSION_ERROR:
 				emit error(tr("Zlib version mismatch!"));
 				break;
+			default:
+				emit error(tr("Unknown Zlib error, %1").arg(ret));
 			}
 		} while (ret == Z_OK && zstream->avail_out == 0);
 		AData.resize(dataPosOut);

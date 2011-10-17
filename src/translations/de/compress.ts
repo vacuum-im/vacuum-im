@@ -27,10 +27,6 @@
         <translation>Ungültiges Kompressionslevel</translation>
     </message>
     <message>
-        <source>invalid or incomplete deflate data</source>
-        <translation>ungültige oder unvollständige Entpackungsdaten</translation>
-    </message>
-    <message>
         <source>Out of memory for Zlib</source>
         <translation>Nicht genügend Speicher für Zlib</translation>
     </message>
@@ -41,6 +37,14 @@
     <message>
         <source>Wrong compression negotiation response</source>
         <translation>Falsche Kompressions Verhandlungsantwort</translation>
+    </message>
+    <message>
+        <source>Invalid or incomplete deflate data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Zlib error, %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
