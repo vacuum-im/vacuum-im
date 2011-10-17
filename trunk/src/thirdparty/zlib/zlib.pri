@@ -7,18 +7,23 @@ HEADERS = crc32.h \
           trees.h \
           zconf.h \
           zlib.h \
-          zutil.h
+          zutil.h \
+          gzguts.h
 
 SOURCES = adler32.c \
           compress.c \
           crc32.c \
           deflate.c \
-          gzio.c \
           infback.c \
           inffast.c \
           inflate.c \
           inftrees.c \
           trees.c \
           uncompr.c \
-          zutil.c
+          zutil.c \
+          gzclose.c \
+          gzlib.c \
+          gzread.c \
+          gzwrite.c
+
 

@@ -27,10 +27,6 @@
         <translation>Неправильний рівень стиснення</translation>
     </message>
     <message>
-        <source>invalid or incomplete deflate data</source>
-        <translation>Некоректні або неповні стиснені дані</translation>
-    </message>
-    <message>
         <source>Out of memory for Zlib</source>
         <translation>Не вистачає пам&apos;яті  для Zlib</translation>
     </message>
@@ -41,6 +37,14 @@
     <message>
         <source>Wrong compression negotiation response</source>
         <translation>Некоректна відповідь під час ініціалізації стиснення</translation>
+    </message>
+    <message>
+        <source>Invalid or incomplete deflate data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown Zlib error, %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
