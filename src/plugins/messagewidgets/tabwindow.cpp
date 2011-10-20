@@ -77,7 +77,7 @@ Menu *TabWindow::windowMenu() const
 
 void TabWindow::addPage(ITabWindowPage *APage)
 {
-	if (ui.twtTabs->indexOf(APage->instance()) < 0)
+	if (APage && ui.twtTabs->indexOf(APage->instance())<0)
 	{
 		int index = ui.twtTabs->addTab(APage->instance(),APage->instance()->windowTitle());
 		connect(APage->instance(),SIGNAL(windowShow()),SLOT(onTabPageShow()));
@@ -92,7 +92,7 @@ void TabWindow::addPage(ITabWindowPage *APage)
 
 bool TabWindow::hasPage(ITabWindowPage *APage) const
 {
-	return ui.twtTabs->indexOf(APage->instance()) >= 0;
+	return APage!=NULL && ui.twtTabs->indexOf(APage->instance())>=0;
 }
 
 ITabWindowPage *TabWindow::currentPage() const
@@ -102,21 +102,25 @@ ITabWindowPage *TabWindow::currentPage() const
 
 void TabWindow::setCurrentPage(ITabWindowPage *APage)
 {
-	ui.twtTabs->setCurrentWidget(APage->instance());
+	if (APage)
+		ui.twtTabs->setCurrentWidget(APage->instance());
 }
 
 void TabWindow::detachPage(ITabWindowPage *APage)
 {
-	removePage(APage);
-	APage->instance()->show();
-	if (APage->instance()->x()<=0 || APage->instance()->y()<0)
-		APage->instance()->move(0,0);
-	emit pageDetached(APage);
+	if (hasPage(APage))
+	{
+		removePage(APage);
+		APage->instance()->show();
+		if (APage->instance()->x()<=0 || APage->instance()->y()<0)
+			APage->instance()->move(0,0);
+		emit pageDetached(APage);
+	}
 }
 
 void TabWindow::removePage(ITabWindowPage *APage)
 {
-	int index = ui.twtTabs->indexOf(APage->instance());
+	int index = APage!=NULL ? ui.twtTabs->indexOf(APage->instance()) : -1;
 	if (index >= 0)
 	{
 		ui.twtTabs->removeTab(index);
@@ -323,9 +327,7 @@ void TabWindow::onTabChanged(int AIndex)
 
 void TabWindow::onTabCloseRequested(int AIndex)
 {
-	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(ui.twtTabs->widget(AIndex));
-	if (page)
-		removePage(page);
+	removePage(qobject_cast<ITabWindowPage *>(ui.twtTabs->widget(AIndex)));
 }
 
 void TabWindow::onTabPageShow()
@@ -340,9 +342,7 @@ void TabWindow::onTabPageShow()
 
 void TabWindow::onTabPageClose()
 {
-	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(sender());
-	if (page)
-		removePage(page);
+	removePage(qobject_cast<ITabWindowPage *>(sender()));
 }
 
 void TabWindow::onTabPageChanged()
@@ -359,9 +359,7 @@ void TabWindow::onTabPageChanged()
 
 void TabWindow::onTabPageDestroyed()
 {
-	ITabWindowPage *page = qobject_cast<ITabWindowPage *>(sender());
-	if (page)
-		removePage(page);
+	removePage(qobject_cast<ITabWindowPage *>(sender()));
 }
 
 void TabWindow::onTabWindowAppended(const QUuid &AWindowId, const QString &AName)
