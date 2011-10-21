@@ -3180,7 +3180,7 @@ void _multicast_update_publish(jdns_session_t *s, int id, const jdns_rr_t *rr)
 {
 	mdnsdr r;
 	published_item_t *pub;
-	int qtype;
+	//int qtype;
 	int n;
 
 	pub = 0;
@@ -3196,7 +3196,7 @@ void _multicast_update_publish(jdns_session_t *s, int id, const jdns_rr_t *rr)
 	if(!pub)
 		return;
 
-	qtype = pub->qtype;
+	//qtype = pub->qtype;
 	r = pub->rec;
 
 	// expire existing record.  this is mostly needed for shared records
