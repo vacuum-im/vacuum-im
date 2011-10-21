@@ -412,7 +412,6 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QImage &AImage, const char 
 	IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
 	if (vcard)
 	{
-		const static QSize maxSize = QSize(96,96);
 		QImage avatar = AImage.width()>96 || AImage.height()>96 ? AImage.scaled(QSize(96,96),Qt::KeepAspectRatio,Qt::SmoothTransformation) : AImage;
 		vcard->setPhotoImage(avatar, AFormat);
 		published = FVCardPlugin->publishVCard(vcard,AStreamJid);
