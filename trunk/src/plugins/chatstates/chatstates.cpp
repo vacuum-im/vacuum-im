@@ -166,7 +166,7 @@ bool ChatStates::initObjects()
 		notifyType.title = tr("When contact is typing the message for you");
 		notifyType.kindMask = INotification::TabPageNotify;
 		notifyType.kindDefs = notifyType.kindMask;
-		FNotifications->registerNotificationType(NID_CHATSTATE_TYPING,notifyType);
+		FNotifications->registerNotificationType(NNT_CHATSTATE_TYPING,notifyType);
 	}
 	return true;
 }
@@ -556,10 +556,10 @@ void ChatStates::notifyUserState(const Jid &AStreamJid, const Jid &AContactJid)
 			if (window)
 			{
 				INotification notify;
-				notify.kinds = FNotifications->notificationKinds(NID_CHATSTATE_TYPING);
+				notify.kinds = FNotifications->notificationKinds(NNT_CHATSTATE_TYPING);
 				if (notify.kinds > 0)
 				{
-					notify.typeId = NID_CHATSTATE_TYPING;
+					notify.typeId = NNT_CHATSTATE_TYPING;
 					notify.data.insert(NDR_STREAM_JID, AStreamJid.full());
 					notify.data.insert(NDR_CONTACT_JID, AContactJid.full());
 					notify.data.insert(NDR_ICON, IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATSTATES_COMPOSING));
