@@ -13,6 +13,6 @@
 #define NNT_SESSION_NEGOTIATION       "SessionNegotiation"
 #define NNT_CONNECTION_ERROR          "ConnectionError"
 #define NNT_BIRTHDAY                  "Birthday"
-#define NID_CHATSTATE_TYPING          "ChatStateTyping"
+#define NNT_CHATSTATE_TYPING          "ChatStateTyping"
 
 #endif // DEF_NOTIFICATIONTYPES_H
