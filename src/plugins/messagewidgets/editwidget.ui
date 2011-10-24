@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
+    <width>506</width>
     <height>71</height>
    </rect>
   </property>
@@ -21,17 +21,7 @@
     <widget class="MessageEditor" name="medEditor"/>
    </item>
    <item>
-    <widget class="QToolButton" name="tlbSend">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="toolTip">
-      <string>Send</string>
-     </property>
-    </widget>
+    <widget class="QWidget" name="wdtSendToolBar" native="true"/>
    </item>
   </layout>
  </widget>

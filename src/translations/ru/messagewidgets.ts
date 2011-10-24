@@ -9,7 +9,7 @@
     </message>
 </context>
 <context>
-    <name>EditWidgetClass</name>
+    <name>EditWidget</name>
     <message>
         <source>Send</source>
         <translation>Отправить</translation>

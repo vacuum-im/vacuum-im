@@ -34,7 +34,7 @@ MessageWindow::MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStrea
 	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid,ui.wdtMessage);
 	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid,ui.wdtMessage);
 	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
-	FEditWidget->setSendButtonVisible(false);
+	FEditWidget->setSendToolBarVisible(false);
 	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 
 	ui.wdtToolBar->setLayout(new QVBoxLayout(ui.wdtToolBar));

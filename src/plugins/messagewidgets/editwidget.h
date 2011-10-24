@@ -8,6 +8,7 @@
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/toolbarchanger.h>
 #include "ui_editwidget.h"
 
 class EditWidget :
@@ -34,8 +35,9 @@ public:
 	virtual void setMinimumLines(int ALines);
 	virtual QString sendShortcut() const;
 	virtual void setSendShortcut(const QString &AShortcutId);
-	virtual bool sendButtonVisible() const;
-	virtual void setSendButtonVisible(bool AVisible);
+	virtual bool sendToolBarVisible() const;
+	virtual void setSendToolBarVisible(bool AVisible);
+	virtual ToolBarChanger *sendToolBarChanger() const;
 	virtual bool textFormatEnabled() const;
 	virtual void setTextFormatEnabled(bool AEnabled);
 signals:
@@ -57,7 +59,9 @@ protected:
 	void showNextBufferedMessage();
 	void showPrevBufferedMessage();
 protected slots:
-	void onSendButtonCliked(bool);
+	void updateSendToolBarMaxWidth();
+protected slots:
+	void onSendActionTriggered(bool);
 	void onShortcutUpdated(const QString &AId);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onOptionsChanged(const OptionsNode &ANode);
@@ -74,6 +78,7 @@ private:
 	QList<QString> FBuffer;
 	QString FSendShortcutId;
 	QKeySequence FSendShortcut;
+	ToolBarChanger *FSendToolBar;
 };
 
 #endif // EDITWIDGET_H

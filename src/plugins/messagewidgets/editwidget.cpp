@@ -13,11 +13,31 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FMessageWidgets = AMessageWidgets;
 	FStreamJid = AStreamJid;
 	FContactJid = AContactJid;
+	
 	FBufferPos = -1;
 	FFormatEnabled = false;
 
-	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(ui.tlbSend,MNI_MESSAGEWIDGETS_SEND);
-	connect(ui.tlbSend,SIGNAL(clicked(bool)),SLOT(onSendButtonCliked(bool)));
+	QToolBar *toolBar = new QToolBar;
+	toolBar->setMovable(false);
+	toolBar->setFloatable(false);
+	toolBar->setIconSize(QSize(16,16));
+	toolBar->layout()->setMargin(0);
+	toolBar->setStyleSheet("QToolBar { border: none; }");
+	toolBar->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+
+	ui.wdtSendToolBar->setLayout(new QHBoxLayout);
+	ui.wdtSendToolBar->layout()->setMargin(0);
+	ui.wdtSendToolBar->layout()->addWidget(toolBar);
+
+	Action *sendAction = new Action(toolBar);
+	sendAction->setToolTip(tr("Send"));
+	sendAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEWIDGETS_SEND);
+	connect(sendAction,SIGNAL(triggered(bool)),SLOT(onSendActionTriggered(bool)));
+
+	FSendToolBar = new ToolBarChanger(toolBar);
+	FSendToolBar->toolBar()->installEventFilter(this);
+	QToolButton *sendButton = FSendToolBar->insertAction(sendAction);
+	sendButton->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
 	ui.medEditor->installEventFilter(this);
 	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE,ui.medEditor);
@@ -52,7 +72,7 @@ void EditWidget::setStreamJid(const Jid &AStreamJid)
 	}
 }
 
-const Jid & EditWidget::contactJid() const
+const Jid &EditWidget::contactJid() const
 {
 	return FContactJid;
 }
@@ -131,14 +151,19 @@ void EditWidget::setSendShortcut(const QString &AShortcutId)
 	}
 }
 
-bool EditWidget::sendButtonVisible() const
+bool EditWidget::sendToolBarVisible() const
 {
-	return ui.tlbSend->isVisible();
+	return FSendToolBar->toolBar()->isVisible();
 }
 
-void EditWidget::setSendButtonVisible(bool AVisible)
+void EditWidget::setSendToolBarVisible(bool AVisible)
 {
-	ui.tlbSend->setVisible(AVisible);
+	FSendToolBar->toolBar()->setVisible(AVisible);
+}
+
+ToolBarChanger *EditWidget::sendToolBarChanger() const
+{
+	return FSendToolBar;
 }
 
 bool EditWidget::textFormatEnabled() const
@@ -154,22 +179,33 @@ void EditWidget::setTextFormatEnabled(bool AEnabled)
 bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
 	bool hooked = false;
-	if (AWatched==ui.medEditor && AEvent->type()==QEvent::KeyPress)
+	if (AWatched == ui.medEditor)
 	{
-		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-		if (FSendShortcut[0] == keyEvent->key()+keyEvent->modifiers())
+		if (AEvent->type() == QEvent::KeyPress)
+		{
+			QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
+			if (FSendShortcut[0] == keyEvent->key()+keyEvent->modifiers())
+			{
+				hooked = true;
+				onShortcutActivated(FSendShortcutId,ui.medEditor);
+			}
+			else
+			{
+				emit keyEventReceived(keyEvent,hooked);
+			}
+		}
+		else if (AEvent->type() == QEvent::ShortcutOverride)
 		{
 			hooked = true;
-			onShortcutActivated(FSendShortcutId,ui.medEditor);
-		}
-		else
-		{
-			emit keyEventReceived(keyEvent,hooked);
 		}
 	}
-	else if (AWatched==ui.medEditor && AEvent->type()==QEvent::ShortcutOverride)
+	else if (AWatched == FSendToolBar->toolBar())
 	{
-		hooked = true;
+		static const QList<QEvent::Type> eventTypes = QList<QEvent::Type>() 
+			<< QEvent::ChildAdded << QEvent::ChildRemoved << QEvent::Show;
+
+		if (eventTypes.contains(AEvent->type()))
+			QTimer::singleShot(0,this,SLOT(updateSendToolBarMaxWidth()));
 	}
 	return hooked || QWidget::eventFilter(AWatched,AEvent);
 }
@@ -217,7 +253,23 @@ void EditWidget::showPrevBufferedMessage()
 	}
 }
 
-void EditWidget::onSendButtonCliked(bool)
+void EditWidget::updateSendToolBarMaxWidth()
+{
+	int widgetWidth = 0;
+	int visibleItemsCount = 0;
+	for (int itemIndex=0; itemIndex<FSendToolBar->toolBar()->layout()->count(); itemIndex++)
+	{
+		QWidget *widget = FSendToolBar->toolBar()->layout()->itemAt(itemIndex)->widget();
+		if (widget && widget->isVisible())
+		{
+			visibleItemsCount++;
+			widgetWidth = widget->sizeHint().width();
+		}
+	}
+	FSendToolBar->toolBar()->setMaximumWidth(visibleItemsCount>1 ? QWIDGETSIZE_MAX : widgetWidth);
+}
+
+void EditWidget::onSendActionTriggered(bool)
 {
 	sendMessage();
 }

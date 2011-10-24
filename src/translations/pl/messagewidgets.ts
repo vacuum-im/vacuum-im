@@ -5,11 +5,11 @@
     <name>ChatWindow</name>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished">Cytuj zaznaczony tekst</translation>
+        <translation>Cytuj zaznaczony tekst</translation>
     </message>
 </context>
 <context>
-    <name>EditWidgetClass</name>
+    <name>EditWidget</name>
     <message>
         <source>Send</source>
         <translation>Wyślij</translation>
@@ -402,7 +402,7 @@
     </message>
     <message>
         <source>%1) %2</source>
-        <translation type="unfinished">%1) %2</translation>
+        <translation>%1) %2</translation>
     </message>
     <message>
         <source>Close Other Tabs</source>
