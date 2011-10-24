@@ -266,7 +266,7 @@ void EditWidget::updateSendToolBarMaxWidth()
 			widgetWidth = widget->sizeHint().width();
 		}
 	}
-	FSendToolBar->toolBar()->setMaximumWidth(visibleItemsCount>1 ? QWIDGETSIZE_MAX : widgetWidth);
+	FSendToolBar->toolBar()->setMaximumWidth(visibleItemsCount==1 ? widgetWidth : QWIDGETSIZE_MAX);
 }
 
 void EditWidget::onSendActionTriggered(bool)
