@@ -571,6 +571,14 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <source>When receiving a new message in conference</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Select the user to refer in the Bash style</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add this suffix when referring to the user:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

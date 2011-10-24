@@ -46,6 +46,9 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FDestroyOnChatClosed = false;
 	FUsersListWidth = -1;
 
+	FStartCompletePos = 0;
+	FCompleteIt = FCompleteNicks.constEnd();
+
 	initialize();
 	createMessageWidgets();
 	setMessageStyle();
@@ -1180,14 +1183,14 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 	else if (AText == "/help")
 	{
 		showStatusMessage(tr("Supported list of commands: \n"
-									" /ban <roomnick> [comment] \n"
-									" /invite <jid> [comment] \n"
-									" /join <roomname> [pass] \n"
-									" /kick <roomnick> [comment] \n"
-									" /msg <roomnick> <foo> \n"
-									" /nick <newnick> \n"
-									" /leave [comment] \n"
-									" /topic <foo>"),IMessageContentOptions::TypeNotification);
+			" /ban <roomnick> [comment] \n"
+			" /invite <jid> [comment] \n"
+			" /join <roomname> [pass] \n"
+			" /kick <roomnick> [comment] \n"
+			" /msg <roomnick> <foo> \n"
+			" /nick <newnick> \n"
+			" /leave [comment] \n"
+			" /topic <foo>"),IMessageContentOptions::TypeNotification);
 		hasCommand = true;
 	}
 	return hasCommand;
@@ -1928,40 +1931,67 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 	{
 		QTextEdit *textEdit = FEditWidget->textEdit();
 		QTextCursor cursor = textEdit->textCursor();
-		cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
-
-		QList<IMultiUser *> users;
-		QString nickStarts = cursor.selectedText().toLower();
-
-		foreach(IMultiUser *user, FUsers.keys())
+		if (FCompleteIt == FCompleteNicks.constEnd())
 		{
-			if (user != FMultiChat->mainUser())
-				if (nickStarts.isEmpty() || user->nickName().toLower().startsWith(nickStarts))
-					users.append(user);
-		}
+			cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
+			FStartCompletePos = cursor.position();
+			QString nickStarts = cursor.selectedText().toLower();
 
-		if (users.count() > 1)
-		{
-			Menu *nickMenu = new Menu(this);
-			nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);
-			foreach(IMultiUser *user, users)
+			QMap<QString,QString> sortedNicks;
+			foreach(IMultiUser *user, FUsers.keys())
 			{
-				Action *action = new Action(nickMenu);
-				action->setText(user->nickName());
-				action->setIcon(FUsers.value(user)->icon());
-				action->setData(ADR_USER_NICK,user->nickName());
-				connect(action,SIGNAL(triggered(bool)),SLOT(onNickMenuActionTriggered(bool)));
-				nickMenu->addAction(action,AG_DEFAULT,true);
+				if (user != FMultiChat->mainUser())
+					if (nickStarts.isEmpty() || user->nickName().toLower().startsWith(nickStarts))
+						sortedNicks.insert(user->nickName().toLower(), user->nickName());
 			}
-			nickMenu->popup(textEdit->viewport()->mapToGlobal(textEdit->cursorRect().topLeft()));
+
+			FCompleteNicks = sortedNicks.values();
+			FCompleteIt = FCompleteNicks.constBegin();
 		}
-		else if (!users.isEmpty())
+		else
 		{
-			QString sufix = cursor.atBlockStart() ? ": " : " ";
-			cursor.insertText(users.first()->nickName() + sufix);
+			cursor.setPosition(FStartCompletePos, QTextCursor::KeepAnchor);
+		}
+
+		QString suffix = cursor.atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : QString(" ");
+		if (FCompleteNicks.count() > 1)
+		{
+			if (!Options::node(OPV_MUC_GROUPCHAT_BASHAPPEND).value().toBool())
+			{
+				Menu *nickMenu = new Menu(this);
+				nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);
+				foreach(QString nick, FCompleteNicks)
+				{
+					IMultiUser *user = FMultiChat->userByNick(nick);
+					if (user)
+					{
+						Action *action = new Action(nickMenu);
+						action->setText(user->nickName());
+						action->setIcon(FUsers.value(user)->icon());
+						action->setData(ADR_USER_NICK,user->nickName());
+						connect(action,SIGNAL(triggered(bool)),SLOT(onNickMenuActionTriggered(bool)));
+						nickMenu->addAction(action,AG_DEFAULT,true);
+					}
+				}
+				nickMenu->popup(textEdit->viewport()->mapToGlobal(textEdit->cursorRect().topLeft()));
+			}
+			else
+			{
+				cursor.insertText(*FCompleteIt + suffix);
+				if (++FCompleteIt == FCompleteNicks.constEnd())
+					FCompleteIt = FCompleteNicks.constBegin();
+			}
+		}
+		else if (!FCompleteNicks.isEmpty())
+		{
+			cursor.insertText(FCompleteNicks.first() + suffix);
 		}
 
 		AHooked = true;
+	}
+	else
+	{
+		FCompleteIt = FCompleteNicks.constEnd();
 	}
 }
 
@@ -2098,7 +2128,7 @@ void MultiUserChatWindow::onNickMenuActionTriggered(bool)
 		QString nick = action->data(ADR_USER_NICK).toString();
 		QTextCursor cursor = FEditWidget->textEdit()->textCursor();
 		cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
-		QString sufix = cursor.atBlockStart() ? ": " : " ";
+		QString sufix = cursor.atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : " ";
 		cursor.insertText(nick + sufix);
 	}
 }

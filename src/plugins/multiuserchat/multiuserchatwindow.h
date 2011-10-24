@@ -251,6 +251,11 @@ private:
 	UsersProxyModel *FUsersProxy;
 	QStandardItemModel *FUsersModel;
 	QHash<IMultiUser *, QStandardItem *> FUsers;
+private:
+	int FStartCompletePos;
+	QList<QString> FCompleteNicks;
+	QList<QString>::const_iterator FCompleteIt;
+
 };
 
 #endif // MULTIUSERCHATWINDOW_H

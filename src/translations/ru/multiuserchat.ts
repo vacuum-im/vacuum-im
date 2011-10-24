@@ -571,6 +571,14 @@ Check values and try again</source>
         <source>When receiving a new message in conference</source>
         <translation>При получении нового сообщения в конференции</translation>
     </message>
+    <message>
+        <source>Select the user to refer in the Bash style</source>
+        <translation>Выбирать пользователя для обращения в стиле Bash</translation>
+    </message>
+    <message>
+        <source>Add this suffix when referring to the user:</source>
+        <translation>Добавлять этот суффикс при обращениии к пользователю:</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

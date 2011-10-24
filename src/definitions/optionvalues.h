@@ -103,6 +103,8 @@
 #define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"
 #define OPV_MUC_GROUPCHAT_SHOWSTATUS                    "muc.groupchat.show-status"
 #define OPV_MUC_GROUPCHAT_ARCHIVESTATUS                 "muc.groupchat.archive-status"
+#define OPV_MUC_GROUPCHAT_BASHAPPEND                    "muc.groupchat.bash-append"
+#define OPV_MUC_GROUPCHAT_NICKNAMESUFIX                 "muc.groupchat.nickname-sufix"
 
 // MessageArchive
 #define OPV_HISTORY_COLLECTION_SIZE                     "history.collection.size"
