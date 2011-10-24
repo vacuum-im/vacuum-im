@@ -91,8 +91,9 @@ public:
 	virtual void setMinimumLines(int ALines) =0;
 	virtual QString sendShortcut() const =0;
 	virtual void setSendShortcut(const QString &AShortcutId) =0;
-	virtual bool sendButtonVisible() const =0;
-	virtual void setSendButtonVisible(bool AVisible) =0;
+	virtual bool sendToolBarVisible() const =0;
+	virtual void setSendToolBarVisible(bool AVisible) =0;
+	virtual ToolBarChanger *sendToolBarChanger() const =0;
 	virtual bool textFormatEnabled() const =0;
 	virtual void setTextFormatEnabled(bool AEnabled) =0;
 protected:
@@ -392,7 +393,7 @@ protected:
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
 Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.1")
-Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.0")
+Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.1")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
 Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")
 Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")

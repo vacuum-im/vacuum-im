@@ -5,11 +5,11 @@
     <name>ChatWindow</name>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished">Цитувати виділений текст</translation>
+        <translation>Цитувати виділений текст</translation>
     </message>
 </context>
 <context>
-    <name>EditWidgetClass</name>
+    <name>EditWidget</name>
     <message>
         <source>Send</source>
         <translation>Відіслати</translation>
@@ -402,7 +402,7 @@
     </message>
     <message>
         <source>%1) %2</source>
-        <translation type="unfinished">%1) %2</translation>
+        <translation>%1) %2</translation>
     </message>
     <message>
         <source>Close Other Tabs</source>
