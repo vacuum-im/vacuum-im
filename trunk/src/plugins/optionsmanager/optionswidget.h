@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QDateTimeEdit>
+#include <QHBoxLayout>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 
@@ -30,7 +31,7 @@ signals:
 	void childApply();
 	void childReset();
 protected:
-	void insertCaption(const QString &ACaption, QWidget *ABuddy);
+	void insertCaption(const QString &ACaption, QWidget *ABuddy, QHBoxLayout *ALayout);
 	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
 	QLabel *FLabel;

@@ -46,8 +46,9 @@ void MultiUserChatPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
@@ -278,6 +279,8 @@ bool MultiUserChatPlugin::initSettings()
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWENTERS,true);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWSTATUS,true);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_ARCHIVESTATUS,false);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_BASHAPPEND,false);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_NICKNAMESUFIX,": ");
 
 	if (FOptionsManager)
 	{
@@ -296,6 +299,8 @@ QMultiMap<int, IOptionsWidget *> MultiUserChatPlugin::optionsWidgets(const QStri
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections/disconnections"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS),tr("Save status messages to history"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_BASHAPPEND),tr("Select the user to refer in the Bash style"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX),tr("Add this suffix when referring to the user:"),AParent));
 	}
 	return widgets;
 }
