@@ -903,7 +903,6 @@ void MultiUserChatWindow::showDateSeparator(IViewWidget *AView, const QDateTime 
 			options.time.setDate(sepDate);
 			options.time.setTime(QTime(0,0));
 			options.timeFormat = " ";
-			options.noScroll = true;
 			wstatus.lastDateSeparator = sepDate;
 			AView->appendText(FMessageStyles->dateSeparator(sepDate),options);
 		}
