@@ -488,7 +488,6 @@ void ChatMessageHandler::showDateSeparator(IChatWindow *AWindow, const QDateTime
 			options.time.setDate(sepDate);
 			options.time.setTime(QTime(0,0));
 			options.timeFormat = " ";
-			options.noScroll = true;
 			wstatus.lastDateSeparator = sepDate;
 			AWindow->viewWidget()->appendText(FMessageStyles->dateSeparator(sepDate),options);
 		}
