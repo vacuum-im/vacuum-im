@@ -101,7 +101,7 @@ protected:
 	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
 	void onMessageReady();
-	void onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
+	void onInfoFieldChanged(int AField, const QVariant &AValue);
 	void onWindowActivated();
 	void onWindowClosed();
 	void onWindowDestroyed();

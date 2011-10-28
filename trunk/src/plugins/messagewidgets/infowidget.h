@@ -38,7 +38,7 @@ public:
 signals:
 	void streamJidChanged(const Jid &ABefore);
 	void contactJidChanged(const Jid &ABefore);
-	void fieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue);
+	void fieldChanged(int AField, const QVariant &AValue);
 protected:
 	void initialize();
 	void updateFieldLabel(IInfoWidget::InfoField AField);

@@ -331,8 +331,8 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
-			connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(IInfoWidget::InfoField, const QVariant &)),
-				SLOT(onInfoFieldChanged(IInfoWidget::InfoField, const QVariant &)));
+			connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(int, const QVariant &)),
+            SLOT(onInfoFieldChanged(int, const QVariant &)), Qt::QueuedConnection);
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
 			connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onWindowClosed()));
 			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
@@ -549,7 +549,7 @@ void ChatMessageHandler::onMessageReady()
 	}
 }
 
-void ChatMessageHandler::onInfoFieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue)
+void ChatMessageHandler::onInfoFieldChanged(int AField, const QVariant &AValue)
 {
 	Q_UNUSED(AValue);
 	if (AField==IInfoWidget::ContactShow || AField==IInfoWidget::ContactStatus || AField==IInfoWidget::ContactName)

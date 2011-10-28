@@ -46,7 +46,7 @@ public:
 protected:
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
-	virtual void fieldChanged(IInfoWidget::InfoField AField, const QVariant &AValue) =0;
+	virtual void fieldChanged(int AField, const QVariant &AValue) =0;
 };
 
 class IViewWidget
@@ -391,7 +391,7 @@ protected:
 	virtual void editContentsHandlerRemoved(int AOrder, IEditContentsHandler *AHandler) =0;
 };
 
-Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.0")
+Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.1")
 Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.1")
 Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.1")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
