@@ -577,7 +577,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Add this suffix when referring to the user:</source>
-        <translation>Добавлять этот суффикс при обращениии к пользователю:</translation>
+        <translation>Добавлять этот суффикс при обращении к пользователю:</translation>
     </message>
 </context>
 <context>
