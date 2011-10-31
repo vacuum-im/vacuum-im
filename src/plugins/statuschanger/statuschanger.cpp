@@ -344,7 +344,7 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 			acceptStatus |= isChangeMainStatus && FMainStatusStreams.contains(presence);
 			acceptStatus |= FStreamMenu.count() == 1;
 
-			if (!acceptStatus && isSwitchOnline && !presence->xmppStream()->isOpen())
+			if (!acceptStatus && isSwitchOnline && !presence->xmppStream()->isConnected())
 			{
 				newStatusId = FLastOnlineStatus.value(presence, STATUS_MAIN_ID);
 				newStatus = FStatusItems.value(FStatusItems.contains(newStatusId) ? newStatusId : STATUS_MAIN_ID);
@@ -368,7 +368,7 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 				if (!presence->setPresence(newStatus.show, newStatus.text, newStatus.priority))
 				{
 					FChangingPresence = NULL;
-					if (newStatus.show!=IPresence::Offline && !presence->xmppStream()->isOpen() && presence->xmppStream()->open())
+					if (newStatus.show!=IPresence::Offline && !presence->xmppStream()->isConnected() && presence->xmppStream()->open())
 					{
 						insertConnectingLabel(presence);
 						setStreamStatusId(presence, STATUS_CONNECTING_ID);

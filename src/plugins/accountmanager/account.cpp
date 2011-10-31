@@ -107,7 +107,7 @@ void Account::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (FOptionsNode.isChildNode(ANode))
 	{
-		if (FXmppStream && !FXmppStream->isOpen())
+		if (FXmppStream && !FXmppStream->isConnected())
 		{
 			if (FOptionsNode.node("streamJid") == ANode)
 			{
