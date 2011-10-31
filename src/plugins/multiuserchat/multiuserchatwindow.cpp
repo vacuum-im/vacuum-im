@@ -1332,9 +1332,21 @@ void MultiUserChatWindow::updateWindow()
 	emit tabPageChanged();
 }
 
-void MultiUserChatWindow::updateCompleteNicks()
+void MultiUserChatWindow::refreshCompleteNicks()
 {
+	QString curNick = FCompleteIt!=FCompleteNicks.constEnd() ? *FCompleteIt : QString::null;
 
+	QMap<QString,QString> sortedNicks;
+	foreach(IMultiUser *user, FUsers.keys())
+	{
+		if (user != FMultiChat->mainUser())
+			if (FCompleteNickStarts.isEmpty() || user->nickName().toLower().startsWith(FCompleteNickStarts))
+				sortedNicks.insert(user->nickName().toLower(), user->nickName());
+	}
+	FCompleteNicks = sortedNicks.values();
+
+	int curNickIndex = FCompleteNicks.indexOf(curNick);
+	FCompleteIt = curNickIndex>=0 ? FCompleteNicks.constBegin()+curNickIndex : FCompleteNicks.constEnd();
 }
 
 void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
@@ -1714,6 +1726,8 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			userItem = new QStandardItem(AUser->nickName());
 			FUsersModel->appendRow(userItem);
 			FUsers.insert(AUser,userItem);
+
+			refreshCompleteNicks();
 			highlightUserRole(AUser);
 			highlightUserAffiliation(AUser);
 
@@ -1760,6 +1774,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			}
 		}
 		FUsers.remove(AUser);
+		refreshCompleteNicks();
 		qDeleteAll(FUsersModel->takeRow(userItem->row()));
 	}
 
@@ -1819,6 +1834,7 @@ void MultiUserChatWindow::onUserNickChanged(IMultiUser *AUser, const QString &AO
 			window->infoWidget()->setField(IInfoWidget::ContactName,ANewNick);
 			updateChatWindow(window);
 		}
+		refreshCompleteNicks();
 	}
 
 	if (AUser == FMultiChat->mainUser())
@@ -1939,17 +1955,8 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 		{
 			cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
 			FStartCompletePos = cursor.position();
-			QString nickStarts = cursor.selectedText().toLower();
-
-			QMap<QString,QString> sortedNicks;
-			foreach(IMultiUser *user, FUsers.keys())
-			{
-				if (user != FMultiChat->mainUser())
-					if (nickStarts.isEmpty() || user->nickName().toLower().startsWith(nickStarts))
-						sortedNicks.insert(user->nickName().toLower(), user->nickName());
-			}
-
-			FCompleteNicks = sortedNicks.values();
+			FCompleteNickStarts = cursor.selectedText().toLower();
+			refreshCompleteNicks();
 			FCompleteIt = FCompleteNicks.constBegin();
 		}
 		else
