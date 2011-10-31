@@ -134,7 +134,7 @@ protected:
 	void showUserMessage(const Message &AMessage, const QString &ANick);
 	void showHistory();
 	void updateWindow();
-	void updateCompleteNicks();
+	void refreshCompleteNicks();
 	void updateListItem(const Jid &AContactJid);
 	void removeActiveMessages();
 protected:
@@ -254,6 +254,7 @@ private:
 	QHash<IMultiUser *, QStandardItem *> FUsers;
 private:
 	int FStartCompletePos;
+	QString FCompleteNickStarts;
 	QList<QString> FCompleteNicks;
 	QList<QString>::const_iterator FCompleteIt;
 
