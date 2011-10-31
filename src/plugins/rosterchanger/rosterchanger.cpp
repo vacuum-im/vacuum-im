@@ -1695,7 +1695,7 @@ void RosterChanger::onNotificationActivated(int ANotifyId)
 {
 	if (FNotifySubsDialog.contains(ANotifyId))
 	{
-		SubscriptionDialog *dialog = FNotifySubsDialog.value(ANotifyId);
+		SubscriptionDialog *dialog = FNotifySubsDialog.take(ANotifyId);
 		if (dialog)
 			WidgetManager::showActivateRaiseWindow(dialog);
 		FNotifications->removeNotification(ANotifyId);
@@ -1707,7 +1707,7 @@ void RosterChanger::onNotificationRemoved(int ANotifyId)
 	if (FNotifySubsDialog.contains(ANotifyId))
 	{
 		SubscriptionDialog *dialog = FNotifySubsDialog.take(ANotifyId);
-		if (dialog && !dialog->isActiveWindow())
+		if (dialog)
 			dialog->reject();
 		FNotifySubsType.remove(ANotifyId);
 	}
