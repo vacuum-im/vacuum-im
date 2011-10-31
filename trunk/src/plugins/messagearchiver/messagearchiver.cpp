@@ -1118,10 +1118,9 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 		CollectionWriter *writer = findCollectionWriter(AStreamJid,itemJid,AMessage.threadId());
 		if (!writer)
 		{
-			QDateTime currentTime = QDateTime::currentDateTime();
 			IArchiveHeader header;
 			header.with = itemJid;
-			header.start = currentTime.addMSecs(-currentTime.time().msec());
+			header.start = QDateTime::currentDateTime();
 			header.subject = AMessage.subject();
 			header.threadId = AMessage.threadId();
 			header.version = 0;
@@ -1646,7 +1645,9 @@ QString MessageArchiver::collectionFileName(const DateTime &AStart) const
 {
 	if (AStart.isValid())
 	{
-		return AStart.toX85UTC().replace(":","=") + COLLECTION_EXT;
+		// Remove msecs for correct file name comparation
+		DateTime start(AStart.dateTime().addMSecs(-AStart.dateTime().time().msec()));
+		return start.toX85UTC().replace(":","=") + COLLECTION_EXT;
 	}
 	return QString::null;
 }
@@ -1779,7 +1780,7 @@ CollectionWriter *MessageArchiver::newCollectionWriter(const Jid &AStreamJid, co
 	CollectionWriter *writer = findCollectionWriter(AStreamJid,AHeader);
 	if (!writer && AHeader.with.isValid() && AHeader.start.isValid())
 	{
-		QString  fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
+		QString fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
 		CollectionWriter *writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
 		if (writer->isOpened())
 		{
@@ -1792,7 +1793,6 @@ CollectionWriter *MessageArchiver::newCollectionWriter(const Jid &AStreamJid, co
 			delete writer;
 			writer = NULL;
 		}
-		return writer;
 	}
 	return writer;
 }
@@ -2750,7 +2750,7 @@ void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AInd
 			Menu *menu = createContextMenu(streamJid,QStringList()<<streamJid.full(),AMenu);
 			AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
 		}
-		else if (isArchivePrefsEnabled(streamJid) && isSelectionAccepted(AIndexes))
+		else if (isSelectionAccepted(AIndexes))
 		{
 			QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
 			Menu *menu = createContextMenu(streamJid,rolesMap.value(RDR_PREP_BARE_JID),AMenu);

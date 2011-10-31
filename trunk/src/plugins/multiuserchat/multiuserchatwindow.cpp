@@ -1332,6 +1332,11 @@ void MultiUserChatWindow::updateWindow()
 	emit tabPageChanged();
 }
 
+void MultiUserChatWindow::updateCompleteNicks()
+{
+
+}
+
 void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
 {
 	IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());

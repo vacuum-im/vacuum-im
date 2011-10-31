@@ -106,26 +106,27 @@ QString DateTime::toX85Date() const
 	return x85;
 }
 
-QString DateTime::toX85Time(bool AMSec) const
+QString DateTime::toX85Time() const
 {
 	QString x85 = d->dt.time().toString(Qt::ISODate);
-	if (AMSec)
-		x85 += QString(".%1").arg(d->dt.time().msec(),3,10,QLatin1Char('0'));
+	int msecs = d->dt.time().msec();
+	if (msecs > 0)
+		x85 += QString(".%1").arg(msecs,3,10,QLatin1Char('0'));
 	return x85;
 }
 
-QString DateTime::toX85DateTime(bool AMSec) const
+QString DateTime::toX85DateTime() const
 {
-	return toX85Format(true,true,true,AMSec);
+	return toX85Format(true,true,true);
 }
 
-QString DateTime::toX85UTC(bool AMSec) const
+QString DateTime::toX85UTC() const
 {
 	DateTime utc = toUTC();
-	return utc.toX85Format(true,true,false,AMSec);
+	return utc.toX85Format(true,true,false);
 }
 
-QString DateTime::toX85Format(bool ADate, bool ATime, bool ATZD, bool AMSec) const
+QString DateTime::toX85Format(bool ADate, bool ATime, bool ATZD) const
 {
 	QString x85;
 	if (ADate)
@@ -133,7 +134,7 @@ QString DateTime::toX85Format(bool ADate, bool ATime, bool ATZD, bool AMSec) con
 	if (ADate && ATime)
 		x85 += "T";
 	if (ATime)
-		x85 += toX85Time(AMSec);
+		x85 += toX85Time();
 	if (ATZD)
 		x85 += toX85TZD();
 	else if (ATime)

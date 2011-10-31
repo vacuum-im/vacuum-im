@@ -1,7 +1,7 @@
 TARGET_LOADER            = vacuum
 
 TARGET_UTILS             = vacuumutils
-unix:!macx:VERSION_UTILS = 1.8.0
+unix:!macx:VERSION_UTILS = 1.8.1
 
 macx:CONFIG             += x86
 
