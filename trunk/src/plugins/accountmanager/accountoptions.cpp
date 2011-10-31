@@ -57,7 +57,7 @@ void AccountOptions::apply()
 
 		if (!FAccount->isValid())
 			QMessageBox::warning(this,tr("Invalid Account"),tr("Account '%1' is not valid, change its Jabber ID").arg(name));
-		else if (changedJid && FAccount->isActive() && FAccount->xmppStream()->isOpen())
+		else if (changedJid && FAccount->isActive() && FAccount->xmppStream()->isConnected())
 			QMessageBox::information(NULL,tr("Delayed Apply"),tr("Some options of account '%1' will be applied after disconnect").arg(name));
 	}
 	emit childApply();

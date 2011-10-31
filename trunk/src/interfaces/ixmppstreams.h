@@ -53,10 +53,11 @@ class IXmppStream
 {
 public:
 	virtual QObject *instance() =0;
-	virtual bool isOpen() const =0;
 	virtual bool open() =0;
 	virtual void close() =0;
 	virtual void abort(const QString &AError) =0;
+	virtual bool isOpen() const =0;
+	virtual bool isConnected() const =0;
 	virtual QString streamId() const =0;
 	virtual QString errorString() const =0;
 	virtual Jid streamJid() const=0;
@@ -127,7 +128,7 @@ Q_DECLARE_INTERFACE(IXmppDataHandler,"Vacuum.Plugin.IXmppDataHandler/1.0");
 Q_DECLARE_INTERFACE(IXmppStanzaHadler,"Vacuum.Plugin.IXmppStanzaHadler/1.0");
 Q_DECLARE_INTERFACE(IXmppFeature,"Vacuum.Plugin.IXmppFeature/1.0");
 Q_DECLARE_INTERFACE(IXmppFeaturesPlugin,"Vacuum.Plugin.IXmppFeaturesPlugin/1.0");
-Q_DECLARE_INTERFACE(IXmppStream, "Vacuum.Plugin.IXmppStream/1.1")
-Q_DECLARE_INTERFACE(IXmppStreams,"Vacuum.Plugin.IXmppStreams/1.1")
+Q_DECLARE_INTERFACE(IXmppStream, "Vacuum.Plugin.IXmppStream/1.2")
+Q_DECLARE_INTERFACE(IXmppStreams,"Vacuum.Plugin.IXmppStreams/1.2")
 
 #endif

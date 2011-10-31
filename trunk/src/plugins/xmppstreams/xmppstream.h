@@ -40,12 +40,13 @@ public:
 	virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IXmppStream
-	virtual bool isOpen() const;
 	virtual bool open();
 	virtual void close();
 	virtual void abort(const QString &AError);
+	virtual bool isOpen() const;
+	virtual bool isConnected() const;
 	virtual QString streamId() const;
-	virtual QString errorString() const;;
+	virtual QString errorString() const;
 	virtual Jid streamJid() const;
 	virtual void setStreamJid(const Jid &AJid);
 	virtual QString password() const;
@@ -115,7 +116,8 @@ private:
 	QMultiMap<int, IXmppDataHandler *> FDataHandlers;
 	QMultiMap<int, IXmppStanzaHadler *> FStanzaHandlers;
 private:
-	bool FOpen;
+	bool FReady;
+	bool FClosed;
 	bool FEncrypt;
 	Jid FStreamJid;
 	Jid FOfflineJid;
