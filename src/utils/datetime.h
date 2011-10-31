@@ -33,10 +33,10 @@ public:
 	QDateTime toLocal() const;
 	QString toX85TZD() const;
 	QString toX85Date() const;
-	QString toX85Time(bool AMSec = false) const;
-	QString toX85DateTime(bool AMSec = false) const;
-	QString toX85UTC(bool AMSec = false) const;
-	QString toX85Format(bool ADate, bool ATime, bool ATZD, bool AMSec = false) const;
+	QString toX85Time() const;
+	QString toX85DateTime() const;
+	QString toX85UTC() const;
+	QString toX85Format(bool ADate, bool ATime, bool ATZD) const;
 public:
 	static int tzdFromX85(const QString &AX85DateTime);
 	static QDateTime dtFromX85(const QString &AX85DateTime);

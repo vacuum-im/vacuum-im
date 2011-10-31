@@ -24,7 +24,7 @@ LEGEND
   [-] When leaving the hidden conferences also closed the conference on non-active tabs
   [-] In the history view could appear duplicates of conversations
   [-] Did not correctly handle changes in the participant's nickname when new nickname is already used by the same participant but from a different resource
-
+  [-] Incorrectly requested history of communication when connected to a server Openfire with plugin Open Archive
 
 v1.1.0
 ------

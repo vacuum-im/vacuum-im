@@ -134,6 +134,7 @@ protected:
 	void showUserMessage(const Message &AMessage, const QString &ANick);
 	void showHistory();
 	void updateWindow();
+	void updateCompleteNicks();
 	void updateListItem(const Jid &AContactJid);
 	void removeActiveMessages();
 protected:
