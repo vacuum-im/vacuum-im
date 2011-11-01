@@ -212,7 +212,7 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 		else
 		{
 			show->setFlags(Qt::ItemIsSelectable);
-			name->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+			name->setFlags(Qt::ItemIsSelectable);
 			message->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 			priority->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
 		}
