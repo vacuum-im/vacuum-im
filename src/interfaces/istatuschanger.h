@@ -45,13 +45,12 @@ public:
 	virtual QIcon iconByShow(int AShow) const =0;
 	virtual QString nameByShow(int AShow) const =0;
 protected:
-	virtual void statusAboutToBeChanged(const Jid &AStreamJid, int AStatusId) =0;
 	virtual void statusChanged(const Jid &AStreamJid, int AStatusId) =0;
 	virtual void statusItemAdded(int AStatusId) =0;
 	virtual void statusItemChanged(int AStatusId) =0;
 	virtual void statusItemRemoved(int AStatusId) =0;
 };
 
-Q_DECLARE_INTERFACE(IStatusChanger,"Vacuum.Plugin.IStatusChanger/1.0")
+Q_DECLARE_INTERFACE(IStatusChanger,"Vacuum.Plugin.IStatusChanger/1.1")
 
 #endif

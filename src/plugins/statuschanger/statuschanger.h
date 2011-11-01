@@ -90,7 +90,6 @@ public:
 	virtual QIcon iconByShow(int AShow) const;
 	virtual QString nameByShow(int AShow) const;
 signals:
-	void statusAboutToBeChanged(const Jid &AStreamJid, int AStatusId);
 	void statusChanged(const Jid &AStreamJid, int AStatusId);
 	void statusItemAdded(int AStatusId);
 	void statusItemChanged(int AStatusId);
@@ -106,7 +105,7 @@ protected:
 	void removeStatusActions(int AStatusId);
 	void createStreamMenu(IPresence *APresence);
 	void updateStreamMenu(IPresence *APresence);
-	int visibleMainStatusId() const;
+	IPresence *visibleMainStatusPresence() const;
 	void updateMainMenu();
 	void updateTrayToolTip();
 	void updateMainStatusActions();
