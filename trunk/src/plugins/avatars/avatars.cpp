@@ -15,7 +15,6 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-#define AVATAR_IMAGE_TYPE         "png"
 #define AVATAR_IQ_TIMEOUT         30000
 
 #define UNKNOWN_AVATAR            QString::null
@@ -108,7 +107,7 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
 				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
-			        SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+				SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
 		}
 	}
 
@@ -263,7 +262,7 @@ void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 			QByteArray avatarData = QByteArray::fromBase64(dataElem.text().toAscii());
 			if (!avatarData.isEmpty())
 			{
-				QString hash = saveAvatar(avatarData);
+				QString hash = saveAvatarData(avatarData);
 				updateIqAvatar(contactJid,hash);
 			}
 			else
@@ -305,7 +304,7 @@ QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
 	if (ARole == RDR_AVATAR_IMAGE)
 	{
-		QImage avatar = avatarImage(AIndex->data(RDR_FULL_JID).toString());
+		QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()),FAvatarSize);
 		if (avatar.isNull() && FShowEmptyAvatars)
 			avatar = FEmptyAvatar;
 		return avatar;
@@ -336,49 +335,6 @@ QMultiMap<int, IOptionsWidget *> Avatars::optionsWidgets(const QString &ANodeId,
 	return widgets;
 }
 
-QString Avatars::avatarFileName(const QString &AHash) const
-{
-	return !AHash.isEmpty() ? FAvatarsDir.filePath(AHash.toLower()) : QString::null;
-}
-
-bool Avatars::hasAvatar(const QString &AHash) const
-{
-	return QFile::exists(avatarFileName(AHash));
-}
-
-QImage Avatars::loadAvatar(const QString &AHash) const
-{
-	return QImage(avatarFileName(AHash));
-}
-
-QString Avatars::saveAvatar(const QByteArray &AImageData) const
-{
-	if (!AImageData.isEmpty())
-	{
-		QString hash = QCryptographicHash::hash(AImageData,QCryptographicHash::Sha1).toHex();
-		if (!hasAvatar(hash))
-		{
-			QFile file(avatarFileName(hash));
-			if (file.open(QFile::WriteOnly|QFile::Truncate))
-			{
-				file.write(AImageData);
-				file.close();
-				return hash;
-			}
-		}
-		else
-			return hash;
-	}
-	return EMPTY_AVATAR;
-}
-
-QString Avatars::saveAvatar(const QImage &AImage, const char *AFormat) const
-{
-	QByteArray bytes;
-	QBuffer buffer(&bytes);
-	return AImage.save(&buffer,AFormat) ? saveAvatar(bytes) : EMPTY_AVATAR;
-}
-
 QString Avatars::avatarHash(const Jid &AContactJid) const
 {
 	QString hash = FCustomPictures.value(AContactJid.bare());
@@ -389,61 +345,140 @@ QString Avatars::avatarHash(const Jid &AContactJid) const
 	return hash;
 }
 
-QImage Avatars::avatarImage(const Jid &AContactJid) const
+bool Avatars::hasAvatar(const QString &AHash) const
 {
-	QString hash = avatarHash(AContactJid);
-	if (!hash.isEmpty() && !FAvatarImages.contains(hash))
-	{
-		QString fileName = avatarFileName(hash);
-		if (QFile::exists(fileName))
-		{
-			QImage image = QImage(fileName).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-			if (!image.isNull())
-				FAvatarImages.insert(hash,image);
-			return image;
-		}
-	}
-	return FAvatarImages.value(hash);
+	return !AHash.isEmpty() ? QFile::exists(avatarFileName(AHash)) : false;
 }
 
-bool Avatars::setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat)
+QString Avatars::avatarFileName(const QString &AHash) const
+{
+	return !AHash.isEmpty() ? FAvatarsDir.filePath(AHash.toLower()) : QString::null;
+}
+
+QString Avatars::saveAvatarData(const QByteArray &AData) const
+{
+	if (!AData.isEmpty())
+	{
+		QString hash = QCryptographicHash::hash(AData,QCryptographicHash::Sha1).toHex();
+		if (!hasAvatar(hash))
+		{
+			if (saveToFile(avatarFileName(hash),AData))
+				return hash;
+		}
+		else
+		{
+			return hash;
+		}
+	}
+	return EMPTY_AVATAR;
+}
+
+QByteArray Avatars::loadAvatarData(const QString &AHash) const
+{
+	return loadFromFile(avatarFileName(AHash));
+}
+
+bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 {
 	bool published = false;
-	IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
-	if (vcard)
+	QString format = getImageFormat(AData);
+	if (AData.isEmpty() || !format.isEmpty())
 	{
-		QImage avatar = AImage.width()>96 || AImage.height()>96 ? AImage.scaled(QSize(96,96),Qt::KeepAspectRatio,Qt::SmoothTransformation) : AImage;
-		vcard->setPhotoImage(avatar, AFormat);
-		published = FVCardPlugin->publishVCard(vcard,AStreamJid);
-		vcard->unlock();
+		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
+		if (vcard)
+		{
+			if (!AData.isEmpty())
+			{
+				vcard->setValueForTags(VVN_PHOTO_VALUE,AData.toBase64());
+				vcard->setValueForTags(VVN_PHOTO_TYPE,QString("image/%1").arg(format));
+			}
+			else
+			{
+				vcard->setValueForTags(VVN_PHOTO_VALUE,QString::null);
+				vcard->setValueForTags(VVN_PHOTO_TYPE,QString::null);
+			}
+			published = FVCardPlugin->publishVCard(vcard,AStreamJid);
+			vcard->unlock();
+		}
 	}
 	return published;
 }
 
-QString Avatars::setCustomPictire(const Jid &AContactJid, const QString &AImageFile)
+QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &AData)
 {
 	Jid contactJid = AContactJid.bare();
-	if (!AImageFile.isEmpty())
+	if (!AData.isEmpty())
 	{
-		QFile file(AImageFile);
-		if (file.open(QFile::ReadOnly))
+		QString hash = saveAvatarData(AData);
+		if (FCustomPictures.value(contactJid) != hash)
 		{
-			QString hash = saveAvatar(file.readAll());
-			if (FCustomPictures.value(contactJid) != hash)
-			{
-				FCustomPictures[contactJid] = hash;
-				updateDataHolder(contactJid);
-			}
-			file.close();
-			return hash;
+			FCustomPictures[contactJid] = hash;
+			updateDataHolder(contactJid);
+			emit avatarChanged(AContactJid);
 		}
+		return hash;
 	}
 	else if (FCustomPictures.contains(contactJid))
 	{
 		FCustomPictures.remove(contactJid);
 		updateDataHolder(contactJid);
+		emit avatarChanged(AContactJid);
 	}
 	return EMPTY_AVATAR;
+}
+
+QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize) const
+{
+	QImage image;
+	QString fileName = avatarFileName(AHash);
+	if (!AHash.isEmpty() && QFile::exists(fileName))
+	{
+		QMap<QSize,QImage> &images = FAvatarImages[AHash];
+		if (!images.contains(AMaxSize))
+		{
+			image.load(fileName);
+			if (!image.isNull())
+			{
+				if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
+					image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+				images.insert(AMaxSize,image);
+			}
+		}
+		else
+		{
+			image = images.value(AMaxSize);
+		}
+	}
+	return image;
+}
+
+QString Avatars::getImageFormat(const QByteArray &AData) const
+{
+	QBuffer buffer;
+	buffer.setData(AData);
+	buffer.open(QBuffer::ReadOnly);
+	QByteArray format = QImageReader::imageFormat(&buffer);
+	return QString::fromLocal8Bit(format.constData(),format.size());
+}
+
+QByteArray Avatars::loadFromFile(const QString &AFileName) const
+{
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
+		return file.readAll();
+	return QByteArray();
+}
+
+bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) const
+{
+	QFile file(AFileName);
+	if (file.open(QFile::WriteOnly|QFile::Truncate))
+	{
+		file.write(AData);
+		file.close();
+		return true;
+	}
+	return false;
 }
 
 QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
@@ -616,7 +651,7 @@ void Avatars::onStreamClosed(IXmppStream *AXmppStream)
 
 void Avatars::onVCardChanged(const Jid &AContactJid)
 {
-	QString hash = saveAvatar(loadAvatarFromVCard(AContactJid));
+	QString hash = saveAvatarData(loadAvatarFromVCard(AContactJid));
 	updateVCardAvatar(AContactJid,hash,true);
 }
 
@@ -715,16 +750,16 @@ void Avatars::onSetAvatarByAction(bool)
 		QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select avatar image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 		if (!fileName.isEmpty())
 		{
+			QByteArray data = loadFromFile(fileName);
 			if (!action->data(ADR_STREAM_JID).isNull())
 			{
-				QImage avatar(fileName);
 				foreach(Jid streamJid, action->data(ADR_STREAM_JID).toStringList())
-					setAvatar(streamJid,avatar,AVATAR_IMAGE_TYPE);
+					setAvatar(streamJid,data);
 			}
 			else if (!action->data(ADR_CONTACT_JID).isNull())
 			{
 				foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
-					setCustomPictire(contactJid,fileName);
+					setCustomPictire(contactJid,data);
 			}
 		}
 	}
@@ -738,12 +773,12 @@ void Avatars::onClearAvatarByAction(bool)
 		if (!action->data(ADR_STREAM_JID).isNull())
 		{
 			Jid streamJid = action->data(ADR_STREAM_JID).toString();
-			setAvatar(streamJid,QImage());
+			setAvatar(streamJid,QByteArray());
 		}
 		else if (!action->data(ADR_CONTACT_JID).isNull())
 		{
 			Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-			setCustomPictire(contactJid,QString::null);
+			setCustomPictire(contactJid,QByteArray());
 		}
 	}
 }
@@ -819,6 +854,11 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 		FShowEmptyAvatars = ANode.value().toBool();
 		updateDataHolder();
 	}
+}
+
+inline bool operator<(const QSize &ASize1, const QSize &ASize2)
+{
+	return ASize1.width()==ASize2.width() ? ASize1.height()<ASize2.height() : ASize1.width()<ASize2.width();
 }
 
 Q_EXPORT_PLUGIN2(plg_avatars, Avatars)

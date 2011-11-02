@@ -70,6 +70,14 @@
         <source>Female</source>
         <translation>Жіноча</translation>
     </message>
+    <message>
+        <source>Size: %1 Kb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image Files (*.%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>VCardDialogClass</name>

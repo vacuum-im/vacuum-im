@@ -14,6 +14,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/vcardvaluenames.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/ixmppstreams.h>
@@ -62,20 +63,22 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAvatars
-	virtual QString avatarFileName(const QString &AHash) const;
-	virtual bool hasAvatar(const QString &AHash) const;
-	virtual QImage loadAvatar(const QString &AHash) const;
-	virtual QString saveAvatar(const QByteArray &AImageData) const;
-	virtual QString saveAvatar(const QImage &AImage, const char *AFormat = NULL) const;
 	virtual QString avatarHash(const Jid &AContactJid) const;
-	virtual QImage avatarImage(const Jid &AContactJid) const;
-	virtual bool setAvatar(const Jid &AStreamJid, const QImage &AImage, const char *AFormat = NULL);
-	virtual QString setCustomPictire(const Jid &AContactJid, const QString &AImageFile);
+	virtual bool hasAvatar(const QString &AHash) const;
+	virtual QString avatarFileName(const QString &AHash) const;
+	virtual QString saveAvatarData(const QByteArray &AData) const;
+	virtual QByteArray loadAvatarData(const QString &AHash) const;
+	virtual bool setAvatar(const Jid &AStreamJid, const QByteArray &AData);
+	virtual QString setCustomPictire(const Jid &AContactJid, const QByteArray &AData);
+	virtual QImage loadAvatarImage(const QString &AHash, const QSize &AMaxSize = QSize()) const;
 signals:
 	void avatarChanged(const Jid &AContactJid);
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
+	QString getImageFormat(const QByteArray &AData) const;
+	QByteArray loadFromFile(const QString &AFileName) const;
+	bool saveToFile(const QString &AFileName, const QByteArray &AData) const;
 	QByteArray loadAvatarFromVCard(const Jid &AContactJid) const;
 	void updatePresence(const Jid &AStreamJid) const;
 	void updateDataHolder(const Jid &AContactJid = Jid::null);
@@ -124,7 +127,7 @@ private:
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
 	QMap<Jid, QString> FStreamAvatars;
-	mutable QHash<QString, QImage> FAvatarImages;
+	mutable QHash<QString, QMap<QSize,QImage> > FAvatarImages;
 };
 
 #endif // AVATARS_H

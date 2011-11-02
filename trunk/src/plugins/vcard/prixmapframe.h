@@ -1,7 +1,10 @@
 #ifndef PRIXMAPFRAME_H
 #define PRIXMAPFRAME_H
 
+#include <QTimer>
 #include <QFrame>
+#include <QBuffer>
+#include <QImageReader>
 
 class PrixmapFrame : 
 	public QFrame
@@ -10,14 +13,21 @@ class PrixmapFrame :
 public:
 	PrixmapFrame(QWidget *AParent);
 	~PrixmapFrame();
-	QPixmap pixmap() const;
-	void setPixmap(const QPixmap &APixmap);
+	QByteArray imageData() const;
+	void setImageData(const QByteArray &AData);
 public:
 	virtual QSize sizeHint() const;
 protected:
-	virtual void paintEvent(QPaintEvent *AEvent);
+	void resetReader();
+	void paintEvent(QPaintEvent *AEvent);
+protected slots:
+	void onUpdateFrameTimeout();
 private:
-	QPixmap FPixmap;
+	QTimer FTimer;
+	QImage FCurFrame;
+	QBuffer FImageBuffer;
+	QByteArray FImageData;
+	QImageReader FImageReader;
 };
 
 #endif // PRIXMAPFRAME_H

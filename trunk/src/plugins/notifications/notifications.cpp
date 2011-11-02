@@ -476,7 +476,7 @@ void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *
 
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
 {
-	return FAvatars!=NULL ? FAvatars->avatarImage(AContactJid) : QImage();
+	return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(AContactJid),QSize(32,32)) : QImage();
 }
 
 QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const

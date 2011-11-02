@@ -70,6 +70,14 @@
         <source>Female</source>
         <translation>Женский</translation>
     </message>
+    <message>
+        <source>Size: %1 Kb</source>
+        <translation>Размер: %1 Кб</translation>
+    </message>
+    <message>
+        <source>Image Files (*.%1)</source>
+        <translation>Картинки (*.%1)</translation>
+    </message>
 </context>
 <context>
     <name>VCardDialogClass</name>
