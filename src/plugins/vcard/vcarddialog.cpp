@@ -1,7 +1,9 @@
 #include "vcarddialog.h"
 
+#include <QBuffer>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QImageReader>
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
 {
@@ -65,6 +67,16 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 VCardDialog::~VCardDialog()
 {
 	FVCard->unlock();
+}
+
+Jid VCardDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid VCardDialog::contactJid() const
+{
+	return FContactJid;
 }
 
 void VCardDialog::updateDialog()
@@ -157,11 +169,11 @@ void VCardDialog::updateDialog()
 	ui.tlbPhoneAdd->setVisible(!readOnly);
 	ui.tlbPhoneDelete->setVisible(!readOnly);
 
-	setLogo(QPixmap::fromImage(FVCard->logoImage()));
+	setLogo(QByteArray::fromBase64(FVCard->value(VVN_LOGO_VALUE).toLatin1()));
 	ui.tlbLogoClear->setVisible(!readOnly);
 	ui.tlbLogoLoad->setVisible(!readOnly);
 
-	setPhoto(QPixmap::fromImage(FVCard->photoImage()));
+	setPhoto(QByteArray::fromBase64(FVCard->value(VVN_PHOTO_VALUE).toLatin1()));
 	ui.tlbPhotoClear->setVisible(!readOnly);
 	ui.tlbPhotoLoad->setVisible(!readOnly);
 
@@ -219,26 +231,73 @@ void VCardDialog::updateVCard()
 		FVCard->setTagsForValue(VVN_TELEPHONE,listItem->text(),listItem->data(Qt::UserRole).toStringList(),phoneTagList);
 	}
 
-	if (!FLogo.isNull())
-		FVCard->setLogoImage(FLogo.toImage());
-	if (!FPhoto.isNull())
-		FVCard->setPhotoImage(FPhoto.toImage());
+	if (!FLogo.isEmpty())
+	{
+		FVCard->setValueForTags(VVN_LOGO_VALUE,FLogo.toBase64());
+		FVCard->setValueForTags(VVN_LOGO_TYPE,QString("image/%1").arg(getImageFormat(FLogo).toLower()));
+	}
+	if (!FPhoto.isEmpty())
+	{
+		FVCard->setValueForTags(VVN_PHOTO_VALUE,FPhoto.toBase64());
+		FVCard->setValueForTags(VVN_PHOTO_TYPE,QString("image/%1").arg(getImageFormat(FPhoto).toLower()));
+	}
 
 	FVCard->setValueForTags(VVN_DESCRIPTION,ui.tedComments->toPlainText());
 }
 
-void VCardDialog::setPhoto(const QPixmap &APhoto)
+void VCardDialog::setPhoto(const QByteArray &APhoto)
 {
-	FPhoto = APhoto;
-	ui.pmfPhoto->setPixmap(FPhoto);
-	ui.tlbPhotoSave->setVisible(!FPhoto.isNull());
+	QPixmap pixmap;
+	if (APhoto.isEmpty() || pixmap.loadFromData(APhoto))
+	{
+		FPhoto = APhoto;
+		ui.pmfPhoto->setImageData(FPhoto);
+		ui.tlbPhotoSave->setVisible(!pixmap.isNull());
+		ui.lblPhotoSize->setVisible(!pixmap.isNull());
+		ui.lblPhotoSize->setText(tr("Size: %1 Kb").arg(FPhoto.size() / 1024));
+	}
 }
 
-void VCardDialog::setLogo(const QPixmap &ALogo)
+void VCardDialog::setLogo(const QByteArray &ALogo)
 {
-	FLogo = ALogo;
-	ui.pmfLogo->setPixmap(FLogo);
-	ui.tlbLogoSave->setVisible(!FLogo.isNull());
+	QPixmap pixmap;
+	if (ALogo.isEmpty() || pixmap.loadFromData(ALogo))
+	{
+		FLogo = ALogo;
+		ui.pmfLogo->setImageData(FLogo);
+		ui.tlbLogoSave->setVisible(!pixmap.isNull());
+		ui.lblLogoSize->setVisible(!pixmap.isNull());
+		ui.lblLogoSize->setText(tr("Size: %1 Kb").arg(FLogo.size() / 1024));
+	}
+}
+
+QString VCardDialog::getImageFormat(const QByteArray &AData) const
+{
+	QBuffer buffer;
+	buffer.setData(AData);
+	buffer.open(QBuffer::ReadOnly);
+	QByteArray format = QImageReader::imageFormat(&buffer);
+	return QString::fromLocal8Bit(format.constData(),format.size());
+}
+
+QByteArray VCardDialog::loadFromFile(const QString &AFileName) const
+{
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
+		return file.readAll();
+	return QByteArray();
+}
+
+bool VCardDialog::saveToFile(const QString &AFileName, const QByteArray &AData) const
+{
+	QFile file(AFileName);
+	if (file.open(QFile::WriteOnly|QFile::Truncate))
+	{
+		file.write(AData);
+		file.close();
+		return true;
+	}
+	return false;
 }
 
 void VCardDialog::onVCardUpdated()
@@ -280,11 +339,13 @@ void VCardDialog::onUpdateDialogTimeout()
 
 void VCardDialog::onPhotoSaveClicked()
 {
-	if (!FPhoto.isNull())
+	if (!FPhoto.isEmpty())
 	{
-		QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+		QString format = getImageFormat(FPhoto).toLower();
+		QString filename = QString("%1_photo.%2").arg(FContactJid.node()).arg(format);
+		filename = QFileDialog::getSaveFileName(this,tr("Save image"),filename,tr("Image Files (*.%1)").arg(format));
 		if (!filename.isEmpty())
-			FPhoto.save(filename);
+			saveToFile(filename,FPhoto);
 	}
 }
 
@@ -292,25 +353,23 @@ void VCardDialog::onPhotoLoadClicked()
 {
 	QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 	if (!filename.isEmpty())
-	{
-		QImage image(filename);
-		if (!image.isNull())
-			setPhoto(QPixmap::fromImage(image));
-	}
+		setPhoto(loadFromFile(filename));
 }
 
 void VCardDialog::onPhotoClearClicked()
 {
-	setPhoto(QPixmap());
+	setPhoto(QByteArray());
 }
 
 void VCardDialog::onLogoSaveClicked()
 {
 	if (!FLogo.isNull())
 	{
-		QString filename = QFileDialog::getSaveFileName(this,tr("Save image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
+		QString format = getImageFormat(FPhoto).toLower();
+		QString filename = QString("%1_logo.%2").arg(FContactJid.node()).arg(format);
+		filename = QFileDialog::getSaveFileName(this,tr("Save image"),filename,tr("Image Files (*.%1)").arg(format));
 		if (!filename.isEmpty())
-			FLogo.save(filename);
+			saveToFile(filename,FLogo);
 	}
 }
 
@@ -318,16 +377,12 @@ void VCardDialog::onLogoLoadClicked()
 {
 	QString filename = QFileDialog::getOpenFileName(this,tr("Open image"),QString::null,tr("Image Files (*.png *.jpg *.bmp *.gif)"));
 	if (!filename.isEmpty())
-	{
-		QImage image(filename);
-		if (!image.isNull())
-			setLogo(QPixmap::fromImage(image));
-	}
+		setLogo(loadFromFile(filename));
 }
 
 void VCardDialog::onLogoClearClicked()
 {
-	setLogo(QPixmap());
+	setLogo(QByteArray());
 }
 
 void VCardDialog::onEmailAddClicked()

@@ -17,13 +17,16 @@ class VCardDialog :
 public:
 	VCardDialog(IVCardPlugin *AVCardPlugin,const Jid &AStreamJid, const Jid &AContactJid);
 	~VCardDialog();
-	virtual Jid streamJid() const { return FStreamJid; }
-	virtual Jid contactJid() const { return FContactJid; }
+	virtual Jid streamJid() const;
+	virtual Jid contactJid() const;
 protected:
 	void updateDialog();
 	void updateVCard();
-	void setPhoto(const QPixmap &APhoto);
-	void setLogo(const QPixmap &ALogo);
+	void setPhoto(const QByteArray &APhoto);
+	void setLogo(const QByteArray &ALogo);
+	QString getImageFormat(const QByteArray &AData) const;
+	QByteArray loadFromFile(const QString &AFileName) const;
+	bool saveToFile(const QString &AFileName, const QByteArray &AData) const;
 protected slots:
 	void onVCardUpdated();
 	void onVCardPublished();
@@ -50,8 +53,8 @@ private:
 private:
 	Jid FContactJid;
 	Jid FStreamJid;
-	QPixmap FLogo;
-	QPixmap FPhoto;
+	QByteArray FLogo;
+	QByteArray FPhoto;
 	bool FSaveClicked;
 };
 

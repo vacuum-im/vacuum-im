@@ -13,14 +13,38 @@ VCard::VCard(const Jid &AContactJid, VCardPlugin *APlugin) : QObject(APlugin)
 	FVCardPlugin = APlugin;
 	connect(FVCardPlugin,SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
 	connect(FVCardPlugin,SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardPublished(const Jid &)));
-	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const QString &)),
-	        SLOT(onVCardError(const Jid &, const QString &)));
+	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const QString &)),SLOT(onVCardError(const Jid &, const QString &)));
 	loadVCardFile();
 }
 
 VCard::~VCard()
 {
 
+}
+
+bool VCard::isValid() const
+{
+	return FContactJid.isValid() && !vcardElem().isNull();
+}
+
+bool VCard::isEmpty() const
+{
+	return !isValid() || !vcardElem().hasChildNodes();
+}
+
+const Jid & VCard::contactJid() const
+{
+	return FContactJid;
+}
+
+QDomElement VCard::vcardElem() const
+{
+	return FDoc.documentElement().firstChildElement(VCARD_TAGNAME);
+}
+
+QDateTime VCard::loadDateTime() const
+{
+	return FLoadDateTime;
 }
 
 QString VCard::value(const QString &AName, const QStringList &ATags, const QStringList &ATagList) const
@@ -65,8 +89,7 @@ QMultiHash<QString,QStringList> VCard::values(const QString &AName, const QStrin
 	return result;
 }
 
-void VCard::setTagsForValue(const QString &AName, const QString &AValue, const QStringList &ATags,
-                            const QStringList &ATagList)
+void VCard::setTagsForValue(const QString &AName, const QString &AValue, const QStringList &ATags, const QStringList &ATagList)
 {
 	QDomElement elem = firstElementByName(AName);
 	while (!elem.isNull() && elem.text()!=AValue)
@@ -96,8 +119,7 @@ void VCard::setTagsForValue(const QString &AName, const QString &AValue, const Q
 	}
 }
 
-void VCard::setValueForTags(const QString &AName, const QString &AValue, const QStringList &ATags,
-                            const QStringList &ATagList)
+void VCard::setValueForTags(const QString &AName, const QString &AValue, const QStringList &ATags, const QStringList &ATagList)
 {
 	bool tagsFaild = true;
 	QDomElement elem = firstElementByName(AName);
@@ -130,52 +152,10 @@ void VCard::setValueForTags(const QString &AName, const QString &AValue, const Q
 	}
 }
 
-void VCard::setLogoImage(const QImage &AImage, const QByteArray &AFormat)
-{
-	if (!AImage.isNull())
-	{
-		QByteArray bytes;
-		QBuffer buffer(&bytes);
-		buffer.open(QIODevice::WriteOnly);
-		QByteArray format = checkImageFormat(AFormat);
-		AImage.save(&buffer,format);
-		setValueForTags(VVN_LOGO_TYPE,formatToType(format));
-		setValueForTags(VVN_LOGO_VALUE,bytes.toBase64());
-	}
-	else
-	{
-		setValueForTags(VVN_LOGO_TYPE,QString::null);
-		setValueForTags(VVN_LOGO_VALUE,QString::null);
-	}
-	FLogo = AImage;
-}
-
-void VCard::setPhotoImage(const QImage &AImage, const QByteArray &AFormat)
-{
-	if (!AImage.isNull())
-	{
-		QByteArray bytes;
-		QBuffer buffer(&bytes);
-		buffer.open(QIODevice::WriteOnly);
-		QByteArray format = checkImageFormat(AFormat);
-		AImage.save(&buffer,format);
-		setValueForTags(VVN_PHOTO_TYPE,formatToType(format));
-		setValueForTags(VVN_PHOTO_VALUE,bytes.toBase64());
-	}
-	else
-	{
-		setValueForTags(VVN_PHOTO_TYPE,QString::null);
-		setValueForTags(VVN_PHOTO_VALUE,QString::null);
-	}
-	FPhoto = AImage;
-}
-
 void VCard::clear()
 {
 	FDoc.documentElement().removeChild(FDoc.documentElement().firstChildElement(VCARD_TAGNAME));
 	FDoc.documentElement().appendChild(FDoc.createElementNS(NS_VCARD_TEMP,VCARD_TAGNAME));
-	FPhoto = QImage();
-	FLogo = QImage();
 }
 
 bool VCard::update(const Jid &AStreamJid)
@@ -217,31 +197,10 @@ void VCard::loadVCardFile()
 		FLoadDateTime = QDateTime::fromString(FDoc.documentElement().attribute("dateTime"),Qt::ISODate);
 	}
 
-	QByteArray imageData = QByteArray::fromBase64(value(VVN_LOGO_VALUE).toAscii());
-	FLogo = !imageData.isEmpty() ? QImage::fromData(imageData) : QImage();
-
-	imageData = QByteArray::fromBase64(value(VVN_PHOTO_VALUE).toAscii());
-	FPhoto = !imageData.isEmpty() ? QImage::fromData(imageData) : QImage();
-
 	emit vcardUpdated();
 }
 
-QByteArray VCard::checkImageFormat(const QByteArray &AFormat) const
-{
-	if (QImageReader::supportedImageFormats().contains(AFormat.toLower()))
-		return AFormat.toLower();
-	return DEFAUL_IMAGE_FORMAT;
-}
-
-QString VCard::formatToType(const QByteArray &AFormat) const
-{
-	if (!AFormat.isEmpty())
-		return QString("image/%1").arg(AFormat.toLower().data());
-	return QString::null;
-}
-
-QDomElement VCard::createElementByName(const QString AName, const QStringList &ATags,
-                                       const QStringList &ATagList)
+QDomElement VCard::createElementByName(const QString AName, const QStringList &ATags, const QStringList &ATagList)
 {
 	QStringList tagTree = AName.split('/',QString::SkipEmptyParts);
 	QDomElement elem = vcardElem().firstChildElement(tagTree.at(0));
@@ -331,4 +290,3 @@ void VCard::onVCardError(const Jid &AContactJid, const QString &AError)
 	if (FContactJid == AContactJid)
 		emit vcardError(AError);
 }
-

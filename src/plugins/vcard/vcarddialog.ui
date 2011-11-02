@@ -656,6 +656,16 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="lblPhotoSize">
+            <property name="text">
+             <string notr="true">Size: 100KB</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <layout class="QHBoxLayout" name="lotPhotoButtons">
             <item>
              <widget class="QToolButton" name="tlbPhotoSave">
@@ -729,6 +739,16 @@
             </property>
             <property name="frameShape">
              <enum>QFrame::Box</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lblLogoSize">
+            <property name="text">
+             <string notr="true">Size: 100KB</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
            </widget>
           </item>
