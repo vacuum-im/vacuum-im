@@ -7,6 +7,10 @@
 #define   SCT_GLOBAL_SHOWROSTER                                    "global.show-roster"
 //ShortcutManager
 #define   SCT_GLOBAL_HIDEALLWIDGETS                                "global.hide-all-widgets"
+//Notifications
+#define   SCT_GLOBAL_TOGGLESOUND                                   "global.toggle-sound"
+#define   SCT_GLOBAL_ACTIVATELASTNOTIFICATION                      "global.activate-last-notification"
+#define   SCT_GLOBAL_REMOVEALLNOTIFICATIONS                        "global.remove-all-lnotifications"
 
 //PluginManager
 #define SCTG_APPLICATION                                           "application"
@@ -16,10 +20,6 @@
 //OptionsManager
 #define   SCT_APP_SHOWOPTIONS                                      "application.show-options"
 #define   SCT_APP_CHANGEPROFILE                                    "application.change-profile"
-//Notifications
-#define   SCT_APP_TOGGLESOUND                                      "application.toggle-sound"
-#define   SCT_APP_ACTIVATENOTIFICATIONS                            "application.activate-notifications"
-#define   SCT_APP_REMOVENOTIFICATIONS                              "application.remove-notifications"
 //FileStreamsManager
 #define   SCT_APP_SHOWFILETRANSFERS                                "application.show-filetransfers"
 //MultiUserChat

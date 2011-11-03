@@ -7,7 +7,7 @@
 #define AG_MMENU_SKINMANAGER                                    500
 #define AG_MMENU_CONSOLE                                        500
 #define AG_MMENU_FILESTREAMSMANAGER                             500
-#define AG_MMENU_PLUGINMANAGER_SETUP                            800
+#define AG_MMENU_PLUGINMANAGER_SETUP                            500
 #define AG_MMENU_PLUGINMANAGER_ABOUT                            900
 #define AG_MMENU_MAINWINDOW                                     1000
 
@@ -34,8 +34,9 @@
 #define AG_RVCM_VCARD                                           900
 
 //TrayManager - TrayMenu
+#define AG_TMTM_NOTIFICATIONS_LAST                              50
 #define AG_TMTM_MAINWINDOW                                      200
-#define AG_TMTM_NOTIFICATIONS                                   300
+#define AG_TMTM_NOTIFICATIONS_MENU                              300
 #define AG_TMTM_STATUSCHANGER                                   400
 #define AG_TMTM_OPTIONS                                         500
 #define AG_TMTM_SKINMANAGER                                     500
@@ -43,7 +44,6 @@
 #define AG_TMTM_MULTIUSERCHAT                                   500
 #define AG_TMTM_BOOKMARKS                                       500
 #define AG_TMTM_FILESTREAMSMANAGER                              500
-#define AG_TMTM_PLUGINMANAGER                                   900
 #define AG_TMTM_TRAYMANAGER                                     1000
 
 //StatusChanger - StatusMenu, StreamMenu

@@ -18,7 +18,7 @@ Notifications::Notifications()
 	FOptionsManager = NULL;
 	FMainWindowPlugin = NULL;
 
-	FActivateAll = NULL;
+	FActivateLast = NULL;
 	FRemoveAll = NULL;
 	FNotifyMenu = NULL;
 
@@ -28,7 +28,7 @@ Notifications::Notifications()
 
 Notifications::~Notifications()
 {
-	delete FActivateAll;
+	delete FActivateLast;
 	delete FRemoveAll;
 	delete FNotifyMenu;
 	delete FSound;
@@ -43,8 +43,9 @@ void Notifications::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
 	if (plugin)
 	{
@@ -100,34 +101,34 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	return true;
 }
 
 bool Notifications::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_APP_TOGGLESOUND, tr("Enable/Disable notifications sound"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_ACTIVATENOTIFICATIONS, tr("Activate all notifications"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_REMOVENOTIFICATIONS, tr("Remove all notifications"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_GLOBAL_TOGGLESOUND, tr("Enable/Disable notifications sound"), QKeySequence::UnknownKey, Shortcuts::GlobalShortcut);
+	Shortcuts::declareShortcut(SCT_GLOBAL_ACTIVATELASTNOTIFICATION, tr("Activate notification"), QKeySequence::UnknownKey, Shortcuts::GlobalShortcut);
+	Shortcuts::declareShortcut(SCT_GLOBAL_REMOVEALLNOTIFICATIONS, tr("Remove all notifications"), QKeySequence::UnknownKey, Shortcuts::GlobalShortcut);
 
 	FSoundOnOff = new Action(this);
 	FSoundOnOff->setToolTip(tr("Enable/Disable notifications sound"));
 	FSoundOnOff->setIcon(RSR_STORAGE_MENUICONS, MNI_NOTIFICATIONS_SOUND_ON);
-	FSoundOnOff->setShortcutId(SCT_APP_TOGGLESOUND);
+	FSoundOnOff->setShortcutId(SCT_GLOBAL_TOGGLESOUND);
 	connect(FSoundOnOff,SIGNAL(triggered(bool)),SLOT(onSoundOnOffActionTriggered(bool)));
 
-	FActivateAll = new Action(this);
-	FActivateAll->setVisible(false);
-	FActivateAll->setText(tr("Activate All Notifications"));
-	FActivateAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_ACTIVATE_ALL);
-	FActivateAll->setShortcutId(SCT_APP_ACTIVATENOTIFICATIONS);
-	connect(FActivateAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
+	FActivateLast = new Action(this);
+	FActivateLast->setVisible(false);
+	FActivateLast->setText(tr("Activate Notification"));
+	FActivateLast->setShortcutId(SCT_GLOBAL_ACTIVATELASTNOTIFICATION);
+	connect(FActivateLast,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FRemoveAll = new Action(this);
 	FRemoveAll->setVisible(false);
 	FRemoveAll->setText(tr("Remove All Notifications"));
 	FRemoveAll->setIcon(RSR_STORAGE_MENUICONS,MNI_NOTIFICATIONS_REMOVE_ALL);
-	FRemoveAll->setShortcutId(SCT_APP_REMOVENOTIFICATIONS);
+	FRemoveAll->setShortcutId(SCT_GLOBAL_REMOVEALLNOTIFICATIONS);
 	connect(FRemoveAll,SIGNAL(triggered(bool)),SLOT(onTrayActionTriggered(bool)));
 
 	FNotifyMenu = new Menu;
@@ -137,9 +138,9 @@ bool Notifications::initObjects()
 
 	if (FTrayManager)
 	{
-		FTrayManager->contextMenu()->addAction(FActivateAll,AG_TMTM_NOTIFICATIONS,false);
-		FTrayManager->contextMenu()->addAction(FRemoveAll,AG_TMTM_NOTIFICATIONS,false);
-		FTrayManager->contextMenu()->addAction(FNotifyMenu->menuAction(),AG_TMTM_NOTIFICATIONS,false);
+		FTrayManager->contextMenu()->addAction(FActivateLast,AG_TMTM_NOTIFICATIONS_LAST,false);
+		FTrayManager->contextMenu()->addAction(FRemoveAll,AG_TMTM_NOTIFICATIONS_MENU,false);
+		FTrayManager->contextMenu()->addAction(FNotifyMenu->menuAction(),AG_TMTM_NOTIFICATIONS_MENU,false);
 	}
 
 	if (FMainWindowPlugin)
@@ -165,6 +166,14 @@ bool Notifications::initSettings()
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
+	return true;
+}
+
+bool Notifications::startPlugin()
+{
+	Shortcuts::setGlobalShortcut(SCT_GLOBAL_TOGGLESOUND,true);
+	Shortcuts::setGlobalShortcut(SCT_GLOBAL_ACTIVATELASTNOTIFICATION,true);
+	Shortcuts::setGlobalShortcut(SCT_GLOBAL_REMOVEALLNOTIFICATIONS,true);
 	return true;
 }
 
@@ -253,6 +262,9 @@ int Notifications::appendNotification(const INotification &ANotification)
 				notify.toolTip = toolTip;
 				record.trayId = FTrayManager->appendNotify(notify);
 			}
+			FTrayNotifies.append(notifyId);
+			FActivateLast->setIcon(icon);
+			FActivateLast->setVisible(true);
 		}
 
 		if (!toolTip.isEmpty() && (record.notification.kinds & INotification::TrayAction)>0 &&
@@ -349,11 +361,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
 	}
 
-	if (FNotifyRecords.isEmpty())
-	{
-		FActivateAll->setVisible(true);
-		FRemoveAll->setVisible(true);
-	}
+	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
 	FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
 
 	FNotifyRecords.insert(notifyId,record);
@@ -398,12 +406,23 @@ void Notifications::removeNotification(int ANotifyId)
 			if (notifier)
 				notifier->removeNotify(record.tabPageId);
 		}
-		if (FNotifyRecords.isEmpty())
+		if (FTrayNotifies.contains(ANotifyId))
 		{
-			FActivateAll->setVisible(false);
-			FRemoveAll->setVisible(false);
+			FTrayNotifies.removeAll(ANotifyId);
+			if (!FTrayNotifies.isEmpty())
+			{
+				NotifyRecord lastRecord = FNotifyRecords.value(FTrayNotifies.last());
+				FActivateLast->setIcon(qvariant_cast<QIcon>(lastRecord.notification.data.value(NDR_ICON)));
+			}
+			else
+			{
+				FActivateLast->setVisible(false);
+			}
 		}
+
+		FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
 		FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
+
 		emit notificationRemoved(ANotifyId);
 	}
 }
@@ -569,11 +588,14 @@ void Notifications::onTrayActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		foreach(int notifyId, FNotifyRecords.keys())
+		if (action == FActivateLast)
 		{
-			if (action == FActivateAll)
-				activateNotification(notifyId);
-			else if (action == FRemoveAll)
+			if (!FTrayNotifies.isEmpty())
+				activateNotification(FTrayNotifies.last());
+		}
+		else if (action == FRemoveAll)
+		{
+			foreach(int notifyId, FNotifyRecords.keys())
 				removeNotification(notifyId);
 		}
 	}
@@ -657,6 +679,25 @@ void Notifications::onOptionsChanged(const OptionsNode &ANode)
 		else if (ANode.nspace().toInt() == INotification::AlertWidget)
 		{
 			WidgetManager::setWidgetAlertEnabled(ANode.value().toBool());
+		}
+	}
+}
+
+void Notifications::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (AWidget == NULL)
+	{
+		if (AId == SCT_GLOBAL_TOGGLESOUND)
+		{
+			FSoundOnOff->trigger();
+		}
+		else if (AId == SCT_GLOBAL_ACTIVATELASTNOTIFICATION)
+		{
+			FActivateLast->trigger();
+		}
+		else if (AId == SCT_GLOBAL_REMOVEALLNOTIFICATIONS)
+		{
+			FRemoveAll->trigger();
 		}
 	}
 }
