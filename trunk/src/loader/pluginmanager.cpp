@@ -690,38 +690,28 @@ void PluginManager::createMenuActions()
 	IPlugin *plugin = pluginInterface("IMainWindowPlugin").value(0);
 	IMainWindowPlugin *mainWindowPlugin = plugin!=NULL ? qobject_cast<IMainWindowPlugin *>(plugin->instance()) : NULL;
 
-	plugin = pluginInterface("ITrayManager").value(0);
-	ITrayManager *trayManager = plugin!=NULL ? qobject_cast<ITrayManager *>(plugin->instance()) : NULL;
-
-	if (mainWindowPlugin || trayManager)
+	if (mainWindowPlugin)
 	{
-		Action *pluginsDialog = new Action(mainWindowPlugin!=NULL ? mainWindowPlugin->instance() : trayManager->instance());
+		Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
+		aboutQt->setText(tr("About Qt"));
+		aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
+		aboutQt->setShortcutId(SCT_APP_ABOUTQT);
+		connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
+		mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
+
+		Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
+		about->setText(tr("About the program"));
+		about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
+		about->setShortcutId(SCT_APP_ABOUTPROGRAM);
+		connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
+		mainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
+
+		Action *pluginsDialog = new Action(mainWindowPlugin->mainWindow()->mainMenu());
 		pluginsDialog->setText(tr("Setup plugins"));
 		pluginsDialog->setIcon(RSR_STORAGE_MENUICONS, MNI_PLUGINMANAGER_SETUP);
 		pluginsDialog->setShortcutId(SCT_APP_SETUPPLUGINS);
 		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
-
-		if (mainWindowPlugin)
-		{
-			Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
-			aboutQt->setText(tr("About Qt"));
-			aboutQt->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT_QT);
-			aboutQt->setShortcutId(SCT_APP_ABOUTQT);
-			connect(aboutQt,SIGNAL(triggered()),QApplication::instance(),SLOT(aboutQt()));
-			mainWindowPlugin->mainWindow()->mainMenu()->addAction(aboutQt,AG_MMENU_PLUGINMANAGER_ABOUT);
-
-			Action *about = new Action(mainWindowPlugin->mainWindow()->mainMenu());
-			about->setText(tr("About the program"));
-			about->setIcon(RSR_STORAGE_MENUICONS,MNI_PLUGINMANAGER_ABOUT);
-			about->setShortcutId(SCT_APP_ABOUTPROGRAM);
-			connect(about,SIGNAL(triggered()),SLOT(onShowAboutBoxDialog()));
-			mainWindowPlugin->mainWindow()->mainMenu()->addAction(about,AG_MMENU_PLUGINMANAGER_ABOUT);
-
-			mainWindowPlugin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
-		}
-
-		if (trayManager)
-			trayManager->contextMenu()->addAction(pluginsDialog,AG_TMTM_PLUGINMANAGER,true);
+		mainWindowPlugin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
 	}
 	else
 	{

@@ -8,10 +8,6 @@
         <translation>Уведомления</translation>
     </message>
     <message>
-        <source>Activate All Notifications</source>
-        <translation>Активировать все уведомления</translation>
-    </message>
-    <message>
         <source>Remove All Notifications</source>
         <translation>Удалить все уведомления</translation>
     </message>
@@ -32,10 +28,6 @@
         <translation>Включить/Выключить звук уведомлений</translation>
     </message>
     <message>
-        <source>Activate all notifications</source>
-        <translation>Активировать все уведомления</translation>
-    </message>
-    <message>
         <source>Remove all notifications</source>
         <translation>Удалить все уведомления</translation>
     </message>
@@ -46,6 +38,14 @@
     <message>
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
         <translation>Отключать звуки, когда установлен статус &apos;Не беспокоить&apos;</translation>
+    </message>
+    <message>
+        <source>Activate notification</source>
+        <translation>Активировать уведомление</translation>
+    </message>
+    <message>
+        <source>Activate Notification</source>
+        <translation>Активировать уведомление</translation>
     </message>
 </context>
 <context>

@@ -73,7 +73,7 @@ public:
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
 	virtual bool initSettings();
-	virtual bool startPlugin() { return true; }
+	virtual bool startPlugin();
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//INotifications
@@ -123,6 +123,7 @@ protected slots:
 	void onActionNotifyActivated(bool);
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IAvatars *FAvatars;
 	IRosterPlugin *FRosterPlugin;
@@ -134,10 +135,11 @@ private:
 	IOptionsManager *FOptionsManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 private:
-	Action *FSoundOnOff;
-	Action *FActivateAll;
-	Action *FRemoveAll;
 	Menu *FNotifyMenu;
+	Action *FSoundOnOff;
+	Action *FRemoveAll;
+	Action *FActivateLast;
+	QList<int> FTrayNotifies;
 private:
 	int FNotifyId;
 	QSound *FSound;

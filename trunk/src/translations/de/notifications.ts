@@ -8,10 +8,6 @@
         <translation>Benachrichtigungen</translation>
     </message>
     <message>
-        <source>Activate All Notifications</source>
-        <translation>Alle Benachrichtigungen aktivieren</translation>
-    </message>
-    <message>
         <source>Remove All Notifications</source>
         <translation>Alle Benachrichtigungen entfernen</translation>
     </message>
@@ -32,10 +28,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Activate all notifications</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Remove all notifications</source>
         <translation></translation>
     </message>
@@ -45,6 +37,14 @@
     </message>
     <message>
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate notification</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate Notification</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
