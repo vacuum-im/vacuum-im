@@ -17,7 +17,6 @@
 #define AG_RVCM_STATUSCHANGER                                   300
 #define AG_RVCM_RCHANGER_ADD_CONTACT                            300
 #define AG_RVCM_GATEWAYS_ADD_LEGACY_USER                        300
-#define AG_RVCM_GATEWAYS_LOGIN                                  350
 #define AG_RVCM_CLIENTINFO                                      400
 #define AG_RVCM_DISCOVERY_FEATURES                              400
 #define AG_RVCM_MULTIUSERCHAT                                   500
@@ -28,9 +27,11 @@
 #define AG_RVCM_ROSTERSVIEW_CLIPBOARD                           500
 #define AG_RVCM_PRIVACYLISTS                                    500
 #define AG_RVCM_STATUSICONS                                     500
-#define AG_RVCM_GATEWAYS_RESOLVE                                500
 #define AG_RVCM_ACCOUNTMANAGER                                  700
 #define AG_RVCM_RCHANGER                                        700
+#define AG_RVCM_GATEWAYS_LOGIN                                  800
+#define AG_RVCM_GATEWAYS_RESOLVE                                800
+#define AG_RVCM_GATEWAYS_REMOVE                                 800
 #define AG_RVCM_VCARD                                           900
 
 //TrayManager - TrayMenu

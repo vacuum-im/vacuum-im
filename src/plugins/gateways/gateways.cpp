@@ -1,5 +1,8 @@
 #include "gateways.h"
 
+#include <QMessageBox>
+#include <QTextDocument>
+
 #define GATEWAY_TIMEOUT           30000
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
@@ -338,6 +341,33 @@ QList<Jid> Gateways::serviceContacts(const Jid &AStreamJid, const Jid &AServiceJ
 	return contacts;
 }
 
+bool Gateways::removeService(const Jid &AStreamJid, const Jid &AServiceJid, bool AWithContacts)
+{
+	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+	if (roster && roster->isOpen())
+	{
+		sendLogPresence(AStreamJid,AServiceJid,false);
+		
+		if (FRosterChanger)
+			FRosterChanger->insertAutoSubscribe(AStreamJid, AServiceJid, true, false, true);
+		if (FRegistration)
+			FRegistration->sendUnregiterRequest(AStreamJid,AServiceJid);
+		roster->removeItem(AServiceJid);
+		
+		if (AWithContacts)
+		{
+			foreach(Jid contactJid, serviceContacts(AStreamJid,AServiceJid))
+			{
+				if (FRosterChanger)
+					FRosterChanger->insertAutoSubscribe(AStreamJid, contactJid, true, false, true);
+				roster->removeItem(contactJid);
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
 bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, const Jid &AServiceTo, bool ARemove, bool ASubscribe)
 {
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
@@ -604,6 +634,37 @@ void Gateways::onChangeActionTriggered(bool)
 	}
 }
 
+void Gateways::onRemoveActionTriggered(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		QStringList serviceList = action->data(ADR_SERVICE_JID).toStringList();
+
+		int button = QMessageBox::No;
+		if (serviceList.count() == 1)
+		{
+			Jid serviceJid = serviceList.first();
+			button = QMessageBox::question(NULL,tr("Remove transport and its contacts"),
+				tr("You are assured that wish to remove a transport '<b>%1</b>' and its <b>%n contacts</b> from roster?","",serviceContacts(streamJid,serviceJid).count()).arg(Qt::escape(serviceJid.bare())),
+				QMessageBox::Yes | QMessageBox::No);
+		}
+		else if (serviceList.count() > 1)
+		{
+			button = QMessageBox::question(NULL,tr("Remove transports and their contacts"),
+				tr("You are assured that wish to remove <b>%n transports</b> and their contacts from roster?","",serviceList.count()),
+				QMessageBox::Yes | QMessageBox::No);
+		}
+
+		if (button == QMessageBox::Yes)
+		{
+			foreach(Jid serviceJid, serviceList)
+				removeService(streamJid,serviceJid);
+		}
+	}
+}
+
 void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
@@ -671,58 +732,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, i
 		{
 			int indexType = AIndexes.first()->type();
 			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
-			if (indexType == RIT_AGENT)
-			{
-				IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
-				if (presence && presence->isOpen())
-				{
-					QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
-					
-					Action *action = new Action(AMenu);
-					action->setText(tr("Login on transport"));
-					action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
-					action->setData(ADR_STREAM_JID,streamJid.full());
-					action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
-					action->setData(ADR_LOG_IN,true);
-					action->setShortcutId(SCT_ROSTERVIEW_GATELOGIN);
-					connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-					AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
 
-					action = new Action(AMenu);
-					action->setText(tr("Logout from transport"));
-					action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
-					action->setData(ADR_STREAM_JID,streamJid.full());
-					action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
-					action->setData(ADR_LOG_IN,false);
-					action->setShortcutId(SCT_ROSTERVIEW_GATELOGOUT);
-					connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
-					AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
-
-					if (FPrivateStorageKeep.contains(streamJid))
-					{
-						int checks = 0;
-						foreach(IRosterIndex *index, AIndexes)
-						{
-							if (FKeepConnections.contains(streamJid,index->data(RDR_PREP_BARE_JID).toString()))
-								checks |= 0x01;
-							else
-								checks |= 0x02;
-						}
-
-						Action *action = new Action(AMenu);
-						action->setText(tr("Keep connection"));
-						action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_KEEP_CONNECTION);
-						action->setData(ADR_STREAM_JID,streamJid.full());
-						action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
-						action->setCheckable(true);
-						action->setChecked(checks == 0x01);
-						action->setVisible(checks != 0x03);
-						connect(action,SIGNAL(triggered(bool)),SLOT(onKeepActionTriggered(bool)));
-						AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN,false);
-					}
-				}
-			}
-			
 			if (indexType == RIT_CONTACT || indexType == RIT_AGENT)
 			{
 				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
@@ -745,7 +755,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, i
 
 					if (showResolve)
 					{
-						QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
+						QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID);
 
 						Action *action = new Action(AMenu);
 						action->setText(indexType==RIT_AGENT ? tr("Resolve nick names") : tr("Resolve nick name"));
@@ -753,7 +763,70 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, i
 						action->setData(ADR_STREAM_JID,streamJid.full());
 						action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
 						connect(action,SIGNAL(triggered(bool)),SLOT(onResolveActionTriggered(bool)));
-						AMenu->addAction(action,AG_RVCM_GATEWAYS_RESOLVE,true);
+						AMenu->addAction(action,AG_RVCM_GATEWAYS_RESOLVE);
+					}
+				}
+			}
+
+			if (indexType == RIT_AGENT)
+			{
+				IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+				if (presence && presence->isOpen())
+				{
+					QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID);
+					
+					Action *action = new Action(AMenu);
+					action->setText(tr("Login on transport"));
+					action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_IN);
+					action->setData(ADR_STREAM_JID,streamJid.full());
+					action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+					action->setData(ADR_LOG_IN,true);
+					action->setShortcutId(SCT_ROSTERVIEW_GATELOGIN);
+					connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
+					AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN);
+
+					action = new Action(AMenu);
+					action->setText(tr("Logout from transport"));
+					action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_LOG_OUT);
+					action->setData(ADR_STREAM_JID,streamJid.full());
+					action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+					action->setData(ADR_LOG_IN,false);
+					action->setShortcutId(SCT_ROSTERVIEW_GATELOGOUT);
+					connect(action,SIGNAL(triggered(bool)),SLOT(onLogActionTriggered(bool)));
+					AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN);
+
+					if (FPrivateStorageKeep.contains(streamJid))
+					{
+						int checks = 0;
+						foreach(IRosterIndex *index, AIndexes)
+						{
+							if (FKeepConnections.contains(streamJid,index->data(RDR_PREP_BARE_JID).toString()))
+								checks |= 0x01;
+							else
+								checks |= 0x02;
+						}
+
+						action = new Action(AMenu);
+						action->setText(tr("Keep connection"));
+						action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_KEEP_CONNECTION);
+						action->setData(ADR_STREAM_JID,streamJid.full());
+						action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+						action->setCheckable(true);
+						action->setChecked(checks == 0x01);
+						action->setVisible(checks != 0x03);
+						connect(action,SIGNAL(triggered(bool)),SLOT(onKeepActionTriggered(bool)));
+						AMenu->addAction(action,AG_RVCM_GATEWAYS_LOGIN);
+					}
+
+					if (AIndexes.count()>1 || !serviceContacts(streamJid,rolesMap.value(RDR_PREP_BARE_JID).value(0)).isEmpty())
+					{
+						action = new Action(AMenu);
+						action->setText(tr("Remove transport and its contacts"));
+						action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_REMOVE);
+						action->setData(ADR_STREAM_JID,streamJid.full());
+						action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
+						connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveActionTriggered(bool)));
+						AMenu->addAction(action,AG_RVCM_GATEWAYS_REMOVE);
 					}
 				}
 			}
