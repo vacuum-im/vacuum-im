@@ -64,6 +64,7 @@ public:
 	virtual void setKeepConnection(const Jid &AStreamJid, const Jid &AServiceJid, bool AEnabled);
 	virtual QList<Jid> streamServices(const Jid &AStreamJid, const IDiscoIdentity &AIdentity = IDiscoIdentity()) const;
 	virtual QList<Jid> serviceContacts(const Jid &AStreamJid, const Jid &AServiceJid) const;
+	virtual bool removeService(const Jid &AStreamJid, const Jid &AService, bool AWithContacts = true);
 	virtual bool changeService(const Jid &AStreamJid, const Jid &AServiceFrom, const Jid &AServiceTo, bool ARemove, bool ASubscribe);
 	virtual QString sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid);
 	virtual QString sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID);
@@ -83,6 +84,7 @@ protected slots:
 	void onResolveActionTriggered(bool);
 	void onKeepActionTriggered(bool);
 	void onChangeActionTriggered(bool);
+	void onRemoveActionTriggered(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);

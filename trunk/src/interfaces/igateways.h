@@ -17,6 +17,7 @@ public:
 	virtual void setKeepConnection(const Jid &AStreamJid, const Jid &AServiceJid, bool AEnabled) =0;
 	virtual QList<Jid> streamServices(const Jid &AStreamJid, const IDiscoIdentity &AIdentity = IDiscoIdentity()) const =0;
 	virtual QList<Jid> serviceContacts(const Jid &AStreamJid, const Jid &AServiceJid) const =0;
+	virtual bool removeService(const Jid &AStreamJid, const Jid &AService, bool AWithContacts = true) =0;
 	virtual bool changeService(const Jid &AStreamJid, const Jid &AServiceFrom, const Jid &AServiceTo, bool ARemove, bool ASubscribe) =0;
 	virtual QString sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
 	virtual QString sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID) =0;
@@ -27,6 +28,6 @@ protected:
 	virtual void errorReceived(const QString &AId, const QString &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IGateways,"Vacuum.Plugin.IGateways/1.0")
+Q_DECLARE_INTERFACE(IGateways,"Vacuum.Plugin.IGateways/1.1")
 
 #endif

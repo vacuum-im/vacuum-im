@@ -85,5 +85,29 @@
         <source>Logout from transport</source>
         <translation>Отключиться от транспорта</translation>
     </message>
+    <message numerus="yes">
+        <source>You are assured that wish to remove a transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contacts&lt;/b&gt; from roster?</source>
+        <translation>
+            <numerusform>Вы уверены, что хотите удалить транспорт &apos;&lt;b&gt;%1&lt;/b&gt;&apos; и его &lt;b&gt;%n контакт&lt;/b&gt; из ростера?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить транспорт &apos;&lt;b&gt;%1&lt;/b&gt;&apos; и его &lt;b&gt;%n контакта&lt;/b&gt; из ростера?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить транспорт &apos;&lt;b&gt;%1&lt;/b&gt;&apos; и его &lt;b&gt;%n контактов&lt;/b&gt; из ростера?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>You are assured that wish to remove &lt;b&gt;%n transports&lt;/b&gt; and their contacts from roster?</source>
+        <translation>
+            <numerusform>Вы уверены, что хотие удалить &lt;b&gt;%n транспорт&lt;/b&gt; и его контакты из росрера?</numerusform>
+            <numerusform>Вы уверены, что хотие удалить &lt;b&gt;%n транспорта&lt;/b&gt; и их контакты из росрера?</numerusform>
+            <numerusform>Вы уверены, что хотие удалить &lt;b&gt;%n транспортов&lt;/b&gt; и их контакты из росрера?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove transport and its contacts</source>
+        <translation>Удалить транспорт и его контакты</translation>
+    </message>
+    <message>
+        <source>Remove transports and their contacts</source>
+        <translation>Удалить транспорты и их контакты</translation>
+    </message>
 </context>
 </TS>

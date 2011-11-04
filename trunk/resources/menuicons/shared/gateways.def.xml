@@ -28,4 +28,8 @@
     <key>gatewaysResolve</key>
     <object mime="image/png">gatewaysresolve.png</object>
   </icon>
+  <icon>
+    <key>gatewaysRemove</key>
+    <object mime="image/png">gatewaysremove.png</object>
+  </icon>
 </icondef>
