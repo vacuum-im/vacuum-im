@@ -86,6 +86,10 @@ bool SocksStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &
 			FHosts.clear();
 			FHostIndex = 0;
 			FHostRequest = AStanza.id();
+
+			if (queryElem.hasAttribute("dstaddr"))
+				FConnectKey = queryElem.attribute("dstaddr");
+
 			QDomElement hostElem = queryElem.firstChildElement("streamhost");
 			while (!hostElem.isNull())
 			{
@@ -606,7 +610,6 @@ bool SocksStream::negotiateConnection(int ACommand)
 					FSocksStreams->removeLocalConnection(FConnectKey);
 				}
 			}
-
 			abort(tr("Invalid host"));
 		}
 		else if (ACommand == NCMD_CHECK_NEXT_HOST)
@@ -623,7 +626,6 @@ bool SocksStream::negotiateConnection(int ACommand)
 			{
 				if (activateStream())
 					return true;
-
 				abort(tr("Failed to activate stream"));
 			}
 			else
@@ -633,7 +635,6 @@ bool SocksStream::negotiateConnection(int ACommand)
 					setStreamState(IDataStreamSocket::Opened);
 					return true;
 				}
-
 				abort(tr("Failed to activate stream"));
 			}
 		}
@@ -671,6 +672,7 @@ bool SocksStream::sendAvailHosts()
 	QDomElement queryElem = request.addElement("query",NS_SOCKS5_BYTESTREAMS);
 	queryElem.setAttribute("sid",FStreamId);
 	queryElem.setAttribute("mode","tcp");
+	queryElem.setAttribute("dstaddr",FConnectKey);
 
 	if (!disableDirectConnection() && FSocksStreams->appendLocalConnection(FConnectKey))
 	{
@@ -802,7 +804,7 @@ void SocksStream::onHostSocketReadyRead()
 		outData += (char)0;                     // reserved
 		outData += (char)3;                     // address type (domain)
 		outData += (char)FConnectKey.length();  // domain length
-		outData += FConnectKey.toUtf8();        // domain
+		outData += FConnectKey.toLatin1();      // domain
 		outData += (char)0;                     // port
 		outData += (char)0;                     // port
 		FTcpSocket->write(outData);
