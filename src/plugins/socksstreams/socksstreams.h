@@ -23,7 +23,7 @@ class SocksStreams :
 			public ISocksStreams
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin ISocksStreams);
+	Q_INTERFACES(IPlugin ISocksStreams IDataStreamMethod);
 public:
 	SocksStreams();
 	~SocksStreams();

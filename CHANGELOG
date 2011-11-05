@@ -16,6 +16,7 @@ LEGEND
 v1.1.1
 ------
   [-] Fixed bug with handling stanzas from Google XMPP servers
+  [*] Added support for transferring files via SOCKS5 in conferences
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
   [-] Fixed bug in Digest-MD5 authorization for which was not possible to log on some servers
 
