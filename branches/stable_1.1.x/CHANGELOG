@@ -8,6 +8,7 @@ LEGEND
 
 ------
   [+] Implemented backup settings and restore them automatically when the main file is damaged
+  [*] Added support for transferring files via SOCKS5 in conferences
   [-] In the history view could appear duplicates of conversations
   [-] Did not correctly handle changes in the participant's nickname when new nickname is already used by the same participant but from a different resource
   [-] Fixed crash in Ubuntu 11.10 when alt key is pressed in chat window
@@ -16,7 +17,6 @@ LEGEND
 v1.1.1
 ------
   [-] Fixed bug with handling stanzas from Google XMPP servers
-  [*] Added support for transferring files via SOCKS5 in conferences
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
   [-] Fixed bug in Digest-MD5 authorization for which was not possible to log on some servers
 
