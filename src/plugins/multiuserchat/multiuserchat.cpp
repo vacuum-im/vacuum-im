@@ -267,10 +267,13 @@ void MultiUserChat::setNickName(const QString &ANick)
 {
 	if (isOpen())
 	{
-		Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
-		Stanza presence("presence");
-		presence.setTo(userJid.eFull());
-		FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
+		if (!ANick.isEmpty() && FNickName!=ANick)
+		{
+			Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
+			Stanza presence("presence");
+			presence.setTo(userJid.eFull());
+			FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
+		}
 	}
 	else
 	{
