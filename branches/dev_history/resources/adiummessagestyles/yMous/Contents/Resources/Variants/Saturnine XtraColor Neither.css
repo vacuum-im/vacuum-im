@@ -1,0 +1,30 @@
+@charset "utf-8";
+
+@import url(./_Themes/_Base.css);
+@import url(./_Themes/_BaseS.css);
+@import url(./_Themes/_XtraColorS.css);
+
+.xxxsender
+{
+	display: none;
+}
+
+.xxxtime
+{
+	display: none;
+}
+
+.xxxiconsmall
+{
+	padding-right: 4px;
+}
+
+.actionMessageUserName
+{
+	display: inline;
+}
+
+.actionMessageUserName:after
+{
+	content: " ";
+}
