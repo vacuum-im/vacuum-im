@@ -12,6 +12,7 @@ LEGEND
   [-] In the history view could appear duplicates of conversations
   [-] Did not correctly handle changes in the participant's nickname when new nickname is already used by the same participant but from a different resource
   [-] Fixed crash in Ubuntu 11.10 when alt key is pressed in chat window
+  [-] The first message in the chat may not be saved in the local message archive
 
 
 v1.1.1
