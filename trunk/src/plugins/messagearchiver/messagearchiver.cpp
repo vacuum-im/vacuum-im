@@ -1781,7 +1781,7 @@ CollectionWriter *MessageArchiver::newCollectionWriter(const Jid &AStreamJid, co
 	if (!writer && AHeader.with.isValid() && AHeader.start.isValid())
 	{
 		QString fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
-		CollectionWriter *writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
+		writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
 		if (writer->isOpened())
 		{
 			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
