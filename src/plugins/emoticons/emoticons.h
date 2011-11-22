@@ -56,7 +56,10 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IEditContentsHandler
-	virtual void editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
+	virtual bool editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *AData);
+	virtual bool editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData);
+	virtual bool editContentsInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
+	virtual bool editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IEmoticons
 	virtual QList<QString> activeIconsets() const;
 	virtual QUrl urlByKey(const QString &AKey) const;

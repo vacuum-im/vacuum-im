@@ -38,9 +38,12 @@ public:
 	virtual bool sendToolBarVisible() const;
 	virtual void setSendToolBarVisible(bool AVisible);
 	virtual ToolBarChanger *sendToolBarChanger() const;
-	virtual bool textFormatEnabled() const;
-	virtual void setTextFormatEnabled(bool AEnabled);
+	virtual bool isRichTextEnabled() const;
+	virtual void setRichTextEnabled(bool AEnabled);
+	virtual void insertTextFragment(const QTextDocumentFragment &AFragment);
+	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const;
 signals:
+	// IEditWidget
 	void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
 	void messageAboutToBeSend();
 	void messageReady();
@@ -50,7 +53,12 @@ signals:
 	void autoResizeChanged(bool AResize);
 	void minimumLinesChanged(int ALines);
 	void sendShortcutChanged(const QString &AShortcutId);
-	void contentsChanged(int APosition, int ARemoved, int AAdded);
+	void richTextEnableChanged(bool AEnabled);
+	// EditWidget
+	void createDataRequest(QMimeData *ADestination) const;
+	void canInsertDataRequest(const QMimeData *AData, bool &ACanInsert) const;
+	void insertDataRequest(const QMimeData *AData, QTextDocument *ADocument) const;
+	void contentsChanged(int APosition, int ARemoved, int AAdded) const;
 protected:
 	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected:
@@ -59,19 +67,20 @@ protected:
 	void showNextBufferedMessage();
 	void showPrevBufferedMessage();
 protected slots:
-	void updateSendToolBarMaxWidth();
-protected slots:
+	void onUpdateSendToolBarMaxWidth();
 	void onSendActionTriggered(bool);
 	void onShortcutUpdated(const QString &AId);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onOptionsChanged(const OptionsNode &ANode);
-	void onContentsChanged(int APosition, int ARemoved, int AAdded);
+	void onEditorCreateDataRequest(QMimeData *AData);
+	void onEditorCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert);
+	void onEditorInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument);
+	void onEditorContentsChanged(int APosition, int ARemoved, int AAdded);
 private:
 	Ui::EditWidgetClass ui;
 private:
 	IMessageWidgets *FMessageWidgets;
 private:
-	bool FFormatEnabled;
 	int FBufferPos;
 	Jid FStreamJid;
 	Jid FContactJid;

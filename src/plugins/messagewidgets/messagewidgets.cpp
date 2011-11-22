@@ -1,11 +1,13 @@
 #include "messagewidgets.h"
 
 #include <QPair>
+#include <QBuffer>
 #include <QMimeData>
 #include <QClipboard>
 #include <QTextBlock>
 #include <QTextCursor>
 #include <QTextDocument>
+#include <QTextDocumentWriter>
 
 #define ADR_CONTEXT_DATA        Action::DR_Parametr1
 
@@ -90,8 +92,7 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
 
 	insertViewUrlHandler(VUHO_MESSAGEWIDGETS_DEFAULT,this);
-	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_FORMAT,this);
-	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_IMAGES,this);
+	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_COPY_INSERT,this);
 
 	return true;
 }
@@ -143,57 +144,68 @@ bool MessageWidgets::viewUrlOpen(int AOrder, IViewWidget* APage, const QUrl &AUr
 	return QDesktopServices::openUrl(AUrl);
 }
 
-void MessageWidgets::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+bool MessageWidgets::editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *AData)
 {
-	Q_UNUSED(ARemoved);
-	if (!AWidget->textFormatEnabled() && AAdded>0)
+	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
 	{
-		QTextCharFormat emptyFormat;
-		QList< QPair<int,int> > formats;
-		QTextBlock block = AWidget->document()->findBlock(APosition);
-		while (block.isValid() && block.position()<=APosition+AAdded)
+		QTextDocumentFragment fragment = AWidget->textEdit()->textCursor().selection();
+		if (!fragment.isEmpty())
 		{
-			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+			if (AWidget->isRichTextEnabled())
 			{
-				QTextCharFormat textFormat = it.fragment().charFormat();
-				if (textFormat.isImageFormat())
-				{
-					if (AOrder == ECHO_MESSAGEWIDGETS_IMAGES)
-						formats.append(qMakePair(it.fragment().position(),it.fragment().length()));
-				}
-				else if (textFormat != emptyFormat)
-				{
-					if (AOrder == ECHO_MESSAGEWIDGETS_FORMAT)
-						formats.append(qMakePair(it.fragment().position(),it.fragment().length()));
-				}
+				QBuffer buffer;
+				QTextDocumentWriter writer(&buffer, "ODF");
+				writer.write(fragment);
+				buffer.close();
+				AData->setData("application/vnd.oasis.opendocument.text", buffer.data());
+				AData->setData("text/html", fragment.toHtml("utf-8").toUtf8());
 			}
-			block = block.next();
-		}
-
-		if (!formats.isEmpty())
-		{
-			int posOffset = 0;
-			QTextCursor cursor(AWidget->document());
-			cursor.beginEditBlock();
-			for (int i=0; i<formats.count(); i++)
-			{
-				const QPair<int,int> &format = formats.at(i);
-				cursor.setPosition(format.first-posOffset);
-				cursor.setPosition(format.first-posOffset+format.second,QTextCursor::KeepAnchor);
-				if (AOrder == ECHO_MESSAGEWIDGETS_IMAGES)
-				{
-					posOffset += cursor.selectedText().length();
-					cursor.removeSelectedText();
-				}
-				else if (AOrder == ECHO_MESSAGEWIDGETS_FORMAT)
-				{
-					cursor.setCharFormat(emptyFormat);
-				}
-			}
-			cursor.endEditBlock();
-			AAdded -= posOffset;
+			AData->setText(fragment.toPlainText());
 		}
 	}
+	return false;
+}
+
+bool MessageWidgets::editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData)
+{
+	Q_UNUSED(AWidget);
+	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
+	{
+		return AData->hasText() || AData->hasHtml();
+	}
+	return false;
+}
+
+bool MessageWidgets::editContentsInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
+{
+	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
+	{
+		if (editContentsCanInsert(AOrder,AWidget,AData))
+		{
+			QTextDocumentFragment fragment;
+			if (AData->hasHtml())
+				fragment = QTextDocumentFragment::fromHtml(AData->html());
+			else if (AData->hasText())
+				fragment = QTextDocumentFragment::fromPlainText(AData->text());
+
+			if (!fragment.isEmpty())
+			{
+				QTextCursor cursor(ADocument);
+				cursor.insertFragment(fragment);
+			}
+		}
+	}
+	return false;
+}
+
+bool MessageWidgets::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+{
+	Q_UNUSED(AOrder);
+	Q_UNUSED(AWidget);
+	Q_UNUSED(APosition);
+	Q_UNUSED(ARemoved);
+	Q_UNUSED(AAdded);
+	return false;
 }
 
 IInfoWidget *MessageWidgets::newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
@@ -218,6 +230,12 @@ IViewWidget *MessageWidgets::newViewWidget(const Jid &AStreamJid, const Jid &ACo
 IEditWidget *MessageWidgets::newEditWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent)
 {
 	IEditWidget *widget = new EditWidget(this,AStreamJid,AContactJid,AParent);
+	connect(widget->instance(),SIGNAL(createDataRequest(QMimeData *)),
+		SLOT(onEditWidgetCreateDataRequest(QMimeData *)));
+	connect(widget->instance(),SIGNAL(canInsertDataRequest(const QMimeData *, bool &)),
+		SLOT(onEditWidgetCanInsertDataRequest(const QMimeData *, bool &)));
+	connect(widget->instance(),SIGNAL(insertDataRequest(const QMimeData *, QTextDocument *)),
+		SLOT(onEditWidgetInsertDataRequest(const QMimeData *, QTextDocument *)));
 	connect(widget->instance(),SIGNAL(contentsChanged(int, int, int)),SLOT(onEditWidgetContentsChanged(int, int, int)));
 	FCleanupHandler.add(widget->instance());
 	emit editWidgetCreated(widget);
@@ -612,6 +630,38 @@ void MessageWidgets::onViewContextSearchActionTriggered(bool)
 	}
 }
 
+void MessageWidgets::onEditWidgetCreateDataRequest(QMimeData *AData)
+{
+	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
+	if (widget)
+	{
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); it++)
+			if (it.value()->editContentsCreate(it.key(),widget,AData))
+				break;
+	}
+}
+
+void MessageWidgets::onEditWidgetCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert)
+{
+	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
+	if (widget)
+	{
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); !ACanInsert && it!=FEditContentsHandlers.constEnd(); it++)
+			ACanInsert = it.value()->editContentsCanInsert(it.key(),widget,AData);
+	}
+}
+
+void MessageWidgets::onEditWidgetInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument)
+{
+	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
+	if (widget)
+	{
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); it++)
+			if (it.value()->editContentsInsert(it.key(),widget,AData,ADocument))
+				break;
+	}
+}
+
 void MessageWidgets::onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded)
 {
 	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
@@ -619,7 +669,8 @@ void MessageWidgets::onEditWidgetContentsChanged(int APosition, int ARemoved, in
 	{
 		widget->document()->blockSignals(true);
 		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); it++)
-			it.value()->editContentsChanged(it.key(),widget,APosition,ARemoved,AAdded);
+			if (it.value()->editContentsChanged(it.key(),widget,APosition,ARemoved,AAdded))
+				break;
 		widget->document()->blockSignals(false);
 	}
 }
@@ -631,6 +682,7 @@ void MessageWidgets::onQuoteActionTriggered(bool)
 	if (widget && widget->viewWidget() && widget->viewWidget()->messageStyle() && widget->editWidget())
 	{
 		QTextDocumentFragment fragment = widget->viewWidget()->messageStyle()->selection(widget->viewWidget()->styleWidget());
+		fragment = TextManager::getTrimmedTextFragment(widget->editWidget()->prepareTextFragment(fragment),!widget->editWidget()->isRichTextEnabled());
 		TextManager::insertQuotedFragment(widget->editWidget()->textEdit()->textCursor(),fragment);
 		widget->editWidget()->textEdit()->setFocus();
 	}

@@ -2,6 +2,7 @@
 
 #include <QSet>
 #include <QChar>
+#include <QMimeData>
 #include <QTextBlock>
 
 #define DEFAULT_ICONSET                 "kolobok_dark"
@@ -67,7 +68,7 @@ bool Emoticons::initObjects()
 	}
 	if (FMessageWidgets)
 	{
-		FMessageWidgets->insertEditContentsHandler(ECHO_EMOTICONS_IMAGE2TEXT,this);
+		FMessageWidgets->insertEditContentsHandler(ECHO_EMOTICONS_CONVERT_IMAGE2TEXT,this);
 	}
 	return true;
 }
@@ -111,16 +112,32 @@ QMultiMap<int, IOptionsWidget *> Emoticons::optionsWidgets(const QString &ANodeI
 	return widgets;
 }
 
-void Emoticons::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+bool Emoticons::editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *AData)
 {
-	Q_UNUSED(ARemoved);
-	if (AOrder==ECHO_EMOTICONS_IMAGE2TEXT && AAdded>0)
+	Q_UNUSED(AOrder);
+	Q_UNUSED(AWidget);
+	Q_UNUSED(AData);
+	return false;
+}
+
+bool Emoticons::editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData)
+{
+	Q_UNUSED(AOrder);
+	Q_UNUSED(AWidget);
+	Q_UNUSED(AData);
+	return false;
+}
+
+bool Emoticons::editContentsInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AData);
+	if (AOrder == ECHO_EMOTICONS_CONVERT_IMAGE2TEXT)
 	{
-		if (AWidget->textFormatEnabled())
+		if (AWidget->isRichTextEnabled())
 		{
 			QList<QUrl> urlList = FUrlByKey.values();
-			QTextBlock block = AWidget->document()->findBlock(APosition);
-			while (block.isValid() && block.position()<=APosition+AAdded)
+			QTextBlock block = ADocument->firstBlock();
+			while (block.isValid())
 			{
 				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
 				{
@@ -143,9 +160,20 @@ void Emoticons::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosi
 		}
 		else
 		{
-			AAdded += replaceImageToText(AWidget->document(),APosition,AAdded);
+			replaceImageToText(ADocument);
 		}
 	}
+	return false;
+}
+
+bool Emoticons::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+{
+	Q_UNUSED(AOrder);
+	Q_UNUSED(AWidget);
+	Q_UNUSED(APosition);
+	Q_UNUSED(ARemoved);
+	Q_UNUSED(AAdded);
+	return false;
 }
 
 QList<QString> Emoticons::activeIconsets() const
@@ -465,7 +493,7 @@ void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconK
 						cursor.insertText(" ");
 				}
 				
-				if (widget->textFormatEnabled())
+				if (widget->isRichTextEnabled())
 				{
 					if (!editor->document()->resource(QTextDocument::ImageResource,url).isValid())
 						editor->document()->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));

@@ -2009,6 +2009,7 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 void MultiUserChatWindow::onViewContextQuoteActionTriggered(bool)
 {
 	QTextDocumentFragment fragment = viewWidget()->messageStyle()->selection(viewWidget()->styleWidget());
+	fragment = TextManager::getTrimmedTextFragment(editWidget()->prepareTextFragment(fragment),!editWidget()->isRichTextEnabled());
 	TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
 	editWidget()->textEdit()->setFocus();
 }

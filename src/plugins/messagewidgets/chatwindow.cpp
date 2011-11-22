@@ -320,6 +320,7 @@ void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 void ChatWindow::onViewContextQuoteActionTriggered(bool)
 {
 	QTextDocumentFragment fragment = viewWidget()->messageStyle()->selection(viewWidget()->styleWidget());
+	fragment = TextManager::getTrimmedTextFragment(editWidget()->prepareTextFragment(fragment),!editWidget()->isRichTextEnabled());
 	TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
 	editWidget()->textEdit()->setFocus();
 }
