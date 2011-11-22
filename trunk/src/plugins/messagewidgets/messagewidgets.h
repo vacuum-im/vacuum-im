@@ -58,7 +58,10 @@ public:
 	//IViewUrlHandler
 	virtual bool viewUrlOpen(int AOrder, IViewWidget *AWidget, const QUrl &AUrl);
 	//IEditContentsHandler
-	virtual void editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
+	virtual bool editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *AData);
+	virtual bool editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData);
+	virtual bool editContentsInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
+	virtual bool editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IMessageWidgets
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IInfoWidget *newInfoWidget(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
@@ -127,6 +130,9 @@ protected slots:
 	void onViewContextCopyActionTriggered(bool);
 	void onViewContextUrlActionTriggered(bool);
 	void onViewContextSearchActionTriggered(bool);
+	void onEditWidgetCreateDataRequest(QMimeData *AData);
+	void onEditWidgetCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert);
+	void onEditWidgetInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument);
 	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onQuoteActionTriggered(bool);
 	void onMessageWindowDestroyed();

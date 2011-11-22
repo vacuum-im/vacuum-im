@@ -63,3 +63,31 @@ void TextManager::insertQuotedFragment(QTextCursor ACursor, const QTextDocumentF
 		ACursor.endEditBlock();
 	}
 }
+
+QTextDocumentFragment TextManager::getTrimmedTextFragment(const QTextDocumentFragment &AFragment, bool APlainText)
+{
+	QTextDocument doc;
+	QTextCursor cursor(&doc);
+	if (APlainText)
+	{
+		QString text = AFragment.toPlainText();
+		text.remove(QChar::Null);
+		text.remove(QChar::ObjectReplacementCharacter);
+		cursor.insertText(text);
+	}
+	else
+	{
+		cursor.insertFragment(AFragment);
+	}
+
+	cursor.movePosition(QTextCursor::Start);
+	while (cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor) && cursor.selectedText().trimmed().isEmpty())
+		cursor.removeSelectedText();
+
+	cursor.movePosition(QTextCursor::End);
+	while (cursor.movePosition(QTextCursor::PreviousCharacter,QTextCursor::KeepAnchor) && cursor.selectedText().trimmed().isEmpty())
+		cursor.removeSelectedText();
+
+	cursor.select(QTextCursor::Document);
+	return cursor.selection();
+}

@@ -12,6 +12,7 @@ public:
 	static QString getDocumentBody(const QTextDocument &ADocument);
 	static QString getTextFragmentHref(const QTextDocumentFragment &AFragment);
 	static void insertQuotedFragment(QTextCursor ACursor, const QTextDocumentFragment &AFragment);
+	static QTextDocumentFragment getTrimmedTextFragment(const QTextDocumentFragment &AFragment, bool APlainText = false);
 };
 
 #endif // TEXTMANAGER_H

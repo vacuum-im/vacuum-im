@@ -15,7 +15,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FContactJid = AContactJid;
 	
 	FBufferPos = -1;
-	FFormatEnabled = false;
+	setRichTextEnabled(false);
 
 	QToolBar *toolBar = new QToolBar;
 	toolBar->setMovable(false);
@@ -42,7 +42,12 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.medEditor->installEventFilter(this);
 	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE,ui.medEditor);
 	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE,ui.medEditor);
-	connect(ui.medEditor->document(),SIGNAL(contentsChange(int,int,int)),SLOT(onContentsChanged(int,int,int)));
+	connect(ui.medEditor,SIGNAL(createDataRequest(QMimeData *)),SLOT(onEditorCreateDataRequest(QMimeData *)));
+	connect(ui.medEditor,SIGNAL(canInsertDataRequest(const QMimeData *, bool &)),
+		SLOT(onEditorCanInsertDataRequest(const QMimeData *, bool &)));
+	connect(ui.medEditor,SIGNAL(insertDataRequest(const QMimeData *, QTextDocument *)),
+		SLOT(onEditorInsertDataRequest(const QMimeData *, QTextDocument *)));
+	connect(ui.medEditor->document(),SIGNAL(contentsChange(int,int,int)),SLOT(onEditorContentsChanged(int,int,int)));
 
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORAUTORESIZE));
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES));
@@ -166,14 +171,48 @@ ToolBarChanger *EditWidget::sendToolBarChanger() const
 	return FSendToolBar;
 }
 
-bool EditWidget::textFormatEnabled() const
+bool EditWidget::isRichTextEnabled() const
 {
-	return FFormatEnabled;
+	return ui.medEditor->acceptRichText();
 }
 
-void EditWidget::setTextFormatEnabled(bool AEnabled)
+void EditWidget::setRichTextEnabled(bool AEnabled)
 {
-	FFormatEnabled = AEnabled;
+	if (isRichTextEnabled() != AEnabled)
+	{
+		ui.medEditor->setAcceptRichText(AEnabled);
+		richTextEnableChanged(AEnabled);
+	}
+}
+
+void EditWidget::insertTextFragment(const QTextDocumentFragment &AFragment)
+{
+	if (!AFragment.isEmpty())
+	{
+		if (isRichTextEnabled())
+			ui.medEditor->textCursor().insertFragment(prepareTextFragment(AFragment));
+		else
+			ui.medEditor->textCursor().insertText(prepareTextFragment(AFragment).toPlainText());
+	}
+}
+
+QTextDocumentFragment EditWidget::prepareTextFragment(const QTextDocumentFragment &AFragment) const
+{
+	QTextDocumentFragment fragment;
+	if (!AFragment.isEmpty())
+	{
+		QMimeData data;
+		data.setHtml(AFragment.toHtml());
+
+		QTextDocument doc;
+		emit insertDataRequest(&data,&doc);
+
+		if (isRichTextEnabled())
+			fragment = QTextDocumentFragment::fromHtml(doc.toHtml());
+		else
+			fragment = QTextDocumentFragment::fromPlainText(doc.toPlainText());
+	}
+	return fragment;
 }
 
 bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
@@ -205,7 +244,7 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 			<< QEvent::ChildAdded << QEvent::ChildRemoved << QEvent::Show;
 
 		if (eventTypes.contains(AEvent->type()))
-			QTimer::singleShot(0,this,SLOT(updateSendToolBarMaxWidth()));
+			QTimer::singleShot(0,this,SLOT(onUpdateSendToolBarMaxWidth()));
 	}
 	return hooked || QWidget::eventFilter(AWatched,AEvent);
 }
@@ -253,7 +292,7 @@ void EditWidget::showPrevBufferedMessage()
 	}
 }
 
-void EditWidget::updateSendToolBarMaxWidth()
+void EditWidget::onUpdateSendToolBarMaxWidth()
 {
 	int widgetWidth = 0;
 	int visibleItemsCount = 0;
@@ -308,7 +347,22 @@ void EditWidget::onOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
-void EditWidget::onContentsChanged(int APosition, int ARemoved, int AAdded)
+void EditWidget::onEditorCreateDataRequest(QMimeData *AData)
+{
+	emit createDataRequest(AData);
+}
+
+void EditWidget::onEditorCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert)
+{
+	emit canInsertDataRequest(AData,ACanInsert);
+}
+
+void EditWidget::onEditorInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument)
+{
+	emit insertDataRequest(AData,ADocument);
+}
+
+void EditWidget::onEditorContentsChanged(int APosition, int ARemoved, int AAdded)
 {
 	emit contentsChanged(APosition,ARemoved,AAdded);
 }

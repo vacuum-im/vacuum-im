@@ -1,6 +1,7 @@
 #include "messageeditor.h"
 
 #include <QFrame>
+#include <QTextDocumentFragment>
 #include <QAbstractTextDocumentLayout>
 
 MessageEditor::MessageEditor(QWidget *AParent) : QTextEdit(AParent)
@@ -65,6 +66,39 @@ int MessageEditor::textHeight(int ALines) const
 		return fontMetrics().height()*ALines + (frameWidth() + qRound(document()->documentMargin()))*2;
 	else
 		return qRound(document()->documentLayout()->documentSize().height()) + frameWidth()*2;
+}
+
+QMimeData *MessageEditor::createMimeDataFromSelection() const
+{
+	QMimeData *data = new QMimeData;
+	emit createDataRequest(data);
+	return data;
+}
+
+bool MessageEditor::canInsertFromMimeData(const QMimeData *ASource)
+{
+	bool canInsert = false;
+	emit canInsertDataRequest(ASource,canInsert);
+	return canInsert;
+}
+
+void MessageEditor::insertFromMimeData(const QMimeData *ASource)
+{
+	QTextDocument doc;
+	emit insertDataRequest(ASource,&doc);
+
+	if (!doc.isEmpty())
+	{
+		QTextCursor cursor(&doc);
+		cursor.select(QTextCursor::Document);
+		if (acceptRichText())
+			textCursor().insertFragment(cursor.selection());
+		else
+			textCursor().insertText(cursor.selection().toPlainText());
+	}
+
+	ensureCursorVisible();
+	setFocus();
 }
 
 void MessageEditor::onTextChanged()

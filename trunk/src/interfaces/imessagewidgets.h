@@ -94,8 +94,10 @@ public:
 	virtual bool sendToolBarVisible() const =0;
 	virtual void setSendToolBarVisible(bool AVisible) =0;
 	virtual ToolBarChanger *sendToolBarChanger() const =0;
-	virtual bool textFormatEnabled() const =0;
-	virtual void setTextFormatEnabled(bool AEnabled) =0;
+	virtual bool isRichTextEnabled() const =0;
+	virtual void setRichTextEnabled(bool AEnabled) =0;
+	virtual void insertTextFragment(const QTextDocumentFragment &AFragment) =0;
+	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const =0;
 protected:
 	virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
 	virtual void messageAboutToBeSend() =0;
@@ -106,7 +108,7 @@ protected:
 	virtual void autoResizeChanged(bool AResize) =0;
 	virtual void minimumLinesChanged(int ALines) =0;
 	virtual void sendShortcutChanged(const QString &AShortcutId) =0;
-	virtual void contentsChanged(int APosition, int ARemoved, int AAdded) =0;
+	virtual void richTextEnableChanged(bool AEnabled) =0;
 };
 
 class IReceiversWidget
@@ -325,7 +327,10 @@ public:
 class IEditContentsHandler
 {
 public:
-	virtual void editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded) =0;
+	virtual bool editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *AData) =0;
+	virtual bool editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData) =0;
+	virtual bool editContentsInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument) =0;
+	virtual bool editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded) =0;
 };
 
 class IMessageWidgets
@@ -393,7 +398,7 @@ protected:
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.1")
 Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.1")
-Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.1")
+Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.2")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
 Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")
 Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
@@ -405,7 +410,7 @@ Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.2")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
-Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.0")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.3")
+Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.1")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.4")
 
 #endif // IMESSAGEWIDGETS_H
