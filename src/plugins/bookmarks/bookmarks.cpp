@@ -57,7 +57,7 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 		if (FPresencePlugin)
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(streamStateChanged(const Jid &, bool)),
-			        SLOT(onStreamStateChanged(const Jid &, bool)));
+				SLOT(onStreamStateChanged(const Jid &, bool)));
 		}
 	}
 
@@ -68,13 +68,13 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 		if (FStorage)
 		{
 			connect(FStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onStorageDataChanged(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onStorageDataChanged(const QString &, const Jid &, const QDomElement &)));
 			connect(FStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onStorageDataChanged(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onStorageDataChanged(const QString &, const Jid &, const QDomElement &)));
 			connect(FStorage->instance(),SIGNAL(dataRemoved(const QString &, const Jid &, const QDomElement &)),
-			        SLOT(onStorageDataRemoved(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onStorageDataRemoved(const QString &, const Jid &, const QDomElement &)));
 			connect(FStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-			        SLOT(onStorageDataError(const QString &, const QString &)));
+				SLOT(onStorageDataError(const QString &, const QString &)));
 		}
 	}
 
@@ -89,7 +89,7 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 		if (FMultiChatPlugin)
 		{
 			connect(FMultiChatPlugin->instance(),SIGNAL(multiChatWindowCreated(IMultiUserChatWindow *)),
-			        SLOT(onMultiChatWindowCreated(IMultiUserChatWindow *)));
+				SLOT(onMultiChatWindowCreated(IMultiUserChatWindow *)));
 		}
 	}
 
@@ -152,6 +152,7 @@ bool BookMarks::initObjects()
 bool BookMarks::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_IGNOREAUTOJOIN, false);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED,false);
 	return true;
 }
 
@@ -159,10 +160,17 @@ QMultiMap<int, IOptionsWidget *> BookMarks::optionsWidgets(const QString &ANodeI
 {
 	QMultiMap<int, IOptionsWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+	if (FOptionsManager)
 	{
-		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-		widgets.insertMulti(OWO_ACCOUNT_BOOKMARKS, FOptionsManager->optionsNodeWidget(aoptions.node("ignore-autojoin"),tr("Disable autojoin to conferences"),AParent));
+		if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+		{
+			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+			widgets.insertMulti(OWO_ACCOUNT_BOOKMARKS, FOptionsManager->optionsNodeWidget(aoptions.node("ignore-autojoin"),tr("Disable autojoin to conferences"),AParent));
+		}
+		else if (ANodeId == OPN_CONFERENCES)
+		{
+			widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Show window automatically connected at startup conferences"),AParent));
+		}
 	}
 	return widgets;
 }
@@ -243,7 +251,7 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 	if (!ABookmark.conference.isEmpty())
 	{
 		Jid roomJid = ABookmark.conference;
-		IMultiUserChatWindow *window = FMultiChatPlugin->getMultiChatWindow(AStreamJid,roomJid,ABookmark.nick,ABookmark.password);
+		IMultiUserChatWindow *window = FMultiChatPlugin!=NULL ? FMultiChatPlugin->getMultiChatWindow(AStreamJid,roomJid,ABookmark.nick,ABookmark.password) : NULL;
 		if (window)
 		{
 			if (AShowWindow)
@@ -523,9 +531,10 @@ void BookMarks::onAccountOptionsChanged(const OptionsNode &ANode)
 void BookMarks::onStartTimerTimeout()
 {
 	QMultiMap<Jid, IBookMark>::iterator it = FPendingBookMarks.begin();
+	bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
 	if (it != FPendingBookMarks.end())
 	{
-		startBookmark(it.key(),it.value(),false);
+		startBookmark(it.key(),it.value(),!it->conference.isEmpty() ? showAutoJoined : false);
 		FPendingBookMarks.erase(it);
 		FStartTimer.start(NEXT_START_TIMEOUT);
 	}

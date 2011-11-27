@@ -27,6 +27,10 @@
         <source>Edit bookmark</source>
         <translation>Редактировать закладку</translation>
     </message>
+    <message>
+        <source>Show window automatically connected at startup conferences</source>
+        <translation>Показывать окна автоматически подключаемых конференций при старте</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

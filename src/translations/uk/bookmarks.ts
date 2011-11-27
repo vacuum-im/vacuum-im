@@ -27,6 +27,10 @@
         <source>Edit bookmark</source>
         <translation>Редагувати закладку</translation>
     </message>
+    <message>
+        <source>Show window automatically connected at startup conferences</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>
