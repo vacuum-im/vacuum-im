@@ -169,7 +169,7 @@ QMultiMap<int, IOptionsWidget *> BookMarks::optionsWidgets(const QString &ANodeI
 		}
 		else if (ANodeId == OPN_CONFERENCES)
 		{
-			widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Show window automatically connected at startup conferences"),AParent));
+			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Automatically show window of conferences connected at startup"),AParent));
 		}
 	}
 	return widgets;

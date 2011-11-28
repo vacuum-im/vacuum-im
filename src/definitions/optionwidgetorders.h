@@ -52,6 +52,7 @@
 
 //Node = ON_CONFERENCES
 #define OWO_CONFERENCES                           500
+#define OWO_CONFERENCES_SHOWAUTOJOINED            700
 
 //Node = ON_SHORTCUTS
 #define OWO_SHORTCUTS                             500
