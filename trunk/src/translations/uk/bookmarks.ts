@@ -28,7 +28,7 @@
         <translation>Редагувати закладку</translation>
     </message>
     <message>
-        <source>Show window automatically connected at startup conferences</source>
+        <source>Automatically show window of conferences connected at startup</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
