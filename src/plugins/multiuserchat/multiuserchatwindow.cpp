@@ -1601,6 +1601,8 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 	if (FShownDetached)
 		saveWindowGeometry();
 	QMainWindow::closeEvent(AEvent);
+	if (Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE).value().toBool())
+		exitAndDestroy(QString::null);
 	emit tabPageClosed();
 }
 

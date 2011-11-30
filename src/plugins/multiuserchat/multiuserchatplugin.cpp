@@ -279,6 +279,7 @@ bool MultiUserChatPlugin::initSettings()
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWENTERS,true);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWSTATUS,true);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_ARCHIVESTATUS,false);
+	Options::setDefaultValue(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE,false);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_BASHAPPEND,false);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_NICKNAMESUFIX,": ");
 
@@ -299,6 +300,7 @@ QMultiMap<int, IOptionsWidget *> MultiUserChatPlugin::optionsWidgets(const QStri
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS),tr("Show users connections/disconnections"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWSTATUS),tr("Show users status changes"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS),tr("Save status messages to history"),AParent));
+		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE),tr("Leave the conference when window closed"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_BASHAPPEND),tr("Select the user to refer in the Bash style"),AParent));
 		widgets.insertMulti(OWO_CONFERENCES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX),tr("Add this suffix when referring to the user:"),AParent));
 	}

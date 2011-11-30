@@ -579,6 +579,10 @@ Check values and try again</source>
         <source>Add this suffix when referring to the user:</source>
         <translation>Добавлять этот суффикс при обращении к пользователю:</translation>
     </message>
+    <message>
+        <source>Leave the conference when window closed</source>
+        <translation>Выходить из конференции при закрытии окна</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
