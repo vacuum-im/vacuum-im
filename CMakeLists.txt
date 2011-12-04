@@ -20,10 +20,16 @@ set(LANGS "" CACHE STRING "List of languages to build localization for (this var
 set(USED_LANGS "" CACHE INTERNAL "List of languages actually used for generating targets")
 add_lang_options()
 
+set(FORCE_BUNDLED_MINIZIP NO CACHE BOOL "Use bundled minizip even if local system have one")
+
 find_library(SYSTEM_ZLIB_FOUND z)
 find_library(SYSTEM_IDN_FOUND idn)
 find_library(SYSTEM_MINIZIP_FOUND minizip)
 find_library(SYSTEM_QTLOCKEDFILE_FOUND QtSolutions_LockedFile-2.4)
+
+if (FORCE_BUNDLED_MINIZIP)
+	set(SYSTEM_MINIZIP_FOUND NO)
+endif (FORCE_BUNDLED_MINIZIP)
 
 if (SYSTEM_ZLIB_FOUND)
 	add_definitions(-DUSE_SYSTEM_ZLIB)
