@@ -20,6 +20,8 @@
 #define HISTORY_MESSAGES            10
 #define HISTORY_TIME_PAST           5
 
+#define REJOIN_AFTER_KICK_MSEC      500
+
 MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat)
 {
 	ui.setupUi(this);
@@ -1861,7 +1863,7 @@ void MultiUserChatWindow::onSubjectChanged(const QString &ANick, const QString &
 void MultiUserChatWindow::onServiceMessageReceived(const Message &AMessage)
 {
 	if (!showStatusCodes(QString::null,FMultiChat->statusCodes()))
-		messageDisplay(AMessage,IMessageProcessor::MessageIn);
+		messageDisplay(AMessage,IMessageProcessor::MessageIn);  
 }
 
 void MultiUserChatWindow::onInviteDeclined(const Jid &AContactJid, const QString &AReason)
@@ -1878,6 +1880,18 @@ void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &ARea
 		.arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid) : ANick)
 		.arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
 		.arg(AReason), IMessageContentOptions::TypeEvent);
+
+	if (Options::node(OPV_MUC_GROUPCHAT_REJOINAFTERKICK).value().toBool()
+		&& ANick == FMultiChat->mainUser()->nickName())
+	{
+		QTimer::singleShot(REJOIN_AFTER_KICK_MSEC,this,SLOT(onRejoinAfterKick()));
+	}
+}
+
+void MultiUserChatWindow::onRejoinAfterKick()
+{
+	FMultiChat->setAutoPresence(false);
+	FMultiChat->setAutoPresence(true);
 }
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)

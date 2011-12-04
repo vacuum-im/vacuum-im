@@ -583,6 +583,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <source>Leave the conference when window closed</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Rejoin in chat room after kick</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

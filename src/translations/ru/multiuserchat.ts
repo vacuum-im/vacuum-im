@@ -583,6 +583,10 @@ Check values and try again</source>
         <source>Leave the conference when window closed</source>
         <translation>Выходить из конференции при закрытии окна</translation>
     </message>
+    <message>
+        <source>Rejoin in chat room after kick</source>
+        <translation>Автоматически перезаходить в конференцию после кика</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>

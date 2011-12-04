@@ -157,6 +157,7 @@ protected slots:
 	void onChatError(const QString &AMessage);
 	void onChatClosed();
 	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
+	void onRejoinAfterKick();
 	//Occupant
 	void onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
 	void onUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter);
