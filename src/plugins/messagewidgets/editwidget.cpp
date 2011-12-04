@@ -267,6 +267,7 @@ void EditWidget::appendMessageToBuffer()
 void EditWidget::showBufferedMessage()
 {
 	ui.medEditor->setPlainText(FBuffer.value(FBufferPos));
+	ui.medEditor->moveCursor(QTextCursor::End,QTextCursor::MoveAnchor);
 }
 
 void EditWidget::showNextBufferedMessage()
