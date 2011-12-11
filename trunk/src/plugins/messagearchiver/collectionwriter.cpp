@@ -1,6 +1,5 @@
 #include "collectionwriter.h"
 
-
 CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
 {
 	FXmlFile = NULL;
@@ -164,27 +163,32 @@ void CollectionWriter::stopCollection()
 
 void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 {
-	QDomElement elem = AElem.firstChildElement();
-	while (!elem.isNull())
+	QDomNode node = AElem.firstChild();
+	while (!node.isNull())
 	{
-		FXmlWriter->writeStartElement(elem.nodeName());
-		if (!elem.namespaceURI().isEmpty())
-			FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
-
-		QDomNamedNodeMap map = elem.attributes();
-		for (uint i =0; i<map.length(); i++)
+		if (node.isElement())
 		{
-			QDomNode attrNode = map.item(i);
-			FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
+			QDomElement elem = node.toElement();
+			FXmlWriter->writeStartElement(elem.nodeName());
+			if (!elem.namespaceURI().isEmpty())
+				FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
+
+			QDomNamedNodeMap map = elem.attributes();
+			for (uint i =0; i<map.length(); i++)
+			{
+				QDomNode attrNode = map.item(i);
+				FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
+			}
+
+			writeElementChilds(elem);
+			FXmlWriter->writeEndElement();
+		}
+		else if (node.isCharacterData())
+		{
+			FXmlWriter->writeCharacters(node.toCharacterData().data());
 		}
 
-		if (!elem.text().isEmpty())
-			FXmlWriter->writeCharacters(elem.text());
-
-		writeElementChilds(elem);
-		FXmlWriter->writeEndElement();
-
-		elem = elem.nextSiblingElement();
+		node = node.nextSibling();
 	}
 }
 
