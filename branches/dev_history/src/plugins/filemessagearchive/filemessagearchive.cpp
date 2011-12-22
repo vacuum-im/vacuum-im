@@ -44,9 +44,6 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 	if (plugin)
 	{
 		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
-		if (FMessageArchiver)
-		{
-		}
 	}
 	return FMessageArchiver!=NULL;
 }
@@ -66,38 +63,74 @@ QString FileMessageArchive::engineDescription() const
 	return tr("History of communications is stored in local files");
 }
 
-int FileMessageArchive::capabilities(const Jid &AStreamJid) const
+uint FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
-	Q_UNUSED(AStreamJid);
+	if (AStreamJid.isValid() && !FMessageArchiver->isReady(AStreamJid))
+		return ArchiveManagement|Replication|TextSearch;
 	return DirectArchiving|ManualArchiving|ArchiveManagement|Replication|TextSearch;
 }
 
-bool FileMessageArchive::isSupported(const Jid &AStreamJid) const
+bool FileMessageArchive::isCapable(const Jid &AStreamJid, uint ACapability) const
 {
-	return FMessageArchiver->isReady(AStreamJid);
+	return (capabilities(AStreamJid) & ACapability) > 0;
 }
 
 bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	if (isSupported(AStreamJid))
+	if (isCapable(AStreamJid,DirectArchiving))
 	{
+		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
+		itemJid = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,itemJid,AMessage.threadId());
+		if (!writer)
+		{
+			IArchiveHeader header;
+			header.with = AItemJid;
+			header.start = QDateTime::currentDateTime();
+			header.subject = AMessage.subject();
+			header.threadId = AMessage.threadId();
+			header.version = 0;
+			writer = newCollectionWriter(AStreamJid,header);
+		}
+		if (writer)
+		{
+			return writer->writeNote(ANote);
+		}
 	}
 	return false;
 }
 
 bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	if (isSupported(AStreamJid))
+	if (isCapable(AStreamJid,DirectArchiving) && FMessageArchiver->isReady(AStreamJid))
 	{
+		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
+		itemJid = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,itemJid,AMessage.threadId());
+		if (!writer)
+		{
+			IArchiveHeader header;
+			header.with = itemJid;
+			header.start = QDateTime::currentDateTime();
+			header.subject = AMessage.subject();
+			header.threadId = AMessage.threadId();
+			header.version = 0;
+			writer = getCollectionWriter(AStreamJid,header);
+		}
+		if (writer)
+		{
+			IArchiveItemPrefs prefs = FMessageArchiver->archiveItemPrefs(AStreamJid,itemJid);
+			return writer->writeMessage(AMessage,prefs.save,ADirectionIn);
+		}
 	}
 	return false;
 }
 
 QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
-	if (isSupported(AStreamJid) && AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	if (isCapable(AStreamJid,ManualArchiving) && AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
 		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
 		wthread->setStreamJid(AStreamJid);
@@ -109,21 +142,54 @@ QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchive
 
 QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened)
 {
+	Q_UNUSED(AOpened);
+	if (AStreamJid.isValid() && isCapable(AStreamJid,ManualArchiving))
+	{
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveRequest(ARequest);
+		return wthread->executeAction(WorkingThread::RemoveCollection);
+	}
 	return QString::null;
 }
 
 QString FileMessageArchive::loadHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter)
 {
+	Q_UNUSED(AAfter);
+	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
+	{
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveRequest(ARequest);
+		return wthread->executeAction(WorkingThread::LoadHeaders);
+	}
 	return QString::null;
 }
 
 QString FileMessageArchive::loadCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter)
 {
+	Q_UNUSED(AAfter);
+	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
+	{
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveHeader(AHeader);
+		return wthread->executeAction(WorkingThread::LoadCollection);
+	}
 	return QString::null;
 }
 
 QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter)
 {
+	Q_UNUSED(AAfter);
+	if (AStreamJid.isValid() && isCapable(AStreamJid,Replication))
+	{
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setModificationsStart(AStart);
+		wthread->setModificationsCount(ACount);
+		return wthread->executeAction(WorkingThread::LoadModifications);
+	}
 	return QString::null;
 }
 
@@ -306,6 +372,7 @@ bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArch
 			file.write(doc.toByteArray(2));
 			file.close();
 			saveFileModification(AStreamJid,collection.header,logAction);
+			emit fileCollectionSaved(AStreamJid,collection.header);
 			return true;
 		}
 	}
@@ -317,11 +384,12 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	QString fileName = collectionFilePath(AStreamJid,AWith,AStart);
 	if (QFile::exists(fileName))
 	{
-		//delete findCollectionWriter(AStreamJid,AHeader);
+		delete findCollectionWriter(AStreamJid,AHeader);
 		IArchiveHeader header = loadHeaderFromFile(fileName);
 		if (QFile::remove(collectionFilePath(AStreamJid,AWith,AStart)))
 		{
 			saveFileModification(AStreamJid,header,LOG_ACTION_REMOVE);
+			emit fileCollectionRemoved(AStreamJid,AHeader);
 			return true;
 		}
 	}
@@ -415,6 +483,46 @@ bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArch
 	return false;
 }
 
+CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const
+{
+	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AHeader.with);
+	foreach(CollectionWriter *writer, writers)
+		if (writer->header() == AHeader)
+			return writer;
+	return NULL;
+}
+
+CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const
+{
+	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AWith);
+	foreach(CollectionWriter *writer, writers)
+		if (writer->header().threadId == AThreadId)
+			return writer;
+	return NULL;
+}
+
+CollectionWriter *FileMessageArchive::getCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader)
+{
+	CollectionWriter *writer = findCollectionWriter(AStreamJid,AHeader);
+	if (!writer && AHeader.with.isValid() && AHeader.start.isValid())
+	{
+		QString fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
+		CollectionWriter *writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
+		if (writer->isOpened())
+		{
+			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
+			connect(writer,SIGNAL(writerDestroyed(CollectionWriter *)),SLOT(onCollectionWriterDestroyed(CollectionWriter *)));
+			emit localCollectionOpened(AStreamJid,AHeader);
+		}
+		else
+		{
+			delete writer;
+			writer = NULL;
+		}
+	}
+	return writer;
+}
+
 void FileMessageArchive::onWorkingThreadFinished()
 {
 	WorkingThread *wthread = qobject_cast<WorkingThread *>(sender());
@@ -448,6 +556,16 @@ void FileMessageArchive::onWorkingThreadFinished()
 			emit requestFailed(wthread->workId(),wthread->errorString());
 		}
 		wthread->deleteLater();
+	}
+}
+
+void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
+{
+	FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
+	if (AWriter->recordsCount() > 0)
+	{
+		saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
+		emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
 	}
 }
 

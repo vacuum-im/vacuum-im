@@ -159,8 +159,8 @@ public:
 	virtual QUuid engineId() const =0;
 	virtual QString engineName() const =0;
 	virtual QString engineDescription() const =0;
-	virtual int capabilities(const Jid &AStreamJid) const =0;
-	virtual bool isSupported(const Jid &AStreamJid) const =0;
+	virtual uint capabilities(const Jid &AStreamJid = Jid::null) const =0;
+	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const =0;
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
@@ -169,6 +169,7 @@ public:
 	virtual QString loadCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null) =0;
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null) =0;
 protected:
+	virtual void capabilitiesChanged(const Jid &AStreamJid) =0;
 	virtual void requestFailed(const QString &AId, const QString &AError) =0;
 	virtual void collectionSaved(const QString &AId, const IArchiveHeader &AHeader) =0;
 	virtual void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;

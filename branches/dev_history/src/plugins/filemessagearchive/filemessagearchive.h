@@ -4,11 +4,11 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifilemessagearchive.h>
 #include <interfaces/imessagearchiver.h>
+#include "collectionwriter.h"
 
 class FileMessageArchive : 
 	public QObject,
 	public IPlugin,
-	public IArchiveEngine,
 	public IFileMessageArchive
 {
 	Q_OBJECT;
@@ -28,8 +28,8 @@ public:
 	virtual QUuid engineId() const;
 	virtual QString engineName() const;
 	virtual QString engineDescription() const;
-	virtual int capabilities(const Jid &AStreamJid) const;
-	virtual bool isSupported(const Jid &AStreamJid) const;
+	virtual uint capabilities(const Jid &AStreamJid = Jid::null) const;
+	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const;
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
@@ -50,19 +50,30 @@ public:
 	virtual IArchiveModifications loadFileModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const;
 signals:
 	//IArchiveEngine
+	void capabilitiesChanged(const Jid &AStreamJid);
 	void requestFailed(const QString &AId, const QString &AError);
 	void collectionSaved(const QString &AId, const IArchiveHeader &AHeader);
 	void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult);
 	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult);
 	void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult);
+	//IFileMessageArchive
+	void fileCollectionOpened(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	void fileCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	void fileCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 protected:
 	bool saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const;
+	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
+	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
+	CollectionWriter *getCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 protected slots:
 	void onWorkingThreadFinished();
+	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
 private:
 	IPluginManager *FPluginManager;
 	IMessageArchiver *FMessageArchiver;
+private:
+	QMap<Jid, QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
 };
 
 #endif // FILEMESSAGEARCHIVE_H

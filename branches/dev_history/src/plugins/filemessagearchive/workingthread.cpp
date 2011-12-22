@@ -164,12 +164,15 @@ void WorkingThread::run()
 	}
 	else if (FAction == LoadHeaders)
 	{
-		FHeaders = FFileArchive->loadHeaders(FStreamJid,FRequest);
+		FHeaders.clear();
+		foreach(QString file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
+			FHeaders.append(FFileArchive->loadHeaderFromFile(file));
 		FResultSet.count = FHeaders.count();
 	}
 	else if (FAction == LoadCollection)
 	{
-		FCollection = FFileArchive->loadCollection(FStreamJid,FHeader);
+		QString file = FFileArchive->collectionFilePath(FStreamJid,FHeader.with,FHeader.start);
+		FCollection = FFileArchive->loadCollectionFromFile(file);
 		if (FCollection.header.with.isValid() && FCollection.header.start.isValid())
 			FResultSet.count = FCollection.messages.count() + FCollection.notes.count();
 		else
