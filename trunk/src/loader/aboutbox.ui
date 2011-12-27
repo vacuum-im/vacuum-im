@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>296</width>
-    <height>171</height>
+    <height>152</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -148,7 +148,7 @@
    <item>
     <widget class="QLabel" name="lblCopyright">
      <property name="text">
-      <string notr="true">Copyright 2006-2010 Sergey Potapov. This software is released under the terms of the GNU General Public License version 3.</string>
+      <string notr="true">This software is released under the terms of the GNU General Public License version 3.</string>
      </property>
      <property name="textFormat">
       <enum>Qt::PlainText</enum>
