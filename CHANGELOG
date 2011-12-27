@@ -13,6 +13,11 @@ LEGEND
   [-] Did not correctly handle changes in the participant's nickname when new nickname is already used by the same participant but from a different resource
   [-] Fixed crash in Ubuntu 11.10 when alt key is pressed in chat window
   [-] The first message in the chat may not be saved in the local message archive
+  [-] Chat dialog icon was not changed after changing the status of a contact without changing the text of the status
+  [-] After downloading the new image in the vCard dialog it was not displayed in the viewing area
+  [-] Dublicate messages may appear in the history view window
+  [-] The first message in the chat could not be saved in a local message archive
+  [-] Messages was incorrectly written into archive if full write mode was enabled and message contains xhtml
 
 
 v1.1.1
