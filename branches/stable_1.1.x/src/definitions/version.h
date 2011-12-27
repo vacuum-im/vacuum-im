@@ -2,7 +2,7 @@
 #define DEF_VERSION_H
 
 #define CLIENT_NAME             "Vacuum-IM"
-#define CLIENT_VERSION          "1.1.1"
+#define CLIENT_VERSION          "1.1.2"
 #define CLIENT_VERSION_SUFIX    ""
 #define CLIENT_HOME_PAGE        "http://vacuum-im.googlecode.com"
 
