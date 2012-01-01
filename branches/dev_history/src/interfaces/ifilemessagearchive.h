@@ -17,9 +17,9 @@ public:
 	virtual QStringList findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const =0;
 	virtual IArchiveHeader loadHeaderFromFile(const QString &AFileName) const =0;
 	virtual IArchiveCollection loadCollectionFromFile(const QString &AFileName) const =0;
-	virtual bool saveCollectionToFile(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend = true) const =0;
-	virtual bool removeCollectionFile(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) const =0;
 	virtual IArchiveModifications loadFileModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const =0;
+	virtual bool saveCollectionToFile(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend = true) =0;
+	virtual bool removeCollectionFile(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) =0;
 protected:
 	virtual void fileCollectionOpened(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
 	virtual void fileCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;

@@ -45,9 +45,9 @@ public:
 	virtual QStringList findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
 	virtual IArchiveHeader loadHeaderFromFile(const QString &AFileName) const;
 	virtual IArchiveCollection loadCollectionFromFile(const QString &AFileName) const;
-	virtual bool saveCollectionToFile(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend = true) const;
-	virtual bool removeCollectionFile(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) const;
 	virtual IArchiveModifications loadFileModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const;
+	virtual bool saveCollectionToFile(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend = true);
+	virtual bool removeCollectionFile(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart);
 signals:
 	//IArchiveEngine
 	void capabilitiesChanged(const Jid &AStreamJid);

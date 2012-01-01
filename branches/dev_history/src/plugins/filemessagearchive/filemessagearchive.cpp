@@ -86,16 +86,16 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 		if (!writer)
 		{
 			IArchiveHeader header;
-			header.with = AItemJid;
+			header.with = itemJid;
 			header.start = QDateTime::currentDateTime();
 			header.subject = AMessage.subject();
 			header.threadId = AMessage.threadId();
 			header.version = 0;
-			writer = newCollectionWriter(AStreamJid,header);
+			writer = getCollectionWriter(AStreamJid,header);
 		}
 		if (writer)
 		{
-			return writer->writeNote(ANote);
+			return writer->writeNote(AMessage.body());
 		}
 	}
 	return false;
@@ -334,68 +334,6 @@ IArchiveCollection FileMessageArchive::loadCollectionFromFile(const QString &AFi
 	return collection;
 }
 
-bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend) const
-{
-	if (AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
-	{
-		QString fileName = collectionFilePath(AStreamJid,ACollection.header.with,ACollection.header.start);
-		IArchiveCollection collection = loadCollectionFromFile(fileName);
-		
-		QString logAction = ACollection.header==collection.header ? LOG_ACTION_MODIFY : LOG_ACTION_CREATE;
-		collection.header = ACollection.header;
-
-		if (AAppend)
-		{
-			// TODO: Find message duplicates
-			if (!ACollection.messages.isEmpty())
-			{
-				collection.messages += ACollection.messages;
-				qSort(collection.messages);
-			}
-			if (!ACollection.notes.isEmpty())
-			{
-				collection.notes += ACollection.notes;
-			}
-		}
-		else
-		{
-			collection.messages = ACollection.messages;
-			collection.notes = ACollection.notes;
-		}
-
-		QFile file(fileName);
-		if (file.open(QFile::WriteOnly|QFile::Truncate))
-		{
-			QDomDocument doc;
-			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
-			//collectionToElement(collection,chatElem,ASaveMode);
-			file.write(doc.toByteArray(2));
-			file.close();
-			saveFileModification(AStreamJid,collection.header,logAction);
-			emit fileCollectionSaved(AStreamJid,collection.header);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) const
-{
-	QString fileName = collectionFilePath(AStreamJid,AWith,AStart);
-	if (QFile::exists(fileName))
-	{
-		delete findCollectionWriter(AStreamJid,AHeader);
-		IArchiveHeader header = loadHeaderFromFile(fileName);
-		if (QFile::remove(collectionFilePath(AStreamJid,AWith,AStart)))
-		{
-			saveFileModification(AStreamJid,header,LOG_ACTION_REMOVE);
-			emit fileCollectionRemoved(AStreamJid,AHeader);
-			return true;
-		}
-	}
-	return false;
-}
-
 IArchiveModifications FileMessageArchive::loadFileModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const
 {
 	IArchiveModifications modifs;
@@ -460,6 +398,68 @@ IArchiveModifications FileMessageArchive::loadFileModifications(const Jid &AStre
 	return modifs;
 }
 
+bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend)
+{
+	if (AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	{
+		QString fileName = collectionFilePath(AStreamJid,ACollection.header.with,ACollection.header.start);
+		IArchiveCollection collection = loadCollectionFromFile(fileName);
+		
+		QString logAction = ACollection.header==collection.header ? LOG_ACTION_MODIFY : LOG_ACTION_CREATE;
+		collection.header = ACollection.header;
+
+		if (AAppend)
+		{
+			// TODO: Find message duplicates
+			if (!ACollection.messages.isEmpty())
+			{
+				collection.messages += ACollection.messages;
+				qSort(collection.messages);
+			}
+			if (!ACollection.notes.isEmpty())
+			{
+				collection.notes += ACollection.notes;
+			}
+		}
+		else
+		{
+			collection.messages = ACollection.messages;
+			collection.notes = ACollection.notes;
+		}
+
+		QFile file(fileName);
+		if (file.open(QFile::WriteOnly|QFile::Truncate))
+		{
+			QDomDocument doc;
+			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
+			//collectionToElement(collection,chatElem,ASaveMode);
+			file.write(doc.toByteArray(2));
+			file.close();
+			saveFileModification(AStreamJid,collection.header,logAction);
+			emit fileCollectionSaved(AStreamJid,collection.header);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart)
+{
+	QString fileName = collectionFilePath(AStreamJid,AWith,AStart);
+	if (QFile::exists(fileName))
+	{
+		IArchiveHeader header = loadHeaderFromFile(fileName);
+		delete findCollectionWriter(AStreamJid,header);
+		if (QFile::remove(collectionFilePath(AStreamJid,AWith,AStart)))
+		{
+			saveFileModification(AStreamJid,header,LOG_ACTION_REMOVE);
+			emit fileCollectionRemoved(AStreamJid,header);
+			return true;
+		}
+	}
+	return false;
+}
+
 bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const
 {
 	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
@@ -512,7 +512,7 @@ CollectionWriter *FileMessageArchive::getCollectionWriter(const Jid &AStreamJid,
 		{
 			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
 			connect(writer,SIGNAL(writerDestroyed(CollectionWriter *)),SLOT(onCollectionWriterDestroyed(CollectionWriter *)));
-			emit localCollectionOpened(AStreamJid,AHeader);
+			emit fileCollectionOpened(AStreamJid,AHeader);
 		}
 		else
 		{
