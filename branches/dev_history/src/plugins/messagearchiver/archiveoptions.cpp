@@ -237,8 +237,8 @@ void ArchiveOptions::apply()
 				FSaveRequests.append(requestId);
 		}
 
-		if (FArchiver->isReplicationEnabled(FStreamJid) != ui.chbReplication->isChecked())
-			FArchiver->setReplicationEnabled(FStreamJid,ui.chbReplication->isChecked());
+		//if (FArchiver->isReplicationEnabled(FStreamJid) != ui.chbReplication->isChecked())
+		//	FArchiver->setReplicationEnabled(FStreamJid,ui.chbReplication->isChecked());
 
 		FLastError.clear();
 		updateWidget();
@@ -261,7 +261,7 @@ void ArchiveOptions::reset()
 			it++;
 		}
 		onArchivePrefsChanged(FStreamJid,prefs);
-		ui.chbReplication->setCheckState(FArchiver->isReplicationEnabled(FStreamJid) ? Qt::Checked : Qt::Unchecked);
+		//ui.chbReplication->setCheckState(FArchiver->isReplicationEnabled(FStreamJid) ? Qt::Checked : Qt::Unchecked);
 		FLastError.clear();
 	}
 	else

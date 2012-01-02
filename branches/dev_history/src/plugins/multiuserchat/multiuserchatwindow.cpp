@@ -1297,12 +1297,12 @@ void MultiUserChatWindow::showHistory()
 		request.end = QDateTime::currentDateTime();
 
 		QList<Message> history;
-		QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(FMultiChat->streamJid(), request);
+		QList<IArchiveHeader> headers;// = FMessageArchiver->loadLocalHeaders(FMultiChat->streamJid(), request);
 		for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
 		{
 			if (headers.at(i).with.resource().isEmpty())
 			{
-				IArchiveCollection collection = FMessageArchiver->loadLocalCollection(FMultiChat->streamJid(), headers.at(i));
+				IArchiveCollection collection;// = FMessageArchiver->loadLocalCollection(FMultiChat->streamJid(), headers.at(i));
 				history = collection.messages + history;
 			}
 		}
@@ -1459,10 +1459,10 @@ void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
 		}
 
 		QList<Message> history;
-		QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
+		QList<IArchiveHeader> headers;// = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
 		for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
 		{
-			IArchiveCollection collection = FMessageArchiver->loadLocalCollection(AWindow->streamJid(), headers.at(i));
+			IArchiveCollection collection;// = FMessageArchiver->loadLocalCollection(AWindow->streamJid(), headers.at(i));
 			history = collection.messages + history;
 		}
 

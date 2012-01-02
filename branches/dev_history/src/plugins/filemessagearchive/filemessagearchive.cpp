@@ -48,6 +48,15 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 	return FMessageArchiver!=NULL;
 }
 
+bool FileMessageArchive::initObjects()
+{
+	if (FMessageArchiver)
+	{
+		FMessageArchiver->registerArchiveEngine(this);
+	}
+	return true;
+}
+
 QUuid FileMessageArchive::engineId() const
 {
 	return FILEMESSAGEARCHIVE_UUID;
@@ -195,7 +204,7 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 
 QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 {
-	Jid jid = FMessageArchiver->gateJid(AWith);
+	Jid jid = AWith; //FMessageArchiver->gateJid(AWith);
 	QString dirName = Jid::encode(jid.pBare());
 	if (!jid.resource().isEmpty())
 		dirName += "/"+Jid::encode(jid.pResource());

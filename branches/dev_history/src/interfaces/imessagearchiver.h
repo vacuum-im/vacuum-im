@@ -140,7 +140,7 @@ class IArchiveHandler
 {
 public:
 	virtual QObject *instance() =0;
-	virtual bool archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn) =0;
+	virtual bool archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn) =0;
 };
 
 class IArchiveEngine
@@ -161,12 +161,16 @@ public:
 	virtual QString engineDescription() const =0;
 	virtual uint capabilities(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const =0;
+	//DirectArchiving
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
+	//ManualArchiving
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false) =0;
+	//ArchiveManagement
 	virtual QString loadHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null) =0;
 	virtual QString loadCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null) =0;
+	//Replication
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null) =0;
 protected:
 	virtual void capabilitiesChanged(const Jid &AStreamJid) =0;
@@ -176,47 +180,6 @@ protected:
 	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult) =0;
 	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult) =0;
 	virtual void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult) =0;
-};
-
-class IArchiveWindow
-{
-public:
-	enum GroupKind {
-		GK_NO_GROUPS,
-		GK_DATE,
-		GK_CONTACT,
-		GK_DATE_CONTACT,
-		GK_CONTACT_DATE
-	};
-	enum ArchiveSource {
-		AS_LOCAL_ARCHIVE,
-		AS_SERVER_ARCHIVE,
-		AS_AUTO
-	};
-public :
-	virtual QMainWindow *instance() =0;
-	virtual const Jid &streamJid() const =0;
-	virtual ToolBarChanger *collectionTools() const =0;
-	virtual ToolBarChanger *messagesTools() const =0;
-	virtual bool isHeaderAccepted(const IArchiveHeader &AHeader) const =0;
-	virtual QList<IArchiveHeader> currentHeaders() const =0;
-	virtual QStandardItem *findHeaderItem(const IArchiveHeader &AHeader, QStandardItem *AParent = NULL) const =0;
-	virtual int groupKind() const =0;
-	virtual void setGroupKind(int AGroupKind) =0;
-	virtual int archiveSource() const =0;
-	virtual void setArchiveSource(int ASource) =0;
-	virtual const IArchiveFilter &filter() const =0;
-	virtual void setFilter(const IArchiveFilter &AFilter) =0;
-	virtual void reload() =0;
-protected:
-	virtual void groupKindChanged(int AGroupKind) =0;
-	virtual void archiveSourceChanged(int ASource) =0;
-	virtual void filterChanged(const IArchiveFilter &AFilter) =0;
-	virtual void itemCreated(QStandardItem *AItem) =0;
-	virtual void itemContextMenu(QStandardItem *AItem, Menu *AMenu) =0;
-	virtual void currentItemChanged(QStandardItem *ACurrent, QStandardItem *ABefore) =0;
-	virtual void itemDestroyed(QStandardItem *AItem) =0;
-	virtual void windowDestroyed(IArchiveWindow *AWindow) =0;
 };
 
 class IMessageArchiver
@@ -230,67 +193,38 @@ public:
 	virtual bool isManualArchiving(const Jid &AStreamJid) const =0;
 	virtual bool isLocalArchiving(const Jid &AStreamJid) const =0;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, int AMessageType) const =0;
+	virtual QString expireName(int AExpire) const =0;
 	virtual QString methodName(const QString &AMethod) const =0;
 	virtual QString otrModeName(const QString &AOTRMode) const =0;
 	virtual QString saveModeName(const QString &ASaveMode) const =0;
-	virtual QString expireName(int AExpire) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const =0;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto) =0;
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
 	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) =0;
-	virtual IArchiveWindow *showArchiveWindow(const Jid &AStreamJid, const IArchiveFilter &AFilter, int AGroupKind, QWidget *AParent = NULL) =0;
-	//Archive Handlers
-	virtual void insertArchiveHandler(IArchiveHandler *AHandler, int AOrder) =0;
-	virtual void removeArchiveHandler(IArchiveHandler *AHandler, int AOrder) =0;
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
 	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null) =0;
-	//Local Archive
-	virtual Jid gateJid(const Jid &AContactJid) const =0;
-	virtual QString gateNick(const Jid &AStreamJid, const Jid &AContactJid) const =0;
-	virtual QList<Message> findLocalMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) const =0;
-	virtual bool hasLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const =0;
-	virtual bool saveLocalCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, bool AAppend = true) =0;
-	virtual IArchiveHeader loadLocalHeader(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) const =0;
-	virtual QList<IArchiveHeader> loadLocalHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) const =0;
-	virtual IArchiveCollection loadLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const =0;
-	virtual bool removeLocalCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
-	virtual IArchiveModifications loadLocalModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const =0;
-	//Server Archive
-	virtual QDateTime replicationPoint(const Jid &AStreamJid) const =0;
-	virtual bool isReplicationEnabled(const Jid &AStreamJid) const =0;
-	virtual void setReplicationEnabled(const Jid &AStreamJid, bool AEnabled) =0;
-	virtual QString saveServerCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
-	virtual QString loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null) =0;
-	virtual QString loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null) =0;
-	virtual QString removeServerCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false) =0;
-	virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null) =0;
+	//Archive Handlers
+	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
+	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
+	//Archive Engines
+	virtual QList<IArchiveEngine *> archiveEngines() const =0;
+	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const =0;
+	virtual void registerArchiveEngine(IArchiveEngine *AEngine) =0;
 protected:
+	virtual void archivePrefsOpened(const Jid &AStreamJid) =0;
+	virtual void archivePrefsClosed(const Jid &AStreamJid) =0;
 	virtual void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto) =0;
 	virtual void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
 	virtual void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs) =0;
 	virtual void archiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid) =0;
 	virtual void requestCompleted(const QString &AId) =0;
 	virtual void requestFailed(const QString &AId, const QString &AError) =0;
-	//Local Archive
-	virtual void localCollectionOpened(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
-	virtual void localCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
-	virtual void localCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
-	//Server Archive
-	virtual void serverCollectionSaved(const QString &AId, const IArchiveHeader &Aheader) =0;
-	virtual void serverHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult) =0;
-	virtual void serverCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection,  const IArchiveResultSet &AResult) =0;
-	virtual void serverCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;
-	virtual void serverModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult) =0;
-	//ArchiveWindow
-	virtual void archiveWindowCreated(IArchiveWindow *AWindow) =0;
-	virtual void archiveWindowDestroyed(IArchiveWindow *AWindow) =0;
 };
 
-Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.0")
+Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")
 Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.0")
-Q_DECLARE_INTERFACE(IArchiveWindow,"Vacuum.Plugin.IArchiveWindow/1.0")
-Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.0")
+Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/2.0")
 
-#endif
+#endif // IMESSAGEARCHIVER_H

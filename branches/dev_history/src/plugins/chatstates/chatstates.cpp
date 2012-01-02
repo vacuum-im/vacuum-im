@@ -152,7 +152,7 @@ bool ChatStates::initObjects()
 	}
 	if (FMessageArchiver)
 	{
-		FMessageArchiver->insertArchiveHandler(this,AHO_DEFAULT);
+		FMessageArchiver->insertArchiveHandler(AHO_DEFAULT,this);
 	}
 	if (FSessionNegotiation && FDataForms)
 	{
@@ -188,7 +188,7 @@ bool ChatStates::startPlugin()
 	return true;
 }
 
-bool ChatStates::archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
+bool ChatStates::archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AStreamJid);
