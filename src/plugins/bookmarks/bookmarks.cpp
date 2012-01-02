@@ -531,10 +531,14 @@ void BookMarks::onAccountOptionsChanged(const OptionsNode &ANode)
 void BookMarks::onStartTimerTimeout()
 {
 	QMultiMap<Jid, IBookMark>::iterator it = FPendingBookMarks.begin();
-	bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
 	if (it != FPendingBookMarks.end())
 	{
-		startBookmark(it.key(),it.value(),!it->conference.isEmpty() ? showAutoJoined : false);
+		bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
+		if (it->conference.isEmpty())
+			showAutoJoined = false;
+		else if (FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(it.key(),it->conference)!=NULL)
+			showAutoJoined = false;
+		startBookmark(it.key(),it.value(), showAutoJoined);
 		FPendingBookMarks.erase(it);
 		FStartTimer.start(NEXT_START_TIMEOUT);
 	}
