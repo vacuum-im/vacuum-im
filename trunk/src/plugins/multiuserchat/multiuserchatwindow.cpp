@@ -1636,7 +1636,7 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 				QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(mouseEvent->pos())));
 				if (userItem)
 				{
-					QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? ": " : " ";
+					QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : " ";
 					FEditWidget->textEdit()->textCursor().insertText(userItem->text() + sufix);
 					FEditWidget->textEdit()->setFocus();
 					AEvent->accept();
