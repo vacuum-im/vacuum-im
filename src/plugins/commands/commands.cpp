@@ -95,20 +95,13 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 bool Commands::initObjects()
 {
-	ErrorHandler::addErrorItem("malformed-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Can not understand the specified action"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Can not accept the specified action"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-locale",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Can not accept the specified language/locale"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-payload",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("The data form did not provide one or more required fields"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-sessionid",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-		tr("Specified session not present"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("session-expired",ErrorHandler::CANCEL,ErrorHandler::NOT_ALLOWED,
-		tr("Specified session is no longer active"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("forbidden", ErrorHandler::AUTH, ErrorHandler::FORBIDDEN,
-		tr("Forbidden"));
+	ErrorHandler::addErrorItem("malformed-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Can not understand the specified action"),NS_COMMANDS);
+	ErrorHandler::addErrorItem("bad-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Can not accept the specified action"),NS_COMMANDS);
+	ErrorHandler::addErrorItem("bad-locale",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Can not accept the specified language/locale"),NS_COMMANDS);
+	ErrorHandler::addErrorItem("bad-payload",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("The data form did not provide one or more required fields"),NS_COMMANDS);
+	ErrorHandler::addErrorItem("bad-sessionid",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Specified session not present"),NS_COMMANDS);
+	ErrorHandler::addErrorItem("session-expired",ErrorHandler::CANCEL,ErrorHandler::NOT_ALLOWED,tr("Specified session is no longer active"),NS_COMMANDS);
+	ErrorHandler::addErrorItem("forbidden",ErrorHandler::AUTH,ErrorHandler::FORBIDDEN,tr("Forbidden"),NS_COMMANDS);
 
 	if (FDiscovery)
 	{
@@ -151,13 +144,13 @@ bool Commands::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		ICommandServer *server = FServers.value(request.node);
 		if (server && !server->isCommandPermitted(request.streamJid,request.contactJid,request.node))
 		{
-			Stanza reply = AStanza.replyError("forbidden",NS_COMMANDS,ErrorHandler::FORBIDDEN);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("forbidden",ErrorHandler::FORBIDDEN,NS_COMMANDS));
+			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else if (!server || !server->receiveCommandRequest(request))
 		{
-			Stanza reply = AStanza.replyError("malformed-action",NS_COMMANDS,ErrorHandler::BAD_REQUEST);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("malformed-action",ErrorHandler::BAD_REQUEST,NS_COMMANDS));
+			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 	}
 	return false;
@@ -224,23 +217,6 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 				if (client->receiveCommandError(error))
 					break;
 		}
-	}
-}
-
-void Commands::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FRequests.contains(AStanzaId))
-	{
-		ICommandError error;
-		error.stanzaId = AStanzaId;
-		ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-		error.code = err.code();
-		error.condition = err.condition();
-		error.message = err.message();
-		foreach(ICommandClient *client, FClients)
-			if (client->receiveCommandError(error))
-				break;
 	}
 }
 
@@ -458,7 +434,7 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 	if (FStanzaProcessor)
 	{
 		Stanza result("iq");
-		result.setTo(AResult.contactJid.eFull()).setType("result").setId(AResult.stanzaId);
+		result.setType("result").setId(AResult.stanzaId).setTo(AResult.contactJid.eFull());
 
 		QDomElement cmdElem = result.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		cmdElem.setAttribute("node",AResult.node);

@@ -71,8 +71,7 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			{
 				if (AStanza.tagName() == "iq")
 				{
-					Stanza result("iq");
-					result.setType("result").setId(AStanza.id()).setTo(AStanza.from());
+					Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 					FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 				}
 
@@ -109,43 +108,37 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 				FSHIClose = insertStanzaHandle(SHC_INBAND_CLOSE);
 				if (FSHIData>0 && FSHIClose>0)
 				{
-					Stanza reply("iq");
-					reply.setType("result").setTo(AStanza.from()).setId(AStanza.id());
-					if (FStanzaProcessor->sendStanzaOut(AStreamJid,reply))
-					{
+					Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+					if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
 						setStreamState(IDataStreamSocket::Opened);
-					}
 					else
-					{
 						abort(tr("Failed to open stream"));
-					}
 				}
 				else
 				{
-					Stanza error = AStanza.replyError("not-acceptable");
+					Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("not-acceptable"));
 					FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 					abort(tr("Failed to open stream"));
 				}
 			}
 			else
 			{
-				Stanza error = AStanza.replyError("resource-constraint",EHN_DEFAULT,ErrorHandler::UNKNOWNCODE,tr("Block size is not acceptable"));
+				Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("resource-constraint"));
 				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 				abort(tr("Block size is not acceptable"));
 			}
 		}
 		else
 		{
-			Stanza error = AStanza.replyError("not-acceptable");
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("not-acceptable"));
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 	}
 	else if (AHandleId==FSHIClose && elem.attribute("sid")==FStreamId)
 	{
 		AAccept = true;
-		Stanza reply("iq");
-		reply.setType("result").setTo(AStanza.from()).setId(AStanza.id());
-		FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 		setStreamState(IDataStreamSocket::Closed);
 	}
 	return false;
@@ -187,23 +180,6 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 	}
 	else if (AStanza.id() == FCloseRequestId)
-	{
-		setStreamState(IDataStreamSocket::Closed);
-	}
-}
-
-void InBandStream::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (AStanzaId == FDataIqRequestId)
-	{
-		abort(ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
-	}
-	else if (AStanzaId == FOpenRequestId)
-	{
-		abort(ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
-	}
-	else if (AStanzaId == FCloseRequestId)
 	{
 		setStreamState(IDataStreamSocket::Closed);
 	}

@@ -111,7 +111,9 @@ void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &
 			emit searchFields(AStanza.id(),fields);
 		}
 		else
+		{
 			emit searchError(AStanza.id(),ErrorHandler(AStanza.element()).message());
+		}
 	}
 	else if (FSubmits.contains(AStanza.id()))
 	{
@@ -146,22 +148,9 @@ void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &
 			emit searchResult(AStanza.id(),result);
 		}
 		else
+		{
 			emit searchError(AStanza.id(),ErrorHandler(AStanza.element()).message());
-	}
-}
-
-void JabberSearch::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FRequests.contains(AStanzaId))
-	{
-		FRequests.removeAt(FRequests.indexOf(AStanzaId));
-		emit searchError(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
-	}
-	else if (FSubmits.contains(AStanzaId))
-	{
-		FSubmits.removeAt(FSubmits.indexOf(AStanzaId));
-		emit searchError(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+		}
 	}
 }
 

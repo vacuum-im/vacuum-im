@@ -8,6 +8,7 @@
 #include <definitions/xmppfeaturepluginorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
+#include <utils/errorhandler.h>
 #include "compression.h"
 
 #define COMPRESS_UUID "{061D0687-B954-416d-B690-D1BA7D845D83}"

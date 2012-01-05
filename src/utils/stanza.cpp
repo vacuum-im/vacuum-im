@@ -1,6 +1,7 @@
 #include "stanza.h"
 
 #include <QTextStream>
+#include "jid.h"
 
 StanzaData::StanzaData(const QString &ATagName)
 {
@@ -42,10 +43,21 @@ bool Stanza::isValid() const
 	if (element().isNull())
 		return false;
 
-	if (type() == "error" && firstElement("error").isNull())
+	if (type()=="error" && firstElement("error").isNull())
 		return false;
 
 	return true;
+}
+
+bool Stanza::isFromServer() const
+{
+	if (!to().isEmpty())
+	{
+		Jid toJid = to();
+		Jid fromJid = from();
+		return fromJid.isEmpty() || fromJid==toJid || fromJid==toJid.bare() || fromJid==toJid.domain();
+	}
+	return false;
 }
 
 QDomDocument Stanza::document() const
@@ -136,46 +148,6 @@ Stanza &Stanza::setLang(const QString &ALang)
 {
 	setAttribute("xml:lang",ALang);
 	return *this;
-}
-
-bool Stanza::canReplyError() const
-{
-	if (tagName() != "iq")
-		return false;
-
-	if (type()!="set" && type()!="get")
-		return false;
-
-	if (!firstElement("error").isNull())
-		return false;
-
-	return true;
-}
-
-Stanza Stanza::replyError(const QString &ACondition, const QString &ANamespace, int ACode, const QString &AText) const
-{
-	Stanza reply(*this);
-	reply.setType("error").setTo(from());
-	reply.element().removeAttribute("from");
-	QDomElement errElem = reply.addElement("error");
-	int code = ACode;
-	QString condition = ACondition;
-	if (code == ErrorHandler::UNKNOWNCODE)
-		code = ErrorHandler::codeByCondition(ACondition, ANamespace);
-	else if (ACondition.isEmpty())
-		condition = ErrorHandler::coditionByCode(code,ANamespace);
-	QString type = ErrorHandler::typeToString(ErrorHandler::typeByCondition(condition,ANamespace));
-
-	if (code != ErrorHandler::UNKNOWNCODE)
-		errElem.setAttribute("code",code);
-	if (!type.isEmpty())
-		errElem.setAttribute("type",type);
-	if (!condition.isEmpty())
-		errElem.appendChild(reply.createElement(condition,ANamespace));
-	if (!AText.isEmpty())
-		errElem.appendChild(reply.createElement("text",ANamespace)).appendChild(reply.createTextNode(AText));
-
-	return reply;
 }
 
 QDomElement Stanza::firstElement(const QString &ATagName, const QString ANamespace) const
