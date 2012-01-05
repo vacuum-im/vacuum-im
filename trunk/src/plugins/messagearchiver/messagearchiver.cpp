@@ -301,15 +301,14 @@ bool MessageArchiver::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Sta
 		Message message(AStanza);
 		processMessage(AStreamJid,message,false);
 	}
-	else if (FSHIPrefs.value(AStreamJid)==AHandlerId && AStreamJid==AStanza.from())
+	else if (FSHIPrefs.value(AStreamJid)==AHandlerId && AStanza.isFromServer())
 	{
 		QDomElement prefElem = AStanza.firstElement("pref",FNamespaces.value(AStreamJid));
 		applyArchivePrefs(AStreamJid,prefElem);
 
 		AAccept = true;
-		Stanza reply("iq");
-		reply.setTo(AStanza.from()).setType("result").setId(AStanza.id());
-		FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	return false;
 }
@@ -488,55 +487,6 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		emit requestCompleted(AStanza.id());
 	else
 		emit requestFailed(AStanza.id(),ErrorHandler(AStanza.element()).message());
-}
-
-void MessageArchiver::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	if (FPrefsLoadRequests.contains(AStanzaId))
-	{
-		FPrefsLoadRequests.remove(AStanzaId);
-		applyArchivePrefs(AStreamJid,QDomElement());
-	}
-	else if (FPrefsSaveRequests.contains(AStanzaId))
-	{
-		FPrefsSaveRequests.remove(AStanzaId);
-		cancelSuspendedStanzaSession(AStreamJid,AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
-	}
-	else if (FPrefsAutoRequests.contains(AStanzaId))
-	{
-		FPrefsAutoRequests.remove(AStanzaId);
-	}
-	else if (FPrefsRemoveRequests.contains(AStanzaId))
-	{
-		FPrefsRemoveRequests.remove(AStanzaId);
-	}
-	else if (FSaveRequests.contains(AStanzaId))
-	{
-		FSaveRequests.remove(AStanzaId);
-	}
-	else if (FRetrieveRequests.contains(AStanzaId))
-	{
-		FRetrieveRequests.remove(AStanzaId);
-	}
-	else if (FListRequests.contains(AStanzaId))
-	{
-		FListRequests.remove(AStanzaId);
-	}
-	else if (FRemoveRequests.contains(AStanzaId))
-	{
-		FRemoveRequests.remove(AStanzaId);
-	}
-	else if (FModifyRequests.contains(AStanzaId))
-	{
-		FModifyRequests.remove(AStanzaId);
-	}
-
-	if (FRestoreRequests.contains(AStanzaId))
-	{
-		FRestoreRequests.remove(AStanzaId);
-	}
-
-	emit requestFailed(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
 }
 
 QMultiMap<int, IOptionsWidget *>  MessageArchiver::optionsWidgets(const QString &ANodeId, QWidget *AParent)

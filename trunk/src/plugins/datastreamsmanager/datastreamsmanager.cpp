@@ -220,21 +220,8 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 		}
 		else if (sprofile)
 		{
-			sprofile->dataStreamError(sid,ErrorHandler(AStanza.element(), NS_STREAM_INITIATION).message());
+			sprofile->dataStreamError(sid,ErrorHandler(AStanza.element(),NS_STREAM_INITIATION).message());
 		}
-	}
-}
-
-void DataStreamsManger::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	QString sid = streamIdByRequestId(AStanzaId);
-	if (FDataForms && FStreams.contains(sid))
-	{
-		FStreams.remove(sid);
-		IDataStreamProfile *sprofile = FProfiles.value(sid,NULL);
-		if (sprofile)
-			sprofile->dataStreamError(sid,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
 	}
 }
 
@@ -392,7 +379,7 @@ bool DataStreamsManger::acceptStream(const QString &AStreamId, const QString &AM
 		if (sprofile && index>=0 && FDataForms->isOptionValid(params.features.fields.at(index).options,AMethodNS))
 		{
 			Stanza response("iq");
-			response.setTo(params.contactJid.eFull()).setType("result").setId(params.requestId);
+			response.setType("result").setId(params.requestId).setTo(params.contactJid.eFull());
 			QDomElement siElem = response.addElement("si",NS_STREAM_INITIATION);
 			if (sprofile->responceDataStream(AStreamId,response))
 			{

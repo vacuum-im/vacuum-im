@@ -75,6 +75,11 @@ QString ErrorHandler::condition() const
 	return FCondition;
 }
 
+QString ErrorHandler::namespaceURI() const
+{
+	return FNsURI;
+}
+
 QString ErrorHandler::meaning() const
 {
 	return FMeaning;
@@ -176,7 +181,7 @@ ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QStr
 		FCode = codeByCondition(FCondition,ANsURI);
 
 	if (FCondition.isEmpty() && FCode != 0)
-		FCondition = coditionByCode(FCode,ANsURI);
+		FCondition = conditionByCode(FCode,ANsURI);
 
 	if (FType == UNKNOWNTYPE && FCode != 0)
 		FType = typeByCode(FCode,ANsURI);
@@ -197,8 +202,7 @@ ErrorHandler &ErrorHandler::parseElement(const QDomElement &AErrElem, const QStr
 }
 
 //Static members
-void ErrorHandler::addErrorItem(const QString &ACondition, ErrorType AType,
-                                int ACode, const QString &AMeaning, const QString &ANsURI)
+void ErrorHandler::addErrorItem(const QString &ACondition, ErrorType AType, int ACode, const QString &AMeaning, const QString &ANsURI)
 {
 	init();
 	ErrorItem *item = itemByCondition(ACondition,ANsURI);
@@ -233,8 +237,7 @@ ErrorHandler::ErrorItem *ErrorHandler::itemByCondition(const QString &ACondition
 	return NULL;
 }
 
-ErrorHandler::ErrorItem *ErrorHandler::itemByCodeCondition(int &ACode, const QString &ACondition,
-    const QString &ANsURI)
+ErrorHandler::ErrorItem *ErrorHandler::itemByCodeCondition(int &ACode, const QString &ACondition, const QString &ANsURI)
 {
 	init();
 	QList<ErrorItem *> items = FItemByNS.values(ANsURI);
@@ -279,7 +282,7 @@ int ErrorHandler::codeByCondition(const QString &ACondition, const QString &ANsU
 	return item != NULL ? item->code : UNKNOWNCODE;
 }
 
-QString ErrorHandler::coditionByCode(int ACode, const QString &ANsURI)
+QString ErrorHandler::conditionByCode(int ACode, const QString &ANsURI)
 {
 	ErrorItem *item = itemByCode(ACode,ANsURI);
 	return item != NULL ? item->condition : QString::null;
@@ -303,30 +306,30 @@ void ErrorHandler::init()
 	if (!inited)
 	{
 		inited = true;
-		addErrorItem("redirect",                MODIFY, 302, qApp->translate("ErrorHandler", "Redirect"));
-		addErrorItem("gone",                    MODIFY, 302, qApp->translate("ErrorHandler", "Redirect"));
-		addErrorItem("bad-request",             MODIFY, 400, qApp->translate("ErrorHandler", "Bad Request"));
-		addErrorItem("unexpected-request",      WAIT,   400, qApp->translate("ErrorHandler", "Unexpected Request"));
-		addErrorItem("jid-malformed",           MODIFY, 400, qApp->translate("ErrorHandler", "Jid Malformed"));
-		addErrorItem("not-authorized",          AUTH,   401, qApp->translate("ErrorHandler", "Not Authorized"));
-		addErrorItem("payment-required",        AUTH,   402, qApp->translate("ErrorHandler", "Payment Required"));
-		addErrorItem("forbidden",               AUTH,   403, qApp->translate("ErrorHandler", "Forbidden"));
-		addErrorItem("item-not-found",          CANCEL, 404, qApp->translate("ErrorHandler", "Not Found"));
-		addErrorItem("recipient-unavailable",   WAIT,   404, qApp->translate("ErrorHandler", "Recipient Unavailable"));
-		addErrorItem("remote-server-not-found", CANCEL, 404, qApp->translate("ErrorHandler", "Remote Server Not Found"));
-		addErrorItem("not-allowed",             CANCEL, 405, qApp->translate("ErrorHandler", "Not Allowed"));
-		addErrorItem("not-acceptable",          MODIFY, 406, qApp->translate("ErrorHandler", "Not Acceptable"));
-		addErrorItem("registration-required",   AUTH,   407, qApp->translate("ErrorHandler", "Registration Required"));
-		addErrorItem("subscription-required",   AUTH,   407, qApp->translate("ErrorHandler", "Subscription Required"));
-		addErrorItem("request-timeout",         WAIT,   408, qApp->translate("ErrorHandler", "Request Timeout"));
-		addErrorItem("conflict",                CANCEL, 409, qApp->translate("ErrorHandler", "Conflict"));
-		addErrorItem("internal-server-error",   WAIT,   500, qApp->translate("ErrorHandler", "Internal Server Error"));
-		addErrorItem("resource-constraint",     WAIT,   500, qApp->translate("ErrorHandler", "Resource Constraint"));
-		addErrorItem("undefined-condition",     CANCEL, 500, qApp->translate("ErrorHandler", "Undefined Condition"));
-		addErrorItem("feature-not-implemented", CANCEL, 501, qApp->translate("ErrorHandler", "Not Implemented"));
-		addErrorItem("remote-server-error",     CANCEL, 502, qApp->translate("ErrorHandler", "Remote Server Error"));
-		addErrorItem("service-unavailable",     CANCEL, 503, qApp->translate("ErrorHandler", "Service Unavailable"));
-		addErrorItem("remote-server-timeout",   WAIT,   504, qApp->translate("ErrorHandler", "Remote Server timeout"));
-		addErrorItem("disconnected",            CANCEL, 510, qApp->translate("ErrorHandler", "Disconnected"));
+		addErrorItem("redirect",                MODIFY, REDIRECT,                qApp->translate("ErrorHandler", "Redirect"));
+		addErrorItem("gone",                    MODIFY, GONE,                    qApp->translate("ErrorHandler", "Redirect"));
+		addErrorItem("bad-request",             MODIFY, BAD_REQUEST,             qApp->translate("ErrorHandler", "Bad Request"));
+		addErrorItem("unexpected-request",      WAIT,   UNEXPECTED_REQUEST,      qApp->translate("ErrorHandler", "Unexpected Request"));
+		addErrorItem("jid-malformed",           MODIFY, JID_MALFORMED,           qApp->translate("ErrorHandler", "Jid Malformed"));
+		addErrorItem("not-authorized",          AUTH,   NOT_AUTHORIZED,          qApp->translate("ErrorHandler", "Not Authorized"));
+		addErrorItem("payment-required",        AUTH,   PAYMENT_REQUIRED,        qApp->translate("ErrorHandler", "Payment Required"));
+		addErrorItem("forbidden",               AUTH,   FORBIDDEN,               qApp->translate("ErrorHandler", "Forbidden"));
+		addErrorItem("item-not-found",          CANCEL, ITEM_NOT_FOUND,          qApp->translate("ErrorHandler", "Not Found"));
+		addErrorItem("recipient-unavailable",   WAIT,   RECIPIENT_UNAVAILABLE,   qApp->translate("ErrorHandler", "Recipient Unavailable"));
+		addErrorItem("remote-server-not-found", CANCEL, REMOTE_SERVER_NOT_FOUND, qApp->translate("ErrorHandler", "Remote Server Not Found"));
+		addErrorItem("not-allowed",             CANCEL, NOT_ALLOWED,             qApp->translate("ErrorHandler", "Not Allowed"));
+		addErrorItem("not-acceptable",          MODIFY, NOT_ACCEPTABLE,          qApp->translate("ErrorHandler", "Not Acceptable"));
+		addErrorItem("registration-required",   AUTH,   REGISTRATION_REQUIRED,   qApp->translate("ErrorHandler", "Registration Required"));
+		addErrorItem("subscription-required",   AUTH,   SUBSCRIPTION_REQUIRED,   qApp->translate("ErrorHandler", "Subscription Required"));
+		addErrorItem("request-timeout",         WAIT,   REQUEST_TIMEOUT,         qApp->translate("ErrorHandler", "Request Timeout"));
+		addErrorItem("conflict",                CANCEL, CONFLICT,                qApp->translate("ErrorHandler", "Conflict"));
+		addErrorItem("internal-server-error",   WAIT,   INTERNAL_SERVER_ERROR,   qApp->translate("ErrorHandler", "Internal Server Error"));
+		addErrorItem("resource-constraint",     WAIT,   RESOURCE_CONSTRAINT,     qApp->translate("ErrorHandler", "Resource Constraint"));
+		addErrorItem("undefined-condition",     CANCEL, UNDEFINED_CONDITION,     qApp->translate("ErrorHandler", "Undefined Condition"));
+		addErrorItem("feature-not-implemented", CANCEL, FEATURE_NOT_IMPLEMENTED, qApp->translate("ErrorHandler", "Not Implemented"));
+		addErrorItem("remote-server-error",     CANCEL, REMOUTE_SERVER_ERROR,    qApp->translate("ErrorHandler", "Remote Server Error"));
+		addErrorItem("service-unavailable",     CANCEL, SERVICE_UNAVAILABLE,     qApp->translate("ErrorHandler", "Service Unavailable"));
+		addErrorItem("remote-server-timeout",   WAIT,   REMOTE_SERVER_TIMEOUT,   qApp->translate("ErrorHandler", "Remote Server timeout"));
+		addErrorItem("disconnected",            CANCEL, DISCONNECTED,            qApp->translate("ErrorHandler", "Disconnected"));
 	}
 }

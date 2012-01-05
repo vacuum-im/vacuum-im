@@ -398,7 +398,7 @@ int SessionNegotiation::initSession(const Jid &AStreamJid, const Jid &AContactJi
 			if (!infoRequested)
 			{
 				session.status = IStanzaSession::Error;
-				session.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::SERVICE_UNAVAILABLE);
+				session.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::SERVICE_UNAVAILABLE);
 				emit sessionTerminated(session);
 				return ISessionNegotiator::Cancel;
 			}
@@ -572,7 +572,7 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 		if (!FDataForms->isSubmitValid(ARequest,submit))
 		{
 			ASession.status = IStanzaSession::Error;
-			ASession.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
+			ASession.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
 			ASession.errorFields = unsubmitedFields(ARequest,submit,true);
 			sendSessionError(ASession,ARequest);
 		}
@@ -617,7 +617,7 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 			if (!FDataForms->isSubmitValid(ASession.form,ARequest))
 			{
 				ASession.status = IStanzaSession::Error;
-				ASession.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::NOT_ACCEPTABLE);
+				ASession.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::NOT_ACCEPTABLE);
 				ASession.errorFields = unsubmitedFields(ARequest,submit,true);
 				sendSessionError(ASession,ARequest);
 				emit sessionTerminated(ASession);
@@ -809,7 +809,7 @@ void SessionNegotiation::processContinue(IStanzaSession &ASession, const IDataFo
 			if ((result & ISessionNegotiator::Cancel) > 0)
 			{
 				ASession.status = IStanzaSession::Error;
-				ASession.errorCondition = ErrorHandler::coditionByCode(ErrorHandler::NOT_ACCEPTABLE);
+				ASession.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::NOT_ACCEPTABLE);
 				sendSessionError(ASession,ARequest);
 			}
 			else if ((result & ISessionNegotiator::Wait) > 0)

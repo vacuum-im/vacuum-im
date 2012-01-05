@@ -42,7 +42,6 @@ public:
 	virtual bool stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
-	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
 	//IBitsOfBinary
 	virtual QString contentIdentifier(const QByteArray &AData) const;
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;

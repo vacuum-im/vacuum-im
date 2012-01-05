@@ -126,7 +126,7 @@ bool PrivacyLists::initObjects()
 
 bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FSHIPrivacy.value(AStreamJid)==AHandlerId && AStreamJid==AStanza.from())
+	if (FSHIPrivacy.value(AStreamJid)==AHandlerId && AStanza.isFromServer())
 	{
 		QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_PRIVACY);
 		QDomElement listElem = queryElem.firstChildElement("list");
@@ -144,8 +144,7 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 				loadPrivacyList(AStreamJid,listName);
 
 			AAccept = true;
-			Stanza result("iq");
-			result.setType("result").setId(AStanza.id());
+			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 		}
 	}
@@ -332,24 +331,6 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		emit requestCompleted(AStanza.id());
 	else
 		emit requestFailed(AStanza.id(),ErrorHandler(AStanza.element()).message());
-}
-
-void PrivacyLists::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	if (FLoadRequests.contains(AStanzaId))
-		FLoadRequests.remove(AStanzaId);
-	else if (FSaveRequests.contains(AStanzaId))
-		FSaveRequests.remove(AStanzaId);
-	else if (FActiveRequests.contains(AStanzaId))
-		FActiveRequests.remove(AStanzaId);
-	else if (FDefaultRequests.contains(AStanzaId))
-		FDefaultRequests.remove(AStanzaId);
-	else if (FRemoveRequests.contains(AStanzaId))
-		FRemoveRequests.remove(AStanzaId);
-
-	FStreamRequests[AStreamJid].removeAt(FStreamRequests[AStreamJid].indexOf(AStanzaId));
-
-	emit requestFailed(AStanzaId,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
 }
 
 bool PrivacyLists::isReady(const Jid &AStreamJid) const

@@ -56,7 +56,6 @@ public:
 	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
-	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStreamId);
 	//IDataStreamsManager
 	virtual QList<QString> methods() const;
 	virtual IDataStreamMethod *method(const QString &AMethodNS) const;

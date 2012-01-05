@@ -190,7 +190,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 			ErrorHandler err(AStanza.element());
 			emit errorReceived(AStanza.id(),err.message());
 		}
-		FPromptRequests.removeAt(FPromptRequests.indexOf(AStanza.id()));
+		FPromptRequests.removeAll(AStanza.id());
 	}
 	else if (FUserJidRequests.contains(AStanza.id()))
 	{
@@ -204,19 +204,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 			ErrorHandler err(AStanza.element());
 			emit errorReceived(AStanza.id(),err.message());
 		}
-		FUserJidRequests.removeAt(FUserJidRequests.indexOf(AStanza.id()));
-	}
-}
-
-void Gateways::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FPromptRequests.contains(AStanzaId) || FUserJidRequests.contains(AStanzaId))
-	{
-		ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-		emit errorReceived(AStanzaId,err.message());
-		FPromptRequests.removeAt(FPromptRequests.indexOf(AStanzaId));
-		FUserJidRequests.removeAt(FUserJidRequests.indexOf(AStanzaId));
+		FUserJidRequests.removeAll(AStanza.id());
 	}
 }
 

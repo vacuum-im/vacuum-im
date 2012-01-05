@@ -207,41 +207,37 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 	if (AHandlerId == FVersionHandle)
 	{
 		AAccept = true;
-		Stanza iq("iq");
-		iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
-		QDomElement elem = iq.addElement("query",NS_JABBER_VERSION);
-		elem.appendChild(iq.createElement("name")).appendChild(iq.createTextNode(CLIENT_NAME));
-		elem.appendChild(iq.createElement("version")).appendChild(iq.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
+		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+		QDomElement elem = result.addElement("query",NS_JABBER_VERSION);
+		elem.appendChild(result.createElement("name")).appendChild(result.createTextNode(CLIENT_NAME));
+		elem.appendChild(result.createElement("version")).appendChild(result.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
 		if (Options::node(OPV_MISC_SHAREOSVERSION).value().toBool())
-			elem.appendChild(iq.createElement("os")).appendChild(iq.createTextNode(osVersion()));
-		FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
+			elem.appendChild(result.createElement("os")).appendChild(result.createTextNode(osVersion()));
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	else if (AHandlerId == FActivityHandler)
 	{
 		AAccept = true;
-		Stanza iq("iq");
-		iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
-		QDomElement elem = iq.addElement("query",NS_JABBER_LAST);
+		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+		QDomElement elem = result.addElement("query",NS_JABBER_LAST);
 		elem.setAttribute("seconds", SystemManager::systemIdle());
-		FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	else if (AHandlerId == FTimeHandle)
 	{
 		AAccept = true;
-		Stanza iq("iq");
-		iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
-		QDomElement elem = iq.addElement("time",NS_XMPP_TIME);
+		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+		QDomElement elem = result.addElement("time",NS_XMPP_TIME);
 		DateTime dateTime(QDateTime::currentDateTime());
-		elem.appendChild(iq.createElement("tzo")).appendChild(iq.createTextNode(dateTime.toX85TZD()));
-		elem.appendChild(iq.createElement("utc")).appendChild(iq.createTextNode(dateTime.toX85UTC()));
-		FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
+		elem.appendChild(result.createElement("tzo")).appendChild(result.createTextNode(dateTime.toX85TZD()));
+		elem.appendChild(result.createElement("utc")).appendChild(result.createTextNode(dateTime.toX85UTC()));
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	else if (AHandlerId == FPingHandle)
 	{
 		AAccept = true;
-		Stanza iq("iq");
-		iq.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
-		FStanzaProcessor->sendStanzaOut(AStreamJid,iq);
+		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	return false;
 }
@@ -306,33 +302,6 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 		{
 			FTimeItems.remove(contactJid);
 		}
-		emit entityTimeChanged(contactJid);
-	}
-}
-
-void ClientInfo::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FSoftwareId.contains(AStanzaId))
-	{
-		Jid contactJid = FSoftwareId.take(AStanzaId);
-		SoftwareItem &software = FSoftwareItems[contactJid];
-		ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-		software.name = err.message();
-		software.version.clear();
-		software.os.clear();
-		software.status = SoftwareError;
-		emit softwareInfoChanged(contactJid);
-	}
-	else if (FActivityId.contains(AStanzaId))
-	{
-		Jid contactJid = FActivityId.take(AStanzaId);
-		emit lastActivityChanged(contactJid);
-	}
-	else if (FTimeId.contains(AStanzaId))
-	{
-		Jid contactJid = FTimeId.take(AStanzaId);
-		FTimeItems.remove(contactJid);
 		emit entityTimeChanged(contactJid);
 	}
 }

@@ -69,25 +69,6 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 	}
 }
 
-void PrivateStorage::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	if (FSaveRequests.contains(AStanzaId))
-	{
-		QDomElement elem = FSaveRequests.take(AStanzaId);
-		removeElement(AStreamJid,elem.tagName(),elem.namespaceURI());
-	}
-	else if (FLoadRequests.contains(AStanzaId))
-	{
-		FLoadRequests.remove(AStanzaId);
-	}
-	else if (FRemoveRequests.contains(AStanzaId))
-	{
-		FRemoveRequests.remove(AStanzaId);
-	}
-	ErrorHandler err(ErrorHandler::REQUEST_TIMEOUT);
-	emit dataError(AStanzaId,err.message());
-}
-
 bool PrivateStorage::isOpen(const Jid &AStreamJid) const
 {
 	return FStreamElements.contains(AStreamJid);
