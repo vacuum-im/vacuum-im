@@ -157,18 +157,9 @@ ArchiveOptions::ArchiveOptions(IMessageArchiver *AArchiver, const Jid &AStreamJi
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddItemPrefClicked()));
 	connect(ui.pbtRemove,SIGNAL(clicked()),SLOT(onRemoveItemPrefClicked()));
-	connect(FArchiver->instance(),SIGNAL(archiveAutoSaveChanged(const Jid &, bool)),
-		SLOT(onArchiveAutoSaveChanged(const Jid &, bool)));
-	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
-		SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
-	connect(FArchiver->instance(),SIGNAL(archiveItemPrefsChanged(const Jid &, const Jid &, const IArchiveItemPrefs &)),
-		SLOT(onArchiveItemPrefsChanged(const Jid &, const Jid &, const IArchiveItemPrefs &)));
-	connect(FArchiver->instance(),SIGNAL(archiveItemPrefsRemoved(const Jid &, const Jid &)),
-		SLOT(onArchiveItemPrefsRemoved(const Jid &, const Jid &)));
-	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),
-		SLOT(onArchiveRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-		SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
+	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onArchiveRequestFailed(const QString &, const QString &)));
 
 	connect(ui.cmbMethodLocal,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbMethodManual,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
@@ -253,14 +244,7 @@ void ArchiveOptions::reset()
 	ui.tbwItemPrefs->setRowCount(0);
 	if (FArchiver->isReady(FStreamJid))
 	{
-		IArchiveStreamPrefs prefs = FArchiver->archivePrefs(FStreamJid);
-		QHash<Jid,IArchiveItemPrefs>::const_iterator it = prefs.itemPrefs.constBegin();
-		while (it!=prefs.itemPrefs.constEnd())
-		{
-			onArchiveItemPrefsChanged(FStreamJid,it.key(),it.value());
-			it++;
-		}
-		onArchivePrefsChanged(FStreamJid,prefs);
+		onArchivePrefsChanged(FStreamJid);
 		//ui.chbReplication->setCheckState(FArchiver->isReplicationEnabled(FStreamJid) ? Qt::Checked : Qt::Unchecked);
 		FLastError.clear();
 	}
@@ -293,13 +277,49 @@ void ArchiveOptions::updateColumnsSize()
 	ui.tbwItemPrefs->horizontalHeader()->reset();
 }
 
+void ArchiveOptions::updateItemPrefs(const Jid &AItemJid, const IArchiveItemPrefs &APrefs)
+{
+	if (!FTableItems.contains(AItemJid))
+	{
+		QTableWidgetItem *jidItem = new QTableWidgetItem(AItemJid.full());
+		QTableWidgetItem *otrItem = new QTableWidgetItem();
+		QTableWidgetItem *saveItem = new QTableWidgetItem();
+		QTableWidgetItem *expireItem = new QTableWidgetItem();
+		ui.tbwItemPrefs->setRowCount(ui.tbwItemPrefs->rowCount()+1);
+		ui.tbwItemPrefs->setItem(ui.tbwItemPrefs->rowCount()-1,JID_COLUMN,jidItem);
+		ui.tbwItemPrefs->setItem(jidItem->row(),OTR_COLUMN,otrItem);
+		ui.tbwItemPrefs->setItem(jidItem->row(),SAVE_COLUMN,saveItem);
+		ui.tbwItemPrefs->setItem(jidItem->row(),EXPIRE_COLUMN,expireItem);
+		ui.tbwItemPrefs->verticalHeader()->setResizeMode(jidItem->row(),QHeaderView::ResizeToContents);
+		FTableItems.insert(AItemJid,jidItem);
+	}
+	QTableWidgetItem *jidItem = FTableItems.value(AItemJid);
+	ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setText(FArchiver->otrModeName(APrefs.otr));
+	ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setData(Qt::UserRole,APrefs.otr);
+	ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setText(FArchiver->saveModeName(APrefs.save));
+	ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setData(Qt::UserRole,APrefs.save);
+	ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setText(FArchiver->expireName(APrefs.expire));
+	ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setData(Qt::UserRole,APrefs.expire);
+	updateColumnsSize();
+}
+
+void ArchiveOptions::removeItemPrefs(const Jid &AItemJid)
+{
+	if (FTableItems.contains(AItemJid))
+	{
+		QTableWidgetItem *jidItem = FTableItems.take(AItemJid);
+		ui.tbwItemPrefs->removeRow(jidItem->row());
+		updateColumnsSize();
+	}
+}
+
 void ArchiveOptions::onAddItemPrefClicked()
 {
 	Jid itemJid = QInputDialog::getText(this,tr("New item preferences"),tr("Enter item JID:"));
 	if (itemJid.isValid() && !FTableItems.contains(itemJid))
 	{
 		IArchiveItemPrefs itemPrefs = FArchiver->archiveItemPrefs(FStreamJid,itemJid);
-		onArchiveItemPrefsChanged(FStreamJid,itemJid,itemPrefs);
+		updateItemPrefs(itemJid,itemPrefs);
 		ui.tbwItemPrefs->setCurrentItem(FTableItems.value(itemJid));
 		emit modified();
 	}
@@ -314,76 +334,43 @@ void ArchiveOptions::onRemoveItemPrefClicked()
 	if (ui.tbwItemPrefs->currentRow()>=0)
 	{
 		QTableWidgetItem *jidItem = ui.tbwItemPrefs->item(ui.tbwItemPrefs->currentRow(),JID_COLUMN);
-		onArchiveItemPrefsRemoved(FStreamJid,FTableItems.key(jidItem));
+		removeItemPrefs(FTableItems.key(jidItem));
 		emit modified();
 	}
 }
 
-void ArchiveOptions::onArchiveAutoSaveChanged(const Jid &AStreamJid, bool AAutoSave)
+void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 {
 	if (AStreamJid == FStreamJid)
 	{
-		ui.chbAutoSave->setChecked(AAutoSave);
-		updateWidget();
-	}
-}
+		IArchiveStreamPrefs prefs = FArchiver->archivePrefs(AStreamJid);
 
-void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
-{
-	if (AStreamJid == FStreamJid)
-	{
-		onArchiveAutoSaveChanged(FStreamJid,APrefs.autoSave);
+		ui.chbAutoSave->setChecked(FArchiver->isAutoArchiving(AStreamJid));
 		ui.grbAuto->setVisible(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_AUTO));
 		ui.chbReplication->setEnabled(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_MANAGE));
 
-		ui.cmbMethodLocal->setCurrentIndex(ui.cmbMethodLocal->findData(APrefs.methodLocal));
-		ui.cmbMethodAuto->setCurrentIndex(ui.cmbMethodAuto->findData(APrefs.methodAuto));
-		ui.cmbMethodManual->setCurrentIndex(ui.cmbMethodManual->findData(APrefs.methodManual));
+		ui.cmbMethodLocal->setCurrentIndex(ui.cmbMethodLocal->findData(prefs.methodLocal));
+		ui.cmbMethodAuto->setCurrentIndex(ui.cmbMethodAuto->findData(prefs.methodAuto));
+		ui.cmbMethodManual->setCurrentIndex(ui.cmbMethodManual->findData(prefs.methodManual));
 		ui.grbMethod->setVisible(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_PREF));
 
-		ui.cmbModeOTR->setCurrentIndex(ui.cmbModeOTR->findData(APrefs.defaultPrefs.otr));
-		ui.cmbModeSave->setCurrentIndex(ui.cmbModeSave->findData(APrefs.defaultPrefs.save));
-		ui.cmbExpireTime->lineEdit()->setText(QString::number(APrefs.defaultPrefs.expire/ONE_DAY));
+		ui.cmbModeOTR->setCurrentIndex(ui.cmbModeOTR->findData(prefs.defaultPrefs.otr));
+		ui.cmbModeSave->setCurrentIndex(ui.cmbModeSave->findData(prefs.defaultPrefs.save));
+		ui.cmbExpireTime->lineEdit()->setText(QString::number(prefs.defaultPrefs.expire/ONE_DAY));
+
+		QSet<Jid> oldItems = FTableItems.keys().toSet();
+		foreach(Jid itemJid, prefs.itemPrefs.keys())
+		{
+			oldItems -= itemJid;
+			updateItemPrefs(itemJid,prefs.itemPrefs.value(itemJid));
+		}
+
+		foreach(Jid itemJid, oldItems)
+		{
+			removeItemPrefs(itemJid);
+		}
 
 		updateWidget();
-	}
-}
-
-void ArchiveOptions::onArchiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs)
-{
-	if (AStreamJid == FStreamJid)
-	{
-		if (!FTableItems.contains(AItemJid))
-		{
-			QTableWidgetItem *jidItem = new QTableWidgetItem(AItemJid.full());
-			QTableWidgetItem *otrItem = new QTableWidgetItem();
-			QTableWidgetItem *saveItem = new QTableWidgetItem();
-			QTableWidgetItem *expireItem = new QTableWidgetItem();
-			ui.tbwItemPrefs->setRowCount(ui.tbwItemPrefs->rowCount()+1);
-			ui.tbwItemPrefs->setItem(ui.tbwItemPrefs->rowCount()-1,JID_COLUMN,jidItem);
-			ui.tbwItemPrefs->setItem(jidItem->row(),OTR_COLUMN,otrItem);
-			ui.tbwItemPrefs->setItem(jidItem->row(),SAVE_COLUMN,saveItem);
-			ui.tbwItemPrefs->setItem(jidItem->row(),EXPIRE_COLUMN,expireItem);
-			ui.tbwItemPrefs->verticalHeader()->setResizeMode(jidItem->row(),QHeaderView::ResizeToContents);
-			FTableItems.insert(AItemJid,jidItem);
-		}
-		QTableWidgetItem *jidItem = FTableItems.value(AItemJid);
-		ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setText(FArchiver->otrModeName(APrefs.otr));
-		ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setData(Qt::UserRole,APrefs.otr);
-		ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setText(FArchiver->saveModeName(APrefs.save));
-		ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setData(Qt::UserRole,APrefs.save);
-		ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setText(FArchiver->expireName(APrefs.expire));
-		ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setData(Qt::UserRole,APrefs.expire);
-		updateColumnsSize();
-	}
-}
-
-void ArchiveOptions::onArchiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid)
-{
-	if (AStreamJid==FStreamJid && FTableItems.contains(AItemJid))
-	{
-		QTableWidgetItem *jidItem = FTableItems.take(AItemJid);
-		ui.tbwItemPrefs->removeRow(jidItem->row());
 		updateColumnsSize();
 	}
 }

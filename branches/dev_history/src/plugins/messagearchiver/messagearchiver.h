@@ -3,6 +3,7 @@
 
 #include <QPair>
 #include <QList>
+#include <QUuid>
 #include <QMultiMap>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
@@ -88,21 +89,23 @@ public:
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const;
 	virtual bool isAutoArchiving(const Jid &AStreamJid) const;
-	virtual bool isManualArchiving(const Jid &AStreamJid) const;
-	virtual bool isLocalArchiving(const Jid &AStreamJid) const;
-	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, int AMessageType) const;
+	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const;
 	virtual QString expireName(int AExpire) const;
 	virtual QString methodName(const QString &AMethod) const;
 	virtual QString otrModeName(const QString &AOTRMode) const;
 	virtual QString saveModeName(const QString &ASaveMode) const;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
-	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const;
+	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto);
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
 	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid);
+	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId);
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
 	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null);
+	//Archive Utilities
+	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
+	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const;
 	//Archive Handlers
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler);
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler);
@@ -112,11 +115,8 @@ public:
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine);
 signals:
 	void archivePrefsOpened(const Jid &AStreamJid);
+	void archivePrefsChanged(const Jid &AStreamJid);
 	void archivePrefsClosed(const Jid &AStreamJid);
-	void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto);
-	void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
-	void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
-	void archiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid);
 	void requestCompleted(const QString &AId);
 	void requestFailed(const QString &AId, const QString &AError);
 protected:
@@ -124,8 +124,6 @@ protected:
 	QString loadServerPrefs(const Jid &AStreamJid);
 	QString loadStoragePrefs(const Jid &AStreamJid);
 	void applyArchivePrefs(const Jid &AStreamJid, const QDomElement &AElem);
-	void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
-	void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const;
 	bool prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	bool processMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	void openHistoryOptionsNode(const Jid &AStreamJid);
@@ -158,7 +156,6 @@ protected slots:
 	void onShowArchiveWindowByToolBarAction(bool);
 	void onShowHistoryOptionsDialogByAction(bool);
 	void onRemoveItemPrefsByAction(bool);
-	void onArchiveHandlerDestroyed(QObject *AHandler);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
@@ -171,12 +168,12 @@ private:
 	IOptionsManager *FOptionsManager;
 	IPrivateStorage *FPrivateStorage;
 	IAccountManager *FAccountManager;
+	IRosterPlugin *FRosterPlugin;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IServiceDiscovery *FDiscovery;
 	IDataForms *FDataForms;
 	IMessageWidgets *FMessageWidgets;
 	ISessionNegotiation *FSessionNegotiation;
-	IRosterPlugin *FRosterPlugin;
 	IMultiUserChatPlugin *FMultiUserChatPlugin;
 private:
 	QMap<Jid,int> FSHIPrefs;
@@ -187,7 +184,8 @@ private:
 	QMap<QString,Jid> FPrefsSaveRequests;
 	QMap<QString,Jid> FPrefsLoadRequests;
 	QMap<QString,bool> FPrefsAutoRequests;
-	QMap<QString,Jid> FPrefsRemoveRequests;
+	QMap<QString,Jid> FPrefsRemoveItemRequests;
+	QMap<QString,QString> FPrefsRemoveSessionRequests;
 private:
 	QList<Jid> FInStoragePrefs;
 	QMap<Jid,QString> FNamespaces;
@@ -195,7 +193,7 @@ private:
 	QMap<Jid,IArchiveStreamPrefs> FArchivePrefs;
 	QMap<Jid,QList< QPair<Message,bool> > > FPendingMessages;
 private:
-	QMap<QString, QString> FRestoreRequests;
+	QMap<QString,QString> FRestoreRequests;
 	QMap<Jid,QMap<Jid,StanzaSession> > FSessions;
 private:
 	QMap<QUuid,IArchiveEngine *> FArchiveEngines;

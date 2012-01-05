@@ -24,7 +24,7 @@ protected:
 	void createActions();
 protected slots:
 	void onActionTriggered(bool);
-	void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
+	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onRequestCompleted(const QString &AId);
 	void onRequestFailed(const QString &AId, const QString &AError);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);

@@ -46,13 +46,12 @@ signals:
 protected:
 	void updateWidget();
 	void updateColumnsSize();
+	void updateItemPrefs(const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
+	void removeItemPrefs(const Jid &AItemJid);
 protected slots:
 	void onAddItemPrefClicked();
 	void onRemoveItemPrefClicked();
-	void onArchiveAutoSaveChanged(const Jid &AStreamJid, bool AAutoSave);
-	void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
-	void onArchiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
-	void onArchiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid);
+	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 private:

@@ -71,7 +71,7 @@ protected slots:
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
 private:
 	IPluginManager *FPluginManager;
-	IMessageArchiver *FMessageArchiver;
+	IMessageArchiver *FArchiver;
 private:
 	QMap<Jid, QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
 };

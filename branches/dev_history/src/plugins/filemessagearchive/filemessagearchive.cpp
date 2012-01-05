@@ -17,7 +17,7 @@
 FileMessageArchive::FileMessageArchive()
 {
 	FPluginManager = NULL;
-	FMessageArchiver = NULL;
+	FArchiver = NULL;
 }
 
 FileMessageArchive::~FileMessageArchive()
@@ -43,16 +43,16 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
 	{
-		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+		FArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
 	}
-	return FMessageArchiver!=NULL;
+	return FArchiver!=NULL;
 }
 
 bool FileMessageArchive::initObjects()
 {
-	if (FMessageArchiver)
+	if (FArchiver)
 	{
-		FMessageArchiver->registerArchiveEngine(this);
+		FArchiver->registerArchiveEngine(this);
 	}
 	return true;
 }
@@ -74,7 +74,7 @@ QString FileMessageArchive::engineDescription() const
 
 uint FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
-	if (AStreamJid.isValid() && !FMessageArchiver->isReady(AStreamJid))
+	if (AStreamJid.isValid() && !FArchiver->isReady(AStreamJid))
 		return ArchiveManagement|Replication|TextSearch;
 	return DirectArchiving|ManualArchiving|ArchiveManagement|Replication|TextSearch;
 }
@@ -112,7 +112,7 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 
 bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	if (isCapable(AStreamJid,DirectArchiving) && FMessageArchiver->isReady(AStreamJid))
+	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		itemJid = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
@@ -130,7 +130,7 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 		}
 		if (writer)
 		{
-			IArchiveItemPrefs prefs = FMessageArchiver->archiveItemPrefs(AStreamJid,itemJid);
+			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid);
 			return writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
 	}
@@ -141,7 +141,7 @@ QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchive
 {
 	if (isCapable(AStreamJid,ManualArchiving) && AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveCollection(ACollection);
 		return wthread->executeAction(WorkingThread::SaveCollection);
@@ -154,7 +154,7 @@ QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArch
 	Q_UNUSED(AOpened);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ManualArchiving))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveRequest(ARequest);
 		return wthread->executeAction(WorkingThread::RemoveCollection);
@@ -167,7 +167,7 @@ QString FileMessageArchive::loadHeaders(const Jid AStreamJid, const IArchiveRequ
 	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveRequest(ARequest);
 		return wthread->executeAction(WorkingThread::LoadHeaders);
@@ -180,7 +180,7 @@ QString FileMessageArchive::loadCollection(const Jid AStreamJid, const IArchiveH
 	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveHeader(AHeader);
 		return wthread->executeAction(WorkingThread::LoadCollection);
@@ -193,7 +193,7 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,Replication))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setModificationsStart(AStart);
 		wthread->setModificationsCount(ACount);
@@ -204,7 +204,7 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 
 QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 {
-	Jid jid = AWith; //FMessageArchiver->gateJid(AWith);
+	Jid jid = AWith; //FArchiver->gateJid(AWith);
 	QString dirName = Jid::encode(jid.pBare());
 	if (!jid.resource().isEmpty())
 		dirName += "/"+Jid::encode(jid.pResource());
@@ -280,7 +280,7 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 			if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
 			{
 				filesMap.insertMulti(fname,fpath);
-				if (filesMap.count() > ARequest.count)
+				if (ARequest.count>0 && filesMap.count()>ARequest.count)
 					filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
 			}
 		}
@@ -337,7 +337,7 @@ IArchiveCollection FileMessageArchive::loadCollectionFromFile(const QString &AFi
 	{
 		QDomDocument doc;
 		doc.setContent(file.readAll(),true);
-		//elementToCollection(doc.documentElement(),collection);
+		FArchiver->elementToCollection(doc.documentElement(),collection);
 		file.close();
 	}
 	return collection;
@@ -441,7 +441,7 @@ bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArch
 		{
 			QDomDocument doc;
 			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
-			//collectionToElement(collection,chatElem,ASaveMode);
+			FArchiver->collectionToElement(collection,chatElem,ASaveMode);
 			file.write(doc.toByteArray(2));
 			file.close();
 			saveFileModification(AStreamJid,collection.header,logAction);

@@ -5,6 +5,7 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <interfaces/ipluginmanager.h>
+#include <interfaces/idataforms.h>
 #include <utils/toolbarchanger.h>
 #include <utils/datetime.h>
 #include <utils/message.h>
@@ -12,6 +13,9 @@
 #include <utils/jid.h>
 
 #define MESSAGEARCHIVER_UUID "{66FEAE08-BE4D-4fd4-BCEA-494F3A70997A}"
+
+#define ARCHIVE_SCOPE_GLOBAL    "global"    //the setting will remain for next streams
+#define ARCHIVE_SCOPE_STREAM    "stream"    //the setting is true only until the end of the stream. For next stream, server default value will be used
 
 #define ARCHIVE_OTR_APPROVE     "approve"   //the user MUST explicitly approve off-the-record communication.
 #define ARCHIVE_OTR_CONCEDE     "concede"   //communications MAY be off the record if requested by another user.
@@ -31,11 +35,16 @@
 
 struct IArchiveItemPrefs
 {
+	IArchiveItemPrefs() {
+		expire = 0;
+		exactmatch = false;
+	}
 	QString save;
 	QString otr;
-	int expire;
+	quint32 expire;
+	bool exactmatch;
 	bool operator==(const IArchiveItemPrefs &AOther) const {
-		return save==AOther.save && otr==AOther.otr && expire==AOther.expire;
+		return save==AOther.save && otr==AOther.otr && expire==AOther.expire && exactmatch==AOther.exactmatch;
 	}
 	bool operator!=(const IArchiveItemPrefs &AOther) const {
 		return !operator==(AOther);
@@ -45,11 +54,13 @@ struct IArchiveItemPrefs
 struct IArchiveStreamPrefs
 {
 	bool autoSave;
+	QString autoScope;
 	QString methodAuto;
 	QString methodLocal;
 	QString methodManual;
 	IArchiveItemPrefs defaultPrefs;
-	QHash<Jid,IArchiveItemPrefs> itemPrefs;
+	QMap<Jid,IArchiveItemPrefs> itemPrefs;
+	QMap<QString,IArchiveItemPrefs> sessionPrefs;
 };
 
 struct IArchiveHeader
@@ -61,7 +72,7 @@ struct IArchiveHeader
 	QDateTime start;
 	QString subject;
 	QString threadId;
-	int version;
+	quint32 version;
 	bool operator<(const IArchiveHeader &AOther) const {
 		return start==AOther.start ? with<AOther.with : start<AOther.start;
 	}
@@ -73,9 +84,18 @@ struct IArchiveHeader
 	}
 };
 
+struct IArchiveCollectionLink
+{
+	Jid with;
+	QDateTime start;
+};
+
 struct IArchiveCollection
 {
 	IArchiveHeader header;
+	IDataForm attributes;
+	IArchiveCollectionLink next;
+	IArchiveCollectionLink previous;
 	QList<Message> messages;
 	QMultiMap<QDateTime,QString> notes;
 	bool operator<(const IArchiveCollection &AOther) const {
@@ -107,31 +127,22 @@ struct IArchiveModifications
 struct IArchiveRequest
 {
 	IArchiveRequest() {
+		count = -1;
 		threadId = QString::null;
-		count = 0x7FFFFFFF;
 		order = Qt::AscendingOrder;
 	}
 	Jid with;
+	qint32 count;
 	QDateTime start;
 	QDateTime end;
 	QString threadId;
-	int count;
 	Qt::SortOrder order;
-};
-
-struct IArchiveFilter
-{
-	Jid with;
-	QDateTime start;
-	QDateTime end;
-	QString threadId;
-	QRegExp body;
 };
 
 struct IArchiveResultSet 
 {
-	int count;
-	int index;
+	quint32 count;
+	quint32 index;
 	QString first;
 	QString last;
 };
@@ -190,21 +201,23 @@ public:
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const =0;
 	virtual bool isAutoArchiving(const Jid &AStreamJid) const =0;
-	virtual bool isManualArchiving(const Jid &AStreamJid) const =0;
-	virtual bool isLocalArchiving(const Jid &AStreamJid) const =0;
-	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, int AMessageType) const =0;
+	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
 	virtual QString expireName(int AExpire) const =0;
 	virtual QString methodName(const QString &AMethod) const =0;
 	virtual QString otrModeName(const QString &AOTRMode) const =0;
 	virtual QString saveModeName(const QString &ASaveMode) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
-	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) const =0;
+	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto) =0;
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
 	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) =0;
+	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId) =0;
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
 	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null) =0;
+	//Archive Utilities
+	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const =0;
+	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const =0;
 	//Archive Handlers
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
@@ -214,11 +227,8 @@ public:
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine) =0;
 protected:
 	virtual void archivePrefsOpened(const Jid &AStreamJid) =0;
+	virtual void archivePrefsChanged(const Jid &AStreamJid) =0;
 	virtual void archivePrefsClosed(const Jid &AStreamJid) =0;
-	virtual void archiveAutoSaveChanged(const Jid &AStreamJid, bool AAuto) =0;
-	virtual void archivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
-	virtual void archiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs) =0;
-	virtual void archiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid) =0;
 	virtual void requestCompleted(const QString &AId) =0;
 	virtual void requestFailed(const QString &AId, const QString &AError) =0;
 };

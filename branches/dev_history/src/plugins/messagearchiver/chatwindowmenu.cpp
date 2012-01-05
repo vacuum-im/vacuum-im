@@ -51,12 +51,9 @@ void ChatWindowMenu::initialize(IPluginManager *APluginManager)
 		}
 	}
 
-	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
-		SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
-	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),
-    SLOT(onRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-		SLOT(onRequestFailed(const QString &,const QString &)));
+	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
+	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onRequestCompleted(const QString &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onRequestFailed(const QString &,const QString &)));
 	connect(FEditWidget->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onEditWidgetContactJidChanged(const Jid &)));
 }
 
@@ -168,19 +165,18 @@ void ChatWindowMenu::onActionTriggered(bool)
 	}
 }
 
-void ChatWindowMenu::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
+void ChatWindowMenu::onArchivePrefsChanged(const Jid &AStreamJid)
 {
-	Q_UNUSED(APrefs);
 	if (FEditWidget->streamJid() == AStreamJid)
 	{
 		bool logEnabled = FArchiver->isAutoArchiving(AStreamJid);
 		if (FArchiver->isArchivePrefsEnabled(AStreamJid))
 		{
-			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(AStreamJid,FEditWidget->contactJid());
-			logEnabled = iprefs.save!=ARCHIVE_SAVE_FALSE;
+			IArchiveItemPrefs itemPrefs = FArchiver->archiveItemPrefs(AStreamJid,FEditWidget->contactJid());
+			logEnabled = itemPrefs.save!=ARCHIVE_SAVE_FALSE;
 			FSaveTrue->setVisible(!logEnabled);
 			FSaveFalse->setVisible(logEnabled);
-			if (iprefs.otr == ARCHIVE_OTR_REQUIRE)
+			if (itemPrefs.otr == ARCHIVE_OTR_REQUIRE)
 			{
 				FSessionRequire->setChecked(true);
 				FSessionRequire->setVisible(true);
@@ -312,5 +308,5 @@ void ChatWindowMenu::onEditWidgetContactJidChanged(const Jid &ABefore)
 			onStanzaSessionActivated(session);
 	}
 
-	onArchivePrefsChanged(FEditWidget->streamJid(),FArchiver->archivePrefs(FEditWidget->streamJid()));
+	onArchivePrefsChanged(FEditWidget->streamJid());
 }
