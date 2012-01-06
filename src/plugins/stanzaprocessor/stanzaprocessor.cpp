@@ -48,7 +48,10 @@ bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 		if (!sendStanzaIn(AXmppStream->streamJid(),AStanza))
 		{
 			if (AStanza.tagName()=="iq" && (AStanza.type()=="set" || AStanza.type()=="get"))
-				sendStanzaOut(AXmppStream->streamJid(), makeReplyError(AStanza,ErrorHandler(ErrorHandler::SERVICE_UNAVAILABLE)));
+			{
+				Stanza error = makeReplyError(AStanza,ErrorHandler(ErrorHandler::SERVICE_UNAVAILABLE));
+				sendStanzaOut(AXmppStream->streamJid(), error);
+			}
 		}
 	}
 	return false;
