@@ -119,10 +119,6 @@ Check values and try again</source>
         <translation>Изменения в списке &apos;%1s&apos; приняты.</translation>
     </message>
     <message>
-        <source>Changes in list of %1s may not be accepted: %2</source>
-        <translation>Изменения в списке &apos;%1s&apos; не могут быть приняты: %2</translation>
-    </message>
-    <message>
         <source>Failed to send request for list of %1s.</source>
         <translation>Не удалось отправить запрос списка &apos;%1s&apos;.</translation>
     </message>
