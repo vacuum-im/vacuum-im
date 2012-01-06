@@ -79,10 +79,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Remote client is timed out to connect</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failed to create hosts</source>
         <translation></translation>
     </message>

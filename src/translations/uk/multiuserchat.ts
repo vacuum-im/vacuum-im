@@ -118,10 +118,6 @@ Check values and try again</source>
         <translation>Зміни в списку %1s прийняті.</translation>
     </message>
     <message>
-        <source>Changes in list of %1s may not be accepted: %2</source>
-        <translation>Зміни в списку &apos;%1s&apos; не можуть бути прийняті: %2</translation>
-    </message>
-    <message>
         <source>Failed to send request for list of %1s.</source>
         <translation>Не вдалось відіслати запит списку &apos;%1s&apos;.</translation>
     </message>

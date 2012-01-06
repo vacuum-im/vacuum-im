@@ -119,10 +119,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Zmiany na liście &apos;%1s&apos; przyjęte.</translation>
     </message>
     <message>
-        <source>Changes in list of %1s may not be accepted: %2</source>
-        <translation>Zmiany na liście &apos;%1s&apos; nie mogą zostać zaakceptowane: %2</translation>
-    </message>
-    <message>
         <source>Failed to send request for list of %1s.</source>
         <translation>Nie mozna wysłać polecenia pobrania listy &apos;%1s&apos;.</translation>
     </message>

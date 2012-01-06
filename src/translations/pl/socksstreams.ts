@@ -79,10 +79,6 @@
         <translation>Nie udało się otworzyc strumienia</translation>
     </message>
     <message>
-        <source>Remote client is timed out to connect</source>
-        <translation>Minął czas na odpowiedź zdalnego klienta</translation>
-    </message>
-    <message>
         <source>Failed to create hosts</source>
         <translation>Nie udało się utworzyć hosta</translation>
     </message>

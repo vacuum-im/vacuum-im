@@ -118,10 +118,6 @@ Check values and try again</source>
         <translation>Änderungen in der Liste von &apos;%1s&apos; akzeptiert.</translation>
     </message>
     <message>
-        <source>Changes in list of %1s may not be accepted: %2</source>
-        <translation>Änderungen in der Liste von &apos;%1s&apos; dürfen nicht akzeptiert werden: %2</translation>
-    </message>
-    <message>
         <source>Failed to send request for list of %1s.</source>
         <translation>Senden der Anfrage für die Liste von &apos;%1s&apos; fehlgeschlagen.</translation>
     </message>

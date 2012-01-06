@@ -79,10 +79,6 @@
         <translation>Не вдалось активувати потік</translation>
     </message>
     <message>
-        <source>Remote client is timed out to connect</source>
-        <translation>Віддалений клієнт не відповів на запит підключення</translation>
-    </message>
-    <message>
         <source>Failed to create hosts</source>
         <translation>Не вдалось створити хост</translation>
     </message>
