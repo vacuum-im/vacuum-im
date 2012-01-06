@@ -138,13 +138,6 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	}
 }
 
-void CaptchaForms::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FChallengeRequest.contains(AStanzaId))
-		emit challengeRejected(FChallengeRequest.take(AStanzaId), ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
-}
-
 IDataFormLocale CaptchaForms::dataFormLocale(const QString &AFormType)
 {
 	IDataFormLocale locale;

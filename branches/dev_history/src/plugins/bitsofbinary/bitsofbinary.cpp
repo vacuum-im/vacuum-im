@@ -173,8 +173,7 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		QString cid = dataElem.attribute("cid");
 		if (!cid.isEmpty() && loadBinary(cid,type,data,maxAge))
 		{
-			Stanza result("iq");
-			result.setType("result").setId(AStanza.id()).setTo(AStanza.from());
+			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 			dataElem = result.addElement("data",NS_BITS_OF_BINARY);
 			dataElem.setAttribute("cid",cid);
 			dataElem.setAttribute("type",type);
@@ -184,8 +183,8 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
-			Stanza error = AStanza.replyError("item-not-found",EHN_DEFAULT);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("item-not-found"));
+			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 		}
 	}
 	return false;
@@ -207,16 +206,9 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 				emit binaryError(cid,tr("Invalid response"));
 		}
 		else
+		{
 			emit binaryError(cid,ErrorHandler(AStanza.element()).message());
-	}
-}
-
-void BitsOfBinary::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FLoadRequests.contains(AStanzaId))
-	{
-		emit binaryError(FLoadRequests.take(AStanzaId),ErrorHandler(ErrorHandler::REQUEST_TIMEOUT).message());
+		}
 	}
 }
 

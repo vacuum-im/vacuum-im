@@ -132,12 +132,12 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 	{
 		Jid fromJid = FVCardRequestId.take(AStanza.id());
 		QDomElement elem = AStanza.firstElement(VCARD_TAGNAME,NS_VCARD_TEMP);
-		if (AStanza.type()=="result")
+		if (AStanza.type() == "result")
 		{
 			saveVCardFile(elem,fromJid);
 			emit vcardReceived(fromJid);
 		}
-		else if (AStanza.type()=="error")
+		else if (AStanza.type() == "error")
 		{
 			ErrorHandler err(AStanza.element());
 			emit vcardError(fromJid,err.message());
@@ -157,21 +157,6 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 			ErrorHandler err(AStanza.element());
 			emit vcardError(fromJid,err.message());
 		}
-	}
-}
-
-void VCardPlugin::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FVCardRequestId.contains(AStanzaId))
-	{
-		ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-		emit vcardError(FVCardRequestId.take(AStanzaId),err.message());
-	}
-	else if (FVCardPublishId.contains(AStanzaId))
-	{
-		ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-		emit vcardError(FVCardPublishId.take(AStanzaId),err.message());
 	}
 }
 

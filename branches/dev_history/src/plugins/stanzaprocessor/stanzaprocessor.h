@@ -9,10 +9,13 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 
-struct StanzaRequest
-{
-	StanzaRequest() { timer=NULL; owner=NULL; }
+struct StanzaRequest {
+	StanzaRequest() { 
+		timer=NULL;
+		owner=NULL;
+	}
 	Jid streamJid;
+	Jid contactJid;
 	QTimer *timer;
 	IStanzaRequestOwner *owner;
 };
@@ -44,21 +47,25 @@ public:
 	virtual bool sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza);
 	virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza);
 	virtual bool sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout);
+	virtual Stanza makeReplyResult(const Stanza &AStanza) const;
+	virtual Stanza makeReplyError(const Stanza &AStanza, const ErrorHandler &AError) const;
+	virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const;
 	virtual QList<int> stanzaHandles() const;
 	virtual IStanzaHandle stanzaHandle(int AHandleId) const;
 	virtual int insertStanzaHandle(const IStanzaHandle &AHandle);
 	virtual void removeStanzaHandle(int AHandleId);
-	virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const;
 signals:
 	void stanzaSent(const Jid &AStreamJid, const Stanza &AStanza);
 	void stanzaReceived(const Jid &AStreamJid, const Stanza &AStanza);
 	void stanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle);
 	void stanzaHandleRemoved(int AHandleId, const IStanzaHandle &AHandle);
 protected:
-	bool checkCondition(const QDomElement &AElem, const QString &ACondition, const int APos = 0) const;
+	bool checkCondition(const QDomElement &AElem, const QString &ACondition, int APos = 0) const;
 	bool processStanza(const Jid &AStreamJid, Stanza &AStanza, int ADirection) const;
 	bool processStanzaRequest(const Jid &AStreamJid, const Stanza &AStanza);
+	void processRequestTimeout(const QString &AStanzaId) const;
 	void removeStanzaRequest(const QString &AStanzaId);
+	void insertErrorElement(Stanza &AStanza, const ErrorHandler &AError) const;
 protected slots:
 	void onStreamCreated(IXmppStream *AXmppStream);
 	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);

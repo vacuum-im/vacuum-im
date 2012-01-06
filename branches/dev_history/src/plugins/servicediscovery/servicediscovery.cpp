@@ -222,19 +222,18 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 		if (dinfo.error.code >= 0)
 		{
 			AAccept = true;
-			Stanza reply = AStanza.replyError(dinfo.error.condition,EHN_DEFAULT,dinfo.error.code,dinfo.error.message);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler(dinfo.error.condition,dinfo.error.code));
+			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else if (!dinfo.identity.isEmpty() || !dinfo.features.isEmpty() || !dinfo.extensions.isEmpty())
 		{
 			AAccept = true;
-			Stanza reply("iq");
-			reply.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
-			QDomElement query = reply.addElement("query",NS_DISCO_INFO);
+			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+			QDomElement query = result.addElement("query",NS_DISCO_INFO);
 			if (!dinfo.node.isEmpty())
 				query.setAttribute("node",dinfo.node);
 			discoInfoToElem(dinfo,query);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 		}
 	}
 	else if (FSHIItems.value(AStreamJid) == AHandlerId)
@@ -251,27 +250,26 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 		if (ditems.error.code >= 0)
 		{
 			AAccept = true;
-			Stanza reply = AStanza.replyError(ditems.error.condition,EHN_DEFAULT,ditems.error.code,ditems.error.message);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler(ditems.error.condition,ditems.error.code));
+			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else
 		{
 			AAccept = true;
-			Stanza reply("iq");
-			reply.setTo(AStanza.from()).setId(AStanza.id()).setType("result");
-			QDomElement query = reply.addElement("query",NS_DISCO_ITEMS);
+			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
+			QDomElement query = result.addElement("query",NS_DISCO_ITEMS);
 			if (!ditems.node.isEmpty())
 				query.setAttribute("node",ditems.node);
 			foreach(IDiscoItem ditem, ditems.items)
 			{
-				QDomElement elem = query.appendChild(reply.createElement("item")).toElement();
+				QDomElement elem = query.appendChild(result.createElement("item")).toElement();
 				elem.setAttribute("jid",ditem.itemJid.eFull());
 				if (!ditem.node.isEmpty())
 					elem.setAttribute("node",ditem.node);
 				if (!ditem.name.isEmpty())
 					elem.setAttribute("name",ditem.name);
 			}
-			FStanzaProcessor->sendStanzaOut(AStreamJid,reply);
+			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 		}
 	}
 	else if (FSHIPresenceIn.value(AStreamJid) == AHandlerId)
@@ -344,38 +342,6 @@ void ServiceDiscovery::stanzaRequestResult(const Jid &AStreamJid, const Stanza &
 	{
 		DiscoveryRequest drequest = FItemsRequestsId.take(AStanza.id());
 		IDiscoItems ditems = parseDiscoItems(AStanza,drequest);
-		emit discoItemsReceived(ditems);
-	}
-}
-
-void ServiceDiscovery::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FInfoRequestsId.contains(AStanzaId))
-	{
-		IDiscoInfo dinfo;
-		DiscoveryRequest drequest = FInfoRequestsId.take(AStanzaId);
-		ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-		dinfo.streamJid = drequest.streamJid;
-		dinfo.contactJid = drequest.contactJid;
-		dinfo.node = drequest.node;
-		dinfo.error.code = err.code();
-		dinfo.error.condition = err.condition();
-		dinfo.error.message = err.message();
-		FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
-		emit discoInfoReceived(dinfo);
-	}
-	else if (FItemsRequestsId.contains(AStanzaId))
-	{
-		IDiscoItems ditems;
-		DiscoveryRequest drequest = FItemsRequestsId.take(AStanzaId);
-		ErrorHandler err(ErrorHandler::REMOTE_SERVER_TIMEOUT);
-		ditems.streamJid = drequest.streamJid;
-		ditems.contactJid = drequest.contactJid;
-		ditems.node = drequest.node;
-		ditems.error.code = err.code();
-		ditems.error.condition = err.condition();
-		ditems.error.message = err.message();
 		emit discoItemsReceived(ditems);
 	}
 }

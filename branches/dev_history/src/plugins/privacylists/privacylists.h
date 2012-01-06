@@ -42,7 +42,6 @@ public:
 	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
-	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
 	//IPrivacyLists
 	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual IPrivacyRule autoListRule(const Jid &AContactJid, const QString &AAutoList) const;

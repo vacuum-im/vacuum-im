@@ -31,7 +31,6 @@ public:
 	virtual bool startPlugin() { return true; }
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
-	virtual void stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId);
 	//IPrivateStorage
 	virtual bool isOpen(const Jid &AStreamJid) const;
 	virtual bool isLoaded(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace) const;

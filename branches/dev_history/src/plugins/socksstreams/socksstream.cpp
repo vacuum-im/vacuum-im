@@ -105,9 +105,9 @@ bool SocksStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &
 		}
 		else
 		{
-			Stanza reply = AStanza.replyError("not-acceptable",EHN_DEFAULT,ErrorHandler::NOT_ACCEPTABLE);
-			reply.element().removeChild(reply.firstElement("query"));
-			FStanzaProcessor->sendStanzaOut(AStreamJid, reply);
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("not-acceptable"));
+			error.element().removeChild(error.firstElement("query"));
+			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 			abort(tr("Unsupported stream mode"));
 		}
 		removeStanzaHandle(FSHIHosts);
@@ -147,7 +147,9 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 			negotiateConnection(NCMD_CONNECT_TO_HOST);
 		}
 		else
+		{
 			abort(tr("Remote client cant connect to given hosts"));
+		}
 	}
 	else if (AStanza.id() == FActivateRequest)
 	{
@@ -155,25 +157,6 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 			negotiateConnection(NCMD_START_STREAM);
 		else
 			abort(tr("Failed to activate stream"));
-	}
-}
-
-void SocksStream::stanzaRequestTimeout(const Jid &AStreamJid, const QString &AStanzaId)
-{
-	Q_UNUSED(AStreamJid);
-	if (FProxyRequests.contains(AStanzaId))
-	{
-		FProxyRequests.removeAll(AStanzaId);
-		if (FProxyRequests.isEmpty())
-			negotiateConnection(NCMD_SEND_AVAIL_HOSTS);
-	}
-	else if (AStanzaId == FHostRequest)
-	{
-		abort(tr("Remote client is timed out to connect"));
-	}
-	else if (AStanzaId == FActivateRequest)
-	{
-		abort(tr("Failed to activate stream"));
 	}
 }
 
@@ -739,7 +722,7 @@ bool SocksStream::sendUsedHost()
 	if (FHostIndex < FHosts.count())
 	{
 		Stanza reply("iq");
-		reply.setType("result").setTo(FContactJid.eFull()).setId(FHostRequest);
+		reply.setType("result").setId(FHostRequest).setTo(FContactJid.eFull());
 
 		QDomElement query =  reply.addElement("query",NS_SOCKS5_BYTESTREAMS);
 		query.setAttribute("sid",FStreamId);
