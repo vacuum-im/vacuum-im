@@ -57,6 +57,17 @@ bool FileMessageArchive::initObjects()
 	return true;
 }
 
+bool FileMessageArchive::initSettings()
+{
+	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES,5);
+	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_SIZE,20*1024);
+	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXSIZE,30*1024);
+	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_TIMEOUT,20*60*1000);
+	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT,5*60*1000);
+	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT,120*60*1000);
+	return true;
+}
+
 QUuid FileMessageArchive::engineId() const
 {
 	return FILEMESSAGEARCHIVE_UUID;
@@ -72,7 +83,7 @@ QString FileMessageArchive::engineDescription() const
 	return tr("History of communications is stored in local files");
 }
 
-uint FileMessageArchive::capabilities(const Jid &AStreamJid) const
+quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
 	if (AStreamJid.isValid() && !FArchiver->isReady(AStreamJid))
 		return ArchiveManagement|Replication|TextSearch;
@@ -82,6 +93,28 @@ uint FileMessageArchive::capabilities(const Jid &AStreamJid) const
 bool FileMessageArchive::isCapable(const Jid &AStreamJid, uint ACapability) const
 {
 	return (capabilities(AStreamJid) & ACapability) > 0;
+}
+
+int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJid) const
+{
+	Q_UNUSED(AStreamJid);
+	switch (ACapability)
+	{
+	case DirectArchiving:
+		return ACO_DIRECT_FILEARCHIVE;
+	case ManualArchiving:
+		return ACO_MANUAL_FILEARCHIVE;
+	case AutomaticArchiving:
+		return ACO_AUTOMATIC_FILEARCHIVE;
+	case ArchiveManagement:
+		return ACO_MANAGE_FILEARCHIVE;
+	case Replication:
+		return ACO_REPLICATION_FILEARCHIVE;
+	case TextSearch:
+		return ACO_SEARCH_FILEARCHIVE;
+	default:
+		return 0;
+	}
 }
 
 bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
@@ -130,7 +163,7 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 		}
 		if (writer)
 		{
-			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid);
+			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
 			return writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
 	}
@@ -516,7 +549,7 @@ CollectionWriter *FileMessageArchive::getCollectionWriter(const Jid &AStreamJid,
 	if (!writer && AHeader.with.isValid() && AHeader.start.isValid())
 	{
 		QString fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
-		CollectionWriter *writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
+		writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
 		if (writer->isOpened())
 		{
 			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);

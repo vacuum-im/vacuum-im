@@ -110,6 +110,7 @@ public:
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler);
 	//Archive Engines
 	virtual QList<IArchiveEngine *> archiveEngines() const;
+	virtual bool isArchiveEngineEnabled(const QUuid &AId) const;
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const;
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine);
 signals:
@@ -124,7 +125,9 @@ protected:
 	QString loadStoragePrefs(const Jid &AStreamJid);
 	void applyArchivePrefs(const Jid &AStreamJid, const QDomElement &AElem);
 	bool prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
-	bool processMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
+	bool processMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
+	IArchiveEngine *findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const;
+	QMultiMap<int, IArchiveEngine *> engineOrderByCapability(quint32 ACapability, const Jid &AStreamJid) const;
 	void openHistoryOptionsNode(const Jid &AStreamJid);
 	void closeHistoryOptionsNode(const Jid &AStreamJid);
 	Menu *createContextMenu(const Jid &AStreamJid, const QStringList &AContacts, QWidget *AParent) const;

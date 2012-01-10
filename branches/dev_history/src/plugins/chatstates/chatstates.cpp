@@ -199,7 +199,7 @@ bool ChatStates::archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &
 		QDomElement elem = AMessage.stanza().firstElement(QString::null,NS_CHATSTATES);
 		elem.parentNode().removeChild(elem);
 	}
-	return true;
+	return false;
 }
 
 QMultiMap<int, IOptionsWidget *> ChatStates::optionsWidgets(const QString &ANodeId, QWidget *AParent)

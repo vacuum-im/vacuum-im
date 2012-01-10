@@ -139,7 +139,7 @@ QString WorkingThread::executeAction(int AAction)
 	{
 		FAction = AAction;
 		if (FAction == SaveCollection)
-			FItemPrefs = FMessageArchiver->archiveItemPrefs(FStreamJid,FCollection.header.with);
+			FItemPrefs = FMessageArchiver->archiveItemPrefs(FStreamJid,FCollection.header.with,FCollection.header.threadId);
 		start();
 		return workId();
 	}

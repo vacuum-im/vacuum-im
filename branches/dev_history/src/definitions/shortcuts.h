@@ -68,8 +68,6 @@
 #define     SCT_MESSAGEWINDOWS_MUC_EXIT                            "message-windows.muc-window.exit"
 //Bookmarks
 #define     SCT_MESSAGEWINDOWS_MUC_BOOKMARK                        "message-windows.muc-window.bookmark"
-//MessageArchive
-#define   SCTG_MESSAGEWINDOWS_HISTORY                              "message-windows.history-window"
 
 //MessageWidgets
 #define SCTG_TABWINDOW                                             "tab-window"
@@ -97,24 +95,6 @@
 #define   SCT_DISCOWINDOW_ADDCONTACT                               "discovery-window.add-contact"
 #define   SCT_DISCOWINDOW_SHOWVCARD                                "discovery-window.show-vcard"
 #define   SCT_DISCOWINDOW_CLOSEWINDOW                              "discovery-window.close-window"
-
-//MessageArchive
-#define SCTG_HISTORYWINDOW                                         "history-window"
-#define   SCT_HISTORYWINDOW_GROUPNONE                              "history-window.group-none"
-#define   SCT_HISTORYWINDOW_GROUPBYDATE                            "history-window.group-by-date"
-#define   SCT_HISTORYWINDOW_GROUPBYCONTACT                         "history-window.group-by-contact"
-#define   SCT_HISTORYWINDOW_GROUPBYDATECONTACT                     "history-window.group-by-date-contact"
-#define   SCT_HISTORYWINDOW_GROUPBYCONTACTDATE                     "history-window.group-by-contact-date"
-#define   SCT_HISTORYWINDOW_EXPANDALL                              "history-window.expand-all"
-#define   SCT_HISTORYWINDOW_COLLAPSEALL                            "history-window.collapse-all"
-#define   SCT_HISTORYWINDOW_SOURCEAUTO                             "history-window.source-auto"
-#define   SCT_HISTORYWINDOW_SOURCELOCAL                            "history-window.source-local"
-#define   SCT_HISTORYWINDOW_SOURCESERVER                           "history-window.source-server"
-#define   SCT_HISTORYWINDOW_FILTERBYCONTACT                        "history-window.filter-by-contact"
-#define   SCT_HISTORYWINDOW_RENAMECOLLECTION                       "history-window.rename-collection"
-#define   SCT_HISTORYWINDOW_REMOVECOLLECTION                       "history-window.remove-collection"
-#define   SCT_HISTORYWINDOW_RELOADCOLLECTIONS                      "history-window.reload-collections"
-#define   SCT_HISTORYWINDOW_CLOSEWINDOW                            "history-window.close-window"
 
 //RosterView
 #define SCTG_ROSTERVIEW                                            "roster-view"

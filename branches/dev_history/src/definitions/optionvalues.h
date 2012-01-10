@@ -25,7 +25,7 @@
 #define OPV_ACCOUNT_STATUS_ISMAIN                       "accounts.account.status.is-main"
 #define OPV_ACCOUNT_STATUS_LASTONLINE                   "accounts.account.status.last-online"
 // MessageArchiver
-#define OPV_ACCOUNT_ARCHIVEREPLICATION                  "accounts.account.archive-replication"
+#define OPV_ACCOUNT_HISTORYREPLICATION                  "accounts.account.history-replication"
 // BookMarks
 #define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
 
@@ -106,13 +106,19 @@
 #define OPV_MUC_GROUPCHAT_BASHAPPEND                    "muc.groupchat.bash-append"
 #define OPV_MUC_GROUPCHAT_NICKNAMESUFIX                 "muc.groupchat.nickname-sufix"
 
-// MessageArchive
-#define OPV_HISTORY_COLLECTION_SIZE                     "history.collection.size"
-#define OPV_HISTORY_COLLECTION_MAXSIZE                  "history.collection.max-size"
-#define OPV_HISTORY_COLLECTION_TIMEOUT                  "history.collection.timeout"
-#define OPV_HISTORY_COLLECTION_MINTIMEOUT               "history.collection.min-timeout"
-#define OPV_HISTORY_COLLECTION_MAXTIMEOUT               "history.collection.max-timeout"
-#define OPV_HISTORY_COLLECTION_MINMESSAGES              "history.collection.min-messages"
+// MessageArchiver
+#define OPV_HISTORY_ENGINE_ITEM                         "history.engine"
+#define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
+#define OPV_HISTORY_CAPABILITY_ITEM                     "history.capability"
+#define OPV_HISTORY_CAPABILITY_DEFAULT                  "history.capability.default"
+
+// FileMessageArchive
+#define OPV_FILEARCHIVE_COLLECTION_SIZE                 "filearchive.collection.size"
+#define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
+#define OPV_FILEARCHIVE_COLLECTION_TIMEOUT              "filearchive.collection.timeout"
+#define OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT           "filearchive.collection.min-timeout"
+#define OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT           "filearchive.collection.max-timeout"
+#define OPV_FILEARCHIVE_COLLECTION_MINMESSAGES          "filearchive.collection.min-messages"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"

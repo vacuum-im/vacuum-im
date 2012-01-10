@@ -1,9 +1,12 @@
 #ifndef FILEMESSAGEARCHIVE_H
 #define FILEMESSAGEARCHIVE_H
 
+#include <definitions/optionvalues.h>
+#include <definitions/archivecapabilityorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifilemessagearchive.h>
 #include <interfaces/imessagearchiver.h>
+#include <utils/options.h>
 #include "collectionwriter.h"
 
 class FileMessageArchive : 
@@ -22,14 +25,15 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin()  { return true; }
 	//IArchiveEngine
 	virtual QUuid engineId() const;
 	virtual QString engineName() const;
 	virtual QString engineDescription() const;
-	virtual uint capabilities(const Jid &AStreamJid = Jid::null) const;
+	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const;
 	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const;
+	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const;
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);

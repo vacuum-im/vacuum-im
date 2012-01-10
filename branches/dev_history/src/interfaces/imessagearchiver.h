@@ -170,8 +170,9 @@ public:
 	virtual QUuid engineId() const =0;
 	virtual QString engineName() const =0;
 	virtual QString engineDescription() const =0;
-	virtual uint capabilities(const Jid &AStreamJid = Jid::null) const =0;
+	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const =0;
+	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;
 	//DirectArchiving
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
@@ -223,6 +224,7 @@ public:
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
 	//Archive Engines
 	virtual QList<IArchiveEngine *> archiveEngines() const =0;
+	virtual bool isArchiveEngineEnabled(const QUuid &AId) const =0;
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const =0;
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine) =0;
 protected:

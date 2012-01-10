@@ -188,25 +188,6 @@ bool MessageArchiver::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR, tr("Require Off-The-Record session"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR, tr("Terminate Off-The-Record session"), QKeySequence::UnknownKey);
 
-	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_HISTORY, tr("History window"), SGO_MESSAGEWINDOWS_HISTORY);
-
-	Shortcuts::declareGroup(SCTG_HISTORYWINDOW, tr("History window"), SGO_HISTORYWINDOW);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPNONE, tr("Group by nothing"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYDATE, tr("Group by date"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYCONTACT, tr("Group by contact"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYDATECONTACT, tr("Group by date and contact"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_GROUPBYCONTACTDATE, tr("Group by contact and date"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_EXPANDALL, tr("Expand All"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_COLLAPSEALL, tr("Collapse All"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCEAUTO, tr("Auto select archive"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCELOCAL, tr("Select local archive"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_SOURCESERVER, tr("Select server archive"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_FILTERBYCONTACT, tr("Filter by contact"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RENAMECOLLECTION, tr("Change conversation subject"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_REMOVECOLLECTION, tr("Remove conversation"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_RELOADCOLLECTIONS, tr("Reload conversations"), QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_HISTORYWINDOW_CLOSEWINDOW, tr("Close history window"), tr("Esc","Close history window"));
-
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H","Show history"),Shortcuts::WidgetShortcut);
 
 	if (FDiscovery)
@@ -226,13 +207,8 @@ bool MessageArchiver::initObjects()
 
 bool MessageArchiver::initSettings()
 {
-	Options::setDefaultValue(OPV_ACCOUNT_ARCHIVEREPLICATION,false);
-	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MINMESSAGES,5);
-	Options::setDefaultValue(OPV_HISTORY_COLLECTION_SIZE,20*1024);
-	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MAXSIZE,30*1024);
-	Options::setDefaultValue(OPV_HISTORY_COLLECTION_TIMEOUT,20*60*1000);
-	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MINTIMEOUT,5*60*1000);
-	Options::setDefaultValue(OPV_HISTORY_COLLECTION_MAXTIMEOUT,120*60*1000);
+	Options::setDefaultValue(OPV_ACCOUNT_HISTORYREPLICATION,false);
+	Options::setDefaultValue(OPV_HISTORY_ENGINE_ENABLED,true);
 
 	if (FOptionsManager)
 	{
@@ -949,11 +925,32 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
+	if (isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
+	{
+		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
+		if (engine)
+		{
+			Message message = AMessage;
+			bool directionIn = AItemJid==message.from() || AStreamJid==message.to();
+			if (prepareMessage(AStreamJid,message,directionIn))
+				return engine->saveMessage(AStreamJid,message,directionIn);
+		}
+	}
 	return false;
 }
 
 bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
+	if (isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
+	{
+		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
+		if (engine)
+		{
+			Message message;
+			message.setFrom(AItemJid.eFull()).setBody(ANote).setThreadId(AThreadId);
+			return engine->saveNote(AStreamJid,message,true);
+		}
+	}
 	return false;
 }
 
@@ -1138,6 +1135,11 @@ void MessageArchiver::removeArchiveHandler(int AOrder, IArchiveHandler *AHandler
 QList<IArchiveEngine *> MessageArchiver::archiveEngines() const
 {
 	return FArchiveEngines.values();
+}
+
+bool MessageArchiver::isArchiveEngineEnabled(const QUuid &AId) const
+{
+	return Options::node(OPV_HISTORY_ENGINE_ITEM,AId.toString()).value("enabled").toBool();
 }
 
 IArchiveEngine *MessageArchiver::findArchiveEngine(const QUuid &AId) const
@@ -1338,14 +1340,17 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 		if (initPrefs)
 		{
 			restoreStanzaSessionContext(AStreamJid);
+
 			QList< QPair<Message,bool> > messages = FPendingMessages.take(AStreamJid);
 			for (int i = 0; i<messages.count(); i++)
 			{
 				QPair<Message, bool> message = messages.at(i);
 				processMessage(AStreamJid, message.first, message.second);
 			}
+
 			if (prefsDisabled)
 				setArchiveAutoSave(AStreamJid,prefs.autoSave);
+
 			openHistoryOptionsNode(AStreamJid);
 			emit archivePrefsOpened(AStreamJid);
 		}
@@ -1365,29 +1370,23 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 
 bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
-	if (AMessage.type() == Message::Error)
+	if (AMessage.type()==Message::Error)
 		return false;
 	if (AMessage.type()==Message::GroupChat && !ADirectionIn)
 		return false;
 	if (AMessage.type()==Message::GroupChat && AMessage.isDelayed())
 		return false;
 
-	QString contactJid = ADirectionIn ? AMessage.from() : AMessage.to();
-	if (contactJid.isEmpty())
-	{
-		if (ADirectionIn)
-			AMessage.setFrom(AStreamJid.domain());
-		else
-			AMessage.setTo(AStreamJid.domain());
-	}
+	if (ADirectionIn && AMessage.from().isEmpty())
+		AMessage.setFrom(AStreamJid.domain());
+	else if (!ADirectionIn && AMessage.to().isEmpty())
+		AMessage.setTo(AStreamJid.domain());
 
-	QMultiMap<int,IArchiveHandler *>::const_iterator it = FArchiveHandlers.constBegin();
-	while (it != FArchiveHandlers.constEnd())
+	for (QMultiMap<int,IArchiveHandler *>::const_iterator it = FArchiveHandlers.constBegin(); it!=FArchiveHandlers.constEnd(); ++it)
 	{
 		IArchiveHandler *handler = it.value();
-		if (!handler->archiveMessageEdit(it.key(),AStreamJid,AMessage,ADirectionIn))
+		if (handler->archiveMessageEdit(it.key(),AStreamJid,AMessage,ADirectionIn))
 			return false;
-		it++;
 	}
 
 	if (AMessage.body().isEmpty())
@@ -1396,19 +1395,45 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
 	return true;
 }
 
-bool MessageArchiver::processMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
+bool MessageArchiver::processMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	Jid contactJid = ADirectionIn ? AMessage.from() : AMessage.to();
+	Jid itemJid = ADirectionIn ? (!AMessage.from().isEmpty() ? AMessage.from() : AStreamJid.domain()) : AMessage.to();
 	if (!isReady(AStreamJid))
 	{
 		FPendingMessages[AStreamJid].append(qMakePair<Message,bool>(AMessage,ADirectionIn));
+		return true;
 	}
-	else if (isArchivingAllowed(AStreamJid,contactJid,AMessage.threadId()))
+	else if (!isAutoArchiving(AStreamJid))
 	{
-		if (prepareMessage(AStreamJid,AMessage,ADirectionIn))
-			return saveMessage(AStreamJid,contactJid,AMessage);
+		return saveMessage(AStreamJid,itemJid,AMessage);
 	}
 	return false;
+}
+
+IArchiveEngine *MessageArchiver::findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const
+{
+	IArchiveEngine *engine = findArchiveEngine(Options::node(OPV_HISTORY_CAPABILITY_ITEM,QString::number(ACapability)).value("default").toString());
+	if (engine==NULL || !isArchiveEngineEnabled(engine->engineId()) || engine->capabilityOrder(ACapability,AStreamJid)<=0)
+	{
+		QMultiMap<int, IArchiveEngine *> order = engineOrderByCapability(ACapability,AStreamJid);
+		engine = !order.isEmpty() ? order.constBegin().value() : NULL;
+	}
+	return engine;
+}
+
+QMultiMap<int, IArchiveEngine *> MessageArchiver::engineOrderByCapability(quint32 ACapability, const Jid &AStreamJid) const
+{
+	QMultiMap<int, IArchiveEngine *> order;
+	for (QMap<QUuid,IArchiveEngine *>::const_iterator it=FArchiveEngines.constBegin(); it!=FArchiveEngines.constEnd(); ++it)
+	{
+		if (isArchiveEngineEnabled(it.key()))
+		{
+			int engineOrder = (*it)->capabilityOrder(ACapability,AStreamJid);
+			if (engineOrder > 0)
+				order.insertMulti(engineOrder,it.value());
+		}
+	}
+	return order;
 }
 
 void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
