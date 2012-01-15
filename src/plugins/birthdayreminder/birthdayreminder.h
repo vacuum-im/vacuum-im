@@ -8,6 +8,7 @@
 #include <definitions/soundfiles.h>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
+#include <definitions/optionvalues.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/rosterlabelorders.h>
 #include <definitions/rostertooltiporders.h>
@@ -42,7 +43,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IBirthdayReminder
 	virtual QDate contactBithday(const Jid &AContactJid) const;

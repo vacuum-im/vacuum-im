@@ -1,6 +1,6 @@
 #include "birthdayreminder.h"
 
-#define NOTIFY_WITHIN_DAYS 7
+#define NOTIFY_WITHIN_DAYS 4
 #define NOTIFY_TIMEOUT     90000
 
 BirthdayReminder::BirthdayReminder()
@@ -137,6 +137,13 @@ bool BirthdayReminder::initObjects()
 	return true;
 }
 
+bool BirthdayReminder::initSettings()
+{
+	Options::setDefaultValue(OPV_BIRTHDAYREMINDER_STARTTIME,QTime(9,0));
+	Options::setDefaultValue(OPV_BIRTHDAYREMINDER_STOPTIME,QTime(23,59,59));
+	return true;
+}
+
 bool BirthdayReminder::startPlugin()
 {
 	FNotifyTimer.start();
@@ -236,34 +243,39 @@ void BirthdayReminder::onShowNotificationTimer()
 {
 	if (FNotifications && FNotifications->notifications().isEmpty())
 	{
-		INotification notify;
-		notify.kinds = FNotifications->notificationKinds(NNT_BIRTHDAY);
-		if ((notify.kinds & (INotification::PopupWindow|INotification::SoundPlay))>0)
+		QTime start = Options::node(OPV_BIRTHDAYREMINDER_STARTTIME).value().toTime();
+		QTime stop = Options::node(OPV_BIRTHDAYREMINDER_STOPTIME).value().toTime();
+		if (start<=QTime::currentTime() && QTime::currentTime()<=stop)
 		{
-			updateBirthdaysStates();
-			notify.typeId = NNT_BIRTHDAY;
-			QSet<Jid> notifyList = FUpcomingBirthdays.keys().toSet() - FNotifiedContacts.toSet();
-			foreach(Jid contactJid, notifyList)
+			INotification notify;
+			notify.kinds = FNotifications->notificationKinds(NNT_BIRTHDAY);
+			if ((notify.kinds & (INotification::PopupWindow|INotification::SoundPlay))>0)
 			{
-				Jid streamJid = findContactStream(contactJid);
+				updateBirthdaysStates();
+				notify.typeId = NNT_BIRTHDAY;
+				QSet<Jid> notifyList = FUpcomingBirthdays.keys().toSet() - FNotifiedContacts.toSet();
+				foreach(Jid contactJid, notifyList)
+				{
+					Jid streamJid = findContactStream(contactJid);
 
-				notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY));
-				notify.data.insert(NDR_POPUP_CAPTION,tr("Birthday remind"));
-				notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(streamJid,contactJid));
-				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
+					notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY));
+					notify.data.insert(NDR_POPUP_CAPTION,tr("Birthday remind"));
+					notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(streamJid,contactJid));
+					notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
 
-				QDate	birthday = contactBithday(contactJid);
-				int daysLeft = FUpcomingBirthdays.value(contactJid);
-				QString text = daysLeft>0 ? tr("Birthday in %n day(s),<br> %1","",daysLeft).arg(birthday.toString(Qt::SystemLocaleLongDate)) : tr("Birthday today!");
-				notify.data.insert(NDR_POPUP_HTML,text);
+					QDate	birthday = contactBithday(contactJid);
+					int daysLeft = FUpcomingBirthdays.value(contactJid);
+					QString text = daysLeft>0 ? tr("Birthday in %n day(s),<br> %1","",daysLeft).arg(birthday.toString(Qt::SystemLocaleLongDate)) : tr("Birthday today!");
+					notify.data.insert(NDR_POPUP_HTML,text);
 
-				if (daysLeft==NOTIFY_WITHIN_DAYS || daysLeft==NOTIFY_WITHIN_DAYS/2 || daysLeft==0)
-					notify.data.insert(NDR_POPUP_TIMEOUT,0);
-				else
-					notify.data.remove(NDR_POPUP_TIMEOUT);
+					if (daysLeft == 0)
+						notify.data.insert(NDR_POPUP_TIMEOUT,0);
+					else
+						notify.data.remove(NDR_POPUP_TIMEOUT);
 
-				FNotifiedContacts.append(contactJid);
-				FNotifies.insert(FNotifications->appendNotification(notify),contactJid);
+					FNotifiedContacts.append(contactJid);
+					FNotifies.insert(FNotifications->appendNotification(notify),contactJid);
+				}
 			}
 		}
 	}
