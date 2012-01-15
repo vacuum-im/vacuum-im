@@ -1338,12 +1338,12 @@ void MultiUserChatWindow::refreshCompleteNicks()
 {
 	QString curNick = FCompleteIt!=FCompleteNicks.constEnd() ? *FCompleteIt : QString::null;
 
-	QMap<QString,QString> sortedNicks;
+	QMultiMap<QString,QString> sortedNicks;
 	foreach(IMultiUser *user, FUsers.keys())
 	{
 		if (user != FMultiChat->mainUser())
 			if (FCompleteNickStarts.isEmpty() || user->nickName().toLower().startsWith(FCompleteNickStarts))
-				sortedNicks.insert(user->nickName().toLower(), user->nickName());
+				sortedNicks.insertMulti(user->nickName().toLower(), user->nickName());
 	}
 	FCompleteNicks = sortedNicks.values();
 
