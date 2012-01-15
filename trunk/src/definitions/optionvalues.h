@@ -29,6 +29,10 @@
 // BookMarks
 #define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
 
+//BirthdayReminder
+#define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
+#define OPV_BIRTHDAYREMINDER_STOPTIME                   "birthdayreminder.stop-time"
+
 // Console
 #define OPV_CONSOLE_ROOT                                "console"
 #define OPV_CONSOLE_CONTEXT_ITEM                        "console.context"
