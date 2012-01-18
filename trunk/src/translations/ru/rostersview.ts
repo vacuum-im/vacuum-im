@@ -78,5 +78,9 @@
         <source>Copy contact status to clipboard</source>
         <translation>Копировать статус  контакта в буфер обмена</translation>
     </message>
+    <message>
+        <source>Alway&apos;s hide scrollbar</source>
+        <translation>Не показывать полосы прокрутки</translation>
+    </message>
 </context>
 </TS>
