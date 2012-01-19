@@ -79,7 +79,7 @@
         <translation>Kopiuj status kontaktu do schowka</translation>
     </message>
     <message>
-        <source>Alway&apos;s hide scrollbar</source>
+        <source>Do not show the scroll bars</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
