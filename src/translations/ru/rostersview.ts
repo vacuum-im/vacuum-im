@@ -79,7 +79,7 @@
         <translation>Копировать статус  контакта в буфер обмена</translation>
     </message>
     <message>
-        <source>Alway&apos;s hide scrollbar</source>
+        <source>Do not show the scroll bars</source>
         <translation>Не показывать полосы прокрутки</translation>
     </message>
 </context>
