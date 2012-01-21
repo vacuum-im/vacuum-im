@@ -81,7 +81,8 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		if (FPresencePlugin)
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
 		}
 	}
@@ -618,16 +619,16 @@ void ChatStates::onPresenceOpened(IPresence *APresence)
 	FChatParams[APresence->streamJid()].clear();
 }
 
-void ChatStates::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
+void ChatStates::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	if (AStateOnline)
+	if (AItem.show!=IPresence::Offline && AItem.show!=IPresence::Error && (ABefore.show==IPresence::Offline || ABefore.show==IPresence::Error))
 	{
-		setSupported(AStreamJid,AContactJid,true);
+		setSupported(APresence->streamJid(),AItem.itemJid,true);
 	}
-	else
+	else if (ABefore.show!=IPresence::Offline && ABefore.show!=IPresence::Error && (AItem.show==IPresence::Offline || AItem.show==IPresence::Error))
 	{
-		if (userChatState(AStreamJid,AContactJid) != IChatStates::StateUnknown)
-			setUserState(AStreamJid,AContactJid,IChatStates::StateGone);
+		if (userChatState(APresence->streamJid(),AItem.itemJid) != IChatStates::StateUnknown)
+			setUserState(APresence->streamJid(),AItem.itemJid,IChatStates::StateGone);
 	}
 }
 
