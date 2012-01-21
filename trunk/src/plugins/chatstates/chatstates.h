@@ -103,7 +103,7 @@ protected:
 	void registerDiscoFeatures();
 protected slots:
 	void onPresenceOpened(IPresence *APresence);
-	void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
+	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onPresenceClosed(IPresence *APresence);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 	void onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const QString &AStatus);
