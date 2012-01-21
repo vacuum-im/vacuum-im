@@ -7,9 +7,9 @@
 TransferThread::TransferThread(IDataStreamSocket *ASocket, QFile *AFile, int AKind, qint64 ABytes, QObject *AParent) : QThread(AParent)
 {
 	FKind = AKind;
-	FBytesToTransfer = ABytes;
 	FFile = AFile;
 	FSocket = ASocket;
+	FBytesToTransfer = ABytes;
 
 	FAbort = false;
 }

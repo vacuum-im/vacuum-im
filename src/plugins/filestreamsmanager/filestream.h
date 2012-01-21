@@ -18,8 +18,7 @@ class FileStream :
 	Q_OBJECT;
 	Q_INTERFACES(IFileStream);
 public:
-	FileStream(IDataStreamsManager *ADataManager, const QString &AStreamId, const Jid &AStreamJid,
-	           const Jid &AContactJid, int AKind, QObject *AParent);
+	FileStream(IDataStreamsManager *ADataManager, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent);
 	~FileStream();
 	virtual QObject *instance() { return this; }
 	virtual QString streamId() const;

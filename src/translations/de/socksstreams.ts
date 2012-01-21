@@ -4,10 +4,6 @@
 <context>
     <name>SocksOptionsClass</name>
     <message>
-        <source>Incoming Direct Connections</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Disable direct connections</source>
         <translation></translation>
     </message>
@@ -58,6 +54,22 @@
     <message>
         <source>Use proxy on account server</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Outgoing Connections</source>
+        <translation>Исходящие подключения</translation>
+    </message>
+    <message>
+        <source>Connect timeout:</source>
+        <translation>Таймаут подключения:</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>секунд</translation>
+    </message>
+    <message>
+        <source>Incoming Connections</source>
+        <translation>Входящие подключения</translation>
     </message>
 </context>
 <context>

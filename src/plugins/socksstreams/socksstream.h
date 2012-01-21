@@ -1,6 +1,7 @@
 #ifndef SOCKSSTREAM_H
 #define SOCKSSTREAM_H
 
+#include <QTimer>
 #include <QWaitCondition>
 #include <QReadWriteLock>
 #include <definitions/namespaces.h>
@@ -27,8 +28,7 @@ class SocksStream :
 	Q_OBJECT;
 	Q_INTERFACES(ISocksStream IDataStreamSocket IStanzaHandler IStanzaRequestOwner);
 public:
-	SocksStream(ISocksStreams *ASocksStreams, IStanzaProcessor *AStanzaProcessor, const QString &AStreamId,
-	            const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent=NULL);
+	SocksStream(ISocksStreams *ASocksStreams, IStanzaProcessor *AStanzaProcessor, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent=NULL);
 	~SocksStream();
 	virtual QIODevice *instance() { return this; }
 	//IStanzaHandler
@@ -56,8 +56,10 @@ public:
 	virtual int errorCode() const;
 	virtual QString errorString() const;
 	//ISocksStream
-	virtual bool disableDirectConnection() const;
-	virtual void setDisableDirectConnection(bool ADisable);
+	virtual int connectTimeout() const;
+	virtual void setConnectTimeout(int ATimeout);
+	virtual bool isDirectConnectionsDisabled() const;
+	virtual void setDirectConnectionsDisabled(bool ADisabled);
 	virtual QString forwardHost() const;
 	virtual quint16 forwardPort() const;
 	virtual void setForwardAddress(const QString &AHost, quint16 APort);
@@ -92,12 +94,14 @@ protected:
 protected slots:
 	void onHostSocketConnected();
 	void onHostSocketReadyRead();
-	void onHostSocketError(QAbstractSocket::SocketError);
+	void onHostSocketError(QAbstractSocket::SocketError AError);
 	void onHostSocketDisconnected();
 	void onTcpSocketReadyRead();
 	void onTcpSocketBytesWritten(qint64 ABytes);
+	void onTcpSocketError(QAbstractSocket::SocketError AError);
 	void onTcpSocketDisconnected();
 	void onLocalConnectionAccepted(const QString &AKey, QTcpSocket *ATcpSocket);
+	void onCloseTimerTimeout();
 private:
 	ISocksStreams *FSocksStreams;
 	IStanzaProcessor *FStanzaProcessor;
@@ -109,7 +113,8 @@ private:
 	int FStreamState;
 	QString FStreamId;
 private:
-	bool FDisableDirectConnect;
+	int FConnectTimeout;
+	bool FDirectConnectDisabled;
 	QString FForwardHost;
 	quint16 FForwardPort;
 	QList<QString> FProxyList;
@@ -121,6 +126,7 @@ private:
 	QList<QString> FProxyRequests;
 private:
 	int FHostIndex;
+	QTimer FCloseTimer;
 	QString FConnectKey;
 	QTcpSocket *FTcpSocket;
 	QList<HostInfo> FHosts;

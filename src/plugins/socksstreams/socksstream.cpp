@@ -10,6 +10,8 @@
 #define PROXY_REQUEST_TIMEOUT     10000
 #define ACTIVATE_REQUEST_TIMEOUT  10000
 
+#define TCP_CLOSE_TIMEOUT         200
+
 #define BUFFER_INCREMENT_SIZE     5120
 #define MAX_BUFFER_SIZE           51200
 
@@ -61,10 +63,14 @@ SocksStream::SocksStream(ISocksStreams *ASocksStreams, IStanzaProcessor *AStanza
 	FStreamState = IDataStreamSocket::Closed;
 
 	FTcpSocket = NULL;
-	FDisableDirectConnect = false;
+	FConnectTimeout = 10000;
+	FDirectConnectDisabled = false;
 	FErrorCode = IDataStreamSocket::NoError;
 
 	FSHIHosts= -1;
+
+	FCloseTimer.setSingleShot(true);
+	connect(&FCloseTimer,SIGNAL(timeout()),SLOT(onCloseTimerTimeout()));
 
 	connect(FSocksStreams->instance(),SIGNAL(localConnectionAccepted(const QString &, QTcpSocket *)),SLOT(onLocalConnectionAccepted(const QString &, QTcpSocket *)));
 }
@@ -301,16 +307,30 @@ QString SocksStream::errorString() const
 	return QIODevice::errorString();
 }
 
-bool SocksStream::disableDirectConnection() const
+int SocksStream::connectTimeout() const
 {
-	return FDisableDirectConnect;
+	return FConnectTimeout;
 }
 
-void SocksStream::setDisableDirectConnection(bool ADisable)
+void SocksStream::setConnectTimeout(int ATimeout)
 {
-	if (FDisableDirectConnect != ADisable)
+	if (ATimeout>100 && ATimeout!=FConnectTimeout)
 	{
-		FDisableDirectConnect = ADisable;
+		FConnectTimeout = ATimeout;
+		emit propertiesChanged();
+	}
+}
+
+bool SocksStream::isDirectConnectionsDisabled() const
+{
+	return FDirectConnectDisabled;
+}
+
+void SocksStream::setDirectConnectionsDisabled(bool ADisable)
+{
+	if (FDirectConnectDisabled != ADisable)
+	{
+		FDirectConnectDisabled = ADisable;
 		emit propertiesChanged();
 	}
 }
@@ -367,6 +387,8 @@ qint64 SocksStream::readData(char *AData, qint64 AMaxSize)
 {
 	FThreadLock.lockForWrite();
 	qint64 bytes = FTcpSocket!=NULL || FReadBuffer.size()>0 ? FReadBuffer.read(AData,AMaxSize) : -1;
+	if (FTcpSocket==NULL && FReadBuffer.size()==0)
+		FCloseTimer.start(0);
 	FThreadLock.unlock();
 
 	if (bytes > 0)
@@ -465,6 +487,7 @@ void SocksStream::setTcpSocket(QTcpSocket *ASocket)
 	{
 		connect(ASocket,SIGNAL(readyRead()), SLOT(onTcpSocketReadyRead()));
 		connect(ASocket,SIGNAL(bytesWritten(qint64)),SLOT(onTcpSocketBytesWritten(qint64)));
+		connect(ASocket,SIGNAL(error(QAbstractSocket::SocketError)),SLOT(onTcpSocketError(QAbstractSocket::SocketError)));
 		connect(ASocket,SIGNAL(disconnected()),SLOT(onTcpSocketDisconnected()));
 		QWriteLocker locker(&FThreadLock);
 		FTcpSocket = ASocket;
@@ -577,7 +600,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 				HostInfo info = FHosts.value(FHostIndex);
 				if (info.jid == FStreamJid)
 				{
-					if (FTcpSocket!=NULL)
+					if (FTcpSocket != NULL)
 					{
 						setStreamState(IDataStreamSocket::Opened);
 						return true;
@@ -657,7 +680,7 @@ bool SocksStream::sendAvailHosts()
 	queryElem.setAttribute("mode","tcp");
 	queryElem.setAttribute("dstaddr",FConnectKey);
 
-	if (!disableDirectConnection() && FSocksStreams->appendLocalConnection(FConnectKey))
+	if (!isDirectConnectionsDisabled() && FSocksStreams->appendLocalConnection(FConnectKey))
 	{
 		if (!FForwardHost.isEmpty() && FForwardPort>0)
 		{
@@ -711,6 +734,7 @@ bool SocksStream::connectToHost()
 			connect(FTcpSocket,SIGNAL(disconnected()),SLOT(onHostSocketDisconnected()));
 			FTcpSocket->setProxy(FNetworkProxy);
 		}
+		FCloseTimer.start(connectTimeout());
 		FTcpSocket->connectToHost(info.name, info.port);
 		return true;
 	}
@@ -769,6 +793,8 @@ bool SocksStream::activateStream()
 
 void SocksStream::onHostSocketConnected()
 {
+	FCloseTimer.stop();
+
 	QByteArray outData;
 	outData += (char)5;   // Socks version
 	outData += (char)1;   // Number of possible authentication methods
@@ -802,14 +828,17 @@ void SocksStream::onHostSocketReadyRead()
 		FTcpSocket->disconnectFromHost();
 }
 
-void SocksStream::onHostSocketError(QAbstractSocket::SocketError)
+void SocksStream::onHostSocketError(QAbstractSocket::SocketError AError)
 {
+	Q_UNUSED(AError);
 	if (FTcpSocket->state() != QAbstractSocket::ConnectedState)
 		onHostSocketDisconnected();
 }
 
 void SocksStream::onHostSocketDisconnected()
 {
+	FCloseTimer.stop();
+
 	FHostIndex++;
 	if (streamKind() == IDataStreamSocket::Initiator)
 		abort(tr("Failed to connect to host"));
@@ -828,14 +857,18 @@ void SocksStream::onTcpSocketBytesWritten(qint64 ABytes)
 	writeBufferedData(false);
 }
 
+void SocksStream::onTcpSocketError(QAbstractSocket::SocketError AError)
+{
+	if (AError != QAbstractSocket::RemoteHostClosedError)
+		setStreamError(FTcpSocket->errorString(),UnknownError);
+}
+
 void SocksStream::onTcpSocketDisconnected()
 {
 	readBufferedData(true);
 
-	if (streamState() == IDataStreamSocket::Closing)
-		setStreamState(IDataStreamSocket::Closed);
-
 	QWriteLocker locker(&FThreadLock);
+	FCloseTimer.start(FReadBuffer.size()>0 ? TCP_CLOSE_TIMEOUT : 0);
 	FTcpSocket->deleteLater();
 	FTcpSocket = NULL;
 }
@@ -844,4 +877,17 @@ void SocksStream::onLocalConnectionAccepted(const QString &AKey, QTcpSocket *ATc
 {
 	if (FConnectKey == AKey)
 		setTcpSocket(ATcpSocket);
+}
+
+void SocksStream::onCloseTimerTimeout()
+{
+	if (FTcpSocket)
+	{
+		FTcpSocket->abort();
+		onHostSocketDisconnected();
+	}
+	else
+	{
+		setStreamState(IDataStreamSocket::Closed);
+	}
 }
