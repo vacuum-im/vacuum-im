@@ -13,8 +13,10 @@ class ISocksStream :
 {
 public:
 	virtual QIODevice *instance() =0;
-	virtual bool disableDirectConnection() const =0;
-	virtual void setDisableDirectConnection(bool ADisable) =0;
+	virtual int connectTimeout() const =0;
+	virtual void setConnectTimeout(int ATimeout) =0;
+	virtual bool isDirectConnectionsDisabled() const =0;
+	virtual void setDirectConnectionsDisabled(bool ADisable) =0;
 	virtual QString forwardHost() const =0;
 	virtual quint16 forwardPort() const =0;
 	virtual void setForwardAddress(const QString &AHost, quint16 APort) =0;
@@ -41,7 +43,7 @@ protected:
 	virtual void localConnectionAccepted(const QString &AKey, QTcpSocket *ATcpSocket) =0;
 };
 
-Q_DECLARE_INTERFACE(ISocksStream,"Vacuum.Plugin.ISocksStream/1.0")
+Q_DECLARE_INTERFACE(ISocksStream,"Vacuum.Plugin.ISocksStream/1.1")
 Q_DECLARE_INTERFACE(ISocksStreams,"Vacuum.Plugin.ISocksStreams/1.0")
 
 #endif // ISOCKSSTREAMS_H

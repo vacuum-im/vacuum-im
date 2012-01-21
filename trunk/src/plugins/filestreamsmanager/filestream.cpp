@@ -6,8 +6,7 @@
 
 #define CONNECTION_TIMEOUT 60000
 
-FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStreamId, const Jid &AStreamJid,
-                       const Jid &AContactJid, int AKind, QObject *AParent) : QObject(AParent)
+FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, int AKind, QObject *AParent) : QObject(AParent)
 {
 	FStreamId = AStreamId;
 	FStreamJid = AStreamJid;

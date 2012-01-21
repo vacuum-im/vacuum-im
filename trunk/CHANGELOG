@@ -27,6 +27,8 @@ LEGEND
   [-] Did not correctly handle changes in the participant's nickname when new nickname is already used by the same participant but from a different resource
   [-] Incorrectly requested history of communication when connected to a server Openfire with plugin Open Archive
   [-] The first message in the chat may not be saved in the local message archive
+  [-] Establishing a connection when transferring files could take up too much time
+  [-] File transfer could hang up from the cancellation of the transfer by the initiator
 
 v1.1.0
 ------

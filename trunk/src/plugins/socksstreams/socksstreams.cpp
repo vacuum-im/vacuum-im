@@ -94,6 +94,7 @@ bool SocksStreams::initSettings()
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEACCOUNTSTREAMPROXY,true);
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_USEACCOUNTNETPROXY,true);
 	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_NETWORKPROXY,QString(APPLICATION_PROXY_REF_UUID));
+	Options::setDefaultValue(OPV_DATASTREAMS_METHOD_CONNECTTIMEOUT,10000);
 	return true;
 }
 
@@ -164,7 +165,8 @@ void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsN
 		}
 		stream->setProxyList(proxyItems);
 
-		stream->setDisableDirectConnection(ANode.value("disable-direct-connections").toBool());
+		stream->setConnectTimeout(ANode.value("connect-timeout").toInt());
+		stream->setDirectConnectionsDisabled(ANode.value("disable-direct-connections").toBool());
 		stream->setForwardAddress(ANode.value("forward-host").toString(), ANode.value("forward-port").toInt());
 		if (ANode.value("use-account-network-proxy").toBool())
 			stream->setNetworkProxy(accountNetworkProxy(stream->streamJid()));

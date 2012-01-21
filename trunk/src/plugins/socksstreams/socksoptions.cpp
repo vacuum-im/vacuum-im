@@ -21,8 +21,7 @@ SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStr
 	reset();
 }
 
-SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager,
-                           const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
+SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	FSocksStreams = ASocksStreams;
@@ -55,6 +54,7 @@ void SocksOptions::apply(OptionsNode ANode)
 
 	Options::node(OPV_DATASTREAMS_SOCKSLISTENPORT).setValue(ui.spbPort->value());
 
+	node.setValue(ui.spbConnectTimeout->value()*1000,"connect-timeout");
 	node.setValue(ui.chbDisableDirectConnect->isChecked(),"disable-direct-connections");
 	node.setValue(ui.lneForwardHost->text(),"forward-host");
 	node.setValue(ui.spbForwardPort->value(),"forward-port");
@@ -79,7 +79,8 @@ void SocksOptions::apply(OptionsNode ANode)
 
 void SocksOptions::apply(ISocksStream *ASocksStream)
 {
-	ASocksStream->setDisableDirectConnection(ui.chbDisableDirectConnect->isChecked());
+	ASocksStream->setConnectTimeout(ui.spbConnectTimeout->value()*1000);
+	ASocksStream->setDirectConnectionsDisabled(ui.chbDisableDirectConnect->isChecked());
 	ASocksStream->setForwardAddress(ui.lneForwardHost->text(), ui.spbForwardPort->value());
 
 	QList<QString> proxyItems;
@@ -102,7 +103,8 @@ void SocksOptions::reset()
 {
 	if (FSocksStream)
 	{
-		ui.chbDisableDirectConnect->setChecked(FSocksStream->disableDirectConnection());
+		ui.spbConnectTimeout->setValue(FSocksStream->connectTimeout()/1000);
+		ui.chbDisableDirectConnect->setChecked(FSocksStream->isDirectConnectionsDisabled());
 		ui.lneForwardHost->setText(FSocksStream->forwardHost());
 		ui.spbForwardPort->setValue(FSocksStream->forwardPort());
 		ui.ltwStreamProxy->addItems(FSocksStream->proxyList());
@@ -110,6 +112,7 @@ void SocksOptions::reset()
 	else
 	{
 		ui.spbPort->setValue(Options::node(OPV_DATASTREAMS_SOCKSLISTENPORT).value().toInt());
+		ui.spbConnectTimeout->setValue(FOptions.value("connect-timeout").toInt()/1000);
 		ui.chbDisableDirectConnect->setChecked(FOptions.value("disable-direct-connections").toBool());
 		ui.lneForwardHost->setText(FOptions.value("forward-host").toString());
 		ui.spbForwardPort->setValue(FOptions.value("forward-port").toInt());
@@ -127,6 +130,7 @@ void SocksOptions::initialize(bool AReadOnly)
 {
 	ui.grbSocksStreams->setTitle(FSocksStreams->methodName());
 
+	ui.spbConnectTimeout->setReadOnly(AReadOnly);
 	ui.spbPort->setReadOnly(AReadOnly);
 	ui.lneForwardHost->setReadOnly(AReadOnly);
 	ui.spbForwardPort->setReadOnly(AReadOnly);
@@ -142,6 +146,7 @@ void SocksOptions::initialize(bool AReadOnly)
 	connect(ui.pbtDeleteStreamProxy,SIGNAL(clicked(bool)),SLOT(onDeleteStreamProxyClicked(bool)));
 
 	connect(ui.spbPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));
+	connect(ui.spbConnectTimeout,SIGNAL(valueChanged(int)),SIGNAL(modified()));
 	connect(ui.chbDisableDirectConnect,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(ui.lneForwardHost,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.spbForwardPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));

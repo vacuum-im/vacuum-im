@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>330</width>
-    <height>429</height>
+    <width>333</width>
+    <height>466</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -16,11 +16,83 @@
    </property>
    <item>
     <widget class="QGroupBox" name="grbSocksStreams">
-     <layout class="QVBoxLayout" name="verticalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout_8">
       <item>
-       <widget class="QGroupBox" name="grbDirectConnection">
+       <widget class="QGroupBox" name="grbOutgoingConnections">
         <property name="title">
-         <string>Incoming Direct Connections</string>
+         <string>Outgoing Connections</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLabel" name="lblConnectTimeout">
+             <property name="text">
+              <string>Connect timeout:</string>
+             </property>
+             <property name="buddy">
+              <cstring>spbConnectTimeout</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spbConnectTimeout">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>60</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblSeconds">
+             <property name="text">
+              <string>seconds</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="grbConnectionProxy">
+           <property name="title">
+            <string>Connection Proxy</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QCheckBox" name="chbUseAccountNetworkProxy">
+              <property name="text">
+               <string>Use account connection proxy settings</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="wdtProxySettings" native="true"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="grbIncomingConnections">
+        <property name="title">
+         <string>Incoming Connections</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_6">
          <item>
@@ -193,25 +265,6 @@
         </layout>
        </widget>
       </item>
-      <item>
-       <widget class="QGroupBox" name="grbConnectionProxy">
-        <property name="title">
-         <string>Connection Proxy</string>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
-         <item>
-          <widget class="QCheckBox" name="chbUseAccountNetworkProxy">
-           <property name="text">
-            <string>Use account connection proxy settings</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="wdtProxySettings" native="true"/>
-         </item>
-        </layout>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
@@ -219,6 +272,9 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
+  <tabstop>spbConnectTimeout</tabstop>
+  <tabstop>chbUseAccountNetworkProxy</tabstop>
+  <tabstop>chbDisableDirectConnect</tabstop>
   <tabstop>spbPort</tabstop>
   <tabstop>lneForwardHost</tabstop>
   <tabstop>spbForwardPort</tabstop>
@@ -229,7 +285,6 @@
   <tabstop>pbtStreamProxyUp</tabstop>
   <tabstop>pbtStreamProxyDown</tabstop>
   <tabstop>pbtDeleteStreamProxy</tabstop>
-  <tabstop>chbUseAccountNetworkProxy</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -240,12 +295,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>304</x>
-     <y>55</y>
+     <x>312</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
-     <x>150</x>
-     <y>56</y>
+     <x>146</x>
+     <y>209</y>
     </hint>
    </hints>
   </connection>
@@ -256,12 +311,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>304</x>
-     <y>55</y>
+     <x>312</x>
+     <y>182</y>
     </hint>
     <hint type="destinationlabel">
-     <x>254</x>
-     <y>88</y>
+     <x>274</x>
+     <y>269</y>
     </hint>
    </hints>
   </connection>
@@ -272,12 +327,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>279</x>
-     <y>354</y>
+     <x>302</x>
+     <y>100</y>
     </hint>
     <hint type="destinationlabel">
-     <x>277</x>
-     <y>378</y>
+     <x>302</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
