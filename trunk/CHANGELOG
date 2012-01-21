@@ -29,6 +29,8 @@ LEGEND
   [-] The first message in the chat may not be saved in the local message archive
   [-] Establishing a connection when transferring files could take up too much time
   [-] File transfer could hang up from the cancellation of the transfer by the initiator
+  [-] Exchanging of chat state information with contact was disabled after receiving offline stored message from it
+
 
 v1.1.0
 ------
