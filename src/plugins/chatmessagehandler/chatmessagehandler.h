@@ -90,7 +90,8 @@ public:
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
 	IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
-	IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
+	IChatWindow *findSubstituteWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
 	void updateWindow(IChatWindow *AWindow);
 	void removeNotifiedMessages(IChatWindow *AWindow);
 	void showHistory(IChatWindow *AWindow);

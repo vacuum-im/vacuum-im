@@ -324,55 +324,118 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 	IChatWindow *window = NULL;
 	if (AStreamJid.isValid() && AContactJid.isValid())
 	{
-		window = FMessageWidgets->newChatWindow(AStreamJid,AContactJid);
-		if (window)
+		window = findSubstituteWindow(AStreamJid,AContactJid);
+		if (!window)
 		{
-			window->infoWidget()->autoUpdateFields();
-			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
-
-			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
-			connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(int, const QVariant &)),
-            SLOT(onInfoFieldChanged(int, const QVariant &)), Qt::QueuedConnection);
-			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
-			connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onWindowClosed()));
-			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
-
-			FWindows.append(window);
-			FWindowStatus[window].createTime = QDateTime::currentDateTime();
-			updateWindow(window);
-			setMessageStyle(window);
-
-			Action *clearAction = new Action(window->instance());
-			clearAction->setText(tr("Clear Chat Window"));
-			clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_CLEAR_CHAT);
-			clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
-			connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearWindowAction(bool)));
-			window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_MWTBW_CLEAR_WINDOW);
-
-			if (FRostersView && FRostersModel)
+			window = FMessageWidgets->newChatWindow(AStreamJid,AContactJid);
+			if (window)
 			{
-				UserContextMenu *menu = new UserContextMenu(FRostersModel,FRostersView,window);
-				menu->menuAction()->setIcon(RSR_STORAGE_MENUICONS, MNI_CHAT_MHANDLER_USER_MENU);
-				QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(menu->menuAction(),TBG_CWTBW_USER_TOOLS);
-				button->setPopupMode(QToolButton::InstantPopup);
-			}
+				window->infoWidget()->autoUpdateFields();
+				window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
-			if (Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool())
-				showHistory(window);
+				connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+				connect(window->infoWidget()->instance(),SIGNAL(fieldChanged(int, const QVariant &)),SLOT(onInfoFieldChanged(int, const QVariant &)), Qt::QueuedConnection);
+				connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
+				connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onWindowClosed()));
+				connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
+
+				FWindows.append(window);
+				FWindowStatus[window].createTime = QDateTime::currentDateTime();
+				updateWindow(window);
+				setMessageStyle(window);
+
+				Action *clearAction = new Action(window->instance());
+				clearAction->setText(tr("Clear Chat Window"));
+				clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_CLEAR_CHAT);
+				clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
+				connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearWindowAction(bool)));
+				window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_MWTBW_CLEAR_WINDOW);
+
+				if (FRostersView && FRostersModel)
+				{
+					UserContextMenu *menu = new UserContextMenu(FRostersModel,FRostersView,window);
+					menu->menuAction()->setIcon(RSR_STORAGE_MENUICONS, MNI_CHAT_MHANDLER_USER_MENU);
+					QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(menu->menuAction(),TBG_CWTBW_USER_TOOLS);
+					button->setPopupMode(QToolButton::InstantPopup);
+				}
+
+				if (Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool())
+					showHistory(window);
+			}
+			else
+			{
+				window = findWindow(AStreamJid,AContactJid);
+			}
 		}
-		else
+		else if(!AContactJid.resource().isEmpty() && window->contactJid()!=AContactJid)
 		{
-			window = findWindow(AStreamJid,AContactJid);
+			window->setContactJid(AContactJid);
 		}
 	}
 	return window;
 }
 
-IChatWindow *ChatMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IChatWindow *ChatMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	foreach(IChatWindow *window,FWindows)
-		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
+	foreach(IChatWindow *window, FWindows)
+		if (window->streamJid()==AStreamJid && window->contactJid()==AContactJid)
 			return window;
+	return NULL;
+}
+
+IChatWindow *ChatMessageHandler::findSubstituteWindow(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+	IChatWindow *fullWindow = NULL;
+	IChatWindow *bareWindow = NULL;
+	IChatWindow *offlineWindow = NULL;
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+
+	int maxResDiff = -1;
+	foreach(IChatWindow *window, FWindows)
+	{
+		if (window->streamJid() == AStreamJid)
+		{
+			if (window->contactJid() == AContactJid)
+			{
+				fullWindow = window;
+				break;
+			}
+			else if(presence && !bareWindow && (window->contactJid() && AContactJid))
+			{
+				IPresenceItem pitem = presence->presenceItem(window->contactJid());
+				if (pitem.show==IPresence::Offline || pitem.show==IPresence::Error)
+				{
+					if (window->contactJid() == AContactJid.bare())
+					{
+						bareWindow = window;
+					}
+					else
+					{
+						int resDiff = 0;
+						QString contactRes = AContactJid.resource();
+						QString offlineRes = window->contactJid().resource();
+						while(offlineRes.size()>resDiff && contactRes.size()>resDiff && offlineRes.at(resDiff)==contactRes.at(resDiff))
+						{
+							resDiff++;
+						}
+						if (maxResDiff < resDiff)
+						{
+							maxResDiff = resDiff;
+							offlineWindow = window;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (fullWindow)
+		return fullWindow;
+	else if(bareWindow)
+		return bareWindow;
+	else if(offlineWindow)
+		return offlineWindow;
+
 	return NULL;
 }
 
@@ -692,35 +755,11 @@ void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &A
 
 void ChatMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	Q_UNUSED(ABefore);
-	if (!AItem.itemJid.resource().isEmpty() && AItem.show!=IPresence::Offline && AItem.show!=IPresence::Error)
+	if (!AItem.itemJid.resource().isEmpty() && AItem.show!=IPresence::Offline && AItem.show!=IPresence::Error && (ABefore.show==IPresence::Offline || ABefore.show==IPresence::Error))
 	{
-		IChatWindow *fullWindow = findWindow(APresence->streamJid(),AItem.itemJid);
-		
-		IChatWindow *bareWindow = findWindow(APresence->streamJid(),AItem.itemJid.bare());
-		if (bareWindow)
-		{
-			if (!fullWindow)
-				bareWindow->setContactJid(AItem.itemJid);
-			else if (!FNotifiedMessages.contains(bareWindow))
-				bareWindow->instance()->deleteLater();
-		}
-
-		if (!fullWindow && !bareWindow)
-		{
-			foreach(IChatWindow *offlineWindow, FWindows)
-			{
-				if (offlineWindow->streamJid()==APresence->streamJid() && (offlineWindow->contactJid() && AItem.itemJid))
-				{
-					int show = APresence->presenceItem(offlineWindow->contactJid()).show;
-					if (show==IPresence::Offline || show==IPresence::Error)
-					{
-						offlineWindow->setContactJid(AItem.itemJid);
-						break;
-					}
-				}
-			}
-		}
+		IChatWindow *window = findSubstituteWindow(APresence->streamJid(),AItem.itemJid);
+		if (window && window->contactJid()!=AItem.itemJid)
+			window->setContactJid(AItem.itemJid);
 	}
 }
 
