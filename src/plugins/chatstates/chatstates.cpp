@@ -81,8 +81,7 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		if (FPresencePlugin)
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
-				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
+			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
 		}
 	}
@@ -353,36 +352,40 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 	}
 	else if (FSHIMessagesIn.value(AStreamJid)==AHandlerId && FChatParams.contains(AStreamJid) && AStanza.type()!="error")
 	{
-		Jid contactJid = AStanza.from();
-		bool hasBody = !AStanza.firstElement("body").isNull();
-		QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
-		if (!elem.isNull())
+		Message message(AStanza);
+		bool hasBody = !message.body().isEmpty();
+		if (!message.isDelayed())
 		{
-			if (hasBody || FChatParams.value(AStreamJid).value(contactJid).canSendStates)
+			Jid contactJid = AStanza.from();
+			QDomElement elem = AStanza.firstElement(QString::null,NS_CHATSTATES);
+			if (!elem.isNull())
 			{
-				AAccept = true;
-				setSupported(AStreamJid,contactJid,true);
-				FChatParams[AStreamJid][contactJid].canSendStates = true;
+				if (hasBody || FChatParams.value(AStreamJid).value(contactJid).canSendStates)
+				{
+					AAccept = true;
+					setSupported(AStreamJid,contactJid,true);
+					FChatParams[AStreamJid][contactJid].canSendStates = true;
 
-				int state = IChatStates::StateUnknown;
-				if (elem.tagName() == STATE_ACTIVE)
-					state = IChatStates::StateActive;
-				else if (elem.tagName() == STATE_COMPOSING)
-					state = IChatStates::StateComposing;
-				else if (elem.tagName() == STATE_PAUSED)
-					state = IChatStates::StatePaused;
-				else if (elem.tagName() == STATE_INACTIVE)
-					state = IChatStates::StateInactive;
-				else if (elem.tagName() == STATE_GONE)
-					state = IChatStates::StateGone;
-				setUserState(AStreamJid,contactJid,state);
+					int state = IChatStates::StateUnknown;
+					if (elem.tagName() == STATE_ACTIVE)
+						state = IChatStates::StateActive;
+					else if (elem.tagName() == STATE_COMPOSING)
+						state = IChatStates::StateComposing;
+					else if (elem.tagName() == STATE_PAUSED)
+						state = IChatStates::StatePaused;
+					else if (elem.tagName() == STATE_INACTIVE)
+						state = IChatStates::StateInactive;
+					else if (elem.tagName() == STATE_GONE)
+						state = IChatStates::StateGone;
+					setUserState(AStreamJid,contactJid,state);
+				}
 			}
-		}
-		else if (hasBody)
-		{
-			if (userChatState(AStreamJid,contactJid) != IChatStates::StateUnknown)
-				setUserState(AStreamJid,contactJid,IChatStates::StateUnknown);
-			setSupported(AStreamJid,contactJid,false);
+			else if (hasBody)
+			{
+				if (userChatState(AStreamJid,contactJid) != IChatStates::StateUnknown)
+					setUserState(AStreamJid,contactJid,IChatStates::StateUnknown);
+				setSupported(AStreamJid,contactJid,false);
+			}
 		}
 		return !hasBody;
 	}
@@ -439,7 +442,10 @@ bool ChatStates::isSupported(const Jid &AStreamJid, const Jid &AContactJid) cons
 	{
 		bool supported = !FNotSupported.value(AStreamJid).contains(AContactJid);
 		if (FDiscovery && supported && userChatState(AStreamJid,AContactJid)==IChatStates::StateUnknown)
-			supported = !FDiscovery->hasDiscoInfo(AStreamJid, AContactJid) || FDiscovery->discoInfo(AStreamJid,AContactJid).features.contains(NS_CHATSTATES);
+		{
+			IDiscoInfo dinfo = FDiscovery->discoInfo(AStreamJid,AContactJid);
+			supported = dinfo.streamJid!=AStreamJid || dinfo.error.code>0 || dinfo.features.contains(NS_CHATSTATES);
+		}
 		return supported;
 	}
 	return true;
@@ -612,13 +618,16 @@ void ChatStates::onPresenceOpened(IPresence *APresence)
 	FChatParams[APresence->streamJid()].clear();
 }
 
-void ChatStates::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
+void ChatStates::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline)
 {
-	Q_UNUSED(ABefore);
-	if (AItem.show==IPresence::Offline || AItem.show==IPresence::Error)
+	if (AStateOnline)
 	{
-		if (userChatState(APresence->streamJid(),AItem.itemJid) != IChatStates::StateUnknown)
-			setUserState(APresence->streamJid(),AItem.itemJid,IChatStates::StateGone);
+		setSupported(AStreamJid,AContactJid,true);
+	}
+	else
+	{
+		if (userChatState(AStreamJid,AContactJid) != IChatStates::StateUnknown)
+			setUserState(AStreamJid,AContactJid,IChatStates::StateGone);
 	}
 }
 
