@@ -469,6 +469,7 @@ void RostersViewPlugin::onOptionsOpened()
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWRESOURCE));
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
 	onOptionsChanged(Options::node(OPV_ROSTER_SORTBYSTATUS));
+	onOptionsChanged(Options::node(OPV_ROSTER_HIDE_SCROLLBAR));
 }
 
 void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
