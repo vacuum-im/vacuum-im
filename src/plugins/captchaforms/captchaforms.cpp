@@ -269,7 +269,7 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 	if (FDataForms && FNotifications)
 	{
 		INotification notify;
-		notify.kinds = FNotifications->notificationKinds(NNT_CAPTCHA_REQUEST);
+		notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_CAPTCHA_REQUEST);
 		if (notify.kinds > 0)
 		{
 			Jid contactJid = FDataForms->fieldValue("from", AChallenge.dialog->formWidget()->dataForm().fields).toString();

@@ -423,7 +423,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 			QString file = !AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null;
 
 			INotification notify;
-			notify.kinds = FNotifications->notificationKinds(NNT_FILETRANSFER);
+			notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_FILETRANSFER);
 			notify.typeId = NNT_FILETRANSFER;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(AStream->streamKind()==IFileStream::SendFile ? MNI_FILETRANSFER_SEND : MNI_FILETRANSFER_RECEIVE));
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AStream->streamJid(),AStream->contactJid()));

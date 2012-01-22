@@ -7,7 +7,6 @@
 #include <definitions/optionvalues.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "ui_notifyoptionswidget.h"
 
 class SortFilterProxyModel : 

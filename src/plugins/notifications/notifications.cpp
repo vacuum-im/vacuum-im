@@ -3,6 +3,8 @@
 #include <QProcess>
 #include <QVBoxLayout>
 
+#define FIRST_KIND         0x0001
+#define LAST_KIND          0x8000
 #define UNDEFINED_KINDS    0xFFFF
 #define ADR_NOTIFYID       Action::DR_Parametr1
 
@@ -211,8 +213,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
 	QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
 
-	if (FRostersModel && FRostersViewPlugin && (record.notification.kinds & INotification::RosterNotify)>0 &&
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::RosterNotify)).value().toBool())
+	if (FRostersModel && FRostersViewPlugin && (record.notification.kinds & INotification::RosterNotify)>0)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
@@ -236,8 +237,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if ((record.notification.kinds & INotification::PopupWindow)>0 && 
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::PopupWindow)).value().toBool())
+	if ((record.notification.kinds & INotification::PopupWindow)>0)
 	{
 		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
@@ -251,8 +251,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 
 	if (FTrayManager)
 	{
-		if ((record.notification.kinds & INotification::TrayNotify)>0 &&
-			Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::TrayNotify)).value().toBool())
+		if ((record.notification.kinds & INotification::TrayNotify)>0)
 		{
 			if (!showNotifyByHandler(INotification::TrayNotify,notifyId,record.notification))
 			{
@@ -267,8 +266,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 			FActivateLast->setVisible(true);
 		}
 
-		if (!toolTip.isEmpty() && (record.notification.kinds & INotification::TrayAction)>0 &&
-			Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::TrayAction)).value().toBool())
+		if (!toolTip.isEmpty() && (record.notification.kinds & INotification::TrayAction)>0)
 		{
 			if (!showNotifyByHandler(INotification::TrayAction,notifyId,record.notification))
 			{
@@ -282,8 +280,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) && (record.notification.kinds & INotification::SoundPlay)>0 &&
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::SoundPlay)).value().toBool())
+	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) && (record.notification.kinds & INotification::SoundPlay)>0)
 	{
 		if (!showNotifyByHandler(INotification::SoundPlay,notifyId,record.notification))
 		{
@@ -307,8 +304,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if ((record.notification.kinds & INotification::ShowMinimized)>0 && 
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::ShowMinimized)).value().toBool())
+	if ((record.notification.kinds & INotification::ShowMinimized)>0)
 	{
 		if (!showNotifyByHandler(INotification::ShowMinimized,notifyId,record.notification))
 		{
@@ -324,8 +320,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if ((record.notification.kinds & INotification::AlertWidget)>0 && 
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AlertWidget)).value().toBool())
+	if ((record.notification.kinds & INotification::AlertWidget)>0)
 	{
 		if (!showNotifyByHandler(INotification::AlertWidget,notifyId,record.notification))
 		{
@@ -335,8 +330,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if ((record.notification.kinds & INotification::TabPageNotify)>0 && 
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::TabPageNotify)).value().toBool())
+	if ((record.notification.kinds & INotification::TabPageNotify)>0)
 	{
 		if (!showNotifyByHandler(INotification::TabPageNotify,notifyId,record.notification))
 		{
@@ -354,8 +348,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 		
-	if ((record.notification.kinds & INotification::AutoActivate)>0 &&
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AutoActivate)).value().toBool())
+	if ((record.notification.kinds & INotification::AutoActivate)>0)
 	{
 		FDelayedActivations.append(notifyId);
 		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
@@ -448,7 +441,29 @@ INotificationType Notifications::notificationType(const QString &ATypeId) const
 	return FTypeRecords.value(ATypeId).type;
 }
 
-ushort Notifications::notificationKinds(const QString &ATypeId) const
+void Notifications::removeNotificationType(const QString &ATypeId)
+{
+	FTypeRecords.remove(ATypeId);
+}
+
+ushort Notifications::enabledNotificationKinds() const
+{
+	ushort kinds = 0;
+	for (ushort kind=FIRST_KIND; kind>0; kind=kind<<1)
+	{
+		if (Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(kind)).value().toBool())
+			kinds |= kind;
+	}
+	return kinds;
+}
+
+void Notifications::setEnabledNotificationKinds(ushort AKinds)
+{
+	for (ushort kind=FIRST_KIND; kind>0; kind=kind<<1)
+		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(kind)).setValue((AKinds & kind)>0 ? true : false);
+}
+
+ushort Notifications::typeNotificationKinds(const QString &ATypeId) const
 {
 	if (FTypeRecords.contains(ATypeId))
 	{
@@ -460,7 +475,12 @@ ushort Notifications::notificationKinds(const QString &ATypeId) const
 	return 0;
 }
 
-void Notifications::setNotificationKinds(const QString &ATypeId, ushort AKinds)
+ushort Notifications::enabledTypeNotificationKinds(const QString &ATypeId) const
+{
+	return typeNotificationKinds(ATypeId) & enabledNotificationKinds();
+}
+
+void Notifications::setTypeNotificationKinds(const QString &ATypeId, ushort AKinds)
 {
 	if (FTypeRecords.contains(ATypeId))
 	{
@@ -468,11 +488,6 @@ void Notifications::setNotificationKinds(const QString &ATypeId, ushort AKinds)
 		typeRecord.kinds = AKinds & typeRecord.type.kindMask;
 		Options::node(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,ATypeId).setValue(typeRecord.kinds ^ typeRecord.type.kindDefs);
 	}
-}
-
-void Notifications::removeNotificationType(const QString &ATypeId)
-{
-	FTypeRecords.remove(ATypeId);
 }
 
 void Notifications::insertNotificationHandler(int AOrder, INotificationHandler *AHandler)

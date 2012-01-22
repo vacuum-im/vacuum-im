@@ -256,14 +256,14 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					page = this;
 					if (isMentionMessage(AMessage))
 					{
-						notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_MENTION);
+						notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_MENTION);
 						notify.typeId = NNT_MUC_MESSAGE_MENTION;
 						notify.data.insert(NDR_TOOLTIP,tr("Mention message in conference: %1").arg(contactJid.node()));
 						notify.data.insert(NDR_POPUP_CAPTION,tr("Mention in conference"));
 					}
 					else
 					{
-						notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_GROUPCHAT);
+						notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_GROUPCHAT);
 						notify.typeId = NNT_MUC_MESSAGE_GROUPCHAT;
 						notify.data.insert(NDR_TOOLTIP,tr("New message in conference: %1").arg(contactJid.node()));
 						notify.data.insert(NDR_POPUP_CAPTION,tr("Conference message"));
@@ -282,7 +282,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 				if (window && !window->isActiveTabPage())
 				{
 					page = window;
-					notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
+					notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_PRIVATE);
 					notify.typeId = NNT_MUC_MESSAGE_PRIVATE;
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 					notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
@@ -324,7 +324,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 			IDataDialogWidget *dialog = FDataFormMessages.value(messageId);
 			if (dialog && !dialog->instance()->isActiveWindow())
 			{
-				notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_PRIVATE);
+				notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_PRIVATE);
 				notify.typeId = NNT_MUC_MESSAGE_PRIVATE;
 				notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_DATA_MESSAGE));
 				notify.data.insert(NDR_TOOLTIP,tr("Data form received from: %1").arg(contactJid.node()));

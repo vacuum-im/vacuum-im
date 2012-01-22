@@ -450,7 +450,7 @@ INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications,
 		Jid roomJid = AMessage.from();
 		if (!multiChatWindow(AMessage.to(),roomJid))
 		{
-			notify.kinds = ANotifications->notificationKinds(NNT_MUC_MESSAGE_INVITE);
+			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_INVITE);
 			if (notify.kinds > 0)
 			{
 				Jid fromJid = inviteElem.attribute("from");

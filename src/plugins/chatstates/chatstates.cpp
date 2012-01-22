@@ -563,7 +563,7 @@ void ChatStates::notifyUserState(const Jid &AStreamJid, const Jid &AContactJid)
 			if (window)
 			{
 				INotification notify;
-				notify.kinds = FNotifications->notificationKinds(NNT_CHATSTATE_TYPING);
+				notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_CHATSTATE_TYPING);
 				if (notify.kinds > 0)
 				{
 					notify.typeId = NNT_CHATSTATE_TYPING;
