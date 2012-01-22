@@ -862,7 +862,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 		if (FNotifications && !dialog->instance()->isActiveWindow())
 		{
 			INotification notify;
-			notify.kinds = FNotifications->notificationKinds(NNT_SESSION_NEGOTIATION);
+			notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_SESSION_NEGOTIATION);
 			if (notify.kinds > 0)
 			{
 				notify.typeId = NNT_SESSION_NEGOTIATION;

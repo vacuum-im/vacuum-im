@@ -248,7 +248,7 @@ void BirthdayReminder::onShowNotificationTimer()
 		if (start<=QTime::currentTime() && QTime::currentTime()<=stop)
 		{
 			INotification notify;
-			notify.kinds = FNotifications->notificationKinds(NNT_BIRTHDAY);
+			notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_BIRTHDAY);
 			if ((notify.kinds & (INotification::PopupWindow|INotification::SoundPlay))>0)
 			{
 				updateBirthdaysStates();

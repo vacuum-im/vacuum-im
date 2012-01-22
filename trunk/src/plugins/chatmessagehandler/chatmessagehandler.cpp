@@ -244,7 +244,7 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 		IChatWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window && !window->isActiveTabPage())
 		{
-			notify.kinds = ANotifications->notificationKinds(NNT_CHAT_MESSAGE);
+			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_CHAT_MESSAGE);
 			if (notify.kinds > 0)
 			{
 				QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHAT_MHANDLER_MESSAGE);

@@ -188,7 +188,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 		IMessageWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window && !window->isActiveTabPage())
 		{
-			notify.kinds = ANotifications->notificationKinds(NNT_NORMAL_MESSAGE);
+			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_NORMAL_MESSAGE);
 			if (notify.kinds > 0)
 			{
 				QIcon icon =  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);

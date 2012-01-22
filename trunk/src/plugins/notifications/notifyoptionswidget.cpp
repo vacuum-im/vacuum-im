@@ -55,12 +55,16 @@ NotifyOptionsWidget::~NotifyOptionsWidget()
 void NotifyOptionsWidget::apply()
 {
 	Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).setValue(ui.spbPopupTimeout->value());
+
+	ushort enabledKinds = 0;
 	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); it++)
-		Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(it.key())).setValue(it.value()->checkState() == Qt::Checked);
+		if (it.value()->checkState() == Qt::Checked)
+			enabledKinds |= it.key();
+	FNotifications->setEnabledNotificationKinds(enabledKinds);
 
 	foreach(QString typeId, FTypeItems.uniqueKeys())
 	{
-		ushort kinds = FNotifications->notificationKinds(typeId);
+		ushort kinds = FNotifications->typeNotificationKinds(typeId);
 		foreach(QStandardItem *typeItem, FTypeItems.values(typeId))
 		{
 			if (typeItem->checkState() == Qt::Checked)
@@ -68,7 +72,7 @@ void NotifyOptionsWidget::apply()
 			else
 				kinds &= ~((ushort)typeItem->data(MDR_KIND).toInt());
 		}
-		FNotifications->setNotificationKinds(typeId,kinds);
+		FNotifications->setTypeNotificationKinds(typeId,kinds);
 	}
 
 	emit childApply();
@@ -78,11 +82,12 @@ void NotifyOptionsWidget::reset()
 {
 	ui.spbPopupTimeout->setValue(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt());
 	
+	ushort enabledKinds = FNotifications->enabledNotificationKinds();
 	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); it++)
-		it.value()->setCheckState(Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(it.key())).value().toBool() ? Qt::Checked : Qt::Unchecked);
+		it.value()->setCheckState((enabledKinds & it.key())>0 ? Qt::Checked : Qt::Unchecked);
 	
 	for (QMultiMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); it++)
-		it.value()->setCheckState((FNotifications->notificationKinds(it.key()) & it.value()->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);
+		it.value()->setCheckState((FNotifications->typeNotificationKinds(it.key()) & it.value()->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);
 
 	void childReset();
 }

@@ -918,7 +918,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 	if (FNotifications)
 	{
 		INotification notify;
-		notify.kinds = FNotifications->notificationKinds(NNT_CONNECTION_ERROR);
+		notify.kinds = FNotifications->enabledTypeNotificationKinds(NNT_CONNECTION_ERROR);
 		if (notify.kinds > 0)
 		{
 			notify.typeId = NNT_CONNECTION_ERROR;
