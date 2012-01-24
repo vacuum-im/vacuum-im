@@ -53,6 +53,10 @@
 #define fopen64 fopen
 #define ftello64 ftell
 #define fseeko64 fseek
+#elif defined(__FreeBSD__)
+#define fopen64 fopen
+#define ftello64 ftello
+#define fseeko64 fseeko
 #else
 #ifdef _MSC_VER
  #define fopen64 fopen
