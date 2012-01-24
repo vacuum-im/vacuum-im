@@ -17,6 +17,9 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 	connect(&FDns, SIGNAL(shutdownFinished()),SLOT(onDnsShutdownFinished()));
 
 	FSocket.setProtocol(QSsl::AnyProtocol);
+#if QT_VERSION >= 0x040600
+	FSocket.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
+#endif
 	connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
 	connect(&FSocket, SIGNAL(encrypted()), SLOT(onSocketEncrypted()));
 	connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
