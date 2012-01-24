@@ -19,5 +19,9 @@
         <source>Supports the exchange of a small amount of binary data in XMPP stanza</source>
         <translation>Поддерживает обмен небольшим количеством бинарных данных в XMPP строфах</translation>
     </message>
+    <message>
+        <source>Failed to read cached data</source>
+        <translation>Не удалось прочитать кэшированные данные</translation>
+    </message>
 </context>
 </TS>

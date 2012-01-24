@@ -19,5 +19,9 @@
         <source>Supports the exchange of a small amount of binary data in XMPP stanza</source>
         <translation>Підтримує обмін невеликими об&apos;ємами бінарних даних</translation>
     </message>
+    <message>
+        <source>Failed to read cached data</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
