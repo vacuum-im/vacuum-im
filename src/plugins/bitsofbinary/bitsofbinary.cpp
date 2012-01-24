@@ -18,6 +18,9 @@ BitsOfBinary::BitsOfBinary()
 	FXmppStreams = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
+
+	FOfflineTimer.setInterval(0);
+	connect(&FOfflineTimer,SIGNAL(timeout()),SLOT(onOfflineTimerTimeout()));
 }
 
 BitsOfBinary::~BitsOfBinary()
@@ -231,13 +234,28 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, const Jid &AStreamJid, 
 {
 	if (FStanzaProcessor)
 	{
-		Stanza request("iq");
-		request.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
-		QDomElement dataElem = request.addElement("data",NS_BITS_OF_BINARY);
-		dataElem.setAttribute("cid",AContentId);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,LOAD_TIMEOUT))
+		if (!hasBinary(AContentId))
 		{
-			FLoadRequests.insert(request.id(),AContentId);
+			if (!FLoadRequests.values().contains(AContentId))
+			{
+				Stanza request("iq");
+				request.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
+				QDomElement dataElem = request.addElement("data",NS_BITS_OF_BINARY);
+				dataElem.setAttribute("cid",AContentId);
+				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,LOAD_TIMEOUT))
+				{
+					FLoadRequests.insert(request.id(),AContentId);
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+		else
+		{
+			FOfflineRequests.append(AContentId);
+			FOfflineTimer.start();
 			return true;
 		}
 	}
@@ -317,6 +335,20 @@ QString BitsOfBinary::contentFileName(const QString &AContentId) const
 void BitsOfBinary::onXmppStreamCreated(IXmppStream *AXmppStream)
 {
 	AXmppStream->insertXmppStanzaHandler(XSHO_BITSOFBINARY,this);
+}
+
+void BitsOfBinary::onOfflineTimerTimeout()
+{
+	QSet<QString> offlineRequests = FOfflineRequests.toSet();
+	FOfflineRequests.clear();
+	foreach(QString contentId, offlineRequests)
+	{
+		QString type; QByteArray data; quint64 maxAge;
+		if (loadBinary(contentId,type,data,maxAge))
+			emit binaryCached(contentId,type,data,maxAge);
+		else
+			emit binaryError(contentId,tr("Failed to read cached data"));
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_bitsofbinary, BitsOfBinary)

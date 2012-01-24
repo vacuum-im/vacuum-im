@@ -3,6 +3,7 @@
 
 #include <QDir>
 #include <QMap>
+#include <QTimer>
 #include <definitions/namespaces.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppstanzahandlerorders.h>
@@ -59,6 +60,7 @@ protected:
 	QString contentFileName(const QString &AContentId) const;
 protected slots:
 	void onXmppStreamCreated(IXmppStream *AXmppStream);
+	void onOfflineTimerTimeout();
 private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;
@@ -68,6 +70,8 @@ private:
 	int FSHIRequest;
 private:
 	QDir FDataDir;
+	QTimer FOfflineTimer;
+	QList<QString> FOfflineRequests;
 	QMap<QString, QString> FLoadRequests;
 };
 
