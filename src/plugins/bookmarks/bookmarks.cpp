@@ -200,7 +200,7 @@ QString BookMarks::setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &A
 				QDomElement markElem = elem.appendChild(doc.createElement("conference")).toElement();
 				markElem.setAttribute("jid",bookmark.conference);
 				markElem.setAttribute("name",bookmark.name);
-				markElem.setAttribute("autojoin",bookmark.autojoin ? "true" : "false");
+				markElem.setAttribute("autojoin",QVariant(bookmark.autojoin).toString());
 				markElem.appendChild(doc.createElement("nick")).appendChild(doc.createTextNode(bookmark.nick));
 				if (!bookmark.password.isEmpty())
 					markElem.appendChild(doc.createElement("password")).appendChild(doc.createTextNode(bookmark.password));
@@ -337,7 +337,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
 			{
 				bookmark.name = elem.attribute("name","conference");
 				bookmark.conference = elem.attribute("jid");
-				bookmark.autojoin = elem.attribute("autojoin")=="true";
+				bookmark.autojoin = QVariant(elem.attribute("autojoin")).toBool();
 				bookmark.nick = elem.firstChildElement("nick").text();
 				bookmark.password = elem.firstChildElement("password").text();
 				streamBookmarks.append(bookmark);
