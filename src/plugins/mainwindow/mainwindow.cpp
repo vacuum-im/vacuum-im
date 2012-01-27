@@ -4,6 +4,7 @@
 
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(AParent,AFlags)
 {
+	setWindowRole("MainWindow");
 	setAttribute(Qt::WA_DeleteOnClose,false);
 
 	QIcon icon;
