@@ -44,7 +44,13 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 	if (plugin)
 	{
 		FArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+		if (FArchiver)
+		{
+			connect(FArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
+			connect(FArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
+		}
 	}
+
 	return FArchiver!=NULL;
 }
 
@@ -117,55 +123,37 @@ int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJ
 	}
 }
 
-bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
-{
-	if (isCapable(AStreamJid,DirectArchiving))
-	{
-		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
-		itemJid = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
-
-		CollectionWriter *writer = findCollectionWriter(AStreamJid,itemJid,AMessage.threadId());
-		if (!writer)
-		{
-			IArchiveHeader header;
-			header.with = itemJid;
-			header.start = QDateTime::currentDateTime();
-			header.subject = AMessage.subject();
-			header.threadId = AMessage.threadId();
-			header.version = 0;
-			writer = getCollectionWriter(AStreamJid,header);
-		}
-		if (writer)
-		{
-			return writer->writeNote(AMessage.body());
-		}
-	}
-	return false;
-}
-
 bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
 	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
-		itemJid = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
+		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
-		CollectionWriter *writer = findCollectionWriter(AStreamJid,itemJid,AMessage.threadId());
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
 		if (!writer)
-		{
-			IArchiveHeader header;
-			header.with = itemJid;
-			header.start = QDateTime::currentDateTime();
-			header.subject = AMessage.subject();
-			header.threadId = AMessage.threadId();
-			header.version = 0;
-			writer = getCollectionWriter(AStreamJid,header);
-		}
+			writer = getCollectionWriter(AStreamJid,makeHeader(with,AMessage));
 		if (writer)
 		{
 			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
 			return writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
+	}
+	return false;
+}
+
+bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
+{
+	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
+	{
+		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
+		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
+
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
+		if (!writer)
+			writer = getCollectionWriter(AStreamJid,makeHeader(with,AMessage));
+		if (writer)
+			return writer->writeNote(AMessage.body());
 	}
 	return false;
 }
@@ -195,7 +183,7 @@ QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArch
 	return QString::null;
 }
 
-QString FileMessageArchive::loadHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter)
+QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter)
 {
 	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
@@ -208,7 +196,7 @@ QString FileMessageArchive::loadHeaders(const Jid AStreamJid, const IArchiveRequ
 	return QString::null;
 }
 
-QString FileMessageArchive::loadCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter)
+QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter)
 {
 	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
@@ -502,6 +490,20 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	return false;
 }
 
+IArchiveHeader FileMessageArchive::makeHeader(const Jid &AItemJid, const Message &AMessage) const
+{
+	IArchiveHeader header;
+	header.with = AItemJid;
+	if (!AMessage.dateTime().isValid() || AMessage.dateTime().secsTo(QDateTime::currentDateTime())>5)
+		header.start = QDateTime::currentDateTime();
+	else
+		header.start = AMessage.dateTime();
+	header.subject = AMessage.subject();
+	header.threadId = AMessage.threadId();
+	header.version = 0;
+	return header;
+}
+
 bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const
 {
 	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
@@ -599,6 +601,18 @@ void FileMessageArchive::onWorkingThreadFinished()
 		}
 		wthread->deleteLater();
 	}
+}
+
+void FileMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
+{
+	emit capabilitiesChanged(AStreamJid);
+}
+
+void FileMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
+{
+	foreach(Jid streamJid, FCollectionWriters.keys())
+		qDeleteAll(FCollectionWriters.take(streamJid));
+	emit capabilitiesChanged(AStreamJid);
 }
 
 void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)

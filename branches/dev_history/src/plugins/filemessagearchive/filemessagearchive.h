@@ -34,12 +34,12 @@ public:
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const;
 	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const;
-	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
+	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false);
-	virtual QString loadHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null);
-	virtual QString loadCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null);
+	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null);
+	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null);
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null);
 	//IFileMessageArchive
 	virtual QString collectionDirName(const Jid &AWith) const;
@@ -66,12 +66,15 @@ signals:
 	void fileCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	void fileCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 protected:
+	IArchiveHeader makeHeader(const Jid &AItemJid, const Message &AMessage) const;
 	bool saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
 	CollectionWriter *getCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 protected slots:
 	void onWorkingThreadFinished();
+	void onArchivePrefsOpened(const Jid &AStreamJid);
+	void onArchivePrefsClosed(const Jid &AStreamJid);
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
 private:
 	IPluginManager *FPluginManager;

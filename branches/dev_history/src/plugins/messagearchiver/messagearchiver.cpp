@@ -989,10 +989,12 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			QString nick = nodeElem.attribute("name");
 			Jid contactJid(with.node(),with.domain(),nick.isEmpty() ? with.resource() : nick);
 
-			nodeElem.tagName()=="to" ? message.setTo(contactJid.eFull()) : message.setFrom(contactJid.eFull());
+			if (nodeElem.tagName()=="to")
+				message.setTo(contactJid.eFull());
+			else
+				message.setFrom(contactJid.eFull());
 
-			if (!nick.isEmpty())
-				message.setType(Message::GroupChat);
+			message.setType(nick.isEmpty() ? Message::Chat : Message::GroupChat);
 
 			QString utc = nodeElem.attribute("utc");
 			if (utc.isEmpty())
@@ -1077,7 +1079,7 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 	foreach(Message message, ACollection.messages)
 	{
 		Jid fromJid = message.from();
-		groupChat |= message.type() == Message::GroupChat;
+		groupChat |= message.type()==Message::GroupChat;
 		if (!groupChat || !fromJid.resource().isEmpty())
 		{
 			bool directionIn = ACollection.header.with && message.from();

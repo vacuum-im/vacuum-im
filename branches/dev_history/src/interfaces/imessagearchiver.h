@@ -174,14 +174,14 @@ public:
 	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const =0;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;
 	//DirectArchiving
-	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
+	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
 	//ManualArchiving
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false) =0;
 	//ArchiveManagement
-	virtual QString loadHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null) =0;
-	virtual QString loadCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null) =0;
+	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null) =0;
+	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null) =0;
 	//Replication
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null) =0;
 protected:
