@@ -1410,7 +1410,7 @@ bool RosterChanger::eventFilter(QObject *AObject, QEvent *AEvent)
 		if (FNotifications)
 		{
 			int notifyId = FNotifySubsDialog.key(qobject_cast<SubscriptionDialog *>(AObject));
-			FNotifications->removeNotification(notifyId);
+			FNotifications->activateNotification(notifyId);
 		}
 	}
 	return QObject::eventFilter(AObject,AEvent);
