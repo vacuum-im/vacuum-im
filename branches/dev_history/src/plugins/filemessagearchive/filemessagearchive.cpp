@@ -3,6 +3,9 @@
 #define ARCHIVE_DIR_NAME      "archive"
 #define COLLECTION_EXT        ".xml"
 #define LOG_FILE_NAME         "archive.dat"
+#define GATEWAY_FILE_NAME     "gateways.dat"
+
+#define CATEGORY_GATEWAY      "gateway"
 
 #define LOG_ACTION_CREATE     "C"
 #define LOG_ACTION_MODIFY     "M"
@@ -17,12 +20,22 @@
 FileMessageArchive::FileMessageArchive()
 {
 	FPluginManager = NULL;
-	FArchiver = NULL;
+	FMessageArchiver = NULL;
+	FDiscovery = NULL;
 }
 
 FileMessageArchive::~FileMessageArchive()
 {
-
+	foreach(QString newDir, FNewDirs)
+	{
+		QDir dir(newDir);
+		if (dir.entryList(QDir::NoDotAndDotDot).isEmpty())
+		{
+			QString name = dir.dirName();
+			dir.cdUp();
+			dir.rmdir(name);
+		}
+	}
 }
 
 void FileMessageArchive::pluginInfo(IPluginInfo *APluginInfo)
@@ -43,22 +56,45 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
 	{
-		FArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
-		if (FArchiver)
+		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+		if (FMessageArchiver)
 		{
-			connect(FArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
-			connect(FArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
+			connect(FMessageArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
+			connect(FMessageArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
 		}
 	}
 
-	return FArchiver!=NULL;
+	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+	if (plugin)
+	{
+		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+		if (FDiscovery)
+		{
+			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+		}
+	}
+
+	return FMessageArchiver!=NULL;
 }
 
 bool FileMessageArchive::initObjects()
 {
-	if (FArchiver)
+	QString dirPath = collectionDirPath(Jid::null,Jid::null);
+	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
+	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
 	{
-		FArchiver->registerArchiveEngine(this);
+		while (!gateways.atEnd())
+		{
+			QStringList gateway = QString::fromUtf8(gateways.readLine()).split(" ");
+			if (!gateway.value(0).isEmpty() && !gateway.value(1).isEmpty())
+				FGatewayTypes.insert(gateway.value(0),gateway.value(1));
+		}
+	}
+	gateways.close();
+
+	if (FMessageArchiver)
+	{
+		FMessageArchiver->registerArchiveEngine(this);
 	}
 	return true;
 }
@@ -91,12 +127,12 @@ QString FileMessageArchive::engineDescription() const
 
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
-	if (AStreamJid.isValid() && !FArchiver->isReady(AStreamJid))
+	if (AStreamJid.isValid() && !FMessageArchiver->isReady(AStreamJid))
 		return ArchiveManagement|Replication|TextSearch;
 	return DirectArchiving|ManualArchiving|ArchiveManagement|Replication|TextSearch;
 }
 
-bool FileMessageArchive::isCapable(const Jid &AStreamJid, uint ACapability) const
+bool FileMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability) const
 {
 	return (capabilities(AStreamJid) & ACapability) > 0;
 }
@@ -125,46 +161,67 @@ int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJ
 
 bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
+	bool written = false;
+	if (isCapable(AStreamJid,DirectArchiving) && FMessageArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
+		FThreadLock.lockForWrite();
 		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
 		if (!writer)
-			writer = getCollectionWriter(AStreamJid,makeHeader(with,AMessage));
+		{
+			FThreadLock.unlock();
+			IArchiveHeader header = makeHeader(with,AMessage);
+			QString fileName = collectionFilePath(AStreamJid,header.with,header.start);
+			FThreadLock.lockForWrite();
+			writer = newCollectionWriter(AStreamJid,header,fileName);
+		}
 		if (writer)
 		{
-			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
-			return writer->writeMessage(AMessage,prefs.save,ADirectionIn);
+			IArchiveItemPrefs prefs = FMessageArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
+			written = writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
+		FThreadLock.unlock();
 	}
-	return false;
+	return written;
 }
 
 bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
+	bool written = false;
+	if (isCapable(AStreamJid,DirectArchiving) && FMessageArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
+		FThreadLock.lockForWrite();
 		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
 		if (!writer)
-			writer = getCollectionWriter(AStreamJid,makeHeader(with,AMessage));
+		{
+			FThreadLock.unlock();
+			IArchiveHeader header = makeHeader(with,AMessage);
+			QString fileName = collectionFilePath(AStreamJid,header.with,header.start);
+			FThreadLock.lockForWrite();
+			writer = newCollectionWriter(AStreamJid,header,fileName);
+		}
 		if (writer)
-			return writer->writeNote(AMessage.body());
+		{
+			written = written = writer->writeNote(AMessage.body());
+		}
+		FThreadLock.unlock();
 	}
-	return false;
+	return written;
 }
 
 QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
 	if (isCapable(AStreamJid,ManualArchiving) && AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveCollection(ACollection);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
 		return wthread->executeAction(WorkingThread::SaveCollection);
 	}
 	return QString::null;
@@ -175,49 +232,50 @@ QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArch
 	Q_UNUSED(AOpened);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ManualArchiving))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveRequest(ARequest);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
 		return wthread->executeAction(WorkingThread::RemoveCollection);
 	}
 	return QString::null;
 }
 
-QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter)
+QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveRequest(ARequest);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
 		return wthread->executeAction(WorkingThread::LoadHeaders);
 	}
 	return QString::null;
 }
 
-QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter)
+QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
 {
-	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveHeader(AHeader);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
 		return wthread->executeAction(WorkingThread::LoadCollection);
 	}
 	return QString::null;
 }
 
-QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter)
+QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount)
 {
-	Q_UNUSED(AAfter);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,Replication))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setModificationsStart(AStart);
 		wthread->setModificationsCount(ACount);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
 		return wthread->executeAction(WorkingThread::LoadModifications);
 	}
 	return QString::null;
@@ -225,7 +283,13 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 
 QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 {
-	Jid jid = AWith; //FArchiver->gateJid(AWith);
+	Jid jid = AWith;
+
+	FThreadLock.lockForRead();
+	if (!jid.node().isEmpty() && FGatewayTypes.contains(jid.domain()))
+		jid.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(jid.domain())));
+	FThreadLock.unlock();
+
 	QString dirName = Jid::encode(jid.pBare());
 	if (!jid.resource().isEmpty())
 		dirName += "/"+Jid::encode(jid.pResource());
@@ -249,22 +313,46 @@ QString FileMessageArchive::collectionDirPath(const Jid &AStreamJid, const Jid &
 
 	QDir dir(FPluginManager->homePath());
 	if (!dir.exists(ARCHIVE_DIR_NAME))
+	{
+		FThreadLock.lockForWrite();
 		noError &= dir.mkdir(ARCHIVE_DIR_NAME);
+		FThreadLock.unlock();
+	}
 	noError &= dir.cd(ARCHIVE_DIR_NAME);
 
 	if (noError && AStreamJid.isValid())
 	{
 		QString streamDir = collectionDirName(AStreamJid.bare());
 		if (!dir.exists(streamDir))
+		{
+			FThreadLock.lockForWrite();
 			noError &= dir.mkdir(streamDir);
+			FNewDirs.prepend(dir.absoluteFilePath(streamDir));
+			FThreadLock.unlock();
+		}
 		noError &= dir.cd(streamDir);
 
 		if (noError && AWith.isValid())
 		{
 			QString withDir = collectionDirName(AWith);
 			if (!dir.exists(withDir))
-				noError &= dir.mkpath(withDir);
-			noError &= dir.cd(withDir);
+			{
+				FThreadLock.lockForWrite();
+				foreach(QString subDir, withDir.split("/"))
+				{
+					if (!dir.exists(subDir))
+					{
+						noError &= dir.mkdir(subDir);
+						FNewDirs.prepend(dir.absoluteFilePath(subDir));
+					}
+					noError &= dir.cd(subDir);
+				}
+				FThreadLock.unlock();
+			}
+			else
+			{
+				noError &= dir.cd(withDir);
+			}
 		}
 	}
 
@@ -293,7 +381,10 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 		QMultiMap<QString,QString> filesMap;
 		QString startName = collectionFileName(ARequest.start);
 		QString endName = collectionFileName(ARequest.end);
-		QDirIterator dirIt(collectionDirPath(AStreamJid,ARequest.with),QDir::Files,QDirIterator::Subdirectories);
+		QString dirPath = collectionDirPath(AStreamJid,ARequest.with);
+		
+		FThreadLock.lockForRead();
+		QDirIterator dirIt(dirPath,QDir::Files,QDirIterator::Subdirectories);
 		while (dirIt.hasNext())
 		{
 			QString fpath = dirIt.next();
@@ -301,10 +392,11 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 			if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
 			{
 				filesMap.insertMulti(fname,fpath);
-				if (ARequest.count>0 && filesMap.count()>ARequest.count)
+				if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
 					filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
 			}
 		}
+		FThreadLock.unlock();
 
 		QMapIterator<QString,QString> fileIt(filesMap);
 		if (ARequest.order == Qt::DescendingOrder)
@@ -323,6 +415,7 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 
 IArchiveHeader FileMessageArchive::loadHeaderFromFile(const QString &AFileName) const
 {
+	FThreadLock.lockForRead();
 	IArchiveHeader header;
 	QFile file(AFileName);
 	if (file.open(QFile::ReadOnly))
@@ -333,6 +426,7 @@ IArchiveHeader FileMessageArchive::loadHeaderFromFile(const QString &AFileName) 
 			reader.readNext();
 			if (reader.isStartElement() && reader.qualifiedName()=="chat")
 			{
+				header.engineId = engineId();
 				header.with = reader.attributes().value("with").toString();
 				header.start = DateTime(reader.attributes().value("start").toString()).toLocal();
 				header.subject = reader.attributes().value("subject").toString();
@@ -347,20 +441,23 @@ IArchiveHeader FileMessageArchive::loadHeaderFromFile(const QString &AFileName) 
 		}
 		file.close();
 	}
+	FThreadLock.unlock();
 	return header;
 }
 
 IArchiveCollection FileMessageArchive::loadCollectionFromFile(const QString &AFileName) const
 {
+	FThreadLock.lockForRead();
 	IArchiveCollection collection;
 	QFile file(AFileName);
 	if (file.open(QFile::ReadOnly))
 	{
 		QDomDocument doc;
 		doc.setContent(file.readAll(),true);
-		FArchiver->elementToCollection(doc.documentElement(),collection);
+		FMessageArchiver->elementToCollection(doc.documentElement(),collection);
 		file.close();
 	}
+	FThreadLock.unlock();
 	return collection;
 }
 
@@ -372,6 +469,7 @@ IArchiveModifications FileMessageArchive::loadFileModifications(const Jid &AStre
 	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 	if (!dirPath.isEmpty() && AStreamJid.isValid() && AStart.isValid())
 	{
+		FThreadLock.lockForRead();
 		QFile log(dirPath+"/"LOG_FILE_NAME);
 		if (log.open(QFile::ReadOnly|QIODevice::Text))
 		{
@@ -424,6 +522,7 @@ IArchiveModifications FileMessageArchive::loadFileModifications(const Jid &AStre
 				}
 			}
 		}
+		FThreadLock.unlock();
 	}
 	return modifs;
 }
@@ -440,35 +539,46 @@ bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArch
 
 		if (AAppend)
 		{
-			// TODO: Find message duplicates
-			if (!ACollection.messages.isEmpty())
+			if (!ACollection.body.messages.isEmpty())
 			{
-				collection.messages += ACollection.messages;
-				qSort(collection.messages);
+				QMultiMap<QDateTime, QString> curMessages;
+				foreach(Message message, collection.body.messages)
+					curMessages.insertMulti(message.dateTime(),message.body());
+					
+				foreach(Message message, ACollection.body.messages)
+					if (!curMessages.contains(message.dateTime(),message.body()))
+						collection.body.messages.append(message);
+
+				qSort(collection.body.messages);
 			}
-			if (!ACollection.notes.isEmpty())
+			if (!ACollection.body.notes.isEmpty())
 			{
-				collection.notes += ACollection.notes;
+				for (QMultiMap<QDateTime, QString>::const_iterator it= ACollection.body.notes.constBegin(); it!=ACollection.body.notes.constEnd(); it++)
+					if (!collection.body.notes.contains(it.key(),it.value()))
+						collection.body.notes.insertMulti(it.key(),it.value());
 			}
 		}
 		else
 		{
-			collection.messages = ACollection.messages;
-			collection.notes = ACollection.notes;
+			collection.body.messages = ACollection.body.messages;
+			collection.body.notes = ACollection.body.notes;
 		}
 
+		FThreadLock.lockForWrite();
 		QFile file(fileName);
 		if (file.open(QFile::WriteOnly|QFile::Truncate))
 		{
 			QDomDocument doc;
 			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
-			FArchiver->collectionToElement(collection,chatElem,ASaveMode);
+			FMessageArchiver->collectionToElement(collection,chatElem,ASaveMode);
 			file.write(doc.toByteArray(2));
 			file.close();
+			FThreadLock.unlock();
 			saveFileModification(AStreamJid,collection.header,logAction);
-			emit fileCollectionSaved(AStreamJid,collection.header);
+			emit fileCollectionSaved(AStreamJid,collection.header); // TODO: emit signal from main thread
 			return true;
 		}
+		FThreadLock.unlock();
 	}
 	return false;
 }
@@ -479,13 +589,17 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	if (QFile::exists(fileName))
 	{
 		IArchiveHeader header = loadHeaderFromFile(fileName);
+		QString file =  collectionFilePath(AStreamJid,AWith,AStart);
+		FThreadLock.lockForWrite();
 		delete findCollectionWriter(AStreamJid,header);
-		if (QFile::remove(collectionFilePath(AStreamJid,AWith,AStart)))
+		if (QFile::remove(file))
 		{
+			FThreadLock.unlock();
 			saveFileModification(AStreamJid,header,LOG_ACTION_REMOVE);
-			emit fileCollectionRemoved(AStreamJid,header);
+			emit fileCollectionRemoved(AStreamJid,header);  // TODO: emit signal from main thread
 			return true;
 		}
+		FThreadLock.unlock();
 	}
 	return false;
 }
@@ -509,6 +623,7 @@ bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArch
 	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
 	if (!dirPath.isEmpty() && AStreamJid.isValid() && AHeader.with.isValid() && AHeader.start.isValid())
 	{
+		FThreadLock.lockForWrite();
 		QFile log(dirPath+"/"LOG_FILE_NAME);
 		if (log.open(QFile::WriteOnly|QFile::Append|QIODevice::Text))
 		{
@@ -521,8 +636,10 @@ bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArch
 			logFields << "\n";
 			log.write(logFields.join(" ").toUtf8());
 			log.close();
+			FThreadLock.unlock();
 			return true;
 		}
+		FThreadLock.unlock();
 	}
 	return false;
 }
@@ -545,13 +662,11 @@ CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid
 	return NULL;
 }
 
-CollectionWriter *FileMessageArchive::getCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader)
+CollectionWriter *FileMessageArchive::newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName)
 {
-	CollectionWriter *writer = findCollectionWriter(AStreamJid,AHeader);
-	if (!writer && AHeader.with.isValid() && AHeader.start.isValid())
+	if (AHeader.with.isValid() && AHeader.start.isValid() && !AFileName.isEmpty())
 	{
-		QString fileName = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
-		writer = new CollectionWriter(AStreamJid,fileName,AHeader,this);
+		CollectionWriter *writer = new CollectionWriter(AStreamJid,AFileName,AHeader,this);
 		if (writer->isOpened())
 		{
 			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
@@ -563,8 +678,9 @@ CollectionWriter *FileMessageArchive::getCollectionWriter(const Jid &AStreamJid,
 			delete writer;
 			writer = NULL;
 		}
+		return writer;
 	}
-	return writer;
+	return NULL;
 }
 
 void FileMessageArchive::onWorkingThreadFinished()
@@ -583,13 +699,13 @@ void FileMessageArchive::onWorkingThreadFinished()
 				emit collectionsRemoved(wthread->workId(),wthread->archiveRequest());
 				break;
 			case WorkingThread::LoadHeaders:
-				emit headersLoaded(wthread->workId(),wthread->archiveHeaders(),wthread->archiveResultSet());
+				emit headersLoaded(wthread->workId(),wthread->archiveHeaders());
 				break;
 			case WorkingThread::LoadCollection:
-				emit collectionLoaded(wthread->workId(),wthread->archiveCollection(),wthread->archiveResultSet());
+				emit collectionLoaded(wthread->workId(),wthread->archiveCollection());
 				break;
 			case WorkingThread::LoadModifications:
-				emit modificationsLoaded(wthread->workId(),wthread->archiveModifications(),wthread->archiveResultSet());
+				emit modificationsLoaded(wthread->workId(),wthread->archiveModifications());
 				break;
 			default:
 				emit requestFailed(wthread->workId(),tr("Internal error"));
@@ -622,6 +738,32 @@ void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 	{
 		saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
 		emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
+	}
+}
+
+void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
+{
+	if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() &&  AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid))
+	{
+		foreach(IDiscoIdentity identity, AInfo.identity)
+		{
+			if (identity.category==CATEGORY_GATEWAY && !identity.type.isEmpty())
+			{
+				QString dirPath = collectionDirPath(Jid::null,Jid::null);
+				QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
+				if (!dirPath.isEmpty() && gateways.open(QFile::WriteOnly|QFile::Append|QFile::Text))
+				{
+					QStringList gateway;
+					gateway << AInfo.contactJid.pDomain();
+					gateway << identity.type;
+					gateway << "\n";
+					gateways.write(gateway.join(" ").toUtf8());
+					gateways.close();
+				}
+				FGatewayTypes.insert(AInfo.contactJid,identity.type);
+				break;
+			}
+		}
 	}
 }
 

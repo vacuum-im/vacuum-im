@@ -50,6 +50,26 @@ struct StanzaSession {
 	QString error;
 };
 
+struct MessagesRequest {
+	Jid streamJid;
+	QString lastError;
+	IArchiveRequest request;
+	QList<IArchiveHeader> headers;
+	IArchiveCollectionBody body;
+};
+
+struct HeadersRequest {
+	QString lastError;
+	IArchiveRequest request;
+	QList<IArchiveEngine *> engines;
+	QMap<IArchiveEngine *,QList<IArchiveHeader> > headers;
+};
+
+struct CollectionRequest {
+	QString lastError;
+	IArchiveCollection collection;
+};
+
 class MessageArchiver :
 	public QObject,
 	public IPlugin,
@@ -93,30 +113,41 @@ public:
 	virtual QString methodName(const QString &AMethod) const;
 	virtual QString otrModeName(const QString &AOTRMode) const;
 	virtual QString saveModeName(const QString &ASaveMode) const;
+   //Preferences
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto);
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
 	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid);
 	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId);
-	//Direct Archiving
+	//Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
 	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null);
-	//Archive Utilities
+	//Management
+	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest);
+	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest);
+	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	//Utilities
 	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
 	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const;
-	//Archive Handlers
+	//Handlers
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler);
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler);
-	//Archive Engines
+	//Engines
 	virtual QList<IArchiveEngine *> archiveEngines() const;
 	virtual bool isArchiveEngineEnabled(const QUuid &AId) const;
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const;
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine);
 signals:
+	//Preferences
 	void archivePrefsOpened(const Jid &AStreamJid);
 	void archivePrefsChanged(const Jid &AStreamJid);
 	void archivePrefsClosed(const Jid &AStreamJid);
+	//Management
+	void messagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
+	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
+	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	//Common Requests
 	void requestCompleted(const QString &AId);
 	void requestFailed(const QString &AId, const QString &AError);
 protected:
@@ -143,6 +174,17 @@ protected:
 	void cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError);
 	void renegotiateStanzaSessions(const Jid &AStreamJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+protected:
+	void processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest);
+	void processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest);
+	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
+protected slots:
+	void onEngineRequestFailed(const QString &AId, const QString &AError);
+	void onEngineHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
+	void onEngineCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	void onSelfRequestFailed(const QString &AId, const QString &AError);
+	void onSelfHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
+	void onSelfCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
@@ -188,6 +230,11 @@ private:
 	QMap<QString,bool> FPrefsAutoRequests;
 	QMap<QString,Jid> FPrefsRemoveItemRequests;
 	QMap<QString,QString> FPrefsRemoveSessionRequests;
+private:
+	QHash<QString,QString> FRequestId2LocalId;
+	QMap<QString,HeadersRequest> FHeadersRequests;
+	QMap<QString,CollectionRequest> FCollectionRequests;
+	QMap<QString,MessagesRequest> FMesssagesRequests;
 private:
 	QList<Jid> FInStoragePrefs;
 	QMap<Jid,QString> FNamespaces;

@@ -73,6 +73,7 @@ struct IArchiveHeader
 	QString subject;
 	QString threadId;
 	quint32 version;
+	QUuid engineId;
 	bool operator<(const IArchiveHeader &AOther) const {
 		return start==AOther.start ? with<AOther.with : start<AOther.start;
 	}
@@ -90,14 +91,19 @@ struct IArchiveCollectionLink
 	QDateTime start;
 };
 
+struct IArchiveCollectionBody 
+{
+	QList<Message> messages;
+	QMultiMap<QDateTime,QString> notes;
+};
+
 struct IArchiveCollection
 {
 	IArchiveHeader header;
 	IDataForm attributes;
 	IArchiveCollectionLink next;
 	IArchiveCollectionLink previous;
-	QList<Message> messages;
-	QMultiMap<QDateTime,QString> notes;
+	IArchiveCollectionBody body;
 	bool operator<(const IArchiveCollection &AOther) const {
 		return header<AOther.header;
 	}
@@ -127,24 +133,16 @@ struct IArchiveModifications
 struct IArchiveRequest
 {
 	IArchiveRequest() {
-		count = -1;
+		maxItems = 0;
 		threadId = QString::null;
 		order = Qt::AscendingOrder;
 	}
 	Jid with;
-	qint32 count;
 	QDateTime start;
 	QDateTime end;
 	QString threadId;
+	qint32 maxItems;
 	Qt::SortOrder order;
-};
-
-struct IArchiveResultSet 
-{
-	quint32 count;
-	quint32 index;
-	QString first;
-	QString last;
 };
 
 class IArchiveHandler
@@ -171,7 +169,7 @@ public:
 	virtual QString engineName() const =0;
 	virtual QString engineDescription() const =0;
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const =0;
-	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const =0;
+	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const =0;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;
 	//DirectArchiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
@@ -180,18 +178,18 @@ public:
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false) =0;
 	//ArchiveManagement
-	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null) =0;
-	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null) =0;
+	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
+	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
 	//Replication
-	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null) =0;
+	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) =0;
 protected:
 	virtual void capabilitiesChanged(const Jid &AStreamJid) =0;
 	virtual void requestFailed(const QString &AId, const QString &AError) =0;
 	virtual void collectionSaved(const QString &AId, const IArchiveHeader &AHeader) =0;
 	virtual void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;
-	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult) =0;
-	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult) =0;
-	virtual void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult) =0;
+	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders) =0;
+	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection) =0;
+	virtual void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs) =0;
 };
 
 class IMessageArchiver
@@ -207,6 +205,7 @@ public:
 	virtual QString methodName(const QString &AMethod) const =0;
 	virtual QString otrModeName(const QString &AOTRMode) const =0;
 	virtual QString saveModeName(const QString &ASaveMode) const =0;
+	//Archive Preferences
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto) =0;
@@ -216,6 +215,10 @@ public:
 	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage) =0;
 	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null) =0;
+	//Archive Management
+	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
+	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
+	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
 	//Archive Utilities
 	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const =0;
 	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const =0;
@@ -228,9 +231,15 @@ public:
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const =0;
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine) =0;
 protected:
+	//Archive Preferences
 	virtual void archivePrefsOpened(const Jid &AStreamJid) =0;
 	virtual void archivePrefsChanged(const Jid &AStreamJid) =0;
 	virtual void archivePrefsClosed(const Jid &AStreamJid) =0;
+	//Archive Management
+	virtual void messagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody) =0;
+	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders) =0;
+	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection) =0;
+	//Common Requests
 	virtual void requestCompleted(const QString &AId) =0;
 	virtual void requestFailed(const QString &AId, const QString &AError) =0;
 };

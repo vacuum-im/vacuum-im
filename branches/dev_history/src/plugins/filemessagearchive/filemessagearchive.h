@@ -1,11 +1,13 @@
 #ifndef FILEMESSAGEARCHIVE_H
 #define FILEMESSAGEARCHIVE_H
 
+#include <QReadWriteLock>
 #include <definitions/optionvalues.h>
 #include <definitions/archivecapabilityorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifilemessagearchive.h>
 #include <interfaces/imessagearchiver.h>
+#include <interfaces/iservicediscovery.h>
 #include <utils/options.h>
 #include "collectionwriter.h"
 
@@ -32,15 +34,15 @@ public:
 	virtual QString engineName() const;
 	virtual QString engineDescription() const;
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const;
-	virtual bool isCapable(const Jid &AStreamJid, uint ACapability) const;
+	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const;
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false);
-	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const QString &AAfter = QString::null);
-	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAfter = QString::null);
-	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &AAfter = QString::null);
+	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest);
+	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount);
 	//IFileMessageArchive
 	virtual QString collectionDirName(const Jid &AWith) const;
 	virtual QString collectionFileName(const QDateTime &AStart) const;
@@ -58,9 +60,9 @@ signals:
 	void requestFailed(const QString &AId, const QString &AError);
 	void collectionSaved(const QString &AId, const IArchiveHeader &AHeader);
 	void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
-	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult);
-	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult);
-	void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult);
+	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
+	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs);
 	//IFileMessageArchive
 	void fileCollectionOpened(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	void fileCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
@@ -70,16 +72,25 @@ protected:
 	bool saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
-	CollectionWriter *getCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	CollectionWriter *newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName);
 protected slots:
 	void onWorkingThreadFinished();
 	void onArchivePrefsOpened(const Jid &AStreamJid);
 	void onArchivePrefsClosed(const Jid &AStreamJid);
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
+	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
 	IPluginManager *FPluginManager;
-	IMessageArchiver *FArchiver;
+	IMessageArchiver *FMessageArchiver;
+	IServiceDiscovery *FDiscovery;
 private:
+	mutable QReadWriteLock FThreadLock;
+	QList<IArchiveHeader> FSavedCollections;
+	QList<IArchiveHeader> FRemovedCollections;
+
+private:
+	mutable QList<QString> FNewDirs;
+	QMap<Jid, QString> FGatewayTypes;
 	QMap<Jid, QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
 };
 

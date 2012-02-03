@@ -175,6 +175,13 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		}
 	}
 
+	connect(this,SIGNAL(requestFailed(const QString &, const QString &)),
+		SLOT(onSelfRequestFailed(const QString &, const QString &)));
+	connect(this,SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
+		SLOT(onSelfHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
+	connect(this,SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
+		SLOT(onSelfCollectionLoaded(const QString &, const IArchiveCollection &)));
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
@@ -954,6 +961,62 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const
 	return false;
 }
 
+QString MessageArchiver::loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest)
+{
+	QString reqId = loadHeaders(AStreamJid,ARequest);
+	if (!reqId.isEmpty())
+	{
+		MessagesRequest request;
+		request.request = ARequest;
+		request.streamJid = AStreamJid;
+		QString localId = QUuid::createUuid().toString();
+		FRequestId2LocalId.insert(reqId,localId);
+		FMesssagesRequests.insert(localId,request);
+		return localId;
+	}
+	return QString::null;
+}
+
+QString MessageArchiver::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
+{
+	HeadersRequest request;
+	QString localId = QUuid::createUuid().toString();
+	foreach(IArchiveEngine *engine, engineOrderByCapability(IArchiveEngine::ArchiveManagement,AStreamJid))
+	{
+		QString reqId = engine->loadHeaders(AStreamJid,ARequest);
+		if (!reqId.isEmpty())
+		{
+			request.engines.append(engine);
+			FRequestId2LocalId.insert(reqId,localId);
+		}
+	}
+	if (!request.engines.isEmpty())
+	{
+		request.request = ARequest;
+		FHeadersRequests.insert(localId,request);
+		return localId;
+	}
+	return QString::null;
+}
+
+QString MessageArchiver::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
+{
+	IArchiveEngine *engine = findArchiveEngine(AHeader.engineId);
+	if (engine)
+	{
+		QString reqId = engine->loadCollection(AStreamJid,AHeader);
+		if (!reqId.isEmpty())
+		{
+			CollectionRequest request;
+			QString localId = QUuid::createUuid().toString();
+			FRequestId2LocalId.insert(reqId,localId);
+			FCollectionRequests.insert(localId,request);
+			return localId;
+		}
+	}
+	return QString::null;
+}
+
 void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const
 {
 	ACollection.header.with = AChatElem.attribute("with");
@@ -1018,12 +1081,12 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 				childElem = childElem.nextSiblingElement();
 			}
 
-			ACollection.messages.append(message);
+			ACollection.body.messages.append(message);
 		}
 		else if (nodeElem.tagName() == "note")
 		{
 			QString utc = nodeElem.attribute("utc");
-			ACollection.notes.insertMulti(DateTime(utc).toLocal(),nodeElem.text());
+			ACollection.body.notes.insertMulti(DateTime(utc).toLocal(),nodeElem.text());
 		}
 		else if(nodeElem.tagName() == "next")
 		{
@@ -1076,7 +1139,7 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 
 	int secLast = 0;
 	bool groupChat = false;
-	foreach(Message message, ACollection.messages)
+	foreach(Message message, ACollection.body.messages)
 	{
 		Jid fromJid = message.from();
 		groupChat |= message.type()==Message::GroupChat;
@@ -1113,8 +1176,8 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 		}
 	}
 
-	QMultiMap<QDateTime,QString>::const_iterator it = ACollection.notes.constBegin();
-	while (it != ACollection.notes.constEnd())
+	QMultiMap<QDateTime,QString>::const_iterator it = ACollection.body.notes.constBegin();
+	while (it != ACollection.body.notes.constEnd())
 	{
 		QDomElement noteElem = AChatElem.appendChild(ownerDoc.createElement("note")).toElement();
 		noteElem.setAttribute("utc",DateTime(it.key()).toX85UTC());
@@ -1152,7 +1215,15 @@ IArchiveEngine *MessageArchiver::findArchiveEngine(const QUuid &AId) const
 void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 {
 	if (AEngine!=NULL && !FArchiveEngines.contains(AEngine->engineId()))
+	{
+		connect(AEngine->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
+			SLOT(onEngineRequestFailed(const QString &, const QString &)));
+		connect(AEngine->instance(),SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
+			SLOT(onEngineHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
+		connect(AEngine->instance(),SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
+			SLOT(onEngineCollectionLoaded(const QString &, const IArchiveCollection &)));
 		FArchiveEngines.insert(AEngine->engineId(),AEngine);
+	}
 }
 
 void MessageArchiver::registerDiscoFeatures()
@@ -1970,6 +2041,181 @@ bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected
 	}
 	return false;
 
+}
+
+void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest)
+{
+	if (ARequest.engines.count() == ARequest.headers.count())
+	{
+		if (!ARequest.engines.isEmpty() || ARequest.lastError.isEmpty())
+		{
+			QList<IArchiveHeader> headers;
+			foreach(IArchiveEngine *engine, ARequest.engines)
+			{
+				foreach(IArchiveHeader header, ARequest.headers.value(engine))
+				{
+					if (!headers.contains(header))
+						headers.append(header);
+				}
+			}
+
+			if (ARequest.request.order == Qt::AscendingOrder)
+				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+			else
+				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+
+			if (ARequest.request.maxItems>0 && headers.count()>ARequest.request.maxItems)
+				headers = headers.mid(0,ARequest.request.maxItems);
+
+			emit headersLoaded(ALocalId,headers);
+		}
+		else
+		{
+			emit requestFailed(ALocalId,ARequest.lastError);
+		}
+		FHeadersRequests.remove(ALocalId);
+	}
+}
+
+void MessageArchiver::processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest)
+{
+	if (ARequest.lastError.isEmpty())
+	{
+		emit collectionLoaded(ALocalId,ARequest.collection);
+	}
+	else
+	{
+		emit requestFailed(ALocalId,ARequest.lastError);
+	}
+	FCollectionRequests.remove(ALocalId);
+}
+
+void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest)
+{
+	if (!ARequest.lastError.isEmpty())
+	{
+		emit requestFailed(ALocalId,ARequest.lastError);
+		FMesssagesRequests.remove(ALocalId);
+	}
+	else if (ARequest.headers.isEmpty() || (ARequest.request.maxItems>0 && ARequest.body.messages.count()>ARequest.request.maxItems))
+	{
+		if (ARequest.request.order == Qt::AscendingOrder)
+			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qLess<Message>());
+		else
+			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qGreater<Message>());
+
+		//if (ARequest.request.maxItems>0 && ARequest.body.messages.count()>ARequest.request.maxItems)
+		//	ARequest.body.messages = ARequest.body.messages.mid(0,ARequest.request.maxItems);
+
+		emit messagesLoaded(ALocalId,ARequest.body);
+	}
+	else
+	{
+		QString reqId = loadCollection(ARequest.streamJid,ARequest.headers.takeFirst());
+		if (!reqId.isEmpty())
+		{
+			FRequestId2LocalId.insert(reqId,ALocalId);
+		}
+		else
+		{
+			ARequest.lastError = tr("Failed to load messages collection");
+			processMessagesRequest(ALocalId,ARequest);
+		}
+	}
+}
+
+void MessageArchiver::onEngineRequestFailed(const QString &AId, const QString &AError)
+{
+	if (FRequestId2LocalId.contains(AId))
+	{
+		QString localId = FRequestId2LocalId.take(AId);
+		IArchiveEngine *engine = qobject_cast<IArchiveEngine *>(sender());
+		if (FHeadersRequests.contains(localId))
+		{
+			HeadersRequest &request = FHeadersRequests[localId];
+			request.lastError = AError;
+			request.engines.removeAll(engine);
+			processHeadersRequest(localId,request);
+		}
+		else if (FCollectionRequests.contains(localId))
+		{
+			CollectionRequest &request = FCollectionRequests[localId];
+			request.lastError = AError;
+			processCollectionRequest(localId,request);
+		}
+	}
+}
+
+void MessageArchiver::onEngineHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders)
+{
+	if (FRequestId2LocalId.contains(AId))
+	{
+		QString localId = FRequestId2LocalId.take(AId);
+		if (FHeadersRequests.contains(localId))
+		{
+			IArchiveEngine *engine = qobject_cast<IArchiveEngine *>(sender());
+			HeadersRequest &request = FHeadersRequests[localId];
+			request.headers.insert(engine,AHeaders);
+			processHeadersRequest(localId,request);
+		}
+	}
+}
+
+void MessageArchiver::onEngineCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection)
+{
+	if (FRequestId2LocalId.contains(AId))
+	{
+		QString localId = FRequestId2LocalId.take(AId);
+		if (FCollectionRequests.contains(localId))
+		{
+			CollectionRequest &request = FCollectionRequests[localId];
+			request.collection = ACollection;
+			processCollectionRequest(localId,request);
+		}
+	}
+}
+
+void MessageArchiver::onSelfRequestFailed(const QString &AId, const QString &AError)
+{
+	if (FRequestId2LocalId.contains(AId))
+	{
+		QString localId = FRequestId2LocalId.take(AId);
+		if (FMesssagesRequests.contains(localId))
+		{
+			MessagesRequest &request = FMesssagesRequests[localId];
+			request.lastError = AError;
+			processMessagesRequest(localId,request);
+		}
+	}
+}
+
+void MessageArchiver::onSelfHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders)
+{
+	if (FRequestId2LocalId.contains(AId))
+	{
+		QString localId = FRequestId2LocalId.take(AId);
+		if (FMesssagesRequests.contains(localId))
+		{
+			MessagesRequest &request = FMesssagesRequests[localId];
+			request.headers = AHeaders;
+			processMessagesRequest(localId,request);
+		}
+	}
+}
+
+void MessageArchiver::onSelfCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection)
+{
+	if (FRequestId2LocalId.contains(AId))
+	{
+		QString localId = FRequestId2LocalId.take(AId);
+		if (FMesssagesRequests.contains(localId))
+		{
+			MessagesRequest &request = FMesssagesRequests[localId];
+			request.body.messages += ACollection.body.messages;
+			request.body.notes += ACollection.body.notes;
+			processMessagesRequest(localId,request);
+		}
+	}
 }
 
 void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)

@@ -93,16 +93,6 @@ void WorkingThread::setArchiveRequest(const IArchiveRequest &ARequest)
 	FRequest = ARequest;
 }
 
-IArchiveResultSet WorkingThread::archiveResultSet() const
-{
-	return FResultSet;
-}
-
-void WorkingThread::setArchiveResultSet(const IArchiveResultSet &AResult)
-{
-	FResultSet = AResult;
-}
-
 int WorkingThread::modificationsCount() const
 {
 	return FModificationsCount;
@@ -167,21 +157,17 @@ void WorkingThread::run()
 		FHeaders.clear();
 		foreach(QString file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
 			FHeaders.append(FFileArchive->loadHeaderFromFile(file));
-		FResultSet.count = FHeaders.count();
 	}
 	else if (FAction == LoadCollection)
 	{
 		QString file = FFileArchive->collectionFilePath(FStreamJid,FHeader.with,FHeader.start);
 		FCollection = FFileArchive->loadCollectionFromFile(file);
-		if (FCollection.header.with.isValid() && FCollection.header.start.isValid())
-			FResultSet.count = FCollection.messages.count() + FCollection.notes.count();
-		else
+		if (!FCollection.header.with.isValid() || !FCollection.header.start.isValid())
 			setErrorString(tr("Failed to load collection from file"));
 	}
 	else if (FAction == LoadModifications)
 	{
 		FModifications = FFileArchive->loadFileModifications(FStreamJid,FModificationsStart,FModificationsCount);
-		FResultSet.count = FModifications.items.count();
 	}
 	else
 	{

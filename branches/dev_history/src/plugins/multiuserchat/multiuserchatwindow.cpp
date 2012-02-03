@@ -206,6 +206,8 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				if (!AMessage.body().isEmpty())
 				{
 					displayed = true;
+					if (FHistoryRequests.values().contains(NULL))
+						FPendingMessages[NULL].append(AMessage);
 					showUserMessage(AMessage,contactJid.resource());
 				}
 			}
@@ -215,6 +217,8 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				if (window)
 				{
 					displayed = true;
+					if (FHistoryRequests.values().contains(window))
+						FPendingMessages[window].append(AMessage);
 					showChatMessage(window,AMessage);
 				}
 			}
@@ -228,6 +232,8 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				if (window)
 				{
 					displayed = true;
+					if (FHistoryRequests.values().contains(window))
+						FPendingMessages[window].append(AMessage);
 					showChatMessage(window,AMessage);
 				}
 			}
@@ -633,7 +639,16 @@ void MultiUserChatWindow::initialize()
 
 	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
+	{
 		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+		if (FMessageArchiver)
+		{
+			connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
+				SLOT(onArchiveMessagesLoaded(const QString &, const IArchiveCollectionBody &)));
+			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
+				SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+		}
+	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
@@ -1229,7 +1244,7 @@ void MultiUserChatWindow::showTopic(const QString &ATopic)
 	FViewWidget->appendText(ATopic,options);
 }
 
-void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AType, int AStatus)
+void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AType, int AStatus, bool AArchive)
 {
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindStatus;
@@ -1240,7 +1255,7 @@ void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AType, 
 	options.time = QDateTime::currentDateTime();
 	options.timeFormat = FMessageStyles->timeFormat(options.time);
 
-	if (FMessageArchiver && Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS).value().toBool())
+	if (AArchive && FMessageArchiver && Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS).value().toBool())
 		FMessageArchiver->saveNote(FMultiChat->streamJid(), FMultiChat->roomJid(), AMessage);
 
 	showDateSeparator(FViewWidget,options.time);
@@ -1288,7 +1303,7 @@ void MultiUserChatWindow::showUserMessage(const Message &AMessage, const QString
 
 void MultiUserChatWindow::showHistory()
 {
-	if (FMessageArchiver)
+	if (FMessageArchiver && !FHistoryRequests.values().contains(NULL))
 	{
 		IArchiveRequest request;
 		request.with = FMultiChat->roomJid();
@@ -1296,22 +1311,11 @@ void MultiUserChatWindow::showHistory()
 		request.start = FWindowStatus.value(FViewWidget).createTime;
 		request.end = QDateTime::currentDateTime();
 
-		QList<Message> history;
-		QList<IArchiveHeader> headers;// = FMessageArchiver->loadLocalHeaders(FMultiChat->streamJid(), request);
-		for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
+		QString reqId = FMessageArchiver->loadMessages(FMultiChat->streamJid(),request);
+		if (!reqId.isEmpty())
 		{
-			if (headers.at(i).with.resource().isEmpty())
-			{
-				IArchiveCollection collection;// = FMessageArchiver->loadLocalCollection(FMultiChat->streamJid(), headers.at(i));
-				history = collection.messages + history;
-			}
-		}
-
-		showTopic(FMultiChat->subject());
-		for (int i=0; i<history.count(); i++)
-		{
-			Message message = history.at(i);
-			showUserMessage(message, Jid(message.from()).resource());
+			showStatusMessage(tr("Loading history..."),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,false);
+			FHistoryRequests.insert(reqId,NULL);
 		}
 	}
 }
@@ -1377,8 +1381,11 @@ void MultiUserChatWindow::setChatMessageStyle(IChatWindow *AWindow)
 	if (FMessageStyles && AWindow)
 	{
 		IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
-		AWindow->viewWidget()->setMessageStyle(style,soptions);
+		if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
+		{
+			IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
+			AWindow->viewWidget()->setMessageStyle(style,soptions);
+		}
 		FWindowStatus[AWindow->viewWidget()].lastDateSeparator = QDate();
 	}
 }
@@ -1440,7 +1447,7 @@ void MultiUserChatWindow::showChatMessage(IChatWindow *AWindow, const Message &A
 
 void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
 {
-	if (FMessageArchiver)
+	if (FMessageArchiver && !FHistoryRequests.values().contains(AWindow))
 	{
 		IArchiveRequest request;
 		request.with = AWindow->contactJid();
@@ -1449,7 +1456,7 @@ void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
 		WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
 		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) < HISTORY_TIME_PAST)
 		{
-			request.count = HISTORY_MESSAGES;
+			request.maxItems = HISTORY_MESSAGES;
 			request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
 		}
 		else
@@ -1458,21 +1465,12 @@ void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
 			request.end = QDateTime::currentDateTime();
 		}
 
-		QList<Message> history;
-		QList<IArchiveHeader> headers;// = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
-		for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
+		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
+		if (!reqId.isEmpty())
 		{
-			IArchiveCollection collection;// = FMessageArchiver->loadLocalCollection(AWindow->streamJid(), headers.at(i));
-			history = collection.messages + history;
+			showChatStatus(AWindow,tr("Loading history..."));
+			FHistoryRequests.insert(reqId,AWindow);
 		}
-
-		for (int i=0; i<history.count(); i++)
-		{
-			Message message = history.at(i);
-			showChatMessage(AWindow,message);
-		}
-
-		wstatus.startTime = history.value(0).dateTime();
 	}
 }
 
@@ -2095,6 +2093,8 @@ void MultiUserChatWindow::onChatWindowDestroyed()
 			delete FDestroyTimers.take(window);
 		FChatWindows.removeAt(FChatWindows.indexOf(window));
 		FWindowStatus.remove(window->viewWidget());
+		FPendingMessages.remove(window);
+		FHistoryRequests.remove(FHistoryRequests.key(window));
 		emit chatWindowDestroyed(window);
 	}
 }
@@ -2128,6 +2128,72 @@ void MultiUserChatWindow::onStyleOptionsChanged(const IMessageStyleOptions &AOpt
 			setMessageStyle();
 			showHistory();
 		}
+	}
+}
+
+void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody)
+{
+	if (FHistoryRequests.contains(AId))
+	{
+		IChatWindow *window = FHistoryRequests.take(AId);
+
+		if (window)
+			setChatMessageStyle(window);
+		else
+			setMessageStyle();
+
+		int messageIt = ABody.messages.count()-1;
+		QMultiMap<QDateTime,QString>::const_iterator noteIt = ABody.notes.constBegin();
+		while (messageIt>=0 || noteIt!=ABody.notes.constEnd())
+		{
+			if (messageIt>=0 && (noteIt==ABody.notes.constEnd() || ABody.messages.at(messageIt).dateTime()<noteIt.key()))
+			{
+				const Message &message = ABody.messages.at(messageIt);
+				if (window)
+					showChatMessage(window,message);
+				else
+					showUserMessage(message,Jid(message.from()).resource());
+				messageIt--;
+			}
+			else if (noteIt != ABody.notes.constEnd())
+			{
+				if (window)
+					showChatStatus(window,noteIt.value());
+				else
+					showStatusMessage(noteIt.value(),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,false);
+				noteIt++;
+			}
+		}
+
+		if (!window)
+			showTopic(FMultiChat->subject());
+
+		foreach(Message message, FPendingMessages.take(window))
+		{
+			if (window)
+				showChatMessage(window,message);
+			else
+				showUserMessage(message,Jid(message.from()).resource());
+		}
+
+		if (window)
+		{
+			WindowStatus &wstatus = FWindowStatus[window->viewWidget()];
+			wstatus.startTime = ABody.messages.value(0).dateTime();
+		}
+	}
+}
+
+void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const QString &AError)
+{
+	if (FHistoryRequests.contains(AId))
+	{
+		IChatWindow *window = FHistoryRequests.take(AId);
+		if (window)
+			showChatStatus(window,tr("Failed to load history: %1").arg(AError));
+		else
+			showStatusMessage(tr("Failed to load history: %1").arg(AError),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,false);
+		FPendingMessages.remove(window);
 	}
 }
 

@@ -34,8 +34,6 @@ public:
 	void setArchiveCollection(const IArchiveCollection &ACollection);
 	IArchiveRequest archiveRequest() const;
 	void setArchiveRequest(const IArchiveRequest &ARequest);
-	IArchiveResultSet archiveResultSet() const;
-	void setArchiveResultSet(const IArchiveResultSet &AResult);
 	int modificationsCount() const;
 	void setModificationsCount(int ACount);
 	QDateTime modificationsStart() const;
@@ -60,7 +58,6 @@ private:
 	IArchiveHeader FHeader;
 	IArchiveCollection FCollection;
 	IArchiveRequest FRequest;
-	IArchiveResultSet FResultSet;
 	QList<IArchiveHeader> FHeaders;
 	int FModificationsCount;
 	QDateTime FModificationsStart;
