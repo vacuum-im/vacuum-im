@@ -97,15 +97,16 @@ QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
 QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-	if (view && view->hasSelection())
-	{
 #if QT_VERSION >= 0x040800
+	if (view && view->hasSelection())
 		return QTextDocumentFragment::fromHtml(view->selectedHtml());
 #else
+	if (view && !view->page()->selectedText().isEmpty())
+	{
 		view->page()->triggerAction(QWebPage::Copy);
 		return QTextDocumentFragment::fromHtml(QApplication::clipboard()->mimeData()->html());
-#endif
 	}
+#endif
 	return QTextDocumentFragment();
 }
 
