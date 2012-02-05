@@ -294,6 +294,7 @@ bool BitsOfBinary::saveBinary(const QString &AContentId, const QString &AType, c
 			dataElem.appendChild(doc.createTextNode(AData.toBase64()));
 			if (file.write(doc.toByteArray()) > 0)
 			{
+				file.close();
 				emit binaryCached(AContentId,AType,AData,AMaxAge);
 				return true;
 			}
