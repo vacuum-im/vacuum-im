@@ -10,8 +10,6 @@ class WebPage :
 public:
 	WebPage(QObject *AParent = NULL);
 	~WebPage();
-	// QWebPage
-	virtual void triggerAction(WebAction AAction, bool AChecked = false);
 };
 
 #endif // WEBPAGE_H

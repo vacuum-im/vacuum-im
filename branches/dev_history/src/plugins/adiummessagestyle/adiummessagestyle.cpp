@@ -97,11 +97,16 @@ QString AdiumMessageStyle::senderColor(const QString &ASenderId) const
 QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+#if QT_VERSION >= 0x040800
+	if (view && view->hasSelection())
+		return QTextDocumentFragment::fromHtml(view->selectedHtml());
+#else
 	if (view && !view->page()->selectedText().isEmpty())
 	{
 		view->page()->triggerAction(QWebPage::Copy);
 		return QTextDocumentFragment::fromHtml(QApplication::clipboard()->mimeData()->html());
 	}
+#endif
 	return QTextDocumentFragment();
 }
 
@@ -110,12 +115,11 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
 	{
-		if (!FWidgetStatus.contains(AWidget))
+		if (!FWidgetStatus.contains(view))
 		{
 			AClean = true;
-			WidgetStatus &wstatus = FWidgetStatus[view];
-			wstatus.lastKind = -1;
-			wstatus.scrollStarted = false;
+			FWidgetStatus[view].wait = 0;
+			FWidgetStatus[view].scrollStarted = false;
 			view->installEventFilter(this);
 			connect(view,SIGNAL(linkClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
 			connect(view,SIGNAL(loadFinished(bool)),SLOT(onStyleWidgetLoadFinished(bool)));
@@ -130,10 +134,13 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 		if (AClean)
 		{
 			WidgetStatus &wstatus = FWidgetStatus[view];
-			wstatus.ready = false;
+			wstatus.wait++;
+			wstatus.pending.clear();
+			wstatus.lastKind = -1;
+			wstatus.lastId = QString::null;
+			wstatus.lastTime = QDateTime();
 			QString html = makeStyleTemplate(AOptions);
 			fillStyleKeywords(html,AOptions);
-			wstatus.styleTemplate = html;
 			view->setHtml(html);
 		}
 		else
@@ -172,10 +179,10 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		escapeStringForScript(html);
 		QString script = scriptForAppendContent(sameSender,AOptions.noScroll).arg(html);
 
-		if (wstatus.ready)
-			view->page()->mainFrame()->evaluateJavaScript(script);
-		else
+		if (wstatus.wait > 0)
 			wstatus.pending.append(script);
+		else
+			view->page()->mainFrame()->evaluateJavaScript(script);
 
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
@@ -690,23 +697,20 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 	if (view)
 	{
 		WidgetStatus &wstatus = FWidgetStatus[view];
-		if (AOk)
+		if (--wstatus.wait == 0)
 		{
-			foreach(QString script, wstatus.pending)
-				view->page()->mainFrame()->evaluateJavaScript(script);
-			view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
-			wstatus.ready = true;
-			wstatus.pending.clear();
-			wstatus.styleTemplate.clear();
-		}
-		else if (!wstatus.styleTemplate.isEmpty())
-		{
-			view->setHtml(wstatus.styleTemplate);
-			wstatus.styleTemplate.clear();
-		}
-		else
-		{
-			view->setHtml("Style Template Load Error!");
+			if (AOk)
+			{
+				foreach(QString script, wstatus.pending)
+					view->page()->mainFrame()->evaluateJavaScript(script);
+				view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
+				wstatus.pending.clear();
+			}
+			else
+			{
+				wstatus.wait++;
+				view->setHtml("Style Template Load Error!");
+			}
 		}
 	}
 }

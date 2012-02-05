@@ -88,7 +88,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 	{
 		if (!FWidgetStatus.contains(view))
 		{
-			FWidgetStatus[view].lastKind = -1;
+			AClean = true;
 			FWidgetStatus[view].scrollStarted = false;
 			view->installEventFilter(this);
 			connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
@@ -102,6 +102,10 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 
 		if (AClean)
 		{
+			WidgetStatus &wstatus = FWidgetStatus[view];
+			wstatus.lastKind = -1;
+			wstatus.lastId = QString::null;
+			wstatus.lastTime = QDateTime();
 			setVariant(AWidget, AOptions.extended.value(MSO_VARIANT).toString());
 			QString html = makeStyleTemplate();
 			fillStyleKeywords(html,AOptions);
