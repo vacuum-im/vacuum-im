@@ -115,13 +115,11 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
 	{
-		if (!FWidgetStatus.contains(AWidget))
+		if (!FWidgetStatus.contains(view))
 		{
 			AClean = true;
-			WidgetStatus &wstatus = FWidgetStatus[view];
-			wstatus.wait = 0;
-			wstatus.lastKind = -1;
-			wstatus.scrollStarted = false;
+			FWidgetStatus[view].wait = 0;
+			FWidgetStatus[view].scrollStarted = false;
 			view->installEventFilter(this);
 			connect(view,SIGNAL(linkClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
 			connect(view,SIGNAL(loadFinished(bool)),SLOT(onStyleWidgetLoadFinished(bool)));
@@ -138,6 +136,9 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 			WidgetStatus &wstatus = FWidgetStatus[view];
 			wstatus.wait++;
 			wstatus.pending.clear();
+			wstatus.lastKind = -1;
+			wstatus.lastId = QString::null;
+			wstatus.lastTime = QDateTime();
 			QString html = makeStyleTemplate(AOptions);
 			fillStyleKeywords(html,AOptions);
 			view->setHtml(html);
