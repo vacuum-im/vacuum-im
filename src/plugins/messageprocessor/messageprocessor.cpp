@@ -94,13 +94,15 @@ void MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 	}
 	else if (AOrder == MWO_MESSAGEPROCESSOR_ANCHORS)
 	{
-		QRegExp regexp("\\b((https?|ftp)://|www.|xmpp:)\\S+");
+		QRegExp regexp("\\b((https?|ftp)://|www\\.|xmpp:)\\S+");
 		regexp.setCaseSensitivity(Qt::CaseInsensitive);
 		for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
 		{
+			QUrl link = cursor.selectedText();
+			link.setScheme(!link.scheme().isEmpty() ? link.scheme() : "http");
 			QTextCharFormat linkFormat = cursor.charFormat();
 			linkFormat.setAnchor(true);
-			linkFormat.setAnchorHref(cursor.selectedText());
+			linkFormat.setAnchorHref(link.toString());
 			cursor.setCharFormat(linkFormat);
 		}
 	}
