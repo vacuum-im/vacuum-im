@@ -98,8 +98,7 @@ void MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 		regexp.setCaseSensitivity(Qt::CaseInsensitive);
 		for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
 		{
-			QUrl link = cursor.selectedText();
-			link.setScheme(!link.scheme().isEmpty() ? link.scheme() : "http");
+			QUrl link = QUrl::fromUserInput(cursor.selectedText());
 			QTextCharFormat linkFormat = cursor.charFormat();
 			linkFormat.setAnchor(true);
 			linkFormat.setAnchorHref(link.toString());
