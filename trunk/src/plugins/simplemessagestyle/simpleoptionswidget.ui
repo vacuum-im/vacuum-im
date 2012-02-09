@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>434</width>
-    <height>101</height>
+    <height>125</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -160,6 +160,13 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QCheckBox" name="chkEnableAnimation">
+     <property name="text">
+      <string>Enable animation (may be slow)</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

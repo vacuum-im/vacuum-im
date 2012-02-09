@@ -47,6 +47,10 @@
         <source>Activate Notification</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Enable animation in notification pop-up</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>

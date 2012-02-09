@@ -5,7 +5,7 @@ TARGET             = $$TARGET_UTILS
 TEMPLATE           = lib
 VERSION            = $$VERSION_UTILS
 CONFIG            += dll
-QT                += xml
+QT                += xm networkl
 DEFINES           += UTILS_DLL QXT_STATIC
 
 DEPENDPATH        += ..

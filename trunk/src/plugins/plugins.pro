@@ -60,3 +60,4 @@ SUBDIRS += remotecontrol
 SUBDIRS += pepmanager
 SUBDIRS += shortcutmanager 
 SUBDIRS += birthdayreminder 
+SUBDIRS += urlprocessor

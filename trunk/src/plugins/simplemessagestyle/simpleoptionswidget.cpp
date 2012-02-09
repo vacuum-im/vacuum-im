@@ -32,6 +32,7 @@ SimpleOptionsWidget::SimpleOptionsWidget(SimpleMessageStylePlugin *APlugin, cons
 	connect(ui.tlbDefaultFont,SIGNAL(clicked()),SLOT(onDefaultFontClicked()));
 	connect(ui.tlbSetImage,SIGNAL(clicked()),SLOT(onSetImageClicked()));
 	connect(ui.tlbDefaultImage,SIGNAL(clicked()),SLOT(onDefaultImageClicked()));
+	connect(ui.chkEnableAnimation,SIGNAL(stateChanged(int)),SLOT(onAnimationEnableToggled(int)));
 
 	reset();
 }
@@ -44,12 +45,14 @@ SimpleOptionsWidget::~SimpleOptionsWidget()
 void SimpleOptionsWidget::apply(OptionsNode ANode)
 {
 	OptionsNode node = ANode.isNull() ? FOptions : ANode;
+
 	node.setValue(FStyleOptions.extended.value(MSO_STYLE_ID),"style-id");
 	node.setValue(FStyleOptions.extended.value(MSO_VARIANT),"variant");
 	node.setValue(FStyleOptions.extended.value(MSO_FONT_FAMILY),"font-family");
 	node.setValue(FStyleOptions.extended.value(MSO_FONT_SIZE),"font-size");
 	node.setValue(FStyleOptions.extended.value(MSO_BG_COLOR),"bg-color");
 	node.setValue(FStyleOptions.extended.value(MSO_BG_IMAGE_FILE),"bg-image-file");
+	node.setValue(FStyleOptions.extended.value(MSO_ANIMATION_ENABLE),"animation-enable");
 	emit childApply();
 }
 
@@ -66,6 +69,7 @@ void SimpleOptionsWidget::reset()
 	ui.cmbStyle->setCurrentIndex(ui.cmbStyle->findData(FStyleOptions.extended.value(MSO_STYLE_ID)));
 	ui.cmbVariant->setCurrentIndex(ui.cmbVariant->findData(FStyleOptions.extended.value(MSO_VARIANT)));
 	ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
+	ui.chkEnableAnimation->setChecked(FStyleOptions.extended.value(MSO_ANIMATION_ENABLE).toBool());
 	updateOptionsWidgets();
 
 	connect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),SLOT(onVariantChanged(int)));
@@ -178,5 +182,11 @@ void SimpleOptionsWidget::onDefaultImageClicked()
 	ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
 
 	updateOptionsWidgets();
+	emit modified();
+}
+
+void SimpleOptionsWidget::onAnimationEnableToggled(int AState)
+{
+	FStyleOptions.extended.insert(MSO_ANIMATION_ENABLE, AState==Qt::Checked);
 	emit modified();
 }

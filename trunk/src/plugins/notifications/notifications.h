@@ -26,6 +26,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/iurlprocessor.h>
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
@@ -137,6 +138,7 @@ private:
 	IRostersViewPlugin *FRostersViewPlugin;
 	IOptionsManager *FOptionsManager;
 	IMainWindowPlugin *FMainWindowPlugin;
+	IUrlProcessor *FUrlProcessor;
 private:
 	Menu *FNotifyMenu;
 	Action *FSoundOnOff;
@@ -150,6 +152,7 @@ private:
 	QMap<int, NotifyRecord> FNotifyRecords;
 	mutable QMap<QString, TypeRecord> FTypeRecords;
 	QMultiMap<int, INotificationHandler *> FHandlers;
+	QNetworkAccessManager *FNetworkAccessManager;
 };
 
 #endif // NOTIFICATIONS_H

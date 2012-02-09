@@ -2,11 +2,13 @@
 
 #include <QAbstractTextDocumentLayout>
 
-NotifyTextBrowser::NotifyTextBrowser(QWidget *AParent) : QTextBrowser(AParent)
+NotifyTextBrowser::NotifyTextBrowser(QWidget *AParent) : AnimatedTextBrowser(AParent)
 {
 	setFixedHeight(0);
 	FMaxHeight = QWIDGETSIZE_MAX;
 	connect(this,SIGNAL(textChanged()),SLOT(onTextChanged()),Qt::QueuedConnection);
+	connect(this,SIGNAL(resourceLoaded(QUrl)),SLOT(onTextChanged()),Qt::QueuedConnection);
+	connect(this,SIGNAL(resourceAdded(QUrl)),SLOT(onTextChanged()),Qt::QueuedConnection);
 }
 
 NotifyTextBrowser::~NotifyTextBrowser()

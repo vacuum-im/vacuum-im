@@ -4,9 +4,10 @@
 #include <QTimer>
 #include <QCoreApplication>
 
-SimpleMessageStylePlugin::SimpleMessageStylePlugin()
+SimpleMessageStylePlugin::SimpleMessageStylePlugin(): FNetworkAccessManager(NULL)
 {
-
+	FUrlProcessor = NULL;
+	FNetworkAccessManager = NULL;
 }
 
 SimpleMessageStylePlugin::~SimpleMessageStylePlugin()
@@ -25,13 +26,20 @@ void SimpleMessageStylePlugin::pluginInfo(IPluginInfo *APluginInfo)
 
 bool SimpleMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-	Q_UNUSED(APluginManager);
 	Q_UNUSED(AInitOrder);
+
+	IPlugin *plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
+	if (plugin)
+	{
+		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
+
 	return true;
 }
 
 bool SimpleMessageStylePlugin::initObjects()
 {
+	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
 	updateAvailStyles();
 	return true;
 }
@@ -60,7 +68,7 @@ IMessageStyle *SimpleMessageStylePlugin::styleForOptions(const IMessageStyleOpti
 		QString stylePath = FStylePaths.value(styleId);
 		if (!stylePath.isEmpty())
 		{
-			SimpleMessageStyle *style = new SimpleMessageStyle(stylePath,this);
+			SimpleMessageStyle *style = new SimpleMessageStyle(stylePath, FNetworkAccessManager, this);
 			if (style->isValid())
 			{
 				FStyles.insert(styleId,style);
@@ -89,6 +97,7 @@ IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(const OptionsNode &A
 	soptions.extended.insert(MSO_FONT_SIZE,ANode.value("font-size"));
 	soptions.extended.insert(MSO_BG_COLOR,ANode.value("bg-color"));
 	soptions.extended.insert(MSO_BG_IMAGE_FILE,ANode.value("bg-image-file"));
+	soptions.extended.insert(MSO_ANIMATION_ENABLE,ANode.value("animation-enable"));
 
 	if (!FStylePaths.isEmpty() && !FStylePaths.contains(styleId.toString()))
 	{

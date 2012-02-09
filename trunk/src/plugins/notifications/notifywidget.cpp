@@ -115,6 +115,16 @@ void NotifyWidget::animateTo(int AYPos)
 	}
 }
 
+void NotifyWidget::setAnimated(bool AAnimated)
+{
+	ui.ntbText->setAnimated(AAnimated);
+}
+
+void NotifyWidget::setNetworkAccessManager(QNetworkAccessManager *ANetworkAccessManager)
+{
+	ui.ntbText->setNetworkAccessManager(ANetworkAccessManager);
+}
+
 void NotifyWidget::resizeEvent(QResizeEvent *AEvent)
 {
 	QWidget::resizeEvent(AEvent);

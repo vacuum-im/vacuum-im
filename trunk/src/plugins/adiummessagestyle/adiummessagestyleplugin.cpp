@@ -6,7 +6,8 @@
 
 AdiumMessageStylePlugin::AdiumMessageStylePlugin()
 {
-
+	FUrlProcessor = NULL;
+	FNetworkAccessManager = NULL;
 }
 
 AdiumMessageStylePlugin::~AdiumMessageStylePlugin()
@@ -14,7 +15,7 @@ AdiumMessageStylePlugin::~AdiumMessageStylePlugin()
 
 }
 
-void AdiumMessageStylePlugin::pluginInfo( IPluginInfo *APluginInfo )
+void AdiumMessageStylePlugin::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Adium Message Style");
 	APluginInfo->description = tr("Allows to use a Adium style in message design");
@@ -25,13 +26,20 @@ void AdiumMessageStylePlugin::pluginInfo( IPluginInfo *APluginInfo )
 
 bool AdiumMessageStylePlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-	Q_UNUSED(APluginManager);
 	Q_UNUSED(AInitOrder);
+
+	IPlugin *plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
+	if (plugin)
+	{
+		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
+
 	return true;
 }
 
 bool AdiumMessageStylePlugin::initObjects()
 {
+	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
 	updateAvailStyles();
 	return true;
 }
@@ -60,7 +68,7 @@ IMessageStyle *AdiumMessageStylePlugin::styleForOptions(const IMessageStyleOptio
 		QString stylePath = FStylePaths.value(styleId);
 		if (!stylePath.isEmpty())
 		{
-			AdiumMessageStyle *style = new AdiumMessageStyle(stylePath,this);
+			AdiumMessageStyle *style = new AdiumMessageStyle(stylePath, FNetworkAccessManager, this);
 			if (style->isValid())
 			{
 				FStyles.insert(styleId,style);

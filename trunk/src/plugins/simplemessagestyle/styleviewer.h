@@ -2,16 +2,17 @@
 #define STYLEVIEWER_H
 
 #include <QTextBrowser>
+#include <utils/animatedtextbrowser.h>
 
-class StyleViewer :
-			public QTextBrowser
+class StyleViewer: 
+	public AnimatedTextBrowser
 {
 	Q_OBJECT;
 public:
 	StyleViewer(QWidget *AParent);
 	~StyleViewer();
 protected:
-   void mouseReleaseEvent(QMouseEvent *AEvent);
+	void mouseReleaseEvent(QMouseEvent *AEvent);
 };
 
 #endif // STYLEVIEWER_H

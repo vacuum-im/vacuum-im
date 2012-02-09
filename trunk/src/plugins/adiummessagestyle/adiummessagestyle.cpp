@@ -44,11 +44,13 @@ static const char *SenderColors[] =  {
 
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
 
-AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QObject *AParent) : QObject(AParent)
+AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
 {
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
 	FResourcePath = AStylePath+"/"STYLE_RESOURCES_PATH;
+	FNetworkAccessManager = ANetworkAccessManager;
+
 	initStyleSettings();
 	loadTemplates();
 	loadSenderColors();
@@ -83,6 +85,8 @@ QList<QWidget *> AdiumMessageStyle::styleWidgets() const
 QWidget *AdiumMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
 	StyleViewer *view = new StyleViewer(AParent);
+	if (FNetworkAccessManager)
+		view->page()->setNetworkAccessManager(FNetworkAccessManager);
 	changeOptions(view,AOptions,true);
 	return view;
 }

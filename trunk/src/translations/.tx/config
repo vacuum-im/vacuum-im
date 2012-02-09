@@ -249,3 +249,6 @@ source_lang = ru
 file_filter = <lang>/commands.ts
 source_lang = ru
 
+[vacuum-im.urlprocessor]
+file_filter = <lang>/urlprocessor.ts
+source_lang = ru

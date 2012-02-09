@@ -80,5 +80,9 @@
         <source>Set Image...</source>
         <translation>Зображення...</translation>
     </message>
+    <message>
+        <source>Enable animation (may be slow)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

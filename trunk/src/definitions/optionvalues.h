@@ -137,11 +137,14 @@
 #define OPV_MESSAGESTYLE_STYLE_BGCOLOR                  "message-styles.message-type.context.style.bg-color"
 #define OPV_MESSAGESTYLE_STYLE_BGIMAGEFILE              "message-styles.message-type.context.style.bg-image-file"
 #define OPV_MESSAGESTYLE_STYLE_BGIMAGELAYOUT            "message-styles.message-type.context.style.bg-image-layout"
+#define OPV_MESSAGESTYLE_STYLE_ANIMATIONENABLE          "message-styles.message-type.context.style.animation-enable"
 
 // OptionsManager
 #define OPV_MISC_ROOT                                   "misc"
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
+// UrlProcessor
+#define OPV_MISC_URLPROXY                               "misc.url-proxy"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
@@ -151,6 +154,7 @@
 #define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
 #define OPV_NOTIFICATIONS_KINDENABLED_ITEM              "notifications.kind-enabled.kind"
+#define OPV_NOTIFICATIONS_ANIMATIONENABLE               "notifications.animation-enable"
 
 // ConnectionManager
 #define OPV_PROXY_ROOT                                  "proxy"
