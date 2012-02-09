@@ -3,6 +3,7 @@
 
 #include <QMouseEvent>
 #include <QDesktopWidget>
+#include <QNetworkAccessManager>
 #include <definitions/optionvalues.h>
 #include <definitions/notificationdataroles.h>
 #include <interfaces/inotifications.h>
@@ -20,6 +21,8 @@ public:
 	~NotifyWidget();
 	void appear();
 	void animateTo(int AYPos);
+	void setAnimated(bool AAnimated);
+	void setNetworkAccessManager(QNetworkAccessManager *ANetworkAccessManager);
 signals:
 	void notifyActivated();
 	void notifyRemoved();

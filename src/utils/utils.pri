@@ -19,8 +19,8 @@ HEADERS  = utilsexport.h \
            options.h \
            shortcuts.h \
            systemmanager.h \
-           textmanager.h
-          
+           textmanager.h \
+           animatedtextbrowser.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -42,4 +42,5 @@ SOURCES  = jid.cpp \
            options.cpp \
            shortcuts.cpp \
            systemmanager.cpp \
-           textmanager.cpp
+           textmanager.cpp \
+           animatedtextbrowser.cpp

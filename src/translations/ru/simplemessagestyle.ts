@@ -80,5 +80,9 @@
         <source>Set Image...</source>
         <translation>Изображение...</translation>
     </message>
+    <message>
+        <source>Enable animation (may be slow)</source>
+        <translation>Разрешить анимацию (может подтормаживать)</translation>
+    </message>
 </context>
 </TS>

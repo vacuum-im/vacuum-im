@@ -3,6 +3,7 @@
 
 #include <QList>
 #include <QTimer>
+#include <QNetworkAccessManager>
 #include <definitions/resources.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/filestorage.h>
@@ -55,6 +56,7 @@
 #define MSO_FONT_SIZE                       "fontSize"
 #define MSO_BG_COLOR                        "bgColor"
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
+#define MSO_ANIMATION_ENABLE                "animationEnable"
 
 struct MessageContentOptions;
 
@@ -72,7 +74,7 @@ public:
 		bool scrollStarted;
 	};
 public:
-	SimpleMessageStyle(const QString &AStylePath, QObject *AParent);
+	SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent);
 	~SimpleMessageStyle();
 	//IMessageStyle
 	virtual QObject *instance() { return this; }
@@ -133,6 +135,7 @@ private:
 	QList<QString> FSenderColors;
 	QMap<QString, QVariant> FInfo;
 	QMap<QWidget *, WidgetStatus> FWidgetStatus;
+	QNetworkAccessManager *FNetworkAccessManager;
 };
 
 #endif // SIMPLEMESSAGESTYLE_H

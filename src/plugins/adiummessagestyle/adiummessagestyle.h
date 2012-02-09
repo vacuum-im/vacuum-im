@@ -4,6 +4,7 @@
 #include <QList>
 #include <QTimer>
 #include <QWebView>
+#include <QNetworkAccessManager>
 #include <definitions/resources.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/filestorage.h>
@@ -106,7 +107,7 @@ public:
 		QList<QString> pending;
 	};
 public:
-	AdiumMessageStyle(const QString &AStylePath, QObject *AParent);
+	AdiumMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent);
 	~AdiumMessageStyle();
 	//IMessageStyle
 	virtual QObject *instance() { return this; }
@@ -176,6 +177,7 @@ private:
 	QList<QString> FSenderColors;
 	QMap<QString, QVariant> FInfo;
 	QMap<QWidget *, WidgetStatus> FWidgetStatus;
+	QNetworkAccessManager *FNetworkAccessManager;
 };
 
 #endif // ADIUMMESSAGESTYLE_H

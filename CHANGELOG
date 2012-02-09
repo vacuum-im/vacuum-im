@@ -9,6 +9,7 @@ LEGEND
 
 ------
   [!] Added new plugin for notifications about birthdays
+  [!] Added new plugin for loading data from custom types of URLs
   [+] Added ability to show a minimized window with the message when notification received
   [+] Added date separators in chat windows and conferences
   [+] Added ability to remove transpots with their contacts from roster
@@ -20,6 +21,7 @@ LEGEND
   [*] Added ability to execute operations on multiple items in roster
   [*] Notification of request for authorization is now deleted automatically in case of confirmation or removal of authorization from another resource
   [*] Added support for transferring files via SOCKS5 in conferences
+  [*] Added animation support in SimpleMessageStyles and notification pop-ups
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
   [-] Fixed bug in Digest-MD5 authorization for which was not possible to log on some servers
   [-] When leaving the hidden conferences also closed the conference on non-active tabs

@@ -2,9 +2,10 @@
 #define NOTIFYTEXTBROWSER_H
 
 #include <QTextBrowser>
+#include <utils/animatedtextbrowser.h>
 
 class NotifyTextBrowser : 
-	public QTextBrowser
+	public AnimatedTextBrowser
 {
 	Q_OBJECT;
 public:

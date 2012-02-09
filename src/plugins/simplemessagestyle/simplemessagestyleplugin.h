@@ -5,6 +5,7 @@
 #include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestyles.h>
+#include <interfaces/iurlprocessor.h>
 #include <utils/message.h>
 #include <utils/options.h>
 #include "simplemessagestyle.h"
@@ -54,8 +55,11 @@ protected slots:
 	void onStyleWidgetRemoved(QWidget *AWidget);
 	void onClearEmptyStyles();
 private:
+	IUrlProcessor *FUrlProcessor;
+private:
 	QMap<QString, QString> FStylePaths;
 	QMap<QString, SimpleMessageStyle *> FStyles;
+	QNetworkAccessManager *FNetworkAccessManager;
 };
 
 #endif // SIMPLEMESSAGESTYLEPLUGIN_H

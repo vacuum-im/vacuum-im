@@ -39,6 +39,7 @@ protected slots:
 	void onBackgroundColorChanged(int AIndex);
 	void onSetImageClicked();
 	void onDefaultImageClicked();
+	void onAnimationEnableToggled(int AState);
 private:
 	Ui::SimpleOptionsWidgetClass ui;
 private:

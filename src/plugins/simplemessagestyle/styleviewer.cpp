@@ -4,7 +4,7 @@
 #include <QMouseEvent>
 #include <QTextDocumentFragment>
 
-StyleViewer::StyleViewer(QWidget *AParent) : QTextBrowser(AParent)
+StyleViewer::StyleViewer(QWidget *AParent) : AnimatedTextBrowser(AParent)
 {
 	setOpenLinks(false);
 	setAcceptDrops(false);

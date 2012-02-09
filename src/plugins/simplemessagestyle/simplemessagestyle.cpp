@@ -25,11 +25,13 @@ static const char *SenderColors[] =  {
 
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
 
-SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QObject *AParent) : QObject(AParent)
+SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
 {
 	FStylePath = AStylePath;
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
+	FNetworkAccessManager=ANetworkAccessManager;
+
 	initStyleSettings();
 	loadTemplates();
 	loadSenderColors();
@@ -64,6 +66,7 @@ QList<QWidget *> SimpleMessageStyle::styleWidgets() const
 QWidget *SimpleMessageStyle::createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent)
 {
 	StyleViewer *view = new StyleViewer(AParent);
+	view->setNetworkAccessManager(FNetworkAccessManager);
 	changeOptions(view,AOptions,true);
 	return view;
 }
@@ -120,6 +123,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 		if (!fontFamily.isEmpty())
 			font.setFamily(fontFamily);
 		view->document()->setDefaultFont(font);
+		view->setAnimated(AOptions.extended.value(MSO_ANIMATION_ENABLE).toBool());
 
 		emit optionsChanged(AWidget,AOptions,AClean);
 		return true;

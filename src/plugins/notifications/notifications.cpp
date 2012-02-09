@@ -19,10 +19,12 @@ Notifications::Notifications()
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
 	FMainWindowPlugin = NULL;
+	FUrlProcessor = NULL;
 
 	FActivateLast = NULL;
 	FRemoveAll = NULL;
 	FNotifyMenu = NULL;
+	FNetworkAccessManager = NULL;
 
 	FNotifyId = 0;
 	FSound = NULL;
@@ -101,6 +103,12 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOr
 	if (plugin)
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 
+	plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
+	if (plugin)
+	{
+		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
+
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
@@ -150,6 +158,8 @@ bool Notifications::initObjects()
 		FMainWindowPlugin->mainWindow()->topToolBarChanger()->insertAction(FSoundOnOff,TBG_MWTTB_NOTIFICATIONS_SOUND);
 	}
 
+	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
+
 	return true;
 }
 
@@ -161,6 +171,7 @@ bool Notifications::initSettings()
 	Options::setDefaultValue(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,0);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_KINDENABLED_ITEM,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUNDCOMMAND,QString("aplay"));
+	Options::setDefaultValue(OPV_NOTIFICATIONS_ANIMATIONENABLE,true);
 
 	if (FOptionsManager)
 	{
@@ -186,6 +197,7 @@ QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &AN
 	{
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE),tr("Enable animation in notification pop-up"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new NotifyOptionsWidget(this,AParent));
 	}
 	return widgets;
@@ -241,10 +253,12 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
-			record.popupWidget = new NotifyWidget(record.notification);
+			record.popupWidget = new NotifyWidget(record.notification);                                                
 			connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
 			connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
 			connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
+			record.popupWidget->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
+			record.popupWidget->setNetworkAccessManager(FNetworkAccessManager);
 			record.popupWidget->appear();
 		}
 	}

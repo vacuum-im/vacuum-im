@@ -47,6 +47,10 @@
         <source>Activate Notification</source>
         <translation>Активировать уведомление</translation>
     </message>
+    <message>
+        <source>Enable animation in notification pop-up</source>
+        <translation>Разрешить анимацию во всплывающем окне</translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>
