@@ -8,6 +8,7 @@ include("utils.cmake")
 project(${TARGET_UTILS})
 
 set(QT_USE_QTXML YES)
+set(QT_USE_QTNETWORK YES)
 include(${QT_USE_FILE})
 
 add_definitions("-DUTILS_DLL")
