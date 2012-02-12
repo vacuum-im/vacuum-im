@@ -176,7 +176,11 @@ void AnimatedTextBrowser::onUpdateDocumentAnimation()
 	if (isVisible())
 	{
 		static const int minUpdateTimeout = qRound(1000/15.0);
-		qint64 timeout = FLastUpdate.isValid() ? FLastUpdate.msecsTo(QDateTime::currentDateTime()) : minUpdateTimeout;
+#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
+		qint64 timeout = FLastUpdate.isValid() ? qAbs(FLastUpdate.msecsTo(QDateTime::currentDateTime())) : minUpdateTimeout;
+#else
+		qint64 timeout = FLastUpdate.isValid() ? qAbs(FLastUpdate.time().msecsTo(QDateTime::currentDateTime().time())) : minUpdateTimeout;
+#endif
 		if (timeout >= minUpdateTimeout)
 		{
 			QList<int> dirtyBlocks;
