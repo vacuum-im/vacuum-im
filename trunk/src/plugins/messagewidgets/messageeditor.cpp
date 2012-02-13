@@ -75,7 +75,7 @@ QMimeData *MessageEditor::createMimeDataFromSelection() const
 	return data;
 }
 
-bool MessageEditor::canInsertFromMimeData(const QMimeData *ASource)
+bool MessageEditor::canInsertFromMimeData(const QMimeData *ASource) const
 {
 	bool canInsert = false;
 	emit canInsertDataRequest(ASource,canInsert);

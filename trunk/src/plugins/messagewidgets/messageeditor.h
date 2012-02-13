@@ -26,7 +26,7 @@ protected:
 	int textHeight(int ALines = 0) const;
 protected:
 	virtual QMimeData *createMimeDataFromSelection() const;
-	virtual bool canInsertFromMimeData(const QMimeData *ASource);
+	virtual bool canInsertFromMimeData(const QMimeData *ASource) const;
 	virtual void insertFromMimeData(const QMimeData *ASource);
 protected slots:
 	void onTextChanged();
