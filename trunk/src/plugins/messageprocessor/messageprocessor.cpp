@@ -94,7 +94,7 @@ void MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 	}
 	else if (AOrder == MWO_MESSAGEPROCESSOR_ANCHORS)
 	{
-		QRegExp regexp("\\b((https?|ftp)://|www\\.|xmpp:)\\S+");
+		QRegExp regexp("\\b((https?|ftp)://|www\\.|xmpp:|magnet:)\\S+");
 		regexp.setCaseSensitivity(Qt::CaseInsensitive);
 		for (QTextCursor cursor = ADocument->find(regexp); !cursor.isNull();  cursor = ADocument->find(regexp,cursor))
 		{
