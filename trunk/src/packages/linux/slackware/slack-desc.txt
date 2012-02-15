@@ -1,0 +1,10 @@
+VacuumIM: Vacum-IM Jabber Client
+VacuumIM:
+VacuumIM:
+VacuumIM:
+VacuumIM:
+VacuumIM:
+VacuumIM:
+VacuumIM:
+VacuumIM: Package created by Oleg A. Deordiev
+VacuumIM:
