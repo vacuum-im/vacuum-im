@@ -115,7 +115,8 @@ bool MessageProcessor::sendMessage(const Jid &AStreamJid, Message &AMessage, int
 	{
 		if (ADirection == IMessageProcessor::MessageOut)
 		{
-			if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(AStreamJid,AMessage.stanza()))
+			Stanza stanza = AMessage.stanza(); // Ignore changes in StanzaProcessor
+			if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(AStreamJid,stanza))
 			{
 				displayMessage(AStreamJid,AMessage,ADirection);
 				emit messageSent(AMessage);
