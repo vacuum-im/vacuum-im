@@ -95,7 +95,7 @@ then
 	exit 1
 fi
 
-if [ ! -f $builddir ]
+if [ ! -d $builddir ]
 then
 	mkdir -p $builddir
 fi
