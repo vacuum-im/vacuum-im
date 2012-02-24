@@ -22,7 +22,7 @@ void MessageData::updateDateTime()
 {
 	FDateTime = QDateTime::currentDateTime();
 
-	QDomElement delayElem = FStanza.firstElement("x","urn:xmpp:delay");
+	QDomElement delayElem = FStanza.firstElement("delay","urn:xmpp:delay");
 	if (delayElem.isNull())
 		delayElem = FStanza.firstElement("x","jabber:x:delay");
 	if (!delayElem.isNull())
