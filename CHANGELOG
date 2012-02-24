@@ -32,6 +32,7 @@ LEGEND
   [-] Establishing a connection when transferring files could take up too much time
   [-] File transfer could hang up from the cancellation of the transfer by the initiator
   [-] Exchanging of chat state information with contact was disabled after receiving offline stored message from it
+  [-] The time of the delayed messages was not defined if it was send by XEP-0203: Delayed Delivery
 
 
 v1.1.0
