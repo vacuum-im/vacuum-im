@@ -41,6 +41,7 @@
 #include <utils/widgetmanager.h>
 #include "archiveoptions.h"
 #include "chatwindowmenu.h"
+#include "archiveviewwindow.h"
 
 struct StanzaSession {
 	QString sessionId;
@@ -113,7 +114,8 @@ public:
 	virtual QString methodName(const QString &AMethod) const;
 	virtual QString otrModeName(const QString &AOTRMode) const;
 	virtual QString saveModeName(const QString &ASaveMode) const;
-   //Preferences
+	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null);
+  //Preferences
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto);

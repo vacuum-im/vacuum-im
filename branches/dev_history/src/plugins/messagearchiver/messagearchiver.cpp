@@ -661,6 +661,19 @@ QString MessageArchiver::saveModeName(const QString &ASaveMode) const
 		return tr("Unknown");
 }
 
+QWidget *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid)
+{
+	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+	if (roster)
+	{
+		ArchiveViewWindow *window = new ArchiveViewWindow(FPluginManager,this,roster);
+		window->setContactJid(AContactJid);
+		WidgetManager::showActivateRaiseWindow(window);
+		return window;
+	}
+	return NULL;
+}
+
 IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
 {
 	return FArchivePrefs.value(AStreamJid);

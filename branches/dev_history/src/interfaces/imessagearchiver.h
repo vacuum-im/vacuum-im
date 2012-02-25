@@ -205,6 +205,7 @@ public:
 	virtual QString methodName(const QString &AMethod) const =0;
 	virtual QString otrModeName(const QString &AOTRMode) const =0;
 	virtual QString saveModeName(const QString &ASaveMode) const =0;
+	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) =0;
 	//Archive Preferences
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
