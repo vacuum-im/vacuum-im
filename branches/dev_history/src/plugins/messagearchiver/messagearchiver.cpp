@@ -293,7 +293,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		{
 			bool autoSave = FPrefsAutoRequests.value(AStanza.id());
 			FArchivePrefs[AStreamJid].autoSave = autoSave;
-			
+
 			if (!isArchivePrefsEnabled(AStreamJid))
 				applyArchivePrefs(AStreamJid,QDomElement());
 			else if (!isSupported(AStreamJid,NS_ARCHIVE_PREF))
@@ -323,7 +323,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		}
 		FPrefsRemoveSessionRequests.remove(AStanza.id());
 	}
-	
+
 	if (FRestoreRequests.contains(AStanza.id()))
 	{
 		QString sessionId = FRestoreRequests.take(AStanza.id());
@@ -831,11 +831,11 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 			QDomElement methodAuto = prefElem.appendChild(save.createElement("method")).toElement();
 			methodAuto.setAttribute("type","auto");
 			methodAuto.setAttribute("use",newPrefs.methodAuto);
-			
+
 			QDomElement methodLocal = prefElem.appendChild(save.createElement("method")).toElement();
 			methodLocal.setAttribute("type","local");
 			methodLocal.setAttribute("use",newPrefs.methodLocal);
-			
+
 			QDomElement methodManual = prefElem.appendChild(save.createElement("method")).toElement();
 			methodManual.setAttribute("type","manual");
 			methodManual.setAttribute("use",newPrefs.methodManual);
@@ -1381,7 +1381,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 			itemPrefs.otr = itemElem.attribute("otr",prefs.defaultPrefs.otr);
 			itemPrefs.expire = itemElem.attribute("expire","0").toUInt();
 			itemPrefs.exactmatch = QVariant(itemElem.attribute("exactmatch","false")).toBool();
-			
+
 			if (!itemPrefs.save.isEmpty() && !itemPrefs.otr.isEmpty())
 				prefs.itemPrefs.insert(itemJid,itemPrefs);
 			else
@@ -1549,26 +1549,18 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringLis
 	menu->setTitle(tr("History"));
 	menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
 
-	//if (AContacts.count() == 1)
-	//{
-	//	Action *action = new Action(menu);
-	//	action->setText(tr("View History"));
-	//	action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
-	//	action->setData(ADR_STREAM_JID,AStreamJid.full());
-	//	action->setData(ADR_FILTER_START,QDateTime::currentDateTime().addMonths(-1));
-	//	if (!isStreamMenu)
-	//	{
-	//		action->setData(ADR_CONTACT_JID,AContacts.first());
-	//		action->setData(ADR_GROUP_KIND,IArchiveWindow::GK_NO_GROUPS);
-	//	}
-	//	else
-	//	{
-	//		action->setData(ADR_GROUP_KIND,IArchiveWindow::GK_CONTACT);
-	//	}
-	//	action->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
-	//	connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByAction(bool)));
-	//	menu->addAction(action,AG_DEFAULT,false);
-	//}
+	if (AContacts.count() == 1)
+	{
+		Action *action = new Action(menu);
+		action->setText(tr("View History"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
+		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		if (!isStreamMenu)
+			action->setData(ADR_CONTACT_JID,AContacts.first());
+		action->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
+		connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByAction(bool)));
+		menu->addAction(action,AG_DEFAULT,false);
+	}
 
 	if (isArchivePrefsEnabled(AStreamJid))
 	{
@@ -1798,7 +1790,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringLis
 			}
 		}
 	}
-	
+
 	if (isStreamMenu && isReady(AStreamJid))
 	{
 		Action *action = new Action(menu);
@@ -2332,11 +2324,9 @@ void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			int indexType = index.data(RDR_TYPE).toInt();
 			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
 			{
-				//IArchiveFilter filter;
-				//if (indexType != RIT_STREAM_ROOT)
-				//	filter.with = index.data(RDR_FULL_JID).toString();
-				//filter.start = QDateTime::currentDateTime().addMonths(-1);
-				//showArchiveWindow(index.data(RDR_STREAM_JID).toString(),filter,indexType==RIT_STREAM_ROOT ? IArchiveWindow::GK_CONTACT : IArchiveWindow::GK_NO_GROUPS);
+				Jid streamJid = index.data(RDR_STREAM_JID).toString();
+				Jid contactJid = indexType!=RIT_STREAM_ROOT ? index.data(RDR_FULL_JID).toString() : Jid::null;
+				showArchiveWindow(streamJid,contactJid);
 			}
 		}
 	}
@@ -2432,13 +2422,9 @@ void MessageArchiver::onShowArchiveWindowByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		//IArchiveFilter filter;
-		//filter.with = action->data(ADR_CONTACT_JID).toString();
-		//filter.start = action->data(ADR_FILTER_START).toDateTime();
-		//filter.end = action->data(ADR_FILTER_END).toDateTime();
-		//int groupKind = action->data(ADR_GROUP_KIND).toInt();
-		//Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		//showArchiveWindow(streamJid,filter,groupKind);
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		Jid contactJid = action->data(ADR_CONTACT_JID).toString();
+		showArchiveWindow(streamJid,contactJid);
 	}
 }
 
@@ -2449,12 +2435,7 @@ void MessageArchiver::onShowArchiveWindowByToolBarAction(bool)
 	{
 		IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
 		if (toolBarWidget && toolBarWidget->editWidget())
-		{
-			//IArchiveFilter filter;
-			//filter.with = toolBarWidget->editWidget()->contactJid();
-			//filter.start = QDateTime::currentDateTime().addMonths(-1);
-			//showArchiveWindow(toolBarWidget->editWidget()->streamJid(),filter,IArchiveWindow::GK_NO_GROUPS);
-		}
+			showArchiveWindow(toolBarWidget->editWidget()->streamJid(),toolBarWidget->editWidget()->contactJid());
 	}
 }
 

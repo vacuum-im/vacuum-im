@@ -34,14 +34,6 @@
 #define TBG_DIWT_DISCOVERY_ACTIONS                              500
 #define TBG_DIWT_DISCOVERY_FEATURE_ACTIONS                      700
 
-//MessageArchiver - ViewHistory Groups
-#define TBG_MAVHG_ARCHIVE_GROUPING                              200
-#define TBG_MAVHG_ARCHIVE_DEFACTIONS                            300
-#define TBG_MAVHG_ARCHIVE_ACTIONS                               500
-
-//MessageArchiver - ViewHistory Tools
-#define TBG_MAVHT_ARCHIVE                                       500
-
 //RosterChanger - AddContactDialog
 #define TBG_RCACD_ROSTERCHANGER                                 500
 

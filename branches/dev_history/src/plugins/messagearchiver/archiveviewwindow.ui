@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>712</width>
-    <height>514</height>
+    <width>699</width>
+    <height>465</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -41,31 +41,31 @@
        <widget class="QLineEdit" name="lneTextFind"/>
       </item>
       <item>
-       <widget class="QPushButton" name="pbtTextFindNext">
+       <widget class="QToolButton" name="tlbTextFindPrev">
         <property name="text">
-         <string>Next</string>
+         <string>&lt;Previous</string>
         </property>
-        <property name="flat">
+        <property name="autoRaise">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pbtTextFindPrev">
+       <widget class="QToolButton" name="tlbTextFindNext">
         <property name="text">
-         <string>Previous</string>
+         <string>Next&gt;</string>
         </property>
-        <property name="flat">
+        <property name="autoRaise">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pbtTextFindHighlight">
+       <widget class="QToolButton" name="tlbTextFindHighlight">
         <property name="text">
          <string>Highlight All</string>
         </property>
-        <property name="flat">
+        <property name="autoRaise">
          <bool>true</bool>
         </property>
        </widget>
@@ -113,7 +113,29 @@
       </widget>
      </item>
      <item>
-      <widget class="QTreeView" name="trvCollections"/>
+      <widget class="QTreeView" name="trvCollections">
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
+       </property>
+       <property name="editTriggers">
+        <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="indentation">
+        <number>10</number>
+       </property>
+       <property name="uniformRowHeights">
+        <bool>true</bool>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
+       <property name="allColumnsShowFocus">
+        <bool>true</bool>
+       </property>
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QCalendarWidget" name="clrCalendar"/>
