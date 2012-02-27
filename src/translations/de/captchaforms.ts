@@ -5,15 +5,15 @@
     <name>CaptchaForms</name>
     <message>
         <source>CAPTCHA Forms</source>
-        <translation>CAPTCHA Form</translation>
+        <translation>CAPTCHA Formulare</translation>
     </message>
     <message>
         <source>CAPTCHA Challenge - %1</source>
-        <translation>CAPTCHA Challenge - %1</translation>
+        <translation>CAPTCHA Anfrage - %1</translation>
     </message>
     <message>
         <source>CAPTCHA Challenge</source>
-        <translation>CAPTCHA Challenge</translation>
+        <translation>CAPTCHA Anfrage</translation>
     </message>
     <message>
         <source>Describe the sound you hear</source>
@@ -49,15 +49,15 @@
     </message>
     <message>
         <source>You have received the CAPTCHA challenge</source>
-        <translation>Sie haben das CAPTCHA Challenge erhalten</translation>
+        <translation>Sie haben die CAPTCHA Anfrage erhalten</translation>
     </message>
     <message>
         <source>Allows to undergo tests on humanity without the use of browser</source>
-        <translation>Ermöglicht die Tests auf Menschlichkeit ohne das Benutzen eines Browsers</translation>
+        <translation>Ermöglicht Tests auf Menschlichkeit ohne das Benutzen eines Browsers</translation>
     </message>
     <message>
         <source>When receiving a CAPTCHA challenge</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn sie eine CHAPTCHA Anfrage erhalten</translation>
     </message>
 </context>
 </TS>

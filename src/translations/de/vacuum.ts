@@ -5,131 +5,131 @@
     <name>AboutBox</name>
     <message>
         <source>Version: %1.%2 %3</source>
-        <translation></translation>
+        <translation>Version: %1.%2 %3</translation>
     </message>
 </context>
 <context>
     <name>AboutBoxClass</name>
     <message>
         <source>About the program</source>
-        <translation></translation>
+        <translation>Über das Programm</translation>
     </message>
 </context>
 <context>
     <name>PluginManager</name>
     <message>
         <source>Duplicate plugin uuid</source>
-        <translation></translation>
+        <translation>Doppelte Plugin UUID</translation>
     </message>
     <message>
         <source>Wrong plugin interface</source>
-        <translation></translation>
+        <translation>Falsches Plugin Interface</translation>
     </message>
     <message>
         <source>Dependences not found</source>
-        <translation></translation>
+        <translation>Abhängigkeiten nicht gefunden</translation>
     </message>
     <message>
         <source>Conflict with plugin %1</source>
-        <translation></translation>
+        <translation>Konflikt mit Plugin %1</translation>
     </message>
     <message>
         <source>Initialization failed</source>
-        <translation></translation>
+        <translation>Initialisierung gescheitert</translation>
     </message>
     <message>
         <source>Setup plugins</source>
-        <translation></translation>
+        <translation>Plugins einrichten</translation>
     </message>
     <message>
         <source>About Qt</source>
-        <translation></translation>
+        <translation>Über Qt</translation>
     </message>
     <message>
         <source>About the program</source>
-        <translation></translation>
+        <translation>Über das Programm</translation>
     </message>
     <message>
         <source>Plugins directory not found</source>
-        <translation></translation>
+        <translation>Plugin Verzeichnis nicht gefunden</translation>
     </message>
     <message>
         <source>Application</source>
-        <translation></translation>
+        <translation>Anwendung</translation>
     </message>
     <message>
         <source>Show information about Qt</source>
-        <translation></translation>
+        <translation>Zeige Informationen über Qt</translation>
     </message>
     <message>
         <source>Show information about client</source>
-        <translation></translation>
+        <translation>Zeige Informationen über Programm</translation>
     </message>
     <message>
         <source>Show setup plugins dialog</source>
-        <translation></translation>
+        <translation>Zeige Plugin Einrichtungsdialog</translation>
     </message>
     <message>
         <source>Global</source>
-        <translation></translation>
+        <translation>Global</translation>
     </message>
 </context>
 <context>
     <name>SetupPluginsDialog</name>
     <message>
         <source>&lt;System&gt;</source>
-        <translation></translation>
+        <translation>&lt;System&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Country&gt;</source>
-        <translation></translation>
+        <translation>&lt;Jedes Land&gt;</translation>
     </message>
     <message>
         <source>Restart Application</source>
-        <translation></translation>
+        <translation>Anwendung neu starten</translation>
     </message>
     <message>
         <source>Settings saved. Do you want to restart application?</source>
-        <translation></translation>
+        <translation>Einstellungen gespeichert. Wollen sie den Anwendung neu starten?</translation>
     </message>
 </context>
 <context>
     <name>SetupPluginsDialogClass</name>
     <message>
         <source>Setup Plugins</source>
-        <translation></translation>
+        <translation>Plugin Einrichtung</translation>
     </message>
     <message>
         <source>Error Message:</source>
-        <translation></translation>
+        <translation>Fehler Meldung:</translation>
     </message>
     <message>
         <source>Common Settings</source>
-        <translation></translation>
+        <translation>Allgemeine Einstellungen</translation>
     </message>
     <message>
         <source>Language:</source>
-        <translation></translation>
+        <translation>Sprache:</translation>
     </message>
     <message>
         <source>Country:</source>
-        <translation></translation>
+        <translation>Land:</translation>
     </message>
     <message>
         <source>Depends</source>
-        <translation></translation>
+        <translation>Abhängigkeiten</translation>
     </message>
     <message>
         <source>Depend</source>
-        <translation></translation>
+        <translation>Abhängig von</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation></translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>File</source>
-        <translation></translation>
+        <translation>Datei</translation>
     </message>
 </context>
 </TS>

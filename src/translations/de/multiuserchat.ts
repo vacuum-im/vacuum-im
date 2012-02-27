@@ -48,12 +48,13 @@
     <message>
         <source>%1 as %2</source>
         <comment>room as nick</comment>
-        <translation></translation>
+        <translation>%1 als %2</translation>
     </message>
     <message>
         <source>Conference parameters is not acceptable.
 Check values and try again</source>
-        <translation></translation>
+        <translation>Konferenz Parameter nicht akzeptierbar.
+Werte überprüfen und neu probieren</translation>
     </message>
 </context>
 <context>
@@ -80,19 +81,19 @@ Check values and try again</source>
     </message>
     <message>
         <source>History:</source>
-        <translation></translation>
+        <translation>Historie:</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Conference Parameters</source>
-        <translation></translation>
+        <translation>Konferenz Parameter</translation>
     </message>
     <message>
         <source>Service:</source>
-        <translation></translation>
+        <translation>Dienst:</translation>
     </message>
 </context>
 <context>
@@ -486,101 +487,101 @@ Check values and try again</source>
     </message>
     <message>
         <source>Leave all hidden conferences</source>
-        <translation></translation>
+        <translation>Verlasse alle verdeckten Konferenzen</translation>
     </message>
     <message>
         <source>Show all hidden conferences</source>
-        <translation></translation>
+        <translation>Zeige alle verdeckten Konferenzen</translation>
     </message>
     <message>
         <source>Show users connections/disconnections</source>
-        <translation></translation>
+        <translation>Zeige Benutzer die kommen/gehen</translation>
     </message>
     <message>
         <source>Show users status changes</source>
-        <translation></translation>
+        <translation>Zeige Status Änderungen von Benutzern</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
-        <translation></translation>
+        <translation>Speichere Status Änderungen in der Historie</translation>
     </message>
     <message>
         <source>Multi-user chat window</source>
-        <translation></translation>
+        <translation>Multibenutzer Chat Fenster</translation>
     </message>
     <message>
         <source>Send message</source>
-        <translation></translation>
+        <translation>Sende Nachricht</translation>
     </message>
     <message>
         <source>Return</source>
         <comment>Send message</comment>
-        <translation></translation>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Clear window</source>
-        <translation></translation>
+        <translation>Leere Fenster</translation>
     </message>
     <message>
         <source>Change nick</source>
-        <translation></translation>
+        <translation>Ändere Nick</translation>
     </message>
     <message>
         <source>Change topic</source>
-        <translation></translation>
+        <translation>Ändere Betreff</translation>
     </message>
     <message>
         <source>Setup conference</source>
-        <translation></translation>
+        <translation>Konferenz einrichten</translation>
     </message>
     <message>
         <source>Enter the conference</source>
-        <translation></translation>
+        <translation>Konferenz beitreten</translation>
     </message>
     <message>
         <source>Leave the conference</source>
-        <translation></translation>
+        <translation>Konferenz verlassen</translation>
     </message>
     <message>
         <source>Ctrl+Q</source>
         <comment>Leave the conference</comment>
-        <translation></translation>
+        <translation>Strg+Q</translation>
     </message>
     <message>
         <source>I&apos;m too busy right now</source>
-        <translation></translation>
+        <translation>Ich bin gerade zu beschäftigt</translation>
     </message>
     <message>
         <source>When receiving an invitation to the conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn sie eine Einladung zu einer Konferenz erhalten</translation>
     </message>
     <message>
         <source>When receiving a new private message in conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn sie eine neue private Nachricht in einer Konferenz erhalten</translation>
     </message>
     <message>
         <source>When referring to you at the conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn jemand ihren Namen in der Konferenz benutzt</translation>
     </message>
     <message>
         <source>When receiving a new message in conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn sie eine neue Nachricht in der Konferenz erhalten</translation>
     </message>
     <message>
         <source>Select the user to refer in the Bash style</source>
-        <translation type="unfinished"></translation>
+        <translation>Den Benutzer auf den sie sich beziehen im Bash Stiel auswählen</translation>
     </message>
     <message>
         <source>Add this suffix when referring to the user:</source>
-        <translation type="unfinished"></translation>
+        <translation>Diesen Suffix beim beziehen auf einen Benutzer anfügen:</translation>
     </message>
     <message>
         <source>Leave the conference when window closed</source>
-        <translation type="unfinished"></translation>
+        <translation>Konferenz verlassen wenn Fenster geschlossen wird</translation>
     </message>
     <message>
         <source>Rejoin in chat room after kick</source>
-        <translation type="unfinished"></translation>
+        <translation>Chat Raum nach einem Rauswurf erneut betreten</translation>
     </message>
 </context>
 <context>
@@ -691,7 +692,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 affiliation changed while not in the room</source>
-        <translation>%1 Mitgliedschaft wurde geändert während der Abwesenheit.</translation>
+        <translation>%1 Mitgliedschaft wurde geändert während der Abwesenheit</translation>
     </message>
     <message>
         <source>Room configuration change has occurred</source>
@@ -914,10 +915,10 @@ Check values and try again</source>
         <translation>Liste unterstützer Befehle:
  /ban &lt;nick&gt; [kommentar] 
  /invite &lt;jid&gt; [kommentar] 
- /join &lt;pokój&gt; [pass] 
+ /join &lt;raum&gt; [pass] 
  /kick &lt;nick&gt; [kommentar] 
  /msg &lt;nick&gt; &lt;foo&gt; 
- /nick &lt;nowy_nick&gt; 
+ /nick &lt;neuer nick&gt; 
  /leave [kommentar] 
  /topic &lt;foo&gt;</translation>
     </message>
@@ -955,27 +956,27 @@ Check values and try again</source>
     </message>
     <message>
         <source>%1 &lt;%2&gt; has joined the room</source>
-        <translation></translation>
+        <translation>%1 &lt;%2&gt; hat den Raum betreten</translation>
     </message>
     <message>
         <source>%1 has joined the room</source>
-        <translation></translation>
+        <translation>%1 hat den Raum betreten</translation>
     </message>
     <message>
         <source>%1 &lt;%2&gt; has left the room</source>
-        <translation></translation>
+        <translation>%1 &lt;%2&gt; hat den Raum verlassen</translation>
     </message>
     <message>
         <source>%1 has left the room</source>
-        <translation></translation>
+        <translation>%1 hat den Raum verlassen</translation>
     </message>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished"></translation>
+        <translation>Zitiere markierten Text</translation>
     </message>
     <message>
         <source>Open chat dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne Chat Dialog</translation>
     </message>
 </context>
 </TS>

@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>d MMM yyyy hh:mm</source>
-        <translation>t MMM jjjj hh:mm</translation>
+        <translation>d MMM jjjj hh:mm</translation>
     </message>
     <message>
         <source>d MMM hh:mm</source>
-        <translation>t MMM hh:mm</translation>
+        <translation>d MMM hh:mm</translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
@@ -25,99 +25,99 @@
     </message>
     <message>
         <source>Allows to use different styles to display messages</source>
-        <translation>Erlaubt das Benutzen von verschiedenen Stile für die Nachrichtenanzeige</translation>
+        <translation>Erlaubt die Benutzung verschiedener Stile für die Nachrichtenanzeige</translation>
     </message>
     <message>
         <source>Show date separators in chat window</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Datums Seperatoren in Chat Fenstern</translation>
     </message>
     <message>
         <source>January</source>
-        <translation type="unfinished"></translation>
+        <translation>Januar</translation>
     </message>
     <message>
         <source>February</source>
-        <translation type="unfinished"></translation>
+        <translation>Februar</translation>
     </message>
     <message>
         <source>March</source>
-        <translation type="unfinished"></translation>
+        <translation>März</translation>
     </message>
     <message>
         <source>April</source>
-        <translation type="unfinished"></translation>
+        <translation>April</translation>
     </message>
     <message>
         <source>May</source>
-        <translation type="unfinished"></translation>
+        <translation>Mai</translation>
     </message>
     <message>
         <source>June</source>
-        <translation type="unfinished"></translation>
+        <translation>Juni</translation>
     </message>
     <message>
         <source>July</source>
-        <translation type="unfinished"></translation>
+        <translation>Juli</translation>
     </message>
     <message>
         <source>August</source>
-        <translation type="unfinished"></translation>
+        <translation>August</translation>
     </message>
     <message>
         <source>September</source>
-        <translation type="unfinished"></translation>
+        <translation>September</translation>
     </message>
     <message>
         <source>October</source>
-        <translation type="unfinished"></translation>
+        <translation>Oktober</translation>
     </message>
     <message>
         <source>November</source>
-        <translation type="unfinished"></translation>
+        <translation>November</translation>
     </message>
     <message>
         <source>December</source>
-        <translation type="unfinished"></translation>
+        <translation>Dezember</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished"></translation>
+        <translation>Montag</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Dienstag</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Mittwoch</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished"></translation>
+        <translation>Donnerstag</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished"></translation>
+        <translation>Freitag</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished"></translation>
+        <translation>Samstag</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished"></translation>
+        <translation>Sonntag</translation>
     </message>
     <message>
         <source>%1, %2 dd</source>
-        <translation type="unfinished"></translation>
+        <translation>%1, %2 dd</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Heute</translation>
     </message>
     <message>
         <source>%1, %2 dd, yyyy</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %2 dd, yyyy</translation>
     </message>
 </context>
 <context>
@@ -208,15 +208,15 @@
     </message>
     <message>
         <source>Single</source>
-        <translation></translation>
+        <translation>Einzelne Nachricht</translation>
     </message>
     <message>
         <source>Headline</source>
-        <translation></translation>
+        <translation>Überschrift</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation></translation>
+        <translation>Fehler</translation>
     </message>
 </context>
 <context>

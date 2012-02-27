@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Allows to search in the Jabber network</source>
-        <translation>Erlaubt die Suche im Jabbernetzwerk</translation>
+        <translation>Erlaubt die Suche im Jabber-Netzwerk</translation>
     </message>
     <message>
         <source>Supports the searching of the information</source>
@@ -56,15 +56,15 @@
     </message>
     <message>
         <source>vCard</source>
-        <translation>vKarte</translation>
+        <translation>vCard</translation>
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation>Geforderte Operation fehlgeschlagen: %1</translation>
+        <translation>Angeforderte Operation fehlgeschlagen: %1</translation>
     </message>
     <message>
         <source>Error: Can&apos;t send request to host.</source>
-        <translation></translation>
+        <translation>Fehler: Kann Anfrage nicht zum Host senden.</translation>
     </message>
 </context>
 <context>
@@ -103,7 +103,7 @@
     </message>
     <message>
         <source>EMail</source>
-        <translation>E-mail</translation>
+        <translation>E-Mail</translation>
     </message>
 </context>
 </TS>

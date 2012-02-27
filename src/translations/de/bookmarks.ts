@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation>Erlaubt das Erstellen von Lesezeichen bei den Jabber Konferezen- und Webseiten</translation>
+        <translation>Erlaubt das Erstellen von Lesezeichen für Jabber Konferenzen und Webseiten</translation>
     </message>
     <message>
         <source>Append to bookmarks</source>
@@ -21,15 +21,15 @@
     </message>
     <message>
         <source>Disable autojoin to conferences</source>
-        <translation></translation>
+        <translation>Sperre das automatische Verbinden zu Konferenzen</translation>
     </message>
     <message>
         <source>Edit bookmark</source>
-        <translation></translation>
+        <translation>Lesezeichen bearbeiten</translation>
     </message>
     <message>
         <source>Automatically show window of conferences connected at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch Fenster für beim Startup verbundene Konferenzen zeigen</translation>
     </message>
 </context>
 <context>
@@ -40,7 +40,7 @@
     </message>
     <message>
         <source>Field &apos;Name&apos; should not be empty</source>
-        <translation>Feld &apos;Name&apos; dürfen nicht leer sein</translation>
+        <translation>Feld &apos;Name&apos; darf nicht leer sein</translation>
     </message>
     <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
-        <translation></translation>
+        <translation>Das Konferenz-Lesezeichen Feld &apos;Raum&apos; darf nicht leer sein</translation>
     </message>
 </context>
 <context>

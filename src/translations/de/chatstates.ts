@@ -9,11 +9,11 @@
     </message>
     <message>
         <source>Allow Chat State Notifications</source>
-        <translation>Chat Status Benachrichtigungen zulassen</translation>
+        <translation>Chat Status Benachrichtigungen einschalten</translation>
     </message>
     <message>
         <source>Disallow Chat State Notifications</source>
-        <translation>Chat Status Benachrichtigungen verbieten</translation>
+        <translation>Chat Status Benachrichtigungen abschalten</translation>
     </message>
     <message>
         <source>Allows to share information about the user&apos;s activity in the chat</source>
@@ -21,19 +21,19 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the user&apos;s activity in the chat</source>
-        <translation>Stellt die Möglichkeit bereit, Informationen über die Aktivität des Benutzers auszutauschen</translation>
+        <translation>Stellt die Möglichkeit bereit, Informationen über die Aktivität des Benutzers im Chat auszutauschen</translation>
     </message>
     <message>
         <source>Send chat state notifications</source>
-        <translation></translation>
+        <translation>Sende Chat Status Informationen</translation>
     </message>
     <message>
         <source>When contact is typing the message for you</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn der Kontakt eine Nachricht für sie schreibt</translation>
     </message>
     <message>
         <source>Typing a message...</source>
-        <translation type="unfinished"></translation>
+        <translation>Schreibt eine Nachricht ...</translation>
     </message>
 </context>
 <context>
@@ -52,7 +52,7 @@
     </message>
     <message>
         <source>Composing</source>
-        <translation>Spreibt</translation>
+        <translation>Schreibt</translation>
     </message>
     <message>
         <source>Paused</source>

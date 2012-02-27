@@ -5,253 +5,253 @@
     <name>EditItemDialogClass</name>
     <message>
         <source>Edit item</source>
-        <translation></translation>
+        <translation>Bearbeite Eintrag</translation>
     </message>
 </context>
 <context>
     <name>VCardDialog</name>
     <message>
         <source>vCard - %1</source>
-        <translation></translation>
+        <translation>vCard - %1</translation>
     </message>
     <message>
         <source>vCard error</source>
-        <translation></translation>
+        <translation>vCard Fehler</translation>
     </message>
     <message>
         <source>vCard request or publish failed.&lt;br&gt;%1</source>
-        <translation></translation>
+        <translation>vCard Anfrage oder Veröffentlichung gescheitert&lt;br&gt;%1</translation>
     </message>
     <message>
         <source>Save image</source>
-        <translation></translation>
+        <translation>Speichere Bild</translation>
     </message>
     <message>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
-        <translation></translation>
+        <translation>Bild Dateien (*.png *.jpg *.bmp *.gif)</translation>
     </message>
     <message>
         <source>Open image</source>
-        <translation></translation>
+        <translation>Bild öffnen</translation>
     </message>
     <message>
         <source>EMail:</source>
-        <translation></translation>
+        <translation>E-Mail:</translation>
     </message>
     <message>
         <source>Phone:</source>
-        <translation></translation>
+        <translation>Telefon:</translation>
     </message>
     <message>
         <source>Reload</source>
-        <translation></translation>
+        <translation>Neu laden</translation>
     </message>
     <message>
         <source>Service unavailable</source>
-        <translation></translation>
+        <translation>Service nicht verfügbar</translation>
     </message>
     <message>
         <source>Failed to publish vCard</source>
-        <translation></translation>
+        <translation>Kann vCard nicht veröffentlichen</translation>
     </message>
     <message>
         <source>Failed to update vCard</source>
-        <translation></translation>
+        <translation>Kann vCard nicht aktualisieren</translation>
     </message>
     <message>
         <source>&lt;Unset&gt;</source>
-        <translation></translation>
+        <translation>&lt;Unbekannt&gt;</translation>
     </message>
     <message>
         <source>Male</source>
-        <translation></translation>
+        <translation>Männlich</translation>
     </message>
     <message>
         <source>Female</source>
-        <translation></translation>
+        <translation>Weiblich</translation>
     </message>
     <message>
         <source>Size: %1 Kb</source>
-        <translation type="unfinished"></translation>
+        <translation>Größe: %1 KB</translation>
     </message>
     <message>
         <source>Image Files (*.%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild Dateien (*.%1)</translation>
     </message>
 </context>
 <context>
     <name>VCardDialogClass</name>
     <message>
         <source>General</source>
-        <translation></translation>
+        <translation>Allgemein</translation>
     </message>
     <message>
         <source>Full name</source>
-        <translation></translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>First name</source>
-        <translation></translation>
+        <translation>Vorname</translation>
     </message>
     <message>
         <source>Middle name</source>
-        <translation></translation>
+        <translation>zweiter Vorname</translation>
     </message>
     <message>
         <source>Last name</source>
-        <translation></translation>
+        <translation>Familenname</translation>
     </message>
     <message>
         <source>Nick name</source>
-        <translation></translation>
+        <translation>Spitzname</translation>
     </message>
     <message>
         <source>Jabber Id</source>
-        <translation></translation>
+        <translation>Jabber Id</translation>
     </message>
     <message>
         <source>Personal</source>
-        <translation></translation>
+        <translation>Persöhnlich</translation>
     </message>
     <message>
         <source>Birthday</source>
-        <translation></translation>
+        <translation>Geburtstag</translation>
     </message>
     <message>
         <source>dd.MMMM.yyyy</source>
-        <translation></translation>
+        <translation>dd.MMMM.yyyy</translation>
     </message>
     <message>
         <source>Gender</source>
-        <translation></translation>
+        <translation>Geschlecht</translation>
     </message>
     <message>
         <source>Occupation</source>
-        <translation></translation>
+        <translation>Beruf</translation>
     </message>
     <message>
         <source>Company</source>
-        <translation></translation>
+        <translation>Firma</translation>
     </message>
     <message>
         <source>Department</source>
-        <translation></translation>
+        <translation>Abteilung</translation>
     </message>
     <message>
         <source>Role</source>
-        <translation></translation>
+        <translation>Funktion</translation>
     </message>
     <message>
         <source>Home page</source>
-        <translation></translation>
+        <translation>WEB Seite</translation>
     </message>
     <message>
         <source>Home</source>
-        <translation></translation>
+        <translation>Privat</translation>
     </message>
     <message>
         <source>Street</source>
-        <translation></translation>
+        <translation>Straße</translation>
     </message>
     <message>
         <source>City</source>
-        <translation></translation>
+        <translation>Ort</translation>
     </message>
     <message>
         <source>State</source>
-        <translation></translation>
+        <translation>Bundesland</translation>
     </message>
     <message>
         <source>Zip code</source>
-        <translation></translation>
+        <translation>Postleitzahl</translation>
     </message>
     <message>
         <source>Country</source>
-        <translation></translation>
+        <translation>Land</translation>
     </message>
     <message>
         <source>Work</source>
-        <translation></translation>
+        <translation>Arbeitsplatz</translation>
     </message>
     <message>
         <source>Contacts</source>
-        <translation></translation>
+        <translation>Kontakte</translation>
     </message>
     <message>
         <source>E-Mail</source>
-        <translation></translation>
+        <translation>E-Mail</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Phone</source>
-        <translation></translation>
+        <translation>Telefon</translation>
     </message>
     <message>
         <source>Photo</source>
-        <translation></translation>
+        <translation>Foto</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation></translation>
+        <translation>Speichern</translation>
     </message>
     <message>
         <source>Load</source>
-        <translation></translation>
+        <translation>Laden</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation></translation>
+        <translation>Leeren</translation>
     </message>
     <message>
         <source>Logo</source>
-        <translation></translation>
+        <translation>Logo</translation>
     </message>
     <message>
         <source>Comments</source>
-        <translation></translation>
+        <translation>Kommentare</translation>
     </message>
     <message>
         <source>Marital status</source>
-        <translation></translation>
+        <translation>Familienstand</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation></translation>
+        <translation>Adresse</translation>
     </message>
 </context>
 <context>
     <name>VCardPlugin</name>
     <message>
         <source>Allows to obtain personal contact information</source>
-        <translation></translation>
+        <translation>Erlaubt die Abfrage persöhnlicher Kontaktinformationen</translation>
     </message>
     <message>
         <source>Supports the requesting of the personal contact information</source>
-        <translation></translation>
+        <translation>Unterstützt die Abfrage der persöhnlichen Kontaktinformationen</translation>
     </message>
     <message>
         <source>Visit Card Manager</source>
-        <translation></translation>
+        <translation>vCard Manager</translation>
     </message>
     <message>
         <source>Show vCard</source>
-        <translation></translation>
+        <translation>vCard anzeigen</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
         <comment>Show vCard</comment>
-        <translation></translation>
+        <translation>Strg+I</translation>
     </message>
     <message>
         <source>Visit Card</source>
-        <translation></translation>
+        <translation>vCard</translation>
     </message>
 </context>
 </TS>

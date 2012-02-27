@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>OS</source>
-        <translation>ОS</translation>
+        <translation>OS</translation>
     </message>
     <message>
         <source>OS Version</source>
@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the application version</source>
-        <translation>Unterstütz den Austausch von Informationen über die Version der Anwendung</translation>
+        <translation>Unterstützt den Austausch von Informationen über die Anwendungsversion</translation>
     </message>
     <message>
         <source>Last Activity</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the user last activity</source>
-        <translation>Unterstütz den Austausch von Informationen über die letzte Aktivität des Benutzers</translation>
+        <translation>Unterstützt den Austausch von Informationen über die letzte Aktivität des Benutzers</translation>
     </message>
     <message>
         <source>Entity Time</source>
@@ -57,27 +57,27 @@
     </message>
     <message>
         <source>Supports the exchanging of the information about the user local time</source>
-        <translation>Unterstützt dan Austausch von Informationen über die Lokalzeit des Benutzers</translation>
+        <translation>Unterstützt den Austausch von Informationen über die Lokalzeit des Benutzers</translation>
     </message>
     <message>
         <source>Service Uptime</source>
-        <translation></translation>
+        <translation>Service Uptime</translation>
     </message>
     <message>
         <source>Idle Time</source>
-        <translation></translation>
+        <translation>Inaktiv seit</translation>
     </message>
     <message>
         <source>Share information about OS version</source>
-        <translation></translation>
+        <translation>Informationen über OS Version freigeben</translation>
     </message>
     <message>
         <source>XMPP Ping</source>
-        <translation></translation>
+        <translation>XMPP Ping</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
-        <translation></translation>
+        <translation>Erlaubt den Austausch von Anwendungs Pings über XML Datenströme</translation>
     </message>
 </context>
 <context>
@@ -120,68 +120,68 @@
     </message>
     <message>
         <source>Software Version</source>
-        <translation></translation>
+        <translation>Software Version</translation>
     </message>
     <message>
         <source>Service Uptime</source>
-        <translation></translation>
+        <translation>Service Uptime</translation>
     </message>
     <message>
         <source>Last Activity</source>
-        <translation></translation>
+        <translation>Letzte Aktivität</translation>
     </message>
     <message>
         <source>Idle Time</source>
-        <translation></translation>
+        <translation>Inaktiv seit</translation>
     </message>
     <message>
         <source>Uptime:</source>
-        <translation></translation>
+        <translation>Uptime:</translation>
     </message>
     <message>
         <source>Inactive:</source>
-        <translation></translation>
+        <translation>Inaktiv:</translation>
     </message>
     <message>
         <source>Idle:</source>
-        <translation></translation>
+        <translation>Idle:</translation>
     </message>
     <message>
         <source>Entity Time</source>
-        <translation></translation>
+        <translation>Laufzeit</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation></translation>
+        <translation>Nicht verfügbar</translation>
     </message>
     <message>
         <source>%1y</source>
         <comment>years</comment>
-        <translation></translation>
+        <translation>%1y</translation>
     </message>
     <message>
         <source>%1d</source>
         <comment>days</comment>
-        <translation></translation>
+        <translation>%1d</translation>
     </message>
     <message>
         <source>%1h</source>
         <comment>hours</comment>
-        <translation></translation>
+        <translation>%1h</translation>
     </message>
     <message>
         <source>%1m</source>
         <comment>minutes</comment>
-        <translation></translation>
+        <translation>%1m</translation>
     </message>
     <message>
         <source>%1s</source>
         <comment>seconds</comment>
-        <translation></translation>
+        <translation>%1s</translation>
     </message>
     <message>
         <source>Waiting response...</source>
-        <translation></translation>
+        <translation>Erwarte Antwort ...</translation>
     </message>
 </context>
 </TS>

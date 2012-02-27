@@ -5,190 +5,190 @@
     <name>EditProfilesDialog</name>
     <message>
         <source>New Profile</source>
-        <translation></translation>
+        <translation>Neues Profil</translation>
     </message>
     <message>
         <source>Enter profile name:</source>
-        <translation></translation>
+        <translation>Profilname eingeben:</translation>
     </message>
     <message>
         <source>Profile Password</source>
-        <translation></translation>
+        <translation>Profil Passwort</translation>
     </message>
     <message>
         <source>Enter profile password:</source>
-        <translation></translation>
+        <translation>Profil Passwort eingeben:</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation></translation>
+        <translation>Passwort bestätigen</translation>
     </message>
     <message>
         <source>Reenter password:</source>
-        <translation></translation>
+        <translation>Passwort bestätigen:</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation></translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <source>Could not create profile, maybe this profile already exists</source>
-        <translation></translation>
+        <translation>Kann Profil nicht erstellen, möglicherweise existiert es schon</translation>
     </message>
     <message>
         <source>Passwords did not match</source>
-        <translation></translation>
+        <translation>Passworte stimmen nicht überein</translation>
     </message>
     <message>
         <source>Enter current profile password:</source>
-        <translation></translation>
+        <translation>Aktuellen Profil Passwort eingeben:</translation>
     </message>
     <message>
         <source>Enter new profile password:</source>
-        <translation></translation>
+        <translation>Neues Profil Passwort eingeben:</translation>
     </message>
     <message>
         <source>Failed to change profile password</source>
-        <translation></translation>
+        <translation>Kann Profil Passwort nicht ändern</translation>
     </message>
     <message>
         <source>Entered password is not valid</source>
-        <translation></translation>
+        <translation>Eingegebenes Passwort ist nicht gültig</translation>
     </message>
     <message>
         <source>Rename Profile</source>
-        <translation></translation>
+        <translation>Profil umbenennen</translation>
     </message>
     <message>
         <source>Enter new name for profile:</source>
-        <translation></translation>
+        <translation>Neuen Namen für Profil eingeben:</translation>
     </message>
     <message>
         <source>Failed to rename profile</source>
-        <translation></translation>
+        <translation>Kann Namen des Profils nicht ändern</translation>
     </message>
     <message>
         <source>Remove Profile</source>
-        <translation></translation>
+        <translation>Profil löschen</translation>
     </message>
     <message>
         <source>Are you sure you want to delete profile &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation></translation>
+        <translation>Sind sie sicher, daß sie das Profil &apos;&lt;b&gt;%1&lt;/b&gt;&apos; löschen möchten?</translation>
     </message>
     <message>
         <source>Failed to remove profile</source>
-        <translation></translation>
+        <translation>Kann Profil nicht löschen</translation>
     </message>
 </context>
 <context>
     <name>EditProfilesDialogClass</name>
     <message>
         <source>Edit Profiles</source>
-        <translation></translation>
+        <translation>Profile bearbeiten</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation></translation>
+        <translation>Passwort</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation></translation>
+        <translation>Umbenennen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation></translation>
+        <translation>Schließen</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
         <source>Profile Blocked</source>
-        <translation></translation>
+        <translation>Profil gesperrt</translation>
     </message>
     <message>
         <source>This profile is now blocked by another program</source>
-        <translation></translation>
+        <translation>Dieses Profil wird zur Zeit von einem anderen Programm genutzt</translation>
     </message>
     <message>
         <source>Wrong Password</source>
-        <translation></translation>
+        <translation>Falsches Passwort</translation>
     </message>
     <message>
         <source>Entered profile password is not correct</source>
-        <translation></translation>
+        <translation>Das eingegebene Profil passwort ist nicht richtig</translation>
     </message>
 </context>
 <context>
     <name>LoginDialogClass</name>
     <message>
         <source>Open Profile</source>
-        <translation></translation>
+        <translation>Offne Profil</translation>
     </message>
     <message>
         <source>Profile:</source>
-        <translation></translation>
+        <translation>Profil:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation></translation>
+        <translation>Passwort:</translation>
     </message>
     <message>
         <source>Profiles</source>
-        <translation></translation>
+        <translation>Profile</translation>
     </message>
 </context>
 <context>
     <name>OptionsDialog</name>
     <message>
         <source>Options</source>
-        <translation></translation>
+        <translation>Optionen</translation>
     </message>
     <message>
         <source>Options are absent</source>
-        <translation></translation>
+        <translation>Keine weiteren Optionen</translation>
     </message>
 </context>
 <context>
     <name>OptionsManager</name>
     <message>
         <source>Options Manager</source>
-        <translation></translation>
+        <translation>Options Manager</translation>
     </message>
     <message>
         <source>Allows to save, load and manage user preferences</source>
-        <translation></translation>
+        <translation>Erlaubt das speichern, laden und bearbeiten von Benutzer Einstellungen</translation>
     </message>
     <message>
         <source>Change Profile</source>
-        <translation></translation>
+        <translation>Wechsele Profil</translation>
     </message>
     <message>
         <source>Misc</source>
-        <translation></translation>
+        <translation>Sonstige</translation>
     </message>
     <message>
         <source>Auto run on system startup</source>
-        <translation></translation>
+        <translation>Automatischer start beim System Startup</translation>
     </message>
     <message>
         <source>Options</source>
-        <translation></translation>
+        <translation>Optionen</translation>
     </message>
     <message>
         <source>Show change profile dialog</source>
-        <translation></translation>
+        <translation>Zeige Profilwechseldialog</translation>
     </message>
     <message>
         <source>Show options dialog</source>
-        <translation></translation>
+        <translation>Zeige Optionsdialog</translation>
     </message>
 </context>
 </TS>

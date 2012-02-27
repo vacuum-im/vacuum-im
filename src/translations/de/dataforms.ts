@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>Data Forms Validation</source>
-        <translation>Daten Formular Gültigkeit</translation>
+        <translation>Daten Formular Überprüfung</translation>
     </message>
     <message>
         <source>Data Forms Layout</source>
@@ -52,7 +52,7 @@
     </message>
     <message>
         <source>Allows other modules to process and display the form with the data intended for user</source>
-        <translation>Erlaubt anderen Modulen das Auswerten und Anzeigen des Datenformular, welches für den Benutzer gedacht ist</translation>
+        <translation>Erlaubt anderen Modulen das Auswerten und Anzeigen von Datenformular die für den Benutzer gedacht sind</translation>
     </message>
     <message>
         <source>Supports the processing and displaying of the forms with the data</source>
@@ -60,11 +60,11 @@
     </message>
     <message>
         <source>Supports the validating of the data entered in the form</source>
-        <translation>Unterstützt die Validierung der im Formular eingegebenen Daten</translation>
+        <translation>Unterstützt die Überprüfung der im Formular eingegebenen Daten</translation>
     </message>
     <message>
         <source>Supports the layouting of the form, including the layout of form fields, pages and sections</source>
-        <translation>Unterstützt das Gestalten eines Formularen, einschließlich des Layouts von Formularfeldern, -seiten und -sektionen</translation>
+        <translation>Unterstützt das Gestalten eines Formulars, einschließlich des Layouts von Formularfeldern, -seiten und -sektionen</translation>
     </message>
 </context>
 <context>

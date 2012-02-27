@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Error: Can&apos;t send request to host.</source>
-        <translation></translation>
+        <translation>Fehler: Kann Anfrage nicht zum Host senden.</translation>
     </message>
 </context>
 <context>
@@ -59,23 +59,23 @@
     <name>RegisterStream</name>
     <message>
         <source>Registration on %1</source>
-        <translation></translation>
+        <translation>Registrierung auf %1</translation>
     </message>
     <message>
         <source>Invalid registration form</source>
-        <translation></translation>
+        <translation>Ungültiges Registrierungsformular</translation>
     </message>
     <message>
         <source>Invalid registration dialog</source>
-        <translation></translation>
+        <translation>Ungültiger Registrierungsdialog</translation>
     </message>
     <message>
         <source>Registration rejected by user</source>
-        <translation></translation>
+        <translation>Registrierung durch benutzer zurückgewiesen</translation>
     </message>
     <message>
         <source>Secure connection is not established</source>
-        <translation></translation>
+        <translation>Sichere Verbindung wurde nicht hergestellt</translation>
     </message>
 </context>
 <context>
@@ -154,15 +154,15 @@
     </message>
     <message>
         <source>Given Name</source>
-        <translation></translation>
+        <translation>Vorname</translation>
     </message>
     <message>
         <source>Family Name</source>
-        <translation></translation>
+        <translation>Familienname</translation>
     </message>
     <message>
         <source>Your Web Page</source>
-        <translation></translation>
+        <translation>Ihre Web-Seite</translation>
     </message>
 </context>
 </TS>

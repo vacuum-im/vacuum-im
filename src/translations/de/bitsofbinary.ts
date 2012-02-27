@@ -13,11 +13,11 @@
     </message>
     <message>
         <source>Allows other modules to receive or send a small amount of binary data in XMPP stanza</source>
-        <translation>Erlaubt anderen Modulen das Empfangen und Versenden von kleinen Mengen Binärdaten via XMPP Stanza</translation>
+        <translation>Erlaubt anderen Modulen das Empfangen und Versenden von kleinen Mengen an Binärdaten über XMPP Packete</translation>
     </message>
     <message>
         <source>Supports the exchange of a small amount of binary data in XMPP stanza</source>
-        <translation></translation>
+        <translation>Unterstützt den Austausch kleiner Mengen an Binärdaten über XMPP Packete</translation>
     </message>
     <message>
         <source>Failed to read cached data</source>

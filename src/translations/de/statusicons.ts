@@ -5,54 +5,54 @@
     <name>IconsOptionsWidgetClass</name>
     <message>
         <source>Default iconset</source>
-        <translation></translation>
+        <translation>Statndard Iconset</translation>
     </message>
     <message>
         <source>Default rules</source>
-        <translation></translation>
+        <translation>Standardregeln</translation>
     </message>
     <message>
         <source>RegExp</source>
-        <translation></translation>
+        <translation>RegExp</translation>
     </message>
     <message>
         <source>Iconset</source>
-        <translation></translation>
+        <translation>Iconset</translation>
     </message>
     <message>
         <source>User rules</source>
-        <translation></translation>
+        <translation>Benutzerregeln</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Löschen</translation>
     </message>
 </context>
 <context>
     <name>StatusIcons</name>
     <message>
         <source>Status Icons Manager</source>
-        <translation></translation>
+        <translation>Status Icon Manager</translation>
     </message>
     <message>
         <source>Status icon</source>
-        <translation></translation>
+        <translation>Status Icon</translation>
     </message>
     <message>
         <source>Status icons</source>
-        <translation></translation>
+        <translation>Status Icons</translation>
     </message>
     <message>
         <source>Default</source>
-        <translation></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Allows to set the status icons for contacts on the basis of standard rules or user-defined</source>
-        <translation></translation>
+        <translation>Erlaubt das setzen von Status Icons für Kontakte auf der Basis von Standard oder benutzer definierten Regeln</translation>
     </message>
 </context>
 </TS>

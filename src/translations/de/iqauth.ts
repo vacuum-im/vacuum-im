@@ -5,11 +5,11 @@
     <name>IqAuth</name>
     <message>
         <source>Secure connection is not established</source>
-        <translation></translation>
+        <translation>Sichere Verbindung wurde nicht hergestellt</translation>
     </message>
     <message>
         <source>Server requested plain text password over insecure connection</source>
-        <translation></translation>
+        <translation>Server hat Klartextpasswort über eine unsichere Verbindung angefordert</translation>
     </message>
 </context>
 <context>
@@ -20,7 +20,7 @@
     </message>
     <message>
         <source>Allow you to log on the Jabber server without support SASL authentication</source>
-        <translation>Erlaubt Ihnen sich am Jabberserver ohne SASL Authentifizierung</translation>
+        <translation>Erlaubt Ihnen sich am Jabber-Server ohne SASL anzumelden</translation>
     </message>
 </context>
 </TS>

@@ -9,15 +9,15 @@
     </message>
     <message>
         <source>Allows to use different types of connections to a Jabber server</source>
-        <translation>Erlaubt das Benutzen von verschiedenen Verbindungsarten zu einem Jabberserver</translation>
+        <translation>Erlaubt das Benutzen verschiedener Verbindungsarten zu einem Jabber-Server</translation>
     </message>
     <message>
         <source>&lt;No Proxy&gt;</source>
-        <translation></translation>
+        <translation>&lt;Kein Proxy&gt;</translation>
     </message>
     <message>
         <source>New Proxy</source>
-        <translation></translation>
+        <translation>Neuer Proxy</translation>
     </message>
 </context>
 <context>
@@ -35,76 +35,76 @@
     <name>EditProxyDialog</name>
     <message>
         <source>HTTP Proxy</source>
-        <translation></translation>
+        <translation>HTTP Proxy</translation>
     </message>
     <message>
         <source>Socks5 Proxy</source>
-        <translation></translation>
+        <translation>Socks5 Proxy</translation>
     </message>
     <message>
         <source>New Proxy</source>
-        <translation></translation>
+        <translation>Neuer Proxy</translation>
     </message>
 </context>
 <context>
     <name>EditProxyDialogClass</name>
     <message>
         <source>Proxy Manager</source>
-        <translation></translation>
+        <translation>Proxy Manager</translation>
     </message>
     <message>
         <source>Name:</source>
-        <translation></translation>
+        <translation>Name:</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation></translation>
+        <translation>Typ:</translation>
     </message>
     <message>
         <source>Host:</source>
-        <translation></translation>
+        <translation>Host:</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation></translation>
+        <translation>Port:</translation>
     </message>
     <message>
         <source>User:</source>
-        <translation></translation>
+        <translation>Benutzer:</translation>
     </message>
     <message>
         <source>Password:</source>
-        <translation></translation>
+        <translation>Passwort:</translation>
     </message>
     <message>
         <source>Default Proxy:</source>
-        <translation></translation>
+        <translation>Standard Proxy:</translation>
     </message>
     <message>
         <source>Add</source>
-        <translation></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Entfernen</translation>
     </message>
 </context>
 <context>
     <name>ProxySettingsWidget</name>
     <message>
         <source>&lt;Default Proxy&gt;</source>
-        <translation></translation>
+        <translation>&lt;Standard Proxy&gt;</translation>
     </message>
 </context>
 <context>
     <name>ProxySettingsWidgetClass</name>
     <message>
         <source>Proxy:</source>
-        <translation></translation>
+        <translation>Proxy:</translation>
     </message>
     <message>
         <source>Edit</source>
-        <translation></translation>
+        <translation>Bearbeiten</translation>
     </message>
 </context>
 </TS>

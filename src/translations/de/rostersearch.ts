@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Group</source>
-        <translation></translation>
+        <translation>Gruppe</translation>
     </message>
 </context>
 </TS>

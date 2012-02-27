@@ -13,93 +13,93 @@
     </message>
     <message>
         <source>Use legacy SSL connection</source>
-        <translation></translation>
+        <translation>Benutze alte SSL Verbindung</translation>
     </message>
 </context>
 <context>
     <name>DefaultConnection</name>
     <message>
         <source>Disconnection timed out</source>
-        <translation>Verbindungsabbruch abgelaufen</translation>
+        <translation>Zeitüberschreitung bei Verbindungsabbruch</translation>
     </message>
 </context>
 <context>
     <name>DefaultConnectionPlugin</name>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation>Erlaubt das Setzen einer Standard TCP Verbindung zum Jabberserver</translation>
+        <translation>Erlaubt den Aufbau von Standard TCP Verbindung zum Jabber-Server</translation>
     </message>
     <message>
         <source>Default Connection</source>
-        <translation></translation>
+        <translation>Standardverbindung</translation>
     </message>
     <message>
         <source>Organization: %1</source>
-        <translation></translation>
+        <translation>Organisation: %1</translation>
     </message>
     <message>
         <source>Subunit: %1</source>
-        <translation></translation>
+        <translation>Abteilung: %1</translation>
     </message>
     <message>
         <source>Country: %1</source>
-        <translation></translation>
+        <translation>Land: %1</translation>
     </message>
     <message>
         <source>Locality: %1</source>
-        <translation></translation>
+        <translation>Ort: %1</translation>
     </message>
     <message>
         <source>State/Province: %1</source>
-        <translation></translation>
+        <translation>Bundesland: %1</translation>
     </message>
     <message>
         <source>Common Name: %1</source>
-        <translation></translation>
+        <translation>Bezeichnung: %1</translation>
     </message>
     <message>
         <source>Issuer Organization: %1</source>
-        <translation></translation>
+        <translation>Herausgeber Organisation: %1</translation>
     </message>
     <message>
         <source>Issuer Unit Name: %1</source>
-        <translation></translation>
+        <translation>Herausgeber Abteilung: %1</translation>
     </message>
     <message>
         <source>Issuer Country: %1</source>
-        <translation></translation>
+        <translation>Herausgeber Land: %1</translation>
     </message>
     <message>
         <source>Issuer Locality: %1</source>
-        <translation></translation>
+        <translation>Herausgeber Ort: %1</translation>
     </message>
     <message>
         <source>Issuer State/Province: %1</source>
-        <translation></translation>
+        <translation>Herausgeber Bundesland: %1</translation>
     </message>
     <message>
         <source>Issuer Common Name: %1</source>
-        <translation></translation>
+        <translation>Herausgeber Bezeichnung: %1</translation>
     </message>
     <message>
         <source>SSL Authentication Error</source>
-        <translation></translation>
+        <translation>SSL Authentifizierungsfehler</translation>
     </message>
     <message>
         <source>Unable to validate the connection to %1 due to errors:</source>
-        <translation></translation>
+        <translation>Kann Verbindung zu %1 Aufgrund von Fehlern nicht bestätigen:</translation>
     </message>
     <message>
         <source>Connect</source>
-        <translation></translation>
+        <translation>Verbinden</translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation></translation>
+        <translation>Trennen</translation>
     </message>
     <message>
         <source>Trust this certificate</source>
-        <translation></translation>
+        <translation>Zertifikat akzeptieren</translation>
     </message>
 </context>
 </TS>

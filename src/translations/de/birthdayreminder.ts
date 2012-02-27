@@ -5,44 +5,44 @@
     <name>BirthdayReminder</name>
     <message>
         <source>Birthday Reminder</source>
-        <translation type="unfinished"></translation>
+        <translation>Geburtstagserinnerungen</translation>
     </message>
     <message>
         <source>Reminds about birthdays of your friends</source>
-        <translation type="unfinished"></translation>
+        <translation>Erinnert an Geburtstage deiner Freunde</translation>
     </message>
     <message>
         <source>Birthday remind</source>
-        <translation type="unfinished"></translation>
+        <translation>Geburtstagserinnerung</translation>
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s),&lt;br&gt; %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Geburtstag in einem Tag,&lt;br&gt; %1</numerusform>
+            <numerusform>Geburtstag in %n Tagen,&lt;br&gt; %1</numerusform>
         </translation>
     </message>
     <message>
         <source>Birthday today!</source>
-        <translation type="unfinished"></translation>
+        <translation>Hat heute Geburtstag!</translation>
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s)!</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Hat morgen Geburtstag!</numerusform>
+            <numerusform>Hat in %n Tagen Geburtstag!</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 marks %n years</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 is ein Jahr alt</numerusform>
+            <numerusform>%1 is %n Jahre alt</numerusform>
         </translation>
     </message>
     <message>
         <source>When reminding of upcoming birthdays</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn an bevorstehende Geburtstage erinnert wird</translation>
     </message>
 </context>
 </TS>

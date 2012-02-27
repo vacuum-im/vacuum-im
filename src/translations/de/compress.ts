@@ -13,18 +13,18 @@
     </message>
     <message>
         <source>Stream Compression</source>
-        <translation>Stream Kompression</translation>
+        <translation>Datenstromkompression</translation>
     </message>
     <message>
         <source>Allows to compress a stream of messages sent and received from the server</source>
-        <translation>Erlaubt das Komprimieren eines Streams von Nachrichten, die vom Server gesendet und empfangen wurden</translation>
+        <translation>Erlaubt das Komprimieren eines Nachrichten Datenstroms zum/vom Server</translation>
     </message>
 </context>
 <context>
     <name>Compression</name>
     <message>
         <source>Invalid compression level</source>
-        <translation>Ungültiges Kompressionslevel</translation>
+        <translation>Ungültiger Kompressionslevel</translation>
     </message>
     <message>
         <source>Out of memory for Zlib</source>
@@ -36,15 +36,15 @@
     </message>
     <message>
         <source>Wrong compression negotiation response</source>
-        <translation>Falsche Kompressions Verhandlungsantwort</translation>
+        <translation>Fehlerhafte Kompressionsaushandlung</translation>
     </message>
     <message>
         <source>Invalid or incomplete deflate data</source>
-        <translation type="unfinished"></translation>
+        <translation>Falsche oder unvollständige Kompressionsdaten</translation>
     </message>
     <message>
         <source>Unknown Zlib error, %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Unbekannter Zlib Fehler, %1</translation>
     </message>
 </context>
 </TS>

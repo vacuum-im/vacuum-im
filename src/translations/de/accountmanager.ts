@@ -17,11 +17,11 @@
     </message>
     <message>
         <source>Allows to create and manage Jabber accounts</source>
-        <translation>ErmÃ¶glicht das Erstellen und verwalten von Jabber Konten</translation>
+        <translation>Ermöglicht das Erstellen und verwalten von Jabber Konten</translation>
     </message>
     <message>
         <source>Require a secure connection</source>
-        <translation></translation>
+        <translation>Benötigt eine sichere Verbindung</translation>
     </message>
 </context>
 <context>
@@ -32,19 +32,19 @@
     </message>
     <message>
         <source>Invalid Account</source>
-        <translation></translation>
+        <translation>Ungültiges Konto</translation>
     </message>
     <message>
         <source>Account &apos;%1&apos; is not valid, change its Jabber ID</source>
-        <translation></translation>
+        <translation>Konto &apos;%1&apos; ist nicht gültig, Jabber ID ändern</translation>
     </message>
     <message>
         <source>Delayed Apply</source>
-        <translation></translation>
+        <translation>Verzögerte Übernahme</translation>
     </message>
     <message>
         <source>Some options of account &apos;%1&apos; will be applied after disconnect</source>
-        <translation></translation>
+        <translation>Einige Optionen des Kontos &apos;%1&apos; werden erst nach dem trennen der Verbindung wirksam</translation>
     </message>
 </context>
 <context>
@@ -75,7 +75,7 @@
     </message>
     <message>
         <source>Example: home; office; notebook</source>
-        <translation></translation>
+        <translation>Beispiel: home; office; notebook</translation>
     </message>
 </context>
 <context>
@@ -94,18 +94,18 @@
     </message>
     <message>
         <source>You are assured that wish to remove an account &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;All settings will be lost.</source>
-        <translation></translation>
+        <translation>Sind sie sicher, daß sie das Konto &lt;b&gt;%1&lt;/b&gt; löschen möchten?&lt;br&gt;Alle Einstellungen gehen verloren.</translation>
     </message>
     <message>
         <source>New Account</source>
-        <translation></translation>
+        <translation>Neues Konto</translation>
     </message>
 </context>
 <context>
     <name>AccountsOptionsClass</name>
     <message>
         <source>Add</source>
-        <translation></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>Remove</source>

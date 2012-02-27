@@ -5,22 +5,22 @@
     <name>StartTLS</name>
     <message>
         <source>StartTLS negotiation failed</source>
-        <translation></translation>
+        <translation>StartTLS Aushandlung gescheitert</translation>
     </message>
     <message>
         <source>Wrong StartTLS negotiation response</source>
-        <translation></translation>
+        <translation>Falsche StartTLS Aushandlungsantwort</translation>
     </message>
 </context>
 <context>
     <name>StartTLSPlugin</name>
     <message>
         <source>StartTLS</source>
-        <translation></translation>
+        <translation>StartTLS</translation>
     </message>
     <message>
         <source>Allows to establish a secure connection to the server after connecting</source>
-        <translation></translation>
+        <translation>Erlaubt das herstellen einer sicheren Verbindung nach dem Verbindungsaufbau</translation>
     </message>
 </context>
 </TS>
