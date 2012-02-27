@@ -5,103 +5,103 @@
     <name>ErrorHandler</name>
     <message>
         <source>Unknown Error</source>
-        <translation></translation>
+        <translation>Unbekannter Fehler</translation>
     </message>
     <message>
         <source>Redirect</source>
-        <translation></translation>
+        <translation>Weiterleiten</translation>
     </message>
     <message>
         <source>Bad Request</source>
-        <translation></translation>
+        <translation>Fehlerhafte Anfrage</translation>
     </message>
     <message>
         <source>Unexpected Request</source>
-        <translation></translation>
+        <translation>Unerwartete Anfrage</translation>
     </message>
     <message>
         <source>Jid Malformed</source>
-        <translation></translation>
+        <translation>JID fehlerhaft</translation>
     </message>
     <message>
         <source>Not Authorized</source>
-        <translation></translation>
+        <translation>Nicht authorisiert</translation>
     </message>
     <message>
         <source>Payment Required</source>
-        <translation></translation>
+        <translation>Bezahlung erforderlich</translation>
     </message>
     <message>
         <source>Forbidden</source>
-        <translation></translation>
+        <translation>Verweigert</translation>
     </message>
     <message>
         <source>Not Found</source>
-        <translation></translation>
+        <translation>Nicht gefunden</translation>
     </message>
     <message>
         <source>Recipient Unavailable</source>
-        <translation></translation>
+        <translation>Empfänger nicht verfügbar</translation>
     </message>
     <message>
         <source>Remote Server Not Found</source>
-        <translation></translation>
+        <translation>Entfernter Server nicht gefunden</translation>
     </message>
     <message>
         <source>Not Allowed</source>
-        <translation></translation>
+        <translation>Nicht erlaubt</translation>
     </message>
     <message>
         <source>Not Acceptable</source>
-        <translation></translation>
+        <translation>Nicht akzeptierbar</translation>
     </message>
     <message>
         <source>Registration Required</source>
-        <translation></translation>
+        <translation>Registrierung erforderlich</translation>
     </message>
     <message>
         <source>Subscription Required</source>
-        <translation></translation>
+        <translation>Vorbestellung erforderlich</translation>
     </message>
     <message>
         <source>Request Timeout</source>
-        <translation></translation>
+        <translation>Anfrage Zeitüberschreitung</translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation></translation>
+        <translation>Konflikt</translation>
     </message>
     <message>
         <source>Internal Server Error</source>
-        <translation></translation>
+        <translation>Interner Server Fehler</translation>
     </message>
     <message>
         <source>Resource Constraint</source>
-        <translation></translation>
+        <translation>Resourcen Verletzung</translation>
     </message>
     <message>
         <source>Undefined Condition</source>
-        <translation></translation>
+        <translation>Undefinierter Zustand</translation>
     </message>
     <message>
         <source>Not Implemented</source>
-        <translation></translation>
+        <translation>Nicht implementiert</translation>
     </message>
     <message>
         <source>Service Unavailable</source>
-        <translation></translation>
+        <translation>Service nicht verfügbar</translation>
     </message>
     <message>
         <source>Remote Server timeout</source>
-        <translation></translation>
+        <translation>Entfernter Server Zeitüberschreitung</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation></translation>
+        <translation>Verbindung getrennt</translation>
     </message>
     <message>
         <source>Remote Server Error</source>
-        <translation></translation>
+        <translation>Entfernter Server Fehler</translation>
     </message>
 </context>
 </TS>

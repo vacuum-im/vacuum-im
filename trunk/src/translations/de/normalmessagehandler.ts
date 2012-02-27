@@ -49,16 +49,16 @@
     </message>
     <message>
         <source>Send message</source>
-        <translation></translation>
+        <translation>Sende Nachricht</translation>
     </message>
     <message>
         <source>Ctrl+Return</source>
         <comment>Send message</comment>
-        <translation></translation>
+        <translation>Ctrl+Return</translation>
     </message>
     <message>
         <source>When receiving new single message</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn neue einzelne Nachricht empfangen</translation>
     </message>
 </context>
 </TS>

@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Allows to use your smiley images in messages</source>
-        <translation>Erlaubt das Benutzen Ihrer Smileybilder in Nachrichten</translation>
+        <translation>Erlaubt das Benutzen von Smiley-Bildern in Nachrichten</translation>
     </message>
 </context>
 </TS>

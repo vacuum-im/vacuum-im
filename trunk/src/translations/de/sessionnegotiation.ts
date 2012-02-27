@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>When receiving session negotiation request</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn eine Sitzungsaushandlung empfangen wurde</translation>
     </message>
 </context>
 </TS>

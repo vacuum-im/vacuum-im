@@ -29,28 +29,28 @@
     </message>
     <message>
         <source>Clear Chat Window</source>
-        <translation></translation>
+        <translation>Lösche Chat Fensterinhalt</translation>
     </message>
     <message>
         <source>Open chat dialog</source>
-        <translation></translation>
+        <translation>Öffne Chat Dialog</translation>
     </message>
     <message>
         <source>Return</source>
         <comment>Open chat dialog</comment>
-        <translation></translation>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Clear window</source>
-        <translation></translation>
+        <translation>Lösche Fensterinhalt</translation>
     </message>
     <message>
         <source>Load messages from history in new chat windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Lade Nachrichtenhistorie in neuen Chat Fenstern</translation>
     </message>
     <message>
         <source>When receiving new chat message</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn neue Chat Nachricht empfangen</translation>
     </message>
 </context>
 </TS>

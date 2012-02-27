@@ -5,11 +5,11 @@
     <name>DataStreamsManger</name>
     <message>
         <source>Data Streams Manager</source>
-        <translation>Datenstreams Manager</translation>
+        <translation>Datenstrommanager</translation>
     </message>
     <message>
         <source>None of the available streams are acceptable</source>
-        <translation>Keiner der verfügbaren Streams sind akzeptierbar</translation>
+        <translation>Keiner der verfügbaren Datenströme ist nutzbar</translation>
     </message>
     <message>
         <source>The profile is not understood or invalid</source>
@@ -25,11 +25,11 @@
     </message>
     <message>
         <source>Stream with same ID already exists</source>
-        <translation>Stream mit der selben ID existiert bereits</translation>
+        <translation>Datenstrom mit der selben ID existiert bereits</translation>
     </message>
     <message>
         <source>Data Streams</source>
-        <translation>Daten Streams</translation>
+        <translation>Datenströme</translation>
     </message>
     <message>
         <source>&lt;Default Profile&gt;</source>
@@ -37,15 +37,15 @@
     </message>
     <message>
         <source>Allows to initiate a custom stream of data between two XMPP entities</source>
-        <translation>Erlaubt das Initiieren von benutzerdefinierten Datenstreams zwischen zwei XMPP Entitäten</translation>
+        <translation>Erlaubt den Aufbauen von benutzerdefinierten Datenströmen zwischen zwei XMPP Endpunkten</translation>
     </message>
     <message>
         <source>Supports the initiating of the custom stream of data between two XMPP entities</source>
-        <translation>Unterstützt die Initiierung von eigenen Datenstreams zwischen zwei XMPP Entitäten</translation>
+        <translation>Unterstützt den Aufbau von eigenen Datenströmen zwischen zwei XMPP Endpunkten</translation>
     </message>
     <message>
         <source>Invalid stream initiation response</source>
-        <translation></translation>
+        <translation>Ungültige Antwort auf Datenstromanfrage</translation>
     </message>
 </context>
 <context>
@@ -64,14 +64,14 @@
     </message>
     <message>
         <source>Do you really want to delete a current data streams profile?</source>
-        <translation>Wollen Sie wirklich ein aktuelles Datenstream Profil löschen?</translation>
+        <translation>Wollen Sie wirklich ein aktuelles Datenstrom Profil löschen?</translation>
     </message>
 </context>
 <context>
     <name>DataStreamsOptionsClass</name>
     <message>
         <source>Data Streams Profiles</source>
-        <translation>Datenstreams Profile</translation>
+        <translation>Datenstromprofile</translation>
     </message>
     <message>
         <source>Profile:</source>
@@ -83,7 +83,7 @@
     </message>
     <message>
         <source>Delete</source>
-        <translation>löschen</translation>
+        <translation>Löschen</translation>
     </message>
 </context>
 </TS>

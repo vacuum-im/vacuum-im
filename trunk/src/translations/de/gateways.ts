@@ -5,11 +5,11 @@
     <name>AddLegacyContactDialog</name>
     <message>
         <source>Add Legacy User to %1</source>
-        <translation>Legacy Benutzer zu %1 hinzufügen</translation>
+        <translation>Altbenutzer zu %1 hinzufügen</translation>
     </message>
     <message>
         <source>Waiting for host response ...</source>
-        <translation>Warte auf Antwort vom Host</translation>
+        <translation>Warte auf Antwort vom Host ...</translation>
     </message>
     <message>
         <source>Contact ID:</source>
@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Received Jabber ID is not valid</source>
-        <translation>Erhaltene Jabber ID ist ungültig</translation>
+        <translation>Empfangene Jabber ID ist ungültig</translation>
     </message>
     <message>
         <source>Requested operation failed: %1</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Error: Can&apos;t send request to host.</source>
-        <translation></translation>
+        <translation>Fehler: Kann Anfrage zum Host nicht senden.</translation>
     </message>
 </context>
 <context>
@@ -47,11 +47,11 @@
     </message>
     <message>
         <source>Add Legacy User</source>
-        <translation>Legacy User hinzufügen</translation>
+        <translation>Altbenutzer hinzufügen</translation>
     </message>
     <message>
         <source>Log Out</source>
-        <translation>Ausloggen</translation>
+        <translation>Abmelden</translation>
     </message>
     <message>
         <source>Keep connection</source>
@@ -75,37 +75,37 @@
     </message>
     <message>
         <source>Supports the adding of the contact by the username of the legacy system</source>
-        <translation>Unterstützt das Hinzufügen von Kontakten via des Benutzernamen des Legacy Systems</translation>
+        <translation>Unterstützt das Hinzufügen von Kontakten via Benutzernamen des Altsystems</translation>
     </message>
     <message>
         <source>Login on transport</source>
-        <translation></translation>
+        <translation>Beim Transport anmelden</translation>
     </message>
     <message>
         <source>Logout from transport</source>
-        <translation></translation>
+        <translation>Beim Transport abmelden</translation>
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove a transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contacts&lt;/b&gt; from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Sind sie sicher, daß sie den Transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; mit seinem Kontakt aus dem Roster entfernen möchten?</numerusform>
+            <numerusform>Sind sie sicher, daß sie den Transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; mit seinen &lt;b&gt;%n Kontakten&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove &lt;b&gt;%n transports&lt;/b&gt; and their contacts from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Send sie sicher, daß sie den Transport mit seinen Kontakten aus dem Roster entfernen möchten?</numerusform>
+            <numerusform>Send sie sicher, daß sie &lt;b&gt;%n Transporte&lt;/b&gt; mit ihren Kontakten aus dem Roster entfernen möchten?</numerusform>
         </translation>
     </message>
     <message>
         <source>Remove transport and its contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Entferne den Transport und seine Kontakte</translation>
     </message>
     <message>
         <source>Remove transports and their contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Entferne die Transporte und ihre Kontakte</translation>
     </message>
 </context>
 </TS>

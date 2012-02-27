@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>&lt;b&gt;denied&lt;/b&gt;</source>
-        <translation></translation>
+        <translation>&lt;b&gt;verboten&lt;/b&gt;</translation>
     </message>
 </context>
 </TS>

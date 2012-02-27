@@ -100,7 +100,7 @@
     </message>
     <message>
         <source>Enable auto archiving</source>
-        <translation>Autp Archivierung aktivieren</translation>
+        <translation>Automatische Archivierung aktivieren</translation>
     </message>
     <message>
         <source>Enable replication</source>
@@ -124,7 +124,7 @@
     </message>
     <message>
         <source>Auto Archiving Preferences</source>
-        <translation></translation>
+        <translation>Einstellungen für die automatische Archivierung</translation>
     </message>
 </context>
 <context>
@@ -254,7 +254,7 @@
     </message>
     <message>
         <source>Disallow all message logging</source>
-        <translation>Verbiete alle Nachrichten Aufzeichnungen</translation>
+        <translation>Verbiete Aufzeichnung aller Nachrichten</translation>
     </message>
     <message>
         <source>Restore defaults</source>
@@ -294,7 +294,7 @@
     </message>
     <message>
         <source>Allows to save the history of communications both locally and on the server</source>
-        <translation>Erlaubt das Speichern des Kommunikationsverlauf lokal und auf dem Server</translation>
+        <translation>Erlaubt das Speichern des Kommunikationsverlaufs lokal und auf dem Server</translation>
     </message>
     <message>
         <source>Messages Archiving</source>
@@ -338,97 +338,97 @@
     </message>
     <message>
         <source>Show history</source>
-        <translation></translation>
+        <translation>Zeige Historie</translation>
     </message>
     <message>
         <source>Ctrl+H</source>
         <comment>Show history</comment>
-        <translation></translation>
+        <translation>Strg+H</translation>
     </message>
     <message>
         <source>Enable message logging</source>
-        <translation></translation>
+        <translation>Nachrichten Aufzeichnung aktivieren</translation>
     </message>
     <message>
         <source>Disable message logging</source>
-        <translation></translation>
+        <translation>Nachrichten Aufzeichnung deaktivieren</translation>
     </message>
     <message>
         <source>Require Off-The-Record session</source>
-        <translation></translation>
+        <translation>Off-The-Record Sitzung erforderlich</translation>
     </message>
     <message>
         <source>Terminate Off-The-Record session</source>
-        <translation></translation>
+        <translation>Off-The-Record Sitzung beenden</translation>
     </message>
     <message>
         <source>Group by nothing</source>
-        <translation></translation>
+        <translation>Nicht gruppieren</translation>
     </message>
     <message>
         <source>Group by date</source>
-        <translation></translation>
+        <translation>Nach Datum gruppieren</translation>
     </message>
     <message>
         <source>Group by contact</source>
-        <translation></translation>
+        <translation>Nach Kontakt gruppieren</translation>
     </message>
     <message>
         <source>Group by date and contact</source>
-        <translation></translation>
+        <translation>Nach Datum und Kontakt gruppieren</translation>
     </message>
     <message>
         <source>Group by contact and date</source>
-        <translation></translation>
+        <translation>Nach Kontakt und Datum gruppieren</translation>
     </message>
     <message>
         <source>Expand All</source>
-        <translation></translation>
+        <translation>Alle ausklappen</translation>
     </message>
     <message>
         <source>Collapse All</source>
-        <translation></translation>
+        <translation>Alle einklappen</translation>
     </message>
     <message>
         <source>Auto select archive</source>
-        <translation></translation>
+        <translation>Archiv automatisch auswählen</translation>
     </message>
     <message>
         <source>Select local archive</source>
-        <translation></translation>
+        <translation>Lokales Archiv auswählen</translation>
     </message>
     <message>
         <source>Select server archive</source>
-        <translation></translation>
+        <translation>Server Archiv auswählen</translation>
     </message>
     <message>
         <source>Filter by contact</source>
-        <translation></translation>
+        <translation>Nach Kontakt filtern</translation>
     </message>
     <message>
         <source>Change conversation subject</source>
-        <translation></translation>
+        <translation>Konversation Betreff ändern</translation>
     </message>
     <message>
         <source>Remove conversation</source>
-        <translation></translation>
+        <translation>Konversation entfernen</translation>
     </message>
     <message>
         <source>Reload conversations</source>
-        <translation></translation>
+        <translation>Konversation erneut laden</translation>
     </message>
     <message>
         <source>History window</source>
-        <translation></translation>
+        <translation>Historie Fenster</translation>
     </message>
     <message>
         <source>Close history window</source>
-        <translation></translation>
+        <translation>Historie Fenster schließen</translation>
     </message>
     <message>
         <source>Esc</source>
         <comment>Close history window</comment>
-        <translation></translation>
+        <translation>Esc</translation>
     </message>
 </context>
 <context>
@@ -563,7 +563,7 @@
     </message>
     <message>
         <source>Change Subject</source>
-        <translation></translation>
+        <translation>Betreff ändern</translation>
     </message>
 </context>
 <context>

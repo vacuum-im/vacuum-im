@@ -5,7 +5,7 @@
     <name>ChatWindow</name>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished"></translation>
+        <translation>Selektierten Text zitieren</translation>
     </message>
 </context>
 <context>
@@ -39,176 +39,176 @@
     </message>
     <message>
         <source>Quote selected text</source>
-        <translation></translation>
+        <translation>Selektierten text zitieren</translation>
     </message>
     <message>
         <source>Tab Window</source>
-        <translation></translation>
+        <translation>Tab Fenster</translation>
     </message>
     <message>
         <source>Enable tab windows</source>
-        <translation></translation>
+        <translation>Tab Fenster aktivieren</translation>
     </message>
     <message>
         <source>Show status changes in chat windows</source>
-        <translation></translation>
+        <translation>Status Änderungen in Chat Fenstern zeigen</translation>
     </message>
     <message>
         <source>Auto resize input field</source>
-        <translation></translation>
+        <translation>Größe des Eingabefeldes automatisch anpassen</translation>
     </message>
     <message>
         <source>Show contact information in chat windows</source>
-        <translation></translation>
+        <translation>Kontakt informationen in Chat Fenstern zeigen</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
-        <translation></translation>
+        <translation>Status Meldungen in der Historie speichern</translation>
     </message>
     <message>
         <source>Tab window</source>
-        <translation></translation>
+        <translation>Tab Fenster</translation>
     </message>
     <message>
         <source>Close tab</source>
-        <translation></translation>
+        <translation>Tab Fenster schließen</translation>
     </message>
     <message>
         <source>Detach tab to separate window</source>
-        <translation></translation>
+        <translation>Tab in eigenes Fenster abtrennen</translation>
     </message>
     <message>
         <source>Next tab</source>
-        <translation></translation>
+        <translation>Nächster Tab</translation>
     </message>
     <message>
         <source>Previous tab</source>
-        <translation></translation>
+        <translation>Vorheriger Tab</translation>
     </message>
     <message>
         <source>Set tabs closable</source>
-        <translation></translation>
+        <translation>Setze Tabs schliesbar</translation>
     </message>
     <message>
         <source>Show tabs at bottom</source>
-        <translation></translation>
+        <translation>Tabs unten anzeigen</translation>
     </message>
     <message>
         <source>Rename tab window</source>
-        <translation></translation>
+        <translation>Tab Fenster umbenennen</translation>
     </message>
     <message>
         <source>Delete tab window</source>
-        <translation></translation>
+        <translation>Tab Fenster löschen</translation>
     </message>
     <message>
         <source>Use as default tab window</source>
-        <translation></translation>
+        <translation>Als Standard Tab Fenster verwenden</translation>
     </message>
     <message>
         <source>Alt+%1</source>
         <comment>Show tab</comment>
-        <translation></translation>
+        <translation>Alt+%1</translation>
     </message>
     <message>
         <source>Message windows</source>
-        <translation></translation>
+        <translation>Nachrichten Fenster</translation>
     </message>
     <message>
         <source>Chat window</source>
-        <translation></translation>
+        <translation>Chat Fenster</translation>
     </message>
     <message>
         <source>Send message</source>
-        <translation></translation>
+        <translation>Nachricht senden</translation>
     </message>
     <message>
         <source>Return</source>
         <comment>Send message</comment>
-        <translation></translation>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Message window</source>
-        <translation></translation>
+        <translation>Nachrichten Fenster</translation>
     </message>
     <message>
         <source>Ctrl+Return</source>
         <comment>Send message</comment>
-        <translation></translation>
+        <translation>Strg+Return</translation>
     </message>
     <message>
         <source>Edit next message</source>
-        <translation></translation>
+        <translation>Nächste Nachricht bearbeiten</translation>
     </message>
     <message>
         <source>Ctrl+Down</source>
         <comment>Edit next message</comment>
-        <translation></translation>
+        <translation>Strg+Down</translation>
     </message>
     <message>
         <source>Edit previous message</source>
-        <translation></translation>
+        <translation>Vorherige Nachricht bearbeiten</translation>
     </message>
     <message>
         <source>Ctrl+Up</source>
         <comment>Edit previous message</comment>
-        <translation></translation>
+        <translation>Strg+Up</translation>
     </message>
     <message>
         <source>Ctrl+W</source>
         <comment>Close tab</comment>
-        <translation></translation>
+        <translation>Strg+W</translation>
     </message>
     <message>
         <source>Show tabs indices</source>
-        <translation></translation>
+        <translation>Zeige Tab Indizies</translation>
     </message>
     <message>
         <source>Close tab window</source>
-        <translation></translation>
+        <translation>Schließe Tab Fenster</translation>
     </message>
     <message>
         <source>Esc</source>
         <comment>Close tab window</comment>
-        <translation></translation>
+        <translation>Esc</translation>
     </message>
     <message>
         <source>Close message window</source>
-        <translation></translation>
+        <translation>Schließe Nachrichten Fenster</translation>
     </message>
     <message>
         <source>Esc</source>
         <comment>Close message window</comment>
-        <translation></translation>
+        <translation>Esc</translation>
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopieren</translation>
     </message>
     <message>
         <source>Send mail</source>
-        <translation type="unfinished"></translation>
+        <translation>Sende Nachricht</translation>
     </message>
     <message>
         <source>Open link</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffne Link</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiere Adresse</translation>
     </message>
     <message>
         <source>Search on Google &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; bei Google suchen</translation>
     </message>
     <message>
         <source>Close other tabs</source>
-        <translation type="unfinished"></translation>
+        <translation>Andere Tabs schließen</translation>
     </message>
     <message>
         <source>Ctrl+Shift+W</source>
         <comment>Close other tabs</comment>
-        <translation type="unfinished"></translation>
+        <translation>Strg+Shift+W</translation>
     </message>
 </context>
 <context>
@@ -265,15 +265,15 @@
     </message>
     <message>
         <source>Clean chat windows after closing in </source>
-        <translation></translation>
+        <translation>Chat Fenster nach dem Schließen leeren in </translation>
     </message>
     <message>
         <source> minutes</source>
-        <translation></translation>
+        <translation>Minuten</translation>
     </message>
     <message>
         <source>(0 - do not clean)</source>
-        <translation></translation>
+        <translation>(0 - nicht leeren)</translation>
     </message>
 </context>
 <context>
@@ -312,7 +312,7 @@
     </message>
     <message>
         <source>Without Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Ohne Gruppen</translation>
     </message>
 </context>
 <context>
@@ -386,27 +386,27 @@
     </message>
     <message>
         <source>Show Tabs at Bottom of the Window</source>
-        <translation></translation>
+        <translation>Zeige Tabs am unteren Fensterrand</translation>
     </message>
     <message>
         <source>Show Tabs Indices</source>
-        <translation></translation>
+        <translation>Zeige Tab Indizes</translation>
     </message>
     <message>
         <source>Close Tab Window</source>
-        <translation></translation>
+        <translation>Schließe Tab Fenster</translation>
     </message>
     <message>
         <source>Remove all tabs on window close</source>
-        <translation></translation>
+        <translation>Entferne alle Tabs wenn das Fenster geschlossen wird</translation>
     </message>
     <message>
         <source>%1) %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1) %2</translation>
     </message>
     <message>
         <source>Close Other Tabs</source>
-        <translation type="unfinished"></translation>
+        <translation>Andere Tabs schließen</translation>
     </message>
 </context>
 <context>

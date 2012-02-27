@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Can&apos;t add contact &apos;&lt;b&gt;%1&lt;/b&gt;&apos; because it is not a valid Jabber ID</source>
-        <translation></translation>
+        <translation>Kann Kontakt &apos;&lt;b&gt;%1&lt;/b&gt;&apos; nicht hinzufügen, da es keine gültige Jabber ID ist</translation>
     </message>
 </context>
 <context>
@@ -91,7 +91,7 @@
     </message>
     <message>
         <source>You are now unsubscribed from %1 presence.</source>
-        <translation>Sie Sind nun von %1 Präsenz ausgetragen</translation>
+        <translation>Sie Sind nun von %1 Präsenz ausgetragen.</translation>
     </message>
     <message>
         <source>This group</source>
@@ -247,61 +247,61 @@
     </message>
     <message>
         <source>Auto accept subscription requests</source>
-        <translation></translation>
+        <translation>Kontaktpräsenz Anfragen automatisch annehmen</translation>
     </message>
     <message>
         <source>Auto unsubscribe contacts</source>
-        <translation></translation>
+        <translation>Kontakte automatisch austragen</translation>
     </message>
     <message>
         <source>Ins</source>
         <comment>Add contact</comment>
-        <translation></translation>
+        <translation>Einfg</translation>
     </message>
     <message>
         <source>Rename contact/group</source>
-        <translation></translation>
+        <translation>Kontakt/Gruppe umbenennen</translation>
     </message>
     <message>
         <source>F2</source>
         <comment>Rename contact/group</comment>
-        <translation></translation>
+        <translation>F2</translation>
     </message>
     <message>
         <source>Remove contact/group from group</source>
-        <translation></translation>
+        <translation>Kontakt/Gruppe aus Gruppe entfernen</translation>
     </message>
     <message>
         <source>Del</source>
         <comment>Remove contact/group from group</comment>
-        <translation></translation>
+        <translation>Entf</translation>
     </message>
     <message>
         <source>Remove contact/group from roster</source>
-        <translation></translation>
+        <translation>Kontakt/Gruppe aus Roster entfernen</translation>
     </message>
     <message>
         <source>Shift+Del</source>
         <comment>Remove contact/group from roster</comment>
-        <translation></translation>
+        <translation>Shift+Del</translation>
     </message>
     <message>
         <source>Add contact...</source>
-        <translation></translation>
+        <translation>Kontakt Hinzufügen ...</translation>
     </message>
     <message>
         <source>Blank Group</source>
-        <translation></translation>
+        <translation>Sonstige</translation>
     </message>
     <message>
         <source>When receiving authorization request</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn sie eine unauthorisierte Anfrage empfangen</translation>
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Sind sie sicher, daß sie &lt;b&gt;den Kontakt&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
+            <numerusform>Sind sie sicher, daß sie &lt;b&gt;%n Kontakte&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
         </translation>
     </message>
 </context>

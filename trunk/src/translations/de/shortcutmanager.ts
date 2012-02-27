@@ -5,53 +5,53 @@
     <name>ShortcutManager</name>
     <message>
         <source>Shortcut Manager</source>
-        <translation></translation>
+        <translation>Tastatur Manager</translation>
     </message>
     <message>
         <source>Allows to setup user defined shortcuts</source>
-        <translation></translation>
+        <translation>Erlaubt die Erstellung Benutzer definierter Tastenbelegungen</translation>
     </message>
     <message>
         <source>Shortcuts</source>
-        <translation></translation>
+        <translation>Tastenbelegungen</translation>
     </message>
     <message>
         <source>Hide all windows, tray icon and notifications</source>
-        <translation></translation>
+        <translation>Verstecke alle Fenster, Tray Icon und Meldungen</translation>
     </message>
     <message>
         <source>Enter profile password:</source>
-        <translation></translation>
+        <translation>Profil Passwort eingeben:</translation>
     </message>
     <message>
         <source>Wrong profile password!</source>
-        <translation></translation>
+        <translation>Falsches Profil Passwort!</translation>
     </message>
 </context>
 <context>
     <name>ShortcutOptionsWidget</name>
     <message>
         <source>Action</source>
-        <translation></translation>
+        <translation>Aktion</translation>
     </message>
     <message>
         <source>Shortcut</source>
-        <translation></translation>
+        <translation>Tastenbelegung</translation>
     </message>
 </context>
 <context>
     <name>ShortcutOptionsWidgetClass</name>
     <message>
         <source>Default</source>
-        <translation></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <source>Clear</source>
-        <translation></translation>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation></translation>
+        <translation>Standards wiederherstellen</translation>
     </message>
 </context>
 </TS>

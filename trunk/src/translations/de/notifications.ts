@@ -25,27 +25,27 @@
     </message>
     <message>
         <source>Enable/Disable notifications sound</source>
-        <translation></translation>
+        <translation>Erlaube/Sperre Benachrichtigungs Sound</translation>
     </message>
     <message>
         <source>Remove all notifications</source>
-        <translation></translation>
+        <translation>Entferne alle Benachrichtigungen</translation>
     </message>
     <message>
         <source>Expand contact groups in roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Erweitere Roster Kontaktgruppe</translation>
     </message>
     <message>
         <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Unterdrücke Sound wenn Status &apos;Do not disturb&apos;</translation>
     </message>
     <message>
         <source>Activate notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviere Benachrichtigung</translation>
     </message>
     <message>
         <source>Activate Notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktiviere Benachrichtigung</translation>
     </message>
     <message>
         <source>Enable animation in notification pop-up</source>
@@ -56,54 +56,54 @@
     <name>NotifyOptionsWidget</name>
     <message>
         <source>Display a notification in your roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Benachrichtigung im Roster</translation>
     </message>
     <message>
         <source>Display a notification in popup window</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Benachrichtigung im Popup Fenster</translation>
     </message>
     <message>
         <source>Display a notification in tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Benachrichtigung im Tray</translation>
     </message>
     <message>
         <source>Display a notification in tray context menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige Benachrichtigung im Tray Kontext Menü</translation>
     </message>
     <message>
         <source>Play sound at the notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Spiele Sound als Benachrichtigung</translation>
     </message>
     <message>
         <source>Highlight the corresponding window in the taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Markiere das Fenster in der Taskbar</translation>
     </message>
     <message>
         <source>Display a notification in tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige eine Benachrichtigung im Tab</translation>
     </message>
     <message>
         <source>Show the corresponding window minimized in the taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeige das Fenster minimiert in der Taskbar</translation>
     </message>
     <message>
         <source>Immediately activate the notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Benachrichtigung sofort aktivieren</translation>
     </message>
 </context>
 <context>
     <name>NotifyOptionsWidgetClass</name>
     <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeit für die Popup-Fenster Anzeige (0 = immer sichtbar):</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="unfinished"></translation>
+        <translation> Sekunden</translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard wiederherstellen</translation>
     </message>
 </context>
 <context>

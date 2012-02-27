@@ -5,15 +5,15 @@
     <name>TrayManager</name>
     <message>
         <source>Quit</source>
-        <translation></translation>
+        <translation>Beenden</translation>
     </message>
     <message>
         <source>Tray Icon</source>
-        <translation></translation>
+        <translation>Tray Icon</translation>
     </message>
     <message>
         <source>Allows other modules to access the icon and context menu in the tray</source>
-        <translation></translation>
+        <translation>Erlaubt andern Modulen den Zugriff auf Icon und Kontextmenü im Tray</translation>
     </message>
 </context>
 </TS>

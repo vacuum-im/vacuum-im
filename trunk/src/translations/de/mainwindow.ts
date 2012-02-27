@@ -40,16 +40,16 @@
     </message>
     <message>
         <source>Main window</source>
-        <translation></translation>
+        <translation>Hauptfenster</translation>
     </message>
     <message>
         <source>Hide roster</source>
-        <translation></translation>
+        <translation>Schließe Roster</translation>
     </message>
     <message>
         <source>Esc</source>
         <comment>Hide roster</comment>
-        <translation></translation>
+        <translation>Esc</translation>
     </message>
 </context>
 </TS>

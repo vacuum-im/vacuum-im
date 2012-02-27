@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Command execution completed.</source>
-        <translation>Befehlsausführunge vollendet.</translation>
+        <translation>Befehlsausführung beendet.</translation>
     </message>
     <message>
         <source>Command execution canceled.</source>
@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Requested operation failed: %1</source>
-        <translation>Geforderte Operation fehlgeschlagen: %1</translation>
+        <translation>Angeforderte Operation fehlgeschlagen: %1</translation>
     </message>
     <message>
         <source>Executing command &apos;%1&apos; at %2</source>
@@ -33,11 +33,11 @@
     </message>
     <message>
         <source>Waiting for host response ...</source>
-        <translation>Warte auf Hostantwort ...</translation>
+        <translation>Warte auf Antwort von Host ...</translation>
     </message>
     <message>
         <source>Error: Can&apos;t send request to host.</source>
-        <translation></translation>
+        <translation>Fehler: Kann Anfrage an den Host nicht senden.</translation>
     </message>
 </context>
 <context>
@@ -56,7 +56,7 @@
     </message>
     <message>
         <source>Can not accept the specified language/locale</source>
-        <translation>Kann die beschriebene Sprache/locale nicht annehmen</translation>
+        <translation>Kann die beschriebene Sprache/Locale nicht annehmen</translation>
     </message>
     <message>
         <source>The data form did not provide one or more required fields</source>
@@ -64,11 +64,11 @@
     </message>
     <message>
         <source>Specified session not present</source>
-        <translation>Gewählte Sitzung nicht präsent</translation>
+        <translation>Angegebene Sitzung existiert nicht</translation>
     </message>
     <message>
         <source>Specified session is no longer active</source>
-        <translation>Gewählte Sitzung ist nicht mehr aktiv</translation>
+        <translation>Angegebene Sitzung ist nicht mehr aktiv</translation>
     </message>
     <message>
         <source>Execute</source>
@@ -88,11 +88,11 @@
     </message>
     <message>
         <source>Supports the running or performing of the special services commands</source>
-        <translation>Unterstütz den Betrieb oder das Ausführen von speziellen Dienstbefehlen</translation>
+        <translation>Unterstützt den Betrieb oder das Ausführen von speziellen Dienstbefehlen</translation>
     </message>
     <message>
         <source>Forbidden</source>
-        <translation></translation>
+        <translation>Verboten</translation>
     </message>
 </context>
 </TS>

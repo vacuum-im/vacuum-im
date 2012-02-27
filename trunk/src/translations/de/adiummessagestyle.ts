@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>Adium Style</source>
-        <translation></translation>
+        <translation>Adium Stil</translation>
     </message>
 </context>
 <context>

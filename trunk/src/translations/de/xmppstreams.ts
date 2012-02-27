@@ -5,142 +5,142 @@
     <name>XmppStream</name>
     <message>
         <source>Password request</source>
-        <translation></translation>
+        <translation>Passwort Anfrage</translation>
     </message>
     <message>
         <source>Enter password for &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation></translation>
+        <translation>Passwort für &lt;b&gt;%1&lt;/b&gt; eingeben</translation>
     </message>
     <message>
         <source>Connection not specified</source>
-        <translation></translation>
+        <translation>Verbindung nicht angegeben</translation>
     </message>
     <message>
         <source>XMPP connection timed out</source>
-        <translation></translation>
+        <translation>XMPP Verbindung Zeitüberschreitung</translation>
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation></translation>
+        <translation>Kann Verbindung nicht herstellen</translation>
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
-        <translation></translation>
+        <translation>Verbindung unerwartet geschlossen</translation>
     </message>
     <message>
         <source>Secure connection is not established</source>
-        <translation></translation>
+        <translation>Sicher Verbindung ist nicht hergestellt</translation>
     </message>
     <message>
         <source>XMPP stream destroyed</source>
-        <translation type="unfinished"></translation>
+        <translation>XMPP Datenstrom getrennt</translation>
     </message>
 </context>
 <context>
     <name>XmppStreams</name>
     <message>
         <source>Bad Request Format</source>
-        <translation></translation>
+        <translation>Falsches Anfrageformat</translation>
     </message>
     <message>
         <source>Bad Namespace Prefix</source>
-        <translation></translation>
+        <translation>Falscher Namensraumpräfix</translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation></translation>
+        <translation>Konflikt</translation>
     </message>
     <message>
         <source>Connection timeout</source>
-        <translation></translation>
+        <translation>Verbindung Zeitüberschreitung</translation>
     </message>
     <message>
         <source>Host Gone</source>
-        <translation></translation>
+        <translation>Host nicht mehr erreichbar</translation>
     </message>
     <message>
         <source>Host Unknown</source>
-        <translation></translation>
+        <translation>Host unbekannt</translation>
     </message>
     <message>
         <source>Improper Addressing</source>
-        <translation></translation>
+        <translation>Unvollständige Addressierung</translation>
     </message>
     <message>
         <source>Internal Server Error</source>
-        <translation></translation>
+        <translation>Interner Server Fehler</translation>
     </message>
     <message>
         <source>Invalid From</source>
-        <translation></translation>
+        <translation>Ungültig Von</translation>
     </message>
     <message>
         <source>Invalid Id</source>
-        <translation></translation>
+        <translation>Ungültig Id</translation>
     </message>
     <message>
         <source>Invalid Namespace</source>
-        <translation></translation>
+        <translation>Ungültig Namensraum</translation>
     </message>
     <message>
         <source>Invalid XML</source>
-        <translation></translation>
+        <translation>Ungültig XML</translation>
     </message>
     <message>
         <source>Not Authorized</source>
-        <translation></translation>
+        <translation>Nicht Authoriziert</translation>
     </message>
     <message>
         <source>Policy Violation</source>
-        <translation></translation>
+        <translation>Sicherheitsverletzung</translation>
     </message>
     <message>
         <source>Remote Connection Failed</source>
-        <translation></translation>
+        <translation>Entfernte Verbindung Fehler</translation>
     </message>
     <message>
         <source>Resource Constraint</source>
-        <translation></translation>
+        <translation>Resourcen Verletzung</translation>
     </message>
     <message>
         <source>Restricted XML</source>
-        <translation></translation>
+        <translation>Eingeschränktes XML</translation>
     </message>
     <message>
         <source>See Other Host</source>
-        <translation></translation>
+        <translation>Anderen Host anzeigen</translation>
     </message>
     <message>
         <source>System Shutdown</source>
-        <translation></translation>
+        <translation>System Beenden</translation>
     </message>
     <message>
         <source>Undefined Condition</source>
-        <translation></translation>
+        <translation>Undefinierter Zustand</translation>
     </message>
     <message>
         <source>Unsupported Encoding</source>
-        <translation></translation>
+        <translation>Nicht unterstützte Codierung</translation>
     </message>
     <message>
         <source>Unsupported Stanza Type</source>
-        <translation></translation>
+        <translation>Nicht unterstützter Stanza Typ</translation>
     </message>
     <message>
         <source>Unsupported Version</source>
-        <translation></translation>
+        <translation>Nicht unterstützte Version</translation>
     </message>
     <message>
         <source>XML Not Well Formed</source>
-        <translation></translation>
+        <translation>Fehlerhaftes XML</translation>
     </message>
     <message>
         <source>XMPP Streams Manager</source>
-        <translation></translation>
+        <translation>XMPP Datenstrom Manager</translation>
     </message>
     <message>
         <source>Allows other modules to create XMPP streams and get access to them</source>
-        <translation></translation>
+        <translation>Erlaubt anderen Modulen XMPP Datenströme zu erstellen und zu benutzen</translation>
     </message>
 </context>
 </TS>

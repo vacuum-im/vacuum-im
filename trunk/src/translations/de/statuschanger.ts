@@ -5,206 +5,208 @@
     <name>EditStatusDialog</name>
     <message>
         <source>Enter status name</source>
-        <translation></translation>
+        <translation>Statusname eingeben</translation>
     </message>
     <message>
         <source>Status name:</source>
-        <translation></translation>
+        <translation>Statusname:</translation>
     </message>
     <message>
         <source>Wrong status name</source>
-        <translation></translation>
+        <translation>Falscher Statusname</translation>
     </message>
     <message>
         <source>Can&apos;t delete status</source>
-        <translation></translation>
+        <translation>Kann den Status nicht löschen</translation>
     </message>
     <message>
         <source>You can not delete standard statuses.</source>
-        <translation></translation>
+        <translation>Sie können keinen Standard Status löschen.</translation>
     </message>
     <message>
         <source>You can not delete active statuses.</source>
-        <translation></translation>
+        <translation>Sie können den aktiven Status nicht löschen.</translation>
     </message>
     <message>
         <source>Delete status</source>
-        <translation></translation>
+        <translation>Status löschen</translation>
     </message>
     <message>
         <source>You are assured that wish to remove a status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation></translation>
+        <translation>Sind sie sicher, daß sie den status &apos;&lt;b&gt;%1&lt;/b&gt;&apos; löschen möchten?</translation>
     </message>
     <message>
         <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; already exists</source>
-        <translation></translation>
+        <translation>Status mit Name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; existiert bereits</translation>
     </message>
 </context>
 <context>
     <name>EditStatusDialogClass</name>
     <message>
         <source>Add</source>
-        <translation></translation>
+        <translation>Hinzufügen</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation></translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <source>Edit statuses</source>
-        <translation></translation>
+        <translation>Bearbeite Status</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation></translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>Status name displayed in status change menu</source>
-        <translation></translation>
+        <translation>Statusname der in der Statusauswahl angezeigt wird</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation></translation>
+        <translation>Meldung</translation>
     </message>
     <message>
         <source>Status message</source>
-        <translation></translation>
+        <translation>Status Meldung</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation></translation>
+        <translation>Priorität</translation>
     </message>
     <message>
         <source>Status priority</source>
-        <translation></translation>
+        <translation>Statuspriorität</translation>
     </message>
     <message>
         <source>Status type&lt;br&gt;
 Types for standard statuses are grayed out.
 You can set status class for additional statuses defined by you.</source>
-        <translation></translation>
+        <translation>Status typ&lt;br&gt;
+Typen für Standardstatusmeldungen sind grau markiert.
+Sie können Statusklassen für zusätzlich von ihnen definierte Statusmeldungen definieren.</translation>
     </message>
     <message>
         <source>Type</source>
-        <translation></translation>
+        <translation>Typ</translation>
     </message>
 </context>
 <context>
     <name>ModifyStatusDialogClass</name>
     <message>
         <source>Modify Status</source>
-        <translation></translation>
+        <translation>Status ändern</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation></translation>
+        <translation>Status</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation></translation>
+        <translation>Name</translation>
     </message>
     <message>
         <source>Priority</source>
-        <translation></translation>
+        <translation>Priorität</translation>
     </message>
 </context>
 <context>
     <name>StatusChanger</name>
     <message>
         <source>Offline</source>
-        <translation></translation>
+        <translation>Offline</translation>
     </message>
     <message>
         <source>Online</source>
-        <translation></translation>
+        <translation>Online</translation>
     </message>
     <message>
         <source>Chat</source>
-        <translation></translation>
+        <translation>Chat</translation>
     </message>
     <message>
         <source>Away</source>
-        <translation></translation>
+        <translation>Abwesend</translation>
     </message>
     <message>
         <source>Extended Away</source>
-        <translation></translation>
+        <translation>Erweitert Abwesend</translation>
     </message>
     <message>
         <source>Do not disturb</source>
-        <translation></translation>
+        <translation>Nicht stören</translation>
     </message>
     <message>
         <source>Invisible</source>
-        <translation></translation>
+        <translation>Unsichtbar</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation></translation>
+        <translation>Fehler</translation>
     </message>
     <message>
         <source>Unknown Status</source>
-        <translation></translation>
+        <translation>Unbekannter Status</translation>
     </message>
     <message>
         <source>Free for chat</source>
-        <translation></translation>
+        <translation>Bereit für Chat</translation>
     </message>
     <message>
         <source>Not available</source>
-        <translation></translation>
+        <translation>Nicht verfügbar</translation>
     </message>
     <message>
         <source>Disconnected</source>
-        <translation></translation>
+        <translation>Verbindung getrennt</translation>
     </message>
     <message>
         <source>%1 - %2</source>
-        <translation></translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
         <source>Connection error</source>
-        <translation></translation>
+        <translation>Verbindungsfehler</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation></translation>
+        <translation>Status</translation>
     </message>
     <message>
         <source>Status Manager</source>
-        <translation></translation>
+        <translation>Statusmanager</translation>
     </message>
     <message>
         <source>Allows to change the status in Jabber network</source>
-        <translation></translation>
+        <translation>Erlaubt den Status im Jabber Netzwerk zu ändern</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation></translation>
+        <translation>Verbindung herstellen...</translation>
     </message>
     <message>
         <source>Modify Status</source>
-        <translation></translation>
+        <translation>Status ändern</translation>
     </message>
     <message>
         <source>Edit Statuses</source>
-        <translation></translation>
+        <translation>Status bearbeiten</translation>
     </message>
     <message>
         <source>Auto connect on startup</source>
-        <translation></translation>
+        <translation>Beim Start automatisch verbinden</translation>
     </message>
     <message>
         <source>Auto reconnect if disconnected</source>
-        <translation></translation>
+        <translation>Automatisch neu verbinden wenn Verbindung getrennt wurde</translation>
     </message>
     <message>
         <source>I&apos;m away from my desk</source>
-        <translation></translation>
+        <translation>Ich bin nicht an meinem Arbeitsplatz</translation>
     </message>
     <message>
         <source>On loss of connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn die Verbindung zum Server verloren geht</translation>
     </message>
 </context>
 </TS>

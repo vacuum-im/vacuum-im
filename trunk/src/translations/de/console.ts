@@ -13,18 +13,18 @@
     </message>
     <message>
         <source>Allows to view XML stream between the client and server</source>
-        <translation>Erlaubt das Anzeigen eines XML Streams zwischen dem Client und dem Server</translation>
+        <translation>Erlaubt das Anzeigen des XML Datenstroms zwischen dem Client und dem Server</translation>
     </message>
     <message>
         <source>Default Context</source>
-        <translation></translation>
+        <translation>Standard Kontext</translation>
     </message>
 </context>
 <context>
     <name>ConsoleWidget</name>
     <message>
         <source>&lt;All Streams&gt;</source>
-        <translation>&lt;Alle Streams&gt;</translation>
+        <translation>&lt;Alle Datenströme&gt;</translation>
     </message>
     <message>
         <source>XML Console - %1</source>
@@ -32,27 +32,27 @@
     </message>
     <message>
         <source>Start sending user stanza...</source>
-        <translation></translation>
+        <translation>Starte das senden des Anwender Packetes ...</translation>
     </message>
     <message>
         <source>Stanza is not well formed.</source>
-        <translation></translation>
+        <translation>Packet ist nicht richtig formatiert.</translation>
     </message>
     <message>
         <source>XML is not well formed.</source>
-        <translation></translation>
+        <translation>XML ist nicht richtig formatiert.</translation>
     </message>
     <message>
         <source>New Context</source>
-        <translation></translation>
+        <translation>Neuer Kontext</translation>
     </message>
     <message>
         <source>Enter context name</source>
-        <translation></translation>
+        <translation>Kontextname eingeben</translation>
     </message>
     <message>
         <source>User stanza sent.</source>
-        <translation></translation>
+        <translation>Anwender Packet gesendet.</translation>
     </message>
 </context>
 <context>
@@ -67,7 +67,7 @@
     </message>
     <message>
         <source>Stream:</source>
-        <translation>Stream:</translation>
+        <translation>Datenstrom:</translation>
     </message>
     <message>
         <source>Condition:</source>
@@ -103,7 +103,7 @@
     </message>
     <message>
         <source>Highlight XML</source>
-        <translation></translation>
+        <translation>XML hervorheben</translation>
     </message>
 </context>
 </TS>

@@ -200,53 +200,53 @@
     </message>
     <message>
         <source>Service discovery window</source>
-        <translation></translation>
+        <translation>Diensteermittlungsfenster</translation>
     </message>
     <message>
         <source>Move back</source>
-        <translation></translation>
+        <translation>zurück</translation>
     </message>
     <message>
         <source>Move forward</source>
-        <translation></translation>
+        <translation>vorwärts</translation>
     </message>
     <message>
         <source>Discover item</source>
-        <translation></translation>
+        <translation>Elemente ermitteln</translation>
     </message>
     <message>
         <source>Reload items</source>
-        <translation></translation>
+        <translation>Elemente neu laden</translation>
     </message>
     <message>
         <source>Show discovery info</source>
-        <translation></translation>
+        <translation>Zeige Ermittlungsinformationen</translation>
     </message>
     <message>
         <source>Add item to roster</source>
-        <translation></translation>
+        <translation>Eintrag zum Roster hinzufügen</translation>
     </message>
     <message>
         <source>Show vCard</source>
-        <translation></translation>
+        <translation>vCard anzeigen</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
         <comment>Show vCard</comment>
-        <translation></translation>
+        <translation>Strg+I</translation>
     </message>
     <message>
         <source>Close discovery window</source>
-        <translation></translation>
+        <translation>Ermittlungsfenster schließen</translation>
     </message>
     <message>
         <source>Esc</source>
         <comment>Close discovery window</comment>
-        <translation></translation>
+        <translation>Esc</translation>
     </message>
     <message>
         <source>Category: %1; Type: %2</source>
-        <translation></translation>
+        <translation>Kategorie: %1, Typ: %2</translation>
     </message>
 </context>
 </TS>

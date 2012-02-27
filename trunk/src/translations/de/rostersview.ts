@@ -17,19 +17,19 @@
     </message>
     <message>
         <source>Jabber ID</source>
-        <translation></translation>
+        <translation>Jabber ID</translation>
     </message>
     <message>
         <source>Status</source>
-        <translation></translation>
+        <translation>Status</translation>
     </message>
     <message>
         <source>Copy to clipboard</source>
-        <translation></translation>
+        <translation>In Zwischenablage kopieren</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation></translation>
+        <translation>Name</translation>
     </message>
 </context>
 <context>
@@ -52,35 +52,35 @@
     </message>
     <message>
         <source>Show offline contact</source>
-        <translation></translation>
+        <translation>Zeige Offline Kontakte</translation>
     </message>
     <message>
         <source>Show contact resource in roster</source>
-        <translation></translation>
+        <translation>Zeige Kontakt Resource im Roster</translation>
     </message>
     <message>
         <source>Show status message in roster</source>
-        <translation></translation>
+        <translation>Zeige Statusmeldung im Roster</translation>
     </message>
     <message>
         <source>Sort contacts by status</source>
-        <translation></translation>
+        <translation>Sortiere Kontakte nach Status</translation>
     </message>
     <message>
         <source>Copy contact JID to clipboard</source>
-        <translation></translation>
+        <translation>Kontakt JID in Zwischenablage kopieren</translation>
     </message>
     <message>
         <source>Copy contact name to clipboard</source>
-        <translation></translation>
+        <translation>Kontakt Name in Zwischenablage kopieren</translation>
     </message>
     <message>
         <source>Copy contact status to clipboard</source>
-        <translation></translation>
+        <translation>Kontakt Status in Zwischenablage kopieren</translation>
     </message>
     <message>
         <source>Do not show the scroll bars</source>
-        <translation type="unfinished"></translation>
+        <translation>Scroll Balken nicht anzeigen</translation>
     </message>
 </context>
 </TS>

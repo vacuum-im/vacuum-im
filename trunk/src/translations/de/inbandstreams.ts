@@ -16,7 +16,7 @@
     <name>InBandOptionsClass</name>
     <message>
         <source> Bytes</source>
-        <translation> Bytes</translation>
+        <translation> Byte</translation>
     </message>
     <message>
         <source>Size of data in packet:</source>
@@ -35,15 +35,15 @@
     <name>InBandStream</name>
     <message>
         <source>Stream destroyed</source>
-        <translation>Stream zerstört</translation>
+        <translation>Datenstrom abgeschlossen</translation>
     </message>
     <message>
         <source>Malformed data packet</source>
-        <translation>Missgeformtes Daten Paket</translation>
+        <translation>Fehlerhaftes Daten Paket</translation>
     </message>
     <message>
         <source>Failed to open stream</source>
-        <translation>Öffnen des Streams fehlgeschlagen</translation>
+        <translation>Öffnen des Datenstroms gescheitert</translation>
     </message>
     <message>
         <source>Block size is not acceptable</source>
@@ -51,7 +51,7 @@
     </message>
     <message>
         <source>Failed to send data</source>
-        <translation>Daten senden fehlgeschlagen</translation>
+        <translation>Senden der Daten fehlgeschlagen</translation>
     </message>
 </context>
 <context>
@@ -62,15 +62,15 @@
     </message>
     <message>
         <source>In-Band Data Stream</source>
-        <translation>Interner Daten Stream</translation>
+        <translation>Interner Datenstrom</translation>
     </message>
     <message>
         <source>Allows to initiate in-band stream of data between two XMPP entities</source>
-        <translation>Erlaubt das Initiieren von internen Daten Streams zwischen zwei XMPP Existenzen</translation>
+        <translation>Erlaubt den Aufbau von internen Datenströmen zwischen zwei XMPP Endpunkten</translation>
     </message>
     <message>
         <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
-        <translation>Unterstützt das Initiieren von internen Daten Streams zwischen zwei XMPP Existenzen</translation>
+        <translation>Unterstützt den Aufbau von internen Datenströmen zwischen zwei XMPP Endpunkten</translation>
     </message>
 </context>
 </TS>

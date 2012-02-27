@@ -5,7 +5,7 @@
     <name>Presence</name>
     <message>
         <source>XMPP stream closed unexpectedly</source>
-        <translation></translation>
+        <translation>XMPP Strom unerwartet geschlossen</translation>
     </message>
 </context>
 <context>

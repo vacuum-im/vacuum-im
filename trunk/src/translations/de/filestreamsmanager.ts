@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Disconnecting</source>
-        <translation>Verbindungsabbruch</translation>
+        <translation>Trenne</translation>
     </message>
     <message>
         <source>Waiting for a response to send a file request</source>
@@ -21,26 +21,26 @@
     </message>
     <message>
         <source>Data transmission finished</source>
-        <translation>Datenübertragung fertig gestellt</translation>
+        <translation>Datenübertragung beendet</translation>
     </message>
     <message>
         <source>Data transmission terminated by remote user</source>
-        <translation>Datenübertragen wurde vom Benutzer abgebrochen</translation>
+        <translation>Datenübertragen wurde vom anderen Benutzer abgebrochen</translation>
     </message>
     <message>
         <source>Connection timed out</source>
-        <translation></translation>
+        <translation>Zeitüberschreitung bei Verbindung</translation>
     </message>
     <message>
         <source>File size unexpectedly changed</source>
-        <translation></translation>
+        <translation>Unerwartete Änderung der Dateigröße</translation>
     </message>
 </context>
 <context>
     <name>FileStreamsManager</name>
     <message>
         <source>File Streams Manager</source>
-        <translation>Dateistreams Manager</translation>
+        <translation>Dateiaustausch Manager</translation>
     </message>
     <message>
         <source>File Transfers</source>
@@ -52,15 +52,15 @@
     </message>
     <message>
         <source>File Transfer</source>
-        <translation>Dateiübertragungen</translation>
+        <translation>Dateiübertragung</translation>
     </message>
     <message>
         <source>Allows to initiate a thread for transferring files between two XMPP entities</source>
-        <translation>Erlaubt das Initiieren eines Thread für die Übertragen von Dateien zwischen zwei XMPP Existenzen</translation>
+        <translation>Erlaubt das Anlegen von seperaten Übertragungen von Dateien zwischen zwei XMPP Endpunkten</translation>
     </message>
     <message>
         <source>Show file transfers</source>
-        <translation></translation>
+        <translation>Zeige Dateiübertragungen</translation>
     </message>
 </context>
 <context>
@@ -82,15 +82,15 @@
     </message>
     <message>
         <source>Default Data Stream:</source>
-        <translation>Standard Datenstream:</translation>
+        <translation>Standard Datenstrom:</translation>
     </message>
     <message>
         <source>Acceptable Data Streams</source>
-        <translation>Zu akzeptierende Datenstreams</translation>
+        <translation>Akzeptierbare Datenströme</translation>
     </message>
     <message>
         <source>Group downloads by sender</source>
-        <translation></translation>
+        <translation>Downloads nach Sender gruppieren</translation>
     </message>
 </context>
 <context>
@@ -133,11 +133,11 @@
     </message>
     <message>
         <source>Disconnect</source>
-        <translation>Verbindung beenden</translation>
+        <translation>Trennen</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation>Fertig gestellt</translation>
+        <translation>Beended</translation>
     </message>
     <message>
         <source>Aborted</source>

@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
-        <translation>Bild Dateien (*.png *.jpg *.bmp *.gif)</translation>
+        <translation>Bilddateien (*.png *.jpg *.bmp *.gif)</translation>
     </message>
     <message>
         <source>Avatars</source>
@@ -45,11 +45,11 @@
     </message>
     <message>
         <source>Show avatars</source>
-        <translation></translation>
+        <translation>Avatare anzeigen</translation>
     </message>
     <message>
         <source>Show empty avatars</source>
-        <translation></translation>
+        <translation>Leere Avatare anzeigen</translation>
     </message>
 </context>
 </TS>

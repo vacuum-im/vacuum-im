@@ -5,11 +5,11 @@
     <name>PEPManager</name>
     <message>
         <source>PEP Manager</source>
-        <translation></translation>
+        <translation>PEP Manager</translation>
     </message>
     <message>
         <source>Allows other plugins to receive and publish PEP events</source>
-        <translation></translation>
+        <translation>Erlaubt anderen plugins PEP Ereignisse zu empfangen oder erzeugen</translation>
     </message>
 </context>
 </TS>

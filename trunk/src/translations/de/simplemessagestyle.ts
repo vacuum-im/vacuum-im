@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>Simple Style</source>
-        <translation></translation>
+        <translation>Einfacher Stil</translation>
     </message>
 </context>
 <context>
