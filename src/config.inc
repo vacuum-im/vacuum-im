@@ -1,9 +1,7 @@
 TARGET_LOADER            = vacuum
 
 TARGET_UTILS             = vacuumutils
-unix:!macx:VERSION_UTILS = 1.11.1
-
-macx:CONFIG             += x86
+unix:VERSION_UTILS       = 1.11.1
 
 #Configurable values
 isEmpty(INSTALL_PREFIX) {
