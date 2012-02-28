@@ -33,7 +33,7 @@ isEmpty(INSTALL_RES_DIR) {
 
 
 #Preprocessor definations
-CONFIG(debug, debug|release) {
+!macx:CONFIG(debug, debug|release) {
   DEFINES               += PLUGINS_DIR='\\\"./plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"./resources\\\"'
   DEFINES               += TRANSLATIONS_DIR='\\\"./src/translations\\\"'
