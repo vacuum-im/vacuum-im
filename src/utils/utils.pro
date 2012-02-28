@@ -30,12 +30,12 @@ macx {
 
 include(utils.pri)
 
-#Translation
-TRANS_SOURCE_ROOT  = ..
-include(../translations.inc)
-
-#Install (for Mac OS X - in loader.pro)
+#Install (for MacOS in loader.pro because instalation directory will be removed in loader installer)
 !macx:{
   target.path      = $$INSTALL_LIBS
   INSTALLS        += target
+
+	#Translation
+	TRANS_SOURCE_ROOT  = ..
+	include(../translations.inc)
 }

@@ -14,15 +14,15 @@ win32 {
 }
 unix:DESTDIR        = ../../../plugins
 
-#Translation
-TRANS_SOURCE_ROOT   = ../..
-include(../translations.inc)
-
 #Install
 target.path         = $$INSTALL_PLUGINS
 INSTALLS           += target
 
-#MaxOS Install
+#Translation
+TRANS_SOURCE_ROOT   = ../..
+include(../translations.inc)
+
+#MacOS Install
 macx {
   name_tool.path    = $$INSTALL_PLUGINS
   name_tool.extra   = install_name_tool -change lib$${TARGET_UTILS}.1.dylib @executable_path/../Frameworks/lib$${TARGET_UTILS}.1.dylib $(INSTALL_ROOT)$$INSTALL_PLUGINS/lib$${TARGET}.dylib

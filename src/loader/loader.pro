@@ -36,10 +36,6 @@ win32 {
   }
 }
 
-#Translation
-TRANS_SOURCE_ROOT  = ..
-include(../translations.inc)
-
 #Install
 target.path        = $$INSTALL_BINS
 resources.path     = $$INSTALL_RESOURCES
@@ -47,6 +43,10 @@ resources.files    = ../../resources/*
 documents.path     = $$INSTALL_DOCUMENTS
 documents.files    = ../../AUTHORS ../../CHANGELOG ../../README ../../COPYING ../../TRANSLATORS
 INSTALLS           += target resources documents
+
+#Translation
+TRANS_SOURCE_ROOT  = ..
+include(../translations.inc)
 
 #Linux desktop install
 unix:!macx {
@@ -59,9 +59,9 @@ unix:!macx {
   INSTALLS        += desktop
 }
 
-#MaxOS Install
+#MacOS Install
 macx {
-  UTILS_LIB_NAME  = lib$${TARGET_UTILS}.$${VERSION_UTILS}.dylib
+	UTILS_LIB_NAME   = lib$${TARGET_UTILS}.$${VERSION_UTILS}.dylib
   UTILS_LIB_LINK   = lib$${TARGET_UTILS}.1.dylib
   UTILS_LIB_LINK_EXTERNAL_PLUGINS = lib$${TARGET_UTILS}.dylib
 
@@ -74,4 +74,9 @@ macx {
   name_tool.path   = $$INSTALL_BINS
   name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$TARGET_LOADER
   INSTALLS        += name_tool
+
+	#Dirty hack to install utils translations
+	TARGET           = $$TARGET_UTILS
+	include(../translations.inc)
+	TARGET           = $$TARGET_LOADER
 }
