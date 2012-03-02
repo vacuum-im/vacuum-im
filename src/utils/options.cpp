@@ -4,12 +4,10 @@
 #include <QRect>
 #include <QDataStream>
 #include <QStringList>
+#include <QKeySequence>
 #include <QCryptographicHash>
 
-#include <QtDebug>
-
-QDomElement findChildElement(const QDomElement &AParent, const QString &APath, const QString &ANSpace,
-                             QString &ChildName, QString &SubPath, QString &NSpace)
+QDomElement findChildElement(const QDomElement &AParent, const QString &APath, const QString &ANSpace, QString &ChildName, QString &SubPath, QString &NSpace)
 {
 	int dotIndex = APath.indexOf('.');
 	ChildName = dotIndex>0 ? APath.left(dotIndex) : APath;
@@ -76,6 +74,10 @@ QString variantToString(const QVariant &AVariant)
 	{
 		return AVariant.toStringList().join(" ;; ");
 	}
+	else if (AVariant.type() == QVariant::KeySequence)
+	{
+		return AVariant.value<QKeySequence>().toString(QKeySequence::PortableText);
+	}
 	return AVariant.toString();
 }
 
@@ -106,6 +108,10 @@ QVariant stringToVariant(const QString &AString, QVariant::Type AType)
 	else if (AType == QVariant::StringList)
 	{
 		return !AString.isEmpty() ? AString.split(" ;; ") : QStringList();
+	}
+	else if(AType == QVariant::KeySequence)
+	{
+		return QKeySequence::fromString(AString,QKeySequence::PortableText);
 	}
 	else
 	{
