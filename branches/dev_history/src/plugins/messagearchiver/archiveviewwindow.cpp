@@ -84,7 +84,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 		{
 			QDateTime leftDate = ALeft.data(HDR_HEADER_START).toDateTime();
 			QDateTime rightDate = ARight.data(HDR_HEADER_START).toDateTime();
-			return rightDate < leftDate;
+			return leftDate < rightDate;
 		}
 		return QSortFilterProxyModel::lessThan(ALeft,ARight);
 	}
@@ -95,7 +95,6 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("View History - %1").arg(ARoster->streamJid().bare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_HISTORY_VIEW,0,0,"windowIcon");
 
 	FRoster = ARoster;
@@ -126,9 +125,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	FPageRequestTimer.setSingleShot(true);
 	connect(&FPageRequestTimer,SIGNAL(timeout()),SLOT(onPageRequestTimerTimeout()));
 
-	ui.clrCalendar->setSelectedDate(QDate::currentDate());
-	connect(ui.clrCalendar,SIGNAL(selectionChanged()),SLOT(onCalendarSelectionChanged()));
-	connect(ui.clrCalendar,SIGNAL(currentPageChanged(int, int)),SLOT(onCalendarCurrentPageChanged(int, int)));
+	connect(ui.spwSelectPage,SIGNAL(currentPageChanged(int, int)),SLOT(onCurrentPageChanged(int, int)));
 
 	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
 		SLOT(onArchiveRequestFailed(const QString &, const QString &)));
@@ -141,8 +138,8 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 		setGeometry(WidgetManager::alignGeometry(QSize(640,640),this));
 	restoreState(Options::fileValue("history.archiveview.state",streamJid().pBare()).toByteArray());
 
-	onCalendarCurrentPageChanged(ui.clrCalendar->yearShown(),ui.clrCalendar->monthShown());
-	FPageRequestTimer.start(0);
+	onCurrentPageChanged(ui.spwSelectPage->yearShown(),ui.spwSelectPage->monthShown());
+	reset();
 }
 
 ArchiveViewWindow::~ArchiveViewWindow()
@@ -158,12 +155,16 @@ Jid ArchiveViewWindow::streamJid() const
 
 Jid ArchiveViewWindow::contactJid() const
 {
-	return Jid::null;
+	return FContactJid;
 }
 
 void ArchiveViewWindow::setContactJid(const Jid &AContactJid)
 {
-
+	if (FContactJid != AContactJid)
+	{
+		FContactJid = AContactJid;
+		reset();
+	}
 }
 
 void ArchiveViewWindow::initialize(IPluginManager *APluginManager)
@@ -181,9 +182,27 @@ void ArchiveViewWindow::initialize(IPluginManager *APluginManager)
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 }
 
-void ArchiveViewWindow::setStatusMessage(const QString &AMessage)
+void ArchiveViewWindow::reset()
 {
+	FHeaderRequests.clear();
 
+	FModel->clear();
+	FContactModelItems.clear();
+
+	FLoadedPages.clear();
+	FCollections.clear();
+
+	FPageRequestTimer.start(0);
+
+	if (FContactJid.isEmpty())
+		setWindowTitle(tr("Chat history - %1").arg(streamJid().bare()));
+	else
+		setWindowTitle(tr("Chat history with %1 - %2").arg(contactName(FContactJid),streamJid().bare()));
+}
+
+QDate ArchiveViewWindow::currentPage() const
+{
+	return QDate(ui.spwSelectPage->yearShown(),ui.spwSelectPage->monthShown(),1);
 }
 
 QString ArchiveViewWindow::contactName(const Jid &AContactJid) const
@@ -231,13 +250,19 @@ QStandardItem *ArchiveViewWindow::createHeaderItem(const IArchiveHeader &AHeader
 	return item;
 }
 
+void ArchiveViewWindow::setHeadersStatus(HeadersStatus AStatus, const QString &AMessage)
+{
+	ui.trvCollections->setEnabled(AStatus != HeadersLoading);
+}
+
 void ArchiveViewWindow::onPageRequestTimerTimeout()
 {
-	QDate start(ui.clrCalendar->yearShown(),ui.clrCalendar->monthShown(),1);
+	QDate start = currentPage();
 	QDate end = start.addMonths(1);
 	if (!FLoadedPages.contains(start))
 	{
 		IArchiveRequest request;
+		request.with = FContactJid.bare();
 		request.start = QDateTime(start);
 		request.end = QDateTime(end);
 		QString requestId = FArchiver->loadHeaders(streamJid(),request);
@@ -248,21 +273,29 @@ void ArchiveViewWindow::onPageRequestTimerTimeout()
 		}
 		else
 		{
-			setStatusMessage(tr("Failed to request archive headers"));
+			setHeadersStatus(HeadersLoadError,tr("Failed to request archive headers"));
 		}
+	}
+	else
+	{
+		setHeadersStatus(HeadersReady);
 	}
 }
 
-void ArchiveViewWindow::onCalendarSelectionChanged()
-{
-
-}
-
-void ArchiveViewWindow::onCalendarCurrentPageChanged(int AYear, int AMonth)
+void ArchiveViewWindow::onCurrentPageChanged(int AYear, int AMonth)
 {
 	QDate start(AYear,AMonth,1);
 	FProxyModel->setVisibleInterval(QDateTime(start),QDateTime(start.addMonths(1)));
-	FPageRequestTimer.start(PAGE_LOAD_TIMEOUT);
+	if (!FLoadedPages.contains(start))
+	{
+		FPageRequestTimer.start(PAGE_LOAD_TIMEOUT);
+		setHeadersStatus(HeadersLoading);
+	}
+	else if (!FHeaderRequests.values().contains(start))
+	{
+		FPageRequestTimer.stop();
+		setHeadersStatus(HeadersReady);
+	}
 }
 
 void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString &AError)
@@ -270,8 +303,9 @@ void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString
 	if (FHeaderRequests.contains(AId))
 	{
 		QDate start = FHeaderRequests.take(AId);
+		if (start == currentPage())
+			setHeadersStatus(HeadersLoadError, AError);
 		FLoadedPages.removeAll(start);
-		setStatusMessage(tr("Failed to request archive headers"));
 	}
 }
 
@@ -279,7 +313,10 @@ void ArchiveViewWindow::onArchiveHeadersLoaded(const QString &AId, const QList<I
 {
 	if (FHeaderRequests.contains(AId))
 	{
-		FHeaderRequests.remove(AId);
+		QDate start = FHeaderRequests.take(AId);
+		if (start == currentPage())
+			setHeadersStatus(HeadersReady);
+
 		for (QList<IArchiveHeader>::const_iterator it = AHeaders.constBegin(); it!=AHeaders.constEnd(); it++)
 		{
 			if (!FCollections.contains(*it) && it->with.isValid() && it->start.isValid())
@@ -288,7 +325,6 @@ void ArchiveViewWindow::onArchiveHeadersLoaded(const QString &AId, const QList<I
 				collection.header = *it;
 				FCollections.insert(collection.header,collection);
 				createHeaderItem(collection.header);
-				//insertContact(collection.header.with);
 			}
 		}
 	}

@@ -19,6 +19,13 @@
 #include <utils/widgetmanager.h>
 #include "ui_archiveviewwindow.h"
 
+enum HeadersStatus {
+	HeadersReady,
+	HeadersLoading,
+	HeadersLoadError
+};
+
+
 class SortFilterProxyModel :
 	public QSortFilterProxyModel
 {
@@ -47,15 +54,17 @@ public:
 	void setContactJid(const Jid &AContactJid);
 protected:
 	void initialize(IPluginManager *APluginManager);
-	void setStatusMessage(const QString &AMessage);
+	void reset();
 protected:
+	QDate currentPage() const;
 	QString contactName(const Jid &AContactJid) const;
 	QStandardItem *createContactItem(const Jid &AContactJid);
 	QStandardItem *createHeaderItem(const IArchiveHeader &AHeader);
+protected:
+	void setHeadersStatus(HeadersStatus AStatus, const QString &AMessage = QString::null);
 protected slots:
 	void onPageRequestTimerTimeout();
-	void onCalendarSelectionChanged();
-	void onCalendarCurrentPageChanged(int AYear, int AMonth);
+	void onCurrentPageChanged(int AYear, int AMonth);
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 	void onArchiveHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
@@ -74,6 +83,7 @@ private:
 private:
 	QMap<QString, QDate> FHeaderRequests;
 private:
+	Jid FContactJid;
 	QTimer FPageRequestTimer;
 	QList<QDate> FLoadedPages;
 	QMap<Jid,QStandardItem *> FContactModelItems;
