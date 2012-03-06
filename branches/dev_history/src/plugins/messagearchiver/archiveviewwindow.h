@@ -15,16 +15,32 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/imessagestyles.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/imessageprocessor.h>
 #include <utils/iconstorage.h>
+#include <utils/textmanager.h>
 #include <utils/widgetmanager.h>
 #include "ui_archiveviewwindow.h"
 
-enum HeadersStatus {
-	HeadersReady,
-	HeadersLoading,
-	HeadersLoadError
+enum PageStatus {
+	PageReady,
+	PageLoading,
+	PageLoadError
 };
 
+enum MessagesStatus {
+	MessagesReady,
+	MessagesLoading,
+	MessagesLoadError
+};
+
+struct ViewOptions {
+	bool isGroupchat;
+	QString selfName;
+	QString contactName;
+	QString lastSenderId;
+	QDateTime lastTime;
+	IMessageStyle *style;
+};
 
 class SortFilterProxyModel :
 	public QSortFilterProxyModel
@@ -56,15 +72,29 @@ protected:
 	void initialize(IPluginManager *APluginManager);
 	void reset();
 protected:
-	QDate currentPage() const;
 	QString contactName(const Jid &AContactJid) const;
 	QStandardItem *createContactItem(const Jid &AContactJid);
 	QStandardItem *createHeaderItem(const IArchiveHeader &AHeader);
+	IArchiveHeader modelIndexHeader(const QModelIndex &AIndex) const;
 protected:
-	void setHeadersStatus(HeadersStatus AStatus, const QString &AMessage = QString::null);
+	QDate currentPage() const;
+	void setPageStatus(PageStatus AStatus, const QString &AMessage = QString::null);
+	void setMessagesStatus(MessagesStatus AStatus, const QString &AMessage = QString::null);
+protected:
+	void clearMessages();
+	void processCollectionsLoad();
+	QString showCollectionInfo(const IArchiveCollection &ACollection);
+	QString showNote(const QString &ANote, const IMessageContentOptions &AOptions);
+	QString showMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
+	void showCollection(const IArchiveCollection &ACollection);
 protected slots:
-	void onPageRequestTimerTimeout();
+	void onHeadersRequestTimerTimeout();
 	void onCurrentPageChanged(int AYear, int AMonth);
+protected slots:
+	void onCollectionShowTimerTimeout();
+	void onCollectionsRequestTimerTimeout();
+	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore);
+protected slots:
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 	void onArchiveHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
@@ -75,19 +105,25 @@ private:
 	IMessageArchiver *FArchiver;
 	IStatusIcons *FStatusIcons;
 	IMessageStyles *FMessageStyles;
-	IMessageWidgets *FMessageWidgets;
+	IMessageProcessor *FMessageProcessor;
 private:
-	IViewWidget *FViewWidget;
 	QStandardItemModel *FModel;
 	SortFilterProxyModel *FProxyModel;
 private:
-	QMap<QString, QDate> FHeaderRequests;
-private:
 	Jid FContactJid;
-	QTimer FPageRequestTimer;
-	QList<QDate> FLoadedPages;
 	QMap<Jid,QStandardItem *> FContactModelItems;
 	QMap<IArchiveHeader,IArchiveCollection> FCollections;
+private:
+	QList<QDate> FLoadedPages;
+	QTimer FHeadersRequestTimer;
+	QMap<QString, QDate> FHeadersRequests;
+private:
+	int FLoadHeaderIndex;
+	ViewOptions FViewOptions;
+	QTimer FCollectionShowTimer;
+	QTimer FCollectionsRequestTimer;
+	QList<IArchiveHeader> FCurrentHeaders;
+	QMap<QString, IArchiveHeader> FCollectionsRequests;
 };
 
 #endif // ARCHIVEVIEWWINDOW_H
