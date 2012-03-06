@@ -1,3 +1,4 @@
+#summary Часто задаваемые вопросы
 = Frequently Asked Questions =
 
 <wiki:toc />
