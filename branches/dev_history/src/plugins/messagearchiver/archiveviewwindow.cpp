@@ -34,7 +34,7 @@ void SortFilterProxyModel::startInvalidate()
 	FInvalidateTimer.start(0);
 }
 
-void SortFilterProxyModel::setVisibleInterval(QDateTime &AStart, QDateTime &AEnd)
+void SortFilterProxyModel::setVisibleInterval(const QDateTime &AStart, const QDateTime &AEnd)
 {
 	if (AStart!=FStart || AEnd!=FEnd)
 	{

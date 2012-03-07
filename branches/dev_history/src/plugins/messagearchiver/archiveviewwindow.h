@@ -48,7 +48,7 @@ class SortFilterProxyModel :
 public:
 	SortFilterProxyModel(QObject *AParent = NULL);
 	void startInvalidate();
-	void setVisibleInterval(QDateTime &AStart, QDateTime &AEnd);
+	void setVisibleInterval(const QDateTime &AStart, const QDateTime &AEnd);
 protected:
 	virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 	virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
