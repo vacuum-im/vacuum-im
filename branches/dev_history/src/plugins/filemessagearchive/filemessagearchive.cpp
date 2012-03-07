@@ -12,6 +12,7 @@
 #define LOG_ACTION_REMOVE     "R"
 
 #include <QDir>
+#include <QStringRef>
 #include <QDirIterator>
 #include <QXmlStreamReader>
 
@@ -391,9 +392,12 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 			QString fname = dirIt.fileName();
 			if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
 			{
-				filesMap.insertMulti(fname,fpath);
-				if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
-					filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
+				if (checkCollectionFile(fpath,ARequest))
+				{
+					filesMap.insertMulti(fname,fpath);
+					if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
+						filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
+				}
 			}
 		}
 		FThreadLock.unlock();
@@ -616,6 +620,67 @@ IArchiveHeader FileMessageArchive::makeHeader(const Jid &AItemJid, const Message
 	header.threadId = AMessage.threadId();
 	header.version = 0;
 	return header;
+}
+
+bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IArchiveRequest &ARequest) const
+{
+	if (!ARequest.threadId.isEmpty() || !ARequest.text.isEmpty())
+	{
+		QFile file(AFileName);
+		if (file.open(QFile::ReadOnly))
+		{
+			Qt::CheckState textState = ARequest.text.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
+			Qt::CheckState threadState = ARequest.threadId.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
+
+			QStringList elemStack;
+			QXmlStreamReader reader(&file);
+			while (!reader.atEnd() && (textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
+			{
+				reader.readNext();
+				if (reader.isStartElement())
+				{
+					elemStack.append(reader.qualifiedName().toString());
+					QString elemPath = elemStack.join("/");
+					if (elemPath == "chat")
+					{
+#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
+						if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
+#else
+						if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
+#endif
+						if (reader.attributes().value("thread").compare(ARequest.threadId)==0)
+							threadState = Qt::Checked;
+						else if (threadState == Qt::PartiallyChecked)
+							threadState = Qt::Unchecked;
+					}
+				}
+				else if (reader.isCharacters())
+				{
+					QString elemPath = elemStack.join("/");
+					if (elemPath=="chat/to/body" || elemPath=="chat/from/body")
+					{
+#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
+						if (reader.text().contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
+#else
+						if (reader.text().toString().contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
+#endif
+					}
+				}
+				else if (reader.isEndElement())
+				{
+					elemStack.removeLast();
+				}
+			}
+			file.close();
+			return textState==Qt::Checked && threadState==Qt::Checked;
+		}
+		return false;
+	}
+	return true;
 }
 
 bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const

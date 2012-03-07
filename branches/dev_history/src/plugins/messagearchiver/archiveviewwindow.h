@@ -68,6 +68,8 @@ public:
 	Jid streamJid() const;
 	Jid contactJid() const;
 	void setContactJid(const Jid &AContactJid);
+	QString searchString() const;
+	void setSearchString(const QString &AText);
 protected:
 	void initialize(IPluginManager *APluginManager);
 	void reset();
@@ -83,6 +85,7 @@ protected:
 protected:
 	void clearMessages();
 	void processCollectionsLoad();
+	IArchiveHeader currentLoadingHeader() const;
 	QString showCollectionInfo(const IArchiveCollection &ACollection);
 	QString showNote(const QString &ANote, const IMessageContentOptions &AOptions);
 	QString showMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
@@ -94,6 +97,14 @@ protected slots:
 	void onCollectionShowTimerTimeout();
 	void onCollectionsRequestTimerTimeout();
 	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore);
+protected slots:
+	void onArchiveSearchStart();
+	void onArchiveSearchChanged(const QString &AText);
+	void onTextSearchTimerTimeout();
+	void onTextSearchNextClicked();
+	void onTextSearchPreviousClicked();
+	void onTextSearchCaseSensitivityChanged();
+	void onTextSearchTextChanged(const QString &AText);
 protected slots:
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 	void onArchiveHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
@@ -113,6 +124,9 @@ private:
 	Jid FContactJid;
 	QMap<Jid,QStandardItem *> FContactModelItems;
 	QMap<IArchiveHeader,IArchiveCollection> FCollections;
+private:
+	QString FSearchString;
+	QTimer FTextSearchTimer;
 private:
 	QList<QDate> FLoadedPages;
 	QTimer FHeadersRequestTimer;

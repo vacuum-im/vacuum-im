@@ -140,6 +140,7 @@ struct IArchiveRequest
 	Jid with;
 	QDateTime start;
 	QDateTime end;
+	QString text;
 	QString threadId;
 	qint32 maxItems;
 	Qt::SortOrder order;

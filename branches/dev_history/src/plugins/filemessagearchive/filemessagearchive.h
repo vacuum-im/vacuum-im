@@ -69,6 +69,7 @@ signals:
 	void fileCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 protected:
 	IArchiveHeader makeHeader(const Jid &AItemJid, const Message &AMessage) const;
+	bool checkCollectionFile(const QString &AFileName, const IArchiveRequest &ARequest) const;
 	bool saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
