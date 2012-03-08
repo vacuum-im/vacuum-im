@@ -58,6 +58,13 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="pbtSelectAllOnLine">
+       <property name="text">
+        <string>All Online</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="pbtSelectNone">
        <property name="text">
         <string>None</string>

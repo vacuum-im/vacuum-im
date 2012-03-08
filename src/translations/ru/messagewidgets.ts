@@ -333,6 +333,10 @@
         <source>None</source>
         <translation>Никого</translation>
     </message>
+    <message>
+        <source>All Online</source>
+        <translation>Все в сети</translation>
+    </message>
 </context>
 <context>
     <name>TabWindow</name>

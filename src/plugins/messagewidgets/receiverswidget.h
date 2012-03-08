@@ -40,6 +40,7 @@ protected:
 protected slots:
 	void onReceiversItemChanged(QTreeWidgetItem *AItem, int AColumn);
 	void onSelectAllClicked();
+	void onSelectAllOnlineClicked();
 	void onSelectNoneClicked();
 	void onAddClicked();
 	void onUpdateClicked();
