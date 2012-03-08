@@ -3,6 +3,8 @@
 #include <QHeaderView>
 #include <QInputDialog>
 
+#define STATUS_ROLE Qt::UserRole +1
+
 ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
@@ -17,6 +19,7 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AS
 	setWindowIconText(tr("Receivers"));
 
 	connect(ui.pbtSelectAll,SIGNAL(clicked()),SLOT(onSelectAllClicked()));
+	connect(ui.pbtSelectAllOnLine,SIGNAL(clicked()),SLOT(onSelectAllOnlineClicked()));
 	connect(ui.pbtSelectNone,SIGNAL(clicked()),SLOT(onSelectNoneClicked()));
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddClicked()));
 	connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
@@ -179,7 +182,6 @@ void ReceiversWidget::createRosterTree()
 	ui.trwReceivers->setIndentation(10);
 	ui.trwReceivers->setHeaderLabels(QStringList() << tr("Contact") << tr("Jid"));
 
-	QString groupDelim = FRoster->groupDelimiter();
 	QList<IRosterItem> ritems = FRoster->rosterItems();
 	foreach (IRosterItem ritem, ritems)
 	{
@@ -209,6 +211,7 @@ void ReceiversWidget::createRosterTree()
 				QString fullName = itemJid.resource().isEmpty() ? bareName : bareName+"/"+itemJid.resource();
 				QTreeWidgetItem *contactItem = getReceiver(itemJid,fullName,groupItem);
 				contactItem->setCheckState(0, Qt::Unchecked);
+				contactItem->setData(0,STATUS_ROLE,FPresence->presenceItem(itemJid).show);
 			}
 		}
 	}
@@ -280,6 +283,18 @@ void ReceiversWidget::onSelectAllClicked()
 {
 	foreach(QTreeWidgetItem *treeItem,FGroupItems)
 		treeItem->setCheckState(0,Qt::Checked);
+}
+
+void ReceiversWidget::onSelectAllOnlineClicked()
+{
+	int status;
+	foreach(QTreeWidgetItem *treeItem,FContactItems) {
+		status = treeItem->data(0,STATUS_ROLE).toInt();
+		if (IPresence::Offline != status && IPresence::Error != status)
+			treeItem->setCheckState(0,Qt::Checked);
+	}
+
+	return;
 }
 
 void ReceiversWidget::onSelectNoneClicked()
