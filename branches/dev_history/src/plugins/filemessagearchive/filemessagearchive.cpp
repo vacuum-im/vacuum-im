@@ -21,7 +21,7 @@
 FileMessageArchive::FileMessageArchive()
 {
 	FPluginManager = NULL;
-	FMessageArchiver = NULL;
+	FArchiver = NULL;
 	FDiscovery = NULL;
 }
 
@@ -57,11 +57,11 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
 	{
-		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
-		if (FMessageArchiver)
+		FArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+		if (FArchiver)
 		{
-			connect(FMessageArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
-			connect(FMessageArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
+			connect(FArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
+			connect(FArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
 		}
 	}
 
@@ -75,7 +75,7 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 		}
 	}
 
-	return FMessageArchiver!=NULL;
+	return FArchiver!=NULL;
 }
 
 bool FileMessageArchive::initObjects()
@@ -93,9 +93,9 @@ bool FileMessageArchive::initObjects()
 	}
 	gateways.close();
 
-	if (FMessageArchiver)
+	if (FArchiver)
 	{
-		FMessageArchiver->registerArchiveEngine(this);
+		FArchiver->registerArchiveEngine(this);
 	}
 	return true;
 }
@@ -128,14 +128,14 @@ QString FileMessageArchive::engineDescription() const
 
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
-	if (AStreamJid.isValid() && !FMessageArchiver->isReady(AStreamJid))
+	if (AStreamJid.isValid() && !FArchiver->isReady(AStreamJid))
 		return ArchiveManagement|Replication|TextSearch;
 	return DirectArchiving|ManualArchiving|ArchiveManagement|Replication|TextSearch;
 }
 
 bool FileMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability) const
 {
-	return (capabilities(AStreamJid) & ACapability) > 0;
+	return (capabilities(AStreamJid) & ACapability) == ACapability;
 }
 
 int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJid) const
@@ -156,14 +156,14 @@ int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJ
 	case TextSearch:
 		return ACO_SEARCH_FILEARCHIVE;
 	default:
-		return 0;
+		return -1;
 	}
 }
 
 bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
 	bool written = false;
-	if (isCapable(AStreamJid,DirectArchiving) && FMessageArchiver->isReady(AStreamJid))
+	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
@@ -180,7 +180,7 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 		}
 		if (writer)
 		{
-			IArchiveItemPrefs prefs = FMessageArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
+			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
 			written = writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
 		FThreadLock.unlock();
@@ -191,7 +191,7 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
 	bool written = false;
-	if (isCapable(AStreamJid,DirectArchiving) && FMessageArchiver->isReady(AStreamJid))
+	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
@@ -219,7 +219,7 @@ QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchive
 {
 	if (isCapable(AStreamJid,ManualArchiving) && AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveCollection(ACollection);
 		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
@@ -233,7 +233,7 @@ QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArch
 	Q_UNUSED(AOpened);
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ManualArchiving))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveRequest(ARequest);
 		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
@@ -246,7 +246,7 @@ QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveReq
 {
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveRequest(ARequest);
 		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
@@ -259,7 +259,7 @@ QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchive
 {
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setArchiveHeader(AHeader);
 		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
@@ -272,7 +272,7 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 {
 	if (AStreamJid.isValid() && isCapable(AStreamJid,Replication))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FMessageArchiver,this);
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
 		wthread->setModificationsStart(AStart);
 		wthread->setModificationsCount(ACount);
@@ -458,7 +458,8 @@ IArchiveCollection FileMessageArchive::loadCollectionFromFile(const QString &AFi
 	{
 		QDomDocument doc;
 		doc.setContent(file.readAll(),true);
-		FMessageArchiver->elementToCollection(doc.documentElement(),collection);
+		FArchiver->elementToCollection(doc.documentElement(),collection);
+		collection.header.engineId = engineId();
 		file.close();
 	}
 	FThreadLock.unlock();
@@ -503,6 +504,7 @@ IArchiveModifications FileMessageArchive::loadFileModifications(const Jid &AStre
 					if (logTime.toLocal() > AStart)
 					{
 						IArchiveModification modif;
+						modif.header.engineId = engineId();
 						modif.header.with = logFields.at(2);
 						modif.header.start = DateTime(logFields.at(3)).toLocal();
 						modif.header.version = logFields.at(4).toInt();
@@ -574,7 +576,7 @@ bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArch
 		{
 			QDomDocument doc;
 			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
-			FMessageArchiver->collectionToElement(collection,chatElem,ASaveMode);
+			FArchiver->collectionToElement(collection,chatElem,ASaveMode);
 			file.write(doc.toByteArray(2));
 			file.close();
 			FThreadLock.unlock();
@@ -611,6 +613,7 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 IArchiveHeader FileMessageArchive::makeHeader(const Jid &AItemJid, const Message &AMessage) const
 {
 	IArchiveHeader header;
+	header.engineId = engineId();
 	header.with = AItemJid;
 	if (!AMessage.dateTime().isValid() || AMessage.dateTime().secsTo(QDateTime::currentDateTime())>5)
 		header.start = QDateTime::currentDateTime();
@@ -659,7 +662,7 @@ bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IAr
 				else if (reader.isCharacters())
 				{
 					QString elemPath = elemStack.join("/");
-					if (elemPath=="chat/to/body" || elemPath=="chat/from/body")
+					if (elemPath=="chat/to/body" || elemPath=="chat/from/body" || elemPath=="chat/note")
 					{
 #if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
 						if (reader.text().contains(ARequest.text,Qt::CaseInsensitive))

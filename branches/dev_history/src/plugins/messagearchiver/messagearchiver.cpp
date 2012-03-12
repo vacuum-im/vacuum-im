@@ -674,6 +674,11 @@ QWidget *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const Jid &AC
 	return NULL;
 }
 
+QString MessageArchiver::prefsNamespace(const Jid &AStreamJid) const
+{
+	return FNamespaces.value(AStreamJid);
+}
+
 IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
 {
 	return FArchivePrefs.value(AStreamJid);
@@ -945,7 +950,7 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
-	if (isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
+	if (!isAutoArchiving(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
 	{
 		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
 		if (engine)
@@ -961,13 +966,13 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 
 bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
-	if (isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
+	if (!isAutoArchiving(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
 	{
 		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
 		if (engine)
 		{
 			Message message;
-			message.setFrom(AItemJid.eFull()).setBody(ANote).setThreadId(AThreadId);
+			message.setTo(AStreamJid.eFull()).setFrom(AItemJid.eFull()).setBody(ANote).setThreadId(AThreadId);
 			return engine->saveNote(AStreamJid,message,true);
 		}
 	}
@@ -976,14 +981,14 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const
 
 QString MessageArchiver::loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	QString reqId = loadHeaders(AStreamJid,ARequest);
-	if (!reqId.isEmpty())
+	QString id = loadHeaders(AStreamJid,ARequest);
+	if (!id.isEmpty())
 	{
 		MessagesRequest request;
 		request.request = ARequest;
 		request.streamJid = AStreamJid;
 		QString localId = QUuid::createUuid().toString();
-		FRequestId2LocalId.insert(reqId,localId);
+		FRequestId2LocalId.insert(id,localId);
 		FMesssagesRequests.insert(localId,request);
 		return localId;
 	}
@@ -996,11 +1001,14 @@ QString MessageArchiver::loadHeaders(const Jid &AStreamJid, const IArchiveReques
 	QString localId = QUuid::createUuid().toString();
 	foreach(IArchiveEngine *engine, engineOrderByCapability(IArchiveEngine::ArchiveManagement,AStreamJid))
 	{
-		QString reqId = engine->loadHeaders(AStreamJid,ARequest);
-		if (!reqId.isEmpty())
+		if (ARequest.text.isEmpty() || engine->isCapable(AStreamJid,IArchiveEngine::TextSearch))
 		{
-			request.engines.append(engine);
-			FRequestId2LocalId.insert(reqId,localId);
+			QString id = engine->loadHeaders(AStreamJid,ARequest);
+			if (!id.isEmpty())
+			{
+				request.engines.append(engine);
+				FRequestId2LocalId.insert(id,localId);
+			}
 		}
 	}
 	if (!request.engines.isEmpty())
@@ -1017,12 +1025,12 @@ QString MessageArchiver::loadCollection(const Jid &AStreamJid, const IArchiveHea
 	IArchiveEngine *engine = findArchiveEngine(AHeader.engineId);
 	if (engine)
 	{
-		QString reqId = engine->loadCollection(AStreamJid,AHeader);
-		if (!reqId.isEmpty())
+		QString id = engine->loadCollection(AStreamJid,AHeader);
+		if (!id.isEmpty())
 		{
 			CollectionRequest request;
 			QString localId = QUuid::createUuid().toString();
-			FRequestId2LocalId.insert(reqId,localId);
+			FRequestId2LocalId.insert(id,localId);
 			FCollectionRequests.insert(localId,request);
 			return localId;
 		}
@@ -1210,6 +1218,17 @@ void MessageArchiver::removeArchiveHandler(int AOrder, IArchiveHandler *AHandler
 	FArchiveHandlers.remove(AOrder,AHandler);
 }
 
+quint32 MessageArchiver::totalCapabilities(const Jid &AStreamJid) const
+{
+	quint32 caps = 0;
+	foreach(IArchiveEngine *engine, FArchiveEngines)
+	{
+		if (isArchiveEngineEnabled(engine->engineId()))
+			caps |= engine->capabilities(AStreamJid);
+	}
+	return caps;
+}
+
 QList<IArchiveEngine *> MessageArchiver::archiveEngines() const
 {
 	return FArchiveEngines.values();
@@ -1229,6 +1248,8 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 {
 	if (AEngine!=NULL && !FArchiveEngines.contains(AEngine->engineId()))
 	{
+		connect(AEngine->instance(),SIGNAL(capabilitiesChanged(const Jid &)),
+			SLOT(onEngineCapabilitiesChanged(const Jid &)));
 		connect(AEngine->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
 			SLOT(onEngineRequestFailed(const QString &, const QString &)));
 		connect(AEngine->instance(),SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
@@ -1236,6 +1257,8 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 		connect(AEngine->instance(),SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
 			SLOT(onEngineCollectionLoaded(const QString &, const IArchiveCollection &)));
 		FArchiveEngines.insert(AEngine->engineId(),AEngine);
+		emit archiveEngineRegistered(AEngine);
+		emit totalCapabilitiesChanged(Jid::null);
 	}
 }
 
@@ -1489,11 +1512,7 @@ bool MessageArchiver::processMessage(const Jid &AStreamJid, const Message &AMess
 		FPendingMessages[AStreamJid].append(qMakePair<Message,bool>(AMessage,ADirectionIn));
 		return true;
 	}
-	else if (!isAutoArchiving(AStreamJid))
-	{
-		return saveMessage(AStreamJid,itemJid,AMessage);
-	}
-	return false;
+	return saveMessage(AStreamJid,itemJid,AMessage);
 }
 
 IArchiveEngine *MessageArchiver::findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const
@@ -2109,6 +2128,7 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 		else
 			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qGreater<Message>());
 
+		//Do not break collections
 		//if (ARequest.request.maxItems>0 && ARequest.body.messages.count()>ARequest.request.maxItems)
 		//	ARequest.body.messages = ARequest.body.messages.mid(0,ARequest.request.maxItems);
 
@@ -2116,10 +2136,10 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 	}
 	else
 	{
-		QString reqId = loadCollection(ARequest.streamJid,ARequest.headers.takeFirst());
-		if (!reqId.isEmpty())
+		QString id = loadCollection(ARequest.streamJid,ARequest.headers.takeFirst());
+		if (!id.isEmpty())
 		{
-			FRequestId2LocalId.insert(reqId,ALocalId);
+			FRequestId2LocalId.insert(id,ALocalId);
 		}
 		else
 		{
@@ -2127,6 +2147,11 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 			processMessagesRequest(ALocalId,ARequest);
 		}
 	}
+}
+
+void MessageArchiver::onEngineCapabilitiesChanged(const Jid &AStreamJid)
+{
+	emit totalCapabilitiesChanged(AStreamJid);
 }
 
 void MessageArchiver::onEngineRequestFailed(const QString &AId, const QString &AError)

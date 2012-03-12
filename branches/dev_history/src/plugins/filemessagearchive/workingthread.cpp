@@ -8,7 +8,7 @@ WorkingThread::WorkingThread(IFileMessageArchive *AFileArchive, IMessageArchiver
 {
 	FHasError = false;
 	FFileArchive = AFileArchive;
-	FMessageArchiver = AMessageArchiver;
+	FArchiver = AMessageArchiver;
 	FWorkId = QString("work_%1").arg(++FWorkIndex);
 }
 
@@ -129,7 +129,7 @@ QString WorkingThread::executeAction(int AAction)
 	{
 		FAction = AAction;
 		if (FAction == SaveCollection)
-			FItemPrefs = FMessageArchiver->archiveItemPrefs(FStreamJid,FCollection.header.with,FCollection.header.threadId);
+			FItemPrefs = FArchiver->archiveItemPrefs(FStreamJid,FCollection.header.with,FCollection.header.threadId);
 		start();
 		return workId();
 	}

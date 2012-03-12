@@ -45,7 +45,7 @@ public:
 protected:
 	virtual void run();
 private:
-	IMessageArchiver *FMessageArchiver;
+	IMessageArchiver *FArchiver;
 	IFileMessageArchive *FFileArchive;
 private:
 	int FAction;

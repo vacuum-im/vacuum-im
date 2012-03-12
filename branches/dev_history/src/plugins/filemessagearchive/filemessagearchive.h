@@ -82,7 +82,7 @@ protected slots:
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
 	IPluginManager *FPluginManager;
-	IMessageArchiver *FMessageArchiver;
+	IMessageArchiver *FArchiver;
 	IServiceDiscovery *FDiscovery;
 private:
 	mutable QReadWriteLock FThreadLock;

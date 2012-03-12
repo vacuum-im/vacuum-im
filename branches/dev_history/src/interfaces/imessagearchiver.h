@@ -146,6 +146,18 @@ struct IArchiveRequest
 	Qt::SortOrder order;
 };
 
+struct IArchiveResultSet 
+{
+	IArchiveResultSet() {
+		index = 0;
+		count = 0;
+	}
+	int index;
+	int count;
+	QString first;
+	QString last;
+};
+
 class IArchiveHandler
 {
 public:
@@ -208,6 +220,7 @@ public:
 	virtual QString saveModeName(const QString &ASaveMode) const =0;
 	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) =0;
 	//Archive Preferences
+	virtual QString prefsNamespace(const Jid &AStreamJid) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto) =0;
@@ -228,6 +241,7 @@ public:
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
 	//Archive Engines
+	virtual quint32 totalCapabilities(const Jid &AStreamJid) const =0;
 	virtual QList<IArchiveEngine *> archiveEngines() const =0;
 	virtual bool isArchiveEngineEnabled(const QUuid &AId) const =0;
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const =0;
@@ -244,6 +258,9 @@ protected:
 	//Common Requests
 	virtual void requestCompleted(const QString &AId) =0;
 	virtual void requestFailed(const QString &AId, const QString &AError) =0;
+	//Engines
+	virtual void totalCapabilitiesChanged(const Jid &AStreamJid) =0;
+	virtual void archiveEngineRegistered(IArchiveEngine *AEngine) =0;
 };
 
 Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")

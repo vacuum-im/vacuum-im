@@ -1,3 +1,3 @@
-set(SOURCES archiveoptions.cpp messagearchiver.cpp viewhistorywindow.cpp collectionwriter.cpp replicator.cpp chatwindowmenu.cpp )
-set(HEADERS archiveoptions.h replicator.h chatwindowmenu.h collectionwriter.h messagearchiver.h viewhistorywindow.h )
-set(UIS archiveoptions.ui viewhistorywindow.ui )
+set(SOURCES archiveoptions.cpp messagearchiver.cpp archiveviewwindow.cpp chatwindowmenu.cpp selectpagewidget.cpp)
+set(HEADERS archiveoptions.h messagearchiver.h archiveviewwindow.h chatwindowmenu.h selectpagewidget.h)
+set(UIS archiveoptions.ui archiveviewwindow.ui selectpagewidget.ui)

@@ -116,6 +116,7 @@ public:
 	virtual QString saveModeName(const QString &ASaveMode) const;
 	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null);
   //Preferences
+	virtual QString prefsNamespace(const Jid &AStreamJid) const;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const;
 	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto);
@@ -136,6 +137,7 @@ public:
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler);
 	virtual void removeArchiveHandler(int AOrder, IArchiveHandler *AHandler);
 	//Engines
+	virtual quint32 totalCapabilities(const Jid &AStreamJid) const;
 	virtual QList<IArchiveEngine *> archiveEngines() const;
 	virtual bool isArchiveEngineEnabled(const QUuid &AId) const;
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const;
@@ -152,6 +154,9 @@ signals:
 	//Common Requests
 	void requestCompleted(const QString &AId);
 	void requestFailed(const QString &AId, const QString &AError);
+	//Engines
+	void totalCapabilitiesChanged(const Jid &AStreamJid);
+	void archiveEngineRegistered(IArchiveEngine *AEngine);
 protected:
 	void registerDiscoFeatures();
 	QString loadServerPrefs(const Jid &AStreamJid);
@@ -181,6 +186,7 @@ protected:
 	void processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest);
 	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
 protected slots:
+	void onEngineCapabilitiesChanged(const Jid &AStreamJid);
 	void onEngineRequestFailed(const QString &AId, const QString &AError);
 	void onEngineHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onEngineCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
