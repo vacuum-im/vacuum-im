@@ -119,9 +119,9 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	palette.setColor(QPalette::Inactive,QPalette::HighlightedText,palette.color(QPalette::Active,QPalette::HighlightedText));
 	ui.tbrMessages->setPalette(palette);
 
-	ui.trvCollections->setModel(FProxyModel);
-	ui.trvCollections->header()->setSortIndicator(0,Qt::AscendingOrder);
-	connect(ui.trvCollections->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
+	ui.trvHeaders->setModel(FProxyModel);
+	ui.trvHeaders->header()->setSortIndicator(0,Qt::AscendingOrder);
+	connect(ui.trvHeaders->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
 		SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 	connect(ui.spwSelectPage,SIGNAL(currentPageChanged(int, int)),SLOT(onCurrentPageChanged(int, int)));
 
@@ -148,10 +148,13 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 #if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
 	ui.lneArchiveSearch->setPlaceholderText(tr("Search in archive"));
 #endif
-	ui.tlbArchiveSearchStart->setIcon(style()->standardIcon(QStyle::SP_BrowserReload, NULL, this));
-	connect(ui.tlbArchiveSearchStart,SIGNAL(clicked()),SLOT(onArchiveSearchStart()));
-	connect(ui.lneArchiveSearch,SIGNAL(returnPressed()),SLOT(onArchiveSearchStart()));
+	ui.tlbArchiveSearchUpdate->setIcon(style()->standardIcon(QStyle::SP_BrowserReload, NULL, this));
+	connect(ui.tlbArchiveSearchUpdate,SIGNAL(clicked()),SLOT(onArchiveSearchUpdate()));
+	connect(ui.lneArchiveSearch,SIGNAL(returnPressed()),SLOT(onArchiveSearchUpdate()));
 	connect(ui.lneArchiveSearch,SIGNAL(textChanged(const QString &)),SLOT(onArchiveSearchChanged(const QString &)));
+
+	ui.pbtHeadersUpdate->setIcon(style()->standardIcon(QStyle::SP_BrowserReload, NULL, this));
+	connect(ui.pbtHeadersUpdate,SIGNAL(clicked()),SLOT(onHeadersUpdateButtonClicked()));
 
 	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
 		SLOT(onArchiveRequestFailed(const QString &, const QString &)));
@@ -168,6 +171,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	restoreState(Options::fileValue("history.archiveview.state").toByteArray());
 
 	onCurrentPageChanged(ui.spwSelectPage->yearShown(),ui.spwSelectPage->monthShown());
+
 	reset();
 }
 
@@ -313,16 +317,16 @@ QDate ArchiveViewWindow::currentPage() const
 
 void ArchiveViewWindow::setPageStatus(PageStatus AStatus, const QString &AMessage)
 {
-	ui.trvCollections->setEnabled(AStatus != PageLoading);
-	ui.wdtArchiveSearch->setEnabled(AStatus != PageLoading);
+	ui.trvHeaders->setEnabled(AStatus == PageReady);
+	ui.wdtArchiveSearch->setEnabled(AStatus == PageReady);
+	ui.pbtHeadersUpdate->setEnabled(AStatus != PageLoading);
 
 	if (AStatus == PageReady)
 	{
-		ui.trvCollections->setFocus(Qt::MouseFocusReason);
-		ui.trvCollections->selectionModel()->clearSelection();
-		ui.trvCollections->setCurrentIndex(QModelIndex());
+		ui.trvHeaders->setFocus(Qt::MouseFocusReason);
+		ui.trvHeaders->selectionModel()->clearSelection();
+		ui.trvHeaders->setCurrentIndex(QModelIndex());
 		ui.stbStatusBar->showMessage(tr("Conversation headers loaded"));
-		onArchiveSearchChanged(ui.lneArchiveSearch->text());
 	}
 	else if(AStatus == PageLoading)
 	{
@@ -332,6 +336,8 @@ void ArchiveViewWindow::setPageStatus(PageStatus AStatus, const QString &AMessag
 	{
 		ui.stbStatusBar->showMessage(tr("Failed to load conversation headers: %1").arg(AMessage));
 	}
+
+	onArchiveSearchChanged(ui.lneArchiveSearch->text());
 }
 
 void ArchiveViewWindow::setMessagesStatus(MessagesStatus AStatus, const QString &AMessage)
@@ -383,7 +389,7 @@ void ArchiveViewWindow::processCollectionsLoad()
 			}
 			else
 			{
-				setMessagesStatus(MessagesLoadError,tr("Failed to request archive collections"));
+				setMessagesStatus(MessagesLoadError,tr("Archive is not accessible"));
 			}
 		}
 		else
@@ -627,6 +633,11 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 	FLoadHeaderIndex++;
 }
 
+void ArchiveViewWindow::onHeadersUpdateButtonClicked()
+{
+	reset();
+}
+
 void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 {
 	QDate start = currentPage();
@@ -646,7 +657,7 @@ void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 		}
 		else
 		{
-			setPageStatus(PageLoadError,tr("Failed to request archive headers"));
+			setPageStatus(PageLoadError,tr("Archive is not accessible"));
 		}
 	}
 }
@@ -680,7 +691,7 @@ void ArchiveViewWindow::onCollectionShowTimerTimeout()
 
 void ArchiveViewWindow::onCollectionsRequestTimerTimeout()
 {
-	QModelIndex index = ui.trvCollections->selectionModel()->currentIndex();
+	QModelIndex index = ui.trvHeaders->selectionModel()->currentIndex();
 	if (index.isValid())
 	{
 		if (index.data(HDR_TYPE).toInt() == HIT_CONTACT)
@@ -716,7 +727,7 @@ void ArchiveViewWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
 	}
 }
 
-void ArchiveViewWindow::onArchiveSearchStart()
+void ArchiveViewWindow::onArchiveSearchUpdate()
 {
 	setSearchString(ui.lneArchiveSearch->text());
 	ui.lneTextSearch->setText(ui.lneArchiveSearch->text());
@@ -724,7 +735,7 @@ void ArchiveViewWindow::onArchiveSearchStart()
 
 void ArchiveViewWindow::onArchiveSearchChanged(const QString &AText)
 {
-	ui.tlbArchiveSearchStart->setEnabled(searchString()!=AText);
+	ui.tlbArchiveSearchUpdate->setEnabled(searchString()!=AText);
 }
 
 void ArchiveViewWindow::onTextSearchTimerTimeout()

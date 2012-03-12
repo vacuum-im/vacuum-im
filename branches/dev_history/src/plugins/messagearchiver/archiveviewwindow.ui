@@ -32,7 +32,7 @@
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="QWidget" name="wdtContacts" native="true">
+      <widget class="QWidget" name="wdtHeaders" native="true">
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="margin">
          <number>0</number>
@@ -54,7 +54,7 @@
             <widget class="QLineEdit" name="lneArchiveSearch"/>
            </item>
            <item>
-            <widget class="QToolButton" name="tlbArchiveSearchStart">
+            <widget class="QToolButton" name="tlbArchiveSearchUpdate">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                <horstretch>0</horstretch>
@@ -73,7 +73,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QTreeView" name="trvCollections">
+         <widget class="QTreeView" name="trvHeaders">
           <property name="contextMenuPolicy">
            <enum>Qt::CustomContextMenu</enum>
           </property>
@@ -94,6 +94,13 @@
           </property>
           <property name="headerHidden">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pbtHeadersUpdate">
+          <property name="text">
+           <string>Update</string>
           </property>
          </widget>
         </item>
@@ -224,7 +231,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>spwSelectPage</tabstop>
-  <tabstop>trvCollections</tabstop>
+  <tabstop>trvHeaders</tabstop>
   <tabstop>tbrMessages</tabstop>
   <tabstop>lneTextSearch</tabstop>
   <tabstop>tlbTextSearchNext</tabstop>

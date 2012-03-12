@@ -91,6 +91,7 @@ protected:
 	QString showMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
 	void showCollection(const IArchiveCollection &ACollection);
 protected slots:
+	void onHeadersUpdateButtonClicked();
 	void onHeadersRequestTimerTimeout();
 	void onCurrentPageChanged(int AYear, int AMonth);
 protected slots:
@@ -98,7 +99,7 @@ protected slots:
 	void onCollectionsRequestTimerTimeout();
 	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore);
 protected slots:
-	void onArchiveSearchStart();
+	void onArchiveSearchUpdate();
 	void onArchiveSearchChanged(const QString &AText);
 	void onTextSearchTimerTimeout();
 	void onTextSearchNextClicked();
