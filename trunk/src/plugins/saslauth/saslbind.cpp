@@ -1,5 +1,7 @@
 #include "saslbind.h"
 
+#include <QProcess>
+
 SASLBind::SASLBind(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
 	FXmppStream = AXmppStream;
@@ -56,7 +58,15 @@ bool SASLBind::start(const QDomElement &AElem)
 		bind.setType("set").setId("bind");
 		bind.addElement("bind",NS_FEATURE_BIND);
 		if (!FXmppStream->streamJid().resource().isEmpty())
-			bind.firstElement("bind",NS_FEATURE_BIND).appendChild(bind.createElement("resource")).appendChild(bind.createTextNode(FXmppStream->streamJid().resource()));
+		{
+			QString resource = FXmppStream->streamJid().resource();
+			foreach(QString env, QProcess::systemEnvironment())
+			{
+				QList<QString> param_value = env.split("=");
+				resource.replace("%"+param_value.value(0)+"%",param_value.value(1));
+			}
+			bind.firstElement("bind",NS_FEATURE_BIND).appendChild(bind.createElement("resource")).appendChild(bind.createTextNode(resource));
+		}
 		FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		FXmppStream->sendStanza(bind);
 		return true;
