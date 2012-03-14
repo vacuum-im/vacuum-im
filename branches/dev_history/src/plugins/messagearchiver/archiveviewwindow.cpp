@@ -736,6 +736,7 @@ void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 	{
 		IArchiveRequest request;
 		request.with = contactJid().bare();
+		request.exactmatch = request.with.node().isEmpty();
 		request.start = QDateTime(start);
 		request.end = QDateTime(end);
 		request.text = searchString();
@@ -935,6 +936,7 @@ void ArchiveViewWindow::onRemoveCollectionsByAction()
 	{
 		IArchiveRequest request;
 		request.with = action->data(ADR_HEADER_WITH).toString();
+		request.exactmatch = request.with.node().isEmpty();
 		request.start = action->data(ADR_HEADER_START).toDateTime();
 		request.end = action->data(ADR_HEADER_END).toDateTime();
 

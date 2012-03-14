@@ -134,6 +134,7 @@ struct IArchiveRequest
 {
 	IArchiveRequest() {
 		opened = false;
+		exactmatch = false;
 		maxItems = 0;
 		threadId = QString::null;
 		order = Qt::AscendingOrder;
@@ -142,6 +143,7 @@ struct IArchiveRequest
 	QDateTime start;
 	QDateTime end;
 	bool opened;
+	bool exactmatch;
 	QString text;
 	qint32 maxItems;
 	QString threadId;

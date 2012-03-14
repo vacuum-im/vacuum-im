@@ -283,16 +283,12 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 
 QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 {
-	Jid jid = AWith;
-
-	FThreadLock.lockForRead();
-	if (!jid.node().isEmpty() && FGatewayTypes.contains(jid.domain()))
-		jid.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(jid.domain())));
-	FThreadLock.unlock();
+	Jid jid = !AWith.node().isEmpty() ? gatewayJid(AWith) : AWith;
 
 	QString dirName = Jid::encode(jid.pBare());
 	if (!jid.resource().isEmpty())
-		dirName += "/"+Jid::encode(jid.pResource());
+		dirName += "/" + Jid::encode(jid.pResource());
+
 	return dirName;
 }
 
@@ -381,21 +377,54 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 		QMultiMap<QString,QString> filesMap;
 		QString startName = collectionFileName(ARequest.start);
 		QString endName = collectionFileName(ARequest.end);
-		QString dirPath = collectionDirPath(AStreamJid,ARequest.with);
+		QDirIterator::IteratorFlags flags = ARequest.with.isValid() && ARequest.exactmatch ? QDirIterator::NoIteratorFlags : QDirIterator::Subdirectories;
 		
-		FThreadLock.lockForRead();
-		QDirIterator dirIt(dirPath,QDir::Files,QDirIterator::Subdirectories);
-		while (dirIt.hasNext())
+		QList<QString> dirPaths;
+		if (ARequest.with.node().isEmpty() && !ARequest.exactmatch)
 		{
-			QString fpath = dirIt.next();
-			QString fname = dirIt.fileName();
-			if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
+			QString gateDomain = gatewayJid(ARequest.with).pDomain();
+			QString encResource = Jid::encode(ARequest.with.pResource());
+			QString streamDirPath = collectionDirPath(AStreamJid,Jid::null);
+			
+			if (ARequest.with.pDomain() != gateDomain)
+				dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
+
+			FThreadLock.lockForRead();
+			QDirIterator dirIt(streamDirPath,QDir::Dirs|QDir::NoDotAndDotDot);
+			while (dirIt.hasNext())
 			{
-				if (checkCollectionFile(fpath,ARequest))
+				QString dirPath = dirIt.next();
+				Jid bareJid = Jid::decode(dirIt.fileName());
+				if (bareJid.pDomain() == gateDomain)
 				{
-					filesMap.insertMulti(fname,fpath);
-					if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
-						filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
+					if (!encResource.isEmpty())
+						dirPath += "/" + encResource;
+					dirPaths.append(dirPath);
+				}
+			}
+			FThreadLock.unlock();
+		}
+		else
+		{
+			dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
+		}
+
+		FThreadLock.lockForRead();
+		for (int i=0; i<dirPaths.count(); i++)
+		{
+			QDirIterator dirIt(dirPaths.at(i),QDir::Files,flags);
+			while (dirIt.hasNext())
+			{
+				QString fpath = dirIt.next();
+				QString fname = dirIt.fileName();
+				if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
+				{
+					if (checkCollectionFile(fpath,ARequest))
+					{
+						filesMap.insertMulti(fname,fpath);
+						if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
+							filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
+					}
 				}
 			}
 		}
@@ -607,6 +636,16 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 		FThreadLock.unlock();
 	}
 	return false;
+}
+
+Jid FileMessageArchive::gatewayJid(const Jid &AJid) const
+{
+	Jid jid = AJid;
+	FThreadLock.lockForRead();
+	if (FGatewayTypes.contains(jid.domain()))
+		jid.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(jid.domain())));
+	FThreadLock.unlock();
+	return jid;
 }
 
 IArchiveHeader FileMessageArchive::makeHeader(const Jid &AItemJid, const Message &AMessage) const

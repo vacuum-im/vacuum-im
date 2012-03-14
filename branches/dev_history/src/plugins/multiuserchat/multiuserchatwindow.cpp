@@ -1307,6 +1307,7 @@ void MultiUserChatWindow::showHistory()
 	{
 		IArchiveRequest request;
 		request.with = FMultiChat->roomJid();
+		request.exactmatch = true;
 		request.order = Qt::DescendingOrder;
 		request.start = FWindowStatus.value(FViewWidget).createTime;
 		request.end = QDateTime::currentDateTime();

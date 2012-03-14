@@ -416,6 +416,7 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 	{
 		IArchiveRequest request;
 		request.with = AWindow->contactJid().bare();
+		request.exactmatch = request.with.node().isEmpty();
 		request.order = Qt::DescendingOrder;
 
 		WindowStatus &wstatus = FWindowStatus[AWindow];
