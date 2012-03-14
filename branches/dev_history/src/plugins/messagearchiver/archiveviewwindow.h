@@ -21,16 +21,10 @@
 #include <utils/widgetmanager.h>
 #include "ui_archiveviewwindow.h"
 
-enum PageStatus {
-	PageReady,
-	PageLoading,
-	PageLoadError
-};
-
-enum MessagesStatus {
-	MessagesReady,
-	MessagesLoading,
-	MessagesLoadError
+enum RequestStatus {
+	RequestFinished,
+	RequestStarted,
+	RequestError
 };
 
 struct ViewOptions {
@@ -74,18 +68,23 @@ protected:
 	void initialize(IPluginManager *APluginManager);
 	void reset();
 protected:
-	QString contactName(const Jid &AContactJid) const;
+	QString contactName(const Jid &AContactJid, bool AShowResource = false) const;
 	QStandardItem *createContactItem(const Jid &AContactJid);
 	QStandardItem *createHeaderItem(const IArchiveHeader &AHeader);
 	IArchiveHeader modelIndexHeader(const QModelIndex &AIndex) const;
+	bool isJidMatched(const Jid &ARequested, const Jid &AHeaderJid) const;
+	QList<QStandardItem *> findHeaderItems(const IArchiveRequest &ARequest, QStandardItem *AParent = NULL) const;
 protected:
 	QDate currentPage() const;
-	void setPageStatus(PageStatus AStatus, const QString &AMessage = QString::null);
-	void setMessagesStatus(MessagesStatus AStatus, const QString &AMessage = QString::null);
+	void setRequestStatus(RequestStatus AStatus, const QString &AMessage);
+	void setPageStatus(RequestStatus AStatus, const QString &AMessage = QString::null);
+	void setMessagesStatus(RequestStatus AStatus, const QString &AMessage = QString::null);
 protected:
 	void clearMessages();
 	void processCollectionsLoad();
 	IArchiveHeader currentLoadingHeader() const;
+	bool updateHeaders(const IArchiveRequest &ARequest);
+	void removeHeaderItems(const IArchiveRequest &ARequest);
 	QString showCollectionInfo(const IArchiveCollection &ACollection);
 	QString showNote(const QString &ANote, const IMessageContentOptions &AOptions);
 	QString showMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
@@ -107,9 +106,13 @@ protected slots:
 	void onTextSearchCaseSensitivityChanged();
 	void onTextSearchTextChanged(const QString &AText);
 protected slots:
+	void onRemoveCollectionsByAction();
+	void onHeaderContextMenuRequested(const QPoint &APos);
+protected slots:
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 	void onArchiveHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	void onArchiveCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 private:
 	Ui::ArchiveViewWindow ui;
 private:
@@ -132,6 +135,7 @@ private:
 	QList<QDate> FLoadedPages;
 	QTimer FHeadersRequestTimer;
 	QMap<QString, QDate> FHeadersRequests;
+	QMap<QString, IArchiveRequest> FRemoveRequests;
 private:
 	int FLoadHeaderIndex;
 	ViewOptions FViewOptions;

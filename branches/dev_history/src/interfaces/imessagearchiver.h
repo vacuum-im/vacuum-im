@@ -133,6 +133,7 @@ struct IArchiveModifications
 struct IArchiveRequest
 {
 	IArchiveRequest() {
+		opened = false;
 		maxItems = 0;
 		threadId = QString::null;
 		order = Qt::AscendingOrder;
@@ -140,9 +141,10 @@ struct IArchiveRequest
 	Jid with;
 	QDateTime start;
 	QDateTime end;
+	bool opened;
 	QString text;
-	QString threadId;
 	qint32 maxItems;
+	QString threadId;
 	Qt::SortOrder order;
 };
 
@@ -184,24 +186,24 @@ public:
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const =0;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;
-	//DirectArchiving
+	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn) =0;
-	//ManualArchiving
+	//Manual Archiving
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection) =0;
-	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false) =0;
-	//ArchiveManagement
+	//Archive Management
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
+	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	//Replication
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) =0;
 protected:
 	virtual void capabilitiesChanged(const Jid &AStreamJid) =0;
 	virtual void requestFailed(const QString &AId, const QString &AError) =0;
 	virtual void collectionSaved(const QString &AId, const IArchiveHeader &AHeader) =0;
-	virtual void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;
 	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders) =0;
 	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection) =0;
+	virtual void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;
 	virtual void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs) =0;
 };
 
@@ -234,6 +236,7 @@ public:
 	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
+	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	//Archive Utilities
 	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const =0;
 	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const =0;
@@ -247,6 +250,9 @@ public:
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const =0;
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine) =0;
 protected:
+	//Common Requests
+	virtual void requestCompleted(const QString &AId) =0;
+	virtual void requestFailed(const QString &AId, const QString &AError) =0;
 	//Archive Preferences
 	virtual void archivePrefsOpened(const Jid &AStreamJid) =0;
 	virtual void archivePrefsChanged(const Jid &AStreamJid) =0;
@@ -255,9 +261,7 @@ protected:
 	virtual void messagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody) =0;
 	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders) =0;
 	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection) =0;
-	//Common Requests
-	virtual void requestCompleted(const QString &AId) =0;
-	virtual void requestFailed(const QString &AId, const QString &AError) =0;
+	virtual void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;
 	//Engines
 	virtual void totalCapabilitiesChanged(const Jid &AStreamJid) =0;
 	virtual void archiveEngineRegistered(IArchiveEngine *AEngine) =0;

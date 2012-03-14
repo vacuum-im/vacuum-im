@@ -1038,6 +1038,28 @@ QString MessageArchiver::loadCollection(const Jid &AStreamJid, const IArchiveHea
 	return QString::null;
 }
 
+QString MessageArchiver::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
+{
+	RemoveRequest request;
+	QString localId = QUuid::createUuid().toString();
+	foreach(IArchiveEngine *engine, engineOrderByCapability(IArchiveEngine::ArchiveManagement,AStreamJid))
+	{
+		QString id = engine->removeCollections(AStreamJid,ARequest);
+		if (!id.isEmpty())
+		{
+			FRequestId2LocalId.insert(id,localId);
+			request.engines.append(engine);
+		}
+	}
+	if (!request.engines.isEmpty())
+	{
+		request.request = ARequest;
+		FRemoveRequests.insert(localId,request);
+		return localId;
+	}
+	return QString::null;
+}
+
 void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const
 {
 	ACollection.header.with = AChatElem.attribute("with");
@@ -1252,6 +1274,8 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 			SLOT(onEngineCapabilitiesChanged(const Jid &)));
 		connect(AEngine->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
 			SLOT(onEngineRequestFailed(const QString &, const QString &)));
+		connect(AEngine->instance(),SIGNAL(collectionsRemoved(const QString &, const IArchiveRequest &)),
+			SLOT(onEngineCollectionsRemoved(const QString &, const IArchiveRequest &)));
 		connect(AEngine->instance(),SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
 			SLOT(onEngineHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
 		connect(AEngine->instance(),SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
@@ -2067,6 +2091,18 @@ bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected
 
 }
 
+void MessageArchiver::processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest)
+{
+	if (ARequest.engines.isEmpty())
+	{
+		if (ARequest.lastError.isEmpty())
+			emit collectionsRemoved(ALocalId,ARequest.request);
+		else
+			emit requestFailed(ALocalId,ARequest.lastError);
+		FRemoveRequests.remove(ALocalId);
+	}
+}
+
 void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest)
 {
 	if (ARequest.engines.count() == ARequest.headers.count())
@@ -2172,6 +2208,29 @@ void MessageArchiver::onEngineRequestFailed(const QString &AId, const QString &A
 			CollectionRequest &request = FCollectionRequests[localId];
 			request.lastError = AError;
 			processCollectionRequest(localId,request);
+		}
+		else if (FRemoveRequests.contains(localId))
+		{
+			RemoveRequest &request = FRemoveRequests[localId];
+			request.lastError = AError;
+			request.engines.removeAll(engine);
+			processRemoveRequest(localId,request);
+		}
+	}
+}
+
+void MessageArchiver::onEngineCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest)
+{
+	Q_UNUSED(ARequest);
+	if (FRequestId2LocalId.contains(AId))
+	{
+		QString localId = FRequestId2LocalId.take(AId);
+		if (FRemoveRequests.contains(localId))
+		{
+			IArchiveEngine *engine = qobject_cast<IArchiveEngine *>(sender());
+			RemoveRequest &request = FRemoveRequests[localId];
+			request.engines.removeAll(engine);
+			processRemoveRequest(localId,request);
 		}
 	}
 }

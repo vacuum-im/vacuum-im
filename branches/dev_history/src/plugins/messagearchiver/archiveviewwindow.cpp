@@ -1,11 +1,8 @@
 #include "archiveviewwindow.h"
 
 #include <QLocale>
+#include <QMessageBox>
 #include <QItemSelectionModel>
-
-#define HEADERS_LOAD_TIMEOUT         500
-#define COLLECTIONS_LOAD_TIMEOUT     200
-#define TEXT_SEARCH_TIMEOUT          500
 
 enum HistoryItemType {
 	HIT_CONTACT,
@@ -22,6 +19,13 @@ enum HistoryDataRoles {
 	HDR_HEADER_VERSION
 };
 
+#define ADR_HEADER_WITH              Action::DR_Parametr1
+#define ADR_HEADER_START             Action::DR_Parametr2
+#define ADR_HEADER_END               Action::DR_Parametr3
+
+#define HEADERS_LOAD_TIMEOUT         500
+#define COLLECTIONS_LOAD_TIMEOUT     200
+#define TEXT_SEARCH_TIMEOUT          500
 
 SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
@@ -123,6 +127,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	ui.trvHeaders->header()->setSortIndicator(0,Qt::AscendingOrder);
 	connect(ui.trvHeaders->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
 		SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
+	connect(ui.trvHeaders,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onHeaderContextMenuRequested(const QPoint &)));
 	connect(ui.spwSelectPage,SIGNAL(currentPageChanged(int, int)),SLOT(onCurrentPageChanged(int, int)));
 
 	FHeadersRequestTimer.setSingleShot(true);
@@ -146,7 +151,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	connect(ui.chbTextSearchCaseSensitive,SIGNAL(stateChanged(int)),SLOT(onTextSearchCaseSensitivityChanged()));
 
 #if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
-	ui.lneArchiveSearch->setPlaceholderText(tr("Search in archive"));
+	ui.lneArchiveSearch->setPlaceholderText(tr("Search in history"));
 #endif
 	ui.tlbArchiveSearchUpdate->setIcon(style()->standardIcon(QStyle::SP_BrowserReload, NULL, this));
 	connect(ui.tlbArchiveSearchUpdate,SIGNAL(clicked()),SLOT(onArchiveSearchUpdate()));
@@ -162,6 +167,8 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 		SLOT(onArchiveHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
 	connect(FArchiver->instance(),SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
 		SLOT(onArchiveCollectionLoaded(const QString &, const IArchiveCollection &)));
+	connect(FArchiver->instance(),SIGNAL(collectionsRemoved(const QString &, const IArchiveRequest &)),
+		SLOT(onArchiveCollectionsRemoved(const QString &, const IArchiveRequest &)));
 	connect(FRoster->instance(),SIGNAL(destroyed(QObject *)),SLOT(close()));
 
 	if (!restoreGeometry(Options::fileValue("history.archiveview.geometry").toByteArray()))
@@ -244,19 +251,22 @@ void ArchiveViewWindow::reset()
 	FCurrentHeaders.clear();
 
 	if (FContactJid.isEmpty())
-		setWindowTitle(tr("Chat history - %1").arg(streamJid().bare()));
+		setWindowTitle(tr("Conversation history - %1").arg(streamJid().bare()));
 	else
-		setWindowTitle(tr("Chat history with %1 - %2").arg(contactName(FContactJid),streamJid().bare()));
+		setWindowTitle(tr("Conversation history with %1 - %2").arg(contactName(FContactJid),streamJid().bare()));
 
 	clearMessages();
-	setPageStatus(PageLoading);
+	setPageStatus(RequestStarted);
 	FHeadersRequestTimer.start(0);
 }
 
-QString ArchiveViewWindow::contactName(const Jid &AContactJid) const
+QString ArchiveViewWindow::contactName(const Jid &AContactJid, bool AShowResource) const
 {
 	IRosterItem ritem = FRoster->rosterItem(AContactJid);
-	return !ritem.name.isEmpty() ? ritem.name : AContactJid.bare();
+	QString name = !ritem.name.isEmpty() ? ritem.name : AContactJid.bare();
+	if (AShowResource && !AContactJid.resource().isEmpty())
+		name = name + "/" +AContactJid.resource();
+	return name;
 }
 
 QStandardItem *ArchiveViewWindow::createContactItem(const Jid &AContactJid)
@@ -310,29 +320,73 @@ IArchiveHeader ArchiveViewWindow::modelIndexHeader(const QModelIndex &AIndex) co
 	return header;
 }
 
+bool ArchiveViewWindow::isJidMatched(const Jid &ARequested, const Jid &AHeaderJid) const
+{
+	if (ARequested.pBare() != AHeaderJid.pBare())
+		return false;
+	else if (!ARequested.resource().isEmpty() && ARequested.pResource()!=AHeaderJid.pResource())
+		return false;
+	return true;
+}
+
+QList<QStandardItem *> ArchiveViewWindow::findHeaderItems(const IArchiveRequest &ARequest, QStandardItem *AParent) const
+{
+	QList<QStandardItem *> items;
+	QStandardItem *parent = AParent!=NULL ? AParent : FModel->invisibleRootItem();
+	for (int row = 0; row<parent->rowCount() ; row++)
+	{
+		QStandardItem *item = parent->child(row);
+		if (item->data(HDR_TYPE) == HIT_HEADER)
+		{
+			bool checked = true;
+			if (ARequest.with.isValid() && !isJidMatched(ARequest.with,item->data(HDR_HEADER_WITH).toString()))
+				checked = false;
+			else if (ARequest.start.isValid() && ARequest.start>item->data(HDR_HEADER_START).toDateTime())
+				checked = false;
+			else if (ARequest.end.isValid() && ARequest.end<item->data(HDR_HEADER_START).toDateTime())
+				checked = false;
+			else if (!ARequest.threadId.isEmpty() && ARequest.threadId!=item->data(HDR_HEADER_THREAD).toString())
+				checked = false;
+			if (checked)
+				items.append(item);
+		}
+		if (item->rowCount() > 0)
+		{
+			items += findHeaderItems(ARequest,item);
+		}
+	}
+	return items;
+}
+
 QDate ArchiveViewWindow::currentPage() const
 {
 	return QDate(ui.spwSelectPage->yearShown(),ui.spwSelectPage->monthShown(),1);
 }
 
-void ArchiveViewWindow::setPageStatus(PageStatus AStatus, const QString &AMessage)
+void ArchiveViewWindow::setRequestStatus(RequestStatus AStatus, const QString &AMessage)
 {
-	ui.trvHeaders->setEnabled(AStatus == PageReady);
-	ui.wdtArchiveSearch->setEnabled(AStatus == PageReady);
-	ui.pbtHeadersUpdate->setEnabled(AStatus != PageLoading);
+	Q_UNUSED(AStatus);
+	ui.stbStatusBar->showMessage(AMessage);
+}
 
-	if (AStatus == PageReady)
+void ArchiveViewWindow::setPageStatus(RequestStatus AStatus, const QString &AMessage)
+{
+	ui.trvHeaders->setEnabled(AStatus == RequestFinished);
+	ui.wdtArchiveSearch->setEnabled(AStatus == RequestFinished);
+	ui.pbtHeadersUpdate->setEnabled(AStatus != RequestStarted);
+
+	if (AStatus == RequestFinished)
 	{
 		ui.trvHeaders->setFocus(Qt::MouseFocusReason);
 		ui.trvHeaders->selectionModel()->clearSelection();
 		ui.trvHeaders->setCurrentIndex(QModelIndex());
 		ui.stbStatusBar->showMessage(tr("Conversation headers loaded"));
 	}
-	else if(AStatus == PageLoading)
+	else if(AStatus == RequestStarted)
 	{
 		ui.stbStatusBar->showMessage(tr("Loading conversation headers..."));
 	}
-	else if (AStatus == PageLoadError)
+	else if (AStatus == RequestError)
 	{
 		ui.stbStatusBar->showMessage(tr("Failed to load conversation headers: %1").arg(AMessage));
 	}
@@ -340,9 +394,9 @@ void ArchiveViewWindow::setPageStatus(PageStatus AStatus, const QString &AMessag
 	onArchiveSearchChanged(ui.lneArchiveSearch->text());
 }
 
-void ArchiveViewWindow::setMessagesStatus(MessagesStatus AStatus, const QString &AMessage)
+void ArchiveViewWindow::setMessagesStatus(RequestStatus AStatus, const QString &AMessage)
 {
-	if (AStatus == MessagesReady)
+	if (AStatus == RequestFinished)
 	{
 		if (FCurrentHeaders.isEmpty())
 			ui.stbStatusBar->showMessage(tr("Select contact or single conversation"));
@@ -350,18 +404,18 @@ void ArchiveViewWindow::setMessagesStatus(MessagesStatus AStatus, const QString 
 			ui.stbStatusBar->showMessage(tr("%n conversation(s) loaded",0,FCurrentHeaders.count()));
 		onTextSearchTimerTimeout();
 	}
-	else if(AStatus == MessagesLoading)
+	else if(AStatus == RequestStarted)
 	{
 		if (FCurrentHeaders.isEmpty())
 			ui.stbStatusBar->showMessage(tr("Loading conversations..."));
 		else
-			ui.stbStatusBar->showMessage(tr("Loading %1 of %2 conversation...").arg(FLoadHeaderIndex+1).arg(FCurrentHeaders.count()));
+			ui.stbStatusBar->showMessage(tr("Loading %1 of %2 conversations...").arg(FLoadHeaderIndex+1).arg(FCurrentHeaders.count()));
 	}
-	else if (AStatus == MessagesLoadError)
+	else if (AStatus == RequestError)
 	{
 		ui.stbStatusBar->showMessage(tr("Failed to load conversations: %1").arg(AMessage));
 	}
-	ui.wdtTextSearch->setEnabled(AStatus==MessagesReady && !FCurrentHeaders.isEmpty());
+	ui.wdtTextSearch->setEnabled(AStatus==RequestFinished && !FCurrentHeaders.isEmpty());
 }
 
 void ArchiveViewWindow::clearMessages()
@@ -370,7 +424,7 @@ void ArchiveViewWindow::clearMessages()
 	FCurrentHeaders.clear();
 	ui.tbrMessages->clear();
 	FCollectionShowTimer.stop();
-	setMessagesStatus(MessagesReady);
+	setMessagesStatus(RequestFinished);
 }
 
 void ArchiveViewWindow::processCollectionsLoad()
@@ -385,17 +439,17 @@ void ArchiveViewWindow::processCollectionsLoad()
 			if (!requestId.isEmpty())
 			{
 				FCollectionsRequests.insert(requestId,header);
-				setMessagesStatus(MessagesLoading);
+				setMessagesStatus(RequestStarted);
 			}
 			else
 			{
-				setMessagesStatus(MessagesLoadError,tr("Archive is not accessible"));
+				setMessagesStatus(RequestError,tr("Archive is not accessible"));
 			}
 		}
 		else
 		{
 			showCollection(collection);
-			setMessagesStatus(MessagesLoading);
+			setMessagesStatus(RequestStarted);
 			FCollectionShowTimer.start(0);
 		}
 	}
@@ -403,12 +457,48 @@ void ArchiveViewWindow::processCollectionsLoad()
 	if (FCurrentHeaders.isEmpty())
 		clearMessages();
 	else if (FLoadHeaderIndex == FCurrentHeaders.count())
-		setMessagesStatus(MessagesReady);
+		setMessagesStatus(RequestFinished);
 }
 
 IArchiveHeader ArchiveViewWindow::currentLoadingHeader() const
 {
 	return FCurrentHeaders.value(FLoadHeaderIndex);
+}
+
+bool ArchiveViewWindow::updateHeaders(const IArchiveRequest &ARequest)
+{
+	QString requestId = FArchiver->loadHeaders(streamJid(),ARequest);
+	if (!requestId.isEmpty())
+	{
+		FHeadersRequests.insert(requestId,ARequest.start.date());
+		return true;
+	}
+	return false;
+}
+
+void ArchiveViewWindow::removeHeaderItems(const IArchiveRequest &ARequest)
+{
+	bool updateMessages = false;
+	QStandardItem *currentItem = FModel->itemFromIndex(FProxyModel->mapToSource(ui.trvHeaders->selectionModel()->currentIndex()));
+	foreach(QStandardItem *item, findHeaderItems(ARequest))
+	{
+		if (!updateMessages && currentItem!=NULL && (currentItem==item || currentItem==item->parent()))
+			updateMessages = true;
+
+		FCollections.remove(modelIndexHeader(FModel->indexFromItem(item)));
+		
+		if (item->parent() != NULL)
+			item->parent()->removeRow(item->row());
+		else
+			qDeleteAll(FModel->takeRow(item->row()));
+		
+		FProxyModel->startInvalidate();
+	}
+	if (updateMessages)
+	{
+		clearMessages();
+		FCollectionShowTimer.start(0);
+	}
 }
 
 QString ArchiveViewWindow::showCollectionInfo(const IArchiveCollection &ACollection)
@@ -422,7 +512,7 @@ QString ArchiveViewWindow::showCollectionInfo(const IArchiveCollection &ACollect
 
 	QString info;
 	if (!FViewOptions.isGroupchat)
-		info = Qt::escape(tr("Conversation with %1 started at %2.").arg(contactName(ACollection.header.with),ACollection.header.start.toString()));
+		info = Qt::escape(tr("Conversation with %1 started at %2.").arg(contactName(ACollection.header.with,true),ACollection.header.start.toString()));
 	else
 		info = Qt::escape(tr("Conversation in conference %1 started at %2.").arg(ACollection.header.with.bare(),ACollection.header.start.toString()));
 
@@ -649,16 +739,11 @@ void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 		request.start = QDateTime(start);
 		request.end = QDateTime(end);
 		request.text = searchString();
-		QString requestId = FArchiver->loadHeaders(streamJid(),request);
-		if (!requestId.isEmpty())
-		{
+
+		if (updateHeaders(request))
 			FLoadedPages.append(start);
-			FHeadersRequests.insert(requestId,start);
-		}
 		else
-		{
-			setPageStatus(PageLoadError,tr("Archive is not accessible"));
-		}
+			setPageStatus(RequestError,tr("Archive is not accessible"));
 	}
 }
 
@@ -671,16 +756,16 @@ void ArchiveViewWindow::onCurrentPageChanged(int AYear, int AMonth)
 	if (!FLoadedPages.contains(start))
 	{
 		FHeadersRequestTimer.start(HEADERS_LOAD_TIMEOUT);
-		setPageStatus(PageLoading);
+		setPageStatus(RequestStarted);
 	}
 	else if (!FHeadersRequests.values().contains(start))
 	{
 		FHeadersRequestTimer.stop();
-		setPageStatus(PageReady);
+		setPageStatus(RequestFinished);
 	}
 	else
 	{
-		setPageStatus(PageLoading);
+		setPageStatus(RequestStarted);
 	}
 }
 
@@ -722,7 +807,7 @@ void ArchiveViewWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
 	clearMessages();
 	if (ACurrent.isValid())
 	{
-		setMessagesStatus(MessagesLoading);
+		setMessagesStatus(RequestStarted);
 		FCollectionsRequestTimer.start(COLLECTIONS_LOAD_TIMEOUT);
 	}
 }
@@ -843,20 +928,113 @@ void ArchiveViewWindow::onTextSearchTextChanged(const QString &AText)
 	FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 }
 
+void ArchiveViewWindow::onRemoveCollectionsByAction()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		IArchiveRequest request;
+		request.with = action->data(ADR_HEADER_WITH).toString();
+		request.start = action->data(ADR_HEADER_START).toDateTime();
+		request.end = action->data(ADR_HEADER_END).toDateTime();
+
+		QString message;
+		if (request.end.isValid())
+		{
+			message = tr("Do you want to remove conversation history with <b>%1</b> for <b>%2 %3</b>?")
+				.arg(Qt::escape(contactName(request.with)))
+				.arg(QLocale().monthName(request.start.date().month()))
+				.arg(request.start.date().year());
+		}
+		else if (request.start.isValid())
+		{
+			message = tr("Do you want to remove conversation with <b>%1</b> started at <b>%2</b>?")
+				.arg(Qt::escape(contactName(request.with,true)))
+				.arg(request.start.toString());
+		}
+		else
+		{
+			message = tr("Do you want to remove <b>all</b> conversation history with <b>%1</b>?")
+				.arg(Qt::escape(contactName(request.with,true)));
+		}
+
+		if (QMessageBox::question(this, tr("Remove conversation history"), message, QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+		{
+			QString id = FArchiver->removeCollections(streamJid(),request);
+			if (!id.isEmpty())
+			{
+				FRemoveRequests.insert(id,request);
+				setRequestStatus(RequestStarted,tr("Removing conversations..."));
+			}
+			else
+			{
+				setRequestStatus(RequestError,tr("Failed to remove conversations: %1").arg(tr("Archive is not accessible")));
+			}
+		}
+	}
+}
+
+void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
+{
+	QStandardItem *item =  FModel->itemFromIndex(FProxyModel->mapToSource(ui.trvHeaders->indexAt(APos)));
+	if (item)
+	{
+		Menu *menu = new Menu(this);
+		menu->setAttribute(Qt::WA_DeleteOnClose,true);
+
+		int itemType = item->data(HDR_TYPE).toInt();
+		if (itemType == HIT_CONTACT)
+		{
+			Action *removeAll = new Action(menu);
+			removeAll->setText(tr("Remove all history"));
+			removeAll->setData(ADR_HEADER_WITH,item->data(HDR_CONTACT_JID));
+			connect(removeAll,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
+			menu->addAction(removeAll);
+
+			Action *removePage = new Action(menu);
+			removePage->setText(tr("Remove history for %1 %2").arg(QLocale().monthName(ui.spwSelectPage->monthShown())).arg(ui.spwSelectPage->yearShown()));
+			removePage->setData(ADR_HEADER_WITH,item->data(HDR_CONTACT_JID));
+			removePage->setData(ADR_HEADER_START,QDateTime(currentPage()));
+			removePage->setData(ADR_HEADER_END,QDateTime(currentPage()).addMonths(1));
+			connect(removePage,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
+			menu->addAction(removePage);
+		}
+		else if (itemType == HIT_HEADER)
+		{
+			Action *removeHeader = new Action(menu);
+			removeHeader->setText(tr("Remove this conversation"));
+			removeHeader->setData(ADR_HEADER_WITH,item->data(HDR_HEADER_WITH));
+			removeHeader->setData(ADR_HEADER_START,item->data(HDR_HEADER_START));
+			connect(removeHeader,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
+			menu->addAction(removeHeader);
+		}
+		!menu->isEmpty() ? menu->popup(ui.trvHeaders->viewport()->mapToGlobal(APos)) : delete menu;
+	}
+}
+
 void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString &AError)
 {
 	if (FHeadersRequests.contains(AId))
 	{
 		QDate start = FHeadersRequests.take(AId);
 		if (currentPage() == start)
-			setPageStatus(PageLoadError, AError);
+			setPageStatus(RequestError, AError);
 		FLoadedPages.removeAll(start);
 	}
 	else if (FCollectionsRequests.contains(AId))
 	{
 		IArchiveHeader header = FCollectionsRequests.take(AId);
 		if (currentLoadingHeader() == header)
-			setMessagesStatus(MessagesLoadError, AError);
+			setMessagesStatus(RequestError, AError);
+	}
+	else if (FRemoveRequests.contains(AId))
+	{
+		IArchiveRequest request = FRemoveRequests.take(AId);
+		request.text = searchString();
+		request.end = !request.end.isValid() ? request.start : request.end;
+		setRequestStatus(RequestError,tr("Failed to remove conversations: %1").arg(AError));
+		updateHeaders(request);
+		removeHeaderItems(request);
 	}
 }
 
@@ -877,7 +1055,7 @@ void ArchiveViewWindow::onArchiveHeadersLoaded(const QString &AId, const QList<I
 		}
 		if (currentPage() == start)
 		{
-			setPageStatus(PageReady);
+			setPageStatus(RequestFinished);
 		}
 	}
 }
@@ -893,5 +1071,19 @@ void ArchiveViewWindow::onArchiveCollectionLoaded(const QString &AId, const IArc
 			showCollection(ACollection);
 			processCollectionsLoad();
 		}
+	}
+}
+
+void ArchiveViewWindow::onArchiveCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest)
+{
+	Q_UNUSED(ARequest);
+	if (FRemoveRequests.contains(AId))
+	{
+		IArchiveRequest request = FRemoveRequests.take(AId);
+		request.text = searchString();
+		request.end = !request.end.isValid() ? request.start : request.end;
+		setRequestStatus(RequestFinished,tr("Conversation history removed successfully"));
+		updateHeaders(request);
+		removeHeaderItems(request);
 	}
 }

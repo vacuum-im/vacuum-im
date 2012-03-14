@@ -51,6 +51,12 @@ struct StanzaSession {
 	QString error;
 };
 
+struct RemoveRequest {
+	QString lastError;
+	IArchiveRequest request;
+	QList<IArchiveEngine *> engines;
+};
+
 struct MessagesRequest {
 	Jid streamJid;
 	QString lastError;
@@ -123,13 +129,14 @@ public:
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
 	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid);
 	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId);
-	//Archiving
+	//Direct Archiving
 	virtual bool saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage);
 	virtual bool saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId = QString::null);
-	//Management
+	//Archive Management
 	virtual QString loadMessages(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	//Utilities
 	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
 	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const;
@@ -143,17 +150,18 @@ public:
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const;
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine);
 signals:
-	//Preferences
-	void archivePrefsOpened(const Jid &AStreamJid);
-	void archivePrefsChanged(const Jid &AStreamJid);
-	void archivePrefsClosed(const Jid &AStreamJid);
-	//Management
-	void messagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
-	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
-	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	//Common Requests
 	void requestCompleted(const QString &AId);
 	void requestFailed(const QString &AId, const QString &AError);
+	//Archive Preferences
+	void archivePrefsOpened(const Jid &AStreamJid);
+	void archivePrefsChanged(const Jid &AStreamJid);
+	void archivePrefsClosed(const Jid &AStreamJid);
+	//Archive Management
+	void messagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
+	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
+	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	//Engines
 	void totalCapabilitiesChanged(const Jid &AStreamJid);
 	void archiveEngineRegistered(IArchiveEngine *AEngine);
@@ -182,12 +190,14 @@ protected:
 	void renegotiateStanzaSessions(const Jid &AStreamJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected:
+	void processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest);
 	void processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest);
 	void processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest);
 	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
 protected slots:
 	void onEngineCapabilitiesChanged(const Jid &AStreamJid);
 	void onEngineRequestFailed(const QString &AId, const QString &AError);
+	void onEngineCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void onEngineHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onEngineCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	void onSelfRequestFailed(const QString &AId, const QString &AError);
@@ -240,6 +250,7 @@ private:
 	QMap<QString,QString> FPrefsRemoveSessionRequests;
 private:
 	QHash<QString,QString> FRequestId2LocalId;
+	QMap<QString,RemoveRequest> FRemoveRequests;
 	QMap<QString,HeadersRequest> FHeadersRequests;
 	QMap<QString,CollectionRequest> FCollectionRequests;
 	QMap<QString,MessagesRequest> FMesssagesRequests;

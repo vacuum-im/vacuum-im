@@ -228,20 +228,6 @@ QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchive
 	return QString::null;
 }
 
-QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened)
-{
-	Q_UNUSED(AOpened);
-	if (AStreamJid.isValid() && isCapable(AStreamJid,ManualArchiving))
-	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
-		wthread->setStreamJid(AStreamJid);
-		wthread->setArchiveRequest(ARequest);
-		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
-		return wthread->executeAction(WorkingThread::RemoveCollection);
-	}
-	return QString::null;
-}
-
 QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
 	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
@@ -264,6 +250,19 @@ QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchive
 		wthread->setArchiveHeader(AHeader);
 		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
 		return wthread->executeAction(WorkingThread::LoadCollection);
+	}
+	return QString::null;
+}
+
+QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
+{
+	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
+	{
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveRequest(ARequest);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
+		return wthread->executeAction(WorkingThread::RemoveCollection);
 	}
 	return QString::null;
 }

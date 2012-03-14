@@ -39,9 +39,9 @@ public:
 	virtual bool saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual bool saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 	virtual QString saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
-	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest, bool AOpened = false);
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount);
 	//IFileMessageArchive
 	virtual QString collectionDirName(const Jid &AWith) const;
@@ -59,9 +59,9 @@ signals:
 	void capabilitiesChanged(const Jid &AStreamJid);
 	void requestFailed(const QString &AId, const QString &AError);
 	void collectionSaved(const QString &AId, const IArchiveHeader &AHeader);
-	void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs);
 	//IFileMessageArchive
 	void fileCollectionOpened(const Jid &AStreamJid, const IArchiveHeader &AHeader);

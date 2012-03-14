@@ -145,6 +145,7 @@ void WorkingThread::run()
 	}
 	else if (FAction == RemoveCollection)
 	{
+		FRequest.end = !FRequest.end.isValid() ? FRequest.start : FRequest.end;
 		foreach(QString file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
 		{
 			IArchiveHeader header = FFileArchive->loadHeaderFromFile(file);
