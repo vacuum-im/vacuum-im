@@ -564,7 +564,7 @@ bool MessageArchiver::isReady(const Jid &AStreamJid) const
 
 bool MessageArchiver::isArchivePrefsEnabled(const Jid &AStreamJid) const
 {
-	return isReady(AStreamJid) && (isSupported(AStreamJid,NS_ARCHIVE_PREF) || !isAutoArchiving(AStreamJid));
+	return isReady(AStreamJid) && (isSupported(AStreamJid,NS_ARCHIVE_PREF) || !isArchiveAutoSave(AStreamJid));
 }
 
 bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const
@@ -572,7 +572,7 @@ bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeature
 	return isReady(AStreamJid) && FFeatures.value(AStreamJid).contains(AFeatureNS);
 }
 
-bool MessageArchiver::isAutoArchiving(const Jid &AStreamJid) const
+bool MessageArchiver::isArchiveAutoSave(const Jid &AStreamJid) const
 {
 	return isSupported(AStreamJid,NS_ARCHIVE_AUTO) && archivePrefs(AStreamJid).autoSave;
 }
@@ -950,7 +950,7 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
-	if (!isAutoArchiving(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
+	if (!isArchiveAutoSave(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
 	{
 		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
 		if (engine)
@@ -966,7 +966,7 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 
 bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
-	if (!isAutoArchiving(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
+	if (!isArchiveAutoSave(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
 	{
 		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
 		if (engine)
@@ -1300,7 +1300,7 @@ void MessageArchiver::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 
 	dfeature.var = NS_ARCHIVE_AUTO;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_AUTO);
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
 	dfeature.name = tr("Automatic Messages Archiving");
 	dfeature.description = tr("Supports the automatic archiving of the messages");
 	FDiscovery->insertDiscoFeature(dfeature);
@@ -1308,7 +1308,7 @@ void MessageArchiver::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 
 	dfeature.var = NS_ARCHIVE_MANAGE;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_MANAGE);
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
 	dfeature.name = tr("Managing Archived Messages");
 	dfeature.description = tr("Supports the managing of the archived messages");
 	FDiscovery->insertDiscoFeature(dfeature);
@@ -1316,7 +1316,7 @@ void MessageArchiver::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 
 	dfeature.var = NS_ARCHIVE_MANUAL;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_MANUAL);
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
 	dfeature.name = tr("Manual Messages Archiving");
 	dfeature.description = tr("Supports the manual archiving of the messages");
 	FDiscovery->insertDiscoFeature(dfeature);
@@ -1324,7 +1324,7 @@ void MessageArchiver::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 
 	dfeature.var = NS_ARCHIVE_PREF;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_OPTIONS);
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
 	dfeature.name = tr("Messages Archive Preferences");
 	dfeature.description = tr("Supports the storing of the archive preferences");
 	FDiscovery->insertDiscoFeature(dfeature);
@@ -1592,256 +1592,106 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringLis
 	menu->setTitle(tr("History"));
 	menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
 
-	if (AContacts.count() == 1)
+	if (AContacts.count()==1 && !engineOrderByCapability(IArchiveEngine::ArchiveManagement,AStreamJid).isEmpty())
 	{
-		Action *action = new Action(menu);
-		action->setText(tr("View History"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		Action *viewAction = new Action(menu);
+		viewAction->setText(tr("View History"));
+		viewAction->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
+		viewAction->setData(ADR_STREAM_JID,AStreamJid.full());
 		if (!isStreamMenu)
-			action->setData(ADR_CONTACT_JID,AContacts.first());
-		action->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByAction(bool)));
-		menu->addAction(action,AG_DEFAULT,false);
+			viewAction->setData(ADR_CONTACT_JID,AContacts.first());
+		viewAction->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
+		connect(viewAction,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByAction(bool)));
+		menu->addAction(viewAction,AG_DEFAULT,false);
+	}
+
+	if (isStreamMenu && isSupported(AStreamJid,NS_ARCHIVE_AUTO))
+	{
+		Action *autoAction = new Action(menu);
+		autoAction->setCheckable(true);
+		autoAction->setText(tr("Automatic Archiving"));
+		autoAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		autoAction->setChecked(isArchiveAutoSave(AStreamJid));
+		connect(autoAction,SIGNAL(triggered(bool)),SLOT(onSetAutoArchivingByAction(bool)));
+		menu->addAction(autoAction,AG_DEFAULT+100,false);
 	}
 
 	if (isArchivePrefsEnabled(AStreamJid))
 	{
-		if (isStreamMenu && isSupported(AStreamJid,NS_ARCHIVE_PREF))
-		{
-			IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
-
-			Menu *autoMenu = new Menu(menu);
-			autoMenu->setTitle(tr("Set Auto Method"));
-			autoMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_AUTO);
-
-			Action *action = new Action(autoMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_AUTO,ARCHIVE_METHOD_CONCEDE);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_CONCEDE);
-			action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			autoMenu->addAction(action,AG_DEFAULT,false);
-
-			action = new Action(autoMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_AUTO,ARCHIVE_METHOD_FORBID);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_FORBID);
-			action->setText(methodName(ARCHIVE_METHOD_FORBID));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			autoMenu->addAction(action,AG_DEFAULT,false);
-
-			action = new Action(autoMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_AUTO,ARCHIVE_METHOD_PREFER);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodAuto == ARCHIVE_METHOD_PREFER);
-			action->setText(methodName(ARCHIVE_METHOD_PREFER));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			autoMenu->addAction(action,AG_DEFAULT,false);
-			menu->addAction(autoMenu->menuAction(),AG_DEFAULT+500,false);
-
-			Menu *manualMenu = new Menu(menu);
-			manualMenu->setTitle(tr("Set Manual Method"));
-			manualMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_MANUAL);
-
-			action = new Action(autoMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_MANUAL,ARCHIVE_METHOD_CONCEDE);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodManual == ARCHIVE_METHOD_CONCEDE);
-			action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			manualMenu->addAction(action,AG_DEFAULT,false);
-
-			action = new Action(autoMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_MANUAL,ARCHIVE_METHOD_FORBID);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodManual == ARCHIVE_METHOD_FORBID);
-			action->setText(methodName(ARCHIVE_METHOD_FORBID));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			manualMenu->addAction(action,AG_DEFAULT,false);
-
-			action = new Action(autoMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_MANUAL,ARCHIVE_METHOD_PREFER);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodManual == ARCHIVE_METHOD_PREFER);
-			action->setText(methodName(ARCHIVE_METHOD_PREFER));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			manualMenu->addAction(action,AG_DEFAULT,false);
-			menu->addAction(manualMenu->menuAction(),AG_DEFAULT+500,false);
-
-			Menu *localMenu = new Menu(menu);
-			localMenu->setTitle(tr("Set Local Method"));
-			localMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_LOCAL);
-
-			action = new Action(localMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_LOCAL,ARCHIVE_METHOD_CONCEDE);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_CONCEDE);
-			action->setText(methodName(ARCHIVE_METHOD_CONCEDE));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			localMenu->addAction(action,AG_DEFAULT,false);
-
-			action = new Action(localMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_LOCAL,ARCHIVE_METHOD_FORBID);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_FORBID);
-			action->setText(methodName(ARCHIVE_METHOD_FORBID));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			localMenu->addAction(action,AG_DEFAULT,false);
-
-			action = new Action(localMenu);
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			action->setData(ADR_METHOD_LOCAL,ARCHIVE_METHOD_PREFER);
-			action->setCheckable(true);
-			action->setChecked(prefs.methodLocal == ARCHIVE_METHOD_PREFER);
-			action->setText(methodName(ARCHIVE_METHOD_PREFER));
-			connect(action,SIGNAL(triggered(bool)),SLOT(onSetMethodByAction(bool)));
-			localMenu->addAction(action,AG_DEFAULT,false);
-			menu->addAction(localMenu->menuAction(),AG_DEFAULT+500,false);
-		}
-
+		IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
+		bool isSeparateItemPrefs = !isStreamMenu && AContacts.count()==1 && prefs.itemPrefs.contains(AContacts.first());
 		IArchiveItemPrefs itemPrefs = isStreamMenu ? archivePrefs(AStreamJid).defaultPrefs : archiveItemPrefs(AStreamJid,AContacts.value(0));
 
-		Menu *otrMenu = new Menu(menu);
-		otrMenu->setTitle(tr("Set OTR mode"));
+		Action *enableSaveAction = new Action(menu);
+		enableSaveAction->setCheckable(true);
+		enableSaveAction->setText(tr("Enable Message Archiving"));
+		enableSaveAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		enableSaveAction->setData(ADR_CONTACT_JID,AContacts);
+		enableSaveAction->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_MESSAGE);
+		enableSaveAction->setChecked(itemPrefs.save!=ARCHIVE_SAVE_FALSE);
+		connect(enableSaveAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
+		menu->addAction(enableSaveAction,AG_DEFAULT+200);
 
-		Action *action = new Action(otrMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_OTR,ARCHIVE_OTR_APPROVE);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.otr==ARCHIVE_OTR_APPROVE);
-		action->setText(otrModeName(ARCHIVE_OTR_APPROVE));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		otrMenu->addAction(action,AG_DEFAULT,false);
+		Action *disableSaveAction = new Action(menu);
+		disableSaveAction->setCheckable(true);
+		disableSaveAction->setText(tr("Disable Message Archiving"));
+		disableSaveAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		disableSaveAction->setData(ADR_CONTACT_JID,AContacts);
+		disableSaveAction->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_FALSE);
+		disableSaveAction->setChecked(itemPrefs.save==ARCHIVE_SAVE_FALSE);
+		connect(disableSaveAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
+		menu->addAction(disableSaveAction,AG_DEFAULT+200);
 
-		action = new Action(otrMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_OTR,ARCHIVE_OTR_CONCEDE);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.otr==ARCHIVE_OTR_CONCEDE);
-		action->setText(otrModeName(ARCHIVE_OTR_CONCEDE));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		otrMenu->addAction(action,AG_DEFAULT,false);
+		Action *allowOTRAction = new Action(menu);
+		allowOTRAction->setCheckable(true);
+		allowOTRAction->setText(tr("Allow Off-The-Record Sessions"));
+		allowOTRAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		allowOTRAction->setData(ADR_CONTACT_JID,AContacts);
+		allowOTRAction->setData(ADR_ITEM_OTR,ARCHIVE_OTR_CONCEDE);
+		allowOTRAction->setChecked(itemPrefs.otr!=ARCHIVE_OTR_APPROVE &&  itemPrefs.otr!=ARCHIVE_OTR_FORBID);
+		connect(allowOTRAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
+		menu->addAction(allowOTRAction,AG_DEFAULT+300);
 
-		action = new Action(otrMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_OTR,ARCHIVE_OTR_FORBID);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.otr==ARCHIVE_OTR_FORBID);
-		action->setText(otrModeName(ARCHIVE_OTR_FORBID));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		otrMenu->addAction(action,AG_DEFAULT,false);
+		Action *forbidOTRAction = new Action(menu);
+		forbidOTRAction->setCheckable(true);
+		forbidOTRAction->setText(tr("Forbid Off-The-Record Sessions"));
+		forbidOTRAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		forbidOTRAction->setData(ADR_CONTACT_JID,AContacts);
+		forbidOTRAction->setData(ADR_ITEM_OTR,ARCHIVE_OTR_FORBID);
+		forbidOTRAction->setChecked(itemPrefs.otr==ARCHIVE_OTR_FORBID);
+		connect(forbidOTRAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
+		menu->addAction(forbidOTRAction,AG_DEFAULT+300);
 
-		action = new Action(otrMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_OTR,ARCHIVE_OTR_OPPOSE);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.otr==ARCHIVE_OTR_OPPOSE);
-		action->setText(otrModeName(ARCHIVE_OTR_OPPOSE));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		otrMenu->addAction(action,AG_DEFAULT,false);
+		Action *approveOTRAction = new Action(menu);
+		approveOTRAction->setCheckable(true);
+		approveOTRAction->setText(tr("Manually Approve Off-The-Record Sessions"));
+		approveOTRAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		approveOTRAction->setData(ADR_CONTACT_JID,AContacts);
+		approveOTRAction->setData(ADR_ITEM_OTR,ARCHIVE_OTR_APPROVE);
+		approveOTRAction->setChecked(itemPrefs.otr==ARCHIVE_OTR_APPROVE);
+		connect(approveOTRAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
+		menu->addAction(approveOTRAction,AG_DEFAULT+300);
 
-		action = new Action(otrMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_OTR,ARCHIVE_OTR_PREFER);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.otr==ARCHIVE_OTR_PREFER);
-		action->setText(otrModeName(ARCHIVE_OTR_PREFER));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		otrMenu->addAction(action,AG_DEFAULT,false);
-
-		action = new Action(otrMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_FALSE);
-		action->setData(ADR_ITEM_OTR,ARCHIVE_OTR_REQUIRE);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.otr==ARCHIVE_OTR_REQUIRE);
-		action->setText(otrModeName(ARCHIVE_OTR_REQUIRE));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		otrMenu->addAction(action,AG_DEFAULT,false);
-		menu->addAction(otrMenu->menuAction(),AG_DEFAULT+500,false);
-
-		Menu *saveMenu = new Menu(menu);
-		saveMenu->setTitle(tr("Set Save mode"));
-
-		action = new Action(saveMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_FALSE);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.save==ARCHIVE_SAVE_FALSE);
-		action->setText(saveModeName(ARCHIVE_SAVE_FALSE));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		saveMenu->addAction(action,AG_DEFAULT,false);
-
-		action = new Action(saveMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_BODY);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.save==ARCHIVE_SAVE_BODY);
-		action->setText(saveModeName(ARCHIVE_SAVE_BODY));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		saveMenu->addAction(action,AG_DEFAULT,false);
-
-		action = new Action(saveMenu);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContacts);
-		action->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_MESSAGE);
-		action->setCheckable(true);
-		action->setChecked(AContacts.count()==1 && itemPrefs.save==ARCHIVE_SAVE_MESSAGE);
-		action->setText(saveModeName(ARCHIVE_SAVE_MESSAGE));
-		connect(action,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
-		saveMenu->addAction(action,AG_DEFAULT,false);
-		menu->addAction(saveMenu->menuAction(),AG_DEFAULT+500,false);
-
-		if (!isStreamMenu)
+		if (isStreamMenu)
 		{
-			bool showRestoreDefaults = false;
-			IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
-			foreach(Jid contactJid, AContacts)
-			{
-				if (prefs.itemPrefs.contains(contactJid))
-				{
-					showRestoreDefaults = true;
-					break;
-				}
-			}
-			if (showRestoreDefaults)
-			{
-				action = new Action(menu);
-				action->setText(tr("Restore defaults"));
-				action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_DEFAULTS);
-				action->setData(ADR_STREAM_JID,AStreamJid.full());
-				action->setData(ADR_CONTACT_JID,AContacts);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onRemoveItemPrefsByAction(bool)));
-				menu->addAction(action,AG_DEFAULT+500,false);
-			}
+			Action *optionsAction = new Action(menu);
+			optionsAction->setText(tr("Options..."));
+			optionsAction->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OPTIONS);
+			optionsAction->setData(ADR_STREAM_JID,AStreamJid.full());
+			connect(optionsAction,SIGNAL(triggered(bool)),SLOT(onShowHistoryOptionsDialogByAction(bool)));
+			menu->addAction(optionsAction,AG_DEFAULT+500,false);
 		}
-	}
-
-	if (isStreamMenu && isReady(AStreamJid))
-	{
-		Action *action = new Action(menu);
-		action->setText(tr("Options..."));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_OPTIONS);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowHistoryOptionsDialogByAction(bool)));
-		menu->addAction(action,AG_DEFAULT+500,false);
+		else
+		{
+			Action *defAction = new Action(menu);
+			defAction->setCheckable(true);
+			defAction->setText(tr("Use Default Options"));
+			defAction->setData(ADR_STREAM_JID,AStreamJid.full());
+			defAction->setData(ADR_CONTACT_JID,AContacts);
+			defAction->setChecked(AContacts.count()==1 && !isSeparateItemPrefs);
+			connect(defAction,SIGNAL(triggered(bool)),SLOT(onRemoveItemPrefsByAction(bool)));
+			menu->addAction(defAction,AG_DEFAULT+500,false);
+		}
 	}
 
 	return menu;
@@ -2429,13 +2279,19 @@ void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AInd
 		if (AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
 		{
 			Menu *menu = createContextMenu(streamJid,QStringList()<<streamJid.full(),AMenu);
-			AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
+			if (!menu->isEmpty())
+				AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
+			else
+				delete menu;
 		}
 		else if (isSelectionAccepted(AIndexes))
 		{
 			QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
 			Menu *menu = createContextMenu(streamJid,rolesMap.value(RDR_PREP_BARE_JID),AMenu);
-			AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
+			if (!menu->isEmpty())
+				AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
+			else
+				delete menu;
 		}
 	}
 }
@@ -2443,21 +2299,10 @@ void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AInd
 void MessageArchiver::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
 	Menu *menu = createContextMenu(AWindow->streamJid(),QStringList()<<AUser->contactJid().full(),AMenu);
-	AMenu->addAction(menu->menuAction(),AG_MUCM_ARCHIVER,true);
-}
-
-void MessageArchiver::onSetMethodByAction(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-	{
-		IArchiveStreamPrefs prefs;
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		prefs.methodLocal = action->data(ADR_METHOD_LOCAL).toString();
-		prefs.methodAuto = action->data(ADR_METHOD_AUTO).toString();
-		prefs.methodManual = action->data(ADR_METHOD_MANUAL).toString();
-		setArchivePrefs(streamJid,prefs);
-	}
+	if (!menu->isEmpty())
+		AMenu->addAction(menu->menuAction(),AG_MUCM_ARCHIVER,true);
+	else
+		delete menu;
 }
 
 void MessageArchiver::onSetItemPrefsByAction(bool)
@@ -2501,6 +2346,27 @@ void MessageArchiver::onSetItemPrefsByAction(bool)
 	}
 }
 
+void MessageArchiver::onSetAutoArchivingByAction(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		setArchiveAutoSave(streamJid,!isArchiveAutoSave(streamJid));
+	}
+}
+
+void MessageArchiver::onRemoveItemPrefsByAction(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
+			removeArchiveItemPrefs(streamJid,contactJid);
+	}
+}
+
 void MessageArchiver::onShowArchiveWindowByAction(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
@@ -2532,17 +2398,6 @@ void MessageArchiver::onShowHistoryOptionsDialogByAction(bool)
 		IAccount *account = FAccountManager->accountByStream(streamJid);
 		if (account)
 			FOptionsManager->showOptionsDialog(OPN_HISTORY"." + account->accountId().toString());
-	}
-}
-
-void MessageArchiver::onRemoveItemPrefsByAction(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
-			removeArchiveItemPrefs(streamJid,contactJid);
 	}
 }
 
@@ -2616,30 +2471,11 @@ void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_VIEW);
 		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWHISTORY);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByToolBarAction(bool)));
-		QToolButton *viewButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
-
-		Menu *setupMenu = new Menu(AWidget->instance());
-		viewButton->setMenu(setupMenu);
-		connect(setupMenu,SIGNAL(aboutToShow()),SLOT(onToolBarSettingsMenuAboutToShow()));
+		QToolButton *chatButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
 
 		ChatWindowMenu *chatMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
-		QToolButton *chatButton = AWidget->toolBarChanger()->insertAction(chatMenu->menuAction(), TBG_MWTBW_ARCHIVE_SETTINGS);
-		chatButton->setPopupMode(QToolButton::InstantPopup);
-	}
-}
-
-void MessageArchiver::onToolBarSettingsMenuAboutToShow()
-{
-	Menu *setupMenu = qobject_cast<Menu *>(sender());
-	if (setupMenu)
-	{
-		IToolBarWidget *widget = qobject_cast<IToolBarWidget *>(setupMenu->parent());
-		if (widget)
-		{
-			Menu *menu = createContextMenu(widget->editWidget()->streamJid(),QStringList()<<widget->editWidget()->contactJid().full(),setupMenu);
-			setupMenu->addMenuActions(menu, AG_NULL, false);
-			connect(setupMenu,SIGNAL(aboutToHide()),menu,SLOT(deleteLater()));
-		}
+		chatButton->setMenu(chatMenu);
+		chatButton->setPopupMode(QToolButton::MenuButtonPopup);
 	}
 }
 

@@ -114,7 +114,7 @@ public:
 	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const;
-	virtual bool isAutoArchiving(const Jid &AStreamJid) const;
+	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const;
 	virtual QString expireName(int AExpire) const;
 	virtual QString methodName(const QString &AMethod) const;
@@ -212,17 +212,16 @@ protected slots:
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
-	void onSetMethodByAction(bool);
 	void onSetItemPrefsByAction(bool);
+	void onSetAutoArchivingByAction(bool);
+	void onRemoveItemPrefsByAction(bool);
 	void onShowArchiveWindowByAction(bool);
 	void onShowArchiveWindowByToolBarAction(bool);
 	void onShowHistoryOptionsDialogByAction(bool);
-	void onRemoveItemPrefsByAction(bool);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
-	void onToolBarSettingsMenuAboutToShow();
 private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;

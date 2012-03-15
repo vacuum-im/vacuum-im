@@ -102,25 +102,9 @@
 
 //MessageArchiver
 #define MNI_HISTORY                     "history"
-#define MNI_HISTORY_DATE                "historyDate"
-#define MNI_HISTORY_AUTO                "historyAuto"
-#define MNI_HISTORY_MANAGE              "historyManage"
-#define MNI_HISTORY_ENCRYPT             "historyEncrypt"
-#define MNI_HISTORY_MANUAL              "historyManual"
-#define MNI_HISTORY_LOCAL               "historyLocal"
-#define MNI_HISTORY_OPTIONS             "historyOptions"
-#define MNI_HISTORY_DEFAULTS            "historyDefaults"
 #define MNI_HISTORY_VIEW                "historyView"
-#define MNI_HISTORY_GROUPS              "historyGroups"
-#define MNI_HISTORY_SOURCE              "historySource"
-#define MNI_HISRORY_FILTER              "historyFilter"
-#define MNI_HISTORY_RENAME              "historyRename"
-#define MNI_HISTORY_REMOVE              "historyRemove"
-#define MNI_HISTORY_RELOAD              "historyReload"
-#define MNI_HISTORY_ENABLE_LOGGING      "historyEnableLogging"
-#define MNI_HISTORY_DISABLE_LOGGING     "historyDisableLogging"
-#define MNI_HISTORY_REQUIRE_OTR         "historyRequireOTR"
-#define MNI_HISTORY_TERMINATE_OTR       "historyTerminateOTR"
+#define MNI_HISTORY_DATE                "historyDate"
+#define MNI_HISTORY_OPTIONS             "historyOptions"
 
 //MessageStyles
 #define MNI_MESSAGE_STYLES              "messagestyles"

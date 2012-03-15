@@ -17,7 +17,6 @@
 #define TBG_MWTBW_VCARD_VIEW                                    900
 #define TBG_MWTBW_CLEAR_WINDOW                                  1800
 #define TBG_MWTBW_CHATSTATES                                    10100
-#define TBG_MWTBW_ARCHIVE_SETTINGS                              10600
 
 //ChatWindow - ToolBarWidget
 #define TBG_CWTBW_USER_TOOLS                                    10900

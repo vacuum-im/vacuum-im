@@ -988,13 +988,13 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 		if (itemType == HIT_CONTACT)
 		{
 			Action *removeAll = new Action(menu);
-			removeAll->setText(tr("Remove all history"));
+			removeAll->setText(tr("Remove all History"));
 			removeAll->setData(ADR_HEADER_WITH,item->data(HDR_CONTACT_JID));
 			connect(removeAll,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
 			menu->addAction(removeAll);
 
 			Action *removePage = new Action(menu);
-			removePage->setText(tr("Remove history for %1 %2").arg(QLocale().monthName(ui.spwSelectPage->monthShown())).arg(ui.spwSelectPage->yearShown()));
+			removePage->setText(tr("Remove History for %1 %2").arg(QLocale().monthName(ui.spwSelectPage->monthShown())).arg(ui.spwSelectPage->yearShown()));
 			removePage->setData(ADR_HEADER_WITH,item->data(HDR_CONTACT_JID));
 			removePage->setData(ADR_HEADER_START,QDateTime(currentPage()));
 			removePage->setData(ADR_HEADER_END,QDateTime(currentPage()).addMonths(1));
@@ -1004,7 +1004,7 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 		else if (itemType == HIT_HEADER)
 		{
 			Action *removeHeader = new Action(menu);
-			removeHeader->setText(tr("Remove this conversation"));
+			removeHeader->setText(tr("Remove this Conversation"));
 			removeHeader->setData(ADR_HEADER_WITH,item->data(HDR_HEADER_WITH));
 			removeHeader->setData(ADR_HEADER_START,item->data(HDR_HEADER_START));
 			connect(removeHeader,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));

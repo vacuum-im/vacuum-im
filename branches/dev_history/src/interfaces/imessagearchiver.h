@@ -216,7 +216,7 @@ public:
 	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const =0;
-	virtual bool isAutoArchiving(const Jid &AStreamJid) const =0;
+	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const =0;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
 	virtual QString expireName(int AExpire) const =0;
 	virtual QString methodName(const QString &AMethod) const =0;

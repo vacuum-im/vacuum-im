@@ -345,7 +345,7 @@ void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 	{
 		IArchiveStreamPrefs prefs = FArchiver->archivePrefs(AStreamJid);
 
-		ui.chbAutoSave->setChecked(FArchiver->isAutoArchiving(AStreamJid));
+		ui.chbAutoSave->setChecked(FArchiver->isArchiveAutoSave(AStreamJid));
 		ui.grbAuto->setVisible(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_AUTO));
 		ui.chbReplication->setEnabled(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_MANAGE));
 

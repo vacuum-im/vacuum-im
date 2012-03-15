@@ -147,8 +147,6 @@ int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJ
 		return ACO_DIRECT_FILEARCHIVE;
 	case ManualArchiving:
 		return ACO_MANUAL_FILEARCHIVE;
-	case AutomaticArchiving:
-		return ACO_AUTOMATIC_FILEARCHIVE;
 	case ArchiveManagement:
 		return ACO_MANAGE_FILEARCHIVE;
 	case Replication:
