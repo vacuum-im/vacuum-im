@@ -102,9 +102,7 @@
 
 //MessageArchiver
 #define MNI_HISTORY                     "history"
-#define MNI_HISTORY_VIEW                "historyView"
 #define MNI_HISTORY_DATE                "historyDate"
-#define MNI_HISTORY_OPTIONS             "historyOptions"
 
 //MessageStyles
 #define MNI_MESSAGE_STYLES              "messagestyles"

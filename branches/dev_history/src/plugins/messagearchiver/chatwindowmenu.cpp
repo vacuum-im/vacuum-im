@@ -89,14 +89,12 @@ void ChatWindowMenu::createActions()
 	addAction(FDisableArchiving,AG_DEFAULT,false);
 
 	FStartOTRSession = new Action(this);
-	FStartOTRSession->setVisible(false);
 	FStartOTRSession->setText(tr("Start Off-The-Record Session"));
 	FStartOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR);
 	connect(FStartOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
 	addAction(FStartOTRSession,AG_DEFAULT+100,false);
 
 	FStopOTRSession = new Action(this);
-	FStopOTRSession->setVisible(false);
 	FStopOTRSession->setText(tr("Terminate Off-The-Record Session"));
 	FStopOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR);
 	connect(FStopOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
@@ -139,11 +137,9 @@ void ChatWindowMenu::updateMenu()
 		IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
 		bool isOTRSession = FSessionNegotiation!=NULL ? isOTRStanzaSession(FSessionNegotiation->getSession(streamJid(),contactJid())) : false;
 
-		FEnableArchiving->setVisible(true);
 		FEnableArchiving->setChecked(iprefs.save != ARCHIVE_SAVE_FALSE);
 		FEnableArchiving->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty() && !isOTRSession);
 
-		FDisableArchiving->setVisible(true);
 		FDisableArchiving->setChecked(iprefs.save == ARCHIVE_SAVE_FALSE);
 		FDisableArchiving->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty() && !isOTRSession);
 
@@ -163,8 +159,12 @@ void ChatWindowMenu::updateMenu()
 	}
 	else
 	{
-		FEnableArchiving->setVisible(false);
-		FDisableArchiving->setVisible(false);
+		FEnableArchiving->setEnabled(false);
+		FEnableArchiving->setChecked(false);
+		
+		FDisableArchiving->setEnabled(false);
+		FDisableArchiving->setChecked(false);
+
 		FStartOTRSession->setVisible(false);
 		FStopOTRSession->setVisible(false);
 	}

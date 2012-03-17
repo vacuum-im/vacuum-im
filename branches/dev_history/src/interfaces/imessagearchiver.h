@@ -39,14 +39,30 @@ struct IArchiveItemPrefs
 		expire = 0;
 		exactmatch = false;
 	}
-	QString save;
 	QString otr;
+	QString save;
 	quint32 expire;
 	bool exactmatch;
 	bool operator==(const IArchiveItemPrefs &AOther) const {
 		return save==AOther.save && otr==AOther.otr && expire==AOther.expire && exactmatch==AOther.exactmatch;
 	}
 	bool operator!=(const IArchiveItemPrefs &AOther) const {
+		return !operator==(AOther);
+	}
+};
+
+struct IArchiveSessionPrefs 
+{
+	IArchiveSessionPrefs() {
+		timeout = -1;
+	}
+	int timeout;
+	QString otr;
+	QString save;
+	bool operator==(const IArchiveSessionPrefs &AOther) const {
+		return save==AOther.save && otr==AOther.otr && timeout==AOther.timeout;
+	}
+	bool operator!=(const IArchiveSessionPrefs &AOther) const {
 		return !operator==(AOther);
 	}
 };
@@ -60,7 +76,7 @@ struct IArchiveStreamPrefs
 	QString methodManual;
 	IArchiveItemPrefs defaultPrefs;
 	QMap<Jid,IArchiveItemPrefs> itemPrefs;
-	QMap<QString,IArchiveItemPrefs> sessionPrefs;
+	QMap<QString,IArchiveSessionPrefs> sessionPrefs;
 };
 
 struct IArchiveHeader
@@ -218,10 +234,6 @@ public:
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const =0;
 	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const =0;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
-	virtual QString expireName(int AExpire) const =0;
-	virtual QString methodName(const QString &AMethod) const =0;
-	virtual QString otrModeName(const QString &AOTRMode) const =0;
-	virtual QString saveModeName(const QString &ASaveMode) const =0;
 	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) =0;
 	//Archive Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const =0;

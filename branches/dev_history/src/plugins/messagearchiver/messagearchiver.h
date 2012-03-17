@@ -116,10 +116,6 @@ public:
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const;
 	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const;
-	virtual QString expireName(int AExpire) const;
-	virtual QString methodName(const QString &AMethod) const;
-	virtual QString otrModeName(const QString &AOTRMode) const;
-	virtual QString saveModeName(const QString &ASaveMode) const;
 	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null);
   //Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const;

@@ -5,15 +5,7 @@
     <object mime="image/png">history.png</object>
   </icon>
   <icon>
-    <key>historyView</key>
-    <object mime="image/png">historyview.png</object>
-  </icon>
-  <icon>
     <key>historyDate</key>
     <object mime="image/png">historydate.png</object>
-  </icon>
-  <icon>
-    <key>historyOptions</key>
-    <object mime="image/png">historyoptions.png</object>
   </icon>
 </icondef>

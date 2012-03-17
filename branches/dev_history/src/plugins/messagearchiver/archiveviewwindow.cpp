@@ -102,7 +102,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_HISTORY_VIEW,0,0,"windowIcon");
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_HISTORY,0,0,"windowIcon");
 
 	FRoster = ARoster;
 	FArchiver = AArchiver;
