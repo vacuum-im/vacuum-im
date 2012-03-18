@@ -2,171 +2,50 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>ArchiveOptions</name>
-    <message>
-        <source>JID</source>
-        <translation>Контакт</translation>
+    <name>ArchiveDelegate</name>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation>
+            <numerusform>%n год</numerusform>
+            <numerusform>%n года</numerusform>
+            <numerusform>%n лет</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n month(s)</source>
+        <translation>
+            <numerusform>%n месяц</numerusform>
+            <numerusform>%n месяца</numerusform>
+            <numerusform>%n месяцев</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation>
+            <numerusform>%n день</numerusform>
+            <numerusform>%n дня</numerusform>
+            <numerusform>%n дней</numerusform>
+        </translation>
     </message>
     <message>
-        <source>OTR</source>
-        <translation>ЗСИ</translation>
+        <source>Never</source>
+        <translation>Никогда</translation>
     </message>
     <message>
-        <source>Save</source>
-        <translation>Записать</translation>
+        <source>Yes</source>
+        <translation>Да</translation>
     </message>
     <message>
-        <source>Expire</source>
-        <translation>Хранить</translation>
+        <source>No</source>
+        <translation>Нет</translation>
     </message>
-    <message>
-        <source>Waiting for host response...</source>
-        <translation>Ожидание ответа хоста...</translation>
-    </message>
-    <message>
-        <source>Preferences accepted</source>
-        <translation>Настройки сохранены</translation>
-    </message>
-    <message>
-        <source>History preferences not loaded</source>
-        <translation>Настройки истории не загружены</translation>
-    </message>
-    <message>
-        <source>Error received: %1</source>
-        <translation>Получена ошибка: %1</translation>
-    </message>
-    <message>
-        <source>New item preferences</source>
-        <translation>Настройки для контакта</translation>
-    </message>
-    <message>
-        <source>Enter item JID:</source>
-        <translation>Введите JID:</translation>
-    </message>
-    <message>
-        <source>Unacceptable item JID</source>
-        <translation>Некорректный JID</translation>
-    </message>
-    <message>
-        <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>%1 не является корректным JID или уже существует</translation>
-    </message>
-</context>
-<context>
-    <name>ArchiveOptionsClass</name>
-    <message>
-        <source>Archiving Method</source>
-        <translation>Настройки архива</translation>
-    </message>
-    <message>
-        <source>Default Archiving Preferences</source>
-        <translation>Настройки по умолчанию</translation>
-    </message>
-    <message>
-        <source>Save Mode:</source>
-        <translation>Способ записи:</translation>
-    </message>
-    <message>
-        <source>Individual Archiving Preferences</source>
-        <translation>Индивидуальные настройки</translation>
-    </message>
-    <message>
-        <source>Jid</source>
-        <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>OTR</source>
-        <translation>ЗСИ</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <source>Expire</source>
-        <translation>Хранить</translation>
-    </message>
-    <message>
-        <source>Local archiving:</source>
-        <translation>Локальный режим:</translation>
-    </message>
-    <message>
-        <source>Manual archiving:</source>
-        <translation>Ручной режим:</translation>
-    </message>
-    <message>
-        <source>Auto archiving:</source>
-        <translation>Авто режим:</translation>
-    </message>
-    <message>
-        <source>Enable auto archiving</source>
-        <translation>Включить автоматическое сохранение</translation>
-    </message>
-    <message>
-        <source>Enable replication</source>
-        <translation>Включить репликацию</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <source>Off The Record Mode:</source>
-        <translation>Запрет сохр. истории:</translation>
-    </message>
-    <message>
-        <source>Expire Time, days:</source>
-        <translation>Хранить, дней:</translation>
-    </message>
-    <message>
-        <source>Auto Archiving Preferences</source>
-        <translation>Настройки авто-сохранения</translation>
-    </message>
-</context>
-<context>
-    <name>ChatWindowMenu</name>
-    <message>
-        <source>Enable Message Logging</source>
-        <translation>Включить сохранение истории</translation>
-    </message>
-    <message>
-        <source>Disable Message Logging</source>
-        <translation>Выключить сохранение истории</translation>
-    </message>
-    <message>
-        <source>Require OTR Session</source>
-        <translation>Требовать установки сессии с ЗСИ</translation>
-    </message>
-    <message>
-        <source>Terminate OTR Session</source>
-        <translation>Завершить сессию с ЗСИ</translation>
-    </message>
-    <message>
-        <source>Message logging enabled</source>
-        <translation>Сохранение истории включено</translation>
-    </message>
-    <message>
-        <source>Message logging disabled</source>
-        <translation>Сохранение истории выключено</translation>
-    </message>
-    <message>
-        <source>Changing archive preferences failed: %1</source>
-        <translation>Изменение настроек архива сорвалось из-за ошибки: %1</translation>
-    </message>
-</context>
-<context>
-    <name>MessageArchiver</name>
     <message>
         <source>Prefer</source>
         <translation>Предпочесть</translation>
     </message>
     <message>
-        <source>Concede</source>
-        <translation>Уступить</translation>
+        <source>Allow</source>
+        <translation>Разрешить</translation>
     </message>
     <message>
         <source>Forbid</source>
@@ -189,25 +68,372 @@
         <translation>Требовать</translation>
     </message>
     <message>
-        <source>False</source>
+        <source>Nothing</source>
         <translation>Ничего</translation>
     </message>
     <message>
         <source>Body</source>
-        <translation>Текст</translation>
+        <translation>Тело</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation>Всё</translation>
+        <translation>Сообщение</translation>
     </message>
     <message>
         <source>Stream</source>
         <translation>Поток</translation>
     </message>
+</context>
+<context>
+    <name>ArchiveOptions</name>
     <message>
-        <source>days</source>
-        <translation>дней</translation>
+        <source>Waiting for host response...</source>
+        <translation>Ожидание ответа хоста...</translation>
     </message>
+    <message>
+        <source>Preferences accepted</source>
+        <translation>Настройки сохранены</translation>
+    </message>
+    <message>
+        <source>New item preferences</source>
+        <translation>Настройки для контакта</translation>
+    </message>
+    <message>
+        <source>Enter item JID:</source>
+        <translation>Введите JID:</translation>
+    </message>
+    <message>
+        <source>Unacceptable item JID</source>
+        <translation>Некорректный JID</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; is not valid JID or already exists</source>
+        <translation>%1 не является корректным JID или уже существует</translation>
+    </message>
+    <message>
+        <source>Yes, if supported by server</source>
+        <translation>Да, если поддерживается сервером</translation>
+    </message>
+    <message>
+        <source>Yes, if other archive is not available</source>
+        <translation>Да, если другой архив недоступен</translation>
+    </message>
+    <message>
+        <source>No, do not save history on server</source>
+        <translation>Нет, не сохранять историю на сервере</translation>
+    </message>
+    <message>
+        <source>Yes, if local archive is available</source>
+        <translation>Да, если локальный архив доступен</translation>
+    </message>
+    <message>
+        <source>No, do not save history in local archive</source>
+        <translation>Нет, не сохранять историю в локальном архиве</translation>
+    </message>
+    <message>
+        <source>Yes, if available</source>
+        <translation>Да, если возможно</translation>
+    </message>
+    <message>
+        <source>Yes, if other replication method is not used</source>
+        <translation>Да, если не используется другой метод репликации</translation>
+    </message>
+    <message>
+        <source>No, do not copy local archive to the server</source>
+        <translation>Нет, не копировать локальных архив на сервер</translation>
+    </message>
+    <message>
+        <source>Save messages with extensions</source>
+        <translation>Сохранять сообщения с расширениями</translation>
+    </message>
+    <message>
+        <source>Save only messages body</source>
+        <translation>Сохранять только тело сообщений</translation>
+    </message>
+    <message>
+        <source>Do not save messages</source>
+        <translation>Не сохранять сообщения</translation>
+    </message>
+    <message>
+        <source>Allow Off-The-Record sessions</source>
+        <translation>Разрешать сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Forbid Off-The-Record sessions</source>
+        <translation>Запрещать сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Manually approve Off-The-Record sessions</source>
+        <translation>Подтверждать вручную сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>History preferences is not available</source>
+        <translation>Настройки истории недоступны</translation>
+    </message>
+    <message>
+        <source>Failed to save archive preferences: %1</source>
+        <translation>Не удалось сохранить настройки истории: %1</translation>
+    </message>
+</context>
+<context>
+    <name>ArchiveOptionsClass</name>
+    <message>
+        <source>Default Archiving Preferences</source>
+        <translation>Настройки по умолчанию</translation>
+    </message>
+    <message>
+        <source>Individual Archiving Preferences</source>
+        <translation>Индивидуальные настройки</translation>
+    </message>
+    <message>
+        <source>OTR</source>
+        <translation>БЗИ</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Добавить</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <source>Auto Archiving Preferences</source>
+        <translation>Настройки автоматического сохранения</translation>
+    </message>
+    <message>
+        <source>Enable automatic archiving of messages on the server</source>
+        <translation>Включить автоматическое сохранение сообщений на сервере</translation>
+    </message>
+    <message>
+        <source>Archiving Policy</source>
+        <translation>Политика архивирования</translation>
+    </message>
+    <message>
+        <source>Save history on server?</source>
+        <translation>Сохранять историю на сервере?</translation>
+    </message>
+    <message>
+        <source>Save history in a local archive?</source>
+        <translation>Сохранять историю в локальном архиве?</translation>
+    </message>
+    <message>
+        <source>Copy local archive to the server?</source>
+        <translation>Копировать локальный архив на сервер?</translation>
+    </message>
+    <message>
+        <source>Message archiving:</source>
+        <translation>Архивирование сообщений:</translation>
+    </message>
+    <message>
+        <source>Off-The-Record sessions:</source>
+        <translation>Сессии Без-Записи-Истории:</translation>
+    </message>
+    <message>
+        <source>Remove messages after, days:</source>
+        <translation>Удалять сообщения после, дней:</translation>
+    </message>
+    <message>
+        <source>(0 - do not remove)</source>
+        <translation>(0 - не удалять)</translation>
+    </message>
+    <message>
+        <source>JID</source>
+        <translation>JID</translation>
+    </message>
+    <message>
+        <source>Contact identifier</source>
+        <translation>Идентификатор контакта</translation>
+    </message>
+    <message>
+        <source>Message archiving</source>
+        <translation>Архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Off-The-Record sessions </source>
+        <translation>Сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Remove messages after, days</source>
+        <translation>Удалять сообщения после, дней</translation>
+    </message>
+    <message>
+        <source>Exact</source>
+        <translation>Точно</translation>
+    </message>
+    <message>
+        <source>Settings are applied to contact which JID is exactly matches</source>
+        <translation>Настройки применяются для контактов чей JID в точности совпадает</translation>
+    </message>
+</context>
+<context>
+    <name>ArchiveViewWindow</name>
+    <message>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Обновить</translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation>Поиск:</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Следующее</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Предыдущее</translation>
+    </message>
+    <message>
+        <source>Case sensitively</source>
+        <translation>С учетом регистра</translation>
+    </message>
+    <message>
+        <source>Search in history</source>
+        <translation>Поиск в истории</translation>
+    </message>
+    <message>
+        <source>Conversation history - %1</source>
+        <translation>История общения - %1</translation>
+    </message>
+    <message>
+        <source>Conversation history with %1 - %2</source>
+        <translation>История общения с %1 - %2</translation>
+    </message>
+    <message>
+        <source>Conversation headers loaded</source>
+        <translation>Заголовки разговоров загружены</translation>
+    </message>
+    <message>
+        <source>Loading conversation headers...</source>
+        <translation>Загрузка заголовков разговоров...</translation>
+    </message>
+    <message>
+        <source>Failed to load conversation headers: %1</source>
+        <translation>Не удалось загрузить заголовки разговоров: %1</translation>
+    </message>
+    <message>
+        <source>Select contact or single conversation</source>
+        <translation>Выберите контакт или отдельный разговор</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation(s) loaded</source>
+        <translation>
+            <numerusform>%n разговор загружен</numerusform>
+            <numerusform>%n разговора загружено</numerusform>
+            <numerusform>%n разговоров загружено</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Loading conversations...</source>
+        <translation>Загрузка разговоров...</translation>
+    </message>
+    <message>
+        <source>Loading %1 of %2 conversations...</source>
+        <translation>Загрузка %1 из %2 разговоров...</translation>
+    </message>
+    <message>
+        <source>Failed to load conversations: %1</source>
+        <translation>Не удалось загрузить разговоры: %1</translation>
+    </message>
+    <message>
+        <source>Archive is not accessible</source>
+        <translation>Архив недоступен</translation>
+    </message>
+    <message>
+        <source>Conversation with %1 started at %2.</source>
+        <translation>Разговор с %1 начат в %2.</translation>
+    </message>
+    <message>
+        <source>Conversation in conference %1 started at %2.</source>
+        <translation>Разговор в конференции %1 начат в %2.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Found %n occurrence(s)</source>
+        <translation>
+            <numerusform>Найдено %n совпадение</numerusform>
+            <numerusform>Найдено %n совпадения</numerusform>
+            <numerusform>Найдено %n совпадений</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Phrase was not found</source>
+        <translation>Фраза не найдена</translation>
+    </message>
+    <message>
+        <source>Do you want to remove conversation history with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
+        <translation>Вы хотите удалить историю разговоров с &lt;b&gt;%1&lt;/b&gt; за &lt;b&gt;%2 %3&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <source>Do you want to remove conversation with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
+        <translation>Вы хотите удалить разговор с &lt;b&gt;%1&lt;/b&gt; начатый в &lt;b&gt;%2&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <source>Do you want to remove &lt;b&gt;all&lt;/b&gt; conversation history with &lt;b&gt;%1&lt;/b&gt;?</source>
+        <translation>Вы хотите удалить &lt;b&gt;всю&lt;/b&gt; историю разговоров с &lt;b&gt;%1&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <source>Remove conversation history</source>
+        <translation>Удалить историю разговоров</translation>
+    </message>
+    <message>
+        <source>Removing conversations...</source>
+        <translation>Удаление разговоров...</translation>
+    </message>
+    <message>
+        <source>Failed to remove conversations: %1</source>
+        <translation>Не удалось удалить разговоры: %1</translation>
+    </message>
+    <message>
+        <source>Remove all History</source>
+        <translation>Удалить всю историю</translation>
+    </message>
+    <message>
+        <source>Remove History for %1 %2</source>
+        <translation>Удалить историю за %1 %2</translation>
+    </message>
+    <message>
+        <source>Remove this Conversation</source>
+        <translation>Удалить этот разговор</translation>
+    </message>
+    <message>
+        <source>Conversation history removed successfully</source>
+        <translation>История разговоров успешно удалена</translation>
+    </message>
+</context>
+<context>
+    <name>ChatWindowMenu</name>
+    <message>
+        <source>Enable Message Archiving</source>
+        <translation>Включить архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Disable Message Archiving</source>
+        <translation>Выключить архивирование сообщений</translation>
+    </message>
+    <message>
+        <source>Start Off-The-Record Session</source>
+        <translation>Начать сессию Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Terminate Off-The-Record Session</source>
+        <translation>Завершить сессию Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Failed to change archive preferences: %1</source>
+        <translation>Не удалось изменить настройки истории: %1</translation>
+    </message>
+</context>
+<context>
+    <name>MessageArchiver</name>
     <message>
         <source>History</source>
         <translation>История</translation>
@@ -217,32 +443,8 @@
         <translation>Просмотр истории</translation>
     </message>
     <message>
-        <source>Set Auto Method</source>
-        <translation>Авто режим</translation>
-    </message>
-    <message>
-        <source>Set Manual Method</source>
-        <translation>Ручной режим</translation>
-    </message>
-    <message>
-        <source>Set Local Method</source>
-        <translation>Локальный режим</translation>
-    </message>
-    <message>
-        <source>Set OTR mode</source>
-        <translation>Режим ЗСИ</translation>
-    </message>
-    <message>
-        <source>Set Save mode</source>
-        <translation>Способ записи</translation>
-    </message>
-    <message>
         <source>Options...</source>
         <translation>Настройки...</translation>
-    </message>
-    <message>
-        <source>OTR session not ready, please wait...</source>
-        <translation>Сессия с ЗСИ не установлена, подождите...</translation>
     </message>
     <message>
         <source>Message logging</source>
@@ -255,18 +457,6 @@
     <message>
         <source>Disallow all message logging</source>
         <translation>Запретить сохранение сообщений</translation>
-    </message>
-    <message>
-        <source>Restore defaults</source>
-        <translation>Восстановить умолчания</translation>
-    </message>
-    <message>
-        <source>Negotiating off the record (OTR) session ...</source>
-        <translation>Устанавливается сессия с запретом сохранения истории (ЗСИ) ...</translation>
-    </message>
-    <message>
-        <source>years</source>
-        <translation>лет</translation>
     </message>
     <message>
         <source>allowed</source>
@@ -287,14 +477,6 @@
     <message>
         <source>Session negotiated: message logging %1</source>
         <translation>Сессия согласована: сохранение истории %1</translation>
-    </message>
-    <message>
-        <source>Forever</source>
-        <translation>Вечно</translation>
-    </message>
-    <message>
-        <source>Allows to save the history of communications both locally and on the server</source>
-        <translation>Позволяет сохранять историю сообщений как локально так и на сервере</translation>
     </message>
     <message>
         <source>Messages Archiving</source>
@@ -346,255 +528,68 @@
         <translation>Ctrl+H</translation>
     </message>
     <message>
-        <source>Enable message logging</source>
-        <translation>Включить сохранение истории</translation>
-    </message>
-    <message>
-        <source>Disable message logging</source>
-        <translation>Выключить сохранение истории</translation>
-    </message>
-    <message>
-        <source>Require Off-The-Record session</source>
-        <translation>Требовать сессию без записи истории</translation>
-    </message>
-    <message>
         <source>Terminate Off-The-Record session</source>
         <translation>Завершить сессию без записи истории</translation>
     </message>
     <message>
-        <source>Group by nothing</source>
-        <translation>Без группировки</translation>
+        <source>Allows to save the history of communications</source>
+        <translation>Позволяет сохранять историю общения</translation>
     </message>
     <message>
-        <source>Group by date</source>
-        <translation>Группировать по дате</translation>
+        <source>Automatic Archiving</source>
+        <translation>Автоматическое архивирование</translation>
     </message>
     <message>
-        <source>Group by contact</source>
-        <translation>Группировать по контактам</translation>
+        <source>Save Messages with Extensions</source>
+        <translation>Сохранять сообщения с расширениями</translation>
     </message>
     <message>
-        <source>Group by date and contact</source>
-        <translation>Группировать по дате и контактам</translation>
+        <source>Save Only Messages Body</source>
+        <translation>Сохранять только тело сообщений</translation>
     </message>
     <message>
-        <source>Group by contact and date</source>
-        <translation>Группировать по контактам и дате</translation>
+        <source>Do not Save Messages</source>
+        <translation>Не сохранять сообщения</translation>
     </message>
     <message>
-        <source>Expand All</source>
-        <translation>Развернуть всё</translation>
+        <source>Allow Off-The-Record Sessions</source>
+        <translation>Разрешать сессии Без-Записи-Истории</translation>
     </message>
     <message>
-        <source>Collapse All</source>
-        <translation>Свернуть всё</translation>
+        <source>Forbid Off-The-Record Sessions</source>
+        <translation>Запрещать сессии Без-Записи-Истории</translation>
     </message>
     <message>
-        <source>Auto select archive</source>
-        <translation>Автоматически выбирать архив</translation>
+        <source>Manually Approve Off-The-Record Sessions</source>
+        <translation>Подтверждать вручную сессии Без-Записи-Истории</translation>
     </message>
     <message>
-        <source>Select local archive</source>
-        <translation>Выбрать локальный архив</translation>
+        <source>Use Default Options</source>
+        <translation>Использовать настройки по умолчанию</translation>
     </message>
     <message>
-        <source>Select server archive</source>
-        <translation>Выбрать архив на сервере</translation>
+        <source>Enable message archiving</source>
+        <translation>Включить архивирование сообщений</translation>
     </message>
     <message>
-        <source>Filter by contact</source>
-        <translation>Фильтровать по контакту</translation>
+        <source>Disable message archiving</source>
+        <translation>Выключить архивирование сообщений</translation>
     </message>
     <message>
-        <source>Change conversation subject</source>
-        <translation>Изменить тему разговора</translation>
+        <source>Start Off-The-Record session</source>
+        <translation>Начать сессию Без-Записи-Истории</translation>
     </message>
     <message>
-        <source>Remove conversation</source>
-        <translation>Удалить разговор</translation>
+        <source>Off-The-Record session not ready, please wait...</source>
+        <translation>Сессия Без-Записи-Истории не установлена, подождите...</translation>
     </message>
     <message>
-        <source>Reload conversations</source>
-        <translation>Перезагрузить разговор</translation>
+        <source>Negotiating Off-The-Record session...</source>
+        <translation>Согласование сессии Без-Записи-Истории...</translation>
     </message>
     <message>
-        <source>History window</source>
-        <translation>Окно истории</translation>
-    </message>
-    <message>
-        <source>Close history window</source>
-        <translation>Закрыть окно истории</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <comment>Close history window</comment>
-        <translation>Esc</translation>
-    </message>
-</context>
-<context>
-    <name>ViewHistoryWindow</name>
-    <message>
-        <source>View History - %1</source>
-        <translation>Просмотр истории - %1</translation>
-    </message>
-    <message>
-        <source>With</source>
-        <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation>Дата</translation>
-    </message>
-    <message>
-        <source>Groups</source>
-        <translation>Группы</translation>
-    </message>
-    <message>
-        <source>No groups</source>
-        <translation>Без групп</translation>
-    </message>
-    <message>
-        <source>Contact</source>
-        <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>Date and Contact</source>
-        <translation>Дата и контакт</translation>
-    </message>
-    <message>
-        <source>Contact and Date</source>
-        <translation>Контакт и дата</translation>
-    </message>
-    <message>
-        <source>Expand All</source>
-        <translation>Развернуть всё</translation>
-    </message>
-    <message>
-        <source>Collapse All</source>
-        <translation>Свернуть всё</translation>
-    </message>
-    <message>
-        <source>Filter</source>
-        <translation>Фильтр</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
-    <message>
-        <source>Reload</source>
-        <translation>Обновить</translation>
-    </message>
-    <message>
-        <source>Message loading failed: %1</source>
-        <translation>Не удалось загрузить сообщения: %1</translation>
-    </message>
-    <message>
-        <source>Messages request failed.</source>
-        <translation>Не удалось отправить запрос.</translation>
-    </message>
-    <message>
-        <source>Enter new collection subject</source>
-        <translation>Введите новую тему</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Тема:</translation>
-    </message>
-    <message>
-        <source>Remove collection</source>
-        <translation>Удалить сообщения</translation>
-    </message>
-    <message>
-        <source>Do you really want to remove this collection with messages?</source>
-        <translation>Вы уверены, что хотите удалить сообщения?</translation>
-    </message>
-    <message>
-        <source>Grouping type</source>
-        <translation>Тип группировки</translation>
-    </message>
-    <message>
-        <source>Source</source>
-        <translation>Источник</translation>
-    </message>
-    <message>
-        <source>History source</source>
-        <translation>Источник истории</translation>
-    </message>
-    <message>
-        <source>Auto select</source>
-        <translation>Автовыбор</translation>
-    </message>
-    <message>
-        <source>Local archive</source>
-        <translation>Локальный архив</translation>
-    </message>
-    <message>
-        <source>Server archive</source>
-        <translation>Архив на сервере</translation>
-    </message>
-    <message>
-        <source>Loading messages from server...</source>
-        <translation>Загрузка сообщений с сервера...</translation>
-    </message>
-    <message>
-        <source>Remove collections</source>
-        <translation>Удалить сообщения</translation>
-    </message>
-    <message>
-        <source>Do you really want to remove %1 collections with messages?</source>
-        <translation>Вы уверены, что хотите удалить записи (%1) с сообщениями?</translation>
-    </message>
-    <message>
-        <source>No conversation selected</source>
-        <translation>Разговор не выбран</translation>
-    </message>
-    <message>
-        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; started at %2</source>
-        <translation>Разговор с &lt;b&gt;%1&lt;/b&gt; начат в %2</translation>
-    </message>
-    <message>
-        <source>Subject: %1</source>
-        <translation>Тема: %1</translation>
-    </message>
-    <message>
-        <source> &lt;All contacts&gt; </source>
-        <translation> &lt;Все контакты&gt; </translation>
-    </message>
-    <message>
-        <source>Change Subject</source>
-        <translation>Изменить тему</translation>
-    </message>
-</context>
-<context>
-    <name>ViewHistoryWindowClass</name>
-    <message>
-        <source>Filter</source>
-        <translation>Фильтр</translation>
-    </message>
-    <message>
-        <source>Start:</source>
-        <translation>С:</translation>
-    </message>
-    <message>
-        <source>End:</source>
-        <translation>По:</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation>Применить</translation>
-    </message>
-    <message>
-        <source>Contact:</source>
-        <translation>Контакт:</translation>
-    </message>
-    <message>
-        <source>Conversations</source>
-        <translation>Разговоры</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Поиск:</translation>
+        <source>Failed to load conversation</source>
+        <translation>Не удалось загрузить разговор</translation>
     </message>
 </context>
 </TS>

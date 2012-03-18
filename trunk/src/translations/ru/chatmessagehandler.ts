@@ -52,5 +52,13 @@
         <source>When receiving new chat message</source>
         <translation>При получении нового чат сообщения</translation>
     </message>
+    <message>
+        <source>Loading history...</source>
+        <translation>Загрузка истории...</translation>
+    </message>
+    <message>
+        <source>Failed to load history: %1</source>
+        <translation>Не удалось загрузить историю: %1</translation>
+    </message>
 </context>
 </TS>

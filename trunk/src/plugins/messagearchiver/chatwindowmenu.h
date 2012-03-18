@@ -19,15 +19,21 @@ class ChatWindowMenu :
 public:
 	ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IToolBarWidget *AToolBarWidget, QWidget *AParent);
 	~ChatWindowMenu();
+	Jid streamJid() const;
+	Jid contactJid() const;
 protected:
 	void initialize(IPluginManager *APluginManager);
 	void createActions();
+protected:
+	bool isOTRStanzaSession(const IStanzaSession &ASession) const;
+	void restoreSessionPrefs(const Jid &AContactJid);
+	void updateMenu();
 protected slots:
 	void onActionTriggered(bool);
-	void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
-	void onRequestCompleted(const QString &AId);
-	void onRequestFailed(const QString &AId, const QString &AError);
-	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
+	void onArchivePrefsChanged(const Jid &AStreamJid);
+	void onArchiveRequestCompleted(const QString &AId);
+	void onArchiveRequestFailed(const QString &AId, const QString &AError);
+	void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 	void onEditWidgetContactJidChanged(const Jid &ABefore);
@@ -39,13 +45,16 @@ private:
 	IServiceDiscovery *FDiscovery;
 	ISessionNegotiation *FSessionNegotiation;
 private:
-	Action *FSaveTrue;
-	Action *FSaveFalse;
-	Action *FSessionRequire;
-	Action *FSessionTerminate;
+	Action *FEnableArchiving;
+	Action *FDisableArchiving;
+	Action *FStartOTRSession;
+	Action *FStopOTRSession;
 private:
 	QString FSaveRequest;
 	QString FSessionRequest;
+private:
+	bool FRestorePrefs;
+	IArchiveItemPrefs FSessionPrefs;
 };
 
 #endif // CHATWINDOWMENU_H

@@ -70,7 +70,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IArchiveHandler
-	virtual bool archiveMessage(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
+	virtual bool archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//ISessionNegotiator

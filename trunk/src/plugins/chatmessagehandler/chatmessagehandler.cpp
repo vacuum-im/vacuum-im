@@ -88,7 +88,16 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 
 	plugin = APluginManager->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
+	{
 		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
+		if (FMessageArchiver)
+		{
+			connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
+				SLOT(onArchiveMessagesLoaded(const QString &, const IArchiveCollectionBody &)));
+			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
+				SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
@@ -130,13 +139,13 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 	if (plugin)
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
-
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
 	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 	}
+
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
 }
@@ -231,6 +240,8 @@ bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 	{
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);
+		if (FHistoryRequests.values().contains(window))
+			FPendingMessages[window].append(AMessage);
 		showStyledMessage(window,AMessage);
 	}
 	return window!=NULL;
@@ -464,16 +475,17 @@ void ChatMessageHandler::removeNotifiedMessages(IChatWindow *AWindow)
 
 void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 {
-	if (FMessageArchiver)
+	if (FMessageArchiver && !FHistoryRequests.values().contains(AWindow))
 	{
 		IArchiveRequest request;
 		request.with = AWindow->contactJid().bare();
+		request.exactmatch = request.with.node().isEmpty();
 		request.order = Qt::DescendingOrder;
 
 		WindowStatus &wstatus = FWindowStatus[AWindow];
 		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) < HISTORY_TIME_PAST)
 		{
-			request.count = HISTORY_MESSAGES;
+			request.maxItems = HISTORY_MESSAGES;
 			request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
 		}
 		else
@@ -482,21 +494,12 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 			request.end = QDateTime::currentDateTime();
 		}
 
-		QList<Message> history;
-		QList<IArchiveHeader> headers = FMessageArchiver->loadLocalHeaders(AWindow->streamJid(), request);
-		for (int i=0; history.count()<HISTORY_MESSAGES && i<headers.count(); i++)
+		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
+		if (!reqId.isEmpty())
 		{
-			IArchiveCollection collection = FMessageArchiver->loadLocalCollection(AWindow->streamJid(), headers.at(i));
-			history = collection.messages + history;
+			showStyledStatus(AWindow,tr("Loading history..."),false);
+			FHistoryRequests.insert(reqId,AWindow);
 		}
-
-		for (int i=0; i<history.count(); i++)
-		{
-			Message message = history.at(i);
-			showStyledMessage(AWindow,message);
-		}
-
-		wstatus.startTime = history.value(0).dateTime();
 	}
 }
 
@@ -507,8 +510,8 @@ void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 	{
 		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
 		AWindow->viewWidget()->setMessageStyle(style,soptions);
-		FWindowStatus[AWindow].lastDateSeparator = QDate();
 	}
+	FWindowStatus[AWindow].lastDateSeparator = QDate();
 } 
 
 void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const
@@ -557,16 +560,17 @@ void ChatMessageHandler::showDateSeparator(IChatWindow *AWindow, const QDateTime
 	}
 }
 
-void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage)
+void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool AArchive)
 {
-	if (FMessageArchiver && Options::node(OPV_MESSAGES_ARCHIVESTATUS).value().toBool())
-		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
-
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindStatus;
 	options.time = QDateTime::currentDateTime();
 	options.timeFormat = FMessageStyles->timeFormat(options.time);
 	options.direction = IMessageContentOptions::DirectionIn;
+
+	if (AArchive && FMessageArchiver && Options::node(OPV_MESSAGES_ARCHIVESTATUS).value().toBool())
+		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
+
 	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);
 	AWindow->viewWidget()->appendText(AMessage,options);
@@ -577,12 +581,12 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindMessage;
 	options.time = AMessage.dateTime();
-	
+
 	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
 		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
 	else
 		options.timeFormat = FMessageStyles->timeFormat(options.time);
-	
+
 	if (AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid()!=AMessage.to() : !(AWindow->contactJid() && AMessage.to()))
 		options.direction = IMessageContentOptions::DirectionIn;
 	else
@@ -679,6 +683,8 @@ void ChatMessageHandler::onWindowDestroyed()
 			delete FDestroyTimers.take(window);
 		FWindows.removeAt(FWindows.indexOf(window));
 		FWindowStatus.remove(window);
+		FPendingMessages.remove(window);
+		FHistoryRequests.remove(FHistoryRequests.key(window));
 	}
 }
 
@@ -729,6 +735,48 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 		}
 	}
 }
+
+void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody)
+{
+	if (FHistoryRequests.contains(AId))
+	{
+		IChatWindow *window = FHistoryRequests.take(AId);
+		setMessageStyle(window);
+
+		int messageIt = ABody.messages.count()-1;
+		QMultiMap<QDateTime,QString>::const_iterator noteIt = ABody.notes.constBegin();
+		while (messageIt>=0 || noteIt!=ABody.notes.constEnd())
+		{
+			if (messageIt>=0 && (noteIt==ABody.notes.constEnd() || ABody.messages.at(messageIt).dateTime()<noteIt.key()))
+			{
+				showStyledMessage(window,ABody.messages.at(messageIt));
+				messageIt--;
+			}
+			else if (noteIt != ABody.notes.constEnd())
+			{
+				showStyledStatus(window,noteIt.value(),false);
+				noteIt++;
+			}
+		}
+
+		foreach(Message message, FPendingMessages.take(window))
+			showStyledMessage(window,message);
+
+		WindowStatus &wstatus = FWindowStatus[window];
+		wstatus.startTime = ABody.messages.value(0).dateTime();
+	}
+}
+
+void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const QString &AError)
+{
+	if (FHistoryRequests.contains(AId))
+	{
+		IChatWindow *window = FHistoryRequests.take(AId);
+		showStyledStatus(window,tr("Failed to load history: %1").arg(AError),false);
+		FPendingMessages.remove(window);
+	}
+}
+
 void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
 	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)

@@ -1,16 +1,15 @@
 FORMS = archiveoptions.ui \
-        viewhistorywindow.ui
+        archiveviewwindow.ui \
+        selectpagewidget.ui
 
 HEADERS = archiveoptions.h \
-          viewhistorywindow.h \
-          replicator.h \
-          collectionwriter.h \
           chatwindowmenu.h \
-          messagearchiver.h
+          archiveviewwindow.h \
+          messagearchiver.h \
+          selectpagewidget.h
           
 SOURCES = archiveoptions.cpp \
-          viewhistorywindow.cpp \
-          replicator.cpp \
-          collectionwriter.cpp \
           chatwindowmenu.cpp \
-          messagearchiver.cpp
+          archiveviewwindow.cpp \
+          messagearchiver.cpp \
+          selectpagewidget.cpp

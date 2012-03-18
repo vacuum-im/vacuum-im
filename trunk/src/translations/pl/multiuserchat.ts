@@ -978,5 +978,13 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <source>Open chat dialog</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Loading history...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load history: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

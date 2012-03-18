@@ -86,7 +86,7 @@ public:
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
 	virtual bool messageShowWindow(int AMessageId);
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
-	// IOptionsHolder
+	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
 	IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
@@ -98,7 +98,7 @@ protected:
 	void setMessageStyle(IChatWindow *AWindow);
 	void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
 	void showDateSeparator(IChatWindow *AWindow, const QDateTime &ADateTime);
-	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage);
+	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool AArchive=true);
 	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
 	void onMessageReady();
@@ -110,6 +110,8 @@ protected slots:
 	void onShowWindowAction(bool);
 	void onClearWindowAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
+	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
@@ -130,6 +132,9 @@ private:
 	QMap<IChatWindow *, QTimer *> FDestroyTimers;
 	QMultiMap<IChatWindow *, int> FNotifiedMessages;
 	QMap<IChatWindow *, WindowStatus> FWindowStatus;
+private:
+	QMap<QString, IChatWindow *> FHistoryRequests;
+	QMap<IChatWindow *, QList<Message> > FPendingMessages;
 };
 
 #endif // CHATMESSAGEHANDLER_H
