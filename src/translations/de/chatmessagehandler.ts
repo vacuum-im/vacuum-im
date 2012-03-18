@@ -52,5 +52,13 @@
         <source>When receiving new chat message</source>
         <translation>Wenn neue Chat Nachricht empfangen</translation>
     </message>
+    <message>
+        <source>Loading history...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load history: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

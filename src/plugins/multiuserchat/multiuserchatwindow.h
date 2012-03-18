@@ -131,7 +131,7 @@ protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMessageStyle();
 	void showTopic(const QString &ATopic);
-	void showStatusMessage(const QString &AMessage, int AType=0, int AStatus=0);
+	void showStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool AArchive=true);
 	void showUserMessage(const Message &AMessage, const QString &ANick);
 	void showHistory();
 	void updateWindow();
@@ -188,6 +188,8 @@ protected slots:
 	void onChatWindowDestroyed();
 	void onHorizontalSplitterMoved(int APos, int AIndex);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
+	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
+	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 protected slots:
 	void onNickMenuActionTriggered(bool);
 	void onToolBarActionTriggered(bool);
@@ -250,6 +252,8 @@ private:
 	QMap<int, IDataDialogWidget *> FDataFormMessages;
 	QHash<IMultiUser *, UserStatus> FUserStatus;
 	QMap<IViewWidget *, WindowStatus> FWindowStatus;
+	QMap<QString, IChatWindow *> FHistoryRequests;
+	QMap<IChatWindow *, QList<Message> > FPendingMessages;
 private:
 	UsersProxyModel *FUsersProxy;
 	QStandardItemModel *FUsersModel;

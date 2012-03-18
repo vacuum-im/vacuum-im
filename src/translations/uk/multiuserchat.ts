@@ -977,5 +977,13 @@ Check values and try again</source>
         <source>Open chat dialog</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Loading history...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load history: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

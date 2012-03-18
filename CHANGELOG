@@ -23,6 +23,7 @@ LEGEND
   [*] Added support for transferring files via SOCKS5 in conferences
   [*] Added animation support in SimpleMessageStyles and notification pop-ups
   [*] Added ability to specify environment variables in the resource
+  [*] Improved and optimized work with message archive
   [-] XML parser did not correctly handle the elements with not declared prefixes, which caused to the breaking the connection
   [-] Fixed bug in Digest-MD5 authorization for which was not possible to log on some servers
   [-] When leaving the hidden conferences also closed the conference on non-active tabs

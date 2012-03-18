@@ -12,13 +12,18 @@ class ArchiveDelegate :
 {
 	Q_OBJECT;
 public:
+	static QString expireName(int AExpire);
+	static QString exactMatchName(bool AExact);
+	static QString methodName(const QString &AMethod);
+	static QString otrModeName(const QString &AOTRMode);
+	static QString saveModeName(const QString &ASaveMode);
+	static void updateComboBox(int AColumn, QComboBox *AComboBox);
+public:
 	ArchiveDelegate(IMessageArchiver *AArchiver, QObject *AParent = NULL);
 	QWidget *createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	void setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const;
 	void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
 	void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-public:
-	void updateComboBox(int AColumn, QComboBox *AComboBox) const;
 protected slots:
 	void onExpireIndexChanged(int AIndex);
 private:
@@ -46,13 +51,12 @@ signals:
 protected:
 	void updateWidget();
 	void updateColumnsSize();
+	void updateItemPrefs(const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
+	void removeItemPrefs(const Jid &AItemJid);
 protected slots:
 	void onAddItemPrefClicked();
 	void onRemoveItemPrefClicked();
-	void onArchiveAutoSaveChanged(const Jid &AStreamJid, bool AAutoSave);
-	void onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
-	void onArchiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
-	void onArchiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid);
+	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 private:

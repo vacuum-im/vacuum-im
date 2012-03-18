@@ -8,7 +8,7 @@ NotifyTextBrowser::NotifyTextBrowser(QWidget *AParent) : AnimatedTextBrowser(APa
 	FMaxHeight = QWIDGETSIZE_MAX;
 	connect(this,SIGNAL(textChanged()),SLOT(onTextChanged()),Qt::QueuedConnection);
 	connect(this,SIGNAL(resourceLoaded(QUrl)),SLOT(onTextChanged()),Qt::QueuedConnection);
-	connect(this,SIGNAL(resourceAdded(QUrl)),SLOT(onTextChanged()),Qt::QueuedConnection);
+	connect(this,SIGNAL(resourceUpdated(QUrl)),SLOT(onTextChanged()),Qt::QueuedConnection);
 }
 
 NotifyTextBrowser::~NotifyTextBrowser()

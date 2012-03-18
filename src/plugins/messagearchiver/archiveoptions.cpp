@@ -12,41 +12,177 @@
 #define ONE_YEAR          (ONE_DAY*365)
 
 #define JID_COLUMN        0
-#define OTR_COLUMN        1
-#define SAVE_COLUMN       2
+#define SAVE_COLUMN       1
+#define OTR_COLUMN        2
 #define EXPIRE_COLUMN     3
+#define EXACT_COLUMN      4
 
 ArchiveDelegate::ArchiveDelegate(IMessageArchiver *AArchiver, QObject *AParent) : QItemDelegate(AParent)
 {
 	FArchiver = AArchiver;
 }
 
-QWidget *ArchiveDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &/*AOption*/, const QModelIndex &AIndex) const
+QString ArchiveDelegate::expireName(int AExpire)
 {
+	QString name;
+	int years = AExpire/ONE_YEAR;
+	int months = (AExpire-years*ONE_YEAR)/ONE_MONTH;
+	int days = (AExpire-years*ONE_YEAR-months*ONE_MONTH)/ONE_DAY;
+
+	if (AExpire>0)
+	{
+		if (years > 0)
+		{
+			name +=  tr("%n year(s)","",years);
+		}
+		if (months > 0)
+		{
+			if (!name.isEmpty())
+				name += " ";
+			name += tr("%n month(s)","",months);
+		}
+		if (days > 0)
+		{
+			if (!name.isEmpty())
+				name += " ";
+			name += tr("%n day(s)","",days);
+		}
+	}
+	else
+	{
+		name = tr("Never");
+	}
+
+	return name;
+}
+
+QString ArchiveDelegate::exactMatchName(bool AExact)
+{
+	return AExact ? tr("Yes") : tr("No");
+}
+
+QString ArchiveDelegate::methodName(const QString &AMethod)
+{
+	if (AMethod == ARCHIVE_METHOD_PREFER)
+		return tr("Prefer");
+	else if (AMethod == ARCHIVE_METHOD_CONCEDE)
+		return tr("Allow");
+	else if (AMethod == ARCHIVE_METHOD_FORBID)
+		return tr("Forbid");
+	else
+		return tr("Unknown");
+}
+
+QString ArchiveDelegate::otrModeName(const QString &AOTRMode)
+{
+	if (AOTRMode == ARCHIVE_OTR_APPROVE)
+		return tr("Approve");
+	else if (AOTRMode == ARCHIVE_OTR_CONCEDE)
+		return tr("Allow");
+	else if (AOTRMode == ARCHIVE_OTR_FORBID)
+		return tr("Forbid");
+	else if (AOTRMode == ARCHIVE_OTR_OPPOSE)
+		return tr("Oppose");
+	else if (AOTRMode == ARCHIVE_OTR_PREFER)
+		return tr("Prefer");
+	else if (AOTRMode == ARCHIVE_OTR_REQUIRE)
+		return tr("Require");
+	else
+		return tr("Unknown");
+}
+
+QString ArchiveDelegate::saveModeName(const QString &ASaveMode)
+{
+	if (ASaveMode == ARCHIVE_SAVE_FALSE)
+		return tr("Nothing");
+	else if (ASaveMode == ARCHIVE_SAVE_BODY)
+		return tr("Body");
+	else if (ASaveMode == ARCHIVE_SAVE_MESSAGE)
+		return tr("Message");
+	else if (ASaveMode == ARCHIVE_SAVE_STREAM)
+		return tr("Stream");
+	else
+		return tr("Unknown");
+}
+
+void ArchiveDelegate::updateComboBox(int AColumn, QComboBox *AComboBox)
+{
+	switch (AColumn)
+	{
+	case SAVE_COLUMN:
+		AComboBox->addItem(saveModeName(ARCHIVE_SAVE_MESSAGE),ARCHIVE_SAVE_MESSAGE);
+		AComboBox->addItem(saveModeName(ARCHIVE_SAVE_BODY),ARCHIVE_SAVE_BODY);
+		AComboBox->addItem(saveModeName(ARCHIVE_SAVE_FALSE),ARCHIVE_SAVE_FALSE);
+		break;
+	case OTR_COLUMN:
+		AComboBox->addItem(otrModeName(ARCHIVE_OTR_CONCEDE),ARCHIVE_OTR_CONCEDE);
+		AComboBox->addItem(otrModeName(ARCHIVE_OTR_FORBID),ARCHIVE_OTR_FORBID);
+		AComboBox->addItem(otrModeName(ARCHIVE_OTR_APPROVE),ARCHIVE_OTR_APPROVE);
+		AComboBox->addItem(otrModeName(ARCHIVE_OTR_REQUIRE),ARCHIVE_OTR_REQUIRE);
+		break;
+	case EXPIRE_COLUMN:
+		AComboBox->setEditable(true);
+		AComboBox->addItem(expireName(0),0);
+		AComboBox->addItem(expireName(ONE_DAY),ONE_DAY);
+		AComboBox->addItem(expireName(7*ONE_DAY),7*ONE_DAY);
+		AComboBox->addItem(expireName(ONE_MONTH),ONE_MONTH);
+		AComboBox->addItem(expireName(6*ONE_MONTH),6*ONE_MONTH);
+		AComboBox->addItem(expireName(ONE_YEAR),ONE_YEAR);
+		AComboBox->addItem(expireName(5*ONE_YEAR),5*ONE_YEAR);
+		AComboBox->addItem(expireName(10*ONE_YEAR),10*ONE_YEAR);
+		AComboBox->lineEdit()->setValidator(new QIntValidator(0,50*ONE_YEAR,AComboBox->lineEdit()));
+		break;
+	case EXACT_COLUMN:
+		AComboBox->addItem(exactMatchName(false),false);
+		AComboBox->addItem(exactMatchName(true),true);
+		break;
+	default:
+		break;
+	}
+}
+
+QWidget *ArchiveDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	Q_UNUSED(AOption);
 	switch (AIndex.column())
 	{
-	case OTR_COLUMN:
 	case SAVE_COLUMN:
+	case OTR_COLUMN:
+	case EXACT_COLUMN:
+		{
+			QComboBox *comboBox = new QComboBox(AParent);
+			updateComboBox(AIndex.column(),comboBox);
+			return comboBox;
+		}
 	case EXPIRE_COLUMN:
-		QComboBox *comboBox = new QComboBox(AParent);
-		updateComboBox(AIndex.column(),comboBox);
-		return comboBox;
+		{
+			QComboBox *comboBox = new QComboBox(AParent);
+			connect(comboBox,SIGNAL(currentIndexChanged(int)),SLOT(onExpireIndexChanged(int)));
+			updateComboBox(AIndex.column(),comboBox);
+			return comboBox;
+		}
 	}
 	return NULL;
 }
 
 void ArchiveDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
 {
-	QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-	int index = comboBox->findData(AIndex.data(Qt::UserRole));
 	switch (AIndex.column())
 	{
-	case OTR_COLUMN:
 	case SAVE_COLUMN:
-		comboBox->setCurrentIndex(index);
+	case OTR_COLUMN:
+	case EXACT_COLUMN:
+		{
+			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
+			comboBox->setCurrentIndex(comboBox->findData(AIndex.data(Qt::UserRole)));
+		}
 		break;
 	case EXPIRE_COLUMN:
-		comboBox->lineEdit()->setText(QString::number(AIndex.data(Qt::UserRole).toInt()/ONE_DAY));
+		{
+			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
+			comboBox->lineEdit()->setText(QString::number(AIndex.data(Qt::UserRole).toInt()/ONE_DAY));
+		}
+		break;
 	default:
 		break;
 	}
@@ -54,22 +190,26 @@ void ArchiveDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex)
 
 void ArchiveDelegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
 {
-	QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-	int index = comboBox->currentIndex();
 	switch (AIndex.column())
 	{
-	case OTR_COLUMN:
 	case SAVE_COLUMN:
-		AModel->setData(AIndex,comboBox->itemText(index),Qt::DisplayRole);
-		AModel->setData(AIndex,comboBox->itemData(index),Qt::UserRole);
+	case OTR_COLUMN:
+	case EXACT_COLUMN:
+		{
+			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
+			int index = comboBox->currentIndex();
+			AModel->setData(AIndex,comboBox->itemText(index),Qt::DisplayRole);
+			AModel->setData(AIndex,comboBox->itemData(index),Qt::UserRole);
+		}
 		break;
 	case EXPIRE_COLUMN:
-	{
-		int expire = comboBox->currentText().toInt()*ONE_DAY;
-		AModel->setData(AIndex,FArchiver->expireName(expire),Qt::DisplayRole);
-		AModel->setData(AIndex,expire,Qt::UserRole);
-	}
-	break;
+		{
+			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
+			int expire = comboBox->currentText().toInt()*ONE_DAY;
+			AModel->setData(AIndex,expireName(expire),Qt::DisplayRole);
+			AModel->setData(AIndex,expire,Qt::UserRole);
+		}
+		break;
 	default:
 		break;
 	}
@@ -81,39 +221,6 @@ void ArchiveDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionV
 	int widthDelta = AEditor->sizeHint().width() - AEditor->width();
 	if (widthDelta>0)
 		AEditor->setGeometry(AEditor->x()-widthDelta,AEditor->y(),AEditor->width()+widthDelta,AEditor->height());
-}
-
-void ArchiveDelegate::updateComboBox(int AColumn, QComboBox *AComboBox) const
-{
-	switch (AColumn)
-	{
-	case OTR_COLUMN:
-		AComboBox->addItem(FArchiver->otrModeName(ARCHIVE_OTR_APPROVE),ARCHIVE_OTR_APPROVE);
-		AComboBox->addItem(FArchiver->otrModeName(ARCHIVE_OTR_CONCEDE),ARCHIVE_OTR_CONCEDE);
-		AComboBox->addItem(FArchiver->otrModeName(ARCHIVE_OTR_FORBID),ARCHIVE_OTR_FORBID);
-		AComboBox->addItem(FArchiver->otrModeName(ARCHIVE_OTR_OPPOSE),ARCHIVE_OTR_OPPOSE);
-		AComboBox->addItem(FArchiver->otrModeName(ARCHIVE_OTR_PREFER),ARCHIVE_OTR_PREFER);
-		AComboBox->addItem(FArchiver->otrModeName(ARCHIVE_OTR_REQUIRE),ARCHIVE_OTR_REQUIRE);
-		break;
-	case SAVE_COLUMN:
-		AComboBox->addItem(FArchiver->saveModeName(ARCHIVE_SAVE_FALSE),ARCHIVE_SAVE_FALSE);
-		AComboBox->addItem(FArchiver->saveModeName(ARCHIVE_SAVE_BODY),ARCHIVE_SAVE_BODY);
-		AComboBox->addItem(FArchiver->saveModeName(ARCHIVE_SAVE_MESSAGE),ARCHIVE_SAVE_MESSAGE);
-		break;
-	case EXPIRE_COLUMN:
-		AComboBox->setEditable(true);
-		AComboBox->addItem(FArchiver->expireName(0),0);
-		AComboBox->addItem(FArchiver->expireName(ONE_DAY),ONE_DAY);
-		AComboBox->addItem(FArchiver->expireName(ONE_MONTH),ONE_MONTH);
-		AComboBox->addItem(FArchiver->expireName(ONE_YEAR),ONE_YEAR);
-		AComboBox->addItem(FArchiver->expireName(5*ONE_YEAR),5*ONE_YEAR);
-		AComboBox->addItem(FArchiver->expireName(10*ONE_YEAR),10*ONE_YEAR);
-		AComboBox->lineEdit()->setValidator(new QIntValidator(0,50*ONE_YEAR,AComboBox->lineEdit()));
-		connect(AComboBox,SIGNAL(currentIndexChanged(int)),SLOT(onExpireIndexChanged(int)));
-		break;
-	default:
-		break;
-	}
 }
 
 void ArchiveDelegate::onExpireIndexChanged(int AIndex)
@@ -130,45 +237,41 @@ ArchiveOptions::ArchiveOptions(IMessageArchiver *AArchiver, const Jid &AStreamJi
 
 	ArchiveDelegate *delegat = new ArchiveDelegate(AArchiver,ui.tbwItemPrefs);
 	ui.tbwItemPrefs->setItemDelegate(delegat);
-	ui.tbwItemPrefs->verticalHeader()->hide();
-	ui.tbwItemPrefs->setHorizontalHeaderLabels(QStringList()<<tr("JID")<<tr("OTR")<<tr("Save")<<tr("Expire"));
 	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(JID_COLUMN,QHeaderView::Stretch);
-	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(OTR_COLUMN,QHeaderView::ResizeToContents);
 	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(SAVE_COLUMN,QHeaderView::ResizeToContents);
+	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(OTR_COLUMN,QHeaderView::ResizeToContents);
 	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(EXPIRE_COLUMN,QHeaderView::ResizeToContents);
+	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(EXACT_COLUMN,QHeaderView::ResizeToContents);
 
-	ui.cmbMethodLocal->addItem(AArchiver->methodName(ARCHIVE_METHOD_PREFER),ARCHIVE_METHOD_PREFER);
-	ui.cmbMethodLocal->addItem(AArchiver->methodName(ARCHIVE_METHOD_CONCEDE),ARCHIVE_METHOD_CONCEDE);
-	ui.cmbMethodLocal->addItem(AArchiver->methodName(ARCHIVE_METHOD_FORBID),ARCHIVE_METHOD_FORBID);
+	ui.cmbMethodAuto->addItem(tr("Yes, if supported by server"),ARCHIVE_METHOD_PREFER);
+	ui.cmbMethodAuto->addItem(tr("Yes, if other archive is not available"),ARCHIVE_METHOD_CONCEDE);
+	ui.cmbMethodAuto->addItem(tr("No, do not save history on server"),ARCHIVE_METHOD_FORBID);
 
-	ui.cmbMethodAuto->addItem(AArchiver->methodName(ARCHIVE_METHOD_PREFER),ARCHIVE_METHOD_PREFER);
-	ui.cmbMethodAuto->addItem(AArchiver->methodName(ARCHIVE_METHOD_CONCEDE),ARCHIVE_METHOD_CONCEDE);
-	ui.cmbMethodAuto->addItem(AArchiver->methodName(ARCHIVE_METHOD_FORBID),ARCHIVE_METHOD_FORBID);
+	ui.cmbMethodLocal->addItem(tr("Yes, if local archive is available"),ARCHIVE_METHOD_PREFER);
+	ui.cmbMethodLocal->addItem(tr("Yes, if other archive is not available"),ARCHIVE_METHOD_CONCEDE);
+	ui.cmbMethodLocal->addItem(tr("No, do not save history in local archive"),ARCHIVE_METHOD_FORBID);
 
-	ui.cmbMethodManual->addItem(AArchiver->methodName(ARCHIVE_METHOD_PREFER),ARCHIVE_METHOD_PREFER);
-	ui.cmbMethodManual->addItem(AArchiver->methodName(ARCHIVE_METHOD_CONCEDE),ARCHIVE_METHOD_CONCEDE);
-	ui.cmbMethodManual->addItem(AArchiver->methodName(ARCHIVE_METHOD_FORBID),ARCHIVE_METHOD_FORBID);
+	ui.cmbMethodManual->addItem(tr("Yes, if available"),ARCHIVE_METHOD_PREFER);
+	ui.cmbMethodManual->addItem(tr("Yes, if other replication method is not used"),ARCHIVE_METHOD_CONCEDE);
+	ui.cmbMethodManual->addItem(tr("No, do not copy local archive to the server"),ARCHIVE_METHOD_FORBID);
 
-	delegat->updateComboBox(OTR_COLUMN,ui.cmbModeOTR);
-	delegat->updateComboBox(SAVE_COLUMN,ui.cmbModeSave);
-	delegat->updateComboBox(EXPIRE_COLUMN,ui.cmbExpireTime);
+	ui.cmbModeSave->addItem(tr("Save messages with extensions"),ARCHIVE_SAVE_MESSAGE);
+	ui.cmbModeSave->addItem(tr("Save only messages body"),ARCHIVE_SAVE_BODY);
+	ui.cmbModeSave->addItem(tr("Do not save messages"),ARCHIVE_SAVE_FALSE);
+
+	ui.cmbModeOTR->addItem(tr("Allow Off-The-Record sessions"),ARCHIVE_OTR_CONCEDE);
+	ui.cmbModeOTR->addItem(tr("Forbid Off-The-Record sessions"),ARCHIVE_OTR_FORBID);
+	ui.cmbModeOTR->addItem(tr("Manually approve Off-The-Record sessions"),ARCHIVE_OTR_APPROVE);
+
+	ArchiveDelegate::updateComboBox(EXPIRE_COLUMN,ui.cmbExpireTime);
 
 	reset();
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddItemPrefClicked()));
 	connect(ui.pbtRemove,SIGNAL(clicked()),SLOT(onRemoveItemPrefClicked()));
-	connect(FArchiver->instance(),SIGNAL(archiveAutoSaveChanged(const Jid &, bool)),
-		SLOT(onArchiveAutoSaveChanged(const Jid &, bool)));
-	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
-		SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
-	connect(FArchiver->instance(),SIGNAL(archiveItemPrefsChanged(const Jid &, const Jid &, const IArchiveItemPrefs &)),
-		SLOT(onArchiveItemPrefsChanged(const Jid &, const Jid &, const IArchiveItemPrefs &)));
-	connect(FArchiver->instance(),SIGNAL(archiveItemPrefsRemoved(const Jid &, const Jid &)),
-		SLOT(onArchiveItemPrefsRemoved(const Jid &, const Jid &)));
-	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),
-		SLOT(onArchiveRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-		SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
+	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onArchiveRequestFailed(const QString &, const QString &)));
 
 	connect(ui.cmbMethodLocal,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbMethodManual,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
@@ -178,7 +281,6 @@ ArchiveOptions::ArchiveOptions(IMessageArchiver *AArchiver, const Jid &AStreamJi
 	connect(ui.cmbExpireTime,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbExpireTime->lineEdit(),SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.chbAutoSave,SIGNAL(stateChanged(int)),SIGNAL(modified()));
-	connect(ui.chbReplication,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(delegat,SIGNAL(commitData(QWidget *)),SIGNAL(modified()));
 }
 
@@ -202,9 +304,10 @@ void ArchiveOptions::apply()
 		foreach(Jid itemJid, FTableItems.keys())
 		{
 			QTableWidgetItem *jidItem = FTableItems.value(itemJid);
-			prefs.itemPrefs[itemJid].otr = ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->data(Qt::UserRole).toString();
 			prefs.itemPrefs[itemJid].save = ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->data(Qt::UserRole).toString();
+			prefs.itemPrefs[itemJid].otr = ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->data(Qt::UserRole).toString();
 			prefs.itemPrefs[itemJid].expire = ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->data(Qt::UserRole).toInt();
+			prefs.itemPrefs[itemJid].exactmatch = ui.tbwItemPrefs->item(jidItem->row(),EXACT_COLUMN)->data(Qt::UserRole).toBool();
 		}
 
 		foreach(Jid itemJid, prefs.itemPrefs.keys())
@@ -237,9 +340,6 @@ void ArchiveOptions::apply()
 				FSaveRequests.append(requestId);
 		}
 
-		if (FArchiver->isReplicationEnabled(FStreamJid) != ui.chbReplication->isChecked())
-			FArchiver->setReplicationEnabled(FStreamJid,ui.chbReplication->isChecked());
-
 		FLastError.clear();
 		updateWidget();
 	}
@@ -248,26 +348,12 @@ void ArchiveOptions::apply()
 
 void ArchiveOptions::reset()
 {
+	FLastError.clear();
 	FTableItems.clear();
 	ui.tbwItemPrefs->clearContents();
 	ui.tbwItemPrefs->setRowCount(0);
 	if (FArchiver->isReady(FStreamJid))
-	{
-		IArchiveStreamPrefs prefs = FArchiver->archivePrefs(FStreamJid);
-		QHash<Jid,IArchiveItemPrefs>::const_iterator it = prefs.itemPrefs.constBegin();
-		while (it!=prefs.itemPrefs.constEnd())
-		{
-			onArchiveItemPrefsChanged(FStreamJid,it.key(),it.value());
-			it++;
-		}
-		onArchivePrefsChanged(FStreamJid,prefs);
-		ui.chbReplication->setCheckState(FArchiver->isReplicationEnabled(FStreamJid) ? Qt::Checked : Qt::Unchecked);
-		FLastError.clear();
-	}
-	else
-	{
-		FLastError = tr("History preferences not loaded");
-	}
+		onArchivePrefsChanged(FStreamJid);
 	updateWidget();
 	emit childReset();
 }
@@ -283,14 +369,57 @@ void ArchiveOptions::updateWidget()
 
 	if (requesting)
 		ui.lblStatus->setText(tr("Waiting for host response..."));
+	if (!FArchiver->isReady(FStreamJid))
+		ui.lblStatus->setText(tr("History preferences is not available"));
 	else if (!FLastError.isEmpty())
-		ui.lblStatus->setText(tr("Error received: %1").arg(FLastError));
-	ui.lblStatus->setVisible(requesting || !FLastError.isEmpty());
+		ui.lblStatus->setText(tr("Failed to save archive preferences: %1").arg(FLastError));
+	else
+		ui.lblStatus->clear();
 }
 
 void ArchiveOptions::updateColumnsSize()
 {
 	ui.tbwItemPrefs->horizontalHeader()->reset();
+}
+
+void ArchiveOptions::updateItemPrefs(const Jid &AItemJid, const IArchiveItemPrefs &APrefs)
+{
+	if (!FTableItems.contains(AItemJid))
+	{
+		QTableWidgetItem *jidItem = new QTableWidgetItem(AItemJid.full());
+		QTableWidgetItem *otrItem = new QTableWidgetItem();
+		QTableWidgetItem *saveItem = new QTableWidgetItem();
+		QTableWidgetItem *expireItem = new QTableWidgetItem();
+		QTableWidgetItem *exactItem = new QTableWidgetItem();
+		ui.tbwItemPrefs->setRowCount(ui.tbwItemPrefs->rowCount()+1);
+		ui.tbwItemPrefs->setItem(ui.tbwItemPrefs->rowCount()-1,JID_COLUMN,jidItem);
+		ui.tbwItemPrefs->setItem(jidItem->row(),SAVE_COLUMN,saveItem);
+		ui.tbwItemPrefs->setItem(jidItem->row(),OTR_COLUMN,otrItem);
+		ui.tbwItemPrefs->setItem(jidItem->row(),EXPIRE_COLUMN,expireItem);
+		ui.tbwItemPrefs->setItem(jidItem->row(),EXACT_COLUMN,exactItem);
+		ui.tbwItemPrefs->verticalHeader()->setResizeMode(jidItem->row(),QHeaderView::ResizeToContents);
+		FTableItems.insert(AItemJid,jidItem);
+	}
+	QTableWidgetItem *jidItem = FTableItems.value(AItemJid);
+	ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setText(ArchiveDelegate::saveModeName(APrefs.save));
+	ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setData(Qt::UserRole,APrefs.save);
+	ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setText(ArchiveDelegate::otrModeName(APrefs.otr));
+	ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setData(Qt::UserRole,APrefs.otr);
+	ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setText(ArchiveDelegate::expireName(APrefs.expire));
+	ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setData(Qt::UserRole,APrefs.expire);
+	ui.tbwItemPrefs->item(jidItem->row(),EXACT_COLUMN)->setText(ArchiveDelegate::exactMatchName(APrefs.exactmatch));
+	ui.tbwItemPrefs->item(jidItem->row(),EXACT_COLUMN)->setData(Qt::UserRole,APrefs.exactmatch);
+	updateColumnsSize();
+}
+
+void ArchiveOptions::removeItemPrefs(const Jid &AItemJid)
+{
+	if (FTableItems.contains(AItemJid))
+	{
+		QTableWidgetItem *jidItem = FTableItems.take(AItemJid);
+		ui.tbwItemPrefs->removeRow(jidItem->row());
+		updateColumnsSize();
+	}
 }
 
 void ArchiveOptions::onAddItemPrefClicked()
@@ -299,7 +428,7 @@ void ArchiveOptions::onAddItemPrefClicked()
 	if (itemJid.isValid() && !FTableItems.contains(itemJid))
 	{
 		IArchiveItemPrefs itemPrefs = FArchiver->archiveItemPrefs(FStreamJid,itemJid);
-		onArchiveItemPrefsChanged(FStreamJid,itemJid,itemPrefs);
+		updateItemPrefs(itemJid,itemPrefs);
 		ui.tbwItemPrefs->setCurrentItem(FTableItems.value(itemJid));
 		emit modified();
 	}
@@ -311,79 +440,54 @@ void ArchiveOptions::onAddItemPrefClicked()
 
 void ArchiveOptions::onRemoveItemPrefClicked()
 {
-	if (ui.tbwItemPrefs->currentRow()>=0)
+	QList<QTableWidgetItem *> selectedRows;
+	foreach(QTableWidgetItem *item, ui.tbwItemPrefs->selectedItems())
+		if (item->column() == JID_COLUMN)
+			selectedRows.append(item);
+
+	foreach(QTableWidgetItem *item, selectedRows)
 	{
-		QTableWidgetItem *jidItem = ui.tbwItemPrefs->item(ui.tbwItemPrefs->currentRow(),JID_COLUMN);
-		onArchiveItemPrefsRemoved(FStreamJid,FTableItems.key(jidItem));
+		removeItemPrefs(FTableItems.key(item));
 		emit modified();
 	}
 }
 
-void ArchiveOptions::onArchiveAutoSaveChanged(const Jid &AStreamJid, bool AAutoSave)
+void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 {
 	if (AStreamJid == FStreamJid)
 	{
-		ui.chbAutoSave->setChecked(AAutoSave);
-		updateWidget();
-	}
-}
+		IArchiveStreamPrefs prefs = FArchiver->archivePrefs(AStreamJid);
 
-void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
-{
-	if (AStreamJid == FStreamJid)
-	{
-		onArchiveAutoSaveChanged(FStreamJid,APrefs.autoSave);
+		ui.chbAutoSave->setChecked(FArchiver->isArchiveAutoSave(AStreamJid));
 		ui.grbAuto->setVisible(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_AUTO));
-		ui.chbReplication->setEnabled(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_MANAGE));
 
-		ui.cmbMethodLocal->setCurrentIndex(ui.cmbMethodLocal->findData(APrefs.methodLocal));
-		ui.cmbMethodAuto->setCurrentIndex(ui.cmbMethodAuto->findData(APrefs.methodAuto));
-		ui.cmbMethodManual->setCurrentIndex(ui.cmbMethodManual->findData(APrefs.methodManual));
+		ui.cmbMethodLocal->setCurrentIndex(ui.cmbMethodLocal->findData(prefs.methodLocal));
+		ui.cmbMethodAuto->setCurrentIndex(ui.cmbMethodAuto->findData(prefs.methodAuto));
+		ui.cmbMethodManual->setCurrentIndex(ui.cmbMethodManual->findData(prefs.methodManual));
 		ui.grbMethod->setVisible(FArchiver->isSupported(FStreamJid,NS_ARCHIVE_PREF));
 
-		ui.cmbModeOTR->setCurrentIndex(ui.cmbModeOTR->findData(APrefs.defaultPrefs.otr));
-		ui.cmbModeSave->setCurrentIndex(ui.cmbModeSave->findData(APrefs.defaultPrefs.save));
-		ui.cmbExpireTime->lineEdit()->setText(QString::number(APrefs.defaultPrefs.expire/ONE_DAY));
+		ui.cmbModeSave->setCurrentIndex(ui.cmbModeSave->findData(prefs.defaultPrefs.save));
+		ui.cmbModeOTR->setCurrentIndex(ui.cmbModeOTR->findData(prefs.defaultPrefs.otr));
+
+		int expIndex = ui.cmbExpireTime->findData(prefs.defaultPrefs.expire);
+		if (expIndex>=0)
+			ui.cmbExpireTime->setCurrentIndex(expIndex);
+		else
+			ui.cmbExpireTime->lineEdit()->setText(QString::number(prefs.defaultPrefs.expire/ONE_DAY));
+
+		QSet<Jid> oldItems = FTableItems.keys().toSet();
+		foreach(Jid itemJid, prefs.itemPrefs.keys())
+		{
+			oldItems -= itemJid;
+			updateItemPrefs(itemJid,prefs.itemPrefs.value(itemJid));
+		}
+
+		foreach(Jid itemJid, oldItems)
+		{
+			removeItemPrefs(itemJid);
+		}
 
 		updateWidget();
-	}
-}
-
-void ArchiveOptions::onArchiveItemPrefsChanged(const Jid &AStreamJid, const Jid &AItemJid, const IArchiveItemPrefs &APrefs)
-{
-	if (AStreamJid == FStreamJid)
-	{
-		if (!FTableItems.contains(AItemJid))
-		{
-			QTableWidgetItem *jidItem = new QTableWidgetItem(AItemJid.full());
-			QTableWidgetItem *otrItem = new QTableWidgetItem();
-			QTableWidgetItem *saveItem = new QTableWidgetItem();
-			QTableWidgetItem *expireItem = new QTableWidgetItem();
-			ui.tbwItemPrefs->setRowCount(ui.tbwItemPrefs->rowCount()+1);
-			ui.tbwItemPrefs->setItem(ui.tbwItemPrefs->rowCount()-1,JID_COLUMN,jidItem);
-			ui.tbwItemPrefs->setItem(jidItem->row(),OTR_COLUMN,otrItem);
-			ui.tbwItemPrefs->setItem(jidItem->row(),SAVE_COLUMN,saveItem);
-			ui.tbwItemPrefs->setItem(jidItem->row(),EXPIRE_COLUMN,expireItem);
-			ui.tbwItemPrefs->verticalHeader()->setResizeMode(jidItem->row(),QHeaderView::ResizeToContents);
-			FTableItems.insert(AItemJid,jidItem);
-		}
-		QTableWidgetItem *jidItem = FTableItems.value(AItemJid);
-		ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setText(FArchiver->otrModeName(APrefs.otr));
-		ui.tbwItemPrefs->item(jidItem->row(),OTR_COLUMN)->setData(Qt::UserRole,APrefs.otr);
-		ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setText(FArchiver->saveModeName(APrefs.save));
-		ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->setData(Qt::UserRole,APrefs.save);
-		ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setText(FArchiver->expireName(APrefs.expire));
-		ui.tbwItemPrefs->item(jidItem->row(),EXPIRE_COLUMN)->setData(Qt::UserRole,APrefs.expire);
-		updateColumnsSize();
-	}
-}
-
-void ArchiveOptions::onArchiveItemPrefsRemoved(const Jid &AStreamJid, const Jid &AItemJid)
-{
-	if (AStreamJid==FStreamJid && FTableItems.contains(AItemJid))
-	{
-		QTableWidgetItem *jidItem = FTableItems.take(AItemJid);
-		ui.tbwItemPrefs->removeRow(jidItem->row());
 		updateColumnsSize();
 	}
 }

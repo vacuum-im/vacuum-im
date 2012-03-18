@@ -194,12 +194,12 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 
 void CollectionWriter::checkLimits()
 {
-	if (FXmlFile->size() > Options::node(OPV_HISTORY_COLLECTION_SIZE).value().toInt())
-		FCloseTimer.start(Options::node(OPV_HISTORY_COLLECTION_MINTIMEOUT).value().toInt());
-	else if (FXmlFile->size() > Options::node(OPV_HISTORY_COLLECTION_MAXSIZE).value().toInt())
+	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_SIZE).value().toInt())
+		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT).value().toInt());
+	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MAXSIZE).value().toInt())
 		FCloseTimer.start(0);
-	else if (FMessagesCount > Options::node(OPV_HISTORY_COLLECTION_MINMESSAGES).value().toInt())
-	   FCloseTimer.start(Options::node(OPV_HISTORY_COLLECTION_TIMEOUT).value().toInt());
+	else if (FMessagesCount > Options::node(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES).value().toInt())
+	   FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_TIMEOUT).value().toInt());
 	else
-		FCloseTimer.start(Options::node(OPV_HISTORY_COLLECTION_MAXTIMEOUT).value().toInt());
+		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT).value().toInt());
 }

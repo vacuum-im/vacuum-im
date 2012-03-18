@@ -978,5 +978,13 @@ Check values and try again</source>
         <source>Open chat dialog</source>
         <translation>Открыть диалог чата</translation>
     </message>
+    <message>
+        <source>Loading history...</source>
+        <translation>Загрузка истории...</translation>
+    </message>
+    <message>
+        <source>Failed to load history: %1</source>
+        <translation>Не удалось загрузить историю: %1</translation>
+    </message>
 </context>
 </TS>

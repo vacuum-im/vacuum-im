@@ -61,3 +61,5 @@ SUBDIRS += pepmanager
 SUBDIRS += shortcutmanager 
 SUBDIRS += birthdayreminder 
 SUBDIRS += urlprocessor
+SUBDIRS += filemessagearchive 
+SUBDIRS += servermessagearchive 

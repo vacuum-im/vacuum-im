@@ -7,19 +7,33 @@ ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APlu
 {
 	FToolBarWidget = AToolBarWidget;
 	FEditWidget = AToolBarWidget->editWidget();
+	
 	FArchiver = AArchiver;
 	FDataForms = NULL;
 	FDiscovery = NULL;
 	FSessionNegotiation = NULL;
 
+	FRestorePrefs = false;
+
 	initialize(APluginManager);
 	createActions();
-	onEditWidgetContactJidChanged(Jid::null);
+
+	updateMenu();
 }
 
 ChatWindowMenu::~ChatWindowMenu()
 {
 
+}
+
+Jid ChatWindowMenu::streamJid() const
+{
+	return FEditWidget->streamJid();
+}
+
+Jid ChatWindowMenu::contactJid() const
+{
+	return FEditWidget->contactJid();
 }
 
 void ChatWindowMenu::initialize(IPluginManager *APluginManager)
@@ -29,7 +43,7 @@ void ChatWindowMenu::initialize(IPluginManager *APluginManager)
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
 	plugin = APluginManager->pluginInterface("ISessionNegotiation").value(0,NULL);
-	if (plugin && FDataForms)
+	if (plugin)
 	{
 		FSessionNegotiation = qobject_cast<ISessionNegotiation *>(plugin->instance());
 		if (FSessionNegotiation)
@@ -42,197 +56,229 @@ void ChatWindowMenu::initialize(IPluginManager *APluginManager)
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
-	if (plugin && FSessionNegotiation)
+	if (plugin)
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 		if (FDiscovery)
 		{
-			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
+			connect(FDiscovery->instance(),SIGNAL(discoInfoRemoved(const IDiscoInfo &)),SLOT(onDiscoInfoChanged(const IDiscoInfo &)));
 		}
 	}
 
-	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)),
-		SLOT(onArchivePrefsChanged(const Jid &, const IArchiveStreamPrefs &)));
-	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),
-    SLOT(onRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-		SLOT(onRequestFailed(const QString &,const QString &)));
+	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
+	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onArchiveRequestFailed(const QString &,const QString &)));
 	connect(FEditWidget->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onEditWidgetContactJidChanged(const Jid &)));
 }
 
 void ChatWindowMenu::createActions()
 {
-	FSaveTrue = new Action(this);
-	FSaveTrue->setText(tr("Enable Message Logging"));
-	FSaveTrue->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_ENABLE_LOGGING);
-	FSaveTrue->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYENABLE);
-	connect(FSaveTrue,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FSaveTrue,AG_DEFAULT,false);
+	FEnableArchiving = new Action(this);
+	FEnableArchiving->setCheckable(true);
+	FEnableArchiving->setText(tr("Enable Message Archiving"));
+	FEnableArchiving->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYENABLE);
+	connect(FEnableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FEnableArchiving,AG_DEFAULT,false);
 
-	FSaveFalse = new Action(this);
-	FSaveFalse->setText(tr("Disable Message Logging"));
-	FSaveFalse->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_DISABLE_LOGGING);
-	FSaveFalse->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYDISABLE);
-	connect(FSaveFalse,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FSaveFalse,AG_DEFAULT,false);
+	FDisableArchiving = new Action(this);
+	FDisableArchiving->setCheckable(true);
+	FDisableArchiving->setText(tr("Disable Message Archiving"));
+	FDisableArchiving->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYDISABLE);
+	connect(FDisableArchiving,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FDisableArchiving,AG_DEFAULT,false);
 
-	FSessionRequire = new Action(this);
-	FSessionRequire->setCheckable(true);
-	FSessionRequire->setVisible(false);
-	FSessionRequire->setText(tr("Require OTR Session"));
-	FSessionRequire->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_REQUIRE_OTR);
-	FSessionRequire->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR);
-	connect(FSessionRequire,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FSessionRequire,AG_DEFAULT,false);
+	FStartOTRSession = new Action(this);
+	FStartOTRSession->setText(tr("Start Off-The-Record Session"));
+	FStartOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYREQUIREOTR);
+	connect(FStartOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FStartOTRSession,AG_DEFAULT+100,false);
 
-	FSessionTerminate = new Action(this);
-	FSessionTerminate->setVisible(false);
-	FSessionTerminate->setText(tr("Terminate OTR Session"));
-	FSessionTerminate->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY_TERMINATE_OTR);
-	FSessionTerminate->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR);
-	connect(FSessionTerminate,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
-	addAction(FSessionTerminate,AG_DEFAULT,false);
+	FStopOTRSession = new Action(this);
+	FStopOTRSession->setText(tr("Terminate Off-The-Record Session"));
+	FStopOTRSession->setShortcutId(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR);
+	connect(FStopOTRSession,SIGNAL(triggered(bool)),SLOT(onActionTriggered(bool)));
+	addAction(FStopOTRSession,AG_DEFAULT+100,false);
+}
+
+bool ChatWindowMenu::isOTRStanzaSession(const IStanzaSession &ASession) const
+{
+	if (FDataForms && ASession.status==IStanzaSession::Active)
+	{
+		int index = FDataForms->fieldIndex(SFP_LOGGING,ASession.form.fields);
+		if (index>=0)
+			return ASession.form.fields.at(index).value.toString() == SFV_MUSTNOT_LOGGING;
+	}
+	return false;
+}
+
+void ChatWindowMenu::restoreSessionPrefs(const Jid &AContactJid)
+{
+	if (FRestorePrefs)
+	{
+		if (!FSessionPrefs.save.isEmpty() && !FSessionPrefs.otr.isEmpty())
+		{
+			IArchiveStreamPrefs sprefs = FArchiver->archivePrefs(streamJid());
+			sprefs.itemPrefs[AContactJid] = FSessionPrefs;
+			FSaveRequest = FArchiver->setArchivePrefs(streamJid(),sprefs);
+		}
+		else
+		{
+			FSaveRequest = FArchiver->removeArchiveItemPrefs(streamJid(),AContactJid);
+		}
+		FRestorePrefs = false;
+	}
+}
+
+void ChatWindowMenu::updateMenu()
+{
+	if (FArchiver->isArchivePrefsEnabled(streamJid()))
+	{
+		IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
+		bool isOTRSession = FSessionNegotiation!=NULL ? isOTRStanzaSession(FSessionNegotiation->getSession(streamJid(),contactJid())) : false;
+
+		FEnableArchiving->setChecked(iprefs.save != ARCHIVE_SAVE_FALSE);
+		FEnableArchiving->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty() && !isOTRSession);
+
+		FDisableArchiving->setChecked(iprefs.save == ARCHIVE_SAVE_FALSE);
+		FDisableArchiving->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty() && !isOTRSession);
+
+		if (FSessionNegotiation && FDataForms && FDiscovery)
+		{
+			FStartOTRSession->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty() && iprefs.otr!=ARCHIVE_OTR_FORBID);
+			FStartOTRSession->setVisible(!isOTRSession && FDiscovery->discoInfo(streamJid(),contactJid()).features.contains(NS_STANZA_SESSION));
+
+			FStopOTRSession->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty());
+			FStopOTRSession->setVisible(isOTRSession);
+		}
+		else
+		{
+			FStartOTRSession->setVisible(false);
+			FStopOTRSession->setVisible(false);
+		}
+	}
+	else
+	{
+		FEnableArchiving->setEnabled(false);
+		FEnableArchiving->setChecked(false);
+		
+		FDisableArchiving->setEnabled(false);
+		FDisableArchiving->setChecked(false);
+
+		FStartOTRSession->setVisible(false);
+		FStopOTRSession->setVisible(false);
+	}
 }
 
 void ChatWindowMenu::onActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
-	if (FSaveRequest.isEmpty() && FSessionRequest.isEmpty())
+	if (action && FSaveRequest.isEmpty() && FSessionRequest.isEmpty())
 	{
-		if (action == FSaveTrue)
+		if (action == FEnableArchiving)
 		{
-			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(FEditWidget->streamJid(),FEditWidget->contactJid().bare());
+			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid().bare());
 			if (iprefs.save == ARCHIVE_SAVE_FALSE)
 			{
-				IArchiveStreamPrefs sprefs = FArchiver->archivePrefs(FEditWidget->streamJid());
-				iprefs.save = sprefs.defaultPrefs.save!=ARCHIVE_SAVE_FALSE ? sprefs.defaultPrefs.save : QString(ARCHIVE_SAVE_BODY);
-				if (iprefs.otr == ARCHIVE_OTR_REQUIRE)
-					iprefs.otr = sprefs.defaultPrefs.otr!=ARCHIVE_OTR_REQUIRE ? sprefs.defaultPrefs.otr : QString(ARCHIVE_OTR_CONCEDE);
+				IArchiveStreamPrefs sprefs = FArchiver->archivePrefs(streamJid());
+				iprefs.save = sprefs.defaultPrefs.save!=ARCHIVE_SAVE_FALSE ? sprefs.defaultPrefs.save : QString(ARCHIVE_SAVE_MESSAGE);
 				if (iprefs != sprefs.defaultPrefs)
 				{
-					sprefs.itemPrefs.insert(FEditWidget->contactJid().bare(),iprefs);
-					FSaveRequest = FArchiver->setArchivePrefs(FEditWidget->streamJid(),sprefs);
+					sprefs.itemPrefs.insert(contactJid().bare(),iprefs);
+					FSaveRequest = FArchiver->setArchivePrefs(streamJid(),sprefs);
 				}
 				else
 				{
-					FSaveRequest = FArchiver->removeArchiveItemPrefs(FEditWidget->streamJid(),FEditWidget->contactJid().bare());
+					FSaveRequest = FArchiver->removeArchiveItemPrefs(streamJid(),contactJid().bare());
 				}
 			}
 		}
-		else if (action == FSaveFalse)
+		else if (action == FDisableArchiving)
 		{
-			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(FEditWidget->streamJid(),FEditWidget->contactJid().bare());
+			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid().bare());
 			if (iprefs.save != ARCHIVE_SAVE_FALSE)
 			{
-				IArchiveStreamPrefs sprefs = FArchiver->archivePrefs(FEditWidget->streamJid());
+				IArchiveStreamPrefs sprefs = FArchiver->archivePrefs(streamJid());
 				iprefs.save = ARCHIVE_SAVE_FALSE;
 				if (iprefs != sprefs.defaultPrefs)
 				{
-					sprefs.itemPrefs.insert(FEditWidget->contactJid().bare(),iprefs);
-					FSaveRequest = FArchiver->setArchivePrefs(FEditWidget->streamJid(),sprefs);
+					sprefs.itemPrefs.insert(contactJid().bare(),iprefs);
+					FSaveRequest = FArchiver->setArchivePrefs(streamJid(),sprefs);
 				}
 				else
 				{
-					FSaveRequest = FArchiver->removeArchiveItemPrefs(FEditWidget->streamJid(),FEditWidget->contactJid().bare());
+					FSaveRequest = FArchiver->removeArchiveItemPrefs(streamJid(),contactJid().bare());
 				}
 			}
 		}
-		else if (action == FSessionRequire)
+		else if (action == FStartOTRSession)
 		{
-			IArchiveStreamPrefs sprefs = FArchiver->archivePrefs(FEditWidget->streamJid());
-			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(FEditWidget->streamJid(),FEditWidget->contactJid().bare());
-			FSessionRequire->setChecked(iprefs.otr == ARCHIVE_OTR_REQUIRE);
-			if (iprefs.otr==ARCHIVE_OTR_REQUIRE)
-				iprefs.otr =  sprefs.defaultPrefs.otr!=ARCHIVE_OTR_REQUIRE ? sprefs.defaultPrefs.otr : QString(ARCHIVE_OTR_CONCEDE);
-			else
+			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
+			if (iprefs.otr != ARCHIVE_OTR_REQUIRE)
+			{
+				IArchiveStreamPrefs sprefs = FArchiver->archivePrefs(streamJid());
+				
+				FRestorePrefs = true;
+				FSessionPrefs = sprefs.itemPrefs.value(contactJid());
+
 				iprefs.otr = ARCHIVE_OTR_REQUIRE;
-			if (iprefs != sprefs.defaultPrefs)
-			{
-				sprefs.itemPrefs.insert(FEditWidget->contactJid().bare(),iprefs);
-				FSessionRequest = FArchiver->setArchivePrefs(FEditWidget->streamJid(),sprefs);
+				sprefs.itemPrefs.insert(contactJid(),iprefs);
+				FSessionRequest = FArchiver->setArchivePrefs(streamJid(),sprefs);
 			}
-			else
+			else if (FSessionNegotiation)
 			{
-				FSessionRequest = FArchiver->removeArchiveItemPrefs(FEditWidget->streamJid(),FEditWidget->contactJid().bare());
+				FSessionNegotiation->initSession(streamJid(),contactJid());
 			}
 		}
-		else if (action == FSessionTerminate)
+		else if (action == FStopOTRSession)
 		{
 			if (FSessionNegotiation)
-				FSessionNegotiation->terminateSession(FEditWidget->streamJid(),FEditWidget->contactJid());
+				FSessionNegotiation->terminateSession(streamJid(),contactJid());
 		}
-	}
-	else if (action)
-	{
-		action->setChecked(!action->isChecked());
+		updateMenu();
 	}
 }
 
-void ChatWindowMenu::onArchivePrefsChanged(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs)
+void ChatWindowMenu::onArchivePrefsChanged(const Jid &AStreamJid)
 {
-	Q_UNUSED(APrefs);
-	if (FEditWidget->streamJid() == AStreamJid)
+	if (streamJid() == AStreamJid)
 	{
-		bool logEnabled = FArchiver->isAutoArchiving(AStreamJid);
-		if (FArchiver->isArchivePrefsEnabled(AStreamJid))
-		{
-			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(AStreamJid,FEditWidget->contactJid());
-			logEnabled = iprefs.save!=ARCHIVE_SAVE_FALSE;
-			FSaveTrue->setVisible(!logEnabled);
-			FSaveFalse->setVisible(logEnabled);
-			if (iprefs.otr == ARCHIVE_OTR_REQUIRE)
-			{
-				FSessionRequire->setChecked(true);
-				FSessionRequire->setVisible(true);
-			}
-			else
-			{
-				FSessionRequire->setChecked(false);
-			}
-			menuAction()->setEnabled(true);
-		}
-		else
-		{
-			menuAction()->setEnabled(false);
-		}
-		menuAction()->setToolTip(logEnabled ? tr("Message logging enabled") : tr("Message logging disabled"));
-		menuAction()->setIcon(RSR_STORAGE_MENUICONS,logEnabled ? MNI_HISTORY_ENABLE_LOGGING : MNI_HISTORY_DISABLE_LOGGING);
+		updateMenu();
 	}
 }
 
-void ChatWindowMenu::onRequestCompleted(const QString &AId)
+void ChatWindowMenu::onArchiveRequestCompleted(const QString &AId)
 {
 	if (FSessionRequest == AId)
 	{
-		if (FDataForms && FSessionNegotiation)
+		if (FSessionNegotiation)
 		{
-			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(FEditWidget->streamJid(),FEditWidget->contactJid());
-			IStanzaSession session = FSessionNegotiation->getSession(FEditWidget->streamJid(),FEditWidget->contactJid());
+			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
+			IStanzaSession session = FSessionNegotiation->getSession(streamJid(),contactJid());
 			if (session.status == IStanzaSession::Active)
 			{
-				int index = FDataForms->fieldIndex(SFP_LOGGING,session.form.fields);
-				if (index>=0)
-				{
-					if (iprefs.otr==ARCHIVE_OTR_REQUIRE && session.form.fields.at(index).value.toString()!=SFV_MUSTNOT_LOGGING)
-						FSessionNegotiation->initSession(FEditWidget->streamJid(),FEditWidget->contactJid());
-					else if (iprefs.otr!=ARCHIVE_OTR_REQUIRE && session.form.fields.at(index).value.toString()==SFV_MUSTNOT_LOGGING)
-						FSessionNegotiation->initSession(FEditWidget->streamJid(),FEditWidget->contactJid());
-				}
+				bool isOTRSession = isOTRStanzaSession(session);
+				if (!isOTRSession && iprefs.otr==ARCHIVE_OTR_REQUIRE)
+					FSessionNegotiation->initSession(streamJid(),contactJid());
+				else if (!isOTRSession && iprefs.otr!=ARCHIVE_OTR_REQUIRE)
+					FSessionNegotiation->initSession(streamJid(),contactJid());
 			}
 			else if (iprefs.otr == ARCHIVE_OTR_REQUIRE)
 			{
-				FSessionNegotiation->initSession(FEditWidget->streamJid(),FEditWidget->contactJid());
+				FSessionNegotiation->initSession(streamJid(),contactJid());
 			}
 		}
 		FSessionRequest.clear();
+		updateMenu();
 	}
 	else if (FSaveRequest == AId)
 	{
 		FSaveRequest.clear();
+		updateMenu();
 	}
 }
 
-void ChatWindowMenu::onRequestFailed(const QString &AId, const QString &AError)
+void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const QString &AError)
 {
 	if (FSaveRequest==AId || FSessionRequest==AId)
 	{
@@ -243,74 +289,43 @@ void ChatWindowMenu::onRequestFailed(const QString &AId, const QString &AError)
 			options.type |= IMessageContentOptions::TypeEvent;
 			options.direction = IMessageContentOptions::DirectionIn;
 			options.time = QDateTime::currentDateTime();
-			FToolBarWidget->viewWidget()->appendText(tr("Changing archive preferences failed: %1").arg(AError),options);
+			FToolBarWidget->viewWidget()->appendText(tr("Failed to change archive preferences: %1").arg(AError),options);
 		}
 		if (FSessionRequest == AId)
 			FSessionRequest.clear();
 		else
 			FSaveRequest.clear();
+		updateMenu();
 	}
 }
 
-void ChatWindowMenu::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
+void ChatWindowMenu::onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo)
 {
-	if (ADiscoInfo.contactJid == FEditWidget->contactJid())
+	if (ADiscoInfo.streamJid==streamJid() && ADiscoInfo.contactJid==contactJid())
 	{
-		FSessionRequire->setVisible(FSessionRequire->isChecked() || ADiscoInfo.features.contains(NS_STANZA_SESSION));
+		updateMenu();
 	}
 }
 
 void ChatWindowMenu::onStanzaSessionActivated(const IStanzaSession &ASession)
 {
-	if (FDataForms && ASession.streamJid==FEditWidget->streamJid() && ASession.contactJid==FEditWidget->contactJid())
+	if (ASession.streamJid==streamJid() && ASession.contactJid==contactJid())
 	{
-		int index = FDataForms->fieldIndex(SFP_LOGGING,ASession.form.fields);
-		if (index>=0)
-		{
-			if (ASession.form.fields.at(index).value.toString() == SFV_MUSTNOT_LOGGING)
-			{
-				FSaveTrue->setEnabled(false);
-				FSaveFalse->setEnabled(false);
-				FSessionTerminate->setVisible(true);
-			}
-			else
-			{
-				FSaveTrue->setEnabled(true);
-				FSaveFalse->setEnabled(true);
-				FSessionTerminate->setVisible(false);
-			}
-		}
+		updateMenu();
 	}
 }
 
 void ChatWindowMenu::onStanzaSessionTerminated(const IStanzaSession &ASession)
 {
-	if (ASession.streamJid==FEditWidget->streamJid() && ASession.contactJid==FEditWidget->contactJid())
+	if (ASession.streamJid==streamJid() && ASession.contactJid==contactJid())
 	{
-		FSaveTrue->setEnabled(true);
-		FSaveFalse->setEnabled(true);
-		FSessionTerminate->setVisible(false);
+		restoreSessionPrefs(contactJid());
+		updateMenu();
 	}
 }
 
 void ChatWindowMenu::onEditWidgetContactJidChanged(const Jid &ABefore)
 {
-	if (FDiscovery)
-	{
-		if (FDiscovery->hasDiscoInfo(FEditWidget->streamJid(), FEditWidget->contactJid()))
-			onDiscoInfoReceived(FDiscovery->discoInfo(FEditWidget->streamJid(), FEditWidget->contactJid()));
-		else
-			FDiscovery->requestDiscoInfo(FEditWidget->streamJid(),FEditWidget->contactJid());
-	}
-
-	if (FSessionNegotiation)
-	{
-		onStanzaSessionTerminated(FSessionNegotiation->getSession(FEditWidget->streamJid(),ABefore));
-
-		IStanzaSession session = FSessionNegotiation->getSession(FEditWidget->streamJid(),FEditWidget->contactJid());
-		if (session.status == IStanzaSession::Active)
-			onStanzaSessionActivated(session);
-	}
-
-	onArchivePrefsChanged(FEditWidget->streamJid(),FArchiver->archivePrefs(FEditWidget->streamJid()));
+	restoreSessionPrefs(ABefore);
+	updateMenu();
 }
