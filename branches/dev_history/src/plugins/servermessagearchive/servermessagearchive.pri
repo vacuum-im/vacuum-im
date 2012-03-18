@@ -1,2 +1,2 @@
-HEADERS = 
-SOURCES = 
+HEADERS = servermessagearchive.h
+SOURCES = servermessagearchive.cpp
