@@ -190,6 +190,10 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	if (!ui.sprSplitter->restoreState(Options::fileValue("history.archiveview.splitter-state").toByteArray()))
 		ui.sprSplitter->setSizes(QList<int>() << 50 << 150);
 	restoreState(Options::fileValue("history.archiveview.state").toByteArray());
+	
+	QFont messagesFont = ui.tbrMessages->font();
+	messagesFont.setPointSize(Options::node(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE).value().toInt());
+	ui.tbrMessages->setFont(messagesFont);
 
 	onCurrentPageChanged(ui.spwSelectPage->yearShown(),ui.spwSelectPage->monthShown());
 
@@ -201,6 +205,7 @@ ArchiveViewWindow::~ArchiveViewWindow()
 	Options::setFileValue(saveState(),"history.archiveview.state");
 	Options::setFileValue(saveGeometry(),"history.archiveview.geometry");
 	Options::setFileValue(ui.sprSplitter->saveState(),"history.archiveview.splitter-state");
+	Options::node(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE).setValue(ui.tbrMessages->font().pointSize());
 }
 
 Jid ArchiveViewWindow::streamJid() const
@@ -691,16 +696,6 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 		if (FMessageStyles)
 		{
 			IMessageStyleOptions soptions = FMessageStyles->styleOptions(FViewOptions.isGroupChat ? Message::GroupChat : Message::Chat);
-			
-			QFont font;
-			int fontSize = soptions.extended.value("fontSize").toInt();
-			if (fontSize>0)
-				font.setPointSize(fontSize);
-			QString fontFamily = soptions.extended.value("fontFamily").toString();
-			if (!fontFamily.isEmpty())
-				font.setFamily(fontFamily);
-			ui.tbrMessages->document()->setDefaultFont(font);
-
 			FViewOptions.style = FViewOptions.isGroupChat ? FMessageStyles->styleForOptions(soptions) : NULL;
 		}
 

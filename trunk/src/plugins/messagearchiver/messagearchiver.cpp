@@ -216,6 +216,7 @@ bool MessageArchiver::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_HISTORYREPLICATION,false);
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_ENABLED,true);
+	Options::setDefaultValue(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE,10);
 
 	if (FOptionsManager)
 	{

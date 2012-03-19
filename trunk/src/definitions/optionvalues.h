@@ -120,6 +120,7 @@
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
 #define OPV_HISTORY_CAPABILITY_ITEM                     "history.capability"
 #define OPV_HISTORY_CAPABILITY_DEFAULT                  "history.capability.default"
+#define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
 
 // FileMessageArchive
 #define OPV_FILEARCHIVE_COLLECTION_SIZE                 "filearchive.collection.size"
