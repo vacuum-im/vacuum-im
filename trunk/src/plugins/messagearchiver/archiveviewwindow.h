@@ -29,7 +29,8 @@ enum RequestStatus {
 };
 
 struct ViewOptions {
-	bool isGroupchat;
+	bool isGroupChat;
+	bool isPrivateChat;
 	QString selfName;
 	QString contactName;
 	QString lastSenderId;
@@ -73,6 +74,7 @@ protected:
 	QStandardItem *createContactItem(const Jid &AContactJid);
 	QStandardItem *createHeaderItem(const IArchiveHeader &AHeader);
 	IArchiveHeader modelIndexHeader(const QModelIndex &AIndex) const;
+	bool isConferencePrivateChat(const Jid &AContactJid) const;
 	bool isJidMatched(const Jid &ARequested, const Jid &AHeaderJid) const;
 	QList<QStandardItem *> findHeaderItems(const IArchiveRequest &ARequest, QStandardItem *AParent = NULL) const;
 protected:
@@ -101,6 +103,8 @@ protected slots:
 protected slots:
 	void onArchiveSearchUpdate();
 	void onArchiveSearchChanged(const QString &AText);
+	void onTextHilightTimerTimeout();
+	void onTextVerticalScrollBarChanged();
 	void onTextSearchTimerTimeout();
 	void onTextSearchNextClicked();
 	void onTextSearchPreviousClicked();
@@ -133,6 +137,8 @@ private:
 private:
 	QString FSearchString;
 	QTimer FTextSearchTimer;
+	QTimer FTextHilightTimer;
+	QList<QTextEdit::ExtraSelection> FSearchResults;
 private:
 	QList<QDate> FLoadedPages;
 	QTimer FHeadersRequestTimer;

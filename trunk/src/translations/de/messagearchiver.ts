@@ -344,14 +344,6 @@
         <source>Archive is not accessible</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Conversation with %1 started at %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Conversation in conference %1 started at %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Found %n occurrence(s)</source>
         <translation type="unfinished">
@@ -401,6 +393,18 @@
     </message>
     <message>
         <source>Conversation history removed successfully</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
