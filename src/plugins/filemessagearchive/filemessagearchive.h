@@ -93,6 +93,7 @@ private:
 private:
 	mutable QList<QString> FNewDirs;
 	QMap<Jid, QString> FGatewayTypes;
+	QMap<QString, CollectionWriter *> FWritingFiles;
 	QMap<Jid, QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
 };
 
