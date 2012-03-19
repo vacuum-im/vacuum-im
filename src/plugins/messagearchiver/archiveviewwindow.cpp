@@ -1,14 +1,12 @@
 #include "archiveviewwindow.h"
 
-#include <QtDebug>
 #include <QPointF>
-#include <QScrollBar>
-#include <QAbstractTextDocumentLayout>
-
 #include <QLocale>
+#include <QScrollBar>
 #include <QMessageBox>
 #include <QItemSelectionModel>
 #include <QNetworkAccessManager>
+#include <QAbstractTextDocumentLayout>
 
 enum HistoryItemType {
 	HIT_CONTACT,
@@ -880,46 +878,26 @@ void ArchiveViewWindow::onArchiveSearchChanged(const QString &AText)
 
 void ArchiveViewWindow::onTextHilightTimerTimeout()
 {
-	if (!FSearchResults.isEmpty())
+	if (FSearchResults.count() > MAX_HILIGHT_ITEMS)
 	{
-		if (FSearchResults.count() > MAX_HILIGHT_ITEMS)
-		{
-			QWidget *scrollViewport = ui.tbrMessages->viewport();
-			QScrollBar *scrollBar = ui.tbrMessages->verticalScrollBar();
-			QAbstractTextDocumentLayout *docLayout = ui.tbrMessages->document()->documentLayout();
+		QWidget *scrollViewport = ui.tbrMessages->viewport();
+		QScrollBar *scrollBar = ui.tbrMessages->verticalScrollBar();
+		QAbstractTextDocumentLayout *docLayout = ui.tbrMessages->document()->documentLayout();
 
-			QPointF startPoint(0,scrollBar->value());
-			QPointF endPoint(scrollViewport->size().width(),scrollBar->value()+scrollViewport->size().height());
+		QPointF startPoint(0,scrollBar->value());
+		QPointF endPoint(scrollViewport->size().width(),scrollBar->value()+scrollViewport->size().height());
 
-			int startPos = docLayout->hitTest(startPoint,Qt::FuzzyHit);
-			int endPos = docLayout->hitTest(endPoint,Qt::FuzzyHit);
+		int startPos = docLayout->hitTest(startPoint,Qt::FuzzyHit);
+		int endPos = docLayout->hitTest(endPoint,Qt::FuzzyHit);
 
-			int startIndex = -1;
-			int endIndex = -1;
-			for (int i=0; i<FSearchResults.count(); i++)
-			{
-				int pos = FSearchResults.at(i).cursor.position();
-				if (startPos<=pos && pos<=endPos)
-				{
-					if (startIndex < 0)
-						startIndex = i;
-					endIndex = i;
-				}
-			}
-
-			if (startIndex >= 0)
-			{
-				ui.tbrMessages->setExtraSelections(FSearchResults.mid(startIndex,endIndex-startIndex+1));
-			}
-			else if (!ui.tbrMessages->extraSelections().isEmpty())
-			{
-				ui.tbrMessages->setExtraSelections(QList<QTextEdit::ExtraSelection>());
-			}
-		}
-		else
-		{
-			ui.tbrMessages->setExtraSelections(FSearchResults);
-		}
+		QList<QTextEdit::ExtraSelection> selections;
+		for (QMap<int, QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(startPos); it!=FSearchResults.constEnd() && it.key()<endPos; it++)
+			selections.append(it.value());
+		ui.tbrMessages->setExtraSelections(selections);
+	}
+	else
+	{
+		ui.tbrMessages->setExtraSelections(FSearchResults.values());
 	}
 }
 
@@ -943,7 +921,7 @@ void ArchiveViewWindow::onTextSearchTimerTimeout()
 				selection.cursor = cursor;
 				selection.format = cursor.charFormat();
 				selection.format.setBackground(Qt::yellow);
-				FSearchResults.append(selection);
+				FSearchResults.insert(cursor.position(),selection);
 				cursor.clearSelection();
 			}
 		} while (!cursor.isNull());
@@ -957,7 +935,7 @@ void ArchiveViewWindow::onTextSearchTimerTimeout()
 
 	if (!FSearchResults.isEmpty())
 	{
-		ui.tbrMessages->setTextCursor(FSearchResults.first().cursor);
+		ui.tbrMessages->setTextCursor(FSearchResults.lowerBound(0)->cursor);
 		ui.tbrMessages->ensureCursorVisible();
 		ui.lblTextSearchInfo->setText(tr("Found %n occurrence(s)",0,FSearchResults.count()));
 	}
@@ -993,38 +971,20 @@ void ArchiveViewWindow::onTextSearchTimerTimeout()
 
 void ArchiveViewWindow::onTextSearchNextClicked()
 {
-	if (!FSearchResults.isEmpty())
+	QMap<int,QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.upperBound(ui.tbrMessages->textCursor().position());
+	if (it != FSearchResults.constEnd())
 	{
-		int index = FSearchResults.count()-1;
-		int pos = ui.tbrMessages->textCursor().position();
-		for (int i=0; i<index; i++)
-		{
-			if (FSearchResults.at(i).cursor.position() > pos)
-			{
-				index = i;
-				break;
-			}
-		}
-		ui.tbrMessages->setTextCursor(FSearchResults.at(index).cursor);
+		ui.tbrMessages->setTextCursor(it->cursor);
 		ui.tbrMessages->ensureCursorVisible();
 	}
 }
 
 void ArchiveViewWindow::onTextSearchPreviousClicked()
 {
-	if (!FSearchResults.isEmpty())
+	QMap<int,QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(ui.tbrMessages->textCursor().position());
+	if (--it != FSearchResults.constEnd())
 	{
-		int index = 0;
-		int pos = ui.tbrMessages->textCursor().position();
-		for (int i=FSearchResults.count()-1; i>index; i--)
-		{
-			if (FSearchResults.at(i).cursor.position() < pos)
-			{
-				index = i;
-				break;
-			}
-		}
-		ui.tbrMessages->setTextCursor(FSearchResults.at(index).cursor);
+		ui.tbrMessages->setTextCursor(it->cursor);
 		ui.tbrMessages->ensureCursorVisible();
 	}
 }
