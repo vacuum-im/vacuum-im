@@ -138,7 +138,7 @@ private:
 	QString FSearchString;
 	QTimer FTextSearchTimer;
 	QTimer FTextHilightTimer;
-	QList<QTextEdit::ExtraSelection> FSearchResults;
+	QMap<int,QTextEdit::ExtraSelection> FSearchResults;
 private:
 	QList<QDate> FLoadedPages;
 	QTimer FHeadersRequestTimer;
