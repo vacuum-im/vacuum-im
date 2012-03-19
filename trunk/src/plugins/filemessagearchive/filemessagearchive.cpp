@@ -447,29 +447,37 @@ IArchiveHeader FileMessageArchive::loadHeaderFromFile(const QString &AFileName) 
 {
 	FThreadLock.lockForRead();
 	IArchiveHeader header;
-	QFile file(AFileName);
-	if (file.open(QFile::ReadOnly))
+	CollectionWriter *writer = FWritingFiles.value(AFileName,NULL);
+	if (writer == NULL)
 	{
-		QXmlStreamReader reader(&file);
-		while (!reader.atEnd())
+		QFile file(AFileName);
+		if (file.open(QFile::ReadOnly))
 		{
-			reader.readNext();
-			if (reader.isStartElement() && reader.qualifiedName()=="chat")
+			QXmlStreamReader reader(&file);
+			while (!reader.atEnd())
 			{
-				header.engineId = engineId();
-				header.with = reader.attributes().value("with").toString();
-				header.start = DateTime(reader.attributes().value("start").toString()).toLocal();
-				header.subject = reader.attributes().value("subject").toString();
-				header.threadId = reader.attributes().value("thread").toString();
-				header.version = reader.attributes().value("version").toString().toInt();
-				break;
+				reader.readNext();
+				if (reader.isStartElement() && reader.qualifiedName()=="chat")
+				{
+					header.engineId = engineId();
+					header.with = reader.attributes().value("with").toString();
+					header.start = DateTime(reader.attributes().value("start").toString()).toLocal();
+					header.subject = reader.attributes().value("subject").toString();
+					header.threadId = reader.attributes().value("thread").toString();
+					header.version = reader.attributes().value("version").toString().toInt();
+					break;
+				}
+				else if (!reader.isStartDocument())
+				{
+					break;
+				}
 			}
-			else if (!reader.isStartDocument())
-			{
-				break;
-			}
+			file.close();
 		}
-		file.close();
+	}
+	else
+	{
+		header = writer->header();
 	}
 	FThreadLock.unlock();
 	return header;
@@ -479,14 +487,22 @@ IArchiveCollection FileMessageArchive::loadCollectionFromFile(const QString &AFi
 {
 	FThreadLock.lockForRead();
 	IArchiveCollection collection;
-	QFile file(AFileName);
-	if (file.open(QFile::ReadOnly))
+	CollectionWriter *writer = FWritingFiles.value(AFileName,NULL);
+	if (writer==NULL || writer->recordsCount()>0)
 	{
-		QDomDocument doc;
-		doc.setContent(file.readAll(),true);
-		FArchiver->elementToCollection(doc.documentElement(),collection);
-		collection.header.engineId = engineId();
-		file.close();
+		QFile file(AFileName);
+		if (file.open(QFile::ReadOnly))
+		{
+			QDomDocument doc;
+			doc.setContent(file.readAll(),true);
+			FArchiver->elementToCollection(doc.documentElement(),collection);
+			collection.header.engineId = engineId();
+			file.close();
+		}
+	}
+	else
+	{
+		collection.header = writer->header();
 	}
 	FThreadLock.unlock();
 	return collection;
@@ -621,7 +637,7 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	if (QFile::exists(fileName))
 	{
 		IArchiveHeader header = loadHeaderFromFile(fileName);
-		QString file =  collectionFilePath(AStreamJid,AWith,AStart);
+		QString file = collectionFilePath(AStreamJid,AWith,AStart);
 		FThreadLock.lockForWrite();
 		delete findCollectionWriter(AStreamJid,header);
 		if (QFile::remove(file))
@@ -768,11 +784,12 @@ CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid
 
 CollectionWriter *FileMessageArchive::newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName)
 {
-	if (AHeader.with.isValid() && AHeader.start.isValid() && !AFileName.isEmpty())
+	if (AHeader.with.isValid() && AHeader.start.isValid() && !AFileName.isEmpty() && !FWritingFiles.contains(AFileName))
 	{
 		CollectionWriter *writer = new CollectionWriter(AStreamJid,AFileName,AHeader,this);
 		if (writer->isOpened())
 		{
+			FWritingFiles.insert(writer->fileName(),writer);
 			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
 			connect(writer,SIGNAL(writerDestroyed(CollectionWriter *)),SLOT(onCollectionWriterDestroyed(CollectionWriter *)));
 			emit fileCollectionOpened(AStreamJid,AHeader);
@@ -837,6 +854,7 @@ void FileMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 
 void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 {
+	FWritingFiles.remove(AWriter->fileName());
 	FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
 	if (AWriter->recordsCount() > 0)
 	{
