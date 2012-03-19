@@ -8,6 +8,7 @@
 #include <QSortFilterProxyModel>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/iroster.h>
