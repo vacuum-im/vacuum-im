@@ -155,6 +155,9 @@
              <property name="text">
               <string>Next</string>
              </property>
+             <property name="autoRepeat">
+              <bool>true</bool>
+             </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonTextBesideIcon</enum>
              </property>
@@ -173,6 +176,9 @@
              </property>
              <property name="text">
               <string>Previous</string>
+             </property>
+             <property name="autoRepeat">
+              <bool>true</bool>
              </property>
              <property name="toolButtonStyle">
               <enum>Qt::ToolButtonTextBesideIcon</enum>

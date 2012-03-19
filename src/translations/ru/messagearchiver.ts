@@ -348,14 +348,6 @@
         <source>Archive is not accessible</source>
         <translation>Архив недоступен</translation>
     </message>
-    <message>
-        <source>Conversation with %1 started at %2.</source>
-        <translation>Разговор с %1 начат в %2.</translation>
-    </message>
-    <message>
-        <source>Conversation in conference %1 started at %2.</source>
-        <translation>Разговор в конференции %1 начат в %2.</translation>
-    </message>
     <message numerus="yes">
         <source>Found %n occurrence(s)</source>
         <translation>
@@ -407,6 +399,18 @@
     <message>
         <source>Conversation history removed successfully</source>
         <translation>История разговоров успешно удалена</translation>
+    </message>
+    <message>
+        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</source>
+        <translation>Разговор с &lt;b&gt;%1&lt;/b&gt; в конференции %2 начат в &lt;b&gt;%3&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Разговор в конференции %1 начат в &lt;b&gt;%2&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Разговор с %1 начат в &lt;b&gt;%2&lt;/b&gt;.</translation>
     </message>
 </context>
 <context>

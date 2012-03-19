@@ -1,5 +1,10 @@
 #include "archiveviewwindow.h"
 
+#include <QtDebug>
+#include <QPointF>
+#include <QScrollBar>
+#include <QAbstractTextDocumentLayout>
+
 #include <QLocale>
 #include <QMessageBox>
 #include <QItemSelectionModel>
@@ -27,6 +32,8 @@ enum HistoryDataRoles {
 #define HEADERS_LOAD_TIMEOUT         500
 #define COLLECTIONS_LOAD_TIMEOUT     200
 #define TEXT_SEARCH_TIMEOUT          500
+
+#define MAX_HILIGHT_ITEMS            10
 
 SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
@@ -124,6 +131,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	palette.setColor(QPalette::Inactive,QPalette::Highlight,palette.color(QPalette::Active,QPalette::Highlight));
 	palette.setColor(QPalette::Inactive,QPalette::HighlightedText,palette.color(QPalette::Active,QPalette::HighlightedText));
 	ui.tbrMessages->setPalette(palette);
+
 	ui.tbrMessages->setNetworkAccessManager(FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(ui.tbrMessages));
 
 	ui.trvHeaders->setModel(FProxyModel);
@@ -144,6 +152,11 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 
 	FTextSearchTimer.setSingleShot(true);
 	connect(&FTextSearchTimer,SIGNAL(timeout()),SLOT(onTextSearchTimerTimeout()));
+
+	FTextHilightTimer.setSingleShot(true);
+	connect(&FTextHilightTimer,SIGNAL(timeout()),SLOT(onTextHilightTimerTimeout()));
+	connect(ui.tbrMessages->verticalScrollBar(),SIGNAL(valueChanged(int)),SLOT(onTextVerticalScrollBarChanged()));
+	connect(ui.tbrMessages->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),SLOT(onTextVerticalScrollBarChanged()));
 
 	ui.tlbTextSearchNext->setIcon(style()->standardIcon(QStyle::SP_ArrowDown, NULL, this));
 	ui.tlbTextSearchPrev->setIcon(style()->standardIcon(QStyle::SP_ArrowUp, NULL, this));
@@ -278,15 +291,23 @@ QString ArchiveViewWindow::contactName(const Jid &AContactJid, bool AShowResourc
 
 QStandardItem *ArchiveViewWindow::createContactItem(const Jid &AContactJid)
 {
-	QStandardItem *item = FContactModelItems.value(AContactJid);
+	bool privateChat = isConferencePrivateChat(AContactJid);
+	Jid itemJid = privateChat ? AContactJid : AContactJid.bare();
+	
+	QStandardItem *item = FContactModelItems.value(itemJid);
 	if (item == NULL)
 	{
-		item = new QStandardItem(contactName(AContactJid));
+		item = new QStandardItem(!privateChat ? contactName(itemJid) : itemJid.resource());
 		item->setData(HIT_CONTACT,HDR_TYPE);
-		item->setData(AContactJid.pBare(),HDR_CONTACT_JID);
-		item->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AContactJid,IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon());
-		FContactModelItems.insert(AContactJid,item);
-		FModel->appendRow(item);
+		item->setData(itemJid.full(),HDR_CONTACT_JID);
+		item->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(itemJid,IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon());
+		FContactModelItems.insert(itemJid,item);
+
+		QStandardItem *parentItem = privateChat ? createContactItem(itemJid.bare()) : NULL;
+		if (parentItem)
+			parentItem->appendRow(item);
+		else
+			FModel->appendRow(item);
 	}
 	return item;
 }
@@ -307,7 +328,7 @@ QStandardItem *ArchiveViewWindow::createHeaderItem(const IArchiveHeader &AHeader
 		itemToolTip += "<hr>" + Qt::escape(AHeader.subject);
 	item->setToolTip(itemToolTip);
 
-	QStandardItem *parentItem = createContactItem(AHeader.with.bare());
+	QStandardItem *parentItem = createContactItem(AHeader.with);
 	parentItem->appendRow(item);
 
 	FProxyModel->startInvalidate();
@@ -325,6 +346,11 @@ IArchiveHeader ArchiveViewWindow::modelIndexHeader(const QModelIndex &AIndex) co
 		header = FCollections.value(header).header;
 	}
 	return header;
+}
+
+bool ArchiveViewWindow::isConferencePrivateChat(const Jid &AContactJid) const
+{
+	return !AContactJid.resource().isEmpty() && AContactJid.pDomain().startsWith("conference.");
 }
 
 bool ArchiveViewWindow::isJidMatched(const Jid &ARequested, const Jid &AHeaderJid) const
@@ -430,6 +456,7 @@ void ArchiveViewWindow::clearMessages()
 	FLoadHeaderIndex = 0;
 	FCurrentHeaders.clear();
 	ui.tbrMessages->clear();
+	FSearchResults.clear();
 	FCollectionShowTimer.stop();
 	setMessagesStatus(RequestFinished);
 }
@@ -511,17 +538,30 @@ void ArchiveViewWindow::removeHeaderItems(const IArchiveRequest &ARequest)
 QString ArchiveViewWindow::showCollectionInfo(const IArchiveCollection &ACollection)
 {
 	static const QString infoTmpl =
-		"<table width='100%' cellpadding='0' cellspacing='0'>"
-		"  <tr>"
-		"    <td style='padding-left:15px; padding-right:15px;'><hr><span style='color:darkCyan;'>%info%</span>%subject%<hr></td>"
+		"<table width='100%' cellpadding='0' cellspacing='0' style='margin-top:10px;'>"
+		"  <tr bgcolor='%bgcolor%'>"
+		"    <td style='padding-top:5px; padding-bottom:5px; padding-left:15px; padding-right:15px;'><span style='color:darkCyan;'>%info%</span>%subject%</td>"
 		"  </tr>"
 		"</table>";
 
 	QString info;
-	if (!FViewOptions.isGroupchat)
-		info = Qt::escape(tr("Conversation with %1 started at %2.").arg(contactName(ACollection.header.with,true),ACollection.header.start.toString()));
+	QString startDate = Qt::escape(ACollection.header.start.toString());
+	if (FViewOptions.isPrivateChat)
+	{
+		QString withName = Qt::escape(ACollection.header.with.resource());
+		QString confName = Qt::escape(ACollection.header.with.bare());
+		info = tr("Conversation with <b>%1</b> in conference %2 started at <b>%3</b>.").arg(withName,confName,startDate);
+	}
+	else if (FViewOptions.isGroupChat)
+	{
+		QString confName = Qt::escape(ACollection.header.with.bare());
+		info = tr("Conversation in conference %1 started at <b>%2</b>.").arg(confName,startDate);
+	}
 	else
-		info = Qt::escape(tr("Conversation in conference %1 started at %2.").arg(ACollection.header.with.bare(),ACollection.header.start.toString()));
+	{
+		QString withName = Qt::escape(contactName(ACollection.header.with,true));
+		info = tr("Conversation with %1 started at <b>%2</b>.").arg(withName,startDate);
+	}
 
 	QString subject;
 	if (!ACollection.header.subject.isEmpty())
@@ -542,6 +582,7 @@ QString ArchiveViewWindow::showCollectionInfo(const IArchiveCollection &ACollect
 	}
 
 	QString tmpl = infoTmpl;
+	tmpl.replace("%bgcolor%",ui.tbrMessages->palette().color(QPalette::AlternateBase).name());
 	tmpl.replace("%info%",info);
 	tmpl.replace("%subject%",subject);
 
@@ -642,13 +683,16 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 	{
 		ui.tbrMessages->clear();
 
-		FViewOptions.isGroupchat = false;
-		for (int i=0; !FViewOptions.isGroupchat && i<ACollection.body.messages.count(); i++)
-			FViewOptions.isGroupchat = ACollection.body.messages.at(i).type()==Message::GroupChat;
+		FViewOptions.isPrivateChat = isConferencePrivateChat(ACollection.header.with);
+
+		FViewOptions.isGroupChat = false;
+		if (!FViewOptions.isPrivateChat)
+			for (int i=0; !FViewOptions.isGroupChat && i<ACollection.body.messages.count(); i++)
+				FViewOptions.isGroupChat = ACollection.body.messages.at(i).type()==Message::GroupChat;
 
 		if (FMessageStyles)
 		{
-			IMessageStyleOptions soptions = FMessageStyles->styleOptions(FViewOptions.isGroupchat ? Message::GroupChat : Message::Chat);
+			IMessageStyleOptions soptions = FMessageStyles->styleOptions(FViewOptions.isGroupChat ? Message::GroupChat : Message::Chat);
 			
 			QFont font;
 			int fontSize = soptions.extended.value("fontSize").toInt();
@@ -659,11 +703,14 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 				font.setFamily(fontFamily);
 			ui.tbrMessages->document()->setDefaultFont(font);
 
-			FViewOptions.style = FViewOptions.isGroupchat ? FMessageStyles->styleForOptions(soptions) : NULL;
+			FViewOptions.style = FViewOptions.isGroupChat ? FMessageStyles->styleForOptions(soptions) : NULL;
 		}
 
+		if (!FViewOptions.isPrivateChat)
+			FViewOptions.contactName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid(),ACollection.header.with) : contactName(ACollection.header.with));
+		else
+			FViewOptions.contactName = Qt::escape(ACollection.header.with.resource());
 		FViewOptions.selfName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid()) : streamJid().bare());
-		FViewOptions.contactName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(ACollection.header.with) : contactName(ACollection.header.with));
 	}
 
 	FViewOptions.lastTime = QDateTime();
@@ -686,7 +733,7 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 			options.time = messageIt->dateTime();
 			options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time,ACollection.header.start) : QString::null;
 
-			if (FViewOptions.isGroupchat)
+			if (FViewOptions.isGroupChat)
 			{
 				options.type |= IMessageContentOptions::TypeGroupchat;
 				options.direction = IMessageContentOptions::DirectionIn;
@@ -831,9 +878,59 @@ void ArchiveViewWindow::onArchiveSearchChanged(const QString &AText)
 	ui.tlbArchiveSearchUpdate->setEnabled(searchString()!=AText);
 }
 
+void ArchiveViewWindow::onTextHilightTimerTimeout()
+{
+	if (!FSearchResults.isEmpty())
+	{
+		if (FSearchResults.count() > MAX_HILIGHT_ITEMS)
+		{
+			QWidget *scrollViewport = ui.tbrMessages->viewport();
+			QScrollBar *scrollBar = ui.tbrMessages->verticalScrollBar();
+			QAbstractTextDocumentLayout *docLayout = ui.tbrMessages->document()->documentLayout();
+
+			QPointF startPoint(0,scrollBar->value());
+			QPointF endPoint(scrollViewport->size().width(),scrollBar->value()+scrollViewport->size().height());
+
+			int startPos = docLayout->hitTest(startPoint,Qt::FuzzyHit);
+			int endPos = docLayout->hitTest(endPoint,Qt::FuzzyHit);
+
+			int startIndex = -1;
+			int endIndex = -1;
+			for (int i=0; i<FSearchResults.count(); i++)
+			{
+				int pos = FSearchResults.at(i).cursor.position();
+				if (startPos<=pos && pos<=endPos)
+				{
+					if (startIndex < 0)
+						startIndex = i;
+					endIndex = i;
+				}
+			}
+
+			if (startIndex >= 0)
+			{
+				ui.tbrMessages->setExtraSelections(FSearchResults.mid(startIndex,endIndex-startIndex+1));
+			}
+			else if (!ui.tbrMessages->extraSelections().isEmpty())
+			{
+				ui.tbrMessages->setExtraSelections(QList<QTextEdit::ExtraSelection>());
+			}
+		}
+		else
+		{
+			ui.tbrMessages->setExtraSelections(FSearchResults);
+		}
+	}
+}
+
+void ArchiveViewWindow::onTextVerticalScrollBarChanged()
+{
+	FTextHilightTimer.start(0);
+}
+
 void ArchiveViewWindow::onTextSearchTimerTimeout()
 {
-	QList<QTextEdit::ExtraSelection> selections;
+	FSearchResults.clear();
 	if (!ui.lneTextSearch->text().isEmpty())
 	{
 		QTextDocument::FindFlags options = ui.chbTextSearchCaseSensitive->isChecked() ? QTextDocument::FindCaseSensitively : (QTextDocument::FindFlag)0;
@@ -846,7 +943,7 @@ void ArchiveViewWindow::onTextSearchTimerTimeout()
 				selection.cursor = cursor;
 				selection.format = cursor.charFormat();
 				selection.format.setBackground(Qt::yellow);
-				selections.append(selection);
+				FSearchResults.append(selection);
 				cursor.clearSelection();
 			}
 		} while (!cursor.isNull());
@@ -858,11 +955,11 @@ void ArchiveViewWindow::onTextSearchTimerTimeout()
 		ui.lblTextSearchInfo->setVisible(false);
 	}
 
-	if (!selections.isEmpty())
+	if (!FSearchResults.isEmpty())
 	{
-		ui.tbrMessages->setTextCursor(selections.first().cursor);
+		ui.tbrMessages->setTextCursor(FSearchResults.first().cursor);
 		ui.tbrMessages->ensureCursorVisible();
-		ui.lblTextSearchInfo->setText(tr("Found %n occurrence(s)",0,selections.count()));
+		ui.lblTextSearchInfo->setText(tr("Found %n occurrence(s)",0,FSearchResults.count()));
 	}
 	else
 	{
@@ -875,7 +972,7 @@ void ArchiveViewWindow::onTextSearchTimerTimeout()
 		ui.lblTextSearchInfo->setText(tr("Phrase was not found"));
 	}
 
-	if (!ui.lneTextSearch->text().isEmpty() && selections.isEmpty())
+	if (!ui.lneTextSearch->text().isEmpty() && FSearchResults.isEmpty())
 	{
 		QPalette palette = ui.lblTextSearch->palette();
 		palette.setColor(QPalette::Active,QPalette::Base,QColor("orangered"));
@@ -887,40 +984,47 @@ void ArchiveViewWindow::onTextSearchTimerTimeout()
 		ui.lneTextSearch->setPalette(QPalette());
 	}
 
-	ui.tbrMessages->setExtraSelections(selections);
-	ui.tlbTextSearchNext->setEnabled(!selections.isEmpty());
-	ui.tlbTextSearchPrev->setEnabled(!selections.isEmpty());
-	ui.chbTextSearchCaseSensitive->setEnabled(!selections.isEmpty() || !ui.lneTextSearch->text().isEmpty());
+	ui.tlbTextSearchNext->setEnabled(!FSearchResults.isEmpty());
+	ui.tlbTextSearchPrev->setEnabled(!FSearchResults.isEmpty());
+	ui.chbTextSearchCaseSensitive->setEnabled(!FSearchResults.isEmpty() || !ui.lneTextSearch->text().isEmpty());
+
+	FTextHilightTimer.start(0);
 }
 
 void ArchiveViewWindow::onTextSearchNextClicked()
 {
-	QList<QTextEdit::ExtraSelection> selections = ui.tbrMessages->extraSelections();
-	if (!selections.isEmpty())
+	if (!FSearchResults.isEmpty())
 	{
-		QTextEdit::ExtraSelection selection;
-		QListIterator<QTextEdit::ExtraSelection> it(selections);
-		it.toFront();
-		do {
-			selection = it.next();
-		} while (it.hasNext() && selection.cursor.position()<=ui.tbrMessages->textCursor().position());
-		ui.tbrMessages->setTextCursor(selection.cursor);
+		int index = FSearchResults.count()-1;
+		int pos = ui.tbrMessages->textCursor().position();
+		for (int i=0; i<index; i++)
+		{
+			if (FSearchResults.at(i).cursor.position() > pos)
+			{
+				index = i;
+				break;
+			}
+		}
+		ui.tbrMessages->setTextCursor(FSearchResults.at(index).cursor);
 		ui.tbrMessages->ensureCursorVisible();
 	}
 }
 
 void ArchiveViewWindow::onTextSearchPreviousClicked()
 {
-	QList<QTextEdit::ExtraSelection> selections = ui.tbrMessages->extraSelections();
-	if (!selections.isEmpty())
+	if (!FSearchResults.isEmpty())
 	{
-		QTextEdit::ExtraSelection selection;
-		QListIterator<QTextEdit::ExtraSelection> it(selections);
-		it.toBack();
-		do {
-			selection = it.previous();
-		} while (it.hasPrevious() && selection.cursor.position()>=ui.tbrMessages->textCursor().position());
-		ui.tbrMessages->setTextCursor(selection.cursor);
+		int index = 0;
+		int pos = ui.tbrMessages->textCursor().position();
+		for (int i=FSearchResults.count()-1; i>index; i--)
+		{
+			if (FSearchResults.at(i).cursor.position() < pos)
+			{
+				index = i;
+				break;
+			}
+		}
+		ui.tbrMessages->setTextCursor(FSearchResults.at(index).cursor);
 		ui.tbrMessages->ensureCursorVisible();
 	}
 }
