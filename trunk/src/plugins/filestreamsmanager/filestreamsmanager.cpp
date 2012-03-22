@@ -2,6 +2,7 @@
 
 #include <QSet>
 #include <QDir>
+#include <QDesktopServices>
 
 FileStreamsManager::FileStreamsManager()
 {
@@ -26,8 +27,9 @@ void FileStreamsManager::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(DATASTREAMSMANAGER_UUID);
 }
 
-bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
 	if (plugin)
 	{
@@ -85,7 +87,7 @@ bool FileStreamsManager::initObjects()
 bool FileStreamsManager::initSettings()
 {
 	QStringList availMethods = FDataManager!=NULL ? FDataManager->methods() : QStringList();
-	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QDir::homePath()+"/"+tr("Downloads"));
+	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation));
 	Options::setDefaultValue(OPV_FILESTREAMS_GROUPBYSENDER,false);
 	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,availMethods.contains(NS_SOCKS5_BYTESTREAMS) ? QString(NS_SOCKS5_BYTESTREAMS) : QString::null);
 	Options::setDefaultValue(OPV_FILESTREAMS_ACCEPTABLEMETHODS,availMethods);
