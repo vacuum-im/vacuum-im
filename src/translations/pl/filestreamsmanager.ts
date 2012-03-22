@@ -47,10 +47,6 @@
         <translation>Transfery</translation>
     </message>
     <message>
-        <source>Downloads</source>
-        <translation>Pobrane pliki</translation>
-    </message>
-    <message>
         <source>File Transfer</source>
         <translation>Transfer plików</translation>
     </message>

@@ -47,10 +47,6 @@
         <translation>Передачи файлов</translation>
     </message>
     <message>
-        <source>Downloads</source>
-        <translation>Загрузки</translation>
-    </message>
-    <message>
         <source>File Transfer</source>
         <translation>Передача файлов</translation>
     </message>
