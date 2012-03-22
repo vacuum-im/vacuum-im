@@ -3,8 +3,6 @@
 #include <QHeaderView>
 #include <QInputDialog>
 
-#define STATUS_ROLE Qt::UserRole +1
-
 ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
@@ -77,7 +75,9 @@ void ReceiversWidget::addReceiver(const Jid &AReceiver)
 		}
 	}
 	else
+	{
 		contactItem->setCheckState(0,Qt::Checked);
+	}
 }
 
 void ReceiversWidget::removeReceiver(const Jid &AReceiver)
@@ -137,7 +137,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiversGroup(const QString &AGroup)
 			QStringList columns = QStringList() << ' '+subGroup << QString::null;
 			groupItem = new QTreeWidgetItem(parentGroupItem,columns);
 			groupItem->setCheckState(0,parentGroupItem->checkState(0));
-			groupItem->setForeground(0,Qt::blue);
+			groupItem->setForeground(0,palette().color(QPalette::Active, QPalette::Highlight));
 			groupItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
 			groupItem->setData(0,RDR_TYPE,RIT_GROUP);
 			groupItem->setData(0,RDR_GROUP,curGroup);
@@ -152,7 +152,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiver(const Jid &AReceiver, const QStrin
 {
 	QTreeWidgetItem *contactItem = NULL;
 	QList<QTreeWidgetItem *> contactItems = FContactItems.values(AReceiver);
-	for (int i = 0; contactItem == NULL && i<contactItems.count(); i++)
+	for (int i = 0; contactItem==NULL && i<contactItems.count(); i++)
 		if (contactItems.at(i)->parent() == AParent)
 			contactItem = contactItems.at(i);
 
@@ -197,21 +197,21 @@ void ReceiversWidget::createRosterTree()
 		{
 			QTreeWidgetItem *groupItem = getReceiversGroup(group);
 
-			QList<Jid> itemJids;
+			QMap<Jid,int> itemJids;
 			QList<IPresenceItem> pitems = FPresence->presenceItems(ritem.itemJid);
 			foreach(IPresenceItem pitem,pitems)
-				itemJids.append(pitem.itemJid);
+				itemJids.insert(pitem.itemJid, pitem.show);
 
 			if (itemJids.isEmpty())
-				itemJids.append(ritem.itemJid);
+				itemJids.insert(ritem.itemJid, IPresence::Offline);
 
-			foreach(Jid itemJid, itemJids)
+			foreach(Jid itemJid, itemJids.keys())
 			{
 				QString bareName = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.bare();
 				QString fullName = itemJid.resource().isEmpty() ? bareName : bareName+"/"+itemJid.resource();
 				QTreeWidgetItem *contactItem = getReceiver(itemJid,fullName,groupItem);
 				contactItem->setCheckState(0, Qt::Unchecked);
-				contactItem->setData(0,STATUS_ROLE,FPresence->presenceItem(itemJid).show);
+				contactItem->setData(0,RDR_SHOW,itemJids.value(itemJid));
 			}
 		}
 	}
@@ -223,6 +223,8 @@ void ReceiversWidget::createRosterTree()
 		QString name = pitem.itemJid.resource();
 		QTreeWidgetItem *contactItem = getReceiver(pitem.itemJid,name,groupItem);
 		contactItem->setCheckState(0, Qt::Unchecked);
+		contactItem->setData(0,RDR_TYPE,RIT_MY_RESOURCE);
+		contactItem->setData(0,RDR_SHOW,pitem.show);
 	}
 
 	ui.trwReceivers->expandAll();
@@ -233,8 +235,9 @@ void ReceiversWidget::createRosterTree()
 	connect(ui.trwReceivers,SIGNAL(itemChanged(QTreeWidgetItem *,int)),SLOT(onReceiversItemChanged(QTreeWidgetItem *,int)));
 }
 
-void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int /*AColumn*/)
+void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int AColumn)
 {
+	Q_UNUSED(AColumn);
 	static int blockUpdateChilds = 0;
 
 	if (AItem->data(0,RDR_TYPE).toInt() == RIT_CONTACT)
@@ -287,14 +290,17 @@ void ReceiversWidget::onSelectAllClicked()
 
 void ReceiversWidget::onSelectAllOnlineClicked()
 {
-	int status;
-	foreach(QTreeWidgetItem *treeItem,FContactItems) {
-		status = treeItem->data(0,STATUS_ROLE).toInt();
-		if (IPresence::Offline != status && IPresence::Error != status)
-			treeItem->setCheckState(0,Qt::Checked);
+	foreach(QTreeWidgetItem *treeItem, FContactItems) 
+	{
+		if (treeItem->data(0,RDR_TYPE).toInt() == RIT_CONTACT)
+		{
+			int status = treeItem->data(0,RDR_SHOW).toInt();
+			if (status!=IPresence::Offline && status!=IPresence::Error)
+				treeItem->setCheckState(0,Qt::Checked);
+			else
+				treeItem->setCheckState(0,Qt::Unchecked);
+		}
 	}
-
-	return;
 }
 
 void ReceiversWidget::onSelectNoneClicked()
@@ -317,4 +323,3 @@ void ReceiversWidget::onUpdateClicked()
 	foreach(Jid receiver, savedReceivers)
 		addReceiver(receiver);
 }
-
