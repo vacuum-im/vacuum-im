@@ -4,11 +4,11 @@
 #include <QInputDialog>
 #include <QSignalMapper>
 
+#define BLINK_INTERVAL              500
+
 #define ADR_TAB_INDEX               Action::DR_Parametr1
 #define ADR_TAB_MENU_ACTION         Action::DR_Parametr2
-
-#define BLINK_INTERVAL              500
-#define ADR_TABWINDOWID             Action::DR_Parametr1
+#define ADR_TABWINDOWID             Action::DR_Parametr3
 
 enum TabMenuActions {
 	CloseTabAction,
@@ -405,6 +405,7 @@ void TabWindow::onTabMenuRequested(int AIndex)
 
 		Action *detachTab = new Action(menu);
 		detachTab->setText(tr("Detach to Separate Window"));
+		detachTab->setData(ADR_TAB_INDEX, AIndex);
 		detachTab->setData(ADR_TAB_MENU_ACTION, DetachTabAction);
 		detachTab->setShortcutId(SCT_TABWINDOW_DETACHTAB);
 		menu->addAction(detachTab,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
@@ -420,6 +421,7 @@ void TabWindow::onTabMenuRequested(int AIndex)
 			{
 				Action *action = new Action(joinTab);
 				action->setText(FMessageWidgets->tabWindowName(id));
+				action->setData(ADR_TAB_INDEX, AIndex);
 				action->setData(ADR_TABWINDOWID,id.toString());
 				action->setData(ADR_TAB_MENU_ACTION, JoinTabAction);
 				joinTab->addAction(action);
@@ -429,6 +431,7 @@ void TabWindow::onTabMenuRequested(int AIndex)
 
 		Action *newWindow = new Action(joinTab);
 		newWindow->setText(tr("New Tab Window"));
+		newWindow->setData(ADR_TAB_INDEX, AIndex);
 		newWindow->setData(ADR_TAB_MENU_ACTION, NewTabWindowAction);
 		joinTab->addAction(newWindow,AG_DEFAULT+1);
 		connect(newWindow,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
