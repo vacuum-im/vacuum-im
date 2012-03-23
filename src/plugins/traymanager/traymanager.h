@@ -67,6 +67,7 @@ private:
 	bool FIconHidden;
 	int FActiveNotify;
 	QIcon FIcon;
+	QIcon FEmptyIcon;
 	QString FToolTip;
 	QList<int> FNotifyOrder;
 	QMap<int, ITrayNotify> FNotifyItems;

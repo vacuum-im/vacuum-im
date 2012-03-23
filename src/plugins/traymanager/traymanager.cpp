@@ -12,6 +12,10 @@ TrayManager::TrayManager()
 	FActiveNotify = -1;
 	FIconHidden = false;
 
+	QPixmap empty(16,16);
+	empty.fill(Qt::transparent);
+	FEmptyIcon.addPixmap(empty);
+
 	FContextMenu = new Menu;
 	FSystemIcon.setContextMenu(FContextMenu);
 
@@ -205,7 +209,8 @@ void TrayManager::onBlinkTimerTimeout()
 	}
 	else
 	{
-		FSystemIcon.setIcon(QIcon());
+		IconStorage::staticStorage(notify.iconStorage)->removeAutoIcon(&FSystemIcon);
+		FSystemIcon.setIcon(FEmptyIcon);
 		FBlinkTimer.start(BLINK_INVISIBLE_TIME);
 	}
 	FIconHidden = !FIconHidden;
