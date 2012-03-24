@@ -3,6 +3,8 @@
 CompressPlugin::CompressPlugin()
 {
 	FXmppStreams = NULL;
+	FOptionsManager = NULL;
+	FAccountManager = NULL;
 }
 
 CompressPlugin::~CompressPlugin()
@@ -20,11 +22,20 @@ void CompressPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
-bool CompressPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool CompressPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+
+	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
+	if (plugin)
+		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 
 	return FXmppStreams!=NULL;
 }
@@ -32,10 +43,10 @@ bool CompressPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 bool CompressPlugin::initObjects()
 {
 	ErrorHandler::addErrorItem("unsupported-method", ErrorHandler::CANCEL,
-	                           ErrorHandler::FEATURE_NOT_IMPLEMENTED, tr("Unsupported compression method"),NS_FEATURE_COMPRESS);
+		ErrorHandler::FEATURE_NOT_IMPLEMENTED, tr("Unsupported compression method"),NS_FEATURE_COMPRESS);
 
 	ErrorHandler::addErrorItem("setup-failed", ErrorHandler::CANCEL,
-	                           ErrorHandler::NOT_ACCEPTABLE, tr("Compression setup failed"), NS_FEATURE_COMPRESS);
+		ErrorHandler::NOT_ACCEPTABLE, tr("Compression setup failed"), NS_FEATURE_COMPRESS);
 
 	if (FXmppStreams)
 	{
@@ -43,17 +54,51 @@ bool CompressPlugin::initObjects()
 		FXmppStreams->registerXmppFeaturePlugin(XFPO_DEFAULT,NS_FEATURE_COMPRESS,this);
 	}
 
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsHolder(this);
+	}
 	return true;
+}
+
+bool CompressPlugin::initSettings()
+{
+	Options::setDefaultValue(OPV_ACCOUNT_STREAMCOMPRESS,false);
+	return true;
+}
+
+QMultiMap<int, IOptionsWidget *> CompressPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager)
+	{
+		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
+		if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+		{
+			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+			widgets.insertMulti(OWO_ACCOUNT_COMPRESS, FOptionsManager->optionsNodeWidget(aoptions.node("stream-compress"),tr("Enable data compression transferred between client and server"),AParent));
+		}
+	}
+	return widgets;
+}
+
+QList<QString> CompressPlugin::xmppFeatures() const
+{
+	return QList<QString>() << NS_FEATURE_COMPRESS;
 }
 
 IXmppFeature *CompressPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
 	if (AFeatureNS == NS_FEATURE_COMPRESS)
 	{
-		IXmppFeature *feature = new Compression(AXmppStream);
-		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
-		emit featureCreated(feature);
-		return feature;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AXmppStream->streamJid()) : NULL;
+		if (account==NULL || account->optionsNode().value("stream-compress").toBool())
+		{
+			IXmppFeature *feature = new Compression(AXmppStream);
+			connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
+			emit featureCreated(feature);
+			return feature;
+		}
 	}
 	return NULL;
 }

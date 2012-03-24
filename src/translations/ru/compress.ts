@@ -19,6 +19,10 @@
         <source>Allows to compress a stream of messages sent and received from the server</source>
         <translation>Позволяет сжимать поток сообщений отправляемый и получаемый от сервера</translation>
     </message>
+    <message>
+        <source>Enable data compression transferred between client and server</source>
+        <translation>Включить сжатие данных передаваемых между клиентом и сервером</translation>
+    </message>
 </context>
 <context>
     <name>Compression</name>

@@ -28,6 +28,8 @@
 #define OPV_ACCOUNT_HISTORYREPLICATION                  "accounts.account.history-replication"
 // BookMarks
 #define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
+// Compress
+#define OPV_ACCOUNT_STREAMCOMPRESS                      "accounts.account.stream-compress"
 
 //BirthdayReminder
 #define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
