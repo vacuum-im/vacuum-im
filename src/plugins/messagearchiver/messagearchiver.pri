@@ -3,7 +3,7 @@ FORMS = archivestreamoptions.ui \
         selectpagewidget.ui
 
 HEADERS = archivestreamoptions.h \ 
-          archiveenginesoptions. h\
+          archiveenginesoptions.h\
           chatwindowmenu.h \
           archiveviewwindow.h \
           messagearchiver.h \
