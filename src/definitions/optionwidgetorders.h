@@ -1,7 +1,7 @@
 #ifndef DEF_OPTIONWIDGETORDERS_H
 #define DEF_OPTIONWIDGETORDERS_H
 
-//Node = ON_ACCOUNTS"::<AccountId>
+//Node = ON_ACCOUNTS::<AccountId>
 #define OWO_ACCOUNT_OPTIONS                       500
 #define OWO_ACCOUNT_CONNECTION                    600
 #define OWO_ACCOUNT_REQUIRE_ENCRYPTION            700
@@ -21,7 +21,10 @@
 #define OWO_EMOTICONS                             500
 
 //Node = ON_HISTORY
-#define OWO_HISTORY                               500
+#define OWO_HISTORY_ENGINES                       500
+
+//Node = ON_HISTORY::<AccountId>
+#define OWO_HISTORY_STREAM                        500
 
 //Node = ON_NOTIFICATIONS
 #define OWO_NOTIFICATIONS_EXTENDED                300

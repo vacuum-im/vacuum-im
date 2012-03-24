@@ -1,14 +1,16 @@
-FORMS = archiveoptions.ui \
+FORMS = archivestreamoptions.ui \
         archiveviewwindow.ui \
         selectpagewidget.ui
 
-HEADERS = archiveoptions.h \
+HEADERS = archivestreamoptions.h \ 
+          archiveenginesoptions. h\
           chatwindowmenu.h \
           archiveviewwindow.h \
           messagearchiver.h \
           selectpagewidget.h
           
-SOURCES = archiveoptions.cpp \
+SOURCES = archivestreamoptions.cpp \
+          archiveenginesoptions.cpp \
           chatwindowmenu.cpp \
           archiveviewwindow.cpp \
           messagearchiver.cpp \

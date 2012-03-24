@@ -12,14 +12,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Side Archive</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>History of communications is stored on server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to request conversation headers from server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -29,6 +21,14 @@
     </message>
     <message>
         <source>Failed to load archive modifications from server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard Server Side Archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>History of conversations is stored on your jabber server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

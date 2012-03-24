@@ -184,12 +184,18 @@ QUuid ServerMessageArchive::engineId() const
 
 QString ServerMessageArchive::engineName() const
 {
-	return tr("Server Side Archive");
+	return tr("Standard Server Side Archive");
 }
 
 QString ServerMessageArchive::engineDescription() const
 {
-	return tr("History of communications is stored on server");
+	return tr("History of conversations is stored on your jabber server");
+}
+
+IOptionsWidget *ServerMessageArchive::engineSettingsWidget(QWidget *AParent)
+{
+	Q_UNUSED(AParent);
+	return NULL;
 }
 
 quint32 ServerMessageArchive::capabilities(const Jid &AStreamJid) const

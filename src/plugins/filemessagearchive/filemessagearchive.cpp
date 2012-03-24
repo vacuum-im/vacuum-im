@@ -126,6 +126,12 @@ QString FileMessageArchive::engineDescription() const
 	return tr("History of conversations is stored in local files");
 }
 
+IOptionsWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
+{
+	Q_UNUSED(AParent);
+	return NULL;
+}
+
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
 	if (AStreamJid.isValid() && !FArchiver->isReady(AStreamJid))
@@ -206,7 +212,7 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 		}
 		if (writer)
 		{
-			written = written = writer->writeNote(AMessage.body());
+			written = writer->writeNote(AMessage.body());
 		}
 		FThreadLock.unlock();
 	}

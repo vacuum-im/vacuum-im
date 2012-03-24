@@ -1,4 +1,4 @@
-#include "archiveoptions.h"
+#include "archivestreamoptions.h"
 
 #include <QLineEdit>
 #include <QHeaderView>
@@ -229,7 +229,7 @@ void ArchiveDelegate::onExpireIndexChanged(int AIndex)
 	comboBox->lineEdit()->setText(QString::number(comboBox->itemData(AIndex).toInt()/ONE_DAY));
 }
 
-ArchiveOptions::ArchiveOptions(IMessageArchiver *AArchiver, const Jid &AStreamJid, QWidget *AParent) : QWidget(AParent)
+ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Jid &AStreamJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	FArchiver = AArchiver;
@@ -284,12 +284,12 @@ ArchiveOptions::ArchiveOptions(IMessageArchiver *AArchiver, const Jid &AStreamJi
 	connect(delegat,SIGNAL(commitData(QWidget *)),SIGNAL(modified()));
 }
 
-ArchiveOptions::~ArchiveOptions()
+ArchiveStreamOptions::~ArchiveStreamOptions()
 {
 
 }
 
-void ArchiveOptions::apply()
+void ArchiveStreamOptions::apply()
 {
 	if (FSaveRequests.isEmpty())
 	{
@@ -346,7 +346,7 @@ void ArchiveOptions::apply()
 	emit childApply();
 }
 
-void ArchiveOptions::reset()
+void ArchiveStreamOptions::reset()
 {
 	FLastError.clear();
 	FTableItems.clear();
@@ -358,7 +358,7 @@ void ArchiveOptions::reset()
 	emit childReset();
 }
 
-void ArchiveOptions::updateWidget()
+void ArchiveStreamOptions::updateWidget()
 {
 	bool requesting = !FSaveRequests.isEmpty();
 
@@ -377,12 +377,12 @@ void ArchiveOptions::updateWidget()
 		ui.lblStatus->clear();
 }
 
-void ArchiveOptions::updateColumnsSize()
+void ArchiveStreamOptions::updateColumnsSize()
 {
 	ui.tbwItemPrefs->horizontalHeader()->reset();
 }
 
-void ArchiveOptions::updateItemPrefs(const Jid &AItemJid, const IArchiveItemPrefs &APrefs)
+void ArchiveStreamOptions::updateItemPrefs(const Jid &AItemJid, const IArchiveItemPrefs &APrefs)
 {
 	if (!FTableItems.contains(AItemJid))
 	{
@@ -412,7 +412,7 @@ void ArchiveOptions::updateItemPrefs(const Jid &AItemJid, const IArchiveItemPref
 	updateColumnsSize();
 }
 
-void ArchiveOptions::removeItemPrefs(const Jid &AItemJid)
+void ArchiveStreamOptions::removeItemPrefs(const Jid &AItemJid)
 {
 	if (FTableItems.contains(AItemJid))
 	{
@@ -422,7 +422,7 @@ void ArchiveOptions::removeItemPrefs(const Jid &AItemJid)
 	}
 }
 
-void ArchiveOptions::onAddItemPrefClicked()
+void ArchiveStreamOptions::onAddItemPrefClicked()
 {
 	Jid itemJid = QInputDialog::getText(this,tr("New item preferences"),tr("Enter item JID:"));
 	if (itemJid.isValid() && !FTableItems.contains(itemJid))
@@ -438,7 +438,7 @@ void ArchiveOptions::onAddItemPrefClicked()
 	}
 }
 
-void ArchiveOptions::onRemoveItemPrefClicked()
+void ArchiveStreamOptions::onRemoveItemPrefClicked()
 {
 	QList<QTableWidgetItem *> selectedRows;
 	foreach(QTableWidgetItem *item, ui.tbwItemPrefs->selectedItems())
@@ -452,7 +452,7 @@ void ArchiveOptions::onRemoveItemPrefClicked()
 	}
 }
 
-void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid)
+void ArchiveStreamOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 {
 	if (AStreamJid == FStreamJid)
 	{
@@ -492,7 +492,7 @@ void ArchiveOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 	}
 }
 
-void ArchiveOptions::onArchiveRequestCompleted(const QString &AId)
+void ArchiveStreamOptions::onArchiveRequestCompleted(const QString &AId)
 {
 	if (FSaveRequests.contains(AId))
 	{
@@ -502,7 +502,7 @@ void ArchiveOptions::onArchiveRequestCompleted(const QString &AId)
 	}
 }
 
-void ArchiveOptions::onArchiveRequestFailed(const QString &AId, const QString &AError)
+void ArchiveStreamOptions::onArchiveRequestFailed(const QString &AId, const QString &AError)
 {
 	if (FSaveRequests.contains(AId))
 	{
