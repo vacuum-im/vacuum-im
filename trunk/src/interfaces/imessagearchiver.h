@@ -6,6 +6,7 @@
 #include <QStandardItemModel>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idataforms.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/toolbarchanger.h>
 #include <utils/datetime.h>
 #include <utils/message.h>
@@ -201,6 +202,7 @@ public:
 	virtual QUuid engineId() const =0;
 	virtual QString engineName() const =0;
 	virtual QString engineDescription() const =0;
+	virtual IOptionsWidget *engineSettingsWidget(QWidget *AParent) = 0;
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const =0;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;
@@ -260,8 +262,9 @@ public:
 	//Archive Engines
 	virtual quint32 totalCapabilities(const Jid &AStreamJid) const =0;
 	virtual QList<IArchiveEngine *> archiveEngines() const =0;
-	virtual bool isArchiveEngineEnabled(const QUuid &AId) const =0;
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const =0;
+	virtual bool isArchiveEngineEnabled(const QUuid &AId) const =0;
+	virtual void setArchiveEngineEnabled(const QUuid &AId, bool AEnabled) =0;
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine) =0;
 protected:
 	//Common Requests
@@ -279,6 +282,7 @@ protected:
 	//Engines
 	virtual void totalCapabilitiesChanged(const Jid &AStreamJid) =0;
 	virtual void archiveEngineRegistered(IArchiveEngine *AEngine) =0;
+	virtual void archiveEngineEnableChanged(const QUuid &AId, bool AEnabled) =0;
 };
 
 Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")

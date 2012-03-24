@@ -182,6 +182,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 	connect(this,SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
 		SLOT(onSelfCollectionLoaded(const QString &, const IArchiveCollection &)));
 
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
@@ -347,8 +348,12 @@ QMultiMap<int, IOptionsWidget *> MessageArchiver::optionsWidgets(const QString &
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
 		if (account && account->isActive() && isReady(account->xmppStream()->streamJid()))
 		{
-			widgets.insertMulti(OWO_HISTORY, new ArchiveOptions(this,account->xmppStream()->streamJid(),AParent));
+			widgets.insertMulti(OWO_HISTORY_STREAM, new ArchiveStreamOptions(this,account->xmppStream()->streamJid(),AParent));
 		}
+	}
+	else if(ANodeId == OPN_HISTORY)
+	{
+		widgets.insertMulti(OWO_HISTORY_ENGINES, new ArchiveEnginesOptions(this,AParent));
 	}
 	return widgets;
 }
@@ -1030,9 +1035,15 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			Jid contactJid(with.node(),with.domain(),nick.isEmpty() ? with.resource() : nick);
 
 			if (nodeElem.tagName()=="to")
+			{
 				message.setTo(contactJid.eFull());
+				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageIn);
+			}
 			else
+			{
 				message.setFrom(contactJid.eFull());
+				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageOut);
+			}
 
 			message.setType(nick.isEmpty() ? Message::Chat : Message::GroupChat);
 
@@ -1190,14 +1201,20 @@ QList<IArchiveEngine *> MessageArchiver::archiveEngines() const
 	return FArchiveEngines.values();
 }
 
+IArchiveEngine *MessageArchiver::findArchiveEngine(const QUuid &AId) const
+{
+	return FArchiveEngines.value(AId);
+}
+
 bool MessageArchiver::isArchiveEngineEnabled(const QUuid &AId) const
 {
 	return Options::node(OPV_HISTORY_ENGINE_ITEM,AId.toString()).value("enabled").toBool();
 }
 
-IArchiveEngine *MessageArchiver::findArchiveEngine(const QUuid &AId) const
+void MessageArchiver::setArchiveEngineEnabled(const QUuid &AId, bool AEnabled)
 {
-	return FArchiveEngines.value(AId);
+	if (isArchiveEngineEnabled(AId) != AEnabled)
+		Options::node(OPV_HISTORY_ENGINE_ITEM,AId.toString()).setValue(AEnabled,"enabled");
 }
 
 void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
@@ -2416,6 +2433,16 @@ void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 		ChatWindowMenu *chatMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
 		chatButton->setMenu(chatMenu);
 		chatButton->setPopupMode(QToolButton::MenuButtonPopup);
+	}
+}
+
+void MessageArchiver::onOptionsChanged(const OptionsNode &ANode)
+{
+	if (Options::cleanNSpaces(ANode.path()) == OPV_HISTORY_ENGINE_ENABLED)
+	{
+		QUuid id = ANode.parent().nspace();
+		emit archiveEngineEnableChanged(id,ANode.value().toBool());
+		emit totalCapabilitiesChanged(Jid::null);
 	}
 }
 

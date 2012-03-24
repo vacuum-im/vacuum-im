@@ -85,31 +85,7 @@
     </message>
 </context>
 <context>
-    <name>ArchiveOptions</name>
-    <message>
-        <source>Waiting for host response...</source>
-        <translation>Oczekuję na odpowiedź hosta...</translation>
-    </message>
-    <message>
-        <source>Preferences accepted</source>
-        <translation>Ustawienia zapisane</translation>
-    </message>
-    <message>
-        <source>New item preferences</source>
-        <translation>Ustawienia kontaktu</translation>
-    </message>
-    <message>
-        <source>Enter item JID:</source>
-        <translation>Wprowadź JID:</translation>
-    </message>
-    <message>
-        <source>Unacceptable item JID</source>
-        <translation>Niepoprawny JID</translation>
-    </message>
-    <message>
-        <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>%1 nie wygląda na poprawny JID albo już taki istnieje</translation>
-    </message>
+    <name>ArchiveStreamOptions</name>
     <message>
         <source>Yes, if supported by server</source>
         <translation type="unfinished"></translation>
@@ -167,6 +143,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Waiting for host response...</source>
+        <translation type="unfinished">Oczekuję na odpowiedź hosta...</translation>
+    </message>
+    <message>
         <source>History preferences is not available</source>
         <translation type="unfinished"></translation>
     </message>
@@ -174,36 +154,32 @@
         <source>Failed to save archive preferences: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>New item preferences</source>
+        <translation type="unfinished">Ustawienia kontaktu</translation>
+    </message>
+    <message>
+        <source>Enter item JID:</source>
+        <translation type="unfinished">Wprowadź JID:</translation>
+    </message>
+    <message>
+        <source>Unacceptable item JID</source>
+        <translation type="unfinished">Niepoprawny JID</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; is not valid JID or already exists</source>
+        <translation type="unfinished">%1 nie wygląda na poprawny JID albo już taki istnieje</translation>
+    </message>
+    <message>
+        <source>Preferences accepted</source>
+        <translation type="unfinished">Ustawienia zapisane</translation>
+    </message>
 </context>
 <context>
-    <name>ArchiveOptionsClass</name>
-    <message>
-        <source>Default Archiving Preferences</source>
-        <translation>Ustawienia domyślne</translation>
-    </message>
-    <message>
-        <source>Individual Archiving Preferences</source>
-        <translation>Ustawienia indywidualne</translation>
-    </message>
-    <message>
-        <source>OTR</source>
-        <translation>OTR</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Zapisz</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Dodaj</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Usuń</translation>
-    </message>
+    <name>ArchiveStreamOptionsClass</name>
     <message>
         <source>Auto Archiving Preferences</source>
-        <translation>Opcje automatycznej archiwizacji</translation>
+        <translation type="unfinished">Opcje automatycznej archiwizacji</translation>
     </message>
     <message>
         <source>Enable automatic archiving of messages on the server</source>
@@ -226,6 +202,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Default Archiving Preferences</source>
+        <translation type="unfinished">Ustawienia domyślne</translation>
+    </message>
+    <message>
         <source>Message archiving:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -242,6 +222,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Individual Archiving Preferences</source>
+        <translation type="unfinished">Ustawienia indywidualne</translation>
+    </message>
+    <message>
         <source>JID</source>
         <translation type="unfinished">Kontakt</translation>
     </message>
@@ -250,12 +234,24 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Save</source>
+        <translation type="unfinished">Zapisz</translation>
+    </message>
+    <message>
         <source>Message archiving</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>OTR</source>
+        <translation type="unfinished">OTR</translation>
+    </message>
+    <message>
         <source>Off-The-Record sessions </source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished">Usuń</translation>
     </message>
     <message>
         <source>Remove messages after, days</source>
@@ -268,6 +264,10 @@
     <message>
         <source>Settings are applied to contact which JID is exactly matches</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Dodaj</translation>
     </message>
 </context>
 <context>
@@ -433,6 +433,25 @@
     </message>
     <message>
         <source>Failed to change archive preferences: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EngineWidget</name>
+    <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disabled</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

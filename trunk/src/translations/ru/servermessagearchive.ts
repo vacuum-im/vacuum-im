@@ -12,14 +12,6 @@
         <translation>Позволяет сохранять историю общения на сервере</translation>
     </message>
     <message>
-        <source>Server Side Archive</source>
-        <translation>Архив на сервере</translation>
-    </message>
-    <message>
-        <source>History of communications is stored on server</source>
-        <translation>Архив общения сохраняется на сервере</translation>
-    </message>
-    <message>
         <source>Failed to request conversation headers from server</source>
         <translation>Не удалось запросить заголовки разговоров с сервера</translation>
     </message>
@@ -30,6 +22,14 @@
     <message>
         <source>Failed to load archive modifications from server</source>
         <translation>Не удалось загрузить изменения архива с сервара</translation>
+    </message>
+    <message>
+        <source>Standard Server Side Archive</source>
+        <translation>Стандартный архив на сервере</translation>
+    </message>
+    <message>
+        <source>History of conversations is stored on your jabber server</source>
+        <translation>История общения сохраняется на вашем jabber сервере</translation>
     </message>
 </context>
 </TS>

@@ -55,6 +55,7 @@ public:
 	virtual QUuid engineId() const;
 	virtual QString engineName() const;
 	virtual QString engineDescription() const;
+	virtual IOptionsWidget *engineSettingsWidget(QWidget *AParent);
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const;
 	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const;

@@ -8,6 +8,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/messagedataroles.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
@@ -24,6 +25,7 @@
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessagestyles.h>
+#include <interfaces/imessageprocessor.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ioptionsmanager.h>
@@ -39,9 +41,10 @@
 #include <utils/shortcuts.h>
 #include <utils/errorhandler.h>
 #include <utils/widgetmanager.h>
-#include "archiveoptions.h"
+#include "archivestreamoptions.h"
 #include "chatwindowmenu.h"
 #include "archiveviewwindow.h"
+#include "archiveenginesoptions.h"
 
 struct StanzaSession {
 	QString sessionId;
@@ -142,8 +145,9 @@ public:
 	//Engines
 	virtual quint32 totalCapabilities(const Jid &AStreamJid) const;
 	virtual QList<IArchiveEngine *> archiveEngines() const;
-	virtual bool isArchiveEngineEnabled(const QUuid &AId) const;
 	virtual IArchiveEngine *findArchiveEngine(const QUuid &AId) const;
+	virtual bool isArchiveEngineEnabled(const QUuid &AId) const;
+	virtual void setArchiveEngineEnabled(const QUuid &AId, bool AEnabled);
 	virtual void registerArchiveEngine(IArchiveEngine *AEngine);
 signals:
 	//Common Requests
@@ -161,6 +165,7 @@ signals:
 	//Engines
 	void totalCapabilitiesChanged(const Jid &AStreamJid);
 	void archiveEngineRegistered(IArchiveEngine *AEngine);
+	void archiveEngineEnableChanged(const QUuid &AId, bool AEnabled);
 protected:
 	void registerDiscoFeatures();
 	QString loadServerPrefs(const Jid &AStreamJid);
@@ -218,6 +223,7 @@ protected slots:
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
+	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;

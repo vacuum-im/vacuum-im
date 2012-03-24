@@ -85,7 +85,7 @@
     </message>
 </context>
 <context>
-    <name>ArchiveOptions</name>
+    <name>ArchiveStreamOptions</name>
     <message>
         <source>Waiting for host response...</source>
         <translation>Ожидание ответа хоста...</translation>
@@ -176,31 +176,7 @@
     </message>
 </context>
 <context>
-    <name>ArchiveOptionsClass</name>
-    <message>
-        <source>Default Archiving Preferences</source>
-        <translation>Настройки по умолчанию</translation>
-    </message>
-    <message>
-        <source>Individual Archiving Preferences</source>
-        <translation>Индивидуальные настройки</translation>
-    </message>
-    <message>
-        <source>OTR</source>
-        <translation>БЗИ</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Сохранить</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Добавить</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Удалить</translation>
-    </message>
+    <name>ArchiveStreamOptionsClass</name>
     <message>
         <source>Auto Archiving Preferences</source>
         <translation>Настройки автоматического сохранения</translation>
@@ -226,6 +202,10 @@
         <translation>Копировать локальный архив на сервер?</translation>
     </message>
     <message>
+        <source>Default Archiving Preferences</source>
+        <translation>Настройки по умолчанию</translation>
+    </message>
+    <message>
         <source>Message archiving:</source>
         <translation>Архивирование сообщений:</translation>
     </message>
@@ -242,6 +222,10 @@
         <translation>(0 - не удалять)</translation>
     </message>
     <message>
+        <source>Individual Archiving Preferences</source>
+        <translation>Индивидуальные настройки</translation>
+    </message>
+    <message>
         <source>JID</source>
         <translation>JID</translation>
     </message>
@@ -250,12 +234,24 @@
         <translation>Идентификатор контакта</translation>
     </message>
     <message>
+        <source>Save</source>
+        <translation>Сохранить</translation>
+    </message>
+    <message>
         <source>Message archiving</source>
         <translation>Архивирование сообщений</translation>
     </message>
     <message>
+        <source>OTR</source>
+        <translation>БЗИ</translation>
+    </message>
+    <message>
         <source>Off-The-Record sessions </source>
         <translation>Сессии Без-Записи-Истории</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Удалить</translation>
     </message>
     <message>
         <source>Remove messages after, days</source>
@@ -268,6 +264,10 @@
     <message>
         <source>Settings are applied to contact which JID is exactly matches</source>
         <translation>Настройки применяются для контактов чей JID в точности совпадает</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Добавить</translation>
     </message>
 </context>
 <context>
@@ -434,6 +434,25 @@
     <message>
         <source>Failed to change archive preferences: %1</source>
         <translation>Не удалось изменить настройки истории: %1</translation>
+    </message>
+</context>
+<context>
+    <name>EngineWidget</name>
+    <message>
+        <source>Enabled</source>
+        <translation>Включено</translation>
+    </message>
+    <message>
+        <source>Disable</source>
+        <translation>Выключить</translation>
+    </message>
+    <message>
+        <source>Enable</source>
+        <translation>Включить</translation>
+    </message>
+    <message>
+        <source>Disabled</source>
+        <translation>Выключено</translation>
     </message>
 </context>
 <context>
