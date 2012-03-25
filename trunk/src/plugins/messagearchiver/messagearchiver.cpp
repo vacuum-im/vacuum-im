@@ -1037,12 +1037,12 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			if (nodeElem.tagName()=="to")
 			{
 				message.setTo(contactJid.eFull());
-				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageIn);
+				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageOut);
 			}
 			else
 			{
 				message.setFrom(contactJid.eFull());
-				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageOut);
+				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageIn);
 			}
 
 			message.setType(nick.isEmpty() ? Message::Chat : Message::GroupChat);
