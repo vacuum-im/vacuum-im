@@ -1452,21 +1452,16 @@ void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
 {
 	if (FMessageArchiver && !FHistoryRequests.values().contains(AWindow))
 	{
+		WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
+
 		IArchiveRequest request;
 		request.with = AWindow->contactJid();
 		request.order = Qt::DescendingOrder;
-
-		WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
-		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) < HISTORY_TIME_PAST)
-		{
-			request.maxItems = HISTORY_MESSAGES;
-			request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
-		}
-		else
-		{
+		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) > HISTORY_TIME_PAST)
 			request.start = wstatus.startTime.isValid() ? wstatus.startTime : wstatus.createTime;
-			request.end = QDateTime::currentDateTime();
-		}
+		else
+			request.maxItems = HISTORY_MESSAGES;
+		request.end = QDateTime::currentDateTime();
 
 		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
 		if (!reqId.isEmpty())
@@ -2160,6 +2155,9 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 		else
 			setMessageStyle();
 
+		QList<Message> pendingMessages = FPendingMessages.take(window);
+		QDateTime lastTime = !pendingMessages.isEmpty() ? pendingMessages.first().dateTime().addSecs(-HISTORY_TIME_PAST) : QDateTime();
+
 		int messageIt = ABody.messages.count()-1;
 		QMultiMap<QDateTime,QString>::const_iterator noteIt = ABody.notes.constBegin();
 		while (messageIt>=0 || noteIt!=ABody.notes.constEnd())
@@ -2167,10 +2165,13 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 			if (messageIt>=0 && (noteIt==ABody.notes.constEnd() || ABody.messages.at(messageIt).dateTime()<noteIt.key()))
 			{
 				const Message &message = ABody.messages.at(messageIt);
-				if (window)
-					showChatMessage(window,message);
-				else
-					showUserMessage(message,Jid(message.from()).resource());
+				if (lastTime.isNull() || lastTime>message.dateTime())
+				{
+					if (window)
+						showChatMessage(window,message);
+					else
+						showUserMessage(message,Jid(message.from()).resource());
+				}
 				messageIt--;
 			}
 			else if (noteIt != ABody.notes.constEnd())
@@ -2186,7 +2187,7 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 		if (!window)
 			showTopic(FMultiChat->subject());
 
-		foreach(Message message, FPendingMessages.take(window))
+		foreach(Message message, pendingMessages)
 		{
 			if (window)
 				showChatMessage(window,message);
@@ -2197,7 +2198,7 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 		if (window)
 		{
 			WindowStatus &wstatus = FWindowStatus[window->viewWidget()];
-			wstatus.startTime = ABody.messages.value(0).dateTime();
+			wstatus.startTime = !ABody.messages.isEmpty() ? ABody.messages.last().dateTime() : QDateTime();
 		}
 	}
 }

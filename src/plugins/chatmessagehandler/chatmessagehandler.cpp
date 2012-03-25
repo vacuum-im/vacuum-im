@@ -477,22 +477,17 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 {
 	if (FMessageArchiver && !FHistoryRequests.values().contains(AWindow))
 	{
+		WindowStatus &wstatus = FWindowStatus[AWindow];
+
 		IArchiveRequest request;
 		request.with = AWindow->contactJid().bare();
 		request.exactmatch = request.with.node().isEmpty();
 		request.order = Qt::DescendingOrder;
-
-		WindowStatus &wstatus = FWindowStatus[AWindow];
-		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) < HISTORY_TIME_PAST)
-		{
-			request.maxItems = HISTORY_MESSAGES;
-			request.end = QDateTime::currentDateTime().addSecs(-HISTORY_TIME_PAST);
-		}
-		else
-		{
+		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) > HISTORY_TIME_PAST)
 			request.start = wstatus.startTime.isValid() ? wstatus.startTime : wstatus.createTime;
-			request.end = QDateTime::currentDateTime();
-		}
+		else
+			request.maxItems = HISTORY_MESSAGES;
+		request.end = QDateTime::currentDateTime();
 
 		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
 		if (!reqId.isEmpty())
@@ -743,13 +738,17 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 		IChatWindow *window = FHistoryRequests.take(AId);
 		setMessageStyle(window);
 
+		QList<Message> pendingMessages = FPendingMessages.take(window);
+		QDateTime lastTime = !pendingMessages.isEmpty() ? pendingMessages.first().dateTime().addSecs(-HISTORY_TIME_PAST) : QDateTime();
+
 		int messageIt = ABody.messages.count()-1;
 		QMultiMap<QDateTime,QString>::const_iterator noteIt = ABody.notes.constBegin();
 		while (messageIt>=0 || noteIt!=ABody.notes.constEnd())
 		{
 			if (messageIt>=0 && (noteIt==ABody.notes.constEnd() || ABody.messages.at(messageIt).dateTime()<noteIt.key()))
 			{
-				showStyledMessage(window,ABody.messages.at(messageIt));
+				if (lastTime.isNull() || lastTime>ABody.messages.at(messageIt).dateTime())
+					showStyledMessage(window,ABody.messages.at(messageIt));
 				messageIt--;
 			}
 			else if (noteIt != ABody.notes.constEnd())
@@ -759,11 +758,11 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 			}
 		}
 
-		foreach(Message message, FPendingMessages.take(window))
+		foreach(Message message, pendingMessages)
 			showStyledMessage(window,message);
 
 		WindowStatus &wstatus = FWindowStatus[window];
-		wstatus.startTime = ABody.messages.value(0).dateTime();
+		wstatus.startTime = !ABody.messages.isEmpty() ? ABody.messages.last().dateTime() : QDateTime();
 	}
 }
 
