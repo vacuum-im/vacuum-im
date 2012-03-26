@@ -119,14 +119,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save messages with extensions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save only messages body</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do not save messages</source>
         <translation type="unfinished"></translation>
     </message>
@@ -173,6 +165,14 @@
     <message>
         <source>Preferences accepted</source>
         <translation type="unfinished">Налаштування збережені</translation>
+    </message>
+    <message>
+        <source>Save messages with formatting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save only messages text</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -563,14 +563,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Save Messages with Extensions</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save Only Messages Body</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Do not Save Messages</source>
         <translation type="unfinished"></translation>
     </message>
@@ -612,6 +604,14 @@
     </message>
     <message>
         <source>Failed to load conversation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Messages with Formatting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Only Messages Text</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

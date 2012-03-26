@@ -143,14 +143,6 @@
         <translation>Нет, не копировать локальных архив на сервер</translation>
     </message>
     <message>
-        <source>Save messages with extensions</source>
-        <translation>Сохранять сообщения с расширениями</translation>
-    </message>
-    <message>
-        <source>Save only messages body</source>
-        <translation>Сохранять только тело сообщений</translation>
-    </message>
-    <message>
         <source>Do not save messages</source>
         <translation>Не сохранять сообщения</translation>
     </message>
@@ -173,6 +165,14 @@
     <message>
         <source>Failed to save archive preferences: %1</source>
         <translation>Не удалось сохранить настройки истории: %1</translation>
+    </message>
+    <message>
+        <source>Save messages with formatting</source>
+        <translation>Сохранять сообщения с форматированием</translation>
+    </message>
+    <message>
+        <source>Save only messages text</source>
+        <translation>Сохранять только текст сообщений</translation>
     </message>
 </context>
 <context>
@@ -563,14 +563,6 @@
         <translation>Автоматическое архивирование</translation>
     </message>
     <message>
-        <source>Save Messages with Extensions</source>
-        <translation>Сохранять сообщения с расширениями</translation>
-    </message>
-    <message>
-        <source>Save Only Messages Body</source>
-        <translation>Сохранять только тело сообщений</translation>
-    </message>
-    <message>
         <source>Do not Save Messages</source>
         <translation>Не сохранять сообщения</translation>
     </message>
@@ -613,6 +605,14 @@
     <message>
         <source>Failed to load conversation</source>
         <translation>Не удалось загрузить разговор</translation>
+    </message>
+    <message>
+        <source>Save Messages with Formatting</source>
+        <translation>Сохранять сообщения с форматированием</translation>
+    </message>
+    <message>
+        <source>Save Only Messages Text</source>
+        <translation>Сохранять только текст сообщений</translation>
     </message>
 </context>
 </TS>

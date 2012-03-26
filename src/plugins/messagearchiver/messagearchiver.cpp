@@ -1571,7 +1571,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringLis
 
 		Action *fullSaveAction = new Action(menu);
 		fullSaveAction->setCheckable(true);
-		fullSaveAction->setText(tr("Save Messages with Extensions"));
+		fullSaveAction->setText(tr("Save Messages with Formatting"));
 		fullSaveAction->setData(ADR_STREAM_JID,AStreamJid.full());
 		fullSaveAction->setData(ADR_CONTACT_JID,AContacts);
 		fullSaveAction->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_MESSAGE);
@@ -1581,7 +1581,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringLis
 
 		Action *bodySaveAction = new Action(menu);
 		bodySaveAction->setCheckable(true);
-		bodySaveAction->setText(tr("Save Only Messages Body"));
+		bodySaveAction->setText(tr("Save Only Messages Text"));
 		bodySaveAction->setData(ADR_STREAM_JID,AStreamJid.full());
 		bodySaveAction->setData(ADR_CONTACT_JID,AContacts);
 		bodySaveAction->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_BODY);

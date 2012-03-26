@@ -255,8 +255,8 @@ ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Ji
 	ui.cmbMethodManual->addItem(tr("Yes, if other replication method is not used"),ARCHIVE_METHOD_CONCEDE);
 	ui.cmbMethodManual->addItem(tr("No, do not copy local archive to the server"),ARCHIVE_METHOD_FORBID);
 
-	ui.cmbModeSave->addItem(tr("Save messages with extensions"),ARCHIVE_SAVE_MESSAGE);
-	ui.cmbModeSave->addItem(tr("Save only messages body"),ARCHIVE_SAVE_BODY);
+	ui.cmbModeSave->addItem(tr("Save messages with formatting"),ARCHIVE_SAVE_MESSAGE);
+	ui.cmbModeSave->addItem(tr("Save only messages text"),ARCHIVE_SAVE_BODY);
 	ui.cmbModeSave->addItem(tr("Do not save messages"),ARCHIVE_SAVE_FALSE);
 
 	ui.cmbModeOTR->addItem(tr("Allow Off-The-Record sessions"),ARCHIVE_OTR_CONCEDE);
