@@ -3,7 +3,6 @@
 
 #include <QTimer>
 #include <QMainWindow>
-#include <QPushButton>
 #include <definitions/optionvalues.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>

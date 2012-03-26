@@ -1,5 +1,6 @@
 #include "tabwindow.h"
 
+#include <QToolButton>
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSignalMapper>
@@ -27,15 +28,17 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->removeTab(0);
 	ui.twtTabs->setMovable(true);
 	ui.twtTabs->setDocumentMode(true);
+	ui.twtTabs->setUsesScrollButtons(true);
 
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),
 		SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
 
-	QPushButton *menuButton = new QPushButton(ui.twtTabs);
+	QToolButton *menuButton = new QToolButton(ui.twtTabs);
+	menuButton->setAutoRaise(true);
+	menuButton->setPopupMode(QToolButton::InstantPopup);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(menuButton,MNI_MESSAGEWIDGETS_TAB_MENU);
-	menuButton->setFlat(true);
 
 	FWindowMenu = new Menu(menuButton);
 	menuButton->setMenu(FWindowMenu);
