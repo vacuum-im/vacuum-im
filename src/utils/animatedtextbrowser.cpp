@@ -1,9 +1,12 @@
 #include "animatedtextbrowser.h"
 
 #include <QBuffer>
+#include <QPointF>
+#include <QScrollBar>
 #include <QTextBlock>
 #include <QTextLayout>
 #include <QNetworkReply>
+#include <QAbstractTextDocumentLayout>
 
 AnimatedTextBrowser::AnimatedTextBrowser(QWidget *AParent) : QTextBrowser(AParent)
 {
@@ -16,7 +19,7 @@ AnimatedTextBrowser::AnimatedTextBrowser(QWidget *AParent) : QTextBrowser(AParen
 	connect(document(),SIGNAL(contentsChange(int, int, int)),SLOT(onDocumentContentsChanged(int,int,int)));
 }
 
-bool AnimatedTextBrowser::isAnimated()
+bool AnimatedTextBrowser::isAnimated() const
 {
 	return FAnimated;
 }
@@ -47,10 +50,24 @@ void AnimatedTextBrowser::setNetworkAccessManager(QNetworkAccessManager *ANetwor
 	FNetworkAccessManager=ANetworkAccessManager;
 }
 
+QPair<int,int> AnimatedTextBrowser::visiblePositionBoundary() const
+{
+	QWidget *scrollViewport = viewport();
+	QScrollBar *scrollBar = verticalScrollBar();
+	QAbstractTextDocumentLayout *docLayout = document()->documentLayout();
+
+	QPointF startPoint(0,scrollBar->value());
+	QPointF endPoint(scrollViewport->size().width(),scrollBar->value()+scrollViewport->size().height());
+
+	int startPos = docLayout->hitTest(startPoint,Qt::FuzzyHit);
+	int endPos = docLayout->hitTest(endPoint,Qt::FuzzyHit);
+
+	return QPair<int,int>(startPos,endPos);
+}
+
 QList<int> AnimatedTextBrowser::findUrlPositions(const QUrl &AName) const
 {
 	QList<int> positions;
-
 	QTextBlock block = document()->firstBlock();
 	while (block.isValid())
 	{
@@ -65,13 +82,12 @@ QList<int> AnimatedTextBrowser::findUrlPositions(const QUrl &AName) const
 		}
 		block = block.next();
 	}
-
 	return positions;
 }
 
 QPixmap AnimatedTextBrowser::addAnimation(const QUrl &AName, const QVariant &AImageData)
 {
-	QMovie *movie = FUrls.key(AName);
+	QMovie *movie = FUrlMovies.value(AName);
 	if (movie == NULL)
 	{
 		switch (AImageData.type())
@@ -97,6 +113,7 @@ QPixmap AnimatedTextBrowser::addAnimation(const QUrl &AName, const QVariant &AIm
 		if (movie != NULL)
 		{
 			FUrls.insert(movie, AName);
+			FUrlMovies.insert(AName,movie);
 			FUrlPositions.insert(movie,findUrlPositions(AName));
 			connect(movie,SIGNAL(frameChanged(int)),SLOT(onAnimationFrameChanged()));
 			connect(movie,SIGNAL(destroyed(QObject *)),SLOT(onMovieDestroyed(QObject *)));
@@ -104,10 +121,6 @@ QPixmap AnimatedTextBrowser::addAnimation(const QUrl &AName, const QVariant &AIm
 			movie->start();
 			movie->setPaused(!FAnimated);
 		}
-	}
-	else
-	{
-		FUrlPositions[movie] = findUrlPositions(AName);
 	}
 	return movie!=NULL ? movie->currentPixmap() : QPixmap();
 }
@@ -183,10 +196,12 @@ void AnimatedTextBrowser::onUpdateDocumentAnimation()
 #endif
 		if (timeout >= minUpdateTimeout)
 		{
-			QList<int> dirtyBlocks;
 			document()->blockSignals(true);
 			QTextCursor cursor(document());
 			cursor.beginEditBlock();
+
+			QList<int> dirtyBlocks;
+			QPair<int,int> posBoundary = visiblePositionBoundary();
 			foreach(QMovie *movie, FChangedMovies)
 			{
 				QUrl url = FUrls.value(movie);
@@ -194,17 +209,21 @@ void AnimatedTextBrowser::onUpdateDocumentAnimation()
 
 				foreach(int pos, FUrlPositions.value(movie))
 				{
-					cursor.setPosition(pos);
-					int block = document()->findBlock(pos).blockNumber();
-					if (!dirtyBlocks.contains(block))
+					if (posBoundary.first<=pos && pos<=posBoundary.second)
 					{
-						cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
-						cursor.insertImage(cursor.charFormat().toImageFormat());
-						dirtyBlocks.append(block);
+						cursor.setPosition(pos);
+						int block = document()->findBlock(pos).blockNumber();
+						if (!dirtyBlocks.contains(block))
+						{
+							cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+							cursor.insertImage(cursor.charFormat().toImageFormat());
+							dirtyBlocks.append(block);
+						}
 					}
 				}
 				emit resourceUpdated(url);
 			}
+
 			cursor.endEditBlock();
 			document()->blockSignals(false);
 
@@ -224,13 +243,16 @@ void AnimatedTextBrowser::onMovieDestroyed(QObject *AObject)
 	if (movie)
 	{
 		FChangedMovies -= movie;
-		FUrls.remove(movie);
+		QUrl url = FUrls.take(movie);
+		FUrlMovies.remove(url);
 		FUrlPositions.remove(movie);
+		document()->addResource(QTextDocument::ImageResource, url, QVariant());
 	}
 }
 
 void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved, int AAdded)
 {
+	// Remove old animation records and correct others
 	for(QHash<QMovie *, QList<int> >::iterator it=FUrlPositions.begin(); it!=FUrlPositions.end(); it++)
 	{
 		QList<int> &positions = it.value();
@@ -240,10 +262,41 @@ void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved,
 			if (pos >= APosition)
 			{
 				if (pos < APosition+ARemoved)
-					positions.removeAt(i--);            // Position was removed // TODO: Destroy movie if positions is empty
+					positions.removeAt(i--);            // Position was removed
 				else
 					positions[i] += AAdded-ARemoved;    // Updating image position
 			}
+		}
+	}
+
+	// Insert new positions for known animations
+	if (AAdded > 0)
+	{
+		QTextBlock block = document()->findBlock(APosition);
+		while (block.isValid())
+		{
+			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+			{
+				QTextFragment fragment = it.fragment();
+				int fragmentPos = fragment.position();
+				if (fragmentPos>=APosition && fragmentPos<APosition+AAdded && fragment.charFormat().isImageFormat())
+				{
+					QMovie *movie = FUrlMovies.value(fragment.charFormat().toImageFormat().name());
+					if (movie)
+						FUrlPositions[movie].append(fragmentPos);
+				}
+			}
+			block = block.next();
+		}
+	}
+
+	// Remove empty animation objects
+	if (ARemoved > 0)
+	{
+		for(QHash<QMovie *, QList<int> >::const_iterator it=FUrlPositions.constBegin(); it!=FUrlPositions.constEnd(); it++)
+		{
+			if (it->isEmpty())
+				it.key()->deleteLater();
 		}
 	}
 }
