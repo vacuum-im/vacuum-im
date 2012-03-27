@@ -300,3 +300,10 @@ void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved,
 		}
 	}
 }
+
+#if QT_VERSION < 0x040700
+uint qHash(const QUrl &key)
+{
+	return qHash(key.toEncoded((QUrl::FormattingOptions)0x100));
+}
+#endif
