@@ -1,8 +1,13 @@
 #!/bin/bash
 
 #
-# Author Oleg A Deordiev
-# Version 1.01
+# Author for slack package script Oleg A Deordiev
+# If you find error in my script please contact with my.
+# Facebook - facebook.com/streamthreader
+# Vk.com   - vk.com/systemroot
+# Mail     - kvantarium@gmail.com
+# Skype    - StreamThreader
+# Jabber   - streamthreader@jabber.ru
 #
 
 arche=$HOSTTYPE
@@ -81,7 +86,7 @@ cpucore="$(cat /proc/cpuinfo | grep -m 1 "cpu cores" | awk -F": " '{print $2}')"
 # Check CPU function
 if [ "$cpucore" == "" ]
 then
-	echo "Failed to get CPU number"
+	echo "Failed to get CPU number, maybe have only 1 core"
 	echo "Set CPU number to 1"
 	cpucore=1
 fi
@@ -92,6 +97,9 @@ echo "Make program in "$cpucore" CPU"
 if ! make -j "$cpucore" > /dev/null 2>&1
 then
 	echo "Erorr - make"
+	echo "Make a log file, please wait..."
+	make -j "$cpucore" > ./makefile.log 2>&1
+	tail ./makefile.log
 	exit 1
 fi
 
@@ -140,4 +148,3 @@ rm -rf "$instldir"
 echo "Clean"
 
 exit 0
-
