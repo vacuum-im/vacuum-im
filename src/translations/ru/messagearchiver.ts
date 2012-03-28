@@ -412,6 +412,26 @@
         <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
         <translation>Разговор с %1 начат в &lt;b&gt;%2&lt;/b&gt;.</translation>
     </message>
+    <message>
+        <source>Load earlier messages</source>
+        <translation>Загрузить более ранние сообщения</translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Date group name</comment>
+        <translatorcomment>Наименование группы даты</translatorcomment>
+        <translation>MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>dd MMM, dddd</source>
+        <comment>Conversation name</comment>
+        <translatorcomment>Наименование разговора</translatorcomment>
+        <translation>dd MMM, dddd</translation>
+    </message>
+    <message>
+        <source>Show history for this contact</source>
+        <translation>Показать историю для этого контакта</translation>
+    </message>
 </context>
 <context>
     <name>ChatWindowMenu</name>

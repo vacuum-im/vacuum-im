@@ -1,5 +1,7 @@
 #include "archiveviewwindow.h"
 
+#include <QtDebug>
+
 #include <QLocale>
 #include <QMessageBox>
 #include <QItemSelectionModel>
@@ -7,12 +9,14 @@
 
 enum HistoryItemType {
 	HIT_CONTACT,
+	HIT_DATEGROUP,
 	HIT_HEADER
 };
 
 enum HistoryDataRoles {
 	HDR_TYPE                = Qt::UserRole+1,
 	HDR_CONTACT_JID,
+	HDR_DATEGROUP_DATE,
 	HDR_HEADER_WITH,
 	HDR_HEADER_START,
 	HDR_HEADER_SUBJECT,
@@ -29,6 +33,7 @@ enum HistoryDataRoles {
 #define TEXT_SEARCH_TIMEOUT          500
 
 #define MAX_HILIGHT_ITEMS            10
+#define LOAD_EARLIER_COUNT           100
 
 SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
@@ -55,20 +60,20 @@ bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent
 {
 	QModelIndex index = sourceModel()->index(ARow,0,AParent);
 	int indexType = index.data(HDR_TYPE).toInt();
-	if (indexType == HIT_CONTACT)
-	{
-		for (int i=0; i<sourceModel()->rowCount(index);i++)
-			if (filterAcceptsRow(i,index))
-				return true;
-		return false;
-	}
-	else if (indexType == HIT_HEADER)
+	if (indexType == HIT_HEADER)
 	{
 		if (FStart.isValid() && FEnd.isValid())
 		{
 			QDateTime date = index.data(HDR_HEADER_START).toDateTime();
 			return FStart<=date && date<=FEnd;
 		}
+	}
+	else
+	{
+		for (int i=0; i<sourceModel()->rowCount(index);i++)
+			if (filterAcceptsRow(i,index))
+				return true;
+		return false;
 	}
 	return QSortFilterProxyModel::filterAcceptsRow(ARow,AParent);
 }
@@ -89,6 +94,12 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 				rightDisplay = rightDisplay.toLower();
 			}
 			return QString::localeAwareCompare(leftDisplay,rightDisplay) < 0;
+		}
+		else if (leftType == HIT_DATEGROUP)
+		{
+			QDate leftDate = ALeft.data(HDR_DATEGROUP_DATE).toDate();
+			QDate rightDate = ARight.data(HDR_DATEGROUP_DATE).toDate();
+			return leftDate >= rightDate;
 		}
 		else if (leftType == HIT_HEADER)
 		{
@@ -138,6 +149,8 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	connect(ui.trvHeaders->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
 		SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 	connect(ui.trvHeaders,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onHeaderContextMenuRequested(const QPoint &)));
+	
+	connect(ui.pbtLoadEarlierMessages,SIGNAL(clicked()),SLOT(onLoadEarlierMessageClicked()));
 	connect(ui.spwSelectPage,SIGNAL(currentPageChanged(int, int)),SLOT(onCurrentPageChanged(int, int)));
 
 	FHeadersRequestTimer.setSingleShot(true);
@@ -191,8 +204,6 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 		ui.sprSplitter->setSizes(QList<int>() << 50 << 150);
 	restoreState(Options::fileValue("history.archiveview.state").toByteArray());
 	
-	onCurrentPageChanged(ui.spwSelectPage->yearShown(),ui.spwSelectPage->monthShown());
-
 	reset();
 }
 
@@ -263,16 +274,24 @@ void ArchiveViewWindow::reset()
 	FCollectionsRequests.clear();
 
 	FModel->clear();
-	FContactModelItems.clear();
+	FProxyModel->setVisibleInterval(QDateTime(),QDateTime());
 
 	FLoadedPages.clear();
 	FCollections.clear();
 	FCurrentHeaders.clear();
 
 	if (FContactJid.isEmpty())
+	{
+		ui.spwSelectPage->setVisible(true);
+		ui.pbtLoadEarlierMessages->setVisible(false);
 		setWindowTitle(tr("Conversation history - %1").arg(streamJid().bare()));
+	}
 	else
+	{
+		ui.spwSelectPage->setVisible(false);
+		ui.pbtLoadEarlierMessages->setVisible(true);
 		setWindowTitle(tr("Conversation history with %1 - %2").arg(contactName(FContactJid),streamJid().bare()));
+	}
 
 	clearMessages();
 	setPageStatus(RequestStarted);
@@ -288,32 +307,62 @@ QString ArchiveViewWindow::contactName(const Jid &AContactJid, bool AShowResourc
 	return name;
 }
 
-QStandardItem *ArchiveViewWindow::createContactItem(const Jid &AContactJid)
+QStandardItem *ArchiveViewWindow::createContactItem(const Jid &AContactJid, QStandardItem *AParent)
 {
-	bool privateChat = isConferencePrivateChat(AContactJid);
-	Jid itemJid = privateChat ? AContactJid : AContactJid.bare();
-	
-	QStandardItem *item = FContactModelItems.value(itemJid);
+	QStandardItem *item = findItem(HIT_CONTACT,HDR_CONTACT_JID,AContactJid.pFull(),AParent);
 	if (item == NULL)
 	{
-		item = new QStandardItem(!privateChat ? contactName(itemJid) : itemJid.resource());
+		item = new QStandardItem();
 		item->setData(HIT_CONTACT,HDR_TYPE);
-		item->setData(itemJid.full(),HDR_CONTACT_JID);
-		item->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(itemJid,IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon());
-		FContactModelItems.insert(itemJid,item);
+		item->setData(AContactJid.pFull(),HDR_CONTACT_JID);
+		item->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AContactJid,IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon());
+		AParent->appendRow(item);
+	}
+	return item;
+}
 
-		QStandardItem *parentItem = privateChat ? createContactItem(itemJid.bare()) : NULL;
-		if (parentItem)
-			parentItem->appendRow(item);
-		else
-			FModel->appendRow(item);
+QStandardItem *ArchiveViewWindow::createDateGroupItem(const QDateTime &ADateTime, QStandardItem *AParent)
+{
+	QDate date(ADateTime.date().year(),ADateTime.date().month(),1);
+	QStandardItem *item = findItem(HIT_DATEGROUP,HDR_DATEGROUP_DATE,date,AParent);
+	if (item == NULL)
+	{
+		item = new QStandardItem(date.toString(tr("MMMM yyyy","Date group name")));
+		item->setData(HIT_DATEGROUP,HDR_TYPE);
+		item->setData(date,HDR_DATEGROUP_DATE);
+		item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_DATE));
+		AParent->appendRow(item);
+	}
+	return item;
+}
+
+QStandardItem *ArchiveViewWindow::createParentItem(const IArchiveHeader &AHeader)
+{
+	QStandardItem *item = NULL;
+	if (FContactJid.isEmpty())
+	{
+		item = createContactItem(AHeader.with.bare(),FModel->invisibleRootItem());
+		item->setText(contactName(AHeader.with));
+	}
+	else
+	{
+		item = createDateGroupItem(AHeader.start,FModel->invisibleRootItem());
+		item->setData(AHeader.with.pBare(),HDR_CONTACT_JID);
+	}
+
+	if (FContactJid!=AHeader.with && isConferencePrivateChat(AHeader.with))
+	{
+		QStandardItem *privateItem = createContactItem(AHeader.with,item);
+		privateItem->setText(AHeader.with.resource());
+		privateItem->setData(item->data(HDR_DATEGROUP_DATE),HDR_DATEGROUP_DATE);
+		item = privateItem;
 	}
 	return item;
 }
 
 QStandardItem *ArchiveViewWindow::createHeaderItem(const IArchiveHeader &AHeader)
 {
-	QStandardItem *item = new QStandardItem(AHeader.start.toString());
+	QStandardItem *item = new QStandardItem(AHeader.start.toString(tr("dd MMM, dddd","Conversation name")));
 	item->setData(HIT_HEADER,HDR_TYPE);
 	item->setData(AHeader.with.pFull(),HDR_HEADER_WITH);
 	item->setData(AHeader.start,HDR_HEADER_START);
@@ -327,8 +376,11 @@ QStandardItem *ArchiveViewWindow::createHeaderItem(const IArchiveHeader &AHeader
 		itemToolTip += "<hr>" + Qt::escape(AHeader.subject);
 	item->setToolTip(itemToolTip);
 
-	QStandardItem *parentItem = createContactItem(AHeader.with);
-	parentItem->appendRow(item);
+	QStandardItem *parentItem = createParentItem(AHeader);
+	if (parentItem)
+		parentItem->appendRow(item);
+	else
+		FModel->appendRow(item);
 
 	FProxyModel->startInvalidate();
 
@@ -361,11 +413,23 @@ bool ArchiveViewWindow::isJidMatched(const Jid &ARequested, const Jid &AHeaderJi
 	return true;
 }
 
+QStandardItem *ArchiveViewWindow::findItem(int AType, int ARole, const QVariant &AValue, QStandardItem *AParent) const
+{
+	QStandardItem *parent = AParent!=NULL ? AParent : FModel->invisibleRootItem();
+	for (int row=0; row<parent->rowCount(); row++)
+	{
+		QStandardItem *item = parent->child(row);
+		if (item->data(HDR_TYPE)==AType && item->data(ARole)==AValue)
+			return item;
+	}
+	return NULL;
+}
+
 QList<QStandardItem *> ArchiveViewWindow::findHeaderItems(const IArchiveRequest &ARequest, QStandardItem *AParent) const
 {
 	QList<QStandardItem *> items;
 	QStandardItem *parent = AParent!=NULL ? AParent : FModel->invisibleRootItem();
-	for (int row = 0; row<parent->rowCount() ; row++)
+	for (int row=0; row<parent->rowCount(); row++)
 	{
 		QStandardItem *item = parent->child(row);
 		if (item->data(HDR_TYPE) == HIT_HEADER)
@@ -406,6 +470,7 @@ void ArchiveViewWindow::setPageStatus(RequestStatus AStatus, const QString &AMes
 	ui.trvHeaders->setEnabled(AStatus == RequestFinished);
 	ui.wdtArchiveSearch->setEnabled(AStatus == RequestFinished);
 	ui.pbtHeadersUpdate->setEnabled(AStatus != RequestStarted);
+	ui.pbtLoadEarlierMessages->setEnabled(AStatus != RequestStarted);
 
 	if (AStatus == RequestFinished)
 	{
@@ -773,22 +838,50 @@ void ArchiveViewWindow::onHeadersUpdateButtonClicked()
 
 void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 {
-	QDate start = currentPage();
-	QDate end = start.addMonths(1);
-	if (!FLoadedPages.contains(start))
+	if (FContactJid.isEmpty())
+	{
+		QDate start = currentPage();
+		QDate end = start.addMonths(1);
+		if (!FLoadedPages.contains(start))
+		{
+			IArchiveRequest request;
+			request.with = isConferencePrivateChat(FContactJid) ? FContactJid : FContactJid.bare();
+			request.exactmatch = request.with.node().isEmpty();
+			request.start = QDateTime(start);
+			request.end = QDateTime(end);
+			request.text = searchString();
+
+			if (updateHeaders(request))
+				FLoadedPages.append(start);
+			else
+				setPageStatus(RequestError,tr("Archive is not accessible"));
+		}
+	}
+	else if (FHeadersRequests.isEmpty())
 	{
 		IArchiveRequest request;
-		request.with = contactJid().bare();
+		request.with = isConferencePrivateChat(FContactJid) ? FContactJid : FContactJid.bare();
 		request.exactmatch = request.with.node().isEmpty();
-		request.start = QDateTime(start);
-		request.end = QDateTime(end);
+		request.maxItems = LOAD_EARLIER_COUNT;
+		request.order = Qt::DescendingOrder;
 		request.text = searchString();
 
-		if (updateHeaders(request))
-			FLoadedPages.append(start);
-		else
+		QMap<IArchiveHeader,IArchiveCollection>::const_iterator it = FCollections.constBegin();
+		request.end = it!=FCollections.constEnd() ? it.key().start.addMSecs(-1) : QDateTime();
+
+		if (!updateHeaders(request))
 			setPageStatus(RequestError,tr("Archive is not accessible"));
 	}
+	else
+	{
+		setPageStatus(RequestFinished);
+	}
+}
+
+void ArchiveViewWindow::onLoadEarlierMessageClicked()
+{
+	FHeadersRequestTimer.start(0);
+	setPageStatus(RequestStarted);
 }
 
 void ArchiveViewWindow::onCurrentPageChanged(int AYear, int AMonth)
@@ -823,7 +916,13 @@ void ArchiveViewWindow::onCollectionsRequestTimerTimeout()
 	QModelIndex index = ui.trvHeaders->selectionModel()->currentIndex();
 	if (index.isValid())
 	{
-		if (index.data(HDR_TYPE).toInt() == HIT_CONTACT)
+		if(index.data(HDR_TYPE).toInt() == HIT_HEADER)
+		{
+			IArchiveHeader header = modelIndexHeader(index);
+			if (header.with.isValid() && header.start.isValid())
+				FCurrentHeaders.append(header);
+		}
+		else
 		{
 			int rows = index.model()->rowCount(index);
 			for (int row=0; row<rows; row++)
@@ -833,13 +932,6 @@ void ArchiveViewWindow::onCollectionsRequestTimerTimeout()
 					FCurrentHeaders.append(header);
 			}
 		}
-		else if(index.data(HDR_TYPE).toInt() == HIT_HEADER)
-		{
-			IArchiveHeader header = modelIndexHeader(index);
-			if (header.with.isValid() && header.start.isValid())
-				FCurrentHeaders.append(header);
-		}
-
 		qSort(FCurrentHeaders);
 		processCollectionsLoad();
 	}
@@ -982,6 +1074,15 @@ void ArchiveViewWindow::onTextSearchTextChanged(const QString &AText)
 	FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 }
 
+void ArchiveViewWindow::onSetContactJidByAction()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		setContactJid(action->data(ADR_HEADER_WITH).toString());
+	}
+}
+
 void ArchiveViewWindow::onRemoveCollectionsByAction()
 {
 	Action *action = qobject_cast<Action *>(sender());
@@ -1040,21 +1141,30 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 		int itemType = item->data(HDR_TYPE).toInt();
 		if (itemType == HIT_CONTACT)
 		{
+			Action *setContact = new Action(menu);
+			setContact->setText(tr("Show history for this contact"));
+			setContact->setData(ADR_HEADER_WITH,item->data(HDR_CONTACT_JID));
+			connect(setContact,SIGNAL(triggered()),SLOT(onSetContactJidByAction()));
+			menu->addAction(setContact,AG_DEFAULT);
+		}
+		if (itemType==HIT_CONTACT || itemType==HIT_DATEGROUP)
+		{
 			Action *removeAll = new Action(menu);
 			removeAll->setText(tr("Remove all History"));
 			removeAll->setData(ADR_HEADER_WITH,item->data(HDR_CONTACT_JID));
 			connect(removeAll,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
-			menu->addAction(removeAll);
+			menu->addAction(removeAll,AG_DEFAULT+500);
 
 			Action *removePage = new Action(menu);
-			removePage->setText(tr("Remove History for %1 %2").arg(QLocale().monthName(ui.spwSelectPage->monthShown())).arg(ui.spwSelectPage->yearShown()));
+			QDate date = FContactJid.isEmpty() ? currentPage() : item->data(HDR_DATEGROUP_DATE).toDate();
+			removePage->setText(tr("Remove History for %1 %2").arg(QLocale().monthName(date.month())).arg(date.year()));
 			removePage->setData(ADR_HEADER_WITH,item->data(HDR_CONTACT_JID));
-			removePage->setData(ADR_HEADER_START,QDateTime(currentPage()));
-			removePage->setData(ADR_HEADER_END,QDateTime(currentPage()).addMonths(1));
+			removePage->setData(ADR_HEADER_START,QDateTime(date));
+			removePage->setData(ADR_HEADER_END,QDateTime(date).addMonths(1));
 			connect(removePage,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
-			menu->addAction(removePage);
+			menu->addAction(removePage,AG_DEFAULT+500);
 		}
-		else if (itemType == HIT_HEADER)
+		if (itemType == HIT_HEADER)
 		{
 			Action *removeHeader = new Action(menu);
 			removeHeader->setText(tr("Remove this Conversation"));
@@ -1072,8 +1182,17 @@ void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString
 	if (FHeadersRequests.contains(AId))
 	{
 		QDate start = FHeadersRequests.take(AId);
-		if (currentPage() == start)
+		if (FContactJid.isEmpty())
+		{
+			if (currentPage() == start)
+				setPageStatus(RequestError, AError);
+		}
+		else
+		{
+			FHeadersRequests.clear();
 			setPageStatus(RequestError, AError);
+			ui.pbtLoadEarlierMessages->setEnabled(true);
+		}
 		FLoadedPages.removeAll(start);
 	}
 	else if (FCollectionsRequests.contains(AId))
@@ -1108,9 +1227,15 @@ void ArchiveViewWindow::onArchiveHeadersLoaded(const QString &AId, const QList<I
 				createHeaderItem(collection.header);
 			}
 		}
-		if (currentPage() == start)
+		if (FContactJid.isEmpty())
+		{
+			if (currentPage() == start)
+				setPageStatus(RequestFinished);
+		}
+		else if (FHeadersRequests.isEmpty())
 		{
 			setPageStatus(RequestFinished);
+			ui.pbtLoadEarlierMessages->setEnabled(AHeaders.count()>=LOAD_EARLIER_COUNT);
 		}
 	}
 }
