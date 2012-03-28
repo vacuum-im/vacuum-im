@@ -407,6 +407,24 @@
         <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Load earlier messages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Date group name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMM, dddd</source>
+        <comment>Conversation name</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show history for this contact</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChatWindowMenu</name>

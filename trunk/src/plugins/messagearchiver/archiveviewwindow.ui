@@ -45,6 +45,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="pbtLoadEarlierMessages">
+          <property name="text">
+           <string>Load earlier messages</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QWidget" name="wdtArchiveSearch" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="margin">
@@ -242,7 +249,11 @@
  </customwidgets>
  <tabstops>
   <tabstop>spwSelectPage</tabstop>
+  <tabstop>pbtLoadEarlierMessages</tabstop>
+  <tabstop>lneArchiveSearch</tabstop>
+  <tabstop>tlbArchiveSearchUpdate</tabstop>
   <tabstop>trvHeaders</tabstop>
+  <tabstop>pbtHeadersUpdate</tabstop>
   <tabstop>tbrMessages</tabstop>
   <tabstop>lneTextSearch</tabstop>
   <tabstop>tlbTextSearchNext</tabstop>

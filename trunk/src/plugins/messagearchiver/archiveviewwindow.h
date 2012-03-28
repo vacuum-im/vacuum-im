@@ -72,11 +72,14 @@ protected:
 	void reset();
 protected:
 	QString contactName(const Jid &AContactJid, bool AShowResource = false) const;
-	QStandardItem *createContactItem(const Jid &AContactJid);
+	QStandardItem *createContactItem(const Jid &AContactJid, QStandardItem *AParent);
+	QStandardItem *createDateGroupItem(const QDateTime &ADateTime, QStandardItem *AParent);
+	QStandardItem *createParentItem(const IArchiveHeader &AHeader);
 	QStandardItem *createHeaderItem(const IArchiveHeader &AHeader);
 	IArchiveHeader modelIndexHeader(const QModelIndex &AIndex) const;
 	bool isConferencePrivateChat(const Jid &AContactJid) const;
 	bool isJidMatched(const Jid &ARequested, const Jid &AHeaderJid) const;
+	QStandardItem *findItem(int AType, int ARole, const QVariant &AValue, QStandardItem *AParent) const;
 	QList<QStandardItem *> findHeaderItems(const IArchiveRequest &ARequest, QStandardItem *AParent = NULL) const;
 protected:
 	QDate currentPage() const;
@@ -96,6 +99,7 @@ protected:
 protected slots:
 	void onHeadersUpdateButtonClicked();
 	void onHeadersRequestTimerTimeout();
+	void onLoadEarlierMessageClicked();
 	void onCurrentPageChanged(int AYear, int AMonth);
 protected slots:
 	void onCollectionShowTimerTimeout();
@@ -112,6 +116,7 @@ protected slots:
 	void onTextSearchCaseSensitivityChanged();
 	void onTextSearchTextChanged(const QString &AText);
 protected slots:
+	void onSetContactJidByAction();
 	void onRemoveCollectionsByAction();
 	void onHeaderContextMenuRequested(const QPoint &APos);
 protected slots:
@@ -133,7 +138,6 @@ private:
 	SortFilterProxyModel *FProxyModel;
 private:
 	Jid FContactJid;
-	QMap<Jid,QStandardItem *> FContactModelItems;
 	QMap<IArchiveHeader,IArchiveCollection> FCollections;
 private:
 	QString FSearchString;
