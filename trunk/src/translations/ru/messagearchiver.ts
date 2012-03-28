@@ -432,6 +432,20 @@
         <source>Show history for this contact</source>
         <translation>Показать историю для этого контакта</translation>
     </message>
+    <message>
+        <source>All messages loaded</source>
+        <translation>Все сообщения загружены</translation>
+    </message>
+    <message>
+        <source>Load message earlier %1</source>
+        <translation>Загрузить сообщения ранее %1</translation>
+    </message>
+    <message>
+        <source>dd MMM yyyy</source>
+        <comment>Load messages earlier date</comment>
+        <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
+        <translation>dd MMM yyyy</translation>
+    </message>
 </context>
 <context>
     <name>ChatWindowMenu</name>

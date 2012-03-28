@@ -1,7 +1,5 @@
 #include "archiveviewwindow.h"
 
-#include <QtDebug>
-
 #include <QLocale>
 #include <QMessageBox>
 #include <QItemSelectionModel>
@@ -290,6 +288,7 @@ void ArchiveViewWindow::reset()
 	{
 		ui.spwSelectPage->setVisible(false);
 		ui.pbtLoadEarlierMessages->setVisible(true);
+		ui.pbtLoadEarlierMessages->setText(tr("Load earlier messages"));
 		setWindowTitle(tr("Conversation history with %1 - %2").arg(contactName(FContactJid),streamJid().bare()));
 	}
 
@@ -1191,7 +1190,6 @@ void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString
 		{
 			FHeadersRequests.clear();
 			setPageStatus(RequestError, AError);
-			ui.pbtLoadEarlierMessages->setEnabled(true);
 		}
 		FLoadedPages.removeAll(start);
 	}
@@ -1235,7 +1233,18 @@ void ArchiveViewWindow::onArchiveHeadersLoaded(const QString &AId, const QList<I
 		else if (FHeadersRequests.isEmpty())
 		{
 			setPageStatus(RequestFinished);
-			ui.pbtLoadEarlierMessages->setEnabled(AHeaders.count()>=LOAD_EARLIER_COUNT);
+			if (AHeaders.count() >= LOAD_EARLIER_COUNT)
+			{
+				ui.pbtLoadEarlierMessages->setEnabled(true);
+				QMap<IArchiveHeader,IArchiveCollection>::const_iterator it = FCollections.constBegin();
+				QDateTime before = it!=FCollections.constEnd() ? it.key().start.addMSecs(-1) : QDateTime::currentDateTime();
+				ui.pbtLoadEarlierMessages->setText(tr("Load message earlier %1").arg(before.toString(tr("dd MMM yyyy","Load messages earlier date"))));
+			}
+			else
+			{
+				ui.pbtLoadEarlierMessages->setEnabled(false);
+				ui.pbtLoadEarlierMessages->setText(tr("All messages loaded"));
+			}
 		}
 	}
 }
