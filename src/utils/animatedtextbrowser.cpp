@@ -11,11 +11,14 @@
 AnimatedTextBrowser::AnimatedTextBrowser(QWidget *AParent) : QTextBrowser(AParent)
 {
 	FAnimated = false;
+	FBoundaryChanged = true;
 	FNetworkAccessManager = NULL;
 
 	FUpdateTimer.setSingleShot(true);
 	connect(&FUpdateTimer,SIGNAL(timeout()),SLOT(onUpdateDocumentAnimation()));
 
+	connect(verticalScrollBar(),SIGNAL(valueChanged(int)),SLOT(onVerticalScrollBarChanged()));
+	connect(verticalScrollBar(),SIGNAL(rangeChanged(int,int)),SLOT(onVerticalScrollBarChanged()));
 	connect(document(),SIGNAL(contentsChange(int, int, int)),SLOT(onDocumentContentsChanged(int,int,int)));
 }
 
@@ -40,6 +43,26 @@ void AnimatedTextBrowser::setAnimated(bool AAnimated)
 	}
 }
 
+QPair<int,int> AnimatedTextBrowser::visiblePositionBoundary() const
+{
+	if (FBoundaryChanged)
+	{
+		QWidget *scrollViewport = viewport();
+		QScrollBar *scrollBar = verticalScrollBar();
+		QAbstractTextDocumentLayout *docLayout = document()->documentLayout();
+
+		QPointF startPoint(0,scrollBar->value());
+		QPointF endPoint(scrollViewport->size().width(),scrollBar->value()+scrollViewport->size().height());
+
+		int startPos = docLayout->hitTest(startPoint,Qt::FuzzyHit);
+		int endPos = docLayout->hitTest(endPoint,Qt::FuzzyHit);
+
+		FBoundaryChanged = false;
+		FBoundary = QPair<int,int>(startPos,endPos);
+	}
+	return FBoundary;
+}
+
 QNetworkAccessManager *AnimatedTextBrowser::networkAccessManager() const
 {
 	return FNetworkAccessManager;
@@ -48,21 +71,6 @@ QNetworkAccessManager *AnimatedTextBrowser::networkAccessManager() const
 void AnimatedTextBrowser::setNetworkAccessManager(QNetworkAccessManager *ANetworkAccessManager)
 {
 	FNetworkAccessManager=ANetworkAccessManager;
-}
-
-QPair<int,int> AnimatedTextBrowser::visiblePositionBoundary() const
-{
-	QWidget *scrollViewport = viewport();
-	QScrollBar *scrollBar = verticalScrollBar();
-	QAbstractTextDocumentLayout *docLayout = document()->documentLayout();
-
-	QPointF startPoint(0,scrollBar->value());
-	QPointF endPoint(scrollViewport->size().width(),scrollBar->value()+scrollViewport->size().height());
-
-	int startPos = docLayout->hitTest(startPoint,Qt::FuzzyHit);
-	int endPos = docLayout->hitTest(endPoint,Qt::FuzzyHit);
-
-	return QPair<int,int>(startPos,endPos);
 }
 
 QList<int> AnimatedTextBrowser::findUrlPositions(const QUrl &AName) const
@@ -196,36 +204,53 @@ void AnimatedTextBrowser::onUpdateDocumentAnimation()
 #endif
 		if (timeout >= minUpdateTimeout)
 		{
-			document()->blockSignals(true);
-			QTextCursor cursor(document());
-			cursor.beginEditBlock();
-
 			QList<int> dirtyBlocks;
-			QPair<int,int> posBoundary = visiblePositionBoundary();
+			QList<int> updatePositions;
+			QList<QMovie *> updateMovies;
+			QPair<int,int> boundary = visiblePositionBoundary();
 			foreach(QMovie *movie, FChangedMovies)
 			{
-				QUrl url = FUrls.value(movie);
-				document()->addResource(QTextDocument::ImageResource, url, movie->currentPixmap());
-
+				bool updateMovie = false;
 				foreach(int pos, FUrlPositions.value(movie))
 				{
-					if (posBoundary.first<=pos && pos<=posBoundary.second)
+					if (boundary.first<=pos && pos<=boundary.second)
 					{
-						cursor.setPosition(pos);
 						int block = document()->findBlock(pos).blockNumber();
 						if (!dirtyBlocks.contains(block))
 						{
-							cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
-							cursor.insertImage(cursor.charFormat().toImageFormat());
+							updateMovie = true;
+							updatePositions.append(pos);
 							dirtyBlocks.append(block);
 						}
 					}
 				}
-				emit resourceUpdated(url);
+				if (updateMovie)
+				{
+					updateMovies.append(movie);
+				}
 			}
 
-			cursor.endEditBlock();
-			document()->blockSignals(false);
+			if (!updatePositions.isEmpty())
+			{
+				foreach(QMovie *movie, updateMovies)
+				{
+					QUrl url = FUrls.value(movie);
+					document()->addResource(QTextDocument::ImageResource, url, movie->currentPixmap());
+					emit resourceUpdated(url);
+				}
+
+				document()->blockSignals(true);
+				QTextCursor cursor(document());
+				cursor.beginEditBlock();
+				foreach(int pos, updatePositions)
+				{
+					cursor.setPosition(pos);
+					cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+					cursor.insertImage(cursor.charFormat().toImageFormat());
+				}
+				cursor.endEditBlock();
+				document()->blockSignals(false);
+			}
 
 			FChangedMovies.clear();
 			FLastUpdate = QDateTime::currentDateTime();
@@ -235,6 +260,12 @@ void AnimatedTextBrowser::onUpdateDocumentAnimation()
 			FUpdateTimer.start(minUpdateTimeout-timeout+1);
 		}
 	}
+}
+
+void AnimatedTextBrowser::onVerticalScrollBarChanged()
+{
+	FBoundaryChanged = true;
+	emit visiblePositionBoundaryChanged();
 }
 
 void AnimatedTextBrowser::onMovieDestroyed(QObject *AObject)
@@ -298,6 +329,11 @@ void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved,
 			if (it->isEmpty())
 				it.key()->deleteLater();
 		}
+	}
+
+	if (!FBoundaryChanged && FBoundary.second>=APosition)
+	{
+		onVerticalScrollBarChanged();
 	}
 }
 
