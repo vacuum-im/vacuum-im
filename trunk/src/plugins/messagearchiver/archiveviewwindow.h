@@ -105,7 +105,7 @@ protected slots:
 	void onArchiveSearchUpdate();
 	void onArchiveSearchChanged(const QString &AText);
 	void onTextHilightTimerTimeout();
-	void onTextVerticalScrollBarChanged();
+	void onTextVisiblePositionBoundaryChanged();
 	void onTextSearchTimerTimeout();
 	void onTextSearchNextClicked();
 	void onTextSearchPreviousClicked();

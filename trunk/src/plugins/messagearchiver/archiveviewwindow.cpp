@@ -1,12 +1,9 @@
 #include "archiveviewwindow.h"
 
-#include <QPointF>
 #include <QLocale>
-#include <QScrollBar>
 #include <QMessageBox>
 #include <QItemSelectionModel>
 #include <QNetworkAccessManager>
-#include <QAbstractTextDocumentLayout>
 
 enum HistoryItemType {
 	HIT_CONTACT,
@@ -125,6 +122,10 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	FProxyModel->setDynamicSortFilter(true);
 	FProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 
+	QFont messagesFont = ui.tbrMessages->font();
+	messagesFont.setPointSize(Options::node(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE).value().toInt());
+	ui.tbrMessages->setFont(messagesFont);
+
 	QPalette palette = ui.tbrMessages->palette();
 	palette.setColor(QPalette::Inactive,QPalette::Highlight,palette.color(QPalette::Active,QPalette::Highlight));
 	palette.setColor(QPalette::Inactive,QPalette::HighlightedText,palette.color(QPalette::Active,QPalette::HighlightedText));
@@ -153,8 +154,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 
 	FTextHilightTimer.setSingleShot(true);
 	connect(&FTextHilightTimer,SIGNAL(timeout()),SLOT(onTextHilightTimerTimeout()));
-	connect(ui.tbrMessages->verticalScrollBar(),SIGNAL(valueChanged(int)),SLOT(onTextVerticalScrollBarChanged()));
-	connect(ui.tbrMessages->verticalScrollBar(),SIGNAL(rangeChanged(int,int)),SLOT(onTextVerticalScrollBarChanged()));
+	connect(ui.tbrMessages,SIGNAL(visiblePositionBoundaryChanged()),SLOT(onTextVisiblePositionBoundaryChanged()));
 
 	ui.tlbTextSearchNext->setIcon(style()->standardIcon(QStyle::SP_ArrowDown, NULL, this));
 	ui.tlbTextSearchPrev->setIcon(style()->standardIcon(QStyle::SP_ArrowUp, NULL, this));
@@ -191,10 +191,6 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 		ui.sprSplitter->setSizes(QList<int>() << 50 << 150);
 	restoreState(Options::fileValue("history.archiveview.state").toByteArray());
 	
-	QFont messagesFont = ui.tbrMessages->font();
-	messagesFont.setPointSize(Options::node(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE).value().toInt());
-	ui.tbrMessages->setFont(messagesFont);
-
 	onCurrentPageChanged(ui.spwSelectPage->yearShown(),ui.spwSelectPage->monthShown());
 
 	reset();
@@ -875,18 +871,9 @@ void ArchiveViewWindow::onTextHilightTimerTimeout()
 {
 	if (FSearchResults.count() > MAX_HILIGHT_ITEMS)
 	{
-		QWidget *scrollViewport = ui.tbrMessages->viewport();
-		QScrollBar *scrollBar = ui.tbrMessages->verticalScrollBar();
-		QAbstractTextDocumentLayout *docLayout = ui.tbrMessages->document()->documentLayout();
-
-		QPointF startPoint(0,scrollBar->value());
-		QPointF endPoint(scrollViewport->size().width(),scrollBar->value()+scrollViewport->size().height());
-
-		int startPos = docLayout->hitTest(startPoint,Qt::FuzzyHit);
-		int endPos = docLayout->hitTest(endPoint,Qt::FuzzyHit);
-
 		QList<QTextEdit::ExtraSelection> selections;
-		for (QMap<int, QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(startPos); it!=FSearchResults.constEnd() && it.key()<endPos; it++)
+		QPair<int,int> boundary = ui.tbrMessages->visiblePositionBoundary();
+		for (QMap<int, QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(boundary.first); it!=FSearchResults.constEnd() && it.key()<boundary.second; it++)
 			selections.append(it.value());
 		ui.tbrMessages->setExtraSelections(selections);
 	}
@@ -896,7 +883,7 @@ void ArchiveViewWindow::onTextHilightTimerTimeout()
 	}
 }
 
-void ArchiveViewWindow::onTextVerticalScrollBarChanged()
+void ArchiveViewWindow::onTextVisiblePositionBoundaryChanged()
 {
 	FTextHilightTimer.start(0);
 }
