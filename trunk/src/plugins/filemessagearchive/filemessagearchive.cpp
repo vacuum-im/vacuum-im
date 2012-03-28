@@ -1,5 +1,11 @@
 #include "filemessagearchive.h"
 
+#include <QDir>
+#include <QStringRef>
+#include <QDirIterator>
+#include <QXmlStreamReader>
+#include "workingthread.h"
+
 #define ARCHIVE_DIR_NAME      "archive"
 #define COLLECTION_EXT        ".xml"
 #define LOG_FILE_NAME         "archive.dat"
@@ -10,13 +16,6 @@
 #define LOG_ACTION_CREATE     "C"
 #define LOG_ACTION_MODIFY     "M"
 #define LOG_ACTION_REMOVE     "R"
-
-#include <QDir>
-#include <QStringRef>
-#include <QDirIterator>
-#include <QXmlStreamReader>
-
-#include "workingthread.h"
 
 FileMessageArchive::FileMessageArchive()
 {
@@ -685,63 +684,68 @@ IArchiveHeader FileMessageArchive::makeHeader(const Jid &AItemJid, const Message
 
 bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IArchiveRequest &ARequest) const
 {
-	if (!ARequest.threadId.isEmpty() || !ARequest.text.isEmpty())
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
 	{
-		QFile file(AFileName);
-		if (file.open(QFile::ReadOnly))
-		{
-			Qt::CheckState textState = ARequest.text.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
-			Qt::CheckState threadState = ARequest.threadId.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
+		Qt::CheckState validCheck = Qt::PartiallyChecked;
+		Qt::CheckState textState = ARequest.text.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
+		Qt::CheckState threadState = ARequest.threadId.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
 
-			QStringList elemStack;
-			QXmlStreamReader reader(&file);
-			while (!reader.atEnd() && (textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
+		QStringList elemStack;
+		QXmlStreamReader reader(&file);
+		while (!reader.atEnd() && validCheck!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked && 
+			(validCheck==Qt::PartiallyChecked || textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
+		{
+			reader.readNext();
+			if (reader.isStartElement())
 			{
-				reader.readNext();
-				if (reader.isStartElement())
+				elemStack.append(reader.qualifiedName().toString());
+				QString elemPath = elemStack.join("/");
+				if (elemPath == "chat")
 				{
-					elemStack.append(reader.qualifiedName().toString());
-					QString elemPath = elemStack.join("/");
-					if (elemPath == "chat")
-					{
+					if (reader.attributes().value("with").isEmpty())
+						validCheck = Qt::Unchecked;
+					else if (reader.attributes().value("start").isEmpty())
+						validCheck = Qt::Unchecked;
+					else
+						validCheck = Qt::Checked;
+
 #if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
-						if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
-							textState = Qt::Checked;
+					if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
+						textState = Qt::Checked;
 #else
-						if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
-							textState = Qt::Checked;
+					if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
+						textState = Qt::Checked;
 #endif
-						if (reader.attributes().value("thread").compare(ARequest.threadId)==0)
-							threadState = Qt::Checked;
-						else if (threadState == Qt::PartiallyChecked)
-							threadState = Qt::Unchecked;
-					}
-				}
-				else if (reader.isCharacters())
-				{
-					QString elemPath = elemStack.join("/");
-					if (elemPath=="chat/to/body" || elemPath=="chat/from/body" || elemPath=="chat/note")
-					{
-#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
-						if (reader.text().contains(ARequest.text,Qt::CaseInsensitive))
-							textState = Qt::Checked;
-#else
-						if (reader.text().toString().contains(ARequest.text,Qt::CaseInsensitive))
-							textState = Qt::Checked;
-#endif
-					}
-				}
-				else if (reader.isEndElement())
-				{
-					elemStack.removeLast();
+					if (reader.attributes().value("thread").compare(ARequest.threadId)==0)
+						threadState = Qt::Checked;
+					else if (threadState == Qt::PartiallyChecked)
+						threadState = Qt::Unchecked;
 				}
 			}
-			file.close();
-			return textState==Qt::Checked && threadState==Qt::Checked;
+			else if (reader.isCharacters())
+			{
+				QString elemPath = elemStack.join("/");
+				if (elemPath=="chat/to/body" || elemPath=="chat/from/body" || elemPath=="chat/note")
+				{
+#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
+					if (reader.text().contains(ARequest.text,Qt::CaseInsensitive))
+						textState = Qt::Checked;
+#else
+					if (reader.text().toString().contains(ARequest.text,Qt::CaseInsensitive))
+						textState = Qt::Checked;
+#endif
+				}
+			}
+			else if (reader.isEndElement())
+			{
+				elemStack.removeLast();
+			}
 		}
-		return false;
+		file.close();
+		return validCheck==Qt::Checked && textState==Qt::Checked && threadState==Qt::Checked;
 	}
-	return true;
+	return false;
 }
 
 bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const
