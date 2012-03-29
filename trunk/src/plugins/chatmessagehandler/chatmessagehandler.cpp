@@ -3,7 +3,8 @@
 #include <QApplication>
 
 #define HISTORY_MESSAGES          10
-#define HISTORY_TIME_PAST         5
+#define HISTORY_TIME_DELTA        5
+#define HISTORY_DUBLICATE_DELTA   2*60
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
@@ -483,7 +484,7 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 		request.with = AWindow->contactJid().bare();
 		request.exactmatch = request.with.node().isEmpty();
 		request.order = Qt::DescendingOrder;
-		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) > HISTORY_TIME_PAST)
+		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) > HISTORY_TIME_DELTA)
 			request.start = wstatus.startTime.isValid() ? wstatus.startTime : wstatus.createTime;
 		else
 			request.maxItems = HISTORY_MESSAGES;
@@ -587,7 +588,7 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 	else
 		options.direction = IMessageContentOptions::DirectionOut;
 
-	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_PAST)
+	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
 		options.type |= IMessageContentOptions::TypeHistory;
 
 	fillContentOptions(AWindow,options);
@@ -738,17 +739,25 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 		IChatWindow *window = FHistoryRequests.take(AId);
 		setMessageStyle(window);
 
+		int messageItEnd = 0;
 		QList<Message> pendingMessages = FPendingMessages.take(window);
-		QDateTime lastTime = !pendingMessages.isEmpty() ? pendingMessages.first().dateTime().addSecs(-HISTORY_TIME_PAST) : QDateTime();
+		while (messageItEnd<pendingMessages.count() && messageItEnd<ABody.messages.count())
+		{
+			const Message &hmessage = ABody.messages.at(messageItEnd);
+			const Message &pmessage = pendingMessages.at(pendingMessages.count()-messageItEnd-1);
+			if (hmessage.body()==pmessage.body() && qAbs(hmessage.dateTime().secsTo(pmessage.dateTime()))<HISTORY_DUBLICATE_DELTA)
+				messageItEnd++;
+			else
+				break;
+		}
 
 		int messageIt = ABody.messages.count()-1;
 		QMultiMap<QDateTime,QString>::const_iterator noteIt = ABody.notes.constBegin();
-		while (messageIt>=0 || noteIt!=ABody.notes.constEnd())
+		while (messageIt>=messageItEnd || noteIt!=ABody.notes.constEnd())
 		{
-			if (messageIt>=0 && (noteIt==ABody.notes.constEnd() || ABody.messages.at(messageIt).dateTime()<noteIt.key()))
+			if (messageIt>=messageItEnd && (noteIt==ABody.notes.constEnd() || ABody.messages.at(messageIt).dateTime()<noteIt.key()))
 			{
-				if (lastTime.isNull() || lastTime>ABody.messages.at(messageIt).dateTime())
-					showStyledMessage(window,ABody.messages.at(messageIt));
+				showStyledMessage(window,ABody.messages.at(messageIt));
 				messageIt--;
 			}
 			else if (noteIt != ABody.notes.constEnd())
