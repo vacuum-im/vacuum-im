@@ -17,13 +17,6 @@
     </message>
 </context>
 <context>
-    <name>DefaultConnection</name>
-    <message>
-        <source>Disconnection timed out</source>
-        <translation>Przekroczony czas odłączenia</translation>
-    </message>
-</context>
-<context>
     <name>DefaultConnectionPlugin</name>
     <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>

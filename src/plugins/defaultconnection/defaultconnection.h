@@ -76,7 +76,7 @@ private:
 private:
 	bool FSSLError;
 	bool FUseLegacySSL;
-	bool FIgnoreSSLErrors;
+	bool FDisconnecting;
 	QSslSocket FSocket;
 private:
 	QMap<int, QVariant> FOptions;

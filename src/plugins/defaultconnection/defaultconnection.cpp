@@ -10,7 +10,8 @@
 DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParent) : QObject(AParent)
 {
 	FPlugin = APlugin;
-
+	FDisconnecting = false;
+	
 	FSrvQueryId = START_QUERY_ID;
 	connect(&FDns, SIGNAL(resultsReady(int, const QJDns::Response &)),SLOT(onDnsResultsReady(int, const QJDns::Response &)));
 	connect(&FDns, SIGNAL(error(int, QJDns::Error)),SLOT(onDnsError(int, QJDns::Error)));
@@ -72,8 +73,9 @@ bool DefaultConnection::connectToHost()
 			FSrvQueryId = FDns.queryStart(QString("_xmpp-client._tcp.%1.").arg(domain).toLatin1(),QJDns::Srv);
 		}
 		else
+		{
 			connectToNextHost();
-
+		}
 		return true;
 	}
 	return false;
@@ -81,32 +83,38 @@ bool DefaultConnection::connectToHost()
 
 void DefaultConnection::disconnectFromHost()
 {
-	FRecords.clear();
-
-	if (FSocket.state() != QSslSocket::UnconnectedState)
+	if (!FDisconnecting)
 	{
-		if (FSocket.state() == QSslSocket::ConnectedState)
+		FRecords.clear();
+		FDisconnecting = true;
+
+		if (FSocket.state() != QSslSocket::UnconnectedState)
 		{
-			emit aboutToDisconnect();
-			FSocket.flush();
-			FSocket.disconnectFromHost();
+			if (FSocket.state() == QSslSocket::ConnectedState)
+			{
+				emit aboutToDisconnect();
+				FSocket.flush();
+				FSocket.disconnectFromHost();
+			}
+			else
+			{
+				FSocket.abort();
+				emit disconnected();
+			}
 		}
-		else
+		else if (FSrvQueryId != START_QUERY_ID)
+		{
+			FSrvQueryId = STOP_QUERY_ID;
+			FDns.shutdown();
+		}
+
+		if (FSocket.state()!=QSslSocket::UnconnectedState && !FSocket.waitForDisconnected(DISCONNECT_TIMEOUT))
 		{
 			FSocket.abort();
 			emit disconnected();
 		}
-	}
-	else if (FSrvQueryId != START_QUERY_ID)
-	{
-		FSrvQueryId = STOP_QUERY_ID;
-		FDns.shutdown();
-	}
 
-	if (FSocket.state()!=QSslSocket::UnconnectedState && !FSocket.waitForDisconnected(DISCONNECT_TIMEOUT))
-	{
-		emit error(tr("Disconnection timed out"));
-		emit disconnected();
+		FDisconnecting = false;
 	}
 }
 
@@ -300,10 +308,14 @@ void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 			emit disconnected();
 		}
 		else
+		{
 			emit error(FSocket.errorString());
+		}
 	}
 	else
+	{
 		connectToNextHost();
+	}
 }
 
 void DefaultConnection::onSocketDisconnected()
