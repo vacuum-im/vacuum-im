@@ -321,33 +321,33 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 		bool isSwitchOnline = false;
 		bool isChangeMainStatus = !AStreamJid.isValid() && AStatusId!=STATUS_MAIN_ID;
 
-		StatusItem status = FStatusItems.value(AStatusId);
+		StatusItem newStatus = FStatusItems.value(AStatusId);
 		IPresence *mainPresence = visibleMainStatusPresence();
+		StatusItem oldMainStatus = FStatusItems.value(FCurrentStatus.value(mainPresence,STATUS_OFFLINE));
 
 		if (isChangeMainStatus)
 		{
-			StatusItem curStatus = FStatusItems.value(FCurrentStatus.value(mainPresence,STATUS_OFFLINE));
-			if (status.show==IPresence::Offline || status.show==IPresence::Error)
+			if (newStatus.show==IPresence::Offline || newStatus.show==IPresence::Error)
 				isSwitchOffline = true;
-			else if (curStatus.show==IPresence::Offline || curStatus.show==IPresence::Error)
+			else if (oldMainStatus.show==IPresence::Offline || oldMainStatus.show==IPresence::Error)
 				isSwitchOnline = true;
 			setMainStatusId(AStatusId);
 		}
 
 		for (QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin(); it!=FCurrentStatus.constEnd(); it++)
 		{
-			int newStatusId = AStatusId;
-			StatusItem newStatus = status;
 			IPresence *presence = it.key();
+			int newStreamStatusId = AStatusId;
+			StatusItem newStreamStatus = newStatus;
 
-			bool acceptStatus = presence->streamJid( )== AStreamJid;
+			bool acceptStatus = presence->streamJid()==AStreamJid;
 			acceptStatus |= isChangeMainStatus && FMainStatusStreams.contains(presence);
 
 			if (!acceptStatus && isSwitchOnline && !presence->xmppStream()->isConnected())
 			{
-				newStatusId = FLastOnlineStatus.value(presence, STATUS_MAIN_ID);
-				newStatusId = FStatusItems.contains(newStatusId) ? newStatusId : STATUS_MAIN_ID;
-				newStatus = FStatusItems.value(newStatusId);
+				newStreamStatusId = FLastOnlineStatus.value(presence,STATUS_MAIN_ID);
+				newStreamStatusId = FStatusItems.contains(newStreamStatusId) ? newStreamStatusId : STATUS_MAIN_ID;
+				newStreamStatus = FStatusItems.value(newStreamStatusId);
 				acceptStatus = true;
 			}
 			else if (isChangeMainStatus && presence==mainPresence)
@@ -361,18 +361,18 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 
 			if (acceptStatus)
 			{
-				if (newStatusId == STATUS_MAIN_ID)
+				if (newStreamStatusId == STATUS_MAIN_ID)
 					FMainStatusStreams += presence;
 				else if (presence->streamJid() == AStreamJid)
 					FMainStatusStreams -= presence;
 
 				FChangingPresence = presence;
-				if (presence->setPresence(newStatus.show, newStatus.text, newStatus.priority))
+				if (presence->setPresence(newStreamStatus.show, newStreamStatus.text, newStreamStatus.priority))
 				{
 					FChangingPresence = NULL;
 
-					int statusId = FMainStatusStreams.contains(presence) ? STATUS_MAIN_ID : newStatus.code;
-					if (newStatus.show!=IPresence::Offline && newStatus.show!=IPresence::Error)
+					int statusId = FMainStatusStreams.contains(presence) ? STATUS_MAIN_ID : newStreamStatus.code;
+					if (newStreamStatus.show!=IPresence::Offline && newStreamStatus.show!=IPresence::Error)
 						FLastOnlineStatus.insert(presence, statusId);
 					else if (presence->xmppStream()->isConnected())
 						presence->xmppStream()->close();
@@ -383,18 +383,18 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 				else
 				{
 					FChangingPresence = NULL;
-					if (newStatus.show!=IPresence::Offline && !presence->xmppStream()->isConnected() && presence->xmppStream()->open())
+					if (newStreamStatus.show!=IPresence::Offline && !presence->xmppStream()->isConnected() && presence->xmppStream()->open())
 					{
 						insertConnectingLabel(presence);
 						setStreamStatusId(presence, STATUS_CONNECTING_ID);
 
-						int statusId = FMainStatusStreams.contains(presence) ? STATUS_MAIN_ID : newStatus.code;
+						int statusId = FMainStatusStreams.contains(presence) ? STATUS_MAIN_ID : newStreamStatus.code;
 						FLastOnlineStatus.insert(presence, statusId);
 						FConnectStatus.insert(presence, statusId);
 					}
-					else if (isChangeMainStatus && FCurrentStatus.value(presence)==STATUS_MAIN_ID)
+					else if (isChangeMainStatus && it.value()==STATUS_MAIN_ID)
 					{
-						setStreamStatusId(presence, FStatusItems.value(FCurrentStatus.value(presence)).code);
+						setStreamStatusId(presence, oldMainStatus.code);
 					}
 				}
 			}
