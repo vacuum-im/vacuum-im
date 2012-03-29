@@ -467,17 +467,23 @@ QByteArray XmppStream::receiveData(qint64 ABytes)
 
 void XmppStream::onConnectionConnected()
 {
-	FClosed = false;
-	insertXmppStanzaHandler(XSHO_XMPP_STREAM,this);
-	startStream();
+	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
+	{
+		FClosed = false;
+		insertXmppStanzaHandler(XSHO_XMPP_STREAM,this);
+		startStream();
+	}
 }
 
 void XmppStream::onConnectionReadyRead(qint64 ABytes)
 {
-	QByteArray data = receiveData(ABytes);
-	if (!processDataHandlers(data,false))
-		if (!data.isEmpty())
-			FParser.parseData(data);
+	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
+	{
+		QByteArray data = receiveData(ABytes);
+		if (!processDataHandlers(data,false))
+			if (!data.isEmpty())
+				FParser.parseData(data);
+	}
 }
 
 void XmppStream::onConnectionError(const QString &AError)
@@ -487,22 +493,25 @@ void XmppStream::onConnectionError(const QString &AError)
 
 void XmppStream::onConnectionDisconnected()
 {
-	FReady = false;
-	FClosed = true;
-
-	if (FStreamState != SS_DISCONNECTING)
-		abort(tr("Connection closed unexpectedly"));
-
-	setStreamState(SS_OFFLINE);
-	setKeepAliveTimerActive(false);
-	removeXmppStanzaHandler(XSHO_XMPP_STREAM,this);
-	emit closed();
-
-	clearActiveFeatures();
-	if (FOfflineJid.isValid())
+	if (FStreamState != SS_OFFLINE)
 	{
-		setStreamJid(FOfflineJid);
-		FOfflineJid = Jid::null;
+		FReady = false;
+		FClosed = true;
+
+		if (FStreamState != SS_DISCONNECTING)
+			abort(tr("Connection closed unexpectedly"));
+
+		setStreamState(SS_OFFLINE);
+		setKeepAliveTimerActive(false);
+		removeXmppStanzaHandler(XSHO_XMPP_STREAM,this);
+		emit closed();
+
+		clearActiveFeatures();
+		if (FOfflineJid.isValid())
+		{
+			setStreamJid(FOfflineJid);
+			FOfflineJid = Jid::null;
+		}
 	}
 }
 
