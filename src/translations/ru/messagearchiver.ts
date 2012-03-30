@@ -273,30 +273,6 @@
 <context>
     <name>ArchiveViewWindow</name>
     <message>
-        <source>Search</source>
-        <translation>Поиск</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>Обновить</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Поиск:</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Следующее</translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation>Предыдущее</translation>
-    </message>
-    <message>
-        <source>Case sensitively</source>
-        <translation>С учетом регистра</translation>
-    </message>
-    <message>
         <source>Search in history</source>
         <translation>Поиск в истории</translation>
     </message>
@@ -445,6 +421,33 @@
         <comment>Load messages earlier date</comment>
         <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation>dd MMM yyyy</translation>
+    </message>
+</context>
+<context>
+    <name>ArchiveViewWindowClass</name>
+    <message>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Обновить</translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation>Поиск:</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation>Следующее</translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation>Предыдущее</translation>
+    </message>
+    <message>
+        <source>Case sensitively</source>
+        <translation>С учетом регистра</translation>
     </message>
 </context>
 <context>

@@ -125,7 +125,7 @@ protected slots:
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	void onArchiveCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 private:
-	Ui::ArchiveViewWindow ui;
+	Ui::ArchiveViewWindowClass ui;
 private:
 	IRoster *FRoster;
 	IMessageArchiver *FArchiver;

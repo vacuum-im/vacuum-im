@@ -74,11 +74,15 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 		}
 	}
 
+	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+
 	return FArchiver!=NULL;
 }
 
 bool FileMessageArchive::initObjects()
 {
+	FArchiveHomePath = FPluginManager->homePath();
+
 	QString dirPath = collectionDirPath(Jid::null,Jid::null);
 	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
 	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
@@ -101,6 +105,7 @@ bool FileMessageArchive::initObjects()
 
 bool FileMessageArchive::initSettings()
 {
+	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString(""));
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES,5);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_SIZE,20*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXSIZE,30*1024);
@@ -127,8 +132,7 @@ QString FileMessageArchive::engineDescription() const
 
 IOptionsWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
 {
-	Q_UNUSED(AParent);
-	return NULL;
+	return new FileArchiveOptions(FPluginManager,AParent);
 }
 
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
@@ -284,6 +288,11 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 	return QString::null;
 }
 
+QString FileMessageArchive::archiveHomePath() const
+{
+	return FArchiveHomePath;
+}
+
 QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 {
 	Jid jid = !AWith.node().isEmpty() ? gatewayJid(AWith) : AWith;
@@ -310,7 +319,7 @@ QString FileMessageArchive::collectionDirPath(const Jid &AStreamJid, const Jid &
 {
 	bool noError = true;
 
-	QDir dir(FPluginManager->homePath());
+	QDir dir(archiveHomePath());
 	if (!dir.exists(ARCHIVE_DIR_NAME))
 	{
 		FThreadLock.lockForWrite();
@@ -871,6 +880,26 @@ void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 		saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
 		emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
 	}
+}
+
+void FileMessageArchive::onOptionsOpened()
+{
+	FArchiveHomePath = Options::node(OPV_FILEARCHIVE_HOMEPATH).value().toString();
+	if (!FArchiveHomePath.isEmpty())
+	{
+		QDir dir(FArchiveHomePath);
+		if (!dir.exists() && !dir.mkpath(FArchiveHomePath))
+			FArchiveHomePath = FPluginManager->homePath();
+	}
+	else
+	{
+		FArchiveHomePath = FPluginManager->homePath();
+	}
+}
+
+void FileMessageArchive::onOptionsClosed()
+{
+	FArchiveHomePath = FPluginManager->homePath();
 }
 
 void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
