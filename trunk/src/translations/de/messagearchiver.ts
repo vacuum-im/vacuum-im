@@ -270,30 +270,6 @@
 <context>
     <name>ArchiveViewWindow</name>
     <message>
-        <source>Search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation type="unfinished">Suche:</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Case sensitively</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Search in history</source>
         <translation type="unfinished"></translation>
     </message>
@@ -436,6 +412,33 @@
     <message>
         <source>dd MMM yyyy</source>
         <comment>Load messages earlier date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ArchiveViewWindowClass</name>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation type="unfinished">Suche:</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Case sensitively</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

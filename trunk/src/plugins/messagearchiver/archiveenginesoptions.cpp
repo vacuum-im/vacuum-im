@@ -56,11 +56,13 @@ EngineWidget::~EngineWidget()
 void EngineWidget::apply()
 {
 	FArchiver->setArchiveEngineEnabled(FEngine->engineId(),FEnabled);
+	emit childApply();
 }
 
 void EngineWidget::reset()
 {
 	setEngineState(FArchiver->isArchiveEngineEnabled(FEngine->engineId()));
+	emit childReset();
 }
 
 void EngineWidget::setEngineState(bool AEnabled)

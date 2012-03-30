@@ -31,7 +31,7 @@ protected slots:
 	void onChangeYearBySpinbox();
 	void onChangeMonthByAction();
 private:
-	Ui::SelectPageWidget ui;
+	Ui::SelectPageWidgetClass ui;
 private:
 	int FYear;
 	int FMonth;

@@ -10,6 +10,7 @@ class IFileMessageArchive :
 {
 public:
 	virtual QObject *instance() =0;
+	virtual QString archiveHomePath() const =0;
 	virtual QString collectionDirName(const Jid &AWith) const =0;
 	virtual QString collectionFileName(const QDateTime &AStart) const =0;
 	virtual QString collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const =0;

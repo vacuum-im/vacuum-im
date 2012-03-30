@@ -10,6 +10,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <utils/options.h>
 #include "collectionwriter.h"
+#include "filearchiveoptions.h"
 
 class FileMessageArchive : 
 	public QObject,
@@ -45,6 +46,7 @@ public:
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount);
 	//IFileMessageArchive
+	virtual QString archiveHomePath() const;
 	virtual QString collectionDirName(const Jid &AWith) const;
 	virtual QString collectionFileName(const QDateTime &AStart) const;
 	virtual QString collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const;
@@ -81,6 +83,9 @@ protected slots:
 	void onArchivePrefsOpened(const Jid &AStreamJid);
 	void onArchivePrefsClosed(const Jid &AStreamJid);
 	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
+protected slots:
+	void onOptionsOpened();
+	void onOptionsClosed();
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
 	IPluginManager *FPluginManager;
@@ -90,8 +95,8 @@ private:
 	mutable QReadWriteLock FThreadLock;
 	QList<IArchiveHeader> FSavedCollections;
 	QList<IArchiveHeader> FRemovedCollections;
-
 private:
+	QString FArchiveHomePath;
 	mutable QList<QString> FNewDirs;
 	QMap<Jid, QString> FGatewayTypes;
 	QMap<QString, CollectionWriter *> FWritingFiles;

@@ -2,6 +2,24 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
+    <name>FileArchiveOptions</name>
+    <message>
+        <source>Select the location for the file archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FileArchiveOptionsClass</name>
+    <message>
+        <source>Change the location of the file archive (restart required)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FileMessageArchive</name>
     <message>
         <source>File Message Archive</source>

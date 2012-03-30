@@ -125,6 +125,7 @@
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
 
 // FileMessageArchive
+#define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
 #define OPV_FILEARCHIVE_COLLECTION_SIZE                 "filearchive.collection.size"
 #define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
 #define OPV_FILEARCHIVE_COLLECTION_TIMEOUT              "filearchive.collection.timeout"

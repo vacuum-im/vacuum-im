@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ArchiveViewWindow</class>
- <widget class="QMainWindow" name="ArchiveViewWindow">
+ <class>ArchiveViewWindowClass</class>
+ <widget class="QMainWindow" name="ArchiveViewWindowClass">
   <property name="geometry">
    <rect>
     <x>0</x>
