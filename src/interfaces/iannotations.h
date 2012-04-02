@@ -16,10 +16,8 @@ public:
 	virtual QString annotation(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QDateTime annotationCreateDate(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QDateTime annotationModifyDate(const Jid &AStreamJid, const Jid &AContactJid) const =0;
-	virtual void setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote) =0;
+	virtual bool setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote) =0;
 	virtual QDialog *showAnnotationDialog(const Jid &AStreamJid, const Jid &AContactJid) =0;
-	virtual bool loadAnnotations(const Jid &AStreamJid) =0;
-	virtual bool saveAnnotations(const Jid &AStreamJid) =0;
 protected:
 	virtual void annotationsLoaded(const Jid &AStreamJid) =0;
 	virtual void annotationsSaved(const Jid &AStreamJid) =0;

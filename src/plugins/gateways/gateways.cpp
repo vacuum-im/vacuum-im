@@ -130,7 +130,9 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorateOpened(const Jid &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onPrivateStorageLoaded(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataLoaded(const QString &, const Jid &, const QDomElement &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
+				SLOT(onPrivateDataChanged(const Jid &, const QString &, const QString &)));
 		}
 	}
 
@@ -892,15 +894,15 @@ void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
 	FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE);
 }
 
-void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
+void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
 	Q_UNUSED(AId);
-	if (AElement.tagName() == PST_GATEWAYS_SERVICES && AElement.namespaceURI() == PSN_GATEWAYS_KEEP)
+	if (AElement.tagName()==PST_GATEWAYS_SERVICES && AElement.namespaceURI()==PSN_GATEWAYS_KEEP)
 	{
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 		if (roster)
 		{
-			QSet<Jid> services;
+			QSet<Jid> newServices;
 			bool changed = false;
 			QDomElement elem = AElement.firstChildElement("service");
 			while (!elem.isNull())
@@ -909,7 +911,7 @@ void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid,
 				IRosterItem ritem = roster->rosterItem(service);
 				if (ritem.isValid)
 				{
-					services += service;
+					newServices += service;
 					if (ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_FROM)
 						sendLogPresence(AStreamJid,service,true);
 					setKeepConnection(AStreamJid,service,true);
@@ -921,16 +923,16 @@ void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid,
 				elem = elem.nextSiblingElement("service");
 			}
 
-			QSet<Jid> oldServices = FPrivateStorageKeep.value(AStreamJid) - services;
+			QSet<Jid> oldServices = FPrivateStorageKeep.value(AStreamJid) - newServices;
 			foreach(Jid service, oldServices)
 				setKeepConnection(AStreamJid,service,false);
-			FPrivateStorageKeep[AStreamJid] = services;
+			FPrivateStorageKeep[AStreamJid] = newServices;
 
 			if (changed)
 				savePrivateStorageKeep(AStreamJid);
 		}
 	}
-	else if (AElement.tagName() == PST_GATEWAYS_SERVICES && AElement.namespaceURI() == PSN_GATEWAYS_SUBSCRIBE)
+	else if (AElement.tagName()==PST_GATEWAYS_SERVICES && AElement.namespaceURI()==PSN_GATEWAYS_SUBSCRIBE)
 	{
 		QDomElement elem = AElement.firstChildElement("service");
 		while (!elem.isNull())
@@ -942,6 +944,14 @@ void Gateways::onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid,
 				FShowRegisterRequests.insert(id,AStreamJid);
 			elem = elem.nextSiblingElement("service");
 		}
+	}
+}
+
+void Gateways::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
+{
+	if (ATagName==PST_GATEWAYS_SERVICES && ANamespace==PSN_GATEWAYS_KEEP)
+	{
+		FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP);
 	}
 }
 

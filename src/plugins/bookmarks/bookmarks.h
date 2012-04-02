@@ -14,7 +14,6 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibookmarks.h>
 #include <interfaces/iprivatestorage.h>
-#include <interfaces/ipresence.h>
 #include <interfaces/itraymanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/iaccountmanager.h>
@@ -62,10 +61,12 @@ protected:
 	void updateBookmarksMenu();
 	void startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark, bool AShowWindow);
 protected slots:
-	void onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline);
-	void onStorageDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-	void onStorageDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-	void onStorageDataError(const QString &AId, const QString &AError);
+	void onPrivateStorageOpened(const Jid &AStreamJid);
+	void onPrivateDataError(const QString &AId, const QString &AError);
+	void onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+	void onPrivateDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
+	void onPrivateStorageClosed(const Jid &AStreamJid);
 	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
 	void onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
@@ -77,8 +78,7 @@ protected slots:
 	void onAccountOptionsChanged(const OptionsNode &ANode);
 	void onStartTimerTimeout();
 private:
-	IPrivateStorage *FStorage;
-	IPresencePlugin *FPresencePlugin;
+	IPrivateStorage *FPrivateStorage;
 	ITrayManager *FTrayManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 	IAccountManager *FAccountManager;

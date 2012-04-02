@@ -26,6 +26,9 @@
 #define SFV_MAY_LOGGING       "may"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 
+#define PST_ARCHIVE_PREFS     "pref"
+#define PSN_ARCHIVE_PREFS     NS_ARCHIVE
+
 #define NS_ARCHIVE_OLD        "http://www.xmpp.org/extensions/xep-0136.html#ns"
 #define NS_ARCHIVE_OLD_AUTO   "http://www.xmpp.org/extensions/xep-0136.html#ns-auto"
 #define NS_ARCHIVE_OLD_MANAGE "http://www.xmpp.org/extensions/xep-0136.html#ns-manage"
@@ -95,12 +98,14 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
 		if (FPrivateStorage)
 		{
-			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
-			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onPrivateDataChanged(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
 				SLOT(onPrivateDataError(const QString &, const QString &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
+				SLOT(onPrivateDataLoadedSaved(const QString &, const Jid &, const QDomElement &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
+				SLOT(onPrivateDataLoadedSaved(const QString &, const Jid &, const QDomElement &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
+				SLOT(onPrivateDataChanged(const Jid &, const QString &, const QString &)));
 		}
 	}
 
@@ -256,7 +261,7 @@ bool MessageArchiver::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Sta
 	}
 	else if (FSHIPrefs.value(AStreamJid)==AHandlerId && AStanza.isFromServer())
 	{
-		QDomElement prefElem = AStanza.firstElement("pref",FNamespaces.value(AStreamJid));
+		QDomElement prefElem = AStanza.firstElement(PST_ARCHIVE_PREFS,FNamespaces.value(AStreamJid));
 		applyArchivePrefs(AStreamJid,prefElem);
 
 		AAccept = true;
@@ -272,7 +277,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 	{
 		if (AStanza.type() == "result")
 		{
-			QDomElement prefElem = AStanza.firstElement("pref",FNamespaces.value(AStreamJid));
+			QDomElement prefElem = AStanza.firstElement(PST_ARCHIVE_PREFS,FNamespaces.value(AStreamJid));
 			applyArchivePrefs(AStreamJid,prefElem);
 		}
 		else
@@ -755,7 +760,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 		Stanza save("iq");
 		save.setType("set").setId(FStanzaProcessor->newId());
 
-		QDomElement prefElem = save.addElement("pref",!storage ? FNamespaces.value(AStreamJid) : NS_ARCHIVE);
+		QDomElement prefElem = save.addElement(PST_ARCHIVE_PREFS,!storage ? FNamespaces.value(AStreamJid) : NS_ARCHIVE);
 
 		bool defChanged = oldPrefs.defaultPrefs!=newPrefs.defaultPrefs;
 		if (storage || defChanged)
@@ -1287,7 +1292,7 @@ QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
 {
 	Stanza load("iq");
 	load.setType("get").setId(FStanzaProcessor!=NULL ? FStanzaProcessor->newId() : QString::null);
-	load.addElement("pref",FNamespaces.value(AStreamJid));
+	load.addElement(PST_ARCHIVE_PREFS,FNamespaces.value(AStreamJid));
 	if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,ARCHIVE_TIMEOUT))
 	{
 		FPrefsLoadRequests.insert(load.id(),AStreamJid);
@@ -1302,7 +1307,7 @@ QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
 
 QString MessageArchiver::loadStoragePrefs(const Jid &AStreamJid)
 {
-	QString requestId = FPrivateStorage!=NULL ? FPrivateStorage->loadData(AStreamJid,"pref",NS_ARCHIVE) : QString::null;
+	QString requestId = FPrivateStorage!=NULL ? FPrivateStorage->loadData(AStreamJid,PST_ARCHIVE_PREFS,PSN_ARCHIVE_PREFS) : QString::null;
 	if (!requestId.isEmpty())
 		FPrefsLoadRequests.insert(requestId,AStreamJid);
 	else
@@ -2164,7 +2169,26 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 	emit archivePrefsClosed(AXmppStream->streamJid());
 }
 
-void MessageArchiver::onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
+void MessageArchiver::onPrivateDataError(const QString &AId, const QString &AError)
+{
+	if (FPrefsLoadRequests.contains(AId))
+	{
+		Jid streamJid = FPrefsLoadRequests.take(AId);
+		applyArchivePrefs(streamJid,QDomElement());
+		emit requestFailed(AId,AError);
+	}
+	else if (FPrefsSaveRequests.contains(AId))
+	{
+		Jid streamJid = FPrefsSaveRequests.take(AId);
+		if (FRestoreRequests.contains(AId))
+			FRestoreRequests.remove(AId);
+		else
+			cancelSuspendedStanzaSession(streamJid,AId,AError);
+		emit requestFailed(AId,AError);
+	}
+}
+
+void MessageArchiver::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
 	if (FPrefsLoadRequests.contains(AId))
 	{
@@ -2186,22 +2210,11 @@ void MessageArchiver::onPrivateDataChanged(const QString &AId, const Jid &AStrea
 	}
 }
 
-void MessageArchiver::onPrivateDataError(const QString &AId, const QString &AError)
+void MessageArchiver::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
-	if (FPrefsLoadRequests.contains(AId))
+	if (FInStoragePrefs.contains(AStreamJid) && ATagName==PST_ARCHIVE_PREFS && ANamespace==PSN_ARCHIVE_PREFS)
 	{
-		Jid streamJid = FPrefsLoadRequests.take(AId);
-		applyArchivePrefs(streamJid,QDomElement());
-		emit requestFailed(AId,AError);
-	}
-	else if (FPrefsSaveRequests.contains(AId))
-	{
-		Jid streamJid = FPrefsSaveRequests.take(AId);
-		if (FRestoreRequests.contains(AId))
-			FRestoreRequests.remove(AId);
-		else
-			cancelSuspendedStanzaSession(streamJid,AId,AError);
-		emit requestFailed(AId,AError);
+		loadStoragePrefs(AStreamJid);
 	}
 }
 

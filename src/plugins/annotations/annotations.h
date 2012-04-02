@@ -1,6 +1,7 @@
 #ifndef ANNOTATIONS_H
 #define ANNOTATIONS_H
 
+#include <QTimer>
 #include <QDomDocument>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterlabelorders.h>
@@ -59,10 +60,8 @@ public:
 	virtual QString annotation(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QDateTime annotationCreateDate(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QDateTime annotationModifyDate(const Jid &AStreamJid, const Jid &AContactJid) const;
-	virtual void setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote);
+	virtual bool setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote);
 	virtual QDialog *showAnnotationDialog(const Jid &AStreamJid, const Jid &AContactJid);
-	virtual bool loadAnnotations(const Jid &AStreamJid);
-	virtual bool saveAnnotations(const Jid &AStreamJid);
 signals:
 	void annotationsLoaded(const Jid &AStreamJid);
 	void annotationsSaved(const Jid &AStreamJid);
@@ -70,12 +69,16 @@ signals:
 	void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
+	bool loadAnnotations(const Jid &AStreamJid);
+	bool saveAnnotations(const Jid &AStreamJid);
 	void updateDataHolder(const Jid &AStreamJid, const QList<Jid> &AContactJids);
 protected slots:
+	void onSaveAnnotationsTimerTimeout();
 	void onPrivateStorageOpened(const Jid &AStreamJid);
+	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-	void onPrivateDataError(const QString &AId, const QString &AError);
+	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageClosed(const Jid &AStreamJid);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -92,8 +95,10 @@ private:
 	IRostersModel *FRostersModel;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
-	QMap<Jid, QString> FLoadRequests;
-	QMap<Jid, QString> FSaveRequests;
+	QTimer FSaveTimer;
+	QSet<Jid> FSavePendingStreams;
+	QMap<QString, Jid> FLoadRequests;
+	QMap<QString, Jid> FSaveRequests;
 	QMap<Jid, QMap<Jid, Annotation> > FAnnotations;
 	QMap<Jid, QMap<Jid, EditNoteDialog *> > FEditDialogs;
 };
