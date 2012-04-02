@@ -17,8 +17,7 @@
 
 BookMarks::BookMarks()
 {
-	FStorage = NULL;
-	FPresencePlugin = NULL;
+	FPrivateStorage = NULL;
 	FTrayManager = NULL;
 	FMainWindowPlugin = NULL;
 	FAccountManager = NULL;
@@ -50,31 +49,24 @@ void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
 
 bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	IPlugin *plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
 	if (plugin)
 	{
-		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (FPresencePlugin)
+		FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
+		if (FPrivateStorage)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(streamStateChanged(const Jid &, bool)),
-				SLOT(onStreamStateChanged(const Jid &, bool)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
-	if (plugin)
-	{
-		FStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
-		if (FStorage)
-		{
-			connect(FStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onStorageDataChanged(const QString &, const Jid &, const QDomElement &)));
-			connect(FStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onStorageDataChanged(const QString &, const Jid &, const QDomElement &)));
-			connect(FStorage->instance(),SIGNAL(dataRemoved(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onStorageDataRemoved(const QString &, const Jid &, const QDomElement &)));
-			connect(FStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-				SLOT(onStorageDataError(const QString &, const QString &)));
+			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorageOpened(const Jid &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
+				SLOT(onPrivateDataError(const QString &, const QString &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
+				SLOT(onPrivateDataLoadedSaved(const QString &, const Jid &, const QDomElement &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
+				SLOT(onPrivateDataLoadedSaved(const QString &, const Jid &, const QDomElement &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataRemoved(const QString &, const Jid &, const QDomElement &)),
+				SLOT(onPrivateDataRemoved(const QString &, const Jid &, const QDomElement &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
+				SLOT(onPrivateDataChanged(const Jid &, const QString &, const QString &)));
+			connect(FPrivateStorage->instance(),SIGNAL(storageClosed(const Jid &)),SLOT(onPrivateStorageClosed(const Jid &)));
 		}
 	}
 
@@ -121,7 +113,7 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 	}
 
-	return FStorage!=NULL;
+	return FPrivateStorage!=NULL;
 }
 
 bool BookMarks::initObjects()
@@ -213,7 +205,7 @@ QString BookMarks::setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &A
 			}
 		}
 	}
-	return FStorage->saveData(AStreamJid,elem);
+	return FPrivateStorage->saveData(AStreamJid,elem);
 }
 
 int BookMarks::execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) const
@@ -269,28 +261,20 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 	}
 }
 
-void BookMarks::onStreamStateChanged(const Jid &AStreamJid, bool AStateOnline)
+void BookMarks::onPrivateStorageOpened(const Jid &AStreamJid)
 {
-	if (!AStateOnline)
-	{
-		delete FDialogs.take(AStreamJid);
-		delete FStreamMenu.take(AStreamJid);
-		FBookMarks.remove(AStreamJid);
-		FPendingBookMarks.remove(AStreamJid);
-		updateBookmarksMenu();
-	}
-	else
-	{
-		FStorage->loadData(AStreamJid,PST_BOOKMARKS,NS_STORAGE_BOOKMARKS);
-	}
+	FPrivateStorage->loadData(AStreamJid,PST_BOOKMARKS,NS_STORAGE_BOOKMARKS);
 }
 
-void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
+void BookMarks::onPrivateDataError(const QString &AId, const QString &AError)
 {
-	IAccount *account = FAccountManager != NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-	bool ignoreAutoJoin = false;
-	if (account && account->optionsNode().value("ignore-autojoin").toBool())
-		ignoreAutoJoin = true;
+	emit bookmarksError(AId,AError);
+}
+
+void BookMarks::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
+{
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	bool ignoreAutoJoin = account && account->optionsNode().value("ignore-autojoin").toBool();
 
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
@@ -371,7 +355,7 @@ void BookMarks::onStorageDataChanged(const QString &AId, const Jid &AStreamJid, 
 	}
 }
 
-void BookMarks::onStorageDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
+void BookMarks::onPrivateDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
@@ -386,9 +370,21 @@ void BookMarks::onStorageDataRemoved(const QString &AId, const Jid &AStreamJid, 
 	}
 }
 
-void BookMarks::onStorageDataError(const QString &AId, const QString &AError)
+void BookMarks::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
-	emit bookmarksError(AId,AError);
+	if (ATagName==PST_BOOKMARKS && ANamespace==NS_STORAGE_BOOKMARKS)
+	{
+		FPrivateStorage->loadData(AStreamJid,PST_BOOKMARKS,NS_STORAGE_BOOKMARKS);
+	}
+}
+
+void BookMarks::onPrivateStorageClosed(const Jid &AStreamJid)
+{
+	delete FDialogs.take(AStreamJid);
+	delete FStreamMenu.take(AStreamJid);
+	FBookMarks.remove(AStreamJid);
+	FPendingBookMarks.remove(AStreamJid);
+	updateBookmarksMenu();
 }
 
 void BookMarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
@@ -439,8 +435,7 @@ void BookMarks::onAddRoomBookmarkActionTriggered(bool)
 		IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(action->parent());
 		if (window)
 		{
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(window->streamJid()) : NULL;
-			if (presence && presence->isOpen())
+			if (FPrivateStorage && FPrivateStorage->isOpen(window->streamJid()))
 			{
 				QList<IBookMark> bookmarkList = bookmarks(window->streamJid());
 

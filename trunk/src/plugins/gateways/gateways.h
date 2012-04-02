@@ -95,7 +95,8 @@ protected slots:
 	void onRosterSubscriptionReceived(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
 	void onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
 	void onPrivateStorateOpened(const Jid &AStreamJid);
-	void onPrivateStorageLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+	void onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onKeepTimerTimeout();
 	void onVCardReceived(const Jid &AContactJid);
 	void onVCardError(const Jid &AContactJid, const QString &AError);

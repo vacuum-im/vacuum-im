@@ -2,9 +2,14 @@
 
 #define PRIVATE_STORAGE_TIMEOUT       30000
 
+#define SHC_NOTIFYDATACHANGED "/message/x[@xmlns='" NS_VACUUM_PRIVATESTORAGE_UPDATE "']"
+
 PrivateStorage::PrivateStorage()
 {
+	FPresencePlugin = NULL;
 	FStanzaProcessor = NULL;
+
+	FSHINotifyDataChanged = -1;
 }
 
 PrivateStorage::~PrivateStorage()
@@ -39,16 +44,52 @@ bool PrivateStorage::initConnections(IPluginManager *APluginManager, int &AInitO
 	if (plugin)
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
+	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
+	if (plugin)
+		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+
 	return FStanzaProcessor!=NULL;
+}
+
+bool PrivateStorage::initObjects()
+{
+	if (FStanzaProcessor)
+	{
+		IStanzaHandle handle;
+		handle.handler = this;
+		handle.order = SHO_MI_PRIVATESTORAGE;
+		handle.conditions.append(SHC_NOTIFYDATACHANGED);
+		handle.direction = IStanzaHandle::DirectionIn;
+		FSHINotifyDataChanged = FStanzaProcessor->insertStanzaHandle(handle);
+	}
+	return true;
+}
+
+bool PrivateStorage::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+	if (AHandleId == FSHINotifyDataChanged)
+	{
+		AAccept = true;
+		QDomElement dataElem = AStanza.firstElement("x",NS_VACUUM_PRIVATESTORAGE_UPDATE).firstChildElement();
+		while (!dataElem.isNull())
+		{
+			emit dataChanged(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
+			dataElem = dataElem.nextSiblingElement();
+		}
+		return true;
+	}
+	return false;
 }
 
 void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
 	if (FSaveRequests.contains(AStanza.id()))
 	{
-		QDomElement elem = FSaveRequests.take(AStanza.id());
-		saveOptionsElement(AStreamJid,elem);
-		emit dataSaved(AStanza.id(),AStreamJid,elem);
+		QDomElement dataElem = FSaveRequests.take(AStanza.id());
+		if (AStanza.type() == "result")
+			notifyDataChanged(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
+		saveOptionsElement(AStreamJid,dataElem);
+		emit dataSaved(AStanza.id(),AStreamJid,dataElem);
 	}
 	else if (FLoadRequests.contains(AStanza.id()))
 	{
@@ -63,6 +104,8 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 	else if (FRemoveRequests.contains(AStanza.id()))
 	{
 		QDomElement dataElem = FRemoveRequests.take(AStanza.id());
+		if (AStanza.type() == "result")
+			notifyDataChanged(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
 		removeElement(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
 		removeOptionsElement(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
 		emit dataRemoved(AStanza.id(),AStreamJid,dataElem);
@@ -139,6 +182,25 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
 		}
 	}
 	return QString::null;
+}
+
+void PrivateStorage::notifyDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
+{
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+	if (FStanzaProcessor && presence && presence->isOpen())
+	{
+		foreach(IPresenceItem item, presence->presenceItems(AStreamJid.bare()))
+		{
+			if (item.itemJid != AStreamJid)
+			{
+				Stanza notify("message");
+				notify.setTo(item.itemJid.eFull());
+				QDomElement xElem = notify.addElement("x",NS_VACUUM_PRIVATESTORAGE_UPDATE);
+				xElem.appendChild(notify.createElement(ATagName,ANamespace));
+				FStanzaProcessor->sendStanzaOut(AStreamJid,notify);
+			}
+		}
+	}
 }
 
 QDomElement PrivateStorage::insertElement(const Jid &AStreamJid, const QDomElement &AElement)

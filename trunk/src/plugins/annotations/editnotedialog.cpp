@@ -28,9 +28,6 @@ void EditNoteDialog::onDialogAccepted()
 {
 	QString note = ui.pteNote->toPlainText();
 	if (note != FAnnotations->annotation(FStreamJid,FContactJid))
-	{
 		FAnnotations->setAnnotation(FStreamJid,FContactJid,ui.pteNote->toPlainText());
-		FAnnotations->saveAnnotations(FStreamJid);
-	}
 	accept();
 }

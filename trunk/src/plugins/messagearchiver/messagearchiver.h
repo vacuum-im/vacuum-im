@@ -207,8 +207,9 @@ protected slots:
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
-	void onPrivateDataChanged(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataError(const QString &AId, const QString &AError);
+	void onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);

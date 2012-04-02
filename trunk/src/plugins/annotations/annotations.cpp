@@ -17,6 +17,10 @@ Annotations::Annotations()
 	FRosterPlugin = NULL;
 	FRostersModel = NULL;
 	FRostersViewPlugin = NULL;
+
+	FSaveTimer.setInterval(0);
+	FSaveTimer.setSingleShot(true);
+	connect(&FSaveTimer,SIGNAL(timeout()),SLOT(onSaveAnnotationsTimerTimeout()));
 }
 
 Annotations::~Annotations()
@@ -34,8 +38,9 @@ void Annotations::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(PRIVATESTORAGE_UUID);
 }
 
-bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
 	if (plugin)
 	{
@@ -43,12 +48,14 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &/*AInitOr
 		if (FPrivateStorage)
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorageOpened(const Jid &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
+				SLOT(onPrivateDataError(const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
 				SLOT(onPrivateDataSaved(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
 				SLOT(onPrivateDataLoaded(const QString &, const Jid &, const QDomElement &)));
-			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-				SLOT(onPrivateDataError(const QString &, const QString &)));
+			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
+				SLOT(onPrivateDataChanged(const Jid &, const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageClosed(const Jid &)),SLOT(onPrivateStorageClosed(const Jid &)));
 		}
 	}
@@ -144,7 +151,6 @@ bool Annotations::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant 
 	if (rosterDataTypes().contains(AIndex->type()) && ARole==RDR_ANNOTATIONS)
 	{
 		setAnnotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString(),AValue.toString());
-		saveAnnotations(AIndex->data(RDR_STREAM_JID).toString());
 		return true;
 	}
 	return false;
@@ -175,7 +181,7 @@ QDateTime Annotations::annotationModifyDate(const Jid &AStreamJid, const Jid &AC
 	return FAnnotations.value(AStreamJid).value(AContactJid.bare()).modified.toLocal();
 }
 
-void Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote)
+bool Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANote)
 {
 	if (isEnabled(AStreamJid))
 	{
@@ -191,9 +197,15 @@ void Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, c
 		{
 			FAnnotations[AStreamJid].remove(AContactJid.bare());
 		}
-		emit annotationModified(AStreamJid,AContactJid);
+
 		updateDataHolder(AStreamJid,QList<Jid>()<<AContactJid);
+		emit annotationModified(AStreamJid,AContactJid);
+
+		FSavePendingStreams += AStreamJid;
+		FSaveTimer.start();
+		return true;
 	}
+	return false;
 }
 
 QDialog *Annotations::showAnnotationDialog(const Jid &AStreamJid, const Jid &AContactJid)
@@ -215,12 +227,12 @@ QDialog *Annotations::showAnnotationDialog(const Jid &AStreamJid, const Jid &ACo
 
 bool Annotations::loadAnnotations(const Jid &AStreamJid)
 {
-	if (FPrivateStorage && !FLoadRequests.contains(AStreamJid))
+	if (FPrivateStorage)
 	{
 		QString id = FPrivateStorage->loadData(AStreamJid,PST_ANNOTATIONS,PSN_ANNOTATIONS);
 		if (!id.isEmpty())
 		{
-			FLoadRequests.insert(AStreamJid,id);
+			FLoadRequests.insert(id,AStreamJid);
 			return true;
 		}
 	}
@@ -229,7 +241,7 @@ bool Annotations::loadAnnotations(const Jid &AStreamJid)
 
 bool Annotations::saveAnnotations(const Jid &AStreamJid)
 {
-	if (isEnabled(AStreamJid) && !FSaveRequests.contains(AStreamJid))
+	if (isEnabled(AStreamJid))
 	{
 		QDomDocument doc;
 		QDomElement storage = doc.appendChild(doc.createElementNS(PSN_ANNOTATIONS,PST_ANNOTATIONS)).toElement();
@@ -249,7 +261,7 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
 		QString id = FPrivateStorage->saveData(AStreamJid,doc.documentElement());
 		if (!id.isEmpty())
 		{
-			FSaveRequests.insert(AStreamJid,id);
+			FSaveRequests.insert(id,AStreamJid);
 			return true;
 		}
 	}
@@ -270,26 +282,47 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 	}
 }
 
+void Annotations::onSaveAnnotationsTimerTimeout()
+{
+	foreach(Jid streamJid, FSavePendingStreams)
+		saveAnnotations(streamJid);
+	FSavePendingStreams.clear();
+}
+
 void Annotations::onPrivateStorageOpened(const Jid &AStreamJid)
 {
 	loadAnnotations(AStreamJid);
 }
 
+void Annotations::onPrivateDataError(const QString &AId, const QString &AError)
+{
+	if (FLoadRequests.contains(AId))
+	{
+		Jid streamJid = FLoadRequests.take(AId);
+		emit annotationsError(streamJid, AError);
+	}
+	else if (FSaveRequests.contains(AId))
+	{
+		Jid streamJid = FSaveRequests.take(AId);
+		emit annotationsError(streamJid, AError);
+	}
+}
+
 void Annotations::onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
 	Q_UNUSED(AElement);
-	if (FSaveRequests.value(AStreamJid) == AId)
+	if (FSaveRequests.contains(AId))
 	{
-		FSaveRequests.remove(AStreamJid);
+		FSaveRequests.remove(AId);
 		emit annotationsSaved(AStreamJid);
 	}
 }
 
 void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
-	if (FLoadRequests.value(AStreamJid) == AId)
+	if (FLoadRequests.contains(AId))
 	{
-		FLoadRequests.remove(AStreamJid);
+		FLoadRequests.remove(AId);
 
 		QMap<Jid, Annotation> &items = FAnnotations[AStreamJid];
 		items.clear();
@@ -313,19 +346,11 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
 	}
 }
 
-void Annotations::onPrivateDataError(const QString &AId, const QString &AError)
+void Annotations::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
-	if (FLoadRequests.values().contains(AId))
+	if (isEnabled(AStreamJid) && ATagName==PST_ANNOTATIONS && ANamespace==PSN_ANNOTATIONS)
 	{
-		Jid streamJid = FLoadRequests.key(AId);
-		FLoadRequests.remove(streamJid);
-		emit annotationsError(streamJid, AError);
-	}
-	else if (FSaveRequests.values().contains(AId))
-	{
-		Jid streamJid = FSaveRequests.key(AId);
-		FSaveRequests.remove(streamJid);
-		emit annotationsError(streamJid, AError);
+		loadAnnotations(AStreamJid);
 	}
 }
 
@@ -334,8 +359,6 @@ void Annotations::onPrivateStorageClosed(const Jid &AStreamJid)
 	QList<Jid> curAnnotations = annotations(AStreamJid);
 
 	qDeleteAll(FEditDialogs.take(AStreamJid));
-	FLoadRequests.remove(AStreamJid);
-	FSaveRequests.remove(AStreamJid);
 	FAnnotations.remove(AStreamJid);
 
 	updateDataHolder(AStreamJid,curAnnotations);
@@ -347,10 +370,7 @@ void Annotations::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIte
 	if (AItem.subscription==SUBSCRIPTION_REMOVE && isEnabled(ARoster->streamJid()))
 	{
 		if (!annotation(ARoster->streamJid(),AItem.itemJid).isEmpty())
-		{
 			setAnnotation(ARoster->streamJid(),AItem.itemJid,QString::null);
-			saveAnnotations(ARoster->streamJid());
-		}
 	}
 }
 
@@ -420,18 +440,14 @@ void Annotations::onCopyToClipboardActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-	{
 		QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
-	}
 }
 
 void Annotations::onEditNoteActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-	{
 		showAnnotationDialog(action->data(ADR_STREAMJID).toString(),action->data(ADR_CONTACTJID).toString());
-	}
 }
 
 void Annotations::onEditNoteDialogDestroyed()
