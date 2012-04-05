@@ -401,7 +401,6 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 			if (ARequest.with.pDomain() != gateDomain)
 				dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
 
-			FThreadLock.lockForRead();
 			QDirIterator dirIt(streamDirPath,QDir::Dirs|QDir::NoDotAndDotDot);
 			while (dirIt.hasNext())
 			{
@@ -414,14 +413,12 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 					dirPaths.append(dirPath);
 				}
 			}
-			FThreadLock.unlock();
 		}
 		else
 		{
 			dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
 		}
 
-		FThreadLock.lockForRead();
 		for (int i=0; i<dirPaths.count(); i++)
 		{
 			QDirIterator dirIt(dirPaths.at(i),QDir::Files,flags);
@@ -440,7 +437,6 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 				}
 			}
 		}
-		FThreadLock.unlock();
 
 		QMapIterator<QString,QString> fileIt(filesMap);
 		if (ARequest.order == Qt::DescendingOrder)
