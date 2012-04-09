@@ -32,7 +32,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 						int userFiled = FDataForms->fieldIndex("username",form.fields);
 						if (userFiled >= 0)
 						{
-							form.fields[userFiled].value = FXmppStream->streamJid().eNode();
+							form.fields[userFiled].value = FXmppStream->streamJid().node();
 							form.fields[userFiled].type = DATAFIELD_TYPE_HIDDEN;
 						}
 
@@ -62,7 +62,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 					submit.setType("set").setId("setReg");
 					QDomElement querySubmit = submit.addElement("query",NS_JABBER_REGISTER);
 					if (!queryElem.firstChildElement("username").isNull())
-						querySubmit.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->streamJid().eNode()));
+						querySubmit.appendChild(submit.createElement("username")).appendChild(submit.createTextNode(FXmppStream->streamJid().node()));
 					if (!queryElem.firstChildElement("password").isNull())
 						querySubmit.appendChild(submit.createElement("password")).appendChild(submit.createTextNode(FXmppStream->getSessionPassword()));
 					if (!queryElem.firstChildElement("key").isNull())

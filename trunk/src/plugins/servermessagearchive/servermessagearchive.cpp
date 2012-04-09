@@ -311,7 +311,7 @@ QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IAr
 
 		QDomElement removeElem = remove.addElement("remove",FNamespaces.value(AStreamJid));
 		if (ARequest.with.isValid())
-			removeElem.setAttribute("with",ARequest.with.eFull());
+			removeElem.setAttribute("with",ARequest.with.full());
 		if (ARequest.with.isValid() && ARequest.exactmatch)
 			removeElem.setAttribute("exactmatch",QVariant(ARequest.exactmatch).toString());
 		if (ARequest.start.isValid())
@@ -355,7 +355,7 @@ QString ServerMessageArchive::loadServerHeaders(const Jid AStreamJid, const IArc
 
 		QDomElement listElem = request.addElement("list",FNamespaces.value(AStreamJid));
 		if (ARequest.with.isValid())
-			listElem.setAttribute("with",ARequest.with.eFull());
+			listElem.setAttribute("with",ARequest.with.full());
 		if (ARequest.with.isValid() && ARequest.exactmatch)
 			listElem.setAttribute("exactmatch",QVariant(ARequest.exactmatch).toString());
 		if (ARequest.start.isValid())
@@ -381,7 +381,7 @@ QString ServerMessageArchive::loadServerCollection(const Jid AStreamJid, const I
 		retrieve.setType("get").setId(FStanzaProcessor->newId());
 
 		QDomElement retrieveElem = retrieve.addElement("retrieve",FNamespaces.value(AStreamJid));
-		retrieveElem.setAttribute("with",AHeader.with.eFull());
+		retrieveElem.setAttribute("with",AHeader.with.full());
 		retrieveElem.setAttribute("start",DateTime(AHeader.start).toX85UTC());
 		insertResultSetRequest(retrieveElem,AResult,Qt::AscendingOrder);
 

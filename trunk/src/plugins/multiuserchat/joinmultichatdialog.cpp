@@ -44,9 +44,9 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
 	if (ARoomJid.isValid())
 	{
 		ui.cmbHistory->setCurrentIndex(-1);
-		ui.lneRoom->setText(ARoomJid.node());
+		ui.lneRoom->setText(ARoomJid.uNode());
 		ui.lneService->setText(ARoomJid.domain());
-		ui.lneNick->setText(!ANick.isEmpty() ? ANick : FStreamJid.node());
+		ui.lneNick->setText(!ANick.isEmpty() ? ANick : FStreamJid.uNode());
 		ui.lnePassword->setText(APassword);
 	}
 	else if (FRecentRooms.isEmpty())
@@ -111,7 +111,7 @@ void JoinMultiChatDialog::loadRecentConferences()
 	foreach(Jid roomJid, enters)
 	{
 		RoomParams params = FRecentRooms.value(roomJid);
-		ui.cmbHistory->addItem(tr("%1 as %2","room as nick").arg(roomJid.bare()).arg(params.nick),roomJid.bare());
+		ui.cmbHistory->addItem(tr("%1 as %2","room as nick").arg(roomJid.uBare()).arg(params.nick),roomJid.bare());
 	}
 	ui.cmbHistory->blockSignals(false);
 	ui.tlbDeleteHistory->setEnabled(!FRecentRooms.isEmpty());
@@ -127,7 +127,7 @@ void JoinMultiChatDialog::saveRecentConferences()
 
 void JoinMultiChatDialog::onDialogAccepted()
 {
-	Jid roomJid = ui.lneRoom->text().trimmed() + "@" + ui.lneService->text().trimmed();
+	Jid roomJid = Jid::fromUserInput(ui.lneRoom->text().trimmed() + "@" + ui.lneService->text().trimmed());
 	QString nick = ui.lneNick->text();
 	QString password = ui.lnePassword->text();
 
@@ -142,7 +142,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 
 		RoomParams &params = FRecentRooms[roomJid];
 		params.enters++;
-		params.nick = nick.isEmpty() ? FStreamJid.node() : nick;
+		params.nick = nick.isEmpty() ? FStreamJid.uNode() : nick;
 		params.password = password;
 		saveRecentConferences();
 
@@ -156,7 +156,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 
 void JoinMultiChatDialog::onStreamIndexChanged(int AIndex)
 {
-	FStreamJid = ui.cmbStreamJid->itemText(AIndex);
+	FStreamJid = ui.cmbStreamJid->itemData(AIndex).toString();
 	updateResolveNickState();
 	loadRecentConferences();
 	onHistoryIndexChanged(ui.cmbHistory->currentIndex());
@@ -168,7 +168,7 @@ void JoinMultiChatDialog::onHistoryIndexChanged(int AIndex)
 	if (FRecentRooms.contains(roomJid))
 	{
 		RoomParams params = FRecentRooms.value(roomJid);
-		ui.lneRoom->setText(roomJid.node());
+		ui.lneRoom->setText(roomJid.uNode());
 		ui.lneService->setText(roomJid.domain());
 		ui.lneNick->setText(params.nick);
 		ui.lnePassword->setText(params.password);
@@ -206,14 +206,14 @@ void JoinMultiChatDialog::onRoomNickReceived(const Jid &AStreamJid, const Jid &A
 	if (AStreamJid==FStreamJid && ARoomJid==serviceJid)
 	{
 		if (ui.lneNick->text().isEmpty())
-			ui.lneNick->setText(ANick.isEmpty() ? FStreamJid.node() : ANick);
+			ui.lneNick->setText(ANick.isEmpty() ? FStreamJid.uNode() : ANick);
 		updateResolveNickState();
 	}
 }
 
 void JoinMultiChatDialog::onStreamAdded(IXmppStream *AXmppStream)
 {
-	ui.cmbStreamJid->addItem(AXmppStream->streamJid().full(), AXmppStream->streamJid().pFull());
+	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull(),AXmppStream->streamJid().pFull());
 }
 
 void JoinMultiChatDialog::onStreamStateChanged(IXmppStream *AXmppStream)

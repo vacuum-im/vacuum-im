@@ -486,7 +486,7 @@ void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid,
 		if (!state.isEmpty())
 		{
 			Stanza stanza("message");
-			stanza.setType("chat").setTo(AContactJid.eFull());
+			stanza.setType("chat").setTo(AContactJid.full());
 			stanza.addElement(state,NS_CHATSTATES);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,stanza);
 		}

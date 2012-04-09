@@ -428,7 +428,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
 	Stanza request("iq");
-	request.setType("get").setTo(AServiceJid.eFull()).setId(FStanzaProcessor->newId());
+	request.setType("get").setTo(AServiceJid.full()).setId(FStanzaProcessor->newId());
 	request.addElement("query",NS_JABBER_GATEWAY);
 	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
 	{
@@ -441,7 +441,7 @@ QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJi
 QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AContactID)
 {
 	Stanza request("iq");
-	request.setType("set").setTo(AServiceJid.eFull()).setId(FStanzaProcessor->newId());
+	request.setType("set").setTo(AServiceJid.full()).setId(FStanzaProcessor->newId());
 	QDomElement elem = request.addElement("query",NS_JABBER_GATEWAY);
 	elem.appendChild(request.createElement("prompt")).appendChild(request.createTextNode(AContactID));
 	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
@@ -485,7 +485,7 @@ void Gateways::savePrivateStorageKeep(const Jid &AStreamJid)
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_KEEP,PST_GATEWAYS_SERVICES)).toElement();
 		QSet<Jid> services = FPrivateStorageKeep.value(AStreamJid);
 		foreach(Jid service, services)
-			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
+			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
 		FPrivateStorage->saveData(AStreamJid,elem);
 	}
 }
@@ -498,7 +498,7 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 		doc.appendChild(doc.createElement("services"));
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_SUBSCRIBE,PST_GATEWAYS_SERVICES)).toElement();
 		foreach(Jid service, FSubscribeServices.values(AStreamJid))
-			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.eBare()));
+			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
 		FPrivateStorage->saveData(AStreamJid,elem);
 	}
 }
@@ -637,7 +637,7 @@ void Gateways::onRemoveActionTriggered(bool)
 		{
 			Jid serviceJid = serviceList.first();
 			button = QMessageBox::question(NULL,tr("Remove transport and its contacts"),
-				tr("You are assured that wish to remove a transport '<b>%1</b>' and its <b>%n contacts</b> from roster?","",serviceContacts(streamJid,serviceJid).count()).arg(Qt::escape(serviceJid.bare())),
+				tr("You are assured that wish to remove a transport '<b>%1</b>' and its <b>%n contacts</b> from roster?","",serviceContacts(streamJid,serviceJid).count()).arg(Qt::escape(serviceJid.domain())),
 				QMessageBox::Yes | QMessageBox::No);
 		}
 		else if (serviceList.count() > 1)
@@ -702,7 +702,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, i
 					if (pitem.show!=IPresence::Error && pitem.itemJid.node().isEmpty() && FDiscovery->discoInfo(streamJid,pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
 					{
 						Action *action = new Action(addUserMenu);
-						action->setText(pitem.itemJid.full());
+						action->setText(pitem.itemJid.uFull());
 						action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,pitem.itemJid) : QIcon());
 						action->setData(ADR_STREAM_JID,streamJid.full());
 						action->setData(ADR_SERVICE_JID,pitem.itemJid.full());
@@ -1029,7 +1029,7 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 				foreach(Jid service, services)
 				{
 					Action *action = new Action(change);
-					action->setText(service.full());
+					action->setText(service.uFull());
 					if (FStatusIcons!=NULL)
 						action->setIcon(FStatusIcons->iconByJid(streamJid,service));
 					else

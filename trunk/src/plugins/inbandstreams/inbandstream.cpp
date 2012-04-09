@@ -270,7 +270,7 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 		if (streamKind() == IDataStreamSocket::Initiator)
 		{
 			Stanza openRequest("iq");
-			openRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.eFull());
+			openRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.full());
 			QDomElement elem = openRequest.addElement("open",NS_INBAND_BYTESTREAMS);
 			elem.setAttribute("sid",FStreamId);
 			elem.setAttribute("block-size",FBlockSize);
@@ -315,7 +315,7 @@ void InBandStream::close()
 	{
 		emit aboutToClose();
 		Stanza closeRequest("iq");
-		closeRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.eFull());
+		closeRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.full());
 		closeRequest.addElement("close",NS_INBAND_BYTESTREAMS).setAttribute("sid",FStreamId);
 		if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,FStreamJid,closeRequest,CLOSE_TIMEOUT))
 		{
@@ -436,7 +436,7 @@ bool InBandStream::sendNextPaket(bool AFlush)
 		if (!data.isEmpty())
 		{
 			Stanza paket(FStanzaType==StanzaMessage ? "message" : "iq");
-			paket.setTo(FContactJid.eFull()).setId(FStanzaProcessor->newId());
+			paket.setTo(FContactJid.full()).setId(FStanzaProcessor->newId());
 			QDomElement dataElem = paket.addElement("data",NS_INBAND_BYTESTREAMS);
 			dataElem.setAttribute("sid",FStreamId);
 			dataElem.setAttribute("seq",FSeqOut);

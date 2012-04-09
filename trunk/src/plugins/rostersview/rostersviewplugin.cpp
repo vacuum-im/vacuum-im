@@ -243,7 +243,7 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 				Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
 				QString display = AIndex->data(RDR_NAME).toString();
 				if (display.isEmpty())
-					display = indexJid.bare();
+					display = indexJid.uBare();
 				if (FShowResource && !indexJid.resource().isEmpty())
 					display += "/" + indexJid.resource();
 				return display;
@@ -259,7 +259,7 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 				if (display.isEmpty())
 				{
 					Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
-					display = indexJid.bare();
+					display = indexJid.uBare();
 				}
 				return display;
 			}

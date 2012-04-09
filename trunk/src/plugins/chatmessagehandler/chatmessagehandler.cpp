@@ -524,7 +524,7 @@ void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageConten
 	{
 		AOptions.senderId = AWindow->streamJid().full();
 		if (AWindow->streamJid() && AWindow->contactJid())
-			AOptions.senderName = Qt::escape(!AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource() : AWindow->streamJid().node());
+			AOptions.senderName = Qt::escape(!AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource() : AWindow->streamJid().uNode());
 		else
 			AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid()));
 		AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->streamJid());
@@ -602,7 +602,7 @@ void ChatMessageHandler::onMessageReady()
 	if (FMessageProcessor && window)
 	{
 		Message message;
-		message.setTo(window->contactJid().eFull()).setType(Message::Chat);
+		message.setTo(window->contactJid().full()).setType(Message::Chat);
 		FMessageProcessor->textToMessage(message,window->editWidget()->document());
 		if (!message.body().isEmpty())
 		{

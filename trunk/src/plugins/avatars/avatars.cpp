@@ -219,7 +219,7 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 				if (!updateIqAvatar(contactJid,hash))
 				{
 					Stanza query("iq");
-					query.setTo(contactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
+					query.setTo(contactJid.full()).setType("get").setId(FStanzaProcessor->newId());
 					query.addElement("query",NS_JABBER_IQ_AVATAR);
 					if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,query,AVATAR_IQ_TIMEOUT))
 						FIqAvatarRequests.insert(query.id(),contactJid);

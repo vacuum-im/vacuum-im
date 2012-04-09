@@ -311,7 +311,7 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
 				QString dirName = Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString();
 				if (Options::node(OPV_FILESTREAMS_GROUPBYSENDER).value().toBool())
 				{
-					QString userDir = dirNameByUserName(FNotifications!=NULL ? FNotifications->contactName(stream->streamJid(),stream->contactJid()) : stream->contactJid().node());
+					QString userDir = dirNameByUserName(FNotifications!=NULL ? FNotifications->contactName(stream->streamJid(),stream->contactJid()) : stream->contactJid().uNode());
 					if (!userDir.isEmpty())
 						dirName += "/" + userDir;
 				}

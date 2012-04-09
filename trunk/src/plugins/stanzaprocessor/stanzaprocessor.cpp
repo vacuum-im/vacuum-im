@@ -324,7 +324,7 @@ void StanzaProcessor::processRequestTimeout(const QString &AStanzaId) const
 		const StanzaRequest &request = FRequests.value(AStanzaId);
 
 		Stanza timeout("iq");
-		timeout.setType("error").setId(AStanzaId).setFrom(request.contactJid.eFull()).setTo(request.streamJid.eFull());
+		timeout.setType("error").setId(AStanzaId).setFrom(request.contactJid.full()).setTo(request.streamJid.full());
 		insertErrorElement(timeout,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT));
 
 		request.owner->stanzaRequestResult(request.streamJid, timeout);

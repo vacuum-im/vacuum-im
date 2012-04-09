@@ -15,7 +15,7 @@ EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster,
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Edit Privacy Lists - %1").arg(AStreamJid.bare()));
+	setWindowTitle(tr("Edit Privacy Lists - %1").arg(AStreamJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_PRIVACYLISTS,0,0,"windowIcon");
 
 	FPrivacyLists = APrivacyLists;
@@ -528,7 +528,7 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 			QList<IRosterItem> ritems = FRoster!=NULL ? FRoster->rosterItems() : QList<IRosterItem>();
 			foreach(IRosterItem ritem, ritems)
 			{
-				QString itemName = !ritem.name.isEmpty() ? ritem.name + " <"+ritem.itemJid.full()+">" : ritem.itemJid.full();
+				QString itemName = !ritem.name.isEmpty() ? ritem.name + " <"+ritem.itemJid.uFull()+">" : ritem.itemJid.uFull();
 				ui.cmbValue->addItem(itemName,ritem.itemJid.full());
 			}
 		}

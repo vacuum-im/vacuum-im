@@ -328,7 +328,7 @@ bool DataStreamsManger::initStream(const Jid &AStreamJid, const Jid &AContactJid
 		if (sprofile)
 		{
 			Stanza request("iq");
-			request.setTo(AContactJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
+			request.setTo(AContactJid.full()).setType("set").setId(FStanzaProcessor->newId());
 			QDomElement siElem = request.addElement("si",NS_STREAM_INITIATION);
 			siElem.setAttribute("id",AStreamId);
 			siElem.setAttribute("profile",AProfileNS);
@@ -379,7 +379,7 @@ bool DataStreamsManger::acceptStream(const QString &AStreamId, const QString &AM
 		if (sprofile && index>=0 && FDataForms->isOptionValid(params.features.fields.at(index).options,AMethodNS))
 		{
 			Stanza response("iq");
-			response.setType("result").setId(params.requestId).setTo(params.contactJid.eFull());
+			response.setType("result").setId(params.requestId).setTo(params.contactJid.full());
 			QDomElement siElem = response.addElement("si",NS_STREAM_INITIATION);
 			if (sprofile->responceDataStream(AStreamId,response))
 			{
@@ -413,7 +413,7 @@ Stanza DataStreamsManger::errorStanza(const Jid &AContactJid, const QString &ARe
                                       const QString &AErrNS, const QString &AText) const
 {
 	Stanza error("iq");
-	error.setTo(AContactJid.eFull()).setType("error").setId(ARequestId);
+	error.setTo(AContactJid.full()).setType("error").setId(ARequestId);
 	QDomElement errElem = error.addElement("error");
 	errElem.setAttribute("code",ErrorHandler::codeByCondition(ACondition,AErrNS));
 	errElem.setAttribute("type",ErrorHandler::typeToString(ErrorHandler::typeByCondition(ACondition,AErrNS)));

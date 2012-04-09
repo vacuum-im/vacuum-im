@@ -430,7 +430,7 @@ void NormalMessageHandler::onMessageReady()
 			bool sent = false;
 			foreach(Jid receiver, window->receiversWidget()->receivers())
 			{
-				message.setTo(receiver.eFull());
+				message.setTo(receiver.full());
 				sent = FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::MessageOut) ? true : sent;
 			}
 			if (sent && !showNextMessage(window))

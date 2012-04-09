@@ -20,7 +20,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	}
 
 	QString label = !FField.label.isEmpty() ? FField.label : FField.desc;
-   QString desc = !FField.desc.isEmpty() ? QString("<span>%1</span>").arg(Qt::escape(FField.desc)) : QString::null;
+	QString desc = !FField.desc.isEmpty() ? QString("<span>%1</span>").arg(Qt::escape(FField.desc)) : QString::null;
 	if (!FReadOnly && FField.type == DATAFIELD_TYPE_BOOLEAN)
 	{
 		FCheckBox = new QCheckBox(this);
@@ -170,13 +170,13 @@ QVariant DataFieldWidget::value() const
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDSINGLE)
 	{
-		return Jid(FLineEdit->text()).eFull();
+		return Jid::fromUserInput(FLineEdit->text()).full();
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDMULTI)
 	{
 		QStringList values = FTextEdit->toPlainText().split("\n", QString::SkipEmptyParts);
 		for (int i = 0; i < values.count(); i++)
-			values[i] = Jid(values.at(i)).eFull();
+			values[i] = Jid::fromUserInput(values.at(i)).full();
 		return values;
 	}
 	else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
@@ -239,13 +239,13 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDSINGLE)
 	{
-		FLineEdit->setText(Jid(AValue.toString()).full());
+		FLineEdit->setText(Jid(AValue.toString()).uFull());
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDMULTI)
 	{
 		FTextEdit->clear();
 		foreach(QString line, AValue.toStringList())
-			FTextEdit->append(Jid(line).full());
+			FTextEdit->append(Jid(line).uFull());
 	}
 	else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
 	{

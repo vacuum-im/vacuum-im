@@ -324,8 +324,8 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		{
 			if (muc->isOpen() && muc->streamJid()==ARequest.streamJid)
 			{
-				opt.label = tr("%1 on %2").arg(muc->nickName()).arg(muc->roomJid().bare());
-				opt.value = muc->roomJid().full();
+				opt.label = tr("%1 on %2").arg(muc->nickName()).arg(muc->roomJid().uBare());
+				opt.value = muc->roomJid().bare();
 				field.options.append(opt);
 			}
 		}
@@ -479,7 +479,7 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 			if (stream->streamKind() == IFileStream::ReceiveFile &&
 				stream->streamState() == IFileStream::Creating)
 			{
-				QString name = FNotifications!=NULL ? FNotifications->contactName(stream->streamJid(),stream->contactJid()) : stream->contactJid().bare();
+				QString name = FNotifications!=NULL ? FNotifications->contactName(stream->streamJid(),stream->contactJid()) : stream->contactJid().uBare();
 				opt.label = tr("%1 (%2 bytes) from '%3'").arg(stream->fileName()).arg(stream->fileSize()).arg(name);
 				opt.value = stream->streamId();
 				field.options.append(opt);
@@ -621,12 +621,12 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		{
 			IDataOption opt;
 
-			QString name = FNotifications!=NULL ? FNotifications->contactName(ARequest.streamJid,it.key()) : it.key().bare();
+			QString name = FNotifications!=NULL ? FNotifications->contactName(ARequest.streamJid,it.key()) : it.key().uBare();
 			if (!it.key().resource().isEmpty())
 				name += "/" + it.key().resource();
 
 			opt.label = tr("%n message(s) from '%1'","",it.value()).arg(name);
-			opt.value = it.key().eFull();
+			opt.value = it.key().full();
 			field.options.append(opt);
 		}
 
@@ -660,7 +660,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				{
 					message.detach();
 					message.setFrom(QString::null);
-					message.setTo(ARequest.contactJid.eFull());
+					message.setTo(ARequest.contactJid.full());
 					message.setDateTime(message.dateTime(),true);
 					
 					QDomElement addresses = message.stanza().firstElement("addresses",NS_ADDRESS);

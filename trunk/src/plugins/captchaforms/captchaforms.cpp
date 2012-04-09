@@ -168,7 +168,7 @@ bool CaptchaForms::submitChallenge(const QString &AChallengeId, const IDataForm 
 		Stanza accept("iq");
 		accept.setType("set");
 		accept.setId(FStanzaProcessor->newId());
-		accept.setTo(item.challenger.eFull());
+		accept.setTo(item.challenger.full());
 		QDomElement captchaElem = accept.addElement("captcha",NS_CAPTCHA_FORMS);
 		FDataForms->xmlForm(ASubmit, captchaElem);
 		if (FStanzaProcessor->sendStanzaRequest(this,item.streamJid,accept,ACCEPT_CHALLENGE_TIMEOUT))
@@ -193,7 +193,7 @@ bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 		Stanza reject("message");
 		reject.setType("error");
 		reject.setId(AChallengeId);
-		reject.setTo(item.challenger.eFull());
+		reject.setTo(item.challenger.full());
 		QDomElement errorElem = reject.addElement("error",EHN_DEFAULT);
 		errorElem.setAttribute("type","modify");
 		errorElem.appendChild(reject.createElement("not-acceptable",EHN_DEFAULT));

@@ -292,7 +292,9 @@ void BookMarks::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJ
 				streamMenu->setTitle(account->name());
 			}
 			else
-				streamMenu->setTitle(AStreamJid.full());
+			{
+				streamMenu->setTitle(AStreamJid.uFull());
+			}
 			streamMenu->menuAction()->setData(ADR_GROUP_SHIFT,groupShift);
 
 			Action *action = new Action(streamMenu);
@@ -449,7 +451,7 @@ void BookMarks::onAddRoomBookmarkActionTriggered(bool)
 				IBookMark &bookmark = bookmarkList[index];
 				if (bookmark.conference.isEmpty())
 				{
-					bookmark.name = window->roomJid().bare();
+					bookmark.name = window->roomJid().uBare();
 					bookmark.conference = window->roomJid().bare();
 					bookmark.nick = window->multiUserChat()->nickName();
 					bookmark.password = window->multiUserChat()->password();

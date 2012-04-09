@@ -27,16 +27,16 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 
 	if (FFileStream->streamKind() == IFileStream::SendFile)
 	{
-		setWindowTitle(tr("Send File - %1").arg(FFileStream->streamJid().full()));
+		setWindowTitle(tr("Send File - %1").arg(FFileStream->streamJid().uFull()));
 		ui.lblContactLabel->setText(tr("To:"));
 	}
 	else
 	{
-		setWindowTitle(tr("Receive File - %1").arg(FFileStream->streamJid().full()));
+		setWindowTitle(tr("Receive File - %1").arg(FFileStream->streamJid().uFull()));
 		ui.lblContactLabel->setText(tr("From:"));
 	}
 
-	ui.lblContact->setText(Qt::escape(FFileStream->contactJid().full()));
+	ui.lblContact->setText(Qt::escape(FFileStream->contactJid().uFull()));
 
 	if (AFileStream->streamState() == IFileStream::Creating)
 	{

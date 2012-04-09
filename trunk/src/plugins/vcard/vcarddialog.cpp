@@ -9,7 +9,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("vCard - %1").arg(AContactJid.full()));
+	setWindowTitle(tr("vCard - %1").arg(AContactJid.uFull()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_VCARD,0,0,"windowIcon");
 
 	FContactJid = AContactJid;
@@ -93,7 +93,7 @@ void VCardDialog::updateDialog()
 	ui.lneLastName->setReadOnly(readOnly);
 	ui.lneNickName->setText(FVCard->value(VVN_NICKNAME));
 	ui.lneNickName->setReadOnly(readOnly);
-	ui.lneJabberId->setText(FContactJid.full());
+	ui.lneJabberId->setText(FContactJid.uFull());
 	ui.lneJabberId->setReadOnly(true);
 
 	QDate birthday = QDate::fromString(FVCard->value(VVN_BIRTHDAY),Qt::ISODate);
@@ -342,7 +342,7 @@ void VCardDialog::onPhotoSaveClicked()
 	if (!FPhoto.isEmpty())
 	{
 		QString format = getImageFormat(FPhoto).toLower();
-		QString filename = QString("%1_photo.%2").arg(FContactJid.node()).arg(format);
+		QString filename = QString("%1_photo.%2").arg(FContactJid.uNode()).arg(format);
 		filename = QFileDialog::getSaveFileName(this,tr("Save image"),filename,tr("Image Files (*.%1)").arg(format));
 		if (!filename.isEmpty())
 			saveToFile(filename,FPhoto);
@@ -366,7 +366,7 @@ void VCardDialog::onLogoSaveClicked()
 	if (!FLogo.isNull())
 	{
 		QString format = getImageFormat(FPhoto).toLower();
-		QString filename = QString("%1_logo.%2").arg(FContactJid.node()).arg(format);
+		QString filename = QString("%1_logo.%2").arg(FContactJid.uNode()).arg(format);
 		filename = QFileDialog::getSaveFileName(this,tr("Save image"),filename,tr("Image Files (*.%1)").arg(format));
 		if (!filename.isEmpty())
 			saveToFile(filename,FLogo);

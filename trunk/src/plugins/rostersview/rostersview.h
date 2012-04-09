@@ -146,7 +146,7 @@ protected slots:
 protected slots:
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-   void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
+	void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 	void onCopyToClipboardActionTriggered(bool);
 	void onIndexInserted(IRosterIndex *AIndex);
 	void onIndexDestroyed(IRosterIndex *AIndex);

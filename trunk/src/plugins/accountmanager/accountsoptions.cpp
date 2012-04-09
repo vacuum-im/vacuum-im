@@ -67,7 +67,7 @@ void AccountsOptions::reset()
 	{
 		QTreeWidgetItem *item = appendAccount(account->accountId(),account->name());
 		item->setCheckState(COL_NAME,account->isActive() ? Qt::Checked : Qt::Unchecked);
-		item->setText(COL_JID,account->streamJid().full());
+		item->setText(COL_JID,account->streamJid().uFull());
 		curAccounts.append(account->accountId());
 	}
 
@@ -144,7 +144,7 @@ void AccountsOptions::onAccountOptionsChanged(IAccount *AAcount, const OptionsNo
 		}
 		else if (AAcount->optionsNode().childPath(ANode) == "streamJid")
 		{
-			item->setText(COL_JID,AAcount->streamJid().full());
+			item->setText(COL_JID,AAcount->streamJid().uFull());
 
 			if (FPendingAccounts.contains(AAcount->accountId()))
 			{

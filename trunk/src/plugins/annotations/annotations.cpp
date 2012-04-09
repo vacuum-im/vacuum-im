@@ -251,7 +251,7 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
 		while (it != items.constEnd())
 		{
 			QDomElement elem = storage.appendChild(doc.createElement("note")).toElement();
-			elem.setAttribute("jid",it.key().eBare());
+			elem.setAttribute("jid",it.key().bare());
 			elem.setAttribute("cdate",it.value().created.toX85UTC());
 			elem.setAttribute("mdate",it.value().modified.toX85UTC());
 			elem.appendChild(doc.createTextNode(it.value().note));

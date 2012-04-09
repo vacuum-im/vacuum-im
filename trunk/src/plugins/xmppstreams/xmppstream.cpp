@@ -199,7 +199,7 @@ QString XmppStream::getSessionPassword(bool AAskIfNeed)
 
 		FPasswordDialog = new QInputDialog(NULL,Qt::Dialog);
 		FPasswordDialog->setWindowTitle(tr("Password request"));
-		FPasswordDialog->setLabelText(tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.bare())));
+		FPasswordDialog->setLabelText(tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.uBare())));
 		FPasswordDialog->setTextEchoMode(QLineEdit::Password);
 		if (FPasswordDialog->exec() == QDialog::Accepted)
 			FSessionPassword = FPasswordDialog->textValue();
@@ -431,7 +431,7 @@ bool XmppStream::processStanzaHandlers(Stanza &AStanza, bool AStanzaOut)
 	QMapIterator<int, IXmppStanzaHadler *> it(FStanzaHandlers);
 	if (!AStanzaOut)
 	{
-		AStanza.setTo(FStreamJid.eFull());
+		AStanza.setTo(FStreamJid.full());
 		it.toBack();
 	}
 	while (!hooked && (AStanzaOut ? it.hasNext() : it.hasPrevious()))

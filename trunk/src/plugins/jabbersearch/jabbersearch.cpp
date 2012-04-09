@@ -196,7 +196,7 @@ IDataFormLocale JabberSearch::dataFormLocale(const QString &AFormType)
 QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
 	Stanza request("iq");
-	request.setTo(AServiceJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
+	request.setTo(AServiceJid.full()).setType("get").setId(FStanzaProcessor->newId());
 	request.addElement("query",NS_JABBER_SEARCH);
 	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,SEARCH_TIMEOUT))
 	{
@@ -209,7 +209,7 @@ QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASubmit)
 {
 	Stanza submit("iq");
-	submit.setTo(ASubmit.serviceJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
+	submit.setTo(ASubmit.serviceJid.full()).setType("set").setId(FStanzaProcessor->newId());
 
 	QDomElement query = submit.addElement("query",NS_JABBER_SEARCH);
 	if (ASubmit.form.type.isEmpty())

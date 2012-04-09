@@ -800,7 +800,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 					itemElem.setAttribute("expire",newItemPrefs.expire);
 				if (newItemPrefs.exactmatch)
 					itemElem.setAttribute("exactmatch",QVariant(newItemPrefs.exactmatch).toString());
-				itemElem.setAttribute("jid",itemJid.eFull());
+				itemElem.setAttribute("jid",itemJid.full());
 				itemElem.setAttribute("otr",newItemPrefs.otr);
 				itemElem.setAttribute("save",newItemPrefs.save);
 			}
@@ -847,7 +847,7 @@ QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid
 			Stanza remove("iq");
 			remove.setType("set").setId(FStanzaProcessor->newId());
 			QDomElement itemElem = remove.addElement("itemremove",FNamespaces.value(AStreamJid)).appendChild(remove.createElement("item")).toElement();
-			itemElem.setAttribute("jid",AItemJid.eFull());
+			itemElem.setAttribute("jid",AItemJid.full());
 			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
 			{
 				FPrefsRemoveItemRequests.insert(remove.id(),AItemJid);
@@ -916,7 +916,7 @@ bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const
 		if (engine)
 		{
 			Message message;
-			message.setTo(AStreamJid.eFull()).setFrom(AItemJid.eFull()).setBody(ANote).setThreadId(AThreadId);
+			message.setTo(AStreamJid.full()).setFrom(AItemJid.full()).setBody(ANote).setThreadId(AThreadId);
 			return engine->saveNote(AStreamJid,message,true);
 		}
 	}
@@ -1041,12 +1041,12 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 
 			if (nodeElem.tagName()=="to")
 			{
-				message.setTo(contactJid.eFull());
+				message.setTo(contactJid.full());
 				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageOut);
 			}
 			else
 			{
-				message.setFrom(contactJid.eFull());
+				message.setFrom(contactJid.full());
 				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageIn);
 			}
 
@@ -1102,7 +1102,7 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const
 {
 	QDomDocument ownerDoc = AChatElem.ownerDocument();
-	AChatElem.setAttribute("with",ACollection.header.with.eFull());
+	AChatElem.setAttribute("with",ACollection.header.with.full());
 	AChatElem.setAttribute("start",DateTime(ACollection.header.start).toX85UTC());
 	AChatElem.setAttribute("version",ACollection.header.version);
 	if (!ACollection.header.subject.isEmpty())
@@ -1114,14 +1114,14 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 	if (ACollection.previous.with.isValid() && ACollection.previous.start.isValid())
 	{
 		QDomElement prevElem = AChatElem.appendChild(ownerDoc.createElement("previous")).toElement();
-		prevElem.setAttribute("with",ACollection.previous.with.eFull());
+		prevElem.setAttribute("with",ACollection.previous.with.full());
 		prevElem.setAttribute("start",DateTime(ACollection.previous.start).toX85UTC());
 	}
 
 	if (ACollection.next.with.isValid() && ACollection.next.start.isValid())
 	{
 		QDomElement nextElem = AChatElem.appendChild(ownerDoc.createElement("next")).toElement();
-		nextElem.setAttribute("with",ACollection.next.with.eFull());
+		nextElem.setAttribute("with",ACollection.next.with.full());
 		nextElem.setAttribute("start",DateTime(ACollection.next.start).toX85UTC());
 	}
 

@@ -182,7 +182,7 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 
 			int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
 			FTimePoint = QTime::currentTime();
-			QString caption = (ASended ? sended : received).arg(Qt::escape(AXmppStream->streamJid().full())).arg(FTimePoint.toString()).arg(delta);
+			QString caption = (ASended ? sended : received).arg(Qt::escape(AXmppStream->streamJid().uFull())).arg(FTimePoint.toString()).arg(delta);
 			ui.tedConsole->append(caption);
 
 			QString xml = stanza.toString(2);
@@ -275,23 +275,23 @@ void ConsoleWidget::onWordWrapStateChanged(int AState)
 
 void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
 {
-	ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
+	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull());
 	AXmppStream->insertXmppStanzaHandler(XSHO_CONSOLE,this);
 }
 
 void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
-	int index = ui.cmbStreamJid->findText(ABefore.full());
+	int index = ui.cmbStreamJid->findText(ABefore.uFull());
 	if (index >= 0)
 	{
 		ui.cmbStreamJid->removeItem(index);
-		ui.cmbStreamJid->addItem(AXmppStream->streamJid().full());
+		ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull());
 	}
 }
 
 void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
 {
-	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().full()));
+	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().uFull()));
 	AXmppStream->removeXmppStanzaHandler(XSHO_CONSOLE,this);
 }
 

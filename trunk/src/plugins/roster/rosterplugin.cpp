@@ -76,8 +76,7 @@ QString RosterPlugin::rosterFileName(const Jid &AStreamJid) const
 	if (!dir.exists("rosters"))
 		dir.mkdir("rosters");
 	dir.cd("rosters");
-
-	return dir.absoluteFilePath(Jid::encode(AStreamJid.bare()).toLower()+".xml");
+	return dir.absoluteFilePath(Jid::encode(AStreamJid.pBare())+".xml");
 }
 
 void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
