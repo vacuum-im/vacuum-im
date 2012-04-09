@@ -115,7 +115,7 @@ void CommandDialog::executeCommand()
 
 void CommandDialog::resetDialog()
 {
-	setWindowTitle(tr("Executing command '%1' at %2").arg(FNode).arg(FCommandJid.full()));
+	setWindowTitle(tr("Executing command '%1' at %2").arg(FNode).arg(FCommandJid.uFull()));
 	ui.lblInfo->setText(QString::null);
 	ui.lblInfo->setVisible(true);
 	if (FCurrentForm)

@@ -7,7 +7,7 @@ AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManage
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Add contact - %1").arg(AStreamJid.bare()));
+	setWindowTitle(tr("Add contact - %1").arg(AStreamJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_ADD_CONTACT,0,0,"windowIcon");
 
 	FRoster = NULL;
@@ -43,12 +43,12 @@ Jid AddContactDialog::streamJid() const
 
 Jid AddContactDialog::contactJid() const
 {
-	return ui.lneContact->text();
+	return Jid::fromUserInput(ui.lneContact->text());
 }
 
 void AddContactDialog::setContactJid(const Jid &AContactJid)
 {
-	ui.lneContact->setText(AContactJid.bare());
+	ui.lneContact->setText(AContactJid.uBare());
 }
 
 QString AddContactDialog::nickName() const
@@ -175,12 +175,12 @@ void AddContactDialog::onDialogAccepted()
 		}
 		else
 		{
-			QMessageBox::information(NULL,FStreamJid.full(),tr("Contact <b>%1</b> already exists.").arg(Qt::escape(contactJid().bare())));
+			QMessageBox::information(NULL,FStreamJid.uBare(),tr("Contact <b>%1</b> already exists.").arg(Qt::escape(contactJid().uBare())));
 		}
 	}
 	else if (!contactJid().isEmpty())
 	{
-		QMessageBox::warning(this,FStreamJid.bare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(Qt::escape(contactJid().bare())));
+		QMessageBox::warning(this,FStreamJid.uBare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(Qt::escape(contactJid().uBare())));
 	}
 }
 

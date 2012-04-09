@@ -718,7 +718,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 		if (account)
 			sMenu->setTitle(account->name());
 		else
-			sMenu->setTitle(APresence->streamJid().full());
+			sMenu->setTitle(APresence->streamJid().uFull());
 		FStreamMenu.insert(APresence,sMenu);
 
 		QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin();
@@ -924,7 +924,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 			notify.typeId = NNT_CONNECTION_ERROR;
 			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon());
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
-			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().full());
+			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().uFull());
 			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
 			notify.data.insert(NDR_POPUP_HTML,Qt::escape(APresence->status()));
 			notify.data.insert(NDR_SOUND_FILE,SDF_SCHANGER_CONNECTION_ERROR);

@@ -194,7 +194,7 @@ void PrivateStorage::notifyDataChanged(const Jid &AStreamJid, const QString &ATa
 			if (item.itemJid != AStreamJid)
 			{
 				Stanza notify("message");
-				notify.setTo(item.itemJid.eFull());
+				notify.setTo(item.itemJid.full());
 				QDomElement xElem = notify.addElement("x",NS_VACUUM_PRIVATESTORAGE_UPDATE);
 				xElem.appendChild(notify.createElement(ATagName,ANamespace));
 				FStanzaProcessor->sendStanzaOut(AStreamJid,notify);

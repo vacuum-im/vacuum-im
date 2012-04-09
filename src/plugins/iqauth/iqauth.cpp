@@ -24,7 +24,7 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 				Stanza auth("iq");
 				auth.setType("set").setTo(FXmppStream->streamJid().domain()).setId("setIqAuth");
 				QDomElement query = auth.addElement("query",NS_JABBER_IQ_AUTH);
-				query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().prepared().eNode()));
+				query.appendChild(auth.createElement("username")).appendChild(auth.createTextNode(FXmppStream->streamJid().pNode()));
 				query.appendChild(auth.createElement("resource")).appendChild(auth.createTextNode(FXmppStream->streamJid().resource()));
 
 				QDomElement reqElem = AStanza.firstElement("query",NS_JABBER_IQ_AUTH);

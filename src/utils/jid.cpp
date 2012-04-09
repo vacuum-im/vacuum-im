@@ -9,8 +9,8 @@
 static const QChar CharDog = '@';
 static const QChar CharSlash = '/';
 QHash<QString,Jid> JidCache = QHash<QString,Jid>();
-QList<QChar> EscChars =     QList<QChar>()   << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40; // << 0x5c;
-QList<QString> EscStrings = QList<QString>() <<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40"; //<<"\\5c";
+QList<QChar> EscChars =     QList<QChar>()   << 0x5c << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40;
+QList<QString> EscStrings = QList<QString>() <<"\\5c"<<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40";
 
 Jid Jid::null = Jid();
 
@@ -36,15 +36,12 @@ JidData::JidData()
 JidData::JidData(const JidData &AOther) : QSharedData(AOther)
 {
 	FFull = AOther.FFull;
-	FEscFull = AOther.FEscFull;
 	FPrepFull = AOther.FPrepFull;
 
 	FBare = AOther.FBare;
-	FEscBare = AOther.FEscBare;
 	FPrepBare = AOther.FPrepBare;
 
 	FNode = AOther.FNode;
-	FEscNode = AOther.FEscNode;
 	FPrepNode = AOther.FPrepNode;
 
 	FDomain = AOther.FDomain;
@@ -83,7 +80,7 @@ Jid::~Jid()
 
 bool Jid::isValid() const
 {
-	return d->FDomainValid && d->FNodeValid && d->FResourceValid && d->FEscFull.size()<1023;
+	return d->FDomainValid && d->FNodeValid && d->FResourceValid && d->FFull.size()<1023;
 }
 
 bool Jid::isEmpty() const
@@ -96,14 +93,14 @@ QString Jid::node() const
 	return d->FNode.toString();
 }
 
-QString Jid::eNode() const
-{
-	return d->FEscNode.toString();
-}
-
 QString Jid::pNode() const
 {
 	return d->FPrepNode.toString();
+}
+
+QString Jid::uNode() const
+{
+	return unescape(d->FNode.toString());
 }
 
 void Jid::setNode(const QString &ANode)
@@ -141,9 +138,26 @@ void Jid::setResource(const QString &AResource)
 	parseFromString(node()+CharDog+domain()+CharSlash+AResource);
 }
 
-Jid Jid::prepared() const
+QString Jid::bare() const
 {
-	return d->FPrepFull;
+	return d->FBare.toString();
+}
+
+QString Jid::pBare() const
+{
+	return d->FPrepBare.toString();
+}
+
+QString Jid::uBare() const
+{
+	QString ubare;
+	if (d->FNode.string())
+	{
+		ubare += unescape(d->FNode.toString());
+		ubare += CharDog;
+	}
+	ubare += d->FDomain.toString();
+	return ubare;
 }
 
 QString Jid::full() const
@@ -151,29 +165,20 @@ QString Jid::full() const
 	return d->FFull;
 }
 
-QString Jid::bare() const
-{
-	return d->FBare.toString();
-}
-
-QString Jid::eFull() const
-{
-	return d->FEscFull;
-}
-
-QString Jid::eBare() const
-{
-	return d->FEscBare.toString();
-}
-
 QString Jid::pFull() const
 {
 	return d->FPrepFull;
 }
 
-QString Jid::pBare() const
+QString Jid::uFull() const
 {
-	return d->FPrepBare.toString();
+	QString ufull = uBare();
+	if (d->FResource.string())
+	{
+		ufull += CharSlash;
+		ufull += d->FResource.toString();
+	}
+	return ufull;
 }
 
 Jid &Jid::operator=(const QString &AJidStr)
@@ -221,148 +226,136 @@ bool Jid::operator>(const Jid &AJid) const
 	return (d->FPrepFull > AJid.d->FPrepFull);
 }
 
+Jid Jid::fromUserInput(const QString &AJidStr)
+{
+	if (!AJidStr.isEmpty())
+	{
+		int at = AJidStr.indexOf(CharDog);
+		int slash = AJidStr.lastIndexOf(CharSlash);
+		if (slash==-1 || slash<at)
+			slash = AJidStr.size();
+		at = AJidStr.lastIndexOf(CharDog,slash-AJidStr.size()-1);
+		if (at > 0)
+			return Jid(escape(unescape(AJidStr.left(at))) + AJidStr.right(AJidStr.size()-at));
+	}
+	return Jid::null;
+}
+
+QString Jid::escape(const QString &AUserNode)
+{
+	QString escNode;
+	if (!AUserNode.isEmpty())
+	{
+		escNode.reserve(AUserNode.length()*3);
+
+		for (int i = 0; i<AUserNode.length(); i++)
+		{
+			int index = EscChars.indexOf(AUserNode.at(i));
+			if (index==0 && EscStrings.indexOf(AUserNode.mid(i,3))>=0)
+				escNode.append(EscStrings.at(index));
+			else if (index > 0)
+				escNode.append(EscStrings.at(index));
+			else
+				escNode.append(AUserNode.at(i));
+		}
+		
+		escNode.squeeze();
+	}
+	return escNode;
+}
+
+QString Jid::unescape(const QString &AEscNode)
+{
+	QString nodeStr;
+	if (!AEscNode.isEmpty())
+	{
+		nodeStr.reserve(AEscNode.length());
+
+		int index;
+		for (int i = 0; i<AEscNode.length(); i++)
+		{
+			if (AEscNode.at(i)=='\\' && (index = EscStrings.indexOf(AEscNode.mid(i,3)))>=0)
+			{
+				nodeStr.append(EscChars.at(index));
+				i+=2;
+			}
+			else
+			{
+				nodeStr.append(AEscNode.at(i));
+			}
+		}
+
+		nodeStr.squeeze();
+	}
+	return nodeStr;
+}
+
 QString Jid::encode(const QString &AJidStr)
 {
 	QString encJid;
-	encJid.reserve(AJidStr.length()*3);
-
-	for (int i = 0; i < AJidStr.length(); i++)
+	if (!AJidStr.isEmpty())
 	{
-		if (AJidStr.at(i) == '@')
-		{
-			encJid.append("_at_");
-		}
-		else if (AJidStr.at(i) == '.')
-		{
-			encJid.append('.');
-		}
-		else if (!AJidStr.at(i).isLetterOrNumber())
-		{
-			QString hex;
-			hex.sprintf("%%%02X", AJidStr.at(i).toLatin1());
-			encJid.append(hex);
-		}
-		else
-		{
-			encJid.append(AJidStr.at(i));
-		}
-	}
+		encJid.reserve(AJidStr.length()*3);
 
-	encJid.squeeze();
+		for (int i = 0; i < AJidStr.length(); i++)
+		{
+			if (AJidStr.at(i) == '@')
+			{
+				encJid.append("_at_");
+			}
+			else if (AJidStr.at(i) == '.')
+			{
+				encJid.append('.');
+			}
+			else if (!AJidStr.at(i).isLetterOrNumber())
+			{
+				QString hex;
+				hex.sprintf("%%%02X", AJidStr.at(i).toLatin1());
+				encJid.append(hex);
+			}
+			else
+			{
+				encJid.append(AJidStr.at(i));
+			}
+		}
+
+		encJid.squeeze();
+	}
 	return encJid;
 }
 
 QString Jid::decode(const QString &AEncJid)
 {
 	QString jidStr;
-	jidStr.reserve(AEncJid.length());
-
-	for (int i = 0; i < AEncJid.length(); i++)
+	if (!AEncJid.isEmpty())
 	{
-		if (AEncJid.at(i) == '%' && (AEncJid.length()-i-1) >= 2)
-		{
-			jidStr.append(char(AEncJid.mid(i+1,2).toInt(NULL,16)));
-			i += 2;
-		}
-		else
-		{
-			jidStr.append(AEncJid.at(i));
-		}
-	}
+		jidStr.reserve(AEncJid.length());
 
-	for (int i = jidStr.length(); i >= 3; i--)
-	{
-		if (jidStr.mid(i, 4) == "_at_")
+		for (int i = 0; i < AEncJid.length(); i++)
 		{
-			jidStr.replace(i, 4, "@");
-			break;
+			if (AEncJid.at(i) == '%' && (AEncJid.length()-i-1) >= 2)
+			{
+				jidStr.append(char(AEncJid.mid(i+1,2).toInt(NULL,16)));
+				i += 2;
+			}
+			else
+			{
+				jidStr.append(AEncJid.at(i));
+			}
 		}
-	}
 
-	jidStr.squeeze();
+		for (int i = jidStr.length(); i >= 3; i--)
+		{
+			if (jidStr.mid(i, 4) == "_at_")
+			{
+				jidStr.replace(i, 4, "@");
+				break;
+			}
+		}
+
+		jidStr.squeeze();
+	}
 	return jidStr;
-}
-
-QString Jid::encode822(const QString &AJidStr)
-{
-	QString encJid;
-	encJid.reserve(AJidStr.length()*4);
-
-	for (int i = 0; i < AJidStr.length(); i++)
-	{
-		if (AJidStr.at(i) == '\\' || AJidStr.at(i) == '<' || AJidStr.at(i) == '>')
-		{
-			QString hex;
-			hex.sprintf("\\x%02X", AJidStr.at(i).toLatin1());
-			encJid.append(hex);
-		}
-		else
-		{
-			encJid.append(AJidStr.at(i));
-		}
-	}
-
-	encJid.squeeze();
-	return encJid;
-}
-
-QString Jid::decode822(const QString &AEncJid)
-{
-	QString jidStr;
-	jidStr.reserve(AEncJid.length());
-
-	for (int i = 0; i < AEncJid.length(); i++)
-	{
-		if (AEncJid.at(i) == '\\' && i+3 < AEncJid.length() && AEncJid.at(i+1) == 'x')
-		{
-			jidStr.append(char(AEncJid.mid(i+2,2).toInt(NULL,16)));
-			i += 3;
-		}
-		else
-			jidStr.append(AEncJid.at(i));
-	}
-
-	jidStr.squeeze();
-	return jidStr;
-}
-
-QString Jid::escape106(const QString &ANode)
-{
-	QString escNode;
-	escNode.reserve(ANode.length()*3);
-
-	for (int i = 0; i<ANode.length(); i++)
-	{
-		int index = EscChars.indexOf(ANode.at(i));
-		if (index >= 0)
-			escNode.append(EscStrings.at(index));
-		else
-			escNode.append(ANode.at(i));
-	}
-
-	escNode.squeeze();
-	return escNode;
-}
-
-QString Jid::unescape106(const QString &AEscNode)
-{
-	QString nodeStr;
-	nodeStr.reserve(AEscNode.length());
-
-	int index;
-	for (int i = 0; i<AEscNode.length(); i++)
-	{
-		if (AEscNode.at(i) == '\\' && (index = EscStrings.indexOf(AEscNode.mid(i,3))) >= 0)
-		{
-			nodeStr.append(EscChars.at(index));
-			i+=2;
-		}
-		else
-			nodeStr.append(AEscNode.at(i));
-	}
-
-	nodeStr.squeeze();
-	return nodeStr;
 }
 
 QString Jid::nodePrepare(const QString &ANode)
@@ -398,7 +391,7 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 
 			if (at > 0)
 			{
-				d->FFull += unescape106(AJidStr.left(at));
+				d->FFull += AJidStr.left(at);
 				d->FNode = QStringRef(&d->FFull,0,d->FFull.size());
 				d->FFull.append(CharDog);
 			}
@@ -439,54 +432,20 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 				d->FResource = QStringRef(NULL,0,0);
 			}
 
-			// Build escaped JID
-			d->FEscFull = QString::null;
-
-			if (d->FNode.string())
-			{
-				d->FEscFull += escape106(d->FNode.toString());
-				d->FEscNode = QStringRef(&d->FEscFull,0,d->FEscFull.size());
-				d->FEscFull.append(CharDog);
-			}
-			else
-			{
-				d->FEscNode = QStringRef(NULL,0,0);
-			}
-
-			if (d->FDomain.string())
-			{
-				d->FEscFull += d->FDomain.toString();
-			}
-
-			if (!d->FEscFull.isEmpty())
-			{
-				d->FEscBare = QStringRef(&d->FEscFull,0,d->FEscFull.size());
-			}
-			else
-			{
-				d->FEscBare = QStringRef(NULL,0,0);
-			}
-
-			if (d->FResource.string())
-			{
-				d->FEscFull.append(CharSlash);
-				d->FEscFull += d->FResource.toString();
-			}
-
 			//Build prepared JID
 			d->FPrepFull = QString::null;
 
-			if (d->FEscNode.string())
+			if (d->FNode.string())
 			{
-				QString prepNode = nodePrepare(d->FEscNode.toString());
+				QString prepNode = nodePrepare(d->FNode.toString());
 				if (!prepNode.isEmpty())
 				{
 					d->FPrepFull += prepNode;
-					d->FNodeValid = true;
+					d->FNodeValid = !prepNode.startsWith("\\20") && !prepNode.endsWith("\\20");
 				}
 				else
 				{
-					d->FPrepFull += d->FEscNode.toString();
+					d->FPrepFull += d->FNode.toString();
 					d->FNodeValid = false;
 				}
 				d->FPrepNode = QStringRef(&d->FPrepFull,0,d->FPrepFull.size());
@@ -554,9 +513,9 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 		}
 		else
 		{
-			d->FFull = d->FEscFull = d->FPrepFull = QString::null;
-			d->FBare = d->FEscBare = d->FPrepBare = QStringRef(NULL,0,0);
-			d->FNode = d->FEscNode = d->FPrepNode = QStringRef(NULL,0,0);
+			d->FFull = d->FPrepFull = QString::null;
+			d->FBare = d->FPrepBare = QStringRef(NULL,0,0);
+			d->FNode = d->FPrepNode = QStringRef(NULL,0,0);
 			d->FDomain = d->FPrepDomain = QStringRef(NULL,0,0);
 			d->FResource = d->FPrepResource = QStringRef(NULL,0,0);
 			d->FNodeValid = d->FDomainValid = d->FResourceValid = false;

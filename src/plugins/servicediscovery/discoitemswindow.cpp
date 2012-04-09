@@ -30,7 +30,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Service Discovery - %1").arg(AStreamJid.full()));
+	setWindowTitle(tr("Service Discovery - %1").arg(AStreamJid.uFull()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SDISCOVERY_DISCOVER,0,0,"windowIcon");
 
 	FDataForms = NULL;
@@ -120,7 +120,7 @@ DiscoItemsWindow::~DiscoItemsWindow()
 
 void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
 {
-	ui.cmbJid->setEditText(AContactJid.full());
+	ui.cmbJid->setEditText(AContactJid.uFull());
 	ui.cmbNode->setEditText(ANode);
 
 	while (FModel->rowCount() > 0)
@@ -365,7 +365,7 @@ void DiscoItemsWindow::onToolBarActionTriggered(bool)
 
 void DiscoItemsWindow::onComboReturnPressed()
 {
-	Jid itemJid = ui.cmbJid->currentText().trimmed();
+	Jid itemJid = Jid::fromUserInput(ui.cmbJid->currentText().trimmed());
 	QString itemNode = ui.cmbNode->currentText().trimmed();
 	if (itemJid.isValid() && FDiscoverySteps.value(FCurrentStep) != qMakePair(itemJid,itemNode))
 		discover(itemJid,itemNode);

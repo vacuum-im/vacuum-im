@@ -81,9 +81,9 @@ QVariant DiscoItemsModel::data(const QModelIndex &AIndex, int ARole) const
 		switch (AIndex.column())
 		{
 		case COL_NAME:
-			return !index->itemName.isEmpty() ? index->itemName : index->itemJid.full();
+			return !index->itemName.isEmpty() ? index->itemName : index->itemJid.uFull();
 		case COL_JID:
-			return index->itemJid.full();
+			return index->itemJid.uFull();
 		case COL_NODE:
 			return index->itemNode;
 		}
@@ -101,7 +101,7 @@ QVariant DiscoItemsModel::data(const QModelIndex &AIndex, int ARole) const
 		case COL_NAME:
 			return index->toolTip;
 		case COL_JID:
-			return index->itemJid.full();
+			return index->itemJid.uFull();
 		case COL_NODE:
 			return index->itemNode;
 		}

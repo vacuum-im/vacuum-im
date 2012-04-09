@@ -41,7 +41,7 @@ void UserContextMenu::updateMenu()
 	{
 		QString name = FRosterIndex->data(RDR_NAME).toString();
 		if (name.isEmpty())
-			name = FChatWindow->contactJid().bare();
+			name = FChatWindow->contactJid().uBare();
 
 		Jid jid = FRosterIndex->data(RDR_PREP_FULL_JID).toString();
 		if (!jid.resource().isEmpty())
@@ -52,7 +52,7 @@ void UserContextMenu::updateMenu()
 	}
 	else
 	{
-		setTitle(FChatWindow->contactJid().full());
+		setTitle(FChatWindow->contactJid().uFull());
 		menuAction()->setVisible(false);
 	}
 }

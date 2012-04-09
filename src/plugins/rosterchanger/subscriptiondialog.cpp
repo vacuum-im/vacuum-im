@@ -5,7 +5,7 @@ SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginMa
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Subscription request - %1").arg(AStreamJid.bare()));
+	setWindowTitle(tr("Subscription request - %1").arg(AStreamJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_RCHANGER_SUBSCRIBTION,0,0,"windowIcon");
 
 	FRoster = NULL;
@@ -118,7 +118,7 @@ void SubscriptionDialog::onDialogAccepted()
 		if (dialog)
 		{
 			dialog->setContactJid(FContactJid);
-			dialog->setNickName(FContactJid.node());
+			dialog->setNickName(FContactJid.uNode());
 		}
 	}
 	else if (ui.rbtSendAndRequest->isChecked())

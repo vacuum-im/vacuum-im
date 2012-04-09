@@ -4,7 +4,7 @@ EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Annotation - %1").arg(AContactJid.bare()));
+	setWindowTitle(tr("Annotation - %1").arg(AContactJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_ANNOTATIONS,0,0,"windowIcon");
 
 	FAnnotations = AAnnotations;

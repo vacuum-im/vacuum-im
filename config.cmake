@@ -2,8 +2,8 @@ set(TARGET_LOADER vacuum)
 set(TARGET_UTILS vacuumutils)
 
 if (UNIX)
-	set(VERSION_UTILS 1.12.0)
-	set(VERSION_UTILS_ABI 1.12)
+	set(VERSION_UTILS 1.13.0)
+	set(VERSION_UTILS_ABI 1.13)
 endif (UNIX)
 
 if (APPLE)

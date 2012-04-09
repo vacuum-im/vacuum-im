@@ -7,7 +7,7 @@ AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChan
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Add Legacy User to %1").arg(AServiceJid.full()));
+	setWindowTitle(tr("Add Legacy User to %1").arg(AServiceJid.uFull()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_GATEWAYS_ADD_CONTACT,0,0,"windowIcon");
 
 	FGateways = AGateways;
@@ -82,7 +82,7 @@ void AddLegacyContactDialog::onUserJidReceived(const QString &AId, const Jid &AU
 	{
 		if (AUserJid.isValid())
 		{
-			ui.lblDescription->setText(tr("Jabber ID for %1 is %2").arg(FContactId).arg(AUserJid.full()));
+			ui.lblDescription->setText(tr("Jabber ID for %1 is %2").arg(FContactId).arg(AUserJid.uFull()));
 			if (FRosterChanger)
 			{
 				IAddContactDialog *dialog = FRosterChanger!=NULL ? FRosterChanger->showAddContactDialog(FStreamJid) : NULL;

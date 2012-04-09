@@ -136,9 +136,9 @@ bool MessageProcessor::sendMessage(const Jid &AStreamJid, Message &AMessage, int
 bool MessageProcessor::processMessage(const Jid &AStreamJid, Message &AMessage, int ADirection)
 {
 	if (ADirection == IMessageProcessor::MessageIn)
-		AMessage.setTo(AStreamJid.eFull());
+		AMessage.setTo(AStreamJid.full());
 	else
-		AMessage.setFrom(AStreamJid.eFull());
+		AMessage.setFrom(AStreamJid.full());
 
 	bool hooked = false;
 	QMapIterator<int,IMessageEditor *> it(FMessageEditors);

@@ -518,7 +518,7 @@ bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const I
 	if (FStanzaProcessor && FDataForms && !AForm.fields.isEmpty())
 	{
 		Stanza data("message");
-		data.setType("normal").setTo(ASession.contactJid.eFull());
+		data.setType("normal").setTo(ASession.contactJid.full());
 		data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
 		QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
 		IDataForm form = AForm;
@@ -534,7 +534,7 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 	if (FStanzaProcessor && FDataForms && !ASession.errorCondition.isEmpty())
 	{
 		Stanza data("message");
-		data.setType("error").setTo(ASession.contactJid.eFull());
+		data.setType("error").setTo(ASession.contactJid.full());
 		data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
 		QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
 		IDataForm request = ARequest;
@@ -867,7 +867,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 			{
 				notify.typeId = NNT_SESSION_NEGOTIATION;
 				notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SNEGOTIATION));
-				notify.data.insert(NDR_TOOLTIP,tr("Session negotiation - %1").arg(ASession.contactJid.full()));
+				notify.data.insert(NDR_TOOLTIP,tr("Session negotiation - %1").arg(ASession.contactJid.uFull()));
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Session negotiation"));
 				notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(ASession.streamJid,ASession.contactJid));
 				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
@@ -895,7 +895,7 @@ void SessionNegotiation::closeAcceptDialog(const IStanzaSession &ASession)
 
 void SessionNegotiation::localizeSession(IStanzaSession &ASession, IDataForm &AForm) const
 {
-	AForm.title = tr("Session negotiation - %1").arg(ASession.contactJid.full());
+	AForm.title = tr("Session negotiation - %1").arg(ASession.contactJid.uFull());
 	AForm.instructions = QStringList() << (AForm.type==DATAFORM_TYPE_FORM ? tr("Set desirable session settings.") : tr("Do you accept this session settings?"));
 
 	if (FDataForms)

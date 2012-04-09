@@ -69,7 +69,7 @@ void ReceiversWidget::addReceiver(const Jid &AReceiver)
 		{
 			QTreeWidgetItem *groupItem = getReceiversGroup(tr("Not in Roster"));
 			groupItem->setExpanded(true);
-			QString name = AReceiver.node().isEmpty() ? AReceiver.domain() : AReceiver.node();
+			QString name = !AReceiver.node().isEmpty() ? AReceiver.uNode() : AReceiver.domain();
 			contactItem = getReceiver(AReceiver,name,groupItem);
 			contactItem->setCheckState(0,Qt::Checked);
 		}
@@ -158,7 +158,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiver(const Jid &AReceiver, const QStrin
 
 	if (!contactItem)
 	{
-		QStringList columns = QStringList() << AName << AReceiver.full();
+		QStringList columns = QStringList() << AName << AReceiver.uFull();
 		contactItem = new QTreeWidgetItem(AParent,columns);
 		contactItem->setIcon(0,FStatusIcons->iconByJid(FStreamJid,AReceiver));
 		contactItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
@@ -207,7 +207,7 @@ void ReceiversWidget::createRosterTree()
 
 			foreach(Jid itemJid, itemJids.keys())
 			{
-				QString bareName = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.bare();
+				QString bareName = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.uBare();
 				QString fullName = itemJid.resource().isEmpty() ? bareName : bareName+"/"+itemJid.resource();
 				QTreeWidgetItem *contactItem = getReceiver(itemJid,fullName,groupItem);
 				contactItem->setCheckState(0, Qt::Unchecked);
@@ -311,7 +311,7 @@ void ReceiversWidget::onSelectNoneClicked()
 
 void ReceiversWidget::onAddClicked()
 {
-	Jid contactJid = QInputDialog::getText(this,tr("Add receiver"),tr("Enter valid contact jid:"));
+	Jid contactJid = Jid::fromUserInput(QInputDialog::getText(this,tr("Add receiver"),tr("Enter valid contact jid:")));
 	if (contactJid.isValid())
 		addReceiver(contactJid);
 }

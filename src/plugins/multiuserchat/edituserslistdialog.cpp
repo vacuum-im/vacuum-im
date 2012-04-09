@@ -26,9 +26,10 @@ EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QLis
 	ui.tbwTable->setRowCount(AList.count());
 	foreach(IMultiUserListItem listItem, AList)
 	{
+		Jid itemJid = listItem.jid;
 		QTableWidgetItem *jidItem = new QTableWidgetItem();
-		jidItem->setText(Jid(listItem.jid).full());
-		jidItem->setData(TIDR_ITEMJID, listItem.jid);
+		jidItem->setText(itemJid.uFull());
+		jidItem->setData(TIDR_ITEMJID, itemJid.full());
 		jidItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 		ui.tbwTable->setItem(row,0,jidItem);
 		if (FAffiliation == MUC_AFFIL_OUTCAST)
@@ -38,7 +39,7 @@ EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QLis
 			ui.tbwTable->setItem(jidItem->row(),1,reasonItem);
 		}
 		row++;
-		FCurrentItems.insert(listItem.jid,jidItem);
+		FCurrentItems.insert(itemJid,jidItem);
 	}
 	ui.tbwTable->horizontalHeader()->setHighlightSections(false);
 
@@ -79,10 +80,10 @@ QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 			listItem.notes = ui.tbwTable->item(jidItem->row(),1)->text();
 		result.append(listItem);
 	}
-	foreach(QString userJid, FDeletedItems)
+	foreach(Jid userJid, FDeletedItems)
 	{
 		IMultiUserListItem listItem;
-		listItem.jid = userJid;
+		listItem.jid = userJid.full();
 		listItem.affiliation = MUC_AFFIL_NONE;
 		result.append(listItem);
 	}
@@ -96,14 +97,14 @@ void EditUsersListDialog::setTitle(const QString &ATitle)
 
 void EditUsersListDialog::onAddClicked()
 {
-	Jid userJid = QInputDialog::getText(this,tr("Add new item"),tr("Enter new item JID:"));
-	if (userJid.isValid() && !FCurrentItems.contains(userJid.eFull()))
+	Jid userJid = Jid::fromUserInput(QInputDialog::getText(this,tr("Add new item"),tr("Enter new item JID:")));
+	if (userJid.isValid() && !FCurrentItems.contains(userJid))
 	{
 		int row = ui.tbwTable->rowCount();
 		ui.tbwTable->setRowCount(row+1);
 		QTableWidgetItem *jidItem = new QTableWidgetItem();
-		jidItem->setText(userJid.full());
-		jidItem->setData(TIDR_ITEMJID,userJid.eFull());
+		jidItem->setText(userJid.uFull());
+		jidItem->setData(TIDR_ITEMJID,userJid.full());
 		jidItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 		ui.tbwTable->setItem(row,0,jidItem);
 		if (FAffiliation == MUC_AFFIL_OUTCAST)
@@ -114,9 +115,9 @@ void EditUsersListDialog::onAddClicked()
 			ui.tbwTable->horizontalHeader()->resizeSection(0,QHeaderView::ResizeToContents);
 		}
 		ui.tbwTable->setCurrentItem(jidItem);
-		FDeletedItems.removeAll(userJid.eFull());
-		FAddedItems.insert(userJid.eFull(),jidItem);
-		FCurrentItems.insert(userJid.eFull(),jidItem);
+		FDeletedItems.removeAll(userJid);
+		FAddedItems.insert(userJid,jidItem);
+		FCurrentItems.insert(userJid,jidItem);
 	}
 	else if (!userJid.isEmpty())
 	{
@@ -129,7 +130,7 @@ void EditUsersListDialog::onDeleteClicked()
 	QTableWidgetItem *tableItem = ui.tbwTable->currentItem();
 	if (tableItem)
 	{
-		QString userJid = ui.tbwTable->item(tableItem->row(),0)->data(TIDR_ITEMJID).toString();
+		Jid userJid = ui.tbwTable->item(tableItem->row(),0)->data(TIDR_ITEMJID).toString();
 		if (!FAddedItems.contains(userJid))
 			FDeletedItems.append(userJid);
 		else

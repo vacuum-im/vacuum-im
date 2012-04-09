@@ -239,7 +239,7 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, const Jid &AStreamJid, 
 			if (!FLoadRequests.values().contains(AContentId))
 			{
 				Stanza request("iq");
-				request.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
+				request.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
 				QDomElement dataElem = request.addElement("data",NS_BITS_OF_BINARY);
 				dataElem.setAttribute("cid",AContentId);
 				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,LOAD_TIMEOUT))

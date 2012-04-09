@@ -195,7 +195,7 @@ QString SocksStreams::accountStreamProxy(const Jid &AStreamJid) const
 
 QString SocksStreams::connectionKey(const QString &ASessionId, const Jid &AInitiator, const Jid &ATarget) const
 {
-	QString keyString = ASessionId + AInitiator.prepared().eFull() + ATarget.prepared().eFull();
+	QString keyString = ASessionId + AInitiator.pFull() + ATarget.pFull();
 	QByteArray keyData = QCryptographicHash::hash(keyString.toUtf8(), QCryptographicHash::Sha1).toHex();
 	return QString::fromUtf8(keyData.constData(), keyData.size()).toLower();
 }

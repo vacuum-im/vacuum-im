@@ -535,9 +535,9 @@ QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) 
 QString Notifications::contactName(const Jid &AStreamJId, const Jid &AContactJid) const
 {
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJId) : NULL;
-	QString name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.node();
+	QString name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
 	if (name.isEmpty())
-		name = AContactJid.bare();
+		name = AContactJid.uBare();
 	return name;
 }
 

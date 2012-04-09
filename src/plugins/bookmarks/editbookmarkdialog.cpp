@@ -11,9 +11,9 @@ EditBookmarkDialog::EditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) :
 	ui.lneName->setText(ABookmark->name);
 	if (!ABookmark->conference.isEmpty())
 	{
-		ui.grbConference->setChecked(true);
 		ui.grbURL->setChecked(false);
-		ui.lneRoom->setText(ABookmark->conference);
+		ui.grbConference->setChecked(true);
+		ui.lneRoom->setText(Jid(ABookmark->conference).uBare());
 		ui.lneNick->setText(ABookmark->nick);
 		ui.lnePassword->setText(ABookmark->password);
 		ui.chbAutoJoin->setChecked(ABookmark->autojoin);
@@ -35,8 +35,9 @@ EditBookmarkDialog::~EditBookmarkDialog()
 
 }
 
-void EditBookmarkDialog::onGroupBoxClicked(bool /*AChecked*/)
+void EditBookmarkDialog::onGroupBoxClicked(bool AChecked)
 {
+	Q_UNUSED(AChecked);
 	QGroupBox *groupBox = qobject_cast<QGroupBox *>(sender());
 	if (groupBox == ui.grbConference)
 		ui.grbURL->setChecked(!ui.grbConference->isChecked());
@@ -53,7 +54,7 @@ void EditBookmarkDialog::onDialogAccepted()
 			if (!ui.lneRoom->text().isEmpty())
 			{
 				FBookmark->name = ui.lneName->text();
-				FBookmark->conference = ui.lneRoom->text();
+				FBookmark->conference = Jid::fromUserInput(ui.lneRoom->text()).bare();
 				FBookmark->nick = ui.lneNick->text();
 				FBookmark->password = ui.lnePassword->text();
 				FBookmark->autojoin = ui.chbAutoJoin->isChecked();
@@ -61,7 +62,9 @@ void EditBookmarkDialog::onDialogAccepted()
 				accept();
 			}
 			else
+			{
 				QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In conference bookmark field 'Room' should not be empty"));
+			}
 		}
 		else
 		{
@@ -76,9 +79,13 @@ void EditBookmarkDialog::onDialogAccepted()
 				accept();
 			}
 			else
+			{
 				QMessageBox::warning(this,tr("Bookmark is not valid"),tr("In URL bookmark field 'URL' should not be empty"));
+			}
 		}
 	}
 	else
+	{
 		QMessageBox::warning(this,tr("Bookmark is not valid"),tr("Field 'Name' should not be empty"));
+	}
 }

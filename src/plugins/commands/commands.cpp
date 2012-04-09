@@ -411,7 +411,7 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
 	if (FStanzaProcessor)
 	{
 		Stanza request("iq");
-		request.setTo(ARequest.contactJid.eFull()).setType("set").setId(FStanzaProcessor->newId());
+		request.setTo(ARequest.contactJid.full()).setType("set").setId(FStanzaProcessor->newId());
 		QDomElement cmdElem = request.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		cmdElem.setAttribute("node",ARequest.node);
 		if (!ARequest.sessionId.isEmpty())
@@ -434,7 +434,7 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 	if (FStanzaProcessor)
 	{
 		Stanza result("iq");
-		result.setType("result").setId(AResult.stanzaId).setTo(AResult.contactJid.eFull());
+		result.setType("result").setId(AResult.stanzaId).setTo(AResult.contactJid.full());
 
 		QDomElement cmdElem = result.addElement(COMMAND_TAG_NAME,NS_COMMANDS);
 		cmdElem.setAttribute("node",AResult.node);

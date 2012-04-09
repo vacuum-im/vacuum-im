@@ -1,7 +1,7 @@
 TARGET_LOADER            = vacuum
 
 TARGET_UTILS             = vacuumutils
-unix:VERSION_UTILS       = 1.12.0
+unix:VERSION_UTILS       = 1.13.0
 
 #Configurable values
 isEmpty(INSTALL_PREFIX) {

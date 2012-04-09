@@ -659,7 +659,7 @@ bool SocksStream::requestProxyAddress()
 	foreach(Jid proxy, FProxyList)
 	{
 		Stanza request("iq");
-		request.setType("get").setTo(proxy.eFull()).setId(FStanzaProcessor->newId());
+		request.setType("get").setTo(proxy.full()).setId(FStanzaProcessor->newId());
 		request.addElement("query",NS_SOCKS5_BYTESTREAMS);
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,PROXY_REQUEST_TIMEOUT))
 		{
@@ -673,7 +673,7 @@ bool SocksStream::requestProxyAddress()
 bool SocksStream::sendAvailHosts()
 {
 	Stanza request("iq");
-	request.setType("set").setTo(FContactJid.eFull()).setId(FStanzaProcessor->newId());
+	request.setType("set").setTo(FContactJid.full()).setId(FStanzaProcessor->newId());
 
 	QDomElement queryElem = request.addElement("query",NS_SOCKS5_BYTESTREAMS);
 	queryElem.setAttribute("sid",FStreamId);
@@ -706,7 +706,7 @@ bool SocksStream::sendAvailHosts()
 	foreach(HostInfo info, FHosts)
 	{
 		QDomElement hostElem = queryElem.appendChild(request.createElement("streamhost")).toElement();
-		hostElem.setAttribute("jid",info.jid.eFull());
+		hostElem.setAttribute("jid",info.jid.full());
 		hostElem.setAttribute("host",info.name);
 		hostElem.setAttribute("port",info.port);
 	}
@@ -746,13 +746,13 @@ bool SocksStream::sendUsedHost()
 	if (FHostIndex < FHosts.count())
 	{
 		Stanza reply("iq");
-		reply.setType("result").setId(FHostRequest).setTo(FContactJid.eFull());
+		reply.setType("result").setId(FHostRequest).setTo(FContactJid.full());
 
 		QDomElement query =  reply.addElement("query",NS_SOCKS5_BYTESTREAMS);
 		query.setAttribute("sid",FStreamId);
 
 		QDomElement hostElem = query.appendChild(reply.addElement("streamhost-used")).toElement();
-		hostElem.setAttribute("jid",FHosts.at(FHostIndex).jid.eFull());
+		hostElem.setAttribute("jid",FHosts.at(FHostIndex).jid.full());
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid, reply))
 			return true;
@@ -763,7 +763,7 @@ bool SocksStream::sendUsedHost()
 bool SocksStream::sendFailedHosts()
 {
 	Stanza reply("iq");
-	reply.setType("error").setTo(FContactJid.eFull()).setId(FHostRequest);
+	reply.setType("error").setTo(FContactJid.full()).setId(FHostRequest);
 
 	QDomElement errElem = reply.addElement("error");
 	errElem.setAttribute("code", 404);
@@ -778,10 +778,10 @@ bool SocksStream::activateStream()
 	if (FHostIndex < FHosts.count())
 	{
 		Stanza request("iq");
-		request.setType("set").setTo(FHosts.at(FHostIndex).jid.eFull()).setId(FStanzaProcessor->newId());
+		request.setType("set").setTo(FHosts.at(FHostIndex).jid.full()).setId(FStanzaProcessor->newId());
 		QDomElement queryElem = request.addElement("query",NS_SOCKS5_BYTESTREAMS);
 		queryElem.setAttribute("sid",FStreamId);
-		queryElem.appendChild(request.createElement("activate")).appendChild(request.createTextNode(FContactJid.eFull()));
+		queryElem.appendChild(request.createElement("activate")).appendChild(request.createTextNode(FContactJid.full()));
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,request,ACTIVATE_REQUEST_TIMEOUT))
 		{
 			FActivateRequest = request.id();

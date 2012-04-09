@@ -14,12 +14,11 @@
 #define TDR_CONF                Qt::UserRole+5
 #define TDR_URL                 Qt::UserRole+6
 
-EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStreamJid,
-    const QList<IBookMark> &AList, QWidget *AParent) : QDialog(AParent)
+EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStreamJid, const QList<IBookMark> &AList, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Edit bookmarks - %1").arg(AStreamJid.bare()));
+	setWindowTitle(tr("Edit bookmarks - %1").arg(AStreamJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_BOOKMARKS_EDIT,0,0,"windowIcon");
 
 	FBookmarks = ABookmarks;
@@ -89,9 +88,11 @@ void EditBookmarksDialog::setBookmarkToRow(int ARow, const IBookMark &ABookmark)
 	nameItem->setData(TDR_CONF,ABookmark.conference);
 	nameItem->setData(TDR_URL,ABookmark.url);
 	ui.tbwBookmarks->setItem(ARow,C_NAME,nameItem);
+
 	QTableWidgetItem *valueItem = new QTableWidgetItem;
-	valueItem->setText(ABookmark.conference.isEmpty() ? ABookmark.url : ABookmark.conference);
+	valueItem->setText(ABookmark.conference.isEmpty() ? ABookmark.url : Jid(ABookmark.conference).uBare());
 	ui.tbwBookmarks->setItem(nameItem->row(),C_VALUE,valueItem);
+
 	QTableWidgetItem *nickItem = new QTableWidgetItem;
 	nickItem->setText(ABookmark.nick);
 	ui.tbwBookmarks->setItem(nameItem->row(),C_NICK,nickItem);
@@ -171,11 +172,15 @@ void EditBookmarksDialog::onDialogAccepted()
 		ui.bbxButtons->setStandardButtons(QDialogButtonBox::Cancel);
 	}
 	else
+	{
 		QMessageBox::warning(this,tr("Bookmarks not saved"),tr("Cant save bookmarks to server"));
+	}
 }
 
-void EditBookmarksDialog::onBookmarksUpdated(const QString &AId, const Jid &/*AStreamJid*/, const QDomElement &/*AElement*/)
+void EditBookmarksDialog::onBookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
+	Q_UNUSED(AStreamJid);
+	Q_UNUSED(AElement);
 	if (AId == FRequestId)
 		accept();
 }

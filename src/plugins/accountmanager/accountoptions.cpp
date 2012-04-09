@@ -46,7 +46,8 @@ void AccountOptions::apply()
 			name = ui.lneJabberId->text().trimmed();
 		if (name.isEmpty())
 			name = tr("New Account");
-		Jid jabberId = ui.lneJabberId->text();
+
+		Jid jabberId = Jid::fromUserInput(ui.lneJabberId->text());
 		jabberId.setResource(ui.lneResource->text());
 
 		bool changedJid = (FAccount->streamJid() != jabberId);
@@ -68,7 +69,7 @@ void AccountOptions::reset()
 	if (FAccount)
 	{
 		ui.lneName->setText(FAccount->name());
-		ui.lneJabberId->setText(FAccount->streamJid().bare());
+		ui.lneJabberId->setText(FAccount->streamJid().uBare());
 		ui.lneResource->setText(FAccount->streamJid().resource());
 		ui.lnePassword->setText(FAccount->password());
 	}

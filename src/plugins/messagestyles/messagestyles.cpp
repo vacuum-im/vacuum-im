@@ -165,7 +165,7 @@ QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid
 	}
 	else if (AStreamJid && AContactJid)
 	{
-		name = !AContactJid.resource().isEmpty() ? AContactJid.resource() : AContactJid.node();
+		name = !AContactJid.resource().isEmpty() ? AContactJid.resource() : AContactJid.uNode();
 	}
 	else
 	{
@@ -176,9 +176,9 @@ QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid
 	if (name.isEmpty())
 	{
 		if (AContactJid.isValid())
-			name = !AContactJid.node().isEmpty() ? AContactJid.node() : AContactJid.domain();
+			name = !AContactJid.node().isEmpty() ? AContactJid.uNode() : AContactJid.domain();
 		else
-			name = !AStreamJid.node().isEmpty() ? AStreamJid.node() : AStreamJid.domain();
+			name = !AStreamJid.node().isEmpty() ? AStreamJid.uNode() : AStreamJid.domain();
 	}
 
 	return name;

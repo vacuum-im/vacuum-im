@@ -540,7 +540,7 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
 		ClientInfoDialog *dialog = FClientInfoDialogs.value(AContactJid,NULL);
 		if (!dialog)
 		{
-			QString contactName =  AContactJid.node();
+			QString contactName =  AContactJid.uNode();
 			if (FDiscovery!=NULL && FDiscovery->discoInfo(AStreamJid,AContactJid.bare()).identity.value(0).category == "conference")
 				contactName = AContactJid.resource();
 			if (contactName.isEmpty())
@@ -555,7 +555,7 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
 						contactName = ritem.name;
 				}
 			}
-			dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,!contactName.isEmpty() ? contactName : AContactJid.full(),AInfoTypes);
+			dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,!contactName.isEmpty() ? contactName : AContactJid.uFull(),AInfoTypes);
 			connect(dialog,SIGNAL(clientInfoDialogClosed(const Jid &)),SLOT(onClientInfoDialogClosed(const Jid &)));
 			FClientInfoDialogs.insert(AContactJid,dialog);
 			dialog->show();
@@ -580,7 +580,7 @@ bool ClientInfo::requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJ
 	{
 		Stanza iq("iq");
 		iq.addElement("query",NS_JABBER_VERSION);
-		iq.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
+		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,SOFTWARE_INFO_TIMEOUT);
 		if (sent)
 		{
@@ -623,7 +623,7 @@ bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJ
 	{
 		Stanza iq("iq");
 		iq.addElement("query",NS_JABBER_LAST);
-		iq.setTo(AContactJid.eFull()).setId(FStanzaProcessor->newId()).setType("get");
+		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
 		if (sent)
 			FActivityId.insert(iq.id(),AContactJid);
@@ -653,7 +653,7 @@ bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid
 	{
 		Stanza iq("iq");
 		iq.addElement("time",NS_XMPP_TIME);
-		iq.setTo(AContactJid.eFull()).setType("get").setId(FStanzaProcessor->newId());
+		iq.setTo(AContactJid.full()).setType("get").setId(FStanzaProcessor->newId());
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,ENTITY_TIME_TIMEOUT);
 		if (sent)
 		{

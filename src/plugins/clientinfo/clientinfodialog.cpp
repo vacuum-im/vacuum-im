@@ -41,7 +41,7 @@ void ClientInfoDialog::setInfoTypes(int AInfoTypes)
 void ClientInfoDialog::updateText()
 {
 	QString itemMask = "%1 %2<br>";
-	QString html = QString("<b>%1</b> (%2)<br><br>").arg(Qt::escape(FContactName)).arg(Qt::escape(FContactJid.full()));
+	QString html = QString("<b>%1</b> (%2)<br><br>").arg(Qt::escape(FContactName)).arg(Qt::escape(FContactJid.uFull()));
 
 	//Software Info
 	if ((FInfoTypes & IClientInfo::SoftwareVersion)>0)

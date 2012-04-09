@@ -765,7 +765,7 @@ bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArch
 			QStringList logFields;
 			logFields << DateTime(QDateTime::currentDateTime()).toX85UTC();
 			logFields << AAction;
-			logFields << AHeader.with.eFull();
+			logFields << AHeader.with.full();
 			logFields << DateTime(AHeader.start).toX85UTC();
 			logFields << QString::number(AHeader.version);
 			logFields << "\n";

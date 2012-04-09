@@ -736,7 +736,7 @@ void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, M
 			{
 				Action *action = new Action(AMenu);
 				action->setText(tr("Jabber ID"));
-				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_FULL_JID));
+				action->setData(ADR_CLIPBOARD_DATA, Jid(index->data(RDR_FULL_JID).toString()).uBare());
 				action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 				AMenu->addAction(action, AG_DEFAULT, true);
@@ -1241,9 +1241,9 @@ void RostersView::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMul
 		if (!name.isEmpty())
 			AToolTips.insert(RTTO_CONTACT_NAME, Qt::escape(name));
 
-		QString jid = AIndex->data(RDR_FULL_JID).toString();
+		Jid jid = AIndex->data(RDR_FULL_JID).toString();
 		if (!jid.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_JID, Qt::escape(jid));
+			AToolTips.insert(RTTO_CONTACT_JID, Qt::escape(jid.uFull()));
 
 		QString priority = AIndex->data(RDR_PRIORITY).toString();
 		if (!priority.isEmpty())

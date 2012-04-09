@@ -386,7 +386,7 @@ void ArchiveStreamOptions::updateItemPrefs(const Jid &AItemJid, const IArchiveIt
 {
 	if (!FTableItems.contains(AItemJid))
 	{
-		QTableWidgetItem *jidItem = new QTableWidgetItem(AItemJid.full());
+		QTableWidgetItem *jidItem = new QTableWidgetItem(AItemJid.uFull());
 		QTableWidgetItem *otrItem = new QTableWidgetItem();
 		QTableWidgetItem *saveItem = new QTableWidgetItem();
 		QTableWidgetItem *expireItem = new QTableWidgetItem();
@@ -424,7 +424,7 @@ void ArchiveStreamOptions::removeItemPrefs(const Jid &AItemJid)
 
 void ArchiveStreamOptions::onAddItemPrefClicked()
 {
-	Jid itemJid = QInputDialog::getText(this,tr("New item preferences"),tr("Enter item JID:"));
+	Jid itemJid = Jid::fromUserInput(QInputDialog::getText(this,tr("New item preferences"),tr("Enter item JID:")));
 	if (itemJid.isValid() && !FTableItems.contains(itemJid))
 	{
 		IArchiveItemPrefs itemPrefs = FArchiver->archiveItemPrefs(FStreamJid,itemJid);
@@ -434,7 +434,7 @@ void ArchiveStreamOptions::onAddItemPrefClicked()
 	}
 	else if (!itemJid.isEmpty())
 	{
-		QMessageBox::warning(this,tr("Unacceptable item JID"),tr("'%1' is not valid JID or already exists").arg(Qt::escape(itemJid.full())));
+		QMessageBox::warning(this,tr("Unacceptable item JID"),tr("'%1' is not valid JID or already exists").arg(Qt::escape(itemJid.uFull())));
 	}
 }
 

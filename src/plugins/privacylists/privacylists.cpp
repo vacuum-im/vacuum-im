@@ -224,7 +224,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 					rule.type = ruleElem.attribute("type");
 					rule.value = ruleElem.attribute("value");
 					if (rule.type == PRIVACY_TYPE_JID)
-						rule.value = Jid(rule.value).prepared().eFull();
+						rule.value = Jid(rule.value).pFull();
 					rule.action = ruleElem.attribute("action");
 					rule.stanzas = IPrivacyRule::EmptyType;
 					if (!ruleElem.firstChildElement("message").isNull())
@@ -343,7 +343,7 @@ IPrivacyRule PrivacyLists::autoListRule(const Jid &AContactJid, const QString &A
 	IPrivacyRule rule;
 	rule.order = 0;
 	rule.type = PRIVACY_TYPE_JID;
-	rule.value = AContactJid.prepared().eFull();
+	rule.value = AContactJid.pFull();
 	rule.stanzas = IPrivacyRule::EmptyType;
 	if (AList == PRIVACY_LIST_VISIBLE)
 	{
@@ -1189,7 +1189,7 @@ void PrivacyLists::onApplyAutoLists()
 
 		IPrivacyRule selfAllow;
 		selfAllow.type = PRIVACY_TYPE_JID;
-		selfAllow.value = streamJid.prepared().eBare();
+		selfAllow.value = streamJid.pBare();
 		selfAllow.action = PRIVACY_ACTION_ALLOW;
 		selfAllow.stanzas = IPrivacyRule::AnyStanza;
 		list.rules.append(selfAllow);

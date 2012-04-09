@@ -414,7 +414,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 			if (dialog)
 			{
 				dialog->setContactJid(AContactJid);
-				dialog->setNickName(AParams.contains("name") ? AParams.value("name") : AContactJid.node());
+				dialog->setNickName(AParams.contains("name") ? AParams.value("name") : AContactJid.uNode());
 				dialog->setGroup(AParams.contains("group") ? AParams.value("group") : QString::null);
 				dialog->instance()->show();
 			}
@@ -427,8 +427,8 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && roster->rosterItem(AContactJid).isValid)
 		{
 			if (QMessageBox::question(NULL, tr("Remove contact"),
-			                          tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(Qt::escape(AContactJid.bare())),
-			                          QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+				tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(Qt::escape(AContactJid.uBare())),
+				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->removeItem(AContactJid);
 			}
@@ -442,8 +442,8 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
 		{
 			if (QMessageBox::question(NULL, tr("Subscribe for contact presence"),
-			                          tr("You are assured that wish to subscribe for a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.bare())),
-			                          QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+				tr("You are assured that wish to subscribe for a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.uBare())),
+				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Subscribe);
 			}
@@ -457,8 +457,8 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_NONE && ritem.subscription!=SUBSCRIPTION_FROM)
 		{
 			if (QMessageBox::question(NULL, tr("Unsubscribe from contact presence"),
-			                          tr("You are assured that wish to unsubscribe from a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.bare())),
-			                          QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
+				tr("You are assured that wish to unsubscribe from a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.uBare())),
+				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Unsubscribe);
 			}
@@ -553,13 +553,13 @@ QString RosterChanger::subscriptionNotify(int ASubsType, const Jid &AContactJid)
 	switch (ASubsType)
 	{
 	case IRoster::Subscribe:
-		return tr("%1 wants to subscribe to your presence.").arg(Qt::escape(AContactJid.bare()));
+		return tr("%1 wants to subscribe to your presence.").arg(AContactJid.uBare());
 	case IRoster::Subscribed:
-		return tr("You are now subscribed for %1 presence.").arg(Qt::escape(AContactJid.bare()));
+		return tr("You are now subscribed for %1 presence.").arg(AContactJid.uBare());
 	case IRoster::Unsubscribe:
-		return tr("%1 unsubscribed from your presence.").arg(Qt::escape(AContactJid.bare()));
+		return tr("%1 unsubscribed from your presence.").arg(AContactJid.uBare());
 	case IRoster::Unsubscribed:
-		return tr("You are now unsubscribed from %1 presence.").arg(Qt::escape(AContactJid.bare()));
+		return tr("You are now unsubscribed from %1 presence.").arg(AContactJid.uBare());
 	}
 	return QString::null;
 }
@@ -870,7 +870,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
 	{
 		int indexType = AIndexes.first()->type();
-		QString streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
+		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 		if (roster && roster->isOpen())
 		{
@@ -892,7 +892,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID<<RDR_GROUP<<RDR_NAME,RDR_PREP_BARE_JID);
 				
 				QHash<int,QVariant> data;
-				data.insert(ADR_STREAM_JID,streamJid);
+				data.insert(ADR_STREAM_JID,streamJid.full());
 				data.insert(ADR_CONTACT_JID,rolesMap.value(RDR_PREP_BARE_JID));
 				data.insert(ADR_NICK,rolesMap.value(RDR_NAME));
 				data.insert(ADR_GROUP,rolesMap.value(RDR_GROUP));
@@ -971,7 +971,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 						action = new Action(AMenu);
 						action->setText(tr("Add contact..."));
 						action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-						action->setData(ADR_STREAM_JID,streamJid);
+						action->setData(ADR_STREAM_JID,streamJid.full());
 						action->setData(ADR_CONTACT_JID,index->data(RDR_FULL_JID));
 						action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
 						connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
@@ -1021,7 +1021,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 						action = new Action(AMenu);
 						action->setText(tr("Remove from group"));
 						action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_REMOVE_FROM_GROUP);
-						action->setData(ADR_STREAM_JID,streamJid);
+						action->setData(ADR_STREAM_JID,streamJid.full());
 						action->setData(ADR_CONTACT_JID,fullRolesMap.value(RDR_PREP_BARE_JID));
 						action->setData(ADR_GROUP,fullRolesMap.value(RDR_GROUP));
 						action->setShortcutId(SCT_ROSTERVIEW_REMOVEFROMGROUP);
@@ -1043,7 +1043,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_GROUP);
 
 				QHash<int,QVariant> data;
-				data.insert(ADR_STREAM_JID,streamJid);
+				data.insert(ADR_STREAM_JID,streamJid.full());
 				data.insert(ADR_GROUP,rolesMap.value(RDR_GROUP));
 
 				if (AIndexes.count() == 1)
@@ -1051,7 +1051,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 					Action *action = new Action(AMenu);
 					action->setText(tr("Add contact..."));
 					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-					action->setData(ADR_STREAM_JID,streamJid);
+					action->setData(ADR_STREAM_JID,streamJid.full());
 					action->setData(ADR_GROUP,AIndexes.first()->data(RDR_GROUP));
 					action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
 					connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
@@ -1060,7 +1060,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 					action = new Action(AMenu);
 					action->setText(tr("Rename group"));
 					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_RENAME);
-					action->setData(ADR_STREAM_JID,streamJid);
+					action->setData(ADR_STREAM_JID,streamJid.full());
 					action->setData(ADR_GROUP,AIndexes.first()->data(RDR_GROUP));
 					action->setShortcutId(SCT_ROSTERVIEW_RENAME);
 					connect(action,SIGNAL(triggered(bool)),SLOT(onRenameGroup(bool)));
@@ -1162,7 +1162,7 @@ void RosterChanger::renameContact(const Jid &AStreamJid, const Jid &AContactJid,
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen() && roster->rosterItem(AContactJid).isValid)
 	{
-		QString newName = QInputDialog::getText(NULL,tr("Rename contact"),tr("Enter name for: <b>%1</b>").arg(Qt::escape(AContactJid.bare())),QLineEdit::Normal,AOldName);
+		QString newName = QInputDialog::getText(NULL,tr("Rename contact"),tr("Enter name for: <b>%1</b>").arg(Qt::escape(AContactJid.uBare())),QLineEdit::Normal,AOldName);
 		if (!newName.isEmpty() && newName != AOldName)
 			roster->renameItem(AContactJid,newName);
 	}

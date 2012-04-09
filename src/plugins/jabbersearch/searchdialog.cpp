@@ -85,7 +85,7 @@ ISearchItem SearchDialog::currentItem() const
 
 void SearchDialog::resetDialog()
 {
-	setWindowTitle(tr("Search in %1").arg(FServiceJid.full()));
+	setWindowTitle(tr("Search in %1").arg(FServiceJid.uFull()));
 	FToolBarChanger->toolBar()->hide();
 	if (FCurrentForm)
 	{
@@ -261,7 +261,7 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
 			ui.tbwResult->setRowCount(AResult.items.count());
 			foreach(ISearchItem item, AResult.items)
 			{
-				QTableWidgetItem *itemJid = new QTableWidgetItem(item.itemJid.full());
+				QTableWidgetItem *itemJid = new QTableWidgetItem(item.itemJid.uFull());
 				itemJid->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 				QTableWidgetItem *itemFirst = new QTableWidgetItem(item.firstName);
 				itemFirst->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);

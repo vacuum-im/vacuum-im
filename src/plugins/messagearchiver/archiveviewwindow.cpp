@@ -282,14 +282,14 @@ void ArchiveViewWindow::reset()
 	{
 		ui.spwSelectPage->setVisible(true);
 		ui.pbtLoadEarlierMessages->setVisible(false);
-		setWindowTitle(tr("Conversation history - %1").arg(streamJid().bare()));
+		setWindowTitle(tr("Conversation history - %1").arg(streamJid().uBare()));
 	}
 	else
 	{
 		ui.spwSelectPage->setVisible(false);
 		ui.pbtLoadEarlierMessages->setVisible(true);
 		ui.pbtLoadEarlierMessages->setText(tr("Load earlier messages"));
-		setWindowTitle(tr("Conversation history with %1 - %2").arg(contactName(FContactJid),streamJid().bare()));
+		setWindowTitle(tr("Conversation history with %1 - %2").arg(contactName(FContactJid),streamJid().uBare()));
 	}
 
 	clearMessages();
@@ -300,7 +300,7 @@ void ArchiveViewWindow::reset()
 QString ArchiveViewWindow::contactName(const Jid &AContactJid, bool AShowResource) const
 {
 	IRosterItem ritem = FRoster->rosterItem(AContactJid);
-	QString name = !ritem.name.isEmpty() ? ritem.name : AContactJid.bare();
+	QString name = !ritem.name.isEmpty() ? ritem.name : AContactJid.uBare();
 	if (AShowResource && !AContactJid.resource().isEmpty())
 		name = name + "/" +AContactJid.resource();
 	return name;
@@ -370,7 +370,7 @@ QStandardItem *ArchiveViewWindow::createHeaderItem(const IArchiveHeader &AHeader
 	item->setData(AHeader.version,HDR_HEADER_VERSION);
 	item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_DATE));
 
-	QString itemToolTip = Qt::escape(AHeader.with.full());
+	QString itemToolTip = Qt::escape(AHeader.with.uFull());
 	if (!AHeader.subject.isEmpty())
 		itemToolTip += "<hr>" + Qt::escape(AHeader.subject);
 	item->setToolTip(itemToolTip);
@@ -612,12 +612,12 @@ QString ArchiveViewWindow::showCollectionInfo(const IArchiveCollection &ACollect
 	if (FViewOptions.isPrivateChat)
 	{
 		QString withName = Qt::escape(ACollection.header.with.resource());
-		QString confName = Qt::escape(ACollection.header.with.bare());
+		QString confName = Qt::escape(ACollection.header.with.uBare());
 		info = tr("Conversation with <b>%1</b> in conference %2 started at <b>%3</b>.").arg(withName,confName,startDate);
 	}
 	else if (FViewOptions.isGroupChat)
 	{
-		QString confName = Qt::escape(ACollection.header.with.bare());
+		QString confName = Qt::escape(ACollection.header.with.uBare());
 		info = tr("Conversation in conference %1 started at <b>%2</b>.").arg(confName,startDate);
 	}
 	else
@@ -763,7 +763,7 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 			FViewOptions.contactName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid(),ACollection.header.with) : contactName(ACollection.header.with));
 		else
 			FViewOptions.contactName = Qt::escape(ACollection.header.with.resource());
-		FViewOptions.selfName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid()) : streamJid().bare());
+		FViewOptions.selfName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid()) : streamJid().uBare());
 	}
 
 	FViewOptions.lastTime = QDateTime();

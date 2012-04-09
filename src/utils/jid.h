@@ -16,9 +16,9 @@ public:
 	JidData();
 	JidData(const JidData &AOther);
 public:
-	QString FFull, FEscFull, FPrepFull;
-	QStringRef FBare, FEscBare, FPrepBare;
-	QStringRef FNode, FEscNode, FPrepNode;
+	QString FFull, FPrepFull;
+	QStringRef FBare, FPrepBare;
+	QStringRef FNode, FPrepNode;
 	QStringRef FDomain, FPrepDomain;
 	QStringRef FResource, FPrepResource;
 	bool FNodeValid, FDomainValid, FResourceValid;
@@ -34,8 +34,8 @@ public:
 	bool isValid() const;
 	bool isEmpty() const;
 	QString node() const;
-	QString eNode() const;
 	QString pNode() const;
+	QString uNode() const;
 	void setNode(const QString &ANode);
 	QString domain() const;
 	QString pDomain() const;
@@ -43,13 +43,12 @@ public:
 	QString resource() const;
 	QString pResource() const;
 	void setResource(const QString &AResource);
-	Jid prepared() const;
-	QString full() const;
 	QString bare() const;
-	QString eFull() const;
-	QString eBare() const;
-	QString pFull() const;
 	QString pBare() const;
+	QString uBare() const;
+	QString full() const;
+	QString pFull() const;
+	QString uFull() const;
 	Jid& operator =(const QString &AJidStr);
 	bool operator ==(const Jid &AJid) const;
 	bool operator ==(const QString &AJidStr) const;
@@ -61,12 +60,11 @@ public:
 	bool operator >(const Jid &AJid) const;
 public:
 	static Jid null;
+	static Jid fromUserInput(const QString &AJidStr);
+	static QString escape(const QString &AUserNode);
+	static QString unescape(const QString &AEscNode);
 	static QString encode(const QString &AJidStr);
 	static QString decode(const QString &AEncJid);
-	static QString encode822(const QString &AJidStr);
-	static QString decode822(const QString &AEncJid);
-	static QString escape106(const QString &ANode);
-	static QString unescape106(const QString &AEscNode);
 	static QString nodePrepare(const QString &ANode);
 	static QString domainPrepare(const QString &ADomain);
 	static QString resourcePrepare(const QString &AResource);

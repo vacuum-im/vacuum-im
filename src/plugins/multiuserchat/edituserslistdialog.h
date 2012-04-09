@@ -25,9 +25,9 @@ private:
 	Ui::EditUsersListDialogClass ui;
 private:
 	QString FAffiliation;
-	QList<QString> FDeletedItems;
-	QMap<QString,QTableWidgetItem *> FAddedItems;
-	QMap<QString,QTableWidgetItem *> FCurrentItems;
+	QList<Jid> FDeletedItems;
+	QMap<Jid,QTableWidgetItem *> FAddedItems;
+	QMap<Jid,QTableWidgetItem *> FCurrentItems;
 };
 
 #endif // EDITUSERSLISTDIALOG_H
