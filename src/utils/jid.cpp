@@ -237,6 +237,7 @@ Jid Jid::fromUserInput(const QString &AJidStr)
 		at = AJidStr.lastIndexOf(CharDog,slash-AJidStr.size()-1);
 		if (at > 0)
 			return Jid(escape(unescape(AJidStr.left(at))) + AJidStr.right(AJidStr.size()-at));
+		return Jid(AJidStr);
 	}
 	return Jid::null;
 }
