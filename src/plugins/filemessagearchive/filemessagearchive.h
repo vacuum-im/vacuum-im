@@ -71,6 +71,7 @@ signals:
 	void fileCollectionSaved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	void fileCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 protected:
+	void loadGatewayTypes();
 	Jid gatewayJid(const Jid &AJid) const;
 	IArchiveHeader makeHeader(const Jid &AItemJid, const Message &AMessage) const;
 	bool checkCollectionFile(const QString &AFileName, const IArchiveRequest &ARequest) const;

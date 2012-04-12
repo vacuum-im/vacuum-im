@@ -83,19 +83,6 @@ bool FileMessageArchive::initObjects()
 {
 	FArchiveHomePath = FPluginManager->homePath();
 
-	QString dirPath = collectionDirPath(Jid::null,Jid::null);
-	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
-	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
-	{
-		while (!gateways.atEnd())
-		{
-			QStringList gateway = QString::fromUtf8(gateways.readLine()).split(" ");
-			if (!gateway.value(0).isEmpty() && !gateway.value(1).isEmpty())
-				FGatewayTypes.insert(gateway.value(0),gateway.value(1));
-		}
-	}
-	gateways.close();
-
 	if (FArchiver)
 	{
 		FArchiver->registerArchiveEngine(this);
@@ -662,6 +649,23 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	return false;
 }
 
+void FileMessageArchive::loadGatewayTypes()
+{
+	FGatewayTypes.clear();
+	QString dirPath = collectionDirPath(Jid::null,Jid::null);
+	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
+	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
+	{
+		while (!gateways.atEnd())
+		{
+			QStringList gateway = QString::fromUtf8(gateways.readLine()).split(" ");
+			if (!gateway.value(0).isEmpty() && !gateway.value(1).isEmpty())
+				FGatewayTypes.insert(gateway.value(0),gateway.value(1));
+		}
+	}
+	gateways.close();
+}
+
 Jid FileMessageArchive::gatewayJid(const Jid &AJid) const
 {
 	Jid jid = AJid;
@@ -891,6 +895,7 @@ void FileMessageArchive::onOptionsOpened()
 	{
 		FArchiveHomePath = FPluginManager->homePath();
 	}
+	loadGatewayTypes();
 }
 
 void FileMessageArchive::onOptionsClosed()
