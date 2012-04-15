@@ -4,16 +4,11 @@
 
 ToolBarChanger::ToolBarChanger(QToolBar *AToolBar) : QObject(AToolBar)
 {
-	FIntVisible = false;
-	FExtVisible = AToolBar->isVisible();
 	FSeparatorsVisible = true;
-	FManageVisibility = true;
-	FVisibleTimerStarted = false;
-	FChangingIntVisible = 0;
+	FAutoHideIfEmpty = true;
 
 	FToolBar = AToolBar;
 	FToolBar->clear();
-	FToolBar->installEventFilter(this);
 
 	QWidget *widget = new QWidget(FToolBar);
 	widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -46,14 +41,14 @@ void ToolBarChanger::setSeparatorsVisible(bool ASeparatorsVisible)
 	updateSeparatorVisible();
 }
 
-bool ToolBarChanger::manageVisibitily() const
+bool ToolBarChanger::autoHideEmptyToolbar() const
 {
-	return FManageVisibility;
+	return FAutoHideIfEmpty;
 }
 
-void ToolBarChanger::setManageVisibility(bool AManageVisibility)
+void ToolBarChanger::setAutoHideEmptyToolbar(bool AAutoHide)
 {
-	FManageVisibility = AManageVisibility;
+	FAutoHideIfEmpty = AAutoHide;
 	updateVisible();
 }
 
@@ -176,12 +171,8 @@ void ToolBarChanger::clear()
 
 void ToolBarChanger::updateVisible()
 {
-	FIntVisible = !isEmpty();
-	if (FManageVisibility && !FVisibleTimerStarted)
-	{
-		QTimer::singleShot(0,this,SLOT(onChangeVisible()));
-		FVisibleTimerStarted = true;
-	}
+	FToolBar->setMaximumWidth(!FAutoHideIfEmpty || !isEmpty() ? QWIDGETSIZE_MAX : 0);
+	FToolBar->setMaximumHeight(!FAutoHideIfEmpty || !isEmpty() ? QWIDGETSIZE_MAX : 0);
 }
 
 void ToolBarChanger::updateSeparatorVisible()
@@ -193,39 +184,9 @@ void ToolBarChanger::updateSeparatorVisible()
 	FSeparators.value(TBG_ALLIGN_CHANGE)->setVisible(false);
 }
 
-bool ToolBarChanger::eventFilter(QObject *AObject, QEvent *AEvent)
-{
-	if (AEvent->type() == QEvent::Show)
-	{
-		if (FChangingIntVisible == 0)
-		{
-			FExtVisible = true;
-			if (FManageVisibility && !FIntVisible)
-				updateVisible();
-		}
-	}
-	else if (AEvent->type() == QEvent::Hide)
-	{
-		if (FChangingIntVisible == 0)
-			FExtVisible = false;
-	}
-	return QObject::eventFilter(AObject,AEvent);
-}
-
 void ToolBarChanger::onWidgetDestroyed(QObject *AObject)
 {
 	foreach(QWidget *widget, FWidgets.values())
 		if (qobject_cast<QObject *>(widget) == AObject)
 			removeItem(FHandles.value(widget));
-}
-
-void ToolBarChanger::onChangeVisible()
-{
-	if (FManageVisibility && !FToolBar->isWindow() && (FIntVisible && FExtVisible)!=FToolBar->isVisible())
-	{
-		FChangingIntVisible++;
-		FToolBar->setVisible(FIntVisible && FExtVisible);
-		FChangingIntVisible--;
-	}
-	FVisibleTimerStarted = false;
 }

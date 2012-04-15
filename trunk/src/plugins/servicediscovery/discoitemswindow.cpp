@@ -49,7 +49,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	FToolBarChanger = new ToolBarChanger(ui.tlbToolBar);
 
 	FActionsBarChanger = new ToolBarChanger(new QToolBar(this));
-	FActionsBarChanger->setManageVisibility(false);
+	FActionsBarChanger->setAutoHideEmptyToolbar(false);
 	FActionsBarChanger->setSeparatorsVisible(false);
 	FActionsBarChanger->toolBar()->setIconSize(this->iconSize());
 	FActionsBarChanger->toolBar()->setOrientation(Qt::Vertical);
