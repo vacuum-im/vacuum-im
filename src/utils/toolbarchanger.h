@@ -22,8 +22,8 @@ public:
 	bool isEmpty() const;
 	bool separatorsVisible() const;
 	void setSeparatorsVisible(bool ASeparatorsVisible);
-	bool manageVisibitily() const;
-	void setManageVisibility(bool AManageVisibility);
+	bool autoHideEmptyToolbar() const;
+	void setAutoHideEmptyToolbar(bool AAutoHide);
 	QToolBar *toolBar() const;
 	int itemGroup(QAction *AHandle) const;
 	QList<QAction *> groupItems(int AGroup = TBG_NULL) const;
@@ -42,20 +42,12 @@ signals:
 protected:
 	void updateVisible();
 	void updateSeparatorVisible();
-protected:
-	virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onWidgetDestroyed(QObject *AObject);
-	void onChangeVisible();
 private:
-	bool FSeparatorsVisible;
-	bool FManageVisibility;
-	bool FVisibleTimerStarted;
-	int FChangingIntVisible;
-	bool FIntVisible;
-	bool FExtVisible;
 	QToolBar *FToolBar;
-private:
+	bool FAutoHideIfEmpty;
+	bool FSeparatorsVisible;
 	QAction *FAllignChange;
 	QMap<int, QAction *> FSeparators;
 	QMap<QWidget *, QAction *> FHandles;

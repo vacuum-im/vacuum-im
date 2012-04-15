@@ -35,7 +35,7 @@ RosterSearch::RosterSearch()
 	searchToolBar->setAllowedAreas(Qt::TopToolBarArea);
 	searchToolBar->setMovable(false);
 	FSearchToolBarChanger = new ToolBarChanger(searchToolBar);
-	FSearchToolBarChanger->setManageVisibility(false);
+	FSearchToolBarChanger->setAutoHideEmptyToolbar(false);
 	FSearchToolBarChanger->setSeparatorsVisible(false);
 	FSearchToolBarChanger->toolBar()->setVisible(false);
 
