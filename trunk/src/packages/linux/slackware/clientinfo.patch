@@ -1,0 +1,34 @@
+--- clientinfo.cpp	2012-03-29 18:52:37.000000000 +0300
++++ clientinfo.cpp	2012-03-29 19:58:25.453818849 +0300
+@@ -433,6 +433,31 @@
+ 			}
+ 		}
+ 
++		foreach(QString dirname, path)
++		{
++			QDir dir(dirname);
++			QFileInfo cand(dir.filePath("cat"));
++			if (cand.isExecutable())
++			{
++				found = cand.absoluteFilePath();
++				break;
++			}
++		}
++
++		if (!found.isEmpty())
++		{
++			QProcess process;
++			process.start(found, QStringList()<<"/etc/slackware-version", QIODevice::ReadOnly);
++			if (process.waitForStarted())
++			{
++				QTextStream stream(&process);
++				while (process.waitForReadyRead())
++					osver += stream.readAll();
++				process.close();
++				osver = osver.trimmed();
++			}
++		}
++
+ 		if (osver.isEmpty())
+ 		{
+ 			utsname buf;
