@@ -36,6 +36,9 @@ then
 	exit 1
 fi
 
+# Patch for version OS
+patch src/plugins/clientinfo/clientinfo.cpp < src/packages/linux/slackware/clientinfo.patch
+
 CWD="$(pwd)"
 srcdir="$CWD"
 builddir="$srcdir"/build
