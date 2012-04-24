@@ -612,7 +612,9 @@ QString AdiumMessageStyle::loadFileData(const QString &AFileName, const QString 
 
 void AdiumMessageStyle::loadTemplates()
 {
-	FIn_ContentHTML =      loadFileData(FResourcePath+"/Incoming/Content.html",QString::null);
+	FIn_ContentHTML =      loadFileData(FResourcePath+"/Content.html",QString::null);
+
+	FIn_ContentHTML =      loadFileData(FResourcePath+"/Incoming/Content.html",FIn_ContentHTML);
 	FIn_NextContentHTML =  loadFileData(FResourcePath+"/Incoming/NextContent.html",FIn_ContentHTML);
 	FIn_ContextHTML =      loadFileData(FResourcePath+"/Incoming/Context.html",FIn_ContentHTML);
 	FIn_NextContextHTML =  loadFileData(FResourcePath+"/Incoming/NextContext.html",FIn_NextContentHTML);
