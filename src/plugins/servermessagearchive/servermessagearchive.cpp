@@ -473,7 +473,7 @@ void ServerMessageArchive::onServerHeadersLoaded(const QString &AId, const QList
 	{
 		HeadersRequest request = FHeadersRequests.take(AId);
 		request.headers += AHeaders;
-		if (!AResult.last.isEmpty() && AResult.index+AHeaders.count()<AResult.count)
+		if (!AResult.last.isEmpty() && AResult.index+AHeaders.count()<AResult.count && (request.request.maxItems<=0 || request.headers.count()<request.request.maxItems))
 		{
 			QString id = loadServerHeaders(request.streamJid,request.request,AResult);
 			if (!id.isEmpty())
