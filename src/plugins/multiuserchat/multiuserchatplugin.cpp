@@ -565,7 +565,6 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 	{
 		IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword);
 		chatWindow = new MultiUserChatWindow(this,chat);
-		chatWindow->setTabPageNotifier(FMessageWidgets!=NULL ? FMessageWidgets->newTabPageNotifier(chatWindow) : NULL);
 		WidgetManager::setWindowSticky(chatWindow->instance(),true);
 		connect(chatWindow->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
 		connect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));

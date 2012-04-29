@@ -178,6 +178,7 @@ protected slots:
 protected slots:
 	void onMessageReady();
 	void onMessageAboutToBeSend();
+	void onNotifierActiveNotifyChanged(int ANotifyId);
 	void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
 	void onViewContextQuoteActionTriggered(bool);
 	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
@@ -186,6 +187,7 @@ protected slots:
 	void onChatWindowActivated();
 	void onChatWindowClosed();
 	void onChatWindowDestroyed();
+	void onChatNotifierActiveNotifyChanged(int ANotifyId);
 	void onHorizontalSplitterMoved(int APos, int AIndex);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);

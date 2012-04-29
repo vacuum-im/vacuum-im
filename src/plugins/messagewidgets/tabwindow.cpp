@@ -5,7 +5,8 @@
 #include <QInputDialog>
 #include <QSignalMapper>
 
-#define BLINK_INTERVAL              500
+#define BLINK_VISIBLE_TIME              750
+#define BLINK_INVISIBLE_TIME            250
 
 #define ADR_TAB_INDEX               Action::DR_Parametr1
 #define ADR_TAB_MENU_ACTION         Action::DR_Parametr2
@@ -45,10 +46,9 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->setCornerWidget(menuButton);
 
 	FBlinkVisible = true;
-	FBlinkTimer.setSingleShot(false);
-	FBlinkTimer.setInterval(BLINK_INTERVAL);
+	FBlinkTimer.setSingleShot(true);
 	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTabNotifyTimerTimeout()));
-	FBlinkTimer.start();
+	FBlinkTimer.start(BLINK_VISIBLE_TIME);
 
 	createActions();
 	loadWindowStateAndGeometry();
@@ -132,7 +132,6 @@ void TabWindow::addTabPage(ITabPage *APage)
 			connect(APage->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onTabPageNotifierActiveNotifyChanged(int)));
 		connect(APage->instance(),SIGNAL(tabPageNotifierChanged()),SLOT(onTabPageNotifierChanged()));
 		
-		updateWindow();
 		updateTab(index);
 		emit tabPageAdded(APage);
 	}
@@ -307,6 +306,7 @@ void TabWindow::updateWindow()
 		emit windowChanged();
 	}
 }
+
 void TabWindow::clearTabs()
 {
 	while (ui.twtTabs->count() > 0)
@@ -355,6 +355,9 @@ void TabWindow::updateTab(int AIndex)
 		ui.twtTabs->setTabIcon(AIndex,tabIcon);
 		ui.twtTabs->setTabText(AIndex,tabCaption);
 		ui.twtTabs->setTabToolTip(AIndex,tabToolTip);
+
+		if (AIndex == ui.twtTabs->currentIndex())
+			updateWindow();
 	}
 }
 
@@ -480,12 +483,7 @@ void TabWindow::onTabPageChanged()
 {
 	ITabPage *page = qobject_cast<ITabPage *>(sender());
 	if (page)
-	{
-		int index = ui.twtTabs->indexOf(page->instance());
-		if (index == ui.twtTabs->currentIndex())
-			updateWindow();
-		updateTab(index);
-	}
+		updateTab(ui.twtTabs->indexOf(page->instance()));
 }
 
 void TabWindow::onTabPageDestroyed()
@@ -505,12 +503,7 @@ void TabWindow::onTabPageNotifierActiveNotifyChanged(int ANotifyId)
 	Q_UNUSED(ANotifyId);
 	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
 	if (notifier)
-	{
-		int index = ui.twtTabs->indexOf(notifier->tabPage()->instance());
-		if (index == ui.twtTabs->currentIndex())
-			updateWindow();
-		updateTab(index);
-	}
+		updateTab(ui.twtTabs->indexOf(notifier->tabPage()->instance()));
 }
 
 void TabWindow::onTabWindowNameChanged(const QUuid &AWindowId, const QString &AName)
@@ -669,7 +662,17 @@ void TabWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 
 void TabWindow::onBlinkTabNotifyTimerTimeout()
 {
-	FBlinkVisible = !FBlinkVisible;
+	if (!FBlinkVisible)
+	{
+		FBlinkVisible = true;
+		FBlinkTimer.start(BLINK_VISIBLE_TIME);
+	}
+	else
+	{
+		FBlinkVisible = false;
+		FBlinkTimer.start(BLINK_INVISIBLE_TIME);
+	}
+
 	for (int index=0; index<tabPageCount(); index++)
 	{
 		ITabPage *page = tabPage(index);

@@ -28,6 +28,7 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
+#include <interfaces/iroster.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/widgetmanager.h>
 #include <utils/errorhandler.h>
@@ -79,6 +80,7 @@ protected slots:
 	void onShowChatWindow();
 	void onWindowActivated();
 	void onWindowDestroyed();
+	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);

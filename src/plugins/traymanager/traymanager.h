@@ -64,7 +64,7 @@ private:
 	QTimer FBlinkTimer;
 	QSystemTrayIcon FSystemIcon;
 private:
-	bool FIconHidden;
+	bool FBlinkVisible;
 	int FActiveNotify;
 	QIcon FIcon;
 	QIcon FEmptyIcon;
