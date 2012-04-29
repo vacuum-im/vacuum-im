@@ -8,7 +8,6 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, false);
 
-	FStatusChanger = NULL;
 	FMessageWidgets = AMessageWidgets;
 
 	FStreamJid = AStreamJid;
@@ -185,12 +184,6 @@ void ChatWindow::initialize()
 				connect(xmppStream->instance(),SIGNAL(jidChanged(const Jid &)), SLOT(onStreamJidChanged(const Jid &)));
 			}
 		}
-	}
-
-	plugin = FMessageWidgets->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
-	if (plugin)
-	{
-		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 	}
 
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));

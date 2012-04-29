@@ -2,15 +2,14 @@
 
 #include <QApplication>
 
-#define BLINK_VISIBLE_TIME      500
-#define BLINK_INVISIBLE_TIME    500
+#define BLINK_VISIBLE_TIME      750
+#define BLINK_INVISIBLE_TIME    250
 
 TrayManager::TrayManager()
 {
 	FPluginManager = NULL;
 
 	FActiveNotify = -1;
-	FIconHidden = false;
 
 	QPixmap empty(16,16);
 	empty.fill(Qt::transparent);
@@ -19,6 +18,7 @@ TrayManager::TrayManager()
 	FContextMenu = new Menu;
 	FSystemIcon.setContextMenu(FContextMenu);
 
+	FBlinkVisible = true;
 	FBlinkTimer.setSingleShot(true);
 	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimerTimeout()));
 
@@ -166,7 +166,7 @@ void TrayManager::updateTray()
 	int notifyId = !FNotifyOrder.isEmpty() ? FNotifyOrder.last() : -1;
 	if (notifyId != FActiveNotify)
 	{
-		FIconHidden = false;
+		FBlinkVisible = true;
 		FBlinkTimer.stop();
 		FActiveNotify = notifyId;
 
@@ -199,21 +199,22 @@ void TrayManager::onTrayIconActivated(QSystemTrayIcon::ActivationReason AReason)
 void TrayManager::onBlinkTimerTimeout()
 {
 	const ITrayNotify &notify = FNotifyItems.value(FActiveNotify);
-	if (FIconHidden)
+	if (!FBlinkVisible)
 	{
 		if (!notify.iconStorage.isEmpty() && !notify.iconKey.isEmpty())
 			IconStorage::staticStorage(notify.iconStorage)->insertAutoIcon(&FSystemIcon,notify.iconKey);
 		else
 			FSystemIcon.setIcon(notify.icon);
+		FBlinkVisible = true;
 		FBlinkTimer.start(BLINK_VISIBLE_TIME);
 	}
 	else
 	{
 		IconStorage::staticStorage(notify.iconStorage)->removeAutoIcon(&FSystemIcon);
 		FSystemIcon.setIcon(FEmptyIcon);
+		FBlinkVisible = false;
 		FBlinkTimer.start(BLINK_INVISIBLE_TIME);
 	}
-	FIconHidden = !FIconHidden;
 }
 
 void TrayManager::onShutdownStarted()

@@ -15,6 +15,9 @@
 #include <QDragLeaveEvent>
 #include <QContextMenuEvent>
 
+#define BLINK_VISIBLE_TIME      750
+#define BLINK_INVISIBLE_TIME    250
+
 #define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
 QDataStream &operator<<(QDataStream &AStream, const IRostersLabel &ALabel)
@@ -38,7 +41,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	FPressedIndex = QModelIndex();
 
 	FBlinkVisible = true;
-	FBlinkTimer.setInterval(500);
+	FBlinkTimer.setSingleShot(true);
 	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimerTimeout()));
 
 	header()->hide();
@@ -830,7 +833,7 @@ void RostersView::appendBlinkItem(int ALabelId, int ANotifyId)
 	if (ANotifyId > 0)
 		FBlinkNotifies += ANotifyId;
 	if (!FBlinkTimer.isActive())
-		FBlinkTimer.start();
+		FBlinkTimer.start(BLINK_VISIBLE_TIME);
 }
 
 void RostersView::removeBlinkItem(int ALabelId, int ANotifyId)
@@ -1336,7 +1339,17 @@ void RostersView::onUpdateIndexNotifyTimeout()
 
 void RostersView::onBlinkTimerTimeout()
 {
-	FBlinkVisible = !FBlinkVisible;
+	if (!FBlinkVisible)
+	{
+		FBlinkVisible = true;
+		FBlinkTimer.start(BLINK_VISIBLE_TIME);
+	}
+	else
+	{
+		FBlinkVisible = false;
+		FBlinkTimer.start(BLINK_INVISIBLE_TIME);
+	}
+
 	FRosterIndexDelegate->setShowBlinkLabels(FBlinkVisible);
 	foreach(int labelId, FBlinkLabels)
 	{
@@ -1348,7 +1361,6 @@ void RostersView::onBlinkTimerTimeout()
 		foreach(IRosterIndex *index, FActiveNotifies.keys(notifyId))
 			repaintRosterIndex(index);
 	}
-	FBlinkTimer.start();
 }
 
 void RostersView::onDragExpandTimer()

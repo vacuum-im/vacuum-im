@@ -9,7 +9,6 @@
 #include <definitions/messagedataroles.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ixmppstreams.h>
-#include <interfaces/istatuschanger.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
@@ -85,7 +84,6 @@ private:
 	Ui::ChatWindowClass ui;
 private:
 	IMessageWidgets *FMessageWidgets;
-	IStatusChanger *FStatusChanger;
 private:
 	IInfoWidget *FInfoWidget;
 	IViewWidget *FViewWidget;

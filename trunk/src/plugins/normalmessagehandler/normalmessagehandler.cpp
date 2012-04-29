@@ -225,7 +225,6 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 				}
 
 				FNotifiedMessages.insertMulti(window,AMessage.data(MDR_MESSAGE_ID).toInt());
-				updateWindow(window);
 			}
 		}
 	}
@@ -269,6 +268,8 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 		if (window)
 		{
 			window->infoWidget()->autoUpdateFields();
+			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
+
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 			connect(window->instance(),SIGNAL(showNextMessage()),SLOT(onShowNextMessage()));
 			connect(window->instance(),SIGNAL(replyMessage()),SLOT(onReplyMessage()));
@@ -276,7 +277,9 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 			connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onShowChatWindow()));
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
 			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
+			connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onWindowNotifierActiveNotifyChanged(int)));
 			FWindows.append(window);
+			updateWindow(window);
 		}
 		else
 		{
@@ -311,10 +314,15 @@ bool NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
 void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 {
 	QIcon icon;
-	if (AWindow->instance()->isWindow() && FNotifiedMessages.contains(AWindow))
-		icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
-	else if (FStatusIcons)
-		icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
+	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
+		icon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
+	if (FStatusIcons && icon.isNull())
+	{
+		if (!AWindow->contactJid().isEmpty())
+			icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
+		else
+			icon = FStatusIcons->iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false);
+	}
 
 	QString caption;
 	if (AWindow->mode() == IMessageWindow::ReadMode)
@@ -331,7 +339,6 @@ void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow)
 	foreach(int messageId, FNotifiedMessages.values(AWindow))
 		FMessageProcessor->removeMessageNotify(messageId);
 	FNotifiedMessages.remove(AWindow);
-	updateWindow(AWindow);
 }
 
 void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
@@ -503,6 +510,15 @@ void NormalMessageHandler::onWindowDestroyed()
 		FMessageQueue.remove(window);
 		FWindows.removeAll(window);
 	}
+}
+
+void NormalMessageHandler::onWindowNotifierActiveNotifyChanged(int ANotifyId)
+{
+	Q_UNUSED(ANotifyId);
+	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
+	IMessageWindow *window = notifier!=NULL ? qobject_cast<IMessageWindow *>(notifier->tabPage()->instance()) : NULL;
+	if (window)
+		updateWindow(window);
 }
 
 void NormalMessageHandler::onStatusIconsChanged()

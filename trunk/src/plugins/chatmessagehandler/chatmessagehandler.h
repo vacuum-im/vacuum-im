@@ -102,10 +102,11 @@ protected:
 	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
 	void onMessageReady();
-	void onInfoFieldChanged(int AField, const QVariant &AValue);
 	void onWindowActivated();
 	void onWindowClosed();
 	void onWindowDestroyed();
+	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
+	void onWindowInfoFieldChanged(int AField, const QVariant &AValue);
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
 	void onClearWindowAction(bool);

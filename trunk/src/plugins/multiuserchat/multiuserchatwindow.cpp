@@ -280,7 +280,6 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
 
 					FActiveMessages.append(messageId);
-					updateWindow();
 				}
 			}
 			else if (!AMessage.body().isEmpty())
@@ -300,7 +299,6 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					if (FDestroyTimers.contains(window))
 						delete FDestroyTimers.take(window);
 					FActiveChatMessages.insertMulti(window, messageId);
-					updateChatWindow(window);
 					updateListItem(contactJid);
 				}
 			}
@@ -720,6 +718,9 @@ void MultiUserChatWindow::createMessageWidgets()
 
 		FStatusBarWidget = FMessageWidgets->newStatusBarWidget(NULL,FViewWidget,FEditWidget,NULL,this);
 		setStatusBar(FStatusBarWidget->instance());
+
+		setTabPageNotifier(FMessageWidgets->newTabPageNotifier(this));
+		connect(tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onNotifierActiveNotifyChanged(int)));
 	}
 }
 
@@ -1327,12 +1328,15 @@ void MultiUserChatWindow::showHistory()
 
 void MultiUserChatWindow::updateWindow()
 {
-	if (isWindow() && !FActiveMessages.isEmpty())
-		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_MESSAGE,0,0,"windowIcon");
-	else
-		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_MUC_CONFERENCE,0,0,"windowIcon");
+	QIcon icon;
+	if (tabPageNotifier() && tabPageNotifier()->activeNotify()>0)
+		icon = tabPageNotifier()->notifyById(tabPageNotifier()->activeNotify()).icon;
+	if (icon.isNull())
+		icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_CONFERENCE);
 
 	QString roomName = tr("%1 (%2)").arg(FMultiChat->roomJid().uNode()).arg(FUsers.count());
+
+	setWindowIcon(icon);
 	setWindowIconText(roomName);
 	setWindowTitle(tr("%1 - Conference").arg(roomName));
 
@@ -1378,7 +1382,6 @@ void MultiUserChatWindow::removeActiveMessages()
 		foreach(int messageId, FActiveMessages)
 			FMessageProcessor->removeMessageNotify(messageId);
 	FActiveMessages.clear();
-	updateWindow();
 }
 
 void MultiUserChatWindow::setChatMessageStyle(IChatWindow *AWindow)
@@ -1489,6 +1492,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onChatWindowActivated()));
 			connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onChatWindowClosed()));
 			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onChatWindowDestroyed()));
+			connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onChatNotifierActiveNotifyChanged(int)));
 
 			window->infoWidget()->setFieldAutoUpdated(IInfoWidget::ContactName,false);
 			window->infoWidget()->setField(IInfoWidget::ContactName,user->nickName());
@@ -1530,7 +1534,6 @@ void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
 			foreach(int messageId, FActiveChatMessages.values(AWindow))
 				FMessageProcessor->removeMessageNotify(messageId);
 		FActiveChatMessages.remove(AWindow);
-		updateChatWindow(AWindow);
 		updateListItem(AWindow->contactJid());
 	}
 }
@@ -1538,9 +1541,9 @@ void MultiUserChatWindow::removeActiveChatMessages(IChatWindow *AWindow)
 void MultiUserChatWindow::updateChatWindow(IChatWindow *AWindow)
 {
 	QIcon icon;
-	if (AWindow->instance()->isWindow() && FActiveChatMessages.contains(AWindow))
-		icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE);
-	else if (FStatusIcons)
+	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
+		icon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
+	if (FStatusIcons && icon.isNull())
 		icon = FStatusIcons->iconByJidStatus(AWindow->contactJid(),AWindow->infoWidget()->field(IInfoWidget::ContactShow).toInt(),QString::null,false);
 
 	QString contactName = AWindow->infoWidget()->field(IInfoWidget::ContactName).toString();
@@ -1957,6 +1960,12 @@ void MultiUserChatWindow::onMessageAboutToBeSend()
 		FEditWidget->clearEditor();
 }
 
+void MultiUserChatWindow::onNotifierActiveNotifyChanged(int ANotifyId)
+{
+	Q_UNUSED(ANotifyId);
+	updateWindow();
+}
+
 void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked)
 {
 	if (FMultiChat->isOpen() && AKeyEvent->modifiers()+AKeyEvent->key() == NICK_MENU_KEY)
@@ -2112,6 +2121,15 @@ void MultiUserChatWindow::onChatWindowDestroyed()
 		FHistoryRequests.remove(FHistoryRequests.key(window));
 		emit chatWindowDestroyed(window);
 	}
+}
+
+void MultiUserChatWindow::onChatNotifierActiveNotifyChanged(int ANotifyId)
+{
+	Q_UNUSED(ANotifyId);
+	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
+	IChatWindow *window = notifier!=NULL ? qobject_cast<IChatWindow *>(notifier->tabPage()->instance()) : NULL;
+	if (window)
+		updateChatWindow(window);
 }
 
 void MultiUserChatWindow::onHorizontalSplitterMoved(int APos, int AIndex)
