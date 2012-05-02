@@ -58,7 +58,7 @@
     </message>
     <message>
         <source>When receiving new single message</source>
-        <translation type="unfinished"></translation>
+        <translation>Podczas pobierania nowej wiadomości</translation>
     </message>
 </context>
 </TS>

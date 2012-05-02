@@ -44,11 +44,11 @@
     </message>
     <message>
         <source>Invalid or incomplete deflate data</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędne lub niepełne dane do kompresji</translation>
     </message>
     <message>
         <source>Unknown Zlib error, %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznany błąd Zlib,%1</translation>
     </message>
 </context>
 </TS>

@@ -25,7 +25,7 @@
     </message>
     <message>
         <source>Without Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Bez grup</translation>
     </message>
 </context>
 </TS>

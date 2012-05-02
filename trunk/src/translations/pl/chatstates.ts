@@ -29,11 +29,11 @@
     </message>
     <message>
         <source>When contact is typing the message for you</source>
-        <translation type="unfinished"></translation>
+        <translation>Kiedy kontakt pisze wiadomość do Ciebie</translation>
     </message>
     <message>
         <source>Typing a message...</source>
-        <translation type="unfinished"></translation>
+        <translation>Pisze wiadomość...</translation>
     </message>
 </context>
 <context>

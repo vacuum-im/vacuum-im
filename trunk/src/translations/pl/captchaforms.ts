@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>When receiving a CAPTCHA challenge</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeżeli zostaniesz poproszony o wypełnienie formularza CAPTCHA</translation>
     </message>
 </context>
 </TS>

@@ -29,7 +29,7 @@
     </message>
     <message>
         <source>Automatically show window of conferences connected at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż przy starcie okna automatycznie podłączanych konferencji</translation>
     </message>
 </context>
 <context>
