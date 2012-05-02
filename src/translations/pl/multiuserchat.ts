@@ -553,35 +553,35 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>When receiving an invitation to the conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeśli otrzymasz zaproszenie na konferencję</translation>
     </message>
     <message>
         <source>When receiving a new private message in conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Gdy nowa wiadomość w konferencji</translation>
     </message>
     <message>
         <source>When referring to you at the conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Odnosząc się do Ciebie na konferencji</translation>
     </message>
     <message>
         <source>When receiving a new message in conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Po otrzymaniu nowej wiadomości w konferencji</translation>
     </message>
     <message>
         <source>Select the user to refer in the Bash style</source>
-        <translation type="unfinished"></translation>
+        <translation>Wybierz użytkownika dla dostępu w stylu Bash</translation>
     </message>
     <message>
         <source>Add this suffix when referring to the user:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodaj przyrostek, odnosząc się do użytkownika:</translation>
     </message>
     <message>
         <source>Leave the conference when window closed</source>
-        <translation type="unfinished"></translation>
+        <translation>Opuszczaj konferencje przy zamknięciu okna</translation>
     </message>
     <message>
         <source>Rejoin in chat room after kick</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatycznie wracaj do konferencji po wyrzuceniu</translation>
     </message>
 </context>
 <context>
@@ -972,11 +972,11 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished"></translation>
+        <translation>Cytuj zaznaczony tekst</translation>
     </message>
     <message>
         <source>Open chat dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz czat dialogu</translation>
     </message>
     <message>
         <source>Loading history...</source>

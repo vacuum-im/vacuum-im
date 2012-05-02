@@ -87,27 +87,27 @@
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove a transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contacts&lt;/b&gt; from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Czy na pewno chcesz usunąć transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; i jego &lt;b&gt;%n kontakt&lt;/b&gt; z rostera?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; i jego &lt;b&gt;%n kontakty&lt;/b&gt; z rostera?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; i jego &lt;b&gt;%n kontaktów&lt;/b&gt; z rostera?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove &lt;b&gt;%n transports&lt;/b&gt; and their contacts from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n transport&lt;/b&gt; i jego kontakty z rostera?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n transporty&lt;/b&gt; i ich kontakty z rostera?</numerusform>
+            <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n transportów&lt;/b&gt; i ich kontakty z rostera?</numerusform>
         </translation>
     </message>
     <message>
         <source>Remove transport and its contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń transport i jego kontakty</translation>
     </message>
     <message>
         <source>Remove transports and their contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Usuń transporty i ich kontakty</translation>
     </message>
 </context>
 </TS>

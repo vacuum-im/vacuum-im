@@ -206,7 +206,7 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
     </message>
     <message>
         <source>On loss of connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>W momencie utraty połączenia z serwerem</translation>
     </message>
 </context>
 </TS>

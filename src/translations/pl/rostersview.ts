@@ -80,7 +80,7 @@
     </message>
     <message>
         <source>Do not show the scroll bars</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie pokazuj paska przewijania</translation>
     </message>
 </context>
 </TS>

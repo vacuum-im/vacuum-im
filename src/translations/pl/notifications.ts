@@ -41,11 +41,11 @@
     </message>
     <message>
         <source>Activate notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz powiadomienie</translation>
     </message>
     <message>
         <source>Activate Notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Włącz powiadomienie</translation>
     </message>
     <message>
         <source>Enable animation in notification pop-up</source>
@@ -56,54 +56,54 @@
     <name>NotifyOptionsWidget</name>
     <message>
         <source>Display a notification in your roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyświetl powiadomienie na liście kontaktów</translation>
     </message>
     <message>
         <source>Display a notification in popup window</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyświetl powiadomienie w wyskakującym okienku</translation>
     </message>
     <message>
         <source>Display a notification in tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyświetl powiadomienie w pasku powiadomień systemowych</translation>
     </message>
     <message>
         <source>Display a notification in tray context menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyświetl powiadomienie w menu kontekstowym paska powiadomień systemowych</translation>
     </message>
     <message>
         <source>Play sound at the notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Graj dźwięk podczas powiadomienia</translation>
     </message>
     <message>
         <source>Highlight the corresponding window in the taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Podświetl odpowiednie okno w pasku zadań</translation>
     </message>
     <message>
         <source>Display a notification in tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyświetl powiadomienie w zakładce</translation>
     </message>
     <message>
         <source>Show the corresponding window minimized in the taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż odpowiednie okno zminimalizowane w pasku zadań</translation>
     </message>
     <message>
         <source>Immediately activate the notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Natychmiast uaktywnij powiadomienie</translation>
     </message>
 </context>
 <context>
     <name>NotifyOptionsWidgetClass</name>
     <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation type="unfinished">Czas pokazywania wyskakujących okienek (0-zawsze widoczne):</translation>
+        <translation>Czas do pokazania wyskakującego okna (0 - zawsze widoczne):</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="unfinished"> sekund</translation>
+        <translation>sekund</translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Przywróć ustawienia domyślne</translation>
     </message>
 </context>
 <context>

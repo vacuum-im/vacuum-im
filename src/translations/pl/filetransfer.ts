@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>When receiving a prompt to accept the file</source>
-        <translation type="unfinished"></translation>
+        <translation>Jeśli pojawi się monit o zaakceptowanie pliku</translation>
     </message>
 </context>
 <context>

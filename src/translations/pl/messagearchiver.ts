@@ -41,7 +41,7 @@
     </message>
     <message>
         <source>Prefer</source>
-        <translation type="unfinished">Preferuj</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Allow</source>
@@ -49,23 +49,23 @@
     </message>
     <message>
         <source>Forbid</source>
-        <translation type="unfinished">Zabroń</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished">Nieznany</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Approve</source>
-        <translation type="unfinished">Pytaj</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Oppose</source>
-        <translation type="unfinished">Zaprzeczaj</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Require</source>
-        <translation type="unfinished">Wymagaj</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Nothing</source>
@@ -73,19 +73,43 @@
     </message>
     <message>
         <source>Body</source>
-        <translation type="unfinished">Tekst</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Wszystko</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Stream</source>
-        <translation type="unfinished">Strumień</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ArchiveStreamOptions</name>
+    <message>
+        <source>Waiting for host response...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preferences accepted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New item preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter item JID:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unacceptable item JID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; is not valid JID or already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Yes, if supported by server</source>
         <translation type="unfinished"></translation>
@@ -135,36 +159,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Waiting for host response...</source>
-        <translation type="unfinished">Oczekuję na odpowiedź hosta...</translation>
-    </message>
-    <message>
         <source>History preferences is not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to save archive preferences: %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New item preferences</source>
-        <translation type="unfinished">Ustawienia kontaktu</translation>
-    </message>
-    <message>
-        <source>Enter item JID:</source>
-        <translation type="unfinished">Wprowadź JID:</translation>
-    </message>
-    <message>
-        <source>Unacceptable item JID</source>
-        <translation type="unfinished">Niepoprawny JID</translation>
-    </message>
-    <message>
-        <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation type="unfinished">%1 nie wygląda na poprawny JID albo już taki istnieje</translation>
-    </message>
-    <message>
-        <source>Preferences accepted</source>
-        <translation type="unfinished">Ustawienia zapisane</translation>
     </message>
     <message>
         <source>Save messages with formatting</source>
@@ -179,7 +179,7 @@
     <name>ArchiveStreamOptionsClass</name>
     <message>
         <source>Auto Archiving Preferences</source>
-        <translation type="unfinished">Opcje automatycznej archiwizacji</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enable automatic archiving of messages on the server</source>
@@ -203,7 +203,7 @@
     </message>
     <message>
         <source>Default Archiving Preferences</source>
-        <translation type="unfinished">Ustawienia domyślne</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Message archiving:</source>
@@ -223,11 +223,11 @@
     </message>
     <message>
         <source>Individual Archiving Preferences</source>
-        <translation type="unfinished">Ustawienia indywidualne</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>JID</source>
-        <translation type="unfinished">Kontakt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Contact identifier</source>
@@ -235,7 +235,7 @@
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished">Zapisz</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Message archiving</source>
@@ -243,7 +243,7 @@
     </message>
     <message>
         <source>OTR</source>
-        <translation type="unfinished">OTR</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Off-The-Record sessions </source>
@@ -251,7 +251,7 @@
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished">Usuń</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Remove messages after, days</source>
@@ -267,7 +267,7 @@
     </message>
     <message>
         <source>Add</source>
-        <translation type="unfinished">Dodaj</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -395,11 +395,13 @@
     <message>
         <source>MMMM yyyy</source>
         <comment>Date group name</comment>
+        <translatorcomment>Наименование группы даты</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>dd MMM, dddd</source>
         <comment>Conversation name</comment>
+        <translatorcomment>Наименование разговора</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -417,6 +419,7 @@
     <message>
         <source>dd MMM yyyy</source>
         <comment>Load messages earlier date</comment>
+        <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -432,7 +435,7 @@
     </message>
     <message>
         <source>Search:</source>
-        <translation type="unfinished">Szukaj:</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Next</source>

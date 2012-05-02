@@ -46,11 +46,11 @@
     </message>
     <message>
         <source>Load messages from history in new chat windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Pobierz wiadomości z historii i wstaw do nowego okienka</translation>
     </message>
     <message>
         <source>When receiving new chat message</source>
-        <translation type="unfinished"></translation>
+        <translation>Podczas pobierania nowej wiadomości</translation>
     </message>
     <message>
         <source>Loading history...</source>

@@ -29,95 +29,95 @@
     </message>
     <message>
         <source>Show date separators in chat window</source>
-        <translation type="unfinished"></translation>
+        <translation>Pokaż separator daty w oknie rozmowy</translation>
     </message>
     <message>
         <source>January</source>
-        <translation type="unfinished"></translation>
+        <translation>Stycznia</translation>
     </message>
     <message>
         <source>February</source>
-        <translation type="unfinished"></translation>
+        <translation>Lutego</translation>
     </message>
     <message>
         <source>March</source>
-        <translation type="unfinished"></translation>
+        <translation>Marca</translation>
     </message>
     <message>
         <source>April</source>
-        <translation type="unfinished"></translation>
+        <translation>Kwietnia</translation>
     </message>
     <message>
         <source>May</source>
-        <translation type="unfinished"></translation>
+        <translation>Maja</translation>
     </message>
     <message>
         <source>June</source>
-        <translation type="unfinished"></translation>
+        <translation>Czerwca</translation>
     </message>
     <message>
         <source>July</source>
-        <translation type="unfinished"></translation>
+        <translation>Lipca</translation>
     </message>
     <message>
         <source>August</source>
-        <translation type="unfinished"></translation>
+        <translation>Sierpnia</translation>
     </message>
     <message>
         <source>September</source>
-        <translation type="unfinished"></translation>
+        <translation>Września</translation>
     </message>
     <message>
         <source>October</source>
-        <translation type="unfinished"></translation>
+        <translation>Października</translation>
     </message>
     <message>
         <source>November</source>
-        <translation type="unfinished"></translation>
+        <translation>Listopada</translation>
     </message>
     <message>
         <source>December</source>
-        <translation type="unfinished"></translation>
+        <translation>Grudnia</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished"></translation>
+        <translation>Poniedziałek</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Wtorek</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Środa</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished"></translation>
+        <translation>Czwartek</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished"></translation>
+        <translation>Piątek</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobota</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished"></translation>
+        <translation>Niedziela</translation>
     </message>
     <message>
         <source>%1, %2 dd</source>
-        <translation type="unfinished"></translation>
+        <translation>%1, dd %2</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Dzisiaj</translation>
     </message>
     <message>
         <source>%1, %2 dd, yyyy</source>
-        <translation type="unfinished"></translation>
+        <translation>%1, dd %2, yyyy</translation>
     </message>
 </context>
 <context>

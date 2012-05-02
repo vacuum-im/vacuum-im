@@ -183,32 +183,32 @@
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj</translation>
     </message>
     <message>
         <source>Send mail</source>
-        <translation type="unfinished"></translation>
+        <translation>Wyślij mail</translation>
     </message>
     <message>
         <source>Open link</source>
-        <translation type="unfinished"></translation>
+        <translation>Otwórz link</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopiuj adres</translation>
     </message>
     <message>
         <source>Search on Google &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Szukaj za pomoca google &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Close other tabs</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij pozostałe zakładki</translation>
     </message>
     <message>
         <source>Ctrl+Shift+W</source>
         <comment>Close other tabs</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Shift+W</translation>
     </message>
 </context>
 <context>
@@ -312,7 +312,7 @@
     </message>
     <message>
         <source>Without Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Bez grup</translation>
     </message>
 </context>
 <context>
@@ -410,7 +410,7 @@
     </message>
     <message>
         <source>Close Other Tabs</source>
-        <translation type="unfinished"></translation>
+        <translation>Zamknij pozostałe zakładki</translation>
     </message>
 </context>
 <context>

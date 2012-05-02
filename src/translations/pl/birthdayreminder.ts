@@ -5,47 +5,47 @@
     <name>BirthdayReminder</name>
     <message>
         <source>Birthday Reminder</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypominacz o urodzinach</translation>
     </message>
     <message>
         <source>Reminds about birthdays of your friends</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypomina o urodzinach twoich przyjaciół</translation>
     </message>
     <message>
         <source>Birthday remind</source>
-        <translation type="unfinished"></translation>
+        <translation>Przypomnij o urodzinach</translation>
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s),&lt;br&gt; %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Urodziny za %n dzień,&lt;br&gt; %1</numerusform>
+            <numerusform>Urodziny za %n dni,&lt;br&gt; %1</numerusform>
+            <numerusform>Urodziny za %n dni,&lt;br&gt; %1</numerusform>
         </translation>
     </message>
     <message>
         <source>Birthday today!</source>
-        <translation type="unfinished"></translation>
+        <translation>Dzisiaj urodziny!</translation>
     </message>
     <message numerus="yes">
         <source>Birthday in %n day(s)!</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Urodziny za %n dzień!</numerusform>
+            <numerusform>Urodziny za %n dni!</numerusform>
+            <numerusform>Urodziny za %n dni!</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%1 marks %n years</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%1 kończy %n rok</numerusform>
+            <numerusform>%1 kończy %n lata</numerusform>
+            <numerusform>%1 kończy %n lat</numerusform>
         </translation>
     </message>
     <message>
         <source>When reminding of upcoming birthdays</source>
-        <translation type="unfinished"></translation>
+        <translation>Podczas przypominania o nadchodzących urodzinach</translation>
     </message>
 </context>
 </TS>

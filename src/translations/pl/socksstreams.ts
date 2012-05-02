@@ -57,19 +57,19 @@
     </message>
     <message>
         <source>Outgoing Connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Połączenia wychodzące</translation>
     </message>
     <message>
         <source>Connect timeout:</source>
-        <translation type="unfinished"></translation>
+        <translation>Limit czasu połączenia:</translation>
     </message>
     <message>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>sekund</translation>
     </message>
     <message>
         <source>Incoming Connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Połączenia przychodzące</translation>
     </message>
 </context>
 <context>

@@ -95,11 +95,11 @@
     <name>NotifyOptionsWidgetClass</name>
     <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation type="unfinished">Час показу вигульку (0 - завжди показувати):</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="unfinished"> секунд</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Restore Defaults</source>

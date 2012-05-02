@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>XMPP stream destroyed</source>
-        <translation type="unfinished"></translation>
+        <translation>Strumień XMPP usunięty</translation>
     </message>
 </context>
 <context>
