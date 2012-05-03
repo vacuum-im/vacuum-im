@@ -278,7 +278,7 @@ QList<IRosterIndex *> RostersView::selectedRosterIndexes() const
 	QList<IRosterIndex *> rosterIndexes;
 	if (FRostersModel)
 	{
-		foreach(QModelIndex modelIndex, selectedIndexes())
+		foreach(QModelIndex modelIndex, selectionModel()->selectedIndexes())
 		{
 			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(modelIndex));
 			if (index)
@@ -292,8 +292,9 @@ void RostersView::selectRosterIndex(IRosterIndex *AIndex)
 {
 	if (FRostersModel)
 	{
-		QModelIndex mindex = FRostersModel->modelIndexByRosterIndex(AIndex);
-		selectionModel()->select(mindex, QItemSelectionModel::Select);
+		QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex));
+		if (mindex.isValid())
+			selectionModel()->select(mindex, QItemSelectionModel::Select);
 	}
 }
 
@@ -322,7 +323,7 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 		if (changeViewModel)
 			emit viewModelAboutToBeChanged(AProxyModel);
 
-		IRosterIndex *selectedIndex = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(selectionModel()!=NULL ? mapToModel(selectionModel()->currentIndex()) : QModelIndex()) : NULL;
+		QList<IRosterIndex *> selIndexes = selectedRosterIndexes();
 		if (selectionModel())
 			selectionModel()->clear();
 
@@ -351,8 +352,8 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 			QTreeView::setModel(AProxyModel);
 		}
 
-		if (selectedIndex)
-			setCurrentIndex(mapFromModel(FRostersModel->modelIndexByRosterIndex(selectedIndex)));
+		foreach(IRosterIndex *index, selIndexes)
+			selectRosterIndex(index);
 
 		if (changeViewModel)
 			emit viewModelChanged(model());
@@ -387,7 +388,7 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 				emit viewModelAboutToBeChanged(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
 		}
 
-		IRosterIndex *selectedIndex = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(selectionModel()!=NULL ? mapToModel(selectionModel()->currentIndex()) : QModelIndex()) : NULL;
+		QList<IRosterIndex *> selIndexes = selectedRosterIndexes();
 		if (selectionModel())
 			selectionModel()->clear();
 
@@ -414,8 +415,8 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 
 		AProxyModel->setSourceModel(NULL);
 
-		if (selectedIndex)
-			setCurrentIndex(mapFromModel(FRostersModel->modelIndexByRosterIndex(selectedIndex)));
+		foreach(IRosterIndex *index, selIndexes)
+			selectRosterIndex(index);
 
 		if (changeViewModel)
 			emit viewModelChanged(model());
@@ -1099,7 +1100,7 @@ void RostersView::keyPressEvent(QKeyEvent *AEvent)
 {
 	bool hooked = false;
 	QList<IRosterIndex *> indexes = selectedRosterIndexes();
-	if (!indexes.isEmpty() && state()==NoState)
+	if (state() == NoState)
 	{
 		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
 		while (!hooked && it!=FKeyHookers.constEnd())
@@ -1118,7 +1119,7 @@ void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
 {
 	bool hooked = false;
 	QList<IRosterIndex *> indexes = selectedRosterIndexes();
-	if (!indexes.isEmpty() && state()==NoState)
+	if (state() == NoState)
 	{
 		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
 		while (!hooked && it!=FKeyHookers.constEnd())
