@@ -386,21 +386,19 @@ void DiscoItemsModel::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
 			QList<DiscoItemIndex*> updateList;
 			foreach(IDiscoItem item, ADiscoItems.items)
 			{
-				DiscoItemIndex *index = findIndex(item.itemJid,item.node,parentIndex,false).value(0);
-				if (index == NULL)
+				QList<DiscoItemIndex *> childIndexes = findIndex(item.itemJid,item.node,parentIndex,false);
+				if (childIndexes.isEmpty())
 				{
-					index = new DiscoItemIndex;
+					DiscoItemIndex *index = new DiscoItemIndex;
 					index->itemJid = item.itemJid;
 					index->itemNode = item.node;
+					index->itemName = item.name;
 					appendList.append(index);
 				}
-				else
-				{
-					updateList.append(index);
-				}
-				if (!item.name.isEmpty())
+				else foreach(DiscoItemIndex *index, childIndexes)
 				{
 					index->itemName = item.name;
+					updateList.append(index);
 				}
 			}
 
