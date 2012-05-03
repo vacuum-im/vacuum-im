@@ -71,6 +71,7 @@ protected:
 protected slots:
 	void onFieldActionTriggered(bool);
 	void onEnableActionTriggered(bool AChecked);
+	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onEditTimedOut();
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -87,6 +88,7 @@ private:
 	QLineEdit *FSearchEdit;
 	ToolBarChanger *FSearchToolBarChanger;
 	QMap<int,Action *> FFieldActions;
+	QList<IRosterIndex *>FSelectedIndexes;
 };
 
 #endif // ROSTERSEARCH_H

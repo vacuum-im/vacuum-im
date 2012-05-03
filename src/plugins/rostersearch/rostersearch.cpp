@@ -183,7 +183,29 @@ bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AI
 
 void RosterSearch::startSearch()
 {
-	QString pattern = searchPattern();
+	QString pattern = isSearchEnabled() ? searchPattern() : QString::null;
+
+	if (FRostersViewPlugin)
+	{
+		if (isSearchEnabled() && !pattern.isEmpty())
+		{
+			if (!FSearchStarted)
+			{
+				if (FRostersViewPlugin->rostersView()->rostersModel())
+				{
+					FSelectedIndexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+					connect(FRostersViewPlugin->rostersView()->rostersModel()->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
+				}
+				
+				FLastShowOffline = Options::node(OPV_ROSTER_SHOWOFFLINE).value().toBool();
+				Options::node(OPV_ROSTER_SHOWOFFLINE).setValue(true);
+
+				FRostersViewPlugin->rostersView()->instance()->expandAll();
+			}
+			FSearchStarted = true;
+		}
+	}
+
 	if (filterRegExp().pattern() != pattern)
 	{
 		setFilterRegExp(pattern);
@@ -192,29 +214,32 @@ void RosterSearch::startSearch()
 
 	if (FRostersViewPlugin)
 	{
-		if (isSearchEnabled() && !pattern.isEmpty())
+		if (FSearchStarted)
 		{
-			if (!FSearchStarted)
-			{
-				FLastShowOffline = Options::node(OPV_ROSTER_SHOWOFFLINE).value().toBool();
-				Options::node(OPV_ROSTER_SHOWOFFLINE).setValue(true);
-				FRostersViewPlugin->rostersView()->instance()->expandAll();
-			}
-			FSearchStarted = true;
+			foreach(IRosterIndex *index, FSelectedIndexes)
+				FRostersViewPlugin->rostersView()->selectRosterIndex(index);
 		}
-		else
+
+		if (!isSearchEnabled() || pattern.isEmpty())
 		{
 			if (FSearchStarted)
 			{
-				FRostersViewPlugin->startRestoreExpandState();
+				if (FRostersViewPlugin->rostersView()->rostersModel())
+				{
+					FSelectedIndexes.clear();
+					disconnect(FRostersViewPlugin->rostersView()->rostersModel()->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onRosterIndexDestroyed(IRosterIndex *)));
+				}
+
 				Options::node(OPV_ROSTER_SHOWOFFLINE).setValue(FLastShowOffline);
+
+				FRostersViewPlugin->startRestoreExpandState();
 			}
 			FSearchStarted = false;
 
 			if (FAutoEnabled)
 			{
 				setSearchEnabled(false);
-				FRostersViewPlugin->rostersView()->instance()->viewport()->setFocus();
+				FRostersViewPlugin->rostersView()->instance()->setFocus();
 			}
 		}
 	}
@@ -353,6 +378,11 @@ void RosterSearch::onFieldActionTriggered(bool)
 void RosterSearch::onEnableActionTriggered(bool AChecked)
 {
 	setSearchEnabled(AChecked);
+}
+
+void RosterSearch::onRosterIndexDestroyed(IRosterIndex *AIndex)
+{
+	FSelectedIndexes.removeAll(AIndex);
 }
 
 void RosterSearch::onEditTimedOut()
