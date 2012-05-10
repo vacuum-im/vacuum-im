@@ -8,6 +8,7 @@
 #include <definitions/notificationtypeorders.h>
 #include <definitions/menuicons.h>
 #include <definitions/resources.h>
+#include <definitions/soundfiles.h>
 #include <definitions/dataformtypes.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icaptchaforms.h>
