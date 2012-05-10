@@ -10,6 +10,7 @@ LEGEND
 ------
   [!] Added new plugin for notifications about birthdays
   [!] Added new plugin for loading data from custom types of URLs
+  [!] Added new plugin for exchanging roster contacts
   [+] Added ability to show a minimized window with the message when notification received
   [+] Added date separators in chat windows and conferences
   [+] Added ability to remove transpots with their contacts from roster
