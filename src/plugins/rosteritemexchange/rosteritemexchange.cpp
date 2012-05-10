@@ -519,7 +519,11 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 			{
 				if (!ritem.isValid)
 					approveList.append(*it);
+#if QT_VERSION >= QT_VERSION_CHECK(4,6,0)
 				else if (!it->groups.isEmpty() && !ritem.groups.contains(it->groups))
+#else
+				else if (!it->groups.isEmpty())
+#endif
 					approveList.append(*it);
 			}
 			else if (ritem.isValid && it->action==ROSTEREXCHANGE_ACTION_DELETE)
@@ -630,7 +634,11 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 							roster->sendSubscription(it->itemJid,IRoster::Subscribe);
 					}
 				}
+#if QT_VERSION >= QT_VERSION_CHECK(4,6,0)
 				else if (!it->groups.isEmpty() && !ritem.groups.contains(it->groups))
+#else
+				else if (!it->groups.isEmpty())
+#endif
 				{
 					applied = true;
 					roster->setItem(ritem.itemJid,ritem.name,ritem.groups+it->groups);
