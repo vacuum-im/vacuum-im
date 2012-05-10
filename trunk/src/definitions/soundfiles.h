@@ -2,7 +2,10 @@
 #define DEF_SOUNDFILES_H
 
 //BirthdayReminder
-#define SDF_BITHDAY_NOTIFY                "birthdayreminderNotify"
+#define SDF_BIRTHDAY_NOTIFY               "birthdayreminderNotify"
+
+//CaptchaForms
+#define SDF_CAPTCHAFORMS_REQUEST          "captchaformsRequest"
 
 //ChatMessagehandler
 #define SDF_CHAT_MHANDLER_MESSAGE         "chatmessagehandlerMessage"

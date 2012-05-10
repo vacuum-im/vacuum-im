@@ -273,6 +273,8 @@ void BirthdayReminder::onShowNotificationTimer()
 					else
 						notify.data.remove(NDR_POPUP_TIMEOUT);
 
+					notify.data.insert(NDR_SOUND_FILE,SDF_BIRTHDAY_NOTIFY);
+
 					FNotifiedContacts.append(contactJid);
 					FNotifies.insert(FNotifications->appendNotification(notify),contactJid);
 				}
