@@ -144,7 +144,7 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 	Menu *dropMenu = new Menu(this);
 
 	bool accepted = false;
-	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+	foreach(IViewDropHandler *handler, FActiveDropHandlers)
 		if (handler->viewDropAction(this, AEvent, dropMenu))
 			accepted = true;
 
@@ -184,7 +184,7 @@ void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	bool accepted = false;
-	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+	foreach(IViewDropHandler *handler, FActiveDropHandlers)
 		if (handler->viewDragMove(this, AEvent))
 			accepted = true;
 
@@ -196,7 +196,7 @@ void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 
 void ViewWidget::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
-	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+	foreach(IViewDropHandler *handler, FActiveDropHandlers)
 		handler->viewDragLeave(this, AEvent);
 }
 
