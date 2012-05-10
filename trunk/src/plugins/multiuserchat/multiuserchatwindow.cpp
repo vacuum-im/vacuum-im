@@ -77,6 +77,8 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	connect(ui.sprHSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onHorizontalSplitterMoved(int,int)));
 
 	connect(this,SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
+
+	updateWindow();
 }
 
 MultiUserChatWindow::~MultiUserChatWindow()
