@@ -17,6 +17,7 @@
 #define OWO_ROSTER                                500
 #define OWO_ROSTER_AVATARS                        800
 #define OWO_ROSTER_CHENGER                        900
+#define OWO_ROSTER_EXCHANGE                       1200
 
 //Node = ON_EMOTICANS
 #define OWO_EMOTICONS                             500

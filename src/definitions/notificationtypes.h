@@ -14,5 +14,6 @@
 #define NNT_CONNECTION_ERROR          "ConnectionError"
 #define NNT_BIRTHDAY                  "Birthday"
 #define NNT_CHATSTATE_TYPING          "ChatStateTyping"
+#define NNT_ROSTEREXCHANGE_REQUEST    "RosterExchangeRequest"
 
 #endif // DEF_NOTIFICATIONTYPES_H

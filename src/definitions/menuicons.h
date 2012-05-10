@@ -194,6 +194,9 @@
 #define MNI_RCHANGER_SUBSCR_REMOVE      "rchangerSubscriptionRemove"
 #define MNI_RCHANGER_SUBSCR_REFUSE      "rchangerSubscriptionRefuse"
 
+//RosterItemExchange
+#define MNI_ROSTEREXCHANGE_REQUEST      "rosterexchangeRequest"
+
 //RosterSearch
 #define MNI_ROSTERSEARCH_MENU           "rostersearchMenu"
 

@@ -194,6 +194,8 @@
 // RosterSearch
 #define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
+//RosterItemExchange
+#define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
 
 //ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"

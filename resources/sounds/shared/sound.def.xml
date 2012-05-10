@@ -4,6 +4,7 @@
 
   <file>
     <key>default</key>
+    <key>rosterexchangeRequest</key>
     <object mime='sound/wav'>default.wav</object>
   </file>
 
