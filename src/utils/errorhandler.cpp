@@ -12,8 +12,8 @@ ErrorHandler::ErrorHandler()
 
 ErrorHandler::ErrorHandler(int ACode, const QString &ANsURI)
 {
-	FNsURI = ANsURI;
 	FCode = ACode;
+	FNsURI = ANsURI;
 	const ErrorItem *item = itemByCode(ACode, ANsURI);
 	if (item)
 	{
@@ -27,6 +27,7 @@ ErrorHandler::ErrorHandler(const QString &ACondition, const QString &ANsURI)
 {
 	FCode = 0;
 	FNsURI = ANsURI;
+	FCondition = ACondition;
 	const ErrorItem *item = itemByCondition(ACondition,ANsURI);
 	if (item)
 	{
@@ -38,8 +39,8 @@ ErrorHandler::ErrorHandler(const QString &ACondition, const QString &ANsURI)
 
 ErrorHandler::ErrorHandler(const QString &ACondition, int ACode, const QString &ANsURI)
 {
-	FNsURI = ANsURI;
 	FCode = ACode;
+	FNsURI = ANsURI;
 	FCondition = ACondition;
 	ErrorItem *item = itemByCodeCondition(ACode,ACondition,ANsURI);
 	if (item)
