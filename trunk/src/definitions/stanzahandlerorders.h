@@ -17,6 +17,9 @@
 #define SHO_PI_SERVICEDISCOVERY       800
 #define SHO_PI_MULTIUSERCHAT          900
 
+//Iq Message In
+#define SHO_IMI_ROSTEREXCHANGE        100
+
 //Iq Message Presence In
 #define SHO_IMPI_BITSOFBINARY         100
 

@@ -85,6 +85,8 @@
 
 #define NS_ADDRESS                              "http://jabber.org/protocol/address"
 
+#define NS_ROSTERX                              "http://jabber.org/protocol/rosterx"
+
 #define NS_VACUUM_PRIVATESTORAGE_UPDATE         "vacuum:privatestorage:update"
 
 #endif

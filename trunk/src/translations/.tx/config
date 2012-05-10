@@ -252,3 +252,7 @@ source_lang = ru
 [vacuum-im.urlprocessor]
 file_filter = <lang>/urlprocessor.ts
 source_lang = ru
+
+[vacuum-im.rosteritemexchange]
+file_filter = <lang>/rosteritemexchange.ts
+source_lang = ru
