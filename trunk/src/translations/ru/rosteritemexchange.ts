@@ -51,7 +51,7 @@
     <name>RosterItemExchange</name>
     <message>
         <source>Roster Item Exchange</source>
-        <translation>Обмен эелементами ростера</translation>
+        <translation>Обмен элементами ростера</translation>
     </message>
     <message>
         <source>Allows to exchange contact list items</source>
@@ -72,7 +72,7 @@
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
         <translation>
-            <numerusform>Отпрвить %n контакт</numerusform>
+            <numerusform>Отправить %n контакт</numerusform>
             <numerusform>Отправить %n контакта</numerusform>
             <numerusform>Отправить %n контактов</numerusform>
         </translation>
