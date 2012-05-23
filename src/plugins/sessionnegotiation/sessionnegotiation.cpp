@@ -540,7 +540,9 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 		
 		IDataForm request = ARequest;
 		request.pages.clear();
-		FDataForms->xmlForm(request,error.addElement("feature",NS_FEATURENEG));
+
+        QDomElement featureElem = error.addElement("feature",NS_FEATURENEG).toElement();
+        FDataForms->xmlForm(request,featureElem);
 
 		if (!ASession.errorFields.isEmpty())
 		{
