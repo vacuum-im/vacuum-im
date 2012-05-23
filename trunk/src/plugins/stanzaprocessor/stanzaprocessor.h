@@ -48,7 +48,7 @@ public:
 	virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza);
 	virtual bool sendStanzaRequest(IStanzaRequestOwner *AIqOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout);
 	virtual Stanza makeReplyResult(const Stanza &AStanza) const;
-	virtual Stanza makeReplyError(const Stanza &AStanza, const ErrorHandler &AError) const;
+	virtual Stanza makeReplyError(const Stanza &AStanza, const XmppStanzaError &AError) const;
 	virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const;
 	virtual QList<int> stanzaHandles() const;
 	virtual IStanzaHandle stanzaHandle(int AHandleId) const;
@@ -65,7 +65,7 @@ protected:
 	bool processStanzaRequest(const Jid &AStreamJid, const Stanza &AStanza);
 	void processRequestTimeout(const QString &AStanzaId) const;
 	void removeStanzaRequest(const QString &AStanzaId);
-	void insertErrorElement(Stanza &AStanza, const ErrorHandler &AError) const;
+	void insertErrorElement(Stanza &AStanza, const XmppStanzaError &AError) const;
 protected slots:
 	void onStreamCreated(IXmppStream *AXmppStream);
 	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);

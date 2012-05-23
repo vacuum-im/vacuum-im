@@ -14,7 +14,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <utils/options.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include "compression.h"
 
 #define COMPRESS_UUID "{061D0687-B954-416d-B690-D1BA7D845D83}"

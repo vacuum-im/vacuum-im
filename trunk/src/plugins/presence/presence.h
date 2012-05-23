@@ -5,7 +5,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 
 class Presence :
 			public QObject,

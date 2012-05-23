@@ -28,10 +28,6 @@
         <translation>Fw: %1</translation>
     </message>
     <message>
-        <source>&lt;b&gt;The message with a error code %1 is received&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Die Nachricht mit dem Fehlercode %1 wurde erhalten&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>Subject: %1</source>
         <translation>Thema: %1</translation>
     </message>
@@ -59,6 +55,10 @@
     <message>
         <source>When receiving new single message</source>
         <translation>Wenn neue einzelne Nachricht empfangen</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;The message with a error is received&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

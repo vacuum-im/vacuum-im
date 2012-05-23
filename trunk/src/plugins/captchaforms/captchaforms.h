@@ -16,7 +16,7 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/istanzaprocessor.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/iconstorage.h>
 #include <utils/widgetmanager.h>
 

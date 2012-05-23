@@ -5,7 +5,6 @@
 #include <definitions/namespaces.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/errorhandler.h>
 #include "xmppstream.h"
 
 class XmppStreams :
@@ -23,7 +22,7 @@ public:
 	virtual QUuid pluginUuid() const { return XMPPSTREAMS_UUID;}
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects();
+	virtual bool initObjects() { return true; }
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IXmppStreams

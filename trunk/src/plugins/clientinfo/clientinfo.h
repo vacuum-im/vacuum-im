@@ -25,7 +25,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/stanza.h>
 #include <utils/menu.h>
 #include <utils/options.h>

@@ -219,10 +219,10 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 		QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
 		IDiscoInfo dinfo = selfDiscoInfo(AStreamJid,query.attribute("node"));
 
-		if (dinfo.error.code >= 0)
+		if (!dinfo.error.isNull())
 		{
 			AAccept = true;
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler(dinfo.error.condition,dinfo.error.code));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,dinfo.error);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else if (!dinfo.identity.isEmpty() || !dinfo.features.isEmpty() || !dinfo.extensions.isEmpty())
@@ -247,10 +247,10 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 		foreach(IDiscoHandler *AHandler, FDiscoHandlers)
 			AHandler->fillDiscoItems(ditems);
 
-		if (ditems.error.code >= 0)
+		if (!ditems.error.isNull())
 		{
 			AAccept = true;
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler(ditems.error.condition,ditems.error.code));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ditems.error);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else
@@ -452,7 +452,7 @@ void ServiceDiscovery::showDiscoItems(const Jid &AStreamJid, const Jid &AContact
 bool ServiceDiscovery::checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault)
 {
 	IDiscoInfo dinfo = discoInfo(AStreamJid,AContactJid,ANode);
-	return dinfo.error.code>=0 || !dinfo.contactJid.isValid() ? ADefault : dinfo.features.contains(AFeature);
+	return !dinfo.error.isNull() || !dinfo.contactJid.isValid() ? ADefault : dinfo.features.contains(AFeature);
 }
 
 QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const
@@ -491,24 +491,18 @@ QIcon ServiceDiscovery::identityIcon(const QList<IDiscoIdentity> &AIdentity) con
 QIcon ServiceDiscovery::serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const
 {
 	QIcon icon;
-	IDiscoInfo info = discoInfo(AStreamJid,AItemJid,ANode);
+	IDiscoInfo dinfo = discoInfo(AStreamJid,AItemJid,ANode);
 	IconStorage *storage = IconStorage::staticStorage(RSR_STORAGE_SERVICEICONS);
 	DiscoveryRequest drequest;
 	drequest.streamJid = AStreamJid;
 	drequest.contactJid = AItemJid;
 	drequest.node = ANode;
 	if (FInfoRequestsId.values().contains(drequest))
-	{
 		icon = storage->getIcon(SRI_SERVICE_WAIT);
-	}
-	else if (info.identity.isEmpty())
-	{
-		icon = storage->getIcon(info.error.code==-1 ? SRI_SERVICE_EMPTY : SRI_SERVICE_ERROR);
-	}
+	else if (dinfo.identity.isEmpty())
+		icon = storage->getIcon(dinfo.error.isNull() ? SRI_SERVICE_EMPTY : SRI_SERVICE_ERROR);
 	else
-	{
-		icon = identityIcon(info.identity);
-	}
+		icon = identityIcon(dinfo.identity);
 	return icon;
 }
 
@@ -778,23 +772,11 @@ IDiscoInfo ServiceDiscovery::parseDiscoInfo(const Stanza &AStanza, const Discove
 
 	QDomElement query = AStanza.firstElement("query",NS_DISCO_INFO);
 	if (AStanza.type() == "error")
-	{
-		ErrorHandler err(AStanza.element());
-		result.error.code = err.code();
-		result.error.condition = err.condition();
-		result.error.message = err.message();
-	}
+		result.error = XmppStanzaError(AStanza);
 	else if (result.contactJid!=AStanza.from() || result.node!=query.attribute("node"))
-	{
-		ErrorHandler err(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
-		result.error.code = err.code();
-		result.error.condition = err.condition();
-		result.error.message = err.message();
-	}
+		result.error = XmppStanzaError(XmppStanzaError::EC_FEATURE_NOT_IMPLEMENTED);
 	else
-	{
 		discoInfoFromElem(query,result);
-	}
 	return result;
 }
 
@@ -808,17 +790,11 @@ IDiscoItems ServiceDiscovery::parseDiscoItems(const Stanza &AStanza, const Disco
 	QDomElement query = AStanza.firstElement("query",NS_DISCO_ITEMS);
 	if (AStanza.type() == "error")
 	{
-		ErrorHandler err(AStanza.element());
-		result.error.code = err.code();
-		result.error.condition = err.condition();
-		result.error.message = err.message();
+		result.error = XmppStanzaError(AStanza);
 	}
 	else if (result.contactJid!=AStanza.from() || result.node!=query.attribute("node"))
 	{
-		ErrorHandler err(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
-		result.error.code = err.code();
-		result.error.condition = err.condition();
-		result.error.message = err.message();
+		result.error = XmppStanzaError(XmppStanzaError::EC_FEATURE_NOT_IMPLEMENTED);
 	}
 	else
 	{
@@ -971,7 +947,7 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) con
 
 bool ServiceDiscovery::saveEntityCaps(const IDiscoInfo &AInfo) const
 {
-	if (AInfo.error.code==-1 && FEntityCaps.value(AInfo.streamJid).contains(AInfo.contactJid))
+	if (AInfo.error.isNull() && FEntityCaps.value(AInfo.streamJid).contains(AInfo.contactJid))
 	{
 		EntityCapabilities caps = FEntityCaps.value(AInfo.streamJid).value(AInfo.contactJid);
 		QString capsNode = QString("%1#%2").arg(caps.node).arg(caps.ver);

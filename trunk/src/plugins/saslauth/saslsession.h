@@ -5,7 +5,7 @@
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/stanza.h>
 
 class SASLSession :

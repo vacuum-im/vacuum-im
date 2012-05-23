@@ -3,7 +3,7 @@
 
 #include <QSet>
 #include <utils/jid.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 
 #define ROSTERITEMEXCHANGE_UUID "{281C3ACA-AC60-401a-B592-81DFC071A766}"
 
@@ -37,7 +37,7 @@ protected:
 	virtual void exchangeRequestReceived(const IRosterExchangeRequest &ARequest) =0;
 	virtual void exchangeRequestApplied(const IRosterExchangeRequest &ARequest) =0;
 	virtual void exchangeRequestApproved(const IRosterExchangeRequest &ARequest) =0;
-	virtual void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const ErrorHandler &AError) =0;
+	virtual void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError) =0;
 };
 
 Q_DECLARE_INTERFACE(IRosterItemExchange,"Vacuum.Plugin.IRosterItemExchange/1.0")

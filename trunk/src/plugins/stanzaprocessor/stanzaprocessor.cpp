@@ -49,7 +49,7 @@ bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 		{
 			if (AStanza.tagName()=="iq" && (AStanza.type()=="set" || AStanza.type()=="get"))
 			{
-				Stanza error = makeReplyError(AStanza,ErrorHandler(ErrorHandler::SERVICE_UNAVAILABLE));
+				Stanza error = makeReplyError(AStanza,XmppStanzaError::EC_SERVICE_UNAVAILABLE);
 				sendStanzaOut(AXmppStream->streamJid(), error);
 			}
 		}
@@ -128,7 +128,7 @@ Stanza StanzaProcessor::makeReplyResult(const Stanza &AStanza) const
 	return result;
 }
 
-Stanza StanzaProcessor::makeReplyError(const Stanza &AStanza, const ErrorHandler &AError) const
+Stanza StanzaProcessor::makeReplyError(const Stanza &AStanza, const XmppStanzaError &AError) const
 {
 	Stanza error(AStanza);
 	error.setType("error").setId(AStanza.id()).setTo(AStanza.from()).setFrom(QString::null);
@@ -325,7 +325,7 @@ void StanzaProcessor::processRequestTimeout(const QString &AStanzaId) const
 
 		Stanza timeout("iq");
 		timeout.setType("error").setId(AStanzaId).setFrom(request.contactJid.full()).setTo(request.streamJid.full());
-		insertErrorElement(timeout,ErrorHandler(ErrorHandler::REQUEST_TIMEOUT));
+		insertErrorElement(timeout,XmppStanzaError(XmppStanzaError::EC_REMOTE_SERVER_TIMEOUT));
 
 		request.owner->stanzaRequestResult(request.streamJid, timeout);
 	}
@@ -337,17 +337,21 @@ void StanzaProcessor::removeStanzaRequest(const QString &AStanzaId)
 	delete request.timer;
 }
 
-void StanzaProcessor::insertErrorElement(Stanza &AStanza, const ErrorHandler &AError) const
+void StanzaProcessor::insertErrorElement(Stanza &AStanza, const XmppStanzaError &AError) const
 {
 	QDomElement errElem = AStanza.addElement("error");
-	if (AError.code() != ErrorHandler::UNKNOWNCODE)
-		errElem.setAttribute("code",AError.code());
-	if (AError.type() != ErrorHandler::UNKNOWNTYPE)
-		errElem.setAttribute("type",ErrorHandler::typeToString(AError.type()));
+	if (AError.errorTypeCode() != XmppStanzaError::ET_UNKNOWN)
+		errElem.setAttribute("type",AError.errorType());
 	if (!AError.condition().isEmpty())
-		errElem.appendChild(AStanza.createElement(AError.condition(),AError.namespaceURI()));
-	if (!AError.text().isEmpty())
-		errElem.appendChild(AStanza.createElement("text",AError.namespaceURI())).appendChild(AStanza.createTextNode(AError.text()));
+	{
+		QDomNode condElem = errElem.appendChild(AStanza.createElement(AError.condition(),XMPP_STANZA_ERROR_NS));
+		if (!AError.conditionText().isEmpty())
+			condElem.appendChild(AStanza.createTextNode(AError.conditionText()));
+	}
+	if (!AError.errorText().isEmpty())
+		errElem.appendChild(AStanza.createElement("text",XMPP_STANZA_ERROR_NS)).appendChild(AStanza.createTextNode(AError.errorText()));
+	foreach(QString appCondNs, AError.appConditionNsList())
+		errElem.appendChild(AStanza.createElement(AError.appCondition(appCondNs),appCondNs));
 }
 
 void StanzaProcessor::onStreamCreated(IXmppStream *AXmppStream)

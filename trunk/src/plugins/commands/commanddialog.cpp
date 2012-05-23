@@ -100,7 +100,7 @@ bool CommandDialog::receiveCommandError(const ICommandError &AError)
 	{
 		resetDialog();
 		FRequestId.clear();
-		ui.lblInfo->setText(tr("Requested operation failed: %1").arg(AError.message));
+		ui.lblInfo->setText(tr("Requested operation failed: %1").arg(AError.error.errorMessage()));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 		return true;
 	}

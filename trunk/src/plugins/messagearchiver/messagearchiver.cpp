@@ -292,7 +292,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		if (AStanza.type() == "result")
 			startSuspendedStanzaSession(AStreamJid,AStanza.id());
 		else
-			cancelSuspendedStanzaSession(AStreamJid,AStanza.id(),ErrorHandler(AStanza.element()).message());
+			cancelSuspendedStanzaSession(AStreamJid,AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 	}
 	else if (FPrefsAutoRequests.contains(AStanza.id()))
 	{
@@ -341,7 +341,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 	if (AStanza.type() == "result")
 		emit requestCompleted(AStanza.id());
 	else
-		emit requestFailed(AStanza.id(),ErrorHandler(AStanza.element()).message());
+		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 }
 
 QMultiMap<int, IOptionsWidget *> MessageArchiver::optionsWidgets(const QString &ANodeId, QWidget *AParent)
@@ -2426,10 +2426,10 @@ void MessageArchiver::onStanzaSessionTerminated(const IStanzaSession &ASession)
 		restoreStanzaSessionContext(ASession.streamJid,ASession.sessionId);
 		FSessions[ASession.streamJid].remove(ASession.contactJid);
 	}
-	if (ASession.errorCondition.isEmpty())
+	if (ASession.error.isNull())
 		notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session terminated"));
 	else
-		notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session failed: %1").arg(ErrorHandler(ASession.errorCondition).message()));
+		notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session failed: %1").arg(ASession.error.errorMessage()));
 }
 
 void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)

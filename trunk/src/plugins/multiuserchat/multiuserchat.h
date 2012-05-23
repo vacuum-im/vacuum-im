@@ -11,6 +11,7 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ipresence.h>
+#include <utils/xmpperror.h>
 #include "multiuser.h"
 
 class MultiUserChat :
@@ -23,8 +24,7 @@ class MultiUserChat :
 	Q_OBJECT;
 	Q_INTERFACES(IMultiUserChat IStanzaHandler IStanzaRequestOwner IMessageEditor);
 public:
-	MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid,
-	              const QString &ANickName, const QString &APassword, QObject *AParent);
+	MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANickName, const QString &APassword, QObject *AParent);
 	~MultiUserChat();
 	virtual QObject *instance() { return this; }
 	//IStanzaHandler
@@ -51,7 +51,7 @@ public:
 	virtual void setPassword(const QString &APassword);
 	virtual int show() const;
 	virtual QString status() const;
-	virtual int errorCode() const;
+	virtual XmppStanzaError roomError() const;
 	virtual void setPresence(int AShow, const QString &AStatus);
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null);
 	virtual bool requestVoice();
@@ -136,6 +136,7 @@ private:
 	QString FNickName;
 	QString FPassword;
 	MultiUser *FMainUser;
+	XmppStanzaError FRoomError;
 	QList<int> FStatusCodes;
 	QHash<QString, MultiUser *> FUsers;
 };

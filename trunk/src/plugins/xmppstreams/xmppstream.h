@@ -10,7 +10,7 @@
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/versionparser.h>
 #include "streamparser.h"
 

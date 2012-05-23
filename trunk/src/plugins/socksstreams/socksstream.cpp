@@ -111,7 +111,7 @@ bool SocksStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &
 		}
 		else
 		{
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("not-acceptable"));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_NOT_ACCEPTABLE);
 			error.element().removeChild(error.firstElement("query"));
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 			abort(tr("Unsupported stream mode"));
@@ -768,7 +768,7 @@ bool SocksStream::sendFailedHosts()
 	QDomElement errElem = reply.addElement("error");
 	errElem.setAttribute("code", 404);
 	errElem.setAttribute("type","cancel");
-	errElem.appendChild(reply.createElement("item-not-found", EHN_DEFAULT));
+	errElem.appendChild(reply.createElement("item-not-found", XMPP_STANZA_ERROR_NS));
 
 	return FStanzaProcessor->sendStanzaOut(FStreamJid, reply);
 }

@@ -445,7 +445,7 @@ bool ChatStates::isSupported(const Jid &AStreamJid, const Jid &AContactJid) cons
 		if (FDiscovery && supported && userChatState(AStreamJid,AContactJid)==IChatStates::StateUnknown)
 		{
 			IDiscoInfo dinfo = FDiscovery->discoInfo(AStreamJid,AContactJid);
-			supported = dinfo.streamJid!=AStreamJid || dinfo.error.code>0 || dinfo.features.contains(NS_CHATSTATES);
+			supported = dinfo.streamJid!=AStreamJid || !dinfo.error.isNull() || dinfo.features.contains(NS_CHATSTATES);
 		}
 		return supported;
 	}

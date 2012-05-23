@@ -377,9 +377,9 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 
 	if (AMessage.type() == Message::Error)
 	{
-		ErrorHandler err(AMessage.stanza().element());
-		QString html = tr("<b>The message with a error code %1 is received</b>").arg(err.code());
-		html += "<p style='color:red;'>"+Qt::escape(err.message())+"</p>";
+		XmppStanzaError err(AMessage.stanza());
+		QString html = tr("<b>The message with a error is received</b>");
+		html += "<p style='color:red;'>"+Qt::escape(err.errorMessage())+"</p>";
 		html += "<hr>";
 		options.kind = IMessageContentOptions::KindMessage;
 		AWindow->viewWidget()->appendHtml(html,options);

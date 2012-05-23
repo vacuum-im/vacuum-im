@@ -37,26 +37,17 @@ bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 
 bool SASLPlugin::initObjects()
 {
-	ErrorHandler::addErrorItem("aborted", ErrorHandler::CANCEL,
-		ErrorHandler::FORBIDDEN, tr("Authorization Aborted"),NS_FEATURE_SASL);
-
-	ErrorHandler::addErrorItem("incorrect-encoding", ErrorHandler::CANCEL,
-		ErrorHandler::NOT_ACCEPTABLE, tr("Incorrect Encoding"),NS_FEATURE_SASL);
-
-	ErrorHandler::addErrorItem("invalid-authzid", ErrorHandler::CANCEL,
-		ErrorHandler::FORBIDDEN, tr("Invalid Authzid"),NS_FEATURE_SASL);
-
-	ErrorHandler::addErrorItem("invalid-mechanism", ErrorHandler::CANCEL,
-		ErrorHandler::NOT_ACCEPTABLE, tr("Invalid Mechanism"),NS_FEATURE_SASL);
-
-	ErrorHandler::addErrorItem("mechanism-too-weak", ErrorHandler::CANCEL,
-		ErrorHandler::NOT_ACCEPTABLE, tr("Mechanism Too Weak"),NS_FEATURE_SASL);
-
-	ErrorHandler::addErrorItem("not-authorized", ErrorHandler::CANCEL,
-		ErrorHandler::NOT_AUTHORIZED, tr("Not Authorized"),NS_FEATURE_SASL);
-
-	ErrorHandler::addErrorItem("temporary-auth-failure", ErrorHandler::CANCEL,
-		ErrorHandler::NOT_AUTHORIZED, tr("Temporary Auth Failure"),NS_FEATURE_SASL);
+	XmppError::registerErrorString(NS_FEATURE_SASL,"aborted",tr("Authorization aborted"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"account-disabled",tr("Account disabled"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"credentials-expired",tr("Credentials expired"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"encryption-required",tr("Encryption required"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"incorrect-encoding",tr("Incorrect encoding"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"invalid-authzid",tr("Invalid authorization id"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"invalid-mechanism",tr("Invalid mechanism"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"malformed-request",tr("Malformed request"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"mechanism-too-weak",tr("Mechanism is too weak"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"not-authorized",tr("Not authorized"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"temporary-auth-failure",tr("Temporary authentication failure"));
 
 	if (FXmppStreams)
 	{

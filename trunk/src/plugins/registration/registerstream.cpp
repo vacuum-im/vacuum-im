@@ -72,8 +72,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 			}
 			else if (AStanza.type() == "error")
 			{
-				ErrorHandler err(AStanza.element());
-				emit error(err.message());
+				emit error(XmppStanzaError(AStanza).errorMessage());
 			}
 			return true;
 		}
@@ -87,8 +86,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 			}
 			else if (AStanza.type() == "error")
 			{
-				ErrorHandler err(AStanza.element());
-				emit error(err.message());
+				emit error(XmppStanzaError(AStanza).errorMessage());
 			}
 			return true;
 		}

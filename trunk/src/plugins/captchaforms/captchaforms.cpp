@@ -134,7 +134,7 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		if (AStanza.type() == "result")
 			emit challengeAccepted(cid);
 		else
-			emit challengeRejected(cid, ErrorHandler(AStanza.element()).message());
+			emit challengeRejected(cid, XmppStanzaError(AStanza).errorMessage());
 	}
 }
 
@@ -191,12 +191,9 @@ bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 		item.dialog->instance()->deleteLater();
 
 		Stanza reject("message");
-		reject.setType("error");
-		reject.setId(AChallengeId);
-		reject.setTo(item.challenger.full());
-		QDomElement errorElem = reject.addElement("error",EHN_DEFAULT);
-		errorElem.setAttribute("type","modify");
-		errorElem.appendChild(reject.createElement("not-acceptable",EHN_DEFAULT));
+		reject.setId(AChallengeId).setFrom(item.challenger.full());
+		reject = FStanzaProcessor->makeReplyError(reject,XmppStanzaError::EC_NOT_ACCEPTABLE);
+
 		if (FStanzaProcessor->sendStanzaOut(item.streamJid, reject))
 		{
 			emit challengeCanceled(AChallengeId);

@@ -12,7 +12,7 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/stanza.h>
 
 class BitsOfBinary :

@@ -39,7 +39,7 @@
 #include <interfaces/iroster.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/widgetmanager.h>
 #include "archivestreamoptions.h"
 #include "chatwindowmenu.h"

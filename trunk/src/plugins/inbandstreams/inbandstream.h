@@ -7,7 +7,7 @@
 #include <interfaces/iinbandstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/ringbuffer.h>
 #include <utils/jid.h>
 

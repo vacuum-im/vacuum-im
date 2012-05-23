@@ -186,7 +186,7 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("item-not-found"));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_ITEM_NOT_FOUND);
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 		}
 	}
@@ -210,7 +210,7 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			emit binaryError(cid,ErrorHandler(AStanza.element()).message());
+			emit binaryError(cid,XmppStanzaError(AStanza).errorMessage());
 		}
 	}
 }

@@ -2,106 +2,178 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>ErrorHandler</name>
+    <name>XmppStreamError</name>
     <message>
-        <source>Unknown Error</source>
+        <source>Undefined error condition</source>
         <translation>Неизвестная ошибка</translation>
     </message>
     <message>
-        <source>Redirect</source>
-        <translation>Перенаправление</translation>
+        <source>Bad request format</source>
+        <translation>Неверный формат запроса</translation>
     </message>
     <message>
-        <source>Bad Request</source>
-        <translation>Плохой запрос</translation>
-    </message>
-    <message>
-        <source>Unexpected Request</source>
-        <translation>Неожиданный запрос</translation>
-    </message>
-    <message>
-        <source>Jid Malformed</source>
-        <translation>Неправильный JID</translation>
-    </message>
-    <message>
-        <source>Not Authorized</source>
-        <translation>Не авторизован</translation>
-    </message>
-    <message>
-        <source>Payment Required</source>
-        <translation>Необходима оплата</translation>
-    </message>
-    <message>
-        <source>Forbidden</source>
-        <translation>Запрещено</translation>
-    </message>
-    <message>
-        <source>Not Found</source>
-        <translation>Не найдено</translation>
-    </message>
-    <message>
-        <source>Recipient Unavailable</source>
-        <translation>Получатель недоступен</translation>
-    </message>
-    <message>
-        <source>Remote Server Not Found</source>
-        <translation>Удалённый сервер не найден</translation>
-    </message>
-    <message>
-        <source>Not Allowed</source>
-        <translation>Не разрешено</translation>
-    </message>
-    <message>
-        <source>Not Acceptable</source>
-        <translation>Не приемлемо</translation>
-    </message>
-    <message>
-        <source>Registration Required</source>
-        <translation>Необходима регистрация</translation>
-    </message>
-    <message>
-        <source>Subscription Required</source>
-        <translation>Необходима подписка</translation>
-    </message>
-    <message>
-        <source>Request Timeout</source>
-        <translation>Истекло время выполнения запроса</translation>
+        <source>Bad namespace prefix</source>
+        <translation>Неверный префикс пространства имён</translation>
     </message>
     <message>
         <source>Conflict</source>
         <translation>Конфликт</translation>
     </message>
     <message>
-        <source>Internal Server Error</source>
+        <source>Connection timeout</source>
+        <translation>Превышено время подключения</translation>
+    </message>
+    <message>
+        <source>Host is not serviced</source>
+        <translation>Хост не обслуживается</translation>
+    </message>
+    <message>
+        <source>Unknown host</source>
+        <translation>Неизвестный хост</translation>
+    </message>
+    <message>
+        <source>Improper addressing</source>
+        <translation>Неправильная адресация</translation>
+    </message>
+    <message>
+        <source>Internal server error</source>
         <translation>Внутренняя ошибка сервера</translation>
     </message>
     <message>
-        <source>Resource Constraint</source>
+        <source>Invalid from address</source>
+        <translation>Неверный адрес отправителя</translation>
+    </message>
+    <message>
+        <source>Invalid namespace</source>
+        <translation>Неверное пространство имен</translation>
+    </message>
+    <message>
+        <source>Invalid XML</source>
+        <translation>Недопустимый XML</translation>
+    </message>
+    <message>
+        <source>Not authorized</source>
+        <translation>Не пройдена авторизация</translation>
+    </message>
+    <message>
+        <source>XML not well formed</source>
+        <translation>XML сформирован неправильно</translation>
+    </message>
+    <message>
+        <source>Policy violation</source>
+        <translation>Нарушены ограничения</translation>
+    </message>
+    <message>
+        <source>Remote connection failed</source>
+        <translation>Сбой удалённого подключения</translation>
+    </message>
+    <message>
+        <source>Stream need to be reseted</source>
+        <translation>Поток необходимо переустановить</translation>
+    </message>
+    <message>
+        <source>Resource constraint</source>
         <translation>Недостаточно ресурсов</translation>
     </message>
     <message>
-        <source>Undefined Condition</source>
-        <translation>Условие не определено</translation>
+        <source>Restricted XML</source>
+        <translation>Запрещенный XML</translation>
     </message>
     <message>
-        <source>Not Implemented</source>
-        <translation>Не реализовано</translation>
+        <source>See other host</source>
+        <translation>Используйте другой хост</translation>
     </message>
     <message>
-        <source>Service Unavailable</source>
+        <source>System shutdown</source>
+        <translation>Система отключена</translation>
+    </message>
+    <message>
+        <source>Unsupported encoding</source>
+        <translation>Неподдерживаемая кодировка</translation>
+    </message>
+    <message>
+        <source>Unsupported feature</source>
+        <translation>Неподдерживаемая функция</translation>
+    </message>
+    <message>
+        <source>Unsupported stanza type</source>
+        <translation>Неподдерживаемый тип станзы</translation>
+    </message>
+    <message>
+        <source>Unsupported version</source>
+        <translation>Неподдерживаемая версия</translation>
+    </message>
+    <message>
+        <source>Feature not implemented</source>
+        <translation>Возможность не реализована</translation>
+    </message>
+    <message>
+        <source>Insufficient permissions</source>
+        <translation>Недостаточно прав</translation>
+    </message>
+    <message>
+        <source>Recipient changed address</source>
+        <translation>Адресат изменил адрес</translation>
+    </message>
+    <message>
+        <source>Requested item not found</source>
+        <translation>Запрашиваемый элемент не найден</translation>
+    </message>
+    <message>
+        <source>Malformed XMPP address</source>
+        <translation>Недопустимый XMPP адрес</translation>
+    </message>
+    <message>
+        <source>Not accepted by the recipient</source>
+        <translation>Не принято адресатом</translation>
+    </message>
+    <message>
+        <source>Not allowed by the recipient</source>
+        <translation>Не разрешено адресатом</translation>
+    </message>
+    <message>
+        <source>Recipient unavailable</source>
+        <translation>Адресат недоступен</translation>
+    </message>
+    <message>
+        <source>Redirect to another address</source>
+        <translation>Перенаправление на другой адрес</translation>
+    </message>
+    <message>
+        <source>Registration required</source>
+        <translation>Требуется регистрация</translation>
+    </message>
+    <message>
+        <source>Remote server not found</source>
+        <translation>Удаленный сервер не найден</translation>
+    </message>
+    <message>
+        <source>Remote server timeout</source>
+        <translation>Превышено время ожидания удалённого сервера</translation>
+    </message>
+    <message>
+        <source>Service unavailable</source>
         <translation>Сервис недоступен</translation>
     </message>
     <message>
-        <source>Remote Server timeout</source>
-        <translation>Истекло время ожидания удалённого сервера</translation>
+        <source>Subscription required</source>
+        <translation>Требуется подписка</translation>
     </message>
     <message>
-        <source>Disconnected</source>
-        <translation>Отключён</translation>
+        <source>Unexpected request</source>
+        <translation>Неожиданный запрос</translation>
     </message>
     <message>
-        <source>Remote Server Error</source>
-        <translation>Ошибка удалённого сервера</translation>
+        <source>Resource limit exceeded</source>
+        <translation>Превышен лимит ресурсов</translation>
+    </message>
+    <message>
+        <source>Stanza is too big</source>
+        <translation>Станза слишком большая</translation>
+    </message>
+    <message>
+        <source>Too many stanzas</source>
+        <translation>Слишком много станз</translation>
     </message>
 </context>
 </TS>

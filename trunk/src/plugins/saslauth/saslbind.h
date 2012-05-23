@@ -4,7 +4,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/stanza.h>
 
 class SASLBind :

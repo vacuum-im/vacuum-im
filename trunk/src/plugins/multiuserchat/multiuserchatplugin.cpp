@@ -855,7 +855,7 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 {
 	if (ADiscoInfo.node == MUC_NODE_ROOM_NICK)
 	{
-		if (ADiscoInfo.error.code == -1)
+		if (ADiscoInfo.error.isNull())
 		{
 			QString nick = ADiscoInfo.identity.value(FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,DIT_TEXT)).name;
 			if (nick.isEmpty())

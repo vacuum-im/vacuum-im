@@ -9,8 +9,8 @@
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <utils/stanza.h>
+#include <utils/xmpperror.h>
 #include <utils/ringbuffer.h>
-#include <utils/errorhandler.h>
 
 struct HostInfo
 {

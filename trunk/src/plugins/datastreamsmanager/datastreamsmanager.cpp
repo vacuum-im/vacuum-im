@@ -74,6 +74,9 @@ bool DataStreamsManger::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool DataStreamsManger::initObjects()
 {
+	XmppError::registerErrorString(NS_STREAM_INITIATION,ERC_BAD_PROFILE,tr("The profile is not understood or invalid"));
+	XmppError::registerErrorString(NS_STREAM_INITIATION,ERC_NO_VALID_STREAMS,tr("None of the available streams are acceptable"));
+
 	if (FStanzaProcessor)
 	{
 		IStanzaHandle shandle;
@@ -93,11 +96,6 @@ bool DataStreamsManger::initObjects()
 		dfeature.description = tr("Supports the initiating of the custom stream of data between two XMPP entities");
 		FDiscovery->insertDiscoFeature(dfeature);
 	}
-
-	ErrorHandler::addErrorItem(ERC_NO_VALID_STREAMS,ErrorHandler::CANCEL,ErrorHandler::BAD_REQUEST,
-	                           tr("None of the available streams are acceptable"),NS_STREAM_INITIATION);
-	ErrorHandler::addErrorItem(ERC_BAD_PROFILE,ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,
-	                           tr("The profile is not understood or invalid"),NS_STREAM_INITIATION);
 
 	return true;
 }
@@ -164,26 +162,30 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 					if (sid.isEmpty() || !sprofile->dataStreamRequest(sid,AStanza,smethods))
 					{
 						FStreams.remove(sid);
-						Stanza error = errorStanza(AStanza.from(),AStanza.id(),"bad-request",EHN_DEFAULT,tr("Invalid profile settings"));
-						FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+						XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
+						err.setErrorText(tr("Invalid profile settings"));
+						FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
 					}
 				}
 				else
 				{
-					Stanza error = errorStanza(AStanza.from(),AStanza.id(),"bad-request",EHN_DEFAULT,tr("Stream with same ID already exists"));
-					FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+					XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
+					err.setErrorText(tr("Stream with same ID already exists"));
+					FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
 				}
 			}
 			else
 			{
-				Stanza error = errorStanza(AStanza.from(),AStanza.id(),ERC_NO_VALID_STREAMS,NS_STREAM_INITIATION);
-				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+				XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
+				err.setAppCondition(NS_STREAM_INITIATION,ERC_NO_VALID_STREAMS);
+				FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
 			}
 		}
 		else
 		{
-			Stanza error = errorStanza(AStanza.from(),AStanza.id(),ERC_BAD_PROFILE,NS_STREAM_INITIATION);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+			XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
+			err.setAppCondition(NS_STREAM_INITIATION,ERC_BAD_PROFILE);
+			FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
 		}
 	}
 	return false;
@@ -220,7 +222,7 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 		}
 		else if (sprofile)
 		{
-			sprofile->dataStreamError(sid,ErrorHandler(AStanza.element(),NS_STREAM_INITIATION).message());
+			sprofile->dataStreamError(sid,XmppStanzaError(AStanza).errorMessage());
 		}
 	}
 }
@@ -399,30 +401,20 @@ bool DataStreamsManger::acceptStream(const QString &AStreamId, const QString &AM
 
 bool DataStreamsManger::rejectStream(const QString &AStreamId, const QString &AError)
 {
-	if (FStreams.contains(AStreamId))
+	if (FStanzaProcessor && FStreams.contains(AStreamId))
 	{
 		StreamParams params = FStreams.take(AStreamId);
-		Stanza error = errorStanza(params.contactJid,params.requestId,"forbidden",EHN_DEFAULT,AError);
-		FStanzaProcessor->sendStanzaOut(params.streamJid,error);
-		return true;
+		
+		XmppStanzaError err(XmppStanzaError::EC_FORBIDDEN);
+		err.setErrorText(AError);
+
+		Stanza error("iq");
+		error.setId(params.requestId).setFrom(params.contactJid.full());
+		error = FStanzaProcessor->makeReplyError(error,err);
+
+		return FStanzaProcessor->sendStanzaOut(params.streamJid,error);
 	}
 	return false;
-}
-
-Stanza DataStreamsManger::errorStanza(const Jid &AContactJid, const QString &ARequestId, const QString &ACondition,
-                                      const QString &AErrNS, const QString &AText) const
-{
-	Stanza error("iq");
-	error.setTo(AContactJid.full()).setType("error").setId(ARequestId);
-	QDomElement errElem = error.addElement("error");
-	errElem.setAttribute("code",ErrorHandler::codeByCondition(ACondition,AErrNS));
-	errElem.setAttribute("type",ErrorHandler::typeToString(ErrorHandler::typeByCondition(ACondition,AErrNS)));
-	errElem.appendChild(error.createElement(ACondition,AErrNS));
-	if (AErrNS != EHN_DEFAULT)
-		errElem.appendChild(error.createElement("bad-request",EHN_DEFAULT));
-	else if (!AText.isEmpty())
-		errElem.appendChild(error.createElement("text",EHN_DEFAULT)).appendChild(error.createTextNode(AText));
-	return error;
 }
 
 QString DataStreamsManger::streamIdByRequestId(const QString &ARequestId) const
@@ -442,11 +434,13 @@ void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
 		{
 			IDataStreamProfile *sprofile = FProfiles.value(it->profile,NULL);
 			if (sprofile)
-				sprofile->dataStreamError(it.key(),ErrorHandler(ErrorHandler::GONE).message());
+				sprofile->dataStreamError(it.key(),XmppStanzaError(XmppStanzaError::EC_RECIPIENT_UNAVAILABLE).errorMessage());
 			it = FStreams.erase(it);
 		}
 		else
+		{
 			it++;
+		}
 	}
 }
 

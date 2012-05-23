@@ -14,7 +14,6 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/ixmppuriqueries.h>
-#include <utils/errorhandler.h>
 #include <utils/menu.h>
 #include "commanddialog.h"
 

@@ -7,6 +7,7 @@
 #include <interfaces/iservermessagearchive.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/istanzaprocessor.h>
+#include <utils/xmpperror.h>
 
 struct HeadersRequest {
 	QString id;

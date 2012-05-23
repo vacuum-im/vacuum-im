@@ -90,7 +90,7 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
-			abort(ErrorHandler(AStanza.element()).message());
+			abort(XmppStanzaError(AStanza).errorMessage());
 		}
 	}
 	else if (AHandleId==FSHIOpen && elem.attribute("sid")==FStreamId)
@@ -116,21 +116,21 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 				}
 				else
 				{
-					Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("not-acceptable"));
+					Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_INTERNAL_SERVER_ERROR);
 					FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 					abort(tr("Failed to open stream"));
 				}
 			}
 			else
 			{
-				Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("resource-constraint"));
+				Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_RESOURCE_CONSTRAINT);
 				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 				abort(tr("Block size is not acceptable"));
 			}
 		}
 		else
 		{
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("not-acceptable"));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_UNEXPECTED_REQUEST);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 	}
@@ -156,7 +156,7 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			abort(ErrorHandler(AStanza.element()).message());
+			abort(XmppStanzaError(AStanza).errorMessage());
 		}
 	}
 	else if (AStanza.id() == FOpenRequestId)
@@ -176,7 +176,7 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			abort(ErrorHandler(AStanza.element()).message());
+			abort(XmppStanzaError(AStanza).errorMessage());
 		}
 	}
 	else if (AStanza.id() == FCloseRequestId)

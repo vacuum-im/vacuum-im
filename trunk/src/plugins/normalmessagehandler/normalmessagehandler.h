@@ -31,7 +31,7 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/widgetmanager.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/textmanager.h>
 #include <utils/shortcuts.h>
 

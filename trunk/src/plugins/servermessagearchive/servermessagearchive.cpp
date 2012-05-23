@@ -174,7 +174,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	}
 
 	if (AStanza.type() == "error")
-		emit requestFailed(AStanza.id(),ErrorHandler(AStanza.element()).message());
+		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 }
 
 QUuid ServerMessageArchive::engineId() const

@@ -2,106 +2,178 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>ErrorHandler</name>
+    <name>XmppStreamError</name>
     <message>
-        <source>Unknown Error</source>
-        <translation>Невідома помилка</translation>
+        <source>Undefined error condition</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Redirect</source>
-        <translation>Перенаправлення</translation>
+        <source>Bad request format</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bad Request</source>
-        <translation>Поганий запит</translation>
-    </message>
-    <message>
-        <source>Unexpected Request</source>
-        <translation>Несподіваний запит</translation>
-    </message>
-    <message>
-        <source>Jid Malformed</source>
-        <translation>Невірний JID</translation>
-    </message>
-    <message>
-        <source>Not Authorized</source>
-        <translation>Не авторизований</translation>
-    </message>
-    <message>
-        <source>Payment Required</source>
-        <translation>Необхідна оплата</translation>
-    </message>
-    <message>
-        <source>Forbidden</source>
-        <translation>Заборонено</translation>
-    </message>
-    <message>
-        <source>Not Found</source>
-        <translation>Не знайдено</translation>
-    </message>
-    <message>
-        <source>Recipient Unavailable</source>
-        <translation>Отримувач недоступний</translation>
-    </message>
-    <message>
-        <source>Remote Server Not Found</source>
-        <translation>Віддалений сервер не знайдений</translation>
-    </message>
-    <message>
-        <source>Not Allowed</source>
-        <translation>Не дозволено</translation>
-    </message>
-    <message>
-        <source>Not Acceptable</source>
-        <translation>Не допустимо</translation>
-    </message>
-    <message>
-        <source>Registration Required</source>
-        <translation>Необхідна реєстрація</translation>
-    </message>
-    <message>
-        <source>Subscription Required</source>
-        <translation>Необхідна підписка</translation>
-    </message>
-    <message>
-        <source>Request Timeout</source>
-        <translation>Вичерпаний час виконання запиту</translation>
+        <source>Bad namespace prefix</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation>Конфлікт</translation>
+        <translation type="unfinished">Конфлікт</translation>
     </message>
     <message>
-        <source>Internal Server Error</source>
-        <translation>Внутрішня помилка серверу</translation>
+        <source>Connection timeout</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Resource Constraint</source>
-        <translation>Недостатньо ресурсів</translation>
+        <source>Host is not serviced</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Undefined Condition</source>
-        <translation>Умова не визначена</translation>
+        <source>Unknown host</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not Implemented</source>
-        <translation>Не реалізовано</translation>
+        <source>Improper addressing</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Service Unavailable</source>
-        <translation>Сервіс недоступний</translation>
+        <source>Internal server error</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remote Server timeout</source>
-        <translation>Вичерпаний час віддаленого серверу</translation>
+        <source>Invalid from address</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Disconnected</source>
-        <translation>Відключений</translation>
+        <source>Invalid namespace</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remote Server Error</source>
-        <translation>Помилка віддаленого серверу</translation>
+        <source>Invalid XML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XML not well formed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Policy violation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote connection failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stream need to be reseted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resource constraint</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restricted XML</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>See other host</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System shutdown</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported stanza type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported version</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Feature not implemented</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Insufficient permissions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recipient changed address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Requested item not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Malformed XMPP address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not accepted by the recipient</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not allowed by the recipient</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recipient unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Redirect to another address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Registration required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote server not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remote server timeout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Service unavailable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subscription required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unexpected request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Resource limit exceeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stanza is too big</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many stanzas</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

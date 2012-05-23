@@ -81,7 +81,7 @@ signals:
 	void exchangeRequestReceived(const IRosterExchangeRequest &ARequest);
 	void exchangeRequestApplied(const IRosterExchangeRequest &ARequest);
 	void exchangeRequestApproved(const IRosterExchangeRequest &ARequest);
-	void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const ErrorHandler &AError);
+	void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError);
 protected:
 	bool isAcceptableDropData(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData) const;
 	bool insertDropActions(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData, Menu *AMenu) const;
@@ -90,7 +90,7 @@ protected:
 	void notifyExchangeRequest(ExchangeApproveDialog *ADialog);
 	bool applyRequest(const IRosterExchangeRequest &ARequest, bool ASubscribe, bool ASilent);
 	void replyRequestResult(const IRosterExchangeRequest &ARequest);
-	void replyRequestError(const IRosterExchangeRequest &ARequest, const ErrorHandler &AError);
+	void replyRequestError(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError);
 	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);

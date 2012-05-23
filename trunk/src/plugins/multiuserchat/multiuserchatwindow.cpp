@@ -872,9 +872,14 @@ void MultiUserChatWindow::updateStaticRoomActions()
 	}
 
 	if (!FMultiChat->isOpen())
-		FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
+	{
+		if (FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom)==NULL)
+			FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
+	}
 	else
+	{
 		FToolBarWidget->toolBarChanger()->removeItem(FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom));
+	}
 }
 
 void MultiUserChatWindow::saveWindowState()
@@ -1692,9 +1697,7 @@ void MultiUserChatWindow::onChatClosed()
 {
 	if (!FDestroyOnChatClosed)
 	{
-		if (FMultiChat->show()==IPresence::Error && 
-			FMultiChat->errorCode()==ErrorHandler::CONFLICT && 
-			!FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
+		if (FMultiChat->show()==IPresence::Error && FMultiChat->roomError().conditionCode()==XmppStanzaError::EC_CONFLICT && !FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
 		{
 			FMultiChat->setNickName(FMultiChat->nickName()+"/"+FMultiChat->streamJid().resource());
 			FEnterRoom->trigger();

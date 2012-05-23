@@ -34,8 +34,7 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 		}
 		else
 		{
-			ErrorHandler err(AStanza.element());
-			emit error(err.message());
+			emit error(XmppStanzaError(AStanza).errorMessage());
 		}
 		return true;
 	}
