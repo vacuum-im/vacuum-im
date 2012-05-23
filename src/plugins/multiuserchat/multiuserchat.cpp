@@ -26,7 +26,6 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FNickName = ANickName;
 	FPassword = APassword;
 	FShow = IPresence::Offline;
-	FErrorCode = -1;
 
 	initialize();
 }
@@ -84,8 +83,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		}
 		else if (AStanza.type() == "error")
 		{
-			ErrorHandler err(AStanza.element());
-			emit chatError(err.message());
+			emit chatError(XmppStanzaError(AStanza).errorMessage());
 		}
 		FConfigRequestId.clear();
 	}
@@ -98,9 +96,9 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		}
 		else if (AStanza.type() == "error")
 		{
-			ErrorHandler err(AStanza.element());
-			emit configFormRejected(err.message());
-			emit chatError(err.message());
+			XmppStanzaError err(AStanza);
+			emit configFormRejected(err.errorMessage());
+			emit chatError(err.errorMessage());
 		}
 		FConfigSubmitId.clear();
 	}
@@ -127,8 +125,8 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		}
 		else if (AStanza.type() == "error")
 		{
-			ErrorHandler err(AStanza.element());
-			emit chatError(tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.message()));
+			XmppStanzaError err(AStanza);
+			emit chatError(tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.errorMessage()));
 		}
 	}
 	else if (FAffilListSubmits.contains(AStanza.id()) && FRoomJid==AStanza.from())
@@ -136,8 +134,8 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		QString affiliation = FAffilListSubmits.take(AStanza.id());
 		if (AStanza.type() == "error")
 		{
-			ErrorHandler err(AStanza.element());
-			emit chatError(tr("Changes in list of %1s was not accepted: %2").arg(affiliation).arg(err.message()));
+			XmppStanzaError err(AStanza);
+			emit chatError(tr("Changes in list of %1s was not accepted: %2").arg(affiliation).arg(err.errorMessage()));
 		}
 		else if (AStanza.type() == "result")
 		{
@@ -146,8 +144,8 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 	}
 	else if (AStanza.type() == "error")
 	{
-		ErrorHandler err(AStanza.element());
-		emit chatError(err.message());
+		XmppStanzaError err(AStanza);
+		emit chatError(err.errorMessage());
 	}
 }
 
@@ -271,9 +269,9 @@ QString MultiUserChat::status() const
 	return FStatus;
 }
 
-int MultiUserChat::errorCode() const
+XmppStanzaError MultiUserChat::roomError() const
 {
-	return FErrorCode;
+	return FRoomError;
 }
 
 void MultiUserChat::setPresence(int AShow, const QString &AStatus)
@@ -312,7 +310,7 @@ void MultiUserChat::setPresence(int AShow, const QString &AStatus)
 
 		if (!isOpen() && AShow!=IPresence::Offline && AShow!=IPresence::Error)
 		{
-			FErrorCode = -1;
+			FRoomError = XmppStanzaError::null;
 			QDomElement xelem = presence.addElement("x",NS_MUC);
 			if (!FPassword.isEmpty())
 				xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));
@@ -590,8 +588,8 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 	Message message(AStanza);
 	if (AStanza.type()=="error")
 	{
-		ErrorHandler err(AStanza.element());
-		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.message()) : err.message());
+		XmppStanzaError err(AStanza);
+		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.errorMessage()) : err.errorMessage());
 	}
 	else if (message.type() == Message::GroupChat && !message.stanza().firstElement("subject").isNull())
 	{
@@ -781,8 +779,15 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	}
 	else if (AStanza.type() == "error")
 	{
-		ErrorHandler err(AStanza.element());
-		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.message()) : err.message());
+		XmppStanzaError err(AStanza);
+		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.errorMessage()) : err.errorMessage());
+
+		if (fromNick == FNickName)
+		{
+			FRoomError = err;
+			closeChat(IPresence::Error,err.errorMessage());
+		}
+
 		accepted = true;
 	}
 

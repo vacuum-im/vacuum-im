@@ -4,6 +4,7 @@
 #include <QDomElement>
 #include <interfaces/idataforms.h>
 #include <utils/jid.h>
+#include <utils/xmpperror.h>
 
 #define COMMANDS_UUID "{6453DC15-3D01-4b60-840F-0EDD75A7D9D2}"
 
@@ -61,10 +62,8 @@ struct ICommandResult
 
 struct ICommandError
 {
-	int code;
 	QString stanzaId;
-	QString condition;
-	QString message;
+	XmppStanzaError error;
 };
 
 class ICommandServer

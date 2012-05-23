@@ -25,10 +25,10 @@
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iregistraton.h>
-#include <utils/errorhandler.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include <utils/shortcuts.h>
+#include <utils/xmpperror.h>
 #include "addlegacycontactdialog.h"
 
 class Gateways :

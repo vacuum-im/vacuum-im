@@ -32,7 +32,7 @@
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"
 #include "usercontextmenu.h"

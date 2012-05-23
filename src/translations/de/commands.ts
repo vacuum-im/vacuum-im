@@ -90,9 +90,5 @@
         <source>Supports the running or performing of the special services commands</source>
         <translation>Unterstützt den Betrieb oder das Ausführen von speziellen Dienstbefehlen</translation>
     </message>
-    <message>
-        <source>Forbidden</source>
-        <translation>Verboten</translation>
-    </message>
 </context>
 </TS>

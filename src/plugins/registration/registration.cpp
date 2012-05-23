@@ -164,7 +164,7 @@ void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			emit registerError(AStanza.id(),ErrorHandler(AStanza.element()).message());
+			emit registerError(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 		}
 		FSendRequests.removeAll(AStanza.id());
 		FSubmitRequests.removeAll(AStanza.id());

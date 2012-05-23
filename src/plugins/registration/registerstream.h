@@ -8,7 +8,7 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/iconnectionmanager.h>
 #include <utils/widgetmanager.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/stanza.h>
 
 class RegisterStream :

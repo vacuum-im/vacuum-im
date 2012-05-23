@@ -20,6 +20,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/inotifications.h>
+#include <utils/xmpperror.h>
 #include <utils/widgetmanager.h>
 
 class SessionNegotiation :

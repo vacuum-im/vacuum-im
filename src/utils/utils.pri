@@ -1,7 +1,7 @@
 HEADERS  = utilsexport.h \
            jid.h \
            versionparser.h \
-           errorhandler.h \
+           xmpperror.h \
            stanza.h \
            action.h \
            menu.h \
@@ -24,7 +24,7 @@ HEADERS  = utilsexport.h \
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
-           errorhandler.cpp \
+           xmpperror.cpp \
            stanza.cpp \
            action.cpp \
            menu.cpp \

@@ -35,7 +35,7 @@ include(utils.pri)
   target.path      = $$INSTALL_LIBS
   INSTALLS        += target
 
-	#Translation
-	TRANS_SOURCE_ROOT  = ..
-	include(../translations.inc)
+  #Translation
+  TRANS_SOURCE_ROOT  = ..
+  include(../translations.inc)
 }

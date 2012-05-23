@@ -4,6 +4,7 @@
 #include <QHash>
 #include <interfaces/idataforms.h>
 #include <utils/jid.h>
+#include <utils/xmpperror.h>
 
 #define SESSIONNEGOTIATION_UUID "{D4908366-6204-4199-AFB8-BA0CB4CAC91C}"
 
@@ -35,7 +36,7 @@ struct IStanzaSession
 	Jid contactJid;
 	int status;
 	IDataForm form;
-	QString errorCondition;
+	XmppStanzaError error;
 	QStringList errorFields;
 };
 

@@ -4,12 +4,12 @@
 <context>
     <name>DiscoInfoWindow</name>
     <message>
-        <source>Error %1: %2</source>
-        <translation>Помилка %1: %2</translation>
-    </message>
-    <message>
         <source>Discovery Info - %1</source>
         <translation>Оглядова інформація - %1</translation>
+    </message>
+    <message>
+        <source>Error: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -82,8 +82,8 @@
         <translation>Ні</translation>
     </message>
     <message>
-        <source>Error %1: %2</source>
-        <translation>Помилка %1: %2</translation>
+        <source>Error: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

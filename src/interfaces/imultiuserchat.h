@@ -7,6 +7,7 @@
 #include <utils/jid.h>
 #include <utils/menu.h>
 #include <utils/message.h>
+#include <utils/xmpperror.h>
 #include <utils/menubarchanger.h>
 
 #define MULTIUSERCHAT_UUID "{EB960F92-59A9-4322-A646-F9AB4913706C}"
@@ -107,7 +108,7 @@ public:
 	virtual void setPassword(const QString &APassword) =0;
 	virtual int show() const =0;
 	virtual QString status() const =0;
-	virtual int errorCode() const =0;
+	virtual XmppStanzaError roomError() const =0;
 	virtual void setPresence(int AShow, const QString &AStatus) =0;
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
 	virtual bool requestVoice() =0;

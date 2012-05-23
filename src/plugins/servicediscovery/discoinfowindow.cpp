@@ -30,7 +30,7 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
 	        SLOT(onCurrentFeatureChanged(QListWidgetItem *, QListWidgetItem *)));
 	connect(ui.lwtFearures,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
 
-	if (!FDiscovery->hasDiscoInfo(FStreamJid,FContactJid,ANode) || FDiscovery->discoInfo(FStreamJid,FContactJid,ANode).error.code>0)
+	if (!FDiscovery->hasDiscoInfo(FStreamJid,FContactJid,ANode) || !FDiscovery->discoInfo(FStreamJid,FContactJid,ANode).error.isNull())
 		requestDiscoInfo();
 	else
 		updateWindow();
@@ -109,9 +109,9 @@ void DiscoInfoWindow::updateWindow()
 		ui.pbtExtensions->setEnabled(FFormMenu!=NULL);
 	}
 
-	if (dinfo.error.code > 0)
+	if (!dinfo.error.isNull())
 	{
-		ui.lblError->setText(tr("Error %1: %2").arg(dinfo.error.code).arg(dinfo.error.message));
+		ui.lblError->setText(tr("Error: %1").arg(dinfo.error.errorMessage()));
 		ui.twtIdentity->setEnabled(false);
 		ui.lwtFearures->setEnabled(false);
 		ui.lblError->setVisible(true);

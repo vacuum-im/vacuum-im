@@ -226,7 +226,7 @@ QList<DiscoItemIndex *> DiscoItemsModel::findIndex(const Jid &AItemJid, const QS
 QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 {
 	QString toolTip;
-	if (ADiscoInfo.error.code < 0)
+	if (ADiscoInfo.error.isNull())
 	{
 		if (!ADiscoInfo.identity.isEmpty())
 		{
@@ -271,7 +271,9 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 		}
 	}
 	else
-		toolTip+=tr("Error %1: %2").arg(ADiscoInfo.error.code).arg(ADiscoInfo.error.message);
+	{
+		toolTip+=tr("Error: %1").arg(ADiscoInfo.error.errorMessage());
+	}
 	return toolTip;
 }
 

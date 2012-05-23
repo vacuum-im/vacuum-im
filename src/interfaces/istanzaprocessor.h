@@ -4,7 +4,7 @@
 #include <QList>
 #include <utils/jid.h>
 #include <utils/stanza.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 
 #define STANZAPROCESSOR_UUID "{1175D470-5D4A-4c29-A69E-EDA46C2BC387}"
 
@@ -51,7 +51,7 @@ public:
 	virtual bool sendStanzaOut(const Jid &AStreamJid, Stanza &AStanza) =0;
 	virtual bool sendStanzaRequest(IStanzaRequestOwner *AOwner, const Jid &AStreamJid, Stanza &AStanza, int ATimeout) =0;
 	virtual Stanza makeReplyResult(const Stanza &AStanza) const =0;
-	virtual Stanza makeReplyError(const Stanza &AStanza, const ErrorHandler &AError) const =0;
+	virtual Stanza makeReplyError(const Stanza &AStanza, const XmppStanzaError &AError) const =0;
 	virtual bool checkStanza(const Stanza &AStanza, const QString &ACondition) const =0;
 	virtual QList<int> stanzaHandles() const =0;
 	virtual IStanzaHandle stanzaHandle(int AHandleId) const =0;

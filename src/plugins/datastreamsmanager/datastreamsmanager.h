@@ -17,7 +17,7 @@
 #include <utils/jid.h>
 #include <utils/stanza.h>
 #include <utils/options.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include "datastreamsoptions.h"
 
 struct StreamParams
@@ -70,8 +70,7 @@ public:
 	virtual OptionsNode settingsProfileNode(const QUuid &AProfileId, const QString &AMethodNS) const;
 	virtual void insertSettingsProfile(const QUuid &AProfileId, const QString &AName);
 	virtual void removeSettingsProfile(const QUuid &AProfileId);
-	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS,
-	                        const QList<QString> &AMethods, int ATimeout =0);
+	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout =0);
 	virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS);
 	virtual bool rejectStream(const QString &AStreamId, const QString &AError);
 signals:
@@ -82,8 +81,6 @@ signals:
 	void settingsProfileInserted(const QUuid &AProfileId, const QString &AName);
 	void settingsProfileRemoved(const QUuid &AProfileId);
 protected:
-	virtual Stanza errorStanza(const Jid &AContactJid, const QString &ARequestId, const QString &ACondition,
-	                           const QString &AErrNS=EHN_DEFAULT, const QString &AText=QString::null) const;
 	virtual QString streamIdByRequestId(const QString &ARequestId) const;
 protected slots:
 	void onXmppStreamClosed(IXmppStream *AXmppStream);

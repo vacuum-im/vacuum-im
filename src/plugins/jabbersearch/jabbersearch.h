@@ -12,6 +12,7 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
+#include <utils/xmpperror.h>
 #include "searchdialog.h"
 
 class JabberSearch :

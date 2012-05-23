@@ -230,7 +230,7 @@ bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, S
 			}
 			else if (!request.id.isEmpty())
 			{
-				replyRequestError(request,ErrorHandler("bad-request"));
+				replyRequestError(request,XmppStanzaError(XmppStanzaError::EC_BAD_REQUEST));
 			}
 
 			return true;
@@ -251,7 +251,7 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 		}
 		else
 		{
-			ErrorHandler err(AStanza.element());
+			XmppStanzaError err(AStanza);
 			emit exchangeRequestFailed(request,err);
 		}
 	}
@@ -539,7 +539,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 
 		if (isForbidden)
 		{
-			replyRequestError(ARequest,ErrorHandler("forbidden"));
+			replyRequestError(ARequest,XmppStanzaError(XmppStanzaError::EC_FORBIDDEN));
 		}
 		else if (!approveList.isEmpty())
 		{
@@ -569,7 +569,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 	}
 	else
 	{
-		replyRequestError(ARequest,ErrorHandler("not-authorized"));
+		replyRequestError(ARequest,XmppStanzaError(XmppStanzaError::EC_NOT_AUTHORIZED));
 	}
 }
 
@@ -678,7 +678,7 @@ void RosterItemExchange::replyRequestResult(const IRosterExchangeRequest &AReque
 	emit exchangeRequestApproved(ARequest);
 }
 
-void RosterItemExchange::replyRequestError(const IRosterExchangeRequest &ARequest, const ErrorHandler &AError)
+void RosterItemExchange::replyRequestError(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError)
 {
 	if (FStanzaProcessor && !ARequest.id.isEmpty())
 	{
@@ -782,7 +782,7 @@ void RosterItemExchange::onExchangeApproveDialogRejected()
 	ExchangeApproveDialog *dialog = qobject_cast<ExchangeApproveDialog *>(sender());
 	if (dialog)
 	{
-		replyRequestError(dialog->receivedRequest(),ErrorHandler("not-allowed"));
+		replyRequestError(dialog->receivedRequest(),XmppStanzaError(XmppStanzaError::EC_NOT_ALLOWED));
 	}
 }
 

@@ -16,6 +16,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
+#include <utils/xmpperror.h>
 #include "editlistsdialog.h"
 
 class PrivacyLists :

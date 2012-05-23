@@ -8,6 +8,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
+#include <utils/xmpperror.h>
 #include "saslauth.h"
 #include "saslbind.h"
 #include "saslsession.h"

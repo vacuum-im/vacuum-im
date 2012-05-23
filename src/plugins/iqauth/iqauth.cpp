@@ -47,8 +47,7 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 			}
 			else if (AStanza.type() == "error")
 			{
-				ErrorHandler err(AStanza.element());
-				emit error(err.message());
+				emit error(XmppStanzaError(AStanza).errorMessage());
 			}
 			return true;
 		}
@@ -62,8 +61,7 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 			}
 			else if (AStanza.type() == "error")
 			{
-				ErrorHandler err(AStanza.element());
-				emit error(err.message());
+				emit error(XmppStanzaError(AStanza).errorMessage());
 			}
 			return true;
 		}

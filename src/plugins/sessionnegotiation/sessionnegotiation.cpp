@@ -42,8 +42,9 @@ void SessionNegotiation::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
@@ -190,9 +191,7 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 			else if (stanzaType=="error" && session.sessionId==sessionId)
 			{
 				session.status = IStanzaSession::Error;
-
-				ErrorHandler err(AStanza.element());
-				session.errorCondition = err.condition();
+				session.error = XmppStanzaError(AStanza);
 
 				session.errorFields.clear();
 				QDomElement errorElem = AStanza.firstElement("error");
@@ -220,8 +219,9 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 	return false;
 }
 
-bool SessionNegotiation::execDiscoFeature(const Jid &/*AStreamJid*/, const QString &/*AFeature*/, const IDiscoInfo &/*ADiscoInfo*/)
+bool SessionNegotiation::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
+	Q_UNUSED(AStreamJid); Q_UNUSED(AFeature); Q_UNUSED(ADiscoInfo);
 	return false;
 }
 
@@ -380,7 +380,7 @@ int SessionNegotiation::initSession(const Jid &AStreamJid, const Jid &AContactJi
 			session.streamJid = AStreamJid;
 			session.contactJid = AContactJid;
 			session.form = IDataForm();
-			session.errorCondition.clear();
+			session.error = XmppStanzaError::null;
 			session.errorFields.clear();
 		}
 		else
@@ -398,7 +398,7 @@ int SessionNegotiation::initSession(const Jid &AStreamJid, const Jid &AContactJi
 			if (!infoRequested)
 			{
 				session.status = IStanzaSession::Error;
-				session.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::SERVICE_UNAVAILABLE);
+				session.error = XmppStanzaError(XmppStanzaError::EC_SERVICE_UNAVAILABLE);
 				emit sessionTerminated(session);
 				return ISessionNegotiator::Cancel;
 			}
@@ -531,26 +531,24 @@ bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const I
 
 bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const IDataForm &ARequest) const
 {
-	if (FStanzaProcessor && FDataForms && !ASession.errorCondition.isEmpty())
+	if (FStanzaProcessor && FDataForms && !ASession.error.isNull())
 	{
-		Stanza data("message");
-		data.setType("error").setTo(ASession.contactJid.full());
-		data.addElement("thread").appendChild(data.createTextNode(ASession.sessionId));
-		QDomElement featureElem = data.addElement("feature",NS_FEATURENEG);
+		Stanza error("message");
+		error.setFrom(ASession.contactJid.full());
+		error = FStanzaProcessor->makeReplyError(error,ASession.error);
+		error.addElement("thread").appendChild(error.createTextNode(ASession.sessionId));
+		
 		IDataForm request = ARequest;
 		request.pages.clear();
-		FDataForms->xmlForm(request,featureElem);
-		QDomElement errorElem = data.addElement("error");
-		errorElem.setAttribute("code",ErrorHandler::codeByCondition(ASession.errorCondition));
-		errorElem.setAttribute("type",ErrorHandler::typeToString(ErrorHandler::typeByCondition(ASession.errorCondition)));
-		errorElem.appendChild(data.createElement(ASession.errorCondition,EHN_DEFAULT));
+		FDataForms->xmlForm(request,error.addElement("feature",NS_FEATURENEG));
+
 		if (!ASession.errorFields.isEmpty())
 		{
-			QDomElement featureElem = errorElem.appendChild(data.createElement("feature",NS_FEATURENEG)).toElement();
-			foreach(QString var, ASession.errorFields) {
-				featureElem.appendChild(data.createElement("field")).toElement().setAttribute("var",var); }
+			QDomElement featureElem = error.firstElement("error").appendChild(error.createElement("feature",NS_FEATURENEG)).toElement();
+			foreach(QString var, ASession.errorFields)
+				featureElem.appendChild(error.createElement("field")).toElement().setAttribute("var",var);
 		}
-		return FStanzaProcessor->sendStanzaOut(ASession.streamJid,data);
+		return FStanzaProcessor->sendStanzaOut(ASession.streamJid,error);
 	}
 	return false;
 }
@@ -572,7 +570,7 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 		if (!FDataForms->isSubmitValid(ARequest,submit))
 		{
 			ASession.status = IStanzaSession::Error;
-			ASession.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::FEATURE_NOT_IMPLEMENTED);
+			ASession.error = XmppStanzaError(XmppStanzaError::EC_FEATURE_NOT_IMPLEMENTED);
 			ASession.errorFields = unsubmitedFields(ARequest,submit,true);
 			sendSessionError(ASession,ARequest);
 		}
@@ -617,7 +615,7 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 			if (!FDataForms->isSubmitValid(ASession.form,ARequest))
 			{
 				ASession.status = IStanzaSession::Error;
-				ASession.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::NOT_ACCEPTABLE);
+				ASession.error = XmppStanzaError(XmppStanzaError::EC_NOT_ACCEPTABLE);
 				ASession.errorFields = unsubmitedFields(ARequest,submit,true);
 				sendSessionError(ASession,ARequest);
 				emit sessionTerminated(ASession);
@@ -809,7 +807,7 @@ void SessionNegotiation::processContinue(IStanzaSession &ASession, const IDataFo
 			if ((result & ISessionNegotiator::Cancel) > 0)
 			{
 				ASession.status = IStanzaSession::Error;
-				ASession.errorCondition = ErrorHandler::conditionByCode(ErrorHandler::NOT_ACCEPTABLE);
+				ASession.error = XmppStanzaError(XmppStanzaError::EC_NOT_ACCEPTABLE);
 				sendSessionError(ASession,ARequest);
 			}
 			else if ((result & ISessionNegotiator::Wait) > 0)

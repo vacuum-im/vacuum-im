@@ -24,6 +24,7 @@
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include <utils/shortcuts.h>
+#include <utils/xmpperror.h>
 #include "vcard.h"
 #include "vcarddialog.h"
 

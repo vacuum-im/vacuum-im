@@ -115,13 +115,14 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			}
 			else if (AStanza.tagName() == "failure")
 			{
-				ErrorHandler err(AStanza.element(),NS_FEATURE_SASL);
-				emit error(err.message());
+				XmppStanzaError err(AStanza.element());
+				emit error(err.errorMessage());
 			}
 			else if (AStanza.tagName() == "abort")
 			{
-				ErrorHandler err("aborted",NS_FEATURE_SASL);
-				emit error(err.message());
+				XmppStanzaError err(XmppStanzaError::EC_NOT_AUTHORIZED);
+				err.setAppCondition(NS_FEATURE_SASL,"aborted");
+				emit error(err.errorMessage());
 			}
 			else
 			{

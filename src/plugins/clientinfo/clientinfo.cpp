@@ -259,8 +259,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 		}
 		else if (AStanza.type() == "error")
 		{
-			ErrorHandler err(AStanza.element());
-			software.name = err.message();
+			software.name = XmppStanzaError(AStanza).errorMessage();
 			software.version.clear();
 			software.os.clear();
 			software.status = SoftwareError;
@@ -279,9 +278,8 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 		}
 		else if (AStanza.type() == "error")
 		{
-			ErrorHandler err(AStanza.element());
 			activity.dateTime = QDateTime();
-			activity.text = err.message();
+			activity.text = XmppStanzaError(AStanza).errorMessage();
 		}
 		emit lastActivityChanged(contactJid);
 	}

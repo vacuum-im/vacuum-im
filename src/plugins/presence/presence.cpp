@@ -62,9 +62,9 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		}
 		else if (AStanza.type() == "error")
 		{
-			ErrorHandler err(AStanza.element());
+			XmppStanzaError err(AStanza);
 			show = Error;
-			status = err.message();
+			status = err.errorMessage();
 			priority = 0;
 		}
 		else

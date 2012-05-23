@@ -189,8 +189,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			ErrorHandler err(AStanza.element());
-			emit errorReceived(AStanza.id(),err.message());
+			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 		}
 		FPromptRequests.removeAll(AStanza.id());
 	}
@@ -203,8 +202,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			ErrorHandler err(AStanza.element());
-			emit errorReceived(AStanza.id(),err.message());
+			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 		}
 		FUserJidRequests.removeAll(AStanza.id());
 	}
@@ -1011,7 +1009,7 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 	{
 		Jid streamJid = AIndex.data(DIDR_STREAM_JID).toString();
 		IDiscoInfo dinfo = FDiscovery->discoInfo(streamJid,itemJid,itemNode);
-		if (dinfo.error.code<0 && !dinfo.identity.isEmpty())
+		if (dinfo.error.isNull() && !dinfo.identity.isEmpty())
 		{
 			QList<Jid> services;
 			foreach(IDiscoIdentity ident, dinfo.identity)

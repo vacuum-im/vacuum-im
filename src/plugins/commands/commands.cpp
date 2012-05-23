@@ -95,13 +95,12 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 bool Commands::initObjects()
 {
-	ErrorHandler::addErrorItem("malformed-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Can not understand the specified action"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-action",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Can not accept the specified action"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-locale",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Can not accept the specified language/locale"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-payload",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("The data form did not provide one or more required fields"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("bad-sessionid",ErrorHandler::MODIFY,ErrorHandler::BAD_REQUEST,tr("Specified session not present"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("session-expired",ErrorHandler::CANCEL,ErrorHandler::NOT_ALLOWED,tr("Specified session is no longer active"),NS_COMMANDS);
-	ErrorHandler::addErrorItem("forbidden",ErrorHandler::AUTH,ErrorHandler::FORBIDDEN,tr("Forbidden"),NS_COMMANDS);
+	XmppError::registerErrorString(NS_COMMANDS,"malformed-action",tr("Can not understand the specified action"));
+	XmppError::registerErrorString(NS_COMMANDS,"bad-action",tr("Can not accept the specified action"));
+	XmppError::registerErrorString(NS_COMMANDS,"bad-locale",tr("Can not accept the specified language/locale"));
+	XmppError::registerErrorString(NS_COMMANDS,"bad-payload",tr("The data form did not provide one or more required fields"));
+	XmppError::registerErrorString(NS_COMMANDS,"bad-sessionid",tr("Specified session not present"));
+	XmppError::registerErrorString(NS_COMMANDS,"session-expired",tr("Specified session is no longer active"));
 
 	if (FDiscovery)
 	{
@@ -144,12 +143,14 @@ bool Commands::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		ICommandServer *server = FServers.value(request.node);
 		if (server && !server->isCommandPermitted(request.streamJid,request.contactJid,request.node))
 		{
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("forbidden",ErrorHandler::FORBIDDEN,NS_COMMANDS));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_FORBIDDEN);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 		else if (!server || !server->receiveCommandRequest(request))
 		{
-			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ErrorHandler("malformed-action",ErrorHandler::BAD_REQUEST,NS_COMMANDS));
+			XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
+			err.setAppCondition(NS_COMMANDS,"malformed-action");
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 	}
@@ -207,15 +208,14 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			ICommandError error;
-			error.stanzaId = AStanza.id();
-			ErrorHandler err(AStanza.element(),NS_COMMANDS);
-			error.code = err.code();
-			error.condition = err.condition();
-			error.message = err.message();
+			ICommandError err;
+			err.stanzaId = AStanza.id();
+			err.error = XmppStanzaError(AStanza);
 			foreach(ICommandClient *client, FClients)
-				if (client->receiveCommandError(error))
+			{
+				if (client->receiveCommandError(err))
 					break;
+			}
 		}
 	}
 }

@@ -9,7 +9,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
-#include <utils/errorhandler.h>
+#include <utils/xmpperror.h>
 #include <utils/stanza.h>
 #include <utils/jid.h>
 

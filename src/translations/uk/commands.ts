@@ -90,9 +90,5 @@
         <source>Supports the running or performing of the special services commands</source>
         <translation>Підтримує запуск або виконання спеціальних сервісних команд</translation>
     </message>
-    <message>
-        <source>Forbidden</source>
-        <translation>Заборонено</translation>
-    </message>
 </context>
 </TS>

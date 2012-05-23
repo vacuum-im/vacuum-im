@@ -59,8 +59,7 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 		}
 		else if (AStanza.element().nodeName() == "stream:error")
 		{
-			ErrorHandler err(AStanza.element(),NS_XMPP_STREAMS);
-			abort(err.message());
+			abort(XmppStreamError(AStanza.element()).errorMessage());
 			return true;
 		}
 	}
