@@ -1,31 +1,31 @@
---- clientinfo.cpp	2012-03-29 18:52:37.000000000 +0300
-+++ clientinfo.cpp	2012-03-29 19:58:25.453818849 +0300
-@@ -433,6 +433,31 @@
+--- clientinfo.cpp	2012-05-20 13:45:56.000000000 +0300
++++ clientinfo-.cpp	2012-05-20 13:32:10.000000000 +0300
+@@ -2,6 +2,8 @@
+ 
+ #include <QDir>
+ #include <QProcess>
++#include <QFile>
++#include <QIODevice>
+ #include <QFileInfo>
+ #include <QTextStream>
+ 
+@@ -432,7 +434,21 @@
+ 				osver = osver.trimmed();
  			}
  		}
- 
-+		foreach(QString dirname, path)
-+		{
-+			QDir dir(dirname);
-+			QFileInfo cand(dir.filePath("cat"));
-+			if (cand.isExecutable())
-+			{
-+				found = cand.absoluteFilePath();
-+				break;
-+			}
-+		}
+-
 +
-+		if (!found.isEmpty())
++// Slackware detect
++		if (osver.isEmpty())
 +		{
-+			QProcess process;
-+			process.start(found, QStringList()<<"/etc/slackware-version", QIODevice::ReadOnly);
-+			if (process.waitForStarted())
++			QFile slackwarever("/etc/slackware-version");
++			if (!slackwarever.open(QIODevice::ReadOnly | QIODevice::Text));
++			QTextStream slackin(&slackwarever);
++			while (!slackin.atEnd())
 +			{
-+				QTextStream stream(&process);
-+				while (process.waitForReadyRead())
-+					osver += stream.readAll();
-+				process.close();
-+				osver = osver.trimmed();
++				QString slackline = slackin.readLine();
++				QString slackprocess_line(slackline);
++				osver.append(slackprocess_line);
 +			}
 +		}
 +

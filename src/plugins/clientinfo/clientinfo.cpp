@@ -370,26 +370,29 @@ QString ClientInfo::osVersion() const
 #if defined(Q_WS_MAC)
 		switch (QSysInfo::MacintoshVersion)
 		{
+		case QSysInfo::MV_LION:
+			osver = "OS X 10.7 (Lion)";
+			break;
 		case QSysInfo::MV_SNOWLEOPARD:
-			osver = "MacOS 10.6(SnowLeopard)";
+			osver = "Mac OS X 10.6 (SnowLeopard)";
 			break;
 		case QSysInfo::MV_LEOPARD:
-			osver = "MacOS 10.5(Leopard)";
+			osver = "Mac OS X 10.5 (Leopard)";
 			break;
 		case QSysInfo::MV_TIGER:
-			osver = "MacOS 10.4(Tiger)";
+			osver = "Mac OS X 10.4 (Tiger)";
 			break;
 		case QSysInfo::MV_PANTHER:
-			osver = "MacOS 10.3(Panther)";
+			osver = "Mac OS X 10.3 (Panther)";
 			break;
 		case QSysInfo::MV_JAGUAR:
-			osver = "MacOS 10.2(Jaguar)";
+			osver = "Mac OS X 10.2 (Jaguar)";
 			break;
 		case QSysInfo::MV_PUMA:
-			osver = "MacOS 10.1(Puma)";
+			osver = "Mac OS X 10.1 (Puma)";
 			break;
 		case QSysInfo::MV_CHEETAH:
-			osver = "MacOS 10.0(Cheetah)";
+			osver = "Mac OS X 10.0 (Cheetah)";
 			break;
 		case QSysInfo::MV_9:
 			osver = "MacOS 9";
