@@ -164,28 +164,32 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 						FStreams.remove(sid);
 						XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
 						err.setErrorText(tr("Invalid profile settings"));
-						FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
+						Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
+						FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 					}
 				}
 				else
 				{
 					XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
 					err.setErrorText(tr("Stream with same ID already exists"));
-					FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
+					Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
+					FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 				}
 			}
 			else
 			{
 				XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
 				err.setAppCondition(NS_STREAM_INITIATION,ERC_NO_VALID_STREAMS);
-				FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
+				Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
+				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 			}
 		}
 		else
 		{
 			XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
 			err.setAppCondition(NS_STREAM_INITIATION,ERC_BAD_PROFILE);
-			FStanzaProcessor->sendStanzaOut(AStreamJid,FStanzaProcessor->makeReplyError(AStanza,err));
+			Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
+			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 	}
 	return false;
