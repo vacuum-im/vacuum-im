@@ -2,12 +2,19 @@
 
 #include <QApplication>
 
+QMap<QString, QMap<QString, QMap<QString,QString> > > XmppError::FErrorStrings;
+QMap<XmppStreamError::ErrorCondition,QString> XmppStreamError::FErrorConditions;
+QMap<XmppStanzaError::ErrorType,QString> XmppStanzaError::FErrorTypes;
+QMap<XmppStanzaError::ErrorCondition,QString> XmppStanzaError::FErrorConditions;
+QMap<XmppStanzaError::ErrorCondition,XmppStanzaError::ErrorType> XmppStanzaError::FConditionTypes;
+
+XmppError XmppError::null = XmppError();
+XmppStreamError XmppStreamError::null = XmppStreamError();
+XmppStanzaError XmppStanzaError::null = XmppStanzaError();
+
 //*********
 //XmppError
 //*********
-XmppError XmppError::null = XmppError();
-QMap<QString, QMap<QString, QMap<QString,QString> > > XmppError::FErrorStrings;
-
 XmppError::XmppError()
 {
 	d = new XmppErrorData;
@@ -142,9 +149,6 @@ void XmppError::registerErrorString(const QString &ANsUri, const QString &ACondi
 //***************
 //XmppStreamError
 //***************
-XmppStreamError XmppStreamError::null = XmppStreamError();
-QMap<XmppStreamError::ErrorCondition,QString> XmppStreamError::FErrorConditions;
-
 XmppStreamError::XmppStreamError() : XmppError()
 {
 
@@ -289,11 +293,6 @@ void XmppStreamError::initialize()
 //***************
 //XmppStanzaError
 //***************
-XmppStanzaError XmppStanzaError::null = XmppStanzaError();
-QMap<XmppStanzaError::ErrorType,QString> XmppStanzaError::FErrorTypes;
-QMap<XmppStanzaError::ErrorCondition,QString> XmppStanzaError::FErrorConditions;
-QMap<XmppStanzaError::ErrorCondition,XmppStanzaError::ErrorType> XmppStanzaError::FConditionTypes;
-
 XmppStanzaError::XmppStanzaError() : XmppError()
 {
 	d = new XmppStanzaErrorData;
@@ -311,7 +310,7 @@ XmppStanzaError::XmppStanzaError(const Stanza &AStanza)
 	*this = XmppStanzaError(AStanza.firstElement("error"));
 }
 
-XmppStanzaError::XmppStanzaError(ErrorCondition ACondition, ErrorType AType, const Jid AErrorBy) : XmppError()
+XmppStanzaError::XmppStanzaError(ErrorCondition ACondition, ErrorType AType, const QString &AErrorBy) : XmppError()
 {
 	d = new XmppStanzaErrorData;
 	setErrorBy(AErrorBy);
@@ -324,14 +323,14 @@ bool XmppStanzaError::isValid() const
 	return !isNull() && (codeByCondition(condition())!=EC_UNDEFINED_CONDITION || !appConditionNsList().isEmpty());
 }
 
-Jid XmppStanzaError::errorBy() const
+QString XmppStanzaError::errorBy() const
 {
 	return d->FErrorBy;
 }
 
-void XmppStanzaError::setErrorBy(const Jid &ABy)
+void XmppStanzaError::setErrorBy(const QString &AErrorBy)
 {
-	d->FErrorBy = ABy;
+	d->FErrorBy = AErrorBy;
 }
 
 QString XmppStanzaError::errorType() const

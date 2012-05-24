@@ -28,8 +28,8 @@ class XmppStanzaErrorData :
 	public QSharedData
 {
 public:
-	Jid FErrorBy;
 	QString FType;
+	QString FErrorBy;
 };
 
 class UTILS_EXPORT XmppError
@@ -54,8 +54,9 @@ public:
 	static QString errorString(const QString &ANsUri, const QString &ACondition, const QString &AContext = QString::null);
 	static void registerErrorString(const QString &ANsUri, const QString &ACondition, const QString &AMessage, const QString &AContext = QString::null);
 private:
-	QSharedDataPointer<XmppErrorData> d;
 	static QMap<QString, QMap<QString, QMap<QString,QString> > > FErrorStrings;
+private:
+	QSharedDataPointer<XmppErrorData> d;
 };
 
 class UTILS_EXPORT XmppStreamError :
@@ -147,10 +148,10 @@ public:
 	XmppStanzaError();
 	XmppStanzaError(QDomElement AErrorElem);
 	XmppStanzaError(const Stanza &AStanza);
-	XmppStanzaError(ErrorCondition ACondition, ErrorType AType = ET_UNKNOWN, const Jid AErrorBy = Jid::null);
+	XmppStanzaError(ErrorCondition ACondition, ErrorType AType = ET_UNKNOWN, const QString &AErrorBy = QString::null);
 	bool isValid() const;
-	Jid errorBy() const;
-	void setErrorBy(const Jid &ABy);
+	QString errorBy() const;
+	void setErrorBy(const QString &AErrorBy);
 	QString errorType() const;
 	ErrorType errorTypeCode() const;
 	void setErrorType(ErrorType AType);
