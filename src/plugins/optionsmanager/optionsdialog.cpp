@@ -207,6 +207,8 @@ void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QMod
 	QWidget *curWidget = FItemWidgets.value(curItem);
 	if (curWidget)
 		ui.scaScroll->setWidget(curWidget);
+
+	Options::node(OPV_MISC_OPTIONS_DIALOG_LASTNODE).setValue(nodeID);
 }
 
 void OptionsDialog::onOptionsWidgetModified()
