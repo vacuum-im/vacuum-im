@@ -468,6 +468,7 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *APar
 			connect(FOptionsDialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()),Qt::QueuedConnection);
 		}
 		FOptionsDialog->showNode(ANodeId);
+		FOptionsDialog->showNode(ANodeId.isNull() ? Options::node(OPV_MISC_OPTIONS_DIALOG_LASTNODE).value().toString() : ANodeId);
 		WidgetManager::showActivateRaiseWindow(FOptionsDialog);
 	}
 	return FOptionsDialog;
