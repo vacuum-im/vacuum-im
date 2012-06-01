@@ -42,6 +42,7 @@
 #define OWO_MESSAGES_LOADHISTORY                  600
 #define OWO_MESSAGES_SHOWDATESEPARATORS           600
 #define OWO_MESSAGES_CHATSTATES                   800
+#define OWO_MESSAGES_UNNOTIFYALLNORMAL            900
 
 //Node = ON_MESSAGE_STYLES
 #define OWO_MESSAGE_STYLES                        500

@@ -16,6 +16,7 @@ NormalMessageHandler::NormalMessageHandler()
 	FPresencePlugin = NULL;
 	FRostersView = NULL;
 	FXmppUriQueries = NULL;
+	FOptionsManager = NULL;
 }
 
 NormalMessageHandler::~NormalMessageHandler()
@@ -113,6 +114,10 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 	if (plugin)
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
@@ -134,6 +139,16 @@ bool NormalMessageHandler::initObjects()
 	{
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, FRostersView->instance());
 	}
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsHolder(this);
+	}
+	return true;
+}
+
+bool NormalMessageHandler::initSettings()
+{
+	Options::setDefaultValue(OPV_MESSAGES_UNNOTIFYALLNORMAL, false);
 	return true;
 }
 
@@ -186,7 +201,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 	if (ADirection == IMessageProcessor::MessageIn)
 	{
 		IMessageWindow *window = findWindow(AMessage.to(),AMessage.from());
-		if (window && !window->isActiveTabPage())
+		if (window)
 		{
 			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_NORMAL_MESSAGE);
 			if (notify.kinds > 0)
@@ -234,7 +249,21 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 bool NormalMessageHandler::messageShowWindow(int AMessageId)
 {
 	IMessageWindow *window = FNotifiedMessages.key(AMessageId);
-	if (window)
+	if (window == NULL)
+	{
+		Message message = FMessageProcessor->notifiedMessage(AMessageId);
+		if (messageDisplay(message,IMessageProcessor::MessageIn))
+		{
+			IMessageWindow *window = findWindow(message.to(),message.from());
+			if (window)
+			{
+				FNotifiedMessages.insertMulti(window,AMessageId);
+				window->showTabPage();
+				return true;
+			}
+		}
+	}
+	else 
 	{
 		window->showTabPage();
 		return true;
@@ -257,6 +286,16 @@ bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, 
 		return true;
 	}
 	return false;
+}
+
+QMultiMap<int, IOptionsWidget *> NormalMessageHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	{
+		widgets.insertMulti(OWO_MESSAGES_UNNOTIFYALLNORMAL,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL),tr("Mark all single messages from user as read when you read the first one"),AParent));
+	}
+	return widgets;
 }
 
 IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
@@ -291,7 +330,7 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 
 IMessageWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	foreach(IMessageWindow *window,FWindows)
+	foreach(IMessageWindow *window, FWindows)
 		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
 			return window;
 	return NULL;
@@ -303,8 +342,10 @@ bool NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
 	{
 		QQueue<Message> &messages = FMessageQueue[AWindow];
 		messages.removeFirst();
+
 		Message message = messages.head();
 		showStyledMessage(AWindow,message);
+		removeCurrentMessageNotify(AWindow);
 		updateWindow(AWindow);
 		return true;
 	}
@@ -334,11 +375,22 @@ void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 	AWindow->setNextCount(FMessageQueue.value(AWindow).count()-1);
 }
 
-void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow)
+void NormalMessageHandler::removeCurrentMessageNotify(IMessageWindow *AWindow)
+{
+	int messageId = FMessageQueue.value(AWindow).head().data(MDR_MESSAGE_ID).toInt();
+	removeNotifiedMessages(AWindow,messageId);
+}
+
+void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow, int AMessageId)
 {
 	foreach(int messageId, FNotifiedMessages.values(AWindow))
-		FMessageProcessor->removeMessageNotify(messageId);
-	FNotifiedMessages.remove(AWindow);
+	{
+		if (AMessageId<0 || AMessageId==messageId)
+		{
+			FMessageProcessor->removeMessageNotify(messageId);
+			FNotifiedMessages.remove(AWindow,messageId);
+		}
+	}
 }
 
 void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
@@ -497,7 +549,10 @@ void NormalMessageHandler::onWindowActivated()
 	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
 	if (FWindows.contains(window))
 	{
-		removeNotifiedMessages(window);
+		if (Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL).value().toBool())
+			removeNotifiedMessages(window);
+		else
+			removeCurrentMessageNotify(window);
 	}
 }
 
@@ -506,9 +561,9 @@ void NormalMessageHandler::onWindowDestroyed()
 	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
 	if (FWindows.contains(window))
 	{
-		removeNotifiedMessages(window);
-		FMessageQueue.remove(window);
 		FWindows.removeAll(window);
+		FMessageQueue.remove(window);
+		FNotifiedMessages.remove(window);
 	}
 }
 
