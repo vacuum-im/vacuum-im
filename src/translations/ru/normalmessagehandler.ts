@@ -60,5 +60,9 @@
         <source>&lt;b&gt;The message with a error is received&lt;/b&gt;</source>
         <translation>&lt;b&gt;Получено сообщение с ошибкой&lt;/b&gt;</translation>
     </message>
+    <message>
+        <source>Mark all single messages from user as read when you read the first one</source>
+        <translation>Пометить прочитанными все одиночные сообщения от пользователя при прочтении первого</translation>
+    </message>
 </context>
 </TS>

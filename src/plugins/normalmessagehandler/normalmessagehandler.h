@@ -20,6 +20,8 @@
 #include <definitions/soundfiles.h>
 #include <definitions/shortcuts.h>
 #include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
@@ -30,19 +32,22 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <interfaces/ioptionsmanager.h>
 #include <utils/widgetmanager.h>
 #include <utils/xmpperror.h>
 #include <utils/textmanager.h>
 #include <utils/shortcuts.h>
+#include <utils/options.h>
 
 class NormalMessageHandler :
 	public QObject,
 	public IPlugin,
 	public IMessageHandler,
-	public IXmppUriHandler
+	public IXmppUriHandler,
+	public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler);
+	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler IOptionsHolder);
 public:
 	NormalMessageHandler();
 	~NormalMessageHandler();
@@ -52,7 +57,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
@@ -62,12 +67,15 @@ public:
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
 	virtual bool messageShowWindow(int AMessageId);
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	//IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
 	IMessageWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	IMessageWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	bool showNextMessage(IMessageWindow *AWindow);
 	void updateWindow(IMessageWindow *AWindow);
-	void removeNotifiedMessages(IMessageWindow *AWindow);
+	void removeCurrentMessageNotify(IMessageWindow *AWindow);
+	void removeNotifiedMessages(IMessageWindow *AWindow, int AMessageId = -1);
 	void setMessageStyle(IMessageWindow *AWindow);
 	void fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const;
 	void showStyledMessage(IMessageWindow *AWindow, const Message &AMessage);
@@ -96,6 +104,7 @@ private:
 	IPresencePlugin *FPresencePlugin;
 	IRostersView *FRostersView;
 	IXmppUriQueries *FXmppUriQueries;
+	IOptionsManager *FOptionsManager;
 private:
 	QList<IMessageWindow *> FWindows;
 	QMultiMap<IMessageWindow *, int> FNotifiedMessages;

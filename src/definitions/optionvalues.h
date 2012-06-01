@@ -103,6 +103,8 @@
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
 // ChatMessageHandler
 #define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
+// NormalMessageHandler
+#define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
 //MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
 
