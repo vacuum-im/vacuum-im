@@ -377,8 +377,11 @@ void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 
 void NormalMessageHandler::removeCurrentMessageNotify(IMessageWindow *AWindow)
 {
-	int messageId = FMessageQueue.value(AWindow).head().data(MDR_MESSAGE_ID).toInt();
-	removeNotifiedMessages(AWindow,messageId);
+	if (!FMessageQueue.value(AWindow).isEmpty())
+	{
+		int messageId = FMessageQueue.value(AWindow).head().data(MDR_MESSAGE_ID).toInt();
+		removeNotifiedMessages(AWindow,messageId);
+	}
 }
 
 void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow, int AMessageId)
@@ -523,7 +526,7 @@ void NormalMessageHandler::onReplyMessage()
 void NormalMessageHandler::onForwardMessage()
 {
 	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-	if (FMessageProcessor && FMessageQueue.contains(window))
+	if (FMessageProcessor && !FMessageQueue.value(window).isEmpty())
 	{
 		Message message = FMessageQueue.value(window).head();
 		window->setMode(IMessageWindow::WriteMode);
@@ -698,7 +701,7 @@ void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOp
 	{
 		foreach (IMessageWindow *window, FWindows)
 		{
-			if (FMessageQueue.contains(window) && FMessageQueue.value(window).head().type()==AMessageType)
+			if (!FMessageQueue.value(window).isEmpty() && FMessageQueue.value(window).head().type()==AMessageType)
 			{
 				IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
 				if (style==NULL || !style->changeOptions(window->viewWidget()->styleWidget(),AOptions,false))
