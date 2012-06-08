@@ -623,9 +623,9 @@ void MessageWidgets::onViewContextSearchActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		QUrl url = QString("http://www.google.ru/search");
-		url.setQueryItems(QList<QPair<QString,QString> >()
-			<< qMakePair<QString,QString>(QString("q"),action->data(ADR_CONTEXT_DATA).toString()));
+		QString domain = tr("google.com","Your google domain");
+		QUrl url = QString("http://www.%1/search").arg(domain);
+		url.setQueryItems(QList<QPair<QString,QString> >() << qMakePair<QString,QString>(QString("q"),action->data(ADR_CONTEXT_DATA).toString()));
 		QDesktopServices::openUrl(url);
 	}
 }
