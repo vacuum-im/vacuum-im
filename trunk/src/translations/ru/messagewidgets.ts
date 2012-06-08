@@ -210,6 +210,11 @@
         <comment>Close other tabs</comment>
         <translation>Ctrl+Shift+W</translation>
     </message>
+    <message>
+        <source>google.com</source>
+        <comment>Your google domain</comment>
+        <translation>google.ru</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
