@@ -84,6 +84,7 @@ public:
 	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
 	virtual QString senderColor(const QString &ASenderId) const;
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
+	virtual QTextDocumentFragment textUnderPosition(const QPoint &APosition, QWidget *AWidget) const;
 	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
 	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 	//ISimpleMessageStyle

@@ -554,19 +554,19 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
 	}
 }
 
-void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
+void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu)
 {
 	Q_UNUSED(APosition);
-	if (!ASelection.isEmpty())
+	if (!AText.isEmpty())
 	{
 		Action *copyAction = new Action(AMenu);
 		copyAction->setText(tr("Copy"));
 		copyAction->setShortcut(QKeySequence::Copy);
-		copyAction->setData(ADR_CONTEXT_DATA,ASelection.toHtml());
+		copyAction->setData(ADR_CONTEXT_DATA,AText.toHtml());
 		connect(copyAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
 		AMenu->addAction(copyAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
 
-		QUrl href = TextManager::getTextFragmentHref(ASelection);
+		QUrl href = TextManager::getTextFragmentHref(AText);
 		if (href.isValid())
 		{
 			bool isMailto = href.scheme()=="mailto";
@@ -586,7 +586,7 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, const QTex
 		}
 		else
 		{
-			QString plainSelection = ASelection.toPlainText().trimmed();
+			QString plainSelection = AText.toPlainText().trimmed();
 			Action *searchAction = new Action(AMenu);
 			searchAction->setText(tr("Search on Google '%1'").arg(plainSelection.length()>33 ? plainSelection.left(30)+"..." : plainSelection));
 			searchAction->setData(ADR_CONTEXT_DATA, plainSelection);
