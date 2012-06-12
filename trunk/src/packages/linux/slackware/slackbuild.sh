@@ -1,13 +1,7 @@
 #!/bin/bash
 
 #
-# Author for slack package script Oleg A Deordiev
-# If you find error in my script please contact with my.
-# Facebook - facebook.com/streamthreader
-# Vk.com   - vk.com/systemroot
-# Mail     - kvantarium@gmail.com
-# Skype    - StreamThreader
-# Jabber   - streamthreader@jabber.ru
+# Author for slack build script script Oleg A Deordiev kvantarium@gmail.com
 #
 
 arche=$HOSTTYPE
@@ -21,7 +15,7 @@ cpucore=""
 threadsmy=""
 pkgtype=txz
 revpkg="1"
-CLIENT_NAME=""
+CLIENT_NAME="vacuum-im"
 CLIENT_VERSION=""
 CLIENT_VERSION_SUFIX=""
 CLIENT_SVN_VER=""
@@ -45,7 +39,6 @@ builddir="$srcdir"/build
 pkgdir="$srcdir"/pkgdir
 instldir="$srcdir"/instldir
 
-CLIENT_NAME="$(grep "CLIENT_NAME" ./src/definitions/version.h | awk -F '"' '{print $2}' | awk -F '"' '{print $1}' | tr -d '-')"
 CLIENT_VERSION="$(grep -m 1 "CLIENT_VERSION" ./src/definitions/version.h | awk -F '"' '{print $2}' | awk -F '"' '{print $1}')"
 CLIENT_VERSION_SUFIX="$(grep "CLIENT_VERSION_SUFIX" ./src/definitions/version.h | awk -F '"' '{print $2}' | awk -F '"' '{print $1}')"
 
