@@ -3,6 +3,8 @@
 #include <QKeyEvent>
 #include <QCoreApplication>
 
+#define ADR_SELECTED_TEXT    Action::DR_Parametr1
+
 ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
 	ui.setupUi(this);
@@ -312,19 +314,24 @@ void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 
 void ChatWindow::onViewContextQuoteActionTriggered(bool)
 {
-	QTextDocumentFragment fragment = viewWidget()->messageStyle()->selection(viewWidget()->styleWidget());
-	fragment = TextManager::getTrimmedTextFragment(editWidget()->prepareTextFragment(fragment),!editWidget()->isRichTextEnabled());
-	TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
-	editWidget()->textEdit()->setFocus();
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		QTextDocumentFragment fragment = QTextDocumentFragment::fromHtml(action->data(ADR_SELECTED_TEXT).toString());
+		fragment = TextManager::getTrimmedTextFragment(editWidget()->prepareTextFragment(fragment),!editWidget()->isRichTextEnabled());
+		TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
+		editWidget()->textEdit()->setFocus();
+	}
 }
 
-void ChatWindow::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
+void ChatWindow::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu)
 {
 	Q_UNUSED(APosition);
-	if (!ASelection.toPlainText().trimmed().isEmpty())
+	if (!AText.toPlainText().trimmed().isEmpty())
 	{
 		Action *quoteAction = new Action(AMenu);
 		quoteAction->setText(tr("Quote selected text"));
+		quoteAction->setData(ADR_SELECTED_TEXT, AText.toHtml());
 		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
 		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
 		connect(quoteAction,SIGNAL(triggered(bool)),SLOT(onViewContextQuoteActionTriggered(bool)));

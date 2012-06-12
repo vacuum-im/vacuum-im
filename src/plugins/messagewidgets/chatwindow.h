@@ -79,7 +79,7 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onViewContextQuoteActionTriggered(bool);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
+	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
 private:
 	Ui::ChatWindowClass ui;
 private:

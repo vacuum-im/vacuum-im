@@ -84,6 +84,41 @@ QTextDocumentFragment SimpleMessageStyle::selection(QWidget *AWidget) const
 	return view!=NULL ? view->textCursor().selection() : QTextDocumentFragment();
 }
 
+QTextDocumentFragment SimpleMessageStyle::textUnderPosition(const QPoint &APosition, QWidget *AWidget) const
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	if (view)
+	{
+		QTextCursor cursor = view->cursorForPosition(APosition);
+		if (view->textCursor().selection().isEmpty() || view->textCursor().selectionStart()>cursor.position() || view->textCursor().selectionEnd()<cursor.position())
+		{
+			if (!view->anchorAt(APosition).isEmpty())
+			{
+				QTextBlock block = cursor.block();
+				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+				{
+					if (it.fragment().contains(cursor.position()))
+					{
+						cursor.setPosition(it.fragment().position());
+						cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
+						break;
+					}
+				}
+			}
+			else
+			{
+				cursor.select(QTextCursor::WordUnderCursor);
+			}
+			return cursor.selection();
+		}
+		else
+		{
+			return selection(AWidget);
+		}
+	}
+	return QTextDocumentFragment();
+}
+
 bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);

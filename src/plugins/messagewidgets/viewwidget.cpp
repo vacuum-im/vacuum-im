@@ -217,7 +217,7 @@ void ViewWidget::onCustomContextMenuRequested(const QPoint &APosition)
 	Menu *menu = new Menu(this);
 	menu->setAttribute(Qt::WA_DeleteOnClose, true);
 
-	contextMenuForView(APosition,FMessageStyle->selection(FStyleWidget),menu);
+	contextMenuForView(APosition,FMessageStyle->textUnderPosition(APosition,FStyleWidget),menu);
 
 	if (!menu->isEmpty())
 		menu->popup(FStyleWidget->mapToGlobal(APosition));

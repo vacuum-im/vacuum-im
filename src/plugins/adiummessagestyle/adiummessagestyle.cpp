@@ -14,6 +14,7 @@
 #include <QDomDocument>
 #include <QApplication>
 #include <QTextDocument>
+#include <QWebHitTestResult>
 
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
@@ -111,6 +112,27 @@ QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 		return QTextDocumentFragment::fromHtml(QApplication::clipboard()->mimeData()->html());
 	}
 #endif
+	return QTextDocumentFragment();
+}
+
+QTextDocumentFragment AdiumMessageStyle::textUnderPosition(const QPoint &APosition, QWidget *AWidget) const
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	if (view)
+	{
+#if QT_VERSION >= 0x040800
+		QWebHitTestResult result = view->page()->currentFrame()->hitTestContent(APosition);
+		if (!result.isContentSelected())
+		{
+			if (result.linkUrl().isValid())
+				return QTextDocumentFragment::fromHtml(QString("<a href='%1'>%2</a>").arg(result.linkUrl().toString(),result.linkText()));
+		}
+		else
+#endif
+		{
+			return selection(AWidget);
+		}
+	}
 	return QTextDocumentFragment();
 }
 
