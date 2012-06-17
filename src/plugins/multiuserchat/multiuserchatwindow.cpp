@@ -1367,7 +1367,7 @@ void MultiUserChatWindow::refreshCompleteNicks()
 	FCompleteNicks = sortedNicks.values();
 
 	int curNickIndex = FCompleteNicks.indexOf(curNick);
-	FCompleteIt = curNickIndex>=0 ? FCompleteNicks.constBegin()+curNickIndex : FCompleteNicks.constEnd();
+	FCompleteIt = FCompleteNicks.constBegin() + (curNickIndex >= 0 ? curNickIndex : 0);
 }
 
 void MultiUserChatWindow::updateListItem(const Jid &AContactJid)
@@ -1984,7 +1984,6 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 			FStartCompletePos = cursor.position();
 			FCompleteNickStarts = cursor.selectedText().toLower();
 			refreshCompleteNicks();
-			FCompleteIt = FCompleteNicks.constBegin();
 		}
 		else
 		{
