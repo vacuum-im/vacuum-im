@@ -56,7 +56,7 @@
 #define MSO_FONT_SIZE                       "fontSize"
 #define MSO_BG_COLOR                        "bgColor"
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
-#define MSO_ANIMATION_ENABLE                "animationEnable"
+#define MSO_ANIMATION_DISABLED              "animationDisabled"
 
 struct MessageContentOptions;
 
