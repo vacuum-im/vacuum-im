@@ -158,7 +158,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 		if (!fontFamily.isEmpty())
 			font.setFamily(fontFamily);
 		view->document()->setDefaultFont(font);
-		view->setAnimated(AOptions.extended.value(MSO_ANIMATION_ENABLE).toBool());
+		view->setAnimated(!AOptions.extended.value(MSO_ANIMATION_DISABLED).toBool());
 
 		emit optionsChanged(AWidget,AOptions,AClean);
 		return true;

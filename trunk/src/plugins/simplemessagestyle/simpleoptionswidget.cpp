@@ -52,7 +52,7 @@ void SimpleOptionsWidget::apply(OptionsNode ANode)
 	node.setValue(FStyleOptions.extended.value(MSO_FONT_SIZE),"font-size");
 	node.setValue(FStyleOptions.extended.value(MSO_BG_COLOR),"bg-color");
 	node.setValue(FStyleOptions.extended.value(MSO_BG_IMAGE_FILE),"bg-image-file");
-	node.setValue(FStyleOptions.extended.value(MSO_ANIMATION_ENABLE),"animation-enable");
+	node.setValue(FStyleOptions.extended.value(MSO_ANIMATION_DISABLED),"animation-disabled");
 	emit childApply();
 }
 
@@ -69,7 +69,7 @@ void SimpleOptionsWidget::reset()
 	ui.cmbStyle->setCurrentIndex(ui.cmbStyle->findData(FStyleOptions.extended.value(MSO_STYLE_ID)));
 	ui.cmbVariant->setCurrentIndex(ui.cmbVariant->findData(FStyleOptions.extended.value(MSO_VARIANT)));
 	ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
-	ui.chkEnableAnimation->setChecked(FStyleOptions.extended.value(MSO_ANIMATION_ENABLE).toBool());
+	ui.chkEnableAnimation->setChecked(!FStyleOptions.extended.value(MSO_ANIMATION_DISABLED).toBool());
 	updateOptionsWidgets();
 
 	connect(ui.cmbVariant,SIGNAL(currentIndexChanged(int)),SLOT(onVariantChanged(int)));
@@ -187,6 +187,6 @@ void SimpleOptionsWidget::onDefaultImageClicked()
 
 void SimpleOptionsWidget::onAnimationEnableToggled(int AState)
 {
-	FStyleOptions.extended.insert(MSO_ANIMATION_ENABLE, AState==Qt::Checked);
+	FStyleOptions.extended.insert(MSO_ANIMATION_DISABLED, AState!=Qt::Checked);
 	emit modified();
 }

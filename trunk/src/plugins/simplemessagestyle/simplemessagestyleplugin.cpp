@@ -97,7 +97,7 @@ IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(const OptionsNode &A
 	soptions.extended.insert(MSO_FONT_SIZE,ANode.value("font-size"));
 	soptions.extended.insert(MSO_BG_COLOR,ANode.value("bg-color"));
 	soptions.extended.insert(MSO_BG_IMAGE_FILE,ANode.value("bg-image-file"));
-	soptions.extended.insert(MSO_ANIMATION_ENABLE,ANode.value("animation-enable"));
+	soptions.extended.insert(MSO_ANIMATION_DISABLED,ANode.value("animation-disabled"));
 
 	if (!FStylePaths.isEmpty() && !FStylePaths.contains(styleId.toString()))
 	{
