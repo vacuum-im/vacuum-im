@@ -1,5 +1,6 @@
 #include "multiuserchatwindow.h"
 
+
 #include <QTimer>
 #include <QKeyEvent>
 #include <QResizeEvent>
@@ -1355,8 +1356,6 @@ void MultiUserChatWindow::updateWindow()
 
 void MultiUserChatWindow::refreshCompleteNicks()
 {
-	QString curNick = FCompleteIt!=FCompleteNicks.constEnd() ? *FCompleteIt : QString::null;
-
 	QMultiMap<QString,QString> sortedNicks;
 	foreach(IMultiUser *user, FUsers.keys())
 	{
@@ -1366,7 +1365,7 @@ void MultiUserChatWindow::refreshCompleteNicks()
 	}
 	FCompleteNicks = sortedNicks.values();
 
-	int curNickIndex = FCompleteNicks.indexOf(curNick);
+	int curNickIndex = FCompleteNicks.indexOf(FCompleteNickLast);
 	FCompleteIt = FCompleteNicks.constBegin() + (curNickIndex >= 0 ? curNickIndex : 0);
 }
 
@@ -2014,13 +2013,16 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 			}
 			else
 			{
+				FCompleteNickLast = *FCompleteIt;
 				cursor.insertText(*FCompleteIt + suffix);
+
 				if (++FCompleteIt == FCompleteNicks.constEnd())
 					FCompleteIt = FCompleteNicks.constBegin();
 			}
 		}
 		else if (!FCompleteNicks.isEmpty())
 		{
+			FCompleteNickLast = *FCompleteIt;
 			cursor.insertText(FCompleteNicks.first() + suffix);
 		}
 

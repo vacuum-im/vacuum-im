@@ -263,6 +263,7 @@ private:
 private:
 	int FStartCompletePos;
 	QString FCompleteNickStarts;
+	QString FCompleteNickLast;
 	QList<QString> FCompleteNicks;
 	QList<QString>::const_iterator FCompleteIt;
 
