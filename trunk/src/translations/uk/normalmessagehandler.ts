@@ -54,15 +54,15 @@
     </message>
     <message>
         <source>When receiving new single message</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні нового окремого повідомлення</translation>
     </message>
     <message>
         <source>&lt;b&gt;The message with a error is received&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt; Отримано повідомлення з помилкою&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Mark all single messages from user as read when you read the first one</source>
-        <translation type="unfinished"></translation>
+        <translation>Позначити прочитаними всі одиночні повідомлення від користувача при прочитанні першого</translation>
     </message>
 </context>
 </TS>

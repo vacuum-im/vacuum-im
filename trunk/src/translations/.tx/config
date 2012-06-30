@@ -1,3 +1,6 @@
+[main]
+host = http://www.transifex.net
+
 [vacuum-im.rosterchangerts]
 file_filter = <lang>/rosterchanger.ts
 source_lang = ru
@@ -97,9 +100,6 @@ source_lang = ru
 [vacuum-im.avatarsts]
 file_filter = <lang>/avatars.ts
 source_lang = ru
-
-[main]
-host = http://www.transifex.net
 
 [vacuum-im.statuschangerts]
 file_filter = <lang>/statuschanger.ts
@@ -249,10 +249,10 @@ source_lang = ru
 file_filter = <lang>/commands.ts
 source_lang = ru
 
-[vacuum-im.urlprocessor]
+[vacuum-im.urlprocessorts]
 file_filter = <lang>/urlprocessor.ts
 source_lang = ru
 
-[vacuum-im.rosteritemexchange]
+[vacuum-im.rosteritemexchangets]
 file_filter = <lang>/rosteritemexchange.ts
 source_lang = ru

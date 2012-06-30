@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Enable data compression transferred between client and server</source>
-        <translation type="unfinished"></translation>
+        <translation>Ввімкнути стиснення даних, що передаються між клієнтом та сервером</translation>
     </message>
 </context>
 <context>
@@ -44,11 +44,11 @@
     </message>
     <message>
         <source>Invalid or incomplete deflate data</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильні чи неповні дані для стиснення</translation>
     </message>
     <message>
         <source>Unknown Zlib error, %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Невідома помилка Zlib, %1</translation>
     </message>
 </context>
 </TS>

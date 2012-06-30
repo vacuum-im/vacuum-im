@@ -87,27 +87,27 @@
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove a transport &apos;&lt;b&gt;%1&lt;/b&gt;&apos; and its &lt;b&gt;%n contacts&lt;/b&gt; from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ви впевнені, що хочете видалити транспорт &apos;&lt;b&gt;%1&lt;/b&gt;&apos; і  його &lt;b&gt;%n контакт&lt;/b&gt; з ростеру?</numerusform>
+            <numerusform>Ви впевнені, що хочете видалити транспорт &apos;&lt;b&gt;%1&lt;/b&gt;&apos; і  його &lt;b&gt;%n контакти&lt;/b&gt; з ростеру?</numerusform>
+            <numerusform>Ви впевнені, що хочете видалити транспорт &apos;&lt;b&gt;%1&lt;/b&gt;&apos; і  його &lt;b&gt;%n контактів&lt;/b&gt; з ростеру?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove &lt;b&gt;%n transports&lt;/b&gt; and their contacts from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ви впевнені, що хочете видалити  &lt;b&gt;%n транспорт&lt;/b&gt; і  його контакти з ростеру?</numerusform>
+            <numerusform>Ви впевнені, що хочете видалити  &lt;b&gt;%n транспорт&lt;/b&gt; і його контакти з ростеру?</numerusform>
+            <numerusform>Ви впевнені, що хочете видалити  &lt;b&gt;%n транспорт&lt;/b&gt; і  його контакти з ростеру?</numerusform>
         </translation>
     </message>
     <message>
         <source>Remove transport and its contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити транспорт та його контакти</translation>
     </message>
     <message>
         <source>Remove transports and their contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити транспорти та їх контакти</translation>
     </message>
 </context>
 </TS>

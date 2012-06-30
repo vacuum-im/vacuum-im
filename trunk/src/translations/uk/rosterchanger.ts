@@ -295,14 +295,14 @@
     </message>
     <message>
         <source>When receiving authorization request</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні запиту на авторизацію</translation>
     </message>
     <message numerus="yes">
         <source>You are assured that wish to remove &lt;b&gt;%n contact(s)&lt;/b&gt; from roster?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ви впевнені що хочете видалити &lt;b&gt;%n контакт&lt;/b&gt; з ростеру?</numerusform>
+            <numerusform>Ви впевнені що хочете видалити &lt;b&gt;%n контакти&lt;/b&gt; з ростеру?</numerusform>
+            <numerusform>Ви впевнені що хочете видалити &lt;b&gt;%n контактів&lt;/b&gt; з ростеру?</numerusform>
         </translation>
     </message>
 </context>

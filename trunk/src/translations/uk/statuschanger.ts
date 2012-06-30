@@ -206,7 +206,7 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>On loss of connection to the server</source>
-        <translation type="unfinished"></translation>
+        <translation>При обриві з’єднання з сервером</translation>
     </message>
 </context>
 </TS>

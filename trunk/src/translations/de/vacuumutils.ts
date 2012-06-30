@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Conflict</source>
-        <translation type="unfinished">Konflikt</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Connection timeout</source>

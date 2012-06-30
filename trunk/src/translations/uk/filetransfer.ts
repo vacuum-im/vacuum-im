@@ -89,7 +89,7 @@
     </message>
     <message>
         <source>When receiving a prompt to accept the file</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні запиту на прийняття файлу</translation>
     </message>
 </context>
 <context>

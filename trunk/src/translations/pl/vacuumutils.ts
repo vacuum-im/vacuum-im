@@ -5,175 +5,175 @@
     <name>XmppStreamError</name>
     <message>
         <source>Undefined error condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznany błąd</translation>
     </message>
     <message>
         <source>Bad request format</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznany format zapytania</translation>
     </message>
     <message>
         <source>Bad namespace prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowy prefiks przestrzeni nazw</translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation type="unfinished">Konflikt</translation>
+        <translation>Konflikt</translation>
     </message>
     <message>
         <source>Connection timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Upłynął czas połączenia</translation>
     </message>
     <message>
         <source>Host is not serviced</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie obsługiwane przez serwer</translation>
     </message>
     <message>
         <source>Unknown host</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznany serwer</translation>
     </message>
     <message>
         <source>Improper addressing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowe adresowanie</translation>
     </message>
     <message>
         <source>Internal server error</source>
-        <translation type="unfinished"></translation>
+        <translation>Wewnętrzny błąd serwera</translation>
     </message>
     <message>
         <source>Invalid from address</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowy adres nadawcy</translation>
     </message>
     <message>
         <source>Invalid namespace</source>
-        <translation type="unfinished"></translation>
+        <translation>Niepoprawna przestrzeń nazw</translation>
     </message>
     <message>
         <source>Invalid XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd XML</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished"></translation>
+        <translation>Brak autoryzacji</translation>
     </message>
     <message>
         <source>XML not well formed</source>
-        <translation type="unfinished"></translation>
+        <translation>Źle sformatowany XML</translation>
     </message>
     <message>
         <source>Policy violation</source>
-        <translation type="unfinished"></translation>
+        <translation>Naruszenie ograniczeń</translation>
     </message>
     <message>
         <source>Remote connection failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd zdalnego połączenia</translation>
     </message>
     <message>
         <source>Stream need to be reseted</source>
-        <translation type="unfinished"></translation>
+        <translation>Strumień wymaga wyzerowania</translation>
     </message>
     <message>
         <source>Resource constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Ograniczenie zasobów</translation>
     </message>
     <message>
         <source>Restricted XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Zabroniony XML</translation>
     </message>
     <message>
         <source>See other host</source>
-        <translation type="unfinished"></translation>
+        <translation>Skorzystaj z innego serwera</translation>
     </message>
     <message>
         <source>System shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>System zamknięty</translation>
     </message>
     <message>
         <source>Unsupported encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodowanie nieobsługiwane</translation>
     </message>
     <message>
         <source>Unsupported feature</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieobsługiwana funkcja</translation>
     </message>
     <message>
         <source>Unsupported stanza type</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieobsługiwany typ bloku</translation>
     </message>
     <message>
         <source>Unsupported version</source>
-        <translation type="unfinished"></translation>
+        <translation>Wersja nieobsługiwana</translation>
     </message>
     <message>
         <source>Feature not implemented</source>
-        <translation type="unfinished"></translation>
+        <translation>Funkcja niezaimplementowana</translation>
     </message>
     <message>
         <source>Insufficient permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>Niewystarczające uprawnienia</translation>
     </message>
     <message>
         <source>Recipient changed address</source>
-        <translation type="unfinished"></translation>
+        <translation>Odbiorca zmienił adres</translation>
     </message>
     <message>
         <source>Requested item not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Oczekiwany element nie został znaleziony</translation>
     </message>
     <message>
         <source>Malformed XMPP address</source>
-        <translation type="unfinished"></translation>
+        <translation>Niedopuszczalny adres XMPP</translation>
     </message>
     <message>
         <source>Not accepted by the recipient</source>
-        <translation type="unfinished"></translation>
+        <translation>Odrzucone przez odbiorcę</translation>
     </message>
     <message>
         <source>Not allowed by the recipient</source>
-        <translation type="unfinished"></translation>
+        <translation>Zabronione przez odbiorcę</translation>
     </message>
     <message>
         <source>Recipient unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Odbiorca niedostępny</translation>
     </message>
     <message>
         <source>Redirect to another address</source>
-        <translation type="unfinished"></translation>
+        <translation>Przekierowanie na inny adres</translation>
     </message>
     <message>
         <source>Registration required</source>
-        <translation type="unfinished"></translation>
+        <translation>Wymagana rejestracja</translation>
     </message>
     <message>
         <source>Remote server not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Zdalny serwer nie znaleziony</translation>
     </message>
     <message>
         <source>Remote server timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Upłynąl czas oczekiwania na zdalny serwer</translation>
     </message>
     <message>
         <source>Service unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Serwis niedostępny</translation>
     </message>
     <message>
         <source>Subscription required</source>
-        <translation type="unfinished"></translation>
+        <translation>Wymagana subskrypcja</translation>
     </message>
     <message>
         <source>Unexpected request</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieoczekiwane żądanie</translation>
     </message>
     <message>
         <source>Resource limit exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Przekroczony limit zasobów</translation>
     </message>
     <message>
         <source>Stanza is too big</source>
-        <translation type="unfinished"></translation>
+        <translation>Blok jest zbyt duży</translation>
     </message>
     <message>
         <source>Too many stanzas</source>
-        <translation type="unfinished"></translation>
+        <translation>Zbyt dużo bloków</translation>
     </message>
 </context>
 </TS>
