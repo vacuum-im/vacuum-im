@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
-        <translation>Файли зображень</translation>
+        <translation>Файли зображень (*.png *.jpg *.bmp *.gif)</translation>
     </message>
     <message>
         <source>Avatars</source>

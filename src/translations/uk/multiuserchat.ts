@@ -552,35 +552,35 @@ Check values and try again</source>
     </message>
     <message>
         <source>When receiving an invitation to the conference</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні запрошення в конференцію</translation>
     </message>
     <message>
         <source>When receiving a new private message in conference</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні нового особистого повідомлення в конференції</translation>
     </message>
     <message>
         <source>When referring to you at the conference</source>
-        <translation type="unfinished"></translation>
+        <translation>При зверненні до Вас в конференції</translation>
     </message>
     <message>
         <source>When receiving a new message in conference</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні нового повідомлення в конференції</translation>
     </message>
     <message>
         <source>Select the user to refer in the Bash style</source>
-        <translation type="unfinished"></translation>
+        <translation>Обирати користувача для звернення в стилі Bash</translation>
     </message>
     <message>
         <source>Add this suffix when referring to the user:</source>
-        <translation type="unfinished"></translation>
+        <translation>Додавати цей суфікс при зверненні до користувача:</translation>
     </message>
     <message>
         <source>Leave the conference when window closed</source>
-        <translation type="unfinished"></translation>
+        <translation>Виходити з конференції при закритті вікна</translation>
     </message>
     <message>
         <source>Rejoin in chat room after kick</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматично заходити до конференції після кіка</translation>
     </message>
 </context>
 <context>
@@ -971,19 +971,19 @@ Check values and try again</source>
     </message>
     <message>
         <source>Quote selected text</source>
-        <translation type="unfinished"></translation>
+        <translation>Цитувати виділений текст</translation>
     </message>
     <message>
         <source>Open chat dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Відкрити діалог чату</translation>
     </message>
     <message>
         <source>Loading history...</source>
-        <translation type="unfinished"></translation>
+        <translation>Завантаження історії</translation>
     </message>
     <message>
         <source>Failed to load history: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити історію: %1</translation>
     </message>
 </context>
 </TS>

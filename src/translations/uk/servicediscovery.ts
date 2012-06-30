@@ -9,7 +9,7 @@
     </message>
     <message>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Помилка: %1</translation>
     </message>
 </context>
 <context>
@@ -83,7 +83,7 @@
     </message>
     <message>
         <source>Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Помилка: %1</translation>
     </message>
 </context>
 <context>

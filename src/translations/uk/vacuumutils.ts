@@ -5,175 +5,175 @@
     <name>XmppStreamError</name>
     <message>
         <source>Undefined error condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Невідома помилка</translation>
     </message>
     <message>
         <source>Bad request format</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірний формат запиту</translation>
     </message>
     <message>
         <source>Bad namespace prefix</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірний префікс простору імен</translation>
     </message>
     <message>
         <source>Conflict</source>
-        <translation type="unfinished">Конфлікт</translation>
+        <translation>Конфлікт</translation>
     </message>
     <message>
         <source>Connection timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Перевищено час з’єднання</translation>
     </message>
     <message>
         <source>Host is not serviced</source>
-        <translation type="unfinished"></translation>
+        <translation>Хост не обслуговується</translation>
     </message>
     <message>
         <source>Unknown host</source>
-        <translation type="unfinished"></translation>
+        <translation>Невідомий хост</translation>
     </message>
     <message>
         <source>Improper addressing</source>
-        <translation type="unfinished"></translation>
+        <translation>Неправильна адресація</translation>
     </message>
     <message>
         <source>Internal server error</source>
-        <translation type="unfinished"></translation>
+        <translation>Внутрішня помилка сервера</translation>
     </message>
     <message>
         <source>Invalid from address</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірна адреса відправника</translation>
     </message>
     <message>
         <source>Invalid namespace</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірний простір імен</translation>
     </message>
     <message>
         <source>Invalid XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимий XML</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished"></translation>
+        <translation>Не пройдена авторизація</translation>
     </message>
     <message>
         <source>XML not well formed</source>
-        <translation type="unfinished"></translation>
+        <translation>XML сформовано неправильно</translation>
     </message>
     <message>
         <source>Policy violation</source>
-        <translation type="unfinished"></translation>
+        <translation>Порушені обмеження</translation>
     </message>
     <message>
         <source>Remote connection failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбій віддаленого з’єднання</translation>
     </message>
     <message>
         <source>Stream need to be reseted</source>
-        <translation type="unfinished"></translation>
+        <translation>Потік необхідно перевстановити</translation>
     </message>
     <message>
         <source>Resource constraint</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостатньо ресурсів</translation>
     </message>
     <message>
         <source>Restricted XML</source>
-        <translation type="unfinished"></translation>
+        <translation>Заборонений XML</translation>
     </message>
     <message>
         <source>See other host</source>
-        <translation type="unfinished"></translation>
+        <translation>Використайте інший хост</translation>
     </message>
     <message>
         <source>System shutdown</source>
-        <translation type="unfinished"></translation>
+        <translation>Система відключена</translation>
     </message>
     <message>
         <source>Unsupported encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Кодування не підтримується</translation>
     </message>
     <message>
         <source>Unsupported feature</source>
-        <translation type="unfinished"></translation>
+        <translation>Функція не підтримується</translation>
     </message>
     <message>
         <source>Unsupported stanza type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип станзи не підтримується </translation>
     </message>
     <message>
         <source>Unsupported version</source>
-        <translation type="unfinished"></translation>
+        <translation>Версія не підтримується</translation>
     </message>
     <message>
         <source>Feature not implemented</source>
-        <translation type="unfinished"></translation>
+        <translation>Можливість не реалізована</translation>
     </message>
     <message>
         <source>Insufficient permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостатньо прав</translation>
     </message>
     <message>
         <source>Recipient changed address</source>
-        <translation type="unfinished"></translation>
+        <translation>Адресат змінив адресу</translation>
     </message>
     <message>
         <source>Requested item not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Запитуваний елемент не знайдено</translation>
     </message>
     <message>
         <source>Malformed XMPP address</source>
-        <translation type="unfinished"></translation>
+        <translation>Неприпустима XMPP адреса</translation>
     </message>
     <message>
         <source>Not accepted by the recipient</source>
-        <translation type="unfinished"></translation>
+        <translation>Не прийнято адресатом</translation>
     </message>
     <message>
         <source>Not allowed by the recipient</source>
-        <translation type="unfinished"></translation>
+        <translation>Не дозволено адресатом</translation>
     </message>
     <message>
         <source>Recipient unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Адресат недоступний</translation>
     </message>
     <message>
         <source>Redirect to another address</source>
-        <translation type="unfinished"></translation>
+        <translation>Перенаправлення на іншу адресу</translation>
     </message>
     <message>
         <source>Registration required</source>
-        <translation type="unfinished"></translation>
+        <translation>Потребує регістрації</translation>
     </message>
     <message>
         <source>Remote server not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Віддалений сервер не знайдено</translation>
     </message>
     <message>
         <source>Remote server timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>Перевищено час очікування віддаленого сервера</translation>
     </message>
     <message>
         <source>Service unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервіс недоступний</translation>
     </message>
     <message>
         <source>Subscription required</source>
-        <translation type="unfinished"></translation>
+        <translation>Потребує підписку</translation>
     </message>
     <message>
         <source>Unexpected request</source>
-        <translation type="unfinished"></translation>
+        <translation>Неочікуваний запит</translation>
     </message>
     <message>
         <source>Resource limit exceeded</source>
-        <translation type="unfinished"></translation>
+        <translation>Перевищено ліміт ресурсів</translation>
     </message>
     <message>
         <source>Stanza is too big</source>
-        <translation type="unfinished"></translation>
+        <translation>Станза занадто велика</translation>
     </message>
     <message>
         <source>Too many stanzas</source>
-        <translation type="unfinished"></translation>
+        <translation>Забагато станз</translation>
     </message>
 </context>
 </TS>

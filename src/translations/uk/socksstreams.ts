@@ -57,19 +57,19 @@
     </message>
     <message>
         <source>Outgoing Connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Вихідні з’єднання</translation>
     </message>
     <message>
         <source>Connect timeout:</source>
-        <translation type="unfinished"></translation>
+        <translation>Таймаут з’єднання</translation>
     </message>
     <message>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>секунд</translation>
     </message>
     <message>
         <source>Incoming Connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Вхідні з’єднання</translation>
     </message>
 </context>
 <context>

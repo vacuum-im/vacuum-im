@@ -50,15 +50,15 @@
     </message>
     <message>
         <source>When receiving new chat message</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні нового повідомлення чату</translation>
     </message>
     <message>
         <source>Loading history...</source>
-        <translation type="unfinished"></translation>
+        <translation>Завантаження історії...</translation>
     </message>
     <message>
         <source>Failed to load history: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити історію: %1</translation>
     </message>
 </context>
 </TS>

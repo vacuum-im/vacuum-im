@@ -5,11 +5,11 @@
     <name>UrlProcessor</name>
     <message>
         <source>URL processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Диспетчер URL запитів</translation>
     </message>
     <message>
         <source>Allows other plugins to load data from custom types of URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволяє іншим модулям завантажувати дані по URL різного типу</translation>
     </message>
 </context>
 </TS>

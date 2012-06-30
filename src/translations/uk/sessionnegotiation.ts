@@ -105,7 +105,7 @@
     </message>
     <message>
         <source>When receiving session negotiation request</source>
-        <translation type="unfinished"></translation>
+        <translation>При отриманні запиту на встановлення сесії</translation>
     </message>
 </context>
 </TS>

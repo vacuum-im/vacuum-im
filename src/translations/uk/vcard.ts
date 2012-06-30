@@ -72,11 +72,11 @@
     </message>
     <message>
         <source>Size: %1 Kb</source>
-        <translation type="unfinished"></translation>
+        <translation>Розмір: %1 Кб</translation>
     </message>
     <message>
         <source>Image Files (*.%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Зображення (*.%1)</translation>
     </message>
 </context>
 <context>

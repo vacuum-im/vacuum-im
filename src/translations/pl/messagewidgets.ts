@@ -213,7 +213,7 @@
     <message>
         <source>google.com</source>
         <comment>Your google domain</comment>
-        <translation type="unfinished"></translation>
+        <translation>google.pl</translation>
     </message>
 </context>
 <context>
@@ -340,7 +340,7 @@
     </message>
     <message>
         <source>All Online</source>
-        <translation type="unfinished"></translation>
+        <translation>Wszyscy aktywni</translation>
     </message>
 </context>
 <context>

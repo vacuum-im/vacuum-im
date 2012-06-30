@@ -41,69 +41,69 @@
     </message>
     <message>
         <source>Activate notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Активувати сповіщення</translation>
     </message>
     <message>
         <source>Activate Notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Активувати сповіщення</translation>
     </message>
     <message>
         <source>Enable animation in notification pop-up</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволити анімацію в спливаючому вікні</translation>
     </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>
     <message>
         <source>Display a notification in your roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати сповіщення в ростері</translation>
     </message>
     <message>
         <source>Display a notification in popup window</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати сповіщення у спливаючому вікні</translation>
     </message>
     <message>
         <source>Display a notification in tray</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати сповіщення в треї</translation>
     </message>
     <message>
         <source>Display a notification in tray context menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати сповіщення в контекстному меню трея</translation>
     </message>
     <message>
         <source>Play sound at the notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Програвати звук сповіщення</translation>
     </message>
     <message>
         <source>Highlight the corresponding window in the taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Підсвічувати відповідне вікно в панелі задач</translation>
     </message>
     <message>
         <source>Display a notification in tab</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати сповіщення у вкладці</translation>
     </message>
     <message>
         <source>Show the corresponding window minimized in the taskbar</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати відповідне вікно згорнутим в панелі задач</translation>
     </message>
     <message>
         <source>Immediately activate the notification</source>
-        <translation type="unfinished"></translation>
+        <translation>Відразу активувати сповіщення</translation>
     </message>
 </context>
 <context>
     <name>NotifyOptionsWidgetClass</name>
     <message>
         <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation type="unfinished"></translation>
+        <translation>Час відображення спливаючого вікна (0 - не закривати):</translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation type="unfinished"></translation>
+        <translation> секунд</translation>
     </message>
     <message>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Скинути по замовчуванню</translation>
     </message>
 </context>
 <context>

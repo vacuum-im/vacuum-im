@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Failed to read cached data</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося прочитати кешовані дані</translation>
     </message>
 </context>
 </TS>

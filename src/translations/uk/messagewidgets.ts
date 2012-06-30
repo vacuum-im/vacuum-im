@@ -183,37 +183,37 @@
     </message>
     <message>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Копіювати</translation>
     </message>
     <message>
         <source>Send mail</source>
-        <translation type="unfinished"></translation>
+        <translation>Відправити листа</translation>
     </message>
     <message>
         <source>Open link</source>
-        <translation type="unfinished"></translation>
+        <translation>Відкрити посилання</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation type="unfinished"></translation>
+        <translation>Копіювати адресу</translation>
     </message>
     <message>
         <source>Search on Google &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Шукати в Google &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Close other tabs</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрити інші вкладки</translation>
     </message>
     <message>
         <source>Ctrl+Shift+W</source>
         <comment>Close other tabs</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+Shift+W</translation>
     </message>
     <message>
         <source>google.com</source>
         <comment>Your google domain</comment>
-        <translation type="unfinished"></translation>
+        <translation>google.com.ua</translation>
     </message>
 </context>
 <context>
@@ -317,7 +317,7 @@
     </message>
     <message>
         <source>Without Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Без груп</translation>
     </message>
 </context>
 <context>
@@ -340,7 +340,7 @@
     </message>
     <message>
         <source>All Online</source>
-        <translation type="unfinished"></translation>
+        <translation>Всі в мережі</translation>
     </message>
 </context>
 <context>
@@ -415,7 +415,7 @@
     </message>
     <message>
         <source>Close Other Tabs</source>
-        <translation type="unfinished"></translation>
+        <translation>Закрити інші вкладки</translation>
     </message>
 </context>
 <context>

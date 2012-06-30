@@ -29,95 +29,95 @@
     </message>
     <message>
         <source>Show date separators in chat window</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати роздільники дат у вікні чату</translation>
     </message>
     <message>
         <source>January</source>
-        <translation type="unfinished"></translation>
+        <translation>Січня</translation>
     </message>
     <message>
         <source>February</source>
-        <translation type="unfinished"></translation>
+        <translation>Лютого</translation>
     </message>
     <message>
         <source>March</source>
-        <translation type="unfinished"></translation>
+        <translation>Березня</translation>
     </message>
     <message>
         <source>April</source>
-        <translation type="unfinished"></translation>
+        <translation>Квітня</translation>
     </message>
     <message>
         <source>May</source>
-        <translation type="unfinished"></translation>
+        <translation>Травня</translation>
     </message>
     <message>
         <source>June</source>
-        <translation type="unfinished"></translation>
+        <translation>Червня</translation>
     </message>
     <message>
         <source>July</source>
-        <translation type="unfinished"></translation>
+        <translation>Липня</translation>
     </message>
     <message>
         <source>August</source>
-        <translation type="unfinished"></translation>
+        <translation>Серпня</translation>
     </message>
     <message>
         <source>September</source>
-        <translation type="unfinished"></translation>
+        <translation>Вересня</translation>
     </message>
     <message>
         <source>October</source>
-        <translation type="unfinished"></translation>
+        <translation>Жовтня</translation>
     </message>
     <message>
         <source>November</source>
-        <translation type="unfinished"></translation>
+        <translation>Листопада</translation>
     </message>
     <message>
         <source>December</source>
-        <translation type="unfinished"></translation>
+        <translation>Грудня</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished"></translation>
+        <translation>Понеділок</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Вівторок</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Середа</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished"></translation>
+        <translation>Четвер</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished"></translation>
+        <translation>П’ятниця</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished"></translation>
+        <translation>Субота</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished"></translation>
+        <translation>Неділя</translation>
     </message>
     <message>
         <source>%1, %2 dd</source>
-        <translation type="unfinished"></translation>
+        <translation>%1, dd %2</translation>
     </message>
     <message>
         <source>Today</source>
-        <translation type="unfinished"></translation>
+        <translation>Сьогодні</translation>
     </message>
     <message>
         <source>%1, %2 dd, yyyy</source>
-        <translation type="unfinished"></translation>
+        <translation>%1, dd %2, yyyy</translation>
     </message>
 </context>
 <context>
