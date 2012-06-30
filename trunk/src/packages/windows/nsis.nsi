@@ -4,7 +4,7 @@
 ;--------------------------------
 
 ; Program Version
-!define PROGRAM_VERSION     "1.1.0-Alpha"
+!define PROGRAM_VERSION     "1.2.0-RC1"
 
 ; Install Folder
 !define PROGRAM_FOLDER      "Vacuum-IM"
