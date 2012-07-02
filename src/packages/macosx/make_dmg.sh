@@ -43,7 +43,7 @@ SVN_ROOT="../../.."
 PRODUCT_NAME="Vacuum-IM"
 
 # Filename of the resulting .dmg image
-DMG_NAME="${ORIG_NAME}_${VERSION}_macosx" 
+DMG_NAME="${PRODUCT_NAME}_${VERSION}_macosx" 
 
 # IMPORTANT! Path to qmake of Qt installation, against which project was built.
 PATH_TO_QMAKE="qmake"
@@ -168,8 +168,8 @@ echo "done!"
 
 echo "Creating disk image..."
 
-hdiutil create -ov -srcfolder $TMP_DIR -format UDBZ -volname "$PRODUCT_NAME" "$DMG_NAME.dmg"
-
+$SCRIPT_DIR/create-dmg/create-dmg --window-size 500 300 --icon-size 96 --volname $PRODUCT_NAME --background background.png --icon "Applications" 380 185 --icon $PRODUCT_NAME 110 185 $DMG_NAME.dmg $TMP_DIR/$ORIG_NAME.app
+hdiutil internet-enable -yes $DMG_NAME.dmg
 
 echo -n "Cleaning up temp folder... "
 rm -rf $TMP_DIR
