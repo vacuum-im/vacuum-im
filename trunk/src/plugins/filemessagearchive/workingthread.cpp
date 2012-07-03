@@ -6,7 +6,9 @@ uint WorkingThread::FWorkIndex = 0;
 
 WorkingThread::WorkingThread(IFileMessageArchive *AFileArchive, IMessageArchiver *AMessageArchiver, QObject *AParent) : QThread(AParent)
 {
+	FAction = NoAction;
 	FHasError = false;
+	FModificationsCount = 0;
 	FFileArchive = AFileArchive;
 	FArchiver = AMessageArchiver;
 	FWorkId = QString("work_%1").arg(++FWorkIndex);

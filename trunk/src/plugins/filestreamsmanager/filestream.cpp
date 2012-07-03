@@ -22,6 +22,7 @@ FileStream::FileStream(IDataStreamsManager *ADataManager, const QString &AStream
 	FFileSize = 0;
 	FRangeOffset = 0;
 	FRangeLength = 0;
+	FSpeedIndex = 0;
 	FRangeSupported = AKind==IFileStream::SendFile;
 	FStreamState = IFileStream::Creating;
 }

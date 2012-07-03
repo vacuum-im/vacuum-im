@@ -49,6 +49,8 @@ RemoteControl::RemoteControl()
 	FMessageProcessor = NULL;
 	FNotifications = NULL;
 	FStanzaProcessor = NULL;
+
+	FSHIMessageForward = -1;
 }
 
 RemoteControl::~RemoteControl()

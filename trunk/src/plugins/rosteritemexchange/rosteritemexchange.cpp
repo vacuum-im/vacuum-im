@@ -29,6 +29,8 @@ RosterItemExchange::RosterItemExchange()
 	FNotifications = NULL;
 	FMessageWidgets = NULL;
 	FRostersViewPlugin = NULL;
+
+	FSHIExchangeRequest = -1;
 }
 
 RosterItemExchange::~RosterItemExchange()

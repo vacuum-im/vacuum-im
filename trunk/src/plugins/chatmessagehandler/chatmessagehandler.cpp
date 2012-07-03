@@ -23,6 +23,7 @@ ChatMessageHandler::ChatMessageHandler()
 	FStatusIcons = NULL;
 	FStatusChanger = NULL;
 	FXmppUriQueries = NULL;
+	FOptionsManager = NULL;
 }
 
 ChatMessageHandler::~ChatMessageHandler()

@@ -4,6 +4,7 @@
 
 AccountManager::AccountManager()
 {
+	FXmppStreams = NULL;
 	FOptionsManager = NULL;
 	FRostersViewPlugin = NULL;
 }

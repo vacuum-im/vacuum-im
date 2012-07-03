@@ -10,6 +10,7 @@ class WorkingThread :
 	Q_OBJECT;
 public:
 	enum Actions {
+		NoAction,
 		SaveCollection,
 		RemoveCollection,
 		LoadHeaders,
