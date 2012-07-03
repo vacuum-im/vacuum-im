@@ -7,6 +7,7 @@
 
 JabberSearch::JabberSearch()
 {
+	FPluginManager = NULL;
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
 	FPresencePlugin = NULL;

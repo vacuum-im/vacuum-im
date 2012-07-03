@@ -209,12 +209,12 @@ void WidgetManager::setWidgetAlertEnabled(bool AEnabled)
 
 Qt::Alignment WidgetManager::windowAlignment(const QWidget *AWindow)
 {
-	static const int delta = 4;
 	Qt::Alignment align = 0;
 	QRect windowRect = AWindow->frameGeometry();
 	QRect screenRect = QApplication::desktop()->availableGeometry(AWindow);
 	if (!screenRect.isEmpty() && !windowRect.isEmpty())
 	{
+		static const int delta = 4;
 		if (qAbs(screenRect.left() - windowRect.left()) < delta)
 			align |= Qt::AlignLeft;
 		else if (qAbs(screenRect.right() - windowRect.right()) < delta)

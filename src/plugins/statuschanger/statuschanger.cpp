@@ -23,6 +23,7 @@ StatusChanger::StatusChanger()
 	FNotifications = NULL;
 
 	FMainMenu = NULL;
+	FModifyStatus = NULL;
 	FStatusIcons = NULL;
 	FConnectingLabel = RLID_NULL;
 	FChangingPresence = NULL;

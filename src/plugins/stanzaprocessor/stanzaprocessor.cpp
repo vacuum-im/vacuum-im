@@ -4,7 +4,7 @@
 
 StanzaProcessor::StanzaProcessor()
 {
-
+	FXmppStreams = NULL;
 }
 
 StanzaProcessor::~StanzaProcessor()

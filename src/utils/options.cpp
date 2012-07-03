@@ -478,10 +478,13 @@ bool OptionsNode::operator!=(const OptionsNode &AOther) const
 
 OptionsNode &OptionsNode::operator=(const OptionsNode &AOther)
 {
-	if (d && !(--d->refCount))
-		delete d;
-	d = AOther.d;
-	d->refCount++;
+	if (d != AOther.d)
+	{
+		if (d && !(--d->refCount))
+			delete d;
+		d = AOther.d;
+		d->refCount++;
+	}
 	return *this;
 }
 

@@ -14,6 +14,8 @@ DataStreamsManger::DataStreamsManger()
 	FXmppStreams = NULL;
 	FStanzaProcessor = NULL;
 	FOptionsManager = NULL;
+
+	FSHIInitStream = -1;
 }
 
 DataStreamsManger::~DataStreamsManger()

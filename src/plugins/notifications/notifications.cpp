@@ -21,6 +21,7 @@ Notifications::Notifications()
 	FMainWindowPlugin = NULL;
 	FUrlProcessor = NULL;
 
+	FSoundOnOff = NULL;
 	FActivateLast = NULL;
 	FRemoveAll = NULL;
 	FNotifyMenu = NULL;
