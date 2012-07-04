@@ -314,13 +314,20 @@ void InBandStream::close()
 	if (state==IDataStreamSocket::Opened || state==IDataStreamSocket::Opening)
 	{
 		emit aboutToClose();
-		Stanza closeRequest("iq");
-		closeRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.full());
-		closeRequest.addElement("close",NS_INBAND_BYTESTREAMS).setAttribute("sid",FStreamId);
-		if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,FStreamJid,closeRequest,CLOSE_TIMEOUT))
+		if (FStanzaProcessor)
 		{
-			FCloseRequestId = closeRequest.id();
-			setStreamState(IDataStreamSocket::Closing);
+			Stanza closeRequest("iq");
+			closeRequest.setType("set").setId(FStanzaProcessor->newId()).setTo(FContactJid.full());
+			closeRequest.addElement("close",NS_INBAND_BYTESTREAMS).setAttribute("sid",FStreamId);
+			if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,closeRequest,CLOSE_TIMEOUT))
+			{
+				FCloseRequestId = closeRequest.id();
+				setStreamState(IDataStreamSocket::Closing);
+			}
+			else
+			{
+				setStreamState(IDataStreamSocket::Closed);
+			}
 		}
 		else
 		{
@@ -435,35 +442,38 @@ bool InBandStream::sendNextPaket(bool AFlush)
 
 		if (!data.isEmpty())
 		{
-			Stanza paket(FStanzaType==StanzaMessage ? "message" : "iq");
-			paket.setTo(FContactJid.full()).setId(FStanzaProcessor->newId());
-			QDomElement dataElem = paket.addElement("data",NS_INBAND_BYTESTREAMS);
-			dataElem.setAttribute("sid",FStreamId);
-			dataElem.setAttribute("seq",FSeqOut);
-			dataElem.appendChild(paket.createTextNode(QString::fromUtf8(data.toBase64())));
-
-			if (FStanzaType == StanzaMessage)
+			if (FStanzaProcessor)
 			{
-				QDomElement ampElem = paket.addElement("amp","http://jabber.org/protocol/amp");
-				QDomElement ruleElem = ampElem.appendChild(paket.createElement("rule")).toElement();
-				ruleElem.setAttribute("condition","deliver");
-				ruleElem.setAttribute("value","stored");
-				ruleElem.setAttribute("action","error");
-				ruleElem = ampElem.appendChild(paket.createElement("rule")).toElement();
-				ruleElem.setAttribute("condition","match-resource");
-				ruleElem.setAttribute("value","exact");
-				ruleElem.setAttribute("action","error");
+				Stanza paket(FStanzaType==StanzaMessage ? "message" : "iq");
+				paket.setTo(FContactJid.full()).setId(FStanzaProcessor->newId());
+				QDomElement dataElem = paket.addElement("data",NS_INBAND_BYTESTREAMS);
+				dataElem.setAttribute("sid",FStreamId);
+				dataElem.setAttribute("seq",FSeqOut);
+				dataElem.appendChild(paket.createTextNode(QString::fromUtf8(data.toBase64())));
 
-				DataEvent *dataEvent = new DataEvent(AFlush);
-				QCoreApplication::postEvent(this, dataEvent);
+				if (FStanzaType == StanzaMessage)
+				{
+					QDomElement ampElem = paket.addElement("amp","http://jabber.org/protocol/amp");
+					QDomElement ruleElem = ampElem.appendChild(paket.createElement("rule")).toElement();
+					ruleElem.setAttribute("condition","deliver");
+					ruleElem.setAttribute("value","stored");
+					ruleElem.setAttribute("action","error");
+					ruleElem = ampElem.appendChild(paket.createElement("rule")).toElement();
+					ruleElem.setAttribute("condition","match-resource");
+					ruleElem.setAttribute("value","exact");
+					ruleElem.setAttribute("action","error");
 
-				sent = FStanzaProcessor && FStanzaProcessor->sendStanzaOut(FStreamJid,paket);
-			}
-			else
-			{
-				paket.setType("set");
-				FDataIqRequestId = paket.id();
-				sent = FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,FStreamJid,paket,DATA_TIMEOUT);
+					DataEvent *dataEvent = new DataEvent(AFlush);
+					QCoreApplication::postEvent(this, dataEvent);
+
+					sent = FStanzaProcessor->sendStanzaOut(FStreamJid,paket);
+				}
+				else
+				{
+					paket.setType("set");
+					FDataIqRequestId = paket.id();
+					sent = FStanzaProcessor->sendStanzaRequest(this,FStreamJid,paket,DATA_TIMEOUT);
+				}
 			}
 
 			if (sent)

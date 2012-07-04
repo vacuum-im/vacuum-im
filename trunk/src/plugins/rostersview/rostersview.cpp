@@ -298,7 +298,7 @@ void RostersView::selectRosterIndex(IRosterIndex *AIndex)
 	}
 }
 
-QMap<int, QStringList > RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> ARoles, int AUniqueRole) const
+QMap<int, QStringList > RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole) const
 {
 	QMap<int, QStringList > map;
 	foreach(IRosterIndex *index, AIndexes)

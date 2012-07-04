@@ -42,7 +42,7 @@ public:
 	virtual Jid streamJid() const { return FStreamJid; }
 	virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
 	virtual ToolBarChanger *actionsBarChanger() const { return FActionsBarChanger; }
-	virtual void discover(const Jid AContactJid, const QString &ANode);
+	virtual void discover(const Jid &AContactJid, const QString &ANode);
 signals:
 	void discoverChanged(const Jid AContactJid, const QString &ANode);
 	void currentIndexChanged(const QModelIndex &AIndex);

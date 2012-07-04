@@ -52,7 +52,7 @@ IconStorage::~IconStorage()
 		removeObject(object); }
 }
 
-QIcon IconStorage::getIcon(const QString AKey, int AIndex) const
+QIcon IconStorage::getIcon(const QString &AKey, int AIndex) const
 {
 	QIcon icon;
 	QString key = fileCacheKey(AKey,AIndex);
@@ -84,7 +84,7 @@ IconStorage *IconStorage::staticStorage(const QString &AStorage)
 	return iconStorage;
 }
 
-void IconStorage::insertAutoIcon(QObject *AObject, const QString AKey, int AIndex, int AAnimate, const QString &AProperty)
+void IconStorage::insertAutoIcon(QObject *AObject, const QString &AKey, int AIndex, int AAnimate, const QString &AProperty)
 {
 	IconStorage *oldStorage = FObjectStorage.value(AObject);
 	if (oldStorage!=NULL && oldStorage!=this)

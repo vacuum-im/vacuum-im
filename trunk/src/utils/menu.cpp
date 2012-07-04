@@ -50,7 +50,7 @@ QList<Action *> Menu::groupActions(int AGroup) const
 	return FActions.values(AGroup);
 }
 
-QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu /*= false*/) const
+QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> &AData, bool ASearchInSubMenu /*= false*/) const
 {
 	QList<Action *> actionList;
 	QList<int> keys = AData.keys();

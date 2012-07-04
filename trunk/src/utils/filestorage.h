@@ -32,12 +32,12 @@ public:
 	QString option(const QString &AOption) const;
 	QList<QString> fileKeys() const;
 	QList<QString> fileFirstKeys() const;
-	int filesCount(const QString AKey) const;
-	QString fileName(const QString AKey, int AIndex = 0) const;
-	QString fileFullName(const QString AKey, int AIndex = 0) const;
-	QString fileMime(const QString AKey, int AIndex = 0) const;
-	QString fileOption(const QString AKey, const QString &AOption) const;
-	QString fileCacheKey(const QString AKey, int AIndex =0) const;
+	int filesCount(const QString &AKey) const;
+	QString fileName(const QString &AKey, int AIndex = 0) const;
+	QString fileFullName(const QString &AKey, int AIndex = 0) const;
+	QString fileMime(const QString &AKey, int AIndex = 0) const;
+	QString fileOption(const QString &AKey, const QString &AOption) const;
+	QString fileCacheKey(const QString &AKey, int AIndex =0) const;
 signals:
 	void storageChanged();
 public:

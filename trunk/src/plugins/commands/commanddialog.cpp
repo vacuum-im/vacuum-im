@@ -3,8 +3,7 @@
 #include <QMessageBox>
 #include <QTextDocument>
 
-CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid ACommandJid,
-                             const QString &ANode, QWidget *AParent)  : QDialog(AParent)
+CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode, QWidget *AParent)  : QDialog(AParent)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);

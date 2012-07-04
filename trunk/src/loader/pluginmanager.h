@@ -84,9 +84,9 @@ protected:
 protected:
 	void removePluginItem(const QUuid &AUuid, const QString &AError);
 	void unloadPlugin(const QUuid &AUuid, const QString &AError = QString::null);
-	bool checkDependences(const QUuid AUuid) const;
+	bool checkDependences(const QUuid &AUuid) const;
 	bool checkConflicts(const QUuid AUuid) const;
-	QList<QUuid> getConflicts(const QUuid AUuid) const;
+	QList<QUuid> getConflicts(const QUuid &AUuid) const;
 	void loadCoreTranslations(const QDir &ADir, const QString &ALocaleName);
 protected:
 	bool isPluginEnabled(const QString &AFile) const;

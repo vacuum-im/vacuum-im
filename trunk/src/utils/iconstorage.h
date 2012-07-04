@@ -18,8 +18,8 @@ class UTILS_EXPORT IconStorage :
 public:
 	IconStorage(const QString &AStorage, const QString &ASubStorage = QString::null, QObject *AParent = NULL);
 	~IconStorage();
-	QIcon getIcon(const QString AKey, int AIndex = 0) const;
-	void insertAutoIcon(QObject *AObject, const QString AKey, int AIndex = 0, int AAnimate = 0, const QString &AProperty = "icon");
+	QIcon getIcon(const QString &AKey, int AIndex = 0) const;
+	void insertAutoIcon(QObject *AObject, const QString &AKey, int AIndex = 0, int AAnimate = 0, const QString &AProperty = "icon");
 	void removeAutoIcon(QObject *AObject);
 public:
 	static void clearIconCache();

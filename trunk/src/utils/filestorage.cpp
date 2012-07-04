@@ -85,17 +85,17 @@ QList<QString> FileStorage::fileFirstKeys() const
 	return keys;
 }
 
-int FileStorage::filesCount(const QString AKey) const
+int FileStorage::filesCount(const QString &AKey) const
 {
 	return FObjects.value(FKey2Object.value(AKey)).fileNames.count();
 }
 
-QString FileStorage::fileName(const QString AKey, int AIndex) const
+QString FileStorage::fileName(const QString &AKey, int AIndex) const
 {
 	return FObjects.value(FKey2Object.value(AKey,-1)).fileNames.value(AIndex);
 }
 
-QString FileStorage::fileFullName(const QString AKey, int AIndex) const
+QString FileStorage::fileFullName(const QString &AKey, int AIndex) const
 {
 	QString name = fileName(AKey,AIndex);
 	if (!name.isEmpty())
@@ -106,17 +106,17 @@ QString FileStorage::fileFullName(const QString AKey, int AIndex) const
 	return QString::null;
 }
 
-QString FileStorage::fileMime(const QString AKey, int AIndex) const
+QString FileStorage::fileMime(const QString &AKey, int AIndex) const
 {
 	return FMimeTypes.at(FObjects.value(FKey2Object.value(AKey)).fileTypes.value(AIndex));
 }
 
-QString FileStorage::fileOption(const QString AKey, const QString &AOption) const
+QString FileStorage::fileOption(const QString &AKey, const QString &AOption) const
 {
 	return FObjects.value(FKey2Object.value(AKey)).fileOptions.value(AOption);
 }
 
-QString FileStorage::fileCacheKey(const QString AKey, int AIndex) const
+QString FileStorage::fileCacheKey(const QString &AKey, int AIndex) const
 {
 	QString name = fileName(AKey,AIndex);
 	if (!name.isEmpty())

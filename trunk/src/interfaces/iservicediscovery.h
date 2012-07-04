@@ -80,7 +80,7 @@ public:
 	virtual Jid streamJid() const =0;
 	virtual ToolBarChanger *toolBarChanger() const =0;
 	virtual ToolBarChanger *actionsBarChanger() const =0;
-	virtual void discover(const Jid AContactJid, const QString &ANode) =0;
+	virtual void discover(const Jid &AContactJid, const QString &ANode) =0;
 protected:
 	virtual void discoverChanged(const Jid AContactJid, const QString &ANode) =0;
 	virtual void currentIndexChanged(const QModelIndex &AIndex) =0;
@@ -99,7 +99,7 @@ public:
 	virtual bool checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true) =0;
 	virtual QList<IDiscoInfo> findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const =0;
 	virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const =0;
-	virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const =0;
+	virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANode) const =0;
 	virtual void updateSelfEntityCapabilities() =0;
 	//DiscoHandler
 	virtual void insertDiscoHandler(IDiscoHandler *AHandler) =0;
@@ -139,7 +139,7 @@ protected:
 
 Q_DECLARE_INTERFACE(IDiscoHandler,"Vacuum.Plugin.IDiscoHandler/1.0")
 Q_DECLARE_INTERFACE(IDiscoFeatureHandler,"Vacuum.Plugin.IDiscoFeatureHandler/1.0")
-Q_DECLARE_INTERFACE(IDiscoItemsWindow,"Vacuum.Plugin.IDiscoItemsWindow/1.0")
-Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.0")
+Q_DECLARE_INTERFACE(IDiscoItemsWindow,"Vacuum.Plugin.IDiscoItemsWindow/1.1")
+Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.1")
 
 #endif

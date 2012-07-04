@@ -8,8 +8,7 @@
 #include <QVBoxLayout>
 #include <QDesktopServices>
 
-StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer,
-                           IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
+StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
@@ -113,7 +112,7 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
 	}
 }
 
-bool StreamDialog::acceptFileName(const QString AFile)
+bool StreamDialog::acceptFileName(const QString &AFile)
 {
 	QFileInfo fileInfo(AFile);
 	if (fileInfo.exists() && FFileStream->streamKind()==IFileStream::ReceiveFile)

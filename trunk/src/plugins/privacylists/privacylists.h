@@ -112,7 +112,7 @@ protected slots:
 	void onChangeContactAutoListed(bool AInserted);
 	void onChangeGroupAutoListed(bool AInserted);
 	void onChangeOffRosterBlocked(bool ABlocked);
-	void onEditListsDialogDestroyed(const Jid AStreamJid);
+	void onEditListsDialogDestroyed(const Jid &AStreamJid);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 private:
 	IXmppStreams *FXmppStreams;

@@ -488,7 +488,7 @@ QIcon ServiceDiscovery::identityIcon(const QList<IDiscoIdentity> &AIdentity) con
 	return icon;
 }
 
-QIcon ServiceDiscovery::serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const
+QIcon ServiceDiscovery::serviceIcon(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANode) const
 {
 	QIcon icon;
 	IDiscoInfo dinfo = discoInfo(AStreamJid,AItemJid,ANode);

@@ -346,7 +346,7 @@ QString ServerMessageArchive::loadModifications(const Jid &AStreamJid, const QDa
 	return QString::null;
 }
 
-QString ServerMessageArchive::loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const IArchiveResultSet &AResult)
+QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const IArchiveResultSet &AResult)
 {
 	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement))
 	{
@@ -373,7 +373,7 @@ QString ServerMessageArchive::loadServerHeaders(const Jid AStreamJid, const IArc
 	return QString::null;
 }
 
-QString ServerMessageArchive::loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const IArchiveResultSet &AResult)
+QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const IArchiveResultSet &AResult)
 {
 	if (FStanzaProcessor && isCapable(AStreamJid,ArchiveManagement) && AHeader.with.isValid() && AHeader.start.isValid())
 	{

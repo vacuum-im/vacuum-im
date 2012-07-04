@@ -24,7 +24,7 @@ public:
 public:
 	virtual QObject *instance() =0;
 	virtual int permitStatus(const Jid &AContactJid) const =0;
-	virtual void setPermitStatus(const Jid AContactJid, int AStatus) =0;
+	virtual void setPermitStatus(const Jid &AContactJid, int AStatus) =0;
 	virtual bool isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual int userChatState(const Jid &AStreamJid, const Jid &AContactJid) const =0;
@@ -36,6 +36,6 @@ protected:
 	virtual void selfChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState) const =0;
 };
 
-Q_DECLARE_INTERFACE(IChatStates,"Vacuum.Plugin.IChatStates/1.0")
+Q_DECLARE_INTERFACE(IChatStates,"Vacuum.Plugin.IChatStates/1.1")
 
 #endif

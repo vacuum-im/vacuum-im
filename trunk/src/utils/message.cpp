@@ -196,7 +196,7 @@ Message &Message::setDateTime(const QDateTime &ADateTime, bool ADelayed)
 		d->FStanza.detach();
 		QDomElement elem = d->FStanza.firstElement("delay","urn:xmpp:delay");
 		if (elem.isNull())
-			QDomElement elem = d->FStanza.firstElement("x","jabber:x:delay");
+			elem = d->FStanza.firstElement("x","jabber:x:delay");
 		if (elem.isNull())
 			elem = d->FStanza.addElement("delay","urn:xmpp:delay");
 		elem.setAttribute("stamp",DateTime(ADateTime).toX85UTC());

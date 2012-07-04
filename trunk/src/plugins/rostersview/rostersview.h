@@ -46,7 +46,7 @@ public:
 	virtual bool hasMultiSelection() const;
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const;
 	virtual void selectRosterIndex(IRosterIndex *AIndex);
-	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> ARoles, int AUniqueRole=-1) const;
+	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const;
 	//--ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual QList<QAbstractProxyModel *> proxyModels() const;

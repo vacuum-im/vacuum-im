@@ -398,7 +398,7 @@ int ChatStates::permitStatus(const Jid &AContactJid) const
 	return FPermitStatus.value(AContactJid.bare(),IChatStates::StatusDefault);
 }
 
-void ChatStates::setPermitStatus(const Jid AContactJid, int AStatus)
+void ChatStates::setPermitStatus(const Jid &AContactJid, int AStatus)
 {
 	if (permitStatus(AContactJid) != AStatus)
 	{

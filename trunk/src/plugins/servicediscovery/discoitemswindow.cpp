@@ -118,7 +118,7 @@ DiscoItemsWindow::~DiscoItemsWindow()
 	emit windowDestroyed(this);
 }
 
-void DiscoItemsWindow::discover(const Jid AContactJid, const QString &ANode)
+void DiscoItemsWindow::discover(const Jid &AContactJid, const QString &ANode)
 {
 	ui.cmbJid->setEditText(AContactJid.uFull());
 	ui.cmbNode->setEditText(ANode);
