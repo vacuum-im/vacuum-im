@@ -35,10 +35,10 @@ void TransferThread::run()
 
 	while (!FAbort && transferedBytes<FBytesToTransfer)
 	{
-		qint64 writtenBytes = 0;
 		qint64 readedBytes = inDevice->read(buffer,qMin(qint64(TRANSFER_BUFFER_SIZE),FBytesToTransfer-transferedBytes));
 		if (readedBytes > 0)
 		{
+			qint64 writtenBytes = 0;
 			while (!FAbort && writtenBytes<readedBytes)
 			{
 				qint64 bytes = outDevice->write(buffer+writtenBytes, readedBytes-writtenBytes);
