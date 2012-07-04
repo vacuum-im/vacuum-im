@@ -514,7 +514,7 @@ void SimpleMessageStyle::onScrollAfterResize()
 	{
 		if (it->scrollStarted)
 		{
-			StyleViewer *view = qobject_cast<StyleViewer *>(sender());
+			StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
 			QScrollBar *scrollBar = view->verticalScrollBar();
 			scrollBar->setSliderPosition(scrollBar->maximum());
 			it->scrollStarted = false;
