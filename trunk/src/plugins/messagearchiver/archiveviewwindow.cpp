@@ -807,7 +807,7 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 			}
 
 			html += showMessage(*messageIt,options);
-			messageIt++;
+			++messageIt;
 		}
 		else if (noteIt != ACollection.body.notes.constEnd())
 		{
@@ -819,7 +819,7 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 			options.timeFormat = FMessageStyles!=NULL ? FMessageStyles->timeFormat(options.time,ACollection.header.start) : QString::null;
 
 			html += showNote(*noteIt,options);
-			noteIt++;
+			++noteIt;
 		}
 	}
 
@@ -964,7 +964,7 @@ void ArchiveViewWindow::onTextHilightTimerTimeout()
 	{
 		QList<QTextEdit::ExtraSelection> selections;
 		QPair<int,int> boundary = ui.tbrMessages->visiblePositionBoundary();
-		for (QMap<int, QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(boundary.first); it!=FSearchResults.constEnd() && it.key()<boundary.second; it++)
+		for (QMap<int, QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(boundary.first); it!=FSearchResults.constEnd() && it.key()<boundary.second; ++it)
 			selections.append(it.value());
 		ui.tbrMessages->setExtraSelections(selections);
 	}
@@ -1215,7 +1215,7 @@ void ArchiveViewWindow::onArchiveHeadersLoaded(const QString &AId, const QList<I
 	if (FHeadersRequests.contains(AId))
 	{
 		QDate start = FHeadersRequests.take(AId);
-		for (QList<IArchiveHeader>::const_iterator it = AHeaders.constBegin(); it!=AHeaders.constEnd(); it++)
+		for (QList<IArchiveHeader>::const_iterator it = AHeaders.constBegin(); it!=AHeaders.constEnd(); ++it)
 		{
 			if (!FCollections.contains(*it) && it->with.isValid() && it->start.isValid())
 			{

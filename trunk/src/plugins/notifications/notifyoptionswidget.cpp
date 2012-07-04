@@ -57,7 +57,7 @@ void NotifyOptionsWidget::apply()
 	Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).setValue(ui.spbPopupTimeout->value());
 
 	ushort enabledKinds = 0;
-	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); it++)
+	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); ++it)
 		if (it.value()->checkState() == Qt::Checked)
 			enabledKinds |= it.key();
 	FNotifications->setEnabledNotificationKinds(enabledKinds);
@@ -83,10 +83,10 @@ void NotifyOptionsWidget::reset()
 	ui.spbPopupTimeout->setValue(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt());
 	
 	ushort enabledKinds = FNotifications->enabledNotificationKinds();
-	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); it++)
+	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); ++it)
 		it.value()->setCheckState((enabledKinds & it.key())>0 ? Qt::Checked : Qt::Unchecked);
 	
-	for (QMultiMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); it++)
+	for (QMultiMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
 		it.value()->setCheckState((FNotifications->typeNotificationKinds(it.key()) & it.value()->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);
 
 	void childReset();
@@ -171,10 +171,10 @@ void NotifyOptionsWidget::setItemBold(QStandardItem *AItem, bool ABold) const
 
 void NotifyOptionsWidget::onRestoreDefaultsClicked()
 {
-	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); it++)
+	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); ++it)
 		it.value()->setCheckState(Qt::Checked);
 
-	for (QMultiMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); it++)
+	for (QMultiMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
 	{
 		INotificationType notifyType = FNotifications->notificationType(it.key());
 		it.value()->setCheckState((notifyType.kindDefs & it.value()->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);

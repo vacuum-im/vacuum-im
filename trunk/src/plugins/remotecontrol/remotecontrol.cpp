@@ -619,7 +619,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 				unread[message.from()]++;
 		}
 
-		for (QMap<Jid, int>::const_iterator it=unread.constBegin(); it!=unread.constEnd(); it++)
+		for (QMap<Jid, int>::const_iterator it=unread.constBegin(); it!=unread.constEnd(); ++it)
 		{
 			IDataOption opt;
 

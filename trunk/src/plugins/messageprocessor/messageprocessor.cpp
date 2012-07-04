@@ -242,7 +242,7 @@ void MessageProcessor::messageToText(QTextDocument *ADocument, const Message &AM
 
 bool MessageProcessor::createMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode) const
 {
-	for (QMultiMap<int, IMessageHandler *>::const_iterator it = FMessageHandlers.constBegin(); it!=FMessageHandlers.constEnd(); it++)
+	for (QMultiMap<int, IMessageHandler *>::const_iterator it = FMessageHandlers.constBegin(); it!=FMessageHandlers.constEnd(); ++it)
 		if (it.value()->messageShowWindow(it.key(),AStreamJid,AContactJid,AType,AShowMode))
 			return true;
 	return false;
@@ -310,7 +310,7 @@ int MessageProcessor::newMessageId()
 
 IMessageHandler *MessageProcessor::findMessageHandler(const Message &AMessage, int ADirection)
 {
-	for (QMultiMap<int, IMessageHandler *>::const_iterator it = FMessageHandlers.constBegin(); it!=FMessageHandlers.constEnd(); it++)
+	for (QMultiMap<int, IMessageHandler *>::const_iterator it = FMessageHandlers.constBegin(); it!=FMessageHandlers.constEnd(); ++it)
 		if (it.value()->messageCheck(it.key(),AMessage,ADirection))
 			return it.value();
 	return NULL;

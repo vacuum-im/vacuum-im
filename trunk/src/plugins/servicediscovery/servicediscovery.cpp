@@ -867,7 +867,7 @@ void ServiceDiscovery::appendQueuedRequest(const QDateTime &ATimeStart, const Di
 	{
 		if (it.value().contactJid==ARequest.contactJid && it.value().node==ARequest.node)
 			return;
-		it++;
+		++it;
 	}
 	FQueuedRequests.insert(ATimeStart,ARequest);
 	if (!FQueueTimer.isActive())
@@ -886,7 +886,7 @@ void ServiceDiscovery::removeQueuedRequest(const DiscoveryRequest &ARequest)
 		)
 			it = FQueuedRequests.erase(it);
 		else
-			it++;
+			++it;
 	}
 }
 
@@ -926,7 +926,7 @@ IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) con
 			if (caps.ver == calcCapsHash(dinfo,caps.hash))
 				return dinfo;
 		}
-		it++;
+		++it;
 	}
 
 	IDiscoInfo dinfo;
@@ -1024,9 +1024,9 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 				{
 					hashList += ifields.key();
 					hashList += ifields.value();
-					ifields++;
+					++ifields;
 				}
-				iforms++;
+				++iforms;
 			}
 		}
 		hashList.append(QString::null);

@@ -152,7 +152,7 @@ QList<QUuid> PluginManager::pluginDependencesOn(const QUuid &AUuid) const
 			plugins += pluginDependencesOn(it.key());
 			plugins.append(it.key());
 		}
-		it++;
+		++it;
 	}
 
 	deepStack.pop();
@@ -392,7 +392,7 @@ void PluginManager::loadPlugins()
 			}
 			else
 			{
-				it++;
+				++it;
 			}
 		}
 	}
@@ -415,7 +415,7 @@ bool PluginManager::initPlugins()
 		if (plugin->initConnections(this,initOrder))
 		{
 			pluginOrder.insertMulti(initOrder,plugin);
-			it++;
+			++it;
 		}
 		else
 		{
@@ -532,7 +532,7 @@ bool PluginManager::checkDependences(const QUuid AUuid) const
 				while (!found && it!=FPluginItems.constEnd())
 				{
 					found = it.value().info->implements.contains(depend);
-					it++;
+					++it;
 				}
 				if (!found)
 					return false;
@@ -573,7 +573,7 @@ QList<QUuid> PluginManager::getConflicts(const QUuid AUuid) const
 			{
 				if (it.key()==conflict || it.value().info->implements.contains(conflict))
 					plugins+=conflict;
-				it++;
+				++it;
 			}
 		}
 	}

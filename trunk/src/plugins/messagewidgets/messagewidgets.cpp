@@ -548,7 +548,7 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
 	IViewWidget *widget = qobject_cast<IViewWidget *>(sender());
 	if (widget)
 	{
-		for (QMap<int,IViewUrlHandler *>::const_iterator it = FViewUrlHandlers.constBegin(); it!=FViewUrlHandlers.constEnd(); it++)
+		for (QMap<int,IViewUrlHandler *>::const_iterator it = FViewUrlHandlers.constBegin(); it!=FViewUrlHandlers.constEnd(); ++it)
 			if (it.value()->viewUrlOpen(it.key(),widget,AUrl))
 				break;
 	}
@@ -635,7 +635,7 @@ void MessageWidgets::onEditWidgetCreateDataRequest(QMimeData *AData)
 	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
 	if (widget)
 	{
-		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); it++)
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); ++it)
 			if (it.value()->editContentsCreate(it.key(),widget,AData))
 				break;
 	}
@@ -646,7 +646,7 @@ void MessageWidgets::onEditWidgetCanInsertDataRequest(const QMimeData *AData, bo
 	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
 	if (widget)
 	{
-		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); !ACanInsert && it!=FEditContentsHandlers.constEnd(); it++)
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); !ACanInsert && it!=FEditContentsHandlers.constEnd(); ++it)
 			ACanInsert = it.value()->editContentsCanInsert(it.key(),widget,AData);
 	}
 }
@@ -656,7 +656,7 @@ void MessageWidgets::onEditWidgetInsertDataRequest(const QMimeData *AData, QText
 	IEditWidget *widget = qobject_cast<IEditWidget *>(sender());
 	if (widget)
 	{
-		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); it++)
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); ++it)
 			if (it.value()->editContentsInsert(it.key(),widget,AData,ADocument))
 				break;
 	}
@@ -668,7 +668,7 @@ void MessageWidgets::onEditWidgetContentsChanged(int APosition, int ARemoved, in
 	if (widget)
 	{
 		widget->document()->blockSignals(true);
-		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); it++)
+		for (QMap<int,IEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); ++it)
 			if (it.value()->editContentsChanged(it.key(),widget,APosition,ARemoved,AAdded))
 				break;
 		widget->document()->blockSignals(false);

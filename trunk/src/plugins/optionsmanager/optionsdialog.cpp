@@ -85,7 +85,7 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 	foreach(IOptionsHolder *optionsHolder,FOptionsManager->optionsHolders())
 	{
 		QMultiMap<int, IOptionsWidget *> widgets = optionsHolder->optionsWidgets(ANodeId,nodeWidget);
-		for (QMultiMap<int, IOptionsWidget *>::const_iterator  it = widgets.constBegin(); it!=widgets.constEnd(); it++)
+		for (QMultiMap<int, IOptionsWidget *>::const_iterator  it = widgets.constBegin(); it!=widgets.constEnd(); ++it)
 		{
 			orderedWidgets.insertMulti(it.key() ,it.value());
 			connect(this,SIGNAL(applied()),it.value()->instance(),SLOT(apply()));

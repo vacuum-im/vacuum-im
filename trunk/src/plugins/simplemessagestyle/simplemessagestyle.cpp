@@ -95,7 +95,7 @@ QTextDocumentFragment SimpleMessageStyle::textUnderPosition(const QPoint &APosit
 			if (!view->anchorAt(APosition).isEmpty())
 			{
 				QTextBlock block = cursor.block();
-				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 				{
 					if (it.fragment().contains(cursor.position()))
 					{
@@ -510,11 +510,12 @@ void SimpleMessageStyle::onLinkClicked(const QUrl &AUrl)
 
 void SimpleMessageStyle::onScrollAfterResize()
 {
-	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); it++)
+	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); ++it)
 	{
 		if (it->scrollStarted)
 		{
-			QScrollBar *scrollBar = ((StyleViewer *)it.key())->verticalScrollBar();
+			StyleViewer *view = qobject_cast<StyleViewer *>(sender());
+			QScrollBar *scrollBar = view->verticalScrollBar();
 			scrollBar->setSliderPosition(scrollBar->maximum());
 			it->scrollStarted = false;
 		}

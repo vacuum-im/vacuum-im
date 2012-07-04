@@ -232,7 +232,7 @@ void IconStorage::removeObject(QObject *AObject)
 void IconStorage::onStorageChanged()
 {
 	FTimerObject.clear();
-	for (QHash<QObject*,IconUpdateParams*>::iterator it=FUpdateParams.begin(); it!=FUpdateParams.end(); it++)
+	for (QHash<QObject*,IconUpdateParams*>::iterator it=FUpdateParams.begin(); it!=FUpdateParams.end(); ++it)
 	{
 		initAnimation(it.key(),it.value());
 		updateObject(it.key());

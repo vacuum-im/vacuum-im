@@ -60,7 +60,7 @@ IRosterExchangeRequest ExchangeApproveDialog::approvedRequest() const
 	request.streamJid = FRoster->streamJid();
 
 	request.items.clear();
-	for (QMap<QTableWidgetItem *, IRosterExchangeItem>::const_iterator it=FItems.constBegin(); it!=FItems.constEnd(); it++)
+	for (QMap<QTableWidgetItem *, IRosterExchangeItem>::const_iterator it=FItems.constBegin(); it!=FItems.constEnd(); ++it)
 	{
 		if (it.key()->checkState() == Qt::Checked)
 			request.items.append(it.value());
@@ -88,7 +88,7 @@ QString ExchangeApproveDialog::contactName(const Jid &AContactJid, bool AWithJid
 
 void ExchangeApproveDialog::appendRequestItems(const QList<IRosterExchangeItem> &AItems)
 {
-	for (QList<IRosterExchangeItem>::const_iterator it=AItems.constBegin(); it!=AItems.constEnd(); it++)
+	for (QList<IRosterExchangeItem>::const_iterator it=AItems.constBegin(); it!=AItems.constEnd(); ++it)
 	{
 		QString actionText;
 		IRosterItem ritem = FRoster->rosterItem(it->itemJid);

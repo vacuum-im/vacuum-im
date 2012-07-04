@@ -75,7 +75,7 @@ QList<QString> FileStorage::fileFirstKeys() const
 		if (index != lastIndex)
 		{
 			lastIndex = index;
-			it++;
+			++it;
 		}
 		else
 		{
@@ -131,7 +131,7 @@ QList<QString> FileStorage::availStorages()
 	{
 		QDir dir(dirPath);
 		QList<QString> dirStorages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-		for (QList<QString>::iterator it=dirStorages.begin(); it!=dirStorages.end(); it++)
+		for (QList<QString>::iterator it=dirStorages.begin(); it!=dirStorages.end(); ++it)
 			if (storages.contains(*it))
 				it = dirStorages.erase(it);
 		storages.append(dirStorages);
@@ -160,7 +160,7 @@ QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool AChec
 					else if (ACheckDefs && dir.entryList(QStringList()<<STORAGE_DEFFILES_MASK).isEmpty())
 						it = dirStorages.erase(it);
 					else
-						it++;
+						++it;
 					dir.cdUp();
 				}
 				else
@@ -211,10 +211,10 @@ void FileStorage::setResourcesDirs(const QList<QString> &ADirs)
 		foreach(FileStorage *fileStorage, FInstances)
 		{
 			bool update = false;
-			for(QSet<QString>::const_iterator dirIt = oldDirs.constBegin(); !update && dirIt!=oldDirs.constEnd(); dirIt++)
+			for(QSet<QString>::const_iterator dirIt = oldDirs.constBegin(); !update && dirIt!=oldDirs.constEnd(); ++dirIt)
 			{
 				QList<QString> curPrefixes = fileStorage->FPrefixes;
-				for(QList<QString>::const_iterator prefIt = curPrefixes.constBegin(); !update && prefIt!=curPrefixes.constEnd(); prefIt++)
+				for(QList<QString>::const_iterator prefIt = curPrefixes.constBegin(); !update && prefIt!=curPrefixes.constEnd(); ++prefIt)
 					update = (*prefIt).startsWith(*dirIt);
 			}
 			if (update)
@@ -230,10 +230,10 @@ void FileStorage::setResourcesDirs(const QList<QString> &ADirs)
 			if (!updateStorages.contains(fileStorage))
 			{
 				bool update = false;
-				for(QSet<QString>::const_iterator dirIt = newDirs.constBegin(); !update && dirIt!=newDirs.constEnd(); dirIt++)
+				for(QSet<QString>::const_iterator dirIt = newDirs.constBegin(); !update && dirIt!=newDirs.constEnd(); ++dirIt)
 				{
 					QList<QString> newPrefixes = subStorageDirs(fileStorage->storage(),fileStorage->subStorage());
-					for(QList<QString>::const_iterator prefIt = newPrefixes.constBegin(); !update && prefIt!=newPrefixes.constEnd(); prefIt++)
+					for(QList<QString>::const_iterator prefIt = newPrefixes.constBegin(); !update && prefIt!=newPrefixes.constEnd(); ++prefIt)
 						update = (*prefIt).startsWith(*dirIt);
 				}
 				if (update)

@@ -230,7 +230,7 @@ void SimpleMessageStylePlugin::onClearEmptyStyles()
 			delete style;
 		}
 		else
-			it++;
+			++it;
 	}
 }
 

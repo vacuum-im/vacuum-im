@@ -293,7 +293,7 @@ QString CaptchaForms::findChallenge(IDataDialogWidget *ADialog) const
 	{
 		if (it->dialog == ADialog)
 			return it.key();
-		it++;
+		++it;
 	}
 	return QString::null;
 }
@@ -307,7 +307,7 @@ QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJi
 		{
 			if (AStreamJid==it->streamJid && AContactJid==FDataForms->fieldValue("from",it->dialog->formWidget()->dataForm().fields).toString())
 				return it.key();
-			it++;
+			++it;
 		}
 	}
 	return QString::null;
@@ -349,7 +349,7 @@ void CaptchaForms::onStreamClosed(IXmppStream *AXmppStream)
 	{
 		if (it->streamJid == AXmppStream->streamJid())
 			dialogs.append(it->dialog);
-		it++;
+		++it;
 	}
 
 	foreach(IDataDialogWidget *dialog, dialogs)

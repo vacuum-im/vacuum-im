@@ -5,16 +5,14 @@ MessageData::MessageData() : FStanza("message")
 	FDateTime = QDateTime::currentDateTime();
 }
 
-MessageData::MessageData(const Stanza &AStanza)
+MessageData::MessageData(const Stanza &AStanza) : FStanza(AStanza)
 {
-	FStanza = AStanza;
 	updateDateTime();
 }
 
-MessageData::MessageData(const MessageData &AOther) : QSharedData(AOther)
+MessageData::MessageData(const MessageData &AOther) : QSharedData(AOther), FStanza(AOther.FStanza)
 {
 	FData = AOther.FData;
-	FStanza = AOther.FStanza;
 	FDateTime = AOther.FDateTime;
 }
 
@@ -93,7 +91,7 @@ void Message::setData(const QHash<int, QVariant> &AData)
 	while (it != AData.constEnd())
 	{
 		setData(it.key(),it.value());
-		it++;
+		++it;
 	}
 }
 

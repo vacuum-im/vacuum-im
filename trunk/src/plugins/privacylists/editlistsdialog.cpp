@@ -128,7 +128,7 @@ void EditListsDialog::apply()
 		}
 		else
 			notValidLists.append(newList.name);
-		it++;
+		++it;
 	}
 
 	QString newActiveList = ui.cmbActive->itemData(ui.cmbActive->currentIndex()).toString();

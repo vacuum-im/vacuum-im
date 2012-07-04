@@ -174,7 +174,7 @@ bool FileStreamsManager::dataStreamRequest(const QString &AStreamId, const Stanz
 	{
 		if (!AMethods.isEmpty())
 		{
-			for (QMultiMap<int, IFileStreamsHandler *>::const_iterator it = FHandlers.constBegin(); it!=FHandlers.constEnd(); it++)
+			for (QMultiMap<int, IFileStreamsHandler *>::const_iterator it = FHandlers.constBegin(); it!=FHandlers.constEnd(); ++it)
 			{
 				IFileStreamsHandler *handler = it.value();
 				if (handler->fileStreamRequest(it.key(),AStreamId,ARequest,AMethods))

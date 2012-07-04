@@ -79,7 +79,7 @@ QList<int> AnimatedTextBrowser::findUrlPositions(const QUrl &AName) const
 	QTextBlock block = document()->firstBlock();
 	while (block.isValid())
 	{
-		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 		{
 			QTextFragment fragment = it.fragment();
 			if (fragment.charFormat().isImageFormat())
@@ -284,7 +284,7 @@ void AnimatedTextBrowser::onMovieDestroyed(QObject *AObject)
 void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved, int AAdded)
 {
 	// Remove old animation records and correct others
-	for(QHash<QMovie *, QList<int> >::iterator it=FUrlPositions.begin(); it!=FUrlPositions.end(); it++)
+	for(QHash<QMovie *, QList<int> >::iterator it=FUrlPositions.begin(); it!=FUrlPositions.end(); ++it)
 	{
 		QList<int> &positions = it.value();
 		for(int i=0; i<positions.count(); i++)
@@ -306,7 +306,7 @@ void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved,
 		QTextBlock block = document()->findBlock(APosition);
 		while (block.isValid())
 		{
-			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+			for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 			{
 				QTextFragment fragment = it.fragment();
 				int fragmentPos = fragment.position();
@@ -324,7 +324,7 @@ void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved,
 	// Remove empty animation objects
 	if (ARemoved > 0)
 	{
-		for(QHash<QMovie *, QList<int> >::const_iterator it=FUrlPositions.constBegin(); it!=FUrlPositions.constEnd(); it++)
+		for(QHash<QMovie *, QList<int> >::const_iterator it=FUrlPositions.constBegin(); it!=FUrlPositions.constEnd(); ++it)
 		{
 			if (it->isEmpty())
 				it.key()->deleteLater();

@@ -598,7 +598,7 @@ bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArch
 			}
 			if (!ACollection.body.notes.isEmpty())
 			{
-				for (QMultiMap<QDateTime, QString>::const_iterator it= ACollection.body.notes.constBegin(); it!=ACollection.body.notes.constEnd(); it++)
+				for (QMultiMap<QDateTime, QString>::const_iterator it= ACollection.body.notes.constBegin(); it!=ACollection.body.notes.constEnd(); ++it)
 					if (!collection.body.notes.contains(it.key(),it.value()))
 						collection.body.notes.insertMulti(it.key(),it.value());
 			}

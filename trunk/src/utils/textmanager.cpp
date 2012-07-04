@@ -30,7 +30,7 @@ QString TextManager::getTextFragmentHref(const QTextDocumentFragment &AFragment)
 	QTextBlock block = doc.firstBlock();
 	while (block.isValid())
 	{
-		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 		{
 			if (it.fragment().charFormat().isAnchor())
 			{

@@ -2218,7 +2218,7 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 					showChatStatus(window,noteIt.value());
 				else
 					showStatusMessage(noteIt.value(),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,false);
-				noteIt++;
+				++noteIt;
 			}
 		}
 

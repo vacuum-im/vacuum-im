@@ -210,12 +210,12 @@ void RosterIndex::setData(int ARole, const QVariant &AData)
 QList<IRosterIndex *> RosterIndex::findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive) const
 {
 	QList<IRosterIndex *> indexes;
-	for(QList<IRosterIndex *>::const_iterator childIt=FChilds.constBegin(); childIt!=FChilds.constEnd(); childIt++)
+	for(QList<IRosterIndex *>::const_iterator childIt=FChilds.constBegin(); childIt!=FChilds.constEnd(); ++childIt)
 	{
 		int lastRole = -1;
 		bool accepted = true;
 		IRosterIndex *index = *childIt;
-		for (QMultiMap<int, QVariant>::const_iterator findIt=AFindData.constBegin(); findIt!=AFindData.constEnd(); findIt++)
+		for (QMultiMap<int, QVariant>::const_iterator findIt=AFindData.constBegin(); findIt!=AFindData.constEnd(); ++findIt)
 		{
 			int findRole = findIt.key();
 			if ( (accepted && lastRole!=findRole) || (!accepted && lastRole==findRole) )

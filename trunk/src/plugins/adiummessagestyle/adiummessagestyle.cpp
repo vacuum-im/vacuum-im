@@ -691,11 +691,12 @@ void AdiumMessageStyle::onLinkClicked(const QUrl &AUrl)
 
 void AdiumMessageStyle::onScrollAfterResize()
 {
-	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); it++)
+	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); ++it)
 	{
 		if (it->scrollStarted)
 		{
-			QWebFrame *frame = ((StyleViewer *)it.key())->page()->mainFrame();
+			StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
+			QWebFrame *frame = view->page()->mainFrame();
 			frame->evaluateJavaScript("alignChat(false);");
 			frame->setScrollBarValue(Qt::Vertical,frame->scrollBarMaximum(Qt::Vertical));
 			it->scrollStarted = false;
