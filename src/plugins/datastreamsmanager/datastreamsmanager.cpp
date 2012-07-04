@@ -425,7 +425,7 @@ bool DataStreamsManger::rejectStream(const QString &AStreamId, const QString &AE
 
 QString DataStreamsManger::streamIdByRequestId(const QString &ARequestId) const
 {
-	for (QMap<QString, StreamParams>::const_iterator it = FStreams.constBegin(); it!=FStreams.constEnd(); it++)
+	for (QMap<QString, StreamParams>::const_iterator it = FStreams.constBegin(); it!=FStreams.constEnd(); ++it)
 		if (it->requestId == ARequestId)
 			return it.key();
 	return QString::null;
@@ -445,7 +445,7 @@ void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
 		}
 		else
 		{
-			it++;
+			++it;
 		}
 	}
 }

@@ -433,7 +433,7 @@ QModelIndex RostersView::mapToModel(const QModelIndex &AProxyIndex) const
 		QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
 		do
 		{
-			it--;
+			--it;
 			index = it.value()->mapToSource(index);
 		} while (it != FProxyModels.constBegin());
 	}
@@ -449,7 +449,7 @@ QModelIndex RostersView::mapFromModel(const QModelIndex &AModelIndex) const
 		while (it != FProxyModels.constEnd())
 		{
 			index = it.value()->mapFromSource(index);
-			it++;
+			++it;
 		}
 	}
 	return index;
@@ -466,7 +466,7 @@ QModelIndex RostersView::mapToProxy(QAbstractProxyModel *AProxyModel, const QMod
 			index = it.value()->mapFromSource(index);
 			if (it.value() == AProxyModel)
 				return index;
-			it++;
+			++it;
 		}
 	}
 	return index;
@@ -481,7 +481,7 @@ QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QM
 		QMap<int, QAbstractProxyModel *>::const_iterator it = FProxyModels.constEnd();
 		do
 		{
-			it--;
+			--it;
 			if (it.value() == AProxyModel)
 				doMap = true;
 			if (doMap)
@@ -870,7 +870,7 @@ void RostersView::setDropIndicatorRect(const QRect &ARect)
 
 IRostersEditHandler *RostersView::findEditHandler(int ADataRole, const QModelIndex &AIndex) const
 {
-	for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); it++)
+	for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); ++it)
 		if (it.value()->rosterEditStart(ADataRole,AIndex))
 			return it.value();
 	return NULL;
@@ -979,7 +979,7 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 					while (!hooked && it!=FClickHookers.constEnd())
 					{
 						hooked = it.value()->rosterIndexDoubleClicked(it.key(),index,AEvent);
-						it++;
+						++it;
 					}
 					if (!hooked)
 						emit indexDoubleClicked(index,labelAt(AEvent->pos(),viewIndex));
@@ -1081,7 +1081,7 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 				while (!hooked && it!=FClickHookers.constEnd())
 				{
 					hooked = it.value()->rosterIndexSingleClicked(it.key(),index,AEvent);
-					it++;
+					++it;
 				}
 				if (!hooked)
 					emit indexClicked(index,labelId!=RLID_NULL ? labelId : RLID_DISPLAY);
@@ -1106,7 +1106,7 @@ void RostersView::keyPressEvent(QKeyEvent *AEvent)
 		while (!hooked && it!=FKeyHookers.constEnd())
 		{
 			hooked = it.value()->rosterKeyPressed(it.key(),indexes,AEvent);
-			it++;
+			++it;
 		}
 	}
 	if (!hooked)
@@ -1125,7 +1125,7 @@ void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
 		while (!hooked && it!=FKeyHookers.constEnd())
 		{
 			hooked = it.value()->rosterKeyReleased(it.key(),indexes,AEvent);
-			it++;
+			++it;
 		}
 	}
 	if (!hooked)

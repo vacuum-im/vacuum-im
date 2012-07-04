@@ -478,7 +478,7 @@ bool OptionsNode::operator!=(const OptionsNode &AOther) const
 
 OptionsNode &OptionsNode::operator=(const OptionsNode &AOther)
 {
-	if (d != AOther.d)
+	if (this!=&AOther && d!=AOther.d)
 	{
 		if (d && !(--d->refCount))
 			delete d;

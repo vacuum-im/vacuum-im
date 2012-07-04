@@ -351,7 +351,7 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 
 		bool isItemsValid = !ARequest.items.isEmpty();
 		QDomElement xElem = request.addElement("x",NS_ROSTERX);
-		for (QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); it++)
+		for (QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); ++it)
 		{
 			if (it->itemJid.isValid() && (it->action==ROSTEREXCHANGE_ACTION_ADD || it->action==ROSTEREXCHANGE_ACTION_DELETE || it->action==ROSTEREXCHANGE_ACTION_MODIFY))
 			{
@@ -408,7 +408,7 @@ bool RosterItemExchange::isAcceptableDropData(const Jid &AStreamJid, const Jid &
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(indexData.value(RDR_STREAM_JID).toString()) : NULL;
 			QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
 			QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
-			for (QList<IRosterItem>::const_iterator it = ritems.constBegin(); !accepted && it!=ritems.constEnd(); it++)
+			for (QList<IRosterItem>::const_iterator it = ritems.constBegin(); !accepted && it!=ritems.constEnd(); ++it)
 			{
 				if (AContactJid.pBare()!=it->itemJid.pBare() && (it->itemJid.node().isEmpty() || !services.contains(it->itemJid.domain())))
 					accepted = true;
@@ -442,7 +442,7 @@ bool RosterItemExchange::insertDropActions(const Jid &AStreamJid, const Jid &ACo
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(indexData.value(RDR_STREAM_JID).toString()) : NULL;
 			QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
 			QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
-			for (QList<IRosterItem>::const_iterator it = ritems.constBegin(); it!=ritems.constEnd(); it++)
+			for (QList<IRosterItem>::const_iterator it = ritems.constBegin(); it!=ritems.constEnd(); ++it)
 			{
 				if (AContactJid.pBare()!=it->itemJid.pBare() && (it->itemJid.node().isEmpty() || !services.contains(it->itemJid.domain())))
 				{
@@ -507,7 +507,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 		bool isForbidden = false;
 		QList<IRosterExchangeItem> approveList;
 		bool autoApprove = (isGateway || isDirectory) && Options::node(OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED).value().toBool();
-		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); it++)
+		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); ++it)
 		{
 			if (autoApprove && !isDirectory && isGateway && it->itemJid.pDomain()!=ARequest.contactJid.pDomain())
 				autoApprove = false;
@@ -619,7 +619,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 	if (roster && roster->isOpen())
 	{
 		bool applied = false;
-		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); it++)
+		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); ++it)
 		{
 			IRosterItem ritem = roster->rosterItem(it->itemJid);
 			if (it->action == ROSTEREXCHANGE_ACTION_ADD)

@@ -38,7 +38,7 @@ void AccountsOptions::apply()
 {
 	FPendingAccounts.clear();
 	QList<IAccount *> curAccounts;
-	for (QMap<QUuid, QTreeWidgetItem *>::const_iterator it = FAccountItems.constBegin(); it!=FAccountItems.constEnd(); it++)
+	for (QMap<QUuid, QTreeWidgetItem *>::const_iterator it = FAccountItems.constBegin(); it!=FAccountItems.constEnd(); ++it)
 	{
 		IAccount *account = FManager->accountById(it.key());
 		if (account)

@@ -247,7 +247,7 @@ IRosterIndex *RostersModel::findGroupIndex(int AType, const QString &AGroup, con
 		QList<IRosterIndex *> indexes = FGroupsCache.value(groupIndex).values(groupTree.takeFirst());
 
 		groupIndex = NULL;
-		for(QList<IRosterIndex *>::const_iterator it = indexes.constBegin(); !groupIndex && it!=indexes.constEnd(); it++)
+		for(QList<IRosterIndex *>::const_iterator it = indexes.constBegin(); !groupIndex && it!=indexes.constEnd(); ++it)
 			if ((*it)->type() == AType)
 				groupIndex = *it;
 
@@ -458,7 +458,7 @@ QList<IRosterIndex *> RostersModel::findContactIndexes(const Jid &AStreamJid, co
 			if ((*it)->parentIndex() != AParent)
 				it = indexes.erase(it);
 			else
-				it++;
+				++it;
 		}
 	}
 
@@ -469,7 +469,7 @@ QList<IRosterIndex *> RostersModel::findContactIndexes(const Jid &AStreamJid, co
 			if (AContactJid != (*it)->data(RDR_FULL_JID).toString())
 				it = indexes.erase(it);
 			else
-				it++;
+				++it;
 		}
 	}
 

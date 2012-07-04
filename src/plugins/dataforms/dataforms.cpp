@@ -561,13 +561,6 @@ bool DataForms::isDataValid(const IDataValidate &AValidate, const QString &AValu
 			valid &= AValidate.regexp.indexIn(AValue) >= 0;
 		}
 	}
-	else if (AValidate.type == DATAVALIDATE_TYPE_LANGUAGE)
-	{
-		if (AValidate.method == DATAVALIDATE_METHOD_REGEXP)
-		{
-			valid &= AValidate.regexp.indexIn(AValue) >= 0;
-		}
-	}
 	else
 	{
 		if (AValidate.method == DATAVALIDATE_METHOD_REGEXP)

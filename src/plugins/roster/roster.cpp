@@ -386,7 +386,7 @@ void Roster::renameGroup(const QString &AGroup, const QString &AGroupTo)
 			newItemGroups += newGroup;
 		}
 		it->groups = newItemGroups;
-		it++;
+		++it;
 	}
 	setItems(allGroupItems);
 }
@@ -417,7 +417,7 @@ void Roster::copyGroupToGroup(const QString &AGroup, const QString &AGroupTo)
 				}
 			}
 			it->groups += newItemGroups;
-			it++;
+			++it;
 		}
 		setItems(allGroupItems);
 	}
@@ -449,7 +449,7 @@ void Roster::moveGroupToGroup(const QString &AGroup, const QString &AGroupTo)
 				}
 			}
 			it->groups = oldItemGroups+newItemGroups;
-			it++;
+			++it;
 		}
 		setItems(allGroupItems);
 	}
@@ -466,7 +466,7 @@ void Roster::removeGroup(const QString &AGroup)
 			if (group.startsWith(AGroup))
 				newItemGroups -= group;
 		it->groups = newItemGroups;
-		it++;
+		++it;
 	}
 	setItems(allGroupItems);
 }

@@ -540,7 +540,7 @@ void StatusIcons::onOptionsClosed()
 		OptionsNode ruleNode = Options::node(OPV_STATUSICONS_RULES_ROOT).node("rule",QString::number(nspace));
 		ruleNode.setValue(it.key(),"pattern");
 		ruleNode.setValue(it.value(),"iconset");
-		it++;
+		++it;
 		nspace++;
 	}
 }

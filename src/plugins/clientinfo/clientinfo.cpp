@@ -499,34 +499,38 @@ QString ClientInfo::osVersion() const
 			break;
 		}
 #elif defined(Q_WS_HAIKU)
-		QString strVersion("Haiku");
 		BPath path;
-		if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) {
-		path.Append("libbe.so");
+		QString strVersion("Haiku");
+		if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) 
+		{
+			path.Append("libbe.so");
 
-		BAppFileInfo appFileInfo;
-		version_info versionInfo;
-		BFile file;
-		if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
-			&& appFileInfo.SetTo(&file) == B_OK
-			&& appFileInfo.GetVersionInfo(&versionInfo, 
-				B_APP_VERSION_KIND) == B_OK
-			&& versionInfo.short_info[0] != '\0')
+			BAppFileInfo appFileInfo;
+			version_info versionInfo;
+			BFile file;
+			if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
+				&& appFileInfo.SetTo(&file) == B_OK
+				&& appFileInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK
+				&& versionInfo.short_info[0] != '\0')
+			{
 				strVersion = versionInfo.short_info;
+			}
 		}
 
 		utsname uname_info;
-		if (uname(&uname_info) == 0) {
-		osver = uname_info.sysname;
-		long revision = 0;
-		if (sscanf(uname_info.version, "r%ld", &revision) == 1) {
-			char version[16];
-			snprintf(version, sizeof(version), "%ld", revision);
-			osver += " ( " + strVersion + " Rev. ";
-			osver += version;
-			osver += ")";
+		if (uname(&uname_info) == 0) 
+		{
+			osver = uname_info.sysname;
+			long revision = 0;
+			if (sscanf(uname_info.version, "r%10ld", &revision) == 1)
+			{
+				char version[16];
+				snprintf(version, sizeof(version), "%ld", revision);
+				osver += " ( " + strVersion + " Rev. ";
+				osver += version;
+				osver += ")";
+			}
 		}
-	}
 #else
 		osver = "Unknown";
 #endif

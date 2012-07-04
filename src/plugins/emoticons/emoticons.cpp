@@ -139,7 +139,7 @@ bool Emoticons::editContentsInsert(int AOrder, IEditWidget *AWidget, const QMime
 			QTextBlock block = ADocument->firstBlock();
 			while (block.isValid())
 			{
-				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 				{
 					QTextFragment fragment = it.fragment();
 					if (fragment.charFormat().isImageFormat())
@@ -184,7 +184,7 @@ QList<QString> Emoticons::activeIconsets() const
 		if (!FStorages.contains(*it))
 			it = iconsets.erase(it);
 		else
-			it++;
+			++it;
 	}
 	return iconsets;
 }
@@ -206,7 +206,7 @@ QMap<int, QString> Emoticons::findTextEmoticons(const QTextDocument *ADocument, 
 	int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
 	while (block.isValid() && block.position()<stopPos)
 	{
-		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); it++)
+		for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
 		{
 			QTextFragment fragment = it.fragment();
 			if (fragment.length()>0 && fragment.position()<stopPos)
@@ -252,7 +252,7 @@ QMap<int, QString> Emoticons::findImageEmoticons(const QTextDocument *ADocument,
 	int stopPos = ALength < 0 ? ADocument->characterCount() : AStartPos+ALength;
 	while (block.isValid() && block.position()<stopPos)
 	{
-		for (QTextBlock::iterator it = block.begin(); !it.atEnd() && it.fragment().position()<stopPos; it++)
+		for (QTextBlock::iterator it = block.begin(); !it.atEnd() && it.fragment().position()<stopPos; ++it)
 		{
 			if (it.fragment().charFormat().isImageFormat())
 			{
@@ -338,7 +338,7 @@ int Emoticons::replaceTextToImage(QTextDocument *ADocument, int AStartPos, int A
 	{
 		QTextCursor cursor(ADocument);
 		cursor.beginEditBlock();
-		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); it++)
+		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); ++it)
 		{
 			QUrl url = FUrlByKey.value(it.value());
 			if (!url.isEmpty())
@@ -365,7 +365,7 @@ int Emoticons::replaceImageToText(QTextDocument *ADocument, int AStartPos, int A
 	{
 		QTextCursor cursor(ADocument);
 		cursor.beginEditBlock();
-		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); it++)
+		for (QMap<int,QString>::const_iterator it=emoticons.constBegin(); it!=emoticons.constEnd(); ++it)
 		{
 			cursor.setPosition(it.key()+posOffset);
 			cursor.deleteChar();
@@ -436,7 +436,7 @@ void Emoticons::removeSelectIconMenu(const QString &ASubStorage)
 			delete menu;
 		}
 		else
-			it++;
+			++it;
 	}
 }
 
@@ -465,7 +465,7 @@ void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 		if (qobject_cast<QObject *>((*it)->instance()) == AObject)
 			it = FToolBarsWidgets.erase(it);
 		else
-			it++;
+			++it;
 	}
 }
 

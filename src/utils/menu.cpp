@@ -107,16 +107,12 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 
 			for (int i = 0; !before && i<actionList.count(); ++i)
 			{
-				QAction *qaction = actionList.at(i);
-				if (FActions.key((Action *)qaction)==AGroup)
+				Action *action = qobject_cast<Action *>(actionList.at(i));
+				if (FActions.key(action)==AGroup)
 				{
-					QString curSortString = qaction->text();
+					QString curSortString = action->text();
 					if (sortRole)
-					{
-						Action *action = qobject_cast<Action *>(qaction);
-						if (action)
-							curSortString = action->data(Action::DR_SortString).toString();
-					}
+						curSortString = action->data(Action::DR_SortString).toString();
 					if (QString::localeAwareCompare(curSortString,sortString) > 0)
 						before = actionList.at(i);
 				}

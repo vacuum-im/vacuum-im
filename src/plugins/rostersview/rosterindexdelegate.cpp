@@ -43,7 +43,7 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption, const Q
 
 	QList<LabelItem> labels = itemLabels(AIndex);
 	getLabelsSize(option,labels);
-	for (QList<LabelItem>::const_iterator it = labels.constBegin(); it!=labels.constEnd(); it++)
+	for (QList<LabelItem>::const_iterator it = labels.constBegin(); it!=labels.constEnd(); ++it)
 	{
 		if (it->order >= RLAP_LEFT_CENTER && it->order < RLAP_LEFT_TOP)
 		{
@@ -64,7 +64,7 @@ QSize RosterIndexDelegate::sizeHint(const QStyleOptionViewItem &AOption, const Q
 
 	QList<LabelItem> footers = itemFooters(AIndex);
 	getLabelsSize(option,footers);
-	for (QList<LabelItem>::const_iterator it = footers.constBegin(); it!=footers.constEnd(); it++)
+	for (QList<LabelItem>::const_iterator it = footers.constBegin(); it!=footers.constEnd(); ++it)
 	{
 		middleBottom.rwidth() = qMax(middleBottom.width(),it->size.width());
 		middleBottom.rheight() += it->size.height();
@@ -130,7 +130,7 @@ int RosterIndexDelegate::labelAt(const QPoint &APoint, const QStyleOptionViewIte
 		return RLID_NULL;
 
 	QHash<int,QRect> rectHash = drawIndex(NULL,AOption,AIndex);
-	for (QHash<int,QRect>::const_iterator it = rectHash.constBegin(); it != rectHash.constEnd(); it++)
+	for (QHash<int,QRect>::const_iterator it = rectHash.constBegin(); it != rectHash.constEnd(); ++it)
 		if (it.key()!=RLID_DISPLAY_EDIT && it->contains(APoint))
 			return it.key();
 
@@ -415,7 +415,7 @@ QList<LabelItem> RosterIndexDelegate::itemLabels(const QModelIndex &AIndex) cons
 	QList<LabelItem> labels;
 
 	RostersLabelItems rlItems = AIndex.data(RDR_LABEL_ITEMS).value<RostersLabelItems>();
-	for (RostersLabelItems::const_iterator it = rlItems.constBegin(); it != rlItems.constEnd(); it++)
+	for (RostersLabelItems::const_iterator it = rlItems.constBegin(); it != rlItems.constEnd(); ++it)
 	{
 		LabelItem label;
 		label.id = it.key();
@@ -455,7 +455,7 @@ QList<LabelItem> RosterIndexDelegate::itemFooters(const QModelIndex &AIndex) con
 		footer.flags = 0;
 		footer.value = fit.value().type()==QVariant::Int ? AIndex.data(fit.value().toInt()) : fit.value();
 		footers.append(footer);
-		fit++;
+		++fit;
 	}
 	return footers;
 }
@@ -500,7 +500,7 @@ QSize RosterIndexDelegate::variantSize(const QStyleOptionViewItemV4 &AOption, co
 
 void RosterIndexDelegate::getLabelsSize(const QStyleOptionViewItemV4 &AOption, QList<LabelItem> &ALabels) const
 {
-	for (QList<LabelItem>::iterator it = ALabels.begin(); it != ALabels.end(); it++)
+	for (QList<LabelItem>::iterator it = ALabels.begin(); it != ALabels.end(); ++it)
 		it->size = variantSize(it->id==RLID_FOOTER_TEXT ? indexFooterOptions(AOption) : AOption, it->value);
 }
 

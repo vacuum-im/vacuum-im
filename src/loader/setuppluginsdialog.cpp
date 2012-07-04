@@ -102,7 +102,7 @@ void SetupPluginsDialog::saveSettings()
 			pluginElem.removeAttribute("enabled");
 		else
 			pluginElem.setAttribute("enabled","false");
-		it++;
+		++it;
 	}
 	FPluginManager->setLocale((QLocale::Language)ui.cmbLanguage->itemData(ui.cmbLanguage->currentIndex()).toInt(), (QLocale::Country)ui.cmbCountry->itemData(ui.cmbCountry->currentIndex()).toInt());
 }

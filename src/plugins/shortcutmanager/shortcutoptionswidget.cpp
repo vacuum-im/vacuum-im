@@ -205,7 +205,7 @@ void ShortcutOptionsWidget::onShowConflictsTimerTimeout()
 {
 	FBlockChangesCheck++;
 
-	for (QMap<QStandardItem *, QKeySequence>::const_iterator it=FItemKeys.constBegin(); it!=FItemKeys.constEnd(); it++)
+	for (QMap<QStandardItem *, QKeySequence>::const_iterator it=FItemKeys.constBegin(); it!=FItemKeys.constEnd(); ++it)
 	{
 		bool conflict = false;
 

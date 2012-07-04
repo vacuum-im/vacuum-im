@@ -1175,7 +1175,7 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 		QDomElement noteElem = AChatElem.appendChild(ownerDoc.createElement("note")).toElement();
 		noteElem.setAttribute("utc",DateTime(it.key()).toX85UTC());
 		noteElem.appendChild(ownerDoc.createTextNode(it.value()));
-		it++;
+		++it;
 	}
 }
 

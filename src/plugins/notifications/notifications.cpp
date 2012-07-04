@@ -545,7 +545,7 @@ QString Notifications::contactName(const Jid &AStreamJId, const Jid &AContactJid
 int Notifications::notifyIdByRosterId(int ARosterId) const
 {
 	QMap<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
-	for (; it!=FNotifyRecords.constEnd(); it++)
+	for (; it!=FNotifyRecords.constEnd(); ++it)
 		if (it.value().rosterId == ARosterId)
 			return it.key();
 	return -1;
@@ -554,7 +554,7 @@ int Notifications::notifyIdByRosterId(int ARosterId) const
 int Notifications::notifyIdByTrayId(int ATrayId) const
 {
 	QMap<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
-	for (; it!=FNotifyRecords.constEnd(); it++)
+	for (; it!=FNotifyRecords.constEnd(); ++it)
 		if (it.value().trayId == ATrayId)
 			return it.key();
 	return -1;
@@ -563,7 +563,7 @@ int Notifications::notifyIdByTrayId(int ATrayId) const
 int Notifications::notifyIdByWidget(NotifyWidget *AWidget) const
 {
 	QMap<int,NotifyRecord>::const_iterator it = FNotifyRecords.constBegin();
-	for (; it!=FNotifyRecords.constEnd(); it++)
+	for (; it!=FNotifyRecords.constEnd(); ++it)
 		if (it.value().popupWidget == AWidget)
 			return it.key();
 	return -1;
@@ -576,7 +576,7 @@ bool Notifications::showNotifyByHandler(ushort AKind, int ANotifyId, const INoti
 	{
 		if (it.value()->showNotification(it.key(),AKind,ANotifyId,ANotification))
 			return true;
-		it++;
+		++it;
 	}
 	return false;
 }

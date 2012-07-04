@@ -772,7 +772,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 			else if (noteIt != ABody.notes.constEnd())
 			{
 				showStyledStatus(window,noteIt.value(),false);
-				noteIt++;
+				++noteIt;
 			}
 		}
 

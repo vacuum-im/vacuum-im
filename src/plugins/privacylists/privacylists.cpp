@@ -138,7 +138,7 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 			while (needLoad && it!=FSaveRequests.constEnd())
 			{
 				needLoad = it.value().name != listName;
-				it++;
+				++it;
 			}
 			if (needLoad)
 				loadPrivacyList(AStreamJid,listName);

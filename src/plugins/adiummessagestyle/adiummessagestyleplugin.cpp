@@ -231,7 +231,7 @@ void AdiumMessageStylePlugin::onClearEmptyStyles()
 			delete style;
 		}
 		else
-			it++;
+			++it;
 	}
 }
 

@@ -790,7 +790,7 @@ void Avatars::onOptionsOpened()
 		if (!hasAvatar(it.value()))
 			it = FCustomPictures.erase(it);
 		else
-			it++;
+			++it;
 	}
 
 	onOptionsChanged(Options::node(OPV_AVATARS_SHOW));

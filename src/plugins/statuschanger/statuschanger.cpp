@@ -274,7 +274,7 @@ Menu *StatusChanger::streamMenu(const Jid &AStreamJid) const
 	{
 		if (it.key()->streamJid() == AStreamJid)
 			return it.value();
-		it++;
+		++it;
 	}
 	return NULL;
 }
@@ -297,7 +297,7 @@ QList<Jid> StatusChanger::statusStreams(int AStatusId) const
 	{
 		if (it.value() == AStatusId)
 			streams.append(it.key()->streamJid());
-		it++;
+		++it;
 	}
 	return streams;
 }
@@ -309,7 +309,7 @@ int StatusChanger::streamStatus(const Jid &AStreamJid) const
 	{
 		if (it.key()->streamJid() == AStreamJid)
 			return it.value();
-		it++;
+		++it;
 	}
 	return !AStreamJid.isValid() ? mainStatus() : STATUS_NULL_ID;
 }
@@ -335,7 +335,7 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 			setMainStatusId(AStatusId);
 		}
 
-		for (QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin(); it!=FCurrentStatus.constEnd(); it++)
+		for (QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin(); it!=FCurrentStatus.constEnd(); ++it)
 		{
 			IPresence *presence = it.key();
 			int newStreamStatusId = AStatusId;
@@ -448,7 +448,7 @@ QList<int> StatusChanger::activeStatusItems() const
 QList<int> StatusChanger::statusByShow(int AShow) const
 {
 	QList<int> statuses;
-	for (QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin(); it!=FStatusItems.constEnd(); it++)
+	for (QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin(); it!=FStatusItems.constEnd(); ++it)
 	{
 		if (it.key()>STATUS_NULL_ID && it->show==AShow)
 			statuses.append(it->code);
@@ -458,7 +458,7 @@ QList<int> StatusChanger::statusByShow(int AShow) const
 
 int StatusChanger::statusByName(const QString &AName) const
 {
-	for (QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin(); it!=FStatusItems.constEnd(); it++)
+	for (QMap<int, StatusItem>::const_iterator it = FStatusItems.constBegin(); it!=FStatusItems.constEnd(); ++it)
 	{
 		if (it->name.toLower() == AName.toLower())
 			return it->code;
@@ -688,7 +688,7 @@ void StatusChanger::createStatusActions(int AStatusId)
 	int group = AStatusId > STATUS_MAX_STANDART_ID ? AG_SCSM_STATUSCHANGER_CUSTOM_STATUS : AG_SCSM_STATUSCHANGER_DEFAULT_STATUS;
 
 	FMainMenu->addAction(createStatusAction(AStatusId,Jid::null,FMainMenu),group,true);
-	for (QMap<IPresence *, Menu *>::const_iterator it = FStreamMenu.constBegin(); it!=FStreamMenu.constEnd(); it++)
+	for (QMap<IPresence *, Menu *>::const_iterator it = FStreamMenu.constBegin(); it!=FStreamMenu.constEnd(); ++it)
 		it.value()->addAction(createStatusAction(AStatusId,it.key()->streamJid(),it.value()),group,true);
 }
 
@@ -729,7 +729,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 				sMenu->addAction(createStatusAction(it.key(),streamJid,sMenu),AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
 			else if (it.key() > STATUS_NULL_ID)
 				sMenu->addAction(createStatusAction(it.key(),streamJid,sMenu),AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
-			it++;
+			++it;
 		}
 
 		Action *action = createStatusAction(STATUS_MAIN_ID, streamJid, sMenu);
@@ -780,7 +780,7 @@ IPresence *StatusChanger::visibleMainStatusPresence() const
 			presence = it.key();
 			statusId = it.value();
 		}
-		it++;
+		++it;
 	}
 
 	return presence;
@@ -819,7 +819,7 @@ void StatusChanger::updateTrayToolTip()
 			if (!trayToolTip.isEmpty())
 				trayToolTip+="\n";
 			trayToolTip += tr("%1 - %2").arg(account->name()).arg(statusItemName(it.value()));
-			it++;
+			++it;
 		}
 		FTrayManager->setToolTip(trayToolTip);
 	}
@@ -901,7 +901,7 @@ void StatusChanger::resendUpdatedStatus(int AStatusId)
 	if (FStatusItems[STATUS_MAIN_ID].code == AStatusId)
 		setMainStatus(AStatusId);
 
-	for (QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin(); it != FCurrentStatus.constEnd(); it++)
+	for (QMap<IPresence *, int>::const_iterator it = FCurrentStatus.constBegin(); it != FCurrentStatus.constEnd(); ++it)
 		if (it.value() == AStatusId)
 			setStreamStatus(it.key()->streamJid(), AStatusId);
 }
@@ -1220,7 +1220,7 @@ void StatusChanger::onReconnectTimer()
 		}
 		else
 		{
-			it++;
+			++it;
 		}
 	}
 }
