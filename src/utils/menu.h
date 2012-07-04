@@ -24,7 +24,7 @@ public:
 	int actionGroup(const Action *AAction) const;
 	QAction *nextGroupSeparator(int AGroup) const;
 	QList<Action *> groupActions(int AGroup = AG_NULL) const;
-	QList<Action *> findActions(const QMultiHash<int, QVariant> AData, bool ASearchInSubMenu = false) const;
+	QList<Action *> findActions(const QMultiHash<int, QVariant> &AData, bool ASearchInSubMenu = false) const;
 	void addAction(Action *AAction, int AGroup = AG_DEFAULT, bool ASort = false);
 	void addMenuActions(const Menu *AMenu, int AGroup = AG_DEFAULT, bool ASort = false);
 	void removeAction(Action *AAction);

@@ -100,7 +100,7 @@ public:
 	virtual bool checkDiscoFeature(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, const QString &AFeature, bool ADefault = true);
 	virtual QList<IDiscoInfo> findDiscoInfo(const Jid &AStreamJid, const IDiscoIdentity &AIdentity, const QStringList &AFeatures, const IDiscoItem &AParent) const;
 	virtual QIcon identityIcon(const QList<IDiscoIdentity> &AIdentity) const;
-	virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid AItemJid, const QString &ANode) const;
+	virtual QIcon serviceIcon(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANode) const;
 	virtual void updateSelfEntityCapabilities();
 	//DiscoHandler
 	virtual void insertDiscoHandler(IDiscoHandler *AHandler);

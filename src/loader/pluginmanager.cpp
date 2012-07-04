@@ -167,7 +167,8 @@ QList<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
 	QList<QUuid> plugins;
 	if (FPluginItems.contains(AUuid))
 	{
-		foreach(QUuid depend, FPluginItems.value(AUuid).info->dependences)
+		QList<QUuid> dependences = FPluginItems.value(AUuid).info->dependences;
+		foreach(QUuid depend, dependences)
 		{
 			if (!deepStack.contains(depend) && FPluginItems.contains(depend))
 			{
@@ -519,11 +520,12 @@ void PluginManager::unloadPlugin(const QUuid &AUuid, const QString &AError)
 	}
 }
 
-bool PluginManager::checkDependences(const QUuid AUuid) const
+bool PluginManager::checkDependences(const QUuid &AUuid) const
 {
 	if (FPluginItems.contains(AUuid))
 	{
-		foreach(QUuid depend, FPluginItems.value(AUuid).info->dependences)
+		QList<QUuid> dependences = FPluginItems.value(AUuid).info->dependences;
+		foreach(QUuid depend, dependences)
 		{
 			if (!FPluginItems.contains(depend))
 			{
@@ -546,7 +548,8 @@ bool PluginManager::checkConflicts(const QUuid AUuid) const
 {
 	if (FPluginItems.contains(AUuid))
 	{
-		foreach (QUuid conflict, FPluginItems.value(AUuid).info->conflicts)
+		QList<QUuid> conflicts = FPluginItems.value(AUuid).info->conflicts;
+		foreach (QUuid conflict, conflicts)
 		{
 			if (!FPluginItems.contains(conflict))
 			{
@@ -555,18 +558,21 @@ bool PluginManager::checkConflicts(const QUuid AUuid) const
 						return false;
 			}
 			else
+			{
 				return false;
+			}
 		}
 	}
 	return true;
 }
 
-QList<QUuid> PluginManager::getConflicts(const QUuid AUuid) const
+QList<QUuid> PluginManager::getConflicts(const QUuid &AUuid) const
 {
 	QSet<QUuid> plugins;
 	if (FPluginItems.contains(AUuid))
 	{
-		foreach (QUuid conflict, FPluginItems.value(AUuid).info->conflicts)
+		QList<QUuid> conflicts = FPluginItems.value(AUuid).info->conflicts;
+		foreach (QUuid conflict, conflicts)
 		{
 			QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
 			while (it!=FPluginItems.constEnd())

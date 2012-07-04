@@ -42,7 +42,7 @@ public:
 	Stanza &setFrom(const QString &AFrom);
 	QString lang() const;
 	Stanza &setLang(const QString &ALang);
-	QDomElement firstElement(const QString &ATagName = QString::null, const QString ANamespace = QString::null) const;
+	QDomElement firstElement(const QString &ATagName = QString::null, const QString &ANamespace = QString::null) const;
 	QDomElement addElement(const QString &ATagName, const QString &ANamespace = QString::null);
 	QDomElement createElement(const QString &ATagName, const QString &ANamespace = QString::null);
 	QDomText createTextNode(const QString &AData);

@@ -150,7 +150,7 @@ Stanza &Stanza::setLang(const QString &ALang)
 	return *this;
 }
 
-QDomElement Stanza::firstElement(const QString &ATagName, const QString ANamespace) const
+QDomElement Stanza::firstElement(const QString &ATagName, const QString &ANamespace) const
 {
 	return findElement(d->FDoc.documentElement(),ATagName,ANamespace);
 }

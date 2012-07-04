@@ -82,7 +82,7 @@ public:
 	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IChatStates
 	virtual int permitStatus(const Jid &AContactJid) const;
-	virtual void setPermitStatus(const Jid AContactJid, int AStatus);
+	virtual void setPermitStatus(const Jid &AContactJid, int AStatus);
 	virtual bool isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual int userChatState(const Jid &AStreamJid, const Jid &AContactJid) const;

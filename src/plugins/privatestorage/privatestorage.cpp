@@ -132,13 +132,13 @@ QDomElement PrivateStorage::getData(const Jid &AStreamJid, const QString &ATagNa
 
 QString PrivateStorage::saveData(const Jid &AStreamJid, const QDomElement &AElement)
 {
-	if (isOpen(AStreamJid) && !AElement.namespaceURI().isEmpty())
+	if (FStanzaProcessor && isOpen(AStreamJid) && !AElement.namespaceURI().isEmpty())
 	{
 		Stanza stanza("iq");
 		stanza.setType("set").setId(FStanzaProcessor->newId());
 		QDomElement elem = stanza.addElement("query",NS_JABBER_PRIVATE);
 		elem.appendChild(AElement.cloneNode(true));
-		if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
 		{
 			FSaveRequests.insert(stanza.id(),insertElement(AStreamJid,AElement));
 			return stanza.id();
@@ -149,13 +149,13 @@ QString PrivateStorage::saveData(const Jid &AStreamJid, const QDomElement &AElem
 
 QString PrivateStorage::loadData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
-	if (isOpen(AStreamJid) && !ATagName.isEmpty() && !ANamespace.isEmpty())
+	if (FStanzaProcessor && isOpen(AStreamJid) && !ATagName.isEmpty() && !ANamespace.isEmpty())
 	{
 		Stanza stanza("iq");
 		stanza.setType("get").setId(FStanzaProcessor->newId());
 		QDomElement elem = stanza.addElement("query",NS_JABBER_PRIVATE);
 		QDomElement dataElem = elem.appendChild(stanza.createElement(ATagName,ANamespace)).toElement();
-		if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
 		{
 			FLoadRequests.insert(stanza.id(),dataElem);
 			return stanza.id();
@@ -166,13 +166,13 @@ QString PrivateStorage::loadData(const Jid &AStreamJid, const QString &ATagName,
 
 QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
-	if (isOpen(AStreamJid) && !ATagName.isEmpty() && !ANamespace.isEmpty())
+	if (FStanzaProcessor && isOpen(AStreamJid) && !ATagName.isEmpty() && !ANamespace.isEmpty())
 	{
 		Stanza stanza("iq");
 		stanza.setType("set").setId(FStanzaProcessor->newId());
 		QDomElement elem = stanza.addElement("query",NS_JABBER_PRIVATE);
 		elem = elem.appendChild(stanza.createElement(ATagName,ANamespace)).toElement();
-		if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
 		{
 			QDomElement dataElem = getData(AStreamJid,ATagName,ANamespace);
 			if (dataElem.isNull())

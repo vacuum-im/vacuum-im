@@ -229,13 +229,13 @@ Qt::Alignment WidgetManager::windowAlignment(const QWidget *AWindow)
 
 bool WidgetManager::alignWindow(QWidget *AWindow, Qt::Alignment AAlign)
 {
-	if (AAlign > 0)
+	if (AWindow!=NULL && AAlign>0)
 	{
 		QRect frameRect = AWindow->frameGeometry();
 		QRect windowRect = AWindow->geometry();
 		if (!frameRect.isEmpty() && !windowRect.isEmpty() && frameRect.contains(windowRect))
 		{
-			QRect availRect = AWindow!=NULL ? QApplication::desktop()->availableGeometry(AWindow) : QApplication::desktop()->availableGeometry();
+			QRect availRect = QApplication::desktop()->availableGeometry(AWindow);
 			QRect rect = alignRect(frameRect,availRect,AAlign);
 			rect.adjust(windowRect.left()-frameRect.left(),windowRect.top()-frameRect.top(),windowRect.right()-frameRect.right(),windowRect.bottom()-frameRect.bottom());
 			AWindow->setGeometry(rect);

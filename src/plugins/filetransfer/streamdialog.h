@@ -17,8 +17,7 @@ class StreamDialog :
 {
 	Q_OBJECT;
 public:
-	StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer,
-	             IFileStream *AFileStream, QWidget *AParent = NULL);
+	StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, IFileStream *AFileStream, QWidget *AParent = NULL);
 	~StreamDialog();
 	IFileStream *stream() const;
 	void setContactName(const QString &AName);
@@ -27,7 +26,7 @@ public:
 signals:
 	void dialogDestroyed();
 protected:
-	bool acceptFileName(const QString AFile);
+	bool acceptFileName(const QString &AFile);
 	QString sizeName(qint64 ABytes) const;
 	inline qint64 minPosition() const;
 	inline qint64 maxPosition() const;

@@ -68,8 +68,8 @@ public:
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount);
 	//IServerMesssageArchive
-	virtual QString loadServerHeaders(const Jid AStreamJid, const IArchiveRequest &ARequest, const IArchiveResultSet &AResult = IArchiveResultSet());
-	virtual QString loadServerCollection(const Jid AStreamJid, const IArchiveHeader &AHeader, const IArchiveResultSet &AResult = IArchiveResultSet());
+	virtual QString loadServerHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest, const IArchiveResultSet &AResult = IArchiveResultSet());
+	virtual QString loadServerCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader, const IArchiveResultSet &AResult = IArchiveResultSet());
 	virtual QString loadServerModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const IArchiveResultSet &AResult = IArchiveResultSet());
 signals:
 	//IArchiveEngine

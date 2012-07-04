@@ -22,7 +22,7 @@ public:
 signals:
 	void dialogDestroyed();
 protected:
-	QString groupSetToString(const QSet<QString> AGroups) const;
+	QString groupSetToString(const QSet<QString> &AGroups) const;
 	QString contactName(const Jid &AContactJid, bool AWithJid = true) const;
 	void appendRequestItems(const QList<IRosterExchangeItem> &AItems);
 private:

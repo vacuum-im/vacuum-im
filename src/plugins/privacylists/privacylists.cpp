@@ -1462,7 +1462,7 @@ void PrivacyLists::onChangeOffRosterBlocked(bool ABlocked)
 	}
 }
 
-void PrivacyLists::onEditListsDialogDestroyed(const Jid AStreamJid)
+void PrivacyLists::onEditListsDialogDestroyed(const Jid &AStreamJid)
 {
 	FEditListsDialogs.remove(AStreamJid);
 }

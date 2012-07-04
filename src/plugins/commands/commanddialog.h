@@ -17,7 +17,7 @@ class CommandDialog :
 	Q_OBJECT;
 	Q_INTERFACES(ICommandClient);
 public:
-	CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid FCommandJid, const QString &ANode, QWidget *AParent = NULL);
+	CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode, QWidget *AParent = NULL);
 	~CommandDialog();
 	//ICommandClient
 	virtual Jid streamJid() const { return FStreamJid; }

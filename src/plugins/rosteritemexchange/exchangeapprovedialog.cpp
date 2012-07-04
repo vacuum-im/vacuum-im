@@ -69,7 +69,7 @@ IRosterExchangeRequest ExchangeApproveDialog::approvedRequest() const
 	return request;
 }
 
-QString ExchangeApproveDialog::groupSetToString(const QSet<QString> AGroups) const
+QString ExchangeApproveDialog::groupSetToString(const QSet<QString> &AGroups) const
 {
 	QStringList groups;
 	foreach(QString group, AGroups)

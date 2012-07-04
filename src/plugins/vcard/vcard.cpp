@@ -200,7 +200,7 @@ void VCard::loadVCardFile()
 	emit vcardUpdated();
 }
 
-QDomElement VCard::createElementByName(const QString AName, const QStringList &ATags, const QStringList &ATagList)
+QDomElement VCard::createElementByName(const QString &AName, const QStringList &ATags, const QStringList &ATagList)
 {
 	QStringList tagTree = AName.split('/',QString::SkipEmptyParts);
 	QDomElement elem = vcardElem().firstChildElement(tagTree.at(0));
@@ -230,7 +230,7 @@ QDomElement VCard::createElementByName(const QString AName, const QStringList &A
 	return elem;
 }
 
-QDomElement VCard::firstElementByName(const QString AName) const
+QDomElement VCard::firstElementByName(const QString &AName) const
 {
 	int index = 0;
 	QDomElement elem = vcardElem();
@@ -240,7 +240,7 @@ QDomElement VCard::firstElementByName(const QString AName) const
 	return elem;
 }
 
-QDomElement VCard::nextElementByName(const QString AName, const QDomElement APrevElem) const
+QDomElement VCard::nextElementByName(const QString &AName, const QDomElement &APrevElem) const
 {
 	QDomElement elem = APrevElem;
 	QStringList tagTree = AName.split('/',QString::SkipEmptyParts);

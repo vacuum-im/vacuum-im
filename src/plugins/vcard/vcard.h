@@ -38,9 +38,9 @@ signals:
 	void vcardError(const QString &AError);
 protected:
 	void loadVCardFile();
-	QDomElement createElementByName(const QString AName, const QStringList &ATags, const QStringList &ATagList);
-	QDomElement firstElementByName(const QString AName) const;
-	QDomElement nextElementByName(const QString AName, const QDomElement APrevElem) const;
+	QDomElement createElementByName(const QString &AName, const QStringList &ATags, const QStringList &ATagList);
+	QDomElement firstElementByName(const QString &AName) const;
+	QDomElement nextElementByName(const QString &AName, const QDomElement &APrevElem) const;
 	QDomElement setTextToElem(QDomElement &AElem, const QString &AText) const;
 protected slots:
 	void onVCardReceived(const Jid &AContactJid);
