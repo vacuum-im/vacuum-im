@@ -36,6 +36,7 @@ v1.2.0
   [-] File transfer could hang up from the cancellation of the transfer by the initiator
   [-] Exchanging of chat state information with contact was disabled after receiving offline stored message from it
   [-] The time of the delayed messages was not defined if it was send by XEP-0203: Delayed Delivery
+  [-] Through the remote control was not possible to set the global status to the account.
 
 
 v1.1.0
