@@ -19,6 +19,7 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
 	FCommandJid = ACommandJid;
 	FNode = ANode;
 	FCurrentForm = NULL;
+	FCanceledByUser = false;
 
 	FPrevButton = new QPushButton(tr("<Back"));
 	FNextButton = new QPushButton(tr("Next>"));
@@ -82,11 +83,20 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
 				ui.dbbButtons->addButton(FCompleteButton,QDialogButtonBox::ActionRole);
 		}
 		else if (AResult.status == COMMAND_STATUS_EXECUTING)
+		{
 			ui.dbbButtons->addButton(FCompleteButton,QDialogButtonBox::AcceptRole);
+		}
 		else if (AResult.status == COMMAND_STATUS_COMPLETED)
+		{
 			ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+		}
 		else if (AResult.status == COMMAND_STATUS_CANCELED)
-			close();
+		{
+			if (!FCanceledByUser)
+				ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
+			else
+				close();
+		}
 
 		return true;
 	}
@@ -152,8 +162,9 @@ void CommandDialog::executeAction(const QString &AAction)
 		resetDialog();
 		if (!FRequestId.isEmpty())
 		{
+			FCanceledByUser = AAction==COMMAND_ACTION_CANCEL;
 			ui.lblInfo->setText(tr("Waiting for host response ..."));
-			ui.dbbButtons->setStandardButtons(AAction!=COMMAND_ACTION_CANCEL ? QDialogButtonBox::Cancel : QDialogButtonBox::Close);
+			ui.dbbButtons->setStandardButtons(!FCanceledByUser ? QDialogButtonBox::Cancel : QDialogButtonBox::Close);
 		}
 		else
 		{

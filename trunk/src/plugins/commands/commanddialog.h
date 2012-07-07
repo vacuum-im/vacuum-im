@@ -49,6 +49,7 @@ private:
 	QString FNode;
 	QString FRequestId;
 	QString FSessionId;
+	bool FCanceledByUser;
 	IDataFormWidget *FCurrentForm;
 };
 
