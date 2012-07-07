@@ -427,7 +427,7 @@ bool RemoteControl::processSetStatus(const ICommandRequest &ARequest)
 	{
 		int index = FDataForms!=NULL ? FDataForms->fieldIndex(FIELD_STATUS, ARequest.form.fields) : -1;
 		int statusId = index>=0 ? ARequest.form.fields.value(index).value.toInt() : STATUS_NULL_ID;
-		if (statusId!=STATUS_NULL_ID && statusId>=(isMainStatus ? STATUS_MAIN_ID : STATUS_NULL_ID) && FStatusChanger->statusItems().contains(statusId))
+		if ((statusId>STATUS_NULL_ID || statusId==STATUS_MAIN_ID) && FStatusChanger->statusItems().contains(statusId))
 		{
 			if (isMainStatus)
 				FStatusChanger->setMainStatus(statusId);
