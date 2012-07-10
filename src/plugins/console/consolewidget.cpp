@@ -4,6 +4,9 @@
 #include <QLineEdit>
 #include <QInputDialog>
 
+#define MAX_HILIGHT_ITEMS            10
+#define TEXT_SEARCH_TIMEOUT          500
+
 ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
@@ -12,12 +15,35 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
 	FXmppStreams = NULL;
 	FStanzaProcessor = NULL;
+	
+	FSearchMoveCursor = false;
 
 	ui.cmbStreamJid->addItem(tr("<All Streams>"));
 	initialize(APluginManager);
 
 	if (!Options::isNull())
 		onOptionsOpened();
+
+	ui.cmbCondition->view()->setTextElideMode(Qt::ElideNone);
+
+	QPalette palette = ui.tbrConsole->palette();
+	palette.setColor(QPalette::Inactive,QPalette::Highlight,palette.color(QPalette::Active,QPalette::Highlight));
+	palette.setColor(QPalette::Inactive,QPalette::HighlightedText,palette.color(QPalette::Active,QPalette::HighlightedText));
+	ui.tbrConsole->setPalette(palette);
+
+	FTextSearchTimer.setSingleShot(true);
+	connect(&FTextSearchTimer,SIGNAL(timeout()),SLOT(onTextSearchTimerTimeout()));
+
+	FTextHilightTimer.setSingleShot(true);
+	connect(&FTextHilightTimer,SIGNAL(timeout()),SLOT(onTextHilightTimerTimeout()));
+	connect(ui.tbrConsole,SIGNAL(visiblePositionBoundaryChanged()),SLOT(onTextVisiblePositionBoundaryChanged()));
+
+	ui.tlbTextSearchNext->setIcon(style()->standardIcon(QStyle::SP_ArrowDown, NULL, this));
+	ui.tlbTextSearchPrev->setIcon(style()->standardIcon(QStyle::SP_ArrowUp, NULL, this));
+	connect(ui.tlbTextSearchNext,SIGNAL(clicked()),SLOT(onTextSearchNextClicked()));
+	connect(ui.tlbTextSearchPrev,SIGNAL(clicked()),SLOT(onTextSearchPreviousClicked()));
+	connect(ui.lneTextSearch,SIGNAL(returnPressed()),SLOT(onTextSearchNextClicked()));
+	connect(ui.lneTextSearch,SIGNAL(textChanged(const QString &)),SLOT(onTextSearchTextChanged(const QString &)));
 
 	connect(ui.tlbAddCondition,SIGNAL(clicked()),SLOT(onAddConditionClicked()));
 	connect(ui.tlbRemoveCondition,SIGNAL(clicked()),SLOT(onRemoveConditionClicked()));
@@ -29,8 +55,9 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 	connect(ui.cmbContext,SIGNAL(currentIndexChanged(int)),SLOT(onContextChanged(int)));
 
 	connect(ui.tlbSendXML,SIGNAL(clicked()),SLOT(onSendXMLClicked()));
-	connect(ui.tlbClearConsole,SIGNAL(clicked()),ui.tedConsole,SLOT(clear()));
-	connect(ui.chbWordWrap,SIGNAL(stateChanged(int)),SLOT(onWordWrapStateChanged(int)));
+	connect(ui.tlbClearConsole,SIGNAL(clicked()),ui.tbrConsole,SLOT(clear()));
+	connect(ui.tlbClearConsole,SIGNAL(clicked()),SLOT(onTextSearchTimerTimeout()));
+	connect(ui.chbWordWrap,SIGNAL(toggled(bool)),SLOT(onWordWrapButtonToggled(bool)));
 }
 
 ConsoleWidget::~ConsoleWidget()
@@ -98,13 +125,14 @@ void ConsoleWidget::loadContext(const QUuid &AContextId)
 	if (streamJid.isEmpty())
 		ui.cmbStreamJid->setCurrentIndex(0);
 	else
-		ui.cmbStreamJid->setCurrentIndex(ui.cmbStreamJid->findText(streamJid));
+		ui.cmbStreamJid->setCurrentIndex(ui.cmbStreamJid->findData(streamJid));
 
 	ui.ltwConditions->clear();
 	ui.ltwConditions->addItems(node.value("conditions").toStringList());
 
 	ui.chbWordWrap->setChecked(node.value("word-wrap").toBool());
 	ui.chbHilightXML->setCheckState((Qt::CheckState)node.value("highlight-xml").toInt());
+	onWordWrapButtonToggled(ui.chbWordWrap->isChecked());
 
 	if (!restoreGeometry(Options::fileValue("console.context.window-geometry",AContextId.toString()).toByteArray()))
 		setGeometry(WidgetManager::alignGeometry(QSize(640,640),this));
@@ -117,8 +145,7 @@ void ConsoleWidget::loadContext(const QUuid &AContextId)
 void ConsoleWidget::saveContext(const QUuid &AContextId)
 {
 	OptionsNode node = Options::node(OPV_CONSOLE_CONTEXT_ITEM, AContextId.toString());
-
-	node.setValue(ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->currentText() : QString::null,"streamjid");
+	node.setValue(ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString() : QString::null,"streamjid");
 
 	QStringList conditions;
 	for (int i=0; i<ui.ltwConditions->count(); i++)
@@ -167,7 +194,7 @@ void ConsoleWidget::hidePasswords(QString &AXml) const
 
 void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AElem, bool ASended)
 {
-	Jid streamJid = ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemText(ui.cmbStreamJid->currentIndex()) : QString::null;
+	Jid streamJid = ui.cmbStreamJid->currentIndex()>0 ? ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString() : QString::null;
 	if (streamJid.isEmpty() || streamJid==AXmppStream->streamJid())
 	{
 		Stanza stanza(AElem);
@@ -183,7 +210,7 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 			int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
 			FTimePoint = QTime::currentTime();
 			QString caption = (ASended ? sended : received).arg(Qt::escape(AXmppStream->streamJid().uFull())).arg(FTimePoint.toString()).arg(delta);
-			ui.tedConsole->append(caption);
+			ui.tbrConsole->append(caption);
 
 			QString xml = stanza.toString(2);
 			hidePasswords(xml);
@@ -192,7 +219,9 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 				colorXml(xml);
 			else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
 				colorXml(xml);
-			ui.tedConsole->append(xml);
+			ui.tbrConsole->append(xml);
+
+			FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 		}
 	}
 }
@@ -222,20 +251,20 @@ void ConsoleWidget::onSendXMLClicked()
 		Stanza stanza(doc.documentElement());
 		if (stanza.isValid())
 		{
-			ui.tedConsole->append("<b>"+tr("Start sending user stanza...")+"</b><br>");
+			ui.tbrConsole->append("<b>"+tr("Start sending user stanza...")+"</b><br>");
 			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-				if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->currentText())
+				if (ui.cmbStreamJid->currentIndex()==0 || stream->streamJid()==ui.cmbStreamJid->itemData(ui.cmbStreamJid->currentIndex()).toString())
 					stream->sendStanza(stanza);
-			ui.tedConsole->append("<b>"+tr("User stanza sent.")+"</b><br>");
+			ui.tbrConsole->append("<b>"+tr("User stanza sent.")+"</b><br>");
 		}
 		else
 		{
-			ui.tedConsole->append("<b>"+tr("Stanza is not well formed.")+"</b><br>");
+			ui.tbrConsole->append("<b>"+tr("Stanza is not well formed.")+"</b><br>");
 		}
 	}
 	else
 	{
-		ui.tedConsole->append("<b>"+tr("XML is not well formed.")+"</b><br>");
+		ui.tbrConsole->append("<b>"+tr("XML is not well formed.")+"</b><br>");
 	}
 }
 
@@ -268,30 +297,135 @@ void ConsoleWidget::onContextChanged(int AIndex)
 	loadContext(FContext);
 }
 
-void ConsoleWidget::onWordWrapStateChanged(int AState)
+void ConsoleWidget::onWordWrapButtonToggled(bool AChecked)
 {
-	ui.tedConsole->setLineWrapMode(AState == Qt::Checked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+	ui.tbrConsole->setLineWrapMode(AChecked ? QTextEdit::WidgetWidth : QTextEdit::NoWrap);
+}
+
+void ConsoleWidget::onTextHilightTimerTimeout()
+{
+	if (FSearchResults.count() > MAX_HILIGHT_ITEMS)
+	{
+		QList<QTextEdit::ExtraSelection> selections;
+		QPair<int,int> boundary = ui.tbrConsole->visiblePositionBoundary();
+		for (QMap<int, QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(boundary.first); it!=FSearchResults.constEnd() && it.key()<boundary.second; ++it)
+			selections.append(it.value());
+		ui.tbrConsole->setExtraSelections(selections);
+	}
+	else
+	{
+		ui.tbrConsole->setExtraSelections(FSearchResults.values());
+	}
+}
+
+void ConsoleWidget::onTextVisiblePositionBoundaryChanged()
+{
+	FTextHilightTimer.start(0);
+}
+
+void ConsoleWidget::onTextSearchTimerTimeout()
+{
+	FSearchResults.clear();
+	if (!ui.lneTextSearch->text().isEmpty())
+	{
+		QTextCursor cursor(ui.tbrConsole->document());
+		do {
+			cursor = ui.tbrConsole->document()->find(ui.lneTextSearch->text(),cursor,0);
+			if (!cursor.isNull())
+			{
+				QTextEdit::ExtraSelection selection;
+				selection.cursor = cursor;
+				selection.format = cursor.charFormat();
+				selection.format.setBackground(Qt::yellow);
+				FSearchResults.insert(cursor.position(),selection);
+				cursor.clearSelection();
+			}
+		} while (!cursor.isNull());
+	}
+
+	if (!FSearchResults.isEmpty())
+	{
+		if (FSearchMoveCursor)
+		{
+			ui.tbrConsole->setTextCursor(FSearchResults.lowerBound(0)->cursor);
+			ui.tbrConsole->ensureCursorVisible();
+		}
+	}
+	else
+	{
+		QTextCursor cursor = ui.tbrConsole->textCursor();
+		if (cursor.hasSelection())
+		{
+			cursor.clearSelection();
+			ui.tbrConsole->setTextCursor(cursor);
+		}
+	}
+	FSearchMoveCursor = false;
+
+	if (!ui.lneTextSearch->text().isEmpty() && FSearchResults.isEmpty())
+	{
+		QPalette palette = this->palette();
+		palette.setColor(QPalette::Active,QPalette::Base,QColor("orangered"));
+		palette.setColor(QPalette::Active,QPalette::Text,Qt::white);
+		ui.lneTextSearch->setPalette(palette);
+	}
+	else
+	{
+		ui.lneTextSearch->setPalette(QPalette());
+	}
+
+	ui.tlbTextSearchNext->setEnabled(!FSearchResults.isEmpty());
+	ui.tlbTextSearchPrev->setEnabled(!FSearchResults.isEmpty());
+
+	FTextHilightTimer.start(0);
+}
+
+void ConsoleWidget::onTextSearchNextClicked()
+{
+	QMap<int,QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.upperBound(ui.tbrConsole->textCursor().position());
+	if (it != FSearchResults.constEnd())
+	{
+		ui.tbrConsole->setTextCursor(it->cursor);
+		ui.tbrConsole->ensureCursorVisible();
+	}
+}
+
+void ConsoleWidget::onTextSearchPreviousClicked()
+{
+	QMap<int,QTextEdit::ExtraSelection>::const_iterator it = FSearchResults.lowerBound(ui.tbrConsole->textCursor().position());
+	if (--it != FSearchResults.constEnd())
+	{
+		ui.tbrConsole->setTextCursor(it->cursor);
+		ui.tbrConsole->ensureCursorVisible();
+	}
+}
+
+void ConsoleWidget::onTextSearchTextChanged(const QString &AText)
+{
+	Q_UNUSED(AText);
+	FSearchMoveCursor = true;
+	FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 }
 
 void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)
 {
-	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull());
+	ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull(),AXmppStream->streamJid().pFull());
 	AXmppStream->insertXmppStanzaHandler(XSHO_CONSOLE,this);
 }
 
 void ConsoleWidget::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
 {
-	int index = ui.cmbStreamJid->findText(ABefore.uFull());
+	int index = ui.cmbStreamJid->findData(ABefore.pFull());
 	if (index >= 0)
 	{
-		ui.cmbStreamJid->removeItem(index);
-		ui.cmbStreamJid->addItem(AXmppStream->streamJid().uFull());
+		ui.cmbStreamJid->setItemText(index,AXmppStream->streamJid().uFull());
+		ui.cmbStreamJid->setItemData(index,AXmppStream->streamJid().pFull());
 	}
 }
 
 void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
 {
-	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findText(AXmppStream->streamJid().uFull()));
+	ui.cmbStreamJid->removeItem(ui.cmbStreamJid->findData(AXmppStream->streamJid().pFull()));
 	AXmppStream->removeXmppStanzaHandler(XSHO_CONSOLE,this);
 }
 
