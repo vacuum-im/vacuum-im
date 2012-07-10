@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>652</width>
-    <height>555</height>
+    <width>718</width>
+    <height>562</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,6 +73,9 @@
          </property>
          <property name="insertPolicy">
           <enum>QComboBox::InsertAlphabetically</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QComboBox::AdjustToContents</enum>
          </property>
         </widget>
        </item>
@@ -193,7 +196,7 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QTextEdit" name="tedConsole">
+         <widget class="AnimatedTextBrowser" name="tbrConsole">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -202,9 +205,6 @@
           </property>
           <property name="lineWrapMode">
            <enum>QTextEdit::NoWrap</enum>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
           </property>
          </widget>
          <widget class="QTextEdit" name="tedSendXML">
@@ -226,18 +226,55 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QCheckBox" name="chbWordWrap">
-           <property name="text">
-            <string>Word wrap</string>
+          <widget class="QLineEdit" name="lneTextSearch">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="chbHilightXML">
-           <property name="text">
-            <string>Highlight XML</string>
+          <widget class="QToolButton" name="tlbTextSearchNext">
+           <property name="enabled">
+            <bool>false</bool>
            </property>
-           <property name="tristate">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="autoRepeat">
+            <bool>true</bool>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="tlbTextSearchPrev">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="autoRepeat">
+            <bool>true</bool>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextBesideIcon</enum>
+           </property>
+           <property name="autoRaise">
             <bool>true</bool>
            </property>
           </widget>
@@ -254,6 +291,23 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chbWordWrap">
+           <property name="text">
+            <string>Word wrap</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chbHilightXML">
+           <property name="text">
+            <string>Highlight XML</string>
+           </property>
+           <property name="tristate">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QToolButton" name="tlbSendXML">
@@ -278,6 +332,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>AnimatedTextBrowser</class>
+   <extends>QTextBrowser</extends>
+   <header location="global">utils/animatedtextbrowser.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

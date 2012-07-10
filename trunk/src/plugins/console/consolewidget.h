@@ -40,7 +40,14 @@ protected slots:
 	void onAddContextClicked();
 	void onRemoveContextClicked();
 	void onContextChanged(int AIndex);
-	void onWordWrapStateChanged(int AState);
+	void onWordWrapButtonToggled(bool AChecked);
+protected slots:
+	void onTextHilightTimerTimeout();
+	void onTextVisiblePositionBoundaryChanged();
+	void onTextSearchTimerTimeout();
+	void onTextSearchNextClicked();
+	void onTextSearchPreviousClicked();
+	void onTextSearchTextChanged(const QString &AText);
 protected slots:
 	void onStreamCreated(IXmppStream *AXmppStream);
 	void onStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
@@ -56,6 +63,11 @@ private:
 private:
 	QUuid FContext;
 	QTime FTimePoint;
+private:
+	bool FSearchMoveCursor;
+	QTimer FTextSearchTimer;
+	QTimer FTextHilightTimer;
+	QMap<int,QTextEdit::ExtraSelection> FSearchResults;
 };
 
 #endif // CONSOLEWIDGET_H
