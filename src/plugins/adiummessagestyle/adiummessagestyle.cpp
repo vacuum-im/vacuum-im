@@ -506,7 +506,7 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 	if (!QFile::exists(avatar))
 	{
 		avatar = isDirectionIn ? "Incoming/buddy_icon.png" : "Outgoing/buddy_icon.png";
-		if (!isDirectionIn && !QFile::exists(avatar))
+		if (!isDirectionIn && !QFile::exists(FResourcePath+"/"+avatar))
 			avatar = "Incoming/buddy_icon.png";
 	}
 	AHtml.replace("%userIconPath%",avatar);

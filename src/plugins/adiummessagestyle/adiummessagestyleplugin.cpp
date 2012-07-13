@@ -188,7 +188,7 @@ void AdiumMessageStylePlugin::updateAvailStyles()
 			if (!FStylePaths.values().contains(dir.absolutePath()))
 			{
 				bool valid = QFile::exists(dir.absoluteFilePath("Contents/Info.plist"));
-				valid = valid &&  QFile::exists(dir.absoluteFilePath("Contents/Resources/Incoming/Content.html"));
+				valid = valid && (QFile::exists(dir.absoluteFilePath("Contents/Resources/Incoming/Content.html")) || QFile::exists(dir.absoluteFilePath("Contents/Resources/Content.html")));
 				if (valid)
 				{
 					QMap<QString, QVariant> info = AdiumMessageStyle::styleInfo(dir.absolutePath());
