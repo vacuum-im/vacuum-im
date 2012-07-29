@@ -1597,9 +1597,21 @@ void MultiUserChatWindow::showEvent(QShowEvent *AEvent)
 		FShownDetached = false;
 		Shortcuts::removeWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
+
 	QMainWindow::showEvent(AEvent);
+	
+	QList<int> splitterSizes = ui.sprHSplitter->sizes();
+	int usersListIndex = ui.sprHSplitter->indexOf(ui.ltvUsers);
+	if (FUsersListWidth>0 && usersListIndex>0 && splitterSizes.value(usersListIndex)!=FUsersListWidth)
+	{
+		splitterSizes[0] += splitterSizes.value(usersListIndex) - FUsersListWidth;
+		splitterSizes[usersListIndex] = FUsersListWidth;
+		ui.sprHSplitter->setSizes(splitterSizes);
+	}
+	
 	if (FEditWidget)
 		FEditWidget->textEdit()->setFocus();
+	
 	if (isActiveTabPage())
 		emit tabPageActivated();
 }
@@ -1655,20 +1667,19 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 	{
 		if (AEvent->type() == QEvent::Resize)
 		{
-			int usersIndex = ui.sprHSplitter->indexOf(ui.ltvUsers);
+			int usersListIndex = ui.sprHSplitter->indexOf(ui.ltvUsers);
 			QResizeEvent *resizeEvent = static_cast<QResizeEvent *>(AEvent);
-			if (resizeEvent && FUsersListWidth>0 && usersIndex>0 && resizeEvent->oldSize().width()>0)
+			if (resizeEvent && FUsersListWidth>0 && usersListIndex>0 && resizeEvent->oldSize().width()>0)
 			{
 				double k = (double)resizeEvent->size().width() / resizeEvent->oldSize().width();
-				QList<int> sizes = ui.sprHSplitter->sizes();
-				for (int i=0; i<sizes.count(); i++)
-					sizes[i] = qRound(sizes[i]*k);
-				int delta = sizes.value(usersIndex) - FUsersListWidth;
-				if (delta != 0)
+				QList<int> splitterSizes = ui.sprHSplitter->sizes();
+				for (int i=0; i<splitterSizes.count(); i++)
+					splitterSizes[i] = qRound(splitterSizes[i]*k);
+				if (splitterSizes.value(usersListIndex) != FUsersListWidth)
 				{
-					sizes[0] += delta;
-					sizes[usersIndex] -= delta;
-					ui.sprHSplitter->setSizes(sizes);
+					splitterSizes[0] += splitterSizes.value(usersListIndex) - FUsersListWidth;
+					splitterSizes[usersListIndex] = FUsersListWidth;
+					ui.sprHSplitter->setSizes(splitterSizes);
 				}
 			}
 		}
