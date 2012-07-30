@@ -77,7 +77,7 @@
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
-        <translation>Підтримує XMPP ping</translation>
+        <translation>Підтримує обмін ping-ами на рівні програми через XMPP-з&apos;єднання</translation>
     </message>
 </context>
 <context>

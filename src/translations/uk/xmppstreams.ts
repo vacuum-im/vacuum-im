@@ -17,11 +17,11 @@
     </message>
     <message>
         <source>XMPP connection timed out</source>
-        <translation>Перевищений час установки XMPP з&apos;єднання</translation>
+        <translation>Перевищений час встановлення з&apos;єднання XMPP</translation>
     </message>
     <message>
         <source>Failed to start connection</source>
-        <translation>Не вдалось запустити з&apos;єднання</translation>
+        <translation>Не вдалося запустити з&apos;єднання</translation>
     </message>
     <message>
         <source>Connection closed unexpectedly</source>
@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>XMPP stream destroyed</source>
-        <translation>XMPP потік видалено</translation>
+        <translation>XMPP-потік видалено</translation>
     </message>
 </context>
 <context>

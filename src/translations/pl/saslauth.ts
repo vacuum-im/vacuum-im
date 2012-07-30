@@ -31,47 +31,47 @@
     </message>
     <message>
         <source>Authorization aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Autoryzacja odwołana</translation>
     </message>
     <message>
         <source>Account disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Konto nieaktywne</translation>
     </message>
     <message>
         <source>Credentials expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Poświadczenia wygasły</translation>
     </message>
     <message>
         <source>Encryption required</source>
-        <translation type="unfinished"></translation>
+        <translation>Wymagane szyfrowanie</translation>
     </message>
     <message>
         <source>Incorrect encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędne kodowanie</translation>
     </message>
     <message>
         <source>Invalid authorization id</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowy identyfikator autoryzacji</translation>
     </message>
     <message>
         <source>Invalid mechanism</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieprawidłowy mechanizm</translation>
     </message>
     <message>
         <source>Malformed request</source>
-        <translation type="unfinished"></translation>
+        <translation>Błędne żądanie</translation>
     </message>
     <message>
         <source>Mechanism is too weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Mechanizm jest zbyt słaby</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieudana autoryzacja</translation>
     </message>
     <message>
         <source>Temporary authentication failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Tymczasowy błąd autoryzacji</translation>
     </message>
 </context>
 </TS>

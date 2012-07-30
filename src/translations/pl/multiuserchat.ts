@@ -980,11 +980,11 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>Loading history...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ładowanie historii...</translation>
     </message>
     <message>
         <source>Failed to load history: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie udało się załadować historii: %1</translation>
     </message>
 </context>
 </TS>

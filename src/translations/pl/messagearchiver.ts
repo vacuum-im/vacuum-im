@@ -5,83 +5,83 @@
     <name>ArchiveDelegate</name>
     <message numerus="yes">
         <source>%n year(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n rok</numerusform>
+            <numerusform>%n lata</numerusform>
+            <numerusform>%n lat</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n month(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n miesiąc</numerusform>
+            <numerusform>%n miesiące</numerusform>
+            <numerusform>%n miesięcy</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n dzień</numerusform>
+            <numerusform>%n dni</numerusform>
+            <numerusform>%n dni</numerusform>
         </translation>
     </message>
     <message>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Nigdy</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished"></translation>
+        <translation>Tak</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished"></translation>
+        <translation>Nie</translation>
     </message>
     <message>
         <source>Prefer</source>
-        <translation type="unfinished"></translation>
+        <translation>Preferuję</translation>
     </message>
     <message>
         <source>Allow</source>
-        <translation type="unfinished"></translation>
+        <translation>Zezwolić</translation>
     </message>
     <message>
         <source>Forbid</source>
-        <translation type="unfinished"></translation>
+        <translation>Zabronić</translation>
     </message>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Nieznany</translation>
     </message>
     <message>
         <source>Approve</source>
-        <translation type="unfinished"></translation>
+        <translation>Zatwierdzaj</translation>
     </message>
     <message>
         <source>Oppose</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprzeciwiaj się</translation>
     </message>
     <message>
         <source>Require</source>
-        <translation type="unfinished"></translation>
+        <translation>Wymagaj</translation>
     </message>
     <message>
         <source>Nothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Nic</translation>
     </message>
     <message>
         <source>Body</source>
-        <translation type="unfinished"></translation>
+        <translation>Ciało</translation>
     </message>
     <message>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Wiadomość</translation>
     </message>
     <message>
         <source>Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Strumień</translation>
     </message>
 </context>
 <context>
@@ -274,27 +274,27 @@
     <name>ArchiveViewWindow</name>
     <message>
         <source>Search in history</source>
-        <translation type="unfinished"></translation>
+        <translation>Szukanie w historii</translation>
     </message>
     <message>
         <source>Conversation history - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Historia wiadomości - %1</translation>
     </message>
     <message>
         <source>Conversation history with %1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Historia rozmów z %1 - %2</translation>
     </message>
     <message>
         <source>Conversation headers loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Nagłówki wiadomości załadowane</translation>
     </message>
     <message>
         <source>Loading conversation headers...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ładowanie nagłówków wiadomości</translation>
     </message>
     <message>
         <source>Failed to load conversation headers: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd podczas ładowania nagłówków wiadomości: %1</translation>
     </message>
     <message>
         <source>Select contact or single conversation</source>

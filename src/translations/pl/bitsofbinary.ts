@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Failed to read cached data</source>
-        <translation type="unfinished"></translation>
+        <translation>Błąd odczytu pamięci podręcznej</translation>
     </message>
 </context>
 </TS>

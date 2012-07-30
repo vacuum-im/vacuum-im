@@ -49,7 +49,7 @@
     </message>
     <message>
         <source>Enable animation in notification pop-up</source>
-        <translation type="unfinished"></translation>
+        <translation>Zezwól na animację w okienku pop-up</translation>
     </message>
 </context>
 <context>
