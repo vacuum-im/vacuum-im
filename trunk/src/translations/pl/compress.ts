@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Enable data compression transferred between client and server</source>
-        <translation type="unfinished"></translation>
+        <translation>Zezwól na kompresję danych w połączeniu klienta z serwerem</translation>
     </message>
 </context>
 <context>

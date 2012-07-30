@@ -82,7 +82,7 @@
     </message>
     <message>
         <source>Enable animation (may be slow)</source>
-        <translation type="unfinished"></translation>
+        <translation>Zezwól na animacje (może spowolnić)</translation>
     </message>
 </context>
 </TS>

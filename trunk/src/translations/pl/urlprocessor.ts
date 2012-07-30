@@ -5,11 +5,11 @@
     <name>UrlProcessor</name>
     <message>
         <source>URL processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Menedżer zapytań URL</translation>
     </message>
     <message>
         <source>Allows other plugins to load data from custom types of URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Pozwala innym wtyczkom na ładowanie danych z niestandardowych typów adresów URL</translation>
     </message>
 </context>
 </TS>
