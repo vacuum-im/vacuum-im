@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sounddef>
+  <file>
+    <key>normalmessagehandlerMessage</key>
+    <object mime='sound/wav'>message.wav</object>
+  </file>
+</sounddef>

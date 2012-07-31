@@ -1,0 +1,34 @@
+--- clientinfo.cpp	2012-05-20 13:45:56.000000000 +0300
++++ clientinfo-.cpp	2012-05-20 13:32:10.000000000 +0300
+@@ -2,6 +2,8 @@
+ 
+ #include <QDir>
+ #include <QProcess>
++#include <QFile>
++#include <QIODevice>
+ #include <QFileInfo>
+ #include <QTextStream>
+ 
+@@ -432,7 +434,21 @@
+ 				osver = osver.trimmed();
+ 			}
+ 		}
+-
++
++// Slackware detect
++		if (osver.isEmpty())
++		{
++			QFile slackwarever("/etc/slackware-version");
++			if (!slackwarever.open(QIODevice::ReadOnly | QIODevice::Text));
++			QTextStream slackin(&slackwarever);
++			while (!slackin.atEnd())
++			{
++				QString slackline = slackin.readLine();
++				QString slackprocess_line(slackline);
++				osver.append(slackprocess_line);
++			}
++		}
++
+ 		if (osver.isEmpty())
+ 		{
+ 			utsname buf;

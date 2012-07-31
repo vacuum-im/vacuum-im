@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>optionsDialog</key>
+    <object mime="image/png">optionsdialog.png</object>
+  </icon>
+  <icon>
+    <key>optionsProfile</key>
+    <object mime="image/png">soptionsprofile.png</object>
+  </icon>
+  <icon>
+    <key>optionsProfiles</key>
+    <object mime="image/png">optionsprofiles.png</object>
+  </icon>
+  <icon>
+    <key>optionsEditProfiles</key>
+    <object mime="image/png">optionseditprofiles.png</object>
+  </icon>
+</icondef>
