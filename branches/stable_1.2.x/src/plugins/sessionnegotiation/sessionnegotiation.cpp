@@ -1014,7 +1014,7 @@ QStringList SessionNegotiation::unsubmitedFields(const IDataForm &ARequest, cons
 	{
 		int index = FDataForms->fieldIndex(rField.var,ASubmit.fields);
 		IDataField sField = index>=0 ? ASubmit.fields.at(index) : IDataField();
-		if ((rField.required || !ARequired) && FDataForms->isFieldEmpty(ASubmit.fields.at(index)))
+		if ((rField.required || !ARequired) && FDataForms->isFieldEmpty(sField))
 			fields.append(rField.var);
 	}
 	return fields;
