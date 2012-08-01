@@ -6,6 +6,10 @@ LEGEND
   [-] Bug fix
 
 
+------
+  [-] The application may fail in some cases after unsuccessful Stanza-session initialization
+
+
 v1.2.0
 ------
   [!] Added new plugin for notifications about birthdays
