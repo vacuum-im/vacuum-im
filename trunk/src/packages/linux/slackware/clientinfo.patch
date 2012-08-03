@@ -1,5 +1,7 @@
---- clientinfo.cpp	2012-05-20 13:45:56.000000000 +0300
-+++ clientinfo-.cpp	2012-05-20 13:32:10.000000000 +0300
+Index: src/plugins/clientinfo/clientinfo.cpp
+===================================================================
+--- src/plugins/clientinfo/clientinfo.cpp	(revision 1862)
++++ src/plugins/clientinfo/clientinfo.cpp	(working copy)
 @@ -2,6 +2,8 @@
  
  #include <QDir>
@@ -9,7 +11,7 @@
  #include <QFileInfo>
  #include <QTextStream>
  
-@@ -432,7 +434,21 @@
+@@ -433,7 +435,21 @@
  				osver = osver.trimmed();
  			}
  		}

@@ -31,7 +31,7 @@ then
 fi
 
 # Patch for version OS
-patch src/plugins/clientinfo/clientinfo.cpp < src/packages/linux/slackware/clientinfo.patch
+patch -p0 < src/packages/linux/slackware/clientinfo.patch
 
 CWD="$(pwd)"
 srcdir="$CWD"
