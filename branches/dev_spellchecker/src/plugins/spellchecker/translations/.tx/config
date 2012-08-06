@@ -1,6 +1,0 @@
-[main]
-host = http://www.transifex.net
-
-[vacuum-im.spellcheckerts]
-file_filter = <lang>/spellchecker.ts
-source_lang = ru

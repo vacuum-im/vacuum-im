@@ -256,3 +256,7 @@ source_lang = ru
 [vacuum-im.rosteritemexchangets]
 file_filter = <lang>/rosteritemexchange.ts
 source_lang = ru
+
+[vacuum-im.spellchecker]
+file_filter = <lang>/spellchecker.ts
+source_lang = ru

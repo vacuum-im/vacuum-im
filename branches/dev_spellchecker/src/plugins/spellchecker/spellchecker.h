@@ -49,10 +49,12 @@ protected slots:
 	void repairWord();
 	void setDict();
 	void addWordToDict();
+/*
 private slots:
 	void resetMenu();
 	void start();
 	void suggestions(const QString &word, const QStringList &words);
+*/
 private:
 	void suggestionsMenu(const QString &word, QMenu *parent);
 private:

@@ -5,7 +5,7 @@
 #include <QMutex>
 #include <QRunnable>
 
-#include <hunspell/hunspell.hxx>
+#include <thirdparty/hunspell/hunspell.hxx>
 #include "spellbackend.h"
 #include "spellchecker.h"
 

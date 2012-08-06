@@ -4,7 +4,6 @@
 
 #include "spellbackend.h"
 #include "spellchecker.h"
-#include "definitions.h"
 
 #include <QDebug>
 
@@ -30,7 +29,7 @@ void SpellChecker::pluginInfo(IPluginInfo *APluginInfo)
 
 bool SpellChecker::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
-	Q_UNUSED(AInitOrder);d
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0);
     if (plugin)
