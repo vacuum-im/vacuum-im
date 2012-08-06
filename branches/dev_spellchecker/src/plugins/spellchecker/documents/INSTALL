@@ -1,0 +1,29 @@
+CMAKE
+======
+To build external plugin you should specify CMAKE_INSTALL_PREFIX where vacuum installed.
+cmake -DCMAKE_INSTALL_PREFIX=/usr
+make
+make install
+
+You can change spellchecker-backend to aspell(enchant is default), by:
+cmake -DSPELLCHECKER_BACKEND=ASPELL
+
+
+QMAKE
+=====
+To build external plugin you should additionally specify two variables
+VACUUM_SRC_PATH - path to the Vacuum sources directory (vacuum/src)
+VACUUM_LIB_PATH - path to the Vacuum builded libraries directory (vacuum/src/libs)
+
+To use aspell backend append USE_ASPELL to CONFIG variable, for enchant append USE_ENCHANT.
+Note:
+  - for mac you should not enabled aspell or enchant
+  - for windows only aspell is now available, and you should additionally specify path to
+    aspell development directory in variable ASPELL_DEV_PATH
+
+
+Windows example
+===============
+qmake CONFIG+=USE_ASPELL ASPELL_DEV_PATH="../aspell-dev-0-50-3-3" VACUUM_SRC_PATH="../vacuum-src/src" VACUUM_LIB_PATH="../vacuum-build/src/libs" CONFIG-=debug_and_release CONFIG-=debug
+nmake
+nmake install
