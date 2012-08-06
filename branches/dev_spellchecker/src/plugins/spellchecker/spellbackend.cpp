@@ -3,13 +3,30 @@
 #include "hunspellchecker.h"
 #include "spellbackend.h"
 
+#if defined(HAVE_MACSPELL)
+#	include "macspellchecker.h"
+#elif defined(HAVE_ENCHANT)
+#	include "enchantchecker.h"
+#elif defined(HAVE_ASPELL)
+#	include "aspellchecker.h"
+#elif defined(HAVE_HUNSPELL)
+#	include "hunspellchecker.h"
+#endif
+
 SpellBackend* SpellBackend::FSelf = 0;
 
 SpellBackend* SpellBackend::instance()
 {
-	if (!FSelf)
-		FSelf = new HunspellChecker(QCoreApplication::instance());
-	return FSelf;
+#ifdef HAVE_ENCHANT
+		FSelf = new EnchantChecker();
+#elif defined(HAVE_ASPELL)
+		FSelf = new ASpellChecker();
+#elif defined(HAVE_HUNSPELL)
+		FSelf = new HunspellChecker();
+#else
+		FSelf = new SpellBackend();
+#endif
+		return FSelf;
 }
 
 SpellBackend::SpellBackend(QObject *parent) : QObject(parent) {}
