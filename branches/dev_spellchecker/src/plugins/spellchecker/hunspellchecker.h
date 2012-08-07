@@ -1,62 +1,39 @@
 #ifndef HUNSPELLCHECKER_H
 #define HUNSPELLCHECKER_H
 
-#include <QMap>
-#include <QMutex>
-#include <QRunnable>
+#include <QList>
+#include <QString>
+#include <QTextCodec>
 
-#include <thirdparty/hunspell/hunspell.hxx>
+#include <hunspell.hxx>
 #include "spellbackend.h"
-#include "spellchecker.h"
 
-class Hunspell;
-class QThreadPool;
-
-class HunspellChecker : public SpellBackend
+class HunspellChecker :
+	public SpellBackend
 {
 public:
-	HunspellChecker(QObject *parent = 0);
+	HunspellChecker();
 	~HunspellChecker();
-	bool add(const QString &AWord);
-	bool available() const;
-	bool isCorrect(const QString &AWord) const;
-	QStringList dictionaries() const;
-	QStringList suggestions(const QString &AWord) const;
-	void setLangs(const QStringList &ADicts);
-	void queuedSuggestions(const QString &AWord) const;
-public:
-	void clear();
-	void load(const QStringList &ADicts);
+	virtual bool available() const;
+	virtual bool writable() const;
+	virtual QString actuallLang();
+	virtual void setLang(const QString &ALang);
+	virtual QList<QString> dictionaries();
+	virtual void setCustomDictPath(const QString &APath);
+	virtual void setPersonalDictPath(const QString &APath);
+	virtual bool isCorrect(const QString &AWord);
+	virtual bool add(const QString &AWord);
+	virtual QList<QString> suggestions(const QString &AWord);
 private:
-	mutable QMutex FMutex;
-	QList<Hunspell*> FHunspellList;
-	QThreadPool *FPool;
+	void loadHunspell(const QString &ALang);
+	void loadPersonalDict(const QString &ALang);
+	void savePersonalDict(const QString &ALang, const QString &AWord);
 private:
-	QString dictPath;
-	QString personalDict;
-};
-
-class HunspellLoader : public QRunnable
-{
-public:
-	HunspellLoader(HunspellChecker *hunspell, const QStringList &dicts);
-	void run();
-private:
-	HunspellChecker *FHunspell;
-	QStringList FDictsList;
-};
-
-class HunspellSuggestions : public QObject, public QRunnable
-{
-	Q_OBJECT
-public:
-	HunspellSuggestions(const HunspellChecker *hunspell, const QString &AWord);
-	void run();
-signals:
-	void ready(const QString &AWord, const QStringList &AWords);
-private:
-	const HunspellChecker *FHunspell;
-	QString FWord;
+	Hunspell *FHunSpell;
+	QString FDictsPath;
+	QString FActualLang;
+	QTextCodec *FDictCodec;
+	QString FPersonalDictPath;
 };
 
 #endif

@@ -12,16 +12,16 @@
         <translation>Highlights words that may not be spelled correctly</translation>
     </message>
     <message>
-        <source>Suggestions</source>
-        <translation>Suggestions</translation>
-    </message>
-    <message>
         <source>Dictionary</source>
         <translation>Dictionary</translation>
     </message>
     <message>
-        <source>Add to dictionary</source>
-        <translation>Add to dictionary</translation>
+        <source>Add to Dictionary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Spell Check</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

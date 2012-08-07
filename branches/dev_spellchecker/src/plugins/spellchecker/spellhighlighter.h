@@ -7,15 +7,18 @@
 #include <interfaces/imultiuserchat.h>
 
 class SpellHighlighter : 
-        public QSyntaxHighlighter
+	public QSyntaxHighlighter
 {
 public:
-    SpellHighlighter(QTextDocument *ADocument, IMultiUserChat *AMultiUserChat);
-    virtual void highlightBlock(const QString &AText);
-    inline bool isUserNickName(const QString &AText);
+	SpellHighlighter(QTextDocument *ADocument, IMultiUserChat *AMultiUserChat);
+	void setEnabled(bool AEnabled);
+	virtual void highlightBlock(const QString &AText);
+protected:
+	inline bool isUserNickName(const QString &AText);
 private:
-    IMultiUserChat *FMultiUserChat;
-    QTextCharFormat FCharFormat;
+	bool FEnabled;
+	IMultiUserChat *FMultiUserChat;
+	QTextCharFormat FCharFormat;
 };
 
 #endif //SPELLHIGHLIGHTER_H

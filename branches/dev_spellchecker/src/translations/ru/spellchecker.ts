@@ -12,16 +12,16 @@
         <translation>Подсвечивает слова, возможно, набранные неправильно</translation>
     </message>
     <message>
-        <source>Suggestions</source>
-        <translation>Варианты</translation>
-    </message>
-    <message>
         <source>Dictionary</source>
         <translation>Словарь</translation>
     </message>
     <message>
-        <source>Add to dictionary</source>
+        <source>Add to Dictionary</source>
         <translation>Добавить в словарь</translation>
+    </message>
+    <message>
+        <source>Spell Check</source>
+        <translation>Проверка орфографии</translation>
     </message>
 </context>
 </TS>

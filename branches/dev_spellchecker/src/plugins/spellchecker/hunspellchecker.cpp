@@ -1,191 +1,165 @@
-#include <QCoreApplication>
-#include <QDir>
-#include <QFile>
-#include <QList>
-#include <QLocale>
-#include <QString>
-#include <QThreadPool>
-#include <QTextCodec>
-#include <QDebug>
-
 #include "hunspellchecker.h"
 
-HunspellChecker::HunspellChecker(QObject *parent) : SpellBackend(parent)
-{
-	FPool = new QThreadPool(this);
-	FPool->setMaxThreadCount(1);
+#include <QDir>
+#include <QFile>
+#include <QLocale>
+#include <QCoreApplication>
 
-	dictPath = SpellChecker::dictPath();
+#include "spellchecker.h"
+
+HunspellChecker::HunspellChecker()
+{
+	FHunSpell = NULL;
+	FDictCodec = NULL;
+
+#ifdef Q_WS_WIN
+	FDictsPath = QString("%1/hunspell").arg(QCoreApplication::applicationDirPath());
+#elif defined (Q_WS_X11)
+	FDictsPath = "/usr/share/hunspell";
+#elif defined (Q_WS_MAC)
+	FDictsPath = QString("%1/Library/Spelling").arg(QDir::homePath());
+#endif
 }
 
 HunspellChecker::~HunspellChecker()
 {
-	clear();
+	delete FHunSpell;
+}
+
+bool HunspellChecker::available() const
+{
+	return FHunSpell!=NULL;
+}
+
+bool HunspellChecker::writable() const
+{
+	return !FPersonalDictPath.isEmpty();
+}
+
+QString HunspellChecker::actuallLang()
+{
+	return FActualLang;
+}
+
+void HunspellChecker::setLang(const QString &ALang)
+{
+	if (FActualLang != ALang)
+	{
+		FActualLang = ALang;
+		loadHunspell(FActualLang);
+	}
+}
+QList<QString> HunspellChecker::dictionaries()
+{
+	QList<QString> availDicts;
+
+	QDir dir(FDictsPath);
+	foreach(QString dictFile, dir.entryList(QStringList("*.dic"), QDir::Files)) 
+	{
+		if (dictFile.startsWith("hyph_"))
+			continue;
+		if (dictFile.startsWith("th_"))
+			continue;
+		if (dictFile.endsWith(".dic"))
+			dictFile = dictFile.mid(0, dictFile.length() - 4);
+		availDicts << dictFile;
+	}
+
+	return availDicts;
+}
+
+void HunspellChecker::setCustomDictPath(const QString &APath)
+{
+	Q_UNUSED(APath);
+}
+
+void HunspellChecker::setPersonalDictPath(const QString &APath)
+{
+	FPersonalDictPath = APath;
+}
+
+bool HunspellChecker::isCorrect(const QString &AWord)
+{
+	if(available())
+	{
+		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
+		return FHunSpell->spell(encWord.constData());
+	}
+	return true;
 }
 
 bool HunspellChecker::add(const QString &AWord)
 {
-	bool result = false;
-//	if (FHunSpell)
-//	{
-//		QFile file(personalDict);
-//		file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
-//		file.write(AWord.toUtf8());
-//		file.write("\n");
-//		file.close();
-//		QByteArray encodedString;
-//		encodedString = codec->fromUnicode(AWord);
-//		FHunSpell->add(encodedString.data());
-//		result = true;
-//	}
-	return result;
-}
-
-
-bool HunspellChecker::available() const
-{
-	return true;
-}
-
-bool HunspellChecker::isCorrect(const QString &AWord) const
-{
-	int sum = 0;
-	if (!FMutex.tryLock())
-		return false;
-	foreach (Hunspell *dic, FHunspellList)
+	if (available())
 	{
-		QByteArray encoded = QTextCodec::codecForName(dic->get_dic_encoding())->fromUnicode(AWord);
-		sum += dic->spell(encoded.constData());
+		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
+		FHunSpell->add(encWord.constData());
+		savePersonalDict(FActualLang,AWord);
+		return true;
 	}
-	FMutex.unlock();
-	return sum > 0;
+	return false;
 }
 
-QStringList HunspellChecker::dictionaries() const
+QList<QString> HunspellChecker::suggestions(const QString &AWord)
 {
-	QStringList dict;
-	QDir dir(dictPath);
-	if (dir.exists())
+	QList<QString> words;
+	if(available())
 	{
-		QStringList lstDic = dir.entryList(QStringList("*.dic"), QDir::Files);
-		foreach(QString tmp, lstDic)
-		{
-			if (tmp.startsWith("hyph_"))
-				continue;
-			if (tmp.startsWith("th_"))
-				continue;
-			if (tmp.endsWith(".dic"))
-				tmp = tmp.mid(0, tmp.length() - 4);
-			dict << tmp;
-		}
+		char **sugglist;
+		QByteArray encWord = FDictCodec ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
+		int count = FHunSpell->suggest(&sugglist, encWord.data());
+		for(int i = 0; i < count; ++i)
+			words.append(FDictCodec ? FDictCodec->toUnicode(sugglist[i]) : QString::fromUtf8(sugglist[i]));
+		FHunSpell->free_list(&sugglist, count);
 	}
-	return dict;
-}
-
-QStringList HunspellChecker::suggestions(const QString &AWord) const
-{
-	QStringList words;
-
-	if (!FMutex.tryLock())
-		return words;
-
-	foreach (Hunspell *dic, FHunspellList)
-	{
-		char **sugglist = NULL;
-		QTextCodec *codec = QTextCodec::codecForName(dic->get_dic_encoding());
-		QByteArray encoded = codec->fromUnicode(AWord);
-		int count = dic->suggest(&sugglist, encoded.constData());
-		for (int i = 0; i < count; ++i)
-			words << codec->toUnicode(sugglist[i]);
-		dic->free_list(&sugglist, count);
-	}
-
-	FMutex.unlock();
 	return words;
 }
 
-void HunspellChecker::queuedSuggestions(const QString &AWord) const
-	{
-		HunspellSuggestions *task = new HunspellSuggestions(this, AWord);
-		connect(task, SIGNAL(ready(QString,QStringList)), SIGNAL(suggestionsReady(QString,QStringList)));
-		FPool->start(task);
-	}
-
-void HunspellChecker::setLangs(const QStringList &ADicts)
+void HunspellChecker::loadHunspell(const QString &ALang)
 {
-	QStringList files;
-	foreach (const QString &name, ADicts)
+	delete FHunSpell;
+	FHunSpell = NULL;
+
+	QString dictFile = QString("%1/%2.dic").arg(FDictsPath).arg(ALang);
+	if (QFileInfo(dictFile).exists())
 	{
-		files.append(dictPath + QDir::separator() + name);
+		QString rulesFile = QString("%1/%2.aff").arg(FDictsPath).arg(ALang);
+		FHunSpell = new Hunspell(rulesFile.toUtf8().constData(), dictFile.toUtf8().constData());
+		FDictCodec = QTextCodec::codecForName(FHunSpell->get_dic_encoding());
+		loadPersonalDict(ALang);
 	}
-	FPool->start(new HunspellLoader(this, files));
 }
 
-void HunspellChecker::clear()
+void HunspellChecker::loadPersonalDict(const QString &ALang)
 {
-	FMutex.lock();
-	qDeleteAll(FHunspellList);
-	FHunspellList.clear();
-	FMutex.unlock();
-}
-
-//void HunspellChecker::loadHunspell(const QString &ALang)
-//{
-//	QString dic = QString("%1/%2.dic").arg(dictPath).arg(ALang);
-//	if (QFileInfo(dic).exists())
-//	{
-//		FHunSpell = new Hunspell(QString("%1/%2.aff").arg(dictPath).arg(ALang).toUtf8().constData(), dic.toUtf8().constData());
-//		codec = QTextCodec::codecForName(FHunSpell->get_dic_encoding());
-//		personalDict = QString("%1/personal.dictionary.txt").arg(SpellChecker::homePath);
-//		QFile file(personalDict);
-//		file.open(QIODevice::ReadOnly | QIODevice::Text);
-//		QTextStream out(&file);
-//		while (!out.atEnd())
-//		{
-//			QByteArray encodedString;
-//			encodedString = codec->fromUnicode(out.readLine());
-//			FHunSpell->add(encodedString.constData());
-//		}
-//		file.close();
-//	}
-//}
-
-void HunspellChecker::load(const QStringList &ADicts)
-{
-	if (ADicts.isEmpty())
-		return;
-	FMutex.lock();
-	foreach (const QString &name, ADicts)
+	if (available() && !FPersonalDictPath.isEmpty() && !ALang.isEmpty())
 	{
-		if (QFile::exists(name + ".dic"))
+		QDir dictDir(FPersonalDictPath);
+		QFile file(dictDir.absoluteFilePath(QString("%1.txt").arg(ALang)));
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
 		{
-			Hunspell *dic = new Hunspell(QString(name + ".aff").toUtf8().constData(), QString(name + ".dic").toUtf8().constData());
-			if (QTextCodec::codecForName(dic->get_dic_encoding()))
-				FHunspellList.append(dic);
-			else
-				delete dic;
+			while (!file.atEnd())
+			{
+				QString word = QString::fromUtf8(file.readLine()).trimmed();
+				QByteArray encWord= FDictCodec!=NULL ? FDictCodec->fromUnicode(word) : word.toUtf8();
+				FHunSpell->add(encWord.constData());
+			}
+			file.close();
 		}
 	}
-	FMutex.unlock();
 }
 
-HunspellLoader::HunspellLoader(HunspellChecker *hunspell, const QStringList &dicts)
-	: QRunnable(), FHunspell(hunspell), FDictsList(dicts) {}
-
-void HunspellLoader::run()
+void HunspellChecker::savePersonalDict(const QString &ALang, const QString &AWord)
 {
-	FHunspell->clear();
-	qDebug() << FDictsList;
-	FHunspell->load(FDictsList);
+	if (!FPersonalDictPath.isEmpty() && !AWord.isEmpty() && !ALang.isEmpty())
+	{
+		QDir dictDir(FPersonalDictPath);
+		QFile file(dictDir.absoluteFilePath(QString("%1.txt").arg(ALang)));
+		if (file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+		{
+			file.write(AWord.toUtf8());
+			file.write("\n");
+			file.close();
+		}
+	}
 }
-
-HunspellSuggestions::HunspellSuggestions(const HunspellChecker *hunspell, const QString &AWord)
-	: QObject(), QRunnable(), FHunspell(hunspell), FWord(AWord) {}
-
-void HunspellSuggestions::run()
-{
-	QStringList words = FHunspell->suggestions(FWord);
-	if (!words.isEmpty())
-		emit ready(FWord, words);
-}
-
