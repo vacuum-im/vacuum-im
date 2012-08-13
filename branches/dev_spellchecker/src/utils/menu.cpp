@@ -50,7 +50,7 @@ QList<Action *> Menu::groupActions(int AGroup) const
 	return FActions.values(AGroup);
 }
 
-QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> &AData, bool ASearchInSubMenu /*= false*/) const
+QList<Action *> Menu::findActions(const QMultiHash<int, QVariant> &AData, bool ASearchInSubMenu) const
 {
 	QList<Action *> actionList;
 	QList<int> keys = AData.keys();
@@ -204,6 +204,32 @@ void Menu::setTitle(const QString &ATitle)
 {
 	FMenuAction->setText(ATitle);
 	QMenu::setTitle(ATitle);
+}
+
+bool Menu::copyStandardMenu(Menu *ADestination, QMenu *ASource, int AGroup)
+{
+	if (ADestination && ASource)
+	{
+		ADestination->setIcon(ASource->icon());
+		ADestination->setTitle(ASource->title());
+		ADestination->setSeparatorsCollapsible(ASource->separatorsCollapsible());
+		ADestination->setTearOffEnabled(ASource->isTearOffEnabled());
+		foreach(QAction *srcAction, ASource->actions())
+		{
+			if (!srcAction->isSeparator())
+			{
+				Action *destAction = new Action(ADestination);
+				Action::copyStandardAction(destAction,srcAction);
+				ADestination->addAction(destAction,AGroup);
+			}
+			else
+			{
+				AGroup += 10;
+			}
+		}
+		return true;
+	}
+	return false;
 }
 
 void Menu::onActionDestroyed(Action *AAction)
