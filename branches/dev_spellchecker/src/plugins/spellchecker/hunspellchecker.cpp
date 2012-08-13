@@ -88,13 +88,20 @@ bool HunspellChecker::isCorrect(const QString &AWord)
 	return true;
 }
 
+bool HunspellChecker::canAdd(const QString &AWord)
+{
+	if (writable())
+		return FDictCodec!=NULL ? FDictCodec->canEncode(AWord) : true;
+	return false;
+}
+
 bool HunspellChecker::add(const QString &AWord)
 {
 	if (available())
 	{
 		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
 		FHunSpell->add(encWord.constData());
-		savePersonalDict(FActualLang,AWord);
+		savePersonalDict(AWord);
 		return true;
 	}
 	return false;
@@ -126,35 +133,38 @@ void HunspellChecker::loadHunspell(const QString &ALang)
 		QString rulesFile = QString("%1/%2.aff").arg(FDictsPath).arg(ALang);
 		FHunSpell = new Hunspell(rulesFile.toUtf8().constData(), dictFile.toUtf8().constData());
 		FDictCodec = QTextCodec::codecForName(FHunSpell->get_dic_encoding());
-		loadPersonalDict(ALang);
+		loadPersonalDict();
 	}
 }
 
-void HunspellChecker::loadPersonalDict(const QString &ALang)
+void HunspellChecker::loadPersonalDict()
 {
-	if (available() && !FPersonalDictPath.isEmpty() && !ALang.isEmpty())
+	if (available() && !FPersonalDictPath.isEmpty())
 	{
 		QDir dictDir(FPersonalDictPath);
-		QFile file(dictDir.absoluteFilePath(QString("%1.txt").arg(ALang)));
+		QFile file(dictDir.absoluteFilePath(PERSONAL_DICT_FILENAME));
 		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
 		{
 			while (!file.atEnd())
 			{
 				QString word = QString::fromUtf8(file.readLine()).trimmed();
-				QByteArray encWord= FDictCodec!=NULL ? FDictCodec->fromUnicode(word) : word.toUtf8();
-				FHunSpell->add(encWord.constData());
+				if (canAdd(word))
+				{
+					QByteArray encWord= FDictCodec!=NULL ? FDictCodec->fromUnicode(word) : word.toUtf8();
+					FHunSpell->add(encWord.constData());
+				}
 			}
 			file.close();
 		}
 	}
 }
 
-void HunspellChecker::savePersonalDict(const QString &ALang, const QString &AWord)
+void HunspellChecker::savePersonalDict(const QString &AWord)
 {
-	if (!FPersonalDictPath.isEmpty() && !AWord.isEmpty() && !ALang.isEmpty())
+	if (!FPersonalDictPath.isEmpty() && !AWord.isEmpty())
 	{
 		QDir dictDir(FPersonalDictPath);
-		QFile file(dictDir.absoluteFilePath(QString("%1.txt").arg(ALang)));
+		QFile file(dictDir.absoluteFilePath(PERSONAL_DICT_FILENAME));
 		if (file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
 		{
 			file.write(AWord.toUtf8());

@@ -16,11 +16,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add to Dictionary</source>
+        <source>Spell Check</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Spell Check</source>
+        <source>Add &apos;%1&apos; to Dictionary</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

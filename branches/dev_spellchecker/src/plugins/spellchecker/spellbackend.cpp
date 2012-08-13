@@ -116,6 +116,12 @@ bool SpellBackend::isCorrect(const QString &AWord)
 	return true;
 }
 
+bool SpellBackend::canAdd(const QString &AWord)
+{
+	Q_UNUSED(AWord);
+	return writable();
+}
+
 bool SpellBackend::add(const QString &AWord)
 {
 	Q_UNUSED(AWord);

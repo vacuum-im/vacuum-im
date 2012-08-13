@@ -86,7 +86,13 @@ bool SpellChecker::startPlugin()
 	foreach(QString dict, SpellBackend::instance()->dictionaries())
 	{
 		Action *action = new Action(FDictMenu);
-		action->setText(dict);
+		QLocale locale(dict);
+		if (locale.country() > QLocale::AnyCountry)
+			action->setText(QString("%1 (%2)").arg(QLocale::languageToString(locale.language()),QLocale::countryToString(locale.country())));
+		else if (locale.language() > QLocale::C)
+			action->setText(QLocale::languageToString(locale.language()));
+		else
+			action->setText(dict);
 		action->setProperty("dictionary", dict);
 		action->setCheckable(true);
 		connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
@@ -181,14 +187,14 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 	if (editWidget)
 	{
 		FCurrentTextEdit = editWidget->textEdit();
-		if (SpellBackend::instance()->available())
+		if (isSpellEnabled() && SpellBackend::instance()->available())
 		{
 			QTextCursor cursor = FCurrentTextEdit->cursorForPosition(APosition);
 			FCurrentCursorPosition = cursor.position();
 			cursor.select(QTextCursor::WordUnderCursor);
 			const QString word = cursor.selectedText();
 
-			if (isSpellEnabled() && !word.isEmpty() && !SpellBackend::instance()->isCorrect(word)) 
+			if (!word.isEmpty() && !SpellBackend::instance()->isCorrect(word)) 
 			{
 				foreach(QString suggestion, SpellBackend::instance()->suggestions(word))
 				{
@@ -199,10 +205,10 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 					AMenu->addAction(suggestAction,AG_EWCM_SPELLCHECKER_SUGGESTS);
 				}
 
-				if (SpellBackend::instance()->writable())
+				if (SpellBackend::instance()->canAdd(word))
 				{
 					Action *appendAction = new Action(AMenu);
-					appendAction->setText(tr("Add to Dictionary"));
+					appendAction->setText(tr("Add '%1' to Dictionary").arg(word));
 					appendAction->setProperty("word",word);
 					connect(appendAction,SIGNAL(triggered()),SLOT(onAddUnknownWordToDictionary()));
 					AMenu->addAction(appendAction,AG_EWCM_SPELLCHECKER_SUGGESTS);

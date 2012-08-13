@@ -22,12 +22,13 @@ public:
 	virtual void setCustomDictPath(const QString &APath);
 	virtual void setPersonalDictPath(const QString &APath);
 	virtual bool isCorrect(const QString &AWord);
+	virtual bool canAdd(const QString &AWord);
 	virtual bool add(const QString &AWord);
 	virtual QList<QString> suggestions(const QString &AWord);
 private:
 	void loadHunspell(const QString &ALang);
-	void loadPersonalDict(const QString &ALang);
-	void savePersonalDict(const QString &ALang, const QString &AWord);
+	void loadPersonalDict();
+	void savePersonalDict(const QString &AWord);
 private:
 	Hunspell *FHunSpell;
 	QString FDictsPath;

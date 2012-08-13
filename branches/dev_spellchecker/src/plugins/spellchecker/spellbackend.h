@@ -31,6 +31,8 @@
 #include <QString>
 #include <QObject>
 
+#define PERSONAL_DICT_FILENAME  "personal.dic"
+
 class SpellBackend : 
 	public QObject
 {
@@ -45,6 +47,7 @@ public:
 	virtual void setCustomDictPath(const QString &APath);
 	virtual void setPersonalDictPath(const QString &APath);
 	virtual bool isCorrect(const QString &AWord);
+	virtual bool canAdd(const QString &AWord);
 	virtual bool add(const QString &AWord);
 	virtual QList<QString> suggestions(const QString &AWord);
 protected:
