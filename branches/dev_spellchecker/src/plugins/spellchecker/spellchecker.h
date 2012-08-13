@@ -1,6 +1,7 @@
 #ifndef SPELLCHECKER_H
 #define SPELLCHECKER_H
 
+#include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
@@ -26,13 +27,16 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin();
+public:
+	virtual bool isSpellEnabled() const;
+	virtual void setSpellEnabled(bool AEnabled);
 protected slots:
-	void onChangeEnable();
+	void onChangeSpellEnable();
 	void onChangeDictionary();
 	void onRepairWordUnderCursor();
 	void onAddUnknownWordToDictionary();
 	void onEditWidgetCreated(IEditWidget *AWidget);
-	void onEditWidgetContextMenuRequested(const QPoint &APos);
+	void onEditWidgetContextMenuRequested(const QPoint &APosition, Menu *AMenu);
 	void onTextEditDestroyed(QObject *AObject);
 protected slots:
 	void onOptionsOpened();
@@ -41,7 +45,7 @@ private:
 	IPluginManager *FPluginManager;
 	IMessageWidgets *FMessageWidgets;
 private:
-	QMenu *FDictMenu;
+	Menu *FDictMenu;
 	QTextEdit *FCurrentTextEdit;
 	int FCurrentCursorPosition;
 	QMap<QObject *, SpellHighlighter *> FSpellHighlighters;

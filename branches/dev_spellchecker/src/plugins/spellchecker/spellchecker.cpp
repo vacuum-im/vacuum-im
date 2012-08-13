@@ -57,7 +57,8 @@ bool SpellChecker::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool SpellChecker::initObjects()
 {
-	FDictMenu = new QMenu(tr("Dictionary"));
+	FDictMenu = new Menu;
+	FDictMenu->setTitle(tr("Dictionary"));
 
 	QDir dictsDir(FPluginManager->homePath());
 	if (!dictsDir.exists(SPELLDICTS_DIR))
@@ -84,7 +85,7 @@ bool SpellChecker::startPlugin()
 {
 	foreach(QString dict, SpellBackend::instance()->dictionaries())
 	{
-		QAction *action = new QAction(FDictMenu);
+		Action *action = new Action(FDictMenu);
 		action->setText(dict);
 		action->setProperty("dictionary", dict);
 		action->setCheckable(true);
@@ -94,12 +95,22 @@ bool SpellChecker::startPlugin()
 	return true;
 }
 
-void SpellChecker::onChangeEnable()
+bool SpellChecker::isSpellEnabled() const
+{
+	return Options::node(OPV_MESSAGES_SPELL_ENABLED).value().toBool();
+}
+
+void SpellChecker::setSpellEnabled(bool AEnabled)
+{
+	Options::node(OPV_MESSAGES_SPELL_ENABLED).setValue(AEnabled);
+}
+
+void SpellChecker::onChangeSpellEnable()
 {
 	QAction *action = qobject_cast<QAction *>(sender());
 	if (action)
 	{
-		Options::node(OPV_MESSAGES_SPELL_ENABLED).setValue(action->isChecked());
+		setSpellEnabled(action->isChecked());
 	}
 }
 
@@ -150,7 +161,7 @@ void SpellChecker::onEditWidgetCreated(IEditWidget *AWidget)
 	QTextEdit *textEdit = AWidget->textEdit();
 	textEdit->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(textEdit,SIGNAL(destroyed(QObject *)),SLOT(onTextEditDestroyed(QObject *)));
-	connect(textEdit, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(onEditWidgetContextMenuRequested(const QPoint &)));
+	connect(AWidget->instance(),SIGNAL(editContextMenu(const QPoint &, Menu *)),SLOT(onEditWidgetContextMenuRequested(const QPoint &, Menu *)));
 
 	IMultiUserChatWindow *mucWindow = NULL;
 	QWidget *parent = AWidget->instance()->parentWidget();
@@ -160,70 +171,64 @@ void SpellChecker::onEditWidgetCreated(IEditWidget *AWidget)
 		parent = parent->parentWidget();
 	}
 	SpellHighlighter *liter = new SpellHighlighter(AWidget->document(), mucWindow!=NULL ? mucWindow->multiUserChat() : NULL);
-	liter->setEnabled(Options::node(OPV_MESSAGES_SPELL_ENABLED).value().toBool());
+	liter->setEnabled(isSpellEnabled());
 	FSpellHighlighters.insert(textEdit, liter);
 }
 
-void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APos)
+void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Menu *AMenu)
 {
-	FCurrentTextEdit = qobject_cast<QTextEdit *>(sender());
-	if (FCurrentTextEdit)
+	IEditWidget *editWidget = qobject_cast<IEditWidget *>(sender());
+	if (editWidget)
 	{
-		QMenu *menu = FCurrentTextEdit->createStandardContextMenu();
-		menu->setAttribute(Qt::WA_DeleteOnClose,true);
-		
-		QAction *beforeAction = menu->actions().value(0);
+		FCurrentTextEdit = editWidget->textEdit();
 		if (SpellBackend::instance()->available())
 		{
-			QTextCursor cursor = FCurrentTextEdit->cursorForPosition(APos);
+			QTextCursor cursor = FCurrentTextEdit->cursorForPosition(APosition);
 			FCurrentCursorPosition = cursor.position();
 			cursor.select(QTextCursor::WordUnderCursor);
 			const QString word = cursor.selectedText();
 
-			if (!word.isEmpty() && !SpellBackend::instance()->isCorrect(word)) 
+			if (isSpellEnabled() && !word.isEmpty() && !SpellBackend::instance()->isCorrect(word)) 
 			{
 				foreach(QString suggestion, SpellBackend::instance()->suggestions(word))
 				{
-					QAction *suggestAction = new QAction(menu);
+					Action *suggestAction = new Action(AMenu);
 					suggestAction->setText(suggestion);
 					suggestAction->setProperty("suggestion", suggestion);
 					connect(suggestAction,SIGNAL(triggered()),SLOT(onRepairWordUnderCursor()));
-					menu->insertAction(beforeAction,suggestAction);
+					AMenu->addAction(suggestAction,AG_EWCM_SPELLCHECKER_SUGGESTS);
 				}
 
 				if (SpellBackend::instance()->writable())
 				{
-					QAction *appendAction = new QAction(menu);
+					Action *appendAction = new Action(AMenu);
 					appendAction->setText(tr("Add to Dictionary"));
 					appendAction->setProperty("word",word);
 					connect(appendAction,SIGNAL(triggered()),SLOT(onAddUnknownWordToDictionary()));
-					menu->insertAction(beforeAction,appendAction);
+					AMenu->addAction(appendAction,AG_EWCM_SPELLCHECKER_SUGGESTS);
 				}
 			}
 		}
 
-		menu->insertSeparator(beforeAction);
-		menu->addSeparator();
-
-		QAction *enableAction = new QAction(menu);
+		Action *enableAction = new Action(AMenu);
 		enableAction->setText(tr("Spell Check"));
 		enableAction->setCheckable(true);
-		enableAction->setChecked(Options::node(OPV_MESSAGES_SPELL_ENABLED).value().toBool());
-		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeEnable()));
-		menu->addAction(enableAction);
+		enableAction->setChecked(isSpellEnabled());
+		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
+		AMenu->addAction(enableAction,AG_EWCM_SPELLCHECKER_OPTIONS);
 
-		if (!FDictMenu->isEmpty())
+		if (!FDictMenu->isEmpty() && isSpellEnabled())
 		{
 			QString actualLang = SpellBackend::instance()->actuallLang();
-			foreach(QAction *action, FDictMenu->actions())
+			foreach(Action *action, FDictMenu->groupActions())
 			{
 				QString dict = action->property("dictionary").toString();
 				action->setChecked(actualLang==dict || actualLang.contains(dict));
 			}
-			menu->addMenu(FDictMenu);
+			AMenu->addAction(FDictMenu->menuAction(),AG_EWCM_SPELLCHECKER_OPTIONS);
 		}
 
-		menu->popup(FCurrentTextEdit->mapToGlobal(APos));
+		AMenu->popup(FCurrentTextEdit->mapToGlobal(APosition));
 	}
 }
 

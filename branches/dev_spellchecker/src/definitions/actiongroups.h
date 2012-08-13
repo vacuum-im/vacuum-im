@@ -86,4 +86,9 @@
 #define AG_VWCM_MESSAGEWIDGETS_QUOTE                            500
 #define AG_VWCM_MESSAGEWIDGETS_SEARCH                           700
 
+//EditWidget - ContextMenu
+#define AG_EWCM_SPELLCHECKER_SUGGESTS                           100
+#define AG_EWCM_MESSAGEWIDGETS_DEFAULT                          500
+#define AG_EWCM_SPELLCHECKER_OPTIONS                            800
+
 #endif
