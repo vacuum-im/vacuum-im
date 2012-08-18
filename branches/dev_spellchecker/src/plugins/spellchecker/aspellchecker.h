@@ -41,18 +41,25 @@ class ASpellChecker :
 public:
 	ASpellChecker();
 	~ASpellChecker();
-	virtual QList<QString> suggestions(const QString &AWord);
-	virtual bool isCorrect(const QString &AWord);
-	virtual bool add(const QString &AWord);
 	virtual bool available() const;
 	virtual bool writable() const;
-	virtual QList<QString> dictionaries();
-	virtual void setLang(const QString &AWord);
 	virtual QString actuallLang();
+	virtual void setLang(const QString &ALang);
+	virtual QList<QString> dictionaries();
+	virtual void setCustomDictPath(const QString &APath);
+	virtual void setPersonalDictPath(const QString &APath);
+	virtual bool isCorrect(const QString &AWord);
+	virtual bool canAdd(const QString &AWord);
+	virtual bool add(const QString &AWord);
+	virtual QList<QString> suggestions(const QString &AWord);
 private:
+	void loadPersonalDict();
+	void savePersonalDict(const QString &AWord); 
+private:
+	QString FActualLang;
 	AspellConfig *FConfig;
 	AspellSpeller *FSpeller;
-	QString lang;
+	QString FPersonalDictPath; 
 };
 
 #endif

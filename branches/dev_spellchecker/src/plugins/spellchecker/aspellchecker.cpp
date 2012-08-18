@@ -24,23 +24,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
+#include <QtDebug>
 
 #include <QDir>
 #include <QLocale>
 #include <QCoreApplication>
-#include <QtDebug>
 
 #include <aspell.h>
 #include "aspellchecker.h"
 
 ASpellChecker::ASpellChecker()
 {
-	FConfig = NULL;
 	FSpeller = NULL;
+
 	FConfig = new_aspell_config();
-	lang = QLocale().name().toUtf8().constData();
 	aspell_config_replace(FConfig, "encoding", "utf-8");
-	aspell_config_replace(FConfig, "lang", lang.toUtf8().constData());
 #ifdef Q_WS_WIN
 	aspell_config_replace(FConfig, "conf-dir", QString("%1/aspell").arg(QCoreApplication::applicationDirPath()).toUtf8().constData());
 	aspell_config_replace(FConfig, "data-dir", QString("%1/aspell/data").arg(QCoreApplication::applicationDirPath()).toUtf8().constData());
@@ -61,60 +59,16 @@ ASpellChecker::ASpellChecker()
 
 ASpellChecker::~ASpellChecker()
 {
-	if(FConfig) 
-	{
-		delete_aspell_config(FConfig);
-		FConfig = NULL;
-	}
-
 	if(FSpeller) 
 	{
 		delete_aspell_speller(FSpeller);
 		FSpeller = NULL;
 	}
-}
-
-bool ASpellChecker::isCorrect(const QString &AWord)
-{
-	if(FSpeller) 
+	if(FConfig) 
 	{
-		int correct = aspell_speller_check(FSpeller,AWord.toUtf8().constData(), -1);
-		return (correct != 0);
+		delete_aspell_config(FConfig);
+		FConfig = NULL;
 	}
-	return true;
-}
-
-QList<QString> ASpellChecker::suggestions(const QString &AWord)
-{
-	QList<QString> words;
-	if (FSpeller) 
-	{
-		const AspellWordList* list = aspell_speller_suggest(FSpeller, AWord.toUtf8().constData(), -1); 
-		AspellStringEnumeration* elements = aspell_word_list_elements(list);
-	
-		const char *c_word;
-		while ((c_word = aspell_string_enumeration_next(elements)) != NULL) 
-			words += QString::fromUtf8(c_word);
-
-		delete_aspell_string_enumeration(elements);
-	}
-	return words;
-}
-
-bool ASpellChecker::add(const QString &AWord)
-{
-	bool result = false;
-	if (FConfig && FSpeller) 
-	{
-		QString trimmed_word = AWord.trimmed();
-		if(!trimmed_word.isEmpty()) 
-		{
-			aspell_speller_add_to_personal(FSpeller, trimmed_word.toUtf8(), trimmed_word.toUtf8().length());
-			aspell_speller_save_all_word_lists(FSpeller);
-			result = true;
-		}
-	}
-	return result;
 }
 
 bool ASpellChecker::available() const
@@ -124,46 +78,135 @@ bool ASpellChecker::available() const
 
 bool ASpellChecker::writable() const
 {
-	return false;
-}
-
-QList< QString > ASpellChecker::dictionaries()
-{
-  AspellDictInfoEnumeration * dels;
-  const AspellDictInfo * entry;
-	QList<QString> dict;
-
-  dels = aspell_dict_info_list_elements(get_aspell_dict_info_list(FConfig));
-
-  while ( (entry = aspell_dict_info_enumeration_next(dels)) != 0) {
-		if(!dict.contains(QString::fromUtf8(entry->code)))
-		 dict += QString::fromUtf8(entry->code);
-	}
-
-  delete_aspell_dict_info_enumeration(dels);
-	
-	return dict;
-}
-
-void ASpellChecker::setLang(const QString &AWord)
-{
-	lang = AWord;
-	aspell_config_replace(FConfig, "lang", AWord.toUtf8());
-	AspellCanHaveError* ret = new_aspell_speller(FConfig);
-	if (aspell_error_number(ret) == 0) 
-	{
-		if(FSpeller) 
-			delete_aspell_speller(FSpeller);
-		
-		FSpeller = to_aspell_speller(ret);
-	}
-	else 
-	{
-		qWarning() << QString("Aspell error: %1").arg(aspell_error_message(ret));
-	}
+	return true;
 }
 
 QString ASpellChecker::actuallLang()
 {
-	return lang;
+	return FActualLang;
+}
+
+void ASpellChecker::setLang(const QString &ALang)
+{
+	if (FActualLang != ALang)
+	{
+		FActualLang = ALang;
+		aspell_config_replace(FConfig, "lang", ALang.toUtf8());
+
+		AspellCanHaveError* ret = new_aspell_speller(FConfig);
+		if (aspell_error_number(ret) == 0) 
+		{
+			if(FSpeller) 
+				delete_aspell_speller(FSpeller);
+			FSpeller = to_aspell_speller(ret);
+			loadPersonalDict();
+		}
+		else 
+		{
+			qWarning() << QString("Aspell error: %1").arg(aspell_error_message(ret));
+			delete_aspell_can_have_error(ret);
+		}
+	}
+}
+
+QList< QString > ASpellChecker::dictionaries()
+{
+	QList<QString> dicts;
+	const AspellDictInfo *entry;
+
+	AspellDictInfoEnumeration *dels = aspell_dict_info_list_elements(get_aspell_dict_info_list(FConfig));
+	while ( (entry = aspell_dict_info_enumeration_next(dels)) != 0) 
+	{
+		if(!dicts.contains(QString::fromUtf8(entry->code)))
+			dicts += QString::fromUtf8(entry->code);
+	}
+	delete_aspell_dict_info_enumeration(dels);
+
+	return dicts;
+}
+
+void ASpellChecker::setCustomDictPath(const QString &APath)
+{
+	Q_UNUSED(APath);
+}
+
+void ASpellChecker::setPersonalDictPath(const QString &APath)
+{
+	FPersonalDictPath = APath;
+}
+
+bool ASpellChecker::isCorrect(const QString &AWord)
+{
+	return available() ? aspell_speller_check(FSpeller,AWord.toUtf8().constData(), -1)!=0 : true;
+}
+
+bool ASpellChecker::canAdd(const QString &AWord)
+{
+	return writable() && !AWord.trimmed().isEmpty();
+}
+
+bool ASpellChecker::add(const QString &AWord)
+{
+	if (available() && canAdd(AWord))
+	{
+		QString trimmed_word = AWord.trimmed();
+		if (aspell_speller_add_to_personal(FSpeller, trimmed_word.toUtf8(), trimmed_word.toUtf8().length()) >= 0)
+		{
+			aspell_speller_save_all_word_lists(FSpeller);
+			savePersonalDict(trimmed_word);
+			return true;
+		}
+	}
+	return false;
+}
+
+QList<QString> ASpellChecker::suggestions(const QString &AWord)
+{
+	QList<QString> words;
+	if (available()) 
+	{
+		const AspellWordList *list = aspell_speller_suggest(FSpeller, AWord.toUtf8().constData(), AWord.toUtf8().length()); 
+		AspellStringEnumeration *elements = aspell_word_list_elements(list);
+
+		const char *c_word;
+		while ((c_word = aspell_string_enumeration_next(elements)) != NULL) 
+			words += QString::fromUtf8(c_word);
+
+		delete_aspell_string_enumeration(elements);
+	}
+	return words;
+}
+
+void ASpellChecker::loadPersonalDict()
+{
+	if (available() && !FPersonalDictPath.isEmpty())
+	{
+		QDir dictDir(FPersonalDictPath);
+		QFile file(dictDir.absoluteFilePath(PERSONAL_DICT_FILENAME));
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+		{
+			while (!file.atEnd())
+			{
+				QString word = QString::fromUtf8(file.readLine()).trimmed();
+				if (canAdd(word))
+					aspell_speller_add_to_personal(FSpeller, word.toUtf8(), word.toUtf8().length());
+			}
+			file.close();
+		}
+	}
+}
+
+void ASpellChecker::savePersonalDict(const QString &AWord)
+{
+	if (!FPersonalDictPath.isEmpty() && !AWord.isEmpty())
+	{
+		QDir dictDir(FPersonalDictPath);
+		QFile file(dictDir.absoluteFilePath(PERSONAL_DICT_FILENAME));
+		if (file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text))
+		{
+			file.write(AWord.toUtf8());
+			file.write("\n");
+			file.close();
+		}
+	}
 }

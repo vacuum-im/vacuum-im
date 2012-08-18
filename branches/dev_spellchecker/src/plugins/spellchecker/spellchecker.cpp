@@ -6,6 +6,7 @@
 #include "spellbackend.h"
 #include "spellchecker.h"
 
+#define MAX_SUGGESTIONS     15
 #define SPELLDICTS_DIR      "spelldicts"
 #define PERSONALDICTS_DIR   "personal"
 
@@ -87,7 +88,7 @@ bool SpellChecker::startPlugin()
 	{
 		Action *action = new Action(FDictMenu);
 		QLocale locale(dict);
-		if (locale.country() > QLocale::AnyCountry)
+		if (locale.country()>QLocale::AnyCountry && dict.contains('_'))
 			action->setText(QString("%1 (%2)").arg(QLocale::languageToString(locale.language()),QLocale::countryToString(locale.country())));
 		else if (locale.language() > QLocale::C)
 			action->setText(QLocale::languageToString(locale.language()));
@@ -96,7 +97,7 @@ bool SpellChecker::startPlugin()
 		action->setProperty("dictionary", dict);
 		action->setCheckable(true);
 		connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
-		FDictMenu->addAction(action);
+		FDictMenu->addAction(action,AG_DEFAULT,true);
 	}
 	return true;
 }
@@ -196,11 +197,12 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 
 			if (!word.isEmpty() && !SpellBackend::instance()->isCorrect(word)) 
 			{
-				foreach(QString suggestion, SpellBackend::instance()->suggestions(word))
+				QList<QString> suggests = SpellBackend::instance()->suggestions(word);
+				for(int i=0; i<suggests.count() && i<MAX_SUGGESTIONS; i++)
 				{
 					Action *suggestAction = new Action(AMenu);
-					suggestAction->setText(suggestion);
-					suggestAction->setProperty("suggestion", suggestion);
+					suggestAction->setText(suggests.at(i));
+					suggestAction->setProperty("suggestion", suggests.at(i));
 					connect(suggestAction,SIGNAL(triggered()),SLOT(onRepairWordUnderCursor()));
 					AMenu->addAction(suggestAction,AG_EWCM_SPELLCHECKER_SUGGESTS);
 				}

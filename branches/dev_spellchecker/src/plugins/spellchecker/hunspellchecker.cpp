@@ -97,7 +97,7 @@ bool HunspellChecker::canAdd(const QString &AWord)
 
 bool HunspellChecker::add(const QString &AWord)
 {
-	if (available())
+	if (available() && canAdd(AWord))
 	{
 		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
 		FHunSpell->add(encWord.constData());
