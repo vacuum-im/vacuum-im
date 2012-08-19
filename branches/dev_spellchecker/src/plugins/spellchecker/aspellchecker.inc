@@ -1,8 +1,10 @@
 DEFINES       += HAVE_ASPELL
 win32 {
-  INCLUDEPATH += $${ASPELL_DEV_PATH}/include
-  LIBS        += -L$${ASPELL_DEV_PATH}/lib
   LIBS        += -laspell-15
+  LIBS        += -L$${ASPELL_DEV_PATH}/lib
+  INCLUDEPATH += $${ASPELL_DEV_PATH}/include
+} else {
+  LIBS        += -laspell
 }
 HEADERS       += aspellchecker.h
 SOURCES       += aspellchecker.cpp

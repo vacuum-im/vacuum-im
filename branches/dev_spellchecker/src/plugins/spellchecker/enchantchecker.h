@@ -29,13 +29,8 @@
 
 #include <QList>
 #include <QString>
-
+#include <enchant/enchant.h>
 #include "spellbackend.h"
-
-namespace enchant
-{
-	class Dict;
-}
 
 class EnchantChecker : 
 	public SpellBackend
@@ -48,12 +43,20 @@ public:
 	virtual QString actuallLang();
 	virtual void setLang(const QString &ALang);
 	virtual QList<QString> dictionaries();
+	virtual void setCustomDictPath(const QString &APath);
+	virtual void setPersonalDictPath(const QString &APath);
 	virtual bool isCorrect(const QString &AWord);
+	virtual bool canAdd(const QString &AWord);
 	virtual bool add(const QString &AWord);
 	virtual QList<QString> suggestions(const QString &AWord);
 private:
-	enchant::Dict *FSpeller;
-	std::string FActualLang;
+	void loadPersonalDict();
+	void savePersonalDict(const QString &AWord);
+private:
+	QString FActualLang;
+	EnchantDict *FDict;
+	EnchantBroker *FBroker;
+	QString FPersonalDictPath;
 };
 
 #endif // ENCHANTCHECKER_H

@@ -45,7 +45,6 @@ private:
 	IPluginManager *FPluginManager;
 	IMessageWidgets *FMessageWidgets;
 private:
-	Menu *FDictMenu;
 	QTextEdit *FCurrentTextEdit;
 	int FCurrentCursorPosition;
 	QMap<QObject *, SpellHighlighter *> FSpellHighlighters;

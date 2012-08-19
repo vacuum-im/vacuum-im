@@ -4,9 +4,9 @@
 #include <QList>
 #include <QString>
 #include <QTextCodec>
-
-#include <hunspell.hxx>
 #include "spellbackend.h"
+
+class Hunspell;
 
 class HunspellChecker :
 	public SpellBackend

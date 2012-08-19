@@ -14,14 +14,12 @@ SpellChecker::SpellChecker()
 {
 	FMessageWidgets = NULL;
 
-	FDictMenu = NULL;
 	FCurrentTextEdit = NULL;
 	FCurrentCursorPosition = 0;
 }
 
 SpellChecker::~SpellChecker()
 {
-	delete FDictMenu;
 	SpellBackend::destroyInstance();
 }
 
@@ -58,9 +56,6 @@ bool SpellChecker::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool SpellChecker::initObjects()
 {
-	FDictMenu = new Menu;
-	FDictMenu->setTitle(tr("Dictionary"));
-
 	QDir dictsDir(FPluginManager->homePath());
 	if (!dictsDir.exists(SPELLDICTS_DIR))
 		dictsDir.mkdir(SPELLDICTS_DIR);
@@ -84,21 +79,6 @@ bool SpellChecker::initSettings()
 
 bool SpellChecker::startPlugin()
 {
-	foreach(QString dict, SpellBackend::instance()->dictionaries())
-	{
-		Action *action = new Action(FDictMenu);
-		QLocale locale(dict);
-		if (locale.country()>QLocale::AnyCountry && dict.contains('_'))
-			action->setText(QString("%1 (%2)").arg(QLocale::languageToString(locale.language()),QLocale::countryToString(locale.country())));
-		else if (locale.language() > QLocale::C)
-			action->setText(QLocale::languageToString(locale.language()));
-		else
-			action->setText(dict);
-		action->setProperty("dictionary", dict);
-		action->setCheckable(true);
-		connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
-		FDictMenu->addAction(action,AG_DEFAULT,true);
-	}
 	return true;
 }
 
@@ -225,15 +205,29 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
 		AMenu->addAction(enableAction,AG_EWCM_SPELLCHECKER_OPTIONS);
 
-		if (!FDictMenu->isEmpty() && isSpellEnabled())
+		if (isSpellEnabled())
 		{
+			Menu *dictsMenu = new Menu(AMenu);
+			dictsMenu->setTitle(tr("Dictionary"));
+			AMenu->addAction(dictsMenu->menuAction(),AG_EWCM_SPELLCHECKER_OPTIONS);
+
 			QString actualLang = SpellBackend::instance()->actuallLang();
-			foreach(Action *action, FDictMenu->groupActions())
+			foreach(QString dict, SpellBackend::instance()->dictionaries())
 			{
-				QString dict = action->property("dictionary").toString();
-				action->setChecked(actualLang==dict || actualLang.contains(dict));
+				Action *action = new Action(dictsMenu);
+				QLocale locale(dict);
+				if (locale.country()>QLocale::AnyCountry && dict.contains('_'))
+					action->setText(QString("%1 (%2)").arg(QLocale::languageToString(locale.language()),QLocale::countryToString(locale.country())));
+				else if (locale.language() > QLocale::C)
+					action->setText(QLocale::languageToString(locale.language()));
+				else
+					action->setText(dict);
+				action->setProperty("dictionary", dict);
+				action->setCheckable(true);
+				action->setChecked(actualLang==dict);
+				connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
+				dictsMenu->addAction(action,AG_DEFAULT,true);
 			}
-			AMenu->addAction(FDictMenu->menuAction(),AG_EWCM_SPELLCHECKER_OPTIONS);
 		}
 
 		AMenu->popup(FCurrentTextEdit->mapToGlobal(APosition));

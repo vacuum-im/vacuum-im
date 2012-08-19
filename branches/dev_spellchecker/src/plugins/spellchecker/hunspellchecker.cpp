@@ -1,10 +1,15 @@
 #include "hunspellchecker.h"
 
+#ifdef USE_SYSTEM_HUNSPELL
+#	include <hunspell/hunspell.hxx>
+#else
+#	include <thirdparty/hunspell/hunspell.hxx>
+#endif
+
 #include <QDir>
 #include <QFile>
 #include <QLocale>
 #include <QCoreApplication>
-
 #include "spellchecker.h"
 
 HunspellChecker::HunspellChecker()
