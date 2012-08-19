@@ -90,8 +90,9 @@ bool HunspellChecker::isCorrect(const QString &AWord)
 
 bool HunspellChecker::canAdd(const QString &AWord)
 {
-	if (writable())
-		return FDictCodec!=NULL ? FDictCodec->canEncode(AWord) : true;
+	QString trimmedWord = AWord.trimmed();
+	if (writable() && !trimmedWord.isEmpty())
+		return FDictCodec!=NULL ? FDictCodec->canEncode(trimmedWord) : true;
 	return false;
 }
 
@@ -99,9 +100,10 @@ bool HunspellChecker::add(const QString &AWord)
 {
 	if (available() && canAdd(AWord))
 	{
-		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(AWord) : AWord.toUtf8();
+		QString trimmedWord = AWord.trimmed();
+		QByteArray encWord = FDictCodec!=NULL ? FDictCodec->fromUnicode(trimmedWord) : trimmedWord.toUtf8();
 		FHunSpell->add(encWord.constData());
-		savePersonalDict(AWord);
+		savePersonalDict(trimmedWord);
 		return true;
 	}
 	return false;
