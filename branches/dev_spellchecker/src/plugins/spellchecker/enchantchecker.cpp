@@ -24,19 +24,20 @@
  *
  */
 
-#include <QDir>
-#include <QCoreApplication>
 #include <QtDebug>
 
-#include "enchant++.h"
+#include <QDir>
+#include <QCoreApplication>
+
+#include <enchant++.h>
 #include "enchantchecker.h"
 
 QList<QString> dict;
 static void enumerate_dicts (const char * const lang_tag,
-		 const char * const provider_name,
-		 const char * const provider_desc,
-		 const char * const provider_file,
-		 void * user_data)
+														 const char * const provider_name,
+														 const char * const provider_desc,
+														 const char * const provider_file,
+														 void * user_data)
 {
 	if(!dict.contains(lang_tag))
 		dict+=lang_tag;
@@ -47,13 +48,13 @@ EnchantChecker::EnchantChecker() : FSpeller(NULL)
 	if (enchant::Broker *instance = enchant::Broker::instance())
 	{
 		QLocale loc;
-		lang="en_US";
+		FActualLang="en_US";
 		dict.clear();
 		instance->list_dicts(enumerate_dicts);
 		if (instance->dict_exists(loc.name().toStdString()))
-			lang = loc.name().toStdString();
+			FActualLang = loc.name().toStdString();
 		try {
-			FSpeller = enchant::Broker::instance()->request_dict(lang);
+			FSpeller = enchant::Broker::instance()->request_dict(FActualLang);
 		} catch (enchant::Exception &e) {
 			qWarning() << QString("Enchant error: %1").arg(e.what());
 		}
@@ -66,6 +67,42 @@ EnchantChecker::~EnchantChecker()
 	FSpeller = NULL;
 }
 
+bool EnchantChecker::available() const
+{
+	return (FSpeller != NULL);
+}
+
+bool EnchantChecker::writable() const
+{
+	return false;
+}
+
+QString EnchantChecker::actuallLang()
+{
+	return QString::fromStdString(FActualLang);
+}
+
+void EnchantChecker::setLang(const QString &ALang)
+{
+	if (enchant::Broker *instance = enchant::Broker::instance())
+	{
+		dict.clear();
+		instance->list_dicts(enumerate_dicts);
+		if (instance->dict_exists(ALang.toStdString()))
+			FActualLang = ALang.toStdString();
+		try {
+			FSpeller = enchant::Broker::instance()->request_dict(FActualLang);
+		} catch (enchant::Exception &e) {
+			qWarning() << QString("Enchant error: %1").arg(e.what());
+		}
+	}
+}
+
+QList< QString > EnchantChecker::dictionaries()
+{
+	return dict;
+}
+
 bool EnchantChecker::isCorrect(const QString &AWord)
 {
 	if(FSpeller) 
@@ -73,20 +110,6 @@ bool EnchantChecker::isCorrect(const QString &AWord)
 		return FSpeller->check(AWord.toUtf8().constData());
 	}
 	return true;
-}
-
-QList<QString> EnchantChecker::suggestions(const QString &AWord)
-{
-	QList<QString> words;
-	if (FSpeller) 
-	{
-		std::vector<std::string> out_suggestions;
-		FSpeller->suggest(AWord.toUtf8().constData(), out_suggestions);
-		std::vector<std::string>::iterator aE = out_suggestions.end();
-		for (std::vector<std::string>::iterator aI = out_suggestions.begin(); aI != aE; ++aI)
-			words += QString::fromUtf8(aI->c_str());
-	}
-	return words;
 }
 
 bool EnchantChecker::add(const QString &AWord)
@@ -104,38 +127,16 @@ bool EnchantChecker::add(const QString &AWord)
 	return result;
 }
 
-bool EnchantChecker::available() const
+QList<QString> EnchantChecker::suggestions(const QString &AWord)
 {
-	return (FSpeller != NULL);
-}
-
-bool EnchantChecker::writable() const
-{
-	return false;
-}
-
-QList< QString > EnchantChecker::dictionaries()
-{
-	return dict;
-}
-
-void EnchantChecker::setLang(const QString &AWord)
-{
-	if (enchant::Broker *instance = enchant::Broker::instance())
+	QList<QString> words;
+	if (FSpeller) 
 	{
-		dict.clear();
-		instance->list_dicts(enumerate_dicts);
-		if (instance->dict_exists(AWord.toStdString()))
-			lang = AWord.toStdString();
-		try {
-			FSpeller = enchant::Broker::instance()->request_dict(lang);
-		} catch (enchant::Exception &e) {
-			qWarning() << QString("Enchant error: %1").arg(e.what());
-		}
+		std::vector<std::string> out_suggestions;
+		FSpeller->suggest(AWord.toUtf8().constData(), out_suggestions);
+		std::vector<std::string>::iterator aE = out_suggestions.end();
+		for (std::vector<std::string>::iterator aI = out_suggestions.begin(); aI != aE; ++aI)
+			words += QString::fromUtf8(aI->c_str());
 	}
-}
-
-QString EnchantChecker::actuallLang()
-{
-	return QString::fromStdString(lang);
+	return words;
 }

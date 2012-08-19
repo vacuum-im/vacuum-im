@@ -43,17 +43,17 @@ class EnchantChecker :
 public:
 	EnchantChecker();
 	~EnchantChecker();
-	virtual QList<QString> suggestions(const QString &AWord);
-	virtual bool isCorrect(const QString &AWord);
-	virtual bool add(const QString &AWord);
 	virtual bool available() const;
 	virtual bool writable() const;
-	virtual QList<QString> dictionaries();
-	virtual void setLang(const QString &AWord);
 	virtual QString actuallLang();
+	virtual void setLang(const QString &ALang);
+	virtual QList<QString> dictionaries();
+	virtual bool isCorrect(const QString &AWord);
+	virtual bool add(const QString &AWord);
+	virtual QList<QString> suggestions(const QString &AWord);
 private:
 	enchant::Dict *FSpeller;
-	std::string lang;
+	std::string FActualLang;
 };
 
 #endif // ENCHANTCHECKER_H
