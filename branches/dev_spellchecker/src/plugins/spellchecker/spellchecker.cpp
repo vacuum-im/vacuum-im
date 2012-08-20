@@ -27,7 +27,7 @@ void SpellChecker::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Spell Checker");
 	APluginInfo->description = tr("Highlights words that may not be spelled correctly");
-	APluginInfo->version = "0.0.7";
+	APluginInfo->version = "1.0";
 	APluginInfo->author = "Minnahmetov V.K.";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 	APluginInfo->dependences.append(MESSAGEWIDGETS_UUID);
@@ -228,6 +228,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 				connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
 				dictsMenu->addAction(action,AG_DEFAULT,true);
 			}
+			dictsMenu->setEnabled(!dictsMenu->isEmpty());
 		}
 
 		AMenu->popup(FCurrentTextEdit->mapToGlobal(APosition));

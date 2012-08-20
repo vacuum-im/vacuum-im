@@ -29,8 +29,7 @@
 
 #include <QList>
 #include <QString>
-
-#include "spellchecker.h"
+#include "spellbackend.h"
 
 class MacSpellChecker : 
 	public SpellBackend
@@ -38,11 +37,9 @@ class MacSpellChecker :
 public:
 	MacSpellChecker();
 	~MacSpellChecker();
-	virtual QList<QString> suggestions(const QString &AWord);
-	virtual bool isCorrect(const QString &AWord);
-	virtual bool add(const QString &AWord);
 	virtual bool available() const;
-	virtual bool writable() const;
+	virtual bool isCorrect(const QString &AWord);
+	virtual QList<QString> suggestions(const QString &AWord);
 };
 
 #endif // MACSPELLCHECKER_H

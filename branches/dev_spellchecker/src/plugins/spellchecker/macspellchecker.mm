@@ -37,6 +37,11 @@ MacSpellChecker::~MacSpellChecker()
 {
 }
 
+bool MacSpellChecker::available() const
+{
+	return true;
+}
+
 bool MacSpellChecker::isCorrect(const QString& word)
 {
 	NSString* ns_word = [NSString stringWithUTF8String: word.toUtf8().data()];
@@ -48,27 +53,9 @@ bool MacSpellChecker::isCorrect(const QString& word)
 QList<QString> MacSpellChecker::suggestions(const QString& word)
 {
 	QList<QString> s;
-
 	NSString* ns_word = [NSString stringWithUTF8String: word.toUtf8().data()];
 	NSArray* ns_suggestions = [[NSSpellChecker sharedSpellChecker] guessesForWord:ns_word];
-	for(unsigned int i = 0; i < [ns_suggestions count]; i++) {
+	for(unsigned int i = 0; i < [ns_suggestions count]; i++)
 		s += QString::fromUtf8([[ns_suggestions objectAtIndex:i] UTF8String]);
-	}
-
 	return s;
-}
-
-bool MacSpellChecker::add(const QString& word)
-{
-	return false;
-}
-
-bool MacSpellChecker::available() const
-{
-	return true;
-}
-
-bool MacSpellChecker::writable() const
-{
-	return false;
 }

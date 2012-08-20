@@ -8,10 +8,6 @@ USE_ENCHANT {
   include(aspellchecker.inc)
 } else:USE_MACSPELL {
   include(macspellchecker.inc)
-} else:USE_HUNSPELL {
-  include(hunspellchecker.inc)
-} else:macx {
-  include(macspellchecker.inc)
 } else {
   include(hunspellchecker.inc)
 }
