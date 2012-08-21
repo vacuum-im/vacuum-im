@@ -3,20 +3,20 @@
 
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
+#include <interfaces/ispellchecker.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imultiuserchat.h>
 #include <utils/options.h>
 #include "spellhighlighter.h"
 
-#define SPELLCHECKER_UUID "{0dc5fbd9-2dd4-4720-9c95-8c3393a577a5}"
-
 class SpellChecker : 
 	public QObject,
-	public IPlugin
+	public IPlugin,
+	public ISpellChecker
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin);
+	Q_INTERFACES(IPlugin ISpellChecker);
 public:
 	SpellChecker();
 	~SpellChecker();
@@ -30,6 +30,20 @@ public:
 public:
 	virtual bool isSpellEnabled() const;
 	virtual void setSpellEnabled(bool AEnabled);
+	virtual bool isSpellAvailable() const;
+	virtual QList<QString> availDictionaries() const;
+	virtual QString currentDictionary() const;
+	virtual void setCurrentDictionary(const QString &ADict);
+	virtual bool isCorrectWord(const QString &AWord) const;
+	virtual QList<QString> wordSuggestions(const QString &AWord) const;
+	virtual bool canAddWordToPersonalDict(const QString &AWord) const;
+	virtual void addWordToPersonalDict(const QString &AWord);
+signals:
+	void spellEnableChanged(bool AEnabled);
+	void currentDictionaryChanged(const QString &ADict);
+	void wordAddedToPersonalDict(const QString &AWord);
+protected:
+	void rehightlightAll();
 protected slots:
 	void onChangeSpellEnable();
 	void onChangeDictionary();

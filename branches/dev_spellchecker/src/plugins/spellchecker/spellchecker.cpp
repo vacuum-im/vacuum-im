@@ -92,26 +92,68 @@ void SpellChecker::setSpellEnabled(bool AEnabled)
 	Options::node(OPV_MESSAGES_SPELL_ENABLED).setValue(AEnabled);
 }
 
+bool SpellChecker::isSpellAvailable() const
+{
+	return SpellBackend::instance()->available();
+}
+
+QList<QString> SpellChecker::availDictionaries() const
+{
+	return SpellBackend::instance()->dictionaries();
+}
+
+QString SpellChecker::currentDictionary() const
+{
+	return SpellBackend::instance()->actuallLang();
+}
+
+void SpellChecker::setCurrentDictionary(const QString &ADict)
+{
+	Options::node(OPV_MESSAGES_SPELL_LANG).setValue(ADict);
+}
+
+bool SpellChecker::isCorrectWord(const QString &AWord) const
+{
+	return AWord.trimmed().isEmpty() || SpellBackend::instance()->isCorrect(AWord);
+}
+
+QList<QString> SpellChecker::wordSuggestions(const QString &AWord) const
+{
+	return SpellBackend::instance()->suggestions(AWord);
+}
+
+bool SpellChecker::canAddWordToPersonalDict(const QString &AWord) const
+{
+	return SpellBackend::instance()->writable() && SpellBackend::instance()->canAdd(AWord);
+}
+
+void SpellChecker::addWordToPersonalDict(const QString &AWord)
+{
+	if (SpellBackend::instance()->add(AWord))
+	{
+		rehightlightAll();
+		emit wordAddedToPersonalDict(AWord);
+	}
+}
+
+void SpellChecker::rehightlightAll()
+{
+	foreach(SpellHighlighter *hiliter, FSpellHighlighters.values())
+		hiliter->rehighlight();
+}
+
 void SpellChecker::onChangeSpellEnable()
 {
 	QAction *action = qobject_cast<QAction *>(sender());
 	if (action)
-	{
 		setSpellEnabled(action->isChecked());
-	}
 }
 
 void SpellChecker::onChangeDictionary()
 {
 	QAction *action = qobject_cast<QAction *>(sender());
-	if (action && FSpellHighlighters.contains(FCurrentTextEdit))
-	{
-		action->setChecked(true);
-		QString lang = action->property("dictionary").toString();
-		SpellBackend::instance()->setLang(lang);
-		FSpellHighlighters.value(FCurrentTextEdit)->rehighlight();
-		Options::node(OPV_MESSAGES_SPELL_LANG).setValue(lang);
-	}
+	if (action)
+		setCurrentDictionary(action->property("dictionary").toString());
 }
 
 void SpellChecker::onRepairWordUnderCursor()
@@ -138,8 +180,7 @@ void SpellChecker::onAddUnknownWordToDictionary()
 		QTextCursor cursor = FCurrentTextEdit->textCursor();
 		cursor.setPosition(FCurrentCursorPosition, QTextCursor::MoveAnchor);
 		cursor.select(QTextCursor::WordUnderCursor);
-		SpellBackend::instance()->add(cursor.selectedText());
-		FSpellHighlighters.value(FCurrentTextEdit)->rehighlightBlock(cursor.block());
+		addWordToPersonalDict(cursor.selectedText());
 	}
 }
 
@@ -168,16 +209,16 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 	if (editWidget)
 	{
 		FCurrentTextEdit = editWidget->textEdit();
-		if (isSpellEnabled() && SpellBackend::instance()->available())
+		if (isSpellEnabled() && isSpellAvailable())
 		{
 			QTextCursor cursor = FCurrentTextEdit->cursorForPosition(APosition);
 			FCurrentCursorPosition = cursor.position();
 			cursor.select(QTextCursor::WordUnderCursor);
 			const QString word = cursor.selectedText();
 
-			if (!word.isEmpty() && !SpellBackend::instance()->isCorrect(word)) 
+			if (!isCorrectWord(word))
 			{
-				QList<QString> suggests = SpellBackend::instance()->suggestions(word);
+				QList<QString> suggests = wordSuggestions(word);
 				for(int i=0; i<suggests.count() && i<MAX_SUGGESTIONS; i++)
 				{
 					Action *suggestAction = new Action(AMenu);
@@ -187,7 +228,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 					AMenu->addAction(suggestAction,AG_EWCM_SPELLCHECKER_SUGGESTS);
 				}
 
-				if (SpellBackend::instance()->canAdd(word))
+				if (canAddWordToPersonalDict(word))
 				{
 					Action *appendAction = new Action(AMenu);
 					appendAction->setText(tr("Add '%1' to Dictionary").arg(word));
@@ -201,7 +242,8 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 		Action *enableAction = new Action(AMenu);
 		enableAction->setText(tr("Spell Check"));
 		enableAction->setCheckable(true);
-		enableAction->setChecked(isSpellEnabled());
+		enableAction->setChecked(isSpellEnabled() && isSpellAvailable());
+		enableAction->setEnabled(isSpellAvailable());
 		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
 		AMenu->addAction(enableAction,AG_EWCM_SPELLCHECKER_OPTIONS);
 
@@ -211,8 +253,8 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 			dictsMenu->setTitle(tr("Dictionary"));
 			AMenu->addAction(dictsMenu->menuAction(),AG_EWCM_SPELLCHECKER_OPTIONS);
 
-			QString actualLang = SpellBackend::instance()->actuallLang();
-			foreach(QString dict, SpellBackend::instance()->dictionaries())
+			QString curDict = currentDictionary();
+			foreach(QString dict, availDictionaries())
 			{
 				Action *action = new Action(dictsMenu);
 				QLocale locale(dict);
@@ -224,7 +266,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 					action->setText(dict);
 				action->setProperty("dictionary", dict);
 				action->setCheckable(true);
-				action->setChecked(actualLang==dict);
+				action->setChecked(curDict==dict);
 				connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
 				dictsMenu->addAction(action,AG_DEFAULT,true);
 			}
@@ -242,16 +284,31 @@ void SpellChecker::onTextEditDestroyed(QObject *AObject)
 
 void SpellChecker::onOptionsOpened()
 {
-	SpellBackend::instance()->setLang(Options::node(OPV_MESSAGES_SPELL_LANG).value().toString());
 	onOptionsChanged(Options::node(OPV_MESSAGES_SPELL_ENABLED));
+	onOptionsChanged(Options::node(OPV_MESSAGES_SPELL_LANG));
 }
 
 void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_MESSAGES_SPELL_ENABLED)
 	{
+		bool enabled = ANode.value().toBool();
 		foreach(SpellHighlighter *liter, FSpellHighlighters.values())
-			liter->setEnabled(ANode.value().toBool());
+			liter->setEnabled(enabled);
+		emit spellEnableChanged(enabled);
+	}
+	else if (ANode.path() == OPV_MESSAGES_SPELL_LANG)
+	{
+		QString fullDict = ANode.value().toString();
+		QString partDict = fullDict.split('_').value(0);
+		QList<QString> availDicts = availDictionaries();
+		QString dict = availDicts.contains(fullDict) ? fullDict : partDict;
+		if (availDicts.contains(dict))
+		{
+			SpellBackend::instance()->setLang(dict);
+			emit currentDictionaryChanged(currentDictionary());
+			rehightlightAll();
+		}
 	}
 }
 
