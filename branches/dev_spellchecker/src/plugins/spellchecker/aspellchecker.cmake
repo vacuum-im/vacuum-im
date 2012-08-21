@@ -2,6 +2,8 @@ add_definitions(-DHAVE_ASPELL)
 
 set(SOURCES ${SOURCES} "aspellchecker.cpp") 
 set(HEADERS ${HEADERS} "aspellchecker.h")
+set(MOC_HEADERS ${MOC_HEADERS} "aspellchecker.h") 
+
 
 if (IS_ENABLED)
 	if (WIN32)

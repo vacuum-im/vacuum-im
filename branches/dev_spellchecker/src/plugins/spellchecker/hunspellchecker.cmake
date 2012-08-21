@@ -3,6 +3,7 @@ add_definitions(-DHUNSPELL_STATIC)
 
 set(SOURCES ${SOURCES} "hunspellchecker.cpp") 
 set(HEADERS ${HEADERS} "hunspellchecker.h")
+set(MOC_HEADERS ${MOC_HEADERS} "hunspellchecker.h") 
 
 if (IS_ENABLED)
 	if (SYSTEM_HUNSPELL_FOUND)
