@@ -32,6 +32,8 @@ public:
 	void setIcon(const QIcon &AIcon);
 	void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
 	void setTitle(const QString &ATitle);
+public:
+	static bool copyStandardMenu(Menu *ADestination, QMenu *ASource, int AGroup = AG_DEFAULT);
 signals:
 	void actionInserted(QAction *ABefore, Action *AAction, int AGroup, bool ASort);
 	void actionRemoved(Action *AAction);
@@ -44,8 +46,8 @@ private:
 	Action *FMenuAction;
 	IconStorage *FIconStorage;
 private:
-	QMultiMap<int, Action *> FActions;
 	QMap<int, QAction *> FSeparators;
+	QMultiMap<int, Action *> FActions;
 };
 
 #endif // MENU_H

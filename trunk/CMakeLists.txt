@@ -26,6 +26,7 @@ find_library(SYSTEM_ZLIB_FOUND z)
 find_library(SYSTEM_IDN_FOUND idn)
 find_library(SYSTEM_MINIZIP_FOUND minizip)
 find_library(SYSTEM_QTLOCKEDFILE_FOUND QtSolutions_LockedFile-2.4)
+find_library(SYSTEM_HUNSPELL_FOUND hunspell)
 
 if (FORCE_BUNDLED_MINIZIP)
 	set(SYSTEM_MINIZIP_FOUND NO)
@@ -47,6 +48,9 @@ if (SYSTEM_QTLOCKEDFILE_FOUND)
 	add_definitions(-DUSE_SYSTEM_QTLOCKEDFILE)
 endif (SYSTEM_QTLOCKEDFILE_FOUND)
 
+if (SYSTEM_HUNSPELL_FOUND)
+	add_definitions(-DUSE_SYSTEM_HUNSPELL)
+endif (SYSTEM_HUNSPELL_FOUND)
 
 if ("${LANGS}" STREQUAL "")
 	process_lang_options()

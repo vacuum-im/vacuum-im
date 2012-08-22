@@ -7,6 +7,7 @@ LEGEND
 
 
 ------
+  [!] Added new plugin for spell checking
   [-] The application may fail in some cases after unsuccessful Stanza-session initialization
 
 

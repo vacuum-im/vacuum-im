@@ -96,6 +96,7 @@ public:
 	virtual ToolBarChanger *sendToolBarChanger() const =0;
 	virtual bool isRichTextEnabled() const =0;
 	virtual void setRichTextEnabled(bool AEnabled) =0;
+	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu) =0;
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment) =0;
 	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const =0;
 protected:
@@ -109,6 +110,7 @@ protected:
 	virtual void minimumLinesChanged(int ALines) =0;
 	virtual void sendShortcutChanged(const QString &AShortcutId) =0;
 	virtual void richTextEnableChanged(bool AEnabled) =0;
+	virtual void editContextMenu(const QPoint &APosition, Menu *AMenu) =0;
 };
 
 class IReceiversWidget
