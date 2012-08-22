@@ -371,9 +371,8 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 					QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(menu->menuAction(),TBG_CWTBW_USER_TOOLS);
 					button->setPopupMode(QToolButton::InstantPopup);
 				}
-
-				if (Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool())
-					showHistory(window);
+				
+				showHistory(window);
 			}
 			else
 			{
@@ -476,7 +475,7 @@ void ChatMessageHandler::removeNotifiedMessages(IChatWindow *AWindow)
 
 void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 {
-	if (FMessageArchiver && !FHistoryRequests.values().contains(AWindow))
+	if (FMessageArchiver && Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool() && !FHistoryRequests.values().contains(AWindow))
 	{
 		WindowStatus &wstatus = FWindowStatus[AWindow];
 
