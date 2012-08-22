@@ -5,7 +5,6 @@ set(PLUGIN_DISPLAY_NAME "Spellchecker")
 set(PLUGIN_DEPENDENCIES messagewidgets) # used only in CPack 
 
 include("spellchecker.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
 
 if (USE_ASPELL)
 	include("aspellchecker.cmake")
@@ -17,3 +16,4 @@ else (USE_ASPELL)
 	include("hunspellchecker.cmake")
 endif (USE_ASPELL)
 
+include("${CMAKE_SOURCE_DIR}/plugins.cmake")
