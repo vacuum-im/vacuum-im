@@ -110,6 +110,7 @@ signals:
 	void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 protected:
 	void insertChatAction(IMultiUserChatWindow *AWindow);
+	void updateChatAction(IMultiUserChatWindow *AWindow);
 	void removeChatAction(IMultiUserChatWindow *AWindow);
 	void registerDiscoFeatures();
 	QString streamVCardNick(const Jid &AStreamJid) const;
@@ -117,6 +118,7 @@ protected:
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
 protected slots:
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
+	void onMultiUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick);
 	void onMultiUserChatDestroyed();
 	void onMultiChatWindowDestroyed();
 	void onStreamRemoved(IXmppStream *AXmppStream);
