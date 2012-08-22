@@ -64,3 +64,4 @@ SUBDIRS += urlprocessor
 SUBDIRS += filemessagearchive 
 SUBDIRS += servermessagearchive 
 SUBDIRS += rosteritemexchange 
+SUBDIRS += spellchecker 

@@ -1,6 +1,7 @@
 #ifndef EDITWIDGET_H
 #define EDITWIDGET_H
 
+#include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -40,6 +41,7 @@ public:
 	virtual ToolBarChanger *sendToolBarChanger() const;
 	virtual bool isRichTextEnabled() const;
 	virtual void setRichTextEnabled(bool AEnabled);
+	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu);
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment);
 	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const;
 signals:
@@ -54,6 +56,7 @@ signals:
 	void minimumLinesChanged(int ALines);
 	void sendShortcutChanged(const QString &AShortcutId);
 	void richTextEnableChanged(bool AEnabled);
+	void editContextMenu(const QPoint &APosition, Menu *AMenu);
 	// EditWidget
 	void createDataRequest(QMimeData *ADestination) const;
 	void canInsertDataRequest(const QMimeData *AData, bool &ACanInsert) const;
@@ -76,6 +79,7 @@ protected slots:
 	void onEditorCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert);
 	void onEditorInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument);
 	void onEditorContentsChanged(int APosition, int ARemoved, int AAdded);
+	void onEditorCustomContextMenuRequested(const QPoint &APosition);
 private:
 	Ui::EditWidgetClass ui;
 private:

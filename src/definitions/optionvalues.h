@@ -107,6 +107,9 @@
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
 //MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
+//SpellChecker
+#define OPV_MESSAGES_SPELL_LANG                         "messages.spell.lang"
+#define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"
 
 // MultiUserChat
 #define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"

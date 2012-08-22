@@ -83,6 +83,35 @@ void Action::setShortcutId(const QString &AId)
 	Shortcuts::bindObjectShortcut(AId, this);
 }
 
+bool Action::copyStandardAction(Action *ADestination, QAction *ASource)
+{
+	if (ADestination && ASource && !ASource->isSeparator())
+	{
+		ADestination->setActionGroup(ASource->actionGroup());
+		ADestination->setAutoRepeat(ASource->autoRepeat());
+		ADestination->setCheckable(ASource->isCheckable());
+		ADestination->setChecked(ASource->isChecked());
+		ADestination->setEnabled(ASource->isEnabled());
+		ADestination->setFont(ASource->font());
+		ADestination->setIcon(ASource->icon());
+		ADestination->setIconText(ASource->iconText());
+		ADestination->setIconVisibleInMenu(ASource->isIconVisibleInMenu());
+		ADestination->setMenuRole(ASource->menuRole());
+		ADestination->setPriority(ASource->priority());
+		ADestination->setShortcut(ASource->shortcut());
+		ADestination->setShortcutContext(ASource->shortcutContext());
+		ADestination->setStatusTip(ASource->statusTip());
+		ADestination->setText(ASource->text());
+		ADestination->setToolTip(ASource->toolTip());
+		ADestination->setVisible(ASource->isVisible());
+		ADestination->setWhatsThis(ASource->whatsThis());
+		connect(ADestination,SIGNAL(triggered()),ASource,SLOT(trigger()));
+		connect(ADestination,SIGNAL(toggled(bool)),ASource,SLOT(toggle()));
+		return true;
+	}
+	return false;
+}
+
 void Action::onMenuDestroyed(Menu *AMenu)
 {
 	Q_UNUSED(AMenu);

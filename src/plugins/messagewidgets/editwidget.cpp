@@ -40,6 +40,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	sendButton->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
 	ui.medEditor->installEventFilter(this);
+	ui.medEditor->setContextMenuPolicy(Qt::CustomContextMenu);
 	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITNEXTMESSAGE,ui.medEditor);
 	Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_EDITPREVMESSAGE,ui.medEditor);
 	connect(ui.medEditor,SIGNAL(createDataRequest(QMimeData *)),SLOT(onEditorCreateDataRequest(QMimeData *)));
@@ -48,6 +49,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	connect(ui.medEditor,SIGNAL(insertDataRequest(const QMimeData *, QTextDocument *)),
 		SLOT(onEditorInsertDataRequest(const QMimeData *, QTextDocument *)));
 	connect(ui.medEditor->document(),SIGNAL(contentsChange(int,int,int)),SLOT(onEditorContentsChanged(int,int,int)));
+	connect(ui.medEditor,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onEditorCustomContextMenuRequested(const QPoint &)));
 
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORAUTORESIZE));
 	onOptionsChanged(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES));
@@ -183,6 +185,14 @@ void EditWidget::setRichTextEnabled(bool AEnabled)
 		ui.medEditor->setAcceptRichText(AEnabled);
 		richTextEnableChanged(AEnabled);
 	}
+}
+
+void EditWidget::contextMenuForEdit(const QPoint &APosition, Menu *AMenu)
+{
+	QMenu *stdMenu = ui.medEditor->createStandardContextMenu(APosition);
+	Menu::copyStandardMenu(AMenu,stdMenu,AG_EWCM_MESSAGEWIDGETS_DEFAULT);
+	connect(AMenu,SIGNAL(destroyed(QObject *)),stdMenu,SLOT(deleteLater()));
+	emit editContextMenu(APosition,AMenu);
 }
 
 void EditWidget::insertTextFragment(const QTextDocumentFragment &AFragment)
@@ -366,4 +376,17 @@ void EditWidget::onEditorInsertDataRequest(const QMimeData *AData, QTextDocument
 void EditWidget::onEditorContentsChanged(int APosition, int ARemoved, int AAdded)
 {
 	emit contentsChanged(APosition,ARemoved,AAdded);
+}
+
+void EditWidget::onEditorCustomContextMenuRequested(const QPoint &APosition)
+{
+	Menu *menu = new Menu(this);
+	menu->setAttribute(Qt::WA_DeleteOnClose, true);
+
+	contextMenuForEdit(APosition,menu);
+
+	if (!menu->isEmpty())
+		menu->popup(ui.medEditor->mapToGlobal(APosition));
+	else
+		delete menu;
 }
