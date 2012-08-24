@@ -422,20 +422,16 @@
         <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation>dd MMM yyyy</translation>
     </message>
+    <message>
+        <source>Search in text</source>
+        <translation>Поиск по тексту</translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindowClass</name>
     <message>
-        <source>Search</source>
-        <translation>Поиск</translation>
-    </message>
-    <message>
         <source>Update</source>
         <translation>Обновить</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Поиск:</translation>
     </message>
     <message>
         <source>Next</source>

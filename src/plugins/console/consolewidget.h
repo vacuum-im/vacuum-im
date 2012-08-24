@@ -44,7 +44,7 @@ protected slots:
 protected slots:
 	void onTextHilightTimerTimeout();
 	void onTextVisiblePositionBoundaryChanged();
-	void onTextSearchTimerTimeout();
+	void onTextSearchStart();
 	void onTextSearchNextClicked();
 	void onTextSearchPreviousClicked();
 	void onTextSearchTextChanged(const QString &AText);
@@ -65,7 +65,6 @@ private:
 	QTime FTimePoint;
 private:
 	bool FSearchMoveCursor;
-	QTimer FTextSearchTimer;
 	QTimer FTextHilightTimer;
 	QMap<int,QTextEdit::ExtraSelection> FSearchResults;
 };

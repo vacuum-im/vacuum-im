@@ -54,6 +54,10 @@
         <source>User stanza sent.</source>
         <translation>Станза пользователя отправлена.</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
 </context>
 <context>
     <name>ConsoleWidgetClass</name>

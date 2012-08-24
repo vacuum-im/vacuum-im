@@ -422,19 +422,15 @@
         <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Search in text</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindowClass</name>
     <message>
-        <source>Search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Search:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

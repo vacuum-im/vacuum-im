@@ -1,7 +1,6 @@
 #ifndef ROSTERSEARCH_H
 #define ROSTERSEARCH_H
 
-#include <QTimer>
 #include <QLineEdit>
 #include <QSortFilterProxyModel>
 #include <definitions/actiongroups.h>
@@ -20,6 +19,7 @@
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/toolbarchanger.h>
+#include <utils/searchlineedit.h>
 
 class RosterSearch :
 			public QSortFilterProxyModel,
@@ -72,7 +72,7 @@ protected slots:
 	void onFieldActionTriggered(bool);
 	void onEnableActionTriggered(bool AChecked);
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
-	void onEditTimedOut();
+	void onSearchEditStart();
 	void onOptionsOpened();
 	void onOptionsClosed();
 private:
@@ -82,10 +82,8 @@ private:
 	bool FAutoEnabled;
 	bool FSearchStarted;
 	bool FLastShowOffline;
-	Menu *FFieldsMenu;
-	QTimer FEditTimeout;
 	Action *FEnableAction;
-	QLineEdit *FSearchEdit;
+	SearchLineEdit *FSearchEdit;
 	ToolBarChanger *FSearchToolBarChanger;
 	QMap<int,Action *> FFieldActions;
 	QList<IRosterIndex *>FSelectedIndexes;
