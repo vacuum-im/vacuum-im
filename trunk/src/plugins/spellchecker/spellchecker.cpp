@@ -272,8 +272,6 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 			}
 			dictsMenu->setEnabled(!dictsMenu->isEmpty());
 		}
-
-		AMenu->popup(FCurrentTextEdit->mapToGlobal(APosition));
 	}
 }
 
