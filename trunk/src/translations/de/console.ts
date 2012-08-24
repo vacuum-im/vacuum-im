@@ -54,6 +54,10 @@
         <source>User stanza sent.</source>
         <translation>Anwender Packet gesendet.</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConsoleWidgetClass</name>

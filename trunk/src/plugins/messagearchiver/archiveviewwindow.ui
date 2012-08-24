@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>774</width>
+    <width>773</width>
     <height>508</height>
    </rect>
   </property>
@@ -45,7 +45,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pbtLoadEarlierMessages"/>
+         <widget class="QPushButton" name="pbtLoadEarlierMessages">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QWidget" name="wdtArchiveSearch" native="true">
@@ -54,23 +61,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLineEdit" name="lneArchiveSearch"/>
-           </item>
-           <item>
-            <widget class="QToolButton" name="tlbArchiveSearchUpdate">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Search</string>
-             </property>
-             <property name="autoRaise">
-              <bool>true</bool>
-             </property>
-            </widget>
+            <widget class="SearchLineEdit" name="lneArchiveSearch"/>
            </item>
           </layout>
          </widget>
@@ -128,17 +119,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="QLabel" name="lblTextSearch">
-             <property name="text">
-              <string>Search:</string>
-             </property>
-             <property name="buddy">
-              <cstring>lneTextSearch</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lneTextSearch">
+            <widget class="SearchLineEdit" name="lneTextSearch">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -199,6 +180,13 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="lblTextSearchInfo">
+             <property name="text">
+              <string notr="true">Phrase was not found</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -210,13 +198,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-           <item>
-            <widget class="QLabel" name="lblTextSearchInfo">
-             <property name="text">
-              <string notr="true">Phrase was not found</string>
-             </property>
-            </widget>
            </item>
           </layout>
          </widget>
@@ -242,12 +223,16 @@
    <extends>QTextBrowser</extends>
    <header location="global">utils/animatedtextbrowser.h</header>
   </customwidget>
+  <customwidget>
+   <class>SearchLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">utils/searchlineedit.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>spwSelectPage</tabstop>
   <tabstop>pbtLoadEarlierMessages</tabstop>
   <tabstop>lneArchiveSearch</tabstop>
-  <tabstop>tlbArchiveSearchUpdate</tabstop>
   <tabstop>trvHeaders</tabstop>
   <tabstop>pbtHeadersUpdate</tabstop>
   <tabstop>tbrMessages</tabstop>

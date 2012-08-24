@@ -106,15 +106,13 @@ protected slots:
 	void onCollectionsRequestTimerTimeout();
 	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore);
 protected slots:
-	void onArchiveSearchUpdate();
-	void onArchiveSearchChanged(const QString &AText);
+	void onArchiveSearchStart();
 	void onTextHilightTimerTimeout();
 	void onTextVisiblePositionBoundaryChanged();
-	void onTextSearchTimerTimeout();
+	void onTextSearchStart();
 	void onTextSearchNextClicked();
 	void onTextSearchPreviousClicked();
 	void onTextSearchCaseSensitivityChanged();
-	void onTextSearchTextChanged(const QString &AText);
 protected slots:
 	void onSetContactJidByAction();
 	void onRemoveCollectionsByAction();
@@ -141,10 +139,10 @@ private:
 	QMap<IArchiveHeader,IArchiveCollection> FCollections;
 private:
 	QString FSearchString;
-	QTimer FTextSearchTimer;
 	QTimer FTextHilightTimer;
 	QMap<int,QTextEdit::ExtraSelection> FSearchResults;
 private:
+	QWidget *FFocusWidget;
 	QList<QDate> FLoadedPages;
 	QTimer FHeadersRequestTimer;
 	QMap<QString, QDate> FHeadersRequests;

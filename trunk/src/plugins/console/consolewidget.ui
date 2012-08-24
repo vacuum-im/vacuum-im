@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
+    <width>737</width>
     <height>562</height>
    </rect>
   </property>
@@ -226,7 +226,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QLineEdit" name="lneTextSearch">
+          <widget class="SearchLineEdit" name="lneTextSearch">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -337,6 +337,11 @@
    <class>AnimatedTextBrowser</class>
    <extends>QTextBrowser</extends>
    <header location="global">utils/animatedtextbrowser.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SearchLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">utils/searchlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -414,20 +414,16 @@
         <source>Conversation history removed successfully</source>
         <translation>Conversation history removed successfully</translation>
     </message>
+    <message>
+        <source>Search in text</source>
+        <translation>Search in text</translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindowClass</name>
     <message>
-        <source>Search</source>
-        <translation>Search</translation>
-    </message>
-    <message>
         <source>Update</source>
         <translation>Update</translation>
-    </message>
-    <message>
-        <source>Search:</source>
-        <translation>Search:</translation>
     </message>
     <message>
         <source>Next</source>

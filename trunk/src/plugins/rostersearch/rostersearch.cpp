@@ -2,8 +2,6 @@
 
 #include <QKeyEvent>
 
-#define EDIT_TIMEOUT     300
-
 RosterSearch::RosterSearch()
 {
 	FRostersViewPlugin = NULL;
@@ -12,14 +10,6 @@ RosterSearch::RosterSearch()
 	FAutoEnabled = false;
 	FSearchStarted = false;
 	FLastShowOffline = false;
-
-	FSearchEdit = NULL;
-	FFieldsMenu = NULL;
-	FSearchToolBarChanger = NULL;
-
-	FEditTimeout.setSingleShot(true);
-	FEditTimeout.setInterval(EDIT_TIMEOUT);
-	connect(&FEditTimeout,SIGNAL(timeout()),SLOT(onEditTimedOut()));
 
 	setDynamicSortFilter(false);
 	setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -39,13 +29,12 @@ RosterSearch::RosterSearch()
 	FSearchToolBarChanger->setSeparatorsVisible(false);
 	FSearchToolBarChanger->toolBar()->setVisible(false);
 
-	FFieldsMenu = new Menu(searchToolBar);
-	FFieldsMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
-	FSearchToolBarChanger->insertAction(FFieldsMenu->menuAction());
-
-	FSearchEdit = new QLineEdit(searchToolBar);
+	FSearchEdit = new SearchLineEdit(searchToolBar);
+	FSearchEdit->setSearchMenuVisible(true);
+	FSearchEdit->setSelectTextOnFocusEnabled(false);
+	FSearchEdit->searchMenu()->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
 	FSearchEdit->setToolTip(tr("Search by regular expression"));
-	connect(FSearchEdit,SIGNAL(textChanged(const QString &)),&FEditTimeout,SLOT(start()));
+	connect(FSearchEdit,SIGNAL(searchStart()),SLOT(onSearchEditStart()));
 	FSearchToolBarChanger->insertWidget(FSearchEdit);
 }
 
@@ -143,7 +132,7 @@ bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIn
 	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
 	{
-		if ((AEvent->modifiers() & ~Qt::ShiftModifier)==0)
+		if ((AEvent->modifiers() & ~(Qt::ShiftModifier|Qt::KeypadModifier))==0)
 		{
 			QChar key = !AEvent->text().isEmpty() ? AEvent->text().at(0) : QChar();
 			if (key.isLetterOrNumber() || key.isPunct())
@@ -158,7 +147,7 @@ bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AI
 	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
 	{
-		if ((AEvent->modifiers() & ~Qt::ShiftModifier)==0)
+		if ((AEvent->modifiers() & ~(Qt::ShiftModifier|Qt::KeypadModifier))==0)
 		{
 			QChar key = !AEvent->text().isEmpty() ? AEvent->text().at(0) : QChar();
 			if (key.isLetterOrNumber() || key.isPunct())
@@ -285,11 +274,11 @@ void RosterSearch::insertSearchField(int ADataRole, const QString &AName)
 	Action *action = FFieldActions.value(ADataRole,NULL);
 	if (action == NULL)
 	{
-		action = new Action(FFieldsMenu);
+		action = new Action(searchFieldsMenu());
 		action->setData(Action::DR_SortString,QString("%1").arg(ADataRole,5,10,QChar('0')));
 		connect(action,SIGNAL(triggered(bool)),SLOT(onFieldActionTriggered(bool)));
 		FFieldActions.insert(ADataRole,action);
-		FFieldsMenu->addAction(action,AG_DEFAULT,true);
+		searchFieldsMenu()->addAction(action,AG_DEFAULT,true);
 	}
 	action->setText(AName);
 	action->setCheckable(true);
@@ -299,7 +288,7 @@ void RosterSearch::insertSearchField(int ADataRole, const QString &AName)
 
 Menu *RosterSearch::searchFieldsMenu() const
 {
-	return FFieldsMenu;
+	return FSearchEdit->searchMenu();
 }
 
 QList<int> RosterSearch::searchFields() const
@@ -326,7 +315,7 @@ void RosterSearch::removeSearchField(int ADataRole)
 	if (FFieldActions.contains(ADataRole))
 	{
 		Action *action = FFieldActions.take(ADataRole);
-		FFieldsMenu->removeAction(action);
+		searchFieldsMenu()->removeAction(action);
 		delete action;
 		emit searchFieldRemoved(ADataRole);
 	}
@@ -385,7 +374,7 @@ void RosterSearch::onRosterIndexDestroyed(IRosterIndex *AIndex)
 	FSelectedIndexes.removeAll(AIndex);
 }
 
-void RosterSearch::onEditTimedOut()
+void RosterSearch::onSearchEditStart()
 {
 	emit searchPatternChanged(FSearchEdit->text());
 	startSearch();
