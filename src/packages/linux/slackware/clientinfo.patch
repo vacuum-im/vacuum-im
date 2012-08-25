@@ -1,6 +1,6 @@
 Index: src/plugins/clientinfo/clientinfo.cpp
 ===================================================================
---- src/plugins/clientinfo/clientinfo.cpp	(revision 1862)
+--- src/plugins/clientinfo/clientinfo.cpp	(revision 1887)
 +++ src/plugins/clientinfo/clientinfo.cpp	(working copy)
 @@ -2,6 +2,8 @@
  
@@ -11,15 +11,13 @@ Index: src/plugins/clientinfo/clientinfo.cpp
  #include <QFileInfo>
  #include <QTextStream>
  
-@@ -433,7 +435,21 @@
- 				osver = osver.trimmed();
+@@ -434,8 +436,23 @@
  			}
  		}
--
-+
+ 
 +// Slackware detect
-+		if (osver.isEmpty())
-+		{
+ 		if (osver.isEmpty())
+ 		{
 +			QFile slackwarever("/etc/slackware-version");
 +			if (!slackwarever.open(QIODevice::ReadOnly | QIODevice::Text));
 +			QTextStream slackin(&slackwarever);
@@ -29,8 +27,11 @@ Index: src/plugins/clientinfo/clientinfo.cpp
 +				QString slackprocess_line(slackline);
 +				osver.append(slackprocess_line);
 +			}
++			slackwarever.close();
 +		}
 +
- 		if (osver.isEmpty())
- 		{
++		if (osver.isEmpty())
++		{
  			utsname buf;
+ 			if (uname(&buf) != -1)
+ 			{
