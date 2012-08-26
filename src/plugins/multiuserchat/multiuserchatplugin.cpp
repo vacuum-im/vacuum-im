@@ -566,6 +566,8 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 		IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword);
 		chatWindow = new MultiUserChatWindow(this,chat);
 		WidgetManager::setWindowSticky(chatWindow->instance(),true);
+		connect(chat->instance(),SIGNAL(userNickChanged(IMultiUser *, const QString &, const QString &)),
+			SLOT(onMultiUserNickChanged(IMultiUser *, const QString &, const QString &)));
 		connect(chatWindow->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
 		connect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
 		insertChatAction(chatWindow);
@@ -595,10 +597,20 @@ void MultiUserChatPlugin::insertChatAction(IMultiUserChatWindow *AWindow)
 	{
 		Action *action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFERENCE);
-		action->setText(tr("%1 as %2").arg(AWindow->multiUserChat()->roomJid().uBare()).arg(AWindow->multiUserChat()->nickName()));
 		connect(action,SIGNAL(triggered(bool)),SLOT(onChatActionTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT,false);
 		FChatActions.insert(AWindow,action);
+		updateChatAction(AWindow);
+	}
+}
+
+void MultiUserChatPlugin::updateChatAction(IMultiUserChatWindow *AWindow)
+{
+	if (FChatMenu && FChatActions.contains(AWindow))
+	{
+		Action *action = FChatActions.value(AWindow);
+		QString nick = AWindow->multiUserChat()->mainUser()!=NULL ? AWindow->multiUserChat()->mainUser()->nickName() : AWindow->multiUserChat()->nickName();
+		action->setText(tr("%1 as %2").arg(AWindow->multiUserChat()->roomJid().uBare()).arg(nick));
 	}
 }
 
@@ -751,6 +763,18 @@ void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 			}
 		}
 		emit multiUserContextMenu(chatWindow,AUser,AMenu);
+	}
+}
+
+void MultiUserChatPlugin::onMultiUserNickChanged(IMultiUser *AUser, const QString &AOldNick, const QString &ANewNick)
+{
+	Q_UNUSED(AOldNick);
+	Q_UNUSED(ANewNick);
+	IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
+	if (chat && chat->mainUser()==AUser)
+	{
+		IMultiUserChatWindow *window = multiChatWindow(chat->streamJid(),chat->roomJid());
+		updateChatAction(window);
 	}
 }
 

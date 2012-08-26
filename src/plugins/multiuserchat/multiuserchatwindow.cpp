@@ -1462,7 +1462,7 @@ void MultiUserChatWindow::showChatMessage(IChatWindow *AWindow, const Message &A
 
 void MultiUserChatWindow::showChatHistory(IChatWindow *AWindow)
 {
-	if (FMessageArchiver && !FHistoryRequests.values().contains(AWindow))
+	if (FMessageArchiver && Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool() && !FHistoryRequests.values().contains(AWindow))
 	{
 		WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
 
