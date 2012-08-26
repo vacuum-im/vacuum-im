@@ -55,12 +55,12 @@ protected:
 	bool processSetOptions(const ICommandRequest &ARequest);
 	bool processForwardMessages(const ICommandRequest &ARequest);
 protected:
-	QList<Message> notifiedMessages(const Jid &AContactJid = Jid::null) const;
+	QList<Message> notifiedMessages(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) const;
 private:
 	ICommands *FCommands;
-	IStatusChanger *FStatusChanger;
-	IMultiUserChatPlugin *FMUCPlugin;
 	IDataForms *FDataForms;
+	IStatusChanger *FStatusChanger;
+	IMultiUserChatPlugin *FMultiUserChatPlugin;
 	IFileStreamsManager *FFileStreamManager;
 	IMessageProcessor *FMessageProcessor;
 	IStanzaProcessor *FStanzaProcessor;

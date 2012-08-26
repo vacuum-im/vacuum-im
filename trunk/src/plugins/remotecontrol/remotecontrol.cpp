@@ -43,7 +43,7 @@ RemoteControl::RemoteControl()
 {
 	FCommands = NULL;
 	FStatusChanger = NULL;
-	FMUCPlugin = NULL;
+	FMultiUserChatPlugin = NULL;
 	FDataForms = NULL;
 	FFileStreamManager = NULL;
 	FMessageProcessor = NULL;
@@ -87,7 +87,7 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
 	if (plugin)
 	{
-		FMUCPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
+		FMultiUserChatPlugin = qobject_cast<IMultiUserChatPlugin *>(plugin->instance());
 	}
 	
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
@@ -134,7 +134,7 @@ bool RemoteControl::initObjects()
 			FCommands->insertServer(COMMAND_NODE_SET_STATUS, this);
 			FCommands->insertServer(COMMAND_NODE_SET_MAIN_STATUS, this);
 		}
-		if (FMUCPlugin)
+		if (FMultiUserChatPlugin)
 		{
 			FCommands->insertServer(COMMAND_NODE_LEAVE_MUC, this);
 		}
@@ -237,7 +237,7 @@ bool RemoteControl::receiveCommandRequest(const ICommandRequest &ARequest)
 		if (ARequest.node == COMMAND_NODE_SET_MAIN_STATUS && FStatusChanger != NULL)
 			return processSetStatus(ARequest);
 
-		if (ARequest.node == COMMAND_NODE_LEAVE_MUC && FMUCPlugin != NULL)
+		if (ARequest.node == COMMAND_NODE_LEAVE_MUC && FMultiUserChatPlugin != NULL)
 			return processLeaveMUC(ARequest);
 
 		if (ARequest.node == COMMAND_NODE_ACCEPT_FILES && FFileStreamManager != NULL)
@@ -322,7 +322,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		field.required = true;
 
 		IDataOption opt;
-		foreach(IMultiUserChat* muc, FMUCPlugin->multiUserChats())
+		foreach(IMultiUserChat* muc, FMultiUserChatPlugin->multiUserChats())
 		{
 			if (muc->isOpen() && muc->streamJid()==ARequest.streamJid)
 			{
@@ -357,7 +357,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		{
 			foreach(QString roomJid, ARequest.form.fields.value(index).value.toStringList())
 			{
-				IMultiUserChatWindow *window = FMUCPlugin->multiChatWindow(ARequest.streamJid, roomJid);
+				IMultiUserChatWindow *window = FMultiUserChatPlugin->multiChatWindow(ARequest.streamJid, roomJid);
 				if (window != NULL)
 					window->exitAndDestroy(tr("Remote command to leave"));
 			}
@@ -613,7 +613,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		field.required = true;
 
 		QMap<Jid, int> unread;
-		foreach(Message message, notifiedMessages())
+		foreach(Message message, notifiedMessages(ARequest.streamJid))
 		{
 			if (ARequest.contactJid != message.from())
 				unread[message.from()]++;
@@ -658,7 +658,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		{
 			foreach(QString senderJid, ARequest.form.fields.value(index).value.toStringList())
 			{
-				foreach(Message  message, notifiedMessages(senderJid))
+				foreach(Message message, notifiedMessages(ARequest.streamJid,senderJid))
 				{
 					message.detach();
 					message.setFrom(QString::null);
@@ -692,18 +692,21 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 	return false;
 }
 
-QList<Message> RemoteControl::notifiedMessages(const Jid &AContactJid) const
+QList<Message> RemoteControl::notifiedMessages(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	QList<Message> messages;
 	foreach(int messageId, FMessageProcessor->notifiedMessages())
 	{
 		Message message = FMessageProcessor->notifiedMessage(messageId);
-		if(message.data(MDR_MESSAGE_DIRECTION).toInt() == IMessageProcessor::MessageIn)
+		if(AStreamJid==message.to() && message.data(MDR_MESSAGE_DIRECTION).toInt()==IMessageProcessor::MessageIn)
 		{
 			if (message.type()!=Message::Error && !message.body().isEmpty())
 			{
-				if (AContactJid.isEmpty() || AContactJid==message.from())
-					messages.append(message);
+				if (FMultiUserChatPlugin==NULL || FMultiUserChatPlugin->multiUserChat(AStreamJid,Jid(message.from()).bare())==NULL)
+				{
+					if (AContactJid.isEmpty() || AContactJid==message.from())
+						messages.append(message);
+				}
 			}
 		}
 	}
