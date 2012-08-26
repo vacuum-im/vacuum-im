@@ -160,7 +160,7 @@
     </message>
     <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
-        <translation>   Статус изменён на ушёл&apos; в %(hh:mm:ss) из-за бездействия с $(hh:mm:ss) в течение #(mm) минут и #(ss) секунд</translation>
+        <translation>   Статус изменён на &apos;ушёл&apos; в %(hh:mm:ss) из-за бездействия с $(hh:mm:ss) в течение #(mm) минут и #(ss) секунд</translation>
     </message>
 </context>
 <context>
