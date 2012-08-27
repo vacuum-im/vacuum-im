@@ -16,6 +16,7 @@ public:
 	SearchLineEdit(QWidget *AParent = NULL);
 	~SearchLineEdit();
 	Menu *searchMenu() const;
+	CloseButton *clearButton() const;
 	bool isStartingSearch() const;
 	void restartTimeout(int AMSecs);
 	int startSearchTimeout() const;
@@ -32,6 +33,7 @@ protected:
 	void showEvent(QShowEvent *AEvent);
 private:
 	void updateTextMargins();
+	void updateLayoutMargins();
 private slots:
 	void onStartTimerTimeout();
 	void onClearButtonClicked();

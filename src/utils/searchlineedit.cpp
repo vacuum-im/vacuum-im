@@ -1,6 +1,7 @@
 #include "searchlineedit.h"
 
 #include <QEvent>
+#include <QStyle>
 #include <QHBoxLayout>
 
 SearchLineEdit::SearchLineEdit(QWidget *AParent) : QLineEdit(AParent)
@@ -9,6 +10,8 @@ SearchLineEdit::SearchLineEdit(QWidget *AParent) : QLineEdit(AParent)
 	FStartTimeout = 500;
 
 	FSearchMenu = new Menu(this);
+	FSearchMenu->menuAction()->setToolTip(tr("Search options"));
+
 	FMenuButton = new QToolButton(this);
 	FMenuButton->setVisible(false);
 	FMenuButton->setAutoRaise(true);
@@ -18,13 +21,23 @@ SearchLineEdit::SearchLineEdit(QWidget *AParent) : QLineEdit(AParent)
 
 	FClearButton = new CloseButton(this);
 	FClearButton->setVisible(false);
+	FClearButton->setToolTip(tr("Clear text"));
+	FClearButton->setIcon(QIcon::fromTheme(layoutDirection()==Qt::LeftToRight ? "edit-clear-locationbar-rtl" :"edit-clear-locationbar-ltr", QIcon::fromTheme("edit-clear")));
 	connect(FClearButton,SIGNAL(clicked()),SLOT(onClearButtonClicked()));
 
 	QHBoxLayout *hLayout = new QHBoxLayout(this);
-	hLayout->addWidget(FMenuButton,0,Qt::AlignVCenter);
-	hLayout->addStretch();
-	hLayout->addWidget(FClearButton,0,Qt::AlignVCenter);
-	hLayout->setContentsMargins(1,0,1,0);
+	if (layoutDirection() == Qt::LeftToRight)
+	{
+		hLayout->addWidget(FMenuButton,0,Qt::AlignVCenter);
+		hLayout->addStretch();
+		hLayout->addWidget(FClearButton,0,Qt::AlignVCenter);
+	}
+	else
+	{
+		hLayout->addWidget(FClearButton,0,Qt::AlignVCenter);
+		hLayout->addStretch();
+		hLayout->addWidget(FMenuButton,0,Qt::AlignVCenter);
+	}
 
 	FStartTimer.setSingleShot(true);
 	connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
@@ -32,6 +45,7 @@ SearchLineEdit::SearchLineEdit(QWidget *AParent) : QLineEdit(AParent)
 	connect(this,SIGNAL(returnPressed()),SLOT(onLineEditReturnPressed()));
 	connect(this,SIGNAL(textChanged(const QString &)),SLOT(onLineEditTextChanged(const QString &)));
 
+	updateLayoutMargins();
 	updateTextMargins();
 }
 
@@ -43,6 +57,11 @@ SearchLineEdit::~SearchLineEdit()
 Menu *SearchLineEdit::searchMenu() const
 {
 	return FSearchMenu;
+}
+
+CloseButton *SearchLineEdit::clearButton() const
+{
+	return FClearButton;
 }
 
 bool SearchLineEdit::isStartingSearch() const
@@ -104,7 +123,30 @@ void SearchLineEdit::showEvent(QShowEvent *AEvent)
 
 void SearchLineEdit::updateTextMargins()
 {
-	setTextMargins(isSearchMenuVisible() ? FMenuButton->size().width() : 0, 0, FClearButton->size().width(), 0);
+	int left, top, right, bottom;
+	getTextMargins(NULL,&top,NULL,&bottom);
+	layout()->getContentsMargins(&left,NULL,&right,NULL);
+	if (layoutDirection() == Qt::LeftToRight)
+	{
+		left += isSearchMenuVisible() ? FMenuButton->size().width()+1: 0;
+		right += FClearButton->size().width()+1;
+	}
+	else
+	{
+		left += FClearButton->size().width()+1;
+		right += isSearchMenuVisible() ? FMenuButton->size().width()+1 : 0;
+	}
+	setTextMargins(left,top,right,bottom);
+}
+
+void SearchLineEdit::updateLayoutMargins()
+{
+	ensurePolished();
+	int correct=0;
+	int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+	if (style()->objectName() == "oxygen")
+		correct += 4;
+	layout()->setContentsMargins(frameWidth,frameWidth,frameWidth+correct,frameWidth);
 }
 
 void SearchLineEdit::onStartTimerTimeout()

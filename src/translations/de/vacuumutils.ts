@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de" sourcelanguage="en">
 <context>
+    <name>SearchLineEdit</name>
+    <message>
+        <source>Search options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear text</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>XmppStreamError</name>
     <message>
         <source>Undefined error condition</source>
