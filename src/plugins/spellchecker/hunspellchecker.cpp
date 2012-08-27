@@ -12,18 +12,16 @@
 #include <QCoreApplication>
 #include "spellchecker.h"
 
-const QString HunspellChecker::FDictsPath =
-#ifdef Q_WS_WIN
-	QString("%1/hunspell").arg(QCoreApplication::applicationDirPath());
-#elif defined (Q_WS_X11)
-	QString(HUNSPELL_DICTIONARIES_PATH);
-#elif defined (Q_WS_MAC)
-	QString("%1/Library/Spelling").arg(QDir::homePath());
-#endif
-
 HunspellChecker::HunspellChecker() : FHunSpell(NULL), FDictCodec(NULL)
 {
-
+#if defined (Q_WS_WIN)
+	FDictsPaths.append(QString("%1/hunspell").arg(QCoreApplication::applicationDirPath()));
+#elif defined (Q_WS_X11)
+	FDictsPaths.append("/usr/share/hunspell");
+	FDictsPaths.append("/usr/share/myspell");
+#elif defined (Q_WS_MAC)
+	FDictsPaths.append(QString("%1/Library/Spelling").arg(QDir::homePath()));
+#endif
 }
 
 HunspellChecker::~HunspellChecker()
@@ -57,19 +55,18 @@ void HunspellChecker::setLang(const QString &ALang)
 QList<QString> HunspellChecker::dictionaries()
 {
 	QList<QString> availDicts;
-
-	QDir dir(FDictsPath);
-	foreach(QString dictFile, dir.entryList(QStringList("*.dic"),
-						QDir::Files | QDir::Readable, 
-						QDir::Name | QDir::IgnoreCase)) 
+	foreach(QString dictsPath, FDictsPaths)
 	{
-		// исключить словарь правил переноса
-		if (dictFile.startsWith("hyph_"))
-			continue;
-
-		availDicts.append(dictFile.mid(0, dictFile.length() - 4));
+		QDir dir(dictsPath);
+		foreach(QString dictFile, dir.entryList(QStringList("*.dic"),QDir::Files|QDir::Readable, QDir::Name|QDir::IgnoreCase))
+		{
+			if (dictFile.startsWith("hyph_"))
+				continue;
+			dictFile = dictFile.mid(0,dictFile.length()-4);
+			if (!availDicts.contains(dictFile))
+				availDicts.append(dictFile);
+		}
 	}
-
 	return availDicts;
 }
 
@@ -134,13 +131,17 @@ void HunspellChecker::loadHunspell(const QString &ALang)
 	delete FHunSpell;
 	FHunSpell = NULL;
 
-	QString dictFile = QString("%1/%2.dic").arg(FDictsPath).arg(ALang);
-	if (QFileInfo(dictFile).exists())
+	foreach(QString dictsPath, FDictsPaths)
 	{
-		QString rulesFile = QString("%1/%2.aff").arg(FDictsPath).arg(ALang);
-		FHunSpell = new Hunspell(rulesFile.toUtf8().constData(), dictFile.toUtf8().constData());
-		FDictCodec = QTextCodec::codecForName(FHunSpell->get_dic_encoding());
-		loadPersonalDict();
+		QString dictFile = QString("%1/%2.dic").arg(dictsPath).arg(ALang);
+		if (QFileInfo(dictFile).exists())
+		{
+			QString rulesFile = QString("%1/%2.aff").arg(dictsPath).arg(ALang);
+			FHunSpell = new Hunspell(rulesFile.toUtf8().constData(), dictFile.toUtf8().constData());
+			FDictCodec = QTextCodec::codecForName(FHunSpell->get_dic_encoding());
+			loadPersonalDict();
+			break;
+		}
 	}
 }
 

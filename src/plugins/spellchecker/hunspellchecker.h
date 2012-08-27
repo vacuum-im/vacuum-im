@@ -31,10 +31,10 @@ private:
 	void savePersonalDict(const QString &AWord);
 private:
 	Hunspell *FHunSpell;
-	static const QString FDictsPath;
 	QString FActualLang;
 	QTextCodec *FDictCodec;
 	QString FPersonalDictPath;
+	QList<QString> FDictsPaths;
 };
 
 #endif
