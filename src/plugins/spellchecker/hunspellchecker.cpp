@@ -12,18 +12,18 @@
 #include <QCoreApplication>
 #include "spellchecker.h"
 
-HunspellChecker::HunspellChecker()
-{
-	FHunSpell = NULL;
-	FDictCodec = NULL;
-
+const QString HunspellChecker::FDictsPath =
 #ifdef Q_WS_WIN
-	FDictsPath = QString("%1/hunspell").arg(QCoreApplication::applicationDirPath());
+	QString("%1/hunspell").arg(QCoreApplication::applicationDirPath());
 #elif defined (Q_WS_X11)
-	FDictsPath = "/usr/share/hunspell";
+	QString(HUNSPELL_DICTIONARIES_PATH);
 #elif defined (Q_WS_MAC)
-	FDictsPath = QString("%1/Library/Spelling").arg(QDir::homePath());
+	QString("%1/Library/Spelling").arg(QDir::homePath());
 #endif
+
+HunspellChecker::HunspellChecker() : FHunSpell(NULL), FDictCodec(NULL)
+{
+
 }
 
 HunspellChecker::~HunspellChecker()
@@ -59,15 +59,15 @@ QList<QString> HunspellChecker::dictionaries()
 	QList<QString> availDicts;
 
 	QDir dir(FDictsPath);
-	foreach(QString dictFile, dir.entryList(QStringList("*.dic"), QDir::Files)) 
+	foreach(QString dictFile, dir.entryList(QStringList("*.dic"),
+						QDir::Files | QDir::Readable, 
+						QDir::Name | QDir::IgnoreCase)) 
 	{
+		// исключить словарь правил переноса
 		if (dictFile.startsWith("hyph_"))
 			continue;
-		if (dictFile.startsWith("th_"))
-			continue;
-		if (dictFile.endsWith(".dic"))
-			dictFile = dictFile.mid(0, dictFile.length() - 4);
-		availDicts << dictFile;
+
+		availDicts.append(dictFile.mid(0, dictFile.length() - 4));
 	}
 
 	return availDicts;
