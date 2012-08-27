@@ -1,5 +1,9 @@
 add_definitions(-DHAVE_HUNSPELL) 
-add_definitions(-DHUNSPELL_STATIC) 
+add_definitions(-DHUNSPELL_STATIC)
+
+if (UNIX)
+	add_definitions(-DHUNSPELL_DICTIONARIES_PATH="${HUNSPELL_DICTIONARIES_PATH}")
+endif (UNIX)
 
 if (SYSTEM_HUNSPELL_FOUND)
 	set(ADD_LIBS ${SYSTEM_HUNSPELL_FOUND})

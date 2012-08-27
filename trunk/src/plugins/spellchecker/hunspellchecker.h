@@ -31,7 +31,7 @@ private:
 	void savePersonalDict(const QString &AWord);
 private:
 	Hunspell *FHunSpell;
-	QString FDictsPath;
+	static const QString FDictsPath;
 	QString FActualLang;
 	QTextCodec *FDictCodec;
 	QString FPersonalDictPath;
