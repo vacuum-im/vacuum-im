@@ -1,8 +1,8 @@
 #summary Список источников пакетов vacuum-im.
 <wiki:toc max_depth="1" />
 
-
 = Agilia =
+
 http://packages.agilialinux.ru/search.php?lname=vacuum-im
 
 == Установка ==
@@ -41,6 +41,7 @@ yum install vacuum
 }}}
 
 = FreeBSD =
+
 http://www.freshports.org/net-im/vacuum-im
 
 = Gentoo =
@@ -52,6 +53,7 @@ http://packages.gentoo.org/package/net-im/vacuum
 https://code.google.com/p/rion-overlay/source/browse/net-im/
 
 = Mandriva =
+
 https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
 
 = openSUSE =
@@ -60,12 +62,12 @@ https://build.opensuse.org/project/show?project=home%3AEGDFree
 
 == Подключение ==
 
-Замените версию дистрибутива на нужную (доступны: *openSUSE_11.3*, *openSUSE_11.4*, *openSUSE_Factory*) и выполните:
+Замените версию дистрибутива на нужную (доступны: *openSUSE_11.4*, *openSUSE_12.1*, *openSUSE_Factory*) и выполните:
 
 === vacuum-im (stable) ===
 Для получения текущей стабильной версии:
 {{{
-sudo zypper ar -f  http://download.opensuse.org/repositories/network/openSUSE_11.4/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/network/openSUSE_12.1/ vacuum-im
 }}}
 
 Если используется Tumbleweed:
@@ -76,7 +78,7 @@ sudo zypper ar -f http://download.opensuse.org/repositories/openSUSE:/Tumbleweed
 === vacuum-im (unstable, vcs) ===
 Для получения новейшей версии из git-репозитория разработки:
 {{{
-sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im:/git/openSUSE_11.4/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im:/git/openSUSE_12.1/ vacuum-im
 }}}
 
 == Установка ==
@@ -84,17 +86,6 @@ sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacu
 sudo zypper in vacuum-im
 }}}
 
-= Pardus =
-
-== Подключение ==
-{{{
-sudo pisi add-repo pardususer.de http://pakete.pardususer.de/pardus-2011/`arch`/pisi-index.xml.xz
-}}}
-
-== Установка ==
-{{{
-sudo pisi install vacuum-im
-}}}
 = Ubuntu =
 
 == Vacuum-IM (stable) ==
