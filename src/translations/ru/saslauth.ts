@@ -67,7 +67,7 @@
     </message>
     <message>
         <source>Not authorized</source>
-        <translation>Не пройдена автоизация</translation>
+        <translation>Не пройдена авторизация</translation>
     </message>
     <message>
         <source>Temporary authentication failure</source>
