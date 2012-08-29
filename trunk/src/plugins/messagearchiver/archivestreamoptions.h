@@ -53,9 +53,12 @@ protected:
 	void updateColumnsSize();
 	void updateItemPrefs(const Jid &AItemJid, const IArchiveItemPrefs &APrefs);
 	void removeItemPrefs(const Jid &AItemJid);
+protected:
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onAddItemPrefClicked();
 	void onRemoveItemPrefClicked();
+	void onExpireIndexChanged(int AIndex);
 	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);

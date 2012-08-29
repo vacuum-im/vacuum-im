@@ -6,6 +6,7 @@
 #include <QInputDialog>
 #include <QIntValidator>
 #include <QTextDocument>
+#include <QKeyEvent>
 
 #define ONE_DAY           (24*60*60)
 #define ONE_MONTH         (ONE_DAY*31)
@@ -130,6 +131,7 @@ void ArchiveDelegate::updateComboBox(int AColumn, QComboBox *AComboBox)
 		AComboBox->addItem(expireName(ONE_YEAR),ONE_YEAR);
 		AComboBox->addItem(expireName(5*ONE_YEAR),5*ONE_YEAR);
 		AComboBox->addItem(expireName(10*ONE_YEAR),10*ONE_YEAR);
+		AComboBox->setInsertPolicy(QComboBox::NoInsert);
 		AComboBox->lineEdit()->setValidator(new QIntValidator(0,50*ONE_YEAR,AComboBox->lineEdit()));
 		break;
 	case EXACT_COLUMN:
@@ -157,8 +159,8 @@ QWidget *ArchiveDelegate::createEditor(QWidget *AParent, const QStyleOptionViewI
 	case EXPIRE_COLUMN:
 		{
 			QComboBox *comboBox = new QComboBox(AParent);
-			connect(comboBox,SIGNAL(currentIndexChanged(int)),SLOT(onExpireIndexChanged(int)));
 			updateComboBox(AIndex.column(),comboBox);
+			connect(comboBox,SIGNAL(currentIndexChanged(int)),SLOT(onExpireIndexChanged(int)));
 			return comboBox;
 		}
 	}
@@ -180,7 +182,7 @@ void ArchiveDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex)
 	case EXPIRE_COLUMN:
 		{
 			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-			comboBox->lineEdit()->setText(QString::number(AIndex.data(Qt::UserRole).toInt()/ONE_DAY));
+			comboBox->setEditText(QString::number(AIndex.data(Qt::UserRole).toInt()/ONE_DAY));
 		}
 		break;
 	default:
@@ -226,7 +228,7 @@ void ArchiveDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionV
 void ArchiveDelegate::onExpireIndexChanged(int AIndex)
 {
 	QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
-	comboBox->lineEdit()->setText(QString::number(comboBox->itemData(AIndex).toInt()/ONE_DAY));
+	comboBox->setEditText(QString::number(comboBox->itemData(AIndex).toInt()/ONE_DAY));
 }
 
 ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Jid &AStreamJid, QWidget *AParent) : QWidget(AParent)
@@ -264,6 +266,8 @@ ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Ji
 	ui.cmbModeOTR->addItem(tr("Manually approve Off-The-Record sessions"),ARCHIVE_OTR_APPROVE);
 
 	ArchiveDelegate::updateComboBox(EXPIRE_COLUMN,ui.cmbExpireTime);
+	ui.cmbExpireTime->installEventFilter(this);
+	connect(ui.cmbExpireTime,SIGNAL(currentIndexChanged(int)),SLOT(onExpireIndexChanged(int)));
 
 	reset();
 
@@ -422,6 +426,49 @@ void ArchiveStreamOptions::removeItemPrefs(const Jid &AItemJid)
 	}
 }
 
+bool ArchiveStreamOptions::eventFilter(QObject *AObject, QEvent *AEvent)
+{
+	bool hooked = false;
+	if (AObject == ui.cmbExpireTime)
+	{
+		bool appendItem = false;
+		if (AEvent->type() == QEvent::KeyPress)
+		{
+			QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
+			if (keyEvent && (keyEvent->key()==Qt::Key_Return || keyEvent->key()==Qt::Key_Enter))
+			{
+				hooked = true;
+				setFocus();
+			}
+		}
+		else if (AEvent->type() == QEvent::FocusOut)
+		{
+			appendItem = true;
+		}
+		else if (AEvent->type() == QEvent::FocusIn)
+		{
+			ui.cmbExpireTime->setEditText(QString::number(ui.cmbExpireTime->itemData(ui.cmbExpireTime->currentIndex()).toInt()/ONE_DAY));
+		}
+		if (appendItem)
+		{
+			bool ok = false;
+			int expireIndex = ui.cmbExpireTime->currentIndex();
+			int expire = ui.cmbExpireTime->currentText().toInt(&ok)*ONE_DAY;
+			if (ok)
+			{
+				expireIndex = ui.cmbExpireTime->findData(expire);
+				if (expireIndex<0)
+				{
+					ui.cmbExpireTime->addItem(ArchiveDelegate::expireName(expire),expire);
+					expireIndex = ui.cmbExpireTime->count()-1;
+				}
+			}
+			ui.cmbExpireTime->setCurrentIndex(expireIndex);
+		}
+	}
+	return hooked ? true : QWidget::eventFilter(AObject,AEvent);
+}
+
 void ArchiveStreamOptions::onAddItemPrefClicked()
 {
 	Jid itemJid = Jid::fromUserInput(QInputDialog::getText(this,tr("New item preferences"),tr("Enter item JID:")));
@@ -452,6 +499,12 @@ void ArchiveStreamOptions::onRemoveItemPrefClicked()
 	}
 }
 
+void ArchiveStreamOptions::onExpireIndexChanged(int AIndex)
+{
+	if (ui.cmbExpireTime->hasFocus() || ui.cmbExpireTime->lineEdit()->hasFocus())
+		ui.cmbExpireTime->setEditText(QString::number(ui.cmbExpireTime->itemData(AIndex).toInt()/ONE_DAY));
+}
+
 void ArchiveStreamOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 {
 	if (AStreamJid == FStreamJid)
@@ -469,11 +522,13 @@ void ArchiveStreamOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 		ui.cmbModeSave->setCurrentIndex(ui.cmbModeSave->findData(prefs.defaultPrefs.save));
 		ui.cmbModeOTR->setCurrentIndex(ui.cmbModeOTR->findData(prefs.defaultPrefs.otr));
 
-		int expIndex = ui.cmbExpireTime->findData(prefs.defaultPrefs.expire);
-		if (expIndex>=0)
-			ui.cmbExpireTime->setCurrentIndex(expIndex);
-		else
-			ui.cmbExpireTime->lineEdit()->setText(QString::number(prefs.defaultPrefs.expire/ONE_DAY));
+		int expireIndex = ui.cmbExpireTime->findData(prefs.defaultPrefs.expire);
+		if (expireIndex<0)
+		{
+			ui.cmbExpireTime->addItem(ArchiveDelegate::expireName(prefs.defaultPrefs.expire),prefs.defaultPrefs.expire);
+			expireIndex = ui.cmbExpireTime->count()-1;
+		}
+		ui.cmbExpireTime->setCurrentIndex(expireIndex);
 
 		QSet<Jid> oldItems = FTableItems.keys().toSet();
 		foreach(Jid itemJid, prefs.itemPrefs.keys())
