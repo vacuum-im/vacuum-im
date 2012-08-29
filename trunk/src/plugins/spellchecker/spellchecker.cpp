@@ -142,6 +142,30 @@ void SpellChecker::rehightlightAll()
 		hiliter->rehighlight();
 }
 
+QString SpellChecker::dictionaryName(const QString &ADict) const
+{
+	QString name = ADict.left(ADict.indexOf('.'));
+	if (name.size() >= 2)
+	{
+		QString localeName = name.size()>=5 && name.at(2)=='_' && name.at(3).isUpper() && name.at(4).isUpper() ? name.left(5) : name.left(2);
+
+		QLocale locale(localeName);
+		if (locale.language() > QLocale::C)
+		{
+			QString suffix = name.right(name.size()-localeName.size());
+			if (!suffix.isEmpty() && !suffix.at(0).isLetterOrNumber())
+				suffix.remove(0,1);
+
+			name = QLocale::languageToString(locale.language());
+			if (locale.country()>QLocale::AnyCountry && localeName.contains('_'))
+				name += "/" + QLocale::countryToString(locale.country());
+			if (!suffix.isEmpty())
+				name += QString(" (%1)").arg(suffix);
+		}
+	}
+	return name;
+}
+
 void SpellChecker::onChangeSpellEnable()
 {
 	QAction *action = qobject_cast<QAction *>(sender());
@@ -257,13 +281,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 			foreach(QString dict, availDictionaries())
 			{
 				Action *action = new Action(dictsMenu);
-				QLocale locale(dict);
-				if (locale.country()>QLocale::AnyCountry && dict.contains('_'))
-					action->setText(QString("%1 (%2)").arg(QLocale::languageToString(locale.language()),QLocale::countryToString(locale.country())));
-				else if (locale.language() > QLocale::C)
-					action->setText(QLocale::languageToString(locale.language()));
-				else
-					action->setText(dict);
+				action->setText(dictionaryName(dict));
 				action->setProperty("dictionary", dict);
 				action->setCheckable(true);
 				action->setChecked(curDict==dict);

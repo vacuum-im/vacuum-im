@@ -44,6 +44,7 @@ signals:
 	void wordAddedToPersonalDict(const QString &AWord);
 protected:
 	void rehightlightAll();
+	QString dictionaryName(const QString &ADict) const;
 protected slots:
 	void onChangeSpellEnable();
 	void onChangeDictionary();
