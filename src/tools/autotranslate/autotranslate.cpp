@@ -32,14 +32,14 @@ int main(int argc, char *argv[])
 
 	if (argc != 2)
 	{
-		qCritical(QString("Usage: autotranslate <diresctory>.").toLocal8Bit().constData());
+		qCritical("Usage: autotranslate <diresctory>.");
 		return -1;
 	}
 
 	QDir dir(app.arguments().value(1),"*.ts",QDir::Name,QDir::Files);
 	if (!dir.exists())
 	{
-		qCritical(QString("Directory '%1' not found.").arg(dir.dirName()).toLocal8Bit().constData());
+		qCritical("Directory '%s' not found.",dir.dirName().toLocal8Bit().constData());
 		return -1;
 	}
 
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 			QDomDocument doc;
 			if (doc.setContent(file.readAll(),true))
 			{
-				qDebug(QString("Auto translating file '%1'.").arg(file.fileName()).toLocal8Bit().constData());
+				qDebug("Auto translating file '%s'.",file.fileName().toLocal8Bit().constData());
 				QDomElement rootElem = doc.firstChildElement("TS");
 				
 				QDomElement contextElem = rootElem.firstChildElement("context");
@@ -95,18 +95,18 @@ int main(int argc, char *argv[])
 				}
 				else
 				{
-					qWarning(QString("Failed to open file '%1' for write.").arg(file.fileName()).toLocal8Bit().constData());
+					qWarning("Failed to open file '%s' for write.",file.fileName().toLocal8Bit().constData());
 				}
 			}
 			else
 			{
-				qWarning(QString("Invalid translation source file '%1'.").arg(file.fileName()).toLocal8Bit().constData());
+				qWarning("Invalid translation source file '%s'.",file.fileName().toLocal8Bit().constData());
 			}
 			file.close();
 		}
 		else
 		{
-			qWarning(QString("Could not open translation source file '%1'.").arg(file.fileName()).toLocal8Bit().constData());
+			qWarning("Could not open translation source file '%s'.",file.fileName().toLocal8Bit().constData());
 		}
 	}
 	return 0;
