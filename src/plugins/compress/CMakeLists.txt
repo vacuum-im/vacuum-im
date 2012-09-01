@@ -11,4 +11,4 @@ else (SYSTEM_ZLIB_FOUND)
 endif (SYSTEM_ZLIB_FOUND)
 
 include("compress.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")

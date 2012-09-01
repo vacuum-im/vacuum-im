@@ -1,9 +1,9 @@
 include(../config.inc)
 include(../install.inc)
 
-TARGET             = $$TARGET_UTILS
+TARGET             = $$VACUUM_UTILS_NAME
 TEMPLATE           = lib
-VERSION            = $$VERSION_UTILS
+VERSION            = $$VACUUM_UTILS_ABI
 CONFIG            += dll
 QT                += xml network
 DEFINES           += UTILS_DLL QXT_STATIC

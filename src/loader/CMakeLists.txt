@@ -1,8 +1,8 @@
 # needed for translations.cmake to correctly generate CPack components
-set(PLUGIN_NAME ${TARGET_LOADER})
+set(PLUGIN_NAME ${VACUUM_LOADER_NAME})
 set(PLUGIN_DISPLAY_NAME "loader")
 
-include("${CMAKE_SOURCE_DIR}/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/config.cmake")
 include("loader.cmake")
 
 project(loader CXX)
@@ -40,14 +40,14 @@ if (WIN32)
 	endif (MINGW)
 endif (WIN32)
 
-add_translations(TRANSLATIONS "${TARGET_LOADER}" ${SOURCES} ${UIS})
-add_executable(${TARGET_LOADER} WIN32 ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
-set_target_properties(${TARGET_LOADER} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-target_link_libraries(${TARGET_LOADER} ${TARGET_UTILS} ${QT_LIBRARIES})
+add_translations(TRANSLATIONS "${VACUUM_LOADER_NAME}" ${SOURCES} ${UIS})
+add_executable(${VACUUM_LOADER_NAME} WIN32 ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
+set_target_properties(${VACUUM_LOADER_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+target_link_libraries(${VACUUM_LOADER_NAME} ${VACUUM_UTILS_NAME} ${QT_LIBRARIES})
 
-install(TARGETS ${TARGET_LOADER}
+install(TARGETS ${VACUUM_LOADER_NAME}
 	RUNTIME	DESTINATION "${INSTALL_BINS}"
-	COMPONENT ${TARGET_LOADER})
+	COMPONENT ${VACUUM_LOADER_NAME})
 if (UNIX AND NOT APPLE AND NOT HAIKU)
 	install(FILES "${CMAKE_SOURCE_DIR}/resources/menuicons/shared/vacuum.png"
 		DESTINATION "${INSTALL_RES_DIR}/pixmaps")
@@ -55,7 +55,7 @@ if (UNIX AND NOT APPLE AND NOT HAIKU)
 		DESTINATION "${INSTALL_RES_DIR}/applications")
 endif (UNIX AND NOT APPLE AND NOT HAIKU)
 
-cpack_add_component(${TARGET_LOADER}
+cpack_add_component(${VACUUM_LOADER_NAME}
 	DISPLAY_NAME "Loader"
 	REQUIRED
 	GROUP core)

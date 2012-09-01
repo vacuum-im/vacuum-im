@@ -1,4 +1,4 @@
-include("${CMAKE_SOURCE_DIR}/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/config.cmake")
 
 project(idle CXX)
 

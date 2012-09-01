@@ -5,7 +5,7 @@ set(PLUGIN_DISPLAY_NAME "Status icons")
 set(${PLUGIN_NAME}_IS_ESSENTIAL YES)
 
 include("statusicons.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
 	install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/statusicons"

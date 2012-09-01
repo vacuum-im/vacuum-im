@@ -16,4 +16,4 @@ else (USE_ASPELL)
 	include("hunspellchecker.cmake")
 endif (USE_ASPELL)
 
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")

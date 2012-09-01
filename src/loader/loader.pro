@@ -1,11 +1,11 @@
 include(../config.inc)
 include(../install.inc)
 
-TARGET             = $$TARGET_LOADER
+TARGET             = $$VACUUM_LOADER_NAME
 TEMPLATE           = app
 QT                += xml
 LIBS              += -L../libs
-LIBS              += -l$$TARGET_UTILS
+LIBS              += -l$$VACUUM_UTILS_NAME
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
 DESTDIR            = ../..
@@ -61,9 +61,9 @@ unix:!macx {
 
 #MacOS Install
 macx {
-	UTILS_LIB_NAME   = lib$${TARGET_UTILS}.$${VERSION_UTILS}.dylib
-  UTILS_LIB_LINK   = lib$${TARGET_UTILS}.1.dylib
-  UTILS_LIB_LINK_EXTERNAL_PLUGINS = lib$${TARGET_UTILS}.dylib
+  UTILS_LIB_NAME   = lib$${VACUUM_UTILS_NAME}.$${VACUUM_UTILS_ABI}.dylib
+  UTILS_LIB_LINK   = lib$${VACUUM_UTILS_NAME}.1.dylib
+  UTILS_LIB_LINK_EXTERNAL_PLUGINS = lib$${VACUUM_UTILS_NAME}.dylib
 
   lib_utils.path   = $$INSTALL_LIBS
   lib_utils.extra  = cp -f ../libs/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_NAME && \
@@ -72,11 +72,11 @@ macx {
   INSTALLS        += lib_utils
 
   name_tool.path   = $$INSTALL_BINS
-  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$TARGET_LOADER
+  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$VACUUM_LOADER_NAME
   INSTALLS        += name_tool
 
-	#Dirty hack to install utils translations
-	TARGET           = $$TARGET_UTILS
-	include(../translations.inc)
-	TARGET           = $$TARGET_LOADER
+  #Dirty hack to install utils translations
+  TARGET           = $$VACUUM_UTILS_NAME
+  include(../translations.inc)
+  TARGET           = $$VACUUM_LOADER_NAME
 }

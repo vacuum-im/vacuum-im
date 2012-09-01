@@ -5,7 +5,7 @@ set(PLUGIN_DISPLAY_NAME "Notifications")
 set(${PLUGIN_NAME}_IS_ESSENTIAL YES)
 
 include("notifications.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
     install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/sounds"

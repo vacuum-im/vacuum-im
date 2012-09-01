@@ -5,7 +5,7 @@ set(PLUGIN_DISPLAY_NAME "Options manager")
 set(${PLUGIN_NAME}_IS_ESSENTIAL YES)
 
 include("optionsmanager.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
 	if (SYSTEM_QTLOCKEDFILE_FOUND)
