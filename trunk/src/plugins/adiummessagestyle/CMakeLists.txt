@@ -7,7 +7,7 @@ set(QT_USE_PHONON NO)
 set(QT_USE_QTXMLPATTERNS NO)
 
 include("adiummessagestyle.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
 	install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/adiummessagestyles"

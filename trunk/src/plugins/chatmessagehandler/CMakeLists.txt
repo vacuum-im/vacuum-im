@@ -6,4 +6,4 @@ set(PLUGIN_DEPENDENCIES messagewidgets messageprocessor messagestyles) # used on
 set(${PLUGIN_NAME}_IS_ESSENTIAL YES)
 
 include("chatmessagehandler.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")

@@ -5,4 +5,4 @@ set(PLUGIN_DISPLAY_NAME "Main window")
 set(${PLUGIN_NAME}_IS_ESSENTIAL YES)
 
 include("mainwindow.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")

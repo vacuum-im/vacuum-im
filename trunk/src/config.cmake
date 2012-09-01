@@ -1,10 +1,4 @@
-set(TARGET_LOADER vacuum)
-set(TARGET_UTILS vacuumutils)
-
-if (UNIX)
-	set(VERSION_UTILS 1.19.0)
-	set(VERSION_UTILS_ABI 1.19)
-endif (UNIX)
+include("${CMAKE_SOURCE_DIR}/src/sdkconfig.cmake")
 
 if (APPLE)
 	set(INSTALL_APP_DIR "vacuum")
@@ -58,5 +52,5 @@ if (WIN32)
 	set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif (WIN32)
 
-include("${CMAKE_SOURCE_DIR}/install.cmake")
-include("${CMAKE_SOURCE_DIR}/translations.cmake")
+include("${CMAKE_SOURCE_DIR}/src/install.cmake")
+include("${CMAKE_SOURCE_DIR}/src/translations.cmake")

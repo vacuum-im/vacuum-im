@@ -5,7 +5,7 @@ set(PLUGIN_DISPLAY_NAME "Default connection")
 set(${PLUGIN_NAME}_IS_ESSENTIAL YES)
 
 include("defaultconnection.cmake")
-include("${CMAKE_SOURCE_DIR}/plugins.cmake")
+include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
 	target_link_libraries(defaultconnection jdns)

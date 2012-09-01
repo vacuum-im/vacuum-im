@@ -6,13 +6,13 @@ find_package(Qt4 REQUIRED)
 
 add_custom_target(updatets)
 
-include("config.cmake")
+include("src/config.cmake")
 
 install(DIRECTORY "resources/menuicons"
 	DESTINATION "${INSTALL_RESOURCES}"
 	PATTERN ".svn" EXCLUDE)
 
-include("package.cmake")
+include("src/package.cmake")
 
 set(INSTALL_SDK YES CACHE BOOL "Install files needed to build custom plugins")
 set(INSTALL_DOCS YES CACHE BOOL "Install documentation (currently it's only AUTHORS, CHANGELOG, README and COPYING)")

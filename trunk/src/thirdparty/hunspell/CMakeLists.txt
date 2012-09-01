@@ -1,4 +1,4 @@
-include("${CMAKE_SOURCE_DIR}/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/config.cmake")
 
 project(hunspell CXX)
 message(STATUS "Using bundled hunspell")

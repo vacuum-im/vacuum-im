@@ -5,7 +5,7 @@ TEMPLATE            = lib
 CONFIG             += plugin
 QT                 += network xml
 LIBS               += -L../../libs
-LIBS               += -l$$TARGET_UTILS
+LIBS               += -l$$VACUUM_UTILS_NAME
 DEPENDPATH         += ../..
 INCLUDEPATH        += ../..
 win32 {
