@@ -90,6 +90,10 @@
         <source>Immediately activate the notification</source>
         <translation>Natychmiast uaktywnij powiadomienie</translation>
     </message>
+    <message>
+        <source>Allowed types of notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidgetClass</name>
