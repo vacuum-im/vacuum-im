@@ -22,7 +22,8 @@ HEADERS  = utilsexport.h \
            textmanager.h \
            animatedtextbrowser.h \
            closebutton.h \
-           searchlineedit.h
+           searchlineedit.h \
+           imagemanager.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -47,4 +48,5 @@ SOURCES  = jid.cpp \
            textmanager.cpp \
            animatedtextbrowser.cpp \
            closebutton.cpp \
-           searchlineedit.cpp
+           searchlineedit.cpp \
+           imagemanager.cpp

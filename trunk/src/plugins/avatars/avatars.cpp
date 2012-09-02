@@ -297,14 +297,10 @@ QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
 	if (ARole == RDR_AVATAR_IMAGE)
 	{
-		QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), AIndex->data(RDR_SHOW).toInt(), FAvatarSize);
+		bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
+		QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
 		if (avatar.isNull() && FShowEmptyAvatars)
-		{
-			if ((AIndex->data(RDR_SHOW).toInt() == IPresence::Offline || AIndex->data(RDR_SHOW).toInt() == IPresence::Error) && FShowEmptyAvatars)
-				avatar = FGrayEmptyAvatar;
-			else
-				avatar = FEmptyAvatar;
-		}
+			avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
 		return avatar;
 	}
 	else if (ARole == RDR_AVATAR_HASH)
@@ -427,47 +423,28 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &ADat
 	return EMPTY_AVATAR;
 }
 
-QImage Avatars::loadAvatarImage(const QString &AHash, int AStatus, const QSize &AMaxSize) const
+QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, bool AGray) const
 {
 	QImage image;
 	QString fileName = avatarFileName(AHash);
 	if (!AHash.isEmpty() && QFile::exists(fileName))
 	{
-		if ((AStatus == IPresence::Offline || AStatus == IPresence::Error) && FShowGrayAvatars)
+		QMap<QSize,QImage> &images = AGray ? FGrayAvatarImages[AHash] : FAvatarImages[AHash];
+		if (!images.contains(AMaxSize))
 		{
-			QMap<QSize,QImage> &images = FGrayAvatarImages[AHash];
-			if (!images.contains(AMaxSize))
+			image.load(fileName);
+			if (!image.isNull())
 			{
-				image.load(fileName);
-				if (!image.isNull())
-				{
-					if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
-						image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-					images.insert(AMaxSize,QIcon(QPixmap::fromImage(image)).pixmap(image.size(), QIcon::Disabled).toImage());
-				}
-			}
-			else
-			{
-				image = images.value(AMaxSize);
+				if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
+					image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+				if (AGray)
+					image = ImageManager::opacitized(ImageManager::grayscaled(image));
+				images.insert(AMaxSize,image);
 			}
 		}
 		else
 		{
-			QMap<QSize,QImage> &images = FAvatarImages[AHash];
-			if (!images.contains(AMaxSize))
-			{
-				image.load(fileName);
-				if (!image.isNull())
-				{
-					if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
-						image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-					images.insert(AMaxSize,image);
-				}
-			}
-			else
-			{
-				image = images.value(AMaxSize);
-			}
+			image = images.value(AMaxSize);
 		}
 	}
 	return image;
