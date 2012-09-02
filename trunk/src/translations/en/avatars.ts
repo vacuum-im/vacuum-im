@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Show grayscaled avatars for offline contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Show grayscaled avatars for offline contacts</translation>
     </message>
 </context>
 </TS>
