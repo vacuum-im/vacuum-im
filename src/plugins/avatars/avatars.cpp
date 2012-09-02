@@ -784,7 +784,7 @@ void Avatars::onClearAvatarByAction(bool)
 void Avatars::onIconStorageChanged()
 {
 	FEmptyAvatar = QImage(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->fileFullName(MNI_AVATAR_EMPTY)).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::FastTransformation);
-	FGrayEmptyAvatar = QIcon(QPixmap::fromImage(FEmptyAvatar)).pixmap(FEmptyAvatar.size(), QIcon::Disabled).toImage();
+	FGrayEmptyAvatar = ImageManager::opacitized(ImageManager::grayscaled(FEmptyAvatar));
 }
 
 void Avatars::onOptionsOpened()
