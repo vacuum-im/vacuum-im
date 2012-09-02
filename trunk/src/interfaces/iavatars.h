@@ -17,7 +17,7 @@ public:
 	virtual QByteArray loadAvatarData(const QString &AHash) const =0;
 	virtual bool setAvatar(const Jid &AStreamJid, const QByteArray &AData) =0;
 	virtual QString setCustomPictire(const Jid &AContactJid, const QByteArray &AData) =0;
-	virtual QImage loadAvatarImage(const QString &AHash, const QSize &AMaxSize = QSize()) const =0;
+	virtual QImage loadAvatarImage(const QString &AHash, int AStatus, const QSize &AMaxSize = QSize()) const =0;
 protected:
 	virtual void avatarChanged(const Jid &AContactJid) =0;
 };

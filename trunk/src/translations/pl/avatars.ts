@@ -51,5 +51,9 @@
         <source>Show empty avatars</source>
         <translation>Pokazuj puste avatary</translation>
     </message>
+    <message>
+        <source>Show grayscaled avatars for offline contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

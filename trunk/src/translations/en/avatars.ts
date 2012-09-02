@@ -51,5 +51,9 @@
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Image Files (*.png *.jpg *.bmp *.gif)</translation>
     </message>
+    <message>
+        <source>Show grayscaled avatars for offline contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

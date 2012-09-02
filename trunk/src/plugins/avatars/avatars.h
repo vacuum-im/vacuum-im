@@ -69,7 +69,7 @@ public:
 	virtual QByteArray loadAvatarData(const QString &AHash) const;
 	virtual bool setAvatar(const Jid &AStreamJid, const QByteArray &AData);
 	virtual QString setCustomPictire(const Jid &AContactJid, const QByteArray &AData);
-	virtual QImage loadAvatarImage(const QString &AHash, const QSize &AMaxSize = QSize()) const;
+	virtual QImage loadAvatarImage(const QString &AHash, int AStatus, const QSize &AMaxSize = QSize()) const;
 signals:
 	void avatarChanged(const Jid &AContactJid);
 	//IRosterDataHolder
@@ -120,13 +120,16 @@ private:
 	QSize FAvatarSize;
 	bool FAvatarsVisible;
 	bool FShowEmptyAvatars;
+	bool FShowGrayAvatars;
 	QMap<Jid, QString> FCustomPictures;
 private:
 	int FAvatarLabelId;
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
+	QImage FGrayEmptyAvatar;
 	QMap<Jid, QString> FStreamAvatars;
 	mutable QHash<QString, QMap<QSize,QImage> > FAvatarImages;
+	mutable QHash<QString, QMap<QSize,QImage> > FGrayAvatarImages;
 };
 
 #endif // AVATARS_H
