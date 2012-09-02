@@ -34,6 +34,7 @@ Avatars::Avatars()
 	FAvatarLabelId = -1;
 	FAvatarsVisible = false;
 	FShowEmptyAvatars = true;
+	FShowGrayAvatars = true;
 	FAvatarSize = QSize(32,32);
 }
 
@@ -145,6 +146,7 @@ bool Avatars::initSettings()
 {
 	Options::setDefaultValue(OPV_AVATARS_SHOW,true);
 	Options::setDefaultValue(OPV_AVATARS_SHOWEMPTY,true);
+	Options::setDefaultValue(OPV_AVATARS_SHOWGRAY,true);
 
 	if (FOptionsManager)
 	{
@@ -295,9 +297,14 @@ QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
 	if (ARole == RDR_AVATAR_IMAGE)
 	{
-		QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()),FAvatarSize);
+		QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), AIndex->data(RDR_SHOW).toInt(), FAvatarSize);
 		if (avatar.isNull() && FShowEmptyAvatars)
-			avatar = FEmptyAvatar;
+		{
+			if ((AIndex->data(RDR_SHOW).toInt() == IPresence::Offline || AIndex->data(RDR_SHOW).toInt() == IPresence::Error) && FShowEmptyAvatars)
+				avatar = FGrayEmptyAvatar;
+			else
+				avatar = FEmptyAvatar;
+		}
 		return avatar;
 	}
 	else if (ARole == RDR_AVATAR_HASH)
@@ -306,6 +313,7 @@ QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
 	}
 	return QVariant();
 }
+
 
 bool Avatars::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
 {
@@ -322,6 +330,7 @@ QMultiMap<int, IOptionsWidget *> Avatars::optionsWidgets(const QString &ANodeId,
 	{
 		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOW),tr("Show avatars"),AParent));
 		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOWEMPTY),tr("Show empty avatars"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOWGRAY),tr("Show grayscaled avatars for offline contacts"),AParent));
 	}
 	return widgets;
 }
@@ -418,26 +427,47 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &ADat
 	return EMPTY_AVATAR;
 }
 
-QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize) const
+QImage Avatars::loadAvatarImage(const QString &AHash, int AStatus, const QSize &AMaxSize) const
 {
 	QImage image;
 	QString fileName = avatarFileName(AHash);
 	if (!AHash.isEmpty() && QFile::exists(fileName))
 	{
-		QMap<QSize,QImage> &images = FAvatarImages[AHash];
-		if (!images.contains(AMaxSize))
+		if ((AStatus == IPresence::Offline || AStatus == IPresence::Error) && FShowGrayAvatars)
 		{
-			image.load(fileName);
-			if (!image.isNull())
+			QMap<QSize,QImage> &images = FGrayAvatarImages[AHash];
+			if (!images.contains(AMaxSize))
 			{
-				if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
-					image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-				images.insert(AMaxSize,image);
+				image.load(fileName);
+				if (!image.isNull())
+				{
+					if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
+						image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+					images.insert(AMaxSize,QIcon(QPixmap::fromImage(image)).pixmap(image.size(), QIcon::Disabled).toImage());
+				}
+			}
+			else
+			{
+				image = images.value(AMaxSize);
 			}
 		}
 		else
 		{
-			image = images.value(AMaxSize);
+			QMap<QSize,QImage> &images = FAvatarImages[AHash];
+			if (!images.contains(AMaxSize))
+			{
+				image.load(fileName);
+				if (!image.isNull())
+				{
+					if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
+						image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+					images.insert(AMaxSize,image);
+				}
+			}
+			else
+			{
+				image = images.value(AMaxSize);
+			}
 		}
 	}
 	return image;
@@ -777,6 +807,7 @@ void Avatars::onClearAvatarByAction(bool)
 void Avatars::onIconStorageChanged()
 {
 	FEmptyAvatar = QImage(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->fileFullName(MNI_AVATAR_EMPTY)).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::FastTransformation);
+	FGrayEmptyAvatar = QIcon(QPixmap::fromImage(FEmptyAvatar)).pixmap(FEmptyAvatar.size(), QIcon::Disabled).toImage();
 }
 
 void Avatars::onOptionsOpened()
@@ -795,6 +826,7 @@ void Avatars::onOptionsOpened()
 
 	onOptionsChanged(Options::node(OPV_AVATARS_SHOW));
 	onOptionsChanged(Options::node(OPV_AVATARS_SHOWEMPTY));
+	onOptionsChanged(Options::node(OPV_AVATARS_SHOWGRAY));
 }
 
 void Avatars::onOptionsClosed()
@@ -843,6 +875,11 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 	else if (ANode.path() == OPV_AVATARS_SHOWEMPTY)
 	{
 		FShowEmptyAvatars = ANode.value().toBool();
+		updateDataHolder();
+	}
+	else if (ANode.path() == OPV_AVATARS_SHOWGRAY)
+	{
+		FShowGrayAvatars = ANode.value().toBool();
 		updateDataHolder();
 	}
 }
