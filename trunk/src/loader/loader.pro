@@ -62,17 +62,15 @@ unix:!macx {
 #MacOS Install
 macx {
   UTILS_LIB_NAME   = lib$${VACUUM_UTILS_NAME}.$${VACUUM_UTILS_ABI}.dylib
-  UTILS_LIB_LINK   = lib$${VACUUM_UTILS_NAME}.1.dylib
-  UTILS_LIB_LINK_EXTERNAL_PLUGINS = lib$${VACUUM_UTILS_NAME}.dylib
+  UTILS_LIB_LINK   = lib$${VACUUM_UTILS_NAME}.dylib
 
   lib_utils.path   = $$INSTALL_LIBS
   lib_utils.extra  = cp -f ../libs/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_NAME && \
-                     ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK && \
-                     ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK_EXTERNAL_PLUGINS
+                     ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK
   INSTALLS        += lib_utils
 
   name_tool.path   = $$INSTALL_BINS
-  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$VACUUM_LOADER_NAME
+  name_tool.extra  = install_name_tool -change $$UTILS_LIB_NAME @executable_path/../Frameworks/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$VACUUM_LOADER_NAME
   INSTALLS        += name_tool
 
   #Dirty hack to install utils translations
