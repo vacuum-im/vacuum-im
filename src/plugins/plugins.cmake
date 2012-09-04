@@ -5,7 +5,8 @@ if (NOT DEFINED PLUGIN_DESCRIPTION)
 	set(PLUGIN_DESCRIPTION "${PLUGIN_DISPLAY_NAME}")
 endif (NOT DEFINED PLUGIN_DESCRIPTION)
 
-include("${CMAKE_SOURCE_DIR}/src/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/sdk/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/translations.cmake") 
 
 set(PLUGIN_${PLUGIN_NAME} YES CACHE BOOL "Enable ${PLUGIN_NAME} plugin")
 

@@ -1,4 +1,4 @@
-include("${CMAKE_SOURCE_DIR}/src/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/sdk/config.cmake")
 
 project(jdns C CXX)
 

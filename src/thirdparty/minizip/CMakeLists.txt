@@ -1,10 +1,10 @@
-include("${CMAKE_SOURCE_DIR}/src/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/sdk/config.cmake")
 
 project(minizip C)
 
 file(GLOB SOURCES "*.c")
 
-include_directories("../zlib")
+include_directories("${CMAKE_SOURCE_DIR}/src" "../zlib")
 
 add_library(minizip STATIC ${SOURCES})
 set_target_properties(minizip PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs"

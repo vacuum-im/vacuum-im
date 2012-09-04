@@ -2,7 +2,8 @@
 set(PLUGIN_NAME ${VACUUM_UTILS_NAME})
 set(PLUGIN_DISPLAY_NAME "utils library")
 
-include("${CMAKE_SOURCE_DIR}/src/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/sdk/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/translations.cmake") 
 include("utils.cmake")
 
 project(${VACUUM_UTILS_NAME})
@@ -14,7 +15,7 @@ include(${QT_USE_FILE})
 add_definitions("-DUTILS_DLL")
 add_definitions("-DQXT_STATIC") 
 link_directories("${CMAKE_BINARY_DIR}/libs")
-include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
+include_directories(AFTER  "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 include(FindX11)
 include_directories(AFTER ${X11_INCLUDE_DIR})
 if (NOT SYSTEM_IDN_FOUND)

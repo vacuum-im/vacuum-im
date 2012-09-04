@@ -2,7 +2,8 @@
 set(PLUGIN_NAME ${VACUUM_LOADER_NAME})
 set(PLUGIN_DISPLAY_NAME "loader")
 
-include("${CMAKE_SOURCE_DIR}/src/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/sdk/config.cmake")
+include("${CMAKE_SOURCE_DIR}/src/translations.cmake") 
 include("loader.cmake")
 
 project(loader CXX)
