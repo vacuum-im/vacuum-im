@@ -35,6 +35,10 @@ include(utils.pri)
   target.path      = $$INSTALL_LIBS
   INSTALLS        += target
 
+  sdk_utils.path   = $$INSTALL_INCLUDES/utils
+  sdk_utils.files  = *.h
+  INSTALLS        += sdk_utils
+
   #Translation
   TRANS_SOURCE_ROOT  = ..
   include(../translations.inc)

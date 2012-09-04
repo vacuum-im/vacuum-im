@@ -1,4 +1,4 @@
-include(sdkconfig.inc)
+include(sdk/sdkconfig.inc)
 
 #Configurable values
 isEmpty(INSTALL_PREFIX) {
@@ -19,6 +19,7 @@ isEmpty(INSTALL_LIB_DIR) {
   win32:INSTALL_LIB_DIR  = .
   unix: INSTALL_LIB_DIR  = lib
   macx: INSTALL_LIB_DIR  = Frameworks
+  haiku:INSTALL_LIB_DIR  = .
 }
 
 isEmpty(INSTALL_RES_DIR) {
@@ -26,6 +27,13 @@ isEmpty(INSTALL_RES_DIR) {
   unix: INSTALL_RES_DIR  = share
   macx: INSTALL_RES_DIR  = Resources
   haiku:INSTALL_RES_DIR  = .
+}
+
+isEmpty(INSTALL_SDK_DIR) {
+  win32:INSTALL_SDK_DIR  = include
+  unix: INSTALL_SDK_DIR  = include
+  macx: INSTALL_SDK_DIR  = include
+  haiku:INSTALL_SDK_DIR  = include
 }
 
 

@@ -1,4 +1,4 @@
-include("${CMAKE_SOURCE_DIR}/src/sdkconfig.cmake")
+include("${CMAKE_SOURCE_DIR}/src/sdk/sdkconfig.cmake")
 
 if (APPLE)
 	set(INSTALL_APP_DIR "vacuum")

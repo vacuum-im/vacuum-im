@@ -73,6 +73,10 @@ macx {
   name_tool.extra  = install_name_tool -change $$UTILS_LIB_NAME @executable_path/../Frameworks/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$VACUUM_LOADER_NAME
   INSTALLS        += name_tool
 
+  sdk_utils.path   = $$INSTALL_INCLUDES/utils
+  sdk_utils.files  = ../utils/*.h
+  INSTALLS        += sdk_utils
+
   #Dirty hack to install utils translations
   TARGET           = $$VACUUM_UTILS_NAME
   include(../translations.inc)
