@@ -1,5 +1,4 @@
-include(../config.inc)
-include(../install.inc)
+include(../sdk/config.inc)
 
 TARGET             = $$VACUUM_UTILS_NAME
 TEMPLATE           = lib

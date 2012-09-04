@@ -1,4 +1,4 @@
-include(../../config.inc)
+include(../../sdk/config.inc)
 
 TARGET     = zlib
 TEMPLATE   = lib

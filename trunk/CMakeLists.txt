@@ -6,7 +6,9 @@ find_package(Qt4 REQUIRED)
 
 add_custom_target(updatets)
 
-include("src/config.cmake")
+include("src/sdk/config.cmake")
+include("src/translations.cmake")
+include_directories("${CMAKE_SOURCE_DIR}/src")
 
 install(DIRECTORY "resources/menuicons"
 	DESTINATION "${INSTALL_RESOURCES}"

@@ -1,8 +1,7 @@
-include(../config.inc)
-include(../install.inc)
+include(config.inc)
 
 TEMPLATE = subdirs
 
 sdk_make.path   = $$INSTALL_INCLUDES
-sdk_make.files  = sdkconfig.inc sdkconfig.cmake 
+sdk_make.files  = config.inc config.cmake 
 INSTALLS       += sdk_make

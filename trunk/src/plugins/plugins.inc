@@ -1,5 +1,4 @@
-include(../config.inc)
-include(../install.inc)
+include(../sdk/config.inc)
 
 TEMPLATE            = lib
 CONFIG             += plugin
