@@ -1,4 +1,4 @@
-include(../../sdk/config.inc)
+include(../../make/config.inc)
 
 TARGET         = minizip
 TEMPLATE       = lib

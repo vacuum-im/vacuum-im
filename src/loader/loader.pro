@@ -1,4 +1,4 @@
-include(../sdk/config.inc)
+include(../make/config.inc)
 
 TARGET             = $$VACUUM_LOADER_NAME
 TEMPLATE           = app
