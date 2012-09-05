@@ -6,7 +6,7 @@ find_package(Qt4 REQUIRED)
 
 add_custom_target(updatets)
 
-include("src/sdk/config.cmake")
+include("src/make/config.cmake")
 include("src/translations.cmake")
 include_directories("${CMAKE_SOURCE_DIR}/src")
 
