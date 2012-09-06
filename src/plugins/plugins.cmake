@@ -6,7 +6,7 @@ if (NOT DEFINED PLUGIN_DESCRIPTION)
 endif (NOT DEFINED PLUGIN_DESCRIPTION)
 
 include("${CMAKE_SOURCE_DIR}/src/make/config.cmake")
-include("${CMAKE_SOURCE_DIR}/src/translations.cmake") 
+include("${CMAKE_SOURCE_DIR}/src/translations/languages.cmake") 
 
 set(PLUGIN_${PLUGIN_NAME} YES CACHE BOOL "Enable ${PLUGIN_NAME} plugin")
 

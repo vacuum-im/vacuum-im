@@ -1,9 +1,9 @@
-# needed for translations.cmake to correctly generate CPack components
+# needed for languages.cmake to correctly generate CPack components
 set(PLUGIN_NAME ${VACUUM_UTILS_NAME})
 set(PLUGIN_DISPLAY_NAME "utils library")
 
 include("${CMAKE_SOURCE_DIR}/src/make/config.cmake")
-include("${CMAKE_SOURCE_DIR}/src/translations.cmake") 
+include("${CMAKE_SOURCE_DIR}/src/translations/languages.cmake") 
 include("utils.cmake")
 
 project(${VACUUM_UTILS_NAME})

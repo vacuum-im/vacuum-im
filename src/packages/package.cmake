@@ -11,8 +11,8 @@ execute_process(COMMAND svnversion -n "${CMAKE_SOURCE_DIR}"
 
 set(CPACK_PACKAGE_NAME "Vacuum-IM")
 set(VER_MAJOR 1)
-set(VER_MINOR 0)
-set(VER_PATCH 2)
+set(VER_MINOR 3)
+set(VER_PATCH 0)
 set(VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_PATCH}")
 
 if (NOT SVNREVISION STREQUAL "")
