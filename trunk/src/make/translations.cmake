@@ -1,10 +1,3 @@
-set(LOCALIZED_LANGS
-	"ru"
-	"pl"
-	"de"
-	"uk"
-)
-
 macro(set_enabled_langs langs)
 	set(USED_LANGS "")
 	if ("${langs}" STREQUAL "")

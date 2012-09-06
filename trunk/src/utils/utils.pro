@@ -40,5 +40,5 @@ include(utils.pri)
 
   #Translation
   TRANS_SOURCE_ROOT  = ..
-  include(../translations.inc)
+  include(../translations/languages.inc)
 }

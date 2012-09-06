@@ -45,7 +45,7 @@ INSTALLS           += target resources documents
 
 #Translation
 TRANS_SOURCE_ROOT  = ..
-include(../translations.inc)
+include(../translations/languages.inc)
 
 #Linux desktop install
 unix:!macx {
@@ -78,6 +78,6 @@ macx {
 
   #Dirty hack to install utils translations
   TARGET           = $$VACUUM_UTILS_NAME
-  include(../translations.inc)
+  include(../translations/languages.inc)
   TARGET           = $$VACUUM_LOADER_NAME
 }
