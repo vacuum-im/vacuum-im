@@ -1224,7 +1224,7 @@ void RosterChanger::removeContactsFromRoster(const Jid &AStreamJid, const QStrin
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen() && !AContacts.isEmpty())
 	{
-		int button;
+		int button = QMessageBox::No;
 		if (AContacts.count() == 1)
 		{
 			IRosterItem ritem = roster->rosterItem(AContacts.first());
