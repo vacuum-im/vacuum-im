@@ -131,7 +131,7 @@ protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMessageStyle();
 	void showTopic(const QString &ATopic);
-	void showStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool AArchive=true);
+	void showStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showUserMessage(const Message &AMessage, const QString &ANick);
 	void showHistory();
 	void updateWindow();
@@ -141,7 +141,7 @@ protected:
 protected:
 	void setChatMessageStyle(IChatWindow *AWindow);
 	void fillChatContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
-	void showChatStatus(IChatWindow *AWindow, const QString &AMessage, int AStatus=0);
+	void showChatStatus(IChatWindow *AWindow, const QString &AMessage, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showChatMessage(IChatWindow *AWindow, const Message &AMessage);
 	void showChatHistory(IChatWindow *AWindow);
 	IChatWindow *getChatWindow(const Jid &AContactJid);
