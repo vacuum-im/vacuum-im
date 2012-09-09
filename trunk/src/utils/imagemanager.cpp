@@ -24,7 +24,7 @@ QImage ImageManager::grayscaled(const QImage &AImage)
 
 QImage ImageManager::squared(const QImage &AImage, int ASize)
 {
-	if (!AImage.isNull() && (AImage.width()!=ASize) || (AImage.height()!=ASize))
+	if (!AImage.isNull() && ((AImage.width()!=ASize) || (AImage.height()!=ASize)))
 	{
 		QImage squaredImage(ASize, ASize, QImage::Format_ARGB32);
 		squaredImage.fill(QColor(0, 0, 0, 0).rgba());
