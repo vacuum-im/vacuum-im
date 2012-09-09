@@ -98,7 +98,7 @@ protected:
 	void setMessageStyle(IChatWindow *AWindow);
 	void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
 	void showDateSeparator(IChatWindow *AWindow, const QDateTime &ADateTime);
-	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool AArchive=true);
+	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
 protected slots:
 	void onMessageReady();
