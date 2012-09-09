@@ -2,6 +2,7 @@
 #include <QObject>
 #include <QMessageBox>
 #include <QApplication>
+#include <QActionGroup>
 
 #include "spellbackend.h"
 #include "spellchecker.h"
@@ -276,6 +277,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 			Menu *dictsMenu = new Menu(AMenu);
 			dictsMenu->setTitle(tr("Dictionary"));
 			AMenu->addAction(dictsMenu->menuAction(),AG_EWCM_SPELLCHECKER_OPTIONS);
+			QActionGroup *dictGroup = new QActionGroup(dictsMenu);
 
 			QString curDict = currentDictionary();
 			foreach(QString dict, availDictionaries())
@@ -285,6 +287,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 				action->setProperty("dictionary", dict);
 				action->setCheckable(true);
 				action->setChecked(curDict==dict);
+				dictGroup->addAction(action);
 				connect(action,SIGNAL(triggered()),SLOT(onChangeDictionary()));
 				dictsMenu->addAction(action,AG_DEFAULT,true);
 			}
