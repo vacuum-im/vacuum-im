@@ -492,7 +492,7 @@ void ChatMessageHandler::showHistory(IChatWindow *AWindow)
 		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
 		if (!reqId.isEmpty())
 		{
-			showStyledStatus(AWindow,tr("Loading history..."),false);
+			showStyledStatus(AWindow,tr("Loading history..."),true);
 			FHistoryRequests.insert(reqId,AWindow);
 		}
 	}
@@ -555,15 +555,19 @@ void ChatMessageHandler::showDateSeparator(IChatWindow *AWindow, const QDateTime
 	}
 }
 
-void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool AArchive)
+void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool ADontSave, const QDateTime &ATime)
 {
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindStatus;
-	options.time = QDateTime::currentDateTime();
-	options.timeFormat = FMessageStyles->timeFormat(options.time);
 	options.direction = IMessageContentOptions::DirectionIn;
 
-	if (AArchive && FMessageArchiver && Options::node(OPV_MESSAGES_ARCHIVESTATUS).value().toBool())
+	options.time = ATime;
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
+
+	if (!ADontSave && FMessageArchiver && Options::node(OPV_MESSAGES_ARCHIVESTATUS).value().toBool())
 		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
 
 	fillContentOptions(AWindow,options);
@@ -575,20 +579,20 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 {
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindMessage;
-	options.time = AMessage.dateTime();
 
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
-		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
-	else
-		options.timeFormat = FMessageStyles->timeFormat(options.time);
+	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
+		options.type |= IMessageContentOptions::TypeHistory;
 
 	if (AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid()!=AMessage.to() : !(AWindow->contactJid() && AMessage.to()))
 		options.direction = IMessageContentOptions::DirectionIn;
 	else
 		options.direction = IMessageContentOptions::DirectionOut;
 
-	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
-		options.type |= IMessageContentOptions::TypeHistory;
+	options.time = AMessage.dateTime();
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);
@@ -770,7 +774,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 			}
 			else if (noteIt != ABody.notes.constEnd())
 			{
-				showStyledStatus(window,noteIt.value(),false);
+				showStyledStatus(window,noteIt.value(),true,noteIt.key());
 				++noteIt;
 			}
 		}
@@ -788,7 +792,7 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const QStrin
 	if (FHistoryRequests.contains(AId))
 	{
 		IChatWindow *window = FHistoryRequests.take(AId);
-		showStyledStatus(window,tr("Failed to load history: %1").arg(AError),false);
+		showStyledStatus(window,tr("Failed to load history: %1").arg(AError),true);
 		FPendingMessages.remove(window);
 	}
 }

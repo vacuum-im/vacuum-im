@@ -11,6 +11,9 @@ LEGEND
   [-] In private chats history of communication are loaded even if the relevant setting has been disabled
   [-] When changing the nickname in the conference the nickname was not changed in the active conferences menu in the roster window
   [-] When requesting delivery of unread messages via RemoteControl in the message list fell messages from conferences and received on a different account
+  [-] The behavior of history time removal widgets is corrected and unified in a settings window
+  [-] The saved status messages including about a file transfer, were displayed with incorrect date when loading from history in windows of a usual chat and a private chat of conferences
+
 
 v1.2.0
 ------
