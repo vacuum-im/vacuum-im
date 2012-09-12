@@ -1258,7 +1258,7 @@ void MultiUserChatWindow::showTopic(const QString &ATopic)
 	FViewWidget->appendText(ATopic,options);
 }
 
-void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AType, int AStatus, bool AArchive)
+void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AType, int AStatus, bool ADontSave, const QDateTime &ATime)
 {
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindStatus;
@@ -1266,10 +1266,13 @@ void MultiUserChatWindow::showStatusMessage(const QString &AMessage, int AType, 
 	options.status = AStatus;
 	options.direction = IMessageContentOptions::DirectionIn;
 
-	options.time = QDateTime::currentDateTime();
-	options.timeFormat = FMessageStyles->timeFormat(options.time);
+	options.time = ATime;
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
-	if (AArchive && FMessageArchiver && Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS).value().toBool())
+	if (!ADontSave && FMessageArchiver && Options::node(OPV_MUC_GROUPCHAT_ARCHIVESTATUS).value().toBool())
 		FMessageArchiver->saveNote(FMultiChat->streamJid(), FMultiChat->roomJid(), AMessage);
 
 	showDateSeparator(FViewWidget,options.time);
@@ -1280,16 +1283,16 @@ void MultiUserChatWindow::showUserMessage(const Message &AMessage, const QString
 {
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindMessage;
+
 	options.type |= IMessageContentOptions::TypeGroupchat;
+	if (AMessage.isDelayed())
+		options.type |= IMessageContentOptions::TypeHistory;
 
 	options.time = AMessage.dateTime();
 	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
 		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
 	else
 		options.timeFormat = FMessageStyles->timeFormat(options.time);
-
-	if (AMessage.isDelayed())
-		options.type |= IMessageContentOptions::TypeHistory;
 
 	options.senderName = Qt::escape(ANick);
 	options.senderId = options.senderName;
@@ -1329,7 +1332,7 @@ void MultiUserChatWindow::showHistory()
 		QString reqId = FMessageArchiver->loadMessages(FMultiChat->streamJid(),request);
 		if (!reqId.isEmpty())
 		{
-			showStatusMessage(tr("Loading history..."),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,false);
+			showStatusMessage(tr("Loading history..."),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
 			FHistoryRequests.insert(reqId,NULL);
 		}
 	}
@@ -1424,15 +1427,18 @@ void MultiUserChatWindow::fillChatContentOptions(IChatWindow *AWindow, IMessageC
 	AOptions.senderId = AOptions.senderName;
 }
 
-void MultiUserChatWindow::showChatStatus(IChatWindow *AWindow, const QString &AMessage, int AStatus)
+void MultiUserChatWindow::showChatStatus(IChatWindow *AWindow, const QString &AMessage, int AStatus, const QDateTime &ATime)
 {
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindStatus;
 	options.status = AStatus;
 	options.direction = IMessageContentOptions::DirectionIn;
 
-	options.time = QDateTime::currentDateTime();
-	options.timeFormat = FMessageStyles->timeFormat(options.time);
+	options.time = ATime;
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	fillChatContentOptions(AWindow,options);
 	showDateSeparator(AWindow->viewWidget(),options.time);
@@ -1444,16 +1450,16 @@ void MultiUserChatWindow::showChatMessage(IChatWindow *AWindow, const Message &A
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindMessage;
 
+	if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
+		options.type |= IMessageContentOptions::TypeHistory;
+
+	options.direction = AWindow->contactJid()!=AMessage.to() ? IMessageContentOptions::DirectionIn : IMessageContentOptions::DirectionOut;
+
 	options.time = AMessage.dateTime();
 	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
 		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
 	else
 		options.timeFormat = FMessageStyles->timeFormat(options.time);
-
-	options.direction = AWindow->contactJid()!=AMessage.to() ? IMessageContentOptions::DirectionIn : IMessageContentOptions::DirectionOut;
-
-	if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
-		options.type |= IMessageContentOptions::TypeHistory;
 
 	fillChatContentOptions(AWindow,options);
 	showDateSeparator(AWindow->viewWidget(),options.time);
@@ -2226,9 +2232,9 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 			else if (noteIt != ABody.notes.constEnd())
 			{
 				if (window)
-					showChatStatus(window,noteIt.value());
+					showChatStatus(window,noteIt.value(),IMessageContentOptions::StatusEmpty,noteIt.key());
 				else
-					showStatusMessage(noteIt.value(),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,false);
+					showStatusMessage(noteIt.value(),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true,noteIt.key());
 				++noteIt;
 			}
 		}
@@ -2260,7 +2266,7 @@ void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const QStri
 		if (window)
 			showChatStatus(window,tr("Failed to load history: %1").arg(AError));
 		else
-			showStatusMessage(tr("Failed to load history: %1").arg(AError),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,false);
+			showStatusMessage(tr("Failed to load history: %1").arg(AError),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
 		FPendingMessages.remove(window);
 	}
 }
