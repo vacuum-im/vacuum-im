@@ -580,6 +580,12 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindMessage;
 
+	options.time = AMessage.dateTime();
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
+	else
+		options.timeFormat = FMessageStyles->timeFormat(options.time);
+
 	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
 		options.type |= IMessageContentOptions::TypeHistory;
 
@@ -587,12 +593,6 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 		options.direction = IMessageContentOptions::DirectionIn;
 	else
 		options.direction = IMessageContentOptions::DirectionOut;
-
-	options.time = AMessage.dateTime();
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
-		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
-	else
-		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);
