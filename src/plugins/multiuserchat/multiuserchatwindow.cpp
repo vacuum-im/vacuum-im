@@ -1450,16 +1450,16 @@ void MultiUserChatWindow::showChatMessage(IChatWindow *AWindow, const Message &A
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindMessage;
 
-	if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
-		options.type |= IMessageContentOptions::TypeHistory;
-
-	options.direction = AWindow->contactJid()!=AMessage.to() ? IMessageContentOptions::DirectionIn : IMessageContentOptions::DirectionOut;
-
 	options.time = AMessage.dateTime();
 	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
 		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
 	else
 		options.timeFormat = FMessageStyles->timeFormat(options.time);
+
+	if (options.time.secsTo(FWindowStatus.value(AWindow->viewWidget()).createTime)>HISTORY_TIME_DELTA)
+		options.type |= IMessageContentOptions::TypeHistory;
+
+	options.direction = AWindow->contactJid()!=AMessage.to() ? IMessageContentOptions::DirectionIn : IMessageContentOptions::DirectionOut;
 
 	fillChatContentOptions(AWindow,options);
 	showDateSeparator(AWindow->viewWidget(),options.time);
