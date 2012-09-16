@@ -82,9 +82,7 @@ bool RosterSearch::initObjects()
 	if (FMainWindow)
 	{
 		FMainWindow->topToolBarChanger()->insertAction(FEnableAction,TBG_MWTTB_ROSTERSEARCH);
-
-		FMainWindow->instance()->addToolBar(FSearchToolBarChanger->toolBar());
-		FMainWindow->instance()->insertToolBarBreak(FSearchToolBarChanger->toolBar());
+		FMainWindow->insertToolBarChanger(MWW_SEARCH_TOOLBAR,FSearchToolBarChanger);
 	}
 
 	if (FRostersViewPlugin)

@@ -5,6 +5,7 @@
 #include <QSortFilterProxyModel>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/mainwindowwidgets.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rosterclickhookerorders.h>

@@ -7,6 +7,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/mainwindowtabpages.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rosterdataholderorders.h>
@@ -24,6 +25,7 @@
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/iconstorage.h>
 #include "rostersview.h"
 #include "sortfilterproxymodel.h"
 

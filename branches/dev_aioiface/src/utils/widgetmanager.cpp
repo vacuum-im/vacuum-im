@@ -158,6 +158,12 @@ void WidgetManager::raiseWidget(QWidget *AWidget)
 	AWidget->raise();
 }
 
+bool WidgetManager::isActiveWindow(const QWidget *AWindow)
+{
+	const QWidget *topWindow = AWindow->window();
+	return topWindow->isActiveWindow() && topWindow->isVisible() && !topWindow->isMinimized();
+}
+
 void WidgetManager::showActivateRaiseWindow(QWidget *AWindow)
 {
 	if (AWindow->isVisible())

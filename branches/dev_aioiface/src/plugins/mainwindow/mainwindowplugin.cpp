@@ -114,15 +114,7 @@ IMainWindow *MainWindowPlugin::mainWindow() const
 	return FMainWindow;
 }
 
-void MainWindowPlugin::updateTitle()
-{
-	if (FOptionsManager && FOptionsManager->isOpened())
-		FMainWindow->setWindowTitle(CLIENT_NAME" - "+FOptionsManager->currentProfile());
-	else
-		FMainWindow->setWindowTitle(CLIENT_NAME);
-}
-
-void MainWindowPlugin::showMainWindow()
+void MainWindowPlugin::showMainWindow() const
 {
 	if (!Options::isNull())
 	{
@@ -136,7 +128,20 @@ void MainWindowPlugin::showMainWindow()
 	}
 }
 
-void MainWindowPlugin::correctWindowPosition()
+void MainWindowPlugin::closeMainWindow() const
+{
+	FMainWindow->close();
+}
+
+void MainWindowPlugin::updateTitle()
+{
+	if (FOptionsManager && FOptionsManager->isOpened())
+		FMainWindow->setWindowTitle(CLIENT_NAME" - "+FOptionsManager->currentProfile());
+	else
+		FMainWindow->setWindowTitle(CLIENT_NAME);
+}
+
+void MainWindowPlugin::correctWindowPosition() const
 {
 	QRect windowRect = FMainWindow->geometry();
 	QRect screenRect = qApp->desktop()->availableGeometry(FMainWindow);
@@ -167,6 +172,7 @@ void MainWindowPlugin::onOptionsOpened()
 	FAligned = false;
 	if (!FMainWindow->restoreGeometry(Options::fileValue("mainwindow.geometry").toByteArray()))
 		FMainWindow->setGeometry(WidgetManager::alignGeometry(QSize(200,500),FMainWindow,Qt::AlignRight|Qt::AlignBottom));
+	FMainWindow->loadWindowState();
 	if (Options::node(OPV_MAINWINDOW_SHOW).value().toBool())
 		showMainWindow();
 	updateTitle();
@@ -174,10 +180,11 @@ void MainWindowPlugin::onOptionsOpened()
 
 void MainWindowPlugin::onOptionsClosed()
 {
+	FMainWindow->saveWindowState();
 	Options::setFileValue(FMainWindow->saveGeometry(),"mainwindow.geometry");
 	Options::node(OPV_MAINWINDOW_ALIGN).setValue((int)WidgetManager::windowAlignment(FMainWindow));
 	updateTitle();
-	FMainWindow->close();
+	closeMainWindow();
 }
 
 void MainWindowPlugin::onShutdownStarted()
@@ -197,7 +204,7 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 	if (ANotifyId<=0 && AReason==QSystemTrayIcon::Trigger)
 	{
 		if (FMainWindow->isActive() || qAbs(FActivationChanged.msecsTo(QTime::currentTime())) < qApp->doubleClickInterval())
-			FMainWindow->close();
+			closeMainWindow();
 		else
 			showMainWindow();
 	}
@@ -216,7 +223,7 @@ void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	}
 	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CLOSEWINDOW)
 	{
-		FMainWindow->close();
+		closeMainWindow();
 	}
 }
 

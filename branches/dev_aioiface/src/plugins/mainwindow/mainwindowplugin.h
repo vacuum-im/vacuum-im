@@ -39,10 +39,11 @@ public:
 	virtual bool startPlugin();
 	//IMainWindowPlugin
 	virtual IMainWindow *mainWindow() const;
+	virtual void showMainWindow() const;
+	virtual void closeMainWindow() const;
 protected:
 	void updateTitle();
-	void showMainWindow();
-	void correctWindowPosition();
+	void correctWindowPosition() const;
 protected:
 	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
@@ -58,7 +59,7 @@ private:
 	IOptionsManager *FOptionsManager;
 	ITrayManager *FTrayManager;
 private:
-	bool FAligned;
+	mutable bool FAligned;
 	MainWindow *FMainWindow;
 	QTime FActivationChanged;
 };

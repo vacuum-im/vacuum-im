@@ -116,7 +116,10 @@ bool RostersViewPlugin::initObjects()
 		FShowOfflineAction->setShortcutId(SCT_MAINWINDOW_TOGGLEOFFLINE);
 		connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
 		FMainWindowPlugin->mainWindow()->topToolBarChanger()->insertAction(FShowOfflineAction,TBG_MWTTB_ROSTERSVIEW);
-		FMainWindowPlugin->mainWindow()->rostersWidget()->insertWidget(0,FRostersView);
+
+		FRostersView->setWindowIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_ROSTERVIEW_CONTACTS));
+		FRostersView->setWindowIconText(tr("Contacts"));
+		FMainWindowPlugin->mainWindow()->insertTabPage(MWTP_ROSTERSVIEW,FRostersView);
 	}
 
 	if (FRostersModel)
