@@ -1,0 +1,49 @@
+.xxxwrapper 
+{
+	border-style: none;
+	font-size: medium;
+	padding: 0 0 0 0;
+	display: block;
+}
+
+.xxxsender
+{
+	white-space: nowrap;
+}
+
+.xxxtime 
+{
+	white-space: nowrap;
+}
+
+.xxxtopic
+{
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.status .xxxmessage
+{
+	color: #008000;
+}
+
+.notification .xxxmessage
+{
+	color: darkblue;
+}
+
+.event .xxxmessage
+{
+	color: darkred;
+}
+
+.date_separator .xxxtime
+{
+	color: transparent;
+}
+
+.date_separator .xxxmessage
+{
+	color: darkCyan;
+}
+
