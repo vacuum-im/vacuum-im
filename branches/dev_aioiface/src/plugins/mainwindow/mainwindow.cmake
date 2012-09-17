@@ -1,2 +1,2 @@
-set(SOURCES tabwidget.cpp mainwindowplugin.cpp mainwindow.cpp )
-set(HEADERS tabwidget.h mainwindow.h mainwindowplugin.h )
+set(SOURCES mainwindowplugin.cpp mainwindow.cpp maintabwidget.cpp )
+set(HEADERS mainwindowplugin.h mainwindow.h maintabwidget.h )

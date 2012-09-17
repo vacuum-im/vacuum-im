@@ -76,8 +76,8 @@
 #define OPV_FILETRANSFER_REMOVEONFINISH                 "filestreams.filetransfer.remove-stream-on-finish"
 
 // MainWindow
-#define OPV_MAINWINDOW_SHOW                             "mainwindow.show"
-#define OPV_MAINWINDOW_ALIGN                            "mainwindow.align"
+#define OPV_MAINWINDOW_SHOWONSTART                      "mainwindow.show-on-start"
+#define OPV_MAINWINDOW_OWM_ENABLED                      "mainwindow.one-window-mode.enabled"
 
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"

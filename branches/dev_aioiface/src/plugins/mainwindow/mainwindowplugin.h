@@ -13,7 +13,6 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/itraymanager.h>
-#include <utils/widgetmanager.h>
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
@@ -39,16 +38,14 @@ public:
 	virtual bool startPlugin();
 	//IMainWindowPlugin
 	virtual IMainWindow *mainWindow() const;
-	virtual void showMainWindow() const;
-	virtual void closeMainWindow() const;
 protected:
 	void updateTitle();
-	void correctWindowPosition() const;
 protected:
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
+	void onOptionsChanged(const OptionsNode &ANode);
 	void onShutdownStarted();
 	void onProfileRenamed(const QString &AProfile, const QString &ANewName);
 	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
@@ -59,7 +56,6 @@ private:
 	IOptionsManager *FOptionsManager;
 	ITrayManager *FTrayManager;
 private:
-	mutable bool FAligned;
 	MainWindow *FMainWindow;
 	QTime FActivationChanged;
 };

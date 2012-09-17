@@ -119,7 +119,7 @@ bool RostersViewPlugin::initObjects()
 
 		FRostersView->setWindowIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_ROSTERVIEW_CONTACTS));
 		FRostersView->setWindowIconText(tr("Contacts"));
-		FMainWindowPlugin->mainWindow()->insertTabPage(MWTP_ROSTERSVIEW,FRostersView);
+		FMainWindowPlugin->mainWindow()->mainTabWidget()->insertTabPage(MWTP_ROSTERSVIEW,FRostersView);
 	}
 
 	if (FRostersModel)

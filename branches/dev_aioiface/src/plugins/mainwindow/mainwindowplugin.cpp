@@ -1,7 +1,6 @@
 #include "mainwindowplugin.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 
 MainWindowPlugin::MainWindowPlugin()
 {
@@ -10,11 +9,7 @@ MainWindowPlugin::MainWindowPlugin()
 	FTrayManager = NULL;
 
 	FActivationChanged = QTime::currentTime();
-#ifdef Q_WS_WIN
-	FMainWindow = new MainWindow(new QWidget, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
-#else
-	FMainWindow = new MainWindow(NULL, Qt::Window|Qt::CustomizeWindowHint|Qt::WindowTitleHint|Qt::WindowCloseButtonHint);
-#endif
+	FMainWindow = new MainWindow(NULL,Qt::Window);
 	FMainWindow->installEventFilter(this);
 	WidgetManager::setWindowSticky(FMainWindow,true);
 }
@@ -62,6 +57,8 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+
 	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
@@ -97,7 +94,8 @@ bool MainWindowPlugin::initObjects()
 
 bool MainWindowPlugin::initSettings()
 {
-	Options::setDefaultValue(OPV_MAINWINDOW_SHOW,true);
+	Options::setDefaultValue(OPV_MAINWINDOW_SHOWONSTART,true);
+	Options::setDefaultValue(OPV_MAINWINDOW_OWM_ENABLED,true);
 	return true;
 }
 
@@ -114,50 +112,12 @@ IMainWindow *MainWindowPlugin::mainWindow() const
 	return FMainWindow;
 }
 
-void MainWindowPlugin::showMainWindow() const
-{
-	if (!Options::isNull())
-	{
-		WidgetManager::showActivateRaiseWindow(FMainWindow);
-		if (!FAligned)
-		{
-			FAligned = true;
-			WidgetManager::alignWindow(FMainWindow,(Qt::Alignment)Options::node(OPV_MAINWINDOW_ALIGN).value().toInt());
-		}
-		correctWindowPosition();
-	}
-}
-
-void MainWindowPlugin::closeMainWindow() const
-{
-	FMainWindow->close();
-}
-
 void MainWindowPlugin::updateTitle()
 {
 	if (FOptionsManager && FOptionsManager->isOpened())
 		FMainWindow->setWindowTitle(CLIENT_NAME" - "+FOptionsManager->currentProfile());
 	else
 		FMainWindow->setWindowTitle(CLIENT_NAME);
-}
-
-void MainWindowPlugin::correctWindowPosition() const
-{
-	QRect windowRect = FMainWindow->geometry();
-	QRect screenRect = qApp->desktop()->availableGeometry(FMainWindow);
-	if (!screenRect.isEmpty() && !windowRect.isEmpty())
-	{
-		Qt::Alignment align = 0;
-		if (windowRect.right() <= screenRect.left())
-			align |= Qt::AlignLeft;
-		else if (windowRect.left() >= screenRect.right())
-			align |= Qt::AlignRight;
-		if (windowRect.top() >= screenRect.bottom())
-			align |= Qt::AlignBottom;
-		else if (windowRect.bottom() <= screenRect.top())
-			align |= Qt::AlignTop;
-		WidgetManager::alignWindow(FMainWindow,align);
-	}
 }
 
 bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
@@ -169,27 +129,31 @@ bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
 
 void MainWindowPlugin::onOptionsOpened()
 {
-	FAligned = false;
-	if (!FMainWindow->restoreGeometry(Options::fileValue("mainwindow.geometry").toByteArray()))
-		FMainWindow->setGeometry(WidgetManager::alignGeometry(QSize(200,500),FMainWindow,Qt::AlignRight|Qt::AlignBottom));
-	FMainWindow->loadWindowState();
-	if (Options::node(OPV_MAINWINDOW_SHOW).value().toBool())
-		showMainWindow();
+	FMainWindow->loadWindowGeometryAndState();
+	onOptionsChanged(Options::node(OPV_MAINWINDOW_OWM_ENABLED));
+	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
+		FMainWindow->showWindow();
 	updateTitle();
 }
 
 void MainWindowPlugin::onOptionsClosed()
 {
-	FMainWindow->saveWindowState();
-	Options::setFileValue(FMainWindow->saveGeometry(),"mainwindow.geometry");
-	Options::node(OPV_MAINWINDOW_ALIGN).setValue((int)WidgetManager::windowAlignment(FMainWindow));
+	FMainWindow->saveWindowGeometryAndState();
+	FMainWindow->closeWindow();
 	updateTitle();
-	closeMainWindow();
+}
+
+void MainWindowPlugin::onOptionsChanged(const OptionsNode &ANode)
+{
+	if (ANode.path() == OPV_MAINWINDOW_OWM_ENABLED)
+	{
+		FMainWindow->setOneWindowModeEnabled(ANode.value().toBool());
+	}
 }
 
 void MainWindowPlugin::onShutdownStarted()
 {
-	Options::node(OPV_MAINWINDOW_SHOW).setValue(FMainWindow->isVisible());
+	Options::node(OPV_MAINWINDOW_SHOWONSTART).setValue(FMainWindow->isVisible());
 }
 
 void MainWindowPlugin::onProfileRenamed(const QString &AProfile, const QString &ANewName)
@@ -204,26 +168,27 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 	if (ANotifyId<=0 && AReason==QSystemTrayIcon::Trigger)
 	{
 		if (FMainWindow->isActive() || qAbs(FActivationChanged.msecsTo(QTime::currentTime())) < qApp->doubleClickInterval())
-			closeMainWindow();
+			FMainWindow->closeWindow();
 		else
-			showMainWindow();
+			FMainWindow->showWindow();
 	}
 }
 
 void MainWindowPlugin::onShowMainWindowByAction(bool)
 {
-	showMainWindow();
+	FMainWindow->showWindow();
 }
 
 void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AWidget==NULL && AId==SCT_GLOBAL_SHOWROSTER)
 	{
-		showMainWindow();
+		FMainWindow->showWindow();
 	}
 	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CLOSEWINDOW)
 	{
-		closeMainWindow();
+		//FMainWindow->closeWindow();
+		FMainWindow->setOneWindowModeEnabled(!FMainWindow->isOneWindowModeEnabled());
 	}
 }
 

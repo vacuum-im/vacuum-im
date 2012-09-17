@@ -1,7 +1,7 @@
-HEADERS = tabwidget.h \
-          mainwindow.h \
+HEADERS = mainwindow.h \
+          maintabwidget.h \
           mainwindowplugin.h
 
-SOURCES = tabwidget.cpp \
-          mainwindow.cpp \
+SOURCES = mainwindow.cpp \
+          maintabwidget.cpp \
           mainwindowplugin.cpp

@@ -1,5 +1,5 @@
-#ifndef TABWIDGET_H
-#define TABWIDGET_H
+#ifndef MAINTABWIDGET_H
+#define MAINTABWIDGET_H
 
 #include <QTabWidget>
 

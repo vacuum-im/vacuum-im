@@ -2,6 +2,9 @@
 
 #include <QResizeEvent>
 #include <QApplication>
+#include <QDesktopWidget>
+
+#define ONE_WINDOW_MODE_OPTIONS_NS "one-window-mode"
 
 MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(AParent,AFlags)
 {
@@ -9,7 +12,9 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	setAttribute(Qt::WA_DeleteOnClose,false);
 	setIconSize(QSize(16,16));
 
+	FAligned = false;
 	FLeftFrameWidth = 0;
+	FOneWindowEnabled = true;
 
 	QIcon icon;
 	IconStorage *iconStorage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
@@ -42,11 +47,9 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FLeftLayout->setMargin(0);
 	FLeftLayout->setSpacing(0);
 
-	FTabWidget = new TabWidget(FLeftFrame);
-	FTabWidget->setMovable(false);
-	FTabWidget->setDocumentMode(true);
-	FTabWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-	insertWidget(MWW_TABPAGES_WIDGET,FTabWidget,10);
+	FMainTabWidget = new MainTabWidget(FLeftFrame);
+	FMainTabWidget->instance()->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	insertWidget(MWW_TABPAGES_WIDGET,FMainTabWidget->instance(),100);
 
 	QToolBar *topToolbar = new QToolBar(this);
 	topToolbar->setFloatable(false);
@@ -75,6 +78,26 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 MainWindow::~MainWindow()
 {
 	delete FMainMenuBar->menuBar();
+}
+
+void MainWindow::showWindow()
+{
+	if (!Options::isNull())
+	{
+		WidgetManager::showActivateRaiseWindow(this);
+		if (!FAligned)
+		{
+			FAligned = true;
+			QString ns = isOneWindowModeEnabled() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+			WidgetManager::alignWindow(this,(Qt::Alignment)Options::fileValue("mainwindow.align",ns).toInt());
+		}
+		correctWindowPosition();
+	}
+}
+
+void MainWindow::closeWindow()
+{
+	close();
 }
 
 bool MainWindow::isActive() const
@@ -130,63 +153,9 @@ void MainWindow::removeWidget(QWidget *AWidget)
 	}
 }
 
-QList<QWidget *> MainWindow::tabPages() const
+IMainTabWidget *MainWindow::mainTabWidget() const
 {
-	return FTabPageOrders.values();
-}
-
-int MainWindow::tabPageOrder(QWidget *APage) const
-{
-	return FTabPageOrders.key(APage);
-}
-
-QWidget *MainWindow::tabPageByOrder(int AOrderId) const
-{
-	return FTabPageOrders.value(AOrderId);
-}
-
-QWidget *MainWindow::currentTabPage() const
-{
-	return FTabWidget->currentWidget();
-}
-
-void MainWindow::setCurrentTabPage(QWidget *APage)
-{
-	FTabWidget->setCurrentWidget(APage);
-}
-
-void MainWindow::insertTabPage(int AOrderId, QWidget *APage)
-{
-	if (!FTabPageOrders.contains(AOrderId))
-	{
-		removeTabPage(APage);
-		QMap<int, QWidget *>::const_iterator it = FTabPageOrders.lowerBound(AOrderId);
-		int index = it!=FTabPageOrders.constEnd() ? FTabWidget->indexOf(it.value()) : -1;
-		FTabWidget->insertTab(index,APage,APage->windowIcon(),APage->windowIconText());
-		FTabPageOrders.insert(AOrderId,APage);
-		updateTabPage(APage);
-		emit tabPageInserted(AOrderId,APage);
-	}
-}
-
-void MainWindow::updateTabPage(QWidget *APage)
-{
-	int index = FTabWidget->indexOf(APage);
-	if (index >= 0)
-	{
-		FTabWidget->setTabIcon(index,APage->windowIcon());
-		FTabWidget->setTabText(index,APage->windowIconText());
-	}
-}
-
-void MainWindow::removeTabPage(QWidget *APage)
-{
-	if (tabPages().contains(APage))
-	{
-		FTabWidget->removeTab(FTabWidget->indexOf(APage));
-		FTabPageOrders.remove(tabPageOrder(APage));
-		emit tabPageRemoved(APage);
-	}
+	return FMainTabWidget;
 }
 
 ToolBarChanger *MainWindow::topToolBarChanger() const
@@ -235,15 +204,72 @@ void MainWindow::removeToolBarChanger(ToolBarChanger *AChanger)
 	}
 }
 
-void MainWindow::saveWindowState()
+bool MainWindow::isOneWindowModeEnabled() const
 {
-	if (FLeftFrameWidth > 0)
-		Options::setFileValue(FLeftFrameWidth,"mainwindow.left-frame-width");
+	return FOneWindowEnabled;
 }
 
-void MainWindow::loadWindowState()
+void MainWindow::setOneWindowModeEnabled(bool AEnabled)
 {
-	FLeftFrameWidth = Options::fileValue("mainwindow.left-frame-width").toInt();
+	if (AEnabled != FOneWindowEnabled)
+	{
+		bool wasVisible = isVisible();
+		saveWindowGeometryAndState();
+		
+		FOneWindowEnabled = AEnabled;
+		if (AEnabled)
+		{
+			FSplitter->setHandleWidth(4);
+			FRightFrame->setVisible(true);
+			setWindowFlags(Qt::Window);
+		}
+		else
+		{
+			FSplitter->setHandleWidth(0);
+			FRightFrame->setVisible(false);
+			setWindowFlags(Qt::Window | Qt::WindowTitleHint);
+		}
+
+		loadWindowGeometryAndState();
+		if (wasVisible)
+			showWindow();
+		Options::node(OPV_MAINWINDOW_OWM_ENABLED).setValue(AEnabled);
+
+		emit oneWindowModeChanged(AEnabled);
+	}
+}
+
+void MainWindow::saveWindowGeometryAndState()
+{
+	QString ns = isOneWindowModeEnabled() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+	if (isOneWindowModeEnabled() && FLeftFrameWidth>0)
+		Options::setFileValue(FLeftFrameWidth,"mainwindow.left-frame-width",ns);
+	Options::setFileValue(saveGeometry(),"mainwindow.geometry",ns);
+	Options::setFileValue((int)WidgetManager::windowAlignment(this),"mainwindow.align",ns);
+}
+
+void MainWindow::loadWindowGeometryAndState()
+{
+	FAligned = false;
+	QString ns = isOneWindowModeEnabled() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+	if (!restoreGeometry(Options::fileValue("mainwindow.geometry",ns).toByteArray()))
+	{
+		if (isOneWindowModeEnabled())
+		{
+			FLeftFrameWidth = 200;
+			Options::setFileValue(0,"mainwindow.align",ns);
+			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this,Qt::AlignCenter));
+		}
+		else
+		{
+			Options::setFileValue((int)(Qt::AlignRight|Qt::AlignBottom),"mainwindow.align",ns);
+			setGeometry(WidgetManager::alignGeometry(QSize(200,500),this,Qt::AlignRight|Qt::AlignBottom));
+		}
+	}
+	else if (isOneWindowModeEnabled())
+	{
+		FLeftFrameWidth = Options::fileValue("mainwindow.left-frame-width",ns).toInt();
+	}
 }
 
 QMenu *MainWindow::createPopupMenu()
@@ -251,18 +277,39 @@ QMenu *MainWindow::createPopupMenu()
 	return NULL;
 }
 
+void MainWindow::correctWindowPosition()
+{
+	QRect windowRect = geometry();
+	QRect screenRect = qApp->desktop()->availableGeometry(this);
+	if (!screenRect.isEmpty() && !windowRect.isEmpty())
+	{
+		Qt::Alignment align = 0;
+		if (windowRect.right() <= screenRect.left())
+			align |= Qt::AlignLeft;
+		else if (windowRect.left() >= screenRect.right())
+			align |= Qt::AlignRight;
+		if (windowRect.top() >= screenRect.bottom())
+			align |= Qt::AlignBottom;
+		else if (windowRect.bottom() <= screenRect.top())
+			align |= Qt::AlignTop;
+		WidgetManager::alignWindow(this,align);
+	}
+}
+
 void MainWindow::showEvent(QShowEvent *AEvent)
 {
 	QMainWindow::showEvent(AEvent);
-
-	QList<int> splitterSizes = FSplitter->sizes();
-	int leftIndex = FSplitter->indexOf(FLeftFrame);
-	int rightIndex = FSplitter->indexOf(FRightFrame);
-	if (FLeftFrameWidth>0 && leftIndex>=0 && rightIndex>=0 && splitterSizes.value(leftIndex)!=FLeftFrameWidth)
+	if (isOneWindowModeEnabled())
 	{
-		splitterSizes[rightIndex] += splitterSizes.value(leftIndex) - FLeftFrameWidth;
-		splitterSizes[leftIndex] = FLeftFrameWidth;
-		FSplitter->setSizes(splitterSizes);
+		QList<int> splitterSizes = FSplitter->sizes();
+		int leftIndex = FSplitter->indexOf(FLeftFrame);
+		int rightIndex = FSplitter->indexOf(FRightFrame);
+		if (FLeftFrameWidth>0 && leftIndex>=0 && rightIndex>=0 && splitterSizes.value(leftIndex)!=FLeftFrameWidth)
+		{
+			splitterSizes[rightIndex] += splitterSizes.value(leftIndex) - FLeftFrameWidth;
+			splitterSizes[leftIndex] = FLeftFrameWidth;
+			FSplitter->setSizes(splitterSizes);
+		}
 	}
 }
 
@@ -270,7 +317,7 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 {
 	if (AObject == FSplitter)
 	{
-		if (AEvent->type() == QEvent::Resize)
+		if (isOneWindowModeEnabled() && AEvent->type()==QEvent::Resize)
 		{
 			int leftIndex = FSplitter->indexOf(FLeftFrame);
 			int rightIndex = FSplitter->indexOf(FRightFrame);
@@ -295,7 +342,6 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 
 void MainWindow::onSplitterMoved(int APos, int AIndex)
 {
-	Q_UNUSED(APos);
-	Q_UNUSED(AIndex);
+	Q_UNUSED(APos); Q_UNUSED(AIndex);
 	FLeftFrameWidth = FSplitter->sizes().value(FSplitter->indexOf(FLeftFrame));
 }
