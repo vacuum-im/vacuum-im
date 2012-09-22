@@ -16,6 +16,7 @@ MessageWidgets::MessageWidgets()
 	FPluginManager = NULL;
 	FXmppStreams = NULL;
 	FOptionsManager = NULL;
+	FMainWindow = NULL;
 }
 
 MessageWidgets::~MessageWidgets()
@@ -55,8 +56,17 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &AInitO
 		}
 	}
 
+	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
+	if (plugin)
+	{
+		IMainWindowPlugin *mainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+		if (mainWindowPlugin)
+			FMainWindow = mainWindowPlugin->mainWindow();
+	}
+
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	return true;
 }
@@ -429,7 +439,20 @@ ITabWindow *MessageWidgets::findTabWindow(const QUuid &AWindowId) const
 
 void MessageWidgets::assignTabWindowPage(ITabPage *APage)
 {
-	if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
+	if (!FAssignedPages.contains(APage))
+	{
+		FAssignedPages.append(APage);
+		connect(APage->instance(),SIGNAL(tabPageDestroyed()),SLOT(onAssignedTabPageDestroyed()));
+	}
+
+	if (FMainWindow && FMainWindow->isCentralWidgetVisible())
+	{
+		ITabWindow *window = newTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+		window->addTabPage(APage);
+		window->setTabBarVisible(false);
+		FMainWindow->mainCentralWidget()->appendCentralPage(window);
+	}
+	else if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
 	{
 		QList<QUuid> availWindows = tabWindowList();
 		QUuid windowId = FPageWindows.value(APage->tabPageId());
@@ -439,6 +462,7 @@ void MessageWidgets::assignTabWindowPage(ITabPage *APage)
 			windowId = availWindows.value(0);
 		ITabWindow *window = newTabWindow(windowId);
 		window->addTabPage(APage);
+		window->setTabBarVisible(true);
 	}
 }
 
@@ -688,6 +712,11 @@ void MessageWidgets::onQuoteActionTriggered(bool)
 	}
 }
 
+void MessageWidgets::onAssignedTabPageDestroyed()
+{
+	FAssignedPages.removeAll(qobject_cast<ITabPage *>(sender()));
+}
+
 void MessageWidgets::onMessageWindowDestroyed()
 {
 	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
@@ -710,13 +739,16 @@ void MessageWidgets::onChatWindowDestroyed()
 
 void MessageWidgets::onTabWindowPageAdded(ITabPage *APage)
 {
-	ITabWindow *window = qobject_cast<ITabWindow *>(sender());
-	if (window)
+	if (FMainWindow==NULL || !FMainWindow->isCentralWidgetVisible())
 	{
-		if (window->windowId() != Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
-			FPageWindows.insert(APage->tabPageId(), window->windowId());
-		else
-			FPageWindows.remove(APage->tabPageId());
+		ITabWindow *window = qobject_cast<ITabWindow *>(sender());
+		if (window)
+		{
+			if (window->windowId() != Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
+				FPageWindows.insert(APage->tabPageId(), window->windowId());
+			else
+				FPageWindows.remove(APage->tabPageId());
+		}
 	}
 }
 
@@ -762,6 +794,52 @@ void MessageWidgets::onOptionsClosed()
 	Options::setFileValue(data,"messages.tab-window-pages");
 
 	deleteWindows();
+}
+
+void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
+{
+	if (ANode.path() == OPV_MESSAGES_TABWINDOWS_ENABLE)
+	{
+		if (ANode.value().toBool())
+		{
+			foreach(ITabPage *page, FAssignedPages)
+				assignTabWindowPage(page);
+
+			foreach(ITabWindow *window, tabWindows())
+				window->showWindow();
+		}
+		else if (FMainWindow==NULL || !FMainWindow->isCentralWidgetVisible())
+		{
+			foreach(ITabWindow *window, tabWindows())
+				while(window->currentTabPage())
+					window->detachTabPage(window->currentTabPage());
+		}
+	}
+	else if (FMainWindow && ANode.path()==OPV_MAINWINDOW_CENTRALVISIBLE)
+	{
+		foreach(ITabPage *page, FAssignedPages)
+			assignTabWindowPage(page);
+
+		ITabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+		if (window)
+		{
+			if (ANode.value().toBool())
+			{
+				window->setTabBarVisible(false);
+				FMainWindow->mainCentralWidget()->appendCentralPage(window);
+			}
+			else if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
+			{
+				window->setTabBarVisible(true);
+				window->showWindow();
+			}
+			else
+			{
+				while(window->currentTabPage())
+					window->detachTabPage(window->currentTabPage());
+			}
+		}
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_messagewidgets, MessageWidgets)

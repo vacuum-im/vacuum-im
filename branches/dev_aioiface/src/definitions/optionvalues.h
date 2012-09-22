@@ -77,7 +77,7 @@
 
 // MainWindow
 #define OPV_MAINWINDOW_SHOWONSTART                      "mainwindow.show-on-start"
-#define OPV_MAINWINDOW_OWM_ENABLED                      "mainwindow.one-window-mode.enabled"
+#define OPV_MAINWINDOW_CENTRALVISIBLE                   "mainwindow.central-widget-visible"
 
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"

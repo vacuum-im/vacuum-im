@@ -95,7 +95,7 @@ bool MainWindowPlugin::initObjects()
 bool MainWindowPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_MAINWINDOW_SHOWONSTART,true);
-	Options::setDefaultValue(OPV_MAINWINDOW_OWM_ENABLED,true);
+	Options::setDefaultValue(OPV_MAINWINDOW_CENTRALVISIBLE,true);
 	return true;
 }
 
@@ -130,7 +130,7 @@ bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
 void MainWindowPlugin::onOptionsOpened()
 {
 	FMainWindow->loadWindowGeometryAndState();
-	onOptionsChanged(Options::node(OPV_MAINWINDOW_OWM_ENABLED));
+	onOptionsChanged(Options::node(OPV_MAINWINDOW_CENTRALVISIBLE));
 	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
 		FMainWindow->showWindow();
 	updateTitle();
@@ -145,9 +145,9 @@ void MainWindowPlugin::onOptionsClosed()
 
 void MainWindowPlugin::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_MAINWINDOW_OWM_ENABLED)
+	if (ANode.path() == OPV_MAINWINDOW_CENTRALVISIBLE)
 	{
-		FMainWindow->setOneWindowModeEnabled(ANode.value().toBool());
+		FMainWindow->setCentralWidgetVisible(ANode.value().toBool());
 	}
 }
 
@@ -188,7 +188,7 @@ void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CLOSEWINDOW)
 	{
 		//FMainWindow->closeWindow();
-		FMainWindow->setOneWindowModeEnabled(!FMainWindow->isOneWindowModeEnabled());
+		FMainWindow->setCentralWidgetVisible(!FMainWindow->isCentralWidgetVisible());
 	}
 }
 

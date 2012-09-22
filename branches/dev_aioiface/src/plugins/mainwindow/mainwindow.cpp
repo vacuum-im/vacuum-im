@@ -13,8 +13,8 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	setIconSize(QSize(16,16));
 
 	FAligned = false;
-	FLeftFrameWidth = 0;
-	FOneWindowEnabled = true;
+	FLeftWidgetWidth = 0;
+	FCentralVisible = true;
 
 	QIcon icon;
 	IconStorage *iconStorage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
@@ -30,26 +30,29 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FSplitter = new QSplitter(this);
 	FSplitter->installEventFilter(this);
 	FSplitter->setOrientation(Qt::Horizontal);
+	FSplitterHandleWidth = FSplitter->handleWidth();
 	connect(FSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onSplitterMoved(int,int)));
 	setCentralWidget(FSplitter);
 
-	FLeftFrame = new QFrame(this);
-	FSplitter->addWidget(FLeftFrame);
+	FLeftWidget = new QFrame(this);
+	FLeftWidget->setFrameShape(QFrame::StyledPanel);
+	FSplitter->addWidget(FLeftWidget);
 	FSplitter->setCollapsible(0,false);
 	FSplitter->setStretchFactor(0,1);
 
-	FRightFrame = new QFrame(this);
-	FSplitter->addWidget(FRightFrame);
+	FCentralWidget = new MainCentralWidget(this,this);
+	FCentralWidget->instance()->setFrameShape(QFrame::StyledPanel);
+	FSplitter->addWidget(FCentralWidget->instance());
 	FSplitter->setCollapsible(1,false);
 	FSplitter->setStretchFactor(1,4);
 
-	FLeftLayout = new QVBoxLayout(FLeftFrame);
+	FLeftLayout = new QVBoxLayout(FLeftWidget);
 	FLeftLayout->setMargin(0);
 	FLeftLayout->setSpacing(0);
 
-	FMainTabWidget = new MainTabWidget(FLeftFrame);
-	FMainTabWidget->instance()->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-	insertWidget(MWW_TABPAGES_WIDGET,FMainTabWidget->instance(),100);
+	FTabWidget = new MainTabWidget(FLeftWidget);
+	FTabWidget->instance()->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	insertWidget(MWW_TABPAGES_WIDGET,FTabWidget->instance(),100);
 
 	QToolBar *topToolbar = new QToolBar(this);
 	topToolbar->setFloatable(false);
@@ -73,6 +76,7 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 
 	FMainMenuBar = new MenuBarChanger(new QMenuBar());
 	setMenuBar(FMainMenuBar->menuBar());
+
 }
 
 MainWindow::~MainWindow()
@@ -80,17 +84,27 @@ MainWindow::~MainWindow()
 	delete FMainMenuBar->menuBar();
 }
 
-void MainWindow::showWindow()
+bool MainWindow::isActive() const
+{
+	return WidgetManager::isActiveWindow(this);
+}
+
+void MainWindow::showWindow(bool AMinimized)
 {
 	if (!Options::isNull())
 	{
-		WidgetManager::showActivateRaiseWindow(this);
+		if (!AMinimized)
+			WidgetManager::showActivateRaiseWindow(this);
+		else if (!isVisible())
+			showMinimized();
+
 		if (!FAligned)
 		{
 			FAligned = true;
-			QString ns = isOneWindowModeEnabled() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+			QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
 			WidgetManager::alignWindow(this,(Qt::Alignment)Options::fileValue("mainwindow.align",ns).toInt());
 		}
+
 		correctWindowPosition();
 	}
 }
@@ -98,11 +112,6 @@ void MainWindow::showWindow()
 void MainWindow::closeWindow()
 {
 	close();
-}
-
-bool MainWindow::isActive() const
-{
-	return isVisible() && WidgetManager::isActiveWindow(this);
 }
 
 Menu *MainWindow::mainMenu() const
@@ -155,7 +164,7 @@ void MainWindow::removeWidget(QWidget *AWidget)
 
 IMainTabWidget *MainWindow::mainTabWidget() const
 {
-	return FMainTabWidget;
+	return FTabWidget;
 }
 
 ToolBarChanger *MainWindow::topToolBarChanger() const
@@ -204,46 +213,55 @@ void MainWindow::removeToolBarChanger(ToolBarChanger *AChanger)
 	}
 }
 
-bool MainWindow::isOneWindowModeEnabled() const
+IMainCentralWidget * MainWindow::mainCentralWidget() const
 {
-	return FOneWindowEnabled;
+	return FCentralWidget;
 }
 
-void MainWindow::setOneWindowModeEnabled(bool AEnabled)
+bool MainWindow::isCentralWidgetVisible() const
 {
-	if (AEnabled != FOneWindowEnabled)
+	return FCentralVisible;
+}
+
+void MainWindow::setCentralWidgetVisible(bool AEnabled)
+{
+	if (AEnabled != FCentralVisible)
 	{
 		bool wasVisible = isVisible();
 		saveWindowGeometryAndState();
 		
-		FOneWindowEnabled = AEnabled;
+		FCentralVisible = AEnabled;
 		if (AEnabled)
 		{
-			FSplitter->setHandleWidth(4);
-			FRightFrame->setVisible(true);
+			FSplitter->setHandleWidth(FSplitterHandleWidth);
+			FLeftWidget->setFrameShape(QFrame::StyledPanel);
+			FCentralWidget->instance()->setVisible(true);
 			setWindowFlags(Qt::Window);
 		}
 		else
 		{
 			FSplitter->setHandleWidth(0);
-			FRightFrame->setVisible(false);
+			FLeftWidget->setFrameShape(QFrame::NoFrame);
+			FCentralWidget->instance()->setVisible(false);
+			while (FCentralWidget->currentCentralPage()!=NULL)
+				FCentralWidget->removeCentralPage(FCentralWidget->currentCentralPage());
 			setWindowFlags(Qt::Window | Qt::WindowTitleHint);
 		}
 
 		loadWindowGeometryAndState();
 		if (wasVisible)
 			showWindow();
-		Options::node(OPV_MAINWINDOW_OWM_ENABLED).setValue(AEnabled);
+		Options::node(OPV_MAINWINDOW_CENTRALVISIBLE).setValue(AEnabled);
 
-		emit oneWindowModeChanged(AEnabled);
+		emit centralWidgetVisibleChanged(AEnabled);
 	}
 }
 
 void MainWindow::saveWindowGeometryAndState()
 {
-	QString ns = isOneWindowModeEnabled() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
-	if (isOneWindowModeEnabled() && FLeftFrameWidth>0)
-		Options::setFileValue(FLeftFrameWidth,"mainwindow.left-frame-width",ns);
+	QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+	if (isCentralWidgetVisible() && FLeftWidgetWidth>0)
+		Options::setFileValue(FLeftWidgetWidth,"mainwindow.left-frame-width",ns);
 	Options::setFileValue(saveGeometry(),"mainwindow.geometry",ns);
 	Options::setFileValue((int)WidgetManager::windowAlignment(this),"mainwindow.align",ns);
 }
@@ -251,12 +269,12 @@ void MainWindow::saveWindowGeometryAndState()
 void MainWindow::loadWindowGeometryAndState()
 {
 	FAligned = false;
-	QString ns = isOneWindowModeEnabled() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
+	QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
 	if (!restoreGeometry(Options::fileValue("mainwindow.geometry",ns).toByteArray()))
 	{
-		if (isOneWindowModeEnabled())
+		if (isCentralWidgetVisible())
 		{
-			FLeftFrameWidth = 200;
+			FLeftWidgetWidth = 200;
 			Options::setFileValue(0,"mainwindow.align",ns);
 			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this,Qt::AlignCenter));
 		}
@@ -266,9 +284,9 @@ void MainWindow::loadWindowGeometryAndState()
 			setGeometry(WidgetManager::alignGeometry(QSize(200,500),this,Qt::AlignRight|Qt::AlignBottom));
 		}
 	}
-	else if (isOneWindowModeEnabled())
+	else if (isCentralWidgetVisible())
 	{
-		FLeftFrameWidth = Options::fileValue("mainwindow.left-frame-width",ns).toInt();
+		FLeftWidgetWidth = Options::fileValue("mainwindow.left-frame-width",ns).toInt();
 	}
 }
 
@@ -299,15 +317,15 @@ void MainWindow::correctWindowPosition()
 void MainWindow::showEvent(QShowEvent *AEvent)
 {
 	QMainWindow::showEvent(AEvent);
-	if (isOneWindowModeEnabled())
+	if (isCentralWidgetVisible())
 	{
 		QList<int> splitterSizes = FSplitter->sizes();
-		int leftIndex = FSplitter->indexOf(FLeftFrame);
-		int rightIndex = FSplitter->indexOf(FRightFrame);
-		if (FLeftFrameWidth>0 && leftIndex>=0 && rightIndex>=0 && splitterSizes.value(leftIndex)!=FLeftFrameWidth)
+		int leftIndex = FSplitter->indexOf(FLeftWidget);
+		int rightIndex = FSplitter->indexOf(FCentralWidget->instance());
+		if (FLeftWidgetWidth>0 && leftIndex>=0 && rightIndex>=0 && splitterSizes.value(leftIndex)!=FLeftWidgetWidth)
 		{
-			splitterSizes[rightIndex] += splitterSizes.value(leftIndex) - FLeftFrameWidth;
-			splitterSizes[leftIndex] = FLeftFrameWidth;
+			splitterSizes[rightIndex] += splitterSizes.value(leftIndex) - FLeftWidgetWidth;
+			splitterSizes[leftIndex] = FLeftWidgetWidth;
 			FSplitter->setSizes(splitterSizes);
 		}
 	}
@@ -317,21 +335,21 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 {
 	if (AObject == FSplitter)
 	{
-		if (isOneWindowModeEnabled() && AEvent->type()==QEvent::Resize)
+		if (isCentralWidgetVisible() && AEvent->type()==QEvent::Resize)
 		{
-			int leftIndex = FSplitter->indexOf(FLeftFrame);
-			int rightIndex = FSplitter->indexOf(FRightFrame);
+			int leftIndex = FSplitter->indexOf(FLeftWidget);
+			int rightIndex = FSplitter->indexOf(FCentralWidget->instance());
 			QResizeEvent *resizeEvent = static_cast<QResizeEvent *>(AEvent);
-			if (resizeEvent && FLeftFrameWidth>0 && leftIndex>=0 && rightIndex>=0 && resizeEvent->oldSize().width()>0)
+			if (resizeEvent && FLeftWidgetWidth>0 && leftIndex>=0 && rightIndex>=0 && resizeEvent->oldSize().width()>0)
 			{
 				double k = (double)resizeEvent->size().width() / resizeEvent->oldSize().width();
 				QList<int> splitterSizes = FSplitter->sizes();
 				for (int i=0; i<splitterSizes.count(); i++)
 					splitterSizes[i] = qRound(splitterSizes[i]*k);
-				if (splitterSizes.value(leftIndex) != FLeftFrameWidth)
+				if (splitterSizes.value(leftIndex) != FLeftWidgetWidth)
 				{
-					splitterSizes[rightIndex] += splitterSizes.value(leftIndex) - FLeftFrameWidth;
-					splitterSizes[leftIndex] = FLeftFrameWidth;
+					splitterSizes[rightIndex] += splitterSizes.value(leftIndex) - FLeftWidgetWidth;
+					splitterSizes[leftIndex] = FLeftWidgetWidth;
 					FSplitter->setSizes(splitterSizes);
 				}
 			}
@@ -343,5 +361,5 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 void MainWindow::onSplitterMoved(int APos, int AIndex)
 {
 	Q_UNUSED(APos); Q_UNUSED(AIndex);
-	FLeftFrameWidth = FSplitter->sizes().value(FSplitter->indexOf(FLeftFrame));
+	FLeftWidgetWidth = FSplitter->sizes().value(FSplitter->indexOf(FLeftWidget));
 }

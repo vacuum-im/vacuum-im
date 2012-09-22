@@ -31,6 +31,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->setDocumentMode(true);
 	ui.twtTabs->setUsesScrollButtons(true);
 
+	FShownDetached = false;
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),
@@ -51,13 +52,11 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	FBlinkTimer.start(BLINK_VISIBLE_TIME);
 
 	createActions();
-	loadWindowStateAndGeometry();
 
 	Shortcuts::insertWidgetShortcut(SCT_TABWINDOW_CLOSETAB,this);
 	Shortcuts::insertWidgetShortcut(SCT_TABWINDOW_CLOSEOTHERTABS,this);
 	Shortcuts::insertWidgetShortcut(SCT_TABWINDOW_DETACHTAB,this);
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),
-		SLOT(onShortcutActivated(const QString &, QWidget *)));
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	FOptionsNode = Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId);
 	onOptionsChanged(FOptionsNode.node("tabs-closable"));
@@ -76,18 +75,31 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 TabWindow::~TabWindow()
 {
 	clearTabs();
-	saveWindowStateAndGeometry();
 	emit windowDestroyed();
+	emit centralPageDestroyed();
+}
+
+void TabWindow::showCentralPage(bool AMinimized)
+{
+	if (!AMinimized)
+		showWindow();
+	else
+		showMinimizedWindow();
 }
 
 void TabWindow::showWindow()
 {
-	WidgetManager::showActivateRaiseWindow(this);
+	if (isWindow())
+		WidgetManager::showActivateRaiseWindow(this);
+	else
+		emit centralPageShow(false);
 }
 
 void TabWindow::showMinimizedWindow()
 {
-	if (!isVisible())
+	if (!isWindow())
+		emit centralPageShow(true);
+	else if (!isVisible())
 		showMinimized();
 }
 
@@ -186,8 +198,21 @@ void TabWindow::removeTabPage(ITabPage *APage)
 		emit tabPageRemoved(APage);
 
 		if (ui.twtTabs->count() == 0)
+		{
+			close();
 			deleteLater();
+		}
 	}
+}
+
+bool TabWindow::isTabBarVisible() const
+{
+	return ui.twtTabs->isTabBarVisible();
+}
+
+void TabWindow::setTabBarVisible(bool AVisible)
+{
+	ui.twtTabs->setTabBarVisible(AVisible);
 }
 
 void TabWindow::createActions()
@@ -273,26 +298,20 @@ void TabWindow::createActions()
 
 void TabWindow::saveWindowStateAndGeometry()
 {
-	if (FMessageWidgets->tabWindowList().contains(FWindowId))
+	if (isWindow() && FMessageWidgets->tabWindowList().contains(FWindowId))
 	{
-		if (isWindow())
-		{
-			Options::setFileValue(saveState(),"messages.tabwindows.window.state",FWindowId.toString());
-			Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
-		}
+		Options::setFileValue(saveState(),"messages.tabwindows.window.state",FWindowId.toString());
+		Options::setFileValue(saveGeometry(),"messages.tabwindows.window.geometry",FWindowId.toString());
 	}
 }
 
 void TabWindow::loadWindowStateAndGeometry()
 {
-	if (FMessageWidgets->tabWindowList().contains(FWindowId))
+	if (isWindow() && FMessageWidgets->tabWindowList().contains(FWindowId))
 	{
-		if (isWindow())
-		{
-			if (!restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray()))
-				setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
-			restoreState(Options::fileValue("messages.tabwindows.window.state",FWindowId.toString()).toByteArray());
-		}
+		if (!restoreGeometry(Options::fileValue("messages.tabwindows.window.geometry",FWindowId.toString()).toByteArray()))
+			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
+		restoreState(Options::fileValue("messages.tabwindows.window.state",FWindowId.toString()).toByteArray());
 	}
 }
 
@@ -365,6 +384,28 @@ void TabWindow::updateTabs(int AFrom, int ATo)
 {
 	for (int tab=AFrom; tab<=ATo; tab++)
 		updateTab(tab);
+}
+
+void TabWindow::showEvent(QShowEvent *AEvent)
+{
+	if (isWindow())
+	{
+		if (!FShownDetached)
+			loadWindowStateAndGeometry();
+		FShownDetached = true;
+	}
+	else
+	{
+		FShownDetached = false;
+	}
+	QMainWindow::showEvent(AEvent);
+}
+
+void TabWindow::closeEvent(QCloseEvent *AEvent)
+{
+	if (FShownDetached)
+		saveWindowStateAndGeometry();
+	QMainWindow::closeEvent(AEvent);
 }
 
 void TabWindow::onTabMoved(int AFrom, int ATo)
@@ -545,50 +586,53 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 void TabWindow::onActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
-	if (action == FNextTab)
+	if (isTabBarVisible())
 	{
-		ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
-	}
-	else if (action == FPrevTab)
-	{
-		ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
-	}
-	else if (action == FShowCloseButtons)
-	{
-		FOptionsNode.node("tabs-closable").setValue(action->isChecked());
-	}
-	else if (action == FTabsBottom)
-	{
-		FOptionsNode.node("tabs-bottom").setValue(action->isChecked());
-	}
-	else if (action == FShowIndices)
-	{
-		FOptionsNode.node("show-indices").setValue(action->isChecked());
-	}
-	else if (action == FRemoveTabsOnClose)
-	{
-		FOptionsNode.node("remove-tabs-on-close").setValue(action->isChecked());
-	}
-	else if (action == FSetAsDefault)
-	{
-		Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).setValue(true);
-	}
-	else if (action == FRenameWindow)
-	{
-		QString name = QInputDialog::getText(this,tr("Rename Tab Window"),tr("Tab window name:"),QLineEdit::Normal,FMessageWidgets->tabWindowName(FWindowId));
-		if (!name.isEmpty())
-			FMessageWidgets->setTabWindowName(FWindowId,name);
-	}
-	else if (action == FCloseWindow)
-	{
-		close();
-	}
-	else if (action == FDeleteWindow)
-	{
-		if (QMessageBox::question(this,tr("Delete Tab Window"),tr("Are you sure you want to delete this tab window?"),
-			QMessageBox::Ok|QMessageBox::Cancel) == QMessageBox::Ok)
+		if (action == FNextTab)
 		{
-			FMessageWidgets->deleteTabWindow(FWindowId);
+			ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
+		}
+		else if (action == FPrevTab)
+		{
+			ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
+		}
+		else if (action == FShowCloseButtons)
+		{
+			FOptionsNode.node("tabs-closable").setValue(action->isChecked());
+		}
+		else if (action == FTabsBottom)
+		{
+			FOptionsNode.node("tabs-bottom").setValue(action->isChecked());
+		}
+		else if (action == FShowIndices)
+		{
+			FOptionsNode.node("show-indices").setValue(action->isChecked());
+		}
+		else if (action == FRemoveTabsOnClose)
+		{
+			FOptionsNode.node("remove-tabs-on-close").setValue(action->isChecked());
+		}
+		else if (action == FSetAsDefault)
+		{
+			Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).setValue(true);
+		}
+		else if (action == FRenameWindow)
+		{
+			QString name = QInputDialog::getText(this,tr("Rename Tab Window"),tr("Tab window name:"),QLineEdit::Normal,FMessageWidgets->tabWindowName(FWindowId));
+			if (!name.isEmpty())
+				FMessageWidgets->setTabWindowName(FWindowId,name);
+		}
+		else if (action == FCloseWindow)
+		{
+			close();
+		}
+		else if (action == FDeleteWindow)
+		{
+			if (QMessageBox::question(this,tr("Delete Tab Window"),tr("Are you sure you want to delete this tab window?"),
+				QMessageBox::Ok|QMessageBox::Cancel) == QMessageBox::Ok)
+			{
+				FMessageWidgets->deleteTabWindow(FWindowId);
+			}
 		}
 	}
 }
@@ -639,7 +683,7 @@ void TabWindow::onTabMenuActionTriggered(bool)
 
 void TabWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (AWidget == this)
+	if (AWidget==this && isTabBarVisible())
 	{
 		if (AId == SCT_TABWINDOW_CLOSETAB)
 		{

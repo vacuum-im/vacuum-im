@@ -79,6 +79,22 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 RostersView::~RostersView()
 {
 	removeLabels();
+	emit tabPageDestroyed();
+}
+
+QIcon RostersView::tabPageIcon() const
+{
+	return IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_ROSTERVIEW_CONTACTS);
+}
+
+QString RostersView::tabPageCaption() const
+{
+	return tr("Contacts");
+}
+
+QString RostersView::tabPageToolTip() const
+{
+	return QString::null;
 }
 
 int RostersView::rosterDataOrder() const

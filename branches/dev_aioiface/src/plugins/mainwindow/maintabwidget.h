@@ -14,24 +14,25 @@ public:
 	MainTabWidget(QWidget *AParent);
 	~MainTabWidget();
 	virtual QTabWidget *instance() { return this; }
-	virtual QList<QWidget *> tabPages() const;
-	virtual int tabPageOrder(QWidget *APage) const;
-	virtual QWidget *tabPageByOrder(int AOrderId) const;
-	virtual QWidget *currentTabPage() const;
-	virtual void setCurrentTabPage(QWidget *APage);
-	virtual void insertTabPage(int AOrderId, QWidget *APage);
-	virtual void updateTabPage(QWidget *APage);
-	virtual void removeTabPage(QWidget *APage);
+	virtual QList<IMainTabPage *> tabPages() const;
+	virtual int tabPageOrder(IMainTabPage *APage) const;
+	virtual IMainTabPage *tabPageByOrder(int AOrderId) const;
+	virtual IMainTabPage *currentTabPage() const;
+	virtual void setCurrentTabPage(IMainTabPage *APage);
+	virtual void insertTabPage(int AOrderId, IMainTabPage *APage);
+	virtual void removeTabPage(IMainTabPage *APage);
 signals:
-	void currentTabPageChanged(QWidget *APage);
-	void tabPageInserted(int AOrderId, QWidget *APage);
-	void tabPageUpdated(QWidget *APage);
-	void tabPageRemoved(QWidget *APage);
+	void currentTabPageChanged(IMainTabPage *APage);
+	void tabPageInserted(int AOrderId, IMainTabPage *APage);
+	void tabPageRemoved(IMainTabPage *APage);
 protected:
 	void tabInserted(int AIndex);
 	void tabRemoved(int AIndex);
+protected slots:
+	void onTabPageChanged();
+	void onTabPageDestroyed();
 private:
-	QMap<int, QWidget *> FTabPageOrders;
+	QMap<int, IMainTabPage *> FTabPageOrders;
 };
 
 #endif // MAINTABWIDGET_H

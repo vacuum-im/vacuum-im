@@ -11,6 +11,7 @@
 #include <utils/widgetmanager.h>
 #include <utils/options.h>
 #include "maintabwidget.h"
+#include "maincentralwidget.h"
 
 class MainWindow :
 	public QMainWindow,
@@ -23,9 +24,9 @@ public:
 	~MainWindow();
 	//IMainWindow
 	virtual QMainWindow *instance() { return this; }
-	virtual void showWindow();
-	virtual void closeWindow();
 	virtual bool isActive() const;
+	virtual void showWindow(bool AMinimized = false);
+	virtual void closeWindow();
 	// Menu Management
 	virtual Menu *mainMenu() const;
 	virtual MenuBarChanger *mainMenuBar() const;
@@ -35,8 +36,6 @@ public:
 	virtual QWidget *widgetByOrder(int AOrderId) const;
 	virtual void insertWidget(int AOrderId, QWidget *AWidget, int AStretch=0);
 	virtual void removeWidget(QWidget *AWidget);
-	// Tab Pages Management
-	virtual IMainTabWidget *mainTabWidget() const;
 	// Tool Bars Management
 	virtual ToolBarChanger *topToolBarChanger() const;
 	virtual ToolBarChanger *bottomToolBarChanger() const;
@@ -45,15 +44,17 @@ public:
 	virtual ToolBarChanger *toolBarChangerByOrder(int AOrderId) const;
 	virtual void insertToolBarChanger(int AOrderId, ToolBarChanger *AChanger);
 	virtual void removeToolBarChanger(ToolBarChanger *AChanger);
-	// One Window Mode Management
-	virtual bool isOneWindowModeEnabled() const;
-	virtual void setOneWindowModeEnabled(bool AEnabled);
+	// Pages Management
+	virtual IMainTabWidget *mainTabWidget() const;
+	virtual IMainCentralWidget *mainCentralWidget() const;
+	virtual bool isCentralWidgetVisible() const;
+	virtual void setCentralWidgetVisible(bool AEnabled);
 signals:
-	void oneWindowModeChanged(bool AEnabled);
 	void widgetInserted(int AOrderId, QWidget *AWidget);
 	void widgetRemoved(QWidget *AWidget);
 	void toolBarChangerInserted(int AOrderId, ToolBarChanger *AChanger);
 	void toolBarChangerRemoved(ToolBarChanger *AChanger);
+	void centralWidgetVisibleChanged(bool AVisible);
 public:
 	void saveWindowGeometryAndState();
 	void loadWindowGeometryAndState();
@@ -66,19 +67,19 @@ protected:
 protected slots:
 	void onSplitterMoved(int APos, int AIndex);
 private:
-	IMainTabWidget *FMainTabWidget;
+	IMainTabWidget *FTabWidget;
+	IMainCentralWidget *FCentralWidget;
 private:
 	Menu *FMainMenu;
+	QFrame *FLeftWidget;
+	QVBoxLayout *FLeftLayout;
 	QSplitter *FSplitter;
 	MenuBarChanger *FMainMenuBar;
 private:
-	int FLeftFrameWidth;
-	QFrame *FLeftFrame;
-	QFrame *FRightFrame;
-	QVBoxLayout *FLeftLayout;
-private:
 	bool FAligned;
-	bool FOneWindowEnabled;
+	bool FCentralVisible;
+	int FLeftWidgetWidth;
+	int FSplitterHandleWidth;
 	QMap<int, QWidget *> FWidgetOrders;
 	QMap<int, ToolBarChanger *> FToolBarOrders;
 };

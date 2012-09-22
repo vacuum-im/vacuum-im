@@ -12,32 +12,67 @@
 
 #define MAINWINDOW_UUID "{A6F3D775-8464-4599-AB79-97BA1BAA6E96}"
 
+class IMainTabPage
+{
+public:
+	virtual QWidget *instance() = 0;
+	virtual QIcon tabPageIcon() const =0;
+	virtual QString tabPageCaption() const =0;
+	virtual QString tabPageToolTip() const =0;
+protected:
+	virtual void tabPageChanged() =0;
+	virtual void tabPageDestroyed() =0;
+};
+
 class IMainTabWidget
 {
 public:
 	virtual QTabWidget *instance() = 0;
-	virtual QList<QWidget *> tabPages() const =0;
-	virtual int tabPageOrder(QWidget *APage) const =0;
-	virtual QWidget *tabPageByOrder(int AOrderId) const =0;
-	virtual QWidget *currentTabPage() const =0;
-	virtual void setCurrentTabPage(QWidget *APage) =0;
-	virtual void insertTabPage(int AOrderId, QWidget *APage) =0;
-	virtual void updateTabPage(QWidget *APage) =0;
-	virtual void removeTabPage(QWidget *APage) =0;
+	virtual QList<IMainTabPage *> tabPages() const =0;
+	virtual int tabPageOrder(IMainTabPage *APage) const =0;
+	virtual IMainTabPage *tabPageByOrder(int AOrderId) const =0;
+	virtual IMainTabPage *currentTabPage() const =0;
+	virtual void setCurrentTabPage(IMainTabPage *APage) =0;
+	virtual void insertTabPage(int AOrderId, IMainTabPage *APage) =0;
+	virtual void removeTabPage(IMainTabPage *APage) =0;
 protected:
-	virtual void currentTabPageChanged(QWidget *APage) =0;
-	virtual void tabPageInserted(int AOrderId, QWidget *APage) =0;
-	virtual void tabPageUpdated(QWidget *APage) =0;
-	virtual void tabPageRemoved(QWidget *APage) =0;
+	virtual void currentTabPageChanged(IMainTabPage *APage) =0;
+	virtual void tabPageInserted(int AOrderId, IMainTabPage *APage) =0;
+	virtual void tabPageRemoved(IMainTabPage *APage) =0;
+};
+
+class IMainCentralPage
+{
+public:
+	virtual QWidget *instance() = 0;
+	virtual void showCentralPage(bool AMinimized = false) =0;
+protected:
+	virtual void centralPageShow(bool AMinimized) =0;
+	virtual void centralPageDestroyed() =0;
+};
+
+class IMainCentralWidget
+{
+public:
+	virtual QStackedWidget *instance() = 0;
+	virtual QList<IMainCentralPage *> centralPages() const =0;
+	virtual IMainCentralPage *currentCentralPage() const =0;
+	virtual void setCurrentCentralPage(IMainCentralPage *APage) =0;
+	virtual void appendCentralPage(IMainCentralPage *APage) =0;
+	virtual void removeCentralPage(IMainCentralPage *APage) =0;
+protected:
+	virtual void currentCentralPageChanged(IMainCentralPage *APage) =0;
+	virtual void centralPageAppended(IMainCentralPage *APage) =0;
+	virtual void centralPageRemoved(IMainCentralPage *APage) =0;
 };
 
 class IMainWindow
 {
 public:
 	virtual QMainWindow *instance() =0;
-	virtual void showWindow() =0;
-	virtual void closeWindow() =0;
 	virtual bool isActive() const =0;
+	virtual void showWindow(bool AMinimized = false) =0;
+	virtual void closeWindow() =0;
 	// Menu Management
 	virtual Menu *mainMenu() const =0;
 	virtual MenuBarChanger *mainMenuBar() const =0;
@@ -47,8 +82,6 @@ public:
 	virtual QWidget *widgetByOrder(int AOrderId) const =0;
 	virtual void insertWidget(int AOrderId, QWidget *AWidget, int AStretch=0) =0;
 	virtual void removeWidget(QWidget *AWidget) =0;
-	// Tab Pages Management
-	virtual IMainTabWidget *mainTabWidget() const =0;
 	// Tool Bars Management
 	virtual ToolBarChanger *topToolBarChanger() const =0;
 	virtual ToolBarChanger *bottomToolBarChanger() const =0;
@@ -57,15 +90,17 @@ public:
 	virtual ToolBarChanger *toolBarChangerByOrder(int AOrderId) const =0;
 	virtual void insertToolBarChanger(int AOrderId, ToolBarChanger *AChanger) =0;
 	virtual void removeToolBarChanger(ToolBarChanger *AChanger) =0;
-	// One Window Mode Management
-	virtual bool isOneWindowModeEnabled() const =0;
-	virtual void setOneWindowModeEnabled(bool AEnabled) =0;
+	// Pages Management
+	virtual IMainTabWidget *mainTabWidget() const =0;
+	virtual IMainCentralWidget *mainCentralWidget() const =0;
+	virtual bool isCentralWidgetVisible() const =0;
+	virtual void setCentralWidgetVisible(bool AVisible) =0;
 protected:
-	virtual void oneWindowModeChanged(bool AEnabled) =0;
 	virtual void widgetInserted(int AOrderId, QWidget *AWidget) =0;
 	virtual void widgetRemoved(QWidget *AWidget) =0;
 	virtual void toolBarChangerInserted(int AOrderId, ToolBarChanger *AChanger) =0;
 	virtual void toolBarChangerRemoved(ToolBarChanger *AChanger) =0;
+	virtual void centralWidgetVisibleChanged(bool AVisible) =0;
 };
 
 class IMainWindowPlugin
@@ -75,8 +110,11 @@ public:
 	virtual IMainWindow *mainWindow() const = 0;
 };
 
-Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.1")
+Q_DECLARE_INTERFACE(IMainTabPage,"Vacuum.Plugin.IMainTabPage/1.0")
 Q_DECLARE_INTERFACE(IMainTabWidget,"Vacuum.Plugin.IMainTabWidget/1.0")
+Q_DECLARE_INTERFACE(IMainCentralPage,"Vacuum.Plugin.IMainCentralPage/1.0")
+Q_DECLARE_INTERFACE(IMainCentralWidget,"Vacuum.Plugin.IMainCentralWidget/1.0")
+Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.1")
 Q_DECLARE_INTERFACE(IMainWindowPlugin,"Vacuum.Plugin.IMainWindowPlugin/1.1")
 
 #endif // IMAINWINDOW_H
