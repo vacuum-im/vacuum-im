@@ -98,11 +98,11 @@ sudo apt-get update
 }}}
 
 == Vacuum-IM (unstable) ==
-https://launchpad.net/~uni/+archive/ppa
+https://launchpad.net/~uni/+archive/vacuum-unstable
 
 === Подключение ===
 {{{
-sudo add-apt-repository ppa:uni/ppa
+sudo add-apt-repository ppa:uni/vacuum-unstable
 sudo apt-get update
 }}}
 
