@@ -24,12 +24,13 @@
 #define   SCT_APP_SHOWFILETRANSFERS                                "application.show-filetransfers"
 //MultiUserChat
 #define   SCT_APP_MUCJOIN                                          "application.muc-join"
-#define   SCT_APP_MUC_SHOWHIDDEN                                   "application.muc-show-hidden"
-#define   SCT_APP_MUC_LEAVEHIDDEN                                  "application.muc-leave-hidden"
+#define   SCT_APP_MUCSHOWHIDDEN                                    "application.muc-show-hidden"
+#define   SCT_APP_MUCLEAVEHIDDEN                                   "application.muc-leave-hidden"
 
 //MainWindow
 #define SCTG_MAINWINDOW                                            "main-window"
 #define   SCT_MAINWINDOW_CLOSEWINDOW                               "main-window.close-window"
+#define   SCT_MAINWINDOW_CHANGECENTRALVISIBLE                      "main-window.change-central-widget-visible"
 //RostersView
 #define   SCT_MAINWINDOW_TOGGLEOFFLINE                             "main-window.toggle-offline"
 

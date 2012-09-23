@@ -4,18 +4,6 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Top toolbar</source>
-        <translation>Obere Toolbar</translation>
-    </message>
-    <message>
-        <source>Left toolbar</source>
-        <translation>Linkte Toolbar</translation>
-    </message>
-    <message>
-        <source>Bottom toolbar</source>
-        <translation>Untere Toolbar</translation>
-    </message>
-    <message>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -50,6 +38,14 @@
         <source>Esc</source>
         <comment>Hide roster</comment>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Combine/Split with message windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combine main window with message windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

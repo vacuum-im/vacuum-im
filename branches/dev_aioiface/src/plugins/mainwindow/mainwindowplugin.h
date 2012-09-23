@@ -3,10 +3,11 @@
 
 #include <QTime>
 #include <definitions/actiongroups.h>
-#include <definitions/version.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/shortcuts.h>
 #include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
@@ -21,10 +22,11 @@
 class MainWindowPlugin :
 		public QObject,
 		public IPlugin,
-		public IMainWindowPlugin
+		public IMainWindowPlugin,
+		public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMainWindowPlugin);
+	Q_INTERFACES(IPlugin IMainWindowPlugin IOptionsHolder);
 public:
 	MainWindowPlugin();
 	~MainWindowPlugin();
@@ -36,10 +38,10 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin();
+	//IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMainWindowPlugin
 	virtual IMainWindow *mainWindow() const;
-protected:
-	void updateTitle();
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
@@ -47,9 +49,8 @@ protected slots:
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onShutdownStarted();
-	void onProfileRenamed(const QString &AProfile, const QString &ANewName);
-	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
 	void onShowMainWindowByAction(bool);
+	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPluginManager *FPluginManager;

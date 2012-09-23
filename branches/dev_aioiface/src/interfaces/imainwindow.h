@@ -46,8 +46,11 @@ class IMainCentralPage
 public:
 	virtual QWidget *instance() = 0;
 	virtual void showCentralPage(bool AMinimized = false) =0;
+	virtual QIcon centralPageIcon() const =0;
+	virtual QString centralPageCaption() const =0;
 protected:
 	virtual void centralPageShow(bool AMinimized) =0;
+	virtual void centralPageChanged() =0;
 	virtual void centralPageDestroyed() =0;
 };
 
@@ -61,6 +64,7 @@ public:
 	virtual void appendCentralPage(IMainCentralPage *APage) =0;
 	virtual void removeCentralPage(IMainCentralPage *APage) =0;
 protected:
+	virtual void currentCentralPageChanged() =0;
 	virtual void currentCentralPageChanged(IMainCentralPage *APage) =0;
 	virtual void centralPageAppended(IMainCentralPage *APage) =0;
 	virtual void centralPageRemoved(IMainCentralPage *APage) =0;

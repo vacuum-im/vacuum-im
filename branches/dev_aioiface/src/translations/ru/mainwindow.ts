@@ -4,18 +4,6 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Top toolbar</source>
-        <translation>Верхняя панель</translation>
-    </message>
-    <message>
-        <source>Left toolbar</source>
-        <translation>Левая панель</translation>
-    </message>
-    <message>
-        <source>Bottom toolbar</source>
-        <translation>Правая панель</translation>
-    </message>
-    <message>
         <source>Menu</source>
         <translation>Меню</translation>
     </message>
@@ -50,6 +38,14 @@
         <source>Esc</source>
         <comment>Hide roster</comment>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Combine/Split with message windows</source>
+        <translation>Объединить/Разделить с окнами сообщений</translation>
+    </message>
+    <message>
+        <source>Combine main window with message windows</source>
+        <translation>Объединить основное окно с окнами сообщений</translation>
     </message>
 </context>
 </TS>

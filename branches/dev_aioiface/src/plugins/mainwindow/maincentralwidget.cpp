@@ -34,6 +34,7 @@ void MainCentralWidget::appendCentralPage(IMainCentralPage *APage)
 	{
 		FCentralPages.append(APage);
 		connect(APage->instance(),SIGNAL(centralPageShow(bool)),SLOT(onCentralPageShow(bool)));
+		connect(APage->instance(),SIGNAL(centralPageChanged()),SLOT(onCentralPageChanged()));
 		connect(APage->instance(),SIGNAL(centralPageDestroyed()),SLOT(onCentralPageDestroyed()));
 		emit centralPageAppended(APage);
 		addWidget(APage->instance());
@@ -56,6 +57,7 @@ void MainCentralWidget::onCurrentIndexChanged(int AIndex)
 {
 	IMainCentralPage *page = qobject_cast<IMainCentralPage *>(widget(AIndex));
 	emit currentCentralPageChanged(page);
+	emit currentCentralPageChanged();
 }
 
 void MainCentralWidget::onCentralPageShow(bool AMinimized)
@@ -63,9 +65,16 @@ void MainCentralWidget::onCentralPageShow(bool AMinimized)
 	IMainCentralPage *page = qobject_cast<IMainCentralPage *>(sender());
 	if (page)
 	{
-		setCurrentWidget(page->instance());
+		setCurrentCentralPage(page);
 		FMainWindow->showWindow(AMinimized);
 	}
+}
+
+void MainCentralWidget::onCentralPageChanged()
+{
+	IMainCentralPage *page = qobject_cast<IMainCentralPage *>(sender());
+	if (page && page==currentCentralPage())
+		emit currentCentralPageChanged();
 }
 
 void MainCentralWidget::onCentralPageDestroyed()

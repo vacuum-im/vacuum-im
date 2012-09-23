@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QSplitter>
 #include <interfaces/imainwindow.h>
+#include <definitions/version.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
@@ -59,12 +60,14 @@ public:
 	void saveWindowGeometryAndState();
 	void loadWindowGeometryAndState();
 protected:
+	void updateWindow();
 	QMenu *createPopupMenu();
 	void correctWindowPosition();
 protected:
 	void showEvent(QShowEvent *AEvent);
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
+	void onCurrentCentralPageChanged();
 	void onSplitterMoved(int APos, int AIndex);
 private:
 	IMainTabWidget *FTabWidget;

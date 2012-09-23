@@ -37,11 +37,6 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 	if (plugin)
 	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-		if (FOptionsManager)
-		{
-			connect(FOptionsManager->instance(), SIGNAL(profileRenamed(const QString &, const QString &)),
-				SLOT(onProfileRenamed(const QString &, const QString &)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
@@ -69,25 +64,28 @@ bool MainWindowPlugin::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_GLOBAL_SHOWROSTER,tr("Show roster"),QKeySequence::UnknownKey,Shortcuts::GlobalShortcut);
 
-	Shortcuts::declareGroup(SCTG_MAINWINDOW, tr("Main window"), SGO_MAINWINDOW);
+	Shortcuts::declareGroup(SCTG_MAINWINDOW,tr("Main window"),SGO_MAINWINDOW);
 	Shortcuts::declareShortcut(SCT_MAINWINDOW_CLOSEWINDOW,tr("Hide roster"),tr("Esc","Hide roster"));
+	Shortcuts::declareShortcut(SCT_MAINWINDOW_CHANGECENTRALVISIBLE,tr("Combine/Split with message windows"),QKeySequence::UnknownKey);
 
-	Action *action = new Action(this);
-	action->setText(tr("Quit"));
-	action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
-	connect(action,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit()));
-	FMainWindow->mainMenu()->addAction(action,AG_MMENU_MAINWINDOW,true);
+	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_CLOSEWINDOW,FMainWindow);
+	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_CHANGECENTRALVISIBLE,FMainWindow);
+
+	Action *quitAction = new Action(this);
+	quitAction->setText(tr("Quit"));
+	quitAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_QUIT);
+	connect(quitAction,SIGNAL(triggered()),FPluginManager->instance(),SLOT(quit()));
+	FMainWindow->mainMenu()->addAction(quitAction,AG_MMENU_MAINWINDOW,true);
 
 	if (FTrayManager)
 	{
-		action = new Action(this);
-		action->setText(tr("Show roster"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool)));
-		FTrayManager->contextMenu()->addAction(action,AG_TMTM_MAINWINDOW,true);
+		Action *showRosterAction = new Action(this);
+		showRosterAction->setText(tr("Show roster"));
+		showRosterAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_SHOW_ROSTER);
+		connect(showRosterAction,SIGNAL(triggered(bool)),SLOT(onShowMainWindowByAction(bool)));
+		FTrayManager->contextMenu()->addAction(showRosterAction,AG_TMTM_MAINWINDOW,true);
 	}
 
-	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_CLOSEWINDOW,FMainWindow);
 
 	return true;
 }
@@ -96,28 +94,34 @@ bool MainWindowPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_MAINWINDOW_SHOWONSTART,true);
 	Options::setDefaultValue(OPV_MAINWINDOW_CENTRALVISIBLE,true);
+
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsHolder(this);
+	}
+
 	return true;
 }
 
 bool MainWindowPlugin::startPlugin()
 {
 	Shortcuts::setGlobalShortcut(SCT_GLOBAL_SHOWROSTER,true);
-
-	updateTitle();
 	return true;
+}
+
+QMultiMap<int, IOptionsWidget *> MainWindowPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (ANodeId == OPN_MESSAGES)
+	{
+		widgets.insertMulti(OWO_MESSAGES_CENTRALVISIBLE, FOptionsManager->optionsNodeWidget(Options::node(OPV_MAINWINDOW_CENTRALVISIBLE),tr("Combine main window with message windows"),AParent));
+	}
+	return widgets;
 }
 
 IMainWindow *MainWindowPlugin::mainWindow() const
 {
 	return FMainWindow;
-}
-
-void MainWindowPlugin::updateTitle()
-{
-	if (FOptionsManager && FOptionsManager->isOpened())
-		FMainWindow->setWindowTitle(CLIENT_NAME" - "+FOptionsManager->currentProfile());
-	else
-		FMainWindow->setWindowTitle(CLIENT_NAME);
 }
 
 bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
@@ -133,14 +137,12 @@ void MainWindowPlugin::onOptionsOpened()
 	onOptionsChanged(Options::node(OPV_MAINWINDOW_CENTRALVISIBLE));
 	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
 		FMainWindow->showWindow();
-	updateTitle();
 }
 
 void MainWindowPlugin::onOptionsClosed()
 {
 	FMainWindow->saveWindowGeometryAndState();
 	FMainWindow->closeWindow();
-	updateTitle();
 }
 
 void MainWindowPlugin::onOptionsChanged(const OptionsNode &ANode)
@@ -156,11 +158,9 @@ void MainWindowPlugin::onShutdownStarted()
 	Options::node(OPV_MAINWINDOW_SHOWONSTART).setValue(FMainWindow->isVisible());
 }
 
-void MainWindowPlugin::onProfileRenamed(const QString &AProfile, const QString &ANewName)
+void MainWindowPlugin::onShowMainWindowByAction(bool)
 {
-	Q_UNUSED(AProfile);
-	Q_UNUSED(ANewName);
-	updateTitle();
+	FMainWindow->showWindow();
 }
 
 void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
@@ -174,11 +174,6 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 	}
 }
 
-void MainWindowPlugin::onShowMainWindowByAction(bool)
-{
-	FMainWindow->showWindow();
-}
-
 void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AWidget==NULL && AId==SCT_GLOBAL_SHOWROSTER)
@@ -187,7 +182,10 @@ void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	}
 	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CLOSEWINDOW)
 	{
-		//FMainWindow->closeWindow();
+		FMainWindow->closeWindow();
+	}
+	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CHANGECENTRALVISIBLE)
+	{
 		FMainWindow->setCentralWidgetVisible(!FMainWindow->isCentralWidgetVisible());
 	}
 }

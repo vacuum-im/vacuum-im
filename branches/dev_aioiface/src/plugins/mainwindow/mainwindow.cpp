@@ -42,6 +42,8 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 
 	FCentralWidget = new MainCentralWidget(this,this);
 	FCentralWidget->instance()->setFrameShape(QFrame::StyledPanel);
+	connect(FCentralWidget->instance(),SIGNAL(currentCentralPageChanged()),SLOT(onCurrentCentralPageChanged()));
+
 	FSplitter->addWidget(FCentralWidget->instance());
 	FSplitter->setCollapsible(1,false);
 	FSplitter->setStretchFactor(1,4);
@@ -77,6 +79,7 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FMainMenuBar = new MenuBarChanger(new QMenuBar());
 	setMenuBar(FMainMenuBar->menuBar());
 
+	updateWindow();
 }
 
 MainWindow::~MainWindow()
@@ -248,6 +251,7 @@ void MainWindow::setCentralWidgetVisible(bool AEnabled)
 			setWindowFlags(Qt::Window | Qt::WindowTitleHint);
 		}
 
+		updateWindow();
 		loadWindowGeometryAndState();
 		if (wasVisible)
 			showWindow();
@@ -288,6 +292,15 @@ void MainWindow::loadWindowGeometryAndState()
 	{
 		FLeftWidgetWidth = Options::fileValue("mainwindow.left-frame-width",ns).toInt();
 	}
+}
+
+void MainWindow::updateWindow()
+{
+	IMainCentralPage *page = isCentralWidgetVisible() ? mainCentralWidget()->currentCentralPage() : NULL;
+	if (page)
+		setWindowTitle(QString(CLIENT_NAME" - %1").arg(page->centralPageCaption()));
+	else
+		setWindowTitle(CLIENT_NAME);
 }
 
 QMenu *MainWindow::createPopupMenu()
@@ -356,6 +369,11 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 		}
 	}
 	return QMainWindow::eventFilter(AObject,AEvent);
+}
+
+void MainWindow::onCurrentCentralPageChanged()
+{
+	updateWindow();
 }
 
 void MainWindow::onSplitterMoved(int APos, int AIndex)

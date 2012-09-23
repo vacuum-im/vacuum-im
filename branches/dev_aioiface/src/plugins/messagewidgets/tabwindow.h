@@ -26,6 +26,8 @@ public:
 	virtual QMainWindow *instance() { return this; }
 	// IMainCentralPage
 	virtual void showCentralPage(bool AMinimized = false);
+	virtual QIcon centralPageIcon() const;
+	virtual QString centralPageCaption() const;
 	// ITabWindow
 	virtual void showWindow();
 	virtual void showMinimizedWindow();
@@ -53,6 +55,7 @@ signals:
 	void windowDestroyed();
 	// IMainCentralPage
 	void centralPageShow(bool AMinimized);
+	void centralPageChanged();
 	void centralPageDestroyed();
 protected:
 	void createActions();

@@ -4,18 +4,6 @@
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Top toolbar</source>
-        <translation>Top toolbar</translation>
-    </message>
-    <message>
-        <source>Left toolbar</source>
-        <translation>Left toolbar</translation>
-    </message>
-    <message>
-        <source>Bottom toolbar</source>
-        <translation>Bottom toolbar</translation>
-    </message>
-    <message>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
@@ -50,6 +38,14 @@
     <message>
         <source>Quit</source>
         <translation>Quit</translation>
+    </message>
+    <message>
+        <source>Combine/Split with message windows</source>
+        <translation>Combine/Split with message windows</translation>
+    </message>
+    <message>
+        <source>Combine main window with message windows</source>
+        <translation>Combine main window with message windows</translation>
     </message>
 </context>
 </TS>

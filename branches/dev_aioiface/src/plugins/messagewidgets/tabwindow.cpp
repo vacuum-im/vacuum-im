@@ -87,6 +87,19 @@ void TabWindow::showCentralPage(bool AMinimized)
 		showMinimizedWindow();
 }
 
+QIcon TabWindow::centralPageIcon() const
+{
+	return windowIcon();
+}
+
+QString TabWindow::centralPageCaption() const
+{
+	ITabPage *page = currentTabPage();
+	if (page)
+		return page->tabPageCaption();
+	return QString::null;
+}
+
 void TabWindow::showWindow()
 {
 	if (isWindow())
@@ -213,6 +226,7 @@ bool TabWindow::isTabBarVisible() const
 void TabWindow::setTabBarVisible(bool AVisible)
 {
 	ui.twtTabs->setTabBarVisible(AVisible);
+	ui.twtTabs->cornerWidget()->setEnabled(AVisible);
 }
 
 void TabWindow::createActions()
@@ -323,6 +337,7 @@ void TabWindow::updateWindow()
 		setWindowIcon(page->tabPageIcon());
 		setWindowTitle(page->tabPageCaption() + " - " + windowName());
 		emit windowChanged();
+		emit centralPageChanged();
 	}
 }
 
@@ -586,53 +601,50 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 void TabWindow::onActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
-	if (isTabBarVisible())
+	if (action == FNextTab)
 	{
-		if (action == FNextTab)
+		ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
+	}
+	else if (action == FPrevTab)
+	{
+		ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
+	}
+	else if (action == FShowCloseButtons)
+	{
+		FOptionsNode.node("tabs-closable").setValue(action->isChecked());
+	}
+	else if (action == FTabsBottom)
+	{
+		FOptionsNode.node("tabs-bottom").setValue(action->isChecked());
+	}
+	else if (action == FShowIndices)
+	{
+		FOptionsNode.node("show-indices").setValue(action->isChecked());
+	}
+	else if (action == FRemoveTabsOnClose)
+	{
+		FOptionsNode.node("remove-tabs-on-close").setValue(action->isChecked());
+	}
+	else if (action == FSetAsDefault)
+	{
+		Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).setValue(true);
+	}
+	else if (action == FRenameWindow)
+	{
+		QString name = QInputDialog::getText(this,tr("Rename Tab Window"),tr("Tab window name:"),QLineEdit::Normal,FMessageWidgets->tabWindowName(FWindowId));
+		if (!name.isEmpty())
+			FMessageWidgets->setTabWindowName(FWindowId,name);
+	}
+	else if (action == FCloseWindow)
+	{
+		close();
+	}
+	else if (action == FDeleteWindow)
+	{
+		if (QMessageBox::question(this,tr("Delete Tab Window"),tr("Are you sure you want to delete this tab window?"),
+			QMessageBox::Ok|QMessageBox::Cancel) == QMessageBox::Ok)
 		{
-			ui.twtTabs->setCurrentIndex((ui.twtTabs->currentIndex()+1) % ui.twtTabs->count());
-		}
-		else if (action == FPrevTab)
-		{
-			ui.twtTabs->setCurrentIndex(ui.twtTabs->currentIndex()>0 ? ui.twtTabs->currentIndex()-1 : ui.twtTabs->count()-1);
-		}
-		else if (action == FShowCloseButtons)
-		{
-			FOptionsNode.node("tabs-closable").setValue(action->isChecked());
-		}
-		else if (action == FTabsBottom)
-		{
-			FOptionsNode.node("tabs-bottom").setValue(action->isChecked());
-		}
-		else if (action == FShowIndices)
-		{
-			FOptionsNode.node("show-indices").setValue(action->isChecked());
-		}
-		else if (action == FRemoveTabsOnClose)
-		{
-			FOptionsNode.node("remove-tabs-on-close").setValue(action->isChecked());
-		}
-		else if (action == FSetAsDefault)
-		{
-			Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).setValue(true);
-		}
-		else if (action == FRenameWindow)
-		{
-			QString name = QInputDialog::getText(this,tr("Rename Tab Window"),tr("Tab window name:"),QLineEdit::Normal,FMessageWidgets->tabWindowName(FWindowId));
-			if (!name.isEmpty())
-				FMessageWidgets->setTabWindowName(FWindowId,name);
-		}
-		else if (action == FCloseWindow)
-		{
-			close();
-		}
-		else if (action == FDeleteWindow)
-		{
-			if (QMessageBox::question(this,tr("Delete Tab Window"),tr("Are you sure you want to delete this tab window?"),
-				QMessageBox::Ok|QMessageBox::Cancel) == QMessageBox::Ok)
-			{
-				FMessageWidgets->deleteTabWindow(FWindowId);
-			}
+			FMessageWidgets->deleteTabWindow(FWindowId);
 		}
 	}
 }
