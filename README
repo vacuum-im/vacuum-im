@@ -22,7 +22,7 @@ Sound on X11 platforms
 
 Portable Version
 ----------------
-  To make Vacuum-IM portable just create folder VacuumIM (for Windows) 
+  To make Vacuum-IM portable just create folder VacuumIM (for Windows)
   in the directory where vacuum.exe is located.
 
 
@@ -33,25 +33,25 @@ Known Issues
   - not native look and feel in Mac OS
 
 
-List of plugins that SHOULD NOT be disabled 
+List of plugins that SHOULD NOT be disabled
 -------------------------------------------
   01. Account Manager            - accountmanager
   02. Chat Messages              - chatmessagehandler
   03. Connection Manager         - connectionmanager
   04. Default connection         - defaultconnection
-  05. Main Window                - mainnwindow
+  05. Main Window                - mainwindow
   06. Message Manager            - messageprocessor
   07. Message Styles Manager     - messagestyles
   08. Message Widgets Manager    - messagewidgets
   09. Normal Messages            - normalmessagehandler
   10. Notifications Manager      - notifications
-  11. Presence Manager           - presence
-  12. Roster Manager             - roster
-  13. Roster Editor              - rosterchanger
-  14. Roster Model               - rostersmodel
-  15. Roster View                - rostersview
-  16. SASL Authentication        - saslauth
-  17. Settings Manager           - settings
+  11. Options Manager            - optionsmanager
+  12. Presence Manager           - presence
+  13. Roster Manager             - roster
+  14. Roster Editor              - rosterchanger
+  15. Roster Model               - rostersmodel
+  16. Roster View                - rostersview
+  17. SASL Authentication        - saslauth
   18. Simple Message Style       - simplemessagestyle
   19. Stanza Manager             - stanzaprocessor
   20. StartTLS                   - starttls

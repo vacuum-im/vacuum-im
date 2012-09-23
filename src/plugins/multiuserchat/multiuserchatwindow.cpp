@@ -103,18 +103,12 @@ QString MultiUserChatWindow::tabPageId() const
 
 bool MultiUserChatWindow::isVisibleTabPage() const
 {
-	const QWidget *widget = this;
-	while (widget->parentWidget())
-		widget = widget->parentWidget();
-	return widget->isVisible();
+	return window()->isVisible();
 }
 
 bool MultiUserChatWindow::isActiveTabPage() const
 {
-	const QWidget *widget = this;
-	while (widget->parentWidget())
-		widget = widget->parentWidget();
-	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
+	return isVisible() && WidgetManager::isActiveWindow(this);
 }
 
 void MultiUserChatWindow::assignTabPage()

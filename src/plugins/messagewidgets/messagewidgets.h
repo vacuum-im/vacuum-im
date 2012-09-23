@@ -16,6 +16,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/imainwindow.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
@@ -135,6 +136,7 @@ protected slots:
 	void onEditWidgetInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument);
 	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onQuoteActionTriggered(bool);
+	void onAssignedTabPageDestroyed();
 	void onMessageWindowDestroyed();
 	void onChatWindowDestroyed();
 	void onTabWindowPageAdded(ITabPage *APage);
@@ -143,8 +145,10 @@ protected slots:
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onOptionsOpened();
 	void onOptionsClosed();
+	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
+	IMainWindow *FMainWindow;
 	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;
 private:
@@ -153,6 +157,7 @@ private:
 	QList<IMessageWindow *> FMessageWindows;
 	QObjectCleanupHandler FCleanupHandler;
 private:
+	QList<ITabPage *> FAssignedPages;
 	QMap<QString, QUuid> FPageWindows;
 	QList<IViewDropHandler *> FViewDropHandlers;
 	QMultiMap<int,IViewUrlHandler *> FViewUrlHandlers;

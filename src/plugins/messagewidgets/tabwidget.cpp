@@ -5,6 +5,7 @@
 
 TabWidget::TabWidget(QWidget *AParent) : QTabWidget(AParent)
 {
+	FTabBarVisible = true;
 	FPressedTabIndex = -1;
 	tabBar()->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(tabBar(), SIGNAL(tabMoved(int,int)), SIGNAL(tabMoved(int,int)));
@@ -14,6 +15,20 @@ TabWidget::TabWidget(QWidget *AParent) : QTabWidget(AParent)
 TabWidget::~TabWidget()
 {
 
+}
+
+bool TabWidget::isTabBarVisible() const
+{
+	return FTabBarVisible;
+}
+
+void TabWidget::setTabBarVisible(bool AVisible)
+{
+	if (AVisible != FTabBarVisible)
+	{
+		FTabBarVisible = AVisible;
+		tabBar()->setVisible(FTabBarVisible);
+	}
 }
 
 void TabWidget::mousePressEvent(QMouseEvent *AEvent)

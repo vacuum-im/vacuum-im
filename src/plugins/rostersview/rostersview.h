@@ -15,21 +15,28 @@
 #include <definitions/rosterdataholderorders.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
+#include <interfaces/imainwindow.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/iconstorage.h>
 #include "rosterindexdelegate.h"
 
 class RostersView :
 	public QTreeView,
+	public IMainTabPage,
 	public IRostersView,
 	public IRosterDataHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IRostersView IRosterDataHolder);
+	Q_INTERFACES(IMainTabPage IRostersView IRosterDataHolder);
 public:
 	RostersView(QWidget *AParent = NULL);
 	~RostersView();
 	virtual QTreeView *instance() { return this; }
+	//IMainTabPage
+	virtual QIcon tabPageIcon() const;
+	virtual QString tabPageCaption() const;
+	virtual QString tabPageToolTip() const;
 	//IRosterDataHolder
 	virtual int rosterDataOrder() const;
 	virtual QList<int> rosterDataRoles() const;
@@ -91,6 +98,12 @@ public:
 	//--ClipboardMenu
 	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 signals:
+	//IMainTabPage
+	void tabPageChanged();
+	void tabPageDestroyed();
+	//IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	//IRostersView
 	void modelAboutToBeSeted(IRostersModel *AModel);
 	void modelSeted(IRostersModel *AModel);
 	void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder);
@@ -108,8 +121,6 @@ signals:
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
 	void notifyRemoved(int ANotifyId);
-	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 public:
 	void updateStatusText(IRosterIndex *AIndex = NULL);
 protected:

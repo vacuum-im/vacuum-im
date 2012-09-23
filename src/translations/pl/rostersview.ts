@@ -31,6 +31,10 @@
         <source>Name</source>
         <translation>Nazwa</translation>
     </message>
+    <message>
+        <source>Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>RostersViewPlugin</name>

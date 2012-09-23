@@ -75,18 +75,12 @@ QString MessageWindow::tabPageId() const
 
 bool MessageWindow::isVisibleTabPage() const
 {
-	const QWidget *widget = this;
-	while (widget->parentWidget())
-		widget = widget->parentWidget();
-	return widget->isVisible();
+	return window()->isVisible();
 }
 
 bool MessageWindow::isActiveTabPage() const
 {
-	const QWidget *widget = this;
-	while (widget->parentWidget())
-		widget = widget->parentWidget();
-	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
+	return isVisible() && WidgetManager::isActiveWindow(this);
 }
 
 void MessageWindow::assignTabPage()

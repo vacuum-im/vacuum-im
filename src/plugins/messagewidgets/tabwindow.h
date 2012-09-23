@@ -19,11 +19,16 @@ class TabWindow :
 	public ITabWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(ITabWindow);
+	Q_INTERFACES(ITabWindow IMainCentralPage);
 public:
 	TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId);
 	~TabWindow();
 	virtual QMainWindow *instance() { return this; }
+	// IMainCentralPage
+	virtual void showCentralPage(bool AMinimized = false);
+	virtual QIcon centralPageIcon() const;
+	virtual QString centralPageCaption() const;
+	// ITabWindow
 	virtual void showWindow();
 	virtual void showMinimizedWindow();
 	virtual QUuid windowId() const;
@@ -37,7 +42,10 @@ public:
 	virtual void setCurrentTabPage(ITabPage *APage);
 	virtual void detachTabPage(ITabPage *APage);
 	virtual void removeTabPage(ITabPage *APage);
+	virtual bool isTabBarVisible() const;
+	virtual void setTabBarVisible(bool AVisible);
 signals:
+	// ITabWindow
 	void currentTabPageChanged(ITabPage *APage);
 	void tabPageMenuRequested(ITabPage *APage, Menu *AMenu);
 	void tabPageAdded(ITabPage *APage);
@@ -45,6 +53,10 @@ signals:
 	void tabPageDetached(ITabPage *APage);
 	void windowChanged();
 	void windowDestroyed();
+	// IMainCentralPage
+	void centralPageShow(bool AMinimized);
+	void centralPageChanged();
+	void centralPageDestroyed();
 protected:
 	void createActions();
 	void saveWindowStateAndGeometry();
@@ -53,6 +65,9 @@ protected:
 	void clearTabs();
 	void updateTab(int AIndex);
 	void updateTabs(int AFrom, int ATo);
+protected:
+	void showEvent(QShowEvent *AEvent);
+	void closeEvent(QCloseEvent *AEvent);
 protected slots:
 	void onTabMoved(int AFrom, int ATo);
 	void onTabChanged(int AIndex);
@@ -92,6 +107,7 @@ private:
 	OptionsNode FOptionsNode;
 private:
 	bool FBlinkVisible;
+	bool FShownDetached;
 	QTimer FBlinkTimer;
 };
 
