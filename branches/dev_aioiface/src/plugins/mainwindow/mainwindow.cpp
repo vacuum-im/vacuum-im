@@ -43,6 +43,11 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FCentralWidget = new MainCentralWidget(this,this);
 	FCentralWidget->instance()->setFrameShape(QFrame::StyledPanel);
 	connect(FCentralWidget->instance(),SIGNAL(currentCentralPageChanged()),SLOT(onCurrentCentralPageChanged()));
+	connect(FCentralWidget->instance(),SIGNAL(centralPageAppended(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
+	connect(FCentralWidget->instance(),SIGNAL(centralPageRemoved(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
+
+	FDefaultCentral = new DefaultCentralPage(NULL);
+	FCentralWidget->appendCentralPage(FDefaultCentral);
 
 	FSplitter->addWidget(FCentralWidget->instance());
 	FSplitter->setCollapsible(1,false);
@@ -71,7 +76,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	insertToolBarChanger(MWW_BOTTOM_TOOLBAR,bottomChanger);
 
 	FMainMenu = new Menu(this);
-	FMainMenu->setTitle(tr("Menu"));
 	FMainMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_MAINWINDOW_MENU);
 	QToolButton *button = bottomToolBarChanger()->insertAction(FMainMenu->menuAction());
 	button->setPopupMode(QToolButton::InstantPopup);
@@ -79,11 +83,13 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FMainMenuBar = new MenuBarChanger(new QMenuBar());
 	setMenuBar(FMainMenuBar->menuBar());
 
+
 	updateWindow();
 }
 
 MainWindow::~MainWindow()
 {
+	delete FDefaultCentral;
 	delete FMainMenuBar->menuBar();
 }
 
@@ -238,6 +244,7 @@ void MainWindow::setCentralWidgetVisible(bool AEnabled)
 		{
 			FSplitter->setHandleWidth(FSplitterHandleWidth);
 			FLeftWidget->setFrameShape(QFrame::StyledPanel);
+			FCentralWidget->appendCentralPage(FDefaultCentral);
 			FCentralWidget->instance()->setVisible(true);
 			setWindowFlags(Qt::Window);
 		}
@@ -297,7 +304,7 @@ void MainWindow::loadWindowGeometryAndState()
 void MainWindow::updateWindow()
 {
 	IMainCentralPage *page = isCentralWidgetVisible() ? mainCentralWidget()->currentCentralPage() : NULL;
-	if (page)
+	if (page && !page->centralPageCaption().isEmpty())
 		setWindowTitle(QString(CLIENT_NAME" - %1").arg(page->centralPageCaption()));
 	else
 		setWindowTitle(CLIENT_NAME);
@@ -374,6 +381,17 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 void MainWindow::onCurrentCentralPageChanged()
 {
 	updateWindow();
+}
+
+void MainWindow::onCentralPageAddedOrRemoved(IMainCentralPage *APage)
+{
+	if (APage != FDefaultCentral)
+	{
+		if (!mainCentralWidget()->centralPages().isEmpty())
+			mainCentralWidget()->removeCentralPage(FDefaultCentral);
+		else if (isCentralWidgetVisible())
+			mainCentralWidget()->appendCentralPage(FDefaultCentral);
+	}
 }
 
 void MainWindow::onSplitterMoved(int APos, int AIndex)

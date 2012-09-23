@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
+    <name>DefaultCentralPage</name>
+    <message>
+        <source>Here will be opened the windows with conversations.</source>
+        <translation>Здесь будут открываться окна с разговорами.</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>Menu</source>
