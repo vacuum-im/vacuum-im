@@ -24,6 +24,7 @@ ModifyStatusDialog::ModifyStatusDialog(IStatusChanger *AStatusChanger, int AStat
 	ui.spbPriority->setValue(FStatusChanger->statusItemPriority(FStatusId));
 	ui.pteText->setPlainText(FStatusChanger->statusItemText(FStatusId));
 	ui.pteText->setFocus();
+	ui.pteText->moveCursor(QTextCursor::End, QTextCursor::MoveAnchor);
 
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonBoxClicked(QAbstractButton *)));
 }

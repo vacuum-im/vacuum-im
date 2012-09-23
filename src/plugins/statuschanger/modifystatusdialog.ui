@@ -86,7 +86,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="pteText"/>
+    <widget class="QPlainTextEdit" name="pteText">
+     <property name="tabChangesFocus">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="dbbButtons">
