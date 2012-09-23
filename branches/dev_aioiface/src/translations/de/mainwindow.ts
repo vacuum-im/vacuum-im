@@ -9,13 +9,6 @@
     </message>
 </context>
 <context>
-    <name>MainWindow</name>
-    <message>
-        <source>Menu</source>
-        <translation>Menu</translation>
-    </message>
-</context>
-<context>
     <name>MainWindowPlugin</name>
     <message>
         <source>Main Window</source>
@@ -51,7 +44,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Combine main window with message windows</source>
+        <source>Combine contact-list with message windows</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

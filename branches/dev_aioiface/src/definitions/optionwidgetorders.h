@@ -15,6 +15,7 @@
 
 //Node = ON_ROSTER
 #define OWO_ROSTER                                500
+#define OWO_ROSTER_CENTRALVISIBLE                 600
 #define OWO_ROSTER_AVATARS                        800
 #define OWO_ROSTER_CHENGER                        900
 #define OWO_ROSTER_EXCHANGE                       1200
@@ -39,7 +40,6 @@
 
 //Node = ON_MESSAGES
 #define OWO_MESSAGES                              300
-#define OWO_MESSAGES_CENTRALVISIBLE               400
 #define OWO_MESSAGES_LOADHISTORY                  600
 #define OWO_MESSAGES_SHOWDATESEPARATORS           600
 #define OWO_MESSAGES_CHATSTATES                   800

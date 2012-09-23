@@ -9,13 +9,6 @@
     </message>
 </context>
 <context>
-    <name>MainWindow</name>
-    <message>
-        <source>Menu</source>
-        <translation>Меню</translation>
-    </message>
-</context>
-<context>
     <name>MainWindowPlugin</name>
     <message>
         <source>Main Window</source>
@@ -51,8 +44,8 @@
         <translation>Объединить/Разделить с окнами сообщений</translation>
     </message>
     <message>
-        <source>Combine main window with message windows</source>
-        <translation>Объединить основное окно с окнами сообщений</translation>
+        <source>Combine contact-list with message windows</source>
+        <translation>Объединить контакт-лист с окнами сообщений</translation>
     </message>
 </context>
 </TS>

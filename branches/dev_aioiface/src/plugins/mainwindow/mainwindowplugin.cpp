@@ -112,9 +112,9 @@ bool MainWindowPlugin::startPlugin()
 QMultiMap<int, IOptionsWidget *> MainWindowPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsWidget *> widgets;
-	if (ANodeId == OPN_MESSAGES)
+	if (ANodeId == OPN_ROSTER)
 	{
-		widgets.insertMulti(OWO_MESSAGES_CENTRALVISIBLE, FOptionsManager->optionsNodeWidget(Options::node(OPV_MAINWINDOW_CENTRALVISIBLE),tr("Combine main window with message windows"),AParent));
+		widgets.insertMulti(OWO_ROSTER_CENTRALVISIBLE, FOptionsManager->optionsNodeWidget(Options::node(OPV_MAINWINDOW_CENTRALVISIBLE),tr("Combine contact-list with message windows"),AParent));
 	}
 	return widgets;
 }
