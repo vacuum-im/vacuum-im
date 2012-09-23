@@ -6,6 +6,7 @@
 #include <QTextBrowser>
 #include <QTextDocument>
 #include <interfaces/ipluginmanager.h>
+#include <interfaces/imainwindow.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/jid.h>
 #include <utils/menu.h>
@@ -224,7 +225,8 @@ protected:
 	virtual void tabPageNotifierChanged() =0;
 };
 
-class ITabWindow
+class ITabWindow :
+	public IMainCentralPage
 {
 public:
 	virtual QMainWindow *instance() = 0;
@@ -241,6 +243,8 @@ public:
 	virtual void setCurrentTabPage(ITabPage *APage) =0;
 	virtual void detachTabPage(ITabPage *APage) =0;
 	virtual void removeTabPage(ITabPage *APage) =0;
+	virtual bool isTabBarVisible() const =0;
+	virtual void setTabBarVisible(bool AVisible) =0;
 protected:
 	virtual void currentTabPageChanged(ITabPage *APage) =0;
 	virtual void tabPageMenuRequested(ITabPage *APage, Menu *AMenu) =0;

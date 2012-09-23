@@ -201,6 +201,7 @@
 #define MNI_ROSTERSEARCH_MENU           "rostersearchMenu"
 
 //RosterView
+#define MNI_ROSTERVIEW_CONTACTS         "rosterviewContacts"
 #define MNI_ROSTERVIEW_OPTIONS          "rosterviewOptions"
 #define MNI_ROSTERVIEW_SHOW_OFFLINE     "rosterviewShowOffline"
 #define MNI_ROSTERVIEW_HIDE_OFFLINE     "rosterviewHideOffline"

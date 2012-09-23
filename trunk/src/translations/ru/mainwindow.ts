@@ -2,22 +2,10 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>MainWindow</name>
+    <name>DefaultCentralPage</name>
     <message>
-        <source>Top toolbar</source>
-        <translation>Верхняя панель</translation>
-    </message>
-    <message>
-        <source>Left toolbar</source>
-        <translation>Левая панель</translation>
-    </message>
-    <message>
-        <source>Bottom toolbar</source>
-        <translation>Правая панель</translation>
-    </message>
-    <message>
-        <source>Menu</source>
-        <translation>Меню</translation>
+        <source>Here will be opened the windows with conversations.</source>
+        <translation>Здесь будут открываться окна с разговорами.</translation>
     </message>
 </context>
 <context>
@@ -50,6 +38,14 @@
         <source>Esc</source>
         <comment>Hide roster</comment>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Combine/Split with message windows</source>
+        <translation>Объединить/Разделить с окнами сообщений</translation>
+    </message>
+    <message>
+        <source>Combine contact-list with message windows</source>
+        <translation>Объединить контакт-лист с окнами сообщений</translation>
     </message>
 </context>
 </TS>

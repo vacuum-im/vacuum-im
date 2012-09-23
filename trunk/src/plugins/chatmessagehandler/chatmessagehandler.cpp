@@ -209,7 +209,8 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
 
 bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder);	Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	if (Options::node(OPV_MAINWINDOW_CENTRALVISIBLE).value().toBool())
+		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
 	return false;
 }
 

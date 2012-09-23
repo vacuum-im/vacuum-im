@@ -2,22 +2,10 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de" sourcelanguage="en">
 <context>
-    <name>MainWindow</name>
+    <name>DefaultCentralPage</name>
     <message>
-        <source>Top toolbar</source>
-        <translation>Obere Toolbar</translation>
-    </message>
-    <message>
-        <source>Left toolbar</source>
-        <translation>Linkte Toolbar</translation>
-    </message>
-    <message>
-        <source>Bottom toolbar</source>
-        <translation>Untere Toolbar</translation>
-    </message>
-    <message>
-        <source>Menu</source>
-        <translation>Menu</translation>
+        <source>Here will be opened the windows with conversations.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -50,6 +38,14 @@
         <source>Esc</source>
         <comment>Hide roster</comment>
         <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Combine/Split with message windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combine contact-list with message windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

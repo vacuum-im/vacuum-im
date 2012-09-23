@@ -31,6 +31,10 @@
         <source>Status:</source>
         <translation>Status:</translation>
     </message>
+    <message>
+        <source>Contacts</source>
+        <translation>Contacts</translation>
+    </message>
 </context>
 <context>
     <name>RostersViewPlugin</name>

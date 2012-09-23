@@ -7,6 +7,7 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/mainwindowtabpages.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rosterdataholderorders.h>

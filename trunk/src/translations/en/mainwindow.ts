@@ -2,22 +2,10 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>MainWindow</name>
+    <name>DefaultCentralPage</name>
     <message>
-        <source>Top toolbar</source>
-        <translation>Top toolbar</translation>
-    </message>
-    <message>
-        <source>Left toolbar</source>
-        <translation>Left toolbar</translation>
-    </message>
-    <message>
-        <source>Bottom toolbar</source>
-        <translation>Bottom toolbar</translation>
-    </message>
-    <message>
-        <source>Menu</source>
-        <translation>Menu</translation>
+        <source>Here will be opened the windows with conversations.</source>
+        <translation>Here will be opened the windows with conversations.</translation>
     </message>
 </context>
 <context>
@@ -50,6 +38,14 @@
     <message>
         <source>Quit</source>
         <translation>Quit</translation>
+    </message>
+    <message>
+        <source>Combine/Split with message windows</source>
+        <translation>Combine/Split with message windows</translation>
+    </message>
+    <message>
+        <source>Combine contact-list with message windows</source>
+        <translation>Combine contact-list with message windows</translation>
     </message>
 </context>
 </TS>

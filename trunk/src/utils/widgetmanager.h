@@ -8,6 +8,7 @@ class UTILS_EXPORT WidgetManager
 {
 public:
 	static void raiseWidget(QWidget *AWidget);
+	static bool isActiveWindow(const QWidget *AWindow);
 	static void showActivateRaiseWindow(QWidget *AWindow);
 	static void setWindowSticky(QWidget *AWindow, bool ASticky);
 	static void alertWidget(QWidget *AWidget);

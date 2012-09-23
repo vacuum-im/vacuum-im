@@ -159,8 +159,8 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 bool MultiUserChatPlugin::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_APP_MUCJOIN, tr("Join conference"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_MUC_LEAVEHIDDEN, tr("Leave all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
-	Shortcuts::declareShortcut(SCT_APP_MUC_SHOWHIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MUCLEAVEHIDDEN, tr("Leave all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
+	Shortcuts::declareShortcut(SCT_APP_MUCSHOWHIDDEN, tr("Show all hidden conferences"), QKeySequence::UnknownKey, Shortcuts::ApplicationShortcut);
 
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_MUC, tr("Multi-user chat window"), SGO_MESSAGEWINDOWS_MUC);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE, tr("Send message"), tr("Return","Send message"), Shortcuts::WidgetShortcut);
@@ -207,14 +207,14 @@ bool MultiUserChatPlugin::initObjects()
 		action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_SHOW_ALL_ROOMS);
 		action->setText(tr("Show all hidden conferences"));
-		action->setShortcutId(SCT_APP_MUC_SHOWHIDDEN);
+		action->setShortcutId(SCT_APP_MUCSHOWHIDDEN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowAllRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 
 		action = new Action(FChatMenu);
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_LEAVE_HIDDEN_ROOMS);
 		action->setText(tr("Leave all hidden conferences"));
-		action->setShortcutId(SCT_APP_MUC_LEAVEHIDDEN);
+		action->setShortcutId(SCT_APP_MUCLEAVEHIDDEN);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onLeaveHiddenRoomsTriggered(bool)));
 		FChatMenu->addAction(action,AG_DEFAULT+100,false);
 	}
