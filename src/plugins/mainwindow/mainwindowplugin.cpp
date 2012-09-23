@@ -93,7 +93,7 @@ bool MainWindowPlugin::initObjects()
 bool MainWindowPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_MAINWINDOW_SHOWONSTART,true);
-	Options::setDefaultValue(OPV_MAINWINDOW_CENTRALVISIBLE,true);
+	Options::setDefaultValue(OPV_MAINWINDOW_CENTRALVISIBLE,false);
 
 	if (FOptionsManager)
 	{
