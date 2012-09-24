@@ -1,6 +1,10 @@
 add_definitions(-DHAVE_ENCHANT) 
 
-set(ADD_LIBS enchant)
+if(SYSTEM_ENCHANT_FOUND)
+	set(ADD_LIBS enchant)
+else(SYSTEM_ENCHANT_FOUND)
+	message(FATAL_ERROR "Enchant not found, check enchant installation or use -DSPELLCHECKER_BACKEND=HUNSPELL instead")
+endif(SYSTEM_ENCHANT_FOUND)
 
 message(STATUS "Spellchecker backend: enchant")
 
