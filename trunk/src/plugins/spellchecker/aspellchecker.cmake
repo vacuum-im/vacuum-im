@@ -8,5 +8,7 @@ else (WIN32)
 	set(ADD_LIBS aspell)
 endif (WIN32)
 
+message(STATUS "Spellchecker backend: aspell")
+
 set(SOURCES ${SOURCES} "aspellchecker.cpp")
 set(HEADERS ${HEADERS} "aspellchecker.h")

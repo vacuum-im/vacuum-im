@@ -50,11 +50,6 @@ if (SYSTEM_QTLOCKEDFILE_FOUND)
 	add_definitions(-DUSE_SYSTEM_QTLOCKEDFILE)
 endif (SYSTEM_QTLOCKEDFILE_FOUND)
 
-if (SYSTEM_HUNSPELL_FOUND)
-	message(STATUS "Found hunspell at ${SYSTEM_HUNSPELL_FOUND}")
-	add_definitions(-DUSE_SYSTEM_HUNSPELL)
-endif (SYSTEM_HUNSPELL_FOUND)
-
 if ("${LANGS}" STREQUAL "")
 	process_lang_options()
 else ("${LANGS}" STREQUAL "")
