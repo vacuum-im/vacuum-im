@@ -8,6 +8,7 @@ if (SYSTEM_HUNSPELL_FOUND)
 else (SYSTEM_HUNSPELL_FOUND)
 	set(ADD_LIBS hunspell)
 	message(STATUS "Spellchecker backend: bundled hunspell")
+	add_subdirectory(../../thirdparty/hunspell hunspell)
 endif (SYSTEM_HUNSPELL_FOUND)
 
 set(SOURCES ${SOURCES} "hunspellchecker.cpp")
