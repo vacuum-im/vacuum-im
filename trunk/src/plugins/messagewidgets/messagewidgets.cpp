@@ -68,11 +68,15 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &AInitO
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
+
 	return true;
 }
 
 bool MessageWidgets::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_MAINWINDOW_COMBINEWITHMESSAGES, tr("Combine/Split with message windows"), QKeySequence::UnknownKey);
+
 	Shortcuts::declareGroup(SCTG_TABWINDOW, tr("Tab window"), SGO_TABWINDOW);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSETAB, tr("Close tab"), tr("Ctrl+W","Close tab"));
 	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSEOTHERTABS, tr("Close other tabs"), tr("Ctrl+Shift+W","Close other tabs"));
@@ -104,6 +108,11 @@ bool MessageWidgets::initObjects()
 	insertViewUrlHandler(VUHO_MESSAGEWIDGETS_DEFAULT,this);
 	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_COPY_INSERT,this);
 
+	if (FMainWindow)
+	{
+		Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_COMBINEWITHMESSAGES,FMainWindow->instance());
+	}
+
 	return true;
 }
 
@@ -116,6 +125,7 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS,140);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
 	Options::setDefaultValue(OPV_MESSAGES_CLEANCHATTIMEOUT,30);
+	Options::setDefaultValue(OPV_MESSAGES_COMBINEWITHROSTER,false);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);
@@ -135,13 +145,14 @@ bool MessageWidgets::initSettings()
 QMultiMap<int, IOptionsWidget *> MessageWidgets::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Enable tab windows"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show status changes in chat windows"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_ARCHIVESTATUS),tr("Save status messages to history"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWINFOWIDGET),tr("Show contact information in chat windows"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Auto resize input field"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_COMBINEWITHROSTER),tr("Combine message windows with contact-list"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,new MessengerOptions(this,AParent));
 	}
 	return widgets;
@@ -445,7 +456,7 @@ void MessageWidgets::assignTabWindowPage(ITabPage *APage)
 		connect(APage->instance(),SIGNAL(tabPageDestroyed()),SLOT(onAssignedTabPageDestroyed()));
 	}
 
-	if (FMainWindow && FMainWindow->isCentralWidgetVisible())
+	if (FMainWindow && Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 	{
 		ITabWindow *window = newTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
 		window->addTabPage(APage);
@@ -739,7 +750,7 @@ void MessageWidgets::onChatWindowDestroyed()
 
 void MessageWidgets::onTabWindowPageAdded(ITabPage *APage)
 {
-	if (FMainWindow==NULL || !FMainWindow->isCentralWidgetVisible())
+	if (!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 	{
 		ITabWindow *window = qobject_cast<ITabWindow *>(sender());
 		if (window)
@@ -759,6 +770,14 @@ void MessageWidgets::onTabWindowDestroyed()
 	{
 		FTabWindows.removeAt(FTabWindows.indexOf(window));
 		emit tabWindowDestroyed(window);
+	}
+}
+
+void MessageWidgets::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (AId==SCT_MAINWINDOW_COMBINEWITHMESSAGES && FMainWindow && AWidget==FMainWindow->instance())
+	{
+		Options::node(OPV_MESSAGES_COMBINEWITHROSTER).setValue(!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool());
 	}
 }
 
@@ -784,6 +803,8 @@ void MessageWidgets::onOptionsOpened()
 	QByteArray data = Options::fileValue("messages.tab-window-pages").toByteArray();
 	QDataStream stream(data);
 	stream >> FPageWindows;
+
+	onOptionsChanged(Options::node(OPV_MESSAGES_COMBINEWITHROSTER));
 }
 
 void MessageWidgets::onOptionsClosed()
@@ -808,36 +829,42 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 			foreach(ITabWindow *window, tabWindows())
 				window->showWindow();
 		}
-		else if (FMainWindow==NULL || !FMainWindow->isCentralWidgetVisible())
+		else if (!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 		{
 			foreach(ITabWindow *window, tabWindows())
 				while(window->currentTabPage())
 					window->detachTabPage(window->currentTabPage());
 		}
 	}
-	else if (FMainWindow && ANode.path()==OPV_MAINWINDOW_CENTRALVISIBLE)
+	else if (FMainWindow && ANode.path()==OPV_MESSAGES_COMBINEWITHROSTER)
 	{
 		foreach(ITabPage *page, FAssignedPages)
 			assignTabWindowPage(page);
 
-		ITabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
-		if (window)
+		ITabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()); 
+		if (ANode.value().toBool())
 		{
-			if (ANode.value().toBool())
-			{
-				window->setTabBarVisible(false);
-				FMainWindow->mainCentralWidget()->appendCentralPage(window);
-			}
-			else if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
-			{
-				window->setTabBarVisible(true);
+			if (!window)
+				window = newTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()); 
+			window->setTabBarVisible(false);
+			window->setAutoCloseEnabled(false);
+			FMainWindow->mainCentralWidget()->appendCentralPage(window);
+		}
+		else if (window && Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
+		{
+			window->setTabBarVisible(true);
+			window->setAutoCloseEnabled(true);
+			FMainWindow->mainCentralWidget()->removeCentralPage(window);
+			if (window->tabPageCount() > 0)
 				window->showWindow();
-			}
 			else
-			{
-				while(window->currentTabPage())
-					window->detachTabPage(window->currentTabPage());
-			}
+				window->instance()->deleteLater();
+		}
+		else if (window)
+		{
+			while(window->currentTabPage())
+				window->detachTabPage(window->currentTabPage());
+			window->instance()->deleteLater();
 		}
 	}
 }

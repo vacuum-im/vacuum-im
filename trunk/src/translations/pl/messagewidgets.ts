@@ -215,6 +215,14 @@
         <comment>Your google domain</comment>
         <translation>google.pl</translation>
     </message>
+    <message>
+        <source>Combine/Split with message windows</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Combine message windows with contact-list</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

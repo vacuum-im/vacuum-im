@@ -13,7 +13,6 @@
 #include <utils/options.h>
 #include "maintabwidget.h"
 #include "maincentralwidget.h"
-#include "defaultcentralpage.h"
 
 class MainWindow :
 	public QMainWindow,
@@ -48,9 +47,8 @@ public:
 	virtual void removeToolBarChanger(ToolBarChanger *AChanger);
 	// Pages Management
 	virtual IMainTabWidget *mainTabWidget() const;
-	virtual IMainCentralWidget *mainCentralWidget() const;
 	virtual bool isCentralWidgetVisible() const;
-	virtual void setCentralWidgetVisible(bool AEnabled);
+	virtual IMainCentralWidget *mainCentralWidget() const;
 signals:
 	void widgetInserted(int AOrderId, QWidget *AWidget);
 	void widgetRemoved(QWidget *AWidget);
@@ -64,10 +62,12 @@ protected:
 	void updateWindow();
 	QMenu *createPopupMenu();
 	void correctWindowPosition();
+	void setCentralWidgetVisible(bool AVisible);
 protected:
 	void showEvent(QShowEvent *AEvent);
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
+	void onUpdateCentralWidgetVisible();
 	void onCurrentCentralPageChanged();
 	void onCentralPageAddedOrRemoved(IMainCentralPage *APage);
 	void onSplitterMoved(int APos, int AIndex);
@@ -80,7 +80,6 @@ private:
 	QVBoxLayout *FLeftLayout;
 	QSplitter *FSplitter;
 	MenuBarChanger *FMainMenuBar;
-	DefaultCentralPage *FDefaultCentral;
 private:
 	bool FAligned;
 	bool FCentralVisible;

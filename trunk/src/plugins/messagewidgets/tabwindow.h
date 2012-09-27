@@ -34,6 +34,10 @@ public:
 	virtual QUuid windowId() const;
 	virtual QString windowName() const;
 	virtual Menu *windowMenu() const;
+	virtual bool isTabBarVisible() const;
+	virtual void setTabBarVisible(bool AVisible);
+	virtual bool isAutoCloseEnabled() const;
+	virtual void setAutoCloseEnabled(bool AEnabled);
 	virtual int tabPageCount() const;
 	virtual ITabPage *tabPage(int AIndex) const;
 	virtual void addTabPage(ITabPage *APage);
@@ -42,8 +46,6 @@ public:
 	virtual void setCurrentTabPage(ITabPage *APage);
 	virtual void detachTabPage(ITabPage *APage);
 	virtual void removeTabPage(ITabPage *APage);
-	virtual bool isTabBarVisible() const;
-	virtual void setTabBarVisible(bool AVisible);
 signals:
 	// ITabWindow
 	void currentTabPageChanged(ITabPage *APage);
@@ -86,6 +88,7 @@ protected slots:
 	void onTabMenuActionTriggered(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onBlinkTabNotifyTimerTimeout();
+	void onCloseWindowIfEmpty();
 private:
 	Ui::TabWindowClass ui;
 private:
@@ -106,6 +109,7 @@ private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;
 private:
+	bool FAutoClose;
 	bool FBlinkVisible;
 	bool FShownDetached;
 	QTimer FBlinkTimer;

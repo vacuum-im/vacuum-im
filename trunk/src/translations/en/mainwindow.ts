@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>DefaultCentralPage</name>
-    <message>
-        <source>Here will be opened the windows with conversations.</source>
-        <translation>Here will be opened the windows with conversations.</translation>
-    </message>
-</context>
-<context>
     <name>MainWindowPlugin</name>
     <message>
         <source>Main Window</source>
@@ -38,14 +31,6 @@
     <message>
         <source>Quit</source>
         <translation>Quit</translation>
-    </message>
-    <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Combine/Split with message windows</translation>
-    </message>
-    <message>
-        <source>Combine contact-list with message windows</source>
-        <translation>Combine contact-list with message windows</translation>
     </message>
 </context>
 </TS>

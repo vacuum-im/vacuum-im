@@ -235,6 +235,10 @@ public:
 	virtual QUuid windowId() const =0;
 	virtual QString windowName() const =0;
 	virtual Menu *windowMenu() const =0;
+	virtual bool isTabBarVisible() const =0;
+	virtual void setTabBarVisible(bool AVisible) =0;
+	virtual bool isAutoCloseEnabled() const =0;
+	virtual void setAutoCloseEnabled(bool AEnabled) =0;
 	virtual int tabPageCount() const =0;
 	virtual ITabPage *tabPage(int AIndex) const =0;
 	virtual void addTabPage(ITabPage *APage) =0;
@@ -243,8 +247,6 @@ public:
 	virtual void setCurrentTabPage(ITabPage *APage) =0;
 	virtual void detachTabPage(ITabPage *APage) =0;
 	virtual void removeTabPage(ITabPage *APage) =0;
-	virtual bool isTabBarVisible() const =0;
-	virtual void setTabBarVisible(bool AVisible) =0;
 protected:
 	virtual void currentTabPageChanged(ITabPage *APage) =0;
 	virtual void tabPageMenuRequested(ITabPage *APage, Menu *AMenu) =0;
@@ -411,7 +413,7 @@ Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
 Q_DECLARE_INTERFACE(IStatusBarWidget,"Vacuum.Plugin.IStatusBarWidget/1.0")
 Q_DECLARE_INTERFACE(ITabPageNotifier,"Vacuum.Plugin.ITabPageNotifier/1.0")
 Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.3")
-Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.3")
+Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.4")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.2")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
