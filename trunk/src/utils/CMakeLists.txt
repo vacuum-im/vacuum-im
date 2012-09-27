@@ -56,7 +56,7 @@ else (X11_Xscreensaver_FOUND)
 endif (X11_Xscreensaver_FOUND)
 
 if (APPLE)
-	list(APPEND ADD_LIBS "-framework Carbon")
+	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
 endif (APPLE)
 
 target_link_libraries(${VACUUM_UTILS_NAME} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
