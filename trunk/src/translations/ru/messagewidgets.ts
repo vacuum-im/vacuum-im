@@ -221,7 +221,7 @@
     </message>
     <message>
         <source>Combine message windows with contact-list</source>
-        <translation>Объединить окна сообщений к контакт-листом</translation>
+        <translation>Объединить окна сообщений с контакт-листом</translation>
     </message>
 </context>
 <context>
