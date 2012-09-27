@@ -5,11 +5,10 @@
 MainWindowPlugin::MainWindowPlugin()
 {
 	FPluginManager = NULL;
-	FOptionsManager = NULL;
 	FTrayManager = NULL;
 
 	FActivationChanged = QTime::currentTime();
-	FMainWindow = new MainWindow(NULL,Qt::Window);
+	FMainWindow = new MainWindow(NULL, Qt::Window|Qt::WindowTitleHint);
 	FMainWindow->installEventFilter(this);
 	WidgetManager::setWindowSticky(FMainWindow,true);
 }
@@ -33,13 +32,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	IPlugin *plugin = FPluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-	if (plugin)
-	{
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
 	if (plugin)
 	{
 		FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
@@ -52,7 +45,6 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
-	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
@@ -66,10 +58,8 @@ bool MainWindowPlugin::initObjects()
 
 	Shortcuts::declareGroup(SCTG_MAINWINDOW,tr("Main window"),SGO_MAINWINDOW);
 	Shortcuts::declareShortcut(SCT_MAINWINDOW_CLOSEWINDOW,tr("Hide roster"),tr("Esc","Hide roster"));
-	Shortcuts::declareShortcut(SCT_MAINWINDOW_CHANGECENTRALVISIBLE,tr("Combine/Split with message windows"),QKeySequence::UnknownKey);
 
 	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_CLOSEWINDOW,FMainWindow);
-	Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_CHANGECENTRALVISIBLE,FMainWindow);
 
 	Action *quitAction = new Action(this);
 	quitAction->setText(tr("Quit"));
@@ -86,20 +76,12 @@ bool MainWindowPlugin::initObjects()
 		FTrayManager->contextMenu()->addAction(showRosterAction,AG_TMTM_MAINWINDOW,true);
 	}
 
-
 	return true;
 }
 
 bool MainWindowPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_MAINWINDOW_SHOWONSTART,true);
-	Options::setDefaultValue(OPV_MAINWINDOW_CENTRALVISIBLE,false);
-
-	if (FOptionsManager)
-	{
-		FOptionsManager->insertOptionsHolder(this);
-	}
-
 	return true;
 }
 
@@ -107,16 +89,6 @@ bool MainWindowPlugin::startPlugin()
 {
 	Shortcuts::setGlobalShortcut(SCT_GLOBAL_SHOWROSTER,true);
 	return true;
-}
-
-QMultiMap<int, IOptionsWidget *> MainWindowPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
-{
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (ANodeId == OPN_ROSTER)
-	{
-		widgets.insertMulti(OWO_ROSTER_CENTRALVISIBLE, FOptionsManager->optionsNodeWidget(Options::node(OPV_MAINWINDOW_CENTRALVISIBLE),tr("Combine contact-list with message windows"),AParent));
-	}
-	return widgets;
 }
 
 IMainWindow *MainWindowPlugin::mainWindow() const
@@ -134,9 +106,7 @@ bool MainWindowPlugin::eventFilter(QObject *AWatched, QEvent *AEvent)
 void MainWindowPlugin::onOptionsOpened()
 {
 	FMainWindow->loadWindowGeometryAndState();
-	onOptionsChanged(Options::node(OPV_MAINWINDOW_CENTRALVISIBLE));
-	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
-		FMainWindow->showWindow();
+	QTimer::singleShot(0,this,SLOT(onShowMainWindowOnStart()));
 }
 
 void MainWindowPlugin::onOptionsClosed()
@@ -145,33 +115,20 @@ void MainWindowPlugin::onOptionsClosed()
 	FMainWindow->closeWindow();
 }
 
-void MainWindowPlugin::onOptionsChanged(const OptionsNode &ANode)
-{
-	if (ANode.path() == OPV_MAINWINDOW_CENTRALVISIBLE)
-	{
-		FMainWindow->setCentralWidgetVisible(ANode.value().toBool());
-	}
-}
-
 void MainWindowPlugin::onShutdownStarted()
 {
 	Options::node(OPV_MAINWINDOW_SHOWONSTART).setValue(FMainWindow->isVisible());
 }
 
+void MainWindowPlugin::onShowMainWindowOnStart()
+{
+	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
+		FMainWindow->showWindow();
+}
+
 void MainWindowPlugin::onShowMainWindowByAction(bool)
 {
 	FMainWindow->showWindow();
-}
-
-void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
-{
-	if (ANotifyId<=0 && AReason==QSystemTrayIcon::Trigger)
-	{
-		if (FMainWindow->isActive() || qAbs(FActivationChanged.msecsTo(QTime::currentTime())) < qApp->doubleClickInterval())
-			FMainWindow->closeWindow();
-		else
-			FMainWindow->showWindow();
-	}
 }
 
 void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
@@ -184,9 +141,16 @@ void MainWindowPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		FMainWindow->closeWindow();
 	}
-	else if (AWidget==FMainWindow && AId==SCT_MAINWINDOW_CHANGECENTRALVISIBLE)
+}
+
+void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason)
+{
+	if (ANotifyId<=0 && AReason==QSystemTrayIcon::Trigger)
 	{
-		FMainWindow->setCentralWidgetVisible(!FMainWindow->isCentralWidgetVisible());
+		if (FMainWindow->isActive() || qAbs(FActivationChanged.msecsTo(QTime::currentTime())) < qApp->doubleClickInterval())
+			FMainWindow->closeWindow();
+		else
+			FMainWindow->showWindow();
 	}
 }
 

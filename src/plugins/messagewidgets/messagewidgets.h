@@ -141,6 +141,7 @@ protected slots:
 	void onChatWindowDestroyed();
 	void onTabWindowPageAdded(ITabPage *APage);
 	void onTabWindowDestroyed();
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onOptionsOpened();

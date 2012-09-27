@@ -96,9 +96,8 @@ public:
 	virtual void removeToolBarChanger(ToolBarChanger *AChanger) =0;
 	// Pages Management
 	virtual IMainTabWidget *mainTabWidget() const =0;
-	virtual IMainCentralWidget *mainCentralWidget() const =0;
 	virtual bool isCentralWidgetVisible() const =0;
-	virtual void setCentralWidgetVisible(bool AVisible) =0;
+	virtual IMainCentralWidget *mainCentralWidget() const =0;
 protected:
 	virtual void widgetInserted(int AOrderId, QWidget *AWidget) =0;
 	virtual void widgetRemoved(QWidget *AWidget) =0;
@@ -118,7 +117,7 @@ Q_DECLARE_INTERFACE(IMainTabPage,"Vacuum.Plugin.IMainTabPage/1.0")
 Q_DECLARE_INTERFACE(IMainTabWidget,"Vacuum.Plugin.IMainTabWidget/1.0")
 Q_DECLARE_INTERFACE(IMainCentralPage,"Vacuum.Plugin.IMainCentralPage/1.0")
 Q_DECLARE_INTERFACE(IMainCentralWidget,"Vacuum.Plugin.IMainCentralWidget/1.0")
-Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.1")
+Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.2")
 Q_DECLARE_INTERFACE(IMainWindowPlugin,"Vacuum.Plugin.IMainWindowPlugin/1.1")
 
 #endif // IMAINWINDOW_H

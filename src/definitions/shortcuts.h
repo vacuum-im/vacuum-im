@@ -30,9 +30,10 @@
 //MainWindow
 #define SCTG_MAINWINDOW                                            "main-window"
 #define   SCT_MAINWINDOW_CLOSEWINDOW                               "main-window.close-window"
-#define   SCT_MAINWINDOW_CHANGECENTRALVISIBLE                      "main-window.change-central-widget-visible"
 //RostersView
 #define   SCT_MAINWINDOW_TOGGLEOFFLINE                             "main-window.toggle-offline"
+//MessageWidgets
+#define   SCT_MAINWINDOW_COMBINEWITHMESSAGES                       "main-window.combine-with-messages"
 
 //MessageWidgets
 #define SCTG_MESSAGEWINDOWS                                        "message-windows"
