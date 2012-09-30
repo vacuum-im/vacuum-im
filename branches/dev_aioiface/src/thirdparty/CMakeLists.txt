@@ -14,10 +14,6 @@ if (NOT SYSTEM_QTLOCKEDFILE_FOUND)
 	add_subdirectory(qtlockedfile)
 endif (NOT SYSTEM_QTLOCKEDFILE_FOUND)
 
-if (NOT SYSTEM_HUNSPELL_FOUND)
-	add_subdirectory(hunspell)
-endif (NOT SYSTEM_HUNSPELL_FOUND)
-
 add_subdirectory(jdns)
 add_subdirectory(idle)
 add_subdirectory(qxtglobalshortcut)

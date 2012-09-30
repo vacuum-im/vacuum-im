@@ -31,11 +31,11 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	ui.twtTabs->setDocumentMode(true);
 	ui.twtTabs->setUsesScrollButtons(true);
 
+	FAutoClose = true;
 	FShownDetached = false;
 	FWindowId = AWindowId;
 	FMessageWidgets = AMessageWidgets;
-	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),
-		SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
+	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
 
 	QToolButton *menuButton = new QToolButton(ui.twtTabs);
 	menuButton->setAutoRaise(true);
@@ -131,6 +131,37 @@ Menu *TabWindow::windowMenu() const
 	return FWindowMenu;
 }
 
+bool TabWindow::isTabBarVisible() const
+{
+	return ui.twtTabs->isTabBarVisible();
+}
+
+void TabWindow::setTabBarVisible(bool AVisible)
+{
+	if (isTabBarVisible() != AVisible)
+	{
+		ui.twtTabs->setTabBarVisible(AVisible);
+		ui.twtTabs->cornerWidget()->setEnabled(AVisible);
+		emit windowChanged();
+	}
+}
+
+bool TabWindow::isAutoCloseEnabled() const
+{
+	return FAutoClose;
+}
+
+void TabWindow::setAutoCloseEnabled(bool AEnabled)
+{
+	if (AEnabled != FAutoClose)
+	{
+		FAutoClose = AEnabled;
+		if (AEnabled)
+			QTimer::singleShot(0,this,SLOT(onCloseWindowIfEmpty()));
+		emit windowChanged();
+	}
+}
+
 int TabWindow::tabPageCount() const
 {
 	return ui.twtTabs->count();
@@ -210,23 +241,8 @@ void TabWindow::removeTabPage(ITabPage *APage)
 		updateTabs(index,ui.twtTabs->count()-1);
 		emit tabPageRemoved(APage);
 
-		if (ui.twtTabs->count() == 0)
-		{
-			close();
-			deleteLater();
-		}
+		QTimer::singleShot(0,this,SLOT(onCloseWindowIfEmpty()));
 	}
-}
-
-bool TabWindow::isTabBarVisible() const
-{
-	return ui.twtTabs->isTabBarVisible();
-}
-
-void TabWindow::setTabBarVisible(bool AVisible)
-{
-	ui.twtTabs->setTabBarVisible(AVisible);
-	ui.twtTabs->cornerWidget()->setEnabled(AVisible);
 }
 
 void TabWindow::createActions()
@@ -738,5 +754,14 @@ void TabWindow::onBlinkTabNotifyTimerTimeout()
 			if (notify.blink && !notify.icon.isNull())
 				updateTab(index);
 		}
+	}
+}
+
+void TabWindow::onCloseWindowIfEmpty()
+{
+	if (isAutoCloseEnabled() && tabPageCount()==0)
+	{
+		deleteLater();
+		close();
 	}
 }

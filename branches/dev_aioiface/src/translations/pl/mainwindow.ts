@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl" sourcelanguage="en">
 <context>
-    <name>DefaultCentralPage</name>
-    <message>
-        <source>Here will be opened the windows with conversations.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>MainWindowPlugin</name>
     <message>
         <source>Main Window</source>
@@ -38,14 +31,6 @@
         <source>Esc</source>
         <comment>Hide roster</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Combine/Split with message windows</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Combine contact-list with message windows</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

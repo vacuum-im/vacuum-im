@@ -1,6 +1,48 @@
 #include "toolbarchanger.h"
 
 #include <QTimer>
+#include <QPointer>
+#include <QWidgetAction>
+
+class ToolButtonAction :
+	public QWidgetAction 
+{
+public:
+	ToolButtonAction(Action *AAction) : QWidgetAction(AAction)
+	{
+		FAction = AAction;
+		FDefaultButton = NULL;
+	}
+	QToolButton *defaultToolButton()
+	{
+		return FDefaultButton;
+	}
+	QWidget *createWidget(QWidget *AParent)
+	{
+		QToolButton *button = new QToolButton(AParent);
+		if (FDefaultButton.isNull())
+		{
+			QToolBar *toolbar = qobject_cast<QToolBar *>(AParent);
+			if (toolbar)
+				button->setToolButtonStyle(toolbar->toolButtonStyle());
+			button->setDefaultAction(FAction);
+			FDefaultButton = button;
+		}
+		else
+		{
+			button->setToolButtonStyle(FDefaultButton->toolButtonStyle());
+			button->setDefaultAction(FDefaultButton->defaultAction());
+			button->setPopupMode(FDefaultButton->popupMode());
+			button->setAutoRaise(FDefaultButton->autoRaise());
+			button->setArrowType(FDefaultButton->arrowType());
+		}
+		return button;
+	}
+private:
+	Action *FAction;
+	QPointer<QToolButton> FDefaultButton;
+};
+
 
 ToolBarChanger::ToolBarChanger(QToolBar *AToolBar) : QObject(AToolBar)
 {
@@ -93,27 +135,17 @@ Action *ToolBarChanger::handleAction(QAction *AHandle) const
 
 QAction *ToolBarChanger::insertWidget(QWidget *AWidget, int AGroup)
 {
-	if (!FWidgets.values().contains(AWidget))
+	if (!FHandles.contains(AWidget))
 	{
-		if (AGroup > TBG_ALLIGN_CHANGE)
-			FAllignChange->setVisible(true);
-
-		QMap<int, QAction *>::const_iterator it = FSeparators.upperBound(AGroup);
-		QAction *before = it!=FSeparators.end() ? it.value() : NULL;
-
+		QAction *before = findGroupSeparator(AGroup);
 		QAction *handle = before!=NULL ? FToolBar->insertWidget(before, AWidget) : FToolBar->addWidget(AWidget);
-		if (!FSeparators.contains(AGroup))
-		{
-			QAction *separator = FToolBar->insertSeparator(handle);
-			separator->setVisible(FSeparatorsVisible);
-			FSeparators.insert(AGroup, separator);
-			updateSeparatorVisible();
-		}
+		insertGroupSeparator(AGroup,handle);
+
 		FWidgets.insertMulti(AGroup,AWidget);
 		FHandles.insert(AWidget, handle);
 		connect(AWidget,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
 
-		emit itemInserted(before,handle,FButtons.key(qobject_cast<QToolButton *>(AWidget)),AWidget,AGroup);
+		emit itemInserted(before,handle,NULL,AWidget,AGroup);
 		updateVisible();
 	}
 	return FHandles.value(AWidget);
@@ -121,12 +153,27 @@ QAction *ToolBarChanger::insertWidget(QWidget *AWidget, int AGroup)
 
 QToolButton *ToolBarChanger::insertAction(Action *AAction, int AGroup)
 {
-	QToolButton *button = new QToolButton(FToolBar);
-	button->setToolButtonStyle(FToolBar->toolButtonStyle());
-	button->setDefaultAction(AAction);
-	FButtons.insert(AAction, button);
-	insertWidget(button, AGroup);
-	return button;
+	if (!FButtons.contains(AAction))
+	{
+		ToolButtonAction *buttonAction = new ToolButtonAction(AAction);
+
+		QAction *before = findGroupSeparator(AGroup);
+		if (before)
+			FToolBar->insertAction(before, buttonAction);
+		else
+			FToolBar->addAction(buttonAction);
+		insertGroupSeparator(AGroup,buttonAction);
+
+		QToolButton *button = buttonAction->defaultToolButton();
+		FWidgets.insert(AGroup,button);
+		FHandles.insert(button,buttonAction);
+		FButtons.insert(AAction,button);
+		connect(button,SIGNAL(destroyed(QObject *)),SLOT(onWidgetDestroyed(QObject *)));
+
+		emit itemInserted(before,buttonAction,AAction,button,AGroup);
+		updateVisible();
+	}
+	return FButtons.value(AAction);
 }
 
 void ToolBarChanger::removeItem(QAction *AHandle)
@@ -134,29 +181,18 @@ void ToolBarChanger::removeItem(QAction *AHandle)
 	QWidget *widget = FHandles.key(AHandle, NULL);
 	if (widget && AHandle!=FAllignChange)
 	{
-		AHandle->deleteLater();
-		FToolBar->removeAction(AHandle);
 		disconnect(widget,SIGNAL(destroyed(QObject *)),this,SLOT(onWidgetDestroyed(QObject *)));
+		FToolBar->removeAction(AHandle);
 
 		Action *action = FButtons.key(qobject_cast<QToolButton *>(widget), NULL);
 		if (action)
 			FButtons.take(action)->deleteLater();
+		FHandles.take(widget)->deleteLater();
 
 		int group = FWidgets.key(widget);
 		FWidgets.remove(group,widget);
-		if (!FWidgets.contains(group))
-		{
-			QAction *separator = FSeparators.take(group);
-			FToolBar->removeAction(separator);
-			delete separator;
-			updateSeparatorVisible();
-		}
-		if (FWidgets.keys().last()<=TBG_ALLIGN_CHANGE)
-		{
-			FAllignChange->setVisible(false);
-		}
+		removeGroupSeparator(group);
 
-		FHandles.remove(widget);
 		emit itemRemoved(AHandle);
 		updateVisible();
 	}
@@ -182,6 +218,42 @@ void ToolBarChanger::updateSeparatorVisible()
 		separators.at(1)->setVisible(FSeparatorsVisible);
 	separators.first()->setVisible(false);
 	FSeparators.value(TBG_ALLIGN_CHANGE)->setVisible(false);
+}
+
+QAction *ToolBarChanger::findGroupSeparator(int AGroup) const
+{
+	QMap<int, QAction *>::const_iterator it = FSeparators.upperBound(AGroup);
+	return it!=FSeparators.end() ? it.value() : NULL;
+}
+
+void ToolBarChanger::insertGroupSeparator(int AGroup, QAction *ABefore)
+{
+	if (AGroup > TBG_ALLIGN_CHANGE)
+	{
+		FAllignChange->setVisible(true);
+	}
+	if (!FSeparators.contains(AGroup))
+	{
+		QAction *separator = FToolBar->insertSeparator(ABefore);
+		separator->setVisible(FSeparatorsVisible);
+		FSeparators.insert(AGroup, separator);
+		updateSeparatorVisible();
+	}
+}
+
+void ToolBarChanger::removeGroupSeparator(int AGroup)
+{
+	if (!FWidgets.contains(AGroup))
+	{
+		QAction *separator = FSeparators.take(AGroup);
+		FToolBar->removeAction(separator);
+		delete separator;
+		updateSeparatorVisible();
+	}
+	if (FWidgets.keys().last()<=TBG_ALLIGN_CHANGE)
+	{
+		FAllignChange->setVisible(false);
+	}
 }
 
 void ToolBarChanger::onWidgetDestroyed(QObject *AObject)

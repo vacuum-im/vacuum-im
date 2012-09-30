@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include <QTimer>
 #include <QResizeEvent>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -14,7 +15,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 
 	FAligned = false;
 	FLeftWidgetWidth = 0;
-	FCentralVisible = true;
 
 	QIcon icon;
 	IconStorage *iconStorage = IconStorage::staticStorage(RSR_STORAGE_MENUICONS);
@@ -35,7 +35,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	setCentralWidget(FSplitter);
 
 	FLeftWidget = new QFrame(this);
-	FLeftWidget->setFrameShape(QFrame::StyledPanel);
 	FSplitter->addWidget(FLeftWidget);
 	FSplitter->setCollapsible(0,false);
 	FSplitter->setStretchFactor(0,1);
@@ -46,12 +45,13 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	connect(FCentralWidget->instance(),SIGNAL(centralPageAppended(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
 	connect(FCentralWidget->instance(),SIGNAL(centralPageRemoved(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
 
-	FDefaultCentral = new DefaultCentralPage(NULL);
-	FCentralWidget->appendCentralPage(FDefaultCentral);
-
 	FSplitter->addWidget(FCentralWidget->instance());
 	FSplitter->setCollapsible(1,false);
 	FSplitter->setStretchFactor(1,4);
+
+	FCentralVisible = false;
+	FSplitter->setHandleWidth(0);
+	FCentralWidget->instance()->setVisible(false);
 
 	FLeftLayout = new QVBoxLayout(FLeftWidget);
 	FLeftLayout->setMargin(0);
@@ -89,7 +89,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 
 MainWindow::~MainWindow()
 {
-	delete FDefaultCentral;
 	delete FMainMenuBar->menuBar();
 }
 
@@ -232,42 +231,6 @@ bool MainWindow::isCentralWidgetVisible() const
 	return FCentralVisible;
 }
 
-void MainWindow::setCentralWidgetVisible(bool AEnabled)
-{
-	if (AEnabled != FCentralVisible)
-	{
-		bool wasVisible = isVisible();
-		saveWindowGeometryAndState();
-		
-		FCentralVisible = AEnabled;
-		if (AEnabled)
-		{
-			FSplitter->setHandleWidth(FSplitterHandleWidth);
-			FLeftWidget->setFrameShape(QFrame::StyledPanel);
-			FCentralWidget->appendCentralPage(FDefaultCentral);
-			FCentralWidget->instance()->setVisible(true);
-			setWindowFlags(Qt::Window);
-		}
-		else
-		{
-			FSplitter->setHandleWidth(0);
-			FLeftWidget->setFrameShape(QFrame::NoFrame);
-			FCentralWidget->instance()->setVisible(false);
-			while (FCentralWidget->currentCentralPage()!=NULL)
-				FCentralWidget->removeCentralPage(FCentralWidget->currentCentralPage());
-			setWindowFlags(Qt::Window | Qt::WindowTitleHint);
-		}
-
-		updateWindow();
-		loadWindowGeometryAndState();
-		if (wasVisible)
-			showWindow();
-		Options::node(OPV_MAINWINDOW_CENTRALVISIBLE).setValue(AEnabled);
-
-		emit centralWidgetVisibleChanged(AEnabled);
-	}
-}
-
 void MainWindow::saveWindowGeometryAndState()
 {
 	QString ns = isCentralWidgetVisible() ? ONE_WINDOW_MODE_OPTIONS_NS : "";
@@ -334,6 +297,39 @@ void MainWindow::correctWindowPosition()
 	}
 }
 
+void MainWindow::setCentralWidgetVisible(bool AVisible)
+{
+	if (AVisible != FCentralVisible)
+	{
+		bool windowVisible = isVisible();
+		saveWindowGeometryAndState();
+
+		FCentralVisible = AVisible;
+		if (AVisible)
+		{
+			FSplitter->setHandleWidth(FSplitterHandleWidth);
+			FLeftWidget->setFrameShape(QFrame::StyledPanel);
+			FCentralWidget->instance()->setVisible(true);
+			setWindowFlags(Qt::Window);
+		}
+		else
+		{
+			FSplitter->setHandleWidth(0);
+			FLeftWidget->setFrameShape(QFrame::NoFrame);
+			FCentralWidget->instance()->setVisible(false);
+			setWindowFlags(Qt::Window | Qt::WindowTitleHint);
+		}
+
+		updateWindow();
+		loadWindowGeometryAndState();
+
+		if (windowVisible)
+			showWindow();
+
+		emit centralWidgetVisibleChanged(AVisible);
+	}
+}
+
 void MainWindow::showEvent(QShowEvent *AEvent)
 {
 	QMainWindow::showEvent(AEvent);
@@ -378,6 +374,11 @@ bool MainWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 	return QMainWindow::eventFilter(AObject,AEvent);
 }
 
+void MainWindow::onUpdateCentralWidgetVisible()
+{
+	setCentralWidgetVisible(!FCentralWidget->centralPages().isEmpty());
+}
+
 void MainWindow::onCurrentCentralPageChanged()
 {
 	updateWindow();
@@ -385,13 +386,8 @@ void MainWindow::onCurrentCentralPageChanged()
 
 void MainWindow::onCentralPageAddedOrRemoved(IMainCentralPage *APage)
 {
-	if (APage != FDefaultCentral)
-	{
-		if (!mainCentralWidget()->centralPages().isEmpty())
-			mainCentralWidget()->removeCentralPage(FDefaultCentral);
-		else if (isCentralWidgetVisible())
-			mainCentralWidget()->appendCentralPage(FDefaultCentral);
-	}
+	Q_UNUSED(APage);
+	QTimer::singleShot(0,this,SLOT(onUpdateCentralWidgetVisible()));
 }
 
 void MainWindow::onSplitterMoved(int APos, int AIndex)
