@@ -6,7 +6,7 @@
 #include <QDoubleValidator>
 
 // фактор растяжения для текста выводимого рядом с элементом настроек
-#define CAPTION_STRATCH 3
+#define CAPTION_STRATCH 0
 
 OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) : QWidget(AParent)
 {
@@ -176,7 +176,7 @@ void OptionsWidget::insertCaption(const QString &ACaption, QWidget *ABuddy, QHBo
 		FLabel->setTextFormat(Qt::PlainText);
 		FLabel->setText(ACaption);
 		FLabel->setBuddy(ABuddy);
-		ALayout->addWidget(FLabel,CAPTION_STRATCH);
+        ALayout->addWidget(FLabel,CAPTION_STRATCH);
 	}
 }
 
