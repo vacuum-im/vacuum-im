@@ -17,6 +17,7 @@ public:
 class IPEPManager
 {
 public:
+	virtual bool isSupported(const Jid &AStreamJid) const =0;
 	virtual bool publishItem(const Jid &AStreamJid, const QString &ANode, const QDomElement &AItem) =0;
 	virtual IPEPHandler *nodeHandler(int AHandleId) const =0;
 	virtual int insertNodeHandler(const QString &ANode, IPEPHandler *AHandle) =0;
@@ -24,6 +25,6 @@ public:
 };
 
 Q_DECLARE_INTERFACE(IPEPHandler,"Vacuum.Plugin.IPEPHandler/1.0")
-Q_DECLARE_INTERFACE(IPEPManager,"Vacuum.Plugin.IPEPManager/1.0")
+Q_DECLARE_INTERFACE(IPEPManager,"Vacuum.Plugin.IPEPManager/1.1")
 
 #endif // IPEPMANAGER_H
