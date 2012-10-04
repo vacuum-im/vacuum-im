@@ -14,6 +14,8 @@
 #define TDR_CONF                Qt::UserRole+5
 #define TDR_URL                 Qt::UserRole+6
 
+#define DEFAULT_COLUMN_SORT 0
+
 EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStreamJid, const QList<IBookMark> &AList, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
@@ -33,6 +35,8 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
 	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NAME,QHeaderView::ResizeToContents);
 	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_VALUE,QHeaderView::Stretch);
 	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NICK,QHeaderView::ResizeToContents);
+
+    ui.tbwBookmarks->sortByColumn(DEFAULT_COLUMN_SORT,Qt::AscendingOrder);
 
 	connect(FBookmarks->instance(),SIGNAL(bookmarksUpdated(const QString &, const Jid &, const QDomElement &)),
 	        SLOT(onBookmarksUpdated(const QString &, const Jid &, const QDomElement &)));
