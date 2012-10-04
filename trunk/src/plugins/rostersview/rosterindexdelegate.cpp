@@ -172,12 +172,13 @@ QHash<int,QRect> RosterIndexDelegate::drawIndex(QPainter *APainter, const QStyle
 
 	if (option.state & QStyle::State_Children)
 	{
-		QStyleOption brachOption(option);
-		brachOption.rect = QStyle::alignedRect(option.direction,Qt::AlignVCenter|Qt::AlignLeft,QSize(BRANCH_WIDTH,BRANCH_WIDTH),paintRect);
+		QStyleOption branchOption(option);
+		branchOption.state &= ~(QStyle::State_Sibling);
+		branchOption.rect = QStyle::alignedRect(option.direction,Qt::AlignVCenter|Qt::AlignLeft,QSize(BRANCH_WIDTH,BRANCH_WIDTH),paintRect);
 		if (APainter)
-			style->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
+			style->drawPrimitive(QStyle::PE_IndicatorBranch, &branchOption, APainter);
 		removeWidth(paintRect,BRANCH_WIDTH,AOption.direction==Qt::LeftToRight);
-		rectHash.insert(RLID_INDICATORBRANCH,brachOption.rect);
+		rectHash.insert(RLID_INDICATORBRANCH,branchOption.rect);
 	}
 
 	QList<LabelItem> labels = itemLabels(AIndex);
