@@ -1,5 +1,6 @@
 #include "chatmessagehandler.h"
 
+#include <QMouseEvent>
 #include <QApplication>
 
 #define HISTORY_MESSAGES          10
@@ -124,7 +125,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)),
 				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
@@ -216,8 +217,8 @@ bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AInd
 
 bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
-	if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)
+	Q_UNUSED(AOrder);
+	if (AEvent->modifiers()==Qt::NoModifier && (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE))
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
@@ -372,7 +373,7 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 					QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(menu->menuAction(),TBG_CWTBW_USER_TOOLS);
 					button->setPopupMode(QToolButton::InstantPopup);
 				}
-				
+
 				showHistory(window);
 			}
 			else
@@ -508,7 +509,7 @@ void ChatMessageHandler::setMessageStyle(IChatWindow *AWindow)
 		AWindow->viewWidget()->setMessageStyle(style,soptions);
 	}
 	FWindowStatus[AWindow].lastDateSeparator = QDate();
-} 
+}
 
 void ChatMessageHandler::fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const
 {
