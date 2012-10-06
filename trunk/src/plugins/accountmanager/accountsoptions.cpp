@@ -20,7 +20,7 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
 
 	connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddButtonClicked(bool)));
 	connect(ui.pbtRemove,SIGNAL(clicked(bool)),SLOT(onRemoveButtonClicked(bool)));
-	connect(ui.trwAccounts,SIGNAL(itemActivated(QTreeWidgetItem *,int)),SLOT(onItemActivated(QTreeWidgetItem *,int)));
+	connect(ui.trwAccounts,SIGNAL(itemDoubleClicked(QTreeWidgetItem *,int)),SLOT(onItemDoubleClicked(QTreeWidgetItem *,int)));
 
 	connect(FManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 
@@ -124,7 +124,7 @@ void AccountsOptions::onRemoveButtonClicked(bool)
 	}
 }
 
-void AccountsOptions::onItemActivated(QTreeWidgetItem *AItem, int AColumn)
+void AccountsOptions::onItemDoubleClicked(QTreeWidgetItem *AItem, int AColumn)
 {
 	Q_UNUSED(AColumn);
 	if (AItem)

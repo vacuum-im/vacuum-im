@@ -50,7 +50,7 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
 	connect(ui.pbtMoveDown,SIGNAL(clicked()),SLOT(onEditButtonClicked()));
 	connect(ui.bbxButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 
-	connect(ui.tbwBookmarks,SIGNAL(itemActivated(QTableWidgetItem *)),SLOT(onTableItemActivated(QTableWidgetItem *)));
+	connect(ui.tbwBookmarks,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),SLOT(onTableItemDoubleClicked(QTableWidgetItem *)));
 }
 
 EditBookmarksDialog::~EditBookmarksDialog()
@@ -205,7 +205,7 @@ void EditBookmarksDialog::onBookmarksError(const QString &AId, const QString &AE
 	}
 }
 
-void EditBookmarksDialog::onTableItemActivated(QTableWidgetItem *AItem)
+void EditBookmarksDialog::onTableItemDoubleClicked(QTableWidgetItem *AItem)
 {
 	IBookMark bookmark = getBookmarkFromRow(AItem->row());
 	if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
