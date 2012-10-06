@@ -303,6 +303,7 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 	{
 		bool windowVisible = isVisible();
 		saveWindowGeometryAndState();
+		closeWindow();
 
 		FCentralVisible = AVisible;
 		if (AVisible)
@@ -321,6 +322,7 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 		}
 
 		updateWindow();
+		setMinimumSize(0,0);
 		loadWindowGeometryAndState();
 
 		if (windowVisible)
