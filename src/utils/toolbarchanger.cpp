@@ -184,9 +184,19 @@ void ToolBarChanger::removeItem(QAction *AHandle)
 		disconnect(widget,SIGNAL(destroyed(QObject *)),this,SLOT(onWidgetDestroyed(QObject *)));
 		FToolBar->removeAction(AHandle);
 
-		Action *action = FButtons.key(qobject_cast<QToolButton *>(widget), NULL);
-		if (action)
-			FButtons.take(action)->deleteLater();
+		QMap<Action *, QToolButton *>::iterator it = FButtons.begin();
+		while (it != FButtons.end())
+		{
+			if (it.value() == widget)
+			{
+				it.key()->deleteLater();
+				it = FButtons.erase(it);
+			}
+			else
+			{
+				it++;
+			}
+		}
 		FHandles.take(widget)->deleteLater();
 
 		int group = FWidgets.key(widget);
