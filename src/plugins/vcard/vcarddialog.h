@@ -40,10 +40,10 @@ protected slots:
 	void onLogoClearClicked();
 	void onEmailAddClicked();
 	void onEmailDeleteClicked();
-	void onEmailItemActivated(QListWidgetItem *AItem);
+	void onEmailItemDoubleClicked(QListWidgetItem *AItem);
 	void onPhoneAddClicked();
 	void onPhoneDeleteClicked();
-	void onPhoneItemActivated(QListWidgetItem *AItem);
+	void onPhoneItemDoubleClicked(QListWidgetItem *AItem);
 	void onDialogButtonClicked(QAbstractButton *AButton);
 private:
 	Ui::VCardDialogClass ui;

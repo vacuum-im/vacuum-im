@@ -28,7 +28,7 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
 	connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
 	connect(ui.lwtFearures,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
 	        SLOT(onCurrentFeatureChanged(QListWidgetItem *, QListWidgetItem *)));
-	connect(ui.lwtFearures,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onListItemActivated(QListWidgetItem *)));
+	connect(ui.lwtFearures,SIGNAL(itemDoubleClicked(QListWidgetItem *)),SLOT(onListItemDoubleClicked(QListWidgetItem *)));
 
 	if (!FDiscovery->hasDiscoInfo(FStreamJid,FContactJid,ANode) || !FDiscovery->discoInfo(FStreamJid,FContactJid,ANode).error.isNull())
 		requestDiscoInfo();
@@ -157,7 +157,7 @@ void DiscoInfoWindow::onUpdateClicked()
 	requestDiscoInfo();
 }
 
-void DiscoInfoWindow::onListItemActivated(QListWidgetItem *AItem)
+void DiscoInfoWindow::onListItemDoubleClicked(QListWidgetItem *AItem)
 {
 	QString feature = AItem->data(Qt::UserRole).toString();
 	if (FDiscovery->hasFeatureHandler(feature))
