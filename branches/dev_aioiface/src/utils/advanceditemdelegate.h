@@ -20,13 +20,13 @@ struct AdvancedDelegateItem
 		CheckStateId,
 		DecorationId,
 		DisplayId,
-		Stretch0Id,
+		DisplayStretchId,
 		UserId = 16
 	};
 	enum Kind {
 		Null,
 		Branch,
-		CheckState,
+		CheckBox,
 		Decoration,
 		Display,
 		Stretch,

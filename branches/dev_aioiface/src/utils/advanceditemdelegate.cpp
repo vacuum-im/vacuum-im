@@ -10,6 +10,51 @@
 #include <QApplication>
 #include <QWindowsVistaStyle>
 
+template <class T>
+void insertLayout(int AOrder, T *ALayout, const QMap<int, T *> &AChilds, QBoxLayout *AParent)
+{
+	typename QMap<int, T *>::const_iterator pos_it = AChilds.upperBound(AOrder);
+	T *before = pos_it!=AChilds.constEnd() ? pos_it.value() : NULL;
+	if (before != NULL)
+	{
+		for (int index = 0; index<AParent->count(); index++)
+		{
+			if (AParent->itemAt(index) == before)
+			{
+				AParent->insertLayout(index,ALayout);
+				break;
+			}
+		}
+	}
+	else
+	{
+		AParent->addLayout(ALayout);
+	}
+}
+
+void destroyLayoutRecursive(QLayout *ALayout)
+{
+	QLayoutItem *child;
+	while ((child = ALayout->takeAt(0)) != NULL)
+	{
+		if (child->layout())
+			destroyLayoutRecursive(child->layout());
+		else
+			delete child;
+	}
+	delete ALayout;
+}
+
+QString getSingleLineText(const QString &AText)
+{
+	QString text = AText;
+	text.replace('\n',' ');
+	return text.trimmed();
+}
+
+/*********************
+	AdvancedDelegateItem
+**********************/
 AdvancedDelegateItem::AdvancedDelegateItem()
 {
 	d = new AdvancedDelegateItemData;
@@ -54,7 +99,9 @@ bool AdvancedDelegateItem::operator <(const AdvancedDelegateItem &AItem) const
 	return d->order < AItem.d->order;
 }
 
-
+/***************************
+	AdvancedDelegateLayoutItem
+****************************/
 class AdvancedDelegateLayoutItem :
 	public QLayoutItem
 {
@@ -114,6 +161,88 @@ public:
 	{
 		return FOption;
 	}
+	void drawVariant(QPainter *APainter, const QVariant &AValue)
+	{
+		QStyle *style = FOption.widget ? FOption.widget->style() : QApplication::style();
+		
+		switch (AValue.type())
+		{
+		case QVariant::Pixmap:
+			{
+				QPixmap pixmap = qvariant_cast<QPixmap>(AValue);
+				style->drawItemPixmap(APainter,FOption.rect,Qt::AlignCenter,pixmap);
+				break;
+			}
+		case QVariant::Image:
+			{
+				QImage image = qvariant_cast<QImage>(AValue);
+				APainter->drawImage(FOption.rect.topLeft(),image);
+				break;
+			}
+		case QVariant::Icon:
+			{
+				QIcon::Mode mode = QIcon::Normal;
+				if (FOption.state & QStyle::State_Selected)
+					mode = QIcon::Selected;
+				else if (!(FOption.state & QStyle::State_Enabled))
+					mode = QIcon::Disabled;
+				
+				QIcon icon = qvariant_cast<QIcon>(AValue);
+				QPixmap pixmap = style->generatedIconPixmap(mode,icon.pixmap(FOption.decorationSize),&FOption);
+				style->drawItemPixmap(APainter,FOption.rect,FOption.decorationAlignment,pixmap);
+				break;
+			}
+		default:
+			{
+				QString itemText = getSingleLineText(AValue.toString());
+				if (!itemText.isEmpty())
+				{
+					APainter->setFont(FOption.font);
+					int flags = FOption.direction | Qt::TextSingleLine;
+					QPalette::ColorRole role = FOption.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text;
+					QString text = FOption.fontMetrics.elidedText(itemText,FOption.textElideMode,FOption.rect.width(),flags);
+					style->proxy()->drawItemText(APainter,FOption.rect,flags,FOption.palette,(FOption.state & QStyle::State_Enabled)>0,text,role);
+				}
+				break;
+			}
+		}
+	}
+	void drawItem(QPainter *APainter)
+	{
+		if (!FOption.rect.isEmpty())
+		{
+			APainter->save();
+			APainter->setClipRect(FOption.rect);
+	
+			if (FItem.d->hints.contains(AdvancedDelegateItem::Opacity))
+				APainter->setOpacity(FItem.d->hints.value(AdvancedDelegateItem::Opacity).toReal());
+	
+			switch (FItem.d->kind)
+			{
+			case AdvancedDelegateItem::Null:
+				break;
+			case AdvancedDelegateItem::Stretch:
+				break;
+			case AdvancedDelegateItem::Branch:
+				{
+					QStyleOption brachOption(FOption);
+					QStyle *style = FOption.widget ? FOption.widget->style() : QApplication::style();
+					style->proxy()->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
+				}
+			case AdvancedDelegateItem::CheckBox:
+				{
+					QStyle *style = FOption.widget ? FOption.widget->style() : QApplication::style();
+					style->proxy()->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &FOption, APainter, FOption.widget);
+					break;
+				}
+			case AdvancedDelegateItem::CustomWidget:
+				break;
+			default:
+				drawVariant(APainter,FItem.d->data);
+			}
+			APainter->restore();
+		}
+	}
 private:
 	mutable QSize FSizeHint;
 	AdvancedDelegateItem FItem;
@@ -121,6 +250,9 @@ private:
 };
 
 
+/*********************
+	AdvancedItemDelegate
+**********************/
 struct AdvancedItemDelegate::ItemsLayout
 {
 	QHBoxLayout *mainLayout;
@@ -129,133 +261,6 @@ struct AdvancedItemDelegate::ItemsLayout
 	QMap<int/*position*/, QVBoxLayout *> positionLayouts;
 	QMap<int/*position*/, QMap<int/*floor*/, QHBoxLayout *> > floorLayouts;
 };
-
-template <class T>
-void insertLayout(int AOrder, T *ALayout, const QMap<int, T *> &AChilds, QBoxLayout *AParent)
-{
-	QMap<int, T *>::const_iterator pos_it = AChilds.upperBound(AOrder);
-	T *before = pos_it!=AChilds.constEnd() ? pos_it.value() : NULL;
-	if (before != NULL)
-	{
-		for (int index = 0; index<AParent->count(); index++)
-		{
-			if (AParent->itemAt(index) == before)
-			{
-				AParent->insertLayout(index,ALayout);
-				break;
-			}
-		}
-	}
-	else
-	{
-		AParent->addLayout(ALayout);
-	}
-}
-
-QIcon::Mode getIconMode(QStyle::State AState)
-{
-	if (!(AState & QStyle::State_Enabled))
-		return QIcon::Disabled;
-	if (AState & QStyle::State_Selected)
-		return QIcon::Selected;
-	return QIcon::Normal;
-}
-
-QIcon::State getIconState(QStyle::State AState)
-{
-	return AState & QStyle::State_Open ? QIcon::On : QIcon::Off;
-}
-
-QString getSingleLineText(const QString &AText)
-{
-	QString text = AText;
-	text.replace('\n',' ');
-	return text.trimmed();
-}
-
-void drawLayoutItem(QPainter *APainter, const AdvancedDelegateLayoutItem *ALayoutItem)
-{
-	if (!ALayoutItem->geometry().isEmpty())
-	{
-		const AdvancedDelegateItem &item = ALayoutItem->delegateItem();
-		const QStyleOptionViewItemV4 &option = ALayoutItem->itemOption();
-		QStyle *style = option.widget ? option.widget->style() : QApplication::style();
-
-		APainter->save();
-		APainter->setClipRect(option.rect);
-
-		switch (item.d->kind)
-		{
-		case AdvancedDelegateItem::Null:
-			break;
-		case AdvancedDelegateItem::Stretch:
-			break;
-		case AdvancedDelegateItem::Branch:
-			{
-				QStyleOption brachOption(option);
-				style->proxy()->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
-			}
-		case AdvancedDelegateItem::CheckState:
-			{
-				style->proxy()->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &option, APainter, option.widget);
-				break;
-			}
-		case AdvancedDelegateItem::CustomWidget:
-			break;
-		default:
-			switch (item.d->data.type())
-			{
-			case QVariant::Pixmap:
-				{
-					QPixmap pixmap = qvariant_cast<QPixmap>(item.d->data);
-					style->drawItemPixmap(APainter,option.rect,Qt::AlignCenter,pixmap);
-					break;
-				}
-			case QVariant::Image:
-				{
-					QImage image = qvariant_cast<QImage>(item.d->data);
-					APainter->drawImage(option.rect.topLeft(),image);
-					break;
-				}
-			case QVariant::Icon:
-				{
-					QIcon icon = qvariant_cast<QIcon>(item.d->data);
-					QPixmap pixmap = style->generatedIconPixmap(getIconMode(option.state),icon.pixmap(option.decorationSize),&option);
-					style->drawItemPixmap(APainter,option.rect,Qt::AlignCenter,pixmap);
-					break;
-				}
-			default:
-				{
-					QString itemText = getSingleLineText(item.d->data.toString());
-					if (!itemText.isEmpty())
-					{
-						APainter->setFont(option.font);
-						int flags = option.direction | Qt::TextSingleLine;
-						QPalette::ColorRole role = option.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text;
-						QString text = option.fontMetrics.elidedText(itemText,option.textElideMode,option.rect.width(),flags);
-						style->proxy()->drawItemText(APainter,option.rect,flags,option.palette,(option.state & QStyle::State_Enabled)>0,text,role);
-					}
-					break;
-				}
-			}
-		}
-
-		APainter->restore();
-	}
-}
-
-void destroyLayoutRecursive(QLayout *ALayout)
-{
-	QLayoutItem *child;
-	while (child = ALayout->takeAt(0))
-	{
-		if (child->layout())
-			destroyLayoutRecursive(child->layout());
-		else
-			delete child;
-	}
-	delete ALayout;
-}
 
 AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelegate(AParent)
 {
@@ -354,7 +359,7 @@ void AdvancedItemDelegate::paint(QPainter *APainter, const QStyleOptionViewItem 
 	ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex),option);
 	layout->mainLayout->setGeometry(option.rect.adjusted(FMargins.left(),FMargins.top(),-FMargins.right(),-FMargins.bottom()));
 	for (QMap<int, AdvancedDelegateLayoutItem *>::const_iterator it=layout->items.constBegin(); it!=layout->items.constEnd(); ++it)
-		drawLayoutItem(APainter,it.value());
+		it.value()->drawItem(APainter);
 	destroyItemsLayout(layout);
 
 	drawFocusRect(APainter,option,option.rect);
@@ -401,7 +406,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 	AdvancedDelegateItem &checkItem = items[AdvancedDelegateItem::CheckStateId];
 	if (checkItem.d->kind == AdvancedDelegateItem::Null)
 	{
-		checkItem.d->kind = AdvancedDelegateItem::CheckState;
+		checkItem.d->kind = AdvancedDelegateItem::CheckBox;
 		checkItem.d->position = AdvancedDelegateItem::Left;
 		checkItem.d->order = 100;
 	}
@@ -426,7 +431,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 	}
 	displayItem.d->data = AIndex.data(Qt::DisplayRole);
 
-	AdvancedDelegateItem &stretch0Item = items[AdvancedDelegateItem::Stretch0Id];
+	AdvancedDelegateItem &stretch0Item = items[AdvancedDelegateItem::DisplayStretchId];
 	if (stretch0Item.d->kind == AdvancedDelegateItem::Null)
 	{
 		stretch0Item.d->kind = AdvancedDelegateItem::Stretch;
@@ -574,10 +579,10 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 {
 	QStyleOptionViewItemV4 option = AIndexOption;
 
-	if (AItem.d->kind == AdvancedDelegateItem::CheckState)
+	if (AItem.d->kind == AdvancedDelegateItem::CheckBox)
 	{
 		option.state = option.state & ~QStyle::State_HasFocus;
-		switch (option.checkState) 
+		switch (option.checkState)
 		{
 		case Qt::Unchecked:
 			option.state |= QStyle::State_Off;
@@ -661,7 +666,7 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 		{
 			return branchSize;
 		}
-	case AdvancedDelegateItem::CheckState:
+	case AdvancedDelegateItem::CheckBox:
 		{
 			int width = style->proxy()->pixelMetric(QStyle::PM_IndicatorWidth, &AItemOption, AItemOption.widget);
 			int height = style->proxy()->pixelMetric(QStyle::PM_IndicatorHeight, &AItemOption, AItemOption.widget);
@@ -721,7 +726,7 @@ bool AdvancedItemDelegate::isItemVisible(const AdvancedDelegateItem &AItem, cons
 		return false;
 	case AdvancedDelegateItem::Branch:
 		return (AItemOption.state & QStyle::State_Children)>0;
-	case AdvancedDelegateItem::CheckState:
+	case AdvancedDelegateItem::CheckBox:
 		return (AItemOption.features & QStyleOptionViewItemV4::HasCheckIndicator)>0;
 	case AdvancedDelegateItem::Stretch:
 		return true;
