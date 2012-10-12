@@ -2,7 +2,9 @@
 
 #include <QStyle>
 #include <QPainter>
+#include <QKeyEvent>
 #include <QMultiMap>
+#include <QMouseEvent>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QApplication>
@@ -98,11 +100,11 @@ public:
 	}
 	QRect geometry() const
 	{
-		return FGeometry;
+		return FOption.rect;
 	}
 	void setGeometry(const QRect &ARect)
 	{
-		FGeometry = ARect;
+		FOption.rect = ARect;
 	}
 	const AdvancedDelegateItem &delegateItem() const
 	{
@@ -113,9 +115,7 @@ public:
 		return FOption;
 	}
 private:
-	QRect FGeometry;
 	mutable QSize FSizeHint;
-private:
 	AdvancedDelegateItem FItem;
 	QStyleOptionViewItemV4 FOption;
 };
@@ -124,6 +124,7 @@ private:
 struct AdvancedItemDelegate::ItemsLayout
 {
 	QHBoxLayout *mainLayout;
+	QStyleOptionViewItemV4 indexOption;
 	QMap<int/*id*/, AdvancedDelegateLayoutItem *> items;
 	QMap<int/*position*/, QVBoxLayout *> positionLayouts;
 	QMap<int/*position*/, QMap<int/*floor*/, QHBoxLayout *> > floorLayouts;
@@ -165,6 +166,13 @@ QIcon::State getIconState(QStyle::State AState)
 	return AState & QStyle::State_Open ? QIcon::On : QIcon::Off;
 }
 
+QString getSingleLineText(const QString &AText)
+{
+	QString text = AText;
+	text.replace('\n',' ');
+	return text.trimmed();
+}
+
 void drawLayoutItem(QPainter *APainter, const AdvancedDelegateLayoutItem *ALayoutItem)
 {
 	if (!ALayoutItem->geometry().isEmpty())
@@ -174,7 +182,7 @@ void drawLayoutItem(QPainter *APainter, const AdvancedDelegateLayoutItem *ALayou
 		QStyle *style = option.widget ? option.widget->style() : QApplication::style();
 
 		APainter->save();
-		APainter->setClipRect(ALayoutItem->geometry());
+		APainter->setClipRect(option.rect);
 
 		switch (item.d->kind)
 		{
@@ -185,11 +193,13 @@ void drawLayoutItem(QPainter *APainter, const AdvancedDelegateLayoutItem *ALayou
 		case AdvancedDelegateItem::Branch:
 			{
 				QStyleOption brachOption(option);
-				brachOption.rect = ALayoutItem->geometry();
-				style->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
+				style->proxy()->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
 			}
 		case AdvancedDelegateItem::CheckState:
-			break;
+			{
+				style->proxy()->drawPrimitive(QStyle::PE_IndicatorViewItemCheck, &option, APainter, option.widget);
+				break;
+			}
 		case AdvancedDelegateItem::CustomWidget:
 			break;
 		default:
@@ -198,29 +208,33 @@ void drawLayoutItem(QPainter *APainter, const AdvancedDelegateLayoutItem *ALayou
 			case QVariant::Pixmap:
 				{
 					QPixmap pixmap = qvariant_cast<QPixmap>(item.d->data);
-					style->drawItemPixmap(APainter,ALayoutItem->geometry(),Qt::AlignCenter,pixmap);
+					style->drawItemPixmap(APainter,option.rect,Qt::AlignCenter,pixmap);
 					break;
 				}
 			case QVariant::Image:
 				{
 					QImage image = qvariant_cast<QImage>(item.d->data);
-					APainter->drawImage(ALayoutItem->geometry().topLeft(),image);
+					APainter->drawImage(option.rect.topLeft(),image);
 					break;
 				}
 			case QVariant::Icon:
 				{
 					QIcon icon = qvariant_cast<QIcon>(item.d->data);
 					QPixmap pixmap = style->generatedIconPixmap(getIconMode(option.state),icon.pixmap(option.decorationSize),&option);
-					style->drawItemPixmap(APainter,ALayoutItem->geometry(),Qt::AlignCenter,pixmap);
+					style->drawItemPixmap(APainter,option.rect,Qt::AlignCenter,pixmap);
 					break;
 				}
 			default:
 				{
-					APainter->setFont(option.font);
-					int flags = option.direction | Qt::TextSingleLine;
-					QPalette::ColorRole role = option.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text;
-					QString text = option.fontMetrics.elidedText(item.d->data.toString(),option.textElideMode,ALayoutItem->geometry().width(),flags);
-					style->drawItemText(APainter,ALayoutItem->geometry(),flags,option.palette,(option.state & QStyle::State_Enabled)>0,text,role);
+					QString itemText = getSingleLineText(item.d->data.toString());
+					if (!itemText.isEmpty())
+					{
+						APainter->setFont(option.font);
+						int flags = option.direction | Qt::TextSingleLine;
+						QPalette::ColorRole role = option.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text;
+						QString text = option.fontMetrics.elidedText(itemText,option.textElideMode,option.rect.width(),flags);
+						style->proxy()->drawItemText(APainter,option.rect,flags,option.palette,(option.state & QStyle::State_Enabled)>0,text,role);
+					}
 					break;
 				}
 			}
@@ -248,6 +262,7 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 	FItemsRole = Qt::UserRole+1000;
 	FVerticalSpacing = -1;
 	FHorizontalSpacing = -1;
+	FFocusRectVisible = false;
 	FDefaultBranchEnabled = false;
 	FMargins = QMargins(1,1,1,1);
 }
@@ -287,14 +302,14 @@ void AdvancedItemDelegate::setHorizontalSpacing(int ASpacing)
 	FHorizontalSpacing = ASpacing;
 }
 
-QMargins AdvancedItemDelegate::contentsMargins() const
+bool AdvancedItemDelegate::focusRectVisible() const
 {
-	return FMargins;
+	return FFocusRectVisible;
 }
 
-void AdvancedItemDelegate::setContentsMargings(const QMargins &AMargins)
+void AdvancedItemDelegate::setFocusRectVisible(bool AVisible) 
 {
-	FMargins = AMargins;
+	FFocusRectVisible = AVisible;
 }
 
 bool AdvancedItemDelegate::defaultBranchItemEnabled() const
@@ -307,12 +322,22 @@ void AdvancedItemDelegate::setDefaultBranchItemEnabled(bool AEnabled)
 	FDefaultBranchEnabled = AEnabled;
 }
 
+QMargins AdvancedItemDelegate::contentsMargins() const
+{
+	return FMargins;
+}
+
+void AdvancedItemDelegate::setContentsMargings(const QMargins &AMargins)
+{
+	FMargins = AMargins;
+}
+
 void AdvancedItemDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
 	QStyleOptionViewItemV4 option = indexStyleOption(AOption,AIndex);
 
-	QStyle *style = option.widget ? option.widget->style() : QApplication::style();
 #if defined(Q_WS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
+	QStyle *style = option.widget ? option.widget->style() : QApplication::style();
 	if (qobject_cast<QWindowsVistaStyle *>(style))
 	{
 		option.palette.setColor(QPalette::All, QPalette::HighlightedText, option.palette.color(QPalette::Active, QPalette::Text));
@@ -332,7 +357,7 @@ void AdvancedItemDelegate::paint(QPainter *APainter, const QStyleOptionViewItem 
 		drawLayoutItem(APainter,it.value());
 	destroyItemsLayout(layout);
 
-	//drawFocusRect(APainter,option,option.rect);
+	drawFocusRect(APainter,option,option.rect);
 
 	APainter->restore();
 }
@@ -431,10 +456,11 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 {
 	QStyle *style = AIndexOption.widget ? AIndexOption.widget->style() : QApplication::style();
 
-	const int vSpacing = FVerticalSpacing<0 ? style->pixelMetric(QStyle::PM_LayoutVerticalSpacing) : FVerticalSpacing;
-	const int hSpacing = FHorizontalSpacing<0 ? style->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) : FHorizontalSpacing;
+	const int vSpacing = FVerticalSpacing<0 ? style->proxy()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) : FVerticalSpacing;
+	const int hSpacing = FHorizontalSpacing<0 ? style->proxy()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) : FHorizontalSpacing;
 
 	ItemsLayout *layout = new ItemsLayout;
+	layout->indexOption = AIndexOption;
 
 	layout->mainLayout = new QHBoxLayout;
 	layout->mainLayout->setSpacing(hSpacing);
@@ -491,9 +517,79 @@ void AdvancedItemDelegate::destroyItemsLayout(ItemsLayout *ALayout) const
 	delete ALayout;
 }
 
+QRect AdvancedItemDelegate::itemRect(int AItemId, const ItemsLayout *ALayout, const QRect &AGeometry) const
+{
+	QRect rect;
+	if (ALayout->items.contains(AItemId))
+	{
+		if (ALayout->mainLayout->geometry() != AGeometry)
+			ALayout->mainLayout->setGeometry(AGeometry.adjusted(FMargins.left(),FMargins.top(),-FMargins.right(),-FMargins.bottom()));
+		rect = ALayout->items.value(AItemId)->geometry();
+	}
+	return rect;
+}
+
+QRect AdvancedItemDelegate::itemRect(int AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	QRect rect;
+	if (AIndex.isValid() && !AOption.rect.isEmpty())
+	{
+		QStyleOptionViewItemV4 option = indexStyleOption(AOption,AIndex);
+		ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex),option);
+		rect = itemRect(AItemId,layout,option.rect);
+		destroyItemsLayout(layout);
+	}
+	return rect;
+}
+int AdvancedItemDelegate::itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const
+{
+	if (AGeometry.contains(APoint))
+	{
+		if (ALayout->mainLayout->geometry() != AGeometry)
+			ALayout->mainLayout->setGeometry(AGeometry.adjusted(FMargins.left(),FMargins.top(),-FMargins.right(),-FMargins.bottom()));
+
+		for (QMap<int,AdvancedDelegateLayoutItem *>::const_iterator it=ALayout->items.constBegin(); it!=ALayout->items.constEnd(); ++it)
+		{
+			if (it.value()->geometry().contains(APoint))
+				return it.key();
+		}
+	}
+	return AdvancedDelegateItem::NullId;
+}
+
+int AdvancedItemDelegate::itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	int itemId = AdvancedDelegateItem::NullId;
+	if (AIndex.isValid() && !AOption.rect.isEmpty())
+	{
+		QStyleOptionViewItemV4 option = indexStyleOption(AOption,AIndex);
+		ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex),option);
+		itemId = itemAt(APoint,layout,option.rect);
+		destroyItemsLayout(layout);
+	}
+	return itemId;
+}
+
 QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption)
 {
 	QStyleOptionViewItemV4 option = AIndexOption;
+
+	if (AItem.d->kind == AdvancedDelegateItem::CheckState)
+	{
+		option.state = option.state & ~QStyle::State_HasFocus;
+		switch (option.checkState) 
+		{
+		case Qt::Unchecked:
+			option.state |= QStyle::State_Off;
+			break;
+		case Qt::PartiallyChecked:
+			option.state |= QStyle::State_NoChange;
+			break;
+		case Qt::Checked:
+			option.state |= QStyle::State_On;
+			break;
+		}
+	}
 
 	if (!AItem.d->hints.isEmpty())
 	{
@@ -567,9 +663,9 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 		}
 	case AdvancedDelegateItem::CheckState:
 		{
-			QStyleOptionButton buttonStyle;
-			buttonStyle.QStyleOption::operator=(AItemOption);
-			return style->sizeFromContents(QStyle::CT_CheckBox,&buttonStyle,QSize(),AItemOption.widget);
+			int width = style->proxy()->pixelMetric(QStyle::PM_IndicatorWidth, &AItemOption, AItemOption.widget);
+			int height = style->proxy()->pixelMetric(QStyle::PM_IndicatorHeight, &AItemOption, AItemOption.widget);
+			return QSize(width,height);
 		}
 	case AdvancedDelegateItem::CustomWidget:
 		{
@@ -601,9 +697,9 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 			}
 		default:
 			{
-				QString text = AItem.d->data.toString();
-				if (!text.isEmpty())
-					return AItemOption.fontMetrics.size(AItemOption.direction|Qt::TextSingleLine,text);
+				QString itemText = getSingleLineText(AItem.d->data.toString());
+				if (!itemText.isEmpty())
+					return AItemOption.fontMetrics.size(AItemOption.direction|Qt::TextSingleLine,itemText);
 				break;
 			}
 		}
@@ -639,21 +735,69 @@ bool AdvancedItemDelegate::isItemVisible(const AdvancedDelegateItem &AItem, cons
 void AdvancedItemDelegate::drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption) const
 {
 	QStyle *style = AIndexOption.widget ? AIndexOption.widget->style() : QApplication::style();
-	style->drawPrimitive(QStyle::PE_PanelItemViewItem,&AIndexOption,APainter,AIndexOption.widget);
+	style->proxy()->drawPrimitive(QStyle::PE_PanelItemViewItem,&AIndexOption,APainter,AIndexOption.widget);
 }
 
 void AdvancedItemDelegate::drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const
 {
-	if ((AIndexOption.state & QStyle::State_HasFocus) && ARect.isValid())
+	Q_UNUSED(ARect);
+	if (FFocusRectVisible && (AIndexOption.state & QStyle::State_HasFocus)>0)
 	{
+		QStyle *style = AIndexOption.widget ? AIndexOption.widget->style() : QApplication::style();
+
 		QStyleOptionFocusRect focusOption;
 		focusOption.QStyleOption::operator=(AIndexOption);
-		focusOption.rect = ARect;
-		focusOption.state |= QStyle::State_KeyboardFocusChange;
+		focusOption.rect = style->proxy()->subElementRect(QStyle::SE_ItemViewItemFocusRect, &AIndexOption, AIndexOption.widget);
+		focusOption.state |= QStyle::State_KeyboardFocusChange|QStyle::State_Item;
+
 		QPalette::ColorGroup cg = (AIndexOption.state & QStyle::State_Enabled) ? QPalette::Normal : QPalette::Disabled;
 		QPalette::ColorRole cr = (AIndexOption.state & QStyle::State_Selected) ? QPalette::Highlight : QPalette::Window;
 		focusOption.backgroundColor = AIndexOption.palette.color(cg,cr);
-		QStyle *style = AIndexOption.widget ? AIndexOption.widget->style() : QApplication::style();
-		style->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, APainter);
+
+		style->proxy()->drawPrimitive(QStyle::PE_FrameFocusRect, &focusOption, APainter);
 	}
+}
+
+bool AdvancedItemDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex)
+{
+	Qt::ItemFlags flags = AModel->flags(AIndex);
+	if ((flags & Qt::ItemIsUserCheckable)==0 || (AOption.state & QStyle::State_Enabled)==0 || (flags & Qt::ItemIsEnabled)==0)
+		return false;
+
+	QVariant value = AIndex.data(Qt::CheckStateRole);
+	if (!value.isValid())
+		return false;
+
+	if ((AEvent->type()==QEvent::MouseButtonRelease) || (AEvent->type()==QEvent::MouseButtonDblClick) || (AEvent->type()==QEvent::MouseButtonPress)) 
+	{
+		QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(AEvent);
+		if (mouseEvent->button()!=Qt::LeftButton)
+			return false;
+
+		QRect checkRect = itemRect(AdvancedDelegateItem::CheckStateId,AOption,AIndex);
+		if (!checkRect.contains(mouseEvent->pos()))
+			return false;
+		else if ((AEvent->type()==QEvent::MouseButtonPress) || (AEvent->type()==QEvent::MouseButtonDblClick))
+			return true;
+	} 
+	else if (AEvent->type() == QEvent::KeyPress) 
+	{
+		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
+		if (keyEvent->key()!=Qt::Key_Space && keyEvent->key()!=Qt::Key_Select)
+			return false;
+	} 
+	else 
+	{
+		return false;
+	}
+
+	Qt::CheckState state;
+	if ((flags & Qt::ItemIsTristate) > 0)
+		state = static_cast<Qt::CheckState>((value.toInt()+1) % 3);
+	else if (value.toInt() == Qt::Unchecked)
+		state = Qt::Checked;
+	else
+		state =  Qt::Unchecked;
+
+	return AModel->setData(AIndex, state, Qt::CheckStateRole);
 }

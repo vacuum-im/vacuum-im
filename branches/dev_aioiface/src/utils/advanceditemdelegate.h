@@ -97,10 +97,12 @@ public:
 	void setVertialSpacing(int ASpacing);
 	int horizontalSpacing() const;
 	void setHorizontalSpacing(int ASpacing);
-	QMargins contentsMargins() const;
-	void setContentsMargings(const QMargins &AMargins);
+	bool focusRectVisible() const;
+	void setFocusRectVisible(bool AVisible);
 	bool defaultBranchItemEnabled() const;
 	void setDefaultBranchItemEnabled(bool AEnabled);
+	QMargins contentsMargins() const;
+	void setContentsMargings(const QMargins &AMargins);
 	//QAbstractItemDelegate
 	virtual void paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	virtual QSize sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
@@ -110,16 +112,24 @@ public:
 	ItemsLayout *createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItemV4 &AIndexOption) const;
 	void destroyItemsLayout(ItemsLayout *ALayout) const;
 public:
+	QRect itemRect(int AItemId, const ItemsLayout *ALayout, const QRect &AGeometry) const;
+	QRect itemRect(int AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	int itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
+	int itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+public:
 	static QStyleOptionViewItemV4 itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption);
 	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 protected:
 	void drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption) const;
 	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const;
+protected:
+	bool editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex);
 private:
 	int FItemsRole;
 	int FVerticalSpacing;
 	int FHorizontalSpacing;
+	bool FFocusRectVisible;
 	bool FDefaultBranchEnabled;
 	QMargins FMargins;
 };
