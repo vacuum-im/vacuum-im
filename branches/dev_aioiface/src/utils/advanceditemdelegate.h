@@ -6,9 +6,7 @@
 #include <QMargins>
 #include <QVariant>
 #include <QSizePolicy>
-#include <QLayoutItem>
 #include <QStyleOption>
-#include <QSharedDataPointer>
 #include <QStyledItemDelegate>
 #include "utilsexport.h"
 
@@ -34,9 +32,11 @@ struct AdvancedDelegateItem
 		CustomWidget
 	};
 	enum Position {
-		Left,
-		Middle,
-		Right
+		Top,
+		MiddleLeft,
+		MiddleCenter,
+		MiddleRight,
+		Bottom
 	};
 	enum Hint {
 		SizeHint,
@@ -66,7 +66,6 @@ struct AdvancedDelegateItem
 		QVariant data;
 		QWidget *widget;
 		QSizePolicy sizePolicy;
-		Qt::Alignment alignment;
 		QStyle::State showStates;
 		QStyle::State hideStates;
 		QMap<int,QVariant> hints;
@@ -76,9 +75,18 @@ struct AdvancedDelegateItem
 	AdvancedDelegateItem(const AdvancedDelegateItem &AOther);
 	~AdvancedDelegateItem();
 	AdvancedDelegateItem &operator =(const AdvancedDelegateItem &AOther); 
-	bool operator <(const AdvancedDelegateItem &AItem) const;
 
 	AdvancedDelegateItemData *d;
+};
+
+static const struct {int id; int position; int floor; int order;} AdvancedDelegateItemDefaults[] =
+{
+	{	AdvancedDelegateItem::NullId,           AdvancedDelegateItem::MiddleCenter, 500, 0     },
+	{	AdvancedDelegateItem::BranchId,         AdvancedDelegateItem::MiddleLeft,   500, 10    },
+	{	AdvancedDelegateItem::CheckStateId,     AdvancedDelegateItem::MiddleLeft,   500, 100   },
+	{	AdvancedDelegateItem::DecorationId,     AdvancedDelegateItem::MiddleLeft,   500, 500   },
+	{	AdvancedDelegateItem::DisplayId,        AdvancedDelegateItem::MiddleCenter, 500, 500   },
+	{	AdvancedDelegateItem::DisplayStretchId, AdvancedDelegateItem::MiddleCenter, 500, 10000 },
 };
 
 typedef QMap<int, AdvancedDelegateItem> AdvancedDelegateItems;

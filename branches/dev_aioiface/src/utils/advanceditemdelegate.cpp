@@ -4,33 +4,12 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QMultiMap>
+#include <QLayoutItem>
 #include <QMouseEvent>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QWindowsVistaStyle>
-
-template <class T>
-void insertLayout(int AOrder, T *ALayout, const QMap<int, T *> &AChilds, QBoxLayout *AParent)
-{
-	typename QMap<int, T *>::const_iterator pos_it = AChilds.upperBound(AOrder);
-	T *before = pos_it!=AChilds.constEnd() ? pos_it.value() : NULL;
-	if (before != NULL)
-	{
-		for (int index = 0; index<AParent->count(); index++)
-		{
-			if (AParent->itemAt(index) == before)
-			{
-				AParent->insertLayout(index,ALayout);
-				break;
-			}
-		}
-	}
-	else
-	{
-		AParent->addLayout(ALayout);
-	}
-}
 
 void destroyLayoutRecursive(QLayout *ALayout)
 {
@@ -52,6 +31,13 @@ QString getSingleLineText(const QString &AText)
 	return text.trimmed();
 }
 
+inline void setItemDefaults(int AItemId, AdvancedDelegateItem &AItem)
+{
+	AItem.d->position = AdvancedDelegateItemDefaults[AItemId].position;
+	AItem.d->floor = AdvancedDelegateItemDefaults[AItemId].floor;
+	AItem.d->order = AdvancedDelegateItemDefaults[AItemId].order;
+}
+
 /*********************
 	AdvancedDelegateItem
 **********************/
@@ -60,14 +46,13 @@ AdvancedDelegateItem::AdvancedDelegateItem()
 	d = new AdvancedDelegateItemData;
 	d->refs = 1;
 	d->kind = Null;
-	d->order = 0;
-	d->floor = 500;
-	d->position = Middle;
+	d->order = AdvancedDelegateItemDefaults[NullId].order;
+	d->floor = AdvancedDelegateItemDefaults[NullId].floor;
+	d->position = AdvancedDelegateItemDefaults[NullId].position;
 	d->flags = 0;
 	d->showStates = 0;
 	d->hideStates = 0;
 	d->widget = NULL;
-	d->alignment = Qt::AlignLeft;
 }
 
 AdvancedDelegateItem::AdvancedDelegateItem(const AdvancedDelegateItem &AOther)
@@ -94,11 +79,6 @@ AdvancedDelegateItem &AdvancedDelegateItem::operator=(const AdvancedDelegateItem
 	return *this;
 }
 
-bool AdvancedDelegateItem::operator <(const AdvancedDelegateItem &AItem) const 
-{
-	return d->order < AItem.d->order;
-}
-
 /***************************
 	AdvancedDelegateLayoutItem
 ****************************/
@@ -107,7 +87,7 @@ class AdvancedDelegateLayoutItem :
 {
 public:
 	AdvancedDelegateLayoutItem(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AOption) : 
-			QLayoutItem(AItem.d->alignment), FItem(AItem), FOption(AOption) 
+			QLayoutItem(Qt::AlignCenter), FItem(AItem), FOption(AOption) 
 	{
 
 	}
@@ -170,7 +150,7 @@ public:
 		case QVariant::Pixmap:
 			{
 				QPixmap pixmap = qvariant_cast<QPixmap>(AValue);
-				style->drawItemPixmap(APainter,FOption.rect,Qt::AlignCenter,pixmap);
+				style->proxy()->drawItemPixmap(APainter,FOption.rect,Qt::AlignCenter,pixmap);
 				break;
 			}
 		case QVariant::Image:
@@ -189,7 +169,7 @@ public:
 				
 				QIcon icon = qvariant_cast<QIcon>(AValue);
 				QPixmap pixmap = style->generatedIconPixmap(mode,icon.pixmap(FOption.decorationSize),&FOption);
-				style->drawItemPixmap(APainter,FOption.rect,FOption.decorationAlignment,pixmap);
+				style->proxy()->drawItemPixmap(APainter,FOption.rect,FOption.decorationAlignment,pixmap);
 				break;
 			}
 		default:
@@ -198,7 +178,7 @@ public:
 				if (!itemText.isEmpty())
 				{
 					APainter->setFont(FOption.font);
-					int flags = FOption.direction | Qt::TextSingleLine;
+					int flags = FOption.displayAlignment | Qt::TextSingleLine;
 					QPalette::ColorRole role = FOption.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text;
 					QString text = FOption.fontMetrics.elidedText(itemText,FOption.textElideMode,FOption.rect.width(),flags);
 					style->proxy()->drawItemText(APainter,FOption.rect,flags,FOption.palette,(FOption.state & QStyle::State_Enabled)>0,text,role);
@@ -255,11 +235,12 @@ private:
 **********************/
 struct AdvancedItemDelegate::ItemsLayout
 {
-	QHBoxLayout *mainLayout;
+	QBoxLayout *mainLayout;
+	QBoxLayout *middleLayout;
 	QStyleOptionViewItemV4 indexOption;
 	QMap<int/*id*/, AdvancedDelegateLayoutItem *> items;
-	QMap<int/*position*/, QVBoxLayout *> positionLayouts;
-	QMap<int/*position*/, QMap<int/*floor*/, QHBoxLayout *> > floorLayouts;
+	QMap<int/*position*/, QBoxLayout *> positionLayouts;
+	QMap<int/*position*/, QMap<int/*floor*/, QBoxLayout *> > floorLayouts;
 };
 
 AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelegate(AParent)
@@ -398,8 +379,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		if (branchItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			branchItem.d->kind = AdvancedDelegateItem::Branch;
-			branchItem.d->position = AdvancedDelegateItem::Left;
-			branchItem.d->order = 100;
+			setItemDefaults(AdvancedDelegateItem::BranchId,branchItem);
 		}
 	}
 
@@ -407,8 +387,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 	if (checkItem.d->kind == AdvancedDelegateItem::Null)
 	{
 		checkItem.d->kind = AdvancedDelegateItem::CheckBox;
-		checkItem.d->position = AdvancedDelegateItem::Left;
-		checkItem.d->order = 100;
+		setItemDefaults(AdvancedDelegateItem::CheckStateId,checkItem);
 	}
 	checkItem.d->data = AIndex.data(Qt::CheckStateRole);
 
@@ -416,8 +395,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 	if (decorationItem.d->kind == AdvancedDelegateItem::Null)
 	{
 		decorationItem.d->kind = AdvancedDelegateItem::Decoration;
-		decorationItem.d->position = AdvancedDelegateItem::Left;
-		decorationItem.d->order = 500;
+		setItemDefaults(AdvancedDelegateItem::DecorationId,decorationItem);
 	}
 	decorationItem.d->data = AIndex.data(Qt::DecorationRole);
 
@@ -425,19 +403,16 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 	if (displayItem.d->kind == AdvancedDelegateItem::Null)
 	{
 		displayItem.d->kind = AdvancedDelegateItem::Display;
-		displayItem.d->position = AdvancedDelegateItem::Middle;
-		displayItem.d->order = 500;
-		displayItem.d->sizePolicy = QSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+		setItemDefaults(AdvancedDelegateItem::DisplayId,displayItem);
 	}
 	displayItem.d->data = AIndex.data(Qt::DisplayRole);
 
-	AdvancedDelegateItem &stretch0Item = items[AdvancedDelegateItem::DisplayStretchId];
-	if (stretch0Item.d->kind == AdvancedDelegateItem::Null)
+	AdvancedDelegateItem &stretchItem = items[AdvancedDelegateItem::DisplayStretchId];
+	if (stretchItem.d->kind == AdvancedDelegateItem::Null)
 	{
-		stretch0Item.d->kind = AdvancedDelegateItem::Stretch;
-		stretch0Item.d->position = AdvancedDelegateItem::Middle;
-		stretch0Item.d->order = 10000;
-		stretch0Item.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+		stretchItem.d->kind = AdvancedDelegateItem::Stretch;
+		setItemDefaults(AdvancedDelegateItem::DisplayStretchId,stretchItem);
+		stretchItem.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
 	}
 
 	for (AdvancedDelegateItems::iterator it = items.begin(); it!=items.end(); ++it)
@@ -461,14 +436,15 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 {
 	QStyle *style = AIndexOption.widget ? AIndexOption.widget->style() : QApplication::style();
 
-	const int vSpacing = FVerticalSpacing<0 ? style->proxy()->pixelMetric(QStyle::PM_LayoutVerticalSpacing) : FVerticalSpacing;
-	const int hSpacing = FHorizontalSpacing<0 ? style->proxy()->pixelMetric(QStyle::PM_LayoutHorizontalSpacing) : FHorizontalSpacing;
+	const int vSpacing = FVerticalSpacing<0 ? style->proxy()->pixelMetric(QStyle::PM_FocusFrameVMargin)+1 : FVerticalSpacing;
+	const int hSpacing = FHorizontalSpacing<0 ? style->proxy()->pixelMetric(QStyle::PM_FocusFrameHMargin)+1 : FHorizontalSpacing;
 
 	ItemsLayout *layout = new ItemsLayout;
+	layout->middleLayout = NULL;
 	layout->indexOption = AIndexOption;
 
-	layout->mainLayout = new QHBoxLayout;
-	layout->mainLayout->setSpacing(hSpacing);
+	layout->mainLayout = new QVBoxLayout;
+	layout->mainLayout->setSpacing(vSpacing);
 
 	QMap<int, QMap<int, QMultiMap<int, AdvancedDelegateLayoutItem *> > > orderedItems;
 	for (AdvancedDelegateItems::const_iterator it = AItems.constBegin(); it!=AItems.constEnd(); ++it)
@@ -476,22 +452,20 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 		QStyleOptionViewItemV4 option = itemStyleOption(it.value(),AIndexOption);
 		if (isItemVisible(it.value(),option))
 		{
-			QMap<int, QVBoxLayout *> &posLayouts = layout->positionLayouts;
-			QVBoxLayout *&posLayout = posLayouts[it->d->position];
+			QMap<int, QBoxLayout *> &posLayouts = layout->positionLayouts;
+			QBoxLayout *&posLayout = posLayouts[it->d->position];
 			if (posLayout == NULL)
 			{
 				posLayout = new QVBoxLayout;
 				posLayout->setSpacing(vSpacing);
-				insertLayout<QVBoxLayout>(it->d->position,posLayout,posLayouts,layout->mainLayout);
 			}
 
-			QMap<int, QHBoxLayout *> &floorLayouts = layout->floorLayouts[it->d->position];
-			QHBoxLayout *&floorLayout = floorLayouts[it->d->floor];
+			QMap<int, QBoxLayout *> &floorLayouts = layout->floorLayouts[it->d->position];
+			QBoxLayout *&floorLayout = floorLayouts[it->d->floor];
 			if (floorLayout == NULL)
 			{
 				floorLayout = new QHBoxLayout;
 				floorLayout->setSpacing(hSpacing);
-				insertLayout<QHBoxLayout>(it->d->floor,floorLayout,floorLayouts,posLayout);
 			}
 
 			AdvancedDelegateLayoutItem *item = new AdvancedDelegateLayoutItem(it.value(),option);
@@ -502,10 +476,28 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 
 	for (QMap<int, QMap<int, QMultiMap<int, AdvancedDelegateLayoutItem *> > >::const_iterator pos_it=orderedItems.constBegin(); pos_it!=orderedItems.constEnd(); ++pos_it)
 	{
-		QMap<int, QHBoxLayout *> &floorLayouts = layout->floorLayouts[pos_it.key()];
+		QBoxLayout *posLayout = layout->positionLayouts.value(pos_it.key());
+
+		if (pos_it.key()>=AdvancedDelegateItem::MiddleLeft && pos_it.key()<=AdvancedDelegateItem::MiddleRight)
+		{
+			if (layout->middleLayout == NULL)
+			{
+				layout->middleLayout = new QHBoxLayout;
+				layout->middleLayout->setSpacing(hSpacing);
+				layout->mainLayout->addLayout(layout->middleLayout);
+			}
+			layout->middleLayout->addLayout(posLayout);
+		}
+		else
+		{
+			layout->mainLayout->addLayout(posLayout);
+		}
+
+		QMap<int, QBoxLayout *> &floorLayouts = layout->floorLayouts[pos_it.key()];
 		for (QMap<int, QMultiMap<int, AdvancedDelegateLayoutItem *> >::const_iterator floor_it=pos_it->constBegin(); floor_it!=pos_it->constEnd(); ++ floor_it)
 		{
-			QHBoxLayout *floorLayout = floorLayouts[floor_it.key()];
+			QBoxLayout *floorLayout = floorLayouts.value(floor_it.key());
+			posLayout->addLayout(floorLayout);
 			for (QMultiMap<int, AdvancedDelegateLayoutItem *>::const_iterator order_it=floor_it->constBegin(); order_it!=floor_it->constEnd(); ++order_it)
 			{
 				floorLayout->addItem(order_it.value());
@@ -579,9 +571,13 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 {
 	QStyleOptionViewItemV4 option = AIndexOption;
 
-	if (AItem.d->kind == AdvancedDelegateItem::CheckBox)
+	if (AItem.d->kind == AdvancedDelegateItem::Branch)
 	{
-		option.state = option.state & ~QStyle::State_HasFocus;
+		option.state &= ~QStyle::State_Sibling;
+	}
+	else if (AItem.d->kind == AdvancedDelegateItem::CheckBox)
+	{
+		option.state &= ~QStyle::State_HasFocus;
 		switch (option.checkState)
 		{
 		case Qt::Unchecked:
@@ -641,9 +637,9 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 		hint = AItem.d->hints.value(AdvancedDelegateItem::TextAlignment);
 		if (!hint.isNull())
 			option.displayAlignment = (Qt::Alignment)hint.toInt();
-	}
 
-	option.fontMetrics = QFontMetrics(option.font);
+		option.fontMetrics = QFontMetrics(option.font);
+	}
 
 	return option;
 }
