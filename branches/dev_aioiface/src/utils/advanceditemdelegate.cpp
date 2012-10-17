@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QKeyEvent>
 #include <QMultiMap>
+#include <QDateTime>
 #include <QLayoutItem>
 #include <QMouseEvent>
 #include <QHBoxLayout>
@@ -11,6 +12,12 @@
 #include <QApplication>
 #include <QItemEditorFactory>
 #include <QWindowsVistaStyle>
+
+const qreal BlinkHideSteps[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.0 };
+const int BlinkStepsCount = sizeof(BlinkHideSteps)/sizeof(BlinkHideSteps[0]);
+const int BlinkStepsTime = 1000;
+#define BLINK_STEP ((QDateTime::currentMSecsSinceEpoch() % BlinkStepsTime) * BlinkStepsCount / BlinkStepsTime)
 
 void destroyLayoutRecursive(QLayout *ALayout)
 {
@@ -198,10 +205,15 @@ public:
 		{
 			APainter->save();
 			APainter->setClipRect(FOption.rect);
-	
+
 			if (FItem.d->hints.contains(AdvancedDelegateItem::Opacity))
 				APainter->setOpacity(FItem.d->hints.value(AdvancedDelegateItem::Opacity).toReal());
-	
+			
+			if (FItem.d->flags & AdvancedDelegateItem::BlinkHide)
+				APainter->setOpacity(APainter->opacity() * BlinkHideSteps[BLINK_STEP]);
+			else if (FItem.d->flags & AdvancedDelegateItem::BlinkFade)
+				APainter->setOpacity(APainter->opacity() * BlinkFadeSteps[BLINK_STEP]);
+
 			switch (FItem.d->kind)
 			{
 			case AdvancedDelegateItem::Null:
@@ -285,6 +297,10 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 
 	FEditProxy = NULL;
 	FEditItemId = AdvancedDelegateItem::NullId;
+	
+	FBlinkTimer.setSingleShot(false);
+	FBlinkTimer.setInterval(BlinkStepsTime/BlinkStepsCount);
+	connect(&FBlinkTimer,SIGNAL(timeout()),SIGNAL(updateBlinkItems()));
 }
 
 AdvancedItemDelegate::~AdvancedItemDelegate()

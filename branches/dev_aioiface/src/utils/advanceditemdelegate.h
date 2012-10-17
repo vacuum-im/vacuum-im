@@ -2,6 +2,7 @@
 #define ADVANCEDITEMDELEGATE_H
 
 #include <QMap>
+#include <QTimer>
 #include <QWidget>
 #include <QMargins>
 #include <QVariant>
@@ -56,7 +57,8 @@ struct AdvancedDelegateItem
 		Opacity
 	};
 	enum Flag {
-		Blink              =0x00000001
+		BlinkHide          =0x00000001,
+		BlinkFade          =0x00000002
 	};
 	struct AdvancedDelegateItemData {
 		int refs;
@@ -84,12 +86,12 @@ typedef QMap<int, AdvancedDelegateItem> AdvancedDelegateItems;
 
 static const struct {int id; int position; int floor; int order;} AdvancedDelegateItemDefaults[] =
 {
-	{	AdvancedDelegateItem::NullId,           AdvancedDelegateItem::MiddleCenter, 500, 0     },
-	{	AdvancedDelegateItem::BranchId,         AdvancedDelegateItem::MiddleLeft,   500, 10    },
-	{	AdvancedDelegateItem::CheckStateId,     AdvancedDelegateItem::MiddleLeft,   500, 100   },
-	{	AdvancedDelegateItem::DecorationId,     AdvancedDelegateItem::MiddleLeft,   500, 500   },
-	{	AdvancedDelegateItem::DisplayId,        AdvancedDelegateItem::MiddleCenter, 500, 500   },
-	{	AdvancedDelegateItem::DisplayStretchId, AdvancedDelegateItem::MiddleCenter, 500, 10000 },
+	{ AdvancedDelegateItem::NullId,           AdvancedDelegateItem::MiddleCenter, 500, 0     },
+	{ AdvancedDelegateItem::BranchId,         AdvancedDelegateItem::MiddleLeft,   500, 10    },
+	{ AdvancedDelegateItem::CheckStateId,     AdvancedDelegateItem::MiddleLeft,   500, 100   },
+	{ AdvancedDelegateItem::DecorationId,     AdvancedDelegateItem::MiddleLeft,   500, 500   },
+	{ AdvancedDelegateItem::DisplayId,        AdvancedDelegateItem::MiddleCenter, 500, 500   },
+	{ AdvancedDelegateItem::DisplayStretchId, AdvancedDelegateItem::MiddleCenter, 500, 10000 },
 };
 
 class AdvancedItemDelegate;
@@ -149,6 +151,8 @@ public:
 public:
 	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
+signals:
+	void updateBlinkItems();
 protected:
 	void drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption) const;
 	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const;
@@ -161,6 +165,7 @@ private:
 	bool FFocusRectVisible;
 	bool FDefaultBranchEnabled;
 	QMargins FMargins;
+	QTimer FBlinkTimer;
 private:
 	int FEditItemId;
 	AdvancedDelegateEditProxy *FEditProxy;
