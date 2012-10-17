@@ -71,7 +71,7 @@ struct AdvancedDelegateItem
 		QMap<int,QVariant> hints;
 	};
 
-	AdvancedDelegateItem();
+	AdvancedDelegateItem(int ADefaultsId = NullId);
 	AdvancedDelegateItem(const AdvancedDelegateItem &AOther);
 	~AdvancedDelegateItem();
 	AdvancedDelegateItem &operator =(const AdvancedDelegateItem &AOther); 
@@ -90,6 +90,15 @@ static const struct {int id; int position; int floor; int order;} AdvancedDelega
 };
 
 typedef QMap<int, AdvancedDelegateItem> AdvancedDelegateItems;
+
+class AdvancedDelegateEditProxy
+{
+public:
+	virtual QWidget *createEditor(int AItemId, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual bool setEditorData(int AItemId, QWidget *AEditor, const QModelIndex &AIndex) const;
+	virtual bool setModelData(int AItemId, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
+	virtual bool updateEditorGeometry(int AItemId, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+};
 
 class UTILS_EXPORT AdvancedItemDelegate : 
 	public QStyledItemDelegate
@@ -111,12 +120,22 @@ public:
 	void setDefaultBranchItemEnabled(bool AEnabled);
 	QMargins contentsMargins() const;
 	void setContentsMargings(const QMargins &AMargins);
-	//QAbstractItemDelegate
-	virtual void paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-	virtual QSize sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 public:
-	AdvancedDelegateItems getIndexItems(const QModelIndex &AIndex) const;
+	int editItemId() const;
+	void setEditItemId(int AItemId);
+	AdvancedDelegateEditProxy *editProxy() const;
+	void setEditProxy(AdvancedDelegateEditProxy *AProxy);
+public:
+	void paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	QSize sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	QWidget *createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	void setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const;
+	void setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
+	void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+public:
+	AdvancedDelegateItems getIndexItems(const QModelIndex &AIndex, const QStyleOptionViewItemV4 &AIndexOption) const;
 	QStyleOptionViewItemV4 indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	QStyleOptionViewItemV4 itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption) const;
 	ItemsLayout *createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItemV4 &AIndexOption) const;
 	void destroyItemsLayout(ItemsLayout *ALayout) const;
 public:
@@ -125,7 +144,6 @@ public:
 	int itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
 	int itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 public:
-	static QStyleOptionViewItemV4 itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption);
 	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 protected:
@@ -140,6 +158,9 @@ private:
 	bool FFocusRectVisible;
 	bool FDefaultBranchEnabled;
 	QMargins FMargins;
+private:
+	int FEditItemId;
+	AdvancedDelegateEditProxy *FEditProxy;
 };
 
 Q_DECLARE_METATYPE(AdvancedDelegateItems);

@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QApplication>
+#include <QItemEditorFactory>
 #include <QWindowsVistaStyle>
 
 void destroyLayoutRecursive(QLayout *ALayout)
@@ -31,28 +32,27 @@ QString getSingleLineText(const QString &AText)
 	return text.trimmed();
 }
 
-inline void setItemDefaults(int AItemId, AdvancedDelegateItem &AItem)
+inline void setItemDefaults(int AItemId, AdvancedDelegateItem *AItem)
 {
-	AItem.d->position = AdvancedDelegateItemDefaults[AItemId].position;
-	AItem.d->floor = AdvancedDelegateItemDefaults[AItemId].floor;
-	AItem.d->order = AdvancedDelegateItemDefaults[AItemId].order;
+	int index = AdvancedDelegateItem::NullId<=AItemId && AItemId<=AdvancedDelegateItem::DisplayStretchId ? AItemId : AdvancedDelegateItem::NullId;
+	AItem->d->position = AdvancedDelegateItemDefaults[index].position;
+	AItem->d->floor = AdvancedDelegateItemDefaults[index].floor;
+	AItem->d->order = AdvancedDelegateItemDefaults[index].order;
 }
 
 /*********************
 	AdvancedDelegateItem
 **********************/
-AdvancedDelegateItem::AdvancedDelegateItem()
+AdvancedDelegateItem::AdvancedDelegateItem(int ADefaultsId)
 {
 	d = new AdvancedDelegateItemData;
 	d->refs = 1;
 	d->kind = Null;
-	d->order = AdvancedDelegateItemDefaults[NullId].order;
-	d->floor = AdvancedDelegateItemDefaults[NullId].floor;
-	d->position = AdvancedDelegateItemDefaults[NullId].position;
 	d->flags = 0;
 	d->showStates = 0;
 	d->hideStates = 0;
 	d->widget = NULL;
+	setItemDefaults(ADefaultsId, this);
 }
 
 AdvancedDelegateItem::AdvancedDelegateItem(const AdvancedDelegateItem &AOther)
@@ -147,6 +147,12 @@ public:
 		
 		switch (AValue.type())
 		{
+		case QVariant::Color:
+			{
+				QColor color = qvariant_cast<QColor>(AValue);
+				APainter->fillRect(FOption.rect,color);
+				break;
+			}
 		case QVariant::Pixmap:
 			{
 				QPixmap pixmap = qvariant_cast<QPixmap>(AValue);
@@ -174,13 +180,12 @@ public:
 			}
 		default:
 			{
-				QString itemText = getSingleLineText(AValue.toString());
-				if (!itemText.isEmpty())
+				if (!FOption.text.isEmpty())
 				{
 					APainter->setFont(FOption.font);
 					int flags = FOption.displayAlignment | Qt::TextSingleLine;
 					QPalette::ColorRole role = FOption.state & QStyle::State_Selected ? QPalette::HighlightedText : QPalette::Text;
-					QString text = FOption.fontMetrics.elidedText(itemText,FOption.textElideMode,FOption.rect.width(),flags);
+					QString text = FOption.fontMetrics.elidedText(FOption.text,FOption.textElideMode,FOption.rect.width(),flags);
 					style->proxy()->drawItemText(APainter,FOption.rect,flags,FOption.palette,(FOption.state & QStyle::State_Enabled)>0,text,role);
 				}
 				break;
@@ -229,6 +234,32 @@ private:
 	QStyleOptionViewItemV4 FOption;
 };
 
+/**************************
+	AdvancedDelegateEditProxy
+***************************/
+QWidget *AdvancedDelegateEditProxy::createEditor(int AItemId, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex)  const
+{
+	Q_UNUSED(AItemId); Q_UNUSED(AParent); Q_UNUSED(AOption); Q_UNUSED(AIndex);
+	return NULL;
+}
+
+bool AdvancedDelegateEditProxy::setEditorData(int AItemId, QWidget *AEditor, const QModelIndex &AIndex) const
+{
+	Q_UNUSED(AItemId); Q_UNUSED(AEditor); Q_UNUSED(AIndex);
+	return false;
+}
+
+bool AdvancedDelegateEditProxy::setModelData(int AItemId, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
+{
+	Q_UNUSED(AItemId); Q_UNUSED(AEditor); Q_UNUSED(AModel); Q_UNUSED(AIndex);
+	return false;
+}
+
+bool AdvancedDelegateEditProxy::updateEditorGeometry(int AItemId, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	Q_UNUSED(AItemId); Q_UNUSED(AEditor); Q_UNUSED(AOption); Q_UNUSED(AIndex);
+	return false;
+}
 
 /*********************
 	AdvancedItemDelegate
@@ -251,6 +282,9 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 	FFocusRectVisible = false;
 	FDefaultBranchEnabled = false;
 	FMargins = QMargins(1,1,1,1);
+
+	FEditItemId = AdvancedDelegateItem::DisplayId;
+	FEditProxy = NULL;
 }
 
 AdvancedItemDelegate::~AdvancedItemDelegate()
@@ -318,32 +352,52 @@ void AdvancedItemDelegate::setContentsMargings(const QMargins &AMargins)
 	FMargins = AMargins;
 }
 
+int AdvancedItemDelegate::editItemId() const
+{
+	return FEditItemId;
+}
+
+void AdvancedItemDelegate::setEditItemId(int AItemId)
+{
+	FEditItemId = AItemId;
+}
+
+AdvancedDelegateEditProxy *AdvancedItemDelegate::editProxy() const
+{
+	return FEditProxy;
+}
+
+void AdvancedItemDelegate::setEditProxy(AdvancedDelegateEditProxy *AProxy)
+{
+	FEditProxy = AProxy;
+}
+
 void AdvancedItemDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	QStyleOptionViewItemV4 option = indexStyleOption(AOption,AIndex);
+	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
 
 #if defined(Q_WS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
-	QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+	QStyle *style = indexOption.widget ? indexOption.widget->style() : QApplication::style();
 	if (qobject_cast<QWindowsVistaStyle *>(style))
 	{
-		option.palette.setColor(QPalette::All, QPalette::HighlightedText, option.palette.color(QPalette::Active, QPalette::Text));
-		option.palette.setColor(QPalette::All, QPalette::Highlight, option.palette.base().color().darker(108));
+		indexOption.palette.setColor(QPalette::All, QPalette::HighlightedText, indexOption.palette.color(QPalette::Active, QPalette::Text));
+		indexOption.palette.setColor(QPalette::All, QPalette::Highlight, indexOption.palette.base().color().darker(108));
 	}
 #endif
 
 	APainter->save();
 	APainter->setClipping(true);
-	APainter->setClipRect(option.rect);
+	APainter->setClipRect(indexOption.rect);
 
-	drawBackground(APainter,option);
+	drawBackground(APainter,indexOption);
 
-	ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex),option);
-	layout->mainLayout->setGeometry(option.rect.adjusted(FMargins.left(),FMargins.top(),-FMargins.right(),-FMargins.bottom()));
+	ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex,indexOption),indexOption);
+	layout->mainLayout->setGeometry(indexOption.rect.adjusted(FMargins.left(),FMargins.top(),-FMargins.right(),-FMargins.bottom()));
 	for (QMap<int, AdvancedDelegateLayoutItem *>::const_iterator it=layout->items.constBegin(); it!=layout->items.constEnd(); ++it)
 		it.value()->drawItem(APainter);
 	destroyItemsLayout(layout);
 
-	drawFocusRect(APainter,option,option.rect);
+	drawFocusRect(APainter,indexOption,indexOption.rect);
 
 	APainter->restore();
 }
@@ -354,64 +408,99 @@ QSize AdvancedItemDelegate::sizeHint(const QStyleOptionViewItem &AOption, const 
 	if (hint.isValid())
 		return qvariant_cast<QSize>(hint);
 
-	QStyleOptionViewItemV4 option = indexStyleOption(AOption,AIndex);
+	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
 	
 	// Some states are not set for sizeHint o_O
 	if (AIndex.model()->hasChildren(AIndex))
-		option.state |= QStyle::State_Children;
+		indexOption.state |= QStyle::State_Children;
 	if (AIndex.sibling(AIndex.row()+1,AIndex.column()).isValid())
-		option.state |= QStyle::State_Sibling;
+		indexOption.state |= QStyle::State_Sibling;
 	
-	ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex),option);
+	ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex,indexOption),indexOption);
 	QSize size = layout->mainLayout->sizeHint() + QSize(FMargins.left()+FMargins.right(),FMargins.top()+FMargins.bottom());
 	destroyItemsLayout(layout);
 
 	return size;
 }
 
-AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIndex) const
+QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	if (AIndex.isValid())
+	{
+		QItemEditorFactory *factory  = itemEditorFactory() ? itemEditorFactory() : QItemEditorFactory::defaultFactory();
+		QVariant::Type type = static_cast<QVariant::Type>(AIndex.data(Qt::EditRole).userType());
+		return factory->createEditor(type, AParent);
+	}
+	return NULL;
+}
+
+void AdvancedItemDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
+{
+
+}
+
+void AdvancedItemDelegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
+{
+
+}
+
+void AdvancedItemDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+
+}
+
+AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIndex, const QStyleOptionViewItemV4 &AIndexOption) const
 {
 	AdvancedDelegateItems items = AIndex.data(FItemsRole).value<AdvancedDelegateItems>();
 
-	if (FDefaultBranchEnabled)
+	if (FDefaultBranchEnabled && (AIndexOption.state & QStyle::State_Children)>0)
 	{
 		AdvancedDelegateItem &branchItem = items[AdvancedDelegateItem::BranchId];
 		if (branchItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			branchItem.d->kind = AdvancedDelegateItem::Branch;
-			setItemDefaults(AdvancedDelegateItem::BranchId,branchItem);
+			setItemDefaults(AdvancedDelegateItem::BranchId,&branchItem);
 		}
 	}
 
-	AdvancedDelegateItem &checkItem = items[AdvancedDelegateItem::CheckStateId];
-	if (checkItem.d->kind == AdvancedDelegateItem::Null)
+	if (AIndexOption.features & QStyleOptionViewItemV4::HasCheckIndicator)
 	{
-		checkItem.d->kind = AdvancedDelegateItem::CheckBox;
-		setItemDefaults(AdvancedDelegateItem::CheckStateId,checkItem);
+		AdvancedDelegateItem &checkItem = items[AdvancedDelegateItem::CheckStateId];
+		if (checkItem.d->kind == AdvancedDelegateItem::Null)
+		{
+			checkItem.d->kind = AdvancedDelegateItem::CheckBox;
+			setItemDefaults(AdvancedDelegateItem::CheckStateId,&checkItem);
+		}
+		checkItem.d->data = AIndex.data(Qt::CheckStateRole);
 	}
-	checkItem.d->data = AIndex.data(Qt::CheckStateRole);
 
-	AdvancedDelegateItem &decorationItem = items[AdvancedDelegateItem::DecorationId];
-	if (decorationItem.d->kind == AdvancedDelegateItem::Null)
+	if (AIndexOption.features & QStyleOptionViewItemV4::HasDecoration)
 	{
-		decorationItem.d->kind = AdvancedDelegateItem::Decoration;
-		setItemDefaults(AdvancedDelegateItem::DecorationId,decorationItem);
+		AdvancedDelegateItem &decorationItem = items[AdvancedDelegateItem::DecorationId];
+		if (decorationItem.d->kind == AdvancedDelegateItem::Null)
+		{
+			decorationItem.d->kind = AdvancedDelegateItem::Decoration;
+			setItemDefaults(AdvancedDelegateItem::DecorationId,&decorationItem);
+		}
+		decorationItem.d->data = AIndex.data(Qt::DecorationRole);
 	}
-	decorationItem.d->data = AIndex.data(Qt::DecorationRole);
 
-	AdvancedDelegateItem &displayItem = items[AdvancedDelegateItem::DisplayId];
-	if (displayItem.d->kind == AdvancedDelegateItem::Null)
+	if (AIndexOption.features & QStyleOptionViewItemV4::HasDisplay)
 	{
-		displayItem.d->kind = AdvancedDelegateItem::Display;
-		setItemDefaults(AdvancedDelegateItem::DisplayId,displayItem);
+		AdvancedDelegateItem &displayItem = items[AdvancedDelegateItem::DisplayId];
+		if (displayItem.d->kind == AdvancedDelegateItem::Null)
+		{
+			displayItem.d->kind = AdvancedDelegateItem::Display;
+			setItemDefaults(AdvancedDelegateItem::DisplayId,&displayItem);
+		}
+		displayItem.d->data = AIndex.data(Qt::DisplayRole);
 	}
-	displayItem.d->data = AIndex.data(Qt::DisplayRole);
 
 	AdvancedDelegateItem &stretchItem = items[AdvancedDelegateItem::DisplayStretchId];
 	if (stretchItem.d->kind == AdvancedDelegateItem::Null)
 	{
 		stretchItem.d->kind = AdvancedDelegateItem::Stretch;
-		setItemDefaults(AdvancedDelegateItem::DisplayStretchId,stretchItem);
+		setItemDefaults(AdvancedDelegateItem::DisplayStretchId,&stretchItem);
 		stretchItem.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
 	}
 
@@ -427,9 +516,128 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 
 QStyleOptionViewItemV4 AdvancedItemDelegate::indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	QStyleOptionViewItemV4 option = AOption;
-	initStyleOption(&option,AIndex);
-	return option;
+	QStyleOptionViewItemV4 indexOption = AOption;
+
+	indexOption.index = AIndex;
+
+	QVariant value = AIndex.data(Qt::FontRole);
+	if (value.isValid() && !value.isNull()) 
+	{
+		indexOption.font = qvariant_cast<QFont>(value).resolve(indexOption.font);
+		indexOption.fontMetrics = QFontMetrics(indexOption.font);
+	}
+
+	value = AIndex.data(Qt::TextAlignmentRole);
+	if (value.isValid() && !value.isNull())
+		indexOption.displayAlignment = Qt::Alignment(value.toInt());
+
+	value = AIndex.data(Qt::ForegroundRole);
+	if (value.canConvert<QBrush>())
+		indexOption.palette.setBrush(QPalette::Text, qvariant_cast<QBrush>(value));
+
+	value = AIndex.data(Qt::CheckStateRole);
+	if (value.isValid() && !value.isNull()) 
+		indexOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
+
+	value = AIndex.data(Qt::DecorationRole);
+	if (value.isValid() && !value.isNull()) 
+		indexOption.features |= QStyleOptionViewItemV2::HasDecoration;
+
+	value = AIndex.data(Qt::DisplayRole);
+	if (value.isValid() && !value.isNull()) 
+		indexOption.features |= QStyleOptionViewItemV2::HasDisplay;
+
+	indexOption.backgroundBrush = qvariant_cast<QBrush>(AIndex.data(Qt::BackgroundRole));
+
+	return indexOption;
+}
+
+QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption) const
+{
+	QStyleOptionViewItemV4 itemOption = AIndexOption;
+
+	if (AItem.d->kind == AdvancedDelegateItem::Branch)
+	{
+		itemOption.state &= ~QStyle::State_Sibling;
+	}
+	
+	if (AItem.d->kind == AdvancedDelegateItem::CheckBox)
+	{
+		itemOption.state &= ~QStyle::State_HasFocus;
+		itemOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
+		itemOption.checkState = static_cast<Qt::CheckState>(AItem.d->data.toInt());
+
+		switch (itemOption.checkState)
+		{
+		case Qt::Unchecked:
+			itemOption.state |= QStyle::State_Off;
+			break;
+		case Qt::PartiallyChecked:
+			itemOption.state |= QStyle::State_NoChange;
+			break;
+		case Qt::Checked:
+			itemOption.state |= QStyle::State_On;
+			break;
+		}
+	}
+	else
+	{
+		itemOption.features &= ~QStyleOptionViewItemV2::HasCheckIndicator;
+	}
+
+	if (!AItem.d->data.isNull() && AItem.d->data.canConvert<QString>())
+		itemOption.text = getSingleLineText(displayText(AItem.d->data,itemOption.locale));
+
+	if (!AItem.d->hints.isEmpty())
+	{
+		QVariant hint = AItem.d->hints.value(AdvancedDelegateItem::FontSize);
+		if (!hint.isNull())
+			itemOption.font.setPointSize(hint.toInt());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontWeight);
+		if (!hint.isNull())
+			itemOption.font.setWeight(hint.toInt());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontHint);
+		if (!hint.isNull())
+			itemOption.font.setStyleHint((QFont::StyleHint)hint.toInt());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontStyle);
+		if (!hint.isNull())
+			itemOption.font.setStyle((QFont::Style)hint.toInt());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontUnderline);
+		if (!hint.isNull())
+			itemOption.font.setUnderline(hint.toBool());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::StatesForceOn);
+		if (!hint.isNull())
+			itemOption.state |= (QStyle::State)hint.toInt();
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::StatesForceOff);
+		if (!hint.isNull())
+			itemOption.state &= ~(QStyle::State)hint.toInt();
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::Foreground);
+		if (!hint.isNull())
+			itemOption.palette.setBrush(QPalette::Text, qvariant_cast<QBrush>(hint));
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::Backgound);
+		if (!hint.isNull())
+			itemOption.backgroundBrush = qvariant_cast<QBrush>(hint);
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::TextElideMode);
+		if (!hint.isNull())
+			itemOption.textElideMode = (Qt::TextElideMode)hint.toInt();
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::TextAlignment);
+		if (!hint.isNull())
+			itemOption.displayAlignment = (Qt::Alignment)hint.toInt();
+
+		itemOption.fontMetrics = QFontMetrics(itemOption.font);
+	}
+
+	return itemOption;
 }
 
 AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItemV4 &AIndexOption) const
@@ -449,8 +657,8 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 	QMap<int, QMap<int, QMultiMap<int, AdvancedDelegateLayoutItem *> > > orderedItems;
 	for (AdvancedDelegateItems::const_iterator it = AItems.constBegin(); it!=AItems.constEnd(); ++it)
 	{
-		QStyleOptionViewItemV4 option = itemStyleOption(it.value(),AIndexOption);
-		if (isItemVisible(it.value(),option))
+		QStyleOptionViewItemV4 itemOption = itemStyleOption(it.value(),AIndexOption);
+		if (isItemVisible(it.value(),itemOption))
 		{
 			QMap<int, QBoxLayout *> &posLayouts = layout->positionLayouts;
 			QBoxLayout *&posLayout = posLayouts[it->d->position];
@@ -468,7 +676,7 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 				floorLayout->setSpacing(hSpacing);
 			}
 
-			AdvancedDelegateLayoutItem *item = new AdvancedDelegateLayoutItem(it.value(),option);
+			AdvancedDelegateLayoutItem *item = new AdvancedDelegateLayoutItem(it.value(),itemOption);
 			layout->items.insert(it.key(),item);
 			orderedItems[it->d->position][it->d->floor].insertMulti(it->d->order,item);
 		}
@@ -531,9 +739,9 @@ QRect AdvancedItemDelegate::itemRect(int AItemId, const QStyleOptionViewItem &AO
 	QRect rect;
 	if (AIndex.isValid() && !AOption.rect.isEmpty())
 	{
-		QStyleOptionViewItemV4 option = indexStyleOption(AOption,AIndex);
-		ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex),option);
-		rect = itemRect(AItemId,layout,option.rect);
+		QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
+		ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex,indexOption),indexOption);
+		rect = itemRect(AItemId,layout,indexOption.rect);
 		destroyItemsLayout(layout);
 	}
 	return rect;
@@ -559,89 +767,12 @@ int AdvancedItemDelegate::itemAt(const QPoint &APoint, const QStyleOptionViewIte
 	int itemId = AdvancedDelegateItem::NullId;
 	if (AIndex.isValid() && !AOption.rect.isEmpty())
 	{
-		QStyleOptionViewItemV4 option = indexStyleOption(AOption,AIndex);
-		ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex),option);
-		itemId = itemAt(APoint,layout,option.rect);
+		QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
+		ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex,indexOption),indexOption);
+		itemId = itemAt(APoint,layout,indexOption.rect);
 		destroyItemsLayout(layout);
 	}
 	return itemId;
-}
-
-QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption)
-{
-	QStyleOptionViewItemV4 option = AIndexOption;
-
-	if (AItem.d->kind == AdvancedDelegateItem::Branch)
-	{
-		option.state &= ~QStyle::State_Sibling;
-	}
-	else if (AItem.d->kind == AdvancedDelegateItem::CheckBox)
-	{
-		option.state &= ~QStyle::State_HasFocus;
-		switch (option.checkState)
-		{
-		case Qt::Unchecked:
-			option.state |= QStyle::State_Off;
-			break;
-		case Qt::PartiallyChecked:
-			option.state |= QStyle::State_NoChange;
-			break;
-		case Qt::Checked:
-			option.state |= QStyle::State_On;
-			break;
-		}
-	}
-
-	if (!AItem.d->hints.isEmpty())
-	{
-		QVariant hint = AItem.d->hints.value(AdvancedDelegateItem::FontSize);
-		if (!hint.isNull())
-			option.font.setPointSize(hint.toInt());
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::FontWeight);
-		if (!hint.isNull())
-			option.font.setWeight(hint.toInt());
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::FontHint);
-		if (!hint.isNull())
-			option.font.setStyleHint((QFont::StyleHint)hint.toInt());
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::FontStyle);
-		if (!hint.isNull())
-			option.font.setStyle((QFont::Style)hint.toInt());
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::FontUnderline);
-		if (!hint.isNull())
-			option.font.setUnderline(hint.toBool());
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::StatesForceOn);
-		if (!hint.isNull())
-			option.state |= (QStyle::State)hint.toInt();
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::StatesForceOff);
-		if (!hint.isNull())
-			option.state &= ~(QStyle::State)hint.toInt();
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::Foreground);
-		if (!hint.isNull())
-			option.palette.setBrush(QPalette::Text, qvariant_cast<QBrush>(hint));
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::Backgound);
-		if (!hint.isNull())
-			option.backgroundBrush = qvariant_cast<QBrush>(hint);
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::TextElideMode);
-		if (!hint.isNull())
-			option.textElideMode = (Qt::TextElideMode)hint.toInt();
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::TextAlignment);
-		if (!hint.isNull())
-			option.displayAlignment = (Qt::Alignment)hint.toInt();
-
-		option.fontMetrics = QFontMetrics(option.font);
-	}
-
-	return option;
 }
 
 QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption)
@@ -698,9 +829,8 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 			}
 		default:
 			{
-				QString itemText = getSingleLineText(AItem.d->data.toString());
-				if (!itemText.isEmpty())
-					return AItemOption.fontMetrics.size(AItemOption.direction|Qt::TextSingleLine,itemText);
+				if (!AItemOption.text.isEmpty())
+					return AItemOption.fontMetrics.size(AItemOption.direction|Qt::TextSingleLine,AItemOption.text);
 				break;
 			}
 		}
@@ -766,7 +896,7 @@ bool AdvancedItemDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AMode
 		return false;
 
 	QVariant value = AIndex.data(Qt::CheckStateRole);
-	if (!value.isValid())
+	if (value.isNull() || !value.isValid())
 		return false;
 
 	if ((AEvent->type()==QEvent::MouseButtonRelease) || (AEvent->type()==QEvent::MouseButtonDblClick) || (AEvent->type()==QEvent::MouseButtonPress)) 
