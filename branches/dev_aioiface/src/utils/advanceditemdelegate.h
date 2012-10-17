@@ -10,6 +10,8 @@
 #include <QStyledItemDelegate>
 #include "utilsexport.h"
 
+#define ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY "AdvanceDelegateEditorValue"
+
 struct AdvancedDelegateItem
 {
 	enum Id {
@@ -78,6 +80,7 @@ struct AdvancedDelegateItem
 
 	AdvancedDelegateItemData *d;
 };
+typedef QMap<int, AdvancedDelegateItem> AdvancedDelegateItems;
 
 static const struct {int id; int position; int floor; int order;} AdvancedDelegateItemDefaults[] =
 {
@@ -89,15 +92,14 @@ static const struct {int id; int position; int floor; int order;} AdvancedDelega
 	{	AdvancedDelegateItem::DisplayStretchId, AdvancedDelegateItem::MiddleCenter, 500, 10000 },
 };
 
-typedef QMap<int, AdvancedDelegateItem> AdvancedDelegateItems;
-
+class AdvancedItemDelegate;
 class AdvancedDelegateEditProxy
 {
 public:
-	virtual QWidget *createEditor(int AItemId, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-	virtual bool setEditorData(int AItemId, QWidget *AEditor, const QModelIndex &AIndex) const;
-	virtual bool setModelData(int AItemId, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
-	virtual bool updateEditorGeometry(int AItemId, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual QWidget *createEditor(const AdvancedItemDelegate *ADelegate, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual bool setEditorData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, const QModelIndex &AIndex) const;
+	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
+	virtual bool updateEditorGeometry(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 };
 
 class UTILS_EXPORT AdvancedItemDelegate : 
@@ -125,6 +127,7 @@ public:
 	void setEditItemId(int AItemId);
 	AdvancedDelegateEditProxy *editProxy() const;
 	void setEditProxy(AdvancedDelegateEditProxy *AProxy);
+	const QItemEditorFactory *editorFactory() const;
 public:
 	void paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	QSize sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;

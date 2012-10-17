@@ -237,27 +237,27 @@ private:
 /**************************
 	AdvancedDelegateEditProxy
 ***************************/
-QWidget *AdvancedDelegateEditProxy::createEditor(int AItemId, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex)  const
+QWidget *AdvancedDelegateEditProxy::createEditor(const AdvancedItemDelegate *ADelegate, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex)  const
 {
-	Q_UNUSED(AItemId); Q_UNUSED(AParent); Q_UNUSED(AOption); Q_UNUSED(AIndex);
+	Q_UNUSED(ADelegate); Q_UNUSED(AParent); Q_UNUSED(AOption); Q_UNUSED(AIndex);
 	return NULL;
 }
 
-bool AdvancedDelegateEditProxy::setEditorData(int AItemId, QWidget *AEditor, const QModelIndex &AIndex) const
+bool AdvancedDelegateEditProxy::setEditorData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, const QModelIndex &AIndex) const
 {
-	Q_UNUSED(AItemId); Q_UNUSED(AEditor); Q_UNUSED(AIndex);
+	Q_UNUSED(ADelegate); Q_UNUSED(AEditor); Q_UNUSED(AIndex);
 	return false;
 }
 
-bool AdvancedDelegateEditProxy::setModelData(int AItemId, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
+bool AdvancedDelegateEditProxy::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
 {
-	Q_UNUSED(AItemId); Q_UNUSED(AEditor); Q_UNUSED(AModel); Q_UNUSED(AIndex);
+	Q_UNUSED(ADelegate); Q_UNUSED(AEditor); Q_UNUSED(AModel); Q_UNUSED(AIndex);
 	return false;
 }
 
-bool AdvancedDelegateEditProxy::updateEditorGeometry(int AItemId, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+bool AdvancedDelegateEditProxy::updateEditorGeometry(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	Q_UNUSED(AItemId); Q_UNUSED(AEditor); Q_UNUSED(AOption); Q_UNUSED(AIndex);
+	Q_UNUSED(ADelegate); Q_UNUSED(AEditor); Q_UNUSED(AOption); Q_UNUSED(AIndex);
 	return false;
 }
 
@@ -283,8 +283,8 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 	FDefaultBranchEnabled = false;
 	FMargins = QMargins(1,1,1,1);
 
-	FEditItemId = AdvancedDelegateItem::DisplayId;
 	FEditProxy = NULL;
+	FEditItemId = AdvancedDelegateItem::NullId;
 }
 
 AdvancedItemDelegate::~AdvancedItemDelegate()
@@ -372,6 +372,11 @@ void AdvancedItemDelegate::setEditProxy(AdvancedDelegateEditProxy *AProxy)
 	FEditProxy = AProxy;
 }
 
+const QItemEditorFactory *AdvancedItemDelegate::editorFactory() const
+{
+	return itemEditorFactory() ? itemEditorFactory() : QItemEditorFactory::defaultFactory();
+}
+
 void AdvancedItemDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
 	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
@@ -425,28 +430,61 @@ QSize AdvancedItemDelegate::sizeHint(const QStyleOptionViewItem &AOption, const 
 
 QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
+	QWidget *widget = NULL;
 	if (AIndex.isValid())
 	{
-		QItemEditorFactory *factory  = itemEditorFactory() ? itemEditorFactory() : QItemEditorFactory::defaultFactory();
-		QVariant::Type type = static_cast<QVariant::Type>(AIndex.data(Qt::EditRole).userType());
-		return factory->createEditor(type, AParent);
+		widget = FEditProxy!=NULL ? FEditProxy->createEditor(this,AParent,AOption,AIndex) : NULL;
+		if (widget == NULL)
+		{
+			QVariant value = AIndex.data(Qt::EditRole);
+			if (FEditItemId != AdvancedDelegateItem::NullId)
+			{
+				QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
+				AdvancedDelegateItems items = getIndexItems(AIndex,indexOption);
+				value = items.value(FEditItemId).d->data;
+			}
+			
+			QVariant::Type type = static_cast<QVariant::Type>(value.userType());
+			widget = editorFactory()->createEditor(type, AParent);
+			
+			if (widget)
+				widget->setProperty(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY,value);
+		}
 	}
-	return NULL;
+	return widget;
 }
 
 void AdvancedItemDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
 {
-
+	if (FEditProxy==NULL || !FEditProxy->setEditorData(this,AEditor,AIndex))
+	{
+		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY);
+		QByteArray name = editorFactory()->valuePropertyName(value.type());
+		if (!name.isEmpty()) 
+			AEditor->setProperty(name, value);
+	}
 }
 
 void AdvancedItemDelegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
 {
-
+	if (FEditProxy==NULL || !FEditProxy->setModelData(this,AEditor,AModel,AIndex))
+	{
+		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY);
+		QByteArray name = editorFactory()->valuePropertyName(value.type());
+		if (!name.isEmpty()) 
+			AModel->setData(AIndex, AEditor->property(name), Qt::EditRole);
+	}
 }
 
 void AdvancedItemDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-
+	if (FEditProxy==NULL || !FEditProxy->updateEditorGeometry(this,AEditor,AOption,AIndex))
+	{
+		int itemId = FEditItemId!=AdvancedDelegateItem::NullId ? FEditItemId : AdvancedDelegateItem::DisplayId;
+		QRect rect = itemRect(itemId,AOption,AIndex);
+		rect.adjust(-1,-1,1,1);
+		AEditor->setGeometry(rect);
+	}
 }
 
 AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIndex, const QStyleOptionViewItemV4 &AIndexOption) const
@@ -470,8 +508,8 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			checkItem.d->kind = AdvancedDelegateItem::CheckBox;
 			setItemDefaults(AdvancedDelegateItem::CheckStateId,&checkItem);
+			checkItem.d->data = Qt::CheckStateRole;
 		}
-		checkItem.d->data = AIndex.data(Qt::CheckStateRole);
 	}
 
 	if (AIndexOption.features & QStyleOptionViewItemV4::HasDecoration)
@@ -481,8 +519,8 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			decorationItem.d->kind = AdvancedDelegateItem::Decoration;
 			setItemDefaults(AdvancedDelegateItem::DecorationId,&decorationItem);
+			decorationItem.d->data = Qt::DecorationRole;
 		}
-		decorationItem.d->data = AIndex.data(Qt::DecorationRole);
 	}
 
 	if (AIndexOption.features & QStyleOptionViewItemV4::HasDisplay)
@@ -492,8 +530,8 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			displayItem.d->kind = AdvancedDelegateItem::Display;
 			setItemDefaults(AdvancedDelegateItem::DisplayId,&displayItem);
+			displayItem.d->data = Qt::DisplayRole;
 		}
-		displayItem.d->data = AIndex.data(Qt::DisplayRole);
 	}
 
 	AdvancedDelegateItem &stretchItem = items[AdvancedDelegateItem::DisplayStretchId];
@@ -746,6 +784,7 @@ QRect AdvancedItemDelegate::itemRect(int AItemId, const QStyleOptionViewItem &AO
 	}
 	return rect;
 }
+
 int AdvancedItemDelegate::itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const
 {
 	if (AGeometry.contains(APoint))
