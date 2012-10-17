@@ -2,6 +2,7 @@
 
 #include <QEvent>
 #include <QStyle>
+#include <QKeyEvent>
 #include <QHBoxLayout>
 
 SearchLineEdit::SearchLineEdit(QWidget *AParent) : QLineEdit(AParent)
@@ -110,8 +111,19 @@ void SearchLineEdit::setSelectTextOnFocusEnabled(bool AEnabled)
 
 bool SearchLineEdit::event(QEvent *AEvent)
 {
-	if (isSelectTextOnFocusEnabled() && AEvent->type()==QEvent::FocusIn)
+	if (AEvent->type()==QEvent::ShortcutOverride && !text().isEmpty())
+	{
+		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
+		if (keyEvent->key()==Qt::Key_Escape && keyEvent->modifiers()==0)
+		{
+			FClearButton->animateClick();
+			AEvent->accept();
+		}
+	}
+	else if (AEvent->type()==QEvent::FocusIn && isSelectTextOnFocusEnabled())
+	{
 		QTimer::singleShot(0,this,SLOT(selectAll()));
+	}
 	return QLineEdit::event(AEvent);
 }
 
