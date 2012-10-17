@@ -21,6 +21,7 @@ ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent
 {
 	ui.setupUi(this);
 	createTreeModel();
+	onRestoreDefaultsClicked();
 
 	FBlockChangesCheck = 0;
 
@@ -47,6 +48,7 @@ ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent
 	connect(ui.trvShortcuts,SIGNAL(doubleClicked(const QModelIndex &)),SLOT(onIndexDoubleClicked(const QModelIndex &)));
 
 	reset();
+	FConflictTimer.start();
 }
 
 ShortcutOptionsWidget::~ShortcutOptionsWidget()
