@@ -32,7 +32,7 @@
 ### Version
 REVISION="$(svnversion -c | cut -f 2 -d :)"
 VER_NUMBER="$(grep 'CLIENT_VERSION ' src/definitions/version.h | cut -f 2 -d '"')"
-VERSION="${VER_NUMBER}${REVISION}"
+VERSION="${VER_NUMBER}.${REVISION}"
 
 ### Namespace
 ORIG_NAME="vacuum"
@@ -161,13 +161,17 @@ cd $SCRIPT_DIR
 TMP_DMG_NAME="temporary.dmg"
 if [ -f $TMP_DMG_NAME ]
 then
-    rm $TMP_DMG_NAME
+	rm $TMP_DMG_NAME
 fi
 
 echo -e "\033[7m Creating temporary dmg disk image... \033[0m"
 hdiutil create -ov -srcfolder $TMP_DIR -format UDRW -volname "$PRODUCT_NAME" "$TMP_DMG_NAME"
 
 echo -e "\033[7m Mounting temporary image... \033[0m"
+while [ -d /Volumes/"$PRODUCT_NAME" ]
+do
+	hdiutil unmount "/Volumes/$PRODUCT_NAME"
+done
 device=$(hdiutil attach -readwrite -noverify -noautoopen "$TMP_DMG_NAME" | egrep '^/dev/' | sed 1q | awk '{print $1}')
 echo "done! (device ${device})"
 
@@ -244,9 +248,9 @@ echo "done!"
 echo -e "\033[7m Converting... \033[0m"
 if [ -f $DMG_NAME ]
 then
-    rm $DMG_NAME
+	rm $DMG_NAME
 fi
-hdiutil convert "$TMP_DMG_NAME" -format UDZO -imagekey zlib-level=9 -o "$SCRIPT_DIR/$DMG_NAME"
+hdiutil convert "$TMP_DMG_NAME" -format UDBZ -o "$SCRIPT_DIR/$DMG_NAME"
 echo "done!"
 
 echo -e "\033[7m Removing temporary folder... \033[0m"
