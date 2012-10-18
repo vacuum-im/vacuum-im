@@ -168,9 +168,12 @@ echo -e "\033[7m Creating temporary dmg disk image... \033[0m"
 hdiutil create -ov -srcfolder $TMP_DIR -format UDRW -volname "$PRODUCT_NAME" "$TMP_DMG_NAME"
 
 echo -e "\033[7m Mounting temporary image... \033[0m"
-while [ -d /Volumes/"$PRODUCT_NAME" ]
+for i in /Volumes/${PRODUCT_NAME}*
 do
-	hdiutil unmount "/Volumes/$PRODUCT_NAME"
+	if [[ -d $i ]]
+	then
+		hdiutil unmount "$i"
+	fi
 done
 device=$(hdiutil attach -readwrite -noverify -noautoopen "$TMP_DMG_NAME" | egrep '^/dev/' | sed 1q | awk '{print $1}')
 echo "done! (device ${device})"
@@ -189,6 +192,8 @@ cp "$SVN_ROOT/vacuum.icns" "$ICON_FOLDER/.VolumeIcon.icns"
 echo "* Setting volume icon... "
 SetFile -c icnC "$ICON_FOLDER/.VolumeIcon.icns"
 SetFile -a C "$ICON_FOLDER"
+echo "* Adding symlink to /Applications... "
+ln -s /Applications "/Volumes/$PRODUCT_NAME/Applications"
 echo "done!"
 
 APPS_X=380
@@ -217,8 +222,6 @@ tell application \"Finder\"
 		set icon size of theViewOptions to 96
 		-- Settings background
 		${NO_BG}set background picture of theViewOptions to file \".background:background.png\"
-		-- Adding symlink to /Applications
-		make new alias file at container window to POSIX file \"/Applications\" with properties {name:\"Applications\"}
 		-- Rearranging
 		set the position of item \"Applications\" to {$APPS_X, $APPS_Y}
 		set the position of item \"$PRODUCT_NAME\" to {$BUNDLE_X, $BUNDLE_Y}
