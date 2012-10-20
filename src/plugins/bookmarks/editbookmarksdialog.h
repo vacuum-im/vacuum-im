@@ -28,6 +28,7 @@ protected slots:
 	void onBookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onBookmarksError(const QString &AId, const QString &AError);
 	void onTableItemDoubleClicked(QTableWidgetItem *AItem);
+	void onSortingStateChange(int);
 private:
 	Ui::EditBookmarksDialogClass ui;
 private:
@@ -35,6 +36,7 @@ private:
 private:
 	Jid FStreamJid;
 	QString FRequestId;
+	int FLastSortSection;
 };
 
 #endif // EDITBOOKMARKSDIALOG_H
