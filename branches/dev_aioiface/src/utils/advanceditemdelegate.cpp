@@ -138,6 +138,8 @@ public:
 	}
 	void setGeometry(const QRect &ARect)
 	{
+		if (FItem.d->widget != NULL)
+			FItem.d->widget->setGeometry(ARect);
 		FOption.rect = ARect;
 	}
 	const AdvancedDelegateItem &delegateItem() const
@@ -217,9 +219,13 @@ public:
 			switch (FItem.d->kind)
 			{
 			case AdvancedDelegateItem::Null:
-				break;
+				{
+					break;
+				}
 			case AdvancedDelegateItem::Stretch:
-				break;
+				{
+					break;
+				}
 			case AdvancedDelegateItem::Branch:
 				{
 					QStyleOption brachOption(FOption);
@@ -233,9 +239,13 @@ public:
 					break;
 				}
 			case AdvancedDelegateItem::CustomWidget:
-				break;
+				{
+					break;
+				}
 			default:
-				drawVariant(APainter,FItem.d->data);
+				{
+					drawVariant(APainter,FItem.d->data);
+				}
 			}
 			APainter->restore();
 		}
@@ -524,7 +534,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			checkItem.d->kind = AdvancedDelegateItem::CheckBox;
 			setItemDefaults(AdvancedDelegateItem::CheckStateId,&checkItem);
-			checkItem.d->data = Qt::CheckStateRole;
+			checkItem.d->data = AIndex.data(Qt::CheckStateRole);
 		}
 	}
 
@@ -535,7 +545,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			decorationItem.d->kind = AdvancedDelegateItem::Decoration;
 			setItemDefaults(AdvancedDelegateItem::DecorationId,&decorationItem);
-			decorationItem.d->data = Qt::DecorationRole;
+			decorationItem.d->data = AIndex.data(Qt::DecorationRole);
 		}
 	}
 
@@ -546,7 +556,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			displayItem.d->kind = AdvancedDelegateItem::Display;
 			setItemDefaults(AdvancedDelegateItem::DisplayId,&displayItem);
-			displayItem.d->data = Qt::DisplayRole;
+			displayItem.d->data = AIndex.data(Qt::DisplayRole);
 		}
 	}
 

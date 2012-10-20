@@ -13,7 +13,7 @@
 
 #define ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY "AdvanceDelegateEditorValue"
 
-struct AdvancedDelegateItem
+struct UTILS_EXPORT AdvancedDelegateItem
 {
 	enum Id {
 		NullId,
@@ -82,7 +82,10 @@ struct AdvancedDelegateItem
 
 	AdvancedDelegateItemData *d;
 };
+Q_DECLARE_METATYPE(AdvancedDelegateItem);
+
 typedef QMap<int, AdvancedDelegateItem> AdvancedDelegateItems;
+Q_DECLARE_METATYPE(AdvancedDelegateItems);
 
 static const struct {int id; int position; int floor; int order;} AdvancedDelegateItemDefaults[] =
 {
@@ -95,7 +98,7 @@ static const struct {int id; int position; int floor; int order;} AdvancedDelega
 };
 
 class AdvancedItemDelegate;
-class AdvancedDelegateEditProxy
+class UTILS_EXPORT AdvancedDelegateEditProxy
 {
 public:
 	virtual QWidget *createEditor(const AdvancedItemDelegate *ADelegate, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
@@ -170,7 +173,5 @@ private:
 	int FEditItemId;
 	AdvancedDelegateEditProxy *FEditProxy;
 };
-
-Q_DECLARE_METATYPE(AdvancedDelegateItems);
 
 #endif // ADVANCEDITEMDELEGATE_H
