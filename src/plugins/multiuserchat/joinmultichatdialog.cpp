@@ -197,6 +197,7 @@ void JoinMultiChatDialog::onDeleteHistoryClicked()
 		FRecentRooms.remove(roomJid);
 		ui.cmbHistory->removeItem(ui.cmbHistory->currentIndex());
 		ui.tlbDeleteHistory->setEnabled(!FRecentRooms.isEmpty());
+		saveRecentConferences();
 	}
 }
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>378</width>
-    <height>239</height>
+    <height>247</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -15,7 +15,7 @@
     <number>5</number>
    </property>
    <item>
-    <layout class="QHBoxLayout">
+    <layout class="QHBoxLayout" name="hltIdentity">
      <item>
       <widget class="QLabel" name="lblIdentity">
        <property name="text">
@@ -52,7 +52,7 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="hltHistory">
      <item>
       <widget class="QLabel" name="lblHistory">
        <property name="text">
@@ -189,13 +189,15 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
-  <tabstop>cmbStreamJid</tabstop>
-  <tabstop>cmbHistory</tabstop>
+  <tabstop>lneRoom</tabstop>
   <tabstop>lneService</tabstop>
   <tabstop>lneNick</tabstop>
   <tabstop>tlbResolveNick</tabstop>
   <tabstop>lnePassword</tabstop>
   <tabstop>btbButtons</tabstop>
+  <tabstop>cmbStreamJid</tabstop>
+  <tabstop>cmbHistory</tabstop>
+  <tabstop>tlbDeleteHistory</tabstop>
  </tabstops>
  <resources/>
  <connections>

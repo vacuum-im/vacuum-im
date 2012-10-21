@@ -46,7 +46,7 @@ void ShortcutOptionsDelegate::setModelData(QWidget *AEditor, QAbstractItemModel 
 	QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
 	if (editor)
 	{
-		QKeySequence key = editor->text().isEmpty() ? qvariant_cast<QKeySequence>(AIndex.data(MDR_DEFAULT_KEYSEQUENCE)) : QKeySequence(editor->text());
+		QKeySequence key = QKeySequence(editor->text());
 		AModel->setData(AIndex,key.toString(QKeySequence::NativeText),Qt::DisplayRole);
 		AModel->setData(AIndex,key,MDR_ACTIVE_KEYSEQUENCE);
 	}
