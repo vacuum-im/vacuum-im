@@ -986,5 +986,13 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <source>Failed to load history: %1</source>
         <translation>Nie udało się załadować historii: %1</translation>
     </message>
+    <message>
+        <source>Enter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

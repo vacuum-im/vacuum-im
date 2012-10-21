@@ -17,9 +17,10 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FChatPlugin = AChatPlugin;
 
 	FMainUser = NULL;
-	FAutoPresence = false;
 	FSHIPresence = -1;
 	FSHIMessage = -1;
+	FConnected = false;
+	FAutoPresence = false;
 
 	FRoomJid = ARoomJid;
 	FStreamJid = AStreamJid;
@@ -176,6 +177,11 @@ bool MultiUserChat::isOpen() const
 	return FMainUser!=NULL;
 }
 
+bool MultiUserChat::isConnected() const
+{
+	return FConnected;
+}
+
 bool MultiUserChat::autoPresence() const
 {
 	return FAutoPresence;
@@ -183,12 +189,7 @@ bool MultiUserChat::autoPresence() const
 
 void MultiUserChat::setAutoPresence(bool AAuto)
 {
-	if (FAutoPresence != AAuto)
-	{
-		FAutoPresence = AAuto;
-		if (FPresence && FAutoPresence)
-			setPresence(FPresence->show(),FPresence->status());
-	}
+	FAutoPresence = AAuto;
 }
 
 QList<int> MultiUserChat::statusCodes() const
@@ -231,21 +232,23 @@ QString MultiUserChat::nickName() const
 	return FNickName;
 }
 
-void MultiUserChat::setNickName(const QString &ANick)
+bool MultiUserChat::setNickName(const QString &ANick)
 {
-	if (isOpen())
+	if (isConnected())
 	{
 		if (!ANick.isEmpty() && FNickName!=ANick)
 		{
 			Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
 			Stanza presence("presence");
 			presence.setTo(userJid.full());
-			FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
+			return FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
 		}
+		return !FNickName.isEmpty();
 	}
 	else
 	{
 		FNickName = ANick;
+		return true;
 	}
 }
 
@@ -274,7 +277,14 @@ XmppStanzaError MultiUserChat::roomError() const
 	return FRoomError;
 }
 
-void MultiUserChat::setPresence(int AShow, const QString &AStatus)
+bool MultiUserChat::sendStreamPresence()
+{
+	if (FPresence)
+		return sendPresence(FPresence->show(),FPresence->status());
+	return false;
+}
+
+bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 {
 	if (FStanzaProcessor)
 	{
@@ -316,8 +326,13 @@ void MultiUserChat::setPresence(int AShow, const QString &AStatus)
 				xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));
 		}
 
-		FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
+		if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
+		{
+			FConnected = presence.type()!="unavailable";
+			return true;
+		}
 	}
+	return false;
 }
 
 bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
@@ -397,17 +412,18 @@ QString MultiUserChat::subject() const
 	return FSubject;
 }
 
-void MultiUserChat::setSubject(const QString &ASubject)
+bool MultiUserChat::sendSubject(const QString &ASubject)
 {
 	if (FStanzaProcessor && isOpen())
 	{
 		Message message;
 		message.setTo(FRoomJid.bare()).setType(Message::GroupChat).setSubject(ASubject);
-		FStanzaProcessor->sendStanzaOut(FStreamJid,message.stanza());
+		return FStanzaProcessor->sendStanzaOut(FStreamJid,message.stanza());
 	}
+	return false;
 }
 
-void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
+bool MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
 {
 	if (FStanzaProcessor && FDataForms && isOpen())
 	{
@@ -416,11 +432,15 @@ void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
 		QDomElement elem = message.stanza().element();
 		FDataForms->xmlForm(AForm,elem);
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,message.stanza(),0))
+		{
 			emit dataFormMessageSent(AForm);
+			return true;
+		}
 	}
+	return false;
 }
 
-void MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QString &AReason)
+bool MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QString &AReason)
 {
 	IMultiUser *user = userByNick(ANick);
 	if (FStanzaProcessor && user)
@@ -434,11 +454,12 @@ void MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QS
 			itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
 		if (!AReason.isEmpty())
 			itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
-		FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
+		return FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
 	}
+	return false;
 }
 
-void MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason)
+bool MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason)
 {
 	IMultiUser *user = userByNick(ANick);
 	if (FStanzaProcessor && user)
@@ -452,8 +473,9 @@ void MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffilia
 			itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
 		if (!AReason.isEmpty())
 			itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
-		FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
+		return FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
 	}
+	return false;
 }
 
 bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
@@ -736,7 +758,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 					if (user == FMainUser)
 					{
 						FNickName = newNick;
-						setPresence(FShow,FStatus);
+						sendPresence(FShow,FStatus);
 					}
 				}
 			}
@@ -866,6 +888,8 @@ void MultiUserChat::initialize()
 
 void MultiUserChat::closeChat(int AShow, const QString &AStatus)
 {
+	FConnected = false;
+
 	if (FMainUser)
 	{
 		FMainUser->setData(MUDR_SHOW,AShow);
@@ -903,13 +927,13 @@ void MultiUserChat::onPresenceChanged(int AShow, const QString &AStatus, int APr
 {
 	Q_UNUSED(APriority);
 	if (FAutoPresence)
-		setPresence(AShow,AStatus);
+		sendPresence(AShow,AStatus);
 }
 
 void MultiUserChat::onPresenceAboutToClose(int AShow, const QString &AStatus)
 {
-	if (FAutoPresence && isOpen())
-		setPresence(AShow,AStatus);
+	if (isConnected())
+		sendPresence(AShow,AStatus);
 }
 
 void MultiUserChat::onStreamClosed()

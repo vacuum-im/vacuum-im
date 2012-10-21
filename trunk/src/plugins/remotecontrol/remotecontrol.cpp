@@ -324,7 +324,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		IDataOption opt;
 		foreach(IMultiUserChat* muc, FMultiUserChatPlugin->multiUserChats())
 		{
-			if (muc->isOpen() && muc->streamJid()==ARequest.streamJid)
+			if (muc->isConnected() && muc->streamJid()==ARequest.streamJid)
 			{
 				opt.label = tr("%1 on %2").arg(muc->nickName()).arg(muc->roomJid().uBare());
 				opt.value = muc->roomJid().bare();

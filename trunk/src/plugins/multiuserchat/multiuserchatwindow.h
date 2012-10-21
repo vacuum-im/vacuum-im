@@ -94,7 +94,7 @@ public:
 	virtual IChatWindow *openChatWindow(const Jid &AContactJid);
 	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
-	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000);
+	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000);
 signals:
 	//ITabWindowPage
 	void tabPageAssign();

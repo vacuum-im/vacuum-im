@@ -37,9 +37,10 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FStatusChanger = NULL;
 	FMessageArchiver = NULL;
 
-	FMultiChat = AMultiChat;
 	FChatPlugin = AChatPlugin;
+	FMultiChat = AMultiChat;
 	FMultiChat->instance()->setParent(this);
+	FMultiChat->setAutoPresence(true);
 
 	FViewWidget = NULL;
 	FEditWidget = NULL;
@@ -567,12 +568,16 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 {
 	closeTabPage();
 
+	bool waitClose = false;
 	FDestroyOnChatClosed = true;
-	if (FMultiChat->isOpen())
-		FMultiChat->setPresence(IPresence::Offline,AStatus);
+	if (FMultiChat->isConnected())
+	{
+		waitClose = true;
+		FMultiChat->sendPresence(IPresence::Offline,AStatus);
+	}
 
 	if (AWaitClose>0)
-		QTimer::singleShot(FMultiChat->isOpen() ? AWaitClose : 0, this, SLOT(deleteLater()));
+		QTimer::singleShot(waitClose ? AWaitClose : 0, this, SLOT(deleteLater()));
 	else
 		delete this;
 }
@@ -801,17 +806,22 @@ void MultiUserChatWindow::createStaticRoomActions()
 	FToolsMenu->addAction(FDestroyRoom,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
 	FEnterRoom = new Action(FToolsMenu);
-	FEnterRoom->setText(tr("Enter room"));
+	FEnterRoom->setText(tr("Enter"));
+	FEnterRoom->setToolTip(tr("Enter room"));
 	FEnterRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
 	FEnterRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_ENTER);
 	connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+	QToolButton *enterButton = FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
+	enterButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
 	FExitRoom = new Action(FToolBarWidget->toolBarChanger()->toolBar());
+	FExitRoom->setText(tr("Exit"));
+	FExitRoom->setToolTip(tr("Exit room"));
 	FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
-	FExitRoom->setText(tr("Exit room"));
 	FExitRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_EXIT);
 	connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
+	QToolButton *exitButton = FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
+	exitButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 }
 
 void MultiUserChatWindow::updateStaticRoomActions()
@@ -867,15 +877,9 @@ void MultiUserChatWindow::updateStaticRoomActions()
 		FDestroyRoom->setVisible(false);
 	}
 
-	if (!FMultiChat->isOpen())
-	{
-		if (FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom)==NULL)
-			FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
-	}
-	else
-	{
-		FToolBarWidget->toolBarChanger()->removeItem(FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom));
-	}
+	QAction *enterHandler = FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom);
+	if (enterHandler)
+		enterHandler->setVisible(!FMultiChat->isOpen());
 }
 
 void MultiUserChatWindow::saveWindowState()
@@ -1190,7 +1194,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString status = parts.join(" ");
-		FMultiChat->setPresence(IPresence::Offline,status);
+		FMultiChat->sendPresence(IPresence::Offline,status);
 		exitAndDestroy(QString::null);
 		hasCommand = true;
 	}
@@ -1199,7 +1203,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString subject = parts.join(" ");
-		FMultiChat->setSubject(subject);
+		FMultiChat->sendSubject(subject);
 		hasCommand = true;
 	}
 	else if (AText == "/help")
@@ -1750,7 +1754,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			highlightUserRole(AUser);
 			highlightUserAffiliation(AUser);
 
-			if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
+			if (FMultiChat->isConnected() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
 			{
 				Jid realJid = AUser->data(MUDR_REAL_JID).toString();
 				if (!realJid.isEmpty())
@@ -1797,10 +1801,8 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 		qDeleteAll(FUsersModel->takeRow(userItem->row()));
 	}
 
-	if (FMultiChat->isOpen())
-	{
+	if (FMultiChat->isConnected())
 		updateWindow();
-	}
 
 	IChatWindow *window = findChatWindow(AUser->contactJid());
 	if (window)
@@ -1905,8 +1907,7 @@ void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &ARea
 
 void MultiUserChatWindow::onRejoinAfterKick()
 {
-	FMultiChat->setAutoPresence(false);
-	FMultiChat->setAutoPresence(true);
+	FMultiChat->sendStreamPresence();
 }
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)
@@ -2295,7 +2296,7 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 			QString newSubject = FMultiChat->subject();
 			InputTextDialog *dialog = new InputTextDialog(this,tr("Change subject"),tr("Enter new subject for room %1").arg(roomJid().uNode()), newSubject);
 			if (dialog->exec() == QDialog::Accepted)
-				FMultiChat->setSubject(newSubject);
+				FMultiChat->sendSubject(newSubject);
 		}
 	}
 	else if (action == FClearChat)
@@ -2304,8 +2305,7 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 	}
 	else if (action == FEnterRoom)
 	{
-		FMultiChat->setAutoPresence(false);
-		FMultiChat->setAutoPresence(true);
+		FMultiChat->sendStreamPresence();
 	}
 	else if (action == FExitRoom)
 	{

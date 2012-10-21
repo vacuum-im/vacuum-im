@@ -94,6 +94,7 @@ public:
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
 	virtual bool isOpen() const =0;
+	virtual bool isConnected() const =0;
 	virtual bool autoPresence() const =0;
 	virtual void setAutoPresence(bool AAuto) =0;
 	virtual QList<int> statusCodes() const =0;
@@ -103,23 +104,24 @@ public:
 	virtual QList<IMultiUser *> allUsers() const =0;
 	//Occupant
 	virtual QString nickName() const =0;
-	virtual void setNickName(const QString &ANick) =0;
+	virtual bool setNickName(const QString &ANick) =0;
 	virtual QString password() const =0;
 	virtual void setPassword(const QString &APassword) =0;
 	virtual int show() const =0;
 	virtual QString status() const =0;
 	virtual XmppStanzaError roomError() const =0;
-	virtual void setPresence(int AShow, const QString &AStatus) =0;
+	virtual bool sendStreamPresence() =0;
+	virtual bool sendPresence(int AShow, const QString &AStatus) =0;
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
 	virtual bool requestVoice() =0;
 	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason) =0;
 	//Moderator
 	virtual QString subject() const =0;
-	virtual void setSubject(const QString &ASubject) =0;
-	virtual void sendDataFormMessage(const IDataForm &AForm) =0;
+	virtual bool sendSubject(const QString &ASubject) =0;
+	virtual bool sendDataFormMessage(const IDataForm &AForm) =0;
 	//Administrator
-	virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null) =0;
-	virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null) =0;
+	virtual bool setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null) =0;
+	virtual bool setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null) =0;
 	virtual bool requestAffiliationList(const QString &AAffiliation) =0;
 	virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList) =0;
 	//Owner
@@ -175,7 +177,7 @@ public:
 	virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0;
 	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
-	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 5000) =0;
+	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000) =0;
 protected:
 	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
 	virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;
@@ -205,7 +207,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
-Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.1")
+Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.2")
 Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.1")
 Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.1")
 

@@ -137,7 +137,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 		if (chatWindow)
 		{
 			chatWindow->showTabPage();
-			chatWindow->multiUserChat()->setAutoPresence(true);
+			chatWindow->multiUserChat()->sendStreamPresence();
 		}
 
 		RoomParams &params = FRecentRooms[roomJid];
