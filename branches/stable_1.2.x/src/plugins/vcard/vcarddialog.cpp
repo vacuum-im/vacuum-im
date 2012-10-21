@@ -42,10 +42,10 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	connect(ui.tlbLogoClear,SIGNAL(clicked()),SLOT(onLogoClearClicked()));
 	connect(ui.tlbEmailAdd,SIGNAL(clicked()),SLOT(onEmailAddClicked()));
 	connect(ui.tlbEmailDelete,SIGNAL(clicked()),SLOT(onEmailDeleteClicked()));
-	connect(ui.ltwEmails,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onEmailItemActivated(QListWidgetItem *)));
+	connect(ui.ltwEmails,SIGNAL(itemDoubleClicked(QListWidgetItem *)),SLOT(onEmailItemDoubleClicked(QListWidgetItem *)));
 	connect(ui.tlbPhoneAdd,SIGNAL(clicked()),SLOT(onPhoneAddClicked()));
 	connect(ui.tlbPhoneDelete,SIGNAL(clicked()),SLOT(onPhoneDeleteClicked()));
-	connect(ui.ltwPhones,SIGNAL(itemActivated(QListWidgetItem *)),SLOT(onPhoneItemActivated(QListWidgetItem *)));
+	connect(ui.ltwPhones,SIGNAL(itemDoubleClicked(QListWidgetItem *)),SLOT(onPhoneItemDoubleClicked(QListWidgetItem *)));
 	
 	if (FVCard->isEmpty())
 	{
@@ -405,7 +405,7 @@ void VCardDialog::onEmailDeleteClicked()
 	delete item;
 }
 
-void VCardDialog::onEmailItemActivated(QListWidgetItem *AItem)
+void VCardDialog::onEmailItemDoubleClicked(QListWidgetItem *AItem)
 {
 	if (FStreamJid && FContactJid)
 	{
@@ -440,7 +440,7 @@ void VCardDialog::onPhoneDeleteClicked()
 	delete item;
 }
 
-void VCardDialog::onPhoneItemActivated(QListWidgetItem *AItem)
+void VCardDialog::onPhoneItemDoubleClicked(QListWidgetItem *AItem)
 {
 	if (FStreamJid && FContactJid)
 	{

@@ -27,7 +27,7 @@ protected slots:
 	void onDialogAccepted();
 	void onBookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onBookmarksError(const QString &AId, const QString &AError);
-	void onTableItemActivated(QTableWidgetItem *AItem);
+	void onTableItemDoubleClicked(QTableWidgetItem *AItem);
 private:
 	Ui::EditBookmarksDialogClass ui;
 private:

@@ -42,6 +42,9 @@ signals:
 protected:
 	void updateVisible();
 	void updateSeparatorVisible();
+	QAction *findGroupSeparator(int AGroup) const;
+	void insertGroupSeparator(int AGroup, QAction *ABefore);
+	void removeGroupSeparator(int AGroup);
 protected slots:
 	void onWidgetDestroyed(QObject *AObject);
 private:

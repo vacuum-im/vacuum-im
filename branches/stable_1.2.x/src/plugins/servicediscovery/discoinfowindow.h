@@ -27,7 +27,7 @@ protected slots:
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 	void onCurrentFeatureChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious);
 	void onUpdateClicked();
-	void onListItemActivated(QListWidgetItem *AItem);
+	void onListItemDoubleClicked(QListWidgetItem *AItem);
 	void onShowExtensionForm(bool);
 private:
 	Ui::DiscoInfoWindowClass ui;

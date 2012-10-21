@@ -326,6 +326,19 @@ void PluginManager::loadPlugins()
 			if (QLibrary::isLibrary(file) && isPluginEnabled(file))
 			{
 				QPluginLoader *loader = new QPluginLoader(pluginsDir.absoluteFilePath(file),this);
+
+				QTranslator *translator = new QTranslator(loader);
+				QString tsFile = file.mid(LIB_PREFIX_SIZE,file.lastIndexOf('.')-LIB_PREFIX_SIZE);
+				if (translator->load(tsFile,tsDir.absoluteFilePath(localeName)) || translator->load(tsFile,tsDir.absoluteFilePath(localeName.left(2))))
+				{
+					qApp->installTranslator(translator);
+				}
+				else
+				{
+					delete translator;
+					translator = NULL;
+				}
+
 				if (loader->load())
 				{
 					IPlugin *plugin = qobject_cast<IPlugin *>(loader->instance());
@@ -339,17 +352,7 @@ void PluginManager::loadPlugins()
 							pluginItem.plugin = plugin;
 							pluginItem.loader = loader;
 							pluginItem.info = new IPluginInfo;
-							pluginItem.translator =  NULL;
-
-							QTranslator *translator = new QTranslator(loader);
-							QString tsFile = file.mid(LIB_PREFIX_SIZE,file.lastIndexOf('.')-LIB_PREFIX_SIZE);
-							if (translator->load(tsFile,tsDir.absoluteFilePath(localeName)) || translator->load(tsFile,tsDir.absoluteFilePath(localeName.left(2))))
-							{
-								qApp->installTranslator(translator);
-								pluginItem.translator = translator;
-							}
-							else
-								delete translator;
+							pluginItem.translator =  translator;
 
 							plugin->pluginInfo(pluginItem.info);
 							savePluginInfo(file, pluginItem.info).setAttribute("uuid", uid.toString());

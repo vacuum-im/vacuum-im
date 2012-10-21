@@ -370,32 +370,37 @@ QString ClientInfo::osVersion() const
 #if defined(Q_WS_MAC)
 		switch (QSysInfo::MacintoshVersion)
 		{
+		# if QT_VERSION >= 0x040803
+			case QSysInfo::MV_MOUNTAINLION:
+				osver = "OS X 10.8 Mountain Lion";
+				break;
+		# endif
 		case QSysInfo::MV_LION:
-			osver = "OS X 10.7 (Lion)";
+			osver = "OS X 10.7 Lion";
 			break;
 		case QSysInfo::MV_SNOWLEOPARD:
-			osver = "Mac OS X 10.6 (SnowLeopard)";
+			osver = "Mac OS X 10.6 Snow Leopard)";
 			break;
 		case QSysInfo::MV_LEOPARD:
-			osver = "Mac OS X 10.5 (Leopard)";
+			osver = "Mac OS X 10.5 Leopard";
 			break;
 		case QSysInfo::MV_TIGER:
-			osver = "Mac OS X 10.4 (Tiger)";
+			osver = "Mac OS X 10.4 Tiger";
 			break;
 		case QSysInfo::MV_PANTHER:
-			osver = "Mac OS X 10.3 (Panther)";
+			osver = "Mac OS X 10.3 Panther";
 			break;
 		case QSysInfo::MV_JAGUAR:
-			osver = "Mac OS X 10.2 (Jaguar)";
+			osver = "Mac OS X 10.2 Jaguar";
 			break;
 		case QSysInfo::MV_PUMA:
-			osver = "Mac OS X 10.1 (Puma)";
+			osver = "Mac OS X 10.1 Puma";
 			break;
 		case QSysInfo::MV_CHEETAH:
-			osver = "Mac OS X 10.0 (Cheetah)";
+			osver = "Mac OS X 10.0 Cheetah";
 			break;
 		case QSysInfo::MV_9:
-			osver = "MacOS 9";
+			osver = "Mac OS 9";
 			break;
 		case QSysInfo::MV_Unknown:
 		default:
@@ -464,6 +469,11 @@ QString ClientInfo::osVersion() const
 		case QSysInfo::WV_CE:
 			osver = "Windows CE";
 			break;
+		# if QT_VERSION >= 0x040803
+			case QSysInfo::WV_WINDOWS8:
+				osver = "Windows 8";
+				break;
+		# endif
 		case QSysInfo::WV_WINDOWS7:
 			osver = "Windows 7";
 			break;

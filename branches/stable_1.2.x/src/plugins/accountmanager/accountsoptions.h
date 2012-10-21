@@ -35,7 +35,7 @@ protected:
 protected slots:
 	void onAddButtonClicked(bool);
 	void onRemoveButtonClicked(bool);
-	void onItemActivated(QTreeWidgetItem *AItem, int AColumn);
+	void onItemDoubleClicked(QTreeWidgetItem *AItem, int AColumn);
 	void onAccountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode);
 private:
 	Ui::AccountsOptionsClass ui;
