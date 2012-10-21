@@ -985,5 +985,13 @@ Check values and try again</source>
         <source>Failed to load history: %1</source>
         <translation>Не вдалося завантажити історію: %1</translation>
     </message>
+    <message>
+        <source>Enter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

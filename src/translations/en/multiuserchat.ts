@@ -986,5 +986,13 @@ Check values and try again</translation>
         <source>Enter reason for ban</source>
         <translation>Enter reason for ban</translation>
     </message>
+    <message>
+        <source>Enter</source>
+        <translation>Enter</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Exit</translation>
+    </message>
 </context>
 </TS>
