@@ -395,7 +395,7 @@ void RosterChanger::rosterEditGeometry(int ADataRole, QWidget *AEditor, const QS
 {
 	if (ADataRole == RDR_NAME)
 	{
-		QRect rect = FRostersView->labelRect(RLID_DISPLAY_EDIT,AIndex);
+		QRect rect = FRostersView->labelRect(AdvancedDelegateItem::DisplayId,AIndex);
 		if (rect.isValid())
 			AEditor->setGeometry(rect);
 		else
@@ -867,7 +867,7 @@ void RosterChanger::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASe
 
 void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		int indexType = AIndexes.first()->type();
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();

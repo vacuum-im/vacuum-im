@@ -39,6 +39,14 @@ QString getSingleLineText(const QString &AText)
 	return text.trimmed();
 }
 
+QVariant getItemValue(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption)
+{
+	if (AItem.d->kind==AdvancedDelegateItem::Decoration || AItem.d->kind==AdvancedDelegateItem::Display || AItem.d->kind==AdvancedDelegateItem::CustomData)
+		if (AItem.d->value.type() == QVariant::Int)
+			return AItemOption.index.data(AItem.d->value.toInt());
+	return AItem.d->value;
+}
+
 inline void setItemDefaults(int AItemId, AdvancedDelegateItem *AItem)
 {
 	int index = AdvancedDelegateItem::NullId<=AItemId && AItemId<=AdvancedDelegateItem::DisplayStretchId ? AItemId : AdvancedDelegateItem::NullId;
@@ -231,6 +239,7 @@ public:
 					QStyleOption brachOption(FOption);
 					QStyle *style = FOption.widget ? FOption.widget->style() : QApplication::style();
 					style->proxy()->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
+					break;
 				}
 			case AdvancedDelegateItem::CheckBox:
 				{
@@ -244,7 +253,7 @@ public:
 				}
 			default:
 				{
-					drawVariant(APainter,FItem.d->data);
+					drawVariant(APainter,getItemValue(FItem,FOption));
 				}
 			}
 			APainter->restore();
@@ -311,6 +320,7 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 	FBlinkTimer.setSingleShot(false);
 	FBlinkTimer.setInterval(BlinkStepsTime/BlinkStepsCount);
 	connect(&FBlinkTimer,SIGNAL(timeout()),SIGNAL(updateBlinkItems()));
+	FBlinkTimer.start();
 }
 
 AdvancedItemDelegate::~AdvancedItemDelegate()
@@ -467,7 +477,7 @@ QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOption
 			{
 				QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
 				AdvancedDelegateItems items = getIndexItems(AIndex,indexOption);
-				value = items.value(FEditItemId).d->data;
+				value = getItemValue(items.value(FEditItemId),indexOption);
 			}
 			
 			QVariant::Type type = static_cast<QVariant::Type>(value.userType());
@@ -534,7 +544,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			checkItem.d->kind = AdvancedDelegateItem::CheckBox;
 			setItemDefaults(AdvancedDelegateItem::CheckStateId,&checkItem);
-			checkItem.d->data = AIndex.data(Qt::CheckStateRole);
+			checkItem.d->value = AIndex.data(Qt::CheckStateRole);
 		}
 	}
 
@@ -545,7 +555,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			decorationItem.d->kind = AdvancedDelegateItem::Decoration;
 			setItemDefaults(AdvancedDelegateItem::DecorationId,&decorationItem);
-			decorationItem.d->data = AIndex.data(Qt::DecorationRole);
+			decorationItem.d->value = AIndex.data(Qt::DecorationRole);
 		}
 	}
 
@@ -556,7 +566,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			displayItem.d->kind = AdvancedDelegateItem::Display;
 			setItemDefaults(AdvancedDelegateItem::DisplayId,&displayItem);
-			displayItem.d->data = AIndex.data(Qt::DisplayRole);
+			displayItem.d->value = AIndex.data(Qt::DisplayRole);
 		}
 	}
 
@@ -566,13 +576,6 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		stretchItem.d->kind = AdvancedDelegateItem::Stretch;
 		setItemDefaults(AdvancedDelegateItem::DisplayStretchId,&stretchItem);
 		stretchItem.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
-	}
-
-	for (AdvancedDelegateItems::iterator it = items.begin(); it!=items.end(); ++it)
-	{
-		if (it->d->kind==AdvancedDelegateItem::Decoration || it->d->kind==AdvancedDelegateItem::Display || it->d->kind==AdvancedDelegateItem::CustomData)
-			if (it->d->data.type() == QVariant::Int)
-				it->d->data = AIndex.data(it->d->data.toInt());
 	}
 
 	return items;
@@ -620,6 +623,8 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 {
 	QStyleOptionViewItemV4 itemOption = AIndexOption;
 
+	QVariant value = getItemValue(AItem,itemOption);
+
 	if (AItem.d->kind == AdvancedDelegateItem::Branch)
 	{
 		itemOption.state &= ~QStyle::State_Sibling;
@@ -629,7 +634,7 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 	{
 		itemOption.state &= ~QStyle::State_HasFocus;
 		itemOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
-		itemOption.checkState = static_cast<Qt::CheckState>(AItem.d->data.toInt());
+		itemOption.checkState = static_cast<Qt::CheckState>(value.toInt());
 
 		switch (itemOption.checkState)
 		{
@@ -649,8 +654,8 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 		itemOption.features &= ~QStyleOptionViewItemV2::HasCheckIndicator;
 	}
 
-	if (!AItem.d->data.isNull() && AItem.d->data.canConvert<QString>())
-		itemOption.text = getSingleLineText(displayText(AItem.d->data,itemOption.locale));
+	if (!value.isNull() && value.canConvert<QString>())
+		itemOption.text = getSingleLineText(displayText(value,itemOption.locale));
 
 	if (!AItem.d->hints.isEmpty())
 	{
@@ -869,37 +874,40 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 			return AItem.d->widget!=NULL ? AItem.d->widget->sizeHint() : zeroSize;
 		}
 	default:
-		switch (AItem.d->data.type())
 		{
-		case QVariant::Pixmap:
+			QVariant value = getItemValue(AItem,AItemOption);
+			switch (value.type())
 			{
-				QPixmap pixmap = qvariant_cast<QPixmap>(AItem.d->data);
-				if (!pixmap.isNull())
-					return pixmap.size();
-				break;
+			case QVariant::Pixmap:
+				{
+					QPixmap pixmap = qvariant_cast<QPixmap>(value);
+					if (!pixmap.isNull())
+						return pixmap.size();
+					break;
+				}
+			case QVariant::Image:
+				{
+					QImage image = qvariant_cast<QImage>(value);
+					if (!image.isNull())
+						return image.size();
+					break;
+				}
+			case QVariant::Icon:
+				{
+					QIcon icon = qvariant_cast<QIcon>(value);
+					if (!icon.isNull())
+						return icon.actualSize(AItemOption.decorationSize);
+					break;
+				}
+			default:
+				{
+					if (!AItemOption.text.isEmpty())
+						return AItemOption.fontMetrics.size(AItemOption.direction|Qt::TextSingleLine,AItemOption.text);
+					break;
+				}
 			}
-		case QVariant::Image:
-			{
-				QImage image = qvariant_cast<QImage>(AItem.d->data);
-				if (!image.isNull())
-					return image.size();
-				break;
-			}
-		case QVariant::Icon:
-			{
-				QIcon icon = qvariant_cast<QIcon>(AItem.d->data);
-				if (!icon.isNull())
-					return icon.actualSize(AItemOption.decorationSize);
-				break;
-			}
-		default:
-			{
-				if (!AItemOption.text.isEmpty())
-					return AItemOption.fontMetrics.size(AItemOption.direction|Qt::TextSingleLine,AItemOption.text);
-				break;
-			}
+			return zeroSize;
 		}
-		return zeroSize;
 	}
 }
 
@@ -924,7 +932,7 @@ bool AdvancedItemDelegate::isItemVisible(const AdvancedDelegateItem &AItem, cons
 	case AdvancedDelegateItem::CustomWidget:
 		return AItem.d->widget!=NULL;
 	default:
-		return !AItem.d->data.isNull();
+		return !getItemValue(AItem,AItemOption).isNull();
 	}
 }
 

@@ -492,7 +492,7 @@ void StatusIcons::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASele
 
 void StatusIcons::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
 		

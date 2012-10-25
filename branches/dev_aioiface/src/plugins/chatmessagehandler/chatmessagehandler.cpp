@@ -800,7 +800,7 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const QStrin
 
 void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;

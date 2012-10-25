@@ -391,7 +391,7 @@ void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
 
 void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
 		Jid streamJid = index->data(RDR_STREAM_JID).toString();
@@ -428,7 +428,7 @@ void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndex
 
 void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-	if (ALabelId==RLID_DISPLAY && rosterDataTypes().contains(AIndex->type()))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && rosterDataTypes().contains(AIndex->type()))
 	{
 		QString note = AIndex->data(RDR_ANNOTATIONS).toString();
 		if (!note.isEmpty())

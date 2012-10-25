@@ -257,7 +257,7 @@ void AccountManager::onAccountOptionsChanged(const OptionsNode &ANode)
 
 void AccountManager::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
 	{
 		IAccount *account = accountByStream(AIndexes.first()->data(RDR_STREAM_JID).toString());
 		if (account)

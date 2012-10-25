@@ -682,7 +682,7 @@ void Gateways::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelecte
 
 void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId == RLID_DISPLAY)
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		if (AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
 		{

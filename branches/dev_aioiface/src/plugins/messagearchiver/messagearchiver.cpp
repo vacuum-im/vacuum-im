@@ -2243,7 +2243,7 @@ void MessageArchiver::onRosterIndexMultiSelection(const QList<IRosterIndex *> &A
 
 void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId == RLID_DISPLAY)
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid streamJid = !AIndexes.isEmpty() ? AIndexes.first()->data(RDR_STREAM_JID).toString() : QString::null;
 		if (AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)

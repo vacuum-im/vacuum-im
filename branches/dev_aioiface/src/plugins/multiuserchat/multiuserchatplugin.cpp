@@ -852,7 +852,7 @@ void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
 
 void MultiUserChatPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
 		if (index->type() == RIT_STREAM_ROOT)

@@ -656,7 +656,7 @@ void NormalMessageHandler::onRosterIndexMultiSelection(const QList<IRosterIndex 
 
 void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;

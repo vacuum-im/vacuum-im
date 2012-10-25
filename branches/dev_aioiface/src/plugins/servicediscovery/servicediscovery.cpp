@@ -1275,7 +1275,7 @@ void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMu
 
 void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		int indexType = AIndexes.first()->type();
 		if (indexType == RIT_STREAM_ROOT || indexType == RIT_CONTACT || indexType == RIT_AGENT || indexType == RIT_MY_RESOURCE)
@@ -1307,7 +1307,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 
 void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-	if (ALabelId == RLID_DISPLAY)
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();

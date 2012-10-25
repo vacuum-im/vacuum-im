@@ -19,7 +19,6 @@
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/iconstorage.h>
-#include "rosterindexdelegate.h"
 
 class RostersView :
 	public QTreeView,
@@ -53,7 +52,7 @@ public:
 	virtual bool hasMultiSelection() const;
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const;
 	virtual void selectRosterIndex(IRosterIndex *AIndex);
-	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const;
+	virtual QMap<int, QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const;
 	//--ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual QList<QAbstractProxyModel *> proxyModels() const;
@@ -63,8 +62,8 @@ public:
 	virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const;
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const;
 	//--IndexLabel
-	virtual int registerLabel(const IRostersLabel &ALabel);
-	virtual void updateLabel(int ALabelId, const IRostersLabel &ALabel);
+	virtual int registerLabel(const AdvancedDelegateItem &ALabel);
+	virtual void updateLabel(int ALabelId, const AdvancedDelegateItem &ALabel);
 	virtual void insertLabel(int ALabelId, IRosterIndex *AIndex);
 	virtual void removeLabel(int ALabelId, IRosterIndex *AIndex);
 	virtual void destroyLabel(int ALabelId);
@@ -163,7 +162,7 @@ protected slots:
 	void onIndexDestroyed(IRosterIndex *AIndex);
 	void onRemoveIndexNotifyTimeout();
 	void onUpdateIndexNotifyTimeout();
-	void onBlinkTimerTimeout();
+	void onUpdateBlinkLabels();
 	void onDragExpandTimer();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
@@ -173,12 +172,10 @@ private:
 	QPoint FPressedPos;
 	QModelIndex FPressedIndex;
 private:
-	bool FBlinkVisible;
-	QTimer FBlinkTimer;
 	QSet<int> FBlinkLabels;
 	QSet<int> FBlinkNotifies;
 private:
-	QMap<int, IRostersLabel> FLabelItems;
+	QMap<int, AdvancedDelegateItem> FLabelItems;
 	QMultiMap<IRosterIndex *, int> FIndexLabels;
 private:
 	QMap<QTimer *, int> FNotifyTimer;
@@ -191,7 +188,7 @@ private:
 	QMultiMap<int, IRostersClickHooker *> FClickHookers;
 	QMultiMap<int, IRostersEditHandler *> FEditHandlers;
 private:
-	RosterIndexDelegate *FRosterIndexDelegate;
+	AdvancedItemDelegate *FAdvancedItemDelegate;
 	QMultiMap<int, QAbstractProxyModel *> FProxyModels;
 private:
 	bool FStartDragFailed;

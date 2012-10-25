@@ -816,7 +816,7 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
 
 void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
 		if (index->type() == RIT_CONTACT || index->type() == RIT_AGENT || index->type() == RIT_MY_RESOURCE)
@@ -845,7 +845,7 @@ void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes,
 
 void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-	if (ALabelId == RLID_DISPLAY)
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 

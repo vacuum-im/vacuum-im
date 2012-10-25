@@ -108,9 +108,10 @@ bool PrivacyLists::initObjects()
 {
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_PRIVACY;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
+		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->order = RLO_PRIVACY;
+		label.d->value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
 		FPrivacyLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 		FRostersView = FRostersViewPlugin->rostersView();
@@ -1290,7 +1291,7 @@ void PrivacyLists::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASel
 
 void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		int indexType = AIndexes.first()->type();
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();

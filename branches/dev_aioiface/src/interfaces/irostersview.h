@@ -8,6 +8,7 @@
 #include <QAbstractProxyModel>
 #include <interfaces/irostersmodel.h>
 #include <utils/menu.h>
+#include <utils/advanceditemdelegate.h>
 
 #define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
 
@@ -106,8 +107,8 @@ public:
 	virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const=0;
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const=0;
 	//--IndexLabel
-	virtual int registerLabel(const IRostersLabel &ALabel) =0;
-	virtual void updateLabel(int ALabelId, const IRostersLabel &ALabel) =0;
+	virtual int registerLabel(const AdvancedDelegateItem &ALabel) =0;
+	virtual void updateLabel(int ALabelId, const AdvancedDelegateItem &ALabel) =0;
 	virtual void insertLabel(int ALabelId, IRosterIndex *AIndex) =0;
 	virtual void removeLabel(int ALabelId, IRosterIndex *AIndex) =0;
 	virtual void destroyLabel(int ALabelId) =0;

@@ -330,7 +330,7 @@ void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 
 void VCardPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
 		if (index->type() == RIT_STREAM_ROOT || index->type() == RIT_CONTACT || index->type() == RIT_AGENT)

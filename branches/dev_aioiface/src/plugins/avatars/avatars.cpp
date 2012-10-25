@@ -672,7 +672,7 @@ void Avatars::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected
 
 void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		int indexType = AIndexes.first()->type();
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID);
@@ -725,7 +725,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, in
 
 void Avatars::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-	if ((ALabelId == RLID_DISPLAY || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->type()))
+	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->type()))
 	{
 		QString hash = AIndex->data(RDR_AVATAR_HASH).toString();
 		if (hasAvatar(hash))
@@ -833,9 +833,11 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 					findData.insertMulti(RDR_TYPE,type);
 				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData, true);
 
-				IRostersLabel label;
-				label.order = RLO_AVATAR_IMAGE;
-				label.value = RDR_AVATAR_IMAGE;
+				AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
+				label.d->kind = AdvancedDelegateItem::CustomData;
+				label.d->position = AdvancedDelegateItem::MiddleRight;
+				label.d->order = RLO_AVATAR_IMAGE;
+				label.d->value = RDR_AVATAR_IMAGE;
 				FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 				foreach (IRosterIndex *index, indexes)

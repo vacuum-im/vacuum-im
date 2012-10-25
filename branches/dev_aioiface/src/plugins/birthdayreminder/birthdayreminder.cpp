@@ -129,9 +129,10 @@ bool BirthdayReminder::initObjects()
 	}
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_BIRTHDAY_NOTIFY;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
+		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->order = RLO_BIRTHDAY_NOTIFY;
+		label.d->value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
 		FBirthdayLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;
@@ -318,7 +319,7 @@ void BirthdayReminder::onRosterIndexInserted(IRosterIndex *AIndex)
 
 void BirthdayReminder::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
-	if (ALabelId==RLID_DISPLAY || ALabelId==FBirthdayLabelId)
+	if (ALabelId==AdvancedDelegateItem::DisplayId || ALabelId==FBirthdayLabelId)
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		int daysLeft = contactBithdayDaysLeft(contactJid);

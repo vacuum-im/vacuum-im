@@ -25,8 +25,8 @@ StatusChanger::StatusChanger()
 	FMainMenu = NULL;
 	FModifyStatus = NULL;
 	FStatusIcons = NULL;
-	FConnectingLabel = RLID_NULL;
 	FChangingPresence = NULL;
+	FConnectingLabel = AdvancedDelegateItem::NullId;
 }
 
 StatusChanger::~StatusChanger()
@@ -195,12 +195,12 @@ bool StatusChanger::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_CONNECTING;
-		label.flags = IRostersLabel::Blink;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
+		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->order = RLO_CONNECTING;
+		label.d->flags = AdvancedDelegateItem::BlinkFade;
+		label.d->value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
 		FConnectingLabel = FRostersViewPlugin->rostersView()->registerLabel(label);
-
 	}
 
 	if (FTrayManager)
@@ -1076,7 +1076,7 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 
 void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1 && AIndexes.first()->data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
 	{
 		Menu *menu = streamMenu(AIndexes.first()->data(RDR_STREAM_JID).toString());
 		if (menu)

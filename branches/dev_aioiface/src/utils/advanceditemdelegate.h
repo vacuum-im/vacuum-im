@@ -67,12 +67,13 @@ struct UTILS_EXPORT AdvancedDelegateItem
 		int floor;
 		int position;
 		quint32 flags;
-		QVariant data;
+		QVariant value;
 		QWidget *widget;
 		QSizePolicy sizePolicy;
 		QStyle::State showStates;
 		QStyle::State hideStates;
 		QMap<int,QVariant> hints;
+		QMap<int,QVariant> properties;
 	};
 
 	AdvancedDelegateItem(int ADefaultsId = NullId);
