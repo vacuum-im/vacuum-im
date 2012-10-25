@@ -111,7 +111,7 @@ bool PrivacyLists::initObjects()
 		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->order = RLO_PRIVACY;
-		label.d->value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
 		FPrivacyLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 		FRostersView = FRostersViewPlugin->rostersView();

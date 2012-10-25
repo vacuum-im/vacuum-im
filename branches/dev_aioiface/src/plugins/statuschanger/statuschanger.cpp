@@ -198,8 +198,8 @@ bool StatusChanger::initObjects()
 		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->order = RLO_CONNECTING;
-		label.d->flags = AdvancedDelegateItem::BlinkFade;
-		label.d->value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
+		label.d->flags = AdvancedDelegateItem::Blink;
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
 		FConnectingLabel = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 

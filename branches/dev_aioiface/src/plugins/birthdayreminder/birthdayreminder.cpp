@@ -132,7 +132,7 @@ bool BirthdayReminder::initObjects()
 		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->order = RLO_BIRTHDAY_NOTIFY;
-		label.d->value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
 		FBirthdayLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;

@@ -498,7 +498,7 @@ int RostersView::registerLabel(const AdvancedDelegateItem &ALabel)
 	while (labelId<=0 || FLabelItems.contains(labelId))
 		labelId = qrand();
 
-	if (ALabel.d->flags & (AdvancedDelegateItem::BlinkFade|AdvancedDelegateItem::BlinkHide))
+	if (ALabel.d->flags & AdvancedDelegateItem::Blink)
 		appendBlinkItem(labelId,-1);
 	FLabelItems.insert(labelId,ALabel);
 
@@ -509,7 +509,7 @@ void RostersView::updateLabel(int ALabelId, const AdvancedDelegateItem &ALabel)
 {
 	if (FLabelItems.contains(ALabelId))
 	{
-		if (ALabel.d->flags & (AdvancedDelegateItem::BlinkFade|AdvancedDelegateItem::BlinkHide))
+		if (ALabel.d->flags & AdvancedDelegateItem::Blink)
 			appendBlinkItem(ALabelId,-1);
 		else
 			removeBlinkItem(ALabelId,-1);

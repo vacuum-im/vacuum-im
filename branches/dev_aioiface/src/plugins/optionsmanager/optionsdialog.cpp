@@ -6,6 +6,8 @@
 #include <QHeaderView>
 #include <QTextDocument>
 
+#include <utils/advanceditemdelegate.h>
+
 static const QString NodeDelimiter = ".";
 
 #define IDR_ORDER   Qt::UserRole + 1
@@ -31,6 +33,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 
 	delete ui.scaScroll->takeWidget();
 	ui.trvNodes->sortByColumn(0,Qt::AscendingOrder);
+	ui.trvNodes->setItemDelegate(new AdvancedItemDelegate(ui.trvNodes));
 
 	FOptionsManager = AOptionsManager;
 	connect(FOptionsManager->instance(),SIGNAL(optionsDialogNodeInserted(const IOptionsDialogNode &)),SLOT(onOptionsDialogNodeInserted(const IOptionsDialogNode &)));
@@ -137,6 +140,8 @@ QStandardItem *OptionsDialog::createNodeItem(const QString &ANodeID)
 				item = new QStandardItem(nodeID);
 				FItemsModel->appendRow(item);
 			}
+			//item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+			//item->setData(Qt::Unchecked, Qt::CheckStateRole);
 			FNodeItems.insert(curNodeID,item);
 		}
 		else

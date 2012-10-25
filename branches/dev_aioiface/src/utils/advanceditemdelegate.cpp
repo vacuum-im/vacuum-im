@@ -39,14 +39,6 @@ QString getSingleLineText(const QString &AText)
 	return text.trimmed();
 }
 
-QVariant getItemValue(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption)
-{
-	if (AItem.d->kind==AdvancedDelegateItem::Decoration || AItem.d->kind==AdvancedDelegateItem::Display || AItem.d->kind==AdvancedDelegateItem::CustomData)
-		if (AItem.d->value.type() == QVariant::Int)
-			return AItemOption.index.data(AItem.d->value.toInt());
-	return AItem.d->value;
-}
-
 inline void setItemDefaults(int AItemId, AdvancedDelegateItem *AItem)
 {
 	int index = AdvancedDelegateItem::NullId<=AItemId && AItemId<=AdvancedDelegateItem::DisplayStretchId ? AItemId : AdvancedDelegateItem::NullId;
@@ -60,7 +52,7 @@ inline void setItemDefaults(int AItemId, AdvancedDelegateItem *AItem)
 **********************/
 AdvancedDelegateItem::AdvancedDelegateItem(int ADefaultsId)
 {
-	d = new AdvancedDelegateItemData;
+	d = new ExplicitData;
 	d->refs = 1;
 	d->kind = Null;
 	d->flags = 0;
@@ -74,6 +66,7 @@ AdvancedDelegateItem::AdvancedDelegateItem(const AdvancedDelegateItem &AOther)
 {
 	d = AOther.d;
 	d->refs++;
+	c = AOther.c;
 }
 
 AdvancedDelegateItem::~AdvancedDelegateItem()
@@ -84,13 +77,14 @@ AdvancedDelegateItem::~AdvancedDelegateItem()
 
 AdvancedDelegateItem &AdvancedDelegateItem::operator=(const AdvancedDelegateItem &AOther)
 {
-	if (this!=&AOther && d!=AOther.d)
+	if (d != AOther.d)
 	{
 		if (--d->refs == 0)
 			delete d;
 		d = AOther.d;
 		d->refs++;
 	}
+	c = AOther.c;
 	return *this;
 }
 
@@ -218,12 +212,8 @@ public:
 
 			if (FItem.d->hints.contains(AdvancedDelegateItem::Opacity))
 				APainter->setOpacity(FItem.d->hints.value(AdvancedDelegateItem::Opacity).toReal());
+			APainter->setOpacity(APainter->opacity() * FItem.c.blinkOpacity);
 			
-			if (FItem.d->flags & AdvancedDelegateItem::BlinkHide)
-				APainter->setOpacity(APainter->opacity() * BlinkHideSteps[BLINK_STEP]);
-			else if (FItem.d->flags & AdvancedDelegateItem::BlinkFade)
-				APainter->setOpacity(APainter->opacity() * BlinkFadeSteps[BLINK_STEP]);
-
 			switch (FItem.d->kind)
 			{
 			case AdvancedDelegateItem::Null:
@@ -253,7 +243,7 @@ public:
 				}
 			default:
 				{
-					drawVariant(APainter,getItemValue(FItem,FOption));
+					drawVariant(APainter,FItem.c.value);
 				}
 			}
 			APainter->restore();
@@ -317,9 +307,11 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 	FEditProxy = NULL;
 	FEditItemId = AdvancedDelegateItem::NullId;
 	
+	FBlinkOpacity = 1.0;
+	FBlinkMode = BlinkHide;
 	FBlinkTimer.setSingleShot(false);
 	FBlinkTimer.setInterval(BlinkStepsTime/BlinkStepsCount);
-	connect(&FBlinkTimer,SIGNAL(timeout()),SIGNAL(updateBlinkItems()));
+	connect(&FBlinkTimer,SIGNAL(timeout()),SLOT(onBlinkTimerTimeout()));
 	FBlinkTimer.start();
 }
 
@@ -386,6 +378,16 @@ QMargins AdvancedItemDelegate::contentsMargins() const
 void AdvancedItemDelegate::setContentsMargings(const QMargins &AMargins)
 {
 	FMargins = AMargins;
+}
+
+AdvancedItemDelegate::BlinkMode AdvancedItemDelegate::blinkMode() const
+{
+	return FBlinkMode;
+}
+
+void AdvancedItemDelegate::setBlinkMode(BlinkMode AMode)
+{
+	FBlinkMode = AMode;
 }
 
 int AdvancedItemDelegate::editItemId() const
@@ -477,7 +479,7 @@ QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOption
 			{
 				QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
 				AdvancedDelegateItems items = getIndexItems(AIndex,indexOption);
-				value = getItemValue(items.value(FEditItemId),indexOption);
+				value = items.value(FEditItemId).c.value;
 			}
 			
 			QVariant::Type type = static_cast<QVariant::Type>(value.userType());
@@ -544,7 +546,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			checkItem.d->kind = AdvancedDelegateItem::CheckBox;
 			setItemDefaults(AdvancedDelegateItem::CheckStateId,&checkItem);
-			checkItem.d->value = AIndex.data(Qt::CheckStateRole);
+			checkItem.d->data = AIndex.data(Qt::CheckStateRole);
 		}
 	}
 
@@ -555,7 +557,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			decorationItem.d->kind = AdvancedDelegateItem::Decoration;
 			setItemDefaults(AdvancedDelegateItem::DecorationId,&decorationItem);
-			decorationItem.d->value = AIndex.data(Qt::DecorationRole);
+			decorationItem.d->data = AIndex.data(Qt::DecorationRole);
 		}
 	}
 
@@ -566,7 +568,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		{
 			displayItem.d->kind = AdvancedDelegateItem::Display;
 			setItemDefaults(AdvancedDelegateItem::DisplayId,&displayItem);
-			displayItem.d->value = AIndex.data(Qt::DisplayRole);
+			displayItem.d->data = AIndex.data(Qt::DisplayRole);
 		}
 	}
 
@@ -577,7 +579,17 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		setItemDefaults(AdvancedDelegateItem::DisplayStretchId,&stretchItem);
 		stretchItem.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
 	}
-
+	
+	for(AdvancedDelegateItems::iterator it=items.begin(); it!=items.end(); ++it)
+	{
+		it->c.value = it->d->data;
+		if (it->d->kind==AdvancedDelegateItem::Decoration || it->d->kind==AdvancedDelegateItem::Display || it->d->kind==AdvancedDelegateItem::CustomData)
+			if (it->d->data.type() == QVariant::Int)
+				it->c.value = AIndex.data(it->d->data.toInt());
+		
+		it->c.blinkOpacity = (it->d->flags & AdvancedDelegateItem::Blink)>0 ? FBlinkOpacity : 1.0;
+	}
+	
 	return items;
 }
 
@@ -623,8 +635,6 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 {
 	QStyleOptionViewItemV4 itemOption = AIndexOption;
 
-	QVariant value = getItemValue(AItem,itemOption);
-
 	if (AItem.d->kind == AdvancedDelegateItem::Branch)
 	{
 		itemOption.state &= ~QStyle::State_Sibling;
@@ -634,7 +644,7 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 	{
 		itemOption.state &= ~QStyle::State_HasFocus;
 		itemOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
-		itemOption.checkState = static_cast<Qt::CheckState>(value.toInt());
+		itemOption.checkState = static_cast<Qt::CheckState>(AItem.c.value.toInt());
 
 		switch (itemOption.checkState)
 		{
@@ -654,8 +664,8 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 		itemOption.features &= ~QStyleOptionViewItemV2::HasCheckIndicator;
 	}
 
-	if (!value.isNull() && value.canConvert<QString>())
-		itemOption.text = getSingleLineText(displayText(value,itemOption.locale));
+	if (!AItem.c.value.isNull() && AItem.c.value.canConvert<QString>())
+		itemOption.text = getSingleLineText(displayText(AItem.c.value,itemOption.locale));
 
 	if (!AItem.d->hints.isEmpty())
 	{
@@ -845,6 +855,31 @@ int AdvancedItemDelegate::itemAt(const QPoint &APoint, const QStyleOptionViewIte
 	return itemId;
 }
 
+bool AdvancedItemDelegate::isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption)
+{
+	if (( AItemOption.state & AItem.d->showStates) != AItem.d->showStates)
+		return false;
+
+	if (( AItemOption.state & AItem.d->hideStates) > 0)
+		return false;
+
+	switch (AItem.d->kind)
+	{
+	case AdvancedDelegateItem::Null:
+		return false;
+	case AdvancedDelegateItem::Branch:
+		return (AItemOption.state & QStyle::State_Children)>0;
+	case AdvancedDelegateItem::CheckBox:
+		return (AItemOption.features & QStyleOptionViewItemV4::HasCheckIndicator)>0;
+	case AdvancedDelegateItem::Stretch:
+		return true;
+	case AdvancedDelegateItem::CustomWidget:
+		return AItem.d->widget!=NULL;
+	default:
+		return !AItem.c.value.isNull();
+	}
+}
+
 QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption)
 {
 	static const QSize zeroSize = QSize(0,0);
@@ -875,26 +910,25 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 		}
 	default:
 		{
-			QVariant value = getItemValue(AItem,AItemOption);
-			switch (value.type())
+			switch (AItem.c.value.type())
 			{
 			case QVariant::Pixmap:
 				{
-					QPixmap pixmap = qvariant_cast<QPixmap>(value);
+					QPixmap pixmap = qvariant_cast<QPixmap>(AItem.c.value);
 					if (!pixmap.isNull())
 						return pixmap.size();
 					break;
 				}
 			case QVariant::Image:
 				{
-					QImage image = qvariant_cast<QImage>(value);
+					QImage image = qvariant_cast<QImage>(AItem.c.value);
 					if (!image.isNull())
 						return image.size();
 					break;
 				}
 			case QVariant::Icon:
 				{
-					QIcon icon = qvariant_cast<QIcon>(value);
+					QIcon icon = qvariant_cast<QIcon>(AItem.c.value);
 					if (!icon.isNull())
 						return icon.actualSize(AItemOption.decorationSize);
 					break;
@@ -908,31 +942,6 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 			}
 			return zeroSize;
 		}
-	}
-}
-
-bool AdvancedItemDelegate::isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption)
-{
-	if (( AItemOption.state & AItem.d->showStates) != AItem.d->showStates)
-		return false;
-
-	if (( AItemOption.state & AItem.d->hideStates) > 0)
-		return false;
-
-	switch (AItem.d->kind)
-	{
-	case AdvancedDelegateItem::Null:
-		return false;
-	case AdvancedDelegateItem::Branch:
-		return (AItemOption.state & QStyle::State_Children)>0;
-	case AdvancedDelegateItem::CheckBox:
-		return (AItemOption.features & QStyleOptionViewItemV4::HasCheckIndicator)>0;
-	case AdvancedDelegateItem::Stretch:
-		return true;
-	case AdvancedDelegateItem::CustomWidget:
-		return AItem.d->widget!=NULL;
-	default:
-		return !getItemValue(AItem,AItemOption).isNull();
 	}
 }
 
@@ -1004,4 +1013,14 @@ bool AdvancedItemDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AMode
 		state =  Qt::Unchecked;
 
 	return AModel->setData(AIndex, state, Qt::CheckStateRole);
+}
+
+void AdvancedItemDelegate::onBlinkTimerTimeout()
+{
+	qreal blinkOpacity = FBlinkMode==BlinkHide ? BlinkHideSteps[BLINK_STEP] : BlinkFadeSteps[BLINK_STEP];
+	if (FBlinkOpacity != blinkOpacity)
+	{
+		FBlinkOpacity = blinkOpacity;
+		emit updateBlinkItems();
+	}
 }

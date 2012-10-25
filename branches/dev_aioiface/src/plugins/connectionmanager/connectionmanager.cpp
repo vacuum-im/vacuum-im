@@ -90,7 +90,7 @@ bool ConnectionManager::initObjects()
 		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->order = RLO_CONNECTION_ENCRYPTED;
-		label.d->value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
 		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;

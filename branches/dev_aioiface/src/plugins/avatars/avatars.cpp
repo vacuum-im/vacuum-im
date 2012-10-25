@@ -837,7 +837,7 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 				label.d->kind = AdvancedDelegateItem::CustomData;
 				label.d->position = AdvancedDelegateItem::MiddleRight;
 				label.d->order = RLO_AVATAR_IMAGE;
-				label.d->value = RDR_AVATAR_IMAGE;
+				label.d->data = RDR_AVATAR_IMAGE;
 				FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 				foreach (IRosterIndex *index, indexes)

@@ -57,17 +57,17 @@ struct UTILS_EXPORT AdvancedDelegateItem
 		Opacity
 	};
 	enum Flag {
-		BlinkHide          =0x00000001,
-		BlinkFade          =0x00000002
+		Hidden         =0x00000001,
+		Blink          =0x00000002
 	};
-	struct AdvancedDelegateItemData {
+	struct ExplicitData {
 		int refs;
 		int kind;
 		int order;
 		int floor;
 		int position;
 		quint32 flags;
-		QVariant value;
+		QVariant data;
 		QWidget *widget;
 		QSizePolicy sizePolicy;
 		QStyle::State showStates;
@@ -75,13 +75,18 @@ struct UTILS_EXPORT AdvancedDelegateItem
 		QMap<int,QVariant> hints;
 		QMap<int,QVariant> properties;
 	};
+	struct ContextData {
+		QVariant value;
+		qreal blinkOpacity;
+	};
 
 	AdvancedDelegateItem(int ADefaultsId = NullId);
 	AdvancedDelegateItem(const AdvancedDelegateItem &AOther);
 	~AdvancedDelegateItem();
-	AdvancedDelegateItem &operator =(const AdvancedDelegateItem &AOther); 
+	AdvancedDelegateItem &operator =(const AdvancedDelegateItem &AOther);
 
-	AdvancedDelegateItemData *d;
+	ContextData c;
+	ExplicitData *d;
 };
 Q_DECLARE_METATYPE(AdvancedDelegateItem);
 
@@ -114,6 +119,11 @@ class UTILS_EXPORT AdvancedItemDelegate :
 	Q_OBJECT;
 	struct ItemsLayout;
 public:
+	enum BlinkMode {
+		BlinkHide,
+		BlinkFade
+	};
+public:
 	AdvancedItemDelegate(QObject *AParent);
 	~AdvancedItemDelegate();
 	int itemsRole() const;
@@ -128,6 +138,8 @@ public:
 	void setDefaultBranchItemEnabled(bool AEnabled);
 	QMargins contentsMargins() const;
 	void setContentsMargings(const QMargins &AMargins);
+	BlinkMode blinkMode() const;
+	void setBlinkMode(BlinkMode AMode);
 public:
 	int editItemId() const;
 	void setEditItemId(int AItemId);
@@ -153,8 +165,8 @@ public:
 	int itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
 	int itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 public:
-	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
+	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 signals:
 	void updateBlinkItems();
 protected:
@@ -162,6 +174,8 @@ protected:
 	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const;
 protected:
 	bool editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex);
+protected slots:
+	void onBlinkTimerTimeout();
 private:
 	int FItemsRole;
 	int FVerticalSpacing;
@@ -169,6 +183,9 @@ private:
 	bool FFocusRectVisible;
 	bool FDefaultBranchEnabled;
 	QMargins FMargins;
+private:
+	qreal FBlinkOpacity;
+	BlinkMode FBlinkMode;
 	QTimer FBlinkTimer;
 private:
 	int FEditItemId;
