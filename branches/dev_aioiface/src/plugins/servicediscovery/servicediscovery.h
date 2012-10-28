@@ -9,7 +9,6 @@
 #include <definitions/version.h>
 #include <definitions/namespaces.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/actiongroups.h>

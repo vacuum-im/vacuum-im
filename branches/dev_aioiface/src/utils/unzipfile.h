@@ -44,6 +44,5 @@ private:
 };
 
 Q_DECLARE_METATYPE(UnzipFile);
-#define UNZIPFILE_METATYPE_ID qMetaTypeId<UnzipFile>()
 
 #endif // UNZIPFILE_H

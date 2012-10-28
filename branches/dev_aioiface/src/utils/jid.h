@@ -74,19 +74,10 @@ private:
 	QSharedDataPointer<JidData> d;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-	UTILS_EXPORT uint qHash(const Jid &Akey);
-	UTILS_EXPORT QDataStream &operator<<(QDataStream &AStream, const Jid &AJid);
-	UTILS_EXPORT QDataStream &operator>>(QDataStream &AStream, Jid &AJid);
-
-#ifdef __cplusplus
-}
-#endif
+UTILS_EXPORT uint qHash(const Jid &AKey);
+UTILS_EXPORT QDataStream &operator>>(QDataStream &AStream, Jid &AJid);
+UTILS_EXPORT QDataStream &operator<<(QDataStream &AStream, const Jid &AJid);
 
 Q_DECLARE_METATYPE(Jid);
-#define JID_METATYPE_ID qMetaTypeId<Jid>()
 
 #endif // JID_H

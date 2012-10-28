@@ -10,7 +10,6 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/actiongroups.h>
 #include <definitions/menuicons.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>

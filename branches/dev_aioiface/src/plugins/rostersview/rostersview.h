@@ -8,7 +8,6 @@
 #include <definitions/optionvalues.h>
 #include <definitions/shortcuts.h>
 #include <definitions/rostertooltiporders.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/rosterdataholderorders.h>

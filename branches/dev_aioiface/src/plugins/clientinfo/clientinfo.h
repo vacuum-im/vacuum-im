@@ -8,7 +8,6 @@
 #include <definitions/actiongroups.h>
 #include <definitions/dataformtypes.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/resources.h>

@@ -8,7 +8,6 @@
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>

@@ -90,10 +90,7 @@ struct UTILS_EXPORT AdvancedDelegateItem
 	ContextData *c;
 	ExplicitData *d;
 };
-Q_DECLARE_METATYPE(AdvancedDelegateItem);
-
 typedef QMap<quint32, AdvancedDelegateItem> AdvancedDelegateItems;
-Q_DECLARE_METATYPE(AdvancedDelegateItems);
 
 class AdvancedItemDelegate;
 class UTILS_EXPORT AdvancedDelegateEditProxy
@@ -183,5 +180,11 @@ private:
 	quint32 FEditItemId;
 	AdvancedDelegateEditProxy *FEditProxy;
 };
+
+UTILS_EXPORT QDataStream &operator>>(QDataStream &AStream, AdvancedDelegateItem &AItem);
+UTILS_EXPORT QDataStream &operator<<(QDataStream &AStream, const AdvancedDelegateItem &AItem);
+
+Q_DECLARE_METATYPE(AdvancedDelegateItem);
+Q_DECLARE_METATYPE(AdvancedDelegateItems);
 
 #endif // ADVANCEDITEMDELEGATE_H

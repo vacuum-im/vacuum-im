@@ -6,7 +6,6 @@
 #include <QPointer>
 #include <QDateTime>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>

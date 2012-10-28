@@ -3,7 +3,6 @@
 
 #include <QDateTime>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/rosteredithandlerorders.h>

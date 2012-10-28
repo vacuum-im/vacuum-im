@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QMultiMap>
 #include <QDateTime>
+#include <QDataStream>
 #include <QLayoutItem>
 #include <QMouseEvent>
 #include <QHBoxLayout>
@@ -18,6 +19,17 @@ const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.
 const int BlinkStepsCount = sizeof(BlinkHideSteps)/sizeof(BlinkHideSteps[0]);
 const int BlinkStepsTime = 1000;
 #define BLINK_STEP ((QDateTime::currentMSecsSinceEpoch() % BlinkStepsTime) * BlinkStepsCount / BlinkStepsTime)
+
+void registerAdvancedDelegateItemStreamOperators()
+{
+	static bool typeStreamOperatorsRegistered = false;
+	if (!typeStreamOperatorsRegistered)
+	{
+		typeStreamOperatorsRegistered = true;
+		qRegisterMetaTypeStreamOperators<AdvancedDelegateItem>("AdvancedDelegateItem");
+		qRegisterMetaTypeStreamOperators<AdvancedDelegateItems>("AdvancedDelegateItems");
+	}
+}
 
 void destroyLayoutRecursive(QLayout *ALayout)
 {
@@ -48,12 +60,57 @@ const quint32 AdvancedDelegateItem::CheckStateId  = AdvancedDelegateItem::makeId
 const quint32 AdvancedDelegateItem::DecorationId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,500);
 const quint32 AdvancedDelegateItem::DisplayId     = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,500);
 
+QDataStream &operator<<(QDataStream &AStream, const AdvancedDelegateItem &AItem)
+{
+	AStream 
+		<< AItem.d->id
+		<< AItem.d->kind
+		<< AItem.d->flags
+		<< AItem.d->data
+		<< (qint64)AItem.d->widget
+		<< AItem.d->sizePolicy
+		<< (int)AItem.d->showStates
+		<< (int)AItem.d->hideStates
+		<< AItem.d->hints
+		<< AItem.d->properties
+		<< AItem.c->value
+		<< AItem.c->blinkOpacity;
+
+	return AStream;
+}
+
+QDataStream &operator>>(QDataStream &AStream, AdvancedDelegateItem &AItem)
+{
+	qint64 widget;
+	int showStates, hideStates;
+
+	AStream 
+		>> AItem.d->id 
+		>> AItem.d->kind 
+		>> AItem.d->flags 
+		>> AItem.d->data 
+		>> widget
+		>> AItem.d->sizePolicy
+		>> showStates
+		>> hideStates
+		>> AItem.d->hints
+		>> AItem.d->properties
+		>> AItem.c->value
+		>> AItem.c->blinkOpacity;
+
+	AItem.d->widget = (QWidget *)widget;
+	AItem.d->showStates = (QStyle::State)showStates;
+	AItem.d->hideStates = (QStyle::State)hideStates;
+
+	return AStream;
+}
+
 AdvancedDelegateItem::AdvancedDelegateItem(quint32 AId)
 {
 	d = new ExplicitData;
 	d->refs = 1;
-	d->kind = Null;
 	d->id = AId;
+	d->kind = Null;
 	d->flags = 0;
 	d->showStates = 0;
 	d->hideStates = 0;
@@ -61,6 +118,8 @@ AdvancedDelegateItem::AdvancedDelegateItem(quint32 AId)
 
 	c = new ContextData;
 	c->blinkOpacity = 1.0;
+
+	registerAdvancedDelegateItemStreamOperators();
 }
 
 AdvancedDelegateItem::AdvancedDelegateItem(const AdvancedDelegateItem &AOther)

@@ -7,7 +7,6 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/discoitemdataroles.h>
