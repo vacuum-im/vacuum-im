@@ -15,15 +15,6 @@
 
 struct UTILS_EXPORT AdvancedDelegateItem
 {
-	enum Id {
-		NullId,
-		BranchId,
-		CheckStateId,
-		DecorationId,
-		DisplayId,
-		DisplayStretchId,
-		UserId = 16
-	};
 	enum Kind {
 		Null,
 		Branch,
@@ -62,10 +53,8 @@ struct UTILS_EXPORT AdvancedDelegateItem
 	};
 	struct ExplicitData {
 		int refs;
-		int kind;
-		int order;
-		int floor;
-		int position;
+		quint32 id;
+		quint8 kind;
 		quint32 flags;
 		QVariant data;
 		QWidget *widget;
@@ -80,28 +69,31 @@ struct UTILS_EXPORT AdvancedDelegateItem
 		qreal blinkOpacity;
 	};
 
-	AdvancedDelegateItem(int ADefaultsId = NullId);
+	AdvancedDelegateItem(quint32 AId = NullId);
 	AdvancedDelegateItem(const AdvancedDelegateItem &AOther);
 	~AdvancedDelegateItem();
 	AdvancedDelegateItem &operator =(const AdvancedDelegateItem &AOther);
+	
+	static const quint16 AlignRightOrderMask = 0x8000;
+	static quint32 makeId(quint8 APosition, quint8 AFloor, quint16 AOrder);
+	static quint32 makeStretchId(quint8 APosition, quint8 AFloor);
+	static quint8 getPosition(quint32 AItemId);
+	static quint8 getFloor(quint32 AItemId);
+	static quint16 getOrder(quint32 AItemId);
 
-	ContextData c;
+	static const quint32 NullId;        //= 0
+	static const quint32 BranchId;      //= makeId(MiddleLeft,128,10)
+	static const quint32 CheckStateId;  //= makeId(MiddleLeft,128,100)
+	static const quint32 DecorationId;  //= makeId(MiddleLeft,128,500)
+	static const quint32 DisplayId;     //= makeId(MiddleCenter,128,500)
+
+	ContextData *c;
 	ExplicitData *d;
 };
 Q_DECLARE_METATYPE(AdvancedDelegateItem);
 
-typedef QMap<int, AdvancedDelegateItem> AdvancedDelegateItems;
+typedef QMap<quint32, AdvancedDelegateItem> AdvancedDelegateItems;
 Q_DECLARE_METATYPE(AdvancedDelegateItems);
-
-static const struct {int id; int position; int floor; int order;} AdvancedDelegateItemDefaults[] =
-{
-	{ AdvancedDelegateItem::NullId,           AdvancedDelegateItem::MiddleCenter, 500, 0     },
-	{ AdvancedDelegateItem::BranchId,         AdvancedDelegateItem::MiddleLeft,   500, 10    },
-	{ AdvancedDelegateItem::CheckStateId,     AdvancedDelegateItem::MiddleLeft,   500, 100   },
-	{ AdvancedDelegateItem::DecorationId,     AdvancedDelegateItem::MiddleLeft,   500, 500   },
-	{ AdvancedDelegateItem::DisplayId,        AdvancedDelegateItem::MiddleCenter, 500, 500   },
-	{ AdvancedDelegateItem::DisplayStretchId, AdvancedDelegateItem::MiddleCenter, 500, 10000 },
-};
 
 class AdvancedItemDelegate;
 class UTILS_EXPORT AdvancedDelegateEditProxy
@@ -141,8 +133,8 @@ public:
 	BlinkMode blinkMode() const;
 	void setBlinkMode(BlinkMode AMode);
 public:
-	int editItemId() const;
-	void setEditItemId(int AItemId);
+	quint32 editItemId() const;
+	void setEditItemId(quint32 AItemId);
 	AdvancedDelegateEditProxy *editProxy() const;
 	void setEditProxy(AdvancedDelegateEditProxy *AProxy);
 	const QItemEditorFactory *editorFactory() const;
@@ -160,10 +152,10 @@ public:
 	ItemsLayout *createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItemV4 &AIndexOption) const;
 	void destroyItemsLayout(ItemsLayout *ALayout) const;
 public:
-	QRect itemRect(int AItemId, const ItemsLayout *ALayout, const QRect &AGeometry) const;
-	QRect itemRect(int AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-	int itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
-	int itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	QRect itemRect(quint32 AItemId, const ItemsLayout *ALayout, const QRect &AGeometry) const;
+	QRect itemRect(quint32 AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	quint32 itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
+	quint32 itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 public:
 	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
@@ -188,7 +180,7 @@ private:
 	BlinkMode FBlinkMode;
 	QTimer FBlinkTimer;
 private:
-	int FEditItemId;
+	quint32 FEditItemId;
 	AdvancedDelegateEditProxy *FEditProxy;
 };
 

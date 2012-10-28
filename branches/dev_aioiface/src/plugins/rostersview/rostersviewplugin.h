@@ -29,11 +29,11 @@
 #include "sortfilterproxymodel.h"
 
 class RostersViewPlugin :
-			public QObject,
-			public IPlugin,
-			public IRostersViewPlugin,
-			public IOptionsHolder,
-			public IRosterDataHolder
+	public QObject,
+	public IPlugin,
+	public IRostersViewPlugin,
+	public IOptionsHolder,
+	public IRosterDataHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder IRosterDataHolder);

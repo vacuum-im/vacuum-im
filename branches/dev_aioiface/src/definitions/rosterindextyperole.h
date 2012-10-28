@@ -30,12 +30,8 @@ enum RosterIndexDataRoles {
 	RDR_PRIORITY,
 	RDR_SUBSCRIBTION,
 	RDR_ASK,
-	//Decoration Roles
-	RDR_FONT_WEIGHT,
-	//Labels roles
+	//View roles
 	RDR_LABEL_ITEMS,
-	RDR_DECORATION_FLAGS,
-	RDR_FOOTER_TEXT,
 	//Avatars
 	RDR_AVATAR_HASH,
 	RDR_AVATAR_IMAGE,

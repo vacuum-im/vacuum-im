@@ -26,7 +26,7 @@ StatusChanger::StatusChanger()
 	FModifyStatus = NULL;
 	FStatusIcons = NULL;
 	FChangingPresence = NULL;
-	FConnectingLabel = AdvancedDelegateItem::NullId;
+	FConnectingLabel = 0;
 }
 
 StatusChanger::~StatusChanger()
@@ -91,8 +91,8 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 		if (FRostersViewPlugin)
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -195,9 +195,8 @@ bool StatusChanger::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
+		AdvancedDelegateItem label(RLID_STATUSCHANGER_CONNECTING);
 		label.d->kind = AdvancedDelegateItem::CustomData;
-		label.d->order = RLO_CONNECTING;
 		label.d->flags = AdvancedDelegateItem::Blink;
 		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
 		FConnectingLabel = FRostersViewPlugin->rostersView()->registerLabel(label);
@@ -224,6 +223,7 @@ bool StatusChanger::initObjects()
 
 bool StatusChanger::initSettings()
 {
+	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
 	Options::setDefaultValue(OPV_STATUS_SHOW,IPresence::Online);
 	Options::setDefaultValue(OPV_STATUS_TEXT,nameByShow(IPresence::Online));
 	Options::setDefaultValue(OPV_STATUS_PRIORITY,0);
@@ -257,6 +257,10 @@ QMultiMap<int, IOptionsWidget *> StatusChanger::optionsWidgets(const QString &AN
 		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
 		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-connect"),tr("Auto connect on startup"),AParent));
 		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"),AParent));
+	}
+	else if (FOptionsManager && ANodeId==OPN_ROSTER)
+	{
+		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"),AParent));
 	}
 	return widgets;
 }
@@ -641,22 +645,22 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 			removeTempStatus(APresence);
 		updateTrayToolTip();
 
-		bool statusShown = Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool();
-		IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
-		if (APresence->show() == IPresence::Error)
-		{
-			if (index && !statusShown)
-				FRostersView->insertFooterText(FTO_ROSTERSVIEW_STATUS,APresence->status(),index);
-			if (!FNotifyId.contains(APresence))
-				insertStatusNotification(APresence);
-			FFastReconnect -= APresence;
-		}
-		else
-		{
-			if (index && !statusShown)
-				FRostersView->removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
-			removeStatusNotification(APresence);
-		}
+		//bool statusShown = Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool();
+		//IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
+		//if (APresence->show() == IPresence::Error)
+		//{
+		//	if (index && !statusShown)
+		//		FRostersView->insertFooterText(FTO_ROSTERSVIEW_STATUS,APresence->status(),index);
+		//	if (!FNotifyId.contains(APresence))
+		//		insertStatusNotification(APresence);
+		//	FFastReconnect -= APresence;
+		//}
+		//else
+		//{
+		//	if (index && !statusShown)
+		//		FRostersView->removeFooterText(FTO_ROSTERSVIEW_STATUS,index);
+		//	removeStatusNotification(APresence);
+		//}
 
 		emit statusChanged(APresence->streamJid(), AStatusId);
 	}
@@ -1074,7 +1078,7 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 		action->setData(ADR_STREAMJID,AAfter.full());
 }
 
-void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
 	{

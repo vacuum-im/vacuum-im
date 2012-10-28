@@ -39,40 +39,44 @@ QString getSingleLineText(const QString &AText)
 	return text.trimmed();
 }
 
-inline void setItemDefaults(int AItemId, AdvancedDelegateItem *AItem)
-{
-	int index = AdvancedDelegateItem::NullId<=AItemId && AItemId<=AdvancedDelegateItem::DisplayStretchId ? AItemId : AdvancedDelegateItem::NullId;
-	AItem->d->position = AdvancedDelegateItemDefaults[index].position;
-	AItem->d->floor = AdvancedDelegateItemDefaults[index].floor;
-	AItem->d->order = AdvancedDelegateItemDefaults[index].order;
-}
-
 /*********************
 	AdvancedDelegateItem
 **********************/
-AdvancedDelegateItem::AdvancedDelegateItem(int ADefaultsId)
+const quint32 AdvancedDelegateItem::NullId        = 0;
+const quint32 AdvancedDelegateItem::BranchId      = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,10);
+const quint32 AdvancedDelegateItem::CheckStateId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,100);
+const quint32 AdvancedDelegateItem::DecorationId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,500);
+const quint32 AdvancedDelegateItem::DisplayId     = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,500);
+
+AdvancedDelegateItem::AdvancedDelegateItem(quint32 AId)
 {
 	d = new ExplicitData;
 	d->refs = 1;
 	d->kind = Null;
+	d->id = AId;
 	d->flags = 0;
 	d->showStates = 0;
 	d->hideStates = 0;
 	d->widget = NULL;
-	setItemDefaults(ADefaultsId, this);
+
+	c = new ContextData;
+	c->blinkOpacity = 1.0;
 }
 
 AdvancedDelegateItem::AdvancedDelegateItem(const AdvancedDelegateItem &AOther)
 {
 	d = AOther.d;
 	d->refs++;
-	c = AOther.c;
+
+	c = new ContextData;
+	*c = *AOther.c;
 }
 
 AdvancedDelegateItem::~AdvancedDelegateItem()
 {
 	if (--d->refs == 0)
 		delete d;
+	delete c;
 }
 
 AdvancedDelegateItem &AdvancedDelegateItem::operator=(const AdvancedDelegateItem &AOther)
@@ -84,8 +88,34 @@ AdvancedDelegateItem &AdvancedDelegateItem::operator=(const AdvancedDelegateItem
 		d = AOther.d;
 		d->refs++;
 	}
-	c = AOther.c;
+
+	*c = *AOther.c;
 	return *this;
+}
+
+quint32 AdvancedDelegateItem::makeId(quint8 APosition, quint8 AFloor, quint16 AOrder)
+{
+	return (((quint32)(APosition+1))<<24) + (((quint32)AFloor)<<16) + (quint32)AOrder;
+}
+
+quint32 AdvancedDelegateItem::makeStretchId( quint8 APosition, quint8 AFloor )
+{
+	return makeId(APosition,AFloor,AlignRightOrderMask);
+}
+
+quint8 AdvancedDelegateItem::getPosition(quint32 AItemId)
+{
+	return (AItemId >> 24) - 1;
+}
+
+quint8 AdvancedDelegateItem::getFloor(quint32 AItemId)
+{
+	return (AItemId & 0x00FF0000) >> 16;
+}
+
+quint16 AdvancedDelegateItem::getOrder(quint32 AItemId)
+{
+	return AItemId & 0x0000FFFF;
 }
 
 /***************************
@@ -212,7 +242,7 @@ public:
 
 			if (FItem.d->hints.contains(AdvancedDelegateItem::Opacity))
 				APainter->setOpacity(FItem.d->hints.value(AdvancedDelegateItem::Opacity).toReal());
-			APainter->setOpacity(APainter->opacity() * FItem.c.blinkOpacity);
+			APainter->setOpacity(APainter->opacity() * FItem.c->blinkOpacity);
 			
 			switch (FItem.d->kind)
 			{
@@ -243,7 +273,7 @@ public:
 				}
 			default:
 				{
-					drawVariant(APainter,FItem.c.value);
+					drawVariant(APainter,FItem.c->value);
 				}
 			}
 			APainter->restore();
@@ -390,12 +420,12 @@ void AdvancedItemDelegate::setBlinkMode(BlinkMode AMode)
 	FBlinkMode = AMode;
 }
 
-int AdvancedItemDelegate::editItemId() const
+quint32 AdvancedItemDelegate::editItemId() const
 {
 	return FEditItemId;
 }
 
-void AdvancedItemDelegate::setEditItemId(int AItemId)
+void AdvancedItemDelegate::setEditItemId(quint32 AItemId)
 {
 	FEditItemId = AItemId;
 }
@@ -479,7 +509,7 @@ QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOption
 			{
 				QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
 				AdvancedDelegateItems items = getIndexItems(AIndex,indexOption);
-				value = items.value(FEditItemId).c.value;
+				value = items.value(FEditItemId).c->value;
 			}
 			
 			QVariant::Type type = static_cast<QVariant::Type>(value.userType());
@@ -518,7 +548,7 @@ void AdvancedItemDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOp
 {
 	if (FEditProxy==NULL || !FEditProxy->updateEditorGeometry(this,AEditor,AOption,AIndex))
 	{
-		int itemId = FEditItemId!=AdvancedDelegateItem::NullId ? FEditItemId : AdvancedDelegateItem::DisplayId;
+		quint32 itemId = FEditItemId!=AdvancedDelegateItem::NullId ? FEditItemId : AdvancedDelegateItem::DisplayId;
 		QRect rect = itemRect(itemId,AOption,AIndex);
 		rect.adjust(-1,-1,1,1);
 		AEditor->setGeometry(rect);
@@ -535,7 +565,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		if (branchItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			branchItem.d->kind = AdvancedDelegateItem::Branch;
-			setItemDefaults(AdvancedDelegateItem::BranchId,&branchItem);
+			branchItem.d->id = AdvancedDelegateItem::BranchId;
 		}
 	}
 
@@ -545,7 +575,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		if (checkItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			checkItem.d->kind = AdvancedDelegateItem::CheckBox;
-			setItemDefaults(AdvancedDelegateItem::CheckStateId,&checkItem);
+			checkItem.d->id = AdvancedDelegateItem::CheckStateId;
 			checkItem.d->data = AIndex.data(Qt::CheckStateRole);
 		}
 	}
@@ -556,7 +586,7 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		if (decorationItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			decorationItem.d->kind = AdvancedDelegateItem::Decoration;
-			setItemDefaults(AdvancedDelegateItem::DecorationId,&decorationItem);
+			decorationItem.d->id = AdvancedDelegateItem::DecorationId;
 			decorationItem.d->data = AIndex.data(Qt::DecorationRole);
 		}
 	}
@@ -567,28 +597,36 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 		if (displayItem.d->kind == AdvancedDelegateItem::Null)
 		{
 			displayItem.d->kind = AdvancedDelegateItem::Display;
-			setItemDefaults(AdvancedDelegateItem::DisplayId,&displayItem);
+			displayItem.d->id = AdvancedDelegateItem::DisplayId;
 			displayItem.d->data = AIndex.data(Qt::DisplayRole);
 		}
 	}
 
-	AdvancedDelegateItem &stretchItem = items[AdvancedDelegateItem::DisplayStretchId];
-	if (stretchItem.d->kind == AdvancedDelegateItem::Null)
-	{
-		stretchItem.d->kind = AdvancedDelegateItem::Stretch;
-		setItemDefaults(AdvancedDelegateItem::DisplayStretchId,&stretchItem);
-		stretchItem.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
-	}
-	
+	AdvancedDelegateItems stretches;
 	for(AdvancedDelegateItems::iterator it=items.begin(); it!=items.end(); ++it)
 	{
-		it->c.value = it->d->data;
+		quint8 position = AdvancedDelegateItem::getPosition(it->d->id);
+		if (position == AdvancedDelegateItem::MiddleCenter)
+		{
+			quint8 floor = AdvancedDelegateItem::getFloor(it->d->id);
+			quint32 stretchId = AdvancedDelegateItem::makeStretchId(position,floor);
+			if (!stretches.contains(stretchId) && !items.contains(stretchId))
+			{
+				AdvancedDelegateItem stretchItem(stretchId);
+				stretchItem.d->kind = AdvancedDelegateItem::Stretch;
+				stretchItem.d->sizePolicy = QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+				stretches.insertMulti(stretchId,stretchItem);
+			}
+		}
+
+		it->c->value = it->d->data;
 		if (it->d->kind==AdvancedDelegateItem::Decoration || it->d->kind==AdvancedDelegateItem::Display || it->d->kind==AdvancedDelegateItem::CustomData)
 			if (it->d->data.type() == QVariant::Int)
-				it->c.value = AIndex.data(it->d->data.toInt());
+				it->c->value = AIndex.data(it->d->data.toInt());
 		
-		it->c.blinkOpacity = (it->d->flags & AdvancedDelegateItem::Blink)>0 ? FBlinkOpacity : 1.0;
+		it->c->blinkOpacity = (it->d->flags & AdvancedDelegateItem::Blink)>0 ? FBlinkOpacity : 1.0;
 	}
+	items.unite(stretches);
 	
 	return items;
 }
@@ -644,7 +682,7 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 	{
 		itemOption.state &= ~QStyle::State_HasFocus;
 		itemOption.features |= QStyleOptionViewItemV2::HasCheckIndicator;
-		itemOption.checkState = static_cast<Qt::CheckState>(AItem.c.value.toInt());
+		itemOption.checkState = static_cast<Qt::CheckState>(AItem.c->value.toInt());
 
 		switch (itemOption.checkState)
 		{
@@ -664,8 +702,8 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 		itemOption.features &= ~QStyleOptionViewItemV2::HasCheckIndicator;
 	}
 
-	if (!AItem.c.value.isNull() && AItem.c.value.canConvert<QString>())
-		itemOption.text = getSingleLineText(displayText(AItem.c.value,itemOption.locale));
+	if (!AItem.c->value.isNull() && AItem.c->value.canConvert<QString>())
+		itemOption.text = getSingleLineText(displayText(AItem.c->value,itemOption.locale));
 
 	if (!AItem.d->hints.isEmpty())
 	{
@@ -739,16 +777,20 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 		QStyleOptionViewItemV4 itemOption = itemStyleOption(it.value(),AIndexOption);
 		if (isItemVisible(it.value(),itemOption))
 		{
+			quint8 position = AdvancedDelegateItem::getPosition(it->d->id);
+			quint8 floor = AdvancedDelegateItem::getFloor(it->d->id);
+			quint16 order = AdvancedDelegateItem::getOrder(it->d->id);
+
 			QMap<int, QBoxLayout *> &posLayouts = layout->positionLayouts;
-			QBoxLayout *&posLayout = posLayouts[it->d->position];
+			QBoxLayout *&posLayout = posLayouts[position];
 			if (posLayout == NULL)
 			{
 				posLayout = new QVBoxLayout;
 				posLayout->setSpacing(vSpacing);
 			}
 
-			QMap<int, QBoxLayout *> &floorLayouts = layout->floorLayouts[it->d->position];
-			QBoxLayout *&floorLayout = floorLayouts[it->d->floor];
+			QMap<int, QBoxLayout *> &floorLayouts = layout->floorLayouts[position];
+			QBoxLayout *&floorLayout = floorLayouts[floor];
 			if (floorLayout == NULL)
 			{
 				floorLayout = new QHBoxLayout;
@@ -757,7 +799,7 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 
 			AdvancedDelegateLayoutItem *item = new AdvancedDelegateLayoutItem(it.value(),itemOption);
 			layout->items.insert(it.key(),item);
-			orderedItems[it->d->position][it->d->floor].insertMulti(it->d->order,item);
+			orderedItems[position][floor].insertMulti(order,item);
 		}
 	}
 
@@ -801,7 +843,7 @@ void AdvancedItemDelegate::destroyItemsLayout(ItemsLayout *ALayout) const
 	delete ALayout;
 }
 
-QRect AdvancedItemDelegate::itemRect(int AItemId, const ItemsLayout *ALayout, const QRect &AGeometry) const
+QRect AdvancedItemDelegate::itemRect(quint32 AItemId, const ItemsLayout *ALayout, const QRect &AGeometry) const
 {
 	QRect rect;
 	if (ALayout->items.contains(AItemId))
@@ -813,7 +855,7 @@ QRect AdvancedItemDelegate::itemRect(int AItemId, const ItemsLayout *ALayout, co
 	return rect;
 }
 
-QRect AdvancedItemDelegate::itemRect(int AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+QRect AdvancedItemDelegate::itemRect(quint32 AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
 	QRect rect;
 	if (AIndex.isValid() && !AOption.rect.isEmpty())
@@ -826,7 +868,7 @@ QRect AdvancedItemDelegate::itemRect(int AItemId, const QStyleOptionViewItem &AO
 	return rect;
 }
 
-int AdvancedItemDelegate::itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const
+quint32 AdvancedItemDelegate::itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const
 {
 	if (AGeometry.contains(APoint))
 	{
@@ -842,9 +884,9 @@ int AdvancedItemDelegate::itemAt(const QPoint &APoint, const ItemsLayout *ALayou
 	return AdvancedDelegateItem::NullId;
 }
 
-int AdvancedItemDelegate::itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+quint32 AdvancedItemDelegate::itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	int itemId = AdvancedDelegateItem::NullId;
+	quint32 itemId = AdvancedDelegateItem::NullId;
 	if (AIndex.isValid() && !AOption.rect.isEmpty())
 	{
 		QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
@@ -876,7 +918,7 @@ bool AdvancedItemDelegate::isItemVisible(const AdvancedDelegateItem &AItem, cons
 	case AdvancedDelegateItem::CustomWidget:
 		return AItem.d->widget!=NULL;
 	default:
-		return !AItem.c.value.isNull();
+		return !AItem.c->value.isNull();
 	}
 }
 
@@ -910,25 +952,25 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 		}
 	default:
 		{
-			switch (AItem.c.value.type())
+			switch (AItem.c->value.type())
 			{
 			case QVariant::Pixmap:
 				{
-					QPixmap pixmap = qvariant_cast<QPixmap>(AItem.c.value);
+					QPixmap pixmap = qvariant_cast<QPixmap>(AItem.c->value);
 					if (!pixmap.isNull())
 						return pixmap.size();
 					break;
 				}
 			case QVariant::Image:
 				{
-					QImage image = qvariant_cast<QImage>(AItem.c.value);
+					QImage image = qvariant_cast<QImage>(AItem.c->value);
 					if (!image.isNull())
 						return image.size();
 					break;
 				}
 			case QVariant::Icon:
 				{
-					QIcon icon = qvariant_cast<QIcon>(AItem.c.value);
+					QIcon icon = qvariant_cast<QIcon>(AItem.c->value);
 					if (!icon.isNull())
 						return icon.actualSize(AItemOption.decorationSize);
 					break;

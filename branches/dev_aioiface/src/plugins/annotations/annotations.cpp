@@ -82,12 +82,12 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		if (FRostersViewPlugin)
 		{
 			IRostersView *rostersView = FRostersViewPlugin->rostersView();
-			connect(rostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(rostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, Menu *)),
 				SLOT(onRosterIndexClipboardMenu(const QList<IRosterIndex *> &, Menu *)));
-			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)));
 		}
 	}
 
@@ -389,7 +389,7 @@ void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	}
 }
 
-void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
@@ -426,7 +426,7 @@ void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndex
 	}
 }
 
-void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && rosterDataTypes().contains(AIndex->type()))
 	{

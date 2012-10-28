@@ -129,10 +129,10 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 		if (FRostersViewPlugin)
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
-			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32 , QMultiMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32 , QMultiMap<int,QString> &)));
 		}
 	}
 
@@ -1273,7 +1273,7 @@ void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMu
 	AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
 }
 
-void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
@@ -1305,7 +1305,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 	}
 }
 
-void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{

@@ -11,7 +11,7 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterfootertextorders.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -126,7 +126,7 @@ protected slots:
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterClosed(IRoster *ARoster);
 	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDefaultStatusIconsChanged();
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -157,7 +157,7 @@ private:
 	QMap<IPresence *, Menu *> FStreamMenu;
 	QMap<IPresence *, Action *> FMainStatusActions;
 private:
-	int FConnectingLabel;
+	quint32 FConnectingLabel;
 	IPresence *FChangingPresence;
 	QSet<IPresence *> FFastReconnect;
 	QList<IPresence *> FShutdownList;

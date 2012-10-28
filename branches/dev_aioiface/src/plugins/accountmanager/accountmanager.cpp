@@ -50,8 +50,8 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &AInitO
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -255,7 +255,7 @@ void AccountManager::onAccountOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
-void AccountManager::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void AccountManager::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
 	{

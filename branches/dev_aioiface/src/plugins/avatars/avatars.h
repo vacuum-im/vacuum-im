@@ -5,7 +5,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/stanzahandlerorders.h>
-#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rostertooltiporders.h>
@@ -91,8 +91,8 @@ protected slots:
 	void onVCardChanged(const Jid &AContactJid);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onSetAvatarByAction(bool);
 	void onClearAvatarByAction(bool);
 	void onIconStorageChanged();
@@ -124,7 +124,7 @@ private:
 	bool FShowGrayAvatars;
 	QMap<Jid, QString> FCustomPictures;
 private:
-	int FAvatarLabelId;
+	quint32 FAvatarLabelId;
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
 	QImage FGrayEmptyAvatar;

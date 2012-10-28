@@ -124,8 +124,8 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -798,7 +798,7 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const QStrin
 	}
 }
 
-void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{

@@ -82,8 +82,8 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 			FRostersView = rostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -865,7 +865,7 @@ void RosterChanger::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASe
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{

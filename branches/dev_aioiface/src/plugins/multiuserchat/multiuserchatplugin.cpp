@@ -110,8 +110,8 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 			FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 			if (FRostersViewPlugin)
 			{
-				connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-					SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+				connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+					SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 			}
 		}
 
@@ -850,7 +850,7 @@ void MultiUserChatPlugin::onLeaveHiddenRoomsTriggered(bool)
 			window->exitAndDestroy(QString::null);
 }
 
-void MultiUserChatPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void MultiUserChatPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{

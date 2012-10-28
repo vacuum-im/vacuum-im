@@ -72,7 +72,7 @@ protected slots:
 	void onShowAccountOptions(bool);
 	void onAccountActiveChanged(bool AActive);
 	void onAccountOptionsChanged(const OptionsNode &ANode);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 private:
 	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;

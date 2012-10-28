@@ -123,8 +123,8 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -2241,7 +2241,7 @@ void MessageArchiver::onRosterIndexMultiSelection(const QList<IRosterIndex *> &A
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{

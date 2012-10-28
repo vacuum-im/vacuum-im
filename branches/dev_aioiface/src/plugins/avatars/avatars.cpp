@@ -31,7 +31,7 @@ Avatars::Avatars()
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
 
-	FAvatarLabelId = -1;
+	FAvatarLabelId = 0;
 	FAvatarsVisible = false;
 	FShowEmptyAvatars = true;
 	FShowGrayAvatars = true;
@@ -105,10 +105,10 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)));
 		}
 	}
 
@@ -670,7 +670,7 @@ void Avatars::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
@@ -723,7 +723,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, in
 	}
 }
 
-void Avatars::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void Avatars::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
 {
 	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->type()))
 	{
@@ -833,10 +833,8 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 					findData.insertMulti(RDR_TYPE,type);
 				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData, true);
 
-				AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
+				AdvancedDelegateItem label(RLID_AVATAR_IMAGE);
 				label.d->kind = AdvancedDelegateItem::CustomData;
-				label.d->position = AdvancedDelegateItem::MiddleRight;
-				label.d->order = RLO_AVATAR_IMAGE;
 				label.d->data = RDR_AVATAR_IMAGE;
 				FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
@@ -846,7 +844,7 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 			else
 			{
 				FRostersViewPlugin->rostersView()->destroyLabel(FAvatarLabelId);
-				FAvatarLabelId = -1;
+				FAvatarLabelId = 0;
 				FAvatarImages.clear();
 			}
 		}

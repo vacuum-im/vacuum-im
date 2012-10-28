@@ -2,7 +2,7 @@
 
 ConnectionManager::ConnectionManager()
 {
-	FEncryptedLabelId = -1;
+	FEncryptedLabelId = 0;
 	FAccountManager = NULL;
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
@@ -87,9 +87,8 @@ bool ConnectionManager::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		AdvancedDelegateItem label(AdvancedDelegateItem::DisplayId);
+		AdvancedDelegateItem label(RLID_CONNECTION_ENCRYPTED);
 		label.d->kind = AdvancedDelegateItem::CustomData;
-		label.d->order = RLO_CONNECTION_ENCRYPTED;
 		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
 		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}

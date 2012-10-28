@@ -81,7 +81,7 @@ protected:
 	void registerDiscoFeatures();
 protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onShowVCardDialogByAction(bool);
 	void onShowVCardDialogByChatWindowAction(bool);

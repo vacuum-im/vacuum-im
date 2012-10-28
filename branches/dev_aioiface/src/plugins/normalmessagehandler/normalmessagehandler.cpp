@@ -105,8 +105,8 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 			FRostersView = rostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -654,7 +654,7 @@ void NormalMessageHandler::onRosterIndexMultiSelection(const QList<IRosterIndex 
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{

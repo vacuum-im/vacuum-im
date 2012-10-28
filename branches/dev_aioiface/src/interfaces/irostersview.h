@@ -107,13 +107,13 @@ public:
 	virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const=0;
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const=0;
 	//--IndexLabel
-	virtual int registerLabel(const AdvancedDelegateItem &ALabel) =0;
-	virtual void updateLabel(int ALabelId, const AdvancedDelegateItem &ALabel) =0;
-	virtual void insertLabel(int ALabelId, IRosterIndex *AIndex) =0;
-	virtual void removeLabel(int ALabelId, IRosterIndex *AIndex) =0;
-	virtual void destroyLabel(int ALabelId) =0;
-	virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
-	virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const =0;
+	virtual quint32 registerLabel(const AdvancedDelegateItem &ALabel) =0;
+	virtual void updateLabel(quint32 ALabelId, const AdvancedDelegateItem &ALabel) =0;
+	virtual void insertLabel(quint32 ALabelId, IRosterIndex *AIndex) =0;
+	virtual void removeLabel(quint32 ALabelId, IRosterIndex *AIndex) =0;
+	virtual void destroyLabel(quint32 ALabelId) =0;
+	virtual quint32 labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
+	virtual QRect labelRect(quint32 ALabeld, const QModelIndex &AIndex) const =0;
 	//--IndexNotify
 	virtual int activeNotify(IRosterIndex *AIndex) const =0;
 	virtual QList<int> notifyQueue(IRosterIndex *AIndex) const =0;
@@ -134,11 +134,8 @@ public:
 	//--EditHandlers
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler) =0;
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler) =0;
-	//--FooterText
-	virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex) =0;
-	virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex) =0;
 	//--ContextMenu
-	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu) =0;
+	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu) =0;
 	//--ClipboardMenu
 	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
 protected:
@@ -152,10 +149,10 @@ protected:
 	virtual void viewModelChanged(QAbstractItemModel *AModel) =0;
 	virtual void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted) =0;
 	virtual void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
-	virtual void indexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu) =0;
-	virtual void indexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips) =0;
-	virtual void indexClicked(IRosterIndex *AIndex, int ALabelId) =0;
-	virtual void indexDoubleClicked(IRosterIndex *AIndex, int ALabelId) =0;
+	virtual void indexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu) =0;
+	virtual void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips) =0;
+	virtual void indexClicked(IRosterIndex *AIndex, quint32 ALabelId) =0;
+	virtual void indexDoubleClicked(IRosterIndex *AIndex, quint32 ALabelId) =0;
 	virtual void notifyInserted(int ANotifyId) =0;
 	virtual void notifyActivated(int ANotifyId) =0;
 	virtual void notifyRemoved(int ANotifyId) =0;

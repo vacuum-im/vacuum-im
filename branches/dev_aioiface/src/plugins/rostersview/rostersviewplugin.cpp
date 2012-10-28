@@ -64,7 +64,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
 		if (FRosterPlugin)
 		{
 			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidAboutToBeChanged(IRoster *, const Jid &)),
-			        SLOT(onRosterStreamJidAboutToBeChanged(IRoster *, const Jid &)));
+				SLOT(onRosterStreamJidAboutToBeChanged(IRoster *, const Jid &)));
 		}
 	}
 
@@ -137,9 +137,8 @@ bool RostersViewPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_ROSTER_SHOWOFFLINE,true);
 	Options::setDefaultValue(OPV_ROSTER_SHOWRESOURCE,true);
-	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
 	Options::setDefaultValue(OPV_ROSTER_SORTBYSTATUS,false);
-    Options::setDefaultValue(OPV_ROSTER_HIDE_SCROLLBAR,false);
+	Options::setDefaultValue(OPV_ROSTER_HIDE_SCROLLBAR,false);
 
 	if (FOptionsManager)
 	{
@@ -157,7 +156,6 @@ QMultiMap<int, IOptionsWidget *> RostersViewPlugin::optionsWidgets(const QString
 	{
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show offline contact"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource in roster"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SORTBYSTATUS),tr("Sort contacts by status"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_HIDE_SCROLLBAR),tr("Do not show the scroll bars"),AParent));
 	}
@@ -175,7 +173,6 @@ QList<int> RostersViewPlugin::rosterDataRoles() const
 	                               << Qt::DisplayRole
 	                               << Qt::BackgroundColorRole
 	                               << Qt::ForegroundRole
-	                               << RDR_FONT_WEIGHT
 	                               << RDR_STATES_FORCE_ON;
 	return dataRoles;
 }
@@ -213,8 +210,8 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
 		case Qt::BackgroundColorRole:
 			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
-		case RDR_FONT_WEIGHT:
-			return QFont::Bold;
+		//case RDR_FONT_WEIGHT:
+		//	return QFont::Bold;
 		case RDR_STATES_FORCE_ON:
 			return QStyle::State_Children;
 		}
@@ -230,8 +227,8 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return AIndex->data(RDR_NAME);
 		case Qt::ForegroundRole:
 			return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
-		case RDR_FONT_WEIGHT:
-			return QFont::DemiBold;
+		//case RDR_FONT_WEIGHT:
+		//	return QFont::DemiBold;
 		case RDR_STATES_FORCE_ON:
 			return QStyle::State_Children;
 		}
@@ -468,7 +465,6 @@ void RostersViewPlugin::onOptionsOpened()
 {
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWOFFLINE));
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWRESOURCE));
-	onOptionsChanged(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
 	onOptionsChanged(Options::node(OPV_ROSTER_SORTBYSTATUS));
 	onOptionsChanged(Options::node(OPV_ROSTER_HIDE_SCROLLBAR));
 }
@@ -485,11 +481,6 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 	else if (ANode.path() == OPV_ROSTER_SHOWRESOURCE)
 	{
 		FShowResource = ANode.value().toBool();
-		emit rosterDataChanged(NULL, Qt::DisplayRole);
-	}
-	else if (ANode.path() == OPV_ROSTER_SHOWSTATUSTEXT)
-	{
-		FRostersView->updateStatusText();
 		emit rosterDataChanged(NULL, Qt::DisplayRole);
 	}
 	else if (ANode.path() == OPV_ROSTER_SORTBYSTATUS)

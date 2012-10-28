@@ -113,7 +113,7 @@ protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
