@@ -241,7 +241,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 				rnotify.order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
 				rnotify.flags = record.notification.data.value(NDR_ROSTER_FLAGS).toInt();
 				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool())
-					rnotify.flags |= IRostersLabel::ExpandParents;
+					rnotify.flags |= IRostersNotify::ExpandParents;
 				rnotify.timeout = record.notification.data.value(NDR_ROSTER_TIMEOUT).toInt();
 				rnotify.footer = record.notification.data.value(NDR_ROSTER_FOOTER).toString();
 				rnotify.background = record.notification.data.value(NDR_ROSTER_BACKGROUND).value<QBrush>();

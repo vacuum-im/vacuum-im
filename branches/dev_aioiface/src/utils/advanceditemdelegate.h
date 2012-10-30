@@ -11,7 +11,7 @@
 #include <QStyledItemDelegate>
 #include "utilsexport.h"
 
-#define ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY "AdvanceDelegateEditorValue"
+#define ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY "AdvanceDelegateEditorValue"
 
 struct UTILS_EXPORT AdvancedDelegateItem
 {

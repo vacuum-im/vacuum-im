@@ -11,6 +11,7 @@
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterlabelholderorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>

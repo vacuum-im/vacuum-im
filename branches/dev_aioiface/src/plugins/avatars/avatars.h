@@ -29,13 +29,13 @@
 #include <utils/imagemanager.h>
 
 class Avatars :
-			public QObject,
-			public IPlugin,
-			public IAvatars,
-			public IStanzaHandler,
-			public IStanzaRequestOwner,
-			public IRosterDataHolder,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IAvatars,
+	public IStanzaHandler,
+	public IStanzaRequestOwner,
+	public IRosterDataHolder,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IStanzaRequestOwner IOptionsHolder);

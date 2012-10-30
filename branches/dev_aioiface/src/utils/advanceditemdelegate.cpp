@@ -575,7 +575,7 @@ QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOption
 			widget = editorFactory()->createEditor(type, AParent);
 			
 			if (widget)
-				widget->setProperty(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY,value);
+				widget->setProperty(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY,value);
 		}
 	}
 	return widget;
@@ -585,7 +585,7 @@ void AdvancedItemDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AI
 {
 	if (FEditProxy==NULL || !FEditProxy->setEditorData(this,AEditor,AIndex))
 	{
-		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY);
+		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
 		QByteArray name = editorFactory()->valuePropertyName(value.type());
 		if (!name.isEmpty()) 
 			AEditor->setProperty(name, value);
@@ -596,7 +596,7 @@ void AdvancedItemDelegate::setModelData(QWidget *AEditor, QAbstractItemModel *AM
 {
 	if (FEditProxy==NULL || !FEditProxy->setModelData(this,AEditor,AModel,AIndex))
 	{
-		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERY);
+		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
 		QByteArray name = editorFactory()->valuePropertyName(value.type());
 		if (!name.isEmpty()) 
 			AModel->setData(AIndex, AEditor->property(name), Qt::EditRole);

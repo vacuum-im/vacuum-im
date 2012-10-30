@@ -62,7 +62,6 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 
 RostersView::~RostersView()
 {
-	removeLabels();
 	emit tabPageDestroyed();
 }
 
@@ -107,8 +106,19 @@ QVariant RostersView::rosterData(const IRosterIndex *AIndex, int ARole) const
 	if (ARole == RDR_LABEL_ITEMS)
 	{
 		AdvancedDelegateItems labelItems;
+
+		for (QMultiMap<int, IRostersLabelHolder *>::const_iterator holder_it=FLabelHolders.constBegin(); holder_it!=FLabelHolders.constEnd(); ++holder_it)
+		{
+			QList<quint32> labels = holder_it.value()->rosterLabels(holder_it.key(),index);
+			for (QList<quint32>::const_iterator label_it = labels.constBegin(); label_it!=labels.constEnd(); ++label_it)
+				if (!labelItems.contains(*label_it))
+					labelItems.insert(*label_it,holder_it.value()->rosterLabel(holder_it.key(),*label_it,index));
+		}
+
 		for (QMultiMap<IRosterIndex *, quint32>::const_iterator it = FIndexLabels.constFind(index); it!=FIndexLabels.constEnd() && it.key()==index; ++it)
-			labelItems.insert(it.value(),FLabelItems.value(it.value()));
+			if (!labelItems.contains(it.value()))
+				labelItems.insert(it.value(),FLabelItems.value(it.value()));
+
 		data.setValue(labelItems);
 	}
 	else if (FActiveNotifies.contains(index))
@@ -167,6 +177,18 @@ bool RostersView::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant 
 	return false;
 }
 
+QList<quint32> RostersView::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
+{
+	QList<quint32> labels;
+
+	return labels;
+}
+
+AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const
+{
+	return AdvancedDelegateItem();
+}
+
 IRostersModel *RostersView::rostersModel() const
 {
 	return FRostersModel;
@@ -186,7 +208,7 @@ void RostersView::setRostersModel(IRostersModel *AModel)
 			disconnect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),this,SLOT(onIndexInserted(IRosterIndex *)));
 			disconnect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onIndexDestroyed(IRosterIndex *)));
 			FRostersModel->removeDefaultDataHolder(this);
-			removeLabels();
+			clearLabels();
 		}
 
 		FRostersModel = AModel;
@@ -494,65 +516,38 @@ QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QM
 
 quint32 RostersView::registerLabel(const AdvancedDelegateItem &ALabel)
 {
-	if (!FLabelItems.contains(ALabel.d->id))
-	{
-		if (ALabel.d->flags & AdvancedDelegateItem::Blink)
-			appendBlinkItem(ALabel.d->id,-1);
-		FLabelItems.insert(ALabel.d->id,ALabel);
-		return ALabel.d->id;
-	}
-	return AdvancedDelegateItem::NullId;
-}
+	if (ALabel.d->flags & AdvancedDelegateItem::Blink)
+		appendBlinkItem(ALabel.d->id,0);
+	else
+		removeBlinkItem(ALabel.d->id,0);
 
-void RostersView::updateLabel(quint32 ALabelId, const AdvancedDelegateItem &ALabel)
-{
-	if (FLabelItems.contains(ALabelId))
-	{
-		if (ALabel.d->flags & AdvancedDelegateItem::Blink)
-			appendBlinkItem(ALabelId,-1);
-		else
-			removeBlinkItem(ALabelId,-1);
-		FLabelItems.insert(ALabelId,ALabel);
+	if (FLabelItems.contains(ALabel.d->id))
+		emit rosterDataChanged(NULL, RDR_LABEL_ITEMS);
 
-		foreach(IRosterIndex *index, FIndexLabels.keys(ALabelId))
-			emit rosterDataChanged(index, RDR_LABEL_ITEMS);
-	}
+	FLabelItems.insert(ALabel.d->id,ALabel);
+	return ALabel.d->id;
 }
 
 void RostersView::insertLabel(quint32 ALabelId, IRosterIndex *AIndex)
 {
 	if (FLabelItems.contains(ALabelId) && !FIndexLabels.contains(AIndex,ALabelId))
 	{
-		//const AdvancedDelegateItem &label = FLabelItems.value(ALabelId);
-		//if (label.flags & IRostersLabel::ExpandParents)
-		//	expandIndexParents(AIndex);
-		//if (label.flags & IRostersLabel::AllwaysVisible)
-		//	AIndex->setData(RDR_ALLWAYS_VISIBLE, AIndex->data(RDR_ALLWAYS_VISIBLE).toInt()+1);
-		FIndexLabels.insertMulti(AIndex, ALabelId);
+		FIndexLabels.insertMulti(AIndex,ALabelId);
 		emit rosterDataChanged(AIndex,RDR_LABEL_ITEMS);
 	}
 }
 
 void RostersView::removeLabel(quint32 ALabelId, IRosterIndex *AIndex)
 {
-	if (FIndexLabels.contains(AIndex,ALabelId))
+	if (AIndex = NULL)
+	{
+		foreach(IRosterIndex *index, FIndexLabels.keys(ALabelId))
+			removeLabel(ALabelId,index);
+	}
+	else if (FIndexLabels.contains(AIndex,ALabelId))
 	{
 		FIndexLabels.remove(AIndex,ALabelId);
-		//const AdvancedDelegateItem &label = FLabelItems.value(ALabelId);
-		//if (label.flags & IRostersLabel::AllwaysVisible)
-		//	AIndex->setData(RDR_ALLWAYS_VISIBLE, AIndex->data(RDR_ALLWAYS_VISIBLE).toInt()-1);
 		emit rosterDataChanged(AIndex,RDR_LABEL_ITEMS);
-	}
-}
-
-void RostersView::destroyLabel(quint32 ALabelId)
-{
-	if (FLabelItems.contains(ALabelId))
-	{
-		FLabelItems.remove(ALabelId);
-		foreach (IRosterIndex *index, FIndexLabels.keys(ALabelId))
-			removeLabel(ALabelId, index);
-		removeBlinkItem(ALabelId,-1);
 	}
 }
 
@@ -602,7 +597,7 @@ int RostersView::insertNotify(const IRostersNotify &ANotify, const QList<IRoster
 	}
 
 	if (ANotify.flags & IRostersNotify::Blink)
-		appendBlinkItem(-1,notifyId);
+		appendBlinkItem(0,notifyId);
 
 	if (ANotify.timeout > 0)
 	{
@@ -636,7 +631,7 @@ void RostersView::removeNotify(int ANotifyId)
 			FNotifyUpdates += index;
 			FIndexNotifies.remove(index,ANotifyId);
 		}
-		removeBlinkItem(-1,ANotifyId);
+		removeBlinkItem(0,ANotifyId);
 
 		QTimer *timer = FNotifyTimer.key(ANotifyId,NULL);
 		if (timer)
@@ -649,6 +644,26 @@ void RostersView::removeNotify(int ANotifyId)
 		QTimer::singleShot(0,this,SLOT(onUpdateIndexNotifyTimeout()));
 
 		emit notifyRemoved(ANotifyId);
+	}
+}
+
+void RostersView::insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
+{
+	if (AHolder)
+	{
+		if (!FLabelHolders.values().contains(AHolder))
+			connect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, const IRosterIndex *)),SLOT(onRosterLabelChanged(quint32, const IRosterIndex *)));
+		FLabelHolders.insertMulti(AOrder,AHolder);
+	}
+}
+
+void RostersView::removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
+{
+	if (AHolder)
+	{
+		FLabelHolders.remove(AOrder,AHolder);
+		if (!FLabelHolders.values().contains(AHolder))
+			disconnect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, const IRosterIndex *)),this,SLOT(onRosterLabelChanged(quint32, const IRosterIndex *)));
 	}
 }
 
@@ -742,6 +757,35 @@ void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, M
 	}
 }
 
+void RostersView::clearLabels()
+{
+	foreach(quint32 labelId, FLabelItems.keys())
+		removeLabel(labelId);
+}
+
+void RostersView::appendBlinkItem(quint32 ALabelId, int ANotifyId)
+{
+	if (ALabelId > 0)
+		FBlinkLabels += ALabelId;
+	if (ANotifyId > 0)
+		FBlinkNotifies += ANotifyId;
+}
+
+void RostersView::removeBlinkItem(quint32 ALabelId, int ANotifyId)
+{
+	FBlinkLabels -= ALabelId;
+	FBlinkNotifies -= ANotifyId;
+}
+
+void RostersView::setDropIndicatorRect(const QRect &ARect)
+{
+	if (FDropIndicatorRect != ARect)
+	{
+		FDropIndicatorRect = ARect;
+		viewport()->update();
+	}
+}
+
 QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
 {
 	QStyleOptionViewItemV4 option = viewOptions();
@@ -767,43 +811,6 @@ QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
 	option.state |= (QStyle::State)AIndex.data(RDR_STATES_FORCE_ON).toInt();
 	option.state &= ~(QStyle::State)AIndex.data(RDR_STATES_FORCE_OFF).toInt();
 	return option;
-}
-
-void RostersView::appendBlinkItem(int ALabelId, int ANotifyId)
-{
-	if (ALabelId > 0)
-		FBlinkLabels += ALabelId;
-	if (ANotifyId > 0)
-		FBlinkNotifies += ANotifyId;
-}
-
-void RostersView::removeBlinkItem(int ALabelId, int ANotifyId)
-{
-	FBlinkLabels -= ALabelId;
-	FBlinkNotifies -= ANotifyId;
-}
-
-QString RostersView::intId2StringId(int AIntId) const
-{
-	return QString("%1").arg(AIntId,10,10,QLatin1Char('0'));
-}
-
-void RostersView::removeLabels()
-{
-	foreach(int labelId, FLabelItems.keys())
-	{
-		foreach(IRosterIndex *index, FIndexLabels.keys(labelId))
-			removeLabel(labelId,index);
-	}
-}
-
-void RostersView::setDropIndicatorRect(const QRect &ARect)
-{
-	if (FDropIndicatorRect != ARect)
-	{
-		FDropIndicatorRect = ARect;
-		viewport()->update();
-	}
 }
 
 IRostersEditHandler *RostersView::findEditHandler(int ADataRole, const QModelIndex &AIndex) const
@@ -919,8 +926,6 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 						hooked = it.value()->rosterIndexDoubleClicked(it.key(),index,AEvent);
 						++it;
 					}
-					if (!hooked)
-						emit indexDoubleClicked(index,labelAt(AEvent->pos(),viewIndex));
 				}
 				else
 				{
@@ -1020,10 +1025,6 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 				{
 					hooked = it.value()->rosterIndexSingleClicked(it.key(),index,AEvent);
 					++it;
-				}
-				if (!hooked)
-				{
-					emit indexClicked(index,labelId!=AdvancedDelegateItem::NullId ? labelId : AdvancedDelegateItem::DisplayId);
 				}
 			}
 		}
@@ -1221,6 +1222,12 @@ void RostersView::onSelectionChanged(const QItemSelection &ASelected, const QIte
 	}
 }
 
+void RostersView::onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex)
+{
+	Q_UNUSED(ALabelId);
+	emit rosterDataChanged(AIndex,RDR_LABEL_ITEMS);
+}
+
 void RostersView::onCopyToClipboardActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
@@ -1236,14 +1243,6 @@ void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
 	FIndexNotifies.remove(AIndex);
 	FActiveNotifies.remove(AIndex);
 	FNotifyUpdates -= AIndex;
-}
-
-void RostersView::onRemoveIndexNotifyTimeout()
-{
-	QTimer *timer = qobject_cast<QTimer *>(sender());
-	timer->stop();
-	timer->deleteLater();
-	removeNotify(FNotifyTimer.value(timer));
 }
 
 void RostersView::onUpdateIndexNotifyTimeout()
@@ -1271,9 +1270,17 @@ void RostersView::onUpdateIndexNotifyTimeout()
 	FNotifyUpdates.clear();
 }
 
+void RostersView::onRemoveIndexNotifyTimeout()
+{
+	QTimer *timer = qobject_cast<QTimer *>(sender());
+	timer->stop();
+	timer->deleteLater();
+	removeNotify(FNotifyTimer.value(timer));
+}
+
 void RostersView::onUpdateBlinkLabels()
 {
-	foreach(int labelId, FBlinkLabels)
+	foreach(quint32 labelId, FBlinkLabels)
 		foreach(IRosterIndex *index, FIndexLabels.keys(labelId))
 			repaintRosterIndex(index);
 

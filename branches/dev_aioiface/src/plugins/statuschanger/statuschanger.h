@@ -33,7 +33,8 @@
 #include "editstatusdialog.h"
 #include "modifystatusdialog.h"
 
-struct StatusItem {
+struct StatusItem 
+{
 	StatusItem() {
 		code = STATUS_NULL_ID;
 		show = IPresence::Offline;
@@ -47,10 +48,10 @@ struct StatusItem {
 };
 
 class StatusChanger :
-			public QObject,
-			public IPlugin,
-			public IStatusChanger,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IStatusChanger,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
@@ -156,7 +157,8 @@ private:
 	QMap<IPresence *, Menu *> FStreamMenu;
 	QMap<IPresence *, Action *> FMainStatusActions;
 private:
-	quint32 FConnectingLabel;
+	quint32 FStatusLabelId;
+	quint32 FConnectingLabelId;
 	IPresence *FChangingPresence;
 	QSet<IPresence *> FFastReconnect;
 	QList<IPresence *> FShutdownList;

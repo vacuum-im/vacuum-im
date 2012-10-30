@@ -26,7 +26,9 @@ StatusChanger::StatusChanger()
 	FModifyStatus = NULL;
 	FStatusIcons = NULL;
 	FChangingPresence = NULL;
-	FConnectingLabel = 0;
+
+	FStatusLabelId = 0;
+	FConnectingLabelId = 0;
 }
 
 StatusChanger::~StatusChanger()
@@ -156,6 +158,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 	connect(APluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
+
 	return FPresencePlugin!=NULL;
 }
 
@@ -195,11 +198,16 @@ bool StatusChanger::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		AdvancedDelegateItem label(RLID_STATUSCHANGER_CONNECTING);
-		label.d->kind = AdvancedDelegateItem::CustomData;
-		label.d->flags = AdvancedDelegateItem::Blink;
-		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
-		FConnectingLabel = FRostersViewPlugin->rostersView()->registerLabel(label);
+		AdvancedDelegateItem statusLabel(RLID_SCHANGER_STATUS);
+		statusLabel.d->kind = AdvancedDelegateItem::CustomData;
+		statusLabel.d->data = RDR_STATUS;
+		FStatusLabelId = FRostersViewPlugin->rostersView()->registerLabel(statusLabel);
+
+		AdvancedDelegateItem connectingLabel(RLID_SCHANGER_CONNECTING);
+		connectingLabel.d->kind = AdvancedDelegateItem::CustomData;
+		connectingLabel.d->flags = AdvancedDelegateItem::Blink;
+		connectingLabel.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
+		FConnectingLabelId = FRostersViewPlugin->rostersView()->registerLabel(connectingLabel);
 	}
 
 	if (FTrayManager)
@@ -846,7 +854,7 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 	{
 		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
 		if (index)
-			FRostersView->insertLabel(FConnectingLabel,index);
+			FRostersView->insertLabel(FConnectingLabelId,index);
 	}
 }
 
@@ -856,7 +864,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 	{
 		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
 		if (index)
-			FRostersView->removeLabel(FConnectingLabel,index);
+			FRostersView->removeLabel(FConnectingLabelId,index);
 	}
 }
 

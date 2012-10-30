@@ -126,6 +126,8 @@ bool RostersViewPlugin::initObjects()
 		FRostersView->setRostersModel(FRostersModel);
 	}
 
+	FRostersView->insertLabelHolder(RLHO_DEFAULT,FRostersView);
+
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYJID,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYSTATUS,FRostersView);

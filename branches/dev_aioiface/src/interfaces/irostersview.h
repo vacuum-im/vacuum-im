@@ -12,22 +12,6 @@
 
 #define ROSTERSVIEW_UUID "{BDD12B32-9C88-4e3c-9B36-2DCB5075288F}"
 
-struct IRostersLabel
-{
-	enum Flags {
-		Blink          = 0x01,
-		AllwaysVisible = 0x02,
-		ExpandParents  = 0x04
-	};
-	IRostersLabel() {
-		order = -1;
-		flags = 0;
-	}
-	int order;
-	int flags;
-	QVariant value;
-};
-
 struct IRostersNotify
 {
 	enum Flags {
@@ -47,6 +31,16 @@ struct IRostersNotify
 	QIcon icon;
 	QString footer;
 	QBrush background;
+};
+
+class IRostersLabelHolder
+{
+public:
+	virtual QObject *instance() = 0;
+	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const =0;
+	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const =0;
+protected:
+	virtual void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL) =0;
 };
 
 class IRostersClickHooker
@@ -108,10 +102,8 @@ public:
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const=0;
 	//--IndexLabel
 	virtual quint32 registerLabel(const AdvancedDelegateItem &ALabel) =0;
-	virtual void updateLabel(quint32 ALabelId, const AdvancedDelegateItem &ALabel) =0;
 	virtual void insertLabel(quint32 ALabelId, IRosterIndex *AIndex) =0;
-	virtual void removeLabel(quint32 ALabelId, IRosterIndex *AIndex) =0;
-	virtual void destroyLabel(quint32 ALabelId) =0;
+	virtual void removeLabel(quint32 ALabelId, IRosterIndex *AIndex = NULL) =0;
 	virtual quint32 labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
 	virtual QRect labelRect(quint32 ALabeld, const QModelIndex &AIndex) const =0;
 	//--IndexNotify
@@ -122,6 +114,9 @@ public:
 	virtual int insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes) =0;
 	virtual void activateNotify(int ANotifyId) =0;
 	virtual void removeNotify(int ANotifyId) =0;
+	//--LabelHolders
+	virtual void insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder) =0;
+	virtual void removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder) =0;
 	//--ClickHookers
 	virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
 	virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
@@ -151,8 +146,6 @@ protected:
 	virtual void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
 	virtual void indexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu) =0;
 	virtual void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips) =0;
-	virtual void indexClicked(IRosterIndex *AIndex, quint32 ALabelId) =0;
-	virtual void indexDoubleClicked(IRosterIndex *AIndex, quint32 ALabelId) =0;
 	virtual void notifyInserted(int ANotifyId) =0;
 	virtual void notifyActivated(int ANotifyId) =0;
 	virtual void notifyRemoved(int ANotifyId) =0;
@@ -167,6 +160,7 @@ public:
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
 };
 
+Q_DECLARE_INTERFACE(IRostersLabelHolder,"Vacuum.Plugin.IRostersLabelHolder/1.0");
 Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.2");
 Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.1");
 Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.0");

@@ -139,6 +139,15 @@ bool Avatars::initObjects()
 	{
 		FRostersModel->insertDefaultDataHolder(this);
 	}
+
+	if (FRostersViewPlugin)
+	{
+		AdvancedDelegateItem label(RLID_AVATAR_IMAGE);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->data = RDR_AVATAR_IMAGE;
+		FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
+	}
+
 	return true;
 }
 
@@ -655,7 +664,7 @@ void Avatars::onVCardChanged(const Jid &AContactJid)
 
 void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin &&  rosterDataTypes().contains(AIndex->type()))
+	if (FRostersViewPlugin && rosterDataTypes().contains(AIndex->type()))
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		if (!FVCardAvatars.contains(contactJid))
@@ -833,18 +842,12 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 					findData.insertMulti(RDR_TYPE,type);
 				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData, true);
 
-				AdvancedDelegateItem label(RLID_AVATAR_IMAGE);
-				label.d->kind = AdvancedDelegateItem::CustomData;
-				label.d->data = RDR_AVATAR_IMAGE;
-				FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
-
 				foreach (IRosterIndex *index, indexes)
 					FRostersViewPlugin->rostersView()->insertLabel(FAvatarLabelId, index);
 			}
 			else
 			{
-				FRostersViewPlugin->rostersView()->destroyLabel(FAvatarLabelId);
-				FAvatarLabelId = 0;
+				FRostersViewPlugin->rostersView()->removeLabel(FAvatarLabelId);
 				FAvatarImages.clear();
 			}
 		}
