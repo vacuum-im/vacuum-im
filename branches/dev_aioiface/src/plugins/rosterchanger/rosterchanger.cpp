@@ -7,6 +7,7 @@
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
+#include <QItemEditorFactory>
 
 #define ADR_STREAM_JID      Action::DR_StreamJid
 #define ADR_CONTACT_JID     Action::DR_Parametr1
@@ -182,7 +183,6 @@ QMultiMap<int, IOptionsWidget *> RosterChanger::optionsWidgets(const QString &AN
 	return widgets;
 }
 
-//IRostersDragDropHandler
 Qt::DropActions RosterChanger::rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent);
@@ -325,82 +325,56 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 	return false;
 }
 
-bool RosterChanger::rosterEditStart(int ADataRole, const QModelIndex &AIndex) const
+quint32 RosterChanger::rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const
 {
 	int type = AIndex.data(RDR_TYPE).toInt();
-	if (ADataRole==RDR_NAME && (type==RIT_CONTACT || type==RIT_AGENT || type==RIT_GROUP))
+	if (AOrder==REHO_ROSTERCHANGER_RENAME && ADataRole==RDR_NAME && (type==RIT_CONTACT || type==RIT_AGENT || type==RIT_GROUP))
 	{
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AIndex.data(RDR_STREAM_JID).toString()) : NULL;
-		return (roster && roster->isOpen());
+		if (roster && roster->isOpen())
+			return AdvancedDelegateItem::DisplayId;
 	}
-	return false;
+	return AdvancedDelegateItem::NullId;
 }
 
-QWidget *RosterChanger::rosterEditEditor(int ADataRole, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+AdvancedDelegateEditProxy *RosterChanger::rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex)
 {
-	Q_UNUSED(AOption);
 	Q_UNUSED(AIndex);
-	if (ADataRole == RDR_NAME)
-	{
-		QLineEdit *editor = new QLineEdit(AParent);
-		editor->setFrame(false);
-		return editor;
-	}
+	if (AOrder==REHO_ROSTERCHANGER_RENAME && ADataRole==RDR_NAME)
+		return this;
 	return NULL;
 }
 
-void RosterChanger::rosterEditLoadData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const
+bool RosterChanger::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
 {
-	if (ADataRole == RDR_NAME)
+	Q_UNUSED(AModel); 
+	if (ADelegate->editRole() == RDR_NAME)
 	{
-		QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
-		if (editor)
-			editor->setText(AIndex.data(RDR_NAME).toString());
-	}
-}
-
-void RosterChanger::rosterEditSaveData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const
-{
-	int type = AIndex.data(RDR_TYPE).toInt();
-	if (ADataRole==RDR_NAME && type==RIT_GROUP)
-	{
-		QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
-		QString newName = editor!=NULL ? editor->text().trimmed() : QString::null;
+		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
+		QByteArray name = ADelegate->editorFactory()->valuePropertyName(value.type());
+		QString newName = AEditor->property(name).toString();
 		if (!newName.isEmpty() && AIndex.data(RDR_NAME).toString()!=newName)
 		{
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AIndex.data(RDR_STREAM_JID).toString()) : NULL;
 			if (roster && roster->isOpen())
 			{
-				QString fullName = AIndex.data(RDR_GROUP).toString();
-				fullName.chop(AIndex.data(RDR_NAME).toString().size());
-				fullName += newName;
-				roster->renameGroup(AIndex.data(RDR_GROUP).toString(),fullName);
+				int type = AIndex.data(RDR_TYPE).toInt();
+				if (type == RIT_GROUP)
+				{
+					QString fullName = AIndex.data(RDR_GROUP).toString();
+					fullName.chop(AIndex.data(RDR_NAME).toString().size());
+					fullName += newName;
+					roster->renameGroup(AIndex.data(RDR_GROUP).toString(),fullName);
+				}
+				else if (type==RIT_CONTACT || type==RIT_AGENT)
+				{
+					roster->renameItem(AIndex.data(RDR_PREP_BARE_JID).toString(),newName);
+				}
 			}
 		}
+		return true;
 	}
-	else if (ADataRole==RDR_NAME && (type==RIT_CONTACT || type==RIT_AGENT))
-	{
-		QLineEdit *editor = qobject_cast<QLineEdit *>(AEditor);
-		QString newName = editor!=NULL ? editor->text().trimmed() : QString::null;
-		if (!newName.isEmpty() && AIndex.data(RDR_NAME).toString()!=newName)
-		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AIndex.data(RDR_STREAM_JID).toString()) : NULL;
-			if (roster && roster->isOpen())
-				roster->renameItem(AIndex.data(RDR_PREP_BARE_JID).toString(),newName);
-		}
-	}
-}
-
-void RosterChanger::rosterEditGeometry(int ADataRole, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
-{
-	if (ADataRole == RDR_NAME)
-	{
-		QRect rect = FRostersView->labelRect(AdvancedDelegateItem::DisplayId,AIndex);
-		if (rect.isValid())
-			AEditor->setGeometry(rect);
-		else
-			AEditor->setGeometry(AOption.rect);
-	}
+	return false;
 }
 
 bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
@@ -1725,4 +1699,3 @@ void RosterChanger::onSubscriptionDialogDestroyed()
 }
 
 Q_EXPORT_PLUGIN2(plg_rosterchanger, RosterChanger)
-

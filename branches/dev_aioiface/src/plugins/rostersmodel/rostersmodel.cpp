@@ -4,15 +4,8 @@
 
 #define INDEX_CHANGES_FOR_RESET 20
 
-static const QList<int> RosterItemTypes = QList<int>() << RIT_CONTACT 
-                                                       << RIT_AGENT 
-                                                       << RIT_MY_RESOURCE;
-
-static const QList<int> RosterGroupTypes = QList<int>() << RIT_GROUP 
-                                                        << RIT_GROUP_BLANK 
-                                                        << RIT_GROUP_NOT_IN_ROSTER 
-                                                        << RIT_GROUP_MY_RESOURCES 
-                                                        << RIT_GROUP_AGENTS;
+static const QList<int> RosterItemTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+static const QList<int> RosterGroupTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_NOT_IN_ROSTER << RIT_GROUP_MY_RESOURCES << RIT_GROUP_AGENTS;
 
 RostersModel::RostersModel()
 {
@@ -137,16 +130,26 @@ Qt::ItemFlags RostersModel::flags(const QModelIndex &AIndex) const
 	return rindex->flags();
 }
 
+QMap<int, QVariant> RostersModel::itemData(const QModelIndex &AIndex) const
+{
+	IRosterIndex *rindex = rosterIndexByModelIndex(AIndex);
+	return rindex->data();
+}
+
 QVariant RostersModel::data(const QModelIndex &AIndex, int ARole) const
 {
 	IRosterIndex *rindex = rosterIndexByModelIndex(AIndex);
 	return rindex->data(ARole);
 }
 
-QMap<int, QVariant> RostersModel::itemData(const QModelIndex &AIndex) const
+bool RostersModel::setData(const QModelIndex &AIndex, const QVariant &AValue, int ARole)
 {
-	IRosterIndex *rindex = rosterIndexByModelIndex(AIndex);
-	return rindex->data();
+	if (AIndex.isValid())
+	{
+		IRosterIndex *rindex = rosterIndexByModelIndex(AIndex);
+		return rindex->setData(ARole,AValue);
+	}
+	return false;
 }
 
 IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)

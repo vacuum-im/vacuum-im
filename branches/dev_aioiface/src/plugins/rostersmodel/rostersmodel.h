@@ -36,8 +36,9 @@ public:
 	virtual int rowCount(const QModelIndex &AParent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex &AParent = QModelIndex()) const;
 	virtual Qt::ItemFlags flags(const QModelIndex &AIndex) const;
-	virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
 	virtual QMap<int, QVariant> itemData(const QModelIndex &AIndex) const;
+	virtual QVariant data(const QModelIndex &AIndex, int ARole = Qt::DisplayRole) const;
+	virtual bool setData(const QModelIndex &AIndex, const QVariant &AValue, int ARole = Qt::EditRole);
 	//IRostersModel
 	virtual IRosterIndex *addStream(const Jid &AStreamJid);
 	virtual QList<Jid> streams() const;

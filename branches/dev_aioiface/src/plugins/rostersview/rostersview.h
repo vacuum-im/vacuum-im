@@ -7,10 +7,12 @@
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/shortcuts.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterlabelholderorders.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imainwindow.h>
@@ -126,7 +128,6 @@ protected:
 	void removeBlinkItem(quint32 ALabelId, int ANotifyId);
 	void setDropIndicatorRect(const QRect &ARect);
 	QStyleOptionViewItemV4 indexOption(const QModelIndex &AIndex) const;
-	IRostersEditHandler *findEditHandler(int ADataRole, const QModelIndex &AIndex) const;
 protected:
 	//QTreeView
 	void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;

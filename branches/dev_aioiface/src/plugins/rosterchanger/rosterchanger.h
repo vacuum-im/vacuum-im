@@ -45,13 +45,14 @@ struct AutoSubscription {
 };
 
 class RosterChanger :
-			public QObject,
-			public IPlugin,
-			public IRosterChanger,
-			public IOptionsHolder,
-			public IRostersDragDropHandler,
-			public IRostersEditHandler,
-			public IXmppUriHandler
+	public QObject,
+	public IPlugin,
+	public IRosterChanger,
+	public IOptionsHolder,
+	public IRostersEditHandler,
+	public IRostersDragDropHandler,
+	public IXmppUriHandler,
+	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterChanger IOptionsHolder IRostersDragDropHandler IRostersEditHandler IXmppUriHandler);
@@ -75,11 +76,10 @@ public:
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
 	virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
 	//IRostersEditHandler
-	virtual bool rosterEditStart(int ADataRole, const QModelIndex &AIndex) const;
-	virtual QWidget *rosterEditEditor(int ADataRole, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-	virtual void rosterEditLoadData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const;
-	virtual void rosterEditSaveData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const;
-	virtual void rosterEditGeometry(int ADataRole, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
+	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
+	//AdvancedDelegateEditProxy
+	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const;
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IRosterChanger

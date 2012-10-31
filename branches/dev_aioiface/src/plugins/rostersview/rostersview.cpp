@@ -32,19 +32,21 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	header()->setStretchLastSection(false);
 
 	setIndentation(4);
-	setVerticalScrollBarPolicy(Options::node(OPV_ROSTER_HIDE_SCROLLBAR).value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
-	setHorizontalScrollBarPolicy(Options::node(OPV_ROSTER_HIDE_SCROLLBAR).value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
 	setAutoScroll(true);
 	setDragEnabled(true);
 	setAcceptDrops(true);
 	setRootIsDecorated(false);
 	setDropIndicatorShown(true);
+	setEditTriggers(NoEditTriggers);
 	setSelectionMode(ExtendedSelection);
 	setContextMenuPolicy(Qt::DefaultContextMenu);
 
 	FAdvancedItemDelegate = new AdvancedItemDelegate(this);
+	FAdvancedItemDelegate->setVertialSpacing(1);
+	FAdvancedItemDelegate->setHorizontalSpacing(2);
 	FAdvancedItemDelegate->setItemsRole(RDR_LABEL_ITEMS);
 	FAdvancedItemDelegate->setDefaultBranchItemEnabled(true);
+	FAdvancedItemDelegate->setBlinkMode(AdvancedItemDelegate::BlinkHide);
 	connect(FAdvancedItemDelegate,SIGNAL(updateBlinkItems()),SLOT(onUpdateBlinkLabels()));
 	setItemDelegate(FAdvancedItemDelegate);
 
@@ -82,14 +84,12 @@ QString RostersView::tabPageToolTip() const
 
 int RostersView::rosterDataOrder() const
 {
-	return RDHO_ROSTER_NOTIFY;
+	return RDHO_ROSTERSVIEW_NOTIFY;
 }
 
 QList<int> RostersView::rosterDataRoles() const
 {
-	static QList<int> dataRoles = QList<int>()
-		<< RDR_LABEL_ITEMS
-		<< RDR_ALLWAYS_VISIBLE << Qt::DecorationRole << Qt::BackgroundColorRole;
+	static QList<int> dataRoles = QList<int>() << RDR_LABEL_ITEMS << RDR_ALLWAYS_VISIBLE << Qt::DecorationRole << Qt::BackgroundColorRole;
 	return dataRoles;
 }
 
@@ -124,19 +124,6 @@ QVariant RostersView::rosterData(const IRosterIndex *AIndex, int ARole) const
 	else if (FActiveNotifies.contains(index))
 	{
 		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
-		//if (ARole == RDR_FOOTER_TEXT)
-		//{
-		//	static bool block = false;
-		//	if (!block && !notify.footer.isNull())
-		//	{
-		//		block = true;
-		//		QVariantMap footer = index->data(ARole).toMap();
-		//		footer.insert(intId2StringId(FTO_ROSTERSVIEW_STATUS),notify.footer);
-		//		data = footer;
-		//		block = false;
-		//	}
-		//}
-		//else 
 		if (ARole == RDR_ALLWAYS_VISIBLE)
 		{
 			static bool block = false;
@@ -147,16 +134,6 @@ QVariant RostersView::rosterData(const IRosterIndex *AIndex, int ARole) const
 				block = false;
 			}
 		}
-		//else if (ARole == RDR_DECORATION_FLAGS)
-		//{
-		//	static bool block = false;
-		//	if (!block && (notify.flags & IRostersNotify::Blink)>0)
-		//	{
-		//		block = true;
-		//		data = index->data(ARole).toInt() | IRostersLabel::Blink;
-		//		block = false;
-		//	}
-		//}
 		else if (ARole == Qt::DecorationRole)
 		{
 			data = !notify.icon.isNull() ? notify.icon : data;
@@ -180,13 +157,71 @@ bool RostersView::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant 
 QList<quint32> RostersView::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
 {
 	QList<quint32> labels;
-
+	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
+	if (AOrder == RLHO_ROSTERSVIEW_DISPLAY)
+	{
+		switch (AIndex->type())
+		{
+		case RIT_STREAM_ROOT:
+		case RIT_GROUP:
+		case RIT_GROUP_BLANK:
+		case RIT_GROUP_AGENTS:
+		case RIT_GROUP_MY_RESOURCES:
+		case RIT_GROUP_NOT_IN_ROSTER:
+			labels.append(AdvancedDelegateItem::DisplayId);
+		}
+	}
+	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && FActiveNotifies.contains(index))
+	{
+		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
+		if (!notify.footer.isEmpty())
+			labels.append(RLID_SCHANGER_STATUS);
+		if (!notify.icon.isNull())
+			labels.append(AdvancedDelegateItem::DecorationId);
+	}
 	return labels;
 }
 
 AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const
 {
-	return AdvancedDelegateItem();
+	AdvancedDelegateItem label;
+	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
+	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && ALabelId==AdvancedDelegateItem::DisplayId)
+	{
+		label.d->id = AdvancedDelegateItem::DisplayId;
+		label.d->kind = AdvancedDelegateItem::Display;
+		label.d->data = AIndex->data(Qt::DisplayRole);
+
+		switch (AIndex->type())
+		{
+		case RIT_STREAM_ROOT:
+			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
+			break;
+		case RIT_GROUP:
+		case RIT_GROUP_BLANK:
+		case RIT_GROUP_AGENTS:
+		case RIT_GROUP_MY_RESOURCES:
+		case RIT_GROUP_NOT_IN_ROSTER:
+			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::DemiBold);
+			break;
+		}
+	}
+	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
+	{
+		label.d->id = AdvancedDelegateItem::DecorationId;
+		label.d->kind = AdvancedDelegateItem::Decoration;
+		label.d->flags = AdvancedDelegateItem::Blink;
+		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).icon;
+	}
+	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==RLID_SCHANGER_STATUS)
+	{
+		label.d->id = RLID_SCHANGER_STATUS;
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
+		label.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);
+		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).footer;
+	}
+	return label;
 }
 
 IRostersModel *RostersView::rostersModel() const
@@ -278,15 +313,22 @@ bool RostersView::editRosterIndex(int ADataRole, IRosterIndex *AIndex)
 	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)) : QModelIndex();
 	if (index.isValid() && state()==NoState)
 	{
-		//IRostersEditHandler *handler = index.isValid() ? findEditHandler(ADataRole,index) : NULL;
-		//if (handler)
-		//{
-		//	FRosterIndexDelegate->setEditHandler(ADataRole,handler);
-		//	if (edit(index,AllEditTriggers,NULL))
-		//		return true;
-		//	else
-		//		FRosterIndexDelegate->setEditHandler(0,NULL);
-		//}
+		for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); ++it)
+		{
+			IRostersEditHandler *handler = it.value();
+			quint32 labelId = handler->rosterEditLabel(it.key(),ADataRole,index);
+			if (labelId != AdvancedDelegateItem::NullId)
+			{
+				FAdvancedItemDelegate->setEditRole(ADataRole);
+				FAdvancedItemDelegate->setEditProxy(handler->rosterEditProxy(it.key(),ADataRole,index));
+
+				if (edit(index,AllEditTriggers,NULL))
+					return true;
+
+				FAdvancedItemDelegate->setEditProxy(NULL);
+				FAdvancedItemDelegate->setEditRole(Qt::EditRole);
+			}
+		}
 	}
 	return false;
 }
@@ -539,7 +581,7 @@ void RostersView::insertLabel(quint32 ALabelId, IRosterIndex *AIndex)
 
 void RostersView::removeLabel(quint32 ALabelId, IRosterIndex *AIndex)
 {
-	if (AIndex = NULL)
+	if (AIndex == NULL)
 	{
 		foreach(IRosterIndex *index, FIndexLabels.keys(ALabelId))
 			removeLabel(ALabelId,index);
@@ -652,7 +694,7 @@ void RostersView::insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
 	if (AHolder)
 	{
 		if (!FLabelHolders.values().contains(AHolder))
-			connect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, const IRosterIndex *)),SLOT(onRosterLabelChanged(quint32, const IRosterIndex *)));
+			connect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, IRosterIndex *)),SLOT(onRosterLabelChanged(quint32, IRosterIndex *)));
 		FLabelHolders.insertMulti(AOrder,AHolder);
 	}
 }
@@ -663,7 +705,7 @@ void RostersView::removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
 	{
 		FLabelHolders.remove(AOrder,AHolder);
 		if (!FLabelHolders.values().contains(AHolder))
-			disconnect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, const IRosterIndex *)),this,SLOT(onRosterLabelChanged(quint32, const IRosterIndex *)));
+			disconnect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, IRosterIndex *)),this,SLOT(onRosterLabelChanged(quint32, IRosterIndex *)));
 	}
 }
 
@@ -813,14 +855,6 @@ QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
 	return option;
 }
 
-IRostersEditHandler *RostersView::findEditHandler(int ADataRole, const QModelIndex &AIndex) const
-{
-	for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); ++it)
-		if (it.value()->rosterEditStart(ADataRole,AIndex))
-			return it.value();
-	return NULL;
-}
-
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
 {
 	Q_UNUSED(APainter);
@@ -868,9 +902,7 @@ void RostersView::resizeEvent(QResizeEvent *AEvent)
 
 bool RostersView::edit(const QModelIndex &AIndex, EditTrigger ATrigger, QEvent *AEvent)
 {
-	//if (FRosterIndexDelegate->editHandler() != NULL)
-	//	return QTreeView::edit(AIndex,ATrigger,AEvent);
-	return false;
+	return QTreeView::edit(AIndex,ATrigger,AEvent);
 }
 
 void RostersView::paintEvent(QPaintEvent *AEvent)
@@ -1158,7 +1190,8 @@ void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)
 
 void RostersView::closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint)
 {
-	//FRosterIndexDelegate->setEditHandler(0,NULL);
+	FAdvancedItemDelegate->setEditProxy(NULL);
+	FAdvancedItemDelegate->setEditRole(Qt::EditRole);
 	QTreeView::closeEditor(AEditor,AHint);
 }
 

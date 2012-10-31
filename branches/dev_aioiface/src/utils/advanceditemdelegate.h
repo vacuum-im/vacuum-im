@@ -34,10 +34,11 @@ struct UTILS_EXPORT AdvancedDelegateItem
 	};
 	enum Hint {
 		SizeHint,
-		FontSize,
-		FontWeight,
 		FontHint,
 		FontStyle,
+		FontWeight,
+		FontSize,
+		FontSizeDelta,
 		FontUnderline,
 		StatesForceOn,
 		StatesForceOff,
@@ -72,6 +73,8 @@ struct UTILS_EXPORT AdvancedDelegateItem
 	AdvancedDelegateItem(quint32 AId = NullId);
 	AdvancedDelegateItem(const AdvancedDelegateItem &AOther);
 	~AdvancedDelegateItem();
+
+	void detach();
 	AdvancedDelegateItem &operator =(const AdvancedDelegateItem &AOther);
 	
 	static const quint16 AlignRightOrderMask = 0x8000;
@@ -130,6 +133,8 @@ public:
 	BlinkMode blinkMode() const;
 	void setBlinkMode(BlinkMode AMode);
 public:
+	int editRole() const;
+	void setEditRole(int ARole);
 	quint32 editItemId() const;
 	void setEditItemId(quint32 AItemId);
 	AdvancedDelegateEditProxy *editProxy() const;
@@ -177,6 +182,7 @@ private:
 	BlinkMode FBlinkMode;
 	QTimer FBlinkTimer;
 private:
+	int FEditRole;
 	quint32 FEditItemId;
 	AdvancedDelegateEditProxy *FEditProxy;
 };

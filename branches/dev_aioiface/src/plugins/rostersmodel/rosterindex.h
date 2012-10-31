@@ -34,7 +34,7 @@ public:
 	virtual void removeDataHolder(IRosterDataHolder *ADataHolder);
 	virtual QVariant data(int ARole) const;
 	virtual QMap<int,QVariant> data() const;
-	virtual void setData(int ARole, const QVariant &AData);
+	virtual bool setData(int ARole, const QVariant &AData);
 	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const;
 	virtual bool removeOnLastChildRemoved() const;
 	virtual void setRemoveOnLastChildRemoved(bool ARemove);

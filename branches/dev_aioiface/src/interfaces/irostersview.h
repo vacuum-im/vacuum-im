@@ -70,11 +70,8 @@ public:
 class IRostersEditHandler
 {
 public:
-	virtual bool rosterEditStart(int ADataRole, const QModelIndex &AIndex) const =0;
-	virtual QWidget *rosterEditEditor(int ADataRole, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const =0;
-	virtual void rosterEditLoadData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const =0;
-	virtual void rosterEditSaveData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const =0;
-	virtual void rosterEditGeometry(int ADataRole, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const =0;
+	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const =0;
+	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex) =0;
 };
 
 class IRostersView
@@ -164,7 +161,7 @@ Q_DECLARE_INTERFACE(IRostersLabelHolder,"Vacuum.Plugin.IRostersLabelHolder/1.0")
 Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.2");
 Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.1");
 Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.0");
-Q_DECLARE_INTERFACE(IRostersEditHandler,"Virtus.Plugin.IRostersEditHandler/1.0")
+Q_DECLARE_INTERFACE(IRostersEditHandler,"Virtus.Plugin.IRostersEditHandler/1.1")
 Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.4");
 Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.4");
 

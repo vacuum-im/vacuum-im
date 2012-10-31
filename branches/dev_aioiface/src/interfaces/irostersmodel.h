@@ -42,7 +42,7 @@ public:
 	virtual void removeDataHolder(IRosterDataHolder *ADataHolder) =0;
 	virtual QVariant data(int ARole) const =0;
 	virtual QMap<int, QVariant> data() const =0;
-	virtual void setData(int ARole, const QVariant &) =0;
+	virtual bool setData(int ARole, const QVariant &AValue) =0;
 	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const =0;
 	virtual bool removeOnLastChildRemoved() const =0;
 	virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
@@ -98,7 +98,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IRosterDataHolder,"Vacuum.Plugin.IRosterDataHolder/1.0");
-Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.1");
+Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.2");
 Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.1");
 
 #endif

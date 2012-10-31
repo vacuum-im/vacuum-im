@@ -6,8 +6,6 @@
 #include <QHeaderView>
 #include <QTextDocument>
 
-#include <utils/advanceditemdelegate.h>
-
 static const QString NodeDelimiter = ".";
 
 #define IDR_ORDER   Qt::UserRole + 1
@@ -33,7 +31,6 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 
 	delete ui.scaScroll->takeWidget();
 	ui.trvNodes->sortByColumn(0,Qt::AscendingOrder);
-	ui.trvNodes->setItemDelegate(new AdvancedItemDelegate(ui.trvNodes));
 
 	FOptionsManager = AOptionsManager;
 	connect(FOptionsManager->instance(),SIGNAL(optionsDialogNodeInserted(const IOptionsDialogNode &)),SLOT(onOptionsDialogNodeInserted(const IOptionsDialogNode &)));
@@ -49,8 +46,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	FProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 
 	ui.trvNodes->setModel(FProxyModel);
-	connect(ui.trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-	        SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
+	connect(ui.trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 
 	ui.dbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
 	ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);

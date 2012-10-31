@@ -126,7 +126,8 @@ bool RostersViewPlugin::initObjects()
 		FRostersView->setRostersModel(FRostersModel);
 	}
 
-	FRostersView->insertLabelHolder(RLHO_DEFAULT,FRostersView);
+	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,FRostersView);
+	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_DISPLAY,FRostersView);
 
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYJID,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
@@ -171,26 +172,15 @@ int RostersViewPlugin::rosterDataOrder() const
 
 QList<int> RostersViewPlugin::rosterDataRoles() const
 {
-	static QList<int> dataRoles  = QList<int>()
-	                               << Qt::DisplayRole
-	                               << Qt::BackgroundColorRole
-	                               << Qt::ForegroundRole
-	                               << RDR_STATES_FORCE_ON;
+	static const QList<int> dataRoles = QList<int>() << Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON;
 	return dataRoles;
 }
 
 QList<int> RostersViewPlugin::rosterDataTypes() const
 {
-	static QList<int> indexTypes  = QList<int>()
-	                                << RIT_STREAM_ROOT
-	                                << RIT_GROUP
-	                                << RIT_GROUP_BLANK
-	                                << RIT_GROUP_AGENTS
-	                                << RIT_GROUP_MY_RESOURCES
-	                                << RIT_GROUP_NOT_IN_ROSTER
-	                                << RIT_CONTACT
-	                                << RIT_AGENT
-	                                << RIT_MY_RESOURCE;
+	static const QList<int> indexTypes = QList<int>() 
+		<< RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES
+		<< RIT_GROUP_NOT_IN_ROSTER<< RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 	return indexTypes;
 }
 
@@ -202,18 +192,11 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 		switch (ARole)
 		{
 		case Qt::DisplayRole:
-			{
-				QString display = AIndex->data(RDR_NAME).toString();
-				if (display.isEmpty())
-					display = AIndex->data(RDR_FULL_JID).toString();
-				return display;
-			}
+			return AIndex->data(RDR_NAME);
 		case Qt::ForegroundRole:
 			return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
 		case Qt::BackgroundColorRole:
 			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
-		//case RDR_FONT_WEIGHT:
-		//	return QFont::Bold;
 		case RDR_STATES_FORCE_ON:
 			return QStyle::State_Children;
 		}
@@ -229,8 +212,6 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return AIndex->data(RDR_NAME);
 		case Qt::ForegroundRole:
 			return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
-		//case RDR_FONT_WEIGHT:
-		//	return QFont::DemiBold;
 		case RDR_STATES_FORCE_ON:
 			return QStyle::State_Children;
 		}

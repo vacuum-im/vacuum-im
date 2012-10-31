@@ -138,6 +138,19 @@ AdvancedDelegateItem::~AdvancedDelegateItem()
 	delete c;
 }
 
+void AdvancedDelegateItem::detach()
+{
+	if (d->refs > 1)
+	{
+		ExplicitData *old = d;
+		old->refs--;
+
+		d = new ExplicitData;
+		*d = *old;
+		d->refs=1;
+	}
+}
+
 AdvancedDelegateItem &AdvancedDelegateItem::operator=(const AdvancedDelegateItem &AOther)
 {
 	if (d != AOther.d)
@@ -394,6 +407,7 @@ AdvancedItemDelegate::AdvancedItemDelegate(QObject *AParent) : QStyledItemDelega
 	FMargins = QMargins(1,1,1,1);
 
 	FEditProxy = NULL;
+	FEditRole = Qt::EditRole;
 	FEditItemId = AdvancedDelegateItem::NullId;
 	
 	FBlinkOpacity = 1.0;
@@ -479,6 +493,16 @@ void AdvancedItemDelegate::setBlinkMode(BlinkMode AMode)
 	FBlinkMode = AMode;
 }
 
+int AdvancedItemDelegate::editRole() const
+{
+	return FEditRole;
+}
+
+void AdvancedItemDelegate::setEditRole(int ARole)
+{
+	FEditRole = ARole;
+}
+
 quint32 AdvancedItemDelegate::editItemId() const
 {
 	return FEditItemId;
@@ -541,13 +565,6 @@ QSize AdvancedItemDelegate::sizeHint(const QStyleOptionViewItem &AOption, const 
 		return qvariant_cast<QSize>(hint);
 
 	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
-	
-	// Some states are not set for sizeHint o_O
-	if (AIndex.model()->hasChildren(AIndex))
-		indexOption.state |= QStyle::State_Children;
-	if (AIndex.sibling(AIndex.row()+1,AIndex.column()).isValid())
-		indexOption.state |= QStyle::State_Sibling;
-	
 	ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex,indexOption),indexOption);
 	QSize size = layout->mainLayout->sizeHint() + QSize(FMargins.left()+FMargins.right(),FMargins.top()+FMargins.bottom());
 	destroyItemsLayout(layout);
@@ -563,7 +580,7 @@ QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOption
 		widget = FEditProxy!=NULL ? FEditProxy->createEditor(this,AParent,AOption,AIndex) : NULL;
 		if (widget == NULL)
 		{
-			QVariant value = AIndex.data(Qt::EditRole);
+			QVariant value = AIndex.data(FEditRole);
 			if (FEditItemId != AdvancedDelegateItem::NullId)
 			{
 				QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
@@ -598,8 +615,8 @@ void AdvancedItemDelegate::setModelData(QWidget *AEditor, QAbstractItemModel *AM
 	{
 		QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
 		QByteArray name = editorFactory()->valuePropertyName(value.type());
-		if (!name.isEmpty()) 
-			AModel->setData(AIndex, AEditor->property(name), Qt::EditRole);
+		if (!name.isEmpty())
+			AModel->setData(AIndex, AEditor->property(name), FEditRole);
 	}
 }
 
@@ -694,6 +711,12 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::indexStyleOption(const QStyleOption
 {
 	QStyleOptionViewItemV4 indexOption = AOption;
 
+	// Some states are not set for sizeHint and createEditor
+	if (AIndex.model()->hasChildren(AIndex))
+		indexOption.state |= QStyle::State_Children;
+	if (AIndex.sibling(AIndex.row()+1,AIndex.column()).isValid())
+		indexOption.state |= QStyle::State_Sibling;
+
 	indexOption.index = AIndex;
 
 	QVariant value = AIndex.data(Qt::FontRole);
@@ -766,11 +789,7 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 
 	if (!AItem.d->hints.isEmpty())
 	{
-		QVariant hint = AItem.d->hints.value(AdvancedDelegateItem::FontSize);
-		if (!hint.isNull())
-			itemOption.font.setPointSize(hint.toInt());
-
-		hint = AItem.d->hints.value(AdvancedDelegateItem::FontWeight);
+		QVariant hint = AItem.d->hints.value(AdvancedDelegateItem::FontWeight);
 		if (!hint.isNull())
 			itemOption.font.setWeight(hint.toInt());
 
@@ -781,6 +800,14 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 		hint = AItem.d->hints.value(AdvancedDelegateItem::FontStyle);
 		if (!hint.isNull())
 			itemOption.font.setStyle((QFont::Style)hint.toInt());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontSize);
+		if (!hint.isNull())
+			itemOption.font.setPointSize(hint.toInt());
+
+		hint = AItem.d->hints.value(AdvancedDelegateItem::FontSizeDelta);
+		if (!hint.isNull())
+			itemOption.font.setPointSize(itemOption.font.pointSize()+hint.toInt());
 
 		hint = AItem.d->hints.value(AdvancedDelegateItem::FontUnderline);
 		if (!hint.isNull())

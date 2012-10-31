@@ -1,6 +1,8 @@
 #ifndef DEF_ROSTERLABELHOLDERORDERS_H
 #define DEF_ROSTERLABELHOLDERORDERS_H
 
-#define RLHO_DEFAULT                 500
+#define RLHO_ROSTERSVIEW_NOTIFY                  300
+#define RLHO_SCHANGER_STATUS                     500
+#define RLHO_ROSTERSVIEW_DISPLAY                 500
 
 #endif //DEF_ROSTERLABELHOLDERORDERS_H
