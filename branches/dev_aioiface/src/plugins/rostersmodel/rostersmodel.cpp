@@ -24,7 +24,8 @@ RostersModel::RostersModel()
 
 RostersModel::~RostersModel()
 {
-
+	FRootIndex->removeAllChilds();
+	delete FRootIndex;
 }
 
 void RostersModel::pluginInfo(IPluginInfo *APluginInfo)

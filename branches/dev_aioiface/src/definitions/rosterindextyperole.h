@@ -4,6 +4,7 @@
 enum RosterIndexTypes {
 	RIT_ANY_TYPE,
 	RIT_ROOT,
+	RIT_RECENT_ROOT,
 	RIT_STREAM_ROOT,
 	RIT_GROUP,
 	RIT_GROUP_BLANK,
@@ -12,7 +13,8 @@ enum RosterIndexTypes {
 	RIT_GROUP_AGENTS,
 	RIT_CONTACT,
 	RIT_AGENT,
-	RIT_MY_RESOURCE
+	RIT_MY_RESOURCE,
+	RIT_RECENT_ITEM
 };
 
 enum RosterIndexDataRoles {

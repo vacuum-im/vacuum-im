@@ -168,6 +168,9 @@
 #define MNI_PLUGINMANAGER_ABOUT         "pluginmanagerAbout"
 #define MNI_PLUGINMANAGER_ABOUT_QT      "pluginmanagerAboutQt"
 
+//RecentContact
+#define MNI_RECENTCONTACTS_RECENT       "recentcontactsRecent"
+
 //Registration
 #define MNI_REGISTERATION               "register"
 #define MNI_REGISTERATION_REMOVE        "registerRemove"
