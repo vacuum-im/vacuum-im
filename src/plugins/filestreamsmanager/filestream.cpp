@@ -494,8 +494,11 @@ void FileStream::onTransferThreadFinished()
 {
 	if (FSocket && FSocket->isOpen())
 	{
-		setStreamState(Disconnecting,tr("Disconnecting"));
-		FSocket->close();
+		if (FStreamKind==ReceiveFile || FThread->isAborted())
+		{
+			setStreamState(Disconnecting,tr("Disconnecting"));
+			FSocket->close();
+		}
 	}
 	FThread->deleteLater();
 	FThread = NULL;
