@@ -62,12 +62,12 @@ https://build.opensuse.org/project/show?project=home%3AEGDFree
 
 == Подключение ==
 
-Замените версию дистрибутива на нужную (доступны: *openSUSE_11.4*, *openSUSE_12.1*, *openSUSE_Factory*) и выполните:
+Замените версию дистрибутива на нужную (доступны: *openSUSE_12.1*, *openSUSE_12.2*, *openSUSE_Factory*) и выполните:
 
 === vacuum-im (stable) ===
 Для получения текущей стабильной версии:
 {{{
-sudo zypper ar -f  http://download.opensuse.org/repositories/network/openSUSE_12.1/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/network/openSUSE_12.2/ vacuum-im
 }}}
 
 Если используется Tumbleweed:
@@ -78,7 +78,7 @@ sudo zypper ar -f http://download.opensuse.org/repositories/openSUSE:/Tumbleweed
 === vacuum-im (unstable, vcs) ===
 Для получения новейшей версии из git-репозитория разработки:
 {{{
-sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im:/git/openSUSE_12.1/ vacuum-im
+sudo zypper ar -f  http://download.opensuse.org/repositories/home:/EGDFree:/vacuum-im:/git/openSUSE_12.2/ vacuum-im
 }}}
 
 == Установка ==
