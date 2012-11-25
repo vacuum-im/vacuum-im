@@ -24,6 +24,7 @@ ChatMessageHandler::ChatMessageHandler()
 	FStatusChanger = NULL;
 	FXmppUriQueries = NULL;
 	FOptionsManager = NULL;
+	FRecentContacts = NULL;
 }
 
 ChatMessageHandler::~ChatMessageHandler()
@@ -143,9 +144,11 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
-	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
+
+	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
+	if (plugin)
+		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
@@ -239,14 +242,24 @@ bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 		window = AMessage.type()!=Message::Error ? getWindow(AMessage.to(),AMessage.from()) : findWindow(AMessage.to(),AMessage.from());
 	else
 		window = AMessage.type()!=Message::Error ? getWindow(AMessage.from(),AMessage.to()) : findWindow(AMessage.from(),AMessage.to());
+
 	if (window)
 	{
+		if (FRecentContacts)
+		{
+			IRecentItem recentItem;
+			recentItem.type = REIT_CONTACT;
+			recentItem.streamJid = window->streamJid();
+			recentItem.reference = window->contactJid().pBare();
+			FRecentContacts->setRecentItem(recentItem);
+		}
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);
 		if (FHistoryRequests.values().contains(window))
 			FPendingMessages[window].append(AMessage);
 		showStyledMessage(window,AMessage);
 	}
+
 	return window!=NULL;
 }
 

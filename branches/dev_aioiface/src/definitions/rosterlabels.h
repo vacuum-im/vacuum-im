@@ -6,6 +6,7 @@
 #define RLID_BIRTHDAY_NOTIFY                       AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,AdvancedDelegateItem::AlignRightOrderMask | 200)
 #define RLID_PRIVACY_STATUS                        AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,AdvancedDelegateItem::AlignRightOrderMask | 300)
 #define RLID_CONNECTION_ENCRYPTED                  AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,AdvancedDelegateItem::AlignRightOrderMask | 500)
+#define RLID_RECENT_FAVORITE                       AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,AdvancedDelegateItem::AlignRightOrderMask | 1000)
 
 //Position=MiddleCenter; Floor=200
 #define RLID_SCHANGER_STATUS                       AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,200,500)

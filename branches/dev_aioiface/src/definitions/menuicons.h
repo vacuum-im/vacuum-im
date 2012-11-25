@@ -170,6 +170,8 @@
 
 //RecentContact
 #define MNI_RECENTCONTACTS_RECENT       "recentcontactsRecent"
+#define MNI_RECENTCONTACTS_INSERT_FAV   "recentcontactsInsertFavorite"
+#define MNI_RECENTCONTACTS_REMOVE_FAV   "recentcontactsRemoveFavorite"
 
 //Registration
 #define MNI_REGISTERATION               "register"

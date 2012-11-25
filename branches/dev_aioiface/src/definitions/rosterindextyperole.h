@@ -43,6 +43,10 @@ enum RosterIndexDataRoles {
 	RDR_AVATAR_IMAGE,
 	//Annotations
 	RDR_ANNOTATIONS,
+	//Recent Items
+	RDR_RECENT_TYPE,
+	RDR_RECENT_REFERENCE,
+	RDR_RECENT_DATETIME,
 	//Other Roles
 	RDR_USER_ROLE = 128
 };

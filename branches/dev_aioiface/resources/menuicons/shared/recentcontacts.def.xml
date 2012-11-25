@@ -4,4 +4,12 @@
     <key>recentcontactsRecent</key>
     <object mime="image/png">recentcontactsrecent.png</object>
   </icon>
+  <icon>
+    <key>recentcontactsInsertFavorite</key>
+    <object mime="image/png">recentcontactsinsertfavorite.png</object>
+  </icon>
+  <icon>
+    <key>recentcontactsRemoveFavorite</key>
+    <object mime="image/png">recentcontactsremovefavorite.png</object>
+  </icon>
 </icondef>

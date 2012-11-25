@@ -16,7 +16,7 @@ struct IRecentItem
 	Jid streamJid;
 	QString reference;
 	bool favorite;
-	QDateTime lastActionTime;
+	QDateTime dateTime;
 	bool operator<(const IRecentItem &AOther) const {
 		if (type != AOther.type)
 			return type < AOther.type;
@@ -32,11 +32,13 @@ struct IRecentItem
 class IRecentItemHandler
 {
 public:
+	virtual QObject *instance() = 0;
+	virtual bool recentItemCanShow(const IRecentItem &AItem) const =0;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const =0;
 	virtual QString recentItemName(const IRecentItem &AItem) const =0;
-	virtual QString recentItemToolTip(const IRecentItem &AItem) const =0;
-	virtual QString recentItemContextMenu(const IRecentItem &AItem, Menu *AMenu) const =0;
 	virtual IRosterIndex *recentItemProxyIndex(const IRecentItem &AItem) const =0;
+protected:
+	virtual void recentItemUpdated(const IRecentItem &AItem) =0;
 };
 
 class IRecentContacts
@@ -44,11 +46,13 @@ class IRecentContacts
 public:
 	virtual QObject *instance() = 0;
 	virtual bool isItemValid(const IRecentItem &AItem) const =0;
-	virtual QList<IRecentItem> visibleItems() const =0;
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const =0;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const =0;
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite) =0;
 	virtual void setRecentItem(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
+	virtual QList<IRecentItem> visibleItems() const =0;
+	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const =0;
+	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const =0;
 	virtual QList<QString> itemHandlerTypes() const =0;
 	virtual IRecentItemHandler *itemTypeHandler(const QString &AType) const =0;
 	virtual void registerItemHandler(const QString &AType, IRecentItemHandler *AHandler) =0;
@@ -57,6 +61,7 @@ protected:
 	virtual void recentItemAdded(const IRecentItem &AItem) =0;
 	virtual void recentItemChanged(const IRecentItem &AItem) =0;
 	virtual void recentItemRemoved(const IRecentItem &AItem) =0;
+	virtual void recentItemIndexCreated(const IRecentItem &AItem, IRosterIndex *AIndex) =0;
 	virtual void itemHandlerRegistered(const QString &AType, IRecentItemHandler *AHandler) =0;
 };
 
