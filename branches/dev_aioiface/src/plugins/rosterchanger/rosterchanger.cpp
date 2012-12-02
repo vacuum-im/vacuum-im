@@ -792,7 +792,7 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			}
 			else if (AId==SCT_ROSTERVIEW_RENAME && !FRostersView->hasMultiSelection())
 			{
-				if (!FRostersView->editRosterIndex(RDR_NAME,index))
+				if (!FRostersView->editRosterIndex(index, RDR_NAME))
 				{
 					if (indexType == RIT_GROUP)
 						renameGroup(streamJid,index->data(RDR_GROUP).toString());
@@ -1523,7 +1523,7 @@ void RosterChanger::onRenameContact(bool)
 				{
 					if (index->data(RDR_GROUP).toString() == group)
 					{
-						editInRoster = FRostersView->editRosterIndex(RDR_NAME,index);
+						editInRoster = FRostersView->editRosterIndex(index,RDR_NAME);
 						break;
 					}
 				}
@@ -1587,7 +1587,7 @@ void RosterChanger::onRenameGroup(bool)
 				IRosterIndex *sroot = FRostersView->rostersModel()->streamRoot(roster->streamJid());
 				IRosterIndex *index = FRostersView->rostersModel()->findGroupIndex(RIT_GROUP,group,roster->groupDelimiter(),sroot);
 				if (index)
-					editInRoster = FRostersView->editRosterIndex(RDR_NAME,index);
+					editInRoster = FRostersView->editRosterIndex(index,RDR_NAME);
 			}
 			if (!editInRoster)
 			{

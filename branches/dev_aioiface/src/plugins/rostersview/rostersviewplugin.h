@@ -61,11 +61,13 @@ public:
 	virtual IRostersView *rostersView();
 	virtual void startRestoreExpandState();
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
+	virtual void registerExpandableRosterIndexType(int AType, int AUniqueRole);
 signals:
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
-	QString indexGroupName(const QModelIndex &AIndex) const;
+	QString rootExpandId(const QModelIndex &AIndex) const;
+	QString indexExpandId(const QModelIndex &AIndex) const;
 	void loadExpandState(const QModelIndex &AIndex);
 	void saveExpandState(const QModelIndex &AIndex);
 protected slots:
@@ -75,30 +77,27 @@ protected slots:
 	void onViewModelAboutToBeChanged(QAbstractItemModel *AModel);
 	void onViewModelChanged(QAbstractItemModel *AModel);
 	void onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
+	void onViewRowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 	void onViewIndexCollapsed(const QModelIndex &AIndex);
 	void onViewIndexExpanded(const QModelIndex &AIndex);
-	void onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter);
-	void onAccountShown(IAccount *AAccount);
-	void onAccountHidden(IAccount *AAccount);
-	void onAccountDestroyed(const QUuid &AAccountId);
 	void onRestoreExpandState();
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onShowOfflineContactsAction(bool AChecked);
 private:
-	IRosterPlugin *FRosterPlugin;
 	IRostersModel *FRostersModel;
 	IMainWindowPlugin *FMainWindowPlugin;
-	IAccountManager *FAccountManager;
 	IOptionsManager *FOptionsManager;
 private:
-	bool FShowResource;
 	bool FStartRestoreExpandState;
+	QMap<int, int> FExpandableTypes;
+	QMap<QString, QHash<QString,bool> > FExpandStates;
+private:
+	bool FShowResource;
 	Action *FShowOfflineAction;
 	RostersView *FRostersView;
 	QAbstractItemModel *FLastModel;
 	SortFilterProxyModel *FSortFilterProxyModel;
-	QMap<Jid, QHash<QString,bool> > FExpandState;
 	struct { int sliderPos; IRosterIndex *currentIndex; } FViewSavedState;
 };
 

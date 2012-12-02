@@ -19,24 +19,73 @@ void SortFilterProxyModel::invalidate()
 	QSortFilterProxyModel::invalidate();
 }
 
+bool SortFilterProxyModel::compareVariant( const QVariant &ALeft, const QVariant &ARight ) const
+{
+	switch (ALeft.userType()) 
+	{
+	case QVariant::Invalid:
+		return (ARight.type() != QVariant::Invalid);
+	case QVariant::Int:
+		return ALeft.toInt() < ARight.toInt();
+	case QVariant::UInt:
+		return ALeft.toUInt() < ARight.toUInt();
+	case QVariant::LongLong:
+		return ALeft.toLongLong() < ARight.toLongLong();
+	case QVariant::ULongLong:
+		return ALeft.toULongLong() < ARight.toULongLong();
+	case QMetaType::Float:
+		return ALeft.toFloat() < ARight.toFloat();
+	case QVariant::Double:
+		return ALeft.toDouble() < ARight.toDouble();
+	case QVariant::Char:
+		return ALeft.toChar() < ARight.toChar();
+	case QVariant::Date:
+		return ALeft.toDate() < ARight.toDate();
+	case QVariant::Time:
+		return ALeft.toTime() < ARight.toTime();
+	case QVariant::DateTime:
+		return ALeft.toDateTime() < ARight.toDateTime();
+	case QVariant::String:
+	default:
+		if (isSortLocaleAware())
+			return ALeft.toString().localeAwareCompare(ARight.toString()) < 0;
+		else
+			return ALeft.toString().compare(ARight.toString(), sortCaseSensitivity()) < 0;
+	}
+	return false;
+}
+
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-	int leftType = ALeft.data(RDR_TYPE).toInt();
-	int rightType = ARight.data(RDR_TYPE).toInt();
-	if (leftType == rightType)
+	int leftTypeOrder = ALeft.data(RDR_TYPE_ORDER).toInt();
+	int rightTypeOrder = ARight.data(RDR_TYPE_ORDER).toInt();
+	if (leftTypeOrder == rightTypeOrder)
 	{
-		int leftShow = ALeft.data(RDR_SHOW).toInt();
-		int rightShow = ARight.data(RDR_SHOW).toInt();
-		if (FSortByStatus && leftType!=RIT_STREAM_ROOT && leftShow!=rightShow)
+		QVariant leftSortOrder = ALeft.data(RDR_SORT_ORDER);
+		QVariant rightSortOrder = ARight.data(RDR_SORT_ORDER);
+		if (leftSortOrder.isNull() || rightSortOrder.isNull() || leftSortOrder==rightSortOrder)
 		{
-			const static int showOrders[] = {6,2,1,3,4,5,7,8};
-			return showOrders[leftShow] < showOrders[rightShow];
+			int leftShow = ALeft.data(RDR_SHOW).toInt();
+			int rightShow = ARight.data(RDR_SHOW).toInt();
+			if (FSortByStatus && leftTypeOrder!=RIT_STREAM_ROOT && leftShow!=rightShow)
+			{
+				const static int showOrders[] = {6,2,1,3,4,5,7,8};
+				return showOrders[leftShow] < showOrders[rightShow];
+			}
+			else
+			{
+				return compareVariant(ALeft.data(Qt::DisplayRole),ARight.data(Qt::DisplayRole));
+			}
 		}
 		else
-			return QSortFilterProxyModel::lessThan(ALeft,ARight);
+		{
+			return compareVariant(leftSortOrder,rightSortOrder);
+		}
 	}
 	else
-		return leftType < rightType;
+	{
+		return leftTypeOrder < rightTypeOrder;
+	}
 }
 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const

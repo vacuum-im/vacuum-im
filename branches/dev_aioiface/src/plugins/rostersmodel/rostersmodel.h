@@ -2,6 +2,7 @@
 #define ROSTERSMODEL_H
 
 #include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindextypeorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/iroster.h>

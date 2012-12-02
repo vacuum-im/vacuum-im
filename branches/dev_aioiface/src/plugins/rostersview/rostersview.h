@@ -52,7 +52,14 @@ public:
 	virtual bool repaintRosterIndex(IRosterIndex *AIndex);
 	virtual void expandIndexParents(IRosterIndex *AIndex);
 	virtual void expandIndexParents(const QModelIndex &AIndex);
-	virtual bool editRosterIndex(int ADataRole, IRosterIndex *AIndex);
+	virtual bool editRosterIndex(IRosterIndex *AIndex, int ADataRole);
+	virtual bool singleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool doubleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool keyPressForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
+	virtual bool keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
+	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMultiMap<int,QString> &AToolTips);
+	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu);
+	//--IndexSelection
 	virtual bool hasMultiSelection() const;
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const;
 	virtual void selectRosterIndex(IRosterIndex *AIndex);
@@ -94,10 +101,6 @@ public:
 	//--EditHandlers
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler);
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler);
-	//--ContextMenu
-	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	//--ClipboardMenu
-	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 signals:
 	//IMainTabPage
 	void tabPageChanged();
@@ -128,6 +131,7 @@ protected:
 	void removeBlinkItem(quint32 ALabelId, int ANotifyId);
 	void setDropIndicatorRect(const QRect &ARect);
 	QStyleOptionViewItemV4 indexOption(const QModelIndex &AIndex) const;
+	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 protected:
 	//QTreeView
 	void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;

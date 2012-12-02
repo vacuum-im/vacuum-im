@@ -8,6 +8,7 @@
 #include <definitions/messagehandlerorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosternotifyorders.h>
+#include <definitions/recentitemtypes.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -32,6 +33,7 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/irecentcontacts.h>
 #include <utils/widgetmanager.h>
 #include <utils/xmpperror.h>
 #include <utils/textmanager.h>
@@ -104,6 +106,7 @@ private:
 	IRostersView *FRostersView;
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
+	IRecentContacts *FRecentContacts;
 private:
 	QList<IMessageWindow *> FWindows;
 	QMultiMap<IMessageWindow *, int> FNotifiedMessages;

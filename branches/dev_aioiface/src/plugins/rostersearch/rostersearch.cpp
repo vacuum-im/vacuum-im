@@ -106,13 +106,13 @@ bool RosterSearch::initSettings()
 	return true;
 }
 
-bool RosterSearch::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool RosterSearch::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
 	return false;
 }
 
-bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AIndex); Q_UNUSED(AEvent);
 	if (AOrder == RCHO_ROSTERSEARCH)
@@ -125,7 +125,7 @@ bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QM
 	return false;
 }
 
-bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent)
+bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent)
 {
 	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
@@ -140,7 +140,7 @@ bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIn
 	return false;
 }
 
-bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent)
+bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent)
 {
 	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
@@ -321,37 +321,29 @@ void RosterSearch::removeSearchField(int ADataRole)
 
 bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 {
-	if (!searchPattern().isEmpty())
+	if (!searchPattern().isEmpty() && AParent.isValid() && sourceModel()!=NULL)
 	{
-		QModelIndex index = sourceModel()!=NULL ? sourceModel()->index(ARow,0,AParent) : QModelIndex();
-		switch (index.data(RDR_TYPE).toInt())
+		QModelIndex index = sourceModel()->index(ARow,0,AParent);
+		if (!sourceModel()->hasChildren(index))
 		{
-		case RIT_CONTACT:
-		case RIT_AGENT:
-		case RIT_MY_RESOURCE:
+			bool accept = true;
+			foreach(int dataField, FFieldActions.keys())
 			{
-				bool accept = true;
-				foreach(int dataField, FFieldActions.keys())
+				if (isSearchFieldEnabled(dataField))
 				{
-					if (isSearchFieldEnabled(dataField))
-					{
-						accept = false;
-						if (filterRegExp().indexIn(index.data(dataField).toString())>=0)
-							return true;
-					}
-				}
-				return accept;
-			}
-		case RIT_GROUP:
-		case RIT_GROUP_AGENTS:
-		case RIT_GROUP_BLANK:
-		case RIT_GROUP_NOT_IN_ROSTER:
-			{
-				for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-					if (filterAcceptsRow(childRow,index))
+					accept = false;
+					if (filterRegExp().indexIn(index.data(dataField).toString())>=0)
 						return true;
-				return false;
+				}
 			}
+			return accept;
+		}
+		else
+		{
+			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+				if (filterAcceptsRow(childRow,index))
+					return true;
+			return false;
 		}
 	}
 	return true;

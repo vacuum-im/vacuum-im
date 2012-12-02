@@ -46,15 +46,15 @@ protected:
 class IRostersClickHooker
 {
 public:
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent) =0;
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent) =0;
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent) =0;
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent) =0;
 };
 
 class IRostersKeyHooker
 {
 public:
-	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent) =0;
-	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent) =0;
+	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent) =0;
+	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent) =0;
 };
 
 class IRostersDragDropHandler
@@ -84,12 +84,19 @@ public:
 	virtual bool repaintRosterIndex(IRosterIndex *AIndex) =0;
 	virtual void expandIndexParents(IRosterIndex *AIndex) =0;
 	virtual void expandIndexParents(const QModelIndex &AIndex) =0;
-	virtual bool editRosterIndex(int ADataRole, IRosterIndex *AIndex) =0;
+	virtual bool editRosterIndex(IRosterIndex *AIndex, int ADataRole) =0;
+	virtual bool singleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent) =0;
+	virtual bool doubleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent) =0;
+	virtual bool keyPressForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent) =0;
+	virtual bool keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent) =0;
+	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMultiMap<int,QString> &AToolTips) =0;
+	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu) =0;
+	//IndexSelection
 	virtual bool hasMultiSelection() const =0;
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const =0;
 	virtual void selectRosterIndex(IRosterIndex * AIndex) = 0;
 	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const =0;
-	//--ProxyModels
+	//ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder) =0;
 	virtual QList<QAbstractProxyModel *> proxyModels() const =0;
 	virtual void removeProxyModel(QAbstractProxyModel *AProxyModel) =0;
@@ -97,13 +104,13 @@ public:
 	virtual QModelIndex mapFromModel(const QModelIndex &AModelIndex) const=0;
 	virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const=0;
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const=0;
-	//--IndexLabel
+	//IndexLabel
 	virtual quint32 registerLabel(const AdvancedDelegateItem &ALabel) =0;
 	virtual void insertLabel(quint32 ALabelId, IRosterIndex *AIndex) =0;
 	virtual void removeLabel(quint32 ALabelId, IRosterIndex *AIndex = NULL) =0;
 	virtual quint32 labelAt(const QPoint &APoint, const QModelIndex &AIndex) const =0;
 	virtual QRect labelRect(quint32 ALabeld, const QModelIndex &AIndex) const =0;
-	//--IndexNotify
+	//IndexNotify
 	virtual int activeNotify(IRosterIndex *AIndex) const =0;
 	virtual QList<int> notifyQueue(IRosterIndex *AIndex) const =0;
 	virtual IRostersNotify notifyById(int ANotifyId) const =0;
@@ -111,25 +118,21 @@ public:
 	virtual int insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes) =0;
 	virtual void activateNotify(int ANotifyId) =0;
 	virtual void removeNotify(int ANotifyId) =0;
-	//--LabelHolders
+	//LabelHolders
 	virtual void insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder) =0;
 	virtual void removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder) =0;
-	//--ClickHookers
+	//ClickHookers
 	virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
 	virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
-	//--KeyHookers
+	//KeyHookers
 	virtual void insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker) =0;
 	virtual void removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker) =0;
-	//--DragDropHandlers
+	//DragDropHandlers
 	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler) =0;
 	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler) =0;
-	//--EditHandlers
+	//EditHandlers
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler) =0;
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler) =0;
-	//--ContextMenu
-	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu) =0;
-	//--ClipboardMenu
-	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
 protected:
 	virtual void modelAboutToBeSeted(IRostersModel *AIndex) =0;
 	virtual void modelSeted(IRostersModel *AIndex) =0;
@@ -155,14 +158,15 @@ public:
 	virtual IRostersView *rostersView() =0;
 	virtual void startRestoreExpandState() =0;
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
+	virtual void registerExpandableRosterIndexType(int AType, int AUniqueRole) =0;
 };
 
 Q_DECLARE_INTERFACE(IRostersLabelHolder,"Vacuum.Plugin.IRostersLabelHolder/1.0");
-Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.2");
-Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.1");
+Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.3");
+Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.2");
 Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.0");
 Q_DECLARE_INTERFACE(IRostersEditHandler,"Virtus.Plugin.IRostersEditHandler/1.1")
-Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.4");
-Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.4");
+Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.5");
+Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.5");
 
 #endif //IROSTERSVIEW_H

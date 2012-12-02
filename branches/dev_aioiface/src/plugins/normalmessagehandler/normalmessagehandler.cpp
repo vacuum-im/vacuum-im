@@ -17,6 +17,7 @@ NormalMessageHandler::NormalMessageHandler()
 	FRostersView = NULL;
 	FXmppUriQueries = NULL;
 	FOptionsManager = NULL;
+	FRecentContacts = NULL;
 }
 
 NormalMessageHandler::~NormalMessageHandler()
@@ -118,6 +119,10 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 	if (plugin)
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 
+	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
+	if (plugin)
+		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return FMessageProcessor!=NULL && FMessageWidgets!=NULL && FMessageStyles!=NULL;
@@ -184,6 +189,14 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 		IMessageWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageWindow::ReadMode);
 		if (window)
 		{
+			if (FRecentContacts)
+			{
+				IRecentItem recentItem;
+				recentItem.type = REIT_CONTACT;
+				recentItem.streamJid = window->streamJid();
+				recentItem.reference = window->contactJid().pBare();
+				FRecentContacts->setItemDateTime(recentItem);
+			}
 			QQueue<Message> &messages = FMessageQueue[window];
 			if (messages.isEmpty())
 				showStyledMessage(window,AMessage);

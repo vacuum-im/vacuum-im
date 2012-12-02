@@ -89,8 +89,8 @@ public:
 	virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
 	virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
 	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IServiceDiscovery
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const;

@@ -387,13 +387,13 @@ void ServiceDiscovery::fillDiscoItems(IDiscoItems &ADiscoItems)
 	Q_UNUSED(ADiscoItems);
 }
 
-bool ServiceDiscovery::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ServiceDiscovery::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
 	return false;
 }
 
-bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();

@@ -49,7 +49,7 @@ public:
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const =0;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const =0;
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite) =0;
-	virtual void setRecentItem(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
+	virtual void setItemDateTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
 	virtual QList<IRecentItem> visibleItems() const =0;
 	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const =0;
 	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const =0;

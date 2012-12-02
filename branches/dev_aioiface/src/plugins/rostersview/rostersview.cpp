@@ -308,7 +308,7 @@ void RostersView::expandIndexParents(const QModelIndex &AIndex)
 	}
 }
 
-bool RostersView::editRosterIndex(int ADataRole, IRosterIndex *AIndex)
+bool RostersView::editRosterIndex(IRosterIndex *AIndex, int ADataRole)
 {
 	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)) : QModelIndex();
 	if (index.isValid() && state()==NoState)
@@ -331,6 +331,94 @@ bool RostersView::editRosterIndex(int ADataRole, IRosterIndex *AIndex)
 		}
 	}
 	return false;
+}
+
+bool RostersView::singleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	bool hooked = false;
+	if (AIndex!=NULL && AEvent!=NULL)
+	{
+		QMultiMap<int,IRostersClickHooker *>::const_iterator it = FClickHookers.constBegin();
+		while (!hooked && it!=FClickHookers.constEnd())
+		{
+			hooked = it.value()->rosterIndexSingleClicked(it.key(),AIndex,AEvent);
+			++it;
+		}
+	}
+	return hooked;
+}
+
+bool RostersView::doubleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	bool hooked = false;
+	if (AIndex!=NULL && AEvent!=NULL)
+	{
+		QMultiMap<int,IRostersClickHooker *>::const_iterator it = FClickHookers.constBegin();
+		while (!hooked && it!=FClickHookers.constEnd())
+		{
+			hooked = it.value()->rosterIndexDoubleClicked(it.key(),AIndex,AEvent);
+			++it;
+		}
+	}
+	return hooked;
+}
+
+bool RostersView::keyPressForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent)
+{
+	bool hooked = false;
+	if (!AIndexes.isEmpty() && AEvent!=NULL)
+	{
+		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
+		while (!hooked && it!=FKeyHookers.constEnd())
+		{
+			hooked = it.value()->rosterKeyPressed(it.key(),AIndexes,AEvent);
+			++it;
+		}
+	}
+	return hooked;
+}
+
+bool RostersView::keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent)
+{
+	bool hooked = false;
+	if (!AIndexes.isEmpty() && AEvent!=NULL)
+	{
+		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
+		while (!hooked && it!=FKeyHookers.constEnd())
+		{
+			hooked = it.value()->rosterKeyReleased(it.key(),AIndexes,AEvent);
+			++it;
+		}
+	}
+	return hooked;
+}
+
+void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMultiMap<int,QString> &AToolTips)
+{
+	if (AIndex != NULL)
+	{
+		quint32 labelId = AdvancedDelegateItem::DisplayId;
+		if (FRostersModel && AEvent!=NULL)
+			labelId = labelAt(AEvent->pos(),mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)));
+
+		emit indexToolTips(AIndex,labelId,AToolTips);
+		if (labelId!=AdvancedDelegateItem::DisplayId && AToolTips.isEmpty())
+			emit indexToolTips(AIndex,AdvancedDelegateItem::DisplayId,AToolTips);
+	}
+}
+
+void RostersView::contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu)
+{
+	if (!AIndexes.isEmpty())
+	{
+		quint32 labelId = AdvancedDelegateItem::DisplayId;
+		if (FRostersModel && AEvent!=NULL)
+			labelId = labelAt(AEvent->pos(),indexAt(AEvent->pos()));
+
+		emit indexContextMenu(AIndexes,labelId,AMenu);
+		if (labelId!=AdvancedDelegateItem::DisplayId && AMenu->isEmpty())
+			emit indexContextMenu(AIndexes,AdvancedDelegateItem::DisplayId,AMenu);
+	}
 }
 
 bool RostersView::hasMultiSelection() const
@@ -754,51 +842,6 @@ void RostersView::removeEditHandler(int AOrder, IRostersEditHandler *AHandler)
 	FEditHandlers.remove(AOrder,AHandler);
 }
 
-void RostersView::contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
-{
-	if (!AIndexes.isEmpty() && AMenu!=NULL)
-		emit indexContextMenu(AIndexes,ALabelId,AMenu);
-}
-
-void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu)
-{
-	if (!AIndexes.isEmpty() && AMenu!=NULL)
-	{
-		if (AIndexes.count() == 1)
-		{
-			IRosterIndex *index = AIndexes.first();
-			if (!index->data(RDR_FULL_JID).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Jabber ID"));
-				action->setData(ADR_CLIPBOARD_DATA, Jid(index->data(RDR_FULL_JID).toString()).uBare());
-				action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-			if (!index->data(RDR_STATUS).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Status"));
-				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_STATUS));
-				action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-			if (!index->data(RDR_NAME).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Name"));
-				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_NAME));
-				action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-		}
-		emit indexClipboardMenu(AIndexes, AMenu);
-	}
-}
-
 void RostersView::clearLabels()
 {
 	foreach(quint32 labelId, FLabelItems.keys())
@@ -855,6 +898,45 @@ QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
 	return option;
 }
 
+void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu)
+{
+	if (!AIndexes.isEmpty() && AMenu!=NULL)
+	{
+		if (AIndexes.count() == 1)
+		{
+			IRosterIndex *index = AIndexes.first();
+			if (!index->data(RDR_FULL_JID).toString().isEmpty())
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Jabber ID"));
+				action->setData(ADR_CLIPBOARD_DATA, Jid(index->data(RDR_FULL_JID).toString()).uBare());
+				action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(action, AG_DEFAULT, true);
+			}
+			if (!index->data(RDR_STATUS).toString().isEmpty())
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Status"));
+				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_STATUS));
+				action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(action, AG_DEFAULT, true);
+			}
+			if (!index->data(RDR_NAME).toString().isEmpty())
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Name"));
+				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_NAME));
+				action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(action, AG_DEFAULT, true);
+			}
+		}
+		emit indexClipboardMenu(AIndexes, AMenu);
+	}
+}
+
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
 {
 	Q_UNUSED(APainter);
@@ -870,22 +952,16 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 		QModelIndex viewIndex = indexAt(helpEvent->pos());
 		if (FRostersModel && viewIndex.isValid())
 		{
-			QMultiMap<int,QString> toolTipsMap;
-			quint32 labelId = labelAt(helpEvent->pos(),viewIndex);
-
 			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
-				emit indexToolTips(index,labelId,toolTipsMap);
-				if (labelId!=AdvancedDelegateItem::DisplayId && toolTipsMap.isEmpty())
-					emit indexToolTips(index,AdvancedDelegateItem::DisplayId,toolTipsMap);
-
+				QMultiMap<int,QString> toolTipsMap;
+				toolTipsForIndex(index,helpEvent,toolTipsMap);
 				if (!toolTipsMap.isEmpty())
 				{
 					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/>"));
 					QToolTip::showText(helpEvent->globalPos(),tooltip,this);
 				}
-
 				return true;
 			}
 		}
@@ -925,11 +1001,7 @@ void RostersView::contextMenuEvent(QContextMenuEvent *AEvent)
 	{
 		Menu *menu = new Menu(this);
 		menu->setAttribute(Qt::WA_DeleteOnClose, true);
-
-		quint32 labelId = labelAt(AEvent->pos(),indexAt(AEvent->pos()));
-		contextMenuForIndex(indexes,labelId,menu);
-		if (labelId!=AdvancedDelegateItem::DisplayId && menu->isEmpty())
-			contextMenuForIndex(indexes,AdvancedDelegateItem::DisplayId,menu);
+		contextMenuForIndex(indexes,AEvent,menu);
 
 		if (!menu->isEmpty())
 			menu->popup(AEvent->globalPos());
@@ -952,12 +1024,7 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 				int notifyId = FActiveNotifies.value(index,-1);
 				if (notifyId<0 || (FNotifyItems.value(notifyId).flags & IRostersNotify::HookClicks)==0)
 				{
-					QMultiMap<int,IRostersClickHooker *>::const_iterator it = FClickHookers.constBegin();
-					while (!hooked && it!=FClickHookers.constEnd())
-					{
-						hooked = it.value()->rosterIndexDoubleClicked(it.key(),index,AEvent);
-						++it;
-					}
+					hooked = doubleClickOnIndex(index,AEvent);
 				}
 				else
 				{
@@ -1050,15 +1117,7 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 		{
 			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
 			if (index)
-			{
-				bool hooked = false;
-				QMultiMap<int,IRostersClickHooker *>::const_iterator it = FClickHookers.constBegin();
-				while (!hooked && it!=FClickHookers.constEnd())
-				{
-					hooked = it.value()->rosterIndexSingleClicked(it.key(),index,AEvent);
-					++it;
-				}
-			}
+				singleClickOnIndex(index,AEvent);
 		}
 	}
 
@@ -1071,40 +1130,14 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 
 void RostersView::keyPressEvent(QKeyEvent *AEvent)
 {
-	bool hooked = false;
-	QList<IRosterIndex *> indexes = selectedRosterIndexes();
-	if (state() == NoState)
-	{
-		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
-		while (!hooked && it!=FKeyHookers.constEnd())
-		{
-			hooked = it.value()->rosterKeyPressed(it.key(),indexes,AEvent);
-			++it;
-		}
-	}
-	if (!hooked)
-	{
+	if (state()!=NoState || !keyPressForIndex(selectedRosterIndexes(),AEvent))
 		QTreeView::keyPressEvent(AEvent);
-	}
 }
 
 void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
 {
-	bool hooked = false;
-	QList<IRosterIndex *> indexes = selectedRosterIndexes();
-	if (state() == NoState)
-	{
-		QMultiMap<int,IRostersKeyHooker *>::const_iterator it = FKeyHookers.constBegin();
-		while (!hooked && it!=FKeyHookers.constEnd())
-		{
-			hooked = it.value()->rosterKeyReleased(it.key(),indexes,AEvent);
-			++it;
-		}
-	}
-	if (!hooked)
-	{
+	if (state()!=NoState || !keyReleaseForIndex(selectedRosterIndexes(),AEvent))
 		QTreeView::keyReleaseEvent(AEvent);
-	}
 }
 
 void RostersView::dropEvent(QDropEvent *AEvent)

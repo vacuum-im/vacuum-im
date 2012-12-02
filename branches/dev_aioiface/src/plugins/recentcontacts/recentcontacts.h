@@ -8,6 +8,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istatusicons.h>
+#include <interfaces/imessageprocessor.h>
 
 class RecentContacts : 
 	public QObject,
@@ -28,8 +29,8 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
-	virtual bool startPlugin() { return true; }
+	virtual bool initSettings();
+	virtual bool startPlugin();
 	//IRosterDataHolder
 	virtual int rosterDataOrder() const;
 	virtual QList<int> rosterDataRoles() const;
@@ -37,8 +38,8 @@ public:
 	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
 	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IRecentItemHandler
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const;
@@ -49,7 +50,7 @@ public:
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const;
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite);
-	virtual void setRecentItem(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
+	virtual void setItemDateTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
 	virtual QList<IRecentItem> visibleItems() const;
 	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const;
 	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const;
@@ -105,7 +106,9 @@ private:
 	IPrivateStorage *FPrivateStorage;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
+	IRostersViewPlugin *FRostersViewPlugin;
 	IStatusIcons *FStatusIcons;
+	IMessageProcessor *FMessageProcessor;
 private:
 	quint32 FInsertFavariteLabelId;
 	quint32 FRemoveFavoriteLabelId;

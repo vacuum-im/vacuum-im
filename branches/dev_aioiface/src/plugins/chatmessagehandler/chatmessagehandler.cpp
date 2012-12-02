@@ -210,14 +210,14 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
 	return false;
 }
 
-bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
 	return false;
 }
 
-bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)
@@ -251,7 +251,7 @@ bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 			recentItem.type = REIT_CONTACT;
 			recentItem.streamJid = window->streamJid();
 			recentItem.reference = window->contactJid().pBare();
-			FRecentContacts->setRecentItem(recentItem);
+			FRecentContacts->setItemDateTime(recentItem);
 		}
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);
