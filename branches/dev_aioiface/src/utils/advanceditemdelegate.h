@@ -149,7 +149,7 @@ public:
 	void updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 public:
 	AdvancedDelegateItems getIndexItems(const QModelIndex &AIndex, const QStyleOptionViewItemV4 &AIndexOption) const;
-	QStyleOptionViewItemV4 indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	QStyleOptionViewItemV4 indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex, bool ACorrect=false) const;
 	QStyleOptionViewItemV4 itemStyleOption(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AIndexOption) const;
 	ItemsLayout *createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItemV4 &AIndexOption) const;
 	void destroyItemsLayout(ItemsLayout *ALayout) const;

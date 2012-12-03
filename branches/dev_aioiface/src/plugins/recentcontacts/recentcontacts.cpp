@@ -35,6 +35,7 @@ RecentContacts::RecentContacts()
 	FRostersModel = NULL;
 	FRostersView = NULL;
 	FStatusIcons = NULL;
+	FRostersViewPlugin = NULL;
 
 	FRootIndex = NULL;
 	FInsertFavariteLabelId = 0;
@@ -186,12 +187,13 @@ QVariant RecentContacts::rosterData(const IRosterIndex *AIndex, int ARole) const
 	{
 	case RIT_RECENT_ROOT:
 		{
+			QPalette plt = FRostersView!=NULL ? FRostersView->instance()->palette() : QPalette();
 			switch (ARole)
 			{
 			case Qt::ForegroundRole:
-				return FRostersView->instance()->palette().color(QPalette::Active, QPalette::BrightText);
+				return plt.color(QPalette::Active, QPalette::BrightText);
 			case Qt::BackgroundColorRole:
-				return FRostersView->instance()->palette().color(QPalette::Active, QPalette::Dark);
+				return plt.color(QPalette::Active, QPalette::Dark);
 			}
 			break;
 		}
@@ -500,15 +502,18 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 		index->setData(RDR_RECENT_DATETIME,item.dateTime);
 		index->setData(RDR_SORT_ORDER, (int)(item.favorite ? 0x80000000 : item.dateTime.secsTo(zero)));
 
-		if (item.favorite)
+		if (FRostersView)
 		{
-			FRostersView->removeLabel(FInsertFavariteLabelId,index);
-			FRostersView->insertLabel(FRemoveFavoriteLabelId,index);
-		}
-		else
-		{
-			FRostersView->removeLabel(FRemoveFavoriteLabelId,index);
-			FRostersView->insertLabel(FInsertFavariteLabelId,index);
+			if (item.favorite)
+			{
+				FRostersView->removeLabel(FInsertFavariteLabelId,index);
+				FRostersView->insertLabel(FRemoveFavoriteLabelId,index);
+			}
+			else
+			{
+				FRostersView->removeLabel(FRemoveFavoriteLabelId,index);
+				FRostersView->insertLabel(FInsertFavariteLabelId,index);
+			}
 		}
 	}
 }

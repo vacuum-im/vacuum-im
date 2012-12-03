@@ -564,7 +564,7 @@ QSize AdvancedItemDelegate::sizeHint(const QStyleOptionViewItem &AOption, const 
 	if (hint.isValid())
 		return qvariant_cast<QSize>(hint);
 
-	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
+	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex,true);
 	ItemsLayout *layout = createItemsLayout(getIndexItems(AIndex,indexOption),indexOption);
 	QSize size = layout->mainLayout->sizeHint() + QSize(FMargins.left()+FMargins.right(),FMargins.top()+FMargins.bottom());
 	destroyItemsLayout(layout);
@@ -583,7 +583,7 @@ QWidget *AdvancedItemDelegate::createEditor(QWidget *AParent, const QStyleOption
 			QVariant value = AIndex.data(FEditRole);
 			if (FEditItemId != AdvancedDelegateItem::NullId)
 			{
-				QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
+				QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex,true);
 				AdvancedDelegateItems items = getIndexItems(AIndex,indexOption);
 				value = items.value(FEditItemId).c->value;
 			}
@@ -625,7 +625,7 @@ void AdvancedItemDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOp
 	if (FEditProxy==NULL || !FEditProxy->updateEditorGeometry(this,AEditor,AOption,AIndex))
 	{
 		quint32 itemId = FEditItemId!=AdvancedDelegateItem::NullId ? FEditItemId : AdvancedDelegateItem::DisplayId;
-		QRect rect = itemRect(itemId,AOption,AIndex);
+		QRect rect = itemRect(itemId,indexStyleOption(AOption,AIndex,true),AIndex);
 		rect.adjust(-1,-1,1,1);
 		AEditor->setGeometry(rect);
 	}
@@ -707,15 +707,16 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 	return items;
 }
 
-QStyleOptionViewItemV4 AdvancedItemDelegate::indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+QStyleOptionViewItemV4 AdvancedItemDelegate::indexStyleOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex, bool ACorrect) const
 {
 	QStyleOptionViewItemV4 indexOption = AOption;
 
-	// Some states are not set for sizeHint and createEditor
-	if (AIndex.model()->hasChildren(AIndex))
-		indexOption.state |= QStyle::State_Children;
-	if (AIndex.sibling(AIndex.row()+1,AIndex.column()).isValid())
-		indexOption.state |= QStyle::State_Sibling;
+	if (ACorrect)
+	{
+		// Some states are not set for sizeHint and createEditor
+		if (AIndex.model()->hasChildren(AIndex))
+			indexOption.state |= QStyle::State_Children;
+	}
 
 	indexOption.index = AIndex;
 
@@ -755,11 +756,6 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 {
 	QStyleOptionViewItemV4 itemOption = AIndexOption;
 
-	if (AItem.d->kind == AdvancedDelegateItem::Branch)
-	{
-		itemOption.state &= ~QStyle::State_Sibling;
-	}
-	
 	if (AItem.d->kind == AdvancedDelegateItem::CheckBox)
 	{
 		itemOption.state &= ~QStyle::State_HasFocus;

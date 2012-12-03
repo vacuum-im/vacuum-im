@@ -944,6 +944,12 @@ void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QMo
 	Q_UNUSED(AIndex);
 }
 
+void RostersView::drawRow(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
+{
+	Q_UNUSED(AOption);
+	QTreeView::drawRow(APainter,indexOption(AIndex),AIndex);
+}
+
 bool RostersView::viewportEvent(QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::ToolTip)

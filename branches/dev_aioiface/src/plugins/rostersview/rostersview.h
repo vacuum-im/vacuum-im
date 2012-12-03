@@ -135,6 +135,7 @@ protected:
 protected:
 	//QTreeView
 	void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
+	void drawRow(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex ) const;
 	//QAbstractItemView
 	bool viewportEvent(QEvent *AEvent);
 	void resizeEvent(QResizeEvent *AEvent);
