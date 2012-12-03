@@ -52,7 +52,7 @@ QString getSingleLineText(const QString &AText)
 }
 
 /*********************
-	AdvancedDelegateItem
+ AdvancedDelegateItem
 **********************/
 const quint32 AdvancedDelegateItem::NullId        = 0;
 const quint32 AdvancedDelegateItem::BranchId      = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,10);
@@ -191,7 +191,7 @@ quint16 AdvancedDelegateItem::getOrder(quint32 AItemId)
 }
 
 /***************************
-	AdvancedDelegateLayoutItem
+ AdvancedDelegateLayoutItem
 ****************************/
 class AdvancedDelegateLayoutItem :
 	public QLayoutItem
@@ -328,9 +328,10 @@ public:
 				}
 			case AdvancedDelegateItem::Branch:
 				{
-					QStyleOption brachOption(FOption);
-					QStyle *style = FOption.widget ? FOption.widget->style() : QApplication::style();
-					style->proxy()->drawPrimitive(QStyle::PE_IndicatorBranch, &brachOption, APainter);
+					QStyleOptionViewItemV4 option(FOption);
+					option.rect = QStyle::alignedRect(option.direction,Qt::AlignCenter,FSizeHint,option.rect);
+					QStyle *style = option.widget ? option.widget->style() : QApplication::style();
+					style->proxy()->drawPrimitive(QStyle::PE_IndicatorBranch, &option, APainter, FOption.widget);
 					break;
 				}
 			case AdvancedDelegateItem::CheckBox:
@@ -358,7 +359,7 @@ private:
 };
 
 /**************************
-	AdvancedDelegateEditProxy
+ AdvancedDelegateEditProxy
 ***************************/
 QWidget *AdvancedDelegateEditProxy::createEditor(const AdvancedItemDelegate *ADelegate, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex)  const
 {
@@ -385,7 +386,7 @@ bool AdvancedDelegateEditProxy::updateEditorGeometry(const AdvancedItemDelegate 
 }
 
 /*********************
-	AdvancedItemDelegate
+ AdvancedItemDelegate
 **********************/
 struct AdvancedItemDelegate::ItemsLayout
 {
@@ -910,9 +911,7 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 			QBoxLayout *floorLayout = floorLayouts.value(floor_it.key());
 			posLayout->addLayout(floorLayout);
 			for (QMultiMap<int, AdvancedDelegateLayoutItem *>::const_iterator order_it=floor_it->constBegin(); order_it!=floor_it->constEnd(); ++order_it)
-			{
 				floorLayout->addItem(order_it.value());
-			}
 		}
 	}
 
@@ -1009,8 +1008,6 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 	static const QSize zeroSize = QSize(0,0);
 	static const QSize branchSize = QSize(12,12);
 
-	QStyle *style = AItemOption.widget!=NULL ? AItemOption.widget->style() : QApplication::style();
-
 	switch (AItem.d->kind)
 	{
 	case AdvancedDelegateItem::Null:
@@ -1024,6 +1021,7 @@ QSize AdvancedItemDelegate::itemSizeHint(const AdvancedDelegateItem &AItem, cons
 		}
 	case AdvancedDelegateItem::CheckBox:
 		{
+			QStyle *style = AItemOption.widget!=NULL ? AItemOption.widget->style() : QApplication::style();
 			int width = style->proxy()->pixelMetric(QStyle::PM_IndicatorWidth, &AItemOption, AItemOption.widget);
 			int height = style->proxy()->pixelMetric(QStyle::PM_IndicatorHeight, &AItemOption, AItemOption.widget);
 			return QSize(width,height);

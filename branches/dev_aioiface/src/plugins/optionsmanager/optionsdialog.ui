@@ -20,6 +20,9 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QTreeView" name="trvNodes">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
       <property name="textElideMode">
        <enum>Qt::ElideNone</enum>
       </property>

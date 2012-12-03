@@ -130,7 +130,7 @@ protected:
 	void appendBlinkItem(quint32 ALabelId, int ANotifyId);
 	void removeBlinkItem(quint32 ALabelId, int ANotifyId);
 	void setDropIndicatorRect(const QRect &ARect);
-	QStyleOptionViewItemV4 indexOption(const QModelIndex &AIndex) const;
+	QStyleOptionViewItemV4 indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 protected:
 	//QTreeView

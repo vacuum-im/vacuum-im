@@ -31,6 +31,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	header()->hide();
 	header()->setStretchLastSection(false);
 
+	setAnimated(true);
 	setIndentation(4);
 	setAutoScroll(true);
 	setDragEnabled(true);
@@ -39,7 +40,9 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	setDropIndicatorShown(true);
 	setEditTriggers(NoEditTriggers);
 	setSelectionMode(ExtendedSelection);
+	setSelectionBehavior(SelectRows);
 	setContextMenuPolicy(Qt::DefaultContextMenu);
+	setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 	FAdvancedItemDelegate = new AdvancedItemDelegate(this);
 	FAdvancedItemDelegate->setVertialSpacing(1);
@@ -683,12 +686,12 @@ void RostersView::removeLabel(quint32 ALabelId, IRosterIndex *AIndex)
 
 quint32 RostersView::labelAt(const QPoint &APoint, const QModelIndex &AIndex) const
 {
-	return FAdvancedItemDelegate->itemAt(APoint,indexOption(AIndex),AIndex);
+	return FAdvancedItemDelegate->itemAt(APoint,indexOption(viewOptions(),AIndex),AIndex);
 }
 
 QRect RostersView::labelRect(quint32 ALabeld, const QModelIndex &AIndex) const
 {
-	return FAdvancedItemDelegate->itemRect(ALabeld,indexOption(AIndex),AIndex);
+	return FAdvancedItemDelegate->itemRect(ALabeld,indexOption(viewOptions(),AIndex),AIndex);
 }
 
 int RostersView::activeNotify(IRosterIndex *AIndex) const
@@ -871,17 +874,21 @@ void RostersView::setDropIndicatorRect(const QRect &ARect)
 	}
 }
 
-QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
+QStyleOptionViewItemV4 RostersView::indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	QStyleOptionViewItemV4 option = viewOptions();
-	option.initFrom(this);
+	QStyleOptionViewItemV4 option = AOption;
+	
+	if (wordWrap())
+		option.features = QStyleOptionViewItemV2::WrapText;
 	option.widget = this;
-	option.rect = visualRect(AIndex);
 	option.locale = locale();
 	option.locale.setNumberOptions(QLocale::OmitGroupSeparator);
-	option.showDecorationSelected |= selectionBehavior() & SelectRows;
-	option.state |= isExpanded(AIndex) ? QStyle::State_Open : QStyle::State_None;
-	if (hasFocus() && currentIndex() == AIndex)
+
+	option.index = AIndex;
+	option.rect = visualRect(AIndex);
+	if (isExpanded(AIndex))
+		option.state |= QStyle::State_Open;
+	if (hasFocus() && currentIndex()==AIndex)
 		option.state |= QStyle::State_HasFocus;
 	if (selectedIndexes().contains(AIndex))
 		option.state |= QStyle::State_Selected;
@@ -891,10 +898,12 @@ QStyleOptionViewItemV4 RostersView::indexOption(const QModelIndex &AIndex) const
 		option.state |= QStyle::State_MouseOver;
 	if (model() && model()->hasChildren(AIndex))
 		option.state |= QStyle::State_Children;
-	if (wordWrap())
-		option.features = QStyleOptionViewItemV2::WrapText;
+
+	option.showDecorationSelected = false;
+	option.state &= ~(QStyle::State_Sibling|QStyle::State_Item);
 	option.state |= (QStyle::State)AIndex.data(RDR_STATES_FORCE_ON).toInt();
 	option.state &= ~(QStyle::State)AIndex.data(RDR_STATES_FORCE_OFF).toInt();
+	
 	return option;
 }
 
@@ -946,8 +955,7 @@ void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QMo
 
 void RostersView::drawRow(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	Q_UNUSED(AOption);
-	QTreeView::drawRow(APainter,indexOption(AIndex),AIndex);
+	QTreeView::drawRow(APainter,indexOption(AOption,AIndex),AIndex);
 }
 
 bool RostersView::viewportEvent(QEvent *AEvent)
@@ -1081,7 +1089,7 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 			QAbstractItemDelegate *itemDeletage = itemDelegate(FPressedIndex);
 			if (itemDeletage)
 			{
-				QStyleOptionViewItemV4 option = indexOption(FPressedIndex);
+				QStyleOptionViewItemV4 option = indexOption(viewOptions(),FPressedIndex);
 				QPoint indexPos = option.rect.topLeft();
 				option.state &= ~QStyle::State_Selected;
 				option.state &= ~QStyle::State_MouseOver;

@@ -155,7 +155,7 @@ int RostersViewPlugin::rosterDataOrder() const
 
 QList<int> RostersViewPlugin::rosterDataRoles() const
 {
-	static const QList<int> dataRoles = QList<int>() << Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON << RDR_STATES_FORCE_OFF;
+	static const QList<int> dataRoles = QList<int>() << Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON;
 	return dataRoles;
 }
 
@@ -182,8 +182,6 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
 		case RDR_STATES_FORCE_ON:
 			return QStyle::State_Children;
-		case RDR_STATES_FORCE_OFF:
-			return QStyle::State_Sibling;
 		}
 		break;
 	case RIT_GROUP:
@@ -199,8 +197,6 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
 		case RDR_STATES_FORCE_ON:
 			return QStyle::State_Children;
-		case RDR_STATES_FORCE_OFF:
-			return QStyle::State_Sibling;
 		}
 		break;
 	case RIT_CONTACT:
