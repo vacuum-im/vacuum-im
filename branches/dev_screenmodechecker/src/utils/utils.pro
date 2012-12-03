@@ -22,7 +22,8 @@ macx {
   QMAKE_LFLAGS    += -framework Carbon -framework IOKit -framework Cocoa
 } else:unix:!haiku {
   LIBS            += -lXss
-  CONFIG          += x11 dbus
+  CONFIG          += x11
+  QT              += dbus
 } else:win32 {
   LIBS            += -luser32
 }
