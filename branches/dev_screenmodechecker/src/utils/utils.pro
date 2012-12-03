@@ -4,7 +4,7 @@ TARGET             = $$VACUUM_UTILS_NAME
 TEMPLATE           = lib
 VERSION            = $$VACUUM_UTILS_ABI
 CONFIG            += dll
-QT                += xml network dbus
+QT                += xml network
 DEFINES           += UTILS_DLL QXT_STATIC
 
 DEPENDPATH        += ..
@@ -22,7 +22,7 @@ macx {
   QMAKE_LFLAGS    += -framework Carbon -framework IOKit -framework Cocoa
 } else:unix:!haiku {
   LIBS            += -lXss
-  CONFIG          += x11
+  CONFIG          += x11 dbus
 } else:win32 {
   LIBS            += -luser32
 }
