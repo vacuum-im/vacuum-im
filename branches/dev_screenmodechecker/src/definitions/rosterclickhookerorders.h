@@ -1,0 +1,8 @@
+#ifndef DEF_ROSTERCLICKHOOKERORDERS_H
+#define DEF_ROSTERCLICKHOOKERORDERS_H
+
+#define RCHO_ROSTERSEARCH                   100
+#define RCHO_CHATMESSAGEHANDLER             400
+#define RCHO_SERVICEDISCOVERY               500
+
+#endif
