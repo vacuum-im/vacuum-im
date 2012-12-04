@@ -31,7 +31,6 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	header()->hide();
 	header()->setStretchLastSection(false);
 
-	setAnimated(true);
 	setIndentation(4);
 	setAutoScroll(true);
 	setDragEnabled(true);
@@ -314,7 +313,7 @@ void RostersView::expandIndexParents(const QModelIndex &AIndex)
 bool RostersView::editRosterIndex(IRosterIndex *AIndex, int ADataRole)
 {
 	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)) : QModelIndex();
-	if (index.isValid() && state()==NoState)
+	if (index.isValid() && state()==NoState && !visualRect(index).isEmpty())
 	{
 		for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); ++it)
 		{

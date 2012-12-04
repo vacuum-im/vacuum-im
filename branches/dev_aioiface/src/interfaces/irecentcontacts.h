@@ -36,7 +36,7 @@ public:
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const =0;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const =0;
 	virtual QString recentItemName(const IRecentItem &AItem) const =0;
-	virtual IRosterIndex *recentItemProxyIndex(const IRecentItem &AItem) const =0;
+	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const =0;
 protected:
 	virtual void recentItemUpdated(const IRecentItem &AItem) =0;
 };
@@ -51,6 +51,8 @@ public:
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite) =0;
 	virtual void setItemDateTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
 	virtual QList<IRecentItem> visibleItems() const =0;
+	virtual quint8 maximumVisibleItems() const =0;
+	virtual void setMaximumVisibleItems(quint8 ACount) =0;
 	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const =0;
 	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const =0;
 	virtual QList<QString> itemHandlerTypes() const =0;

@@ -44,7 +44,7 @@ public:
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const;
 	virtual QString recentItemName(const IRecentItem &AItem) const;
-	virtual IRosterIndex *recentItemProxyIndex(const IRecentItem &AItem) const;
+	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IRecentContacts
 	virtual bool isItemValid(const IRecentItem &AItem) const;
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const;
@@ -52,6 +52,8 @@ public:
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite);
 	virtual void setItemDateTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
 	virtual QList<IRecentItem> visibleItems() const;
+	virtual quint8 maximumVisibleItems() const;
+	virtual void setMaximumVisibleItems(quint8 ACount);
 	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const;
 	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const;
 	virtual QList<QString> itemHandlerTypes() const;
@@ -74,9 +76,10 @@ protected:
 	void updateItemIndex(const IRecentItem &AItem);
 	void removeItemIndex(const IRecentItem &AItem);
 	void updateItemProxy(const IRecentItem &AItem);
-	void insertRecentItems(const QList<IRecentItem> &AItems);
+	void mergeRecentItems(const QList<IRecentItem> &AItems);
 	IRecentItem &findRealItem(const IRecentItem &AItem);
 	IRecentItem rosterIndexItem(const IRosterIndex *AIndex) const;
+	QList<IRosterIndex *> sortItemProxies(const QList<IRosterIndex *> &AIndexes) const;
 protected:
 	QString recentFileName(const Jid &AStreamJid) const;
 	void saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems) const;
@@ -91,6 +94,10 @@ protected slots:
 	void onRostersModelIndexRemoved(IRosterIndex *AIndex);
 protected slots:
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRostersViewNotifyInserted(int ANotifyId);
+	void onRostersViewNotifyRemoved(int ANotifyId);
+	void onRostersViewNotifyActivated(int ANotifyId);
 protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
@@ -98,7 +105,6 @@ protected slots:
 	void onPrivateStorageAboutToClose(const Jid &AStreamJid);
 protected slots:
 	void onProxyIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
-	void onProxyIndexDestroyed(IRosterIndex *AIndex);
 protected slots:
 	void onHandlerRecentItemUpdated(const IRecentItem &AItem);
 private:
@@ -113,10 +119,14 @@ private:
 	quint32 FInsertFavariteLabelId;
 	quint32 FRemoveFavoriteLabelId;
 private:
+	quint8 FMaxVisibleItems;
 	QMap<Jid, QList<IRecentItem> > FStreamItems;
 	QMap<IRecentItem, IRosterIndex *> FVisibleItems;
+private:
+	QMap<int, int> FProxyToIndexNotify;
 	QMap<const IRosterIndex *, IRosterIndex *> FIndexToProxy;
 	QMap<const IRosterIndex *, IRosterIndex *> FProxyToIndex;
+	QMap<IRosterIndex *, QList<IRosterIndex *> > FIndexProxies;
 private:
 	IRosterIndex *FRootIndex;
 	QMap<QString, IRecentItemHandler *> FItemHandlers;
