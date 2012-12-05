@@ -51,6 +51,10 @@
         <source>Enable animation in notification pop-up</source>
         <translation>Enable animation in notification pop-up</translation>
     </message>
+    <message>
+        <source>Disable all pop-up windows when watching fullscreen movies or games</source>
+        <translation>Disable all pop-up windows when watching fullscreen movies or games</translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>
