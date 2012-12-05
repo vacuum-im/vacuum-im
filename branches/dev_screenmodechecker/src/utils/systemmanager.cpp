@@ -54,6 +54,7 @@ bool SystemManager::isScreenSaverRunning()
 
 bool SystemManager::isFullScreenMode()
 {
+	qDebug() << "------------------------";
 	qDebug() << "isDummy?" << d->screenmode->isDummy();
 	qDebug() << "isFull?" << d->screenmode->isFullscreenAppActive();
 	qDebug() << "isScreen?" << d->screenmode->isScreensaverActive();

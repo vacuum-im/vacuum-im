@@ -260,7 +260,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 
 	if (!isFullScreen && (record.notification.kinds & INotification::PopupWindow)>0)
 	{
-		if (!SystemManager::isFullScreenMode() || !SystemManager::isScreenSaverRunning())
+		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
 			qDebug() << "NOTIFY CREATED";
 			record.popupWidget = new NotifyWidget(record.notification);
