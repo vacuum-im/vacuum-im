@@ -27,6 +27,7 @@
 #define AG_RVCM_ROSTERSVIEW_CLIPBOARD                           500
 #define AG_RVCM_PRIVACYLISTS                                    500
 #define AG_RVCM_STATUSICONS                                     500
+#define AG_RVCM_RECENT_FAVORITES                                600
 #define AG_RVCM_ACCOUNTMANAGER                                  700
 #define AG_RVCM_RCHANGER                                        700
 #define AG_RVCM_GATEWAYS_LOGIN                                  800

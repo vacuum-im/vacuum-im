@@ -197,6 +197,11 @@ void Shortcuts::setGlobalShortcut(const QString &AId, bool AEnabled)
 	}
 }
 
+void Shortcuts::activateShortcut(const QString &AId, QWidget *AWidget)
+{
+	emit instance()->shortcutActivated(AId,AWidget);
+}
+
 void Shortcuts::updateObject(QObject *AObject)
 {
 	static QDesktopWidget *deskWidget = QApplication::desktop();

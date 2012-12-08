@@ -93,8 +93,9 @@ public:
 	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu) =0;
 	//IndexSelection
 	virtual bool hasMultiSelection() const =0;
+	virtual bool isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes) =0;
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const =0;
-	virtual void selectRosterIndex(IRosterIndex * AIndex) = 0;
+	virtual bool setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes, bool APartial=true) =0;
 	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const =0;
 	//ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder) =0;

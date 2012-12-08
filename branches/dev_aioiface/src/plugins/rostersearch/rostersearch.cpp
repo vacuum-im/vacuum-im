@@ -203,8 +203,7 @@ void RosterSearch::startSearch()
 	{
 		if (FSearchStarted)
 		{
-			foreach(IRosterIndex *index, FSelectedIndexes)
-				FRostersViewPlugin->rostersView()->selectRosterIndex(index);
+			FRostersViewPlugin->rostersView()->setSelectedRosterIndexes(FSelectedIndexes);
 		}
 
 		if (!isSearchEnabled() || pattern.isEmpty())

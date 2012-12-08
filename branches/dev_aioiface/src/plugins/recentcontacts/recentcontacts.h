@@ -50,7 +50,7 @@ public:
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const;
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite);
-	virtual void setItemDateTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
+	virtual void setItemActiveTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
 	virtual QList<IRecentItem> visibleItems() const;
 	virtual quint8 maximumVisibleItems() const;
 	virtual void setMaximumVisibleItems(quint8 ACount);
@@ -80,12 +80,20 @@ protected:
 	IRecentItem &findRealItem(const IRecentItem &AItem);
 	IRecentItem rosterIndexItem(const IRosterIndex *AIndex) const;
 	QList<IRosterIndex *> sortItemProxies(const QList<IRosterIndex *> &AIndexes) const;
+	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
+protected:
+	void startSaveRecentItems(const Jid &AStreamJid);
+	void saveRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems);
 protected:
 	QString recentFileName(const Jid &AStreamJid) const;
 	void saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems) const;
 	QList<IRecentItem> loadItemsFromXML(const Jid &AStreamJid, const QDomElement &AElement) const;
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
 	QList<IRecentItem> loadItemsFromFile(const Jid &AStreamJid, const QString &AFileName) const;
+protected:
+	bool isRecentSelectionAccepted(const QList<IRosterIndex *> AIndexes) const;
+	bool isContactsSelectionAccepted(const QList<IRosterIndex *> AIndexes) const;
+	void setItemsFavorite(bool AFavorite, QStringList AIndexTypes, QStringList AStreamJids, QStringList ARecentTypes, QStringList ARefs, QStringList AContactsJids);
 protected slots:
 	void onRostersModelStreamAdded(const Jid &AStreamJid);
 	void onRostersModelStreamRemoved(const Jid &AStreamJid);
@@ -93,20 +101,25 @@ protected slots:
 	void onRostersModelIndexInserted(IRosterIndex *AIndex);
 	void onRostersModelIndexRemoved(IRosterIndex *AIndex);
 protected slots:
+	void onPrivateStorageOpened(const Jid &AStreamJid);
+	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
+	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
+	void onPrivateStorageAboutToClose(const Jid &AStreamJid);
+protected slots:
+	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onRostersViewNotifyInserted(int ANotifyId);
 	void onRostersViewNotifyRemoved(int ANotifyId);
 	void onRostersViewNotifyActivated(int ANotifyId);
 protected slots:
-	void onPrivateStorageOpened(const Jid &AStreamJid);
-	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
-	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
-	void onPrivateStorageAboutToClose(const Jid &AStreamJid);
-protected slots:
 	void onProxyIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
-protected slots:
 	void onHandlerRecentItemUpdated(const IRecentItem &AItem);
+protected slots:
+	void onInsertToFavoritesByAction();
+	void onRemoveFromFavoritesByAction();
+	void onSaveRecentItemsTimerTimeout();
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
@@ -116,12 +129,16 @@ private:
 	IStatusIcons *FStatusIcons;
 	IMessageProcessor *FMessageProcessor;
 private:
+	quint32 FShowFavariteLabelId;
 	quint32 FInsertFavariteLabelId;
 	quint32 FRemoveFavoriteLabelId;
 private:
 	quint8 FMaxVisibleItems;
 	QMap<Jid, QList<IRecentItem> > FStreamItems;
 	QMap<IRecentItem, IRosterIndex *> FVisibleItems;
+private:
+	QTimer FSaveTimer;
+	QSet<Jid> FSaveStreams;
 private:
 	QMap<int, int> FProxyToIndexNotify;
 	QMap<const IRosterIndex *, IRosterIndex *> FIndexToProxy;

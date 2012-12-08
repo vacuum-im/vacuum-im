@@ -251,7 +251,7 @@ bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 			recentItem.type = REIT_CONTACT;
 			recentItem.streamJid = window->streamJid();
 			recentItem.reference = window->contactJid().pBare();
-			FRecentContacts->setItemDateTime(recentItem);
+			FRecentContacts->setItemActiveTime(recentItem);
 		}
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);

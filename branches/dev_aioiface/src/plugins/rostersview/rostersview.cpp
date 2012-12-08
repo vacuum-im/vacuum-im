@@ -428,6 +428,17 @@ bool RostersView::hasMultiSelection() const
 	return FRostersModel!=NULL ? selectedIndexes().count()>1 : false;
 }
 
+bool RostersView::isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes)
+{
+	if (AIndexes.count() > 1)
+	{
+		bool accepted = false;
+		emit indexMultiSelection(AIndexes,accepted);
+		return accepted;
+	}
+	return true;
+}
+
 QList<IRosterIndex *> RostersView::selectedRosterIndexes() const
 {
 	QList<IRosterIndex *> rosterIndexes;
@@ -443,14 +454,34 @@ QList<IRosterIndex *> RostersView::selectedRosterIndexes() const
 	return rosterIndexes;
 }
 
-void RostersView::selectRosterIndex(IRosterIndex *AIndex)
+bool RostersView::setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes, bool APartial)
 {
 	if (FRostersModel)
 	{
-		QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex));
-		if (mindex.isValid())
-			selectionModel()->select(mindex, QItemSelectionModel::Select);
+		bool accepted = APartial || isSelectionAcceptable(AIndexes);
+		if (accepted)
+		{
+			QSet<IRosterIndex *> curSelected = selectedRosterIndexes().toSet();
+			QSet<IRosterIndex *> newSelected = AIndexes.toSet() - curSelected;
+			QSet<IRosterIndex *> oldSelected = curSelected - AIndexes.toSet();
+
+			foreach(IRosterIndex *index, oldSelected)
+			{
+				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
+				if (mindex.isValid())
+					selectionModel()->select(mindex, QItemSelectionModel::Deselect);
+			}
+
+			foreach(IRosterIndex *index, newSelected)
+			{
+				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
+				if (mindex.isValid())
+					selectionModel()->select(mindex, QItemSelectionModel::Select);
+			}
+		}
+		return accepted;
 	}
+	return false;
 }
 
 QMap<int, QStringList > RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole) const
@@ -507,8 +538,7 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 			QTreeView::setModel(AProxyModel);
 		}
 
-		foreach(IRosterIndex *index, selIndexes)
-			selectRosterIndex(index);
+		setSelectedRosterIndexes(selIndexes);
 
 		if (changeViewModel)
 			emit viewModelChanged(model());
@@ -570,8 +600,7 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 
 		AProxyModel->setSourceModel(NULL);
 
-		foreach(IRosterIndex *index, selIndexes)
-			selectRosterIndex(index);
+		setSelectedRosterIndexes(selIndexes);
 
 		if (changeViewModel)
 			emit viewModelChanged(model());
@@ -1286,18 +1315,12 @@ void RostersView::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, 
 
 void RostersView::onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected)
 {
-	QList<IRosterIndex *> newSelection = selectedRosterIndexes();
-	if (newSelection.count() > 1)
+	if (!isSelectionAcceptable(selectedRosterIndexes()))
 	{
-		bool accepted = false;
-		emit indexMultiSelection(newSelection,accepted);
-		if (!accepted)
-		{
-			selectionModel()->blockSignals(true);
-			selectionModel()->select(ASelected,QItemSelectionModel::Deselect);
-			selectionModel()->select(ADeselected,QItemSelectionModel::Select);
-			selectionModel()->blockSignals(false);
-		}
+		selectionModel()->blockSignals(true);
+		selectionModel()->select(ASelected,QItemSelectionModel::Deselect);
+		selectionModel()->select(ADeselected,QItemSelectionModel::Select);
+		selectionModel()->blockSignals(false);
 	}
 }
 

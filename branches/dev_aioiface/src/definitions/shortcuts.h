@@ -125,5 +125,8 @@
 #define   SCT_ROSTERVIEW_GATELOGOUT                                "roster-view.gate-logout"
 //Annotations
 #define   SCT_ROSTERVIEW_EDITANNOTATION                            "roster-view.edit-annotation"
+//RecentContacts
+#define   SCT_ROSTERVIEW_INSERTFAVORITE                            "roster-view.insert-favorite"
+#define   SCT_ROSTERVIEW_REMOVEFAVORITE                            "roster-view.remove-favorite"
 
 #endif // DEF_SHORTCUTS_H

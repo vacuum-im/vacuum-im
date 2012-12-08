@@ -169,9 +169,10 @@
 #define MNI_PLUGINMANAGER_ABOUT_QT      "pluginmanagerAboutQt"
 
 //RecentContact
-#define MNI_RECENTCONTACTS_RECENT       "recentcontactsRecent"
-#define MNI_RECENTCONTACTS_INSERT_FAV   "recentcontactsInsertFavorite"
-#define MNI_RECENTCONTACTS_REMOVE_FAV   "recentcontactsRemoveFavorite"
+#define MNI_RECENT                      "recentcontacts"
+#define MNI_RECENT_FAVORITE             "recentcontactsFavorite"
+#define MNI_RECENT_INSERT_FAVORITE      "recentcontactsInsertFavorite"
+#define MNI_RECENT_REMOVE_FAVORITE      "recentcontactsRemoveFavorite"
 
 //Registration
 #define MNI_REGISTERATION               "register"

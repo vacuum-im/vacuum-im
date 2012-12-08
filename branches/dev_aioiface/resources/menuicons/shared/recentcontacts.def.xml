@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <icondef>
   <icon>
-    <key>recentcontactsRecent</key>
-    <object mime="image/png">recentcontactsrecent.png</object>
+    <key>recentcontacts</key>
+    <object mime="image/png">recentcontacts.png</object>
+  </icon>
+  <icon>
+    <key>recentcontactsFavorite</key>
+    <object mime="image/png">recentcontactsfavorite.png</object>
   </icon>
   <icon>
     <key>recentcontactsInsertFavorite</key>

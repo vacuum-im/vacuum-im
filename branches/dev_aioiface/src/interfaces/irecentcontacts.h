@@ -16,7 +16,8 @@ struct IRecentItem
 	Jid streamJid;
 	QString reference;
 	bool favorite;
-	QDateTime dateTime;
+	QDateTime activeTime;
+	QDateTime updateTime;
 	bool operator<(const IRecentItem &AOther) const {
 		if (type != AOther.type)
 			return type < AOther.type;
@@ -49,7 +50,7 @@ public:
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const =0;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const =0;
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite) =0;
-	virtual void setItemDateTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
+	virtual void setItemActiveTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
 	virtual QList<IRecentItem> visibleItems() const =0;
 	virtual quint8 maximumVisibleItems() const =0;
 	virtual void setMaximumVisibleItems(quint8 ACount) =0;

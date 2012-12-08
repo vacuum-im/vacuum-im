@@ -195,7 +195,7 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 				recentItem.type = REIT_CONTACT;
 				recentItem.streamJid = window->streamJid();
 				recentItem.reference = window->contactJid().pBare();
-				FRecentContacts->setItemDateTime(recentItem);
+				FRecentContacts->setItemActiveTime(recentItem);
 			}
 			QQueue<Message> &messages = FMessageQueue[window];
 			if (messages.isEmpty())
