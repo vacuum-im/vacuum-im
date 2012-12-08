@@ -49,15 +49,15 @@ void SystemManager::startSystemIdle()
 
 bool SystemManager::isScreenSaverRunning()
 {
+	qDebug() << "------------------------";
+	qDebug() << "isScreen?" << d->screenmode->isScreensaverActive();
 	return !d->screenmode->isDummy() ? d->screenmode->isScreensaverActive() : false;
 }
 
 bool SystemManager::isFullScreenMode()
 {
 	qDebug() << "------------------------";
-	qDebug() << "isDummy?" << d->screenmode->isDummy();
 	qDebug() << "isFull?" << d->screenmode->isFullscreenAppActive();
-	qDebug() << "isScreen?" << d->screenmode->isScreensaverActive();
 	return !d->screenmode->isDummy() ? d->screenmode->isFullscreenAppActive() : false;
 }
 

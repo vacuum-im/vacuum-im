@@ -228,8 +228,6 @@ int Notifications::appendNotification(const INotification &ANotification)
 	emit notificationAppend(notifyId, record.notification);
 
 	bool isDND = FStatusChanger!=NULL ? FStatusChanger->statusItemShow(STATUS_MAIN_ID)==IPresence::DoNotDisturb : false;
-	bool isFullScreen = SystemManager::isScreenSaverRunning() && Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN).value().toBool();
-	isFullScreen |= SystemManager::isFullScreenMode() && Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN).value().toBool();
 
 	QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
 	QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
@@ -258,9 +256,11 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (!isFullScreen && (record.notification.kinds & INotification::PopupWindow)>0)
+	if ((record.notification.kinds & INotification::PopupWindow)>0)
 	{
-		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
+		bool isFullScreen = SystemManager::isScreenSaverRunning() && Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN).value().toBool();
+		isFullScreen |= SystemManager::isFullScreenMode() && Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN).value().toBool();
+		if (!isFullScreen && !showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
 			qDebug() << "NOTIFY CREATED";
 			record.popupWidget = new NotifyWidget(record.notification);

@@ -35,6 +35,24 @@ public:
 	bool isDummy() { return false; }
 };
 
+// MacOSX
+#elif defined(Q_WS_MACX)
+
+#include "mactools.h"
+
+class ScreenModeChecker : public QObject
+{
+	Q_OBJECT
+public:
+	ScreenModeChecker() { InitTools(); }
+	~ScreenModeChecker() { StopTools(); }
+
+	bool isFullscreenAppActive();
+	bool isScreensaverActive();
+	bool isDummy() { return false; }
+};
+
+
 #else
 // Dummy
 
