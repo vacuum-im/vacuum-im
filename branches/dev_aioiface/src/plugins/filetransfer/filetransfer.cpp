@@ -754,12 +754,10 @@ void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_SENDFILE)
 		{
-			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
-			int indexType = index.data(RDR_TYPE).toInt();
+			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
+			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
 			if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
-			{
-				sendFile(index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString());
-			}
+				sendFile(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
 		}
 	}
 }

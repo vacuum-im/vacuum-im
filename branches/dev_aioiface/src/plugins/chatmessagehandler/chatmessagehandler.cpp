@@ -748,12 +748,10 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 	{
 		if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
 		{
-			QModelIndex index = FRostersView->instance()->currentIndex();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index.data(RDR_STREAM_JID).toString()) : NULL;
-			if (presence && presence->isOpen() && ChatActionTypes.contains(index.data(RDR_TYPE).toInt()))
-			{
-				messageShowWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
-			}
+			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
+			IPresence *presence = FPresencePlugin!=NULL && index!=NULL ? FPresencePlugin->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
+			if (presence && ChatActionTypes.contains(index->data(RDR_TYPE).toInt()))
+				messageShowWindow(MHO_CHATMESSAGEHANDLER,index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
 		}
 	}
 }

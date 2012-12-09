@@ -34,6 +34,7 @@ class IRecentItemHandler
 {
 public:
 	virtual QObject *instance() = 0;
+	virtual bool recentItemValid(const IRecentItem &AItem) const =0;
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const =0;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const =0;
 	virtual QString recentItemName(const IRecentItem &AItem) const =0;

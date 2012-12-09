@@ -2224,12 +2224,12 @@ void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_SHOWHISTORY)
 		{
-			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
-			int indexType = index.data(RDR_TYPE).toInt();
+			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
+			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
 			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
 			{
-				Jid streamJid = index.data(RDR_STREAM_JID).toString();
-				Jid contactJid = indexType!=RIT_STREAM_ROOT ? index.data(RDR_FULL_JID).toString() : Jid::null;
+				Jid streamJid = index->data(RDR_STREAM_JID).toString();
+				Jid contactJid = indexType!=RIT_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : Jid::null;
 				showArchiveWindow(streamJid,contactJid);
 			}
 		}

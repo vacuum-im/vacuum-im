@@ -41,6 +41,7 @@ public:
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IRecentItemHandler
+	virtual bool recentItemValid(const IRecentItem &AItem) const;
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const;
 	virtual QString recentItemName(const IRecentItem &AItem) const;
@@ -82,8 +83,8 @@ protected:
 	QList<IRosterIndex *> sortItemProxies(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
 protected:
-	void startSaveRecentItems(const Jid &AStreamJid);
-	void saveRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems);
+	void startSaveItemsToStorage(const Jid &AStreamJid);
+	bool saveItemsToStorage(const Jid &AStreamJid);
 protected:
 	QString recentFileName(const Jid &AStreamJid) const;
 	void saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems) const;
@@ -104,7 +105,7 @@ protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
-	void onPrivateStorageAboutToClose(const Jid &AStreamJid);
+	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
 protected slots:
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
@@ -118,7 +119,7 @@ protected slots:
 protected slots:
 	void onInsertToFavoritesByAction();
 	void onRemoveFromFavoritesByAction();
-	void onSaveRecentItemsTimerTimeout();
+	void onSaveItemsToStorageTimerTimeout();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPluginManager *FPluginManager;

@@ -318,12 +318,10 @@ void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
 		{
-			QModelIndex index = FRostersView->instance()->currentIndex();
-			int indexType = index.data(RDR_TYPE).toInt();
+			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
+			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
 			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
-			{
-				showVCardDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_PREP_BARE_JID).toString());
-			}
+				showVCardDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
 	}
 }

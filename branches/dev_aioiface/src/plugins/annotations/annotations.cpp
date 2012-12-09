@@ -380,11 +380,9 @@ void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_EDITANNOTATION)
 		{
-			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
-			if (rosterDataTypes().contains(index.data(RDR_TYPE).toInt()))
-			{
-				showAnnotationDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_PREP_BARE_JID).toString());
-			}
+			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
+			if (index!=NULL && rosterDataTypes().contains(index->data(RDR_TYPE).toInt()))
+				showAnnotationDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
 	}
 }
