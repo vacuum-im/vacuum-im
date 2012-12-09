@@ -277,6 +277,7 @@ void PrivateStorage::onStreamAboutToClose(IXmppStream *AXmppStream)
 
 void PrivateStorage::onStreamClosed(IXmppStream *AXmppStream)
 {
+	FPreClosedStreams -= AXmppStream->streamJid();
 	emit storageClosed(AXmppStream->streamJid());
 	FStorage.removeChild(FStreamElements.take(AXmppStream->streamJid()));
 }
