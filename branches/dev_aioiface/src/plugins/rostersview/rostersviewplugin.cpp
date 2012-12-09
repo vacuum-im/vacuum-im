@@ -155,7 +155,8 @@ int RostersViewPlugin::rosterDataOrder() const
 
 QList<int> RostersViewPlugin::rosterDataRoles() const
 {
-	static const QList<int> dataRoles = QList<int>() << Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON;
+	static const QList<int> dataRoles = QList<int>() 
+		<< Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON << RDR_ALLWAYS_VISIBLE;
 	return dataRoles;
 }
 
@@ -182,6 +183,8 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
 		case RDR_STATES_FORCE_ON:
 			return QStyle::State_Children;
+		case RDR_ALLWAYS_VISIBLE:
+			return 1;
 		}
 		break;
 	case RIT_GROUP:

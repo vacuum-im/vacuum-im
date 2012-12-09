@@ -90,38 +90,25 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
-	if (FShowOffline)
+	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
+	if (index.data(RDR_ALLWAYS_INVISIBLE).toInt() > 0)
+		return false;
+	if (index.data(RDR_ALLWAYS_VISIBLE).toInt() > 0)
 		return true;
 
-	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
-
-	if (index.isValid())
+	if (!FShowOffline)
 	{
-		if (index.data(RDR_ALLWAYS_INVISIBLE).toInt() > 0)
-			return false;
-		else if (index.data(RDR_ALLWAYS_VISIBLE).toInt() > 0)
-			return true;
-
-		int indexType = index.data(RDR_TYPE).toInt();
-		switch (indexType)
+		if (sourceModel()->hasChildren(index))
 		{
-		case RIT_CONTACT:
-			{
-				int indexShow = index.data(RDR_SHOW).toInt();
-				return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
-			}
-		case RIT_GROUP:
-		case RIT_GROUP_AGENTS:
-		case RIT_GROUP_BLANK:
-		case RIT_GROUP_NOT_IN_ROSTER:
-			{
-				for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-					if (filterAcceptsRow(childRow,index))
-						return true;
-				return false;
-			}
-		default:
-			return true;
+			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+				if (filterAcceptsRow(childRow,index))
+					return true;
+			return false;
+		}
+		else if (!index.data(RDR_SHOW).isNull())
+		{
+			int indexShow = index.data(RDR_SHOW).toInt();
+			return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
 		}
 	}
 	return true;

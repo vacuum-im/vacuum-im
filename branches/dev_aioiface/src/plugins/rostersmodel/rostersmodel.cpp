@@ -361,6 +361,7 @@ QList<IRosterIndex *> RostersModel::getContactIndexList(const Jid &AStreamJid, c
 			itemIndex->setData(RDR_PREP_FULL_JID,AContactJid.pFull());
 			itemIndex->setData(RDR_PREP_BARE_JID,AContactJid.pBare());
 			itemIndex->setData(RDR_GROUP,groupIndex->data(RDR_GROUP));
+			itemIndex->setData(RDR_SHOW,IPresence::Offline);
 			insertRosterIndex(itemIndex,groupIndex);
 			indexes.append(itemIndex);
 		}
@@ -605,8 +606,6 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 							itemIndex = createRosterIndex(itemType,groupIndex);
 							itemIndex->setData(RDR_FULL_JID,pitem.itemJid.full());
 							itemIndex->setData(RDR_PREP_FULL_JID,pitem.itemJid.pFull());
-							itemIndex->setData(RDR_SHOW,pitem.show);
-							itemIndex->setData(RDR_STATUS,pitem.status);
 							itemIndex->setData(RDR_PRIORITY,pitem.priority);
 						}
 						else
@@ -621,6 +620,8 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 						itemIndex->setData(RDR_SUBSCRIBTION,AItem.subscription);
 						itemIndex->setData(RDR_ASK,AItem.ask);
 						itemIndex->setData(RDR_GROUP,group);
+						itemIndex->setData(RDR_SHOW,pitem.show);
+						itemIndex->setData(RDR_STATUS,pitem.status);
 						insertRosterIndex(itemIndex,groupIndex);
 						itemList.append(itemIndex);
 					}
