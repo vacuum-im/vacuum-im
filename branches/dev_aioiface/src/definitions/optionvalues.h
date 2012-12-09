@@ -204,6 +204,9 @@
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
 //StatusChanger
 #define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
+//RecentContact
+#define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
+#define OPV_ROSTER_RECENT_HIDELATERCONTACTS             "roster.recent.hide-later-contacts"
 
 //ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"

@@ -9,6 +9,8 @@
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/imessageprocessor.h>
+#include <interfaces/ipresence.h>
+#include <utils/options.h>
 
 class RecentContacts : 
 	public QObject,
@@ -121,6 +123,11 @@ protected slots:
 	void onRemoveFromFavoritesByAction();
 	void onSaveItemsToStorageTimerTimeout();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+protected slots:
+	void onOptionsOpened();
+	void onOptionsChanged(const OptionsNode &ANode);
+	void onChangeAlwaysShowOfflineContacts();
+	void onChangeHideLaterContacts();
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
@@ -146,6 +153,8 @@ private:
 	QMap<const IRosterIndex *, IRosterIndex *> FProxyToIndex;
 	QMap<IRosterIndex *, QList<IRosterIndex *> > FIndexProxies;
 private:
+	bool FHideLaterContacts;
+	bool FAllwaysShowOffline;
 	IRosterIndex *FRootIndex;
 	QMap<QString, IRecentItemHandler *> FItemHandlers;
 };
