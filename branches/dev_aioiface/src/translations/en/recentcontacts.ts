@@ -11,5 +11,29 @@
         <source>Displays a recently used contacts</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Add contact to favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove contact from favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Later Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Always Show Offline Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Favorites</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

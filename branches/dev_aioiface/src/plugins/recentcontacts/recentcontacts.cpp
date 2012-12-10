@@ -508,8 +508,8 @@ void RecentContacts::updateVisibleItems()
 				{
 					if (firstTime.isNull())
 					{
-						++it;
 						firstTime = it->activeTime;
+						++it;
 					}
 					else if (firstTime.daysTo(it->activeTime) > LATER_CONTACTS_DAYS_DELTA)
 					{
