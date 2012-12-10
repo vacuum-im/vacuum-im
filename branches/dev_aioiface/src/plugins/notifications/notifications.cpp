@@ -161,6 +161,8 @@ bool Notifications::initObjects()
 
 	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
 
+	NotifyWidget::setMainWindow(FMainWindowPlugin->mainWindow());
+
 	return true;
 }
 
@@ -303,17 +305,12 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
 			if (!soundFile.isEmpty())
 			{
-				if (QSound::isAvailable())
-				{
+#ifdef Q_WS_X11
+				QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND).value().toString(),QStringList()<<soundFile);
+#else
 					delete FSound;
 					FSound = new QSound(soundFile);
 					FSound->play();
-				}
-#ifdef Q_WS_X11
-				else
-				{
-					QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND).value().toString(),QStringList()<<soundFile);
-				}
 #endif
 			}
 		}

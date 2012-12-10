@@ -30,6 +30,7 @@ RosterSearch::RosterSearch()
 	FSearchToolBarChanger->toolBar()->setVisible(false);
 
 	FSearchEdit = new SearchLineEdit(searchToolBar);
+	FSearchEdit->installEventFilter(this);
 	FSearchEdit->setSearchMenuVisible(true);
 	FSearchEdit->setSelectTextOnFocusEnabled(false);
 	FSearchEdit->searchMenu()->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
@@ -118,12 +119,10 @@ bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, co
 	if (AOrder == RCHO_ROSTERSEARCH)
 	{
 		if (!searchPattern().isEmpty() && AIndex->childCount()==0)
-		{
 			setSearchPattern(QString::null);
 		}
-	}
 	return false;
-}
+	}
 
 bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent)
 {
@@ -186,24 +185,21 @@ void RosterSearch::startSearch()
 				
 				FLastShowOffline = Options::node(OPV_ROSTER_SHOWOFFLINE).value().toBool();
 				Options::node(OPV_ROSTER_SHOWOFFLINE).setValue(true);
-
-				FRostersViewPlugin->rostersView()->instance()->expandAll();
 			}
 			FSearchStarted = true;
 		}
 	}
 
 	if (filterRegExp().pattern() != pattern)
-	{
 		setFilterRegExp(pattern);
 		invalidate();
-	}
 
 	if (FRostersViewPlugin)
 	{
 		if (FSearchStarted)
 		{
 			FRostersViewPlugin->rostersView()->setSelectedRosterIndexes(FSelectedIndexes);
+			FRostersViewPlugin->rostersView()->instance()->expandAll();
 		}
 
 		if (!isSearchEnabled() || pattern.isEmpty())
@@ -316,6 +312,26 @@ void RosterSearch::removeSearchField(int ADataRole)
 		delete action;
 		emit searchFieldRemoved(ADataRole);
 	}
+}
+
+bool RosterSearch::eventFilter(QObject *AObject, QEvent *AEvent)
+{
+	if (AObject==FSearchEdit && AEvent->type()==QEvent::KeyPress)
+	{
+		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
+		if (FRostersViewPlugin && keyEvent->key()==Qt::Key_Down)
+		{
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->model()->index(0,0);
+			if (index.isValid())
+			{
+				FRostersViewPlugin->rostersView()->instance()->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect);
+				FRostersViewPlugin->rostersView()->instance()->setCurrentIndex(index);
+			}
+			FRostersViewPlugin->rostersView()->instance()->setFocus();
+			return true;
+		}
+	}
+	return QSortFilterProxyModel::eventFilter(AObject,AEvent);
 }
 
 bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const

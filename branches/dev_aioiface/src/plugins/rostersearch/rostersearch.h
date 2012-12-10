@@ -68,7 +68,8 @@ signals:
 	void searchFieldChanged(int ADataRole);
 	void searchFieldRemoved(int ADataRole);
 protected:
-	virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
+	bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 protected slots:
 	void onFieldActionTriggered(bool);
 	void onEnableActionTriggered(bool AChecked);

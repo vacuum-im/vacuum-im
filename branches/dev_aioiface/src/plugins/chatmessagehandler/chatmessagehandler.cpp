@@ -1,5 +1,6 @@
 #include "chatmessagehandler.h"
 
+#include <QMouseEvent>
 #include <QApplication>
 
 #define HISTORY_MESSAGES          10
@@ -219,8 +220,8 @@ bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AInd
 
 bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
-	if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE)
+	Q_UNUSED(AOrder);
+	if (AEvent->modifiers()==Qt::NoModifier && (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE))
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
@@ -565,8 +566,8 @@ void ChatMessageHandler::showDateSeparator(IChatWindow *AWindow, const QDateTime
 			options.timeFormat = " ";
 			wstatus.lastDateSeparator = sepDate;
 			AWindow->viewWidget()->appendText(FMessageStyles->dateSeparator(sepDate),options);
-		}
 	}
+}
 }
 
 void ChatMessageHandler::showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool ADontSave, const QDateTime &ATime)

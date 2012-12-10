@@ -260,6 +260,8 @@ void BirthdayReminder::onShowNotificationTimer()
 				{
 					Jid streamJid = findContactStream(contactJid);
 
+					notify.data.insert(NDR_STREAM_JID,streamJid.full());
+					notify.data.insert(NDR_CONTACT_JID,contactJid.full());
 					notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY));
 					notify.data.insert(NDR_POPUP_CAPTION,tr("Birthday remind"));
 					notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(streamJid,contactJid));

@@ -13,6 +13,7 @@
 
 SpellChecker::SpellChecker()
 {
+	FPluginManager = NULL;
 	FMessageWidgets = NULL;
 
 	FCurrentTextEdit = NULL;

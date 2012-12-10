@@ -15,6 +15,7 @@ LEGEND
   [-] When changing the nickname in the conference the nickname was not changed in the active conferences menu in the roster window
   [-] When requesting delivery of unread messages via RemoteControl in the message list fell messages from conferences and received on a different account
   [-] The saved status messages including about a file transfer, were displayed with incorrect date when loading from history in windows of a usual chat and a private chat of conferences
+  [-] The exit from conference occurred incorrectly if was requested after a send of request for an entrance, but before receiving confirmation on an entrance
 
 
 v1.2.0

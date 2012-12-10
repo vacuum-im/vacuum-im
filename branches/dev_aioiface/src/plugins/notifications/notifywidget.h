@@ -7,6 +7,7 @@
 #include <definitions/optionvalues.h>
 #include <definitions/notificationdataroles.h>
 #include <interfaces/inotifications.h>
+#include <interfaces/imainwindow.h>
 #include <utils/message.h>
 #include <utils/options.h>
 #include <utils/textmanager.h>
@@ -23,6 +24,7 @@ public:
 	void animateTo(int AYPos);
 	void setAnimated(bool AAnimated);
 	void setNetworkAccessManager(QNetworkAccessManager *ANetworkAccessManager);
+	static void setMainWindow(IMainWindow *AMainWindow);
 signals:
 	void notifyActivated();
 	void notifyRemoved();
@@ -44,8 +46,10 @@ private:
 	QString FCaption;
 private:
 	static void layoutWidgets();
+	static IMainWindow *FMainWindow;
 	static QDesktopWidget *FDesktop;
 	static QList<NotifyWidget *> FWidgets;
+	static QRect FDisplay;
 };
 
 #endif // NOTIFYWIDGET_H

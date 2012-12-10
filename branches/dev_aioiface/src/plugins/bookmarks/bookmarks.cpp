@@ -248,8 +248,8 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 		{
 			if (AShowWindow)
 				window->showTabPage();
-			if (!window->multiUserChat()->isOpen())
-				window->multiUserChat()->setAutoPresence(true);
+			if (!window->multiUserChat()->isConnected())
+				window->multiUserChat()->sendStreamPresence();
 		}
 	}
 	else if (!ABookmark.url.isEmpty())

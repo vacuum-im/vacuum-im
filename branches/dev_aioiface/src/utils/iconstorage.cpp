@@ -5,10 +5,17 @@
 #include <QVariant>
 #include <QApplication>
 
+struct IconStorage::IconAnimateFrame {
+	int delay;
+	QIcon icon;
+};
+
 struct IconStorage::IconAnimateParams {
 	IconAnimateParams() { 
-		timer = new QTimer; 
-		reader = NULL; 
+		frameIndex = 0;
+		frameCount = 0;
+		timer = new QTimer;
+		reader = NULL;
 	}
 	~IconAnimateParams() { 
 		timer->stop();
@@ -19,6 +26,7 @@ struct IconStorage::IconAnimateParams {
 	int frameCount;
 	QTimer *timer;
 	QImageReader *reader;
+	QList<IconAnimateFrame> frames;
 };
 
 struct IconStorage::IconUpdateParams {
@@ -32,13 +40,13 @@ struct IconStorage::IconUpdateParams {
 	int index;
 	int animate;
 	QString prop;
-	QSize size;
 	IconAnimateParams *animation;
 };
 
 QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
 QHash<QString, IconStorage*> IconStorage::FStaticStorages;
 QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
+QHash<QString, QHash<QString, QList<IconStorage::IconAnimateFrame> > > IconStorage::FAnimateCache;
 
 IconStorage::IconStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : FileStorage(AStorage,ASubStorage,AParent)
 {
@@ -71,6 +79,7 @@ QIcon IconStorage::getIcon(const QString &AKey, int AIndex) const
 void IconStorage::clearIconCache()
 {
 	FIconCache.clear();
+	FAnimateCache.clear();
 }
 
 IconStorage *IconStorage::staticStorage(const QString &AStorage)
@@ -108,8 +117,6 @@ void IconStorage::insertAutoIcon(QObject *AObject, const QString &AKey, int AInd
 		params->prop = AProperty;
 		params->animate = AAnimate;
 		QString file = fileFullName(AKey,AIndex);
-		if (!file.isEmpty() && AProperty=="pixmap")
-			params->size = QImageReader(file).size();
 		initAnimation(AObject,params);
 		updateObject(AObject);
 		connect(AObject,SIGNAL(destroyed(QObject *)),SLOT(onObjectDestroyed(QObject *)));
@@ -153,13 +160,16 @@ void IconStorage::initAnimation(QObject *AObject, IconUpdateParams *AParams)
 		else if (!file.isEmpty() && movieMimes.contains(fileMime(AParams->key,AParams->index)))
 		{
 			AParams->animation = new IconAnimateParams;
-			AParams->animation->frameIndex = 0;
-			AParams->animation->frameCount = 0;
-			AParams->animation->reader = new QImageReader(file);
+			QString key = fileCacheKey(AParams->key,AParams->index);
+			AParams->animation->frames = FAnimateCache[storage()].value(key);
+			if (!AParams->animation->frames.isEmpty())
+				AParams->animation->frameCount = AParams->animation->frames.count();
+			else
+				AParams->animation->reader = new QImageReader(file);
 		}
 		if (AParams->animation)
 		{
-			AParams->animation->timer->start();
+			AParams->animation->timer->start(0);
 			FTimerObject.insert(AParams->animation->timer,AObject);
 			connect(AParams->animation->timer,SIGNAL(timeout()),SLOT(onAnimateTimer()));
 		}
@@ -180,31 +190,49 @@ void IconStorage::updateObject(QObject *AObject)
 {
 	QIcon icon;
 	IconUpdateParams *params = FUpdateParams[AObject];
-	if (params->animation)
+
+	if (params->animation!=NULL && params->animation->reader!=NULL)
 	{
-		if (params->animation->reader)
+		if (params->animation->reader->canRead())
 		{
 			QImage image = params->animation->reader->read();
-			if (image.isNull())
-			{
-				if (params->animation->frameIndex > 1)
-				{
-					params->animation->frameIndex = 0;
-					params->animation->reader->setFileName(params->animation->reader->fileName());
-					image = params->animation->reader->read();
-				}
-				else
-				{
-					removeAnimation(params);
-					icon = getIcon(params->key,params->index);
-				}
-			}
 			if (!image.isNull())
 			{
-				params->animation->frameIndex++;
 				icon.addPixmap(QPixmap::fromImage(image));
-				params->animation->timer->start(params->animation->reader->nextImageDelay());
+
+				IconAnimateFrame frame;
+				frame.icon = icon;
+				frame.delay = params->animation->reader->nextImageDelay();
+				params->animation->frames.append(frame);
+				
+				params->animation->frameCount = params->animation->frames.count();
+				params->animation->frameIndex = params->animation->frameCount-1;
 			}
+			else
+			{
+				removeAnimation(params);
+			}
+		}
+		else
+		{
+			QString key = fileCacheKey(params->key,params->index);
+			if (!key.isEmpty())
+				FAnimateCache[storage()].insert(key,params->animation->frames);
+
+			delete params->animation->reader;
+			params->animation->reader = NULL;
+			params->animation->frameIndex = 0;
+			
+		}
+	}
+
+	if (params->animation)
+	{
+		if (!params->animation->frames.isEmpty())
+		{
+			const IconAnimateFrame &frame = params->animation->frames.at(params->animation->frameIndex);
+			icon = frame.icon;
+			params->animation->timer->start(frame.delay);
 		}
 		else
 		{
@@ -215,8 +243,9 @@ void IconStorage::updateObject(QObject *AObject)
 	{
 		icon = getIcon(params->key,params->index);
 	}
+	
 	if (params->prop == "pixmap")
-		AObject->setProperty(params->prop.toLatin1(),icon.pixmap(params->size));
+		AObject->setProperty(params->prop.toLatin1(),icon.pixmap(icon.availableSizes().value(0)));
 	else
 		AObject->setProperty(params->prop.toLatin1(),icon);
 }
@@ -255,4 +284,3 @@ void IconStorage::onObjectDestroyed(QObject *AObject)
 {
 	removeObject(AObject);
 }
-

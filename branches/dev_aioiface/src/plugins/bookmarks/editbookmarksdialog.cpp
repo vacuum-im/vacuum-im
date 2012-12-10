@@ -6,6 +6,7 @@
 #define C_NAME                  0
 #define C_VALUE                 1
 #define C_NICK                  2
+#define C_DEFAULT_SORT_COLUMN   3
 
 #define TDR_NAME                Qt::UserRole+1
 #define TDR_AUTO                Qt::UserRole+2
@@ -25,14 +26,18 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
 	FStreamJid = AStreamJid;
 
 	ui.tbwBookmarks->setRowCount(AList.count());
-	for (int row=0; row<AList.count(); row++)
+	for (int row=0; row<AList.count(); ++row)
 	{
 		IBookMark bookmark = AList.at(row);
 		setBookmarkToRow(row,bookmark);
 	}
-	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NAME,QHeaderView::ResizeToContents);
-	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_VALUE,QHeaderView::Stretch);
-	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NICK,QHeaderView::ResizeToContents);
+	QHeaderView *header = ui.tbwBookmarks->horizontalHeader();
+	header->setResizeMode(C_NAME,QHeaderView::ResizeToContents);
+	header->setResizeMode(C_VALUE,QHeaderView::Stretch);
+	header->setResizeMode(C_NICK,QHeaderView::ResizeToContents);
+	header->hideSection(C_DEFAULT_SORT_COLUMN);
+	header->setClickable(true);
+	connect(header,SIGNAL(sectionClicked(int)),SLOT(onSortingStateChange(int)));
 
 	connect(FBookmarks->instance(),SIGNAL(bookmarksUpdated(const QString &, const Jid &, const QDomElement &)),
 	        SLOT(onBookmarksUpdated(const QString &, const Jid &, const QDomElement &)));
@@ -46,7 +51,7 @@ EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStr
 	connect(ui.pbtMoveDown,SIGNAL(clicked()),SLOT(onEditButtonClicked()));
 	connect(ui.bbxButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 
-	connect(ui.tbwBookmarks,SIGNAL(itemActivated(QTableWidgetItem *)),SLOT(onTableItemActivated(QTableWidgetItem *)));
+	connect(ui.tbwBookmarks,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),SLOT(onTableItemDoubleClicked(QTableWidgetItem *)));
 }
 
 EditBookmarksDialog::~EditBookmarksDialog()
@@ -96,6 +101,10 @@ void EditBookmarksDialog::setBookmarkToRow(int ARow, const IBookMark &ABookmark)
 	QTableWidgetItem *nickItem = new QTableWidgetItem;
 	nickItem->setText(ABookmark.nick);
 	ui.tbwBookmarks->setItem(nameItem->row(),C_NICK,nickItem);
+
+	QTableWidgetItem *hiddenItem = new QTableWidgetItem;
+	hiddenItem->setText(nameItem->text());
+	ui.tbwBookmarks->setItem(nameItem->row(),C_DEFAULT_SORT_COLUMN,hiddenItem);
 }
 
 void EditBookmarksDialog::onEditButtonClicked()
@@ -113,7 +122,7 @@ void EditBookmarksDialog::onEditButtonClicked()
 	else if (button == ui.pbtEdit)
 	{
 		int row = ui.tbwBookmarks->currentRow();
-		if (row >=0)
+		if (row >= 0)
 		{
 			IBookMark bookmark = getBookmarkFromRow(row);
 			if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
@@ -201,9 +210,32 @@ void EditBookmarksDialog::onBookmarksError(const QString &AId, const QString &AE
 	}
 }
 
-void EditBookmarksDialog::onTableItemActivated(QTableWidgetItem *AItem)
+void EditBookmarksDialog::onTableItemDoubleClicked(QTableWidgetItem *AItem)
 {
 	IBookMark bookmark = getBookmarkFromRow(AItem->row());
 	if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
 		setBookmarkToRow(AItem->row(),bookmark);
+}
+
+void EditBookmarksDialog::onSortingStateChange(int AColumn)
+{
+	QHeaderView *header = qobject_cast<QHeaderView *>(sender());
+	Q_ASSERT(header);
+	QTableWidget *table;
+	if (header)
+	{
+		table = qobject_cast<QTableWidget *>(header->parentWidget());
+	}
+	Q_ASSERT(table);
+	if (table) {
+		if (!(FLastSortSection == AColumn && header->sortIndicatorOrder() == Qt::AscendingOrder)) {
+		// first or double click
+			FLastSortSection = AColumn;
+			table->sortItems(AColumn, header->sortIndicatorOrder());
+		} else {
+		// triple click
+			FLastSortSection = -1;
+			table->sortItems(C_DEFAULT_SORT_COLUMN, Qt::AscendingOrder);
+		}
+	}
 }
