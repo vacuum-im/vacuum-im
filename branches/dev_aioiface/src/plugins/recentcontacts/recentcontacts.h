@@ -17,11 +17,12 @@ class RecentContacts :
 	public IPlugin,
 	public IRecentContacts,
 	public IRosterDataHolder,
-	public IRecentItemHandler,
-	public IRostersClickHooker
+	public IRostersLabelHolder,
+	public IRostersClickHooker,
+	public IRecentItemHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRecentItemHandler IRostersClickHooker);
+	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker IRecentItemHandler);
 public:
 	RecentContacts();
 	~RecentContacts();
@@ -39,6 +40,9 @@ public:
 	virtual QList<int> rosterDataTypes() const;
 	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	//IRostersLabelHolder
+	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
+	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
@@ -71,6 +75,8 @@ signals:
 	void itemHandlerRegistered(const QString &AType, IRecentItemHandler *AHandler);
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	//IRostersLabelHolder
+	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 	//IRecentItemHandler
 	void recentItemUpdated(const IRecentItem &AItem);
 protected:
@@ -111,7 +117,7 @@ protected slots:
 protected slots:
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onRostersViewNotifyInserted(int ANotifyId);
 	void onRostersViewNotifyRemoved(int ANotifyId);
 	void onRostersViewNotifyActivated(int ANotifyId);
@@ -128,6 +134,7 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onChangeAlwaysShowOfflineContacts();
 	void onChangeHideLaterContacts();
+	void onChangeSimpleContactsView();
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
@@ -155,6 +162,7 @@ private:
 private:
 	bool FHideLaterContacts;
 	bool FAllwaysShowOffline;
+	bool FSimpleContactsView;
 	IRosterIndex *FRootIndex;
 	QMap<QString, IRecentItemHandler *> FItemHandlers;
 };

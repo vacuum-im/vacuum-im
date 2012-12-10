@@ -156,8 +156,8 @@ bool ClientInfo::initObjects()
 	{
 		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
 			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)),
-			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 	}
 
 	if (FDiscovery)
@@ -843,7 +843,7 @@ void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes,
 	}
 }
 
-void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
+void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{

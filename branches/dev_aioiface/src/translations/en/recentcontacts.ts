@@ -35,5 +35,9 @@
         <source>Remove from Favorites</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Simplify Contacts View</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

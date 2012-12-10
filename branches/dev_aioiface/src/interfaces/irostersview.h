@@ -89,7 +89,7 @@ public:
 	virtual bool doubleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent) =0;
 	virtual bool keyPressForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent) =0;
 	virtual bool keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent) =0;
-	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMultiMap<int,QString> &AToolTips) =0;
+	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMap<int,QString> &AToolTips) =0;
 	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu) =0;
 	//IndexSelection
 	virtual bool hasMultiSelection() const =0;
@@ -106,6 +106,7 @@ public:
 	virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const=0;
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const=0;
 	//IndexLabel
+	virtual AdvancedDelegateItem registeredLabel(quint32 ALabelId) const =0;
 	virtual quint32 registerLabel(const AdvancedDelegateItem &ALabel) =0;
 	virtual void insertLabel(quint32 ALabelId, IRosterIndex *AIndex) =0;
 	virtual void removeLabel(quint32 ALabelId, IRosterIndex *AIndex = NULL) =0;
@@ -146,7 +147,7 @@ protected:
 	virtual void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted) =0;
 	virtual void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
 	virtual void indexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu) =0;
-	virtual void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips) =0;
+	virtual void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips) =0;
 	virtual void notifyInserted(int ANotifyId) =0;
 	virtual void notifyActivated(int ANotifyId) =0;
 	virtual void notifyRemoved(int ANotifyId) =0;

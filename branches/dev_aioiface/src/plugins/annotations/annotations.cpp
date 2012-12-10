@@ -86,8 +86,8 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, Menu *)),
 				SLOT(onRosterIndexClipboardMenu(const QList<IRosterIndex *> &, Menu *)));
-			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)));
+			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		}
 	}
 
@@ -424,7 +424,7 @@ void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndex
 	}
 }
 
-void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
+void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && rosterDataTypes().contains(AIndex->type()))
 	{

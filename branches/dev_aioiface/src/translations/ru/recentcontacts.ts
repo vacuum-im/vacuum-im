@@ -35,5 +35,9 @@
         <source>Remove from Favorites</source>
         <translation>Удалить из избранных</translation>
     </message>
+    <message>
+        <source>Simplify Contacts View</source>
+        <translation>Упростить отображение контактов</translation>
+    </message>
 </context>
 </TS>

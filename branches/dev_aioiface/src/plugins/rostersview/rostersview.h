@@ -57,7 +57,7 @@ public:
 	virtual bool doubleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool keyPressForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
 	virtual bool keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
-	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMultiMap<int,QString> &AToolTips);
+	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMap<int,QString> &AToolTips);
 	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu);
 	//--IndexSelection
 	virtual bool hasMultiSelection() const;
@@ -74,6 +74,7 @@ public:
 	virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const;
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const;
 	//--IndexLabel
+	virtual AdvancedDelegateItem registeredLabel(quint32 ALabelId) const;
 	virtual quint32 registerLabel(const AdvancedDelegateItem &ALabel);
 	virtual void insertLabel(quint32 ALabelId, IRosterIndex *AIndex);
 	virtual void removeLabel(quint32 ALabelId, IRosterIndex *AIndex = NULL);
@@ -122,7 +123,7 @@ signals:
 	void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 	void indexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips);
+	void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
 	void notifyRemoved(int ANotifyId);
@@ -159,7 +160,7 @@ protected slots:
 	void closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint);
 protected slots:
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 	void onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex);
 	void onCopyToClipboardActionTriggered(bool);

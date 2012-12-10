@@ -131,8 +131,8 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 			FRostersView = FRostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
 				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32 , QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32 , QMultiMap<int,QString> &)));
+			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)));
 		}
 	}
 
@@ -1305,7 +1305,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 	}
 }
 
-void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
+void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
@@ -1316,7 +1316,7 @@ void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabe
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
 			foreach(IDiscoIdentity identity, dinfo.identity)
 				if (identity.category != DIC_CLIENT)
-					AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
+					AToolTips.insert(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
 		}
 	}
 }

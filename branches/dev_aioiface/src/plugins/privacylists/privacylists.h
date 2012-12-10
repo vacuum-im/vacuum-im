@@ -103,7 +103,7 @@ protected slots:
 	void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onUpdateCreatedRosterIndexes();
 	void onShowEditListsDialog(bool);
 	void onSetActiveListByAction(bool);

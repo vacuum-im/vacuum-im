@@ -15,6 +15,7 @@
 #include <definitions/rosterindextypeorders.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterclickhookerorders.h>
+#include <definitions/rosterlabelholderorders.h>
 #include <definitions/recentitemtypes.h>
 #include <utils/iconstorage.h>
 #include <utils/datetime.h>
@@ -57,6 +58,7 @@ RecentContacts::RecentContacts()
 	FMaxVisibleItems = 20;
 	FHideLaterContacts = true;
 	FAllwaysShowOffline = true;
+	FSimpleContactsView = true;
 
 	FSaveTimer.setSingleShot(true);
 	connect(&FSaveTimer,SIGNAL(timeout()),SLOT(onSaveItemsToStorageTimerTimeout()));
@@ -122,8 +124,8 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersView->instance(), SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)));
-			connect(FRostersView->instance(), SIGNAL(indexToolTips(IRosterIndex*,quint32,QMultiMap<int,QString>&)),
-				SLOT(onRostersViewIndexToolTips(IRosterIndex*,quint32,QMultiMap<int,QString>&)));
+			connect(FRostersView->instance(), SIGNAL(indexToolTips(IRosterIndex*,quint32,QMap<int,QString>&)),
+				SLOT(onRostersViewIndexToolTips(IRosterIndex*,quint32,QMap<int,QString>&)));
 			connect(FRostersView->instance(), SIGNAL(notifyInserted(int)),SLOT(onRostersViewNotifyInserted(int)));
 			connect(FRostersView->instance(), SIGNAL(notifyRemoved(int)),SLOT(onRostersViewNotifyRemoved(int)));
 			connect(FRostersView->instance(), SIGNAL(notifyActivated(int)),SLOT(onRostersViewNotifyActivated(int)));
@@ -175,6 +177,7 @@ bool RecentContacts::initObjects()
 		removeFavorive.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT_REMOVE_FAVORITE);
 		FRemoveFavoriteLabelId = FRostersView->registerLabel(removeFavorive);
 
+		FRostersView->insertLabelHolder(RLHO_RECENT_FILTER,this);
 		FRostersView->insertClickHooker(RCHO_RECENTCONTACTS,this);
 		FRostersViewPlugin->registerExpandableRosterIndexType(RIT_RECENT_ROOT,RDR_TYPE);
 
@@ -202,6 +205,7 @@ bool RecentContacts::initSettings()
 {
 	Options::setDefaultValue(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE,true);
 	Options::setDefaultValue(OPV_ROSTER_RECENT_HIDELATERCONTACTS,true);
+	Options::setDefaultValue(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW,true);
 	return true;
 }
 
@@ -219,7 +223,7 @@ QList<int> RecentContacts::rosterDataRoles() const
 {
 	static const QList<int> roles = QList<int>() 
 		<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole 
-		<< RDR_NAME << RDR_SHOW << RDR_STATUS << RDR_ALLWAYS_VISIBLE;
+		<< RDR_NAME << RDR_SHOW << RDR_STATUS << RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_ALLWAYS_VISIBLE;
 	return roles;
 }
 
@@ -272,6 +276,24 @@ bool RecentContacts::setRosterData(IRosterIndex *AIndex, int ARole, const QVaria
 	Q_UNUSED(ARole);
 	Q_UNUSED(AValue);
 	return false;
+}
+
+QList<quint32> RecentContacts::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
+{
+	QList<quint32> labels;
+	if (AOrder==RLHO_RECENT_FILTER && FSimpleContactsView && AIndex->type()==RIT_RECENT_ITEM)
+	{
+		labels.append(RLID_AVATAR_IMAGE);
+		labels.append(RLID_SCHANGER_STATUS);
+	}
+	return labels;
+}
+
+AdvancedDelegateItem RecentContacts::rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const
+{
+	Q_UNUSED(AOrder); Q_UNUSED(ALabelId); Q_UNUSED(AIndex);
+	static AdvancedDelegateItem null = AdvancedDelegateItem();
+	return null;
 }
 
 bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
@@ -1026,6 +1048,13 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			showOffline->setChecked(FAllwaysShowOffline);
 			connect(showOffline,SIGNAL(triggered()),SLOT(onChangeAlwaysShowOfflineContacts()));
 			AMenu->addAction(showOffline,AG_DEFAULT,true);
+			
+			Action *simpleView = new Action(AMenu);
+			simpleView->setText(tr("Simplify Contacts View"));
+			simpleView->setCheckable(true);
+			simpleView->setChecked(FSimpleContactsView);
+			connect(simpleView,SIGNAL(triggered()),SLOT(onChangeSimpleContactsView()));
+			AMenu->addAction(simpleView,AG_DEFAULT,true);
 		}
 		else
 		{
@@ -1078,12 +1107,14 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 	}
 }
 
-void RecentContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int, QString> &AToolTips)
+void RecentContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips)
 {
-	Q_UNUSED(ALabelId);
-	IRosterIndex *proxy = FIndexToProxy.value(AIndex);
-	if (proxy != NULL)
-		FRostersView->toolTipsForIndex(proxy,NULL,AToolTips);
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	{
+		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
+		if (proxy != NULL)
+			FRostersView->toolTipsForIndex(proxy,NULL,AToolTips);
+	}
 }
 
 void RecentContacts::onRostersViewNotifyInserted(int ANotifyId)
@@ -1207,6 +1238,8 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 void RecentContacts::onOptionsOpened()
 {
 	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_HIDELATERCONTACTS));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW));
 }
 
 void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
@@ -1222,6 +1255,12 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 		FHideLaterContacts = ANode.value().toBool();
 		updateVisibleItems();
 	}
+	else if (ANode.path() == OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW)
+	{
+		FSimpleContactsView = ANode.value().toBool();
+		rosterLabelChanged(RLID_AVATAR_IMAGE);
+		rosterLabelChanged(RLID_SCHANGER_STATUS);
+	}
 }
 
 void RecentContacts::onChangeAlwaysShowOfflineContacts()
@@ -1232,6 +1271,11 @@ void RecentContacts::onChangeAlwaysShowOfflineContacts()
 void RecentContacts::onChangeHideLaterContacts()
 {
 	Options::node(OPV_ROSTER_RECENT_HIDELATERCONTACTS).setValue(!FHideLaterContacts);
+}
+
+void RecentContacts::onChangeSimpleContactsView()
+{
+	Options::node(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW).setValue(!FSimpleContactsView);
 }
 
 uint qHash(const IRecentItem &AKey)

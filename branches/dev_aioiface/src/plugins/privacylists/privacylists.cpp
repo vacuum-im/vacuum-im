@@ -114,8 +114,8 @@ bool PrivacyLists::initObjects()
 		FPrivacyLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 		FRostersView = FRostersViewPlugin->rostersView();
-		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)),
-			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)));
+		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 			SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 		connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
@@ -1341,7 +1341,7 @@ void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 	}
 }
 
-void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
+void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if (ALabelId == FPrivacyLabelId)
 	{
@@ -1356,7 +1356,7 @@ void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId,
 		toolTip += tr("- messages: %1").arg((stanzas & IPrivacyRule::Messages) >0           ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences in: %1").arg((stanzas & IPrivacyRule::PresencesIn) >0    ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences out: %1").arg((stanzas & IPrivacyRule::PresencesOut) >0  ? tr("<b>denied</b>") : tr("allowed"));
-		AToolTips.insertMulti(RTTO_PRIVACY,toolTip);
+		AToolTips.insert(RTTO_PRIVACY,toolTip);
 	}
 }
 

@@ -56,8 +56,8 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	FDragExpandTimer.setInterval(500);
 	connect(&FDragExpandTimer,SIGNAL(timeout()),SLOT(onDragExpandTimer()));
 
-	connect(this,SIGNAL(indexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)),
-		SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMultiMap<int,QString> &)));
+	connect(this,SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+		SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 	connect(this,SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
 		SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),
@@ -113,8 +113,11 @@ QVariant RostersView::rosterData(const IRosterIndex *AIndex, int ARole) const
 		{
 			QList<quint32> labels = holder_it.value()->rosterLabels(holder_it.key(),index);
 			for (QList<quint32>::const_iterator label_it = labels.constBegin(); label_it!=labels.constEnd(); ++label_it)
-				if (!labelItems.contains(*label_it))
-					labelItems.insert(*label_it,holder_it.value()->rosterLabel(holder_it.key(),*label_it,index));
+			{
+				quint32 labelId = *label_it;
+				if (!labelItems.contains(labelId))
+					labelItems.insert(labelId,holder_it.value()->rosterLabel(holder_it.key(),labelId,index));
+			}
 		}
 
 		for (QMultiMap<IRosterIndex *, quint32>::const_iterator it = FIndexLabels.constFind(index); it!=FIndexLabels.constEnd() && it.key()==index; ++it)
@@ -395,7 +398,7 @@ bool RostersView::keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, cons
 	return hooked;
 }
 
-void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMultiMap<int,QString> &AToolTips)
+void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMap<int, QString> &AToolTips)
 {
 	if (AIndex != NULL)
 	{
@@ -673,6 +676,11 @@ QModelIndex RostersView::mapFromProxy(QAbstractProxyModel *AProxyModel, const QM
 		} while (it != FProxyModels.constBegin());
 	}
 	return index;
+}
+
+AdvancedDelegateItem RostersView::registeredLabel(quint32 ALabelId) const
+{
+	return FLabelItems.value(ALabelId);
 }
 
 quint32 RostersView::registerLabel(const AdvancedDelegateItem &ALabel)
@@ -997,7 +1005,7 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
-				QMultiMap<int,QString> toolTipsMap;
+				QMap<int,QString> toolTipsMap;
 				toolTipsForIndex(index,helpEvent,toolTipsMap);
 				if (!toolTipsMap.isEmpty())
 				{
@@ -1286,7 +1294,7 @@ void RostersView::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes
 	}
 }
 
-void RostersView::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMultiMap<int,QString> &AToolTips)
+void RostersView::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
