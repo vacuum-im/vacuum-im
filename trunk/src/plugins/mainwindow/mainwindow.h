@@ -62,6 +62,7 @@ protected:
 	void updateWindow();
 	QMenu *createPopupMenu();
 	void correctWindowPosition();
+	void restoreAcceptDrops(QWidget *AParent);
 	void setCentralWidgetVisible(bool AVisible);
 protected:
 	void showEvent(QShowEvent *AEvent);
