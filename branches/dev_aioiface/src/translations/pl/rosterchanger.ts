@@ -122,22 +122,6 @@
         <translation>Poproś</translation>
     </message>
     <message>
-        <source>Copy contact</source>
-        <translation>Kopiuj kontakt</translation>
-    </message>
-    <message>
-        <source>Move contact</source>
-        <translation>Przenieś kontakt</translation>
-    </message>
-    <message>
-        <source>Copy group</source>
-        <translation>Kopiuj grupę</translation>
-    </message>
-    <message>
-        <source>Move group</source>
-        <translation>Przenieś grupę</translation>
-    </message>
-    <message>
         <source>Refuse</source>
         <translation>Odmów</translation>
     </message>
@@ -304,6 +288,10 @@
             <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n kontakty&lt;/b&gt; z listy kontaktów?</numerusform>
             <numerusform>Czy na pewno chcesz usunąć &lt;b&gt;%n kontaktów&lt;/b&gt; z listy kontaktów?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Add group</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

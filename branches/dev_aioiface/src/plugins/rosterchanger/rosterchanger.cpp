@@ -183,11 +183,10 @@ QMultiMap<int, IOptionsWidget *> RosterChanger::optionsWidgets(const QString &AN
 	return widgets;
 }
 
-Qt::DropActions RosterChanger::rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
+Qt::DropActions RosterChanger::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
-	Q_UNUSED(AEvent);
-	Q_UNUSED(ADrag);
-	int indexType = AIndex.data(RDR_TYPE).toInt();
+	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
+	int indexType = AIndex->data(RDR_TYPE).toInt();
 	if (indexType==RIT_CONTACT || indexType==RIT_GROUP)
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
@@ -208,15 +207,23 @@ bool RosterChanger::rosterDragEnter(const QDragEnterEvent *AEvent)
 	return false;
 }
 
-bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
+bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
-	Q_UNUSED(AEvent);
-	int indexType = AHover.data(RDR_TYPE).toInt();
-	if (DragGroups.contains(indexType) || indexType==RIT_STREAM_ROOT)
+	int hoverType = AHover->data(RDR_TYPE).toInt();
+	if (DragGroups.contains(hoverType) || hoverType==RIT_STREAM_ROOT)
 	{
-		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AHover.data(RDR_STREAM_JID).toString()) : NULL;
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AHover->data(RDR_STREAM_JID).toString()) : NULL;
 		if (roster && roster->isOpen())
+		{
+			if (hoverType == RIT_STREAM_ROOT)
+			{
+				QMap<int, QVariant> indexData;
+				QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
+				operator>>(stream,indexData);
+				return indexData.value(RDR_STREAM_JID)!=AHover->data(RDR_STREAM_JID);
+			}
 			return true;
+		}
 	}
 	return false;
 }
@@ -226,12 +233,12 @@ void RosterChanger::rosterDragLeave(const QDragLeaveEvent *AEvent)
 	Q_UNUSED(AEvent);
 }
 
-bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
+bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
 {
-	int hoverType = AIndex.data(RDR_TYPE).toInt();
+	int hoverType = AIndex->data(RDR_TYPE).toInt();
 	if ((AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0 && (DragGroups.contains(hoverType) || hoverType==RIT_STREAM_ROOT))
 	{
-		Jid hoverStreamJid = AIndex.data(RDR_STREAM_JID).toString();
+		Jid hoverStreamJid = AIndex->data(RDR_STREAM_JID).toString();
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(hoverStreamJid) : NULL;
 		if (roster && roster->isOpen())
 		{
@@ -243,24 +250,50 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 			Jid indexStreamJid = indexData.value(RDR_STREAM_JID).toString();
 			bool isNewContact = indexType==RIT_CONTACT && !roster->rosterItem(indexData.value(RDR_PREP_BARE_JID).toString()).isValid;
 
-			if (!isNewContact && (hoverStreamJid && indexStreamJid))
+			if (isNewContact || hoverStreamJid.pBare()!=indexStreamJid.pBare())
+			{
+				Action *addAction = new Action(AMenu);
+				addAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
+				addAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
+				addAction->setData(ADR_TO_GROUP,AIndex->data(RDR_GROUP));
+
+				if (indexType == RIT_CONTACT)
+				{
+					addAction->setText(tr("Add contact"));
+					addAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
+					addAction->setData(ADR_NICK,indexData.value(RDR_NAME));
+					connect(addAction,SIGNAL(triggered(bool)),SLOT(onAddContactToGroup(bool)));
+					AMenu->addAction(addAction,AG_DEFAULT,true);
+				}
+				else
+				{
+					addAction->setText(tr("Add group"));
+					addAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
+					addAction->setData(ADR_FROM_STREAM_JID,indexStreamJid.full());
+					addAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+					connect(addAction,SIGNAL(triggered(bool)),SLOT(onAddGroupToGroup(bool)));
+					AMenu->addAction(addAction,AG_DEFAULT,true);
+				}
+				AMenu->setDefaultAction(addAction);
+				return true;
+			}
+			else if (hoverType != RIT_STREAM_ROOT)
 			{
 				if (AEvent->dropAction() == Qt::CopyAction)
 				{
 					Action *copyAction = new Action(AMenu);
 					copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
 					copyAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
-					copyAction->setData(ADR_TO_GROUP,AIndex.data(RDR_GROUP));
+					copyAction->setData(ADR_TO_GROUP,AIndex->data(RDR_GROUP));
+					copyAction->setText(tr("Copy to group"));
 					if (indexType == RIT_CONTACT)
 					{
-						copyAction->setText(tr("Copy contact"));
 						copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
 						connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyContactsToGroup(bool)));
 						AMenu->addAction(copyAction,AG_DEFAULT,true);
 					}
 					else
 					{
-						copyAction->setText(tr("Copy group"));
 						copyAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
 						connect(copyAction,SIGNAL(triggered(bool)),SLOT(onCopyGroupsToGroup(bool)));
 						AMenu->addAction(copyAction,AG_DEFAULT,true);
@@ -273,10 +306,10 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 					Action *moveAction = new Action(AMenu);
 					moveAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
 					moveAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
-					moveAction->setData(ADR_TO_GROUP,AIndex.data(RDR_GROUP));
+					moveAction->setData(ADR_TO_GROUP,AIndex->data(RDR_GROUP));
+					moveAction->setText(tr("Move to group"));
 					if (indexType == RIT_CONTACT)
 					{
-						moveAction->setText(tr("Move contact"));
 						moveAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
 						moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
 						connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveContactsToGroup(bool)));
@@ -284,7 +317,6 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 					}
 					else
 					{
-						moveAction->setText(tr("Move group"));
 						moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
 						connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveGroupsToGroup(bool)));
 						AMenu->addAction(moveAction,AG_DEFAULT,true);
@@ -292,33 +324,6 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 					AMenu->setDefaultAction(moveAction);
 					return true;
 				}
-			}
-			else
-			{
-				Action *copyAction = new Action(AMenu);
-				copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-				copyAction->setData(ADR_STREAM_JID,hoverStreamJid.full());
-				copyAction->setData(ADR_TO_GROUP,AIndex.data(RDR_GROUP));
-
-				if (indexType == RIT_CONTACT)
-				{
-					copyAction->setText(isNewContact ? tr("Add contact") : tr("Copy contact"));
-					copyAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
-					copyAction->setData(ADR_NICK,indexData.value(RDR_NAME));
-					connect(copyAction,SIGNAL(triggered(bool)),SLOT(onAddContactToGroup(bool)));
-					AMenu->addAction(copyAction,AG_DEFAULT,true);
-				}
-				else
-				{
-					copyAction->setText(tr("Copy group"));
-					copyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
-					copyAction->setData(ADR_FROM_STREAM_JID,indexStreamJid.full());
-					copyAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
-					connect(copyAction,SIGNAL(triggered(bool)),SLOT(onAddGroupToGroup(bool)));
-					AMenu->addAction(copyAction,AG_DEFAULT,true);
-				}
-				AMenu->setDefaultAction(copyAction);
-				return true;
 			}
 		}
 	}

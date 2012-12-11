@@ -816,6 +816,28 @@ void RostersView::removeNotify(int ANotifyId)
 	}
 }
 
+QList<IRostersDragDropHandler *> RostersView::dragDropHandlers() const
+{
+	return FDragDropHandlers;
+}
+
+void RostersView::insertDragDropHandler(IRostersDragDropHandler *AHandler)
+{
+	if (!FDragDropHandlers.contains(AHandler))
+		FDragDropHandlers.append(AHandler);
+}
+
+void RostersView::removeDragDropHandler(IRostersDragDropHandler *AHandler)
+{
+	if (FDragDropHandlers.contains(AHandler))
+		FDragDropHandlers.removeAll(AHandler);
+}
+
+QMultiMap<int, IRostersLabelHolder *> RostersView::labelHolders() const
+{
+	return FLabelHolders;
+}
+
 void RostersView::insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
 {
 	if (AHolder)
@@ -836,6 +858,11 @@ void RostersView::removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
 	}
 }
 
+QMultiMap<int, IRostersClickHooker *> RostersView::clickHookers() const
+{
+	return FClickHookers;
+}
+
 void RostersView::insertClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
 	if (AHooker)
@@ -845,6 +872,11 @@ void RostersView::insertClickHooker(int AOrder, IRostersClickHooker *AHooker)
 void RostersView::removeClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
 	FClickHookers.remove(AOrder,AHooker);
+}
+
+QMultiMap<int, IRostersKeyHooker *> RostersView::keyHookers() const
+{
+	return FKeyHookers;
 }
 
 void RostersView::insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
@@ -858,16 +890,9 @@ void RostersView::removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
 	FKeyHookers.remove(AOrder,AHooker);
 }
 
-void RostersView::insertDragDropHandler(IRostersDragDropHandler *AHandler)
+QMultiMap<int, IRostersEditHandler *> RostersView::editHandlers() const
 {
-	if (!FDragDropHandlers.contains(AHandler))
-		FDragDropHandlers.append(AHandler);
-}
-
-void RostersView::removeDragDropHandler(IRostersDragDropHandler *AHandler)
-{
-	if (FDragDropHandlers.contains(AHandler))
-		FDragDropHandlers.removeAll(AHandler);
+	return FEditHandlers;
 }
 
 void RostersView::insertEditHandler(int AOrder, IRostersEditHandler *AHandler)
@@ -1109,16 +1134,22 @@ void RostersView::mousePressEvent(QMouseEvent *AEvent)
 
 void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 {
-	if (!FStartDragFailed && AEvent->buttons()!=Qt::NoButton && FPressedIndex.isValid() && 
-		(AEvent->pos()-FPressedPos).manhattanLength() > QApplication::startDragDistance() &&
-		selectedIndexes().count() == 1)
+	if (FRostersModel && !FStartDragFailed && AEvent->buttons()!=Qt::NoButton && FPressedIndex.isValid() && 
+		(AEvent->pos()-FPressedPos).manhattanLength()>QApplication::startDragDistance() && selectedIndexes().count()==1)
 	{
+		IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(FPressedIndex));
+		
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(new QMimeData);
 
+		QByteArray data;
+		QDataStream stream(&data,QIODevice::WriteOnly);
+		operator<<(stream,index->data());
+		drag->mimeData()->setData(DDT_ROSTERSVIEW_INDEX_DATA,data);
+
 		Qt::DropActions actions = Qt::IgnoreAction;
 		foreach(IRostersDragDropHandler *handler, FDragDropHandlers)
-			actions |= handler->rosterDragStart(AEvent,FPressedIndex,drag);
+			actions |= handler->rosterDragStart(AEvent,index,drag);
 
 		if (actions != Qt::IgnoreAction)
 		{
@@ -1138,11 +1169,6 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 				drag->setPixmap(pixmap);
 				drag->setHotSpot(FPressedPos - indexPos);
 			}
-
-			QByteArray data;
-			QDataStream stream(&data,QIODevice::WriteOnly);
-			operator<<(stream,model()->itemData(FPressedIndex));
-			drag->mimeData()->setData(DDT_ROSTERSVIEW_INDEX_DATA,data);
 
 			setState(DraggingState);
 			drag->exec(actions);
@@ -1192,32 +1218,33 @@ void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
 
 void RostersView::dropEvent(QDropEvent *AEvent)
 {
-	Menu *dropMenu = new Menu(this);
-
-	bool accepted = false;
-	QModelIndex index = indexAt(AEvent->pos());
-	foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-		if (handler->rosterDropAction(AEvent,index,dropMenu))
-			accepted = true;
-
-	QList<Action *> actionList = dropMenu->groupActions();
-	if (accepted && !actionList.isEmpty())
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(indexAt(AEvent->pos()))) : NULL;
+	if (index)
 	{
-		QAction *action = !(AEvent->mouseButtons() & Qt::RightButton) && actionList.count()==1 ? actionList.value(0) : NULL;
-		if (action)
-			action->trigger();
+		Menu *dropMenu = new Menu(this);
+		
+		bool accepted = false;
+		foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+			if (handler->rosterDropAction(AEvent,index,dropMenu))
+				accepted = true;
+		
+		if (accepted && !dropMenu->isEmpty())
+		{
+			if (dropMenu->exec(mapToGlobal(AEvent->pos())))
+				AEvent->acceptProposedAction();
+			else
+				AEvent->ignore();
+		}
 		else
-			action = dropMenu->exec(mapToGlobal(AEvent->pos()));
-
-		if (action)
-			AEvent->acceptProposedAction();
-		else
+		{
 			AEvent->ignore();
+		}
+		delete dropMenu;
 	}
 	else
+	{
 		AEvent->ignore();
-
-	delete dropMenu;
+	}
 	stopAutoScroll();
 	setDropIndicatorRect(QRect());
 }
@@ -1243,24 +1270,26 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 
 void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
 {
-	QModelIndex index = indexAt(AEvent->pos());
-
-	bool accepted = false;
-	foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
-		if (handler->rosterDragMove(AEvent,index))
-			accepted = true;
-
-	if (accepted)
-		AEvent->acceptProposedAction();
-	else
-		AEvent->ignore();
-
-	if (!isExpanded(index))
-		FDragExpandTimer.start();
-	else
-		FDragExpandTimer.stop();
-
-	setDropIndicatorRect(visualRect(index));
+	QModelIndex modelIndex = indexAt(AEvent->pos());
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(modelIndex)) : NULL;
+	if (index)
+	{
+		bool accepted = false;
+		foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+			if (handler->rosterDragMove(AEvent,index))
+				accepted = true;
+		
+		if (accepted)
+			AEvent->acceptProposedAction();
+		else
+			AEvent->ignore();
+		
+		if (!isExpanded(modelIndex))
+			FDragExpandTimer.start();
+		else
+			FDragExpandTimer.stop();
+	}
+	setDropIndicatorRect(visualRect(modelIndex));
 }
 
 void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)

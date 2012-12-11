@@ -60,11 +60,11 @@ public:
 class IRostersDragDropHandler
 {
 public:
-	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag) =0;
+	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag) =0;
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent) =0;
-	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover) =0;
+	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover) =0;
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent) =0;
-	virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu) =0;
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu) =0;
 };
 
 class IRostersEditHandler
@@ -120,19 +120,24 @@ public:
 	virtual int insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes) =0;
 	virtual void activateNotify(int ANotifyId) =0;
 	virtual void removeNotify(int ANotifyId) =0;
+	//DragDropHandlers
+	virtual QList<IRostersDragDropHandler *> dragDropHandlers() const =0;
+	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler) =0;
+	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler) =0;
 	//LabelHolders
+	virtual QMultiMap<int, IRostersLabelHolder *> labelHolders() const =0;
 	virtual void insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder) =0;
 	virtual void removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder) =0;
 	//ClickHookers
+	virtual QMultiMap<int, IRostersClickHooker *> clickHookers() const =0;
 	virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
 	virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker) =0;
 	//KeyHookers
+	virtual QMultiMap<int, IRostersKeyHooker *> keyHookers() const =0;
 	virtual void insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker) =0;
 	virtual void removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker) =0;
-	//DragDropHandlers
-	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler) =0;
-	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler) =0;
 	//EditHandlers
+	virtual QMultiMap<int, IRostersEditHandler *> editHandlers() const =0;
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler) =0;
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler) =0;
 protected:
@@ -166,7 +171,7 @@ public:
 Q_DECLARE_INTERFACE(IRostersLabelHolder,"Vacuum.Plugin.IRostersLabelHolder/1.0");
 Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.3");
 Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.2");
-Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.0");
+Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.1");
 Q_DECLARE_INTERFACE(IRostersEditHandler,"Virtus.Plugin.IRostersEditHandler/1.1")
 Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.5");
 Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.5");

@@ -88,19 +88,24 @@ public:
 	virtual int insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes);
 	virtual void activateNotify(int ANotifyId);
 	virtual void removeNotify(int ANotifyId);
+	//--DragDrop
+	virtual QList<IRostersDragDropHandler *> dragDropHandlers() const;
+	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler);
+	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler);
 	//--LabelHolders
+	virtual QMultiMap<int, IRostersLabelHolder *> labelHolders() const;
 	virtual void insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder);
 	virtual void removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder);
 	//--ClickHookers
+	virtual QMultiMap<int, IRostersClickHooker *> clickHookers() const;
 	virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker);
 	virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker);
 	//--KeyHookers
+	virtual QMultiMap<int, IRostersKeyHooker *> keyHookers() const;
 	virtual void insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker);
 	virtual void removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker);
-	//--DragDrop
-	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler);
-	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler);
 	//--EditHandlers
+	virtual QMultiMap<int, IRostersEditHandler *> editHandlers() const;
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler);
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler);
 signals:

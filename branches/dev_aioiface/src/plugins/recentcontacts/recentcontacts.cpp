@@ -16,6 +16,7 @@
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosterlabelholderorders.h>
+#include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/recentitemtypes.h>
 #include <utils/iconstorage.h>
 #include <utils/datetime.h>
@@ -177,6 +178,7 @@ bool RecentContacts::initObjects()
 		removeFavorive.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT_REMOVE_FAVORITE);
 		FRemoveFavoriteLabelId = FRostersView->registerLabel(removeFavorive);
 
+		FRostersView->insertDragDropHandler(this);
 		FRostersView->insertLabelHolder(RLHO_RECENT_FILTER,this);
 		FRostersView->insertClickHooker(RCHO_RECENTCONTACTS,this);
 		FRostersViewPlugin->registerExpandableRosterIndexType(RIT_RECENT_ROOT,RDR_TYPE);
@@ -223,7 +225,8 @@ QList<int> RecentContacts::rosterDataRoles() const
 {
 	static const QList<int> roles = QList<int>() 
 		<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole 
-		<< RDR_NAME << RDR_SHOW << RDR_STATUS << RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_ALLWAYS_VISIBLE;
+		<< RDR_NAME << RDR_SHOW << RDR_STATUS 
+		<< RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_ALLWAYS_VISIBLE;
 	return roles;
 }
 
@@ -276,6 +279,80 @@ bool RecentContacts::setRosterData(IRosterIndex *AIndex, int ARole, const QVaria
 	Q_UNUSED(ARole);
 	Q_UNUSED(AValue);
 	return false;
+}
+
+Qt::DropActions RecentContacts::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
+{
+	Qt::DropActions actions = Qt::IgnoreAction;
+	if (AIndex->data(RDR_TYPE).toInt()==RIT_RECENT_ITEM)
+	{
+		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
+		if (proxy)
+		{
+			foreach(IRostersDragDropHandler *handler, FRostersView->dragDropHandlers())
+				actions |= handler!=this ? handler->rosterDragStart(AEvent,proxy,ADrag) : Qt::IgnoreAction;
+
+			if (actions != Qt::IgnoreAction)
+			{
+				QByteArray proxyData;
+				QDataStream proxyStream(&proxyData,QIODevice::WriteOnly);
+				operator<<(proxyStream,proxy->data());
+				ADrag->mimeData()->setData(DDT_ROSTERSVIEW_INDEX_DATA,proxyData);
+
+				QByteArray indexData;
+				QDataStream indexStream(&indexData,QIODevice::WriteOnly);
+				operator<<(indexStream,AIndex->data());
+				ADrag->mimeData()->setData(DDT_RECENT_INDEX_DATA,indexData);
+			}
+		}
+	}
+	return actions;
+}
+
+bool RecentContacts::rosterDragEnter(const QDragEnterEvent *AEvent)
+{
+	FExteredProxyDragHandlers.clear();
+	foreach(IRostersDragDropHandler *handler, FRostersView->dragDropHandlers())
+		if (handler!=this && handler->rosterDragEnter(AEvent))
+			FExteredProxyDragHandlers.append(handler);
+	return !FExteredProxyDragHandlers.isEmpty();
+}
+
+bool RecentContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
+{
+	FMovedProxyDragHandlers.clear();
+	if (AHover->data(RDR_TYPE).toInt() == RIT_RECENT_ITEM)
+	{
+		IRosterIndex *proxy = FIndexToProxy.value(AHover);
+		if (proxy)
+		{
+			foreach(IRostersDragDropHandler *handler, FExteredProxyDragHandlers)
+				if (handler!=this && handler->rosterDragMove(AEvent,proxy))
+					FMovedProxyDragHandlers.append(handler);
+		}
+	}
+	return !FMovedProxyDragHandlers.isEmpty();
+}
+
+void RecentContacts::rosterDragLeave(const QDragLeaveEvent *AEvent)
+{
+	Q_UNUSED(AEvent);
+}
+
+bool RecentContacts::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
+{
+	bool accepted = false;
+	if (AIndex->data(RDR_TYPE).toInt() == RIT_RECENT_ITEM)
+	{
+		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
+		if (proxy)
+		{
+			foreach(IRostersDragDropHandler *handler, FMovedProxyDragHandlers)
+				if (handler!=this && handler->rosterDropAction(AEvent,proxy,AMenu))
+					accepted = true;
+		}
+	}
+	return accepted;
 }
 
 QList<quint32> RecentContacts::rosterLabels(int AOrder, const IRosterIndex *AIndex) const

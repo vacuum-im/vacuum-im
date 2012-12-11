@@ -17,12 +17,13 @@ class RecentContacts :
 	public IPlugin,
 	public IRecentContacts,
 	public IRosterDataHolder,
+	public IRostersDragDropHandler,
 	public IRostersLabelHolder,
 	public IRostersClickHooker,
 	public IRecentItemHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker IRecentItemHandler);
+	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRostersDragDropHandler IRostersLabelHolder IRostersClickHooker IRecentItemHandler);
 public:
 	RecentContacts();
 	~RecentContacts();
@@ -40,6 +41,12 @@ public:
 	virtual QList<int> rosterDataTypes() const;
 	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	//IRostersDragDropHandler
+	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
+	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
+	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
+	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
@@ -159,6 +166,8 @@ private:
 	QMap<const IRosterIndex *, IRosterIndex *> FIndexToProxy;
 	QMap<const IRosterIndex *, IRosterIndex *> FProxyToIndex;
 	QMap<IRosterIndex *, QList<IRosterIndex *> > FIndexProxies;
+	QList<IRostersDragDropHandler *> FMovedProxyDragHandlers;
+	QList<IRostersDragDropHandler *> FExteredProxyDragHandlers;
 private:
 	bool FHideLaterContacts;
 	bool FAllwaysShowOffline;
