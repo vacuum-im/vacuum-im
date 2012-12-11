@@ -83,7 +83,6 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FMainMenuBar = new MenuBarChanger(new QMenuBar());
 	setMenuBar(FMainMenuBar->menuBar());
 
-
 	updateWindow();
 }
 
@@ -297,6 +296,25 @@ void MainWindow::correctWindowPosition()
 	}
 }
 
+void MainWindow::restoreAcceptDrops(QWidget *AParent)
+{
+#ifdef Q_WS_WIN
+	foreach(QObject *object, AParent->children())
+	{
+		if (object->isWidgetType())
+		{
+			QWidget *childWidget = qobject_cast<QWidget *>(object);
+			if (childWidget->acceptDrops())
+			{
+				childWidget->setAcceptDrops(false);
+				childWidget->setAcceptDrops(true);
+			}
+			restoreAcceptDrops(childWidget);
+		}
+	}
+#endif
+}
+
 void MainWindow::setCentralWidgetVisible(bool AVisible)
 {
 	if (AVisible != FCentralVisible)
@@ -304,7 +322,7 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 		bool windowVisible = isVisible();
 		saveWindowGeometryAndState();
 		closeWindow();
-
+		
 		FCentralVisible = AVisible;
 		if (AVisible)
 		{
@@ -323,6 +341,7 @@ void MainWindow::setCentralWidgetVisible(bool AVisible)
 
 		updateWindow();
 		setMinimumSize(0,0);
+		restoreAcceptDrops(this);
 		loadWindowGeometryAndState();
 
 		if (windowVisible)
