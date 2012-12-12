@@ -1077,7 +1077,10 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 			FStartDragFailed = true;
 		}
 	}
-	QTreeView::mouseMoveEvent(AEvent);
+	else
+	{
+		QTreeView::mouseMoveEvent(AEvent);
+	}
 }
 
 void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
