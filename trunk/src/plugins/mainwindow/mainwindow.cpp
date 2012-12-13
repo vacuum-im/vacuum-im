@@ -312,6 +312,8 @@ void MainWindow::restoreAcceptDrops(QWidget *AParent)
 			restoreAcceptDrops(childWidget);
 		}
 	}
+#else
+	Q_UNUSED(AParent);
 #endif
 }
 

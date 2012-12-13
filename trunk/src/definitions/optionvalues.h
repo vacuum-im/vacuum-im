@@ -31,7 +31,7 @@
 // Compress
 #define OPV_ACCOUNT_STREAMCOMPRESS                      "accounts.account.stream-compress"
 
-//BirthdayReminder
+// BirthdayReminder
 #define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
 #define OPV_BIRTHDAYREMINDER_STOPTIME                   "birthdayreminder.stop-time"
 
@@ -105,9 +105,9 @@
 #define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
 // NormalMessageHandler
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
-//MessageStyles
+// MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
-//SpellChecker
+// SpellChecker
 #define OPV_MESSAGES_SPELL_LANG                         "messages.spell.lang"
 #define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"
 
@@ -194,17 +194,16 @@
 #define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
 #define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"
 // Avatars
-#define OPV_AVATARS_SHOW                                "roster.avatars.show"
-#define OPV_AVATARS_SHOWEMPTY                           "roster.avatars.show-empty"
-#define OPV_AVATARS_SHOWGRAY                            "roster.avatars.show-gray"
-#define OPV_AVATARS_CUSTOM_ITEM                         "roster.avatars.custom"
+#define OPV_ROSTER_AVATARS_SHOW                         "roster.avatars.show"
+#define OPV_ROSTER_AVATARS_SHOWEMPTY                    "roster.avatars.show-empty"
+#define OPV_ROSTER_AVATARS_SHOWGRAY                     "roster.avatars.show-gray"
 // RosterSearch
 #define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
-//RosterItemExchange
+// RosterItemExchange
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
 
-//ShortcutManager
+// ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"
 
 // StatusChanger
@@ -231,5 +230,12 @@
 #define OPV_STATUSICONS_RULE_ITEM                       "statusicons.rules.rule"
 #define OPV_STATUSICONS_RULE_PATTERN                    "statusicons.rules.rule.pattern"
 #define OPV_STATUSICONS_RULE_ICONSET                    "statusicons.rules.rule.iconset"
+
+// XmppStreams
+#define OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE               "xmppstreams.timeout.handshake"
+#define OPV_XMPPSTREAMS_TIMEOUT_KEEPALIVE               "xmppstreams.timeout.keepalive"
+#define OPV_XMPPSTREAMS_TIMEOUT_DISCONNECT              "xmppstreams.timeout.disconnect"
+// RosterPlugin
+#define OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST           "xmppstreams.timeout.roster-request"
 
 #endif // DEF_OPTIONVALUES_H

@@ -2,9 +2,6 @@
 
 #include <QTextDocument>
 
-#define DISCONNECT_TIMEOUT          5000
-#define KEEP_ALIVE_TIMEOUT          30000
-
 XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObject(AXmppStreams->instance())
 {
 	FXmppStreams = AXmppStreams;
@@ -115,7 +112,7 @@ void XmppStream::close()
 		{
 			emit aboutToClose();
 			sendData("</stream:stream>");
-			FKeepAliveTimer.start(DISCONNECT_TIMEOUT);
+			setKeepAliveTimerActive(true);
 			FClosed = true;
 		}
 		else
@@ -265,10 +262,31 @@ bool XmppStream::isKeepAliveTimerActive() const
 
 void XmppStream::setKeepAliveTimerActive(bool AActive)
 {
-	if (AActive && FStreamState!=SS_OFFLINE)
-		FKeepAliveTimer.start(KEEP_ALIVE_TIMEOUT);
-	else if (!AActive)
+	if (AActive)
+	{
+		switch (FStreamState)
+		{
+		case SS_OFFLINE:
+		case SS_CONNECTING:
+			FKeepAliveTimer.stop();
+			break;
+		case SS_INITIALIZE:
+		case SS_FEATURES:
+			FKeepAliveTimer.start(Options::node(OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE).value().toInt());
+			break;
+		case SS_ONLINE:
+		case SS_ERROR:
+			FKeepAliveTimer.start(Options::node(OPV_XMPPSTREAMS_TIMEOUT_KEEPALIVE).value().toInt());
+			break;
+		case SS_DISCONNECTING:
+			FKeepAliveTimer.start(Options::node(OPV_XMPPSTREAMS_TIMEOUT_DISCONNECT).value().toInt());
+			break;
+		}
+	}
+	else
+	{
 		FKeepAliveTimer.stop();
+	}
 }
 
 qint64 XmppStream::sendStanza(Stanza &AStanza)
