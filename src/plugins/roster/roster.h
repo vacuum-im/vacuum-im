@@ -2,10 +2,12 @@
 #define ROSTER_H
 
 #include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/iroster.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
+#include <utils/options.h>
 
 class Roster :
 			public QObject,

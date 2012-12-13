@@ -144,9 +144,9 @@ bool Avatars::initObjects()
 
 bool Avatars::initSettings()
 {
-	Options::setDefaultValue(OPV_AVATARS_SHOW,true);
-	Options::setDefaultValue(OPV_AVATARS_SHOWEMPTY,true);
-	Options::setDefaultValue(OPV_AVATARS_SHOWGRAY,true);
+	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOW,true);
+	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWEMPTY,true);
+	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWGRAY,true);
 
 	if (FOptionsManager)
 	{
@@ -324,9 +324,9 @@ QMultiMap<int, IOptionsWidget *> Avatars::optionsWidgets(const QString &ANodeId,
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_ROSTER)
 	{
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOW),tr("Show avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOWEMPTY),tr("Show empty avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOWGRAY),tr("Show grayscaled avatars for offline contacts"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOW),tr("Show avatars"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY),tr("Show empty avatars"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY),tr("Show grayscaled avatars for offline contacts"),AParent));
 	}
 	return widgets;
 }
@@ -801,9 +801,9 @@ void Avatars::onOptionsOpened()
 			++it;
 	}
 
-	onOptionsChanged(Options::node(OPV_AVATARS_SHOW));
-	onOptionsChanged(Options::node(OPV_AVATARS_SHOWEMPTY));
-	onOptionsChanged(Options::node(OPV_AVATARS_SHOWGRAY));
+	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOW));
+	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY));
+	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY));
 }
 
 void Avatars::onOptionsClosed()
@@ -821,7 +821,7 @@ void Avatars::onOptionsClosed()
 
 void Avatars::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_AVATARS_SHOW)
+	if (ANode.path() == OPV_ROSTER_AVATARS_SHOW)
 	{
 		FAvatarsVisible = ANode.value().toBool();
 		if (FRostersViewPlugin && FRostersModel)
@@ -849,12 +849,12 @@ void Avatars::onOptionsChanged(const OptionsNode &ANode)
 			}
 		}
 	}
-	else if (ANode.path() == OPV_AVATARS_SHOWEMPTY)
+	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWEMPTY)
 	{
 		FShowEmptyAvatars = ANode.value().toBool();
 		updateDataHolder();
 	}
-	else if (ANode.path() == OPV_AVATARS_SHOWGRAY)
+	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWGRAY)
 	{
 		FShowGrayAvatars = ANode.value().toBool();
 		updateDataHolder();

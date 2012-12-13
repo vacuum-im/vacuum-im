@@ -48,6 +48,12 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
 
+bool RosterPlugin::initSettings()
+{
+	Options::setDefaultValue(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST,60000);
+	return true;
+}
+
 //IRosterPlugin
 IRoster *RosterPlugin::getRoster(IXmppStream *AXmppStream)
 {

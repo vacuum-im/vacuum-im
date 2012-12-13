@@ -25,6 +25,14 @@ bool XmppStreams::initConnections(IPluginManager *APluginManager, int &AInitOrde
 	return true;
 }
 
+bool XmppStreams::initSettings()
+{
+	Options::setDefaultValue(OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE,60000);
+	Options::setDefaultValue(OPV_XMPPSTREAMS_TIMEOUT_KEEPALIVE,30000);
+	Options::setDefaultValue(OPV_XMPPSTREAMS_TIMEOUT_DISCONNECT,5000);
+	return true;
+}
+
 QList<IXmppStream *> XmppStreams::xmppStreams() const
 {
 	return FStreams;
