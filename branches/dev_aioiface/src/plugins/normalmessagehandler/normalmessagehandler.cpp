@@ -179,7 +179,7 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 bool NormalMessageHandler::messageCheck(int AOrder, const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(ADirection);
-	return !AMessage.body().isEmpty() || !AMessage.subject().isEmpty();
+	return AMessage.type()!=Message::GroupChat && (!AMessage.body().isEmpty() || !AMessage.subject().isEmpty());
 }
 
 bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
@@ -286,17 +286,20 @@ bool NormalMessageHandler::messageShowWindow(int AMessageId)
 
 bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AType);
-	IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
-	if (window)
+	Q_UNUSED(AOrder);
+	if (AType != Message::GroupChat)
 	{
-		if (AShowMode == IMessageHandler::SM_ASSIGN)
-			window->assignTabPage();
-		else if (AShowMode == IMessageHandler::SM_SHOW)
-			window->showTabPage();
-		else if (AShowMode == IMessageHandler::SM_MINIMIZED)
-			window->showMinimizedTabPage();
-		return true;
+		IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
+		if (window)
+		{
+			if (AShowMode == IMessageHandler::SM_ASSIGN)
+				window->assignTabPage();
+			else if (AShowMode == IMessageHandler::SM_SHOW)
+				window->showTabPage();
+			else if (AShowMode == IMessageHandler::SM_MINIMIZED)
+				window->showMinimizedTabPage();
+			return true;
+		}
 	}
 	return false;
 }

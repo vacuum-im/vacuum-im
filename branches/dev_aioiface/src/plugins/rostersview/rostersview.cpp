@@ -163,18 +163,12 @@ QList<quint32> RostersView::rosterLabels(int AOrder, const IRosterIndex *AIndex)
 {
 	QList<quint32> labels;
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
-	if (AOrder == RLHO_ROSTERSVIEW_DISPLAY)
+	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && FRostersModel)
 	{
-		switch (AIndex->type())
-		{
-		case RIT_STREAM_ROOT:
-		case RIT_GROUP:
-		case RIT_GROUP_BLANK:
-		case RIT_GROUP_AGENTS:
-		case RIT_GROUP_MY_RESOURCES:
-		case RIT_GROUP_NOT_IN_ROSTER:
+		if (AIndex->parentIndex()==FRostersModel->rootIndex())
 			labels.append(AdvancedDelegateItem::DisplayId);
-		}
+		else if (FRostersModel->isGroupType(AIndex->type()))
+			labels.append(AdvancedDelegateItem::DisplayId);
 	}
 	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && FActiveNotifies.contains(index))
 	{
@@ -191,25 +185,15 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 {
 	AdvancedDelegateItem label;
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
-	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && ALabelId==AdvancedDelegateItem::DisplayId)
+	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && ALabelId==AdvancedDelegateItem::DisplayId && FRostersModel)
 	{
 		label.d->id = AdvancedDelegateItem::DisplayId;
 		label.d->kind = AdvancedDelegateItem::Display;
 		label.d->data = AIndex->data(Qt::DisplayRole);
-
-		switch (AIndex->type())
-		{
-		case RIT_STREAM_ROOT:
+		if (AIndex->parentIndex()==FRostersModel->rootIndex())
 			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
-			break;
-		case RIT_GROUP:
-		case RIT_GROUP_BLANK:
-		case RIT_GROUP_AGENTS:
-		case RIT_GROUP_MY_RESOURCES:
-		case RIT_GROUP_NOT_IN_ROSTER:
+		else if (FRostersModel->isGroupType(AIndex->type()))
 			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::DemiBold);
-			break;
-		}
 	}
 	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
 	{

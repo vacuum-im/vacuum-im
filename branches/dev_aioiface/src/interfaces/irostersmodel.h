@@ -78,6 +78,8 @@ public:
 	virtual QList<IRosterIndex *> getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false) =0;
 	virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) const =0;
 	virtual IRosterIndex *rosterIndexByModelIndex(const QModelIndex &AIndex) const =0;
+	virtual bool isGroupType(int AType) const =0;
+	virtual QList<int> singleGroupTypes() const =0;
 	virtual QString singleGroupName(int AType) const =0;
 	virtual void registerSingleGroup(int AType, const QString &AName) =0;
 	virtual void insertDefaultDataHolder(IRosterDataHolder *ADataHolder) =0;
@@ -99,6 +101,6 @@ protected:
 
 Q_DECLARE_INTERFACE(IRosterDataHolder,"Vacuum.Plugin.IRosterDataHolder/1.0");
 Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.2");
-Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.1");
+Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.2");
 
 #endif

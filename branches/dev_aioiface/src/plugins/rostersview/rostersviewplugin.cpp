@@ -162,86 +162,60 @@ QList<int> RostersViewPlugin::rosterDataRoles() const
 
 QList<int> RostersViewPlugin::rosterDataTypes() const
 {
-	static const QList<int> indexTypes = QList<int>() 
-		<< RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES
-		<< RIT_GROUP_NOT_IN_ROSTER<< RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+	static const QList<int> indexTypes = QList<int>() << RIT_ANY_TYPE;
 	return indexTypes;
 }
 
 QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
-	switch (AIndex->type())
+	if (FRostersModel)
 	{
-	case RIT_STREAM_ROOT:
-		switch (ARole)
+		if (AIndex->parentIndex() == FRostersModel->rootIndex())
 		{
-		case Qt::DisplayRole:
-			return AIndex->data(RDR_NAME);
-		case Qt::ForegroundRole:
-			return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
-		case Qt::BackgroundColorRole:
-			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
-		case RDR_STATES_FORCE_ON:
-			return QStyle::State_Children;
-		case RDR_ALLWAYS_VISIBLE:
-			return 1;
-		}
-		break;
-	case RIT_GROUP:
-	case RIT_GROUP_BLANK:
-	case RIT_GROUP_AGENTS:
-	case RIT_GROUP_MY_RESOURCES:
-	case RIT_GROUP_NOT_IN_ROSTER:
-		switch (ARole)
-		{
-		case Qt::DisplayRole:
-			return AIndex->data(RDR_NAME);
-		case Qt::ForegroundRole:
-			return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
-		case RDR_STATES_FORCE_ON:
-			return QStyle::State_Children;
-		}
-		break;
-	case RIT_CONTACT:
-		switch (ARole)
-		{
-		case Qt::DisplayRole:
+			switch (ARole)
 			{
-				Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
-				QString display = AIndex->data(RDR_NAME).toString();
-				if (display.isEmpty())
-					display = indexJid.uBare();
-				if (FShowResource && !indexJid.resource().isEmpty())
-					display += "/" + indexJid.resource();
-				return display;
+			case Qt::DisplayRole:
+				return AIndex->data(RDR_NAME);
+			case Qt::ForegroundRole:
+				return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
+			case Qt::BackgroundColorRole:
+				return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
+			case RDR_STATES_FORCE_ON:
+				return QStyle::State_Children;
+			case RDR_ALLWAYS_VISIBLE:
+				return 1;
 			}
 		}
-		break;
-	case RIT_AGENT:
-		switch (ARole)
+		else if (FRostersModel->isGroupType(AIndex->type()))
 		{
-		case Qt::DisplayRole:
+			switch (ARole)
 			{
-				QString display = AIndex->data(RDR_NAME).toString();
-				if (display.isEmpty())
-				{
-					Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
-					display = indexJid.uBare();
-				}
-				return display;
+			case Qt::DisplayRole:
+				return AIndex->data(RDR_NAME);
+			case Qt::ForegroundRole:
+				return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
+			case RDR_STATES_FORCE_ON:
+				return QStyle::State_Children;
 			}
 		}
-		break;
-	case RIT_MY_RESOURCE:
-		switch (ARole)
+		else if (ARole == Qt::DisplayRole)
 		{
-		case Qt::DisplayRole:
+			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+			Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
+			QString name = AIndex->data(RDR_NAME).toString();
+			if (streamJid.pBare() != indexJid.pBare())
 			{
-				Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
-				return indexJid.resource();
+				if (name.isEmpty())
+					name = indexJid.uBare();
+				if (FShowResource && !indexJid.node().isEmpty() && !indexJid.resource().isEmpty())
+					name += "/" + indexJid.resource();
 			}
+			else if (name.isEmpty())
+			{
+				name = indexJid.resource();
+			}
+			return name;
 		}
-		break;
 	}
 	return QVariant();
 }

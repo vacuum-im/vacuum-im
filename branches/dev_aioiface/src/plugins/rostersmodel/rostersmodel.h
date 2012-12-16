@@ -54,6 +54,8 @@ public:
 	virtual QList<IRosterIndex *> getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false);
 	virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) const;
 	virtual IRosterIndex *rosterIndexByModelIndex(const QModelIndex &AIndex) const;
+	virtual bool isGroupType(int AType) const;
+	virtual QList<int> singleGroupTypes() const;
 	virtual QString singleGroupName(int AType) const;
 	virtual void registerSingleGroup(int AType, const QString &AName);
 	virtual void insertDefaultDataHolder(IRosterDataHolder *ADataHolder);
@@ -77,6 +79,7 @@ protected:
 	void insertChangedIndex(IRosterIndex *AIndex);
 	void removeChangedIndex(IRosterIndex *AIndex);
 	QString getGroupName(int AType, const QString &AGroup) const;
+	bool isChildIndex(IRosterIndex *AIndex, IRosterIndex *AParent) const;
 	QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, bool ABare, IRosterIndex *AParent = NULL) const;
 protected slots:
 	void onAccountShown(IAccount *AAccount);

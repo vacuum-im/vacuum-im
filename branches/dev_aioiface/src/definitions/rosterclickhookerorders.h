@@ -5,5 +5,6 @@
 #define RCHO_RECENTCONTACTS                 300
 #define RCHO_SERVICEDISCOVERY               1000
 #define RCHO_CHATMESSAGEHANDLER             1000
+#define RCHO_MULTIUSERCHAT                  1000
 
 #endif

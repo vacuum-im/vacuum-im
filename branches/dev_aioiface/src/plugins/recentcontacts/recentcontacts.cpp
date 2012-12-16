@@ -189,11 +189,9 @@ bool RecentContacts::initObjects()
 	if (FRostersModel)
 	{
 		FRootIndex = FRostersModel->createRosterIndex(RIT_RECENT_ROOT,FRostersModel->rootIndex());
-		FRootIndex->setData(RDR_TYPE_ORDER,RITO_RECENT_ROOT);
-		FRootIndex->setData(Qt::DisplayRole,tr("Recent Contacts"));
 		FRootIndex->setData(Qt::DecorationRole,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT));
-		FRootIndex->setData(RDR_STATES_FORCE_ON,QStyle::State_Children);
-		FRootIndex->setData(RDR_ALLWAYS_VISIBLE,1);
+		FRootIndex->setData(RDR_TYPE_ORDER,RITO_RECENT_ROOT);
+		FRootIndex->setData(RDR_NAME,tr("Recent Contacts"));
 		FRootIndex->setRemoveOnLastChildRemoved(false);
 		FRootIndex->setRemoveChildsOnRemoved(false);
 		FRootIndex->setDestroyOnParentRemoved(false);
@@ -667,39 +665,6 @@ void RecentContacts::createItemIndex(const IRecentItem &AItem)
 	}
 }
 
-void RecentContacts::updateItemProxy(const IRecentItem &AItem)
-{
-	IRosterIndex *index = FVisibleItems.value(AItem);
-	if (index)
-	{
-		IRecentItemHandler *handler = FItemHandlers.value(AItem.type);
-		if (handler)
-		{
-			QList<IRosterIndex *> proxies = handler->recentItemProxyIndexes(AItem);
-			FIndexProxies.insert(index,proxies);
-			
-			IRosterIndex *proxy = proxies.value(0);
-			IRosterIndex *oldProxy = FIndexToProxy.value(index);
-			if (oldProxy != proxy)
-			{
-				if (oldProxy)
-					disconnect(oldProxy->instance());
-
-				if (proxy)
-				{
-					FIndexToProxy.insert(index,proxy);
-					FProxyToIndex.insert(proxy,index);
-					connect(proxy->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),SLOT(onProxyIndexDataChanged(IRosterIndex *, int)));
-				}
-				else
-				{
-					FProxyToIndex.remove(FIndexToProxy.take(index));
-				}
-			}
-		}
-	}
-}
-
 void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 {
 	static const QDateTime zero = QDateTime::fromTime_t(0);
@@ -716,7 +681,6 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 			{
 				QString name = handler->recentItemName(item);
 				index->setData(RDR_NAME, name);
-				index->setData(Qt::DisplayRole, name);
 				index->setData(Qt::DecorationRole, handler->recentItemIcon(item));
 			}
 		}
@@ -750,6 +714,39 @@ void RecentContacts::removeItemIndex(const IRecentItem &AItem)
 		FProxyToIndex.remove(FIndexToProxy.take(index));
 		FRostersModel->removeRosterIndex(index);
 		delete index->instance();
+	}
+}
+
+void RecentContacts::updateItemProxy(const IRecentItem &AItem)
+{
+	IRosterIndex *index = FVisibleItems.value(AItem);
+	if (index)
+	{
+		IRecentItemHandler *handler = FItemHandlers.value(AItem.type);
+		if (handler)
+		{
+			QList<IRosterIndex *> proxies = handler->recentItemProxyIndexes(AItem);
+			FIndexProxies.insert(index,proxies);
+
+			IRosterIndex *proxy = proxies.value(0);
+			IRosterIndex *oldProxy = FIndexToProxy.value(index);
+			if (oldProxy != proxy)
+			{
+				if (oldProxy)
+					disconnect(oldProxy->instance());
+
+				if (proxy)
+				{
+					FIndexToProxy.insert(index,proxy);
+					FProxyToIndex.insert(proxy,index);
+					connect(proxy->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),SLOT(onProxyIndexDataChanged(IRosterIndex *, int)));
+				}
+				else
+				{
+					FProxyToIndex.remove(FIndexToProxy.take(index));
+				}
+			}
+		}
 	}
 }
 
