@@ -322,26 +322,32 @@ bool MultiUserChatPlugin::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIn
 	Q_UNUSED(AOrder);
 	if (AEvent->modifiers() == Qt::NoModifier)
 	{
-		IMultiUserChatWindow *window = NULL;
-		if (AIndex->type()==RIT_MUC_ITEM)
+		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
+		if (stream && stream->isOpen())
 		{
-			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-			Jid roomJid = AIndex->data(RDR_PREP_BARE_JID).toString();
-			if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
-				window = getMultiChatWindow(streamJid,roomJid,AIndex->data(RDR_MUC_NICK).toString(),AIndex->data(RDR_MUC_PASSWORD).toString());
-		}
-		else if (AIndex->type()==RIT_RECENT_ITEM && AIndex->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE)
-		{
-			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-			Jid roomJid = AIndex->data(RDR_RECENT_REFERENCE).toString();
-			if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
-				window = getMultiChatWindow(streamJid,roomJid,streamJid.uNode(),QString::null);
-		}
-		if (window)
-		{
-			if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
-				window->multiUserChat()->sendStreamPresence();
-			window->showTabPage();
+			IMultiUserChatWindow *window = NULL;
+			if (AIndex->type() == RIT_MUC_ITEM)
+			{
+				Jid roomJid = AIndex->data(RDR_PREP_BARE_JID).toString();
+				if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
+					window = getMultiChatWindow(streamJid,roomJid,AIndex->data(RDR_MUC_NICK).toString(),AIndex->data(RDR_MUC_PASSWORD).toString());
+			}
+			else if (FRecentContacts && AIndex->type()==RIT_RECENT_ITEM && AIndex->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE)
+			{
+				IRecentItem item = FRecentContacts->rosterIndexItem(AIndex);
+				Jid roomJid = AIndex->data(RDR_RECENT_REFERENCE).toString();
+				QString nick = FRecentContacts->itemProperty(item,RIP_CONFERENCE_NICK).toString();
+				QString password = FRecentContacts->itemProperty(item,RIP_CONFERENCE_PASSWORD).toString();
+				if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
+					window = getMultiChatWindow(streamJid,roomJid,nick.isEmpty() ? streamJid.uNode() : nick,password);
+			}
+			if (window)
+			{
+				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
+					window->multiUserChat()->sendStreamPresence();
+				window->showTabPage();
+			}
 		}
 	}
 	return false;
@@ -575,7 +581,20 @@ QIcon MultiUserChatPlugin::recentItemIcon(const IRecentItem &AItem) const
 
 QString MultiUserChatPlugin::recentItemName(const IRecentItem &AItem) const
 {
-	return AItem.reference;
+	QString name = FRecentContacts->itemProperty(AItem,RIP_ITEM_NAME).toString();
+	return name.isEmpty() ? AItem.reference : name;
+}
+
+IRecentItem MultiUserChatPlugin::recentItemForIndex(const IRosterIndex *AIndex) const
+{
+	IRecentItem item;
+	if (AIndex->type() == RIT_MUC_ITEM)
+	{
+		item.type = REIT_CONFERENCE;
+		item.streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		item.reference = AIndex->data(RDR_PREP_BARE_JID).toString();
+	}
+	return item;
 }
 
 QList<IRosterIndex *> MultiUserChatPlugin::recentItemProxyIndexes(const IRecentItem &AItem) const
@@ -665,7 +684,6 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 		connect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
 		FChatWindows.append(chatWindow);
 		getMultiChatRosterIndex(chatWindow->streamJid(),chatWindow->roomJid(),chatWindow->multiUserChat()->nickName(),chatWindow->multiUserChat()->password());
-		updateChatRosterIndex(chatWindow);
 		emit multiChatWindowCreated(chatWindow);
 	}
 	return chatWindow;
@@ -699,19 +717,31 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 			chatGroup->setData(RDR_TYPE_ORDER,RITO_GROUP_MUC);
 
 			chatIndex = FRostersModel->createRosterIndex(RIT_MUC_ITEM,chatGroup);
+			FChatIndexes.append(chatIndex);
+
 			chatIndex->setData(RDR_STREAM_JID,AStreamJid.pFull());
 			chatIndex->setData(RDR_FULL_JID,ARoomJid.full());
 			chatIndex->setData(RDR_PREP_FULL_JID,ARoomJid.pFull());
 			chatIndex->setData(RDR_PREP_BARE_JID,ARoomJid.pBare());
-			chatIndex->setData(RDR_SHOW,IPresence::Offline);
-			chatIndex->setData(RDR_STATUS,QString());
-			chatIndex->setData(RDR_NAME,ARoomJid.bare());
-			chatIndex->setData(RDR_MUC_NICK,ANick);
-			chatIndex->setData(RDR_MUC_PASSWORD,APassword);
+
+			IMultiUserChatWindow *window = multiChatWindow(AStreamJid,ARoomJid);
+			if (!window)
+			{
+				chatIndex->setData(RDR_STATUS,QString());
+				chatIndex->setData(RDR_SHOW,IPresence::Offline);
+				chatIndex->setData(RDR_NAME,ARoomJid.uBare());
+				chatIndex->setData(RDR_MUC_NICK,ANick);
+				chatIndex->setData(RDR_MUC_PASSWORD,APassword);
+			}
+			else
+			{
+				updateChatRosterIndex(window);
+			}
+
 			connect(chatIndex->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
-			FChatIndexes.append(chatIndex);
 			FRostersModel->insertRosterIndex(chatIndex,chatGroup);
 			emit multiChatRosterIndexCreated(chatIndex);
+
 			updateRecentItemProxy(chatIndex);
 		}
 	}
@@ -829,6 +859,16 @@ void MultiUserChatPlugin::updateRecentItemProxy(IRosterIndex *AIndex)
 	}
 }
 
+void MultiUserChatPlugin::updateRecentItemProperties(IRosterIndex *AIndex)
+{
+	if (FRecentContacts)
+	{
+		IRecentItem item = recentItemForIndex(AIndex);
+		FRecentContacts->setItemProperty(item,RIP_CONFERENCE_NICK,AIndex->data(RDR_MUC_NICK).toString());
+		FRecentContacts->setItemProperty(item,RIP_CONFERENCE_PASSWORD,AIndex->data(RDR_MUC_PASSWORD).toString());
+	}
+}
+
 void MultiUserChatPlugin::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
 {
 	IRosterIndex *chatIndex = AWindow!=NULL ? findMultiChatRosterIndex(AWindow->streamJid(),AWindow->roomJid()) : NULL;
@@ -840,10 +880,20 @@ void MultiUserChatPlugin::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
 			chatIndex->setData(RDR_STATUS,AWindow->multiUserChat()->roomError().errorMessage());
 		else
 			chatIndex->setData(RDR_STATUS,QString());
-		chatIndex->setData(RDR_NAME,AWindow->multiUserChat()->roomName());
+
+		QString name = AWindow->multiUserChat()->roomName();
+		if (FRecentContacts && AWindow->multiUserChat()->roomJid().uBare()==name)
+		{
+			name = FRecentContacts->itemProperty(recentItemForIndex(chatIndex),RIP_ITEM_NAME).toString();
+			if (name.isEmpty())
+				name = AWindow->multiUserChat()->roomName();
+		}
+		chatIndex->setData(RDR_NAME,name);
+
 		chatIndex->setData(RDR_SHOW,AWindow->multiUserChat()->show());
 		chatIndex->setData(RDR_MUC_NICK,AWindow->multiUserChat()->nickName());
 		chatIndex->setData(RDR_MUC_PASSWORD,AWindow->multiUserChat()->password());
+		updateRecentItemProperties(chatIndex);
 	}
 }
 

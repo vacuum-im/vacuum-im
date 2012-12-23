@@ -6,6 +6,7 @@
 #include <definitions/toolbargroups.h>
 #include <definitions/dataformtypes.h>
 #include <definitions/recentitemtypes.h>
+#include <definitions/recentitemproperties.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/rosterindextypeorders.h>
@@ -107,6 +108,7 @@ public:
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const;
 	virtual QString recentItemName(const IRecentItem &AItem) const;
+	virtual IRecentItem recentItemForIndex(const IRosterIndex *AIndex) const;
 	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IMultiUserChatPlugin
 	virtual IPluginManager *pluginManager() const;
@@ -137,6 +139,7 @@ protected:
 	void registerDiscoFeatures();
 	QString streamVCardNick(const Jid &AStreamJid) const;
 	void updateRecentItemProxy(IRosterIndex *AIndex);
+	void updateRecentItemProperties(IRosterIndex *AIndex);
 	void updateChatRosterIndex(IMultiUserChatWindow *AWindow);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;

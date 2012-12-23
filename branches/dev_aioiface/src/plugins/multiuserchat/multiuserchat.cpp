@@ -28,7 +28,7 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FNickName = ANickName;
 	FPassword = APassword;
 	FShow = IPresence::Offline;
-	FRoomName = FRoomJid.bare();
+	FRoomName = FRoomJid.uBare();
 
 	initialize();
 }

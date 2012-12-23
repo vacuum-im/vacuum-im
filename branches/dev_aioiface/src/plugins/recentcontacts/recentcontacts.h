@@ -58,16 +58,20 @@ public:
 	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
 	virtual QIcon recentItemIcon(const IRecentItem &AItem) const;
 	virtual QString recentItemName(const IRecentItem &AItem) const;
+	virtual IRecentItem recentItemForIndex(const IRosterIndex *AIndex) const;
 	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IRecentContacts
 	virtual bool isItemValid(const IRecentItem &AItem) const;
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const;
+	virtual QVariant itemProperty(const IRecentItem &AItem, const QString &AName) const;
+	virtual void setItemProperty(const IRecentItem &AItem, const QString &AName, const QVariant &AValue);
 	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite);
 	virtual void setItemActiveTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
 	virtual QList<IRecentItem> visibleItems() const;
 	virtual quint8 maximumVisibleItems() const;
 	virtual void setMaximumVisibleItems(quint8 ACount);
+	virtual IRecentItem rosterIndexItem(const IRosterIndex *AIndex) const;
 	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const;
 	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const;
 	virtual QList<QString> itemHandlerTypes() const;
@@ -92,9 +96,10 @@ protected:
 	void updateItemIndex(const IRecentItem &AItem);
 	void removeItemIndex(const IRecentItem &AItem);
 	void updateItemProxy(const IRecentItem &AItem);
+	void updateItemProperties(const IRecentItem &AItem);
 	void mergeRecentItems(const QList<IRecentItem> &AItems);
 	IRecentItem &findRealItem(const IRecentItem &AItem);
-	IRecentItem rosterIndexItem(const IRosterIndex *AIndex) const;
+	IRecentItem findRealItem(const IRecentItem &AItem) const;
 	QList<IRosterIndex *> sortItemProxies(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
 protected:
@@ -107,9 +112,9 @@ protected:
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
 	QList<IRecentItem> loadItemsFromFile(const Jid &AStreamJid, const QString &AFileName) const;
 protected:
+	bool isSelectionAccepted(const QList<IRosterIndex *> AIndexes) const;
 	bool isRecentSelectionAccepted(const QList<IRosterIndex *> AIndexes) const;
-	bool isContactsSelectionAccepted(const QList<IRosterIndex *> AIndexes) const;
-	void setItemsFavorite(bool AFavorite, QStringList AIndexTypes, QStringList AStreamJids, QStringList ARecentTypes, QStringList ARefs, QStringList AContactsJids);
+	void setItemsFavorite(bool AFavorite, const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 protected slots:
 	void onRostersModelStreamAdded(const Jid &AStreamJid);
 	void onRostersModelStreamRemoved(const Jid &AStreamJid);
