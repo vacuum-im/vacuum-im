@@ -132,7 +132,7 @@ QList<int> Annotations::rosterDataRoles() const
 
 QList<int> Annotations::rosterDataTypes() const
 {
-	static const QList<int> dataTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
+	static const QList<int> dataTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MUC_ITEM;
 	return dataTypes;
 }
 

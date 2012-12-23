@@ -7,6 +7,7 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
+#include <definitions/rosternotifyorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -93,6 +94,7 @@ public:
 	virtual IMultiUserChat *multiUserChat() const;
 	virtual IChatWindow *openChatWindow(const Jid &AContactJid);
 	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
+	virtual void contextMenuForWindow(Menu *AMenu);
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000);
 signals:
@@ -110,6 +112,7 @@ signals:
 	//IMultiUserChatWindow
 	void chatWindowCreated(IChatWindow *AWindow);
 	void chatWindowDestroyed(IChatWindow *AWindow);
+	void multiChatWindowContextMenu(Menu *AMenu);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 protected:
 	void initialize();
@@ -148,10 +151,10 @@ protected:
 	void removeActiveChatMessages(IChatWindow *AWindow);
 	void updateChatWindow(IChatWindow *AWindow);
 protected:
-	virtual bool event(QEvent *AEvent);
-	virtual void showEvent(QShowEvent *AEvent);
-	virtual void closeEvent(QCloseEvent *AEvent);
-	virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
+	bool event(QEvent *AEvent);
+	void showEvent(QShowEvent *AEvent);
+	void closeEvent(QCloseEvent *AEvent);
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onChatOpened();
 	void onChatNotify(const QString &ANotify);
@@ -235,7 +238,7 @@ private:
 	Action *FInviteContact;
 	Action *FRequestVoice;
 	Action *FClearChat;
-	Action *FChangeSubject;
+	Action *FChangeTopic;
 	Action *FBanList;
 	Action *FMembersList;
 	Action *FAdminsList;

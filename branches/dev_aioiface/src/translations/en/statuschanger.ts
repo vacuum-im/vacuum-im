@@ -210,7 +210,7 @@ You can set status class for additional statuses defined by you.</translation>
     </message>
     <message>
         <source>Show status message in roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Show status message in roster</translation>
     </message>
 </context>
 </TS>

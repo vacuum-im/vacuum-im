@@ -1278,7 +1278,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		int indexType = AIndexes.first()->type();
-		if (indexType == RIT_STREAM_ROOT || indexType == RIT_CONTACT || indexType == RIT_AGENT || indexType == RIT_MY_RESOURCE)
+		if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT || indexType==RIT_MY_RESOURCE)
 		{
 			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 			Jid contactJid = indexType!=RIT_STREAM_ROOT ? AIndexes.first()->data(RDR_FULL_JID).toString() : streamJid.domain();

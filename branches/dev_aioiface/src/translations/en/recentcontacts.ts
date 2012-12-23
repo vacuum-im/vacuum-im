@@ -5,39 +5,39 @@
     <name>RecentContacts</name>
     <message>
         <source>Recent Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Recent Contacts</translation>
     </message>
     <message>
         <source>Displays a recently used contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Displays a recently used contacts</translation>
     </message>
     <message>
         <source>Add contact to favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Add contact to favorites</translation>
     </message>
     <message>
         <source>Remove contact from favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Remove contact from favorites</translation>
     </message>
     <message>
         <source>Hide Later Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Hide Later Contacts</translation>
     </message>
     <message>
         <source>Always Show Offline Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Always Show Offline Contacts</translation>
     </message>
     <message>
         <source>Add to Favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Add to Favorites</translation>
     </message>
     <message>
         <source>Remove from Favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Remove from Favorites</translation>
     </message>
     <message>
         <source>Simplify Contacts View</source>
-        <translation type="unfinished"></translation>
+        <translation>Simplify Contacts View</translation>
     </message>
 </context>
 </TS>

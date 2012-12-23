@@ -439,7 +439,7 @@ void StatusIcons::updateCustomIconMenu(const QStringList &APatterns)
 
 bool StatusIcons::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
+	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MUC_ITEM;
 	if (!ASelected.isEmpty())
 	{
 		foreach(IRosterIndex *index, ASelected)

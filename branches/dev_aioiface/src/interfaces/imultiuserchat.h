@@ -179,11 +179,13 @@ public:
 	virtual IMultiUserChat *multiUserChat() const =0;
 	virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0;
 	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
+	virtual void contextMenuForWindow(Menu *AMenu) =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000) =0;
 protected:
 	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
 	virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;
+	virtual void multiChatWindowContextMenu(Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
 };
 
@@ -211,6 +213,7 @@ protected:
 	virtual void multiChatWindowDestroyed(IMultiUserChatWindow *AWindow) =0;
 	virtual void multiChatRosterIndexCreated(IRosterIndex *AIndex) =0;
 	virtual void multiChatRosterIndexDestroyed(IRosterIndex *AIndex) =0;
+	virtual void multiChatWindowContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu) =0;
 };
 

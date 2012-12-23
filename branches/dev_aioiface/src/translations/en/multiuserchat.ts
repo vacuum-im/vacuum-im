@@ -240,14 +240,6 @@ Check values and try again</translation>
         <translation>Leave the conference when window closed</translation>
     </message>
     <message>
-        <source>Rejoin in chat room after kick</source>
-        <translation>Rejoin in chat room after kick</translation>
-    </message>
-    <message>
-        <source>Select the user to refer in the Bash style</source>
-        <translation>Select the user to refer in the Bash style</translation>
-    </message>
-    <message>
         <source>Add this suffix when referring to the user:</source>
         <translation>Add this suffix when referring to the user:</translation>
     </message>
@@ -452,10 +444,6 @@ Check values and try again</translation>
         <translation>Invite</translation>
     </message>
     <message>
-        <source>%1 as %2</source>
-        <translation>%1 as %2</translation>
-    </message>
-    <message>
         <source>Supports the multi-user conferences</source>
         <translation>Supports the multi-user conferences</translation>
     </message>
@@ -576,12 +564,49 @@ Check values and try again</translation>
         <translation>Enter a reason</translation>
     </message>
     <message>
-        <source>You are welcome here</source>
-        <translation>You are welcome here</translation>
-    </message>
-    <message>
         <source>Invite user</source>
         <translation>Invite user</translation>
+    </message>
+    <message>
+        <source>Open conference dialog</source>
+        <translation>Open conference dialog</translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <comment>Open conference dialog</comment>
+        <translation>Return</translation>
+    </message>
+    <message>
+        <source>Enter conference</source>
+        <translation>Enter conference</translation>
+    </message>
+    <message>
+        <source>Exit conference</source>
+        <translation>Exit conference</translation>
+    </message>
+    <message>
+        <source>Rejoin in conference after kick</source>
+        <translation>Rejoin in conference after kick</translation>
+    </message>
+    <message>
+        <source>Select the user to refer without menu</source>
+        <translation>Select the user to refer without menu</translation>
+    </message>
+    <message>
+        <source>Enter</source>
+        <translation>Enter</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Exit</translation>
+    </message>
+    <message>
+        <source>Open Conference Dialog</source>
+        <translation>Open Conference Dialog</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference!</source>
+        <translation>Please, enter this conference!</translation>
     </message>
 </context>
 <context>
@@ -627,18 +652,6 @@ Check values and try again</translation>
         <translation>Data form received</translation>
     </message>
     <message>
-        <source>Open chat dialog</source>
-        <translation>Open chat dialog</translation>
-    </message>
-    <message>
-        <source>Kick user</source>
-        <translation>Kick user</translation>
-    </message>
-    <message>
-        <source>Ban user</source>
-        <translation>Ban user</translation>
-    </message>
-    <message>
         <source>Change Role</source>
         <translation>Change Role</translation>
     </message>
@@ -679,56 +692,8 @@ Check values and try again</translation>
         <translation>Tools</translation>
     </message>
     <message>
-        <source>Change room nick</source>
-        <translation>Change room nick</translation>
-    </message>
-    <message>
-        <source>Invite to this room</source>
-        <translation>Invite to this room</translation>
-    </message>
-    <message>
-        <source>Request voice</source>
-        <translation>Request voice</translation>
-    </message>
-    <message>
-        <source>Clear chat window</source>
-        <translation>Clear chat window</translation>
-    </message>
-    <message>
         <source>Change topic</source>
         <translation>Change topic</translation>
-    </message>
-    <message>
-        <source>Edit ban list</source>
-        <translation>Edit ban list</translation>
-    </message>
-    <message>
-        <source>Edit members list</source>
-        <translation>Edit members list</translation>
-    </message>
-    <message>
-        <source>Edit administrators list</source>
-        <translation>Edit administrators list</translation>
-    </message>
-    <message>
-        <source>Edit owners list</source>
-        <translation>Edit owners list</translation>
-    </message>
-    <message>
-        <source>Configure room</source>
-        <translation>Configure room</translation>
-    </message>
-    <message>
-        <source>Destroy room</source>
-        <translation>Destroy room</translation>
-    </message>
-    <message>
-        <source>Enter room</source>
-        <translation>Enter room</translation>
-    </message>
-    <message>
-        <source>Exit room</source>
-        <translation>Exit room</translation>
     </message>
     <message>
         <source>Any occupant is allowed to see the user&apos;s full JID</source>
@@ -927,28 +892,12 @@ Check values and try again</translation>
         <translation>This room was destroyed by owner. %1</translation>
     </message>
     <message>
-        <source>Quote selected text</source>
-        <translation>Quote selected text</translation>
-    </message>
-    <message>
         <source>Failed to load history: %1</source>
         <translation>Failed to load history: %1</translation>
     </message>
     <message>
         <source>Change nick name</source>
         <translation>Change nick name</translation>
-    </message>
-    <message>
-        <source>Enter your new nick name in room %1</source>
-        <translation>Enter your new nick name in room %1</translation>
-    </message>
-    <message>
-        <source>Change subject</source>
-        <translation>Change subject</translation>
-    </message>
-    <message>
-        <source>Enter new subject for room %1</source>
-        <translation>Enter new subject for room %1</translation>
     </message>
     <message>
         <source>Invite user</source>
@@ -959,16 +908,8 @@ Check values and try again</translation>
         <translation>Enter user JID:</translation>
     </message>
     <message>
-        <source>You are welcome here</source>
-        <translation>You are welcome here</translation>
-    </message>
-    <message>
         <source>Enter a reason:</source>
         <translation>Enter a reason:</translation>
-    </message>
-    <message>
-        <source>Destroying room</source>
-        <translation>Destroying room</translation>
     </message>
     <message>
         <source>Kick reason</source>
@@ -993,6 +934,94 @@ Check values and try again</translation>
     <message>
         <source>Exit</source>
         <translation>Exit</translation>
+    </message>
+    <message>
+        <source>Open Chat Dialog</source>
+        <translation>Open Chat Dialog</translation>
+    </message>
+    <message>
+        <source>Kick User</source>
+        <translation>Kick User</translation>
+    </message>
+    <message>
+        <source>Ban User</source>
+        <translation>Ban User</translation>
+    </message>
+    <message>
+        <source>Change Nick</source>
+        <translation>Change Nick</translation>
+    </message>
+    <message>
+        <source>Change Topic</source>
+        <translation>Change Topic</translation>
+    </message>
+    <message>
+        <source>Invite to Conference</source>
+        <translation>Invite to Conference</translation>
+    </message>
+    <message>
+        <source>Request Voice</source>
+        <translation>Request Voice</translation>
+    </message>
+    <message>
+        <source>Clear Conference Window</source>
+        <translation>Clear Conference Window</translation>
+    </message>
+    <message>
+        <source>Edit Ban List</source>
+        <translation>Edit Ban List</translation>
+    </message>
+    <message>
+        <source>Edit Members List</source>
+        <translation>Edit Members List</translation>
+    </message>
+    <message>
+        <source>Edit Administrators List</source>
+        <translation>Edit Administrators List</translation>
+    </message>
+    <message>
+        <source>Edit Owners List</source>
+        <translation>Edit Owners List</translation>
+    </message>
+    <message>
+        <source>Configure Conference</source>
+        <translation>Configure Conference</translation>
+    </message>
+    <message>
+        <source>Destroy Conference</source>
+        <translation>Destroy Conference</translation>
+    </message>
+    <message>
+        <source>Enter conference</source>
+        <translation>Enter conference</translation>
+    </message>
+    <message>
+        <source>Exit conference</source>
+        <translation>Exit conference</translation>
+    </message>
+    <message>
+        <source>Clear Chat Window</source>
+        <translation>Clear Chat Window</translation>
+    </message>
+    <message>
+        <source>Quote Selected Text</source>
+        <translation>Quote Selected Text</translation>
+    </message>
+    <message>
+        <source>Enter your new nick name in conference %1</source>
+        <translation>Enter your new nick name in conference %1</translation>
+    </message>
+    <message>
+        <source>Enter new topic for conference %1</source>
+        <translation>Enter new topic for conference %1</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference!</source>
+        <translation>Please, enter this conference!</translation>
+    </message>
+    <message>
+        <source>Destroying conference</source>
+        <translation>Destroying conference</translation>
     </message>
 </context>
 </TS>

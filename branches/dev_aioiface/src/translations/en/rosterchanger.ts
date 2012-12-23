@@ -290,7 +290,7 @@
     </message>
     <message>
         <source>Add group</source>
-        <translation type="unfinished"></translation>
+        <translation>Add group</translation>
     </message>
 </context>
 <context>
