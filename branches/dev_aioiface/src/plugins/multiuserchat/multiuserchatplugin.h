@@ -5,6 +5,7 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/dataformtypes.h>
+#include <definitions/recentitemtypes.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/rosterindextypeorders.h>
@@ -41,6 +42,7 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
+#include <interfaces/irecentcontacts.h>
 #include <utils/widgetmanager.h>
 #include <utils/shortcuts.h>
 #include <utils/message.h>
@@ -66,10 +68,11 @@ class MultiUserChatPlugin :
 	public IMessageHandler,
 	public IDataLocalizer,
 	public IOptionsHolder,
-	public IRostersClickHooker
+	public IRostersClickHooker,
+	public IRecentItemHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsHolder IRostersClickHooker);
+	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsHolder IRostersClickHooker IRecentItemHandler);
 public:
 	MultiUserChatPlugin();
 	~MultiUserChatPlugin();
@@ -99,6 +102,12 @@ public:
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
 	virtual bool messageShowWindow(int AMessageId);
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
+	//IRecentItemHandler
+	virtual bool recentItemValid(const IRecentItem &AItem) const;
+	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
+	virtual QIcon recentItemIcon(const IRecentItem &AItem) const;
+	virtual QString recentItemName(const IRecentItem &AItem) const;
+	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IMultiUserChatPlugin
 	virtual IPluginManager *pluginManager() const;
 	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
@@ -122,9 +131,12 @@ signals:
 	void multiChatRosterIndexDestroyed(IRosterIndex *AIndex);
 	void multiChatWindowContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu);
 	void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
+	//IRecentItemHandler
+	void recentItemUpdated(const IRecentItem &AItem);
 protected:
 	void registerDiscoFeatures();
 	QString streamVCardNick(const Jid &AStreamJid) const;
+	void updateRecentItemProxy(IRosterIndex *AIndex);
 	void updateChatRosterIndex(IMultiUserChatWindow *AWindow);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
@@ -165,6 +177,7 @@ private:
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
 	IStatusIcons *FStatusIcons;
+	IRecentContacts *FRecentContacts;
 private:
 	QList<IMultiUserChat *> FChats;
 	QMap<int, Message> FActiveInvites;

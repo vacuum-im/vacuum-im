@@ -36,6 +36,7 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FMessageStyles = NULL;
 	FStatusChanger = NULL;
 	FMessageArchiver = NULL;
+	FRecentContacts = NULL;
 
 	FChatPlugin = AChatPlugin;
 	FMultiChat = AMultiChat;
@@ -208,6 +209,8 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				if (!AMessage.body().isEmpty())
 				{
 					displayed = true;
+					if (!AMessage.isDelayed())
+						updateRecentItemActiveTime();
 					if (FHistoryRequests.values().contains(NULL))
 						FPendingMessages[NULL].append(AMessage);
 					showUserMessage(AMessage,contactJid.resource());
@@ -219,6 +222,8 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				if (window)
 				{
 					displayed = true;
+					if (!AMessage.isDelayed())
+						updateRecentItemActiveTime();
 					if (FHistoryRequests.values().contains(window))
 						FPendingMessages[window].append(AMessage);
 					showChatMessage(window,AMessage);
@@ -275,7 +280,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 						notify.data.insert(NDR_POPUP_CAPTION,tr("Conference message"));
 					}
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
-					notify.data.insert(NDR_STREAM_JID,AMessage.to());
+					notify.data.insert(NDR_STREAM_JID,streamJid().full());
 					notify.data.insert(NDR_CONTACT_JID,contactJid.pBare());
 					notify.data.insert(NDR_ROSTER_ORDER,RNO_GROUPCHATMESSAGE);
 					notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
@@ -295,6 +300,10 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					notify.typeId = NNT_MUC_MESSAGE_PRIVATE;
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 					notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
+					notify.data.insert(NDR_STREAM_JID,streamJid().full());
+					notify.data.insert(NDR_CONTACT_JID,contactJid.pBare());
+					notify.data.insert(NDR_ROSTER_ORDER,RNO_GROUPCHATMESSAGE);
+					notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
 					notify.data.insert(NDR_POPUP_CAPTION,tr("Private message"));
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.uNode()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
@@ -668,6 +677,10 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IRecentContacts").value(0,NULL);
+	if (plugin)
+		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
 
@@ -923,6 +936,18 @@ void MultiUserChatWindow::loadWindowGeometry()
 		if (!restoreGeometry(Options::fileValue("muc.mucwindow.geometry",tabPageId()).toByteArray()))
 			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
 		restoreState(Options::fileValue("muc.mucwindow.state",tabPageId()).toByteArray());
+	}
+}
+
+void MultiUserChatWindow::updateRecentItemActiveTime()
+{
+	if (FRecentContacts)
+	{
+		IRecentItem recentItem;
+		recentItem.type = REIT_CONFERENCE;
+		recentItem.streamJid = streamJid();
+		recentItem.reference = roomJid().pBare();
+		FRecentContacts->setItemActiveTime(recentItem);
 	}
 }
 

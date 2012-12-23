@@ -453,7 +453,6 @@ QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &
 	{
 		QMultiMap<int, QVariant> findData;
 		findData.insertMulti(RDR_TYPE,RIT_CONTACT);
-		findData.insertMulti(RDR_TYPE,RIT_AGENT);
 		findData.insertMulti(RDR_PREP_BARE_JID,AItem.reference);
 		proxies =  sortItemProxies(root->findChilds(findData,true));
 	}
@@ -847,7 +846,7 @@ IRecentItem &RecentContacts::findRealItem(const IRecentItem &AItem)
 IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 {
 	IRecentItem item;
-	if (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT)
+	if (AIndex->type()==RIT_CONTACT)
 	{
 		item.type = REIT_CONTACT;
 		item.streamJid = AIndex->data(RDR_STREAM_JID).toString();
@@ -993,7 +992,7 @@ bool RecentContacts::isRecentSelectionAccepted(const QList<IRosterIndex *> AInde
 bool RecentContacts::isContactsSelectionAccepted(const QList<IRosterIndex *> AIndexes) const
 {
 	foreach(IRosterIndex *index, AIndexes)
-		if (index->type()!=RIT_CONTACT && index->type()!=RIT_AGENT)
+		if (index->type()!=RIT_CONTACT)
 			return false;
 	return true;
 }
@@ -1010,7 +1009,7 @@ void RecentContacts::setItemsFavorite(bool AFavorite, QStringList AIndexTypes, Q
 			item.type = ARecentTypes.value(index);
 			item.reference = ARefs.value(index);
 		}
-		else if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+		else if (indexType==RIT_CONTACT)
 		{
 			item.type = REIT_CONTACT;
 			item.reference = AContactsJids.value(index);

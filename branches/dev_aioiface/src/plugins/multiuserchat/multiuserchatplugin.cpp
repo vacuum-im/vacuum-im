@@ -29,6 +29,7 @@ MultiUserChatPlugin::MultiUserChatPlugin()
 	FXmppUriQueries = NULL;
 	FOptionsManager = NULL;
 	FStatusIcons = NULL;
+	FRecentContacts = NULL;
 }
 
 MultiUserChatPlugin::~MultiUserChatPlugin()
@@ -102,60 +103,63 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
 	}
 
-	if (FMessageWidgets)
+	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
+	if (plugin)
 	{
-		plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
-		if (plugin)
+		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+		if (FStatusIcons)
 		{
-			FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+			connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
 		}
+	}
 
-		plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
-		if (plugin)
+	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
+	if (plugin)
+	{
+		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
+	if (plugin)
+	{
+		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
 		{
-			FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-			if (FRostersViewPlugin)
-			{
-				connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-					SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-				connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-					SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			}
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
+	}
 
-		plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
-		if (plugin)
-		{
-			FNotifications = qobject_cast<INotifications *>(plugin->instance());
-		}
+	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
+	if (plugin)
+	{
+		FNotifications = qobject_cast<INotifications *>(plugin->instance());
+	}
 
-		plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
-		if (plugin)
-		{
-			FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
-		}
+	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
+	}
 
-		plugin = APluginManager->pluginInterface("IRegistration").value(0,NULL);
-		if (plugin)
+	plugin = APluginManager->pluginInterface("IRegistration").value(0,NULL);
+	if (plugin)
+	{
+		FRegistration = qobject_cast<IRegistration *>(plugin->instance());
+		if (FRegistration)
 		{
-			FRegistration = qobject_cast<IRegistration *>(plugin->instance());
-			if (FRegistration)
-			{
-				connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
-					SLOT(onRegisterFieldsReceived(const QString &, const IRegisterFields &)));
-				connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
-					SLOT(onRegisterErrorReceived(const QString &, const QString &)));
-			}
-		}
-
-		plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
-		if (plugin)
-		{
-			FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-			if (FStatusIcons)
-			{
-				connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
-			}
+			connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
+				SLOT(onRegisterFieldsReceived(const QString &, const IRegisterFields &)));
+			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
+				SLOT(onRegisterErrorReceived(const QString &, const QString &)));
 		}
 	}
 
@@ -221,7 +225,7 @@ bool MultiUserChatPlugin::initObjects()
 		privateType.order = NTO_MUC_PRIVATE_MESSAGE;
 		privateType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_PRIVATE_MESSAGE);
 		privateType.title = tr("When receiving a new private message in conference");
-		privateType.kindMask = INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+		privateType.kindMask = INotification::RosterNotify|INotification::TrayNotify|INotification::TrayAction|INotification::PopupWindow|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		privateType.kindDefs = privateType.kindMask & ~(INotification::AutoActivate);
 		FNotifications->registerNotificationType(NNT_MUC_MESSAGE_PRIVATE,privateType);
 
@@ -260,6 +264,11 @@ bool MultiUserChatPlugin::initObjects()
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWMUCDIALOG,FRostersViewPlugin->rostersView()->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_ENTERCONFERENCE,FRostersViewPlugin->rostersView()->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_EXITCONFERENCE,FRostersViewPlugin->rostersView()->instance());
+	}
+
+	if (FRecentContacts)
+	{
+		FRecentContacts->registerItemHandler(REIT_CONFERENCE,this);
 	}
 
 	return true;
@@ -311,19 +320,28 @@ bool MultiUserChatPlugin::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIn
 bool MultiUserChatPlugin::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder);
-	if (AEvent->modifiers()==Qt::NoModifier && AIndex->type()==RIT_MUC_ITEM)
+	if (AEvent->modifiers() == Qt::NoModifier)
 	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid roomJid = AIndex->data(RDR_PREP_BARE_JID).toString();
-		if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
+		IMultiUserChatWindow *window = NULL;
+		if (AIndex->type()==RIT_MUC_ITEM)
 		{
-			IMultiUserChatWindow *window = getMultiChatWindow(streamJid,roomJid,AIndex->data(RDR_MUC_NICK).toString(),AIndex->data(RDR_MUC_PASSWORD).toString());
-			if (window)
-			{
-				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
-					window->multiUserChat()->sendStreamPresence();
-				window->showTabPage();
-			}
+			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+			Jid roomJid = AIndex->data(RDR_PREP_BARE_JID).toString();
+			if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
+				window = getMultiChatWindow(streamJid,roomJid,AIndex->data(RDR_MUC_NICK).toString(),AIndex->data(RDR_MUC_PASSWORD).toString());
+		}
+		else if (AIndex->type()==RIT_RECENT_ITEM && AIndex->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE)
+		{
+			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+			Jid roomJid = AIndex->data(RDR_RECENT_REFERENCE).toString();
+			if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
+				window = getMultiChatWindow(streamJid,roomJid,streamJid.uNode(),QString::null);
+		}
+		if (window)
+		{
+			if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
+				window->multiUserChat()->sendStreamPresence();
+			window->showTabPage();
 		}
 	}
 	return false;
@@ -539,6 +557,36 @@ bool MultiUserChatPlugin::messageShowWindow(int AOrder, const Jid &AStreamJid, c
 	return false;
 }
 
+bool MultiUserChatPlugin::recentItemValid(const IRecentItem &AItem) const
+{
+	return !AItem.reference.isEmpty();
+}
+
+bool MultiUserChatPlugin::recentItemCanShow(const IRecentItem &AItem) const
+{
+	Q_UNUSED(AItem);
+	return true;
+}
+
+QIcon MultiUserChatPlugin::recentItemIcon(const IRecentItem &AItem) const
+{
+	return FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AItem.reference,IPresence::Offline,SUBSCRIPTION_BOTH,false) : QIcon();
+}
+
+QString MultiUserChatPlugin::recentItemName(const IRecentItem &AItem) const
+{
+	return AItem.reference;
+}
+
+QList<IRosterIndex *> MultiUserChatPlugin::recentItemProxyIndexes(const IRecentItem &AItem) const
+{
+	QList<IRosterIndex *> proxies;
+	IRosterIndex *index = findMultiChatRosterIndex(AItem.streamJid,AItem.reference);
+	if (index)
+		proxies.append(index);
+	return proxies;
+}
+
 IPluginManager *MultiUserChatPlugin::pluginManager() const
 {
 	return FPluginManager;
@@ -664,6 +712,7 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 			FChatIndexes.append(chatIndex);
 			FRostersModel->insertRosterIndex(chatIndex,chatGroup);
 			emit multiChatRosterIndexCreated(chatIndex);
+			updateRecentItemProxy(chatIndex);
 		}
 	}
 	return chatIndex;
@@ -766,6 +815,18 @@ QString MultiUserChatPlugin::streamVCardNick(const Jid &AStreamJid) const
 		vCard->unlock();
 	}
 	return nick;
+}
+
+void MultiUserChatPlugin::updateRecentItemProxy(IRosterIndex *AIndex)
+{
+	if (AIndex)
+	{
+		IRecentItem item;
+		item.type = REIT_CONFERENCE;
+		item.streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		item.reference = AIndex->data(RDR_PREP_BARE_JID).toString();
+		emit recentItemUpdated(item);
+	}
 }
 
 void MultiUserChatPlugin::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
@@ -894,6 +955,7 @@ void MultiUserChatPlugin::onRosterIndexDestroyed(IRosterIndex *AIndex)
 	{
 		FChatIndexes.removeAt(index);
 		emit multiChatRosterIndexDestroyed(AIndex);
+		updateRecentItemProxy(AIndex);
 	}
 }
 

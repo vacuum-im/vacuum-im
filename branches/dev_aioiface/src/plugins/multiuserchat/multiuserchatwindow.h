@@ -7,6 +7,7 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
+#include <definitions/recentitemtypes.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
@@ -30,6 +31,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
+#include <interfaces/irecentcontacts.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
@@ -124,6 +126,7 @@ protected:
 	void loadWindowState();
 	void saveWindowGeometry();
 	void loadWindowGeometry();
+	void updateRecentItemActiveTime();
 	void showDateSeparator(IViewWidget *AView, const QDateTime &ADateTime);
 	bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
 	void highlightUserRole(IMultiUser *AUser);
@@ -222,6 +225,7 @@ private:
 	IStatusChanger *FStatusChanger;
 	IMultiUserChat *FMultiChat;
 	IMultiUserChatPlugin *FChatPlugin;
+	IRecentContacts *FRecentContacts;
 private:
 	IViewWidget *FViewWidget;
 	IEditWidget *FEditWidget;
@@ -269,7 +273,6 @@ private:
 	QString FCompleteNickLast;
 	QList<QString> FCompleteNicks;
 	QList<QString>::const_iterator FCompleteIt;
-
 };
 
 #endif // MULTIUSERCHATWINDOW_H
