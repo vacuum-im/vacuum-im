@@ -46,8 +46,19 @@ void destroyLayoutRecursive(QLayout *ALayout)
 
 QString getSingleLineText(const QString &AText)
 {
+	static const QChar space(' ');
+	static const QChar lineBreak('\n');
+	static const QChar lineSep(QChar::LineSeparator);
+	static const QChar paragraphSep(QChar::ParagraphSeparator);
+
 	QString text = AText;
-	text.replace('\n',' ');
+	for (int i=0; i<text.size(); i++)
+	{
+		const QChar textChar = text.at(i);
+		if (textChar==lineBreak || textChar==lineSep || textChar==paragraphSep)
+			text[i] = space;
+	}
+
 	return text.trimmed();
 }
 
@@ -842,6 +853,8 @@ QStyleOptionViewItemV4 AdvancedItemDelegate::itemStyleOption(const AdvancedDeleg
 
 AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const AdvancedDelegateItems &AItems, const QStyleOptionViewItemV4 &AIndexOption) const
 {
+	static const Qt::Alignment layoutAlign = Qt::AlignLeft|Qt::AlignVCenter;
+
 	QStyle *style = AIndexOption.widget ? AIndexOption.widget->style() : QApplication::style();
 
 	const int vSpacing = FVerticalSpacing<0 ? style->proxy()->pixelMetric(QStyle::PM_FocusFrameVMargin)+1 : FVerticalSpacing;
@@ -853,6 +866,7 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 
 	layout->mainLayout = new QVBoxLayout;
 	layout->mainLayout->setSpacing(vSpacing);
+	layout->mainLayout->setAlignment(layoutAlign);
 
 	QMap<int, QMap<int, QMultiMap<int, AdvancedDelegateLayoutItem *> > > orderedItems;
 	for (AdvancedDelegateItems::const_iterator it = AItems.constBegin(); it!=AItems.constEnd(); ++it)
@@ -870,6 +884,7 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 			{
 				posLayout = new QVBoxLayout;
 				posLayout->setSpacing(vSpacing);
+				posLayout->setAlignment(layoutAlign);
 			}
 
 			QMap<int, QBoxLayout *> &floorLayouts = layout->floorLayouts[position];
@@ -878,6 +893,7 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 			{
 				floorLayout = new QHBoxLayout;
 				floorLayout->setSpacing(hSpacing);
+				floorLayout->setAlignment(layoutAlign);
 			}
 
 			AdvancedDelegateLayoutItem *item = new AdvancedDelegateLayoutItem(it.value(),itemOption);
@@ -896,6 +912,7 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 			{
 				layout->middleLayout = new QHBoxLayout;
 				layout->middleLayout->setSpacing(hSpacing);
+				layout->middleLayout->setAlignment(layoutAlign);
 				layout->mainLayout->addLayout(layout->middleLayout);
 			}
 			layout->middleLayout->addLayout(posLayout);
