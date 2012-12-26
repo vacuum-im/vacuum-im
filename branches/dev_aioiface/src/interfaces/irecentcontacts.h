@@ -49,7 +49,7 @@ class IRecentContacts
 {
 public:
 	virtual QObject *instance() = 0;
-	virtual bool isItemValid(const IRecentItem &AItem) const =0;
+	virtual bool isValidItem(const IRecentItem &AItem) const =0;
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const =0;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const =0;
 	virtual QVariant itemProperty(const IRecentItem &AItem, const QString &AName) const =0;

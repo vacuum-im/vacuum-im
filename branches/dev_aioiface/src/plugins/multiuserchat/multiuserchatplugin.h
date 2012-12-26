@@ -29,10 +29,7 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ixmppstreams.h>
-#include <interfaces/istanzaprocessor.h>
 #include <interfaces/ipresence.h>
-#include <interfaces/imainwindow.h>
-#include <interfaces/itraymanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/idataforms.h>

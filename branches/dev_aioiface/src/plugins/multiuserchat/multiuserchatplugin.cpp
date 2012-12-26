@@ -725,8 +725,10 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 			chatIndex->setData(RDR_PREP_BARE_JID,ARoomJid.pBare());
 
 			IMultiUserChatWindow *window = multiChatWindow(AStreamJid,ARoomJid);
-			if (!window)
+			if (window==NULL)
 			{
+				if (FStatusIcons)
+					chatIndex->setData(Qt::DecorationRole,FStatusIcons->iconByJidStatus(ARoomJid,IPresence::Offline,SUBSCRIPTION_BOTH,false));
 				chatIndex->setData(RDR_STATUS,QString());
 				chatIndex->setData(RDR_SHOW,IPresence::Offline);
 				chatIndex->setData(RDR_NAME,ARoomJid.uBare());

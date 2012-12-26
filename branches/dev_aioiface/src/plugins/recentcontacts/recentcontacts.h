@@ -61,7 +61,7 @@ public:
 	virtual IRecentItem recentItemForIndex(const IRosterIndex *AIndex) const;
 	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IRecentContacts
-	virtual bool isItemValid(const IRecentItem &AItem) const;
+	virtual bool isValidItem(const IRecentItem &AItem) const;
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const;
 	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const;
 	virtual QVariant itemProperty(const IRecentItem &AItem, const QString &AName) const;

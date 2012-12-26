@@ -63,7 +63,7 @@
      </column>
      <column>
       <property name="text">
-       <string notr="true">Hidden</string>
+       <string notr="true">Sort</string>
       </property>
       <property name="toolTip">
        <string notr="true"/>

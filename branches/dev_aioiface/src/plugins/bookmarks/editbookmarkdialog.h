@@ -10,7 +10,7 @@ class EditBookmarkDialog :
 {
 	Q_OBJECT;
 public:
-	EditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent = NULL);
+	EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent = NULL);
 	~EditBookmarkDialog();
 protected slots:
 	void onGroupBoxClicked(bool AChecked);
@@ -18,7 +18,7 @@ protected slots:
 private:
 	Ui::EditBookmarkDialogClass ui;
 private:
-	IBookMark *FBookmark;
+	IBookmark *FBookmark;
 };
 
 #endif // EDITBOOKMARKDIALOG_H

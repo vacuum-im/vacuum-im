@@ -18,6 +18,7 @@
 #define AG_RVCM_STATUSCHANGER                                   300
 #define AG_RVCM_RCHANGER_ADD_CONTACT                            300
 #define AG_RVCM_GATEWAYS_ADD_LEGACY_USER                        300
+#define AG_RVCM_BOOKMARS_MENU                                   350
 #define AG_RVCM_CLIENTINFO                                      400
 #define AG_RVCM_DISCOVERY_FEATURES                              400
 #define AG_RVCM_MULTIUSERCHAT_JOIN                              500
@@ -29,6 +30,7 @@
 #define AG_RVCM_PRIVACYLISTS                                    500
 #define AG_RVCM_STATUSICONS                                     500
 #define AG_RVCM_RECENT_FAVORITES                                600
+#define AG_RVCM_BOOKMARS_TOOLS                                  600
 #define AG_RVCM_MULTIUSERCHAT_COMMON                            650
 #define AG_RVCM_ACCOUNTMANAGER                                  700
 #define AG_RVCM_RCHANGER                                        700
@@ -45,10 +47,7 @@
 #define AG_TMTM_NOTIFICATIONS_MENU                              300
 #define AG_TMTM_STATUSCHANGER                                   400
 #define AG_TMTM_OPTIONS                                         500
-#define AG_TMTM_SKINMANAGER                                     500
 #define AG_TMTM_DISCOVERY                                       500
-#define AG_TMTM_MULTIUSERCHAT                                   500
-#define AG_TMTM_BOOKMARKS                                       500
 #define AG_TMTM_FILESTREAMSMANAGER                              500
 #define AG_TMTM_TRAYMANAGER                                     1000
 
@@ -77,9 +76,8 @@
 #define AG_MUCM_MULTIUSERCHAT_UTILS                             800
 
 //Bookmarks - BookmarksMenu
-#define AG_BMM_BOOKMARKS_STREAMS                                500
+#define AG_BBM_BOOKMARKS_TOOLS                                  500
 #define AG_BMM_BOOKMARKS_ITEMS                                  700
-#define AG_BBM_BOOKMARKS_TOOLS                                  900
 
 //ViewWidget - ContextMenu
 #define AG_VWCM_MESSAGEWIDGETS_URL                              300

@@ -10,34 +10,32 @@
 #define ADR_DISCO_JID           Action::DR_Parametr2
 #define ADR_DISCO_NODE          Action::DR_Parametr3
 #define ADR_DISCO_NAME          Action::DR_Parametr4
-#define ADR_GROUP_SHIFT         Action::DR_Parametr1
 
 #define FIRST_START_TIMEOUT     1000
 #define NEXT_START_TIMEOUT      500
 
-BookMarks::BookMarks()
+Bookmarks::Bookmarks()
 {
 	FPrivateStorage = NULL;
-	FTrayManager = NULL;
-	FMainWindowPlugin = NULL;
 	FAccountManager = NULL;
 	FMultiChatPlugin = NULL;
 	FXmppUriQueries = NULL;
 	FDiscovery = NULL;
 	FOptionsManager = NULL;
-
-	FBookMarksMenu = NULL;
+	FRostersModel = NULL;
+	FRostersView = NULL;
+	FRostersViewPlugin = NULL;
 
 	FStartTimer.setSingleShot(true);
 	connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
 }
 
-BookMarks::~BookMarks()
+Bookmarks::~Bookmarks()
 {
-	delete FBookMarksMenu;
+
 }
 
-void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
+void Bookmarks::pluginInfo(IPluginInfo *APluginInfo)
 {
 	APluginInfo->name = tr("Bookmarks");
 	APluginInfo->description = tr("Allows to create bookmarks at the jabber conference and web pages");
@@ -47,8 +45,10 @@ void BookMarks::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(PRIVATESTORAGE_UUID);
 }
 
-bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IPrivateStorage").value(0,NULL);
 	if (plugin)
 	{
@@ -56,12 +56,10 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 		if (FPrivateStorage)
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorageOpened(const Jid &)));
-			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-				SLOT(onPrivateDataError(const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onPrivateDataLoadedSaved(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataUpdated(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
-				SLOT(onPrivateDataLoadedSaved(const QString &, const Jid &, const QDomElement &)));
+				SLOT(onPrivateDataUpdated(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataRemoved(const QString &, const Jid &, const QDomElement &)),
 				SLOT(onPrivateDataRemoved(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
@@ -85,14 +83,6 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
-	if (plugin)
-		FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
-
-	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
-	if (plugin)
-		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
 	if (plugin)
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
@@ -109,46 +99,54 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0, NULL);
 	if (plugin)
-	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+
+	plugin = APluginManager->pluginInterface("IRostersModel").value(0, NULL);
+	if (plugin)
+		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+
+	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0, NULL);
+	if (plugin)
+	{
+		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			FRostersView = FRostersViewPlugin->rostersView();
+			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+			connect(FRostersView->instance(), SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)),
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)));
+		}
 	}
 
 	return FPrivateStorage!=NULL;
 }
 
-bool BookMarks::initObjects()
+bool Bookmarks::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_MUC_BOOKMARK, tr("Edit bookmark"), QKeySequence::UnknownKey);
 
-	FBookMarksMenu = new Menu;
-	FBookMarksMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
-	FBookMarksMenu->setTitle(tr("Bookmarks"));
-	FBookMarksMenu->menuAction()->setEnabled(false);
-	FBookMarksMenu->menuAction()->setData(ADR_GROUP_SHIFT,1);
-
-	if (FTrayManager)
-	{
-		FTrayManager->contextMenu()->addAction(FBookMarksMenu->menuAction(),AG_TMTM_BOOKMARKS,true);
-	}
-	if (FMainWindowPlugin)
-	{
-		ToolBarChanger *changer = FMainWindowPlugin->mainWindow()->topToolBarChanger();
-		QToolButton *button = changer->insertAction(FBookMarksMenu->menuAction(),TBG_MWTTB_BOOKMARKS);
-		button->setPopupMode(QToolButton::InstantPopup);
-	}
 	if (FOptionsManager)
+	{
 		FOptionsManager->insertOptionsHolder(this);
+	}
+
+	if (FRostersModel)
+	{
+		FRostersModel->insertDefaultDataHolder(this);
+	}
+
 	return true;
 }
 
-bool BookMarks::initSettings()
+bool Bookmarks::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_IGNOREAUTOJOIN, false);
 	Options::setDefaultValue(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED,false);
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> BookMarks::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsWidget *> Bookmarks::optionsWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
@@ -167,56 +165,94 @@ QMultiMap<int, IOptionsWidget *> BookMarks::optionsWidgets(const QString &ANodeI
 	return widgets;
 }
 
-QString BookMarks::addBookmark(const Jid &AStreamJid, const IBookMark &ABookmark)
+int Bookmarks::rosterDataOrder() const
 {
-	if (!ABookmark.name.isEmpty())
+	return RDHO_BOOKMARKS;
+}
+
+QList<int> Bookmarks::rosterDataRoles() const
+{
+	static const QList<int> dataRoles = QList<int>() << RDR_NAME << RDR_MUC_NICK << RDR_MUC_PASSWORD;
+	return dataRoles;
+}
+
+QList<int> Bookmarks::rosterDataTypes() const
+{
+	static const QList<int> dataTypes = QList<int>() << RIT_MUC_ITEM;
+	return dataTypes;
+}
+
+QVariant Bookmarks::rosterData(const IRosterIndex *AIndex, int ARole) const
+{
+	if (AIndex->type() == RIT_MUC_ITEM)
 	{
-		QList<IBookMark> bookmarkList = bookmarks(AStreamJid);
+		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
+		const IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(index);
+		switch (ARole)
+		{
+		case RDR_NAME:
+			return !bookmark.name.isEmpty() ? QVariant(bookmark.name) : QVariant();
+		case RDR_MUC_NICK:
+			return !bookmark.conference.nick.isEmpty() ? QVariant(bookmark.conference.nick) : QVariant();
+		case RDR_MUC_PASSWORD:
+			return !bookmark.conference.password.isEmpty() ? QVariant(bookmark.conference.password) : QVariant();
+		default:
+			break;
+		}
+	}
+	return QVariant();
+}
+
+bool Bookmarks::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+{
+	Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
+	return false;
+}
+
+bool Bookmarks::isValidBookmark(const IBookmark &ABookmark) const
+{
+	if (ABookmark.type == IBookmark::Url)
+		return ABookmark.url.url.isValid();
+	if (ABookmark.type == IBookmark::Conference)
+		return ABookmark.conference.roomJid.isValid();
+	return false;
+}
+
+QList<IBookmark> Bookmarks::bookmarks(const Jid &AStreamJid) const
+{
+	return FBookmarks.value(AStreamJid);
+}
+
+bool Bookmarks::addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark)
+{
+	if (isValidBookmark(ABookmark))
+	{
+		QList<IBookmark> bookmarkList = bookmarks(AStreamJid);
 		bookmarkList.append(ABookmark);
 		return setBookmarks(AStreamJid,bookmarkList);
 	}
-	return QString::null;
+	return false;
 }
 
-QString BookMarks::setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &ABookmarks)
+bool Bookmarks::setBookmarks(const Jid &AStreamJid, const QList<IBookmark> &ABookmarks)
 {
 	QDomDocument doc;
 	doc.appendChild(doc.createElement("bookmarks"));
 	QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(NS_STORAGE_BOOKMARKS,PST_BOOKMARKS)).toElement();
-	foreach(IBookMark bookmark, ABookmarks)
-	{
-		if (!bookmark.name.isEmpty())
-		{
-			if (!bookmark.conference.isEmpty())
-			{
-				QDomElement markElem = elem.appendChild(doc.createElement("conference")).toElement();
-				markElem.setAttribute("jid",bookmark.conference);
-				markElem.setAttribute("name",bookmark.name);
-				markElem.setAttribute("autojoin",QVariant(bookmark.autojoin).toString());
-				markElem.appendChild(doc.createElement("nick")).appendChild(doc.createTextNode(bookmark.nick));
-				if (!bookmark.password.isEmpty())
-					markElem.appendChild(doc.createElement("password")).appendChild(doc.createTextNode(bookmark.password));
-			}
-			else if (!bookmark.url.isEmpty())
-			{
-				QDomElement markElem = elem.appendChild(doc.createElement("url")).toElement();
-				markElem.setAttribute("name",bookmark.name);
-				markElem.setAttribute("url",bookmark.url);
-			}
-		}
-	}
-	return FPrivateStorage->saveData(AStreamJid,elem);
+	saveBookmarksToXML(elem,ABookmarks);
+	return !FPrivateStorage->saveData(AStreamJid,elem).isEmpty();
 }
 
-int BookMarks::execEditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) const
+int Bookmarks::execEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) const
 {
 	EditBookmarkDialog *dialog = new EditBookmarkDialog(ABookmark,AParent);
 	return dialog->exec();
 }
 
-void BookMarks::showEditBookmarksDialog(const Jid &AStreamJid)
+void Bookmarks::showEditBookmarksDialog(const Jid &AStreamJid)
 {
-	if (FBookMarks.contains(AStreamJid))
+	if (FBookmarks.contains(AStreamJid))
 	{
 		EditBookmarksDialog *dialog = FDialogs.value(AStreamJid,NULL);
 		if (!dialog)
@@ -229,185 +265,251 @@ void BookMarks::showEditBookmarksDialog(const Jid &AStreamJid)
 	}
 }
 
-void BookMarks::updateBookmarksMenu()
+void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 {
-	bool enabled = false;
-	QList<Action *> actionList = FBookMarksMenu->groupActions();
-	for (int i=0; !enabled && i<actionList.count(); i++)
-		enabled = actionList.at(i)->isVisible();
-	FBookMarksMenu->menuAction()->setEnabled(enabled);
-}
-
-void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark, bool AShowWindow)
-{
-	if (!ABookmark.conference.isEmpty())
+	if (FMultiChatPlugin)
 	{
-		Jid roomJid = ABookmark.conference;
-		IMultiUserChatWindow *window = FMultiChatPlugin!=NULL ? FMultiChatPlugin->getMultiChatWindow(AStreamJid,roomJid,ABookmark.nick,ABookmark.password) : NULL;
-		if (window)
+		QSet<IBookmark> newBookmarks = FBookmarks.value(AStreamJid).toSet();
+		QSet<IBookmark> curBookarks = FBookmarkIndexes.value(AStreamJid).values().toSet();
+		QSet<IBookmark> removeBookmarks = curBookarks - newBookmarks;
+
+		foreach(IBookmark bookmark, newBookmarks)
 		{
-			if (AShowWindow)
-				window->showTabPage();
-			if (!window->multiUserChat()->isConnected())
-				window->multiUserChat()->sendStreamPresence();
+			if (bookmark.type == IBookmark::Conference)
+			{
+				IRosterIndex *index = FMultiChatPlugin->getMultiChatRosterIndex(AStreamJid,bookmark.conference.roomJid,bookmark.conference.nick,bookmark.conference.password);
+				connect(index->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)),Qt::UniqueConnection);
+				FBookmarkIndexes[AStreamJid].insert(index,bookmark);
+				emit rosterDataChanged(index);
+			}
+		}
+
+		foreach(IBookmark bookmark, removeBookmarks)
+		{
+			IRosterIndex *index = FBookmarkIndexes.value(AStreamJid).key(bookmark);
+			IMultiUserChatWindow *window = FMultiChatPlugin->multiChatWindow(AStreamJid,bookmark.conference.roomJid);
+			if (window == NULL)
+			{
+				index->instance()->disconnect(this);
+				index->instance()->deleteLater();
+			}
+			FBookmarkIndexes[AStreamJid].remove(index);
 		}
 	}
-	else if (!ABookmark.url.isEmpty())
+}
+
+QList<IBookmark> Bookmarks::loadBookmarksFromXML(const QDomElement &AElement) const
+{
+	QList<IBookmark> bookmarkList;
+
+	QDomElement elem = AElement.firstChildElement();
+	while (!elem.isNull())
 	{
-		if (FXmppUriQueries && ABookmark.url.startsWith("xmpp:",Qt::CaseInsensitive))
-			FXmppUriQueries->openXmppUri(AStreamJid, ABookmark.url);
-		else
-			QDesktopServices::openUrl(ABookmark.url);
+		if (elem.tagName() == "conference")
+		{
+			IBookmark bookmark;
+			bookmark.type = IBookmark::Conference;
+			bookmark.name = elem.attribute("name","conference");
+			bookmark.conference.roomJid = elem.attribute("jid");
+			bookmark.conference.autojoin = QVariant(elem.attribute("autojoin")).toBool();
+			bookmark.conference.nick = elem.firstChildElement("nick").text();
+			bookmark.conference.password = elem.firstChildElement("password").text();
+			bookmark.name = bookmark.name.isEmpty() ? bookmark.conference.roomJid.uBare() : bookmark.name;
+			bookmarkList.append(bookmark);
+		}
+		else if (elem.tagName() == "url")
+		{
+			IBookmark bookmark;
+			bookmark.type = IBookmark::Url;
+			bookmark.name = elem.attribute("name","url");
+			bookmark.url.url = elem.attribute("url");
+			bookmark.name = bookmark.name.isEmpty() ? bookmark.url.url.host() : bookmark.name;
+			bookmarkList.append(bookmark);
+		}
+		elem = elem.nextSiblingElement();
+	}
+
+	return bookmarkList;
+}
+
+void Bookmarks::saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const
+{
+	foreach(IBookmark bookmark, ABookmarks)
+	{
+		if (bookmark.type == IBookmark::Conference)
+		{
+			QDomElement markElem = AElement.appendChild(AElement.ownerDocument().createElement("conference")).toElement();
+			markElem.setAttribute("name",bookmark.name);
+			markElem.setAttribute("jid",bookmark.conference.roomJid.bare());
+			markElem.setAttribute("autojoin",QVariant(bookmark.conference.autojoin).toString());
+			markElem.appendChild(AElement.ownerDocument().createElement("nick")).appendChild(AElement.ownerDocument().createTextNode(bookmark.conference.nick));
+			if (!bookmark.conference.password.isEmpty())
+				markElem.appendChild(AElement.ownerDocument().createElement("password")).appendChild(AElement.ownerDocument().createTextNode(bookmark.conference.password));
+		}
+		else if (bookmark.type == IBookmark::Url)
+		{
+			QDomElement markElem = AElement.appendChild(AElement.ownerDocument().createElement("url")).toElement();
+			markElem.setAttribute("name",bookmark.name);
+			markElem.setAttribute("url",bookmark.url.url.toString());
+		}
 	}
 }
 
-void BookMarks::onPrivateStorageOpened(const Jid &AStreamJid)
+void Bookmarks::startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark, bool AShowWindow)
+{
+	if (isValidBookmark(ABookmark))
+	{
+		if (FMultiChatPlugin && ABookmark.type==IBookmark::Conference)
+		{
+			IMultiUserChatWindow *window = FMultiChatPlugin->getMultiChatWindow(AStreamJid,ABookmark.conference.roomJid,ABookmark.conference.nick,ABookmark.conference.password);
+			if (window)
+			{
+				if (AShowWindow)
+					window->showTabPage();
+				if (!window->multiUserChat()->isConnected())
+					window->multiUserChat()->sendStreamPresence();
+			}
+		}
+		else if (ABookmark.type == IBookmark::Url)
+		{
+			if (FXmppUriQueries && ABookmark.url.url.scheme()=="xmpp")
+				FXmppUriQueries->openXmppUri(AStreamJid, ABookmark.url.url);
+			else
+				QDesktopServices::openUrl(ABookmark.url.url);
+		}
+	}
+}
+
+void Bookmarks::onPrivateStorageOpened(const Jid &AStreamJid)
 {
 	FPrivateStorage->loadData(AStreamJid,PST_BOOKMARKS,NS_STORAGE_BOOKMARKS);
 }
 
-void BookMarks::onPrivateDataError(const QString &AId, const QString &AError)
+void Bookmarks::onPrivateDataUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
-	emit bookmarksError(AId,AError);
-}
-
-void BookMarks::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
-{
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-	bool ignoreAutoJoin = account && account->optionsNode().value("ignore-autojoin").toBool();
-
+	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
-		QList<IBookMark> &streamBookmarks = FBookMarks[AStreamJid];
-		Menu *streamMenu = FStreamMenu.value(AStreamJid,NULL);
-		int groupShift = streamMenu!=NULL ? streamMenu->menuAction()->data(ADR_GROUP_SHIFT).toInt() : FBookMarksMenu->menuAction()->data(ADR_GROUP_SHIFT).toInt();
-		if (!streamMenu)
-		{
-			streamMenu = new Menu(FBookMarksMenu);
-			streamMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
-			IAccount *account = FAccountManager->accountByStream(AStreamJid);
-			if (account)
-			{
-				connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
-				streamMenu->setTitle(account->name());
-			}
-			else
-			{
-				streamMenu->setTitle(AStreamJid.uFull());
-			}
-			streamMenu->menuAction()->setData(ADR_GROUP_SHIFT,groupShift);
+		FBookmarks[AStreamJid] = loadBookmarksFromXML(AElement);
 
-			Action *action = new Action(streamMenu);
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
-			action->setText(tr("Edit bookmarks"));
-			action->setData(ADR_STREAM_JID,AStreamJid.full());
-			connect(action,SIGNAL(triggered(bool)),SLOT(onEditBookmarksActionTriggered(bool)));
-			streamMenu->addAction(action,AG_BBM_BOOKMARKS_TOOLS,true);
-
-			FStreamMenu.insert(AStreamJid,streamMenu);
-			FBookMarksMenu->addAction(streamMenu->menuAction(),AG_BMM_BOOKMARKS_STREAMS,false);
-			FBookMarksMenu->menuAction()->setData(ADR_GROUP_SHIFT,groupShift+1);
-		}
-		else
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		if (account==NULL || !account->optionsNode().value("ignore-autojoin").toBool())
 		{
-			qDeleteAll(streamMenu->groupActions(AG_BMM_BOOKMARKS_ITEMS));
-			qDeleteAll(FBookMarksMenu->groupActions(AG_BMM_BOOKMARKS_ITEMS + groupShift));
-			streamBookmarks.clear();
-		}
-
-		QDomElement elem = AElement.firstChildElement();
-		while (!elem.isNull())
-		{
-			IBookMark bookmark;
-			if (elem.tagName() == "conference")
+			foreach(const IBookmark &bookmark, FBookmarks.value(AStreamJid))
 			{
-				bookmark.name = elem.attribute("name","conference");
-				bookmark.conference = elem.attribute("jid");
-				bookmark.autojoin = QVariant(elem.attribute("autojoin")).toBool();
-				bookmark.nick = elem.firstChildElement("nick").text();
-				bookmark.password = elem.firstChildElement("password").text();
-				streamBookmarks.append(bookmark);
-				if (bookmark.autojoin && !ignoreAutoJoin)
+				if (bookmark.type==IBookmark::Conference && bookmark.conference.autojoin)
 				{
-					FPendingBookMarks.insertMulti(AStreamJid,bookmark);
+					FPendingBookmarks.insertMulti(AStreamJid,bookmark);
 					FStartTimer.start(FIRST_START_TIMEOUT);
+				}
 			}
-			}
-			else if (elem.tagName() == "url")
-			{
-				bookmark.name = elem.attribute("name","url");
-				bookmark.url = elem.attribute("url");
-				streamBookmarks.append(bookmark);
-			}
-			if (!bookmark.name.isEmpty())
-			{
-				Action *action = new Action(streamMenu);
-				action->setIcon(RSR_STORAGE_MENUICONS ,bookmark.conference.isEmpty() ? MNI_BOOKMARKS_URL : MNI_BOOKMARKS_ROOM);
-				action->setText(bookmark.name);
-				action->setData(ADR_STREAM_JID,AStreamJid.full());
-				action->setData(ADR_BOOKMARK_INDEX,streamBookmarks.count()-1);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onBookmarkActionTriggered(bool)));
-				streamMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS,false);
-				FBookMarksMenu->addAction(action,AG_BMM_BOOKMARKS_ITEMS + groupShift,false);
-			}
-			elem = elem.nextSiblingElement();
 		}
-		updateBookmarksMenu();
-		emit bookmarksUpdated(AId,AStreamJid,AElement);
+
+		updateConferenceIndexes(AStreamJid);
+		emit bookmarksChanged(AStreamJid);
 	}
 }
 
-void BookMarks::onPrivateDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
+void Bookmarks::onPrivateDataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
+	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
-		if (FStreamMenu.contains(AStreamJid))
-		{
-			qDeleteAll(FStreamMenu[AStreamJid]->groupActions(AG_BMM_BOOKMARKS_ITEMS));
-			FBookMarks[AStreamJid].clear();
-			FPendingBookMarks.remove(AStreamJid);
-		}
-		updateBookmarksMenu();
-		emit bookmarksUpdated(AId,AStreamJid,AElement);
+		FBookmarks[AStreamJid].clear();
+		FPendingBookmarks.remove(AStreamJid);
+		updateConferenceIndexes(AStreamJid);
+		emit bookmarksChanged(AStreamJid);
 	}
 }
 
-void BookMarks::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
+void Bookmarks::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
 	if (ATagName==PST_BOOKMARKS && ANamespace==NS_STORAGE_BOOKMARKS)
-	{
 		FPrivateStorage->loadData(AStreamJid,PST_BOOKMARKS,NS_STORAGE_BOOKMARKS);
+}
+
+void Bookmarks::onPrivateStorageClosed(const Jid &AStreamJid)
+{
+	delete FDialogs.take(AStreamJid);
+	FBookmarks.remove(AStreamJid);
+	FPendingBookmarks.remove(AStreamJid);
+	updateConferenceIndexes(AStreamJid);
+	FBookmarkIndexes.remove(AStreamJid);
+}
+
+void Bookmarks::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+{
+	Q_UNUSED(ASelected); Q_UNUSED(AAccepted);
+}
+
+void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+{
+	if (ALabelId==AdvancedDelegateItem::DisplayId)
+	{
+		IRosterIndex *index = AIndexes.value(0);
+		Jid streamJid = index->data(RDR_STREAM_JID).toString();
+		if (!FRostersView->hasMultiSelection() && index->type()==RIT_STREAM_ROOT && FBookmarks.contains(streamJid))
+		{
+			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+			if (!bookmarkList.isEmpty())
+			{
+				Menu *streamMenu = new Menu(AMenu);
+				streamMenu->setTitle(tr("Bookmarks"));
+				streamMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
+
+				for(int index=0; index<bookmarkList.count(); index++)
+				{
+					const IBookmark &bookmark = bookmarkList.at(index);
+					if (isValidBookmark(bookmark) && !bookmark.name.isEmpty())
+					{
+						Action *startAction = new Action(streamMenu);
+						startAction->setIcon(RSR_STORAGE_MENUICONS,bookmark.type==IBookmark::Url ? MNI_BOOKMARKS_URL : MNI_BOOKMARKS_ROOM);
+						startAction->setText(bookmark.name.size()>33 ? bookmark.name.left(30)+"..." : bookmark.name);
+						startAction->setData(ADR_STREAM_JID,streamJid.full());
+						startAction->setData(ADR_BOOKMARK_INDEX,index);
+						connect(startAction,SIGNAL(triggered(bool)),SLOT(onStartBookmarkActionTriggered(bool)));
+						streamMenu->addAction(startAction,AG_BMM_BOOKMARKS_ITEMS);
+					}
+				}
+				AMenu->addAction(streamMenu->menuAction(),AG_RVCM_BOOKMARS_MENU);
+			}
+
+			Action *editAction = new Action(AMenu);
+			editAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
+			editAction->setText(tr("Edit Bookmarks"));
+			editAction->setData(ADR_STREAM_JID,streamJid.full());
+			connect(editAction,SIGNAL(triggered(bool)),SLOT(onEditBookmarksActionTriggered(bool)));
+			AMenu->addAction(editAction,AG_RVCM_BOOKMARS_MENU);
+		}
 	}
 }
 
-void BookMarks::onPrivateStorageClosed(const Jid &AStreamJid)
+void Bookmarks::onRosterIndexDestroyed(IRosterIndex *AIndex)
 {
-	delete FDialogs.take(AStreamJid);
-	delete FStreamMenu.take(AStreamJid);
-	FBookMarks.remove(AStreamJid);
-	FPendingBookMarks.remove(AStreamJid);
-	updateBookmarksMenu();
+	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+	if (FBookmarks.contains(streamJid))
+		FBookmarkIndexes[streamJid].remove(AIndex);
 }
 
-void BookMarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
+void Bookmarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 {
 	Action *action = new Action(AWindow->instance());
-	action->setText(tr("Append to bookmarks"));
+	action->setText(tr("Append to Bookmarks"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
 	action->setShortcutId(SCT_MESSAGEWINDOWS_MUC_BOOKMARK);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onAddRoomBookmarkActionTriggered(bool)));
 	AWindow->toolBarWidget()->toolBarChanger()->insertAction(action, TBG_MCWTBW_BOOKMARKS);
 }
 
-void BookMarks::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
+void Bookmarks::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
 {
 	connect(AWindow->instance(),SIGNAL(indexContextMenu(const QModelIndex &, Menu *)),SLOT(onDiscoIndexContextMenu(const QModelIndex &, Menu *)));
 }
 
-void BookMarks::onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu)
+void Bookmarks::onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu)
 {
 	Action *action = new Action(AMenu);
-	action->setText(tr("Append to bookmarks"));
+	action->setText(tr("Append to Bookmarks"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
 	action->setData(ADR_STREAM_JID,AIndex.data(DIDR_STREAM_JID));
 	action->setData(ADR_DISCO_JID,AIndex.data(DIDR_JID));
@@ -417,19 +519,19 @@ void BookMarks::onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu)
 	AMenu->addAction(action, TBG_DIWT_DISCOVERY_ACTIONS, true);
 }
 
-void BookMarks::onBookmarkActionTriggered(bool)
+void Bookmarks::onStartBookmarkActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		int index = action->data(ADR_BOOKMARK_INDEX).toInt();
-		IBookMark bookmark = FBookMarks.value(streamJid).value(index);
+		IBookmark bookmark = FBookmarks.value(streamJid).value(index);
 		startBookmark(streamJid,bookmark,true);
 	}
 }
 
-void BookMarks::onAddRoomBookmarkActionTriggered(bool)
+void Bookmarks::onAddRoomBookmarkActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
@@ -439,35 +541,34 @@ void BookMarks::onAddRoomBookmarkActionTriggered(bool)
 		{
 			if (FPrivateStorage && FPrivateStorage->isOpen(window->streamJid()))
 			{
-				QList<IBookMark> bookmarkList = bookmarks(window->streamJid());
+				QList<IBookmark> bookmarkList = bookmarks(window->streamJid());
 
 				int index = 0;
-				while (index<bookmarkList.count() && window->roomJid()!=bookmarkList.at(index).conference)
+				while (index<bookmarkList.count() && window->roomJid()!=bookmarkList.at(index).conference.roomJid)
 					index++;
 
 				if (index == bookmarkList.count())
-					bookmarkList.append(IBookMark());
+					bookmarkList.append(IBookmark());
 
-				IBookMark &bookmark = bookmarkList[index];
-				if (bookmark.conference.isEmpty())
+				IBookmark &bookmark = bookmarkList[index];
+				if (bookmark.type == IBookmark::None)
 				{
-					bookmark.name = window->roomJid().uBare();
-					bookmark.conference = window->roomJid().bare();
-					bookmark.nick = window->multiUserChat()->nickName();
-					bookmark.password = window->multiUserChat()->password();
-					bookmark.autojoin = false;
+					bookmark.type = IBookmark::Conference;
+					bookmark.name = window->multiUserChat()->roomName();
+					bookmark.conference.roomJid = window->roomJid();
+					bookmark.conference.nick = window->multiUserChat()->nickName();
+					bookmark.conference.password = window->multiUserChat()->password();
+					bookmark.conference.autojoin = false;
 				}
 
 				if (execEditBookmarkDialog(&bookmark,window->instance()) == QDialog::Accepted)
-				{
 					setBookmarks(window->streamJid(),bookmarkList);
-				}
 			}
 		}
 	}
 }
 
-void BookMarks::onAddDiscoBookmarkActionTriggered(bool)
+void Bookmarks::onAddDiscoBookmarkActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
@@ -489,19 +590,21 @@ void BookMarks::onAddDiscoBookmarkActionTriggered(bool)
 				queryItems << qMakePair(QString("node"),discoNode);
 			url.setQueryItems(queryItems);
 
-			IBookMark bookmark;
+			IBookmark bookmark;
+			bookmark.type = IBookmark::Url;
 			bookmark.name = "XMPP: ";
 			bookmark.name += !discoName.isEmpty() ? discoName + " | " : QString::null;
 			bookmark.name += discoJid;
 			bookmark.name += !discoNode.isEmpty() ? " | " + discoNode : QString::null;
-			bookmark.url = url.toString().replace("?disco=;","?disco;");
+			bookmark.url.url = url.toString().replace("?disco=;","?disco;");
+
 			if (execEditBookmarkDialog(&bookmark,NULL) == QDialog::Accepted)
 				addBookmark(streamJid,bookmark);
 		}
 	}
 }
 
-void BookMarks::onEditBookmarksActionTriggered(bool)
+void Bookmarks::onEditBookmarksActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
@@ -511,34 +614,40 @@ void BookMarks::onEditBookmarksActionTriggered(bool)
 	}
 }
 
-void BookMarks::onEditBookmarksDialogDestroyed()
+void Bookmarks::onEditBookmarksDialogDestroyed()
 {
 	EditBookmarksDialog *dialog = qobject_cast<EditBookmarksDialog *>(sender());
 	if (dialog)
 		FDialogs.remove(dialog->streamJid());
 }
 
-void BookMarks::onAccountOptionsChanged(const OptionsNode &ANode)
+void Bookmarks::onStartTimerTimeout()
 {
-	IAccount *account = qobject_cast<IAccount *>(sender());
-	if (account && account->isActive() && account->optionsNode().childPath(ANode)=="name" &&  FStreamMenu.contains(account->xmppStream()->streamJid()))
-		FStreamMenu[account->xmppStream()->streamJid()]->setTitle(ANode.value().toString());
-}
-
-void BookMarks::onStartTimerTimeout()
-{
-	QMultiMap<Jid, IBookMark>::iterator it = FPendingBookMarks.begin();
-	if (it != FPendingBookMarks.end())
+	QMultiMap<Jid, IBookmark>::iterator it = FPendingBookmarks.begin();
+	if (it != FPendingBookmarks.end())
 	{
 		bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
-		if (it->conference.isEmpty())
+		if (it->type != IBookmark::Conference)
 			showAutoJoined = false;
-		else if (FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(it.key(),it->conference)!=NULL)
+		else if (FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(it.key(),it->conference.roomJid)!=NULL)
 			showAutoJoined = false;
-		startBookmark(it.key(),it.value(), showAutoJoined);
-		FPendingBookMarks.erase(it);
+		startBookmark(it.key(),it.value(),showAutoJoined);
+		FPendingBookmarks.erase(it);
 		FStartTimer.start(NEXT_START_TIMEOUT);
 	}
 }
 
-Q_EXPORT_PLUGIN2(plg_bookmarks, BookMarks)
+uint qHash(const IBookmark &AKey)
+{
+	switch (AKey.type)
+	{
+	case IBookmark::Url:
+		return qHash(AKey.url.url);
+	case IBookmark::Conference:
+		return qHash(AKey.conference.roomJid);
+	default:
+		return qHash(QString::null);
+	}
+}
+
+Q_EXPORT_PLUGIN2(plg_bookmarks, Bookmarks)

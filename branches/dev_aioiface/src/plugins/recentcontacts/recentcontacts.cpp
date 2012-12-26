@@ -473,7 +473,7 @@ QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &
 	return proxies;
 }
 
-bool RecentContacts::isItemValid(const IRecentItem &AItem) const
+bool RecentContacts::isValidItem(const IRecentItem &AItem) const
 {
 	if (AItem.type.isEmpty())
 		return false;
@@ -595,7 +595,7 @@ IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 		foreach(IRecentItemHandler *handler, FItemHandlers)
 		{
 			IRecentItem item = handler->recentItemForIndex(AIndex);
-			if (isItemValid(item))
+			if (isValidItem(item))
 				return item;
 		}
 	}
@@ -828,7 +828,7 @@ void RecentContacts::mergeRecentItems(const QList<IRecentItem> &AItems)
 	for (QList<IRecentItem>::const_iterator it=AItems.constBegin(); it!=AItems.constEnd(); ++it)
 	{
 		IRecentItem newItem = *it;
-		if (isItemValid(newItem))
+		if (isValidItem(newItem))
 		{
 			QList<IRecentItem> &curItems = FStreamItems[it->streamJid];
 
