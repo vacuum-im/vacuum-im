@@ -2,34 +2,42 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>BookMarks</name>
+    <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
         <translation>Закладки</translation>
-    </message>
-    <message>
-        <source>Edit bookmarks</source>
-        <translation>Редактировать закладки</translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
         <translation>Позволяет создавать закладки на джаббер конференции и веб-страницы</translation>
     </message>
     <message>
-        <source>Append to bookmarks</source>
-        <translation>Добавить в закладки</translation>
+        <source>Edit bookmark</source>
+        <translation>Редактировать закладку</translation>
     </message>
     <message>
         <source>Disable autojoin to conferences</source>
         <translation>Отключить автовход в конференции</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation>Редактировать закладку</translation>
-    </message>
-    <message>
         <source>Automatically show window of conferences connected at startup</source>
         <translation>Показывать окна автоматически подключаемых конференций при старте</translation>
+    </message>
+    <message>
+        <source>Edit Bookmarks</source>
+        <translation>Редактировать закладки</translation>
+    </message>
+    <message>
+        <source>Add to Bookmarks</source>
+        <translation>Добавить в закладки</translation>
+    </message>
+    <message>
+        <source>Remove from Bookmarks</source>
+        <translation>Удалить из закладок</translation>
+    </message>
+    <message>
+        <source>Edit Bookmark</source>
+        <translation>Редактировать закладку</translation>
     </message>
 </context>
 <context>
@@ -99,10 +107,6 @@
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Не удалось сохранить закладки на сервере</translation>
-    </message>
-    <message>
-        <source>Cant save bookmarks to server. %1</source>
-        <translation>Не удалось сохранить закладки на сервере. %1</translation>
     </message>
     <message>
         <source>Edit bookmarks - %1</source>

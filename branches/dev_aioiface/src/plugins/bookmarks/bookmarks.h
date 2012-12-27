@@ -72,6 +72,7 @@ signals:
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
 	void updateConferenceIndexes(const Jid &AStreamJid);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IBookmark> loadBookmarksFromXML(const QDomElement &AElement) const;
 	void saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const;
 	void startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark, bool AShowWindow);
@@ -90,9 +91,12 @@ protected slots:
 	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
 	void onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 	void onStartBookmarkActionTriggered(bool);
-	void onAddRoomBookmarkActionTriggered(bool);
-	void onAddDiscoBookmarkActionTriggered(bool);
+	void onEditBookmarkActionTriggered(bool);
+	void onAddBookmarksActionTriggered(bool);
+	void onRemoveBookmarksActionTriggered(bool);
 	void onEditBookmarksActionTriggered(bool);
+	void onMultiChatWindowAddBookmarkActionTriggered(bool);
+	void onDiscoWindowAddBookmarkActionTriggered(bool);
 	void onEditBookmarksDialogDestroyed();
 	void onStartTimerTimeout();
 private:

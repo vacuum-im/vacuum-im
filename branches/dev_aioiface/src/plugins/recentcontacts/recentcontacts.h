@@ -112,8 +112,8 @@ protected:
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
 	QList<IRecentItem> loadItemsFromFile(const Jid &AStreamJid, const QString &AFileName) const;
 protected:
-	bool isSelectionAccepted(const QList<IRosterIndex *> AIndexes) const;
-	bool isRecentSelectionAccepted(const QList<IRosterIndex *> AIndexes) const;
+	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
+	bool isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
 	void setItemsFavorite(bool AFavorite, const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 protected slots:
 	void onRostersModelStreamAdded(const Jid &AStreamJid);

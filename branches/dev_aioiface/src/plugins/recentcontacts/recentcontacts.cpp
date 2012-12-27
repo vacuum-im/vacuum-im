@@ -1057,7 +1057,7 @@ QList<IRecentItem> RecentContacts::loadItemsFromFile(const Jid &AStreamJid, cons
 	return items;
 }
 
-bool RecentContacts::isSelectionAccepted(const QList<IRosterIndex *> AIndexes) const
+bool RecentContacts::isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const
 {
 	foreach(IRosterIndex *index, AIndexes)
 		if (rosterIndexItem(index).type.isEmpty())
@@ -1065,7 +1065,7 @@ bool RecentContacts::isSelectionAccepted(const QList<IRosterIndex *> AIndexes) c
 	return true;
 }
 
-bool RecentContacts::isRecentSelectionAccepted(const QList<IRosterIndex *> AIndexes) const
+bool RecentContacts::isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const
 {
 	foreach(IRosterIndex *index, AIndexes)
 		if (index->type() != RIT_RECENT_ITEM)

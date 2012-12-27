@@ -6,6 +6,7 @@ EditBookmarkDialog::EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) :
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_BOOKMARKS_EDIT,0,0,"windowIcon");
 
 	FBookmark = ABookmark;
 	ui.lneName->setText(ABookmark->name);
