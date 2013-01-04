@@ -631,13 +631,19 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 					renameAction->setShortcutId(SCT_ROSTERVIEW_RENAME);
 					connect(renameAction,SIGNAL(triggered(bool)),SLOT(onRenameBookmarkActionTriggered(bool)));
 					AMenu->addAction(renameAction,AG_RVCM_BOOKMARS_TOOLS);
+				}
 
+				if (!FRostersView->hasMultiSelection())
+				{
 					Action *autoJoinAction = new Action(AMenu);
 					autoJoinAction->setCheckable(true);
 					autoJoinAction->setChecked(bookmark.conference.autojoin);
 					autoJoinAction->setText(tr("Join to Conference at Startup"));
 					autoJoinAction->setData(ADR_STREAM_JID,streamJid.full());
-					autoJoinAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
+					autoJoinAction->setData(ADR_BOOKMARK_NAME,index->data(RDR_NAME));
+					autoJoinAction->setData(ADR_BOOKMARK_ROOM_JID,index->data(RDR_PREP_BARE_JID));
+					autoJoinAction->setData(ADR_BOOKMARK_ROOM_NICK,index->data(RDR_MUC_NICK));
+					autoJoinAction->setData(ADR_BOOKMARK_ROOM_PASSWORD,index->data(RDR_MUC_PASSWORD));
 					connect(autoJoinAction,SIGNAL(triggered(bool)),SLOT(onChangeBookmarkAutoJoinActionTriggered(bool)));
 					AMenu->addAction(autoJoinAction,AG_RVCM_BOOKMARS_TOOLS);
 				}
@@ -761,7 +767,10 @@ void Bookmarks::onChangeBookmarkAutoJoinActionTriggered(bool)
 	{
 		IBookmark bookmark;
 		bookmark.type = IBookmark::Conference;
+		bookmark.name = action->data(ADR_BOOKMARK_NAME).toString();
 		bookmark.conference.roomJid = action->data(ADR_BOOKMARK_ROOM_JID).toString();
+		bookmark.conference.nick = action->data(ADR_BOOKMARK_ROOM_NICK).toString();
+		bookmark.conference.password = action->data(ADR_BOOKMARK_ROOM_PASSWORD).toString();
 
 		QString streamJid = action->data(ADR_STREAM_JID).toString();
 		QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
@@ -772,6 +781,12 @@ void Bookmarks::onChangeBookmarkAutoJoinActionTriggered(bool)
 			IBookmark bookmark = bookmarkList.at(index);
 			bookmark.conference.autojoin = !bookmark.conference.autojoin;
 			bookmarkList.replace(index,bookmark);
+			setBookmarks(streamJid,bookmarkList);
+		}
+		else if (isValidBookmark(bookmark))
+		{
+			bookmark.conference.autojoin = true;
+			bookmarkList.append(bookmark);
 			setBookmarks(streamJid,bookmarkList);
 		}
 	}
