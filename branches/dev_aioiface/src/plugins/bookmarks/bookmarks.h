@@ -102,6 +102,7 @@ protected slots:
 	void onStartBookmarkActionTriggered(bool);
 	void onEditBookmarkActionTriggered(bool);
 	void onRenameBookmarkActionTriggered(bool);
+	void onChangeBookmarkAutoJoinActionTriggered(bool);
 	void onAddBookmarksActionTriggered(bool);
 	void onRemoveBookmarksActionTriggered(bool);
 	void onEditBookmarksActionTriggered(bool);

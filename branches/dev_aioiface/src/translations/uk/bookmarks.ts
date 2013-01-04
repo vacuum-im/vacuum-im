@@ -47,6 +47,10 @@
         <source>Enter bookmark name:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Join to Conference at Startup</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

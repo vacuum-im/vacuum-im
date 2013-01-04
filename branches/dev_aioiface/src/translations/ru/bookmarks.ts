@@ -47,6 +47,10 @@
         <source>Enter bookmark name:</source>
         <translation>Введите имя закладки:</translation>
     </message>
+    <message>
+        <source>Join to Conference at Startup</source>
+        <translation>Входить в конференцию при запуске</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

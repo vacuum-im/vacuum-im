@@ -631,6 +631,15 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 					renameAction->setShortcutId(SCT_ROSTERVIEW_RENAME);
 					connect(renameAction,SIGNAL(triggered(bool)),SLOT(onRenameBookmarkActionTriggered(bool)));
 					AMenu->addAction(renameAction,AG_RVCM_BOOKMARS_TOOLS);
+
+					Action *autoJoinAction = new Action(AMenu);
+					autoJoinAction->setCheckable(true);
+					autoJoinAction->setChecked(bookmark.conference.autojoin);
+					autoJoinAction->setText(tr("Join to Conference at Startup"));
+					autoJoinAction->setData(ADR_STREAM_JID,streamJid.full());
+					autoJoinAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
+					connect(autoJoinAction,SIGNAL(triggered(bool)),SLOT(onChangeBookmarkAutoJoinActionTriggered(bool)));
+					AMenu->addAction(autoJoinAction,AG_RVCM_BOOKMARS_TOOLS);
 				}
 			}
 		}
@@ -741,6 +750,29 @@ void Bookmarks::onRenameBookmarkActionTriggered(bool)
 			{
 				renameBookmark(streamJid,bookmark);
 			}
+		}
+	}
+}
+
+void Bookmarks::onChangeBookmarkAutoJoinActionTriggered(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		IBookmark bookmark;
+		bookmark.type = IBookmark::Conference;
+		bookmark.conference.roomJid = action->data(ADR_BOOKMARK_ROOM_JID).toString();
+
+		QString streamJid = action->data(ADR_STREAM_JID).toString();
+		QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+
+		int index = bookmarkList.indexOf(bookmark);
+		if (index >= 0)
+		{
+			IBookmark bookmark = bookmarkList.at(index);
+			bookmark.conference.autojoin = !bookmark.conference.autojoin;
+			bookmarkList.replace(index,bookmark);
+			setBookmarks(streamJid,bookmarkList);
 		}
 	}
 }
@@ -918,14 +950,13 @@ void Bookmarks::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		if (isSelectionAccepted(indexes))
 		{
 			IRosterIndex *index = indexes.first();
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
 			if (AId==SCT_ROSTERVIEW_RENAME && !FRostersView->hasMultiSelection())
 			{
 				if (!FRostersView->editRosterIndex(index,RDR_NAME))
 				{
-					IBookmark bookmark;
-					bookmark.type = IBookmark::Conference;
-					bookmark.conference.roomJid = index->data(RDR_PREP_BARE_JID).toString();
-					renameBookmark(index->data(RDR_STREAM_JID).toString(),bookmark);
+					IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(index);
+					renameBookmark(streamJid,bookmark);
 				}
 			}
 		}

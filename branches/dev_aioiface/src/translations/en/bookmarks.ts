@@ -47,6 +47,10 @@
         <source>Enter bookmark name:</source>
         <translation>Enter bookmark name:</translation>
     </message>
+    <message>
+        <source>Join to Conference at Startup</source>
+        <translation>Join to Conference at Startup</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>
