@@ -39,6 +39,14 @@
         <source>Edit Bookmark</source>
         <translation>Редактировать закладку</translation>
     </message>
+    <message>
+        <source>Rename Bookmark</source>
+        <translation>Переименовать закладку</translation>
+    </message>
+    <message>
+        <source>Enter bookmark name:</source>
+        <translation>Введите имя закладки:</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

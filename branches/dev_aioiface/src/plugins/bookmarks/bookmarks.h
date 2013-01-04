@@ -13,6 +13,7 @@
 #include <definitions/discoitemdataroles.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosterdataholderorders.h>
+#include <definitions/rosteredithandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibookmarks.h>
 #include <interfaces/iprivatestorage.h>
@@ -36,10 +37,12 @@ class Bookmarks :
 	public IPlugin,
 	public IBookmarks,
 	public IOptionsHolder,
-	public IRosterDataHolder
+	public IRosterDataHolder,
+	public IRostersEditHandler,
+	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IBookmarks IOptionsHolder IRosterDataHolder);
+	Q_INTERFACES(IPlugin IBookmarks IOptionsHolder IRosterDataHolder IRostersEditHandler);
 public:
 	Bookmarks();
 	~Bookmarks();
@@ -59,6 +62,11 @@ public:
 	virtual QList<int> rosterDataTypes() const;
 	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	//IRostersEditHandler
+	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
+	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
+	//AdvancedDelegateEditProxy
+	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	//IBookmarks
 	virtual bool isValidBookmark(const IBookmark &ABookmark) const;
 	virtual QList<IBookmark> bookmarks(const Jid &AStreamJid) const;
@@ -75,6 +83,7 @@ protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IBookmark> loadBookmarksFromXML(const QDomElement &AElement) const;
 	void saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const;
+	void renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
 	void startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark, bool AShowWindow);
 protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
@@ -92,6 +101,7 @@ protected slots:
 	void onDiscoIndexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 	void onStartBookmarkActionTriggered(bool);
 	void onEditBookmarkActionTriggered(bool);
+	void onRenameBookmarkActionTriggered(bool);
 	void onAddBookmarksActionTriggered(bool);
 	void onRemoveBookmarksActionTriggered(bool);
 	void onEditBookmarksActionTriggered(bool);
@@ -99,6 +109,7 @@ protected slots:
 	void onDiscoWindowAddBookmarkActionTriggered(bool);
 	void onEditBookmarksDialogDestroyed();
 	void onStartTimerTimeout();
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPrivateStorage *FPrivateStorage;
 	IAccountManager *FAccountManager;

@@ -39,6 +39,14 @@
         <source>Edit Bookmark</source>
         <translation>Edit Bookmark</translation>
     </message>
+    <message>
+        <source>Rename Bookmark</source>
+        <translation>Rename Bookmark</translation>
+    </message>
+    <message>
+        <source>Enter bookmark name:</source>
+        <translation>Enter bookmark name:</translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

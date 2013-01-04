@@ -39,6 +39,14 @@
         <source>Edit Bookmark</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Rename Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter bookmark name:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditBookmarkDialog</name>

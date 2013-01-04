@@ -1,6 +1,8 @@
 #include "bookmarks.h"
 
+#include <QInputDialog>
 #include <QDesktopServices>
+#include <QItemEditorFactory>
 
 #define PST_BOOKMARKS                    "storage"
 
@@ -123,6 +125,8 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 	}
 
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
+
 	return FPrivateStorage!=NULL;
 }
 
@@ -138,6 +142,11 @@ bool Bookmarks::initObjects()
 	if (FRostersModel)
 	{
 		FRostersModel->insertDefaultDataHolder(this);
+	}
+
+	if (FRostersView)
+	{
+		FRostersView->insertEditHandler(REHO_BOOKMARKS_RENAME,this);
 	}
 
 	return true;
@@ -211,6 +220,58 @@ QVariant Bookmarks::rosterData(const IRosterIndex *AIndex, int ARole) const
 bool Bookmarks::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
 {
 	Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
+	return false;
+}
+
+quint32 Bookmarks::rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const
+{
+	if (AOrder==REHO_BOOKMARKS_RENAME && ADataRole==RDR_NAME && AIndex.data(RDR_TYPE).toInt()==RIT_MUC_ITEM)
+	{
+		IBookmark bookmark;
+		bookmark.type = IBookmark::Conference;
+		bookmark.conference.roomJid = AIndex.data(RDR_PREP_BARE_JID).toString();
+		if (FBookmarks.value(AIndex.data(RDR_STREAM_JID).toString()).contains(bookmark))
+			return AdvancedDelegateItem::DisplayId;
+	}
+	return AdvancedDelegateItem::NullId;
+}
+
+AdvancedDelegateEditProxy *Bookmarks::rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex)
+{
+	Q_UNUSED(AIndex);
+	if (AOrder==REHO_BOOKMARKS_RENAME && ADataRole==RDR_NAME)
+		return this;
+	return NULL;
+}
+
+bool Bookmarks::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex)
+{
+	Q_UNUSED(AModel);
+	if (ADelegate->editRole()==RDR_NAME && AIndex.data(RDR_TYPE)==RIT_MUC_ITEM)
+	{
+		IBookmark bookmark;
+		bookmark.type = IBookmark::Conference;
+		bookmark.conference.roomJid = AIndex.data(RDR_PREP_BARE_JID).toString();
+
+		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
+		int index = FBookmarks.value(streamJid).indexOf(bookmark);
+		if (index >= 0)
+		{
+			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+			IBookmark bookmark = bookmarkList.at(index);
+
+			QVariant value = AEditor->property(ADVANCED_DELEGATE_EDITOR_VALUE_PROPERTY);
+			QByteArray name = ADelegate->editorFactory()->valuePropertyName(value.type());
+			QString newName = AEditor->property(name).toString();
+			if (!newName.isEmpty() && bookmark.name!=newName)
+			{
+				bookmark.name = newName;
+				bookmarkList.replace(index,bookmark);
+				setBookmarks(streamJid,bookmarkList);
+			}
+		}
+		return true;
+	}
 	return false;
 }
 
@@ -370,6 +431,24 @@ void Bookmarks::saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark>
 			QDomElement markElem = AElement.appendChild(AElement.ownerDocument().createElement("url")).toElement();
 			markElem.setAttribute("name",bookmark.name);
 			markElem.setAttribute("url",bookmark.url.url.toString());
+		}
+	}
+}
+
+void Bookmarks::renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark)
+{
+	QList<IBookmark> bookmarkList = FBookmarks.value(AStreamJid);
+
+	int index = bookmarkList.indexOf(ABookmark);
+	if (index >= 0)
+	{
+		IBookmark bookmark = bookmarkList.at(index);
+		QString newName = QInputDialog::getText(NULL,tr("Rename Bookmark"),tr("Enter bookmark name:"),QLineEdit::Normal,bookmark.name);
+		if (!newName.isEmpty() && newName!=bookmark.name)
+		{
+			bookmark.name = newName;
+			bookmarkList.replace(index,bookmark);
+			setBookmarks(AStreamJid,bookmarkList);
 		}
 	}
 }
@@ -543,6 +622,15 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 					editAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
 					connect(editAction,SIGNAL(triggered(bool)),SLOT(onEditBookmarkActionTriggered(bool)));
 					AMenu->addAction(editAction,AG_RVCM_BOOKMARS_TOOLS);
+
+					Action *renameAction = new Action(AMenu);
+					renameAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
+					renameAction->setText(tr("Rename Bookmark"));
+					renameAction->setData(ADR_STREAM_JID,streamJid.full());
+					renameAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
+					renameAction->setShortcutId(SCT_ROSTERVIEW_RENAME);
+					connect(renameAction,SIGNAL(triggered(bool)),SLOT(onRenameBookmarkActionTriggered(bool)));
+					AMenu->addAction(renameAction,AG_RVCM_BOOKMARS_TOOLS);
 				}
 			}
 		}
@@ -559,8 +647,8 @@ void Bookmarks::onRosterIndexDestroyed(IRosterIndex *AIndex)
 void Bookmarks::onMultiChatWindowCreated(IMultiUserChatWindow *AWindow)
 {
 	Action *action = new Action(AWindow->instance());
-	action->setText(tr("Add to Bookmarks"));
-	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
+	action->setText(tr("Edit Bookmark"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
 	action->setShortcutId(SCT_MESSAGEWINDOWS_MUC_BOOKMARK);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onMultiChatWindowAddBookmarkActionTriggered(bool)));
 	AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MCWTBW_BOOKMARKS);
@@ -622,6 +710,36 @@ void Bookmarks::onEditBookmarkActionTriggered(bool)
 			{
 				bookmarkList.replace(index,bookmark);
 				setBookmarks(streamJid,bookmarkList);
+			}
+		}
+	}
+}
+
+void Bookmarks::onRenameBookmarkActionTriggered(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		IBookmark bookmark;
+		bookmark.type = IBookmark::Conference;
+		bookmark.conference.roomJid = action->data(ADR_BOOKMARK_ROOM_JID).toString();
+
+		QString streamJid = action->data(ADR_STREAM_JID).toString();
+		QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+
+		int index = bookmarkList.indexOf(bookmark);
+		if (index >= 0)
+		{
+			bool editInRoster = false;
+			if (FRostersView && FMultiChatPlugin)
+			{
+				IRosterIndex *mucIndex = FMultiChatPlugin->findMultiChatRosterIndex(streamJid,bookmark.conference.roomJid);
+				if (mucIndex)
+					editInRoster = FRostersView->editRosterIndex(mucIndex,RDR_NAME);
+			}
+			if (!editInRoster)
+			{
+				renameBookmark(streamJid,bookmark);
 			}
 		}
 	}
@@ -789,6 +907,28 @@ void Bookmarks::onStartTimerTimeout()
 		startBookmark(it.key(),it.value(),showAutoJoined);
 		FPendingBookmarks.erase(it);
 		FStartTimer.start(NEXT_START_TIMEOUT);
+	}
+}
+
+void Bookmarks::onShortcutActivated(const QString &AId, QWidget *AWidget)
+{
+	if (FRostersView && AWidget==FRostersView->instance())
+	{
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
+		if (isSelectionAccepted(indexes))
+		{
+			IRosterIndex *index = indexes.first();
+			if (AId==SCT_ROSTERVIEW_RENAME && !FRostersView->hasMultiSelection())
+			{
+				if (!FRostersView->editRosterIndex(index,RDR_NAME))
+				{
+					IBookmark bookmark;
+					bookmark.type = IBookmark::Conference;
+					bookmark.conference.roomJid = index->data(RDR_PREP_BARE_JID).toString();
+					renameBookmark(index->data(RDR_STREAM_JID).toString(),bookmark);
+				}
+			}
+		}
 	}
 }
 

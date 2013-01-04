@@ -372,19 +372,19 @@ private:
 /**************************
  AdvancedDelegateEditProxy
 ***************************/
-QWidget *AdvancedDelegateEditProxy::createEditor(const AdvancedItemDelegate *ADelegate, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex)  const
+QWidget *AdvancedDelegateEditProxy::createEditor(const AdvancedItemDelegate *ADelegate, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex)
 {
 	Q_UNUSED(ADelegate); Q_UNUSED(AParent); Q_UNUSED(AOption); Q_UNUSED(AIndex);
 	return NULL;
 }
 
-bool AdvancedDelegateEditProxy::setEditorData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, const QModelIndex &AIndex) const
+bool AdvancedDelegateEditProxy::setEditorData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, const QModelIndex &AIndex)
 {
 	Q_UNUSED(ADelegate); Q_UNUSED(AEditor); Q_UNUSED(AIndex);
 	return false;
 }
 
-bool AdvancedDelegateEditProxy::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
+bool AdvancedDelegateEditProxy::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex)
 {
 	Q_UNUSED(ADelegate); Q_UNUSED(AEditor); Q_UNUSED(AModel); Q_UNUSED(AIndex);
 	return false;

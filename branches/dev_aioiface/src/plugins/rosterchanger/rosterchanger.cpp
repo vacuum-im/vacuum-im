@@ -350,7 +350,7 @@ AdvancedDelegateEditProxy *RosterChanger::rosterEditProxy(int AOrder, int ADataR
 	return NULL;
 }
 
-bool RosterChanger::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex) const
+bool RosterChanger::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex)
 {
 	Q_UNUSED(AModel); 
 	if (ADelegate->editRole() == RDR_NAME)
