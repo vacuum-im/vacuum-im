@@ -666,7 +666,7 @@ void RecentContacts::updateVisibleItems()
 						firstTime = it->activeTime;
 						++it;
 					}
-					else if (firstTime.daysTo(it->activeTime) > LATER_CONTACTS_DAYS_DELTA)
+					else if (it->activeTime.daysTo(firstTime) > LATER_CONTACTS_DAYS_DELTA)
 					{
 						it = common.erase(it);
 					}
