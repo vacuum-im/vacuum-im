@@ -19,7 +19,12 @@ QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
 IMainWindow *NotifyWidget::FMainWindow = NULL;
 QRect NotifyWidget::FDisplay = QRect();
 
-NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
+NotifyWidget::NotifyWidget(const INotification &ANotification)
+#if defined(Q_OS_MAC)
+	: QWidget(NULL, Qt::SubWindow|Qt::FramelessWindowHint|Qt::WindowSystemMenuHint|Qt::WindowStaysOnTopHint)
+#else
+	: QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
+#endif
 {
 	ui.setupUi(this);
 	setFocusPolicy(Qt::NoFocus);
