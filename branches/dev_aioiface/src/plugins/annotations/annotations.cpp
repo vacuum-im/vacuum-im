@@ -84,8 +84,8 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 			IRostersView *rostersView = FRostersViewPlugin->rostersView();
 			connect(rostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
 				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, Menu *)),
-				SLOT(onRosterIndexClipboardMenu(const QList<IRosterIndex *> &, Menu *)));
+			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
+				SLOT(onRosterIndexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
 				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		}
@@ -408,9 +408,9 @@ void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes
 	}
 }
 
-void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu)
+void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (AIndexes.count()==1 && rosterDataTypes().contains(AIndexes.first()->type()))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && rosterDataTypes().contains(AIndexes.first()->type()))
 	{
 		QString note = annotation(AIndexes.first()->data(RDR_STREAM_JID).toString(), AIndexes.first()->data(RDR_FULL_JID).toString());
 		if (!note.isEmpty())

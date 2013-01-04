@@ -20,6 +20,7 @@
 #include <utils/datetime.h>
 #include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
+#include <utils/advanceditemdelegate.h>
 #include "editnotedialog.h"
 
 struct Annotation {
@@ -82,7 +83,7 @@ protected slots:
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
+	void onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onCopyToClipboardActionTriggered(bool);
 	void onEditNoteActionTriggered(bool);
