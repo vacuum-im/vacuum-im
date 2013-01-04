@@ -101,6 +101,7 @@ protected:
 	void showDateSeparator(IChatWindow *AWindow, const QDateTime &ADateTime);
 	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onMessageReady();
 	void onWindowActivated();

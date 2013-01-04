@@ -1883,15 +1883,14 @@ void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
 
 bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MUC_ITEM;
 	if (!ASelected.isEmpty())
 	{
 		Jid singleStream;
 		foreach(IRosterIndex *index, ASelected)
 		{
-			int indexType = index->type();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!acceptTypes.contains(indexType))
+			Jid contactJid = index->data(RDR_FULL_JID).toString();
+			if (!contactJid.isValid() || contactJid.pBare()==streamJid.pBare())
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;

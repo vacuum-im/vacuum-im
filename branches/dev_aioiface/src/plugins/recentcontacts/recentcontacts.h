@@ -127,6 +127,7 @@ protected slots:
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
 protected slots:
+	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
@@ -168,6 +169,7 @@ private:
 	QSet<Jid> FSaveStreams;
 private:
 	QMap<int, int> FProxyToIndexNotify;
+	QMap<Menu *, QSet<Action *> > FProxyContextMenuActions;
 	QMap<const IRosterIndex *, IRosterIndex *> FIndexToProxy;
 	QMap<const IRosterIndex *, IRosterIndex *> FProxyToIndex;
 	QMap<IRosterIndex *, QList<IRosterIndex *> > FIndexProxies;

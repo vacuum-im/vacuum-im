@@ -4,9 +4,6 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_GROUP                 Action::DR_Parametr3
 
-static const QList<int> MessageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK
-  << RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-
 NormalMessageHandler::NormalMessageHandler()
 {
 	FMessageWidgets = NULL;
@@ -464,9 +461,12 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
+	static const QList<int> normalDialogTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK
+		<< RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 	static const QList<int> groupTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_AGENTS 
 		<< RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER;
 	static const QList<int> contactTypes =  QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+
 	if (!ASelected.isEmpty())
 	{
 		Jid singleStream;
@@ -476,7 +476,7 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 		{
 			int indexType = index->type();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!MessageActionTypes.contains(indexType))
+			if (!normalDialogTypes.contains(indexType))
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;

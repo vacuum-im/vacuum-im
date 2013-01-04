@@ -439,12 +439,13 @@ void StatusIcons::updateCustomIconMenu(const QStringList &APatterns)
 
 bool StatusIcons::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MUC_ITEM;
 	if (!ASelected.isEmpty())
 	{
 		foreach(IRosterIndex *index, ASelected)
 		{
-			if (!acceptTypes.contains(index->type()))
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
+			Jid contactJid = index->data(RDR_PREP_BARE_JID).toString();
+			if (!contactJid.isValid() || contactJid.pBare()==streamJid.pBare())
 				return false;
 		}
 		return true;

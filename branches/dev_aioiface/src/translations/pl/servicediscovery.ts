@@ -227,15 +227,6 @@
         <translation>Dodaj element do listy kontaktów</translation>
     </message>
     <message>
-        <source>Show vCard</source>
-        <translation>Pokaż wizytówkę vCard</translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <comment>Show vCard</comment>
-        <translation>Ctrl+I</translation>
-    </message>
-    <message>
         <source>Close discovery window</source>
         <translation>Zamknij odkryte informacje</translation>
     </message>
@@ -247,6 +238,15 @@
     <message>
         <source>Category: %1; Type: %2</source>
         <translation>Kategoria: %1; Typ: %2</translation>
+    </message>
+    <message>
+        <source>Show Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show Profile</comment>
+        <translation type="unfinished">Ctrl+I</translation>
     </message>
 </context>
 </TS>

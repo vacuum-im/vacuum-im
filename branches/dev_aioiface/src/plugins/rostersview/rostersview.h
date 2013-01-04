@@ -59,6 +59,7 @@ public:
 	virtual bool keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
 	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMap<int,QString> &AToolTips);
 	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu);
+	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu);
 	//--IndexSelection
 	virtual bool hasMultiSelection() const;
 	virtual bool isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes);
@@ -126,8 +127,8 @@ signals:
 	void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
 	void viewModelChanged(QAbstractItemModel *AModel);
 	void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 	void indexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
@@ -138,7 +139,6 @@ protected:
 	void removeBlinkItem(quint32 ALabelId, int ANotifyId);
 	void setDropIndicatorRect(const QRect &ARect);
 	QStyleOptionViewItemV4 indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 protected:
 	//QTreeView
 	void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
@@ -164,7 +164,6 @@ protected slots:
 	//QAbstractItemView
 	void closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint);
 protected slots:
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 	void onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex);

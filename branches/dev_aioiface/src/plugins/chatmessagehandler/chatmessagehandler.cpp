@@ -10,8 +10,6 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-static const QList<int> ChatActionTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-
 ChatMessageHandler::ChatMessageHandler()
 {
 	FMessageWidgets = NULL;
@@ -614,6 +612,22 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
+bool ChatMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
+{
+	static const QList<int> chatDialogTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+	if (!ASelected.isEmpty())
+	{
+		foreach(IRosterIndex *index, ASelected)
+		{
+			int indexType = index->type();
+			if (!chatDialogTypes.contains(indexType))
+				return false;
+		}
+		return true;
+	}
+	return false;
+}
+
 void ChatMessageHandler::onMessageReady()
 {
 	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
@@ -747,11 +761,12 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 {
 	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
 	{
-		if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && isSelectionAccepted(indexes))
 		{
-			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
-			IPresence *presence = FPresencePlugin!=NULL && index!=NULL ? FPresencePlugin->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
-			if (presence && ChatActionTypes.contains(index->data(RDR_TYPE).toInt()))
+			IRosterIndex *index = indexes.first();
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
+			if (presence && presence->isOpen())
 				messageShowWindow(MHO_CHATMESSAGEHANDLER,index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
 		}
 	}
@@ -812,14 +827,14 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const QStrin
 
 void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 		if (presence && presence->isOpen())
 		{
 			Jid contactJid = AIndexes.first()->data(RDR_FULL_JID).toString();
-			if (ChatActionTypes.contains(AIndexes.first()->type()))
+			if (!FRostersView->hasMultiSelection())
 			{
 				Action *action = new Action(AMenu);
 				action->setText(tr("Open chat dialog"));

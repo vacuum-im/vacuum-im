@@ -58,8 +58,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 
 	connect(this,SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
 		SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
-	connect(this,SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
-		SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),
 		SLOT(onShortcutActivated(const QString &, QWidget *)));
 }
@@ -396,17 +395,79 @@ void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEven
 	}
 }
 
+
 void RostersView::contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu)
 {
 	if (!AIndexes.isEmpty())
 	{
+		Menu *clipMenu = new Menu(AMenu);
+		clipMenu->setTitle(tr("Copy to clipboard"));
+		clipMenu->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_CLIPBOARD);
+
 		quint32 labelId = AdvancedDelegateItem::DisplayId;
 		if (FRostersModel && AEvent!=NULL)
 			labelId = labelAt(AEvent->pos(),indexAt(AEvent->pos()));
 
 		emit indexContextMenu(AIndexes,labelId,AMenu);
+		clipboardMenuForIndex(AIndexes,AEvent,clipMenu);
+
 		if (labelId!=AdvancedDelegateItem::DisplayId && AMenu->isEmpty())
+		{
+			clipMenu->clear();
 			emit indexContextMenu(AIndexes,AdvancedDelegateItem::DisplayId,AMenu);
+			clipboardMenuForIndex(AIndexes,NULL,clipMenu);
+		}
+
+		if (!clipMenu->isEmpty())
+			AMenu->addAction(clipMenu->menuAction(),AG_RVCM_ROSTERSVIEW_CLIPBOARD,true);
+		else
+			delete clipMenu;
+	}
+}
+
+void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu)
+{
+	if (!AIndexes.isEmpty() && AMenu!=NULL)
+	{
+		quint32 labelId = AdvancedDelegateItem::DisplayId;
+		if (FRostersModel && AEvent!=NULL)
+			labelId = labelAt(AEvent->pos(),indexAt(AEvent->pos()));
+
+		if (labelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
+		{
+			IRosterIndex *index = AIndexes.first();
+			if (!index->data(RDR_FULL_JID).toString().isEmpty())
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Jabber ID"));
+				action->setData(ADR_CLIPBOARD_DATA, Jid(index->data(RDR_FULL_JID).toString()).uBare());
+				action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(action, AG_DEFAULT, true);
+			}
+
+			if (!index->data(RDR_STATUS).toString().isEmpty())
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Status"));
+				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_STATUS));
+				action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(action, AG_DEFAULT, true);
+			}
+
+			if (!index->data(RDR_NAME).toString().isEmpty())
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Name"));
+				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_NAME));
+				action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(action, AG_DEFAULT, true);
+			}
+		}
+
+		emit indexClipboardMenu(AIndexes,labelId,AMenu);
 	}
 }
 
@@ -952,45 +1013,6 @@ QStyleOptionViewItemV4 RostersView::indexOption(const QStyleOptionViewItem &AOpt
 	return option;
 }
 
-void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu)
-{
-	if (!AIndexes.isEmpty() && AMenu!=NULL)
-	{
-		if (AIndexes.count() == 1)
-		{
-			IRosterIndex *index = AIndexes.first();
-			if (!index->data(RDR_FULL_JID).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Jabber ID"));
-				action->setData(ADR_CLIPBOARD_DATA, Jid(index->data(RDR_FULL_JID).toString()).uBare());
-				action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-			if (!index->data(RDR_STATUS).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Status"));
-				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_STATUS));
-				action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-			if (!index->data(RDR_NAME).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Name"));
-				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_NAME));
-				action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-		}
-		emit indexClipboardMenu(AIndexes, AMenu);
-	}
-}
-
 void RostersView::drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const
 {
 	Q_UNUSED(APainter);
@@ -1289,22 +1311,6 @@ void RostersView::closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHi
 	FAdvancedItemDelegate->setEditProxy(NULL);
 	FAdvancedItemDelegate->setEditRole(Qt::EditRole);
 	QTreeView::closeEditor(AEditor,AHint);
-}
-
-void RostersView::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
-{
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
-	{
-		Menu *clipMenu = new Menu(AMenu);
-		clipMenu->setTitle(tr("Copy to clipboard"));
-		clipMenu->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_CLIPBOARD);
-		clipboardMenuForIndex(AIndexes, clipMenu);
-
-		if (!clipMenu->isEmpty())
-			AMenu->addAction(clipMenu->menuAction(), AG_RVCM_ROSTERSVIEW_CLIPBOARD, true);
-		else
-			delete clipMenu;
-	}
 }
 
 void RostersView::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)

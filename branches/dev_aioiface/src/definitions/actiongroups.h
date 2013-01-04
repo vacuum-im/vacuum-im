@@ -35,6 +35,7 @@
 #define AG_RVCM_ACCOUNTMANAGER                                  700
 #define AG_RVCM_RCHANGER                                        700
 #define AG_RVCM_MULTIUSERCHAT_TOOLS                             700
+#define AG_RVCM_RECENT_OPTIONS                                  700
 #define AG_RVCM_GATEWAYS_LOGIN                                  800
 #define AG_RVCM_GATEWAYS_RESOLVE                                800
 #define AG_RVCM_GATEWAYS_REMOVE                                 800

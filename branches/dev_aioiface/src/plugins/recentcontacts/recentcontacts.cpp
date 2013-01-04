@@ -443,7 +443,7 @@ QIcon RecentContacts::recentItemIcon(const IRecentItem &AItem) const
 
 QString RecentContacts::recentItemName(const IRecentItem &AItem) const
 {
-	QString name = itemProperty(AItem,RIP_ITEM_NAME).toString();
+	QString name = itemProperty(AItem,REIP_ITEM_NAME).toString();
 	return name.isEmpty() ? AItem.reference : name;
 }
 
@@ -814,7 +814,7 @@ void RecentContacts::updateItemProperties(const IRecentItem &AItem)
 	if (index)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(index);
-		setItemProperty(AItem, RIP_ITEM_NAME, proxy!=NULL ? proxy->data(RDR_NAME).toString() : index->data(RDR_NAME).toString());
+		setItemProperty(AItem, REIP_ITEM_NAME, proxy!=NULL ? proxy->data(RDR_NAME).toString() : index->data(RDR_NAME).toString());
 	}
 }
 
@@ -1162,6 +1162,19 @@ void RecentContacts::onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid)
 	saveItemsToStorage(AStreamJid);
 }
 
+void RecentContacts::onRostersViewIndexContextMenuAboutToShow()
+{
+	Menu *menu = qobject_cast<Menu *>(sender());
+	if (menu)
+	{
+		QSet<Action *> proxyActions = FProxyContextMenuActions.take(menu);
+		foreach(Action *action, menu->groupActions())
+			if (!proxyActions.contains(action))
+				action->setVisible(false);
+	}
+	FProxyContextMenuActions.clear();
+}
+
 void RecentContacts::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
@@ -1172,6 +1185,7 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 	static bool blocked = false;
 	if (!blocked && ALabelId==AdvancedDelegateItem::DisplayId)
 	{
+		QSet<Action *> recentActions;
 		if (!FRostersView->hasMultiSelection() && AIndexes.value(0)->type()==RIT_RECENT_ROOT)
 		{
 			Action *hideLater = new Action(AMenu);
@@ -1179,21 +1193,24 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			hideLater->setCheckable(true);
 			hideLater->setChecked(FHideLaterContacts);
 			connect(hideLater,SIGNAL(triggered()),SLOT(onChangeHideLaterContacts()));
-			AMenu->addAction(hideLater,AG_DEFAULT,true);
+			AMenu->addAction(hideLater,AG_RVCM_RECENT_OPTIONS,true);
+			recentActions += hideLater;
 
 			Action *showOffline = new Action(AMenu);
 			showOffline->setText(tr("Always Show Offline Contacts"));
 			showOffline->setCheckable(true);
 			showOffline->setChecked(FAllwaysShowOffline);
 			connect(showOffline,SIGNAL(triggered()),SLOT(onChangeAlwaysShowOfflineContacts()));
-			AMenu->addAction(showOffline,AG_DEFAULT,true);
+			AMenu->addAction(showOffline,AG_RVCM_RECENT_OPTIONS,true);
+			recentActions += showOffline;
 			
 			Action *simpleView = new Action(AMenu);
 			simpleView->setText(tr("Simplify Contacts View"));
 			simpleView->setCheckable(true);
 			simpleView->setChecked(FSimpleContactsView);
 			connect(simpleView,SIGNAL(triggered()),SLOT(onChangeSimpleContactsView()));
-			AMenu->addAction(simpleView,AG_DEFAULT,true);
+			AMenu->addAction(simpleView,AG_RVCM_RECENT_OPTIONS,true);
+			recentActions += simpleView;
 		}
 		else if (isSelectionAccepted(AIndexes))
 		{
@@ -1221,6 +1238,8 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 				insertFavorite->setShortcutId(SCT_ROSTERVIEW_INSERTFAVORITE);
 				connect(insertFavorite,SIGNAL(triggered(bool)),SLOT(onInsertToFavoritesByAction()));
 				AMenu->addAction(insertFavorite,AG_RVCM_RECENT_FAVORITES);
+				recentActions += insertFavorite;
+
 			}
 			if (FRostersView->hasMultiSelection() || favorite)
 			{
@@ -1231,15 +1250,23 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 				removeFavorite->setShortcutId(SCT_ROSTERVIEW_REMOVEFAVORITE);
 				connect(removeFavorite,SIGNAL(triggered(bool)),SLOT(onRemoveFromFavoritesByAction()));
 				AMenu->addAction(removeFavorite,AG_RVCM_RECENT_FAVORITES);
+				recentActions += removeFavorite;
 			}
 
 			if (isRecentSelectionAccepted(AIndexes))
 			{
-				blocked = true;
 				QList<IRosterIndex *> proxies = indexesProxies(AIndexes,false);
 				if (!proxies.isEmpty())
+				{
+					blocked = true;
+
+					QSet<Action *> oldActions = AMenu->groupActions().toSet();
 					FRostersView->contextMenuForIndex(proxies,NULL,AMenu);
-				blocked = false;
+					connect(AMenu,SIGNAL(aboutToShow()),SLOT(onRostersViewIndexContextMenuAboutToShow()));
+					FProxyContextMenuActions[AMenu] = AMenu->groupActions().toSet() - oldActions + recentActions;
+
+					blocked = false;
+				}
 			}
 		}
 	}

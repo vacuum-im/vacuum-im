@@ -91,6 +91,7 @@ public:
 	virtual bool keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent) =0;
 	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMap<int,QString> &AToolTips) =0;
 	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu) =0;
+	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu) =0;
 	//IndexSelection
 	virtual bool hasMultiSelection() const =0;
 	virtual bool isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes) =0;
@@ -150,8 +151,8 @@ protected:
 	virtual void viewModelAboutToBeChanged(QAbstractItemModel *AModel) =0;
 	virtual void viewModelChanged(QAbstractItemModel *AModel) =0;
 	virtual void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted) =0;
-	virtual void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu) =0;
 	virtual void indexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu) =0;
+	virtual void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu) =0;
 	virtual void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips) =0;
 	virtual void notifyInserted(int ANotifyId) =0;
 	virtual void notifyActivated(int ANotifyId) =0;

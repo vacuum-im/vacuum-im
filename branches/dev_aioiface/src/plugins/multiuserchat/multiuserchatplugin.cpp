@@ -337,8 +337,8 @@ bool MultiUserChatPlugin::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIn
 			{
 				IRecentItem item = FRecentContacts->rosterIndexItem(AIndex);
 				Jid roomJid = AIndex->data(RDR_RECENT_REFERENCE).toString();
-				QString nick = FRecentContacts->itemProperty(item,RIP_CONFERENCE_NICK).toString();
-				QString password = FRecentContacts->itemProperty(item,RIP_CONFERENCE_PASSWORD).toString();
+				QString nick = FRecentContacts->itemProperty(item,REIP_CONFERENCE_NICK).toString();
+				QString password = FRecentContacts->itemProperty(item,REIP_CONFERENCE_PASSWORD).toString();
 				if (FMessageProcessor==NULL || !FMessageProcessor->createMessageWindow(streamJid,roomJid,Message::GroupChat,IMessageHandler::SM_SHOW))
 					window = getMultiChatWindow(streamJid,roomJid,nick.isEmpty() ? streamJid.uNode() : nick,password);
 			}
@@ -581,7 +581,7 @@ QIcon MultiUserChatPlugin::recentItemIcon(const IRecentItem &AItem) const
 
 QString MultiUserChatPlugin::recentItemName(const IRecentItem &AItem) const
 {
-	QString name = FRecentContacts->itemProperty(AItem,RIP_ITEM_NAME).toString();
+	QString name = FRecentContacts->itemProperty(AItem,REIP_ITEM_NAME).toString();
 	return name.isEmpty() ? AItem.reference : name;
 }
 
@@ -866,8 +866,8 @@ void MultiUserChatPlugin::updateRecentItemProperties(IRosterIndex *AIndex)
 	if (FRecentContacts)
 	{
 		IRecentItem item = recentItemForIndex(AIndex);
-		FRecentContacts->setItemProperty(item,RIP_CONFERENCE_NICK,AIndex->data(RDR_MUC_NICK).toString());
-		FRecentContacts->setItemProperty(item,RIP_CONFERENCE_PASSWORD,AIndex->data(RDR_MUC_PASSWORD).toString());
+		FRecentContacts->setItemProperty(item,REIP_CONFERENCE_NICK,AIndex->data(RDR_MUC_NICK).toString());
+		FRecentContacts->setItemProperty(item,REIP_CONFERENCE_PASSWORD,AIndex->data(RDR_MUC_PASSWORD).toString());
 	}
 }
 
@@ -886,7 +886,7 @@ void MultiUserChatPlugin::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
 		QString name = AWindow->multiUserChat()->roomName();
 		if (FRecentContacts && AWindow->multiUserChat()->roomJid().uBare()==name)
 		{
-			name = FRecentContacts->itemProperty(recentItemForIndex(chatIndex),RIP_ITEM_NAME).toString();
+			name = FRecentContacts->itemProperty(recentItemForIndex(chatIndex),REIP_ITEM_NAME).toString();
 			if (name.isEmpty())
 				name = AWindow->multiUserChat()->roomName();
 		}

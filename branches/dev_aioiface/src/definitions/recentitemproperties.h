@@ -2,10 +2,10 @@
 #define DEF_RECENTITEMPROPERTIES_H
 
 //RecentContacts
-#define RIP_ITEM_NAME                         "name"
+#define REIP_ITEM_NAME                         "name"
 
 //MultiUSerChat
-#define RIP_CONFERENCE_NICK                   "nick"
-#define RIP_CONFERENCE_PASSWORD               "password"
+#define REIP_CONFERENCE_NICK                   "nick"
+#define REIP_CONFERENCE_PASSWORD               "password"
 
 #endif // DEF_RECENTITEMPROPERTIES_H
