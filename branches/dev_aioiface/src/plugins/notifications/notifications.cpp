@@ -323,11 +323,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_SHOWMINIMIZED_WIDGET).toLongLong());
 			if (widget)
 			{
-				ITabPage *page = qobject_cast<ITabPage *>(widget);
-				if (page)
-					page->showMinimizedTabPage();
-				else if (widget->isWindow() && !widget->isVisible())
-					widget->showMinimized();
+				FDelayedShowMinimized.append(widget);
+				QTimer::singleShot(0,this,SLOT(onDelayedShowMinimized()));
 			}
 		}
 	}
@@ -363,7 +360,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	if ((record.notification.kinds & INotification::AutoActivate)>0)
 	{
 		FDelayedActivations.append(notifyId);
-		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
+		QTimer::singleShot(0,this,SLOT(onDelayedActivations()));
 	}
 
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
@@ -597,11 +594,24 @@ void Notifications::removeInvisibleNotification(int ANotifyId)
 	}
 }
 
-void Notifications::onActivateDelayedActivations()
+void Notifications::onDelayedActivations()
 {
 	foreach(int notifyId, FDelayedActivations)
 		activateNotification(notifyId);
 	FDelayedActivations.clear();
+}
+
+void Notifications::onDelayedShowMinimized()
+{
+	foreach(QWidget *widget, FDelayedShowMinimized)
+	{
+		ITabPage *page = qobject_cast<ITabPage *>(widget);
+		if (page)
+			page->showMinimizedTabPage();
+		else if (widget->isWindow() && !widget->isVisible())
+			widget->showMinimized();
+	}
+	FDelayedShowMinimized.clear();
 }
 
 void Notifications::onSoundOnOffActionTriggered(bool)

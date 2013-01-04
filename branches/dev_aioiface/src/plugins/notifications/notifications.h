@@ -114,7 +114,8 @@ protected:
 	bool showNotifyByHandler(ushort AKind, int ANotifyId, const INotification &ANotification) const;
 	void removeInvisibleNotification(int ANotifyId);
 protected slots:
-	void onActivateDelayedActivations();
+	void onDelayedActivations();
+	void onDelayedShowMinimized();
 	void onSoundOnOffActionTriggered(bool);
 	void onTrayActionTriggered(bool);
 	void onRosterNotifyActivated(int ANotifyId);
@@ -149,6 +150,7 @@ private:
 	int FNotifyId;
 	QSound *FSound;
 	QList<int> FDelayedActivations;
+	QList<QWidget *> FDelayedShowMinimized;
 	QMap<int, NotifyRecord> FNotifyRecords;
 	mutable QMap<QString, TypeRecord> FTypeRecords;
 	QMultiMap<int, INotificationHandler *> FHandlers;
