@@ -50,6 +50,7 @@ private:
 	IPluginManager *FPluginManager;
 	ITrayManager *FTrayManager;
 private:
+	int FStartShowLoopCount;
 	MainWindow *FMainWindow;
 	QTime FActivationChanged;
 };

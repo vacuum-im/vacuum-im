@@ -7,6 +7,8 @@ MainWindowPlugin::MainWindowPlugin()
 	FPluginManager = NULL;
 	FTrayManager = NULL;
 
+	FStartShowLoopCount = 0;
+
 	FActivationChanged = QTime::currentTime();
 	FMainWindow = new MainWindow(NULL, Qt::Window|Qt::WindowTitleHint);
 	FMainWindow->installEventFilter(this);
@@ -122,8 +124,17 @@ void MainWindowPlugin::onShutdownStarted()
 
 void MainWindowPlugin::onShowMainWindowOnStart()
 {
-	if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
-		FMainWindow->showWindow();
+	if (FStartShowLoopCount >= 3)
+	{
+		if (Options::node(OPV_MAINWINDOW_SHOWONSTART).value().toBool())
+			FMainWindow->showWindow();
+		FStartShowLoopCount = 0;
+	}
+	else
+	{
+		FStartShowLoopCount++;
+		QTimer::singleShot(0,this,SLOT(onShowMainWindowOnStart()));
+	}
 }
 
 void MainWindowPlugin::onShowMainWindowByAction(bool)
