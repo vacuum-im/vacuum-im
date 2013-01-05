@@ -427,6 +427,8 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 			notify.typeId = NNT_FILETRANSFER;
 			notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(AStream->streamKind()==IFileStream::SendFile ? MNI_FILETRANSFER_SEND : MNI_FILETRANSFER_RECEIVE));
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AStream->streamJid(),AStream->contactJid()));
+			notify.data.insert(NDR_STREAM_JID,AStream->streamJid().full());
+			notify.data.insert(NDR_CONTACT_JID,AStream->contactJid().full());
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(AStream->contactJid()));
 			notify.data.insert(NDR_POPUP_CAPTION, file);
 

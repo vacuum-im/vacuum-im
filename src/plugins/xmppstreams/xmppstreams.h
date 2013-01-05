@@ -3,8 +3,10 @@
 
 #include <QMultiMap>
 #include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
+#include <utils/options.h>
 #include "xmppstream.h"
 
 class XmppStreams :
@@ -23,7 +25,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects() { return true; }
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IXmppStreams
 	virtual QList<IXmppStream *> xmppStreams() const;

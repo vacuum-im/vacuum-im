@@ -3,8 +3,6 @@
 #include <QSet>
 #include <QFile>
 
-#define REQUEST_TIMEOUT       30000
-
 #define SHC_ROSTER            "/iq[@type='set']/query[@xmlns='" NS_JABBER_ROSTER "']"
 #define SHC_PRESENCE          "/presence[@type]"
 
@@ -545,7 +543,7 @@ void Roster::requestGroupDelimiter()
 	Stanza query("iq");
 	query.setType("get").setId(FStanzaProcessor->newId());
 	query.addElement("query",NS_JABBER_PRIVATE).appendChild(query.createElement("roster",NS_GROUP_DELIMITER));
-	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,REQUEST_TIMEOUT))
+	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
 		FDelimRequestId = query.id();
 }
 
@@ -566,7 +564,7 @@ void Roster::requestRosterItems()
 	else
 		query.addElement("query",NS_JABBER_ROSTER).setAttribute("ver",FRosterVer);
 
-	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,REQUEST_TIMEOUT))
+	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
 		FOpenRequestId = query.id();
 }
 
