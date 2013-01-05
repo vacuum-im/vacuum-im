@@ -187,7 +187,6 @@
 #define OPV_ROSTER_ROOT                                 "roster"
 #define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
 #define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
-#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
 #define OPV_ROSTER_SORTBYSTATUS                         "roster.sort-by-status"
 #define OPV_ROSTER_HIDE_SCROLLBAR                       "roster.always-hide-scrollbar"
 // RosterChanger
@@ -202,6 +201,12 @@
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
 // RosterItemExchange
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
+//StatusChanger
+#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
+//RecentContact
+#define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
+#define OPV_ROSTER_RECENT_HIDELATERCONTACTS             "roster.recent.hide-later-contacts"
+#define OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW            "roster.recent.simple-contacts-view"
 
 // ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"

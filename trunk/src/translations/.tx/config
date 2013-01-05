@@ -264,3 +264,7 @@ source_lang = ru
 [vacuum-im.messagecarbons]
 file_filter = <lang>/messagecarbons.ts
 source_lang = ru
+
+[vacuum-im.recentcontacts]
+file_filter = <lang>/recentcontacts.ts
+source_lang = ru

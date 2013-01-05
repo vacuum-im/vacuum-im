@@ -55,6 +55,5 @@ private:
 };
 
 Q_DECLARE_METATYPE(Stanza);
-#define STANZA_METATYPE_ID qMetaTypeId<Stanza>()
 
 #endif // STANZA_H

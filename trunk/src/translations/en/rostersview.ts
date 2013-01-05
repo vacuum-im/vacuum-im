@@ -75,10 +75,6 @@
         <translation>Show contact resource in roster</translation>
     </message>
     <message>
-        <source>Show status message in roster</source>
-        <translation>Show status message in roster</translation>
-    </message>
-    <message>
         <source>Sort contacts by status</source>
         <translation>Sort contacts by status</translation>
     </message>

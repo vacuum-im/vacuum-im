@@ -9,7 +9,6 @@
 #include <definitions/version.h>
 #include <definitions/namespaces.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/actiongroups.h>
@@ -90,8 +89,8 @@ public:
 	virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
 	virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
 	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IServiceDiscovery
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const;
@@ -164,8 +163,8 @@ protected slots:
 	void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onShowDiscoInfoByAction(bool);
 	void onShowDiscoItemsByAction(bool);
 	void onDiscoInfoWindowDestroyed(QObject *AObject);

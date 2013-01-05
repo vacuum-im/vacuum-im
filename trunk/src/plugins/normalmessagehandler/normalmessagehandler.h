@@ -7,8 +7,8 @@
 #include <QMultiMap>
 #include <definitions/messagehandlerorders.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosternotifyorders.h>
+#include <definitions/recentitemtypes.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -33,6 +33,7 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/irecentcontacts.h>
 #include <utils/widgetmanager.h>
 #include <utils/xmpperror.h>
 #include <utils/textmanager.h>
@@ -93,7 +94,7 @@ protected slots:
 	void onShowWindowAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
@@ -105,6 +106,7 @@ private:
 	IRostersView *FRostersView;
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
+	IRecentContacts *FRecentContacts;
 private:
 	QList<IMessageWindow *> FWindows;
 	QMultiMap<IMessageWindow *, int> FNotifiedMessages;

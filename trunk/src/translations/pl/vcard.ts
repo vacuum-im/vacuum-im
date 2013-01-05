@@ -11,18 +11,6 @@
 <context>
     <name>VCardDialog</name>
     <message>
-        <source>vCard - %1</source>
-        <translation>vCard - %1</translation>
-    </message>
-    <message>
-        <source>vCard error</source>
-        <translation>Błąd vCard</translation>
-    </message>
-    <message>
-        <source>vCard request or publish failed.&lt;br&gt;%1</source>
-        <translation>Pobranie lub wysłanie vCard nie powiodło się.&lt;br&gt;%1</translation>
-    </message>
-    <message>
         <source>Save image</source>
         <translation>Zapisz obraz</translation>
     </message>
@@ -51,14 +39,6 @@
         <translation>Usługa niedostępna</translation>
     </message>
     <message>
-        <source>Failed to publish vCard</source>
-        <translation>Nie udało się uaktualnić vCard</translation>
-    </message>
-    <message>
-        <source>Failed to update vCard</source>
-        <translation>Nie udało się uaktualnić vCard</translation>
-    </message>
-    <message>
         <source>&lt;Unset&gt;</source>
         <translation>&lt;nieustawione&gt;</translation>
     </message>
@@ -77,6 +57,30 @@
     <message>
         <source>Image Files (*.%1)</source>
         <translation>Obrazy (*.%1)</translation>
+    </message>
+    <message>
+        <source>Profile - %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to publish your profile: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to publish your profile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load profile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load profile: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -241,17 +245,21 @@
         <translation>Menedżer wizytówek vCard</translation>
     </message>
     <message>
-        <source>Show vCard</source>
-        <translation>Pokaż wizytówkę</translation>
+        <source>Show Profile</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <comment>Show vCard</comment>
-        <translation>Ctrl+I</translation>
+        <comment>Show Profile</comment>
+        <translation type="unfinished">Ctrl+I</translation>
     </message>
     <message>
-        <source>Visit Card</source>
-        <translation>Wizytówka</translation>
+        <source>Contact Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Profile</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

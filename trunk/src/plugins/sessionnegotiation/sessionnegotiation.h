@@ -5,7 +5,6 @@
 #include <definitions/dataformtypes.h>
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/discofeaturehandlerorders.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>

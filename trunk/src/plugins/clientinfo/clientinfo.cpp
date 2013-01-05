@@ -154,10 +154,10 @@ bool ClientInfo::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-			SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 	}
 
 	if (FDiscovery)
@@ -824,9 +824,9 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
 	}
 }
 
-void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
 		if (index->type() == RIT_CONTACT || index->type() == RIT_AGENT || index->type() == RIT_MY_RESOURCE)
@@ -853,9 +853,9 @@ void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes,
 	}
 }
 
-void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if (ALabelId == RLID_DISPLAY)
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 

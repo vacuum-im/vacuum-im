@@ -8,7 +8,6 @@
 #include <definitions/actiongroups.h>
 #include <definitions/dataformtypes.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/resources.h>
@@ -123,8 +122,8 @@ protected:
 	void registerDiscoFeatures();
 protected slots:
 	void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onClientInfoActionTriggered(bool);
 	void onClientInfoDialogClosed(const Jid &AContactJid);
 	void onRosterRemoved(IRoster *ARoster);

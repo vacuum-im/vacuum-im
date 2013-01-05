@@ -25,6 +25,7 @@
 //Bookmarks
 #define MNI_BOOKMARKS                   "bookmarks"
 #define MNI_BOOKMARKS_ADD               "bookmarksAdd"
+#define MNI_BOOKMARKS_REMOVE            "bookmarksRemove"
 #define MNI_BOOKMARKS_ROOM              "bookmarksRoom"
 #define MNI_BOOKMARKS_URL               "bookmarksURL"
 #define MNI_BOOKMARKS_EDIT              "bookmarksEdit"
@@ -167,6 +168,12 @@
 #define MNI_PLUGINMANAGER_SETUP         "pluginmanagerSetup"
 #define MNI_PLUGINMANAGER_ABOUT         "pluginmanagerAbout"
 #define MNI_PLUGINMANAGER_ABOUT_QT      "pluginmanagerAboutQt"
+
+//RecentContact
+#define MNI_RECENT                      "recentcontacts"
+#define MNI_RECENT_FAVORITE             "recentcontactsFavorite"
+#define MNI_RECENT_INSERT_FAVORITE      "recentcontactsInsertFavorite"
+#define MNI_RECENT_REMOVE_FAVORITE      "recentcontactsRemoveFavorite"
 
 //Registration
 #define MNI_REGISTERATION               "register"

@@ -2,8 +2,7 @@
 
 #include <QVBoxLayout>
 
-EditItemDialog::EditItemDialog(const QString &AValue, QStringList ATags,
-                               QStringList ATagList, QWidget *AParent) : QDialog(AParent)
+EditItemDialog::EditItemDialog(const QString &AValue, QStringList ATags, QStringList ATagList, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
 	ui.lneEdit->setText(AValue);

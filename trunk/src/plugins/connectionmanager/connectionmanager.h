@@ -5,7 +5,7 @@
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
@@ -75,7 +75,7 @@ private:
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
-	int FEncryptedLabelId;
+	quint32 FEncryptedLabelId;
 	QMap<QString, IConnectionPlugin *> FPlugins;
 };
 

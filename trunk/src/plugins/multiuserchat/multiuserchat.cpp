@@ -14,6 +14,7 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FXmppStream = NULL;
 	FStanzaProcessor = NULL;
 	FMessageProcessor = NULL;
+	FDiscovery = NULL;
 	FChatPlugin = AChatPlugin;
 
 	FMainUser = NULL;
@@ -27,6 +28,7 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FNickName = ANickName;
 	FPassword = APassword;
 	FShow = IPresence::Offline;
+	FRoomName = FRoomJid.uBare();
 
 	initialize();
 }
@@ -170,6 +172,11 @@ Jid MultiUserChat::streamJid() const
 Jid MultiUserChat::roomJid() const
 {
 	return FRoomJid;
+}
+
+QString MultiUserChat::roomName() const
+{
+	return FRoomName;
 }
 
 bool MultiUserChat::isOpen() const
@@ -324,6 +331,8 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 			QDomElement xelem = presence.addElement("x",NS_MUC);
 			if (!FPassword.isEmpty())
 				xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));
+			if (FDiscovery && !FDiscovery->hasDiscoInfo(streamJid(),roomJid()))
+				FDiscovery->requestDiscoInfo(streamJid(),roomJid());
 		}
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
@@ -593,6 +602,86 @@ bool MultiUserChat::destroyRoom(const QString &AReason)
 	return false;
 }
 
+void MultiUserChat::initialize()
+{
+	IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+		if (FMessageProcessor)
+			FMessageProcessor->insertMessageEditor(MEO_MULTIUSERCHAT,this);
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+		if (FStanzaProcessor)
+		{
+			IStanzaHandle shandle;
+			shandle.handler = this;
+			shandle.order = SHO_PI_MULTIUSERCHAT;
+			shandle.direction = IStanzaHandle::DirectionIn;
+			shandle.streamJid = FStreamJid;
+			shandle.conditions.append(SHC_PRESENCE);
+			FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
+
+			if (FMessageProcessor == NULL)
+			{
+				shandle.conditions.clear();
+				shandle.order = SHO_MI_MULTIUSERCHAT;
+				shandle.conditions.append(SHC_MESSAGE);
+				FSHIMessage = FStanzaProcessor->insertStanzaHandle(shandle);
+			}
+		}
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
+	if (plugin)
+	{
+		IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		if (presencePlugin)
+		{
+			FPresence = presencePlugin->findPresence(FStreamJid);
+			if (FPresence)
+			{
+				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
+				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),SLOT(onPresenceAboutToClose(int , const QString &)));
+			}
+		}
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
+	if (plugin)
+	{
+		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		if (xmppStreams)
+		{
+			FXmppStream = xmppStreams->xmppStream(FStreamJid);
+			if (FXmppStream)
+			{
+				connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
+				connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
+			}
+		}
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
+	if (plugin)
+		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IServiceDiscovery").value(0,NULL);
+	if (plugin)
+	{
+		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+		if (FDiscovery)
+		{
+			onDiscoveryInfoReceived(FDiscovery->discoInfo(streamJid(),roomJid()));
+			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoveryInfoReceived(const IDiscoInfo &)));
+		}
+	}
+}
+
 bool MultiUserChat::processMessage(const Stanza &AStanza)
 {
 	bool hooked = true;
@@ -817,75 +906,6 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	return accepted;
 }
 
-void MultiUserChat::initialize()
-{
-	IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-		if (FMessageProcessor)
-			FMessageProcessor->insertMessageEditor(MEO_MULTIUSERCHAT,this);
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor)
-		{
-			IStanzaHandle shandle;
-			shandle.handler = this;
-			shandle.order = SHO_PI_MULTIUSERCHAT;
-			shandle.direction = IStanzaHandle::DirectionIn;
-			shandle.streamJid = FStreamJid;
-			shandle.conditions.append(SHC_PRESENCE);
-			FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
-
-			if (FMessageProcessor == NULL)
-			{
-				shandle.conditions.clear();
-				shandle.order = SHO_MI_MULTIUSERCHAT;
-				shandle.conditions.append(SHC_MESSAGE);
-				FSHIMessage = FStanzaProcessor->insertStanzaHandle(shandle);
-			}
-		}
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
-	if (plugin)
-	{
-		IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (presencePlugin)
-		{
-			FPresence = presencePlugin->findPresence(FStreamJid);
-			if (FPresence)
-			{
-				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
-				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),SLOT(onPresenceAboutToClose(int , const QString &)));
-			}
-		}
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
-	if (plugin)
-	{
-		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (xmppStreams)
-		{
-			FXmppStream = xmppStreams->xmppStream(FStreamJid);
-			if (FXmppStream)
-			{
-				connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
-				connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
-			}
-		}
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-}
-
 void MultiUserChat::closeChat(int AShow, const QString &AStatus)
 {
 	FConnected = false;
@@ -928,6 +948,19 @@ void MultiUserChat::onPresenceChanged(int AShow, const QString &AStatus, int APr
 	Q_UNUSED(APriority);
 	if (FAutoPresence)
 		sendPresence(AShow,AStatus);
+}
+
+void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
+{
+	if (AInfo.streamJid==streamJid() && AInfo.contactJid==roomJid())
+	{
+		int index = FDiscovery->findIdentity(AInfo.identity,"conference","text");
+		if (index>=0 && !AInfo.identity.at(index).name.isEmpty())
+		{
+			FRoomName = AInfo.identity.at(index).name;
+			emit roomNameChanged(FRoomName);
+		}
+	}
 }
 
 void MultiUserChat::onPresenceAboutToClose(int AShow, const QString &AStatus)

@@ -157,9 +157,9 @@ QVariant RosterIndex::data(int ARole) const
 {
 	QVariant roleData;
 	QList<IRosterDataHolder *> dataHolders = FDataHolders.value(ARole).values();
-	for (int i=0; !roleData.isValid() && i<dataHolders.count(); i++)
+	for (int i=0; roleData.isNull() && i<dataHolders.count(); i++)
 		roleData = dataHolders.at(i)->rosterData(this,ARole);
-	return !roleData.isValid() ? FData.value(ARole) : roleData;
+	return roleData.isNull() ? FData.value(ARole) : roleData;
 }
 
 QMap<int,QVariant> RosterIndex::data() const
@@ -171,7 +171,7 @@ QMap<int,QVariant> RosterIndex::data() const
 		for (int i=0; i<dataHolders.count(); i++)
 		{
 			QVariant roleData = dataHolders.at(i)->rosterData(this,role);
-			if (roleData.isValid())
+			if (!roleData.isNull())
 			{
 				values.insert(role,roleData);
 				break;
@@ -186,7 +186,7 @@ QMap<int,QVariant> RosterIndex::data() const
 	return values;
 }
 
-void RosterIndex::setData(int ARole, const QVariant &AData)
+bool RosterIndex::setData(int ARole, const QVariant &AData)
 {
 	bool changed = false;
 
@@ -196,7 +196,7 @@ void RosterIndex::setData(int ARole, const QVariant &AData)
 
 	if (!changed && FData.value(ARole)!=AData)
 	{
-		if (AData.isValid())
+		if (!AData.isNull())
 			FData.insert(ARole,AData);
 		else
 			FData.remove(ARole);
@@ -205,6 +205,8 @@ void RosterIndex::setData(int ARole, const QVariant &AData)
 
 	if (changed)
 		emit dataChanged(this, ARole);
+
+	return true;
 }
 
 QList<IRosterIndex *> RosterIndex::findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive) const

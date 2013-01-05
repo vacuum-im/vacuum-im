@@ -63,10 +63,6 @@
         <translation>Pokaż zasoby kontaktów na liście</translation>
     </message>
     <message>
-        <source>Show status message in roster</source>
-        <translation>pokaż statusy kontaktów na liście</translation>
-    </message>
-    <message>
         <source>Sort contacts by status</source>
         <translation>Sortuj kontakty według statusu</translation>
     </message>

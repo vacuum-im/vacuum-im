@@ -2,34 +2,54 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl" sourcelanguage="en">
 <context>
-    <name>BookMarks</name>
+    <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
-        <translation>Zakładki</translation>
-    </message>
-    <message>
-        <source>Edit bookmarks</source>
-        <translation>Edytuj zakładki</translation>
+        <translation type="unfinished">Zakładki</translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation>Pozwala na tworzenie zakładek dla konferencji oraz stron internetowych</translation>
-    </message>
-    <message>
-        <source>Append to bookmarks</source>
-        <translation>Dodaj do zakładek</translation>
-    </message>
-    <message>
-        <source>Disable autojoin to conferences</source>
-        <translation>Wyłącz autodołączanie do konferencji</translation>
+        <translation type="unfinished">Pozwala na tworzenie zakładek dla konferencji oraz stron internetowych</translation>
     </message>
     <message>
         <source>Edit bookmark</source>
-        <translation>Edytuj zakładkę</translation>
+        <translation type="unfinished">Edytuj zakładkę</translation>
+    </message>
+    <message>
+        <source>Disable autojoin to conferences</source>
+        <translation type="unfinished">Wyłącz autodołączanie do konferencji</translation>
     </message>
     <message>
         <source>Automatically show window of conferences connected at startup</source>
-        <translation>Pokaż przy starcie okna automatycznie podłączanych konferencji</translation>
+        <translation type="unfinished">Pokaż przy starcie okna automatycznie podłączanych konferencji</translation>
+    </message>
+    <message>
+        <source>Edit Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter bookmark name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Join to Conference at Startup</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -99,10 +119,6 @@
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Nie można zapisać zakładek na serwerze</translation>
-    </message>
-    <message>
-        <source>Cant save bookmarks to server. %1</source>
-        <translation>Nie można zapisać zakładek na serwerze. %1</translation>
     </message>
     <message>
         <source>Edit bookmarks - %1</source>

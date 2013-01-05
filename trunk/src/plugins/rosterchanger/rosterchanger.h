@@ -3,7 +3,6 @@
 
 #include <QDateTime>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/rosteredithandlerorders.h>
@@ -46,13 +45,14 @@ struct AutoSubscription {
 };
 
 class RosterChanger :
-			public QObject,
-			public IPlugin,
-			public IRosterChanger,
-			public IOptionsHolder,
-			public IRostersDragDropHandler,
-			public IRostersEditHandler,
-			public IXmppUriHandler
+	public QObject,
+	public IPlugin,
+	public IRosterChanger,
+	public IOptionsHolder,
+	public IRostersEditHandler,
+	public IRostersDragDropHandler,
+	public IXmppUriHandler,
+	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterChanger IOptionsHolder IRostersDragDropHandler IRostersEditHandler IXmppUriHandler);
@@ -70,17 +70,16 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRostersDragDropHandler
-	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
+	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
-	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
+	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
-	virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
 	//IRostersEditHandler
-	virtual bool rosterEditStart(int ADataRole, const QModelIndex &AIndex) const;
-	virtual QWidget *rosterEditEditor(int ADataRole, QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
-	virtual void rosterEditLoadData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const;
-	virtual void rosterEditSaveData(int ADataRole, QWidget *AEditor, const QModelIndex &AIndex) const;
-	virtual void rosterEditGeometry(int ADataRole, QWidget *AEditor, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
+	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
+	//AdvancedDelegateEditProxy
+	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IRosterChanger
@@ -147,7 +146,7 @@ protected slots:
 	void onRosterClosed(IRoster *ARoster);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);

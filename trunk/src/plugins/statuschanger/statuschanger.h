@@ -6,12 +6,12 @@
 #include <QPointer>
 #include <QDateTime>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterfootertextorders.h>
+#include <definitions/rosterlabelholderorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -34,7 +34,8 @@
 #include "editstatusdialog.h"
 #include "modifystatusdialog.h"
 
-struct StatusItem {
+struct StatusItem 
+{
 	StatusItem() {
 		code = STATUS_NULL_ID;
 		show = IPresence::Offline;
@@ -48,13 +49,14 @@ struct StatusItem {
 };
 
 class StatusChanger :
-			public QObject,
-			public IPlugin,
-			public IStatusChanger,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IStatusChanger,
+	public IOptionsHolder,
+	public IRostersLabelHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
+	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder IRostersLabelHolder);
 public:
 	StatusChanger();
 	~StatusChanger();
@@ -68,6 +70,9 @@ public:
 	virtual bool startPlugin();
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	//IRostersLabelHolder
+	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
+	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IStatusChanger
 	virtual Menu *statusMenu() const;
 	virtual Menu *streamMenu(const Jid &AStreamJid) const;
@@ -94,6 +99,8 @@ signals:
 	void statusItemAdded(int AStatusId);
 	void statusItemChanged(int AStatusId);
 	void statusItemRemoved(int AStatusId);
+	//IRostersLabelHolder
+	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	void createDefaultStatus();
 	void setMainStatusId(int AStatusId);
@@ -126,7 +133,7 @@ protected slots:
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterClosed(IRoster *ARoster);
 	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDefaultStatusIconsChanged();
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -157,10 +164,11 @@ private:
 	QMap<IPresence *, Menu *> FStreamMenu;
 	QMap<IPresence *, Action *> FMainStatusActions;
 private:
-	int FConnectingLabel;
+	quint32 FConnectingLabelId;
 	IPresence *FChangingPresence;
 	QSet<IPresence *> FFastReconnect;
 	QList<IPresence *> FShutdownList;
+	AdvancedDelegateItem FStatusLabel;
 	QMap<int, StatusItem> FStatusItems;
 	QSet<IPresence *> FMainStatusStreams;
 	QMap<IPresence *, int> FLastOnlineStatus;

@@ -35,9 +35,6 @@
       <attribute name="headerVisible">
        <bool>false</bool>
       </attribute>
-      <attribute name="headerVisible">
-       <bool>false</bool>
-      </attribute>
      </widget>
      <widget class="QScrollArea" name="scaScroll">
       <property name="widgetResizable">
@@ -48,8 +45,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>105</width>
-         <height>457</height>
+         <width>70</width>
+         <height>453</height>
         </rect>
        </property>
       </widget>

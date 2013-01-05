@@ -82,12 +82,12 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		if (FRostersViewPlugin)
 		{
 			IRostersView *rostersView = FRostersViewPlugin->rostersView();
-			connect(rostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
-			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, Menu *)),
-				SLOT(onRosterIndexClipboardMenu(const QList<IRosterIndex *> &, Menu *)));
-			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+			connect(rostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(rostersView->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
+				SLOT(onRosterIndexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(rostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		}
 	}
 
@@ -132,7 +132,7 @@ QList<int> Annotations::rosterDataRoles() const
 
 QList<int> Annotations::rosterDataTypes() const
 {
-	static const QList<int> dataTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
+	static const QList<int> dataTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MUC_ITEM;
 	return dataTypes;
 }
 
@@ -380,18 +380,16 @@ void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_EDITANNOTATION)
 		{
-			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
-			if (rosterDataTypes().contains(index.data(RDR_TYPE).toInt()))
-			{
-				showAnnotationDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_PREP_BARE_JID).toString());
-			}
+			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
+			if (index!=NULL && rosterDataTypes().contains(index->data(RDR_TYPE).toInt()))
+				showAnnotationDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
 	}
 }
 
-void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
 		Jid streamJid = index->data(RDR_STREAM_JID).toString();
@@ -410,9 +408,9 @@ void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes
 	}
 }
 
-void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu)
+void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (AIndexes.count()==1 && rosterDataTypes().contains(AIndexes.first()->type()))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && rosterDataTypes().contains(AIndexes.first()->type()))
 	{
 		QString note = annotation(AIndexes.first()->data(RDR_STREAM_JID).toString(), AIndexes.first()->data(RDR_FULL_JID).toString());
 		if (!note.isEmpty())
@@ -426,9 +424,9 @@ void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndex
 	}
 }
 
-void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if (ALabelId==RLID_DISPLAY && rosterDataTypes().contains(AIndex->type()))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && rosterDataTypes().contains(AIndex->type()))
 	{
 		QString note = AIndex->data(RDR_ANNOTATIONS).toString();
 		if (!note.isEmpty())

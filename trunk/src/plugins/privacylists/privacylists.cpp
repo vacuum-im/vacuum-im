@@ -27,7 +27,7 @@ PrivacyLists::PrivacyLists()
 	FStanzaProcessor = NULL;
 	FRosterPlugin = NULL;
 
-	FPrivacyLabelId = -1;
+	FPrivacyLabelId = 0;
 	FApplyAutoListsTimer.setSingleShot(true);
 	FApplyAutoListsTimer.setInterval(AUTO_LISTS_TIMEOUT);
 	connect(&FApplyAutoListsTimer,SIGNAL(timeout()),SLOT(onApplyAutoLists()));
@@ -108,18 +108,18 @@ bool PrivacyLists::initObjects()
 {
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_PRIVACY;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
+		AdvancedDelegateItem label(RLID_PRIVACY_STATUS);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
 		FPrivacyLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 		FRostersView = FRostersViewPlugin->rostersView();
-		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
-			SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 			SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-		connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+		connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 	}
 	return true;
 }
@@ -1288,9 +1288,9 @@ void PrivacyLists::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASel
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		int indexType = AIndexes.first()->type();
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
@@ -1341,7 +1341,7 @@ void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 	}
 }
 
-void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if (ALabelId == FPrivacyLabelId)
 	{
@@ -1356,7 +1356,7 @@ void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMu
 		toolTip += tr("- messages: %1").arg((stanzas & IPrivacyRule::Messages) >0           ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences in: %1").arg((stanzas & IPrivacyRule::PresencesIn) >0    ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences out: %1").arg((stanzas & IPrivacyRule::PresencesOut) >0  ? tr("<b>denied</b>") : tr("allowed"));
-		AToolTips.insertMulti(RTTO_PRIVACY,toolTip);
+		AToolTips.insert(RTTO_PRIVACY,toolTip);
 	}
 }
 

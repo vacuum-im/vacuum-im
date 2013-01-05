@@ -146,22 +146,6 @@
         <translation>Auto unsubscribe contacts</translation>
     </message>
     <message>
-        <source>Copy contact</source>
-        <translation>Copy contact</translation>
-    </message>
-    <message>
-        <source>Copy group</source>
-        <translation>Copy group</translation>
-    </message>
-    <message>
-        <source>Move contact</source>
-        <translation>Move contact</translation>
-    </message>
-    <message>
-        <source>Move group</source>
-        <translation>Move group</translation>
-    </message>
-    <message>
         <source>Remove contact</source>
         <translation>Remove contact</translation>
     </message>
@@ -303,6 +287,10 @@
     <message>
         <source>Subscription message</source>
         <translation>Subscription message</translation>
+    </message>
+    <message>
+        <source>Add group</source>
+        <translation>Add group</translation>
     </message>
 </context>
 <context>

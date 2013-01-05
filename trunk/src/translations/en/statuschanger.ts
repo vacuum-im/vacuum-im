@@ -208,5 +208,9 @@ You can set status class for additional statuses defined by you.</translation>
         <source>Status</source>
         <translation>Status</translation>
     </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation>Show status message in roster</translation>
+    </message>
 </context>
 </TS>

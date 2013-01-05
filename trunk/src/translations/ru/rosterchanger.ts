@@ -122,22 +122,6 @@
         <translation>Запросить</translation>
     </message>
     <message>
-        <source>Copy contact</source>
-        <translation>Копировать контакт</translation>
-    </message>
-    <message>
-        <source>Move contact</source>
-        <translation>Переместить контакт</translation>
-    </message>
-    <message>
-        <source>Copy group</source>
-        <translation>Копировать группу</translation>
-    </message>
-    <message>
-        <source>Move group</source>
-        <translation>Переместить группу</translation>
-    </message>
-    <message>
         <source>Refuse</source>
         <translation>Отказаться</translation>
     </message>
@@ -304,6 +288,10 @@
             <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контакта&lt;/b&gt; из списка контактов?</numerusform>
             <numerusform>Вы уверены, что хотите удалить &lt;b&gt;%n контактов&lt;/b&gt; из списка контактов?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Add group</source>
+        <translation>Добавить группу</translation>
     </message>
 </context>
 <context>

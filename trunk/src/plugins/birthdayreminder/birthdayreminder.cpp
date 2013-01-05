@@ -14,6 +14,8 @@ BirthdayReminder::BirthdayReminder()
 	FRostersViewPlugin = NULL;
 	FMessageProcessor = NULL;
 
+	FBirthdayLabelId = 0;
+
 	FNotifyTimer.setSingleShot(false);
 	FNotifyTimer.setInterval(NOTIFY_TIMEOUT);
 	connect(&FNotifyTimer,SIGNAL(timeout()),SLOT(onShowNotificationTimer()));
@@ -60,8 +62,8 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		}
 	}
 
@@ -129,9 +131,9 @@ bool BirthdayReminder::initObjects()
 	}
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_BIRTHDAY_NOTIFY;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
+		AdvancedDelegateItem label(RLID_BIRTHDAY_NOTIFY);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
 		FBirthdayLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;
@@ -318,9 +320,9 @@ void BirthdayReminder::onRosterIndexInserted(IRosterIndex *AIndex)
 	}
 }
 
-void BirthdayReminder::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void BirthdayReminder::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if (ALabelId==RLID_DISPLAY || ALabelId==FBirthdayLabelId)
+	if (ALabelId==AdvancedDelegateItem::DisplayId || ALabelId==FBirthdayLabelId)
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		int daysLeft = contactBithdayDaysLeft(contactJid);

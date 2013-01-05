@@ -18,6 +18,8 @@ public:
 public slots:
 	void invalidate();
 protected:
+	bool compareVariant(const QVariant &ALeft, const QVariant &ARight) const;
+protected:
 	virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
 	virtual bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
 private:
