@@ -68,11 +68,11 @@ public:
 	virtual void viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent);
 	virtual bool viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
 	//IRostersDragDropHandler
-	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
+	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
-	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
+	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
-	virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
 	//IRosterItemExchange
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QString sendExchangeRequest(const IRosterExchangeRequest &ARequest, bool AIqQuery = true);
@@ -83,7 +83,8 @@ signals:
 	void exchangeRequestApproved(const IRosterExchangeRequest &ARequest);
 	void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError);
 protected:
-	bool isAcceptableDropData(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData) const;
+	QList<IRosterItem> dragDataContacts(const QMimeData *AData) const;
+	QList<IRosterItem> dropDataContacts(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData) const;
 	bool insertDropActions(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData, Menu *AMenu) const;
 protected:
 	void processRequest(const IRosterExchangeRequest &ARequest);

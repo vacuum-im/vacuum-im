@@ -123,8 +123,8 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -1883,15 +1883,14 @@ void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
 
 bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
 	if (!ASelected.isEmpty())
 	{
 		Jid singleStream;
 		foreach(IRosterIndex *index, ASelected)
 		{
-			int indexType = index->type();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!acceptTypes.contains(indexType))
+			Jid contactJid = index->data(RDR_FULL_JID).toString();
+			if (!contactJid.isValid() || contactJid.pBare()==streamJid.pBare())
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;
@@ -2224,12 +2223,12 @@ void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_SHOWHISTORY)
 		{
-			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
-			int indexType = index.data(RDR_TYPE).toInt();
+			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
+			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
 			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
 			{
-				Jid streamJid = index.data(RDR_STREAM_JID).toString();
-				Jid contactJid = indexType!=RIT_STREAM_ROOT ? index.data(RDR_FULL_JID).toString() : Jid::null;
+				Jid streamJid = index->data(RDR_STREAM_JID).toString();
+				Jid contactJid = indexType!=RIT_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : Jid::null;
 				showArchiveWindow(streamJid,contactJid);
 			}
 		}
@@ -2241,9 +2240,9 @@ void MessageArchiver::onRosterIndexMultiSelection(const QList<IRosterIndex *> &A
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId == RLID_DISPLAY)
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid streamJid = !AIndexes.isEmpty() ? AIndexes.first()->data(RDR_STREAM_JID).toString() : QString::null;
 		if (AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)

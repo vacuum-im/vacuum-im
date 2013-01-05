@@ -122,22 +122,6 @@
         <translation>Anfrage</translation>
     </message>
     <message>
-        <source>Copy contact</source>
-        <translation>Kontakt kopieren</translation>
-    </message>
-    <message>
-        <source>Move contact</source>
-        <translation>Kontakt verschieben</translation>
-    </message>
-    <message>
-        <source>Copy group</source>
-        <translation>Gruppe kopieren</translation>
-    </message>
-    <message>
-        <source>Move group</source>
-        <translation>Gruppe verschieben</translation>
-    </message>
-    <message>
         <source>Refuse</source>
         <translation>Abweisen</translation>
     </message>
@@ -303,6 +287,10 @@
             <numerusform>Sind sie sicher, daß sie &lt;b&gt;den Kontakt&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
             <numerusform>Sind sie sicher, daß sie &lt;b&gt;%n Kontakte&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Add group</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

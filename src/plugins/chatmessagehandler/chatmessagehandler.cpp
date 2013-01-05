@@ -10,8 +10,6 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-static const QList<int> ChatActionTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-
 ChatMessageHandler::ChatMessageHandler()
 {
 	FMessageWidgets = NULL;
@@ -25,6 +23,7 @@ ChatMessageHandler::ChatMessageHandler()
 	FStatusChanger = NULL;
 	FXmppUriQueries = NULL;
 	FOptionsManager = NULL;
+	FRecentContacts = NULL;
 }
 
 ChatMessageHandler::~ChatMessageHandler()
@@ -125,8 +124,8 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		if (rostersViewPlugin)
 		{
 			FRostersView = rostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)),
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -144,9 +143,11 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
-	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
+
+	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
+	if (plugin)
+		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
@@ -208,14 +209,14 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
 	return false;
 }
 
-bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
 	return false;
 }
 
-bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder);
 	if (AEvent->modifiers()==Qt::NoModifier && (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE))
@@ -242,12 +243,21 @@ bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 		window = AMessage.type()!=Message::Error ? getWindow(AMessage.from(),AMessage.to()) : findWindow(AMessage.from(),AMessage.to());
 	if (window)
 	{
+		if (FRecentContacts)
+		{
+			IRecentItem recentItem;
+			recentItem.type = REIT_CONTACT;
+			recentItem.streamJid = window->streamJid();
+			recentItem.reference = window->contactJid().pBare();
+			FRecentContacts->setItemActiveTime(recentItem);
+		}
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);
 		if (FHistoryRequests.values().contains(window))
 			FPendingMessages[window].append(AMessage);
 		showStyledMessage(window,AMessage);
 	}
+
 	return window!=NULL;
 }
 
@@ -601,6 +611,22 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
+bool ChatMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
+{
+	static const QList<int> chatDialogTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+	if (!ASelected.isEmpty())
+	{
+		foreach(IRosterIndex *index, ASelected)
+		{
+			int indexType = index->type();
+			if (!chatDialogTypes.contains(indexType))
+				return false;
+		}
+		return true;
+	}
+	return false;
+}
+
 void ChatMessageHandler::onMessageReady()
 {
 	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
@@ -734,17 +760,16 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 {
 	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
 	{
-		if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && isSelectionAccepted(indexes))
 		{
-			QModelIndex index = FRostersView->instance()->currentIndex();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index.data(RDR_STREAM_JID).toString()) : NULL;
-			if (presence && presence->isOpen() && ChatActionTypes.contains(index.data(RDR_TYPE).toInt()))
-			{
-				messageShowWindow(MHO_CHATMESSAGEHANDLER,index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
+			IRosterIndex *index = indexes.first();
+			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
+			if (presence && presence->isOpen())
+				messageShowWindow(MHO_CHATMESSAGEHANDLER,index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
 			}
 		}
 	}
-}
 
 void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody)
 {
@@ -799,16 +824,16 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const QStrin
 	}
 }
 
-void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 		if (presence && presence->isOpen())
 		{
 			Jid contactJid = AIndexes.first()->data(RDR_FULL_JID).toString();
-			if (ChatActionTypes.contains(AIndexes.first()->type()))
+			if (!FRostersView->hasMultiSelection())
 			{
 				Action *action = new Action(AMenu);
 				action->setText(tr("Open chat dialog"));

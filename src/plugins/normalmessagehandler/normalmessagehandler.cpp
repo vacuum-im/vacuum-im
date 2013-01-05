@@ -4,9 +4,6 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_GROUP                 Action::DR_Parametr3
 
-static const QList<int> MessageActionTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK
-  << RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-
 NormalMessageHandler::NormalMessageHandler()
 {
 	FMessageWidgets = NULL;
@@ -17,6 +14,7 @@ NormalMessageHandler::NormalMessageHandler()
 	FRostersView = NULL;
 	FXmppUriQueries = NULL;
 	FOptionsManager = NULL;
+	FRecentContacts = NULL;
 }
 
 NormalMessageHandler::~NormalMessageHandler()
@@ -105,8 +103,8 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 			FRostersView = rostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -117,6 +115,10 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+
+	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
+	if (plugin)
+		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
@@ -174,7 +176,7 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 bool NormalMessageHandler::messageCheck(int AOrder, const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(ADirection);
-	return !AMessage.body().isEmpty() || !AMessage.subject().isEmpty();
+	return AMessage.type()!=Message::GroupChat && (!AMessage.body().isEmpty() || !AMessage.subject().isEmpty());
 }
 
 bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
@@ -184,6 +186,14 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 		IMessageWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageWindow::ReadMode);
 		if (window)
 		{
+			if (FRecentContacts)
+			{
+				IRecentItem recentItem;
+				recentItem.type = REIT_CONTACT;
+				recentItem.streamJid = window->streamJid();
+				recentItem.reference = window->contactJid().pBare();
+				FRecentContacts->setItemActiveTime(recentItem);
+			}
 			QQueue<Message> &messages = FMessageQueue[window];
 			if (messages.isEmpty())
 				showStyledMessage(window,AMessage);
@@ -273,17 +283,20 @@ bool NormalMessageHandler::messageShowWindow(int AMessageId)
 
 bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AType);
-	IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
-	if (window)
+	Q_UNUSED(AOrder);
+	if (AType != Message::GroupChat)
 	{
-		if (AShowMode == IMessageHandler::SM_ASSIGN)
-			window->assignTabPage();
-		else if (AShowMode == IMessageHandler::SM_SHOW)
-			window->showTabPage();
-		else if (AShowMode == IMessageHandler::SM_MINIMIZED)
-			window->showMinimizedTabPage();
-		return true;
+		IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
+		if (window)
+		{
+			if (AShowMode == IMessageHandler::SM_ASSIGN)
+				window->assignTabPage();
+			else if (AShowMode == IMessageHandler::SM_SHOW)
+				window->showTabPage();
+			else if (AShowMode == IMessageHandler::SM_MINIMIZED)
+				window->showMinimizedTabPage();
+			return true;
+		}
 	}
 	return false;
 }
@@ -448,9 +461,12 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
+	static const QList<int> normalDialogTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK
+		<< RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
 	static const QList<int> groupTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_AGENTS 
 		<< RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER;
 	static const QList<int> contactTypes =  QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+
 	if (!ASelected.isEmpty())
 	{
 		Jid singleStream;
@@ -460,7 +476,7 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 		{
 			int indexType = index->type();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!MessageActionTypes.contains(indexType))
+			if (!normalDialogTypes.contains(indexType))
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;
@@ -654,9 +670,9 @@ void NormalMessageHandler::onRosterIndexMultiSelection(const QList<IRosterIndex 
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;

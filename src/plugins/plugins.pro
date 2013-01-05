@@ -65,4 +65,5 @@ SUBDIRS += filemessagearchive
 SUBDIRS += servermessagearchive 
 SUBDIRS += rosteritemexchange 
 SUBDIRS += spellchecker 
-SUBDIRS += messagecarbons  
+SUBDIRS += messagecarbons
+SUBDIRS += recentcontacts 

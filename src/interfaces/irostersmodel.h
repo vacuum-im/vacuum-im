@@ -42,7 +42,7 @@ public:
 	virtual void removeDataHolder(IRosterDataHolder *ADataHolder) =0;
 	virtual QVariant data(int ARole) const =0;
 	virtual QMap<int, QVariant> data() const =0;
-	virtual void setData(int ARole, const QVariant &) =0;
+	virtual bool setData(int ARole, const QVariant &AValue) =0;
 	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const =0;
 	virtual bool removeOnLastChildRemoved() const =0;
 	virtual void setRemoveOnLastChildRemoved(bool ARemove) =0;
@@ -78,6 +78,8 @@ public:
 	virtual QList<IRosterIndex *> getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false) =0;
 	virtual QModelIndex modelIndexByRosterIndex(IRosterIndex *AIndex) const =0;
 	virtual IRosterIndex *rosterIndexByModelIndex(const QModelIndex &AIndex) const =0;
+	virtual bool isGroupType(int AType) const =0;
+	virtual QList<int> singleGroupTypes() const =0;
 	virtual QString singleGroupName(int AType) const =0;
 	virtual void registerSingleGroup(int AType, const QString &AName) =0;
 	virtual void insertDefaultDataHolder(IRosterDataHolder *ADataHolder) =0;
@@ -98,7 +100,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IRosterDataHolder,"Vacuum.Plugin.IRosterDataHolder/1.0");
-Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.1");
-Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.1");
+Q_DECLARE_INTERFACE(IRosterIndex,"Vacuum.Plugin.IRosterIndex/1.2");
+Q_DECLARE_INTERFACE(IRostersModel,"Vacuum.Plugin.IRostersModel/1.2");
 
 #endif

@@ -243,7 +243,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 				rnotify.order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
 				rnotify.flags = record.notification.data.value(NDR_ROSTER_FLAGS).toInt();
 				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool())
-					rnotify.flags |= IRostersLabel::ExpandParents;
+					rnotify.flags |= IRostersNotify::ExpandParents;
 				rnotify.timeout = record.notification.data.value(NDR_ROSTER_TIMEOUT).toInt();
 				rnotify.footer = record.notification.data.value(NDR_ROSTER_FOOTER).toString();
 				rnotify.background = record.notification.data.value(NDR_ROSTER_BACKGROUND).value<QBrush>();
@@ -323,11 +323,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_SHOWMINIMIZED_WIDGET).toLongLong());
 			if (widget)
 			{
-				ITabPage *page = qobject_cast<ITabPage *>(widget);
-				if (page)
-					page->showMinimizedTabPage();
-				else if (widget->isWindow() && !widget->isVisible())
-					widget->showMinimized();
+				FDelayedShowMinimized.append(widget);
+				QTimer::singleShot(0,this,SLOT(onDelayedShowMinimized()));
 			}
 		}
 	}
@@ -363,7 +360,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	if ((record.notification.kinds & INotification::AutoActivate)>0)
 	{
 		FDelayedActivations.append(notifyId);
-		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
+		QTimer::singleShot(0,this,SLOT(onDelayedActivations()));
 	}
 
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
@@ -597,11 +594,24 @@ void Notifications::removeInvisibleNotification(int ANotifyId)
 	}
 }
 
-void Notifications::onActivateDelayedActivations()
+void Notifications::onDelayedActivations()
 {
 	foreach(int notifyId, FDelayedActivations)
 		activateNotification(notifyId);
 	FDelayedActivations.clear();
+}
+
+void Notifications::onDelayedShowMinimized()
+{
+	foreach(QWidget *widget, FDelayedShowMinimized)
+	{
+		ITabPage *page = qobject_cast<ITabPage *>(widget);
+		if (page)
+			page->showMinimizedTabPage();
+		else if (widget->isWindow() && !widget->isVisible())
+			widget->showMinimized();
+	}
+	FDelayedShowMinimized.clear();
 }
 
 void Notifications::onSoundOnOffActionTriggered(bool)

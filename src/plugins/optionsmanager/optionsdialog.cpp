@@ -46,8 +46,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	FProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 
 	ui.trvNodes->setModel(FProxyModel);
-	connect(ui.trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-	        SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
+	connect(ui.trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 
 	ui.dbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
 	ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);
@@ -137,6 +136,8 @@ QStandardItem *OptionsDialog::createNodeItem(const QString &ANodeID)
 				item = new QStandardItem(nodeID);
 				FItemsModel->appendRow(item);
 			}
+			//item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+			//item->setData(Qt::Unchecked, Qt::CheckStateRole);
 			FNodeItems.insert(curNodeID,item);
 		}
 		else

@@ -8,8 +8,6 @@ RostersViewPlugin::RostersViewPlugin()
 	FRostersModel = NULL;
 	FMainWindowPlugin = NULL;
 	FOptionsManager = NULL;
-	FRosterPlugin = NULL;
-	FAccountManager = NULL;
 
 	FSortFilterProxyModel = NULL;
 	FLastModel = NULL;
@@ -43,8 +41,9 @@ void RostersViewPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(ROSTERSMODEL_UUID);
 }
 
-bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
 	if (plugin)
 	{
@@ -55,29 +54,6 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &/*A
 	if (plugin)
 	{
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
-	if (plugin)
-	{
-		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin)
-		{
-			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidAboutToBeChanged(IRoster *, const Jid &)),
-			        SLOT(onRosterStreamJidAboutToBeChanged(IRoster *, const Jid &)));
-		}
-	}
-
-	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
-	if (plugin)
-	{
-		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
-		if (FAccountManager)
-		{
-			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(destroyed(const QUuid &)),SLOT(onAccountDestroyed(const QUuid &)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -126,9 +102,19 @@ bool RostersViewPlugin::initObjects()
 		FRostersView->setRostersModel(FRostersModel);
 	}
 
+	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,FRostersView);
+	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_DISPLAY,FRostersView);
+
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYJID,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYSTATUS,FRostersView);
+
+	registerExpandableRosterIndexType(RIT_STREAM_ROOT,RDR_PREP_BARE_JID);
+	registerExpandableRosterIndexType(RIT_GROUP,RDR_GROUP);
+	registerExpandableRosterIndexType(RIT_GROUP_BLANK,RDR_NAME);
+	registerExpandableRosterIndexType(RIT_GROUP_NOT_IN_ROSTER,RDR_NAME);
+	registerExpandableRosterIndexType(RIT_GROUP_MY_RESOURCES,RDR_NAME);
+	registerExpandableRosterIndexType(RIT_GROUP_AGENTS,RDR_NAME);
 
 	return true;
 }
@@ -137,9 +123,8 @@ bool RostersViewPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_ROSTER_SHOWOFFLINE,true);
 	Options::setDefaultValue(OPV_ROSTER_SHOWRESOURCE,true);
-	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
 	Options::setDefaultValue(OPV_ROSTER_SORTBYSTATUS,false);
-    Options::setDefaultValue(OPV_ROSTER_HIDE_SCROLLBAR,false);
+	Options::setDefaultValue(OPV_ROSTER_HIDE_SCROLLBAR,false);
 
 	if (FOptionsManager)
 	{
@@ -157,7 +142,6 @@ QMultiMap<int, IOptionsWidget *> RostersViewPlugin::optionsWidgets(const QString
 	{
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show offline contact"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource in roster"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SORTBYSTATUS),tr("Sort contacts by status"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_HIDE_SCROLLBAR),tr("Do not show the scroll bars"),AParent));
 	}
@@ -171,111 +155,67 @@ int RostersViewPlugin::rosterDataOrder() const
 
 QList<int> RostersViewPlugin::rosterDataRoles() const
 {
-	static QList<int> dataRoles  = QList<int>()
-	                               << Qt::DisplayRole
-	                               << Qt::BackgroundColorRole
-	                               << Qt::ForegroundRole
-	                               << RDR_FONT_WEIGHT
-	                               << RDR_STATES_FORCE_ON;
+	static const QList<int> dataRoles = QList<int>() 
+		<< Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON << RDR_ALLWAYS_VISIBLE;
 	return dataRoles;
 }
 
 QList<int> RostersViewPlugin::rosterDataTypes() const
 {
-	static QList<int> indexTypes  = QList<int>()
-	                                << RIT_STREAM_ROOT
-	                                << RIT_GROUP
-	                                << RIT_GROUP_BLANK
-	                                << RIT_GROUP_AGENTS
-	                                << RIT_GROUP_MY_RESOURCES
-	                                << RIT_GROUP_NOT_IN_ROSTER
-	                                << RIT_CONTACT
-	                                << RIT_AGENT
-	                                << RIT_MY_RESOURCE;
+	static const QList<int> indexTypes = QList<int>() << RIT_ANY_TYPE;
 	return indexTypes;
 }
 
 QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
-	switch (AIndex->type())
+	if (FRostersModel)
 	{
-	case RIT_STREAM_ROOT:
-		switch (ARole)
+		if (AIndex->parentIndex() == FRostersModel->rootIndex())
 		{
-		case Qt::DisplayRole:
+			switch (ARole)
 			{
-				QString display = AIndex->data(RDR_NAME).toString();
-				if (display.isEmpty())
-					display = AIndex->data(RDR_FULL_JID).toString();
-				return display;
-			}
-		case Qt::ForegroundRole:
-			return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
-		case Qt::BackgroundColorRole:
-			return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
-		case RDR_FONT_WEIGHT:
-			return QFont::Bold;
-		case RDR_STATES_FORCE_ON:
-			return QStyle::State_Children;
-		}
-		break;
-	case RIT_GROUP:
-	case RIT_GROUP_BLANK:
-	case RIT_GROUP_AGENTS:
-	case RIT_GROUP_MY_RESOURCES:
-	case RIT_GROUP_NOT_IN_ROSTER:
-		switch (ARole)
-		{
-		case Qt::DisplayRole:
-			return AIndex->data(RDR_NAME);
-		case Qt::ForegroundRole:
-			return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
-		case RDR_FONT_WEIGHT:
-			return QFont::DemiBold;
-		case RDR_STATES_FORCE_ON:
-			return QStyle::State_Children;
-		}
-		break;
-	case RIT_CONTACT:
-		switch (ARole)
-		{
-		case Qt::DisplayRole:
-			{
-				Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
-				QString display = AIndex->data(RDR_NAME).toString();
-				if (display.isEmpty())
-					display = indexJid.uBare();
-				if (FShowResource && !indexJid.resource().isEmpty())
-					display += "/" + indexJid.resource();
-				return display;
+			case Qt::DisplayRole:
+				return AIndex->data(RDR_NAME);
+			case Qt::ForegroundRole:
+				return FRostersView->palette().color(QPalette::Active, QPalette::BrightText);
+			case Qt::BackgroundColorRole:
+				return FRostersView->palette().color(QPalette::Active, QPalette::Dark);
+			case RDR_STATES_FORCE_ON:
+				return QStyle::State_Children;
+			case RDR_ALLWAYS_VISIBLE:
+				return 1;
 			}
 		}
-		break;
-	case RIT_AGENT:
-		switch (ARole)
+		else if (FRostersModel->isGroupType(AIndex->type()))
 		{
-		case Qt::DisplayRole:
+			switch (ARole)
 			{
-				QString display = AIndex->data(RDR_NAME).toString();
-				if (display.isEmpty())
-				{
-					Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
-					display = indexJid.uBare();
-				}
-				return display;
+			case Qt::DisplayRole:
+				return AIndex->data(RDR_NAME);
+			case Qt::ForegroundRole:
+				return FRostersView->palette().color(QPalette::Active, QPalette::Highlight);
+			case RDR_STATES_FORCE_ON:
+				return QStyle::State_Children;
 			}
 		}
-		break;
-	case RIT_MY_RESOURCE:
-		switch (ARole)
+		else if (ARole == Qt::DisplayRole)
 		{
-		case Qt::DisplayRole:
+			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+			Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
+			QString name = AIndex->data(RDR_NAME).toString();
+			if (streamJid.pBare() != indexJid.pBare())
 			{
-				Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
-				return indexJid.resource();
+				if (name.isEmpty())
+					name = indexJid.uBare();
+				if (FShowResource && !indexJid.node().isEmpty() && !indexJid.resource().isEmpty())
+					name += "/" + indexJid.resource();
 			}
+			else if (name.isEmpty())
+			{
+				name = indexJid.resource();
+			}
+			return name;
 		}
-		break;
 	}
 	return QVariant();
 }
@@ -315,26 +255,35 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 	}
 }
 
-QString RostersViewPlugin::indexGroupName(const QModelIndex &AIndex) const
+void RostersViewPlugin::registerExpandableRosterIndexType(int AType, int AUniqueRole)
 {
-	int indexType = AIndex.data(RDR_TYPE).toInt();
-	switch (indexType)
-	{
-	case RIT_GROUP:
-		return AIndex.data(RDR_GROUP).toString();
-	default:
-		return FRostersModel!=NULL ? FRostersModel->singleGroupName(indexType) : QString::null;
-	}
+	if (!FExpandableTypes.contains(AType))
+		FExpandableTypes.insert(AType,AUniqueRole);
+}
+
+QString RostersViewPlugin::rootExpandId(const QModelIndex &AIndex) const
+{
+	QModelIndex index = AIndex;
+	while (index.parent().isValid())
+		index=index.parent();
+	return indexExpandId(index);
+}
+
+QString RostersViewPlugin::indexExpandId(const QModelIndex &AIndex) const
+{
+	int role = FExpandableTypes.value(AIndex.data(RDR_TYPE).toInt());
+	if (role > 0)
+		return AIndex.data(role).toString();
 	return QString::null;
 }
 
 void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 {
-	QString groupName = indexGroupName(AIndex);
-	if (!groupName.isEmpty() || AIndex.data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
+	QString indexId = indexExpandId(AIndex);
+	if (!indexId.isEmpty())
 	{
-		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
-		bool isExpanded = FExpandState.value(streamJid).value(groupName,true);
+		QString rootId = rootExpandId(AIndex);
+		bool isExpanded = FExpandStates.value(rootId).value(indexId,true);
 		if (isExpanded && !FRostersView->isExpanded(AIndex))
 			FRostersView->expand(AIndex);
 		else if (!isExpanded && FRostersView->isExpanded(AIndex))
@@ -344,14 +293,17 @@ void RostersViewPlugin::loadExpandState(const QModelIndex &AIndex)
 
 void RostersViewPlugin::saveExpandState(const QModelIndex &AIndex)
 {
-	QString groupName = indexGroupName(AIndex);
-	if (!groupName.isEmpty() || AIndex.data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
+	QString indexId = indexExpandId(AIndex);
+	if (!indexId.isEmpty())
 	{
-		Jid streamJid = AIndex.data(RDR_STREAM_JID).toString();
-		if (!FRostersView->isExpanded(AIndex))
-			FExpandState[streamJid][groupName] = false;
-		else
-			FExpandState[streamJid].remove(groupName);
+		QString rootId = rootExpandId(AIndex);
+		if (!rootId.isEmpty())
+		{
+			if (!FRostersView->isExpanded(AIndex))
+				FExpandStates[rootId][indexId] = false;
+			else
+				FExpandStates[rootId].remove(indexId);
+		}
 	}
 }
 
@@ -369,7 +321,9 @@ void RostersViewPlugin::onViewModelAboutToBeReset()
 		FViewSavedState.sliderPos = FRostersView->verticalScrollBar()->sliderPosition();
 	}
 	else
+	{
 		FViewSavedState.currentIndex = NULL;
+	}
 }
 
 void RostersViewPlugin::onViewModelReset()
@@ -390,6 +344,7 @@ void RostersViewPlugin::onViewModelAboutToBeChanged(QAbstractItemModel *AModel)
 		disconnect(FRostersView->model(),SIGNAL(modelAboutToBeReset()),this,SLOT(onViewModelAboutToBeReset()));
 		disconnect(FRostersView->model(),SIGNAL(modelReset()),this,SLOT(onViewModelReset()));
 		disconnect(FRostersView->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),this,SLOT(onViewRowsInserted(const QModelIndex &, int , int )));
+		disconnect(FRostersView->model(),SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int , int )),this,SLOT(onViewRowsAboutToBeRemoved(const QModelIndex &, int , int )));
 	}
 }
 
@@ -401,6 +356,7 @@ void RostersViewPlugin::onViewModelChanged(QAbstractItemModel *AModel)
 		connect(FRostersView->model(),SIGNAL(modelAboutToBeReset()),SLOT(onViewModelAboutToBeReset()));
 		connect(FRostersView->model(),SIGNAL(modelReset()),SLOT(onViewModelReset()));
 		connect(FRostersView->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),SLOT(onViewRowsInserted(const QModelIndex &, int , int )));
+		connect(FRostersView->model(),SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int , int )),SLOT(onViewRowsAboutToBeRemoved(const QModelIndex &, int , int )));
 		startRestoreExpandState();
 	}
 }
@@ -408,7 +364,35 @@ void RostersViewPlugin::onViewModelChanged(QAbstractItemModel *AModel)
 void RostersViewPlugin::onViewRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
 {
 	for (int row=AStart; row<=AEnd; row++)
-		restoreExpandState(AParent.child(row,0));
+	{
+		QModelIndex index = FRostersView->model()->index(row,0,AParent);
+		if (!AParent.isValid())
+		{
+			QString rootId = rootExpandId(index);
+			if (!rootId.isEmpty() && !FExpandStates.contains(rootId))
+			{
+				QByteArray data = Options::fileValue("rosterview.expand-state",rootId).toByteArray();
+				QDataStream stream(data);
+				stream >> FExpandStates[rootId];
+			}
+		}
+		restoreExpandState(index);
+	}
+}
+
+void RostersViewPlugin::onViewRowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd)
+{
+	for (int row=AStart; !AParent.isValid() && row<=AEnd; row++)
+	{
+		QString rootId = rootExpandId(FRostersView->model()->index(row,0,AParent));
+		if (FExpandStates.contains(rootId))
+		{
+			QByteArray data;
+			QDataStream stream(&data, QIODevice::WriteOnly);
+			stream << FExpandStates.take(rootId);
+			Options::setFileValue(data,"rosterview.expand-state",rootId);
+		}
+	}
 }
 
 void RostersViewPlugin::onViewIndexCollapsed(const QModelIndex &AIndex)
@@ -421,43 +405,6 @@ void RostersViewPlugin::onViewIndexExpanded(const QModelIndex &AIndex)
 	saveExpandState(AIndex);
 }
 
-void RostersViewPlugin::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
-{
-	Jid before = ARoster->streamJid();
-	if (FExpandState.contains(before))
-	{
-		QHash<QString, bool> state = FExpandState.take(before);
-		if (before && AAfter)
-			FExpandState.insert(AAfter,state);
-	}
-}
-
-void RostersViewPlugin::onAccountShown(IAccount *AAccount)
-{
-	if (AAccount->isActive())
-	{
-		QByteArray data = Options::fileValue("rosterview.expand-state",AAccount->accountId().toString()).toByteArray();
-		QDataStream stream(data);
-		stream >> FExpandState[AAccount->xmppStream()->streamJid()];
-	}
-}
-
-void RostersViewPlugin::onAccountHidden(IAccount *AAccount)
-{
-	if (AAccount->isActive())
-	{
-		QByteArray data;
-		QDataStream stream(&data, QIODevice::WriteOnly);
-		stream << FExpandState.take(AAccount->xmppStream()->streamJid());
-		Options::setFileValue(data,"rosterview.expand-state",AAccount->accountId().toString());
-	}
-}
-
-void RostersViewPlugin::onAccountDestroyed(const QUuid &AAccountId)
-{
-	Options::setFileValue(QVariant(),"rosterview.expand-state",AAccountId.toString());
-}
-
 void RostersViewPlugin::onRestoreExpandState()
 {
 	restoreExpandState();
@@ -468,7 +415,6 @@ void RostersViewPlugin::onOptionsOpened()
 {
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWOFFLINE));
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWRESOURCE));
-	onOptionsChanged(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
 	onOptionsChanged(Options::node(OPV_ROSTER_SORTBYSTATUS));
 	onOptionsChanged(Options::node(OPV_ROSTER_HIDE_SCROLLBAR));
 }
@@ -485,11 +431,6 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 	else if (ANode.path() == OPV_ROSTER_SHOWRESOURCE)
 	{
 		FShowResource = ANode.value().toBool();
-		emit rosterDataChanged(NULL, Qt::DisplayRole);
-	}
-	else if (ANode.path() == OPV_ROSTER_SHOWSTATUSTEXT)
-	{
-		FRostersView->updateStatusText();
 		emit rosterDataChanged(NULL, Qt::DisplayRole);
 	}
 	else if (ANode.path() == OPV_ROSTER_SORTBYSTATUS)

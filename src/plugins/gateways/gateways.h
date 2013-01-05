@@ -7,7 +7,6 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/discoitemdataroles.h>
@@ -86,7 +85,7 @@ protected slots:
 	void onRemoveActionTriggered(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onPresenceOpened(IPresence *APresence);
 	void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
 	void onPresenceClosed(IPresence *APresence);

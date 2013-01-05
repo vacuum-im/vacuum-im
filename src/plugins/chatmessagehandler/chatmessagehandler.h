@@ -6,9 +6,9 @@
 #include <QTimer>
 #include <definitions/messagehandlerorders.h>
 #include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosternotifyorders.h>
+#include <definitions/recentitemtypes.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -40,6 +40,7 @@
 #include <interfaces/iavatars.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ixmppuriqueries.h>
+#include <interfaces/irecentcontacts.h>
 #include <utils/widgetmanager.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
@@ -78,8 +79,8 @@ public:
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -100,6 +101,7 @@ protected:
 	void showDateSeparator(IChatWindow *AWindow, const QDateTime &ADateTime);
 	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onMessageReady();
 	void onWindowActivated();
@@ -113,7 +115,7 @@ protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onArchiveRequestFailed(const QString &AId, const QString &AError);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
@@ -128,6 +130,7 @@ private:
 	IStatusChanger *FStatusChanger;
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
+	IRecentContacts *FRecentContacts;
 private:
 	QList<IChatWindow *> FWindows;
 	QMap<IChatWindow *, QTimer *> FDestroyTimers;

@@ -48,6 +48,7 @@ public:
 	static QList<QString> globalShortcuts();
 	static bool isGlobalShortcutActive(const QString &AId);
 	static void setGlobalShortcut(const QString &AId, bool AEnabled);
+	static void activateShortcut(const QString &AId, QWidget *AWidget);
 signals:
 	void groupDeclared(const QString &AId);
 	void shortcutDeclared(const QString &AId);

@@ -129,10 +129,10 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 		if (FRostersViewPlugin)
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
-			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)));
 		}
 	}
 
@@ -168,7 +168,7 @@ bool ServiceDiscovery::initObjects()
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_RELOAD,tr("Reload items"),QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWDISCOINFO,tr("Show discovery info"),QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_ADDCONTACT,tr("Add item to roster"),QKeySequence::UnknownKey);
-	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWVCARD,tr("Show vCard"),tr("Ctrl+I","Show vCard"));
+	Shortcuts::declareShortcut(SCT_DISCOWINDOW_SHOWVCARD,tr("Show Profile"),tr("Ctrl+I","Show Profile"));
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_CLOSEWINDOW,tr("Close discovery window"),tr("Esc","Close discovery window"));
 
 	FDiscoMenu = new Menu;
@@ -387,13 +387,13 @@ void ServiceDiscovery::fillDiscoItems(IDiscoItems &ADiscoItems)
 	Q_UNUSED(ADiscoItems);
 }
 
-bool ServiceDiscovery::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ServiceDiscovery::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
 	return false;
 }
 
-bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
@@ -1273,12 +1273,12 @@ void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMu
 	AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
 }
 
-void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		int indexType = AIndexes.first()->type();
-		if (indexType == RIT_STREAM_ROOT || indexType == RIT_CONTACT || indexType == RIT_AGENT || indexType == RIT_MY_RESOURCE)
+		if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT || indexType==RIT_MY_RESOURCE)
 		{
 			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 			Jid contactJid = indexType!=RIT_STREAM_ROOT ? AIndexes.first()->data(RDR_FULL_JID).toString() : streamJid.domain();
@@ -1305,9 +1305,9 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 	}
 }
 
-void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if (ALabelId == RLID_DISPLAY)
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
@@ -1316,7 +1316,7 @@ void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId,
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
 			foreach(IDiscoIdentity identity, dinfo.identity)
 				if (identity.category != DIC_CLIENT)
-					AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
+					AToolTips.insert(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
 		}
 	}
 }

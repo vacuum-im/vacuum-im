@@ -13,6 +13,7 @@ set(HEADERS "action.h"
             "animatedtextbrowser.h"
             "closebutton.h"
             "searchlineedit.h"
-            "imagemanager.h")
+            "imagemanager.h"
+            "advanceditemdelegate.h")
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})

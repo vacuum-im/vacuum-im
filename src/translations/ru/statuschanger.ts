@@ -208,5 +208,9 @@ You can set status class for additional statuses defined by you.</source>
         <source>On loss of connection to the server</source>
         <translation>При обрыве подключения к серверу</translation>
     </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation>Показывать статус контактов</translation>
+    </message>
 </context>
 </TS>

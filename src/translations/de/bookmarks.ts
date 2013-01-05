@@ -2,34 +2,54 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de" sourcelanguage="en">
 <context>
-    <name>BookMarks</name>
+    <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
-        <translation>Lesezeichen</translation>
-    </message>
-    <message>
-        <source>Edit bookmarks</source>
-        <translation>Lesezeichen bearbeiten</translation>
+        <translation type="unfinished">Lesezeichen</translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation>Erlaubt das Erstellen von Lesezeichen für Jabber Konferenzen und Webseiten</translation>
-    </message>
-    <message>
-        <source>Append to bookmarks</source>
-        <translation>Zu Lesezeichen hinzufügen</translation>
-    </message>
-    <message>
-        <source>Disable autojoin to conferences</source>
-        <translation>Sperre das automatische Verbinden zu Konferenzen</translation>
+        <translation type="unfinished">Erlaubt das Erstellen von Lesezeichen für Jabber Konferenzen und Webseiten</translation>
     </message>
     <message>
         <source>Edit bookmark</source>
-        <translation>Lesezeichen bearbeiten</translation>
+        <translation type="unfinished">Lesezeichen bearbeiten</translation>
+    </message>
+    <message>
+        <source>Disable autojoin to conferences</source>
+        <translation type="unfinished">Sperre das automatische Verbinden zu Konferenzen</translation>
     </message>
     <message>
         <source>Automatically show window of conferences connected at startup</source>
-        <translation>Automatisch Fenster für beim Startup verbundene Konferenzen zeigen</translation>
+        <translation type="unfinished">Automatisch Fenster für beim Startup verbundene Konferenzen zeigen</translation>
+    </message>
+    <message>
+        <source>Edit Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename Bookmark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter bookmark name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Join to Conference at Startup</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -99,10 +119,6 @@
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Kann Lesezeichen nicht auf Server speichern</translation>
-    </message>
-    <message>
-        <source>Cant save bookmarks to server. %1</source>
-        <translation>Kann Lesezeichen nicht auf Server speichern. %1</translation>
     </message>
     <message>
         <source>Edit bookmarks - %1</source>

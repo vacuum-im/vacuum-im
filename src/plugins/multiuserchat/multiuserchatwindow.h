@@ -7,6 +7,8 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
+#include <definitions/recentitemtypes.h>
+#include <definitions/rosternotifyorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -29,6 +31,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
+#include <interfaces/irecentcontacts.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
@@ -93,6 +96,7 @@ public:
 	virtual IMultiUserChat *multiUserChat() const;
 	virtual IChatWindow *openChatWindow(const Jid &AContactJid);
 	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
+	virtual void contextMenuForWindow(Menu *AMenu);
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000);
 signals:
@@ -110,6 +114,7 @@ signals:
 	//IMultiUserChatWindow
 	void chatWindowCreated(IChatWindow *AWindow);
 	void chatWindowDestroyed(IChatWindow *AWindow);
+	void multiChatWindowContextMenu(Menu *AMenu);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 protected:
 	void initialize();
@@ -121,6 +126,7 @@ protected:
 	void loadWindowState();
 	void saveWindowGeometry();
 	void loadWindowGeometry();
+	void updateRecentItemActiveTime();
 	void showDateSeparator(IViewWidget *AView, const QDateTime &ADateTime);
 	bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
 	void highlightUserRole(IMultiUser *AUser);
@@ -148,10 +154,10 @@ protected:
 	void removeActiveChatMessages(IChatWindow *AWindow);
 	void updateChatWindow(IChatWindow *AWindow);
 protected:
-	virtual bool event(QEvent *AEvent);
-	virtual void showEvent(QShowEvent *AEvent);
-	virtual void closeEvent(QCloseEvent *AEvent);
-	virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
+	bool event(QEvent *AEvent);
+	void showEvent(QShowEvent *AEvent);
+	void closeEvent(QCloseEvent *AEvent);
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onChatOpened();
 	void onChatNotify(const QString &ANotify);
@@ -219,6 +225,7 @@ private:
 	IStatusChanger *FStatusChanger;
 	IMultiUserChat *FMultiChat;
 	IMultiUserChatPlugin *FChatPlugin;
+	IRecentContacts *FRecentContacts;
 private:
 	IViewWidget *FViewWidget;
 	IEditWidget *FEditWidget;
@@ -235,7 +242,7 @@ private:
 	Action *FInviteContact;
 	Action *FRequestVoice;
 	Action *FClearChat;
-	Action *FChangeSubject;
+	Action *FChangeTopic;
 	Action *FBanList;
 	Action *FMembersList;
 	Action *FAdminsList;
@@ -266,7 +273,6 @@ private:
 	QString FCompleteNickLast;
 	QList<QString> FCompleteNicks;
 	QList<QString>::const_iterator FCompleteIt;
-
 };
 
 #endif // MULTIUSERCHATWINDOW_H
