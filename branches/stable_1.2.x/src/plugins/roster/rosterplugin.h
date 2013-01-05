@@ -2,8 +2,10 @@
 #define ROSTERPLUGIN_H
 
 #include <QObjectCleanupHandler>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ipresence.h>
+#include <utils/options.h>
 #include "roster.h"
 
 class RosterPlugin :
@@ -22,7 +24,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects() { return true; }
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IRosterPlugin
 	virtual IRoster *getRoster(IXmppStream *AXmppStream);

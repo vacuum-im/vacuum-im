@@ -16,8 +16,15 @@
 
 QList<NotifyWidget *> NotifyWidget::FWidgets;
 QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
+IMainWindow *NotifyWidget::FMainWindow = NULL;
+QRect NotifyWidget::FDisplay = QRect();
 
-NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
+NotifyWidget::NotifyWidget(const INotification &ANotification)
+#if defined(Q_OS_MAC)
+	: QWidget(NULL, Qt::SubWindow|Qt::FramelessWindowHint|Qt::WindowSystemMenuHint|Qt::WindowStaysOnTopHint)
+#else
+	: QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
+#endif
 {
 	ui.setupUi(this);
 	setFocusPolicy(Qt::NoFocus);
@@ -101,6 +108,8 @@ void NotifyWidget::appear()
 
 		setWindowOpacity(ANIMATE_OPACITY_START);
 
+		if (FWidgets.isEmpty())
+			FDisplay = FDesktop->availableGeometry(FMainWindow->instance());
 		FWidgets.prepend(this);
 		layoutWidgets();
 	}
@@ -123,6 +132,11 @@ void NotifyWidget::setAnimated(bool AAnimated)
 void NotifyWidget::setNetworkAccessManager(QNetworkAccessManager *ANetworkAccessManager)
 {
 	ui.ntbText->setNetworkAccessManager(ANetworkAccessManager);
+}
+
+void NotifyWidget::setMainWindow(IMainWindow *AMainWindow)
+{
+	FMainWindow = AMainWindow;
 }
 
 void NotifyWidget::resizeEvent(QResizeEvent *AEvent)
@@ -161,15 +175,14 @@ void NotifyWidget::onAnimateStep()
 
 void NotifyWidget::layoutWidgets()
 {
-	QRect display = FDesktop->availableGeometry();
-	int ypos = display.bottom();
+	int ypos = FDisplay.bottom();
 	for (int i=0; ypos>0 && i<FWidgets.count(); i++)
 	{
 		NotifyWidget *widget = FWidgets.at(i);
 		if (!widget->isVisible())
 		{
 			widget->show();
-			widget->move(display.right() - widget->frameGeometry().width(), display.bottom());
+			widget->move(FDisplay.right() - widget->frameGeometry().width(), FDisplay.bottom());
 			QTimer::singleShot(0,widget,SLOT(adjustHeight()));
 			QTimer::singleShot(10,widget,SLOT(adjustHeight()));
 		}

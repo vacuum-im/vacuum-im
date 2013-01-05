@@ -31,7 +31,7 @@
 // Compress
 #define OPV_ACCOUNT_STREAMCOMPRESS                      "accounts.account.stream-compress"
 
-//BirthdayReminder
+// BirthdayReminder
 #define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
 #define OPV_BIRTHDAYREMINDER_STOPTIME                   "birthdayreminder.stop-time"
 
@@ -105,7 +105,7 @@
 #define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
 // NormalMessageHandler
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
-//MessageStyles
+// MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
 
 // MultiUserChat
@@ -197,10 +197,10 @@
 // RosterSearch
 #define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
-//RosterItemExchange
+// RosterItemExchange
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
 
-//ShortcutManager
+// ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"
 
 // StatusChanger
@@ -227,5 +227,12 @@
 #define OPV_STATUSICONS_RULE_ITEM                       "statusicons.rules.rule"
 #define OPV_STATUSICONS_RULE_PATTERN                    "statusicons.rules.rule.pattern"
 #define OPV_STATUSICONS_RULE_ICONSET                    "statusicons.rules.rule.iconset"
+
+// XmppStreams
+#define OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE               "xmppstreams.timeout.handshake"
+#define OPV_XMPPSTREAMS_TIMEOUT_KEEPALIVE               "xmppstreams.timeout.keepalive"
+#define OPV_XMPPSTREAMS_TIMEOUT_DISCONNECT              "xmppstreams.timeout.disconnect"
+// RosterPlugin
+#define OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST           "xmppstreams.timeout.roster-request"
 
 #endif // DEF_OPTIONVALUES_H
