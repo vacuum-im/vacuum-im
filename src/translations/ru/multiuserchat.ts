@@ -568,16 +568,6 @@ Check values and try again</source>
         <translation>Выходить из конференции при закрытии окна</translation>
     </message>
     <message>
-        <source>Open conference dialog</source>
-        <translation>Открыть диалог конференции</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Open conference dialog</comment>
-        <translatorcomment>Открыть диалог конференции</translatorcomment>
-        <translation>Return</translation>
-    </message>
-    <message>
         <source>Enter conference</source>
         <translation>Войти в конференцию</translation>
     </message>

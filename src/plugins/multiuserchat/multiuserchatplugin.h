@@ -141,6 +141,7 @@ protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
+	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
 protected slots:
 	void onMultiChatWindowContextMenu(Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
