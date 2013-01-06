@@ -568,15 +568,6 @@ Werte überprüfen und neu probieren</translation>
         <translation>Konferenz verlassen wenn Fenster geschlossen wird</translation>
     </message>
     <message>
-        <source>Open conference dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Open conference dialog</comment>
-        <translation type="unfinished">Return</translation>
-    </message>
-    <message>
         <source>Enter conference</source>
         <translation type="unfinished"></translation>
     </message>

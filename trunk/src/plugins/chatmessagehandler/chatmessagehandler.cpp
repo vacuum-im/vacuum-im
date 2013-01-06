@@ -764,12 +764,10 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && isSelectionAccepted(indexes))
 		{
 			IRosterIndex *index = indexes.first();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
-			if (presence && presence->isOpen())
-				messageShowWindow(MHO_CHATMESSAGEHANDLER,index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
-			}
+			messageShowWindow(MHO_CHATMESSAGEHANDLER,index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);
 		}
 	}
+}
 
 void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody)
 {
@@ -828,22 +826,16 @@ void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &A
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
-		if (presence && presence->isOpen())
+		if (!FRostersView->hasMultiSelection())
 		{
-			Jid contactJid = AIndexes.first()->data(RDR_FULL_JID).toString();
-			if (!FRostersView->hasMultiSelection())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Open chat dialog"));
-				action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
-				action->setData(ADR_STREAM_JID,streamJid.full());
-				action->setData(ADR_CONTACT_JID,contactJid.full());
-				action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
-				AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
-			}
+			Action *action = new Action(AMenu);
+			action->setText(tr("Open chat dialog"));
+			action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
+			action->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
+			action->setData(ADR_CONTACT_JID,AIndexes.first()->data(RDR_FULL_JID));
+			action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
+			AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
+			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 		}
 	}
 }

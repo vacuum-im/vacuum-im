@@ -108,7 +108,6 @@
 //NormalMessageHandler
 #define   SCT_ROSTERVIEW_SHOWNORMALDIALOG                          "roster-view.show-normal-dialog"
 //MultiUserChat
-#define   SCT_ROSTERVIEW_SHOWMUCDIALOG                             "roster-view.show-muc-dialog"
 #define   SCT_ROSTERVIEW_ENTERCONFERENCE                           "roster-view.enter-conference"
 #define   SCT_ROSTERVIEW_EXITCONFERENCE                            "roster-view.exit-conference"
 //RosterChanger

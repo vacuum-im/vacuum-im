@@ -567,15 +567,6 @@ Check values and try again</source>
         <translation>Виходити з конференції при закритті вікна</translation>
     </message>
     <message>
-        <source>Open conference dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Open conference dialog</comment>
-        <translation type="unfinished">Повернутися</translation>
-    </message>
-    <message>
         <source>Enter conference</source>
         <translation type="unfinished"></translation>
     </message>

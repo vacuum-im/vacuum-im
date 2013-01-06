@@ -568,15 +568,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Opuszczaj konferencje przy zamknięciu okna</translation>
     </message>
     <message>
-        <source>Open conference dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Open conference dialog</comment>
-        <translation type="unfinished">Return</translation>
-    </message>
-    <message>
         <source>Enter conference</source>
         <translation type="unfinished"></translation>
     </message>

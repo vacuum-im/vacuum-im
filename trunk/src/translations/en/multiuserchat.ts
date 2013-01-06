@@ -568,15 +568,6 @@ Check values and try again</translation>
         <translation>Invite user</translation>
     </message>
     <message>
-        <source>Open conference dialog</source>
-        <translation>Open conference dialog</translation>
-    </message>
-    <message>
-        <source>Return</source>
-        <comment>Open conference dialog</comment>
-        <translation>Return</translation>
-    </message>
-    <message>
         <source>Enter conference</source>
         <translation>Enter conference</translation>
     </message>
