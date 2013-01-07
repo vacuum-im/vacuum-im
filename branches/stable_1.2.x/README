@@ -28,7 +28,6 @@ Portable Version
 
 Known Issues
 ------------
-  - on some systems popup window may capture input focus
   - on GTalk accounts allways used default nested roster group delimiter
   - not native look and feel in Mac OS
 
