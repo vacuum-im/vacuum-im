@@ -16,4 +16,8 @@
     <key>recentcontactsRemoveFavorite</key>
     <object mime="image/png">recentcontactsremovefavorite.png</object>
   </icon>
+  <icon>
+    <key>recentcontactsRemoveRecent</key>
+    <object mime="image/png">recentcontactsremoverecent.png</object>
+  </icon>
 </icondef>

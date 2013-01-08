@@ -15,7 +15,6 @@ struct IRecentItem
 	QString type;
 	Jid streamJid;
 	QString reference;
-	bool favorite;
 	QDateTime activeTime;
 	QDateTime updateTime;
 	QMap<QString, QVariant> properties;
@@ -49,13 +48,13 @@ class IRecentContacts
 {
 public:
 	virtual QObject *instance() = 0;
+	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual bool isValidItem(const IRecentItem &AItem) const =0;
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const =0;
-	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const =0;
 	virtual QVariant itemProperty(const IRecentItem &AItem, const QString &AName) const =0;
 	virtual void setItemProperty(const IRecentItem &AItem, const QString &AName, const QVariant &AValue) =0;
-	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite) =0;
 	virtual void setItemActiveTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
+	virtual void removeItem(const IRecentItem &AItem) =0;
 	virtual QList<IRecentItem> visibleItems() const =0;
 	virtual quint8 maximumVisibleItems() const =0;
 	virtual void setMaximumVisibleItems(quint8 ACount) =0;
@@ -77,6 +76,6 @@ protected:
 Q_DECLARE_METATYPE(IRecentItem);
 
 Q_DECLARE_INTERFACE(IRecentItemHandler,"Vacuum.Plugin.IRecentItemHandler/1.0")
-Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.0")
+Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.1")
 
 #endif //IRECENTCONTACTS_H

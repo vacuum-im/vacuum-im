@@ -174,6 +174,7 @@
 #define MNI_RECENT_FAVORITE             "recentcontactsFavorite"
 #define MNI_RECENT_INSERT_FAVORITE      "recentcontactsInsertFavorite"
 #define MNI_RECENT_REMOVE_FAVORITE      "recentcontactsRemoveFavorite"
+#define MNI_RECENT_REMOVE_RECENT        "recentcontactsRemoveRecent"
 
 //Registration
 #define MNI_REGISTERATION               "register"

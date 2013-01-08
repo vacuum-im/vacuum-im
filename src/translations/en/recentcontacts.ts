@@ -39,5 +39,13 @@
         <source>Simplify Contacts View</source>
         <translation>Simplify Contacts View</translation>
     </message>
+    <message>
+        <source>Remove from Recent Contacts</source>
+        <translation>Remove from Recent Contacts</translation>
+    </message>
+    <message>
+        <source>Remove from recent contacts</source>
+        <translation>Remove from recent contacts</translation>
+    </message>
 </context>
 </TS>

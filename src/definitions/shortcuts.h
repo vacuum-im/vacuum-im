@@ -131,5 +131,6 @@
 //RecentContacts
 #define   SCT_ROSTERVIEW_INSERTFAVORITE                            "roster-view.insert-favorite"
 #define   SCT_ROSTERVIEW_REMOVEFAVORITE                            "roster-view.remove-favorite"
+#define   SCT_ROSTERVIEW_REMOVEFROMRECENT                          "roster-view.remove-from-recent"
 
 #endif // DEF_SHORTCUTS_H
