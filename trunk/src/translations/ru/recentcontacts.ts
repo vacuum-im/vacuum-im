@@ -39,5 +39,13 @@
         <source>Simplify Contacts View</source>
         <translation>Упростить отображение контактов</translation>
     </message>
+    <message>
+        <source>Remove from Recent Contacts</source>
+        <translation>Удалить из недавних контактов</translation>
+    </message>
+    <message>
+        <source>Remove from recent contacts</source>
+        <translation>Удалить из недавних контактов</translation>
+    </message>
 </context>
 </TS>

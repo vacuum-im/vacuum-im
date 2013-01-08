@@ -61,13 +61,13 @@ public:
 	virtual IRecentItem recentItemForIndex(const IRosterIndex *AIndex) const;
 	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	//IRecentContacts
+	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual bool isValidItem(const IRecentItem &AItem) const;
 	virtual QList<IRecentItem> streamItems(const Jid &AStreamJid) const;
-	virtual QList<IRecentItem> favoriteItems(const Jid &AStreamJid) const;
 	virtual QVariant itemProperty(const IRecentItem &AItem, const QString &AName) const;
 	virtual void setItemProperty(const IRecentItem &AItem, const QString &AName, const QVariant &AValue);
-	virtual void setItemFavorite(const IRecentItem &AItem, bool AFavorite);
 	virtual void setItemActiveTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
+	virtual void removeItem(const IRecentItem &AItem);
 	virtual QList<IRecentItem> visibleItems() const;
 	virtual quint8 maximumVisibleItems() const;
 	virtual void setMaximumVisibleItems(quint8 ACount);
@@ -97,9 +97,9 @@ protected:
 	void removeItemIndex(const IRecentItem &AItem);
 	void updateItemProxy(const IRecentItem &AItem);
 	void updateItemProperties(const IRecentItem &AItem);
-	void mergeRecentItems(const QList<IRecentItem> &AItems);
 	IRecentItem &findRealItem(const IRecentItem &AItem);
 	IRecentItem findRealItem(const IRecentItem &AItem) const;
+	void mergeRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems, bool AReplace);
 	QList<IRosterIndex *> sortItemProxies(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
 protected:
@@ -107,13 +107,14 @@ protected:
 	bool saveItemsToStorage(const Jid &AStreamJid);
 protected:
 	QString recentFileName(const Jid &AStreamJid) const;
+	QList<IRecentItem> loadItemsFromXML(const QDomElement &AElement) const;
 	void saveItemsToXML(QDomElement &AElement, const QList<IRecentItem> &AItems) const;
-	QList<IRecentItem> loadItemsFromXML(const Jid &AStreamJid, const QDomElement &AElement) const;
+	QList<IRecentItem> loadItemsFromFile(const QString &AFileName) const;
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
-	QList<IRecentItem> loadItemsFromFile(const Jid &AStreamJid, const QString &AFileName) const;
 protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
 	bool isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
+	void removeRecentItems(const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 	void setItemsFavorite(bool AFavorite, const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 protected slots:
 	void onRostersModelStreamAdded(const Jid &AStreamJid);
@@ -138,6 +139,7 @@ protected slots:
 	void onProxyIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
 	void onHandlerRecentItemUpdated(const IRecentItem &AItem);
 protected slots:
+	void onRemoveFromRecentByAction();
 	void onInsertToFavoritesByAction();
 	void onRemoveFromFavoritesByAction();
 	void onSaveItemsToStorageTimerTimeout();
@@ -158,8 +160,6 @@ private:
 	IMessageProcessor *FMessageProcessor;
 private:
 	quint32 FShowFavariteLabelId;
-	quint32 FInsertFavariteLabelId;
-	quint32 FRemoveFavoriteLabelId;
 private:
 	quint8 FMaxVisibleItems;
 	QMap<Jid, QList<IRecentItem> > FStreamItems;

@@ -576,7 +576,7 @@ QIcon MultiUserChatPlugin::recentItemIcon(const IRecentItem &AItem) const
 
 QString MultiUserChatPlugin::recentItemName(const IRecentItem &AItem) const
 {
-	QString name = FRecentContacts->itemProperty(AItem,REIP_ITEM_NAME).toString();
+	QString name = FRecentContacts->itemProperty(AItem,REIP_NAME).toString();
 	return name.isEmpty() ? AItem.reference : name;
 }
 
@@ -881,7 +881,7 @@ void MultiUserChatPlugin::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
 		QString name = AWindow->multiUserChat()->roomName();
 		if (FRecentContacts && AWindow->multiUserChat()->roomJid().uBare()==name)
 		{
-			name = FRecentContacts->itemProperty(recentItemForIndex(chatIndex),REIP_ITEM_NAME).toString();
+			name = FRecentContacts->itemProperty(recentItemForIndex(chatIndex),REIP_NAME).toString();
 			if (name.isEmpty())
 				name = AWindow->multiUserChat()->roomName();
 		}

@@ -2,7 +2,8 @@
 #define DEF_RECENTITEMPROPERTIES_H
 
 //RecentContacts
-#define REIP_ITEM_NAME                         "name"
+#define REIP_NAME                              "name"
+#define REIP_FAVORITE                          "favorite"
 
 //MultiUSerChat
 #define REIP_CONFERENCE_NICK                   "nick"

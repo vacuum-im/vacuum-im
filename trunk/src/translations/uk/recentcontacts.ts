@@ -39,5 +39,13 @@
         <source>Simplify Contacts View</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Remove from Recent Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from recent contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
