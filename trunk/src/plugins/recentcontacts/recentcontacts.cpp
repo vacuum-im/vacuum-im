@@ -946,7 +946,7 @@ void RecentContacts::startSaveItemsToStorage(const Jid &AStreamJid)
 
 bool RecentContacts::saveItemsToStorage(const Jid &AStreamJid)
 {
-	if (FPrivateStorage && FPrivateStorage->isOpen(AStreamJid))
+	if (FPrivateStorage && isReady(AStreamJid))
 	{
 		QDomDocument doc;
 		QDomElement itemsElem = doc.appendChild(doc.createElementNS(PSN_RECENTCONTACTS,PST_RECENTCONTACTS)).toElement();
