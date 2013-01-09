@@ -1,6 +1,7 @@
 #include "rostersearch.h"
 
 #include <QKeyEvent>
+#include <QMouseEvent>
 
 RosterSearch::RosterSearch()
 {
@@ -34,7 +35,7 @@ RosterSearch::RosterSearch()
 	FSearchEdit->setSearchMenuVisible(true);
 	FSearchEdit->setSelectTextOnFocusEnabled(false);
 	FSearchEdit->searchMenu()->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
-	FSearchEdit->setToolTip(tr("Search by regular expression"));
+	FSearchEdit->setPlaceholderText(tr("Search for Contacts"));
 	connect(FSearchEdit,SIGNAL(searchStart()),SLOT(onSearchEditStart()));
 	FSearchToolBarChanger->insertWidget(FSearchEdit);
 }
@@ -109,17 +110,22 @@ bool RosterSearch::initSettings()
 
 bool RosterSearch::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
 	return false;
 }
 
 bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	Q_UNUSED(AIndex); Q_UNUSED(AEvent);
-	if (AOrder == RCHO_ROSTERSEARCH)
+	Q_UNUSED(AEvent);
+	if (AOrder==RCHO_ROSTERSEARCH && AEvent->modifiers()==Qt::NoModifier)
 	{
 		if (!searchPattern().isEmpty() && AIndex->childCount()==0)
+		{
+			FSelectedIndexes.clear();
+			FSelectedIndexes.append(AIndex);
 			setSearchPattern(QString::null);
+		}
 	}
 	return false;
 }
@@ -191,7 +197,10 @@ void RosterSearch::startSearch()
 	}
 
 	if (filterRegExp().pattern() != pattern)
-		setFilterRegExp(pattern);
+	{
+		QRegExp regExp(pattern,Qt::CaseInsensitive,QRegExp::Wildcard);
+		setFilterRegExp(regExp);
+	}
 	invalidate();
 
 	if (FRostersViewPlugin)

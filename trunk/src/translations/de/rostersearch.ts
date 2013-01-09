@@ -8,10 +8,6 @@
         <translation>Suchleiste</translation>
     </message>
     <message>
-        <source>Search by regular expression</source>
-        <translation>Suche mit RegEx</translation>
-    </message>
-    <message>
         <source>Roster Search</source>
         <translation>Rostersuche</translation>
     </message>
@@ -38,6 +34,10 @@
     <message>
         <source>Group</source>
         <translation>Gruppe</translation>
+    </message>
+    <message>
+        <source>Search for Contacts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
