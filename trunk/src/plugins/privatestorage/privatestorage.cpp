@@ -103,9 +103,9 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 		QDomElement dataElem; 
 		QDomElement loadElem = FLoadRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
-			dataElem = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement();
-		else
-			dataElem = loadOptionsElement(AStreamJid, loadElem.tagName(),loadElem.namespaceURI());
+			dataElem = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement(loadElem.tagName());
+		if (dataElem.isNull())
+			dataElem = loadOptionsElement(AStreamJid,loadElem.tagName(),loadElem.namespaceURI());
 		emit dataLoaded(AStanza.id(),AStreamJid,insertElement(AStreamJid,dataElem));
 	}
 	else if (FRemoveRequests.contains(AStanza.id()))
