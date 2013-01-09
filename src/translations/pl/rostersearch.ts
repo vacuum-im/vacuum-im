@@ -8,10 +8,6 @@
         <translation>Listwa wyszukiwarki</translation>
     </message>
     <message>
-        <source>Search by regular expression</source>
-        <translation>Szukaj za pomocą wyrażeń regularnych</translation>
-    </message>
-    <message>
         <source>Roster Search</source>
         <translation>Szukaj na liście kontaktów</translation>
     </message>
@@ -38,6 +34,10 @@
     <message>
         <source>Group</source>
         <translation>Grupa</translation>
+    </message>
+    <message>
+        <source>Search for Contacts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
