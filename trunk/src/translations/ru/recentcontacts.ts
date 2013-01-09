@@ -47,5 +47,13 @@
         <source>Remove from recent contacts</source>
         <translation>Удалить из недавних контактов</translation>
     </message>
+    <message>
+        <source>Sort by Last Activity</source>
+        <translation>Сортировать по последней активности</translation>
+    </message>
+    <message>
+        <source>Show Only Favorite Contacts</source>
+        <translation>Показывать только избранные контакты</translation>
+    </message>
 </context>
 </TS>

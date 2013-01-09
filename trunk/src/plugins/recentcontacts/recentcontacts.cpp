@@ -61,6 +61,8 @@ RecentContacts::RecentContacts()
 	FHideLaterContacts = true;
 	FAllwaysShowOffline = true;
 	FSimpleContactsView = true;
+	FSortByLastActivity = true;
+	FShowOnlyFavorite = false;
 
 	FSaveTimer.setSingleShot(true);
 	connect(&FSaveTimer,SIGNAL(timeout()),SLOT(onSaveItemsToStorageTimerTimeout()));
@@ -196,6 +198,8 @@ bool RecentContacts::initSettings()
 	Options::setDefaultValue(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE,true);
 	Options::setDefaultValue(OPV_ROSTER_RECENT_HIDELATERCONTACTS,true);
 	Options::setDefaultValue(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW,true);
+	Options::setDefaultValue(OPV_ROSTER_RECENT_SORTBYACTIVETIME,true);
+	Options::setDefaultValue(OPV_ROSTER_RECENT_SHOWONLYFAVORITE,false);
 	return true;
 }
 
@@ -628,31 +632,36 @@ void RecentContacts::updateVisibleItems()
 		}
 		qSort(common.begin(),common.end(),recentItemLessThen);
 
-		if (FHideLaterContacts)
+		QDateTime firstTime;
+		for (QList<IRecentItem>::iterator it=common.begin(); it!=common.end(); )
 		{
-			QDateTime firstTime;
-			for (QList<IRecentItem>::iterator it=common.begin(); it!=common.end(); )
+			if (it->properties.value(REIP_FAVORITE).toBool())
 			{
-				if (!it->properties.value(REIP_FAVORITE).toBool())
+				++it;
+			}
+			else if (FShowOnlyFavorite)
+			{
+				it = common.erase(it);
+			}
+			else if (FHideLaterContacts)
+			{
+				if (firstTime.isNull())
 				{
-					if (firstTime.isNull())
-					{
-						firstTime = it->activeTime;
-						++it;
-					}
-					else if (it->activeTime.daysTo(firstTime) > LATER_CONTACTS_DAYS_DELTA)
-					{
-						it = common.erase(it);
-					}
-					else
-					{
-						++it;
-					}
+					firstTime = it->activeTime;
+					++it;
+				}
+				else if (it->activeTime.daysTo(firstTime) > LATER_CONTACTS_DAYS_DELTA)
+				{
+					it = common.erase(it);
 				}
 				else
 				{
 					++it;
 				}
+			}
+			else
+			{
+				++it;
 			}
 		}
 
@@ -719,7 +728,11 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 			}
 		}
 		index->setData(RDR_RECENT_DATETIME,item.activeTime);
-		index->setData(RDR_SORT_ORDER, (int)(favorite ? 0x80000000 : item.activeTime.secsTo(zero)));
+		
+		if (FSortByLastActivity)
+			index->setData(RDR_SORT_ORDER, (int)(favorite ? 0x80000000 : item.activeTime.secsTo(zero)));
+		else
+			index->setData(RDR_SORT_ORDER, QVariant());
 
 		if (FRostersView)
 		{
@@ -1175,7 +1188,7 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			hideLater->setCheckable(true);
 			hideLater->setChecked(FHideLaterContacts);
 			connect(hideLater,SIGNAL(triggered()),SLOT(onChangeHideLaterContacts()));
-			AMenu->addAction(hideLater,AG_RVCM_RECENT_OPTIONS,true);
+			AMenu->addAction(hideLater,AG_RVCM_RECENT_OPTIONS);
 			recentActions += hideLater;
 
 			Action *showOffline = new Action(AMenu);
@@ -1183,7 +1196,7 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			showOffline->setCheckable(true);
 			showOffline->setChecked(FAllwaysShowOffline);
 			connect(showOffline,SIGNAL(triggered()),SLOT(onChangeAlwaysShowOfflineContacts()));
-			AMenu->addAction(showOffline,AG_RVCM_RECENT_OPTIONS,true);
+			AMenu->addAction(showOffline,AG_RVCM_RECENT_OPTIONS);
 			recentActions += showOffline;
 			
 			Action *simpleView = new Action(AMenu);
@@ -1191,8 +1204,24 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			simpleView->setCheckable(true);
 			simpleView->setChecked(FSimpleContactsView);
 			connect(simpleView,SIGNAL(triggered()),SLOT(onChangeSimpleContactsView()));
-			AMenu->addAction(simpleView,AG_RVCM_RECENT_OPTIONS,true);
+			AMenu->addAction(simpleView,AG_RVCM_RECENT_OPTIONS);
 			recentActions += simpleView;
+			
+			Action *sortByActivity = new Action(AMenu);
+			sortByActivity->setText(tr("Sort by Last Activity"));
+			sortByActivity->setCheckable(true);
+			sortByActivity->setChecked(FSortByLastActivity);
+			connect(sortByActivity,SIGNAL(triggered()),SLOT(onChangeSortByLastActivity()));
+			AMenu->addAction(sortByActivity,AG_RVCM_RECENT_OPTIONS);
+			recentActions += sortByActivity;
+
+			Action *showFavorite = new Action(AMenu);
+			showFavorite->setText(tr("Show Only Favorite Contacts"));
+			showFavorite->setCheckable(true);
+			showFavorite->setChecked(FShowOnlyFavorite);
+			connect(showFavorite,SIGNAL(triggered()),SLOT(onChangeShowOnlyFavorite()));
+			AMenu->addAction(showFavorite,AG_RVCM_RECENT_OPTIONS);
+			recentActions += showFavorite;
 		}
 		else if (isSelectionAccepted(AIndexes))
 		{
@@ -1434,6 +1463,8 @@ void RecentContacts::onOptionsOpened()
 	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE));
 	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_HIDELATERCONTACTS));
 	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SORTBYACTIVETIME));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SHOWONLYFAVORITE));
 }
 
 void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
@@ -1455,6 +1486,17 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 		rosterLabelChanged(RLID_AVATAR_IMAGE);
 		rosterLabelChanged(RLID_SCHANGER_STATUS);
 	}
+	else if (ANode.path() == OPV_ROSTER_RECENT_SORTBYACTIVETIME)
+	{
+		FSortByLastActivity = ANode.value().toBool();
+		foreach(IRecentItem item, FVisibleItems.keys())
+			updateItemIndex(item);
+	}
+	else if (ANode.path() == OPV_ROSTER_RECENT_SHOWONLYFAVORITE)
+	{
+		FShowOnlyFavorite = ANode.value().toBool();
+		updateVisibleItems();
+	}
 }
 
 void RecentContacts::onChangeAlwaysShowOfflineContacts()
@@ -1470,6 +1512,16 @@ void RecentContacts::onChangeHideLaterContacts()
 void RecentContacts::onChangeSimpleContactsView()
 {
 	Options::node(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW).setValue(!FSimpleContactsView);
+}
+
+void RecentContacts::onChangeSortByLastActivity()
+{
+	Options::node(OPV_ROSTER_RECENT_SORTBYACTIVETIME).setValue(!FSortByLastActivity);
+}
+
+void RecentContacts::onChangeShowOnlyFavorite()
+{
+	Options::node(OPV_ROSTER_RECENT_SHOWONLYFAVORITE).setValue(!FShowOnlyFavorite);
 }
 
 uint qHash(const IRecentItem &AKey)

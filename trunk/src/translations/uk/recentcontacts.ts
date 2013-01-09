@@ -47,5 +47,13 @@
         <source>Remove from recent contacts</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Sort by Last Activity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Only Favorite Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

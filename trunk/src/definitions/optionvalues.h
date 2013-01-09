@@ -207,6 +207,8 @@
 #define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
 #define OPV_ROSTER_RECENT_HIDELATERCONTACTS             "roster.recent.hide-later-contacts"
 #define OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW            "roster.recent.simple-contacts-view"
+#define OPV_ROSTER_RECENT_SORTBYACTIVETIME              "roster.recent.sort-by-active-time"
+#define OPV_ROSTER_RECENT_SHOWONLYFAVORITE              "roster.recent.show-only-favorite"
 
 // ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"

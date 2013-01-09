@@ -150,6 +150,8 @@ protected slots:
 	void onChangeAlwaysShowOfflineContacts();
 	void onChangeHideLaterContacts();
 	void onChangeSimpleContactsView();
+	void onChangeSortByLastActivity();
+	void onChangeShowOnlyFavorite();
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
@@ -179,6 +181,8 @@ private:
 	bool FHideLaterContacts;
 	bool FAllwaysShowOffline;
 	bool FSimpleContactsView;
+	bool FSortByLastActivity;
+	bool FShowOnlyFavorite;
 	IRosterIndex *FRootIndex;
 	QMap<QString, IRecentItemHandler *> FItemHandlers;
 };
