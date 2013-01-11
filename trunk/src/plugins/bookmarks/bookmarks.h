@@ -109,7 +109,6 @@ protected slots:
 	void onMultiChatWindowAddBookmarkActionTriggered(bool);
 	void onDiscoWindowAddBookmarkActionTriggered(bool);
 	void onEditBookmarksDialogDestroyed();
-	void onStartTimerTimeout();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPrivateStorage *FPrivateStorage;
@@ -122,10 +121,8 @@ private:
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
-	QTimer FStartTimer;
 	QMap<Jid, QList<IBookmark> > FBookmarks;
 	QMap<Jid, EditBookmarksDialog *> FDialogs;
-	QMultiMap<Jid, IBookmark> FPendingBookmarks;
 	QMap<Jid, QMap<IRosterIndex *, IBookmark> > FBookmarkIndexes;
 };
 

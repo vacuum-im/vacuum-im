@@ -17,9 +17,6 @@
 #define ADR_DISCO_NODE                   Action::DR_Parametr2
 #define ADR_DISCO_NAME                   Action::DR_Parametr3
 
-#define FIRST_START_TIMEOUT              1000
-#define NEXT_START_TIMEOUT               500
-
 Bookmarks::Bookmarks()
 {
 	FPrivateStorage = NULL;
@@ -31,9 +28,6 @@ Bookmarks::Bookmarks()
 	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
-
-	FStartTimer.setSingleShot(true);
-	connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
 }
 
 Bookmarks::~Bookmarks()
@@ -493,12 +487,14 @@ void Bookmarks::onPrivateDataUpdated(const QString &AId, const Jid &AStreamJid, 
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
 		if (account==NULL || !account->optionsNode().value("ignore-autojoin").toBool())
 		{
+			bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
 			foreach(const IBookmark &bookmark, FBookmarks.value(AStreamJid))
 			{
 				if (bookmark.type==IBookmark::Conference && bookmark.conference.autojoin)
 				{
-					FPendingBookmarks.insertMulti(AStreamJid,bookmark);
-					FStartTimer.start(FIRST_START_TIMEOUT);
+					if (FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(AStreamJid,bookmark.conference.roomJid)!=NULL)
+						showAutoJoined = false;
+					startBookmark(AStreamJid,bookmark,showAutoJoined);
 				}
 			}
 		}
@@ -514,7 +510,6 @@ void Bookmarks::onPrivateDataRemoved(const QString &AId, const Jid &AStreamJid, 
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
 		FBookmarks[AStreamJid].clear();
-		FPendingBookmarks.remove(AStreamJid);
 		updateConferenceIndexes(AStreamJid);
 		emit bookmarksChanged(AStreamJid);
 	}
@@ -530,7 +525,6 @@ void Bookmarks::onPrivateStorageClosed(const Jid &AStreamJid)
 {
 	delete FDialogs.take(AStreamJid);
 	FBookmarks.remove(AStreamJid);
-	FPendingBookmarks.remove(AStreamJid);
 	updateConferenceIndexes(AStreamJid);
 	FBookmarkIndexes.remove(AStreamJid);
 }
@@ -939,22 +933,6 @@ void Bookmarks::onEditBookmarksDialogDestroyed()
 	EditBookmarksDialog *dialog = qobject_cast<EditBookmarksDialog *>(sender());
 	if (dialog)
 		FDialogs.remove(dialog->streamJid());
-}
-
-void Bookmarks::onStartTimerTimeout()
-{
-	QMultiMap<Jid, IBookmark>::iterator it = FPendingBookmarks.begin();
-	if (it != FPendingBookmarks.end())
-	{
-		bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
-		if (it->type != IBookmark::Conference)
-			showAutoJoined = false;
-		else if (FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(it.key(),it->conference.roomJid)!=NULL)
-			showAutoJoined = false;
-		startBookmark(it.key(),it.value(),showAutoJoined);
-		FPendingBookmarks.erase(it);
-		FStartTimer.start(NEXT_START_TIMEOUT);
-	}
 }
 
 void Bookmarks::onShortcutActivated(const QString &AId, QWidget *AWidget)
