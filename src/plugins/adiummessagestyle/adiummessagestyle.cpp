@@ -16,6 +16,9 @@
 #include <QTextDocument>
 #include <QWebHitTestResult>
 
+#define SCROLL_TIMEOUT                      100
+#define EVALUTE_TIMEOUT                     10
+
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
@@ -57,8 +60,12 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessMa
 	loadSenderColors();
 
 	FScrollTimer.setSingleShot(true);
-	FScrollTimer.setInterval(100);
+	FScrollTimer.setInterval(SCROLL_TIMEOUT);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
+
+	FPendingTimer.setSingleShot(true);
+	FPendingTimer.setInterval(EVALUTE_TIMEOUT);
+	connect(&FPendingTimer,SIGNAL(timeout()),SLOT(onEvaluateNextPendingScript()));
 
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 }
@@ -205,10 +212,9 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		escapeStringForScript(html);
 		QString script = scriptForAppendContent(sameSender,AOptions.noScroll).arg(html);
 
-		if (wstatus.wait > 0)
-			wstatus.pending.append(script);
-		else
-			view->page()->mainFrame()->evaluateJavaScript(script);
+		if (wstatus.pending.isEmpty())
+			FPendingTimer.start();
+		wstatus.pending.append(script);
 
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
@@ -704,6 +710,25 @@ void AdiumMessageStyle::onScrollAfterResize()
 	}
 }
 
+void AdiumMessageStyle::onEvaluateNextPendingScript()
+{
+	bool restart = false;
+	for(QMap<QWidget *, WidgetStatus>::iterator it=FWidgetStatus.begin(); it!=FWidgetStatus.end(); ++it)
+	{
+		StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
+		if (view && it->wait==0 && !it->pending.isEmpty())
+		{
+			QString script = it->pending.takeFirst();
+			restart = restart || !it->pending.isEmpty();
+			view->page()->mainFrame()->evaluateJavaScript(script);
+		}
+	}
+	if (restart)
+	{
+		FPendingTimer.start();
+	}
+}
+
 void AdiumMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget)
 {
 	if (AStyle!=this && FWidgetStatus.contains(AWidget))
@@ -730,10 +755,9 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 		{
 			if (AOk)
 			{
-				foreach(QString script, wstatus.pending)
-					view->page()->mainFrame()->evaluateJavaScript(script);
+				if (!wstatus.pending.isEmpty())
+					FPendingTimer.start();
 				view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
-				wstatus.pending.clear();
 			}
 			else
 			{

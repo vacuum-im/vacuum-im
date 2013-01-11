@@ -61,8 +61,8 @@
 struct MessageContentOptions;
 
 class SimpleMessageStyle :
-			public QObject,
-			public IMessageStyle
+	public QObject,
+	public IMessageStyle
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMessageStyle);
@@ -112,7 +112,7 @@ protected:
 	void loadSenderColors();
 	void initStyleSettings();
 protected:
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onLinkClicked(const QUrl &AUrl);
 	void onScrollAfterResize();
