@@ -722,8 +722,7 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 			IRecentItemHandler *handler = FItemHandlers.value(item.type);
 			if (handler)
 			{
-				QString name = handler->recentItemName(item);
-				index->setData(RDR_NAME, name);
+				index->setData(RDR_NAME, handler->recentItemName(item));
 				index->setData(Qt::DecorationRole, handler->recentItemIcon(item));
 			}
 		}
@@ -732,7 +731,7 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 		if (FSortByLastActivity)
 			index->setData(RDR_SORT_ORDER, (int)(favorite ? 0x80000000 : item.activeTime.secsTo(zero)));
 		else
-			index->setData(RDR_SORT_ORDER, QVariant());
+			index->setData(RDR_SORT_ORDER, favorite ? QString("") : index->data(Qt::DisplayRole).toString());
 
 		if (FRostersView)
 		{
