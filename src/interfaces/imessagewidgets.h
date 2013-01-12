@@ -355,10 +355,10 @@ public:
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
 	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage) = 0;
 	virtual QList<IMessageWindow *> messageWindows() const =0;
-	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
+	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QList<IChatWindow *> chatWindows() const =0;
-	virtual IChatWindow *newChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
+	virtual IChatWindow *getChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
 	virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QList<QUuid> tabWindowList() const =0;
 	virtual QUuid appendTabWindow(const QString &AName) =0;
@@ -366,7 +366,7 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const =0;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName) =0;
 	virtual QList<ITabWindow *> tabWindows() const =0;
-	virtual ITabWindow *newTabWindow(const QUuid &AWindowId) =0;
+	virtual ITabWindow *getTabWindow(const QUuid &AWindowId) =0;
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const =0;
 	virtual void assignTabWindowPage(ITabPage *APage) =0;
 	virtual QList<IViewDropHandler *> viewDropHandlers() const =0;
@@ -419,6 +419,6 @@ Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.1")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.4")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.5")
 
 #endif // IMESSAGEWIDGETS_H

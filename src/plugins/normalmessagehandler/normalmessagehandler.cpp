@@ -316,7 +316,7 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 	IMessageWindow *window = NULL;
 	if (AStreamJid.isValid() && (AContactJid.isValid() || AMode == IMessageWindow::WriteMode))
 	{
-		window = FMessageWidgets->newMessageWindow(AStreamJid,AContactJid,AMode);
+		window = FMessageWidgets->getMessageWindow(AStreamJid,AContactJid,AMode);
 		if (window)
 		{
 			window->infoWidget()->autoUpdateFields();

@@ -351,7 +351,7 @@ IChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &ACo
 		window = findSubstituteWindow(AStreamJid,AContactJid);
 		if (!window)
 		{
-			window = FMessageWidgets->newChatWindow(AStreamJid,AContactJid);
+			window = FMessageWidgets->getChatWindow(AStreamJid,AContactJid);
 			if (window)
 			{
 				window->infoWidget()->autoUpdateFields();
