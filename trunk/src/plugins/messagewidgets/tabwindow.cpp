@@ -140,8 +140,12 @@ void TabWindow::setTabBarVisible(bool AVisible)
 {
 	if (isTabBarVisible() != AVisible)
 	{
-		ui.twtTabs->setTabBarVisible(AVisible);
+		foreach(Action *action, FWindowMenu->groupActions())
+			action->setEnabled(AVisible);
 		ui.twtTabs->cornerWidget()->setEnabled(AVisible);
+
+		ui.twtTabs->setTabBarVisible(AVisible);
+
 		emit windowChanged();
 	}
 }
@@ -252,7 +256,7 @@ void TabWindow::createActions()
 	{
 		Action *action = new Action(this);
 		action->setShortcutId(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber));
-		addAction(action);
+		ui.twtTabs->cornerWidget()->addAction(action);
 
 		tabMapper->setMapping(action, tabNumber-1); // QTabWidget's indices are 0-based
 		connect(action, SIGNAL(triggered()), tabMapper, SLOT(map()));
@@ -693,7 +697,7 @@ void TabWindow::onTabMenuActionTriggered(bool)
 			QString name = QInputDialog::getText(this,tr("New Tab Window"),tr("Tab window name:"));
 			if (!name.isEmpty())
 			{
-				ITabWindow *window = FMessageWidgets->newTabWindow(FMessageWidgets->appendTabWindow(name));
+				ITabWindow *window = FMessageWidgets->getTabWindow(FMessageWidgets->appendTabWindow(name));
 				removeTabPage(page);
 				window->addTabPage(page);
 				window->showWindow();
@@ -701,7 +705,7 @@ void TabWindow::onTabMenuActionTriggered(bool)
 		}
 		else if (tabAction == JoinTabAction)
 		{
-			ITabWindow *window = FMessageWidgets->newTabWindow(action->data(ADR_TABWINDOWID).toString());
+			ITabWindow *window = FMessageWidgets->getTabWindow(action->data(ADR_TABWINDOWID).toString());
 			removeTabPage(page);
 			window->addTabPage(page);
 			window->showWindow();

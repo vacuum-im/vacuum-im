@@ -90,6 +90,7 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareShortcut(SCT_TABWINDOW_CLOSEWINDOW, tr("Close tab window"), tr("Esc","Close tab window"));
 	Shortcuts::declareShortcut(SCT_TABWINDOW_DELETEWINDOW, tr("Delete tab window"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_TABWINDOW_SETASDEFAULT, tr("Use as default tab window"), QKeySequence::UnknownKey);
+
 	for (int tabNumber=1; tabNumber<=10; tabNumber++)
 		Shortcuts::declareShortcut(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber), QString::null, tr("Alt+%1","Show tab").arg(tabNumber % 10));
 
@@ -109,9 +110,7 @@ bool MessageWidgets::initObjects()
 	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_COPY_INSERT,this);
 
 	if (FMainWindow)
-	{
 		Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_COMBINEWITHMESSAGES,FMainWindow->instance());
-	}
 
 	return true;
 }
@@ -139,6 +138,7 @@ bool MessageWidgets::initSettings()
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
+
 	return true;
 }
 
@@ -309,7 +309,7 @@ QList<IMessageWindow *> MessageWidgets::messageWindows() const
 	return FMessageWindows;
 }
 
-IMessageWindow *MessageWidgets::newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
+IMessageWindow *MessageWidgets::getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
 {
 	IMessageWindow *window = findMessageWindow(AStreamJid,AContactJid);
 	if (!window)
@@ -338,7 +338,7 @@ QList<IChatWindow *> MessageWidgets::chatWindows() const
 	return FChatWindows;
 }
 
-IChatWindow *MessageWidgets::newChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IChatWindow *MessageWidgets::getChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	IChatWindow *window = findChatWindow(AStreamJid,AContactJid);
 	if (!window)
@@ -425,7 +425,7 @@ QList<ITabWindow *> MessageWidgets::tabWindows() const
 	return FTabWindows;
 }
 
-ITabWindow *MessageWidgets::newTabWindow(const QUuid &AWindowId)
+ITabWindow *MessageWidgets::getTabWindow(const QUuid &AWindowId)
 {
 	ITabWindow *window = findTabWindow(AWindowId);
 	if (!window)
@@ -434,6 +434,7 @@ ITabWindow *MessageWidgets::newTabWindow(const QUuid &AWindowId)
 		FTabWindows.append(window);
 		WidgetManager::setWindowSticky(window->instance(),true);
 		connect(window->instance(),SIGNAL(tabPageAdded(ITabPage *)),SLOT(onTabWindowPageAdded(ITabPage *)));
+		connect(window->instance(),SIGNAL(currentTabPageChanged(ITabPage *)),SLOT(onTabWindowCurrentPageChanged(ITabPage *)));
 		connect(window->instance(),SIGNAL(windowDestroyed()),SLOT(onTabWindowDestroyed()));
 		emit tabWindowCreated(window);
 	}
@@ -456,24 +457,23 @@ void MessageWidgets::assignTabWindowPage(ITabPage *APage)
 		connect(APage->instance(),SIGNAL(tabPageDestroyed()),SLOT(onAssignedTabPageDestroyed()));
 	}
 
-	if (FMainWindow && Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 	{
-		ITabWindow *window = newTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+		ITabWindow *window = getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
 		window->addTabPage(APage);
-		window->setTabBarVisible(false);
-		FMainWindow->mainCentralWidget()->appendCentralPage(window);
 	}
 	else if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
 	{
 		QList<QUuid> availWindows = tabWindowList();
+
 		QUuid windowId = FPageWindows.value(APage->tabPageId());
 		if (!availWindows.contains(windowId))
 			windowId = Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString();
 		if (!availWindows.contains(windowId))
 			windowId = availWindows.value(0);
-		ITabWindow *window = newTabWindow(windowId);
+
+		ITabWindow *window = getTabWindow(windowId);
 		window->addTabPage(APage);
-		window->setTabBarVisible(true);
 	}
 }
 
@@ -763,6 +763,26 @@ void MessageWidgets::onTabWindowPageAdded(ITabPage *APage)
 	}
 }
 
+void MessageWidgets::onTabWindowCurrentPageChanged(ITabPage *APage)
+{
+	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+	{
+		ITabWindow *window = qobject_cast<ITabWindow *>(sender());
+		if (window && window->windowId()==Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
+		{
+			for (int index=0; index<window->tabPageCount(); index++)
+			{
+				ITabPage *page = window->tabPage(index);
+				if (page != APage)
+				{
+					index--;
+					page->closeTabPage();
+				}
+			}
+		}
+	}
+}
+
 void MessageWidgets::onTabWindowDestroyed()
 {
 	ITabWindow *window = qobject_cast<ITabWindow *>(sender());
@@ -845,7 +865,7 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 		if (ANode.value().toBool())
 		{
 			if (!window)
-				window = newTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()); 
+				window = getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()); 
 			window->setTabBarVisible(false);
 			window->setAutoCloseEnabled(false);
 			FMainWindow->mainCentralWidget()->appendCentralPage(window);

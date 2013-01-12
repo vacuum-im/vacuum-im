@@ -74,10 +74,10 @@ public:
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage);
 	virtual QList<IMessageWindow *> messageWindows() const;
-	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
+	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QList<IChatWindow *> chatWindows() const;
-	virtual IChatWindow *newChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	virtual IChatWindow *getChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QList<QUuid> tabWindowList() const;
 	virtual QUuid appendTabWindow(const QString &AName);
@@ -85,7 +85,7 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName);
 	virtual QList<ITabWindow *> tabWindows() const;
-	virtual ITabWindow *newTabWindow(const QUuid &AWindowId);
+	virtual ITabWindow *getTabWindow(const QUuid &AWindowId);
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
 	virtual void assignTabWindowPage(ITabPage *APage);
 	virtual QList<IViewDropHandler *> viewDropHandlers() const;
@@ -140,6 +140,7 @@ protected slots:
 	void onMessageWindowDestroyed();
 	void onChatWindowDestroyed();
 	void onTabWindowPageAdded(ITabPage *APage);
+	void onTabWindowCurrentPageChanged(ITabPage *APage);
 	void onTabWindowDestroyed();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);

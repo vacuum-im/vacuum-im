@@ -1533,7 +1533,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 	IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
 	if (!window && user && user!=FMultiChat->mainUser())
 	{
-		window = FMessageWidgets!=NULL ? FMessageWidgets->newChatWindow(streamJid(),AContactJid) : NULL;
+		window = FMessageWidgets!=NULL ? FMessageWidgets->getChatWindow(streamJid(),AContactJid) : NULL;
 		if (window)
 		{
 			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
@@ -1663,9 +1663,11 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 {
 	if (FShownDetached)
 		saveWindowGeometry();
-	QMainWindow::closeEvent(AEvent);
-	if (Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE).value().toBool())
+
+	if (Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE).value().toBool() && !Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 		exitAndDestroy(QString::null);
+
+	QMainWindow::closeEvent(AEvent);
 	emit tabPageClosed();
 }
 
