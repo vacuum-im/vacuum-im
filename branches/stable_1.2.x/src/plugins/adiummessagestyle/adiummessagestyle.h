@@ -80,8 +80,8 @@
 #define MSO_BG_IMAGE_LAYOUT                 "bgImageLayout"
 
 class AdiumMessageStyle :
-			public QObject,
-			public IMessageStyle
+	public QObject,
+	public IMessageStyle
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMessageStyle);
@@ -148,15 +148,17 @@ protected:
 	void loadSenderColors();
 	void initStyleSettings();
 protected:
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onLinkClicked(const QUrl &AUrl);
 	void onScrollAfterResize();
+	void onEvaluateNextPendingScript();
 	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
 	void onStyleWidgetLoadFinished(bool AOk);
 	void onStyleWidgetDestroyed(QObject *AObject);
 private:
 	QTimer FScrollTimer;
+	QTimer FPendingTimer;
 	bool FCombineConsecutive;
 	bool FUsingCustomTemplate;
 	bool FAllowCustomBackground;
