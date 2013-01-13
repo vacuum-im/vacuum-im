@@ -9,6 +9,7 @@
 #include <QCoreApplication>
 #include <QTextDocumentFragment>
 
+#define SCROLL_TIMEOUT                      100
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
 
 static const char *SenderColors[] =  {
@@ -37,7 +38,7 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccess
 	loadSenderColors();
 
 	FScrollTimer.setSingleShot(true);
-	FScrollTimer.setInterval(100);
+	FScrollTimer.setInterval(SCROLL_TIMEOUT);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
 
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));

@@ -21,6 +21,7 @@ LEGEND
   [-] Popup notifications appear now on that monitor where there is the main window
   [-] The behavior of the main window after Drag&Drop is corrected
   [-] Popup notifications are not capture input focus in Mac OS X
+  [-] Fixed problem with message appearance in Adium style
 
 
 v1.2.0
