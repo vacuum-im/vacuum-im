@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<sounddef>
-  <file>
-    <key>rchangerSubscription</key>
-    <object mime='sound/wav'>auth.wav</object>
-  </file>
-</sounddef>

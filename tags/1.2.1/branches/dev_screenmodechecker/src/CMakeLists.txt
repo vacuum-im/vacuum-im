@@ -1,7 +1,0 @@
-add_subdirectory(thirdparty)
-add_subdirectory(utils)
-add_subdirectory(loader)
-add_subdirectory(plugins)
-add_subdirectory(definitions)
-add_subdirectory(interfaces)
-add_subdirectory(make)

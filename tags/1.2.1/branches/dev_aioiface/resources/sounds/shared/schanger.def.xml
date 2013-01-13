@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<sounddef>
-  <file>
-    <key>schangerConnectionError</key>
-    <object mime='sound/wav'>error.wav</object>
-  </file>
-</sounddef>
