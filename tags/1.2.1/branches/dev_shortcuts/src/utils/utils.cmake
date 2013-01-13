@@ -1,0 +1,13 @@
+file(GLOB SOURCES "*.cpp")
+
+set(HEADERS "action.h"
+		"filestorage.h"
+		"iconstorage.h"
+		"menu.h"
+		"menubarchanger.h"
+		"options.h"
+		"shortcuts.h"
+		"statusbarchanger.h"
+		"toolbarchanger.h")
+
+qt4_wrap_cpp(MOC_SOURCES ${HEADERS})

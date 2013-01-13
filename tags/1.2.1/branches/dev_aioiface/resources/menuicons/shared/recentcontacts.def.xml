@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>recentcontacts</key>
+    <object mime="image/png">recentcontacts.png</object>
+  </icon>
+  <icon>
+    <key>recentcontactsFavorite</key>
+    <object mime="image/png">recentcontactsfavorite.png</object>
+  </icon>
+  <icon>
+    <key>recentcontactsInsertFavorite</key>
+    <object mime="image/png">recentcontactsinsertfavorite.png</object>
+  </icon>
+  <icon>
+    <key>recentcontactsRemoveFavorite</key>
+    <object mime="image/png">recentcontactsremovefavorite.png</object>
+  </icon>
+</icondef>

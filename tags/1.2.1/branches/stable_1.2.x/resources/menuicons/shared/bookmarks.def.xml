@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>bookmarks</key>
+    <object mime="image/png">bookmarks.png</object>
+  </icon>
+  <icon>
+    <key>bookmarksAdd</key>
+    <object mime="image/png">bookmarksadd.png</object>
+  </icon>
+  <icon>
+    <key>bookmarksRoom</key>
+    <object mime="image/png">bookmarksroom.png</object>
+  </icon>
+  <icon>
+    <key>bookmarksURL</key>
+    <object mime="image/png">bookmarksurl.png</object>
+  </icon>
+  <icon>
+    <key>bookmarksEdit</key>
+    <object mime="image/png">bookmarksedit.png</object>
+  </icon>
+</icondef>

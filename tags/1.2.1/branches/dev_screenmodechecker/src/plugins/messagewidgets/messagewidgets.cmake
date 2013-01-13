@@ -1,0 +1,3 @@
+set(SOURCES messengeroptions.cpp tabwidget.cpp editwidget.cpp receiverswidget.cpp messagewidgets.cpp messageeditor.cpp messagewindow.cpp chatwindow.cpp statusbarwidget.cpp infowidget.cpp toolbarwidget.cpp menubarwidget.cpp viewwidget.cpp tabwindow.cpp tabpagenotifier.cpp)
+set(HEADERS tabwindow.h messagewidgets.h editwidget.h chatwindow.h receiverswidget.h messageeditor.h toolbarwidget.h menubarwidget.h messagewindow.h messengeroptions.h viewwidget.h tabwidget.h infowidget.h statusbarwidget.h tabpagenotifier.h)
+set(UIS editwidget.ui messagewindow.ui viewwidget.ui chatwindow.ui tabwindow.ui messengeroptions.ui infowidget.ui receiverswidget.ui )

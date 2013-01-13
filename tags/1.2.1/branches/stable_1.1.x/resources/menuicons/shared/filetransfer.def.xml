@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>filetransferSend</key>
+    <object mime="image/png">filetransfersend.png</object>
+  </icon>
+  <icon>
+    <key>filetransferReceive</key>
+    <object mime="image/png">filetransferreceive.png</object>
+  </icon>
+</icondef>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>sdiscoveryArrowLeft</key>
+    <object mime="image/png">arrowleft.png</object>
+  </icon>
+  <icon>
+    <key>sdiscoveryArrowRight</key>
+    <object mime="image/png">arrowright.png</object>
+  </icon>
+  <icon>
+    <key>sdiscoveryDiscoInfo</key>
+    <object mime="image/png">sdiscoverydiscoinfo.png</object>
+  </icon>
+  <icon>
+    <key>sdiscoveryDiscover</key>
+    <object mime="image/png">sdiscoverydiscover.png</object>
+  </icon>
+  <icon>
+    <key>sdiscoveryReload</key>
+    <object mime="image/png">sdiscoveryreload.png</object>
+  </icon>
+</icondef>

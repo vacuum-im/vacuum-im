@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>VCard</key>
+    <object mime="image/png">vcard.png</object>
+  </icon>
+</icondef>

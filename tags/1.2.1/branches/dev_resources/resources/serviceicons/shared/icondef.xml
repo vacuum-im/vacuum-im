@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<icondef>
+	<icon>
+		<key>_service_</key>
+		<object mime='image/png'>_service_.png</object>
+	</icon>
+
+	<icon>
+		<key>_error_</key>
+		<object mime='image/png'>_error_.png</object>
+	</icon>
+</icondef>

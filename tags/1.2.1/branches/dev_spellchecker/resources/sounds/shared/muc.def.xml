@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sounddef>
+  <file>
+    <key>mucMessage</key>
+    <key>mucDataMessage</key>
+    <key>mucPrivateMessage</key>
+    <key>mucInviteMessage</key>
+    <object mime='sound/wav'>message.wav</object>
+  </file>
+</sounddef>

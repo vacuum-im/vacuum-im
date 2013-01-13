@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>avatarSet</key>
+    <object mime="image/png">avatarset.png</object>
+  </icon>
+  <icon>
+    <key>avatarRemove</key>
+    <object mime="image/png">avatarremove.png</object>
+  </icon>
+  <icon>
+    <key>avatarChange</key>
+    <object mime="image/png">avatarchange.png</object>
+  </icon>
+  <icon>
+    <key>avatarCustom</key>
+    <object mime="image/png">avatarcustom.png</object>
+  </icon>
+  <icon>
+    <key>avatarEmpty</key>
+    <object mime="image/png">avatarempty.png</object>
+  </icon>
+</icondef>

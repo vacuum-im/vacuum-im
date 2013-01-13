@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<sounddef>
+  <file>
+    <key>birthdayreminderNotify</key>
+    <object mime='sound/wav'>default.wav</object>
+  </file>
+</sounddef>

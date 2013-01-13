@@ -1,0 +1,60 @@
+.xxxwrapper 
+{
+	border-style: none;
+	font-size: medium;
+	padding: 0 0 0 0;
+	display: block;
+}
+
+.xxxsender
+{
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+.xxxtime 
+{
+	white-space: nowrap;
+	color: gray;
+}
+
+.xxxtopic
+{
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.status .xxxmessage
+{
+	color: darkgreen;
+}
+
+.notification .xxxmessage
+{
+	color: darkblue;
+}
+
+.event .xxxmessage
+{
+	color: darkred;
+}
+
+.mention
+{
+	background-color: mistyrose;
+}
+
+.history
+{
+	background-color: #f0f0f0;
+}
+
+.date_separator .xxxmessage
+{
+	color: darkCyan;
+}
+
+.date_separator .xxxtime
+{
+	color: transparent;
+}

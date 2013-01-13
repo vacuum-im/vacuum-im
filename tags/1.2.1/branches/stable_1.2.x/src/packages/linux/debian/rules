@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+#export DH_VERBOSE=1
+
+REV=$(shell dpkg-parsechangelog | awk '/^Version: / {print $$2}' | sed 's/.*svn//' | sed 's/-.*//')
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DVER_STRING=$(REV) -DCMAKE_BUILD_TYPE=Release
+
+override_dh_install:
+	dh_install --list-missing -XCOPYING -Xlicense.txt
+	for size in 16 24 32 48 64 96 128 ; do \
+	mkdir -p $(CURDIR)/debian/vacuum/usr/share/icons/hicolor/$${size}x$${size}/apps/ && install -Dm644 $(CURDIR)/resources/menuicons/shared/mainwindowlogo$${size}.png $(CURDIR)/debian/vacuum/usr/share/icons/hicolor/$${size}x$${size}/apps/vacuum.png ; \
+	done
+
+%:
+	dh $@ --parallel
