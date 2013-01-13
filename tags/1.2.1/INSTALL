@@ -1,0 +1,40 @@
+[Requirements]
+  - Qt 4.5.x
+  - OpenSSL 0.9.8k
+
+[Common]
+  ==qmake parametrs==
+    INSTALL_PREFIX  - installation prefix
+    INSTALL_APP_DIR - directory name for application
+    INSTALL_LIB_DIR - directory name for libraries
+    INSTALL_RES_DIR - directory name for resources
+
+
+[Windows]
+  * Default install directory c:\vacuum
+  ==Visual Studio==
+    qmake CONFIG-=debug_and_release CONFIG-=debug -recursive vacuum.pro
+    nmake
+    nmake install
+
+  ==MinGW==
+    qmake CONFIG-=debug_and_release CONFIG-=debug -recursive vacuum.pro
+    mingw32-make.exe
+    mingw32-make.exe install
+
+
+[Linux/Unix]
+  * Default install prefix /usr/local
+  * By default libvacuumutils.so is copied to /usr/local/lib. On some distributives
+  * you may receive message that libvacuumutils.so is not found. In this case configure
+  * your system to search libraries in /usr/local/lib.
+  qmake CONFIG-=debug_and_release CONFIG-=debug -recursive vacuum.pro
+  make
+  make install
+
+
+[MacOS X]
+  * Default install directory /Applications/vacuum.app
+  qmake CONFIG-=debug_and_release CONFIG-=debug -recursive vacuum.pro
+  make
+  make install
