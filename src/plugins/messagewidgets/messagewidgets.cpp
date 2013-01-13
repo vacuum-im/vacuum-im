@@ -125,6 +125,7 @@ bool MessageWidgets::initSettings()
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
 	Options::setDefaultValue(OPV_MESSAGES_CLEANCHATTIMEOUT,30);
 	Options::setDefaultValue(OPV_MESSAGES_COMBINEWITHROSTER,false);
+	Options::setDefaultValue(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE,false);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);
@@ -153,6 +154,7 @@ QMultiMap<int, IOptionsWidget *> MessageWidgets::optionsWidgets(const QString &A
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWINFOWIDGET),tr("Show contact information in chat windows"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Auto resize input field"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_COMBINEWITHROSTER),tr("Combine message windows with contact-list"),AParent));
+		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE),tr("Show tabs in combined message windows with contact-list mode"),AParent));
 		widgets.insertMulti(OWO_MESSAGES,new MessengerOptions(this,AParent));
 	}
 	return widgets;
@@ -765,7 +767,7 @@ void MessageWidgets::onTabWindowPageAdded(ITabPage *APage)
 
 void MessageWidgets::onTabWindowCurrentPageChanged(ITabPage *APage)
 {
-	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool() && !Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE).value().toBool())
 	{
 		ITabWindow *window = qobject_cast<ITabWindow *>(sender());
 		if (window && window->windowId()==Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
@@ -825,6 +827,7 @@ void MessageWidgets::onOptionsOpened()
 	stream >> FPageWindows;
 
 	onOptionsChanged(Options::node(OPV_MESSAGES_COMBINEWITHROSTER));
+	onOptionsChanged(Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE));
 }
 
 void MessageWidgets::onOptionsClosed()
@@ -866,7 +869,7 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 		{
 			if (!window)
 				window = getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()); 
-			window->setTabBarVisible(false);
+			window->setTabBarVisible(Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE).value().toBool());
 			window->setAutoCloseEnabled(false);
 			FMainWindow->mainCentralWidget()->appendCentralPage(window);
 		}
@@ -885,6 +888,17 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 			while(window->currentTabPage())
 				window->detachTabPage(window->currentTabPage());
 			window->instance()->deleteLater();
+		}
+	}
+	else if (ANode.path()==OPV_MESSAGES_SHOWTABSINCOMBINEDMODE)
+	{
+		if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+		{
+			ITabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+			if (window)
+			{
+				window->setTabBarVisible(ANode.value().toBool());
+			}
 		}
 	}
 }

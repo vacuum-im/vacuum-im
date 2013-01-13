@@ -223,6 +223,10 @@
         <source>Combine message windows with contact-list</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show tabs in combined message windows with contact-list mode</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>

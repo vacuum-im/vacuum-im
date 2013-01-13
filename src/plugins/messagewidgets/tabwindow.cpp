@@ -64,6 +64,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	onOptionsChanged(FOptionsNode.node("show-indices"));
 	onOptionsChanged(FOptionsNode.node("remove-tabs-on-close"));
 	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT));
+	onOptionsChanged(Options::node(OPV_MESSAGES_COMBINEWITHROSTER));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	connect(ui.twtTabs,SIGNAL(currentChanged(int)),SLOT(onTabChanged(int)));
@@ -466,6 +467,8 @@ void TabWindow::onTabMenuRequested(int AIndex)
 	Menu *menu = new Menu(this);
 	menu->setAttribute(Qt::WA_DeleteOnClose, true);
 
+	bool isCombined = Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool();
+
 	if (AIndex >= 0)
 	{
 		Action *tabClose = new Action(menu);
@@ -485,40 +488,43 @@ void TabWindow::onTabMenuRequested(int AIndex)
 		connect(otherClose,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
 		menu->addAction(otherClose,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
 
-		Action *detachTab = new Action(menu);
-		detachTab->setText(tr("Detach to Separate Window"));
-		detachTab->setData(ADR_TAB_INDEX, AIndex);
-		detachTab->setData(ADR_TAB_MENU_ACTION, DetachTabAction);
-		detachTab->setShortcutId(SCT_TABWINDOW_DETACHTAB);
-		menu->addAction(detachTab,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
-		connect(detachTab,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
-
-		Menu *joinTab = new Menu(menu);
-		joinTab->setTitle(tr("Join to"));
-		menu->addAction(joinTab->menuAction(),AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
-
-		foreach(QUuid id,FMessageWidgets->tabWindowList())
+		if (!isCombined)
 		{
-			if (id != FWindowId)
-			{
-				Action *action = new Action(joinTab);
-				action->setText(FMessageWidgets->tabWindowName(id));
-				action->setData(ADR_TAB_INDEX, AIndex);
-				action->setData(ADR_TABWINDOWID,id.toString());
-				action->setData(ADR_TAB_MENU_ACTION, JoinTabAction);
-				joinTab->addAction(action);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
-			}
-		}
+			Action *detachTab = new Action(menu);
+			detachTab->setText(tr("Detach to Separate Window"));
+			detachTab->setData(ADR_TAB_INDEX, AIndex);
+			detachTab->setData(ADR_TAB_MENU_ACTION, DetachTabAction);
+			detachTab->setShortcutId(SCT_TABWINDOW_DETACHTAB);
+			menu->addAction(detachTab,AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
+			connect(detachTab,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
 
-		Action *newWindow = new Action(joinTab);
-		newWindow->setText(tr("New Tab Window"));
-		newWindow->setData(ADR_TAB_INDEX, AIndex);
-		newWindow->setData(ADR_TAB_MENU_ACTION, NewTabWindowAction);
-		joinTab->addAction(newWindow,AG_DEFAULT+1);
-		connect(newWindow,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
+			Menu *joinTab = new Menu(menu);
+			joinTab->setTitle(tr("Join to"));
+			menu->addAction(joinTab->menuAction(),AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
+
+			foreach(QUuid id,FMessageWidgets->tabWindowList())
+			{
+				if (id != FWindowId)
+				{
+					Action *action = new Action(joinTab);
+					action->setText(FMessageWidgets->tabWindowName(id));
+					action->setData(ADR_TAB_INDEX, AIndex);
+					action->setData(ADR_TABWINDOWID,id.toString());
+					action->setData(ADR_TAB_MENU_ACTION, JoinTabAction);
+					joinTab->addAction(action);
+					connect(action,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
+				}
+			}
+
+			Action *newWindow = new Action(joinTab);
+			newWindow->setText(tr("New Tab Window"));
+			newWindow->setData(ADR_TAB_INDEX, AIndex);
+			newWindow->setData(ADR_TAB_MENU_ACTION, NewTabWindowAction);
+			joinTab->addAction(newWindow,AG_DEFAULT+1);
+			connect(newWindow,SIGNAL(triggered(bool)),SLOT(onTabMenuActionTriggered(bool)));
+		}
 	}
-	else
+	else if (!isCombined)
 	{
 		Action *windowClose = new Action(menu);
 		windowClose->setText(tr("Close Tab Window"));
@@ -595,6 +601,15 @@ void TabWindow::onOptionsChanged(const OptionsNode &ANode)
 	{
 		FSetAsDefault->setChecked(FWindowId==ANode.value().toString());
 		FDeleteWindow->setVisible(!FSetAsDefault->isChecked());
+	}
+	else if (ANode.path() == OPV_MESSAGES_COMBINEWITHROSTER)
+	{
+		bool isCombined = ANode.value().toBool();
+		FRemoveTabsOnClose->setVisible(!isCombined);
+		FSetAsDefault->setVisible(!isCombined);
+		FRenameWindow->setVisible(!isCombined);
+		FCloseWindow->setVisible(!isCombined);
+		FDeleteWindow->setVisible(!isCombined);
 	}
 	else if (FOptionsNode.childPath(ANode) == "tabs-closable")
 	{
