@@ -42,7 +42,6 @@ InBandStream::InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamI
 	FStreamJid = AStreamJid;
 	FContactJid = AContactJid;
 	FStreamKind = AKind;
-	FErrorCode = NoError;
 
 	FSHIOpen = -1;
 	FSHIClose = -1;

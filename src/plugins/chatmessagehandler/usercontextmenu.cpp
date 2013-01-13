@@ -63,7 +63,7 @@ void UserContextMenu::onAboutToShow()
 	{
 		QList<IRosterIndex *> indexes;
 		indexes.append(FRosterIndex);
-		FRostersView->contextMenuForIndex(indexes,NULL,this);
+		FRostersView->contextMenuForIndex(indexes,RLID_DISPLAY,this);
 	}
 }
 

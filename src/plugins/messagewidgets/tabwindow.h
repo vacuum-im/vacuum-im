@@ -19,25 +19,16 @@ class TabWindow :
 	public ITabWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(ITabWindow IMainCentralPage);
+	Q_INTERFACES(ITabWindow);
 public:
 	TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId);
 	~TabWindow();
 	virtual QMainWindow *instance() { return this; }
-	// IMainCentralPage
-	virtual void showCentralPage(bool AMinimized = false);
-	virtual QIcon centralPageIcon() const;
-	virtual QString centralPageCaption() const;
-	// ITabWindow
 	virtual void showWindow();
 	virtual void showMinimizedWindow();
 	virtual QUuid windowId() const;
 	virtual QString windowName() const;
 	virtual Menu *windowMenu() const;
-	virtual bool isTabBarVisible() const;
-	virtual void setTabBarVisible(bool AVisible);
-	virtual bool isAutoCloseEnabled() const;
-	virtual void setAutoCloseEnabled(bool AEnabled);
 	virtual int tabPageCount() const;
 	virtual ITabPage *tabPage(int AIndex) const;
 	virtual void addTabPage(ITabPage *APage);
@@ -47,7 +38,6 @@ public:
 	virtual void detachTabPage(ITabPage *APage);
 	virtual void removeTabPage(ITabPage *APage);
 signals:
-	// ITabWindow
 	void currentTabPageChanged(ITabPage *APage);
 	void tabPageMenuRequested(ITabPage *APage, Menu *AMenu);
 	void tabPageAdded(ITabPage *APage);
@@ -55,10 +45,6 @@ signals:
 	void tabPageDetached(ITabPage *APage);
 	void windowChanged();
 	void windowDestroyed();
-	// IMainCentralPage
-	void centralPageShow(bool AMinimized);
-	void centralPageChanged();
-	void centralPageDestroyed();
 protected:
 	void createActions();
 	void saveWindowStateAndGeometry();
@@ -67,9 +53,6 @@ protected:
 	void clearTabs();
 	void updateTab(int AIndex);
 	void updateTabs(int AFrom, int ATo);
-protected:
-	void showEvent(QShowEvent *AEvent);
-	void closeEvent(QCloseEvent *AEvent);
 protected slots:
 	void onTabMoved(int AFrom, int ATo);
 	void onTabChanged(int AIndex);
@@ -88,7 +71,6 @@ protected slots:
 	void onTabMenuActionTriggered(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onBlinkTabNotifyTimerTimeout();
-	void onCloseWindowIfEmpty();
 private:
 	Ui::TabWindowClass ui;
 private:
@@ -109,9 +91,7 @@ private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;
 private:
-	bool FAutoClose;
 	bool FBlinkVisible;
-	bool FShownDetached;
 	QTimer FBlinkTimer;
 };
 

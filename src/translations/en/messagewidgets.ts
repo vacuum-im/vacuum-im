@@ -215,18 +215,6 @@
         <source>Main Tab Window</source>
         <translation>Main Tab Window</translation>
     </message>
-    <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Combine/Split with message windows</translation>
-    </message>
-    <message>
-        <source>Combine message windows with contact-list</source>
-        <translation>Combine message windows with contact-list</translation>
-    </message>
-    <message>
-        <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation>Show tabs in combined message windows with contact-list mode</translation>
-    </message>
 </context>
 <context>
     <name>MessageWindow</name>

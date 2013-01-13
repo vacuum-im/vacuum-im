@@ -12,6 +12,10 @@
         <translation>Search toolbar</translation>
     </message>
     <message>
+        <source>Search by regular expression</source>
+        <translation>Search by regular expression</translation>
+    </message>
+    <message>
         <source>Roster Search</source>
         <translation>Roster Search</translation>
     </message>
@@ -34,10 +38,6 @@
     <message>
         <source>Group</source>
         <translation>Group</translation>
-    </message>
-    <message>
-        <source>Search for Contacts</source>
-        <translation>Search for Contacts</translation>
     </message>
 </context>
 </TS>

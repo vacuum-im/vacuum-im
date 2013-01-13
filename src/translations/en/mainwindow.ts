@@ -2,6 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
+    <name>MainWindow</name>
+    <message>
+        <source>Top toolbar</source>
+        <translation>Top toolbar</translation>
+    </message>
+    <message>
+        <source>Left toolbar</source>
+        <translation>Left toolbar</translation>
+    </message>
+    <message>
+        <source>Bottom toolbar</source>
+        <translation>Bottom toolbar</translation>
+    </message>
+    <message>
+        <source>Menu</source>
+        <translation>Menu</translation>
+    </message>
+</context>
+<context>
     <name>MainWindowPlugin</name>
     <message>
         <source>Main Window</source>

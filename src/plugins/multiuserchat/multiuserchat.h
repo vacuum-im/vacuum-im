@@ -10,17 +10,16 @@
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
-#include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
 #include <utils/xmpperror.h>
 #include "multiuser.h"
 
 class MultiUserChat :
-	public QObject,
-	public IMultiUserChat,
-	public IStanzaHandler,
-	public IStanzaRequestOwner,
-	public IMessageEditor
+			public QObject,
+			public IMultiUserChat,
+			public IStanzaHandler,
+			public IStanzaRequestOwner,
+			public IMessageEditor
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMultiUserChat IStanzaHandler IStanzaRequestOwner IMessageEditor);
@@ -37,9 +36,7 @@ public:
 	//IMultiUserChar
 	virtual Jid streamJid() const;
 	virtual Jid roomJid() const;
-	virtual QString roomName() const;
 	virtual bool isOpen() const;
-	virtual bool isConnected() const;
 	virtual bool autoPresence() const;
 	virtual void setAutoPresence(bool AAuto);
 	virtual QList<int> statusCodes() const;
@@ -49,24 +46,23 @@ public:
 	virtual QList<IMultiUser *> allUsers() const;
 	//Occupant
 	virtual QString nickName() const;
-	virtual bool setNickName(const QString &ANick);
+	virtual void setNickName(const QString &ANick);
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
 	virtual int show() const;
 	virtual QString status() const;
 	virtual XmppStanzaError roomError() const;
-	virtual bool sendStreamPresence();
-	virtual bool sendPresence(int AShow, const QString &AStatus);
+	virtual void setPresence(int AShow, const QString &AStatus);
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null);
 	virtual bool requestVoice();
 	virtual bool inviteContact(const Jid &AContactJid, const QString &AReason);
 	//Moderator
 	virtual QString subject() const;
-	virtual bool sendSubject(const QString &ASubject);
-	virtual bool sendDataFormMessage(const IDataForm &AForm);
+	virtual void setSubject(const QString &ASubject);
+	virtual void sendDataFormMessage(const IDataForm &AForm);
 	//Administrator
-	virtual bool setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null);
-	virtual bool setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null);
+	virtual void setRole(const QString &ANick, const QString &ARole, const QString &AReason = QString::null);
+	virtual void setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason = QString::null);
 	virtual bool requestAffiliationList(const QString &AAffiliation);
 	virtual bool changeAffiliationList(const QList<IMultiUserListItem> &ADeltaList);
 	//Owner
@@ -79,7 +75,6 @@ signals:
 	void chatError(const QString &AMessage);
 	void chatClosed();
 	void chatDestroyed();
-	void roomNameChanged(const QString &AName);
 	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	//Occupant
 	void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
@@ -106,14 +101,13 @@ signals:
 	void configFormRejected(const QString &AError);
 	void roomDestroyed(const QString &AReason);
 protected:
-	void initialize();
 	bool processMessage(const Stanza &AStanza);
 	bool processPresence(const Stanza &AStanza);
+	void initialize();
 	void closeChat(int AShow, const QString &AStatus);
 protected slots:
 	void onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
-	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
 	void onPresenceAboutToClose(int AShow, const QString &AStatus);
 	void onStreamClosed();
 	void onStreamJidChanged(const Jid &ABefore);
@@ -124,9 +118,7 @@ private:
 	IStanzaProcessor *FStanzaProcessor;
 	IMultiUserChatPlugin *FChatPlugin;
 	IMessageProcessor *FMessageProcessor;
-	IServiceDiscovery *FDiscovery;
 private:
-	QString FRoomName;
 	QString FConfigRequestId;
 	QString FConfigSubmitId;
 	QMap<QString, QString> FAffilListRequests;
@@ -134,10 +126,9 @@ private:
 private:
 	int FSHIPresence;
 	int FSHIMessage;
+	bool FAutoPresence;
 	int FShow;
 	int FErrorCode;
-	bool FConnected;
-	bool FAutoPresence;
 	Jid FStreamJid;
 	Jid FRoomJid;
 	QString FStatus;

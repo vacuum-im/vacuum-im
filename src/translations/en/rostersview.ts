@@ -31,10 +31,6 @@
         <source>Status:</source>
         <translation>Status:</translation>
     </message>
-    <message>
-        <source>Contacts</source>
-        <translation>Contacts</translation>
-    </message>
 </context>
 <context>
     <name>RostersViewPlugin</name>
@@ -73,6 +69,10 @@
     <message>
         <source>Show contact resource in roster</source>
         <translation>Show contact resource in roster</translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation>Show status message in roster</translation>
     </message>
     <message>
         <source>Sort contacts by status</source>

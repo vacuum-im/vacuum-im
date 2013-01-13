@@ -243,7 +243,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 				rnotify.order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
 				rnotify.flags = record.notification.data.value(NDR_ROSTER_FLAGS).toInt();
 				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool())
-					rnotify.flags |= IRostersNotify::ExpandParents;
+					rnotify.flags |= IRostersLabel::ExpandParents;
 				rnotify.timeout = record.notification.data.value(NDR_ROSTER_TIMEOUT).toInt();
 				rnotify.footer = record.notification.data.value(NDR_ROSTER_FOOTER).toString();
 				rnotify.background = record.notification.data.value(NDR_ROSTER_BACKGROUND).value<QBrush>();
@@ -323,8 +323,11 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_SHOWMINIMIZED_WIDGET).toLongLong());
 			if (widget)
 			{
-				FDelayedShowMinimized.append(widget);
-				QTimer::singleShot(0,this,SLOT(onDelayedShowMinimized()));
+				ITabPage *page = qobject_cast<ITabPage *>(widget);
+				if (page)
+					page->showMinimizedTabPage();
+				else if (widget->isWindow() && !widget->isVisible())
+					widget->showMinimized();
 			}
 		}
 	}
@@ -360,7 +363,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	if ((record.notification.kinds & INotification::AutoActivate)>0)
 	{
 		FDelayedActivations.append(notifyId);
-		QTimer::singleShot(0,this,SLOT(onDelayedActivations()));
+		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
 	}
 
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
@@ -519,7 +522,7 @@ void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *
 
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
 {
-	return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(AContactJid), QSize(32,32)) : QImage();
+	return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(AContactJid),QSize(32,32)) : QImage();
 }
 
 QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -594,24 +597,11 @@ void Notifications::removeInvisibleNotification(int ANotifyId)
 	}
 }
 
-void Notifications::onDelayedActivations()
+void Notifications::onActivateDelayedActivations()
 {
 	foreach(int notifyId, FDelayedActivations)
 		activateNotification(notifyId);
 	FDelayedActivations.clear();
-}
-
-void Notifications::onDelayedShowMinimized()
-{
-	foreach(QWidget *widget, FDelayedShowMinimized)
-	{
-		ITabPage *page = qobject_cast<ITabPage *>(widget);
-		if (page)
-			page->showMinimizedTabPage();
-		else if (widget->isWindow() && !widget->isVisible())
-			widget->showMinimized();
-	}
-	FDelayedShowMinimized.clear();
 }
 
 void Notifications::onSoundOnOffActionTriggered(bool)

@@ -1,7 +1,6 @@
 #ifndef PRIVATESTORAGE_H
 #define PRIVATESTORAGE_H
 
-#include <QSet>
 #include <QMap>
 #include <definitions/namespaces.h>
 #include <definitions/stanzahandlerorders.h>
@@ -51,7 +50,6 @@ signals:
 	void dataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void dataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void dataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
-	void storageNotifyAboutToClose(const Jid &AStreamJid);
 	void storageAboutToClose(const Jid &AStreamJid);
 	void storageClosed(const Jid &AStreamJid);
 protected:
@@ -65,7 +63,6 @@ protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamAboutToClose(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
-	void onPresenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
 private:
 	IPresencePlugin *FPresencePlugin;
 	IStanzaProcessor *FStanzaProcessor;
@@ -76,7 +73,6 @@ private:
 	QMap<QString, QDomElement> FRemoveRequests;
 private:
 	QDomDocument FStorage;
-	QSet<Jid> FPreClosedStreams;
 	QMap<Jid, QDomElement> FStreamElements;
 };
 

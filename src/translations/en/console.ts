@@ -54,10 +54,6 @@
         <source>Enter context name</source>
         <translation>Enter context name</translation>
     </message>
-    <message>
-        <source>Search</source>
-        <translation>Search</translation>
-    </message>
 </context>
 <context>
     <name>ConsoleWidgetClass</name>

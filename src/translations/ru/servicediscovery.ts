@@ -227,6 +227,15 @@
         <translation>Добавить элемент в список контактов</translation>
     </message>
     <message>
+        <source>Show vCard</source>
+        <translation>Показать vCard</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
         <source>Close discovery window</source>
         <translation>Закрыть окно обзора сервисов</translation>
     </message>
@@ -238,16 +247,6 @@
     <message>
         <source>Category: %1; Type: %2</source>
         <translation>Категория: %1; Тип: %2</translation>
-    </message>
-    <message>
-        <source>Show Profile</source>
-        <translation>Показать личные данные</translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translatorcomment>Показать личные данные</translatorcomment>
-        <translation>Ctrl+I</translation>
     </message>
 </context>
 </TS>

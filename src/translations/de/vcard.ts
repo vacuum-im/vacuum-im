@@ -11,6 +11,18 @@
 <context>
     <name>VCardDialog</name>
     <message>
+        <source>vCard - %1</source>
+        <translation>vCard - %1</translation>
+    </message>
+    <message>
+        <source>vCard error</source>
+        <translation>vCard Fehler</translation>
+    </message>
+    <message>
+        <source>vCard request or publish failed.&lt;br&gt;%1</source>
+        <translation>vCard Anfrage oder Veröffentlichung gescheitert&lt;br&gt;%1</translation>
+    </message>
+    <message>
         <source>Save image</source>
         <translation>Speichere Bild</translation>
     </message>
@@ -39,6 +51,14 @@
         <translation>Service nicht verfügbar</translation>
     </message>
     <message>
+        <source>Failed to publish vCard</source>
+        <translation>Kann vCard nicht veröffentlichen</translation>
+    </message>
+    <message>
+        <source>Failed to update vCard</source>
+        <translation>Kann vCard nicht aktualisieren</translation>
+    </message>
+    <message>
         <source>&lt;Unset&gt;</source>
         <translation>&lt;Unbekannt&gt;</translation>
     </message>
@@ -57,30 +77,6 @@
     <message>
         <source>Image Files (*.%1)</source>
         <translation>Bild Dateien (*.%1)</translation>
-    </message>
-    <message>
-        <source>Profile - %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to publish your profile: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to publish your profile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to load profile.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to load profile: %1</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -245,21 +241,17 @@
         <translation>vCard Manager</translation>
     </message>
     <message>
-        <source>Show Profile</source>
-        <translation type="unfinished"></translation>
+        <source>Show vCard</source>
+        <translation>vCard anzeigen</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translation type="unfinished">Strg+I</translation>
+        <comment>Show vCard</comment>
+        <translation>Strg+I</translation>
     </message>
     <message>
-        <source>Contact Profile</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Profile</source>
-        <translation type="unfinished"></translation>
+        <source>Visit Card</source>
+        <translation>vCard</translation>
     </message>
 </context>
 </TS>

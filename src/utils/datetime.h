@@ -45,5 +45,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(DateTime);
+#define DATETIME_METATYPE_ID qMetaTypeId<DateTime>()
 
 #endif // DATETIME_H

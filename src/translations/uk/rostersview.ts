@@ -31,10 +31,6 @@
         <source>Name</source>
         <translation>Ім&apos;я</translation>
     </message>
-    <message>
-        <source>Contacts</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>RostersViewPlugin</name>
@@ -61,6 +57,10 @@
     <message>
         <source>Show contact resource in roster</source>
         <translation>Показувати ресурс контактів</translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation>Показувати статус контактів</translation>
     </message>
     <message>
         <source>Sort contacts by status</source>

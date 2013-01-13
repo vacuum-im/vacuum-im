@@ -148,17 +148,23 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 		if (handler->viewDropAction(this, AEvent, dropMenu))
 			accepted = true;
 
-	if (accepted && !dropMenu->isEmpty())
+	QList<Action *> actionList = dropMenu->groupActions();
+	if (accepted && !actionList.isEmpty())
 	{
-		if (dropMenu->exec(mapToGlobal(AEvent->pos())))
+		QAction *action = !(AEvent->mouseButtons() & Qt::RightButton) && actionList.count()==1 ? actionList.value(0) : NULL;
+		if (action)
+			action->trigger();
+		else
+			action = dropMenu->exec(mapToGlobal(AEvent->pos()));
+
+		if (action)
 			AEvent->acceptProposedAction();
 		else
 			AEvent->ignore();
 	}
 	else
-	{
 		AEvent->ignore();
-	}
+
 	delete dropMenu;
 }
 

@@ -122,6 +122,22 @@
         <translation>Запитати</translation>
     </message>
     <message>
+        <source>Copy contact</source>
+        <translation>Копіювати контакт</translation>
+    </message>
+    <message>
+        <source>Move contact</source>
+        <translation>Перемістити контакт</translation>
+    </message>
+    <message>
+        <source>Copy group</source>
+        <translation>Копіювати групу</translation>
+    </message>
+    <message>
+        <source>Move group</source>
+        <translation>Перемістити групу</translation>
+    </message>
+    <message>
         <source>Refuse</source>
         <translation>Відмовитись</translation>
     </message>
@@ -288,10 +304,6 @@
             <numerusform>Ви впевнені що хочете видалити &lt;b&gt;%n контакти&lt;/b&gt; з ростеру?</numerusform>
             <numerusform>Ви впевнені що хочете видалити &lt;b&gt;%n контактів&lt;/b&gt; з ростеру?</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Add group</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

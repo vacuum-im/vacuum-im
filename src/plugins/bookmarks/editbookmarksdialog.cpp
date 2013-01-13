@@ -3,23 +3,18 @@
 #include <QHeaderView>
 #include <QMessageBox>
 
-enum Columns {
-	COL_NAME,
-	COL_VALUE,
-	COL_NICK,
-	COL_SORT,
-	COL_COUNT
-};
+#define C_NAME                  0
+#define C_VALUE                 1
+#define C_NICK                  2
 
-#define TDR_TYPE                Qt::UserRole+1
-#define TDR_NAME                Qt::UserRole+2
-#define TDR_ROOMJID             Qt::UserRole+3
-#define TDR_AUTO                Qt::UserRole+4
-#define TDR_NICK                Qt::UserRole+5
-#define TDR_PASSWORD            Qt::UserRole+6
-#define TDR_URL                 Qt::UserRole+7
+#define TDR_NAME                Qt::UserRole+1
+#define TDR_AUTO                Qt::UserRole+2
+#define TDR_NICK                Qt::UserRole+3
+#define TDR_PASSWORD            Qt::UserRole+4
+#define TDR_CONF                Qt::UserRole+5
+#define TDR_URL                 Qt::UserRole+6
 
-EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStreamJid, const QList<IBookmark> &AList, QWidget *AParent) : QDialog(AParent)
+EditBookmarksDialog::EditBookmarksDialog(IBookMarks *ABookmarks, const Jid &AStreamJid, const QList<IBookMark> &AList, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
@@ -30,19 +25,19 @@ EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStr
 	FStreamJid = AStreamJid;
 
 	ui.tbwBookmarks->setRowCount(AList.count());
-	for (int row=0; row<AList.count(); ++row)
+	for (int row=0; row<AList.count(); row++)
 	{
-		IBookmark bookmark = AList.at(row);
+		IBookMark bookmark = AList.at(row);
 		setBookmarkToRow(row,bookmark);
 	}
+	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NAME,QHeaderView::ResizeToContents);
+	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_VALUE,QHeaderView::Stretch);
+	ui.tbwBookmarks->horizontalHeader()->setResizeMode(C_NICK,QHeaderView::ResizeToContents);
 
-	QHeaderView *header = ui.tbwBookmarks->horizontalHeader();
-	header->setClickable(true);
-	header->hideSection(COL_SORT);
-	header->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
-	header->setResizeMode(COL_VALUE,QHeaderView::Stretch);
-	header->setResizeMode(COL_NICK,QHeaderView::ResizeToContents);
-	connect(header,SIGNAL(sectionClicked(int)),SLOT(onSortingStateChange(int)));
+	connect(FBookmarks->instance(),SIGNAL(bookmarksUpdated(const QString &, const Jid &, const QDomElement &)),
+	        SLOT(onBookmarksUpdated(const QString &, const Jid &, const QDomElement &)));
+	connect(FBookmarks->instance(),SIGNAL(bookmarksError(const QString &, const QString &)),
+	        SLOT(onBookmarksError(const QString &, const QString &)));
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onEditButtonClicked()));
 	connect(ui.pbtEdit,SIGNAL(clicked()),SLOT(onEditButtonClicked()));
@@ -59,57 +54,48 @@ EditBookmarksDialog::~EditBookmarksDialog()
 	emit dialogDestroyed();
 }
 
-IBookmark EditBookmarksDialog::getBookmarkFromRow(int ARow) const
+IBookMark EditBookmarksDialog::getBookmarkFromRow(int ARow) const
 {
-	IBookmark bookmark;
-	QTableWidgetItem *tableItem = ui.tbwBookmarks->item(ARow,COL_NAME);
-	bookmark.type = tableItem->data(TDR_TYPE).toInt();
+	IBookMark bookmark;
+	QTableWidgetItem *tableItem = ui.tbwBookmarks->item(ARow,C_NAME);
 	bookmark.name = tableItem->data(TDR_NAME).toString();
-	bookmark.conference.roomJid = tableItem->data(TDR_ROOMJID).toString();
-	bookmark.conference.autojoin = tableItem->data(TDR_AUTO).toBool();
-	bookmark.conference.nick = tableItem->data(TDR_NICK).toString();
-	bookmark.conference.password = tableItem->data(TDR_PASSWORD).toString();
-	bookmark.url.url = tableItem->data(TDR_URL).toString();
+	bookmark.autojoin = tableItem->data(TDR_AUTO).toBool();
+	bookmark.nick = tableItem->data(TDR_NICK).toString();
+	bookmark.password = tableItem->data(TDR_PASSWORD).toString();
+	bookmark.conference = tableItem->data(TDR_CONF).toString();
+	bookmark.url = tableItem->data(TDR_URL).toString();
 	return bookmark;
 }
 
-void EditBookmarksDialog::setBookmarkToRow(int ARow, const IBookmark &ABookmark)
+void EditBookmarksDialog::setBookmarkToRow(int ARow, const IBookMark &ABookmark)
 {
 	QTableWidgetItem *nameItem = new QTableWidgetItem;
 	nameItem->setText(ABookmark.name);
-
-	if (ABookmark.type == IBookmark::Url)
+	if (ABookmark.conference.isEmpty())
 		nameItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BOOKMARKS_URL));
 	else
 		nameItem->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BOOKMARKS_ROOM));
-
-	if (ABookmark.type==IBookmark::Conference && ABookmark.conference.autojoin)
+	if (!ABookmark.conference.isEmpty() && ABookmark.autojoin)
 	{
 		QFont font = nameItem->font();
 		font.setBold(true);
 		nameItem->setFont(font);
 	}
-
-	nameItem->setData(TDR_TYPE,ABookmark.type);
 	nameItem->setData(TDR_NAME,ABookmark.name);
-	nameItem->setData(TDR_ROOMJID,ABookmark.conference.roomJid.bare());
-	nameItem->setData(TDR_AUTO,ABookmark.conference.autojoin);
-	nameItem->setData(TDR_NICK,ABookmark.conference.nick);
-	nameItem->setData(TDR_PASSWORD,ABookmark.conference.password);
-	nameItem->setData(TDR_URL,ABookmark.url.url.toString());
-	ui.tbwBookmarks->setItem(ARow,COL_NAME,nameItem);
+	nameItem->setData(TDR_AUTO,ABookmark.autojoin);
+	nameItem->setData(TDR_NICK,ABookmark.nick);
+	nameItem->setData(TDR_PASSWORD,ABookmark.password);
+	nameItem->setData(TDR_CONF,ABookmark.conference);
+	nameItem->setData(TDR_URL,ABookmark.url);
+	ui.tbwBookmarks->setItem(ARow,C_NAME,nameItem);
 
 	QTableWidgetItem *valueItem = new QTableWidgetItem;
-	valueItem->setText(ABookmark.type==IBookmark::Url ? ABookmark.url.url.toString() : ABookmark.conference.roomJid.uBare());
-	ui.tbwBookmarks->setItem(nameItem->row(),COL_VALUE,valueItem);
+	valueItem->setText(ABookmark.conference.isEmpty() ? ABookmark.url : Jid(ABookmark.conference).uBare());
+	ui.tbwBookmarks->setItem(nameItem->row(),C_VALUE,valueItem);
 
 	QTableWidgetItem *nickItem = new QTableWidgetItem;
-	nickItem->setText(ABookmark.conference.nick);
-	ui.tbwBookmarks->setItem(nameItem->row(),COL_NICK,nickItem);
-
-	QTableWidgetItem *sortItem = new QTableWidgetItem;
-	sortItem->setText(nameItem->text());
-	ui.tbwBookmarks->setItem(nameItem->row(),COL_SORT,sortItem);
+	nickItem->setText(ABookmark.nick);
+	ui.tbwBookmarks->setItem(nameItem->row(),C_NICK,nickItem);
 }
 
 void EditBookmarksDialog::onEditButtonClicked()
@@ -117,7 +103,7 @@ void EditBookmarksDialog::onEditButtonClicked()
 	QPushButton *button = qobject_cast<QPushButton *>(sender());
 	if (button == ui.pbtAdd)
 	{
-		IBookmark bookmark;
+		IBookMark bookmark;
 		if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
 		{
 			ui.tbwBookmarks->setRowCount(ui.tbwBookmarks->rowCount()+1);
@@ -127,9 +113,9 @@ void EditBookmarksDialog::onEditButtonClicked()
 	else if (button == ui.pbtEdit)
 	{
 		int row = ui.tbwBookmarks->currentRow();
-		if (row >= 0)
+		if (row >=0)
 		{
-			IBookmark bookmark = getBookmarkFromRow(row);
+			IBookMark bookmark = getBookmarkFromRow(row);
 			if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
 				setBookmarkToRow(row,bookmark);
 		}
@@ -146,11 +132,11 @@ void EditBookmarksDialog::onEditButtonClicked()
 		if (tableItem && tableItem->row()>0)
 		{
 			int row = tableItem->row();
-			IBookmark bookmark1 = getBookmarkFromRow(row);
-			IBookmark bookmark2 = getBookmarkFromRow(row-1);
+			IBookMark bookmark1 = getBookmarkFromRow(row);
+			IBookMark bookmark2 = getBookmarkFromRow(row-1);
 			setBookmarkToRow(row,bookmark2);
 			setBookmarkToRow(row-1,bookmark1);
-			ui.tbwBookmarks->setCurrentCell(row-1,COL_NAME);
+			ui.tbwBookmarks->setCurrentCell(row-1,C_NAME);
 		}
 	}
 	else if (button == ui.pbtMoveDown)
@@ -159,51 +145,65 @@ void EditBookmarksDialog::onEditButtonClicked()
 		if (tableItem && tableItem->row()<ui.tbwBookmarks->rowCount()-1)
 		{
 			int row = tableItem->row();
-			IBookmark bookmark1 = getBookmarkFromRow(row);
-			IBookmark bookmark2 = getBookmarkFromRow(row+1);
+			IBookMark bookmark1 = getBookmarkFromRow(row);
+			IBookMark bookmark2 = getBookmarkFromRow(row+1);
 			setBookmarkToRow(row,bookmark2);
 			setBookmarkToRow(row+1,bookmark1);
-			ui.tbwBookmarks->setCurrentCell(row+1,COL_NAME);
+			ui.tbwBookmarks->setCurrentCell(row+1,C_NAME);
 		}
 	}
 }
 
 void EditBookmarksDialog::onDialogAccepted()
 {
-	QList<IBookmark> bookmarks;
+	QList<IBookMark> bookmarks;
 	for (int row=0; row<ui.tbwBookmarks->rowCount(); row++)
 		bookmarks.append(getBookmarkFromRow(row));
 
-	if (!FBookmarks->setBookmarks(FStreamJid,bookmarks))
-		QMessageBox::warning(this,tr("Bookmarks not saved"),tr("Cant save bookmarks to server"));
+	FRequestId = FBookmarks->setBookmarks(FStreamJid,bookmarks);
+	if (!FRequestId.isEmpty())
+	{
+		ui.pbtAdd->setEnabled(false);
+		ui.pbtEdit->setEnabled(false);
+		ui.pbtDelete->setEnabled(false);
+		ui.pbtMoveUp->setEnabled(false);
+		ui.pbtMoveDown->setEnabled(false);
+		ui.tbwBookmarks->setEnabled(false);
+		ui.bbxButtons->setStandardButtons(QDialogButtonBox::Cancel);
+	}
 	else
+	{
+		QMessageBox::warning(this,tr("Bookmarks not saved"),tr("Cant save bookmarks to server"));
+	}
+}
+
+void EditBookmarksDialog::onBookmarksUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
+{
+	Q_UNUSED(AStreamJid);
+	Q_UNUSED(AElement);
+	if (AId == FRequestId)
 		accept();
+}
+
+void EditBookmarksDialog::onBookmarksError(const QString &AId, const QString &AError)
+{
+	if (AId == FRequestId)
+	{
+		FRequestId.clear();
+		ui.pbtAdd->setEnabled(true);
+		ui.pbtEdit->setEnabled(true);
+		ui.pbtDelete->setEnabled(true);
+		ui.pbtMoveUp->setEnabled(true);
+		ui.pbtMoveDown->setEnabled(true);
+		ui.tbwBookmarks->setEnabled(true);
+		ui.bbxButtons->setStandardButtons(QDialogButtonBox::Save|QDialogButtonBox::Cancel);
+		QMessageBox::warning(this,tr("Bookmarks not saved"),tr("Cant save bookmarks to server. %1").arg(AError));
+	}
 }
 
 void EditBookmarksDialog::onTableItemDoubleClicked(QTableWidgetItem *AItem)
 {
-	IBookmark bookmark = getBookmarkFromRow(AItem->row());
+	IBookMark bookmark = getBookmarkFromRow(AItem->row());
 	if (FBookmarks->execEditBookmarkDialog(&bookmark,this) == QDialog::Accepted)
 		setBookmarkToRow(AItem->row(),bookmark);
-}
-
-void EditBookmarksDialog::onSortingStateChange(int AColumn)
-{
-	QHeaderView *header = qobject_cast<QHeaderView *>(sender());
-	QTableWidget *table = header!=NULL ? qobject_cast<QTableWidget *>(header->parentWidget()) : NULL;
-	if (table) 
-	{
-		if (FLastSortSection!=AColumn || header->sortIndicatorOrder()!=Qt::AscendingOrder) 
-		{
-			// first or double click
-			FLastSortSection = AColumn;
-			table->sortItems(AColumn, header->sortIndicatorOrder());
-		} 
-		else 
-		{
-			// triple click
-			FLastSortSection = -1;
-			table->sortItems(COL_SORT, Qt::AscendingOrder);
-		}
-	}
 }

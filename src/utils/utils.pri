@@ -20,11 +20,7 @@ HEADERS  = utilsexport.h \
            shortcuts.h \
            systemmanager.h \
            textmanager.h \
-           animatedtextbrowser.h \
-           closebutton.h \
-           searchlineedit.h \
-           imagemanager.h \
-           advanceditemdelegate.h
+           animatedtextbrowser.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -47,8 +43,4 @@ SOURCES  = jid.cpp \
            shortcuts.cpp \
            systemmanager.cpp \
            textmanager.cpp \
-           animatedtextbrowser.cpp \
-           closebutton.cpp \
-           searchlineedit.cpp \
-           imagemanager.cpp \
-           advanceditemdelegate.cpp
+           animatedtextbrowser.cpp

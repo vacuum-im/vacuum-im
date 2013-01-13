@@ -179,6 +179,15 @@
         <translation>Add item to roster</translation>
     </message>
     <message>
+        <source>Show vCard</source>
+        <translation>Show vCard</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
         <source>Close discovery window</source>
         <translation>Close discovery window</translation>
     </message>
@@ -238,15 +247,6 @@
     <message>
         <source>Category: %1; Type: %2</source>
         <translation>Category: %1; Type: %2</translation>
-    </message>
-    <message>
-        <source>Show Profile</source>
-        <translation>Show Profile</translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translation>Ctrl+I</translation>
     </message>
 </context>
 </TS>

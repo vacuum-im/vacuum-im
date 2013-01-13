@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>Bookmarks</name>
+    <name>BookMarks</name>
     <message>
         <source>Bookmarks</source>
         <translation>Bookmarks</translation>
@@ -24,32 +24,12 @@
         <translation>Automatically show window of conferences connected at startup</translation>
     </message>
     <message>
-        <source>Edit Bookmarks</source>
-        <translation>Edit Bookmarks</translation>
+        <source>Edit bookmarks</source>
+        <translation>Edit bookmarks</translation>
     </message>
     <message>
-        <source>Add to Bookmarks</source>
-        <translation>Add to Bookmarks</translation>
-    </message>
-    <message>
-        <source>Remove from Bookmarks</source>
-        <translation>Remove from Bookmarks</translation>
-    </message>
-    <message>
-        <source>Edit Bookmark</source>
-        <translation>Edit Bookmark</translation>
-    </message>
-    <message>
-        <source>Rename Bookmark</source>
-        <translation>Rename Bookmark</translation>
-    </message>
-    <message>
-        <source>Enter bookmark name:</source>
-        <translation>Enter bookmark name:</translation>
-    </message>
-    <message>
-        <source>Join to Conference at Startup</source>
-        <translation>Join to Conference at Startup</translation>
+        <source>Append to bookmarks</source>
+        <translation>Append to bookmarks</translation>
     </message>
 </context>
 <context>
@@ -123,6 +103,10 @@
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Cant save bookmarks to server</translation>
+    </message>
+    <message>
+        <source>Cant save bookmarks to server. %1</source>
+        <translation>Cant save bookmarks to server. %1</translation>
     </message>
 </context>
 <context>
