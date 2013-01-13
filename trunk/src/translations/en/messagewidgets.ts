@@ -223,6 +223,10 @@
         <source>Combine message windows with contact-list</source>
         <translation>Combine message windows with contact-list</translation>
     </message>
+    <message>
+        <source>Show tabs in combined message windows with contact-list mode</source>
+        <translation>Show tabs in combined message windows with contact-list mode</translation>
+    </message>
 </context>
 <context>
     <name>MessageWindow</name>
