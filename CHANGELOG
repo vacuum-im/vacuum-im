@@ -16,6 +16,7 @@ LEGEND
   [-] When requesting delivery of unread messages via RemoteControl in the message list fell messages from conferences and received on a different account
   [-] The saved status messages including about a file transfer, were displayed with incorrect date when loading from history in windows of a usual chat and a private chat of conferences
   [-] The exit from conference occurred incorrectly if was requested after a send of request for an entrance, but before receiving confirmation on an entrance
+  [-] Full text search in file archive of messages in certain cases worked not correctly
 
 
 v1.2.0
