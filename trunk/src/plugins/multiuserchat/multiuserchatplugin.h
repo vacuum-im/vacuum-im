@@ -142,6 +142,7 @@ protected:
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
 	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
+	QString getRoomName(const Jid &AStreamJid, const Jid &ARoomJid) const;
 protected slots:
 	void onMultiChatWindowContextMenu(Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);

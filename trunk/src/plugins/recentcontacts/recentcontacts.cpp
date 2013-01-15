@@ -113,6 +113,7 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 			connect(FRostersModel->instance(),SIGNAL(streamRemoved(const Jid &)),SLOT(onRostersModelStreamRemoved(const Jid &)));
 			connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onRostersModelStreamJidChanged(const Jid &, const Jid &)));
 			connect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),SLOT(onRostersModelIndexInserted(IRosterIndex *)));
+			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex*, int)));
 			connect(FRostersModel->instance(),SIGNAL(indexRemoved(IRosterIndex *)),SLOT(onRostersModelIndexRemoved(IRosterIndex *)));
 		}
 	}
@@ -485,18 +486,29 @@ void RecentContacts::setItemProperty(const IRecentItem &AItem, const QString &AN
 {
 	if (isReady(AItem.streamJid))
 	{
+		bool itemChanged = false;
 		IRecentItem item = findRealItem(AItem);
-		if (item.type.isEmpty() || item.properties.value(AName)!=AValue)
+
+		if (item.type.isEmpty())
 		{
-			if (item.type.isEmpty())
-				item = AItem;
+			itemChanged = true;
+			item = AItem;
+		}
 
-			if (QVariant(AValue.type()) != AValue)
-				item.properties.insert(AName,AValue);
-			else
-				item.properties.remove(AName);
+		if (QVariant(AValue.type()) != AValue)
+		{
+			itemChanged = itemChanged || item.properties.value(AName).toString()!=AValue.toString();
+			item.properties.insert(AName,AValue);
+		}
+		else if (item.properties.contains(AName))
+		{
+			itemChanged = true;
+			item.properties.remove(AName);
+		}
+	
+		if (itemChanged)
+		{
 			item.updateTime = QDateTime::currentDateTime();
-
 			mergeRecentItems(item.streamJid, QList<IRecentItem>() << item, false);
 			startSaveItemsToStorage(item.streamJid);
 		}
@@ -777,7 +789,6 @@ void RecentContacts::updateItemProxy(const IRecentItem &AItem)
 				{
 					FIndexToProxy.insert(index,proxy);
 					FProxyToIndex.insert(proxy,index);
-					connect(proxy->instance(),SIGNAL(dataChanged(IRosterIndex *, int)),SLOT(onProxyIndexDataChanged(IRosterIndex *, int)));
 				}
 				else
 				{
@@ -1128,6 +1139,23 @@ void RecentContacts::onRostersModelIndexInserted(IRosterIndex *AIndex)
 	}
 }
 
+void RecentContacts::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole)
+{
+	if (FProxyToIndex.contains(AIndex))
+	{
+		static const QList<int> updateItemRoles = QList<int>() << 0 << RDR_SHOW << RDR_PRIORITY;
+		static const QList<int> updateDataRoles = QList<int>() << 0 << Qt::DecorationRole << Qt::DisplayRole;
+		static const QList<int> updatePropertiesRoles = QList<int>() << 0 << RDR_NAME;
+		
+		if (updateItemRoles.contains(ARole))
+			emit recentItemUpdated(recentItemForIndex(AIndex));
+		if (updateDataRoles.contains(ARole))
+			emit rosterDataChanged(FProxyToIndex.value(AIndex),ARole);
+		if (updatePropertiesRoles.contains(ARole))
+			updateItemProperties(rosterIndexItem(AIndex));
+	}
+}
+
 void RecentContacts::onRostersModelIndexRemoved(IRosterIndex *AIndex)
 {
 	onRostersModelIndexInserted(AIndex);
@@ -1343,20 +1371,6 @@ void RecentContacts::onRostersViewNotifyActivated(int ANotifyId)
 	int notifyId = FProxyToIndexNotify.key(ANotifyId);
 	if (notifyId > 0)
 		FRostersView->activateNotify(notifyId);
-}
-
-void RecentContacts::onProxyIndexDataChanged(IRosterIndex *AIndex, int ARole)
-{
-	static const QList<int> updateItemRoles = QList<int>() << RDR_SHOW << RDR_PRIORITY;
-	static const QList<int> updateDataRoles = QList<int>() << 0 << Qt::DecorationRole << Qt::DisplayRole;
-	static const QList<int> updatePropertiesRoles = QList<int>() << RDR_NAME;
-
-	if (updateItemRoles.contains(ARole))
-		emit recentItemUpdated(recentItemForIndex(AIndex));
-	else if (updateDataRoles.contains(ARole))
-		emit rosterDataChanged(FProxyToIndex.value(AIndex),ARole);
-	else if (updatePropertiesRoles.contains(ARole))
-		updateItemProperties(rosterIndexItem(AIndex));
 }
 
 void RecentContacts::onHandlerRecentItemUpdated(const IRecentItem &AItem)

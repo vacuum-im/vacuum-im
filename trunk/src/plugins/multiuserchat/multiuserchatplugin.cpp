@@ -341,11 +341,11 @@ bool MultiUserChatPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContact
 	}
 	else if (AAction == "invite")
 	{
-		IMultiUserChat *mchat = multiUserChat(AStreamJid, AContactJid);
-		if (mchat != NULL)
+		IMultiUserChat *chat = multiUserChat(AStreamJid, AContactJid);
+		if (chat != NULL)
 		{
 			foreach(QString userJid, AParams.values("jid"))
-				mchat->inviteContact(userJid, QString::null);
+				chat->inviteContact(userJid, QString::null);
 		}
 		return true;
 	}
@@ -720,13 +720,13 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 			chatIndex->setData(RDR_PREP_BARE_JID,ARoomJid.pBare());
 
 			IMultiUserChatWindow *window = multiChatWindow(AStreamJid,ARoomJid);
-			if (window==NULL)
+			if (window == NULL)
 			{
 				if (FStatusIcons)
 					chatIndex->setData(Qt::DecorationRole,FStatusIcons->iconByJidStatus(ARoomJid,IPresence::Offline,SUBSCRIPTION_BOTH,false));
 				chatIndex->setData(RDR_STATUS,QString());
 				chatIndex->setData(RDR_SHOW,IPresence::Offline);
-				chatIndex->setData(RDR_NAME,ARoomJid.uBare());
+				chatIndex->setData(RDR_NAME,getRoomName(AStreamJid,ARoomJid));
 				chatIndex->setData(RDR_MUC_NICK,ANick);
 				chatIndex->setData(RDR_MUC_PASSWORD,APassword);
 			}
@@ -877,16 +877,7 @@ void MultiUserChatPlugin::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
 			chatIndex->setData(RDR_STATUS,AWindow->multiUserChat()->roomError().errorMessage());
 		else
 			chatIndex->setData(RDR_STATUS,QString());
-
-		QString name = AWindow->multiUserChat()->roomName();
-		if (FRecentContacts && AWindow->multiUserChat()->roomJid().uBare()==name)
-		{
-			name = FRecentContacts->itemProperty(recentItemForIndex(chatIndex),REIP_NAME).toString();
-			if (name.isEmpty())
-				name = AWindow->multiUserChat()->roomName();
-		}
-		chatIndex->setData(RDR_NAME,name);
-
+		chatIndex->setData(RDR_NAME,getRoomName(AWindow->streamJid(),AWindow->roomJid()));
 		chatIndex->setData(RDR_SHOW,AWindow->multiUserChat()->show());
 		chatIndex->setData(RDR_MUC_NICK,AWindow->multiUserChat()->nickName());
 		chatIndex->setData(RDR_MUC_PASSWORD,AWindow->multiUserChat()->password());
@@ -962,6 +953,29 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindowForIndex(const IRos
 		}
 	}
 	return window;
+}
+
+QString MultiUserChatPlugin::getRoomName(const Jid &AStreamJid, const Jid &ARoomJid) const
+{
+	QString name = ARoomJid.uBare();
+
+	IMultiUserChat *chat = multiUserChat(AStreamJid, ARoomJid);
+	if (chat)
+		name = chat->roomName();
+
+	if (FRecentContacts && name==ARoomJid.uBare())
+	{
+		IRecentItem item;
+		item.type = REIT_CONFERENCE;
+		item.streamJid = AStreamJid;
+		item.reference = ARoomJid.pBare();
+
+		QString recent_name = FRecentContacts->itemProperty(item,REIP_NAME).toString();
+		if (!recent_name.isEmpty())
+			name = recent_name;
+	}
+
+	return name;
 }
 
 void MultiUserChatPlugin::onMultiChatWindowContextMenu(Menu *AMenu)
