@@ -121,6 +121,7 @@ protected slots:
 	void onRostersModelStreamRemoved(const Jid &AStreamJid);
 	void onRostersModelStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void onRostersModelIndexInserted(IRosterIndex *AIndex);
+	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
 	void onRostersModelIndexRemoved(IRosterIndex *AIndex);
 protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
@@ -136,7 +137,6 @@ protected slots:
 	void onRostersViewNotifyRemoved(int ANotifyId);
 	void onRostersViewNotifyActivated(int ANotifyId);
 protected slots:
-	void onProxyIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
 	void onHandlerRecentItemUpdated(const IRecentItem &AItem);
 protected slots:
 	void onRemoveFromRecentByAction();
