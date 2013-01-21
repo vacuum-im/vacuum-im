@@ -12,6 +12,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/xmppurihandlerorders.h>
+#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>
@@ -24,19 +25,20 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <utils/stanza.h>
 #include <utils/options.h>
+#include <utils/xmpperror.h>
 #include "registerdialog.h"
 #include "registerstream.h"
 
 class Registration :
-			public QObject,
-			public IPlugin,
-			public IRegistration,
-			public IStanzaRequestOwner,
-			public IXmppUriHandler,
-			public IDiscoFeatureHandler,
-			public IXmppFeaturesPlugin,
-			public IOptionsHolder,
-			public IDataLocalizer
+	public QObject,
+	public IPlugin,
+	public IRegistration,
+	public IStanzaRequestOwner,
+	public IXmppUriHandler,
+	public IDiscoFeatureHandler,
+	public IXmppFeaturesPlugin,
+	public IOptionsHolder,
+	public IDataLocalizer
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IOptionsHolder IDataLocalizer);
@@ -78,7 +80,7 @@ signals:
 	//IRegistration
 	void registerFields(const QString &AId, const IRegisterFields &AFields);
 	void registerSuccessful(const QString &AId);
-	void registerError(const QString &AId, const QString &AError);
+	void registerError(const QString &AId, const XmppError &AError);
 protected:
 	void registerDiscoFeatures();
 protected slots:

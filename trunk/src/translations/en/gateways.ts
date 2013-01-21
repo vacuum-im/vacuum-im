@@ -24,10 +24,6 @@
         <translation>Jabber ID for %1 is %2</translation>
     </message>
     <message>
-        <source>Received Jabber ID is not valid</source>
-        <translation>Received Jabber ID is not valid</translation>
-    </message>
-    <message>
         <source>Requested operation failed: %1</source>
         <translation>Requested operation failed: %1</translation>
     </message>

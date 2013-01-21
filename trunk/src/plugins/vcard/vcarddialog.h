@@ -30,7 +30,7 @@ protected:
 protected slots:
 	void onVCardUpdated();
 	void onVCardPublished();
-	void onVCardError(const QString &AError);
+	void onVCardError(const XmppError &AError);
 	void onUpdateDialogTimeout();
 	void onPhotoSaveClicked();
 	void onPhotoLoadClicked();

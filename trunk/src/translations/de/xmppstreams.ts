@@ -15,26 +15,6 @@
         <source>Connection not specified</source>
         <translation>Verbindung nicht angegeben</translation>
     </message>
-    <message>
-        <source>XMPP connection timed out</source>
-        <translation>XMPP Verbindung Zeitüberschreitung</translation>
-    </message>
-    <message>
-        <source>Failed to start connection</source>
-        <translation>Kann Verbindung nicht herstellen</translation>
-    </message>
-    <message>
-        <source>Connection closed unexpectedly</source>
-        <translation>Verbindung unerwartet geschlossen</translation>
-    </message>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Sicher Verbindung ist nicht hergestellt</translation>
-    </message>
-    <message>
-        <source>XMPP stream destroyed</source>
-        <translation>XMPP Datenstrom getrennt</translation>
-    </message>
 </context>
 <context>
     <name>XmppStreams</name>
@@ -45,6 +25,22 @@
     <message>
         <source>Allows other modules to create XMPP streams and get access to them</source>
         <translation>Erlaubt anderen Modulen XMPP Datenströme zu erstellen und zu benutzen</translation>
+    </message>
+    <message>
+        <source>XMPP stream destroyed</source>
+        <translation>XMPP Datenstrom getrennt</translation>
+    </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Sicher Verbindung ist nicht hergestellt</translation>
+    </message>
+    <message>
+        <source>Connection closed unexpectedly</source>
+        <translation>Verbindung unerwartet geschlossen</translation>
+    </message>
+    <message>
+        <source>Failed to start connection</source>
+        <translation>Kann Verbindung nicht herstellen</translation>
     </message>
 </context>
 </TS>

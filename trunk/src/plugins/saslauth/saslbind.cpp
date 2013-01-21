@@ -29,12 +29,12 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			}
 			else
 			{
-				emit error(tr("Invalid XMPP stream JID in SASL bind response"));
+				emit error(XmppError(IERR_SASL_BIND_INVALID_STREAM_JID));
 			}
 		}
 		else
 		{
-			emit error(XmppStanzaError(AStanza).errorMessage());
+			emit error(XmppStanzaError(AStanza));
 		}
 		return true;
 	}
@@ -47,6 +47,16 @@ bool SASLBind::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrd
 	Q_UNUSED(AStanza);
 	Q_UNUSED(AOrder);
 	return false;
+}
+
+QString SASLBind::featureNS() const
+{
+	return NS_FEATURE_BIND;
+}
+
+IXmppStream *SASLBind::xmppStream() const
+{
+	return FXmppStream;
 }
 
 bool SASLBind::start(const QDomElement &AElem)

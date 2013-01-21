@@ -858,13 +858,11 @@ void FileMessageArchive::onWorkingThreadFinished()
 			case WorkingThread::LoadModifications:
 				emit modificationsLoaded(wthread->workId(),wthread->archiveModifications());
 				break;
-			default:
-				emit requestFailed(wthread->workId(),tr("Internal error"));
 			}
 		}
 		else
 		{
-			emit requestFailed(wthread->workId(),wthread->errorString());
+			emit requestFailed(wthread->workId(),wthread->error());
 		}
 		wthread->deleteLater();
 	}

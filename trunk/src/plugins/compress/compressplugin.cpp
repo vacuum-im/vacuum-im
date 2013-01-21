@@ -42,8 +42,14 @@ bool CompressPlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 
 bool CompressPlugin::initObjects()
 {
-	XmppError::registerErrorString(NS_FEATURE_COMPRESS,"unsupported-method",tr("Unsupported compression method"));
-	XmppError::registerErrorString(NS_FEATURE_COMPRESS,"setup-failed",tr("Compression setup failed"));
+	XmppError::registerError(NS_FEATURE_COMPRESS,XERR_COMPRESS_UNSUPPORTED_METHOD,tr("Unsupported compression method"));
+	XmppError::registerError(NS_FEATURE_COMPRESS,XERR_COMPRESS_SETUP_FAILED,tr("Compression setup failed"));
+
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_COMPRESS_UNKNOWN_ERROR,tr("ZLib error"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_COMPRESS_OUT_OF_MEMORY,tr("Out of memory for ZLib"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_COMPRESS_VERSION_MISMATCH,tr("ZLib version mismatch"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_COMPRESS_INVALID_DEFLATE_DATA,tr("Invalid or incomplete deflate data"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_COMPRESS_INVALID_COMPRESSION_LEVEL,tr("Invalid compression level"));
 
 	if (FXmppStreams)
 	{

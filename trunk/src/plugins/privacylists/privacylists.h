@@ -76,7 +76,7 @@ signals:
 	void activeListChanged(const Jid &AStreamJid, const QString &AList);
 	void defaultListChanged(const Jid &AStreamJid, const QString &AList);
 	void requestCompleted(const QString &AId);
-	void requestFailed(const QString &AId, const QString &AError);
+	void requestFailed(const QString &AId, const XmppError &AError);
 protected:
 	QString loadPrivacyLists(const Jid &AStreamJid);
 	Menu *createPrivacyMenu(Menu *AMenu) const;

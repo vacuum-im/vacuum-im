@@ -20,6 +20,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
 #include <definitions/shortcutgrouporders.h>
+#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
@@ -50,32 +51,32 @@ struct StanzaSession {
 	bool defaultPrefs;
 	QString saveMode;
 	QString requestId;
-	QString error;
+	XmppStanzaError error;
 };
 
 struct RemoveRequest {
-	QString lastError;
+	XmppError lastError;
 	IArchiveRequest request;
 	QList<IArchiveEngine *> engines;
 };
 
 struct MessagesRequest {
 	Jid streamJid;
-	QString lastError;
+	XmppError lastError;
 	IArchiveRequest request;
 	QList<IArchiveHeader> headers;
 	IArchiveCollectionBody body;
 };
 
 struct HeadersRequest {
-	QString lastError;
+	XmppError lastError;
 	IArchiveRequest request;
 	QList<IArchiveEngine *> engines;
 	QMap<IArchiveEngine *,QList<IArchiveHeader> > headers;
 };
 
 struct CollectionRequest {
-	QString lastError;
+	XmppError lastError;
 	IArchiveCollection collection;
 };
 
@@ -151,7 +152,7 @@ public:
 signals:
 	//Common Requests
 	void requestCompleted(const QString &AId);
-	void requestFailed(const QString &AId, const QString &AError);
+	void requestFailed(const QString &AId, const XmppError &AError);
 	//Archive Preferences
 	void archivePrefsOpened(const Jid &AStreamJid);
 	void archivePrefsChanged(const Jid &AStreamJid);
@@ -186,7 +187,7 @@ protected:
 	void restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId = QString::null);
 	void removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const;
 	void startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId);
-	void cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError);
+	void cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const XmppStanzaError &AError);
 	void renegotiateStanzaSessions(const Jid &AStreamJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected:
@@ -196,17 +197,16 @@ protected:
 	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
 protected slots:
 	void onEngineCapabilitiesChanged(const Jid &AStreamJid);
-	void onEngineRequestFailed(const QString &AId, const QString &AError);
+	void onEngineRequestFailed(const QString &AId, const XmppError &AError);
 	void onEngineCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void onEngineHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onEngineCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
-	void onSelfRequestFailed(const QString &AId, const QString &AError);
+	void onSelfRequestFailed(const QString &AId, const XmppError &AError);
 	void onSelfHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onSelfCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
-	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);

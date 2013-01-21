@@ -158,8 +158,8 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 		{
 			connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
 				SLOT(onRegisterFieldsReceived(const QString &, const IRegisterFields &)));
-			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
-				SLOT(onRegisterErrorReceived(const QString &, const QString &)));
+			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const XmppError &)),
+				SLOT(onRegisterErrorReceived(const QString &, const XmppError &)));
 		}
 	}
 
@@ -1331,7 +1331,7 @@ void MultiUserChatPlugin::onRegisterFieldsReceived(const QString &AId, const IRe
 	}
 }
 
-void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const QString &AError)
+void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const XmppError &AError)
 {
 	Q_UNUSED(AError);
 	if (FNickRequests.contains(AId))

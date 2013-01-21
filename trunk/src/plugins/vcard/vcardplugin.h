@@ -38,11 +38,11 @@ struct VCardItem
 };
 
 class VCardPlugin :
-			public QObject,
-			public IPlugin,
-			public IVCardPlugin,
-			public IStanzaRequestOwner,
-			public IXmppUriHandler
+	public QObject,
+	public IPlugin,
+	public IVCardPlugin,
+	public IStanzaRequestOwner,
+	public IXmppUriHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IVCardPlugin IStanzaRequestOwner IXmppUriHandler);
@@ -72,7 +72,7 @@ public:
 signals:
 	void vcardReceived(const Jid &AContactJid);
 	void vcardPublished(const Jid &AContactJid);
-	void vcardError(const Jid &AContactJid, const QString &AError);
+	void vcardError(const Jid &AContactJid, const XmppError &AError);
 protected:
 	void unlockVCard(const Jid &AContactJid);
 	void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;

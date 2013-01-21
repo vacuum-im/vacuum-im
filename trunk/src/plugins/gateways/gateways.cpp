@@ -118,7 +118,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		if (FVCardPlugin)
 		{
 			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
-			connect(FVCardPlugin->instance(),SIGNAL(vcardError(const Jid &, const QString &)),SLOT(onVCardError(const Jid &, const QString &)));
+			connect(FVCardPlugin->instance(),SIGNAL(vcardError(const Jid &, const XmppError &)),SLOT(onVCardError(const Jid &, const XmppError &)));
 		}
 	}
 
@@ -148,8 +148,8 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		{
 			connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
 				SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
-			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
-				SLOT(onRegisterError(const QString &, const QString &)));
+			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const XmppError &)),
+				SLOT(onRegisterError(const QString &, const XmppError &)));
 		}
 	}
 
@@ -189,7 +189,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza));
 		}
 		FPromptRequests.removeAll(AStanza.id());
 	}
@@ -202,7 +202,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza));
 		}
 		FUserJidRequests.removeAll(AStanza.id());
 	}
@@ -990,7 +990,7 @@ void Gateways::onVCardReceived(const Jid &AContactJid)
 	}
 }
 
-void Gateways::onVCardError(const Jid &AContactJid, const QString &AError)
+void Gateways::onVCardError(const Jid &AContactJid, const XmppError &AError)
 {
 	Q_UNUSED(AError);
 	FResolveNicks.remove(AContactJid);
@@ -1054,7 +1054,7 @@ void Gateways::onRegisterFields(const QString &AId, const IRegisterFields &AFiel
 	}
 }
 
-void Gateways::onRegisterError(const QString &AId, const QString &AError)
+void Gateways::onRegisterError(const QString &AId, const XmppError &AError)
 {
 	Q_UNUSED(AError);
 	FShowRegisterRequests.remove(AId);

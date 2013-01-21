@@ -69,6 +69,19 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &/*AInitO
 
 bool SocksStreams::initObjects()
 {
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_DESTROYED,tr("Stream destroyed"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_INVALID_MODE,tr("Unsupported stream mode"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOSTS_REJECTED,tr("Remote client cant connect to given hosts"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOSTS_UNREACHABLE,tr("Cant connect to given hosts"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOSTS_NOT_CREATED,tr("Failed to create hosts"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_NOT_ACTIVATED,tr("Failed to activate stream"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_DATA_NOT_SENT,tr("Failed to send data to socket"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_NO_DIRECT_CONNECTION,tr("Direct connection not established"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_INVALID_HOST,tr("Invalid host"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_INVALID_HOST_ADDRESS,tr("Invalid host address"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOST_NOT_CONNECTED,tr("Failed to connect to host"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOST_DISCONNECTED,tr("Host disconnected"));
+
 	if (FDataManager)
 	{
 		FDataManager->insertMethod(this);
@@ -113,8 +126,7 @@ QString SocksStreams::methodDescription() const
 	return tr("Data is transferred out-band over TCP or UDP connection");
 }
 
-IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid,
-    IDataStreamSocket::StreamKind AKind, QObject *AParent)
+IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
 {
 	if (FStanzaProcessor)
 	{

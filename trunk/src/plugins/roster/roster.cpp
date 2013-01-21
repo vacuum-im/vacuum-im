@@ -103,7 +103,7 @@ void Roster::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			FXmppStream->abort(tr("Roster request failed"));
+			FXmppStream->abort(XmppError(IERR_ROSTER_REQUEST_FAILED));
 		}
 	}
 }

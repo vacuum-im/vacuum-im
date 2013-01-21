@@ -3,11 +3,13 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
+#include <definitions/internalerrors.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/iroster.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/options.h>
+#include <utils/xmpperror.h>
 
 class Roster :
 			public QObject,

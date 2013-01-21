@@ -73,45 +73,6 @@
     </message>
 </context>
 <context>
-    <name>SocksStream</name>
-    <message>
-        <source>Stream destroyed</source>
-        <translation>Stream destroyed</translation>
-    </message>
-    <message>
-        <source>Unsupported stream mode</source>
-        <translation>Unsupported stream mode</translation>
-    </message>
-    <message>
-        <source>Remote client cant connect to given hosts</source>
-        <translation>Remote client cant connect to given hosts</translation>
-    </message>
-    <message>
-        <source>Failed to activate stream</source>
-        <translation>Failed to activate stream</translation>
-    </message>
-    <message>
-        <source>Failed to create hosts</source>
-        <translation>Failed to create hosts</translation>
-    </message>
-    <message>
-        <source>Direct connection not established</source>
-        <translation>Direct connection not established</translation>
-    </message>
-    <message>
-        <source>Invalid host</source>
-        <translation>Invalid host</translation>
-    </message>
-    <message>
-        <source>Cant connect to given hosts</source>
-        <translation>Cant connect to given hosts</translation>
-    </message>
-    <message>
-        <source>Failed to connect to host</source>
-        <translation>Failed to connect to host</translation>
-    </message>
-</context>
-<context>
     <name>SocksStreams</name>
     <message>
         <source>SOCKS5 Data Stream</source>
@@ -128,6 +89,54 @@
     <message>
         <source>Data is transferred out-band over TCP or UDP connection</source>
         <translation>Data is transferred out-band over TCP or UDP connection</translation>
+    </message>
+    <message>
+        <source>Stream destroyed</source>
+        <translation>Stream destroyed</translation>
+    </message>
+    <message>
+        <source>Unsupported stream mode</source>
+        <translation>Unsupported stream mode</translation>
+    </message>
+    <message>
+        <source>Remote client cant connect to given hosts</source>
+        <translation>Remote client cant connect to given hosts</translation>
+    </message>
+    <message>
+        <source>Cant connect to given hosts</source>
+        <translation>Cant connect to given hosts</translation>
+    </message>
+    <message>
+        <source>Failed to create hosts</source>
+        <translation>Failed to create hosts</translation>
+    </message>
+    <message>
+        <source>Failed to activate stream</source>
+        <translation>Failed to activate stream</translation>
+    </message>
+    <message>
+        <source>Failed to send data to socket</source>
+        <translation>Failed to send data to socket</translation>
+    </message>
+    <message>
+        <source>Direct connection not established</source>
+        <translation>Direct connection not established</translation>
+    </message>
+    <message>
+        <source>Invalid host</source>
+        <translation>Invalid host</translation>
+    </message>
+    <message>
+        <source>Invalid host address</source>
+        <translation>Invalid host address</translation>
+    </message>
+    <message>
+        <source>Failed to connect to host</source>
+        <translation>Failed to connect to host</translation>
+    </message>
+    <message>
+        <source>Host disconnected</source>
+        <translation>Host disconnected</translation>
     </message>
 </context>
 </TS>

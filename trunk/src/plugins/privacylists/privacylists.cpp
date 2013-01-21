@@ -330,7 +330,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	if (AStanza.type() == "result")
 		emit requestCompleted(AStanza.id());
 	else
-		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
 }
 
 bool PrivacyLists::isReady(const Jid &AStreamJid) const

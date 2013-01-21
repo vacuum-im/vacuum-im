@@ -98,8 +98,6 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		FPrivateStorage = qobject_cast<IPrivateStorage *>(plugin->instance());
 		if (FPrivateStorage)
 		{
-			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-				SLOT(onPrivateDataError(const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
 				SLOT(onPrivateDataLoadedSaved(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
@@ -180,8 +178,8 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		}
 	}
 
-	connect(this,SIGNAL(requestFailed(const QString &, const QString &)),
-		SLOT(onSelfRequestFailed(const QString &, const QString &)));
+	connect(this,SIGNAL(requestFailed(const QString &, const XmppError &)),
+		SLOT(onSelfRequestFailed(const QString &, const XmppError &)));
 	connect(this,SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
 		SLOT(onSelfHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
 	connect(this,SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
@@ -202,6 +200,12 @@ bool MessageArchiver::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_HISTORYTERMINATEOTR, tr("Terminate Off-The-Record session"), QKeySequence::UnknownKey);
 
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWHISTORY,tr("Show history"),tr("Ctrl+H","Show history"),Shortcuts::WidgetShortcut);
+
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_HISTORY_HEADERS_LOAD_ERROR,tr("Failed to load conversation headers"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_HISTORY_CONVERSATION_SAVE_ERROR,tr("Failed to save conversation"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_HISTORY_CONVERSATION_LOAD_ERROR,tr("Failed to load conversation"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_HISTORY_CONVERSATION_REMOVE_ERROR,tr("Failed to remove conversation"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_HISTORY_MODIFICATIONS_LOAD_ERROR,tr("Failed to load archive modifications"));
 
 	if (FDiscovery)
 	{
@@ -292,7 +296,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		if (AStanza.type() == "result")
 			startSuspendedStanzaSession(AStreamJid,AStanza.id());
 		else
-			cancelSuspendedStanzaSession(AStreamJid,AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+			cancelSuspendedStanzaSession(AStreamJid,AStanza.id(),XmppStanzaError(AStanza));
 	}
 	else if (FPrefsAutoRequests.contains(AStanza.id()))
 	{
@@ -341,7 +345,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 	if (AStanza.type() == "result")
 		emit requestCompleted(AStanza.id());
 	else
-		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
 }
 
 QMultiMap<int, IOptionsWidget *> MessageArchiver::optionsWidgets(const QString &ANodeId, QWidget *AParent)
@@ -516,7 +520,7 @@ int MessageArchiver::sessionApply(const IStanzaSession &ASession)
 			{
 				result = ISessionNegotiator::Wait;
 			}
-			else if (!session.error.isEmpty())
+			else if (!session.error.isNull())
 			{
 				result = ISessionNegotiator::Cancel;
 			}
@@ -1228,8 +1232,8 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 	{
 		connect(AEngine->instance(),SIGNAL(capabilitiesChanged(const Jid &)),
 			SLOT(onEngineCapabilitiesChanged(const Jid &)));
-		connect(AEngine->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-			SLOT(onEngineRequestFailed(const QString &, const QString &)));
+		connect(AEngine->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+			SLOT(onEngineRequestFailed(const QString &, const XmppError &)));
 		connect(AEngine->instance(),SIGNAL(collectionsRemoved(const QString &, const IArchiveRequest &)),
 			SLOT(onEngineCollectionsRemoved(const QString &, const IArchiveRequest &)));
 		connect(AEngine->instance(),SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
@@ -1846,7 +1850,7 @@ void MessageArchiver::startSuspendedStanzaSession(const Jid &AStreamJid, const Q
 	}
 }
 
-void MessageArchiver::cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError)
+void MessageArchiver::cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const XmppStanzaError &AError)
 {
 	if (FSessionNegotiation)
 	{
@@ -1906,7 +1910,7 @@ void MessageArchiver::processRemoveRequest(const QString &ALocalId, RemoveReques
 {
 	if (ARequest.engines.isEmpty())
 	{
-		if (ARequest.lastError.isEmpty())
+		if (ARequest.lastError.isNull())
 			emit collectionsRemoved(ALocalId,ARequest.request);
 		else
 			emit requestFailed(ALocalId,ARequest.lastError);
@@ -1918,7 +1922,7 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 {
 	if (ARequest.engines.count() == ARequest.headers.count())
 	{
-		if (!ARequest.engines.isEmpty() || ARequest.lastError.isEmpty())
+		if (!ARequest.engines.isEmpty() || ARequest.lastError.isNull())
 		{
 			QList<IArchiveHeader> headers;
 			foreach(IArchiveEngine *engine, ARequest.engines)
@@ -1950,20 +1954,16 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 
 void MessageArchiver::processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest)
 {
-	if (ARequest.lastError.isEmpty())
-	{
+	if (ARequest.lastError.isNull())
 		emit collectionLoaded(ALocalId,ARequest.collection);
-	}
 	else
-	{
 		emit requestFailed(ALocalId,ARequest.lastError);
-	}
 	FCollectionRequests.remove(ALocalId);
 }
 
 void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest)
 {
-	if (!ARequest.lastError.isEmpty())
+	if (!ARequest.lastError.isNull())
 	{
 		emit requestFailed(ALocalId,ARequest.lastError);
 		FMesssagesRequests.remove(ALocalId);
@@ -1990,7 +1990,7 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 		}
 		else
 		{
-			ARequest.lastError = tr("Failed to load conversation");
+			ARequest.lastError = XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR);
 			processMessagesRequest(ALocalId,ARequest);
 		}
 	}
@@ -2001,7 +2001,7 @@ void MessageArchiver::onEngineCapabilitiesChanged(const Jid &AStreamJid)
 	emit totalCapabilitiesChanged(AStreamJid);
 }
 
-void MessageArchiver::onEngineRequestFailed(const QString &AId, const QString &AError)
+void MessageArchiver::onEngineRequestFailed(const QString &AId, const XmppError &AError)
 {
 	if (FRequestId2LocalId.contains(AId))
 	{
@@ -2075,7 +2075,7 @@ void MessageArchiver::onEngineCollectionLoaded(const QString &AId, const IArchiv
 	}
 }
 
-void MessageArchiver::onSelfRequestFailed(const QString &AId, const QString &AError)
+void MessageArchiver::onSelfRequestFailed(const QString &AId, const XmppError &AError)
 {
 	if (FRequestId2LocalId.contains(AId))
 	{
@@ -2166,25 +2166,6 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 
 	emit archivePrefsChanged(AXmppStream->streamJid());
 	emit archivePrefsClosed(AXmppStream->streamJid());
-}
-
-void MessageArchiver::onPrivateDataError(const QString &AId, const QString &AError)
-{
-	if (FPrefsLoadRequests.contains(AId))
-	{
-		Jid streamJid = FPrefsLoadRequests.take(AId);
-		applyArchivePrefs(streamJid,QDomElement());
-		emit requestFailed(AId,AError);
-	}
-	else if (FPrefsSaveRequests.contains(AId))
-	{
-		Jid streamJid = FPrefsSaveRequests.take(AId);
-		if (FRestoreRequests.contains(AId))
-			FRestoreRequests.remove(AId);
-		else
-			cancelSuspendedStanzaSession(streamJid,AId,AError);
-		emit requestFailed(AId,AError);
-	}
 }
 
 void MessageArchiver::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)

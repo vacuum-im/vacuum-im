@@ -23,32 +23,32 @@
         <source>Enable data compression transferred between client and server</source>
         <translation>Ввімкнути стиснення даних, що передаються між клієнтом та сервером</translation>
     </message>
-</context>
-<context>
-    <name>Compression</name>
     <message>
-        <source>Invalid compression level</source>
-        <translation>Неправильний рівень стиснення</translation>
+        <source>ZLib error</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Out of memory for Zlib</source>
-        <translation>Не вистачає пам&apos;яті  для Zlib</translation>
+        <source>Out of memory for ZLib</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Zlib version mismatch!</source>
-        <translation>Неправильна версія Zlib!</translation>
-    </message>
-    <message>
-        <source>Wrong compression negotiation response</source>
-        <translation>Некоректна відповідь під час ініціалізації стиснення</translation>
+        <source>ZLib version mismatch</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Invalid or incomplete deflate data</source>
         <translation>Неправильні чи неповні дані для стиснення</translation>
     </message>
     <message>
-        <source>Unknown Zlib error, %1</source>
-        <translation>Невідома помилка Zlib, %1</translation>
+        <source>Invalid compression level</source>
+        <translation>Неправильний рівень стиснення</translation>
+    </message>
+</context>
+<context>
+    <name>Compression</name>
+    <message>
+        <source>Error code: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

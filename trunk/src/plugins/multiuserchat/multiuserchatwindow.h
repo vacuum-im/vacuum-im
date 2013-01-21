@@ -197,7 +197,7 @@ protected slots:
 	void onHorizontalSplitterMoved(int APos, int AIndex);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
-	void onArchiveRequestFailed(const QString &AId, const QString &AError);
+	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 protected slots:
 	void onNickMenuActionTriggered(bool);
 	void onToolBarActionTriggered(bool);

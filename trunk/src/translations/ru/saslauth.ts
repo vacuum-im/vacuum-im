@@ -2,24 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>SASLAuth</name>
-    <message>
-        <source>Wrong SASL authentication response</source>
-        <translation>Неверный ответ во время SASL авторизации</translation>
-    </message>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Защищенное подключение не установлено</translation>
-    </message>
-</context>
-<context>
-    <name>SASLBind</name>
-    <message>
-        <source>Invalid XMPP stream JID in SASL bind response</source>
-        <translation>Некорректный JID в ответе на SASL-Bind</translation>
-    </message>
-</context>
-<context>
     <name>SASLPlugin</name>
     <message>
         <source>SASL Authentication</source>
@@ -72,6 +54,14 @@
     <message>
         <source>Temporary authentication failure</source>
         <translation>Временный сбой авторизации</translation>
+    </message>
+    <message>
+        <source>Wrong SASL authentication response</source>
+        <translation>Неверный ответ во время SASL авторизации</translation>
+    </message>
+    <message>
+        <source>Invalid XMPP stream JID in SASL bind response</source>
+        <translation>Некорректный JID в ответе на SASL-Bind</translation>
     </message>
 </context>
 </TS>

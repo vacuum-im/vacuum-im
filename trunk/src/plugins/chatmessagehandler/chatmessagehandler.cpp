@@ -96,8 +96,8 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		{
 			connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
 				SLOT(onArchiveMessagesLoaded(const QString &, const IArchiveCollectionBody &)));
-			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-				SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+				SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
 		}
 	}
 
@@ -812,12 +812,12 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 	}
 }
 
-void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const QString &AError)
+void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
 {
 	if (FHistoryRequests.contains(AId))
 	{
 		IChatWindow *window = FHistoryRequests.take(AId);
-		showStyledStatus(window,tr("Failed to load history: %1").arg(AError),true);
+		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
 		FPendingMessages.remove(window);
 	}
 }

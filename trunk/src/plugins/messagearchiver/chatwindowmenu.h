@@ -32,7 +32,7 @@ protected slots:
 	void onActionTriggered(bool);
 	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
-	void onArchiveRequestFailed(const QString &AId, const QString &AError);
+	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 	void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);

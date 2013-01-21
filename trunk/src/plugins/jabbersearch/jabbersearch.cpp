@@ -113,7 +113,7 @@ void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &
 		}
 		else
 		{
-			emit searchError(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+			emit searchError(AStanza.id(),XmppStanzaError(AStanza));
 		}
 	}
 	else if (FSubmits.contains(AStanza.id()))
@@ -150,7 +150,7 @@ void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &
 		}
 		else
 		{
-			emit searchError(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+			emit searchError(AStanza.id(),XmppStanzaError(AStanza));
 		}
 	}
 }

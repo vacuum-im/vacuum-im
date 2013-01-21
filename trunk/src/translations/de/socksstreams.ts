@@ -73,45 +73,6 @@
     </message>
 </context>
 <context>
-    <name>SocksStream</name>
-    <message>
-        <source>Stream destroyed</source>
-        <translation>Datenstrom unterbrochen</translation>
-    </message>
-    <message>
-        <source>Unsupported stream mode</source>
-        <translation>Nicht unterstützter Datenstrom Modus</translation>
-    </message>
-    <message>
-        <source>Remote client cant connect to given hosts</source>
-        <translation>Entfernter Rechner kann Verbindung zum angegebenen Host nicht herstellen</translation>
-    </message>
-    <message>
-        <source>Failed to activate stream</source>
-        <translation>Kann Datenstrom nicht aktivieren</translation>
-    </message>
-    <message>
-        <source>Failed to create hosts</source>
-        <translation>Kann Host nicht erstellen</translation>
-    </message>
-    <message>
-        <source>Direct connection not established</source>
-        <translation>Direktverbindung nicht hergestellt</translation>
-    </message>
-    <message>
-        <source>Invalid host</source>
-        <translation>Ungültiger Host</translation>
-    </message>
-    <message>
-        <source>Cant connect to given hosts</source>
-        <translation>Kann Verbindung zum angegebenen Host nicht herstellen</translation>
-    </message>
-    <message>
-        <source>Failed to connect to host</source>
-        <translation>Verbindung zum Host konnte nicht hergestellt werden</translation>
-    </message>
-</context>
-<context>
     <name>SocksStreams</name>
     <message>
         <source>SOCKS5 Data Stream</source>
@@ -128,6 +89,54 @@
     <message>
         <source>Data is transferred out-band over TCP or UDP connection</source>
         <translation>Daten wurde priorisiert über TCP oder UDP Verbindung übertragen</translation>
+    </message>
+    <message>
+        <source>Stream destroyed</source>
+        <translation>Datenstrom unterbrochen</translation>
+    </message>
+    <message>
+        <source>Unsupported stream mode</source>
+        <translation>Nicht unterstützter Datenstrom Modus</translation>
+    </message>
+    <message>
+        <source>Remote client cant connect to given hosts</source>
+        <translation>Entfernter Rechner kann Verbindung zum angegebenen Host nicht herstellen</translation>
+    </message>
+    <message>
+        <source>Cant connect to given hosts</source>
+        <translation>Kann Verbindung zum angegebenen Host nicht herstellen</translation>
+    </message>
+    <message>
+        <source>Failed to create hosts</source>
+        <translation>Kann Host nicht erstellen</translation>
+    </message>
+    <message>
+        <source>Failed to activate stream</source>
+        <translation>Kann Datenstrom nicht aktivieren</translation>
+    </message>
+    <message>
+        <source>Failed to send data to socket</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Direct connection not established</source>
+        <translation>Direktverbindung nicht hergestellt</translation>
+    </message>
+    <message>
+        <source>Invalid host</source>
+        <translation>Ungültiger Host</translation>
+    </message>
+    <message>
+        <source>Invalid host address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to connect to host</source>
+        <translation>Verbindung zum Host konnte nicht hergestellt werden</translation>
+    </message>
+    <message>
+        <source>Host disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

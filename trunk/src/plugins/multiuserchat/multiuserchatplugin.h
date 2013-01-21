@@ -160,7 +160,7 @@ protected slots:
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 	void onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields);
-	void onRegisterErrorReceived(const QString &AId, const QString &AError);
+	void onRegisterErrorReceived(const QString &AId, const XmppError &AError);
 	void onInviteDialogFinished(int AResult);
 	void onInviteActionTriggered(bool);
 	void onStatusIconsChanged();

@@ -120,6 +120,9 @@ bool FileTransfer::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SENDFILE, tr("Send file"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
 
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_NOT_STARTED,tr("Failed to start file transfer"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_TERMINATED,tr("Data transmission terminated"));
+
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
@@ -351,7 +354,7 @@ bool FileTransfer::fileStreamResponce(const QString &AStreamId, const Stanza &AR
 				stream->setRangeLength(rangeElem.attribute("length").toLongLong());
 		}
 		if (!stream->startStream(AMethodNS))
-			stream->abortStream(tr("Failed to start file transfer"));
+			stream->abortStream(XmppError(IERR_FILETRANSFER_TRANSFER_NOT_STARTED));
 		else
 			return true;
 	}

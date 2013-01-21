@@ -31,11 +31,11 @@
 #include "addlegacycontactdialog.h"
 
 class Gateways :
-			public QObject,
-			public IPlugin,
-			public IGateways,
-			public IStanzaRequestOwner,
-			public IDiscoFeatureHandler
+	public QObject,
+	public IPlugin,
+	public IGateways,
+	public IStanzaRequestOwner,
+	public IDiscoFeatureHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IGateways IStanzaRequestOwner IDiscoFeatureHandler);
@@ -70,7 +70,7 @@ public:
 signals:
 	void promptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
 	void userJidReceived(const QString &AId, const Jid &AUserJid);
-	void errorReceived(const QString &AId, const QString &AError);
+	void errorReceived(const QString &AId, const XmppError &AError);
 protected:
 	void registerDiscoFeatures();
 	void savePrivateStorageKeep(const Jid &AStreamJid);
@@ -98,11 +98,11 @@ protected slots:
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onKeepTimerTimeout();
 	void onVCardReceived(const Jid &AContactJid);
-	void onVCardError(const Jid &AContactJid, const QString &AError);
+	void onVCardError(const Jid &AContactJid, const XmppError &AError);
 	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
 	void onDiscoItemContextMenu(const QModelIndex AIndex, Menu *AMenu);
 	void onRegisterFields(const QString &AId, const IRegisterFields &AFields);
-	void onRegisterError(const QString &AId, const QString &AError);
+	void onRegisterError(const QString &AId, const XmppError &AError);
 private:
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;

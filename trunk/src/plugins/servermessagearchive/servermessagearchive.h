@@ -2,6 +2,7 @@
 #define SERVERMESSAGEARCHIVE_H
 
 #include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
 #include <definitions/archivecapabilityorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservermessagearchive.h>
@@ -74,7 +75,7 @@ public:
 signals:
 	//IArchiveEngine
 	void capabilitiesChanged(const Jid &AStreamJid);
-	void requestFailed(const QString &AId, const QString &AError);
+	void requestFailed(const QString &AId, const XmppError &AError);
 	void collectionSaved(const QString &AId, const IArchiveHeader &AHeader);
 	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
@@ -91,7 +92,7 @@ protected slots:
 	void onArchivePrefsOpened(const Jid &AStreamJid);
 	void onArchivePrefsClosed(const Jid &AStreamJid);
 protected slots:
-	void onServerRequestFailed(const QString &AId, const QString &AError);
+	void onServerRequestFailed(const QString &AId, const XmppError &AError);
 	void onServerHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult);
 	void onServerCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection, const IArchiveResultSet &AResult);
 	void onServerModificationsLoaded(const QString &AId, const IArchiveModifications &AModifs, const IArchiveResultSet &AResult);

@@ -647,5 +647,21 @@
         <source>Save Only Messages Text</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Failed to load conversation headers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save conversation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to remove conversation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to load archive modifications</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

@@ -61,22 +61,6 @@
         <source>Registration on %1</source>
         <translation>Registration on %1</translation>
     </message>
-    <message>
-        <source>Invalid registration form</source>
-        <translation>Invalid registration form</translation>
-    </message>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Secure connection is not established</translation>
-    </message>
-    <message>
-        <source>Invalid registration dialog</source>
-        <translation>Invalid registration dialog</translation>
-    </message>
-    <message>
-        <source>Registration rejected by user</source>
-        <translation>Registration rejected by user</translation>
-    </message>
 </context>
 <context>
     <name>Registration</name>
@@ -163,6 +147,18 @@
     <message>
         <source>Supports the registration</source>
         <translation>Supports the registration</translation>
+    </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation>Invalid registration form</translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation>Invalid registration dialog</translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation>Registration rejected by user</translation>
     </message>
 </context>
 </TS>

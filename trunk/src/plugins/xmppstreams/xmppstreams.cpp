@@ -25,6 +25,15 @@ bool XmppStreams::initConnections(IPluginManager *APluginManager, int &AInitOrde
 	return true;
 }
 
+bool XmppStreams::initObjects()
+{
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_DESTROYED,tr("XMPP stream destroyed"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_NOT_SECURE,tr("Secure connection is not established"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_CLOSED_UNEXPECTEDLY,tr("Connection closed unexpectedly"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_FAILED_START_CONNECTION,tr("Failed to start connection"));
+	return true;
+}
+
 bool XmppStreams::initSettings()
 {
 	Options::setDefaultValue(OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE,60000);
@@ -71,7 +80,7 @@ void XmppStreams::addXmppStream(IXmppStream *AXmppStream)
 		connect(AXmppStream->instance(), SIGNAL(opened()), SLOT(onStreamOpened()));
 		connect(AXmppStream->instance(), SIGNAL(aboutToClose()), SLOT(onStreamAboutToClose()));
 		connect(AXmppStream->instance(), SIGNAL(closed()), SLOT(onStreamClosed()));
-		connect(AXmppStream->instance(), SIGNAL(error(const QString &)), SLOT(onStreamError(const QString &)));
+		connect(AXmppStream->instance(), SIGNAL(error(const XmppError &)), SLOT(onStreamError(const XmppError &)));
 		connect(AXmppStream->instance(), SIGNAL(jidAboutToBeChanged(const Jid &)), SLOT(onStreamJidAboutToBeChanged(const Jid &)));
 		connect(AXmppStream->instance(), SIGNAL(jidChanged(const Jid &)), SLOT(onStreamJidChanged(const Jid &)));
 		connect(AXmppStream->instance(), SIGNAL(connectionChanged(IConnection *)), SLOT(onStreamConnectionChanged(IConnection *)));
@@ -151,7 +160,7 @@ void XmppStreams::onStreamClosed()
 		emit closed(stream);
 }
 
-void XmppStreams::onStreamError(const QString &AError)
+void XmppStreams::onStreamError(const XmppError &AError)
 {
 	IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
 	if (stream)

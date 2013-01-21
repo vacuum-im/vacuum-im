@@ -7,6 +7,7 @@
 #include <utils/jid.h>
 #include <utils/stanza.h>
 #include <utils/options.h>
+#include <utils/xmpperror.h>
 
 #define FILESTREAMSMANAGER_UUID "{ea9ea27a-5ad7-40e3-82b3-db8ac3bdc288}"
 
@@ -36,6 +37,7 @@ public:
 	virtual QString methodNS() const =0;
 	virtual qint64 speed() const =0;
 	virtual qint64 progress() const =0;
+	virtual XmppError error() const =0;
 	virtual QString stateString() const =0;
 	virtual bool isRangeSupported() const =0;
 	virtual void setRangeSupported(bool ASupported) =0;
@@ -59,7 +61,7 @@ public:
 	virtual void setAcceptableMethods(const QStringList &AMethods) =0;
 	virtual bool initStream(const QList<QString> &AMethods) =0;
 	virtual bool startStream(const QString &AMethodNS) =0;
-	virtual void abortStream(const QString &AError) =0;
+	virtual void abortStream(const XmppError &AError) =0;
 protected:
 	virtual void stateChanged() =0;
 	virtual void speedChanged() =0;
@@ -91,8 +93,8 @@ protected:
 	virtual void streamDestroyed(IFileStream *AStream) =0;
 };
 
-Q_DECLARE_INTERFACE(IFileStream,"Vacuum.Plugin.IFileStream/1.1")
+Q_DECLARE_INTERFACE(IFileStream,"Vacuum.Plugin.IFileStream/1.2")
 Q_DECLARE_INTERFACE(IFileStreamsHandler,"Vacuum.Plugin.IFileStreamsHandler/1.0")
-Q_DECLARE_INTERFACE(IFileStreamsManager,"Vacuum.Plugin.IFileStreamsManager/1.0")
+Q_DECLARE_INTERFACE(IFileStreamsManager,"Vacuum.Plugin.IFileStreamsManager/1.2")
 
 #endif // IFILESTREAMSMANAGER_H

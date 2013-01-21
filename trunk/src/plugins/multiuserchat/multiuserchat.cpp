@@ -100,7 +100,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else if (AStanza.type() == "error")
 		{
 			XmppStanzaError err(AStanza);
-			emit configFormRejected(err.errorMessage());
+			emit configFormRejected(err);
 			emit chatError(err.errorMessage());
 		}
 		FConfigSubmitId.clear();
@@ -279,7 +279,7 @@ QString MultiUserChat::status() const
 	return FStatus;
 }
 
-XmppStanzaError MultiUserChat::roomError() const
+XmppError MultiUserChat::roomError() const
 {
 	return FRoomError;
 }
@@ -327,7 +327,7 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 
 		if (!isOpen() && AShow!=IPresence::Offline && AShow!=IPresence::Error)
 		{
-			FRoomError = XmppStanzaError::null;
+			FRoomError = XmppError::null;
 			QDomElement xelem = presence.addElement("x",NS_MUC);
 			if (!FPassword.isEmpty())
 				xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));

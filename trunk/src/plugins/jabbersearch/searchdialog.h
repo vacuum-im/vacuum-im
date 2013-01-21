@@ -36,7 +36,7 @@ protected:
 protected slots:
 	void onSearchFields(const QString &AId, const ISearchFields &AFields);
 	void onSearchResult(const QString &AId, const ISearchResult &AResult);
-	void onSearchError(const QString &AId, const QString &AError);
+	void onSearchError(const QString &AId, const XmppError &AError);
 	void onToolBarActionTriggered(bool);
 	void onDialogButtonClicked(QAbstractButton *AButton);
 private:

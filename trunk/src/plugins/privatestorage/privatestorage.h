@@ -46,7 +46,7 @@ public:
 	virtual QString removeData(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 signals:
 	void storageOpened(const Jid &AStreamJid);
-	void dataError(const QString &AId, const QString &AError);
+	void dataError(const QString &AId, const XmppError &AError);
 	void dataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void dataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void dataRemoved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);

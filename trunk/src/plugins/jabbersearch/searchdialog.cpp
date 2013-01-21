@@ -37,12 +37,9 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
 	ui.pgeForm->setLayout(new QVBoxLayout);
 	ui.pgeForm->layout()->setMargin(0);
 
-	connect(FSearch->instance(),SIGNAL(searchFields(const QString &, const ISearchFields &)),
-	        SLOT(onSearchFields(const QString &, const ISearchFields &)));
-	connect(FSearch->instance(),SIGNAL(searchResult(const QString &, const ISearchResult &)),
-	        SLOT(onSearchResult(const QString &, const ISearchResult &)));
-	connect(FSearch->instance(),SIGNAL(searchError(const QString &, const QString &)),
-	        SLOT(onSearchError(const QString &, const QString &)));
+	connect(FSearch->instance(),SIGNAL(searchFields(const QString &, const ISearchFields &)),SLOT(onSearchFields(const QString &, const ISearchFields &)));
+	connect(FSearch->instance(),SIGNAL(searchResult(const QString &, const ISearchResult &)),SLOT(onSearchResult(const QString &, const ISearchResult &)));
+	connect(FSearch->instance(),SIGNAL(searchError(const QString &, const XmppError &)),SLOT(onSearchError(const QString &, const XmppError &)));
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
 	initialize();
@@ -287,12 +284,12 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
 	}
 }
 
-void SearchDialog::onSearchError(const QString &AId, const QString &AError)
+void SearchDialog::onSearchError(const QString &AId, const XmppError &AError)
 {
 	if (FRequestId == AId)
 	{
 		resetDialog();
-		ui.lblInstructions->setText(tr("Requested operation failed: %1").arg(AError));
+		ui.lblInstructions->setText(tr("Requested operation failed: %1").arg(AError.errorMessage()));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 	}
 }

@@ -61,7 +61,7 @@
     </message>
     <message>
         <source>Connect timeout:</source>
-        <translation>Таймаут з’єднання</translation>
+        <translation>Таймаут з’єднання:</translation>
     </message>
     <message>
         <source>seconds</source>
@@ -70,45 +70,6 @@
     <message>
         <source>Incoming Connections</source>
         <translation>Вхідні з’єднання</translation>
-    </message>
-</context>
-<context>
-    <name>SocksStream</name>
-    <message>
-        <source>Stream destroyed</source>
-        <translation>Потік видалений</translation>
-    </message>
-    <message>
-        <source>Unsupported stream mode</source>
-        <translation>Непідтримуваний режим потоку</translation>
-    </message>
-    <message>
-        <source>Remote client cant connect to given hosts</source>
-        <translation>Віддалений клієнт не зміг підключитись до отриманих хостів</translation>
-    </message>
-    <message>
-        <source>Failed to activate stream</source>
-        <translation>Не вдалось активувати потік</translation>
-    </message>
-    <message>
-        <source>Failed to create hosts</source>
-        <translation>Не вдалось створити хост</translation>
-    </message>
-    <message>
-        <source>Direct connection not established</source>
-        <translation>Пряме підключення не встановлено</translation>
-    </message>
-    <message>
-        <source>Invalid host</source>
-        <translation>Невірний хост</translation>
-    </message>
-    <message>
-        <source>Cant connect to given hosts</source>
-        <translation>Не вдалось підключитись до отриманих хостів</translation>
-    </message>
-    <message>
-        <source>Failed to connect to host</source>
-        <translation>Не вдалось підключитись до хосту</translation>
     </message>
 </context>
 <context>
@@ -128,6 +89,54 @@
     <message>
         <source>Data is transferred out-band over TCP or UDP connection</source>
         <translation>Дані передаються по окремому TCP або UDP підключенню</translation>
+    </message>
+    <message>
+        <source>Stream destroyed</source>
+        <translation>Потік видалений</translation>
+    </message>
+    <message>
+        <source>Unsupported stream mode</source>
+        <translation>Непідтримуваний режим потоку</translation>
+    </message>
+    <message>
+        <source>Remote client cant connect to given hosts</source>
+        <translation>Віддалений клієнт не зміг підключитись до отриманих хостів</translation>
+    </message>
+    <message>
+        <source>Cant connect to given hosts</source>
+        <translation>Не вдалось підключитись до отриманих хостів</translation>
+    </message>
+    <message>
+        <source>Failed to create hosts</source>
+        <translation>Не вдалось створити хост</translation>
+    </message>
+    <message>
+        <source>Failed to activate stream</source>
+        <translation>Не вдалось активувати потік</translation>
+    </message>
+    <message>
+        <source>Failed to send data to socket</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Direct connection not established</source>
+        <translation>Пряме підключення не встановлено</translation>
+    </message>
+    <message>
+        <source>Invalid host</source>
+        <translation>Невірний хост</translation>
+    </message>
+    <message>
+        <source>Invalid host address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to connect to host</source>
+        <translation>Не вдалось підключитись до хосту</translation>
+    </message>
+    <message>
+        <source>Host disconnected</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

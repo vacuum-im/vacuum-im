@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <interfaces/iroster.h>
 #include <utils/jid.h>
+#include <utils/xmpperror.h>
 
 #define PRIVACYLISTS_UUID "{B7B7F21A-DF0E-4f3e-B0C2-AA14976B546F}"
 
@@ -97,9 +98,9 @@ protected:
 	virtual void activeListChanged(const Jid &AStreamJid, const QString &AList) =0;
 	virtual void defaultListChanged(const Jid &AStreamJid, const QString &AList) =0;
 	virtual void requestCompleted(const QString &AId) =0;
-	virtual void requestFailed(const QString &AId, const QString &AError) =0;
+	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.0")
+Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.1")
 
 #endif

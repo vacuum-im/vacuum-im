@@ -8,10 +8,6 @@
         <translation>Waiting for a response to send a file request</translation>
     </message>
     <message>
-        <source>File size unexpectedly changed</source>
-        <translation>File size unexpectedly changed</translation>
-    </message>
-    <message>
         <source>Connecting</source>
         <translation>Connecting</translation>
     </message>
@@ -24,16 +20,8 @@
         <translation>Data transmission finished</translation>
     </message>
     <message>
-        <source>Data transmission terminated by remote user</source>
-        <translation>Data transmission terminated by remote user</translation>
-    </message>
-    <message>
         <source>Disconnecting</source>
         <translation>Disconnecting</translation>
-    </message>
-    <message>
-        <source>Connection timed out</source>
-        <translation>Connection timed out</translation>
     </message>
 </context>
 <context>
@@ -57,6 +45,22 @@
     <message>
         <source>File Transfer</source>
         <translation>File Transfer</translation>
+    </message>
+    <message>
+        <source>File input/output error</source>
+        <translation>File input/output error</translation>
+    </message>
+    <message>
+        <source>File size unexpectedly changed</source>
+        <translation>File size unexpectedly changed</translation>
+    </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation>Connection timed out</translation>
+    </message>
+    <message>
+        <source>Data transmission terminated by remote user</source>
+        <translation>Data transmission terminated by remote user</translation>
     </message>
 </context>
 <context>

@@ -61,22 +61,6 @@
         <source>Registration on %1</source>
         <translation>Rejestracja na %1</translation>
     </message>
-    <message>
-        <source>Invalid registration form</source>
-        <translation>Nieprawidłowa forma rejestracji</translation>
-    </message>
-    <message>
-        <source>Invalid registration dialog</source>
-        <translation>Nieprawidłowy dialog rejestracji</translation>
-    </message>
-    <message>
-        <source>Registration rejected by user</source>
-        <translation>Rejestracja odrzucona przez użytkownika</translation>
-    </message>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Brak możliwości bezpiecznego połączenia</translation>
-    </message>
 </context>
 <context>
     <name>Registration</name>
@@ -163,6 +147,18 @@
     <message>
         <source>Your Web Page</source>
         <translation>Strona internetowa</translation>
+    </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation>Nieprawidłowa forma rejestracji</translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation>Nieprawidłowy dialog rejestracji</translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation>Rejestracja odrzucona przez użytkownika</translation>
     </message>
 </context>
 </TS>

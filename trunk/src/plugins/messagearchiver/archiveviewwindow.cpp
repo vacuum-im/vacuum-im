@@ -181,8 +181,8 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	ui.pbtHeadersUpdate->setIcon(style()->standardIcon(QStyle::SP_BrowserReload, NULL, this));
 	connect(ui.pbtHeadersUpdate,SIGNAL(clicked()),SLOT(onHeadersUpdateButtonClicked()));
 
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-		SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+		SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
 	connect(FArchiver->instance(),SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
 		SLOT(onArchiveHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
 	connect(FArchiver->instance(),SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
@@ -1164,7 +1164,7 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 	}
 }
 
-void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString &AError)
+void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
 {
 	if (FHeadersRequests.contains(AId))
 	{
@@ -1172,12 +1172,12 @@ void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString
 		if (FContactJid.isEmpty())
 		{
 			if (currentPage() == start)
-				setPageStatus(RequestError, AError);
+				setPageStatus(RequestError, AError.errorMessage());
 		}
 		else
 		{
 			FHeadersRequests.clear();
-			setPageStatus(RequestError, AError);
+			setPageStatus(RequestError, AError.errorMessage());
 		}
 		FLoadedPages.removeAll(start);
 	}
@@ -1185,14 +1185,14 @@ void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString
 	{
 		IArchiveHeader header = FCollectionsRequests.take(AId);
 		if (currentLoadingHeader() == header)
-			setMessagesStatus(RequestError, AError);
+			setMessagesStatus(RequestError, AError.errorMessage());
 	}
 	else if (FRemoveRequests.contains(AId))
 	{
 		IArchiveRequest request = FRemoveRequests.take(AId);
 		request.text = searchString();
 		request.end = !request.end.isValid() ? request.start : request.end;
-		setRequestStatus(RequestError,tr("Failed to remove conversations: %1").arg(AError));
+		setRequestStatus(RequestError,tr("Failed to remove conversations: %1").arg(AError.errorMessage()));
 		updateHeaders(request);
 		removeHeaderItems(request);
 	}

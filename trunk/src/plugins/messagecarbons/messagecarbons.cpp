@@ -140,8 +140,7 @@ void MessageCarbons::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 	}
 	else
 	{
-		XmppStanzaError err(AStanza);
-		emit errorReceived(AStreamJid,err);
+		emit errorReceived(AStreamJid,XmppStanzaError(AStanza));
 	}
 	FEnableRequests.removeAll(AStanza.id());
 	FDisableRequests.removeAll(AStanza.id());

@@ -1,13 +1,10 @@
 #include "workingthread.h"
 
-#include <QMutexLocker>
-
 uint WorkingThread::FWorkIndex = 0;
 
 WorkingThread::WorkingThread(IFileMessageArchive *AFileArchive, IMessageArchiver *AMessageArchiver, QObject *AParent) : QThread(AParent)
 {
 	FAction = NoAction;
-	FHasError = false;
 	FModificationsCount = 0;
 	FFileArchive = AFileArchive;
 	FArchiver = AMessageArchiver;
@@ -31,18 +28,17 @@ int WorkingThread::workAction() const
 
 bool WorkingThread::hasError() const
 {
-	return FHasError;
+	return !FError.isNull();
 }
 
-QString WorkingThread::errorString() const
+XmppError WorkingThread::error() const
 {
-	return FErrorString;
+	return FError;
 }
 
-void WorkingThread::setErrorString(const QString &AError)
+void WorkingThread::setError(const XmppError &AError)
 {
-	FHasError = !AError.isNull();
-	FErrorString = AError;
+	FError = AError;
 }
 
 Jid WorkingThread::streamJid() const
@@ -143,7 +139,7 @@ void WorkingThread::run()
 	if (FAction == SaveCollection)
 	{
 		if (!FFileArchive->saveCollectionToFile(FStreamJid,FCollection,FItemPrefs.save))
-			setErrorString(tr("Failed to save conversation to file"));
+			setError(XmppError(IERR_HISTORY_CONVERSATION_SAVE_ERROR));
 	}
 	else if (FAction == RemoveCollection)
 	{
@@ -152,7 +148,7 @@ void WorkingThread::run()
 		{
 			IArchiveHeader header = FFileArchive->loadHeaderFromFile(file);
 			if (!FFileArchive->removeCollectionFile(FStreamJid,header.with,header.start))
-				setErrorString(tr("Failed to remove conversation file"));
+				setError(XmppError(IERR_HISTORY_CONVERSATION_REMOVE_ERROR));
 		}
 	}
 	else if (FAction == LoadHeaders)
@@ -166,14 +162,10 @@ void WorkingThread::run()
 		QString file = FFileArchive->collectionFilePath(FStreamJid,FHeader.with,FHeader.start);
 		FCollection = FFileArchive->loadCollectionFromFile(file);
 		if (!FCollection.header.with.isValid() || !FCollection.header.start.isValid())
-			setErrorString(tr("Failed to load conversation from file"));
+			setError(XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR));
 	}
 	else if (FAction == LoadModifications)
 	{
 		FModifications = FFileArchive->loadFileModifications(FStreamJid,FModificationsStart,FModificationsCount);
-	}
-	else
-	{
-		setErrorString(tr("Internal error"));
 	}
 }

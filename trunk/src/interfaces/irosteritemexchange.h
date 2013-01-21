@@ -37,9 +37,9 @@ protected:
 	virtual void exchangeRequestReceived(const IRosterExchangeRequest &ARequest) =0;
 	virtual void exchangeRequestApplied(const IRosterExchangeRequest &ARequest) =0;
 	virtual void exchangeRequestApproved(const IRosterExchangeRequest &ARequest) =0;
-	virtual void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError) =0;
+	virtual void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const XmppError &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IRosterItemExchange,"Vacuum.Plugin.IRosterItemExchange/1.0")
+Q_DECLARE_INTERFACE(IRosterItemExchange,"Vacuum.Plugin.IRosterItemExchange/1.1")
 
 #endif //IROSTERITEMEXCHANGE_H

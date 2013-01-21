@@ -639,5 +639,21 @@
         <source>Session failed: %1</source>
         <translation>Session failed: %1</translation>
     </message>
+    <message>
+        <source>Failed to load conversation headers</source>
+        <translation>Failed to load conversation headers</translation>
+    </message>
+    <message>
+        <source>Failed to save conversation</source>
+        <translation>Failed to save conversation</translation>
+    </message>
+    <message>
+        <source>Failed to remove conversation</source>
+        <translation>Failed to remove conversation</translation>
+    </message>
+    <message>
+        <source>Failed to load archive modifications</source>
+        <translation>Failed to load archive modifications</translation>
+    </message>
 </context>
 </TS>

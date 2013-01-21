@@ -44,14 +44,10 @@ bool Compression::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AO
 			FXmppStream->insertXmppDataHandler(XDHO_FEATURE_COMPRESS,this);
 			emit finished(true);
 		}
-		else if (AStanza.tagName() == "failure")
+		else
 		{
 			deleteLater();
 			emit finished(false);
-		}
-		else
-		{
-			emit error(tr("Wrong compression negotiation response"));
 		}
 		return true;
 	}
@@ -160,19 +156,19 @@ void Compression::processData(QByteArray &AData, bool ADataOut)
 					FOutBuffer.reserve(FOutBuffer.capacity() + CHUNK);
 				break;
 			case Z_STREAM_ERROR:
-				emit error(tr("Invalid compression level"));
+				emit error(XmppError(IERR_COMPRESS_INVALID_COMPRESSION_LEVEL));
 				break;
 			case Z_DATA_ERROR:
-				emit error(tr("Invalid or incomplete deflate data"));
+				emit error(XmppError(IERR_COMPRESS_INVALID_DEFLATE_DATA));
 				break;
 			case Z_MEM_ERROR:
-				emit error(tr("Out of memory for Zlib"));
+				emit error(XmppError(IERR_COMPRESS_OUT_OF_MEMORY));
 				break;
 			case Z_VERSION_ERROR:
-				emit error(tr("Zlib version mismatch!"));
+				emit error(XmppError(IERR_COMPRESS_VERSION_MISMATCH));
 				break;
 			default:
-				emit error(tr("Unknown Zlib error, %1").arg(ret));
+				emit error(XmppError(IERR_COMPRESS_UNKNOWN_ERROR,tr("Error code: %1").arg(ret)));
 			}
 		} while (ret == Z_OK && zstream->avail_out == 0);
 		AData.resize(dataPosOut);

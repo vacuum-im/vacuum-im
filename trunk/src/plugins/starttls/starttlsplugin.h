@@ -2,19 +2,21 @@
 #define STARTTLSPLUGIN_H
 
 #include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
 #include <definitions/xmppfeatureorders.h>
 #include <definitions/xmppfeaturepluginorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/idefaultconnection.h>
+#include <utils/xmpperror.h>
 #include "starttls.h"
 
 #define STARTTLS_UUID "{F554544C-0851-4e2a-9158-99191911E468}"
 
 class StartTLSPlugin :
-			public QObject,
-			public IPlugin,
-			public IXmppFeaturesPlugin
+	public QObject,
+	public IPlugin,
+	public IXmppFeaturesPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeaturesPlugin);

@@ -19,17 +19,5 @@
         <source>History of conversations is stored on your jabber server</source>
         <translation>History of conversations is stored on your jabber server</translation>
     </message>
-    <message>
-        <source>Failed to request conversation headers from server</source>
-        <translation>Failed to request conversation headers from server</translation>
-    </message>
-    <message>
-        <source>Failed to load conversation from server</source>
-        <translation>Failed to load conversation from server</translation>
-    </message>
-    <message>
-        <source>Failed to load archive modifications from server</source>
-        <translation>Failed to load archive modifications from server</translation>
-    </message>
 </context>
 </TS>

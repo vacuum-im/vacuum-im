@@ -358,10 +358,9 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
 	}
 	else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Abort)
 	{
-		if (QMessageBox::question(this,tr("Cancel file transfer"),tr("Are you sure you want to cancel a file transfer?"),
-		                          QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+		if (QMessageBox::question(this,tr("Cancel file transfer"),tr("Are you sure you want to cancel a file transfer?"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
 		{
-			FFileStream->abortStream(tr("Data transmission terminated"));
+			FFileStream->abortStream(XmppError(IERR_FILETRANSFER_TRANSFER_TERMINATED));
 		}
 	}
 	else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Retry)
