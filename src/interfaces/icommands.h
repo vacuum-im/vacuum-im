@@ -63,7 +63,7 @@ struct ICommandResult
 struct ICommandError
 {
 	QString stanzaId;
-	XmppStanzaError error;
+	XmppError error;
 };
 
 class ICommandServer
@@ -110,6 +110,6 @@ protected:
 
 Q_DECLARE_INTERFACE(ICommandServer,"Vacuum.Plugin.ICommandServer/1.0")
 Q_DECLARE_INTERFACE(ICommandClient,"Vacuum.Plugin.ICommandClient/1.0")
-Q_DECLARE_INTERFACE(ICommands,"Vacuum.Plugin.ICommands/1.1")
+Q_DECLARE_INTERFACE(ICommands,"Vacuum.Plugin.ICommands/1.2")
 
 #endif

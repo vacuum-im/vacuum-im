@@ -68,7 +68,7 @@ void ChatWindowMenu::initialize(IPluginManager *APluginManager)
 
 	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
 	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onArchiveRequestFailed(const QString &,const QString &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
 	connect(FEditWidget->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onEditWidgetContactJidChanged(const Jid &)));
 }
 
@@ -278,7 +278,7 @@ void ChatWindowMenu::onArchiveRequestCompleted(const QString &AId)
 	}
 }
 
-void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const QString &AError)
+void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
 {
 	if (FSaveRequest==AId || FSessionRequest==AId)
 	{
@@ -289,7 +289,7 @@ void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const QString &A
 			options.type |= IMessageContentOptions::TypeEvent;
 			options.direction = IMessageContentOptions::DirectionIn;
 			options.time = QDateTime::currentDateTime();
-			FToolBarWidget->viewWidget()->appendText(tr("Failed to change archive preferences: %1").arg(AError),options);
+			FToolBarWidget->viewWidget()->appendText(tr("Failed to change archive preferences: %1").arg(AError.errorMessage()),options);
 		}
 		if (FSessionRequest == AId)
 			FSessionRequest.clear();

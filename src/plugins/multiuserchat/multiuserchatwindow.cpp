@@ -672,8 +672,8 @@ void MultiUserChatWindow::initialize()
 		{
 			connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
 				SLOT(onArchiveMessagesLoaded(const QString &, const IArchiveCollectionBody &)));
-			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-				SLOT(onArchiveRequestFailed(const QString &, const QString &)));
+			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+				SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
 		}
 	}
 
@@ -1757,7 +1757,8 @@ void MultiUserChatWindow::onChatClosed()
 {
 	if (!FDestroyOnChatClosed)
 	{
-		if (FMultiChat->show()==IPresence::Error && FMultiChat->roomError().conditionCode()==XmppStanzaError::EC_CONFLICT && !FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
+		bool isConflictError = FMultiChat->roomError().toStanzaError().conditionCode()==XmppStanzaError::EC_CONFLICT;
+		if (FMultiChat->show()==IPresence::Error && isConflictError && !FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
 		{
 			FMultiChat->setNickName(FMultiChat->nickName()+"/"+FMultiChat->streamJid().resource());
 			FEnterRoom->trigger();
@@ -2298,15 +2299,15 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 	}
 }
 
-void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const QString &AError)
+void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
 {
 	if (FHistoryRequests.contains(AId))
 	{
 		IChatWindow *window = FHistoryRequests.take(AId);
 		if (window)
-			showChatStatus(window,tr("Failed to load history: %1").arg(AError));
+			showChatStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()));
 		else
-			showStatusMessage(tr("Failed to load history: %1").arg(AError),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
+			showStatusMessage(tr("Failed to load history: %1").arg(AError.errorMessage()),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
 		FPendingMessages.remove(window);
 	}
 }

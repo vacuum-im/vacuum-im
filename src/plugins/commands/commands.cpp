@@ -95,12 +95,12 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 bool Commands::initObjects()
 {
-	XmppError::registerErrorString(NS_COMMANDS,"malformed-action",tr("Can not understand the specified action"));
-	XmppError::registerErrorString(NS_COMMANDS,"bad-action",tr("Can not accept the specified action"));
-	XmppError::registerErrorString(NS_COMMANDS,"bad-locale",tr("Can not accept the specified language/locale"));
-	XmppError::registerErrorString(NS_COMMANDS,"bad-payload",tr("The data form did not provide one or more required fields"));
-	XmppError::registerErrorString(NS_COMMANDS,"bad-sessionid",tr("Specified session not present"));
-	XmppError::registerErrorString(NS_COMMANDS,"session-expired",tr("Specified session is no longer active"));
+	XmppError::registerError(NS_COMMANDS,XERR_COMMANDS_MALFORMED_ACTION,tr("Can not understand the specified action"));
+	XmppError::registerError(NS_COMMANDS,XERR_COMMANDS_BAD_ACTION,tr("Can not accept the specified action"));
+	XmppError::registerError(NS_COMMANDS,XERR_COMMANDS_BAD_LOCALE,tr("Can not accept the specified language/locale"));
+	XmppError::registerError(NS_COMMANDS,XERR_COMMANDS_BAD_PAYLOAD,tr("The data form did not provide one or more required fields"));
+	XmppError::registerError(NS_COMMANDS,XERR_COMMANDS_BAD_SESSIONID,tr("Specified session not present"));
+	XmppError::registerError(NS_COMMANDS,XERR_COMMANDS_SESSION_EXPIRED,tr("Specified session is no longer active"));
 
 	if (FDiscovery)
 	{
@@ -149,7 +149,7 @@ bool Commands::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		else if (!server || !server->receiveCommandRequest(request))
 		{
 			XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-			err.setAppCondition(NS_COMMANDS,"malformed-action");
+			err.setAppCondition(NS_COMMANDS,XERR_COMMANDS_MALFORMED_ACTION);
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}

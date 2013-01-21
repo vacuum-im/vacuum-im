@@ -16,11 +16,11 @@ AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChan
 	FServiceJid = AServiceJid;
 
 	connect(FGateways->instance(),SIGNAL(promptReceived(const QString &,const QString &,const QString &)),
-	        SLOT(onPromptReceived(const QString &,const QString &,const QString &)));
+		SLOT(onPromptReceived(const QString &,const QString &,const QString &)));
 	connect(FGateways->instance(),SIGNAL(userJidReceived(const QString &, const Jid &)),
-	        SLOT(onUserJidReceived(const QString &, const Jid &)));
-	connect(FGateways->instance(),SIGNAL(errorReceived(const QString &, const QString &)),
-	        SLOT(onErrorReceived(const QString &, const QString &)));
+		SLOT(onUserJidReceived(const QString &, const Jid &)));
+	connect(FGateways->instance(),SIGNAL(errorReceived(const QString &, const XmppError &)),
+		SLOT(onErrorReceived(const QString &, const XmppError &)));
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonsClicked(QAbstractButton *)));
 
 	requestPrompt();
@@ -80,32 +80,27 @@ void AddLegacyContactDialog::onUserJidReceived(const QString &AId, const Jid &AU
 {
 	if (FRequestId == AId)
 	{
-		if (AUserJid.isValid())
+		ui.lblDescription->setText(tr("Jabber ID for %1 is %2").arg(FContactId).arg(AUserJid.uFull()));
+		if (FRosterChanger)
 		{
-			ui.lblDescription->setText(tr("Jabber ID for %1 is %2").arg(FContactId).arg(AUserJid.uFull()));
-			if (FRosterChanger)
+			IAddContactDialog *dialog = FRosterChanger!=NULL ? FRosterChanger->showAddContactDialog(FStreamJid) : NULL;
+			if (dialog)
 			{
-				IAddContactDialog *dialog = FRosterChanger!=NULL ? FRosterChanger->showAddContactDialog(FStreamJid) : NULL;
-				if (dialog)
-				{
-					dialog->setContactJid(AUserJid);
-					dialog->setNickName(FContactId);
-					accept();
-				}
+				dialog->setContactJid(AUserJid);
+				dialog->setNickName(FContactId);
+				accept();
 			}
 		}
-		else
-			onErrorReceived(AId,tr("Received Jabber ID is not valid"));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Cancel);
 	}
 }
 
-void AddLegacyContactDialog::onErrorReceived(const QString &AId, const QString &AError)
+void AddLegacyContactDialog::onErrorReceived(const QString &AId, const XmppError &AError)
 {
 	if (FRequestId == AId)
 	{
 		resetDialog();
-		ui.lblDescription->setText(tr("Requested operation failed: %1").arg(AError));
+		ui.lblDescription->setText(tr("Requested operation failed: %1").arg(AError.errorMessage()));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Cancel);
 	}
 }

@@ -19,6 +19,10 @@
         <source>&lt;No Proxy&gt;</source>
         <translation>&lt;No Proxy&gt;</translation>
     </message>
+    <message>
+        <source>Connection error</source>
+        <translation>Connection error</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>

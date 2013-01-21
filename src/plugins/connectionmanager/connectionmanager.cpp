@@ -85,6 +85,8 @@ bool ConnectionManager::initObjects()
 	Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
 	Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
 
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_CONNECTIONS_CONNECT_ERROR,tr("Connection error"));
+
 	if (FRostersViewPlugin)
 	{
 		AdvancedDelegateItem label(RLID_CONNECTION_ENCRYPTED);

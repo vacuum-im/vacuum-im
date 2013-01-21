@@ -30,10 +30,10 @@ struct Annotation {
 };
 
 class Annotations :
-			public QObject,
-			public IPlugin,
-			public IAnnotations,
-			public IRosterDataHolder
+	public QObject,
+	public IPlugin,
+	public IAnnotations,
+	public IRosterDataHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAnnotations IRosterDataHolder);
@@ -65,7 +65,6 @@ public:
 signals:
 	void annotationsLoaded(const Jid &AStreamJid);
 	void annotationsSaved(const Jid &AStreamJid);
-	void annotationsError(const Jid &AStreamJid, const QString &AError);
 	void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
@@ -75,7 +74,6 @@ protected:
 protected slots:
 	void onSaveAnnotationsTimerTimeout();
 	void onPrivateStorageOpened(const Jid &AStreamJid);
-	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);

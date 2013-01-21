@@ -5,6 +5,7 @@
 #include <QWaitCondition>
 #include <QReadWriteLock>
 #include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
@@ -12,18 +13,17 @@
 #include <utils/xmpperror.h>
 #include <utils/ringbuffer.h>
 
-struct HostInfo
-{
+struct HostInfo {
 	Jid jid;
 	QString name;
 	quint16 port;
 };
 
 class SocksStream :
-			public QIODevice,
-			public ISocksStream,
-			public IStanzaHandler,
-			public IStanzaRequestOwner
+	public QIODevice,
+	public ISocksStream,
+	public IStanzaHandler,
+	public IStanzaRequestOwner
 {
 	Q_OBJECT;
 	Q_INTERFACES(ISocksStream IDataStreamSocket IStanzaHandler IStanzaRequestOwner);
@@ -48,13 +48,12 @@ public:
 	virtual Jid contactJid() const;
 	virtual int streamKind() const;
 	virtual int streamState() const;
+	virtual XmppError error() const;
 	virtual bool isOpen() const;
 	virtual bool open(QIODevice::OpenMode AMode);
 	virtual bool flush();
 	virtual void close();
-	virtual void abort(const QString &AError, int ACode = UnknownError);
-	virtual int errorCode() const;
-	virtual QString errorString() const;
+	virtual void abort(const XmppError &AError);
 	//ISocksStream
 	virtual int connectTimeout() const;
 	virtual void setConnectTimeout(int ATimeout);
@@ -77,7 +76,7 @@ protected:
 	virtual bool event(QEvent *AEvent);
 protected:
 	void setStreamState(int AState);
-	void setStreamError(const QString &AError, int ACode);
+	void setStreamError(const XmppError &AError);
 	void setTcpSocket(QTcpSocket *ASocket);
 	void writeBufferedData(bool AFlush);
 	void readBufferedData(bool AFlush);
@@ -106,11 +105,11 @@ private:
 	ISocksStreams *FSocksStreams;
 	IStanzaProcessor *FStanzaProcessor;
 private:
-	int FErrorCode;
 	Jid FStreamJid;
 	Jid FContactJid;
 	int FStreamKind;
 	int FStreamState;
+	XmppError FError;
 	QString FStreamId;
 private:
 	int FConnectTimeout;

@@ -344,12 +344,12 @@ void StanzaProcessor::insertErrorElement(Stanza &AStanza, const XmppStanzaError 
 		errElem.setAttribute("type",AError.errorType());
 	if (!AError.condition().isEmpty())
 	{
-		QDomNode condElem = errElem.appendChild(AStanza.createElement(AError.condition(),XMPP_STANZA_ERROR_NS));
+		QDomNode condElem = errElem.appendChild(AStanza.createElement(AError.condition(),NS_XMPP_STANZA_ERROR));
 		if (!AError.conditionText().isEmpty())
 			condElem.appendChild(AStanza.createTextNode(AError.conditionText()));
 	}
 	if (!AError.errorText().isEmpty())
-		errElem.appendChild(AStanza.createElement("text",XMPP_STANZA_ERROR_NS)).appendChild(AStanza.createTextNode(AError.errorText()));
+		errElem.appendChild(AStanza.createElement("text",NS_XMPP_STANZA_ERROR)).appendChild(AStanza.createTextNode(AError.errorText()));
 	foreach(QString appCondNs, AError.appConditionNsList())
 		errElem.appendChild(AStanza.createElement(AError.appCondition(appCondNs),appCondNs));
 }

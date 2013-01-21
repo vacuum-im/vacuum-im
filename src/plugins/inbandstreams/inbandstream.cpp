@@ -19,7 +19,7 @@
 #define SHC_INBAND_DATA_MESSAGE   "/message/data[@xmlns='" NS_INBAND_BYTESTREAMS "']"
 
 class DataEvent :
-			public QEvent
+	public QEvent
 {
 public:
 	DataEvent(bool AFlush) : QEvent(FEventType) { FFlush = AFlush; }
@@ -42,7 +42,6 @@ InBandStream::InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamI
 	FStreamJid = AStreamJid;
 	FContactJid = AContactJid;
 	FStreamKind = AKind;
-	FErrorCode = NoError;
 
 	FSHIOpen = -1;
 	FSHIClose = -1;
@@ -56,7 +55,7 @@ InBandStream::InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamI
 
 InBandStream::~InBandStream()
 {
-	abort(tr("Stream destroyed"));
+	abort(XmppError(IERR_INBAND_STREAM_DESTROYED));
 }
 
 bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
@@ -86,12 +85,12 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			}
 			else
 			{
-				abort(tr("Malformed data packet"));
+				abort(XmppError(IERR_INBAND_STREAM_INVALID_DATA));
 			}
 		}
 		else
 		{
-			abort(XmppStanzaError(AStanza).errorMessage());
+			abort(XmppStanzaError(AStanza));
 		}
 	}
 	else if (AHandleId==FSHIOpen && elem.attribute("sid")==FStreamId)
@@ -113,20 +112,20 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 					if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
 						setStreamState(IDataStreamSocket::Opened);
 					else
-						abort(tr("Failed to open stream"));
+						abort(XmppError(IERR_INBAND_STREAM_NOT_OPENED));
 				}
 				else
 				{
 					Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_INTERNAL_SERVER_ERROR);
 					FStanzaProcessor->sendStanzaOut(AStreamJid,error);
-					abort(tr("Failed to open stream"));
+					abort(XmppError(IERR_INBAND_STREAM_NOT_OPENED));
 				}
 			}
 			else
 			{
 				Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_RESOURCE_CONSTRAINT);
 				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
-				abort(tr("Block size is not acceptable"));
+				abort(XmppError(IERR_INBAND_STREAM_INVALID_BLOCK_SIZE));
 			}
 		}
 		else
@@ -157,7 +156,7 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			abort(XmppStanzaError(AStanza).errorMessage());
+			abort(XmppStanzaError(AStanza));
 		}
 	}
 	else if (AStanza.id() == FOpenRequestId)
@@ -167,17 +166,13 @@ void InBandStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			FSHIData = insertStanzaHandle(FStanzaType==StanzaMessage ? SHC_INBAND_DATA_MESSAGE : SHC_INBAND_DATA_IQ);
 			FSHIClose = insertStanzaHandle(SHC_INBAND_CLOSE);
 			if (FSHIData>0 && FSHIClose>0)
-			{
 				setStreamState(IDataStreamSocket::Opened);
-			}
 			else
-			{
-				abort(tr("Failed to open stream"));
-			}
+				abort(XmppError(IERR_INBAND_STREAM_NOT_OPENED));
 		}
 		else
 		{
-			abort(XmppStanzaError(AStanza).errorMessage());
+			abort(XmppStanzaError(AStanza));
 		}
 	}
 	else if (AStanza.id() == FCloseRequestId)
@@ -257,6 +252,12 @@ int InBandStream::streamState() const
 	return FStreamState;
 }
 
+XmppError InBandStream::error() const
+{
+	QReadLocker locker(&FThreadLock);
+	return FError;
+}
+
 bool InBandStream::isOpen() const
 {
 	QReadLocker locker(&FThreadLock);
@@ -267,7 +268,7 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 {
 	if (FStanzaProcessor && streamState()==IDataStreamSocket::Closed)
 	{
-		setStreamError(QString::null,NoError);
+		setStreamError(XmppError::null);
 		if (streamKind() == IDataStreamSocket::Initiator)
 		{
 			Stanza openRequest("iq");
@@ -337,26 +338,14 @@ void InBandStream::close()
 	}
 }
 
-void InBandStream::abort(const QString &AError, int ACode)
+void InBandStream::abort(const XmppError &AError)
 {
 	if (streamState() != IDataStreamSocket::Closed)
 	{
-		setStreamError(AError, ACode);
+		setStreamError(AError);
 		close();
 		setStreamState(IDataStreamSocket::Closed);
 	}
-}
-
-int InBandStream::errorCode() const
-{
-	QReadLocker locker(&FThreadLock);
-	return FErrorCode;
-}
-
-QString InBandStream::errorString() const
-{
-	QReadLocker locker(&FThreadLock);
-	return QIODevice::errorString();
 }
 
 int InBandStream::blockSize() const
@@ -485,7 +474,7 @@ bool InBandStream::sendNextPaket(bool AFlush)
 			}
 			else
 			{
-				abort(tr("Failed to send data"));
+				abort(XmppError(IERR_INBAND_STREAM_DATA_NOT_SENT));
 			}
 		}
 	}
@@ -533,13 +522,13 @@ void InBandStream::setStreamState(int AState)
 	}
 }
 
-void InBandStream::setStreamError(const QString &AError, int ACode)
+void InBandStream::setStreamError(const XmppError &AError)
 {
-	if (ACode==NoError || errorCode()==NoError)
+	if (AError.isNull() != FError.isNull())
 	{
 		QWriteLocker locker(&FThreadLock);
-		FErrorCode = ACode;
-		setErrorString(AError);
+		FError = AError;
+		setErrorString(!FError.isNull() ? FError.errorString() : QString::null);
 	}
 }
 

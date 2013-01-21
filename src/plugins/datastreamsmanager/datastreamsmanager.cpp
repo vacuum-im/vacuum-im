@@ -1,8 +1,5 @@
 #include "datastreamsmanager.h"
 
-#define ERC_BAD_PROFILE               "bad-profile"
-#define ERC_NO_VALID_STREAMS          "no-valid-streams"
-
 #define DFV_STREAM_METHOD             "stream-method"
 
 #define SHC_INIT_STREAM               "/iq[@type='set']/si[@xmlns='" NS_STREAM_INITIATION "']"
@@ -76,8 +73,12 @@ bool DataStreamsManger::initConnections(IPluginManager *APluginManager, int &/*A
 
 bool DataStreamsManger::initObjects()
 {
-	XmppError::registerErrorString(NS_STREAM_INITIATION,ERC_BAD_PROFILE,tr("The profile is not understood or invalid"));
-	XmppError::registerErrorString(NS_STREAM_INITIATION,ERC_NO_VALID_STREAMS,tr("None of the available streams are acceptable"));
+	XmppError::registerError(NS_STREAM_INITIATION,XERR_SI_BAD_PROFILE,tr("The profile is not understood or invalid"));
+	XmppError::registerError(NS_STREAM_INITIATION,XERR_SI_NO_VALID_STREAMS,tr("None of the available streams are acceptable"));
+
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_PROFILE_INVALID_SETTINGS,tr("Invalid profile settings"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_STREAMID_EXISTS,tr("Stream with same ID already exists"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_INVALID_INIT_RESPONCE,tr("Invalid stream initiation response"));
 
 	if (FStanzaProcessor)
 	{
@@ -165,7 +166,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 					{
 						FStreams.remove(sid);
 						XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-						err.setErrorText(tr("Invalid profile settings"));
+						err.setAppCondition(NS_INTERNAL_ERROR,IERR_DATASTREAMS_PROFILE_INVALID_SETTINGS);
 						Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
 						FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 					}
@@ -173,7 +174,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 				else
 				{
 					XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-					err.setErrorText(tr("Stream with same ID already exists"));
+					err.setAppCondition(NS_INTERNAL_ERROR,IERR_DATASTREAMS_STREAM_STREAMID_EXISTS);
 					Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
 					FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 				}
@@ -181,7 +182,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 			else
 			{
 				XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-				err.setAppCondition(NS_STREAM_INITIATION,ERC_NO_VALID_STREAMS);
+				err.setAppCondition(NS_STREAM_INITIATION,XERR_SI_NO_VALID_STREAMS);
 				Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
 				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 			}
@@ -189,7 +190,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 		else
 		{
 			XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
-			err.setAppCondition(NS_STREAM_INITIATION,ERC_BAD_PROFILE);
+			err.setAppCondition(NS_STREAM_INITIATION,XERR_SI_BAD_PROFILE);
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
@@ -223,12 +224,12 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 			}
 			else if (sprofile)
 			{
-				sprofile->dataStreamError(sid,tr("Invalid stream initiation response"));
+				sprofile->dataStreamError(sid,XmppError(IERR_DATASTREAMS_STREAM_INVALID_INIT_RESPONCE));
 			}
 		}
 		else if (sprofile)
 		{
-			sprofile->dataStreamError(sid,XmppStanzaError(AStanza).errorMessage());
+			sprofile->dataStreamError(sid,XmppStanzaError(AStanza));
 		}
 	}
 }
@@ -405,18 +406,15 @@ bool DataStreamsManger::acceptStream(const QString &AStreamId, const QString &AM
 	return false;
 }
 
-bool DataStreamsManger::rejectStream(const QString &AStreamId, const QString &AError)
+bool DataStreamsManger::rejectStream(const QString &AStreamId, const XmppStanzaError &AError)
 {
 	if (FStanzaProcessor && FStreams.contains(AStreamId))
 	{
 		StreamParams params = FStreams.take(AStreamId);
 		
-		XmppStanzaError err(XmppStanzaError::EC_FORBIDDEN);
-		err.setErrorText(AError);
-
 		Stanza error("iq");
 		error.setId(params.requestId).setFrom(params.contactJid.full());
-		error = FStanzaProcessor->makeReplyError(error,err);
+		error = FStanzaProcessor->makeReplyError(error,AError);
 
 		return FStanzaProcessor->sendStanzaOut(params.streamJid,error);
 	}
@@ -434,13 +432,13 @@ QString DataStreamsManger::streamIdByRequestId(const QString &ARequestId) const
 void DataStreamsManger::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	QMap<QString, StreamParams>::iterator it = FStreams.begin();
-	while (it!=FStreams.end())
+	while (it != FStreams.end())
 	{
 		if (it->streamJid == AXmppStream->streamJid())
 		{
 			IDataStreamProfile *sprofile = FProfiles.value(it->profile,NULL);
 			if (sprofile)
-				sprofile->dataStreamError(it.key(),XmppStanzaError(XmppStanzaError::EC_RECIPIENT_UNAVAILABLE).errorMessage());
+				sprofile->dataStreamError(it.key(),XmppStanzaError(XmppStanzaError::EC_RECIPIENT_UNAVAILABLE));
 			it = FStreams.erase(it);
 		}
 		else

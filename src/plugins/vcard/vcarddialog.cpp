@@ -32,7 +32,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	FVCard = FVCardPlugin->vcard(FContactJid);
 	connect(FVCard->instance(),SIGNAL(vcardUpdated()),SLOT(onVCardUpdated()));
 	connect(FVCard->instance(),SIGNAL(vcardPublished()),SLOT(onVCardPublished()));
-	connect(FVCard->instance(),SIGNAL(vcardError(const QString &)),SLOT(onVCardError(const QString &)));
+	connect(FVCard->instance(),SIGNAL(vcardError(const XmppError &)),SLOT(onVCardError(const XmppError &)));
 
 	connect(ui.tlbPhotoSave,SIGNAL(clicked()),SLOT(onPhotoSaveClicked()));
 	connect(ui.tlbPhotoLoad,SIGNAL(clicked()),SLOT(onPhotoLoadClicked()));
@@ -320,12 +320,12 @@ void VCardDialog::onVCardPublished()
 	}
 }
 
-void VCardDialog::onVCardError(const QString &AError)
+void VCardDialog::onVCardError(const XmppError &AError)
 {
 	QMessageBox::critical(this,tr("Error"),
 		streamJid().pBare() != contactJid().pBare() ? 
-		tr("Failed to load profile: %1").arg(Qt::escape(AError)) :
-		tr("Failed to publish your profile: %1").arg(Qt::escape(AError)));
+		tr("Failed to load profile: %1").arg(Qt::escape(AError.errorMessage())) :
+		tr("Failed to publish your profile: %1").arg(Qt::escape(AError.errorMessage())));
 
 	if (!FSaveClicked)
 		deleteLater();

@@ -53,7 +53,7 @@ bool ServerMessageArchive::initConnections(IPluginManager *APluginManager, int &
 		SLOT(onServerCollectionLoaded(const QString &, const IArchiveCollection &, const IArchiveResultSet &)));
 	connect(this,SIGNAL(serverModificationsLoaded(const QString &, const IArchiveModifications &, const IArchiveResultSet &)),
 		SLOT(onServerModificationsLoaded(const QString &, const IArchiveModifications &, const IArchiveResultSet &)));
-	connect(this,SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onServerRequestFailed(const QString &, const QString &)));
+	connect(this,SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onServerRequestFailed(const QString &, const XmppError &)));
 
 	return FArchiver!=NULL && FStanzaProcessor!=NULL;
 }
@@ -174,7 +174,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 	}
 
 	if (AStanza.type() == "error")
-		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
+		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
 }
 
 QUuid ServerMessageArchive::engineId() const
@@ -453,7 +453,7 @@ void ServerMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 	emit capabilitiesChanged(AStreamJid);
 }
 
-void ServerMessageArchive::onServerRequestFailed(const QString &AId, const QString &AError)
+void ServerMessageArchive::onServerRequestFailed(const QString &AId, const XmppError &AError)
 {
 	if (FHeadersRequests.contains(AId))
 	{
@@ -479,7 +479,7 @@ void ServerMessageArchive::onServerHeadersLoaded(const QString &AId, const QList
 			if (!id.isEmpty())
 				FHeadersRequests.insert(id,request);
 			else
-				emit requestFailed(request.id,tr("Failed to request conversation headers from server"));
+				emit requestFailed(request.id,XmppError(IERR_HISTORY_HEADERS_LOAD_ERROR));
 		}
 		else
 		{
@@ -504,7 +504,7 @@ void ServerMessageArchive::onServerCollectionLoaded(const QString &AId, const IA
 			if (!id.isEmpty())
 				FCollectionRequests.insert(id,request);
 			else
-				emit requestFailed(request.id,tr("Failed to load conversation from server"));
+				emit requestFailed(request.id,XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR));
 		}
 		else
 		{
@@ -527,7 +527,7 @@ void ServerMessageArchive::onServerModificationsLoaded(const QString &AId, const
 			if (!id.isEmpty())
 				FModificationsRequests.insert(id,request);
 			else
-				emit requestFailed(request.id,tr("Failed to load archive modifications from server"));
+				emit requestFailed(request.id,XmppError(IERR_HISTORY_MODIFICATIONS_LOAD_ERROR));
 		}
 		else
 		{

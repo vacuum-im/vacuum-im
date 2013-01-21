@@ -13,7 +13,7 @@ VCard::VCard(const Jid &AContactJid, VCardPlugin *APlugin) : QObject(APlugin)
 	FVCardPlugin = APlugin;
 	connect(FVCardPlugin,SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
 	connect(FVCardPlugin,SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardPublished(const Jid &)));
-	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const QString &)),SLOT(onVCardError(const Jid &, const QString &)));
+	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const XmppError &)),SLOT(onVCardError(const Jid &, const XmppError &)));
 	loadVCardFile();
 }
 
@@ -285,7 +285,7 @@ void VCard::onVCardPublished(const Jid &AContactJid)
 		emit vcardPublished();
 }
 
-void VCard::onVCardError(const Jid &AContactJid, const QString &AError)
+void VCard::onVCardError(const Jid &AContactJid, const XmppError &AError)
 {
 	if (FContactJid == AContactJid)
 		emit vcardError(AError);

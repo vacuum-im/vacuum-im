@@ -8,6 +8,7 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/toolbarchanger.h>
+#include <utils/xmpperror.h>
 #include <utils/datetime.h>
 #include <utils/message.h>
 #include <utils/menu.h>
@@ -219,7 +220,7 @@ public:
 	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) =0;
 protected:
 	virtual void capabilitiesChanged(const Jid &AStreamJid) =0;
-	virtual void requestFailed(const QString &AId, const QString &AError) =0;
+	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
 	virtual void collectionSaved(const QString &AId, const IArchiveHeader &AHeader) =0;
 	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders) =0;
 	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection) =0;
@@ -269,7 +270,7 @@ public:
 protected:
 	//Common Requests
 	virtual void requestCompleted(const QString &AId) =0;
-	virtual void requestFailed(const QString &AId, const QString &AError) =0;
+	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
 	//Archive Preferences
 	virtual void archivePrefsOpened(const Jid &AStreamJid) =0;
 	virtual void archivePrefsChanged(const Jid &AStreamJid) =0;
@@ -286,7 +287,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")
-Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.0")
-Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/2.0")
+Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.1")
+Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.1")
 
 #endif // IMESSAGEARCHIVER_H

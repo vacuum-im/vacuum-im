@@ -48,6 +48,12 @@ bool RosterPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
 
+bool RosterPlugin::initObjects()
+{
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_ROSTER_REQUEST_FAILED,tr("Roster request failed"));
+	return true;
+}
+
 bool RosterPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST,60000);

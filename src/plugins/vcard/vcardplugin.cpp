@@ -139,8 +139,7 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		}
 		else if (AStanza.type() == "error")
 		{
-			XmppStanzaError err(AStanza);
-			emit vcardError(fromJid,err.errorMessage());
+			emit vcardError(fromJid,XmppStanzaError(AStanza));
 		}
 	}
 	else if (FVCardPublishId.contains(AStanza.id()))
@@ -154,8 +153,7 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		}
 		else if (AStanza.type() == "error")
 		{
-			XmppStanzaError err(AStanza);
-			emit vcardError(fromJid,err.errorMessage());
+			emit vcardError(fromJid,XmppStanzaError(AStanza));
 		}
 	}
 }

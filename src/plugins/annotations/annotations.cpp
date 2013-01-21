@@ -48,8 +48,6 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		if (FPrivateStorage)
 		{
 			connect(FPrivateStorage->instance(),SIGNAL(storageOpened(const Jid &)),SLOT(onPrivateStorageOpened(const Jid &)));
-			connect(FPrivateStorage->instance(),SIGNAL(dataError(const QString &, const QString &)),
-				SLOT(onPrivateDataError(const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataSaved(const QString &, const Jid &, const QDomElement &)),
 				SLOT(onPrivateDataSaved(const QString &, const Jid &, const QDomElement &)));
 			connect(FPrivateStorage->instance(),SIGNAL(dataLoaded(const QString &, const Jid &, const QDomElement &)),
@@ -292,20 +290,6 @@ void Annotations::onSaveAnnotationsTimerTimeout()
 void Annotations::onPrivateStorageOpened(const Jid &AStreamJid)
 {
 	loadAnnotations(AStreamJid);
-}
-
-void Annotations::onPrivateDataError(const QString &AId, const QString &AError)
-{
-	if (FLoadRequests.contains(AId))
-	{
-		Jid streamJid = FLoadRequests.take(AId);
-		emit annotationsError(streamJid, AError);
-	}
-	else if (FSaveRequests.contains(AId))
-	{
-		Jid streamJid = FSaveRequests.take(AId);
-		emit annotationsError(streamJid, AError);
-	}
 }
 
 void Annotations::onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)

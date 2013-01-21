@@ -19,7 +19,7 @@ Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
 	shandle.conditions.append(SHC_PRESENCE);
 	FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
 
-	connect(AXmppStream->instance(),SIGNAL(error(const QString &)),SLOT(onStreamError(const QString &)));
+	connect(AXmppStream->instance(),SIGNAL(error(const XmppError &)),SLOT(onStreamError(const XmppError &)));
 	connect(AXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
 }
 
@@ -299,13 +299,13 @@ void Presence::clearItems()
 	}
 }
 
+void Presence::onStreamError(const XmppError &AError)
+{
+	setPresence(Error,AError.errorMessage(),0);
+}
+
 void Presence::onStreamClosed()
 {
 	if (isOpen())
 		setPresence(Offline,tr("XMPP stream closed unexpectedly"),0);
-}
-
-void Presence::onStreamError(const QString &AError)
-{
-	setPresence(Error,AError,0);
 }

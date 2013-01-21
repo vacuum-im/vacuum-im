@@ -29,7 +29,7 @@ enum NegotiationCommands
 };
 
 class DataEvent :
-			public QEvent
+	public QEvent
 {
 public:
 	DataEvent(bool ARead, bool AWrite, bool AFlush) : QEvent(FEventType) {
@@ -65,7 +65,6 @@ SocksStream::SocksStream(ISocksStreams *ASocksStreams, IStanzaProcessor *AStanza
 	FTcpSocket = NULL;
 	FConnectTimeout = 10000;
 	FDirectConnectDisabled = false;
-	FErrorCode = IDataStreamSocket::NoError;
 
 	FSHIHosts= -1;
 
@@ -77,7 +76,7 @@ SocksStream::SocksStream(ISocksStreams *ASocksStreams, IStanzaProcessor *AStanza
 
 SocksStream::~SocksStream()
 {
-	abort(tr("Stream destroyed"));
+	abort(XmppError(IERR_SOCKS5_STREAM_DESTROYED));
 	delete FTcpSocket;
 }
 
@@ -114,7 +113,7 @@ bool SocksStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_NOT_ACCEPTABLE);
 			error.element().removeChild(error.firstElement("query"));
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
-			abort(tr("Unsupported stream mode"));
+			abort(XmppError(IERR_SOCKS5_STREAM_INVALID_MODE));
 		}
 		removeStanzaHandle(FSHIHosts);
 	}
@@ -154,7 +153,7 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		}
 		else
 		{
-			abort(tr("Remote client cant connect to given hosts"));
+			abort(XmppError(IERR_SOCKS5_STREAM_HOSTS_REJECTED));
 		}
 	}
 	else if (AStanza.id() == FActivateRequest)
@@ -162,7 +161,7 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		if (AStanza.type() == "result")
 			negotiateConnection(NCMD_START_STREAM);
 		else
-			abort(tr("Failed to activate stream"));
+			abort(XmppError(IERR_SOCKS5_STREAM_NOT_ACTIVATED));
 	}
 }
 
@@ -237,6 +236,12 @@ int SocksStream::streamState() const
 	return FStreamState;
 }
 
+XmppError SocksStream::error() const
+{
+	QReadLocker locker(&FThreadLock);
+	return FError;
+}
+
 bool SocksStream::isOpen() const
 {
 	QReadLocker locker(&FThreadLock);
@@ -247,7 +252,7 @@ bool SocksStream::open(QIODevice::OpenMode AMode)
 {
 	if (streamState() == IDataStreamSocket::Closed)
 	{
-		setStreamError(QString::null,NoError);
+		setStreamError(XmppError::null);
 		if (negotiateConnection(NCMD_START_NEGOTIATION))
 		{
 			setOpenMode(AMode);
@@ -285,26 +290,14 @@ void SocksStream::close()
 	}
 }
 
-void SocksStream::abort(const QString &AError, int ACode)
+void SocksStream::abort(const XmppError &AError)
 {
 	if (streamState() != IDataStreamSocket::Closed)
 	{
-		setStreamError(AError, ACode);
+		setStreamError(AError);
 		close();
 		setStreamState(IDataStreamSocket::Closed);
 	}
-}
-
-int SocksStream::errorCode() const
-{
-	QReadLocker locker(&FThreadLock);
-	return FErrorCode;
-}
-
-QString SocksStream::errorString() const
-{
-	QReadLocker locker(&FThreadLock);
-	return QIODevice::errorString();
 }
 
 int SocksStream::connectTimeout() const
@@ -471,13 +464,13 @@ void SocksStream::setStreamState(int AState)
 	}
 }
 
-void SocksStream::setStreamError(const QString &AError, int ACode)
+void SocksStream::setStreamError(const XmppError &AError)
 {
-	if (ACode==NoError || errorCode()==NoError)
+	if (AError.isNull() != FError.isNull())
 	{
 		QWriteLocker locker(&FThreadLock);
-		FErrorCode = ACode;
-		setErrorString(AError);
+		FError = AError;
+		setErrorString(AError.errorString());
 	}
 }
 
@@ -510,7 +503,7 @@ void SocksStream::writeBufferedData(bool AFlush)
 			FBytesWrittenCondition.wakeAll();
 
 			if (FTcpSocket->write(data) != data.size())
-				abort("Failed to send data to socket");
+				abort(XmppError(IERR_SOCKS5_STREAM_DATA_NOT_SENT));
 			else if (AFlush)
 				FTcpSocket->flush();
 
@@ -591,7 +584,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 		{
 			if (sendAvailHosts())
 				return true;
-			abort(tr("Failed to create hosts"));
+			abort(XmppError(IERR_SOCKS5_STREAM_HOSTS_NOT_CREATED));
 		}
 		else if (ACommand == NCMD_CONNECT_TO_HOST)
 		{
@@ -605,18 +598,18 @@ bool SocksStream::negotiateConnection(int ACommand)
 						setStreamState(IDataStreamSocket::Opened);
 						return true;
 					}
-					abort(tr("Direct connection not established"));
+					abort(XmppError(IERR_SOCKS5_STREAM_NO_DIRECT_CONNECTION));
 				}
 				else
 				{
 					if (connectToHost())
 						return true;
 
-					abort("Invalid host address");
+					abort(XmppError(IERR_SOCKS5_STREAM_INVALID_HOST_ADDRESS));
 					FSocksStreams->removeLocalConnection(FConnectKey);
 				}
 			}
-			abort(tr("Invalid host"));
+			abort(XmppError(IERR_SOCKS5_STREAM_INVALID_HOST));
 		}
 		else if (ACommand == NCMD_CHECK_NEXT_HOST)
 		{
@@ -624,7 +617,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 				return true;
 
 			sendFailedHosts();
-			abort(tr("Cant connect to given hosts"));
+			abort(XmppError(IERR_SOCKS5_STREAM_HOSTS_UNREACHABLE));
 		}
 		else if (ACommand == NCMD_ACTIVATE_STREAM)
 		{
@@ -632,7 +625,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 			{
 				if (activateStream())
 					return true;
-				abort(tr("Failed to activate stream"));
+				abort(XmppError(IERR_SOCKS5_STREAM_NOT_ACTIVATED));
 			}
 			else
 			{
@@ -641,7 +634,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 					setStreamState(IDataStreamSocket::Opened);
 					return true;
 				}
-				abort(tr("Failed to activate stream"));
+				abort(XmppError(IERR_SOCKS5_STREAM_NOT_ACTIVATED));
 			}
 		}
 		else if (ACommand == NCMD_START_STREAM)
@@ -768,7 +761,7 @@ bool SocksStream::sendFailedHosts()
 	QDomElement errElem = reply.addElement("error");
 	errElem.setAttribute("code", 404);
 	errElem.setAttribute("type","cancel");
-	errElem.appendChild(reply.createElement("item-not-found", XMPP_STANZA_ERROR_NS));
+	errElem.appendChild(reply.createElement("item-not-found", NS_XMPP_STANZA_ERROR));
 
 	return FStanzaProcessor->sendStanzaOut(FStreamJid, reply);
 }
@@ -841,7 +834,7 @@ void SocksStream::onHostSocketDisconnected()
 
 	FHostIndex++;
 	if (streamKind() == IDataStreamSocket::Initiator)
-		abort(tr("Failed to connect to host"));
+		abort(XmppError(IERR_SOCKS5_STREAM_HOST_NOT_CONNECTED));
 	else
 		negotiateConnection(NCMD_CHECK_NEXT_HOST);
 }
@@ -860,7 +853,7 @@ void SocksStream::onTcpSocketBytesWritten(qint64 ABytes)
 void SocksStream::onTcpSocketError(QAbstractSocket::SocketError AError)
 {
 	if (AError != QAbstractSocket::RemoteHostClosedError)
-		setStreamError(FTcpSocket->errorString(),UnknownError);
+		setStreamError(XmppError(IERR_SOCKS5_STREAM_HOST_DISCONNECTED,FTcpSocket->errorString()));
 }
 
 void SocksStream::onTcpSocketDisconnected()

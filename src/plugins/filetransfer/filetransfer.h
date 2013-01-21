@@ -21,6 +21,7 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifiletransfer.h>
 #include <interfaces/ifilestreamsmanager.h>
@@ -43,14 +44,14 @@
 #include "streamdialog.h"
 
 class FileTransfer :
-			public QObject,
-			public IPlugin,
-			public IFileTransfer,
-			public IOptionsHolder,
-			public IDiscoFeatureHandler,
-			public IRostersDragDropHandler,
-			public IViewDropHandler,
-			public IFileStreamsHandler
+	public QObject,
+	public IPlugin,
+	public IFileTransfer,
+	public IOptionsHolder,
+	public IDiscoFeatureHandler,
+	public IRostersDragDropHandler,
+	public IViewDropHandler,
+	public IFileStreamsHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IViewDropHandler IFileStreamsHandler);

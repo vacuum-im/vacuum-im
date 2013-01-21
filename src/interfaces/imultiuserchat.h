@@ -111,7 +111,7 @@ public:
 	virtual void setPassword(const QString &APassword) =0;
 	virtual int show() const =0;
 	virtual QString status() const =0;
-	virtual XmppStanzaError roomError() const =0;
+	virtual XmppError roomError() const =0;
 	virtual bool sendStreamPresence() =0;
 	virtual bool sendPresence(int AShow, const QString &AStatus) =0;
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
@@ -160,7 +160,7 @@ protected:
 	virtual void configFormReceived(const IDataForm &AForm) =0;
 	virtual void configFormSent(const IDataForm &AForm) =0;
 	virtual void configFormAccepted() =0;
-	virtual void configFormRejected(const QString &AError) =0;
+	virtual void configFormRejected(const XmppError &AError) =0;
 	virtual void roomDestroyed(const QString &AReason) =0;
 };
 
@@ -218,8 +218,8 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
-Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.3")
+Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.4")
 Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.2")
-Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.2")
+Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.4")
 
 #endif

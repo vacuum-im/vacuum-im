@@ -81,7 +81,7 @@ signals:
 	void exchangeRequestReceived(const IRosterExchangeRequest &ARequest);
 	void exchangeRequestApplied(const IRosterExchangeRequest &ARequest);
 	void exchangeRequestApproved(const IRosterExchangeRequest &ARequest);
-	void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError);
+	void exchangeRequestFailed(const IRosterExchangeRequest &ARequest, const XmppError &AError);
 protected:
 	QList<IRosterItem> dragDataContacts(const QMimeData *AData) const;
 	QList<IRosterItem> dropDataContacts(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData) const;

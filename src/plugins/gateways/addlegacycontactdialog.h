@@ -9,7 +9,7 @@
 #include "ui_addlegacycontactdialog.h"
 
 class AddLegacyContactDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
@@ -25,7 +25,7 @@ protected:
 protected slots:
 	void onPromptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
 	void onUserJidReceived(const QString &AId, const Jid &AUserJid);
-	void onErrorReceived(const QString &AId, const QString &AError);
+	void onErrorReceived(const QString &AId, const XmppError &AError);
 	void onDialogButtonsClicked(QAbstractButton *AButton);
 private:
 	Ui::AddLegacyContactDialogClass ui;

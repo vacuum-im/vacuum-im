@@ -16,10 +16,10 @@ DataMediaWidget::DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedi
 	setFrameShadow(QLabel::Sunken);
 
 	connect(FDataForms->instance(),SIGNAL(urlLoaded(const QUrl &, const QByteArray &)),SLOT(onUrlLoaded(const QUrl &, const QByteArray &)));
-	connect(FDataForms->instance(),SIGNAL(urlLoadFailed(const QUrl &, const QString &)),SLOT(onUrlLoadFailed(const QUrl &, const QString &)));
+	connect(FDataForms->instance(),SIGNAL(urlLoadFailed(const QUrl &, const XmppError &)),SLOT(onUrlLoadFailed(const QUrl &, const XmppError &)));
 
 	uriIndex = 0;
-	FLastError = tr("Unsupported media type");
+	FLastError = XmppError(IERR_DATAFORMS_MEDIA_INVALID_TYPE);
 	loadUri();
 }
 
@@ -58,7 +58,7 @@ void DataMediaWidget::loadUri()
 	else
 	{
 		disconnect(FDataForms->instance());
-		setText(FLastError);
+		setText(FLastError.errorMessage());
 		emit mediaError(FLastError);
 	}
 }
@@ -103,7 +103,9 @@ bool DataMediaWidget::updateWidget(const IDataMediaURI &AUri, const QByteArray &
 			emit mediaShown();
 		}
 		else
+		{
 			delete buffer;
+		}
 	}
 	return success;
 }
@@ -116,13 +118,13 @@ void DataMediaWidget::onUrlLoaded(const QUrl &AUrl, const QByteArray &AData)
 		if (!updateWidget(uri, AData))
 		{
 			uriIndex++;
-			FLastError = tr("Unsupported data format");
+			FLastError = XmppError(IERR_DATAFORMS_MEDIA_INVALID_FORMAT);
 			loadUri();
 		}
 	}
 }
 
-void DataMediaWidget::onUrlLoadFailed(const QUrl &AUrl, const QString &AError)
+void DataMediaWidget::onUrlLoadFailed(const QUrl &AUrl, const XmppError &AError)
 {
 	if (uriIndex<FMedia.uris.count() && FMedia.uris.at(uriIndex).url == AUrl)
 	{
@@ -131,4 +133,3 @@ void DataMediaWidget::onUrlLoadFailed(const QUrl &AUrl, const QString &AError)
 		loadUri();
 	}
 }
-

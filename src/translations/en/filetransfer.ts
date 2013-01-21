@@ -91,6 +91,10 @@
         <source>File &apos;%1&apos; successfully received.</source>
         <translation>File &apos;%1&apos; successfully received.</translation>
     </message>
+    <message>
+        <source>Data transmission terminated</source>
+        <translation>Data transmission terminated</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>
@@ -213,10 +217,6 @@
     <message>
         <source>Are you sure you want to cancel a file transfer?</source>
         <translation>Are you sure you want to cancel a file transfer?</translation>
-    </message>
-    <message>
-        <source>Data transmission terminated</source>
-        <translation>Data transmission terminated</translation>
     </message>
 </context>
 <context>

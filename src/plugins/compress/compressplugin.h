@@ -7,6 +7,8 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/xmpperrors.h>
+#include <definitions/internalerrors.h>
 #include <definitions/xmppfeatureorders.h>
 #include <definitions/xmppfeaturepluginorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -20,10 +22,10 @@
 #define COMPRESS_UUID "{061D0687-B954-416d-B690-D1BA7D845D83}"
 
 class CompressPlugin :
-			public QObject,
-			public IPlugin,
-			public IOptionsHolder,
-			public IXmppFeaturesPlugin
+	public QObject,
+	public IPlugin,
+	public IOptionsHolder,
+	public IXmppFeaturesPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsHolder IXmppFeaturesPlugin);

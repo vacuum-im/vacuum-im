@@ -19,6 +19,10 @@
         <source>New Proxy</source>
         <translation>Neuer Proxy</translation>
     </message>
+    <message>
+        <source>Connection error</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>

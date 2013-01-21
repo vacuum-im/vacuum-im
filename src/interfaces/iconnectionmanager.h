@@ -10,6 +10,7 @@
 #include <QNetworkProxy>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
+#include <utils/xmpperror.h>
 
 class IConnectionPlugin;
 
@@ -35,7 +36,7 @@ protected:
 	virtual void connected() =0;
 	virtual void encrypted() =0;
 	virtual void readyRead(qint64 ABytes) =0;
-	virtual void error(const QString &AMessage) =0;
+	virtual void error(const XmppError &AError) =0;
 	virtual void aboutToDisconnect() =0;
 	virtual void disconnected() =0;
 	virtual void connectionDestroyed() =0;
@@ -80,8 +81,8 @@ protected:
 	virtual void defaultProxyChanged(const QUuid &AProxyId) =0;
 };
 
-Q_DECLARE_INTERFACE(IConnection,"Vacuum.Plugin.IConnection/1.0")
+Q_DECLARE_INTERFACE(IConnection,"Vacuum.Plugin.IConnection/1.1")
 Q_DECLARE_INTERFACE(IConnectionPlugin,"Vacuum.Plugin.IConnectionPlugin/1.0")
-Q_DECLARE_INTERFACE(IConnectionManager,"Vacuum.Plugin.IConnectionManager/1.0")
+Q_DECLARE_INTERFACE(IConnectionManager,"Vacuum.Plugin.IConnectionManager/1.1")
 
 #endif

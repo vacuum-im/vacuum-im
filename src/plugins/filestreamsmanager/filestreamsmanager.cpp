@@ -65,6 +65,11 @@ bool FileStreamsManager::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),QKeySequence::UnknownKey,Shortcuts::ApplicationShortcut);
 
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_IO_ERROR,tr("File input/output error"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED,tr("File size unexpectedly changed"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_CONNECTION_TIMEOUT,tr("Connection timed out"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_TERMINATED_BY_REMOTE_USER,tr("Data transmission terminated by remote user"));
+
 	if (FDataManager)
 	{
 		FDataManager->insertProfile(this);
@@ -193,7 +198,7 @@ bool FileStreamsManager::dataStreamResponce(const QString &AStreamId, const Stan
 	return handler!=NULL ? handler->fileStreamResponce(AStreamId,AResponce,AMethod) : false;
 }
 
-bool FileStreamsManager::dataStreamError(const QString &AStreamId, const QString &AError)
+bool FileStreamsManager::dataStreamError(const QString &AStreamId, const XmppError &AError)
 {
 	IFileStream *stream = streamById(AStreamId);
 	if (stream)

@@ -54,7 +54,7 @@ public:
 	virtual void setPassword(const QString &APassword);
 	virtual int show() const;
 	virtual QString status() const;
-	virtual XmppStanzaError roomError() const;
+	virtual XmppError roomError() const;
 	virtual bool sendStreamPresence();
 	virtual bool sendPresence(int AShow, const QString &AStatus);
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null);
@@ -103,7 +103,7 @@ signals:
 	void configFormReceived(const IDataForm &AForm);
 	void configFormSent(const IDataForm &AForm);
 	void configFormAccepted();
-	void configFormRejected(const QString &AError);
+	void configFormRejected(const XmppError &AError);
 	void roomDestroyed(const QString &AReason);
 protected:
 	void initialize();
@@ -145,7 +145,7 @@ private:
 	QString FNickName;
 	QString FPassword;
 	MultiUser *FMainUser;
-	XmppStanzaError FRoomError;
+	XmppError FRoomError;
 	QList<int> FStatusCodes;
 	QHash<QString, MultiUser *> FUsers;
 };

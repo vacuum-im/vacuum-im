@@ -304,12 +304,12 @@ void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 	{
 		if (FSocket.state()!=QSslSocket::ConnectedState || FSSLError)
 		{
-			emit error(FSocket.errorString());
+			emit error(XmppError(IERR_CONNECTIONS_CONNECT_ERROR,FSocket.errorString()));
 			emit disconnected();
 		}
 		else
 		{
-			emit error(FSocket.errorString());
+			emit error(XmppError(IERR_CONNECTIONS_CONNECT_ERROR,FSocket.errorString()));
 		}
 	}
 	else
