@@ -4,16 +4,16 @@
 <context>
     <name>TrayManager</name>
     <message>
+        <source>Quit</source>
+        <translation>Quit</translation>
+    </message>
+    <message>
         <source>Tray Icon</source>
         <translation>Tray Icon</translation>
     </message>
     <message>
         <source>Allows other modules to access the icon and context menu in the tray</source>
         <translation>Allows other modules to access the icon and context menu in the tray</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>Quit</translation>
     </message>
 </context>
 </TS>

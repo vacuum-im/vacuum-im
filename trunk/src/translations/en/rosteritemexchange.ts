@@ -4,20 +4,28 @@
 <context>
     <name>ExchangeApproveDialog</name>
     <message>
-        <source>Roster Modification - %1</source>
-        <translation>Roster Modification - %1</translation>
-    </message>
-    <message>
         <source>Contact &apos;%1&apos; offers you to make the following changes in your contact list:</source>
         <translation>Contact &apos;%1&apos; offers you to make the following changes in your contact list:</translation>
     </message>
     <message>
-        <source>Modification</source>
-        <translation>Modification</translation>
-    </message>
-    <message>
         <source>Add new contact &apos;%1 &lt;%2&gt;&apos;</source>
         <translation>Add new contact &apos;%1 &lt;%2&gt;&apos;</translation>
+    </message>
+    <message>
+        <source>Remove contact &apos;%1&apos; from contact list</source>
+        <translation>Remove contact &apos;%1&apos; from contact list</translation>
+    </message>
+    <message>
+        <source>Rename contact &apos;%1&apos; to &apos;%2&apos;</source>
+        <translation>Rename contact &apos;%1&apos; to &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <source>Roster Modification - %1</source>
+        <translation>Roster Modification - %1</translation>
+    </message>
+    <message>
+        <source>Modification</source>
+        <translation>Modification</translation>
     </message>
     <message>
         <source>Add new contact &apos;%1 &lt;%2&gt;&apos; to the group: %3</source>
@@ -28,16 +36,8 @@
         <translation>Copy contact &apos;%1&apos; to the group: %2</translation>
     </message>
     <message>
-        <source>Remove contact &apos;%1&apos; from contact list</source>
-        <translation>Remove contact &apos;%1&apos; from contact list</translation>
-    </message>
-    <message>
         <source>Remove contact &apos;%1&apos; from the group: %2</source>
         <translation>Remove contact &apos;%1&apos; from the group: %2</translation>
-    </message>
-    <message>
-        <source>Rename contact &apos;%1&apos; to &apos;%2&apos;</source>
-        <translation>Rename contact &apos;%1&apos; to &apos;%2&apos;</translation>
     </message>
 </context>
 <context>

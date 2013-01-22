@@ -92,7 +92,7 @@
     </message>
     <message>
         <source>Allowed types of notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволені типи сповіщень</translation>
     </message>
 </context>
 <context>

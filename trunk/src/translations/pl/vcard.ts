@@ -251,7 +251,8 @@
     <message>
         <source>Ctrl+I</source>
         <comment>Show Profile</comment>
-        <translation type="unfinished">Ctrl+I</translation>
+        <translatorcomment>Показать личные данные</translatorcomment>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Contact Profile</source>

@@ -584,11 +584,11 @@ Check values and try again</source>
     </message>
     <message>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ввійти</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Вийти</translation>
     </message>
     <message>
         <source>Open Conference Dialog</source>
@@ -919,11 +919,11 @@ Check values and try again</source>
     </message>
     <message>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation>Ввійти</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Вийти</translation>
     </message>
     <message>
         <source>Open Chat Dialog</source>

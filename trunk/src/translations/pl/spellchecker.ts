@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pl_PL">
+<TS version="2.0" language="pl">
 <context>
     <name>SpellChecker</name>
     <message>
         <source>Spell Checker</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprawdzanie pisowni</translation>
     </message>
     <message>
         <source>Highlights words that may not be spelled correctly</source>
-        <translation type="unfinished"></translation>
+        <translation>Podświetl słowa, które mogą być napisane niepoprawnie</translation>
     </message>
     <message>
         <source>Dictionary</source>

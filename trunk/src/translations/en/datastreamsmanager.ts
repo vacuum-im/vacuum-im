@@ -8,40 +8,40 @@
         <translation>Data Streams Manager</translation>
     </message>
     <message>
-        <source>Allows to initiate a custom stream of data between two XMPP entities</source>
-        <translation>Allows to initiate a custom stream of data between two XMPP entities</translation>
+        <source>None of the available streams are acceptable</source>
+        <translation>None of the available streams are acceptable</translation>
     </message>
     <message>
         <source>The profile is not understood or invalid</source>
         <translation>The profile is not understood or invalid</translation>
     </message>
     <message>
-        <source>None of the available streams are acceptable</source>
-        <translation>None of the available streams are acceptable</translation>
+        <source>Invalid profile settings</source>
+        <translation>Invalid profile settings</translation>
     </message>
     <message>
         <source>Data Streams Initiation</source>
         <translation>Data Streams Initiation</translation>
     </message>
     <message>
-        <source>Supports the initiating of the custom stream of data between two XMPP entities</source>
-        <translation>Supports the initiating of the custom stream of data between two XMPP entities</translation>
-    </message>
-    <message>
-        <source>&lt;Default Profile&gt;</source>
-        <translation>&lt;Default Profile&gt;</translation>
+        <source>Stream with same ID already exists</source>
+        <translation>Stream with same ID already exists</translation>
     </message>
     <message>
         <source>Data Streams</source>
         <translation>Data Streams</translation>
     </message>
     <message>
-        <source>Invalid profile settings</source>
-        <translation>Invalid profile settings</translation>
+        <source>&lt;Default Profile&gt;</source>
+        <translation>&lt;Default Profile&gt;</translation>
     </message>
     <message>
-        <source>Stream with same ID already exists</source>
-        <translation>Stream with same ID already exists</translation>
+        <source>Allows to initiate a custom stream of data between two XMPP entities</source>
+        <translation>Allows to initiate a custom stream of data between two XMPP entities</translation>
+    </message>
+    <message>
+        <source>Supports the initiating of the custom stream of data between two XMPP entities</source>
+        <translation>Supports the initiating of the custom stream of data between two XMPP entities</translation>
     </message>
     <message>
         <source>Invalid stream initiation response</source>

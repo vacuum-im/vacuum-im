@@ -4,10 +4,6 @@
 <context>
     <name>RosterSearch</name>
     <message>
-        <source>Show search toolbar</source>
-        <translation>Show search toolbar</translation>
-    </message>
-    <message>
         <source>Search toolbar</source>
         <translation>Search toolbar</translation>
     </message>
@@ -16,8 +12,8 @@
         <translation>Roster Search</translation>
     </message>
     <message>
-        <source>Allows to search for contacts in the roster</source>
-        <translation>Allows to search for contacts in the roster</translation>
+        <source>Show search toolbar</source>
+        <translation>Show search toolbar</translation>
     </message>
     <message>
         <source>Name</source>
@@ -30,6 +26,10 @@
     <message>
         <source>Jabber ID</source>
         <translation>Jabber ID</translation>
+    </message>
+    <message>
+        <source>Allows to search for contacts in the roster</source>
+        <translation>Allows to search for contacts in the roster</translation>
     </message>
     <message>
         <source>Group</source>

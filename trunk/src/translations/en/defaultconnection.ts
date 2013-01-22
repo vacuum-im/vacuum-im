@@ -4,10 +4,6 @@
 <context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
-        <source>Use legacy SSL connection</source>
-        <translation>Use legacy SSL connection</translation>
-    </message>
-    <message>
         <source>Host:</source>
         <translation>Host:</translation>
     </message>
@@ -15,16 +11,20 @@
         <source>Port:</source>
         <translation>Port:</translation>
     </message>
+    <message>
+        <source>Use legacy SSL connection</source>
+        <translation>Use legacy SSL connection</translation>
+    </message>
 </context>
 <context>
     <name>DefaultConnectionPlugin</name>
     <message>
-        <source>Default Connection</source>
-        <translation>Default Connection</translation>
-    </message>
-    <message>
         <source>Allows to set a standard TCP connection to Jabber server</source>
         <translation>Allows to set a standard TCP connection to Jabber server</translation>
+    </message>
+    <message>
+        <source>Default Connection</source>
+        <translation>Default Connection</translation>
     </message>
     <message>
         <source>Organization: %1</source>

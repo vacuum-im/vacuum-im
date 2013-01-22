@@ -217,11 +217,11 @@
     </message>
     <message>
         <source>Combine/Split with message windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Об&apos;єднати/Розділити з вікнами повідомлень</translation>
     </message>
     <message>
         <source>Combine message windows with contact-list</source>
-        <translation type="unfinished"></translation>
+        <translation>Об&apos;єднати вікна повідомлень з контакт-листом</translation>
     </message>
     <message>
         <source>Show tabs in combined message windows with contact-list mode</source>

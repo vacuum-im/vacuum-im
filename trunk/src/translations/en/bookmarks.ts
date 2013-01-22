@@ -59,16 +59,16 @@
         <translation>Bookmark is not valid</translation>
     </message>
     <message>
-        <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
-        <translation>In conference bookmark field &apos;Room&apos; should not be empty</translation>
+        <source>Field &apos;Name&apos; should not be empty</source>
+        <translation>Field &apos;Name&apos; should not be empty</translation>
     </message>
     <message>
         <source>In URL bookmark field &apos;URL&apos; should not be empty</source>
         <translation>In URL bookmark field &apos;URL&apos; should not be empty</translation>
     </message>
     <message>
-        <source>Field &apos;Name&apos; should not be empty</source>
-        <translation>Field &apos;Name&apos; should not be empty</translation>
+        <source>In conference bookmark field &apos;Room&apos; should not be empty</source>
+        <translation>In conference bookmark field &apos;Room&apos; should not be empty</translation>
     </message>
 </context>
 <context>
@@ -113,16 +113,16 @@
 <context>
     <name>EditBookmarksDialog</name>
     <message>
-        <source>Edit bookmarks - %1</source>
-        <translation>Edit bookmarks - %1</translation>
-    </message>
-    <message>
         <source>Bookmarks not saved</source>
         <translation>Bookmarks not saved</translation>
     </message>
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Cant save bookmarks to server</translation>
+    </message>
+    <message>
+        <source>Edit bookmarks - %1</source>
+        <translation>Edit bookmarks - %1</translation>
     </message>
 </context>
 <context>

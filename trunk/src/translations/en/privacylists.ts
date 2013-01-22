@@ -8,66 +8,6 @@
         <translation>Edit Privacy Lists - %1</translation>
     </message>
     <message>
-        <source>&lt;None&gt;</source>
-        <translation>&lt;None&gt;</translation>
-    </message>
-    <message>
-        <source>jid</source>
-        <translation>jid</translation>
-    </message>
-    <message>
-        <source>group</source>
-        <translation>group</translation>
-    </message>
-    <message>
-        <source>subscription</source>
-        <translation>subscription</translation>
-    </message>
-    <message>
-        <source>&lt;always&gt;</source>
-        <translation>&lt;always&gt;</translation>
-    </message>
-    <message>
-        <source>deny</source>
-        <translation>deny</translation>
-    </message>
-    <message>
-        <source>allow</source>
-        <translation>allow</translation>
-    </message>
-    <message>
-        <source>messages</source>
-        <translation>messages</translation>
-    </message>
-    <message>
-        <source>queries</source>
-        <translation>queries</translation>
-    </message>
-    <message>
-        <source>pres-in</source>
-        <translation>pres-in</translation>
-    </message>
-    <message>
-        <source>pres-out</source>
-        <translation>pres-out</translation>
-    </message>
-    <message>
-        <source>&lt;any stanza&gt;</source>
-        <translation>&lt;any stanza&gt;</translation>
-    </message>
-    <message>
-        <source>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</source>
-        <translation>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</translation>
-    </message>
-    <message>
-        <source>&lt;action&gt;</source>
-        <translation>&lt;action&gt;</translation>
-    </message>
-    <message>
-        <source>%1: always %2 [%3 ]</source>
-        <translation>%1: always %2 [%3 ]</translation>
-    </message>
-    <message>
         <source>Privacy List Error</source>
         <translation>Privacy List Error</translation>
     </message>
@@ -104,6 +44,58 @@
         <translation>Are you really want to delete privacy list &apos;%1&apos; with rules?</translation>
     </message>
     <message>
+        <source>&lt;always&gt;</source>
+        <translation>&lt;always&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;action&gt;</source>
+        <translation>&lt;action&gt;</translation>
+    </message>
+    <message>
+        <source>jid</source>
+        <translation>jid</translation>
+    </message>
+    <message>
+        <source>group</source>
+        <translation>group</translation>
+    </message>
+    <message>
+        <source>subscription</source>
+        <translation>subscription</translation>
+    </message>
+    <message>
+        <source>deny</source>
+        <translation>deny</translation>
+    </message>
+    <message>
+        <source>allow</source>
+        <translation>allow</translation>
+    </message>
+    <message>
+        <source>&lt;None&gt;</source>
+        <translation>&lt;None&gt;</translation>
+    </message>
+    <message>
+        <source>messages</source>
+        <translation>messages</translation>
+    </message>
+    <message>
+        <source>queries</source>
+        <translation>queries</translation>
+    </message>
+    <message>
+        <source>pres-in</source>
+        <translation>pres-in</translation>
+    </message>
+    <message>
+        <source>pres-out</source>
+        <translation>pres-out</translation>
+    </message>
+    <message>
+        <source>&lt;any stanza&gt;</source>
+        <translation>&lt;any stanza&gt;</translation>
+    </message>
+    <message>
         <source>none</source>
         <comment>Subscription type</comment>
         <translation>none</translation>
@@ -122,6 +114,14 @@
         <source>both</source>
         <comment>Subscription type</comment>
         <translation>both</translation>
+    </message>
+    <message>
+        <source>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</source>
+        <translation>%1: if %2 = &apos;%3&apos; then %4 [%5 ]</translation>
+    </message>
+    <message>
+        <source>%1: always %2 [%3 ]</source>
+        <translation>%1: always %2 [%3 ]</translation>
     </message>
 </context>
 <context>
@@ -167,12 +167,12 @@
         <translation>Edit rule condition</translation>
     </message>
     <message>
-        <source>if</source>
-        <translation>if</translation>
-    </message>
-    <message>
         <source>=</source>
         <translation>=</translation>
+    </message>
+    <message>
+        <source>if</source>
+        <translation>if</translation>
     </message>
     <message>
         <source>then</source>
@@ -200,10 +200,6 @@
     <message>
         <source>Privacy Lists</source>
         <translation>Privacy Lists</translation>
-    </message>
-    <message>
-        <source>Allows to block unwanted contacts</source>
-        <translation>Allows to block unwanted contacts</translation>
     </message>
     <message>
         <source>Privacy</source>
@@ -274,10 +270,6 @@
         <translation>- queries: %1</translation>
     </message>
     <message>
-        <source>&lt;b&gt;denied&lt;/b&gt;</source>
-        <translation>&lt;b&gt;denied&lt;/b&gt;</translation>
-    </message>
-    <message>
         <source>allowed</source>
         <translation>allowed</translation>
     </message>
@@ -292,6 +284,14 @@
     <message>
         <source>- presences out: %1</source>
         <translation>- presences out: %1</translation>
+    </message>
+    <message>
+        <source>Allows to block unwanted contacts</source>
+        <translation>Allows to block unwanted contacts</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;denied&lt;/b&gt;</source>
+        <translation>&lt;b&gt;denied&lt;/b&gt;</translation>
     </message>
 </context>
 </TS>

@@ -4,6 +4,14 @@
 <context>
     <name>AccountManager</name>
     <message>
+        <source>Accounts</source>
+        <translation>Accounts</translation>
+    </message>
+    <message>
+        <source>Modify account</source>
+        <translation>Modify account</translation>
+    </message>
+    <message>
         <source>Account Manager</source>
         <translation>Account Manager</translation>
     </message>
@@ -12,16 +20,8 @@
         <translation>Allows to create and manage Jabber accounts</translation>
     </message>
     <message>
-        <source>Accounts</source>
-        <translation>Accounts</translation>
-    </message>
-    <message>
         <source>Require a secure connection</source>
         <translation>Require a secure connection</translation>
-    </message>
-    <message>
-        <source>Modify account</source>
-        <translation>Modify account</translation>
     </message>
 </context>
 <context>
@@ -89,16 +89,16 @@
         <translation>Jabber ID</translation>
     </message>
     <message>
-        <source>New Account</source>
-        <translation>New Account</translation>
-    </message>
-    <message>
         <source>Confirm removal of an account</source>
         <translation>Confirm removal of an account</translation>
     </message>
     <message>
         <source>You are assured that wish to remove an account &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;All settings will be lost.</source>
         <translation>You are assured that wish to remove an account &lt;b&gt;%1&lt;/b&gt;?&lt;br&gt;All settings will be lost.</translation>
+    </message>
+    <message>
+        <source>New Account</source>
+        <translation>New Account</translation>
     </message>
 </context>
 <context>

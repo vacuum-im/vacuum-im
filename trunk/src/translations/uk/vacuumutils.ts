@@ -5,11 +5,11 @@
     <name>SearchLineEdit</name>
     <message>
         <source>Search options</source>
-        <translation type="unfinished"></translation>
+        <translation>Налаштування пошуку</translation>
     </message>
     <message>
         <source>Clear text</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистити текст</translation>
     </message>
 </context>
 <context>

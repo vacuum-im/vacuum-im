@@ -5,11 +5,11 @@
     <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
-        <translation type="unfinished">Закладки</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation type="unfinished">Дозволяє створювати закладки для конференцій та веб-сторінок</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit bookmark</source>
@@ -17,11 +17,11 @@
     </message>
     <message>
         <source>Disable autojoin to conferences</source>
-        <translation type="unfinished">Не входити автоматично до конференцій</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automatically show window of conferences connected at startup</source>
-        <translation type="unfinished">Показувати вікна конференцій, що підключаються автоматично, при старті</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit Bookmarks</source>

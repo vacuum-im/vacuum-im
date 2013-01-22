@@ -4,16 +4,28 @@
 <context>
     <name>MessageStyles</name>
     <message>
+        <source>Message Styles</source>
+        <translation>Message Styles</translation>
+    </message>
+    <message>
+        <source>d MMM yyyy hh:mm</source>
+        <translation>d MMM yyyy hh:mm</translation>
+    </message>
+    <message>
+        <source>d MMM hh:mm</source>
+        <translation>d MMM hh:mm</translation>
+    </message>
+    <message>
+        <source>hh:mm:ss</source>
+        <translation>hh:mm:ss</translation>
+    </message>
+    <message>
         <source>Message Styles Manager</source>
         <translation>Message Styles Manager</translation>
     </message>
     <message>
         <source>Allows to use different styles to display messages</source>
         <translation>Allows to use different styles to display messages</translation>
-    </message>
-    <message>
-        <source>Message Styles</source>
-        <translation>Message Styles</translation>
     </message>
     <message>
         <source>Show date separators in chat window</source>
@@ -107,18 +119,6 @@
         <source>%1, %2 dd, yyyy</source>
         <translation>%1, %2 dd, yyyy</translation>
     </message>
-    <message>
-        <source>d MMM yyyy hh:mm</source>
-        <translation>d MMM yyyy hh:mm</translation>
-    </message>
-    <message>
-        <source>d MMM hh:mm</source>
-        <translation>d MMM hh:mm</translation>
-    </message>
-    <message>
-        <source>hh:mm:ss</source>
-        <translation>hh:mm:ss</translation>
-    </message>
 </context>
 <context>
     <name>StyleOptionsWidget</name>
@@ -129,26 +129,6 @@
     <message>
         <source>Conference</source>
         <translation>Conference</translation>
-    </message>
-    <message>
-        <source>Single</source>
-        <translation>Single</translation>
-    </message>
-    <message>
-        <source>Headline</source>
-        <translation>Headline</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation>Error</translation>
-    </message>
-    <message>
-        <source>Receiver</source>
-        <translation>Receiver</translation>
-    </message>
-    <message>
-        <source>Sender</source>
-        <translation>Sender</translation>
     </message>
     <message>
         <source>The message with a error code %1 is received</source>
@@ -217,6 +197,26 @@
     <message>
         <source>Outgoing consecutive message</source>
         <translation>Outgoing consecutive message</translation>
+    </message>
+    <message>
+        <source>Receiver</source>
+        <translation>Receiver</translation>
+    </message>
+    <message>
+        <source>Sender</source>
+        <translation>Sender</translation>
+    </message>
+    <message>
+        <source>Single</source>
+        <translation>Single</translation>
+    </message>
+    <message>
+        <source>Headline</source>
+        <translation>Headline</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Error</translation>
     </message>
 </context>
 <context>
