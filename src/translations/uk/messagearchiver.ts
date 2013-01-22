@@ -424,7 +424,7 @@
     </message>
     <message>
         <source>Search in text</source>
-        <translation type="unfinished"></translation>
+        <translation>Пошук по тексту</translation>
     </message>
 </context>
 <context>

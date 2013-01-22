@@ -8,12 +8,16 @@
         <translation>Main Window</translation>
     </message>
     <message>
-        <source>Allows other modules to place their widgets in the main window</source>
-        <translation>Allows other modules to place their widgets in the main window</translation>
+        <source>Quit</source>
+        <translation>Quit</translation>
     </message>
     <message>
         <source>Show roster</source>
         <translation>Show roster</translation>
+    </message>
+    <message>
+        <source>Allows other modules to place their widgets in the main window</source>
+        <translation>Allows other modules to place their widgets in the main window</translation>
     </message>
     <message>
         <source>Main window</source>
@@ -27,10 +31,6 @@
         <source>Esc</source>
         <comment>Hide roster</comment>
         <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>Quit</translation>
     </message>
 </context>
 </TS>

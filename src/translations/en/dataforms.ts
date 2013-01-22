@@ -19,12 +19,16 @@
 <context>
     <name>DataForms</name>
     <message>
-        <source>Data Forms Manager</source>
-        <translation>Data Forms Manager</translation>
+        <source>Data Forms</source>
+        <translation>Data Forms</translation>
     </message>
     <message>
-        <source>Allows other modules to process and display the form with the data intended for user</source>
-        <translation>Allows other modules to process and display the form with the data intended for user</translation>
+        <source>Data Forms Validation</source>
+        <translation>Data Forms Validation</translation>
+    </message>
+    <message>
+        <source>Data Forms Layout</source>
+        <translation>Data Forms Layout</translation>
     </message>
     <message>
         <source>Yes</source>
@@ -35,32 +39,28 @@
         <translation>No</translation>
     </message>
     <message>
-        <source>Url load failed</source>
-        <translation>Url load failed</translation>
-    </message>
-    <message>
         <source>Unsupported url scheme</source>
         <translation>Unsupported url scheme</translation>
     </message>
     <message>
-        <source>Data Forms</source>
-        <translation>Data Forms</translation>
+        <source>Url load failed</source>
+        <translation>Url load failed</translation>
+    </message>
+    <message>
+        <source>Data Forms Manager</source>
+        <translation>Data Forms Manager</translation>
+    </message>
+    <message>
+        <source>Allows other modules to process and display the form with the data intended for user</source>
+        <translation>Allows other modules to process and display the form with the data intended for user</translation>
     </message>
     <message>
         <source>Supports the processing and displaying of the forms with the data</source>
         <translation>Supports the processing and displaying of the forms with the data</translation>
     </message>
     <message>
-        <source>Data Forms Validation</source>
-        <translation>Data Forms Validation</translation>
-    </message>
-    <message>
         <source>Supports the validating of the data entered in the form</source>
         <translation>Supports the validating of the data entered in the form</translation>
-    </message>
-    <message>
-        <source>Data Forms Layout</source>
-        <translation>Data Forms Layout</translation>
     </message>
     <message>
         <source>Supports the layouting of the form, including the layout of form fields, pages and sections</source>

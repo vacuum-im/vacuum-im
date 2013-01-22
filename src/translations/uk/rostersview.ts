@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Контакти</translation>
     </message>
 </context>
 <context>

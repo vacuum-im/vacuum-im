@@ -4,36 +4,8 @@
 <context>
     <name>SocksOptionsClass</name>
     <message>
-        <source>Outgoing Connections</source>
-        <translation>Outgoing Connections</translation>
-    </message>
-    <message>
-        <source>Connect timeout:</source>
-        <translation>Connect timeout:</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation>seconds</translation>
-    </message>
-    <message>
-        <source>Connection Proxy</source>
-        <translation>Connection Proxy</translation>
-    </message>
-    <message>
-        <source>Use account connection proxy settings</source>
-        <translation>Use account connection proxy settings</translation>
-    </message>
-    <message>
-        <source>Incoming Connections</source>
-        <translation>Incoming Connections</translation>
-    </message>
-    <message>
         <source>Disable direct connections</source>
         <translation>Disable direct connections</translation>
-    </message>
-    <message>
-        <source>Listening port:</source>
-        <translation>Listening port:</translation>
     </message>
     <message>
         <source>Port Forwarding</source>
@@ -52,10 +24,6 @@
         <translation>Stream Proxy</translation>
     </message>
     <message>
-        <source>Use proxy on account server</source>
-        <translation>Use proxy on account server</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Add</translation>
     </message>
@@ -70,6 +38,38 @@
     <message>
         <source>Delete</source>
         <translation>Delete</translation>
+    </message>
+    <message>
+        <source>Connection Proxy</source>
+        <translation>Connection Proxy</translation>
+    </message>
+    <message>
+        <source>Use account connection proxy settings</source>
+        <translation>Use account connection proxy settings</translation>
+    </message>
+    <message>
+        <source>Listening port:</source>
+        <translation>Listening port:</translation>
+    </message>
+    <message>
+        <source>Use proxy on account server</source>
+        <translation>Use proxy on account server</translation>
+    </message>
+    <message>
+        <source>Outgoing Connections</source>
+        <translation>Outgoing Connections</translation>
+    </message>
+    <message>
+        <source>Connect timeout:</source>
+        <translation>Connect timeout:</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>seconds</translation>
+    </message>
+    <message>
+        <source>Incoming Connections</source>
+        <translation>Incoming Connections</translation>
     </message>
 </context>
 <context>

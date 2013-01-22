@@ -12,12 +12,12 @@
         <translation>Allows to use different types of connections to a Jabber server</translation>
     </message>
     <message>
-        <source>New Proxy</source>
-        <translation>New Proxy</translation>
-    </message>
-    <message>
         <source>&lt;No Proxy&gt;</source>
         <translation>&lt;No Proxy&gt;</translation>
+    </message>
+    <message>
+        <source>New Proxy</source>
+        <translation>New Proxy</translation>
     </message>
     <message>
         <source>Connection error</source>

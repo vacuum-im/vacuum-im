@@ -4,18 +4,6 @@
 <context>
     <name>RostersModel</name>
     <message>
-        <source>Roster Model</source>
-        <translation>Roster Model</translation>
-    </message>
-    <message>
-        <source>Creates a hierarchical model for display roster</source>
-        <translation>Creates a hierarchical model for display roster</translation>
-    </message>
-    <message>
-        <source>Without Groups</source>
-        <translation>Without Groups</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Agents</translation>
     </message>
@@ -26,6 +14,18 @@
     <message>
         <source>Not in Roster</source>
         <translation>Not in Roster</translation>
+    </message>
+    <message>
+        <source>Roster Model</source>
+        <translation>Roster Model</translation>
+    </message>
+    <message>
+        <source>Creates a hierarchical model for display roster</source>
+        <translation>Creates a hierarchical model for display roster</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation>Without Groups</translation>
     </message>
 </context>
 </TS>

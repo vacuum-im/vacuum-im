@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Show grayscaled avatars for offline contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати аватари відключених контактів сірим</translation>
     </message>
 </context>
 </TS>

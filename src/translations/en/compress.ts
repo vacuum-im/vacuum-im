@@ -4,20 +4,20 @@
 <context>
     <name>CompressPlugin</name>
     <message>
-        <source>Stream Compression</source>
-        <translation>Stream Compression</translation>
-    </message>
-    <message>
-        <source>Allows to compress a stream of messages sent and received from the server</source>
-        <translation>Allows to compress a stream of messages sent and received from the server</translation>
-    </message>
-    <message>
         <source>Unsupported compression method</source>
         <translation>Unsupported compression method</translation>
     </message>
     <message>
         <source>Compression setup failed</source>
         <translation>Compression setup failed</translation>
+    </message>
+    <message>
+        <source>Stream Compression</source>
+        <translation>Stream Compression</translation>
+    </message>
+    <message>
+        <source>Allows to compress a stream of messages sent and received from the server</source>
+        <translation>Allows to compress a stream of messages sent and received from the server</translation>
     </message>
     <message>
         <source>Enable data compression transferred between client and server</source>

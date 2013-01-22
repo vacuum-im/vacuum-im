@@ -8,14 +8,6 @@
         <translation>CAPTCHA Forms</translation>
     </message>
     <message>
-        <source>Allows to undergo tests on humanity without the use of browser</source>
-        <translation>Allows to undergo tests on humanity without the use of browser</translation>
-    </message>
-    <message>
-        <source>When receiving a CAPTCHA challenge</source>
-        <translation>When receiving a CAPTCHA challenge</translation>
-    </message>
-    <message>
         <source>CAPTCHA Challenge - %1</source>
         <translation>CAPTCHA Challenge - %1</translation>
     </message>
@@ -58,6 +50,14 @@
     <message>
         <source>You have received the CAPTCHA challenge</source>
         <translation>You have received the CAPTCHA challenge</translation>
+    </message>
+    <message>
+        <source>Allows to undergo tests on humanity without the use of browser</source>
+        <translation>Allows to undergo tests on humanity without the use of browser</translation>
+    </message>
+    <message>
+        <source>When receiving a CAPTCHA challenge</source>
+        <translation>When receiving a CAPTCHA challenge</translation>
     </message>
 </context>
 </TS>

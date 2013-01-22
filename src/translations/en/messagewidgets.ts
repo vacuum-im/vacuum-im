@@ -18,6 +18,18 @@
 <context>
     <name>MessageWidgets</name>
     <message>
+        <source>Messages</source>
+        <translation>Messages</translation>
+    </message>
+    <message>
+        <source>Tab Window %1</source>
+        <translation>Tab Window %1</translation>
+    </message>
+    <message>
+        <source>Main Tab Window</source>
+        <translation>Main Tab Window</translation>
+    </message>
+    <message>
         <source>Message Widgets Manager</source>
         <translation>Message Widgets Manager</translation>
     </message>
@@ -26,26 +38,40 @@
         <translation>Allows other modules to use standard widgets for messaging</translation>
     </message>
     <message>
+        <source>Quote selected text</source>
+        <translation>Quote selected text</translation>
+    </message>
+    <message>
+        <source>Tab Window</source>
+        <translation>Tab Window</translation>
+    </message>
+    <message>
+        <source>Enable tab windows</source>
+        <translation>Enable tab windows</translation>
+    </message>
+    <message>
+        <source>Show status changes in chat windows</source>
+        <translation>Show status changes in chat windows</translation>
+    </message>
+    <message>
+        <source>Auto resize input field</source>
+        <translation>Auto resize input field</translation>
+    </message>
+    <message>
+        <source>Show contact information in chat windows</source>
+        <translation>Show contact information in chat windows</translation>
+    </message>
+    <message>
+        <source>Save status messages to history</source>
+        <translation>Save status messages to history</translation>
+    </message>
+    <message>
         <source>Tab window</source>
         <translation>Tab window</translation>
     </message>
     <message>
         <source>Close tab</source>
         <translation>Close tab</translation>
-    </message>
-    <message>
-        <source>Ctrl+W</source>
-        <comment>Close tab</comment>
-        <translation>Ctrl+W</translation>
-    </message>
-    <message>
-        <source>Close other tabs</source>
-        <translation>Close other tabs</translation>
-    </message>
-    <message>
-        <source>Ctrl+Shift+W</source>
-        <comment>Close other tabs</comment>
-        <translation>Ctrl+Shift+W</translation>
     </message>
     <message>
         <source>Detach tab to separate window</source>
@@ -68,21 +94,8 @@
         <translation>Show tabs at bottom</translation>
     </message>
     <message>
-        <source>Show tabs indices</source>
-        <translation>Show tabs indices</translation>
-    </message>
-    <message>
         <source>Rename tab window</source>
         <translation>Rename tab window</translation>
-    </message>
-    <message>
-        <source>Close tab window</source>
-        <translation>Close tab window</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <comment>Close tab window</comment>
-        <translation>Esc</translation>
     </message>
     <message>
         <source>Delete tab window</source>
@@ -100,37 +113,6 @@
     <message>
         <source>Message windows</source>
         <translation>Message windows</translation>
-    </message>
-    <message>
-        <source>Quote selected text</source>
-        <translation>Quote selected text</translation>
-    </message>
-    <message>
-        <source>Close message window</source>
-        <translation>Close message window</translation>
-    </message>
-    <message>
-        <source>Esc</source>
-        <comment>Close message window</comment>
-        <translation>Esc</translation>
-    </message>
-    <message>
-        <source>Edit next message</source>
-        <translation>Edit next message</translation>
-    </message>
-    <message>
-        <source>Ctrl+Down</source>
-        <comment>Edit next message</comment>
-        <translation>Ctrl+Down</translation>
-    </message>
-    <message>
-        <source>Edit previous message</source>
-        <translation>Edit previous message</translation>
-    </message>
-    <message>
-        <source>Ctrl+Up</source>
-        <comment>Edit previous message</comment>
-        <translation>Ctrl+Up</translation>
     </message>
     <message>
         <source>Chat window</source>
@@ -155,36 +137,49 @@
         <translation>Ctrl+Return</translation>
     </message>
     <message>
-        <source>Tab Window</source>
-        <translation>Tab Window</translation>
+        <source>Edit next message</source>
+        <translation>Edit next message</translation>
     </message>
     <message>
-        <source>Messages</source>
-        <translation>Messages</translation>
+        <source>Ctrl+Down</source>
+        <comment>Edit next message</comment>
+        <translation>Ctrl+Down</translation>
     </message>
     <message>
-        <source>Enable tab windows</source>
-        <translation>Enable tab windows</translation>
+        <source>Edit previous message</source>
+        <translation>Edit previous message</translation>
     </message>
     <message>
-        <source>Show status changes in chat windows</source>
-        <translation>Show status changes in chat windows</translation>
+        <source>Ctrl+Up</source>
+        <comment>Edit previous message</comment>
+        <translation>Ctrl+Up</translation>
     </message>
     <message>
-        <source>Save status messages to history</source>
-        <translation>Save status messages to history</translation>
+        <source>Ctrl+W</source>
+        <comment>Close tab</comment>
+        <translation>Ctrl+W</translation>
     </message>
     <message>
-        <source>Show contact information in chat windows</source>
-        <translation>Show contact information in chat windows</translation>
+        <source>Show tabs indices</source>
+        <translation>Show tabs indices</translation>
     </message>
     <message>
-        <source>Auto resize input field</source>
-        <translation>Auto resize input field</translation>
+        <source>Close tab window</source>
+        <translation>Close tab window</translation>
     </message>
     <message>
-        <source>Tab Window %1</source>
-        <translation>Tab Window %1</translation>
+        <source>Esc</source>
+        <comment>Close tab window</comment>
+        <translation>Esc</translation>
+    </message>
+    <message>
+        <source>Close message window</source>
+        <translation>Close message window</translation>
+    </message>
+    <message>
+        <source>Esc</source>
+        <comment>Close message window</comment>
+        <translation>Esc</translation>
     </message>
     <message>
         <source>Copy</source>
@@ -207,13 +202,18 @@
         <translation>Search on Google &apos;%1&apos;</translation>
     </message>
     <message>
+        <source>Close other tabs</source>
+        <translation>Close other tabs</translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+W</source>
+        <comment>Close other tabs</comment>
+        <translation>Ctrl+Shift+W</translation>
+    </message>
+    <message>
         <source>google.com</source>
         <comment>Your google domain</comment>
         <translation>google.com</translation>
-    </message>
-    <message>
-        <source>Main Tab Window</source>
-        <translation>Main Tab Window</translation>
     </message>
     <message>
         <source>Combine/Split with message windows</source>
@@ -316,10 +316,6 @@
         <translation>Agents</translation>
     </message>
     <message>
-        <source>Without Groups</source>
-        <translation>Without Groups</translation>
-    </message>
-    <message>
         <source>My Resources</source>
         <translation>My Resources</translation>
     </message>
@@ -330,6 +326,10 @@
     <message>
         <source>Enter valid contact jid:</source>
         <translation>Enter valid contact jid:</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation>Without Groups</translation>
     </message>
 </context>
 <context>
@@ -347,16 +347,20 @@
         <translation>All</translation>
     </message>
     <message>
-        <source>All Online</source>
-        <translation>All Online</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>None</translation>
+    </message>
+    <message>
+        <source>All Online</source>
+        <translation>All Online</translation>
     </message>
 </context>
 <context>
     <name>TabWindow</name>
+    <message>
+        <source>Close Tab</source>
+        <translation>Close Tab</translation>
+    </message>
     <message>
         <source>Next Tab</source>
         <translation>Next Tab</translation>
@@ -368,46 +372,6 @@
     <message>
         <source>Tabs Closable</source>
         <translation>Tabs Closable</translation>
-    </message>
-    <message>
-        <source>Show Tabs at Bottom of the Window</source>
-        <translation>Show Tabs at Bottom of the Window</translation>
-    </message>
-    <message>
-        <source>Show Tabs Indices</source>
-        <translation>Show Tabs Indices</translation>
-    </message>
-    <message>
-        <source>Remove all tabs on window close</source>
-        <translation>Remove all tabs on window close</translation>
-    </message>
-    <message>
-        <source>Use as Default Tab Window</source>
-        <translation>Use as Default Tab Window</translation>
-    </message>
-    <message>
-        <source>Rename Tab Window</source>
-        <translation>Rename Tab Window</translation>
-    </message>
-    <message>
-        <source>Close Tab Window</source>
-        <translation>Close Tab Window</translation>
-    </message>
-    <message>
-        <source>Delete Tab Window</source>
-        <translation>Delete Tab Window</translation>
-    </message>
-    <message>
-        <source>%1) %2</source>
-        <translation>%1) %2</translation>
-    </message>
-    <message>
-        <source>Close Tab</source>
-        <translation>Close Tab</translation>
-    </message>
-    <message>
-        <source>Close Other Tabs</source>
-        <translation>Close Other Tabs</translation>
     </message>
     <message>
         <source>Detach to Separate Window</source>
@@ -422,12 +386,48 @@
         <translation>New Tab Window</translation>
     </message>
     <message>
+        <source>Use as Default Tab Window</source>
+        <translation>Use as Default Tab Window</translation>
+    </message>
+    <message>
+        <source>Rename Tab Window</source>
+        <translation>Rename Tab Window</translation>
+    </message>
+    <message>
+        <source>Delete Tab Window</source>
+        <translation>Delete Tab Window</translation>
+    </message>
+    <message>
         <source>Tab window name:</source>
         <translation>Tab window name:</translation>
     </message>
     <message>
         <source>Are you sure you want to delete this tab window?</source>
         <translation>Are you sure you want to delete this tab window?</translation>
+    </message>
+    <message>
+        <source>Show Tabs at Bottom of the Window</source>
+        <translation>Show Tabs at Bottom of the Window</translation>
+    </message>
+    <message>
+        <source>Show Tabs Indices</source>
+        <translation>Show Tabs Indices</translation>
+    </message>
+    <message>
+        <source>Close Tab Window</source>
+        <translation>Close Tab Window</translation>
+    </message>
+    <message>
+        <source>Remove all tabs on window close</source>
+        <translation>Remove all tabs on window close</translation>
+    </message>
+    <message>
+        <source>%1) %2</source>
+        <translation>%1) %2</translation>
+    </message>
+    <message>
+        <source>Close Other Tabs</source>
+        <translation>Close Other Tabs</translation>
     </message>
 </context>
 <context>

@@ -5,11 +5,11 @@
     <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
-        <translation type="unfinished">Lesezeichen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation type="unfinished">Erlaubt das Erstellen von Lesezeichen für Jabber Konferenzen und Webseiten</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit bookmark</source>
@@ -17,11 +17,11 @@
     </message>
     <message>
         <source>Disable autojoin to conferences</source>
-        <translation type="unfinished">Sperre das automatische Verbinden zu Konferenzen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Automatically show window of conferences connected at startup</source>
-        <translation type="unfinished">Automatisch Fenster für beim Startup verbundene Konferenzen zeigen</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Edit Bookmarks</source>
