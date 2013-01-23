@@ -8,6 +8,7 @@
 SearchLineEdit::SearchLineEdit(QWidget *AParent) : QLineEdit(AParent)
 {
 	FSelectText = true;
+	FTextChanged = false;
 	FStartTimeout = 500;
 
 	FSearchMenu = new Menu(this);
@@ -111,18 +112,24 @@ void SearchLineEdit::setSelectTextOnFocusEnabled(bool AEnabled)
 
 bool SearchLineEdit::event(QEvent *AEvent)
 {
-	if (AEvent->type()==QEvent::ShortcutOverride && !text().isEmpty())
+	if (AEvent->type() == QEvent::ShortcutOverride)
 	{
 		QKeyEvent *keyEvent = static_cast<QKeyEvent *>(AEvent);
-		if (keyEvent->key()==Qt::Key_Escape && keyEvent->modifiers()==0)
+		if (!text().isEmpty() && keyEvent->key()==Qt::Key_Escape && keyEvent->modifiers()==0)
 		{
 			FClearButton->animateClick();
 			AEvent->accept();
 		}
 	}
-	else if (AEvent->type()==QEvent::FocusIn && isSelectTextOnFocusEnabled())
+	else if (AEvent->type() == QEvent::FocusIn)
 	{
-		QTimer::singleShot(0,this,SLOT(selectAll()));
+		if (isSelectTextOnFocusEnabled())
+			QTimer::singleShot(0,this,SLOT(selectAll()));
+	}
+	else if (AEvent->type() == QEvent::FocusOut)
+	{
+		if (FTextChanged)
+			QTimer::singleShot(0,this,SLOT(onLineEditReturnPressed()));
 	}
 	return QLineEdit::event(AEvent);
 }
@@ -163,6 +170,7 @@ void SearchLineEdit::updateLayoutMargins()
 
 void SearchLineEdit::onStartTimerTimeout()
 {
+	FTextChanged = false;
 	emit searchStart();
 }
 
@@ -174,18 +182,15 @@ void SearchLineEdit::onClearButtonClicked()
 
 void SearchLineEdit::onLineEditReturnPressed()
 {
-	if (isStartingSearch())
-	{
+	if (FTextChanged)
 		restartTimeout(0);
-	}
 	else if (!text().isEmpty())
-	{
 		emit searchNext();
-	}
 }
 
 void SearchLineEdit::onLineEditTextChanged(const QString &AText)
 {
+	FTextChanged = true;
 	FClearButton->setVisible(!AText.isEmpty());
 	restartTimeout(startSearchTimeout());
 	updateTextMargins();
