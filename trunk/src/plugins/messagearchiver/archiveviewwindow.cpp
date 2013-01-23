@@ -173,7 +173,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	connect(ui.lneTextSearch,SIGNAL(searchNext()),SLOT(onTextSearchNextClicked()));
 	connect(ui.chbTextSearchCaseSensitive,SIGNAL(stateChanged(int)),SLOT(onTextSearchCaseSensitivityChanged()));
 
-
+	ui.lneArchiveSearch->setStartSearchTimeout(-1);
 	ui.lneArchiveSearch->setPlaceholderText(tr("Search in history"));
 	ui.lneArchiveSearch->setSelectTextOnFocusEnabled(false);
 	connect(ui.lneArchiveSearch,SIGNAL(searchStart()),SLOT(onArchiveSearchStart()));
