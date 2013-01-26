@@ -1,0 +1,61 @@
+Vacuum-IM
+---------
+
+Web Site:
+  http://www.vacuum-im.org
+  http://code.google.com/p/vacuum-im/
+
+Source:
+  http://code.google.com/p/vacuum-im
+
+Jabber conference:
+  vacuum@conference.jabber.ru
+
+Forum:
+  http://forum.jrudevels.org/viewforum.php?f=11
+
+
+Sound on X11 platforms
+----------------------
+  The Network Audio System is used if available, otherwise "aplay <soundfile>" command is used.
+
+
+Portable Version
+----------------
+  To make Vacuum-IM portable just create folder VacuumIM (for Windows)
+  in the directory where vacuum.exe is located.
+
+
+Known Issues
+------------
+  - on some systems popup window may capture input focus
+  - on GTalk accounts allways used default nested roster group delimiter
+  - not native look and feel in Mac OS
+
+
+List of plugins that SHOULD NOT be disabled
+-------------------------------------------
+  01. Account Manager            - accountmanager
+  02. Chat Messages              - chatmessagehandler
+  03. Connection Manager         - connectionmanager
+  04. Default connection         - defaultconnection
+  05. Main Window                - mainwindow
+  06. Message Manager            - messageprocessor
+  07. Message Styles Manager     - messagestyles
+  08. Message Widgets Manager    - messagewidgets
+  09. Normal Messages            - normalmessagehandler
+  10. Notifications Manager      - notifications
+  11. Options Manager            - optionsmanager
+  12. Presence Manager           - presence
+  13. Roster Manager             - roster
+  14. Roster Editor              - rosterchanger
+  15. Roster Model               - rostersmodel
+  16. Roster View                - rostersview
+  17. SASL Authentication        - saslauth
+  18. Simple Message Style       - simplemessagestyle
+  19. Stanza Manager             - stanzaprocessor
+  20. StartTLS                   - starttls
+  21. Status Manager             - statuschanger
+  22. Status Icons Manager       - statusicons
+  23. Tray Icon                  - traymanager
+  24. XMPP Streams Manager       - xmppstreams

@@ -1,0 +1,10 @@
+@charset "utf-8";
+
+@import url(./_Themes/_Base.css);
+@import url(./_Themes/_BaseM.css);
+@import url(./_Themes/_XtraColorM.css);
+
+.xxxtime
+{
+	display: none;
+}
