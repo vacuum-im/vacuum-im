@@ -6,6 +6,12 @@ LEGEND
   [-] Bug fix
 
 
+1.2.2
+------
+  [-] Full text search in file archive of messages in certain cases worked not correctly
+
+
+1.2.1
 ------
   [*] Added skype status icons
   [*] The animation caching is added
