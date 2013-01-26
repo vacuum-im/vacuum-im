@@ -28,7 +28,8 @@ XmppError::XmppError(QDomElement AErrorElem, const QString &ADefinedNS)
 		QDomElement elem = AErrorElem.firstChildElement();
 		while (!elem.isNull())
 		{
-			if (elem.namespaceURI() == ADefinedNS)
+			QString nsURI = !elem.namespaceURI().isEmpty() ? elem.namespaceURI() : elem.parentNode().namespaceURI();
+			if (nsURI == ADefinedNS)
 			{
 				if (elem.tagName() == "text")
 				{
@@ -40,9 +41,9 @@ XmppError::XmppError(QDomElement AErrorElem, const QString &ADefinedNS)
 					d->FConditionText = elem.text();
 				}
 			}
-			else if (!elem.namespaceURI().isEmpty())
+			else if (!nsURI.isEmpty())
 			{
-				d->FAppConditions.insert(elem.namespaceURI(),elem.tagName());
+				d->FAppConditions.insert(nsURI,elem.tagName());
 			}
 			elem = elem.nextSiblingElement();
 		}

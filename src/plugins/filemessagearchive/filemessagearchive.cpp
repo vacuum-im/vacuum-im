@@ -696,19 +696,22 @@ bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IAr
 	QFile file(AFileName);
 	if (file.open(QFile::ReadOnly))
 	{
+		QXmlStreamReader reader(&file);
+		reader.setNamespaceProcessing(false);
+
 		Qt::CheckState validCheck = Qt::PartiallyChecked;
 		Qt::CheckState textState = ARequest.text.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
 		Qt::CheckState threadState = ARequest.threadId.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
 
 		QStringList elemStack;
-		QXmlStreamReader reader(&file);
+		bool checkElemText = false;
 		while (!reader.atEnd() && validCheck!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked && 
 			(validCheck==Qt::PartiallyChecked || textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
 		{
 			reader.readNext();
 			if (reader.isStartElement())
 			{
-				elemStack.append(reader.qualifiedName().toString());
+				elemStack.append(reader.qualifiedName().toString().toLower());
 				QString elemPath = elemStack.join("/");
 				if (elemPath == "chat")
 				{
@@ -719,23 +722,30 @@ bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IAr
 					else
 						validCheck = Qt::Checked;
 
-#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
-					if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
-						textState = Qt::Checked;
-#else
-					if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
-						textState = Qt::Checked;
-#endif
 					if (reader.attributes().value("thread").compare(ARequest.threadId)==0)
 						threadState = Qt::Checked;
 					else if (threadState == Qt::PartiallyChecked)
 						threadState = Qt::Unchecked;
+
+					if (textState != Qt::Checked)
+					{
+#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
+						if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
+#else
+						if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
+#endif
+					}
+				}
+				else if (textState != Qt::Checked)
+				{
+					checkElemText = elemPath=="chat/to/body" || elemPath=="chat/from/body" || elemPath=="chat/note";
 				}
 			}
 			else if (reader.isCharacters())
 			{
-				QString elemPath = elemStack.join("/");
-				if (elemPath=="chat/to/body" || elemPath=="chat/from/body" || elemPath=="chat/note")
+				if (checkElemText)
 				{
 #if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
 					if (reader.text().contains(ARequest.text,Qt::CaseInsensitive))
@@ -748,6 +758,7 @@ bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IAr
 			}
 			else if (reader.isEndElement())
 			{
+				checkElemText = false;
 				elemStack.removeLast();
 			}
 		}
