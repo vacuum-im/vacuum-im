@@ -56,8 +56,6 @@ public:
 	virtual void setItemActiveTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime()) =0;
 	virtual void removeItem(const IRecentItem &AItem) =0;
 	virtual QList<IRecentItem> visibleItems() const =0;
-	virtual quint8 maximumVisibleItems() const =0;
-	virtual void setMaximumVisibleItems(quint8 ACount) =0;
 	virtual IRecentItem rosterIndexItem(const IRosterIndex *AIndex) const =0;
 	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const =0;
 	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const =0;
@@ -76,6 +74,6 @@ protected:
 Q_DECLARE_METATYPE(IRecentItem);
 
 Q_DECLARE_INTERFACE(IRecentItemHandler,"Vacuum.Plugin.IRecentItemHandler/1.0")
-Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.1")
+Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.2")
 
 #endif //IRECENTCONTACTS_H

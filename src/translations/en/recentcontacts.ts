@@ -20,10 +20,6 @@
         <translation>Remove contact from favorites</translation>
     </message>
     <message>
-        <source>Hide Later Contacts</source>
-        <translation>Hide Later Contacts</translation>
-    </message>
-    <message>
         <source>Always Show Offline Contacts</source>
         <translation>Always Show Offline Contacts</translation>
     </message>
@@ -54,6 +50,10 @@
     <message>
         <source>Show Only Favorite Contacts</source>
         <translation>Show Only Favorite Contacts</translation>
+    </message>
+    <message>
+        <source>Hide Inactive Contacts</source>
+        <translation>Hide Inactive Contacts</translation>
     </message>
 </context>
 </TS>
