@@ -109,12 +109,12 @@ bool RostersViewPlugin::initObjects()
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYSTATUS,FRostersView);
 
-	registerExpandableRosterIndexType(RIT_STREAM_ROOT,RDR_PREP_BARE_JID);
-	registerExpandableRosterIndexType(RIT_GROUP,RDR_GROUP);
-	registerExpandableRosterIndexType(RIT_GROUP_BLANK,RDR_NAME);
-	registerExpandableRosterIndexType(RIT_GROUP_NOT_IN_ROSTER,RDR_NAME);
-	registerExpandableRosterIndexType(RIT_GROUP_MY_RESOURCES,RDR_NAME);
-	registerExpandableRosterIndexType(RIT_GROUP_AGENTS,RDR_NAME);
+	registerExpandableRosterIndexKind(RIK_STREAM_ROOT,RDR_PREP_BARE_JID);
+	registerExpandableRosterIndexKind(RIK_GROUP,RDR_GROUP);
+	registerExpandableRosterIndexKind(RIK_GROUP_BLANK,RDR_NAME);
+	registerExpandableRosterIndexKind(RIK_GROUP_NOT_IN_ROSTER,RDR_NAME);
+	registerExpandableRosterIndexKind(RIK_GROUP_MY_RESOURCES,RDR_NAME);
+	registerExpandableRosterIndexKind(RIK_GROUP_AGENTS,RDR_NAME);
 
 	return true;
 }
@@ -162,8 +162,8 @@ QList<int> RostersViewPlugin::rosterDataRoles() const
 
 QList<int> RostersViewPlugin::rosterDataTypes() const
 {
-	static const QList<int> indexTypes = QList<int>() << RIT_ANY_TYPE;
-	return indexTypes;
+	static const QList<int> indexKinds = QList<int>() << RIK_ANY_KIND;
+	return indexKinds;
 }
 
 QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) const
@@ -186,7 +186,7 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 				return 1;
 			}
 		}
-		else if (FRostersModel->isGroupType(AIndex->type()))
+		else if (FRostersModel->isGroupKind(AIndex->kind()))
 		{
 			switch (ARole)
 			{
@@ -255,10 +255,10 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 	}
 }
 
-void RostersViewPlugin::registerExpandableRosterIndexType(int AType, int AUniqueRole)
+void RostersViewPlugin::registerExpandableRosterIndexKind(int AKind, int AUniqueRole)
 {
-	if (!FExpandableTypes.contains(AType))
-		FExpandableTypes.insert(AType,AUniqueRole);
+	if (!FExpandableKinds.contains(AKind))
+		FExpandableKinds.insert(AKind,AUniqueRole);
 }
 
 QString RostersViewPlugin::rootExpandId(const QModelIndex &AIndex) const
@@ -271,7 +271,7 @@ QString RostersViewPlugin::rootExpandId(const QModelIndex &AIndex) const
 
 QString RostersViewPlugin::indexExpandId(const QModelIndex &AIndex) const
 {
-	int role = FExpandableTypes.value(AIndex.data(RDR_TYPE).toInt());
+	int role = FExpandableKinds.value(AIndex.data(RDR_KIND).toInt());
 	if (role > 0)
 		return AIndex.data(role).toString();
 	return QString::null;
@@ -317,7 +317,7 @@ void RostersViewPlugin::onViewModelAboutToBeReset()
 {
 	if (FRostersView->currentIndex().isValid())
 	{
-		FViewSavedState.currentIndex = FRostersView->rostersModel()->rosterIndexByModelIndex(FRostersView->mapToModel(FRostersView->currentIndex()));
+		FViewSavedState.currentIndex = FRostersView->rostersModel()->rosterIndexFromModelIndex(FRostersView->mapToModel(FRostersView->currentIndex()));
 		FViewSavedState.sliderPos = FRostersView->verticalScrollBar()->sliderPosition();
 	}
 	else
@@ -331,7 +331,7 @@ void RostersViewPlugin::onViewModelReset()
 	restoreExpandState();
 	if (FViewSavedState.currentIndex != NULL)
 	{
-		FRostersView->setCurrentIndex(FRostersView->mapFromModel(FRostersView->rostersModel()->modelIndexByRosterIndex(FViewSavedState.currentIndex)));
+		FRostersView->setCurrentIndex(FRostersView->mapFromModel(FRostersView->rostersModel()->modelIndexFromRosterIndex(FViewSavedState.currentIndex)));
 		FRostersView->verticalScrollBar()->setSliderPosition(FViewSavedState.sliderPos);
 	}
 }

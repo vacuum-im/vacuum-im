@@ -13,7 +13,8 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/resources.h>

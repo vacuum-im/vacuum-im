@@ -9,7 +9,8 @@
 #include <definitions/shortcuts.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rostertooltiporders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterlabelholderorders.h>

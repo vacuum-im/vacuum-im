@@ -11,7 +11,8 @@
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/rosterdragdropmimetypes.h>

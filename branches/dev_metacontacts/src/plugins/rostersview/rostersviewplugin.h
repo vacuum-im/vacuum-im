@@ -8,7 +8,8 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/mainwindowtabpages.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterlabelholderorders.h>
@@ -61,7 +62,7 @@ public:
 	virtual IRostersView *rostersView();
 	virtual void startRestoreExpandState();
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex());
-	virtual void registerExpandableRosterIndexType(int AType, int AUniqueRole);
+	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole);
 signals:
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
@@ -90,7 +91,7 @@ private:
 	IOptionsManager *FOptionsManager;
 private:
 	bool FStartRestoreExpandState;
-	QMap<int, int> FExpandableTypes;
+	QMap<int, int> FExpandableKinds;
 	QMap<QString, QHash<QString,bool> > FExpandStates;
 private:
 	bool FShowResource;

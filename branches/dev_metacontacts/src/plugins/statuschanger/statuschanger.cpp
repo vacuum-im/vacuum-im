@@ -278,7 +278,7 @@ QList<quint32> StatusChanger::rosterLabels(int AOrder, const IRosterIndex *AInde
 	QList<quint32> labels;
 	if (AOrder==RLHO_SCHANGER_STATUS && !AIndex->data(RDR_STATUS).toString().isEmpty())
 	{
-		if (AIndex->type()==RIT_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
+		if (AIndex->kind()==RIK_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
 			labels.append(RLID_SCHANGER_STATUS);
 		else if (Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool())
 			labels.append(RLID_SCHANGER_STATUS);
@@ -1110,7 +1110,7 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 
 void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_KIND).toInt()==RIK_STREAM_ROOT)
 	{
 		Menu *menu = streamMenu(AIndexes.first()->data(RDR_STREAM_JID).toString());
 		if (menu)

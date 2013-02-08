@@ -3,7 +3,8 @@
 
 #include <QDateTime>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/rosteredithandlerorders.h>
 #include <definitions/rosterdragdropmimetypes.h>

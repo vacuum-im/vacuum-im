@@ -3,7 +3,8 @@
 
 #include <QSortFilterProxyModel>
 #include <definitions/optionvalues.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>

@@ -5,7 +5,8 @@
 
 #include <QTimer>
 #include <definitions/messagehandlerorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/recentitemtypes.h>

@@ -503,22 +503,22 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 
 bool Gateways::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
+	static const QList<int> acceptTypes = QList<int>() << RIK_CONTACT << RIK_AGENT;
 	if (!ASelected.isEmpty())
 	{
-		int singleType = -1;
+		int singleKind = -1;
 		Jid singleStream;
 		foreach(IRosterIndex *index, ASelected)
 		{
-			int indexType = index->type();
+			int indexKind = index->kind();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!acceptTypes.contains(indexType))
+			if (!acceptTypes.contains(indexKind))
 				return false;
-			else if (singleType!=-1 && singleType!=indexType)
+			else if (singleKind!=-1 && singleKind!=indexKind)
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;
-			singleType = indexType;
+			singleKind = indexKind;
 			singleStream = streamJid;
 		}
 		return true;
@@ -661,7 +661,7 @@ void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		{
 			foreach(IRosterIndex *index, FRostersViewPlugin->rostersView()->selectedRosterIndexes())
 			{
-				if (index->type() == RIT_AGENT)
+				if (index->kind() == RIK_AGENT)
 				{
 					Jid streamJid = index->data(RDR_STREAM_JID).toString();
 					Jid serviceJid = index->data(RDR_PREP_BARE_JID).toString();
@@ -684,7 +684,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, q
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
-		if (AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
+		if (AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_ROOT)
 		{
 			IRosterIndex *index = AIndexes.first();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
@@ -718,10 +718,10 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, q
 		
 		if (isSelectionAccepted(AIndexes))
 		{
-			int indexType = AIndexes.first()->type();
+			int indexKind = AIndexes.first()->kind();
 			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 
-			if (indexType == RIT_CONTACT || indexType == RIT_AGENT)
+			if (indexKind == RIK_CONTACT || indexKind == RIK_AGENT)
 			{
 				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 				if (FVCardPlugin && roster && roster->isOpen())
@@ -730,7 +730,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, q
 					for(int i=0; showResolve && i<AIndexes.count(); i++)
 					{
 						IRosterIndex *index = AIndexes.at(i);
-						if (indexType == RIT_CONTACT)
+						if (indexKind == RIK_CONTACT)
 						{
 							IRosterItem ritem = roster->rosterItem(index->data(RDR_PREP_BARE_JID).toString());
 							showResolve = ritem.name.trimmed().isEmpty() || streamServices(streamJid).contains(ritem.itemJid.domain());
@@ -746,7 +746,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, q
 						QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID);
 
 						Action *action = new Action(AMenu);
-						action->setText(indexType==RIT_AGENT ? tr("Resolve nick names") : tr("Resolve nick name"));
+						action->setText(indexKind==RIK_AGENT ? tr("Resolve nick names") : tr("Resolve nick name"));
 						action->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_RESOLVE);
 						action->setData(ADR_STREAM_JID,streamJid.full());
 						action->setData(ADR_SERVICE_JID,rolesMap.value(RDR_PREP_BARE_JID));
@@ -756,7 +756,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, q
 				}
 			}
 
-			if (indexType == RIT_AGENT)
+			if (indexKind == RIK_AGENT)
 			{
 				IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 				if (presence && presence->isOpen())

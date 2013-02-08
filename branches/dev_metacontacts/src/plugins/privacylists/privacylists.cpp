@@ -1101,13 +1101,13 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 			setPrivacyLabel(AStreamJid,contactJid,false); }
 
 		IRosterIndex *streamIndex = FRostersModel->streamRoot(AStreamJid);
-		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIT_GROUP_NOT_IN_ROSTER,QString::null,QString("::"),streamIndex);
+		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,QString("::"),streamIndex);
 		if (groupIndex)
 		{
 			for (int i=0;i<groupIndex->childCount();i++)
 			{
-				IRosterIndex *index = groupIndex->child(i);
-				if (index->type() == RIT_CONTACT || index->type()==RIT_AGENT)
+				IRosterIndex *index = groupIndex->childIndex(i);
+				if (index->kind() == RIK_CONTACT || index->kind()==RIK_AGENT)
 				{
 					IRosterItem ritem;
 					ritem.itemJid = index->data(RDR_PREP_BARE_JID).toString();
@@ -1123,22 +1123,22 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 
 bool PrivacyLists::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT << RIT_GROUP;
+	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
 	if (!ASelected.isEmpty())
 	{
 		int singleType = -1;
 		Jid singleStream;
 		foreach(IRosterIndex *index, ASelected)
 		{
-			int indexType = index->type();
+			int indexKind = index->kind();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!acceptTypes.contains(indexType))
+			if (!acceptTypes.contains(indexKind))
 				return false;
-			else if (singleType!=-1 && singleType!=indexType)
+			else if (singleType!=-1 && singleType!=indexKind)
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;
-			singleType = indexType;
+			singleType = indexKind;
 			singleStream = streamJid;
 		}
 		return true;
@@ -1275,7 +1275,7 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
 void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent)
 {
 	Q_UNUSED(AParent);
-	if (FRostersView && (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT))
+	if (FRostersView && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_AGENT))
 	{
 		if (FCreatedRosterIndexes.isEmpty())
 			QTimer::singleShot(0,this,SLOT(onUpdateCreatedRosterIndexes()));
@@ -1292,11 +1292,11 @@ void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		int indexType = AIndexes.first()->type();
+		int indexKind = AIndexes.first()->kind();
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		if (isReady(streamJid))
 		{
-			if (indexType == RIT_STREAM_ROOT)
+			if (indexKind == RIK_STREAM_ROOT)
 			{
 				Menu *pmenu = createPrivacyMenu(AMenu);
 				createAutoPrivacyStreamActions(streamJid,pmenu);
@@ -1324,13 +1324,13 @@ void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 			}
 			else if (isAutoPrivacy(streamJid))
 			{
-				if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+				if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 				{
 					QMap<int,QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
 					Menu *pmenu = createPrivacyMenu(AMenu);
 					createAutoPrivacyContactActions(streamJid,rolesMap.value(RDR_PREP_BARE_JID),pmenu);
 				}
-				else if (indexType == RIT_GROUP)
+				else if (indexKind == RIK_GROUP)
 				{
 					QMap<int,QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_GROUP,RDR_GROUP);
 					Menu *pmenu = createPrivacyMenu(AMenu);

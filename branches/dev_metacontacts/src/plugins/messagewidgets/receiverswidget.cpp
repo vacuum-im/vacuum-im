@@ -139,7 +139,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiversGroup(const QString &AGroup)
 			groupItem->setCheckState(0,parentGroupItem->checkState(0));
 			groupItem->setForeground(0,palette().color(QPalette::Active, QPalette::Highlight));
 			groupItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-			groupItem->setData(0,RDR_TYPE,RIT_GROUP);
+			groupItem->setData(0,RDR_KIND,RIK_GROUP);
 			groupItem->setData(0,RDR_GROUP,curGroup);
 			FGroupItems.insert(curGroup,groupItem);
 		}
@@ -162,7 +162,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiver(const Jid &AReceiver, const QStrin
 		contactItem = new QTreeWidgetItem(AParent,columns);
 		contactItem->setIcon(0,FStatusIcons->iconByJid(FStreamJid,AReceiver));
 		contactItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-		contactItem->setData(0,RDR_TYPE,RIT_CONTACT);
+		contactItem->setData(0,RDR_KIND,RIK_CONTACT);
 		contactItem->setData(0,RDR_FULL_JID,AReceiver.full());
 		contactItem->setData(0,RDR_NAME,AName);
 		FContactItems.insert(AReceiver,contactItem);
@@ -187,9 +187,9 @@ void ReceiversWidget::createRosterTree()
 	{
 		QSet<QString> groups;
 		if (ritem.itemJid.node().isEmpty())
-			groups.insert(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_AGENTS) : tr("Agents"));
+			groups.insert(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_AGENTS) : tr("Agents"));
 		else if (ritem.groups.isEmpty())
-			groups.insert(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_BLANK) : tr("Without Groups"));
+			groups.insert(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_BLANK) : tr("Without Groups"));
 		else
 			groups = ritem.groups;
 
@@ -219,11 +219,11 @@ void ReceiversWidget::createRosterTree()
 	QList<IPresenceItem> myResources = FPresence->presenceItems(FStreamJid);
 	foreach(IPresenceItem pitem, myResources)
 	{
-		QTreeWidgetItem *groupItem = getReceiversGroup(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_MY_RESOURCES) : tr("My Resources"));
+		QTreeWidgetItem *groupItem = getReceiversGroup(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_MY_RESOURCES) : tr("My Resources"));
 		QString name = pitem.itemJid.resource();
 		QTreeWidgetItem *contactItem = getReceiver(pitem.itemJid,name,groupItem);
 		contactItem->setCheckState(0, Qt::Unchecked);
-		contactItem->setData(0,RDR_TYPE,RIT_MY_RESOURCE);
+		contactItem->setData(0,RDR_KIND,RIK_MY_RESOURCE);
 		contactItem->setData(0,RDR_SHOW,pitem.show);
 	}
 
@@ -240,7 +240,7 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int AColumn
 	Q_UNUSED(AColumn);
 	static int blockUpdateChilds = 0;
 
-	if (AItem->data(0,RDR_TYPE).toInt() == RIT_CONTACT)
+	if (AItem->data(0,RDR_KIND).toInt() == RIK_CONTACT)
 	{
 		Jid contactJid = AItem->data(0,RDR_FULL_JID).toString();
 		if (AItem->checkState(0) == Qt::Checked && !FReceivers.contains(contactJid))
@@ -258,7 +258,7 @@ void ReceiversWidget::onReceiversItemChanged(QTreeWidgetItem *AItem, int AColumn
 		foreach(QTreeWidgetItem *contactItem,contactItems)
 			contactItem->setCheckState(0,AItem->checkState(0));
 	}
-	else if (blockUpdateChilds == 0 && AItem->data(0,RDR_TYPE).toInt() == RIT_GROUP)
+	else if (blockUpdateChilds == 0 && AItem->data(0,RDR_KIND).toInt() == RIK_GROUP)
 	{
 		for (int i =0; i< AItem->childCount(); i++)
 			AItem->child(i)->setCheckState(0,AItem->checkState(0));
@@ -292,7 +292,7 @@ void ReceiversWidget::onSelectAllOnlineClicked()
 {
 	foreach(QTreeWidgetItem *treeItem, FContactItems) 
 	{
-		if (treeItem->data(0,RDR_TYPE).toInt() == RIT_CONTACT)
+		if (treeItem->data(0,RDR_KIND).toInt() == RIK_CONTACT)
 		{
 			int status = treeItem->data(0,RDR_SHOW).toInt();
 			if (status!=IPresence::Offline && status!=IPresence::Error)

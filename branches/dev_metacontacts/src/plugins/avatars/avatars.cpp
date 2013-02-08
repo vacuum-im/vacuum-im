@@ -300,8 +300,8 @@ QList<int> Avatars::rosterDataRoles() const
 
 QList<int> Avatars::rosterDataTypes() const
 {
-	static const QList<int> indexTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT;
-	return indexTypes;
+	static const QList<int> indexKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
+	return indexKinds;
 }
 
 QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
@@ -535,7 +535,7 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 	{
 		QMultiMap<int,QVariant> findData;
 		foreach(int type, rosterDataTypes())
-			findData.insert(RDR_TYPE,type);
+			findData.insert(RDR_KIND,type);
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
@@ -609,20 +609,20 @@ bool Avatars::updateIqAvatar(const Jid &AContactJid, const QString &AHash)
 
 bool Avatars::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT;
+	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
 	if (!ASelected.isEmpty())
 	{
-		int singleType = -1;
+		int singleKind = -1;
 		foreach(IRosterIndex *index, ASelected)
 		{
-			int indexType = index->type();
-			if (!acceptTypes.contains(indexType))
+			int indexKind = index->kind();
+			if (!acceptTypes.contains(indexKind))
 				return false;
-			else if (singleType!=-1 && singleType!=indexType)
+			else if (singleKind!=-1 && singleKind!=indexKind)
 				return false;
 			else if (!FStreamAvatars.contains(index->data(RDR_STREAM_JID).toString()))
 				return false;
-			singleType = indexType;
+			singleKind = indexKind;
 		}
 		return true;
 	}
@@ -680,7 +680,7 @@ void Avatars::onVCardChanged(const Jid &AContactJid)
 
 void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin && rosterDataTypes().contains(AIndex->type()))
+	if (FRostersViewPlugin && rosterDataTypes().contains(AIndex->kind()))
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		if (!FVCardAvatars.contains(contactJid))
@@ -697,9 +697,9 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, qu
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		int indexType = AIndexes.first()->type();
+		int indexKind = AIndexes.first()->kind();
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID);
-		if (indexType == RIT_STREAM_ROOT)
+		if (indexKind == RIK_STREAM_ROOT)
 		{
 			Menu *avatar = new Menu(AMenu);
 			avatar->setTitle(tr("Avatar"));
@@ -721,7 +721,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, qu
 
 			AMenu->addAction(avatar->menuAction(),AG_RVCM_AVATARS,true);
 		}
-		else if (indexType == RIT_CONTACT)
+		else if (indexKind == RIK_CONTACT)
 		{
 			Menu *picture = new Menu(AMenu);
 			picture->setTitle(tr("Custom picture"));
@@ -748,7 +748,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, qu
 
 void Avatars::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->type()))
+	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->kind()))
 	{
 		QString hash = AIndex->data(RDR_AVATAR_HASH).toString();
 		if (hasAvatar(hash))

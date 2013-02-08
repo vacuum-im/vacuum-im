@@ -253,13 +253,13 @@ bool MultiUserChatPlugin::initObjects()
 
 	if (FRostersModel)
 	{
-		FRostersModel->registerSingleGroup(RIT_GROUP_MUC,tr("Conferences"));
+		FRostersModel->registerSingleGroup(RIK_GROUP_MUC,tr("Conferences"));
 	}
 
 	if (FRostersViewPlugin)
 	{
 		FRostersViewPlugin->rostersView()->insertClickHooker(RCHO_MULTIUSERCHAT,this);
-		FRostersViewPlugin->registerExpandableRosterIndexType(RIT_GROUP_MUC,RDR_TYPE);
+		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_GROUP_MUC,RDR_KIND);
 
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_ENTERCONFERENCE,FRostersViewPlugin->rostersView()->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_EXITCONFERENCE,FRostersViewPlugin->rostersView()->instance());
@@ -583,7 +583,7 @@ QString MultiUserChatPlugin::recentItemName(const IRecentItem &AItem) const
 IRecentItem MultiUserChatPlugin::recentItemForIndex(const IRosterIndex *AIndex) const
 {
 	IRecentItem item;
-	if (AIndex->type() == RIT_MUC_ITEM)
+	if (AIndex->kind() == RIK_MUC_ITEM)
 	{
 		item.type = REIT_CONFERENCE;
 		item.streamJid = AIndex->data(RDR_STREAM_JID).toString();
@@ -708,10 +708,10 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
 		if (sroot)
 		{
-			IRosterIndex *chatGroup = FRostersModel->createGroupIndex(RIT_GROUP_MUC,tr("Conferences"),"::",sroot);
-			chatGroup->setData(RDR_TYPE_ORDER,RITO_GROUP_MUC);
+			IRosterIndex *chatGroup = FRostersModel->createGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",sroot);
+			chatGroup->setData(RDR_KIND_ORDER,RIKO_GROUP_MUC);
 
-			chatIndex = FRostersModel->createRosterIndex(RIT_MUC_ITEM,chatGroup);
+			chatIndex = FRostersModel->createRosterIndex(RIK_MUC_ITEM,chatGroup);
 			FChatIndexes.append(chatIndex);
 
 			chatIndex->setData(RDR_STREAM_JID,AStreamJid.pFull());
@@ -890,7 +890,7 @@ bool MultiUserChatPlugin::isSelectionAccepted(const QList<IRosterIndex *> &ASele
 	if (ASelected.count() > 1)
 	{
 		foreach(IRosterIndex *index, ASelected)
-			if (index->type() != RIT_MUC_ITEM)
+			if (index->kind() != RIK_MUC_ITEM)
 				return false;
 	}
 	return !ASelected.isEmpty();
@@ -938,12 +938,12 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindowForIndex(const IRos
 	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
 	if (stream && stream->isOpen())
 	{
-		if (AIndex->type() == RIT_MUC_ITEM)
+		if (AIndex->kind() == RIK_MUC_ITEM)
 		{
 			Jid roomJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 			window = getMultiChatWindow(streamJid,roomJid,AIndex->data(RDR_MUC_NICK).toString(),AIndex->data(RDR_MUC_PASSWORD).toString());
 		}
-		else if (FRecentContacts && AIndex->type()==RIT_RECENT_ITEM && AIndex->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE)
+		else if (FRecentContacts && AIndex->kind()==RIK_RECENT_ITEM && AIndex->data(RDR_RECENT_TYPE).toString()==REIT_CONFERENCE)
 		{
 			IRecentItem item = FRecentContacts->rosterIndexItem(AIndex);
 			Jid roomJid = AIndex->data(RDR_RECENT_REFERENCE).toString();
@@ -1168,7 +1168,7 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 	else if (AId == SCT_ROSTERVIEW_ENTERCONFERENCE)
 	{
 		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->type()==RIT_MUC_ITEM)
+		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
 		{
 			foreach(IRosterIndex *index, selected)
 			{
@@ -1181,7 +1181,7 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 	else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE)
 	{
 		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->type()==RIT_MUC_ITEM)
+		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
 		{
 			foreach(IRosterIndex *index, selected)
 			{
@@ -1203,7 +1203,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		IRosterIndex *index = AIndexes.first();
-		if (index->type()==RIT_STREAM_ROOT)
+		if (index->kind()==RIK_STREAM_ROOT)
 		{
 			int show = index->data(RDR_SHOW).toInt();
 			if (show!=IPresence::Offline && show!=IPresence::Error)
@@ -1212,7 +1212,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
 			}
 		}
-		else if (index->type() == RIT_GROUP_MUC)
+		else if (index->kind() == RIK_GROUP_MUC)
 		{
 			int show = index->parentIndex()->data(RDR_SHOW).toInt();
 			if (show!=IPresence::Offline && show!=IPresence::Error)
@@ -1221,7 +1221,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
 			}
 		}
-		else if (index->type() == RIT_MUC_ITEM)
+		else if (index->kind() == RIK_MUC_ITEM)
 		{
 			IMultiUserChatWindow *window =multiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 			if (window==NULL || FRostersViewPlugin->rostersView()->hasMultiSelection())

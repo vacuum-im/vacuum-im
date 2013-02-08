@@ -6,7 +6,8 @@
 #include <QQueue>
 #include <QMultiMap>
 #include <definitions/messagehandlerorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/recentitemtypes.h>
 #include <definitions/notificationtypes.h>

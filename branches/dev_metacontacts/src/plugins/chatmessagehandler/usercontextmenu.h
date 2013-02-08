@@ -1,7 +1,8 @@
 #ifndef USERCONTEXTMENU_H
 #define USERCONTEXTMENU_H
 
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imessagewidgets.h>

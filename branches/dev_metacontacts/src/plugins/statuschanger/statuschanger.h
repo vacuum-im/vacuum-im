@@ -10,7 +10,8 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/rosterlabels.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterlabelholderorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>

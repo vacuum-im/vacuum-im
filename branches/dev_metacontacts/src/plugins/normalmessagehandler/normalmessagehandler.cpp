@@ -461,11 +461,11 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> normalDialogTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK
-		<< RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-	static const QList<int> groupTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_AGENTS 
-		<< RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER;
-	static const QList<int> contactTypes =  QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+	static const QList<int> normalDialogKinds = QList<int>() << RIK_STREAM_ROOT << RIK_GROUP << RIK_GROUP_BLANK
+		<< RIK_GROUP_AGENTS << RIK_GROUP_MY_RESOURCES << RIK_GROUP_NOT_IN_ROSTER << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
+	static const QList<int> groupKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_AGENTS 
+		<< RIK_GROUP_MY_RESOURCES << RIK_GROUP_NOT_IN_ROSTER;
+	static const QList<int> contactKinds =  QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
 
 	if (!ASelected.isEmpty())
 	{
@@ -474,21 +474,21 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 		bool hasContacts = false;
 		foreach(IRosterIndex *index, ASelected)
 		{
-			int indexType = index->type();
+			int indexKind = index->kind();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!normalDialogTypes.contains(indexType))
+			if (!normalDialogKinds.contains(indexKind))
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;
-			else if (indexType==RIT_STREAM_ROOT && ASelected.count()>1)
+			else if (indexKind==RIK_STREAM_ROOT && ASelected.count()>1)
 				return false;
-			else if (hasGroups && !groupTypes.contains(indexType))
+			else if (hasGroups && !groupKinds.contains(indexKind))
 				return false;
-			else if (hasContacts && !contactTypes.contains(indexType))
+			else if (hasContacts && !contactKinds.contains(indexKind))
 				return false;
 			singleStream = streamJid;
-			hasGroups = hasGroups || groupTypes.contains(indexType);
-			hasContacts = hasContacts || contactTypes.contains(indexType);
+			hasGroups = hasGroups || groupKinds.contains(indexKind);
+			hasContacts = hasContacts || contactKinds.contains(indexKind);
 		}
 		return true;
 	}
@@ -639,11 +639,11 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 				QStringList contacts;
 				foreach(IRosterIndex *index, indexes)
 				{
-					if (index->type() == RIT_GROUP)
+					if (index->kind() == RIK_GROUP)
 						groups.append(index->data(RDR_GROUP).toString());
-					else if (index->type()>=RIT_GROUP_BLANK && index->type()<=RIT_GROUP_AGENTS)
-						groups.append(FRostersView->rostersModel()->singleGroupName(index->type()));
-					else if (index->type() != RIT_STREAM_ROOT)
+					else if (index->kind()>=RIK_GROUP_BLANK && index->kind()<=RIK_GROUP_AGENTS)
+						groups.append(FRostersView->rostersModel()->singleGroupName(index->kind()));
+					else if (index->kind() != RIK_STREAM_ROOT)
 						contacts.append(index->data(RDR_FULL_JID).toString());
 				}
 
@@ -682,11 +682,11 @@ void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> 
 			QStringList contacts;
 			foreach(IRosterIndex *index, AIndexes)
 			{
-				if (index->type() == RIT_GROUP)
+				if (index->kind() == RIK_GROUP)
 					groups.append(index->data(RDR_GROUP).toString());
-				else if (index->type()>=RIT_GROUP_BLANK && index->type()<=RIT_GROUP_AGENTS)
-					groups.append(FRostersView->rostersModel()->singleGroupName(index->type()));
-				else if (index->type() != RIT_STREAM_ROOT)
+				else if (index->kind()>=RIK_GROUP_BLANK && index->kind()<=RIK_GROUP_AGENTS)
+					groups.append(FRostersView->rostersModel()->singleGroupName(index->kind()));
+				else if (index->kind() != RIK_STREAM_ROOT)
 					contacts.append(index->data(RDR_FULL_JID).toString());
 			}
 

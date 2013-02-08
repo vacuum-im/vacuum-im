@@ -23,7 +23,7 @@ public:
 	virtual QMap<int, QVariant> itemData() const;
 	virtual QList<QStandardItem *> findChilds(const QMultiMap<int, QVariant> &AData, Qt::MatchFlags AFlags=Qt::MatchExactly, int AColumn=0) const;
 public:
-	static const int ItemTypeValue = QStandardItem::UserType+100;
+	static const int StandardItemTypeValue = QStandardItem::UserType+100;
 private:
 	QMap<int, QVariant> FData;
 };

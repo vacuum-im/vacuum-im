@@ -4,7 +4,8 @@
 #include <QTimer>
 #include <QDomDocument>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/menuicons.h>

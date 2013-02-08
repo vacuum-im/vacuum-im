@@ -165,12 +165,8 @@ QList<int> StatusIcons::rosterDataRoles() const
 
 QList<int> StatusIcons::rosterDataTypes() const
 {
-	static QList<int> indexTypes = QList<int>()
-	                               << RIT_STREAM_ROOT
-	                               << RIT_CONTACT
-	                               << RIT_AGENT
-	                               << RIT_MY_RESOURCE;
-	return indexTypes;
+	static QList<int> indexKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
+	return indexKinds;
 }
 
 QVariant StatusIcons::rosterData(const IRosterIndex *AIndex, int ARole) const

@@ -316,8 +316,8 @@ void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
 		{
 			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
-			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
-			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
+			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 				showVCardDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
 	}
@@ -333,7 +333,7 @@ void VCardPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes
 		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
 
 		bool canShowDialog = hasVCard(contactJid);
-		canShowDialog = canShowDialog || (stream!=NULL && stream->isOpen() && (index->type()==RIT_STREAM_ROOT || index->type()==RIT_CONTACT || index->type()==RIT_AGENT));
+		canShowDialog = canShowDialog || (stream!=NULL && stream->isOpen() && (index->kind()==RIK_STREAM_ROOT || index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT));
 		canShowDialog = canShowDialog || (FDiscovery!=NULL && FDiscovery->discoInfo(streamJid,contactJid.bare()).features.contains(NS_VCARD_TEMP));
 
 		if (canShowDialog)

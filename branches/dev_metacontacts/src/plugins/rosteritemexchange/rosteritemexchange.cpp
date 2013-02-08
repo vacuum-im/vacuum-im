@@ -294,8 +294,8 @@ bool RosterItemExchange::viewDropAction(IViewWidget *AWidget, const QDropEvent *
 Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	int indexType = AIndex->data(RDR_TYPE).toInt();
-	if (indexType==RIT_CONTACT || indexType==RIT_GROUP || indexType==RIT_AGENT)
+	int indexKind = AIndex->data(RDR_KIND).toInt();
+	if (indexKind==RIK_CONTACT || indexKind==RIK_GROUP || indexKind==RIK_AGENT)
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -308,8 +308,8 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 
-		int indexType = indexData.value(RDR_TYPE).toInt();
-		if (indexType==RIT_CONTACT || indexType==RIT_GROUP || indexType==RIT_AGENT)
+		int indexKind = indexData.value(RDR_KIND).toInt();
+		if (indexKind==RIK_CONTACT || indexKind==RIK_GROUP || indexKind==RIK_AGENT)
 		{
 			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
 			if (!indexJid.node().isEmpty())
@@ -410,8 +410,8 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 		QDataStream stream(AData->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 		
-		int indexType = indexData.value(RDR_TYPE).toInt();
-		if (indexType == RIT_GROUP)
+		int indexKind = indexData.value(RDR_KIND).toInt();
+		if (indexKind == RIK_GROUP)
 		{
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(indexData.value(RDR_STREAM_JID).toString()) : NULL;
 			QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
@@ -422,7 +422,7 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 				contactList.append(*it);
 			}
 		}
-		else if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 		{
 			IRosterItem ritem;
 			ritem.isValid = true;

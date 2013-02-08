@@ -1,2 +1,2 @@
-set(SOURCES rosterindex.cpp rostersmodel.cpp )
-set(HEADERS rosterindex.h rostersmodel.h )
+set(SOURCES rootindex.cpp rosterindex.cpp rostersmodel.cpp )
+set(HEADERS rootindex.h rosterindex.h rostersmodel.h )

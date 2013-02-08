@@ -1,22 +1,16 @@
-#ifndef ROSTERINDEX_H
-#define ROSTERINDEX_H
+#ifndef ROOTINDEX_H
+#define ROOTINDEX_H
 
 #include <interfaces/irostersmodel.h>
 
-class RostersModel;
-
-class RosterIndex :
-	public AdvancedItem,
+class RootIndex : 
 	public IRosterIndex
 {
 	Q_INTERFACES(IRosterIndex);
 public:
-	RosterIndex(int AKind, RostersModel *AModel);
-	~RosterIndex();
-	// AdvancedItem
-	virtual int type() const;
-	// IRosterIndex
-	virtual AdvancedItem *instance() { return this; }
+	RootIndex(AdvancedItemModel *AModel);
+	~RootIndex();
+	virtual AdvancedItem *instance() { return NULL; }
 	virtual int kind() const;
 	virtual int row() const;
 	virtual IRosterIndex *parentIndex() const;
@@ -32,7 +26,7 @@ public:
 	virtual void setData(const QVariant &AValue, int ARole = Qt::UserRole+1);
 	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const;
 private:
-	RostersModel *FModel;
+	AdvancedItemModel *FModel;
 };
 
-#endif // ROSTERINDEX_H
+#endif // ROOTINDEX_H

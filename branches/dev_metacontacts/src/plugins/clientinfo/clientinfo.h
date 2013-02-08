@@ -7,7 +7,8 @@
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/dataformtypes.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/resources.h>

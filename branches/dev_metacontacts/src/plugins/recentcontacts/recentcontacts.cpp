@@ -11,8 +11,9 @@
 #include <definitions/optionvalues.h>
 #include <definitions/shortcuts.h>
 #include <definitions/rosterlabels.h>
-#include <definitions/rosterindextyperole.h>
-#include <definitions/rosterindextypeorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterindexkindorders.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosterlabelholderorders.h>
@@ -173,7 +174,7 @@ bool RecentContacts::initObjects()
 		FRostersView->insertDragDropHandler(this);
 		FRostersView->insertLabelHolder(RLHO_RECENT_FILTER,this);
 		FRostersView->insertClickHooker(RCHO_RECENTCONTACTS,this);
-		FRostersViewPlugin->registerExpandableRosterIndexType(RIT_RECENT_ROOT,RDR_TYPE);
+		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_RECENT_ROOT,RDR_KIND);
 
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_INSERTFAVORITE,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFAVORITE,FRostersView->instance());
@@ -181,9 +182,9 @@ bool RecentContacts::initObjects()
 	}
 	if (FRostersModel)
 	{
-		FRootIndex = FRostersModel->createRosterIndex(RIT_RECENT_ROOT,FRostersModel->rootIndex());
+		FRootIndex = FRostersModel->createRosterIndex(RIK_RECENT_ROOT,FRostersModel->rootIndex());
 		FRootIndex->setData(Qt::DecorationRole,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT));
-		FRootIndex->setData(RDR_TYPE_ORDER,RITO_RECENT_ROOT);
+		FRootIndex->setData(RDR_KIND_ORDER,RIKO_RECENT_ROOT);
 		FRootIndex->setData(RDR_NAME,tr("Recent Contacts"));
 		FRootIndex->setRemoveOnLastChildRemoved(false);
 		FRootIndex->setRemoveChildsOnRemoved(false);
@@ -226,15 +227,15 @@ QList<int> RecentContacts::rosterDataRoles() const
 QList<int> RecentContacts::rosterDataTypes() const
 {
 	static const QList<int> types = QList<int>() 
-		<< RIT_RECENT_ROOT << RIT_RECENT_ITEM;
+		<< RIK_RECENT_ROOT << RIK_RECENT_ITEM;
 	return types;
 }
 
 QVariant RecentContacts::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
-	switch (AIndex->type())
+	switch (AIndex->kind())
 	{
-	case RIT_RECENT_ROOT:
+	case RIK_RECENT_ROOT:
 		{
 			QPalette palette = FRostersView!=NULL ? FRostersView->instance()->palette() : QPalette();
 			switch (ARole)
@@ -248,7 +249,7 @@ QVariant RecentContacts::rosterData(const IRosterIndex *AIndex, int ARole) const
 			}
 			break;
 		}
-	case RIT_RECENT_ITEM:
+	case RIK_RECENT_ITEM:
 		{
 			IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 			switch (ARole)
@@ -277,7 +278,7 @@ bool RecentContacts::setRosterData(IRosterIndex *AIndex, int ARole, const QVaria
 Qt::DropActions RecentContacts::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Qt::DropActions actions = Qt::IgnoreAction;
-	if (AIndex->data(RDR_TYPE).toInt()==RIT_RECENT_ITEM)
+	if (AIndex->data(RDR_KIND).toInt()==RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
@@ -314,7 +315,7 @@ bool RecentContacts::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool RecentContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
 	FMovedProxyDragHandlers.clear();
-	if (AHover->data(RDR_TYPE).toInt() == RIT_RECENT_ITEM)
+	if (AHover->data(RDR_KIND).toInt() == RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AHover);
 		if (proxy)
@@ -335,7 +336,7 @@ void RecentContacts::rosterDragLeave(const QDragLeaveEvent *AEvent)
 bool RecentContacts::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
 {
 	bool accepted = false;
-	if (AIndex->data(RDR_TYPE).toInt() == RIT_RECENT_ITEM)
+	if (AIndex->data(RDR_KIND).toInt() == RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
@@ -351,7 +352,7 @@ bool RecentContacts::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AI
 QList<quint32> RecentContacts::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
 {
 	QList<quint32> labels;
-	if (AOrder==RLHO_RECENT_FILTER && FSimpleContactsView && AIndex->type()==RIT_RECENT_ITEM)
+	if (AOrder==RLHO_RECENT_FILTER && FSimpleContactsView && AIndex->kind()==RIK_RECENT_ITEM)
 	{
 		labels.append(RLID_AVATAR_IMAGE);
 		labels.append(RLID_SCHANGER_STATUS);
@@ -368,9 +369,9 @@ AdvancedDelegateItem RecentContacts::rosterLabel(int AOrder, quint32 ALabelId, c
 
 bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	if (AOrder == RCHO_RECENTCONTACTS && AIndex->type()==RIT_RECENT_ITEM)
+	if (AOrder == RCHO_RECENTCONTACTS && AIndex->kind()==RIK_RECENT_ITEM)
 	{
-		QModelIndex modelIndex = FRostersView->mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex));
+		QModelIndex modelIndex = FRostersView->mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex));
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
 		{
@@ -388,7 +389,7 @@ bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, 
 
 bool RecentContacts::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	if (AOrder == RCHO_RECENTCONTACTS && AIndex->type()==RIT_RECENT_ITEM)
+	if (AOrder == RCHO_RECENTCONTACTS && AIndex->kind()==RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
@@ -432,7 +433,7 @@ QString RecentContacts::recentItemName(const IRecentItem &AItem) const
 IRecentItem RecentContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 {
 	IRecentItem item;
-	if (AIndex->type()==RIT_CONTACT)
+	if (AIndex->kind()==RIK_CONTACT)
 	{
 		item.type = REIT_CONTACT;
 		item.streamJid = AIndex->data(RDR_STREAM_JID).toString();
@@ -448,7 +449,7 @@ QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &
 	if (root)
 	{
 		QMultiMap<int, QVariant> findData;
-		findData.insertMulti(RDR_TYPE,RIT_CONTACT);
+		findData.insertMulti(RDR_KIND,RIK_CONTACT);
 		findData.insertMulti(RDR_PREP_BARE_JID,AItem.reference);
 		proxies =  sortItemProxies(root->findChilds(findData,true));
 	}
@@ -572,7 +573,7 @@ void RecentContacts::setMaximumVisibleItems(quint8 ACount)
 IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 {
 	static IRecentItem nullItem;
-	if (AIndex->type() == RIT_RECENT_ITEM)
+	if (AIndex->kind() == RIK_RECENT_ITEM)
 	{
 		IRecentItem item;
 		item.type = AIndex->data(RDR_RECENT_TYPE).toString();
@@ -702,7 +703,7 @@ void RecentContacts::createItemIndex(const IRecentItem &AItem)
 		IRecentItemHandler *handler = FItemHandlers.value(AItem.type);
 		if (handler)
 		{
-			index = FRostersModel->createRosterIndex(RIT_RECENT_ITEM,FRootIndex);
+			index = FRostersModel->createRosterIndex(RIK_RECENT_ITEM,FRootIndex);
 			index->setData(RDR_RECENT_TYPE,AItem.type);
 			index->setData(RDR_STREAM_JID,AItem.streamJid.pFull());
 			index->setData(RDR_RECENT_REFERENCE,AItem.reference);
@@ -1066,7 +1067,7 @@ bool RecentContacts::isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) 
 bool RecentContacts::isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const
 {
 	foreach(IRosterIndex *index, AIndexes)
-		if (index->type() != RIT_RECENT_ITEM)
+		if (index->kind() != RIK_RECENT_ITEM)
 			return false;
 	return true;
 }
@@ -1131,7 +1132,7 @@ void RecentContacts::onRostersModelStreamJidChanged(const Jid &ABefore, const Ji
 
 void RecentContacts::onRostersModelIndexInserted(IRosterIndex *AIndex)
 {
-	if (AIndex->type() != RIT_RECENT_ITEM)
+	if (AIndex->kind() != RIK_RECENT_ITEM)
 	{
 		IRecentItem item = recentItemForIndex(AIndex);
 		if (FVisibleItems.contains(item))
@@ -1208,7 +1209,7 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 	if (!blocked && ALabelId==AdvancedDelegateItem::DisplayId)
 	{
 		QSet<Action *> recentActions;
-		if (!FRostersView->hasMultiSelection() && AIndexes.value(0)->type()==RIT_RECENT_ROOT)
+		if (!FRostersView->hasMultiSelection() && AIndexes.value(0)->kind()==RIK_RECENT_ROOT)
 		{
 			Action *hideLater = new Action(AMenu);
 			hideLater->setText(tr("Hide Later Contacts"));

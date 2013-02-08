@@ -7,9 +7,10 @@
 #include <definitions/dataformtypes.h>
 #include <definitions/recentitemtypes.h>
 #include <definitions/recentitemproperties.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
-#include <definitions/rosterindextypeorders.h>
+#include <definitions/rosterindexkindorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/messagehandlerorders.h>

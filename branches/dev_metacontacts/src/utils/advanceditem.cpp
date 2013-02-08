@@ -16,7 +16,7 @@ AdvancedItem::AdvancedItem(const QIcon &AIcon, const QString &AText) : QStandard
 
 int AdvancedItem::type() const
 {
-	return ItemTypeValue;
+	return StandardItemTypeValue;
 }
 
 QStandardItem *AdvancedItem::clone() const

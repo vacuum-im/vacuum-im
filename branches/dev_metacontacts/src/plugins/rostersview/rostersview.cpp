@@ -96,7 +96,7 @@ QList<int> RostersView::rosterDataRoles() const
 
 QList<int> RostersView::rosterDataTypes() const
 {
-	static QList<int> dataTypes = QList<int>() << RIT_ANY_TYPE;
+	static QList<int> dataTypes = QList<int>() << RIK_ANY_KIND;
 	return dataTypes;
 }
 
@@ -166,7 +166,7 @@ QList<quint32> RostersView::rosterLabels(int AOrder, const IRosterIndex *AIndex)
 	{
 		if (AIndex->parentIndex()==FRostersModel->rootIndex())
 			labels.append(AdvancedDelegateItem::DisplayId);
-		else if (FRostersModel->isGroupType(AIndex->type()))
+		else if (FRostersModel->isGroupKind(AIndex->kind()))
 			labels.append(AdvancedDelegateItem::DisplayId);
 	}
 	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && FActiveNotifies.contains(index))
@@ -191,7 +191,7 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 		label.d->data = AIndex->data(Qt::DisplayRole);
 		if (AIndex->parentIndex()==FRostersModel->rootIndex())
 			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
-		else if (FRostersModel->isGroupType(AIndex->type()))
+		else if (FRostersModel->isGroupKind(AIndex->kind()))
 			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::DemiBold);
 	}
 	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
@@ -228,7 +228,6 @@ void RostersView::setRostersModel(IRostersModel *AModel)
 
 		if (FRostersModel)
 		{
-			disconnect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),this,SLOT(onIndexInserted(IRosterIndex *)));
 			disconnect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onIndexDestroyed(IRosterIndex *)));
 			FRostersModel->removeDefaultDataHolder(this);
 			clearLabels();
@@ -265,7 +264,7 @@ bool RostersView::repaintRosterIndex(IRosterIndex *AIndex)
 {
 	if (FRostersModel)
 	{
-		QModelIndex modelIndex = mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex));
+		QModelIndex modelIndex = mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex));
 		if (modelIndex.isValid())
 		{
 			QRect rect = visualRect(modelIndex).adjusted(1,1,-1,-1);
@@ -281,7 +280,7 @@ bool RostersView::repaintRosterIndex(IRosterIndex *AIndex)
 
 void RostersView::expandIndexParents(IRosterIndex *AIndex)
 {
-	QModelIndex index = FRostersModel->modelIndexByRosterIndex(AIndex);
+	QModelIndex index = FRostersModel->modelIndexFromRosterIndex(AIndex);
 	index = mapFromModel(index);
 	expandIndexParents(index);
 }
@@ -298,7 +297,7 @@ void RostersView::expandIndexParents(const QModelIndex &AIndex)
 
 bool RostersView::editRosterIndex(IRosterIndex *AIndex, int ADataRole)
 {
-	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)) : QModelIndex();
+	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex)) : QModelIndex();
 	if (index.isValid() && state()==NoState && !visualRect(index).isEmpty())
 	{
 		for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); ++it)
@@ -387,7 +386,7 @@ void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEven
 	{
 		quint32 labelId = AdvancedDelegateItem::DisplayId;
 		if (FRostersModel && AEvent!=NULL)
-			labelId = labelAt(AEvent->pos(),mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)));
+			labelId = labelAt(AEvent->pos(),mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex)));
 
 		emit indexToolTips(AIndex,labelId,AToolTips);
 		if (labelId!=AdvancedDelegateItem::DisplayId && AToolTips.isEmpty())
@@ -494,7 +493,7 @@ QList<IRosterIndex *> RostersView::selectedRosterIndexes() const
 	{
 		foreach(QModelIndex modelIndex, selectionModel()->selectedIndexes())
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(modelIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(modelIndex));
 			if (index)
 				rosterIndexes.append(index);
 		}
@@ -515,14 +514,14 @@ bool RostersView::setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes
 
 			foreach(IRosterIndex *index, oldSelected)
 			{
-				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
+				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexFromRosterIndex(index));
 				if (mindex.isValid())
 					selectionModel()->select(mindex, QItemSelectionModel::Deselect);
 			}
 
 			foreach(IRosterIndex *index, newSelected)
 			{
-				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
+				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexFromRosterIndex(index));
 				if (mindex.isValid())
 					selectionModel()->select(mindex, QItemSelectionModel::Select);
 			}
@@ -1033,7 +1032,7 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 		QModelIndex viewIndex = indexAt(helpEvent->pos());
 		if (FRostersModel && viewIndex.isValid())
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
 				QMap<int,QString> toolTipsMap;
@@ -1099,7 +1098,7 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 		QModelIndex viewIndex = indexAt(AEvent->pos());
 		if (FRostersModel && viewIndex.isValid())
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
 				int notifyId = FActiveNotifies.value(index,-1);
@@ -1143,7 +1142,7 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 	if (FRostersModel && !FStartDragFailed && AEvent->buttons()!=Qt::NoButton && FPressedIndex.isValid() && 
 		(AEvent->pos()-FPressedPos).manhattanLength()>QApplication::startDragDistance() && selectedIndexes().count()==1)
 	{
-		IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(FPressedIndex));
+		IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(FPressedIndex));
 		
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(new QMimeData);
@@ -1200,7 +1199,7 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 		quint32 labelId = labelAt(AEvent->pos(),viewIndex);
 		if (FRostersModel && FPressedIndex.isValid() && FPressedIndex==viewIndex && FPressedLabel==labelId)
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index)
 				singleClickOnIndex(index,AEvent);
 		}
@@ -1227,7 +1226,7 @@ void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
 
 void RostersView::dropEvent(QDropEvent *AEvent)
 {
-	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(indexAt(AEvent->pos()))) : NULL;
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexFromModelIndex(mapToModel(indexAt(AEvent->pos()))) : NULL;
 	if (index)
 	{
 		Menu *dropMenu = new Menu(this);
@@ -1280,7 +1279,7 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	QModelIndex modelIndex = indexAt(AEvent->pos());
-	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(modelIndex)) : NULL;
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexFromModelIndex(mapToModel(modelIndex)) : NULL;
 	if (index)
 	{
 		bool accepted = false;

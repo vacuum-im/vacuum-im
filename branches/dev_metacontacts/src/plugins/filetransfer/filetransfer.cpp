@@ -224,7 +224,7 @@ bool FileTransfer::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
 	Q_UNUSED(AEvent);
-	return AHover->data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover->data(RDR_STREAM_JID).toString(), AHover->data(RDR_FULL_JID).toString());
+	return AHover->data(RDR_KIND).toInt()!=RIK_STREAM_ROOT && isSupported(AHover->data(RDR_STREAM_JID).toString(), AHover->data(RDR_FULL_JID).toString());
 }
 
 void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
@@ -234,7 +234,7 @@ void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
 
 bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
 {
-	if (AEvent->dropAction()!=Qt::IgnoreAction && AIndex->data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && 
+	if (AEvent->dropAction()!=Qt::IgnoreAction && AIndex->data(RDR_KIND).toInt()!=RIK_STREAM_ROOT && 
 		isSupported(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString()))
 	{
 		Action *action = new Action(AMenu);
@@ -759,8 +759,8 @@ void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		if (AId == SCT_ROSTERVIEW_SENDFILE)
 		{
 			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
-			if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
+			if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 				sendFile(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
 		}
 	}

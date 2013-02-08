@@ -3,7 +3,8 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>

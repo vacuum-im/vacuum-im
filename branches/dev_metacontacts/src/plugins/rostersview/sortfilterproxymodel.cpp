@@ -57,8 +57,8 @@ bool SortFilterProxyModel::compareVariant( const QVariant &ALeft, const QVariant
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-	int leftTypeOrder = ALeft.data(RDR_TYPE_ORDER).toInt();
-	int rightTypeOrder = ARight.data(RDR_TYPE_ORDER).toInt();
+	int leftTypeOrder = ALeft.data(RDR_KIND_ORDER).toInt();
+	int rightTypeOrder = ARight.data(RDR_KIND_ORDER).toInt();
 	if (leftTypeOrder == rightTypeOrder)
 	{
 		QVariant leftSortOrder = ALeft.data(RDR_SORT_ORDER);
@@ -67,7 +67,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 		{
 			int leftShow = ALeft.data(RDR_SHOW).toInt();
 			int rightShow = ARight.data(RDR_SHOW).toInt();
-			if (FSortByStatus && leftTypeOrder!=RIT_STREAM_ROOT && leftShow!=rightShow)
+			if (FSortByStatus && leftTypeOrder!=RIK_STREAM_ROOT && leftShow!=rightShow)
 			{
 				const static int showOrders[] = {6,2,1,3,4,5,7,8};
 				return showOrders[leftShow] < showOrders[rightShow];

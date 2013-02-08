@@ -397,7 +397,7 @@ bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-	if (AIndex->type()==RIT_AGENT && FSelfCaps.contains(streamJid))
+	if (AIndex->kind()==RIK_AGENT && FSelfCaps.contains(streamJid))
 	{
 		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
 	}
@@ -1277,18 +1277,18 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
-		int indexType = AIndexes.first()->type();
-		if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT || indexType==RIT_MY_RESOURCE)
+		int indexKind = AIndexes.first()->kind();
+		if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_MY_RESOURCE)
 		{
 			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
-			Jid contactJid = indexType!=RIT_STREAM_ROOT ? AIndexes.first()->data(RDR_FULL_JID).toString() : streamJid.domain();
+			Jid contactJid = indexKind!=RIK_STREAM_ROOT ? AIndexes.first()->data(RDR_FULL_JID).toString() : streamJid.domain();
 
 			if (FSelfCaps.contains(streamJid))
 			{
 				Action *action = createDiscoInfoAction(streamJid, contactJid, QString::null, AMenu);
 				AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
 
-				if (indexType == RIT_STREAM_ROOT || indexType == RIT_AGENT)
+				if (indexKind == RIK_STREAM_ROOT || indexKind == RIK_AGENT)
 				{
 					action = createDiscoItemsAction(streamJid, contactJid, QString::null, AMenu);
 					AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
@@ -1310,7 +1310,7 @@ void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabe
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
+		Jid contactJid = AIndex->kind()==RIK_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
 		if (hasDiscoInfo(streamJid,contactJid))
 		{
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);

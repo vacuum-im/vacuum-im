@@ -25,7 +25,7 @@ public:
 	virtual QVariant advancedItemData(int ARole, int AOrder, const QStandardItem *AItem) const;
 	virtual bool setAdvancedItemData(const QVariant &AValue, int ARole, int AOrder, QStandardItem *AItem);
 protected:
-	void emitItemDataChanged(AdvancedItemModel *AModel, QStandardItem *AItem, int ARole);
+	void emitItemDataChanged(QStandardItem *AItem, int ARole);
 };
 
 class UTILS_EXPORT AdvancedItemModel :
@@ -37,6 +37,10 @@ public:
 	// QStandardItemModel
 	QMap<int, QVariant> itemData(const QModelIndex &AIndex) const;
 	// AdvancedItemModel
+	bool isDelayedDataChangedSignals() const;
+	void setDelayedDataChangedSignals(bool AEnabed);
+	bool isRecursiveParentDataChangedSignals() const;
+	void setRecursiveParentDataChangedSignals(bool AEnabled);
 	QList<QStandardItem *> findItems(const QMultiMap<int, QVariant> &AData, const QStandardItem *AParent=NULL, Qt::MatchFlags AFlags=Qt::MatchExactly, int AColumn=0) const;
 public:
 	// Sort Handlers
@@ -48,14 +52,27 @@ public:
 	void insertItemDataHandler(int AOrder, AdvancedItemDataHandler *AHandler);
 	void removeItemDataHandler(int AOrder, AdvancedItemDataHandler *AHandler);
 signals:
+	void itemInserted(QStandardItem *AItem);
+	void itemRemoved(QStandardItem *AItem);
 	void itemDataChanged(QStandardItem *AItem, int ARole);
 public:
 	static const int AnyRole = -1;
 protected:
+	void emitItemChanged(QStandardItem *AItem);
 	void emitItemDataChanged(QStandardItem *AItem, int ARole);
+protected:
+	void onEmitDelayedDataChangedSignals();
+	void onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
+	void onColumnsInserted(const QModelIndex &AParent, int AStart, int AEnd);
+	void onRowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
+	void onColumnsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 private:
 	friend class AdvancedItem;
 	friend class AdvancedItemDataHandler;
+private:
+	bool FDelayedDataChangedSignals;
+	bool FRecursiveParentDataChangedSignals;
+	QMultiMap<QStandardItem *, int> FChangedItems;
 	QMultiMap<int, AdvancedItemSortHandler *> FItemSortHandlers;
 	QMap<int, QMultiMap<int, AdvancedItemDataHandler *> > FItemDataHandlers;
 };

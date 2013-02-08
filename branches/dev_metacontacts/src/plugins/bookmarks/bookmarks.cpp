@@ -185,13 +185,13 @@ QList<int> Bookmarks::rosterDataRoles() const
 
 QList<int> Bookmarks::rosterDataTypes() const
 {
-	static const QList<int> dataTypes = QList<int>() << RIT_MUC_ITEM;
+	static const QList<int> dataTypes = QList<int>() << RIK_MUC_ITEM;
 	return dataTypes;
 }
 
 QVariant Bookmarks::rosterData(const IRosterIndex *AIndex, int ARole) const
 {
-	if (AIndex->type() == RIT_MUC_ITEM)
+	if (AIndex->kind() == RIK_MUC_ITEM)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
@@ -219,7 +219,7 @@ bool Bookmarks::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &A
 
 quint32 Bookmarks::rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const
 {
-	if (AOrder==REHO_BOOKMARKS_RENAME && ADataRole==RDR_NAME && AIndex.data(RDR_TYPE).toInt()==RIT_MUC_ITEM)
+	if (AOrder==REHO_BOOKMARKS_RENAME && ADataRole==RDR_NAME && AIndex.data(RDR_KIND).toInt()==RIK_MUC_ITEM)
 	{
 		IBookmark bookmark;
 		bookmark.type = IBookmark::Conference;
@@ -241,7 +241,7 @@ AdvancedDelegateEditProxy *Bookmarks::rosterEditProxy(int AOrder, int ADataRole,
 bool Bookmarks::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex)
 {
 	Q_UNUSED(AModel);
-	if (ADelegate->editRole()==RDR_NAME && AIndex.data(RDR_TYPE)==RIT_MUC_ITEM)
+	if (ADelegate->editRole()==RDR_NAME && AIndex.data(RDR_KIND)==RIK_MUC_ITEM)
 	{
 		IBookmark bookmark;
 		bookmark.type = IBookmark::Conference;
@@ -362,7 +362,7 @@ bool Bookmarks::isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const
 	Jid streamJid;
 	foreach(IRosterIndex *index, AIndexes)
 	{
-		if (index->type() != RIT_MUC_ITEM)
+		if (index->kind() != RIK_MUC_ITEM)
 			return false;
 		if (streamJid.isEmpty())
 			streamJid = index->data(RDR_STREAM_JID).toString();
@@ -542,7 +542,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 		Jid streamJid = index->data(RDR_STREAM_JID).toString();
 		if (FBookmarks.contains(streamJid))
 		{
-			if (!FRostersView->hasMultiSelection() && index->type()==RIT_STREAM_ROOT)
+			if (!FRostersView->hasMultiSelection() && index->kind()==RIK_STREAM_ROOT)
 			{
 				QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
 				if (!bookmarkList.isEmpty())

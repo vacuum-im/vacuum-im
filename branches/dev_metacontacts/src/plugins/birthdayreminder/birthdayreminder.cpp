@@ -219,7 +219,7 @@ bool BirthdayReminder::updateBirthdayState(const Jid &AContactJid)
 	if (isStateChanged && FRostersViewPlugin && FRostersModel)
 	{
 		QMultiMap<int, QVariant> findData;
-		findData.insert(RDR_TYPE,RIT_CONTACT);
+		findData.insert(RDR_KIND,RIK_CONTACT);
 		findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		foreach (IRosterIndex *index, FRostersModel->rootIndex()->findChilds(findData,true))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,index);
@@ -313,7 +313,7 @@ void BirthdayReminder::onNotificationRemoved(int ANotifyId)
 
 void BirthdayReminder::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin && AIndex->type() == RIT_CONTACT)
+	if (FRostersViewPlugin && AIndex->kind() == RIK_CONTACT)
 	{
 		if (FUpcomingBirthdays.contains(AIndex->data(RDR_PREP_BARE_JID).toString()))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,AIndex);

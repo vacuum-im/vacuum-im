@@ -829,7 +829,7 @@ void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes,
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
-		if (index->type() == RIT_CONTACT || index->type() == RIT_AGENT || index->type() == RIT_MY_RESOURCE)
+		if (index->kind() == RIK_CONTACT || index->kind() == RIK_AGENT || index->kind() == RIK_MY_RESOURCE)
 		{
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;

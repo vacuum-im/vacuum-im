@@ -1,7 +1,8 @@
 #ifndef RECEIVERSWIDGET_H
 #define RECEIVERSWIDGET_H
 
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>

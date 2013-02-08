@@ -219,7 +219,7 @@ bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AInd
 bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
 	Q_UNUSED(AOrder);
-	if (AEvent->modifiers()==Qt::NoModifier && (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_MY_RESOURCE))
+	if (AEvent->modifiers()==Qt::NoModifier && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_MY_RESOURCE))
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
@@ -613,13 +613,13 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 
 bool ChatMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> chatDialogTypes = QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
+	static const QList<int> chatDialogKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
 	if (!ASelected.isEmpty())
 	{
 		foreach(IRosterIndex *index, ASelected)
 		{
-			int indexType = index->type();
-			if (!chatDialogTypes.contains(indexType))
+			int indexKinds = index->kind();
+			if (!chatDialogKinds.contains(indexKinds))
 				return false;
 		}
 		return true;
