@@ -182,14 +182,12 @@ bool RecentContacts::initObjects()
 	}
 	if (FRostersModel)
 	{
-		FRootIndex = FRostersModel->createRosterIndex(RIK_RECENT_ROOT,FRostersModel->rootIndex());
-		FRootIndex->setData(Qt::DecorationRole,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT));
-		FRootIndex->setData(RDR_KIND_ORDER,RIKO_RECENT_ROOT);
-		FRootIndex->setData(RDR_NAME,tr("Recent Contacts"));
-		FRootIndex->setRemoveOnLastChildRemoved(false);
-		FRootIndex->setRemoveChildsOnRemoved(false);
-		FRootIndex->setDestroyOnParentRemoved(false);
-		FRootIndex->insertDataHolder(this);
+		FRootIndex = FRostersModel->newRosterIndex(RIK_RECENT_ROOT,FRostersModel->rootIndex());
+		FRootIndex->setData(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT),Qt::DecorationRole);
+		FRootIndex->setData(RIKO_RECENT_ROOT,RDR_KIND_ORDER);
+		FRootIndex->setData(tr("Recent Contacts"),RDR_NAME);
+
+		FRostersModel->insertRosterDataHolder(RDHO_RECENTCONTACTS,this);
 	}
 	registerItemHandler(REIT_CONTACT,this);
 	return true;
@@ -210,68 +208,60 @@ bool RecentContacts::startPlugin()
 	return true;
 }
 
-int RecentContacts::rosterDataOrder() const
+QList<int> RecentContacts::rosterDataRoles(int AOrder) const
 {
-	return RDHO_DEFAULT;
-}
-
-QList<int> RecentContacts::rosterDataRoles() const
-{
-	static const QList<int> roles = QList<int>() 
-		<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole 
-		<< RDR_NAME << RDR_SHOW << RDR_STATUS 
-		<< RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_ALLWAYS_VISIBLE;
-	return roles;
-}
-
-QList<int> RecentContacts::rosterDataTypes() const
-{
-	static const QList<int> types = QList<int>() 
-		<< RIK_RECENT_ROOT << RIK_RECENT_ITEM;
-	return types;
-}
-
-QVariant RecentContacts::rosterData(const IRosterIndex *AIndex, int ARole) const
-{
-	switch (AIndex->kind())
+	if (AOrder == RDHO_RECENTCONTACTS)
 	{
-	case RIK_RECENT_ROOT:
+		return QList<int>() 
+			<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole 
+			<< RDR_NAME << RDR_SHOW << RDR_STATUS 
+			<< RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_ALLWAYS_VISIBLE;
+	}
+	return QList<int>();
+}
+
+QVariant RecentContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
+{
+	if (AOrder == RDHO_RECENTCONTACTS)
+	{
+		switch (AIndex->kind())
 		{
-			QPalette palette = FRostersView!=NULL ? FRostersView->instance()->palette() : QPalette();
-			switch (ARole)
+		case RIK_RECENT_ROOT:
 			{
-			case Qt::ForegroundRole:
-				return palette.color(QPalette::Active, QPalette::BrightText);
-			case Qt::BackgroundColorRole:
-				return palette.color(QPalette::Active, QPalette::Dark);
-			case RDR_ALLWAYS_VISIBLE:
-				return 1;
+				QPalette palette = FRostersView!=NULL ? FRostersView->instance()->palette() : QPalette();
+				switch (ARole)
+				{
+				case Qt::ForegroundRole:
+					return palette.color(QPalette::Active, QPalette::BrightText);
+				case Qt::BackgroundColorRole:
+					return palette.color(QPalette::Active, QPalette::Dark);
+				case RDR_ALLWAYS_VISIBLE:
+					return 1;
+				}
+				break;
 			}
-			break;
-		}
-	case RIK_RECENT_ITEM:
-		{
-			IRosterIndex *proxy = FIndexToProxy.value(AIndex);
-			switch (ARole)
+		case RIK_RECENT_ITEM:
 			{
-			case RDR_SHOW:
-				return proxy!=NULL ? proxy->data(ARole) : IPresence::Offline;
-			case RDR_ALLWAYS_VISIBLE:
-				return (proxy!=NULL ? proxy->data(ARole).toInt() : 0) + (FAllwaysShowOffline ? 1 : 0);
-			default:
-				return proxy!=NULL ? proxy->data(ARole) : QVariant();
+				IRosterIndex *proxy = FIndexToProxy.value(AIndex);
+				switch (ARole)
+				{
+				case RDR_SHOW:
+					return proxy!=NULL ? proxy->data(ARole) : IPresence::Offline;
+				case RDR_ALLWAYS_VISIBLE:
+					return (proxy!=NULL ? proxy->data(ARole).toInt() : 0) + (FAllwaysShowOffline ? 1 : 0);
+				default:
+					return proxy!=NULL ? proxy->data(ARole) : QVariant();
+				}
+				break;
 			}
-			break;
 		}
 	}
 	return QVariant();
 }
 
-bool RecentContacts::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool RecentContacts::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex);
-	Q_UNUSED(ARole);
-	Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
 }
 
@@ -290,12 +280,12 @@ Qt::DropActions RecentContacts::rosterDragStart(const QMouseEvent *AEvent, IRost
 			{
 				QByteArray proxyData;
 				QDataStream proxyStream(&proxyData,QIODevice::WriteOnly);
-				operator<<(proxyStream,proxy->data());
+				operator<<(proxyStream,proxy->indexData());
 				ADrag->mimeData()->setData(DDT_ROSTERSVIEW_INDEX_DATA,proxyData);
 
 				QByteArray indexData;
 				QDataStream indexStream(&indexData,QIODevice::WriteOnly);
-				operator<<(indexStream,AIndex->data());
+				operator<<(indexStream,AIndex->indexData());
 				ADrag->mimeData()->setData(DDT_RECENT_INDEX_DATA,indexData);
 			}
 		}
@@ -445,7 +435,7 @@ IRecentItem RecentContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &AItem) const
 {
 	QList<IRosterIndex *> proxies;
-	IRosterIndex *root = FRostersModel!=NULL ? FRostersModel->streamRoot(AItem.streamJid) : NULL;
+	IRosterIndex *root = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AItem.streamJid) : NULL;
 	if (root)
 	{
 		QMultiMap<int, QVariant> findData;
@@ -703,12 +693,11 @@ void RecentContacts::createItemIndex(const IRecentItem &AItem)
 		IRecentItemHandler *handler = FItemHandlers.value(AItem.type);
 		if (handler)
 		{
-			index = FRostersModel->createRosterIndex(RIK_RECENT_ITEM,FRootIndex);
-			index->setData(RDR_RECENT_TYPE,AItem.type);
-			index->setData(RDR_STREAM_JID,AItem.streamJid.pFull());
-			index->setData(RDR_RECENT_REFERENCE,AItem.reference);
-			index->insertDataHolder(this);
-			FRostersModel->insertRosterIndex(index,FRootIndex);
+			index = FRostersModel->newRosterIndex(RIK_RECENT_ITEM,FRootIndex);
+			index->setData(AItem.type,RDR_RECENT_TYPE);
+			index->setData(AItem.streamJid.pFull(),RDR_STREAM_JID);
+			index->setData(AItem.reference,RDR_RECENT_REFERENCE);
+			FRootIndex->appendChild(index);
 
 			FVisibleItems.insert(AItem,index);
 			emit recentItemIndexCreated(AItem,index);
@@ -735,16 +724,16 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 			IRecentItemHandler *handler = FItemHandlers.value(item.type);
 			if (handler)
 			{
-				index->setData(RDR_NAME, handler->recentItemName(item));
-				index->setData(Qt::DecorationRole, handler->recentItemIcon(item));
+				index->setData(handler->recentItemName(item),RDR_NAME);
+				index->setData(handler->recentItemIcon(item),Qt::DecorationRole);
 			}
 		}
-		index->setData(RDR_RECENT_DATETIME,item.activeTime);
+		index->setData(item.activeTime,RDR_RECENT_DATETIME);
 		
 		if (FSortByLastActivity)
-			index->setData(RDR_SORT_ORDER, (int)(favorite ? 0x80000000 : item.activeTime.secsTo(zero)));
+			index->setData((int)(favorite ? 0x80000000 : item.activeTime.secsTo(zero)),RDR_SORT_ORDER);
 		else
-			index->setData(RDR_SORT_ORDER, favorite ? QString("") : index->data(Qt::DisplayRole).toString());
+			index->setData(favorite ? QString("") : index->data(Qt::DisplayRole).toString(),RDR_SORT_ORDER);
 
 		if (FRostersView)
 		{
@@ -764,7 +753,6 @@ void RecentContacts::removeItemIndex(const IRecentItem &AItem)
 		FIndexProxies.remove(index);
 		FProxyToIndex.remove(FIndexToProxy.take(index));
 		FRostersModel->removeRosterIndex(index);
-		delete index->instance();
 	}
 }
 
@@ -783,9 +771,6 @@ void RecentContacts::updateItemProxy(const IRecentItem &AItem)
 			IRosterIndex *oldProxy = FIndexToProxy.value(index);
 			if (oldProxy != proxy)
 			{
-				if (oldProxy)
-					disconnect(oldProxy->instance());
-
 				if (proxy)
 				{
 					FIndexToProxy.insert(index,proxy);
@@ -1099,7 +1084,7 @@ void RecentContacts::setItemsFavorite(bool AFavorite, const QStringList &ATypes,
 void RecentContacts::onRostersModelStreamAdded(const Jid &AStreamJid)
 {
 	if (FRostersModel && FStreamItems.isEmpty())
-		FRostersModel->insertRosterIndex(FRootIndex,FRostersModel->rootIndex());
+		FRostersModel->rootIndex()->appendChild(FRootIndex);
 
 	FStreamItems[AStreamJid].clear();
 	mergeRecentItems(AStreamJid,loadItemsFromFile(recentFileName(AStreamJid)),true);
@@ -1113,7 +1098,7 @@ void RecentContacts::onRostersModelStreamRemoved(const Jid &AStreamJid)
 	updateVisibleItems();
 	
 	if (FRostersModel && FStreamItems.isEmpty())
-		FRostersModel->removeRosterIndex(FRootIndex);
+		FRootIndex->remove(false);
 }
 
 void RecentContacts::onRostersModelStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
@@ -1144,9 +1129,9 @@ void RecentContacts::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int AR
 {
 	if (FProxyToIndex.contains(AIndex))
 	{
-		static const QList<int> updateItemRoles = QList<int>() << 0 << RDR_SHOW << RDR_PRIORITY;
-		static const QList<int> updateDataRoles = QList<int>() << 0 << Qt::DecorationRole << Qt::DisplayRole;
-		static const QList<int> updatePropertiesRoles = QList<int>() << 0 << RDR_NAME;
+		static const QList<int> updateItemRoles = QList<int>() << RDR_SHOW << RDR_PRIORITY;
+		static const QList<int> updateDataRoles = QList<int>() << Qt::DecorationRole << Qt::DisplayRole;
+		static const QList<int> updatePropertiesRoles = QList<int>() << RDR_NAME;
 		
 		if (updateItemRoles.contains(ARole))
 			emit recentItemUpdated(recentItemForIndex(AIndex));

@@ -43,15 +43,13 @@ void AdvancedItem::write(QDataStream &AOut) const
 QVariant AdvancedItem::data(int ARole) const
 {
 	QVariant value;
-
 	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
 	if (advModel)
 	{
-		const QMultiMap<int, AdvancedItemDataHandler *> &handlers = advModel->itemDataHandlers(ARole);
-		for(QMultiMap<int, AdvancedItemDataHandler *>::const_iterator it=handlers.constBegin(); value.isNull() && it!=handlers.constEnd(); ++it)
-			value = it.value()->advancedItemData(ARole,it.key(),this);
+		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(ARole);
+		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); value.isNull() && it!=holders.constEnd(); ++it)
+			value = it.value()->advancedItemData(it.key(),this,ARole);
 	}
-
 	return value.isNull() ? FData.value(ARole) : value;
 }
 
@@ -60,9 +58,9 @@ void AdvancedItem::setData(const QVariant &AValue, int ARole)
 	AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
 	if (advModel)
 	{
-		const QMultiMap<int, AdvancedItemDataHandler *> &handlers = advModel->itemDataHandlers(ARole);
-		for(QMultiMap<int, AdvancedItemDataHandler *>::const_iterator it=handlers.constBegin(); it!=handlers.constEnd(); ++it)
-			if (it.value()->setAdvancedItemData(AValue,ARole,it.key(),this))
+		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(ARole);
+		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); it!=holders.constEnd(); ++it)
+			if (it.value()->setAdvancedItemData(it.key(),AValue,this,ARole))
 				return;
 	}
 
@@ -110,29 +108,27 @@ bool AdvancedItem::operator <(const QStandardItem &AOther) const
 QMap<int, QVariant> AdvancedItem::itemData() const
 {
 	QMap<int, QVariant> values = FData;
-
 	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
 	if (advModel)
 	{
-		QList<int> handlerRoles;
-		const QMultiMap<int, AdvancedItemDataHandler *> &handlers = advModel->itemDataHandlers(AdvancedItemModel::AnyRole);
-		for(QMultiMap<int, AdvancedItemDataHandler *>::const_iterator it=handlers.constBegin(); it!=handlers.constEnd(); ++it)
+		QList<int> holderRoles;
+		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(AdvancedItemModel::AnyRole);
+		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); it!=holders.constEnd(); ++it)
 		{
 			foreach(int role, it.value()->advancedItemDataRoles(it.key()))
 			{
-				if (!handlerRoles.contains(role))
+				if (!holderRoles.contains(role))
 				{
-					QVariant value = it.value()->advancedItemData(role,it.key(),this);
+					QVariant value = it.value()->advancedItemData(it.key(),this,role);
 					if (!value.isNull())
 					{
 						values.insert(role,value);
-						handlerRoles.append(role);
+						holderRoles.append(role);
 					}
 				}
 			}
 		}
 	}
-
 	return values;
 }
 

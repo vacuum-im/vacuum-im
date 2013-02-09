@@ -123,6 +123,10 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 	if (plugin)
 	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+		if (FRostersModel)
+		{
+			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
@@ -705,38 +709,37 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 	IRosterIndex *chatIndex = findMultiChatRosterIndex(AStreamJid,ARoomJid);
 	if (chatIndex==NULL)
 	{
-		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
+		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AStreamJid) : NULL;
 		if (sroot)
 		{
-			IRosterIndex *chatGroup = FRostersModel->createGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",sroot);
-			chatGroup->setData(RDR_KIND_ORDER,RIKO_GROUP_MUC);
+			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",sroot);
+			chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
 
-			chatIndex = FRostersModel->createRosterIndex(RIK_MUC_ITEM,chatGroup);
+			chatIndex = FRostersModel->newRosterIndex(RIK_MUC_ITEM,chatGroup);
 			FChatIndexes.append(chatIndex);
 
-			chatIndex->setData(RDR_STREAM_JID,AStreamJid.pFull());
-			chatIndex->setData(RDR_FULL_JID,ARoomJid.full());
-			chatIndex->setData(RDR_PREP_FULL_JID,ARoomJid.pFull());
-			chatIndex->setData(RDR_PREP_BARE_JID,ARoomJid.pBare());
+			chatIndex->setData(AStreamJid.pFull(),RDR_STREAM_JID);
+			chatIndex->setData(ARoomJid.full(),RDR_FULL_JID);
+			chatIndex->setData(ARoomJid.pFull(),RDR_PREP_FULL_JID);
+			chatIndex->setData(ARoomJid.pBare(),RDR_PREP_BARE_JID);
 
 			IMultiUserChatWindow *window = multiChatWindow(AStreamJid,ARoomJid);
 			if (window == NULL)
 			{
 				if (FStatusIcons)
-					chatIndex->setData(Qt::DecorationRole,FStatusIcons->iconByJidStatus(ARoomJid,IPresence::Offline,SUBSCRIPTION_BOTH,false));
-				chatIndex->setData(RDR_STATUS,QString());
-				chatIndex->setData(RDR_SHOW,IPresence::Offline);
-				chatIndex->setData(RDR_NAME,getRoomName(AStreamJid,ARoomJid));
-				chatIndex->setData(RDR_MUC_NICK,ANick);
-				chatIndex->setData(RDR_MUC_PASSWORD,APassword);
+					chatIndex->setData(FStatusIcons->iconByJidStatus(ARoomJid,IPresence::Offline,SUBSCRIPTION_BOTH,false),Qt::DecorationRole);
+				chatIndex->setData(QString(),RDR_STATUS);
+				chatIndex->setData(IPresence::Offline,RDR_SHOW);
+				chatIndex->setData(getRoomName(AStreamJid,ARoomJid),RDR_NAME);
+				chatIndex->setData(ANick,RDR_MUC_NICK);
+				chatIndex->setData(APassword,RDR_MUC_PASSWORD);
 			}
 			else
 			{
 				updateChatRosterIndex(window);
 			}
 
-			connect(chatIndex->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
-			FRostersModel->insertRosterIndex(chatIndex,chatGroup);
+			chatGroup->appendChild(chatIndex);
 			emit multiChatRosterIndexCreated(chatIndex);
 
 			updateRecentItemProxy(chatIndex);
@@ -872,15 +875,15 @@ void MultiUserChatPlugin::updateChatRosterIndex(IMultiUserChatWindow *AWindow)
 	if (chatIndex)
 	{
 		if (FStatusIcons)
-			chatIndex->setData(Qt::DecorationRole,FStatusIcons->iconByJidStatus(AWindow->roomJid(),AWindow->multiUserChat()->show(),SUBSCRIPTION_BOTH,false));
+			chatIndex->setData(FStatusIcons->iconByJidStatus(AWindow->roomJid(),AWindow->multiUserChat()->show(),SUBSCRIPTION_BOTH,false),Qt::DecorationRole);
 		if (!AWindow->multiUserChat()->roomError().isNull())
-			chatIndex->setData(RDR_STATUS,AWindow->multiUserChat()->roomError().errorMessage());
+			chatIndex->setData(AWindow->multiUserChat()->roomError().errorMessage(),RDR_STATUS);
 		else
-			chatIndex->setData(RDR_STATUS,QString());
-		chatIndex->setData(RDR_NAME,getRoomName(AWindow->streamJid(),AWindow->roomJid()));
-		chatIndex->setData(RDR_SHOW,AWindow->multiUserChat()->show());
-		chatIndex->setData(RDR_MUC_NICK,AWindow->multiUserChat()->nickName());
-		chatIndex->setData(RDR_MUC_PASSWORD,AWindow->multiUserChat()->password());
+			chatIndex->setData(QString(),RDR_STATUS);
+		chatIndex->setData(getRoomName(AWindow->streamJid(),AWindow->roomJid()),RDR_NAME);
+		chatIndex->setData(AWindow->multiUserChat()->show(),RDR_SHOW);
+		chatIndex->setData(AWindow->multiUserChat()->nickName(),RDR_MUC_NICK);
+		chatIndex->setData(AWindow->multiUserChat()->password(),RDR_MUC_PASSWORD);
 		updateRecentItemProperties(chatIndex);
 	}
 }

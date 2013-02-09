@@ -39,11 +39,9 @@ public:
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
@@ -111,14 +109,6 @@ public:
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler);
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler);
 signals:
-	//IMainTabPage
-	void tabPageChanged();
-	void tabPageDestroyed();
-	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
-	//IRostersLabelHolder
-	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
-	//IRostersView
 	void modelAboutToBeSeted(IRostersModel *AModel);
 	void modelSeted(IRostersModel *AModel);
 	void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder);
@@ -134,6 +124,13 @@ signals:
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
 	void notifyRemoved(int ANotifyId);
+	//IMainTabPage
+	void tabPageChanged();
+	void tabPageDestroyed();
+	//IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
+	//IRostersLabelHolder
+	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	void clearLabels();
 	void appendBlinkItem(quint32 ALabelId, int ANotifyId);

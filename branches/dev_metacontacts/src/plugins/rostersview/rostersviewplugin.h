@@ -53,11 +53,9 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersViewPlugin
 	virtual IRostersView *rostersView();
 	virtual void startRestoreExpandState();
@@ -65,7 +63,7 @@ public:
 	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole);
 signals:
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	QString rootExpandId(const QModelIndex &AIndex) const;
 	QString indexExpandId(const QModelIndex &AIndex) const;

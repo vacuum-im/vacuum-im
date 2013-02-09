@@ -674,7 +674,7 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 		updateTrayToolTip();
 
 		bool statusShown = Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool();
-		IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
+		IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->findStreamRoot(APresence->streamJid()) : NULL;
 		if (APresence->show() == IPresence::Error)
 		{
 			if (index && !statusShown)
@@ -872,7 +872,7 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
+		IRosterIndex *index = FRostersModel->findStreamRoot(APresence->xmppStream()->streamJid());
 		if (index)
 			FRostersView->insertLabel(FConnectingLabelId,index);
 	}
@@ -882,7 +882,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
+		IRosterIndex *index = FRostersModel->findStreamRoot(APresence->xmppStream()->streamJid());
 		if (index)
 			FRostersView->removeLabel(FConnectingLabelId,index);
 	}

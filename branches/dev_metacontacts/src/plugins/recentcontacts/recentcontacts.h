@@ -36,11 +36,9 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersDragDropHandler
 	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
@@ -85,7 +83,7 @@ signals:
 	void recentItemIndexCreated(const IRecentItem &AItem, IRosterIndex *AIndex);
 	void itemHandlerRegistered(const QString &AType, IRecentItemHandler *AHandler);
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 	//IRecentItemHandler

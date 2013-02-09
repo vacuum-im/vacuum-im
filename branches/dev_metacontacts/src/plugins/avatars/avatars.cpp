@@ -20,6 +20,8 @@
 #define UNKNOWN_AVATAR            QString::null
 #define EMPTY_AVATAR              QString("")
 
+static const QList<int> RosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
+
 Avatars::Avatars()
 {
 	FPluginManager = NULL;
@@ -137,7 +139,7 @@ bool Avatars::initObjects()
 
 	if (FRostersModel)
 	{
-		FRostersModel->insertDefaultDataHolder(this);
+		FRostersModel->insertRosterDataHolder(RDHO_AVATARS,this);
 	}
 
 	if (FRostersViewPlugin)
@@ -287,46 +289,46 @@ void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	}
 }
 
-int Avatars::rosterDataOrder() const
+QList<int> Avatars::rosterDataRoles(int AOerder) const
 {
-	return RDHO_DEFAULT;
+	if (AOerder == RDHO_AVATARS)
+		return QList<int>() << RDR_AVATAR_HASH << RDR_AVATAR_IMAGE;
+	return QList<int>();
 }
 
-QList<int> Avatars::rosterDataRoles() const
+QVariant Avatars::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	static const QList<int> indexRoles = QList<int>() << RDR_AVATAR_HASH << RDR_AVATAR_IMAGE;
-	return indexRoles;
-}
-
-QList<int> Avatars::rosterDataTypes() const
-{
-	static const QList<int> indexKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
-	return indexKinds;
-}
-
-QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
-{
-	if (ARole == RDR_AVATAR_IMAGE)
+	if (AOrder == RDHO_AVATARS)
 	{
-		bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
-		QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
-		if (avatar.isNull() && FShowEmptyAvatars)
-			avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
-		return avatar;
-	}
-	else if (ARole == RDR_AVATAR_HASH)
-	{
-		return avatarHash(AIndex->data(RDR_FULL_JID).toString());
+		switch (AIndex->kind())
+		{
+		case RIK_STREAM_ROOT:
+		case RIK_CONTACT:
+			switch (ARole)
+			{
+			case RDR_AVATAR_IMAGE:
+				{
+					bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
+					QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
+					if (avatar.isNull() && FShowEmptyAvatars)
+						avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
+					return avatar;
+				}
+			case RDR_AVATAR_HASH:
+				{
+					return avatarHash(AIndex->data(RDR_FULL_JID).toString());
+				}
+			}
+			break;
+		}
 	}
 	return QVariant();
 }
 
 
-bool Avatars::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool Avatars::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex);
-	Q_UNUSED(ARole);
-	Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
 }
 
@@ -534,10 +536,11 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 	if (FRostersModel)
 	{
 		QMultiMap<int,QVariant> findData;
-		foreach(int type, rosterDataTypes())
-			findData.insert(RDR_KIND,type);
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
+		findData.insert(RDR_KIND,RIK_STREAM_ROOT);
+		findData.insert(RDR_KIND,RIK_CONTACT);
+
 		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
 		foreach (IRosterIndex *index, indexes)
 		{
@@ -680,7 +683,7 @@ void Avatars::onVCardChanged(const Jid &AContactJid)
 
 void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin && rosterDataTypes().contains(AIndex->kind()))
+	if (FRostersViewPlugin && RosterKinds.contains(AIndex->kind()))
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		if (!FVCardAvatars.contains(contactJid))
@@ -748,7 +751,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, qu
 
 void Avatars::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->kind()))
+	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && RosterKinds.contains(AIndex->kind()))
 	{
 		QString hash = AIndex->data(RDR_AVATAR_HASH).toString();
 		if (hasAvatar(hash))

@@ -7,6 +7,7 @@ RosterIndex::RosterIndex(int AKind, RostersModel *AModel)
 {
 	FModel = AModel;
 	setData(AKind,RDR_KIND);
+	setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsEditable);
 }
 
 RosterIndex::~RosterIndex()
@@ -33,11 +34,10 @@ IRosterIndex *RosterIndex::parentIndex() const
 {
 	QStandardItem *pitem = AdvancedItem::parent();
 	if (pitem == NULL)
-		return NULL;
+		return model()!=NULL ? FModel->rootIndex() : NULL;
 	else if (pitem->type() == IRosterIndex::StandardItemTypeValue)
 		return static_cast<RosterIndex *>(pitem);
-	else 
-		return FModel->rootIndex();
+	return NULL;
 }
 
 int RosterIndex::childCount() const
@@ -47,7 +47,8 @@ int RosterIndex::childCount() const
 
 void RosterIndex::appendChild(IRosterIndex *AIndex)
 {
-	appendRow(AIndex->instance());
+	if (AIndex->parentIndex() != this)
+		appendRow(AIndex->instance());
 }
 
 IRosterIndex *RosterIndex::childIndex(int ARow) const

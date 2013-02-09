@@ -289,7 +289,7 @@ void ConnectionManager::onStreamOpened(IXmppStream *AXmppStream)
 	if (FRostersViewPlugin && AXmppStream->connection() && AXmppStream->connection()->isEncrypted())
 	{
 		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
-		IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->streamJid()) : NULL;
+		IRosterIndex *index = model!=NULL ? model->findStreamRoot(AXmppStream->streamJid()) : NULL;
 		if (index!=NULL)
 			FRostersViewPlugin->rostersView()->insertLabel(FEncryptedLabelId,index);
 	}
@@ -300,7 +300,7 @@ void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
 	if (FRostersViewPlugin)
 	{
 		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
-		IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->streamJid()) : NULL;
+		IRosterIndex *index = model!=NULL ? model->findStreamRoot(AXmppStream->streamJid()) : NULL;
 		if (index!=NULL)
 			FRostersViewPlugin->rostersView()->removeLabel(FEncryptedLabelId,index);
 	}

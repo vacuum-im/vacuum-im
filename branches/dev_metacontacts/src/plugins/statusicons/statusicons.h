@@ -25,11 +25,11 @@
 #include "iconsoptionswidget.h"
 
 class StatusIcons :
-			public QObject,
-			public IPlugin,
-			public IStatusIcons,
-			public IOptionsHolder,
-			public IRosterDataHolder
+	public QObject,
+	public IPlugin,
+	public IStatusIcons,
+	public IOptionsHolder,
+	public IRosterDataHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatusIcons IOptionsHolder IRosterDataHolder);
@@ -47,11 +47,9 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IStatusIcons
 	virtual QList<QString> rules(RuleType ARuleType) const;
 	virtual QString ruleIconset(const QString &APattern, RuleType ARuleType) const;
@@ -71,7 +69,7 @@ signals:
 	void defaultIconsChanged();
 	void statusIconsChanged();
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	void loadStorages();
 	void clearStorages();

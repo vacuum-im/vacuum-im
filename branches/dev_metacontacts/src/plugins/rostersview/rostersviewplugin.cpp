@@ -98,7 +98,7 @@ bool RostersViewPlugin::initObjects()
 
 	if (FRostersModel)
 	{
-		FRostersModel->insertDefaultDataHolder(this);
+		FRostersModel->insertRosterDataHolder(RDHO_ROSTERSVIEW,this);
 		FRostersView->setRostersModel(FRostersModel);
 	}
 
@@ -148,29 +148,19 @@ QMultiMap<int, IOptionsWidget *> RostersViewPlugin::optionsWidgets(const QString
 	return widgets;
 }
 
-int RostersViewPlugin::rosterDataOrder() const
+QList<int> RostersViewPlugin::rosterDataRoles(int AOrder) const
 {
-	return RDHO_DEFAULT;
+	if (AOrder == RDHO_ROSTERSVIEW)
+		return QList<int>() << Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON << RDR_ALLWAYS_VISIBLE;
+	return QList<int>();
 }
 
-QList<int> RostersViewPlugin::rosterDataRoles() const
+QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	static const QList<int> dataRoles = QList<int>() 
-		<< Qt::DisplayRole << Qt::ForegroundRole << Qt::BackgroundColorRole << RDR_STATES_FORCE_ON << RDR_ALLWAYS_VISIBLE;
-	return dataRoles;
-}
-
-QList<int> RostersViewPlugin::rosterDataTypes() const
-{
-	static const QList<int> indexKinds = QList<int>() << RIK_ANY_KIND;
-	return indexKinds;
-}
-
-QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) const
-{
-	if (FRostersModel)
+	if (AOrder==RDHO_ROSTERSVIEW && FRostersView->rostersModel())
 	{
-		if (AIndex->parentIndex() == FRostersModel->rootIndex())
+		IRostersModel *model = FRostersView->rostersModel();
+		if (AIndex->parentIndex() == model->rootIndex())
 		{
 			switch (ARole)
 			{
@@ -186,7 +176,7 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 				return 1;
 			}
 		}
-		else if (FRostersModel->isGroupKind(AIndex->kind()))
+		else if (model->isGroupKind(AIndex->kind()))
 		{
 			switch (ARole)
 			{
@@ -220,11 +210,9 @@ QVariant RostersViewPlugin::rosterData(const IRosterIndex *AIndex, int ARole) co
 	return QVariant();
 }
 
-bool RostersViewPlugin::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool RostersViewPlugin::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex);
-	Q_UNUSED(ARole);
-	Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
 }
 

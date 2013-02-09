@@ -101,7 +101,7 @@ protected slots:
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
-	void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
+	void onRosterIndexCreated(IRosterIndex *AIndex);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);

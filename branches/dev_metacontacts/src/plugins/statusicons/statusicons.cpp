@@ -120,7 +120,7 @@ bool StatusIcons::initObjects()
 
 	if (FRostersModel)
 	{
-		FRostersModel->insertDefaultDataHolder(this);
+		FRostersModel->insertRosterDataHolder(RDHO_STATUSICONS,this);
 	}
 
 	loadStorages();
@@ -145,44 +145,36 @@ QMultiMap<int, IOptionsWidget *> StatusIcons::optionsWidgets(const QString &ANod
 {
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (ANodeId == OPN_STATUSICONS)
-	{
 		widgets.insertMulti(OWO_STATUSICONS, new IconsOptionsWidget(this,AParent));
-	}
 	return widgets;
 }
 
-int StatusIcons::rosterDataOrder() const
+QList<int> StatusIcons::rosterDataRoles(int AOrder) const
 {
-	return RDHO_DEFAULT;
+	if (AOrder == RDHO_STATUSICONS)
+		return QList<int>() << Qt::DecorationRole;
+	return QList<int>();
 }
 
-QList<int> StatusIcons::rosterDataRoles() const
+QVariant StatusIcons::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	static QList<int> dataRoles = QList<int>()
-	                              << Qt::DecorationRole;
-	return dataRoles;
-}
-
-QList<int> StatusIcons::rosterDataTypes() const
-{
-	static QList<int> indexKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
-	return indexKinds;
-}
-
-QVariant StatusIcons::rosterData(const IRosterIndex *AIndex, int ARole) const
-{
-	if (ARole == Qt::DecorationRole)
+	if (AOrder==RDHO_STATUSICONS && ARole==Qt::DecorationRole)
 	{
-		return iconByJid(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString());
+		switch (AIndex->kind())
+		{
+		case RIK_STREAM_ROOT:
+		case RIK_CONTACT:
+		case RIK_AGENT:
+		case RIK_MY_RESOURCE:
+			return iconByJid(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString());
+		}
 	}
 	return QVariant();
 }
 
-bool StatusIcons::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool StatusIcons::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex);
-	Q_UNUSED(ARole);
-	Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
 }
 
@@ -459,7 +451,7 @@ void StatusIcons::onStatusIconsChangedTimer()
 void StatusIcons::onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority)
 {
 	Q_UNUSED(AShow); Q_UNUSED(AStatus); Q_UNUSED(APriority);
-	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->findStreamRoot(APresence->streamJid()) : NULL;
 	if (index)
 		emit rosterDataChanged(index,Qt::DecorationRole);
 }

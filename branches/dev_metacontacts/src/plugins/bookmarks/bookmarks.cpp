@@ -103,7 +103,13 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0, NULL);
 	if (plugin)
+	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+		if (FRostersModel)
+		{
+			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0, NULL);
 	if (plugin)
@@ -135,7 +141,7 @@ bool Bookmarks::initObjects()
 
 	if (FRostersModel)
 	{
-		FRostersModel->insertDefaultDataHolder(this);
+		FRostersModel->insertRosterDataHolder(RDHO_BOOKMARKS,this);
 	}
 
 	if (FRostersView)
@@ -172,26 +178,16 @@ QMultiMap<int, IOptionsWidget *> Bookmarks::optionsWidgets(const QString &ANodeI
 	return widgets;
 }
 
-int Bookmarks::rosterDataOrder() const
+QList<int> Bookmarks::rosterDataRoles(int AOrder) const
 {
-	return RDHO_BOOKMARKS;
+	if (AOrder == RDHO_BOOKMARKS)
+		return QList<int>() << RDR_NAME << RDR_MUC_NICK << RDR_MUC_PASSWORD;
+	return QList<int>();
 }
 
-QList<int> Bookmarks::rosterDataRoles() const
+QVariant Bookmarks::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	static const QList<int> dataRoles = QList<int>() << RDR_NAME << RDR_MUC_NICK << RDR_MUC_PASSWORD;
-	return dataRoles;
-}
-
-QList<int> Bookmarks::rosterDataTypes() const
-{
-	static const QList<int> dataTypes = QList<int>() << RIK_MUC_ITEM;
-	return dataTypes;
-}
-
-QVariant Bookmarks::rosterData(const IRosterIndex *AIndex, int ARole) const
-{
-	if (AIndex->kind() == RIK_MUC_ITEM)
+	if (AOrder==RDHO_BOOKMARKS && AIndex->kind()==RIK_MUC_ITEM)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
@@ -204,16 +200,14 @@ QVariant Bookmarks::rosterData(const IRosterIndex *AIndex, int ARole) const
 			return !bookmark.conference.nick.isEmpty() ? QVariant(bookmark.conference.nick) : QVariant();
 		case RDR_MUC_PASSWORD:
 			return !bookmark.conference.password.isEmpty() ? QVariant(bookmark.conference.password) : QVariant();
-		default:
-			break;
 		}
 	}
 	return QVariant();
 }
 
-bool Bookmarks::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool Bookmarks::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
 }
 
@@ -337,9 +331,10 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 			if (bookmark.type == IBookmark::Conference)
 			{
 				IRosterIndex *index = FMultiChatPlugin->getMultiChatRosterIndex(AStreamJid,bookmark.conference.roomJid,bookmark.conference.nick,bookmark.conference.password);
-				connect(index->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)),Qt::UniqueConnection);
 				FBookmarkIndexes[AStreamJid].insert(index,bookmark);
-				emit rosterDataChanged(index);
+				emit rosterDataChanged(index,RDR_NAME);
+				emit rosterDataChanged(index,RDR_MUC_NICK);
+				emit rosterDataChanged(index,RDR_MUC_PASSWORD);
 			}
 		}
 
@@ -348,10 +343,7 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 			IRosterIndex *index = FBookmarkIndexes.value(AStreamJid).key(bookmark);
 			IMultiUserChatWindow *window = FMultiChatPlugin->multiChatWindow(AStreamJid,bookmark.conference.roomJid);
 			if (window == NULL)
-			{
-				index->instance()->disconnect(this);
-				index->instance()->deleteLater();
-			}
+				FRostersModel->removeRosterIndex(index);
 			FBookmarkIndexes[AStreamJid].remove(index);
 		}
 	}

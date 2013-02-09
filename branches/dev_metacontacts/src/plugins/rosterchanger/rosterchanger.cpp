@@ -1240,7 +1240,7 @@ void RosterChanger::removeContactsFromRoster(const Jid &AStreamJid, const QStrin
 
 		if (findData.contains(RDR_PREP_BARE_JID))
 		{
-			IRosterIndex *streamIndex = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
+			IRosterIndex *streamIndex = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AStreamJid) : NULL;
 			if (streamIndex)
 			{
 				foreach(IRosterIndex *index, streamIndex->findChilds(findData,true))
@@ -1589,7 +1589,7 @@ void RosterChanger::onRenameGroup(bool)
 			QString group = action->data(ADR_GROUP).toString();
 			if (FRostersView && FRostersView->instance()->isActiveWindow() && FRostersView->rostersModel())
 			{
-				IRosterIndex *sroot = FRostersView->rostersModel()->streamRoot(roster->streamJid());
+				IRosterIndex *sroot = FRostersView->rostersModel()->findStreamRoot(roster->streamJid());
 				IRosterIndex *index = FRostersView->rostersModel()->findGroupIndex(RIK_GROUP,group,roster->groupDelimiter(),sroot);
 				if (index)
 					editInRoster = FRostersView->editRosterIndex(index,RDR_NAME);

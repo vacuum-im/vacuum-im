@@ -11,12 +11,8 @@
 #define ADR_GROUP_NAME      Action::DR_Parametr2
 #define ADR_LISTNAME        Action::DR_Parametr3
 
-QStringList PrivacyLists::FAutoLists = QStringList()
-                                       << PRIVACY_LIST_VISIBLE
-                                       << PRIVACY_LIST_CONFERENCES
-                                       << PRIVACY_LIST_INVISIBLE
-                                       << PRIVACY_LIST_IGNORE
-                                       << PRIVACY_LIST_SUBSCRIPTION;
+QStringList PrivacyLists::FAutoLists = QStringList() << PRIVACY_LIST_VISIBLE << PRIVACY_LIST_CONFERENCES << PRIVACY_LIST_INVISIBLE
+                                       << PRIVACY_LIST_IGNORE << PRIVACY_LIST_SUBSCRIPTION;
 
 PrivacyLists::PrivacyLists()
 {
@@ -78,8 +74,7 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitO
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
 		{
-			connect(FRostersModel->instance(),SIGNAL(indexCreated(IRosterIndex *,IRosterIndex *)),
-			        SLOT(onRosterIndexCreated(IRosterIndex *,IRosterIndex *)));
+			connect(FRostersModel->instance(),SIGNAL(indexCreated(IRosterIndex *)),SLOT(onRosterIndexCreated(IRosterIndex *)));
 		}
 	}
 
@@ -1100,7 +1095,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 		foreach(Jid contactJid, allow) {
 			setPrivacyLabel(AStreamJid,contactJid,false); }
 
-		IRosterIndex *streamIndex = FRostersModel->streamRoot(AStreamJid);
+		IRosterIndex *streamIndex = FRostersModel->findStreamRoot(AStreamJid);
 		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,QString("::"),streamIndex);
 		if (groupIndex)
 		{
@@ -1272,9 +1267,8 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
 	}
 }
 
-void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent)
+void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex)
 {
-	Q_UNUSED(AParent);
 	if (FRostersView && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_AGENT))
 	{
 		if (FCreatedRosterIndexes.isEmpty())

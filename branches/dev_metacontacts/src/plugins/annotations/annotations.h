@@ -50,11 +50,9 @@ public:
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IAnnotations
 	virtual bool isEnabled(const Jid &AStreamJid) const;
 	virtual QList<Jid> annotations(const Jid &AStreamJid) const;
@@ -67,7 +65,8 @@ signals:
 	void annotationsLoaded(const Jid &AStreamJid);
 	void annotationsSaved(const Jid &AStreamJid);
 	void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	// IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	bool loadAnnotations(const Jid &AStreamJid);
 	bool saveAnnotations(const Jid &AStreamJid);

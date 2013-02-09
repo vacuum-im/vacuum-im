@@ -58,11 +58,9 @@ public:
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
@@ -80,7 +78,7 @@ public:
 signals:
 	void avatarChanged(const Jid &AContactJid);
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
