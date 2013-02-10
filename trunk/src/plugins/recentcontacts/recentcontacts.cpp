@@ -59,7 +59,7 @@ RecentContacts::RecentContacts()
 	FRostersViewPlugin = NULL;
 
 	FRootIndex = NULL;
-	FShowFavariteLabelId = 0;
+	FShowFavoriteLabelId = 0;
 	
 	FMaxVisibleItems = 20;
 	FInactiveDaysTimeout = 7;
@@ -173,7 +173,7 @@ bool RecentContacts::initObjects()
 		AdvancedDelegateItem showFavorite(RLID_RECENT_FAVORITE);
 		showFavorite.d->kind = AdvancedDelegateItem::CustomData;
 		showFavorite.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT_FAVORITE);
-		FShowFavariteLabelId = FRostersView->registerLabel(showFavorite);
+		FShowFavoriteLabelId = FRostersView->registerLabel(showFavorite);
 
 		FRostersView->insertDragDropHandler(this);
 		FRostersView->insertLabelHolder(RLHO_RECENT_FILTER,this);
@@ -741,9 +741,9 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 		if (FRostersView)
 		{
 			if (favorite)
-				FRostersView->insertLabel(FShowFavariteLabelId,index);
+				FRostersView->insertLabel(FShowFavoriteLabelId,index);
 			else
-				FRostersView->removeLabel(FShowFavariteLabelId,index);
+				FRostersView->removeLabel(FShowFavoriteLabelId,index);
 		}
 	}
 }
@@ -1116,7 +1116,15 @@ void RecentContacts::onRostersModelStreamJidChanged(const Jid &ABefore, const Ji
 {
 	QList<IRecentItem> items = FStreamItems.take(ABefore);
 	for (QList<IRecentItem>::iterator it=items.begin(); it!=items.end(); ++it)
+	{
+		IRosterIndex *index = FVisibleItems.take(*it);
 		it->streamJid = AAfter;
+		if (index)
+		{
+			index->setData(RDR_STREAM_JID,ABefore.pFull());
+			FVisibleItems.insert(*it,index);
+		}
+	}
 	FStreamItems.insert(AAfter,items);
 	
 	if (FSaveStreams.contains(ABefore))
