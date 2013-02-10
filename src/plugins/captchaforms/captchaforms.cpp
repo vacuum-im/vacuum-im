@@ -117,6 +117,7 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 				ChallengeItem &challenge = FChallenges[cid];
 				challenge.challenger = AStanza.from();
 				challenge.dialog->setForm(FDataForms->localizeForm(form));
+				setFocusToEditableWidget(challenge.dialog->instance());
 			}
 			emit challengeReceived(AStanza.id(), form);
 			return true;
@@ -313,14 +314,44 @@ QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJi
 	return QString::null;
 }
 
+bool CaptchaForms::setFocusToEditableWidget(QWidget *AWidget)
+{
+	static const QList<const char *> editableWidgets = QList<const char *>() << "QLineEdit" << "QTextEdit";
+
+	QWidget *focus = AWidget->focusWidget();
+	foreach(const char *className, editableWidgets)
+	{
+		if (focus && focus->inherits(className))
+		{
+			return true;
+		}
+		else if (AWidget->focusPolicy()!=Qt::NoFocus && AWidget->inherits(className))
+		{
+			AWidget->setFocus();
+			return true;
+		}
+	}
+
+	foreach(QObject *child, AWidget->children())
+		if (child->isWidgetType() && setFocusToEditableWidget(qobject_cast<QWidget *>(child)))
+			return true;
+
+	return false;
+}
+
 bool CaptchaForms::eventFilter(QObject *AObject, QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::WindowActivate)
 	{
-		if (FNotifications)
+		IDataDialogWidget *dialog = qobject_cast<IDataDialogWidget *>(AObject);
+		if (dialog)
 		{
-         QString cid = findChallenge(qobject_cast<IDataDialogWidget *>(AObject));
-			FNotifications->removeNotification(FChallengeNotify.key(cid));
+			if (FNotifications)
+			{
+				QString cid = findChallenge(dialog);
+				FNotifications->removeNotification(FChallengeNotify.key(cid));
+			}
+			setFocusToEditableWidget(dialog->instance());
 		}
 	}
 	return QObject::eventFilter(AObject,AEvent);
