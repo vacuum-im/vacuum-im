@@ -183,10 +183,31 @@ void AdvancedItemModel::removeItemDataHolder(int AOrder, AdvancedItemDataHolder 
 	}
 }
 
+void AdvancedItemModel::insertChangedItem(QStandardItem *AItem, int ARole)
+{
+	if (FChangedItems.isEmpty())
+	{
+		QTimer::singleShot(0,this,SLOT(onEmitDelayedDataChangedSignals()));
+		FChangedItems.insertMulti(AItem,ARole);
+	}
+	else if (!FChangedItems.contains(AItem,ARole))
+	{
+		FChangedItems.insertMulti(AItem,ARole);
+	}
+}
+
+void AdvancedItemModel::removeChangedItem(QStandardItem *AItem)
+{
+	FChangedItems.remove(AItem);
+}
+
 void AdvancedItemModel::emitItemInserted(QStandardItem *AItem)
 {
 	if (AItem)
 	{
+		if (FDelayedDataChangedSignals)
+			FRemovedItems.removeAll(AItem);
+
 		for (int row=0; row<AItem->rowCount(); row++)
 			for (int col=0; col<AItem->columnCount(); col++)
 				emitItemInserted(AItem->child(row,col));
@@ -198,6 +219,9 @@ void AdvancedItemModel::emitItemRemoved(QStandardItem *AItem)
 {
 	if (AItem)
 	{
+		if (FDelayedDataChangedSignals)
+			FRemovedItems.append(AItem);
+
 		for (int row=0; row<AItem->rowCount(); row++)
 			for (int col=0; col<AItem->columnCount(); col++)
 				emitItemRemoved(AItem->child(row,col));
@@ -223,17 +247,15 @@ void AdvancedItemModel::emitItemChanged(QStandardItem *AItem)
 
 void AdvancedItemModel::emitItemDataChanged(QStandardItem *AItem, int ARole)
 {
-	if (FDelayedDataChangedSignals)
-	{
-		if (FChangedItems.isEmpty())
-			QTimer::singleShot(0,this,SLOT(onEmitDelayedDataChangedSignals()));
-		FChangedItems.insertMulti(AItem,ARole);
-	}
-	else
+	if (!FDelayedDataChangedSignals)
 	{
 		if (ARole > AnyRole)
 			emit itemDataChanged(AItem,ARole);
 		emitItemChanged(AItem);
+	}
+	else
+	{
+		insertChangedItem(AItem,ARole);
 	}
 	emitRecursiveParentDataChanged(AItem->parent());
 }
@@ -244,37 +266,48 @@ void AdvancedItemModel::emitRecursiveParentDataChanged(QStandardItem *AParent)
 	{
 		for(QStandardItem *parentItem=AParent; parentItem!=NULL; parentItem = parentItem->parent())
 		{
-			if (FDelayedDataChangedSignals)
-			{
-				if (FChangedItems.isEmpty())
-					QTimer::singleShot(0,this,SLOT(onEmitDelayedDataChangedSignals()));
-				FChangedItems.insertMulti(parentItem,AnyRole);
-			}
-			else
-			{
+			if (!FDelayedDataChangedSignals)
 				emitItemChanged(parentItem);
-			}
+			else
+				insertChangedItem(parentItem,AnyRole);
 		}
 	}
 }
 
 void AdvancedItemModel::onEmitDelayedDataChangedSignals()
 {
-	QStandardItem *lastItem = NULL;
-	for (QMultiMap<QStandardItem *, int>::const_iterator it=FChangedItems.constBegin(); it!=FChangedItems.constEnd(); ++it)
-	{
-		int role = it.value();
-		QStandardItem *item = it.key();
-
-		if (lastItem != item)
-			emitItemChanged(item);
-
-		if (role > AnyRole)
-			emit itemDataChanged(item,role);
-		
-		lastItem = item;
-	}
+	QMultiMap<QStandardItem *, int> changedItems = FChangedItems;
 	FChangedItems.clear();
+
+	QStandardItem *lastItem = NULL;
+	for (QMultiMap<QStandardItem *, int>::const_iterator it=changedItems.constBegin(); it!=changedItems.constEnd(); ++it)
+	{
+		QStandardItem *item = it.key();
+		if (lastItem==item || !FRemovedItems.contains(item))
+		{
+			int role = it.value();
+
+			if (lastItem != item)
+				emitItemChanged(item);
+
+			if (role > AnyRole)
+				emit itemDataChanged(item,role);
+
+			lastItem = item;
+		}
+	}
+
+	if (FChangedItems.isEmpty())
+	{
+		FRemovedItems.clear();
+	}
+	else for (QList<QStandardItem *>::iterator it=FRemovedItems.begin(); it!=FRemovedItems.end(); )
+	{
+		if (!FChangedItems.contains(*it))
+			it = FRemovedItems.erase(it);
+		else
+			++it;
+	}
 }
 
 void AdvancedItemModel::onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
@@ -299,17 +332,8 @@ void AdvancedItemModel::onRowsAboutToBeRemoved(const QModelIndex &AParent, int A
 {
 	int colums = columnCount(AParent);
 	for (int row=AStart; row<=AEnd; row++)
-	{
 		for (int col=0; col<colums; col++)
-		{
-			QStandardItem *item = itemFromIndex(index(row,col,AParent));
-			if (item)
-			{
-				FChangedItems.remove(item);
-				emitItemRemoved(item);
-			}
-		}
-	}
+			emitItemRemoved(itemFromIndex(index(row,col,AParent)));
 	emitRecursiveParentDataChanged(itemFromIndex(AParent));
 }
 
@@ -317,16 +341,7 @@ void AdvancedItemModel::onColumnsAboutToBeRemoved(const QModelIndex &AParent, in
 {
 	int rows = rowCount(AParent);
 	for (int col=AStart; col<=AEnd; col++)
-	{
 		for(int row=0; row<rows; row++)
-		{
-			QStandardItem *item = itemFromIndex(index(row,col,AParent));
-			if (item)
-			{
-				FChangedItems.remove(item);
-				emitItemRemoved(item);
-			}
-		}
-	}
+			emitItemRemoved(itemFromIndex(index(row,col,AParent)));
 	emitRecursiveParentDataChanged(itemFromIndex(AParent));
 }

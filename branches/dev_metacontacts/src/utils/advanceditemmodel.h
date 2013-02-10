@@ -59,6 +59,9 @@ public:
 	static const int AnyRole = -1;
 	static const int FlagsRole = Qt::UserRole-1;
 protected:
+	void insertChangedItem(QStandardItem *AItem, int ARole);
+	void removeChangedItem(QStandardItem *AItem);
+protected:
 	void emitItemInserted(QStandardItem *AItem);
 	void emitItemRemoved(QStandardItem *AItem);
 	void emitItemChanged(QStandardItem *AItem);
@@ -76,6 +79,7 @@ private:
 private:
 	bool FDelayedDataChangedSignals;
 	bool FRecursiveParentDataChangedSignals;
+	QList<QStandardItem *> FRemovedItems;
 	QMultiMap<QStandardItem *, int> FChangedItems;
 	QMultiMap<int, AdvancedItemSortHandler *> FItemSortHandlers;
 	QMap<int, QMultiMap<int, AdvancedItemDataHolder *> > FItemDataHolders;

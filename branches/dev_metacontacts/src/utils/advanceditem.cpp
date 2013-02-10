@@ -2,16 +2,21 @@
 
 #include "advanceditemmodel.h"
 
+static const qint32 DefaultItemFlags = Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled;
+
 AdvancedItem::AdvancedItem() : QStandardItem()
 {
+	FData.insert(AdvancedItemModel::FlagsRole,DefaultItemFlags);
 }
 
 AdvancedItem::AdvancedItem(const QString &AText) : QStandardItem(AText)
 {
+	FData.insert(AdvancedItemModel::FlagsRole,DefaultItemFlags);
 }
 
 AdvancedItem::AdvancedItem(const QIcon &AIcon, const QString &AText) : QStandardItem(AIcon,AText)
 {
+	FData.insert(AdvancedItemModel::FlagsRole,DefaultItemFlags);
 }
 
 int AdvancedItem::type() const
@@ -111,19 +116,19 @@ QMap<int, QVariant> AdvancedItem::itemData() const
 	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
 	if (advModel)
 	{
-		QList<int> holderRoles;
+		QList<int> presentRoles;
 		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(AdvancedItemModel::AnyRole);
 		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); it!=holders.constEnd(); ++it)
 		{
 			foreach(int role, it.value()->advancedItemDataRoles(it.key()))
 			{
-				if (!holderRoles.contains(role))
+				if (!presentRoles.contains(role))
 				{
 					QVariant value = it.value()->advancedItemData(it.key(),this,role);
 					if (!value.isNull())
 					{
 						values.insert(role,value);
-						holderRoles.append(role);
+						presentRoles.append(role);
 					}
 				}
 			}
