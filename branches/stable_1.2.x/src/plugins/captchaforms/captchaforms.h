@@ -69,6 +69,7 @@ protected:
 	void notifyChallenge(const ChallengeItem &AChallenge);
 	QString findChallenge(IDataDialogWidget *ADialog) const;
 	QString findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const;
+	bool setFocusToEditableWidget(QWidget *AWidget);
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:

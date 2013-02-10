@@ -843,7 +843,7 @@ IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASu
 
 			if (sfield.type == DATAFIELD_TYPE_BOOLEAN)
 			{
-				sfield.type == DATAFIELD_TYPE_TEXTSINGLE;
+				sfield.type = DATAFIELD_TYPE_TEXTSINGLE;
 				sfield.value = sfield.value.toBool() ? tr("Yes") : tr("No");
 			}
 			else if (sfield.type == DATAFIELD_TYPE_LISTSINGLE)

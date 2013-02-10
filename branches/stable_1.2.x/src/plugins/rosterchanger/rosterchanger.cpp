@@ -211,12 +211,24 @@ bool RosterChanger::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
 {
 	Q_UNUSED(AEvent);
-	int indexType = AHover.data(RDR_TYPE).toInt();
-	if (DragGroups.contains(indexType) || indexType==RIT_STREAM_ROOT)
+	int hoverType = AHover.data(RDR_TYPE).toInt();
+	if (DragGroups.contains(hoverType) || hoverType==RIT_STREAM_ROOT)
 	{
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AHover.data(RDR_STREAM_JID).toString()) : NULL;
 		if (roster && roster->isOpen())
+		{
+			QMap<int, QVariant> indexData;
+			QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
+			operator>>(stream,indexData);
+
+			if (hoverType == RIT_STREAM_ROOT)
+				return indexData.value(RDR_STREAM_JID)!=AHover.data(RDR_STREAM_JID);
+			else if (hoverType == RIT_GROUP_BLANK)
+				return indexData.value(RDR_TYPE).toInt() != RIT_GROUP;
+			else if (hoverType==RIT_GROUP && indexData.value(RDR_TYPE).toInt()==RIT_GROUP)
+				return AHover.data(RDR_STREAM_JID)!=indexData.value(RDR_STREAM_JID) ||  AHover.data(RDR_GROUP)!=indexData.value(RDR_GROUP);
 			return true;
+		}
 	}
 	return false;
 }
@@ -278,7 +290,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, const QModelIndex
 					{
 						moveAction->setText(tr("Move contact"));
 						moveAction->setData(ADR_CONTACT_JID,indexData.value(RDR_PREP_BARE_JID));
-						moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP));
+						moveAction->setData(ADR_GROUP,indexData.value(RDR_GROUP).toString());
 						connect(moveAction,SIGNAL(triggered(bool)),SLOT(onMoveContactsToGroup(bool)));
 						AMenu->addAction(moveAction,AG_DEFAULT,true);
 					}
@@ -980,6 +992,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				}
 
 				bool isAllItemsValid = true;
+				bool isAllInEmptyGroup = true;
 				QSet<QString> exceptGroups;
 				foreach(QString contactJid, data.value(ADR_CONTACT_JID).toStringList())
 				{
@@ -988,6 +1001,10 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 					{
 						isAllItemsValid = false;
 						break;
+					}
+					else if (!ritem.groups.isEmpty())
+					{
+						isAllInEmptyGroup = false;
 					}
 					exceptGroups = !exceptGroups.isEmpty() ? (exceptGroups & ritem.groups) : ritem.groups;
 					exceptGroups += QString::null;
@@ -998,12 +1015,15 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				{
 					if (indexType == RIT_CONTACT)
 					{
-						Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,false,SLOT(onCopyContactsToGroup(bool)),AMenu);
-						copyItem->setTitle(tr("Copy to group"));
-						copyItem->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
-						AMenu->addAction(copyItem->menuAction(),AG_RVCM_RCHANGER);
+						if (!isAllInEmptyGroup)
+						{
+							Menu *copyItem = createGroupMenu(data,exceptGroups,true,false,false,SLOT(onCopyContactsToGroup(bool)),AMenu);
+							copyItem->setTitle(tr("Copy to group"));
+							copyItem->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_COPY_GROUP);
+							AMenu->addAction(copyItem->menuAction(),AG_RVCM_RCHANGER);
+						}
 
-						Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,true,SLOT(onMoveContactsToGroup(bool)),AMenu);
+						Menu *moveItem = createGroupMenu(data,exceptGroups,true,false,!isAllInEmptyGroup,SLOT(onMoveContactsToGroup(bool)),AMenu);
 						moveItem->setTitle(tr("Move to group"));
 						moveItem->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_MOVE_GROUP);
 						AMenu->addAction(moveItem->menuAction(),AG_RVCM_RCHANGER);
@@ -1228,7 +1248,7 @@ void RosterChanger::removeContactsFromRoster(const Jid &AStreamJid, const QStrin
 		if (AContacts.count() == 1)
 		{
 			IRosterItem ritem = roster->rosterItem(AContacts.first());
-			QString name = ritem.isValid && !ritem.name.isEmpty() ? ritem.name : AContacts.first();
+			QString name = ritem.isValid && !ritem.name.isEmpty() ? ritem.name : Jid(AContacts.first()).uBare();
 			if (ritem.isValid)
 			{
 				button = QMessageBox::question(NULL,tr("Remove contact"),

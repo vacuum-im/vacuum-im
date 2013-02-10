@@ -9,6 +9,7 @@ LEGEND
 1.2.2
 ------
   [-] Full text search in file archive of messages in certain cases worked not correctly
+  [-] Did not work contacts moving from an empty group
 
 
 1.2.1
