@@ -159,7 +159,7 @@ private:
 	IStatusIcons *FStatusIcons;
 	IMessageProcessor *FMessageProcessor;
 private:
-	quint32 FShowFavariteLabelId;
+	quint32 FShowFavoriteLabelId;
 private:
 	quint8 FMaxVisibleItems;
 	quint8 FInactiveDaysTimeout;
