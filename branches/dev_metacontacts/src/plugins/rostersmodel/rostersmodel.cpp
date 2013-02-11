@@ -19,7 +19,7 @@ RostersModel::RostersModel()
 	setRecursiveParentDataChangedSignals(true);
 
 	connect(this,SIGNAL(itemInserted(QStandardItem *)),SLOT(onAdvancedItemInserted(QStandardItem *)));
-	connect(this,SIGNAL(itemRemoved(QStandardItem *)),SLOT(onAdvancedItemRemoved(QStandardItem *)));
+	connect(this,SIGNAL(itemRemoving(QStandardItem *)),SLOT(onAdvancedItemRemoving(QStandardItem *)));
 	connect(this,SIGNAL(itemDataChanged(QStandardItem *,int)),SLOT(onAdvancedItemDataChanged(QStandardItem *,int)));
 }
 
@@ -452,7 +452,7 @@ void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 	}
 }
 
-void RostersModel::onAdvancedItemRemoved(QStandardItem *AItem)
+void RostersModel::onAdvancedItemRemoving(QStandardItem *AItem)
 {
 	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
 	{
@@ -470,7 +470,7 @@ void RostersModel::onAdvancedItemRemoved(QStandardItem *AItem)
 			if (streamIndex && isChildIndex(rindex,streamIndex))
 				FContactsCache[streamIndex].remove(bareJid,rindex);
 		}
-		emit indexRemoved(rindex);
+		emit indexRemoving(rindex);
 	}
 }
 

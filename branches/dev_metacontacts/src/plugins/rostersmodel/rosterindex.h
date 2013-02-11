@@ -19,6 +19,7 @@ public:
 	virtual AdvancedItem *instance() { return this; }
 	virtual int kind() const;
 	virtual int row() const;
+	virtual bool isRemoved() const;
 	virtual IRosterIndex *parentIndex() const;
 	virtual int childCount() const;
 	virtual void appendChild(IRosterIndex *AIndex);

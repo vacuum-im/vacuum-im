@@ -56,7 +56,7 @@ signals:
 	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void indexCreated(IRosterIndex *AIndex);
 	void indexInserted(IRosterIndex *AIndex);
-	void indexRemoved(IRosterIndex *AIndex);
+	void indexRemoving(IRosterIndex *AIndex);
 	void indexDestroyed(IRosterIndex *AIndex);
 	void indexDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
@@ -67,7 +67,7 @@ protected:
 	QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, bool ABare, IRosterIndex *AParent = NULL) const;
 protected slots:
 	void onAdvancedItemInserted(QStandardItem *AItem);
-	void onAdvancedItemRemoved(QStandardItem *AItem);
+	void onAdvancedItemRemoving(QStandardItem *AItem);
 	void onAdvancedItemDataChanged(QStandardItem *AItem, int ARole);
 protected slots:
 	void onAccountShown(IAccount *AAccount);

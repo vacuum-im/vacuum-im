@@ -24,6 +24,11 @@ int RootIndex::row() const
 	return -1;
 }
 
+bool RootIndex::isRemoved() const
+{
+	return false;
+}
+
 IRosterIndex *RootIndex::parentIndex() const
 {
 	return NULL;

@@ -33,6 +33,11 @@ class UTILS_EXPORT AdvancedItemModel :
 {
 	Q_OBJECT;
 public:
+	enum AdvancedRole {
+		AnyRole = -1,
+		FlagsRole = Qt::UserRole-1
+	};
+public:
 	AdvancedItemModel(QObject *AParent = NULL);
 	// QStandardItemModel
 	QMap<int, QVariant> itemData(const QModelIndex &AIndex) const;
@@ -41,6 +46,7 @@ public:
 	void setDelayedDataChangedSignals(bool AEnabed);
 	bool isRecursiveParentDataChangedSignals() const;
 	void setRecursiveParentDataChangedSignals(bool AEnabled);
+	inline bool isRemovedItem(const QStandardItem *AItem) const;
 	QList<QStandardItem *> findItems(const QMultiMap<int, QVariant> &AData, const QStandardItem *AParent=NULL, Qt::MatchFlags AFlags=Qt::MatchExactly, int AColumn=0) const;
 public:
 	// Sort Handlers
@@ -53,17 +59,14 @@ public:
 	void removeItemDataHolder(int AOrder, AdvancedItemDataHolder *AHandler);
 signals:
 	void itemInserted(QStandardItem *AItem);
-	void itemRemoved(QStandardItem *AItem);
+	void itemRemoving(QStandardItem *AItem);
 	void itemDataChanged(QStandardItem *AItem, int ARole);
-public:
-	static const int AnyRole = -1;
-	static const int FlagsRole = Qt::UserRole-1;
 protected:
 	void insertChangedItem(QStandardItem *AItem, int ARole);
 	void removeChangedItem(QStandardItem *AItem);
 protected:
 	void emitItemInserted(QStandardItem *AItem);
-	void emitItemRemoved(QStandardItem *AItem);
+	void emitItemRemoving(QStandardItem *AItem);
 	void emitItemChanged(QStandardItem *AItem);
 	void emitItemDataChanged(QStandardItem *AItem, int ARole);
 	void emitRecursiveParentDataChanged(QStandardItem *AParent);
@@ -73,13 +76,14 @@ protected slots:
 	void onColumnsInserted(const QModelIndex &AParent, int AStart, int AEnd);
 	void onRowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 	void onColumnsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
+	void onRowsOrColumnsRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 private:
 	friend class AdvancedItem;
 	friend class AdvancedItemDataHolder;
 private:
 	bool FDelayedDataChangedSignals;
 	bool FRecursiveParentDataChangedSignals;
-	QList<QStandardItem *> FRemovedItems;
+	QList<const QStandardItem *> FRemovingItems;
 	QMultiMap<QStandardItem *, int> FChangedItems;
 	QMultiMap<int, AdvancedItemSortHandler *> FItemSortHandlers;
 	QMap<int, QMultiMap<int, AdvancedItemDataHolder *> > FItemDataHolders;

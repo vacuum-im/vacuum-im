@@ -30,6 +30,11 @@ int RosterIndex::row() const
 	return AdvancedItem::row();
 }
 
+bool RosterIndex::isRemoved() const
+{
+	return AdvancedItem::isRemoved();
+}
+
 IRosterIndex *RosterIndex::parentIndex() const
 {
 	QStandardItem *pitem = AdvancedItem::parent();

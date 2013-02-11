@@ -110,6 +110,14 @@ bool AdvancedItem::operator <(const QStandardItem &AOther) const
 	return QStandardItem::operator<(AOther);
 }
 
+bool AdvancedItem::isRemoved() const
+{
+	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
+	if (advModel)
+		return advModel->isRemovedItem(this);
+	return false;
+}
+
 QMap<int, QVariant> AdvancedItem::itemData() const
 {
 	QMap<int, QVariant> values = FData;

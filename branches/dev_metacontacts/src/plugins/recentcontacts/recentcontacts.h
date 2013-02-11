@@ -120,7 +120,7 @@ protected slots:
 	void onRostersModelStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void onRostersModelIndexInserted(IRosterIndex *AIndex);
 	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
-	void onRostersModelIndexRemoved(IRosterIndex *AIndex);
+	void onRostersModelIndexRemoving(IRosterIndex *AIndex);
 protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);

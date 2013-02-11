@@ -23,7 +23,7 @@ protected slots:
 	void onAboutToHide();
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole);
-	void onRosterIndexRemoved(IRosterIndex *AIndex);
+	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onChatWindowContactJidChanged(const Jid &ABefore);
 private:
 	IRosterIndex *FRosterIndex;

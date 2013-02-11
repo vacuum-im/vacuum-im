@@ -47,6 +47,8 @@ AdvancedItemModel::AdvancedItemModel(QObject *AParent) : QStandardItemModel(APar
 	connect(this,SIGNAL(columnsInserted(const QModelIndex &, int, int)),SLOT(onColumnsInserted(const QModelIndex &, int, int)));
 	connect(this,SIGNAL(rowsAboutToBeRemoved(const QModelIndex &, int, int)),SLOT(onRowsAboutToBeRemoved(const QModelIndex &, int, int)));
 	connect(this,SIGNAL(columnsAboutToBeRemoved(const QModelIndex &, int, int)),SLOT(onColumnsAboutToBeRemoved(const QModelIndex &, int, int)));
+	connect(this,SIGNAL(rowsRemoved(const QModelIndex &, int, int)),SLOT(onRowsOrColumnsRemoved(const QModelIndex &, int, int)));
+	connect(this,SIGNAL(columnsRemoved(const QModelIndex &, int, int)),SLOT(onRowsOrColumnsRemoved(const QModelIndex &, int, int)));
 }
 
 QMap<int, QVariant> AdvancedItemModel::itemData(const QModelIndex &AIndex) const
@@ -80,6 +82,11 @@ void AdvancedItemModel::setRecursiveParentDataChangedSignals(bool AEnabled)
 	FRecursiveParentDataChangedSignals = AEnabled;
 }
 
+bool AdvancedItemModel::isRemovedItem(const QStandardItem *AItem) const
+{
+	return FRemovingItems.contains(AItem);
+}
+
 QList<QStandardItem *> AdvancedItemModel::findItems(const QMultiMap<int, QVariant> &AData, const QStandardItem *AParent, Qt::MatchFlags AFlags, int AColumn) const
 {
 	QList<QStandardItem *> items;
@@ -89,54 +96,57 @@ QList<QStandardItem *> AdvancedItemModel::findItems(const QMultiMap<int, QVarian
 	Qt::CaseSensitivity cs = AFlags & Qt::MatchCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
 
 	int row=0;
-	QStandardItem *rowItem=NULL;
+	QStandardItem *rowItem;
 	const QStandardItem *parentItem = AParent==NULL ? invisibleRootItem() : AParent;
-	while (rowItem = parentItem->child(row++,AColumn))
+	while ((rowItem = parentItem->child(row++,AColumn)) != NULL)
 	{
-		int lastRole = -1;
-		bool accepted = true;
-		for (QMultiMap<int, QVariant>::const_iterator findIt=AData.constBegin(); findIt!=AData.constEnd(); ++findIt)
+		if (!FRemovingItems.contains(rowItem))
 		{
-			int findRole = findIt.key();
-			if ((accepted && lastRole!=findRole) || (!accepted && lastRole==findRole))
+			int lastRole = -1;
+			bool accepted = true;
+			for (QMultiMap<int, QVariant>::const_iterator findIt=AData.constBegin(); findIt!=AData.constEnd(); ++findIt)
 			{
-				QVariant findValue = findIt.value();
-				QVariant itemValue = rowItem->data(findRole);
-				switch(matchType)
+				int findRole = findIt.key();
+				if ((accepted && lastRole!=findRole) || (!accepted && lastRole==findRole))
 				{
-				case Qt::MatchExactly:
-					accepted = (findValue==itemValue);
-					break;
-				case Qt::MatchRegExp:
-					accepted = QRegExp(findValue.toString(),cs).exactMatch(itemValue.toString());
-					break;
-				case Qt::MatchWildcard:
-					accepted = QRegExp(findValue.toString(), cs, QRegExp::Wildcard).exactMatch(itemValue.toString());
-					break;
-				case Qt::MatchStartsWith:
-					accepted = itemValue.toString().startsWith(findValue.toString(), cs);
-					break;
-				case Qt::MatchEndsWith:
-					accepted = itemValue.toString().endsWith(findValue.toString(), cs);
-					break;
-				case Qt::MatchFixedString:
-					accepted = (itemValue.toString().compare(findValue.toString(), cs)==0);
-					break;
-				case Qt::MatchContains:
-				default:
-					accepted = itemValue.toString().contains(findValue.toString(), cs);
+					QVariant findValue = findIt.value();
+					QVariant itemValue = rowItem->data(findRole);
+					switch(matchType)
+					{
+					case Qt::MatchExactly:
+						accepted = (findValue==itemValue);
+						break;
+					case Qt::MatchRegExp:
+						accepted = QRegExp(findValue.toString(),cs).exactMatch(itemValue.toString());
+						break;
+					case Qt::MatchWildcard:
+						accepted = QRegExp(findValue.toString(), cs, QRegExp::Wildcard).exactMatch(itemValue.toString());
+						break;
+					case Qt::MatchStartsWith:
+						accepted = itemValue.toString().startsWith(findValue.toString(), cs);
+						break;
+					case Qt::MatchEndsWith:
+						accepted = itemValue.toString().endsWith(findValue.toString(), cs);
+						break;
+					case Qt::MatchFixedString:
+						accepted = (itemValue.toString().compare(findValue.toString(), cs)==0);
+						break;
+					case Qt::MatchContains:
+					default:
+						accepted = itemValue.toString().contains(findValue.toString(), cs);
+					}
 				}
+				else if (!accepted)
+				{
+					break;
+				}
+				lastRole = findRole;
 			}
-			else if (!accepted)
-			{
-				break;
-			}
-			lastRole = findRole;
+			if (accepted)
+				items.append(rowItem);
+			if (recursive && rowItem->hasChildren())
+				items += findItems(AData,rowItem,AFlags,AColumn);
 		}
-		if (accepted)
-			items.append(rowItem);
-		if (recursive && rowItem->hasChildren())
-			items += findItems(AData,rowItem,AFlags,AColumn);
 	}
 
 	return items;
@@ -205,9 +215,7 @@ void AdvancedItemModel::emitItemInserted(QStandardItem *AItem)
 {
 	if (AItem)
 	{
-		if (FDelayedDataChangedSignals)
-			FRemovedItems.removeAll(AItem);
-
+		FRemovingItems.removeAll(AItem);
 		for (int row=0; row<AItem->rowCount(); row++)
 			for (int col=0; col<AItem->columnCount(); col++)
 				emitItemInserted(AItem->child(row,col));
@@ -215,17 +223,15 @@ void AdvancedItemModel::emitItemInserted(QStandardItem *AItem)
 	}
 }
 
-void AdvancedItemModel::emitItemRemoved(QStandardItem *AItem)
+void AdvancedItemModel::emitItemRemoving(QStandardItem *AItem)
 {
 	if (AItem)
 	{
-		if (FDelayedDataChangedSignals)
-			FRemovedItems.append(AItem);
-
+		FRemovingItems.append(AItem);
 		for (int row=0; row<AItem->rowCount(); row++)
 			for (int col=0; col<AItem->columnCount(); col++)
-				emitItemRemoved(AItem->child(row,col));
-		emit itemRemoved(AItem);
+				emitItemRemoving(AItem->child(row,col));
+		emit itemRemoving(AItem);
 	}
 }
 
@@ -281,22 +287,18 @@ void AdvancedItemModel::onEmitDelayedDataChangedSignals()
 		QStandardItem *lastItem = NULL;
 		for (QMultiMap<QStandardItem *, int>::iterator it=FChangedItems.begin(); it!=FChangedItems.end(); it=FChangedItems.erase(it))
 		{
+			int role = it.value();
 			QStandardItem *item = it.key();
-			if (lastItem==item || !FRemovedItems.contains(item))
-			{
-				int role = it.value();
 
-				if (lastItem != item)
-					emitItemChanged(item);
+			if (lastItem != item)
+				emitItemChanged(item);
 
-				if (role > AnyRole)
-					emit itemDataChanged(item,role);
+			if (role > AnyRole)
+				emit itemDataChanged(item,role);
 
-				lastItem = item;
-			}
+			lastItem = item;
 		}
 	}
-	FRemovedItems.clear();
 }
 
 void AdvancedItemModel::onRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
@@ -322,8 +324,7 @@ void AdvancedItemModel::onRowsAboutToBeRemoved(const QModelIndex &AParent, int A
 	int colums = columnCount(AParent);
 	for (int row=AStart; row<=AEnd; row++)
 		for (int col=0; col<colums; col++)
-			emitItemRemoved(itemFromIndex(index(row,col,AParent)));
-	emitRecursiveParentDataChanged(itemFromIndex(AParent));
+			emitItemRemoving(itemFromIndex(index(row,col,AParent)));
 }
 
 void AdvancedItemModel::onColumnsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd)
@@ -331,6 +332,24 @@ void AdvancedItemModel::onColumnsAboutToBeRemoved(const QModelIndex &AParent, in
 	int rows = rowCount(AParent);
 	for (int col=AStart; col<=AEnd; col++)
 		for(int row=0; row<rows; row++)
-			emitItemRemoved(itemFromIndex(index(row,col,AParent)));
+			emitItemRemoving(itemFromIndex(index(row,col,AParent)));
+}
+
+void AdvancedItemModel::onRowsOrColumnsRemoved(const QModelIndex &AParent, int AStart, int AEnd)
+{
+	Q_UNUSED(AStart); Q_UNUSED(AEnd);
+	for (QMap<QStandardItem *, int>::iterator it=FChangedItems.begin(); it!=FChangedItems.end(); )
+	{
+		if (FRemovingItems.contains(it.key()))
+		{
+			for (QStandardItem *item=it.key(); item==it.key() && it!=FChangedItems.end(); it=FChangedItems.erase(it))
+				;
+		}
+		else
+		{
+			++it;
+		}
+	}
+	FRemovingItems.clear();
 	emitRecursiveParentDataChanged(itemFromIndex(AParent));
 }

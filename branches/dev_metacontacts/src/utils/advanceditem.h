@@ -20,6 +20,7 @@ public:
 	void setData(const QVariant &AValue, int ARole = Qt::UserRole+1);
 	bool operator<(const QStandardItem &AOther) const;
 	// AdvancedItem
+	bool isRemoved() const;
 	virtual QMap<int, QVariant> itemData() const;
 	virtual QList<QStandardItem *> findChilds(const QMultiMap<int, QVariant> &AData, Qt::MatchFlags AFlags=Qt::MatchExactly, int AColumn=0) const;
 public:

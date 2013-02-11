@@ -27,6 +27,7 @@ public:
 	virtual AdvancedItem *instance() =0;
 	virtual int kind() const =0;
 	virtual int row() const =0;
+	virtual bool isRemoved() const =0;
 	virtual IRosterIndex *parentIndex() const =0;
 	virtual int childCount() const =0;
 	virtual void appendChild(IRosterIndex *AIndex) =0;
@@ -72,7 +73,7 @@ protected:
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 	virtual void indexCreated(IRosterIndex *AIndex) =0;
 	virtual void indexInserted(IRosterIndex *AIndex) =0;
-	virtual void indexRemoved(IRosterIndex *AIndex) =0;
+	virtual void indexRemoving(IRosterIndex *AIndex) =0;
 	virtual void indexDestroyed(IRosterIndex *AIndex) =0;
 	virtual void indexDataChanged(IRosterIndex *AIndex, int ARole) =0;
 };

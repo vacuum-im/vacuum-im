@@ -115,7 +115,7 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 			connect(FRostersModel->instance(),SIGNAL(streamJidChanged(const Jid &, const Jid &)),SLOT(onRostersModelStreamJidChanged(const Jid &, const Jid &)));
 			connect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),SLOT(onRostersModelIndexInserted(IRosterIndex *)));
 			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex*, int)));
-			connect(FRostersModel->instance(),SIGNAL(indexRemoved(IRosterIndex *)),SLOT(onRostersModelIndexRemoved(IRosterIndex *)));
+			connect(FRostersModel->instance(),SIGNAL(indexRemoving(IRosterIndex *)),SLOT(onRostersModelIndexRemoving(IRosterIndex *)));
 		}
 	}
 
@@ -1142,7 +1142,7 @@ void RecentContacts::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int AR
 	}
 }
 
-void RecentContacts::onRostersModelIndexRemoved(IRosterIndex *AIndex)
+void RecentContacts::onRostersModelIndexRemoving(IRosterIndex *AIndex)
 {
 	onRostersModelIndexInserted(AIndex);
 }

@@ -11,10 +11,10 @@ UserContextMenu::UserContextMenu(IRostersModel *AModel, IRostersView *AView, ICh
 	connect(this,SIGNAL(aboutToHide()),SLOT(onAboutToHide()));
 	connect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),SLOT(onRosterIndexInserted(IRosterIndex *)));
 	connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *,int)),SLOT(onRosterIndexDataChanged(IRosterIndex *,int)));
-	connect(FRostersModel->instance(),SIGNAL(indexRemoved(IRosterIndex *)),SLOT(onRosterIndexRemoved(IRosterIndex *)));
+	connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
 	connect(FChatWindow->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onChatWindowContactJidChanged(const Jid &)));
 
-	onRosterIndexRemoved(FRosterIndex);
+	onRosterIndexDestroyed(FRosterIndex);
 }
 
 UserContextMenu::~UserContextMenu()
@@ -90,7 +90,7 @@ void UserContextMenu::onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole)
 			if (isAcceptedIndex(AIndex))
 				updateMenu();
 			else
-				onRosterIndexRemoved(FRosterIndex);
+				onRosterIndexDestroyed(FRosterIndex);
 		}
 		else if (ARole == RDR_NAME)
 		{
@@ -104,7 +104,7 @@ void UserContextMenu::onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole)
 	}
 }
 
-void UserContextMenu::onRosterIndexRemoved(IRosterIndex *AIndex)
+void UserContextMenu::onRosterIndexDestroyed(IRosterIndex *AIndex)
 {
 	if (FRosterIndex == AIndex)
 	{
@@ -113,7 +113,8 @@ void UserContextMenu::onRosterIndexRemoved(IRosterIndex *AIndex)
 	}
 }
 
-void UserContextMenu::onChatWindowContactJidChanged(const Jid &/*ABefore*/)
+void UserContextMenu::onChatWindowContactJidChanged(const Jid &ABefore)
 {
-	onRosterIndexRemoved(FRosterIndex);
+	Q_UNUSED(ABefore);
+	onRosterIndexDestroyed(FRosterIndex);
 }
