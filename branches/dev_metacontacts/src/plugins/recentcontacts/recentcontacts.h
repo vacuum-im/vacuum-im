@@ -67,8 +67,6 @@ public:
 	virtual void setItemActiveTime(const IRecentItem &AItem, const QDateTime &ATime = QDateTime::currentDateTime());
 	virtual void removeItem(const IRecentItem &AItem);
 	virtual QList<IRecentItem> visibleItems() const;
-	virtual quint8 maximumVisibleItems() const;
-	virtual void setMaximumVisibleItems(quint8 ACount);
 	virtual IRecentItem rosterIndexItem(const IRosterIndex *AIndex) const;
 	virtual IRosterIndex *itemRosterIndex(const IRecentItem &AItem) const;
 	virtual IRosterIndex *itemRosterProxyIndex(const IRecentItem &AItem) const;
@@ -145,8 +143,8 @@ protected slots:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
-	void onChangeAlwaysShowOfflineContacts();
-	void onChangeHideLaterContacts();
+	void onChangeAlwaysShowOfflineItems();
+	void onChangeHideInactiveItems();
 	void onChangeSimpleContactsView();
 	void onChangeSortByLastActivity();
 	void onChangeShowOnlyFavorite();
@@ -159,9 +157,10 @@ private:
 	IStatusIcons *FStatusIcons;
 	IMessageProcessor *FMessageProcessor;
 private:
-	quint32 FShowFavariteLabelId;
+	quint32 FShowFavoriteLabelId;
 private:
 	quint8 FMaxVisibleItems;
+	quint8 FInactiveDaysTimeout;
 	QMap<Jid, QList<IRecentItem> > FStreamItems;
 	QMap<IRecentItem, IRosterIndex *> FVisibleItems;
 private:

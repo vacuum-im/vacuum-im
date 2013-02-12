@@ -20,10 +20,6 @@
         <translation>Удалить контакт из избранных</translation>
     </message>
     <message>
-        <source>Hide Later Contacts</source>
-        <translation>Прятать более поздние контакты</translation>
-    </message>
-    <message>
         <source>Always Show Offline Contacts</source>
         <translation>Всегда отображать отключенные контакты</translation>
     </message>
@@ -54,6 +50,10 @@
     <message>
         <source>Show Only Favorite Contacts</source>
         <translation>Показывать только избранные контакты</translation>
+    </message>
+    <message>
+        <source>Hide Inactive Contacts</source>
+        <translation>Прятать не активные контакты</translation>
     </message>
 </context>
 </TS>

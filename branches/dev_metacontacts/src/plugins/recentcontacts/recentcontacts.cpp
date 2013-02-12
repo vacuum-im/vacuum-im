@@ -29,10 +29,14 @@
 #define PST_RECENTCONTACTS           "recent"
 #define PSN_RECENTCONTACTS           "vacuum:recent-contacts"
 
-#define MIN_VISIBLE_ITEMS            5
+#define MAX_STORAGE_CONTACTS         20
+#define MIN_VISIBLE_CONTACTS         5
+
+#define MAX_INACTIVE_TIMEOUT         31
+#define MIX_INACTIVE_TIMEOUT         1
+
 #define STORAGE_SAVE_TIMEOUT         100
 #define STORAGE_FIRST_SAVE_TIMEOUT   5000
-#define LATER_CONTACTS_DAYS_DELTA    7
 
 #define ADR_STREAM_JID               Action::DR_StreamJid
 #define ADR_CONTACT_JID              Action::DR_UserDefined + 1
@@ -56,9 +60,10 @@ RecentContacts::RecentContacts()
 	FRostersViewPlugin = NULL;
 
 	FRootIndex = NULL;
-	FShowFavariteLabelId = 0;
+	FShowFavoriteLabelId = 0;
 	
 	FMaxVisibleItems = 20;
+	FInactiveDaysTimeout = 7;
 	FHideLaterContacts = true;
 	FAllwaysShowOffline = true;
 	FSimpleContactsView = true;
@@ -169,7 +174,7 @@ bool RecentContacts::initObjects()
 		AdvancedDelegateItem showFavorite(RLID_RECENT_FAVORITE);
 		showFavorite.d->kind = AdvancedDelegateItem::CustomData;
 		showFavorite.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT_FAVORITE);
-		FShowFavariteLabelId = FRostersView->registerLabel(showFavorite);
+		FShowFavoriteLabelId = FRostersView->registerLabel(showFavorite);
 
 		FRostersView->insertDragDropHandler(this);
 		FRostersView->insertLabelHolder(RLHO_RECENT_FILTER,this);
@@ -196,10 +201,12 @@ bool RecentContacts::initObjects()
 bool RecentContacts::initSettings()
 {
 	Options::setDefaultValue(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE,true);
-	Options::setDefaultValue(OPV_ROSTER_RECENT_HIDELATERCONTACTS,true);
-	Options::setDefaultValue(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW,true);
+	Options::setDefaultValue(OPV_ROSTER_RECENT_HIDEINACTIVEITEMS,true);
+	Options::setDefaultValue(OPV_ROSTER_RECENT_SIMPLEITEMSVIEW,true);
 	Options::setDefaultValue(OPV_ROSTER_RECENT_SORTBYACTIVETIME,true);
 	Options::setDefaultValue(OPV_ROSTER_RECENT_SHOWONLYFAVORITE,false);
+	Options::setDefaultValue(OPV_ROSTER_RECENT_MAXVISIBLEITEMS,20);
+	Options::setDefaultValue(OPV_ROSTER_RECENT_INACTIVEDAYSTIMEOUT,7);
 	return true;
 }
 
@@ -546,20 +553,6 @@ QList<IRecentItem> RecentContacts::visibleItems() const
 	return FVisibleItems.keys();
 }
 
-quint8 RecentContacts::maximumVisibleItems() const
-{
-	return FMaxVisibleItems;
-}
-
-void RecentContacts::setMaximumVisibleItems(quint8 ACount)
-{
-	if (FMaxVisibleItems!=ACount && ACount>=MIN_VISIBLE_ITEMS)
-	{
-		FMaxVisibleItems = ACount;
-		updateVisibleItems();
-	}
-}
-
 IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 {
 	static IRecentItem nullItem;
@@ -653,7 +646,7 @@ void RecentContacts::updateVisibleItems()
 					firstTime = it->activeTime;
 					++it;
 				}
-				else if (it->activeTime.daysTo(firstTime) > LATER_CONTACTS_DAYS_DELTA)
+				else if (it->activeTime.daysTo(firstTime) > FInactiveDaysTimeout)
 				{
 					it = common.erase(it);
 				}
@@ -738,9 +731,9 @@ void RecentContacts::updateItemIndex(const IRecentItem &AItem)
 		if (FRostersView)
 		{
 			if (favorite)
-				FRostersView->insertLabel(FShowFavariteLabelId,index);
+				FRostersView->insertLabel(FShowFavoriteLabelId,index);
 			else
-				FRostersView->removeLabel(FShowFavariteLabelId,index);
+				FRostersView->removeLabel(FShowFavoriteLabelId,index);
 		}
 	}
 }
@@ -872,7 +865,11 @@ void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecent
 	{
 		qSort(curItems.begin(),curItems.end(),recentItemLessThen);
 
-		int removeCount = curItems.count() - FMaxVisibleItems;
+		int favoriteCount = 0;
+		while(favoriteCount<curItems.count() && curItems.at(favoriteCount).properties.value(REIP_FAVORITE).toBool())
+			favoriteCount++;
+
+		int removeCount = curItems.count() - favoriteCount - MAX_STORAGE_CONTACTS;
 		for(int index = curItems.count()-1; removeCount>0 && index>=0; index--)
 		{
 			if (!curItems.at(index).properties.value(REIP_FAVORITE).toBool())
@@ -1105,7 +1102,15 @@ void RecentContacts::onRostersModelStreamJidChanged(const Jid &ABefore, const Ji
 {
 	QList<IRecentItem> items = FStreamItems.take(ABefore);
 	for (QList<IRecentItem>::iterator it=items.begin(); it!=items.end(); ++it)
+	{
+		IRosterIndex *index = FVisibleItems.take(*it);
 		it->streamJid = AAfter;
+		if (index)
+		{
+			index->setData(ABefore.pFull(),RDR_STREAM_JID);
+			FVisibleItems.insert(*it,index);
+		}
+	}
 	FStreamItems.insert(AAfter,items);
 	
 	if (FSaveStreams.contains(ABefore))
@@ -1196,19 +1201,19 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 		QSet<Action *> recentActions;
 		if (!FRostersView->hasMultiSelection() && AIndexes.value(0)->kind()==RIK_RECENT_ROOT)
 		{
-			Action *hideLater = new Action(AMenu);
-			hideLater->setText(tr("Hide Later Contacts"));
-			hideLater->setCheckable(true);
-			hideLater->setChecked(FHideLaterContacts);
-			connect(hideLater,SIGNAL(triggered()),SLOT(onChangeHideLaterContacts()));
-			AMenu->addAction(hideLater,AG_RVCM_RECENT_OPTIONS);
-			recentActions += hideLater;
+			Action *hideInactive = new Action(AMenu);
+			hideInactive->setText(tr("Hide Inactive Contacts"));
+			hideInactive->setCheckable(true);
+			hideInactive->setChecked(FHideLaterContacts);
+			connect(hideInactive,SIGNAL(triggered()),SLOT(onChangeHideInactiveItems()));
+			AMenu->addAction(hideInactive,AG_RVCM_RECENT_OPTIONS);
+			recentActions += hideInactive;
 
 			Action *showOffline = new Action(AMenu);
 			showOffline->setText(tr("Always Show Offline Contacts"));
 			showOffline->setCheckable(true);
 			showOffline->setChecked(FAllwaysShowOffline);
-			connect(showOffline,SIGNAL(triggered()),SLOT(onChangeAlwaysShowOfflineContacts()));
+			connect(showOffline,SIGNAL(triggered()),SLOT(onChangeAlwaysShowOfflineItems()));
 			AMenu->addAction(showOffline,AG_RVCM_RECENT_OPTIONS);
 			recentActions += showOffline;
 			
@@ -1460,10 +1465,12 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 void RecentContacts::onOptionsOpened()
 {
 	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE));
-	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_HIDELATERCONTACTS));
-	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_HIDEINACTIVEITEMS));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SIMPLEITEMSVIEW));
 	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SORTBYACTIVETIME));
 	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_SHOWONLYFAVORITE));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_MAXVISIBLEITEMS));
+	onOptionsChanged(Options::node(OPV_ROSTER_RECENT_INACTIVEDAYSTIMEOUT));
 }
 
 void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
@@ -1474,12 +1481,12 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 		foreach(IRosterIndex *index, FVisibleItems.values())
 			emit rosterDataChanged(index,RDR_ALLWAYS_VISIBLE);
 	}
-	else if (ANode.path() == OPV_ROSTER_RECENT_HIDELATERCONTACTS)
+	else if (ANode.path() == OPV_ROSTER_RECENT_HIDEINACTIVEITEMS)
 	{
 		FHideLaterContacts = ANode.value().toBool();
 		updateVisibleItems();
 	}
-	else if (ANode.path() == OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW)
+	else if (ANode.path() == OPV_ROSTER_RECENT_SIMPLEITEMSVIEW)
 	{
 		FSimpleContactsView = ANode.value().toBool();
 		rosterLabelChanged(RLID_AVATAR_IMAGE);
@@ -1496,21 +1503,31 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 		FShowOnlyFavorite = ANode.value().toBool();
 		updateVisibleItems();
 	}
+	else if (ANode.path() == OPV_ROSTER_RECENT_MAXVISIBLEITEMS)
+	{
+		FMaxVisibleItems = qMin(qMax(ANode.value().toInt(),MIN_VISIBLE_CONTACTS),MAX_STORAGE_CONTACTS);
+		updateVisibleItems();
+	}
+	else if (ANode.path() == OPV_ROSTER_RECENT_INACTIVEDAYSTIMEOUT)
+	{
+		FInactiveDaysTimeout = qMin(qMax(ANode.value().toInt(),MIX_INACTIVE_TIMEOUT),MAX_INACTIVE_TIMEOUT);
+		updateVisibleItems();
+	}
 }
 
-void RecentContacts::onChangeAlwaysShowOfflineContacts()
+void RecentContacts::onChangeAlwaysShowOfflineItems()
 {
 	Options::node(OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE).setValue(!FAllwaysShowOffline);
 }
 
-void RecentContacts::onChangeHideLaterContacts()
+void RecentContacts::onChangeHideInactiveItems()
 {
-	Options::node(OPV_ROSTER_RECENT_HIDELATERCONTACTS).setValue(!FHideLaterContacts);
+	Options::node(OPV_ROSTER_RECENT_HIDEINACTIVEITEMS).setValue(!FHideLaterContacts);
 }
 
 void RecentContacts::onChangeSimpleContactsView()
 {
-	Options::node(OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW).setValue(!FSimpleContactsView);
+	Options::node(OPV_ROSTER_RECENT_SIMPLEITEMSVIEW).setValue(!FSimpleContactsView);
 }
 
 void RecentContacts::onChangeSortByLastActivity()

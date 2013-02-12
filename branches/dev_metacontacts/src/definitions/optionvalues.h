@@ -206,10 +206,12 @@
 #define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
 //RecentContact
 #define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
-#define OPV_ROSTER_RECENT_HIDELATERCONTACTS             "roster.recent.hide-later-contacts"
-#define OPV_ROSTER_RECENT_SIMPLECONTACTSVIEW            "roster.recent.simple-contacts-view"
+#define OPV_ROSTER_RECENT_HIDEINACTIVEITEMS             "roster.recent.hide-inactive-items"
+#define OPV_ROSTER_RECENT_SIMPLEITEMSVIEW               "roster.recent.simple-items-view"
 #define OPV_ROSTER_RECENT_SORTBYACTIVETIME              "roster.recent.sort-by-active-time"
 #define OPV_ROSTER_RECENT_SHOWONLYFAVORITE              "roster.recent.show-only-favorite"
+#define OPV_ROSTER_RECENT_MAXVISIBLEITEMS               "roster.recent.max-visible-items"
+#define OPV_ROSTER_RECENT_INACTIVEDAYSTIMEOUT           "roster.recent.inactive-days-timeout"
 
 // ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"

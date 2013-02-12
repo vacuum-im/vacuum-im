@@ -20,10 +20,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hide Later Contacts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Always Show Offline Contacts</source>
         <translation type="unfinished"></translation>
     </message>
@@ -53,6 +49,10 @@
     </message>
     <message>
         <source>Show Only Favorite Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Inactive Contacts</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
