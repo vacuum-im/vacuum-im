@@ -1,5 +1,5 @@
 HEADERS = dataholder.h \
-          rootindex. h \
+          rootindex.h \
           rosterindex.h \
           rostersmodel.h 
 

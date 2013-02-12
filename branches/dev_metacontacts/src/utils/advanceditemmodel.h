@@ -46,7 +46,7 @@ public:
 	void setDelayedDataChangedSignals(bool AEnabed);
 	bool isRecursiveParentDataChangedSignals() const;
 	void setRecursiveParentDataChangedSignals(bool AEnabled);
-	inline bool isRemovedItem(const QStandardItem *AItem) const;
+	bool isRemovedItem(const QStandardItem *AItem) const;
 	QList<QStandardItem *> findItems(const QMultiMap<int, QVariant> &AData, const QStandardItem *AParent=NULL, Qt::MatchFlags AFlags=Qt::MatchExactly, int AColumn=0) const;
 public:
 	// Sort Handlers
