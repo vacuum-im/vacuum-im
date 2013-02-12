@@ -4,6 +4,7 @@
 #include <QSortFilterProxyModel>
 #include <definitions/optionvalues.h>
 #include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindextypeorders.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
@@ -20,8 +21,8 @@ public slots:
 protected:
 	bool compareVariant(const QVariant &ALeft, const QVariant &ARight) const;
 protected:
-	virtual bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
-	virtual bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
+	bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
+	bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
 private:
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
