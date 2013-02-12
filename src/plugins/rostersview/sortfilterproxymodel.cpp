@@ -65,27 +65,21 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 		QVariant rightSortOrder = ARight.data(RDR_SORT_ORDER);
 		if (leftSortOrder.isNull() || rightSortOrder.isNull() || leftSortOrder==rightSortOrder)
 		{
-			int leftShow = ALeft.data(RDR_SHOW).toInt();
-			int rightShow = ARight.data(RDR_SHOW).toInt();
-			if (FSortByStatus && leftTypeOrder!=RIT_STREAM_ROOT && leftShow!=rightShow)
+			if (FSortByStatus && leftTypeOrder!=RITO_STREAM_ROOT)
 			{
-				const static int showOrders[] = {6,2,1,3,4,5,7,8};
-				return showOrders[leftShow] < showOrders[rightShow];
+				int leftShow = ALeft.data(RDR_SHOW).toInt();
+				int rightShow = ARight.data(RDR_SHOW).toInt();
+				if (leftShow != rightShow)
+				{
+					static const int showOrders[] = {6,2,1,3,4,5,7,8};
+					return showOrders[leftShow] < showOrders[rightShow];
+				}
 			}
-			else
-			{
-				return compareVariant(ALeft.data(Qt::DisplayRole),ARight.data(Qt::DisplayRole));
-			}
+			return compareVariant(ALeft.data(Qt::DisplayRole),ARight.data(Qt::DisplayRole));
 		}
-		else
-		{
-			return compareVariant(leftSortOrder,rightSortOrder);
-		}
+		return compareVariant(leftSortOrder,rightSortOrder);
 	}
-	else
-	{
-		return leftTypeOrder < rightTypeOrder;
-	}
+	return leftTypeOrder < rightTypeOrder;
 }
 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
