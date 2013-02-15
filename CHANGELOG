@@ -17,6 +17,7 @@ LEGEND
   [-] The saved status messages including about a file transfer, were displayed with incorrect date when loading from history in windows of a usual chat and a private chat of conferences
   [-] The exit from conference occurred incorrectly if was requested after a send of request for an entrance, but before receiving confirmation on an entrance
   [-] Full text search in file archive of messages in certain cases worked not correctly
+  [-] Proxy authorization in certain cases was not worked
 
 
 v1.2.0

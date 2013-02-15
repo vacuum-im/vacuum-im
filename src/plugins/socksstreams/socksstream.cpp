@@ -3,6 +3,7 @@
 #include <QEvent>
 #include <QReadLocker>
 #include <QWriteLocker>
+#include <QAuthenticator>
 #include <QCoreApplication>
 #include <QNetworkInterface>
 
@@ -721,6 +722,8 @@ bool SocksStream::connectToHost()
 		if (!FTcpSocket)
 		{
 			FTcpSocket = new QTcpSocket(this);
+			connect(FTcpSocket, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
+				SLOT(onHostSocketProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
 			connect(FTcpSocket,SIGNAL(connected()),SLOT(onHostSocketConnected()));
 			connect(FTcpSocket,SIGNAL(readyRead()), SLOT(onHostSocketReadyRead()));
 			connect(FTcpSocket,SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onHostSocketError(QAbstractSocket::SocketError)));
@@ -782,6 +785,12 @@ bool SocksStream::activateStream()
 		}
 	}
 	return false;
+}
+
+void SocksStream::onHostSocketProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth)
+{
+	AAuth->setUser(AProxy.user());
+	AAuth->setPassword(AProxy.password());
 }
 
 void SocksStream::onHostSocketConnected()
