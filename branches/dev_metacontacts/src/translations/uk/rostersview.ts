@@ -43,20 +43,12 @@
         <translation>Ростер</translation>
     </message>
     <message>
-        <source>Show/Hide offline contacts</source>
-        <translation>Сховати/показати відключені контакти</translation>
-    </message>
-    <message>
         <source>Roster View</source>
         <translation>Перегляд ростеру</translation>
     </message>
     <message>
         <source>Displays a hierarchical roster&apos;s model</source>
         <translation>Відображає ієрархічну модель ростеру</translation>
-    </message>
-    <message>
-        <source>Show offline contact</source>
-        <translation>Показувати відключені контакти</translation>
     </message>
     <message>
         <source>Show contact resource in roster</source>
@@ -81,6 +73,18 @@
     <message>
         <source>Do not show the scroll bars</source>
         <translation>Не показувати полосу прокрутки</translation>
+    </message>
+    <message>
+        <source>Show/Hide disconnected contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show disconnected contact</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -12,7 +12,6 @@
 #include <definitions/rosterlabels.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
-#include <definitions/rosterlabelholderorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
@@ -53,11 +52,10 @@ class StatusChanger :
 	public QObject,
 	public IPlugin,
 	public IStatusChanger,
-	public IOptionsHolder,
-	public IRostersLabelHolder
+	public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder IRostersLabelHolder);
+	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
 public:
 	StatusChanger();
 	~StatusChanger();
@@ -71,9 +69,6 @@ public:
 	virtual bool startPlugin();
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
-	//IRostersLabelHolder
-	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
-	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IStatusChanger
 	virtual Menu *statusMenu() const;
 	virtual Menu *streamMenu(const Jid &AStreamJid) const;
@@ -100,8 +95,6 @@ signals:
 	void statusItemAdded(int AStatusId);
 	void statusItemChanged(int AStatusId);
 	void statusItemRemoved(int AStatusId);
-	//IRostersLabelHolder
-	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	void createDefaultStatus();
 	void setMainStatusId(int AStatusId);
@@ -169,7 +162,6 @@ private:
 	IPresence *FChangingPresence;
 	QSet<IPresence *> FFastReconnect;
 	QList<IPresence *> FShutdownList;
-	AdvancedDelegateItem FStatusLabel;
 	QMap<int, StatusItem> FStatusItems;
 	QSet<IPresence *> FMainStatusStreams;
 	QMap<IPresence *, int> FLastOnlineStatus;

@@ -43,20 +43,12 @@
         <translation>Roster</translation>
     </message>
     <message>
-        <source>Show/Hide offline contacts</source>
-        <translation>Zeige/Verstecke offline Kontakte</translation>
-    </message>
-    <message>
         <source>Roster View</source>
         <translation>Roster Ansicht</translation>
     </message>
     <message>
         <source>Displays a hierarchical roster&apos;s model</source>
         <translation>Zeigt ein hierarchisches Roster Modell</translation>
-    </message>
-    <message>
-        <source>Show offline contact</source>
-        <translation>Zeige Offline Kontakte</translation>
     </message>
     <message>
         <source>Show contact resource in roster</source>
@@ -81,6 +73,18 @@
     <message>
         <source>Do not show the scroll bars</source>
         <translation>Scroll Balken nicht anzeigen</translation>
+    </message>
+    <message>
+        <source>Show/Hide disconnected contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show disconnected contact</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

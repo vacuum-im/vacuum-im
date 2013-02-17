@@ -48,6 +48,10 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 	if (plugin)
 	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+		if (FRostersModel)
+		{
+			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex *, int)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
@@ -70,7 +74,7 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 
 bool RostersViewPlugin::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MAINWINDOW_TOGGLEOFFLINE, tr("Show/Hide offline contacts"),QKeySequence::UnknownKey);
+	Shortcuts::declareShortcut(SCT_MAINWINDOW_TOGGLEOFFLINE, tr("Show/Hide disconnected contacts"),QKeySequence::UnknownKey);
 	
 	Shortcuts::declareGroup(SCTG_ROSTERVIEW,tr("Roster"),SGO_ROSTERVIEW);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COPYJID,tr("Copy contact JID to clipboard"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
@@ -84,11 +88,17 @@ bool RostersViewPlugin::initObjects()
 	FSortFilterProxyModel->sort(0,Qt::AscendingOrder);
 	FRostersView->insertProxyModel(FSortFilterProxyModel,RPO_ROSTERSVIEW_SORTFILTER);
 
+	FStatusLabel.d->id = RLID_ROSTERSVIEW_STATUS;
+	FStatusLabel.d->kind = AdvancedDelegateItem::CustomData;
+	FStatusLabel.d->data = RDR_STATUS;
+	FStatusLabel.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
+	FStatusLabel.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);
+
 	if (FMainWindowPlugin)
 	{
 		FShowOfflineAction = new Action(this);
 		FShowOfflineAction->setIcon(RSR_STORAGE_MENUICONS, MNI_ROSTERVIEW_HIDE_OFFLINE);
-		FShowOfflineAction->setToolTip(tr("Show/Hide offline contacts"));
+		FShowOfflineAction->setToolTip(tr("Show/Hide disconnected contacts"));
 		FShowOfflineAction->setShortcutId(SCT_MAINWINDOW_TOGGLEOFFLINE);
 		connect(FShowOfflineAction,SIGNAL(triggered(bool)),SLOT(onShowOfflineContactsAction(bool)));
 		FMainWindowPlugin->mainWindow()->topToolBarChanger()->insertAction(FShowOfflineAction,TBG_MWTTB_ROSTERSVIEW);
@@ -102,6 +112,7 @@ bool RostersViewPlugin::initObjects()
 		FRostersView->setRostersModel(FRostersModel);
 	}
 
+	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_STATUS,this);
 	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,FRostersView);
 	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_DISPLAY,FRostersView);
 
@@ -125,6 +136,7 @@ bool RostersViewPlugin::initSettings()
 	Options::setDefaultValue(OPV_ROSTER_SHOWRESOURCE,true);
 	Options::setDefaultValue(OPV_ROSTER_SORTBYSTATUS,false);
 	Options::setDefaultValue(OPV_ROSTER_HIDE_SCROLLBAR,false);
+	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
 
 	if (FOptionsManager)
 	{
@@ -140,10 +152,11 @@ QMultiMap<int, IOptionsWidget *> RostersViewPlugin::optionsWidgets(const QString
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_ROSTER)
 	{
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show offline contact"),AParent));
+		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contact"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource in roster"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SORTBYSTATUS),tr("Sort contacts by status"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_HIDE_SCROLLBAR),tr("Do not show the scroll bars"),AParent));
+		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"),AParent));
 	}
 	return widgets;
 }
@@ -214,6 +227,27 @@ bool RostersViewPlugin::setRosterData(int AOrder, const QVariant &AValue, IRoste
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
+}
+
+QList<quint32> RostersViewPlugin::rosterLabels( int AOrder, const IRosterIndex *AIndex ) const
+{
+	QList<quint32> labels;
+	if (AOrder==RLHO_ROSTERSVIEW_STATUS && !AIndex->data(RDR_STATUS).toString().isEmpty())
+	{
+		if (AIndex->kind()==RIK_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
+			labels.append(RLID_ROSTERSVIEW_STATUS);
+		else if (Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool())
+			labels.append(RLID_ROSTERSVIEW_STATUS);
+	}
+	return labels;
+}
+
+AdvancedDelegateItem RostersViewPlugin::rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const
+{
+	Q_UNUSED(ALabelId); Q_UNUSED(AIndex);
+	if (AOrder==RLHO_ROSTERSVIEW_STATUS)
+		return FStatusLabel;
+	return AdvancedDelegateItem();
 }
 
 IRostersView *RostersViewPlugin::rostersView()
@@ -430,12 +464,32 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 		FRostersView->setVerticalScrollBarPolicy(ANode.value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
 		FRostersView->setHorizontalScrollBarPolicy(ANode.value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
 	}
+	else if (ANode.path() == OPV_ROSTER_SHOWSTATUSTEXT)
+	{
+		emit rosterLabelChanged(RLID_ROSTERSVIEW_STATUS);
+	}
 }
 
 void RostersViewPlugin::onShowOfflineContactsAction(bool)
 {
 	OptionsNode node = Options::node(OPV_ROSTER_SHOWOFFLINE);
 	node.setValue(!node.value().toBool());
+}
+
+void RostersViewPlugin::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole)
+{
+	if (ARole == RDR_STATUS)
+	{
+		if (!Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool())
+		{
+			if (AIndex->kind()==RIK_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
+				emit rosterLabelChanged(RLID_ROSTERSVIEW_STATUS,AIndex);
+		}
+		else
+		{
+			emit rosterLabelChanged(RLID_ROSTERSVIEW_STATUS,AIndex);
+		}
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_rostersview, RostersViewPlugin)

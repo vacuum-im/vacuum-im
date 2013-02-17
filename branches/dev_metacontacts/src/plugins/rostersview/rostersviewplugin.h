@@ -35,10 +35,11 @@ class RostersViewPlugin :
 	public IPlugin,
 	public IRostersViewPlugin,
 	public IOptionsHolder,
-	public IRosterDataHolder
+	public IRosterDataHolder,
+	public IRostersLabelHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder IRosterDataHolder);
+	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder IRosterDataHolder IRostersLabelHolder);
 public:
 	RostersViewPlugin();
 	~RostersViewPlugin();
@@ -56,6 +57,9 @@ public:
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
+	//IRostersLabelHolder
+	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
+	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IRostersViewPlugin
 	virtual IRostersView *rostersView();
 	virtual void startRestoreExpandState();
@@ -64,6 +68,8 @@ public:
 signals:
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
+	//IRostersLabelHolder
+	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	QString rootExpandId(const QModelIndex &AIndex) const;
 	QString indexExpandId(const QModelIndex &AIndex) const;
@@ -83,6 +89,7 @@ protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onShowOfflineContactsAction(bool AChecked);
+	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
 private:
 	IRostersModel *FRostersModel;
 	IMainWindowPlugin *FMainWindowPlugin;
@@ -96,6 +103,7 @@ private:
 	Action *FShowOfflineAction;
 	RostersView *FRostersView;
 	QAbstractItemModel *FLastModel;
+	AdvancedDelegateItem FStatusLabel;
 	SortFilterProxyModel *FSortFilterProxyModel;
 	struct { int sliderPos; IRosterIndex *currentIndex; } FViewSavedState;
 };

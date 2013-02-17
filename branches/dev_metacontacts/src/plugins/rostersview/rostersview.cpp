@@ -164,7 +164,7 @@ QList<quint32> RostersView::rosterLabels(int AOrder, const IRosterIndex *AIndex)
 	{
 		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
 		if (!notify.footer.isEmpty())
-			labels.append(RLID_SCHANGER_STATUS);
+			labels.append(RLID_ROSTERSVIEW_STATUS);
 		if (!notify.icon.isNull())
 			labels.append(AdvancedDelegateItem::DecorationId);
 	}
@@ -192,9 +192,9 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 		label.d->flags = AdvancedDelegateItem::Blink;
 		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).icon;
 	}
-	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==RLID_SCHANGER_STATUS)
+	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==RLID_ROSTERSVIEW_STATUS)
 	{
-		label.d->id = RLID_SCHANGER_STATUS;
+		label.d->id = RLID_ROSTERSVIEW_STATUS;
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
 		label.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);

@@ -11,7 +11,7 @@
 #define RLID_RECENT_REMOVE_FAVORITE                AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,AdvancedDelegateItem::AlignRightOrderMask | 1002)
 
 //Position=MiddleCenter; Floor=200
-#define RLID_SCHANGER_STATUS                       AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,200,500)
+#define RLID_ROSTERSVIEW_STATUS                    AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,200,500)
 
 //Position=MiddleRight; Floor=128
 #define RLID_AVATAR_IMAGE                          AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleRight,200,500)

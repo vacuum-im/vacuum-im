@@ -352,7 +352,7 @@ QList<quint32> RecentContacts::rosterLabels(int AOrder, const IRosterIndex *AInd
 	if (AOrder==RLHO_RECENT_FILTER && FSimpleContactsView && AIndex->kind()==RIK_RECENT_ITEM)
 	{
 		labels.append(RLID_AVATAR_IMAGE);
-		labels.append(RLID_SCHANGER_STATUS);
+		labels.append(RLID_ROSTERSVIEW_STATUS);
 	}
 	return labels;
 }
@@ -1490,7 +1490,7 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 	{
 		FSimpleContactsView = ANode.value().toBool();
 		rosterLabelChanged(RLID_AVATAR_IMAGE);
-		rosterLabelChanged(RLID_SCHANGER_STATUS);
+		rosterLabelChanged(RLID_ROSTERSVIEW_STATUS);
 	}
 	else if (ANode.path() == OPV_ROSTER_RECENT_SORTBYACTIVETIME)
 	{
