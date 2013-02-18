@@ -4,18 +4,6 @@
 <context>
     <name>RostersView</name>
     <message>
-        <source>Priority: %1</source>
-        <translation>Приоритет: %1</translation>
-    </message>
-    <message>
-        <source>Subscription: %1 %2</source>
-        <translation>Авторизация: %1 %2</translation>
-    </message>
-    <message>
-        <source>Status:</source>
-        <translation>Статус:</translation>
-    </message>
-    <message>
         <source>Jabber ID</source>
         <translation>Jabber ID</translation>
     </message>
@@ -85,6 +73,42 @@
     <message>
         <source>Show disconnected contact</source>
         <translation>Показывать отключенные контакты</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>Absent</source>
+        <translation>Отсутствует</translation>
+    </message>
+    <message>
+        <source>Mutual</source>
+        <translation>Обоюдная</translation>
+    </message>
+    <message>
+        <source>Provided to you</source>
+        <translation>Предоставлена Вам</translation>
+    </message>
+    <message>
+        <source>Provided from you</source>
+        <translation>Предоставлена Вами</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Subscription:&lt;/b&gt; %1, request sent</source>
+        <translation>&lt;b&gt;Подписка:&lt;/b&gt; %1, запрос отправлен</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Subscription:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Подписка:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Resource:&lt;/b&gt; %1 (%2)</source>
+        <translation>&lt;b&gt;Ресурс:&lt;/b&gt; %1 (%2)</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

@@ -296,7 +296,7 @@ void BirthdayReminder::onNotificationActivated(int ANotifyId)
 			Jid contactJid = FNotifies.value(ANotifyId);
 			Jid streamJid = findContactStream(contactJid);
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
-			QList<IPresenceItem> presences = presence!=NULL ? presence->presenceItems(contactJid) : QList<IPresenceItem>();
+			QList<IPresenceItem> presences = presence!=NULL ? presence->findItems(contactJid) : QList<IPresenceItem>();
 			FMessageProcessor->createMessageWindow(streamJid, !presences.isEmpty() ? presences.first().itemJid : contactJid, Message::Chat, IMessageHandler::SM_SHOW);
 		}
 		FNotifications->removeNotification(ANotifyId);

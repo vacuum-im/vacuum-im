@@ -318,7 +318,7 @@ QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid)
 	else if (AStreamJid && AContactJid)
 	{
 		subscription = SUBSCRIPTION_BOTH;
-		show = presence!=NULL ? presence->presenceItem(AContactJid).show : show;
+		show = presence!=NULL ? presence->findItem(AContactJid).show : show;
 	}
 	else
 	{
@@ -326,7 +326,7 @@ QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid)
 		IRosterItem ritem = roster!=NULL ? roster->rosterItem(AContactJid) : IRosterItem();
 		ask = !ritem.ask.isEmpty();
 		subscription = ritem.subscription;
-		show = presence!=NULL ? presence->presenceItem(AContactJid).show : show;
+		show = presence!=NULL ? presence->findItem(AContactJid).show : show;
 	}
 	return iconKeyByStatus(show,subscription,ask);
 }

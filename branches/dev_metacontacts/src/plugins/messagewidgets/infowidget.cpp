@@ -98,12 +98,12 @@ void InfoWidget::autoUpdateField(InfoField AField)
 	}
 	case ContactShow:
 	{
-		setField(AField,FPresence!=NULL ? FPresence->presenceItem(FContactJid).show : IPresence::Offline);
+		setField(AField,FPresence!=NULL ? FPresence->findItem(FContactJid).show : IPresence::Offline);
 		break;
 	}
 	case ContactStatus:
 	{
-		setField(AField,FPresence!=NULL ? FPresence->presenceItem(FContactJid).status : QString::null);
+		setField(AField,FPresence!=NULL ? FPresence->findItem(FContactJid).status : QString::null);
 		break;
 	}
 	case ContactAvatar:

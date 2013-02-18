@@ -20,10 +20,12 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/istatuschanger.h>
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
@@ -90,20 +92,23 @@ protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onShowOfflineContactsAction(bool AChecked);
 	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 private:
 	IRostersModel *FRostersModel;
-	IMainWindowPlugin *FMainWindowPlugin;
+	IStatusChanger *FStatusChanger;
+	IPresencePlugin *FPresencePlugin;
 	IOptionsManager *FOptionsManager;
+	IMainWindowPlugin *FMainWindowPlugin;
 private:
 	bool FStartRestoreExpandState;
 	QMap<int, int> FExpandableKinds;
 	QMap<QString, QHash<QString,bool> > FExpandStates;
 private:
+	bool FShowStatus;
 	bool FShowResource;
 	Action *FShowOfflineAction;
 	RostersView *FRostersView;
 	QAbstractItemModel *FLastModel;
-	AdvancedDelegateItem FStatusLabel;
 	SortFilterProxyModel *FSortFilterProxyModel;
 	struct { int sliderPos; IRosterIndex *currentIndex; } FViewSavedState;
 };

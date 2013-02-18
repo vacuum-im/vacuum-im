@@ -198,7 +198,7 @@ void ReceiversWidget::createRosterTree()
 			QTreeWidgetItem *groupItem = getReceiversGroup(group);
 
 			QMap<Jid,int> itemJids;
-			QList<IPresenceItem> pitems = FPresence->presenceItems(ritem.itemJid);
+			QList<IPresenceItem> pitems = FPresence->findItems(ritem.itemJid);
 			foreach(IPresenceItem pitem,pitems)
 				itemJids.insert(pitem.itemJid, pitem.show);
 
@@ -216,7 +216,7 @@ void ReceiversWidget::createRosterTree()
 		}
 	}
 
-	QList<IPresenceItem> myResources = FPresence->presenceItems(FStreamJid);
+	QList<IPresenceItem> myResources = FPresence->findItems(FStreamJid);
 	foreach(IPresenceItem pitem, myResources)
 	{
 		QTreeWidgetItem *groupItem = getReceiversGroup(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_MY_RESOURCES) : tr("My Resources"));

@@ -426,7 +426,7 @@ IChatWindow *ChatMessageHandler::findSubstituteWindow(const Jid &AStreamJid, con
 			}
 			else if(presence && !bareWindow && (window->contactJid() && AContactJid))
 			{
-				IPresenceItem pitem = presence->presenceItem(window->contactJid());
+				IPresenceItem pitem = presence->findItem(window->contactJid());
 				if (pitem.show==IPresence::Offline || pitem.show==IPresence::Error)
 				{
 					if (window->contactJid() == AContactJid.bare())

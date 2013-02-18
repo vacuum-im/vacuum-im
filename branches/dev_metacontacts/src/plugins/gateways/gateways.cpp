@@ -366,7 +366,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 		IRosterItem ritemNew = roster->rosterItem(AServiceTo);
 
 		//Разлогиниваемся на старом транспорте
-		if (!presence->presenceItems(AServiceFrom).isEmpty())
+		if (!presence->findItems(AServiceFrom).isEmpty())
 			sendLogPresence(AStreamJid,AServiceFrom,false);
 
 		//Удаляем регистрацию на старом транспорте
@@ -695,7 +695,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, q
 				addUserMenu->setTitle(tr("Add Legacy User"));
 				addUserMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_ADD_CONTACT);
 
-				foreach(IPresenceItem pitem, presence->presenceItems())
+				foreach(IPresenceItem pitem, presence->findItems())
 				{
 					if (pitem.show!=IPresence::Error && pitem.itemJid.node().isEmpty() && FDiscovery->discoInfo(streamJid,pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
 					{
@@ -967,7 +967,7 @@ void Gateways::onKeepTimerTimeout()
 			{
 				if (roster->rosterItem(service).isValid)
 				{
-					const QList<IPresenceItem> pitems = presence->presenceItems(service);
+					const QList<IPresenceItem> pitems = presence->findItems(service);
 					if (pitems.isEmpty() || pitems.at(0).show==IPresence::Error)
 					{
 						presence->sendPresence(service,IPresence::Offline,QString::null,0);

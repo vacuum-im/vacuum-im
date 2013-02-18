@@ -64,7 +64,7 @@ protected:
 	void removeEmptyGroup(IRosterIndex *AGroupIndex);
 	QString getGroupName(int AKind, const QString &AGroup) const;
 	bool isChildIndex(IRosterIndex *AIndex, IRosterIndex *AParent) const;
-	QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, bool ABare, IRosterIndex *AParent = NULL) const;
+	QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, IRosterIndex *AParent = NULL) const;
 protected slots:
 	void onAdvancedItemInserted(QStandardItem *AItem);
 	void onAdvancedItemRemoving(QStandardItem *AItem);

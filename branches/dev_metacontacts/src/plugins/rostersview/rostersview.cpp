@@ -9,7 +9,6 @@
 #include <QHeaderView>
 #include <QResizeEvent>
 #include <QApplication>
-#include <QTextDocument>
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
@@ -56,11 +55,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	FDragExpandTimer.setInterval(500);
 	connect(&FDragExpandTimer,SIGNAL(timeout()),SLOT(onDragExpandTimer()));
 
-	connect(this,SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
-		SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
-
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),
-		SLOT(onShortcutActivated(const QString &, QWidget *)));
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 }
 
 RostersView::~RostersView()
@@ -153,14 +148,7 @@ QList<quint32> RostersView::rosterLabels(int AOrder, const IRosterIndex *AIndex)
 {
 	QList<quint32> labels;
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
-	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && FRostersModel)
-	{
-		if (AIndex->parentIndex()==FRostersModel->rootIndex())
-			labels.append(AdvancedDelegateItem::DisplayId);
-		else if (FRostersModel->isGroupKind(AIndex->kind()))
-			labels.append(AdvancedDelegateItem::DisplayId);
-	}
-	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && FActiveNotifies.contains(index))
+	if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && FActiveNotifies.contains(index))
 	{
 		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
 		if (!notify.footer.isEmpty())
@@ -175,17 +163,7 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 {
 	AdvancedDelegateItem label;
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
-	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && ALabelId==AdvancedDelegateItem::DisplayId && FRostersModel)
-	{
-		label.d->id = AdvancedDelegateItem::DisplayId;
-		label.d->kind = AdvancedDelegateItem::Display;
-		label.d->data = AIndex->data(Qt::DisplayRole);
-		if (AIndex->parentIndex()==FRostersModel->rootIndex())
-			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
-		else if (FRostersModel->isGroupKind(AIndex->kind()))
-			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::DemiBold);
-	}
-	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
+	if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
 	{
 		label.d->id = AdvancedDelegateItem::DecorationId;
 		label.d->kind = AdvancedDelegateItem::Decoration;
@@ -1304,33 +1282,6 @@ void RostersView::closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHi
 	FAdvancedItemDelegate->setEditProxy(NULL);
 	FAdvancedItemDelegate->setEditRole(Qt::EditRole);
 	QTreeView::closeEditor(AEditor,AHint);
-}
-
-void RostersView::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
-{
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
-	{
-		QString name = AIndex->data(RDR_NAME).toString();
-		if (!name.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_NAME, Qt::escape(name));
-
-		Jid jid = AIndex->data(RDR_FULL_JID).toString();
-		if (!jid.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_JID, Qt::escape(jid.uFull()));
-
-		QString priority = AIndex->data(RDR_PRIORITY).toString();
-		if (!priority.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_PRIORITY, tr("Priority: %1").arg(priority.toInt()));
-
-		QString ask = AIndex->data(RDR_ASK).toString();
-		QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
-		if (!subscription.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_SUBSCRIPTION, tr("Subscription: %1 %2").arg(Qt::escape(subscription)).arg(Qt::escape(ask)));
-
-		QString status = AIndex->data(RDR_STATUS).toString();
-		if (!status.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_STATUS, QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Status:")).arg(Qt::escape(status).replace("\n","<br>")));
-	}
 }
 
 void RostersView::onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected)

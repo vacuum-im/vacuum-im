@@ -162,7 +162,6 @@ protected slots:
 	//QAbstractItemView
 	void closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint);
 protected slots:
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 	void onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex);
 	void onCopyToClipboardActionTriggered(bool);
