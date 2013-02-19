@@ -4,14 +4,6 @@
 <context>
     <name>ClientInfo</name>
     <message>
-        <source>Software: %1 %2</source>
-        <translation>Програмне забезпечення: %1 %2</translation>
-    </message>
-    <message>
-        <source>Entity time: %1</source>
-        <translation>Локальний час: %1</translation>
-    </message>
-    <message>
         <source>Software information</source>
         <translation>Інформація про програмне забезпечення</translation>
     </message>

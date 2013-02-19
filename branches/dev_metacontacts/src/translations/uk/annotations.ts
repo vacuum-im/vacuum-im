@@ -12,16 +12,20 @@
         <translation>Коментар</translation>
     </message>
     <message>
-        <source>Annotation:</source>
-        <translation>Коментар:</translation>
-    </message>
-    <message>
         <source>Allows to add comments to the contacts in the roster</source>
         <translation>Дозволяє додавати короткі записи до контактів у ростері</translation>
     </message>
     <message>
         <source>Edit annotation</source>
         <translation>Редагувати коментар</translation>
+    </message>
+    <message>
+        <source>Annotation: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

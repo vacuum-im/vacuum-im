@@ -21,6 +21,7 @@
 #include <definitions/shortcutgrouporders.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
+#include <definitions/discofeaturehandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppstreams.h>
@@ -57,17 +58,18 @@ struct EntityCapabilities {
 };
 
 class ServiceDiscovery :
-			public QObject,
-			public IPlugin,
-			public IServiceDiscovery,
-			public IStanzaHandler,
-			public IStanzaRequestOwner,
-			public IXmppUriHandler,
-			public IDiscoHandler,
-			public IRostersClickHooker
+	public QObject,
+	public IPlugin,
+	public IServiceDiscovery,
+	public IStanzaHandler,
+	public IStanzaRequestOwner,
+	public IXmppUriHandler,
+	public IRostersClickHooker,
+	public IDiscoHandler,
+	public IDiscoFeatureHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IXmppUriHandler IDiscoHandler IRostersClickHooker);
+	Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IXmppUriHandler IRostersClickHooker IDiscoHandler IDiscoFeatureHandler);
 public:
 	ServiceDiscovery();
 	~ServiceDiscovery();
@@ -85,12 +87,15 @@ public:
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
-	//IDiscoHandler
-	virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
-	virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
 	//IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	//IDiscoHandler
+	virtual void fillDiscoInfo(IDiscoInfo &ADiscoInfo);
+	virtual void fillDiscoItems(IDiscoItems &ADiscoItems);
+	//IDiscoFeatureHandler
+	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
+	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IServiceDiscovery
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const;

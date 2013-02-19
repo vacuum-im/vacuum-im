@@ -4,20 +4,8 @@
 <context>
     <name>RostersView</name>
     <message>
-        <source>Jabber ID</source>
-        <translation>Jabber ID</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Status</translation>
-    </message>
-    <message>
         <source>Copy to clipboard</source>
         <translation>Copy to clipboard</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
     </message>
     <message>
         <source>Contacts</source>
@@ -109,6 +97,18 @@
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Status:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>Name: %1</source>
+        <translation>Name: %1</translation>
+    </message>
+    <message>
+        <source>Jabber ID: %1</source>
+        <translation>Jabber ID: %1</translation>
+    </message>
+    <message>
+        <source>Status: %1</source>
+        <translation>Status: %1</translation>
     </message>
 </context>
 </TS>

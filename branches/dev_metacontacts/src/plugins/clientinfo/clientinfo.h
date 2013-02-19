@@ -24,6 +24,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/istatusicons.h>
 #include <utils/xmpperror.h>
 #include <utils/stanza.h>
 #include <utils/menu.h>
@@ -50,21 +51,25 @@ struct ActivityItem {
 };
 
 struct TimeItem {
-	TimeItem() { ping = -1; delta = 0; zone = 0; }
+	TimeItem() { 
+		ping = -1;
+		delta = 0;
+		zone = 0;
+	}
 	int ping;
 	int delta;
 	int zone;
 };
 
 class ClientInfo :
-			public QObject,
-			public IPlugin,
-			public IClientInfo,
-			public IOptionsHolder,
-			public IStanzaHandler,
-			public IStanzaRequestOwner,
-			public IDataLocalizer,
-			public IDiscoFeatureHandler
+	public QObject,
+	public IPlugin,
+	public IClientInfo,
+	public IOptionsHolder,
+	public IStanzaHandler,
+	public IStanzaRequestOwner,
+	public IDataLocalizer,
+	public IDiscoFeatureHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IClientInfo IOptionsHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
@@ -137,6 +142,7 @@ private:
 	IServiceDiscovery *FDiscovery;
 	IDataForms *FDataForms;
 	IOptionsManager *FOptionsManager;
+	IStatusIcons *FStatusIcons;
 private:
 	int FPingHandle;
 	int FTimeHandle;
