@@ -838,48 +838,9 @@ void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes,
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 			{
-				Jid contactJid = index->data(RDR_FULL_JID).toString();
-
-				QStringList resources = index->data(RDR_RESOURCES).toStringList();
-				if (resources.isEmpty())
-					resources.append(contactJid.pFull());
-				bool multiResource = resources.count()>1;
-
-				Menu *verMenu = NULL;
-				foreach(const Jid &itemJid, resources)
-				{
-					QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(streamJid,itemJid).features : QStringList();
-					if (!features.contains(NS_JABBER_VERSION))
-					{
-						IPresenceItem pitem = presence->findItem(itemJid);
-						if (pitem.isValid && pitem.show!=IPresence::Offline && pitem.show!=IPresence::Error)
-						{
-							Action *action = createInfoAction(streamJid,itemJid,NS_JABBER_VERSION,AMenu);
-							if (multiResource)
-							{
-								if (verMenu == NULL)
-								{
-									verMenu = new Menu(AMenu);
-									verMenu->setIcon(action->icon());
-									verMenu->setTitle(action->text());
-									AMenu->addAction(verMenu->menuAction(),AG_RVCM_CLIENTINFO,true);
-								}
-								action->setParent(verMenu);
-								action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,itemJid) : QIcon());
-								action->setText(!itemJid.resource().isEmpty() ? itemJid.resource() : itemJid.uBare());
-								verMenu->addAction(action,AG_RVCM_CLIENTINFO,false);
-							}
-							else
-							{
-								AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
-							}
-						}
-					}
-				}
-
 				int show = index->data(RDR_SHOW).toInt();
-				QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(streamJid,contactJid).features : QStringList();
-				if ((show==IPresence::Offline || show==IPresence::Error) && !features.contains(NS_JABBER_LAST))
+				Jid contactJid = index->data(RDR_FULL_JID).toString();
+				if (show==IPresence::Offline || show==IPresence::Error)
 				{
 					Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_LAST,AMenu);
 					AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);

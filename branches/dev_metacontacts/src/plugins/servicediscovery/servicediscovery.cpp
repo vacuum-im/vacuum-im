@@ -1318,6 +1318,11 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 			foreach(const Jid &itemJid, resources)
 			{
 				IDiscoInfo dinfo = discoInfo(streamJid,itemJid);
+
+				// Many clients support version info but don`t show it in disco info
+				if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))
+					dinfo.features.append(NS_JABBER_VERSION);
+
 				foreach(QString feature, dinfo.features)
 				{
 					foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
