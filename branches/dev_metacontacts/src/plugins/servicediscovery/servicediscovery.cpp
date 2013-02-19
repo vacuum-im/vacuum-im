@@ -131,8 +131,6 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 			FRostersView = FRostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
 				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)));
 		}
 	}
 
@@ -1301,22 +1299,6 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 				foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
 					AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
 			}
-		}
-	}
-}
-
-void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
-{
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
-	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->kind()==RIK_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
-		if (hasDiscoInfo(streamJid,contactJid))
-		{
-			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
-			foreach(IDiscoIdentity identity, dinfo.identity)
-				if (identity.category != DIC_CLIENT)
-					AToolTips.insert(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
 		}
 	}
 }

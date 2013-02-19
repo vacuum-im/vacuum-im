@@ -6,7 +6,6 @@
 #include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
-#include <definitions/shortcuts.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/rosterindexkinds.h>
@@ -18,7 +17,6 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imainwindow.h>
 #include <utils/options.h>
-#include <utils/shortcuts.h>
 #include <utils/iconstorage.h>
 
 class RostersView :
@@ -164,13 +162,11 @@ protected slots:
 protected slots:
 	void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 	void onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex);
-	void onCopyToClipboardActionTriggered(bool);
 	void onIndexDestroyed(IRosterIndex *AIndex);
 	void onUpdateIndexNotifyTimeout();
 	void onRemoveIndexNotifyTimeout();
 	void onUpdateBlinkLabels();
 	void onDragExpandTimer();
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IRostersModel *FRostersModel;
 private:

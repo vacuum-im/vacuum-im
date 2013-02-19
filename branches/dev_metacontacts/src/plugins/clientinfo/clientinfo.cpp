@@ -89,8 +89,7 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
-			        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
+			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)), SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
 		}
 	}
 
@@ -104,6 +103,11 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 	if (plugin)
 	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -150,14 +154,6 @@ bool ClientInfo::initObjects()
 		shandle.conditions.clear();
 		shandle.conditions.append(SHC_XMPP_PING);
 		FPingHandle = FStanzaProcessor->insertStanzaHandle(shandle);
-	}
-
-	if (FRostersViewPlugin)
-	{
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
-			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 	}
 
 	if (FDiscovery)
@@ -850,20 +846,6 @@ void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes,
 				}
 			}
 		}
-	}
-}
-
-void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
-{
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
-	{
-		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
-
-		if (hasSoftwareInfo(contactJid))
-			AToolTips.insert(RTTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(Qt::escape(softwareName(contactJid))).arg(Qt::escape(softwareVersion(contactJid))));
-
-		if (hasEntityTime(contactJid))
-			AToolTips.insert(RTTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
 	}
 }
 

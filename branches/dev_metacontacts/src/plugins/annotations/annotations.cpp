@@ -406,16 +406,19 @@ void Annotations::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes
 
 void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && RosterKinds.contains(AIndexes.first()->kind()))
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
-		QString note = annotation(AIndexes.first()->data(RDR_STREAM_JID).toString(), AIndexes.first()->data(RDR_FULL_JID).toString());
-		if (!note.isEmpty())
+		foreach(IRosterIndex *index, AIndexes)
 		{
-			Action *action = new Action(AMenu);
-			action->setText(tr("Annotation"));
-			action->setData(ADR_CLIPBOARD_DATA, note);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-			AMenu->addAction(action, AG_DEFAULT, true);
+			QString note = index->data(RDR_ANNOTATIONS).toString();
+			if (!note.isEmpty())
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Annotation: %1").arg(Action::reduceString(note,50)));
+				action->setData(ADR_CLIPBOARD_DATA, note);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(action, AG_RVCBM_ANNOTATION, true);
+			}
 		}
 	}
 }
@@ -426,7 +429,7 @@ void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, 
 	{
 		QString note = AIndex->data(RDR_ANNOTATIONS).toString();
 		if (!note.isEmpty())
-			AToolTips.insert(RTTO_ANNOTATIONS,QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Annotation:")).arg(Qt::escape(note).replace("\n","<br>")));
+			AToolTips.insert(RTTO_ANNOTATIONS, "<nbsp>"+tr("<b>Annotation:</b>")+"<br>"+Qt::escape(note).replace("\n","<br>"));
 	}
 }
 

@@ -83,6 +83,18 @@ void Action::setShortcutId(const QString &AId)
 	Shortcuts::bindObjectShortcut(AId, this);
 }
 
+QString Action::reduceString(const QString &AString, int AMaxChars)
+{
+	if (AString.length()>AMaxChars && AMaxChars>3)
+	{
+		QString string = AString.left(AMaxChars-3);
+		while (string.endsWith(' '))
+			string.chop(1);
+		return string + "...";
+	}
+	return AString;
+}
+
 bool Action::copyStandardAction(Action *ADestination, QAction *ASource)
 {
 	if (ADestination && ASource && !ASource->isSeparator())

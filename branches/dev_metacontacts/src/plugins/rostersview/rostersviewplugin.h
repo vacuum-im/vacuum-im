@@ -78,7 +78,7 @@ protected:
 	void loadExpandState(const QModelIndex &AIndex);
 	void saveExpandState(const QModelIndex &AIndex);
 protected slots:
-	void onRostersViewDestroyed(QObject *AObject);
+	void onViewDestroyed(QObject *AObject);
 	void onViewModelAboutToBeReset();
 	void onViewModelReset();
 	void onViewModelAboutToBeChanged(QAbstractItemModel *AModel);
@@ -87,12 +87,17 @@ protected slots:
 	void onViewRowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 	void onViewIndexCollapsed(const QModelIndex &AIndex);
 	void onViewIndexExpanded(const QModelIndex &AIndex);
+protected slots:
+	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
+	void onRostersViewClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+protected slots:
 	void onRestoreExpandState();
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onCopyToClipboardActionTriggered(bool);
 	void onShowOfflineContactsAction(bool AChecked);
-	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
-	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IRostersModel *FRostersModel;
 	IStatusChanger *FStatusChanger;

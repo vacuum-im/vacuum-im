@@ -149,7 +149,7 @@ bool Avatars::initObjects()
 		label.d->data = RDR_AVATAR_IMAGE;
 		FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 		
-		FRostersViewPlugin->rostersView()->insertLabelHolder(RLHO_AVATARS_AVATAR,this);
+		FRostersViewPlugin->rostersView()->insertLabelHolder(RLHO_AVATARS,this);
 	}
 
 	return true;
@@ -335,7 +335,7 @@ bool Avatars::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AI
 QList<quint32> Avatars::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
 {
 	QList<quint32> labels;
-	if (AOrder==RLHO_AVATARS_AVATAR && FAvatarsVisible && !AIndex->data(RDR_AVATAR_IMAGE).isNull())
+	if (AOrder==RLHO_AVATARS && FAvatarsVisible && !AIndex->data(RDR_AVATAR_IMAGE).isNull())
 		labels.append(FAvatarLabelId);
 	return labels;
 }

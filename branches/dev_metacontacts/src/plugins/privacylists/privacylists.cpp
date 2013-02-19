@@ -1350,7 +1350,7 @@ void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId,
 		toolTip += tr("- messages: %1").arg((stanzas & IPrivacyRule::Messages) >0           ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences in: %1").arg((stanzas & IPrivacyRule::PresencesIn) >0    ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences out: %1").arg((stanzas & IPrivacyRule::PresencesOut) >0  ? tr("<b>denied</b>") : tr("allowed"));
-		AToolTips.insert(RTTO_PRIVACY,toolTip);
+		AToolTips.insert(RTTO_PRIVACYLISTS,toolTip);
 	}
 }
 

@@ -42,6 +42,7 @@ public:
 signals:
 	void actionDestroyed(Action *AAction);
 public:
+	static QString reduceString(const QString &AString, int AMaxChars);
 	static bool copyStandardAction(Action *ADestination, QAction *ASource);
 protected slots:
 	void onMenuDestroyed(Menu *AMenu);

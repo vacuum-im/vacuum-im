@@ -42,6 +42,12 @@
 #define AG_RVCM_VCARD                                           900
 #define AG_RVCM_MULTIUSERCHAT_EXIT                              1000
 
+//RostersView - ClipboardMenu
+#define AG_RVCBM_NAME                                           100
+#define AG_RVCBM_JABBERID                                       200
+#define AG_RVCBM_STATUS                                         300
+#define AG_RVCBM_ANNOTATION                                     400
+
 //TrayManager - TrayMenu
 #define AG_TMTM_NOTIFICATIONS_LAST                              50
 #define AG_TMTM_MAINWINDOW                                      200

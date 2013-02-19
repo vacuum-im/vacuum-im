@@ -14,7 +14,6 @@
 #include <definitions/multiuserdataroles.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
-#include <definitions/rostertooltiporders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/serviceicons.h>
@@ -165,7 +164,6 @@ protected slots:
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onShowDiscoInfoByAction(bool);
 	void onShowDiscoItemsByAction(bool);
 	void onDiscoInfoWindowDestroyed(QObject *AObject);
