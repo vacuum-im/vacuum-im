@@ -112,10 +112,10 @@ public:
 	virtual IPluginManager *pluginManager() const;
 	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
 	virtual QList<IMultiUserChat *> multiUserChats() const;
-	virtual IMultiUserChat *multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const;
+	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,const QString &APassword);
 	virtual QList<IMultiUserChatWindow *> multiChatWindows() const;
-	virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const;
+	virtual IMultiUserChatWindow *findMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
 	virtual QList<IRosterIndex *> multiChatRosterIndexes() const;
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const;
@@ -150,6 +150,7 @@ protected slots:
 	void onMultiUserChatChanged();
 	void onMultiUserChatDestroyed();
 	void onMultiChatWindowDestroyed();
+protected slots:
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onJoinRoomActionTriggered(bool);

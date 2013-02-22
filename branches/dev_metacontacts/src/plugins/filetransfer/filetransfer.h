@@ -51,11 +51,11 @@ class FileTransfer :
 	public IOptionsHolder,
 	public IDiscoFeatureHandler,
 	public IRostersDragDropHandler,
-	public IViewDropHandler,
+	public IMessageViewDropHandler,
 	public IFileStreamsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IViewDropHandler IFileStreamsHandler);
+	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IMessageViewDropHandler IFileStreamsHandler);
 public:
 	FileTransfer();
 	~FileTransfer();
@@ -78,11 +78,11 @@ public:
 	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
 	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
-	//IViewDropHandler
-	virtual bool viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent);
-	virtual bool viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent);
-	virtual void viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent);
-	virtual bool viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
+	//IMessageViewDropHandler
+	virtual bool viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
+	virtual bool viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
+	virtual void viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
+	virtual bool viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
 	//IFileTransferHandler
 	virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
 	virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);
@@ -94,9 +94,9 @@ protected:
 	void registerDiscoFeatures();
 	void notifyStream(IFileStream *AStream, bool ANewStream = false);
 	void autoStartStream(IFileStream *AStream);
-	void insertToolBarAction(IToolBarWidget *AWidget);
-	void removeToolBarAction(IToolBarWidget *AWidget);
-	QList<IToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
+	void insertToolBarAction(IMessageToolBarWidget *AWidget);
+	void removeToolBarAction(IMessageToolBarWidget *AWidget);
+	QList<IMessageToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
 	StreamDialog *getStreamDialog(IFileStream *ASession);
 	IFileStream *createStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind);
 	QString dirNameByUserName(const QString &AUserName) const;
@@ -111,8 +111,8 @@ protected slots:
 	void onNotificationRemoved(int ANotifyId);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
-	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
-	void onEditWidgetContactJidChanged(const Jid &ABefore);
+	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
+	void onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
@@ -128,7 +128,7 @@ private:
 private:
 	QMap<QString, int> FStreamNotify;
 	QMap<QString, StreamDialog *> FStreamDialog;
-	QMap<IToolBarWidget *, Action *> FToolBarActions;
+	QMap<IMessageToolBarWidget *, Action *> FToolBarActions;
 };
 
 #endif // FILETRANSFER_H

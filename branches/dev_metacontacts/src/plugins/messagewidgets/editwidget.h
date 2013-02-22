@@ -13,19 +13,18 @@
 #include "ui_editwidget.h"
 
 class EditWidget :
-			public QWidget,
-			public IEditWidget
+	public QWidget,
+	public IMessageEditWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IEditWidget);
+	Q_INTERFACES(IMessageWidget IMessageEditWidget);
 public:
-	EditWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
+	EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent);
 	~EditWidget();
+	// IMessageWidget
 	virtual QWidget *instance() { return this; }
-	virtual const Jid &streamJid() const;
-	virtual void setStreamJid(const Jid &AStreamJid);
-	virtual const Jid &contactJid() const;
-	virtual void setContactJid(const Jid &AContactJid);
+	virtual IMessageWindow *messageWindow() const;
+	// IMessageEditWidget
 	virtual QTextEdit *textEdit() const;
 	virtual QTextDocument *document() const;
 	virtual void sendMessage();
@@ -45,13 +44,11 @@ public:
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment);
 	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const;
 signals:
-	// IEditWidget
+	// IMessageEditWidget
 	void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
 	void messageAboutToBeSend();
 	void messageReady();
 	void editorCleared();
-	void streamJidChanged(const Jid &ABefore);
-	void contactJidChanged(const Jid &ABefore);
 	void autoResizeChanged(bool AResize);
 	void minimumLinesChanged(int ALines);
 	void sendShortcutChanged(const QString &AShortcutId);
@@ -63,7 +60,7 @@ signals:
 	void insertDataRequest(const QMimeData *AData, QTextDocument *ADocument) const;
 	void contentsChanged(int APosition, int ARemoved, int AAdded) const;
 protected:
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected:
 	void appendMessageToBuffer();
 	void showBufferedMessage();
@@ -86,8 +83,7 @@ private:
 	IMessageWidgets *FMessageWidgets;
 private:
 	int FBufferPos;
-	Jid FStreamJid;
-	Jid FContactJid;
+	IMessageWindow *FWindow;
 	QList<QString> FBuffer;
 	QString FSendShortcutId;
 	QKeySequence FSendShortcut;

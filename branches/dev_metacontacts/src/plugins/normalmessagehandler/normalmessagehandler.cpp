@@ -161,7 +161,7 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 		QString type = AParams.value("type");
 		if (type.isEmpty() || type=="normal")
 		{
-			IMessageWindow *window = getWindow(AStreamJid, AContactJid, IMessageWindow::WriteMode);
+			IMessageNormalWindow *window = getWindow(AStreamJid, AContactJid, IMessageNormalWindow::WriteMode);
 			if (AParams.contains("thread"))
 				window->setThreadId(AParams.value("thread"));
 			window->setSubject(AParams.value("subject"));
@@ -183,7 +183,7 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 {
 	if (ADirection == IMessageProcessor::MessageIn)
 	{
-		IMessageWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageWindow::ReadMode);
+		IMessageNormalWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageNormalWindow::ReadMode);
 		if (window)
 		{
 			if (FRecentContacts)
@@ -194,10 +194,12 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 				recentItem.reference = window->contactJid().pBare();
 				FRecentContacts->setItemActiveTime(recentItem);
 			}
+
 			QQueue<Message> &messages = FMessageQueue[window];
 			if (messages.isEmpty())
 				showStyledMessage(window,AMessage);
 			messages.append(AMessage);
+
 			updateWindow(window);
 			return true;
 		}
@@ -210,7 +212,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 	INotification notify;
 	if (ADirection == IMessageProcessor::MessageIn)
 	{
-		IMessageWindow *window = findWindow(AMessage.to(),AMessage.from());
+		IMessageNormalWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window)
 		{
 			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_NORMAL_MESSAGE);
@@ -258,13 +260,13 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 
 bool NormalMessageHandler::messageShowWindow(int AMessageId)
 {
-	IMessageWindow *window = FNotifiedMessages.key(AMessageId);
+	IMessageNormalWindow *window = FNotifiedMessages.key(AMessageId);
 	if (window == NULL)
 	{
 		Message message = FMessageProcessor->notifiedMessage(AMessageId);
 		if (messageDisplay(message,IMessageProcessor::MessageIn))
 		{
-			IMessageWindow *window = findWindow(message.to(),message.from());
+			IMessageNormalWindow *window = findWindow(message.to(),message.from());
 			if (window)
 			{
 				FNotifiedMessages.insertMulti(window,AMessageId);
@@ -286,7 +288,7 @@ bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, 
 	Q_UNUSED(AOrder);
 	if (AType != Message::GroupChat)
 	{
-		IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
+		IMessageNormalWindow *window = getWindow(AStreamJid,AContactJid,IMessageNormalWindow::WriteMode);
 		if (window)
 		{
 			if (AShowMode == IMessageHandler::SM_ASSIGN)
@@ -311,25 +313,26 @@ QMultiMap<int, IOptionsWidget *> NormalMessageHandler::optionsWidgets(const QStr
 	return widgets;
 }
 
-IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
+IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode)
 {
-	IMessageWindow *window = NULL;
-	if (AStreamJid.isValid() && (AContactJid.isValid() || AMode == IMessageWindow::WriteMode))
+	IMessageNormalWindow *window = NULL;
+	if (AStreamJid.isValid() && (AContactJid.isValid() || AMode==IMessageNormalWindow::WriteMode))
 	{
-		window = FMessageWidgets->getMessageWindow(AStreamJid,AContactJid,AMode);
+		window = FMessageWidgets->getNormalWindow(AStreamJid,AContactJid,AMode);
 		if (window)
 		{
 			window->infoWidget()->autoUpdateFields();
 			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
-			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
-			connect(window->instance(),SIGNAL(showNextMessage()),SLOT(onShowNextMessage()));
-			connect(window->instance(),SIGNAL(replyMessage()),SLOT(onReplyMessage()));
-			connect(window->instance(),SIGNAL(forwardMessage()),SLOT(onForwardMessage()));
-			connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onShowChatWindow()));
+			connect(window->instance(),SIGNAL(messageReady()),SLOT(onWindowMessageReady()));
+			connect(window->instance(),SIGNAL(showNextMessage()),SLOT(onWindowShowNextMessage()));
+			connect(window->instance(),SIGNAL(replyMessage()),SLOT(onWindowReplyMessage()));
+			connect(window->instance(),SIGNAL(forwardMessage()),SLOT(onWindowForwardMessage()));
+			connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onWindowShowChatWindow()));
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
 			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
 			connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onWindowNotifierActiveNotifyChanged(int)));
+			
 			FWindows.append(window);
 			updateWindow(window);
 		}
@@ -341,15 +344,15 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 	return window;
 }
 
-IMessageWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IMessageNormalWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	foreach(IMessageWindow *window, FWindows)
-		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
+	foreach(IMessageNormalWindow *window, FWindows)
+		if (window->streamJid()==AStreamJid && window->contactJid()==AContactJid)
 			return window;
 	return NULL;
 }
 
-bool NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
+bool NormalMessageHandler::showNextMessage(IMessageNormalWindow *AWindow)
 {
 	if (FMessageQueue.value(AWindow).count() > 1)
 	{
@@ -365,7 +368,7 @@ bool NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
 	return false;
 }
 
-void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
+void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow)
 {
 	QIcon icon;
 	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
@@ -379,8 +382,8 @@ void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 	}
 
 	QString caption;
-	if (AWindow->mode() == IMessageWindow::ReadMode)
-		caption = tr("%1 - Message").arg(AWindow->infoWidget()->field(IInfoWidget::ContactName).toString());
+	if (AWindow->mode() == IMessageNormalWindow::ReadMode)
+		caption = tr("%1 - Message").arg(AWindow->infoWidget()->field(IMessageInfoWidget::ContactName).toString());
 	else
 		caption = tr("Composing message");
 
@@ -388,7 +391,7 @@ void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
 	AWindow->setNextCount(FMessageQueue.value(AWindow).count()-1);
 }
 
-void NormalMessageHandler::removeCurrentMessageNotify(IMessageWindow *AWindow)
+void NormalMessageHandler::removeCurrentMessageNotify(IMessageNormalWindow *AWindow)
 {
 	if (!FMessageQueue.value(AWindow).isEmpty())
 	{
@@ -397,7 +400,7 @@ void NormalMessageHandler::removeCurrentMessageNotify(IMessageWindow *AWindow)
 	}
 }
 
-void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow, int AMessageId)
+void NormalMessageHandler::removeNotifiedMessages(IMessageNormalWindow *AWindow, int AMessageId)
 {
 	foreach(int messageId, FNotifiedMessages.values(AWindow))
 	{
@@ -409,7 +412,7 @@ void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow, int A
 	}
 }
 
-void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
+void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 {
 	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
 	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
@@ -419,7 +422,7 @@ void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
 	}
 }
 
-void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const
+void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageContentOptions &AOptions) const
 {
 	AOptions.senderColor = "blue";
 	AOptions.senderId = AWindow->contactJid().full();
@@ -428,7 +431,7 @@ void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageC
 	AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 }
 
-void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Message &AMessage)
+void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, const Message &AMessage)
 {
 	IMessageContentOptions options;
 	options.time = AMessage.dateTime();
@@ -437,7 +440,7 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 	options.noScroll = true;
 	fillContentOptions(AWindow,options);
 
-	AWindow->setMode(IMessageWindow::ReadMode);
+	AWindow->setMode(IMessageNormalWindow::ReadMode);
 	AWindow->setSubject(AMessage.subject());
 	AWindow->setThreadId(AMessage.threadId());
 
@@ -495,9 +498,9 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 	return false;
 }
 
-void NormalMessageHandler::onMessageReady()
+void NormalMessageHandler::onWindowMessageReady()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FMessageProcessor && window)
 	{
 		Message message;
@@ -519,19 +522,19 @@ void NormalMessageHandler::onMessageReady()
 	}
 }
 
-void NormalMessageHandler::onShowNextMessage()
+void NormalMessageHandler::onWindowShowNextMessage()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (window)
 		showNextMessage(window);
 }
 
-void NormalMessageHandler::onReplyMessage()
+void NormalMessageHandler::onWindowReplyMessage()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (window)
 	{
-		window->setMode(IMessageWindow::WriteMode);
+		window->setMode(IMessageNormalWindow::WriteMode);
 		window->setSubject(tr("Re: %1").arg(window->subject()));
 		window->editWidget()->clearEditor();
 		window->editWidget()->textEdit()->setFocus();
@@ -539,13 +542,13 @@ void NormalMessageHandler::onReplyMessage()
 	}
 }
 
-void NormalMessageHandler::onForwardMessage()
+void NormalMessageHandler::onWindowForwardMessage()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FMessageProcessor && !FMessageQueue.value(window).isEmpty())
 	{
 		Message message = FMessageQueue.value(window).head();
-		window->setMode(IMessageWindow::WriteMode);
+		window->setMode(IMessageNormalWindow::WriteMode);
 		window->setSubject(tr("Fw: %1").arg(message.subject()));
 		window->setThreadId(message.threadId());
 		FMessageProcessor->messageToText(window->editWidget()->document(),message);
@@ -556,16 +559,16 @@ void NormalMessageHandler::onForwardMessage()
 	}
 }
 
-void NormalMessageHandler::onShowChatWindow()
+void NormalMessageHandler::onWindowShowChatWindow()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FMessageProcessor && window)
 		FMessageProcessor->createMessageWindow(window->streamJid(),window->contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
 }
 
 void NormalMessageHandler::onWindowActivated()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FWindows.contains(window))
 	{
 		if (Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL).value().toBool())
@@ -577,7 +580,7 @@ void NormalMessageHandler::onWindowActivated()
 
 void NormalMessageHandler::onWindowDestroyed()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FWindows.contains(window))
 	{
 		FWindows.removeAll(window);
@@ -589,15 +592,15 @@ void NormalMessageHandler::onWindowDestroyed()
 void NormalMessageHandler::onWindowNotifierActiveNotifyChanged(int ANotifyId)
 {
 	Q_UNUSED(ANotifyId);
-	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
-	IMessageWindow *window = notifier!=NULL ? qobject_cast<IMessageWindow *>(notifier->tabPage()->instance()) : NULL;
+	IMessageTabPageNotifier *notifier = qobject_cast<IMessageTabPageNotifier *>(sender());
+	IMessageNormalWindow *window = notifier!=NULL ? qobject_cast<IMessageNormalWindow *>(notifier->tabPage()->instance()) : NULL;
 	if (window)
 		updateWindow(window);
 }
 
 void NormalMessageHandler::onStatusIconsChanged()
 {
-	foreach(IMessageWindow *window, FWindows)
+	foreach(IMessageNormalWindow *window, FWindows)
 		updateWindow(window);
 }
 
@@ -611,7 +614,7 @@ void NormalMessageHandler::onShowWindowAction(bool)
 		Jid contactJid = contacts.count()==1 ? contacts.first() : QString::null;
 		if (messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW))
 		{
-			IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
+			IMessageNormalWindow *window = FMessageWidgets->findNormalWindow(streamJid,contactJid,true);
 			if (window)
 			{
 				foreach(QString group, action->data(ADR_GROUP).toStringList())
@@ -650,7 +653,7 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 				Jid contactJid = contacts.count()==1 ? contacts.first() : QString::null;
 				if (messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW))
 				{
-					IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
+					IMessageNormalWindow *window = FMessageWidgets->findNormalWindow(streamJid,contactJid,true);
 					if (window)
 					{
 						foreach(QString group, groups)
@@ -706,7 +709,7 @@ void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> 
 void NormalMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
 	Q_UNUSED(ABefore);
-	IMessageWindow *window = findWindow(APresence->streamJid(),AItem.itemJid);
+	IMessageNormalWindow *window = findWindow(APresence->streamJid(),AItem.itemJid);
 	if (window)
 		updateWindow(window);
 }
@@ -715,7 +718,7 @@ void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOp
 {
 	if (AContext.isEmpty())
 	{
-		foreach (IMessageWindow *window, FWindows)
+		foreach (IMessageNormalWindow *window, FWindows)
 		{
 			if (!FMessageQueue.value(window).isEmpty() && FMessageQueue.value(window).head().type()==AMessageType)
 			{

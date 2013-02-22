@@ -1,6 +1,6 @@
 #include "usercontextmenu.h"
 
-UserContextMenu::UserContextMenu(IRostersModel *AModel, IRostersView *AView, IChatWindow *AWindow) : Menu(AWindow->instance())
+UserContextMenu::UserContextMenu(IRostersModel *AModel, IRostersView *AView, IMessageChatWindow *AWindow) : Menu(AWindow->instance())
 {
 	FRosterIndex = NULL;
 	FRostersModel = AModel;
@@ -12,7 +12,7 @@ UserContextMenu::UserContextMenu(IRostersModel *AModel, IRostersView *AView, ICh
 	connect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),SLOT(onRosterIndexInserted(IRosterIndex *)));
 	connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *,int)),SLOT(onRosterIndexDataChanged(IRosterIndex *,int)));
 	connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
-	connect(FChatWindow->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onChatWindowContactJidChanged(const Jid &)));
+	connect(FChatWindow->address()->instance(),SIGNAL(addressChanged(const Jid &,const Jid &)),SLOT(onChatWindowAddressChanged(const Jid &,const Jid &)));
 
 	onRosterIndexDestroyed(FRosterIndex);
 }
@@ -113,8 +113,8 @@ void UserContextMenu::onRosterIndexDestroyed(IRosterIndex *AIndex)
 	}
 }
 
-void UserContextMenu::onChatWindowContactJidChanged(const Jid &ABefore)
+void UserContextMenu::onChatWindowAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
 {
-	Q_UNUSED(ABefore);
+	Q_UNUSED(AStreamBefore); Q_UNUSED(AContactBefore);
 	onRosterIndexDestroyed(FRosterIndex);
 }

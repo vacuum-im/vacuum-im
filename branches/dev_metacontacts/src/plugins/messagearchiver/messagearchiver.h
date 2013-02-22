@@ -223,7 +223,7 @@ protected slots:
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
-	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
+	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;

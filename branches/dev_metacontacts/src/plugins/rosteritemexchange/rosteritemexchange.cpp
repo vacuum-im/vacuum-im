@@ -268,27 +268,27 @@ QMultiMap<int, IOptionsWidget *> RosterItemExchange::optionsWidgets(const QStrin
 	return widgets;
 }
 
-bool RosterItemExchange::viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool RosterItemExchange::viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
-	return !dropDataContacts(AWidget->streamJid(),AWidget->contactJid(),AEvent->mimeData()).isEmpty();
+	return !dropDataContacts(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData()).isEmpty();
 }
 
-bool RosterItemExchange::viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent)
+bool RosterItemExchange::viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 	return true;
 }
 
-void RosterItemExchange::viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent)
+void RosterItemExchange::viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 }
 
-bool RosterItemExchange::viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
+bool RosterItemExchange::viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
 {
-	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AWidget->streamJid(),AWidget->contactJid(),AEvent->mimeData(),AMenu) : false;
+	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData(),AMenu) : false;
 }
 
 Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
@@ -716,7 +716,7 @@ void RosterItemExchange::replyRequestError(const IRosterExchangeRequest &AReques
 
 void RosterItemExchange::notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const
 {
-	IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
+	IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
 	if (window)
 	{
 		IMessageContentOptions options;

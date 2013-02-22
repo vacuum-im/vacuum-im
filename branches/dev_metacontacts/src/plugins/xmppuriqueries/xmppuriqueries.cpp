@@ -41,10 +41,10 @@ bool XmppUriQueries::initObjects()
 	return true;
 }
 
-bool XmppUriQueries::viewUrlOpen(int AOrder, IViewWidget *AWidget, const QUrl &AUrl)
+bool XmppUriQueries::viewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl)
 {
 	if (AOrder == VUHO_XMPPURIQUERIES)
-		return openXmppUri(AWidget->streamJid(), AUrl);
+		return openXmppUri(AWidget->messageWindow()->streamJid(), AUrl);
 	return false;
 }
 

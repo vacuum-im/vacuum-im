@@ -4,7 +4,7 @@
 
 #define ADR_PERMIT_STATUS     Action::DR_Parametr1
 
-StateWidget::StateWidget(IChatStates *AChatStates, IChatWindow *AWindow, QWidget *AParent) : QToolButton(AParent)
+StateWidget::StateWidget(IChatStates *AChatStates, IMessageChatWindow *AWindow, QWidget *AParent) : QToolButton(AParent)
 {
 	FWindow = AWindow;
 	FChatStates = AChatStates;

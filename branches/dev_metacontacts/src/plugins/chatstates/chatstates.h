@@ -107,11 +107,11 @@ protected slots:
 	void onPresenceClosed(IPresence *APresence);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 	void onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void onChatWindowCreated(IChatWindow *AWindow);
+	void onChatWindowCreated(IMessageChatWindow *AWindow);
 	void onChatWindowActivated();
 	void onChatWindowTextChanged();
 	void onChatWindowClosed();
-	void onChatWindowDestroyed(IChatWindow *AWindow);
+	void onChatWindowDestroyed(IMessageChatWindow *AWindow);
 	void onUpdateSelfStates();
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -137,7 +137,7 @@ private:
 	QMap<Jid, QList<Jid> > FNotSupported;
 	QMap<Jid, QMap<Jid, ChatParams> > FChatParams;
 	QMap<Jid, QMap<Jid, QString> > FStanzaSessions;
-	QMap<QTextEdit *, IChatWindow *> FChatByEditor;
+	QMap<QTextEdit *, IMessageChatWindow *> FChatByEditor;
 };
 
 #endif // CHATSTATES_H

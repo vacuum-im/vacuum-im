@@ -3,12 +3,12 @@
 #include <QHeaderView>
 #include <QInputDialog>
 
-ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, QWidget *AParent) : QWidget(AParent)
+ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 
+	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
-	FStreamJid = AStreamJid;
 
 	FPresence = NULL;
 	FStatusIcons = NULL;
@@ -23,6 +23,7 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AS
 	connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
 
 	initialize();
+	connect(FWindow->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),SLOT(onAddressChanged(const Jid &, const Jid &)));
 }
 
 ReceiversWidget::~ReceiversWidget()
@@ -30,12 +31,14 @@ ReceiversWidget::~ReceiversWidget()
 
 }
 
-void ReceiversWidget::setStreamJid(const Jid &AStreamJid)
+IMessageWindow *ReceiversWidget::messageWindow() const
 {
-	Jid before = FStreamJid;
-	FStreamJid = AStreamJid;
-	initialize();
-	emit streamJidChanged(before);
+	return FWindow;
+}
+
+QList<Jid> ReceiversWidget::receivers() const
+{
+	return FReceivers;
 }
 
 QString ReceiversWidget::receiverName(const Jid &AReceiver) const
@@ -99,7 +102,7 @@ void ReceiversWidget::initialize()
 	{
 		IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (presencePlugin)
-			FPresence = presencePlugin->findPresence(FStreamJid);
+			FPresence = presencePlugin->findPresence(FWindow->streamJid());
 	}
 
 	plugin = FMessageWidgets->pluginManager()->pluginInterface("IRosterPlugin").value(0,NULL);
@@ -107,7 +110,7 @@ void ReceiversWidget::initialize()
 	{
 		IRosterPlugin *rosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 		if (rosterPlugin)
-			FRoster = rosterPlugin->findRoster(FStreamJid);
+			FRoster = rosterPlugin->findRoster(FWindow->streamJid());
 	}
 
 	plugin = FMessageWidgets->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
@@ -160,7 +163,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiver(const Jid &AReceiver, const QStrin
 	{
 		QStringList columns = QStringList() << AName << AReceiver.uFull();
 		contactItem = new QTreeWidgetItem(AParent,columns);
-		contactItem->setIcon(0,FStatusIcons->iconByJid(FStreamJid,AReceiver));
+		contactItem->setIcon(0,FStatusIcons->iconByJid(FWindow->streamJid(),AReceiver));
 		contactItem->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
 		contactItem->setData(0,RDR_KIND,RIK_CONTACT);
 		contactItem->setData(0,RDR_FULL_JID,AReceiver.full());
@@ -216,7 +219,7 @@ void ReceiversWidget::createRosterTree()
 		}
 	}
 
-	QList<IPresenceItem> myResources = FPresence->findItems(FStreamJid);
+	QList<IPresenceItem> myResources = FPresence->findItems(FWindow->streamJid());
 	foreach(IPresenceItem pitem, myResources)
 	{
 		QTreeWidgetItem *groupItem = getReceiversGroup(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_MY_RESOURCES) : tr("My Resources"));
@@ -322,4 +325,11 @@ void ReceiversWidget::onUpdateClicked()
 	createRosterTree();
 	foreach(Jid receiver, savedReceivers)
 		addReceiver(receiver);
+}
+
+void ReceiversWidget::onAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
+{
+	Q_UNUSED(AContactBefore);
+	if (AStreamBefore != FWindow->streamJid())
+		initialize();
 }

@@ -165,26 +165,19 @@ protected:
 };
 
 class IMultiUserChatWindow :
-	public ITabPage
+	public IMessageWindow
 {
 public:
-	//virtual QMainWindow *instance() =0;
-	virtual Jid streamJid() const =0;
-	virtual Jid roomJid() const =0;
-	virtual IViewWidget *viewWidget() const =0;
-	virtual IEditWidget *editWidget() const =0;
-	virtual IMenuBarWidget *menuBarWidget() const =0;
-	virtual IToolBarWidget *toolBarWidget() const =0;
-	virtual IStatusBarWidget *statusBarWidget() const =0;
+	virtual QMainWindow *instance() =0;
 	virtual IMultiUserChat *multiUserChat() const =0;
-	virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0;
-	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
+	virtual IMessageChatWindow *openChatWindow(const Jid &AContactJid) =0;
+	virtual IMessageChatWindow *findChatWindow(const Jid &AContactJid) const =0;
 	virtual void contextMenuForWindow(Menu *AMenu) =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000) =0;
 protected:
-	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
-	virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;
+	virtual void chatWindowCreated(IMessageChatWindow *AWindow) =0;
+	virtual void chatWindowDestroyed(IMessageChatWindow *AWindow) =0;
 	virtual void multiChatWindowContextMenu(Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
 };
@@ -196,10 +189,10 @@ public:
 	virtual IPluginManager *pluginManager() const =0;
 	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
 	virtual QList<IMultiUserChat *> multiUserChats() const =0;
-	virtual IMultiUserChat *multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
+	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
-	virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
+	virtual IMultiUserChatWindow *findMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
 	virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual QList<IRosterIndex *> multiChatRosterIndexes() const =0;
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
@@ -219,7 +212,7 @@ protected:
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
 Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.4")
-Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.2")
-Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.4")
+Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.3")
+Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.5")
 
-#endif
+#endif //IMULTIUSERCHAT_H

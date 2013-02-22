@@ -96,7 +96,7 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(), SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
+			connect(FMessageWidgets->instance(), SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onChatWindowCreated(IMessageChatWindow *)));
 		}
 	}
 
@@ -381,15 +381,15 @@ void VCardPlugin::onShowVCardDialogByChatWindowAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
-		if (toolBarWidget && toolBarWidget->viewWidget())
+		IMessageToolBarWidget *toolBarWidget = qobject_cast<IMessageToolBarWidget *>(action->parent());
+		if (toolBarWidget)
 		{
 			bool isMucUser = false;
-			Jid contactJid = toolBarWidget->viewWidget()->contactJid();
+			Jid contactJid = toolBarWidget->messageWindow()->contactJid();
 			QList<IMultiUserChatWindow *> windows = FMultiUserChatPlugin!=NULL ? FMultiUserChatPlugin->multiChatWindows() : QList<IMultiUserChatWindow *>();
 			for (int i=0; !isMucUser && i<windows.count(); i++)
 				isMucUser = windows.at(i)->findChatWindow(contactJid)!=NULL;
-			showVCardDialog(toolBarWidget->viewWidget()->streamJid(), isMucUser ? contactJid : contactJid.bare());
+			showVCardDialog(toolBarWidget->messageWindow()->streamJid(), isMucUser ? contactJid : contactJid.bare());
 		}
 	}
 }
@@ -407,9 +407,9 @@ void VCardPlugin::onXmppStreamRemoved(IXmppStream *AXmppStream)
 			delete dialog;
 }
 
-void VCardPlugin::onChatWindowCreated(IChatWindow *AWindow)
+void VCardPlugin::onChatWindowCreated(IMessageChatWindow *AWindow)
 {
-	if (AWindow->toolBarWidget() && AWindow->toolBarWidget()->viewWidget())
+	if (AWindow->toolBarWidget())
 	{
 		Action *action = new Action(AWindow->toolBarWidget()->instance());
 		action->setText(tr("Show Profile"));

@@ -4,15 +4,14 @@
 
 #define MAX_BUFFERED_MESSAGES     10
 
-EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
+EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	ui.medEditor->setAcceptRichText(true);
 	ui.medEditor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
+	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
-	FStreamJid = AStreamJid;
-	FContactJid = AContactJid;
 	
 	FBufferPos = -1;
 	setRichTextEnabled(false);
@@ -64,34 +63,9 @@ EditWidget::~EditWidget()
 
 }
 
-const Jid &EditWidget::streamJid() const
+IMessageWindow *EditWidget::messageWindow() const
 {
-	return FStreamJid;
-}
-
-void EditWidget::setStreamJid(const Jid &AStreamJid)
-{
-	if (AStreamJid != FStreamJid)
-	{
-		Jid before = FStreamJid;
-		FStreamJid = AStreamJid;
-		emit streamJidChanged(before);
-	}
-}
-
-const Jid &EditWidget::contactJid() const
-{
-	return FContactJid;
-}
-
-void EditWidget::setContactJid(const Jid &AContactJid)
-{
-	if (AContactJid != FContactJid)
-	{
-		Jid before = FContactJid;
-		FContactJid = AContactJid;
-		emit contactJidChanged(before);
-	}
+	return FWindow;
 }
 
 QTextEdit *EditWidget::textEdit() const

@@ -11,18 +11,19 @@
 #include "ui_receiverswidget.h"
 
 class ReceiversWidget :
-			public QWidget,
-			public IReceiversWidget
+	public QWidget,
+	public IMessageReceiversWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IReceiversWidget);
+	Q_INTERFACES(IMessageWidget IMessageReceiversWidget);
 public:
-	ReceiversWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, QWidget *AParent);
+	ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent);
 	~ReceiversWidget();
+	// IMessageWidget
 	virtual QWidget *instance() { return this; }
-	virtual const Jid &streamJid() const { return FStreamJid; }
-	virtual void setStreamJid(const Jid &AStreamJid);
-	virtual QList<Jid> receivers() const { return FReceivers; }
+	virtual IMessageWindow *messageWindow() const;
+	// IMessageReceiversWidget
+	virtual QList<Jid> receivers() const;
 	virtual QString receiverName(const Jid &AReceiver) const;
 	virtual void addReceiversGroup(const QString &AGroup);
 	virtual void removeReceiversGroup(const QString &AGroup);
@@ -30,7 +31,6 @@ public:
 	virtual void removeReceiver(const Jid &AReceiver);
 	virtual void clear();
 signals:
-	void streamJidChanged(const Jid &ABefore);
 	void receiverAdded(const Jid &AReceiver);
 	void receiverRemoved(const Jid &AReceiver);
 protected:
@@ -45,17 +45,18 @@ protected slots:
 	void onSelectNoneClicked();
 	void onAddClicked();
 	void onUpdateClicked();
+	void onAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 private:
 	Ui::ReceiversWidgetClass ui;
 private:
-	IMessageWidgets *FMessageWidgets;
 	IRoster *FRoster;
 	IPresence *FPresence;
 	IStatusIcons *FStatusIcons;
 	IRostersModel *FRostersModel;
+	IMessageWidgets *FMessageWidgets;
 private:
-	Jid FStreamJid;
 	QList<Jid> FReceivers;
+	IMessageWindow *FWindow;
 	QHash<QString,QTreeWidgetItem *> FGroupItems;
 	QMultiHash<Jid,QTreeWidgetItem *> FContactItems;
 };

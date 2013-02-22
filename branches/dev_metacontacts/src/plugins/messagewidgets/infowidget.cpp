@@ -3,7 +3,7 @@
 #include <QMovie>
 #include <QImageReader>
 
-InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
+InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 
@@ -13,13 +13,14 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FAvatars = NULL;
 	FStatusChanger = NULL;
 
+	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
-	FStreamJid = AStreamJid;
-	FContactJid = AContactJid;
+
 	FAutoFields = 0xFFFFFFFF;
 	FVisibleFields = AccountName|ContactName|ContactStatus|ContactAvatar;
 
 	initialize();
+	connect(FWindow->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),SLOT(onAddressChanged(const Jid &, const Jid &)));
 }
 
 InfoWidget::~InfoWidget()
@@ -27,37 +28,9 @@ InfoWidget::~InfoWidget()
 
 }
 
-const Jid &InfoWidget::streamJid() const
+IMessageWindow *InfoWidget::messageWindow() const
 {
-	return FStreamJid;
-}
-
-void InfoWidget::setStreamJid(const Jid &AStreamJid)
-{
-	if (FStreamJid != AStreamJid)
-	{
-		Jid before = FStreamJid;
-		FStreamJid = AStreamJid;
-		initialize();
-		autoUpdateFields();
-		emit streamJidChanged(before);
-	}
-}
-
-const Jid &InfoWidget::contactJid() const
-{
-	return FContactJid;
-}
-
-void InfoWidget::setContactJid(const Jid &AContactJid)
-{
-	if (FContactJid != AContactJid)
-	{
-		Jid before = FContactJid;
-		FContactJid = AContactJid;
-		autoUpdateFields();
-		emit contactJidChanged(before);
-	}
+	return FWindow;
 }
 
 void InfoWidget::autoUpdateFields()
@@ -80,35 +53,38 @@ void InfoWidget::autoUpdateField(InfoField AField)
 	{
 	case AccountName:
 	{
-		setField(AField, FAccount!=NULL ? FAccount->name() : FStreamJid.uFull());
+		setField(AField, FAccount!=NULL ? FAccount->name() : FWindow->streamJid().uFull());
 		break;
 	}
 	case ContactName:
 	{
 		QString name;
-		if (!(FStreamJid && FContactJid))
+		Jid contactJid = FWindow->contactJid();
+		if (FWindow->streamJid().pBare() != contactJid.pBare())
 		{
-			IRosterItem ritem = FRoster ? FRoster->rosterItem(FContactJid) : IRosterItem();
-			name = ritem.isValid && !ritem.name.isEmpty() ? ritem.name : (!FContactJid.node().isEmpty() ? FContactJid.uNode() : FContactJid.domain());
+			IRosterItem ritem = FRoster ? FRoster->rosterItem(contactJid) : IRosterItem();
+			name = ritem.isValid && !ritem.name.isEmpty() ? ritem.name : (!contactJid.node().isEmpty() ? contactJid.uNode() : contactJid.domain());
 		}
 		else
-			name = FContactJid.resource();
+		{
+			name = contactJid.resource();
+		}
 		setField(AField,name);
 		break;
 	}
 	case ContactShow:
 	{
-		setField(AField,FPresence!=NULL ? FPresence->findItem(FContactJid).show : IPresence::Offline);
+		setField(AField,FPresence!=NULL ? FPresence->findItem(FWindow->contactJid()).show : IPresence::Offline);
 		break;
 	}
 	case ContactStatus:
 	{
-		setField(AField,FPresence!=NULL ? FPresence->findItem(FContactJid).status : QString::null);
+		setField(AField,FPresence!=NULL ? FPresence->findItem(FWindow->contactJid()).status : QString::null);
 		break;
 	}
 	case ContactAvatar:
 	{
-		setField(AField, FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(FContactJid)) : QString::null);
+		setField(AField, FAvatars!=NULL ? FAvatars->avatarFileName(FAvatars->avatarHash(FWindow->contactJid())) : QString::null);
 		break;
 	}
 	}
@@ -131,12 +107,12 @@ int InfoWidget::autoUpdatedFields() const
 	return FAutoFields;
 }
 
-bool InfoWidget::isFiledAutoUpdated(IInfoWidget::InfoField AField) const
+bool InfoWidget::isFiledAutoUpdated(IMessageInfoWidget::InfoField AField) const
 {
 	return (FAutoFields & AField) > 0;
 }
 
-void InfoWidget::setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto)
+void InfoWidget::setFieldAutoUpdated(IMessageInfoWidget::InfoField AField, bool AAuto)
 {
 	if (isFiledAutoUpdated(AField) != AAuto)
 	{
@@ -146,7 +122,9 @@ void InfoWidget::setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto)
 			autoUpdateField(AField);
 		}
 		else
+		{
 			FAutoFields &= ~AField;
+		}
 	}
 }
 
@@ -155,12 +133,12 @@ int InfoWidget::visibleFields() const
 	return FVisibleFields;
 }
 
-bool InfoWidget::isFieldVisible(IInfoWidget::InfoField AField) const
+bool InfoWidget::isFieldVisible(IMessageInfoWidget::InfoField AField) const
 {
 	return (FVisibleFields & AField) >0;
 }
 
-void InfoWidget::setFieldVisible(IInfoWidget::InfoField AField, bool AVisible)
+void InfoWidget::setFieldVisible(IMessageInfoWidget::InfoField AField, bool AVisible)
 {
 	if (isFieldVisible(AField) != AVisible)
 	{
@@ -183,7 +161,7 @@ void InfoWidget::initialize()
 					SLOT(onAccountChanged(const OptionsNode &)));
 			}
 
-			FAccount = accountManager->accountByStream(FStreamJid);
+			FAccount = accountManager->accountByStream(FWindow->streamJid());
 			if (FAccount)
 			{
 				connect(FAccount->instance(),SIGNAL(optionsChanged(const OptionsNode &)),
@@ -204,7 +182,7 @@ void InfoWidget::initialize()
 					SLOT(onRosterItemReceived(const IRosterItem &, const IRosterItem &)));
 			}
 
-			FRoster = rosterPlugin->findRoster(FStreamJid);
+			FRoster = rosterPlugin->findRoster(FWindow->streamJid());
 			if (FRoster)
 			{
 				connect(FRoster->instance(),SIGNAL(itemReceived(const IRosterItem &, const IRosterItem &)), 
@@ -225,7 +203,7 @@ void InfoWidget::initialize()
 					SLOT(onPresenceItemReceived(const IPresenceItem &, const IPresenceItem &)));
 			}
 
-			FPresence = presencePlugin->findPresence(FStreamJid);
+			FPresence = presencePlugin->findPresence(FWindow->streamJid());
 			if (FPresence)
 			{
 				connect(FPresence->instance(),SIGNAL(itemReceived(const IPresenceItem &, const IPresenceItem &)), 
@@ -251,7 +229,7 @@ void InfoWidget::initialize()
 	}
 }
 
-void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
+void InfoWidget::updateFieldLabel(IMessageInfoWidget::InfoField AField)
 {
 	switch (AField)
 	{
@@ -266,11 +244,11 @@ void InfoWidget::updateFieldLabel(IInfoWidget::InfoField AField)
 	{
 		QString name = field(AField).toString();
 
-		IRosterItem ritem = FRoster ? FRoster->rosterItem(FContactJid) : IRosterItem();
+		IRosterItem ritem = FRoster ? FRoster->rosterItem(FWindow->contactJid()) : IRosterItem();
 		if (isFiledAutoUpdated(AField) && ritem.name.isEmpty())
-			ui.lblName->setText(Qt::escape(FContactJid.uFull()));
+			ui.lblName->setText(Qt::escape(FWindow->contactJid().uFull()));
 		else
-			ui.lblName->setText(QString("<big><b>%1</b></big> - %2").arg(Qt::escape(name)).arg(Qt::escape(FContactJid.uFull())));
+			ui.lblName->setText(QString("<big><b>%1</b></big> - %2").arg(Qt::escape(name)).arg(Qt::escape(FWindow->contactJid().uFull())));
 
 		ui.lblName->setVisible(isFieldVisible(AField));
 		break;
@@ -330,13 +308,13 @@ void InfoWidget::onAccountChanged(const OptionsNode &ANode)
 
 void InfoWidget::onRosterItemReceived(const IRosterItem &AItem, const IRosterItem &ABefore)
 {
-	if (isFiledAutoUpdated(ContactName) && (AItem.itemJid && FContactJid) && AItem.name!=ABefore.name)
+	if (isFiledAutoUpdated(ContactName) && (AItem.itemJid && FWindow->contactJid()) && AItem.name!=ABefore.name)
 		autoUpdateField(ContactName);
 }
 
 void InfoWidget::onPresenceItemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	if (AItem.itemJid==FContactJid && (AItem.show!=ABefore.show || AItem.status!=ABefore.status))
+	if (AItem.itemJid==FWindow->contactJid() && (AItem.show!=ABefore.show || AItem.status!=ABefore.status))
 	{
 		if (isFiledAutoUpdated(ContactShow))
 			setField(ContactShow,AItem.show);
@@ -347,6 +325,14 @@ void InfoWidget::onPresenceItemReceived(const IPresenceItem &AItem, const IPrese
 
 void InfoWidget::onAvatarChanged(const Jid &AContactJid)
 {
-	if (isFiledAutoUpdated(ContactAvatar) && (FContactJid && AContactJid))
+	if (isFiledAutoUpdated(ContactAvatar) && (FWindow->contactJid() && AContactJid))
 		autoUpdateField(ContactAvatar);
+}
+
+void InfoWidget::onAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
+{
+	Q_UNUSED(AContactBefore);
+	if (FWindow->streamJid() != AStreamBefore)
+		initialize();
+	autoUpdateFields();
 }

@@ -5,26 +5,21 @@
 #include <interfaces/imessagewidgets.h>
 
 class ToolBarWidget :
-			public QToolBar,
-			public IToolBarWidget
+	public QToolBar,
+	public IMessageToolBarWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IToolBarWidget);
+	Q_INTERFACES(IMessageWidget IMessageToolBarWidget);
 public:
-	ToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
+	ToolBarWidget(IMessageWindow *AWindow, QWidget *AParent);
 	~ToolBarWidget();
+	// IMessageWidget
 	virtual QToolBar *instance() { return this; }
-	virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
-	virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
-	virtual IViewWidget *viewWidget() const { return FViewWidget; }
-	virtual IEditWidget *editWidget() const { return FEditWidget; }
-	virtual IReceiversWidget *receiversWidget() const { return FReceiversWidget; }
+	virtual IMessageWindow *messageWindow() const;
+	// IMessageToolBarWidget
+	virtual ToolBarChanger *toolBarChanger() const;
 private:
-	IInfoWidget *FInfoWidget;
-	IViewWidget *FViewWidget;
-	IEditWidget *FEditWidget;
-	IReceiversWidget *FReceiversWidget;
-private:
+	IMessageWindow *FWindow;
 	ToolBarChanger *FToolBarChanger;
 };
 

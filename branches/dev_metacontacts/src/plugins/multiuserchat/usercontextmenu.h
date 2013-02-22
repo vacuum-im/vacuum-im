@@ -11,15 +11,15 @@ class UserContextMenu :
 {
 	Q_OBJECT;
 public:
-	UserContextMenu(IMultiUserChatWindow *AMUCWindow, IChatWindow *AChatWindow);
+	UserContextMenu(IMultiUserChatWindow *AMUCWindow, IMessageChatWindow *AChatWindow);
 	~UserContextMenu();
 protected slots:
 	void onAboutToShow();
 	void onAboutToHide();
 	void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void onChatWindowContactJidChanged(const Jid &ABefore);
+	void onChatWindowAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 private:
-	IChatWindow *FChatWindow;
+	IMessageChatWindow *FChatWindow;
 	IMultiUserChatWindow *FMUCWindow;
 };
 

@@ -43,15 +43,13 @@
 #include "usersproxymodel.h"
 #include "ui_multiuserchatwindow.h"
 
-struct WindowStatus
-{
+struct WindowStatus {
 	QDateTime startTime;
 	QDateTime createTime;
 	QDate lastDateSeparator;
 };
 
-struct UserStatus
-{
+struct UserStatus {
 	QString lastStatusShow;
 };
 
@@ -61,11 +59,22 @@ class MultiUserChatWindow :
 	public IMessageHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMultiUserChatWindow ITabPage IMessageHandler);
+	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IMessageHandler);
 public:
 	MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
 	virtual QMainWindow *instance() { return this; }
+	//IMessageWindow
+	virtual Jid streamJid() const;
+	virtual Jid contactJid() const;
+	virtual IMessageAddress *address() const;
+	virtual IMessageInfoWidget *infoWidget() const;
+	virtual IMessageViewWidget *viewWidget() const;
+	virtual IMessageEditWidget *editWidget() const;
+	virtual IMessageMenuBarWidget *menuBarWidget() const;
+	virtual IMessageToolBarWidget *toolBarWidget() const;
+	virtual IMessageStatusBarWidget *statusBarWidget() const;
+	virtual IMessageReceiversWidget *receiversWidget() const;
 	//ITabWindowPage
 	virtual QString tabPageId() const;
 	virtual bool isVisibleTabPage() const;
@@ -77,8 +86,8 @@ public:
 	virtual QIcon tabPageIcon() const;
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
-	virtual ITabPageNotifier *tabPageNotifier() const;
-	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
+	virtual IMessageTabPageNotifier *tabPageNotifier() const;
+	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -86,16 +95,9 @@ public:
 	virtual bool messageShowWindow(int AMessageId);
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IMultiUserChatWindow
-	virtual Jid streamJid() const;
-	virtual Jid roomJid() const;
-	virtual IViewWidget *viewWidget() const;
-	virtual IEditWidget *editWidget() const;
-	virtual IMenuBarWidget *menuBarWidget() const;
-	virtual IToolBarWidget *toolBarWidget() const;
-	virtual IStatusBarWidget *statusBarWidget() const;
 	virtual IMultiUserChat *multiUserChat() const;
-	virtual IChatWindow *openChatWindow(const Jid &AContactJid);
-	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const;
+	virtual IMessageChatWindow *openChatWindow(const Jid &AContactJid);
+	virtual IMessageChatWindow *findChatWindow(const Jid &AContactJid) const;
 	virtual void contextMenuForWindow(Menu *AMenu);
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000);
@@ -112,8 +114,8 @@ signals:
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
 	//IMultiUserChatWindow
-	void chatWindowCreated(IChatWindow *AWindow);
-	void chatWindowDestroyed(IChatWindow *AWindow);
+	void chatWindowCreated(IMessageChatWindow *AWindow);
+	void chatWindowDestroyed(IMessageChatWindow *AWindow);
 	void multiChatWindowContextMenu(Menu *AMenu);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
 protected:
@@ -127,7 +129,7 @@ protected:
 	void saveWindowGeometry();
 	void loadWindowGeometry();
 	void updateRecentItemActiveTime();
-	void showDateSeparator(IViewWidget *AView, const QDateTime &ADateTime);
+	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
 	bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
 	void highlightUserRole(IMultiUser *AUser);
 	void highlightUserAffiliation(IMultiUser *AUser);
@@ -145,14 +147,14 @@ protected:
 	void updateListItem(const Jid &AContactJid);
 	void removeActiveMessages();
 protected:
-	void setChatMessageStyle(IChatWindow *AWindow);
-	void fillChatContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
-	void showChatStatus(IChatWindow *AWindow, const QString &AMessage, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
-	void showChatMessage(IChatWindow *AWindow, const Message &AMessage);
-	void showChatHistory(IChatWindow *AWindow);
-	IChatWindow *getChatWindow(const Jid &AContactJid);
-	void removeActiveChatMessages(IChatWindow *AWindow);
-	void updateChatWindow(IChatWindow *AWindow);
+	void setChatMessageStyle(IMessageChatWindow *AWindow);
+	void fillChatContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void showChatStatus(IMessageChatWindow *AWindow, const QString &AMessage, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
+	void showChatMessage(IMessageChatWindow *AWindow, const Message &AMessage);
+	void showChatHistory(IMessageChatWindow *AWindow);
+	IMessageChatWindow *getChatWindow(const Jid &AContactJid);
+	void removeActiveChatMessages(IMessageChatWindow *AWindow);
+	void updateChatWindow(IMessageChatWindow *AWindow);
 protected:
 	bool event(QEvent *AEvent);
 	void showEvent(QShowEvent *AEvent);
@@ -163,7 +165,6 @@ protected slots:
 	void onChatNotify(const QString &ANotify);
 	void onChatError(const QString &AMessage);
 	void onChatClosed();
-	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void onRejoinAfterKick();
 	//Occupant
 	void onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
@@ -189,6 +190,7 @@ protected slots:
 	void onViewContextQuoteActionTriggered(bool);
 	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
 	void onWindowActivated();
+protected slots:
 	void onChatMessageReady();
 	void onChatWindowActivated();
 	void onChatWindowClosed();
@@ -227,12 +229,13 @@ private:
 	IMultiUserChatPlugin *FChatPlugin;
 	IRecentContacts *FRecentContacts;
 private:
-	IViewWidget *FViewWidget;
-	IEditWidget *FEditWidget;
-	IMenuBarWidget *FMenuBarWidget;
-	IToolBarWidget *FToolBarWidget;
-	IStatusBarWidget *FStatusBarWidget;
-	ITabPageNotifier *FTabPageNotifier;
+	IMessageAddress *FAddress;
+	IMessageViewWidget *FViewWidget;
+	IMessageEditWidget *FEditWidget;
+	IMessageMenuBarWidget *FMenuBarWidget;
+	IMessageToolBarWidget *FToolBarWidget;
+	IMessageStatusBarWidget *FStatusBarWidget;
+	IMessageTabPageNotifier *FTabPageNotifier;
 private:
 	Action *FEnterRoom;
 	Action *FExitRoom;
@@ -255,14 +258,14 @@ private:
 	bool FDestroyOnChatClosed;
 	QString FTabPageToolTip;
 	QList<int> FActiveMessages;
-	QList<IChatWindow *> FChatWindows;
-	QMap<IChatWindow *, QTimer *> FDestroyTimers;
-	QMultiMap<IChatWindow *,int> FActiveChatMessages;
+	QList<IMessageChatWindow *> FChatWindows;
+	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;
+	QMultiMap<IMessageChatWindow *,int> FActiveChatMessages;
 	QMap<int, IDataDialogWidget *> FDataFormMessages;
 	QHash<IMultiUser *, UserStatus> FUserStatus;
-	QMap<IViewWidget *, WindowStatus> FWindowStatus;
-	QMap<QString, IChatWindow *> FHistoryRequests;
-	QMap<IChatWindow *, QList<Message> > FPendingMessages;
+	QMap<IMessageViewWidget *, WindowStatus> FWindowStatus;
+	QMap<QString, IMessageChatWindow *> FHistoryRequests;
+	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
 private:
 	UsersProxyModel *FUsersProxy;
 	QStandardItemModel *FUsersModel;

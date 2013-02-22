@@ -13,7 +13,7 @@ class UserContextMenu :
 {
 	Q_OBJECT;
 public:
-	UserContextMenu(IRostersModel *AModel, IRostersView *AView, IChatWindow *AWindow);
+	UserContextMenu(IRostersModel *AModel, IRostersView *AView, IMessageChatWindow *AWindow);
 	~UserContextMenu();
 protected:
 	bool isAcceptedIndex(IRosterIndex *AIndex);
@@ -24,12 +24,12 @@ protected slots:
 	void onRosterIndexInserted(IRosterIndex *AIndex);
 	void onRosterIndexDataChanged(IRosterIndex *AIndex, int ARole);
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
-	void onChatWindowContactJidChanged(const Jid &ABefore);
+	void onChatWindowAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 private:
 	IRosterIndex *FRosterIndex;
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
-	IChatWindow *FChatWindow;
+	IMessageChatWindow *FChatWindow;
 };
 
 #endif // USERCONTEXTMENU_H

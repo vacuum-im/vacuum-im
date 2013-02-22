@@ -87,7 +87,7 @@ protected slots:
 	void onShowVCardDialogByChatWindowAction(bool);
 	void onVCardDialogDestroyed(QObject *ADialog);
 	void onXmppStreamRemoved(IXmppStream *AXmppStream);
-	void onChatWindowCreated(IChatWindow *AWindow);
+	void onChatWindowCreated(IMessageChatWindow *AWindow);
 private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;

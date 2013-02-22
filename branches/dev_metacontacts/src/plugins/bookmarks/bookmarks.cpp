@@ -341,7 +341,7 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 		foreach(IBookmark bookmark, removeBookmarks)
 		{
 			IRosterIndex *index = FBookmarkIndexes.value(AStreamJid).key(bookmark);
-			IMultiUserChatWindow *window = FMultiChatPlugin->multiChatWindow(AStreamJid,bookmark.conference.roomJid);
+			IMultiUserChatWindow *window = FMultiChatPlugin->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid);
 			if (window == NULL)
 				FRostersModel->removeRosterIndex(index);
 			FBookmarkIndexes[AStreamJid].remove(index);
@@ -484,7 +484,7 @@ void Bookmarks::onPrivateDataUpdated(const QString &AId, const Jid &AStreamJid, 
 			{
 				if (bookmark.type==IBookmark::Conference && bookmark.conference.autojoin)
 				{
-					if (FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(AStreamJid,bookmark.conference.roomJid)!=NULL)
+					if (FMultiChatPlugin && FMultiChatPlugin->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid)!=NULL)
 						showAutoJoined = false;
 					startBookmark(AStreamJid,bookmark,showAutoJoined);
 				}
@@ -860,7 +860,7 @@ void Bookmarks::onMultiChatWindowAddBookmarkActionTriggered(bool)
 				QList<IBookmark> bookmarkList = bookmarks(window->streamJid());
 
 				int index = 0;
-				while (index<bookmarkList.count() && window->roomJid()!=bookmarkList.at(index).conference.roomJid)
+				while (index<bookmarkList.count() && window->contactJid()!=bookmarkList.at(index).conference.roomJid)
 					index++;
 
 				if (index == bookmarkList.count())
@@ -871,7 +871,7 @@ void Bookmarks::onMultiChatWindowAddBookmarkActionTriggered(bool)
 				{
 					bookmark.type = IBookmark::Conference;
 					bookmark.name = window->multiUserChat()->roomName();
-					bookmark.conference.roomJid = window->roomJid();
+					bookmark.conference.roomJid = window->contactJid();
 					bookmark.conference.nick = window->multiUserChat()->nickName();
 					bookmark.conference.password = window->multiUserChat()->password();
 					bookmark.conference.autojoin = false;

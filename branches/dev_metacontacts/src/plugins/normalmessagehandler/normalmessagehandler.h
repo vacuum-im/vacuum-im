@@ -72,25 +72,26 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
-	IMessageWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
-	IMessageWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
-	bool showNextMessage(IMessageWindow *AWindow);
-	void updateWindow(IMessageWindow *AWindow);
-	void removeCurrentMessageNotify(IMessageWindow *AWindow);
-	void removeNotifiedMessages(IMessageWindow *AWindow, int AMessageId = -1);
-	void setMessageStyle(IMessageWindow *AWindow);
-	void fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const;
-	void showStyledMessage(IMessageWindow *AWindow, const Message &AMessage);
+	IMessageNormalWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode);
+	IMessageNormalWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	bool showNextMessage(IMessageNormalWindow *AWindow);
+	void updateWindow(IMessageNormalWindow *AWindow);
+	void removeCurrentMessageNotify(IMessageNormalWindow *AWindow);
+	void removeNotifiedMessages(IMessageNormalWindow *AWindow, int AMessageId = -1);
+	void setMessageStyle(IMessageNormalWindow *AWindow);
+	void fillContentOptions(IMessageNormalWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void showStyledMessage(IMessageNormalWindow *AWindow, const Message &AMessage);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
-	void onMessageReady();
-	void onShowNextMessage();
-	void onReplyMessage();
-	void onForwardMessage();
-	void onShowChatWindow();
+	void onWindowMessageReady();
+	void onWindowShowNextMessage();
+	void onWindowReplyMessage();
+	void onWindowForwardMessage();
+	void onWindowShowChatWindow();
 	void onWindowActivated();
 	void onWindowDestroyed();
 	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
+protected slots:
 	void onStatusIconsChanged();
 	void onShowWindowAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -109,9 +110,9 @@ private:
 	IOptionsManager *FOptionsManager;
 	IRecentContacts *FRecentContacts;
 private:
-	QList<IMessageWindow *> FWindows;
-	QMultiMap<IMessageWindow *, int> FNotifiedMessages;
-	QMap<IMessageWindow *, QQueue<Message> > FMessageQueue;
+	QList<IMessageNormalWindow *> FWindows;
+	QMultiMap<IMessageNormalWindow *, int> FNotifiedMessages;
+	QMap<IMessageNormalWindow *, QQueue<Message> > FMessageQueue;
 };
 
 #endif // NORMALMESSAGEHANDLER_H

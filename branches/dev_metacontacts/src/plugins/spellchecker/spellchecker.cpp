@@ -46,7 +46,7 @@ bool SpellChecker::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(),SIGNAL(editWidgetCreated(IEditWidget *)),SLOT(onEditWidgetCreated(IEditWidget *)));
+			connect(FMessageWidgets->instance(),SIGNAL(editWidgetCreated(IMessageEditWidget *)),SLOT(onEditWidgetCreated(IMessageEditWidget *)));
 		}
 	}
 
@@ -210,7 +210,7 @@ void SpellChecker::onAddUnknownWordToDictionary()
 	}
 }
 
-void SpellChecker::onEditWidgetCreated(IEditWidget *AWidget)
+void SpellChecker::onEditWidgetCreated(IMessageEditWidget *AWidget)
 {
 	QTextEdit *textEdit = AWidget->textEdit();
 	textEdit->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -231,7 +231,7 @@ void SpellChecker::onEditWidgetCreated(IEditWidget *AWidget)
 
 void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Menu *AMenu)
 {
-	IEditWidget *editWidget = qobject_cast<IEditWidget *>(sender());
+	IMessageEditWidget *editWidget = qobject_cast<IMessageEditWidget *>(sender());
 	if (editWidget)
 	{
 		FCurrentTextEdit = editWidget->textEdit();

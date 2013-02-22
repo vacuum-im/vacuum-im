@@ -95,7 +95,7 @@ QIcon TabWindow::centralPageIcon() const
 
 QString TabWindow::centralPageCaption() const
 {
-	ITabPage *page = currentTabPage();
+	IMessageTabPage *page = currentTabPage();
 	if (page)
 		return page->tabPageCaption();
 	return QString::null;
@@ -172,13 +172,13 @@ int TabWindow::tabPageCount() const
 	return ui.twtTabs->count();
 }
 
-ITabPage *TabWindow::tabPage(int AIndex) const
+IMessageTabPage *TabWindow::tabPage(int AIndex) const
 {
 	QWidget *page = ui.twtTabs->widget(AIndex);
-	return qobject_cast<ITabPage *>(page);
+	return qobject_cast<IMessageTabPage *>(page);
 }
 
-void TabWindow::addTabPage(ITabPage *APage)
+void TabWindow::addTabPage(IMessageTabPage *APage)
 {
 	if (!hasTabPage(APage))
 	{
@@ -198,23 +198,23 @@ void TabWindow::addTabPage(ITabPage *APage)
 	}
 }
 
-bool TabWindow::hasTabPage(ITabPage *APage) const
+bool TabWindow::hasTabPage(IMessageTabPage *APage) const
 {
 	return APage!=NULL && ui.twtTabs->indexOf(APage->instance()) >= 0;
 }
 
-ITabPage *TabWindow::currentTabPage() const
+IMessageTabPage *TabWindow::currentTabPage() const
 {
-	return qobject_cast<ITabPage *>(ui.twtTabs->currentWidget());
+	return qobject_cast<IMessageTabPage *>(ui.twtTabs->currentWidget());
 }
 
-void TabWindow::setCurrentTabPage(ITabPage *APage)
+void TabWindow::setCurrentTabPage(IMessageTabPage *APage)
 {
 	if (APage)
 		ui.twtTabs->setCurrentWidget(APage->instance());
 }
 
-void TabWindow::detachTabPage(ITabPage *APage)
+void TabWindow::detachTabPage(IMessageTabPage *APage)
 {
 	if (hasTabPage(APage))
 	{
@@ -226,7 +226,7 @@ void TabWindow::detachTabPage(ITabPage *APage)
 	}
 }
 
-void TabWindow::removeTabPage(ITabPage *APage)
+void TabWindow::removeTabPage(IMessageTabPage *APage)
 {
 	int index = APage!=NULL ? ui.twtTabs->indexOf(APage->instance()) : -1;
 	if (index >= 0)
@@ -352,7 +352,7 @@ void TabWindow::loadWindowStateAndGeometry()
 
 void TabWindow::updateWindow()
 {
-	ITabPage *page = currentTabPage();
+	IMessageTabPage *page = currentTabPage();
 	if (page)
 	{
 		setWindowIcon(page->tabPageIcon());
@@ -366,7 +366,7 @@ void TabWindow::clearTabs()
 {
 	while (ui.twtTabs->count() > 0)
 	{
-		ITabPage *page = qobject_cast<ITabPage *>(ui.twtTabs->widget(0));
+		IMessageTabPage *page = qobject_cast<IMessageTabPage *>(ui.twtTabs->widget(0));
 		if (page)
 			removeTabPage(page);
 		else
@@ -376,7 +376,7 @@ void TabWindow::clearTabs()
 
 void TabWindow::updateTab(int AIndex)
 {
-	ITabPage *page = tabPage(AIndex);
+	IMessageTabPage *page = tabPage(AIndex);
 	if (page)
 	{
 		QIcon tabIcon = page->tabPageIcon();
@@ -393,7 +393,7 @@ void TabWindow::updateTab(int AIndex)
 				emptyIcon.addPixmap(pixmap);
 			}
 
-			ITabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
+			IMessageTabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
 			if (!notify.icon.isNull())
 				tabIcon = notify.icon;
 			if (notify.blink && !FBlinkVisible)
@@ -543,7 +543,7 @@ void TabWindow::onTabMenuRequested(int AIndex)
 
 void TabWindow::onTabPageShow()
 {
-	ITabPage *page = qobject_cast<ITabPage *>(sender());
+	IMessageTabPage *page = qobject_cast<IMessageTabPage *>(sender());
 	if (page)
 	{
 		setCurrentTabPage(page);
@@ -558,24 +558,24 @@ void TabWindow::onTabPageShowMinimized()
 
 void TabWindow::onTabPageClose()
 {
-	removeTabPage(qobject_cast<ITabPage *>(sender()));
+	removeTabPage(qobject_cast<IMessageTabPage *>(sender()));
 }
 
 void TabWindow::onTabPageChanged()
 {
-	ITabPage *page = qobject_cast<ITabPage *>(sender());
+	IMessageTabPage *page = qobject_cast<IMessageTabPage *>(sender());
 	if (page)
 		updateTab(ui.twtTabs->indexOf(page->instance()));
 }
 
 void TabWindow::onTabPageDestroyed()
 {
-	removeTabPage(qobject_cast<ITabPage *>(sender()));
+	removeTabPage(qobject_cast<IMessageTabPage *>(sender()));
 }
 
 void TabWindow::onTabPageNotifierChanged()
 {
-	ITabPage *page = qobject_cast<ITabPage *>(sender());
+	IMessageTabPage *page = qobject_cast<IMessageTabPage *>(sender());
 	if (page && page->tabPageNotifier()!=NULL)
 		connect(page->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),SLOT(onTabPageNotifierActiveNotifyChanged(int)));
 }
@@ -583,7 +583,7 @@ void TabWindow::onTabPageNotifierChanged()
 void TabWindow::onTabPageNotifierActiveNotifyChanged(int ANotifyId)
 {
 	Q_UNUSED(ANotifyId);
-	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
+	IMessageTabPageNotifier *notifier = qobject_cast<IMessageTabPageNotifier *>(sender());
 	if (notifier)
 		updateTab(ui.twtTabs->indexOf(notifier->tabPage()->instance()));
 }
@@ -689,7 +689,7 @@ void TabWindow::onTabMenuActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		ITabPage *page = tabPage(action->data(ADR_TAB_INDEX).toInt());
+		IMessageTabPage *page = tabPage(action->data(ADR_TAB_INDEX).toInt());
 		int tabAction = action->data(ADR_TAB_MENU_ACTION).toInt();
 		if (tabAction == CloseTabAction)
 		{
@@ -712,7 +712,7 @@ void TabWindow::onTabMenuActionTriggered(bool)
 			QString name = QInputDialog::getText(this,tr("New Tab Window"),tr("Tab window name:"));
 			if (!name.isEmpty())
 			{
-				ITabWindow *window = FMessageWidgets->getTabWindow(FMessageWidgets->appendTabWindow(name));
+				IMessageTabWindow *window = FMessageWidgets->getTabWindow(FMessageWidgets->appendTabWindow(name));
 				removeTabPage(page);
 				window->addTabPage(page);
 				window->showWindow();
@@ -720,7 +720,7 @@ void TabWindow::onTabMenuActionTriggered(bool)
 		}
 		else if (tabAction == JoinTabAction)
 		{
-			ITabWindow *window = FMessageWidgets->getTabWindow(action->data(ADR_TABWINDOWID).toString());
+			IMessageTabWindow *window = FMessageWidgets->getTabWindow(action->data(ADR_TABWINDOWID).toString());
 			removeTabPage(page);
 			window->addTabPage(page);
 			window->showWindow();
@@ -766,10 +766,10 @@ void TabWindow::onBlinkTabNotifyTimerTimeout()
 
 	for (int index=0; index<tabPageCount(); index++)
 	{
-		ITabPage *page = tabPage(index);
+		IMessageTabPage *page = tabPage(index);
 		if (page && page->tabPageNotifier() && page->tabPageNotifier()->activeNotify()>0)
 		{
-			ITabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
+			IMessageTabPageNotify notify = page->tabPageNotifier()->notifyById(page->tabPageNotifier()->activeNotify());
 			if (notify.blink && !notify.icon.isNull())
 				updateTab(index);
 		}

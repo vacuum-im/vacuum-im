@@ -146,7 +146,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
+			connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IMessageToolBarWidget *)),SLOT(onToolBarWidgetCreated(IMessageToolBarWidget *)));
 		}
 	}
 
@@ -1665,7 +1665,7 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringLis
 
 void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const
 {
-	IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
+	IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid,true) : NULL;
 	if (window)
 	{
 		IMessageContentOptions options;
@@ -2333,9 +2333,9 @@ void MessageArchiver::onShowArchiveWindowByToolBarAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
-		if (toolBarWidget && toolBarWidget->editWidget())
-			showArchiveWindow(toolBarWidget->editWidget()->streamJid(),toolBarWidget->editWidget()->contactJid());
+		IMessageToolBarWidget *toolBarWidget = qobject_cast<IMessageToolBarWidget *>(action->parent());
+		if (toolBarWidget)
+			showArchiveWindow(toolBarWidget->messageWindow()->streamJid(),toolBarWidget->messageWindow()->contactJid());
 	}
 }
 
@@ -2412,21 +2412,18 @@ void MessageArchiver::onStanzaSessionTerminated(const IStanzaSession &ASession)
 		notifyInChatWindow(ASession.streamJid,ASession.contactJid,tr("Session failed: %1").arg(ASession.error.errorMessage()));
 }
 
-void MessageArchiver::onToolBarWidgetCreated(IToolBarWidget *AWidget)
+void MessageArchiver::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
 {
-	if (AWidget->editWidget() != NULL)
-	{
-		Action *action = new Action(AWidget->toolBarChanger()->toolBar());
-		action->setText(tr("View History"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
-		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWHISTORY);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByToolBarAction(bool)));
-		QToolButton *chatButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
+	Action *action = new Action(AWidget->toolBarChanger()->toolBar());
+	action->setText(tr("View History"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
+	action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWHISTORY);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByToolBarAction(bool)));
+	QToolButton *chatButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
 
-		ChatWindowMenu *chatMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
-		chatButton->setMenu(chatMenu);
-		chatButton->setPopupMode(QToolButton::MenuButtonPopup);
-	}
+	ChatWindowMenu *chatMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
+	chatButton->setMenu(chatMenu);
+	chatButton->setPopupMode(QToolButton::MenuButtonPopup);
 }
 
 void MessageArchiver::onOptionsChanged(const OptionsNode &ANode)

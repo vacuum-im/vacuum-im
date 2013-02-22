@@ -63,8 +63,8 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
-			connect(FMessageWidgets->instance(),SIGNAL(chatWindowDestroyed(IChatWindow *)),SLOT(onChatWindowDestroyed(IChatWindow *)));
+			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onChatWindowCreated(IMessageChatWindow *)));
+			connect(FMessageWidgets->instance(),SIGNAL(chatWindowDestroyed(IMessageChatWindow *)),SLOT(onChatWindowDestroyed(IMessageChatWindow *)));
 		}
 	}
 
@@ -341,7 +341,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		Jid contactJid = AStanza.to();
 		if (isSupported(AStreamJid,contactJid))
 		{
-			IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid) : NULL;
+			IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid,true) : NULL;
 			if (window)
 			{
 				stateSent = true;
@@ -559,7 +559,7 @@ void ChatStates::notifyUserState(const Jid &AStreamJid, const Jid &AContactJid)
 		ChatParams &params = FChatParams[AStreamJid][AContactJid];
 		if (params.userState==IChatStates::StateComposing && params.notifyId<=0)
 		{
-			IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
+			IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
 			if (window)
 			{
 				INotification notify;
@@ -672,7 +672,7 @@ void ChatStates::onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const
 	}
 }
 
-void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
+void ChatStates::onChatWindowCreated(IMessageChatWindow *AWindow)
 {
 	StateWidget *widget = new StateWidget(this,AWindow,AWindow->toolBarWidget()->toolBarChanger()->toolBar());
 	AWindow->toolBarWidget()->toolBarChanger()->insertWidget(widget,TBG_MWTBW_CHATSTATES);
@@ -687,7 +687,7 @@ void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 
 void ChatStates::onChatWindowActivated()
 {
-	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
+	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
 	if (window)
 	{
 		int state = selfChatState(window->streamJid(),window->contactJid());
@@ -699,7 +699,7 @@ void ChatStates::onChatWindowActivated()
 void ChatStates::onChatWindowTextChanged()
 {
 	QTextEdit *editor = qobject_cast<QTextEdit *>(sender());
-	IChatWindow *window = FChatByEditor.value(editor,NULL);
+	IMessageChatWindow *window = FChatByEditor.value(editor,NULL);
 	if (editor && window)
 	{
 		if (!editor->document()->isEmpty())
@@ -711,7 +711,7 @@ void ChatStates::onChatWindowTextChanged()
 
 void ChatStates::onChatWindowClosed()
 {
-	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
+	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
 	if (window)
 	{
 		int state = selfChatState(window->streamJid(),window->contactJid());
@@ -720,7 +720,7 @@ void ChatStates::onChatWindowClosed()
 	}
 }
 
-void ChatStates::onChatWindowDestroyed(IChatWindow *AWindow)
+void ChatStates::onChatWindowDestroyed(IMessageChatWindow *AWindow)
 {
 	setSelfState(AWindow->streamJid(),AWindow->contactJid(),IChatStates::StateGone);
 	FChatByEditor.remove(AWindow->editWidget()->textEdit());
@@ -728,8 +728,8 @@ void ChatStates::onChatWindowDestroyed(IChatWindow *AWindow)
 
 void ChatStates::onUpdateSelfStates()
 {
-	QList<IChatWindow *> windows = FMessageWidgets!=NULL ? FMessageWidgets->chatWindows() : QList<IChatWindow *>();
-	foreach (IChatWindow *window, windows)
+	QList<IMessageChatWindow *> windows = FMessageWidgets!=NULL ? FMessageWidgets->chatWindows() : QList<IMessageChatWindow *>();
+	foreach (IMessageChatWindow *window, windows)
 	{
 		if (FChatParams.value(window->streamJid()).contains(window->contactJid()))
 		{

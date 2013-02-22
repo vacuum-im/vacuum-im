@@ -14,19 +14,30 @@
 #include <utils/shortcuts.h>
 #include <utils/xmpperror.h>
 #include <utils/widgetmanager.h>
-#include "ui_messagewindow.h"
+#include "ui_normalwindow.h"
 
-class MessageWindow :
+class NormalWindow :
 	public QMainWindow,
-	public IMessageWindow
+	public IMessageNormalWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageWindow ITabPage);
+	Q_INTERFACES(IMessageWindow IMessageNormalWindow IMessageTabPage);
 public:
-	MessageWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode);
-	virtual ~MessageWindow();
+	NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode);
+	virtual ~NormalWindow();
 	virtual QMainWindow *instance() { return this; }
-	//ITabWindowPage
+	// IMessageWindow
+	virtual Jid streamJid() const;
+	virtual Jid contactJid() const;
+	virtual IMessageAddress *address() const;
+	virtual IMessageInfoWidget *infoWidget() const;
+	virtual IMessageViewWidget *viewWidget() const;
+	virtual IMessageEditWidget *editWidget() const;
+	virtual IMessageMenuBarWidget *menuBarWidget() const;
+	virtual IMessageToolBarWidget *toolBarWidget() const;
+	virtual IMessageStatusBarWidget *statusBarWidget() const;
+	virtual IMessageReceiversWidget *receiversWidget() const;
+	// ITabWindowPage
 	virtual QString tabPageId() const;
 	virtual bool isVisibleTabPage() const;
 	virtual bool isActiveTabPage() const;
@@ -37,32 +48,25 @@ public:
 	virtual QIcon tabPageIcon() const;
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
-	virtual ITabPageNotifier *tabPageNotifier() const;
-	virtual void setTabPageNotifier(ITabPageNotifier *ANotifier);
-	//IMessageWindow
-	virtual const Jid &streamJid() const { return FStreamJid; }
-	virtual const Jid &contactJid() const { return FContactJid; }
-	virtual void setContactJid(const Jid &AContactJid);
+	virtual IMessageTabPageNotifier *tabPageNotifier() const;
+	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
+	// IMessageNormalWindow
 	virtual void addTabWidget(QWidget *AWidget);
 	virtual void setCurrentTabWidget(QWidget *AWidget);
 	virtual void removeTabWidget(QWidget *AWidget);
-	virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
-	virtual IViewWidget *viewWidget() const { return FViewWidget; }
-	virtual IEditWidget *editWidget() const { return FEditWidget; }
-	virtual IReceiversWidget *receiversWidget() const { return FReceiversWidget; }
-	virtual IToolBarWidget *viewToolBarWidget() const { return FViewToolBarWidget; }
-	virtual IToolBarWidget *editToolBarWidget() const { return FEditToolBarWidget; }
 	virtual Mode mode() const { return FMode; }
 	virtual void setMode(Mode AMode);
-	virtual QString subject() const { return ui.lneSubject->text(); }
+	virtual QString subject() const;
 	virtual void setSubject(const QString &ASubject);
-	virtual QString threadId() const { return FCurrentThreadId; }
+	virtual QString threadId() const;
 	virtual void setThreadId(const QString &AThreadId);
-	virtual int nextCount() const { return FNextCount; }
+	virtual int nextCount() const;
 	virtual void setNextCount(int ACount);
+	virtual IMessageToolBarWidget *viewToolBarWidget() const;
+	virtual IMessageToolBarWidget *editToolBarWidget() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
-	//ITabWindowPage
+	// ITabWindowPage
 	void tabPageAssign();
 	void tabPageShow();
 	void tabPageShowMinimized();
@@ -73,24 +77,20 @@ signals:
 	void tabPageDeactivated();
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
-	//IMessageWindow
+	// IMessageNormalWindow
 	void showNextMessage();
 	void replyMessage();
 	void forwardMessage();
 	void showChatWindow();
 	void messageReady();
-	void streamJidChanged(const Jid &ABefore);
-	void contactJidChanged(const Jid &ABefore);
 protected:
-	void initialize();
 	void saveWindowGeometry();
 	void loadWindowGeometry();
 protected:
-	virtual bool event(QEvent *AEvent);
-	virtual void showEvent(QShowEvent *AEvent);
-	virtual void closeEvent(QCloseEvent *AEvent);
+	bool event(QEvent *AEvent);
+	void showEvent(QShowEvent *AEvent);
+	void closeEvent(QCloseEvent *AEvent);
 protected slots:
-	void onStreamJidChanged(const Jid &ABefore);
 	void onMessageReady();
 	void onSendButtonClicked();
 	void onNextButtonClicked();
@@ -100,22 +100,22 @@ protected slots:
 	void onReceiversChanged(const Jid &AReceiver);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
-	Ui::MessageWindowClass ui;
+	Ui::NormalWindowClass ui;
 private:
-	IInfoWidget *FInfoWidget;
-	IViewWidget *FViewWidget;
-	IEditWidget *FEditWidget;
-	IReceiversWidget *FReceiversWidget;
-	IToolBarWidget *FViewToolBarWidget;
-	IToolBarWidget *FEditToolBarWidget;
-	ITabPageNotifier *FTabPageNotifier;
-private:
+	IMessageAddress *FAddress;
+	IMessageInfoWidget *FInfoWidget;
+	IMessageViewWidget *FViewWidget;
+	IMessageEditWidget *FEditWidget;
+	IMessageReceiversWidget *FReceiversWidget;
+	IMessageMenuBarWidget *FMenuBarWidget;
+	IMessageToolBarWidget *FViewToolBarWidget;
+	IMessageToolBarWidget *FEditToolBarWidget;
+	IMessageStatusBarWidget *FStatusBarWidget;
+	IMessageTabPageNotifier *FTabPageNotifier;
 	IMessageWidgets *FMessageWidgets;
 private:
 	Mode FMode;
 	int FNextCount;
-	Jid FStreamJid;
-	Jid FContactJid;
 	bool FShownDetached;
 	QString FTabPageToolTip;
 	QString FCurrentThreadId;
