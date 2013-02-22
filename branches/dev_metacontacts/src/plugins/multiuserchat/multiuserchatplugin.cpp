@@ -995,15 +995,6 @@ void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 	IMultiUserChatWindow *chatWindow = qobject_cast<IMultiUserChatWindow *>(sender());
 	if (chatWindow)
 	{
-		if (FDiscovery && FDiscovery->hasDiscoInfo(chatWindow->streamJid(), AUser->contactJid()))
-		{
-			IDiscoInfo info = FDiscovery->discoInfo(chatWindow->streamJid(), AUser->contactJid());
-			foreach(QString feature, info.features)
-			{
-				foreach(Action *action, FDiscovery->createFeatureActions(chatWindow->streamJid(),feature,info,AMenu))
-					AMenu->addAction(action, AG_MUCM_DISCOVERY_FEATURES, true);
-			}
-		}
 		emit multiUserContextMenu(chatWindow,AUser,AMenu);
 	}
 }

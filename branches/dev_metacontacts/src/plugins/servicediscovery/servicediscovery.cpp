@@ -566,28 +566,6 @@ void ServiceDiscovery::insertFeatureHandler(const QString &AFeature, IDiscoFeatu
 	}
 }
 
-bool ServiceDiscovery::execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
-{
-	QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
-	foreach(IDiscoFeatureHandler *handler, handlers)
-		if (handler->execDiscoFeature(AStreamJid,AFeature,ADiscoInfo))
-			return true;
-	return false;
-}
-
-QList<Action *> ServiceDiscovery::createFeatureActions(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
-{
-	QList<Action *> actions;
-	QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
-	foreach(IDiscoFeatureHandler *handler, handlers)
-	{
-		Action *action = handler->createDiscoFeatureAction(AStreamJid,AFeature,ADiscoInfo,AParent);
-		if (action)
-			actions.append(action);
-	}
-	return actions;
-}
-
 void ServiceDiscovery::removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler)
 {
 	if (FFeatureHandlers.value(AFeature).values().contains(AHandler))
@@ -597,6 +575,23 @@ void ServiceDiscovery::removeFeatureHandler(const QString &AFeature, IDiscoFeatu
 			FFeatureHandlers.remove(AFeature);
 		emit featureHandlerRemoved(AFeature,AHandler);
 	}
+}
+
+bool ServiceDiscovery::execFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
+{
+	QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
+	foreach(IDiscoFeatureHandler *handler, handlers)
+		if (handler->execDiscoFeature(AStreamJid,AFeature,ADiscoInfo))
+			return true;
+	return false;
+}
+
+Action * ServiceDiscovery::createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
+{
+	foreach(IDiscoFeatureHandler *handler, FFeatureHandlers.value(AFeature).values())
+		if (Action *action = handler->createDiscoFeatureAction(AStreamJid,AFeature,ADiscoInfo,AParent))
+			return action;
+	return NULL;
 }
 
 void ServiceDiscovery::insertDiscoFeature(const IDiscoFeature &AFeature)
@@ -1288,8 +1283,21 @@ void ServiceDiscovery::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
 
 void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
-	Action *action = createDiscoInfoAction(AWindow->streamJid(), AUser->contactJid(), QString::null, AMenu);
-	AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
+	if (FSelfCaps.contains(AWindow->streamJid()))
+	{
+		IDiscoInfo dinfo = discoInfo(AWindow->streamJid(),AUser->contactJid());
+
+		// Many clients support version info but don`t show it in disco info
+		if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))
+			dinfo.features.append(NS_JABBER_VERSION);
+
+		foreach(QString feature, dinfo.features)
+		{
+			Action *action = createFeatureAction(AWindow->streamJid(),feature,dinfo,AMenu);
+			if (action)
+				AMenu->addAction(action, AG_MUCM_DISCOVERY_FEATURES, true);
+		}
+	}
 }
 
 void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
@@ -1325,7 +1333,8 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 
 				foreach(QString feature, dinfo.features)
 				{
-					foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
+					Action *action = createFeatureAction(streamJid,feature,dinfo,AMenu);
+					if (action)
 					{
 						if (multiResorces)
 						{

@@ -112,9 +112,9 @@ public:
 	//FeatureHandler
 	virtual bool hasFeatureHandler(const QString &AFeature) const;
 	virtual void insertFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler, int AOrder);
-	virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
-	virtual QList<Action *> createFeatureActions(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	virtual void removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler);
+	virtual bool execFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
+	virtual Action *createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//DiscoFeatures
 	virtual void insertDiscoFeature(const IDiscoFeature &AFeature);
 	virtual QList<QString> discoFeatures() const;
