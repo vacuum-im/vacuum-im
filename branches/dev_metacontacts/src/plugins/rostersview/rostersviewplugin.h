@@ -29,6 +29,7 @@
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/textmanager.h>
 #include "rostersview.h"
 #include "sortfilterproxymodel.h"
 

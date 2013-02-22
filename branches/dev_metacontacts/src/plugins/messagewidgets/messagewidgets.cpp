@@ -653,7 +653,7 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, const QTex
 		{
 			QString plainSelection = AText.toPlainText().trimmed();
 			Action *searchAction = new Action(AMenu);
-			searchAction->setText(tr("Search on Google '%1'").arg(plainSelection.length()>33 ? plainSelection.left(30)+"..." : plainSelection));
+			searchAction->setText(tr("Search on Google '%1'").arg(TextManager::getElidedString(plainSelection,Qt::ElideRight,30)));
 			searchAction->setData(ADR_CONTEXT_DATA, plainSelection);
 			connect(searchAction,SIGNAL(triggered(bool)),SLOT(onViewContextSearchActionTriggered(bool)));
 			AMenu->addAction(searchAction,AG_VWCM_MESSAGEWIDGETS_SEARCH,true);

@@ -414,7 +414,7 @@ void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndex
 			if (!note.isEmpty())
 			{
 				Action *action = new Action(AMenu);
-				action->setText(tr("Annotation: %1").arg(Action::reduceString(note,50)));
+				action->setText(tr("Annotation: %1").arg(TextManager::getElidedString(note,Qt::ElideRight,50)));
 				action->setData(ADR_CLIPBOARD_DATA, note);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 				AMenu->addAction(action, AG_RVCBM_ANNOTATION, true);

@@ -20,6 +20,7 @@
 #include <interfaces/irostersmodel.h>
 #include <utils/datetime.h>
 #include <utils/shortcuts.h>
+#include <utils/textmanager.h>
 #include <utils/widgetmanager.h>
 #include <utils/advanceditemdelegate.h>
 #include "editnotedialog.h"

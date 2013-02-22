@@ -524,7 +524,7 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 			if (!name.isEmpty())
 			{
 				Action *action = new Action(AMenu);
-				action->setText(tr("Name: %1").arg(Action::reduceString(name,50)));
+				action->setText(tr("Name: %1").arg(TextManager::getElidedString(name,Qt::ElideRight,50)));
 				action->setData(ADR_CLIPBOARD_DATA,name);
 				action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
 				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
@@ -550,7 +550,7 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 				if (pitem.isValid && !pitem.status.isEmpty())
 				{
 					Action *action = new Action(AMenu);
-					action->setText(tr("Status: %1").arg(Action::reduceString(pitem.status,50)));
+					action->setText(tr("Status: %1").arg(TextManager::getElidedString(pitem.status,Qt::ElideRight,50)));
 					action->setData(ADR_CLIPBOARD_DATA,pitem.status);
 					action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
 					connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
