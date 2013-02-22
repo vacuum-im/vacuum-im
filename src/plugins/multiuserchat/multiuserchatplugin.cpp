@@ -1029,7 +1029,7 @@ void MultiUserChatPlugin::onMultiChatWindowDestroyed()
 	if (chatWindow)
 	{
 		FChatWindows.removeAll(chatWindow);
-		emit multiChatWindowCreated(chatWindow);
+		emit multiChatWindowDestroyed(chatWindow);
 	}
 }
 
