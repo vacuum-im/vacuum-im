@@ -49,27 +49,25 @@ class IMessageInfoWidget :
 	public IMessageWidget
 {
 public:
-	enum InfoField {
-		AccountName         =0x01,
-		ContactName         =0x02,
-		ContactShow         =0x04,
-		ContactStatus       =0x08,
-		ContactAvatar       =0x10
+	enum Field {
+		Avatar,
+		Name,
+		StatusIcon,
+		StatusText,
+		UserFields = 16
 	};
 public:
 	virtual QWidget *instance() = 0;
-	virtual void autoUpdateFields() =0;
-	virtual void autoUpdateField(InfoField AField) =0;
-	virtual QVariant field(InfoField AField) const =0;
-	virtual void setField(InfoField AField, const QVariant &AValue) =0;
-	virtual int autoUpdatedFields() const =0;
-	virtual bool isFiledAutoUpdated(IMessageInfoWidget::InfoField AField) const =0;
-	virtual void setFieldAutoUpdated(IMessageInfoWidget::InfoField AField, bool AAuto) =0;
-	virtual int visibleFields() const =0;
-	virtual bool isFieldVisible(IMessageInfoWidget::InfoField AField) const =0;
-	virtual void setFieldVisible(IMessageInfoWidget::InfoField AField, bool AVisible) =0;
+	virtual ToolBarChanger *toolBarChanger() const =0;
+	virtual bool isAddressSelectorEnabled() const =0;
+	virtual void setAddressSelectorEnabled(bool AEnabled) =0;
+	virtual QVariant fieldValue(int AField) const =0;
+	virtual void setFieldValue(int AField, const QVariant &AValue) =0;
 protected:
-	virtual void fieldChanged(int AField, const QVariant &AValue) =0;
+	virtual void fieldValueChanged(int AField) =0;
+	virtual void addressSelectorEnableChanged(bool AEnabled) =0;
+	virtual void contextMenuRequested(Menu *AMenu) =0;
+	virtual void toolTipsRequested(QMap<int,QString> &AToolTips) =0;
 };
 
 class IMessageViewWidget :

@@ -21,7 +21,6 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.wdtInfo->layout()->setMargin(0);
 	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.wdtInfo);
 	ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
-	onOptionsChanged(Options::node(OPV_MESSAGES_SHOWINFOWIDGET));
 
 	ui.wdtView->setLayout(new QVBoxLayout);
 	ui.wdtView->layout()->setMargin(0);
@@ -49,7 +48,6 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FStatusBarWidget = FMessageWidgets->newStatusBarWidget(this,this);
 	setStatusBar(FStatusBarWidget->instance());
 
-	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
 
@@ -281,18 +279,6 @@ void ChatWindow::closeEvent(QCloseEvent *AEvent)
 void ChatWindow::onMessageReady()
 {
 	emit messageReady();
-}
-
-void ChatWindow::onOptionsChanged(const OptionsNode &ANode)
-{
-	if (ANode.path() == OPV_MESSAGES_SHOWINFOWIDGET)
-	{
-		FInfoWidget->instance()->setVisible(ANode.value().toBool());
-	}
-	else if (ANode.path() == OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS)
-	{
-		FInfoWidget->setField(IMessageInfoWidget::ContactStatus,FInfoWidget->field(IMessageInfoWidget::ContactStatus));
-	}
 }
 
 void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)

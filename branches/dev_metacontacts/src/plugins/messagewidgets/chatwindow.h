@@ -74,7 +74,6 @@ protected:
 	void closeEvent(QCloseEvent *AEvent);
 protected slots:
 	void onMessageReady();
-	void onOptionsChanged(const OptionsNode &ANode);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onViewContextQuoteActionTriggered(bool);
 	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);

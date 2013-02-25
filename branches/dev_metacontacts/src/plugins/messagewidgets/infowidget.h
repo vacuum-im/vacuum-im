@@ -1,14 +1,8 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
-#include <definitions/optionvalues.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/iaccountmanager.h>
-#include <interfaces/iroster.h>
-#include <interfaces/ipresence.h>
 #include <interfaces/iavatars.h>
-#include <interfaces/istatuschanger.h>
-#include <utils/options.h>
 #include "ui_infowidget.h"
 
 class InfoWidget :
@@ -24,40 +18,35 @@ public:
 	virtual QWidget *instance() { return this; }
 	virtual IMessageWindow *messageWindow() const;
 	//IMessageInfoWidget
-	virtual void autoUpdateFields();
-	virtual void autoUpdateField(InfoField AField);
-	virtual QVariant field(InfoField AField) const;
-	virtual void setField(InfoField AField, const QVariant &AValue);
-	virtual int autoUpdatedFields() const;
-	virtual bool isFiledAutoUpdated(IMessageInfoWidget::InfoField AField) const;
-	virtual void setFieldAutoUpdated(IMessageInfoWidget::InfoField AField, bool AAuto);
-	virtual int visibleFields() const;
-	virtual bool isFieldVisible(IMessageInfoWidget::InfoField AField) const;
-	virtual void setFieldVisible(IMessageInfoWidget::InfoField AField, bool AVisible);
+	virtual ToolBarChanger *toolBarChanger() const;
+	virtual bool isAddressSelectorEnabled() const;
+	virtual void setAddressSelectorEnabled(bool AEnabled);
+	virtual QVariant fieldValue(int AField) const;
+	virtual void setFieldValue(int AField, const QVariant &AValue);
 signals:
-	void fieldChanged(int AField, const QVariant &AValue);
+	void fieldValueChanged(int AField);
+	void addressSelectorEnableChanged(bool AEnabled);
+	void contextMenuRequested(Menu *AMenu);
+	void toolTipsRequested(QMap<int,QString> &AToolTips);
 protected:
 	void initialize();
-	void updateFieldLabel(IMessageInfoWidget::InfoField AField);
+	void updateFieldView(int AField);
+protected:
+	bool event(QEvent *AEvent);
+	void contextMenuEvent(QContextMenuEvent *AEvent);
 protected slots:
-	void onAccountChanged(const OptionsNode &ANode);
-	void onRosterItemReceived(const IRosterItem &AItem, const IRosterItem &ABefore);
-	void onPresenceItemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore);
-	void onAvatarChanged(const Jid &AContactJid);
+	void onAddressMenuAboutToShow();
 	void onAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 private:
 	Ui::InfoWidgetClass ui;
 private:
-	IAccount *FAccount;
-	IRoster *FRoster;
-	IPresence *FPresence;
 	IAvatars *FAvatars;
-	IStatusChanger *FStatusChanger;
 	IMessageWidgets *FMessageWidgets;
 private:
-	int FAutoFields;
-	int FVisibleFields;
+	Menu *FAddressMenu;
+	bool FSelectorEnabled;
 	IMessageWindow *FWindow;
+	ToolBarChanger *FInfoToolBar;
 	QMap<int, QVariant> FFieldValues;
 };
 

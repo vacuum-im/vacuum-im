@@ -82,8 +82,6 @@
 #define OPV_MESSAGES_ROOT                               "messages"
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status"
 #define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
-#define OPV_MESSAGES_SHOWINFOWIDGET                     "messages.show-info-widget"
-#define OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS           "messages.info-widget-max-status-chars"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
 #define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
