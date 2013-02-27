@@ -53,7 +53,7 @@ body
 .xxxwrapper:hover,
 .xxxwrapper.xxxhover
 {
-	//text-shadow: .0em .1em .2em hsla(0, 0%, 100%, .8);
+	text-shadow: .0em .1em .2em hsla(0, 0%, 100%, .8);
 }
 
 .xxxwrapper,
@@ -75,7 +75,7 @@ body
 .xxxwrapper.xxxhover > .xxxmark,
 .xxxwrapper.xxxhover > .xxxmessage
 {
-	//background-color: hsla(0, 0%, 75%, 1) !important;
+	background-color: hsla(0, 0%, 75%, 1) !important;
 }
 
 .xxxwrapper.history:hover,
@@ -85,7 +85,7 @@ body
 .xxxwrapper.history.xxxhover > .xxxmark,
 .xxxwrapper.history.xxxhover > .xxxmessage
 {
-	//background-color: hsla(0, 0%, 75%, 1) !important;
+	background-color: hsla(0, 0%, 75%, 1) !important;
 }
 
 .xxxmark
@@ -118,5 +118,5 @@ body
 .mention.xxxhover .xxxmessage,
 .history.mention.xxxhover .xxxmessage
 {
-	//background-color: hsla(0, 50%, 85%, 1) !important;
+	background-color: hsla(0, 50%, 85%, 1) !important;
 }
