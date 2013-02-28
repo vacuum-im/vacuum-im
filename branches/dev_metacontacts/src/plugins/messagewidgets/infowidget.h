@@ -3,6 +3,10 @@
 
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iavatars.h>
+#include <interfaces/iroster.h>
+#include <interfaces/ipresence.h>
+#include <interfaces/istatusicons.h>
+#include <interfaces/iaccountmanager.h>
 #include "ui_infowidget.h"
 
 class InfoWidget :
@@ -19,13 +23,15 @@ public:
 	virtual IMessageWindow *messageWindow() const;
 	//IMessageInfoWidget
 	virtual ToolBarChanger *toolBarChanger() const;
-	virtual bool isAddressSelectorEnabled() const;
-	virtual void setAddressSelectorEnabled(bool AEnabled);
+	virtual Menu *addressMenu() const;
+	virtual bool isAddressMenuVisible() const;
+	virtual void setAddressMenuVisible(bool AVisible);
 	virtual QVariant fieldValue(int AField) const;
 	virtual void setFieldValue(int AField, const QVariant &AValue);
 signals:
 	void fieldValueChanged(int AField);
-	void addressSelectorEnableChanged(bool AEnabled);
+	void addressMenuVisibleChanged(bool AVisible);
+	void addressMenuRequested(Menu *AMenu);
 	void contextMenuRequested(Menu *AMenu);
 	void toolTipsRequested(QMap<int,QString> &AToolTips);
 protected:
@@ -36,7 +42,6 @@ protected:
 	void contextMenuEvent(QContextMenuEvent *AEvent);
 protected slots:
 	void onAddressMenuAboutToShow();
-	void onAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 private:
 	Ui::InfoWidgetClass ui;
 private:
@@ -44,7 +49,7 @@ private:
 	IMessageWidgets *FMessageWidgets;
 private:
 	Menu *FAddressMenu;
-	bool FSelectorEnabled;
+	bool FAddressMenuVisible;
 	IMessageWindow *FWindow;
 	ToolBarChanger *FInfoToolBar;
 	QMap<int, QVariant> FFieldValues;

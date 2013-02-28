@@ -6,6 +6,10 @@
 #include <QHelpEvent>
 #include <QHBoxLayout>
 #include <QContextMenuEvent>
+#include <utils/textmanager.h>
+
+#define ADR_STREAM_JID           Action::DR_StreamJid
+#define ADR_CONTACT_JID          Action::DR_Parametr1
 
 InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
@@ -14,9 +18,10 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
 
-	FSelectorEnabled = false;
+	FAddressMenuVisible = false;
 
 	FAddressMenu = new Menu(this);
+	connect(FAddressMenu,SIGNAL(aboutToShow()),SLOT(onAddressMenuAboutToShow()));
 
 	QToolBar *toolBar = new QToolBar;
 	toolBar->setMovable(false);
@@ -32,7 +37,6 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	ui.wdtInfoToolBar->layout()->addWidget(toolBar);
 
 	initialize();
-	connect(FWindow->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),SLOT(onAddressChanged(const Jid &, const Jid &)));
 }
 
 InfoWidget::~InfoWidget()
@@ -50,17 +54,32 @@ ToolBarChanger *InfoWidget::toolBarChanger() const
 	return FInfoToolBar;
 }
 
-bool InfoWidget::isAddressSelectorEnabled() const
+Menu *InfoWidget::addressMenu() const
 {
-	return FSelectorEnabled;
+	return FAddressMenu;
 }
 
-void InfoWidget::setAddressSelectorEnabled(bool AEnabled)
+bool InfoWidget::isAddressMenuVisible() const
 {
-	if (FSelectorEnabled != AEnabled)
+	return FAddressMenuVisible;
+}
+
+void InfoWidget::setAddressMenuVisible(bool AVisible)
+{
+	if (FAddressMenuVisible != AVisible)
 	{
-		FSelectorEnabled = AEnabled;
-		emit addressSelectorEnableChanged(AEnabled);
+		FAddressMenuVisible = AVisible;
+		if (AVisible)
+		{
+			QToolButton *button = FInfoToolBar->insertAction(FAddressMenu->menuAction());
+			button->setPopupMode(QToolButton::InstantPopup);
+			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+		}
+		else
+		{
+			FInfoToolBar->removeItem(FInfoToolBar->actionHandle(FAddressMenu->menuAction()));
+		}
+		emit addressMenuVisibleChanged(AVisible);
 	}
 }
 
@@ -220,10 +239,48 @@ void InfoWidget::contextMenuEvent(QContextMenuEvent *AEvent)
 
 void InfoWidget::onAddressMenuAboutToShow()
 {
+	FAddressMenu->clear();
+	emit addressMenuRequested(FAddressMenu);
 
-}
+	/*
+	QMultiMap<Jid,Jid> addresses = FWindow->address()->availAddresses();
+	bool multiStream = addresses.keys().count()>1;
 
-void InfoWidget::onAddressChanged( const Jid &AStreamBefore, const Jid &AContactBefore )
-{
+	Jid streamJid;
+	IRoster *roster = NULL;
+	IPresence *presence = NULL;
+	for(QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
+	{
+		if (streamJid.isEmpty() || streamJid!=it.key())
+		{
+			streamJid = it.key();
+			roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+			presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+		}
 
+		IRosterItem ritem = roster!=NULL ? roster->rosterItem(it.value()) : IRosterItem();
+		IPresenceItem pitem = presence!=NULL ? presence->findItem(it.value()) : IPresenceItem();
+
+		QString addressName;
+		QString contactName = (!ritem.name.isEmpty() ? ritem.name : it->uBare()) + "/" + it->resource();
+		if (multiStream)
+		{
+			IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(it.key()) : NULL;
+			QString accountName = account!=NULL ? account->name() : it.key().uBare();
+			addressName = tr("To: %1, From: %2").arg(contactName,accountName);
+		}
+		else
+		{
+			addressName = tr("To: %1").arg(contactName);
+		}
+
+		Action *action = new Action(FAddressMenu);
+		action->setData(ADR_STREAM_JID,streamJid.full());
+		action->setData(ADR_CONTACT_JID,it->full());
+		action->setText(addressName);
+		action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(it.value(),pitem.show,ritem.subscription,!ritem.ask.isEmpty()) : QIcon());
+		connect(action,SIGNAL(triggered()),SLOT(onChangeAddressActionTriggered()));
+		FAddressMenu->addAction(action,AG_DEFAULT,true);
+	}
+	*/
 }

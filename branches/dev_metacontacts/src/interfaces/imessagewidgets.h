@@ -54,18 +54,20 @@ public:
 		Name,
 		StatusIcon,
 		StatusText,
-		UserFields = 16
+		UserField = 16
 	};
 public:
 	virtual QWidget *instance() = 0;
 	virtual ToolBarChanger *toolBarChanger() const =0;
-	virtual bool isAddressSelectorEnabled() const =0;
-	virtual void setAddressSelectorEnabled(bool AEnabled) =0;
+	virtual Menu *addressMenu() const =0;
+	virtual bool isAddressMenuVisible() const =0;
+	virtual void setAddressMenuVisible(bool AVisible) =0;
 	virtual QVariant fieldValue(int AField) const =0;
 	virtual void setFieldValue(int AField, const QVariant &AValue) =0;
 protected:
 	virtual void fieldValueChanged(int AField) =0;
-	virtual void addressSelectorEnableChanged(bool AEnabled) =0;
+	virtual void addressMenuVisibleChanged(bool AVisible) =0;
+	virtual void addressMenuRequested(Menu *AMenu) =0;
 	virtual void contextMenuRequested(Menu *AMenu) =0;
 	virtual void toolTipsRequested(QMap<int,QString> &AToolTips) =0;
 };
@@ -273,16 +275,6 @@ public:
 	virtual IMessageReceiversWidget *receiversWidget() const =0;
 };
 
-class IMessageChatWindow :
-	public IMessageWindow
-{
-public:
-	virtual QMainWindow *instance() =0;
-	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
-protected:
-	virtual void messageReady() =0;
-};
-
 class IMessageNormalWindow :
 	public IMessageWindow
 {
@@ -312,6 +304,16 @@ protected:
 	virtual void replyMessage() =0;
 	virtual void forwardMessage() =0;
 	virtual void showChatWindow() =0;
+	virtual void messageReady() =0;
+};
+
+class IMessageChatWindow :
+	public IMessageWindow
+{
+public:
+	virtual QMainWindow *instance() =0;
+	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
+protected:
 	virtual void messageReady() =0;
 };
 
@@ -417,8 +419,8 @@ Q_DECLARE_INTERFACE(IMessageTabPageNotifier,"Vacuum.Plugin.IMessageTabPageNotifi
 Q_DECLARE_INTERFACE(IMessageTabPage,"Vacuum.Plugin.IMessageTabPage/1.3")
 Q_DECLARE_INTERFACE(IMessageTabWindow,"Vacuum.Plugin.IMessageTabWindow/1.4")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.0")
-Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.2")
 Q_DECLARE_INTERFACE(IMessageNormalWindow,"Vacuum.Plugin.IMessageNormalWindow/1.2")
+Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.2")
 Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.1")
