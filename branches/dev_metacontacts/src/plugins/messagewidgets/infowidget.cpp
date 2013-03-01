@@ -2,6 +2,7 @@
 
 #include <QIcon>
 #include <QMovie>
+#include <QTimer>
 #include <QToolTip>
 #include <QHelpEvent>
 #include <QHBoxLayout>
@@ -19,9 +20,8 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	FMessageWidgets = AMessageWidgets;
 
 	FAddressMenuVisible = false;
-
-	FAddressMenu = new Menu(this);
-	connect(FAddressMenu,SIGNAL(aboutToShow()),SLOT(onAddressMenuAboutToShow()));
+	ui.lblAvatar->setVisible(false);
+	ui.lblIcon->setVisible(false);
 
 	QToolBar *toolBar = new QToolBar;
 	toolBar->setMovable(false);
@@ -30,11 +30,18 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	toolBar->layout()->setMargin(0);
 	toolBar->setStyleSheet("QToolBar { border: none; }");
 	toolBar->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+
 	FInfoToolBar = new ToolBarChanger(toolBar);
+	FInfoToolBar->setSeparatorsVisible(false);
+	toolBar->installEventFilter(this);
 
 	ui.wdtInfoToolBar->setLayout(new QHBoxLayout);
 	ui.wdtInfoToolBar->layout()->setMargin(0);
 	ui.wdtInfoToolBar->layout()->addWidget(toolBar);
+
+	FAddressMenu = new Menu(this);
+	FAddressMenu->menuAction()->setToolTip(tr("Contact address"));
+	connect(FAddressMenu,SIGNAL(aboutToShow()),SLOT(onAddressMenuAboutToShow()));
 
 	initialize();
 }
@@ -215,7 +222,7 @@ bool InfoWidget::event(QEvent *AEvent)
 			emit toolTipsRequested(toolTipsMap);
 			if (!toolTipsMap.isEmpty())
 			{
-				QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/>"));
+				QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/><nbsp>"));
 				QToolTip::showText(helpEvent->globalPos(),tooltip,this);
 			}
 		}
@@ -237,50 +244,34 @@ void InfoWidget::contextMenuEvent(QContextMenuEvent *AEvent)
 		delete menu;
 }
 
+bool InfoWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
+{
+	if (AWatched == FInfoToolBar->toolBar())
+	{
+		if (AEvent->type() == QEvent::LayoutRequest)
+			QTimer::singleShot(0,this,SLOT(onUpdateInfoToolBarMaxWidth()));
+	}
+	return QWidget::eventFilter(AWatched,AEvent);
+}
+
 void InfoWidget::onAddressMenuAboutToShow()
 {
 	FAddressMenu->clear();
 	emit addressMenuRequested(FAddressMenu);
+}
 
-	/*
-	QMultiMap<Jid,Jid> addresses = FWindow->address()->availAddresses();
-	bool multiStream = addresses.keys().count()>1;
-
-	Jid streamJid;
-	IRoster *roster = NULL;
-	IPresence *presence = NULL;
-	for(QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
+void InfoWidget::onUpdateInfoToolBarMaxWidth()
+{
+	int widgetWidth = 0;
+	int visibleItemsCount = 0;
+	for (int itemIndex=0; visibleItemsCount<2 && itemIndex<FInfoToolBar->toolBar()->layout()->count(); itemIndex++)
 	{
-		if (streamJid.isEmpty() || streamJid!=it.key())
+		QWidget *widget = FInfoToolBar->toolBar()->layout()->itemAt(itemIndex)->widget();
+		if (widget && widget->isVisible())
 		{
-			streamJid = it.key();
-			roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
-			presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+			visibleItemsCount++;
+			widgetWidth = widget->sizeHint().width();
 		}
-
-		IRosterItem ritem = roster!=NULL ? roster->rosterItem(it.value()) : IRosterItem();
-		IPresenceItem pitem = presence!=NULL ? presence->findItem(it.value()) : IPresenceItem();
-
-		QString addressName;
-		QString contactName = (!ritem.name.isEmpty() ? ritem.name : it->uBare()) + "/" + it->resource();
-		if (multiStream)
-		{
-			IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(it.key()) : NULL;
-			QString accountName = account!=NULL ? account->name() : it.key().uBare();
-			addressName = tr("To: %1, From: %2").arg(contactName,accountName);
-		}
-		else
-		{
-			addressName = tr("To: %1").arg(contactName);
-		}
-
-		Action *action = new Action(FAddressMenu);
-		action->setData(ADR_STREAM_JID,streamJid.full());
-		action->setData(ADR_CONTACT_JID,it->full());
-		action->setText(addressName);
-		action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(it.value(),pitem.show,ritem.subscription,!ritem.ask.isEmpty()) : QIcon());
-		connect(action,SIGNAL(triggered()),SLOT(onChangeAddressActionTriggered()));
-		FAddressMenu->addAction(action,AG_DEFAULT,true);
 	}
-	*/
+	FInfoToolBar->toolBar()->setMaximumWidth(visibleItemsCount==1 ? widgetWidth : QWIDGETSIZE_MAX);
 }

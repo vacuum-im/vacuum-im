@@ -9,7 +9,13 @@ bool presenceItemLessThen(const IPresenceItem &AItem1, const IPresenceItem &AIte
 		if (AItem1.show<showOrdersCount && AItem2.show<showOrdersCount)
 			return showOrders[AItem1.show] < showOrders[AItem2.show];
 	}
-	return AItem1.priority > AItem2.priority;
+	
+	if (AItem1.priority != AItem2.priority)
+	{
+		return AItem1.priority > AItem2.priority;
+	}
+
+	return AItem1.itemJid < AItem2.itemJid;
 }
 
 PresencePlugin::PresencePlugin()

@@ -429,7 +429,7 @@ void Annotations::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, 
 	{
 		QString note = AIndex->data(RDR_ANNOTATIONS).toString();
 		if (!note.isEmpty())
-			AToolTips.insert(RTTO_ANNOTATIONS, "<nbsp>"+tr("<b>Annotation:</b>")+"<br>"+Qt::escape(note).replace("\n","<br>"));
+			AToolTips.insert(RTTO_ANNOTATIONS, tr("<b>Annotation:</b>")+"<br>"+Qt::escape(note).replace("\n","<br>"));
 	}
 }
 

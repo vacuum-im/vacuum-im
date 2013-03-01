@@ -172,14 +172,16 @@ public:
 	virtual IMultiUserChat *multiUserChat() const =0;
 	virtual IMessageChatWindow *openChatWindow(const Jid &AContactJid) =0;
 	virtual IMessageChatWindow *findChatWindow(const Jid &AContactJid) const =0;
-	virtual void contextMenuForWindow(Menu *AMenu) =0;
+	virtual void contextMenuForRoom(Menu *AMenu) =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
+	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000) =0;
 protected:
-	virtual void chatWindowCreated(IMessageChatWindow *AWindow) =0;
-	virtual void chatWindowDestroyed(IMessageChatWindow *AWindow) =0;
-	virtual void multiChatWindowContextMenu(Menu *AMenu) =0;
+	virtual void multiChatContextMenu(Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
+	virtual void multiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
+	virtual void privateChatWindowCreated(IMessageChatWindow *AWindow) =0;
+	virtual void privateChatWindowDestroyed(IMessageChatWindow *AWindow) =0;
 };
 
 class IMultiUserChatPlugin
@@ -206,13 +208,14 @@ protected:
 	virtual void multiChatWindowDestroyed(IMultiUserChatWindow *AWindow) =0;
 	virtual void multiChatRosterIndexCreated(IRosterIndex *AIndex) =0;
 	virtual void multiChatRosterIndexDestroyed(IRosterIndex *AIndex) =0;
-	virtual void multiChatWindowContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu) =0;
+	virtual void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu) =0;
+	virtual void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
 Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.4")
-Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.3")
+Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.4")
 Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.5")
 
 #endif //IMULTIUSERCHAT_H

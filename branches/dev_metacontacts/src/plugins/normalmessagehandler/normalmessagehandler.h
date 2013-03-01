@@ -32,6 +32,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/iroster.h>
+#include <interfaces/iavatars.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/irecentcontacts.h>
@@ -90,22 +91,31 @@ protected slots:
 	void onWindowShowChatWindow();
 	void onWindowActivated();
 	void onWindowDestroyed();
+	void onWindowAddressChanged();
+	void onWindowAvailAddressesChanged();
+	void onWindowContextMenuRequested(Menu *AMenu);
+	void onWindowToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
 protected slots:
 	void onStatusIconsChanged();
+	void onAvatarChanged(const Jid &AContactJid);
+	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
+protected slots:
 	void onShowWindowAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
+	IAvatars *FAvatars;
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
 	IMessageStyles *FMessageStyles;
 	IStatusIcons *FStatusIcons;
+	INotifications *FNotifications;
 	IPresencePlugin *FPresencePlugin;
 	IRostersView *FRostersView;
+	IRostersModel *FRostersModel;
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
 	IRecentContacts *FRecentContacts;

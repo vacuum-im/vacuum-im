@@ -224,10 +224,7 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 	}
 	else if (AWatched == FSendToolBar->toolBar())
 	{
-		static const QList<QEvent::Type> eventTypes = QList<QEvent::Type>() 
-			<< QEvent::ChildAdded << QEvent::ChildRemoved << QEvent::Show;
-
-		if (eventTypes.contains(AEvent->type()))
+		if (AEvent->type() == QEvent::LayoutRequest)
 			QTimer::singleShot(0,this,SLOT(onUpdateSendToolBarMaxWidth()));
 	}
 	return hooked || QWidget::eventFilter(AWatched,AEvent);

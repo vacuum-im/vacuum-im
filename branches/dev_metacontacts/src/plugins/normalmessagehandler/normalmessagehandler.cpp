@@ -6,12 +6,15 @@
 
 NormalMessageHandler::NormalMessageHandler()
 {
+	FAvatars = NULL;
 	FMessageWidgets = NULL;
 	FMessageProcessor = NULL;
 	FMessageStyles = NULL;
 	FStatusIcons = NULL;
+	FNotifications = NULL;
 	FPresencePlugin = NULL;
 	FRostersView = NULL;
+	FRostersModel = NULL;
 	FXmppUriQueries = NULL;
 	FOptionsManager = NULL;
 	FRecentContacts = NULL;
@@ -57,6 +60,16 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		}
 	}
 
+	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
+	if (plugin)
+	{
+		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
+		if (FAvatars)
+		{
+			connect(FAvatars->instance(),SIGNAL(avatarChanged(const Jid &)),SLOT(onAvatarChanged(const Jid &)));
+		}
+	}
+
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
 	{
@@ -80,19 +93,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
-	{
-		INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
-		if (notifications)
-		{
-			INotificationType notifyType;
-			notifyType.order = NTO_NORMALHANDLER_MESSAGE;
-			notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
-			notifyType.title = tr("When receiving new single message");
-			notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-			notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
-			notifications->registerNotificationType(NNT_NORMAL_MESSAGE,notifyType);
-		}
-	}
+		FNotifications = qobject_cast<INotifications *>(plugin->instance());
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
@@ -107,6 +108,10 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
+
+	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
+	if (plugin)
+		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
 	if (plugin)
@@ -129,6 +134,16 @@ bool NormalMessageHandler::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
 
+	if (FNotifications)
+	{
+		INotificationType notifyType;
+		notifyType.order = NTO_NORMALHANDLER_MESSAGE;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
+		notifyType.title = tr("When receiving new single message");
+		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_NORMAL_MESSAGE,notifyType);
+	}
 	if (FMessageProcessor)
 	{
 		FMessageProcessor->insertMessageHandler(MHO_NORMALMESSAGEHANDLER,this);
@@ -321,7 +336,6 @@ IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, con
 		window = FMessageWidgets->getNormalWindow(AStreamJid,AContactJid,AMode);
 		if (window)
 		{
-			window->infoWidget()->autoUpdateFields();
 			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
 			connect(window->instance(),SIGNAL(messageReady()),SLOT(onWindowMessageReady()));
@@ -331,6 +345,10 @@ IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, con
 			connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onWindowShowChatWindow()));
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
 			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
+			connect(window->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),SLOT(onWindowAddressChanged()));
+			connect(window->address()->instance(),SIGNAL(availAddressesChanged()),SLOT(onWindowAvailAddressesChanged()));
+			connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onWindowContextMenuRequested(Menu *)));
+			connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onWindowToolTipsRequested(QMap<int,QString> &)));
 			connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onWindowNotifierActiveNotifyChanged(int)));
 			
 			FWindows.append(window);
@@ -370,24 +388,43 @@ bool NormalMessageHandler::showNextMessage(IMessageNormalWindow *AWindow)
 
 void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow)
 {
-	QIcon icon;
-	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
-		icon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
-	if (FStatusIcons && icon.isNull())
+	if (FAvatars)
 	{
-		if (!AWindow->contactJid().isEmpty())
-			icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
+		QString avatar = FAvatars->avatarHash(AWindow->contactJid());
+		if (!avatar.isEmpty() && FAvatars->hasAvatar(avatar))
+			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,avatar);
 		else
-			icon = FStatusIcons->iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false);
+			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage());
 	}
 
-	QString caption;
-	if (AWindow->mode() == IMessageNormalWindow::ReadMode)
-		caption = tr("%1 - Message").arg(AWindow->infoWidget()->field(IMessageInfoWidget::ContactName).toString());
-	else
-		caption = tr("Composing message");
+	QString name = FMessageStyles!=NULL ? FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
 
-	AWindow->updateWindow(icon,caption,caption,QString::null);
+	QIcon statusIcon;
+	if (FStatusIcons)
+	{
+		if (!AWindow->contactJid().isEmpty())
+			statusIcon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
+		else
+			statusIcon = FStatusIcons->iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false);
+	}
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
+
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AWindow->streamJid()) : NULL;
+	IPresenceItem pitem = presence!=NULL ? presence->findItem(AWindow->contactJid()) : IPresenceItem();
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusText,pitem.status);
+
+	QString title;
+	if (AWindow->mode() == IMessageNormalWindow::ReadMode)
+		title = tr("%1 - Message").arg(name);
+	else
+		title = tr("Composing message");
+
+	QIcon tabIcon = statusIcon;
+	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
+		tabIcon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
+
+	AWindow->updateWindow(tabIcon,name,title,QString::null);
 	AWindow->setNextCount(FMessageQueue.value(AWindow).count()-1);
 }
 
@@ -589,6 +626,46 @@ void NormalMessageHandler::onWindowDestroyed()
 	}
 }
 
+void NormalMessageHandler::onWindowAddressChanged()
+{
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender()->parent());
+	if (window)
+		updateWindow(window);
+}
+
+void NormalMessageHandler::onWindowAvailAddressesChanged()
+{
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender()->parent());
+	if (window)
+	{
+		QMultiMap<Jid,Jid> addresses = window->address()->availAddresses();
+		if (addresses.isEmpty())
+			window->instance()->deleteLater();
+	}
+}
+
+void NormalMessageHandler::onWindowContextMenuRequested(Menu *AMenu)
+{
+	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+	if (widget && FRostersModel && FRostersView)
+	{
+		IRosterIndex *index = FRostersModel->getContactIndexList(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		if (index)
+			FRostersView->contextMenuForIndex(QList<IRosterIndex *>()<<index,NULL,AMenu);
+	}
+}
+
+void NormalMessageHandler::onWindowToolTipsRequested(QMap<int,QString> &AToolTips)
+{
+	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+	if (widget && FRostersModel && FRostersView)
+	{
+		IRosterIndex *index = FRostersModel->getContactIndexList(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		if (index)
+			FRostersView->toolTipsForIndex(index,NULL,AToolTips);
+	}
+}
+
 void NormalMessageHandler::onWindowNotifierActiveNotifyChanged(int ANotifyId)
 {
 	Q_UNUSED(ANotifyId);
@@ -602,6 +679,23 @@ void NormalMessageHandler::onStatusIconsChanged()
 {
 	foreach(IMessageNormalWindow *window, FWindows)
 		updateWindow(window);
+}
+
+void NormalMessageHandler::onAvatarChanged(const Jid &AContactJid)
+{
+	foreach(IMessageNormalWindow *window, FWindows)
+		if (window->contactJid() && AContactJid)
+			updateWindow(window);
+}
+
+void NormalMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
+{
+	if (AItem.show!=ABefore.show || AItem.status!=ABefore.status)
+	{
+		IMessageNormalWindow *window = findWindow(APresence->streamJid(),AItem.itemJid);
+		if (window)
+			updateWindow(window);
+	}
 }
 
 void NormalMessageHandler::onShowWindowAction(bool)
@@ -704,14 +798,6 @@ void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> 
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 		}
 	}
-}
-
-void NormalMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
-{
-	Q_UNUSED(ABefore);
-	IMessageNormalWindow *window = findWindow(APresence->streamJid(),AItem.itemJid);
-	if (window)
-		updateWindow(window);
 }
 
 void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)

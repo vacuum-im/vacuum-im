@@ -16,6 +16,13 @@
     </message>
 </context>
 <context>
+    <name>InfoWidget</name>
+    <message>
+        <source>Contact address</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MessageWidgets</name>
     <message>
         <source>Messages</source>
@@ -56,10 +63,6 @@
     <message>
         <source>Auto resize input field</source>
         <translation>Auto resize input field</translation>
-    </message>
-    <message>
-        <source>Show contact information in chat windows</source>
-        <translation>Show contact information in chat windows</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
@@ -229,52 +232,6 @@
     </message>
 </context>
 <context>
-    <name>MessageWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation>Next - %1</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Close</translation>
-    </message>
-</context>
-<context>
-    <name>MessageWindowClass</name>
-    <message>
-        <source>Message</source>
-        <translation>Message</translation>
-    </message>
-    <message>
-        <source>To:</source>
-        <translation>To:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Subject:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation>Reply</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Forward</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Chat</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Send</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Next</translation>
-    </message>
-</context>
-<context>
     <name>MessengerOptionsClass</name>
     <message>
         <source>Minimum input field lines:</source>
@@ -291,6 +248,52 @@
     <message>
         <source>(0 - do not clean)</source>
         <translation>(0 - do not clean)</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindow</name>
+    <message>
+        <source>Next - %1</source>
+        <translation type="unfinished">Next - %1</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Close</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindowClass</name>
+    <message>
+        <source>Message</source>
+        <translation type="unfinished">Message</translation>
+    </message>
+    <message>
+        <source>To:</source>
+        <translation type="unfinished">To:</translation>
+    </message>
+    <message>
+        <source>Subject:</source>
+        <translation type="unfinished">Subject:</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <translation type="unfinished">Reply</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation type="unfinished">Forward</translation>
+    </message>
+    <message>
+        <source>Chat</source>
+        <translation type="unfinished">Chat</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished">Send</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Next</translation>
     </message>
 </context>
 <context>

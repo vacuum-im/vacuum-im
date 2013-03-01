@@ -450,6 +450,14 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &ADat
 	return EMPTY_AVATAR;
 }
 
+QImage Avatars::emptyAvatarImage(const QSize &AMaxSize, bool AGray) const
+{
+	QImage image = AGray ? FGrayEmptyAvatar : FEmptyAvatar;
+	if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
+		image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+	return image;
+}
+
 QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, bool AGray) const
 {
 	QImage image;

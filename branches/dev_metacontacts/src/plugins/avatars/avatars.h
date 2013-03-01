@@ -74,6 +74,7 @@ public:
 	virtual QByteArray loadAvatarData(const QString &AHash) const;
 	virtual bool setAvatar(const Jid &AStreamJid, const QByteArray &AData);
 	virtual QString setCustomPictire(const Jid &AContactJid, const QByteArray &AData);
+	virtual QImage emptyAvatarImage(const QSize &AMaxSize = QSize(), bool AGray = false) const;
 	virtual QImage loadAvatarImage(const QString &AHash, const QSize &AMaxSize = QSize(), bool AGray = false) const;
 signals:
 	void avatarChanged(const Jid &AContactJid);

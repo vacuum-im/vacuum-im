@@ -16,6 +16,13 @@
     </message>
 </context>
 <context>
+    <name>InfoWidget</name>
+    <message>
+        <source>Contact address</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MessageWidgets</name>
     <message>
         <source>Messages</source>
@@ -56,10 +63,6 @@
     <message>
         <source>Auto resize input field</source>
         <translation>Automatyczna zmiana rozmiaru pola wpisywania wiadomości</translation>
-    </message>
-    <message>
-        <source>Show contact information in chat windows</source>
-        <translation>Pokaż informacje o kontakcie w oknie rozmów</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
@@ -229,52 +232,6 @@
     </message>
 </context>
 <context>
-    <name>MessageWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation>Następna - %1</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Zamknij</translation>
-    </message>
-</context>
-<context>
-    <name>MessageWindowClass</name>
-    <message>
-        <source>Message</source>
-        <translation>Wiadomość</translation>
-    </message>
-    <message>
-        <source>To:</source>
-        <translation>Do:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Temat:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation>Odpowiedz</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Przekaż</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Czat</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Wyślij</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Następna</translation>
-    </message>
-</context>
-<context>
     <name>MessengerOptionsClass</name>
     <message>
         <source>Minimum input field lines:</source>
@@ -291,6 +248,52 @@
     <message>
         <source>(0 - do not clean)</source>
         <translation>(0 - nie czyść)</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindow</name>
+    <message>
+        <source>Next - %1</source>
+        <translation type="unfinished">Następna - %1</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Zamknij</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindowClass</name>
+    <message>
+        <source>Message</source>
+        <translation type="unfinished">Wiadomość</translation>
+    </message>
+    <message>
+        <source>To:</source>
+        <translation type="unfinished">Do:</translation>
+    </message>
+    <message>
+        <source>Subject:</source>
+        <translation type="unfinished">Temat:</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <translation type="unfinished">Odpowiedz</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation type="unfinished">Przekaż</translation>
+    </message>
+    <message>
+        <source>Chat</source>
+        <translation type="unfinished">Czat</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished">Wyślij</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Następna</translation>
     </message>
 </context>
 <context>

@@ -18,9 +18,6 @@
 #define TBG_MWTBW_CLEAR_WINDOW                                  1800
 #define TBG_MWTBW_CHATSTATES                                    10100
 
-//ChatWindow - ToolBarWidget
-#define TBG_CWTBW_USER_TOOLS                                    10900
-
 //MultiChatWindow - ToolBarWidget
 #define TBG_MCWTBW_BOOKMARKS                                    10200
 #define TBG_MCWTBW_ROOM_TOOLS                                   10900

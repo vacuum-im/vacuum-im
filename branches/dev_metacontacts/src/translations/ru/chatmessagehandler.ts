@@ -60,5 +60,13 @@
         <source>Failed to load history: %1</source>
         <translation>Не удалось загрузить историю: %1</translation>
     </message>
+    <message>
+        <source>&lt;Empty&gt;</source>
+        <translation>&lt;Пустой&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Disconnected&gt;</source>
+        <translation>&lt;Отключен&gt;</translation>
+    </message>
 </context>
 </TS>

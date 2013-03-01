@@ -129,8 +129,9 @@ signals:
 	void multiChatWindowDestroyed(IMultiUserChatWindow *AWindow);
 	void multiChatRosterIndexCreated(IRosterIndex *AIndex);
 	void multiChatRosterIndexDestroyed(IRosterIndex *AIndex);
-	void multiChatWindowContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu);
+	void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu);
 	void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
+	void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips);
 	//IRecentItemHandler
 	void recentItemUpdated(const IRecentItem &AItem);
 protected:
@@ -145,12 +146,17 @@ protected:
 	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
 	QString getRoomName(const Jid &AStreamJid, const Jid &ARoomJid) const;
 protected slots:
-	void onMultiChatWindowContextMenu(Menu *AMenu);
+	void onMultiChatContextMenu(Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
+	void onMultiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
 	void onMultiUserChatChanged();
 	void onMultiUserChatDestroyed();
 	void onMultiChatWindowDestroyed();
 protected slots:
+	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
+	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
+protected slots:
+	void onStatusIconsChanged();
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onJoinRoomActionTriggered(bool);
@@ -165,7 +171,6 @@ protected slots:
 	void onRegisterErrorReceived(const QString &AId, const XmppError &AError);
 	void onInviteDialogFinished(int AResult);
 	void onInviteActionTriggered(bool);
-	void onStatusIconsChanged();
 private:
 	IPluginManager *FPluginManager;
 	IMessageWidgets *FMessageWidgets;

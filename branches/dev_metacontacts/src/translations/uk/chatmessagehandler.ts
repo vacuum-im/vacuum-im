@@ -60,5 +60,13 @@
         <source>Failed to load history: %1</source>
         <translation>Не вдалося завантажити історію: %1</translation>
     </message>
+    <message>
+        <source>&lt;Empty&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Disconnected&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

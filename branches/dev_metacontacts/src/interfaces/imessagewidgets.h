@@ -398,12 +398,6 @@ protected:
 	virtual void tabWindowDeleted(const QUuid &AWindowId) =0;
 	virtual void tabWindowCreated(IMessageTabWindow *AWindow) =0;
 	virtual void tabWindowDestroyed(IMessageTabWindow *AWindow) =0;
-	virtual void viewDropHandlerInserted(IMessageViewDropHandler *AHandler) =0;
-	virtual void viewDropHandlerRemoved(IMessageViewDropHandler *AHandler) =0;
-	virtual void viewUrlHandlerInserted(int AOrder, IMessageViewUrlHandler *AHandler) =0;
-	virtual void viewUrlHandlerRemoved(int AOrder, IMessageViewUrlHandler *AHandler) =0;
-	virtual void editContentsHandlerInserted(int AOrder, IMessageEditContentsHandler *AHandler) =0;
-	virtual void editContentsHandlerRemoved(int AOrder, IMessageEditContentsHandler *AHandler) =0;
 };
 
 Q_DECLARE_INTERFACE(IMessageAddress,"Vacuum.Plugin.IMessageAddress/1.0")

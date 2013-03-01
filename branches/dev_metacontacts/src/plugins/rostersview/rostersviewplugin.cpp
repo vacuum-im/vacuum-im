@@ -565,7 +565,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
-		QString ttInfo = "<nbsp>";
+		QString ttInfo;
 
 		QString name = AIndex->data(RDR_NAME).toString();
 		if (!name.isEmpty())
@@ -603,7 +603,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 		QStringList resources = AIndex->data(RDR_RESOURCES).toStringList();
 		if (!resources.isEmpty())
 		{
-			QString ttResources = "<nbsp><hr>";
+			QString ttResources = "<hr>";
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
 			foreach(QString itemJid, resources)
 			{

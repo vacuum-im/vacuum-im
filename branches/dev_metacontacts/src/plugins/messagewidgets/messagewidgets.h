@@ -118,16 +118,10 @@ signals:
 	void tabWindowDeleted(const QUuid &AWindowId);
 	void tabWindowCreated(IMessageTabWindow *AWindow);
 	void tabWindowDestroyed(IMessageTabWindow *AWindow);
-	void viewDropHandlerInserted(IMessageViewDropHandler *AHandler);
-	void viewDropHandlerRemoved(IMessageViewDropHandler *AHandler);
-	void viewUrlHandlerInserted(int AOrder, IMessageViewUrlHandler *AHandler);
-	void viewUrlHandlerRemoved(int AOrder, IMessageViewUrlHandler *AHandler);
-	void editContentsHandlerInserted(int AOrder, IMessageEditContentsHandler *AHandler);
-	void editContentsHandlerRemoved(int AOrder, IMessageEditContentsHandler *AHandler);
 protected:
+	void deleteTabWindows();
+	void deleteMessageWindows(const Jid &AStreamJid);
 	void insertQuoteAction(IMessageToolBarWidget *AWidget);
-	void deleteWindows();
-	void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
 	void onViewWidgetUrlClicked(const QUrl &AUrl);
 	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);

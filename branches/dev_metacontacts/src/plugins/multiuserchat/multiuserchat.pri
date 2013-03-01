@@ -9,7 +9,6 @@ HEADERS = multiuser.h \
           joinmultichatdialog.h \
           multiuserchatwindow.h \
           edituserslistdialog.h \
-          usercontextmenu.h \
           inputtextdialog.h \
           usersproxymodel.h
 
@@ -19,6 +18,5 @@ SOURCES = multiuser.cpp \
           joinmultichatdialog.cpp \
           multiuserchatwindow.cpp \
           edituserslistdialog.cpp \
-          usercontextmenu.cpp \
           inputtextdialog.cpp \
           usersproxymodel.cpp

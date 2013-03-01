@@ -58,7 +58,6 @@
 
 //ChatMessageHandler
 #define MNI_CHAT_MHANDLER_MESSAGE       "chatmessagehandlerMessage"
-#define MNI_CHAT_MHANDLER_USER_MENU     "chatmessagehandlerUserMenu"
 #define MNI_CHAT_MHANDLER_CLEAR_CHAT    "chatmessagehandlerClearChat"
 
 //DataStreamsManager
@@ -118,7 +117,6 @@
 #define MNI_MUC_JOIN                    "mucJoin"
 #define MNI_MUC_SHOW_ALL_ROOMS          "mucShowAllRooms"
 #define MNI_MUC_LEAVE_HIDDEN_ROOMS      "mucLeaveHiddenRooms"
-#define MNI_MUC_TOOLS_MENU              "mucToolsMenu"
 #define MNI_MUC_INVITE                  "mucInvite"
 #define MNI_MUC_CHANGE_NICK             "mucChangeNick"
 #define MNI_MUC_CHANGE_TOPIC            "mucChangeTopic"

@@ -5,6 +5,7 @@
 #include <definitions/messagedataroles.h>
 #include <definitions/messagehandlerorders.h>
 #include <definitions/multiuserdataroles.h>
+#include <definitions/multiusertooltiporders.h>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/recentitemtypes.h>
@@ -28,7 +29,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/istatuschanger.h>
-#include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/irecentcontacts.h>
@@ -38,7 +38,6 @@
 #include <utils/xmpperror.h>
 #include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"
-#include "usercontextmenu.h"
 #include "inputtextdialog.h"
 #include "usersproxymodel.h"
 #include "ui_multiuserchatwindow.h"
@@ -98,8 +97,9 @@ public:
 	virtual IMultiUserChat *multiUserChat() const;
 	virtual IMessageChatWindow *openChatWindow(const Jid &AContactJid);
 	virtual IMessageChatWindow *findChatWindow(const Jid &AContactJid) const;
-	virtual void contextMenuForWindow(Menu *AMenu);
+	virtual void contextMenuForRoom(Menu *AMenu);
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu);
+	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips);
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000);
 signals:
 	//ITabWindowPage
@@ -114,47 +114,46 @@ signals:
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
 	//IMultiUserChatWindow
-	void chatWindowCreated(IMessageChatWindow *AWindow);
-	void chatWindowDestroyed(IMessageChatWindow *AWindow);
-	void multiChatWindowContextMenu(Menu *AMenu);
+	void multiChatContextMenu(Menu *AMenu);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
+	void multiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
+	void privateChatWindowCreated(IMessageChatWindow *AWindow);
+	void privateChatWindowDestroyed(IMessageChatWindow *AWindow);
 protected:
 	void initialize();
-	void connectMultiChat();
+	void connectMultiChatSignals();
 	void createMessageWidgets();
 	void createStaticRoomActions();
-	void updateStaticRoomActions();
 	void saveWindowState();
 	void loadWindowState();
 	void saveWindowGeometry();
 	void loadWindowGeometry();
-	void updateRecentItemActiveTime();
-	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
-	bool showStatusCodes(const QString &ANick, const QList<int> &ACodes);
-	void highlightUserRole(IMultiUser *AUser);
-	void highlightUserAffiliation(IMultiUser *AUser);
-	void setToolTipForUser(IMultiUser *AUser);
-	bool execShortcutCommand(const QString &AText);
-protected:
-	bool isMentionMessage(const Message &AMessage) const;
-	void setMessageStyle();
-	void showTopic(const QString &ATopic);
-	void showStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
-	void showUserMessage(const Message &AMessage, const QString &ANick);
-	void showHistory();
-	void updateWindow();
 	void refreshCompleteNicks();
 	void updateListItem(const Jid &AContactJid);
-	void removeActiveMessages();
+	void updateRecentItemActiveTime();
+	void highlightUserRole(IMultiUser *AUser);
+	void highlightUserAffiliation(IMultiUser *AUser);
+	bool execShortcutCommand(const QString &AText);
+	void showDateSeparator(IMessageViewWidget *AView, const QDateTime &ADateTime);
 protected:
-	void setChatMessageStyle(IMessageChatWindow *AWindow);
-	void fillChatContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const;
-	void showChatStatus(IMessageChatWindow *AWindow, const QString &AMessage, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
-	void showChatMessage(IMessageChatWindow *AWindow, const Message &AMessage);
-	void showChatHistory(IMessageChatWindow *AWindow);
-	IMessageChatWindow *getChatWindow(const Jid &AContactJid);
-	void removeActiveChatMessages(IMessageChatWindow *AWindow);
-	void updateChatWindow(IMessageChatWindow *AWindow);
+	bool isMentionMessage(const Message &AMessage) const;
+	void setMultiChatMessageStyle();
+	void showMultiChatTopic(const QString &ATopic);
+	void showMultiChatStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
+	bool showMultiChatStatusCodes(const QString &ANick, const QList<int> &ACodes);
+	void showMultiChatUserMessage(const Message &AMessage, const QString &ANick);
+	void showMultiChatHistory();
+	void updateMultiChatWindow();
+	void removeMultiChatActiveMessages();
+protected:
+	IMessageChatWindow *getPrivateChatWindow(const Jid &AContactJid);
+	void setPrivateChatMessageStyle(IMessageChatWindow *AWindow);
+	void fillPrivateChatContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void showPrivateChatStatusMessage(IMessageChatWindow *AWindow, const QString &AMessage, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
+	void showPrivateChatMessage(IMessageChatWindow *AWindow, const Message &AMessage);
+	void showPrivateChatHistory(IMessageChatWindow *AWindow);
+	void updatePrivateChatWindow(IMessageChatWindow *AWindow);
+	void removePrivateChatActiveMessages(IMessageChatWindow *AWindow);
 protected:
 	bool event(QEvent *AEvent);
 	void showEvent(QShowEvent *AEvent);
@@ -165,7 +164,7 @@ protected slots:
 	void onChatNotify(const QString &ANotify);
 	void onChatError(const QString &AMessage);
 	void onChatClosed();
-	void onRejoinAfterKick();
+	void onRoomNameChanged(const QString &AName);
 	//Occupant
 	void onUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
 	void onUserDataChanged(IMultiUser *AUser, int ARole, const QVariant &ABefore, const QVariant &AAfter);
@@ -183,38 +182,40 @@ protected slots:
 	void onConfigFormReceived(const IDataForm &AForm);
 	void onRoomDestroyed(const QString &AReason);
 protected slots:
-	void onMessageReady();
-	void onMessageAboutToBeSend();
-	void onNotifierActiveNotifyChanged(int ANotifyId);
-	void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
-	void onViewContextQuoteActionTriggered(bool);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
-	void onWindowActivated();
+	void onMultiChatMessageReady();
+	void onMultiChatMessageAboutToBeSend();
+	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
+	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
+	void onMultiChatViewContextQuoteActionTriggered(bool);
+	void onMultiChatViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
+	void onMultiChatWindowActivated();
+	void onMultiChatHorizontalSplitterMoved(int APos, int AIndex);
+	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
 protected slots:
-	void onChatMessageReady();
-	void onChatWindowActivated();
-	void onChatWindowClosed();
-	void onChatWindowDestroyed();
-	void onChatNotifierActiveNotifyChanged(int ANotifyId);
-	void onHorizontalSplitterMoved(int APos, int AIndex);
-	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
-	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
-	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
+	void onPrivateChatMessageReady();
+	void onPrivateChatWindowActivated();
+	void onPrivateChatWindowClosed();
+	void onPrivateChatWindowDestroyed();
+	void onPrivateChatClearWindowActionTriggered(bool);
+	void onPrivateChatContextMenuRequested(Menu *AMenu);
+	void onPrivateChatToolTipsRequested(QMap<int,QString> &AToolTips);
+	void onPrivateChatNotifierActiveNotifyChanged(int ANotifyId);
+	void onPrivateChatArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
+	void onPrivateChatArchiveRequestFailed(const QString &AId, const XmppError &AError);
 protected slots:
-	void onNickMenuActionTriggered(bool);
-	void onToolBarActionTriggered(bool);
-	void onOpenChatWindowActionTriggered(bool);
+	void onRoomActionTriggered(bool);
+	void onNickCompleteMenuActionTriggered(bool);
+	void onOpenPrivateChatWindowActionTriggered(bool);
 	void onChangeUserRoleActionTriggeted(bool);
 	void onChangeUserAffiliationActionTriggered(bool);
-	void onClearChatWindowActionTriggered(bool);
 	void onDataFormMessageDialogAccepted();
 	void onAffiliationListDialogAccepted();
 	void onConfigFormDialogAccepted();
 protected slots:
-	void onUserItemDoubleClicked(const QModelIndex &AIndex);
 	void onStatusIconsChanged();
-	void onAccountOptionsChanged(const OptionsNode &ANode);
+	void onAutoRejoinAfterKick();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
 	Ui::MultiUserChatWindowClass ui;
 private:
@@ -230,6 +231,7 @@ private:
 	IRecentContacts *FRecentContacts;
 private:
 	IMessageAddress *FAddress;
+	IMessageInfoWidget *FInfoWidget;
 	IMessageViewWidget *FViewWidget;
 	IMessageEditWidget *FEditWidget;
 	IMessageMenuBarWidget *FMenuBarWidget;
@@ -237,14 +239,13 @@ private:
 	IMessageStatusBarWidget *FStatusBarWidget;
 	IMessageTabPageNotifier *FTabPageNotifier;
 private:
+	Action *FClearChat;
 	Action *FEnterRoom;
 	Action *FExitRoom;
 private:
-	Menu *FToolsMenu;
 	Action *FChangeNick;
 	Action *FInviteContact;
 	Action *FRequestVoice;
-	Action *FClearChat;
 	Action *FChangeTopic;
 	Action *FBanList;
 	Action *FMembersList;

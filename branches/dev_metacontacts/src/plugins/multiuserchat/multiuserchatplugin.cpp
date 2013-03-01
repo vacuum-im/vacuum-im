@@ -678,9 +678,12 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 		IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword);
 		chatWindow = new MultiUserChatWindow(this,chat);
 		WidgetManager::setWindowSticky(chatWindow->instance(),true);
-		connect(chatWindow->instance(),SIGNAL(multiChatWindowContextMenu(Menu *)),SLOT(onMultiChatWindowContextMenu(Menu *)));
+		connect(chatWindow->instance(),SIGNAL(multiChatContextMenu(Menu *)),SLOT(onMultiChatContextMenu(Menu *)));
 		connect(chatWindow->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
+		connect(chatWindow->instance(),SIGNAL(multiUserToolTips(IMultiUser *, QMap<int,QString> &)),SLOT(onMultiUserToolTips(IMultiUser *, QMap<int,QString> &)));
 		connect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
+		connect(chatWindow->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onMultiChatWindowInfoContextMenu(Menu *)));
+		connect(chatWindow->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onMultiChatWindowInfoToolTips(QMap<int,QString> &)));
 		FChatWindows.append(chatWindow);
 		getMultiChatRosterIndex(chatWindow->streamJid(),chatWindow->contactJid(),chatWindow->multiUserChat()->nickName(),chatWindow->multiUserChat()->password());
 		emit multiChatWindowCreated(chatWindow);
@@ -981,12 +984,12 @@ QString MultiUserChatPlugin::getRoomName(const Jid &AStreamJid, const Jid &ARoom
 	return name;
 }
 
-void MultiUserChatPlugin::onMultiChatWindowContextMenu(Menu *AMenu)
+void MultiUserChatPlugin::onMultiChatContextMenu(Menu *AMenu)
 {
 	IMultiUserChatWindow *chatWindow = qobject_cast<IMultiUserChatWindow *>(sender());
 	if (chatWindow)
 	{
-		emit multiChatWindowContextMenu(chatWindow,AMenu);
+		emit multiChatContextMenu(chatWindow,AMenu);
 	}
 }
 
@@ -999,6 +1002,14 @@ void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 	}
 }
 
+void MultiUserChatPlugin::onMultiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips)
+{
+	IMultiUserChatWindow *chatWindow = qobject_cast<IMultiUserChatWindow *>(sender());
+	if (chatWindow)
+	{
+		emit multiUserToolTips(chatWindow,AUser,AToolTips);
+	}
+}
 
 void MultiUserChatPlugin::onMultiUserChatChanged()
 {
@@ -1025,6 +1036,34 @@ void MultiUserChatPlugin::onMultiChatWindowDestroyed()
 		FChatWindows.removeAll(chatWindow);
 		emit multiChatWindowDestroyed(chatWindow);
 	}
+}
+
+void MultiUserChatPlugin::onMultiChatWindowInfoContextMenu(Menu *AMenu)
+{
+	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+	if (widget && FRostersViewPlugin)
+	{
+		IRosterIndex *index = findMultiChatRosterIndex(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid());
+		if (index)
+			FRostersViewPlugin->rostersView()->contextMenuForIndex(QList<IRosterIndex *>()<<index,NULL,AMenu);
+	}
+}
+
+void MultiUserChatPlugin::onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips)
+{
+	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+	if (widget && FRostersViewPlugin)
+	{
+		IRosterIndex *index = findMultiChatRosterIndex(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid());
+		if (index)
+			FRostersViewPlugin->rostersView()->toolTipsForIndex(index,NULL,AToolTips);
+	}
+}
+
+void MultiUserChatPlugin::onStatusIconsChanged()
+{
+	foreach(IMultiUserChatWindow *window, FChatWindows)
+		updateChatRosterIndex(window);
 }
 
 void MultiUserChatPlugin::onRosterIndexDestroyed(IRosterIndex *AIndex)
@@ -1281,7 +1320,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				connect(exit,SIGNAL(triggered(bool)),SLOT(onExitRoomActionTriggered(bool)));
 				AMenu->addAction(exit,AG_RVCM_MULTIUSERCHAT_EXIT);
 
-				window->contextMenuForWindow(AMenu);
+				window->contextMenuForRoom(AMenu);
 			}
 		}
 	}
@@ -1379,12 +1418,6 @@ void MultiUserChatPlugin::onInviteActionTriggered(bool)
 				window->multiUserChat()->inviteContact(contactJid,reason);
 		}
 	}
-}
-
-void MultiUserChatPlugin::onStatusIconsChanged()
-{
-	foreach(IMultiUserChatWindow *window, FChatWindows)
-		updateChatRosterIndex(window);
 }
 
 Q_EXPORT_PLUGIN2(plg_multiuserchat, MultiUserChatPlugin)

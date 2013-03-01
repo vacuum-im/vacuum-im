@@ -511,20 +511,14 @@ QList<IMessageViewDropHandler *> MessageWidgets::viewDropHandlers() const
 
 void MessageWidgets::insertViewDropHandler(IMessageViewDropHandler *AHandler)
 {
-	if (!FViewDropHandlers.contains(AHandler))
-	{
+	if (AHandler && !FViewDropHandlers.contains(AHandler))
 		FViewDropHandlers.append(AHandler);
-		emit viewDropHandlerInserted(AHandler);
-	}
 }
 
 void MessageWidgets::removeViewDropHandler(IMessageViewDropHandler *AHandler)
 {
 	if (FViewDropHandlers.contains(AHandler))
-	{
 		FViewDropHandlers.removeAll(AHandler);
-		emit viewDropHandlerRemoved(AHandler);
-	}
 }
 
 QMultiMap<int, IMessageViewUrlHandler *> MessageWidgets::viewUrlHandlers() const
@@ -534,20 +528,14 @@ QMultiMap<int, IMessageViewUrlHandler *> MessageWidgets::viewUrlHandlers() const
 
 void MessageWidgets::insertViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler)
 {
-	if (!FViewUrlHandlers.values(AOrder).contains(AHandler))
-	{
+	if (AHandler && !FViewUrlHandlers.contains(AOrder,AHandler))
 		FViewUrlHandlers.insertMulti(AOrder,AHandler);
-		emit viewUrlHandlerInserted(AOrder,AHandler);
-	}
 }
 
 void MessageWidgets::removeViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler)
 {
-	if (FViewUrlHandlers.values(AOrder).contains(AHandler))
-	{
+	if (FViewUrlHandlers.contains(AOrder,AHandler))
 		FViewUrlHandlers.remove(AOrder,AHandler);
-		emit viewUrlHandlerRemoved(AOrder,AHandler);
-	}
 }
 
 QMultiMap<int, IMessageEditContentsHandler *> MessageWidgets::editContentsHandlers() const
@@ -557,20 +545,33 @@ QMultiMap<int, IMessageEditContentsHandler *> MessageWidgets::editContentsHandle
 
 void MessageWidgets::insertEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler)
 {
-	if (!FEditContentsHandlers.values(AOrder).contains(AHandler))
-	{
+	if (AHandler && !FEditContentsHandlers.contains(AOrder,AHandler))
 		FEditContentsHandlers.insertMulti(AOrder,AHandler);
-		emit editContentsHandlerInserted(AOrder,AHandler);
-	}
 }
 
 void MessageWidgets::removeEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler)
 {
-	if (FEditContentsHandlers.values(AOrder).contains(AHandler))
-	{
+	if (FEditContentsHandlers.contains(AOrder,AHandler))
 		FEditContentsHandlers.remove(AOrder,AHandler);
-		emit editContentsHandlerRemoved(AOrder,AHandler);
-	}
+}
+
+void MessageWidgets::deleteTabWindows()
+{
+	foreach(IMessageTabWindow *window, tabWindows())
+		delete window->instance();
+}
+
+void MessageWidgets::deleteMessageWindows(const Jid &AStreamJid)
+{
+	QList<IMessageChatWindow *> chatWindows = FChatWindows;
+	foreach(IMessageChatWindow *window, chatWindows)
+		if (window->streamJid() == AStreamJid)
+			delete window->instance();
+
+	QList<IMessageNormalWindow *> messageWindows = FNormalWindows;
+	foreach(IMessageNormalWindow *window, messageWindows)
+		if (window->streamJid() == AStreamJid)
+			delete window->instance();
 }
 
 void MessageWidgets::insertQuoteAction(IMessageToolBarWidget *AWidget)
@@ -584,25 +585,6 @@ void MessageWidgets::insertQuoteAction(IMessageToolBarWidget *AWidget)
 		connect(action,SIGNAL(triggered(bool)),SLOT(onQuoteActionTriggered(bool)));
 		AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_MESSAGEWIDGETS_QUOTE);
 	}
-}
-
-void MessageWidgets::deleteWindows()
-{
-	foreach(IMessageTabWindow *window, tabWindows())
-		delete window->instance();
-}
-
-void MessageWidgets::deleteStreamWindows(const Jid &AStreamJid)
-{
-	QList<IMessageChatWindow *> chatWindows = FChatWindows;
-	foreach(IMessageChatWindow *window, chatWindows)
-		if (window->streamJid() == AStreamJid)
-			delete window->instance();
-
-	QList<IMessageNormalWindow *> messageWindows = FNormalWindows;
-	foreach(IMessageNormalWindow *window, messageWindows)
-		if (window->streamJid() == AStreamJid)
-			delete window->instance();
 }
 
 void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
@@ -831,12 +813,12 @@ void MessageWidgets::onShortcutActivated(const QString &AId, QWidget *AWidget)
 void MessageWidgets::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
 {
 	if (!(AAfter && AXmppStream->streamJid()))
-		deleteStreamWindows(AXmppStream->streamJid());
+		deleteMessageWindows(AXmppStream->streamJid());
 }
 
 void MessageWidgets::onStreamRemoved(IXmppStream *AXmppStream)
 {
-	deleteStreamWindows(AXmppStream->streamJid());
+	deleteMessageWindows(AXmppStream->streamJid());
 }
 
 void MessageWidgets::onOptionsOpened()
@@ -862,7 +844,7 @@ void MessageWidgets::onOptionsClosed()
 	stream << FPageWindows;
 	Options::setFileValue(data,"messages.tab-window-pages");
 
-	deleteWindows();
+	deleteTabWindows();
 }
 
 void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)

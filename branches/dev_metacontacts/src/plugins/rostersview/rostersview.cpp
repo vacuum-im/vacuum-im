@@ -979,7 +979,7 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 				toolTipsForIndex(index,helpEvent,toolTipsMap);
 				if (!toolTipsMap.isEmpty())
 				{
-					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/>"));
+					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/><nbsp>"));
 					QToolTip::showText(helpEvent->globalPos(),tooltip,this);
 				}
 				return true;

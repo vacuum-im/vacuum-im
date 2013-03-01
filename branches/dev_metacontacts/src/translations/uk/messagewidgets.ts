@@ -16,6 +16,13 @@
     </message>
 </context>
 <context>
+    <name>InfoWidget</name>
+    <message>
+        <source>Contact address</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MessageWidgets</name>
     <message>
         <source>Messages</source>
@@ -56,10 +63,6 @@
     <message>
         <source>Auto resize input field</source>
         <translation>Автоматично змінювати розмір поля вводу</translation>
-    </message>
-    <message>
-        <source>Show contact information in chat windows</source>
-        <translation>Показувати інформацію про контакт в вікні чату</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
@@ -229,52 +232,6 @@
     </message>
 </context>
 <context>
-    <name>MessageWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation>Наступний - %1</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Закрити</translation>
-    </message>
-</context>
-<context>
-    <name>MessageWindowClass</name>
-    <message>
-        <source>Message</source>
-        <translation>Повідомлення</translation>
-    </message>
-    <message>
-        <source>To:</source>
-        <translation>Кому:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Тема:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation>Відповісти</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Переслати</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Відіслати</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Наступне</translation>
-    </message>
-</context>
-<context>
     <name>MessengerOptionsClass</name>
     <message>
         <source>Minimum input field lines:</source>
@@ -291,6 +248,52 @@
     <message>
         <source>(0 - do not clean)</source>
         <translation>(0 - не очищати)</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindow</name>
+    <message>
+        <source>Next - %1</source>
+        <translation type="unfinished">Наступний - %1</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished">Закрити</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindowClass</name>
+    <message>
+        <source>Message</source>
+        <translation type="unfinished">Повідомлення</translation>
+    </message>
+    <message>
+        <source>To:</source>
+        <translation type="unfinished">Кому:</translation>
+    </message>
+    <message>
+        <source>Subject:</source>
+        <translation type="unfinished">Тема:</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <translation type="unfinished">Відповісти</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation type="unfinished">Переслати</translation>
+    </message>
+    <message>
+        <source>Chat</source>
+        <translation type="unfinished">Чат</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished">Відіслати</translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished">Наступне</translation>
     </message>
 </context>
 <context>

@@ -16,6 +16,13 @@
     </message>
 </context>
 <context>
+    <name>InfoWidget</name>
+    <message>
+        <source>Contact address</source>
+        <translation>Адрес контакта</translation>
+    </message>
+</context>
+<context>
     <name>MessageWidgets</name>
     <message>
         <source>Messages</source>
@@ -56,10 +63,6 @@
     <message>
         <source>Auto resize input field</source>
         <translation>Автоматически изменять размер поля ввода</translation>
-    </message>
-    <message>
-        <source>Show contact information in chat windows</source>
-        <translation>Показывать информацию о контакте в окне чата</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
@@ -229,7 +232,26 @@
     </message>
 </context>
 <context>
-    <name>MessageWindow</name>
+    <name>MessengerOptionsClass</name>
+    <message>
+        <source>Minimum input field lines:</source>
+        <translation>Минимальное число строк в поле ввода:</translation>
+    </message>
+    <message>
+        <source>Clean chat windows after closing in </source>
+        <translation>Очищать окна чата после закрытия через</translation>
+    </message>
+    <message>
+        <source> minutes</source>
+        <translation> минут</translation>
+    </message>
+    <message>
+        <source>(0 - do not clean)</source>
+        <translation>(0 - не очищать)</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindow</name>
     <message>
         <source>Next - %1</source>
         <translation>Следующее - %1</translation>
@@ -240,7 +262,7 @@
     </message>
 </context>
 <context>
-    <name>MessageWindowClass</name>
+    <name>NormalWindowClass</name>
     <message>
         <source>Message</source>
         <translation>Сообщение</translation>
@@ -272,25 +294,6 @@
     <message>
         <source>Next</source>
         <translation>Следующее</translation>
-    </message>
-</context>
-<context>
-    <name>MessengerOptionsClass</name>
-    <message>
-        <source>Minimum input field lines:</source>
-        <translation>Минимальное число строк в поле ввода:</translation>
-    </message>
-    <message>
-        <source>Clean chat windows after closing in </source>
-        <translation>Очищать окна чата после закрытия через</translation>
-    </message>
-    <message>
-        <source> minutes</source>
-        <translation> минут</translation>
-    </message>
-    <message>
-        <source>(0 - do not clean)</source>
-        <translation>(0 - не очищать)</translation>
     </message>
 </context>
 <context>
