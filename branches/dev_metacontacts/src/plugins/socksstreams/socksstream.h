@@ -91,6 +91,7 @@ protected:
 	bool sendFailedHosts();
 	bool activateStream();
 protected slots:
+	void onHostSocketProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
 	void onHostSocketConnected();
 	void onHostSocketReadyRead();
 	void onHostSocketError(QAbstractSocket::SocketError AError);

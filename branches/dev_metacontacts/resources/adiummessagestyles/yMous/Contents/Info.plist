@@ -2,8 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleVersion</key>
+	<string>1.3.6</string>
 	<key>CFBundleGetInfoString</key>
-	<string>1.3.5</string>
+	<string>1.3.6</string>
+	<key>XtraBundleVersion</key>
+	<string>1</string>
 	<key>CFBundleIdentifier</key>
 	<string>mathuaerknedam.yMous.style</string>
 	<key>CFBundleName</key>
