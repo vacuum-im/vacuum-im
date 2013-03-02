@@ -36,6 +36,7 @@ protected:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
 private:
 	IOptionsManager *FOptionsManager;
 	IConnectionManager *FConnectionManager;

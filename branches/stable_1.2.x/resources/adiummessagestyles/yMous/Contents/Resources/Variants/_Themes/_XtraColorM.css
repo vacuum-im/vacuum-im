@@ -14,7 +14,7 @@
 .incoming.xxxhover,
 .consecutive.message.xxxhover .xxxsender:after
 {
-	//color: hsla(0, 0%, 0%, 1);
+	color: hsla(0, 0%, 0%, 1);
 }
 
 .status,
@@ -45,7 +45,7 @@
 .event.xxxhover .xxxmark,
 .event.xxxhover .xxxmessage
 {
-	//color: hsla(0, 0%, 25%, 1) !important;
+	color: hsla(0, 0%, 25%, 1) !important;
 }
 
 .history.status .xxxmark,
@@ -61,7 +61,7 @@
 .event.history.xxxhover .xxxmark
 {
 	//background-color: hsla(0, 0%, 80%, 1);
-	//color: hsla(0, 0%, 45%, 1) !important;
+	color: hsla(0, 0%, 45%, 1) !important;
 }
 
 .message:not(.history):not(.consecutive) .xxxmark
@@ -74,11 +74,12 @@
 	border-top: 1px solid hsla(0, 0%, 90%, 1);
 }
 
-.message.mention .xxxmark,
-.message:hover .xxxmark,
-.message.xxxhover .xxxmark
+.message:hover:not(.history):not(.consecutive) .xxxmark,
+.message:hover.history:not(.consecutive) .xxxmark,
+.message.xxxhover:not(.history):not(.consecutive) .xxxmark,
+.message.xxxhover.history:not(.consecutive) .xxxmark
 {
-	//border-top: transparent !important;
+	border-top: 1px solid transparent;
 }
 
 #Chat > div:first-of-type .xxxmark,

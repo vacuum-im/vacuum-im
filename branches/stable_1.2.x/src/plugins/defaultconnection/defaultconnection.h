@@ -61,6 +61,7 @@ protected slots:
 	void onDnsResultsReady(int AId, const QJDns::Response &AResults);
 	void onDnsError(int AId, QJDns::Error AError);
 	void onDnsShutdownFinished();
+	void onSocketProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
 	void onSocketConnected();
 	void onSocketEncrypted();
 	void onSocketReadyRead();

@@ -4,10 +4,15 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
 
+#include <QAuthenticator>
+
 UrlProcessor::UrlProcessor(QObject *AParent) : QNetworkAccessManager(AParent)
 {
 	FOptionsManager = NULL;
 	FConnectionManager = NULL;
+
+	connect(this, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
+		SLOT(onProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
 }
 
 void UrlProcessor::pluginInfo(IPluginInfo *APluginInfo)
@@ -101,6 +106,12 @@ void UrlProcessor::onOptionsChanged(const OptionsNode &ANode)
 		if (FConnectionManager)
 			setProxy(FConnectionManager->proxyById(ANode.value().toString()).proxy);
 	}
+}
+
+void UrlProcessor::onProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth)
+{
+	AAuth->setUser(AProxy.user());
+	AAuth->setPassword(AProxy.password());
 }
 
 Q_EXPORT_PLUGIN2(plg_urlprocessor, UrlProcessor)

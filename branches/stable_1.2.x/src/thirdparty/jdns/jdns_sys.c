@@ -735,6 +735,8 @@ static jdns_dnsparams_t *dnsparams_get_unixsys()
 	// nameservers - ipv6
 #if defined(JDNS_OS_OPENBSD)
 	for(n = 0; n < MAXNS && n < RESVAR.nscount; ++n)
+#elif defined(JDNS_MODERN_RES_API)
+	for(n = 0; n < MAXNS && n < RESVAR._u._ext.nscount6; ++n)
 #else
  	for(n = 0; n < MAXNS && n < RESVAR._u._ext.nscount; ++n)
 #endif

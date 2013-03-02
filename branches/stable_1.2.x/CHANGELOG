@@ -10,6 +10,7 @@ LEGEND
 ------
   [-] Full text search in file archive of messages in certain cases worked not correctly
   [-] Did not work contacts moving from an empty group
+  [-] Proxy authorization in certain cases was not working
 
 
 1.2.1
