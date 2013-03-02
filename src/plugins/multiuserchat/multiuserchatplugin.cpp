@@ -795,7 +795,7 @@ void MultiUserChatPlugin::onMultiChatWindowDestroyed()
 	{
 		removeChatAction(chatWindow);
 		FChatWindows.removeAll(chatWindow);
-		emit multiChatWindowCreated(chatWindow);
+		emit multiChatWindowDestroyed(chatWindow);
 	}
 }
 

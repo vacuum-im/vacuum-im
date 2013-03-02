@@ -1,6 +1,7 @@
 #include "defaultconnection.h"
 
 #include <QNetworkProxy>
+#include <QAuthenticator>
 
 #define START_QUERY_ID        0
 #define STOP_QUERY_ID         -1
@@ -21,6 +22,8 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 #if QT_VERSION >= 0x040600
 	FSocket.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
 #endif
+	connect(&FSocket, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
+		SLOT(onSocketProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
 	connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
 	connect(&FSocket, SIGNAL(encrypted()), SLOT(onSocketEncrypted()));
 	connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
@@ -266,6 +269,12 @@ void DefaultConnection::onDnsShutdownFinished()
 		FSrvQueryId = START_QUERY_ID;
 		emit disconnected();
 	}
+}
+
+void DefaultConnection::onSocketProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth)
+{
+	AAuth->setUser(AProxy.user());
+	AAuth->setPassword(AProxy.password());
 }
 
 void DefaultConnection::onSocketConnected()

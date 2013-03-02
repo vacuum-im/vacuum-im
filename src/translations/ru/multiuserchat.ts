@@ -520,7 +520,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Clear window</source>
-        <translation>Отчистить окно</translation>
+        <translation>Очистить окно</translation>
     </message>
     <message>
         <source>Change nick</source>
