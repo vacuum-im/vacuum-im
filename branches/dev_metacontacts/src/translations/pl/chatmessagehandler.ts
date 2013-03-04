@@ -61,11 +61,11 @@
         <translation>Nie udało się załadować historii: %1</translation>
     </message>
     <message>
-        <source>&lt;Empty&gt;</source>
+        <source>Contact resource</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Disconnected&gt;</source>
+        <source>&lt;Absent&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

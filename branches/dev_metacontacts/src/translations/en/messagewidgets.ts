@@ -2,24 +2,10 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>ChatWindow</name>
-    <message>
-        <source>Quote selected text</source>
-        <translation>Quote selected text</translation>
-    </message>
-</context>
-<context>
     <name>EditWidget</name>
     <message>
         <source>Send</source>
         <translation>Send</translation>
-    </message>
-</context>
-<context>
-    <name>InfoWidget</name>
-    <message>
-        <source>Contact address</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -230,6 +216,10 @@
         <source>Show tabs in combined message windows with contact-list mode</source>
         <translation>Show tabs in combined message windows with contact-list mode</translation>
     </message>
+    <message>
+        <source>Quote Selected Text</source>
+        <translation>Quote Selected Text</translation>
+    </message>
 </context>
 <context>
     <name>MessengerOptionsClass</name>
@@ -254,46 +244,46 @@
     <name>NormalWindow</name>
     <message>
         <source>Next - %1</source>
-        <translation type="unfinished">Next - %1</translation>
+        <translation>Next - %1</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation type="unfinished">Close</translation>
+        <translation>Close</translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
         <source>Message</source>
-        <translation type="unfinished">Message</translation>
+        <translation>Message</translation>
     </message>
     <message>
         <source>To:</source>
-        <translation type="unfinished">To:</translation>
+        <translation>To:</translation>
     </message>
     <message>
         <source>Subject:</source>
-        <translation type="unfinished">Subject:</translation>
+        <translation>Subject:</translation>
     </message>
     <message>
         <source>Reply</source>
-        <translation type="unfinished">Reply</translation>
+        <translation>Reply</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished">Forward</translation>
+        <translation>Forward</translation>
     </message>
     <message>
         <source>Chat</source>
-        <translation type="unfinished">Chat</translation>
+        <translation>Chat</translation>
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished">Send</translation>
+        <translation>Send</translation>
     </message>
     <message>
         <source>Next</source>
-        <translation type="unfinished">Next</translation>
+        <translation>Next</translation>
     </message>
 </context>
 <context>

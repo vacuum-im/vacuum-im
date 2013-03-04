@@ -2,24 +2,10 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="ru" sourcelanguage="en">
 <context>
-    <name>ChatWindow</name>
-    <message>
-        <source>Quote selected text</source>
-        <translation>Цитировать выделенный текст</translation>
-    </message>
-</context>
-<context>
     <name>EditWidget</name>
     <message>
         <source>Send</source>
         <translation>Отправить</translation>
-    </message>
-</context>
-<context>
-    <name>InfoWidget</name>
-    <message>
-        <source>Contact address</source>
-        <translation>Адрес контакта</translation>
     </message>
 </context>
 <context>
@@ -229,6 +215,10 @@
     <message>
         <source>Show tabs in combined message windows with contact-list mode</source>
         <translation>Показывать вкладки в режиме объединения окон сообщений с контакт-листом</translation>
+    </message>
+    <message>
+        <source>Quote Selected Text</source>
+        <translation>Цитировать выделенный текст</translation>
     </message>
 </context>
 <context>

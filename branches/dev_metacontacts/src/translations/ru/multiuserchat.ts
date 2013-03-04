@@ -979,10 +979,6 @@ Check values and try again</source>
         <translation>Очистить окно чата</translation>
     </message>
     <message>
-        <source>Quote Selected Text</source>
-        <translation>Цитировать выделенный текст</translation>
-    </message>
-    <message>
         <source>Enter your new nick name in conference %1</source>
         <translation>Введите Ваш новый ник в конференции %1</translation>
     </message>

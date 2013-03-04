@@ -979,10 +979,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Quote Selected Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enter your new nick name in conference %1</source>
         <translation type="unfinished"></translation>
     </message>

@@ -58,7 +58,13 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+		if (FMessageProcessor)
+		{
+			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
 	if (plugin)
@@ -230,9 +236,12 @@ bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJ
 		if (type == "chat")
 		{
 			IMessageChatWindow *window = getWindow(AStreamJid, AContactJid);
-			window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
-			window->showTabPage();
-			return true;
+			if (window)
+			{
+				window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
+				window->showTabPage();
+				return true;
+			}
 		}
 	}
 	return false;
@@ -385,7 +394,7 @@ bool ChatMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, co
 IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	IMessageChatWindow *window = NULL;
-	if (AStreamJid.isValid() && AContactJid.isValid())
+	if (FMessageProcessor && FMessageProcessor->isActiveStream(AStreamJid) && AContactJid.isValid())
 	{
 		window = findWindow(AStreamJid,AContactJid);
 		if (!window)
@@ -395,6 +404,7 @@ IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const J
 			{
 				window->address()->setAutoAddresses(true);
 				window->infoWidget()->setAddressMenuVisible(true);
+				window->infoWidget()->addressMenu()->menuAction()->setToolTip(tr("Contact resource"));
 				window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
 				connect(window->instance(),SIGNAL(messageReady()),SLOT(onWindowMessageReady()));
@@ -456,15 +466,8 @@ void ChatMessageHandler::updateWindow(IMessageChatWindow *AWindow)
 	IPresenceItem pitem = presence!=NULL ? presence->findItem(AWindow->contactJid()) : IPresenceItem();
 	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusText,pitem.status);
 
-	if (pitem.show!=IPresence::Offline && pitem.show!=IPresence::Error)
-	{
-		QString resource = !AWindow->contactJid().resource().isEmpty() ? AWindow->contactJid().resource() : tr("<Empty>");
-		AWindow->infoWidget()->addressMenu()->setTitle(TextManager::getElidedString(resource,Qt::ElideRight,20));
-	}
-	else
-	{
-		AWindow->infoWidget()->addressMenu()->setTitle(tr("<Disconnected>"));
-	}
+	QString resource = !AWindow->contactJid().resource().isEmpty() ? AWindow->contactJid().resource() : tr("<Absent>");
+	AWindow->infoWidget()->addressMenu()->setTitle(TextManager::getElidedString(resource,Qt::ElideRight,20));
 
 	QIcon tabIcon = statusIcon;
 	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
@@ -896,6 +899,12 @@ void ChatMessageHandler::onChangeWindowAddressAction()
 		if (window)
 			window->address()->setAddress(streamJid,contactJid);
 	}
+}
+
+void ChatMessageHandler::onActiveStreamRemoved(const Jid &AStreamJid)
+{
+	foreach(IMessageChatWindow *window, FWindows)
+		window->address()->removeAddress(AStreamJid);
 }
 
 void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)

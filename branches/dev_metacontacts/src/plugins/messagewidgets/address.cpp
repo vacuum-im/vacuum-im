@@ -131,7 +131,6 @@ void Address::initialize()
 		{
 			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
-			connect(FPresencePlugin->instance(),SIGNAL(presenceRemoved(IPresence *)),SLOT(onPresenceRemoved(IPresence *)));
 		}
 	}
 }
@@ -210,9 +209,9 @@ void Address::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefor
 
 void Address::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
-	if (AItem.show != ABefore.show)
+	if (FAutoAddresses && AItem.show!=ABefore.show)
 	{
-		QList<Jid> contacts = FAutoAddresses ? FAddresses.value(APresence->streamJid()).values(AItem.itemJid.bare()) : QList<Jid>();
+		QList<Jid> contacts = FAddresses.value(APresence->streamJid()).values(AItem.itemJid.bare());
 		if (!contacts.isEmpty())
 		{
 			Jid bareJid = AItem.itemJid.bare();
@@ -235,10 +234,4 @@ void Address::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &
 			}
 		}
 	}
-}
-
-void Address::onPresenceRemoved(IPresence *APresence)
-{
-	if (FAutoAddresses)
-		removeAddress(APresence->streamJid());
 }

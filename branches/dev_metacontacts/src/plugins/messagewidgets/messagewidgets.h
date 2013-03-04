@@ -120,11 +120,11 @@ signals:
 	void tabWindowDestroyed(IMessageTabWindow *AWindow);
 protected:
 	void deleteTabWindows();
-	void deleteMessageWindows(const Jid &AStreamJid);
-	void insertQuoteAction(IMessageToolBarWidget *AWidget);
+	void insertToolBarQuoteAction(IMessageToolBarWidget *AWidget);
+	Action *createQuouteAction(IMessageWindow *AWindow, QObject *AParent);
 protected slots:
 	void onViewWidgetUrlClicked(const QUrl &AUrl);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
+	void onViewWidgetContextMenuRequested(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
 	void onViewContextCopyActionTriggered(bool);
 	void onViewContextUrlActionTriggered(bool);
 	void onViewContextSearchActionTriggered(bool);
@@ -132,23 +132,21 @@ protected slots:
 	void onEditWidgetCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert);
 	void onEditWidgetInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument);
 	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
+	void onMessageWindowWidgetLayoutChanged();
 	void onQuoteActionTriggered(bool);
 	void onAssignedTabPageDestroyed();
-	void onMessageWindowDestroyed();
+	void onNormalWindowDestroyed();
 	void onChatWindowDestroyed();
 	void onTabWindowPageAdded(IMessageTabPage *APage);
 	void onTabWindowCurrentPageChanged(IMessageTabPage *APage);
 	void onTabWindowDestroyed();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
-	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onOptionsOpened();
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
 	IMainWindow *FMainWindow;
-	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;
 private:
 	QList<IMessageTabWindow *> FTabWindows;

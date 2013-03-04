@@ -20,6 +20,7 @@ public:
 	~InfoWidget();
 	//IMessageWidget
 	virtual QWidget *instance() { return this; }
+	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	//IMessageInfoWidget
 	virtual ToolBarChanger *toolBarChanger() const;

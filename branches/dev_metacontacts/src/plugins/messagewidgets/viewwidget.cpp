@@ -30,6 +30,11 @@ ViewWidget::~ViewWidget()
 
 }
 
+bool ViewWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
 IMessageWindow *ViewWidget::messageWindow() const
 {
 	return FWindow;
@@ -114,7 +119,7 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 
 void ViewWidget::contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
 {
-	emit viewContextMenu(APosition,ASelection,AMenu);
+	emit contextMenuRequested(APosition,ASelection,AMenu);
 }
 
 void ViewWidget::initialize()

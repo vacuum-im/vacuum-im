@@ -61,12 +61,12 @@
         <translation>Failed to load history: %1</translation>
     </message>
     <message>
-        <source>&lt;Empty&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>Contact resource</source>
+        <translation>Contact resource</translation>
     </message>
     <message>
-        <source>&lt;Disconnected&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>&lt;Absent&gt;</source>
+        <translation>&lt;Absent&gt;</translation>
     </message>
 </context>
 </TS>

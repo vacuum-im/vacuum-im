@@ -28,17 +28,18 @@ void MessageProcessor::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(added(IXmppStream *)),SLOT(onXmppStreamAdded(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onXmppStreamRemoved(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
 		}
 	}
 
@@ -69,7 +70,7 @@ bool MessageProcessor::initObjects()
 
 bool MessageProcessor::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FSHIMessages.value(AStreamJid) == AHandlerId)
+	if (FActiveStreams.value(AStreamJid) == AHandlerId)
 	{
 		Message message(AStanza);
 		AAccept = sendMessage(AStreamJid,message,IMessageProcessor::MessageIn) || AAccept;
@@ -106,6 +107,46 @@ void MessageProcessor::writeMessageToText(int AOrder, Message &AMessage, QTextDo
 			linkFormat.setAnchorHref(link.toString());
 			cursor.setCharFormat(linkFormat);
 		}
+	}
+}
+
+QList<Jid> MessageProcessor::activeStreams() const
+{
+	return FActiveStreams.keys();
+}
+
+bool MessageProcessor::isActiveStream(const Jid &AStreamJid) const
+{
+	return FActiveStreams.contains(AStreamJid);
+}
+
+void MessageProcessor::appendActiveStream(const Jid &AStreamJid)
+{
+	if (FStanzaProcessor && AStreamJid.isValid() && !FActiveStreams.contains(AStreamJid))
+	{
+		IStanzaHandle shandle;
+		shandle.handler = this;
+		shandle.order = SHO_DEFAULT;
+		shandle.direction = IStanzaHandle::DirectionIn;
+		shandle.streamJid = AStreamJid;
+		shandle.conditions.append(SHC_MESSAGE);
+		FActiveStreams.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
+		emit activeStreamAppended(AStreamJid);
+	}
+}
+
+void MessageProcessor::removeActiveStream(const Jid &AStreamJid)
+{
+	if (FStanzaProcessor && FActiveStreams.contains(AStreamJid))
+	{
+		FStanzaProcessor->removeStanzaHandle(FActiveStreams.take(AStreamJid));
+		foreach(int notifyId, FNotifyId2MessageId.keys())
+		{
+			INotification notify = FNotifications->notificationById(notifyId);
+			if (AStreamJid == notify.data.value(NDR_STREAM_JID).toString())
+				removeMessageNotify(FNotifyId2MessageId.value(notifyId));
+		}
+		emit activeStreamRemoved(AStreamJid);
 	}
 }
 
@@ -248,58 +289,55 @@ bool MessageProcessor::createMessageWindow(const Jid &AStreamJid, const Jid &ACo
 	return false;
 }
 
+QMultiMap<int, IMessageHandler *> MessageProcessor::messageHandlers() const
+{
+	return FMessageHandlers;
+}
+
 void MessageProcessor::insertMessageHandler(int AOrder, IMessageHandler *AHandler)
 {
-	if (!FMessageHandlers.contains(AOrder,AHandler))
-	{
+	if (AHandler && !FMessageHandlers.contains(AOrder,AHandler))
 		FMessageHandlers.insertMulti(AOrder,AHandler);
-		emit messageHandlerInserted(AOrder,AHandler);
-	}
 }
 
 void MessageProcessor::removeMessageHandler(int AOrder, IMessageHandler *AHandler)
 {
 	if (FMessageHandlers.contains(AOrder,AHandler))
-	{
 		FMessageHandlers.remove(AOrder,AHandler);
-		emit messageHandlerRemoved(AOrder,AHandler);
-	}
+}
+
+QMultiMap<int, IMessageWriter *> MessageProcessor::messageWriters() const
+{
+	return FMessageWriters;
 }
 
 void MessageProcessor::insertMessageWriter(int AOrder, IMessageWriter *AWriter)
 {
-	if (!FMessageWriters.contains(AOrder,AWriter))
-	{
+	if (AWriter && !FMessageWriters.contains(AOrder,AWriter))
 		FMessageWriters.insertMulti(AOrder,AWriter);
-		emit messageWriterInserted(AOrder,AWriter);
-	}
 }
 
 void MessageProcessor::removeMessageWriter(int AOrder, IMessageWriter *AWriter)
 {
 	if (FMessageWriters.contains(AOrder,AWriter))
-	{
 		FMessageWriters.remove(AOrder,AWriter);
-		emit messageWriterRemoved(AOrder,AWriter);
-	}
+}
+
+QMultiMap<int, IMessageEditor *> MessageProcessor::messageEditors() const
+{
+	return FMessageEditors;
 }
 
 void MessageProcessor::insertMessageEditor(int AOrder, IMessageEditor *AEditor)
 {
-	if (!FMessageEditors.contains(AOrder,AEditor))
-	{
+	if (AEditor && !FMessageEditors.contains(AOrder,AEditor))
 		FMessageEditors.insertMulti(AOrder,AEditor);
-		emit messageEditorInserted(AOrder,AEditor);
-	}
 }
 
 void MessageProcessor::removeMessageEditor(int AOrder, IMessageEditor *AEditor)
 {
 	if (FMessageEditors.contains(AOrder,AEditor))
-	{
 		FMessageEditors.remove(AOrder,AEditor);
-		emit messageEditorRemoved(AOrder,AEditor);
-	}
 }
 
 int MessageProcessor::newMessageId()
@@ -345,41 +383,9 @@ QString MessageProcessor::prepareBodyForReceive(const QString &AString) const
 {
 	QString result = Qt::escape(AString);
 	result.replace('\n',"<br>");
-	result.replace("  ","&nbsp; ");
-	result.replace('\t',"&nbsp; &nbsp; ");
+	result.replace("  ","<nbsp> ");
+	result.replace('\t',"<nbsp> <nbsp> ");
 	return result;
-}
-
-void MessageProcessor::onStreamOpened(IXmppStream *AXmppStream)
-{
-	if (FStanzaProcessor)
-	{
-		IStanzaHandle shandle;
-		shandle.handler = this;
-		shandle.order = SHO_DEFAULT;
-		shandle.direction = IStanzaHandle::DirectionIn;
-		shandle.streamJid = AXmppStream->streamJid();
-		shandle.conditions.append(SHC_MESSAGE);
-		FSHIMessages.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
-	}
-}
-
-void MessageProcessor::onStreamClosed(IXmppStream *AXmppStream)
-{
-	if (FStanzaProcessor)
-	{
-		FStanzaProcessor->removeStanzaHandle(FSHIMessages.take(AXmppStream->streamJid()));
-	}
-}
-
-void MessageProcessor::onStreamRemoved(IXmppStream *AXmppStream)
-{
-	foreach(int notifyId, FNotifyId2MessageId.keys())
-	{
-		INotification notify = FNotifications->notificationById(notifyId);
-		if (AXmppStream->streamJid() == notify.data.value(NDR_STREAM_JID).toString())
-			removeMessageNotify(FNotifyId2MessageId.value(notifyId));
-	}
 }
 
 void MessageProcessor::onNotificationActivated(int ANotifyId)
@@ -392,6 +398,25 @@ void MessageProcessor::onNotificationRemoved(int ANotifyId)
 {
 	if (FNotifyId2MessageId.contains(ANotifyId))
 		removeMessageNotify(FNotifyId2MessageId.value(ANotifyId));
+}
+
+void MessageProcessor::onXmppStreamAdded(IXmppStream *AXmppStream)
+{
+	appendActiveStream(AXmppStream->streamJid());
+}
+
+void MessageProcessor::onXmppStreamRemoved(IXmppStream *AXmppStream)
+{
+	removeActiveStream(AXmppStream->streamJid());
+}
+
+void MessageProcessor::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore)
+{
+	if (FActiveStreams.contains(ABefore))
+	{
+		int handleId = FActiveStreams.take(ABefore);
+		FActiveStreams.insert(AXmppStream->streamJid(),handleId);
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_messageprocessor, MessageProcessor)

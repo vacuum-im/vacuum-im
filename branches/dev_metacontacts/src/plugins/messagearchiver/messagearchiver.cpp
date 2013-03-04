@@ -2419,11 +2419,11 @@ void MessageArchiver::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
 	action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWHISTORY);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByToolBarAction(bool)));
-	QToolButton *chatButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
+	QToolButton *historyButton = AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_ARCHIVE_VIEW);
 
-	ChatWindowMenu *chatMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
-	chatButton->setMenu(chatMenu);
-	chatButton->setPopupMode(QToolButton::MenuButtonPopup);
+	ChatWindowMenu *historyMenu = new ChatWindowMenu(this,FPluginManager,AWidget,AWidget->toolBarChanger()->toolBar());
+	historyButton->setMenu(historyMenu);
+	historyButton->setPopupMode(QToolButton::MenuButtonPopup);
 }
 
 void MessageArchiver::onOptionsChanged(const OptionsNode &ANode)

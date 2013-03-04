@@ -31,6 +31,11 @@ ReceiversWidget::~ReceiversWidget()
 
 }
 
+bool ReceiversWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
 IMessageWindow *ReceiversWidget::messageWindow() const
 {
 	return FWindow;

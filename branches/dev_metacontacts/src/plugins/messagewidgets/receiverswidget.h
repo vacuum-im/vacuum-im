@@ -21,6 +21,7 @@ public:
 	~ReceiversWidget();
 	// IMessageWidget
 	virtual QWidget *instance() { return this; }
+	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	// IMessageReceiversWidget
 	virtual QList<Jid> receivers() const;

@@ -215,7 +215,7 @@ void SpellChecker::onEditWidgetCreated(IMessageEditWidget *AWidget)
 	QTextEdit *textEdit = AWidget->textEdit();
 	textEdit->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(textEdit,SIGNAL(destroyed(QObject *)),SLOT(onTextEditDestroyed(QObject *)));
-	connect(AWidget->instance(),SIGNAL(editContextMenu(const QPoint &, Menu *)),SLOT(onEditWidgetContextMenuRequested(const QPoint &, Menu *)));
+	connect(AWidget->instance(),SIGNAL(contextMenuRequested(const QPoint &, Menu *)),SLOT(onEditWidgetContextMenuRequested(const QPoint &, Menu *)));
 
 	IMultiUserChatWindow *mucWindow = NULL;
 	QWidget *parent = AWidget->instance()->parentWidget();

@@ -9,12 +9,12 @@
 #include <QTextDocument>
 #include <QTextDocumentWriter>
 
+#define ADR_QUOTE_WINDOW        Action::DR_Parametr1
 #define ADR_CONTEXT_DATA        Action::DR_Parametr1
 
 MessageWidgets::MessageWidgets()
 {
 	FPluginManager = NULL;
-	FXmppStreams = NULL;
 	FOptionsManager = NULL;
 	FMainWindow = NULL;
 }
@@ -42,18 +42,6 @@ bool MessageWidgets::initConnections(IPluginManager *APluginManager, int &AInitO
 	if (plugin)
 	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
-	if (plugin)
-	{
-		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams)
-		{
-			connect(FXmppStreams->instance(),SIGNAL(jidAboutToBeChanged(IXmppStream *, const Jid &)),
-				SLOT(onStreamJidAboutToBeChanged(IXmppStream *, const Jid &)));
-			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onStreamRemoved(IXmppStream *)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
@@ -247,8 +235,8 @@ IMessageInfoWidget *MessageWidgets::newInfoWidget(IMessageWindow *AWindow, QWidg
 IMessageViewWidget *MessageWidgets::newViewWidget(IMessageWindow *AWindow, QWidget *AParent)
 {
 	IMessageViewWidget *widget = new ViewWidget(this,AWindow,AParent);
-	connect(widget->instance(),SIGNAL(viewContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)),
-		SLOT(onViewWidgetContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)));
+	connect(widget->instance(),SIGNAL(contextMenuRequested(const QPoint &, const QTextDocumentFragment &, Menu *)),
+		SLOT(onViewWidgetContextMenuRequested(const QPoint &, const QTextDocumentFragment &, Menu *)));
 	connect(widget->instance(),SIGNAL(urlClicked(const QUrl &)),SLOT(onViewWidgetUrlClicked(const QUrl &)));
 	FCleanupHandler.add(widget->instance());
 	emit viewWidgetCreated(widget);
@@ -290,7 +278,7 @@ IMessageToolBarWidget *MessageWidgets::newToolBarWidget(IMessageWindow *AWindow,
 {
 	IMessageToolBarWidget *widget = new ToolBarWidget(AWindow,AParent);
 	FCleanupHandler.add(widget->instance());
-	insertQuoteAction(widget);
+	insertToolBarQuoteAction(widget);
 	emit toolBarWidgetCreated(widget);
 	return widget;
 }
@@ -324,7 +312,7 @@ IMessageNormalWindow *MessageWidgets::getNormalWindow(const Jid &AStreamJid, con
 		window = new NormalWindow(this,AStreamJid,AContactJid,AMode);
 		FNormalWindows.append(window);
 		WidgetManager::setWindowSticky(window->instance(),true);
-		connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMessageWindowDestroyed()));
+		connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onNormalWindowDestroyed()));
 		FCleanupHandler.add(window->instance());
 		emit normalWindowCreated(window);
 		return window;
@@ -561,31 +549,34 @@ void MessageWidgets::deleteTabWindows()
 		delete window->instance();
 }
 
-void MessageWidgets::deleteMessageWindows(const Jid &AStreamJid)
+void MessageWidgets::insertToolBarQuoteAction(IMessageToolBarWidget *AWidget)
 {
-	QList<IMessageChatWindow *> chatWindows = FChatWindows;
-	foreach(IMessageChatWindow *window, chatWindows)
-		if (window->streamJid() == AStreamJid)
-			delete window->instance();
-
-	QList<IMessageNormalWindow *> messageWindows = FNormalWindows;
-	foreach(IMessageNormalWindow *window, messageWindows)
-		if (window->streamJid() == AStreamJid)
-			delete window->instance();
-}
-
-void MessageWidgets::insertQuoteAction(IMessageToolBarWidget *AWidget)
-{
-	if (AWidget->messageWindow()->viewWidget() && AWidget->messageWindow()->editWidget())
+	Action *quoteAction = createQuouteAction(AWidget->messageWindow(),AWidget->instance());
+	if (quoteAction)
 	{
-		Action *action = new Action(AWidget->instance());
-		action->setToolTip(tr("Quote selected text"));
-		action->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
-		action->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onQuoteActionTriggered(bool)));
-		AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_MESSAGEWIDGETS_QUOTE);
+		AWidget->toolBarChanger()->insertAction(quoteAction,TBG_MWTBW_MESSAGEWIDGETS_QUOTE);
+		AWidget->toolBarChanger()->actionHandle(quoteAction)->setVisible(quoteAction->isVisible());
+		connect(AWidget->messageWindow()->instance(),SIGNAL(widgetLayoutChanged()),SLOT(onMessageWindowWidgetLayoutChanged()));
 	}
 }
+
+Action *MessageWidgets::createQuouteAction(IMessageWindow *AWindow, QObject *AParent)
+{
+	if (AWindow->viewWidget() && AWindow->editWidget())
+	{
+		Action *quoteAction = new Action(AParent);
+		quoteAction->setData(ADR_QUOTE_WINDOW,(qint64)AWindow->instance());
+		quoteAction->setText(tr("Quote Selected Text"));
+		quoteAction->setToolTip(tr("Quote selected text"));
+		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
+		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
+		quoteAction->setVisible(AWindow->viewWidget()->isVisibleOnWindow() && AWindow->editWidget()->isVisibleOnWindow());
+		connect(quoteAction,SIGNAL(triggered(bool)),SLOT(onQuoteActionTriggered(bool)));
+		return quoteAction;
+	}
+	return NULL;
+}
+
 
 void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
 {
@@ -598,10 +589,11 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
 	}
 }
 
-void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu)
+void MessageWidgets::onViewWidgetContextMenuRequested(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu)
 {
 	Q_UNUSED(APosition);
-	if (!AText.isEmpty())
+	IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
+	if (widget && !AText.isEmpty())
 	{
 		Action *copyAction = new Action(AMenu);
 		copyAction->setText(tr("Copy"));
@@ -609,6 +601,10 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, const QTex
 		copyAction->setData(ADR_CONTEXT_DATA,AText.toHtml());
 		connect(copyAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
 		AMenu->addAction(copyAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
+
+		Action *quoteAction = createQuouteAction(widget->messageWindow(),AMenu);
+		if (quoteAction)
+			AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
 
 		QUrl href = TextManager::getTextFragmentHref(AText);
 		if (href.isValid())
@@ -719,16 +715,27 @@ void MessageWidgets::onEditWidgetContentsChanged(int APosition, int ARemoved, in
 	}
 }
 
+void MessageWidgets::onMessageWindowWidgetLayoutChanged()
+{
+	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	if (window && window->toolBarWidget())
+	{
+		QAction *quoteActionHandle = window->toolBarWidget()->toolBarChanger()->groupItems(TBG_MWTBW_MESSAGEWIDGETS_QUOTE).value(0);
+		if (quoteActionHandle)
+			quoteActionHandle->setVisible(window->viewWidget()->isVisibleOnWindow() && window->editWidget()->isVisibleOnWindow());
+	}
+}
+
 void MessageWidgets::onQuoteActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
-	IMessageToolBarWidget *widget = action!=NULL ? qobject_cast<IMessageToolBarWidget *>(action->parent()) : NULL;
-	if (widget && widget->messageWindow()->viewWidget() && widget->messageWindow()->viewWidget()->messageStyle() && widget->messageWindow()->editWidget())
+	IMessageWindow *window = action!=NULL ? qobject_cast<IMessageWindow *>((QWidget *)action->data(ADR_QUOTE_WINDOW).toLongLong()) : NULL;
+	if (window && window->viewWidget() && window->viewWidget()->messageStyle() && window->editWidget())
 	{
-		QTextDocumentFragment fragment = widget->messageWindow()->viewWidget()->messageStyle()->selection(widget->messageWindow()->viewWidget()->styleWidget());
-		fragment = TextManager::getTrimmedTextFragment(widget->messageWindow()->editWidget()->prepareTextFragment(fragment),!widget->messageWindow()->editWidget()->isRichTextEnabled());
-		TextManager::insertQuotedFragment(widget->messageWindow()->editWidget()->textEdit()->textCursor(),fragment);
-		widget->messageWindow()->editWidget()->textEdit()->setFocus();
+		QTextDocumentFragment fragment = window->viewWidget()->messageStyle()->selection(window->viewWidget()->styleWidget());
+		fragment = TextManager::getTrimmedTextFragment(window->editWidget()->prepareTextFragment(fragment),!window->editWidget()->isRichTextEnabled());
+		TextManager::insertQuotedFragment(window->editWidget()->textEdit()->textCursor(),fragment);
+		window->editWidget()->textEdit()->setFocus();
 	}
 }
 
@@ -737,7 +744,7 @@ void MessageWidgets::onAssignedTabPageDestroyed()
 	FAssignedPages.removeAll(qobject_cast<IMessageTabPage *>(sender()));
 }
 
-void MessageWidgets::onMessageWindowDestroyed()
+void MessageWidgets::onNormalWindowDestroyed()
 {
 	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (window)
@@ -808,17 +815,6 @@ void MessageWidgets::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		Options::node(OPV_MESSAGES_COMBINEWITHROSTER).setValue(!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool());
 	}
-}
-
-void MessageWidgets::onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter)
-{
-	if (!(AAfter && AXmppStream->streamJid()))
-		deleteMessageWindows(AXmppStream->streamJid());
-}
-
-void MessageWidgets::onStreamRemoved(IXmppStream *AXmppStream)
-{
-	deleteMessageWindows(AXmppStream->streamJid());
 }
 
 void MessageWidgets::onOptionsOpened()
@@ -903,9 +899,7 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 		{
 			IMessageTabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
 			if (window)
-			{
 				window->setTabBarVisible(ANode.value().toBool());
-			}
 		}
 	}
 }

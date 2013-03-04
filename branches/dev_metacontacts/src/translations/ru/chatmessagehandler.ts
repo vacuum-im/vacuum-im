@@ -61,12 +61,12 @@
         <translation>Не удалось загрузить историю: %1</translation>
     </message>
     <message>
-        <source>&lt;Empty&gt;</source>
-        <translation>&lt;Пустой&gt;</translation>
+        <source>Contact resource</source>
+        <translation>Ресурс контакта</translation>
     </message>
     <message>
-        <source>&lt;Disconnected&gt;</source>
-        <translation>&lt;Отключен&gt;</translation>
+        <source>&lt;Absent&gt;</source>
+        <translation>&lt;Отсутствует&gt;</translation>
     </message>
 </context>
 </TS>

@@ -15,7 +15,6 @@
 #define ADR_USER_NICK               Action::DR_Parametr4
 #define ADR_USER_ROLE               Action::DR_UserDefined + 1
 #define ADR_USER_AFFIL              Action::DR_UserDefined + 2
-#define ADR_SELECTED_TEXT           Action::DR_Parametr1
 
 #define NICK_MENU_KEY               Qt::Key_Tab
 
@@ -811,8 +810,6 @@ void MultiUserChatWindow::createMessageWidgets()
 		ui.wdtView->setLayout(new QVBoxLayout);
 		ui.wdtView->layout()->setMargin(0);
 		FViewWidget = FMessageWidgets->newViewWidget(this,ui.wdtView);
-		connect(FViewWidget->instance(),SIGNAL(viewContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)),
-			SLOT(onMultiChatViewWidgetContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)));
 		ui.wdtView->layout()->addWidget(FViewWidget->instance());
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
@@ -2088,33 +2085,6 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 	else
 	{
 		FCompleteIt = FCompleteNicks.constEnd();
-	}
-}
-
-void MultiUserChatWindow::onMultiChatViewContextQuoteActionTriggered(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-	{
-		QTextDocumentFragment fragment = QTextDocumentFragment::fromHtml(action->data(ADR_SELECTED_TEXT).toString());
-		fragment = TextManager::getTrimmedTextFragment(editWidget()->prepareTextFragment(fragment),!editWidget()->isRichTextEnabled());
-		TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
-		editWidget()->textEdit()->setFocus();
-	}
-}
-
-void MultiUserChatWindow::onMultiChatViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu)
-{
-	Q_UNUSED(APosition);
-	if (!AText.toPlainText().trimmed().isEmpty())
-	{
-		Action *quoteAction = new Action(AMenu);
-		quoteAction->setText(tr("Quote Selected Text"));
-		quoteAction->setData(ADR_SELECTED_TEXT, AText.toHtml());
-		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
-		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
-		connect(quoteAction,SIGNAL(triggered(bool)),SLOT(onMultiChatViewContextQuoteActionTriggered(bool)));
-		AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
 	}
 }
 

@@ -23,7 +23,7 @@ class NormalWindow :
 	Q_OBJECT;
 	Q_INTERFACES(IMessageWindow IMessageNormalWindow IMessageTabPage);
 public:
-	NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode);
+	NormalWindow(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, Mode AMode);
 	virtual ~NormalWindow();
 	virtual QMainWindow *instance() { return this; }
 	// IMessageWindow
@@ -54,7 +54,7 @@ public:
 	virtual void addTabWidget(QWidget *AWidget);
 	virtual void setCurrentTabWidget(QWidget *AWidget);
 	virtual void removeTabWidget(QWidget *AWidget);
-	virtual Mode mode() const { return FMode; }
+	virtual Mode mode() const;
 	virtual void setMode(Mode AMode);
 	virtual QString subject() const;
 	virtual void setSubject(const QString &ASubject);
@@ -62,8 +62,6 @@ public:
 	virtual void setThreadId(const QString &AThreadId);
 	virtual int nextCount() const;
 	virtual void setNextCount(int ACount);
-	virtual IMessageToolBarWidget *viewToolBarWidget() const;
-	virtual IMessageToolBarWidget *editToolBarWidget() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	// ITabWindowPage
@@ -77,6 +75,8 @@ signals:
 	void tabPageDeactivated();
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
+	// IMessageWindow
+	void widgetLayoutChanged();
 	// IMessageNormalWindow
 	void showNextMessage();
 	void replyMessage();
@@ -108,8 +108,7 @@ private:
 	IMessageEditWidget *FEditWidget;
 	IMessageReceiversWidget *FReceiversWidget;
 	IMessageMenuBarWidget *FMenuBarWidget;
-	IMessageToolBarWidget *FViewToolBarWidget;
-	IMessageToolBarWidget *FEditToolBarWidget;
+	IMessageToolBarWidget *FToolBarWidget;
 	IMessageStatusBarWidget *FStatusBarWidget;
 	IMessageTabPageNotifier *FTabPageNotifier;
 	IMessageWidgets *FMessageWidgets;

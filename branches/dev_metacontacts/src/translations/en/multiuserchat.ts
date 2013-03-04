@@ -979,10 +979,6 @@ Check values and try again</translation>
         <translation>Clear Chat Window</translation>
     </message>
     <message>
-        <source>Quote Selected Text</source>
-        <translation>Quote Selected Text</translation>
-    </message>
-    <message>
         <source>Enter your new nick name in conference %1</source>
         <translation>Enter your new nick name in conference %1</translation>
     </message>
@@ -1000,19 +996,19 @@ Check values and try again</translation>
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Role:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Affiliation:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Status:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

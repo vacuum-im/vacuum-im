@@ -157,12 +157,12 @@ protected slots:
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
 protected slots:
 	void onStatusIconsChanged();
-	void onRosterIndexDestroyed(IRosterIndex *AIndex);
-	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onJoinRoomActionTriggered(bool);
 	void onOpenRoomActionTriggered(bool);
 	void onEnterRoomActionTriggered(bool);
 	void onExitRoomActionTriggered(bool);
+	void onRosterIndexDestroyed(IRosterIndex *AIndex);
+	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);

@@ -2,24 +2,10 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>ChatWindow</name>
-    <message>
-        <source>Quote selected text</source>
-        <translation>Цитувати виділений текст</translation>
-    </message>
-</context>
-<context>
     <name>EditWidget</name>
     <message>
         <source>Send</source>
         <translation>Відіслати</translation>
-    </message>
-</context>
-<context>
-    <name>InfoWidget</name>
-    <message>
-        <source>Contact address</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -228,6 +214,10 @@
     </message>
     <message>
         <source>Show tabs in combined message windows with contact-list mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Quote Selected Text</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

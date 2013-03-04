@@ -11,6 +11,11 @@ StatusBarWidget::~StatusBarWidget()
 
 }
 
+bool StatusBarWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
 IMessageWindow *StatusBarWidget::messageWindow() const
 {
 	return FWindow;

@@ -21,6 +21,7 @@ public:
 	~ViewWidget();
 	//IMessageWidget
 	virtual QWidget *instance() { return this; }
+	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	//IMessageViewWidget
 	virtual QWidget *styleWidget() const;
@@ -33,7 +34,7 @@ public:
 signals:
 	void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
 	void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
-	void viewContextMenu(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
+	void contextMenuRequested(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
 	void urlClicked(const QUrl &AUrl) const;
 protected:
 	void initialize();

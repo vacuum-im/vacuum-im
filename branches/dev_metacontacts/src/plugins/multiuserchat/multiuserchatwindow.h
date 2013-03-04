@@ -113,6 +113,8 @@ signals:
 	void tabPageDeactivated();
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
+	// IMessageWindow
+	void widgetLayoutChanged();
 	//IMultiUserChatWindow
 	void multiChatContextMenu(Menu *AMenu);
 	void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
@@ -186,8 +188,6 @@ protected slots:
 	void onMultiChatMessageAboutToBeSend();
 	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
 	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
-	void onMultiChatViewContextQuoteActionTriggered(bool);
-	void onMultiChatViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
 	void onMultiChatWindowActivated();
 	void onMultiChatHorizontalSplitterMoved(int APos, int AIndex);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);

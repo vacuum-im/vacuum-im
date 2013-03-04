@@ -42,6 +42,7 @@ class IMessageWidget
 {
 public:
 	virtual QWidget *instance() = 0;
+	virtual bool isVisibleOnWindow() const =0;
 	virtual IMessageWindow *messageWindow() const =0;
 };
 
@@ -87,7 +88,7 @@ public:
 protected:
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
-	virtual void viewContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu) =0;
+	virtual void contextMenuRequested(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu) =0;
 	virtual void urlClicked(const QUrl &AUrl) const =0;
 };
 
@@ -123,7 +124,7 @@ protected:
 	virtual void minimumLinesChanged(int ALines) =0;
 	virtual void sendShortcutChanged(const QString &AShortcutId) =0;
 	virtual void richTextEnableChanged(bool AEnabled) =0;
-	virtual void editContextMenu(const QPoint &APosition, Menu *AMenu) =0;
+	virtual void contextMenuRequested(const QPoint &APosition, Menu *AMenu) =0;
 };
 
 class IMessageReceiversWidget :
@@ -273,6 +274,8 @@ public:
 	virtual IMessageToolBarWidget *toolBarWidget() const =0;
 	virtual IMessageStatusBarWidget *statusBarWidget() const =0;
 	virtual IMessageReceiversWidget *receiversWidget() const =0;
+protected:
+	virtual void widgetLayoutChanged() =0;
 };
 
 class IMessageNormalWindow :
@@ -296,8 +299,6 @@ public:
 	virtual void setThreadId(const QString &AThreadId) =0;
 	virtual int nextCount() const =0;
 	virtual void setNextCount(int ACount) =0;
-	virtual IMessageToolBarWidget *viewToolBarWidget() const =0;
-	virtual IMessageToolBarWidget *editToolBarWidget() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 protected:
 	virtual void showNextMessage() =0;

@@ -23,6 +23,7 @@ public:
 	~EditWidget();
 	// IMessageWidget
 	virtual QWidget *instance() { return this; }
+	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	// IMessageEditWidget
 	virtual QTextEdit *textEdit() const;
@@ -53,7 +54,7 @@ signals:
 	void minimumLinesChanged(int ALines);
 	void sendShortcutChanged(const QString &AShortcutId);
 	void richTextEnableChanged(bool AEnabled);
-	void editContextMenu(const QPoint &APosition, Menu *AMenu);
+	void contextMenuRequested(const QPoint &APosition, Menu *AMenu);
 	// EditWidget
 	void createDataRequest(QMimeData *ADestination) const;
 	void canInsertDataRequest(const QMimeData *AData, bool &ACanInsert) const;

@@ -14,6 +14,11 @@ MenuBarWidget::~MenuBarWidget()
 
 }
 
+bool MenuBarWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
 IMessageWindow *MenuBarWidget::messageWindow() const
 {
 	return FWindow;

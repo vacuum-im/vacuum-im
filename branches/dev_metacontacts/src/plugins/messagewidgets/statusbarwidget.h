@@ -15,6 +15,7 @@ public:
 	~StatusBarWidget();
 	// IMessageWidget
 	virtual QStatusBar *instance() { return this; }
+	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	// IMessageStatusBarWidget
 	virtual StatusBarChanger *statusBarChanger() const;

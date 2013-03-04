@@ -23,8 +23,7 @@
 #include "selecticonmenu.h"
 #include "emoticonsoptions.h"
 
-struct EmoticonTreeItem
-{
+struct EmoticonTreeItem {
 	QUrl url;
 	QMap<QChar, EmoticonTreeItem *> childs;
 };
@@ -77,6 +76,7 @@ protected:
 	void insertSelectIconMenu(const QString &ASubStorage);
 	void removeSelectIconMenu(const QString &ASubStorage);
 protected slots:
+	void onToolBarWindowLayoutChanged();
 	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onToolBarWidgetDestroyed(QObject *AObject);
 	void onIconSelected(const QString &ASubStorage, const QString &AIconKey);

@@ -33,7 +33,6 @@ protected:
 protected slots:
 	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
-	void onPresenceRemoved(IPresence *APresence);
 private:
 	IXmppStreams *FXmppStreams;
 	IMessageWidgets *FMessageWidgets;

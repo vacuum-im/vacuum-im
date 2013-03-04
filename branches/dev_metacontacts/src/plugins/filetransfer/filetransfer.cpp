@@ -530,34 +530,26 @@ void FileTransfer::autoStartStream(IFileStream *AStream)
 	}
 }
 
-void FileTransfer::insertToolBarAction(IMessageToolBarWidget *AWidget)
+void FileTransfer::updateToolBarAction(IMessageToolBarWidget *AWidget)
 {
-	if (FToolBarActions.value(AWidget) == NULL)
+	Action *fileAction = FToolBarActions.value(AWidget,NULL);
+	bool supported = isSupported(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid());
+	if (supported && fileAction==NULL)
 	{
-		Action *action = NULL;
-		if (isSupported(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid()))
-		{
-			action = new Action(AWidget->toolBarChanger()->toolBar());
-			action->setIcon(RSR_STORAGE_MENUICONS, MNI_FILETRANSFER_SEND);
-			action->setText(tr("Send File"));
-			action->setShortcutId(SCT_MESSAGEWINDOWS_SENDFILE);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
-			AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_FILETRANSFER);
-		}
-		FToolBarActions.insert(AWidget, action);
+		fileAction = new Action(AWidget->toolBarChanger()->toolBar());
+		fileAction->setIcon(RSR_STORAGE_MENUICONS, MNI_FILETRANSFER_SEND);
+		fileAction->setText(tr("Send File"));
+		fileAction->setShortcutId(SCT_MESSAGEWINDOWS_SENDFILE);
+		connect(fileAction,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
+		AWidget->toolBarChanger()->insertAction(fileAction,TBG_MWTBW_FILETRANSFER);
 	}
-	else
+	else if (!supported && fileAction!=NULL)
 	{
-		FToolBarActions.value(AWidget)->setEnabled(true);
+		fileAction->deleteLater();
+		AWidget->toolBarChanger()->removeItem(AWidget->toolBarChanger()->actionHandle(fileAction));
+		fileAction = NULL;
 	}
-}
-
-void FileTransfer::removeToolBarAction(IMessageToolBarWidget *AWidget)
-{
-	if (FToolBarActions.value(AWidget)!=NULL)
-	{
-		FToolBarActions.value(AWidget)->setEnabled(false);
-	}
+	FToolBarActions.insert(AWidget,fileAction);
 }
 
 QList<IMessageToolBarWidget *> FileTransfer::findToolBarWidgets(const Jid &AContactJid) const
@@ -707,28 +699,20 @@ void FileTransfer::onNotificationRemoved(int ANotifyId)
 void FileTransfer::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
 	foreach(IMessageToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
-	{
-		if (isSupported(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()))
-			insertToolBarAction(widget);
-		else
-			removeToolBarAction(widget);
-	}
+		updateToolBarAction(widget);
 }
 
 void FileTransfer::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
 {
 	foreach(IMessageToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
-		removeToolBarAction(widget);
+		updateToolBarAction(widget);
 }
 
 void FileTransfer::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
 {
-	if (AWidget->messageWindow()->editWidget() != NULL)
-	{
-		insertToolBarAction(AWidget);
-		connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
-		connect(AWidget->messageWindow()->address()->instance(),SIGNAL(addressChanged(const Jid &,const Jid &)),SLOT(onToolBarWidgetAddressChanged(const Jid &,const Jid &)));
-	}
+	updateToolBarAction(AWidget);
+	connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
+	connect(AWidget->messageWindow()->address()->instance(),SIGNAL(addressChanged(const Jid &,const Jid &)),SLOT(onToolBarWidgetAddressChanged(const Jid &,const Jid &)));
 }
 
 void FileTransfer::onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
@@ -737,16 +721,9 @@ void FileTransfer::onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const
 	IMessageAddress *address = qobject_cast<IMessageAddress *>(sender());
 	if (address)
 	{
-		foreach(IMessageToolBarWidget *widget, findToolBarWidgets(address->contactJid()))
-		{
+		foreach(IMessageToolBarWidget *widget, FToolBarActions.keys())
 			if (widget->messageWindow()->address() == address)
-			{
-				if (isSupported(address->streamJid(),address->contactJid()))
-					insertToolBarAction(widget);
-				else
-					removeToolBarAction(widget);
-			}
-		}
+				updateToolBarAction(widget);
 	}
 }
 

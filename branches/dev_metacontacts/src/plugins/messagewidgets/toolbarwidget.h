@@ -15,6 +15,7 @@ public:
 	~ToolBarWidget();
 	// IMessageWidget
 	virtual QToolBar *instance() { return this; }
+	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	// IMessageToolBarWidget
 	virtual ToolBarChanger *toolBarChanger() const;

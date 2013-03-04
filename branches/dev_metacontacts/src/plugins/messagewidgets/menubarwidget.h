@@ -15,6 +15,7 @@ public:
 	~MenuBarWidget();
 	// IMessageWidget
 	virtual QMenuBar *instance() { return this; }
+	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	// IMessageMenuBarWidget
 	virtual MenuBarChanger *menuBarChanger() const;

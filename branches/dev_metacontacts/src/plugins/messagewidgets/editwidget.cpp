@@ -63,6 +63,11 @@ EditWidget::~EditWidget()
 
 }
 
+bool EditWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
 IMessageWindow *EditWidget::messageWindow() const
 {
 	return FWindow;
@@ -166,7 +171,7 @@ void EditWidget::contextMenuForEdit(const QPoint &APosition, Menu *AMenu)
 	QMenu *stdMenu = ui.medEditor->createStandardContextMenu(APosition);
 	Menu::copyStandardMenu(AMenu,stdMenu,AG_EWCM_MESSAGEWIDGETS_DEFAULT);
 	connect(AMenu,SIGNAL(destroyed(QObject *)),stdMenu,SLOT(deleteLater()));
-	emit editContextMenu(APosition,AMenu);
+	emit contextMenuRequested(APosition,AMenu);
 }
 
 void EditWidget::insertTextFragment(const QTextDocumentFragment &AFragment)

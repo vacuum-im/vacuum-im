@@ -7,6 +7,7 @@
 #include <QHelpEvent>
 #include <QHBoxLayout>
 #include <QContextMenuEvent>
+#include <definitions/toolbargroups.h>
 #include <utils/textmanager.h>
 
 #define ADR_STREAM_JID           Action::DR_StreamJid
@@ -22,6 +23,7 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	FAddressMenuVisible = false;
 	ui.lblAvatar->setVisible(false);
 	ui.lblIcon->setVisible(false);
+	ui.wdtInfoToolBar->setVisible(false);
 
 	QToolBar *toolBar = new QToolBar;
 	toolBar->setMovable(false);
@@ -40,7 +42,6 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	ui.wdtInfoToolBar->layout()->addWidget(toolBar);
 
 	FAddressMenu = new Menu(this);
-	FAddressMenu->menuAction()->setToolTip(tr("Contact address"));
 	connect(FAddressMenu,SIGNAL(aboutToShow()),SLOT(onAddressMenuAboutToShow()));
 
 	initialize();
@@ -49,6 +50,11 @@ InfoWidget::InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 InfoWidget::~InfoWidget()
 {
 
+}
+
+bool InfoWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
 }
 
 IMessageWindow *InfoWidget::messageWindow() const
@@ -78,7 +84,7 @@ void InfoWidget::setAddressMenuVisible(bool AVisible)
 		FAddressMenuVisible = AVisible;
 		if (AVisible)
 		{
-			QToolButton *button = FInfoToolBar->insertAction(FAddressMenu->menuAction());
+			QToolButton *button = FInfoToolBar->insertAction(FAddressMenu->menuAction(),TBG_MWIWTB_ADDRESSMENU);
 			button->setPopupMode(QToolButton::InstantPopup);
 			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 		}
@@ -264,6 +270,7 @@ void InfoWidget::onUpdateInfoToolBarMaxWidth()
 {
 	int widgetWidth = 0;
 	int visibleItemsCount = 0;
+	ui.wdtInfoToolBar->setVisible(!FInfoToolBar->isEmpty());
 	for (int itemIndex=0; visibleItemsCount<2 && itemIndex<FInfoToolBar->toolBar()->layout()->count(); itemIndex++)
 	{
 		QWidget *widget = FInfoToolBar->toolBar()->layout()->itemAt(itemIndex)->widget();

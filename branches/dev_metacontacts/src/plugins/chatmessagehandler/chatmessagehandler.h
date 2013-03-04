@@ -122,6 +122,7 @@ protected slots:
 	void onShowWindowAction(bool);
 	void onClearWindowAction(bool);
 	void onChangeWindowAddressAction();
+	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);

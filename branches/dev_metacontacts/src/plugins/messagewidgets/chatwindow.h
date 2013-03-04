@@ -63,6 +63,8 @@ signals:
 	void tabPageDeactivated();
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
+	// IMessageWindow
+	void widgetLayoutChanged();
 	// IMessageChatWindow
 	void messageReady();
 protected:
@@ -75,8 +77,6 @@ protected:
 protected slots:
 	void onMessageReady();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onViewContextQuoteActionTriggered(bool);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
 private:
 	Ui::ChatWindowClass ui;
 private:

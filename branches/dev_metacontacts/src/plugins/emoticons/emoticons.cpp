@@ -417,7 +417,6 @@ void Emoticons::insertSelectIconMenu(const QString &ASubStorage)
 		SelectIconMenu *menu = createSelectIconMenu(ASubStorage,widget->instance());
 		FToolBarWidgetByMenu.insert(menu,widget);
 		QToolButton *button = widget->toolBarChanger()->insertAction(menu->menuAction(),TBG_MWTBW_EMOTICONS);
-		button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 		button->setPopupMode(QToolButton::InstantPopup);
 	}
 }
@@ -440,20 +439,33 @@ void Emoticons::removeSelectIconMenu(const QString &ASubStorage)
 	}
 }
 
+void Emoticons::onToolBarWindowLayoutChanged()
+{
+	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	if (window && window->toolBarWidget())
+	{
+		foreach(QAction *handle, window->toolBarWidget()->toolBarChanger()->groupItems(TBG_MWTBW_EMOTICONS))
+			handle->setVisible(window->editWidget()->isVisibleOnWindow());
+	}
+}
+
 void Emoticons::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
 {
-	if (AWidget->messageWindow()->editWidget() != NULL)
+	if (AWidget->messageWindow()->editWidget())
 	{
 		FToolBarsWidgets.append(AWidget);
-		foreach(QString substorage, activeIconsets())
+		if (AWidget->messageWindow()->editWidget()->isVisibleOnWindow())
 		{
-			SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
-			FToolBarWidgetByMenu.insert(menu,AWidget);
-			QToolButton *button = AWidget->toolBarChanger()->insertAction(menu->menuAction(),TBG_MWTBW_EMOTICONS);
-			button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-			button->setPopupMode(QToolButton::InstantPopup);
+			foreach(QString substorage, activeIconsets())
+			{
+				SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
+				FToolBarWidgetByMenu.insert(menu,AWidget);
+				QToolButton *button = AWidget->toolBarChanger()->insertAction(menu->menuAction(),TBG_MWTBW_EMOTICONS);
+				button->setPopupMode(QToolButton::InstantPopup);
+			}
 		}
 		connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
+		connect(AWidget->messageWindow()->instance(),SIGNAL(widgetLayoutChanged()),SLOT(onToolBarWindowLayoutChanged()));
 	}
 }
 

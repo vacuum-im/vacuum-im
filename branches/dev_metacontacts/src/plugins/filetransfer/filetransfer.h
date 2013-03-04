@@ -94,8 +94,7 @@ protected:
 	void registerDiscoFeatures();
 	void notifyStream(IFileStream *AStream, bool ANewStream = false);
 	void autoStartStream(IFileStream *AStream);
-	void insertToolBarAction(IMessageToolBarWidget *AWidget);
-	void removeToolBarAction(IMessageToolBarWidget *AWidget);
+	void updateToolBarAction(IMessageToolBarWidget *AWidget);
 	QList<IMessageToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
 	StreamDialog *getStreamDialog(IFileStream *ASession);
 	IFileStream *createStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind);

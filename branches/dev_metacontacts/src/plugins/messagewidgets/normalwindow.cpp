@@ -33,10 +33,9 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 
 	ui.wdtToolBar->setLayout(new QVBoxLayout(ui.wdtToolBar));
 	ui.wdtToolBar->layout()->setMargin(0);
-	FViewToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.wdtToolBar);
-	FViewToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-	FEditToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.wdtToolBar);
-	FEditToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
+	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.wdtToolBar);
+	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
+	ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
 
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(this,ui.wdtTabs);
 	connect(FReceiversWidget->instance(),SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
@@ -58,9 +57,9 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
-	setCurrentTabWidget(ui.tabMessage);
 	setMode(AMode);
 	setNextCount(FNextCount);
+	setCurrentTabWidget(ui.tabMessage);
 }
 
 NormalWindow::~NormalWindow()
@@ -71,8 +70,7 @@ NormalWindow::~NormalWindow()
 	delete FEditWidget->instance();
 	delete FReceiversWidget->instance();
 	delete FMenuBarWidget->instance();
-	delete FViewToolBarWidget->instance();
-	delete FEditToolBarWidget->instance();
+	delete FToolBarWidget->instance();
 	delete FStatusBarWidget->instance();
 }
 
@@ -113,7 +111,7 @@ IMessageMenuBarWidget *NormalWindow::menuBarWidget() const
 
 IMessageToolBarWidget *NormalWindow::toolBarWidget() const
 {
-	return FMode==ReadMode ? FViewToolBarWidget : FEditToolBarWidget;
+	return FToolBarWidget;
 }
 
 IMessageStatusBarWidget *NormalWindow::statusBarWidget() const
@@ -124,16 +122,6 @@ IMessageStatusBarWidget *NormalWindow::statusBarWidget() const
 IMessageReceiversWidget *NormalWindow::receiversWidget() const
 {
 	return FReceiversWidget;
-}
-
-IMessageToolBarWidget *NormalWindow::viewToolBarWidget() const
-{
-	return FViewToolBarWidget;
-}
-
-IMessageToolBarWidget *NormalWindow::editToolBarWidget() const
-{
-	return FEditToolBarWidget;
 }
 
 QString NormalWindow::tabPageId() const
@@ -232,29 +220,29 @@ void NormalWindow::removeTabWidget(QWidget *AWidget)
 	ui.wdtTabs->removeTab(ui.wdtTabs->indexOf(AWidget));
 }
 
+IMessageNormalWindow::Mode NormalWindow::mode() const
+{
+	return FMode;
+}
+
 void NormalWindow::setMode(Mode AMode)
 {
 	FMode = AMode;
 	if (AMode == ReadMode)
 	{
-		ui.wdtMessage->layout()->removeWidget(FEditWidget->instance());
 		ui.wdtMessage->layout()->addWidget(FViewWidget->instance());
-		ui.wdtToolBar->layout()->removeWidget(FEditToolBarWidget->instance());
-		ui.wdtToolBar->layout()->addWidget(FViewToolBarWidget->instance());
+		ui.wdtMessage->layout()->removeWidget(FEditWidget->instance());
 		FEditWidget->instance()->setParent(NULL);
-		FEditToolBarWidget->instance()->setParent(NULL);
 		removeTabWidget(FReceiversWidget->instance());
 	}
 	else
 	{
-		ui.wdtMessage->layout()->removeWidget(FViewWidget->instance());
 		ui.wdtMessage->layout()->addWidget(FEditWidget->instance());
-		ui.wdtToolBar->layout()->removeWidget(FViewToolBarWidget->instance());
-		ui.wdtToolBar->layout()->addWidget(FEditToolBarWidget->instance());
+		ui.wdtMessage->layout()->removeWidget(FViewWidget->instance());
 		FViewWidget->instance()->setParent(NULL);
-		FViewToolBarWidget->instance()->setParent(NULL);
 		addTabWidget(FReceiversWidget->instance());
 	}
+
 	ui.wdtReceivers->setVisible(FMode == WriteMode);
 	ui.wdtInfo->setVisible(FMode == ReadMode);
 	ui.wdtSubject->setVisible(FMode == WriteMode);
@@ -262,6 +250,8 @@ void NormalWindow::setMode(Mode AMode)
 	ui.pbtReply->setVisible(FMode == ReadMode);
 	ui.pbtForward->setVisible(FMode == ReadMode);
 	ui.pbtChat->setVisible(FMode == ReadMode);
+
+	QTimer::singleShot(0,this,SIGNAL(widgetLayoutChanged()));
 }
 
 QString NormalWindow::subject() const

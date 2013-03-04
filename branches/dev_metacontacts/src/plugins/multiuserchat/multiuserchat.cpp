@@ -626,7 +626,7 @@ void MultiUserChat::initialize()
 			shandle.conditions.append(SHC_PRESENCE);
 			FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
 
-			if (FMessageProcessor == NULL)
+			if (FMessageProcessor==NULL || !FMessageProcessor->isActiveStream(streamJid()))
 			{
 				shandle.conditions.clear();
 				shandle.order = SHO_MI_MULTIUSERCHAT;
@@ -660,8 +660,8 @@ void MultiUserChat::initialize()
 			FXmppStream = xmppStreams->xmppStream(FStreamJid);
 			if (FXmppStream)
 			{
-				connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
 				connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
+				connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
 			}
 		}
 	}

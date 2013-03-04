@@ -47,7 +47,13 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+		if (FMessageProcessor)
+		{
+			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
 	if (plugin)
@@ -177,12 +183,15 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 		if (type.isEmpty() || type=="normal")
 		{
 			IMessageNormalWindow *window = getWindow(AStreamJid, AContactJid, IMessageNormalWindow::WriteMode);
-			if (AParams.contains("thread"))
-				window->setThreadId(AParams.value("thread"));
-			window->setSubject(AParams.value("subject"));
-			window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
-			window->showTabPage();
-			return true;
+			if (window)
+			{
+				if (AParams.contains("thread"))
+					window->setThreadId(AParams.value("thread"));
+				window->setSubject(AParams.value("subject"));
+				window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
+				window->showTabPage();
+				return true;
+			}
 		}
 	}
 	return false;
@@ -331,7 +340,7 @@ QMultiMap<int, IOptionsWidget *> NormalMessageHandler::optionsWidgets(const QStr
 IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode)
 {
 	IMessageNormalWindow *window = NULL;
-	if (AStreamJid.isValid() && (AContactJid.isValid() || AMode==IMessageNormalWindow::WriteMode))
+	if (FMessageProcessor && FMessageProcessor->isActiveStream(AStreamJid) && (AContactJid.isValid() || AMode==IMessageNormalWindow::WriteMode))
 	{
 		window = FMessageWidgets->getNormalWindow(AStreamJid,AContactJid,AMode);
 		if (window)
@@ -719,6 +728,12 @@ void NormalMessageHandler::onShowWindowAction(bool)
 			}
 		}
 	}
+}
+
+void NormalMessageHandler::onActiveStreamRemoved(const Jid &AStreamJid)
+{
+	foreach(IMessageNormalWindow *window, FWindows)
+		window->address()->removeAddress(AStreamJid);
 }
 
 void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)

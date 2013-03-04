@@ -12,6 +12,11 @@ ToolBarWidget::~ToolBarWidget()
 
 }
 
+bool ToolBarWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
 IMessageWindow *ToolBarWidget::messageWindow() const
 {
 	return FWindow;
