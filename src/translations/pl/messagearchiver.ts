@@ -422,15 +422,19 @@
         <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Search in text</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ArchiveViewWindowClass</name>
     <message>
+        <source>Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -645,22 +649,6 @@
     </message>
     <message>
         <source>Save Only Messages Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to load conversation headers</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save conversation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to remove conversation</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to load archive modifications</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

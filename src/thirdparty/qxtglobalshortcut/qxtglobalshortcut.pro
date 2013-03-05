@@ -1,4 +1,4 @@
-include(../../make/config.inc)
+include(../../config.inc)
 
 TARGET         = qxtglobalshortcut
 TEMPLATE       = lib

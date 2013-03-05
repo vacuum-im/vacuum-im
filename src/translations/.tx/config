@@ -1,5 +1,5 @@
 [main]
-host = https://www.transifex.com
+host = http://www.transifex.net
 
 [vacuum-im.rosterchangerts]
 file_filter = <lang>/rosterchanger.ts
@@ -255,16 +255,4 @@ source_lang = ru
 
 [vacuum-im.rosteritemexchangets]
 file_filter = <lang>/rosteritemexchange.ts
-source_lang = ru
-
-[vacuum-im.spellcheckerts]
-file_filter = <lang>/spellchecker.ts
-source_lang = ru
-
-[vacuum-im.messagecarbonsts]
-file_filter = <lang>/messagecarbons.ts
-source_lang = ru
-
-[vacuum-im.recentcontactsts]
-file_filter = <lang>/recentcontacts.ts
 source_lang = ru

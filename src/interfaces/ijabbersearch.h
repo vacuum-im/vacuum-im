@@ -3,7 +3,6 @@
 
 #include <interfaces/idataforms.h>
 #include <utils/jid.h>
-#include <utils/xmpperror.h>
 
 #define JABBERSEARCH_UUID "{F66BCFC9-F6BB-43b2-8101-8CA41EF227AF}"
 
@@ -55,9 +54,9 @@ public:
 protected:
 	virtual void searchFields(const QString &AId, const ISearchFields &AFields) =0;
 	virtual void searchResult(const QString &AId, const ISearchResult &AResult) =0;
-	virtual void searchError(const QString &AId, const XmppError &AError) =0;
+	virtual void searchError(const QString &AId, const QString &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IJabberSearch,"Vacuum.Plugin.IJabberSearch/1.1")
+Q_DECLARE_INTERFACE(IJabberSearch,"Vacuum.Plugin.IJabberSearch/1.0")
 
 #endif

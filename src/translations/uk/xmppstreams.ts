@@ -15,6 +15,26 @@
         <source>Connection not specified</source>
         <translation>З&apos;єднання не визначене</translation>
     </message>
+    <message>
+        <source>XMPP connection timed out</source>
+        <translation>Перевищений час встановлення з&apos;єднання XMPP</translation>
+    </message>
+    <message>
+        <source>Failed to start connection</source>
+        <translation>Не вдалося запустити з&apos;єднання</translation>
+    </message>
+    <message>
+        <source>Connection closed unexpectedly</source>
+        <translation>З&apos;єднання несподівано завершено</translation>
+    </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Захищене з&apos;єднання не встановлено</translation>
+    </message>
+    <message>
+        <source>XMPP stream destroyed</source>
+        <translation>XMPP-потік видалено</translation>
+    </message>
 </context>
 <context>
     <name>XmppStreams</name>
@@ -25,22 +45,6 @@
     <message>
         <source>Allows other modules to create XMPP streams and get access to them</source>
         <translation>Дозволяє іншим модулям створювати XMPP-потоки та отримувати доступ до них</translation>
-    </message>
-    <message>
-        <source>XMPP stream destroyed</source>
-        <translation>XMPP-потік видалено</translation>
-    </message>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Захищене з&apos;єднання не встановлено</translation>
-    </message>
-    <message>
-        <source>Connection closed unexpectedly</source>
-        <translation>З&apos;єднання несподівано завершено</translation>
-    </message>
-    <message>
-        <source>Failed to start connection</source>
-        <translation>Не вдалося запустити з&apos;єднання</translation>
     </message>
 </context>
 </TS>

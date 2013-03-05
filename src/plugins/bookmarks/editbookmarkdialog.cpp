@@ -2,28 +2,27 @@
 
 #include <QMessageBox>
 
-EditBookmarkDialog::EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) : QDialog(AParent)
+EditBookmarkDialog::EditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_BOOKMARKS_EDIT,0,0,"windowIcon");
 
 	FBookmark = ABookmark;
 	ui.lneName->setText(ABookmark->name);
-	if (ABookmark->type == IBookmark::Conference)
+	if (!ABookmark->conference.isEmpty())
 	{
 		ui.grbURL->setChecked(false);
 		ui.grbConference->setChecked(true);
-		ui.lneRoom->setText(ABookmark->conference.roomJid.uBare());
-		ui.lneNick->setText(ABookmark->conference.nick);
-		ui.lnePassword->setText(ABookmark->conference.password);
-		ui.chbAutoJoin->setChecked(ABookmark->conference.autojoin);
+		ui.lneRoom->setText(Jid(ABookmark->conference).uBare());
+		ui.lneNick->setText(ABookmark->nick);
+		ui.lnePassword->setText(ABookmark->password);
+		ui.chbAutoJoin->setChecked(ABookmark->autojoin);
 	}
-	else if (ABookmark->type == IBookmark::Url)
+	else
 	{
 		ui.grbURL->setChecked(true);
 		ui.grbConference->setChecked(false);
-		ui.lneUrl->setText(ABookmark->url.url.toString());
+		ui.lneUrl->setText(ABookmark->url);
 	}
 
 	connect(ui.grbConference,SIGNAL(clicked(bool)),SLOT(onGroupBoxClicked(bool)));
@@ -54,12 +53,12 @@ void EditBookmarkDialog::onDialogAccepted()
 		{
 			if (!ui.lneRoom->text().isEmpty())
 			{
-				FBookmark->type = IBookmark::Conference;
 				FBookmark->name = ui.lneName->text();
-				FBookmark->conference.roomJid = Jid::fromUserInput(ui.lneRoom->text()).bare();
-				FBookmark->conference.nick = ui.lneNick->text();
-				FBookmark->conference.password = ui.lnePassword->text();
-				FBookmark->conference.autojoin = ui.chbAutoJoin->isChecked();
+				FBookmark->conference = Jid::fromUserInput(ui.lneRoom->text()).bare();
+				FBookmark->nick = ui.lneNick->text();
+				FBookmark->password = ui.lnePassword->text();
+				FBookmark->autojoin = ui.chbAutoJoin->isChecked();
+				FBookmark->url = QString::null;
 				accept();
 			}
 			else
@@ -71,9 +70,12 @@ void EditBookmarkDialog::onDialogAccepted()
 		{
 			if (!ui.lneUrl->text().isEmpty())
 			{
-				FBookmark->type = IBookmark::Url;
 				FBookmark->name = ui.lneName->text();
-				FBookmark->url.url = QUrl::fromUserInput(ui.lneUrl->text());
+				FBookmark->url = ui.lneUrl->text();
+				FBookmark->conference = QString::null;
+				FBookmark->nick = QString::null;
+				FBookmark->password = QString::null;
+				FBookmark->autojoin = false;
 				accept();
 			}
 			else

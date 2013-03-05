@@ -142,7 +142,6 @@ void Shortcuts::insertWidgetShortcut(const QString &AId, QWidget *AWidget)
 		d->widgetShortcutsId.insert(shortcut, AId);
 		d->widgetShortcutsWidget.insert(shortcut, AWidget);
 		connect(shortcut,SIGNAL(activated()),instance(),SLOT(onShortcutActivated()));
-		connect(shortcut,SIGNAL(activatedAmbiguously()),instance(),SLOT(onShortcutActivated()));
 		updateWidget(shortcut);
 		emit instance()->shortcutInserted(AId,AWidget);
 	}
@@ -196,11 +195,6 @@ void Shortcuts::setGlobalShortcut(const QString &AId, bool AEnabled)
 		delete shortcut;
 		emit instance()->shortcutEnabled(AId, AEnabled);
 	}
-}
-
-void Shortcuts::activateShortcut(const QString &AId, QWidget *AWidget)
-{
-	emit instance()->shortcutActivated(AId,AWidget);
 }
 
 void Shortcuts::updateObject(QObject *AObject)

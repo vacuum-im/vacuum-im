@@ -41,8 +41,6 @@ public:
 	void setShortcutId(const QString &AId);
 signals:
 	void actionDestroyed(Action *AAction);
-public:
-	static bool copyStandardAction(Action *ADestination, QAction *ASource);
 protected slots:
 	void onMenuDestroyed(Menu *AMenu);
 private:

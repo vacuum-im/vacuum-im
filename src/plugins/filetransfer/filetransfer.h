@@ -21,7 +21,6 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifiletransfer.h>
 #include <interfaces/ifilestreamsmanager.h>
@@ -44,14 +43,14 @@
 #include "streamdialog.h"
 
 class FileTransfer :
-	public QObject,
-	public IPlugin,
-	public IFileTransfer,
-	public IOptionsHolder,
-	public IDiscoFeatureHandler,
-	public IRostersDragDropHandler,
-	public IViewDropHandler,
-	public IFileStreamsHandler
+			public QObject,
+			public IPlugin,
+			public IFileTransfer,
+			public IOptionsHolder,
+			public IDiscoFeatureHandler,
+			public IRostersDragDropHandler,
+			public IViewDropHandler,
+			public IFileStreamsHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IViewDropHandler IFileStreamsHandler);
@@ -72,11 +71,11 @@ public:
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IRostersDragDropHandler
-	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
+	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
-	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
+	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
-	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
 	//IViewDropHandler
 	virtual bool viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent);
 	virtual bool viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent);

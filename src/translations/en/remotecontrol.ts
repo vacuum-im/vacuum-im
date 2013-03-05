@@ -8,28 +8,56 @@
         <translation>Remote Control</translation>
     </message>
     <message>
+        <source>Allows to remotely control the client</source>
+        <translation>Allows to remotely control the client</translation>
+    </message>
+    <message>
+        <source>Play sounds</source>
+        <translation>Play sounds</translation>
+    </message>
+    <message>
+        <source>Automatically Open New Messages</source>
+        <translation>Automatically Open New Messages</translation>
+    </message>
+    <message>
+        <source>Automatically Accept File Transfers</source>
+        <translation>Automatically Accept File Transfers</translation>
+    </message>
+    <message>
+        <source>Automatically Authorize Contacts</source>
+        <translation>Automatically Authorize Contacts</translation>
+    </message>
+    <message>
         <source>Ping</source>
         <translation>Ping</translation>
+    </message>
+    <message>
+        <source>Change connection status</source>
+        <translation>Change connection status</translation>
     </message>
     <message>
         <source>Change main status</source>
         <translation>Change main status</translation>
     </message>
     <message>
-        <source>Pong!</source>
-        <translation>Pong!</translation>
+        <source>Leave conferences</source>
+        <translation>Leave conferences</translation>
     </message>
     <message>
-        <source>%1 on %2</source>
-        <translation>%1 on %2</translation>
+        <source>Accept pending file transfers</source>
+        <translation>Accept pending file transfers</translation>
     </message>
     <message>
-        <source>Main status</source>
-        <translation>Main status</translation>
+        <source>Set options</source>
+        <translation>Set options</translation>
     </message>
     <message>
-        <source>%1 (%2)</source>
-        <translation>%1 (%2)</translation>
+        <source>Forward unread messages</source>
+        <translation>Forward unread messages</translation>
+    </message>
+    <message>
+        <source>Whether to automatically authorize subscription requests</source>
+        <translation>Whether to automatically authorize subscription requests</translation>
     </message>
     <message>
         <source>Whether to automatically accept file transfers</source>
@@ -52,6 +80,14 @@
         <translation>A list of pending file transfers</translation>
     </message>
     <message>
+        <source>A list of unread messages</source>
+        <translation>A list of unread messages</translation>
+    </message>
+    <message>
+        <source>A list of joined conferences</source>
+        <translation>A list of joined conferences</translation>
+    </message>
+    <message>
         <source>A presence or availability status</source>
         <translation>A presence or availability status</translation>
     </message>
@@ -64,8 +100,12 @@
         <translation>The new priority for the client</translation>
     </message>
     <message>
-        <source>Leave conferences</source>
-        <translation>Leave conferences</translation>
+        <source>Pong!</source>
+        <translation>Pong!</translation>
+    </message>
+    <message>
+        <source>%1 on %2</source>
+        <translation>%1 on %2</translation>
     </message>
     <message>
         <source>This entity is not joined to any conferences</source>
@@ -76,64 +116,28 @@
         <translation>Remote command to leave</translation>
     </message>
     <message>
+        <source>Main status</source>
+        <translation>Main status</translation>
+    </message>
+    <message>
+        <source>%1 (%2)</source>
+        <translation>%1 (%2)</translation>
+    </message>
+    <message>
         <source>Requested status is not acceptable</source>
         <translation>Requested status is not acceptable</translation>
-    </message>
-    <message>
-        <source>Whether to automatically authorize subscription requests</source>
-        <translation>Whether to automatically authorize subscription requests</translation>
-    </message>
-    <message>
-        <source>A list of joined conferences</source>
-        <translation>A list of joined conferences</translation>
-    </message>
-    <message>
-        <source>Allows to remotely control the client</source>
-        <translation>Allows to remotely control the client</translation>
-    </message>
-    <message>
-        <source>Change connection status</source>
-        <translation>Change connection status</translation>
-    </message>
-    <message>
-        <source>Accept pending file transfers</source>
-        <translation>Accept pending file transfers</translation>
     </message>
     <message>
         <source>Pending file transfers</source>
         <translation>Pending file transfers</translation>
     </message>
     <message>
-        <source>There are no pending file transfers</source>
-        <translation>There are no pending file transfers</translation>
-    </message>
-    <message>
-        <source>Play sounds</source>
-        <translation>Play sounds</translation>
-    </message>
-    <message>
-        <source>Automatically Open New Messages</source>
-        <translation>Automatically Open New Messages</translation>
-    </message>
-    <message>
-        <source>Automatically Accept File Transfers</source>
-        <translation>Automatically Accept File Transfers</translation>
-    </message>
-    <message>
-        <source>Automatically Authorize Contacts</source>
-        <translation>Automatically Authorize Contacts</translation>
-    </message>
-    <message>
-        <source>Set options</source>
-        <translation>Set options</translation>
-    </message>
-    <message>
-        <source>Forward unread messages</source>
-        <translation>Forward unread messages</translation>
-    </message>
-    <message>
         <source>%1 (%2 bytes) from &apos;%3&apos;</source>
         <translation>%1 (%2 bytes) from &apos;%3&apos;</translation>
+    </message>
+    <message>
+        <source>There are no pending file transfers</source>
+        <translation>There are no pending file transfers</translation>
     </message>
     <message>
         <source>List of unread messages</source>
@@ -149,10 +153,6 @@
     <message>
         <source>There are no unread messages</source>
         <translation>There are no unread messages</translation>
-    </message>
-    <message>
-        <source>A list of unread messages</source>
-        <translation>A list of unread messages</translation>
     </message>
 </context>
 </TS>

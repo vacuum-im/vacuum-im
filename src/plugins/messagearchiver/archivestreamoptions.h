@@ -61,14 +61,14 @@ protected slots:
 	void onExpireIndexChanged(int AIndex);
 	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
-	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
+	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 private:
 	Ui::ArchiveStreamOptionsClass ui;
 private:
 	IMessageArchiver *FArchiver;
 private:
 	Jid FStreamJid;
-	XmppError FLastError;
+	QString FLastError;
 	QList<QString> FSaveRequests;
 	QHash<Jid,QTableWidgetItem *> FTableItems;
 };

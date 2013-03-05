@@ -44,7 +44,7 @@ signals:
 protected:
 	void clearItems();
 protected slots:
-	void onStreamError(const XmppError &AError);
+	void onStreamError(const QString &AError);
 	void onStreamClosed();
 private:
 	IXmppStream *FXmppStream;

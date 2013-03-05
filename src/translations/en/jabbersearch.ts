@@ -8,6 +8,10 @@
         <translation>Jabber Search</translation>
     </message>
     <message>
+        <source>Allows to search in the Jabber network</source>
+        <translation>Allows to search in the Jabber network</translation>
+    </message>
+    <message>
         <source>Search</source>
         <translation>Search</translation>
     </message>
@@ -28,10 +32,6 @@
         <translation>Email Address</translation>
     </message>
     <message>
-        <source>Allows to search in the Jabber network</source>
-        <translation>Allows to search in the Jabber network</translation>
-    </message>
-    <message>
         <source>Supports the searching of the information</source>
         <translation>Supports the searching of the information</translation>
     </message>
@@ -45,6 +45,10 @@
     <message>
         <source>Waiting for host response ...</source>
         <translation>Waiting for host response ...</translation>
+    </message>
+    <message>
+        <source>Error: Can&apos;t send request to host.</source>
+        <translation>Error: Can&apos;t send request to host.</translation>
     </message>
     <message>
         <source>Disco info</source>
@@ -61,10 +65,6 @@
     <message>
         <source>Requested operation failed: %1</source>
         <translation>Requested operation failed: %1</translation>
-    </message>
-    <message>
-        <source>Error: Can&apos;t send request to host.</source>
-        <translation>Error: Can&apos;t send request to host.</translation>
     </message>
 </context>
 <context>

@@ -75,8 +75,8 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -439,13 +439,12 @@ void StatusIcons::updateCustomIconMenu(const QStringList &APatterns)
 
 bool StatusIcons::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
+	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
 	if (!ASelected.isEmpty())
 	{
 		foreach(IRosterIndex *index, ASelected)
 		{
-			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			Jid contactJid = index->data(RDR_PREP_BARE_JID).toString();
-			if (!contactJid.isValid() || contactJid.pBare()==streamJid.pBare())
+			if (!acceptTypes.contains(index->type()))
 				return false;
 		}
 		return true;
@@ -491,9 +490,9 @@ void StatusIcons::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASele
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void StatusIcons::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void StatusIcons::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
+	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
 	{
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
 		

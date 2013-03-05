@@ -34,12 +34,12 @@
         <translation>Conflict with plugin %1</translation>
     </message>
     <message>
-        <source>Initialization failed</source>
-        <translation>Initialization failed</translation>
+        <source>Plugins directory not found</source>
+        <translation>Plugins directory not found</translation>
     </message>
     <message>
-        <source>Setup plugins</source>
-        <translation>Setup plugins</translation>
+        <source>Initialization failed</source>
+        <translation>Initialization failed</translation>
     </message>
     <message>
         <source>About Qt</source>
@@ -50,8 +50,12 @@
         <translation>About the program</translation>
     </message>
     <message>
-        <source>Plugins directory not found</source>
-        <translation>Plugins directory not found</translation>
+        <source>Setup plugins</source>
+        <translation>Setup plugins</translation>
+    </message>
+    <message>
+        <source>Global</source>
+        <translation>Global</translation>
     </message>
     <message>
         <source>Application</source>
@@ -68,10 +72,6 @@
     <message>
         <source>Show setup plugins dialog</source>
         <translation>Show setup plugins dialog</translation>
-    </message>
-    <message>
-        <source>Global</source>
-        <translation>Global</translation>
     </message>
 </context>
 <context>
@@ -100,6 +100,22 @@
         <translation>Setup Plugins</translation>
     </message>
     <message>
+        <source>Name</source>
+        <translation>Name</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation>File</translation>
+    </message>
+    <message>
+        <source>Depends</source>
+        <translation>Depends</translation>
+    </message>
+    <message>
+        <source>Depend</source>
+        <translation>Depend</translation>
+    </message>
+    <message>
         <source>Error Message:</source>
         <translation>Error Message:</translation>
     </message>
@@ -114,22 +130,6 @@
     <message>
         <source>Country:</source>
         <translation>Country:</translation>
-    </message>
-    <message>
-        <source>Depends</source>
-        <translation>Depends</translation>
-    </message>
-    <message>
-        <source>Depend</source>
-        <translation>Depend</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <source>File</source>
-        <translation>File</translation>
     </message>
 </context>
 </TS>

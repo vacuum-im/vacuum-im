@@ -71,12 +71,18 @@ QString ChatWindow::tabPageId() const
 
 bool ChatWindow::isVisibleTabPage() const
 {
-	return window()->isVisible();
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return widget->isVisible();
 }
 
 bool ChatWindow::isActiveTabPage() const
 {
-	return isVisible() && WidgetManager::isActiveWindow(this);
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
 void ChatWindow::assignTabPage()

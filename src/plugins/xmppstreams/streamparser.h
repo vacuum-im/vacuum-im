@@ -5,7 +5,6 @@
 #include <QDomDocument>
 #include <QXmlStreamReader>
 #include <definitions/namespaces.h>
-#include <utils/xmpperror.h>
 
 class StreamParser :
 			public QObject
@@ -19,7 +18,7 @@ public:
 signals:
 	void opened(QDomElement AElem);
 	void element(QDomElement AElem);
-	void error(const XmppError &AError);
+	void error(const QString &AError);
 	void closed();
 private:
 	int FLevel;

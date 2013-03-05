@@ -4,6 +4,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterindextyperole.h>
+#include <definitions/rosterlabelorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -38,11 +39,11 @@ struct VCardItem
 };
 
 class VCardPlugin :
-	public QObject,
-	public IPlugin,
-	public IVCardPlugin,
-	public IStanzaRequestOwner,
-	public IXmppUriHandler
+			public QObject,
+			public IPlugin,
+			public IVCardPlugin,
+			public IStanzaRequestOwner,
+			public IXmppUriHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IVCardPlugin IStanzaRequestOwner IXmppUriHandler);
@@ -72,7 +73,7 @@ public:
 signals:
 	void vcardReceived(const Jid &AContactJid);
 	void vcardPublished(const Jid &AContactJid);
-	void vcardError(const Jid &AContactJid, const XmppError &AError);
+	void vcardError(const Jid &AContactJid, const QString &AError);
 protected:
 	void unlockVCard(const Jid &AContactJid);
 	void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;
@@ -80,7 +81,7 @@ protected:
 	void registerDiscoFeatures();
 protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onShowVCardDialogByAction(bool);
 	void onShowVCardDialogByChatWindowAction(bool);

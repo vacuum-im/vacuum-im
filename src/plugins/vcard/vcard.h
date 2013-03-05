@@ -10,8 +10,8 @@
 class VCardPlugin;
 
 class VCard :
-	public QObject,
-	public IVCard
+			public QObject,
+			public IVCard
 {
 	Q_OBJECT;
 	Q_INTERFACES(IVCard);
@@ -35,7 +35,7 @@ public:
 signals:
 	void vcardUpdated();
 	void vcardPublished();
-	void vcardError(const XmppError &AError);
+	void vcardError(const QString &AError);
 protected:
 	void loadVCardFile();
 	QDomElement createElementByName(const QString &AName, const QStringList &ATags, const QStringList &ATagList);
@@ -45,7 +45,7 @@ protected:
 protected slots:
 	void onVCardReceived(const Jid &AContactJid);
 	void onVCardPublished(const Jid &AContactJid);
-	void onVCardError(const Jid &AContactJid, const XmppError &AError);
+	void onVCardError(const Jid &AContactJid, const QString &AError);
 private:
 	VCardPlugin *FVCardPlugin;
 private:

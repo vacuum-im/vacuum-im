@@ -10,10 +10,6 @@ set(HEADERS "action.h"
             "statusbarchanger.h"
             "systemmanager.h"
             "toolbarchanger.h"
-            "animatedtextbrowser.h"
-            "closebutton.h"
-            "searchlineedit.h"
-            "imagemanager.h"
-            "advanceditemdelegate.h")
+            "animatedtextbrowser.h")
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})

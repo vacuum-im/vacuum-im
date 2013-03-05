@@ -5,10 +5,9 @@
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/rosterlabels.h>
+#include <definitions/rosterlabelorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
@@ -17,16 +16,15 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/widgetmanager.h>
-#include <utils/xmpperror.h>
 #include "editproxydialog.h"
 #include "proxysettingswidget.h"
 #include "connectionoptionswidget.h"
 
 class ConnectionManager :
-	public QObject,
-	public IPlugin,
-	public IConnectionManager,
-	public IOptionsHolder
+			public QObject,
+			public IPlugin,
+			public IConnectionManager,
+			public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IConnectionManager IOptionsHolder);
@@ -77,7 +75,7 @@ private:
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
-	quint32 FEncryptedLabelId;
+	int FEncryptedLabelId;
 	QMap<QString, IConnectionPlugin *> FPlugins;
 };
 

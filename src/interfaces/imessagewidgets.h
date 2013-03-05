@@ -6,7 +6,6 @@
 #include <QTextBrowser>
 #include <QTextDocument>
 #include <interfaces/ipluginmanager.h>
-#include <interfaces/imainwindow.h>
 #include <interfaces/imessagestyles.h>
 #include <utils/jid.h>
 #include <utils/menu.h>
@@ -97,7 +96,6 @@ public:
 	virtual ToolBarChanger *sendToolBarChanger() const =0;
 	virtual bool isRichTextEnabled() const =0;
 	virtual void setRichTextEnabled(bool AEnabled) =0;
-	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu) =0;
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment) =0;
 	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const =0;
 protected:
@@ -111,7 +109,6 @@ protected:
 	virtual void minimumLinesChanged(int ALines) =0;
 	virtual void sendShortcutChanged(const QString &AShortcutId) =0;
 	virtual void richTextEnableChanged(bool AEnabled) =0;
-	virtual void editContextMenu(const QPoint &APosition, Menu *AMenu) =0;
 };
 
 class IReceiversWidget
@@ -225,8 +222,7 @@ protected:
 	virtual void tabPageNotifierChanged() =0;
 };
 
-class ITabWindow :
-	public IMainCentralPage
+class ITabWindow
 {
 public:
 	virtual QMainWindow *instance() = 0;
@@ -235,10 +231,6 @@ public:
 	virtual QUuid windowId() const =0;
 	virtual QString windowName() const =0;
 	virtual Menu *windowMenu() const =0;
-	virtual bool isTabBarVisible() const =0;
-	virtual void setTabBarVisible(bool AVisible) =0;
-	virtual bool isAutoCloseEnabled() const =0;
-	virtual void setAutoCloseEnabled(bool AEnabled) =0;
 	virtual int tabPageCount() const =0;
 	virtual ITabPage *tabPage(int AIndex) const =0;
 	virtual void addTabPage(ITabPage *APage) =0;
@@ -355,10 +347,10 @@ public:
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) =0;
 	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage) = 0;
 	virtual QList<IMessageWindow *> messageWindows() const =0;
-	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
+	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode) =0;
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QList<IChatWindow *> chatWindows() const =0;
-	virtual IChatWindow *getChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
+	virtual IChatWindow *newChatWindow(const Jid &AStreamJid, const Jid &AContactJid) =0;
 	virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QList<QUuid> tabWindowList() const =0;
 	virtual QUuid appendTabWindow(const QString &AName) =0;
@@ -366,7 +358,7 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const =0;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName) =0;
 	virtual QList<ITabWindow *> tabWindows() const =0;
-	virtual ITabWindow *getTabWindow(const QUuid &AWindowId) =0;
+	virtual ITabWindow *newTabWindow(const QUuid &AWindowId) =0;
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const =0;
 	virtual void assignTabWindowPage(ITabPage *APage) =0;
 	virtual QList<IViewDropHandler *> viewDropHandlers() const =0;
@@ -413,12 +405,12 @@ Q_DECLARE_INTERFACE(IToolBarWidget,"Vacuum.Plugin.IToolBarWidget/1.0")
 Q_DECLARE_INTERFACE(IStatusBarWidget,"Vacuum.Plugin.IStatusBarWidget/1.0")
 Q_DECLARE_INTERFACE(ITabPageNotifier,"Vacuum.Plugin.ITabPageNotifier/1.0")
 Q_DECLARE_INTERFACE(ITabPage,"Vacuum.Plugin.ITabPage/1.3")
-Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.4")
+Q_DECLARE_INTERFACE(ITabWindow,"Vacuum.Plugin.ITabWindow/1.3")
 Q_DECLARE_INTERFACE(IChatWindow,"Vacuum.Plugin.IChatWindow/1.2")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.2")
 Q_DECLARE_INTERFACE(IViewDropHandler,"Vacuum.Plugin.IViewDropHandler/1.0")
 Q_DECLARE_INTERFACE(IViewUrlHandler,"Vacuum.Plugin.IViewUrlHandler/1.0")
 Q_DECLARE_INTERFACE(IEditContentsHandler,"Vacuum.Plugin.IEditContentsHandler/1.1")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.5")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.4")
 
 #endif // IMESSAGEWIDGETS_H

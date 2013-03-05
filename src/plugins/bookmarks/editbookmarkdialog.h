@@ -2,10 +2,7 @@
 #define EDITBOOKMARKDIALOG_H
 
 #include <QDialog>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ibookmarks.h>
-#include <utils/iconstorage.h>
 #include "ui_editbookmarkdialog.h"
 
 class EditBookmarkDialog :
@@ -13,7 +10,7 @@ class EditBookmarkDialog :
 {
 	Q_OBJECT;
 public:
-	EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent = NULL);
+	EditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent = NULL);
 	~EditBookmarkDialog();
 protected slots:
 	void onGroupBoxClicked(bool AChecked);
@@ -21,7 +18,7 @@ protected slots:
 private:
 	Ui::EditBookmarkDialogClass ui;
 private:
-	IBookmark *FBookmark;
+	IBookMark *FBookmark;
 };
 
 #endif // EDITBOOKMARKDIALOG_H

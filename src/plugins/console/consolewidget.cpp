@@ -31,17 +31,18 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 	palette.setColor(QPalette::Inactive,QPalette::HighlightedText,palette.color(QPalette::Active,QPalette::HighlightedText));
 	ui.tbrConsole->setPalette(palette);
 
+	FTextSearchTimer.setSingleShot(true);
+	connect(&FTextSearchTimer,SIGNAL(timeout()),SLOT(onTextSearchTimerTimeout()));
+
 	FTextHilightTimer.setSingleShot(true);
 	connect(&FTextHilightTimer,SIGNAL(timeout()),SLOT(onTextHilightTimerTimeout()));
 	connect(ui.tbrConsole,SIGNAL(visiblePositionBoundaryChanged()),SLOT(onTextVisiblePositionBoundaryChanged()));
 
-	ui.lneTextSearch->setPlaceholderText(tr("Search"));
 	ui.tlbTextSearchNext->setIcon(style()->standardIcon(QStyle::SP_ArrowDown, NULL, this));
 	ui.tlbTextSearchPrev->setIcon(style()->standardIcon(QStyle::SP_ArrowUp, NULL, this));
 	connect(ui.tlbTextSearchNext,SIGNAL(clicked()),SLOT(onTextSearchNextClicked()));
 	connect(ui.tlbTextSearchPrev,SIGNAL(clicked()),SLOT(onTextSearchPreviousClicked()));
-	connect(ui.lneTextSearch,SIGNAL(searchStart()),SLOT(onTextSearchStart()));
-	connect(ui.lneTextSearch,SIGNAL(searchNext()),SLOT(onTextSearchNextClicked()));
+	connect(ui.lneTextSearch,SIGNAL(returnPressed()),SLOT(onTextSearchNextClicked()));
 	connect(ui.lneTextSearch,SIGNAL(textChanged(const QString &)),SLOT(onTextSearchTextChanged(const QString &)));
 
 	connect(ui.tlbAddCondition,SIGNAL(clicked()),SLOT(onAddConditionClicked()));
@@ -55,7 +56,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
 	connect(ui.tlbSendXML,SIGNAL(clicked()),SLOT(onSendXMLClicked()));
 	connect(ui.tlbClearConsole,SIGNAL(clicked()),ui.tbrConsole,SLOT(clear()));
-	connect(ui.tlbClearConsole,SIGNAL(clicked()),SLOT(onTextSearchStart()));
+	connect(ui.tlbClearConsole,SIGNAL(clicked()),SLOT(onTextSearchTimerTimeout()));
 	connect(ui.chbWordWrap,SIGNAL(toggled(bool)),SLOT(onWordWrapButtonToggled(bool)));
 }
 
@@ -220,7 +221,7 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 				colorXml(xml);
 			ui.tbrConsole->append(xml);
 
-			ui.lneTextSearch->restartTimeout(ui.lneTextSearch->startSearchTimeout());
+			FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 		}
 	}
 }
@@ -322,7 +323,7 @@ void ConsoleWidget::onTextVisiblePositionBoundaryChanged()
 	FTextHilightTimer.start(0);
 }
 
-void ConsoleWidget::onTextSearchStart()
+void ConsoleWidget::onTextSearchTimerTimeout()
 {
 	FSearchResults.clear();
 	if (!ui.lneTextSearch->text().isEmpty())
@@ -403,6 +404,7 @@ void ConsoleWidget::onTextSearchTextChanged(const QString &AText)
 {
 	Q_UNUSED(AText);
 	FSearchMoveCursor = true;
+	FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 }
 
 void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)

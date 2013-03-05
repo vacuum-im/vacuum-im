@@ -5,7 +5,6 @@
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
-#include <definitions/xmpperrors.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icommands.h>

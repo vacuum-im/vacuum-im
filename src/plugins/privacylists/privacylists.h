@@ -5,7 +5,7 @@
 #include <definitions/namespaces.h>
 #include <definitions/rosterindextyperole.h>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterlabels.h>
+#include <definitions/rosterlabelorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -76,7 +76,7 @@ signals:
 	void activeListChanged(const Jid &AStreamJid, const QString &AList);
 	void defaultListChanged(const Jid &AStreamJid, const QString &AList);
 	void requestCompleted(const QString &AId);
-	void requestFailed(const QString &AId, const XmppError &AError);
+	void requestFailed(const QString &AId, const QString &AError);
 protected:
 	QString loadPrivacyLists(const Jid &AStreamJid);
 	Menu *createPrivacyMenu(Menu *AMenu) const;
@@ -102,8 +102,8 @@ protected slots:
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onUpdateCreatedRosterIndexes();
 	void onShowEditListsDialog(bool);
 	void onSetActiveListByAction(bool);
@@ -133,7 +133,7 @@ private:
 	QHash<QString, QString> FRemoveRequests;
 	QHash<Jid, QStringList > FStreamRequests;
 private:
-	quint32 FPrivacyLabelId;
+	int FPrivacyLabelId;
 	QTimer FApplyAutoListsTimer;
 	QList<IRosterIndex *> FCreatedRosterIndexes;
 	QHash<Jid, QString> FApplyAutoLists;

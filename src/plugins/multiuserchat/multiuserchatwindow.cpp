@@ -36,12 +36,10 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FMessageStyles = NULL;
 	FStatusChanger = NULL;
 	FMessageArchiver = NULL;
-	FRecentContacts = NULL;
 
-	FChatPlugin = AChatPlugin;
 	FMultiChat = AMultiChat;
+	FChatPlugin = AChatPlugin;
 	FMultiChat->instance()->setParent(this);
-	FMultiChat->setAutoPresence(true);
 
 	FViewWidget = NULL;
 	FEditWidget = NULL;
@@ -105,12 +103,18 @@ QString MultiUserChatWindow::tabPageId() const
 
 bool MultiUserChatWindow::isVisibleTabPage() const
 {
-	return window()->isVisible();
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return widget->isVisible();
 }
 
 bool MultiUserChatWindow::isActiveTabPage() const
 {
-	return isVisible() && WidgetManager::isActiveWindow(this);
+	const QWidget *widget = this;
+	while (widget->parentWidget())
+		widget = widget->parentWidget();
+	return isVisible() && widget->isActiveWindow() && !widget->isMinimized() && widget->isVisible();
 }
 
 void MultiUserChatWindow::assignTabPage()
@@ -209,8 +213,6 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				if (!AMessage.body().isEmpty())
 				{
 					displayed = true;
-					if (!AMessage.isDelayed())
-						updateRecentItemActiveTime();
 					if (FHistoryRequests.values().contains(NULL))
 						FPendingMessages[NULL].append(AMessage);
 					showUserMessage(AMessage,contactJid.resource());
@@ -222,8 +224,6 @@ bool MultiUserChatWindow::messageDisplay(const Message &AMessage, int ADirection
 				if (window)
 				{
 					displayed = true;
-					if (!AMessage.isDelayed())
-						updateRecentItemActiveTime();
 					if (FHistoryRequests.values().contains(window))
 						FPendingMessages[window].append(AMessage);
 					showChatMessage(window,AMessage);
@@ -280,10 +280,6 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 						notify.data.insert(NDR_POPUP_CAPTION,tr("Conference message"));
 					}
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_MESSAGE));
-					notify.data.insert(NDR_STREAM_JID,streamJid().full());
-					notify.data.insert(NDR_CONTACT_JID,contactJid.pBare());
-					notify.data.insert(NDR_ROSTER_ORDER,RNO_GROUPCHATMESSAGE);
-					notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.uNode()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
 
@@ -292,7 +288,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 			}
 			else if (!AMessage.body().isEmpty())
 			{
-				IChatWindow *window = getChatWindow(contactJid);
+				IChatWindow *window = getChatWindow(AMessage.from());
 				if (window && !window->isActiveTabPage())
 				{
 					page = window;
@@ -300,10 +296,6 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					notify.typeId = NNT_MUC_MESSAGE_PRIVATE;
 					notify.data.insert(NDR_ICON,storage->getIcon(MNI_MUC_PRIVATE_MESSAGE));
 					notify.data.insert(NDR_TOOLTIP,tr("Private message from: [%1]").arg(contactJid.resource()));
-					notify.data.insert(NDR_STREAM_JID,streamJid().full());
-					notify.data.insert(NDR_CONTACT_JID,contactJid.pBare());
-					notify.data.insert(NDR_ROSTER_ORDER,RNO_GROUPCHATMESSAGE);
-					notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
 					notify.data.insert(NDR_POPUP_CAPTION,tr("Private message"));
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(contactJid.resource()).arg(contactJid.uNode()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
@@ -472,23 +464,13 @@ IChatWindow *MultiUserChatWindow::findChatWindow(const Jid &AContactJid) const
 	return NULL;
 }
 
-void MultiUserChatWindow::contextMenuForWindow(Menu *AMenu)
-{
-	QList<Action *> toolsActions = FToolsMenu->groupActions();
-	for (int i = toolsActions.count()-1; i>=0; i--)
-	{
-		Action *action = toolsActions.at(i);
-		AMenu->addAction(action,FToolsMenu->actionGroup(action));
-	}
-}
-
 void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
 {
 	if (AMenu && FMultiChat->isOpen() && FUsers.contains(AUser) && AUser!=FMultiChat->mainUser())
 	{
 		Action *openChat = new Action(AMenu);
 		openChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_PRIVATE_MESSAGE);
-		openChat->setText(tr("Open Chat Dialog"));
+		openChat->setText(tr("Open chat dialog"));
 		openChat->setData(ADR_USER_NICK,AUser->nickName());
 		connect(openChat,SIGNAL(triggered(bool)),SLOT(onOpenChatWindowActionTriggered(bool)));
 		AMenu->addAction(openChat,AG_MUCM_MULTIUSERCHAT_PRIVATE,true);
@@ -496,14 +478,14 @@ void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
 		if (FMultiChat->mainUser()->role() == MUC_ROLE_MODERATOR)
 		{
 			Action *setRoleNone = new Action(AMenu);
-			setRoleNone->setText(tr("Kick User"));
+			setRoleNone->setText(tr("Kick user"));
 			setRoleNone->setData(ADR_USER_NICK,AUser->nickName());
 			setRoleNone->setData(ADR_USER_ROLE,MUC_ROLE_NONE);
 			connect(setRoleNone,SIGNAL(triggered(bool)),SLOT(onChangeUserRoleActionTriggeted(bool)));
 			AMenu->addAction(setRoleNone,AG_MUCM_MULTIUSERCHAT_UTILS,false);
 
 			Action *setAffilOutcast = new Action(AMenu);
-			setAffilOutcast->setText(tr("Ban User"));
+			setAffilOutcast->setText(tr("Ban user"));
 			setAffilOutcast->setData(ADR_USER_NICK,AUser->nickName());
 			setAffilOutcast->setData(ADR_USER_AFFIL,MUC_AFFIL_OUTCAST);
 			connect(setAffilOutcast,SIGNAL(triggered(bool)),SLOT(onChangeUserAffiliationActionTriggered(bool)));
@@ -591,16 +573,12 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 {
 	closeTabPage();
 
-	bool waitClose = false;
 	FDestroyOnChatClosed = true;
-	if (FMultiChat->isConnected())
-	{
-		waitClose = true;
-		FMultiChat->sendPresence(IPresence::Offline,AStatus);
-	}
+	if (FMultiChat->isOpen())
+		FMultiChat->setPresence(IPresence::Offline,AStatus);
 
 	if (AWaitClose>0)
-		QTimer::singleShot(waitClose ? AWaitClose : 0, this, SLOT(deleteLater()));
+		QTimer::singleShot(FMultiChat->isOpen() ? AWaitClose : 0, this, SLOT(deleteLater()));
 	else
 		delete this;
 }
@@ -672,14 +650,10 @@ void MultiUserChatWindow::initialize()
 		{
 			connect(FMessageArchiver->instance(),SIGNAL(messagesLoaded(const QString &, const IArchiveCollectionBody &)),
 				SLOT(onArchiveMessagesLoaded(const QString &, const IArchiveCollectionBody &)));
-			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
-				SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
+			connect(FMessageArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
+				SLOT(onArchiveRequestFailed(const QString &, const QString &)));
 		}
 	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IRecentContacts").value(0,NULL);
-	if (plugin)
-		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
@@ -763,92 +737,87 @@ void MultiUserChatWindow::createStaticRoomActions()
 	toolsButton->setPopupMode(QToolButton::InstantPopup);
 
 	FChangeNick = new Action(FToolsMenu);
-	FChangeNick->setText(tr("Change Nick"));
+	FChangeNick->setText(tr("Change room nick"));
 	FChangeNick->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_NICK);
 	FChangeNick->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CHANGENICK);
 	connect(FChangeNick,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FChangeNick,AG_RVCM_MULTIUSERCHAT_COMMON,false);
-
-	FChangeTopic = new Action(FToolsMenu);
-	FChangeTopic->setText(tr("Change Topic"));
-	FChangeTopic->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
-	FChangeTopic->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CHANGETOPIC);
-	connect(FChangeTopic,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FChangeTopic,AG_RVCM_MULTIUSERCHAT_COMMON,false);
+	FToolsMenu->addAction(FChangeNick,AG_MUTM_MULTIUSERCHAT_COMMON,false);
 
 	FInviteContact = new Action(FToolsMenu);
-	FInviteContact->setText(tr("Invite to Conference"));
+	FInviteContact->setText(tr("Invite to this room"));
 	FInviteContact->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_INVITE);
 	connect(FInviteContact,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FInviteContact,AG_RVCM_MULTIUSERCHAT_COMMON,false);
+	FToolsMenu->addAction(FInviteContact,AG_MUTM_MULTIUSERCHAT_COMMON,false);
 
 	FRequestVoice = new Action(FToolsMenu);
-	FRequestVoice->setText(tr("Request Voice"));
+	FRequestVoice->setText(tr("Request voice"));
 	FRequestVoice->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_REQUEST_VOICE);
 	connect(FRequestVoice,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FRequestVoice,AG_RVCM_MULTIUSERCHAT_COMMON,false);
+	FToolsMenu->addAction(FRequestVoice,AG_MUTM_MULTIUSERCHAT_COMMON,false);
 
 	FClearChat = new Action(FToolsMenu);
-	FClearChat->setText(tr("Clear Conference Window"));
+	FClearChat->setText(tr("Clear chat window"));
 	FClearChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
 	FClearChat->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CLEARWINDOW);
 	connect(FClearChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 	FToolBarWidget->toolBarChanger()->insertAction(FClearChat,TBG_MWTBW_CLEAR_WINDOW);
 
+	FChangeSubject = new Action(FToolsMenu);
+	FChangeSubject->setText(tr("Change topic"));
+	FChangeSubject->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CHANGE_TOPIC);
+	FChangeSubject->setShortcutId(SCT_MESSAGEWINDOWS_MUC_CHANGETOPIC);
+	connect(FChangeSubject,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
+	FToolsMenu->addAction(FChangeSubject,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
+
 	FBanList = new Action(FToolsMenu);
-	FBanList->setText(tr("Edit Ban List"));
+	FBanList->setText(tr("Edit ban list"));
 	FBanList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_BAN_LIST);
 	connect(FBanList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FBanList,AG_RVCM_MULTIUSERCHAT_TOOLS,false);
+	FToolsMenu->addAction(FBanList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
 	FMembersList = new Action(FToolsMenu);
-	FMembersList->setText(tr("Edit Members List"));
+	FMembersList->setText(tr("Edit members list"));
 	FMembersList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_MEMBERS_LIST);
 	connect(FMembersList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FMembersList,AG_RVCM_MULTIUSERCHAT_TOOLS,false);
+	FToolsMenu->addAction(FMembersList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
 	FAdminsList = new Action(FToolsMenu);
-	FAdminsList->setText(tr("Edit Administrators List"));
+	FAdminsList->setText(tr("Edit administrators list"));
 	FAdminsList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_ADMINS_LIST);
 	connect(FAdminsList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FAdminsList,AG_RVCM_MULTIUSERCHAT_TOOLS,false);
+	FToolsMenu->addAction(FAdminsList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
 	FOwnersList = new Action(FToolsMenu);
-	FOwnersList->setText(tr("Edit Owners List"));
+	FOwnersList->setText(tr("Edit owners list"));
 	FOwnersList->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EDIT_OWNERS_LIST);
 	connect(FOwnersList,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FOwnersList,AG_RVCM_MULTIUSERCHAT_TOOLS,false);
+	FToolsMenu->addAction(FOwnersList,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
 	FConfigRoom = new Action(FToolsMenu);
-	FConfigRoom->setText(tr("Configure Conference"));
+	FConfigRoom->setText(tr("Configure room"));
 	FConfigRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CONFIGURE_ROOM);
 	FConfigRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_ROOMSETTINGS);
 	connect(FConfigRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FConfigRoom,AG_RVCM_MULTIUSERCHAT_TOOLS,false);
+	FToolsMenu->addAction(FConfigRoom,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
 	FDestroyRoom = new Action(FToolsMenu);
-	FDestroyRoom->setText(tr("Destroy Conference"));
+	FDestroyRoom->setText(tr("Destroy room"));
 	FDestroyRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_DESTROY_ROOM);
 	connect(FDestroyRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	FToolsMenu->addAction(FDestroyRoom,AG_RVCM_MULTIUSERCHAT_TOOLS,false);
+	FToolsMenu->addAction(FDestroyRoom,AG_MUTM_MULTIUSERCHAT_TOOLS,false);
 
 	FEnterRoom = new Action(FToolsMenu);
-	FEnterRoom->setText(tr("Enter"));
-	FEnterRoom->setToolTip(tr("Enter conference"));
+	FEnterRoom->setText(tr("Enter room"));
 	FEnterRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_ENTER_ROOM);
 	FEnterRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_ENTER);
 	connect(FEnterRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	QToolButton *enterButton = FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
-	enterButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 
 	FExitRoom = new Action(FToolBarWidget->toolBarChanger()->toolBar());
-	FExitRoom->setText(tr("Exit"));
-	FExitRoom->setToolTip(tr("Exit conference"));
 	FExitRoom->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_EXIT_ROOM);
+	FExitRoom->setText(tr("Exit room"));
 	FExitRoom->setShortcutId(SCT_MESSAGEWINDOWS_MUC_EXIT);
 	connect(FExitRoom,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
-	QToolButton *exitButton = FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
-	exitButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	FToolBarWidget->toolBarChanger()->insertAction(FExitRoom, TBG_MCWTBW_ROOM_EXIT);
 }
 
 void MultiUserChatWindow::updateStaticRoomActions()
@@ -857,7 +826,7 @@ void MultiUserChatWindow::updateStaticRoomActions()
 	QString affiliation = FMultiChat->isOpen() ? FMultiChat->mainUser()->affiliation() : MUC_AFFIL_NONE;
 	if (affiliation == MUC_AFFIL_OWNER)
 	{
-		FChangeTopic->setVisible(true);
+		FChangeSubject->setVisible(true);
 		FInviteContact->setVisible(true);
 		FRequestVoice->setVisible(false);
 		FBanList->setVisible(true);
@@ -869,7 +838,7 @@ void MultiUserChatWindow::updateStaticRoomActions()
 	}
 	else if (affiliation == MUC_AFFIL_ADMIN)
 	{
-		FChangeTopic->setVisible(true);
+		FChangeSubject->setVisible(true);
 		FInviteContact->setVisible(true);
 		FRequestVoice->setVisible(false);
 		FBanList->setVisible(true);
@@ -881,7 +850,7 @@ void MultiUserChatWindow::updateStaticRoomActions()
 	}
 	else if (role == MUC_ROLE_VISITOR)
 	{
-		FChangeTopic->setVisible(false);
+		FChangeSubject->setVisible(false);
 		FInviteContact->setVisible(false);
 		FRequestVoice->setVisible(true);
 		FBanList->setVisible(false);
@@ -893,7 +862,7 @@ void MultiUserChatWindow::updateStaticRoomActions()
 	}
 	else
 	{
-		FChangeTopic->setVisible(true);
+		FChangeSubject->setVisible(true);
 		FInviteContact->setVisible(true);
 		FRequestVoice->setVisible(false);
 		FBanList->setVisible(false);
@@ -904,9 +873,15 @@ void MultiUserChatWindow::updateStaticRoomActions()
 		FDestroyRoom->setVisible(false);
 	}
 
-	QAction *enterHandler = FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom);
-	if (enterHandler)
-		enterHandler->setVisible(!FMultiChat->isOpen());
+	if (!FMultiChat->isOpen())
+	{
+		if (FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom)==NULL)
+			FToolBarWidget->toolBarChanger()->insertAction(FEnterRoom, TBG_MCWTBW_ROOM_ENTER);
+	}
+	else
+	{
+		FToolBarWidget->toolBarChanger()->removeItem(FToolBarWidget->toolBarChanger()->actionHandle(FEnterRoom));
+	}
 }
 
 void MultiUserChatWindow::saveWindowState()
@@ -936,18 +911,6 @@ void MultiUserChatWindow::loadWindowGeometry()
 		if (!restoreGeometry(Options::fileValue("muc.mucwindow.geometry",tabPageId()).toByteArray()))
 			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
 		restoreState(Options::fileValue("muc.mucwindow.state",tabPageId()).toByteArray());
-	}
-}
-
-void MultiUserChatWindow::updateRecentItemActiveTime()
-{
-	if (FRecentContacts)
-	{
-		IRecentItem recentItem;
-		recentItem.type = REIT_CONFERENCE;
-		recentItem.streamJid = streamJid();
-		recentItem.reference = roomJid().pBare();
-		FRecentContacts->setItemActiveTime(recentItem);
 	}
 }
 
@@ -1233,7 +1196,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString status = parts.join(" ");
-		FMultiChat->sendPresence(IPresence::Offline,status);
+		FMultiChat->setPresence(IPresence::Offline,status);
 		exitAndDestroy(QString::null);
 		hasCommand = true;
 	}
@@ -1242,7 +1205,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
 		QString subject = parts.join(" ");
-		FMultiChat->sendSubject(subject);
+		FMultiChat->setSubject(subject);
 		hasCommand = true;
 	}
 	else if (AText == "/help")
@@ -1533,7 +1496,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 	IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
 	if (!window && user && user!=FMultiChat->mainUser())
 	{
-		window = FMessageWidgets!=NULL ? FMessageWidgets->getChatWindow(streamJid(),AContactJid) : NULL;
+		window = FMessageWidgets!=NULL ? FMessageWidgets->newChatWindow(streamJid(),AContactJid) : NULL;
 		if (window)
 		{
 			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
@@ -1557,7 +1520,7 @@ IChatWindow *MultiUserChatWindow::getChatWindow(const Jid &AContactJid)
 			updateChatWindow(window);
 
 			Action *clearAction = new Action(window->instance());
-			clearAction->setText(tr("Clear Chat Window"));
+			clearAction->setText(tr("Clear chat window"));
 			clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_CLEAR_CHAT);
 			clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
 			connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearChatWindowActionTriggered(bool)));
@@ -1663,11 +1626,9 @@ void MultiUserChatWindow::closeEvent(QCloseEvent *AEvent)
 {
 	if (FShownDetached)
 		saveWindowGeometry();
-
-	if (Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE).value().toBool() && !Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
-		exitAndDestroy(QString::null);
-
 	QMainWindow::closeEvent(AEvent);
+	if (Options::node(OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE).value().toBool())
+		exitAndDestroy(QString::null);
 	emit tabPageClosed();
 }
 
@@ -1694,20 +1655,16 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 		else if (AEvent->type() == QEvent::MouseButtonPress)
 		{
 			QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(AEvent);
-			if (FEditWidget)
+			if (FEditWidget && mouseEvent->button()==Qt::MidButton)
 			{
 				QStandardItem *userItem = FUsersModel->itemFromIndex(FUsersProxy->mapToSource(ui.ltvUsers->indexAt(mouseEvent->pos())));
-				if(mouseEvent->button()==Qt::MidButton && userItem)
+				if (userItem)
 				{
 					QString sufix = FEditWidget->textEdit()->textCursor().atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : " ";
 					FEditWidget->textEdit()->textCursor().insertText(userItem->text() + sufix);
 					FEditWidget->textEdit()->setFocus();
 					AEvent->accept();
 					return true;
-				}
-				else if (mouseEvent->button()==Qt::LeftButton && !userItem)
-				{
-					ui.ltvUsers->selectionModel()->clearSelection();
 				}
 			}
 		}
@@ -1757,8 +1714,7 @@ void MultiUserChatWindow::onChatClosed()
 {
 	if (!FDestroyOnChatClosed)
 	{
-		bool isConflictError = FMultiChat->roomError().toStanzaError().conditionCode()==XmppStanzaError::EC_CONFLICT;
-		if (FMultiChat->show()==IPresence::Error && isConflictError && !FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
+		if (FMultiChat->show()==IPresence::Error && FMultiChat->roomError().conditionCode()==XmppStanzaError::EC_CONFLICT && !FMultiChat->nickName().endsWith("/"+FMultiChat->streamJid().resource()))
 		{
 			FMultiChat->setNickName(FMultiChat->nickName()+"/"+FMultiChat->streamJid().resource());
 			FEnterRoom->trigger();
@@ -1800,7 +1756,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 			highlightUserRole(AUser);
 			highlightUserAffiliation(AUser);
 
-			if (FMultiChat->isConnected() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
+			if (FMultiChat->isOpen() && Options::node(OPV_MUC_GROUPCHAT_SHOWENTERS).value().toBool())
 			{
 				Jid realJid = AUser->data(MUDR_REAL_JID).toString();
 				if (!realJid.isEmpty())
@@ -1847,8 +1803,10 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 		qDeleteAll(FUsersModel->takeRow(userItem->row()));
 	}
 
-	if (FMultiChat->isConnected())
+	if (FMultiChat->isOpen())
+	{
 		updateWindow();
+	}
 
 	IChatWindow *window = findChatWindow(AUser->contactJid());
 	if (window)
@@ -1953,7 +1911,8 @@ void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &ARea
 
 void MultiUserChatWindow::onRejoinAfterKick()
 {
-	FMultiChat->sendStreamPresence();
+	FMultiChat->setAutoPresence(false);
+	FMultiChat->setAutoPresence(true);
 }
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)
@@ -2110,7 +2069,7 @@ void MultiUserChatWindow::onViewWidgetContextMenu(const QPoint &APosition, const
 	if (!AText.toPlainText().trimmed().isEmpty())
 	{
 		Action *quoteAction = new Action(AMenu);
-		quoteAction->setText(tr("Quote Selected Text"));
+		quoteAction->setText(tr("Quote selected text"));
 		quoteAction->setData(ADR_SELECTED_TEXT, AText.toHtml());
 		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
 		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
@@ -2299,15 +2258,15 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 	}
 }
 
-void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
+void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const QString &AError)
 {
 	if (FHistoryRequests.contains(AId))
 	{
 		IChatWindow *window = FHistoryRequests.take(AId);
 		if (window)
-			showChatStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()));
+			showChatStatus(window,tr("Failed to load history: %1").arg(AError));
 		else
-			showStatusMessage(tr("Failed to load history: %1").arg(AError.errorMessage()),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
+			showStatusMessage(tr("Failed to load history: %1").arg(AError),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
 		FPendingMessages.remove(window);
 	}
 }
@@ -2330,19 +2289,19 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action == FChangeNick)
 	{
-		QString nick = QInputDialog::getText(this,tr("Change nick name"),tr("Enter your new nick name in conference %1").arg(roomJid().uNode()),
+		QString nick = QInputDialog::getText(this,tr("Change nick name"),tr("Enter your new nick name in room %1").arg(roomJid().uNode()),
 			QLineEdit::Normal,FMultiChat->nickName());
 		if (!nick.isEmpty())
 			FMultiChat->setNickName(nick);
 	}
-	else if (action == FChangeTopic)
+	else if (action == FChangeSubject)
 	{
 		if (FMultiChat->isOpen())
 		{
 			QString newSubject = FMultiChat->subject();
-			InputTextDialog *dialog = new InputTextDialog(this,tr("Change topic"),tr("Enter new topic for conference %1").arg(roomJid().uNode()), newSubject);
+			InputTextDialog *dialog = new InputTextDialog(this,tr("Change subject"),tr("Enter new subject for room %1").arg(roomJid().uNode()), newSubject);
 			if (dialog->exec() == QDialog::Accepted)
-				FMultiChat->sendSubject(newSubject);
+				FMultiChat->setSubject(newSubject);
 		}
 	}
 	else if (action == FClearChat)
@@ -2351,7 +2310,8 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 	}
 	else if (action == FEnterRoom)
 	{
-		FMultiChat->sendStreamPresence();
+		FMultiChat->setAutoPresence(false);
+		FMultiChat->setAutoPresence(true);
 	}
 	else if (action == FExitRoom)
 	{
@@ -2364,7 +2324,7 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 			Jid contactJid = QInputDialog::getText(this,tr("Invite user"),tr("Enter user JID:"));
 			if (contactJid.isValid())
 			{
-				QString reason = tr("Please, enter this conference!");
+				QString reason = tr("You are welcome here");
 				reason = QInputDialog::getText(this,tr("Invite user"),tr("Enter a reason:"),QLineEdit::Normal,reason);
 				FMultiChat->inviteContact(contactJid,reason);
 			}
@@ -2399,7 +2359,7 @@ void MultiUserChatWindow::onToolBarActionTriggered(bool)
 		if (FMultiChat->isOpen())
 		{
 			bool ok = false;
-			QString reason = QInputDialog::getText(this,tr("Destroying conference"),tr("Enter a reason:"),QLineEdit::Normal,QString::null,&ok);
+			QString reason = QInputDialog::getText(this,tr("Destroying room"),tr("Enter a reason:"),QLineEdit::Normal,QString::null,&ok);
 			if (ok)
 				FMultiChat->destroyRoom(reason);
 		}

@@ -19,10 +19,6 @@
         <source>New Proxy</source>
         <translation>Новый прокси</translation>
     </message>
-    <message>
-        <source>Connection error</source>
-        <translation>Ошибка подключения</translation>
-    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>

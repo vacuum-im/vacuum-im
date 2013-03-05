@@ -6,15 +6,13 @@ find_package(Qt4 REQUIRED)
 
 add_custom_target(updatets)
 
-include("src/make/config.cmake")
-include("src/translations/languages.cmake")
-include_directories("${CMAKE_SOURCE_DIR}/src")
+include("config.cmake")
 
 install(DIRECTORY "resources/menuicons"
 	DESTINATION "${INSTALL_RESOURCES}"
 	PATTERN ".svn" EXCLUDE)
 
-include("src/packages/package.cmake")
+include("package.cmake")
 
 set(INSTALL_SDK YES CACHE BOOL "Install files needed to build custom plugins")
 set(INSTALL_DOCS YES CACHE BOOL "Install documentation (currently it's only AUTHORS, CHANGELOG, README and COPYING)")
@@ -48,6 +46,7 @@ endif (SYSTEM_MINIZIP_FOUND)
 if (SYSTEM_QTLOCKEDFILE_FOUND)
 	add_definitions(-DUSE_SYSTEM_QTLOCKEDFILE)
 endif (SYSTEM_QTLOCKEDFILE_FOUND)
+
 
 if ("${LANGS}" STREQUAL "")
 	process_lang_options()

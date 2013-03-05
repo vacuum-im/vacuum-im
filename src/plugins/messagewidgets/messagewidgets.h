@@ -16,7 +16,6 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
-#include <interfaces/imainwindow.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
@@ -74,10 +73,10 @@ public:
 	virtual IStatusBarWidget *newStatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	virtual ITabPageNotifier *newTabPageNotifier(ITabPage *ATabPage);
 	virtual QList<IMessageWindow *> messageWindows() const;
-	virtual IMessageWindow *getMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
+	virtual IMessageWindow *newMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
 	virtual IMessageWindow *findMessageWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QList<IChatWindow *> chatWindows() const;
-	virtual IChatWindow *getChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	virtual IChatWindow *newChatWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual IChatWindow *findChatWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QList<QUuid> tabWindowList() const;
 	virtual QUuid appendTabWindow(const QString &AName);
@@ -85,7 +84,7 @@ public:
 	virtual QString tabWindowName(const QUuid &AWindowId) const;
 	virtual void setTabWindowName(const QUuid &AWindowId, const QString &AName);
 	virtual QList<ITabWindow *> tabWindows() const;
-	virtual ITabWindow *getTabWindow(const QUuid &AWindowId);
+	virtual ITabWindow *newTabWindow(const QUuid &AWindowId);
 	virtual ITabWindow *findTabWindow(const QUuid &AWindowId) const;
 	virtual void assignTabWindowPage(ITabPage *APage);
 	virtual QList<IViewDropHandler *> viewDropHandlers() const;
@@ -136,21 +135,16 @@ protected slots:
 	void onEditWidgetInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument);
 	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onQuoteActionTriggered(bool);
-	void onAssignedTabPageDestroyed();
 	void onMessageWindowDestroyed();
 	void onChatWindowDestroyed();
 	void onTabWindowPageAdded(ITabPage *APage);
-	void onTabWindowCurrentPageChanged(ITabPage *APage);
 	void onTabWindowDestroyed();
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onStreamJidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
 	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onOptionsOpened();
 	void onOptionsClosed();
-	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;
-	IMainWindow *FMainWindow;
 	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;
 private:
@@ -159,7 +153,6 @@ private:
 	QList<IMessageWindow *> FMessageWindows;
 	QObjectCleanupHandler FCleanupHandler;
 private:
-	QList<ITabPage *> FAssignedPages;
 	QMap<QString, QUuid> FPageWindows;
 	QList<IViewDropHandler *> FViewDropHandlers;
 	QMultiMap<int,IViewUrlHandler *> FViewUrlHandlers;

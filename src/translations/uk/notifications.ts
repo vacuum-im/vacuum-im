@@ -90,10 +90,6 @@
         <source>Immediately activate the notification</source>
         <translation>Відразу активувати сповіщення</translation>
     </message>
-    <message>
-        <source>Allowed types of notifications</source>
-        <translation>Дозволені типи сповіщень</translation>
-    </message>
 </context>
 <context>
     <name>NotifyOptionsWidgetClass</name>

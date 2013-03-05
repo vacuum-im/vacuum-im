@@ -23,6 +23,18 @@
         <source>Data transmission finished</source>
         <translation>Datenübertragung beendet</translation>
     </message>
+    <message>
+        <source>Data transmission terminated by remote user</source>
+        <translation>Datenübertragen wurde vom anderen Benutzer abgebrochen</translation>
+    </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation>Zeitüberschreitung bei Verbindung</translation>
+    </message>
+    <message>
+        <source>File size unexpectedly changed</source>
+        <translation>Unerwartete Änderung der Dateigröße</translation>
+    </message>
 </context>
 <context>
     <name>FileStreamsManager</name>
@@ -45,22 +57,6 @@
     <message>
         <source>Show file transfers</source>
         <translation>Zeige Dateiübertragungen</translation>
-    </message>
-    <message>
-        <source>File input/output error</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>File size unexpectedly changed</source>
-        <translation>Unerwartete Änderung der Dateigröße</translation>
-    </message>
-    <message>
-        <source>Connection timed out</source>
-        <translation>Zeitüberschreitung bei Verbindung</translation>
-    </message>
-    <message>
-        <source>Data transmission terminated by remote user</source>
-        <translation>Datenübertragen wurde vom anderen Benutzer abgebrochen</translation>
     </message>
 </context>
 <context>

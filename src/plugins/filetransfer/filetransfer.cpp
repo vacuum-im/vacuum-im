@@ -120,9 +120,6 @@ bool FileTransfer::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SENDFILE, tr("Send file"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
 
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_NOT_STARTED,tr("Failed to start file transfer"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_TERMINATED,tr("Data transmission terminated"));
-
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
@@ -204,9 +201,11 @@ Action *FileTransfer::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 	return NULL;
 }
 
-Qt::DropActions FileTransfer::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
+Qt::DropActions FileTransfer::rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
 {
-	Q_UNUSED(AEvent); Q_UNUSED(AIndex); Q_UNUSED(ADrag);
+	Q_UNUSED(AEvent);
+	Q_UNUSED(AIndex);
+	Q_UNUSED(ADrag);
 	return Qt::IgnoreAction;
 }
 
@@ -221,10 +220,10 @@ bool FileTransfer::rosterDragEnter(const QDragEnterEvent *AEvent)
 	return false;
 }
 
-bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
+bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
 {
 	Q_UNUSED(AEvent);
-	return AHover->data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover->data(RDR_STREAM_JID).toString(), AHover->data(RDR_FULL_JID).toString());
+	return AHover.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover.data(RDR_STREAM_JID).toString(), AHover.data(RDR_FULL_JID).toString());
 }
 
 void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
@@ -232,17 +231,16 @@ void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
 	Q_UNUSED(AEvent);
 }
 
-bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
+bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
 {
-	if (AEvent->dropAction()!=Qt::IgnoreAction && AIndex->data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && 
-		isSupported(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString()))
+	if (AEvent->dropAction() != Qt::IgnoreAction)
 	{
 		Action *action = new Action(AMenu);
 		action->setText(tr("Send File"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILETRANSFER_SEND);
-		action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID).toString());
-		action->setData(ADR_CONTACT_JID,AIndex->data(RDR_FULL_JID).toString());
-		action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().value(0).toLocalFile());
+		action->setData(ADR_STREAM_JID,AIndex.data(RDR_STREAM_JID).toString());
+		action->setData(ADR_CONTACT_JID,AIndex.data(RDR_FULL_JID).toString());
+		action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().first().toLocalFile());
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
 		AMenu->addAction(action, AG_DEFAULT, true);
 		AMenu->setDefaultAction(action);
@@ -354,7 +352,7 @@ bool FileTransfer::fileStreamResponce(const QString &AStreamId, const Stanza &AR
 				stream->setRangeLength(rangeElem.attribute("length").toLongLong());
 		}
 		if (!stream->startStream(AMethodNS))
-			stream->abortStream(XmppError(IERR_FILETRANSFER_TRANSFER_NOT_STARTED));
+			stream->abortStream(tr("Failed to start file transfer"));
 		else
 			return true;
 	}
@@ -758,10 +756,12 @@ void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_SENDFILE)
 		{
-			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
+			int indexType = index.data(RDR_TYPE).toInt();
 			if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
-				sendFile(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
+			{
+				sendFile(index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString());
+			}
 		}
 	}
 }

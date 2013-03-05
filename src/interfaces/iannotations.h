@@ -21,9 +21,10 @@ public:
 protected:
 	virtual void annotationsLoaded(const Jid &AStreamJid) =0;
 	virtual void annotationsSaved(const Jid &AStreamJid) =0;
+	virtual void annotationsError(const Jid &AStreamJid, const QString &AError) =0;
 	virtual void annotationModified(const Jid &AStreamJid, const Jid &AContactJid) =0;
 };
 
-Q_DECLARE_INTERFACE(IAnnotations,"Vacuum.Plugin.IAnnotations/1.1")
+Q_DECLARE_INTERFACE(IAnnotations,"Vacuum.Plugin.IAnnotations/1.0")
 
 #endif

@@ -6,18 +6,30 @@ LEGEND
   [-] Bug fix
 
 
+1.2.2
 ------
-  [!] Added new plugin for spell checking
-  [!] Adden new plugin for keeping all user IM clients engaged in a conversation
-  [!] Added new plugin for viewing recently used contacts in main window
+  [-] Full text search in file archive of messages in certain cases worked not correctly
+  [-] Did not work contacts moving from an empty group
+  [-] Proxy authorization in certain cases was not working
+
+
+1.2.1
+------
+  [*] Added skype status icons
+  [*] The animation caching is added
+  [*] Under Linux sounds always are reproduced through aplay call
+  [-] Fixed deletion of history in join conference dialog
+  [-] When editing control of a hotkey instead of empty value value by default was saved
   [-] The application may fail in some cases after unsuccessful Stanza-session initialization
   [-] In private chats history of communication are loaded even if the relevant setting has been disabled
   [-] When changing the nickname in the conference the nickname was not changed in the active conferences menu in the roster window
   [-] When requesting delivery of unread messages via RemoteControl in the message list fell messages from conferences and received on a different account
+  [-] The behavior of history time removal widgets is corrected and unified in a settings window
   [-] The saved status messages including about a file transfer, were displayed with incorrect date when loading from history in windows of a usual chat and a private chat of conferences
-  [-] The exit from conference occurred incorrectly if was requested after a send of request for an entrance, but before receiving confirmation on an entrance
-  [-] Full text search in file archive of messages in certain cases worked not correctly
-  [-] Proxy authorization in certain cases was not worked
+  [-] Popup notifications appear now on that monitor where there is the main window
+  [-] The behavior of the main window after Drag&Drop is corrected
+  [-] Popup notifications are not capture input focus in Mac OS X
+  [-] Fixed problem with message appearance in Adium style
 
 
 v1.2.0

@@ -1,12 +1,11 @@
-# needed for languages.cmake to correctly generate CPack components
-set(PLUGIN_NAME ${VACUUM_UTILS_NAME})
+# needed for translations.cmake to correctly generate CPack components
+set(PLUGIN_NAME ${TARGET_UTILS})
 set(PLUGIN_DISPLAY_NAME "utils library")
 
-include("${CMAKE_SOURCE_DIR}/src/make/config.cmake")
-include("${CMAKE_SOURCE_DIR}/src/translations/languages.cmake") 
+include("${CMAKE_SOURCE_DIR}/config.cmake")
 include("utils.cmake")
 
-project(${VACUUM_UTILS_NAME})
+project(${TARGET_UTILS})
 
 set(QT_USE_QTXML YES)
 set(QT_USE_QTNETWORK YES)
@@ -15,18 +14,18 @@ include(${QT_USE_FILE})
 add_definitions("-DUTILS_DLL")
 add_definitions("-DQXT_STATIC") 
 link_directories("${CMAKE_BINARY_DIR}/libs")
-include_directories(AFTER  "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
+include_directories(AFTER "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 include(FindX11)
 include_directories(AFTER ${X11_INCLUDE_DIR})
 if (NOT SYSTEM_IDN_FOUND)
 	include_directories("${CMAKE_SOURCE_DIR}/src/thirdparty/idn")
 endif (NOT SYSTEM_IDN_FOUND)
 
-add_translations(TRANSLATIONS "${VACUUM_UTILS_NAME}" ${SOURCES})
-add_library(${VACUUM_UTILS_NAME} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
-set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES
-	VERSION "${VACUUM_UTILS_ABI}"
-	SOVERSION "${VACUUM_UTILS_ABI}")
+add_translations(TRANSLATIONS "${TARGET_UTILS}" ${SOURCES})
+add_library(${TARGET_UTILS} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
+set_target_properties(${TARGET_UTILS} PROPERTIES
+	VERSION "${VERSION_UTILS}"
+	SOVERSION "${VERSION_UTILS_ABI}")
 
 set(ADD_LIBS qxtglobalshortcut idle)
 if (SYSTEM_ZLIB_FOUND)
@@ -56,25 +55,25 @@ else (X11_Xscreensaver_FOUND)
 endif (X11_Xscreensaver_FOUND)
 
 if (APPLE)
-	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
+	list(APPEND ADD_LIBS "-framework Carbon")
 endif (APPLE)
 
-target_link_libraries(${VACUUM_UTILS_NAME} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
-target_link_libraries(${VACUUM_UTILS_NAME} ${QT_LIBRARIES} ${ADD_LIBS})
+target_link_libraries(${TARGET_UTILS} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
+target_link_libraries(${TARGET_UTILS} ${QT_LIBRARIES} ${ADD_LIBS})
 
 if (WIN32)
-	set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-	install(TARGETS ${VACUUM_UTILS_NAME}
+	set_target_properties(${TARGET_UTILS} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+	install(TARGETS ${TARGET_UTILS}
 		RUNTIME DESTINATION "${INSTALL_LIBS}"
-		COMPONENT ${VACUUM_UTILS_NAME})
+		COMPONENT ${TARGET_UTILS})
 else (WIN32)
-	set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs")
-	install(TARGETS ${VACUUM_UTILS_NAME}
+	set_target_properties(${TARGET_UTILS} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs")
+	install(TARGETS ${TARGET_UTILS}
 		LIBRARY DESTINATION "${INSTALL_LIBS}"
-		COMPONENT ${VACUUM_UTILS_NAME})
+		COMPONENT ${TARGET_UTILS})
 endif (WIN32)
 
-cpack_add_component(${VACUUM_UTILS_NAME}
+cpack_add_component(${TARGET_UTILS}
 	DISPLAY_NAME "Utils library"
 	REQUIRED
 	GROUP core)
@@ -85,7 +84,7 @@ if (INSTALL_SDK)
 		DESTINATION "${INSTALL_INCLUDES}/utils"
 		COMPONENT sdk)
 	if (WIN32)
-		install(TARGETS ${VACUUM_UTILS_NAME}
+		install(TARGETS ${TARGET_UTILS}
 			ARCHIVE DESTINATION "${INSTALL_LIBS}"
 			COMPONENT sdk)
 	endif (WIN32)

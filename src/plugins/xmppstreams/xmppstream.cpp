@@ -16,7 +16,7 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 
 	connect(&FParser,SIGNAL(opened(QDomElement)), SLOT(onParserOpened(QDomElement)));
 	connect(&FParser,SIGNAL(element(QDomElement)), SLOT(onParserElement(QDomElement)));
-	connect(&FParser,SIGNAL(error(const XmppError &)), SLOT(onParserError(const XmppError &)));
+	connect(&FParser,SIGNAL(error(const QString &)), SLOT(onParserError(const QString &)));
 	connect(&FParser,SIGNAL(closed()), SLOT(onParserClosed()));
 
 	FKeepAliveTimer.setSingleShot(false);
@@ -25,7 +25,7 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 
 XmppStream::~XmppStream()
 {
-	abort(XmppError(IERR_XMPPSTREAM_DESTROYED));
+	abort(tr("XMPP stream destroyed"));
 	clearActiveFeatures();
 	emit streamDestroyed();
 }
@@ -56,7 +56,7 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 		}
 		else if (AStanza.element().nodeName() == "stream:error")
 		{
-			abort(XmppStreamError(AStanza.element()));
+			abort(XmppStreamError(AStanza.element()).errorMessage());
 			return true;
 		}
 	}
@@ -85,7 +85,7 @@ bool XmppStream::open()
 {
 	if (FConnection && FStreamState==SS_OFFLINE)
 	{
-		FError = XmppError::null;
+		FErrorString.clear();
 		if (FConnection->connectToHost())
 		{
 			setStreamState(SS_CONNECTING);
@@ -93,7 +93,7 @@ bool XmppStream::open()
 		}
 		else
 		{
-			abort(XmppError(IERR_XMPPSTREAM_FAILED_START_CONNECTION));
+			abort(tr("Failed to start connection"));
 		}
 	}
 	else if (!FConnection)
@@ -123,14 +123,14 @@ void XmppStream::close()
 	}
 }
 
-void XmppStream::abort(const XmppError &AError)
+void XmppStream::abort(const QString &AError)
 {
 	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
 		if (FStreamState != SS_DISCONNECTING)
 		{
 			setStreamState(SS_ERROR);
-			FError = AError;
+			FErrorString = AError;
 			emit error(AError);
 		}
 
@@ -144,9 +144,9 @@ QString XmppStream::streamId() const
 	return FStreamId;
 }
 
-XmppError XmppStream::error() const
+QString XmppStream::errorString() const
 {
-	return FError;
+	return FErrorString;
 }
 
 Jid XmppStream::streamJid() const
@@ -246,7 +246,7 @@ void XmppStream::setConnection(IConnection *AConnection)
 		{
 			connect(AConnection->instance(),SIGNAL(connected()),SLOT(onConnectionConnected()));
 			connect(AConnection->instance(),SIGNAL(readyRead(qint64)),SLOT(onConnectionReadyRead(qint64)));
-			connect(AConnection->instance(),SIGNAL(error(const XmppError &)),SLOT(onConnectionError(const XmppError &)));
+			connect(AConnection->instance(),SIGNAL(error(const QString &)),SLOT(onConnectionError(const QString &)));
 			connect(AConnection->instance(),SIGNAL(disconnected()),SLOT(onConnectionDisconnected()));
 		}
 
@@ -379,7 +379,7 @@ void XmppStream::processFeatures()
 		}
 		else
 		{
-			abort(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
+			abort(tr("Secure connection is not established"));
 		}
 	}
 }
@@ -407,7 +407,7 @@ bool XmppStream::startFeature(const QString &AFeatureNS, const QDomElement &AFea
 		{
 			FActiveFeatures.append(feature);
 			connect(feature->instance(),SIGNAL(finished(bool)),SLOT(onFeatureFinished(bool)));
-			connect(feature->instance(),SIGNAL(error(const XmppError &)),SLOT(onFeatureError(const XmppError &)));
+			connect(feature->instance(),SIGNAL(error(const QString &)),SLOT(onFeatureError(const QString &)));
 			connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 			connect(this,SIGNAL(closed()),feature->instance(),SLOT(deleteLater()));
 			return true;
@@ -503,7 +503,7 @@ void XmppStream::onConnectionReadyRead(qint64 ABytes)
 	}
 }
 
-void XmppStream::onConnectionError(const XmppError &AError)
+void XmppStream::onConnectionError(const QString &AError)
 {
 	abort(AError);
 }
@@ -516,7 +516,7 @@ void XmppStream::onConnectionDisconnected()
 		FClosed = true;
 
 		if (FStreamState != SS_DISCONNECTING)
-			abort(XmppError(IERR_XMPPSTREAM_CLOSED_UNEXPECTEDLY));
+			abort(tr("Connection closed unexpectedly"));
 
 		setStreamState(SS_OFFLINE);
 		setKeepAliveTimerActive(false);
@@ -544,7 +544,7 @@ void XmppStream::onParserElement(QDomElement AElem)
 	processStanzaHandlers(stanza,false);
 }
 
-void XmppStream::onParserError(const XmppError &AError)
+void XmppStream::onParserError(const QString &AError)
 {
 	static const QString xmlError(
 		"<stream:error>"
@@ -552,7 +552,7 @@ void XmppStream::onParserError(const XmppError &AError)
 			"<text xmlns='urn:ietf:params:xml:ns:xmpp-streams'>%1</text>"
 		"</stream:error></stream:stream>");
 
-	sendData(xmlError.arg(AError.errorText()).toUtf8());
+	sendData(xmlError.arg(AError).toUtf8());
 	abort(AError);
 }
 
@@ -570,10 +570,9 @@ void XmppStream::onFeatureFinished(bool ARestart)
 		startStream();
 }
 
-void XmppStream::onFeatureError(const XmppError &AError)
+void XmppStream::onFeatureError(const QString &AError)
 {
-	if (AError.errorNs()==NS_FEATURE_SASL || AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
-		FSessionPassword = QString::null;
+	FSessionPassword.clear();
 	abort(AError);
 }
 
@@ -589,7 +588,7 @@ void XmppStream::onKeepAliveTimeout()
 	if (FStreamState == SS_DISCONNECTING)
 		FConnection->disconnectFromHost();
 	else if (FStreamState != SS_ONLINE)
-		abort(XmppStreamError(XmppStreamError::EC_CONNECTION_TIMEOUT));
+		abort(tr("XMPP connection timed out"));
 	else
 		sendData(space);
 }

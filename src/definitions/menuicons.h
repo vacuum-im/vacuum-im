@@ -25,7 +25,6 @@
 //Bookmarks
 #define MNI_BOOKMARKS                   "bookmarks"
 #define MNI_BOOKMARKS_ADD               "bookmarksAdd"
-#define MNI_BOOKMARKS_REMOVE            "bookmarksRemove"
 #define MNI_BOOKMARKS_ROOM              "bookmarksRoom"
 #define MNI_BOOKMARKS_URL               "bookmarksURL"
 #define MNI_BOOKMARKS_EDIT              "bookmarksEdit"
@@ -169,13 +168,6 @@
 #define MNI_PLUGINMANAGER_ABOUT         "pluginmanagerAbout"
 #define MNI_PLUGINMANAGER_ABOUT_QT      "pluginmanagerAboutQt"
 
-//RecentContact
-#define MNI_RECENT                      "recentcontacts"
-#define MNI_RECENT_FAVORITE             "recentcontactsFavorite"
-#define MNI_RECENT_INSERT_FAVORITE      "recentcontactsInsertFavorite"
-#define MNI_RECENT_REMOVE_FAVORITE      "recentcontactsRemoveFavorite"
-#define MNI_RECENT_REMOVE_RECENT        "recentcontactsRemoveRecent"
-
 //Registration
 #define MNI_REGISTERATION               "register"
 #define MNI_REGISTERATION_REMOVE        "registerRemove"
@@ -209,7 +201,6 @@
 #define MNI_ROSTERSEARCH_MENU           "rostersearchMenu"
 
 //RosterView
-#define MNI_ROSTERVIEW_CONTACTS         "rosterviewContacts"
 #define MNI_ROSTERVIEW_OPTIONS          "rosterviewOptions"
 #define MNI_ROSTERVIEW_SHOW_OFFLINE     "rosterviewShowOffline"
 #define MNI_ROSTERVIEW_HIDE_OFFLINE     "rosterviewHideOffline"

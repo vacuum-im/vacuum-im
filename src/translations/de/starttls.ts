@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de" sourcelanguage="en">
 <context>
+    <name>StartTLS</name>
+    <message>
+        <source>StartTLS negotiation failed</source>
+        <translation>StartTLS Aushandlung gescheitert</translation>
+    </message>
+    <message>
+        <source>Wrong StartTLS negotiation response</source>
+        <translation>Falsche StartTLS Aushandlungsantwort</translation>
+    </message>
+</context>
+<context>
     <name>StartTLSPlugin</name>
     <message>
         <source>StartTLS</source>
@@ -10,14 +21,6 @@
     <message>
         <source>Allows to establish a secure connection to the server after connecting</source>
         <translation>Erlaubt das herstellen einer sicheren Verbindung nach dem Verbindungsaufbau</translation>
-    </message>
-    <message>
-        <source>Wrong StartTLS negotiation response</source>
-        <translation>Falsche StartTLS Aushandlungsantwort</translation>
-    </message>
-    <message>
-        <source>StartTLS negotiation failed</source>
-        <translation>StartTLS Aushandlung gescheitert</translation>
     </message>
 </context>
 </TS>

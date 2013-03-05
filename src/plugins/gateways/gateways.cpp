@@ -106,8 +106,8 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
 				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -118,7 +118,7 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		if (FVCardPlugin)
 		{
 			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
-			connect(FVCardPlugin->instance(),SIGNAL(vcardError(const Jid &, const XmppError &)),SLOT(onVCardError(const Jid &, const XmppError &)));
+			connect(FVCardPlugin->instance(),SIGNAL(vcardError(const Jid &, const QString &)),SLOT(onVCardError(const Jid &, const QString &)));
 		}
 	}
 
@@ -148,8 +148,8 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		{
 			connect(FRegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
 				SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
-			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const XmppError &)),
-				SLOT(onRegisterError(const QString &, const XmppError &)));
+			connect(FRegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
+				SLOT(onRegisterError(const QString &, const QString &)));
 		}
 	}
 
@@ -189,7 +189,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza));
+			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 		}
 		FPromptRequests.removeAll(AStanza.id());
 	}
@@ -202,7 +202,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
-			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza));
+			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 		}
 		FUserJidRequests.removeAll(AStanza.id());
 	}
@@ -680,9 +680,9 @@ void Gateways::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelecte
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	if (ALabelId == RLID_DISPLAY)
 	{
 		if (AIndexes.count()==1 && AIndexes.first()->type()==RIT_STREAM_ROOT)
 		{
@@ -990,7 +990,7 @@ void Gateways::onVCardReceived(const Jid &AContactJid)
 	}
 }
 
-void Gateways::onVCardError(const Jid &AContactJid, const XmppError &AError)
+void Gateways::onVCardError(const Jid &AContactJid, const QString &AError)
 {
 	Q_UNUSED(AError);
 	FResolveNicks.remove(AContactJid);
@@ -1054,7 +1054,7 @@ void Gateways::onRegisterFields(const QString &AId, const IRegisterFields &AFiel
 	}
 }
 
-void Gateways::onRegisterError(const QString &AId, const XmppError &AError)
+void Gateways::onRegisterError(const QString &AId, const QString &AError)
 {
 	Q_UNUSED(AError);
 	FShowRegisterRequests.remove(AId);

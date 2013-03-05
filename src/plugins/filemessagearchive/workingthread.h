@@ -2,9 +2,7 @@
 #define WORKINGTHREAD_H
 
 #include <QThread>
-#include <definitions/internalerrors.h>
 #include <interfaces/ifilemessagearchive.h>
-#include <utils/xmpperror.h>
 
 class WorkingThread : 
 	public QThread
@@ -25,8 +23,8 @@ public:
 	QString workId() const;
 	int workAction() const;
 	bool hasError() const;
-	XmppError error() const;
-	void setError(const XmppError &AError);
+	QString errorString() const;
+	void setErrorString(const QString &AError);
 	Jid streamJid() const;
 	void setStreamJid(const Jid &AStreamJid);
 	IArchiveHeader archiveHeader() const;
@@ -52,8 +50,9 @@ private:
 	IFileMessageArchive *FFileArchive;
 private:
 	int FAction;
+	bool FHasError;
 	QString FWorkId;
-	XmppError FError;
+	QString FErrorString;
 	IArchiveItemPrefs FItemPrefs;
 private:
 	Jid FStreamJid;

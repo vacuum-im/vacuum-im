@@ -3,11 +3,9 @@
 
 #include <QObjectCleanupHandler>
 #include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
-#include <utils/xmpperror.h>
 #include "roster.h"
 
 class RosterPlugin :
@@ -25,7 +23,7 @@ public:
 	virtual QUuid pluginUuid() const { return ROSTER_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects();
+	virtual bool initObjects() { return true; }
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IRosterPlugin

@@ -215,18 +215,6 @@
         <comment>Your google domain</comment>
         <translation>google.com.ua</translation>
     </message>
-    <message>
-        <source>Combine/Split with message windows</source>
-        <translation>Об&apos;єднати/Розділити з вікнами повідомлень</translation>
-    </message>
-    <message>
-        <source>Combine message windows with contact-list</source>
-        <translation>Об&apos;єднати вікна повідомлень з контакт-листом</translation>
-    </message>
-    <message>
-        <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MessageWindow</name>

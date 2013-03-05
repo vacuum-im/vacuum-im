@@ -2,9 +2,8 @@
 #define IGATEWAYS_H
 
 #include <QDialog>
-#include <interfaces/iservicediscovery.h>
 #include <utils/jid.h>
-#include <utils/xmpperror.h>
+#include <interfaces/iservicediscovery.h>
 
 #define GATEWAYS_UUID "{BF34165C-DD9A-43eb-949B-926DD411E1A8}"
 
@@ -26,9 +25,9 @@ public:
 protected:
 	virtual void promptReceived(const QString &AId, const QString &ADesc, const QString &APrompt) =0;
 	virtual void userJidReceived(const QString &AId, const Jid &AUserJid) =0;
-	virtual void errorReceived(const QString &AId, const XmppError &AError) =0;
+	virtual void errorReceived(const QString &AId, const QString &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IGateways,"Vacuum.Plugin.IGateways/1.2")
+Q_DECLARE_INTERFACE(IGateways,"Vacuum.Plugin.IGateways/1.1")
 
 #endif

@@ -2,7 +2,7 @@
 
 ConnectionManager::ConnectionManager()
 {
-	FEncryptedLabelId = 0;
+	FEncryptedLabelId = -1;
 	FAccountManager = NULL;
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
@@ -85,13 +85,11 @@ bool ConnectionManager::initObjects()
 	Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
 	Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
 
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_CONNECTIONS_CONNECT_ERROR,tr("Connection error"));
-
 	if (FRostersViewPlugin)
 	{
-		AdvancedDelegateItem label(RLID_CONNECTION_ENCRYPTED);
-		label.d->kind = AdvancedDelegateItem::CustomData;
-		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
+		IRostersLabel label;
+		label.order = RLO_CONNECTION_ENCRYPTED;
+		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
 		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;

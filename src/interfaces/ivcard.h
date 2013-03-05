@@ -7,7 +7,6 @@
 #include <QStringList>
 #include <QDomDocument>
 #include <utils/jid.h>
-#include <utils/xmpperror.h>
 
 #define VCARD_UUID "{8AD31549-AD09-4e84-BD6F-41928B3BDA7E}"
 
@@ -34,7 +33,7 @@ public:
 protected:
 	virtual void vcardUpdated() =0;
 	virtual void vcardPublished() =0;
-	virtual void vcardError(const XmppError &AError) =0;
+	virtual void vcardError(const QString &AError) =0;
 };
 
 class IVCardPlugin 
@@ -50,10 +49,10 @@ public:
 protected:
 	virtual void vcardReceived(const Jid &AContactJid) =0;
 	virtual void vcardPublished(const Jid &AContactJid) =0;
-	virtual void vcardError(const Jid &AContactJid, const XmppError &AError) =0;
+	virtual void vcardError(const Jid &AContactJid, const QString &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IVCard,"Vacuum.Plugin.IVCard/1.2")
-Q_DECLARE_INTERFACE(IVCardPlugin,"Vacuum.Plugin.IVCardPlugin/1.2")
+Q_DECLARE_INTERFACE(IVCard,"Vacuum.Plugin.IVCard/1.1")
+Q_DECLARE_INTERFACE(IVCardPlugin,"Vacuum.Plugin.IVCardPlugin/1.1")
 
 #endif

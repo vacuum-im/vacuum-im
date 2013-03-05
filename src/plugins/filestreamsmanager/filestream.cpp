@@ -92,11 +92,6 @@ qint64 FileStream::progress() const
 	return FProgress;
 }
 
-XmppError FileStream::error() const
-{
-	return FError;
-}
-
 QString FileStream::stateString() const
 {
 	return FStateString;
@@ -328,14 +323,14 @@ bool FileStream::startStream(const QString &AMethodNS)
 	return false;
 }
 
-void FileStream::abortStream(const XmppError &AError)
+void FileStream::abortStream(const QString &AError)
 {
 	if (FStreamState != Aborted)
 	{
 		if (!FAborted)
 		{
 			FAborted = true;
-			FError = AError;
+			FAbortString = AError;
 		}
 		if (FThread && FThread->isRunning())
 		{
@@ -345,26 +340,11 @@ void FileStream::abortStream(const XmppError &AError)
 		{
 			FSocket->close();
 		}
-		else if (AError.toStanzaError().conditionCode() == XmppStanzaError::EC_FORBIDDEN)
-		{
-			setStreamState(Aborted,XmppError::getErrorString(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_TERMINATED_BY_REMOTE_USER));
-		}
 		else
 		{
 			if (FStreamKind==ReceiveFile && FStreamState==Creating)
-			{
-				if (!AError.isStanzaError())
-				{
-					XmppStanzaError err(XmppStanzaError::EC_FORBIDDEN,AError.errorText());
-					err.setAppCondition(AError.errorNs(),AError.condition());
-					FDataManager->rejectStream(FStreamId,err);
-				}
-				else
-				{
-					FDataManager->rejectStream(FStreamId,AError.toStanzaError());
-				}
-			}
-			setStreamState(Aborted,AError.errorMessage());
+				FDataManager->rejectStream(FStreamId,AError);
+			setStreamState(Aborted,AError);
 		}
 	}
 }
@@ -411,7 +391,7 @@ bool FileStream::updateFileInfo()
 			}
 			else
 			{
-				abortStream(XmppError(IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED));
+				abortStream(tr("File size unexpectedly changed"));
 				return false;
 			}
 		}
@@ -479,11 +459,11 @@ void FileStream::onSocketStateChanged(int AState)
 			qint64 bytesForTransfer = FRangeLength>0 ? FRangeLength : FFileSize-FRangeOffset;
 			if (FFile.error() != QFile::NoError)
 			{
-				abortStream(XmppError(IERR_FILESTREAMS_STREAM_FILE_IO_ERROR,FFile.errorString()));
+				abortStream(FFile.errorString());
 			}
-			else if (!FSocket->error().isNull())
+			else if (FSocket->errorCode() != IDataStreamSocket::NoError)
 			{
-				abortStream(FSocket->error());
+				abortStream(FSocket->errorString());
 			}
 			else if (FProgress == bytesForTransfer)
 			{
@@ -491,12 +471,12 @@ void FileStream::onSocketStateChanged(int AState)
 			}
 			else
 			{
-				abortStream(XmppError(IERR_FILESTREAMS_STREAM_TERMINATED_BY_REMOTE_USER));
+				abortStream(tr("Data transmission terminated by remote user"));
 			}
 		}
 		else
 		{
-			abortStream(FError);
+			abortStream(FAbortString);
 		}
 		FSocket->instance()->deleteLater();
 		FSocket = NULL;
@@ -534,6 +514,6 @@ void FileStream::onConnectionTimeout()
 {
 	if (FStreamState == Connecting)
 	{
-		abortStream(XmppError(IERR_FILESTREAMS_STREAM_CONNECTION_TIMEOUT));
+		abortStream(tr("Connection timed out"));
 	}
 }

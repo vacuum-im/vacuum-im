@@ -7,6 +7,7 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/rosterindextyperole.h>
+#include <definitions/rosterlabelorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/vcardvaluenames.h>
 #include <definitions/discoitemdataroles.h>
@@ -31,11 +32,11 @@
 #include "addlegacycontactdialog.h"
 
 class Gateways :
-	public QObject,
-	public IPlugin,
-	public IGateways,
-	public IStanzaRequestOwner,
-	public IDiscoFeatureHandler
+			public QObject,
+			public IPlugin,
+			public IGateways,
+			public IStanzaRequestOwner,
+			public IDiscoFeatureHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IGateways IStanzaRequestOwner IDiscoFeatureHandler);
@@ -70,7 +71,7 @@ public:
 signals:
 	void promptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
 	void userJidReceived(const QString &AId, const Jid &AUserJid);
-	void errorReceived(const QString &AId, const XmppError &AError);
+	void errorReceived(const QString &AId, const QString &AError);
 protected:
 	void registerDiscoFeatures();
 	void savePrivateStorageKeep(const Jid &AStreamJid);
@@ -85,7 +86,7 @@ protected slots:
 	void onRemoveActionTriggered(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onPresenceOpened(IPresence *APresence);
 	void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
 	void onPresenceClosed(IPresence *APresence);
@@ -98,11 +99,11 @@ protected slots:
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onKeepTimerTimeout();
 	void onVCardReceived(const Jid &AContactJid);
-	void onVCardError(const Jid &AContactJid, const XmppError &AError);
+	void onVCardError(const Jid &AContactJid, const QString &AError);
 	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
 	void onDiscoItemContextMenu(const QModelIndex AIndex, Menu *AMenu);
 	void onRegisterFields(const QString &AId, const IRegisterFields &AFields);
-	void onRegisterError(const QString &AId, const XmppError &AError);
+	void onRegisterError(const QString &AId, const QString &AError);
 private:
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
