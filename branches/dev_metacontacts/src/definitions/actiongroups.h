@@ -47,6 +47,7 @@
 #define AG_RVCBM_JABBERID                                       200
 #define AG_RVCBM_STATUS                                         300
 #define AG_RVCBM_ANNOTATION                                     400
+#define AG_RVCBM_MUC_SUBJECT                                    500
 
 //TrayManager - TrayMenu
 #define AG_TMTM_NOTIFICATIONS_LAST                              50

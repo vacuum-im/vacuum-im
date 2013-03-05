@@ -20,10 +20,6 @@
         <translation>Edit annotation</translation>
     </message>
     <message>
-        <source>Annotation: %1</source>
-        <translation>Annotation: %1</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation>&lt;b&gt;Annotation:&lt;/b&gt;</translation>
     </message>

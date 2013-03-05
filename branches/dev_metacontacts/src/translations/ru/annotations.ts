@@ -20,10 +20,6 @@
         <translation>Редактировать комментарий</translation>
     </message>
     <message>
-        <source>Annotation: %1</source>
-        <translation>Комментарий: %1</translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation>&lt;b&gt;Комментарий:&lt;/b&gt;</translation>
     </message>

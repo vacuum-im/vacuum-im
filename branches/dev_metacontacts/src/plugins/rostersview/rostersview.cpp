@@ -407,6 +407,15 @@ void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, c
 		if (FRostersModel && AEvent!=NULL)
 			labelId = labelAt(AEvent->pos(),indexAt(AEvent->pos()));
 		emit indexClipboardMenu(AIndexes,labelId,AMenu);
+
+		QList<QString> texts;
+		foreach(Action *action, AMenu->groupActions())
+		{
+			if (texts.contains(action->text()))
+				action->setVisible(false);
+			else
+				texts.append(action->text());
+		}
 	}
 }
 

@@ -98,17 +98,5 @@
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
-    <message>
-        <source>Name: %1</source>
-        <translation>Имя: %1</translation>
-    </message>
-    <message>
-        <source>Jabber ID: %1</source>
-        <translation>Jabber ID: %1</translation>
-    </message>
-    <message>
-        <source>Status: %1</source>
-        <translation>Статус: %1</translation>
-    </message>
 </context>
 </TS>

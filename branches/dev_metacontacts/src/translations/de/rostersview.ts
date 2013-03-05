@@ -98,17 +98,5 @@
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Name: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Jabber ID: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Status: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>

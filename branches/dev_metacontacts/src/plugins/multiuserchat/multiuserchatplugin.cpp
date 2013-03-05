@@ -1,5 +1,6 @@
 #include "multiuserchatplugin.h"
 
+#include <QClipboard>
 #include <QInputDialog>
 #include <QApplication>
 #include <QDesktopWidget>
@@ -9,6 +10,7 @@
 #define ADR_ROOM                  Action::DR_Parametr2
 #define ADR_NICK                  Action::DR_Parametr3
 #define ADR_PASSWORD              Action::DR_Parametr4
+#define ADR_CLIPBOARD_DATA        Action::DR_Parametr1
 
 #define DIC_CONFERENCE            "conference"
 #define DIT_TEXT                  "text"
@@ -86,8 +88,7 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 		if (FDiscovery)
 		{
-			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),
-				SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 		}
 	}
 
@@ -139,6 +140,8 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
+				SLOT(onRostersViewClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -1130,6 +1133,13 @@ void MultiUserChatPlugin::onExitRoomActionTriggered(bool)
 	}
 }
 
+void MultiUserChatPlugin::onCopyToClipboardActionTriggered( bool )
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+		QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
+}
+
 void MultiUserChatPlugin::onRosterIndexDestroyed(IRosterIndex *AIndex)
 {
 	int index = FChatIndexes.indexOf(AIndex);
@@ -1323,6 +1333,41 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				AMenu->addAction(exit,AG_RVCM_MULTIUSERCHAT_EXIT);
 
 				window->contextMenuForRoom(AMenu);
+			}
+		}
+	}
+}
+
+void MultiUserChatPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+{
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	{
+		foreach(IRosterIndex *index, AIndexes)
+		{
+			IMultiUserChatWindow *window = getMultiChatWindowForIndex(index);
+			if (window)
+			{
+				QString name = window->multiUserChat()->roomName().trimmed();
+				if (!name.isEmpty())
+				{
+					Action *nameAction = new Action(AMenu);
+					nameAction->setText(TextManager::getElidedString(name,Qt::ElideRight,50));
+					nameAction->setData(ADR_CLIPBOARD_DATA,name);
+					nameAction->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
+					connect(nameAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+					AMenu->addAction(nameAction, AG_RVCBM_NAME, true);
+				}
+
+				QString subject = window->multiUserChat()->subject().trimmed();
+				if (!subject.isEmpty())
+				{
+					Action *subjectAction = new Action(AMenu);
+					subjectAction->setText(TextManager::getElidedString(subject,Qt::ElideRight,50));
+					subjectAction->setData(ADR_CLIPBOARD_DATA,subject);
+					subjectAction->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
+					connect(subjectAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+					AMenu->addAction(subjectAction, AG_RVCBM_MUC_SUBJECT, true);
+				}
 			}
 		}
 	}

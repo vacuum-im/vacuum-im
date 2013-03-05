@@ -523,23 +523,33 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 			QString name = index->data(RDR_NAME).toString().trimmed();
 			if (!name.isEmpty())
 			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Name: %1").arg(TextManager::getElidedString(name,Qt::ElideRight,50)));
-				action->setData(ADR_CLIPBOARD_DATA,name);
-				action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_RVCBM_NAME, true);
+				Action *nameAction = new Action(AMenu);
+				nameAction->setText(TextManager::getElidedString(name,Qt::ElideRight,50));
+				nameAction->setData(ADR_CLIPBOARD_DATA,name);
+				nameAction->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
+				connect(nameAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(nameAction, AG_RVCBM_NAME, true);
 			}
 
 			Jid jid = index->data(RDR_FULL_JID).toString();
 			if (!jid.isEmpty())
 			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Jabber ID: %1").arg(jid.uBare()));
-				action->setData(ADR_CLIPBOARD_DATA, jid.uBare());
-				action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_RVCBM_JABBERID, true);
+				Action *bareJidAction = new Action(AMenu);
+				bareJidAction->setText(jid.uBare());
+				bareJidAction->setData(ADR_CLIPBOARD_DATA, jid.uBare());
+				bareJidAction->setShortcutId(SCT_ROSTERVIEW_COPYJID);
+				connect(bareJidAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(bareJidAction, AG_RVCBM_JABBERID, true);
+
+				if (!jid.resource().isEmpty())
+				{
+					Action *fullJidAction = new Action(AMenu);
+					fullJidAction->setText(jid.uFull());
+					fullJidAction->setData(ADR_CLIPBOARD_DATA, jid.uFull());
+					fullJidAction->setShortcutId(SCT_ROSTERVIEW_COPYJID);
+					connect(fullJidAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+					AMenu->addAction(fullJidAction, AG_RVCBM_JABBERID, true);
+				}
 			}
 
 			QStringList resources = index->data(RDR_RESOURCES).toStringList();
@@ -549,12 +559,12 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 				IPresenceItem pitem =presence!=NULL ? presence->findItem(resource) : IPresenceItem();
 				if (pitem.isValid && !pitem.status.isEmpty())
 				{
-					Action *action = new Action(AMenu);
-					action->setText(tr("Status: %1").arg(TextManager::getElidedString(pitem.status,Qt::ElideRight,50)));
-					action->setData(ADR_CLIPBOARD_DATA,pitem.status);
-					action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
-					connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-					AMenu->addAction(action, AG_RVCBM_STATUS, true);
+					Action *statusAction = new Action(AMenu);
+					statusAction->setText(TextManager::getElidedString(pitem.status,Qt::ElideRight,50));
+					statusAction->setData(ADR_CLIPBOARD_DATA,pitem.status);
+					statusAction->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
+					connect(statusAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+					AMenu->addAction(statusAction, AG_RVCBM_STATUS, true);
 				}
 			}
 		}

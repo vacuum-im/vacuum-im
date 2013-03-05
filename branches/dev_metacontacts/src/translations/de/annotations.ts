@@ -20,10 +20,6 @@
         <translation>Bearbeite Kommentar</translation>
     </message>
     <message>
-        <source>Annotation: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
         <translation type="unfinished"></translation>
     </message>

@@ -413,11 +413,11 @@ void Annotations::onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndex
 			QString note = index->data(RDR_ANNOTATIONS).toString();
 			if (!note.isEmpty())
 			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Annotation: %1").arg(TextManager::getElidedString(note,Qt::ElideRight,50)));
-				action->setData(ADR_CLIPBOARD_DATA, note);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_RVCBM_ANNOTATION, true);
+				Action *noteAction = new Action(AMenu);
+				noteAction->setText(TextManager::getElidedString(note,Qt::ElideRight,50));
+				noteAction->setData(ADR_CLIPBOARD_DATA, note);
+				connect(noteAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+				AMenu->addAction(noteAction, AG_RVCBM_ANNOTATION, true);
 			}
 		}
 	}

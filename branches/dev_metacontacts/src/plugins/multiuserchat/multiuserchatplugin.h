@@ -161,11 +161,13 @@ protected slots:
 	void onOpenRoomActionTriggered(bool);
 	void onEnterRoomActionTriggered(bool);
 	void onExitRoomActionTriggered(bool);
+	void onCopyToClipboardActionTriggered(bool);
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 	void onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields);
 	void onRegisterErrorReceived(const QString &AId, const XmppError &AError);
