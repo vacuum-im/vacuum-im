@@ -23,12 +23,12 @@ public:
 	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	//IMessageInfoWidget
-	virtual ToolBarChanger *toolBarChanger() const;
 	virtual Menu *addressMenu() const;
 	virtual bool isAddressMenuVisible() const;
 	virtual void setAddressMenuVisible(bool AVisible);
 	virtual QVariant fieldValue(int AField) const;
 	virtual void setFieldValue(int AField, const QVariant &AValue);
+	virtual ToolBarChanger *infoToolBarChanger() const;
 signals:
 	void fieldValueChanged(int AField);
 	void addressMenuVisibleChanged(bool AVisible);

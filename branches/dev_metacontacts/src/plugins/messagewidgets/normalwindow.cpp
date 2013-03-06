@@ -28,7 +28,7 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	FViewWidget = FMessageWidgets->newViewWidget(this,ui.wdtMessage);
 	FEditWidget = FMessageWidgets->newEditWidget(this,ui.wdtMessage);
 	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
-	FEditWidget->setSendToolBarVisible(false);
+	FEditWidget->setEditToolBarVisible(false);
 	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
 
 	ui.wdtToolBar->setLayout(new QVBoxLayout(ui.wdtToolBar));

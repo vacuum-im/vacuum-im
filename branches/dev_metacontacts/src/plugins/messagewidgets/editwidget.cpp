@@ -24,6 +24,10 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	toolBar->setStyleSheet("QToolBar { border: none; }");
 	toolBar->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
+	FEditToolBar = new ToolBarChanger(toolBar);
+	FEditToolBar->setSeparatorsVisible(false);
+	FEditToolBar->toolBar()->installEventFilter(this);
+
 	ui.wdtSendToolBar->setLayout(new QHBoxLayout);
 	ui.wdtSendToolBar->layout()->setMargin(0);
 	ui.wdtSendToolBar->layout()->addWidget(toolBar);
@@ -32,11 +36,7 @@ EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 	sendAction->setToolTip(tr("Send"));
 	sendAction->setIcon(RSR_STORAGE_MENUICONS,MNI_MESSAGEWIDGETS_SEND);
 	connect(sendAction,SIGNAL(triggered(bool)),SLOT(onSendActionTriggered(bool)));
-
-	FSendToolBar = new ToolBarChanger(toolBar);
-	FSendToolBar->toolBar()->installEventFilter(this);
-	QToolButton *sendButton = FSendToolBar->insertAction(sendAction);
-	sendButton->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
+	FEditToolBar->insertAction(sendAction,TBG_MWEWTB_SENDMESSAGE);
 
 	ui.medEditor->installEventFilter(this);
 	ui.medEditor->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -137,21 +137,6 @@ void EditWidget::setSendShortcut(const QString &AShortcutId)
 	}
 }
 
-bool EditWidget::sendToolBarVisible() const
-{
-	return FSendToolBar->toolBar()->isVisible();
-}
-
-void EditWidget::setSendToolBarVisible(bool AVisible)
-{
-	FSendToolBar->toolBar()->setVisible(AVisible);
-}
-
-ToolBarChanger *EditWidget::sendToolBarChanger() const
-{
-	return FSendToolBar;
-}
-
 bool EditWidget::isRichTextEnabled() const
 {
 	return ui.medEditor->acceptRichText();
@@ -164,6 +149,21 @@ void EditWidget::setRichTextEnabled(bool AEnabled)
 		ui.medEditor->setAcceptRichText(AEnabled);
 		richTextEnableChanged(AEnabled);
 	}
+}
+
+bool EditWidget::isEditToolBarVisible() const
+{
+	return FEditToolBar->toolBar()->isVisible();
+}
+
+void EditWidget::setEditToolBarVisible(bool AVisible)
+{
+	FEditToolBar->toolBar()->setVisible(AVisible);
+}
+
+ToolBarChanger *EditWidget::editToolBarChanger() const
+{
+	return FEditToolBar;
 }
 
 void EditWidget::contextMenuForEdit(const QPoint &APosition, Menu *AMenu)
@@ -227,10 +227,10 @@ bool EditWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 			hooked = true;
 		}
 	}
-	else if (AWatched == FSendToolBar->toolBar())
+	else if (AWatched == FEditToolBar->toolBar())
 	{
 		if (AEvent->type() == QEvent::LayoutRequest)
-			QTimer::singleShot(0,this,SLOT(onUpdateSendToolBarMaxWidth()));
+			QTimer::singleShot(0,this,SLOT(onUpdateEditToolBarMaxWidth()));
 	}
 	return hooked || QWidget::eventFilter(AWatched,AEvent);
 }
@@ -279,20 +279,20 @@ void EditWidget::showPrevBufferedMessage()
 	}
 }
 
-void EditWidget::onUpdateSendToolBarMaxWidth()
+void EditWidget::onUpdateEditToolBarMaxWidth()
 {
 	int widgetWidth = 0;
 	int visibleItemsCount = 0;
-	for (int itemIndex=0; itemIndex<FSendToolBar->toolBar()->layout()->count(); itemIndex++)
+	for (int itemIndex=0; itemIndex<FEditToolBar->toolBar()->layout()->count(); itemIndex++)
 	{
-		QWidget *widget = FSendToolBar->toolBar()->layout()->itemAt(itemIndex)->widget();
+		QWidget *widget = FEditToolBar->toolBar()->layout()->itemAt(itemIndex)->widget();
 		if (widget && widget->isVisible())
 		{
 			visibleItemsCount++;
 			widgetWidth = widget->sizeHint().width();
 		}
 	}
-	FSendToolBar->toolBar()->setMaximumWidth(visibleItemsCount==1 ? widgetWidth : QWIDGETSIZE_MAX);
+	FEditToolBar->toolBar()->setMaximumWidth(visibleItemsCount==1 ? widgetWidth : QWIDGETSIZE_MAX);
 }
 
 void EditWidget::onSendActionTriggered(bool)

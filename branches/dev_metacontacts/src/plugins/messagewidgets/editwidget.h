@@ -6,6 +6,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
+#include <definitions/toolbargroups.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
@@ -36,11 +37,11 @@ public:
 	virtual void setMinimumLines(int ALines);
 	virtual QString sendShortcut() const;
 	virtual void setSendShortcut(const QString &AShortcutId);
-	virtual bool sendToolBarVisible() const;
-	virtual void setSendToolBarVisible(bool AVisible);
-	virtual ToolBarChanger *sendToolBarChanger() const;
 	virtual bool isRichTextEnabled() const;
 	virtual void setRichTextEnabled(bool AEnabled);
+	virtual bool isEditToolBarVisible() const;
+	virtual void setEditToolBarVisible(bool AVisible);
+	virtual ToolBarChanger *editToolBarChanger() const;
 	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu);
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment);
 	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const;
@@ -68,7 +69,7 @@ protected:
 	void showNextBufferedMessage();
 	void showPrevBufferedMessage();
 protected slots:
-	void onUpdateSendToolBarMaxWidth();
+	void onUpdateEditToolBarMaxWidth();
 	void onSendActionTriggered(bool);
 	void onShortcutUpdated(const QString &AId);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -88,7 +89,7 @@ private:
 	QList<QString> FBuffer;
 	QString FSendShortcutId;
 	QKeySequence FSendShortcut;
-	ToolBarChanger *FSendToolBar;
+	ToolBarChanger *FEditToolBar;
 };
 
 #endif // EDITWIDGET_H

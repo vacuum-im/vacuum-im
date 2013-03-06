@@ -62,11 +62,6 @@ IMessageWindow *InfoWidget::messageWindow() const
 	return FWindow;
 }
 
-ToolBarChanger *InfoWidget::toolBarChanger() const
-{
-	return FInfoToolBar;
-}
-
 Menu *InfoWidget::addressMenu() const
 {
 	return FAddressMenu;
@@ -84,12 +79,31 @@ void InfoWidget::setAddressMenuVisible(bool AVisible)
 		FAddressMenuVisible = AVisible;
 		if (AVisible)
 		{
+			if (messageWindow()->editWidget())
+			{
+				QAction *sendHandle = messageWindow()->editWidget()->editToolBarChanger()->groupItems(TBG_MWEWTB_SENDMESSAGE).value(0);
+				QToolButton *button = qobject_cast<QToolButton *>(messageWindow()->editWidget()->editToolBarChanger()->handleWidget(sendHandle));
+				if (button)
+				{
+					button->setMenu(FAddressMenu);
+					button->setPopupMode(QToolButton::MenuButtonPopup);
+				}
+			}
+
 			QToolButton *button = FInfoToolBar->insertAction(FAddressMenu->menuAction(),TBG_MWIWTB_ADDRESSMENU);
-			button->setPopupMode(QToolButton::InstantPopup);
 			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+			button->setPopupMode(QToolButton::InstantPopup);
 		}
 		else
 		{
+			if (messageWindow()->editWidget())
+			{
+				QAction *sendHandle = messageWindow()->editWidget()->editToolBarChanger()->groupItems(TBG_MWEWTB_SENDMESSAGE).value(0);
+				QToolButton *button = qobject_cast<QToolButton *>(messageWindow()->editWidget()->editToolBarChanger()->handleWidget(sendHandle));
+				if (button)
+					button->setMenu(NULL);
+			}
+
 			FInfoToolBar->removeItem(FInfoToolBar->actionHandle(FAddressMenu->menuAction()));
 		}
 		emit addressMenuVisibleChanged(AVisible);
@@ -112,6 +126,11 @@ void InfoWidget::setFieldValue(int AField, const QVariant &AValue)
 		updateFieldView(AField);
 		emit fieldValueChanged(AField);
 	}
+}
+
+ToolBarChanger *InfoWidget::infoToolBarChanger() const
+{
+	return FInfoToolBar;
 }
 
 void InfoWidget::initialize()

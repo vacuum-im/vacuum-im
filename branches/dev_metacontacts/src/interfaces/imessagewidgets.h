@@ -59,12 +59,12 @@ public:
 	};
 public:
 	virtual QWidget *instance() = 0;
-	virtual ToolBarChanger *toolBarChanger() const =0;
 	virtual Menu *addressMenu() const =0;
 	virtual bool isAddressMenuVisible() const =0;
 	virtual void setAddressMenuVisible(bool AVisible) =0;
 	virtual QVariant fieldValue(int AField) const =0;
 	virtual void setFieldValue(int AField, const QVariant &AValue) =0;
+	virtual ToolBarChanger *infoToolBarChanger() const =0;
 protected:
 	virtual void fieldValueChanged(int AField) =0;
 	virtual void addressMenuVisibleChanged(bool AVisible) =0;
@@ -107,11 +107,11 @@ public:
 	virtual void setMinimumLines(int ALines) =0;
 	virtual QString sendShortcut() const =0;
 	virtual void setSendShortcut(const QString &AShortcutId) =0;
-	virtual bool sendToolBarVisible() const =0;
-	virtual void setSendToolBarVisible(bool AVisible) =0;
-	virtual ToolBarChanger *sendToolBarChanger() const =0;
 	virtual bool isRichTextEnabled() const =0;
 	virtual void setRichTextEnabled(bool AEnabled) =0;
+	virtual bool isEditToolBarVisible() const =0;
+	virtual void setEditToolBarVisible(bool AVisible) =0;
+	virtual ToolBarChanger *editToolBarChanger() const =0;
 	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu) =0;
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment) =0;
 	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const =0;
