@@ -717,15 +717,15 @@ IRosterIndex *MultiUserChatPlugin::findMultiChatRosterIndex(const Jid &AStreamJi
 IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
 {
 	IRosterIndex *chatIndex = findMultiChatRosterIndex(AStreamJid,ARoomJid);
-	if (chatIndex==NULL)
+	if (chatIndex == NULL)
 	{
-		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AStreamJid) : NULL;
-		if (sroot)
+		IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AStreamJid) : NULL;
+		if (streamRoot)
 		{
-			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",sroot);
+			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",streamRoot);
 			chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
 
-			chatIndex = FRostersModel->newRosterIndex(RIK_MUC_ITEM,chatGroup);
+			chatIndex = FRostersModel->newRosterIndex(RIK_MUC_ITEM);
 			FChatIndexes.append(chatIndex);
 
 			chatIndex->setData(AStreamJid.pFull(),RDR_STREAM_JID);
@@ -1248,7 +1248,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		IRosterIndex *index = AIndexes.first();
-		if (index->kind()==RIK_STREAM_ROOT)
+		if (index->kind()==RIK_STREAM_INDEX)
 		{
 			int show = index->data(RDR_SHOW).toInt();
 			if (show!=IPresence::Offline && show!=IPresence::Error)

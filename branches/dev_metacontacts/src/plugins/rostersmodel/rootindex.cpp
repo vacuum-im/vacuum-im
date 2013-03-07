@@ -41,7 +41,8 @@ int RootIndex::childCount() const
 
 void RootIndex::appendChild(IRosterIndex *AIndex)
 {
-	FModel->appendRow(AIndex->instance());
+	if (AIndex->parentIndex() != this)
+		FModel->appendRow(AIndex->instance());
 }
 
 IRosterIndex *RootIndex::childIndex(int ARow) const
@@ -86,7 +87,7 @@ void RootIndex::setData(const QVariant &AValue, int ARole)
 	Q_UNUSED(AValue); Q_UNUSED(ARole);
 }
 
-QList<IRosterIndex *> RootIndex::findChilds( const QMultiMap<int, QVariant> &AFindData, bool ARecursive) const
+QList<IRosterIndex *> RootIndex::findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive) const
 {
 	QList<IRosterIndex *> indexes;
 	foreach(QStandardItem *item, FModel->findItems(AFindData, NULL, ARecursive ? Qt::MatchRecursive : Qt::MatchExactly))

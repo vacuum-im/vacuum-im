@@ -510,7 +510,7 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> normalDialogKinds = QList<int>() << RIK_STREAM_ROOT << RIK_GROUP << RIK_GROUP_BLANK
+	static const QList<int> normalDialogKinds = QList<int>() << RIK_STREAM_INDEX << RIK_GROUP << RIK_GROUP_BLANK
 		<< RIK_GROUP_AGENTS << RIK_GROUP_MY_RESOURCES << RIK_GROUP_NOT_IN_ROSTER << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
 	static const QList<int> groupKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_AGENTS 
 		<< RIK_GROUP_MY_RESOURCES << RIK_GROUP_NOT_IN_ROSTER;
@@ -529,7 +529,7 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 				return false;
 			else if(!singleStream.isEmpty() && singleStream!=streamJid)
 				return false;
-			else if (indexKind==RIK_STREAM_ROOT && ASelected.count()>1)
+			else if (indexKind==RIK_STREAM_INDEX && ASelected.count()>1)
 				return false;
 			else if (hasGroups && !groupKinds.contains(indexKind))
 				return false;
@@ -755,7 +755,7 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 						groups.append(index->data(RDR_GROUP).toString());
 					else if (index->kind()>=RIK_GROUP_BLANK && index->kind()<=RIK_GROUP_AGENTS)
 						groups.append(FRostersView->rostersModel()->singleGroupName(index->kind()));
-					else if (index->kind() != RIK_STREAM_ROOT)
+					else if (index->kind() != RIK_STREAM_INDEX)
 						contacts.append(index->data(RDR_FULL_JID).toString());
 				}
 
@@ -798,7 +798,7 @@ void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> 
 					groups.append(index->data(RDR_GROUP).toString());
 				else if (index->kind()>=RIK_GROUP_BLANK && index->kind()<=RIK_GROUP_AGENTS)
 					groups.append(FRostersView->rostersModel()->singleGroupName(index->kind()));
-				else if (index->kind() != RIK_STREAM_ROOT)
+				else if (index->kind() != RIK_STREAM_INDEX)
 					contacts.append(index->data(RDR_FULL_JID).toString());
 			}
 

@@ -1118,7 +1118,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 
 bool PrivacyLists::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
+	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_INDEX << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
 	if (!ASelected.isEmpty())
 	{
 		int singleType = -1;
@@ -1290,7 +1290,7 @@ void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		if (isReady(streamJid))
 		{
-			if (indexKind == RIK_STREAM_ROOT)
+			if (indexKind == RIK_STREAM_INDEX)
 			{
 				Menu *pmenu = createPrivacyMenu(AMenu);
 				createAutoPrivacyStreamActions(streamJid,pmenu);

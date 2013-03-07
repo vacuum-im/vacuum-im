@@ -280,13 +280,15 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
 
 void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &AContactJids)
 {
-	if (FRostersModel && !AContactJids.isEmpty() && FRostersModel->findStreamRoot(AStreamJid))
+	IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AStreamJid) : NULL;
+	if (streamRoot && !AContactJids.isEmpty())
 	{
 		QMultiMap<int,QVariant> findData;
 		foreach(Jid contactJid, AContactJids)
 			findData.insertMulti(RDR_PREP_BARE_JID,contactJid.pBare());
+		findData.insertMulti(RDR_STREAM_JID,AStreamJid.pFull());
 
-		QList<IRosterIndex *> indexes = FRostersModel->findStreamRoot(AStreamJid)->findChilds(findData,true);
+		QList<IRosterIndex *> indexes = streamRoot->findChilds(findData,true);
 		foreach (IRosterIndex *index, indexes)
 			emit rosterDataChanged(index,RDR_ANNOTATIONS);
 	}

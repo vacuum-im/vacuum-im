@@ -98,5 +98,9 @@
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
+    <message>
+        <source>Unite contacts of all accounts</source>
+        <translation>Объединить контакты всех аккаунтов</translation>
+    </message>
 </context>
 </TS>

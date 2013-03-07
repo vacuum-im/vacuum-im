@@ -187,7 +187,7 @@ bool RecentContacts::initObjects()
 	}
 	if (FRostersModel)
 	{
-		FRootIndex = FRostersModel->newRosterIndex(RIK_RECENT_ROOT,FRostersModel->rootIndex());
+		FRootIndex = FRostersModel->newRosterIndex(RIK_RECENT_ROOT);
 		FRootIndex->setData(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_RECENT),Qt::DecorationRole);
 		FRootIndex->setData(RIKO_RECENT_ROOT,RDR_KIND_ORDER);
 		FRootIndex->setData(tr("Recent Contacts"),RDR_NAME);
@@ -442,13 +442,14 @@ IRecentItem RecentContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &AItem) const
 {
 	QList<IRosterIndex *> proxies;
-	IRosterIndex *root = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AItem.streamJid) : NULL;
-	if (root)
+	IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AItem.streamJid) : NULL;
+	if (streamRoot)
 	{
 		QMultiMap<int, QVariant> findData;
 		findData.insertMulti(RDR_KIND,RIK_CONTACT);
+		findData.insertMulti(RDR_STREAM_JID,AItem.streamJid.pFull());
 		findData.insertMulti(RDR_PREP_BARE_JID,AItem.reference);
-		proxies =  sortItemProxies(root->findChilds(findData,true));
+		proxies = sortItemProxies(streamRoot->findChilds(findData,true));
 	}
 	return proxies;
 }
@@ -686,7 +687,7 @@ void RecentContacts::createItemIndex(const IRecentItem &AItem)
 		IRecentItemHandler *handler = FItemHandlers.value(AItem.type);
 		if (handler)
 		{
-			index = FRostersModel->newRosterIndex(RIK_RECENT_ITEM,FRootIndex);
+			index = FRostersModel->newRosterIndex(RIK_RECENT_ITEM);
 			index->setData(AItem.type,RDR_RECENT_TYPE);
 			index->setData(AItem.streamJid.pFull(),RDR_STREAM_JID);
 			index->setData(AItem.reference,RDR_RECENT_REFERENCE);

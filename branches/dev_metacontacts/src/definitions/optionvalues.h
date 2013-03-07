@@ -187,7 +187,8 @@
 #define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
 #define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
 #define OPV_ROSTER_SORTBYSTATUS                         "roster.sort-by-status"
-#define OPV_ROSTER_HIDE_SCROLLBAR                       "roster.always-hide-scrollbar"
+#define OPV_ROSTER_HIDESCROLLBAR                        "roster.always-hide-scrollbar"
+#define OPV_ROSTER_MERGESTREAMS                         "roster.streams-layout"
 // RosterChanger
 #define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
 #define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"

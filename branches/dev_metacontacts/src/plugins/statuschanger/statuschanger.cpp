@@ -832,9 +832,9 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->findStreamRoot(APresence->xmppStream()->streamJid());
-		if (index)
-			FRostersView->insertLabel(FConnectingLabelId,index);
+		IRosterIndex *streamIndex = FRostersModel->findStreamIndex(APresence->xmppStream()->streamJid());
+		if (streamIndex)
+			FRostersView->insertLabel(FConnectingLabelId,streamIndex);
 	}
 }
 
@@ -842,9 +842,9 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->findStreamRoot(APresence->xmppStream()->streamJid());
-		if (index)
-			FRostersView->removeLabel(FConnectingLabelId,index);
+		IRosterIndex *streamIndex = FRostersModel->findStreamIndex(APresence->xmppStream()->streamJid());
+		if (streamIndex)
+			FRostersView->removeLabel(FConnectingLabelId,streamIndex);
 	}
 }
 
@@ -1070,7 +1070,7 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 
 void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_KIND).toInt()==RIK_STREAM_ROOT)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_KIND).toInt()==RIK_STREAM_INDEX)
 	{
 		Menu *menu = streamMenu(AIndexes.first()->data(RDR_STREAM_JID).toString());
 		if (menu)

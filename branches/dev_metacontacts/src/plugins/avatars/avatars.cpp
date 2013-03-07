@@ -20,7 +20,7 @@
 #define UNKNOWN_AVATAR            QString::null
 #define EMPTY_AVATAR              QString("")
 
-static const QList<int> RosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
+static const QList<int> RosterKinds = QList<int>() << RIK_STREAM_INDEX << RIK_CONTACT;
 
 Avatars::Avatars()
 {
@@ -302,7 +302,7 @@ QVariant Avatars::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) 
 	{
 		switch (AIndex->kind())
 		{
-		case RIK_STREAM_ROOT:
+		case RIK_STREAM_INDEX:
 		case RIK_CONTACT:
 			switch (ARole)
 			{
@@ -546,7 +546,7 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 		QMultiMap<int,QVariant> findData;
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
-		findData.insert(RDR_KIND,RIK_STREAM_ROOT);
+		findData.insert(RDR_KIND,RIK_STREAM_INDEX);
 		findData.insert(RDR_KIND,RIK_CONTACT);
 
 		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
@@ -620,7 +620,7 @@ bool Avatars::updateIqAvatar(const Jid &AContactJid, const QString &AHash)
 
 bool Avatars::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
+	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_INDEX << RIK_CONTACT;
 	if (!ASelected.isEmpty())
 	{
 		int singleKind = -1;
@@ -710,7 +710,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, qu
 	{
 		int indexKind = AIndexes.first()->kind();
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID);
-		if (indexKind == RIK_STREAM_ROOT)
+		if (indexKind == RIK_STREAM_INDEX)
 		{
 			Menu *avatar = new Menu(AMenu);
 			avatar->setTitle(tr("Avatar"));

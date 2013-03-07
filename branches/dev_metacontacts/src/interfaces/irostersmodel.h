@@ -47,13 +47,21 @@ public:
 class IRostersModel
 {
 public:
+	enum StreamsLayout {
+		LayoutMerged,
+		LayoutSeparately
+	};
+public:
 	virtual AdvancedItemModel *instance() =0;
 	virtual QList<Jid> streams() const =0;
 	virtual IRosterIndex *addStream(const Jid &AStreamJid) =0;
 	virtual void removeStream(const Jid &AStreamJid) =0;
+	virtual int streamsLayout() const =0;
+	virtual void setStreamsLayout(StreamsLayout ALayout) =0;
 	virtual IRosterIndex *rootIndex() const =0;
+	virtual IRosterIndex *newRosterIndex(int AKind) =0;
 	virtual IRosterIndex *findStreamRoot(const Jid &AStreamJid) const =0;
-	virtual IRosterIndex *newRosterIndex(int AKind, IRosterIndex *AParent) =0;
+	virtual IRosterIndex *findStreamIndex(const Jid &AStreamJid) const =0;
 	virtual void removeRosterIndex(IRosterIndex *AIndex, bool ADestroy = true) =0;
 	virtual IRosterIndex *findGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const =0;
 	virtual IRosterIndex *getGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) =0;
@@ -71,6 +79,8 @@ protected:
 	virtual void streamAdded(const Jid &AStreamJid) =0;
 	virtual void streamRemoved(const Jid &AStreamJid) =0;
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
+	virtual void streamsLayoutAboutToBeChanged(int AAfter) =0;
+	virtual void streamsLayoutChanged(int ABefore) =0;
 	virtual void indexCreated(IRosterIndex *AIndex) =0;
 	virtual void indexInserted(IRosterIndex *AIndex) =0;
 	virtual void indexRemoving(IRosterIndex *AIndex) =0;

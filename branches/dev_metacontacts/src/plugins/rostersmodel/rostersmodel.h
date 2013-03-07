@@ -34,9 +34,12 @@ public:
 	virtual QList<Jid> streams() const;
 	virtual IRosterIndex *addStream(const Jid &AStreamJid);
 	virtual void removeStream(const Jid &AStreamJid);
+	virtual int streamsLayout() const;
+	virtual void setStreamsLayout(StreamsLayout ALayout);
 	virtual IRosterIndex *rootIndex() const;
+	virtual IRosterIndex *newRosterIndex(int AKind);
 	virtual IRosterIndex *findStreamRoot(const Jid &AStreamJid) const;
-	virtual IRosterIndex *newRosterIndex(int AKind, IRosterIndex *AParent);
+	virtual IRosterIndex *findStreamIndex(const Jid &AStreamJid) const;
 	virtual void removeRosterIndex(IRosterIndex *AIndex, bool ADestroy = true);
 	virtual IRosterIndex *findGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const;
 	virtual IRosterIndex *getGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent);
@@ -54,12 +57,15 @@ signals:
 	void streamAdded(const Jid &AStreamJid);
 	void streamRemoved(const Jid &AStreamJid);
 	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
+	void streamsLayoutAboutToBeChanged(int AAfter);
+	void streamsLayoutChanged(int ABefore);
 	void indexCreated(IRosterIndex *AIndex);
 	void indexInserted(IRosterIndex *AIndex);
 	void indexRemoving(IRosterIndex *AIndex);
 	void indexDestroyed(IRosterIndex *AIndex);
 	void indexDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
+	void updateStreamsLayout();
 	void emitIndexDestroyed(IRosterIndex *AIndex);
 	void removeEmptyGroup(IRosterIndex *AGroupIndex);
 	QString getGroupName(int AKind, const QString &AGroup) const;
@@ -84,9 +90,11 @@ private:
 	IPresencePlugin *FPresencePlugin;
 	IAccountManager *FAccountManager;
 private:
+	StreamsLayout FLayout;
 	RootIndex *FRootIndex;
+	IRosterIndex *FStreamsRoot;
 	QMap<int, QString> FSingleGroups;
-	QMap<Jid,IRosterIndex *> FStreamRoots;
+	QMap<Jid,IRosterIndex *> FStreamIndexes;
 	QMultiMap<int, IRosterDataHolder *> FRosterDataHolders;
 	QMap<IRosterDataHolder *, DataHolder *> FAdvancedDataHolders;
 private:

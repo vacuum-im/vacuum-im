@@ -139,12 +139,14 @@ bool RostersViewPlugin::initObjects()
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYSTATUS,FRostersView);
 
-	registerExpandableRosterIndexKind(RIK_STREAM_ROOT,RDR_PREP_BARE_JID);
+	registerExpandableRosterIndexKind(RIK_STREAMS_ROOT,RDR_KIND);
+	registerExpandableRosterIndexKind(RIK_STREAM_INDEX,RDR_PREP_BARE_JID);
 	registerExpandableRosterIndexKind(RIK_GROUP,RDR_GROUP);
-	registerExpandableRosterIndexKind(RIK_GROUP_BLANK,RDR_NAME);
-	registerExpandableRosterIndexKind(RIK_GROUP_NOT_IN_ROSTER,RDR_NAME);
-	registerExpandableRosterIndexKind(RIK_GROUP_MY_RESOURCES,RDR_NAME);
-	registerExpandableRosterIndexKind(RIK_GROUP_AGENTS,RDR_NAME);
+	registerExpandableRosterIndexKind(RIK_GROUP_ACCOUNTS,RDR_KIND);
+	registerExpandableRosterIndexKind(RIK_GROUP_BLANK,RDR_KIND);
+	registerExpandableRosterIndexKind(RIK_GROUP_NOT_IN_ROSTER,RDR_KIND);
+	registerExpandableRosterIndexKind(RIK_GROUP_MY_RESOURCES,RDR_KIND);
+	registerExpandableRosterIndexKind(RIK_GROUP_AGENTS,RDR_KIND);
 
 	return true;
 }
@@ -154,8 +156,9 @@ bool RostersViewPlugin::initSettings()
 	Options::setDefaultValue(OPV_ROSTER_SHOWOFFLINE,true);
 	Options::setDefaultValue(OPV_ROSTER_SHOWRESOURCE,false);
 	Options::setDefaultValue(OPV_ROSTER_SORTBYSTATUS,false);
-	Options::setDefaultValue(OPV_ROSTER_HIDE_SCROLLBAR,false);
+	Options::setDefaultValue(OPV_ROSTER_HIDESCROLLBAR,false);
 	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
+	Options::setDefaultValue(OPV_ROSTER_MERGESTREAMS,false);
 
 	if (FOptionsManager)
 	{
@@ -174,8 +177,9 @@ QMultiMap<int, IOptionsWidget *> RostersViewPlugin::optionsWidgets(const QString
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contact"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource in roster"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SORTBYSTATUS),tr("Sort contacts by status"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_HIDE_SCROLLBAR),tr("Do not show the scroll bars"),AParent));
+		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_HIDESCROLLBAR),tr("Do not show the scroll bars"),AParent));
 		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"),AParent));
+		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_MERGESTREAMS),tr("Unite contacts of all accounts"),AParent));
 	}
 	return widgets;
 }
@@ -255,7 +259,7 @@ QList<quint32> RostersViewPlugin::rosterLabels(int AOrder, const IRosterIndex *A
 	{
 		if (!AIndex->data(RDR_STATUS).toString().isEmpty())
 		{
-			if (AIndex->kind()==RIK_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
+			if (AIndex->kind()==RIK_STREAM_INDEX && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
 				labels.append(RLID_ROSTERSVIEW_STATUS);
 			else if (FShowStatus)
 				labels.append(RLID_ROSTERSVIEW_STATUS);
@@ -500,7 +504,7 @@ void RostersViewPlugin::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int
 	{
 		if (!Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool())
 		{
-			if (AIndex->kind()==RIK_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
+			if (AIndex->kind()==RIK_STREAM_INDEX && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
 				emit rosterLabelChanged(RLID_ROSTERSVIEW_STATUS,AIndex);
 		}
 		else
@@ -646,8 +650,9 @@ void RostersViewPlugin::onOptionsOpened()
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWOFFLINE));
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWRESOURCE));
 	onOptionsChanged(Options::node(OPV_ROSTER_SORTBYSTATUS));
-	onOptionsChanged(Options::node(OPV_ROSTER_HIDE_SCROLLBAR));
+	onOptionsChanged(Options::node(OPV_ROSTER_HIDESCROLLBAR));
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
+	onOptionsChanged(Options::node(OPV_ROSTER_MERGESTREAMS));
 }
 
 void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
@@ -668,7 +673,7 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 	{
 		FSortFilterProxyModel->invalidate();
 	}
-	else if (ANode.path() == OPV_ROSTER_HIDE_SCROLLBAR)
+	else if (ANode.path() == OPV_ROSTER_HIDESCROLLBAR)
 	{
 		FRostersView->setVerticalScrollBarPolicy(ANode.value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
 		FRostersView->setHorizontalScrollBarPolicy(ANode.value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
@@ -677,6 +682,11 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 	{
 		FShowStatus = ANode.value().toBool();
 		emit rosterLabelChanged(RLID_ROSTERSVIEW_STATUS);
+	}
+	else if (ANode.path() == OPV_ROSTER_MERGESTREAMS)
+	{
+		if (FRostersView->rostersModel())
+			FRostersView->rostersModel()->setStreamsLayout(ANode.value().toBool() ? IRostersModel::LayoutMerged : IRostersModel::LayoutSeparately);
 	}
 }
 

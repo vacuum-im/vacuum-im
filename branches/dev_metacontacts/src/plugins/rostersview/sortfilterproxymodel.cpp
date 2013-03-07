@@ -65,7 +65,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 		QVariant rightSortOrder = ARight.data(RDR_SORT_ORDER);
 		if (leftSortOrder.isNull() || rightSortOrder.isNull() || leftSortOrder==rightSortOrder)
 		{
-			if (FSortByStatus && leftTypeOrder!=RIKO_STREAM_ROOT)
+			if (FSortByStatus && leftTypeOrder!=RIKO_STREAM_INDEX)
 			{
 				int leftShow = ALeft.data(RDR_SHOW).toInt();
 				int rightShow = ARight.data(RDR_SHOW).toInt();
