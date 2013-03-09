@@ -6,14 +6,19 @@ LEGEND
   [-] Bug fix
 
 
-1.2.2
+v1.2.3
+------
+  [-] The application will fail if the server terminates the connection before the user enters the password
+
+
+v1.2.2
 ------
   [-] Full text search in file archive of messages in certain cases worked not correctly
   [-] Did not work contacts moving from an empty group
   [-] Proxy authorization in certain cases was not working
 
 
-1.2.1
+v1.2.1
 ------
   [*] Added skype status icons
   [*] The animation caching is added
