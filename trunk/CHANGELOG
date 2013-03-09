@@ -18,6 +18,7 @@ LEGEND
   [-] The exit from conference occurred incorrectly if was requested after a send of request for an entrance, but before receiving confirmation on an entrance
   [-] Full text search in file archive of messages in certain cases worked not correctly
   [-] Proxy authorization in certain cases was not worked
+  [-] The application will fail if the server terminates the connection before the user enters the password
 
 
 v1.2.0
