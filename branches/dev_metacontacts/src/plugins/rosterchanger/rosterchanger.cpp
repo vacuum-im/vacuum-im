@@ -210,7 +210,7 @@ bool RosterChanger::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
 	int hoverKind = AHover->data(RDR_KIND).toInt();
-	if (DragGroups.contains(hoverKind) || hoverKind==RIK_STREAM_INDEX)
+	if (DragGroups.contains(hoverKind) || hoverKind==RIK_STREAM_ROOT)
 	{
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AHover->data(RDR_STREAM_JID).toString()) : NULL;
 		if (roster && roster->isOpen())
@@ -219,7 +219,7 @@ bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *A
 			QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 			operator>>(stream,indexData);
 
-			if (hoverKind == RIK_STREAM_INDEX)
+			if (hoverKind == RIK_STREAM_ROOT)
 				return indexData.value(RDR_STREAM_JID)!=AHover->data(RDR_STREAM_JID);
 			else if (hoverKind == RIK_GROUP_BLANK)
 				return indexData.value(RDR_KIND).toInt() != RIK_GROUP;
@@ -239,7 +239,7 @@ void RosterChanger::rosterDragLeave(const QDragLeaveEvent *AEvent)
 bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
 {
 	int hoverKind = AIndex->data(RDR_KIND).toInt();
-	if ((AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0 && (DragGroups.contains(hoverKind) || hoverKind==RIK_STREAM_INDEX))
+	if ((AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0 && (DragGroups.contains(hoverKind) || hoverKind==RIK_STREAM_ROOT))
 	{
 		Jid hoverStreamJid = AIndex->data(RDR_STREAM_JID).toString();
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(hoverStreamJid) : NULL;
@@ -280,7 +280,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIn
 				AMenu->setDefaultAction(addAction);
 				return true;
 			}
-			else if (hoverKind != RIK_STREAM_INDEX)
+			else if (hoverKind != RIK_STREAM_ROOT)
 			{
 				if (AEvent->dropAction() == Qt::CopyAction)
 				{
@@ -727,7 +727,7 @@ SubscriptionDialog *RosterChanger::createSubscriptionDialog(const Jid &AStreamJi
 
 bool RosterChanger::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_INDEX << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
+	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
 	if (!ASelected.isEmpty())
 	{
 		int singleKind = -1;
@@ -786,7 +786,7 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 				IRosterItem ritem = roster!=NULL ? roster->rosterItem(index->data(RDR_PREP_BARE_JID).toString()) : IRosterItem();
 				
-				bool showDialog = indexKind==RIK_GROUP || indexKind==RIK_STREAM_INDEX;
+				bool showDialog = indexKind==RIK_GROUP || indexKind==RIK_STREAM_ROOT;
 				showDialog = showDialog || (!ritem.isValid && (indexKind==RIK_CONTACT || indexKind==RIK_AGENT));
 				
 				IAddContactDialog *dialog = showDialog ? showAddContactDialog(streamJid) : NULL;
@@ -856,7 +856,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 		if (roster && roster->isOpen())
 		{
-			if (indexKind==RIK_STREAM_INDEX)
+			if (indexKind==RIK_STREAM_ROOT)
 			{
 				if (AIndexes.count() == 1)
 				{
@@ -1252,10 +1252,10 @@ void RosterChanger::removeContactsFromRoster(const Jid &AStreamJid, const QStrin
 
 		if (findData.contains(RDR_PREP_BARE_JID))
 		{
-			IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AStreamJid) : NULL;
-			if (streamRoot)
+			IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
+			if (sroot)
 			{
-				foreach(IRosterIndex *index, streamRoot->findChilds(findData,true))
+				foreach(IRosterIndex *index, sroot->findChilds(findData,true))
 					FRostersModel->removeRosterIndex(index);
 			}
 		}
@@ -1601,8 +1601,8 @@ void RosterChanger::onRenameGroup(bool)
 			QString group = action->data(ADR_GROUP).toString();
 			if (FRostersView && FRostersView->instance()->isActiveWindow() && FRostersView->rostersModel())
 			{
-				IRosterIndex *streamRoot = FRostersView->rostersModel()->findStreamRoot(roster->streamJid());
-				IRosterIndex *index = FRostersView->rostersModel()->findGroupIndex(RIK_GROUP,group,roster->groupDelimiter(),streamRoot);
+				IRosterIndex *sroot = FRostersView->rostersModel()->streamRoot(roster->streamJid());
+				IRosterIndex *index = FRostersView->rostersModel()->findGroupIndex(RIK_GROUP,group,roster->groupDelimiter(),sroot);
 				if (index)
 					editInRoster = FRostersView->editRosterIndex(index,RDR_NAME);
 			}

@@ -1309,9 +1309,9 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 		if (FSelfCaps.contains(streamJid))
 		{
 			int indexKind = index->kind();
-			Jid contactJid = indexKind!=RIK_STREAM_INDEX ? index->data(RDR_FULL_JID).toString() : streamJid.domain();
+			Jid contactJid = indexKind!=RIK_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : streamJid.domain();
 
-			if (indexKind==RIK_STREAM_INDEX || indexKind==RIK_AGENT)
+			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_AGENT)
 			{
 				Action *action = createDiscoItemsAction(streamJid,contactJid,QString::null,AMenu);
 				AMenu->addAction(action,AG_RVCM_DISCOVERY,true);

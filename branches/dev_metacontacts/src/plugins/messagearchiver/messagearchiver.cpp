@@ -2206,10 +2206,10 @@ void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		{
 			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
 			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_STREAM_INDEX || indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
+			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 			{
 				Jid streamJid = index->data(RDR_STREAM_JID).toString();
-				Jid contactJid = indexKind!=RIK_STREAM_INDEX ? index->data(RDR_FULL_JID).toString() : Jid::null;
+				Jid contactJid = indexKind!=RIK_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : Jid::null;
 				showArchiveWindow(streamJid,contactJid);
 			}
 		}
@@ -2226,7 +2226,7 @@ void MessageArchiver::onRosterIndexContextMenu(const QList<IRosterIndex *> &AInd
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		Jid streamJid = !AIndexes.isEmpty() ? AIndexes.first()->data(RDR_STREAM_JID).toString() : QString::null;
-		if (AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_INDEX)
+		if (AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_ROOT)
 		{
 			Menu *menu = createContextMenu(streamJid,QStringList()<<streamJid.full(),AMenu);
 			if (!menu->isEmpty())

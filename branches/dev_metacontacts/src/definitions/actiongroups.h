@@ -12,6 +12,7 @@
 #define AG_MMENU_MAINWINDOW                                     1000
 
 //RostersView - ContextMenu
+#define AG_RVCM_ROSTERSVIEW_STREAMS                             100
 #define AG_RVCM_CHATMESSAGEHANDLER                              200
 #define AG_RVCM_NORMALMESSAGEHANDLER                            200
 #define AG_RVCM_MULTIUSERCHAT_OPEN                              200

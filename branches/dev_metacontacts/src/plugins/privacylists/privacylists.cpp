@@ -1089,14 +1089,14 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 		QSet<Jid> deny = denied - FLabeledContacts.value(AStreamJid);
 		QSet<Jid> allow = FLabeledContacts.value(AStreamJid) - denied;
 
-		foreach(Jid contactJid, deny) {
-			setPrivacyLabel(AStreamJid,contactJid,true); }
+		foreach(Jid contactJid, deny)
+			setPrivacyLabel(AStreamJid,contactJid,true);
 
-		foreach(Jid contactJid, allow) {
-			setPrivacyLabel(AStreamJid,contactJid,false); }
+		foreach(Jid contactJid, allow)
+			setPrivacyLabel(AStreamJid,contactJid,false);
 
-		IRosterIndex *streamIndex = FRostersModel->findStreamRoot(AStreamJid);
-		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,QString("::"),streamIndex);
+		IRosterIndex *sroot = FRostersModel->streamRoot(AStreamJid);
+		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,QString("::"),sroot);
 		if (groupIndex)
 		{
 			for (int i=0;i<groupIndex->childCount();i++)
@@ -1118,7 +1118,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 
 bool PrivacyLists::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_INDEX << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
+	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
 	if (!ASelected.isEmpty())
 	{
 		int singleType = -1;
@@ -1290,7 +1290,7 @@ void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
 		if (isReady(streamJid))
 		{
-			if (indexKind == RIK_STREAM_INDEX)
+			if (indexKind == RIK_STREAM_ROOT)
 			{
 				Menu *pmenu = createPrivacyMenu(AMenu);
 				createAutoPrivacyStreamActions(streamJid,pmenu);

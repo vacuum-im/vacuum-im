@@ -22,6 +22,7 @@ public:
 	// AdvancedItem
 	bool isRemoved() const;
 	virtual QMap<int, QVariant> itemData() const;
+	virtual void setItemData(const QMap<int, QVariant> &AData);
 	virtual QList<QStandardItem *> findChilds(const QMultiMap<int, QVariant> &AData, Qt::MatchFlags AFlags=Qt::MatchExactly, int AColumn=0) const;
 public:
 	static const int StandardItemTypeValue = QStandardItem::UserType+100;

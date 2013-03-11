@@ -224,7 +224,7 @@ bool FileTransfer::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
 	Q_UNUSED(AEvent);
-	return AHover->data(RDR_KIND).toInt()!=RIK_STREAM_INDEX && isSupported(AHover->data(RDR_STREAM_JID).toString(), AHover->data(RDR_FULL_JID).toString());
+	return AHover->data(RDR_KIND).toInt()!=RIK_STREAM_ROOT && isSupported(AHover->data(RDR_STREAM_JID).toString(), AHover->data(RDR_FULL_JID).toString());
 }
 
 void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
@@ -234,7 +234,7 @@ void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
 
 bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
 {
-	if (AEvent->dropAction()!=Qt::IgnoreAction && AIndex->data(RDR_KIND).toInt()!=RIK_STREAM_INDEX && 
+	if (AEvent->dropAction()!=Qt::IgnoreAction && AIndex->data(RDR_KIND).toInt()!=RIK_STREAM_ROOT && 
 		isSupported(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString()))
 	{
 		Action *action = new Action(AMenu);

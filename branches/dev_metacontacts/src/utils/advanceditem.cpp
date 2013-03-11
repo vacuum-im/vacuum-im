@@ -145,6 +145,12 @@ QMap<int, QVariant> AdvancedItem::itemData() const
 	return values;
 }
 
+void AdvancedItem::setItemData(const QMap<int, QVariant> &AData)
+{
+	for (QMap<int, QVariant>::const_iterator it=AData.constBegin(); it!=AData.constEnd(); ++it)
+		setData(it.value(),it.key());
+}
+
 QList<QStandardItem *> AdvancedItem::findChilds(const QMultiMap<int, QVariant> &AData, Qt::MatchFlags AFlags, int AColumn) const
 {
 	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());

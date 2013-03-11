@@ -684,7 +684,7 @@ void Gateways::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, q
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
-		if (AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_INDEX)
+		if (AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_ROOT)
 		{
 			IRosterIndex *index = AIndexes.first();
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();

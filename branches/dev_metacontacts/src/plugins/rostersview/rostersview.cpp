@@ -81,7 +81,7 @@ QList<int> RostersView::rosterDataRoles(int AOrder) const
 	if (AOrder == RDHO_ROSTERSVIEW)
 		return QList<int>() << RDR_LABEL_ITEMS;
 	else if (AOrder == RDHO_ROSTERSVIEW_NOTIFY)
-		return QList<int>() << RDR_ALLWAYS_VISIBLE << Qt::DecorationRole << Qt::BackgroundColorRole;
+		return QList<int>() << RDR_FORCE_VISIBLE << Qt::DecorationRole << Qt::BackgroundColorRole;
 	return QList<int>();
 }
 
@@ -119,14 +119,11 @@ QVariant RostersView::rosterData(int AOrder, const IRosterIndex *AIndex, int ARo
 		if (FActiveNotifies.contains(index))
 		{
 			const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
-			if (ARole == RDR_ALLWAYS_VISIBLE)
+			if (ARole == RDR_FORCE_VISIBLE)
 			{
-				static bool block = false;
-				if (!block && (notify.flags & IRostersNotify::AllwaysVisible)>0)
+				if ((notify.flags & IRostersNotify::AllwaysVisible) > 0)
 				{
-					block = true;
-					data = index->data(ARole).toInt() + 1;
-					block = false;
+					data = 1;
 				}
 			}
 			else if (ARole == Qt::DecorationRole)
@@ -1306,7 +1303,7 @@ void RostersView::onUpdateIndexNotifyTimeout()
 			if(notify.flags & IRostersNotify::ExpandParents)
 				expandIndexParents(index);
 
-			emit rosterDataChanged(index,RDR_ALLWAYS_VISIBLE);
+			emit rosterDataChanged(index,RDR_FORCE_VISIBLE);
 			emit rosterDataChanged(index,Qt::DecorationRole);
 			emit rosterDataChanged(index,Qt::BackgroundRole);
 		}

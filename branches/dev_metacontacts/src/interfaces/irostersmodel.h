@@ -59,9 +59,10 @@ public:
 	virtual int streamsLayout() const =0;
 	virtual void setStreamsLayout(StreamsLayout ALayout) =0;
 	virtual IRosterIndex *rootIndex() const =0;
+	virtual IRosterIndex *contactsRoot() const =0;
+	virtual IRosterIndex *streamRoot(const Jid &AStreamJid) const =0;
+	virtual IRosterIndex *streamIndex(const Jid &AStreamJid) const =0;
 	virtual IRosterIndex *newRosterIndex(int AKind) =0;
-	virtual IRosterIndex *findStreamRoot(const Jid &AStreamJid) const =0;
-	virtual IRosterIndex *findStreamIndex(const Jid &AStreamJid) const =0;
 	virtual void removeRosterIndex(IRosterIndex *AIndex, bool ADestroy = true) =0;
 	virtual IRosterIndex *findGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const =0;
 	virtual IRosterIndex *getGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) =0;

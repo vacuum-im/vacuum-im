@@ -384,11 +384,12 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 					FChangingPresence = NULL;
 					if (newStreamStatus.show!=IPresence::Offline && !presence->xmppStream()->isConnected() && presence->xmppStream()->open())
 					{
-						insertConnectingLabel(presence);
 						setStreamStatusId(presence, STATUS_CONNECTING_ID);
 
 						int statusId = FMainStatusStreams.contains(presence) ? STATUS_MAIN_ID : newStreamStatus.code;
 						FLastOnlineStatus.insert(presence, statusId);
+						
+						insertConnectingLabel(presence);
 						FConnectStatus.insert(presence, statusId);
 					}
 					else if (isChangeMainStatus && it.value()==STATUS_MAIN_ID)
@@ -796,6 +797,14 @@ void StatusChanger::updateMainMenu()
 		//else
 			FTrayManager->setIcon(iconByShow(statusItemShow(statusId)));
 	}
+
+	if (FRostersModel)
+	{
+		IRosterIndex *croot = FRostersModel->contactsRoot();
+		croot->setData(statusItemShow(statusId),RDR_SHOW);
+		croot->setData(statusItemText(statusId),RDR_STATUS);
+		croot->setData(statusItemPriority(statusId),RDR_PRIORITY);
+	}
 }
 
 void StatusChanger::updateTrayToolTip()
@@ -832,9 +841,13 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *streamIndex = FRostersModel->findStreamIndex(APresence->xmppStream()->streamJid());
-		if (streamIndex)
-			FRostersView->insertLabel(FConnectingLabelId,streamIndex);
+		IRosterIndex *sindex = FRostersModel->streamIndex(APresence->xmppStream()->streamJid());
+		if (sindex)
+			FRostersView->insertLabel(FConnectingLabelId,sindex);
+
+		IRosterIndex *croot = FRostersModel->contactsRoot();
+		if (croot && FConnectStatus.isEmpty())
+			FRostersView->insertLabel(FConnectingLabelId,croot);
 	}
 }
 
@@ -842,9 +855,13 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *streamIndex = FRostersModel->findStreamIndex(APresence->xmppStream()->streamJid());
-		if (streamIndex)
-			FRostersView->removeLabel(FConnectingLabelId,streamIndex);
+		IRosterIndex *sindex = FRostersModel->streamIndex(APresence->xmppStream()->streamJid());
+		if (sindex)
+			FRostersView->removeLabel(FConnectingLabelId,sindex);
+
+		IRosterIndex *croot = FRostersModel->contactsRoot();
+		if (croot && FConnectStatus.isEmpty())
+			FRostersView->removeLabel(FConnectingLabelId,croot);
 	}
 }
 
@@ -998,8 +1015,8 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 		}
 		if (FConnectStatus.contains(APresence))
 		{
-			removeConnectingLabel(APresence);
 			FConnectStatus.remove(APresence);
+			removeConnectingLabel(APresence);
 		}
 
 		if (AShow!= IPresence::Offline && AShow!=IPresence::Error)
@@ -1022,11 +1039,13 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 	removeStatusNotification(APresence);
 	removeTempStatus(APresence);
 
+	FConnectStatus.remove(APresence);
+	removeConnectingLabel(APresence);
+
 	FFastReconnect -= APresence;
 	FMainStatusStreams -= APresence;
 	FMainStatusActions.remove(APresence);
 	FCurrentStatus.remove(APresence);
-	FConnectStatus.remove(APresence);
 	FLastOnlineStatus.remove(APresence);
 	FPendingReconnect.remove(APresence);
 	delete FStreamMenu.take(APresence);
@@ -1070,16 +1089,31 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 
 void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_KIND).toInt()==RIK_STREAM_INDEX)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
-		Menu *menu = streamMenu(AIndexes.first()->data(RDR_STREAM_JID).toString());
-		if (menu)
+		IRosterIndex *index = AIndexes.first();
+		if (index->kind() == RIK_STREAM_ROOT)
 		{
-			Action *action = new Action(AMenu);
-			action->setText(tr("Status"));
-			action->setMenu(menu);
-			action->setIcon(menu->menuAction()->icon());
-			AMenu->addAction(action,AG_RVCM_STATUSCHANGER,true);
+			Menu *menu = streamMenu(index->data(RDR_STREAM_JID).toString());
+			if (menu)
+			{
+				Action *action = new Action(AMenu);
+				action->setMenu(menu);
+				action->setText(tr("Status"));
+				action->setIcon(menu->menuAction()->icon());
+				AMenu->addAction(action,AG_RVCM_STATUSCHANGER,true);
+			}
+		}
+		else if (index->kind() == RIK_CONTACTS_ROOT)
+		{
+			Menu *menu = new Menu(AMenu);
+			menu->setTitle(tr("Status"));
+			menu->setIcon(FMainMenu->icon());
+			foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_CUSTOM_STATUS))
+				menu->addAction(action,AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
+			foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
+				menu->addAction(action,AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
+			AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER,true);
 		}
 	}
 }

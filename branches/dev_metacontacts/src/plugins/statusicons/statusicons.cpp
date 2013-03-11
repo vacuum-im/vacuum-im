@@ -162,7 +162,9 @@ QVariant StatusIcons::rosterData(int AOrder, const IRosterIndex *AIndex, int ARo
 	{
 		switch (AIndex->kind())
 		{
-		case RIK_STREAM_INDEX:
+		case RIK_CONTACTS_ROOT:
+			return iconByStatus(AIndex->data(RDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
+		case RIK_STREAM_ROOT:
 		case RIK_CONTACT:
 		case RIK_AGENT:
 		case RIK_MY_RESOURCE:
@@ -451,9 +453,9 @@ void StatusIcons::onStatusIconsChangedTimer()
 void StatusIcons::onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority)
 {
 	Q_UNUSED(AShow); Q_UNUSED(AStatus); Q_UNUSED(APriority);
-	IRosterIndex *streamIndex = FRostersModel!=NULL ? FRostersModel->findStreamIndex(APresence->streamJid()) : NULL;
-	if (streamIndex)
-		emit rosterDataChanged(streamIndex,Qt::DecorationRole);
+	IRosterIndex *sindex = FRostersModel!=NULL ? FRostersModel->streamIndex(APresence->streamJid()) : NULL;
+	if (sindex)
+		emit rosterDataChanged(sindex,Qt::DecorationRole);
 }
 
 void StatusIcons::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)

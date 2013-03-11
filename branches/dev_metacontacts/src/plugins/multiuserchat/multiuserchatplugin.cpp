@@ -719,10 +719,10 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 	IRosterIndex *chatIndex = findMultiChatRosterIndex(AStreamJid,ARoomJid);
 	if (chatIndex == NULL)
 	{
-		IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AStreamJid) : NULL;
-		if (streamRoot)
+		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
+		if (sroot)
 		{
-			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",streamRoot);
+			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",sroot);
 			chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
 
 			chatIndex = FRostersModel->newRosterIndex(RIK_MUC_ITEM);
@@ -1248,7 +1248,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		IRosterIndex *index = AIndexes.first();
-		if (index->kind()==RIK_STREAM_INDEX)
+		if (index->kind()==RIK_STREAM_ROOT)
 		{
 			int show = index->data(RDR_SHOW).toInt();
 			if (show!=IPresence::Offline && show!=IPresence::Error)

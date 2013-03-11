@@ -65,7 +65,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 		QVariant rightSortOrder = ARight.data(RDR_SORT_ORDER);
 		if (leftSortOrder.isNull() || rightSortOrder.isNull() || leftSortOrder==rightSortOrder)
 		{
-			if (FSortByStatus && leftTypeOrder!=RIKO_STREAM_INDEX)
+			if (FSortByStatus && leftTypeOrder!=RIKO_STREAM_ROOT)
 			{
 				int leftShow = ALeft.data(RDR_SHOW).toInt();
 				int rightShow = ARight.data(RDR_SHOW).toInt();
@@ -87,25 +87,28 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
 	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
-	if (index.data(RDR_ALLWAYS_INVISIBLE).toInt() > 0)
-		return false;
-	if (index.data(RDR_ALLWAYS_VISIBLE).toInt() > 0)
-		return true;
 
-	if (!FShowOffline)
+	int visible = index.data(RDR_FORCE_VISIBLE).toInt();
+	if (visible > 0)
 	{
-		if (sourceModel()->hasChildren(index))
-		{
-			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-				if (filterAcceptsRow(childRow,index))
-					return true;
-			return false;
-		}
-		else if (!index.data(RDR_SHOW).isNull())
-		{
-			int indexShow = index.data(RDR_SHOW).toInt();
-			return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
-		}
+		return true;
 	}
+	else if (visible < 0)
+	{
+		return false;
+	}
+	else if (sourceModel()->hasChildren(index))
+	{
+		for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+			if (filterAcceptsRow(childRow,index))
+				return true;
+		return false;
+	}
+	else if (!FShowOffline && !index.data(RDR_SHOW).isNull())
+	{
+		int indexShow = index.data(RDR_SHOW).toInt();
+		return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
+	}
+
 	return true;
 }

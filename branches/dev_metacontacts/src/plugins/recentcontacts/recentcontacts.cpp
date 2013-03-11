@@ -222,7 +222,7 @@ QList<int> RecentContacts::rosterDataRoles(int AOrder) const
 		return QList<int>() 
 			<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole 
 			<< RDR_NAME << RDR_RESOURCES << RDR_SHOW << RDR_STATUS 
-			<< RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_ALLWAYS_VISIBLE;
+			<< RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_FORCE_VISIBLE;
 	}
 	return QList<int>();
 }
@@ -242,7 +242,7 @@ QVariant RecentContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int 
 					return palette.color(QPalette::Active, QPalette::BrightText);
 				case Qt::BackgroundColorRole:
 					return palette.color(QPalette::Active, QPalette::Dark);
-				case RDR_ALLWAYS_VISIBLE:
+				case RDR_FORCE_VISIBLE:
 					return 1;
 				}
 				break;
@@ -254,7 +254,7 @@ QVariant RecentContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int 
 				{
 				case RDR_SHOW:
 					return proxy!=NULL ? proxy->data(ARole) : IPresence::Offline;
-				case RDR_ALLWAYS_VISIBLE:
+				case RDR_FORCE_VISIBLE:
 					return (proxy!=NULL ? proxy->data(ARole).toInt() : 0) + (FAllwaysShowOffline ? 1 : 0);
 				default:
 					return proxy!=NULL ? proxy->data(ARole) : QVariant();
@@ -442,14 +442,14 @@ IRecentItem RecentContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &AItem) const
 {
 	QList<IRosterIndex *> proxies;
-	IRosterIndex *streamRoot = FRostersModel!=NULL ? FRostersModel->findStreamRoot(AItem.streamJid) : NULL;
-	if (streamRoot)
+	IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AItem.streamJid) : NULL;
+	if (sroot)
 	{
 		QMultiMap<int, QVariant> findData;
 		findData.insertMulti(RDR_KIND,RIK_CONTACT);
 		findData.insertMulti(RDR_STREAM_JID,AItem.streamJid.pFull());
 		findData.insertMulti(RDR_PREP_BARE_JID,AItem.reference);
-		proxies = sortItemProxies(streamRoot->findChilds(findData,true));
+		proxies = sortItemProxies(sroot->findChilds(findData,true));
 	}
 	return proxies;
 }
@@ -1480,7 +1480,7 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 	{
 		FAllwaysShowOffline = ANode.value().toBool();
 		foreach(IRosterIndex *index, FVisibleItems.values())
-			emit rosterDataChanged(index,RDR_ALLWAYS_VISIBLE);
+			emit rosterDataChanged(index,RDR_FORCE_VISIBLE);
 	}
 	else if (ANode.path() == OPV_ROSTER_RECENT_HIDEINACTIVEITEMS)
 	{

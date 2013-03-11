@@ -92,6 +92,7 @@ protected slots:
 	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
 	void onRostersViewClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 protected slots:
 	void onRestoreExpandState();
 	void onOptionsOpened();
@@ -112,6 +113,7 @@ private:
 private:
 	bool FShowStatus;
 	bool FShowResource;
+	bool FShowMergedStreams;
 	Action *FShowOfflineAction;
 	RostersView *FRostersView;
 	QAbstractItemModel *FLastModel;

@@ -534,7 +534,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 		Jid streamJid = index->data(RDR_STREAM_JID).toString();
 		if (FBookmarks.contains(streamJid))
 		{
-			if (!FRostersView->hasMultiSelection() && index->kind()==RIK_STREAM_INDEX)
+			if (!FRostersView->hasMultiSelection() && index->kind()==RIK_STREAM_ROOT)
 			{
 				QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
 				if (!bookmarkList.isEmpty())
