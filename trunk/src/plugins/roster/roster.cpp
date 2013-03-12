@@ -126,9 +126,29 @@ bool Roster::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder
 	return false;
 }
 
+Jid Roster::streamJid() const
+{
+	return FXmppStream->streamJid();
+}
+
+IXmppStream * Roster::xmppStream() const
+{
+	return FXmppStream;
+}
+
+bool Roster::isOpen() const
+{
+	return FOpened;
+}
+
+QString Roster::groupDelimiter() const
+{
+	return FGroupDelim;
+}
+
 IRosterItem Roster::rosterItem(const Jid &AItemJid) const
 {
-	foreach(IRosterItem ritem, FRosterItems)
+	foreach(const IRosterItem &ritem, FRosterItems)
 		if (AItemJid && ritem.itemJid)
 			return ritem;
 	return IRosterItem();
@@ -139,25 +159,31 @@ QList<IRosterItem> Roster::rosterItems() const
 	return FRosterItems.values();
 }
 
-QSet<QString> Roster::groups() const
+QSet<QString> Roster::allGroups() const
 {
-	QSet<QString> allGroups;
-	foreach(IRosterItem ritem, FRosterItems)
+	QSet<QString> groups;
+	foreach(const IRosterItem &ritem, FRosterItems)
 		if (!ritem.itemJid.node().isEmpty())
-			allGroups += ritem.groups;
-	return allGroups;
+			groups += ritem.groups;
+	return groups;
+}
+
+bool Roster::hasGroup(const QString &AGroup) const
+{
+	foreach(const QString &group, allGroups())
+		if (isSubgroup(AGroup,group))
+			return true;
+	return false;
 }
 
 QList<IRosterItem> Roster::groupItems(const QString &AGroup) const
 {
-	QString groupWithDelim = AGroup+FGroupDelim;
 	QList<IRosterItem> ritems;
-	foreach(IRosterItem ritem, FRosterItems)
+	foreach(const IRosterItem &ritem, FRosterItems)
 	{
-		QSet<QString> allItemGroups = ritem.groups;
-		foreach(QString itemGroup,allItemGroups)
+		foreach(const QString &group, ritem.groups)
 		{
-			if (itemGroup==AGroup || itemGroup.startsWith(groupWithDelim))
+			if (isSubgroup(AGroup,group))
 			{
 				ritems.append(ritem);
 				break;
@@ -172,6 +198,11 @@ QSet<QString> Roster::itemGroups(const Jid &AItemJid) const
 	return rosterItem(AItemJid).groups;
 }
 
+bool Roster::isSubgroup(const QString &ASubGroup, const QString &AGroup) const
+{
+	return AGroup==ASubGroup || AGroup.startsWith(ASubGroup+FGroupDelim);
+}
+
 void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups)
 {
 	if (isOpen())
@@ -182,9 +213,9 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
 		itemElem.setAttribute("jid", AItemJid.bare());
 		if (!AName.isEmpty())
 			itemElem.setAttribute("name",AName);
-		foreach (QString groupName,AGroups)
-			if (!groupName.isEmpty())
-				itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
+		foreach (const QString &group, AGroups)
+			if (!group.isEmpty())
+				itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(group));
 		FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
 	}
 }
@@ -196,15 +227,15 @@ void Roster::setItems(const QList<IRosterItem> &AItems)
 		Stanza query("iq");
 		query.setType("set").setId(FStanzaProcessor->newId());
 		QDomElement elem = query.addElement("query",NS_JABBER_ROSTER);
-		foreach(IRosterItem ritem, AItems)
+		foreach(const IRosterItem &ritem, AItems)
 		{
 			QDomElement itemElem = elem.appendChild(query.createElement("item")).toElement();
 			itemElem.setAttribute("jid", ritem.itemJid.bare());
 			if (!ritem.name.isEmpty())
 				itemElem.setAttribute("name",ritem.name);
-			foreach (QString groupName,ritem.groups)
-				if (!groupName.isEmpty())
-					itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(groupName));
+			foreach (const QString &group, ritem.groups)
+				if (!group.isEmpty())
+					itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(group));
 		}
 		FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),query);
 	}
@@ -327,13 +358,13 @@ void Roster::renameItem(const Jid &AItemJid, const QString &AName)
 		setItem(AItemJid,AName,ritem.groups);
 }
 
-void Roster::copyItemToGroup(const Jid &AItemJid, const QString &AGroup)
+void Roster::copyItemToGroup(const Jid &AItemJid, const QString &AGroupTo)
 {
 	IRosterItem ritem = rosterItem(AItemJid);
-	if (ritem.isValid && !AGroup.isEmpty() && !ritem.groups.contains(AGroup))
+	if (ritem.isValid && !AGroupTo.isEmpty() && !ritem.groups.contains(AGroupTo))
 	{
 		QSet<QString> allItemGroups = ritem.groups;
-		setItem(AItemJid,ritem.name,allItemGroups += AGroup);
+		setItem(AItemJid,ritem.name,allItemGroups += AGroupTo);
 	}
 }
 
@@ -356,35 +387,32 @@ void Roster::moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, con
 	}
 }
 
-void Roster::removeItemFromGroup(const Jid &AItemJid, const QString &AGroup)
+void Roster::removeItemFromGroup(const Jid &AItemJid, const QString &AGroupFrom)
 {
 	IRosterItem ritem = rosterItem(AItemJid);
-	if (ritem.isValid && ritem.groups.contains(AGroup))
+	if (ritem.isValid && ritem.groups.contains(AGroupFrom))
 	{
 		QSet<QString> allItemGroups = ritem.groups;
-		setItem(AItemJid,ritem.name,allItemGroups -= AGroup);
+		setItem(AItemJid,ritem.name,allItemGroups -= AGroupFrom);
 	}
 }
 
 void Roster::renameGroup(const QString &AGroup, const QString &AGroupTo)
 {
 	QList<IRosterItem> allGroupItems = groupItems(AGroup);
-	QList<IRosterItem>::iterator it = allGroupItems.begin();
-	while (it != allGroupItems.end())
+	for (QList<IRosterItem>::iterator it=allGroupItems.begin(); it!=allGroupItems.end(); ++it)
 	{
 		QSet<QString> newItemGroups;
-		foreach(QString group,it->groups)
+		foreach(QString group, it->groups)
 		{
-			QString newGroup = group;
-			if (newGroup.startsWith(AGroup))
+			if (isSubgroup(AGroup,group))
 			{
-				newGroup.remove(0,AGroup.size());
-				newGroup.prepend(AGroupTo);
+				group.remove(0,AGroup.size());
+				group.prepend(AGroupTo);
 			}
-			newItemGroups += newGroup;
+			newItemGroups += group;
 		}
 		it->groups = newItemGroups;
-		++it;
 	}
 	setItems(allGroupItems);
 }
@@ -395,27 +423,20 @@ void Roster::copyGroupToGroup(const QString &AGroup, const QString &AGroupTo)
 	{
 		QList<IRosterItem> allGroupItems = groupItems(AGroup);
 		QString groupName = AGroup.split(FGroupDelim,QString::SkipEmptyParts).last();
-		QList<IRosterItem>::iterator it = allGroupItems.begin();
-		while (it != allGroupItems.end())
+		for (QList<IRosterItem>::iterator it = allGroupItems.begin(); it != allGroupItems.end(); ++it)
 		{
-			QSet<QString> newItemGroups;
-			QSet<QString> oldItemGroups = it->groups;
-			foreach(QString group,oldItemGroups)
+			foreach(QString group, it->groups)
 			{
-				if (group.startsWith(AGroup))
+				if (isSubgroup(AGroup,group))
 				{
-					QString newGroup = group;
-					newGroup.remove(0,AGroup.size());
+					group.remove(0,AGroup.size());
 					if (!AGroupTo.isEmpty())
-						newGroup.prepend(AGroupTo + FGroupDelim + groupName);
+						group.prepend(AGroupTo + FGroupDelim + groupName);
 					else
-						newGroup.prepend(groupName);
-
-					newItemGroups += newGroup;
+						group.prepend(groupName);
+					it->groups += group;
 				}
 			}
-			it->groups += newItemGroups;
-			++it;
 		}
 		setItems(allGroupItems);
 	}
@@ -427,27 +448,21 @@ void Roster::moveGroupToGroup(const QString &AGroup, const QString &AGroupTo)
 	{
 		QList<IRosterItem> allGroupItems = groupItems(AGroup);
 		QString groupName = AGroup.split(FGroupDelim,QString::SkipEmptyParts).last();
-		QList<IRosterItem>::iterator it = allGroupItems.begin();
-		while (it != allGroupItems.end())
+		for (QList<IRosterItem>::iterator it=allGroupItems.begin(); it!=allGroupItems.end(); ++it)
 		{
-			QSet<QString> newItemGroups;
-			QSet<QString> oldItemGroups = it->groups;
-			foreach(QString group,oldItemGroups)
+			foreach(QString group, it->groups)
 			{
-				if (group.startsWith(AGroup))
+				if (isSubgroup(AGroup,group))
 				{
-					QString newGroup = group;
-					newGroup.remove(0,AGroup.size());
+					it->groups -= group;
+					group.remove(0,AGroup.size());
 					if (!AGroupTo.isEmpty())
-						newGroup.prepend(AGroupTo + FGroupDelim + groupName);
+						group.prepend(AGroupTo + FGroupDelim + groupName);
 					else
-						newGroup.prepend(groupName);
-					newItemGroups += newGroup;
-					oldItemGroups -= group;
+						group.prepend(groupName);
+					it->groups += group;
 				}
 			}
-			it->groups = oldItemGroups+newItemGroups;
-			++it;
 		}
 		setItems(allGroupItems);
 	}
@@ -456,15 +471,11 @@ void Roster::moveGroupToGroup(const QString &AGroup, const QString &AGroupTo)
 void Roster::removeGroup(const QString &AGroup)
 {
 	QList<IRosterItem> allGroupItems = groupItems(AGroup);
-	QList<IRosterItem>::iterator it = allGroupItems.begin();
-	while (it != allGroupItems.end())
+	for (QList<IRosterItem>::iterator it=allGroupItems.begin(); it!=allGroupItems.end(); ++it)
 	{
-		QSet<QString> newItemGroups = it->groups;
 		foreach(QString group, it->groups)
-			if (group.startsWith(AGroup))
-				newItemGroups -= group;
-		it->groups = newItemGroups;
-		++it;
+			if (isSubgroup(AGroup,group))
+				it->groups -= group;
 	}
 	setItems(allGroupItems);
 }

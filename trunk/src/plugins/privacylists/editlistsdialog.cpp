@@ -534,8 +534,8 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 		}
 		else if (type == PRIVACY_TYPE_GROUP)
 		{
-			QSet<QString> groupItems = FRoster!=NULL ? FRoster->groups() : QSet<QString>();
-			foreach(QString group, groupItems)
+			QSet<QString> groups = FRoster!=NULL ? FRoster->allGroups() : QSet<QString>();
+			foreach(QString group, groups)
 				ui.cmbValue->addItem(group.replace(FRoster->groupDelimiter(),"::"),group);
 		}
 		ui.cmbValue->setEditable(true);

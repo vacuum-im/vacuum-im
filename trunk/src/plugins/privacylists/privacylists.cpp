@@ -433,12 +433,11 @@ void PrivacyLists::setAutoListed(const Jid &AStreamJid, const QString &AGroup, c
 			}
 
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-			QStringList groups = roster!=NULL ? (roster->groups()<<AGroup).toList() : QStringList(AGroup);
-			QString groupWithDelim = roster!=NULL ? AGroup + roster->groupDelimiter() : AGroup;
+			QStringList groups = roster!=NULL ? (roster->allGroups()<<AGroup).toList() : QStringList(AGroup);
 			qSort(groups);
 			foreach(QString group, groups)
 			{
-				if (group==AGroup || group.startsWith(groupWithDelim))
+				if (roster->isSubgroup(AGroup,group))
 				{
 					rule.value = group;
 					if (AInserted)
@@ -451,7 +450,9 @@ void PrivacyLists::setAutoListed(const Jid &AStreamJid, const QString &AGroup, c
 						}
 					}
 					else
+					{
 						list.rules.removeAt(list.rules.indexOf(rule));
+					}
 				}
 			}
 
