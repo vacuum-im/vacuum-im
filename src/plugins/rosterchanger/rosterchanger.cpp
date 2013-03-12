@@ -605,10 +605,9 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 	if (roster)
 	{
 		QString group;
-		QString groupDelim = roster->groupDelimiter();
 		QHash<QString,Menu *> menus;
-		QSet<QString> allGroups = roster->groups();
-		foreach(group,allGroups)
+		QString groupDelim = roster->groupDelimiter();
+		foreach(group, roster->allGroups())
 		{
 			Menu *parentMenu = menu;
 			QList<QString> groupTree = group.split(groupDelim,QString::SkipEmptyParts);
@@ -1275,17 +1274,17 @@ void RosterChanger::addGroupToGroup(const Jid &AToStreamJid, const Jid &AFromStr
 			QSet<QString> newGroups;
 			foreach(QString group, fromItem.groups)
 			{
-				if (group.startsWith(AGroup))
+				if (fromRoster->isSubgroup(AGroup,group))
 				{
-					QString newGroup = group;
-					newGroup.remove(0,AGroup.size());
+					group.remove(0,AGroup.size());
 					if (!AGroupTo.isEmpty())
-						newGroup.prepend(AGroupTo + toRoster->groupDelimiter() + fromGroupLast);
+						group.prepend(AGroupTo + toRoster->groupDelimiter() + fromGroupLast);
 					else
-						newGroup.prepend(fromGroupLast);
-					newGroups += newGroup;
+						group.prepend(fromGroupLast);
+					newGroups += group;
 				}
 			}
+
 			IRosterItem toItem = toRoster->rosterItem(fromItem.itemJid);
 			if (!toItem.isValid)
 			{
@@ -1307,7 +1306,7 @@ void RosterChanger::addGroupToGroup(const Jid &AToStreamJid, const Jid &AFromStr
 void RosterChanger::renameGroup(const Jid &AStreamJid, const QString &AGroup) const
 {
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-	if (roster && roster->isOpen() && roster->groups().contains(AGroup))
+	if (roster && roster->isOpen() && roster->allGroups().contains(AGroup))
 	{
 		QString groupDelim = roster->groupDelimiter();
 		QList<QString> groupTree = AGroup.split(groupDelim,QString::SkipEmptyParts);
