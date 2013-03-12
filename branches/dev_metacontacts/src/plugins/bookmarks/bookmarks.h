@@ -27,6 +27,7 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <utils/advanceditemdelegate.h>
+#include <utils/textmanager.h>
 #include <utils/shortcuts.h>
 #include <utils/options.h>
 #include <utils/menu.h>

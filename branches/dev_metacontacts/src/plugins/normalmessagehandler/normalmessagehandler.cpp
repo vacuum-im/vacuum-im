@@ -658,7 +658,7 @@ void NormalMessageHandler::onWindowContextMenuRequested(Menu *AMenu)
 	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
 	if (widget && FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->getContactIndexList(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		IRosterIndex *index = FRostersModel->findContactIndexes(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
 		if (index)
 			FRostersView->contextMenuForIndex(QList<IRosterIndex *>()<<index,NULL,AMenu);
 	}
@@ -669,7 +669,7 @@ void NormalMessageHandler::onWindowToolTipsRequested(QMap<int,QString> &AToolTip
 	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
 	if (widget && FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->getContactIndexList(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		IRosterIndex *index = FRostersModel->findContactIndexes(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
 		if (index)
 			FRostersView->toolTipsForIndex(index,NULL,AToolTips);
 	}

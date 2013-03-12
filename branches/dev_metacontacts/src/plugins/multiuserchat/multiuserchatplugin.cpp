@@ -749,7 +749,7 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 				updateChatRosterIndex(window);
 			}
 
-			chatGroup->appendChild(chatIndex);
+			FRostersModel->insertRosterIndex(chatIndex,chatGroup);
 			emit multiChatRosterIndexCreated(chatIndex);
 
 			updateRecentItemProxy(chatIndex);
@@ -1247,6 +1247,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
+		bool isMultiSelection = AIndexes.count()>1;
 		IRosterIndex *index = AIndexes.first();
 		if (index->kind()==RIK_STREAM_ROOT)
 		{
@@ -1269,7 +1270,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 		else if (index->kind() == RIK_MUC_ITEM)
 		{
 			IMultiUserChatWindow *window =findMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
-			if (window==NULL || FRostersViewPlugin->rostersView()->hasMultiSelection())
+			if (window==NULL || isMultiSelection)
 			{
 				QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_MUC_NICK<<RDR_MUC_PASSWORD);
 
@@ -1287,7 +1288,7 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 				connect(enter,SIGNAL(triggered(bool)),SLOT(onEnterRoomActionTriggered(bool)));
 				AMenu->addAction(enter,AG_RVCM_MULTIUSERCHAT_EXIT);
 
-				if (FRostersViewPlugin->rostersView()->hasMultiSelection())
+				if (isMultiSelection)
 				{
 					Action *exit = new Action(AMenu);
 					exit->setText(tr("Exit"));

@@ -15,10 +15,11 @@
 class RostersModel :
 	public AdvancedItemModel,
 	public IPlugin,
-	public IRostersModel
+	public IRostersModel,
+	public IRosterDataHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRostersModel);
+	Q_INTERFACES(IPlugin IRostersModel IRosterDataHolder);
 public:
 	RostersModel();
 	~RostersModel();
@@ -30,6 +31,10 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
+	//IRosterDataHolder
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersModel
 	virtual QList<Jid> streams() const;
 	virtual IRosterIndex *addStream(const Jid &AStreamJid);
@@ -41,10 +46,12 @@ public:
 	virtual IRosterIndex *streamRoot(const Jid &AStreamJid) const;
 	virtual IRosterIndex *streamIndex(const Jid &AStreamJid) const;
 	virtual IRosterIndex *newRosterIndex(int AKind);
+	virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
 	virtual void removeRosterIndex(IRosterIndex *AIndex, bool ADestroy = true);
 	virtual IRosterIndex *findGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const;
 	virtual IRosterIndex *getGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent);
-	virtual QList<IRosterIndex *> getContactIndexList(const Jid &AStreamJid, const Jid &AContactJid, bool ACreate = false);
+	virtual QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, IRosterIndex *AParent = NULL) const;
+	virtual QList<IRosterIndex *> getContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, IRosterIndex *AParent = NULL);
 	virtual QModelIndex modelIndexFromRosterIndex(IRosterIndex *AIndex) const;
 	virtual IRosterIndex *rosterIndexFromModelIndex(const QModelIndex &AIndex) const;
 	virtual bool isGroupKind(int AKind) const;
@@ -55,6 +62,7 @@ public:
 	virtual void insertRosterDataHolder(int AOrder, IRosterDataHolder *AHolder);
 	virtual void removeRosterDataHolder(int AOrder, IRosterDataHolder *AHolder);
 signals:
+	//IRostersModel
 	void streamAdded(const Jid &AStreamJid);
 	void streamRemoved(const Jid &AStreamJid);
 	void streamJidChanged(const Jid &ABefore, const Jid &AAfter);
@@ -65,13 +73,14 @@ signals:
 	void indexRemoving(IRosterIndex *AIndex);
 	void indexDestroyed(IRosterIndex *AIndex);
 	void indexDataChanged(IRosterIndex *AIndex, int ARole);
+	//IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	void updateStreamsLayout();
 	void emitIndexDestroyed(IRosterIndex *AIndex);
 	void removeEmptyGroup(IRosterIndex *AGroupIndex);
 	QString getGroupName(int AKind, const QString &AGroup) const;
 	bool isChildIndex(IRosterIndex *AIndex, IRosterIndex *AParent) const;
-	QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, IRosterIndex *AParent = NULL) const;
 protected slots:
 	void onAdvancedItemInserted(QStandardItem *AItem);
 	void onAdvancedItemRemoving(QStandardItem *AItem);
@@ -93,7 +102,7 @@ private:
 private:
 	StreamsLayout FLayout;
 	RootIndex *FRootIndex;
-	IRosterIndex *FStreamsRoot;
+	IRosterIndex *FContactsRoot;
 	QMap<int, QString> FSingleGroups;
 	QMap<Jid,IRosterIndex *> FStreamIndexes;
 	QMultiMap<int, IRosterDataHolder *> FRosterDataHolders;

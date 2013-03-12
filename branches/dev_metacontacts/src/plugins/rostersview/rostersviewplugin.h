@@ -89,6 +89,7 @@ protected slots:
 	void onViewIndexCollapsed(const QModelIndex &AIndex);
 	void onViewIndexExpanded(const QModelIndex &AIndex);
 protected slots:
+	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
 	void onRostersViewClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
@@ -118,6 +119,7 @@ private:
 	RostersView *FRostersView;
 	QAbstractItemModel *FLastModel;
 	SortFilterProxyModel *FSortFilterProxyModel;
+	QMap<Menu *, QSet<Action *> > FStreamsContextMenuActions;
 	struct { int sliderPos; IRosterIndex *currentIndex; } FViewSavedState;
 };
 

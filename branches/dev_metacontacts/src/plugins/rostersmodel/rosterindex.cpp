@@ -52,8 +52,7 @@ int RosterIndex::childCount() const
 
 void RosterIndex::appendChild(IRosterIndex *AIndex)
 {
-	if (AIndex->parentIndex() != this)
-		appendRow(AIndex->instance());
+	appendRow(AIndex->instance());
 }
 
 IRosterIndex *RosterIndex::childIndex(int ARow) const

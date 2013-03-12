@@ -1106,14 +1106,17 @@ void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 		}
 		else if (index->kind() == RIK_CONTACTS_ROOT)
 		{
-			Menu *menu = new Menu(AMenu);
-			menu->setTitle(tr("Status"));
-			menu->setIcon(FMainMenu->icon());
-			foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_CUSTOM_STATUS))
-				menu->addAction(action,AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
-			foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
-				menu->addAction(action,AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
-			AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER,true);
+			if (index->data(RDR_STREAMS).toStringList().count()>1)
+			{
+				Menu *menu = new Menu(AMenu);
+				menu->setTitle(tr("Status"));
+				menu->setIcon(FMainMenu->icon());
+				foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_CUSTOM_STATUS))
+					menu->addAction(action,AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
+				foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
+					menu->addAction(action,AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
+				AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER,true);
+			}
 		}
 	}
 }

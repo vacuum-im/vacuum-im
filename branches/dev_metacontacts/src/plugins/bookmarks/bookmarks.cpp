@@ -528,13 +528,14 @@ void Bookmarks::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &AS
 
 void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId)
+	bool isMultiSelection = AIndexes.count()>1;
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
 		IRosterIndex *index = AIndexes.value(0);
 		Jid streamJid = index->data(RDR_STREAM_JID).toString();
 		if (FBookmarks.contains(streamJid))
 		{
-			if (!FRostersView->hasMultiSelection() && index->kind()==RIK_STREAM_ROOT)
+			if (!isMultiSelection && index->kind()==RIK_STREAM_ROOT)
 			{
 				QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
 				if (!bookmarkList.isEmpty())
@@ -543,14 +544,14 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 					streamMenu->setTitle(tr("Bookmarks"));
 					streamMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
 
-					for(int index=0; index<bookmarkList.count(); index++)
+					for (int index=0; index<bookmarkList.count(); index++)
 					{
 						const IBookmark &bookmark = bookmarkList.at(index);
 						if (isValidBookmark(bookmark) && !bookmark.name.isEmpty())
 						{
 							Action *startAction = new Action(streamMenu);
 							startAction->setIcon(RSR_STORAGE_MENUICONS,bookmark.type==IBookmark::Url ? MNI_BOOKMARKS_URL : MNI_BOOKMARKS_ROOM);
-							startAction->setText(bookmark.name.size()>33 ? bookmark.name.left(30)+"..." : bookmark.name);
+							startAction->setText(TextManager::getElidedString(bookmark.name,Qt::ElideRight,30));
 							startAction->setData(ADR_STREAM_JID,streamJid.full());
 							startAction->setData(ADR_BOOKMARK_TYPE,bookmark.type);
 							startAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
@@ -574,7 +575,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 				IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(AIndexes.value(0));
 				QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_NAME<<RDR_PREP_BARE_JID<<RDR_MUC_NICK<<RDR_MUC_PASSWORD);
 
-				if (FRostersView->hasMultiSelection() || !isValidBookmark(bookmark))
+				if (isMultiSelection || !isValidBookmark(bookmark))
 				{
 					Action *appendAction = new Action(AMenu);
 					appendAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
@@ -588,7 +589,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 					AMenu->addAction(appendAction,AG_RVCM_BOOKMARS_TOOLS);
 				}
 
-				if (FRostersView->hasMultiSelection() || isValidBookmark(bookmark))
+				if (isMultiSelection || isValidBookmark(bookmark))
 				{
 					Action *removeAction = new Action(AMenu);
 					removeAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_REMOVE);
@@ -599,7 +600,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 					AMenu->addAction(removeAction,AG_RVCM_BOOKMARS_TOOLS);
 				}
 
-				if (!FRostersView->hasMultiSelection() && isValidBookmark(bookmark))
+				if (!isMultiSelection && isValidBookmark(bookmark))
 				{
 					Action *editAction = new Action(AMenu);
 					editAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
@@ -619,7 +620,7 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 					AMenu->addAction(renameAction,AG_RVCM_BOOKMARS_TOOLS);
 				}
 
-				if (!FRostersView->hasMultiSelection())
+				if (!isMultiSelection)
 				{
 					Action *autoJoinAction = new Action(AMenu);
 					autoJoinAction->setCheckable(true);

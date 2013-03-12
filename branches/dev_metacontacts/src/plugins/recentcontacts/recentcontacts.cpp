@@ -691,7 +691,7 @@ void RecentContacts::createItemIndex(const IRecentItem &AItem)
 			index->setData(AItem.type,RDR_RECENT_TYPE);
 			index->setData(AItem.streamJid.pFull(),RDR_STREAM_JID);
 			index->setData(AItem.reference,RDR_RECENT_REFERENCE);
-			FRootIndex->appendChild(index);
+			FRostersModel->insertRosterIndex(index,FRootIndex);
 
 			FVisibleItems.insert(AItem,index);
 			emit recentItemIndexCreated(AItem,index);
@@ -1082,7 +1082,7 @@ void RecentContacts::setItemsFavorite(bool AFavorite, const QStringList &ATypes,
 void RecentContacts::onRostersModelStreamAdded(const Jid &AStreamJid)
 {
 	if (FRostersModel && FStreamItems.isEmpty())
-		FRostersModel->rootIndex()->appendChild(FRootIndex);
+		FRostersModel->insertRosterIndex(FRootIndex,FRostersModel->rootIndex());
 
 	FStreamItems[AStreamJid].clear();
 	mergeRecentItems(AStreamJid,loadItemsFromFile(recentFileName(AStreamJid)),true);
@@ -1200,7 +1200,8 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 	if (!blocked && ALabelId==AdvancedDelegateItem::DisplayId)
 	{
 		QSet<Action *> recentActions;
-		if (!FRostersView->hasMultiSelection() && AIndexes.value(0)->kind()==RIK_RECENT_ROOT)
+		bool isMultiSelection = AIndexes.count()>1;
+		if (!isMultiSelection && AIndexes.value(0)->kind()==RIK_RECENT_ROOT)
 		{
 			Action *hideInactive = new Action(AMenu);
 			hideInactive->setText(tr("Hide Inactive Contacts"));
@@ -1264,7 +1265,7 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 				data.insert(ADR_RECENT_REFERENCE,rolesMap.value(RDR_RECENT_REFERENCE));
 
 				bool favorite = findRealItem(rosterIndexItem(AIndexes.value(0))).properties.value(REIP_FAVORITE).toBool();
-				if (FRostersView->hasMultiSelection() || !favorite)
+				if (isMultiSelection || !favorite)
 				{
 					Action *insertFavorite = new Action(AMenu);
 					insertFavorite->setText(tr("Add to Favorites"));
@@ -1276,7 +1277,7 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 					recentActions += insertFavorite;
 
 				}
-				if (FRostersView->hasMultiSelection() || favorite)
+				if (isMultiSelection || favorite)
 				{
 					Action *removeFavorite = new Action(AMenu);
 					removeFavorite->setText(tr("Remove from Favorites"));

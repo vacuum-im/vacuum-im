@@ -509,6 +509,23 @@ void RostersViewPlugin::onViewIndexExpanded(const QModelIndex &AIndex)
 	saveExpandState(AIndex);
 }
 
+void RostersViewPlugin::onRostersViewIndexContextMenuAboutToShow()
+{
+	Menu *menu = qobject_cast<Menu *>(sender());
+	if (menu)
+	{
+		QSet<Action *> streamsActions = FStreamsContextMenuActions.take(menu);
+		QSet<Action *> rootActions = menu->groupActions().toSet() - streamsActions;
+		foreach(Action *streamAction, streamsActions)
+		{
+			foreach(Action *rootAction, rootActions)
+				if (streamAction->text() == rootAction->text())
+					streamAction->setVisible(false);
+		}
+	}
+	FStreamsContextMenuActions.clear();
+}
+
 void RostersViewPlugin::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole)
 {
 	if (ARole == RDR_STATUS)
@@ -699,17 +716,28 @@ void RostersViewPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex *
 {
 	if (AIndexes.count()==1 && AIndexes.first()->kind()==RIK_CONTACTS_ROOT && ALabelId==AdvancedDelegateItem::DisplayId)
 	{
-		foreach(Jid streamJid, FRostersView->rostersModel()->streams())
+		QList<IRosterIndex *> streamIndexes;
+		QStringList streams = AIndexes.first()->data(RDR_STREAMS).toStringList();
+		foreach(const Jid &streamJid, streams)
 		{
 			IRosterIndex *sindex = FRostersView->rostersModel()->streamIndex(streamJid);
+			streamIndexes.append(sindex);
 
-			Menu *streamMenu = new Menu(AMenu);
-			streamMenu->setIcon(sindex->data(Qt::DecorationRole).value<QIcon>());
-			streamMenu->setTitle(sindex->data(Qt::DisplayRole).toString());
+			if (streams.count() > 1)
+			{
+				Menu *streamMenu = new Menu(AMenu);
+				streamMenu->setIcon(sindex->data(Qt::DecorationRole).value<QIcon>());
+				streamMenu->setTitle(sindex->data(Qt::DisplayRole).toString());
 
-			FRostersView->contextMenuForIndex(QList<IRosterIndex *>()<<sindex,NULL,streamMenu);
-			AMenu->addAction(streamMenu->menuAction(),AG_RVCM_ROSTERSVIEW_STREAMS,true);
+				FRostersView->contextMenuForIndex(QList<IRosterIndex *>()<<sindex,NULL,streamMenu);
+				AMenu->addAction(streamMenu->menuAction(),AG_RVCM_ROSTERSVIEW_STREAMS,true);
+			}
 		}
+
+		QSet<Action *> curActions = AMenu->groupActions().toSet();
+		FRostersView->contextMenuForIndex(streamIndexes,NULL,AMenu);
+		connect(AMenu,SIGNAL(aboutToShow()),SLOT(onRostersViewIndexContextMenuAboutToShow()));
+		FStreamsContextMenuActions[AMenu] = AMenu->groupActions().toSet() - curActions;
 	}
 }
 

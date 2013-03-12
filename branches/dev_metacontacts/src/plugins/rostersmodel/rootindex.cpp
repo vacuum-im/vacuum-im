@@ -41,8 +41,7 @@ int RootIndex::childCount() const
 
 void RootIndex::appendChild(IRosterIndex *AIndex)
 {
-	if (AIndex->parentIndex() != this)
-		FModel->appendRow(AIndex->instance());
+	FModel->appendRow(AIndex->instance());
 }
 
 IRosterIndex *RootIndex::childIndex(int ARow) const

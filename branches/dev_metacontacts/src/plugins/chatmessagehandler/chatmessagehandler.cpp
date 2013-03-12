@@ -792,7 +792,7 @@ void ChatMessageHandler::onWindowContextMenuRequested(Menu *AMenu)
 	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
 	if (widget && FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->getContactIndexList(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		IRosterIndex *index = FRostersModel->findContactIndexes(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
 		if (index)
 			FRostersView->contextMenuForIndex(QList<IRosterIndex *>()<<index,NULL,AMenu);
 	}
@@ -803,7 +803,7 @@ void ChatMessageHandler::onWindowToolTipsRequested(QMap<int,QString> &AToolTips)
 	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
 	if (widget && FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->getContactIndexList(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		IRosterIndex *index = FRostersModel->findContactIndexes(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
 		if (index)
 			FRostersView->toolTipsForIndex(index,NULL,AToolTips);
 	}
@@ -977,7 +977,7 @@ void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &A
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		if (!FRostersView->hasMultiSelection())
+		if (AIndexes.count() == 1)
 		{
 			Action *action = new Action(AMenu);
 			action->setText(tr("Open chat dialog"));

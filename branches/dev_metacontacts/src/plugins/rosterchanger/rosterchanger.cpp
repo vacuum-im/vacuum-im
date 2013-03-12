@@ -1535,7 +1535,7 @@ void RosterChanger::onRenameContact(bool)
 			if (FRostersView && FRostersView->instance()->isActiveWindow() && FRostersView->rostersModel())
 			{
 				QString group = action->data(ADR_GROUP).toStringList().value(0);
-				QList<IRosterIndex *> indexes = FRostersView->rostersModel()->getContactIndexList(streamJid,contactJid);
+				QList<IRosterIndex *> indexes = FRostersView->rostersModel()->findContactIndexes(streamJid,contactJid);
 				foreach(IRosterIndex *index, indexes)
 				{
 					if (index->data(RDR_GROUP).toString() == group)

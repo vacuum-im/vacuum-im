@@ -232,10 +232,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
-			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
 			Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
 			Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
-			QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,createIndex);
+			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
+			QList<IRosterIndex *> indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
 			if (!indexes.isEmpty())
 			{
 				IRostersNotify rnotify;

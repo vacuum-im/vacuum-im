@@ -462,7 +462,7 @@ void StatusIcons::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIte
 {
 	if (FRostersModel && (AItem.subscription!=ABefore.subscription || AItem.ask!=ABefore.ask))
 	{
-		foreach (IRosterIndex *index, FRostersModel->getContactIndexList(ARoster->streamJid(),AItem.itemJid))
+		foreach (IRosterIndex *index, FRostersModel->findContactIndexes(ARoster->streamJid(),AItem.itemJid))
 			emit rosterDataChanged(index,Qt::DecorationRole);
 	}
 }
@@ -471,7 +471,7 @@ void StatusIcons::onPresenceItemReceived(IPresence *APresence, const IPresenceIt
 {
 	if (FRostersModel && AItem.show!=ABefore.show)
 	{
-		foreach (IRosterIndex *index, FRostersModel->getContactIndexList(APresence->streamJid(),AItem.itemJid))
+		foreach (IRosterIndex *index, FRostersModel->findContactIndexes(APresence->streamJid(),AItem.itemJid))
 			emit rosterDataChanged(index,Qt::DecorationRole);
 	}
 }
