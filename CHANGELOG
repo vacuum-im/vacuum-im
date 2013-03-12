@@ -19,6 +19,7 @@ LEGEND
   [-] Proxy authorization in certain cases was not working
   [-] The application will fail if the server terminates the connection before the user enters the password
   [-] In very rare cases renaming, moving and copying of nested groups not working correctly
+  [-] Removing of avatars in several selected accounts or contacts was not working
 
 
 v1.2.0

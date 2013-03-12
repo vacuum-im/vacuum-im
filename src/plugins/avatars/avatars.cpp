@@ -793,13 +793,13 @@ void Avatars::onClearAvatarByAction(bool)
 	{
 		if (!action->data(ADR_STREAM_JID).isNull())
 		{
-			Jid streamJid = action->data(ADR_STREAM_JID).toString();
-			setAvatar(streamJid,QByteArray());
+			foreach(Jid streamJid, action->data(ADR_STREAM_JID).toStringList())
+				setAvatar(streamJid,QByteArray());
 		}
 		else if (!action->data(ADR_CONTACT_JID).isNull())
 		{
-			Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-			setCustomPictire(contactJid,QByteArray());
+			foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
+				setCustomPictire(contactJid,QByteArray());
 		}
 	}
 }
