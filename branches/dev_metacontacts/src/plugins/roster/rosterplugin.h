@@ -11,9 +11,9 @@
 #include "roster.h"
 
 class RosterPlugin :
-			public QObject,
-			public IPlugin,
-			public IRosterPlugin
+	public QObject,
+	public IPlugin,
+	public IRosterPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterPlugin);

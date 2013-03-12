@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Hide Inactive Contacts</source>
-        <translation>Прятать не активные контакты</translation>
+        <translation>Прятать неактивные контакты</translation>
     </message>
 </context>
 </TS>

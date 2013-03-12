@@ -130,15 +130,8 @@ QVariant RostersModel::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 					if (AIndex->kind() == RDR_GROUP)
 					{
 						IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
-						QSet<QString> streamGroups = roster!=NULL ? roster->groups() : QSet<QString>();
-						foreach(const QString &streamGroup, streamGroups)
-						{
-							if (streamGroup==group || streamGroup.startsWith(group+roster->groupDelimiter()))
-							{
-								groupStreams.append(streamJid.pFull());
-								break;
-							}
-						}
+						if (roster && roster->hasGroup(group))
+							groupStreams.append(streamJid.pFull());
 					}
 					else
 					{

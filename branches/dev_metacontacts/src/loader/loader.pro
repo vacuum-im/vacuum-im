@@ -23,13 +23,15 @@ isEmpty(SVN_REVISION) {
 }
 win32 {
   exists(svninfo.h):system(del svninfo.h)
-  !isEmpty(SVN_REVISION):system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
+  !isEmpty(SVN_REVISION):!contains( SVN_REVISION, Unversioned ):!contains( SVN_REVISION, exported ) {
+    system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
     DEFINES         += SVNINFO
     QMAKE_DISTCLEAN += svninfo.h
   }
 } else {
   exists(svninfo.h):system(rm -f svninfo.h)
-  !isEmpty(SVN_REVISION):system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h) {
+  !isEmpty(SVN_REVISION):!contains( SVN_REVISION, Unversioned ):!contains( SVN_REVISION, exported ) {
+    system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h)
     DEFINES         += SVNINFO
     QMAKE_DISTCLEAN += svninfo.h
   }
