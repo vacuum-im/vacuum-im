@@ -97,7 +97,7 @@ public:
 	virtual bool isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes) =0;
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const =0;
 	virtual bool setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes, bool APartial=true) =0;
-	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const =0;
+	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1, int AGroupByRole=-1) const =0;
 	//ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder) =0;
 	virtual QList<QAbstractProxyModel *> proxyModels() const =0;

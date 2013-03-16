@@ -1108,7 +1108,7 @@ void RecentContacts::onRostersModelStreamJidChanged(const Jid &ABefore, const Ji
 		it->streamJid = AAfter;
 		if (index)
 		{
-			index->setData(ABefore.pFull(),RDR_STREAM_JID);
+			index->setData(AAfter.pFull(),RDR_STREAM_JID);
 			FVisibleItems.insert(*it,index);
 		}
 	}

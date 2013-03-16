@@ -722,7 +722,7 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
 		if (sroot)
 		{
-			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),"::",sroot);
+			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),sroot);
 			chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
 
 			chatIndex = FRostersModel->newRosterIndex(RIK_MUC_ITEM);

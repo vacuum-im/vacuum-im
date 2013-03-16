@@ -102,5 +102,9 @@
         <source>Unite contacts of all accounts</source>
         <translation>Объединить контакты всех аккаунтов</translation>
     </message>
+    <message>
+        <source>Show list of united accounts</source>
+        <translation>Показывать список объединенных аккаунтов</translation>
+    </message>
 </context>
 </TS>

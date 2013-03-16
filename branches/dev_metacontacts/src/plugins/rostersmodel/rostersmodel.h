@@ -48,8 +48,8 @@ public:
 	virtual IRosterIndex *newRosterIndex(int AKind);
 	virtual void insertRosterIndex(IRosterIndex *AIndex, IRosterIndex *AParent);
 	virtual void removeRosterIndex(IRosterIndex *AIndex, bool ADestroy = true);
-	virtual IRosterIndex *findGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const;
-	virtual IRosterIndex *getGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent);
+	virtual IRosterIndex *findGroupIndex(int AKind, const QString &AGroup, IRosterIndex *AParent) const;
+	virtual IRosterIndex *getGroupIndex(int AKind, const QString &AGroup, IRosterIndex *AParent);
 	virtual QList<IRosterIndex *> findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, IRosterIndex *AParent = NULL) const;
 	virtual QList<IRosterIndex *> getContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, IRosterIndex *AParent = NULL);
 	virtual QModelIndex modelIndexFromRosterIndex(IRosterIndex *AIndex) const;

@@ -102,5 +102,9 @@
         <source>Unite contacts of all accounts</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Show list of united accounts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

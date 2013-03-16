@@ -1097,7 +1097,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 			setPrivacyLabel(AStreamJid,contactJid,false);
 
 		IRosterIndex *sroot = FRostersModel->streamRoot(AStreamJid);
-		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,QString("::"),sroot);
+		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,sroot);
 		if (groupIndex)
 		{
 			for (int i=0;i<groupIndex->childCount();i++)

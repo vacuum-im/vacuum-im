@@ -28,8 +28,9 @@
 #define NS_VCARD_TEMP                           "vcard-temp"
 #define NS_VCARD_UPDATE                         "vcard-temp:x:update"
 
+#define NS_STORAGE_GROUP_DELIMITER              "roster:delimiter"
 #define NS_STORAGE_BOOKMARKS                    "storage:bookmarks"
-#define NS_STORAGE_METACONTACTS                 "vacuum:storage:metacontacts"
+#define NS_STORAGE_METACONTACTS                 "vacuum:metacontacts"
 
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"

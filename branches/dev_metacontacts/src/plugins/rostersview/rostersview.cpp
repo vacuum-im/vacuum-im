@@ -477,12 +477,31 @@ bool RostersView::setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes
 	return false;
 }
 
-QMap<int, QStringList > RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole) const
+QMap<int, QStringList > RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole, int AGroupByRole) const
 {
 	QMap<int, QStringList > map;
+	bool hasGroupBy = AUniqueRole>=0 && ARoles.contains(AGroupByRole);
 	foreach(IRosterIndex *index, AIndexes)
 	{
-		if (AUniqueRole<0 || !map[AUniqueRole].contains(index->data(AUniqueRole).toString()))
+		bool processIndex = true;
+		if (!map.isEmpty())
+		{
+			if (hasGroupBy)
+			{
+				QStringList uniqueList = map.value(AUniqueRole);
+				QStringList groupList = map.value(AGroupByRole);
+				QString uniqueValue = index->data(AUniqueRole).toString();
+				QString groupValue = index->data(AGroupByRole).toString();
+				for (int pos=uniqueList.indexOf(uniqueValue); processIndex && pos>=0; pos=uniqueList.indexOf(uniqueValue,pos+1))
+					if (groupList.at(pos) == groupValue)
+						processIndex = false;
+			}
+			else if (AUniqueRole>=0 && map.value(AUniqueRole).contains(index->data(AUniqueRole).toString()))
+			{
+				processIndex = false;
+			}
+		}
+		if (processIndex)
 		{
 			foreach(int role, ARoles)
 				map[role].append(index->data(role).toString());

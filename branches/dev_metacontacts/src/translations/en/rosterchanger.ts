@@ -94,18 +94,6 @@
         <translation>You are now unsubscribed from %1 presence.</translation>
     </message>
     <message>
-        <source>This group</source>
-        <translation>This group</translation>
-    </message>
-    <message>
-        <source>Create new...</source>
-        <translation>Create new...</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation>Root</translation>
-    </message>
-    <message>
         <source>Subscription</source>
         <translation>Subscription</translation>
     </message>
@@ -126,30 +114,6 @@
         <translation>Refuse</translation>
     </message>
     <message>
-        <source>Copy to group</source>
-        <translation>Copy to group</translation>
-    </message>
-    <message>
-        <source>Move to group</source>
-        <translation>Move to group</translation>
-    </message>
-    <message>
-        <source>Remove from group</source>
-        <translation>Remove from group</translation>
-    </message>
-    <message>
-        <source>Remove from roster</source>
-        <translation>Remove from roster</translation>
-    </message>
-    <message>
-        <source>Remove group</source>
-        <translation>Remove group</translation>
-    </message>
-    <message>
-        <source>Remove contacts</source>
-        <translation>Remove contacts</translation>
-    </message>
-    <message>
         <source>Subscription message from %1</source>
         <translation>Subscription message from %1</translation>
     </message>
@@ -158,16 +122,8 @@
         <translation>Subscription message</translation>
     </message>
     <message>
-        <source>Rename contact</source>
-        <translation>Rename contact</translation>
-    </message>
-    <message>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Enter name for: &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Create new group</source>
-        <translation>Create new group</translation>
     </message>
     <message>
         <source>Enter group name:</source>
@@ -180,14 +136,6 @@
     <message>
         <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
         <translation>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</translation>
-    </message>
-    <message>
-        <source>Rename group</source>
-        <translation>Rename group</translation>
-    </message>
-    <message>
-        <source>Enter new group name:</source>
-        <translation>Enter new group name:</translation>
     </message>
     <message>
         <source>You are now subscribed for %1 presence.</source>
@@ -270,14 +218,6 @@
         <translation>Shift+Del</translation>
     </message>
     <message>
-        <source>Add contact...</source>
-        <translation>Add contact...</translation>
-    </message>
-    <message>
-        <source>Blank Group</source>
-        <translation>Blank Group</translation>
-    </message>
-    <message>
         <source>When receiving authorization request</source>
         <translation>When receiving authorization request</translation>
     </message>
@@ -289,8 +229,112 @@
         </translation>
     </message>
     <message>
-        <source>Add group</source>
-        <translation>Add group</translation>
+        <source>Add Contact</source>
+        <translation>Add Contact</translation>
+    </message>
+    <message>
+        <source>Add Group with Contacts</source>
+        <translation>Add Group with Contacts</translation>
+    </message>
+    <message>
+        <source>Copy Group to Root</source>
+        <translation>Copy Group to Root</translation>
+    </message>
+    <message>
+        <source>Move Group to Root</source>
+        <translation>Move Group to Root</translation>
+    </message>
+    <message>
+        <source>Copy Contact to Group</source>
+        <translation>Copy Contact to Group</translation>
+    </message>
+    <message>
+        <source>Move Contact to Group</source>
+        <translation>Move Contact to Group</translation>
+    </message>
+    <message>
+        <source>Copy Group to Group</source>
+        <translation>Copy Group to Group</translation>
+    </message>
+    <message>
+        <source>Move Group to Group</source>
+        <translation>Move Group to Group</translation>
+    </message>
+    <message>
+        <source>Create New...</source>
+        <translation>Create New...</translation>
+    </message>
+    <message>
+        <source>To Root</source>
+        <translation>To Root</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation>Without Groups</translation>
+    </message>
+    <message>
+        <source>Add Contact...</source>
+        <translation>Add Contact...</translation>
+    </message>
+    <message>
+        <source>Subscribe Contact</source>
+        <translation>Subscribe Contact</translation>
+    </message>
+    <message>
+        <source>Unsubscribe Contact</source>
+        <translation>Unsubscribe Contact</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Rename</translation>
+    </message>
+    <message>
+        <source>Add to Roster...</source>
+        <translation>Add to Roster...</translation>
+    </message>
+    <message>
+        <source>Copy to Group</source>
+        <translation>Copy to Group</translation>
+    </message>
+    <message>
+        <source>Move to Group</source>
+        <translation>Move to Group</translation>
+    </message>
+    <message>
+        <source>Remove from Group</source>
+        <translation>Remove from Group</translation>
+    </message>
+    <message>
+        <source>Remove from Roster</source>
+        <translation>Remove from Roster</translation>
+    </message>
+    <message>
+        <source>Remove Group</source>
+        <translation>Remove Group</translation>
+    </message>
+    <message>
+        <source>Remove Contacts</source>
+        <translation>Remove Contacts</translation>
+    </message>
+    <message>
+        <source>Rename Contact</source>
+        <translation>Rename Contact</translation>
+    </message>
+    <message>
+        <source>Create Group</source>
+        <translation>Create Group</translation>
+    </message>
+    <message>
+        <source>Remove Contact</source>
+        <translation>Remove Contact</translation>
+    </message>
+    <message>
+        <source>Rename Group</source>
+        <translation>Rename Group</translation>
+    </message>
+    <message>
+        <source>In this Group</source>
+        <translation>In this Group</translation>
     </message>
 </context>
 <context>

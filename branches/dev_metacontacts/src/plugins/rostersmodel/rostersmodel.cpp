@@ -1,14 +1,10 @@
 #include "rostersmodel.h"
 
-#include <QtDebug>
-
 #include <QTimer>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosterindexkindorders.h>
 #include <definitions/rosterdataholderorders.h>
-
-#define DEFAULT_GROUP_DELIM "::"
 
 RostersModel::RostersModel()
 {
@@ -141,7 +137,14 @@ QVariant RostersModel::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 			}
 			else
 			{
-				groupStreams.append(AIndex->data(RDR_STREAM_JID).toString());
+				for(IRosterIndex *pindex = AIndex->parentIndex(); pindex!=NULL; pindex=pindex->parentIndex())
+				{
+					if (pindex->kind() == RIK_STREAM_ROOT)
+					{
+						groupStreams.append(pindex->data(RDR_STREAM_JID).toString());
+						break;
+					}
+				}
 			}
 			return groupStreams;
 		}
@@ -194,7 +197,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 			if (FLayout == LayoutMerged)
 			{
 				insertRosterIndex(FContactsRoot,FRootIndex);
-				insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,DEFAULT_GROUP_DELIM,FContactsRoot));
+				insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,FContactsRoot));
 			}
 			else
 			{
@@ -281,7 +284,7 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 					IRosterIndex *pindex = itemIndex->parentIndex();
 					if (isGroupKind(pindex->kind()))
 					{
-						IRosterIndex *groupIndex = getGroupIndex(pindex->kind(),pindex->data(RDR_GROUP).toString(),pindex->data(RDR_GROUP_DELIM).toString(),sroot);
+						IRosterIndex *groupIndex = getGroupIndex(pindex->kind(),pindex->data(RDR_GROUP).toString(),sroot);
 						groupIndex->setData(pindex->data(RDR_KIND_ORDER),RDR_KIND_ORDER);
 						insertRosterIndex(itemIndex,groupIndex);
 					}
@@ -297,7 +300,7 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 				foreach(IRosterIndex *sindex, FStreamIndexes.values())
 				{
 					sindex->removeChildren();
-					insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,DEFAULT_GROUP_DELIM,FContactsRoot));
+					insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,FContactsRoot));
 				}
 			}
 			else if (ALayout == LayoutSeparately)
@@ -389,10 +392,10 @@ void RostersModel::removeRosterIndex(IRosterIndex *AIndex, bool ADestroy)
 	}
 }
 
-IRosterIndex *RostersModel::findGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent) const
+IRosterIndex *RostersModel::findGroupIndex(int AKind, const QString &AGroup, IRosterIndex *AParent) const
 {
 	QString groupPath = getGroupName(AKind,AGroup);
-	QList<QString> groupTree = groupPath.split(AGroupDelim,QString::SkipEmptyParts);
+	QList<QString> groupTree = groupPath.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts);
 
 	IRosterIndex *groupIndex = AParent;
 	do {
@@ -408,13 +411,13 @@ IRosterIndex *RostersModel::findGroupIndex(int AKind, const QString &AGroup, con
 	return groupIndex;
 }
 
-IRosterIndex *RostersModel::getGroupIndex(int AKind, const QString &AGroup, const QString &AGroupDelim, IRosterIndex *AParent)
+IRosterIndex *RostersModel::getGroupIndex(int AKind, const QString &AGroup, IRosterIndex *AParent)
 {
-	IRosterIndex *groupIndex = findGroupIndex(AKind,AGroup,AGroupDelim,AParent);
+	IRosterIndex *groupIndex = findGroupIndex(AKind,AGroup,AParent);
 	if (!groupIndex)
 	{
 		QString groupPath = getGroupName(AKind,AGroup);
-		QList<QString> groupTree = groupPath.split(AGroupDelim,QString::SkipEmptyParts);
+		QList<QString> groupTree = groupPath.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts);
 
 		int i = 0;
 		groupIndex = AParent;
@@ -425,9 +428,9 @@ IRosterIndex *RostersModel::getGroupIndex(int AKind, const QString &AGroup, cons
 			if (group.isEmpty())
 				group = groupTree.at(i);
 			else
-				group += AGroupDelim + groupTree.at(i);
+				group += ROSTER_GROUP_DELIMITER + groupTree.at(i);
 
-			childGroupIndex = findGroupIndex(AKind, groupTree.at(i), AGroupDelim, groupIndex);
+			childGroupIndex = findGroupIndex(AKind, groupTree.at(i), groupIndex);
 			if (childGroupIndex)
 			{
 				groupIndex = childGroupIndex;
@@ -440,13 +443,11 @@ IRosterIndex *RostersModel::getGroupIndex(int AKind, const QString &AGroup, cons
 			childGroupIndex = newRosterIndex(AKind);
 			if (!FSingleGroups.contains(AKind))
 				childGroupIndex->setData(group,RDR_GROUP);
-			childGroupIndex->setData(AGroupDelim,RDR_GROUP_DELIM);
 			childGroupIndex->setData(groupTree.at(i),RDR_NAME);
-			childGroupIndex->setData(groupIndex->data(RDR_STREAM_JID),RDR_STREAM_JID);
 			insertRosterIndex(childGroupIndex,groupIndex);
 
 			groupIndex = childGroupIndex;
-			group += AGroupDelim + groupTree.value(++i);
+			group += ROSTER_GROUP_DELIMITER + groupTree.value(++i);
 		}
 	}
 	return groupIndex;
@@ -486,9 +487,9 @@ QList<IRosterIndex *> RostersModel::getContactIndexes(const Jid &AStreamJid, con
 			if (AParent)
 				groupIndex = AParent;
 			else if (type == RIK_MY_RESOURCE)
-				groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString::null,DEFAULT_GROUP_DELIM,sroot);
+				groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString::null,sroot);
 			else
-				groupIndex = getGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,DEFAULT_GROUP_DELIM,sroot);
+				groupIndex = getGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,sroot);
 
 			IRosterIndex *itemIndex = newRosterIndex(type);
 			itemIndex->setData(AStreamJid.pFull(),RDR_STREAM_JID);
@@ -724,11 +725,10 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 			QSet<QString> newGroups = itemGroups - curGroups;
 			QSet<QString> oldGroups = curGroups - itemGroups;
 
-			QString groupDelim = ARoster->groupDelimiter();
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(ARoster->streamJid()) : NULL;
 			foreach(QString group, itemGroups)
 			{
-				IRosterIndex *groupIndex = getGroupIndex(groupKind,group,groupDelim,sroot);
+				IRosterIndex *groupIndex = getGroupIndex(groupKind,group,sroot);
 
 				QList<IRosterIndex *> groupItemList;
 				if (newGroups.contains(group) && !oldGroups.isEmpty())
@@ -736,9 +736,9 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 					IRosterIndex *oldGroupIndex;
 					QString oldGroup = oldGroups.values().value(0);
 					if (oldGroup.isEmpty())
-						oldGroupIndex = findGroupIndex(RIK_GROUP_BLANK,QString::null,groupDelim,sroot);
+						oldGroupIndex = findGroupIndex(RIK_GROUP_BLANK,QString::null,sroot);
 					else
-						oldGroupIndex = findGroupIndex(RIK_GROUP,oldGroup,groupDelim,sroot);
+						oldGroupIndex = findGroupIndex(RIK_GROUP,oldGroup,sroot);
 					if (oldGroupIndex)
 					{
 						groupItemList = findContactIndexes(ARoster->streamJid(),AItem.itemJid,oldGroupIndex);
@@ -881,7 +881,7 @@ void RostersModel::onPresenceItemReceived(IPresence *APresence, const IPresenceI
 			{
 				if (itemIndex == NULL)
 				{
-					IRosterIndex *groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString::null,DEFAULT_GROUP_DELIM,sroot);
+					IRosterIndex *groupIndex = getGroupIndex(RIK_GROUP_MY_RESOURCES,QString::null,sroot);
 					itemIndex = newRosterIndex(itemKind);
 					itemIndex->setData(APresence->streamJid().pFull(),RDR_STREAM_JID);
 					itemIndex->setData(AItem.itemJid.pBare(),RDR_PREP_BARE_JID);

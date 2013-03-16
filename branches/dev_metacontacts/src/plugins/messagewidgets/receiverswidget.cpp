@@ -133,12 +133,11 @@ void ReceiversWidget::initialize()
 QTreeWidgetItem *ReceiversWidget::getReceiversGroup(const QString &AGroup)
 {
 	QString curGroup;
-	QString groupDelim = FRoster->groupDelimiter();
 	QTreeWidgetItem *parentGroupItem = ui.trwReceivers->invisibleRootItem();
-	QStringList subGroups = AGroup.split(groupDelim,QString::SkipEmptyParts);
+	QStringList subGroups = AGroup.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts);
 	foreach(QString subGroup,subGroups)
 	{
-		curGroup = curGroup.isEmpty() ? subGroup : curGroup+groupDelim+subGroup;
+		curGroup = curGroup.isEmpty() ? subGroup : curGroup+ROSTER_GROUP_DELIMITER+subGroup;
 		QTreeWidgetItem *groupItem = FGroupItems.value(curGroup,NULL);
 		if (groupItem == NULL)
 		{
