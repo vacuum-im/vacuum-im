@@ -2,7 +2,9 @@
 qm_build_all.target = build_qm
 for(LANG, TRANS_LANGS) {
   TS_FILE = $${_PRO_FILE_PWD_}/$${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${TRANS_TARGET}.ts
-  QM_FILE = $${_PRO_FILE_PWD_}/$${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${TRANS_TARGET}.qm
+  QM_FILE = $${TRANS_BUILD_ROOT}/src/translations/$${LANG}/$${TRANS_TARGET}.qm
+  QM_DIR = $${TRANS_BUILD_ROOT}/src/translations/$${LANG}
+  win32: QM_DIR = $$replace(QM_DIR, /, \\\\)
 
   LRELEASE = $$[QT_INSTALL_BINS]/lrelease
   win32: LRELEASE = $$replace(LRELEASE, \\\\, \\\\)
@@ -10,7 +12,8 @@ for(LANG, TRANS_LANGS) {
 
   eval(qm_$${TRANS_TARGET}_build_$${LANG}.target   = $${QM_FILE})
   eval(qm_$${TRANS_TARGET}_build_$${LANG}.depends  = $${TS_FILE})
-  eval(qm_$${TRANS_TARGET}_build_$${LANG}.commands = $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE})
+  eval(qm_$${TRANS_TARGET}_build_$${LANG}.commands = $(MKDIR) $${QM_DIR} & \
+                                                     $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE})
 
   qm_build_all.depends += qm_$${TRANS_TARGET}_build_$${LANG}
   QMAKE_EXTRA_TARGETS  += qm_$${TRANS_TARGET}_build_$${LANG}
@@ -27,7 +30,7 @@ for(LANG, TRANS_LANGS) {
   INST_DIR  = $${INSTALL_TRANSLATIONS}/$${LANG}
   win32: INST_DIR = $$replace(INST_DIR, /, \\\\)
 	
-  INST_FILE = $${_PRO_FILE_PWD_}/$${TRANS_SOURCE_ROOT}/translations/$${LANG}/$${TRANS_TARGET}.qm
+  INST_FILE = $${TRANS_BUILD_ROOT}/src/translations/$${LANG}/$${TRANS_TARGET}.qm
   win32: INST_FILE = $$replace(INST_FILE, /, \\\\)
 	
   eval(qm_$${TRANS_TARGET}_inst_$${LANG}.path  = $${INST_DIR})
