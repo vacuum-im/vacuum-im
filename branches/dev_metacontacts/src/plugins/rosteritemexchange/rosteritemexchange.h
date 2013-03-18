@@ -73,7 +73,7 @@ public:
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
 	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
-	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu);
 	//IRosterItemExchange
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QString sendExchangeRequest(const IRosterExchangeRequest &ARequest, bool AIqQuery = true);

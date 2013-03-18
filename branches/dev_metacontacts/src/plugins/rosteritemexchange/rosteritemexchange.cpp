@@ -248,13 +248,9 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 	{
 		IRosterExchangeRequest request = FSentRequests.take(AStanza.id());
 		if (AStanza.type()=="result")
-		{
 			emit exchangeRequestApproved(request);
-		}
 		else
-		{
 			emit exchangeRequestFailed(request,XmppStanzaError(AStanza));
-		}
 	}
 }
 
@@ -295,7 +291,7 @@ Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, I
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
 	int indexKind = AIndex->data(RDR_KIND).toInt();
-	if (indexKind==RIK_CONTACT || indexKind==RIK_GROUP || indexKind==RIK_AGENT)
+	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -309,7 +305,7 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		operator>>(stream,indexData);
 
 		int indexKind = indexData.value(RDR_KIND).toInt();
-		if (indexKind==RIK_CONTACT || indexKind==RIK_GROUP || indexKind==RIK_AGENT)
+		if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
 		{
 			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
 			if (!indexJid.node().isEmpty())
@@ -333,10 +329,10 @@ void RosterItemExchange::rosterDragLeave(const QDragLeaveEvent *AEvent)
 	Q_UNUSED(AEvent);
 }
 
-bool RosterItemExchange::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
+bool RosterItemExchange::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu)
 {
 	if (AEvent->dropAction() != Qt::IgnoreAction)
-		return insertDropActions(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString(),AEvent->mimeData(),AMenu);
+		return insertDropActions(AHover->data(RDR_STREAM_JID).toString(),AHover->data(RDR_FULL_JID).toString(),AEvent->mimeData(),AMenu);
 	return false;
 }
 
@@ -413,13 +409,21 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 		int indexKind = indexData.value(RDR_KIND).toInt();
 		if (indexKind == RIK_GROUP)
 		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(indexData.value(RDR_STREAM_JID).toString()) : NULL;
-			QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
-			for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
+			QList<Jid> totalContacts;
+			foreach(const Jid &streamJid, indexData.value(RDR_STREAMS).toStringList())
 			{
-				it->groups.clear();
-				it->groups += indexData.value(RDR_NAME).toString();
-				contactList.append(*it);
+				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+				QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
+				for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
+				{
+					if (!totalContacts.contains(it->itemJid))
+					{
+						it->groups.clear();
+						it->groups += indexData.value(RDR_NAME).toString();
+						contactList.append(*it);
+						totalContacts.append(it->itemJid);
+					}
+				}
 			}
 		}
 		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
@@ -460,7 +464,7 @@ QList<IRosterItem> RosterItemExchange::dropDataContacts(const Jid &AStreamJid, c
 			contactList = dragDataContacts(AData);
 			for (QList<IRosterItem>::iterator it = contactList.begin(); it!=contactList.end(); )
 			{
-				if (AContactJid.pBare()==it->itemJid.pBare())
+				if (AContactJid.pBare() == it->itemJid.pBare())
 					it = contactList.erase(it);
 				else
 					++it;

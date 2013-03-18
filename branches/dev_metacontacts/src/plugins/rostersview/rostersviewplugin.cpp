@@ -234,7 +234,7 @@ QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, i
 			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 			Jid indexJid = AIndex->data(RDR_FULL_JID).toString();
 			QString name = AIndex->data(RDR_NAME).toString();
-			if (streamJid.pBare() != indexJid.pBare())
+			if (AIndex->kind() != RIK_MY_RESOURCE)
 			{
 				if (name.isEmpty())
 					name = indexJid.uBare();

@@ -395,7 +395,7 @@ void RostersModel::removeRosterIndex(IRosterIndex *AIndex, bool ADestroy)
 IRosterIndex *RostersModel::findGroupIndex(int AKind, const QString &AGroup, IRosterIndex *AParent) const
 {
 	QString groupPath = getGroupName(AKind,AGroup);
-	QList<QString> groupTree = groupPath.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts);
+	QList<QString> groupTree = groupPath.split(ROSTER_GROUP_DELIMITER);
 
 	IRosterIndex *groupIndex = AParent;
 	do {
@@ -417,7 +417,7 @@ IRosterIndex *RostersModel::getGroupIndex(int AKind, const QString &AGroup, IRos
 	if (!groupIndex)
 	{
 		QString groupPath = getGroupName(AKind,AGroup);
-		QList<QString> groupTree = groupPath.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts);
+		QList<QString> groupTree = groupPath.split(ROSTER_GROUP_DELIMITER);
 
 		int i = 0;
 		groupIndex = AParent;

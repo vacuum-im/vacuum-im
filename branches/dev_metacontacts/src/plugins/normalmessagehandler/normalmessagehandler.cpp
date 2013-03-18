@@ -510,15 +510,14 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> normalDialogKinds = QList<int>() << RIK_STREAM_ROOT << RIK_GROUP << RIK_GROUP_BLANK
-		<< RIK_GROUP_AGENTS << RIK_GROUP_MY_RESOURCES << RIK_GROUP_NOT_IN_ROSTER << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
+	static const QList<int> normalDialogKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE
+		<< RIK_GROUP << RIK_GROUP_BLANK	<< RIK_GROUP_AGENTS << RIK_GROUP_MY_RESOURCES << RIK_GROUP_NOT_IN_ROSTER ;
 	static const QList<int> groupKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_AGENTS 
 		<< RIK_GROUP_MY_RESOURCES << RIK_GROUP_NOT_IN_ROSTER;
 	static const QList<int> contactKinds =  QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
 
 	if (!ASelected.isEmpty())
 	{
-		Jid singleStream;
 		bool hasGroups = false;
 		bool hasContacts = false;
 		foreach(IRosterIndex *index, ASelected)
@@ -527,15 +526,12 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
 			if (!normalDialogKinds.contains(indexKind))
 				return false;
-			else if(!singleStream.isEmpty() && singleStream!=streamJid)
-				return false;
 			else if (indexKind==RIK_STREAM_ROOT && ASelected.count()>1)
 				return false;
 			else if (hasGroups && !groupKinds.contains(indexKind))
 				return false;
 			else if (hasContacts && !contactKinds.contains(indexKind))
 				return false;
-			singleStream = streamJid;
 			hasGroups = hasGroups || groupKinds.contains(indexKind);
 			hasContacts = hasContacts || contactKinds.contains(indexKind);
 		}

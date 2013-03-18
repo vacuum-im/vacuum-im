@@ -113,7 +113,7 @@ protected:
 	void changeSubscription(const QStringList &AStreams, const QStringList &AContacts, int ASubsc);
 	//Operations on contacts
 	void renameContact(const Jid &AStreamJid, const Jid &AContactJid, const QString &AOldName) const;
-	void addContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QString &AGroup) const;
+	void addContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QStringList &ANames, const QString &AGroup) const;
 	void copyContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QString &AGroup) const;
 	void moveContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AGroupsFrom, const QString &AGroupTo) const;
 	void removeContactsFromGroups(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AGroups) const;

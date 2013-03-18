@@ -71,13 +71,12 @@ signals:
 	void streamJidAboutToBeChanged(const Jid &AAfter);
 	void streamJidChanged(const Jid &ABefore);
 protected:
-	void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
+	void clearRosterItems();
+	void requestRosterItems();
 	void requestGroupDelimiter();
 	void setGroupDelimiter(const QString &ADelimiter);
-	void requestRosterItems();
-	void clearItems();
-	void setStanzaHandlers();
-	void removeStanzaHandlers();
+	void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
+	QString replaceGroupDelimiter(const QString &AGroup, const QString &AFrom, const QString &ATo) const;
 protected slots:
 	void onStreamOpened();
 	void onStreamClosed();

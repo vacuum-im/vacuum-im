@@ -13,7 +13,24 @@ Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : Q
 
 	FOpened = false;
 	FVerSupported = false;
-	setStanzaHandlers();
+
+	IStanzaHandle itemHandle;
+	itemHandle.handler = this;
+	itemHandle.order = SHO_DEFAULT;
+	itemHandle.direction = IStanzaHandle::DirectionIn;
+	itemHandle.streamJid = FXmppStream->streamJid();
+	itemHandle.conditions.append(SHC_ROSTER);
+	FSHIRosterPush = FStanzaProcessor->insertStanzaHandle(itemHandle);
+
+	IStanzaHandle subscrHandle;
+	subscrHandle.handler = this;
+	subscrHandle.order = SHO_DEFAULT;
+	subscrHandle.direction = IStanzaHandle::DirectionIn;
+	subscrHandle.streamJid = FXmppStream->streamJid();
+	subscrHandle.conditions.append(SHC_PRESENCE);
+	FSHISubscription = FStanzaProcessor->insertStanzaHandle(subscrHandle);
+
+	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 
 	connect(FXmppStream->instance(),SIGNAL(opened()),SLOT(onStreamOpened()));
 	connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
@@ -23,8 +40,11 @@ Roster::Roster(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : Q
 
 Roster::~Roster()
 {
-	clearItems();
-	removeStanzaHandlers();
+	FStanzaProcessor->removeStanzaHandle(FSHIRosterPush);
+	FStanzaProcessor->removeStanzaHandle(FSHISubscription);
+	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
+
+	clearRosterItems();
 }
 
 bool Roster::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
@@ -215,7 +235,7 @@ void Roster::setItem(const Jid &AItemJid, const QString &AName, const QSet<QStri
 
 		foreach (QString group, AGroups)
 		{
-			group.replace(ROSTER_GROUP_DELIMITER,FGroupDelim);
+			group = replaceGroupDelimiter(group,ROSTER_GROUP_DELIMITER,FGroupDelim);
 			if (!group.isEmpty())
 				itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(group));
 		}
@@ -241,7 +261,7 @@ void Roster::setItems(const QList<IRosterItem> &AItems)
 
 			foreach(QString group, ritem.groups)
 			{
-				group.replace(ROSTER_GROUP_DELIMITER,FGroupDelim);
+				group = replaceGroupDelimiter(group,ROSTER_GROUP_DELIMITER,FGroupDelim);
 				if (!group.isEmpty())
 					itemElem.appendChild(query.createElement("group")).appendChild(query.createTextNode(group));
 			}
@@ -329,7 +349,7 @@ void Roster::saveRosterItems(const QString &AFileName) const
 		itemElem.setAttribute("ask",ritem.ask);
 		foreach(QString group, ritem.groups)
 		{
-			group.replace(ROSTER_GROUP_DELIMITER,FGroupDelim);
+			group = replaceGroupDelimiter(group,ROSTER_GROUP_DELIMITER,FGroupDelim);
 			if (!group.isEmpty())
 				itemElem.appendChild(xml.createElement("group")).appendChild(xml.createTextNode(group));
 		}
@@ -436,7 +456,7 @@ void Roster::copyGroupToGroup(const QString &AGroup, const QString &AGroupTo)
 	if (AGroup!=AGroupTo && !AGroup.isEmpty())
 	{
 		QList<IRosterItem> allGroupItems = groupItems(AGroup);
-		QString groupName = AGroup.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts).last();
+		QString groupName = AGroup.split(ROSTER_GROUP_DELIMITER).last();
 		for (QList<IRosterItem>::iterator it = allGroupItems.begin(); it != allGroupItems.end(); ++it)
 		{
 			foreach(QString group, it->groups)
@@ -461,7 +481,7 @@ void Roster::moveGroupToGroup(const QString &AGroup, const QString &AGroupTo)
 	if (AGroup != AGroupTo)
 	{
 		QList<IRosterItem> allGroupItems = groupItems(AGroup);
-		QString groupName = AGroup.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts).last();
+		QString groupName = AGroup.split(ROSTER_GROUP_DELIMITER).last();
 		for (QList<IRosterItem>::iterator it=allGroupItems.begin(); it!=allGroupItems.end(); ++it)
 		{
 			foreach(QString group, it->groups)
@@ -494,6 +514,48 @@ void Roster::removeGroup(const QString &AGroup)
 	setItems(allGroupItems);
 }
 
+void Roster::clearRosterItems()
+{
+	foreach(Jid itemJid, FRosterItems.keys())
+	{
+		IRosterItem ritem = FRosterItems.take(itemJid);
+		IRosterItem before = ritem;
+		ritem.subscription = SUBSCRIPTION_REMOVE;
+		emit itemReceived(ritem,before);
+	}
+	FRosterVer.clear();
+}
+
+void Roster::requestRosterItems()
+{
+	Stanza query("iq");
+	query.setType("get").setId(FStanzaProcessor->newId());
+
+	if (!FVerSupported)
+		query.addElement("query",NS_JABBER_ROSTER);
+	else
+		query.addElement("query",NS_JABBER_ROSTER).setAttribute("ver",FRosterVer);
+
+	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
+		FOpenRequestId = query.id();
+}
+
+void Roster::requestGroupDelimiter()
+{
+	Stanza query("iq");
+	query.setType("get").setId(FStanzaProcessor->newId());
+	query.addElement("query",NS_JABBER_PRIVATE).appendChild(query.createElement("roster",NS_STORAGE_GROUP_DELIMITER));
+	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
+		FDelimRequestId = query.id();
+}
+
+void Roster::setGroupDelimiter(const QString &ADelimiter)
+{
+	if (FGroupDelim != ADelimiter)
+		clearRosterItems();
+	FGroupDelim = ADelimiter;
+}
+
 void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster)
 {
 	if (!AItemsElem.isNull())
@@ -523,7 +585,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 					QDomElement groupElem = itemElem.firstChildElement("group");
 					while (!groupElem.isNull())
 					{
-						QString group = groupElem.text().replace(FGroupDelim,ROSTER_GROUP_DELIMITER);
+						QString group = replaceGroupDelimiter(groupElem.text(),FGroupDelim,ROSTER_GROUP_DELIMITER);
 						if (!group.trimmed().isEmpty())
 							allItemGroups += group;
 						groupElem = groupElem.nextSiblingElement("group");
@@ -551,71 +613,9 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 	}
 }
 
-void Roster::clearItems()
+QString Roster::replaceGroupDelimiter(const QString &AGroup, const QString &AFrom, const QString &ATo) const
 {
-	foreach(Jid itemJid, FRosterItems.keys())
-	{
-		IRosterItem ritem = FRosterItems.take(itemJid);
-		IRosterItem before = ritem;
-		ritem.subscription = SUBSCRIPTION_REMOVE;
-		emit itemReceived(ritem,before);
-	}
-	FRosterVer.clear();
-}
-
-void Roster::requestGroupDelimiter()
-{
-	Stanza query("iq");
-	query.setType("get").setId(FStanzaProcessor->newId());
-	query.addElement("query",NS_JABBER_PRIVATE).appendChild(query.createElement("roster",NS_STORAGE_GROUP_DELIMITER));
-	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
-		FDelimRequestId = query.id();
-}
-
-void Roster::setGroupDelimiter(const QString &ADelimiter)
-{
-	if (FGroupDelim != ADelimiter)
-		clearItems();
-	FGroupDelim = ADelimiter;
-}
-
-void Roster::requestRosterItems()
-{
-	Stanza query("iq");
-	query.setType("get").setId(FStanzaProcessor->newId());
-
-	if (!FVerSupported)
-		query.addElement("query",NS_JABBER_ROSTER);
-	else
-		query.addElement("query",NS_JABBER_ROSTER).setAttribute("ver",FRosterVer);
-
-	if (FStanzaProcessor->sendStanzaRequest(this,FXmppStream->streamJid(),query,Options::node(OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST).value().toInt()))
-		FOpenRequestId = query.id();
-}
-
-void Roster::setStanzaHandlers()
-{
-	IStanzaHandle shandle;
-	shandle.handler = this;
-	shandle.order = SHO_DEFAULT;
-	shandle.direction = IStanzaHandle::DirectionIn;
-	shandle.streamJid = FXmppStream->streamJid();
-
-	shandle.conditions.append(SHC_ROSTER);
-	FSHIRosterPush = FStanzaProcessor->insertStanzaHandle(shandle);
-
-	shandle.conditions.clear();
-	shandle.conditions.append(SHC_PRESENCE);
-	FSHISubscription = FStanzaProcessor->insertStanzaHandle(shandle);
-
-	FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-}
-
-void Roster::removeStanzaHandlers()
-{
-	FStanzaProcessor->removeStanzaHandle(FSHIRosterPush);
-	FStanzaProcessor->removeStanzaHandle(FSHISubscription);
-	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
+	return AGroup.split(AFrom,QString::SkipEmptyParts).join(ATo);
 }
 
 void Roster::onStreamOpened()
@@ -640,7 +640,7 @@ void Roster::onStreamJidAboutToBeChanged(const Jid &AAfter)
 {
 	emit streamJidAboutToBeChanged(AAfter);
 	if (!(FXmppStream->streamJid() && AAfter))
-		clearItems();
+		clearRosterItems();
 }
 
 void Roster::onStreamJidChanged(const Jid &ABefore)

@@ -46,12 +46,12 @@ public:
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IPrivacyLists
 	virtual bool isReady(const Jid &AStreamJid) const;
-	virtual IPrivacyRule autoListRule(const Jid &AContactJid, const QString &AAutoList) const;
-	virtual IPrivacyRule autoListRule(const QString &AGroup, const QString &AAutoList) const;
-	virtual bool isAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const;
-	virtual bool isAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const;
-	virtual void setAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool AInserted);
-	virtual void setAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool AInserted);
+	virtual IPrivacyRule groupAutoListRule(const QString &AGroup, const QString &AAutoList) const;
+	virtual IPrivacyRule contactAutoListRule(const Jid &AContactJid, const QString &AAutoList) const;
+	virtual bool isGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const;
+	virtual bool isContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const;
+	virtual void setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool AInserted);
+	virtual void setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool AInserted);
 	virtual IPrivacyRule offRosterRule() const;
 	virtual bool isOffRosterBlocked(const Jid &AStreamJid) const;
 	virtual void setOffRosterBlocked(const Jid &AStreamJid, bool ABlocked);
@@ -81,9 +81,9 @@ signals:
 protected:
 	QString loadPrivacyLists(const Jid &AStreamJid);
 	Menu *createPrivacyMenu(Menu *AMenu) const;
-	void createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *AMenu) const;
-	void createAutoPrivacyContactActions(const Jid &AStreamJid, const QStringList &AContacts, Menu *AMenu) const;
-	void createAutoPrivacyGroupActions(const Jid &AStreamJid, const QStringList &AGroups, Menu *AMenu) const;
+	void createAutoPrivacyStreamActions(const QStringList &AStreams, Menu *AMenu) const;
+	void createAutoPrivacyContactActions(const QStringList &AStreams, const QStringList &AContacts, Menu *AMenu) const;
+	void createAutoPrivacyGroupActions(const QStringList &AStreams, const QStringList &AGroups, Menu *AMenu) const;
 	Menu *createSetActiveMenu(const Jid &AStreamJid, const QList<IPrivacyList> &ALists, Menu *AMenu) const;
 	Menu *createSetDefaultMenu(const Jid &AStreamJid, const QList<IPrivacyList> &ALists, Menu *AMenu) const;
 	bool isMatchedJid(const Jid &AMask, const Jid &AJid) const;
@@ -91,6 +91,7 @@ protected:
 	void sendOfflinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList);
 	void setPrivacyLabel(const Jid &AStreamJid, const Jid &AContactJid, bool AVisible);
 	void updatePrivacyLabels(const Jid &AStreamJid);
+	bool isAnyReady(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onListAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList);
@@ -105,14 +106,14 @@ protected slots:
 	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
-	void onUpdateCreatedRosterIndexes();
+	void onUpdateNewRosterIndexes();
 	void onShowEditListsDialog(bool);
 	void onSetActiveListByAction(bool);
 	void onSetDefaultListByAction(bool);
-	void onSetAutoPrivacyByAction(bool);
-	void onChangeContactAutoListed(bool AInserted);
-	void onChangeGroupAutoListed(bool AInserted);
-	void onChangeOffRosterBlocked(bool ABlocked);
+	void onChangeStreamsAutoPrivacy(bool);
+	void onChangeContactsAutoListed(bool AInserted);
+	void onChangeGroupsAutoListed(bool AInserted);
+	void onChangeStreamsOffRosterBlocked(bool ABlocked);
 	void onEditListsDialogDestroyed(const Jid &AStreamJid);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 private:
@@ -124,28 +125,26 @@ private:
 	IRosterPlugin *FRosterPlugin;
 	IPresencePlugin *FPresencePlugin;
 private:
-	QHash<Jid,int> FSHIPrivacy;
-	QHash<Jid,int> FSHIRosterIn;
-	QHash<Jid,int> FSHIRosterOut;
-	QHash<QString, IPrivacyList> FSaveRequests;
-	QHash<QString, QString> FLoadRequests;
-	QHash<QString, QString> FActiveRequests;
-	QHash<QString, QString> FDefaultRequests;
-	QHash<QString, QString> FRemoveRequests;
-	QHash<Jid, QStringList > FStreamRequests;
+	QMap<Jid,int> FSHIPrivacy;
+	QMap<Jid,int> FSHIRosterIn;
+	QMap<Jid,int> FSHIRosterOut;
+	QMap<QString, IPrivacyList> FSaveRequests;
+	QMap<QString, QString> FLoadRequests;
+	QMap<QString, QString> FActiveRequests;
+	QMap<QString, QString> FDefaultRequests;
+	QMap<QString, QString> FRemoveRequests;
+	QMap<Jid, QStringList > FStreamRequests;
 private:
 	quint32 FPrivacyLabelId;
 	QTimer FApplyAutoListsTimer;
-	QList<IRosterIndex *> FCreatedRosterIndexes;
-	QHash<Jid, QString> FApplyAutoLists;
-	QHash<Jid, QSet<Jid> > FOfflinePresences;
-	QHash<Jid, QString> FActiveLists;
-	QHash<Jid, QString> FDefaultLists;
-	QHash<Jid, QHash<QString,IPrivacyList> > FPrivacyLists;
-	QHash<Jid, QSet<Jid> > FLabeledContacts;
-	QHash<Jid, EditListsDialog *> FEditListsDialogs;
-private:
-	static QStringList FAutoLists;
+	QList<IRosterIndex *> FNewRosterIndexes;
+	QMap<Jid, QString> FApplyAutoLists;
+	QMap<Jid, QString> FActiveLists;
+	QMap<Jid, QString> FDefaultLists;
+	QMap<Jid, QSet<Jid> > FLabeledContacts;
+	QMap<Jid, QSet<Jid> > FOfflinePresences;
+	QMap<Jid, EditListsDialog *> FEditListsDialogs;
+	QMap<Jid, QMap<QString,IPrivacyList> > FPrivacyLists;
 };
 
 #endif // PRIVACYLISTS_H

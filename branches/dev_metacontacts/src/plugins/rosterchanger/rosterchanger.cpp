@@ -262,7 +262,7 @@ bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *A
 						return false;
 					else if (hoverGroup.startsWith(indexGroup+ROSTER_GROUP_DELIMITER))
 						return false;
-					else if (indexGroup == hoverGroup+ROSTER_GROUP_DELIMITER+indexGroup.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts).last())
+					else if (indexGroup == hoverGroup+ROSTER_GROUP_DELIMITER+indexGroup.split(ROSTER_GROUP_DELIMITER).last())
 						return false;
 					return true;
 				}
@@ -311,6 +311,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
 					action->setData(ADR_STREAM_JID,QStringList()<<hoverStreamJid);
 					action->setData(ADR_CONTACT_JID,QStringList()<<indexData.value(RDR_PREP_BARE_JID).toString());
+					action->setData(RDR_NAME,QStringList()<<indexData.value(RDR_NAME).toString());
 					action->setData(ADR_TO_GROUP,QVariant(QString::null));
 					connect(action,SIGNAL(triggered(bool)),SLOT(onAddContactsToGroup(bool)));
 				}
@@ -320,6 +321,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 					{
 						QStringList streams;
 						QStringList contacts;
+						QStringList names;
 						foreach(const QString &streamJid, indexData.value(RDR_STREAMS).toStringList())
 						{
 							IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
@@ -330,6 +332,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 								{
 									streams.append(hoverStreamJid);
 									contacts.append(ritem.itemJid.pBare());
+									names.append(ritem.name);
 								}
 							}
 						}
@@ -338,6 +341,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 						action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
 						action->setData(ADR_STREAM_JID,streams);
 						action->setData(ADR_CONTACT_JID,contacts);
+						action->setData(ADR_NAME,names);
 						action->setData(ADR_TO_GROUP,indexData.value(RDR_GROUP).toString());
 						connect(action,SIGNAL(triggered(bool)),SLOT(onAddContactsToGroup(bool)));
 					}
@@ -414,6 +418,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 					Action *action = new Action(AMenu);
 					action->setData(ADR_STREAM_JID,QStringList()<<destStreamJid);
 					action->setData(ADR_CONTACT_JID,QStringList()<<indexData.value(RDR_PREP_BARE_JID).toString());
+					action->setData(ADR_NAME,QStringList()<<indexData.value(RDR_NAME).toString());
 					action->setData(ADR_TO_GROUP,AHover->data(RDR_GROUP).toString());
 
 					if (indexStreamJid != destStreamJid)
@@ -478,6 +483,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 					{
 						QStringList streams;
 						QStringList contacts;
+						QStringList names;
 						foreach(const QString &streamJid, indexData.value(RDR_STREAMS).toStringList())
 						{
 							IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
@@ -488,15 +494,17 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 								{
 									streams.append(destStreams.value(0));
 									contacts.append(ritem.itemJid.pBare());
+									names.append(ritem.name);
 								}
 							}
 						}
 						action->setData(ADR_STREAM_JID,streams);
 						action->setData(ADR_CONTACT_JID,contacts);
+						action->setData(ADR_NAME,names);
 
 						QString groupTo = AHover->data(RDR_GROUP).toString();
 						groupTo += ROSTER_GROUP_DELIMITER;
-						groupTo += indexData.value(RDR_GROUP).toString().split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts).last();
+						groupTo += indexData.value(RDR_GROUP).toString().split(ROSTER_GROUP_DELIMITER).last();
 						action->setData(ADR_TO_GROUP,groupTo);
 
 						action->setText(tr("Add Group with Contacts"));
@@ -900,7 +908,7 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 		{
 			QString groupPath;
 			Menu *parentMenu = menu;
-			QList<QString> groupTree = group.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts);
+			QList<QString> groupTree = group.split(ROSTER_GROUP_DELIMITER);
 			for (int index=0; index<groupTree.count(); index++)
 			{
 				if (groupPath.isEmpty())
@@ -1408,21 +1416,20 @@ void RosterChanger::renameContact(const Jid &AStreamJid, const Jid &AContactJid,
 	}
 }
 
-void RosterChanger::addContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QString &AGroup) const
+void RosterChanger::addContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QStringList &ANames, const QString &AGroup) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count())
+	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && AContacts.count()==ANames.count())
 	{
 		for(int i=0; i<AStreams.count(); i++)
 		{
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreams.at(i)) : NULL;
 			if (roster && roster->isOpen())
 			{
-				Jid contactJid = AContacts.at(i);
-				IRosterItem ritem = roster->rosterItem(contactJid);
+				IRosterItem ritem = roster->rosterItem(AContacts.at(i));
 				if (!ritem.isValid)
-					roster->setItem(contactJid,QString::null,QSet<QString>()<<AGroup);
+					roster->setItem(AContacts.at(i),ANames.at(i),QSet<QString>()<<AGroup);
 				else
-					roster->copyItemToGroup(contactJid,AGroup);
+					roster->copyItemToGroup(ritem.itemJid,AGroup);
 			}
 		}
 	}
@@ -1556,7 +1563,7 @@ void RosterChanger::renameGroups(const QStringList &AStreams, const QStringList 
 			if (roster && roster->isOpen())
 			{
 				QString newGroupName = AGroups.at(i);
-				QList<QString> groupTree = newGroupName.split(ROSTER_GROUP_DELIMITER,QString::SkipEmptyParts);
+				QList<QString> groupTree = newGroupName.split(ROSTER_GROUP_DELIMITER);
 				newGroupName.chop(groupTree.last().size());
 				newGroupName += newGroupPart;
 				roster->renameGroup(AGroups.at(i),newGroupName);
@@ -1807,7 +1814,7 @@ void RosterChanger::onAddContactsToGroup(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-		addContactsToGroup(action->data(ADR_STREAM_JID).toStringList(),action->data(ADR_CONTACT_JID).toStringList(),action->data(ADR_TO_GROUP).toString());
+		addContactsToGroup(action->data(ADR_STREAM_JID).toStringList(),action->data(ADR_CONTACT_JID).toStringList(),action->data(ADR_NAME).toStringList(),action->data(ADR_TO_GROUP).toString());
 }
 
 void RosterChanger::onCopyContactsToGroup(bool)
