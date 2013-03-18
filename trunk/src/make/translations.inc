@@ -12,7 +12,7 @@ for(LANG, TRANS_LANGS) {
 
   eval(qm_$${TRANS_TARGET}_build_$${LANG}.target   = $${QM_FILE})
   eval(qm_$${TRANS_TARGET}_build_$${LANG}.depends  = $${TS_FILE})
-  eval(qm_$${TRANS_TARGET}_build_$${LANG}.commands = $(MKDIR) $${QM_DIR} & \
+  eval(qm_$${TRANS_TARGET}_build_$${LANG}.commands = $(MKDIR) $${QM_DIR} && \
                                                      $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE})
 
   qm_build_all.depends += qm_$${TRANS_TARGET}_build_$${LANG}
