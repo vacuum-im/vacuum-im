@@ -7,7 +7,6 @@
 EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
-	ui.medEditor->setAcceptRichText(true);
 	ui.medEditor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
 	FMessageWidgets = AMessageWidgets;
@@ -183,7 +182,7 @@ void EditWidget::setRichTextEnabled(bool AEnabled)
 	if (isRichTextEnabled() != AEnabled)
 	{
 		ui.medEditor->setAcceptRichText(AEnabled);
-		richTextEnableChanged(AEnabled);
+		emit richTextEnableChanged(AEnabled);
 	}
 }
 
