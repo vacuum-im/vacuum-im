@@ -110,7 +110,7 @@ IMessageReceiversWidget *ChatWindow::receiversWidget() const
 
 QString ChatWindow::tabPageId() const
 {
-	return "ChatWindow|"+FAddress->streamJid().pBare()+"|"+FAddress->contactJid().pBare();
+	return "ChatWindow|"+streamJid().pBare()+"|"+contactJid().pBare();
 }
 
 bool ChatWindow::isVisibleTabPage() const
@@ -197,7 +197,7 @@ void ChatWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const
 	emit tabPageChanged();
 }
 
-void ChatWindow::saveWindowGeometry()
+void ChatWindow::saveWindowGeometryAndState()
 {
 	if (isWindow())
 	{
@@ -206,7 +206,7 @@ void ChatWindow::saveWindowGeometry()
 	}
 }
 
-void ChatWindow::loadWindowGeometry()
+void ChatWindow::loadWindowGeometryAndState()
 {
 	if (isWindow())
 	{
@@ -248,7 +248,7 @@ void ChatWindow::showEvent(QShowEvent *AEvent)
 	if (isWindow())
 	{
 		if (!FShownDetached)
-			loadWindowGeometry();
+			loadWindowGeometryAndState();
 		FShownDetached = true;
 		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
@@ -267,7 +267,7 @@ void ChatWindow::showEvent(QShowEvent *AEvent)
 void ChatWindow::closeEvent(QCloseEvent *AEvent)
 {
 	if (FShownDetached)
-		saveWindowGeometry();
+		saveWindowGeometryAndState();
 	QMainWindow::closeEvent(AEvent);
 	emit tabPageClosed();
 }

@@ -225,7 +225,7 @@ void AdvancedItemModel::emitItemInserted(QStandardItem *AItem)
 
 void AdvancedItemModel::emitItemRemoving(QStandardItem *AItem)
 {
-	if (AItem)
+	if (AItem && !FRemovingItems.contains(AItem))
 	{
 		FRemovingItems.append(AItem);
 		for (int row=0; row<AItem->rowCount(); row++)

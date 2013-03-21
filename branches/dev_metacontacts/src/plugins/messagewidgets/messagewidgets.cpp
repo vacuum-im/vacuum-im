@@ -121,7 +121,7 @@ bool MessageWidgets::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_MESSAGES, OPN_MESSAGES, tr("Messages"), MNI_NORMAL_MHANDLER_MESSAGE };
+		IOptionsDialogNode dnode = { ONO_MESSAGES, OPN_MESSAGES, tr("Messages"), MNI_NORMALMHANDLER_MESSAGE };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
@@ -307,7 +307,7 @@ QList<IMessageNormalWindow *> MessageWidgets::normalWindows() const
 IMessageNormalWindow *MessageWidgets::getNormalWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode)
 {
 	IMessageNormalWindow *window = findNormalWindow(AStreamJid,AContactJid,true);
-	if (!window)
+	if (window == NULL)
 	{
 		window = new NormalWindow(this,AStreamJid,AContactJid,AMode);
 		FNormalWindows.append(window);
@@ -322,18 +322,12 @@ IMessageNormalWindow *MessageWidgets::getNormalWindow(const Jid &AStreamJid, con
 
 IMessageNormalWindow *MessageWidgets::findNormalWindow(const Jid &AStreamJid, const Jid &AContactJid, bool AExact) const
 {
-	foreach(IMessageNormalWindow *window,FNormalWindows)
+	foreach(IMessageNormalWindow *window, FNormalWindows)
 	{
-		if (AExact)
-		{
-			if (window->address()->availAddresses().contains(AStreamJid,AContactJid))
-				return window;
-		}
-		else
-		{
-			if (window->address()->availAddresses(true).contains(AStreamJid,AContactJid.bare()))
-				return window;
-		}
+		if (AExact && window->address()->availAddresses().contains(AStreamJid,AContactJid))
+			return window;
+		else if (!AExact && window->address()->availAddresses(true).contains(AStreamJid,AContactJid.bare()))
+			return window;
 	}
 	return NULL;
 }
@@ -346,7 +340,7 @@ QList<IMessageChatWindow *> MessageWidgets::chatWindows() const
 IMessageChatWindow *MessageWidgets::getChatWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	IMessageChatWindow *window = findChatWindow(AStreamJid,AContactJid,true);
-	if (!window)
+	if (window == NULL)
 	{
 		window = new ChatWindow(this,AStreamJid,AContactJid);
 		FChatWindows.append(window);
@@ -363,16 +357,10 @@ IMessageChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const 
 {
 	foreach(IMessageChatWindow *window, FChatWindows)
 	{
-		if (AExact)
-		{
-			if (window->address()->availAddresses().contains(AStreamJid,AContactJid))
-				return window;
-		}
-		else
-		{
-			if (window->address()->availAddresses(true).contains(AStreamJid,AContactJid.bare()))
-				return window;
-		}
+		if (AExact && window->address()->availAddresses().contains(AStreamJid,AContactJid))
+			return window;
+		else if (!AExact && window->address()->availAddresses(true).contains(AStreamJid,AContactJid.bare()))
+			return window;
 	}
 	return NULL;
 }

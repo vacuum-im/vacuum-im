@@ -24,6 +24,9 @@
 //MessageWidgets - EditWidgetToolBar
 #define TBG_MWEWTB_SENDMESSAGE                                  500
 
+//MessageWidgets - NormalWindowToolBar
+#define TBG_MWNWTB_WINDOWMENU                                   15000
+
 //MultiChatWindow - ToolBarWidget
 #define TBG_MCWTBW_BOOKMARKS                                    10200
 #define TBG_MCWTBW_ROOM_ENTER                                   10990

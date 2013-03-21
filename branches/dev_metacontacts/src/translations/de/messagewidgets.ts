@@ -242,48 +242,23 @@
 </context>
 <context>
     <name>NormalWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation type="unfinished">Nächste - %1</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">Schließen</translation>
+    <message numerus="yes">
+        <source>Selected %n contact(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
-        <source>Message</source>
-        <translation type="unfinished">Nachricht</translation>
+        <source>Subject</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To:</source>
-        <translation type="unfinished">An:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation type="unfinished">Betreff:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation type="unfinished">Antworten</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation type="unfinished">Weiter</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation type="unfinished">Chat</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation type="unfinished">Senden</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="unfinished">Nächste</translation>
+        <source>Fast choice</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -297,54 +272,67 @@
         <translation>Nicht im Roster</translation>
     </message>
     <message>
-        <source>Contact</source>
-        <translation>Kontakt</translation>
-    </message>
-    <message>
-        <source>Jid</source>
-        <translation>JID</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Agenten</translation>
-    </message>
-    <message>
-        <source>My Resources</source>
-        <translation>Meine Resourcen</translation>
-    </message>
-    <message>
-        <source>Add receiver</source>
-        <translation>Empfänger hinzufügen</translation>
-    </message>
-    <message>
-        <source>Enter valid contact jid:</source>
-        <translation>Gültige Kontakt JID eingeben:</translation>
     </message>
     <message>
         <source>Without Groups</source>
         <translation>Ohne Gruppen</translation>
     </message>
-</context>
-<context>
-    <name>ReceiversWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Hinzufügen</translation>
+        <source>Select All Contacts</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation>Aktualisieren</translation>
+        <source>Select Online Contact</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All</source>
-        <translation>Alle</translation>
+        <source>Select Available Contacts</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>None</source>
-        <translation>Keine</translation>
+        <source>Clear Selection</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All Online</source>
+        <source>Load Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Contacts from File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to Load Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect file format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to read file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Contacts to File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to Save Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create file: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

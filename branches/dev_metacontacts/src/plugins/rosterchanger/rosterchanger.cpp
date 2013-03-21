@@ -963,6 +963,17 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 		}
 	}
 
+	if (ABlankGroup)
+	{
+		Action *blankGroupAction = new Action(menu);
+		blankGroupAction->setData(AData);
+		blankGroupAction->setText(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_BLANK) : tr("Without Groups"));
+		blankGroupAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_GROUP);
+		blankGroupAction->setData(ADR_TO_GROUP,QString());
+		connect(blankGroupAction,SIGNAL(triggered(bool)),ASlot);
+		menu->addAction(blankGroupAction,AG_RVCM_RCHANGER+1);
+	}
+
 	if (ARootGroup)
 	{
 		Action *rootGroupAction = new Action(menu);
@@ -985,16 +996,6 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 		menu->addAction(newGroupAction,AG_RVCM_RCHANGER+1);
 	}
 
-	if (ABlankGroup)
-	{
-		Action *blankGroupAction = new Action(menu);
-		blankGroupAction->setData(AData);
-		blankGroupAction->setText(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIK_GROUP_BLANK) : tr("Without Groups"));
-		blankGroupAction->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_GROUP);
-		blankGroupAction->setData(ADR_TO_GROUP,QString());
-		connect(blankGroupAction,SIGNAL(triggered(bool)),ASlot);
-		menu->addAction(blankGroupAction,AG_RVCM_RCHANGER-1);
-	}
 
 	return menu;
 }

@@ -36,7 +36,7 @@ public:
 	virtual IMessageToolBarWidget *toolBarWidget() const;
 	virtual IMessageStatusBarWidget *statusBarWidget() const;
 	virtual IMessageReceiversWidget *receiversWidget() const;
-	// ITabWindowPage
+	// IMessageTabPage
 	virtual QString tabPageId() const;
 	virtual bool isVisibleTabPage() const;
 	virtual bool isActiveTabPage() const;
@@ -52,6 +52,10 @@ public:
 	// IMessageChatWindow
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
+	// IMessageChatWindow
+	void messageReady();
+	// IMessageWindow
+	void widgetLayoutChanged();
 	// ITabWindowPage
 	void tabPageAssign();
 	void tabPageShow();
@@ -63,13 +67,9 @@ signals:
 	void tabPageDeactivated();
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
-	// IMessageWindow
-	void widgetLayoutChanged();
-	// IMessageChatWindow
-	void messageReady();
 protected:
-	void saveWindowGeometry();
-	void loadWindowGeometry();
+	void saveWindowGeometryAndState();
+	void loadWindowGeometryAndState();
 protected:
 	bool event(QEvent *AEvent);
 	void showEvent(QShowEvent *AEvent);

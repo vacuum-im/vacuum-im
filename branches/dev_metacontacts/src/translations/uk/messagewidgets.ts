@@ -242,48 +242,24 @@
 </context>
 <context>
     <name>NormalWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation type="unfinished">Наступний - %1</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">Закрити</translation>
+    <message numerus="yes">
+        <source>Selected %n contact(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
-        <source>Message</source>
-        <translation type="unfinished">Повідомлення</translation>
+        <source>Subject</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To:</source>
-        <translation type="unfinished">Кому:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation type="unfinished">Тема:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation type="unfinished">Відповісти</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation type="unfinished">Переслати</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation type="unfinished">Чат</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation type="unfinished">Відіслати</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation type="unfinished">Наступне</translation>
+        <source>Fast choice</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -297,55 +273,68 @@
         <translation>Не в ростері</translation>
     </message>
     <message>
-        <source>Contact</source>
-        <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>Jid</source>
-        <translation>JID</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Агенти</translation>
-    </message>
-    <message>
-        <source>My Resources</source>
-        <translation>Мої ресурси</translation>
-    </message>
-    <message>
-        <source>Add receiver</source>
-        <translation>Додати Отримувача</translation>
-    </message>
-    <message>
-        <source>Enter valid contact jid:</source>
-        <translation>Введіть коректний JID:</translation>
     </message>
     <message>
         <source>Without Groups</source>
         <translation>Без груп</translation>
     </message>
-</context>
-<context>
-    <name>ReceiversWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Додати</translation>
+        <source>Select All Contacts</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation>Поновити</translation>
+        <source>Select Online Contact</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All</source>
-        <translation>Всі</translation>
+        <source>Select Available Contacts</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>None</source>
-        <translation>Нікого</translation>
+        <source>Clear Selection</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All Online</source>
-        <translation>Всі в мережі</translation>
+        <source>Load Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Contacts from File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to Load Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect file format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to read file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Contacts to File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to Save Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create file: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

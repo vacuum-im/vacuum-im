@@ -73,6 +73,14 @@
 //MessageWidgets - TabWindowTabMenu
 #define AG_MWTWTM_MWIDGETS_TAB_ACTIONS                          500
 
+//MessageWidgets - ReceiversWidgetContextMenu
+#define AG_MWRWCM_MWIDGETS_SELECT_ONLINE                        500
+#define AG_MWRWCM_MWIDGETS_SELECT_NOTBUSY                       500
+#define AG_MWRWCM_MWIDGETS_SELECT_ALL                           500
+#define AG_MWRWCM_MWIDGETS_SELECT_LOAD                          700
+#define AG_MWRWCM_MWIDGETS_SELECT_SAVE                          700
+#define AG_MWRWCM_MWIDGETS_SELECT_CLEAR                         900
+
 //MultiuserChat - MultiUserContextMenu
 #define AG_MUCM_MULTIUSERCHAT_UTILS                             100
 #define AG_MUCM_MULTIUSERCHAT_PRIVATE                           200

@@ -242,48 +242,23 @@
 </context>
 <context>
     <name>NormalWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation>Next - %1</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Close</translation>
+    <message numerus="yes">
+        <source>Selected %n contact(s)</source>
+        <translation>
+            <numerusform>Selected %n contact(s)</numerusform>
+            <numerusform>Selected %n contact(s)</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
-        <source>Message</source>
-        <translation>Message</translation>
+        <source>Subject</source>
+        <translation>Subject</translation>
     </message>
     <message>
-        <source>To:</source>
-        <translation>To:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Subject:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation>Reply</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Forward</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Chat</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Send</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Next</translation>
+        <source>Fast choice</source>
+        <translation>Fast choice</translation>
     </message>
 </context>
 <context>
@@ -297,55 +272,68 @@
         <translation>Not in Roster</translation>
     </message>
     <message>
-        <source>Contact</source>
-        <translation>Contact</translation>
-    </message>
-    <message>
-        <source>Jid</source>
-        <translation>Jid</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Agents</translation>
-    </message>
-    <message>
-        <source>My Resources</source>
-        <translation>My Resources</translation>
-    </message>
-    <message>
-        <source>Add receiver</source>
-        <translation>Add receiver</translation>
-    </message>
-    <message>
-        <source>Enter valid contact jid:</source>
-        <translation>Enter valid contact jid:</translation>
     </message>
     <message>
         <source>Without Groups</source>
         <translation>Without Groups</translation>
     </message>
-</context>
-<context>
-    <name>ReceiversWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Add</translation>
+        <source>Select All Contacts</source>
+        <translation>Select All Contacts</translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation>Update</translation>
+        <source>Select Online Contact</source>
+        <translation>Select Online Contact</translation>
     </message>
     <message>
-        <source>All</source>
-        <translation>All</translation>
+        <source>Select Available Contacts</source>
+        <translation>Select Available Contacts</translation>
     </message>
     <message>
-        <source>None</source>
-        <translation>None</translation>
+        <source>Clear Selection</source>
+        <translation>Clear Selection</translation>
     </message>
     <message>
-        <source>All Online</source>
-        <translation>All Online</translation>
+        <source>Load Selection</source>
+        <translation>Load Selection</translation>
+    </message>
+    <message>
+        <source>Save Selection</source>
+        <translation>Save Selection</translation>
+    </message>
+    <message>
+        <source>Load Contacts from File</source>
+        <translation>Load Contacts from File</translation>
+    </message>
+    <message>
+        <source>Failed to Load Contacts</source>
+        <translation>Failed to Load Contacts</translation>
+    </message>
+    <message>
+        <source>Incorrect file format</source>
+        <translation>Incorrect file format</translation>
+    </message>
+    <message>
+        <source>Failed to read file: %1</source>
+        <translation>Failed to read file: %1</translation>
+    </message>
+    <message>
+        <source>Failed to open file: %1</source>
+        <translation>Failed to open file: %1</translation>
+    </message>
+    <message>
+        <source>Save Contacts to File</source>
+        <translation>Save Contacts to File</translation>
+    </message>
+    <message>
+        <source>Failed to Save Contacts</source>
+        <translation>Failed to Save Contacts</translation>
+    </message>
+    <message>
+        <source>Failed to create file: %1</source>
+        <translation>Failed to create file: %1</translation>
     </message>
 </context>
 <context>

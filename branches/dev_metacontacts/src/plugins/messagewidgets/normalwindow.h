@@ -1,6 +1,8 @@
 #ifndef MESSAGEWINDOW_H
 #define MESSAGEWINDOW_H
 
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/rosterindexkinds.h>
@@ -13,6 +15,7 @@
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/xmpperror.h>
+#include <utils/iconstorage.h>
 #include <utils/widgetmanager.h>
 #include "ui_normalwindow.h"
 
@@ -51,20 +54,20 @@ public:
 	virtual IMessageTabPageNotifier *tabPageNotifier() const;
 	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
 	// IMessageNormalWindow
-	virtual void addTabWidget(QWidget *AWidget);
-	virtual void setCurrentTabWidget(QWidget *AWidget);
-	virtual void removeTabWidget(QWidget *AWidget);
 	virtual Mode mode() const;
 	virtual void setMode(Mode AMode);
 	virtual QString subject() const;
 	virtual void setSubject(const QString &ASubject);
 	virtual QString threadId() const;
 	virtual void setThreadId(const QString &AThreadId);
-	virtual int nextCount() const;
-	virtual void setNextCount(int ACount);
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
-	// ITabWindowPage
+	// IMessageNormalWindow
+	void messageReady();
+	void modeChanged(int AMode);
+	// IMessageWindow
+	void widgetLayoutChanged();
+	// IMessageTabPage
 	void tabPageAssign();
 	void tabPageShow();
 	void tabPageShowMinimized();
@@ -75,30 +78,18 @@ signals:
 	void tabPageDeactivated();
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
-	// IMessageWindow
-	void widgetLayoutChanged();
-	// IMessageNormalWindow
-	void showNextMessage();
-	void replyMessage();
-	void forwardMessage();
-	void showChatWindow();
-	void messageReady();
 protected:
-	void saveWindowGeometry();
-	void loadWindowGeometry();
+	void saveWindowGeometryAndState();
+	void loadWindowGeometryAndState();
 protected:
 	bool event(QEvent *AEvent);
 	void showEvent(QShowEvent *AEvent);
 	void closeEvent(QCloseEvent *AEvent);
 protected slots:
 	void onMessageReady();
-	void onSendButtonClicked();
-	void onNextButtonClicked();
-	void onReplyButtonClicked();
-	void onForwardButtonClicked();
-	void onChatButtonClicked();
-	void onReceiversChanged(const Jid &AReceiver);
+	void onSelectReceiversMenuAboutToShow();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+	void onReceiverslAddressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected);
 private:
 	Ui::NormalWindowClass ui;
 private:
@@ -114,7 +105,6 @@ private:
 	IMessageWidgets *FMessageWidgets;
 private:
 	Mode FMode;
-	int FNextCount;
 	bool FShownDetached;
 	QString FTabPageToolTip;
 	QString FCurrentThreadId;

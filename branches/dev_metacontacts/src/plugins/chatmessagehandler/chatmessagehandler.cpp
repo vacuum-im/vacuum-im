@@ -186,7 +186,7 @@ bool ChatMessageHandler::initObjects()
 	{
 		INotificationType notifyType;
 		notifyType.order = NTO_CHATHANDLER_MESSAGE;
-		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATMHANDLER_MESSAGE);
 		notifyType.title = tr("When receiving new chat message");
 		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
@@ -320,7 +320,7 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_CHAT_MESSAGE);
 			if (notify.kinds > 0)
 			{
-				QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHAT_MHANDLER_MESSAGE);
+				QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATMHANDLER_MESSAGE);
 				QString name = ANotifications->contactName(AMessage.to(),AMessage.from());
 
 				notify.typeId = NNT_CHAT_MESSAGE;
@@ -423,7 +423,7 @@ IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const J
 
 				Action *clearAction = new Action(window->instance());
 				clearAction->setText(tr("Clear Chat Window"));
-				clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_CLEAR_CHAT);
+				clearAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_CLEAR_CHAT);
 				clearAction->setShortcutId(SCT_MESSAGEWINDOWS_CHAT_CLEARWINDOW);
 				connect(clearAction,SIGNAL(triggered(bool)),SLOT(onClearWindowAction(bool)));
 				window->toolBarWidget()->toolBarChanger()->insertAction(clearAction, TBG_MWTBW_CLEAR_WINDOW);
@@ -981,7 +981,7 @@ void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &A
 		{
 			Action *action = new Action(AMenu);
 			action->setText(tr("Open chat dialog"));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
+			action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
 			action->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
 			action->setData(ADR_CONTACT_JID,AIndexes.first()->data(RDR_FULL_JID));
 			action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);

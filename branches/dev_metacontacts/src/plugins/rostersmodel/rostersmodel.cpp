@@ -123,7 +123,7 @@ QVariant RostersModel::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 				QString group = AIndex->data(RDR_GROUP).toString();
 				foreach(const Jid &streamJid, FStreamIndexes.keys())
 				{
-					if (AIndex->kind() == RDR_GROUP)
+					if (AIndex->kind() == RIK_GROUP)
 					{
 						IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 						if (roster && roster->hasGroup(group))

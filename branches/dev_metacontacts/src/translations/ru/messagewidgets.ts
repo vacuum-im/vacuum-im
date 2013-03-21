@@ -242,48 +242,24 @@
 </context>
 <context>
     <name>NormalWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation>Следующее - %1</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Закрыть</translation>
+    <message numerus="yes">
+        <source>Selected %n contact(s)</source>
+        <translation>
+            <numerusform>Выбран %n контакт</numerusform>
+            <numerusform>Выбрано %n контакта</numerusform>
+            <numerusform>Выбрано %n контактов</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
-        <source>Message</source>
-        <translation>Сообщение</translation>
+        <source>Subject</source>
+        <translation>Тема</translation>
     </message>
     <message>
-        <source>To:</source>
-        <translation>Кому:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Тема:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation>Ответить</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Переслать</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Отправить</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Следующее</translation>
+        <source>Fast choice</source>
+        <translation>Быстрый выбор</translation>
     </message>
 </context>
 <context>
@@ -297,55 +273,68 @@
         <translation>Не в контакт-листе</translation>
     </message>
     <message>
-        <source>Contact</source>
-        <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>Jid</source>
-        <translation>JID</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Агенты</translation>
-    </message>
-    <message>
-        <source>My Resources</source>
-        <translation>Мои ресурсы</translation>
-    </message>
-    <message>
-        <source>Add receiver</source>
-        <translation>Добавить получателя</translation>
-    </message>
-    <message>
-        <source>Enter valid contact jid:</source>
-        <translation>Введите корректный JID:</translation>
     </message>
     <message>
         <source>Without Groups</source>
         <translation>Без групп</translation>
     </message>
-</context>
-<context>
-    <name>ReceiversWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Добавить</translation>
+        <source>Select All Contacts</source>
+        <translation>Выбрать все контакты</translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation>Обновить</translation>
+        <source>Select Online Contact</source>
+        <translation>Выбрать подключенные контакты</translation>
     </message>
     <message>
-        <source>All</source>
-        <translation>Все</translation>
+        <source>Select Available Contacts</source>
+        <translation>Выбрать не занятые контакты</translation>
     </message>
     <message>
-        <source>None</source>
-        <translation>Никого</translation>
+        <source>Clear Selection</source>
+        <translation>Очистить выделение</translation>
     </message>
     <message>
-        <source>All Online</source>
-        <translation>Все в сети</translation>
+        <source>Load Selection</source>
+        <translation>Загрузить выбор</translation>
+    </message>
+    <message>
+        <source>Save Selection</source>
+        <translation>Сохранить выбор</translation>
+    </message>
+    <message>
+        <source>Load Contacts from File</source>
+        <translation>Загрузить контакты из файла</translation>
+    </message>
+    <message>
+        <source>Failed to Load Contacts</source>
+        <translation>Не удалось загрузить контакты</translation>
+    </message>
+    <message>
+        <source>Incorrect file format</source>
+        <translation>Неверный формат файла</translation>
+    </message>
+    <message>
+        <source>Failed to read file: %1</source>
+        <translation>Не удалось прочитать файл: %1</translation>
+    </message>
+    <message>
+        <source>Failed to open file: %1</source>
+        <translation>Не удалось открыть файл: %1</translation>
+    </message>
+    <message>
+        <source>Save Contacts to File</source>
+        <translation>Сохранить контакты в файл</translation>
+    </message>
+    <message>
+        <source>Failed to Save Contacts</source>
+        <translation>Не удалось сохранить контакты в файл</translation>
+    </message>
+    <message>
+        <source>Failed to create file: %1</source>
+        <translation>Не удалось создать файл: %1</translation>
     </message>
 </context>
 <context>

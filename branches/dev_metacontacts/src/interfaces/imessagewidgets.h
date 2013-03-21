@@ -3,6 +3,7 @@
 
 #include <QUuid>
 #include <QMultiMap>
+#include <QTreeView>
 #include <QTextBrowser>
 #include <QTextDocument>
 #include <interfaces/ipluginmanager.h>
@@ -15,6 +16,7 @@
 #include <utils/menubarchanger.h>
 #include <utils/toolbarchanger.h>
 #include <utils/statusbarchanger.h>
+#include <utils/advanceditemmodel.h>
 
 #define MESSAGEWIDGETS_UUID "{89de35ee-bd44-49fc-8495-edd2cfebb685}"
 
@@ -132,16 +134,18 @@ class IMessageReceiversWidget :
 {
 public:
 	virtual QWidget *instance() = 0;
-	virtual QList<Jid> receivers() const =0;
-	virtual QString receiverName(const Jid &AReceiver) const =0;
-	virtual void addReceiversGroup(const QString &AGroup) =0;
-	virtual void removeReceiversGroup(const QString &AGroup) =0;
-	virtual void addReceiver(const Jid &AReceiver) =0;
-	virtual void removeReceiver(const Jid &AReceiver) =0;
-	virtual void clear() =0;
+	virtual QList<Jid> availStreams() const =0;
+	virtual QTreeView *receiversView() const =0;
+	virtual AdvancedItemModel *receiversModel() const =0;
+	virtual void contextMenuForItem(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual QMultiMap<Jid, Jid> selectedAddresses() const =0;
+	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected) =0;
+	virtual void setAddressSelection(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
+	virtual void clearSelection() =0;
 protected:
-	virtual void receiverAdded(const Jid &AReceiver) =0;
-	virtual void receiverRemoved(const Jid &AReceiver) =0;
+	virtual void availStreamsChanged() =0;
+	virtual void contextMenuForItemRequested(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual void addressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
 };
 
 class IMessageMenuBarWidget :
@@ -288,24 +292,16 @@ public:
 	};
 public:
 	virtual QMainWindow *instance() =0;
-	virtual void addTabWidget(QWidget *AWidget) =0;
-	virtual void setCurrentTabWidget(QWidget *AWidget) =0;
-	virtual void removeTabWidget(QWidget *AWidget) =0;
 	virtual Mode mode() const =0;
 	virtual void setMode(Mode AMode) =0;
 	virtual QString subject() const =0;
 	virtual void setSubject(const QString &ASubject) =0;
 	virtual QString threadId() const =0;
 	virtual void setThreadId(const QString &AThreadId) =0;
-	virtual int nextCount() const =0;
-	virtual void setNextCount(int ACount) =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 protected:
-	virtual void showNextMessage() =0;
-	virtual void replyMessage() =0;
-	virtual void forwardMessage() =0;
-	virtual void showChatWindow() =0;
 	virtual void messageReady() =0;
+	virtual void modeChanged(int AMode) =0;
 };
 
 class IMessageChatWindow :

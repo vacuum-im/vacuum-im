@@ -9,12 +9,10 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 
 	FMessageWidgets = AMessageWidgets;
 
-	FNextCount = 0;
 	FShownDetached = false;
 	FCurrentThreadId = QUuid::createUuid().toString();
 
 	FTabPageNotifier = NULL;
-	ui.wdtTabs->setDocumentMode(true);
 
 	FAddress = FMessageWidgets->newAddress(AStreamJid,AContactJid,this);
 
@@ -37,11 +35,13 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
 	ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
 
-	FReceiversWidget = FMessageWidgets->newReceiversWidget(this,ui.wdtTabs);
-	connect(FReceiversWidget->instance(),SIGNAL(receiverAdded(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
-	connect(FReceiversWidget->instance(),SIGNAL(receiverRemoved(const Jid &)),SLOT(onReceiversChanged(const Jid &)));
-	ui.wdtTabs->addTab(FReceiversWidget->instance(),FReceiversWidget->instance()->windowIconText());
-	FReceiversWidget->addReceiver(AContactJid);
+	ui.wdtReceiversTree->setLayout(new QVBoxLayout(ui.wdtReceiversTree));
+	ui.wdtReceiversTree->layout()->setMargin(0);
+	FReceiversWidget = FMessageWidgets->newReceiversWidget(this,ui.wdtReceivers);
+	connect(FReceiversWidget->instance(),SIGNAL(addressSelectionChanged(const Jid &, const Jid &, bool)),
+		SLOT(onReceiverslAddressSelectionChanged(const Jid &, const Jid &, bool)));
+	FReceiversWidget->setAddressSelection(AStreamJid,AContactJid,true);
+	ui.wdtReceiversTree->layout()->addWidget(FReceiversWidget->instance());
 
 	FMenuBarWidget = FMessageWidgets->newMenuBarWidget(this,this);
 	setMenuBar(FMenuBarWidget->instance());
@@ -49,17 +49,16 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	FStatusBarWidget = FMessageWidgets->newStatusBarWidget(this,this);
 	setStatusBar(FStatusBarWidget->instance());
 
-	connect(ui.pbtSend,SIGNAL(clicked()),SLOT(onSendButtonClicked()));
-	connect(ui.pbtReply,SIGNAL(clicked()),SLOT(onReplyButtonClicked()));
-	connect(ui.pbtForward,SIGNAL(clicked()),SLOT(onForwardButtonClicked()));
-	connect(ui.pbtChat,SIGNAL(clicked()),SLOT(onChatButtonClicked()));
-	connect(ui.pbtNext,SIGNAL(clicked()),SLOT(onNextButtonClicked()));
+	Menu *menu = new Menu(ui.tlbReceivers);
+	ui.tlbReceivers->setMenu(menu);
+	connect(menu,SIGNAL(aboutToShow()),SLOT(onSelectReceiversMenuAboutToShow()));
+
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(ui.tlbReceivers,MNI_MESSAGEWIDGETS_SELECT);
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	setMode(AMode);
-	setNextCount(FNextCount);
-	setCurrentTabWidget(ui.tabMessage);
+	onReceiverslAddressSelectionChanged(AStreamJid,AContactJid,true);
 }
 
 NormalWindow::~NormalWindow()
@@ -126,7 +125,7 @@ IMessageReceiversWidget *NormalWindow::receiversWidget() const
 
 QString NormalWindow::tabPageId() const
 {
-	return "NormalWindow|"+FAddress->streamJid().pBare()+"|"+FAddress->contactJid().pBare();
+	return "NormalWindow|"+streamJid().pBare()+"|"+contactJid().pBare();
 }
 
 bool NormalWindow::isVisibleTabPage() const
@@ -202,24 +201,6 @@ void NormalWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 	}
 }
 
-void NormalWindow::addTabWidget(QWidget *AWidget)
-{
-	ui.wdtTabs->addTab(AWidget,AWidget->windowIconText());
-}
-
-void NormalWindow::setCurrentTabWidget(QWidget *AWidget)
-{
-	if (AWidget)
-		ui.wdtTabs->setCurrentWidget(AWidget);
-	else
-		ui.wdtTabs->setCurrentWidget(ui.wdtMessage);
-}
-
-void NormalWindow::removeTabWidget(QWidget *AWidget)
-{
-	ui.wdtTabs->removeTab(ui.wdtTabs->indexOf(AWidget));
-}
-
 IMessageNormalWindow::Mode NormalWindow::mode() const
 {
 	return FMode;
@@ -233,25 +214,20 @@ void NormalWindow::setMode(Mode AMode)
 		ui.wdtMessage->layout()->addWidget(FViewWidget->instance());
 		ui.wdtMessage->layout()->removeWidget(FEditWidget->instance());
 		FEditWidget->instance()->setParent(NULL);
-		removeTabWidget(FReceiversWidget->instance());
 	}
 	else
 	{
 		ui.wdtMessage->layout()->addWidget(FEditWidget->instance());
 		ui.wdtMessage->layout()->removeWidget(FViewWidget->instance());
 		FViewWidget->instance()->setParent(NULL);
-		addTabWidget(FReceiversWidget->instance());
 	}
 
-	ui.wdtReceivers->setVisible(FMode == WriteMode);
-	ui.wdtInfo->setVisible(FMode == ReadMode);
-	ui.wdtSubject->setVisible(FMode == WriteMode);
-	ui.pbtSend->setVisible(FMode == WriteMode);
-	ui.pbtReply->setVisible(FMode == ReadMode);
-	ui.pbtForward->setVisible(FMode == ReadMode);
-	ui.pbtChat->setVisible(FMode == ReadMode);
+	ui.wdtReceivers->setVisible(AMode == WriteMode);
+	ui.wdtInfo->setVisible(AMode == ReadMode);
+	ui.lneSubject->setVisible(AMode == WriteMode);
 
 	QTimer::singleShot(0,this,SIGNAL(widgetLayoutChanged()));
+	emit modeChanged(AMode);
 }
 
 QString NormalWindow::subject() const
@@ -274,35 +250,24 @@ void NormalWindow::setThreadId(const QString &AThreadId)
 	FCurrentThreadId = AThreadId;
 }
 
-int NormalWindow::nextCount() const
-{
-	return FNextCount;
-}
-
-void NormalWindow::setNextCount(int ACount)
-{
-	if (ACount > 0)
-		ui.pbtNext->setText(tr("Next - %1").arg(ACount));
-	else
-		ui.pbtNext->setText(tr("Close"));
-	FNextCount = ACount;
-}
-
-void NormalWindow::saveWindowGeometry()
+void NormalWindow::saveWindowGeometryAndState()
 {
 	if (isWindow())
 	{
 		Options::setFileValue(saveState(),"messages.messagewindow.state",tabPageId());
 		Options::setFileValue(saveGeometry(),"messages.messagewindow.geometry",tabPageId());
+		Options::setFileValue(ui.sprReceivers->saveState(),"messages.messagewindow.splitter-receivers-state");
 	}
 }
 
-void NormalWindow::loadWindowGeometry()
+void NormalWindow::loadWindowGeometryAndState()
 {
 	if (isWindow())
 	{
 		if (!restoreGeometry(Options::fileValue("messages.messagewindow.geometry",tabPageId()).toByteArray()))
 			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
+		if (!ui.sprReceivers->restoreState(Options::fileValue("messages.messagewindow.splitter-receivers-state").toByteArray()))
+			ui.sprReceivers->setSizes(QList<int>()<<70<<30);
 		restoreState(Options::fileValue("messages.messagewindow.state",tabPageId()).toByteArray());
 	}
 }
@@ -334,7 +299,7 @@ void NormalWindow::showEvent(QShowEvent *AEvent)
 	if (isWindow())
 	{
 		if (!FShownDetached)
-			loadWindowGeometry();
+			loadWindowGeometryAndState();
 		FShownDetached = true;
 		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
@@ -354,7 +319,7 @@ void NormalWindow::showEvent(QShowEvent *AEvent)
 void NormalWindow::closeEvent(QCloseEvent *AEvent)
 {
 	if (FShownDetached)
-		saveWindowGeometry();
+		saveWindowGeometryAndState();
 	QMainWindow::closeEvent(AEvent);
 	emit tabPageClosed();
 }
@@ -364,41 +329,14 @@ void NormalWindow::onMessageReady()
 	emit messageReady();
 }
 
-void NormalWindow::onSendButtonClicked()
+void NormalWindow::onSelectReceiversMenuAboutToShow()
 {
-	emit messageReady();
-}
-
-void NormalWindow::onNextButtonClicked()
-{
-	if (FNextCount > 0)
-		emit showNextMessage();
-	else
-		close();
-}
-
-void NormalWindow::onReplyButtonClicked()
-{
-	emit replyMessage();
-}
-
-void NormalWindow::onForwardButtonClicked()
-{
-	emit forwardMessage();
-}
-
-void NormalWindow::onChatButtonClicked()
-{
-	emit showChatWindow();
-}
-
-void NormalWindow::onReceiversChanged(const Jid &AReceiver)
-{
-	Q_UNUSED(AReceiver);
-	QString receiversStr;
-	foreach(Jid contactJid,FReceiversWidget->receivers())
-		receiversStr += QString("%1; ").arg(FReceiversWidget->receiverName(contactJid));
-	ui.lblReceivers->setText(receiversStr);
+	Menu *menu = qobject_cast<Menu *>(sender());
+	if (menu)
+	{
+		menu->clear();
+		FReceiversWidget->contextMenuForItem(FReceiversWidget->receiversModel()->invisibleRootItem(),menu);
+	}
 }
 
 void NormalWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
@@ -407,4 +345,10 @@ void NormalWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		closeTabPage();
 	}
+}
+
+void NormalWindow::onReceiverslAddressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected)
+{
+	Q_UNUSED(AStreamJid); Q_UNUSED(AContactJid); Q_UNUSED(ASelected);
+	ui.lblReceivers->setText(tr("Selected %n contact(s)","",FReceiversWidget->selectedAddresses().count()));
 }
