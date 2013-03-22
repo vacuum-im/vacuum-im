@@ -168,7 +168,7 @@ protected slots:
 	void onMultiUserPresence(IMultiUser *AUser, int AShow, const QString &AStatus);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onShowDiscoInfoByAction(bool);
 	void onShowDiscoItemsByAction(bool);
 	void onDiscoInfoWindowDestroyed(QObject *AObject);

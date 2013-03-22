@@ -107,7 +107,7 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -827,7 +827,7 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
 	}
 }
 
-void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void ClientInfo::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{

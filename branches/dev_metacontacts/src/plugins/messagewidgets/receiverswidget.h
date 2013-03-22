@@ -2,6 +2,7 @@
 #define RECEIVERSWIDGET_H
 
 #include <QHash>
+#include <QSortFilterProxyModel>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosterindexkinds.h>
@@ -14,6 +15,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <utils/advanceditemdelegate.h>
+#include <utils/options.h>
 #include "ui_receiverswidget.h"
 
 class ReceiversWidget :
@@ -26,8 +28,6 @@ class ReceiversWidget :
 public:
 	ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent);
 	~ReceiversWidget();
-	// AdvancedItemSortHandler
-	virtual SortResult advancedItemSort(int AOrder, const QStandardItem *ALeft, const QStandardItem *ARight) const;
 	// IMessageWidget
 	virtual QWidget *instance() { return this; }
 	virtual bool isVisibleOnWindow() const;
@@ -36,6 +36,8 @@ public:
 	virtual QList<Jid> availStreams() const;
 	virtual QTreeView *receiversView() const;
 	virtual AdvancedItemModel *receiversModel() const;
+	virtual QModelIndex mapModelToView(QStandardItem *AItem);
+	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex);
 	virtual void contextMenuForItem(QStandardItem *AItem, Menu *AMenu);
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const;
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected);
@@ -60,6 +62,8 @@ protected:
 	void updateContactItemsPresence(const Jid &AStreamJid, const Jid &AContactJid);
 protected:
 	Jid findAvailStream(const Jid &AStreamJid) const;
+	void selectionLoad(const QString &AFileName);
+	void selectionSave(const QString &AFileName);
 	void selectAllContacts(QStandardItem *AParent);
 	void selectOnlineContacts(QStandardItem *AParent);
 	void selectNotBusyContacts(QStandardItem *AParent);
@@ -76,6 +80,7 @@ protected slots:
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 protected slots:
+	void onSelectionLast();
 	void onSelectionLoad();
 	void onSelectionSave();
 	void onSelectAllContacts();
@@ -85,6 +90,7 @@ protected slots:
 	void onReceiversContextMenuRequested(const QPoint &APos);
 protected slots:
 	void onDeleteDelayedItems();
+	void onStartSearchContacts();
 private:
 	Ui::ReceiversWidgetClass ui;
 private:
@@ -99,6 +105,7 @@ private:
 	QList<Jid> FReceivers;
 	IMessageWindow *FWindow;
 	AdvancedItemModel *FModel;
+	QSortFilterProxyModel *FProxyModel;
 private:
 	QList<QStandardItem *> FDeleteDelayed;
 	QMap<Jid, QStandardItem *> FStreamItems;

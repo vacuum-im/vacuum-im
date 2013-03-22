@@ -127,7 +127,7 @@ protected slots:
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterClosed(IRoster *ARoster);
 	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDefaultStatusIconsChanged();
 	void onOptionsOpened();
 	void onOptionsClosed();

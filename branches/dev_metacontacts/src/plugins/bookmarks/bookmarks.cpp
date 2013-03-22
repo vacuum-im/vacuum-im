@@ -263,6 +263,11 @@ bool Bookmarks::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEd
 	return false;
 }
 
+bool Bookmarks::isReady(const Jid &AStreamJid) const
+{
+	return FBookmarks.contains(AStreamJid);
+}
+
 bool Bookmarks::isValidBookmark(const IBookmark &ABookmark) const
 {
 	if (ABookmark.type == IBookmark::Url)
@@ -279,7 +284,7 @@ QList<IBookmark> Bookmarks::bookmarks(const Jid &AStreamJid) const
 
 bool Bookmarks::addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark)
 {
-	if (isValidBookmark(ABookmark))
+	if (isReady(AStreamJid) && isValidBookmark(ABookmark))
 	{
 		QList<IBookmark> bookmarkList = bookmarks(AStreamJid);
 		bookmarkList.append(ABookmark);
@@ -290,11 +295,15 @@ bool Bookmarks::addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark)
 
 bool Bookmarks::setBookmarks(const Jid &AStreamJid, const QList<IBookmark> &ABookmarks)
 {
-	QDomDocument doc;
-	doc.appendChild(doc.createElement("bookmarks"));
-	QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(NS_STORAGE_BOOKMARKS,PST_BOOKMARKS)).toElement();
-	saveBookmarksToXML(elem,ABookmarks);
-	return !FPrivateStorage->saveData(AStreamJid,elem).isEmpty();
+	if (isReady(AStreamJid))
+	{
+		QDomDocument doc;
+		doc.appendChild(doc.createElement("bookmarks"));
+		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(NS_STORAGE_BOOKMARKS,PST_BOOKMARKS)).toElement();
+		saveBookmarksToXML(elem,ABookmarks);
+		return !FPrivateStorage->saveData(AStreamJid,elem).isEmpty();
+	}
+	return false;
 }
 
 int Bookmarks::execEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) const
@@ -305,7 +314,7 @@ int Bookmarks::execEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) co
 
 void Bookmarks::showEditBookmarksDialog(const Jid &AStreamJid)
 {
-	if (FBookmarks.contains(AStreamJid))
+	if (isReady(AStreamJid))
 	{
 		EditBookmarksDialog *dialog = FDialogs.value(AStreamJid,NULL);
 		if (!dialog)
@@ -349,19 +358,21 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 	}
 }
 
-bool Bookmarks::isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const
+bool Bookmarks::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	Jid streamJid;
-	foreach(IRosterIndex *index, AIndexes)
+	int singleKind = -1;
+	foreach(IRosterIndex *index, ASelected)
 	{
-		if (index->kind() != RIK_MUC_ITEM)
+		int indexKind = index->kind();
+		if (indexKind!=RIK_MUC_ITEM && indexKind!=RIK_STREAM_ROOT)
 			return false;
-		if (streamJid.isEmpty())
-			streamJid = index->data(RDR_STREAM_JID).toString();
-		else if (streamJid != index->data(RDR_STREAM_JID).toString())
+		else if (singleKind!=-1 && singleKind!=indexKind)
 			return false;
+		else if (!isReady(index->data(RDR_STREAM_JID).toString()))
+			return false;
+		singleKind = indexKind;
 	}
-	return !AIndexes.isEmpty();
+	return !ASelected.isEmpty();
 }
 
 QList<IBookmark> Bookmarks::loadBookmarksFromXML(const QDomElement &AElement) const
@@ -528,112 +539,120 @@ void Bookmarks::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &AS
 
 void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	bool isMultiSelection = AIndexes.count()>1;
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		IRosterIndex *index = AIndexes.value(0);
-		Jid streamJid = index->data(RDR_STREAM_JID).toString();
-		if (FBookmarks.contains(streamJid))
+		bool isMultiSelection = AIndexes.count()>1;
+		int indexKind = AIndexes.first()->kind();
+		if (indexKind == RIK_STREAM_ROOT)
 		{
-			if (!isMultiSelection && index->kind()==RIK_STREAM_ROOT)
+			Menu *bookmarksMenu = new Menu(AMenu);
+			bookmarksMenu->setTitle(tr("Bookmarks"));
+			bookmarksMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
+
+			int streamGroup = AG_BBM_BOOKMARKS_ITEMS;
+			foreach(IRosterIndex *index, AIndexes)
 			{
-				QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+				QList<IBookmark> bookmarkList = FBookmarks.value(index->data(RDR_STREAM_JID).toString());
 				if (!bookmarkList.isEmpty())
 				{
-					Menu *streamMenu = new Menu(AMenu);
-					streamMenu->setTitle(tr("Bookmarks"));
-					streamMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS);
-
-					for (int index=0; index<bookmarkList.count(); index++)
+					for (int i=0; i<bookmarkList.count(); i++)
 					{
-						const IBookmark &bookmark = bookmarkList.at(index);
+						const IBookmark &bookmark = bookmarkList.at(i);
 						if (isValidBookmark(bookmark) && !bookmark.name.isEmpty())
 						{
-							Action *startAction = new Action(streamMenu);
+							Action *startAction = new Action(bookmarksMenu);
 							startAction->setIcon(RSR_STORAGE_MENUICONS,bookmark.type==IBookmark::Url ? MNI_BOOKMARKS_URL : MNI_BOOKMARKS_ROOM);
-							startAction->setText(TextManager::getElidedString(bookmark.name,Qt::ElideRight,30));
-							startAction->setData(ADR_STREAM_JID,streamJid.full());
+							startAction->setText(TextManager::getElidedString(bookmark.name,Qt::ElideRight,50));
+							startAction->setData(ADR_STREAM_JID,index->data(RDR_STREAM_JID));
 							startAction->setData(ADR_BOOKMARK_TYPE,bookmark.type);
 							startAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
 							startAction->setData(ADR_BOOKMARK_URL,bookmark.url.url.toString());
 							connect(startAction,SIGNAL(triggered(bool)),SLOT(onStartBookmarkActionTriggered(bool)));
-							streamMenu->addAction(startAction,AG_BMM_BOOKMARKS_ITEMS);
+							bookmarksMenu->addAction(startAction,streamGroup);
 						}
 					}
-					AMenu->addAction(streamMenu->menuAction(),AG_RVCM_BOOKMARS_MENU);
+					streamGroup++;
 				}
+			}
 
+			if (!bookmarksMenu->isEmpty())
+				AMenu->addAction(bookmarksMenu->menuAction(),AG_RVCM_BOOKMARS_MENU);
+			else
+				delete bookmarksMenu;
+
+			if (!isMultiSelection)
+			{
 				Action *editAction = new Action(AMenu);
 				editAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
 				editAction->setText(tr("Edit Bookmarks"));
-				editAction->setData(ADR_STREAM_JID,streamJid.full());
+				editAction->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID).toString());
 				connect(editAction,SIGNAL(triggered(bool)),SLOT(onEditBookmarksActionTriggered(bool)));
 				AMenu->addAction(editAction,AG_RVCM_BOOKMARS_MENU);
 			}
-			else if (isSelectionAccepted(AIndexes))
+		}
+		else if (indexKind == RIK_MUC_ITEM)
+		{
+			IBookmark bookmark = !isMultiSelection ? FBookmarkIndexes.value(AIndexes.first()->data(RDR_STREAM_JID).toString()).value(AIndexes.first()) : IBookmark();
+			QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_NAME<<RDR_PREP_BARE_JID<<RDR_MUC_NICK<<RDR_MUC_PASSWORD,RDR_PREP_BARE_JID,RDR_STREAM_JID);
+
+			if (isMultiSelection || !isValidBookmark(bookmark))
 			{
-				IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(AIndexes.value(0));
-				QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_NAME<<RDR_PREP_BARE_JID<<RDR_MUC_NICK<<RDR_MUC_PASSWORD);
+				Action *appendAction = new Action(AMenu);
+				appendAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
+				appendAction->setText(tr("Add to Bookmarks"));
+				appendAction->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
+				appendAction->setData(ADR_BOOKMARK_NAME,rolesMap.value(RDR_NAME));
+				appendAction->setData(ADR_BOOKMARK_ROOM_JID,rolesMap.value(RDR_PREP_BARE_JID));
+				appendAction->setData(ADR_BOOKMARK_ROOM_NICK,rolesMap.value(RDR_MUC_NICK));
+				appendAction->setData(ADR_BOOKMARK_ROOM_PASSWORD,rolesMap.value(RDR_MUC_PASSWORD));
+				connect(appendAction,SIGNAL(triggered(bool)),SLOT(onAddBookmarksActionTriggered(bool)));
+				AMenu->addAction(appendAction,AG_RVCM_BOOKMARS_TOOLS);
+			}
 
-				if (isMultiSelection || !isValidBookmark(bookmark))
-				{
-					Action *appendAction = new Action(AMenu);
-					appendAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_ADD);
-					appendAction->setText(tr("Add to Bookmarks"));
-					appendAction->setData(ADR_STREAM_JID,streamJid.full());
-					appendAction->setData(ADR_BOOKMARK_NAME,rolesMap.value(RDR_NAME));
-					appendAction->setData(ADR_BOOKMARK_ROOM_JID,rolesMap.value(RDR_PREP_BARE_JID));
-					appendAction->setData(ADR_BOOKMARK_ROOM_NICK,rolesMap.value(RDR_MUC_NICK));
-					appendAction->setData(ADR_BOOKMARK_ROOM_PASSWORD,rolesMap.value(RDR_MUC_PASSWORD));
-					connect(appendAction,SIGNAL(triggered(bool)),SLOT(onAddBookmarksActionTriggered(bool)));
-					AMenu->addAction(appendAction,AG_RVCM_BOOKMARS_TOOLS);
-				}
+			if (isMultiSelection || isValidBookmark(bookmark))
+			{
+				Action *removeAction = new Action(AMenu);
+				removeAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_REMOVE);
+				removeAction->setText(tr("Remove from Bookmarks"));
+				removeAction->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
+				removeAction->setData(ADR_BOOKMARK_ROOM_JID,rolesMap.value(RDR_PREP_BARE_JID));
+				connect(removeAction,SIGNAL(triggered(bool)),SLOT(onRemoveBookmarksActionTriggered(bool)));
+				AMenu->addAction(removeAction,AG_RVCM_BOOKMARS_TOOLS);
+			}
 
-				if (isMultiSelection || isValidBookmark(bookmark))
-				{
-					Action *removeAction = new Action(AMenu);
-					removeAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_REMOVE);
-					removeAction->setText(tr("Remove from Bookmarks"));
-					removeAction->setData(ADR_STREAM_JID,streamJid.full());
-					removeAction->setData(ADR_BOOKMARK_ROOM_JID,rolesMap.value(RDR_PREP_BARE_JID));
-					connect(removeAction,SIGNAL(triggered(bool)),SLOT(onRemoveBookmarksActionTriggered(bool)));
-					AMenu->addAction(removeAction,AG_RVCM_BOOKMARS_TOOLS);
-				}
+			if (!isMultiSelection && isValidBookmark(bookmark))
+			{
+				Action *editAction = new Action(AMenu);
+				editAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
+				editAction->setText(tr("Edit Bookmark"));
+				editAction->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
+				editAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
+				connect(editAction,SIGNAL(triggered(bool)),SLOT(onEditBookmarkActionTriggered(bool)));
+				AMenu->addAction(editAction,AG_RVCM_BOOKMARS_TOOLS);
 
-				if (!isMultiSelection && isValidBookmark(bookmark))
-				{
-					Action *editAction = new Action(AMenu);
-					editAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
-					editAction->setText(tr("Edit Bookmark"));
-					editAction->setData(ADR_STREAM_JID,streamJid.full());
-					editAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
-					connect(editAction,SIGNAL(triggered(bool)),SLOT(onEditBookmarkActionTriggered(bool)));
-					AMenu->addAction(editAction,AG_RVCM_BOOKMARS_TOOLS);
+				Action *renameAction = new Action(AMenu);
+				renameAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
+				renameAction->setText(tr("Rename Bookmark"));
+				renameAction->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
+				renameAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
+				renameAction->setShortcutId(SCT_ROSTERVIEW_RENAME);
+				connect(renameAction,SIGNAL(triggered(bool)),SLOT(onRenameBookmarkActionTriggered(bool)));
+				AMenu->addAction(renameAction,AG_RVCM_BOOKMARS_TOOLS);
+			}
 
-					Action *renameAction = new Action(AMenu);
-					renameAction->setIcon(RSR_STORAGE_MENUICONS,MNI_BOOKMARKS_EDIT);
-					renameAction->setText(tr("Rename Bookmark"));
-					renameAction->setData(ADR_STREAM_JID,streamJid.full());
-					renameAction->setData(ADR_BOOKMARK_ROOM_JID,bookmark.conference.roomJid.bare());
-					renameAction->setShortcutId(SCT_ROSTERVIEW_RENAME);
-					connect(renameAction,SIGNAL(triggered(bool)),SLOT(onRenameBookmarkActionTriggered(bool)));
-					AMenu->addAction(renameAction,AG_RVCM_BOOKMARS_TOOLS);
-				}
-
-				if (!isMultiSelection)
-				{
-					Action *autoJoinAction = new Action(AMenu);
-					autoJoinAction->setCheckable(true);
-					autoJoinAction->setChecked(bookmark.conference.autojoin);
-					autoJoinAction->setText(tr("Join to Conference at Startup"));
-					autoJoinAction->setData(ADR_STREAM_JID,streamJid.full());
-					autoJoinAction->setData(ADR_BOOKMARK_NAME,index->data(RDR_NAME));
-					autoJoinAction->setData(ADR_BOOKMARK_ROOM_JID,index->data(RDR_PREP_BARE_JID));
-					autoJoinAction->setData(ADR_BOOKMARK_ROOM_NICK,index->data(RDR_MUC_NICK));
-					autoJoinAction->setData(ADR_BOOKMARK_ROOM_PASSWORD,index->data(RDR_MUC_PASSWORD));
-					connect(autoJoinAction,SIGNAL(triggered(bool)),SLOT(onChangeBookmarkAutoJoinActionTriggered(bool)));
-					AMenu->addAction(autoJoinAction,AG_RVCM_BOOKMARS_TOOLS);
-				}
+			if (!isMultiSelection)
+			{
+				Action *autoJoinAction = new Action(AMenu);
+				autoJoinAction->setCheckable(true);
+				autoJoinAction->setChecked(bookmark.conference.autojoin);
+				autoJoinAction->setText(tr("Join to Conference at Startup"));
+				autoJoinAction->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
+				autoJoinAction->setData(ADR_BOOKMARK_NAME,AIndexes.first()->data(RDR_NAME));
+				autoJoinAction->setData(ADR_BOOKMARK_ROOM_JID,AIndexes.first()->data(RDR_PREP_BARE_JID));
+				autoJoinAction->setData(ADR_BOOKMARK_ROOM_NICK,AIndexes.first()->data(RDR_MUC_NICK));
+				autoJoinAction->setData(ADR_BOOKMARK_ROOM_PASSWORD,AIndexes.first()->data(RDR_MUC_PASSWORD));
+				connect(autoJoinAction,SIGNAL(triggered(bool)),SLOT(onChangeBookmarkAutoJoinActionTriggered(bool)));
+				AMenu->addAction(autoJoinAction,AG_RVCM_BOOKMARS_TOOLS);
 			}
 		}
 	}
@@ -784,30 +803,35 @@ void Bookmarks::onAddBookmarksActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		if (FBookmarks.contains(streamJid))
-		{
-			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
+		QStringList names = action->data(ADR_BOOKMARK_NAME).toStringList();
+		QStringList rooms = action->data(ADR_BOOKMARK_ROOM_JID).toStringList();
+		QStringList nicks = action->data(ADR_BOOKMARK_ROOM_NICK).toStringList();
+		QStringList passwords = action->data(ADR_BOOKMARK_ROOM_PASSWORD).toStringList();
 
-			QStringList name = action->data(ADR_BOOKMARK_NAME).toStringList();
-			QStringList roomJid = action->data(ADR_BOOKMARK_ROOM_JID).toStringList();
-			QStringList roomNick = action->data(ADR_BOOKMARK_ROOM_NICK).toStringList();
-			QStringList roomPassword = action->data(ADR_BOOKMARK_ROOM_PASSWORD).toStringList();
-			for (int i=0; i<roomJid.count(); i++)
+		QMap<Jid, QList<IBookmark> > bookmarksMap;
+		for (int i=0; i<streams.count(); i++)
+		{
+			if (isReady(streams.at(i)))
 			{
+				if (!bookmarksMap.contains(streams.at(i)))
+					bookmarksMap[streams.at(i)] = FBookmarks.value(streams.at(i));
+
 				IBookmark bookmark;
 				bookmark.type = IBookmark::Conference;
-				bookmark.name = name.value(i);
-				bookmark.conference.roomJid = roomJid.value(i);
-				bookmark.conference.nick = roomNick.value(i);
-				bookmark.conference.password = roomPassword.value(i);
+				bookmark.name = names.at(i);
+				bookmark.conference.roomJid = rooms.at(i);
+				bookmark.conference.nick = nicks.at(i);
+				bookmark.conference.password = passwords.at(i);
 
+				QList<IBookmark> &bookmarkList = bookmarksMap[streams.at(i)];
 				if (!bookmarkList.contains(bookmark))
 					bookmarkList.append(bookmark);
 			}
-
-			setBookmarks(streamJid,bookmarkList);
 		}
+
+		for (QMap<Jid, QList<IBookmark> >::const_iterator it=bookmarksMap.constBegin(); it!=bookmarksMap.constEnd(); ++it)
+			setBookmarks(it.key(),it.value());
 	}
 }
 
@@ -816,25 +840,30 @@ void Bookmarks::onRemoveBookmarksActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		if (FBookmarks.contains(streamJid))
-		{
-			QList<IBookmark> bookmarkList = FBookmarks.value(streamJid);
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
+		QStringList rooms = action->data(ADR_BOOKMARK_ROOM_JID).toStringList();
 
-			QStringList roomJid = action->data(ADR_BOOKMARK_ROOM_JID).toStringList();
-			for (int i=0; i<roomJid.count(); i++)
+		QMap<Jid, QList<IBookmark> > bookmarksMap;
+		for (int i=0; i<streams.count(); i++)
+		{
+			if (isReady(streams.at(i)))
 			{
+				if (!bookmarksMap.contains(streams.at(i)))
+					bookmarksMap[streams.at(i)] = FBookmarks.value(streams.at(i));
+
 				IBookmark bookmark;
 				bookmark.type = IBookmark::Conference;
-				bookmark.conference.roomJid = roomJid.value(i);
+				bookmark.conference.roomJid = rooms.at(i);
 
+				QList<IBookmark> &bookmarkList = bookmarksMap[streams.at(i)];
 				int index = bookmarkList.indexOf(bookmark);
 				if (index >= 0)
 					bookmarkList.removeAt(index);
 			}
-
-			setBookmarks(streamJid,bookmarkList);
 		}
+
+		for (QMap<Jid, QList<IBookmark> >::const_iterator it=bookmarksMap.constBegin(); it!=bookmarksMap.constEnd(); ++it)
+			setBookmarks(it.key(),it.value());
 	}
 }
 
@@ -933,17 +962,14 @@ void Bookmarks::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (FRostersView && AWidget==FRostersView->instance())
 	{
 		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
-		if (isSelectionAccepted(indexes))
+		if (AId==SCT_ROSTERVIEW_RENAME && !FRostersView->hasMultiSelection())
 		{
 			IRosterIndex *index = indexes.first();
-			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (AId==SCT_ROSTERVIEW_RENAME && !FRostersView->hasMultiSelection())
+			if (isSelectionAccepted(indexes) && !FRostersView->editRosterIndex(index,RDR_NAME))
 			{
-				if (!FRostersView->editRosterIndex(index,RDR_NAME))
-				{
-					IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(index);
-					renameBookmark(streamJid,bookmark);
-				}
+				Jid streamJid = index->data(RDR_STREAM_JID).toString();
+				IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(index);
+				renameBookmark(streamJid,bookmark);
 			}
 		}
 	}

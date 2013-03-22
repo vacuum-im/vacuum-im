@@ -1039,12 +1039,16 @@ void RecentContacts::saveItemsToFile(const QString &AFileName, const QList<IRece
 	}
 }
 
-bool RecentContacts::isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const
+bool RecentContacts::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	foreach(IRosterIndex *index, AIndexes)
-		if (rosterIndexItem(index).type.isEmpty())
-			return false;
-	return true;
+	if (!ASelected.isEmpty())
+	{
+		foreach(IRosterIndex *index, ASelected)
+			if (rosterIndexItem(index).type.isEmpty())
+				return false;
+		return true;
+	}
+	return false;
 }
 
 bool RecentContacts::isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const

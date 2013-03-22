@@ -14,6 +14,7 @@ RostersViewPlugin::RostersViewPlugin()
 	FStatusChanger = NULL;
 	FPresencePlugin = NULL;
 	FOptionsManager = NULL;
+	FAccountManager = NULL;
 	FMainWindowPlugin = NULL;
 
 	FSortFilterProxyModel = NULL;
@@ -72,27 +73,23 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 
 	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
-	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
-	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
-	{
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
-	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
+
+	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
+	if (plugin)
+		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -638,9 +635,16 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			if (!name.isEmpty())
 				ttInfo += "<big><b>" + Qt::escape(name) + "</b></big><br>";
 
-			Jid jid = AIndex->data(RDR_FULL_JID).toString();
-			if (!jid.isEmpty())
-				ttInfo += tr("<b>Jabber ID:</b> %1").arg(Qt::escape(jid.uBare())) + "<br>";
+			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+			if (!streamJid.isEmpty() && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
+			{
+				IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
+				ttInfo += tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())) + "<br>";
+			}
+
+			Jid itemJid = AIndex->data(RDR_FULL_JID).toString();
+			if (!itemJid.isEmpty())
+				ttInfo += tr("<b>Jabber ID:</b> %1").arg(Qt::escape(itemJid.uBare())) + "<br>";
 
 			QString ask = AIndex->data(RDR_ASK).toString();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();

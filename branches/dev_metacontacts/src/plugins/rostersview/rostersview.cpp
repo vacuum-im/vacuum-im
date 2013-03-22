@@ -477,7 +477,7 @@ bool RostersView::setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes
 	return false;
 }
 
-QMap<int, QStringList > RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole, int AGroupByRole) const
+QMap<int, QStringList> RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole, int AGroupByRole) const
 {
 	QMap<int, QStringList > map;
 	bool hasGroupBy = AUniqueRole>=0 && ARoles.contains(AGroupByRole);

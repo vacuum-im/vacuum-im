@@ -74,9 +74,9 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -476,12 +476,12 @@ void StatusIcons::onPresenceItemReceived(IPresence *APresence, const IPresenceIt
 	}
 }
 
-void StatusIcons::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void StatusIcons::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void StatusIcons::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void StatusIcons::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{

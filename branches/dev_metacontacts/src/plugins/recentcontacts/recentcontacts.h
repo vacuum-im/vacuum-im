@@ -108,7 +108,7 @@ protected:
 	QList<IRecentItem> loadItemsFromFile(const QString &AFileName) const;
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
 protected:
-	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	bool isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
 	void removeRecentItems(const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 	void setItemsFavorite(bool AFavorite, const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);

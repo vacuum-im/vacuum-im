@@ -77,6 +77,7 @@
 #define AG_MWRWCM_MWIDGETS_SELECT_ONLINE                        500
 #define AG_MWRWCM_MWIDGETS_SELECT_NOTBUSY                       500
 #define AG_MWRWCM_MWIDGETS_SELECT_ALL                           500
+#define AG_MWRWCM_MWIDGETS_SELECT_LAST                          700
 #define AG_MWRWCM_MWIDGETS_SELECT_LOAD                          700
 #define AG_MWRWCM_MWIDGETS_SELECT_SAVE                          700
 #define AG_MWRWCM_MWIDGETS_SELECT_CLEAR                         900
@@ -94,7 +95,7 @@
 
 //Bookmarks - BookmarksMenu
 #define AG_BBM_BOOKMARKS_TOOLS                                  500
-#define AG_BMM_BOOKMARKS_ITEMS                                  700
+#define AG_BBM_BOOKMARKS_ITEMS                                  700
 
 //ViewWidget - ContextMenu
 #define AG_VWCM_MESSAGEWIDGETS_URL                              300

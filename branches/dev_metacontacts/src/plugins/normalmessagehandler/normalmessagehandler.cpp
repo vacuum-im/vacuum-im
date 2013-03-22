@@ -1,5 +1,7 @@
 #include "normalmessagehandler.h"
 
+#include <QMouseEvent>
+
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_GROUP                 Action::DR_Parametr2
@@ -111,9 +113,9 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		{
 			FRostersView = rostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -162,6 +164,7 @@ bool NormalMessageHandler::initObjects()
 	}
 	if (FRostersView)
 	{
+		FRostersView->insertClickHooker(RCHO_NORMALMESSAGEHANDLER,this);
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, FRostersView->instance());
 	}
 	if (FOptionsManager)
@@ -193,6 +196,34 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 				window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
 				window->showTabPage();
 				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool NormalMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	return false;
+}
+
+bool NormalMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	int indexKind = AIndex->kind();
+	if (AOrder==RCHO_NORMALMESSAGEHANDLER && AEvent->modifiers()==Qt::NoModifier)
+	{
+		QString streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		if (isAnyPresenceOpened(QStringList() << streamJid))
+		{
+			if (indexKind==RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
+			{
+				return messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW);
+			}
+			else if (indexKind==RIK_CONTACT || indexKind==RIK_MY_RESOURCE || indexKind==RIK_AGENT)
+			{
+				Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+				return messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW);
 			}
 		}
 	}
@@ -975,12 +1006,12 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 	}
 }
 
-void NormalMessageHandler::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void NormalMessageHandler::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void NormalMessageHandler::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{

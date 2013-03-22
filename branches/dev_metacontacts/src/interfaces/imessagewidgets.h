@@ -137,6 +137,8 @@ public:
 	virtual QList<Jid> availStreams() const =0;
 	virtual QTreeView *receiversView() const =0;
 	virtual AdvancedItemModel *receiversModel() const =0;
+	virtual QModelIndex mapModelToView(QStandardItem *AItem) =0;
+	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex) =0;
 	virtual void contextMenuForItem(QStandardItem *AItem, Menu *AMenu) =0;
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const =0;
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected) =0;

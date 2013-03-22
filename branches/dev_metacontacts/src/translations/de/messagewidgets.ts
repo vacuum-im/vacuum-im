@@ -335,6 +335,17 @@
         <source>Failed to create file: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Load Last Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>ReceiversWidgetClass</name>
+    <message>
+        <source>Search Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>TabWindow</name>

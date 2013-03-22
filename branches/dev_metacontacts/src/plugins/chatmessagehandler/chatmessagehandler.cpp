@@ -140,7 +140,7 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		{
 			FRostersView = rostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -256,8 +256,7 @@ bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AInd
 
 bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder);
-	if (AEvent->modifiers()==Qt::NoModifier && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_MY_RESOURCE))
+	if (AOrder==RCHO_CHATMESSAGEHANDLER && AEvent->modifiers()==Qt::NoModifier && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_MY_RESOURCE))
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
@@ -973,21 +972,18 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppEr
 	}
 }
 
-void ChatMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void ChatMessageHandler::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes) && AIndexes.count()==1)
 	{
-		if (AIndexes.count() == 1)
-		{
-			Action *action = new Action(AMenu);
-			action->setText(tr("Open chat dialog"));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
-			action->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
-			action->setData(ADR_CONTACT_JID,AIndexes.first()->data(RDR_FULL_JID));
-			action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
-			AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
-		}
+		Action *action = new Action(AMenu);
+		action->setText(tr("Open chat dialog"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
+		action->setData(ADR_STREAM_JID,AIndexes.first()->data(RDR_STREAM_JID));
+		action->setData(ADR_CONTACT_JID,AIndexes.first()->data(RDR_FULL_JID));
+		action->setShortcutId(SCT_ROSTERVIEW_SHOWCHATDIALOG);
+		AMenu->addAction(action,AG_RVCM_CHATMESSAGEHANDLER,true);
+		connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 	}
 }
 

@@ -20,6 +20,7 @@
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
+#include <definitions/rosterclickhookerorders.h>
 #include <definitions/recentitemtypes.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
@@ -56,10 +57,11 @@ class NormalMessageHandler :
 	public IPlugin,
 	public IMessageHandler,
 	public IXmppUriHandler,
+	public IRostersClickHooker,
 	public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler IOptionsHolder);
+	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler IRostersClickHooker IOptionsHolder);
 public:
 	NormalMessageHandler();
 	~NormalMessageHandler();
@@ -73,6 +75,9 @@ public:
 	virtual bool startPlugin() { return true; }
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
+	//IRostersClickHooker
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -127,8 +132,8 @@ protected slots:
 	void onShowWindowAction(bool);
 	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
 	IAvatars *FAvatars;

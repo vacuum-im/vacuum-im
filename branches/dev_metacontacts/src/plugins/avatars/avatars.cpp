@@ -106,11 +106,11 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
+				SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		}
 	}
 
@@ -699,12 +699,12 @@ void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 	}
 }
 
-void Avatars::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void Avatars::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void Avatars::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
@@ -757,7 +757,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, qu
 	}
 }
 
-void Avatars::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
+void Avatars::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && RosterKinds.contains(AIndex->kind()))
 	{

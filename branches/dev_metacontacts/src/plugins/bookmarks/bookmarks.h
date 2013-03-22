@@ -68,6 +68,7 @@ public:
 	//AdvancedDelegateEditProxy
 	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	//IBookmarks
+	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual bool isValidBookmark(const IBookmark &ABookmark) const;
 	virtual QList<IBookmark> bookmarks(const Jid &AStreamJid) const;
 	virtual bool addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
@@ -80,7 +81,7 @@ signals:
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	void updateConferenceIndexes(const Jid &AStreamJid);
-	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QList<IBookmark> loadBookmarksFromXML(const QDomElement &AElement) const;
 	void saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const;
 	void renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);

@@ -106,5 +106,9 @@
         <source>Show list of united accounts</source>
         <translation>Показывать список объединенных аккаунтов</translation>
     </message>
+    <message>
+        <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Аккаунт:&lt;/b&gt; %1</translation>
+    </message>
 </context>
 </TS>

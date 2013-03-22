@@ -106,5 +106,9 @@
         <source>Show list of united accounts</source>
         <translation>Show list of united accounts</translation>
     </message>
+    <message>
+        <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Account:&lt;/b&gt; %1</translation>
+    </message>
 </context>
 </TS>

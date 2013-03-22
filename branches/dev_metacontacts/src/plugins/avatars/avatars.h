@@ -97,9 +97,9 @@ protected slots:
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onVCardChanged(const Jid &AContactJid);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
-	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onSetAvatarByAction(bool);
 	void onClearAvatarByAction(bool);
 	void onIconStorageChanged();

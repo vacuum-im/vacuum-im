@@ -108,12 +108,12 @@ bool PrivacyLists::initObjects()
 		FPrivacyLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 		FRostersView = FRostersViewPlugin->rostersView();
-		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
-			SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-			SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+			SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 		connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+			SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 	}
 	return true;
 }
@@ -1311,12 +1311,12 @@ void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex)
 	}
 }
 
-void PrivacyLists::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void PrivacyLists::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void PrivacyLists::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	bool isMultiSelection = AIndexes.count()>1;
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
@@ -1397,7 +1397,7 @@ void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 	}
 }
 
-void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
+void PrivacyLists::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
 	if (ALabelId == FPrivacyLabelId)
 	{

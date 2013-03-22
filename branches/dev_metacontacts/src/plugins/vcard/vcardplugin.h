@@ -82,7 +82,7 @@ protected:
 	void insertMessageToolBarAction(IMessageToolBarWidget *AWidget);
 protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onShowVCardDialogByAction(bool);
 	void onShowVCardDialogByMessageWindowAction(bool);

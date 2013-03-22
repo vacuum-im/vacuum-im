@@ -15,6 +15,13 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="SearchLineEdit" name="sleSearch">
+     <property name="placeholderText">
+      <string>Search Contacts</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTreeView" name="trvReceivers">
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
@@ -23,13 +30,10 @@
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
      <property name="indentation">
-      <number>10</number>
+      <number>6</number>
      </property>
      <property name="rootIsDecorated">
       <bool>false</bool>
-     </property>
-     <property name="sortingEnabled">
-      <bool>true</bool>
      </property>
      <property name="allColumnsShowFocus">
       <bool>true</bool>
@@ -42,6 +46,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>SearchLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">utils/searchlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

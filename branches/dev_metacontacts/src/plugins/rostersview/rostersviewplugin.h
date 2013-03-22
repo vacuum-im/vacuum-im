@@ -23,8 +23,8 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/iaccountmanager.h>
 #include <interfaces/istatuschanger.h>
 #include <utils/action.h>
 #include <utils/options.h>
@@ -106,6 +106,7 @@ private:
 	IStatusChanger *FStatusChanger;
 	IPresencePlugin *FPresencePlugin;
 	IOptionsManager *FOptionsManager;
+	IAccountManager *FAccountManager;
 	IMainWindowPlugin *FMainWindowPlugin;
 private:
 	bool FStartRestoreExpandState;

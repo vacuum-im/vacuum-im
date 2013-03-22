@@ -5,11 +5,55 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QDomDocument>
-#include <QSortFilterProxyModel>
 
 #define ADR_ITEM_PTR            Action::DR_Parametr1
 
-#define SORT_HANDLER_ORDER      500
+class SortSearchProxyModel : 
+	public QSortFilterProxyModel
+{
+public:
+	SortSearchProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent) {
+		setSortLocaleAware(true);
+		setDynamicSortFilter(true);
+		setSortCaseSensitivity(Qt::CaseInsensitive);
+		setFilterCaseSensitivity(Qt::CaseInsensitive);
+	}
+protected:
+	bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight)  const
+	{
+		int leftTypeOrder = ALeft.data(RDR_KIND_ORDER).toInt();
+		int rightTypeOrder = ARight.data(RDR_KIND_ORDER).toInt();
+		if (leftTypeOrder == rightTypeOrder)
+		{
+			if (leftTypeOrder != RIKO_STREAM_ROOT)
+			{
+				int leftShow = ALeft.data(RDR_SHOW).toInt();
+				int rightShow = ARight.data(RDR_SHOW).toInt();
+				if (leftShow != rightShow)
+				{
+					static const int showOrders[] = {6,2,1,3,4,5,7,8};
+					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
+					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
+						return showOrders[leftShow] < showOrders[rightShow];
+				}
+			}
+			return QSortFilterProxyModel::lessThan(ALeft,ARight);
+		}
+		return leftTypeOrder < rightTypeOrder;
+	}
+	bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
+	{
+		QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
+		if (sourceModel()->hasChildren(index))
+		{
+			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+				if (filterAcceptsRow(childRow,index))
+					return true;
+			return false;
+		}
+		return QSortFilterProxyModel::filterAcceptsRow(AModelRow,AModelParent);
+	}
+};
 
 ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
@@ -34,49 +78,24 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 	connect(FModel,SIGNAL(itemInserted(QStandardItem *)),SLOT(onModelItemInserted(QStandardItem *)));
 	connect(FModel,SIGNAL(itemRemoving(QStandardItem *)),SLOT(onModelItemRemoving(QStandardItem *)));
 	connect(FModel,SIGNAL(itemDataChanged(QStandardItem *,int)),SLOT(onModelItemDataChanged(QStandardItem *,int)));
-	FModel->insertItemSortHandler(SORT_HANDLER_ORDER,this);
-	ui.trvReceivers->setModel(FModel);
+
+	FProxyModel = new SortSearchProxyModel(this);
+	FProxyModel->setSourceModel(FModel);
+	FProxyModel->sort(0,Qt::AscendingOrder);
+	ui.trvReceivers->setModel(FProxyModel);
 
 	initialize();
 
 	foreach(const Jid &streamJid, FMessageProcessor!=NULL ? FMessageProcessor->activeStreams() : QList<Jid>())
 		onActiveStreamAppended(streamJid);
 
+	connect(ui.sleSearch,SIGNAL(searchStart()),SLOT(onStartSearchContacts()));
 	connect(ui.trvReceivers,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onReceiversContextMenuRequested(const QPoint &)));
 }
 
 ReceiversWidget::~ReceiversWidget()
 {
 
-}
-
-AdvancedItemSortHandler::SortResult ReceiversWidget::advancedItemSort(int AOrder, const QStandardItem *ALeft, const QStandardItem *ARight) const
-{
-	if (AOrder == SORT_HANDLER_ORDER)
-	{
-		int leftTypeOrder = ALeft->data(RDR_KIND_ORDER).toInt();
-		int rightTypeOrder = ARight->data(RDR_KIND_ORDER).toInt();
-		if (leftTypeOrder == rightTypeOrder)
-		{
-			if (leftTypeOrder != RIKO_STREAM_ROOT)
-			{
-				int leftShow = ALeft->data(RDR_SHOW).toInt();
-				int rightShow = ARight->data(RDR_SHOW).toInt();
-				if (leftShow != rightShow)
-				{
-					static const int showOrders[] = {6,2,1,3,4,5,7,8};
-					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
-						return showOrders[leftShow]<showOrders[rightShow] ? AdvancedItemSortHandler::LessThen : AdvancedItemSortHandler::NotLessThen;
-				}
-			}
-			QString leftDisplay = ALeft->data(Qt::DisplayRole).toString().toLower();
-			QString rightDisplay = ARight->data(Qt::DisplayRole).toString().toLower();
-			return leftDisplay.localeAwareCompare(rightDisplay)<0 ? AdvancedItemSortHandler::LessThen : AdvancedItemSortHandler::NotLessThen;
-		}
-		return leftTypeOrder<rightTypeOrder ? AdvancedItemSortHandler::LessThen : AdvancedItemSortHandler::NotLessThen;
-	}
-	return AdvancedItemSortHandler::Undefined;
 }
 
 bool ReceiversWidget::isVisibleOnWindow() const
@@ -102,6 +121,27 @@ QTreeView *ReceiversWidget::receiversView() const
 AdvancedItemModel *ReceiversWidget::receiversModel() const
 {
 	return FModel;
+}
+
+QModelIndex ReceiversWidget::mapModelToView(QStandardItem *AItem)
+{
+	QModelIndex index = FModel->indexFromItem(AItem);
+	if (ui.trvReceivers->model() != FModel)
+	{
+		QAbstractProxyModel *proxy = qobject_cast<QAbstractProxyModel *>(ui.trvReceivers->model());
+		return proxy!=NULL ? proxy->mapFromSource(index) : QModelIndex();
+	}
+	return index;
+}
+
+QStandardItem *ReceiversWidget::mapViewToModel(const QModelIndex &AIndex)
+{
+	if (ui.trvReceivers->model() != FModel)
+	{
+		QAbstractProxyModel *proxy = qobject_cast<QAbstractProxyModel *>(ui.trvReceivers->model());
+		return proxy!=NULL ? FModel->itemFromIndex(proxy->mapToSource(AIndex)) : NULL;
+	}
+	return FModel->itemFromIndex(AIndex);
 }
 
 void ReceiversWidget::contextMenuForItem(QStandardItem *AItem, Menu *AMenu)
@@ -134,15 +174,19 @@ void ReceiversWidget::contextMenuForItem(QStandardItem *AItem, Menu *AMenu)
 
 		if (AItem == FModel->invisibleRootItem())
 		{
+			Action *selectLast = new Action(AMenu);
+			selectLast->setText(tr("Load Last Selection"));
+			selectLast->setEnabled(QFile::exists(Options::fileValue("messagewidgets.receiverswidget.last-selection").toString()));
+			connect(selectLast,SIGNAL(triggered()),SLOT(onSelectionLast()));
+			AMenu->addAction(selectLast,AG_MWRWCM_MWIDGETS_SELECT_LAST);
+
 			Action *selectLoad = new Action(AMenu);
 			selectLoad->setText(tr("Load Selection"));
-			selectLoad->setData(ADR_ITEM_PTR,(qint64)AItem);
 			connect(selectLoad,SIGNAL(triggered()),SLOT(onSelectionLoad()));
 			AMenu->addAction(selectLoad,AG_MWRWCM_MWIDGETS_SELECT_LOAD);
 
 			Action *selectSave = new Action(AMenu);
 			selectSave->setText(tr("Save Selection"));
-			selectSave->setData(ADR_ITEM_PTR,(qint64)AItem);
 			connect(selectSave,SIGNAL(triggered()),SLOT(onSelectionSave()));
 			AMenu->addAction(selectSave,AG_MWRWCM_MWIDGETS_SELECT_SAVE);
 		}
@@ -299,7 +343,7 @@ QStandardItem *ReceiversWidget::getStreamItem(const Jid &AStreamJid)
 		streamItem->setText(account!=NULL ? account->name() : AStreamJid.uBare());
 
 		FModel->invisibleRootItem()->appendRow(streamItem);
-		ui.trvReceivers->expand(FModel->indexFromItem(streamItem));
+		ui.trvReceivers->expand(mapModelToView(streamItem));
 	}
 	return streamItem;
 }
@@ -329,7 +373,7 @@ QStandardItem *ReceiversWidget::getGroupItem(const Jid &AStreamJid, const QStrin
 		QStandardItem *parentItem = groupPath.isEmpty() ? getStreamItem(AStreamJid) : getGroupItem(AStreamJid,groupPath.join(ROSTER_GROUP_DELIMITER),AGroupOrder);
 		parentItem->appendRow(groupItem);
 
-		ui.trvReceivers->expand(FModel->indexFromItem(groupItem));
+		ui.trvReceivers->expand(mapModelToView(groupItem));
 	}
 	return groupItem;
 }
@@ -422,6 +466,91 @@ Jid ReceiversWidget::findAvailStream(const Jid &AStreamJid) const
 	return Jid::null;
 }
 
+void ReceiversWidget::selectionLoad(const QString &AFileName)
+{
+	if (!AFileName.isEmpty())
+	{
+		QFile file(AFileName);
+		if (file.open(QFile::ReadOnly))
+		{
+			QString errorMsg;
+			QDomDocument doc;
+			if (doc.setContent(&file,true,&errorMsg))
+			{
+				if (doc.documentElement().namespaceURI() == "vacuum:messagewidgets:receiverswidget:selection")
+				{
+					clearSelection();
+					QDomElement streamElem = doc.documentElement().firstChildElement("stream");
+					while(!streamElem.isNull())
+					{
+						Jid streamJid = findAvailStream(streamElem.attribute("jid"));
+						if (streamJid.isValid())
+						{
+							QDomElement itemElem = streamElem.firstChildElement("item");
+							while(!itemElem.isNull())
+							{
+								setAddressSelection(streamJid,itemElem.text(),true);
+								itemElem = itemElem.nextSiblingElement("item");
+							}
+						}
+						streamElem = streamElem.nextSiblingElement("stream");
+					}
+				}
+				else
+				{
+					QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Incorrect file format"),QMessageBox::Ok);
+				}
+			}
+			else
+			{
+				QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Failed to read file: %1").arg(errorMsg),QMessageBox::Ok);
+			}
+		}
+		else
+		{
+			QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Failed to open file: %1").arg(file.errorString()),QMessageBox::Ok);
+		}
+	}
+}
+
+void ReceiversWidget::selectionSave(const QString &AFileName)
+{
+	if (!AFileName.isEmpty())
+	{
+		QFile file(AFileName);
+		if (file.open(QFile::WriteOnly))
+		{
+			QDomDocument doc;
+			doc.appendChild(doc.createElementNS("vacuum:messagewidgets:receiverswidget:selection","addresses"));
+
+			Jid streamJid;
+			QDomElement streamElem;
+			QMultiMap<Jid, Jid> addresses = selectedAddresses();
+			for (QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
+			{
+				if (streamJid != it.key())
+				{
+					streamJid = it.key();
+					streamElem = doc.documentElement().appendChild(doc.createElement("stream")).toElement();
+					streamElem.setAttribute("jid",streamJid.bare());
+				}
+
+				QDomElement itemElem = streamElem.appendChild(doc.createElement("item")).toElement();
+				itemElem.appendChild(doc.createTextNode(it->bare()));
+			}
+
+			file.write(doc.toByteArray());
+			file.close();
+
+			Options::setFileValue(AFileName,"messagewidgets.receiverswidget.last-selection");
+		}
+		else
+		{
+			QMessageBox::critical(this,tr("Failed to Save Contacts"),tr("Failed to create file: %1").arg(file.errorString()),QMessageBox::Ok);
+		}
+	}
+}
+
 void ReceiversWidget::selectAllContacts(QStandardItem *AParent)
 {
 	for (int row=0; row<AParent->rowCount(); row++)
@@ -499,11 +628,6 @@ void ReceiversWidget::onModelItemInserted(QStandardItem *AItem)
 		else if (itemKind == RIK_CONTACT)
 			FContactItems[streamJid].insertMulti(AItem->data(RDR_PREP_BARE_JID).toString(),AItem);
 	}
-
-	if (AItem->parent())
-		AItem->parent()->sortChildren(0);
-	else
-		FModel->sort(0);
 	updateCheckState(AItem->parent());
 }
 
@@ -560,10 +684,6 @@ void ReceiversWidget::onModelItemDataChanged(QStandardItem *AItem, int ARole)
 			for (int row=0; row<AItem->rowCount(); row++)
 				AItem->child(row)->setCheckState(state);
 		updateCheckState(AItem->parent());
-	}
-	else if (ARole==Qt::DisplayRole || ARole==RDR_KIND_ORDER || ARole==RDR_SHOW)
-	{
-		AItem->parent()->sortChildren(0);
 	}
 }
 
@@ -677,92 +797,19 @@ void ReceiversWidget::onRosterItemReceived(IRoster *ARoster, const IRosterItem &
 	}
 }
 
+void ReceiversWidget::onSelectionLast()
+{
+	selectionLoad(Options::fileValue("messagewidgets.receiverswidget.last-selection").toString());
+}
+
 void ReceiversWidget::onSelectionLoad()
 {
-	QString fileName = QFileDialog::getOpenFileName(this,tr("Load Contacts from File"),QString::null,"*.cts");
-	if (!fileName.isEmpty())
-	{
-		QFile file(fileName);
-		if (file.open(QFile::ReadOnly))
-		{
-			QString errorMsg;
-			QDomDocument doc;
-			if (doc.setContent(&file,true,&errorMsg))
-			{
-				if (doc.documentElement().namespaceURI() == "vacuum:messagewidgets:receiverswidget:selection")
-				{
-					clearSelection();
-					QDomElement streamElem = doc.documentElement().firstChildElement("stream");
-					while(!streamElem.isNull())
-					{
-						Jid streamJid = findAvailStream(streamElem.attribute("jid"));
-						if (streamJid.isValid())
-						{
-							QDomElement itemElem = streamElem.firstChildElement("item");
-							while(!itemElem.isNull())
-							{
-								setAddressSelection(streamJid,itemElem.text(),true);
-								itemElem = itemElem.nextSiblingElement("item");
-							}
-						}
-						streamElem = streamElem.nextSiblingElement("stream");
-					}
-				}
-				else
-				{
-					QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Incorrect file format"),QMessageBox::Ok);
-				}
-			}
-			else
-			{
-				QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Failed to read file: %1").arg(errorMsg),QMessageBox::Ok);
-			}
-		}
-		else
-		{
-			QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Failed to open file: %1").arg(file.errorString()),QMessageBox::Ok);
-		}
-	}
+	selectionLoad(QFileDialog::getOpenFileName(this,tr("Load Contacts from File"),QString::null,"*.cts"));
 }
 
 void ReceiversWidget::onSelectionSave()
 {
-	QMultiMap<Jid, Jid> addresses = selectedAddresses();
-	if (!addresses.isEmpty())
-	{
-		QString fileName = QFileDialog::getSaveFileName(this,tr("Save Contacts to File"),QString::null,"*.cts");
-		if (!fileName.isEmpty())
-		{
-			QFile file(fileName);
-			if (file.open(QFile::WriteOnly))
-			{
-				QDomDocument doc;
-				doc.appendChild(doc.createElementNS("vacuum:messagewidgets:receiverswidget:selection","addresses"));
-
-				Jid streamJid;
-				QDomElement streamElem;
-				for (QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
-				{
-					if (streamJid != it.key())
-					{
-						streamJid = it.key();
-						streamElem = doc.documentElement().appendChild(doc.createElement("stream")).toElement();
-						streamElem.setAttribute("jid",streamJid.bare());
-					}
-
-					QDomElement itemElem = streamElem.appendChild(doc.createElement("item")).toElement();
-					itemElem.appendChild(doc.createTextNode(it->bare()));
-				}
-
-				file.write(doc.toByteArray());
-				file.close();
-			}
-			else
-			{
-				QMessageBox::critical(this,tr("Failed to Save Contacts"),tr("Failed to create file: %1").arg(file.errorString()),QMessageBox::Ok);
-			}
-		}
-	}
+	selectionSave(QFileDialog::getSaveFileName(this,tr("Save Contacts to File"),QString::null,"*.cts"));
 }
 
 void ReceiversWidget::onSelectAllContacts()
@@ -800,7 +847,7 @@ void ReceiversWidget::onReceiversContextMenuRequested(const QPoint &APos)
 	{
 		Menu *menu = new Menu(this);
 		menu->setAttribute(Qt::WA_DeleteOnClose,true);
-		contextMenuForItem(FModel->itemFromIndex(index),menu);
+		contextMenuForItem(mapViewToModel(index),menu);
 
 		if (!menu->isEmpty())
 			menu->popup(ui.trvReceivers->mapToGlobal(APos));
@@ -817,4 +864,10 @@ void ReceiversWidget::onDeleteDelayedItems()
 		if (FDeleteDelayed.contains(item))
 			item->parent()->removeRow(item->row());
 	}
+}
+
+void ReceiversWidget::onStartSearchContacts()
+{
+	FProxyModel->setFilterWildcard(ui.sleSearch->text());
+	ui.trvReceivers->expandAll();
 }
