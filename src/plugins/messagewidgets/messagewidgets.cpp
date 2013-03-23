@@ -210,6 +210,8 @@ bool MessageWidgets::editContentsInsert(int AOrder, IEditWidget *AWidget, const 
 			fragment = QTextDocumentFragment::fromHtml(AData->html().replace(QChar::Null,""));
 		else if (AData->hasText())
 			fragment = QTextDocumentFragment::fromPlainText(AData->text().replace(QChar::Null,""));
+		else if (AData->hasHtml())
+			fragment = QTextDocumentFragment::fromPlainText(QTextDocumentFragment::fromHtml(AData->html().replace(QChar::Null,"")).toPlainText());
 
 		if (!fragment.isEmpty())
 		{
