@@ -117,7 +117,8 @@ public:
 	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
 	virtual QString senderColor(const QString &ASenderId) const;
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
-	virtual QTextDocumentFragment textUnderPosition(const QPoint &APosition, QWidget *AWidget) const;
+	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const;
+	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
 	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 	//AdiumMessageStyle
@@ -134,6 +135,7 @@ public:
 	static QList<QString> styleVariants(const QString &AStylePath);
 	static QMap<QString, QVariant> styleInfo(const QString &AStylePath);
 protected:
+	QWebHitTestResult hitTest(QWidget *AWidget, const QPoint &APosition) const;
 	bool isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const;
 	void setVariant(QWidget *AWidget, const QString  &AVariant);
 	QString makeStyleTemplate(const IMessageStyleOptions &AOptions);
