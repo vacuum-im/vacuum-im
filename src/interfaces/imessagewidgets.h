@@ -26,7 +26,7 @@ public:
 		ContactName         =0x02,
 		ContactShow         =0x04,
 		ContactStatus       =0x08,
-		ContactAvatar       =0x10
+		ContactAvatar       =0x10,
 	};
 public:
 	virtual QWidget *instance() = 0;
@@ -64,13 +64,16 @@ public:
 	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
 	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
-	virtual void contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu) =0;
+	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu) =0;
+	virtual QTextDocumentFragment selection() const =0;
+	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const =0;
+	virtual QTextDocumentFragment textFragmentAt(const QPoint &APosition) const =0;
 protected:
 	virtual void streamJidChanged(const Jid &ABefore) =0;
 	virtual void contactJidChanged(const Jid &ABefore) =0;
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
-	virtual void viewContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu) =0;
+	virtual void viewContextMenu(const QPoint &APosition, Menu *AMenu) =0;
 	virtual void urlClicked(const QUrl &AUrl) const =0;
 };
 
@@ -405,7 +408,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IInfoWidget,"Vacuum.Plugin.IInfoWidget/1.1")
-Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.1")
+Q_DECLARE_INTERFACE(IViewWidget,"Vacuum.Plugin.IViewWidget/1.2")
 Q_DECLARE_INTERFACE(IEditWidget,"Vacuum.Plugin.IEditWidget/1.2")
 Q_DECLARE_INTERFACE(IReceiversWidget,"Vacuum.Plugin.IReceiversWidget/1.0")
 Q_DECLARE_INTERFACE(IMenuBarWidget,"Vacuum.Plugin.IMenuBarWidget/1.0")

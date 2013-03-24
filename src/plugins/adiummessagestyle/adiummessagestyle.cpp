@@ -6,6 +6,8 @@
 #include <QRegExp>
 #include <QMimeData>
 #include <QWebFrame>
+#include <QTextBlock>
+#include <QWebElement>
 #include <QByteArray>
 #include <QClipboard>
 #include <QStringList>
@@ -122,25 +124,34 @@ QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 	return QTextDocumentFragment();
 }
 
-QTextDocumentFragment AdiumMessageStyle::textUnderPosition(const QPoint &APosition, QWidget *AWidget) const
+QTextCharFormat AdiumMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &APosition) const
 {
-	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-	if (view)
+	QWebHitTestResult result = hitTest(AWidget,APosition);
+	if (!result.isNull())
 	{
-#if QT_VERSION >= 0x040800
-		QWebHitTestResult result = view->page()->currentFrame()->hitTestContent(APosition);
-		if (!result.isContentSelected())
+		QWebElement element = result.linkElement();
+		if (element.isNull())
 		{
-			if (result.linkUrl().isValid())
-				return QTextDocumentFragment::fromHtml(QString("<a href='%1'>%2</a>").arg(result.linkUrl().toString(),result.linkText()));
+			element = result.element();
+			if (element.isNull())
+				element = result.enclosingBlockElement();
 		}
-		else
-#endif
-		{
-			return selection(AWidget);
-		}
+
+		QTextDocument doc;
+		doc.setHtml(element.toOuterXml());
+		QTextBlock block = doc.begin();
+		QTextBlock::iterator it = block.begin();
+		QTextFragment frag = it.fragment();
+
+		return ++it!=block.end() ? block.charFormat() : frag.charFormat();
 	}
-	return QTextDocumentFragment();
+	return QTextCharFormat();
+}
+
+QTextDocumentFragment AdiumMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
+{
+	QWebHitTestResult result = hitTest(AWidget,APosition);
+	return !result.isNull() ? QTextDocumentFragment::fromHtml(result.enclosingBlockElement().toOuterXml()) : QTextDocumentFragment();
 }
 
 bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
@@ -281,6 +292,13 @@ QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
 		}
 	}
 	return info;
+}
+
+QWebHitTestResult AdiumMessageStyle::hitTest(QWidget *AWidget, const QPoint &APosition) const
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	QWebFrame *frame = view!=NULL ? view->page()->frameAt(APosition) : NULL;
+	return frame!=NULL ? frame->hitTestContent(APosition) : QWebHitTestResult();
 }
 
 bool AdiumMessageStyle::isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const

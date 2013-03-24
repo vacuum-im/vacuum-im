@@ -43,8 +43,7 @@
 #include "usersproxymodel.h"
 #include "ui_multiuserchatwindow.h"
 
-struct WindowStatus
-{
+struct WindowStatus {
 	QDateTime startTime;
 	QDateTime createTime;
 	QDate lastDateSeparator;
@@ -187,7 +186,7 @@ protected slots:
 	void onNotifierActiveNotifyChanged(int ANotifyId);
 	void onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
 	void onViewContextQuoteActionTriggered(bool);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
+	void onViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu);
 	void onWindowActivated();
 	void onChatMessageReady();
 	void onChatWindowActivated();

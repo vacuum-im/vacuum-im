@@ -127,7 +127,7 @@ protected:
 	void deleteStreamWindows(const Jid &AStreamJid);
 protected slots:
 	void onViewWidgetUrlClicked(const QUrl &AUrl);
-	void onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu);
+	void onViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu);
 	void onViewContextCopyActionTriggered(bool);
 	void onViewContextUrlActionTriggered(bool);
 	void onViewContextSearchActionTriggered(bool);
