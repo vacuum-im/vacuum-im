@@ -159,7 +159,7 @@ bool RostersViewPlugin::initSettings()
 	Options::setDefaultValue(OPV_ROSTER_HIDESCROLLBAR,false);
 	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
 	Options::setDefaultValue(OPV_ROSTER_MERGESTREAMS,false);
-	Options::setDefaultValue(OPV_ROSTER_SHOWMERGEDSTREAMS,true);
+	Options::setDefaultValue(OPV_ROSTER_SHOWMERGEDSTREAMS,false);
 
 	if (FOptionsManager)
 	{
@@ -247,7 +247,9 @@ QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, i
 		
 		if (AIndex->kind()==RIK_STREAM_ROOT && ARole==RDR_FORCE_VISIBLE && model->streamsLayout()==IRostersModel::LayoutMerged)
 		{
-			if (!FShowMergedStreams)
+			if (AIndex->data(RDR_SHOW).toInt() == IPresence::Error)
+				return 1;
+			else if (!FShowMergedStreams)
 				return -1;
 		}
 	}
@@ -525,9 +527,14 @@ void RostersViewPlugin::onRostersViewIndexContextMenuAboutToShow()
 
 void RostersViewPlugin::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole)
 {
-	if (ARole == RDR_STATUS)
+	if (ARole == RDR_SHOW)
 	{
-		if (!Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool())
+		if (AIndex->kind() == RIK_STREAM_ROOT)
+			emit rosterDataChanged(AIndex,RDR_FORCE_VISIBLE);
+	}
+	else if (ARole == RDR_STATUS)
+	{
+		if (!FShowStatus)
 		{
 			if (AIndex->kind()==RIK_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
 				emit rosterLabelChanged(RLID_ROSTERSVIEW_STATUS,AIndex);
@@ -616,18 +623,19 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 
 		if (AIndex->kind() == RIK_CONTACTS_ROOT)
 		{
-			QMap<Jid, QString> streamsToolTips;
+			QStringList streamsToolTips;
 			foreach(const Jid &streamJid, FRostersView->rostersModel()->streams())
 			{
 				QMap<int, QString> toolTips;
 				FRostersView->toolTipsForIndex(FRostersView->rostersModel()->streamIndex(streamJid),NULL,toolTips);
 				if (!toolTips.isEmpty())
 				{
+					toolTips.remove(RTTO_AVATAR_IMAGE);
 					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTips.values()).join("<p/><nbsp>"));
-					streamsToolTips.insert(streamJid,tooltip);
+					streamsToolTips.append(tooltip);
 				}
 			}
-			ttInfo = QString("<span>%1</span>").arg(QStringList(streamsToolTips.values()).join("<hr><p/><nbsp>"));
+			ttInfo = QString("<span>%1</span>").arg(streamsToolTips.join("<hr><p/><nbsp>"));
 		}
 		else
 		{
@@ -636,7 +644,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 				ttInfo += "<big><b>" + Qt::escape(name) + "</b></big><br>";
 
 			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-			if (!streamJid.isEmpty() && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
+			if (!streamJid.isEmpty() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
 			{
 				IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
 				ttInfo += tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())) + "<br>";

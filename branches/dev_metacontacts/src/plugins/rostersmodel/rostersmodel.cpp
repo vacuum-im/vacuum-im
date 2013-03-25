@@ -234,15 +234,15 @@ void RostersModel::removeStream(const Jid &AStreamJid)
 		}
 		removeRosterIndex(sindex);
 
+		FContactsCache.remove(sindex);
+		FStreamIndexes.remove(AStreamJid);
+		emit rosterDataChanged(FContactsRoot,RDR_STREAMS);
+
 		if (FLayout==LayoutMerged && FStreamIndexes.isEmpty())
 		{
 			FContactsRoot->removeChildren();
 			removeRosterIndex(FContactsRoot,false);
 		}
-
-		FContactsCache.remove(sindex);
-		FStreamIndexes.remove(AStreamJid);
-		emit rosterDataChanged(FContactsRoot,RDR_STREAMS);
 
 		emit streamRemoved(AStreamJid);
 	}
