@@ -30,11 +30,14 @@ public:
 	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions);
 	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions);
 	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions);
-	virtual void contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
+	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu);
+	virtual QTextDocumentFragment selection() const;
+	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const;
+	virtual QTextDocumentFragment textFragmentAt(const QPoint &APosition) const;
 signals:
 	void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
 	void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
-	void contextMenuRequested(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu);
+	void viewContextMenu(const QPoint &APosition, Menu *AMenu);
 	void urlClicked(const QUrl &AUrl) const;
 protected:
 	void initialize();

@@ -86,11 +86,14 @@ public:
 	virtual void appendHtml(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 	virtual void appendText(const QString &AText, const IMessageContentOptions &AOptions) =0;
 	virtual void appendMessage(const Message &AMessage, const IMessageContentOptions &AOptions) =0;
-	virtual void contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu) =0;
+	virtual void contextMenuForView(const QPoint &APosition, Menu *AMenu) =0;
+	virtual QTextDocumentFragment selection() const =0;
+	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const =0;
+	virtual QTextDocumentFragment textFragmentAt(const QPoint &APosition) const =0;
 protected:
 	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
-	virtual void contextMenuRequested(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu) =0;
+	virtual void viewContextMenu(const QPoint &APosition, Menu *AMenu) =0;
 	virtual void urlClicked(const QUrl &AUrl) const =0;
 };
 

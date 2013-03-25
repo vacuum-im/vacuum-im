@@ -7,7 +7,6 @@
 EditWidget::EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
-	ui.medEditor->setAcceptRichText(true);
 	ui.medEditor->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
 	FWindow = AWindow;

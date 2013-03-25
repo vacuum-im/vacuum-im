@@ -117,9 +117,28 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 	appendHtml(TextManager::getDocumentBody(doc),options);
 }
 
-void ViewWidget::contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
+void ViewWidget::contextMenuForView(const QPoint &APosition, Menu *AMenu)
 {
-	emit contextMenuRequested(APosition,ASelection,AMenu);
+	emit viewContextMenu(APosition, AMenu);
+}
+
+QTextDocumentFragment ViewWidget::selection() const
+{
+	return FMessageStyle!=NULL ? FMessageStyle->selection(FStyleWidget) : QTextDocumentFragment();
+}
+
+QTextCharFormat ViewWidget::textFormatAt(const QPoint &APosition) const
+{
+	if (FMessageStyle && FStyleWidget)
+		return FMessageStyle->textFormatAt(FStyleWidget,FStyleWidget->mapFromGlobal(mapToGlobal(APosition)));
+	return QTextCharFormat();
+}
+
+QTextDocumentFragment ViewWidget::textFragmentAt(const QPoint &APosition) const
+{
+	if (FMessageStyle && FStyleWidget)
+		return FMessageStyle->textFragmentAt(FStyleWidget,FStyleWidget->mapFromGlobal(mapToGlobal(APosition)));
+	return QTextDocumentFragment();
 }
 
 void ViewWidget::initialize()
@@ -201,7 +220,7 @@ void ViewWidget::onCustomContextMenuRequested(const QPoint &APosition)
 	Menu *menu = new Menu(this);
 	menu->setAttribute(Qt::WA_DeleteOnClose, true);
 
-	contextMenuForView(APosition,FMessageStyle->textUnderPosition(APosition,FStyleWidget),menu);
+	contextMenuForView(APosition, menu);
 
 	if (!menu->isEmpty())
 		menu->popup(FStyleWidget->mapToGlobal(APosition));

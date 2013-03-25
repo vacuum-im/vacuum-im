@@ -39,6 +39,7 @@ include(utils.pri)
   INSTALLS        += sdk_utils
 
   #Translation
+  TRANS_BUILD_ROOT   = $${OUT_PWD}/../..
   TRANS_SOURCE_ROOT  = ..
   include(../translations/languages.inc)
 }

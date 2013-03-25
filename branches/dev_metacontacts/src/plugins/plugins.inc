@@ -18,6 +18,7 @@ target.path         = $$INSTALL_PLUGINS
 INSTALLS           += target
 
 #Translation
+TRANS_BUILD_ROOT   = $${OUT_PWD}/../../..
 TRANS_SOURCE_ROOT   = ../..
 include(../translations/languages.inc)
 

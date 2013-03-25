@@ -85,40 +85,31 @@ QTextDocumentFragment SimpleMessageStyle::selection(QWidget *AWidget) const
 	return view!=NULL ? view->textCursor().selection() : QTextDocumentFragment();
 }
 
-QTextDocumentFragment SimpleMessageStyle::textUnderPosition(const QPoint &APosition, QWidget *AWidget) const
+QTextCharFormat SimpleMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &APosition) const
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	return view!=NULL ? view->cursorForPosition(APosition).charFormat() : QTextCharFormat();
+}
+
+QTextDocumentFragment SimpleMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view)
 	{
 		QTextCursor cursor = view->cursorForPosition(APosition);
-		if (view->textCursor().selection().isEmpty() || view->textCursor().selectionStart()>cursor.position() || view->textCursor().selectionEnd()<cursor.position())
+		for (QTextBlock::iterator it = cursor.block().begin(); !it.atEnd(); ++it)
 		{
-			if (!view->anchorAt(APosition).isEmpty())
+			if (it.fragment().contains(cursor.position()))
 			{
-				QTextBlock block = cursor.block();
-				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
-				{
-					if (it.fragment().contains(cursor.position()))
-					{
-						cursor.setPosition(it.fragment().position());
-						cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
-						break;
-					}
-				}
+				cursor.setPosition(it.fragment().position());
+				cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
+				return cursor.selection();
 			}
-			else
-			{
-				cursor.select(QTextCursor::WordUnderCursor);
-			}
-			return cursor.selection();
-		}
-		else
-		{
-			return selection(AWidget);
 		}
 	}
 	return QTextDocumentFragment();
 }
+
 
 bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {

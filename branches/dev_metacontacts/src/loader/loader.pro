@@ -49,6 +49,7 @@ documents.files    = ../../AUTHORS ../../CHANGELOG ../../README ../../COPYING ..
 INSTALLS           += target resources documents
 
 #Translation
+TRANS_BUILD_ROOT   = $${OUT_PWD}/../..
 TRANS_SOURCE_ROOT  = ..
 include(../translations/languages.inc)
 

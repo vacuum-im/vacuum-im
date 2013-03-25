@@ -176,10 +176,12 @@ bool MessageWidgets::editContentsCreate(int AOrder, IMessageEditWidget *AWidget,
 
 bool MessageWidgets::editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData)
 {
-	Q_UNUSED(AWidget);
 	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
 	{
-		return AData->hasText() || AData->hasHtml();
+		if (AData->hasText())
+			return true;
+		else if (AWidget->isRichTextEnabled() && AData->hasHtml())
+			return true;
 	}
 	return false;
 }
@@ -188,19 +190,18 @@ bool MessageWidgets::editContentsInsert(int AOrder, IMessageEditWidget *AWidget,
 {
 	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
 	{
-		if (editContentsCanInsert(AOrder,AWidget,AData))
-		{
-			QTextDocumentFragment fragment;
-			if (AData->hasHtml())
-				fragment = QTextDocumentFragment::fromHtml(AData->html());
-			else if (AData->hasText())
-				fragment = QTextDocumentFragment::fromPlainText(AData->text());
+		QTextDocumentFragment fragment;
+		if (AWidget->isRichTextEnabled() && AData->hasHtml())
+			fragment = QTextDocumentFragment::fromHtml(AData->html().replace(QChar::Null,""));
+		else if (AData->hasText())
+			fragment = QTextDocumentFragment::fromPlainText(AData->text().replace(QChar::Null,""));
+		else if (AData->hasHtml())
+			fragment = QTextDocumentFragment::fromPlainText(QTextDocumentFragment::fromHtml(AData->html().replace(QChar::Null,"")).toPlainText());
 
-			if (!fragment.isEmpty())
-			{
-				QTextCursor cursor(ADocument);
-				cursor.insertFragment(fragment);
-			}
+		if (!fragment.isEmpty())
+		{
+			QTextCursor cursor(ADocument);
+			cursor.insertFragment(fragment);
 		}
 	}
 	return false;
@@ -235,8 +236,8 @@ IMessageInfoWidget *MessageWidgets::newInfoWidget(IMessageWindow *AWindow, QWidg
 IMessageViewWidget *MessageWidgets::newViewWidget(IMessageWindow *AWindow, QWidget *AParent)
 {
 	IMessageViewWidget *widget = new ViewWidget(this,AWindow,AParent);
-	connect(widget->instance(),SIGNAL(contextMenuRequested(const QPoint &, const QTextDocumentFragment &, Menu *)),
-		SLOT(onViewWidgetContextMenuRequested(const QPoint &, const QTextDocumentFragment &, Menu *)));
+	connect(widget->instance(),SIGNAL(viewContextMenu(const QPoint &, Menu *)),
+		SLOT(onViewWidgetContextMenu(const QPoint &, Menu *)));
 	connect(widget->instance(),SIGNAL(urlClicked(const QUrl &)),SLOT(onViewWidgetUrlClicked(const QUrl &)));
 	FCleanupHandler.add(widget->instance());
 	emit viewWidgetCreated(widget);
@@ -577,16 +578,17 @@ void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
 	}
 }
 
-void MessageWidgets::onViewWidgetContextMenuRequested(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu)
+void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu)
 {
-	Q_UNUSED(APosition);
 	IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
-	if (widget && !AText.isEmpty())
+
+	QTextDocumentFragment textSelection = widget!=NULL ? widget->selection() : QTextDocumentFragment();
+	if (!textSelection.isEmpty())
 	{
 		Action *copyAction = new Action(AMenu);
 		copyAction->setText(tr("Copy"));
 		copyAction->setShortcut(QKeySequence::Copy);
-		copyAction->setData(ADR_CONTEXT_DATA,AText.toHtml());
+		copyAction->setData(ADR_CONTEXT_DATA,textSelection.toHtml());
 		connect(copyAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
 		AMenu->addAction(copyAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
 
@@ -594,33 +596,32 @@ void MessageWidgets::onViewWidgetContextMenuRequested(const QPoint &APosition, c
 		if (quoteAction)
 			AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
 
-		QUrl href = TextManager::getTextFragmentHref(AText);
-		if (href.isValid())
-		{
-			bool isMailto = href.scheme()=="mailto";
+		QString plainSelection = textSelection.toPlainText().trimmed();
+		Action *searchAction = new Action(AMenu);
+		searchAction->setText(tr("Search on Google '%1'").arg(TextManager::getElidedString(plainSelection,Qt::ElideRight,30)));
+		searchAction->setData(ADR_CONTEXT_DATA, plainSelection);
+		connect(searchAction,SIGNAL(triggered(bool)),SLOT(onViewContextSearchActionTriggered(bool)));
+		AMenu->addAction(searchAction,AG_VWCM_MESSAGEWIDGETS_SEARCH,true);
+	}
 
-			Action *urlAction = new Action(AMenu);
-			urlAction->setText(isMailto ? tr("Send mail") : tr("Open link"));
-			urlAction->setData(ADR_CONTEXT_DATA,href.toString());
-			connect(urlAction,SIGNAL(triggered(bool)),SLOT(onViewContextUrlActionTriggered(bool)));
-			AMenu->addAction(urlAction,AG_VWCM_MESSAGEWIDGETS_URL,true);
-			AMenu->setDefaultAction(urlAction);
+	QTextDocumentFragment textFragment = widget!=NULL ? widget->textFragmentAt(APosition) : QTextDocumentFragment();
+	QUrl href = TextManager::getTextFragmentHref(!textSelection.isEmpty() ? textSelection : textFragment);
+	if (href.isValid())
+	{
+		bool isMailto = href.scheme()=="mailto";
 
-			Action *copyHrefAction = new Action(AMenu);
-			copyHrefAction->setText(tr("Copy address"));
-			copyHrefAction->setData(ADR_CONTEXT_DATA,isMailto ? href.path() : href.toString());
-			connect(copyHrefAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
-			AMenu->addAction(copyHrefAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
-		}
-		else
-		{
-			QString plainSelection = AText.toPlainText().trimmed();
-			Action *searchAction = new Action(AMenu);
-			searchAction->setText(tr("Search on Google '%1'").arg(TextManager::getElidedString(plainSelection,Qt::ElideRight,30)));
-			searchAction->setData(ADR_CONTEXT_DATA, plainSelection);
-			connect(searchAction,SIGNAL(triggered(bool)),SLOT(onViewContextSearchActionTriggered(bool)));
-			AMenu->addAction(searchAction,AG_VWCM_MESSAGEWIDGETS_SEARCH,true);
-		}
+		Action *urlAction = new Action(AMenu);
+		urlAction->setText(isMailto ? tr("Send mail") : tr("Open link"));
+		urlAction->setData(ADR_CONTEXT_DATA,href.toString());
+		connect(urlAction,SIGNAL(triggered(bool)),SLOT(onViewContextUrlActionTriggered(bool)));
+		AMenu->addAction(urlAction,AG_VWCM_MESSAGEWIDGETS_URL,true);
+		AMenu->setDefaultAction(urlAction);
+
+		Action *copyHrefAction = new Action(AMenu);
+		copyHrefAction->setText(tr("Copy address"));
+		copyHrefAction->setData(ADR_CONTEXT_DATA,isMailto ? href.path() : href.toString());
+		connect(copyHrefAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
+		AMenu->addAction(copyHrefAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
 	}
 }
 
