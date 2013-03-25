@@ -687,38 +687,38 @@ bool NormalMessageHandler::isAnyPresenceOpened(const QStringList &AStreams) cons
 
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> normalDialogKinds = QList<int>() 
+	static const QList<int> acceptKinds = QList<int>() 
 		<< RIK_STREAM_ROOT 
 		<< RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE
 		<< RIK_GROUP << RIK_GROUP_BLANK	<< RIK_GROUP_NOT_IN_ROSTER;
 	static const QList<int> contactKinds =  QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
 	static const QList<int> groupKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_NOT_IN_ROSTER;
 
-	if (!ASelected.isEmpty())
+	bool hasGroups = false;
+	bool hasContacts = false;
+	bool hasOpenedStreams = false;
+	for(int i=0; i<ASelected.count(); i++)
 	{
-		bool hasGroups = false;
-		bool hasContacts = false;
-		foreach(IRosterIndex *index, ASelected)
-		{
-			int indexKind = index->kind();
-			if (!normalDialogKinds.contains(indexKind))
-				return false;
-			else if (hasGroups && !groupKinds.contains(indexKind))
-				return false;
-			else if (hasContacts && !contactKinds.contains(indexKind))
-				return false;
-			else if (groupKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAMS).toStringList()))
-				return false;
-			else if (contactKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
-				return false;
-			else if (indexKind==RIK_STREAM_ROOT && !isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
-				return false;
-			hasGroups = hasGroups || groupKinds.contains(indexKind);
-			hasContacts = hasContacts || contactKinds.contains(indexKind);
-		}
-		return true;
+		IRosterIndex *index = ASelected.at(i);
+		int indexKind = index->kind();
+		if (!acceptKinds.contains(indexKind))
+			return false;
+		else if (hasGroups && !groupKinds.contains(indexKind))
+			return false;
+		else if (hasContacts && !contactKinds.contains(indexKind))
+			return false;
+		else if (groupKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAMS).toStringList()))
+			return false;
+		else if (contactKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
+			return false;
+		else if (indexKind==RIK_STREAM_ROOT && isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
+			hasOpenedStreams = true;
+		else if (!hasOpenedStreams && i==ASelected.count()-1)
+			return false;
+		hasGroups = hasGroups || groupKinds.contains(indexKind);
+		hasContacts = hasContacts || contactKinds.contains(indexKind);
 	}
-	return false;
+	return !ASelected.isEmpty();
 }
 
 QMap<int,QStringList> NormalMessageHandler::indexesRolesMap(const QList<IRosterIndex *> &AIndexes) const
@@ -757,9 +757,12 @@ QMap<int,QStringList> NormalMessageHandler::indexesRolesMap(const QList<IRosterI
 		}
 		else if (indexKind == RIK_STREAM_ROOT)
 		{
-			rolesMap[RDR_STREAM_JID].append(index->data(RDR_STREAM_JID).toString());
-			rolesMap[RDR_PREP_BARE_JID].append(QString::null);
-			rolesMap[RDR_GROUP].append(QString::null);
+			if (isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
+			{
+				rolesMap[RDR_STREAM_JID].append(index->data(RDR_STREAM_JID).toString());
+				rolesMap[RDR_PREP_BARE_JID].append(QString::null);
+				rolesMap[RDR_GROUP].append(QString::null);
+			}
 		}
 		else
 		{

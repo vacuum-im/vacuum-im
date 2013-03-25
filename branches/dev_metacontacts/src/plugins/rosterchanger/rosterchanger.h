@@ -103,7 +103,7 @@ protected:
 	SubscriptionDialog *createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage);
 protected:
 	bool isRosterOpened(const Jid &AStreamJid) const;
-	bool isAnyRosterOpened(const QStringList &AStreams) const;
+	bool isAllRostersOpened(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QMap<int, QStringList> groupIndexesRolesMap(const QList<IRosterIndex *> &AIndexes) const;
 	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,bool ANewGroup, bool ARootGroup, bool ABlank, const char *ASlot, Menu *AParent);

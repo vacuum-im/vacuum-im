@@ -621,23 +621,20 @@ bool Avatars::updateIqAvatar(const Jid &AContactJid, const QString &AHash)
 bool Avatars::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
 	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
-	if (!ASelected.isEmpty())
+
+	int singleKind = -1;
+	foreach(IRosterIndex *index, ASelected)
 	{
-		int singleKind = -1;
-		foreach(IRosterIndex *index, ASelected)
-		{
-			int indexKind = index->kind();
-			if (!acceptTypes.contains(indexKind))
-				return false;
-			else if (singleKind!=-1 && singleKind!=indexKind)
-				return false;
-			else if (!FStreamAvatars.contains(index->data(RDR_STREAM_JID).toString()))
-				return false;
-			singleKind = indexKind;
-		}
-		return true;
+		int indexKind = index->kind();
+		if (!acceptTypes.contains(indexKind))
+			return false;
+		else if (singleKind!=-1 && singleKind!=indexKind)
+			return false;
+		else if (!FStreamAvatars.contains(index->data(RDR_STREAM_JID).toString()))
+			return false;
+		singleKind = indexKind;
 	}
-	return false;
+	return !ASelected.isEmpty();
 }
 
 void Avatars::onStreamOpened(IXmppStream *AXmppStream)

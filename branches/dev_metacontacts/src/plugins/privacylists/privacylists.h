@@ -50,8 +50,8 @@ public:
 	virtual IPrivacyRule contactAutoListRule(const Jid &AContactJid, const QString &AAutoList) const;
 	virtual bool isGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const;
 	virtual bool isContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const;
-	virtual void setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool AInserted);
-	virtual void setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool AInserted);
+	virtual void setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool APresent);
+	virtual void setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool APresent);
 	virtual IPrivacyRule offRosterRule() const;
 	virtual bool isOffRosterBlocked(const Jid &AStreamJid) const;
 	virtual void setOffRosterBlocked(const Jid &AStreamJid, bool ABlocked);
@@ -91,7 +91,7 @@ protected:
 	void sendOfflinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList);
 	void setPrivacyLabel(const Jid &AStreamJid, const Jid &AContactJid, bool AVisible);
 	void updatePrivacyLabels(const Jid &AStreamJid);
-	bool isAnyReady(const QStringList &AStreams) const;
+	bool isAllStreamsReady(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected slots:
 	void onListAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList);
@@ -111,8 +111,8 @@ protected slots:
 	void onSetActiveListByAction(bool);
 	void onSetDefaultListByAction(bool);
 	void onChangeStreamsAutoPrivacy(bool);
-	void onChangeContactsAutoListed(bool AInserted);
-	void onChangeGroupsAutoListed(bool AInserted);
+	void onChangeContactsAutoListed(bool APresent);
+	void onChangeGroupsAutoListed(bool APresent);
 	void onChangeStreamsOffRosterBlocked(bool ABlocked);
 	void onEditListsDialogDestroyed(const Jid &AStreamJid);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);

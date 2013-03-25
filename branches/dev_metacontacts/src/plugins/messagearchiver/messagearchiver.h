@@ -178,7 +178,7 @@ protected:
 	QMultiMap<int, IArchiveEngine *> engineOrderByCapability(quint32 ACapability, const Jid &AStreamJid) const;
 	void openHistoryOptionsNode(const Jid &AStreamJid);
 	void closeHistoryOptionsNode(const Jid &AStreamJid);
-	Menu *createContextMenu(const Jid &AStreamJid, const QStringList &AContacts, QWidget *AParent) const;
+	Menu *createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const;
 	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
 	bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
 	bool isOTRStanzaSession(const IStanzaSession &ASession) const;

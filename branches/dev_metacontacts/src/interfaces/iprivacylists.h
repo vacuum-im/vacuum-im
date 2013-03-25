@@ -71,8 +71,8 @@ public:
 	virtual IPrivacyRule contactAutoListRule(const Jid &AContactJid, const QString &AAutoList) const =0;
 	virtual bool isGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const =0;
 	virtual bool isContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const =0;
-	virtual void setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool AInserted) =0;
-	virtual void setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool AInserted) =0;
+	virtual void setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool APresent) =0;
+	virtual void setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool APresent) =0;
 	virtual IPrivacyRule offRosterRule() const =0;
 	virtual bool isOffRosterBlocked(const Jid &AStreamJid) const =0;
 	virtual void setOffRosterBlocked(const Jid &AStreamJid, bool ABlocked) =0;

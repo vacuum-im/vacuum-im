@@ -239,13 +239,13 @@ bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *A
 		{
 			if (indexKind == RIK_GROUP)
 			{
-				if (isAnyRosterOpened(indexData.value(RDR_STREAMS).toStringList()) && indexData.value(RDR_GROUP).toString().contains(ROSTER_GROUP_DELIMITER))
+				if (isAllRostersOpened(indexData.value(RDR_STREAMS).toStringList()) && indexData.value(RDR_GROUP).toString().contains(ROSTER_GROUP_DELIMITER))
 					return true;
 			}
 		}
 		else if (hoverKind == RIK_GROUP)
 		{
-			if (isAnyRosterOpened(AHover->data(RDR_STREAMS).toStringList()))
+			if (isAllRostersOpened(AHover->data(RDR_STREAMS).toStringList()))
 			{
 				if (indexKind == RIK_CONTACT)
 				{
@@ -270,7 +270,7 @@ bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *A
 		}
 		else if (hoverKind == RIK_GROUP_BLANK)
 		{
-			if (isAnyRosterOpened(AHover->data(RDR_STREAMS).toStringList()))
+			if (isAllRostersOpened(AHover->data(RDR_STREAMS).toStringList()))
 			{
 				if (indexKind == RIK_CONTACT)
 				{
@@ -372,7 +372,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 		}
 		else if (hoverKind == RIK_CONTACTS_ROOT)
 		{
-			if (indexKind==RIK_GROUP && isAnyRosterOpened(indexData.value(RDR_STREAMS).toStringList()))
+			if (indexKind==RIK_GROUP && isAllRostersOpened(indexData.value(RDR_STREAMS).toStringList()))
 			{
 				QStringList streams;
 				QStringList groups;
@@ -449,7 +449,7 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 			else if (indexKind==RIK_GROUP && hoverKind!=RIK_GROUP_BLANK)
 			{
 				QStringList destStreams = isLayoutMerged ? indexData.value(RDR_STREAMS).toStringList() : AHover->data(RDR_STREAMS).toStringList();
-				if (isAnyRosterOpened(destStreams))
+				if (isAllRostersOpened(destStreams))
 				{
 					Action *action = new Action(AMenu);
 					if (isLayoutMerged || AHover->data(RDR_STREAMS)==indexData.value(RDR_STREAMS))
@@ -529,7 +529,7 @@ quint32 RosterChanger::rosterEditLabel(int AOrder, int ADataRole, const QModelIn
 	{
 		if (indexKind == RIK_GROUP)
 		{
-			if (isAnyRosterOpened(AIndex.data(RDR_STREAMS).toStringList()))
+			if (isAllRostersOpened(AIndex.data(RDR_STREAMS).toStringList()))
 				return AdvancedDelegateItem::DisplayId;
 		}
 		else if (isRosterOpened(AIndex.data(RDR_STREAM_JID).toString()))
@@ -835,45 +835,35 @@ bool RosterChanger::isRosterOpened(const Jid &AStreamJid) const
 	return roster!=NULL && roster->isOpen();
 }
 
-bool RosterChanger::isAnyRosterOpened(const QStringList &AStreams) const
+bool RosterChanger::isAllRostersOpened(const QStringList &AStreams) const
 {
 	foreach(const QString &streamJid, AStreams)
-		if (isRosterOpened(streamJid))
-			return true;
-	return false;
+		if (!isRosterOpened(streamJid))
+			return false;
+	return !AStreams.isEmpty();
 }
 
 bool RosterChanger::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
 	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
-	if (!ASelected.isEmpty())
-	{
-		int singleKind = -1;
-		foreach(IRosterIndex *index, ASelected)
-		{
-			int indexKind = index->kind();
-			if (!acceptKinds.contains(indexKind))
-				return false;
-			if (singleKind!=-1 && singleKind!=indexKind)
-				return false;
-			if (indexKind==RIK_STREAM_ROOT && ASelected.count()>1)
-				return false;
-			singleKind = indexKind;
 
-			if (indexKind == RIK_GROUP)
-			{
-				if (!isAnyRosterOpened(index->data(RDR_STREAMS).toStringList()))
-					return false;
-			}
-			else
-			{
-				if (!isRosterOpened(index->data(RDR_STREAM_JID).toString()))
-					return false;
-			}
-		}
-		return true;
+	int singleKind = -1;
+	foreach(IRosterIndex *index, ASelected)
+	{
+		int indexKind = index->kind();
+		if (!acceptKinds.contains(indexKind))
+			return false;
+		else if (singleKind!=-1 && singleKind!=indexKind)
+			return false;
+		else if (indexKind==RIK_STREAM_ROOT && ASelected.count()>1)
+			return false;
+		else if (indexKind==RIK_GROUP && !isAllRostersOpened(index->data(RDR_STREAMS).toStringList()))
+			return false;
+		else if (indexKind!=RIK_GROUP && !isRosterOpened(index->data(RDR_STREAM_JID).toString()))
+			return false;
+		singleKind = indexKind;
 	}
-	return false;
+	return !ASelected.isEmpty();
 }
 
 QMap<int, QStringList> RosterChanger::groupIndexesRolesMap(const QList<IRosterIndex *> &AIndexes) const
@@ -1126,13 +1116,16 @@ void RosterChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 		int indexKind = firstIndex->kind();
 		if (indexKind == RIK_STREAM_ROOT)
 		{
-			Action *action = new Action(AMenu);
-			action->setText(tr("Add Contact..."));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-			action->setData(ADR_STREAM_JID, firstIndex->data(RDR_STREAM_JID));
-			action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
-			AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
+			if (!isMultiSelection)
+			{
+				Action *action = new Action(AMenu);
+				action->setText(tr("Add Contact..."));
+				action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
+				action->setData(ADR_STREAM_JID, firstIndex->data(RDR_STREAM_JID));
+				action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
+				connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
+				AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
+			}
 		}
 		else if (indexKind == RIK_CONTACT || indexKind == RIK_AGENT)
 		{
@@ -1299,16 +1292,19 @@ void RosterChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 
 			if (!isMultiSelection)
 			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Add Contact..."));
-				action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
-				action->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID).value(0));
-				action->setData(ADR_GROUP,rolesMap.value(RDR_GROUP).value(0));
-				action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
-				AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
+				if (rolesMap.value(RDR_STREAM_JID).count() == 1)
+				{
+					Action *action = new Action(AMenu);
+					action->setText(tr("Add Contact..."));
+					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_ADD_CONTACT);
+					action->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID).first());
+					action->setData(ADR_GROUP,rolesMap.value(RDR_GROUP).first());
+					action->setShortcutId(SCT_ROSTERVIEW_ADDCONTACT);
+					connect(action,SIGNAL(triggered(bool)),SLOT(onShowAddContactDialog(bool)));
+					AMenu->addAction(action,AG_RVCM_RCHANGER_ADD_CONTACT,true);
+				}
 
-				action = new Action(AMenu);
+				Action *action = new Action(AMenu);
 				action->setData(data);
 				action->setText(tr("Rename"));
 				action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_RENAME);
@@ -1438,7 +1434,7 @@ void RosterChanger::addContactsToGroup(const QStringList &AStreams, const QStrin
 
 void RosterChanger::copyContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QString &AGroup) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && isAnyRosterOpened(AStreams))
+	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && isAllRostersOpened(AStreams))
 	{
 		QString newGroupName;
 		if (AGroup.endsWith(ROSTER_GROUP_DELIMITER))
@@ -1460,7 +1456,7 @@ void RosterChanger::copyContactsToGroup(const QStringList &AStreams, const QStri
 
 void RosterChanger::moveContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AGroupsFrom, const QString &AGroupTo) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && AStreams.count()==AGroupsFrom.count() && isAnyRosterOpened(AStreams))
+	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && AStreams.count()==AGroupsFrom.count() && isAllRostersOpened(AStreams))
 	{
 		QString newGroupName;
 		if (AGroupTo.endsWith(ROSTER_GROUP_DELIMITER))
@@ -1496,7 +1492,7 @@ void RosterChanger::removeContactsFromGroups(const QStringList &AStreams, const 
 
 void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const QStringList &AContacts) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && isAnyRosterOpened(AStreams))
+	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && isAllRostersOpened(AStreams))
 	{
 		int button = QMessageBox::No;
 		if (AContacts.count() == 1)
@@ -1555,7 +1551,7 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 
 void RosterChanger::renameGroups(const QStringList &AStreams, const QStringList &AGroups, const QString &AOldName) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AGroups.count() && isAnyRosterOpened(AStreams))
+	if (!AStreams.isEmpty() && AStreams.count()==AGroups.count() && isAllRostersOpened(AStreams))
 	{
 		QString newGroupPart = QInputDialog::getText(NULL,tr("Rename Group"),tr("Enter group name:"),QLineEdit::Normal,AOldName);
 		for(int i=0; !newGroupPart.isEmpty() && newGroupPart!=AOldName && i<AStreams.count(); i++)
@@ -1575,7 +1571,7 @@ void RosterChanger::renameGroups(const QStringList &AStreams, const QStringList 
 
 void RosterChanger::copyGroupsToGroup(const QStringList &AStreams, const QStringList &AGroups, const QString &AGroupTo) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AGroups.count() && isAnyRosterOpened(AStreams))
+	if (!AStreams.isEmpty() && AStreams.count()==AGroups.count() && isAllRostersOpened(AStreams))
 	{
 		QString newGroupName;
 		if (AGroupTo.endsWith(ROSTER_GROUP_DELIMITER))
@@ -1597,7 +1593,7 @@ void RosterChanger::copyGroupsToGroup(const QStringList &AStreams, const QString
 
 void RosterChanger::moveGroupsToGroup(const QStringList &AStreams, const QStringList &AGroups, const QString &AGroupTo) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AGroups.count() && isAnyRosterOpened(AStreams))
+	if (!AStreams.isEmpty() && AStreams.count()==AGroups.count() && isAllRostersOpened(AStreams))
 	{
 		QString newGroupName;
 		if (AGroupTo.endsWith(ROSTER_GROUP_DELIMITER))

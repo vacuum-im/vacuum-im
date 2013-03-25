@@ -1539,20 +1539,51 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
 	}
 }
 
-Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringList &AContacts, QWidget *AParent) const
+Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const
 {
-	bool isStreamMenu = AStreamJid==AContacts.value(0);
+	bool isMultiSelection = AStreams.count()>1;
+	bool isStreamMenu = Jid(AStreams.first()).pBare()==Jid(AContacts.first()).pBare();
+
+	bool isAllAutoSave = true;
+	bool isAllSupported = true;
+	bool isAllPrefsEnabled = true;
+	bool isAllDefaultPrefs = !isStreamMenu;
+	QString allPrefsSave = QString::null;
+	QString allPrefsOtr = QString::null;
+	for (int i=0; i<AStreams.count(); i++)
+	{
+		isAllAutoSave = isAllAutoSave && isArchiveAutoSave(AStreams.at(i));
+		isAllSupported = isAllSupported && isSupported(AStreams.at(i),NS_ARCHIVE_AUTO);
+		isAllPrefsEnabled = isAllPrefsEnabled && isArchivePrefsEnabled(AStreams.at(i));
+
+		if (isAllPrefsEnabled)
+		{
+			IArchiveItemPrefs itemPrefs = isStreamMenu ? archivePrefs(AStreams.at(i)).defaultPrefs : archiveItemPrefs(AStreams.at(i),AContacts.at(i));
+
+			if (allPrefsSave.isNull())
+				allPrefsSave = itemPrefs.save;
+			else if (allPrefsSave != itemPrefs.save)
+				allPrefsSave = "-=different=-";
+
+			if (allPrefsOtr.isNull())
+				allPrefsOtr = itemPrefs.otr;
+			else if (allPrefsOtr != itemPrefs.otr)
+				allPrefsOtr = "-=different=-";
+			
+			isAllDefaultPrefs = isAllDefaultPrefs && !archivePrefs(AStreams.at(i)).itemPrefs.contains(AContacts.at(i));
+		}
+	}
 
 	Menu *menu = new Menu(AParent);
 	menu->setTitle(tr("History"));
 	menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
 
-	if (AContacts.count()==1 && !engineOrderByCapability(IArchiveEngine::ArchiveManagement,AStreamJid).isEmpty())
+	if (!isMultiSelection && !engineOrderByCapability(IArchiveEngine::ArchiveManagement,AStreams.at(0)).isEmpty())
 	{
 		Action *viewAction = new Action(menu);
 		viewAction->setText(tr("View History"));
 		viewAction->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
-		viewAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		viewAction->setData(ADR_STREAM_JID,AStreams.first());
 		if (!isStreamMenu)
 			viewAction->setData(ADR_CONTACT_JID,AContacts.first());
 		viewAction->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
@@ -1560,102 +1591,107 @@ Menu *MessageArchiver::createContextMenu(const Jid &AStreamJid, const QStringLis
 		menu->addAction(viewAction,AG_DEFAULT,false);
 	}
 
-	if (isStreamMenu && isSupported(AStreamJid,NS_ARCHIVE_AUTO))
+	if (isStreamMenu && isAllSupported)
 	{
 		Action *autoAction = new Action(menu);
 		autoAction->setCheckable(true);
 		autoAction->setText(tr("Automatic Archiving"));
-		autoAction->setData(ADR_STREAM_JID,AStreamJid.full());
-		autoAction->setChecked(isArchiveAutoSave(AStreamJid));
+		autoAction->setData(ADR_STREAM_JID,AStreams);
+		autoAction->setChecked(isAllAutoSave);
 		connect(autoAction,SIGNAL(triggered(bool)),SLOT(onSetAutoArchivingByAction(bool)));
 		menu->addAction(autoAction,AG_DEFAULT+100,false);
 	}
 
-	if (isArchivePrefsEnabled(AStreamJid))
+	if (isAllPrefsEnabled)
 	{
-		IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
-		bool isSingleItemPrefs = AContacts.count()==1;
-		bool isSeparateItemPrefs = !isStreamMenu && AContacts.count()==1 && prefs.itemPrefs.contains(AContacts.first());
-		IArchiveItemPrefs itemPrefs = isStreamMenu ? archivePrefs(AStreamJid).defaultPrefs : archiveItemPrefs(AStreamJid,AContacts.value(0));
-
 		Action *fullSaveAction = new Action(menu);
 		fullSaveAction->setCheckable(true);
 		fullSaveAction->setText(tr("Save Messages with Formatting"));
-		fullSaveAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		fullSaveAction->setData(ADR_STREAM_JID,AStreams);
 		fullSaveAction->setData(ADR_CONTACT_JID,AContacts);
 		fullSaveAction->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_MESSAGE);
-		fullSaveAction->setChecked(isSingleItemPrefs && (itemPrefs.save==ARCHIVE_SAVE_MESSAGE || itemPrefs.save==ARCHIVE_SAVE_STREAM));
+		fullSaveAction->setChecked(allPrefsSave==ARCHIVE_SAVE_MESSAGE || allPrefsSave==ARCHIVE_SAVE_STREAM);
 		connect(fullSaveAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
 		menu->addAction(fullSaveAction,AG_DEFAULT+200);
 
 		Action *bodySaveAction = new Action(menu);
 		bodySaveAction->setCheckable(true);
 		bodySaveAction->setText(tr("Save Only Messages Text"));
-		bodySaveAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		bodySaveAction->setData(ADR_STREAM_JID,AStreams);
 		bodySaveAction->setData(ADR_CONTACT_JID,AContacts);
 		bodySaveAction->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_BODY);
-		bodySaveAction->setChecked(isSingleItemPrefs && itemPrefs.save==ARCHIVE_SAVE_BODY);
+		bodySaveAction->setChecked(allPrefsSave == ARCHIVE_SAVE_BODY);
 		connect(bodySaveAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
 		menu->addAction(bodySaveAction,AG_DEFAULT+200);
 
 		Action *disableSaveAction = new Action(menu);
 		disableSaveAction->setCheckable(true);
 		disableSaveAction->setText(tr("Do not Save Messages"));
-		disableSaveAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		disableSaveAction->setData(ADR_STREAM_JID,AStreams);
 		disableSaveAction->setData(ADR_CONTACT_JID,AContacts);
 		disableSaveAction->setData(ADR_ITEM_SAVE,ARCHIVE_SAVE_FALSE);
-		disableSaveAction->setChecked(isSingleItemPrefs && itemPrefs.save==ARCHIVE_SAVE_FALSE);
+		disableSaveAction->setChecked(allPrefsSave == ARCHIVE_SAVE_FALSE);
 		connect(disableSaveAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
 		menu->addAction(disableSaveAction,AG_DEFAULT+200);
+
+		QActionGroup *saveGroup = new QActionGroup(menu);
+		saveGroup->addAction(fullSaveAction);
+		saveGroup->addAction(bodySaveAction);
+		saveGroup->addAction(disableSaveAction);
 
 		Action *allowOTRAction = new Action(menu);
 		allowOTRAction->setCheckable(true);
 		allowOTRAction->setText(tr("Allow Off-The-Record Sessions"));
-		allowOTRAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		allowOTRAction->setData(ADR_STREAM_JID,AStreams);
 		allowOTRAction->setData(ADR_CONTACT_JID,AContacts);
 		allowOTRAction->setData(ADR_ITEM_OTR,ARCHIVE_OTR_CONCEDE);
-		allowOTRAction->setChecked(isSingleItemPrefs && itemPrefs.otr!=ARCHIVE_OTR_APPROVE &&  itemPrefs.otr!=ARCHIVE_OTR_FORBID);
+		allowOTRAction->setChecked(allPrefsOtr!=ARCHIVE_OTR_APPROVE && allPrefsOtr!=ARCHIVE_OTR_FORBID);
 		connect(allowOTRAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
 		menu->addAction(allowOTRAction,AG_DEFAULT+300);
 
 		Action *forbidOTRAction = new Action(menu);
 		forbidOTRAction->setCheckable(true);
 		forbidOTRAction->setText(tr("Forbid Off-The-Record Sessions"));
-		forbidOTRAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		forbidOTRAction->setData(ADR_STREAM_JID,AStreams);
 		forbidOTRAction->setData(ADR_CONTACT_JID,AContacts);
 		forbidOTRAction->setData(ADR_ITEM_OTR,ARCHIVE_OTR_FORBID);
-		forbidOTRAction->setChecked(isSingleItemPrefs && itemPrefs.otr==ARCHIVE_OTR_FORBID);
+		forbidOTRAction->setChecked(allPrefsOtr == ARCHIVE_OTR_FORBID);
 		connect(forbidOTRAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
 		menu->addAction(forbidOTRAction,AG_DEFAULT+300);
 
 		Action *approveOTRAction = new Action(menu);
 		approveOTRAction->setCheckable(true);
 		approveOTRAction->setText(tr("Manually Approve Off-The-Record Sessions"));
-		approveOTRAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		approveOTRAction->setData(ADR_STREAM_JID,AStreams);
 		approveOTRAction->setData(ADR_CONTACT_JID,AContacts);
 		approveOTRAction->setData(ADR_ITEM_OTR,ARCHIVE_OTR_APPROVE);
-		approveOTRAction->setChecked(isSingleItemPrefs && itemPrefs.otr==ARCHIVE_OTR_APPROVE);
+		approveOTRAction->setChecked(allPrefsOtr == ARCHIVE_OTR_APPROVE);
 		connect(approveOTRAction,SIGNAL(triggered(bool)),SLOT(onSetItemPrefsByAction(bool)));
 		menu->addAction(approveOTRAction,AG_DEFAULT+300);
+
+		QActionGroup *otrGroup = new QActionGroup(menu);
+		otrGroup->addAction(allowOTRAction);
+		otrGroup->addAction(forbidOTRAction);
+		otrGroup->addAction(approveOTRAction);
 
 		if (!isStreamMenu)
 		{
 			Action *defAction = new Action(menu);
 			defAction->setCheckable(true);
 			defAction->setText(tr("Use Default Options"));
-			defAction->setData(ADR_STREAM_JID,AStreamJid.full());
+			defAction->setData(ADR_STREAM_JID,AStreams);
 			defAction->setData(ADR_CONTACT_JID,AContacts);
-			defAction->setChecked(isSingleItemPrefs && !isSeparateItemPrefs);
+			defAction->setChecked(isAllDefaultPrefs);
 			connect(defAction,SIGNAL(triggered(bool)),SLOT(onRemoveItemPrefsByAction(bool)));
 			menu->addAction(defAction,AG_DEFAULT+500,false);
 		}
 	}
 
-	if (isStreamMenu && isReady(AStreamJid))
+	if (!isMultiSelection && isStreamMenu && isReady(AStreams.first()))
 	{
 		Action *optionsAction = new Action(menu);
 		optionsAction->setText(tr("Options..."));
-		optionsAction->setData(ADR_STREAM_JID,AStreamJid.full());
+		optionsAction->setData(ADR_STREAM_JID,AStreams.first());
 		connect(optionsAction,SIGNAL(triggered(bool)),SLOT(onShowHistoryOptionsDialogByAction(bool)));
 		menu->addAction(optionsAction,AG_DEFAULT+500,false);
 	}
@@ -1887,22 +1923,17 @@ void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
 
 bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	if (!ASelected.isEmpty())
+	int singleKind=-1;
+	foreach(IRosterIndex *index, ASelected)
 	{
-		Jid singleStream;
-		foreach(IRosterIndex *index, ASelected)
-		{
-			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			Jid contactJid = index->data(RDR_FULL_JID).toString();
-			if (!contactJid.isValid() || contactJid.pBare()==streamJid.pBare())
-				return false;
-			else if(!singleStream.isEmpty() && singleStream!=streamJid)
-				return false;
-			singleStream = streamJid;
-		}
-		return true;
+		Jid contactJid = index->data(RDR_FULL_JID).toString();
+		if (!contactJid.isValid())
+			return false;
+		else if (singleKind!=-1 && singleKind!=index->kind())
+			return false;
+		singleKind = index->kind();
 	}
-	return false;
+	return !ASelected.isEmpty();
 
 }
 
@@ -2223,32 +2254,21 @@ void MessageArchiver::onRostersViewIndexMultiSelection(const QList<IRosterIndex 
 
 void MessageArchiver::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		Jid streamJid = !AIndexes.isEmpty() ? AIndexes.first()->data(RDR_STREAM_JID).toString() : QString::null;
-		if (AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_ROOT)
-		{
-			Menu *menu = createContextMenu(streamJid,QStringList()<<streamJid.full(),AMenu);
-			if (!menu->isEmpty())
-				AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
-			else
-				delete menu;
-		}
-		else if (isSelectionAccepted(AIndexes))
-		{
-			QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
-			Menu *menu = createContextMenu(streamJid,rolesMap.value(RDR_PREP_BARE_JID),AMenu);
-			if (!menu->isEmpty())
-				AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
-			else
-				delete menu;
-		}
+		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
+		
+		Menu *menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),AMenu);
+		if (!menu->isEmpty())
+			AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
+		else
+			delete menu;
 	}
 }
 
 void MessageArchiver::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
-	Menu *menu = createContextMenu(AWindow->streamJid(),QStringList()<<AUser->contactJid().full(),AMenu);
+	Menu *menu = createContextMenu(QStringList()<<AWindow->streamJid().full(),QStringList()<<AUser->contactJid().full(),AMenu);
 	if (!menu->isEmpty())
 		AMenu->addAction(menu->menuAction(),AG_MUCM_ARCHIVER,true);
 	else
@@ -2260,14 +2280,22 @@ void MessageArchiver::onSetItemPrefsByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		IArchiveStreamPrefs prefs = archivePrefs(streamJid);
-		foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
+		QMap<Jid, IArchiveStreamPrefs> streamPrefs;
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
+		QStringList contacts = action->data(ADR_CONTACT_JID).toStringList();
+		for (int i=0; i<streams.count(); i++)
 		{
+			Jid streamJid = streams.at(i);
+			Jid contactJid = contacts.at(i);
+
+			if (!streamPrefs.contains(streamJid))
+				streamPrefs[streamJid] = archivePrefs(streamJid);
+			IArchiveStreamPrefs &prefs = streamPrefs[streamJid];
+
 			QString itemSave = action->data(ADR_ITEM_SAVE).toString();
 			if (!itemSave.isEmpty())
 			{
-				if (streamJid != contactJid)
+				if (streamJid.pBare() != contactJid.pBare())
 				{
 					prefs.itemPrefs[contactJid] = archiveItemPrefs(streamJid,contactJid);
 					prefs.itemPrefs[contactJid].save = itemSave;
@@ -2281,7 +2309,7 @@ void MessageArchiver::onSetItemPrefsByAction(bool)
 			QString itemOTR = action->data(ADR_ITEM_OTR).toString();
 			if (!itemOTR.isEmpty())
 			{
-				if (streamJid != contactJid)
+				if (streamJid.pBare() != contactJid.pBare())
 				{
 					prefs.itemPrefs[contactJid] = archiveItemPrefs(streamJid,contactJid);
 					prefs.itemPrefs[contactJid].otr = itemOTR;
@@ -2292,7 +2320,9 @@ void MessageArchiver::onSetItemPrefsByAction(bool)
 				}
 			}
 		}
-		setArchivePrefs(streamJid,prefs);
+
+		for (QMap<Jid, IArchiveStreamPrefs>::const_iterator it=streamPrefs.constBegin(); it!=streamPrefs.constEnd(); ++it)
+			setArchivePrefs(it.key(),it.value());
 	}
 }
 
@@ -2301,8 +2331,8 @@ void MessageArchiver::onSetAutoArchivingByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		setArchiveAutoSave(streamJid,!isArchiveAutoSave(streamJid));
+		foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
+			setArchiveAutoSave(streamJid,action->isChecked());
 	}
 }
 
@@ -2311,9 +2341,28 @@ void MessageArchiver::onRemoveItemPrefsByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
-			removeArchiveItemPrefs(streamJid,contactJid);
+		QMap<Jid, IArchiveStreamPrefs> streamPrefs;
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
+		QStringList contacts = action->data(ADR_CONTACT_JID).toStringList();
+		for (int i=0; i<streams.count(); i++)
+		{
+			if (!isSupported(streams.at(i),NS_ARCHIVE_PREF))
+			{
+				if (!streamPrefs.contains(streams.at(i)))
+					streamPrefs[streams.at(i)] = archivePrefs(streams.at(i));
+				IArchiveStreamPrefs &prefs = streamPrefs[streams.at(i)];
+
+				prefs.itemPrefs[contacts.at(i)].save = QString::null;
+				prefs.itemPrefs[contacts.at(i)].otr = QString::null;
+			}
+			else
+			{
+				removeArchiveItemPrefs(streams.at(i),contacts.at(i));
+			}
+		}
+
+		for (QMap<Jid, IArchiveStreamPrefs>::const_iterator it=streamPrefs.constBegin(); it!=streamPrefs.constEnd(); ++it)
+			setArchivePrefs(it.key(),it.value());
 	}
 }
 

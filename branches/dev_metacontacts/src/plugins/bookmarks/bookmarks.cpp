@@ -361,14 +361,20 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 bool Bookmarks::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
 	int singleKind = -1;
-	foreach(IRosterIndex *index, ASelected)
+	bool hasReadyStreams = false;
+	for(int i=0; i<ASelected.count(); i++)
 	{
+		IRosterIndex *index = ASelected.at(i);
 		int indexKind = index->kind();
 		if (indexKind!=RIK_MUC_ITEM && indexKind!=RIK_STREAM_ROOT)
 			return false;
 		else if (singleKind!=-1 && singleKind!=indexKind)
 			return false;
-		else if (!isReady(index->data(RDR_STREAM_JID).toString()))
+		else if (indexKind==RIK_MUC_ITEM && !isReady(index->data(RDR_STREAM_JID).toString()))
+			return false;
+		else if (indexKind==RIK_STREAM_ROOT && isReady(index->data(RDR_STREAM_JID).toString()))
+			hasReadyStreams = true;
+		else if (!hasReadyStreams && i==ASelected.count()-1)
 			return false;
 		singleKind = indexKind;
 	}

@@ -214,48 +214,8 @@
         <translation>Tryb niewidoczny</translation>
     </message>
     <message>
-        <source>Disable privacy lists</source>
-        <translation>Wyłącz listy prywatności</translation>
-    </message>
-    <message>
-        <source>Block off roster contacts</source>
-        <translation>Blokuj kontakty spoza listy</translation>
-    </message>
-    <message>
-        <source>Visible to contact</source>
-        <translation>Widoczny dla kontaktu</translation>
-    </message>
-    <message>
-        <source>Invisible to contact</source>
-        <translation>Niewidoczny dla kontaktu</translation>
-    </message>
-    <message>
-        <source>Ignore contact</source>
-        <translation>Ignoruj kontakt</translation>
-    </message>
-    <message>
-        <source>Visible to group</source>
-        <translation>Widoczny dla grupy</translation>
-    </message>
-    <message>
-        <source>Invisible to group</source>
-        <translation>Niewidoczny dla grupy</translation>
-    </message>
-    <message>
-        <source>Ignore group</source>
-        <translation>Ignoruj grupę</translation>
-    </message>
-    <message>
-        <source>Set Active list</source>
-        <translation>Aktywna lista</translation>
-    </message>
-    <message>
         <source>&lt;None&gt;</source>
         <translation>&lt;Nic&gt;</translation>
-    </message>
-    <message>
-        <source>Set Default list</source>
-        <translation>Domyślna lista</translation>
     </message>
     <message>
         <source>Advanced...</source>
@@ -292,6 +252,50 @@
     <message>
         <source>&lt;b&gt;denied&lt;/b&gt;</source>
         <translation>&lt;b&gt;zabronione&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Disable Privacy Lists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Block Contacts Without Subscription</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default Rule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visible to Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invisible to Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Visible to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invisible to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Active List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set Default List</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

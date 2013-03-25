@@ -614,17 +614,13 @@ void ChatMessageHandler::showStyledMessage(IMessageChatWindow *AWindow, const Me
 bool ChatMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
 	static const QList<int> chatDialogKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
-	if (!ASelected.isEmpty())
+	foreach(IRosterIndex *index, ASelected)
 	{
-		foreach(IRosterIndex *index, ASelected)
-		{
-			int indexKinds = index->kind();
-			if (!chatDialogKinds.contains(indexKinds))
-				return false;
-		}
-		return true;
+		int indexKinds = index->kind();
+		if (!chatDialogKinds.contains(indexKinds))
+			return false;
 	}
-	return false;
+	return !ASelected.isEmpty();
 }
 
 QMap<Jid, QList<Jid> > ChatMessageHandler::getSortedAddresses(const QMultiMap<Jid,Jid> &AAddresses) const
