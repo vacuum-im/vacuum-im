@@ -126,32 +126,32 @@ QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 
 QTextCharFormat AdiumMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &APosition) const
 {
-	QWebHitTestResult result = hitTest(AWidget,APosition);
-	if (!result.isNull())
+	QTextDocumentFragment fragment = textFragmentAt(AWidget,APosition);
+	if (!fragment.isEmpty())
 	{
-		QWebElement element = result.linkElement();
-		if (element.isNull())
-		{
-			element = result.element();
-			if (element.isNull())
-				element = result.enclosingBlockElement();
-		}
-
 		QTextDocument doc;
-		doc.setHtml(element.toOuterXml());
-		QTextBlock block = doc.begin();
-		QTextBlock::iterator it = block.begin();
-		QTextFragment frag = it.fragment();
-
-		return ++it!=block.end() ? block.charFormat() : frag.charFormat();
+		QTextCursor cursor(&doc);
+		cursor.insertFragment(fragment);
+		cursor.setPosition(0);
+		return cursor.charFormat();
 	}
 	return QTextCharFormat();
 }
 
 QTextDocumentFragment AdiumMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
 {
-	QWebHitTestResult result = hitTest(AWidget,APosition);
-	return !result.isNull() ? QTextDocumentFragment::fromHtml(result.enclosingBlockElement().toOuterXml()) : QTextDocumentFragment();
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	if (view)
+	{
+		QWebHitTestResult result = hitTest(AWidget,APosition);
+		if (result.linkUrl().isValid())
+			return QTextDocumentFragment::fromHtml(result.linkElement().toOuterXml());
+		else if (!result.element().isNull())
+			return QTextDocumentFragment::fromHtml(result.element().toOuterXml());
+		else if (!result.enclosingBlockElement().isNull())
+			return QTextDocumentFragment::fromHtml(result.enclosingBlockElement().toOuterXml());
+	}
+	return QTextDocumentFragment();
 }
 
 bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
