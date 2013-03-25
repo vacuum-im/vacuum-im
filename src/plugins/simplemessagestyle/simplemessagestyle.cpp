@@ -88,13 +88,7 @@ QTextDocumentFragment SimpleMessageStyle::selection(QWidget *AWidget) const
 QTextCharFormat SimpleMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &APosition) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-	if (view)
-	{
-		QTextCursor cursor = view->cursorForPosition(APosition);
-		cursor.select(QTextCursor::WordUnderCursor);
-		return cursor.charFormat();
-	}
-	return QTextCharFormat();
+	return view!=NULL ? view->cursorForPosition(APosition).charFormat() : QTextCharFormat();
 }
 
 QTextDocumentFragment SimpleMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
@@ -103,8 +97,15 @@ QTextDocumentFragment SimpleMessageStyle::textFragmentAt(QWidget *AWidget, const
 	if (view)
 	{
 		QTextCursor cursor = view->cursorForPosition(APosition);
-		cursor.select(QTextCursor::BlockUnderCursor);
-		return cursor.selection();
+		for (QTextBlock::iterator it = cursor.block().begin(); !it.atEnd(); ++it)
+		{
+			if (it.fragment().contains(cursor.position()))
+			{
+				cursor.setPosition(it.fragment().position());
+				cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
+				return cursor.selection();
+			}
+		}
 	}
 	return QTextDocumentFragment();
 }
