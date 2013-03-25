@@ -107,9 +107,9 @@ public:
 	//FeatureHandler
 	virtual bool hasFeatureHandler(const QString &AFeature) const =0;
 	virtual void insertFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler, int AOrder) =0;
-	virtual bool execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo) =0;
-	virtual QList<Action *> createFeatureActions(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent) =0;
 	virtual void removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler) =0;
+	virtual bool execFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo) =0;
+	virtual Action *createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent) =0;
 	//DiscoFeatures
 	virtual void insertDiscoFeature(const IDiscoFeature &AFeature) =0;
 	virtual QList<QString> discoFeatures() const =0;
@@ -140,6 +140,6 @@ protected:
 Q_DECLARE_INTERFACE(IDiscoHandler,"Vacuum.Plugin.IDiscoHandler/1.0")
 Q_DECLARE_INTERFACE(IDiscoFeatureHandler,"Vacuum.Plugin.IDiscoFeatureHandler/1.0")
 Q_DECLARE_INTERFACE(IDiscoItemsWindow,"Vacuum.Plugin.IDiscoItemsWindow/1.1")
-Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.1")
+Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.2")
 
 #endif

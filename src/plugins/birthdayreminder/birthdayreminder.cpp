@@ -219,7 +219,7 @@ bool BirthdayReminder::updateBirthdayState(const Jid &AContactJid)
 	if (isStateChanged && FRostersViewPlugin && FRostersModel)
 	{
 		QMultiMap<int, QVariant> findData;
-		findData.insert(RDR_TYPE,RIT_CONTACT);
+		findData.insert(RDR_KIND,RIK_CONTACT);
 		findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		foreach (IRosterIndex *index, FRostersModel->rootIndex()->findChilds(findData,true))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,index);
@@ -296,7 +296,7 @@ void BirthdayReminder::onNotificationActivated(int ANotifyId)
 			Jid contactJid = FNotifies.value(ANotifyId);
 			Jid streamJid = findContactStream(contactJid);
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
-			QList<IPresenceItem> presences = presence!=NULL ? presence->presenceItems(contactJid) : QList<IPresenceItem>();
+			QList<IPresenceItem> presences = presence!=NULL ? presence->findItems(contactJid) : QList<IPresenceItem>();
 			FMessageProcessor->createMessageWindow(streamJid, !presences.isEmpty() ? presences.first().itemJid : contactJid, Message::Chat, IMessageHandler::SM_SHOW);
 		}
 		FNotifications->removeNotification(ANotifyId);
@@ -313,7 +313,7 @@ void BirthdayReminder::onNotificationRemoved(int ANotifyId)
 
 void BirthdayReminder::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin && AIndex->type() == RIT_CONTACT)
+	if (FRostersViewPlugin && AIndex->kind() == RIK_CONTACT)
 	{
 		if (FUpcomingBirthdays.contains(AIndex->data(RDR_PREP_BARE_JID).toString()))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,AIndex);

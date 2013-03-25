@@ -5,10 +5,6 @@
     <object mime="image/png">chatmessagehandlermessage.png</object>
   </icon>
   <icon>
-    <key>chatmessagehandlerUserMenu</key>
-    <object mime="image/png">chatmessagehandlerusermenu.png</object>
-  </icon>
-  <icon>
     <key>chatmessagehandlerClearChat</key>
     <object mime="image/png">chatmessagehandlerclearchat.png</object>
   </icon>

@@ -4,4 +4,20 @@
     <key>normalmessagehandlerMessage</key>
     <object mime="image/png">normalmessagehandlermessage.png</object>
   </icon>
+  <icon>
+    <key>normalmessagehandlerSend</key>
+    <object mime="image/png">normalmessagehandlersend.png</object>
+  </icon>
+  <icon>
+    <key>normalmessagehandlerReply</key>
+    <object mime="image/png">normalmessagehandlerreply.png</object>
+  </icon>
+  <icon>
+    <key>normalmessagehandlerForward</key>
+    <object mime="image/png">normalmessagehandlerforward.png</object>
+  </icon>
+  <icon>
+    <key>normalmessagehandlerNext</key>
+    <object mime="image/png">normalmessagehandlernext.png</object>
+  </icon>
 </icondef>

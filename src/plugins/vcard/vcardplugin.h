@@ -3,7 +3,8 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -74,19 +75,21 @@ signals:
 	void vcardPublished(const Jid &AContactJid);
 	void vcardError(const Jid &AContactJid, const XmppError &AError);
 protected:
+	void registerDiscoFeatures();
 	void unlockVCard(const Jid &AContactJid);
 	void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;
 	void removeEmptyChildElements(QDomElement &AElem) const;
-	void registerDiscoFeatures();
+	void insertMessageToolBarAction(IMessageToolBarWidget *AWidget);
 protected slots:
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onShowVCardDialogByAction(bool);
-	void onShowVCardDialogByChatWindowAction(bool);
+	void onShowVCardDialogByMessageWindowAction(bool);
 	void onVCardDialogDestroyed(QObject *ADialog);
 	void onXmppStreamRemoved(IXmppStream *AXmppStream);
-	void onChatWindowCreated(IChatWindow *AWindow);
+	void onMessageNormalWindowCreated(IMessageNormalWindow *AWindow);
+	void onMessageChatWindowCreated(IMessageChatWindow *AWindow);
 private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;

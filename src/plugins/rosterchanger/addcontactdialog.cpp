@@ -108,7 +108,7 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
 			ui.cmbGroup->addItems(FRoster->allGroups().toList());
 			ui.cmbGroup->model()->sort(0,Qt::AscendingOrder);
 			ui.cmbGroup->setCurrentIndex(-1);
-			ui.lblGroupDelim->setText(tr("* nested group delimiter - '%1'").arg(FRoster->groupDelimiter()));
+			ui.lblGroupDelim->setText(tr("* nested group delimiter - '%1'").arg(ROSTER_GROUP_DELIMITER));
 		}
 	}
 
@@ -121,14 +121,14 @@ void AddContactDialog::initialize(IPluginManager *APluginManager)
 			FShowChat = new Action(FToolBarChanger->toolBar());
 			FShowChat->setText(tr("Chat"));
 			FShowChat->setToolTip(tr("Open chat window"));
-			FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
+			FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
 			FToolBarChanger->insertAction(FShowChat,TBG_RCACD_ROSTERCHANGER);
 			connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 			FSendMessage = new Action(FToolBarChanger->toolBar());
 			FSendMessage->setText(tr("Message"));
 			FSendMessage->setToolTip(tr("Send Message"));
-			FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
+			FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_MESSAGE);
 			FToolBarChanger->insertAction(FSendMessage,TBG_RCACD_ROSTERCHANGER);
 			connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 		}

@@ -208,9 +208,5 @@ Sie können Statusklassen für zusätzlich von ihnen definierte Statusmeldungen 
         <source>On loss of connection to the server</source>
         <translation>Wenn die Verbindung zum Server verloren geht</translation>
     </message>
-    <message>
-        <source>Show status message in roster</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>

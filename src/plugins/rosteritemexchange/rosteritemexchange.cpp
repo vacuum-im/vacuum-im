@@ -248,13 +248,9 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 	{
 		IRosterExchangeRequest request = FSentRequests.take(AStanza.id());
 		if (AStanza.type()=="result")
-		{
 			emit exchangeRequestApproved(request);
-		}
 		else
-		{
 			emit exchangeRequestFailed(request,XmppStanzaError(AStanza));
-		}
 	}
 }
 
@@ -268,34 +264,34 @@ QMultiMap<int, IOptionsWidget *> RosterItemExchange::optionsWidgets(const QStrin
 	return widgets;
 }
 
-bool RosterItemExchange::viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool RosterItemExchange::viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
-	return !dropDataContacts(AWidget->streamJid(),AWidget->contactJid(),AEvent->mimeData()).isEmpty();
+	return !dropDataContacts(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData()).isEmpty();
 }
 
-bool RosterItemExchange::viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent)
+bool RosterItemExchange::viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 	return true;
 }
 
-void RosterItemExchange::viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent)
+void RosterItemExchange::viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 }
 
-bool RosterItemExchange::viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
+bool RosterItemExchange::viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
 {
-	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AWidget->streamJid(),AWidget->contactJid(),AEvent->mimeData(),AMenu) : false;
+	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData(),AMenu) : false;
 }
 
 Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	int indexType = AIndex->data(RDR_TYPE).toInt();
-	if (indexType==RIT_CONTACT || indexType==RIT_GROUP || indexType==RIT_AGENT)
+	int indexKind = AIndex->data(RDR_KIND).toInt();
+	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -308,8 +304,8 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 
-		int indexType = indexData.value(RDR_TYPE).toInt();
-		if (indexType==RIT_CONTACT || indexType==RIT_GROUP || indexType==RIT_AGENT)
+		int indexKind = indexData.value(RDR_KIND).toInt();
+		if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
 		{
 			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
 			if (!indexJid.node().isEmpty())
@@ -333,10 +329,10 @@ void RosterItemExchange::rosterDragLeave(const QDragLeaveEvent *AEvent)
 	Q_UNUSED(AEvent);
 }
 
-bool RosterItemExchange::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
+bool RosterItemExchange::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu)
 {
 	if (AEvent->dropAction() != Qt::IgnoreAction)
-		return insertDropActions(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString(),AEvent->mimeData(),AMenu);
+		return insertDropActions(AHover->data(RDR_STREAM_JID).toString(),AHover->data(RDR_FULL_JID).toString(),AEvent->mimeData(),AMenu);
 	return false;
 }
 
@@ -410,19 +406,27 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 		QDataStream stream(AData->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 		
-		int indexType = indexData.value(RDR_TYPE).toInt();
-		if (indexType == RIT_GROUP)
+		int indexKind = indexData.value(RDR_KIND).toInt();
+		if (indexKind == RIK_GROUP)
 		{
-			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(indexData.value(RDR_STREAM_JID).toString()) : NULL;
-			QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
-			for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
+			QList<Jid> totalContacts;
+			foreach(const Jid &streamJid, indexData.value(RDR_STREAMS).toStringList())
 			{
-				it->groups.clear();
-				it->groups += indexData.value(RDR_NAME).toString();
-				contactList.append(*it);
+				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+				QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
+				for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
+				{
+					if (!totalContacts.contains(it->itemJid))
+					{
+						it->groups.clear();
+						it->groups += indexData.value(RDR_NAME).toString();
+						contactList.append(*it);
+						totalContacts.append(it->itemJid);
+					}
+				}
 			}
 		}
-		else if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 		{
 			IRosterItem ritem;
 			ritem.isValid = true;
@@ -460,7 +464,7 @@ QList<IRosterItem> RosterItemExchange::dropDataContacts(const Jid &AStreamJid, c
 			contactList = dragDataContacts(AData);
 			for (QList<IRosterItem>::iterator it = contactList.begin(); it!=contactList.end(); )
 			{
-				if (AContactJid.pBare()==it->itemJid.pBare())
+				if (AContactJid.pBare() == it->itemJid.pBare())
 					it = contactList.erase(it);
 				else
 					++it;
@@ -716,7 +720,7 @@ void RosterItemExchange::replyRequestError(const IRosterExchangeRequest &AReques
 
 void RosterItemExchange::notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const
 {
-	IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
+	IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
 	if (window)
 	{
 		IMessageContentOptions options;

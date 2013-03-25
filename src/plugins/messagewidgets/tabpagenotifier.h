@@ -6,19 +6,19 @@
 
 class TabPageNotifier : 
 	public QObject,
-	public ITabPageNotifier
+	public IMessageTabPageNotifier
 {
 	Q_OBJECT;
-	Q_INTERFACES(ITabPageNotifier);
+	Q_INTERFACES(IMessageTabPageNotifier);
 public:
-	TabPageNotifier(ITabPage *ATabPage);
+	TabPageNotifier(IMessageTabPage *ATabPage);
 	virtual ~TabPageNotifier();
 	virtual QObject *instance() { return this; }
-	virtual ITabPage *tabPage() const;
+	virtual IMessageTabPage *tabPage() const;
 	virtual int activeNotify() const;
 	virtual QList<int> notifies() const;
-	virtual ITabPageNotify notifyById(int ANotifyId) const;
-	virtual int insertNotify(const ITabPageNotify &ANotify);
+	virtual IMessageTabPageNotify notifyById(int ANotifyId) const;
+	virtual int insertNotify(const IMessageTabPageNotify &ANotify);
 	virtual void removeNotify(int ANotifyId);
 signals:
 	void notifyInserted(int ANotifyId);
@@ -27,11 +27,11 @@ signals:
 protected slots:
 	void onUpdateTimerTimeout();
 private:
-	ITabPage *FTabPage;
+	IMessageTabPage *FTabPage;
 private:
 	int FActiveNotify;
 	QTimer FUpdateTimer;
-	QMap<int, ITabPageNotify> FNotifies;
+	QMap<int, IMessageTabPageNotify> FNotifies;
 	QMultiMap<int, int> FNotifyIdByPriority;
 };
 

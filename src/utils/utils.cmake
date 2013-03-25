@@ -14,6 +14,8 @@ set(HEADERS "action.h"
             "closebutton.h"
             "searchlineedit.h"
             "imagemanager.h"
+            "advanceditem.h"
+            "advanceditemmodel.h"
             "advanceditemdelegate.h")
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})

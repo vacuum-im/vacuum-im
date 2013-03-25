@@ -5,16 +5,6 @@
 
 #include <QQueue>
 #include <QMultiMap>
-#include <definitions/messagehandlerorders.h>
-#include <definitions/rosterindextyperole.h>
-#include <definitions/rosternotifyorders.h>
-#include <definitions/recentitemtypes.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/actiongroups.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
@@ -22,7 +12,20 @@
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/messagehandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosternotifyorders.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/recentitemtypes.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/tabpagenotifypriorities.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
@@ -31,6 +34,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/iroster.h>
+#include <interfaces/iavatars.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/irecentcontacts.h>
@@ -40,15 +44,24 @@
 #include <utils/shortcuts.h>
 #include <utils/options.h>
 
+enum WindowMenuAction {
+	NextAction,
+	SendAction,
+	ReplyAction,
+	ForwardAction,
+	ChatAction
+};
+
 class NormalMessageHandler :
 	public QObject,
 	public IPlugin,
 	public IMessageHandler,
 	public IXmppUriHandler,
+	public IRostersClickHooker,
 	public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler IOptionsHolder);
+	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler IRostersClickHooker IOptionsHolder);
 public:
 	NormalMessageHandler();
 	~NormalMessageHandler();
@@ -62,6 +75,9 @@ public:
 	virtual bool startPlugin() { return true; }
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
+	//IRostersClickHooker
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -71,46 +87,71 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
-	IMessageWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode);
-	IMessageWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid);
-	bool showNextMessage(IMessageWindow *AWindow);
-	void updateWindow(IMessageWindow *AWindow);
-	void removeCurrentMessageNotify(IMessageWindow *AWindow);
-	void removeNotifiedMessages(IMessageWindow *AWindow, int AMessageId = -1);
-	void setMessageStyle(IMessageWindow *AWindow);
-	void fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const;
-	void showStyledMessage(IMessageWindow *AWindow, const Message &AMessage);
+	IMessageNormalWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode);
+	IMessageNormalWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
+	Menu *createWindowMenu(IMessageNormalWindow *AWindow) const;
+	Action *findWindowMenuAction(IMessageNormalWindow *AWindow, WindowMenuAction AActionId) const;
+	void setDefaultWindowMenuAction(IMessageNormalWindow *AWindow, WindowMenuAction AActionId) const;
+	void setWindowMenuActionVisible(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AVisible) const;
+	void setWindowMenuActionEnabled(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AEnabled) const;
+	void updateWindow(IMessageNormalWindow *AWindow) const;
+protected:
+	bool sendMessage(IMessageNormalWindow *AWindow);
+	bool showNextMessage(IMessageNormalWindow *AWindow);
+	void removeCurrentMessageNotify(IMessageNormalWindow *AWindow);
+	void removeNotifiedMessages(IMessageNormalWindow *AWindow, int AMessageId = -1);
+protected:
+	void setMessageStyle(IMessageNormalWindow *AWindow);
+	void fillContentOptions(IMessageNormalWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void showStyledMessage(IMessageNormalWindow *AWindow, const Message &AMessage);
+protected:
+	bool isAnyPresenceOpened(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	QMap<int,QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes) const;
 protected slots:
-	void onMessageReady();
-	void onShowNextMessage();
-	void onReplyMessage();
-	void onForwardMessage();
-	void onShowChatWindow();
+	void onWindowMessageReady();
 	void onWindowActivated();
 	void onWindowDestroyed();
+	void onWindowAddressChanged();
+	void onWindowAvailAddressesChanged();
+	void onWindowSelectedReceiversChanged();
+	void onWindowContextMenuRequested(Menu *AMenu);
+	void onWindowToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
+protected slots:
+	void onWindowMenuSendMessage();
+	void onWindowMenuShowNextMessage();
+	void onWindowMenuReplyMessage();
+	void onWindowMenuForwardMessage();
+	void onWindowMenuShowChatDialog();
+protected slots:
 	void onStatusIconsChanged();
-	void onShowWindowAction(bool);
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onAvatarChanged(const Jid &AContactJid);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
+protected slots:
+	void onShowWindowAction(bool);
+	void onActiveStreamRemoved(const Jid &AStreamJid);
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
+	IAvatars *FAvatars;
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
 	IMessageStyles *FMessageStyles;
 	IStatusIcons *FStatusIcons;
+	INotifications *FNotifications;
 	IPresencePlugin *FPresencePlugin;
 	IRostersView *FRostersView;
+	IRostersModel *FRostersModel;
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
 	IRecentContacts *FRecentContacts;
 private:
-	QList<IMessageWindow *> FWindows;
-	QMultiMap<IMessageWindow *, int> FNotifiedMessages;
-	QMap<IMessageWindow *, QQueue<Message> > FMessageQueue;
+	QList<IMessageNormalWindow *> FWindows;
+	QMultiMap<IMessageNormalWindow *, int> FNotifiedMessages;
+	QMap<IMessageNormalWindow *, QQueue<Message> > FMessageQueue;
 };
 
 #endif // NORMALMESSAGEHANDLER_H

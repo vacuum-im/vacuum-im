@@ -67,3 +67,4 @@ SUBDIRS += rosteritemexchange
 SUBDIRS += spellchecker 
 SUBDIRS += messagecarbons
 SUBDIRS += recentcontacts 
+#SUBDIRS += metacontacts 

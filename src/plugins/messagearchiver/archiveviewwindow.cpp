@@ -56,8 +56,8 @@ void SortFilterProxyModel::setVisibleInterval(const QDateTime &AStart, const QDa
 bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 {
 	QModelIndex index = sourceModel()->index(ARow,0,AParent);
-	int indexType = index.data(HDR_TYPE).toInt();
-	if (indexType == HIT_HEADER)
+	int indexKind = index.data(HDR_TYPE).toInt();
+	if (indexKind == HIT_HEADER)
 	{
 		if (FStart.isValid() && FEnd.isValid())
 		{

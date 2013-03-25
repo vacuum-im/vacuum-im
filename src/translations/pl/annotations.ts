@@ -12,16 +12,16 @@
         <translation>Komentarz</translation>
     </message>
     <message>
-        <source>Annotation:</source>
-        <translation>Komentarz:</translation>
-    </message>
-    <message>
         <source>Allows to add comments to the contacts in the roster</source>
         <translation>Pozwala na dodawanie komentarzy do kontaktów na liście kontaktów</translation>
     </message>
     <message>
         <source>Edit annotation</source>
         <translation>Edytuj komentarz</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

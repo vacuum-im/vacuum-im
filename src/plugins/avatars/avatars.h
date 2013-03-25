@@ -6,7 +6,8 @@
 #include <definitions/actiongroups.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/rosterlabels.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/rosterlabelholderorders.h>
@@ -57,11 +58,9 @@ public:
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
@@ -75,11 +74,12 @@ public:
 	virtual QByteArray loadAvatarData(const QString &AHash) const;
 	virtual bool setAvatar(const Jid &AStreamJid, const QByteArray &AData);
 	virtual QString setCustomPictire(const Jid &AContactJid, const QByteArray &AData);
+	virtual QImage emptyAvatarImage(const QSize &AMaxSize = QSize(), bool AGray = false) const;
 	virtual QImage loadAvatarImage(const QString &AHash, const QSize &AMaxSize = QSize(), bool AGray = false) const;
 signals:
 	void avatarChanged(const Jid &AContactJid);
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
@@ -97,9 +97,9 @@ protected slots:
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onVCardChanged(const Jid &AContactJid);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
-	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onSetAvatarByAction(bool);
 	void onClearAvatarByAction(bool);
 	void onIconStorageChanged();

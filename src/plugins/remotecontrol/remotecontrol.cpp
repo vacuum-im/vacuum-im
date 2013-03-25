@@ -357,7 +357,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		{
 			foreach(QString roomJid, ARequest.form.fields.value(index).value.toStringList())
 			{
-				IMultiUserChatWindow *window = FMultiUserChatPlugin->multiChatWindow(ARequest.streamJid, roomJid);
+				IMultiUserChatWindow *window = FMultiUserChatPlugin->findMultiChatWindow(ARequest.streamJid, roomJid);
 				if (window != NULL)
 					window->exitAndDestroy(tr("Remote command to leave"));
 			}
@@ -702,7 +702,7 @@ QList<Message> RemoteControl::notifiedMessages(const Jid &AStreamJid, const Jid 
 		{
 			if (message.type()!=Message::Error && !message.body().isEmpty())
 			{
-				if (FMultiUserChatPlugin==NULL || FMultiUserChatPlugin->multiUserChat(AStreamJid,Jid(message.from()).bare())==NULL)
+				if (FMultiUserChatPlugin==NULL || FMultiUserChatPlugin->findMultiUserChat(AStreamJid,Jid(message.from()).bare())==NULL)
 				{
 					if (AContactJid.isEmpty() || AContactJid==message.from())
 						messages.append(message);

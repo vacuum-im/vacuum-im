@@ -6,6 +6,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
+#include <definitions/toolbargroups.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
@@ -13,19 +14,19 @@
 #include "ui_editwidget.h"
 
 class EditWidget :
-			public QWidget,
-			public IEditWidget
+	public QWidget,
+	public IMessageEditWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IEditWidget);
+	Q_INTERFACES(IMessageWidget IMessageEditWidget);
 public:
-	EditWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent);
+	EditWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent);
 	~EditWidget();
+	// IMessageWidget
 	virtual QWidget *instance() { return this; }
-	virtual const Jid &streamJid() const;
-	virtual void setStreamJid(const Jid &AStreamJid);
-	virtual const Jid &contactJid() const;
-	virtual void setContactJid(const Jid &AContactJid);
+	virtual bool isVisibleOnWindow() const;
+	virtual IMessageWindow *messageWindow() const;
+	// IMessageEditWidget
 	virtual QTextEdit *textEdit() const;
 	virtual QTextDocument *document() const;
 	virtual void sendMessage();
@@ -36,41 +37,39 @@ public:
 	virtual void setMinimumLines(int ALines);
 	virtual QString sendShortcut() const;
 	virtual void setSendShortcut(const QString &AShortcutId);
-	virtual bool sendToolBarVisible() const;
-	virtual void setSendToolBarVisible(bool AVisible);
-	virtual ToolBarChanger *sendToolBarChanger() const;
 	virtual bool isRichTextEnabled() const;
 	virtual void setRichTextEnabled(bool AEnabled);
+	virtual bool isEditToolBarVisible() const;
+	virtual void setEditToolBarVisible(bool AVisible);
+	virtual ToolBarChanger *editToolBarChanger() const;
 	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu);
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment);
 	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const;
 signals:
-	// IEditWidget
+	// IMessageEditWidget
 	void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
 	void messageAboutToBeSend();
 	void messageReady();
 	void editorCleared();
-	void streamJidChanged(const Jid &ABefore);
-	void contactJidChanged(const Jid &ABefore);
 	void autoResizeChanged(bool AResize);
 	void minimumLinesChanged(int ALines);
 	void sendShortcutChanged(const QString &AShortcutId);
 	void richTextEnableChanged(bool AEnabled);
-	void editContextMenu(const QPoint &APosition, Menu *AMenu);
+	void contextMenuRequested(const QPoint &APosition, Menu *AMenu);
 	// EditWidget
 	void createDataRequest(QMimeData *ADestination) const;
 	void canInsertDataRequest(const QMimeData *AData, bool &ACanInsert) const;
 	void insertDataRequest(const QMimeData *AData, QTextDocument *ADocument) const;
 	void contentsChanged(int APosition, int ARemoved, int AAdded) const;
 protected:
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected:
 	void appendMessageToBuffer();
 	void showBufferedMessage();
 	void showNextBufferedMessage();
 	void showPrevBufferedMessage();
 protected slots:
-	void onUpdateSendToolBarMaxWidth();
+	void onUpdateEditToolBarMaxWidth();
 	void onSendActionTriggered(bool);
 	void onShortcutUpdated(const QString &AId);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -86,12 +85,11 @@ private:
 	IMessageWidgets *FMessageWidgets;
 private:
 	int FBufferPos;
-	Jid FStreamJid;
-	Jid FContactJid;
+	IMessageWindow *FWindow;
 	QList<QString> FBuffer;
 	QString FSendShortcutId;
 	QKeySequence FSendShortcut;
-	ToolBarChanger *FSendToolBar;
+	ToolBarChanger *FEditToolBar;
 };
 
 #endif // EDITWIDGET_H

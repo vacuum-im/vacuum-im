@@ -49,7 +49,7 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			else if (showText == "xa")
 				show = ExtendedAway;
 			else
-				show = Online;    //Костыль под кривые клиенты и транспорты
+				show = Online;
 
 			status = AStanza.firstElement("status").text();
 			priority = AStanza.firstElement("priority").text().toInt();
@@ -68,7 +68,9 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			priority = 0;
 		}
 		else
+		{
 			return false;
+		}
 
 		if (AStreamJid != AStanza.from())
 		{
@@ -101,17 +103,29 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 	return false;
 }
 
-QList<IPresenceItem> Presence::presenceItems(const Jid &AItemJid) const
+Jid Presence::streamJid() const
 {
-	if (!AItemJid.isEmpty())
-	{
-		QList<IPresenceItem> pitems;
-		foreach(IPresenceItem pitem, FItems)
-			if (AItemJid && pitem.itemJid)
-				pitems.append(pitem);
-		return pitems;
-	}
-	return FItems.values();
+	return FXmppStream->streamJid();
+}
+
+IXmppStream * Presence::xmppStream() const
+{
+	return FXmppStream;
+}
+
+bool Presence::isOpen() const
+{
+	return FOpened;
+}
+
+int Presence::show() const
+{
+	return FShow;
+}
+
+QString Presence::status() const
+{
+	return FStatus;
 }
 
 bool Presence::setShow(int AShow)
@@ -122,6 +136,11 @@ bool Presence::setShow(int AShow)
 bool Presence::setStatus(const QString &AStatus)
 {
 	return setPresence(FShow,AStatus,FPriority);
+}
+
+int Presence::priority() const
+{
+	return FPriority;
 }
 
 bool Presence::setPriority(int APriority)
@@ -284,18 +303,33 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 	return false;
 }
 
+IPresenceItem Presence::findItem(const Jid &AItemFullJid) const
+{
+	return FItems.value(AItemFullJid);
+}
+
+QList<IPresenceItem> Presence::findItems(const Jid &AItemBareJid) const
+{
+	if (!AItemBareJid.isEmpty())
+	{
+		QList<IPresenceItem> pitems;
+		foreach(IPresenceItem pitem, FItems)
+			if (AItemBareJid && pitem.itemJid)
+				pitems.append(pitem);
+		return pitems;
+	}
+	return FItems.values();
+}
+
 void Presence::clearItems()
 {
-	QList<Jid> items = FItems.keys();
-	foreach(Jid itemJid, items)
+	for (QHash<Jid, IPresenceItem>::iterator it=FItems.begin(); it!=FItems.end(); it = FItems.erase(it))
 	{
-		IPresenceItem &pitem = FItems[itemJid];
-		IPresenceItem before = pitem;
-		pitem.show = Offline;
-		pitem.priority = 0;
-		pitem.status.clear();
-		emit itemReceived(pitem,before);
-		FItems.remove(itemJid);
+		IPresenceItem before = it.value();
+		it->show = Offline;
+		it->priority = 0;
+		it->status = QString::null;
+		emit itemReceived(it.value(),before);
 	}
 }
 

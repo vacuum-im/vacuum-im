@@ -11,7 +11,8 @@
 #include <definitions/shortcuts.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/discoitemdataroles.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosteredithandlerorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -26,6 +27,7 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <utils/advanceditemdelegate.h>
+#include <utils/textmanager.h>
 #include <utils/shortcuts.h>
 #include <utils/options.h>
 #include <utils/menu.h>
@@ -57,17 +59,16 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersEditHandler
 	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
 	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
 	//AdvancedDelegateEditProxy
 	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	//IBookmarks
+	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual bool isValidBookmark(const IBookmark &ABookmark) const;
 	virtual QList<IBookmark> bookmarks(const Jid &AStreamJid) const;
 	virtual bool addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
@@ -77,10 +78,10 @@ public:
 signals:
 	void bookmarksChanged(const Jid &AStreamJid);
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	void updateConferenceIndexes(const Jid &AStreamJid);
-	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QList<IBookmark> loadBookmarksFromXML(const QDomElement &AElement) const;
 	void saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const;
 	void renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);

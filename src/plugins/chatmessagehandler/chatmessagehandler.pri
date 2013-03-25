@@ -1,5 +1,3 @@
-HEADERS = chatmessagehandler.h \
-          usercontextmenu.h
+HEADERS = chatmessagehandler.h
 
-SOURCES = chatmessagehandler.cpp \
-          usercontextmenu.cpp
+SOURCES = chatmessagehandler.cpp

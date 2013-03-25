@@ -827,10 +827,6 @@ Check values and try again</source>
         <translation>%1 - Конференция</translation>
     </message>
     <message>
-        <source>Tools</source>
-        <translation>Инструменты</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Нет</translation>
     </message>
@@ -873,18 +869,6 @@ Check values and try again</source>
     <message>
         <source>%1 changed status to [%2] %3</source>
         <translation>%1 изменил статус на [%2] %3</translation>
-    </message>
-    <message>
-        <source>Role: %1</source>
-        <translation>Тип: %1</translation>
-    </message>
-    <message>
-        <source>Affiliation: %1</source>
-        <translation>Членство: %1</translation>
-    </message>
-    <message>
-        <source>Status:</source>
-        <translation>Статус:</translation>
     </message>
     <message>
         <source>Mention message in conference: %1</source>
@@ -995,10 +979,6 @@ Check values and try again</source>
         <translation>Очистить окно чата</translation>
     </message>
     <message>
-        <source>Quote Selected Text</source>
-        <translation>Цитировать выделенный текст</translation>
-    </message>
-    <message>
         <source>Enter your new nick name in conference %1</source>
         <translation>Введите Ваш новый ник в конференции %1</translation>
     </message>
@@ -1013,6 +993,22 @@ Check values and try again</source>
     <message>
         <source>Destroying conference</source>
         <translation>Уничтожить конференцию</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Тип:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Членство:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

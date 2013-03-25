@@ -130,9 +130,7 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32 , QMap<int,QString> &)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -200,6 +198,8 @@ bool ServiceDiscovery::initObjects()
 	{
 		FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
 	}
+
+	insertFeatureHandler(NS_DISCO_INFO,this,DFO_DEFAULT);
 
 	return true;
 }
@@ -366,6 +366,23 @@ bool ServiceDiscovery::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid
 	return false;
 }
 
+bool ServiceDiscovery::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	return false;
+}
+
+bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
+	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+	if (AIndex->kind()==RIK_AGENT && FSelfCaps.contains(streamJid))
+	{
+		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
+	}
+	return false;
+}
+
 void ServiceDiscovery::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 {
 	if (ADiscoInfo.node.isEmpty())
@@ -387,21 +404,23 @@ void ServiceDiscovery::fillDiscoItems(IDiscoItems &ADiscoItems)
 	Q_UNUSED(ADiscoItems);
 }
 
-bool ServiceDiscovery::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+bool ServiceDiscovery::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	if (AFeature == NS_DISCO_INFO)
+	{
+		showDiscoInfo(AStreamJid,ADiscoInfo.contactJid,ADiscoInfo.node);
+		return true;
+	}
 	return false;
 }
 
-bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+Action *ServiceDiscovery::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
-	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-	if (AIndex->type()==RIT_AGENT && FSelfCaps.contains(streamJid))
+	if (AFeature==NS_DISCO_INFO && FSelfCaps.contains(AStreamJid))
 	{
-		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
+		return createDiscoInfoAction(AStreamJid,ADiscoInfo.contactJid,ADiscoInfo.node,AParent);
 	}
-	return false;
+	return NULL;
 }
 
 IDiscoInfo ServiceDiscovery::selfDiscoInfo(const Jid &AStreamJid, const QString &ANode) const
@@ -547,28 +566,6 @@ void ServiceDiscovery::insertFeatureHandler(const QString &AFeature, IDiscoFeatu
 	}
 }
 
-bool ServiceDiscovery::execFeatureHandler(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
-{
-	QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
-	foreach(IDiscoFeatureHandler *handler, handlers)
-		if (handler->execDiscoFeature(AStreamJid,AFeature,ADiscoInfo))
-			return true;
-	return false;
-}
-
-QList<Action *> ServiceDiscovery::createFeatureActions(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
-{
-	QList<Action *> actions;
-	QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
-	foreach(IDiscoFeatureHandler *handler, handlers)
-	{
-		Action *action = handler->createDiscoFeatureAction(AStreamJid,AFeature,ADiscoInfo,AParent);
-		if (action)
-			actions.append(action);
-	}
-	return actions;
-}
-
 void ServiceDiscovery::removeFeatureHandler(const QString &AFeature, IDiscoFeatureHandler *AHandler)
 {
 	if (FFeatureHandlers.value(AFeature).values().contains(AHandler))
@@ -578,6 +575,23 @@ void ServiceDiscovery::removeFeatureHandler(const QString &AFeature, IDiscoFeatu
 			FFeatureHandlers.remove(AFeature);
 		emit featureHandlerRemoved(AFeature,AHandler);
 	}
+}
+
+bool ServiceDiscovery::execFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo)
+{
+	QList<IDiscoFeatureHandler *> handlers = FFeatureHandlers.value(AFeature).values();
+	foreach(IDiscoFeatureHandler *handler, handlers)
+		if (handler->execDiscoFeature(AStreamJid,AFeature,ADiscoInfo))
+			return true;
+	return false;
+}
+
+Action * ServiceDiscovery::createFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
+{
+	foreach(IDiscoFeatureHandler *handler, FFeatureHandlers.value(AFeature).values())
+		if (Action *action = handler->createDiscoFeatureAction(AStreamJid,AFeature,ADiscoInfo,AParent))
+			return action;
+	return NULL;
 }
 
 void ServiceDiscovery::insertDiscoFeature(const IDiscoFeature &AFeature)
@@ -1269,54 +1283,82 @@ void ServiceDiscovery::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
 
 void ServiceDiscovery::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
-	Action *action = createDiscoInfoAction(AWindow->streamJid(), AUser->contactJid(), QString::null, AMenu);
-	AMenu->addAction(action, AG_MUCM_DISCOVERY, true);
-}
-
-void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
-{
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
+	if (FSelfCaps.contains(AWindow->streamJid()))
 	{
-		int indexType = AIndexes.first()->type();
-		if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT || indexType==RIT_MY_RESOURCE)
+		IDiscoInfo dinfo = discoInfo(AWindow->streamJid(),AUser->contactJid());
+
+		// Many clients support version info but don`t show it in disco info
+		if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))
+			dinfo.features.append(NS_JABBER_VERSION);
+
+		foreach(QString feature, dinfo.features)
 		{
-			Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
-			Jid contactJid = indexType!=RIT_STREAM_ROOT ? AIndexes.first()->data(RDR_FULL_JID).toString() : streamJid.domain();
-
-			if (FSelfCaps.contains(streamJid))
-			{
-				Action *action = createDiscoInfoAction(streamJid, contactJid, QString::null, AMenu);
-				AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
-
-				if (indexType == RIT_STREAM_ROOT || indexType == RIT_AGENT)
-				{
-					action = createDiscoItemsAction(streamJid, contactJid, QString::null, AMenu);
-					AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
-				}
-			}
-
-			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
-			foreach(QString feature, dinfo.features)
-			{
-				foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
-					AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
-			}
+			Action *action = createFeatureAction(AWindow->streamJid(),feature,dinfo,AMenu);
+			if (action)
+				AMenu->addAction(action, AG_MUCM_DISCOVERY_FEATURES, true);
 		}
 	}
 }
 
-void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
+void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->type()==RIT_STREAM_ROOT ? Jid(AIndex->data(RDR_FULL_JID).toString()).domain() : AIndex->data(RDR_FULL_JID).toString();
-		if (hasDiscoInfo(streamJid,contactJid))
+		IRosterIndex *index = AIndexes.first();
+		Jid streamJid = index->data(RDR_STREAM_JID).toString();
+		if (FSelfCaps.contains(streamJid))
 		{
-			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
-			foreach(IDiscoIdentity identity, dinfo.identity)
-				if (identity.category != DIC_CLIENT)
-					AToolTips.insert(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
+			int indexKind = index->kind();
+			Jid contactJid = indexKind!=RIK_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : streamJid.domain();
+
+			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_AGENT)
+			{
+				Action *action = createDiscoItemsAction(streamJid,contactJid,QString::null,AMenu);
+				AMenu->addAction(action,AG_RVCM_DISCOVERY,true);
+			}
+
+			QStringList resources = index->data(RDR_RESOURCES).toStringList();
+			if (resources.isEmpty())
+				resources.append(contactJid.pFull());
+			bool multiResorces = resources.count()>1;
+
+			QMap<QString, Menu *> resMenu;
+			foreach(const Jid &itemJid, resources)
+			{
+				IDiscoInfo dinfo = discoInfo(streamJid,itemJid);
+
+				// Many clients support version info but don`t show it in disco info
+				if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))
+					dinfo.features.append(NS_JABBER_VERSION);
+
+				foreach(QString feature, dinfo.features)
+				{
+					Action *action = createFeatureAction(streamJid,feature,dinfo,AMenu);
+					if (action)
+					{
+						if (multiResorces)
+						{
+							Menu *menu = resMenu.value(action->text());
+							if (menu == NULL)
+							{
+								menu = new Menu(AMenu);
+								menu->setIcon(action->icon());
+								menu->setTitle(action->text());
+								resMenu.insert(action->text(),menu);
+								AMenu->addAction(menu->menuAction(),AG_RVCM_DISCOVERY_FEATURES,true);
+							}
+							action->setParent(action->parent()==AMenu ? menu : action->parent());
+							action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,itemJid) : QIcon());
+							action->setText(!itemJid.resource().isEmpty() ? itemJid.resource() : itemJid.uBare());
+							menu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,false); 
+						}
+						else
+						{
+							AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
+						}
+					}
+				}
+			}
 		}
 	}
 }

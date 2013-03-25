@@ -11,7 +11,8 @@
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/rosterdragdropmimetypes.h>
@@ -40,11 +41,11 @@ class RosterItemExchange :
 	public IOptionsHolder,
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
-	public IViewDropHandler,
+	public IMessageViewDropHandler,
 	public IRostersDragDropHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsHolder IStanzaHandler IStanzaRequestOwner IViewDropHandler IRostersDragDropHandler);
+	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsHolder IStanzaHandler IStanzaRequestOwner IMessageViewDropHandler IRostersDragDropHandler);
 public:
 	RosterItemExchange();
 	~RosterItemExchange();
@@ -62,17 +63,17 @@ public:
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
-	//IViewDropHandler
-	virtual bool viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent);
-	virtual bool viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent);
-	virtual void viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent);
-	virtual bool viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
+	//IMessageViewDropHandler
+	virtual bool viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
+	virtual bool viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
+	virtual void viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
+	virtual bool viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
 	//IRostersDragDropHandler
 	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
 	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
-	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu);
 	//IRosterItemExchange
 	virtual bool isSupported(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QString sendExchangeRequest(const IRosterExchangeRequest &ARequest, bool AIqQuery = true);

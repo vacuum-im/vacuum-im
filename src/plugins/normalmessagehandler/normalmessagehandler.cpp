@@ -1,17 +1,24 @@
 #include "normalmessagehandler.h"
 
+#include <QMouseEvent>
+
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
-#define ADR_GROUP                 Action::DR_Parametr3
+#define ADR_GROUP                 Action::DR_Parametr2
+#define ADR_WINDOW                Action::DR_Parametr1
+#define ADR_ACTION_ID             Action::DR_Parametr2
 
 NormalMessageHandler::NormalMessageHandler()
 {
+	FAvatars = NULL;
 	FMessageWidgets = NULL;
 	FMessageProcessor = NULL;
 	FMessageStyles = NULL;
 	FStatusIcons = NULL;
+	FNotifications = NULL;
 	FPresencePlugin = NULL;
 	FRostersView = NULL;
+	FRostersModel = NULL;
 	FXmppUriQueries = NULL;
 	FOptionsManager = NULL;
 	FRecentContacts = NULL;
@@ -44,7 +51,13 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+		if (FMessageProcessor)
+		{
+			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
+		}
+	}
 
 	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
 	if (plugin)
@@ -54,6 +67,16 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		{
 			connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
 				SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+		}
+	}
+
+	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
+	if (plugin)
+	{
+		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
+		if (FAvatars)
+		{
+			connect(FAvatars->instance(),SIGNAL(avatarChanged(const Jid &)),SLOT(onAvatarChanged(const Jid &)));
 		}
 	}
 
@@ -80,19 +103,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
-	{
-		INotifications *notifications = qobject_cast<INotifications *>(plugin->instance());
-		if (notifications)
-		{
-			INotificationType notifyType;
-			notifyType.order = NTO_NORMALHANDLER_MESSAGE;
-			notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
-			notifyType.title = tr("When receiving new single message");
-			notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
-			notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
-			notifications->registerNotificationType(NNT_NORMAL_MESSAGE,notifyType);
-		}
-	}
+		FNotifications = qobject_cast<INotifications *>(plugin->instance());
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
@@ -102,11 +113,15 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		{
 			FRostersView = rostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
+
+	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
+	if (plugin)
+		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
 	if (plugin)
@@ -129,6 +144,16 @@ bool NormalMessageHandler::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
 
+	if (FNotifications)
+	{
+		INotificationType notifyType;
+		notifyType.order = NTO_NORMALHANDLER_MESSAGE;
+		notifyType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMALMHANDLER_MESSAGE);
+		notifyType.title = tr("When receiving new single message");
+		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
+		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
+		FNotifications->registerNotificationType(NNT_NORMAL_MESSAGE,notifyType);
+	}
 	if (FMessageProcessor)
 	{
 		FMessageProcessor->insertMessageHandler(MHO_NORMALMESSAGEHANDLER,this);
@@ -139,6 +164,7 @@ bool NormalMessageHandler::initObjects()
 	}
 	if (FRostersView)
 	{
+		FRostersView->insertClickHooker(RCHO_NORMALMESSAGEHANDLER,this);
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWNORMALDIALOG, FRostersView->instance());
 	}
 	if (FOptionsManager)
@@ -161,13 +187,44 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 		QString type = AParams.value("type");
 		if (type.isEmpty() || type=="normal")
 		{
-			IMessageWindow *window = getWindow(AStreamJid, AContactJid, IMessageWindow::WriteMode);
-			if (AParams.contains("thread"))
-				window->setThreadId(AParams.value("thread"));
-			window->setSubject(AParams.value("subject"));
-			window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
-			window->showTabPage();
-			return true;
+			IMessageNormalWindow *window = getWindow(AStreamJid, AContactJid, IMessageNormalWindow::WriteMode);
+			if (window)
+			{
+				if (AParams.contains("thread"))
+					window->setThreadId(AParams.value("thread"));
+				window->setSubject(AParams.value("subject"));
+				window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
+				window->showTabPage();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool NormalMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	return false;
+}
+
+bool NormalMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	int indexKind = AIndex->kind();
+	if (AOrder==RCHO_NORMALMESSAGEHANDLER && AEvent->modifiers()==Qt::NoModifier)
+	{
+		QString streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		if (isAnyPresenceOpened(QStringList() << streamJid))
+		{
+			if (indexKind==RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
+			{
+				return messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW);
+			}
+			else if (indexKind==RIK_CONTACT || indexKind==RIK_MY_RESOURCE || indexKind==RIK_AGENT)
+			{
+				Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+				return messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW);
+			}
 		}
 	}
 	return false;
@@ -183,7 +240,7 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 {
 	if (ADirection == IMessageProcessor::MessageIn)
 	{
-		IMessageWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageWindow::ReadMode);
+		IMessageNormalWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageNormalWindow::ReadMode);
 		if (window)
 		{
 			if (FRecentContacts)
@@ -194,10 +251,12 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 				recentItem.reference = window->contactJid().pBare();
 				FRecentContacts->setItemActiveTime(recentItem);
 			}
+
 			QQueue<Message> &messages = FMessageQueue[window];
 			if (messages.isEmpty())
 				showStyledMessage(window,AMessage);
 			messages.append(AMessage);
+
 			updateWindow(window);
 			return true;
 		}
@@ -210,13 +269,13 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 	INotification notify;
 	if (ADirection == IMessageProcessor::MessageIn)
 	{
-		IMessageWindow *window = findWindow(AMessage.to(),AMessage.from());
+		IMessageNormalWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window)
 		{
 			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_NORMAL_MESSAGE);
 			if (notify.kinds > 0)
 			{
-				QIcon icon =  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMAL_MHANDLER_MESSAGE);
+				QIcon icon =  IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMALMHANDLER_MESSAGE);
 				QString name= ANotifications->contactName(AMessage.to(),AMessage.from());
 
 				notify.typeId = NNT_NORMAL_MESSAGE;
@@ -258,13 +317,13 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 
 bool NormalMessageHandler::messageShowWindow(int AMessageId)
 {
-	IMessageWindow *window = FNotifiedMessages.key(AMessageId);
+	IMessageNormalWindow *window = FNotifiedMessages.key(AMessageId);
 	if (window == NULL)
 	{
 		Message message = FMessageProcessor->notifiedMessage(AMessageId);
 		if (messageDisplay(message,IMessageProcessor::MessageIn))
 		{
-			IMessageWindow *window = findWindow(message.to(),message.from());
+			IMessageNormalWindow *window = findWindow(message.to(),message.from());
 			if (window)
 			{
 				FNotifiedMessages.insertMulti(window,AMessageId);
@@ -286,7 +345,7 @@ bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, 
 	Q_UNUSED(AOrder);
 	if (AType != Message::GroupChat)
 	{
-		IMessageWindow *window = getWindow(AStreamJid,AContactJid,IMessageWindow::WriteMode);
+		IMessageNormalWindow *window = getWindow(AStreamJid,AContactJid,IMessageNormalWindow::WriteMode);
 		if (window)
 		{
 			if (AShowMode == IMessageHandler::SM_ASSIGN)
@@ -311,25 +370,30 @@ QMultiMap<int, IOptionsWidget *> NormalMessageHandler::optionsWidgets(const QStr
 	return widgets;
 }
 
-IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageWindow::Mode AMode)
+IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode)
 {
-	IMessageWindow *window = NULL;
-	if (AStreamJid.isValid() && (AContactJid.isValid() || AMode == IMessageWindow::WriteMode))
+	IMessageNormalWindow *window = NULL;
+	if (FMessageProcessor && FMessageProcessor->isActiveStream(AStreamJid) && (AContactJid.isValid() || AMode==IMessageNormalWindow::WriteMode))
 	{
-		window = FMessageWidgets->getMessageWindow(AStreamJid,AContactJid,AMode);
+		window = FMessageWidgets->getNormalWindow(AStreamJid,AContactJid,AMode);
 		if (window)
 		{
-			window->infoWidget()->autoUpdateFields();
 			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
-			connect(window->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
-			connect(window->instance(),SIGNAL(showNextMessage()),SLOT(onShowNextMessage()));
-			connect(window->instance(),SIGNAL(replyMessage()),SLOT(onReplyMessage()));
-			connect(window->instance(),SIGNAL(forwardMessage()),SLOT(onForwardMessage()));
-			connect(window->instance(),SIGNAL(showChatWindow()),SLOT(onShowChatWindow()));
+			connect(window->instance(),SIGNAL(messageReady()),SLOT(onWindowMessageReady()));
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
 			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
+			connect(window->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),SLOT(onWindowAddressChanged()));
+			connect(window->address()->instance(),SIGNAL(availAddressesChanged()),SLOT(onWindowAvailAddressesChanged()));
+			connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onWindowContextMenuRequested(Menu *)));
+			connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onWindowToolTipsRequested(QMap<int,QString> &)));
+			connect(window->receiversWidget()->instance(),SIGNAL(addressSelectionChanged(const Jid &, const Jid &, bool)),SLOT(onWindowSelectedReceiversChanged()));
 			connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onWindowNotifierActiveNotifyChanged(int)));
+			
+			Menu *windowMenu = createWindowMenu(window);
+			QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(windowMenu->menuAction(),TBG_MWNWTB_WINDOWMENU);
+			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+
 			FWindows.append(window);
 			updateWindow(window);
 		}
@@ -341,15 +405,189 @@ IMessageWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, const Jid
 	return window;
 }
 
-IMessageWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid)
+IMessageNormalWindow *NormalMessageHandler::findWindow(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	foreach(IMessageWindow *window, FWindows)
-		if (window->streamJid() == AStreamJid && window->contactJid() == AContactJid)
+	foreach(IMessageNormalWindow *window, FWindows)
+		if (window->streamJid()==AStreamJid && window->contactJid()==AContactJid)
 			return window;
 	return NULL;
 }
 
-bool NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
+Menu *NormalMessageHandler::createWindowMenu(IMessageNormalWindow *AWindow) const
+{
+	Menu *menu = new Menu(AWindow->instance());
+
+	Action *nextAction = new Action(menu);
+	nextAction->setText(tr("Show Next"));
+	nextAction->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_NEXT);
+	nextAction->setData(ADR_ACTION_ID,NextAction);
+	nextAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
+	connect(nextAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuShowNextMessage()));
+	menu->addAction(nextAction);
+
+	Action *sendAction = new Action(menu);
+	sendAction->setText(tr("Send"));
+	sendAction->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_SEND);
+	sendAction->setData(ADR_ACTION_ID,SendAction);
+	sendAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
+	connect(sendAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuSendMessage()));
+	menu->addAction(sendAction);
+
+	Action *replyAction = new Action(menu);
+	replyAction->setText(tr("Reply"));
+	replyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_REPLY);
+	replyAction->setData(ADR_ACTION_ID,ReplyAction);
+	replyAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
+	connect(replyAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuReplyMessage()));
+	menu->addAction(replyAction);
+
+	Action *forwardAction = new Action(menu);
+	forwardAction->setText(tr("Forward"));
+	forwardAction->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_FORWARD);
+	forwardAction->setData(ADR_ACTION_ID,ForwardAction);
+	forwardAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
+	connect(forwardAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuForwardMessage()));
+	menu->addAction(forwardAction);
+
+	Action *chatAction = new Action(menu);
+	chatAction->setText(tr("Show Chat Dialog"));
+	chatAction->setData(ADR_ACTION_ID,ChatAction);
+	chatAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
+	chatAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
+	connect(chatAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuShowChatDialog()));
+	menu->addAction(chatAction);
+
+	return menu;
+}
+
+Action *NormalMessageHandler::findWindowMenuAction(IMessageNormalWindow *AWindow, WindowMenuAction AActionId) const
+{
+	if (AWindow)
+	{
+		QAction *menuHandle = AWindow->toolBarWidget()->toolBarChanger()->groupItems(TBG_MWNWTB_WINDOWMENU).value(0);
+		Action *menuAction = AWindow->toolBarWidget()->toolBarChanger()->handleAction(menuHandle);
+		if (menuAction && menuAction->menu())
+		{
+			foreach(Action *action, menuAction->menu()->groupActions(AG_DEFAULT))
+				if (action->data(ADR_ACTION_ID).toInt() == AActionId)
+					return action;
+		}
+	}
+	return NULL;
+}
+
+void NormalMessageHandler::setDefaultWindowMenuAction(IMessageNormalWindow *AWindow, WindowMenuAction AActionId) const
+{
+	Action *action = findWindowMenuAction(AWindow,AActionId);
+	if (action)
+	{
+		Menu *menu = qobject_cast<Menu *>(action->parent());
+		if (menu)
+		{
+			menu->menuAction()->disconnect(menu->defaultAction());
+			
+			menu->setDefaultAction(action);
+			menu->menuAction()->setText(action->text());
+			menu->menuAction()->setIcon(action->icon());
+			connect(menu->menuAction(),SIGNAL(triggered()),action,SLOT(trigger()));
+		}
+	}
+}
+
+void NormalMessageHandler::setWindowMenuActionVisible(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AVisible) const
+{
+	Action *action = findWindowMenuAction(AWindow,AActionId);
+	if (action)
+		action->setVisible(AVisible);
+}
+
+void NormalMessageHandler::setWindowMenuActionEnabled(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AEnabled) const
+{
+	Action *action = findWindowMenuAction(AWindow,AActionId);
+	if (action)
+		action->setEnabled(AEnabled);
+}
+
+void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
+{
+	if (FAvatars)
+	{
+		QString avatar = FAvatars->avatarHash(AWindow->contactJid());
+		if (!avatar.isEmpty() && FAvatars->hasAvatar(avatar))
+			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,avatar);
+		else
+			AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Avatar,FAvatars->emptyAvatarImage());
+	}
+
+	QString name = FMessageStyles!=NULL ? FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()) : AWindow->contactJid().uFull();
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::Name,name);
+
+	QIcon statusIcon;
+	if (FStatusIcons && AWindow->mode()==IMessageNormalWindow::ReadMode)
+		statusIcon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
+	else
+		statusIcon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NORMALMHANDLER_MESSAGE);
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusIcon,statusIcon);
+
+	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AWindow->streamJid()) : NULL;
+	IPresenceItem pitem = presence!=NULL ? presence->findItem(AWindow->contactJid()) : IPresenceItem();
+	AWindow->infoWidget()->setFieldValue(IMessageInfoWidget::StatusText,pitem.status);
+
+	QString title;
+	if (AWindow->mode() == IMessageNormalWindow::ReadMode)
+		title = tr("%1 - Message").arg(name);
+	else
+		title = tr("Composing message");
+
+	QIcon tabIcon = statusIcon;
+	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
+		tabIcon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
+
+	bool hasNext = FMessageQueue.value(AWindow).count()>1;
+	if (AWindow->mode() == IMessageNormalWindow::WriteMode)
+	{
+		setWindowMenuActionVisible(AWindow,NextAction,hasNext);
+		setWindowMenuActionVisible(AWindow,SendAction,true);
+		setWindowMenuActionVisible(AWindow,ReplyAction,false);
+		setWindowMenuActionVisible(AWindow,ForwardAction,false);
+		setWindowMenuActionVisible(AWindow,ChatAction,AWindow->contactJid().isValid());
+		setDefaultWindowMenuAction(AWindow,SendAction);
+	}
+	else
+	{
+		setWindowMenuActionVisible(AWindow,NextAction,hasNext);
+		setWindowMenuActionVisible(AWindow,SendAction,false);
+		setWindowMenuActionVisible(AWindow,ReplyAction,true);
+		setWindowMenuActionVisible(AWindow,ForwardAction,true);
+		setWindowMenuActionVisible(AWindow,ChatAction,AWindow->contactJid().isValid());
+		setDefaultWindowMenuAction(AWindow,hasNext ? NextAction : ReplyAction);
+	}
+
+	AWindow->updateWindow(tabIcon,name,title,QString::null);
+}
+
+bool NormalMessageHandler::sendMessage(IMessageNormalWindow *AWindow)
+{
+	bool sent = false;
+	if (AWindow && AWindow->mode()==IMessageNormalWindow::WriteMode)
+	{
+		Message message;
+		message.setType(Message::Normal).setSubject(AWindow->subject()).setThreadId(AWindow->threadId());
+		FMessageProcessor->textToMessage(message,AWindow->editWidget()->document());
+		if (!message.body().isEmpty())
+		{
+			QMultiMap<Jid, Jid> addresses = AWindow->receiversWidget()->selectedAddresses();
+			for (QMultiMap<Jid, Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
+			{
+				message.setTo(it->full());
+				sent = FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::MessageOut) ? true : sent;
+			}
+		}
+	}
+	return sent;
+}
+
+bool NormalMessageHandler::showNextMessage(IMessageNormalWindow *AWindow)
 {
 	if (FMessageQueue.value(AWindow).count() > 1)
 	{
@@ -365,30 +603,7 @@ bool NormalMessageHandler::showNextMessage(IMessageWindow *AWindow)
 	return false;
 }
 
-void NormalMessageHandler::updateWindow(IMessageWindow *AWindow)
-{
-	QIcon icon;
-	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
-		icon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
-	if (FStatusIcons && icon.isNull())
-	{
-		if (!AWindow->contactJid().isEmpty())
-			icon = FStatusIcons->iconByJid(AWindow->streamJid(),AWindow->contactJid());
-		else
-			icon = FStatusIcons->iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false);
-	}
-
-	QString caption;
-	if (AWindow->mode() == IMessageWindow::ReadMode)
-		caption = tr("%1 - Message").arg(AWindow->infoWidget()->field(IInfoWidget::ContactName).toString());
-	else
-		caption = tr("Composing message");
-
-	AWindow->updateWindow(icon,caption,caption,QString::null);
-	AWindow->setNextCount(FMessageQueue.value(AWindow).count()-1);
-}
-
-void NormalMessageHandler::removeCurrentMessageNotify(IMessageWindow *AWindow)
+void NormalMessageHandler::removeCurrentMessageNotify(IMessageNormalWindow *AWindow)
 {
 	if (!FMessageQueue.value(AWindow).isEmpty())
 	{
@@ -397,7 +612,7 @@ void NormalMessageHandler::removeCurrentMessageNotify(IMessageWindow *AWindow)
 	}
 }
 
-void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow, int AMessageId)
+void NormalMessageHandler::removeNotifiedMessages(IMessageNormalWindow *AWindow, int AMessageId)
 {
 	foreach(int messageId, FNotifiedMessages.values(AWindow))
 	{
@@ -409,7 +624,7 @@ void NormalMessageHandler::removeNotifiedMessages(IMessageWindow *AWindow, int A
 	}
 }
 
-void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
+void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 {
 	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
 	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
@@ -419,7 +634,7 @@ void NormalMessageHandler::setMessageStyle(IMessageWindow *AWindow)
 	}
 }
 
-void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageContentOptions &AOptions) const
+void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMessageContentOptions &AOptions) const
 {
 	AOptions.senderColor = "blue";
 	AOptions.senderId = AWindow->contactJid().full();
@@ -428,7 +643,7 @@ void NormalMessageHandler::fillContentOptions(IMessageWindow *AWindow, IMessageC
 	AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 }
 
-void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Message &AMessage)
+void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, const Message &AMessage)
 {
 	IMessageContentOptions options;
 	options.time = AMessage.dateTime();
@@ -437,7 +652,7 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 	options.noScroll = true;
 	fillContentOptions(AWindow,options);
 
-	AWindow->setMode(IMessageWindow::ReadMode);
+	AWindow->setMode(IMessageNormalWindow::ReadMode);
 	AWindow->setSubject(AMessage.subject());
 	AWindow->setThreadId(AMessage.threadId());
 
@@ -459,113 +674,119 @@ void NormalMessageHandler::showStyledMessage(IMessageWindow *AWindow, const Mess
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
 
-bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
+bool NormalMessageHandler::isAnyPresenceOpened(const QStringList &AStreams) const
 {
-	static const QList<int> normalDialogTypes = QList<int>() << RIT_STREAM_ROOT << RIT_GROUP << RIT_GROUP_BLANK
-		<< RIT_GROUP_AGENTS << RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-	static const QList<int> groupTypes = QList<int>() << RIT_GROUP << RIT_GROUP_BLANK << RIT_GROUP_AGENTS 
-		<< RIT_GROUP_MY_RESOURCES << RIT_GROUP_NOT_IN_ROSTER;
-	static const QList<int> contactTypes =  QList<int>() << RIT_CONTACT << RIT_AGENT << RIT_MY_RESOURCE;
-
-	if (!ASelected.isEmpty())
+	foreach(const Jid &streamJid, AStreams)
 	{
-		Jid singleStream;
-		bool hasGroups = false;
-		bool hasContacts = false;
-		foreach(IRosterIndex *index, ASelected)
-		{
-			int indexType = index->type();
-			Jid streamJid = index->data(RDR_STREAM_JID).toString();
-			if (!normalDialogTypes.contains(indexType))
-				return false;
-			else if(!singleStream.isEmpty() && singleStream!=streamJid)
-				return false;
-			else if (indexType==RIT_STREAM_ROOT && ASelected.count()>1)
-				return false;
-			else if (hasGroups && !groupTypes.contains(indexType))
-				return false;
-			else if (hasContacts && !contactTypes.contains(indexType))
-				return false;
-			singleStream = streamJid;
-			hasGroups = hasGroups || groupTypes.contains(indexType);
-			hasContacts = hasContacts || contactTypes.contains(indexType);
-		}
-		return true;
+		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+		if (presence && presence->isOpen())
+			return true;
 	}
 	return false;
 }
 
-void NormalMessageHandler::onMessageReady()
+bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-	if (FMessageProcessor && window)
+	static const QList<int> acceptKinds = QList<int>() 
+		<< RIK_STREAM_ROOT 
+		<< RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE
+		<< RIK_GROUP << RIK_GROUP_BLANK	<< RIK_GROUP_NOT_IN_ROSTER;
+	static const QList<int> contactKinds =  QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
+	static const QList<int> groupKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_NOT_IN_ROSTER;
+
+	bool hasGroups = false;
+	bool hasContacts = false;
+	bool hasOpenedStreams = false;
+	for(int i=0; i<ASelected.count(); i++)
 	{
-		Message message;
-		message.setType(Message::Normal).setSubject(window->subject()).setThreadId(window->threadId());
-		FMessageProcessor->textToMessage(message,window->editWidget()->document());
-		if (!message.body().isEmpty())
+		IRosterIndex *index = ASelected.at(i);
+		int indexKind = index->kind();
+		if (!acceptKinds.contains(indexKind))
+			return false;
+		else if (hasGroups && !groupKinds.contains(indexKind))
+			return false;
+		else if (hasContacts && !contactKinds.contains(indexKind))
+			return false;
+		else if (groupKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAMS).toStringList()))
+			return false;
+		else if (contactKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
+			return false;
+		else if (indexKind==RIK_STREAM_ROOT && isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
+			hasOpenedStreams = true;
+		else if (!hasOpenedStreams && i==ASelected.count()-1)
+			return false;
+		hasGroups = hasGroups || groupKinds.contains(indexKind);
+		hasContacts = hasContacts || contactKinds.contains(indexKind);
+	}
+	return !ASelected.isEmpty();
+}
+
+QMap<int,QStringList> NormalMessageHandler::indexesRolesMap(const QList<IRosterIndex *> &AIndexes) const
+{
+	QMap<int, QStringList> rolesMap;
+	foreach(IRosterIndex *index, AIndexes)
+	{
+		int indexKind = index->kind();
+		if (indexKind==RIK_GROUP || indexKind==RIK_GROUP_BLANK || indexKind==RIK_GROUP_AGENTS)
 		{
-			bool sent = false;
-			foreach(Jid receiver, window->receiversWidget()->receivers())
+			QString group;
+			if (indexKind != RIK_GROUP)
+				group = FRostersModel!=NULL ? FRostersModel->singleGroupName(indexKind) : QString::null;
+			else
+				group = index->data(RDR_GROUP).toString();
+
+			foreach(const QString &streamJid, index->data(RDR_STREAMS).toStringList())
 			{
-				message.setTo(receiver.full());
-				sent = FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::MessageOut) ? true : sent;
-			}
-			if (sent && !showNextMessage(window))
-			{
-				window->closeTabPage();
+				rolesMap[RDR_STREAM_JID].append(streamJid);
+				rolesMap[RDR_PREP_BARE_JID].append(QString::null);
+				rolesMap[RDR_GROUP].append(group);
 			}
 		}
+		else if (indexKind == RIK_GROUP_NOT_IN_ROSTER)
+		{
+			for (int row=0; row<index->childCount(); row++)
+			{
+				IRosterIndex *child = index->childIndex(row);
+				if (child->kind() == RIK_CONTACT)
+				{
+					rolesMap[RDR_STREAM_JID].append(child->data(RDR_STREAM_JID).toString());
+					rolesMap[RDR_PREP_BARE_JID].append(child->data(RDR_PREP_BARE_JID).toString());
+					rolesMap[RDR_GROUP].append(QString::null);
+				}
+			}
+		}
+		else if (indexKind == RIK_STREAM_ROOT)
+		{
+			if (isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
+			{
+				rolesMap[RDR_STREAM_JID].append(index->data(RDR_STREAM_JID).toString());
+				rolesMap[RDR_PREP_BARE_JID].append(QString::null);
+				rolesMap[RDR_GROUP].append(QString::null);
+			}
+		}
+		else
+		{
+			rolesMap[RDR_STREAM_JID].append(index->data(RDR_STREAM_JID).toString());
+			rolesMap[RDR_PREP_BARE_JID].append(index->data(RDR_PREP_BARE_JID).toString());
+			rolesMap[RDR_GROUP].append(QString::null);
+		}
 	}
+	return rolesMap;
 }
 
-void NormalMessageHandler::onShowNextMessage()
+void NormalMessageHandler::onWindowMessageReady()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-	if (window)
-		showNextMessage(window);
-}
-
-void NormalMessageHandler::onReplyMessage()
-{
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-	if (window)
-	{
-		window->setMode(IMessageWindow::WriteMode);
-		window->setSubject(tr("Re: %1").arg(window->subject()));
-		window->editWidget()->clearEditor();
-		window->editWidget()->textEdit()->setFocus();
-		updateWindow(window);
-	}
-}
-
-void NormalMessageHandler::onForwardMessage()
-{
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
-	if (FMessageProcessor && !FMessageQueue.value(window).isEmpty())
-	{
-		Message message = FMessageQueue.value(window).head();
-		window->setMode(IMessageWindow::WriteMode);
-		window->setSubject(tr("Fw: %1").arg(message.subject()));
-		window->setThreadId(message.threadId());
-		FMessageProcessor->messageToText(window->editWidget()->document(),message);
-		window->editWidget()->textEdit()->setFocus();
-		window->receiversWidget()->clear();
-		window->setCurrentTabWidget(window->receiversWidget()->instance());
-		updateWindow(window);
-	}
-}
-
-void NormalMessageHandler::onShowChatWindow()
-{
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FMessageProcessor && window)
-		FMessageProcessor->createMessageWindow(window->streamJid(),window->contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
+	{
+		if (sendMessage(window) && !showNextMessage(window))
+			window->closeTabPage();
+	}
 }
 
 void NormalMessageHandler::onWindowActivated()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FWindows.contains(window))
 	{
 		if (Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL).value().toBool())
@@ -577,7 +798,7 @@ void NormalMessageHandler::onWindowActivated()
 
 void NormalMessageHandler::onWindowDestroyed()
 {
-	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FWindows.contains(window))
 	{
 		FWindows.removeAll(window);
@@ -586,19 +807,144 @@ void NormalMessageHandler::onWindowDestroyed()
 	}
 }
 
-void NormalMessageHandler::onWindowNotifierActiveNotifyChanged(int ANotifyId)
+void NormalMessageHandler::onWindowAddressChanged()
 {
-	Q_UNUSED(ANotifyId);
-	ITabPageNotifier *notifier = qobject_cast<ITabPageNotifier *>(sender());
-	IMessageWindow *window = notifier!=NULL ? qobject_cast<IMessageWindow *>(notifier->tabPage()->instance()) : NULL;
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender()->parent());
 	if (window)
 		updateWindow(window);
 }
 
+void NormalMessageHandler::onWindowAvailAddressesChanged()
+{
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender()->parent());
+	if (window)
+	{
+		QMultiMap<Jid,Jid> addresses = window->address()->availAddresses();
+		if (addresses.isEmpty())
+			window->instance()->deleteLater();
+	}
+}
+
+void NormalMessageHandler::onWindowSelectedReceiversChanged()
+{
+	IMessageReceiversWidget *widget = qobject_cast<IMessageReceiversWidget *>(sender());
+	if (widget)
+	{
+		IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(widget->messageWindow()->instance());
+		setWindowMenuActionEnabled(window,SendAction,!widget->selectedAddresses().isEmpty());
+	}
+}
+
+void NormalMessageHandler::onWindowContextMenuRequested(Menu *AMenu)
+{
+	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+	if (widget && FRostersModel && FRostersView)
+	{
+		IRosterIndex *index = FRostersModel->findContactIndexes(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		if (index)
+			FRostersView->contextMenuForIndex(QList<IRosterIndex *>()<<index,NULL,AMenu);
+	}
+}
+
+void NormalMessageHandler::onWindowToolTipsRequested(QMap<int,QString> &AToolTips)
+{
+	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+	if (widget && FRostersModel && FRostersView)
+	{
+		IRosterIndex *index = FRostersModel->findContactIndexes(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()).value(0);
+		if (index)
+			FRostersView->toolTipsForIndex(index,NULL,AToolTips);
+	}
+}
+
+void NormalMessageHandler::onWindowNotifierActiveNotifyChanged(int ANotifyId)
+{
+	Q_UNUSED(ANotifyId);
+	IMessageTabPageNotifier *notifier = qobject_cast<IMessageTabPageNotifier *>(sender());
+	IMessageNormalWindow *window = notifier!=NULL ? qobject_cast<IMessageNormalWindow *>(notifier->tabPage()->instance()) : NULL;
+	if (window)
+		updateWindow(window);
+}
+
+void NormalMessageHandler::onWindowMenuSendMessage()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(action!=NULL ? (QWidget *)action->data(ADR_WINDOW).toLongLong() : NULL);
+	if (window)
+	{
+		if (sendMessage(window) && !showNextMessage(window))
+			window->closeTabPage();
+	}
+}
+
+void NormalMessageHandler::onWindowMenuShowNextMessage()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(action!=NULL ? (QWidget *)action->data(ADR_WINDOW).toLongLong() : NULL);
+	if (window)
+		showNextMessage(window);
+}
+
+void NormalMessageHandler::onWindowMenuReplyMessage()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(action!=NULL ? (QWidget *)action->data(ADR_WINDOW).toLongLong() : NULL);
+	if (window)
+	{
+		window->setMode(IMessageNormalWindow::WriteMode);
+		window->setSubject(tr("Re: %1").arg(window->subject()));
+		window->editWidget()->clearEditor();
+		window->editWidget()->textEdit()->setFocus();
+		updateWindow(window);
+	}
+}
+
+void NormalMessageHandler::onWindowMenuForwardMessage()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(action!=NULL ? (QWidget *)action->data(ADR_WINDOW).toLongLong() : NULL);
+	if (FMessageProcessor && !FMessageQueue.value(window).isEmpty())
+	{
+		Message message = FMessageQueue.value(window).head();
+		window->setMode(IMessageNormalWindow::WriteMode);
+		window->setSubject(tr("Fw: %1").arg(message.subject()));
+		window->setThreadId(message.threadId());
+		FMessageProcessor->messageToText(window->editWidget()->document(),message);
+		window->editWidget()->textEdit()->setFocus();
+		window->receiversWidget()->clearSelection();
+		updateWindow(window);
+	}
+}
+
+void NormalMessageHandler::onWindowMenuShowChatDialog()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(action!=NULL ? (QWidget *)action->data(ADR_WINDOW).toLongLong() : NULL);
+	if (FMessageProcessor && window)
+		FMessageProcessor->createMessageWindow(window->streamJid(),window->contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
+}
+
 void NormalMessageHandler::onStatusIconsChanged()
 {
-	foreach(IMessageWindow *window, FWindows)
+	foreach(IMessageNormalWindow *window, FWindows)
 		updateWindow(window);
+}
+
+void NormalMessageHandler::onAvatarChanged(const Jid &AContactJid)
+{
+	foreach(IMessageNormalWindow *window, FWindows)
+		if (window->contactJid() && AContactJid)
+			updateWindow(window);
+}
+
+void NormalMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
+{
+	if (AItem.show!=ABefore.show || AItem.status!=ABefore.status)
+	{
+		IMessageNormalWindow *window = findWindow(APresence->streamJid(),AItem.itemJid);
+		if (window)
+			updateWindow(window);
+	}
 }
 
 void NormalMessageHandler::onShowWindowAction(bool)
@@ -606,22 +952,30 @@ void NormalMessageHandler::onShowWindowAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
 		QStringList contacts = action->data(ADR_CONTACT_JID).toStringList();
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		Jid contactJid = contacts.count()==1 ? contacts.first() : QString::null;
-		if (messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW))
+		QStringList groups = action->data(ADR_GROUP).toStringList();
+		if (messageShowWindow(MHO_NORMALMESSAGEHANDLER,streams.value(0),Jid::null,Message::Normal,IMessageHandler::SM_SHOW))
 		{
-			IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
+			IMessageNormalWindow *window = FMessageWidgets->findNormalWindow(streams.value(0),Jid::null,true);
 			if (window)
 			{
-				foreach(QString group, action->data(ADR_GROUP).toStringList())
-					window->receiversWidget()->addReceiversGroup(group);
-
-				foreach(QString contactJid, action->data(ADR_CONTACT_JID).toStringList())
-					window->receiversWidget()->addReceiver(contactJid);
+				for (int i=0; i<streams.count(); i++)
+				{
+					if (!contacts.at(i).isEmpty())
+						window->receiversWidget()->setAddressSelection(streams.at(i),contacts.at(i),true);
+					if (!groups.at(i).isEmpty())
+						window->receiversWidget()->setGroupSelection(streams.at(i),groups.at(i),true);
+				}
 			}
 		}
 	}
+}
+
+void NormalMessageHandler::onActiveStreamRemoved(const Jid &AStreamJid)
+{
+	foreach(IMessageNormalWindow *window, FWindows)
+		window->address()->removeAddress(AStreamJid);
 }
 
 void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)
@@ -629,35 +983,25 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 	if (FRostersView && AWidget==FRostersView->instance())
 	{
 		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
-		if (AId == SCT_ROSTERVIEW_SHOWNORMALDIALOG && isSelectionAccepted(indexes))
+		if (AId==SCT_ROSTERVIEW_SHOWNORMALDIALOG && isSelectionAccepted(indexes))
 		{
-			Jid streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
-			if (presence && presence->isOpen())
+			QMap<int, QStringList> rolesMap = indexesRolesMap(indexes);
+			Jid streamJid = rolesMap.value(RDR_STREAM_JID).value(0);
+			if (messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW))
 			{
-				QStringList groups;
-				QStringList contacts;
-				foreach(IRosterIndex *index, indexes)
+				IMessageNormalWindow *window = FMessageWidgets->findNormalWindow(streamJid,Jid::null,true);
+				if (window)
 				{
-					if (index->type() == RIT_GROUP)
-						groups.append(index->data(RDR_GROUP).toString());
-					else if (index->type()>=RIT_GROUP_BLANK && index->type()<=RIT_GROUP_AGENTS)
-						groups.append(FRostersView->rostersModel()->singleGroupName(index->type()));
-					else if (index->type() != RIT_STREAM_ROOT)
-						contacts.append(index->data(RDR_FULL_JID).toString());
-				}
-
-				Jid contactJid = contacts.count()==1 ? contacts.first() : QString::null;
-				if (messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,contactJid,Message::Normal,IMessageHandler::SM_SHOW))
-				{
-					IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
-					if (window)
+					for (int i=0; i<rolesMap.value(RDR_STREAM_JID).count(); i++)
 					{
-						foreach(QString group, groups)
-							window->receiversWidget()->addReceiversGroup(group);
+						Jid streamJid = rolesMap.value(RDR_STREAM_JID).at(i);
+						Jid contactJid = rolesMap.value(RDR_PREP_BARE_JID).at(i);
+						QString group = rolesMap.value(RDR_GROUP).at(i);
 
-						foreach(QString contactJid, contacts)
-							window->receiversWidget()->addReceiver(contactJid);
+						if (!contactJid.isEmpty())
+							window->receiversWidget()->setAddressSelection(streamJid,contactJid,true);
+						if (!group.isEmpty())
+							window->receiversWidget()->setGroupSelection(streamJid,group,true);
 					}
 				}
 			}
@@ -665,57 +1009,34 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 	}
 }
 
-void NormalMessageHandler::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void NormalMessageHandler::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void NormalMessageHandler::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void NormalMessageHandler::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
-		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
-		if (presence && presence->isOpen())
-		{
-			QStringList groups;
-			QStringList contacts;
-			foreach(IRosterIndex *index, AIndexes)
-			{
-				if (index->type() == RIT_GROUP)
-					groups.append(index->data(RDR_GROUP).toString());
-				else if (index->type()>=RIT_GROUP_BLANK && index->type()<=RIT_GROUP_AGENTS)
-					groups.append(FRostersView->rostersModel()->singleGroupName(index->type()));
-				else if (index->type() != RIT_STREAM_ROOT)
-					contacts.append(index->data(RDR_FULL_JID).toString());
-			}
+		QMap<int, QStringList> rolesMap = indexesRolesMap(AIndexes);
 
-			Action *action = new Action(AMenu);
-			action->setText(tr("Send message"));
-			action->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
-			action->setData(ADR_STREAM_JID,streamJid.full());
-			action->setData(ADR_GROUP,groups);
-			action->setData(ADR_CONTACT_JID,contacts);
-			action->setShortcutId(SCT_ROSTERVIEW_SHOWNORMALDIALOG);
-			AMenu->addAction(action,AG_RVCM_NORMALMESSAGEHANDLER,true);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
-		}
+		Action *action = new Action(AMenu);
+		action->setText(tr("Send Message"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_MESSAGE);
+		action->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
+		action->setData(ADR_CONTACT_JID,rolesMap.value(RDR_PREP_BARE_JID));
+		action->setData(ADR_GROUP,rolesMap.value(RDR_GROUP));
+		action->setShortcutId(SCT_ROSTERVIEW_SHOWNORMALDIALOG);
+		AMenu->addAction(action,AG_RVCM_NORMALMESSAGEHANDLER,true);
+		connect(action,SIGNAL(triggered(bool)),SLOT(onShowWindowAction(bool)));
 	}
-}
-
-void NormalMessageHandler::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
-{
-	Q_UNUSED(ABefore);
-	IMessageWindow *window = findWindow(APresence->streamJid(),AItem.itemJid);
-	if (window)
-		updateWindow(window);
 }
 
 void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext)
 {
 	if (AContext.isEmpty())
 	{
-		foreach (IMessageWindow *window, FWindows)
+		foreach (IMessageNormalWindow *window, FWindows)
 		{
 			if (!FMessageQueue.value(window).isEmpty() && FMessageQueue.value(window).head().type()==AMessageType)
 			{

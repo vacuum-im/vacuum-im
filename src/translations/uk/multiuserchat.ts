@@ -826,10 +826,6 @@ Check values and try again</source>
         <translation>%1 - Конференція</translation>
     </message>
     <message>
-        <source>Tools</source>
-        <translation>Інструменти</translation>
-    </message>
-    <message>
         <source>None</source>
         <translation>Ні</translation>
     </message>
@@ -872,18 +868,6 @@ Check values and try again</source>
     <message>
         <source>%1 changed status to [%2] %3</source>
         <translation>%1 змінив статус на [%2] %3</translation>
-    </message>
-    <message>
-        <source>Role: %1</source>
-        <translation>Тип: %1</translation>
-    </message>
-    <message>
-        <source>Affiliation: %1</source>
-        <translation>Членство: %1</translation>
-    </message>
-    <message>
-        <source>Status:</source>
-        <translation>Статус:</translation>
     </message>
     <message>
         <source>Mention message in conference: %1</source>
@@ -994,10 +978,6 @@ Check values and try again</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Quote Selected Text</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Enter your new nick name in conference %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1011,6 +991,22 @@ Check values and try again</source>
     </message>
     <message>
         <source>Destroying conference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

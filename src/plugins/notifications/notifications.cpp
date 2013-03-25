@@ -232,10 +232,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
-			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
 			Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
 			Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
-			QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,createIndex);
+			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
+			QList<IRosterIndex *> indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
 			if (!indexes.isEmpty())
 			{
 				IRostersNotify rnotify;
@@ -343,10 +343,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::TabPageNotify,notifyId,record.notification))
 		{
-			ITabPage *page = qobject_cast<ITabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_WIDGET).toLongLong());
+			IMessageTabPage *page = qobject_cast<IMessageTabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_WIDGET).toLongLong());
 			if (page && page->tabPageNotifier())
 			{
-				ITabPageNotify notify;
+				IMessageTabPageNotify notify;
 				notify.icon = icon;
 				notify.toolTip = toolTip;
 				notify.priority = record.notification.data.value(NDR_TABPAGE_PRIORITY).toInt();
@@ -404,7 +404,7 @@ void Notifications::removeNotification(int ANotifyId)
 		}
 		if (!record.tabPageNotifier.isNull())
 		{
-			ITabPageNotifier *notifier =  qobject_cast<ITabPageNotifier *>(record.tabPageNotifier);
+			IMessageTabPageNotifier *notifier =  qobject_cast<IMessageTabPageNotifier *>(record.tabPageNotifier);
 			if (notifier)
 				notifier->removeNotify(record.tabPageId);
 		}
@@ -605,7 +605,7 @@ void Notifications::onDelayedShowMinimized()
 {
 	foreach(QWidget *widget, FDelayedShowMinimized)
 	{
-		ITabPage *page = qobject_cast<ITabPage *>(widget);
+		IMessageTabPage *page = qobject_cast<IMessageTabPage *>(widget);
 		if (page)
 			page->showMinimizedTabPage();
 		else if (widget->isWindow() && !widget->isVisible())

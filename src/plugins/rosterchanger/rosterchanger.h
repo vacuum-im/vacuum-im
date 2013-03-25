@@ -3,7 +3,8 @@
 
 #include <QDateTime>
 #include <definitions/actiongroups.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/rosteredithandlerorders.h>
 #include <definitions/rosterdragdropmimetypes.h>
@@ -74,7 +75,7 @@ public:
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
 	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
-	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu);
 	//IRostersEditHandler
 	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
 	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
@@ -98,44 +99,48 @@ protected:
 	QString subscriptionNotify(int ASubsType, const Jid &AContactJid) const;
 	QList<int> findNotifies(const Jid &AStreamJid, const Jid &AContactJid) const;
 	void removeObsoleteNotifies(const Jid &AStreamJid, const Jid &AContactJid, int ASubsType, bool ASent);
-	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,bool ANewGroup, bool ARootGroup, bool ABlank, const char *ASlot, Menu *AParent);
 	SubscriptionDialog *findSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid) const;
 	SubscriptionDialog *createSubscriptionDialog(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANotify, const QString &AMessage);
-	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
-	QStringList indexesRoleList(const QList<IRosterIndex *> &AIndexes, int ARole, bool AUnique) const;
 protected:
-	void changeContactsSubscription(const Jid &AStreamJid, const QStringList &AContacts, int ASubsc);
-	void sendSubscription(const Jid &AStreamJid, const QStringList &AContacts, int ASubsc) const;
-	void addContactToGroup(const Jid &AStreamJid, const Jid &AContactJid, const QString &AGroup) const;
+	bool isRosterOpened(const Jid &AStreamJid) const;
+	bool isAllRostersOpened(const QStringList &AStreams) const;
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	QMap<int, QStringList> groupIndexesRolesMap(const QList<IRosterIndex *> &AIndexes) const;
+	Menu *createGroupMenu(const QHash<int,QVariant> &AData, const QSet<QString> &AExceptGroups,bool ANewGroup, bool ARootGroup, bool ABlank, const char *ASlot, Menu *AParent);
+protected:
+	//Operations on subscription
+	void sendSubscription(const QStringList &AStreams, const QStringList &AContacts, int ASubsc) const;
+	void changeSubscription(const QStringList &AStreams, const QStringList &AContacts, int ASubsc);
+	//Operations on contacts
 	void renameContact(const Jid &AStreamJid, const Jid &AContactJid, const QString &AOldName) const;
-	void copyContactsToGroup(const Jid &AStreamJid, const QStringList &AContacts, const QString &AGroup) const;
-	void moveContactsToGroup(const Jid &AStreamJid, const QStringList &AContacts, const QStringList &AGroupsFrom, const QString &AGroupTo) const;
-	void removeContactsFromGroups(const Jid &AStreamJid, const QStringList &AContacts, const QStringList &AGroups) const;
-	void removeContactsFromRoster(const Jid &AStreamJid, const QStringList &AContacts) const;
-	void addGroupToGroup(const Jid &AToStreamJid, const Jid &AFromStreamJid, const QString &AGroup, const QString &AGroupTo) const;
-	void renameGroup(const Jid &AStreamJid, const QString &AGroup) const;
-	void copyGroupsToGroup(const Jid &AStreamJid, const QStringList &AGroups, const QString &AGroupTo) const;
-	void moveGroupsToGroup(const Jid &AStreamJid, const QStringList &AGroups, const QString &AGroupTo) const;
-	void removeGroups(const Jid &AStreamJid, const QStringList &AGroups) const;
-	void removeGroupsContacts(const Jid &AStreamJid, const QStringList &AGroups) const;
+	void addContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QStringList &ANames, const QString &AGroup) const;
+	void copyContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QString &AGroup) const;
+	void moveContactsToGroup(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AGroupsFrom, const QString &AGroupTo) const;
+	void removeContactsFromGroups(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AGroups) const;
+	void removeContactsFromRoster(const QStringList &AStreams, const QStringList &AContacts) const;
+	//Operations on groups
+	void renameGroups(const QStringList &AStreams, const QStringList &AGroups, const QString &AOldName) const;
+	void copyGroupsToGroup(const QStringList &AStreams, const QStringList &AGroups, const QString &AGroupTo) const;
+	void moveGroupsToGroup(const QStringList &AStreams, const QStringList &AGroups, const QString &AGroupTo) const;
+	void removeGroups(const QStringList &AStreams, const QStringList &AGroups) const;
+	void removeGroupsContacts(const QStringList &AStreams, const QStringList &AGroups) const;
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	//Operations on subscription
 	void onSendSubscription(bool);
-	void onChangeContactsSubscription(bool);
+	void onChangeSubscription(bool);
 	void onSubscriptionSent(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AText);
 	void onSubscriptionReceived(IRoster *ARoster, const Jid &AItemJid, int ASubsType, const QString &AMessage);
 	//Operations on contacts
-	void onAddContactToGroup(bool);
 	void onRenameContact(bool);
+	void onAddContactsToGroup(bool);
 	void onCopyContactsToGroup(bool);
 	void onMoveContactsToGroup(bool);
 	void onRemoveContactsFromGroups(bool);
 	void onRemoveContactsFromRoster(bool);
 	//Operations on groups
-	void onAddGroupToGroup(bool);
-	void onRenameGroup(bool);
+	void onRenameGroups(bool);
 	void onCopyGroupsToGroup(bool);
 	void onMoveGroupsToGroup(bool);
 	void onRemoveGroups(bool);
@@ -145,8 +150,8 @@ protected slots:
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onRosterClosed(IRoster *ARoster);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);

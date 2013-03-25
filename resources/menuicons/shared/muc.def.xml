@@ -17,10 +17,6 @@
     <object mime="image/png">mucjoin.png</object>
   </icon>
   <icon>
-    <key>mucToolsMenu</key>
-    <object mime="image/png">muctoolsmenu.png</object>
-  </icon>
-  <icon>
     <key>mucInvite</key>
     <object mime="image/png">mucinvite.png</object>
   </icon>
