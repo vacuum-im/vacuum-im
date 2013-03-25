@@ -63,7 +63,7 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -96,7 +96,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(), SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
+			connect(FMessageWidgets->instance(), SIGNAL(normalWindowCreated(IMessageNormalWindow *)),SLOT(onMessageNormalWindowCreated(IMessageNormalWindow *)));
+			connect(FMessageWidgets->instance(), SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onMessageChatWindowCreated(IMessageChatWindow *)));
 		}
 	}
 
@@ -253,6 +254,17 @@ void VCardPlugin::showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid)
 	}
 }
 
+void VCardPlugin::registerDiscoFeatures()
+{
+	IDiscoFeature dfeature;
+	dfeature.active = false;
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_VCARD);
+	dfeature.var = NS_VCARD_TEMP;
+	dfeature.name = tr("Contact Profile");
+	dfeature.description = tr("Supports the requesting of the personal contact information");
+	FDiscovery->insertDiscoFeature(dfeature);
+}
+
 void VCardPlugin::unlockVCard(const Jid &AContactJid)
 {
 	VCardItem &vcardItem = FVCards[AContactJid];
@@ -298,15 +310,17 @@ void VCardPlugin::removeEmptyChildElements(QDomElement &AElem) const
 	}
 }
 
-void VCardPlugin::registerDiscoFeatures()
+void VCardPlugin::insertMessageToolBarAction(IMessageToolBarWidget *AWidget)
 {
-	IDiscoFeature dfeature;
-	dfeature.active = false;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_VCARD);
-	dfeature.var = NS_VCARD_TEMP;
-	dfeature.name = tr("Contact Profile");
-	dfeature.description = tr("Supports the requesting of the personal contact information");
-	FDiscovery->insertDiscoFeature(dfeature);
+	if (AWidget && AWidget->messageWindow()->contactJid().isValid())
+	{
+		Action *action = new Action(AWidget->instance());
+		action->setText(tr("Show Profile"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWVCARD);
+		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByMessageWindowAction(bool)));
+		AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_VCARD_VIEW);
+	}
 }
 
 void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
@@ -316,14 +330,14 @@ void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
 		{
 			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
-			int indexType = index!=NULL ? index->data(RDR_TYPE).toInt() : -1;
-			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
+			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 				showVCardDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
 	}
 }
 
-void VCardPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void VCardPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
@@ -333,7 +347,7 @@ void VCardPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes
 		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
 
 		bool canShowDialog = hasVCard(contactJid);
-		canShowDialog = canShowDialog || (stream!=NULL && stream->isOpen() && (index->type()==RIT_STREAM_ROOT || index->type()==RIT_CONTACT || index->type()==RIT_AGENT));
+		canShowDialog = canShowDialog || (stream!=NULL && stream->isOpen() && (index->kind()==RIK_STREAM_ROOT || index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT));
 		canShowDialog = canShowDialog || (FDiscovery!=NULL && FDiscovery->discoInfo(streamJid,contactJid.bare()).features.contains(NS_VCARD_TEMP));
 
 		if (canShowDialog)
@@ -376,20 +390,20 @@ void VCardPlugin::onShowVCardDialogByAction(bool)
 	}
 }
 
-void VCardPlugin::onShowVCardDialogByChatWindowAction(bool)
+void VCardPlugin::onShowVCardDialogByMessageWindowAction(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
-		if (toolBarWidget && toolBarWidget->viewWidget())
+		IMessageToolBarWidget *widget = qobject_cast<IMessageToolBarWidget *>(action->parent());
+		if (widget)
 		{
 			bool isMucUser = false;
-			Jid contactJid = toolBarWidget->viewWidget()->contactJid();
+			Jid contactJid = widget->messageWindow()->contactJid();
 			QList<IMultiUserChatWindow *> windows = FMultiUserChatPlugin!=NULL ? FMultiUserChatPlugin->multiChatWindows() : QList<IMultiUserChatWindow *>();
 			for (int i=0; !isMucUser && i<windows.count(); i++)
 				isMucUser = windows.at(i)->findChatWindow(contactJid)!=NULL;
-			showVCardDialog(toolBarWidget->viewWidget()->streamJid(), isMucUser ? contactJid : contactJid.bare());
+			showVCardDialog(widget->messageWindow()->streamJid(), isMucUser ? contactJid : contactJid.bare());
 		}
 	}
 }
@@ -407,17 +421,14 @@ void VCardPlugin::onXmppStreamRemoved(IXmppStream *AXmppStream)
 			delete dialog;
 }
 
-void VCardPlugin::onChatWindowCreated(IChatWindow *AWindow)
+void VCardPlugin::onMessageNormalWindowCreated(IMessageNormalWindow *AWindow)
 {
-	if (AWindow->toolBarWidget() && AWindow->toolBarWidget()->viewWidget())
-	{
-		Action *action = new Action(AWindow->toolBarWidget()->instance());
-		action->setText(tr("Show Profile"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWVCARD);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByChatWindowAction(bool)));
-		AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MWTBW_VCARD_VIEW);
-	}
+	insertMessageToolBarAction(AWindow->toolBarWidget());
+}
+
+void VCardPlugin::onMessageChatWindowCreated(IMessageChatWindow *AWindow)
+{
+	insertMessageToolBarAction(AWindow->toolBarWidget());
 }
 
 Q_EXPORT_PLUGIN2(plg_vcard, VCardPlugin)

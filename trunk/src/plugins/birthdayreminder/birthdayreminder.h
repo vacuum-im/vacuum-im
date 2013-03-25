@@ -12,7 +12,8 @@
 #include <definitions/vcardvaluenames.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rostertooltiporders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibirthdayreminder.h>
 #include <interfaces/ivcard.h>

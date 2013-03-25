@@ -18,12 +18,17 @@
 #define TBG_MWTBW_CLEAR_WINDOW                                  1800
 #define TBG_MWTBW_CHATSTATES                                    10100
 
-//ChatWindow - ToolBarWidget
-#define TBG_CWTBW_USER_TOOLS                                    10900
+//MessageWidgets - InfowWidgetToolBar
+#define TBG_MWIWTB_ADDRESSMENU                                  500
+
+//MessageWidgets - EditWidgetToolBar
+#define TBG_MWEWTB_SENDMESSAGE                                  500
+
+//MessageWidgets - NormalWindowToolBar
+#define TBG_MWNWTB_WINDOWMENU                                   15000
 
 //MultiChatWindow - ToolBarWidget
 #define TBG_MCWTBW_BOOKMARKS                                    10200
-#define TBG_MCWTBW_ROOM_TOOLS                                   10900
 #define TBG_MCWTBW_ROOM_ENTER                                   10990
 #define TBG_MCWTBW_ROOM_EXIT                                    11000
 
@@ -39,4 +44,4 @@
 //RosterChanger - SubscriptionRequestDialog
 #define TBG_RCSRD_ROSTERCHANGER                                 500
 
-#endif
+#endif // DEF_TOOLBARGROUPS_H

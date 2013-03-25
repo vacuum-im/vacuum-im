@@ -12,16 +12,16 @@
         <translation>Annotation</translation>
     </message>
     <message>
-        <source>Annotation:</source>
-        <translation>Annotation:</translation>
-    </message>
-    <message>
         <source>Allows to add comments to the contacts in the roster</source>
         <translation>Allows to add comments to the contacts in the roster</translation>
     </message>
     <message>
         <source>Edit annotation</source>
         <translation>Edit annotation</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Annotation:&lt;/b&gt;</translation>
     </message>
 </context>
 <context>

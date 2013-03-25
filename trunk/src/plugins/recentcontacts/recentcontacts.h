@@ -36,11 +36,9 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersDragDropHandler
 	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
@@ -83,7 +81,7 @@ signals:
 	void recentItemIndexCreated(const IRecentItem &AItem, IRosterIndex *AIndex);
 	void itemHandlerRegistered(const QString &AType, IRecentItemHandler *AHandler);
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 	//IRecentItemHandler
@@ -110,7 +108,7 @@ protected:
 	QList<IRecentItem> loadItemsFromFile(const QString &AFileName) const;
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
 protected:
-	bool isSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	bool isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
 	void removeRecentItems(const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 	void setItemsFavorite(bool AFavorite, const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
@@ -120,7 +118,7 @@ protected slots:
 	void onRostersModelStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
 	void onRostersModelIndexInserted(IRosterIndex *AIndex);
 	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
-	void onRostersModelIndexRemoved(IRosterIndex *AIndex);
+	void onRostersModelIndexRemoving(IRosterIndex *AIndex);
 protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);

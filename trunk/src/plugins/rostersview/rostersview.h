@@ -6,10 +6,10 @@
 #include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
-#include <definitions/shortcuts.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rostertooltiporders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterlabelholderorders.h>
@@ -17,7 +17,6 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imainwindow.h>
 #include <utils/options.h>
-#include <utils/shortcuts.h>
 #include <utils/iconstorage.h>
 
 class RostersView :
@@ -38,11 +37,9 @@ public:
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
@@ -65,7 +62,7 @@ public:
 	virtual bool isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes);
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const;
 	virtual bool setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes, bool APartial=true);
-	virtual QMap<int, QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const;
+	virtual QMap<int, QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1, int AGroupByRole=-1) const;
 	//--ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual QList<QAbstractProxyModel *> proxyModels() const;
@@ -110,14 +107,6 @@ public:
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler);
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler);
 signals:
-	//IMainTabPage
-	void tabPageChanged();
-	void tabPageDestroyed();
-	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
-	//IRostersLabelHolder
-	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
-	//IRostersView
 	void modelAboutToBeSeted(IRostersModel *AModel);
 	void modelSeted(IRostersModel *AModel);
 	void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder);
@@ -133,6 +122,13 @@ signals:
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
 	void notifyRemoved(int ANotifyId);
+	//IMainTabPage
+	void tabPageChanged();
+	void tabPageDestroyed();
+	//IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
+	//IRostersLabelHolder
+	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	void clearLabels();
 	void appendBlinkItem(quint32 ALabelId, int ANotifyId);
@@ -164,16 +160,13 @@ protected slots:
 	//QAbstractItemView
 	void closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint);
 protected slots:
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
 	void onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex);
-	void onCopyToClipboardActionTriggered(bool);
 	void onIndexDestroyed(IRosterIndex *AIndex);
 	void onUpdateIndexNotifyTimeout();
 	void onRemoveIndexNotifyTimeout();
 	void onUpdateBlinkLabels();
 	void onDragExpandTimer();
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IRostersModel *FRostersModel;
 private:

@@ -5,7 +5,8 @@
 
 #include <QTimer>
 #include <definitions/messagehandlerorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/recentitemtypes.h>
@@ -35,23 +36,22 @@
 #include <interfaces/istatusicons.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
+#include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/ivcard.h>
 #include <interfaces/iavatars.h>
+#include <interfaces/iaccountmanager.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/irecentcontacts.h>
-#include <utils/widgetmanager.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
-#include "usercontextmenu.h"
+#include <utils/widgetmanager.h>
 
-struct WindowStatus
-{
+struct WindowStatus {
 	QDateTime startTime;
 	QDateTime createTime;
-	QString lastStatusShow;
 	QDate lastDateSeparator;
 };
 
@@ -90,55 +90,69 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
-	IChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
-	IChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
-	IChatWindow *findSubstituteWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
-	void updateWindow(IChatWindow *AWindow);
-	void removeNotifiedMessages(IChatWindow *AWindow);
-	void showHistory(IChatWindow *AWindow);
-	void setMessageStyle(IChatWindow *AWindow);
-	void fillContentOptions(IChatWindow *AWindow, IMessageContentOptions &AOptions) const;
-	void showDateSeparator(IChatWindow *AWindow, const QDateTime &ADateTime);
-	void showStyledStatus(IChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
-	void showStyledMessage(IChatWindow *AWindow, const Message &AMessage);
+	IMessageChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
+	IMessageChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
+	void updateWindow(IMessageChatWindow *AWindow);
+	void removeNotifiedMessages(IMessageChatWindow *AWindow);
+	void showHistory(IMessageChatWindow *AWindow);
+	void setMessageStyle(IMessageChatWindow *AWindow);
+	void fillContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const;
+	void showDateSeparator(IMessageChatWindow *AWindow, const QDateTime &ADateTime);
+	void showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
+	void showStyledMessage(IMessageChatWindow *AWindow, const Message &AMessage);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	QMap<Jid, QList<Jid> > getSortedAddresses(const QMultiMap<Jid,Jid> &AAddresses) const;
 protected slots:
-	void onMessageReady();
+	void onWindowMessageReady();
 	void onWindowActivated();
 	void onWindowClosed();
 	void onWindowDestroyed();
+	void onWindowAddressChanged();
+	void onWindowAvailAddressesChanged();
+	void onWindowAddressMenuRequested(Menu *AMenu);
+	void onWindowContextMenuRequested(Menu *AMenu);
+	void onWindowToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
-	void onWindowInfoFieldChanged(int AField, const QVariant &AValue);
+protected slots:
 	void onStatusIconsChanged();
+	void onAvatarChanged(const Jid &AContactJid);
+	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
+	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
+protected slots:
 	void onShowWindowAction(bool);
 	void onClearWindowAction(bool);
+	void onChangeWindowAddressAction();
+	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
+	IAvatars *FAvatars;
 	IMessageWidgets *FMessageWidgets;
 	IMessageProcessor *FMessageProcessor;
 	IMessageStyles *FMessageStyles;
+	IRosterPlugin *FRosterPlugin;
 	IPresencePlugin *FPresencePlugin;
 	IMessageArchiver *FMessageArchiver;
 	IRostersView *FRostersView;
 	IRostersModel *FRostersModel;
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
+	INotifications *FNotifications;
+	IAccountManager *FAccountManager;
 	IXmppUriQueries *FXmppUriQueries;
 	IOptionsManager *FOptionsManager;
 	IRecentContacts *FRecentContacts;
 private:
-	QList<IChatWindow *> FWindows;
-	QMap<IChatWindow *, QTimer *> FDestroyTimers;
-	QMultiMap<IChatWindow *, int> FNotifiedMessages;
-	QMap<IChatWindow *, WindowStatus> FWindowStatus;
+	QList<IMessageChatWindow *> FWindows;
+	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;
+	QMultiMap<IMessageChatWindow *, int> FNotifiedMessages;
+	QMap<IMessageChatWindow *, WindowStatus> FWindowStatus;
 private:
-	QMap<QString, IChatWindow *> FHistoryRequests;
-	QMap<IChatWindow *, QList<Message> > FPendingMessages;
+	QMap<QString, IMessageChatWindow *> FHistoryRequests;
+	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
 };
 
 #endif // CHATMESSAGEHANDLER_H

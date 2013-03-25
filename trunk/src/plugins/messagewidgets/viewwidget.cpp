@@ -6,7 +6,7 @@
 #include <QVBoxLayout>
 #include <QTextDocumentFragment>
 
-ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
+ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	setAcceptDrops(true);
@@ -16,10 +16,10 @@ ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, 
 
 	FMessageStyle = NULL;
 	FMessageProcessor = NULL;
+
+	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
 
-	FStreamJid = AStreamJid;
-	FContactJid = AContactJid;
 	FStyleWidget = NULL;
 
 	initialize();
@@ -30,24 +30,14 @@ ViewWidget::~ViewWidget()
 
 }
 
-void ViewWidget::setStreamJid(const Jid &AStreamJid)
+bool ViewWidget::isVisibleOnWindow() const
 {
-	if (AStreamJid != FStreamJid)
-	{
-		Jid before = FStreamJid;
-		FStreamJid = AStreamJid;
-		emit streamJidChanged(before);
-	}
+	return isVisibleTo(FWindow->instance());
 }
 
-void ViewWidget::setContactJid(const Jid &AContactJid)
+IMessageWindow *ViewWidget::messageWindow() const
 {
-	if (AContactJid != FContactJid)
-	{
-		Jid before = FContactJid;
-		FContactJid = AContactJid;
-		emit contactJidChanged(before);
-	}
+	return FWindow;
 }
 
 QWidget *ViewWidget::styleWidget() const
@@ -163,7 +153,7 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 	Menu *dropMenu = new Menu(this);
 
 	bool accepted = false;
-	foreach(IViewDropHandler *handler, FActiveDropHandlers)
+	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
 		if (handler->viewDropAction(this, AEvent, dropMenu))
 			accepted = true;
 
@@ -184,7 +174,7 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 {
 	FActiveDropHandlers.clear();
-	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+	foreach(IMessageViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
 		if (handler->viewDragEnter(this, AEvent))
 			FActiveDropHandlers.append(handler);
 
@@ -197,7 +187,7 @@ void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	bool accepted = false;
-	foreach(IViewDropHandler *handler, FActiveDropHandlers)
+	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
 		if (handler->viewDragMove(this, AEvent))
 			accepted = true;
 
@@ -209,7 +199,7 @@ void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 
 void ViewWidget::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
-	foreach(IViewDropHandler *handler, FActiveDropHandlers)
+	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
 		handler->viewDragLeave(this, AEvent);
 }
 

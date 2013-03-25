@@ -27,5 +27,13 @@
         <source>Without Groups</source>
         <translation>Without Groups</translation>
     </message>
+    <message>
+        <source>Accounts</source>
+        <translation>Accounts</translation>
+    </message>
+    <message>
+        <source>All Contacts</source>
+        <translation>All Contacts</translation>
+    </message>
 </context>
 </TS>

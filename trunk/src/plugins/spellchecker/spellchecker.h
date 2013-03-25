@@ -50,7 +50,7 @@ protected slots:
 	void onChangeDictionary();
 	void onRepairWordUnderCursor();
 	void onAddUnknownWordToDictionary();
-	void onEditWidgetCreated(IEditWidget *AWidget);
+	void onEditWidgetCreated(IMessageEditWidget *AWidget);
 	void onEditWidgetContextMenuRequested(const QPoint &APosition, Menu *AMenu);
 	void onTextEditDestroyed(QObject *AObject);
 protected slots:

@@ -3,14 +3,15 @@
 
 #include <QSortFilterProxyModel>
 #include <definitions/optionvalues.h>
-#include <definitions/rosterindextyperole.h>
-#include <definitions/rosterindextypeorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterindexkindorders.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
 
 class SortFilterProxyModel :
-			public QSortFilterProxyModel
+	public QSortFilterProxyModel
 {
 	Q_OBJECT;
 public:

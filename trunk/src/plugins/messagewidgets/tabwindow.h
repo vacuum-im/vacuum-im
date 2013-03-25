@@ -16,10 +16,10 @@
 
 class TabWindow :
 	public QMainWindow,
-	public ITabWindow
+	public IMessageTabWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(ITabWindow IMainCentralPage);
+	Q_INTERFACES(IMessageTabWindow IMainCentralPage);
 public:
 	TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId);
 	~TabWindow();
@@ -28,7 +28,7 @@ public:
 	virtual void showCentralPage(bool AMinimized = false);
 	virtual QIcon centralPageIcon() const;
 	virtual QString centralPageCaption() const;
-	// ITabWindow
+	// IMessageTabWindow
 	virtual void showWindow();
 	virtual void showMinimizedWindow();
 	virtual QUuid windowId() const;
@@ -39,20 +39,20 @@ public:
 	virtual bool isAutoCloseEnabled() const;
 	virtual void setAutoCloseEnabled(bool AEnabled);
 	virtual int tabPageCount() const;
-	virtual ITabPage *tabPage(int AIndex) const;
-	virtual void addTabPage(ITabPage *APage);
-	virtual bool hasTabPage(ITabPage *APage) const;
-	virtual ITabPage *currentTabPage() const;
-	virtual void setCurrentTabPage(ITabPage *APage);
-	virtual void detachTabPage(ITabPage *APage);
-	virtual void removeTabPage(ITabPage *APage);
+	virtual IMessageTabPage *tabPage(int AIndex) const;
+	virtual void addTabPage(IMessageTabPage *APage);
+	virtual bool hasTabPage(IMessageTabPage *APage) const;
+	virtual IMessageTabPage *currentTabPage() const;
+	virtual void setCurrentTabPage(IMessageTabPage *APage);
+	virtual void detachTabPage(IMessageTabPage *APage);
+	virtual void removeTabPage(IMessageTabPage *APage);
 signals:
-	// ITabWindow
-	void currentTabPageChanged(ITabPage *APage);
-	void tabPageMenuRequested(ITabPage *APage, Menu *AMenu);
-	void tabPageAdded(ITabPage *APage);
-	void tabPageRemoved(ITabPage *APage);
-	void tabPageDetached(ITabPage *APage);
+	// IMessageTabWindow
+	void currentTabPageChanged(IMessageTabPage *APage);
+	void tabPageMenuRequested(IMessageTabPage *APage, Menu *AMenu);
+	void tabPageAdded(IMessageTabPage *APage);
+	void tabPageRemoved(IMessageTabPage *APage);
+	void tabPageDetached(IMessageTabPage *APage);
 	void windowChanged();
 	void windowDestroyed();
 	// IMainCentralPage

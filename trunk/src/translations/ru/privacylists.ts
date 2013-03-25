@@ -214,48 +214,8 @@
         <translation>Невидимый режим</translation>
     </message>
     <message>
-        <source>Disable privacy lists</source>
-        <translation>Отключить списки приватности</translation>
-    </message>
-    <message>
-        <source>Block off roster contacts</source>
-        <translation>Заблокировать контакты вне контакт-листа</translation>
-    </message>
-    <message>
-        <source>Visible to contact</source>
-        <translation>Видим для контакта</translation>
-    </message>
-    <message>
-        <source>Invisible to contact</source>
-        <translation>Невидим для контакта</translation>
-    </message>
-    <message>
-        <source>Ignore contact</source>
-        <translation>Игнорировать контакт</translation>
-    </message>
-    <message>
-        <source>Visible to group</source>
-        <translation>Видим для группы</translation>
-    </message>
-    <message>
-        <source>Invisible to group</source>
-        <translation>Невидим для группы</translation>
-    </message>
-    <message>
-        <source>Ignore group</source>
-        <translation>Игнорировать группу</translation>
-    </message>
-    <message>
-        <source>Set Active list</source>
-        <translation>Активный список</translation>
-    </message>
-    <message>
         <source>&lt;None&gt;</source>
         <translation>&lt;Нет&gt;</translation>
-    </message>
-    <message>
-        <source>Set Default list</source>
-        <translation>Список по умолчанию</translation>
     </message>
     <message>
         <source>Advanced...</source>
@@ -292,6 +252,50 @@
     <message>
         <source>&lt;b&gt;denied&lt;/b&gt;</source>
         <translation>&lt;b&gt;запрещено&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Disable Privacy Lists</source>
+        <translation>Отключить списки приватности</translation>
+    </message>
+    <message>
+        <source>Block Contacts Without Subscription</source>
+        <translation>Блокировать контакты без подписки</translation>
+    </message>
+    <message>
+        <source>Default Rule</source>
+        <translation>Правило по умолчанию</translation>
+    </message>
+    <message>
+        <source>Visible to Contact</source>
+        <translation>Видим для контакта</translation>
+    </message>
+    <message>
+        <source>Invisible to Contact</source>
+        <translation>Невиди для контакта</translation>
+    </message>
+    <message>
+        <source>Ignore Contact</source>
+        <translation>Игнорировать контакт</translation>
+    </message>
+    <message>
+        <source>Visible to Group</source>
+        <translation>Видим для группы</translation>
+    </message>
+    <message>
+        <source>Invisible to Group</source>
+        <translation>Невидим для группы</translation>
+    </message>
+    <message>
+        <source>Ignore Group</source>
+        <translation>Игнорировать группу</translation>
+    </message>
+    <message>
+        <source>Set Active List</source>
+        <translation>Установить активный спосок</translation>
+    </message>
+    <message>
+        <source>Set Default List</source>
+        <translation>Установить список по умолчанию</translation>
     </message>
 </context>
 </TS>

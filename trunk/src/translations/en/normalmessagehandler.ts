@@ -64,5 +64,29 @@
         <source>Mark all single messages from user as read when you read the first one</source>
         <translation>Mark all single messages from user as read when you read the first one</translation>
     </message>
+    <message>
+        <source>Send</source>
+        <translation>Send</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <translation>Reply</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation>Forward</translation>
+    </message>
+    <message>
+        <source>Show Chat Dialog</source>
+        <translation>Show Chat Dialog</translation>
+    </message>
+    <message>
+        <source>Send Message</source>
+        <translation>Send Message</translation>
+    </message>
+    <message>
+        <source>Show Next</source>
+        <translation>Show Next</translation>
+    </message>
 </context>
 </TS>

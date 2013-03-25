@@ -64,5 +64,29 @@
         <source>Mark all single messages from user as read when you read the first one</source>
         <translation>Oznacz wszystkie wiadomości od użytkownika jako przeczytane po przeczytaniu pierwszej</translation>
     </message>
+    <message>
+        <source>Send</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Chat Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Next</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

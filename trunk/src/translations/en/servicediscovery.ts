@@ -236,10 +236,6 @@
         <translation>Esc</translation>
     </message>
     <message>
-        <source>Category: %1; Type: %2</source>
-        <translation>Category: %1; Type: %2</translation>
-    </message>
-    <message>
         <source>Show Profile</source>
         <translation>Show Profile</translation>
     </message>

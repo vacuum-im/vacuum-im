@@ -57,22 +57,24 @@ bool SortFilterProxyModel::compareVariant( const QVariant &ALeft, const QVariant
 
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-	int leftTypeOrder = ALeft.data(RDR_TYPE_ORDER).toInt();
-	int rightTypeOrder = ARight.data(RDR_TYPE_ORDER).toInt();
+	int leftTypeOrder = ALeft.data(RDR_KIND_ORDER).toInt();
+	int rightTypeOrder = ARight.data(RDR_KIND_ORDER).toInt();
 	if (leftTypeOrder == rightTypeOrder)
 	{
 		QVariant leftSortOrder = ALeft.data(RDR_SORT_ORDER);
 		QVariant rightSortOrder = ARight.data(RDR_SORT_ORDER);
 		if (leftSortOrder.isNull() || rightSortOrder.isNull() || leftSortOrder==rightSortOrder)
 		{
-			if (FSortByStatus && leftTypeOrder!=RITO_STREAM_ROOT)
+			if (FSortByStatus && leftTypeOrder!=RIKO_STREAM_ROOT)
 			{
 				int leftShow = ALeft.data(RDR_SHOW).toInt();
 				int rightShow = ARight.data(RDR_SHOW).toInt();
 				if (leftShow != rightShow)
 				{
 					static const int showOrders[] = {6,2,1,3,4,5,7,8};
-					return showOrders[leftShow] < showOrders[rightShow];
+					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
+					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
+						return showOrders[leftShow] < showOrders[rightShow];
 				}
 			}
 			return compareVariant(ALeft.data(Qt::DisplayRole),ARight.data(Qt::DisplayRole));
@@ -85,25 +87,28 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
 	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
-	if (index.data(RDR_ALLWAYS_INVISIBLE).toInt() > 0)
-		return false;
-	if (index.data(RDR_ALLWAYS_VISIBLE).toInt() > 0)
-		return true;
 
-	if (!FShowOffline)
+	int visible = index.data(RDR_FORCE_VISIBLE).toInt();
+	if (visible > 0)
 	{
-		if (sourceModel()->hasChildren(index))
-		{
-			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-				if (filterAcceptsRow(childRow,index))
-					return true;
-			return false;
-		}
-		else if (!index.data(RDR_SHOW).isNull())
-		{
-			int indexShow = index.data(RDR_SHOW).toInt();
-			return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
-		}
+		return true;
 	}
+	else if (visible < 0)
+	{
+		return false;
+	}
+	else if (sourceModel()->hasChildren(index))
+	{
+		for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+			if (filterAcceptsRow(childRow,index))
+				return true;
+		return false;
+	}
+	else if (!FShowOffline && !index.data(RDR_SHOW).isNull())
+	{
+		int indexShow = index.data(RDR_SHOW).toInt();
+		return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
+	}
+
 	return true;
 }

@@ -9,7 +9,6 @@
 #include <QHeaderView>
 #include <QResizeEvent>
 #include <QApplication>
-#include <QTextDocument>
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
@@ -17,8 +16,6 @@
 
 #define BLINK_VISIBLE_TIME      750
 #define BLINK_INVISIBLE_TIME    250
-
-#define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
 RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 {
@@ -56,11 +53,7 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	FDragExpandTimer.setInterval(500);
 	connect(&FDragExpandTimer,SIGNAL(timeout()),SLOT(onDragExpandTimer()));
 
-	connect(this,SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
-		SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
-
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),
-		SLOT(onShortcutActivated(const QString &, QWidget *)));
+	insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,this);
 }
 
 RostersView::~RostersView()
@@ -83,78 +76,72 @@ QString RostersView::tabPageToolTip() const
 	return QString::null;
 }
 
-int RostersView::rosterDataOrder() const
+QList<int> RostersView::rosterDataRoles(int AOrder) const
 {
-	return RDHO_ROSTERSVIEW_NOTIFY;
+	if (AOrder == RDHO_ROSTERSVIEW)
+		return QList<int>() << RDR_LABEL_ITEMS;
+	else if (AOrder == RDHO_ROSTERSVIEW_NOTIFY)
+		return QList<int>() << RDR_FORCE_VISIBLE << Qt::DecorationRole << Qt::BackgroundColorRole;
+	return QList<int>();
 }
 
-QList<int> RostersView::rosterDataRoles() const
-{
-	static QList<int> dataRoles = QList<int>() << RDR_LABEL_ITEMS << RDR_ALLWAYS_VISIBLE << Qt::DecorationRole << Qt::BackgroundColorRole;
-	return dataRoles;
-}
-
-QList<int> RostersView::rosterDataTypes() const
-{
-	static QList<int> dataTypes = QList<int>() << RIT_ANY_TYPE;
-	return dataTypes;
-}
-
-QVariant RostersView::rosterData(const IRosterIndex *AIndex, int ARole) const
+QVariant RostersView::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
 	QVariant data;
-	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
-	if (ARole == RDR_LABEL_ITEMS)
+	if (AOrder == RDHO_ROSTERSVIEW)
 	{
-		AdvancedDelegateItems labelItems;
-
-		for (QMultiMap<int, IRostersLabelHolder *>::const_iterator holder_it=FLabelHolders.constBegin(); holder_it!=FLabelHolders.constEnd(); ++holder_it)
+		IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
+		if (ARole == RDR_LABEL_ITEMS)
 		{
-			QList<quint32> labels = holder_it.value()->rosterLabels(holder_it.key(),index);
-			for (QList<quint32>::const_iterator label_it = labels.constBegin(); label_it!=labels.constEnd(); ++label_it)
+			AdvancedDelegateItems labelItems;
+
+			for (QMultiMap<int, IRostersLabelHolder *>::const_iterator holder_it=FLabelHolders.constBegin(); holder_it!=FLabelHolders.constEnd(); ++holder_it)
 			{
-				quint32 labelId = *label_it;
-				if (!labelItems.contains(labelId))
-					labelItems.insert(labelId,holder_it.value()->rosterLabel(holder_it.key(),labelId,index));
+				QList<quint32> labels = holder_it.value()->rosterLabels(holder_it.key(),index);
+				for (QList<quint32>::const_iterator label_it = labels.constBegin(); label_it!=labels.constEnd(); ++label_it)
+				{
+					quint32 labelId = *label_it;
+					if (!labelItems.contains(labelId))
+						labelItems.insert(labelId,holder_it.value()->rosterLabel(holder_it.key(),labelId,index));
+				}
 			}
+
+			for (QMultiMap<IRosterIndex *, quint32>::const_iterator it = FIndexLabels.constFind(index); it!=FIndexLabels.constEnd() && it.key()==index; ++it)
+				if (!labelItems.contains(it.value()))
+					labelItems.insert(it.value(),FLabelItems.value(it.value()));
+
+			data.setValue(labelItems);
 		}
-
-		for (QMultiMap<IRosterIndex *, quint32>::const_iterator it = FIndexLabels.constFind(index); it!=FIndexLabels.constEnd() && it.key()==index; ++it)
-			if (!labelItems.contains(it.value()))
-				labelItems.insert(it.value(),FLabelItems.value(it.value()));
-
-		data.setValue(labelItems);
 	}
-	else if (FActiveNotifies.contains(index))
+	else if (AOrder == RDHO_ROSTERSVIEW_NOTIFY)
 	{
-		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
-		if (ARole == RDR_ALLWAYS_VISIBLE)
+		IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
+		if (FActiveNotifies.contains(index))
 		{
-			static bool block = false;
-			if (!block && (notify.flags & IRostersNotify::AllwaysVisible)>0)
+			const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
+			if (ARole == RDR_FORCE_VISIBLE)
 			{
-				block = true;
-				data = index->data(ARole).toInt() + 1;
-				block = false;
+				if ((notify.flags & IRostersNotify::AllwaysVisible) > 0)
+				{
+					data = 1;
+				}
 			}
-		}
-		else if (ARole == Qt::DecorationRole)
-		{
-			data = !notify.icon.isNull() ? notify.icon : data;
-		}
-		else if (ARole == Qt::BackgroundColorRole)
-		{
-			data = notify.background;
+			else if (ARole == Qt::DecorationRole)
+			{
+				data = !notify.icon.isNull() ? notify.icon : data;
+			}
+			else if (ARole == Qt::BackgroundColorRole)
+			{
+				data = notify.background;
+			}
 		}
 	}
 	return data;
 }
 
-bool RostersView::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool RostersView::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex);
-	Q_UNUSED(ARole);
-	Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
 }
 
@@ -162,18 +149,11 @@ QList<quint32> RostersView::rosterLabels(int AOrder, const IRosterIndex *AIndex)
 {
 	QList<quint32> labels;
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
-	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && FRostersModel)
-	{
-		if (AIndex->parentIndex()==FRostersModel->rootIndex())
-			labels.append(AdvancedDelegateItem::DisplayId);
-		else if (FRostersModel->isGroupType(AIndex->type()))
-			labels.append(AdvancedDelegateItem::DisplayId);
-	}
-	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && FActiveNotifies.contains(index))
+	if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && FActiveNotifies.contains(index))
 	{
 		const IRostersNotify &notify = FNotifyItems.value(FActiveNotifies.value(index));
 		if (!notify.footer.isEmpty())
-			labels.append(RLID_SCHANGER_STATUS);
+			labels.append(RLID_ROSTERSVIEW_STATUS);
 		if (!notify.icon.isNull())
 			labels.append(AdvancedDelegateItem::DecorationId);
 	}
@@ -184,26 +164,16 @@ AdvancedDelegateItem RostersView::rosterLabel(int AOrder, quint32 ALabelId, cons
 {
 	AdvancedDelegateItem label;
 	IRosterIndex *index = const_cast<IRosterIndex *>(AIndex);
-	if (AOrder==RLHO_ROSTERSVIEW_DISPLAY && ALabelId==AdvancedDelegateItem::DisplayId && FRostersModel)
-	{
-		label.d->id = AdvancedDelegateItem::DisplayId;
-		label.d->kind = AdvancedDelegateItem::Display;
-		label.d->data = AIndex->data(Qt::DisplayRole);
-		if (AIndex->parentIndex()==FRostersModel->rootIndex())
-			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
-		else if (FRostersModel->isGroupType(AIndex->type()))
-			label.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::DemiBold);
-	}
-	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
+	if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==AdvancedDelegateItem::DecorationId)
 	{
 		label.d->id = AdvancedDelegateItem::DecorationId;
 		label.d->kind = AdvancedDelegateItem::Decoration;
 		label.d->flags = AdvancedDelegateItem::Blink;
 		label.d->data = FNotifyItems.value(FActiveNotifies.value(index)).icon;
 	}
-	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==RLID_SCHANGER_STATUS)
+	else if (AOrder==RLHO_ROSTERSVIEW_NOTIFY && ALabelId==RLID_ROSTERSVIEW_STATUS)
 	{
-		label.d->id = RLID_SCHANGER_STATUS;
+		label.d->id = RLID_ROSTERSVIEW_STATUS;
 		label.d->kind = AdvancedDelegateItem::CustomData;
 		label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
 		label.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);
@@ -228,9 +198,9 @@ void RostersView::setRostersModel(IRostersModel *AModel)
 
 		if (FRostersModel)
 		{
-			disconnect(FRostersModel->instance(),SIGNAL(indexInserted(IRosterIndex *)),this,SLOT(onIndexInserted(IRosterIndex *)));
 			disconnect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),this,SLOT(onIndexDestroyed(IRosterIndex *)));
-			FRostersModel->removeDefaultDataHolder(this);
+			FRostersModel->removeRosterDataHolder(RDHO_ROSTERSVIEW,this);
+			FRostersModel->removeRosterDataHolder(RDHO_ROSTERSVIEW_NOTIFY,this);
 			clearLabels();
 		}
 
@@ -238,7 +208,8 @@ void RostersView::setRostersModel(IRostersModel *AModel)
 
 		if (FRostersModel)
 		{
-			FRostersModel->insertDefaultDataHolder(this);
+			FRostersModel->insertRosterDataHolder(RDHO_ROSTERSVIEW,this);
+			FRostersModel->insertRosterDataHolder(RDHO_ROSTERSVIEW_NOTIFY,this);
 			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)), SLOT(onIndexDestroyed(IRosterIndex *)));
 		}
 
@@ -265,7 +236,7 @@ bool RostersView::repaintRosterIndex(IRosterIndex *AIndex)
 {
 	if (FRostersModel)
 	{
-		QModelIndex modelIndex = mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex));
+		QModelIndex modelIndex = mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex));
 		if (modelIndex.isValid())
 		{
 			QRect rect = visualRect(modelIndex).adjusted(1,1,-1,-1);
@@ -281,7 +252,7 @@ bool RostersView::repaintRosterIndex(IRosterIndex *AIndex)
 
 void RostersView::expandIndexParents(IRosterIndex *AIndex)
 {
-	QModelIndex index = FRostersModel->modelIndexByRosterIndex(AIndex);
+	QModelIndex index = FRostersModel->modelIndexFromRosterIndex(AIndex);
 	index = mapFromModel(index);
 	expandIndexParents(index);
 }
@@ -298,7 +269,7 @@ void RostersView::expandIndexParents(const QModelIndex &AIndex)
 
 bool RostersView::editRosterIndex(IRosterIndex *AIndex, int ADataRole)
 {
-	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)) : QModelIndex();
+	QModelIndex index = FRostersModel!=NULL ? mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex)) : QModelIndex();
 	if (index.isValid() && state()==NoState && !visualRect(index).isEmpty())
 	{
 		for (QMultiMap<int,IRostersEditHandler *>::const_iterator it=FEditHandlers.constBegin(); it!=FEditHandlers.constEnd(); ++it)
@@ -387,7 +358,7 @@ void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEven
 	{
 		quint32 labelId = AdvancedDelegateItem::DisplayId;
 		if (FRostersModel && AEvent!=NULL)
-			labelId = labelAt(AEvent->pos(),mapFromModel(FRostersModel->modelIndexByRosterIndex(AIndex)));
+			labelId = labelAt(AEvent->pos(),mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex)));
 
 		emit indexToolTips(AIndex,labelId,AToolTips);
 		if (labelId!=AdvancedDelegateItem::DisplayId && AToolTips.isEmpty())
@@ -432,42 +403,16 @@ void RostersView::clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, c
 		quint32 labelId = AdvancedDelegateItem::DisplayId;
 		if (FRostersModel && AEvent!=NULL)
 			labelId = labelAt(AEvent->pos(),indexAt(AEvent->pos()));
-
-		if (labelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
-		{
-			IRosterIndex *index = AIndexes.first();
-			if (!index->data(RDR_FULL_JID).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Jabber ID"));
-				action->setData(ADR_CLIPBOARD_DATA, Jid(index->data(RDR_FULL_JID).toString()).uBare());
-				action->setShortcutId(SCT_ROSTERVIEW_COPYJID);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-
-			if (!index->data(RDR_STATUS).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Status"));
-				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_STATUS));
-				action->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-
-			if (!index->data(RDR_NAME).toString().isEmpty())
-			{
-				Action *action = new Action(AMenu);
-				action->setText(tr("Name"));
-				action->setData(ADR_CLIPBOARD_DATA, index->data(RDR_NAME));
-				action->setShortcutId(SCT_ROSTERVIEW_COPYNAME);
-				connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-				AMenu->addAction(action, AG_DEFAULT, true);
-			}
-		}
-
 		emit indexClipboardMenu(AIndexes,labelId,AMenu);
+
+		QList<QString> texts;
+		foreach(Action *action, AMenu->groupActions())
+		{
+			if (texts.contains(action->text()))
+				action->setVisible(false);
+			else
+				texts.append(action->text());
+		}
 	}
 }
 
@@ -494,7 +439,7 @@ QList<IRosterIndex *> RostersView::selectedRosterIndexes() const
 	{
 		foreach(QModelIndex modelIndex, selectionModel()->selectedIndexes())
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(modelIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(modelIndex));
 			if (index)
 				rosterIndexes.append(index);
 		}
@@ -515,14 +460,14 @@ bool RostersView::setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes
 
 			foreach(IRosterIndex *index, oldSelected)
 			{
-				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
+				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexFromRosterIndex(index));
 				if (mindex.isValid())
 					selectionModel()->select(mindex, QItemSelectionModel::Deselect);
 			}
 
 			foreach(IRosterIndex *index, newSelected)
 			{
-				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexByRosterIndex(index));
+				QModelIndex mindex = mapFromModel(FRostersModel->modelIndexFromRosterIndex(index));
 				if (mindex.isValid())
 					selectionModel()->select(mindex, QItemSelectionModel::Select);
 			}
@@ -532,12 +477,31 @@ bool RostersView::setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes
 	return false;
 }
 
-QMap<int, QStringList > RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole) const
+QMap<int, QStringList> RostersView::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole, int AGroupByRole) const
 {
 	QMap<int, QStringList > map;
+	bool hasGroupBy = AUniqueRole>=0 && ARoles.contains(AGroupByRole);
 	foreach(IRosterIndex *index, AIndexes)
 	{
-		if (AUniqueRole<0 || !map[AUniqueRole].contains(index->data(AUniqueRole).toString()))
+		bool processIndex = true;
+		if (!map.isEmpty())
+		{
+			if (hasGroupBy)
+			{
+				QStringList uniqueList = map.value(AUniqueRole);
+				QStringList groupList = map.value(AGroupByRole);
+				QString uniqueValue = index->data(AUniqueRole).toString();
+				QString groupValue = index->data(AGroupByRole).toString();
+				for (int pos=uniqueList.indexOf(uniqueValue); processIndex && pos>=0; pos=uniqueList.indexOf(uniqueValue,pos+1))
+					if (groupList.at(pos) == groupValue)
+						processIndex = false;
+			}
+			else if (AUniqueRole>=0 && map.value(AUniqueRole).contains(index->data(AUniqueRole).toString()))
+			{
+				processIndex = false;
+			}
+		}
+		if (processIndex)
 		{
 			foreach(int role, ARoles)
 				map[role].append(index->data(role).toString());
@@ -735,8 +699,8 @@ quint32 RostersView::registerLabel(const AdvancedDelegateItem &ALabel)
 	else
 		removeBlinkItem(ALabel.d->id,0);
 
-	if (FLabelItems.contains(ALabel.d->id))
-		emit rosterDataChanged(NULL, RDR_LABEL_ITEMS);
+	foreach(IRosterIndex *index, FIndexLabels.keys(ALabel.d->id))
+		emit rosterDataChanged(index, RDR_LABEL_ITEMS);
 
 	FLabelItems.insert(ALabel.d->id,ALabel);
 	return ALabel.d->id;
@@ -1033,14 +997,14 @@ bool RostersView::viewportEvent(QEvent *AEvent)
 		QModelIndex viewIndex = indexAt(helpEvent->pos());
 		if (FRostersModel && viewIndex.isValid())
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
 				QMap<int,QString> toolTipsMap;
 				toolTipsForIndex(index,helpEvent,toolTipsMap);
 				if (!toolTipsMap.isEmpty())
 				{
-					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/>"));
+					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTipsMap.values()).join("<p/><nbsp>"));
 					QToolTip::showText(helpEvent->globalPos(),tooltip,this);
 				}
 				return true;
@@ -1099,7 +1063,7 @@ void RostersView::mouseDoubleClickEvent(QMouseEvent *AEvent)
 		QModelIndex viewIndex = indexAt(AEvent->pos());
 		if (FRostersModel && viewIndex.isValid())
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index != NULL)
 			{
 				int notifyId = FActiveNotifies.value(index,-1);
@@ -1143,14 +1107,14 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 	if (FRostersModel && !FStartDragFailed && AEvent->buttons()!=Qt::NoButton && FPressedIndex.isValid() && 
 		(AEvent->pos()-FPressedPos).manhattanLength()>QApplication::startDragDistance() && selectedIndexes().count()==1)
 	{
-		IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(FPressedIndex));
+		IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(FPressedIndex));
 		
 		QDrag *drag = new QDrag(this);
 		drag->setMimeData(new QMimeData);
 
 		QByteArray data;
 		QDataStream stream(&data,QIODevice::WriteOnly);
-		operator<<(stream,index->data());
+		operator<<(stream,index->indexData());
 		drag->mimeData()->setData(DDT_ROSTERSVIEW_INDEX_DATA,data);
 
 		Qt::DropActions actions = Qt::IgnoreAction;
@@ -1200,7 +1164,7 @@ void RostersView::mouseReleaseEvent(QMouseEvent *AEvent)
 		quint32 labelId = labelAt(AEvent->pos(),viewIndex);
 		if (FRostersModel && FPressedIndex.isValid() && FPressedIndex==viewIndex && FPressedLabel==labelId)
 		{
-			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(viewIndex));
+			IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(viewIndex));
 			if (index)
 				singleClickOnIndex(index,AEvent);
 		}
@@ -1227,7 +1191,7 @@ void RostersView::keyReleaseEvent(QKeyEvent *AEvent)
 
 void RostersView::dropEvent(QDropEvent *AEvent)
 {
-	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(indexAt(AEvent->pos()))) : NULL;
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexFromModelIndex(mapToModel(indexAt(AEvent->pos()))) : NULL;
 	if (index)
 	{
 		Menu *dropMenu = new Menu(this);
@@ -1280,7 +1244,7 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	QModelIndex modelIndex = indexAt(AEvent->pos());
-	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexByModelIndex(mapToModel(modelIndex)) : NULL;
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexFromModelIndex(mapToModel(modelIndex)) : NULL;
 	if (index)
 	{
 		bool accepted = false;
@@ -1316,33 +1280,6 @@ void RostersView::closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHi
 	QTreeView::closeEditor(AEditor,AHint);
 }
 
-void RostersView::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
-{
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
-	{
-		QString name = AIndex->data(RDR_NAME).toString();
-		if (!name.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_NAME, Qt::escape(name));
-
-		Jid jid = AIndex->data(RDR_FULL_JID).toString();
-		if (!jid.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_JID, Qt::escape(jid.uFull()));
-
-		QString priority = AIndex->data(RDR_PRIORITY).toString();
-		if (!priority.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_PRIORITY, tr("Priority: %1").arg(priority.toInt()));
-
-		QString ask = AIndex->data(RDR_ASK).toString();
-		QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
-		if (!subscription.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_SUBSCRIPTION, tr("Subscription: %1 %2").arg(Qt::escape(subscription)).arg(Qt::escape(ask)));
-
-		QString status = AIndex->data(RDR_STATUS).toString();
-		if (!status.isEmpty())
-			AToolTips.insert(RTTO_CONTACT_STATUS, QString("%1 <div style='margin-left:10px;'>%2</div>").arg(tr("Status:")).arg(Qt::escape(status).replace("\n","<br>")));
-	}
-}
-
 void RostersView::onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected)
 {
 	if (!isSelectionAcceptable(selectedRosterIndexes()))
@@ -1358,15 +1295,6 @@ void RostersView::onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex)
 {
 	Q_UNUSED(ALabelId);
 	emit rosterDataChanged(AIndex,RDR_LABEL_ITEMS);
-}
-
-void RostersView::onCopyToClipboardActionTriggered(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-	{
-		QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
-	}
 }
 
 void RostersView::onIndexDestroyed(IRosterIndex *AIndex)
@@ -1394,7 +1322,7 @@ void RostersView::onUpdateIndexNotifyTimeout()
 			if(notify.flags & IRostersNotify::ExpandParents)
 				expandIndexParents(index);
 
-			emit rosterDataChanged(index,RDR_ALLWAYS_VISIBLE);
+			emit rosterDataChanged(index,RDR_FORCE_VISIBLE);
 			emit rosterDataChanged(index,Qt::DecorationRole);
 			emit rosterDataChanged(index,Qt::BackgroundRole);
 		}
@@ -1425,27 +1353,4 @@ void RostersView::onDragExpandTimer()
 {
 	QModelIndex index = indexAt(FDropIndicatorRect.center());
 	setExpanded(index,true);
-}
-
-void RostersView::onShortcutActivated(const QString &AId, QWidget *AWidget)
-{
-	if (!hasMultiSelection())
-	{
-		QModelIndex index = currentIndex();
-		if (AId==SCT_ROSTERVIEW_COPYJID && AWidget==this)
-		{
-			if (!index.data(RDR_FULL_JID).toString().isEmpty())
-				QApplication::clipboard()->setText(index.data(RDR_FULL_JID).toString());
-		}
-		else if (AId==SCT_ROSTERVIEW_COPYNAME && AWidget==this)
-		{
-			if (!index.data(RDR_NAME).toString().isEmpty())
-				QApplication::clipboard()->setText(index.data(RDR_NAME).toString());
-		}
-		else if (AId==SCT_ROSTERVIEW_COPYSTATUS && AWidget==this)
-		{
-			if (!index.data(RDR_STATUS).toString().isEmpty())
-				QApplication::clipboard()->setText(index.data(RDR_STATUS).toString());
-		}
-	}
 }

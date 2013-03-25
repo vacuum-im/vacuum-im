@@ -97,7 +97,7 @@ public:
 	virtual bool isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes) =0;
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const =0;
 	virtual bool setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes, bool APartial=true) =0;
-	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const =0;
+	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1, int AGroupByRole=-1) const =0;
 	//ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder) =0;
 	virtual QList<QAbstractProxyModel *> proxyModels() const =0;
@@ -166,7 +166,7 @@ public:
 	virtual IRostersView *rostersView() =0;
 	virtual void startRestoreExpandState() =0;
 	virtual void restoreExpandState(const QModelIndex &AParent = QModelIndex()) =0;
-	virtual void registerExpandableRosterIndexType(int AType, int AUniqueRole) =0;
+	virtual void registerExpandableRosterIndexKind(int AKind, int AUniqueRole) =0;
 };
 
 Q_DECLARE_INTERFACE(IRostersLabelHolder,"Vacuum.Plugin.IRostersLabelHolder/1.0");
@@ -174,7 +174,7 @@ Q_DECLARE_INTERFACE(IRostersClickHooker,"Vacuum.Plugin.IRostersClickHooker/1.3")
 Q_DECLARE_INTERFACE(IRostersKeyHooker,"Vacuum.Plugin.IRostersKeyHooker/1.2");
 Q_DECLARE_INTERFACE(IRostersDragDropHandler,"Vacuum.Plugin.IRostersDragDropHandler/1.1");
 Q_DECLARE_INTERFACE(IRostersEditHandler,"Virtus.Plugin.IRostersEditHandler/1.1")
-Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.5");
-Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.5");
+Q_DECLARE_INTERFACE(IRostersView,"Vacuum.Plugin.IRostersView/1.6");
+Q_DECLARE_INTERFACE(IRostersViewPlugin,"Vacuum.Plugin.IRostersViewPlugin/1.6");
 
 #endif //IROSTERSVIEW_H

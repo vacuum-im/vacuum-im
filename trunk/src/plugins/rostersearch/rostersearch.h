@@ -6,7 +6,8 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/mainwindowwidgets.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosterkeyhookerorders.h>

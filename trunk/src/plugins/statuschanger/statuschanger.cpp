@@ -92,7 +92,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -196,19 +196,11 @@ bool StatusChanger::initObjects()
 
 	if (FRostersViewPlugin)
 	{
-		FStatusLabel.d->id = RLID_SCHANGER_STATUS;
-		FStatusLabel.d->kind = AdvancedDelegateItem::CustomData;
-		FStatusLabel.d->data = RDR_STATUS;
-		FStatusLabel.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
-		FStatusLabel.d->hints.insert(AdvancedDelegateItem::FontStyle,QFont::StyleItalic);
-
 		AdvancedDelegateItem connectingLabel(RLID_SCHANGER_CONNECTING);
 		connectingLabel.d->kind = AdvancedDelegateItem::CustomData;
 		connectingLabel.d->flags = AdvancedDelegateItem::Blink;
 		connectingLabel.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_SCHANGER_CONNECTING);
 		FConnectingLabelId = FRostersViewPlugin->rostersView()->registerLabel(connectingLabel);
-
-		FRostersViewPlugin->rostersView()->insertLabelHolder(RLHO_SCHANGER_STATUS,this);
 	}
 
 	if (FTrayManager)
@@ -232,7 +224,6 @@ bool StatusChanger::initObjects()
 
 bool StatusChanger::initSettings()
 {
-	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
 	Options::setDefaultValue(OPV_STATUS_SHOW,IPresence::Online);
 	Options::setDefaultValue(OPV_STATUS_TEXT,nameByShow(IPresence::Online));
 	Options::setDefaultValue(OPV_STATUS_PRIORITY,0);
@@ -266,32 +257,7 @@ QMultiMap<int, IOptionsWidget *> StatusChanger::optionsWidgets(const QString &AN
 		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-connect"),tr("Auto connect on startup"),AParent));
 		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"),AParent));
 	}
-	else if (FOptionsManager && ANodeId==OPN_ROSTER)
-	{
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"),AParent));
-	}
 	return widgets;
-}
-
-QList<quint32> StatusChanger::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
-{
-	QList<quint32> labels;
-	if (AOrder==RLHO_SCHANGER_STATUS && !AIndex->data(RDR_STATUS).toString().isEmpty())
-	{
-		if (AIndex->type()==RIT_STREAM_ROOT && AIndex->data(RDR_SHOW).toInt()==IPresence::Error)
-			labels.append(RLID_SCHANGER_STATUS);
-		else if (Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool())
-			labels.append(RLID_SCHANGER_STATUS);
-	}
-	return labels;
-}
-
-AdvancedDelegateItem StatusChanger::rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const
-{
-	Q_UNUSED(ALabelId); Q_UNUSED(AIndex);
-	if (AOrder == RLHO_SCHANGER_STATUS)
-		return FStatusLabel;
-	return AdvancedDelegateItem();
 }
 
 Menu *StatusChanger::statusMenu() const
@@ -418,11 +384,12 @@ void StatusChanger::setStreamStatus(const Jid &AStreamJid, int AStatusId)
 					FChangingPresence = NULL;
 					if (newStreamStatus.show!=IPresence::Offline && !presence->xmppStream()->isConnected() && presence->xmppStream()->open())
 					{
-						insertConnectingLabel(presence);
 						setStreamStatusId(presence, STATUS_CONNECTING_ID);
 
 						int statusId = FMainStatusStreams.contains(presence) ? STATUS_MAIN_ID : newStreamStatus.code;
 						FLastOnlineStatus.insert(presence, statusId);
+						
+						insertConnectingLabel(presence);
 						FConnectStatus.insert(presence, statusId);
 					}
 					else if (isChangeMainStatus && it.value()==STATUS_MAIN_ID)
@@ -673,20 +640,14 @@ void StatusChanger::setStreamStatusId(IPresence *APresence, int AStatusId)
 			removeTempStatus(APresence);
 		updateTrayToolTip();
 
-		bool statusShown = Options::node(OPV_ROSTER_SHOWSTATUSTEXT).value().toBool();
-		IRosterIndex *index = FRostersView && FRostersModel ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
 		if (APresence->show() == IPresence::Error)
 		{
-			if (index && !statusShown)
-				emit rosterLabelChanged(RLID_SCHANGER_STATUS, index);
 			if (!FNotifyId.contains(APresence))
 				insertStatusNotification(APresence);
 			FFastReconnect -= APresence;
 		}
 		else
 		{
-			if (index && !statusShown)
-				emit rosterLabelChanged(RLID_SCHANGER_STATUS, index);
 			removeStatusNotification(APresence);
 		}
 
@@ -836,6 +797,14 @@ void StatusChanger::updateMainMenu()
 		//else
 			FTrayManager->setIcon(iconByShow(statusItemShow(statusId)));
 	}
+
+	if (FRostersModel)
+	{
+		IRosterIndex *croot = FRostersModel->contactsRoot();
+		croot->setData(statusItemShow(statusId),RDR_SHOW);
+		croot->setData(statusItemText(statusId),RDR_STATUS);
+		croot->setData(statusItemPriority(statusId),RDR_PRIORITY);
+	}
 }
 
 void StatusChanger::updateTrayToolTip()
@@ -872,9 +841,13 @@ void StatusChanger::insertConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
-		if (index)
-			FRostersView->insertLabel(FConnectingLabelId,index);
+		IRosterIndex *sindex = FRostersModel->streamIndex(APresence->xmppStream()->streamJid());
+		if (sindex)
+			FRostersView->insertLabel(FConnectingLabelId,sindex);
+
+		IRosterIndex *croot = FRostersModel->contactsRoot();
+		if (croot && FConnectStatus.isEmpty())
+			FRostersView->insertLabel(FConnectingLabelId,croot);
 	}
 }
 
@@ -882,9 +855,13 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 {
 	if (FRostersModel && FRostersView)
 	{
-		IRosterIndex *index = FRostersModel->streamRoot(APresence->xmppStream()->streamJid());
-		if (index)
-			FRostersView->removeLabel(FConnectingLabelId,index);
+		IRosterIndex *sindex = FRostersModel->streamIndex(APresence->xmppStream()->streamJid());
+		if (sindex)
+			FRostersView->removeLabel(FConnectingLabelId,sindex);
+
+		IRosterIndex *croot = FRostersModel->contactsRoot();
+		if (croot && FConnectStatus.isEmpty())
+			FRostersView->removeLabel(FConnectingLabelId,croot);
 	}
 }
 
@@ -1038,8 +1015,8 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 		}
 		if (FConnectStatus.contains(APresence))
 		{
-			removeConnectingLabel(APresence);
 			FConnectStatus.remove(APresence);
+			removeConnectingLabel(APresence);
 		}
 
 		if (AShow!= IPresence::Offline && AShow!=IPresence::Error)
@@ -1062,11 +1039,13 @@ void StatusChanger::onPresenceRemoved(IPresence *APresence)
 	removeStatusNotification(APresence);
 	removeTempStatus(APresence);
 
+	FConnectStatus.remove(APresence);
+	removeConnectingLabel(APresence);
+
 	FFastReconnect -= APresence;
 	FMainStatusStreams -= APresence;
 	FMainStatusActions.remove(APresence);
 	FCurrentStatus.remove(APresence);
-	FConnectStatus.remove(APresence);
 	FLastOnlineStatus.remove(APresence);
 	FPendingReconnect.remove(APresence);
 	delete FStreamMenu.take(APresence);
@@ -1108,18 +1087,36 @@ void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 		action->setData(ADR_STREAMJID,AAfter.full());
 }
 
-void StatusChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void StatusChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->data(RDR_TYPE).toInt()==RIT_STREAM_ROOT)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
-		Menu *menu = streamMenu(AIndexes.first()->data(RDR_STREAM_JID).toString());
-		if (menu)
+		IRosterIndex *index = AIndexes.first();
+		if (index->kind() == RIK_STREAM_ROOT)
 		{
-			Action *action = new Action(AMenu);
-			action->setText(tr("Status"));
-			action->setMenu(menu);
-			action->setIcon(menu->menuAction()->icon());
-			AMenu->addAction(action,AG_RVCM_STATUSCHANGER,true);
+			Menu *menu = streamMenu(index->data(RDR_STREAM_JID).toString());
+			if (menu)
+			{
+				Action *action = new Action(AMenu);
+				action->setMenu(menu);
+				action->setText(tr("Status"));
+				action->setIcon(menu->menuAction()->icon());
+				AMenu->addAction(action,AG_RVCM_STATUSCHANGER,true);
+			}
+		}
+		else if (index->kind() == RIK_CONTACTS_ROOT)
+		{
+			if (index->data(RDR_STREAMS).toStringList().count()>1)
+			{
+				Menu *menu = new Menu(AMenu);
+				menu->setTitle(tr("Status"));
+				menu->setIcon(FMainMenu->icon());
+				foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_CUSTOM_STATUS))
+					menu->addAction(action,AG_SCSM_STATUSCHANGER_CUSTOM_STATUS,true);
+				foreach(Action *action, FMainMenu->groupActions(AG_SCSM_STATUSCHANGER_DEFAULT_STATUS))
+					menu->addAction(action,AG_SCSM_STATUSCHANGER_DEFAULT_STATUS,true);
+				AMenu->addAction(menu->menuAction(),AG_RVCM_STATUSCHANGER,true);
+			}
 		}
 	}
 }
@@ -1206,10 +1203,6 @@ void StatusChanger::onOptionsChanged(const OptionsNode &ANode)
 	if (ANode.path() == OPV_STATUSES_MODIFY)
 	{
 		FModifyStatus->setChecked(ANode.value().toBool());
-	}
-	else if (ANode.path() == OPV_ROSTER_SHOWSTATUSTEXT)
-	{
-		emit rosterLabelChanged(RLID_SCHANGER_STATUS);
 	}
 }
 

@@ -44,7 +44,7 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IToolBarWidget *)),SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
+			connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IMessageToolBarWidget *)),SLOT(onToolBarWidgetCreated(IMessageToolBarWidget *)));
 		}
 	}
 
@@ -112,7 +112,7 @@ QMultiMap<int, IOptionsWidget *> Emoticons::optionsWidgets(const QString &ANodeI
 	return widgets;
 }
 
-bool Emoticons::editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *AData)
+bool Emoticons::editContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AWidget);
@@ -120,7 +120,7 @@ bool Emoticons::editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *
 	return false;
 }
 
-bool Emoticons::editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData)
+bool Emoticons::editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AWidget);
@@ -128,7 +128,7 @@ bool Emoticons::editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QM
 	return false;
 }
 
-bool Emoticons::editContentsInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
+bool Emoticons::editContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AData);
 	if (AOrder == ECHO_EMOTICONS_CONVERT_IMAGE2TEXT)
@@ -166,7 +166,7 @@ bool Emoticons::editContentsInsert(int AOrder, IEditWidget *AWidget, const QMime
 	return false;
 }
 
-bool Emoticons::editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+bool Emoticons::editContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AWidget);
@@ -412,23 +412,22 @@ SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWid
 
 void Emoticons::insertSelectIconMenu(const QString &ASubStorage)
 {
-	foreach(IToolBarWidget *widget, FToolBarsWidgets)
+	foreach(IMessageToolBarWidget *widget, FToolBarsWidgets)
 	{
 		SelectIconMenu *menu = createSelectIconMenu(ASubStorage,widget->instance());
 		FToolBarWidgetByMenu.insert(menu,widget);
 		QToolButton *button = widget->toolBarChanger()->insertAction(menu->menuAction(),TBG_MWTBW_EMOTICONS);
-		button->setToolButtonStyle(Qt::ToolButtonIconOnly);
 		button->setPopupMode(QToolButton::InstantPopup);
 	}
 }
 
 void Emoticons::removeSelectIconMenu(const QString &ASubStorage)
 {
-	QMap<SelectIconMenu *,IToolBarWidget *>::iterator it = FToolBarWidgetByMenu.begin();
+	QMap<SelectIconMenu *,IMessageToolBarWidget *>::iterator it = FToolBarWidgetByMenu.begin();
 	while (it != FToolBarWidgetByMenu.end())
 	{
 		SelectIconMenu *menu = it.key();
-		IToolBarWidget *widget = it.value();
+		IMessageToolBarWidget *widget = it.value();
 		if (menu->iconset() == ASubStorage)
 		{
 			widget->toolBarChanger()->removeItem(widget->toolBarChanger()->actionHandle(menu->menuAction()));
@@ -440,26 +439,39 @@ void Emoticons::removeSelectIconMenu(const QString &ASubStorage)
 	}
 }
 
-void Emoticons::onToolBarWidgetCreated(IToolBarWidget *AWidget)
+void Emoticons::onToolBarWindowLayoutChanged()
 {
-	if (AWidget->editWidget() != NULL)
+	IMessageWindow *window = qobject_cast<IMessageWindow *>(sender());
+	if (window && window->toolBarWidget())
+	{
+		foreach(QAction *handle, window->toolBarWidget()->toolBarChanger()->groupItems(TBG_MWTBW_EMOTICONS))
+			handle->setVisible(window->editWidget()->isVisibleOnWindow());
+	}
+}
+
+void Emoticons::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
+{
+	if (AWidget->messageWindow()->editWidget())
 	{
 		FToolBarsWidgets.append(AWidget);
-		foreach(QString substorage, activeIconsets())
+		if (AWidget->messageWindow()->editWidget()->isVisibleOnWindow())
 		{
-			SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
-			FToolBarWidgetByMenu.insert(menu,AWidget);
-			QToolButton *button = AWidget->toolBarChanger()->insertAction(menu->menuAction(),TBG_MWTBW_EMOTICONS);
-			button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-			button->setPopupMode(QToolButton::InstantPopup);
+			foreach(QString substorage, activeIconsets())
+			{
+				SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
+				FToolBarWidgetByMenu.insert(menu,AWidget);
+				QToolButton *button = AWidget->toolBarChanger()->insertAction(menu->menuAction(),TBG_MWTBW_EMOTICONS);
+				button->setPopupMode(QToolButton::InstantPopup);
+			}
 		}
 		connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
+		connect(AWidget->messageWindow()->instance(),SIGNAL(widgetLayoutChanged()),SLOT(onToolBarWindowLayoutChanged()));
 	}
 }
 
 void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 {
-	QList<IToolBarWidget *>::iterator it = FToolBarsWidgets.begin();
+	QList<IMessageToolBarWidget *>::iterator it = FToolBarsWidgets.begin();
 	while (it != FToolBarsWidgets.end())
 	{
 		if (qobject_cast<QObject *>((*it)->instance()) == AObject)
@@ -475,7 +487,7 @@ void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconK
 	SelectIconMenu *menu = qobject_cast<SelectIconMenu *>(sender());
 	if (FToolBarWidgetByMenu.contains(menu))
 	{
-		IEditWidget *widget = FToolBarWidgetByMenu.value(menu)->editWidget();
+		IMessageEditWidget *widget = FToolBarWidgetByMenu.value(menu)->messageWindow()->editWidget();
 		if (widget)
 		{
 			QUrl url = FUrlByKey.value(AIconKey);

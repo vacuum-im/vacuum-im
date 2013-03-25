@@ -1,11 +1,8 @@
 #include "toolbarwidget.h"
 
-ToolBarWidget::ToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) : QToolBar(AParent)
+ToolBarWidget::ToolBarWidget(IMessageWindow *AWindow, QWidget *AParent) : QToolBar(AParent)
 {
-	FInfoWidget = AInfo;
-	FViewWidget = AView;
-	FEditWidget = AEdit;
-	FReceiversWidget = AReceivers;
+	FWindow = AWindow;
 	FToolBarChanger = new ToolBarChanger(this);
 	setIconSize(QSize(16,16));
 }
@@ -13,4 +10,19 @@ ToolBarWidget::ToolBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget
 ToolBarWidget::~ToolBarWidget()
 {
 
+}
+
+bool ToolBarWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
+IMessageWindow *ToolBarWidget::messageWindow() const
+{
+	return FWindow;
+}
+
+ToolBarChanger *ToolBarWidget::toolBarChanger() const
+{
+	return FToolBarChanger;
 }

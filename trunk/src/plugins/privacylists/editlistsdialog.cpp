@@ -536,7 +536,7 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 		{
 			QSet<QString> groups = FRoster!=NULL ? FRoster->allGroups() : QSet<QString>();
 			foreach(QString group, groups)
-				ui.cmbValue->addItem(group.replace(FRoster->groupDelimiter(),"::"),group);
+				ui.cmbValue->addItem(group,group);
 		}
 		ui.cmbValue->setEditable(true);
 		ui.cmbValue->blockSignals(false);

@@ -7,9 +7,10 @@
 #include <definitions/dataformtypes.h>
 #include <definitions/recentitemtypes.h>
 #include <definitions/recentitemproperties.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
-#include <definitions/rosterindextypeorders.h>
+#include <definitions/rosterindexkindorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/messagehandlerorders.h>
@@ -111,10 +112,10 @@ public:
 	virtual IPluginManager *pluginManager() const;
 	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid);
 	virtual QList<IMultiUserChat *> multiUserChats() const;
-	virtual IMultiUserChat *multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const;
+	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick,const QString &APassword);
 	virtual QList<IMultiUserChatWindow *> multiChatWindows() const;
-	virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const;
+	virtual IMultiUserChatWindow *findMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const;
 	virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword);
 	virtual QList<IRosterIndex *> multiChatRosterIndexes() const;
 	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const;
@@ -128,8 +129,9 @@ signals:
 	void multiChatWindowDestroyed(IMultiUserChatWindow *AWindow);
 	void multiChatRosterIndexCreated(IRosterIndex *AIndex);
 	void multiChatRosterIndexDestroyed(IRosterIndex *AIndex);
-	void multiChatWindowContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu);
+	void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu);
 	void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
+	void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips);
 	//IRecentItemHandler
 	void recentItemUpdated(const IRecentItem &AItem);
 protected:
@@ -144,26 +146,33 @@ protected:
 	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
 	QString getRoomName(const Jid &AStreamJid, const Jid &ARoomJid) const;
 protected slots:
-	void onMultiChatWindowContextMenu(Menu *AMenu);
+	void onMultiChatContextMenu(Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu);
+	void onMultiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips);
 	void onMultiUserChatChanged();
 	void onMultiUserChatDestroyed();
 	void onMultiChatWindowDestroyed();
-	void onRosterIndexDestroyed(IRosterIndex *AIndex);
-	void onStreamRemoved(IXmppStream *AXmppStream);
+protected slots:
+	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
+	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
+protected slots:
+	void onStatusIconsChanged();
 	void onJoinRoomActionTriggered(bool);
 	void onOpenRoomActionTriggered(bool);
 	void onEnterRoomActionTriggered(bool);
 	void onExitRoomActionTriggered(bool);
+	void onCopyToClipboardActionTriggered(bool);
+	void onRosterIndexDestroyed(IRosterIndex *AIndex);
+	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);
 	void onRegisterFieldsReceived(const QString &AId, const IRegisterFields &AFields);
 	void onRegisterErrorReceived(const QString &AId, const XmppError &AError);
 	void onInviteDialogFinished(int AResult);
 	void onInviteActionTriggered(bool);
-	void onStatusIconsChanged();
 private:
 	IPluginManager *FPluginManager;
 	IMessageWidgets *FMessageWidgets;

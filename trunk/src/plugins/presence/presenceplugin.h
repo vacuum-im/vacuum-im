@@ -8,9 +8,9 @@
 #include "presence.h"
 
 class PresencePlugin :
-			public QObject,
-			public IPlugin,
-			public IPresencePlugin
+	public QObject,
+	public IPlugin,
+	public IPresencePlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPresencePlugin);
@@ -28,10 +28,11 @@ public:
 	//IPresencePlugin
 	virtual IPresence *getPresence(IXmppStream *AXmppStream);
 	virtual IPresence *findPresence(const Jid &AStreamJid) const;
-	virtual bool isContactOnline(const Jid &AContactJid) const { return FContactPresences.contains(AContactJid); }
-	virtual QList<Jid> contactsOnline() const { return FContactPresences.keys(); }
-	virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const { return FContactPresences.value(AContactJid).toList(); }
 	virtual void removePresence(IXmppStream *AXmppStream);
+	virtual QList<Jid> onlineContacts() const;
+	virtual bool isOnlineContact(const Jid &AContactJid) const;
+	virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const;
+	virtual QList<IPresenceItem> sortPresenceItems(const QList<IPresenceItem> &AItems) const;
 signals:
 	void streamStateChanged(const Jid &AStreamJid, bool AStateOnline);
 	void contactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);

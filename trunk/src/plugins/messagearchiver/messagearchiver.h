@@ -13,7 +13,8 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/sessionnegotiatororders.h>
 #include <definitions/resources.h>
@@ -177,7 +178,7 @@ protected:
 	QMultiMap<int, IArchiveEngine *> engineOrderByCapability(quint32 ACapability, const Jid &AStreamJid) const;
 	void openHistoryOptionsNode(const Jid &AStreamJid);
 	void closeHistoryOptionsNode(const Jid &AStreamJid);
-	Menu *createContextMenu(const Jid &AStreamJid, const QStringList &AContacts, QWidget *AParent) const;
+	Menu *createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const;
 	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
 	bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
 	bool isOTRStanzaSession(const IStanzaSession &ASession) const;
@@ -210,8 +211,8 @@ protected slots:
 	void onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onSetItemPrefsByAction(bool);
 	void onSetAutoArchivingByAction(bool);
@@ -222,7 +223,7 @@ protected slots:
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
-	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
+	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onOptionsChanged(const OptionsNode &ANode);
 private:
 	IPluginManager *FPluginManager;

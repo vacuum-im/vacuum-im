@@ -18,6 +18,8 @@
 #define SUBSCRIPTION_UNSUBSCRIBED     "unsubscribed"
 #define SUBSCRIPTION_REMOVE           "remove"
 
+#define ROSTER_GROUP_DELIMITER        "::"
+
 struct IRosterItem 
 {
 	IRosterItem() { 
@@ -112,4 +114,4 @@ protected:
 Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.3")
 Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.3")
 
-#endif
+#endif //IROSTER_H

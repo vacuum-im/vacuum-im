@@ -7,8 +7,8 @@
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/dataformtypes.h>
-#include <definitions/rosterindextyperole.h>
-#include <definitions/rostertooltiporders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -24,6 +24,7 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/istatusicons.h>
 #include <utils/xmpperror.h>
 #include <utils/stanza.h>
 #include <utils/menu.h>
@@ -50,21 +51,25 @@ struct ActivityItem {
 };
 
 struct TimeItem {
-	TimeItem() { ping = -1; delta = 0; zone = 0; }
+	TimeItem() { 
+		ping = -1;
+		delta = 0;
+		zone = 0;
+	}
 	int ping;
 	int delta;
 	int zone;
 };
 
 class ClientInfo :
-			public QObject,
-			public IPlugin,
-			public IClientInfo,
-			public IOptionsHolder,
-			public IStanzaHandler,
-			public IStanzaRequestOwner,
-			public IDataLocalizer,
-			public IDiscoFeatureHandler
+	public QObject,
+	public IPlugin,
+	public IClientInfo,
+	public IOptionsHolder,
+	public IStanzaHandler,
+	public IStanzaRequestOwner,
+	public IDataLocalizer,
+	public IDiscoFeatureHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IClientInfo IOptionsHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
@@ -122,8 +127,7 @@ protected:
 	void registerDiscoFeatures();
 protected slots:
 	void onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onClientInfoActionTriggered(bool);
 	void onClientInfoDialogClosed(const Jid &AContactJid);
 	void onRosterRemoved(IRoster *ARoster);
@@ -138,6 +142,7 @@ private:
 	IServiceDiscovery *FDiscovery;
 	IDataForms *FDataForms;
 	IOptionsManager *FOptionsManager;
+	IStatusIcons *FStatusIcons;
 private:
 	int FPingHandle;
 	int FTimeHandle;

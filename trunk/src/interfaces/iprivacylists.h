@@ -67,12 +67,12 @@ class IPrivacyLists
 public:
 	virtual QObject *instance() =0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
-	virtual IPrivacyRule autoListRule(const Jid &AContactJid, const QString &AAutoList) const =0;
-	virtual IPrivacyRule autoListRule(const QString &AGroup, const QString &AAutoList) const =0;
-	virtual bool isAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const =0;
-	virtual bool isAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const =0;
-	virtual void setAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool AInserted) =0;
-	virtual void setAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool AInserted) =0;
+	virtual IPrivacyRule groupAutoListRule(const QString &AGroup, const QString &AAutoList) const =0;
+	virtual IPrivacyRule contactAutoListRule(const Jid &AContactJid, const QString &AAutoList) const =0;
+	virtual bool isGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const =0;
+	virtual bool isContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const =0;
+	virtual void setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool APresent) =0;
+	virtual void setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool APresent) =0;
 	virtual IPrivacyRule offRosterRule() const =0;
 	virtual bool isOffRosterBlocked(const Jid &AStreamJid) const =0;
 	virtual void setOffRosterBlocked(const Jid &AStreamJid, bool ABlocked) =0;
@@ -101,6 +101,6 @@ protected:
 	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.1")
+Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.2")
 
 #endif
