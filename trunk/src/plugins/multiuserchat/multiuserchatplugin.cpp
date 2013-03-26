@@ -318,8 +318,16 @@ QMultiMap<int, IOptionsWidget *> MultiUserChatPlugin::optionsWidgets(const QStri
 
 bool MultiUserChatPlugin::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
-		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
+	Q_UNUSED(AOrder);
+	if (AEvent->modifiers()==Qt::NoModifier && Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool() )
+	{
+		IMultiUserChatWindow *window = findMultiChatWindowForIndex(AIndex);
+		if (window)
+		{
+			window->showTabPage();
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -942,6 +950,16 @@ Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &
 	action->setData(ADR_ROOM,ARoomJid.node());
 	connect(action,SIGNAL(triggered(bool)),SLOT(onJoinRoomActionTriggered(bool)));
 	return action;
+}
+
+IMultiUserChatWindow *MultiUserChatPlugin::findMultiChatWindowForIndex(const IRosterIndex *AIndex)
+{
+	IMultiUserChatWindow *window = NULL;
+	if (AIndex->kind() == RIK_MUC_ITEM)
+		window = findMultiChatWindow(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString());
+	else if (AIndex->kind() == RIK_RECENT_ITEM)
+		window = findMultiChatWindow(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_RECENT_REFERENCE).toString());
+	return window;
 }
 
 IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindowForIndex(const IRosterIndex *AIndex)
