@@ -9,6 +9,7 @@ LEGEND
 v1.2.3
 ------
   [-] The application will fail if the server terminates the connection before the user enters the password
+  [-] Removing of avatars in several selected accounts or contacts was not working
 
 
 v1.2.2
