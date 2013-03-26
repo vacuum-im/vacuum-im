@@ -374,7 +374,7 @@ bool Bookmarks::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) cons
 			return false;
 		else if (indexKind==RIK_STREAM_ROOT && isReady(index->data(RDR_STREAM_JID).toString()))
 			hasReadyStreams = true;
-		else if (!hasReadyStreams && i==ASelected.count()-1)
+		else if (indexKind==RIK_STREAM_ROOT && !hasReadyStreams && i==ASelected.count()-1)
 			return false;
 		singleKind = indexKind;
 	}
