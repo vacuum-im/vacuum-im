@@ -256,8 +256,8 @@ void NormalWindow::saveWindowGeometryAndState()
 	{
 		Options::setFileValue(saveState(),"messages.messagewindow.state",tabPageId());
 		Options::setFileValue(saveGeometry(),"messages.messagewindow.geometry",tabPageId());
-		Options::setFileValue(ui.sprReceivers->saveState(),"messages.messagewindow.splitter-receivers-state");
 	}
+	Options::setFileValue(ui.sprReceivers->saveState(),"messages.messagewindow.splitter-receivers-state");
 }
 
 void NormalWindow::loadWindowGeometryAndState()
@@ -266,10 +266,11 @@ void NormalWindow::loadWindowGeometryAndState()
 	{
 		if (!restoreGeometry(Options::fileValue("messages.messagewindow.geometry",tabPageId()).toByteArray()))
 			setGeometry(WidgetManager::alignGeometry(QSize(640,480),this));
-		if (!ui.sprReceivers->restoreState(Options::fileValue("messages.messagewindow.splitter-receivers-state").toByteArray()))
-			ui.sprReceivers->setSizes(QList<int>()<<70<<30);
 		restoreState(Options::fileValue("messages.messagewindow.state",tabPageId()).toByteArray());
 	}
+
+	if (!ui.sprReceivers->restoreState(Options::fileValue("messages.messagewindow.splitter-receivers-state").toByteArray()))
+		ui.sprReceivers->setSizes(QList<int>() << 700 << 300);
 }
 
 void NormalWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)

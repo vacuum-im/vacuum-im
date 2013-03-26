@@ -713,7 +713,7 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 			return false;
 		else if (indexKind==RIK_STREAM_ROOT && isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
 			hasOpenedStreams = true;
-		else if (!hasOpenedStreams && i==ASelected.count()-1)
+		else if (indexKind==RIK_STREAM_ROOT && !hasOpenedStreams && i==ASelected.count()-1)
 			return false;
 		hasGroups = hasGroups || groupKinds.contains(indexKind);
 		hasContacts = hasContacts || contactKinds.contains(indexKind);
