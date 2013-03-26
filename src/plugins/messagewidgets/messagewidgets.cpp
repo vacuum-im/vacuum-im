@@ -168,10 +168,12 @@ bool MessageWidgets::editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeD
 
 bool MessageWidgets::editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData)
 {
-	Q_UNUSED(AWidget);
 	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
 	{
-		return AData->hasText() || AData->hasHtml();
+		if (AData->hasText())
+			return true;
+		else if (AWidget->isRichTextEnabled() && AData->hasHtml())
+			return true;
 	}
 	return false;
 }
@@ -180,19 +182,18 @@ bool MessageWidgets::editContentsInsert(int AOrder, IEditWidget *AWidget, const 
 {
 	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
 	{
-		if (editContentsCanInsert(AOrder,AWidget,AData))
-		{
-			QTextDocumentFragment fragment;
-			if (AData->hasHtml())
-				fragment = QTextDocumentFragment::fromHtml(AData->html());
-			else if (AData->hasText())
-				fragment = QTextDocumentFragment::fromPlainText(AData->text());
+		QTextDocumentFragment fragment;
+		if (AWidget->isRichTextEnabled() && AData->hasHtml())
+			fragment = QTextDocumentFragment::fromHtml(AData->html().replace(QChar::Null,""));
+		else if (AData->hasText())
+			fragment = QTextDocumentFragment::fromPlainText(AData->text().replace(QChar::Null,""));
+		else if (AData->hasHtml())
+			fragment = QTextDocumentFragment::fromPlainText(QTextDocumentFragment::fromHtml(AData->html().replace(QChar::Null,"")).toPlainText());
 
-			if (!fragment.isEmpty())
-			{
-				QTextCursor cursor(ADocument);
-				cursor.insertFragment(fragment);
-			}
+		if (!fragment.isEmpty())
+		{
+			QTextCursor cursor(ADocument);
+			cursor.insertFragment(fragment);
 		}
 	}
 	return false;
