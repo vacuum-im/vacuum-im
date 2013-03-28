@@ -176,13 +176,9 @@ bool MessageWidgets::editContentsCreate(int AOrder, IMessageEditWidget *AWidget,
 
 bool MessageWidgets::editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData)
 {
+	Q_UNUSED(AWidget);
 	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
-	{
-		if (AData->hasText())
-			return true;
-		else if (AWidget->isRichTextEnabled() && AData->hasHtml())
-			return true;
-	}
+		return AData->hasText() || AData->hasHtml();
 	return false;
 }
 
@@ -605,21 +601,22 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 	}
 
 	QTextDocumentFragment textFragment = widget!=NULL ? widget->textFragmentAt(APosition) : QTextDocumentFragment();
-	QUrl href = TextManager::getTextFragmentHref(!textSelection.isEmpty() ? textSelection : textFragment);
-	if (href.isValid())
+	QString href  = TextManager::getTextFragmentHref(!textSelection.isEmpty() ? textSelection : textFragment);
+	QUrl link = href;
+	if (link.isValid())
 	{
-		bool isMailto = href.scheme()=="mailto";
+		bool isMailto = link.scheme()=="mailto";
 
 		Action *urlAction = new Action(AMenu);
 		urlAction->setText(isMailto ? tr("Send mail") : tr("Open link"));
-		urlAction->setData(ADR_CONTEXT_DATA,href.toString());
+		urlAction->setData(ADR_CONTEXT_DATA,href);
 		connect(urlAction,SIGNAL(triggered(bool)),SLOT(onViewContextUrlActionTriggered(bool)));
 		AMenu->addAction(urlAction,AG_VWCM_MESSAGEWIDGETS_URL,true);
 		AMenu->setDefaultAction(urlAction);
 
 		Action *copyHrefAction = new Action(AMenu);
 		copyHrefAction->setText(tr("Copy address"));
-		copyHrefAction->setData(ADR_CONTEXT_DATA,isMailto ? href.path() : href.toString());
+		copyHrefAction->setData(ADR_CONTEXT_DATA,isMailto ? link.path() : href);
 		connect(copyHrefAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
 		AMenu->addAction(copyHrefAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
 	}
