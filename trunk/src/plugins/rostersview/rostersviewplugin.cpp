@@ -576,16 +576,6 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 				bareJidAction->setShortcutId(SCT_ROSTERVIEW_COPYJID);
 				connect(bareJidAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
 				AMenu->addAction(bareJidAction, AG_RVCBM_JABBERID, true);
-
-				if (!jid.resource().isEmpty())
-				{
-					Action *fullJidAction = new Action(AMenu);
-					fullJidAction->setText(jid.uFull());
-					fullJidAction->setData(ADR_CLIPBOARD_DATA, jid.uFull());
-					fullJidAction->setShortcutId(SCT_ROSTERVIEW_COPYJID);
-					connect(fullJidAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-					AMenu->addAction(fullJidAction, AG_RVCBM_JABBERID, true);
-				}
 			}
 
 			QStringList resources = index->data(RDR_RESOURCES).toStringList();
@@ -593,14 +583,26 @@ void RostersViewPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *> &
 			foreach(const QString &resource, resources)
 			{
 				IPresenceItem pitem =presence!=NULL ? presence->findItem(resource) : IPresenceItem();
-				if (pitem.isValid && !pitem.status.isEmpty())
+				if (pitem.isValid)
 				{
-					Action *statusAction = new Action(AMenu);
-					statusAction->setText(TextManager::getElidedString(pitem.status,Qt::ElideRight,50));
-					statusAction->setData(ADR_CLIPBOARD_DATA,pitem.status);
-					statusAction->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
-					connect(statusAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-					AMenu->addAction(statusAction, AG_RVCBM_STATUS, true);
+					if (!pitem.itemJid.resource().isEmpty())
+					{
+						Action *fullJidAction = new Action(AMenu);
+						fullJidAction->setText(pitem.itemJid.uFull());
+						fullJidAction->setData(ADR_CLIPBOARD_DATA, pitem.itemJid.uFull());
+						connect(fullJidAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+						AMenu->addAction(fullJidAction, AG_RVCBM_JABBERID, true);
+					}
+
+					if (!pitem.status.isEmpty())
+					{
+						Action *statusAction = new Action(AMenu);
+						statusAction->setText(TextManager::getElidedString(pitem.status,Qt::ElideRight,50));
+						statusAction->setData(ADR_CLIPBOARD_DATA,pitem.status);
+						statusAction->setShortcutId(SCT_ROSTERVIEW_COPYSTATUS);
+						connect(statusAction,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+						AMenu->addAction(statusAction, AG_RVCBM_STATUS, true);
+					}
 				}
 			}
 
