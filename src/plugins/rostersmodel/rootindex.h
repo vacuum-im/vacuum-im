@@ -9,7 +9,7 @@ class RootIndex :
 	Q_INTERFACES(IRosterIndex);
 public:
 	RootIndex(AdvancedItemModel *AModel);
-	~RootIndex();
+	virtual ~RootIndex();
 	virtual AdvancedItem *instance() { return NULL; }
 	virtual int kind() const;
 	virtual int row() const;
