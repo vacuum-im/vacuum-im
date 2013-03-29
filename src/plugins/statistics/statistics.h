@@ -5,6 +5,7 @@
 #include <QNetworkCookieJar>
 #include <QNetworkAccessManager>
 #include <interfaces/ipluginmanager.h>
+#include "statisticswebpage.h"
 
 #define STATISTICS_UUID "{C9344821-9406-4089-A9D0-D6FD4919CF8F}"
 
@@ -28,7 +29,7 @@ public:
 protected:
 	QString getDataFilePath(const QString &AFileName) const;
 protected slots:
-	void onWebViewLoadFinished(bool AOk);
+	void onStatisticsViewLoadFinished(bool AOk);
 private:
 	IPluginManager *FPluginManager;
 private:

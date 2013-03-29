@@ -1,5 +1,9 @@
 project(statistics)
 
+set(QT_USE_QTWEBKIT YES)
+set(QT_USE_PHONON NO)
+set(QT_USE_QTXMLPATTERNS NO) 
+
 set(PLUGIN_NAME "statistics")
 set(PLUGIN_DISPLAY_NAME "Statistics")
 
