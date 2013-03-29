@@ -2,7 +2,7 @@ set(VACUUM_LOADER_NAME vacuum)
 set(VACUUM_UTILS_NAME vacuumutils)
 
 if (UNIX)
-	set(VACUUM_UTILS_ABI 24)
+	set(VACUUM_UTILS_ABI 25)
 endif (UNIX)
 
 if (WIN32)

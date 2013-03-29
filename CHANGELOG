@@ -9,6 +9,7 @@ LEGEND
   [!] Added new plugin for spell checking
   [!] Adden new plugin for keeping all user IM clients engaged in a conversation
   [!] Added new plugin for viewing recently used contacts in main window
+  [!] Added new plugin for collecting statistics
   [-] The application may fail in some cases after unsuccessful Stanza-session initialization
   [-] In private chats history of communication are loaded even if the relevant setting has been disabled
   [-] When changing the nickname in the conference the nickname was not changed in the active conferences menu in the roster window

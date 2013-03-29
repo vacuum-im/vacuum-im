@@ -26,7 +26,8 @@ HEADERS  = utilsexport.h \
            imagemanager.h \
            advanceditem.h \
            advanceditemmodel.h \
-           advanceditemdelegate.h
+           advanceditemdelegate.h \
+           filecookiejar.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -55,4 +56,5 @@ SOURCES  = jid.cpp \
            imagemanager.cpp \
            advanceditem.cpp \
            advanceditemmodel.cpp \
-           advanceditemdelegate.cpp
+           advanceditemdelegate.cpp \
+           filecookiejar.cpp

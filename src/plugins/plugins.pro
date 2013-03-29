@@ -68,3 +68,4 @@ SUBDIRS += spellchecker
 SUBDIRS += messagecarbons
 SUBDIRS += recentcontacts 
 #SUBDIRS += metacontacts 
+SUBDIRS += statistics 
