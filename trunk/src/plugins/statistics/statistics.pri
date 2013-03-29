@@ -1,2 +1,5 @@
-HEADERS = statistics.h
-SOURCES = statistics.cpp
+HEADERS = statistics.h \
+          statisticswebpage.h
+
+SOURCES = statistics.cpp \
+          statisticswebpage.cpp
