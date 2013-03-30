@@ -33,6 +33,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 {
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
+	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onApplicationShutdownStarted()));
 
 	IPlugin *plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
 	if (plugin)
@@ -48,7 +49,6 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 
-	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	return true;
@@ -117,7 +117,7 @@ void MainWindowPlugin::onOptionsClosed()
 	FMainWindow->closeWindow();
 }
 
-void MainWindowPlugin::onShutdownStarted()
+void MainWindowPlugin::onApplicationShutdownStarted()
 {
 	Options::node(OPV_MAINWINDOW_SHOWONSTART).setValue(FMainWindow->isVisible());
 }
