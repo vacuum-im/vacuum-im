@@ -54,7 +54,7 @@ bool OptionsManager::initConnections(IPluginManager *APluginManager, int &AInitO
 	Q_UNUSED(AInitOrder);
 
 	FPluginManager = APluginManager;
-	connect(FPluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onAboutToQuit()));
+	connect(FPluginManager->instance(),SIGNAL(aboutToQuit()),SLOT(onApplicationAboutToQuit()));
 
 	IPlugin *plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
@@ -664,7 +664,7 @@ void OptionsManager::onAutoSaveTimerTimeout()
 	saveOptions();
 }
 
-void OptionsManager::onAboutToQuit()
+void OptionsManager::onApplicationAboutToQuit()
 {
 	closeProfile();
 }

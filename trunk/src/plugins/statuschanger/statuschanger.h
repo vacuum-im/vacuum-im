@@ -133,7 +133,7 @@ protected slots:
 	void onOptionsClosed();
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onProfileOpened(const QString &AProfile);
-	void onShutdownStarted();
+	void onApplicationShutdownStarted();
 	void onReconnectTimer();
 	void onEditStatusAction(bool);
 	void onModifyStatusAction(bool);
@@ -161,7 +161,6 @@ private:
 	quint32 FConnectingLabelId;
 	IPresence *FChangingPresence;
 	QSet<IPresence *> FFastReconnect;
-	QList<IPresence *> FShutdownList;
 	QMap<int, StatusItem> FStatusItems;
 	QSet<IPresence *> FMainStatusStreams;
 	QMap<IPresence *, int> FLastOnlineStatus;

@@ -47,7 +47,7 @@ bool TrayManager::initConnections(IPluginManager *APluginManager, int &AInitOrde
 	Q_UNUSED(AInitOrder);
 
 	FPluginManager = APluginManager;
-	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
+	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onApplicationShutdownStarted()));
 
 	return true;
 }
@@ -217,7 +217,7 @@ void TrayManager::onBlinkTimerTimeout()
 	}
 }
 
-void TrayManager::onShutdownStarted()
+void TrayManager::onApplicationShutdownStarted()
 {
 	FSystemIcon.hide();
 }

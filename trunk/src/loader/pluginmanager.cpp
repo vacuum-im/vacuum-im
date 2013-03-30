@@ -11,7 +11,8 @@
 #include <QSettings>
 #include <QLibraryInfo>
 
-#define DELAYED_QUIT_TIMEOUT        5000
+#define START_QUIT_TIMEOUT          100
+#define DELAYED_QUIT_TIMEOUT        7000
 #define DELAYED_COMMIT_TIMEOUT      2000
 
 #define ORGANIZATION_NAME           "JRuDevels"
@@ -203,19 +204,15 @@ void PluginManager::restart()
 void PluginManager::delayShutdown()
 {
 	if (FShutdownKind != SK_WORK)
-	{
-		FShutdownDelayCount++;
-	}
+		FShutdownTimer.start(DELAYED_QUIT_TIMEOUT);
+	FShutdownDelayCount++;
 }
 
 void PluginManager::continueShutdown()
 {
-	if (FShutdownKind != SK_WORK)
-	{
-		FShutdownDelayCount--;
-		if (FShutdownDelayCount <= 0)
-			FShutdownTimer.start(0);
-	}
+	if (FShutdownDelayCount<=1 && FShutdownKind!=SK_WORK)
+		FShutdownTimer.start(START_QUIT_TIMEOUT);
+	FShutdownDelayCount--;
 }
 
 void PluginManager::loadSettings()
@@ -449,7 +446,6 @@ void PluginManager::startPlugins()
 
 void PluginManager::startShutdown()
 {
-	FShutdownTimer.start(DELAYED_QUIT_TIMEOUT);
 	delayShutdown();
 	emit shutdownStarted();
 	closeTopLevelWidgets();
@@ -484,7 +480,6 @@ void PluginManager::finishShutdown()
 	{
 		QTimer::singleShot(0,qApp,SLOT(quit()));
 	}
-
 }
 
 void PluginManager::closeTopLevelWidgets()
