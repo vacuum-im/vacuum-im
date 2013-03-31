@@ -8,8 +8,8 @@
 #include "ui_proxysettingswidget.h"
 
 class ProxySettingsWidget :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

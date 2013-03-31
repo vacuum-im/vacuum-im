@@ -11,8 +11,8 @@
 class ConnectionManager;
 
 class ConnectionOptionsWidget :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

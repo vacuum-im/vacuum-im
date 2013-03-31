@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>382</width>
-    <height>224</height>
+    <height>193</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -141,33 +141,6 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="lblDefault">
-       <property name="text">
-        <string>Default Proxy:</string>
-       </property>
-       <property name="textFormat">
-        <enum>Qt::PlainText</enum>
-       </property>
-       <property name="buddy">
-        <cstring>cmbDefault</cstring>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="cmbDefault">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pbtAdd">
@@ -203,7 +176,6 @@
   <tabstop>spbPort</tabstop>
   <tabstop>lneUser</tabstop>
   <tabstop>lnePassword</tabstop>
-  <tabstop>cmbDefault</tabstop>
   <tabstop>pbtAdd</tabstop>
   <tabstop>pbtDelete</tabstop>
   <tabstop>btbButtons</tabstop>
