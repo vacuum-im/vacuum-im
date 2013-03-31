@@ -81,10 +81,6 @@
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Default Proxy:</source>
-        <translation>Проксі за замовчуванням:</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Додати</translation>
     </message>
@@ -98,6 +94,10 @@
     <message>
         <source>&lt;Default Proxy&gt;</source>
         <translation>&lt;Проксі за замовчуванням&gt;</translation>
+    </message>
+    <message>
+        <source>Default proxy:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

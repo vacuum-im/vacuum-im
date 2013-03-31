@@ -5,7 +5,6 @@
 #include <QDataStream>
 #include <QAuthenticator>
 #include <QNetworkProxy>
-#include <QNetworkReply>
 #include <QNetworkRequest>
 #include <definitions/version.h>
 #include <definitions/optionvalues.h>
@@ -19,9 +18,6 @@
 #define MP_VER                       "1"
 #define MP_ID                        "UA-11825394-9"
 #define MP_URL                       "http://www.google-analytics.com/collect"
-
-#define RELOAD_TIMEOUT               60000
-#define DESTROY_TIMEOUT              30000
 
 #define RESEND_PENDING_TIMEOUT       60000
 
@@ -84,6 +80,7 @@ QDataStream &operator<<(QDataStream &AStream, const IStatisticsHit &AHit)
 Statistics::Statistics()
 {
 	FPluginManager = NULL;
+	FConnectionManager = NULL;
 
 	FStatisticsView = new QWebView(NULL);
 	connect(FStatisticsView,SIGNAL(loadFinished(bool)),SLOT(onStatisticsViewLoadFinished(bool)));
@@ -114,8 +111,17 @@ void Statistics::pluginInfo(IPluginInfo *APluginInfo)
 bool Statistics::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
-
 	FPluginManager = APluginManager;
+
+	IPlugin *plugin = APluginManager->pluginInterface("IConnectionManager").value(0,NULL);
+	if (plugin)
+	{
+		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
+		if (FConnectionManager)
+		{
+			connect(FConnectionManager->instance(),SIGNAL(defaultProxyChanged(const QUuid &)),SLOT(onDefaultConnectionProxyChanged(const QUuid &)));
+		}
+	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
@@ -285,15 +291,9 @@ QString Statistics::getStatisticsFilePath(const QString &AFileName) const
 
 void Statistics::onStatisticsViewLoadFinished(bool AOk)
 {
-	if (AOk)
-	{
-		QTimer::singleShot(DESTROY_TIMEOUT,FStatisticsView,SLOT(deleteLater()));
-		FStatisticsView = NULL;
-	}
-	else
-	{
-		QTimer::singleShot(RELOAD_TIMEOUT,FStatisticsView,SLOT(reload()));
-	}
+	Q_UNUSED(AOk);
+	QTimer::singleShot(30000,FStatisticsView,SLOT(deleteLater()));
+	FStatisticsView = NULL;
 }
 
 void Statistics::onNetworkManagerFinished(QNetworkReply *AReply)
@@ -343,7 +343,8 @@ void Statistics::onOptionsOpened()
 	hit.event.action = SEVA_APPLICATION_LAUNCH;
 	sendStatisticsHit(hit);
 
-	FStatisticsView->load(QUrl("http://www.vacuum-im.org/statistics"));
+	if (FStatisticsView)
+		FStatisticsView->setUrl(QUrl("http://www.vacuum-im.org/statistics"));
 }
 
 void Statistics::onOptionsClosed()
@@ -364,6 +365,11 @@ void Statistics::onPendingTimerTimeout()
 		if (sendStatisticsHit(hit))
 			break;
 	}
+}
+
+void Statistics::onDefaultConnectionProxyChanged( const QUuid &AProxyId )
+{
+	FNetworkManager->setProxy(FConnectionManager->proxyById(AProxyId).proxy);
 }
 
 Q_EXPORT_PLUGIN2(plg_statistics, Statistics)

@@ -1,11 +1,14 @@
 #ifndef STATISTICS_H
 #define STATISTICS_H
 
+#include <QMap>
 #include <QTimer>
 #include <QWebView>
+#include <QNetworkReply>
 #include <QNetworkAccessManager>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatistics.h>
+#include <interfaces/iconnectionmanager.h>
 #include "statisticswebpage.h"
 
 class Statistics : 
@@ -42,8 +45,10 @@ protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
 	void onPendingTimerTimeout();
+	void onDefaultConnectionProxyChanged(const QUuid &AProxyId);
 private:
 	IPluginManager *FPluginManager;
+	IConnectionManager *FConnectionManager;
 private:
 	QUuid FProfileId;
 	QWebView *FStatisticsView;

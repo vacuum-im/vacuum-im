@@ -35,7 +35,7 @@
 //Node = ON_MISC
 #define OWO_MISC_CLIENTINFO                       300
 #define OWO_MISC_AUTOSTART                        500
-#define OWO_MISC_URLPROXY                         700
+#define OWO_MISC_DEFAULTPROXY                     700
 
 //Node = ON_MESSAGES
 #define OWO_MESSAGES                              300

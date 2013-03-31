@@ -158,8 +158,6 @@
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
 #define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
-// UrlProcessor
-#define OPV_MISC_URLPROXY                               "misc.url-proxy"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
