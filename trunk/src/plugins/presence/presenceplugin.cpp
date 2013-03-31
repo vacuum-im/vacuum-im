@@ -26,7 +26,7 @@ PresencePlugin::PresencePlugin()
 
 PresencePlugin::~PresencePlugin()
 {
-
+	FCleanupHandler.clear();
 }
 
 //IPlugin

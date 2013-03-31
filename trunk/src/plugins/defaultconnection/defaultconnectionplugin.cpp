@@ -12,7 +12,7 @@ DefaultConnectionPlugin::DefaultConnectionPlugin()
 
 DefaultConnectionPlugin::~DefaultConnectionPlugin()
 {
-
+	FCleanupHandler.clear();
 }
 
 void DefaultConnectionPlugin::pluginInfo(IPluginInfo *APluginInfo)
