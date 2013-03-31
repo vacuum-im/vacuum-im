@@ -1,39 +1,57 @@
 #ifndef STATISTICS_H
 #define STATISTICS_H
 
+#include <QTimer>
 #include <QWebView>
-#include <QNetworkCookieJar>
 #include <QNetworkAccessManager>
 #include <interfaces/ipluginmanager.h>
+#include <interfaces/istatistics.h>
 #include "statisticswebpage.h"
-
-#define STATISTICS_UUID "{C9344821-9406-4089-A9D0-D6FD4919CF8F}"
 
 class Statistics : 
 	public QObject,
-	public IPlugin
+	public IPlugin,
+	public IStatistics
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin);
+	Q_INTERFACES(IPlugin IStatistics);
 public:
 	Statistics();
 	~Statistics();
-	//IPlugin
+	// IPlugin
 	virtual QObject *instance() { return this; }
 	virtual QUuid pluginUuid() const { return STATISTICS_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
 	virtual bool initSettings() { return true; }
-	virtual bool startPlugin();
+	virtual bool startPlugin() { return true; }
+	// IStatistics
+	virtual QUuid profileId() const;
+	virtual bool isValidHit(const IStatisticsHit &AHit) const;
+	virtual bool sendStatisticsHit(const IStatisticsHit &AHit);
 protected:
-	QString getDataFilePath(const QString &AFileName) const;
+	QUrl buildHitUrl(const IStatisticsHit &AHit) const;
+	QString getStatisticsFilePath(const QString &AFileName) const;
 protected slots:
 	void onStatisticsViewLoadFinished(bool AOk);
+protected slots:
+	void onNetworkManagerFinished(QNetworkReply *AReply);
+	void onNetworkManagerProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
+protected slots:
+	void onOptionsOpened();
+	void onOptionsClosed();
+	void onPendingTimerTimeout();
 private:
 	IPluginManager *FPluginManager;
 private:
+	QUuid FProfileId;
 	QWebView *FStatisticsView;
+	QNetworkAccessManager *FNetworkManager;
+private:
+	QTimer FPendingTimer;
+	QList<IStatisticsHit> FPendingHits;
+	QMap<QNetworkReply *, IStatisticsHit> FReplyHits;
 };
 
 #endif // STATISTICS_H

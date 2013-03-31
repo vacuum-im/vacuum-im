@@ -241,6 +241,9 @@
 #define OPV_STATUSICONS_RULE_PATTERN                    "statusicons.rules.rule.pattern"
 #define OPV_STATUSICONS_RULE_ICONSET                    "statusicons.rules.rule.iconset"
 
+// Statistics
+#define OPV_STATISTICS_PROFILEID                        "statistics.profile-id"
+
 // XmppStreams
 #define OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE               "xmppstreams.timeout.handshake"
 #define OPV_XMPPSTREAMS_TIMEOUT_KEEPALIVE               "xmppstreams.timeout.keepalive"
