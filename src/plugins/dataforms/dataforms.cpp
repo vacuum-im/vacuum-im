@@ -10,7 +10,7 @@ DataForms::DataForms()
 
 DataForms::~DataForms()
 {
-
+	FCleanupHandler.clear();
 }
 
 void DataForms::pluginInfo(IPluginInfo *APluginInfo)
