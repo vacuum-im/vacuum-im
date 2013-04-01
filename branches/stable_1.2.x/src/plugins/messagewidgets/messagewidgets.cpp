@@ -20,7 +20,7 @@ MessageWidgets::MessageWidgets()
 
 MessageWidgets::~MessageWidgets()
 {
-
+	FCleanupHandler.clear();
 }
 
 void MessageWidgets::pluginInfo(IPluginInfo *APluginInfo)

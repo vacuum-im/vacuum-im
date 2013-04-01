@@ -48,7 +48,7 @@ protected:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
-	void onShutdownStarted();
+	void onApplicationShutdownStarted();
 	void onProfileRenamed(const QString &AProfile, const QString &ANewName);
 	void onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::ActivationReason AReason);
 	void onShowMainWindowByAction(bool);

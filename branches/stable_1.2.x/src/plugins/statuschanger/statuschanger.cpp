@@ -53,6 +53,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 {
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
+	connect(APluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onApplicationShutdownStarted()));
 
 	IPlugin *plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
@@ -155,7 +156,6 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
-	connect(APluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onShutdownStarted()));
 	return FPresencePlugin!=NULL;
 }
 
@@ -1051,20 +1051,15 @@ void StatusChanger::onRosterOpened(IRoster *ARoster)
 	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
 	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
+	FPluginManager->delayShutdown();
 }
 
 void StatusChanger::onRosterClosed(IRoster *ARoster)
 {
 	IPresence *presence = FPresencePlugin->findPresence(ARoster->streamJid());
-	if (FShutdownList.contains(presence))
-	{
-		FShutdownList.removeAll(presence);
-		FPluginManager->continueShutdown();
-	}
-	else if (FConnectStatus.contains(presence))
-	{
+	if (FConnectStatus.contains(presence))
 		setStreamStatus(presence->streamJid(), FConnectStatus.value(presence));
-	}
+	FPluginManager->continueShutdown();
 }
 
 void StatusChanger::onStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
@@ -1193,18 +1188,11 @@ void StatusChanger::onProfileOpened(const QString &AProfile)
 	}
 }
 
-void StatusChanger::onShutdownStarted()
+void StatusChanger::onApplicationShutdownStarted()
 {
-	FShutdownList.clear();
 	foreach(IPresence *presence, FCurrentStatus.keys())
-	{
 		if (presence->isOpen())
-		{
-			FPluginManager->delayShutdown();
-			FShutdownList.append(presence);
 			presence->xmppStream()->close();
-		}
-	}
 }
 
 void StatusChanger::onReconnectTimer()
