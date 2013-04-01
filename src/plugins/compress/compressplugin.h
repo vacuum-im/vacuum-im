@@ -2,7 +2,6 @@
 #define COMPRESSPLUGIN_H
 
 #include <QObject>
-#include <QObjectCleanupHandler>
 #include <definitions/namespaces.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>

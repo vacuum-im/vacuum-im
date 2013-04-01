@@ -11,7 +11,7 @@ RosterPlugin::RosterPlugin()
 
 RosterPlugin::~RosterPlugin()
 {
-
+	FCleanupHandler.clear();
 }
 
 void RosterPlugin::pluginInfo(IPluginInfo *APluginInfo)
