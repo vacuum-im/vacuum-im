@@ -19,6 +19,8 @@
 #define MP_ID                        "UA-11825394-9"
 #define MP_URL                       "http://www.google-analytics.com/collect"
 
+#define STAT_PAGE_URL                "http://www.vacuum-im.org/statistics"
+
 #define RESEND_PENDING_TIMEOUT       60000
 
 QDataStream &operator>>(QDataStream &AStream, IStatisticsHit& AHit)
@@ -82,9 +84,6 @@ Statistics::Statistics()
 	FPluginManager = NULL;
 	FConnectionManager = NULL;
 
-	FStatisticsView = new QWebView(NULL);
-	connect(FStatisticsView,SIGNAL(loadFinished(bool)),SLOT(onStatisticsViewLoadFinished(bool)));
-
 	FNetworkManager = new QNetworkAccessManager(this);
 	connect(FNetworkManager,SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
 		SLOT(onNetworkManagerProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
@@ -96,7 +95,7 @@ Statistics::Statistics()
 
 Statistics::~Statistics()
 {
-	delete FStatisticsView;
+
 }
 
 void Statistics::pluginInfo(IPluginInfo *APluginInfo)
@@ -126,15 +125,6 @@ bool Statistics::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 
-	return true;
-}
-
-bool Statistics::initObjects()
-{
-	StatisticsWebPage *statPage = new StatisticsWebPage(FStatisticsView);
-	statPage->setNetworkAccessManager(FNetworkManager);
-	statPage->setUserAgent(QString("%1/%2.%3").arg(CLIENT_NAME).arg(FPluginManager->version()).arg(FPluginManager->revision()));
-	FStatisticsView->setPage(statPage);
 	return true;
 }
 
@@ -292,8 +282,9 @@ QString Statistics::getStatisticsFilePath(const QString &AFileName) const
 void Statistics::onStatisticsViewLoadFinished(bool AOk)
 {
 	Q_UNUSED(AOk);
-	QTimer::singleShot(30000,FStatisticsView,SLOT(deleteLater()));
-	FStatisticsView = NULL;
+	QWebView *statView = qobject_cast<QWebView *>(sender());
+	if (statView)
+		QTimer::singleShot(30000,statView,SLOT(deleteLater()));
 }
 
 void Statistics::onNetworkManagerFinished(QNetworkReply *AReply)
@@ -343,8 +334,15 @@ void Statistics::onOptionsOpened()
 	hit.event.action = SEVA_APPLICATION_LAUNCH;
 	sendStatisticsHit(hit);
 
-	if (FStatisticsView)
-		FStatisticsView->setUrl(QUrl("http://www.vacuum-im.org/statistics"));
+	QWebView *statView = new QWebView(NULL);
+	connect(statView,SIGNAL(loadFinished(bool)),SLOT(onStatisticsViewLoadFinished(bool)));
+
+	StatisticsWebPage *statPage = new StatisticsWebPage(statView);
+	statPage->setNetworkAccessManager(FNetworkManager);
+	statPage->setVersion(QString("%1.%2").arg(FPluginManager->version()).arg(FPluginManager->revision()));
+	statView->setPage(statPage);
+
+	statView->load(QUrl(STAT_PAGE_URL));
 }
 
 void Statistics::onOptionsClosed()
