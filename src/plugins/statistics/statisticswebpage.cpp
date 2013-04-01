@@ -10,15 +10,15 @@ StatisticsWebPage::~StatisticsWebPage()
 
 }
 
-void StatisticsWebPage::setUserAgent(const QString &AUserAgent)
+void StatisticsWebPage::setVersion(const QString &AUserAgent)
 {
-	FUserAgent = AUserAgent;
+	FVersion = AUserAgent;
 }
 
 QString StatisticsWebPage::userAgentForUrl(const QUrl &AUrl) const
 {
 	QString agent = QWebPage::userAgentForUrl(AUrl);
-	if (!FUserAgent.isEmpty())
-		agent += " " + FUserAgent;
+	if (!FVersion.isEmpty())
+		agent = agent.left(agent.indexOf("Safari/")+7)+FVersion;
 	return agent;
 }

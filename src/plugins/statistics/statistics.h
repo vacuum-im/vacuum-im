@@ -26,7 +26,7 @@ public:
 	virtual QUuid pluginUuid() const { return STATISTICS_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects();
+	virtual bool initObjects() { return true; }
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	// IStatistics
@@ -51,7 +51,6 @@ private:
 	IConnectionManager *FConnectionManager;
 private:
 	QUuid FProfileId;
-	QWebView *FStatisticsView;
 	QNetworkAccessManager *FNetworkManager;
 private:
 	QTimer FPendingTimer;

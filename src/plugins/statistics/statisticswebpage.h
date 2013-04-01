@@ -11,11 +11,11 @@ class StatisticsWebPage :
 public:
 	explicit StatisticsWebPage(QObject *AParent=NULL);
 	virtual ~StatisticsWebPage();
-	void setUserAgent(const QString &AUserAgent);
+	void setVersion(const QString &AUserAgent);
 protected:
 	virtual QString userAgentForUrl(const QUrl &AUrl) const;
 private:
-	QString FUserAgent;
+	QString FVersion;
 };
 
 #endif // STATISTICSWEBPAGE_H
