@@ -278,10 +278,12 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 		{
 			Jid contactJid = AStanza.from();
 			QDomElement capsElem = AStanza.firstElement("c",NS_CAPS);
+			bool isMucPresence = !AStanza.firstElement("x",NS_MUC_USER).isNull();
 
 			EntityCapabilities newCaps;
 			newCaps.streamJid = AStreamJid;
 			newCaps.entityJid = contactJid;
+			newCaps.owner = isMucPresence ? contactJid.pFull() : contactJid.pBare();
 			newCaps.node = capsElem.attribute("node");
 			newCaps.ver = capsElem.attribute("ver");
 			newCaps.hash = capsElem.attribute("hash");
@@ -303,7 +305,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			{
 				if (hasEntityCaps(newCaps))
 				{
-					IDiscoInfo dinfo = loadEntityCaps(newCaps);
+					IDiscoInfo dinfo = loadCapsInfo(newCaps);
 					dinfo.streamJid = AStreamJid;
 					dinfo.contactJid = contactJid;
 					FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
@@ -314,7 +316,6 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 					DiscoveryRequest request;
 					request.streamJid = AStreamJid;
 					request.contactJid = contactJid;
-					//request.node = !newCaps.hash.isEmpty() ? newCaps.node+"#"+newCaps.ver : QString::null;
 					appendQueuedRequest(QUEUE_REQUEST_START,request);
 				}
 				if (!capsElem.isNull() && !newCaps.node.isEmpty() && !newCaps.ver.isEmpty())
@@ -335,7 +336,7 @@ void ServiceDiscovery::stanzaRequestResult(const Jid &AStreamJid, const Stanza &
 		DiscoveryRequest drequest = FInfoRequestsId.take(AStanza.id());
 		IDiscoInfo dinfo = parseDiscoInfo(AStanza,drequest);
 		FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
-		saveEntityCaps(dinfo);
+		saveCapsInfo(dinfo);
 		emit discoInfoReceived(dinfo);
 	}
 	else if (FItemsRequestsId.contains(AStanza.id()))
@@ -909,10 +910,11 @@ bool ServiceDiscovery::hasEntityCaps(const EntityCapabilities &ACaps) const
 	return QFile::exists(capsFileName(ACaps,false)) || QFile::exists(capsFileName(ACaps,true));
 }
 
-QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AForJid) const
+QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AWithOwner) const
 {
 	static bool entered = false;
 	static QDir dir(FPluginManager->homePath());
+	
 	if (!entered)
 	{
 		entered = true;
@@ -922,44 +924,45 @@ QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AFo
 	}
 
 	QString hashString = ACaps.hash.isEmpty() ? ACaps.node+ACaps.ver : ACaps.ver+ACaps.hash;
-	hashString += AForJid ? ACaps.entityJid.pFull() : QString::null;
+	hashString += AWithOwner ? ACaps.owner : QString::null;
 	QString fileName = QCryptographicHash::hash(hashString.toUtf8(),QCryptographicHash::Md5).toHex().toLower() + ".xml";
 	return dir.absoluteFilePath(fileName);
 }
 
-IDiscoInfo ServiceDiscovery::loadEntityCaps(const EntityCapabilities &ACaps) const
+IDiscoInfo ServiceDiscovery::loadCapsInfo(const EntityCapabilities &ACaps) const
 {
+	// Check if present another user with same correct calculated caps and loaded discovery info
 	QHash<Jid, EntityCapabilities> streamEntityCaps = FEntityCaps.value(ACaps.streamJid);
-	QHash<Jid, EntityCapabilities>::const_iterator it = streamEntityCaps.constBegin();
-	while (it != streamEntityCaps.constEnd())
+	for(QHash<Jid, EntityCapabilities>::const_iterator it=streamEntityCaps.constBegin(); it!=streamEntityCaps.constEnd(); ++it)
 	{
-		EntityCapabilities caps = it.value();
-		if ((!ACaps.hash.isEmpty() || caps.node==ACaps.node) && caps.ver==ACaps.ver && caps.hash==ACaps.hash && hasDiscoInfo(caps.streamJid, caps.entityJid))
+		if ((!ACaps.hash.isEmpty() || ACaps.node==it->node) && ACaps.ver==it->ver && ACaps.hash==it->hash && hasDiscoInfo(it->streamJid,it->entityJid))
 		{
-			IDiscoInfo dinfo = discoInfo(caps.streamJid,caps.entityJid);
-			if (caps.ver == calcCapsHash(dinfo,caps.hash))
+			IDiscoInfo dinfo = discoInfo(it->streamJid,it->entityJid);
+			if (!it->ver.isEmpty() && it->ver==calcCapsHash(dinfo,it->hash))
 				return dinfo;
 		}
-		++it;
 	}
 
+	// Load discovery info from file
 	IDiscoInfo dinfo;
-	QString fileName = capsFileName(ACaps,true);
-	if (!QFile::exists(fileName))
-		fileName = capsFileName(ACaps,false);
-	QFile capsFile(fileName);
-	if (capsFile.exists() && capsFile.open(QIODevice::ReadOnly))
+	foreach(const QString &fileName, QStringList() << capsFileName(ACaps,true) << capsFileName(ACaps,false))
 	{
-		QDomDocument doc;
-		doc.setContent(capsFile.readAll(),true);
-		capsFile.close();
-		QDomElement capsElem = doc.documentElement();
-		discoInfoFromElem(capsElem,dinfo);
+		QFile capsFile(fileName);
+		if (capsFile.open(QIODevice::ReadOnly))
+		{
+			QDomDocument doc;
+			doc.setContent(capsFile.readAll(),true);
+			QDomElement capsElem = doc.documentElement();
+			discoInfoFromElem(capsElem,dinfo);
+			capsFile.close();
+			break;
+		}
 	}
+
 	return dinfo;
 }
 
-bool ServiceDiscovery::saveEntityCaps(const IDiscoInfo &AInfo) const
+bool ServiceDiscovery::saveCapsInfo(const IDiscoInfo &AInfo) const
 {
 	if (AInfo.error.isNull() && FEntityCaps.value(AInfo.streamJid).contains(AInfo.contactJid))
 	{
@@ -969,15 +972,17 @@ bool ServiceDiscovery::saveEntityCaps(const IDiscoInfo &AInfo) const
 		{
 			if (!hasEntityCaps(caps))
 			{
-				bool checked = (caps.ver==calcCapsHash(AInfo,caps.hash));
 				QDomDocument doc;
 				QDomElement capsElem = doc.appendChild(doc.createElement(CAPS_FILE_TAG_NAME)).toElement();
 				capsElem.setAttribute("node",caps.node);
 				capsElem.setAttribute("ver",caps.ver);
 				capsElem.setAttribute("hash",caps.hash);
-				if (!checked)
-					capsElem.setAttribute("jid",caps.entityJid.pFull());
 				discoInfoToElem(AInfo,capsElem);
+
+				bool checked = (!caps.ver.isEmpty() && caps.ver==calcCapsHash(AInfo,caps.hash));
+				if (!checked)
+					capsElem.setAttribute("jid",caps.owner);
+
 				QFile capsFile(capsFileName(caps,!checked));
 				if (capsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
 				{
@@ -1155,7 +1160,7 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 	myCaps.entityJid = AXmppStream->streamJid();
 	myCaps.node = CLIENT_HOME_PAGE;
 	myCaps.hash = CAPS_HASH_SHA1;
-	myCaps.ver = calcCapsHash(selfDiscoInfo(myCaps.entityJid),myCaps.hash);
+	myCaps.ver = calcCapsHash(selfDiscoInfo(myCaps.streamJid),myCaps.hash);
 
 	Jid streamDomane = AXmppStream->streamJid().domain();
 	requestDiscoInfo(AXmppStream->streamJid(),streamDomane);
