@@ -222,19 +222,23 @@ bool ServerMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability)
 
 int ServerMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJid) const
 {
-	switch (ACapability)
+	if (isCapable(AStreamJid,ACapability))
 	{
-	case ManualArchiving:
-		return isCapable(AStreamJid,ManualArchiving) ? ACO_MANUAL_SERVERARCHIVE : -1;
-	case AutomaticArchiving:
-		return isCapable(AStreamJid,AutomaticArchiving) ? ACO_AUTOMATIC_SERVERARCHIVE : -1;
-	case ArchiveManagement:
-		return isCapable(AStreamJid,ArchiveManagement) ? ACO_MANAGE_SERVERARCHIVE : -1;
-	case Replication:
-		return isCapable(AStreamJid,Replication) ? ACO_REPLICATION_SERVERARCHIVE : -1;
-	default:
-		return -1;
+		switch (ACapability)
+		{
+		case ManualArchiving:
+			return ACO_MANUAL_SERVERARCHIVE;
+		case AutomaticArchiving:
+			return ACO_AUTOMATIC_SERVERARCHIVE;
+		case ArchiveManagement:
+			return ACO_MANAGE_SERVERARCHIVE;
+		case Replication:
+			return ACO_REPLICATION_SERVERARCHIVE;
+		default:
+			break;
+		}
 	}
+	return -1;
 }
 
 bool ServerMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)

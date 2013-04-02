@@ -69,7 +69,7 @@ int CollectionWriter::secondsFromStart() const
 
 bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
 {
-	if (isOpened() && ASaveMode != ARCHIVE_SAVE_FALSE)
+	if (isOpened() && ASaveMode!=ARCHIVE_SAVE_FALSE)
 	{
 		Jid contactJid = AMessage.from();
 		FGroupchat |= AMessage.type()==Message::GroupChat;
@@ -87,7 +87,9 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
 				FSecsSum += secs-FSecsSum;
 			}
 			else
+			{
 				FXmlWriter->writeAttribute("utc",DateTime(AMessage.dateTime()).toX85UTC());
+			}
 
 			if (FGroupchat)
 				FXmlWriter->writeAttribute("name",contactJid.resource());
