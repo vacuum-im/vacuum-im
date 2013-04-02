@@ -900,13 +900,31 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 {
 	if (!isArchiveAutoSave(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
 	{
+		QString errMessage;
 		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
 		if (engine)
 		{
 			Message message = AMessage;
 			bool directionIn = AItemJid==message.from() || AStreamJid==message.to();
 			if (prepareMessage(AStreamJid,message,directionIn))
-				return engine->saveMessage(AStreamJid,message,directionIn);
+			{
+				if (!engine->saveMessage(AStreamJid,message,directionIn))
+					errMessage = "Engine failed to save message";
+				else
+					return true;
+			}
+			else
+			{
+				errMessage = "Failed to prepare message";
+			}
+		}
+		else
+		{
+			errMessage = "Engine not found";
+		}
+		if (!errMessage.isEmpty())
+		{
+			notifyInChatWindow(AStreamJid,AItemJid,QString("Message was not saved to history: %1. Please join to conference xmpp:vacuum@conference.jabber.ru?join to notify developers about this bug!").arg(errMessage));
 		}
 	}
 	return false;
@@ -1491,7 +1509,10 @@ bool MessageArchiver::processMessage(const Jid &AStreamJid, const Message &AMess
 		FPendingMessages[AStreamJid].append(qMakePair<Message,bool>(AMessage,ADirectionIn));
 		return true;
 	}
-	return saveMessage(AStreamJid,itemJid,AMessage);
+	else
+	{
+		return saveMessage(AStreamJid,itemJid,AMessage);
+	}
 }
 
 IArchiveEngine *MessageArchiver::findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const

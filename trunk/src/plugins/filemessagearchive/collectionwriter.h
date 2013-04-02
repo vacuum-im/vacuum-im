@@ -12,7 +12,7 @@
 #include <utils/options.h>
 
 class CollectionWriter :
-			public QObject
+	public QObject
 {
 	Q_OBJECT;
 public:
