@@ -858,7 +858,7 @@ QString MultiUserChatPlugin::streamVCardNick(const Jid &AStreamJid) const
 	QString nick;
 	if (FVCardPlugin!=NULL && FVCardPlugin->hasVCard(AStreamJid.bare()))
 	{
-		IVCard *vCard = FVCardPlugin->vcard(AStreamJid.bare());
+		IVCard *vCard = FVCardPlugin->getVCard(AStreamJid.bare());
 		nick = vCard->value(VVN_NICKNAME);
 		vCard->unlock();
 	}

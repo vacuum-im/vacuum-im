@@ -407,7 +407,7 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 	QString format = getImageFormat(AData);
 	if (AData.isEmpty() || !format.isEmpty())
 	{
-		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
+		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
 		if (vcard)
 		{
 			if (!AData.isEmpty())
