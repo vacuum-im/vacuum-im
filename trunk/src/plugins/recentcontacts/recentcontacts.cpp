@@ -430,7 +430,7 @@ QString RecentContacts::recentItemName(const IRecentItem &AItem) const
 IRecentItem RecentContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 {
 	IRecentItem item;
-	if (AIndex->kind()==RIK_CONTACT)
+	if (AIndex->kind() == RIK_CONTACT)
 	{
 		item.type = REIT_CONTACT;
 		item.streamJid = AIndex->data(RDR_STREAM_JID).toString();
@@ -449,7 +449,8 @@ QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &
 		findData.insertMulti(RDR_KIND,RIK_CONTACT);
 		findData.insertMulti(RDR_STREAM_JID,AItem.streamJid.pFull());
 		findData.insertMulti(RDR_PREP_BARE_JID,AItem.reference);
-		proxies = sortItemProxies(sroot->findChilds(findData,true));
+		proxies = sroot->findChilds(findData,true);
+		qSort(proxies.begin(),proxies.end());
 	}
 	return proxies;
 }
@@ -765,14 +766,11 @@ void RecentContacts::updateItemProxy(const IRecentItem &AItem)
 			IRosterIndex *oldProxy = FIndexToProxy.value(index);
 			if (oldProxy != proxy)
 			{
+				FProxyToIndex.remove(FIndexToProxy.take(index));
 				if (proxy)
 				{
 					FIndexToProxy.insert(index,proxy);
 					FProxyToIndex.insert(proxy,index);
-				}
-				else
-				{
-					FProxyToIndex.remove(FIndexToProxy.take(index));
 				}
 			}
 		}
@@ -894,26 +892,6 @@ void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecent
 		updateItemIndex(item);
 		emit recentItemChanged(item);
 	}
-}
-
-QList<IRosterIndex *> RecentContacts::sortItemProxies(const QList<IRosterIndex *> &AIndexes) const
-{
-	QList<IRosterIndex *> proxies;
-	
-	QMap<int, QMultiMap<int, IRosterIndex *> > order;
-	for (int i=0; i<AIndexes.count(); i++)
-	{
-		const static int showOrders[] = {6,2,1,3,4,5,7,8};
-		IRosterIndex *index = AIndexes.at(i);
-		int showOrder = showOrders[index->data(RDR_SHOW).toInt()];
-		int priority = index->data(RDR_PRIORITY).toInt();
-		order[showOrder].insertMulti(-priority, index);
-	}
-	
-	for(QMap<int, QMultiMap<int, IRosterIndex *> >::const_iterator it=order.constBegin(); it!=order.constEnd(); ++it)
-		proxies += it->values();
-	
-	return proxies;
 }
 
 QList<IRosterIndex *> RecentContacts::indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive) const
