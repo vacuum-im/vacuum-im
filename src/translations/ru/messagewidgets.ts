@@ -340,6 +340,18 @@
         <source>Load Last Selection</source>
         <translation>Загрузить последний выбор</translation>
     </message>
+    <message>
+        <source>Expand All Groups</source>
+        <translation>Развернуть все группы</translation>
+    </message>
+    <message>
+        <source>Collapse All Groups</source>
+        <translation>Свернуть все группы</translation>
+    </message>
+    <message>
+        <source>Hide Offline Contacts</source>
+        <translation>Не показывать отключенные контакты</translation>
+    </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>

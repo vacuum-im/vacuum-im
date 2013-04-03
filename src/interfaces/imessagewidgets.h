@@ -142,14 +142,14 @@ public:
 	virtual AdvancedItemModel *receiversModel() const =0;
 	virtual QModelIndex mapModelToView(QStandardItem *AItem) =0;
 	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex) =0;
-	virtual void contextMenuForItem(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual void contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu) =0;
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const =0;
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected) =0;
 	virtual void setAddressSelection(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
 	virtual void clearSelection() =0;
 protected:
 	virtual void availStreamsChanged() =0;
-	virtual void contextMenuForItemRequested(QStandardItem *AItem, Menu *AMenu) =0;
+	virtual void contextMenuForItemsRequested(QList<QStandardItem *> AItems, Menu *AMenu) =0;
 	virtual void addressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
 };
 
@@ -407,7 +407,7 @@ Q_DECLARE_INTERFACE(IMessageWidget,"Vacuum.Plugin.IMessageWidget/1.0")
 Q_DECLARE_INTERFACE(IMessageInfoWidget,"Vacuum.Plugin.IMessageInfoWidget/1.2")
 Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.3")
 Q_DECLARE_INTERFACE(IMessageEditWidget,"Vacuum.Plugin.IMessageEditWidget/1.3")
-Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.1")
+Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.2")
 Q_DECLARE_INTERFACE(IMessageMenuBarWidget,"Vacuum.Plugin.IMessageMenuBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageToolBarWidget,"Vacuum.Plugin.IMessageToolBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageStatusBarWidget,"Vacuum.Plugin.IMessageStatusBarWidget/1.1")
@@ -420,6 +420,6 @@ Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.3")
 Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandler/1.1")
 Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.1")
 Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.2")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.6")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.7")
 
 #endif // IMESSAGEWIDGETS_H

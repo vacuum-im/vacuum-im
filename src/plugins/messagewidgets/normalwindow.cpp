@@ -336,7 +336,7 @@ void NormalWindow::onSelectReceiversMenuAboutToShow()
 	if (menu)
 	{
 		menu->clear();
-		FReceiversWidget->contextMenuForItem(FReceiversWidget->receiversModel()->invisibleRootItem(),menu);
+		FReceiversWidget->contextMenuForItems(QList<QStandardItem *>() << FReceiversWidget->receiversModel()->invisibleRootItem(),menu);
 	}
 }
 
