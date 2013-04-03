@@ -240,7 +240,7 @@ void Gateways::resolveNickName(const Jid &AStreamJid, const Jid &AContactJid)
 		if (FVCardPlugin->hasVCard(ritem.itemJid))
 		{
 			static const QList<QString> nickFields = QList<QString>() << VVN_NICKNAME << VVN_FULL_NAME << VVN_GIVEN_NAME << VVN_FAMILY_NAME;
-			IVCard *vcard = FVCardPlugin->vcard(ritem.itemJid);
+			IVCard *vcard = FVCardPlugin->getVCard(ritem.itemJid);
 			foreach(QString field, nickFields)
 			{
 				QString nick = vcard->value(field);

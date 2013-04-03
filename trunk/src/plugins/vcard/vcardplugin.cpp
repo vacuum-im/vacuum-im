@@ -2,10 +2,15 @@
 
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QDomDocument>
 
-#define VCARD_DIRNAME             "vcards"
+#define DIR_VCARDS                "vcards"
 #define VCARD_TIMEOUT             60000
+
+#define UPDATE_VCARD_DAYS         7
+#define UPDATE_REQUEST_TIMEOUT    5000
+
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
@@ -13,6 +18,7 @@ VCardPlugin::VCardPlugin()
 {
 	FPluginManager = NULL;
 	FXmppStreams = NULL;
+	FRosterPlugin = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
 	FStanzaProcessor = NULL;
@@ -20,6 +26,10 @@ VCardPlugin::VCardPlugin()
 	FDiscovery = NULL;
 	FXmppUriQueries = NULL;
 	FMessageWidgets = NULL;
+
+	FUpdateTimer.setSingleShot(false);
+	FUpdateTimer.start(UPDATE_REQUEST_TIMEOUT);
+	connect(&FUpdateTimer,SIGNAL(timeout()),SLOT(onUpdateTimerTimeout()));
 }
 
 VCardPlugin::~VCardPlugin()
@@ -52,6 +62,19 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		if (FXmppStreams)
 		{
 			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onXmppStreamRemoved(IXmppStream *)));
+		}
+	}
+
+	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+		if (FRosterPlugin)
+		{
+			connect(FRosterPlugin->instance(),SIGNAL(rosterOpened(IRoster *)),SLOT(onRosterOpened(IRoster *)));
+			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
+			connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
 		}
 	}
 
@@ -145,16 +168,16 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 	}
 	else if (FVCardPublishId.contains(AStanza.id()))
 	{
-		Jid fromJid = FVCardPublishId.take(AStanza.id());
+		Jid streamJid = FVCardPublishId.take(AStanza.id());
 		Stanza stanza = FVCardPublishStanza.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			saveVCardFile(stanza.element().firstChildElement(VCARD_TAGNAME),fromJid);
-			emit vcardPublished(fromJid);
+			saveVCardFile(stanza.element().firstChildElement(VCARD_TAGNAME),streamJid);
+			emit vcardPublished(streamJid);
 		}
 		else if (AStanza.type() == "error")
 		{
-			emit vcardError(fromJid,XmppStanzaError(AStanza));
+			emit vcardError(streamJid,XmppStanzaError(AStanza));
 		}
 	}
 }
@@ -172,24 +195,30 @@ bool VCardPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, con
 
 QString VCardPlugin::vcardFileName(const Jid &AContactJid) const
 {
-	QDir dir(FPluginManager->homePath());
-	if (!dir.exists(VCARD_DIRNAME))
-		dir.mkdir(VCARD_DIRNAME);
-	dir.cd(VCARD_DIRNAME);
+	static bool entered = false;
+	static QDir dir(FPluginManager->homePath());
+	
+	if (!entered)
+	{
+		entered = true;
+		if (!dir.exists(DIR_VCARDS))
+			dir.mkdir(DIR_VCARDS);
+		dir.cd(DIR_VCARDS);
+	}
+	
 	return dir.absoluteFilePath(Jid::encode(AContactJid.pFull())+".xml");
 }
 
 bool VCardPlugin::hasVCard(const Jid &AContactJid) const
 {
-	QString fileName = vcardFileName(AContactJid);
-	return QFile::exists(fileName);
+	return QFile::exists(vcardFileName(AContactJid));
 }
 
-IVCard *VCardPlugin::vcard(const Jid &AContactJid)
+IVCard *VCardPlugin::getVCard(const Jid &AContactJid)
 {
 	VCardItem &vcardItem = FVCards[AContactJid];
 	if (vcardItem.vcard == NULL)
-		vcardItem.vcard = new VCard(AContactJid,this);
+		vcardItem.vcard = new VCard(this,AContactJid);
 	vcardItem.locks++;
 	return vcardItem.vcard;
 }
@@ -207,33 +236,28 @@ bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 			{
 				FVCardRequestId.insert(request.id(),AContactJid);
 				return true;
-			};
+			}
+			return false;
 		}
-		else
-			return true;
+		return true;
 	}
 	return false;
 }
 
 bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
 {
-	if (FStanzaProcessor && AVCard->isValid())
+	if (FStanzaProcessor && AVCard->isValid() && FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
 	{
-		if (FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
+		Stanza publish("iq");
+		publish.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
+		QDomElement elem = publish.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
+		removeEmptyChildElements(elem);
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,publish,VCARD_TIMEOUT))
 		{
-			Stanza publish("iq");
-			publish.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
-			QDomElement elem = publish.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
-			removeEmptyChildElements(elem);
-			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,publish,VCARD_TIMEOUT))
-			{
-				FVCardPublishId.insert(publish.id(),AStreamJid.pBare());
-				FVCardPublishStanza.insert(publish.id(),publish);
-				return true;
-			}
-		}
-		else
+			FVCardPublishId.insert(publish.id(),AStreamJid.pBare());
+			FVCardPublishStanza.insert(publish.id(),publish);
 			return true;
+		}
 	}
 	return false;
 }
@@ -269,7 +293,7 @@ void VCardPlugin::unlockVCard(const Jid &AContactJid)
 {
 	VCardItem &vcardItem = FVCards[AContactJid];
 	vcardItem.locks--;
-	if (vcardItem.locks == 0)
+	if (vcardItem.locks <= 0)
 	{
 		VCard *vcardCopy = vcardItem.vcard;
 		FVCards.remove(AContactJid);
@@ -286,11 +310,12 @@ void VCardPlugin::saveVCardFile(const QDomElement &AElem, const Jid &AContactJid
 		elem.setAttribute("jid",AContactJid.full());
 		elem.setAttribute("dateTime",QDateTime::currentDateTime().toString(Qt::ISODate));
 		elem.appendChild(AElem.cloneNode(true));
-		QFile vcardFile(vcardFileName(AContactJid));
-		if (vcardFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+
+		QFile file(vcardFileName(AContactJid));
+		if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 		{
-			vcardFile.write(doc.toByteArray());
-			vcardFile.close();
+			file.write(doc.toByteArray());
+			file.close();
 		}
 	}
 }
@@ -429,6 +454,40 @@ void VCardPlugin::onMessageNormalWindowCreated(IMessageNormalWindow *AWindow)
 void VCardPlugin::onMessageChatWindowCreated(IMessageChatWindow *AWindow)
 {
 	insertMessageToolBarAction(AWindow->toolBarWidget());
+}
+
+void VCardPlugin::onUpdateTimerTimeout()
+{
+	bool requestSent = false;
+	QMultiMap<Jid,Jid>::iterator it=FUpdateQueue.begin();
+	while(!requestSent && it!=FUpdateQueue.end())
+	{
+		QFileInfo info(vcardFileName(it.value()));
+		if (!info.exists() || info.lastModified().daysTo(QDateTime::currentDateTime())>UPDATE_VCARD_DAYS)
+			requestSent = requestVCard(it.key(),it.value());
+		it = FUpdateQueue.erase(it);
+	}
+}
+
+void VCardPlugin::onRosterOpened(IRoster *ARoster)
+{
+	IRosterItem emptyItem;
+	foreach(const IRosterItem &item, ARoster->rosterItems())
+		onRosterItemReceived(ARoster,item,emptyItem);
+}
+
+void VCardPlugin::onRosterClosed(IRoster *ARoster)
+{
+	FUpdateQueue.remove(ARoster->streamJid());
+}
+
+void VCardPlugin::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
+{
+	if (ARoster->isOpen() && !ABefore.isValid)
+	{
+		if (!FUpdateQueue.contains(ARoster->streamJid(),AItem.itemJid))
+			FUpdateQueue.insertMulti(ARoster->streamJid(),AItem.itemJid);
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_vcard, VCardPlugin)

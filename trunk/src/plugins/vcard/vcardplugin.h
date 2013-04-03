@@ -1,6 +1,8 @@
 #ifndef VCARDPLUGIN_H
 #define VCARDPLUGIN_H
 
+#include <QTimer>
+#include <QObjectCleanupHandler>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterindexkinds.h>
@@ -13,6 +15,7 @@
 #include <definitions/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ivcard.h>
+#include <interfaces/iroster.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
@@ -28,8 +31,7 @@
 #include "vcard.h"
 #include "vcarddialog.h"
 
-struct VCardItem
-{
+struct VCardItem {
 	VCardItem() {
 		vcard = NULL;
 		locks = 0;
@@ -66,7 +68,7 @@ public:
 	//IVCardPlugin
 	virtual QString vcardFileName(const Jid &AContactJid) const;
 	virtual bool hasVCard(const Jid &AContactJid) const;
-	virtual IVCard *vcard(const Jid &AContactJid);
+	virtual IVCard *getVCard(const Jid &AContactJid);
 	virtual bool requestVCard(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual bool publishVCard(IVCard *AVCard, const Jid &AStreamJid);
 	virtual void showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid);
@@ -90,9 +92,15 @@ protected slots:
 	void onXmppStreamRemoved(IXmppStream *AXmppStream);
 	void onMessageNormalWindowCreated(IMessageNormalWindow *AWindow);
 	void onMessageChatWindowCreated(IMessageChatWindow *AWindow);
+protected slots:
+	void onUpdateTimerTimeout();
+	void onRosterOpened(IRoster *ARoster);
+	void onRosterClosed(IRoster *ARoster);
+	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;
+	IRosterPlugin *FRosterPlugin;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IStanzaProcessor *FStanzaProcessor;
@@ -101,11 +109,13 @@ private:
 	IXmppUriQueries *FXmppUriQueries;
 	IMessageWidgets *FMessageWidgets;
 private:
-	QMap<Jid, VCardItem> FVCards;
-	QMap<QString, Jid> FVCardRequestId;
-	QMap<QString, Jid> FVCardPublishId;
-	QMap<QString, Stanza> FVCardPublishStanza;
-	QMap<Jid, VCardDialog *> FVCardDialogs;
+	QTimer FUpdateTimer;
+	QMap<Jid,VCardItem> FVCards;
+	QMultiMap<Jid,Jid> FUpdateQueue;
+	QMap<QString,Jid> FVCardRequestId;
+	QMap<QString,Jid> FVCardPublishId;
+	QMap<QString,Stanza> FVCardPublishStanza;
+	QMap<Jid,VCardDialog *> FVCardDialogs;
 };
 
 #endif // VCARDPLUGIN_H

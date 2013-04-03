@@ -344,7 +344,7 @@ void BirthdayReminder::onVCardReceived(const Jid &AContactJid)
 {
 	if (findContactStream(AContactJid).isValid())
 	{
-		IVCard *vcard = FVCardPlugin->vcard(AContactJid);
+		IVCard *vcard = FVCardPlugin->getVCard(AContactJid);
 		setContactBithday(AContactJid,DateTime(vcard->value(VVN_BIRTHDAY)).dateTime().date());
 		vcard->unlock();
 	}
@@ -355,7 +355,7 @@ void BirthdayReminder::onRosterItemReceived(IRoster *ARoster, const IRosterItem 
 	Q_UNUSED(ARoster);
 	if (!ABefore.isValid && FVCardPlugin && FVCardPlugin->hasVCard(AItem.itemJid))
 	{
-		IVCard *vcard = FVCardPlugin->vcard(AItem.itemJid);
+		IVCard *vcard = FVCardPlugin->getVCard(AItem.itemJid);
 		setContactBithday(AItem.itemJid,DateTime(vcard->value(VVN_BIRTHDAY)).dateTime().date());
 		vcard->unlock();
 	}

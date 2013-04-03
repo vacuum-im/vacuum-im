@@ -29,7 +29,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	ui.btbButtons->addButton(tr("Reload"),QDialogButtonBox::ResetRole);
 	connect(ui.btbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-	FVCard = FVCardPlugin->vcard(FContactJid);
+	FVCard = FVCardPlugin->getVCard(FContactJid);
 	connect(FVCard->instance(),SIGNAL(vcardUpdated()),SLOT(onVCardUpdated()));
 	connect(FVCard->instance(),SIGNAL(vcardPublished()),SLOT(onVCardPublished()));
 	connect(FVCard->instance(),SIGNAL(vcardError(const XmppError &)),SLOT(onVCardError(const XmppError &)));
