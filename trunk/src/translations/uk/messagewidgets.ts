@@ -340,6 +340,18 @@
         <source>Load Last Selection</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Expand All Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Collapse All Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Offline Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>
