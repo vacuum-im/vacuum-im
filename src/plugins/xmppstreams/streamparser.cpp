@@ -73,8 +73,7 @@ void StreamParser::parseData(const QByteArray &AData)
 		}
 		else if (FReader.isCharacters())
 		{
-			if (!FReader.isCDATA() && !FReader.isWhitespace())
-				FCurrentElem.appendChild(doc.createTextNode(FReader.text().toString()));
+			FCurrentElem.appendChild(doc.createTextNode(FReader.text().toString()));
 		}
 		else if (FReader.isEndElement())
 		{
