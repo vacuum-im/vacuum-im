@@ -1,6 +1,6 @@
 [Requirements]
-  - Qt 4.5.x
-  - OpenSSL 0.9.8k
+  - Qt 4.8.x
+  - OpenSSL 1.0.0
 
 [Common]
   ==qmake parametrs==
