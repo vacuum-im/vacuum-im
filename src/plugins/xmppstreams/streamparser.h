@@ -1,14 +1,13 @@
 #ifndef STREAMPARSER_H
 #define STREAMPARSER_H
 
-#include <QStack>
 #include <QDomDocument>
 #include <QXmlStreamReader>
 #include <definitions/namespaces.h>
 #include <utils/xmpperror.h>
 
 class StreamParser :
-			public QObject
+	public QObject
 {
 	Q_OBJECT;
 public:
@@ -23,6 +22,7 @@ signals:
 	void closed();
 private:
 	int FLevel;
+	QDomText FElemSpace;
 	QDomElement FRootElem;
 	QDomElement FCurrentElem;
 	QXmlStreamReader FReader;
