@@ -712,15 +712,13 @@ void ReceiversWidget::collapseAllChilds(QList<QStandardItem *> AParents)
 {
 	foreach(QStandardItem *parentItem, AParents)
 	{
-		QModelIndex index = mapModelToView(parentItem);
-		if (index.isValid())
-			ui.trvReceivers->collapse(index);
-
 		for (int row=0; row<parentItem->rowCount(); row++)
 		{
 			QStandardItem *item = parentItem->child(row);
 			if (item->hasChildren())
 				collapseAllChilds(QList<QStandardItem *>() << item);
+			if (item->parent() != NULL)
+				ui.trvReceivers->collapse(mapModelToView(item));
 		}
 	}
 }
