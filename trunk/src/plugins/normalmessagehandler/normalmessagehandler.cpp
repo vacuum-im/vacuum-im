@@ -418,7 +418,6 @@ Menu *NormalMessageHandler::createWindowMenu(IMessageNormalWindow *AWindow) cons
 	Menu *menu = new Menu(AWindow->instance());
 
 	Action *nextAction = new Action(menu);
-	nextAction->setText(tr("Show Next"));
 	nextAction->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_NEXT);
 	nextAction->setData(ADR_ACTION_ID,NextAction);
 	nextAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
@@ -543,10 +542,17 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 	if (AWindow->tabPageNotifier() && AWindow->tabPageNotifier()->activeNotify()>0)
 		tabIcon = AWindow->tabPageNotifier()->notifyById(AWindow->tabPageNotifier()->activeNotify()).icon;
 
-	bool hasNext = FMessageQueue.value(AWindow).count()>1;
+	int nextCount = FMessageQueue.value(AWindow).count()-1;
+	if (nextCount > 0)
+	{
+		Action *nextAction = findWindowMenuAction(AWindow,NextAction);
+		if (nextAction)
+			nextAction->setText(tr("Show Next (%1)").arg(nextCount));
+	}
+
 	if (AWindow->mode() == IMessageNormalWindow::WriteMode)
 	{
-		setWindowMenuActionVisible(AWindow,NextAction,hasNext);
+		setWindowMenuActionVisible(AWindow,NextAction,nextCount>0);
 		setWindowMenuActionVisible(AWindow,SendAction,true);
 		setWindowMenuActionVisible(AWindow,ReplyAction,false);
 		setWindowMenuActionVisible(AWindow,ForwardAction,false);
@@ -555,12 +561,12 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 	}
 	else
 	{
-		setWindowMenuActionVisible(AWindow,NextAction,hasNext);
+		setWindowMenuActionVisible(AWindow,NextAction,nextCount>0);
 		setWindowMenuActionVisible(AWindow,SendAction,false);
 		setWindowMenuActionVisible(AWindow,ReplyAction,true);
 		setWindowMenuActionVisible(AWindow,ForwardAction,true);
 		setWindowMenuActionVisible(AWindow,ChatAction,AWindow->contactJid().isValid());
-		setDefaultWindowMenuAction(AWindow,hasNext ? NextAction : ReplyAction);
+		setDefaultWindowMenuAction(AWindow,nextCount>0 ? NextAction : ReplyAction);
 	}
 
 	AWindow->updateWindow(tabIcon,name,title,QString::null);

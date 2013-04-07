@@ -85,8 +85,8 @@
         <translation>Отправить сообщение</translation>
     </message>
     <message>
-        <source>Show Next</source>
-        <translation>Показать следующее</translation>
+        <source>Show Next (%1)</source>
+        <translation>Показать следующее (%1)</translation>
     </message>
 </context>
 </TS>
