@@ -365,19 +365,19 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 		IRosterItem ritemOld = roster->rosterItem(AServiceFrom);
 		IRosterItem ritemNew = roster->rosterItem(AServiceTo);
 
-		//Р Р°Р·Р»РѕРіРёРЅРёРІР°РµРјСЃСЏ РЅР° СЃС‚Р°СЂРѕРј С‚СЂР°РЅСЃРїРѕСЂС‚Рµ
+		//Разлогиниваемся на старом транспорте
 		if (!presence->presenceItems(AServiceFrom).isEmpty())
 			sendLogPresence(AStreamJid,AServiceFrom,false);
 
-		//РЈРґР°Р»СЏРµРј СЂРµРіРёСЃС‚СЂР°С†РёСЋ РЅР° СЃС‚Р°СЂРѕРј С‚СЂР°РЅСЃРїРѕСЂС‚Рµ
+		//Удаляем регистрацию на старом транспорте
 		if (FRegistration && ARemove)
 			FRegistration->sendUnregiterRequest(AStreamJid,AServiceFrom);
 
-		//РЈРґР°Р»СЏРµРј РїРѕРґРїРёСЃРєСѓ Сѓ СЃС‚Р°СЂРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°
+		//Удаляем подписку у старого транспорта
 		if (ritemOld.isValid && !ARemove)
 			FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,QString::null,true);
 
-		//Р”РѕР±Р°РІР»СЏРµРј РєРѕРЅС‚Р°РєС‚С‹ РЅРѕРІРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р° Рё СѓРґР°Р»СЏРµРј СЃС‚Р°СЂС‹Рµ
+		//Добавляем контакты нового транспорта и удаляем старые
 		QList<IRosterItem> newItems, oldItems, curItems;
 		foreach(IRosterItem ritem, roster->rosterItems())
 		{
@@ -399,7 +399,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 		roster->removeItems(oldItems);
 		roster->setItems(newItems);
 
-		//Р—Р°РїСЂР°С€РёРІР°РµРј РїРѕРґРїРёСЃРєСѓ Сѓ РЅРѕРІРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р° Рё РєРѕРЅС‚Р°РєС‚РѕРІ
+		//Запрашиваем подписку у нового транспорта и контактов
 		if (ASubscribe)
 		{
 			FSubscribeServices.remove(AStreamJid,AServiceFrom.bare());

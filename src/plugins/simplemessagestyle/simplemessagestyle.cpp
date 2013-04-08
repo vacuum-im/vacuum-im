@@ -23,11 +23,20 @@ static const char *SenderColors[] =  {
 	"purple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "seagreen", "sienna", "slateblue",
 	"steelblue", "teal", "tomato", "violet"
 };
-
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
+
+QString SimpleMessageStyle::FSharedPath = QString::null;
 
 SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
 {
+	if (FSharedPath.isEmpty())
+	{
+		if (QDir::isRelativePath(SHARED_STYLE_PATH))
+			FSharedPath = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH;
+		else
+			FSharedPath = SHARED_STYLE_PATH;
+	}
+
 	FStylePath = AStylePath;
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
@@ -287,8 +296,7 @@ QString SimpleMessageStyle::makeStyleTemplate() const
 {
 	QString htmlFileName = FStylePath+"/Template.html";
 	if (!QFile::exists(htmlFileName))
-		htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
-
+		htmlFileName =FSharedPath+"/Template.html";
 	return loadFileData(htmlFileName,QString::null);
 }
 
@@ -416,7 +424,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
 		if (!isDirectionIn && !QFile::exists(avatar))
 			avatar = FStylePath+"/Incoming/buddy_icon.png";
 		if (!QFile::exists(avatar))
-			avatar = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/buddy_icon.png";
+			avatar = FSharedPath+"/buddy_icon.png";
 	}
 	AHtml.replace("%userIconPath%",avatar);
 

@@ -181,6 +181,8 @@ private:
 	QMap<QString, QVariant> FInfo;
 	QMap<QWidget *, WidgetStatus> FWidgetStatus;
 	QNetworkAccessManager *FNetworkAccessManager;
+private:
+	static QString FSharedPath;
 };
 
 #endif // ADIUMMESSAGESTYLE_H
