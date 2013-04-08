@@ -70,14 +70,24 @@ void StreamParser::parseData(const QByteArray &AData)
 				FCurrentElem.appendChild(newElement);
 				FCurrentElem = newElement;
 			}
+
+			FElemSpace = QDomText();
 		}
 		else if (FReader.isCharacters())
 		{
-			if (!FReader.isCDATA() && !FReader.isWhitespace())
+			if (FReader.isCDATA())
+				FCurrentElem.appendChild(doc.createCDATASection(FReader.text().toString()));
+			else if (FReader.isWhitespace())
+				FElemSpace = doc.createTextNode(FReader.text().toString());
+			else
 				FCurrentElem.appendChild(doc.createTextNode(FReader.text().toString()));
 		}
 		else if (FReader.isEndElement())
 		{
+			if (!FElemSpace.isNull() && !FCurrentElem.hasChildNodes())
+				FCurrentElem.appendChild(FElemSpace);
+			FElemSpace = QDomText();
+
 			FLevel--;
 			if (FLevel > 1)
 				FCurrentElem = FCurrentElem.parentNode().toElement();
