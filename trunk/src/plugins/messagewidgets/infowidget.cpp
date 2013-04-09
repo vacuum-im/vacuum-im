@@ -273,7 +273,10 @@ bool InfoWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 {
 	if (AWatched == FInfoToolBar->toolBar())
 	{
-		if (AEvent->type() == QEvent::LayoutRequest)
+		static const QList<QEvent::Type> updateEventTypes = QList<QEvent::Type>() 
+			<< QEvent::LayoutRequest << QEvent::ChildAdded << QEvent::ChildRemoved << QEvent::Show;
+
+		if (updateEventTypes.contains(AEvent->type()))
 			QTimer::singleShot(0,this,SLOT(onUpdateInfoToolBarMaxWidth()));
 	}
 	return QWidget::eventFilter(AWatched,AEvent);
