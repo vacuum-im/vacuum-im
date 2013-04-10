@@ -271,7 +271,7 @@
     </message>
     <message>
         <source>Invisible to Contact</source>
-        <translation>Невиди для контакта</translation>
+        <translation>Невидим для контакта</translation>
     </message>
     <message>
         <source>Ignore Contact</source>
