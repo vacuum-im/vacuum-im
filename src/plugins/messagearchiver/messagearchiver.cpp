@@ -913,10 +913,6 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 				else
 					return true;
 			}
-			else
-			{
-				errMessage = "Failed to prepare message";
-			}
 		}
 		else
 		{
@@ -1476,6 +1472,8 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 
 bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
+	if (AMessage.body().isEmpty())
+		return false;
 	if (AMessage.type()==Message::Error)
 		return false;
 	if (AMessage.type()==Message::GroupChat && !ADirectionIn)
@@ -1495,8 +1493,11 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
 			return false;
 	}
 
-	if (AMessage.body().isEmpty())
-		return false;
+	if (AMessage.type()==Message::Chat || AMessage.type()==Message::GroupChat)
+	{
+		if (!AMessage.threadId().isEmpty())
+			AMessage.setThreadId(QString::null);
+	}
 
 	return true;
 }
@@ -1509,10 +1510,7 @@ bool MessageArchiver::processMessage(const Jid &AStreamJid, const Message &AMess
 		FPendingMessages[AStreamJid].append(qMakePair<Message,bool>(AMessage,ADirectionIn));
 		return true;
 	}
-	else
-	{
-		return saveMessage(AStreamJid,itemJid,AMessage);
-	}
+	return saveMessage(AStreamJid,itemJid,AMessage);
 }
 
 IArchiveEngine *MessageArchiver::findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const
