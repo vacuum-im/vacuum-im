@@ -38,8 +38,7 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	ui.wdtReceiversTree->setLayout(new QVBoxLayout(ui.wdtReceiversTree));
 	ui.wdtReceiversTree->layout()->setMargin(0);
 	FReceiversWidget = FMessageWidgets->newReceiversWidget(this,ui.wdtReceivers);
-	connect(FReceiversWidget->instance(),SIGNAL(addressSelectionChanged(const Jid &, const Jid &, bool)),
-		SLOT(onReceiverslAddressSelectionChanged(const Jid &, const Jid &, bool)));
+	connect(FReceiversWidget->instance(),SIGNAL(addressSelectionChanged()),SLOT(onReceiverslAddressSelectionChanged()));
 	FReceiversWidget->setAddressSelection(AStreamJid,AContactJid,true);
 	ui.wdtReceiversTree->layout()->addWidget(FReceiversWidget->instance());
 
@@ -58,7 +57,7 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	setMode(AMode);
-	onReceiverslAddressSelectionChanged(AStreamJid,AContactJid,true);
+	onReceiverslAddressSelectionChanged();
 }
 
 NormalWindow::~NormalWindow()
@@ -340,16 +339,15 @@ void NormalWindow::onSelectReceiversMenuAboutToShow()
 	}
 }
 
+void NormalWindow::onReceiverslAddressSelectionChanged()
+{
+	ui.lblReceivers->setText(tr("Selected %n contact(s)","",FReceiversWidget->selectedAddresses().count()));
+}
+
 void NormalWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 	{
 		closeTabPage();
 	}
-}
-
-void NormalWindow::onReceiverslAddressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected)
-{
-	Q_UNUSED(AStreamJid); Q_UNUSED(AContactJid); Q_UNUSED(ASelected);
-	ui.lblReceivers->setText(tr("Selected %n contact(s)","",FReceiversWidget->selectedAddresses().count()));
 }

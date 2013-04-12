@@ -1,5 +1,6 @@
 #include "normalmessagehandler.h"
 
+#include <QLineEdit>
 #include <QMouseEvent>
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
@@ -387,8 +388,9 @@ IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, con
 			connect(window->address()->instance(),SIGNAL(availAddressesChanged()),SLOT(onWindowAvailAddressesChanged()));
 			connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onWindowContextMenuRequested(Menu *)));
 			connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onWindowToolTipsRequested(QMap<int,QString> &)));
-			connect(window->receiversWidget()->instance(),SIGNAL(addressSelectionChanged(const Jid &, const Jid &, bool)),SLOT(onWindowSelectedReceiversChanged()));
+			connect(window->receiversWidget()->instance(),SIGNAL(addressSelectionChanged()),SLOT(onWindowSelectedReceiversChanged()));
 			connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onWindowNotifierActiveNotifyChanged(int)));
+			onWindowSelectedReceiversChanged();
 			
 			Menu *windowMenu = createWindowMenu(window);
 			QToolButton *button = window->toolBarWidget()->toolBarChanger()->insertAction(windowMenu->menuAction(),TBG_MWNWTB_WINDOWMENU);
@@ -448,13 +450,21 @@ Menu *NormalMessageHandler::createWindowMenu(IMessageNormalWindow *AWindow) cons
 	connect(forwardAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuForwardMessage()));
 	menu->addAction(forwardAction);
 
-	Action *chatAction = new Action(menu);
-	chatAction->setText(tr("Show Chat Dialog"));
-	chatAction->setData(ADR_ACTION_ID,ChatAction);
-	chatAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
-	chatAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
-	connect(chatAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuShowChatDialog()));
-	menu->addAction(chatAction);
+	Action *openChatAction = new Action(menu);
+	openChatAction->setText(tr("Show Chat Dialog"));
+	openChatAction->setData(ADR_ACTION_ID,OpenChatAction);
+	openChatAction->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
+	openChatAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
+	connect(openChatAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuShowChatDialog()));
+	menu->addAction(openChatAction);
+
+	Action *sendChatAction = new Action(menu);
+	sendChatAction->setCheckable(true);
+	sendChatAction->setText(tr("Send as Chat Message"));
+	sendChatAction->setData(ADR_ACTION_ID,SendChatAction);
+	sendChatAction->setData(ADR_WINDOW,(qint64)AWindow->instance());
+	connect(sendChatAction,SIGNAL(triggered(bool)),SLOT(onWindowMenuSendAsChatMessage()));
+	menu->addAction(sendChatAction,AG_DEFAULT+100);
 
 	return menu;
 }
@@ -467,7 +477,7 @@ Action *NormalMessageHandler::findWindowMenuAction(IMessageNormalWindow *AWindow
 		Action *menuAction = AWindow->toolBarWidget()->toolBarChanger()->handleAction(menuHandle);
 		if (menuAction && menuAction->menu())
 		{
-			foreach(Action *action, menuAction->menu()->groupActions(AG_DEFAULT))
+			foreach(Action *action, menuAction->menu()->groupActions())
 				if (action->data(ADR_ACTION_ID).toInt() == AActionId)
 					return action;
 		}
@@ -488,6 +498,7 @@ void NormalMessageHandler::setDefaultWindowMenuAction(IMessageNormalWindow *AWin
 			menu->setDefaultAction(action);
 			menu->menuAction()->setText(action->text());
 			menu->menuAction()->setIcon(action->icon());
+			menu->menuAction()->setEnabled(action->isEnabled());
 			connect(menu->menuAction(),SIGNAL(triggered()),action,SLOT(trigger()));
 		}
 	}
@@ -505,6 +516,35 @@ void NormalMessageHandler::setWindowMenuActionEnabled(IMessageNormalWindow *AWin
 	Action *action = findWindowMenuAction(AWindow,AActionId);
 	if (action)
 		action->setEnabled(AEnabled);
+}
+
+void NormalMessageHandler::updateWindowMenu(IMessageNormalWindow *AWindow) const
+{
+	int nextCount = FMessageQueue.value(AWindow).count()-1;
+	if (AWindow->mode() == IMessageNormalWindow::WriteMode)
+	{
+		Action *sendAction = findWindowMenuAction(AWindow,SendAction);
+		if (sendAction)
+			sendAction->setEnabled(!AWindow->receiversWidget()->selectedAddresses().isEmpty()); 
+
+		setWindowMenuActionVisible(AWindow,NextAction,nextCount>0);
+		setWindowMenuActionVisible(AWindow,SendAction,true);
+		setWindowMenuActionVisible(AWindow,ReplyAction,false);
+		setWindowMenuActionVisible(AWindow,ForwardAction,false);
+		setWindowMenuActionVisible(AWindow,OpenChatAction,AWindow->contactJid().isValid());
+		setWindowMenuActionVisible(AWindow,SendChatAction,true);
+		setDefaultWindowMenuAction(AWindow,SendAction);
+	}
+	else
+	{
+		setWindowMenuActionVisible(AWindow,NextAction,nextCount>0);
+		setWindowMenuActionVisible(AWindow,SendAction,false);
+		setWindowMenuActionVisible(AWindow,ReplyAction,true);
+		setWindowMenuActionVisible(AWindow,ForwardAction,true);
+		setWindowMenuActionVisible(AWindow,OpenChatAction,AWindow->contactJid().isValid());
+		setWindowMenuActionVisible(AWindow,SendChatAction,false);
+		setDefaultWindowMenuAction(AWindow,nextCount>0 ? NextAction : ReplyAction);
+	}
 }
 
 void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
@@ -550,25 +590,7 @@ void NormalMessageHandler::updateWindow(IMessageNormalWindow *AWindow) const
 			nextAction->setText(tr("Show Next (%1)").arg(nextCount));
 	}
 
-	if (AWindow->mode() == IMessageNormalWindow::WriteMode)
-	{
-		setWindowMenuActionVisible(AWindow,NextAction,nextCount>0);
-		setWindowMenuActionVisible(AWindow,SendAction,true);
-		setWindowMenuActionVisible(AWindow,ReplyAction,false);
-		setWindowMenuActionVisible(AWindow,ForwardAction,false);
-		setWindowMenuActionVisible(AWindow,ChatAction,AWindow->contactJid().isValid());
-		setDefaultWindowMenuAction(AWindow,SendAction);
-	}
-	else
-	{
-		setWindowMenuActionVisible(AWindow,NextAction,nextCount>0);
-		setWindowMenuActionVisible(AWindow,SendAction,false);
-		setWindowMenuActionVisible(AWindow,ReplyAction,true);
-		setWindowMenuActionVisible(AWindow,ForwardAction,true);
-		setWindowMenuActionVisible(AWindow,ChatAction,AWindow->contactJid().isValid());
-		setDefaultWindowMenuAction(AWindow,nextCount>0 ? NextAction : ReplyAction);
-	}
-
+	updateWindowMenu(AWindow);
 	AWindow->updateWindow(tabIcon,name,title,QString::null);
 }
 
@@ -578,7 +600,13 @@ bool NormalMessageHandler::sendMessage(IMessageNormalWindow *AWindow)
 	if (AWindow && AWindow->mode()==IMessageNormalWindow::WriteMode)
 	{
 		Message message;
-		message.setType(Message::Normal).setSubject(AWindow->subject()).setThreadId(AWindow->threadId());
+
+		Action *sendChatAction = findWindowMenuAction(AWindow,SendChatAction);
+		if (sendChatAction!=NULL && sendChatAction->isChecked())
+			message.setType(Message::Chat);
+		else
+			message.setType(Message::Normal).setSubject(AWindow->subject()).setThreadId(AWindow->threadId());
+
 		FMessageProcessor->textToMessage(message,AWindow->editWidget()->document());
 		if (!message.body().isEmpty())
 		{
@@ -837,7 +865,7 @@ void NormalMessageHandler::onWindowSelectedReceiversChanged()
 	if (widget)
 	{
 		IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(widget->messageWindow()->instance());
-		setWindowMenuActionEnabled(window,SendAction,!widget->selectedAddresses().isEmpty());
+		updateWindowMenu(window);
 	}
 }
 
@@ -928,6 +956,18 @@ void NormalMessageHandler::onWindowMenuShowChatDialog()
 	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(action!=NULL ? (QWidget *)action->data(ADR_WINDOW).toLongLong() : NULL);
 	if (FMessageProcessor && window)
 		FMessageProcessor->createMessageWindow(window->streamJid(),window->contactJid(),Message::Chat,IMessageHandler::SM_SHOW);
+}
+
+void NormalMessageHandler::onWindowMenuSendAsChatMessage()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(action!=NULL ? (QWidget *)action->data(ADR_WINDOW).toLongLong() : NULL);
+	if (window)
+	{
+		QLineEdit *lneSubject = window->instance()->findChild<QLineEdit *>("lneSubject");
+		if (lneSubject)
+			lneSubject->setEnabled(!action->isChecked());
+	}
 }
 
 void NormalMessageHandler::onStatusIconsChanged()

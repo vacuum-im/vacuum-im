@@ -88,5 +88,9 @@
         <source>Show Next (%1)</source>
         <translation>Показать следующее (%1)</translation>
     </message>
+    <message>
+        <source>Send as Chat Message</source>
+        <translation>Отправить как чат сообщение</translation>
+    </message>
 </context>
 </TS>

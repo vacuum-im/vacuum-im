@@ -88,8 +88,8 @@ protected:
 protected slots:
 	void onMessageReady();
 	void onSelectReceiversMenuAboutToShow();
+	void onReceiverslAddressSelectionChanged();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onReceiverslAddressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected);
 private:
 	Ui::NormalWindowClass ui;
 private:
