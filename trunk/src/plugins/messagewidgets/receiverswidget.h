@@ -2,6 +2,7 @@
 #define RECEIVERSWIDGET_H
 
 #include <QHash>
+#include <QTimer>
 #include <QSortFilterProxyModel>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterindexroles.h>
@@ -59,8 +60,8 @@ public:
 	virtual void clearSelection();
 signals:
 	void availStreamsChanged();
+	void addressSelectionChanged();
 	void contextMenuForItemsRequested(QList<QStandardItem *> AItems, Menu *AMenu);
-	void addressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected);
 protected:
 	void initialize();
 	void createStreamItems(const Jid &AStreamJid);
@@ -131,6 +132,7 @@ private:
 	AdvancedItemModel *FModel;
 	ReceiversSortSearchProxyModel *FProxyModel;
 private:
+	QTimer FSelectionSignalTimer;
 	QList<QStandardItem *> FDeleteDelayed;
 	QMap<Jid, QStandardItem *> FStreamItems;
 	QMap<Jid, QMap<QString, QStandardItem *> > FGroupItems;

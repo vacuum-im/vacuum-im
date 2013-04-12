@@ -49,7 +49,8 @@ enum WindowMenuAction {
 	SendAction,
 	ReplyAction,
 	ForwardAction,
-	ChatAction
+	OpenChatAction,
+	SendChatAction
 };
 
 class NormalMessageHandler :
@@ -94,6 +95,7 @@ protected:
 	void setDefaultWindowMenuAction(IMessageNormalWindow *AWindow, WindowMenuAction AActionId) const;
 	void setWindowMenuActionVisible(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AVisible) const;
 	void setWindowMenuActionEnabled(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AEnabled) const;
+	void updateWindowMenu(IMessageNormalWindow *AWindow) const;
 	void updateWindow(IMessageNormalWindow *AWindow) const;
 protected:
 	bool sendMessage(IMessageNormalWindow *AWindow);
@@ -124,6 +126,7 @@ protected slots:
 	void onWindowMenuReplyMessage();
 	void onWindowMenuForwardMessage();
 	void onWindowMenuShowChatDialog();
+	void onWindowMenuSendAsChatMessage();
 protected slots:
 	void onStatusIconsChanged();
 	void onAvatarChanged(const Jid &AContactJid);

@@ -88,5 +88,9 @@
         <source>Show Next (%1)</source>
         <translation>Show Next (%1)</translation>
     </message>
+    <message>
+        <source>Send as Chat Message</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

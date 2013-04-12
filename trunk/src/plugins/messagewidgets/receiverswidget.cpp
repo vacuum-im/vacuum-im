@@ -1,6 +1,5 @@
 #include "receiverswidget.h"
 
-#include <QTimer>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -104,6 +103,10 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 	FProxyModel->setSourceModel(FModel);
 	FProxyModel->sort(0,Qt::AscendingOrder);
 	ui.trvReceivers->setModel(FProxyModel);
+
+	FSelectionSignalTimer.setSingleShot(true);
+	FSelectionSignalTimer.setInterval(0);
+	connect(&FSelectionSignalTimer,SIGNAL(timeout()),SIGNAL(addressSelectionChanged()));
 
 	initialize();
 	qRegisterMetaType< QList<QStandardItem *> >("QList<QStandardItem *>");
@@ -799,11 +802,11 @@ void ReceiversWidget::onModelItemDataChanged(QStandardItem *AItem, int ARole)
 				{
 					foreach(QStandardItem *contactItem, contactItems)
 						contactItem->setCheckState(AItem->checkState());
-					emit addressSelectionChanged(streamJid,contactJid,AItem->checkState()==Qt::Checked);
+					FSelectionSignalTimer.start();
 				}
 				else if (contactItems.count() < 2)
 				{
-					emit addressSelectionChanged(streamJid,contactJid,false);
+					FSelectionSignalTimer.start();
 				}
 				block = false;
 			}

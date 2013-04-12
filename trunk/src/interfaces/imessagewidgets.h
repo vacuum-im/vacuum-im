@@ -149,8 +149,8 @@ public:
 	virtual void clearSelection() =0;
 protected:
 	virtual void availStreamsChanged() =0;
+	virtual void addressSelectionChanged() =0;
 	virtual void contextMenuForItemsRequested(QList<QStandardItem *> AItems, Menu *AMenu) =0;
-	virtual void addressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected) =0;
 };
 
 class IMessageMenuBarWidget :
@@ -407,7 +407,7 @@ Q_DECLARE_INTERFACE(IMessageWidget,"Vacuum.Plugin.IMessageWidget/1.0")
 Q_DECLARE_INTERFACE(IMessageInfoWidget,"Vacuum.Plugin.IMessageInfoWidget/1.2")
 Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.3")
 Q_DECLARE_INTERFACE(IMessageEditWidget,"Vacuum.Plugin.IMessageEditWidget/1.3")
-Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.2")
+Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.3")
 Q_DECLARE_INTERFACE(IMessageMenuBarWidget,"Vacuum.Plugin.IMessageMenuBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageToolBarWidget,"Vacuum.Plugin.IMessageToolBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageStatusBarWidget,"Vacuum.Plugin.IMessageStatusBarWidget/1.1")
