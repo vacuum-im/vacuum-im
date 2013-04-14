@@ -2,9 +2,6 @@
 #define DEF_STATUCICONS_H
 
 //StatusIcons
-#define STO_PATTERN     "pattern"
-
-//StatusIcons
 #define STI_ONLINE      "online"
 #define STI_CHAT        "chat"
 #define STI_AWAY        "away"
