@@ -3,7 +3,7 @@ VACUUM_LOADER_NAME      = vacuum
 VACUUM_UTILS_NAME       = vacuumutils
 
 #Library ABI version
-unix:VACUUM_UTILS_ABI   = 25
+unix:VACUUM_UTILS_ABI   = 26
 
 
 #Configurable values
