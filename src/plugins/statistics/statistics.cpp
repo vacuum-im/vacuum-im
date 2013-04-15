@@ -170,6 +170,7 @@ bool Statistics::isValidHit(const IStatisticsHit &AHit) const
 
 bool Statistics::sendStatisticsHit(const IStatisticsHit &AHit)
 {
+#ifndef DEBUG_MODE
 	if (false && isValidHit(AHit) && !FProfileId.isNull())
 	{
 		QNetworkReply *reply = FNetworkManager->get(QNetworkRequest(buildHitUrl(AHit)));
@@ -180,6 +181,7 @@ bool Statistics::sendStatisticsHit(const IStatisticsHit &AHit)
 			return true;
 		}
 	}
+#endif
 	return false;
 }
 
@@ -334,6 +336,7 @@ void Statistics::onOptionsOpened()
 	hit.event.action = SEVA_APPLICATION_LAUNCH;
 	sendStatisticsHit(hit);
 
+#ifndef DEBUG_MODE
 	QWebView *statView = new QWebView(NULL);
 	connect(statView,SIGNAL(loadFinished(bool)),SLOT(onStatisticsViewLoadFinished(bool)));
 
@@ -343,6 +346,7 @@ void Statistics::onOptionsOpened()
 	statView->setPage(statPage);
 
 	statView->load(QUrl(STAT_PAGE_URL));
+#endif
 }
 
 void Statistics::onOptionsClosed()
