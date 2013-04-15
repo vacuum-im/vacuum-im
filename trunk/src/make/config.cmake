@@ -5,6 +5,10 @@ if (UNIX)
 	set(VACUUM_UTILS_ABI 26)
 endif (UNIX)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	add_definitions(-DDEBUG_MODE)
+endif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+
 if (WIN32)
 	set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif (WIN32)
