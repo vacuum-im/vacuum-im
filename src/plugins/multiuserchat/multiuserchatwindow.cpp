@@ -1190,8 +1190,18 @@ void MultiUserChatWindow::showDateSeparator(IMessageViewWidget *AView, const QDa
 
 bool MultiUserChatWindow::isMentionMessage(const Message &AMessage) const
 {
-	QRegExp mention(QString("\\b%1\\b").arg(QRegExp::escape(FMultiChat->nickName())));
-	return AMessage.body().indexOf(mention)>=0;
+	QString message = AMessage.body();
+	QString nick = FMultiChat->nickName();
+
+	// QString::indexOf will not work if nick ends with '+'
+	if (!nick.isEmpty() && !nick.at(nick.size()-1).isLetterOrNumber())
+	{
+		message.replace(nick,nick+'z');
+		nick += 'z';
+	}
+
+	QRegExp mention(QString("\\b%1\\b").arg(QRegExp::escape(nick)));
+	return message.indexOf(mention)>=0;
 }
 
 void MultiUserChatWindow::setMultiChatMessageStyle()
