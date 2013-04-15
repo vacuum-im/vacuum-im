@@ -1,9 +1,14 @@
 #Loader and library names
-VACUUM_LOADER_NAME      = vacuum
-VACUUM_UTILS_NAME       = vacuumutils
+VACUUM_LOADER_NAME       = vacuum
+VACUUM_UTILS_NAME        = vacuumutils
 
 #Library ABI version
-unix:VACUUM_UTILS_ABI   = 26
+unix:VACUUM_UTILS_ABI    = 26
+
+#Build config
+CONFIG(debug, debug|release) {
+  DEFINES               += DEBUG_MODE
+}
 
 
 #Configurable values
@@ -43,8 +48,8 @@ isEmpty(INSTALL_SDK_DIR) {
 }
 
 
-#Preprocessor definitions
-!macx:CONFIG(debug, debug|release) {
+#Resources directories
+!macx:contains(DEFINES,DEBUG_MODE) {
   DEFINES               += PLUGINS_DIR='\\\"./plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"$${PWD}/../../resources\\\"'
   DEFINES               += TRANSLATIONS_DIR='\\\"./src/translations\\\"'
