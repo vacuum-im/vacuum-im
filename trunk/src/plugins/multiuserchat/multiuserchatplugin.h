@@ -143,7 +143,7 @@ protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
-	IMultiUserChatWindow *findMultiChatWindowForIndex(const IRosterIndex *AIndex);
+	IMultiUserChatWindow *findMultiChatWindowForIndex(const IRosterIndex *AIndex) const;
 	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
 	QString getRoomName(const Jid &AStreamJid, const Jid &ARoomJid) const;
 protected slots:
