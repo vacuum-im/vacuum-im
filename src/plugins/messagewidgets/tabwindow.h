@@ -105,6 +105,7 @@ private:
 	Action *FRenameWindow;
 	Action *FCloseWindow;
 	Action *FDeleteWindow;
+	QToolButton *FCornerButton;
 private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;
