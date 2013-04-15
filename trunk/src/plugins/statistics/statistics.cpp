@@ -181,6 +181,8 @@ bool Statistics::sendStatisticsHit(const IStatisticsHit &AHit)
 			return true;
 		}
 	}
+#else
+	Q_UNUSED(AHit);
 #endif
 	return false;
 }
