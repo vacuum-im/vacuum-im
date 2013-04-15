@@ -647,7 +647,7 @@ QList<IMultiUserChat *> MultiUserChatPlugin::multiUserChats() const
 IMultiUserChat *MultiUserChatPlugin::findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const
 {
 	foreach(IMultiUserChat *chat, FChats)
-		if (chat->streamJid() == AStreamJid && chat->roomJid() == ARoomJid)
+		if (chat->streamJid()==AStreamJid && chat->roomJid()==ARoomJid)
 			return chat;
 	return NULL;
 }
@@ -952,7 +952,7 @@ Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &
 	return action;
 }
 
-IMultiUserChatWindow *MultiUserChatPlugin::findMultiChatWindowForIndex(const IRosterIndex *AIndex)
+IMultiUserChatWindow *MultiUserChatPlugin::findMultiChatWindowForIndex(const IRosterIndex *AIndex) const
 {
 	IMultiUserChatWindow *window = NULL;
 	if (AIndex->kind() == RIK_MUC_ITEM)
@@ -1363,7 +1363,7 @@ void MultiUserChatPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *>
 	{
 		foreach(IRosterIndex *index, AIndexes)
 		{
-			IMultiUserChatWindow *window = getMultiChatWindowForIndex(index);
+			IMultiUserChatWindow *window = findMultiChatWindowForIndex(index);
 			if (window)
 			{
 				QString name = window->multiUserChat()->roomName().trimmed();
