@@ -32,27 +32,7 @@
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QWidget" name="wdtInfo" native="true"/>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lneSubject">
-          <property name="placeholderText">
-           <string>Subject</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QWidget" name="wdtToolBar" native="true"/>
-        </item>
-        <item>
-         <widget class="QWidget" name="wdtMessage" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+         <widget class="BoxWidget" name="bwtMessageBox"/>
         </item>
        </layout>
       </widget>
@@ -99,6 +79,14 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>BoxWidget</class>
+   <extends>QFrame</extends>
+   <header location="global">utils/boxwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

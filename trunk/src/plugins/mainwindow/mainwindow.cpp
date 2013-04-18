@@ -34,7 +34,9 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	connect(FSplitter,SIGNAL(splitterMoved(int,int)),SLOT(onSplitterMoved(int,int)));
 	setCentralWidget(FSplitter);
 
-	FLeftWidget = new QFrame(this);
+	FLeftWidget = new BoxWidget(this);
+	FLeftWidget->layout()->setSpacing(0);
+
 	FSplitter->addWidget(FLeftWidget);
 	FSplitter->setCollapsible(0,false);
 	FSplitter->setStretchFactor(0,1);
@@ -53,13 +55,9 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 	FSplitter->setHandleWidth(0);
 	FCentralWidget->instance()->setVisible(false);
 
-	FLeftLayout = new QVBoxLayout(FLeftWidget);
-	FLeftLayout->setMargin(0);
-	FLeftLayout->setSpacing(0);
-
 	FTabWidget = new MainTabWidget(FLeftWidget);
 	FTabWidget->instance()->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-	insertWidget(MWW_TABPAGES_WIDGET,FTabWidget->instance(),100);
+	FLeftWidget->insertWidget(MWW_TABPAGES_WIDGET,FTabWidget->instance(),100);
 
 	QToolBar *topToolbar = new QToolBar(this);
 	topToolbar->setFloatable(false);
@@ -131,47 +129,24 @@ MenuBarChanger *MainWindow::mainMenuBar() const
 	return FMainMenuBar;
 }
 
-QList<QWidget *> MainWindow::widgets() const
+BoxWidget *MainWindow::mainLeftWidget() const
 {
-	return FWidgetOrders.values();
-}
-
-int MainWindow::widgetOrder(QWidget *AWidget) const
-{
-	return FWidgetOrders.key(AWidget);
-}
-
-QWidget *MainWindow::widgetByOrder(int AOrderId) const
-{
-	return FWidgetOrders.value(AOrderId);
-}
-
-void MainWindow::insertWidget(int AOrderId, QWidget *AWidget, int AStretch)
-{
-	if (!FWidgetOrders.contains(AOrderId))
-	{
-		removeWidget(AWidget);
-		QMap<int, QWidget *>::const_iterator it = FWidgetOrders.lowerBound(AOrderId);
-		int index = it!=FWidgetOrders.constEnd() ? FLeftLayout->indexOf(it.value()) : -1;
-		FLeftLayout->insertWidget(index,AWidget,AStretch);
-		FWidgetOrders.insert(AOrderId,AWidget);
-		emit widgetInserted(AOrderId,AWidget);
-	}
-}
-
-void MainWindow::removeWidget(QWidget *AWidget)
-{
-	if (widgets().contains(AWidget))
-	{
-		FLeftLayout->removeWidget(AWidget);
-		FWidgetOrders.remove(widgetOrder(AWidget));
-		emit widgetRemoved(AWidget);
-	}
+	return FLeftWidget;
 }
 
 IMainTabWidget *MainWindow::mainTabWidget() const
 {
 	return FTabWidget;
+}
+
+bool MainWindow::isCentralWidgetVisible() const
+{
+	return FCentralVisible;
+}
+
+IMainCentralWidget * MainWindow::mainCentralWidget() const
+{
+	return FCentralWidget;
 }
 
 ToolBarChanger *MainWindow::topToolBarChanger() const
@@ -201,10 +176,10 @@ ToolBarChanger *MainWindow::toolBarChangerByOrder(int AOrderId) const
 
 void MainWindow::insertToolBarChanger(int AOrderId, ToolBarChanger *AChanger)
 {
-	if (!FWidgetOrders.contains(AOrderId))
+	if (FLeftWidget->widgetByOrder(AOrderId) == NULL)
 	{
 		AChanger->toolBar()->setIconSize(iconSize());
-		insertWidget(AOrderId,AChanger->toolBar());
+		FLeftWidget->insertWidget(AOrderId,AChanger->toolBar());
 		FToolBarOrders.insert(AOrderId,AChanger);
 		emit toolBarChangerInserted(AOrderId,AChanger);
 	}
@@ -214,20 +189,10 @@ void MainWindow::removeToolBarChanger(ToolBarChanger *AChanger)
 {
 	if (toolBarChangers().contains(AChanger))
 	{
-		removeWidget(AChanger->toolBar());
+		FLeftWidget->removeWidget(AChanger->toolBar());
 		FToolBarOrders.remove(toolBarChangerOrder(AChanger));
 		emit toolBarChangerRemoved(AChanger);
 	}
-}
-
-IMainCentralWidget * MainWindow::mainCentralWidget() const
-{
-	return FCentralWidget;
-}
-
-bool MainWindow::isCentralWidgetVisible() const
-{
-	return FCentralVisible;
 }
 
 void MainWindow::saveWindowGeometryAndState()
