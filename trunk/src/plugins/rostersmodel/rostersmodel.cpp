@@ -13,7 +13,9 @@ RostersModel::RostersModel()
 	FAccountManager = NULL;
 
 	FLayout = LayoutSeparately;
+
 	FRootIndex = new RootIndex(this);
+	FContactsRoot = newRosterIndex(RIK_CONTACTS_ROOT);
 
 	setDelayedDataChangedSignals(true);
 	setRecursiveParentDataChangedSignals(true);
@@ -83,7 +85,6 @@ bool RostersModel::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool RostersModel::initObjects()
 {
-	FContactsRoot = newRosterIndex(RIK_CONTACTS_ROOT);
 	FContactsRoot->setData(tr("All Contacts"),RDR_NAME);
 
 	registerSingleGroup(RIK_GROUP_ACCOUNTS,tr("Accounts"));
