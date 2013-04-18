@@ -1,7 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QFrame>
 #include <QSplitter>
 #include <interfaces/imainwindow.h>
 #include <definitions/version.h>
@@ -32,11 +31,10 @@ public:
 	virtual Menu *mainMenu() const;
 	virtual MenuBarChanger *mainMenuBar() const;
 	// Widgets Management
-	virtual QList<QWidget *> widgets() const;
-	virtual int widgetOrder(QWidget *AWidget) const;
-	virtual QWidget *widgetByOrder(int AOrderId) const;
-	virtual void insertWidget(int AOrderId, QWidget *AWidget, int AStretch=0);
-	virtual void removeWidget(QWidget *AWidget);
+	virtual BoxWidget *mainLeftWidget() const;
+	virtual IMainTabWidget *mainTabWidget() const;
+	virtual bool isCentralWidgetVisible() const;
+	virtual IMainCentralWidget *mainCentralWidget() const;
 	// Tool Bars Management
 	virtual ToolBarChanger *topToolBarChanger() const;
 	virtual ToolBarChanger *bottomToolBarChanger() const;
@@ -45,13 +43,7 @@ public:
 	virtual ToolBarChanger *toolBarChangerByOrder(int AOrderId) const;
 	virtual void insertToolBarChanger(int AOrderId, ToolBarChanger *AChanger);
 	virtual void removeToolBarChanger(ToolBarChanger *AChanger);
-	// Pages Management
-	virtual IMainTabWidget *mainTabWidget() const;
-	virtual bool isCentralWidgetVisible() const;
-	virtual IMainCentralWidget *mainCentralWidget() const;
 signals:
-	void widgetInserted(int AOrderId, QWidget *AWidget);
-	void widgetRemoved(QWidget *AWidget);
 	void toolBarChangerInserted(int AOrderId, ToolBarChanger *AChanger);
 	void toolBarChangerRemoved(ToolBarChanger *AChanger);
 	void centralWidgetVisibleChanged(bool AVisible);
@@ -77,16 +69,14 @@ private:
 	IMainCentralWidget *FCentralWidget;
 private:
 	Menu *FMainMenu;
-	QFrame *FLeftWidget;
-	QVBoxLayout *FLeftLayout;
 	QSplitter *FSplitter;
+	BoxWidget *FLeftWidget;
 	MenuBarChanger *FMainMenuBar;
 private:
 	bool FAligned;
 	bool FCentralVisible;
 	int FLeftWidgetWidth;
 	int FSplitterHandleWidth;
-	QMap<int, QWidget *> FWidgetOrders;
 	QMap<int, ToolBarChanger *> FToolBarOrders;
 };
 

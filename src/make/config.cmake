@@ -2,7 +2,7 @@ set(VACUUM_LOADER_NAME vacuum)
 set(VACUUM_UTILS_NAME vacuumutils)
 
 if (UNIX)
-	set(VACUUM_UTILS_ABI 26)
+	set(VACUUM_UTILS_ABI 27)
 endif (UNIX)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")

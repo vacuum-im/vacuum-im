@@ -7,6 +7,7 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, false);
+	ui.bwtMessageBox->layout()->setSpacing(3);
 
 	FMessageWidgets = AMessageWidgets;
 
@@ -14,30 +15,22 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	FTabPageNotifier = NULL;
 
 	FAddress = FMessageWidgets->newAddress(AStreamJid,AContactJid,this);
+	
+	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.bwtMessageBox);
+	ui.bwtMessageBox->insertWidget(MCWW_INFOWIDGET,FInfoWidget->instance());
 
-	ui.wdtInfo->setLayout(new QVBoxLayout);
-	ui.wdtInfo->layout()->setMargin(0);
-	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.wdtInfo);
-	ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
+	FViewWidget = FMessageWidgets->newViewWidget(this,ui.bwtMessageBox);
+	ui.bwtMessageBox->insertWidget(MCWW_VIEWWIDGET,FViewWidget->instance(),100);
 
-	ui.wdtView->setLayout(new QVBoxLayout);
-	ui.wdtView->layout()->setMargin(0);
-	FViewWidget = FMessageWidgets->newViewWidget(this,ui.wdtView);
-	ui.wdtView->layout()->addWidget(FViewWidget->instance());
-
-	ui.wdtEdit->setLayout(new QVBoxLayout);
-	ui.wdtEdit->layout()->setMargin(0);
-	FEditWidget = FMessageWidgets->newEditWidget(this,ui.wdtEdit);
+	FEditWidget = FMessageWidgets->newEditWidget(this,ui.bwtMessageBox);
 	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
-	ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
 	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+	ui.bwtMessageBox->insertWidget(MCWW_EDITWIDGET,FEditWidget->instance());
 
-	ui.wdtToolBar->setLayout(new QVBoxLayout);
-	ui.wdtToolBar->layout()->setMargin(0);
-	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.wdtToolBar);
+	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.bwtMessageBox);
 	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-	ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
-
+	ui.bwtMessageBox->insertWidget(MCWW_TOOLBARWIDGET,FToolBarWidget->instance());
+	
 	FMenuBarWidget = FMessageWidgets->newMenuBarWidget(this,this);
 	setMenuBar(FMenuBarWidget->instance());
 
@@ -186,6 +179,11 @@ void ChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 		FTabPageNotifier = ANotifier;
 		emit tabPageNotifierChanged();
 	}
+}
+
+BoxWidget *ChatWindow::messageWidgetsBox() const
+{
+	return ui.bwtMessageBox;
 }
 
 void ChatWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)

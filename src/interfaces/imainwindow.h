@@ -7,6 +7,7 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <utils/menu.h>
+#include <utils/boxwidget.h>
 #include <utils/menubarchanger.h>
 #include <utils/toolbarchanger.h>
 
@@ -81,11 +82,10 @@ public:
 	virtual Menu *mainMenu() const =0;
 	virtual MenuBarChanger *mainMenuBar() const =0;
 	// Widgets Management
-	virtual QList<QWidget *> widgets() const =0;
-	virtual int widgetOrder(QWidget *AWidget) const =0;
-	virtual QWidget *widgetByOrder(int AOrderId) const =0;
-	virtual void insertWidget(int AOrderId, QWidget *AWidget, int AStretch=0) =0;
-	virtual void removeWidget(QWidget *AWidget) =0;
+	virtual BoxWidget *mainLeftWidget() const =0;
+	virtual IMainTabWidget *mainTabWidget() const =0;
+	virtual bool isCentralWidgetVisible() const =0;
+	virtual IMainCentralWidget *mainCentralWidget() const =0;
 	// Tool Bars Management
 	virtual ToolBarChanger *topToolBarChanger() const =0;
 	virtual ToolBarChanger *bottomToolBarChanger() const =0;
@@ -94,13 +94,7 @@ public:
 	virtual ToolBarChanger *toolBarChangerByOrder(int AOrderId) const =0;
 	virtual void insertToolBarChanger(int AOrderId, ToolBarChanger *AChanger) =0;
 	virtual void removeToolBarChanger(ToolBarChanger *AChanger) =0;
-	// Pages Management
-	virtual IMainTabWidget *mainTabWidget() const =0;
-	virtual bool isCentralWidgetVisible() const =0;
-	virtual IMainCentralWidget *mainCentralWidget() const =0;
 protected:
-	virtual void widgetInserted(int AOrderId, QWidget *AWidget) =0;
-	virtual void widgetRemoved(QWidget *AWidget) =0;
 	virtual void toolBarChangerInserted(int AOrderId, ToolBarChanger *AChanger) =0;
 	virtual void toolBarChangerRemoved(ToolBarChanger *AChanger) =0;
 	virtual void centralWidgetVisibleChanged(bool AVisible) =0;
@@ -117,7 +111,7 @@ Q_DECLARE_INTERFACE(IMainTabPage,"Vacuum.Plugin.IMainTabPage/1.0")
 Q_DECLARE_INTERFACE(IMainTabWidget,"Vacuum.Plugin.IMainTabWidget/1.0")
 Q_DECLARE_INTERFACE(IMainCentralPage,"Vacuum.Plugin.IMainCentralPage/1.0")
 Q_DECLARE_INTERFACE(IMainCentralWidget,"Vacuum.Plugin.IMainCentralWidget/1.0")
-Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.2")
-Q_DECLARE_INTERFACE(IMainWindowPlugin,"Vacuum.Plugin.IMainWindowPlugin/1.1")
+Q_DECLARE_INTERFACE(IMainWindow,"Vacuum.Plugin.IMainWindow/1.3")
+Q_DECLARE_INTERFACE(IMainWindowPlugin,"Vacuum.Plugin.IMainWindowPlugin/1.3")
 
 #endif // IMAINWINDOW_H

@@ -250,13 +250,13 @@
             <numerusform>Выбрано %n контактов</numerusform>
         </translation>
     </message>
-</context>
-<context>
-    <name>NormalWindowClass</name>
     <message>
         <source>Subject</source>
         <translation>Тема</translation>
     </message>
+</context>
+<context>
+    <name>NormalWindowClass</name>
     <message>
         <source>Fast choice</source>
         <translation>Быстрый выбор</translation>

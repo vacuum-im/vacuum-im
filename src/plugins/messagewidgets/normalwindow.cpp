@@ -1,11 +1,13 @@
 #include "normalwindow.h"
 
+#include <QLineEdit>
 #include <QHeaderView>
 
 NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
+	ui.bwtMessageBox->layout()->setSpacing(3);
 
 	FMessageWidgets = AMessageWidgets;
 
@@ -16,24 +18,25 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 
 	FAddress = FMessageWidgets->newAddress(AStreamJid,AContactJid,this);
 
-	ui.wdtInfo->setLayout(new QVBoxLayout(ui.wdtInfo));
-	ui.wdtInfo->layout()->setMargin(0);
-	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.wdtInfo);
-	ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
+	FSubjectWidget = new QLineEdit(ui.bwtMessageBox);
+	FSubjectWidget->setPlaceholderText(tr("Subject"));
+	ui.bwtMessageBox->insertWidget(MNWW_SUBJECTWIDGET,FSubjectWidget);
 
-	ui.wdtMessage->setLayout(new QVBoxLayout(ui.wdtMessage));
-	ui.wdtMessage->layout()->setMargin(0);
-	FViewWidget = FMessageWidgets->newViewWidget(this,ui.wdtMessage);
-	FEditWidget = FMessageWidgets->newEditWidget(this,ui.wdtMessage);
-	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
+	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.bwtMessageBox);
+	ui.bwtMessageBox->insertWidget(MNWW_INFOWIDGET,FInfoWidget->instance());
+
+	FViewWidget = FMessageWidgets->newViewWidget(this,ui.bwtMessageBox);
+	ui.bwtMessageBox->insertWidget(MNWW_VIEWWIDGET,FViewWidget->instance(),100);
+
+	FEditWidget = FMessageWidgets->newEditWidget(this,ui.bwtMessageBox);
 	FEditWidget->setEditToolBarVisible(false);
+	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
 	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+	ui.bwtMessageBox->insertWidget(MNWW_EDITWIDGET,FEditWidget->instance(),100);
 
-	ui.wdtToolBar->setLayout(new QVBoxLayout(ui.wdtToolBar));
-	ui.wdtToolBar->layout()->setMargin(0);
-	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.wdtToolBar);
+	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.bwtMessageBox);
 	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-	ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
+	ui.bwtMessageBox->insertWidget(MNWW_TOOLBARWIDGET,FToolBarWidget->instance());
 
 	ui.wdtReceiversTree->setLayout(new QVBoxLayout(ui.wdtReceiversTree));
 	ui.wdtReceiversTree->layout()->setMargin(0);
@@ -63,13 +66,6 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 NormalWindow::~NormalWindow()
 {
 	emit tabPageDestroyed();
-	delete FInfoWidget->instance();
-	delete FViewWidget->instance();
-	delete FEditWidget->instance();
-	delete FReceiversWidget->instance();
-	delete FMenuBarWidget->instance();
-	delete FToolBarWidget->instance();
-	delete FStatusBarWidget->instance();
 }
 
 Jid NormalWindow::streamJid() const
@@ -210,20 +206,18 @@ void NormalWindow::setMode(Mode AMode)
 	FMode = AMode;
 	if (AMode == ReadMode)
 	{
-		ui.wdtMessage->layout()->addWidget(FViewWidget->instance());
-		ui.wdtMessage->layout()->removeWidget(FEditWidget->instance());
-		FEditWidget->instance()->setParent(NULL);
+		FViewWidget->instance()->setVisible(true);
+		FEditWidget->instance()->setVisible(false);
 	}
 	else
 	{
-		ui.wdtMessage->layout()->addWidget(FEditWidget->instance());
-		ui.wdtMessage->layout()->removeWidget(FViewWidget->instance());
-		FViewWidget->instance()->setParent(NULL);
+		FViewWidget->instance()->setVisible(false);
+		FEditWidget->instance()->setVisible(true);
 	}
 
 	ui.wdtReceivers->setVisible(AMode == WriteMode);
-	ui.wdtInfo->setVisible(AMode == ReadMode);
-	ui.lneSubject->setVisible(AMode == WriteMode);
+	FInfoWidget->instance()->setVisible(AMode == ReadMode);
+	FSubjectWidget->setVisible(AMode == WriteMode);
 
 	QTimer::singleShot(0,this,SIGNAL(widgetLayoutChanged()));
 	emit modeChanged(AMode);
@@ -231,12 +225,12 @@ void NormalWindow::setMode(Mode AMode)
 
 QString NormalWindow::subject() const
 {
-	return ui.lneSubject->text();
+	return FSubjectWidget->text();
 }
 
 void NormalWindow::setSubject(const QString &ASubject)
 {
-	ui.lneSubject->setText(ASubject);
+	FSubjectWidget->setText(ASubject);
 }
 
 QString NormalWindow::threadId() const
@@ -270,6 +264,11 @@ void NormalWindow::loadWindowGeometryAndState()
 
 	if (!ui.sprReceivers->restoreState(Options::fileValue("messages.messagewindow.splitter-receivers-state").toByteArray()))
 		ui.sprReceivers->setSizes(QList<int>() << 700 << 300);
+}
+
+BoxWidget *NormalWindow::messageWidgetsBox() const
+{
+	return ui.bwtMessageBox;
 }
 
 void NormalWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)
