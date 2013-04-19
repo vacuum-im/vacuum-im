@@ -79,6 +79,7 @@ protected:
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
 	CollectionWriter *newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName);
+	void removeCollectionWriter(CollectionWriter *AWriter);
 protected slots:
 	void onWorkingThreadFinished();
 	void onArchivePrefsOpened(const Jid &AStreamJid);

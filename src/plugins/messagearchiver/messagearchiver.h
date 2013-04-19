@@ -167,34 +167,43 @@ signals:
 	void archiveEngineRegistered(IArchiveEngine *AEngine);
 	void archiveEngineEnableChanged(const QUuid &AId, bool AEnabled);
 protected:
-	void registerDiscoFeatures();
+	QString archiveStreamDirPath(const Jid &AStreamJid) const;
+	QString archiveStreamFilePath(const Jid &AStreamJid, const QString &AFileName) const;
+protected:
 	QString loadServerPrefs(const Jid &AStreamJid);
 	QString loadStoragePrefs(const Jid &AStreamJid);
 	void applyArchivePrefs(const Jid &AStreamJid, const QDomElement &AElem);
+protected:
+	void loadPendingMessages(const Jid &AStreamJid);
+	void savePendingMessages(const Jid &AStreamJid);
+	void processPendingMessages(const Jid &AStreamJid);
 	bool prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	bool processMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
+protected:
 	IArchiveEngine *findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const;
 	QMultiMap<int, IArchiveEngine *> engineOrderByCapability(quint32 ACapability, const Jid &AStreamJid) const;
-	void openHistoryOptionsNode(const Jid &AStreamJid);
-	void closeHistoryOptionsNode(const Jid &AStreamJid);
-	Menu *createContextMenu(const Jid &AStreamJid, const QStringList &AContacts, QWidget *AParent) const;
-	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
+protected:
+	void processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest);
+	void processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest);
+	void processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest);
+	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
+protected:
 	bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
 	bool isOTRStanzaSession(const IStanzaSession &ASession) const;
 	bool isOTRStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
-	QString stanzaSessionDirPath(const Jid &AStreamJid) const;
 	void saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const;
 	void restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId = QString::null);
 	void removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const;
 	void startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId);
 	void cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const QString &AError);
 	void renegotiateStanzaSessions(const Jid &AStreamJid) const;
-	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 protected:
-	void processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest);
-	void processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest);
-	void processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest);
-	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
+	void registerDiscoFeatures();
+	void openHistoryOptionsNode(const Jid &AStreamJid);
+	void closeHistoryOptionsNode(const Jid &AStreamJid);
+	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	Menu *createContextMenu(const Jid &AStreamJid, const QStringList &AContacts, QWidget *AParent) const;
+	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;
 protected slots:
 	void onEngineCapabilitiesChanged(const Jid &AStreamJid);
 	void onEngineRequestFailed(const QString &AId, const QString &AError);

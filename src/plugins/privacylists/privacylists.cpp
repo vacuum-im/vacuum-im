@@ -203,6 +203,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 {
 	if (FLoadRequests.contains(AStanza.id()))
 	{
+		QString loadListName = FLoadRequests.value(AStanza.id());
 		if (AStanza.type() == "result")
 		{
 			QHash<QString,IPrivacyList> &lists = FPrivacyLists[AStreamJid];
@@ -212,6 +213,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			while (!listElem.isNull())
 			{
 				QString listName = listElem.attribute("name");
+				
 				IPrivacyList &list = lists[listName];
 				list.name = listName;
 				list.rules.clear();
@@ -242,10 +244,10 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 				}
 				qSort(list.rules);
 
-				if (!list.rules.isEmpty())
-					emit listLoaded(AStreamJid,list.name);
+				if (loadListName.isEmpty())
+					loadPrivacyList(AStreamJid,list.name);
 				else
-					loadPrivacyList(AStreamJid,listName);
+					emit listLoaded(AStreamJid,list.name);
 
 				listElem = listElem.nextSiblingElement("list");
 			}
@@ -266,7 +268,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 				emit defaultListChanged(AStreamJid,defaultListName);
 			}
 
-			if (FLoadRequests.value(AStanza.id()).isEmpty())
+			if (loadListName.isEmpty())
 			{
 				if (lists.isEmpty())
 					setAutoPrivacy(AStreamJid,PRIVACY_LIST_AUTO_VISIBLE);
@@ -276,11 +278,10 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else if (AStanza.type() == "error")
 		{
-			QString listName = FLoadRequests.value(AStanza.id());
-			if (FPrivacyLists.value(AStreamJid).contains(listName))
+			if (FPrivacyLists.value(AStreamJid).contains(loadListName))
 			{
-				FPrivacyLists[AStreamJid].remove(listName);
-				emit listRemoved(AStreamJid,listName);
+				FPrivacyLists[AStreamJid].remove(loadListName);
+				emit listRemoved(AStreamJid,loadListName);
 			}
 		}
 		FLoadRequests.remove(AStanza.id());
