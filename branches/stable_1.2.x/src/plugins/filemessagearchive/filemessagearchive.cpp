@@ -634,10 +634,15 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	if (QFile::exists(fileName))
 	{
 		IArchiveHeader header = loadHeaderFromFile(fileName);
-		QString file = collectionFilePath(AStreamJid,AWith,AStart);
 		FThreadLock.lockForWrite();
-		delete findCollectionWriter(AStreamJid,header);
-		if (QFile::remove(file))
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,header);
+		if (writer)
+		{
+			FThreadLock.unlock();
+			removeCollectionWriter(writer);
+			FThreadLock.lockForWrite();
+		}
+		if (QFile::remove(fileName))
 		{
 			FThreadLock.unlock();
 			saveFileModification(AStreamJid,header,LOG_ACTION_REMOVE);
@@ -834,6 +839,31 @@ CollectionWriter *FileMessageArchive::newCollectionWriter(const Jid &AStreamJid,
 	return NULL;
 }
 
+void FileMessageArchive::removeCollectionWriter(CollectionWriter *AWriter)
+{
+	FThreadLock.lockForWrite();
+	if (FWritingFiles.contains(AWriter->fileName()))
+	{
+		AWriter->closeAndDeleteLater();
+		FWritingFiles.remove(AWriter->fileName());
+		FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
+		if (AWriter->recordsCount() > 0)
+		{
+			FThreadLock.unlock();
+			saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
+			emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
+		}
+		else
+		{
+			FThreadLock.unlock();
+		}
+	}
+	else
+	{
+		FThreadLock.unlock();
+	}
+}
+
 void FileMessageArchive::onWorkingThreadFinished()
 {
 	WorkingThread *wthread = qobject_cast<WorkingThread *>(sender());
@@ -884,13 +914,7 @@ void FileMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 
 void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 {
-	FWritingFiles.remove(AWriter->fileName());
-	FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
-	if (AWriter->recordsCount() > 0)
-	{
-		saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
-		emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
-	}
+	removeCollectionWriter(AWriter);
 }
 
 void FileMessageArchive::onOptionsOpened()

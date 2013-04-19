@@ -76,8 +76,6 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
 		if (!FGroupchat || !contactJid.resource().isEmpty())
 		{
 			FMessagesCount++;
-			FCloseTimer.stop();
-
 			FXmlWriter->writeStartElement(ADirectionIn ? "from" : "to");
 
 			int secs = FHeader.start.secsTo(AMessage.dateTime());
@@ -112,7 +110,6 @@ bool CollectionWriter::writeNote(const QString &ANote)
 	if (isOpened() && !ANote.isEmpty())
 	{
 		FNotesCount++;
-		FCloseTimer.stop();
 		FXmlWriter->writeStartElement("note");
 		FXmlWriter->writeAttribute("utc",DateTime(QDateTime::currentDateTime()).toX85UTC());
 		FXmlWriter->writeCharacters(ANote);
@@ -124,9 +121,14 @@ bool CollectionWriter::writeNote(const QString &ANote)
 	return false;
 }
 
+void CollectionWriter::closeAndDeleteLater()
+{
+	stopCollection();
+	deleteLater();
+}
+
 void CollectionWriter::startCollection()
 {
-	FCloseTimer.stop();
 	FXmlWriter->setAutoFormatting(true);
 	FXmlWriter->writeStartElement("chat");
 	FXmlWriter->writeAttribute("with",FHeader.with.full());
@@ -141,7 +143,6 @@ void CollectionWriter::startCollection()
 
 void CollectionWriter::stopCollection()
 {
-	FCloseTimer.stop();
 	if (FXmlWriter)
 	{
 		FXmlWriter->writeEndElement();
@@ -152,12 +153,10 @@ void CollectionWriter::stopCollection()
 	if (FXmlFile)
 	{
 		FXmlFile->close();
-		delete FXmlFile;
+		if (FMessagesCount == 0)
+			QFile::remove(FFileName);
+		FXmlFile->deleteLater();
 		FXmlFile = NULL;
-	}
-	if (FMessagesCount == 0)
-	{
-		QFile::remove(FFileName);
 	}
 }
 
@@ -199,7 +198,7 @@ void CollectionWriter::checkLimits()
 	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MAXSIZE).value().toInt())
 		FCloseTimer.start(0);
 	else if (FMessagesCount > Options::node(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES).value().toInt())
-	   FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_TIMEOUT).value().toInt());
+		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_TIMEOUT).value().toInt());
 	else
 		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT).value().toInt());
 }
