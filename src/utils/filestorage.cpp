@@ -163,9 +163,15 @@ QList<QString> FileStorage::availStorages()
 	{
 		QDir dir(dirPath);
 		QList<QString> dirStorages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-		for (QList<QString>::iterator it=dirStorages.begin(); it!=dirStorages.end(); ++it)
+
+		QList<QString>::iterator it = dirStorages.begin();
+		while(it != dirStorages.end())
+		{
 			if (storages.contains(*it))
 				it = dirStorages.erase(it);
+			else
+				++it;
+		}
 		storages.append(dirStorages);
 	}
 	return storages;
@@ -182,8 +188,8 @@ QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool AChec
 			QList<QString> dirStorages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
 			dirStorages.removeAll(FILE_STORAGE_SHARED_DIR);
 
-			QList<QString>::iterator it=dirStorages.begin();
-			while (it!=dirStorages.end())
+			QList<QString>::iterator it = dirStorages.begin();
+			while (it != dirStorages.end())
 			{
 				if (dir.cd(*it))
 				{
