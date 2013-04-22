@@ -93,7 +93,7 @@ sudo zypper in vacuum-im
 
 === Подключение ===
 {{{
-sudo add-apt-repository 
+sudo add-apt-repository ppa:vacuum-im/release
 sudo apt-get update
 }}}
 
@@ -102,7 +102,7 @@ sudo apt-get update
 
 === Подключение ===
 {{{
-sudo add-apt-repository ppa:
+sudo add-apt-repository ppa:vacuum-im/unstable
 sudo apt-get update
 }}}
 
