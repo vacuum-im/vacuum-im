@@ -46,6 +46,7 @@ void BoxWidget::removeWidget(QWidget *AWidget)
 	if (widgets().contains(AWidget))
 	{
 		FLayout->removeWidget(AWidget);
+		AWidget->setParent(NULL);
 		FWidgetOrders.remove(widgetOrder(AWidget));
 		disconnect(AWidget,SIGNAL(destroyed(QObject *)),this,SLOT(onWidgetDestroyed(QObject *)));
 		emit widgetRemoved(AWidget);
