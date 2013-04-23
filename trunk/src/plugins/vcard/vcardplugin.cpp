@@ -158,11 +158,12 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		QDomElement elem = AStanza.firstElement(VCARD_TAGNAME,NS_VCARD_TEMP);
 		if (AStanza.type() == "result")
 		{
-			saveVCardFile(elem,fromJid);
+			saveVCardFile(fromJid,elem);
 			emit vcardReceived(fromJid);
 		}
 		else if (AStanza.type() == "error")
 		{
+			saveVCardFile(fromJid,QDomElement());
 			emit vcardError(fromJid,XmppStanzaError(AStanza));
 		}
 	}
@@ -172,7 +173,7 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		Stanza stanza = FVCardPublishStanza.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			saveVCardFile(stanza.element().firstChildElement(VCARD_TAGNAME),streamJid);
+			saveVCardFile(streamJid,stanza.element().firstChildElement(VCARD_TAGNAME));
 			emit vcardPublished(streamJid);
 		}
 		else if (AStanza.type() == "error")
@@ -301,20 +302,35 @@ void VCardPlugin::unlockVCard(const Jid &AContactJid)
 	}
 }
 
-void VCardPlugin::saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const
+void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem) const
 {
-	if (!AElem.isNull() && AContactJid.isValid())
+	if (AContactJid.isValid())
 	{
 		QDomDocument doc;
-		QDomElement elem = doc.appendChild(doc.createElement(VCARD_FILE_ROOT_TAGNAME)).toElement();
-		elem.setAttribute("jid",AContactJid.full());
-		elem.setAttribute("dateTime",QDateTime::currentDateTime().toString(Qt::ISODate));
-		elem.appendChild(AElem.cloneNode(true));
+		QDomElement rootElem = doc.appendChild(doc.createElement(VCARD_TAGNAME)).toElement();
+		rootElem.setAttribute("jid",AContactJid.full());
+		rootElem.setAttribute("dateTime",QDateTime::currentDateTime().toString(Qt::ISODate));
 
 		QFile file(vcardFileName(AContactJid));
-		if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+		if (!AElem.isNull() && file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+		{
+			rootElem.appendChild(AElem.cloneNode(true));
+			file.write(doc.toByteArray());
+			file.close();
+		}
+		else if (AElem.isNull() && !file.exists() && file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 		{
 			file.write(doc.toByteArray());
+			file.close();
+		}
+		else if (AElem.isNull() && file.exists() && file.open(QIODevice::ReadWrite))
+		{
+			char data;
+			if (file.getChar(&data))
+			{
+				file.seek(0);
+				file.putChar(data);
+			}
 			file.close();
 		}
 	}

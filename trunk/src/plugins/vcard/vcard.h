@@ -4,7 +4,6 @@
 #include <definitions/namespaces.h>
 #include <interfaces/ivcard.h>
 
-#define VCARD_FILE_ROOT_TAGNAME         "VCard"
 #define VCARD_TAGNAME                   "vCard"
 
 class VCardPlugin;

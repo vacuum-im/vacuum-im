@@ -79,7 +79,7 @@ signals:
 protected:
 	void registerDiscoFeatures();
 	void unlockVCard(const Jid &AContactJid);
-	void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;
+	void saveVCardFile(const Jid &AContactJid, const QDomElement &AElem) const;
 	void removeEmptyChildElements(QDomElement &AElem) const;
 	void insertMessageToolBarAction(IMessageToolBarWidget *AWidget);
 protected slots:
