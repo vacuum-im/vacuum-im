@@ -25,6 +25,7 @@
 #include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/messageeditsendhandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
@@ -58,13 +59,14 @@ struct WindowStatus {
 class ChatMessageHandler :
 	public QObject,
 	public IPlugin,
-	public IMessageHandler,
+	public IOptionsHolder,
 	public IXmppUriHandler,
+	public IMessageHandler,
 	public IRostersClickHooker,
-	public IOptionsHolder
+	public IMessageEditSendHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageHandler IRostersClickHooker IXmppUriHandler IOptionsHolder);
+	Q_INTERFACES(IPlugin IOptionsHolder IXmppUriHandler IMessageHandler IRostersClickHooker IMessageEditSendHandler);
 public:
 	ChatMessageHandler();
 	~ChatMessageHandler();
@@ -76,11 +78,9 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
-	//IXmppUriHandler
-	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
-	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	//IMessageEditSendHandler
+	virtual bool messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget);
+	virtual bool messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -89,6 +89,11 @@ public:
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	//IRostersClickHooker
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	//IXmppUriHandler
+	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 protected:
 	IMessageChatWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid);
 	IMessageChatWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -103,7 +108,6 @@ protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QMap<Jid, QList<Jid> > getSortedAddresses(const QMultiMap<Jid,Jid> &AAddresses) const;
 protected slots:
-	void onWindowMessageReady();
 	void onWindowActivated();
 	void onWindowClosed();
 	void onWindowDestroyed();

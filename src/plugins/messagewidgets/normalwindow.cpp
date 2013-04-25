@@ -30,8 +30,7 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 
 	FEditWidget = FMessageWidgets->newEditWidget(this,ui.bwtMessageBox);
 	FEditWidget->setEditToolBarVisible(false);
-	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
-	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
 	ui.bwtMessageBox->insertWidget(MNWW_EDITWIDGET,FEditWidget->instance(),100);
 
 	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.bwtMessageBox);
@@ -321,11 +320,6 @@ void NormalWindow::closeEvent(QCloseEvent *AEvent)
 		saveWindowGeometryAndState();
 	QMainWindow::closeEvent(AEvent);
 	emit tabPageClosed();
-}
-
-void NormalWindow::onMessageReady()
-{
-	emit messageReady();
 }
 
 void NormalWindow::onSelectReceiversMenuAboutToShow()

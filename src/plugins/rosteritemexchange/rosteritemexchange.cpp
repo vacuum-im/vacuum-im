@@ -264,25 +264,25 @@ QMultiMap<int, IOptionsWidget *> RosterItemExchange::optionsWidgets(const QStrin
 	return widgets;
 }
 
-bool RosterItemExchange::viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool RosterItemExchange::messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
 	return !dropDataContacts(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData()).isEmpty();
 }
 
-bool RosterItemExchange::viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
+bool RosterItemExchange::messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 	return true;
 }
 
-void RosterItemExchange::viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
+void RosterItemExchange::messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 }
 
-bool RosterItemExchange::viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
+bool RosterItemExchange::messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
 {
 	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData(),AMenu) : false;
 }

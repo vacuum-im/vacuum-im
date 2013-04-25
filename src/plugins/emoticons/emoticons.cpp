@@ -68,7 +68,7 @@ bool Emoticons::initObjects()
 	}
 	if (FMessageWidgets)
 	{
-		FMessageWidgets->insertEditContentsHandler(ECHO_EMOTICONS_CONVERT_IMAGE2TEXT,this);
+		FMessageWidgets->insertEditContentsHandler(MECHO_EMOTICONS_CONVERT_IMAGE2TEXT,this);
 	}
 	return true;
 }
@@ -112,7 +112,7 @@ QMultiMap<int, IOptionsWidget *> Emoticons::optionsWidgets(const QString &ANodeI
 	return widgets;
 }
 
-bool Emoticons::editContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData)
+bool Emoticons::messageEditContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AWidget);
@@ -120,7 +120,7 @@ bool Emoticons::editContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMim
 	return false;
 }
 
-bool Emoticons::editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData)
+bool Emoticons::messageEditContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AWidget);
@@ -128,10 +128,10 @@ bool Emoticons::editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, c
 	return false;
 }
 
-bool Emoticons::editContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
+bool Emoticons::messageEditContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AData);
-	if (AOrder == ECHO_EMOTICONS_CONVERT_IMAGE2TEXT)
+	if (AOrder == MECHO_EMOTICONS_CONVERT_IMAGE2TEXT)
 	{
 		if (AWidget->isRichTextEnabled())
 		{
@@ -166,7 +166,7 @@ bool Emoticons::editContentsInsert(int AOrder, IMessageEditWidget *AWidget, cons
 	return false;
 }
 
-bool Emoticons::editContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+bool Emoticons::messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AWidget);

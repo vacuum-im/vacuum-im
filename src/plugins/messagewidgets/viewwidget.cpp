@@ -154,7 +154,7 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 
 	bool accepted = false;
 	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
-		if (handler->viewDropAction(this, AEvent, dropMenu))
+		if (handler->messageViewDropAction(this, AEvent, dropMenu))
 			accepted = true;
 
 	if (accepted && !dropMenu->isEmpty())
@@ -175,7 +175,7 @@ void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 {
 	FActiveDropHandlers.clear();
 	foreach(IMessageViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
-		if (handler->viewDragEnter(this, AEvent))
+		if (handler->messagaeViewDragEnter(this, AEvent))
 			FActiveDropHandlers.append(handler);
 
 	if (!FActiveDropHandlers.isEmpty())
@@ -188,7 +188,7 @@ void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	bool accepted = false;
 	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
-		if (handler->viewDragMove(this, AEvent))
+		if (handler->messageViewDragMove(this, AEvent))
 			accepted = true;
 
 	if (accepted)
@@ -200,19 +200,19 @@ void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 void ViewWidget::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
 	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
-		handler->viewDragLeave(this, AEvent);
-}
-
-void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
-{
-	if (AWidget == FStyleWidget)
-		emit contentAppended(AHtml,AOptions);
+		handler->messageViewDragLeave(this, AEvent);
 }
 
 void ViewWidget::onUrlClicked(QWidget *AWidget, const QUrl &AUrl)
 {
 	if (AWidget == FStyleWidget)
+	{
+		QMap<int,IMessageViewUrlHandler *> handlers = FMessageWidgets->viewUrlHandlers();
+		for (QMap<int,IMessageViewUrlHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
+			if (it.value()->messageViewUrlOpen(it.key(),this,AUrl))
+				break;
 		emit urlClicked(AUrl);
+	}
 }
 
 void ViewWidget::onCustomContextMenuRequested(const QPoint &APosition)
@@ -226,4 +226,10 @@ void ViewWidget::onCustomContextMenuRequested(const QPoint &APosition)
 		menu->popup(FStyleWidget->mapToGlobal(APosition));
 	else
 		delete menu;
+}
+
+void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
+{
+	if (AWidget == FStyleWidget)
+		emit contentAppended(AHtml,AOptions);
 }

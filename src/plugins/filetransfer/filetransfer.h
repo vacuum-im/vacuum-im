@@ -79,10 +79,10 @@ public:
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
 	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
 	//IMessageViewDropHandler
-	virtual bool viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
-	virtual bool viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
-	virtual void viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
-	virtual bool viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
+	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
+	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
+	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
+	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
 	//IFileTransferHandler
 	virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
 	virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);

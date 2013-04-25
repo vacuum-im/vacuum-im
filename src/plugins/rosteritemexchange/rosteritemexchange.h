@@ -64,10 +64,10 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageViewDropHandler
-	virtual bool viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
-	virtual bool viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
-	virtual void viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
-	virtual bool viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
+	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
+	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
+	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
+	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
 	//IRostersDragDropHandler
 	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
