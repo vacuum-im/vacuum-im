@@ -105,31 +105,33 @@ public:
 	virtual QWidget *instance() = 0;
 	virtual QTextEdit *textEdit() const =0;
 	virtual QTextDocument *document() const =0;
-	virtual void sendMessage() =0;
-	virtual void clearEditor() =0;
-	virtual bool autoResize() const =0;
-	virtual void setAutoResize(bool AResize) =0;
-	virtual int minimumLines() const =0;
-	virtual void setMinimumLines(int ALines) =0;
-	virtual QString sendShortcut() const =0;
-	virtual void setSendShortcut(const QString &AShortcutId) =0;
+	virtual bool sendMessage() =0;
+	virtual bool isSendEnabled() const =0;
+	virtual void setSendEnabled(bool AEnabled) =0;
+	virtual bool isEditEnabled() const =0;
+	virtual void setEditEnabled(bool AEnabled) =0;
+	virtual bool isAutoResize() const =0;
+	virtual void setAutoResize(bool AAuto) =0;
+	virtual int minimumHeightLines() const =0;
+	virtual void setMinimumHeightLines(int ALines) =0;
 	virtual bool isRichTextEnabled() const =0;
 	virtual void setRichTextEnabled(bool AEnabled) =0;
 	virtual bool isEditToolBarVisible() const =0;
 	virtual void setEditToolBarVisible(bool AVisible) =0;
 	virtual ToolBarChanger *editToolBarChanger() const =0;
+	virtual QString sendShortcutId() const =0;
+	virtual void setSendShortcutId(const QString &AShortcutId) =0;
 	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu) =0;
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment) =0;
-	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const =0;
+	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) =0;
 protected:
-	virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
-	virtual void messageAboutToBeSend() =0;
-	virtual void messageReady() =0;
-	virtual void editorCleared() =0;
-	virtual void autoResizeChanged(bool AResize) =0;
-	virtual void minimumLinesChanged(int ALines) =0;
-	virtual void sendShortcutChanged(const QString &AShortcutId) =0;
+	virtual void sendEnableChanged(bool AEnabled) =0;
+	virtual void editEnableChanged(bool AEnabled) =0;
+	virtual void autoResizeChanged(bool AAuto) =0;
+	virtual void minimumHeightLinesChanged(int ALines) =0;
 	virtual void richTextEnableChanged(bool AEnabled) =0;
+	virtual void sendShortcutIdChanged(const QString &AShortcutId) =0;
+	virtual void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook) =0;
 	virtual void contextMenuRequested(const QPoint &APosition, Menu *AMenu) =0;
 };
 
@@ -307,7 +309,6 @@ public:
 	virtual BoxWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 protected:
-	virtual void messageReady() =0;
 	virtual void modeChanged(int AMode) =0;
 };
 
@@ -318,32 +319,37 @@ public:
 	virtual QMainWindow *instance() =0;
 	virtual BoxWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
-protected:
-	virtual void messageReady() =0;
 };
 
 class IMessageViewDropHandler
 {
 public:
-	virtual bool viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent) =0;
-	virtual bool viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent) =0;
-	virtual void viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent) =0;
-	virtual bool viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu) =0;
+	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent) =0;
+	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent) =0;
+	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent) =0;
+	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu) =0;
 };
 
 class IMessageViewUrlHandler
 {
 public:
-	virtual bool viewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl) =0;
+	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl) =0;
+};
+
+class IMessageEditSendHandler
+{
+public:
+	virtual bool messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget) =0;
+	virtual bool messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget) =0;
 };
 
 class IMessageEditContentsHandler
 {
 public:
-	virtual bool editContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData) =0;
-	virtual bool editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData) =0;
-	virtual bool editContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument) =0;
-	virtual bool editContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded) =0;
+	virtual bool messageEditContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData) =0;
+	virtual bool messageEditContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData) =0;
+	virtual bool messageEditContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument) =0;
+	virtual bool messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded) =0;
 };
 
 class IMessageWidgets
@@ -381,6 +387,9 @@ public:
 	virtual QMultiMap<int, IMessageViewUrlHandler *> viewUrlHandlers() const =0;
 	virtual void insertViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler) =0;
 	virtual void removeViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler) =0;
+	virtual QMultiMap<int, IMessageEditSendHandler *> editSendHandlers() const =0;
+	virtual void insertEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler) =0;
+	virtual void removeEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler) =0;
 	virtual QMultiMap<int, IMessageEditContentsHandler *> editContentsHandlers() const =0;
 	virtual void insertEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler) =0;
 	virtual void removeEditContentsHandler( int AOrder, IMessageEditContentsHandler *AHandler) =0;
@@ -409,7 +418,7 @@ Q_DECLARE_INTERFACE(IMessageAddress,"Vacuum.Plugin.IMessageAddress/1.0")
 Q_DECLARE_INTERFACE(IMessageWidget,"Vacuum.Plugin.IMessageWidget/1.0")
 Q_DECLARE_INTERFACE(IMessageInfoWidget,"Vacuum.Plugin.IMessageInfoWidget/1.2")
 Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.3")
-Q_DECLARE_INTERFACE(IMessageEditWidget,"Vacuum.Plugin.IMessageEditWidget/1.3")
+Q_DECLARE_INTERFACE(IMessageEditWidget,"Vacuum.Plugin.IMessageEditWidget/1.4")
 Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.3")
 Q_DECLARE_INTERFACE(IMessageMenuBarWidget,"Vacuum.Plugin.IMessageMenuBarWidget/1.1")
 Q_DECLARE_INTERFACE(IMessageToolBarWidget,"Vacuum.Plugin.IMessageToolBarWidget/1.1")
@@ -418,11 +427,12 @@ Q_DECLARE_INTERFACE(IMessageTabPageNotifier,"Vacuum.Plugin.IMessageTabPageNotifi
 Q_DECLARE_INTERFACE(IMessageTabPage,"Vacuum.Plugin.IMessageTabPage/1.4")
 Q_DECLARE_INTERFACE(IMessageTabWindow,"Vacuum.Plugin.IMessageTabWindow/1.5")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.3")
-Q_DECLARE_INTERFACE(IMessageNormalWindow,"Vacuum.Plugin.IMessageNormalWindow/1.4")
-Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.4")
-Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandler/1.1")
-Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.1")
-Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.2")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.8")
+Q_DECLARE_INTERFACE(IMessageNormalWindow,"Vacuum.Plugin.IMessageNormalWindow/1.5")
+Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.5")
+Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandler/1.2")
+Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.2")
+Q_DECLARE_INTERFACE(IMessageEditSendHandler,"QIP.Plugin.IMessageEditSendHandler/1.0")
+Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.3")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.9")
 
 #endif // IMESSAGEWIDGETS_H

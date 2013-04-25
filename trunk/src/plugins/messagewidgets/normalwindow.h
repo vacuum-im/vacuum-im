@@ -65,7 +65,6 @@ public:
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	// IMessageNormalWindow
-	void messageReady();
 	void modeChanged(int AMode);
 	// IMessageWindow
 	void widgetLayoutChanged();
@@ -88,7 +87,6 @@ protected:
 	void showEvent(QShowEvent *AEvent);
 	void closeEvent(QCloseEvent *AEvent);
 protected slots:
-	void onMessageReady();
 	void onSelectReceiversMenuAboutToShow();
 	void onReceiverslAddressSelectionChanged();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);

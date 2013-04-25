@@ -54,8 +54,6 @@ public:
 	virtual BoxWidget *messageWidgetsBox() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
-	// IMessageChatWindow
-	void messageReady();
 	// IMessageWindow
 	void widgetLayoutChanged();
 	// ITabWindowPage
@@ -77,7 +75,6 @@ protected:
 	void showEvent(QShowEvent *AEvent);
 	void closeEvent(QCloseEvent *AEvent);
 protected slots:
-	void onMessageReady();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	Ui::ChatWindowClass ui;

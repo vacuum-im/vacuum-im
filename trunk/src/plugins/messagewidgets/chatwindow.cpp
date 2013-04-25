@@ -23,8 +23,7 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 	ui.bwtMessageBox->insertWidget(MCWW_VIEWWIDGET,FViewWidget->instance(),100);
 
 	FEditWidget = FMessageWidgets->newEditWidget(this,ui.bwtMessageBox);
-	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
-	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
 	ui.bwtMessageBox->insertWidget(MCWW_EDITWIDGET,FEditWidget->instance());
 
 	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.bwtMessageBox);
@@ -43,12 +42,6 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 ChatWindow::~ChatWindow()
 {
 	emit tabPageDestroyed();
-	delete FInfoWidget->instance();
-	delete FViewWidget->instance();
-	delete FEditWidget->instance();
-	delete FMenuBarWidget->instance();
-	delete FToolBarWidget->instance();
-	delete FStatusBarWidget->instance();
 }
 
 Jid ChatWindow::streamJid() const
@@ -268,11 +261,6 @@ void ChatWindow::closeEvent(QCloseEvent *AEvent)
 		saveWindowGeometryAndState();
 	QMainWindow::closeEvent(AEvent);
 	emit tabPageClosed();
-}
-
-void ChatWindow::onMessageReady()
-{
-	emit messageReady();
 }
 
 void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)

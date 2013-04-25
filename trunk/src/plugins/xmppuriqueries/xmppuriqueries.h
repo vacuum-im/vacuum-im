@@ -4,7 +4,7 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
-#include <definitions/viewurlhandlerorders.h>
+#include <definitions/messageviewurlhandlerorders.h>
 
 class XmppUriQueries :
 			public QObject,
@@ -26,7 +26,7 @@ public:
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IMessageViewUrlHandler
-	virtual bool viewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
+	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IXmppUriQueries
 	virtual bool openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const;
 	virtual void insertUriHandler(IXmppUriHandler *AHandler, int AOrder);

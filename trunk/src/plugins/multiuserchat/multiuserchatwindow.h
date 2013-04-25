@@ -2,24 +2,25 @@
 #define MULTIUSERCHATWINDOW_H
 
 #include <QStandardItemModel>
-#include <definitions/messagedataroles.h>
-#include <definitions/messagehandlerorders.h>
-#include <definitions/multiuserdataroles.h>
-#include <definitions/multiusertooltiporders.h>
 #include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
+#include <definitions/optionvalues.h>
+#include <definitions/toolbargroups.h>
 #include <definitions/actiongroups.h>
 #include <definitions/recentitemtypes.h>
 #include <definitions/rosternotifyorders.h>
+#include <definitions/multiuserdataroles.h>
+#include <definitions/multiusertooltiporders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
 #include <definitions/notificationtypeorders.h>
 #include <definitions/tabpagenotifypriorities.h>
-#include <definitions/soundfiles.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionvalues.h>
-#include <definitions/toolbargroups.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/messagehandlerorders.h>
+#include <definitions/messageeditsendhandlerorders.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
@@ -55,10 +56,11 @@ struct UserStatus {
 class MultiUserChatWindow :
 	public QMainWindow,
 	public IMultiUserChatWindow,
-	public IMessageHandler
+	public IMessageHandler,
+	public IMessageEditSendHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IMessageHandler);
+	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IMessageHandler IMessageEditSendHandler);
 public:
 	MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
@@ -87,6 +89,9 @@ public:
 	virtual QString tabPageToolTip() const;
 	virtual IMessageTabPageNotifier *tabPageNotifier() const;
 	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
+	//IMessageEditSendHandler
+	virtual bool messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget);
+	virtual bool messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -184,15 +189,12 @@ protected slots:
 	void onConfigFormReceived(const IDataForm &AForm);
 	void onRoomDestroyed(const QString &AReason);
 protected slots:
-	void onMultiChatMessageReady();
-	void onMultiChatMessageAboutToBeSend();
 	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
 	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
 	void onMultiChatWindowActivated();
 	void onMultiChatHorizontalSplitterMoved(int APos, int AIndex);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
 protected slots:
-	void onPrivateChatMessageReady();
 	void onPrivateChatWindowActivated();
 	void onPrivateChatWindowClosed();
 	void onPrivateChatWindowDestroyed();

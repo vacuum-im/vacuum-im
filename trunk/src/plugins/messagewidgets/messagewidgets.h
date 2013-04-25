@@ -4,15 +4,15 @@
 #include <QDesktopServices>
 #include <QObjectCleanupHandler>
 #include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/viewurlhandlerorders.h>
-#include <definitions/editcontentshandlerorders.h>
-#include <definitions/toolbargroups.h>
 #include <definitions/shortcuts.h>
 #include <definitions/shortcutgrouporders.h>
+#include <definitions/messageviewurlhandlerorders.h>
+#include <definitions/messageeditcontentshandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
@@ -58,12 +58,12 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageViewUrlHandler
-	virtual bool viewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
+	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IMessageEditContentsHandler
-	virtual bool editContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData);
-	virtual bool editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData);
-	virtual bool editContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
-	virtual bool editContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
+	virtual bool messageEditContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData);
+	virtual bool messageEditContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData);
+	virtual bool messageEditContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
+	virtual bool messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IMessageWidgets
 	virtual IPluginManager *pluginManager() const { return FPluginManager; }
 	virtual IMessageAddress *newAddress(const Jid &AStreamJid, const Jid &AContactJid, QObject *AParent);
@@ -96,6 +96,9 @@ public:
 	virtual QMultiMap<int, IMessageViewUrlHandler *> viewUrlHandlers() const;
 	virtual void insertViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler);
 	virtual void removeViewUrlHandler(int AOrder, IMessageViewUrlHandler *AHandler);
+	virtual QMultiMap<int, IMessageEditSendHandler *> editSendHandlers() const;
+	virtual void insertEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler);
+	virtual void removeEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler);
 	virtual QMultiMap<int, IMessageEditContentsHandler *> editContentsHandlers() const;
 	virtual void insertEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler);
 	virtual void removeEditContentsHandler(int AOrder, IMessageEditContentsHandler *AHandler);
@@ -123,15 +126,10 @@ protected:
 	void insertToolBarQuoteAction(IMessageToolBarWidget *AWidget);
 	Action *createQuouteAction(IMessageWindow *AWindow, QObject *AParent);
 protected slots:
-	void onViewWidgetUrlClicked(const QUrl &AUrl);
 	void onViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu);
 	void onViewContextCopyActionTriggered(bool);
 	void onViewContextUrlActionTriggered(bool);
 	void onViewContextSearchActionTriggered(bool);
-	void onEditWidgetCreateDataRequest(QMimeData *AData);
-	void onEditWidgetCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert);
-	void onEditWidgetInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument);
-	void onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded);
 	void onMessageWindowWidgetLayoutChanged();
 	void onQuoteActionTriggered(bool);
 	void onAssignedTabPageDestroyed();
@@ -158,6 +156,7 @@ private:
 	QMap<QString, QUuid> FPageWindows;
 	QList<IMessageViewDropHandler *> FViewDropHandlers;
 	QMultiMap<int,IMessageViewUrlHandler *> FViewUrlHandlers;
+	QMultiMap<int,IMessageEditSendHandler *> FEditSendHandlers;
 	QMultiMap<int,IMessageEditContentsHandler *> FEditContentsHandlers;
 };
 

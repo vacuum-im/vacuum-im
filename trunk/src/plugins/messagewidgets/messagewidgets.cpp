@@ -94,8 +94,8 @@ bool MessageWidgets::initObjects()
 	Shortcuts::declareGroup(SCTG_MESSAGEWINDOWS_NORMAL, tr("Message window"), SGO_MESSAGEWINDOWS_NORMAL);
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE, tr("Send message"), tr("Ctrl+Return","Send message"), Shortcuts::WidgetShortcut);
 
-	insertViewUrlHandler(VUHO_MESSAGEWIDGETS_DEFAULT,this);
-	insertEditContentsHandler(ECHO_MESSAGEWIDGETS_COPY_INSERT,this);
+	insertViewUrlHandler(MVUHO_MESSAGEWIDGETS_DEFAULT,this);
+	insertEditContentsHandler(MECHO_MESSAGEWIDGETS_COPY_INSERT,this);
 
 	if (FMainWindow)
 		Shortcuts::insertWidgetShortcut(SCT_MAINWINDOW_COMBINEWITHMESSAGES,FMainWindow->instance());
@@ -145,16 +145,16 @@ QMultiMap<int, IOptionsWidget *> MessageWidgets::optionsWidgets(const QString &A
 	return widgets;
 }
 
-bool MessageWidgets::viewUrlOpen(int AOrder, IMessageViewWidget* APage, const QUrl &AUrl)
+bool MessageWidgets::messageViewUrlOpen(int AOrder, IMessageViewWidget* APage, const QUrl &AUrl)
 {
 	Q_UNUSED(APage);
 	Q_UNUSED(AOrder);
 	return QDesktopServices::openUrl(AUrl);
 }
 
-bool MessageWidgets::editContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData)
+bool MessageWidgets::messageEditContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData)
 {
-	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
+	if (AOrder == MECHO_MESSAGEWIDGETS_COPY_INSERT)
 	{
 		QTextDocumentFragment fragment = AWidget->textEdit()->textCursor().selection();
 		if (!fragment.isEmpty())
@@ -174,17 +174,17 @@ bool MessageWidgets::editContentsCreate(int AOrder, IMessageEditWidget *AWidget,
 	return false;
 }
 
-bool MessageWidgets::editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData)
+bool MessageWidgets::messageEditContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData)
 {
 	Q_UNUSED(AWidget);
-	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
+	if (AOrder == MECHO_MESSAGEWIDGETS_COPY_INSERT)
 		return AData->hasText() || AData->hasHtml();
 	return false;
 }
 
-bool MessageWidgets::editContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
+bool MessageWidgets::messageEditContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument)
 {
-	if (AOrder == ECHO_MESSAGEWIDGETS_COPY_INSERT)
+	if (AOrder == MECHO_MESSAGEWIDGETS_COPY_INSERT)
 	{
 		QTextDocumentFragment fragment;
 		if (AWidget->isRichTextEnabled() && AData->hasHtml())
@@ -203,7 +203,7 @@ bool MessageWidgets::editContentsInsert(int AOrder, IMessageEditWidget *AWidget,
 	return false;
 }
 
-bool MessageWidgets::editContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
+bool MessageWidgets::messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
 {
 	Q_UNUSED(AOrder);
 	Q_UNUSED(AWidget);
@@ -232,9 +232,7 @@ IMessageInfoWidget *MessageWidgets::newInfoWidget(IMessageWindow *AWindow, QWidg
 IMessageViewWidget *MessageWidgets::newViewWidget(IMessageWindow *AWindow, QWidget *AParent)
 {
 	IMessageViewWidget *widget = new ViewWidget(this,AWindow,AParent);
-	connect(widget->instance(),SIGNAL(viewContextMenu(const QPoint &, Menu *)),
-		SLOT(onViewWidgetContextMenu(const QPoint &, Menu *)));
-	connect(widget->instance(),SIGNAL(urlClicked(const QUrl &)),SLOT(onViewWidgetUrlClicked(const QUrl &)));
+	connect(widget->instance(),SIGNAL(viewContextMenu(const QPoint &, Menu *)),SLOT(onViewWidgetContextMenu(const QPoint &, Menu *)));
 	FCleanupHandler.add(widget->instance());
 	emit viewWidgetCreated(widget);
 	return widget;
@@ -243,13 +241,6 @@ IMessageViewWidget *MessageWidgets::newViewWidget(IMessageWindow *AWindow, QWidg
 IMessageEditWidget *MessageWidgets::newEditWidget(IMessageWindow *AWindow, QWidget *AParent)
 {
 	IMessageEditWidget *widget = new EditWidget(this,AWindow,AParent);
-	connect(widget->instance(),SIGNAL(createDataRequest(QMimeData *)),
-		SLOT(onEditWidgetCreateDataRequest(QMimeData *)));
-	connect(widget->instance(),SIGNAL(canInsertDataRequest(const QMimeData *, bool &)),
-		SLOT(onEditWidgetCanInsertDataRequest(const QMimeData *, bool &)));
-	connect(widget->instance(),SIGNAL(insertDataRequest(const QMimeData *, QTextDocument *)),
-		SLOT(onEditWidgetInsertDataRequest(const QMimeData *, QTextDocument *)));
-	connect(widget->instance(),SIGNAL(contentsChanged(int, int, int)),SLOT(onEditWidgetContentsChanged(int, int, int)));
 	FCleanupHandler.add(widget->instance());
 	emit editWidgetCreated(widget);
 	return widget;
@@ -511,6 +502,23 @@ void MessageWidgets::removeViewUrlHandler(int AOrder, IMessageViewUrlHandler *AH
 		FViewUrlHandlers.remove(AOrder,AHandler);
 }
 
+QMultiMap<int, IMessageEditSendHandler *> MessageWidgets::editSendHandlers() const
+{
+	return FEditSendHandlers;
+}
+
+void MessageWidgets::insertEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler)
+{
+	if (AHandler && !FEditSendHandlers.contains(AOrder,AHandler))
+		FEditSendHandlers.insertMulti(AOrder,AHandler);
+}
+
+void MessageWidgets::removeEditSendHandler(int AOrder, IMessageEditSendHandler *AHandler)
+{
+	if (FEditSendHandlers.contains(AOrder,AHandler))
+		FEditSendHandlers.remove(AOrder,AHandler);
+}
+
 QMultiMap<int, IMessageEditContentsHandler *> MessageWidgets::editContentsHandlers() const
 {
 	return FEditContentsHandlers;
@@ -560,18 +568,6 @@ Action *MessageWidgets::createQuouteAction(IMessageWindow *AWindow, QObject *APa
 		return quoteAction;
 	}
 	return NULL;
-}
-
-
-void MessageWidgets::onViewWidgetUrlClicked(const QUrl &AUrl)
-{
-	IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
-	if (widget)
-	{
-		for (QMap<int,IMessageViewUrlHandler *>::const_iterator it = FViewUrlHandlers.constBegin(); it!=FViewUrlHandlers.constEnd(); ++it)
-			if (it.value()->viewUrlOpen(it.key(),widget,AUrl))
-				break;
-	}
 }
 
 void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMenu)
@@ -653,51 +649,6 @@ void MessageWidgets::onViewContextSearchActionTriggered(bool)
 		QUrl url = QString("http://www.%1/search").arg(domain);
 		url.setQueryItems(QList<QPair<QString,QString> >() << qMakePair<QString,QString>(QString("q"),action->data(ADR_CONTEXT_DATA).toString()));
 		QDesktopServices::openUrl(url);
-	}
-}
-
-void MessageWidgets::onEditWidgetCreateDataRequest(QMimeData *AData)
-{
-	IMessageEditWidget *widget = qobject_cast<IMessageEditWidget *>(sender());
-	if (widget)
-	{
-		for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); ++it)
-			if (it.value()->editContentsCreate(it.key(),widget,AData))
-				break;
-	}
-}
-
-void MessageWidgets::onEditWidgetCanInsertDataRequest(const QMimeData *AData, bool &ACanInsert)
-{
-	IMessageEditWidget *widget = qobject_cast<IMessageEditWidget *>(sender());
-	if (widget)
-	{
-		for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); !ACanInsert && it!=FEditContentsHandlers.constEnd(); ++it)
-			ACanInsert = it.value()->editContentsCanInsert(it.key(),widget,AData);
-	}
-}
-
-void MessageWidgets::onEditWidgetInsertDataRequest(const QMimeData *AData, QTextDocument *ADocument)
-{
-	IMessageEditWidget *widget = qobject_cast<IMessageEditWidget *>(sender());
-	if (widget)
-	{
-		for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); ++it)
-			if (it.value()->editContentsInsert(it.key(),widget,AData,ADocument))
-				break;
-	}
-}
-
-void MessageWidgets::onEditWidgetContentsChanged(int APosition, int ARemoved, int AAdded)
-{
-	IMessageEditWidget *widget = qobject_cast<IMessageEditWidget *>(sender());
-	if (widget)
-	{
-		widget->document()->blockSignals(true);
-		for (QMap<int,IMessageEditContentsHandler *>::const_iterator it = FEditContentsHandlers.constBegin(); it!=FEditContentsHandlers.constEnd(); ++it)
-			if (it.value()->editContentsChanged(it.key(),widget,APosition,ARemoved,AAdded))
-				break;
-		widget->document()->blockSignals(false);
 	}
 }
 
