@@ -249,13 +249,13 @@
             <numerusform>Selected %n contact(s)</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Subject</source>
+        <translation type="unfinished">Subject</translation>
+    </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
-    <message>
-        <source>Subject</source>
-        <translation>Subject</translation>
-    </message>
     <message>
         <source>Fast choice</source>
         <translation>Fast choice</translation>

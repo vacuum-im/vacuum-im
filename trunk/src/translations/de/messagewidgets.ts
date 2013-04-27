@@ -249,13 +249,13 @@
             <numerusform></numerusform>
         </translation>
     </message>
-</context>
-<context>
-    <name>NormalWindowClass</name>
     <message>
         <source>Subject</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>NormalWindowClass</name>
     <message>
         <source>Fast choice</source>
         <translation type="unfinished"></translation>
