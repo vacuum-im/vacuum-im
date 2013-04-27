@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>Set Active List</source>
-        <translation>Установить активный спосок</translation>
+        <translation>Установить активный список</translation>
     </message>
     <message>
         <source>Set Default List</source>
