@@ -93,6 +93,13 @@ MultiUserChatWindow::~MultiUserChatWindow()
 	if (FMessageProcessor)
 		FMessageProcessor->removeMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
 
+	if (FMessageWidgets)
+	{
+		FMessageWidgets->removeEditSendHandler(MESHO_MULTIUSERCHATWINDOW_COMMANDS,this);
+		FMessageWidgets->removeEditSendHandler(MESHO_MULTIUSERCHATWINDOW_GROUPCHAT,this);
+		FMessageWidgets->removeEditSendHandler(MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT,this);
+	}
+
 	saveWindowState();
 	emit tabPageDestroyed();
 }
