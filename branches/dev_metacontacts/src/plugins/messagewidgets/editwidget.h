@@ -29,38 +29,36 @@ public:
 	// IMessageEditWidget
 	virtual QTextEdit *textEdit() const;
 	virtual QTextDocument *document() const;
-	virtual void sendMessage();
-	virtual void clearEditor();
-	virtual bool autoResize() const;
-	virtual void setAutoResize(bool AResize);
-	virtual int minimumLines() const;
-	virtual void setMinimumLines(int ALines);
-	virtual QString sendShortcut() const;
-	virtual void setSendShortcut(const QString &AShortcutId);
+	virtual bool sendMessage();
+	virtual bool isSendEnabled() const;
+	virtual void setSendEnabled(bool AEnabled);
+	virtual bool isEditEnabled() const;
+	virtual void setEditEnabled(bool AEnabled);
+	virtual bool isAutoResize() const;
+	virtual void setAutoResize(bool AAuto);
+	virtual int minimumHeightLines() const;
+	virtual void setMinimumHeightLines(int ALines);
 	virtual bool isRichTextEnabled() const;
 	virtual void setRichTextEnabled(bool AEnabled);
 	virtual bool isEditToolBarVisible() const;
 	virtual void setEditToolBarVisible(bool AVisible);
 	virtual ToolBarChanger *editToolBarChanger() const;
+	virtual QString sendShortcutId() const;
+	virtual void setSendShortcutId(const QString &AShortcutId);
 	virtual void contextMenuForEdit(const QPoint &APosition, Menu *AMenu);
 	virtual void insertTextFragment(const QTextDocumentFragment &AFragment);
-	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment) const;
+	virtual QTextDocumentFragment prepareTextFragment(const QTextDocumentFragment &AFragment);
 signals:
 	// IMessageEditWidget
-	void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
-	void messageAboutToBeSend();
-	void messageReady();
-	void editorCleared();
+	void messageSent();
+	void sendEnableChanged(bool AEnabled);
+	void editEnableChanged(bool AEnabled);
 	void autoResizeChanged(bool AResize);
-	void minimumLinesChanged(int ALines);
-	void sendShortcutChanged(const QString &AShortcutId);
+	void minimumHeightLinesChanged(int ALines);
 	void richTextEnableChanged(bool AEnabled);
+	void sendShortcutIdChanged(const QString &AShortcutId);
+	void keyEventReceived(QKeyEvent *AKeyEvent, bool &AHook);
 	void contextMenuRequested(const QPoint &APosition, Menu *AMenu);
-	// EditWidget
-	void createDataRequest(QMimeData *ADestination) const;
-	void canInsertDataRequest(const QMimeData *AData, bool &ACanInsert) const;
-	void insertDataRequest(const QMimeData *AData, QTextDocument *ADocument) const;
-	void contentsChanged(int APosition, int ARemoved, int AAdded) const;
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected:
@@ -85,6 +83,9 @@ private:
 	IMessageWidgets *FMessageWidgets;
 private:
 	int FBufferPos;
+	bool FSendEnabled;
+	bool FEditEnabled;
+	Action *FSendAction;
 	IMessageWindow *FWindow;
 	QList<QString> FBuffer;
 	QString FSendShortcutId;

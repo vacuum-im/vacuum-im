@@ -96,7 +96,6 @@ protected:
 	IRecentItem &findRealItem(const IRecentItem &AItem);
 	IRecentItem findRealItem(const IRecentItem &AItem) const;
 	void mergeRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems, bool AReplace);
-	QList<IRosterIndex *> sortItemProxies(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
 protected:
 	void startSaveItemsToStorage(const Jid &AStreamJid);

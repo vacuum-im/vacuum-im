@@ -92,7 +92,7 @@ bool FileMessageArchive::initObjects()
 
 bool FileMessageArchive::initSettings()
 {
-	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString(""));
+	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString());
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES,5);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_SIZE,20*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXSIZE,30*1024);
@@ -124,9 +124,11 @@ IOptionsWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
 
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
-	if (AStreamJid.isValid() && !FArchiver->isReady(AStreamJid))
+	if (FArchiver->isReady(AStreamJid))
+		return DirectArchiving|ManualArchiving|ArchiveManagement|Replication|TextSearch;
+	else if (AStreamJid.isValid())
 		return ArchiveManagement|Replication|TextSearch;
-	return DirectArchiving|ManualArchiving|ArchiveManagement|Replication|TextSearch;
+	return 0;
 }
 
 bool FileMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability) const
@@ -137,27 +139,31 @@ bool FileMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability) c
 int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJid) const
 {
 	Q_UNUSED(AStreamJid);
-	switch (ACapability)
+	if (isCapable(AStreamJid,ACapability))
 	{
-	case DirectArchiving:
-		return ACO_DIRECT_FILEARCHIVE;
-	case ManualArchiving:
-		return ACO_MANUAL_FILEARCHIVE;
-	case ArchiveManagement:
-		return ACO_MANAGE_FILEARCHIVE;
-	case Replication:
-		return ACO_REPLICATION_FILEARCHIVE;
-	case TextSearch:
-		return ACO_SEARCH_FILEARCHIVE;
-	default:
-		return -1;
+		switch (ACapability)
+		{
+		case DirectArchiving:
+			return ACO_DIRECT_FILEARCHIVE;
+		case ManualArchiving:
+			return ACO_MANUAL_FILEARCHIVE;
+		case ArchiveManagement:
+			return ACO_MANAGE_FILEARCHIVE;
+		case Replication:
+			return ACO_REPLICATION_FILEARCHIVE;
+		case TextSearch:
+			return ACO_SEARCH_FILEARCHIVE;
+		default:
+			break;
+		}
 	}
+	return -1;
 }
 
 bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
 	bool written = false;
-	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
+	if (isCapable(AStreamJid,DirectArchiving))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
@@ -185,7 +191,7 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
 	bool written = false;
-	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
+	if (isCapable(AStreamJid,DirectArchiving))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
@@ -211,7 +217,7 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 
 QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
-	if (isCapable(AStreamJid,ManualArchiving) && AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	if (isCapable(AStreamJid,ManualArchiving) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
 		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
@@ -224,7 +230,7 @@ QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchive
 
 QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
+	if (isCapable(AStreamJid,ArchiveManagement))
 	{
 		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
@@ -237,7 +243,7 @@ QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveReq
 
 QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
 {
-	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
+	if (isCapable(AStreamJid,ArchiveManagement))
 	{
 		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
@@ -250,7 +256,7 @@ QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchive
 
 QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
+	if (isCapable(AStreamJid,ArchiveManagement))
 	{
 		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
@@ -263,7 +269,7 @@ QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArch
 
 QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount)
 {
-	if (AStreamJid.isValid() && isCapable(AStreamJid,Replication))
+	if (isCapable(AStreamJid,Replication))
 	{
 		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
 		wthread->setStreamJid(AStreamJid);
@@ -634,10 +640,15 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	if (QFile::exists(fileName))
 	{
 		IArchiveHeader header = loadHeaderFromFile(fileName);
-		QString file = collectionFilePath(AStreamJid,AWith,AStart);
 		FThreadLock.lockForWrite();
-		delete findCollectionWriter(AStreamJid,header);
-		if (QFile::remove(file))
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,header);
+		if (writer)
+		{
+			FThreadLock.unlock();
+			removeCollectionWriter(writer);
+			FThreadLock.lockForWrite();
+		}
+		if (QFile::remove(fileName))
 		{
 			FThreadLock.unlock();
 			saveFileModification(AStreamJid,header,LOG_ACTION_REMOVE);
@@ -834,6 +845,31 @@ CollectionWriter *FileMessageArchive::newCollectionWriter(const Jid &AStreamJid,
 	return NULL;
 }
 
+void FileMessageArchive::removeCollectionWriter(CollectionWriter *AWriter)
+{
+	FThreadLock.lockForWrite();
+	if (FWritingFiles.contains(AWriter->fileName()))
+	{
+		AWriter->closeAndDeleteLater();
+		FWritingFiles.remove(AWriter->fileName());
+		FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
+		if (AWriter->recordsCount() > 0)
+		{
+			FThreadLock.unlock();
+			saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
+			emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
+		}
+		else
+		{
+			FThreadLock.unlock();
+		}
+	}
+	else
+	{
+		FThreadLock.unlock();
+	}
+}
+
 void FileMessageArchive::onWorkingThreadFinished()
 {
 	WorkingThread *wthread = qobject_cast<WorkingThread *>(sender());
@@ -882,13 +918,7 @@ void FileMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 
 void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 {
-	FWritingFiles.remove(AWriter->fileName());
-	FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
-	if (AWriter->recordsCount() > 0)
-	{
-		saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
-		emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
-	}
+	removeCollectionWriter(AWriter);
 }
 
 void FileMessageArchive::onOptionsOpened()

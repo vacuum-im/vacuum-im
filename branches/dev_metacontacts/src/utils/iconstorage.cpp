@@ -87,7 +87,7 @@ IconStorage *IconStorage::staticStorage(const QString &AStorage)
 	IconStorage *iconStorage = FStaticStorages.value(AStorage,NULL);
 	if (!iconStorage)
 	{
-		iconStorage = new IconStorage(AStorage,STORAGE_SHARED_DIR,qApp);
+		iconStorage = new IconStorage(AStorage,FILE_STORAGE_SHARED_DIR,qApp);
 		FStaticStorages.insert(AStorage,iconStorage);
 	}
 	return iconStorage;
@@ -147,7 +147,7 @@ void IconStorage::initAnimation(QObject *AObject, IconUpdateParams *AParams)
 		QString file = fileFullName(AParams->key,AParams->index);
 		if (iconCount > 1)
 		{
-			int interval = AParams->animate > 0 ? AParams->animate : fileOption(AParams->key,OPTION_ANIMATE).toInt();
+			int interval = AParams->animate > 0 ? AParams->animate : fileProperty(AParams->key,ICON_STORAGE_ANIMATE_INTERVAL).toInt();
 			if (interval > 0)
 			{
 				AParams->animation = new IconAnimateParams;

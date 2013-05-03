@@ -209,6 +209,10 @@ bool ChatMessageHandler::initObjects()
 	{
 		FOptionsManager->insertOptionsHolder(this);
 	}
+	if (FMessageWidgets)
+	{
+		FMessageWidgets->insertEditSendHandler(MESHO_CHATMESSAGEHANDLER,this);
+	}
 	return true;
 }
 
@@ -218,49 +222,24 @@ bool ChatMessageHandler::initSettings()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> ChatMessageHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+bool ChatMessageHandler::messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MESSAGES)
-	{
-		widgets.insertMulti(OWO_MESSAGES_LOADHISTORY,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_LOAD_HISTORY),tr("Load messages from history in new chat windows"),AParent));
-	}
-	return widgets;
+	Q_UNUSED(AOrder); Q_UNUSED(AWidget);
+	return false;
 }
 
-bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+bool ChatMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget)
 {
-	if (AAction == "message")
+	if (AOrder == MESHO_CHATMESSAGEHANDLER)
 	{
-		QString type = AParams.value("type");
-		if (type == "chat")
+		IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(AWidget->messageWindow()->instance());
+		if (FMessageProcessor && FWindows.contains(window))
 		{
-			IMessageChatWindow *window = getWindow(AStreamJid, AContactJid);
-			if (window)
-			{
-				window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
-				window->showTabPage();
-				return true;
-			}
+			Message message;
+			message.setTo(window->contactJid().full()).setType(Message::Chat);
+			FMessageProcessor->textToMessage(message,AWidget->document());
+			return !message.body().isEmpty() && FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::MessageOut);
 		}
-	}
-	return false;
-}
-
-bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
-{
-	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
-		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
-	return false;
-}
-
-bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
-{
-	if (AOrder==RCHO_CHATMESSAGEHANDLER && AEvent->modifiers()==Qt::NoModifier && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_MY_RESOURCE))
-	{
-		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
-		return messageShowWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat,IMessageHandler::SM_SHOW);
 	}
 	return false;
 }
@@ -390,6 +369,53 @@ bool ChatMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, co
 	return false;
 }
 
+QMultiMap<int, IOptionsWidget *> ChatMessageHandler::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	{
+		widgets.insertMulti(OWO_MESSAGES_LOADHISTORY,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_LOAD_HISTORY),tr("Load messages from history in new chat windows"),AParent));
+	}
+	return widgets;
+}
+
+bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
+	return false;
+}
+
+bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
+{
+	if (AOrder==RCHO_CHATMESSAGEHANDLER && AEvent->modifiers()==Qt::NoModifier && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_MY_RESOURCE))
+	{
+		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+		return messageShowWindow(MHO_CHATMESSAGEHANDLER,streamJid,contactJid,Message::Chat,IMessageHandler::SM_SHOW);
+	}
+	return false;
+}
+
+bool ChatMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
+{
+	if (AAction == "message")
+	{
+		QString type = AParams.value("type");
+		if (type == "chat")
+		{
+			IMessageChatWindow *window = getWindow(AStreamJid, AContactJid);
+			if (window)
+			{
+				window->editWidget()->textEdit()->setPlainText(AParams.value("body"));
+				window->showTabPage();
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const Jid &AContactJid)
 {
 	IMessageChatWindow *window = NULL;
@@ -406,7 +432,6 @@ IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const J
 				window->infoWidget()->addressMenu()->menuAction()->setToolTip(tr("Contact resource"));
 				window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
-				connect(window->instance(),SIGNAL(messageReady()),SLOT(onWindowMessageReady()));
 				connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
 				connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onWindowClosed()));
 				connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onWindowDestroyed()));
@@ -648,22 +673,6 @@ QMap<Jid, QList<Jid> > ChatMessageHandler::getSortedAddresses(const QMultiMap<Ji
 		addresses[streamJid] = contacts;
 	}
 	return addresses;
-}
-
-void ChatMessageHandler::onWindowMessageReady()
-{
-	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
-	if (FMessageProcessor && window)
-	{
-		Message message;
-		message.setTo(window->contactJid().full()).setType(Message::Chat);
-		FMessageProcessor->textToMessage(message,window->editWidget()->document());
-		if (!message.body().isEmpty())
-		{
-			if (FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::MessageOut))
-				window->editWidget()->clearEditor();
-		}
-	}
 }
 
 void ChatMessageHandler::onWindowActivated()

@@ -93,6 +93,13 @@ MultiUserChatWindow::~MultiUserChatWindow()
 	if (FMessageProcessor)
 		FMessageProcessor->removeMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
 
+	if (FMessageWidgets)
+	{
+		FMessageWidgets->removeEditSendHandler(MESHO_MULTIUSERCHATWINDOW_COMMANDS,this);
+		FMessageWidgets->removeEditSendHandler(MESHO_MULTIUSERCHATWINDOW_GROUPCHAT,this);
+		FMessageWidgets->removeEditSendHandler(MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT,this);
+	}
+
 	saveWindowState();
 	emit tabPageDestroyed();
 }
@@ -225,6 +232,51 @@ void MultiUserChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 		FTabPageNotifier = ANotifier;
 		emit tabPageNotifierChanged();
 	}
+}
+
+bool MultiUserChatWindow::messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AWidget);
+	return false;
+}
+
+bool MultiUserChatWindow::messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget)
+{
+	if (AOrder == MESHO_MULTIUSERCHATWINDOW_COMMANDS)
+	{
+		if (AWidget->messageWindow() == this)
+			return execShortcutCommand(AWidget->textEdit()->toPlainText());
+	}
+	else if (AOrder == MESHO_MULTIUSERCHATWINDOW_GROUPCHAT)
+	{
+		if (AWidget->messageWindow()==this && FMultiChat->isOpen())
+		{
+			Message message;
+
+			if (FMessageProcessor)
+				FMessageProcessor->textToMessage(message,AWidget->document());
+			else
+				message.setBody(AWidget->document()->toPlainText());
+			
+			return !message.body().isEmpty() && FMultiChat->sendMessage(message);
+		}
+	}
+	else if (AOrder == MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT)
+	{
+		IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(AWidget->messageWindow()->instance());
+		if (FChatWindows.contains(window) && FMultiChat->isOpen() && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
+		{
+			Message message;
+
+			if (FMessageProcessor)
+				FMessageProcessor->textToMessage(message,AWidget->document());
+			else
+				message.setBody(AWidget->document()->toPlainText());
+
+			return !message.body().isEmpty() && FMultiChat->sendMessage(message,window->contactJid().resource());
+		}
+	}
+	return false;
 }
 
 bool MultiUserChatWindow::messageCheck(int AOrder, const Message &AMessage, int ADirection)
@@ -724,7 +776,15 @@ void MultiUserChatWindow::initialize()
 
 	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageWidgets").value(0,NULL);
 	if (plugin)
+	{
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+		if (FMessageWidgets)
+		{
+			FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_COMMANDS,this);
+			FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_GROUPCHAT,this);
+			FMessageWidgets->insertEditSendHandler(MESHO_MULTIUSERCHATWINDOW_PRIVATECHAT,this);
+		}
+	}
 
 	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
@@ -816,10 +876,8 @@ void MultiUserChatWindow::createMessageWidgets()
 		ui.wdtEdit->setLayout(new QVBoxLayout);
 		ui.wdtEdit->layout()->setMargin(0);
 		FEditWidget = FMessageWidgets->newEditWidget(this,ui.wdtEdit);
-		FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE);
+		FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_MUC_SENDMESSAGE);
 		ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
-		connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMultiChatMessageReady()));
-		connect(FEditWidget->instance(),SIGNAL(messageAboutToBeSend()),SLOT(onMultiChatMessageAboutToBeSend()));
 		connect(FEditWidget->instance(),SIGNAL(keyEventReceived(QKeyEvent *,bool &)),SLOT(onMultiChatEditWidgetKeyEvent(QKeyEvent *,bool &)));
 
 		ui.wdtToolBar->setLayout(new QVBoxLayout);
@@ -1190,8 +1248,18 @@ void MultiUserChatWindow::showDateSeparator(IMessageViewWidget *AView, const QDa
 
 bool MultiUserChatWindow::isMentionMessage(const Message &AMessage) const
 {
-	QRegExp mention(QString("\\b%1\\b").arg(QRegExp::escape(FMultiChat->nickName())));
-	return AMessage.body().indexOf(mention)>=0;
+	QString message = AMessage.body();
+	QString nick = FMultiChat->nickName();
+
+	// QString::indexOf will not work if nick ends with '+'
+	if (!nick.isEmpty() && !nick.at(nick.size()-1).isLetterOrNumber())
+	{
+		message.replace(nick,nick+'z');
+		nick += 'z';
+	}
+
+	QRegExp mention(QString("\\b%1\\b").arg(QRegExp::escape(nick)));
+	return message.indexOf(mention)>=0;
 }
 
 void MultiUserChatWindow::setMultiChatMessageStyle()
@@ -1428,7 +1496,6 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 			{
 				window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
-				connect(window->instance(),SIGNAL(messageReady()),SLOT(onPrivateChatMessageReady()));
 				connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onPrivateChatWindowActivated()));
 				connect(window->instance(),SIGNAL(tabPageClosed()),SLOT(onPrivateChatWindowClosed()));
 				connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onPrivateChatWindowDestroyed()));
@@ -1984,7 +2051,9 @@ void MultiUserChatWindow::onConfigFormReceived(const IDataForm &AForm)
 {
 	if (FDataForms)
 	{
-		IDataDialogWidget *dialog = FDataForms->dialogWidget(FDataForms->localizeForm(AForm),this);
+		IDataForm localizedForm(FDataForms->localizeForm(AForm));
+		localizedForm.title = QString("%1 (%2)").arg(localizedForm.title, FMultiChat->roomJid().uBare());
+		IDataDialogWidget *dialog = FDataForms->dialogWidget(localizedForm,this);
 		connect(dialog->instance(),SIGNAL(accepted()),SLOT(onConfigFormDialogAccepted()));
 		connect(FMultiChat->instance(),SIGNAL(chatClosed()),dialog->instance(),SLOT(reject()));
 		connect(FMultiChat->instance(),SIGNAL(configFormReceived(const IDataForm &)),dialog->instance(),SLOT(reject()));
@@ -1995,28 +2064,6 @@ void MultiUserChatWindow::onConfigFormReceived(const IDataForm &AForm)
 void MultiUserChatWindow::onRoomDestroyed(const QString &AReason)
 {
 	showMultiChatStatusMessage(tr("This room was destroyed by owner. %1").arg(AReason),IMessageContentOptions::TypeEvent);
-}
-
-void MultiUserChatWindow::onMultiChatMessageReady()
-{
-	if (FMultiChat->isOpen())
-	{
-		Message message;
-
-		if (FMessageProcessor)
-			FMessageProcessor->textToMessage(message,FEditWidget->document());
-		else
-			message.setBody(FEditWidget->document()->toPlainText());
-
-		if (!message.body().isEmpty() && FMultiChat->sendMessage(message))
-			FEditWidget->clearEditor();
-	}
-}
-
-void MultiUserChatWindow::onMultiChatMessageAboutToBeSend()
-{
-	if (execShortcutCommand(FEditWidget->textEdit()->toPlainText()))
-		FEditWidget->clearEditor();
 }
 
 void MultiUserChatWindow::onMultiChatNotifierActiveNotifyChanged(int ANotifyId)
@@ -2105,24 +2152,6 @@ void MultiUserChatWindow::onMultiChatUserItemDoubleClicked(const QModelIndex &AI
 void MultiUserChatWindow::onMultiChatWindowActivated()
 {
 	removeMultiChatActiveMessages();
-}
-
-void MultiUserChatWindow::onPrivateChatMessageReady()
-{
-	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
-	if (window && FMultiChat->isOpen() && FMultiChat->userByNick(window->contactJid().resource())!=NULL)
-	{
-		Message message;
-		message.setType(Message::Chat).setTo(window->contactJid().full());
-
-		if (FMessageProcessor)
-			FMessageProcessor->textToMessage(message,window->editWidget()->document());
-		else
-			message.setBody(window->editWidget()->document()->toPlainText());
-
-		if (!message.body().isEmpty() && FMultiChat->sendMessage(message,window->contactJid().resource()))
-			window->editWidget()->clearEditor();
-	}
 }
 
 void MultiUserChatWindow::onPrivateChatWindowActivated()

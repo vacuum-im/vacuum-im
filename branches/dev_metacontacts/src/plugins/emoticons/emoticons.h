@@ -3,15 +3,15 @@
 
 #include <QHash>
 #include <QStringList>
+#include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
-#include <definitions/messagewriterorders.h>
-#include <definitions/editcontentshandlerorders.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/menuicons.h>
+#include <definitions/messagewriterorders.h>
+#include <definitions/messageeditcontentshandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iemoticons.h>
 #include <interfaces/imessageprocessor.h>
@@ -55,10 +55,10 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageEditContentsHandler
-	virtual bool editContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData);
-	virtual bool editContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData);
-	virtual bool editContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
-	virtual bool editContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
+	virtual bool messageEditContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData);
+	virtual bool messageEditContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData);
+	virtual bool messageEditContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
+	virtual bool messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IEmoticons
 	virtual QList<QString> activeIconsets() const;
 	virtual QUrl urlByKey(const QString &AKey) const;

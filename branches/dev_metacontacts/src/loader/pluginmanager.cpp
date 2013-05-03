@@ -11,8 +11,8 @@
 #include <QSettings>
 #include <QLibraryInfo>
 
-#define DELAYED_QUIT_TIMEOUT        5000
-#define DELAYED_COMMIT_TIMEOUT      2000
+#define START_SHUTDOWN_TIMEOUT      100
+#define DELAYED_SHUTDOWN_TIMEOUT    5000
 
 #define ORGANIZATION_NAME           "JRuDevels"
 #define APPLICATION_NAME            "VacuumIM"
@@ -56,6 +56,9 @@
 
 PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 {
+	FQuitReady = false;
+	FQuitStarted = false;
+	FCloseStarted = false;
 	FShutdownKind = SK_WORK;
 	FShutdownDelayCount = 0;
 
@@ -184,38 +187,33 @@ QList<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
 
 void PluginManager::quit()
 {
-	if (FShutdownKind == SK_WORK)
+	if (!isShutingDown())
 	{
 		FShutdownKind = SK_QUIT;
-		startShutdown();
+		startClose();
 	}
 }
 
 void PluginManager::restart()
 {
-	if (FShutdownKind == SK_WORK)
+	if (!isShutingDown())
 	{
 		FShutdownKind = SK_RESTART;
-		startShutdown();
+		startClose();
 	}
 }
 
 void PluginManager::delayShutdown()
 {
-	if (FShutdownKind != SK_WORK)
-	{
-		FShutdownDelayCount++;
-	}
+	if (isShutingDown())
+		FShutdownTimer.start(DELAYED_SHUTDOWN_TIMEOUT);
+	FShutdownDelayCount++;
 }
 
 void PluginManager::continueShutdown()
 {
-	if (FShutdownKind != SK_WORK)
-	{
-		FShutdownDelayCount--;
-		if (FShutdownDelayCount <= 0)
-			FShutdownTimer.start(0);
-	}
+	if (--FShutdownDelayCount<=0 && isShutingDown())
+		FShutdownTimer.start(START_SHUTDOWN_TIMEOUT);
 }
 
 void PluginManager::loadSettings()
@@ -447,48 +445,93 @@ void PluginManager::startPlugins()
 		pluginItem.plugin->startPlugin();
 }
 
-void PluginManager::startShutdown()
+void PluginManager::unloadPlugins()
 {
-	FShutdownTimer.start(DELAYED_QUIT_TIMEOUT);
-	delayShutdown();
-	emit shutdownStarted();
-	closeTopLevelWidgets();
-	continueShutdown();
+	foreach(const QUuid &uid, FPluginItems.keys())
+		unloadPlugin(uid);
+
+	QCoreApplication::removeTranslator(FQtTranslator);
+	QCoreApplication::removeTranslator(FUtilsTranslator);
+	QCoreApplication::removeTranslator(FLoaderTranslator);
 }
 
-void PluginManager::finishShutdown()
+void PluginManager::startClose()
+{
+	if (!FCloseStarted)
+	{
+		FCloseStarted = true;
+		delayShutdown();
+		emit shutdownStarted();
+		closeTopLevelWidgets();
+		continueShutdown();
+	}
+}
+
+void PluginManager::finishClose()
 {
 	FShutdownTimer.stop();
-	if (FShutdownKind == SK_RESTART)
+	if (FCloseStarted)
 	{
-		onApplicationAboutToQuit();
-		FShutdownKind = SK_WORK;
-		FShutdownDelayCount = 0;
+		FCloseStarted = false;
+		startQuit();
+	}
+}
 
-		loadSettings();
-		loadPlugins();
-		if (initPlugins())
+void PluginManager::startQuit()
+{
+	if (!FQuitStarted)
+	{
+		FQuitStarted = true;
+		delayShutdown();
+		emit aboutToQuit();
+		continueShutdown();
+	}
+}
+
+void PluginManager::finishQuit()
+{
+	FShutdownTimer.stop();
+	if (FQuitStarted)
+	{
+		FQuitStarted = false;
+		unloadPlugins();
+		
+		if (FShutdownKind == SK_RESTART)
 		{
-			saveSettings();
-			createMenuActions();
-			declareShortcuts();
-			startPlugins();
-			FBlockedPlugins.clear();
+			FShutdownKind = SK_WORK;
+			FShutdownDelayCount = 0;
+
+			loadSettings();
+			loadPlugins();
+			if (initPlugins())
+			{
+				saveSettings();
+				createMenuActions();
+				declareShortcuts();
+				startPlugins();
+				FBlockedPlugins.clear();
+			}
+			else
+			{
+				QTimer::singleShot(0,this,SLOT(restart()));
+			}
 		}
-		else
+		else if (FShutdownKind == SK_QUIT)
 		{
-			QTimer::singleShot(0,this,SLOT(restart()));
+			FQuitReady = true;
+			QTimer::singleShot(0,qApp,SLOT(quit()));
 		}
 	}
-	else if (FShutdownKind == SK_QUIT)
-	{
-		QTimer::singleShot(0,qApp,SLOT(quit()));
-	}
-
 }
 
 void PluginManager::closeTopLevelWidgets()
 {
+	if (!FPluginsDialog.isNull())
+		FPluginsDialog->reject();
+
+	if (!FAboutDialog.isNull())
+		FAboutDialog->reject();
+
 	foreach(QWidget *widget, QApplication::topLevelWidgets())
 		widget->close();
 }
@@ -740,31 +783,26 @@ void PluginManager::declareShortcuts()
 
 void PluginManager::onApplicationAboutToQuit()
 {
-	emit aboutToQuit();
-
-	if (!FPluginsDialog.isNull())
-		FPluginsDialog->reject();
-
-	if (!FAboutDialog.isNull())
-		FAboutDialog->reject();
-
-	foreach(QUuid uid, FPluginItems.keys())
-		unloadPlugin(uid);
-
-	QCoreApplication::removeTranslator(FQtTranslator);
-	QCoreApplication::removeTranslator(FUtilsTranslator);
-	QCoreApplication::removeTranslator(FLoaderTranslator);
+	if (!FQuitReady)
+	{
+		FShutdownKind = SK_QUIT;
+		startClose();
+	
+		QDateTime closeTimeout = QDateTime::currentDateTime().addMSecs(DELAYED_SHUTDOWN_TIMEOUT);
+		while (closeTimeout>QDateTime::currentDateTime() && FShutdownDelayCount>0)
+			QApplication::processEvents();
+		finishClose();
+		
+		QDateTime quitTimeout = QDateTime::currentDateTime().addMSecs(DELAYED_SHUTDOWN_TIMEOUT);
+		while (quitTimeout>QDateTime::currentDateTime() && FShutdownDelayCount>0)
+			QApplication::processEvents();
+		finishQuit();
+	}
 }
 
 void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
 {
 	Q_UNUSED(AManager);
-	FShutdownKind = SK_QUIT;
-	startShutdown();
-	QDateTime stopTime = QDateTime::currentDateTime().addMSecs(DELAYED_COMMIT_TIMEOUT);
-	while (stopTime>QDateTime::currentDateTime() && FShutdownDelayCount>0)
-		QApplication::processEvents();
-	finishShutdown();
 	qApp->quit();
 }
 
@@ -792,5 +830,8 @@ void PluginManager::onShowAboutBoxDialog()
 
 void PluginManager::onShutdownTimerTimeout()
 {
-	finishShutdown();
+	if (FCloseStarted)
+		finishClose();
+	else if (FQuitStarted)
+		finishQuit();
 }

@@ -21,7 +21,7 @@
 #define SCROLL_TIMEOUT                      100
 #define EVALUTE_TIMEOUT                     10
 
-#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
+#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
 
@@ -47,11 +47,20 @@ static const char *SenderColors[] =  {
 	"purple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "seagreen", "sienna", "slateblue",
 	"steelblue", "teal", "tomato", "violet"
 };
-
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
+
+QString AdiumMessageStyle::FSharedPath = QString::null;
 
 AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
 {
+	if (FSharedPath.isEmpty())
+	{
+		if (QDir::isRelativePath(SHARED_STYLE_PATH))
+			FSharedPath = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH;
+		else
+			FSharedPath = SHARED_STYLE_PATH;
+	}
+
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
 	FResourcePath = AStylePath+"/"STYLE_RESOURCES_PATH;
@@ -340,7 +349,7 @@ QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOption
 	if (!QFile::exists(htmlFileName))
 	{
 		FUsingCustomTemplate = false;
-		htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
+		htmlFileName = FSharedPath+"/Template.html";
 	}
 
 	QString html = loadFileData(htmlFileName,QString::null);

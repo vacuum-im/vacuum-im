@@ -249,13 +249,13 @@
             <numerusform>Selected %n contact(s)</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Subject</source>
+        <translation type="unfinished">Subject</translation>
+    </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
-    <message>
-        <source>Subject</source>
-        <translation>Subject</translation>
-    </message>
     <message>
         <source>Fast choice</source>
         <translation>Fast choice</translation>
@@ -338,6 +338,18 @@
     <message>
         <source>Load Last Selection</source>
         <translation>Load Last Selection</translation>
+    </message>
+    <message>
+        <source>Expand All Groups</source>
+        <translation>Expand All Groups</translation>
+    </message>
+    <message>
+        <source>Collapse All Groups</source>
+        <translation>Collapse All Groups</translation>
+    </message>
+    <message>
+        <source>Hide Offline Contacts</source>
+        <translation>Hide Offline Contacts</translation>
     </message>
 </context>
 <context>

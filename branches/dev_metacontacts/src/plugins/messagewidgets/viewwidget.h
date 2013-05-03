@@ -47,9 +47,9 @@ protected:
 	void dragMoveEvent(QDragMoveEvent *AEvent);
 	void dragLeaveEvent(QDragLeaveEvent *AEvent);
 protected slots:
-	void onContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 	void onUrlClicked(QWidget *AWidget, const QUrl &AUrl);
 	void onCustomContextMenuRequested(const QPoint &APosition);
+	void onContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 private:
 	Ui::ViewWidgetClass ui;
 private:

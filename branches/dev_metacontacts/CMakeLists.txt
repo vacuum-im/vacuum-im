@@ -81,10 +81,10 @@ if (WIN32)
 		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/QtXmlPatterns4.dll")
 	endif (NOT WEBKIT_WITHOUT_XMLPATTERNS)
 	install(FILES ${QT_LIBS}
-		DESTINATION "."
+		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs)
 	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats"
-		DESTINATION "."
+		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs
 		FILES_MATCHING
 		PATTERN "*.dll"
@@ -105,17 +105,17 @@ if (WIN32)
 			DEPENDS qt_libs)
 	endforeach(LANG)
 
-	install(FILES "libeay32.dll" "ssleay32.dll"
-		DESTINATION "."
-		COMPONENT openssl_libs)
-	cpack_add_component(openssl_libs
-		DISPLAY_NAME "OpenSSL libraries"
-		DESCRIPTION "May be unchecked if you already have OpenSSL installed"
-		GROUP libs)
+#	install(FILES "libeay32.dll" "ssleay32.dll"
+#		DESTINATION "${INSTALL_LIBS}"
+#		COMPONENT openssl_libs)
+#	cpack_add_component(openssl_libs
+#		DISPLAY_NAME "OpenSSL libraries"
+#		DESCRIPTION "May be unchecked if you already have OpenSSL installed"
+#		GROUP libs)
 
 	if (MINGW)
 		install(FILES "mingwm10.dll" "libgcc_s_dw2-1.dll"
-			DESTINATION "."
+			DESTINATION "${INSTALL_LIBS}"
 			COMPONENT mingw_runtime)
 		cpack_add_component(mingw_runtime
 			DISPLAY_NAME "MinGW runtime libraries"
@@ -126,7 +126,7 @@ if (WIN32)
 		file(GLOB MSVC_DLLS "msvc*.dll")
 		file(GLOB MANIFEST "Microsoft.VC*.CRT.manifest")
 		install(FILES ${MSVC_DLLS} ${MANIFEST}
-			DESTINATION "."
+			DESTINATION "${INSTALL_LIBS}"
 			COMPONENT msvc_runtime)
 		cpack_add_component(msvc_runtime
 			DISPLAY_NAME "MSVC runtime libraries"

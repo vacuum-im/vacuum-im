@@ -8,7 +8,7 @@ ConsolePlugin::ConsolePlugin()
 
 ConsolePlugin::~ConsolePlugin()
 {
-
+	FCleanupHandler.clear();
 }
 
 void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)

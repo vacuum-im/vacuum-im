@@ -85,7 +85,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Next</source>
+        <source>Show Next (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send as Chat Message</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

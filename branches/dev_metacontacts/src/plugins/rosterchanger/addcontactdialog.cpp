@@ -216,7 +216,7 @@ void AddContactDialog::onVCardReceived(const Jid &AContactJid)
 {
 	if (FResolving && (AContactJid && contactJid()))
 	{
-		IVCard *vcard = FVcardPlugin->vcard(AContactJid.bare());
+		IVCard *vcard = FVcardPlugin->getVCard(AContactJid.bare());
 		if (vcard)
 		{
 			setNickName(vcard->value(VVN_NICKNAME));

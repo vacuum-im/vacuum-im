@@ -5,9 +5,6 @@
 #include <QIntValidator>
 #include <QDoubleValidator>
 
-// фактор растяжения для текста выводимого рядом с элементом настроек
-#define CAPTION_STRATCH 3
-
 OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) : QWidget(AParent)
 {
 	FNode = ANode;
@@ -29,10 +26,9 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
 			FDateTimeEdit = new QDateEdit(FValue.toDate(), this);
 		else
 			FDateTimeEdit = new QDateTimeEdit(FValue.toDateTime(),this);
-		FDateTimeEdit->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+		FDateTimeEdit->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
 		connect(FDateTimeEdit,SIGNAL(dateTimeChanged(const QDateTime &)),SIGNAL(modified()));
-		insertCaption(ACaption,FDateTimeEdit,FLayout);
-		FLayout->addWidget(FDateTimeEdit);
+		insertWithCaption(ACaption,FDateTimeEdit,FLayout);
 	}
 	else if (FValue.type() == QVariant::Color)
 	{
@@ -43,10 +39,9 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
 			FComboBox->setItemData(FComboBox->count()-1,QColor(color),Qt::DecorationRole);
 		}
 		FComboBox->setCurrentIndex(FComboBox->findData(FValue));
-		FComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+		FComboBox->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
 		connect(FComboBox,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
-		insertCaption(ACaption,FComboBox,FLayout);
-		FLayout->addWidget(FComboBox);
+		insertWithCaption(ACaption,FComboBox,FLayout);
 	}
 	else if (FValue.type() == QVariant::Font)
 	{
@@ -54,13 +49,11 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
 		FFontComboBox->setCurrentFont(FValue.value<QFont>());
 		FFontComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
 		connect(FFontComboBox,SIGNAL(currentFontChanged(const QFont &)),SIGNAL(modified()));
-		insertCaption(ACaption,FFontComboBox,FLayout);
-		FLayout->addWidget(FFontComboBox);
+		insertWithCaption(ACaption,FFontComboBox,FLayout);
 	}
 	else if (FValue.canConvert(QVariant::String))
 	{
 		FLineEdit = new QLineEdit(this);
-		FLineEdit->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
 		if (FValue.type()==QVariant::Int || FValue.type()==QVariant::LongLong)
 		{
 			QIntValidator *validator = new QIntValidator(FLineEdit);
@@ -82,9 +75,9 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
 			FLineEdit->installEventFilter(this);
 		}
 		FLineEdit->setText(FValue.toString());
+		FLineEdit->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
 		connect(FLineEdit,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
-		insertCaption(ACaption,FLineEdit,FLayout);
-		FLayout->addWidget(FLineEdit);
+		insertWithCaption(ACaption,FLineEdit,FLayout);
 	}
 
 	setLayout(FLayout);
@@ -167,16 +160,17 @@ void OptionsWidget::reset()
 	emit childReset();
 }
 
-void OptionsWidget::insertCaption(const QString &ACaption, QWidget *ABuddy, QHBoxLayout *ALayout)
+void OptionsWidget::insertWithCaption(const QString &ACaption, QWidget *ABuddy, QHBoxLayout *ALayout)
 {
 	if (!ACaption.isEmpty())
 	{
 		FLabel = new QLabel(this);
-		FLabel->setWordWrap(true);
 		FLabel->setTextFormat(Qt::PlainText);
 		FLabel->setText(ACaption);
 		FLabel->setBuddy(ABuddy);
-		ALayout->addWidget(FLabel,CAPTION_STRATCH);
+		ALayout->addWidget(FLabel);
+		ALayout->addWidget(ABuddy);
+		ALayout->addStretch();
 	}
 }
 

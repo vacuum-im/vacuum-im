@@ -16,6 +16,7 @@
 #include <definitions/toolbargroups.h>
 #include <definitions/messagedataroles.h>
 #include <definitions/messagehandlerorders.h>
+#include <definitions/messageeditsendhandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
@@ -49,19 +50,21 @@ enum WindowMenuAction {
 	SendAction,
 	ReplyAction,
 	ForwardAction,
-	ChatAction
+	OpenChatAction,
+	SendChatAction
 };
 
 class NormalMessageHandler :
 	public QObject,
 	public IPlugin,
-	public IMessageHandler,
+	public IOptionsHolder,
 	public IXmppUriHandler,
+	public IMessageHandler,
 	public IRostersClickHooker,
-	public IOptionsHolder
+	public IMessageEditSendHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageHandler IXmppUriHandler IRostersClickHooker IOptionsHolder);
+	Q_INTERFACES(IPlugin IOptionsHolder IXmppUriHandler IMessageHandler IRostersClickHooker IMessageEditSendHandler);
 public:
 	NormalMessageHandler();
 	~NormalMessageHandler();
@@ -73,11 +76,9 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
-	//IXmppUriHandler
-	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
-	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	//IMessageEditSendHandler
+	virtual bool messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget);
+	virtual bool messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget);
 	//IMessageHandler
 	virtual bool messageCheck(int AOrder, const Message &AMessage, int ADirection);
 	virtual bool messageDisplay(const Message &AMessage, int ADirection);
@@ -86,6 +87,11 @@ public:
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	//IRostersClickHooker
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	//IXmppUriHandler
+	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 protected:
 	IMessageNormalWindow *getWindow(const Jid &AStreamJid, const Jid &AContactJid, IMessageNormalWindow::Mode AMode);
 	IMessageNormalWindow *findWindow(const Jid &AStreamJid, const Jid &AContactJid) const;
@@ -94,9 +100,9 @@ protected:
 	void setDefaultWindowMenuAction(IMessageNormalWindow *AWindow, WindowMenuAction AActionId) const;
 	void setWindowMenuActionVisible(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AVisible) const;
 	void setWindowMenuActionEnabled(IMessageNormalWindow *AWindow, WindowMenuAction AActionId, bool AEnabled) const;
+	void updateWindowMenu(IMessageNormalWindow *AWindow) const;
 	void updateWindow(IMessageNormalWindow *AWindow) const;
 protected:
-	bool sendMessage(IMessageNormalWindow *AWindow);
 	bool showNextMessage(IMessageNormalWindow *AWindow);
 	void removeCurrentMessageNotify(IMessageNormalWindow *AWindow);
 	void removeNotifiedMessages(IMessageNormalWindow *AWindow, int AMessageId = -1);
@@ -109,7 +115,6 @@ protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	QMap<int,QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes) const;
 protected slots:
-	void onWindowMessageReady();
 	void onWindowActivated();
 	void onWindowDestroyed();
 	void onWindowAddressChanged();
@@ -124,6 +129,7 @@ protected slots:
 	void onWindowMenuReplyMessage();
 	void onWindowMenuForwardMessage();
 	void onWindowMenuShowChatDialog();
+	void onWindowMenuSendAsChatMessage();
 protected slots:
 	void onStatusIconsChanged();
 	void onAvatarChanged(const Jid &AContactJid);

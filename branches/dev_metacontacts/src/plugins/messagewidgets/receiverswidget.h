@@ -2,6 +2,7 @@
 #define RECEIVERSWIDGET_H
 
 #include <QHash>
+#include <QTimer>
 #include <QSortFilterProxyModel>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterindexroles.h>
@@ -17,6 +18,20 @@
 #include <utils/advanceditemdelegate.h>
 #include <utils/options.h>
 #include "ui_receiverswidget.h"
+
+class ReceiversSortSearchProxyModel : 
+	public QSortFilterProxyModel
+{
+public:
+	ReceiversSortSearchProxyModel(QObject *AParent);
+	bool isOfflineContactsVisible() const;
+	void setOfflineContactsVisible(bool AVisible);
+protected:
+	bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight)  const;
+	bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
+private:
+	bool FOfflineVisible;
+};
 
 class ReceiversWidget :
 	public QWidget,
@@ -38,15 +53,15 @@ public:
 	virtual AdvancedItemModel *receiversModel() const;
 	virtual QModelIndex mapModelToView(QStandardItem *AItem);
 	virtual QStandardItem *mapViewToModel(const QModelIndex &AIndex);
-	virtual void contextMenuForItem(QStandardItem *AItem, Menu *AMenu);
+	virtual void contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu);
 	virtual QMultiMap<Jid, Jid> selectedAddresses() const;
 	virtual void setGroupSelection(const Jid &AStreamJid, const QString &AGroup, bool ASelected);
 	virtual void setAddressSelection(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected);
 	virtual void clearSelection();
 signals:
 	void availStreamsChanged();
-	void contextMenuForItemRequested(QStandardItem *AItem, Menu *AMenu);
-	void addressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected);
+	void addressSelectionChanged();
+	void contextMenuForItemsRequested(QList<QStandardItem *> AItems, Menu *AMenu);
 protected:
 	void initialize();
 	void createStreamItems(const Jid &AStreamJid);
@@ -64,14 +79,22 @@ protected:
 	Jid findAvailStream(const Jid &AStreamJid) const;
 	void selectionLoad(const QString &AFileName);
 	void selectionSave(const QString &AFileName);
-	void selectAllContacts(QStandardItem *AParent);
-	void selectOnlineContacts(QStandardItem *AParent);
-	void selectNotBusyContacts(QStandardItem *AParent);
-	void selectNoneContacts(QStandardItem *AParent);
+	void selectAllContacts(QList<QStandardItem *> AParents);
+	void selectOnlineContacts(QList<QStandardItem *> AParents);
+	void selectNotBusyContacts(QList<QStandardItem *> AParents);
+	void selectNoneContacts(QList<QStandardItem *> AParents);
+	void expandAllChilds(QList<QStandardItem *> AParents);
+	void collapseAllChilds(QList<QStandardItem *> AParents);
+	void restoreExpandState(QList<QStandardItem *> AParents);
 protected slots:
 	void onModelItemInserted(QStandardItem *AItem);
 	void onModelItemRemoving(QStandardItem *AItem);
 	void onModelItemDataChanged(QStandardItem *AItem, int ARole);
+protected slots:
+	void onViewIndexExpanded(const QModelIndex &AIndex);
+	void onViewIndexCollapsed(const QModelIndex &AIndex);
+	void onViewContextMenuRequested(const QPoint &APos);
+	void onViewModelRowsInserted(const QModelIndex &AParent, int AStart, int AEnd);
 protected slots:
 	void onActiveStreamAppended(const Jid &AStreamJid);
 	void onActiveStreamRemoved(const Jid &AStreamJid);
@@ -87,7 +110,9 @@ protected slots:
 	void onSelectOnlineContacts();
 	void onSelectNotBusyContacts();
 	void onSelectNoneContacts();
-	void onReceiversContextMenuRequested(const QPoint &APos);
+	void onExpandAllChilds();
+	void onCollapseAllChilds();
+	void onHideOfflineContacts();
 protected slots:
 	void onDeleteDelayedItems();
 	void onStartSearchContacts();
@@ -105,8 +130,9 @@ private:
 	QList<Jid> FReceivers;
 	IMessageWindow *FWindow;
 	AdvancedItemModel *FModel;
-	QSortFilterProxyModel *FProxyModel;
+	ReceiversSortSearchProxyModel *FProxyModel;
 private:
+	QTimer FSelectionSignalTimer;
 	QList<QStandardItem *> FDeleteDelayed;
 	QMap<Jid, QStandardItem *> FStreamItems;
 	QMap<Jid, QMap<QString, QStandardItem *> > FGroupItems;

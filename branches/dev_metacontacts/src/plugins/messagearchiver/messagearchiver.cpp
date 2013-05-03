@@ -5,6 +5,7 @@
 
 #define ARCHIVE_TIMEOUT       30000
 #define ARCHIVE_DIR_NAME      "archive"
+#define PENDING_FILE_NAME     "pending.xml"
 #define SESSIONS_FILE_NAME    "sessions.xml"
 
 #define SHC_MESSAGE_BODY      "/message/body"
@@ -900,13 +901,27 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 {
 	if (!isArchiveAutoSave(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
 	{
+		QString errMessage;
 		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
 		if (engine)
 		{
 			Message message = AMessage;
 			bool directionIn = AItemJid==message.from() || AStreamJid==message.to();
 			if (prepareMessage(AStreamJid,message,directionIn))
-				return engine->saveMessage(AStreamJid,message,directionIn);
+			{
+				if (!engine->saveMessage(AStreamJid,message,directionIn))
+					errMessage = "Engine failed to save message";
+				else
+					return true;
+			}
+		}
+		else
+		{
+			errMessage = "Engine not found";
+		}
+		if (!errMessage.isEmpty())
+		{
+			notifyInChatWindow(AStreamJid,AItemJid,QString("Message was not saved to history: %1. Please join to conference xmpp:vacuum@conference.jabber.ru?join to notify developers about this bug!").arg(errMessage));
 		}
 	}
 	return false;
@@ -1246,50 +1261,29 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 	}
 }
 
-void MessageArchiver::registerDiscoFeatures()
+QString MessageArchiver::archiveStreamDirPath(const Jid &AStreamJid) const
 {
-	IDiscoFeature dfeature;
+	bool noError = true;
 
-	dfeature.active = false;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
-	dfeature.var = NS_ARCHIVE;
-	dfeature.name = tr("Messages Archiving");
-	dfeature.description = tr("Supports the archiving of the messages");
-	FDiscovery->insertDiscoFeature(dfeature);
-	dfeature.var = NS_ARCHIVE_OLD;
-	FDiscovery->insertDiscoFeature(dfeature);
+	QDir dir(FPluginManager->homePath());
+	if (!dir.exists(ARCHIVE_DIR_NAME))
+		noError &= dir.mkdir(ARCHIVE_DIR_NAME);
+	noError &= dir.cd(ARCHIVE_DIR_NAME);
 
-	dfeature.var = NS_ARCHIVE_AUTO;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
-	dfeature.name = tr("Automatic Messages Archiving");
-	dfeature.description = tr("Supports the automatic archiving of the messages");
-	FDiscovery->insertDiscoFeature(dfeature);
-	dfeature.var = NS_ARCHIVE_OLD_AUTO;
-	FDiscovery->insertDiscoFeature(dfeature);
+	QString streamDir = Jid::encode(AStreamJid.pBare());
+	if (!dir.exists(streamDir))
+		noError &= dir.mkdir(streamDir);
+	noError &= dir.cd(streamDir);
 
-	dfeature.var = NS_ARCHIVE_MANAGE;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
-	dfeature.name = tr("Managing Archived Messages");
-	dfeature.description = tr("Supports the managing of the archived messages");
-	FDiscovery->insertDiscoFeature(dfeature);
-	dfeature.var = NS_ARCHIVE_OLD_MANAGE;
-	FDiscovery->insertDiscoFeature(dfeature);
+	return noError ? dir.path() : QString::null;
+}
 
-	dfeature.var = NS_ARCHIVE_MANUAL;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
-	dfeature.name = tr("Manual Messages Archiving");
-	dfeature.description = tr("Supports the manual archiving of the messages");
-	FDiscovery->insertDiscoFeature(dfeature);
-	dfeature.var = NS_ARCHIVE_OLD_MANUAL;
-	FDiscovery->insertDiscoFeature(dfeature);
-
-	dfeature.var = NS_ARCHIVE_PREF;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
-	dfeature.name = tr("Messages Archive Preferences");
-	dfeature.description = tr("Supports the storing of the archive preferences");
-	FDiscovery->insertDiscoFeature(dfeature);
-	dfeature.var = NS_ARCHIVE_OLD_PREF;
-	FDiscovery->insertDiscoFeature(dfeature);
+QString MessageArchiver::archiveStreamFilePath(const Jid &AStreamJid, const QString &AFileName) const
+{
+	QString dirPath = archiveStreamDirPath(AStreamJid);
+	if (!dirPath.isEmpty() && !AFileName.isEmpty())
+		return dirPath+"/"+AFileName;
+	return QString::null;
 }
 
 QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
@@ -1429,18 +1423,13 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 		{
 			restoreStanzaSessionContext(AStreamJid);
 
-			QList< QPair<Message,bool> > messages = FPendingMessages.take(AStreamJid);
-			for (int i = 0; i<messages.count(); i++)
-			{
-				QPair<Message, bool> message = messages.at(i);
-				processMessage(AStreamJid, message.first, message.second);
-			}
-
 			if (prefsDisabled)
 				setArchiveAutoSave(AStreamJid,prefs.autoSave);
 
 			openHistoryOptionsNode(AStreamJid);
 			emit archivePrefsOpened(AStreamJid);
+
+			processPendingMessages(AStreamJid);
 		}
 		else
 		{
@@ -1456,8 +1445,82 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 	}
 }
 
+void MessageArchiver::loadPendingMessages(const Jid &AStreamJid)
+{
+	QFile file(archiveStreamFilePath(AStreamJid,PENDING_FILE_NAME));
+	if (file.open(QFile::ReadOnly))
+	{
+		QDomDocument doc;
+		if (doc.setContent(file.readAll(),true) && AStreamJid.pBare()==doc.documentElement().attribute("jid"))
+		{
+			QList< QPair<Message,bool> > &messages = FPendingMessages[AStreamJid];
+			QDomElement messageElem = doc.documentElement().firstChildElement("message");
+			while (!messageElem.isNull())
+			{
+				bool directionIn = QVariant(messageElem.attribute("x-archive-direction-in")).toBool();
+				messageElem.removeAttribute("x-archive-direction-in");
+
+				Stanza stanza(messageElem);
+				Message message(stanza);
+
+				if (directionIn)
+					message.setTo(AStreamJid.full());
+				else
+					message.setFrom(AStreamJid.full());
+				messages.append(qMakePair<Message,bool>(message,directionIn));
+
+				messageElem = messageElem.nextSiblingElement("message");
+			}
+		}
+		file.close();
+	}
+}
+
+void MessageArchiver::savePendingMessages(const Jid &AStreamJid)
+{
+	QList< QPair<Message,bool> > messages = FPendingMessages.take(AStreamJid);
+	if (!messages.isEmpty())
+	{
+		QDomDocument doc;
+		doc.appendChild(doc.createElement("pending-messages"));
+		doc.documentElement().setAttribute("version","1.0");
+		doc.documentElement().setAttribute("jid",AStreamJid.pBare());
+
+		for (int i=0; i<messages.count(); i++)
+		{
+			QPair<Message,bool> &message = messages[i];
+			message.first.setDateTime(message.first.dateTime(),true);
+			if (prepareMessage(AStreamJid,message.first,message.second))
+			{
+				QDomElement messageElem = doc.documentElement().appendChild(doc.importNode(message.first.stanza().element(),true)).toElement();
+				messageElem.setAttribute("x-archive-direction-in",QVariant(message.second).toString());
+			}
+		}
+
+		QFile file(archiveStreamFilePath(AStreamJid,PENDING_FILE_NAME));
+		if (file.open(QFile::WriteOnly|QFile::Truncate))
+		{
+			file.write(doc.toByteArray());
+			file.close();
+		}
+	}
+}
+
+void MessageArchiver::processPendingMessages(const Jid &AStreamJid)
+{
+	QList< QPair<Message,bool> > messages = FPendingMessages.take(AStreamJid);
+	for (int i = 0; i<messages.count(); i++)
+	{
+		QPair<Message, bool> message = messages.at(i);
+		processMessage(AStreamJid, message.first, message.second);
+	}
+	QFile::remove(archiveStreamFilePath(AStreamJid,PENDING_FILE_NAME));
+}
+
 bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
 {
+	if (AMessage.body().isEmpty())
+		return false;
 	if (AMessage.type()==Message::Error)
 		return false;
 	if (AMessage.type()==Message::GroupChat && !ADirectionIn)
@@ -1477,8 +1540,11 @@ bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, b
 			return false;
 	}
 
-	if (AMessage.body().isEmpty())
-		return false;
+	if (AMessage.type()==Message::Chat || AMessage.type()==Message::GroupChat)
+	{
+		if (!AMessage.threadId().isEmpty())
+			AMessage.setThreadId(QString::null);
+	}
 
 	return true;
 }
@@ -1520,6 +1586,317 @@ QMultiMap<int, IArchiveEngine *> MessageArchiver::engineOrderByCapability(quint3
 	return order;
 }
 
+void MessageArchiver::processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest)
+{
+	if (ARequest.engines.isEmpty())
+	{
+		if (ARequest.lastError.isNull())
+			emit collectionsRemoved(ALocalId,ARequest.request);
+		else
+			emit requestFailed(ALocalId,ARequest.lastError);
+		FRemoveRequests.remove(ALocalId);
+	}
+}
+
+void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest)
+{
+	if (ARequest.engines.count() == ARequest.headers.count())
+	{
+		if (!ARequest.engines.isEmpty() || ARequest.lastError.isNull())
+		{
+			QList<IArchiveHeader> headers;
+			foreach(IArchiveEngine *engine, ARequest.engines)
+			{
+				foreach(IArchiveHeader header, ARequest.headers.value(engine))
+				{
+					if (!headers.contains(header))
+						headers.append(header);
+				}
+			}
+
+			if (ARequest.request.order == Qt::AscendingOrder)
+				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
+			else
+				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
+
+			if (ARequest.request.maxItems>0 && headers.count()>ARequest.request.maxItems)
+				headers = headers.mid(0,ARequest.request.maxItems);
+
+			emit headersLoaded(ALocalId,headers);
+		}
+		else
+		{
+			emit requestFailed(ALocalId,ARequest.lastError);
+		}
+		FHeadersRequests.remove(ALocalId);
+	}
+}
+
+void MessageArchiver::processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest)
+{
+	if (ARequest.lastError.isNull())
+		emit collectionLoaded(ALocalId,ARequest.collection);
+	else
+		emit requestFailed(ALocalId,ARequest.lastError);
+	FCollectionRequests.remove(ALocalId);
+}
+
+void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest)
+{
+	if (!ARequest.lastError.isNull())
+	{
+		emit requestFailed(ALocalId,ARequest.lastError);
+		FMesssagesRequests.remove(ALocalId);
+	}
+	else if (ARequest.headers.isEmpty() || (ARequest.request.maxItems>0 && ARequest.body.messages.count()>ARequest.request.maxItems))
+	{
+		if (ARequest.request.order == Qt::AscendingOrder)
+			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qLess<Message>());
+		else
+			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qGreater<Message>());
+
+		emit messagesLoaded(ALocalId,ARequest.body);
+	}
+	else
+	{
+		QString id = loadCollection(ARequest.streamJid,ARequest.headers.takeFirst());
+		if (!id.isEmpty())
+		{
+			FRequestId2LocalId.insert(id,ALocalId);
+		}
+		else
+		{
+			ARequest.lastError = XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR);
+			processMessagesRequest(ALocalId,ARequest);
+		}
+	}
+}
+
+bool MessageArchiver::hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+	return FSessionNegotiation!=NULL ? FSessionNegotiation->getSession(AStreamJid,AContactJid).status==IStanzaSession::Active : false;
+}
+
+bool MessageArchiver::isOTRStanzaSession(const IStanzaSession &ASession) const
+{
+	if (FDataForms)
+	{
+		int index = FDataForms->fieldIndex(SFP_LOGGING,ASession.form.fields);
+		if (index>=0)
+			return ASession.form.fields.at(index).value.toString() == SFV_MUSTNOT_LOGGING;
+	}
+	return false;
+}
+
+bool MessageArchiver::isOTRStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+	if (FSessionNegotiation && FDataForms)
+	{
+		IStanzaSession session = FSessionNegotiation->getSession(AStreamJid,AContactJid);
+		if (session.status == IStanzaSession::Active)
+			return isOTRStanzaSession(session);
+	}
+	return false;
+}
+
+void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+	QDomDocument sessions;
+	QFile file(archiveStreamFilePath(AStreamJid,SESSIONS_FILE_NAME));
+	if (file.open(QFile::ReadOnly))
+	{
+		if (!sessions.setContent(&file))
+			sessions.clear();
+		file.close();
+	}
+	if (file.open(QFile::WriteOnly|QFile::Truncate))
+	{
+		if (sessions.isNull())
+			sessions.appendChild(sessions.createElement("stanzaSessions"));
+		const StanzaSession &session = FSessions.value(AStreamJid).value(AContactJid);
+		QDomElement elem = sessions.documentElement().appendChild(sessions.createElement("session")).toElement();
+		elem.setAttribute("id",session.sessionId);
+		elem.appendChild(sessions.createElement("jid")).appendChild(sessions.createTextNode(AContactJid.pFull()));
+		if (!session.defaultPrefs)
+			elem.appendChild(sessions.createElement("saveMode")).appendChild(sessions.createTextNode(session.saveMode));
+		file.write(sessions.toByteArray());
+		file.close();
+	}
+}
+
+void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId)
+{
+	QFile file(archiveStreamFilePath(AStreamJid,SESSIONS_FILE_NAME));
+	if (file.open(QFile::ReadOnly))
+	{
+		QDomDocument sessions;
+		sessions.setContent(&file);
+		file.close();
+
+		QDomElement elem = sessions.documentElement().firstChildElement("session");
+		while (!elem.isNull())
+		{
+			if (ASessionId.isEmpty() || elem.attribute("id")==ASessionId)
+			{
+				QString requestId;
+				Jid contactJid = elem.firstChildElement("jid").text();
+				QString saveMode= elem.firstChildElement("saveMode").text();
+
+				if (saveMode.isEmpty() && archivePrefs(AStreamJid).itemPrefs.contains(contactJid))
+				{
+					requestId = removeArchiveItemPrefs(AStreamJid,contactJid);
+				}
+				else if (!saveMode.isEmpty() && archiveItemPrefs(AStreamJid,contactJid).save!=saveMode)
+				{
+					IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
+					prefs.itemPrefs[contactJid].save = saveMode;
+					requestId = setArchivePrefs(AStreamJid,prefs);
+				}
+				else
+				{
+					removeStanzaSessionContext(AStreamJid,elem.attribute("id"));
+				}
+
+				if (!requestId.isEmpty())
+					FRestoreRequests.insert(requestId,elem.attribute("id"));
+			}
+			elem = elem.nextSiblingElement("session");
+		}
+	}
+}
+
+void MessageArchiver::removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const
+{
+	QDomDocument sessions;
+	QFile file(archiveStreamFilePath(AStreamJid,SESSIONS_FILE_NAME));
+	if (file.open(QFile::ReadOnly))
+	{
+		if (!sessions.setContent(&file))
+			sessions.clear();
+		file.close();
+	}
+	if (!sessions.isNull())
+	{
+		QDomElement elem = sessions.documentElement().firstChildElement("session");
+		while (!elem.isNull())
+		{
+			if (elem.attribute("id") == ASessionId)
+			{
+				elem.parentNode().removeChild(elem);
+				break;
+			}
+			elem = elem.nextSiblingElement("session");
+		}
+	}
+	if (sessions.documentElement().hasChildNodes() && file.open(QFile::WriteOnly|QFile::Truncate))
+	{
+		file.write(sessions.toByteArray());
+		file.close();
+	}
+	else
+	{
+		file.remove();
+	}
+}
+
+void MessageArchiver::startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId)
+{
+	if (FSessionNegotiation)
+	{
+		foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
+		{
+			const StanzaSession &session = FSessions.value(AStreamJid).value(contactJid);
+			if (session.requestId == ARequestId)
+			{
+				saveStanzaSessionContext(AStreamJid,contactJid);
+				FSessionNegotiation->resumeSession(AStreamJid,contactJid);
+				break;
+			}
+		}
+	}
+}
+
+void MessageArchiver::cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const XmppStanzaError &AError)
+{
+	if (FSessionNegotiation)
+	{
+		foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
+		{
+			StanzaSession &session = FSessions[AStreamJid][contactJid];
+			if (session.requestId == ARequestId)
+			{
+				session.error = AError;
+				FSessionNegotiation->resumeSession(AStreamJid,contactJid);
+				break;
+			}
+		}
+	}
+}
+
+void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
+{
+	if (FSessionNegotiation)
+	{
+		QList<IStanzaSession> sessions = FSessionNegotiation->getSessions(AStreamJid,IStanzaSession::Active);
+		foreach(IStanzaSession session, sessions)
+		{
+			bool isOTRSession = isOTRStanzaSession(session);
+			IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,session.contactJid);
+			if ((isOTRSession && itemPrefs.save!=ARCHIVE_SAVE_FALSE) || (!isOTRSession && itemPrefs.otr==ARCHIVE_OTR_REQUIRE))
+			{
+				removeStanzaSessionContext(AStreamJid,session.sessionId);
+				FSessionNegotiation->initSession(AStreamJid,session.contactJid);
+			}
+		}
+	}
+}
+
+void MessageArchiver::registerDiscoFeatures()
+{
+	IDiscoFeature dfeature;
+
+	dfeature.active = false;
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
+	dfeature.var = NS_ARCHIVE;
+	dfeature.name = tr("Messages Archiving");
+	dfeature.description = tr("Supports the archiving of the messages");
+	FDiscovery->insertDiscoFeature(dfeature);
+	dfeature.var = NS_ARCHIVE_OLD;
+	FDiscovery->insertDiscoFeature(dfeature);
+
+	dfeature.var = NS_ARCHIVE_AUTO;
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
+	dfeature.name = tr("Automatic Messages Archiving");
+	dfeature.description = tr("Supports the automatic archiving of the messages");
+	FDiscovery->insertDiscoFeature(dfeature);
+	dfeature.var = NS_ARCHIVE_OLD_AUTO;
+	FDiscovery->insertDiscoFeature(dfeature);
+
+	dfeature.var = NS_ARCHIVE_MANAGE;
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
+	dfeature.name = tr("Managing Archived Messages");
+	dfeature.description = tr("Supports the managing of the archived messages");
+	FDiscovery->insertDiscoFeature(dfeature);
+	dfeature.var = NS_ARCHIVE_OLD_MANAGE;
+	FDiscovery->insertDiscoFeature(dfeature);
+
+	dfeature.var = NS_ARCHIVE_MANUAL;
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
+	dfeature.name = tr("Manual Messages Archiving");
+	dfeature.description = tr("Supports the manual archiving of the messages");
+	FDiscovery->insertDiscoFeature(dfeature);
+	dfeature.var = NS_ARCHIVE_OLD_MANUAL;
+	FDiscovery->insertDiscoFeature(dfeature);
+
+	dfeature.var = NS_ARCHIVE_PREF;
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY);
+	dfeature.name = tr("Messages Archive Preferences");
+	dfeature.description = tr("Supports the storing of the archive preferences");
+	FDiscovery->insertDiscoFeature(dfeature);
+	dfeature.var = NS_ARCHIVE_OLD_PREF;
+	FDiscovery->insertDiscoFeature(dfeature);
+}
+
 void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
 {
 	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
@@ -1537,6 +1914,22 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
 	{
 		FOptionsManager->removeOptionsDialogNode(OPN_HISTORY"." + account->accountId().toString());
 	}
+}
+
+bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
+{
+	int singleKind=-1;
+	foreach(IRosterIndex *index, ASelected)
+	{
+		Jid contactJid = index->data(RDR_FULL_JID).toString();
+		if (!contactJid.isValid())
+			return false;
+		else if (singleKind!=-1 && singleKind!=index->kind())
+			return false;
+		singleKind = index->kind();
+	}
+	return !ASelected.isEmpty();
+
 }
 
 Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const
@@ -1569,7 +1962,7 @@ Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStr
 				allPrefsOtr = itemPrefs.otr;
 			else if (allPrefsOtr != itemPrefs.otr)
 				allPrefsOtr = "-=different=-";
-			
+
 			isAllDefaultPrefs = isAllDefaultPrefs && !archivePrefs(AStreams.at(i)).itemPrefs.contains(AContacts.at(i));
 		}
 	}
@@ -1710,320 +2103,6 @@ void MessageArchiver::notifyInChatWindow(const Jid &AStreamJid, const Jid &ACont
 		options.direction = IMessageContentOptions::DirectionIn;
 		options.time = QDateTime::currentDateTime();
 		window->viewWidget()->appendText(AMessage,options);
-	}
-}
-
-bool MessageArchiver::hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const
-{
-	return FSessionNegotiation!=NULL ? FSessionNegotiation->getSession(AStreamJid,AContactJid).status==IStanzaSession::Active : false;
-}
-
-bool MessageArchiver::isOTRStanzaSession(const IStanzaSession &ASession) const
-{
-	if (FDataForms)
-	{
-		int index = FDataForms->fieldIndex(SFP_LOGGING,ASession.form.fields);
-		if (index>=0)
-			return ASession.form.fields.at(index).value.toString() == SFV_MUSTNOT_LOGGING;
-	}
-	return false;
-}
-
-bool MessageArchiver::isOTRStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const
-{
-	if (FSessionNegotiation && FDataForms)
-	{
-		IStanzaSession session = FSessionNegotiation->getSession(AStreamJid,AContactJid);
-		if (session.status == IStanzaSession::Active)
-			return isOTRStanzaSession(session);
-	}
-	return false;
-}
-
-QString MessageArchiver::stanzaSessionDirPath(const Jid &AStreamJid) const
-{
-	bool noError = true;
-
-	QDir dir(FPluginManager->homePath());
-	if (!dir.exists(ARCHIVE_DIR_NAME))
-		noError &= dir.mkdir(ARCHIVE_DIR_NAME);
-	noError &= dir.cd(ARCHIVE_DIR_NAME);
-
-	QString streamDir = Jid::encode(AStreamJid.pBare());
-	if (!dir.exists(streamDir))
-		noError &= dir.mkdir(streamDir);
-	noError &= dir.cd(streamDir);
-
-	return noError ? dir.path() : QString::null;
-}
-
-void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const
-{
-	QString dirPath = stanzaSessionDirPath(AStreamJid);
-	if (AStreamJid.isValid() && !dirPath.isEmpty())
-	{
-		QDomDocument sessions;
-		QFile file(dirPath+"/"SESSIONS_FILE_NAME);
-		if (file.open(QFile::ReadOnly))
-		{
-			if (!sessions.setContent(&file))
-				sessions.clear();
-			file.close();
-		}
-		if (file.open(QFile::WriteOnly|QFile::Truncate))
-		{
-			if (sessions.isNull())
-				sessions.appendChild(sessions.createElement("stanzaSessions"));
-			const StanzaSession &session = FSessions.value(AStreamJid).value(AContactJid);
-			QDomElement elem = sessions.documentElement().appendChild(sessions.createElement("session")).toElement();
-			elem.setAttribute("id",session.sessionId);
-			elem.appendChild(sessions.createElement("jid")).appendChild(sessions.createTextNode(AContactJid.pFull()));
-			if (!session.defaultPrefs)
-				elem.appendChild(sessions.createElement("saveMode")).appendChild(sessions.createTextNode(session.saveMode));
-			file.write(sessions.toByteArray());
-			file.close();
-		}
-	}
-}
-
-void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId)
-{
-	QString dirPath = stanzaSessionDirPath(AStreamJid);
-	if (AStreamJid.isValid() && !dirPath.isEmpty())
-	{
-		QFile file(dirPath+"/"SESSIONS_FILE_NAME);
-		if (file.open(QFile::ReadOnly))
-		{
-			QDomDocument sessions;
-			sessions.setContent(&file);
-			file.close();
-
-			QDomElement elem = sessions.documentElement().firstChildElement("session");
-			while (!elem.isNull())
-			{
-				if (ASessionId.isEmpty() || elem.attribute("id")==ASessionId)
-				{
-					QString requestId;
-					Jid contactJid = elem.firstChildElement("jid").text();
-					QString saveMode= elem.firstChildElement("saveMode").text();
-
-					if (saveMode.isEmpty() && archivePrefs(AStreamJid).itemPrefs.contains(contactJid))
-					{
-						requestId = removeArchiveItemPrefs(AStreamJid,contactJid);
-					}
-					else if (!saveMode.isEmpty() && archiveItemPrefs(AStreamJid,contactJid).save!=saveMode)
-					{
-						IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
-						prefs.itemPrefs[contactJid].save = saveMode;
-						requestId = setArchivePrefs(AStreamJid,prefs);
-					}
-					else
-					{
-						removeStanzaSessionContext(AStreamJid,elem.attribute("id"));
-					}
-
-					if (!requestId.isEmpty())
-						FRestoreRequests.insert(requestId,elem.attribute("id"));
-				}
-				elem = elem.nextSiblingElement("session");
-			}
-		}
-	}
-}
-
-void MessageArchiver::removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const
-{
-	QString dirPath = stanzaSessionDirPath(AStreamJid);
-	if (AStreamJid.isValid() && !dirPath.isEmpty())
-	{
-		QDomDocument sessions;
-		QFile file(dirPath+"/"SESSIONS_FILE_NAME);
-		if (file.open(QFile::ReadOnly))
-		{
-			if (!sessions.setContent(&file))
-				sessions.clear();
-			file.close();
-		}
-		if (!sessions.isNull())
-		{
-			QDomElement elem = sessions.documentElement().firstChildElement("session");
-			while (!elem.isNull())
-			{
-				if (elem.attribute("id") == ASessionId)
-				{
-					elem.parentNode().removeChild(elem);
-					break;
-				}
-				elem = elem.nextSiblingElement("session");
-			}
-		}
-		if (sessions.documentElement().hasChildNodes() && file.open(QFile::WriteOnly|QFile::Truncate))
-		{
-			file.write(sessions.toByteArray());
-			file.close();
-		}
-		else
-		{
-			file.remove();
-		}
-	}
-}
-
-void MessageArchiver::startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId)
-{
-	if (FSessionNegotiation)
-	{
-		foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
-		{
-			const StanzaSession &session = FSessions.value(AStreamJid).value(contactJid);
-			if (session.requestId == ARequestId)
-			{
-				saveStanzaSessionContext(AStreamJid,contactJid);
-				FSessionNegotiation->resumeSession(AStreamJid,contactJid);
-				break;
-			}
-		}
-	}
-}
-
-void MessageArchiver::cancelSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId, const XmppStanzaError &AError)
-{
-	if (FSessionNegotiation)
-	{
-		foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
-		{
-			StanzaSession &session = FSessions[AStreamJid][contactJid];
-			if (session.requestId == ARequestId)
-			{
-				session.error = AError;
-				FSessionNegotiation->resumeSession(AStreamJid,contactJid);
-				break;
-			}
-		}
-	}
-}
-
-void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
-{
-	if (FSessionNegotiation)
-	{
-		QList<IStanzaSession> sessions = FSessionNegotiation->getSessions(AStreamJid,IStanzaSession::Active);
-		foreach(IStanzaSession session, sessions)
-		{
-			bool isOTRSession = isOTRStanzaSession(session);
-			IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,session.contactJid);
-			if ((isOTRSession && itemPrefs.save!=ARCHIVE_SAVE_FALSE) || (!isOTRSession && itemPrefs.otr==ARCHIVE_OTR_REQUIRE))
-			{
-				removeStanzaSessionContext(AStreamJid,session.sessionId);
-				FSessionNegotiation->initSession(AStreamJid,session.contactJid);
-			}
-		}
-	}
-}
-
-bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
-{
-	int singleKind=-1;
-	foreach(IRosterIndex *index, ASelected)
-	{
-		Jid contactJid = index->data(RDR_FULL_JID).toString();
-		if (!contactJid.isValid())
-			return false;
-		else if (singleKind!=-1 && singleKind!=index->kind())
-			return false;
-		singleKind = index->kind();
-	}
-	return !ASelected.isEmpty();
-
-}
-
-void MessageArchiver::processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest)
-{
-	if (ARequest.engines.isEmpty())
-	{
-		if (ARequest.lastError.isNull())
-			emit collectionsRemoved(ALocalId,ARequest.request);
-		else
-			emit requestFailed(ALocalId,ARequest.lastError);
-		FRemoveRequests.remove(ALocalId);
-	}
-}
-
-void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest)
-{
-	if (ARequest.engines.count() == ARequest.headers.count())
-	{
-		if (!ARequest.engines.isEmpty() || ARequest.lastError.isNull())
-		{
-			QList<IArchiveHeader> headers;
-			foreach(IArchiveEngine *engine, ARequest.engines)
-			{
-				foreach(IArchiveHeader header, ARequest.headers.value(engine))
-				{
-					if (!headers.contains(header))
-						headers.append(header);
-				}
-			}
-
-			if (ARequest.request.order == Qt::AscendingOrder)
-				qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
-			else
-				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
-
-			if (ARequest.request.maxItems>0 && headers.count()>ARequest.request.maxItems)
-				headers = headers.mid(0,ARequest.request.maxItems);
-
-			emit headersLoaded(ALocalId,headers);
-		}
-		else
-		{
-			emit requestFailed(ALocalId,ARequest.lastError);
-		}
-		FHeadersRequests.remove(ALocalId);
-	}
-}
-
-void MessageArchiver::processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest)
-{
-	if (ARequest.lastError.isNull())
-		emit collectionLoaded(ALocalId,ARequest.collection);
-	else
-		emit requestFailed(ALocalId,ARequest.lastError);
-	FCollectionRequests.remove(ALocalId);
-}
-
-void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest)
-{
-	if (!ARequest.lastError.isNull())
-	{
-		emit requestFailed(ALocalId,ARequest.lastError);
-		FMesssagesRequests.remove(ALocalId);
-	}
-	else if (ARequest.headers.isEmpty() || (ARequest.request.maxItems>0 && ARequest.body.messages.count()>ARequest.request.maxItems))
-	{
-		if (ARequest.request.order == Qt::AscendingOrder)
-			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qLess<Message>());
-		else
-			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qGreater<Message>());
-
-		//Do not break collections
-		//if (ARequest.request.maxItems>0 && ARequest.body.messages.count()>ARequest.request.maxItems)
-		//	ARequest.body.messages = ARequest.body.messages.mid(0,ARequest.request.maxItems);
-
-		emit messagesLoaded(ALocalId,ARequest.body);
-	}
-	else
-	{
-		QString id = loadCollection(ARequest.streamJid,ARequest.headers.takeFirst());
-		if (!id.isEmpty())
-		{
-			FRequestId2LocalId.insert(id,ALocalId);
-		}
-		else
-		{
-			ARequest.lastError = XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR);
-			processMessagesRequest(ALocalId,ARequest);
-		}
 	}
 }
 
@@ -2174,6 +2253,8 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 		FSHIMessageBlocks.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 	}
 
+	loadPendingMessages(AXmppStream->streamJid());
+
 	if (!FDiscovery || !FDiscovery->requestDiscoInfo(AXmppStream->streamJid(),AXmppStream->streamJid().domain()))
 		applyArchivePrefs(AXmppStream->streamJid(),QDomElement());
 }
@@ -2187,13 +2268,13 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 		FStanzaProcessor->removeStanzaHandle(FSHIMessageOut.take(AXmppStream->streamJid()));
 	}
 
+	savePendingMessages(AXmppStream->streamJid());
 	closeHistoryOptionsNode(AXmppStream->streamJid());
 	FFeatures.remove(AXmppStream->streamJid());
 	FNamespaces.remove(AXmppStream->streamJid());
 	FArchivePrefs.remove(AXmppStream->streamJid());
 	FInStoragePrefs.removeAll(AXmppStream->streamJid());
 	FSessions.remove(AXmppStream->streamJid());
-	FPendingMessages.remove(AXmppStream->streamJid());
 
 	emit archivePrefsChanged(AXmppStream->streamJid());
 	emit archivePrefsClosed(AXmppStream->streamJid());

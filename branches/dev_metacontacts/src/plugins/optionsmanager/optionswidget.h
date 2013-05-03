@@ -14,8 +14,8 @@
 #include <utils/options.h>
 
 class OptionsWidget :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);
@@ -31,8 +31,8 @@ signals:
 	void childApply();
 	void childReset();
 protected:
-	void insertCaption(const QString &ACaption, QWidget *ABuddy, QHBoxLayout *ALayout);
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	void insertWithCaption(const QString &ACaption, QWidget *ABuddy, QHBoxLayout *ALayout);
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
 	QLabel *FLabel;
 	QCheckBox *FCheckBox;

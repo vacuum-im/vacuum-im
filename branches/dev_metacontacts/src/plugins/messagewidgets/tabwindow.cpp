@@ -37,14 +37,15 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	FMessageWidgets = AMessageWidgets;
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
 
-	QToolButton *menuButton = new QToolButton(ui.twtTabs);
-	menuButton->setAutoRaise(true);
-	menuButton->setPopupMode(QToolButton::InstantPopup);
-	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(menuButton,MNI_MESSAGEWIDGETS_TAB_MENU);
+	FCornerButton = new QToolButton(ui.twtTabs);
+	FCornerButton->setAutoRaise(true);
+	FCornerButton->setPopupMode(QToolButton::InstantPopup);
+	FCornerButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(FCornerButton,MNI_MESSAGEWIDGETS_TAB_MENU);
 
-	FWindowMenu = new Menu(menuButton);
-	menuButton->setMenu(FWindowMenu);
-	ui.twtTabs->setCornerWidget(menuButton);
+	FWindowMenu = new Menu(FCornerButton);
+	FCornerButton->setMenu(FWindowMenu);
+	ui.twtTabs->setCornerWidget(FCornerButton);
 
 	FBlinkVisible = true;
 	FBlinkTimer.setSingleShot(true);
@@ -76,6 +77,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 TabWindow::~TabWindow()
 {
 	clearTabs();
+	FCornerButton->deleteLater();
 	emit windowDestroyed();
 	emit centralPageDestroyed();
 }
@@ -141,12 +143,11 @@ void TabWindow::setTabBarVisible(bool AVisible)
 {
 	if (isTabBarVisible() != AVisible)
 	{
-		foreach(Action *action, FWindowMenu->groupActions())
-			action->setEnabled(AVisible);
-		ui.twtTabs->cornerWidget()->setEnabled(AVisible);
+		ui.twtTabs->setCornerWidget(AVisible ? FCornerButton : NULL);
+		FCornerButton->setParent(AVisible ? ui.twtTabs : NULL);
+		FCornerButton->setVisible(AVisible);
 
 		ui.twtTabs->setTabBarVisible(AVisible);
-
 		emit windowChanged();
 	}
 }

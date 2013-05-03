@@ -24,11 +24,11 @@
 #include <utils/searchlineedit.h>
 
 class RosterSearch :
-			public QSortFilterProxyModel,
-			public IPlugin,
-			public IRosterSearch,
-			public IRostersClickHooker,
-			public IRostersKeyHooker
+	public QSortFilterProxyModel,
+	public IPlugin,
+	public IRosterSearch,
+	public IRostersClickHooker,
+	public IRostersKeyHooker
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterSearch IRostersClickHooker IRostersKeyHooker);

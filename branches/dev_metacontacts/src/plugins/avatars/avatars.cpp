@@ -289,9 +289,9 @@ void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	}
 }
 
-QList<int> Avatars::rosterDataRoles(int AOerder) const
+QList<int> Avatars::rosterDataRoles(int AOrder) const
 {
-	if (AOerder == RDHO_AVATARS)
+	if (AOrder == RDHO_AVATARS)
 		return QList<int>() << RDR_AVATAR_HASH << RDR_AVATAR_IMAGE;
 	return QList<int>();
 }
@@ -407,7 +407,7 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 	QString format = getImageFormat(AData);
 	if (AData.isEmpty() || !format.isEmpty())
 	{
-		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
+		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
 		if (vcard)
 		{
 			if (!AData.isEmpty())

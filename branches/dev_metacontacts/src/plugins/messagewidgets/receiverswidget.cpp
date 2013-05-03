@@ -1,59 +1,78 @@
 #include "receiverswidget.h"
 
-#include <QTimer>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QDomDocument>
 
-#define ADR_ITEM_PTR            Action::DR_Parametr1
+#define ADR_ITEMS                  Action::DR_Parametr1
 
-class SortSearchProxyModel : 
-	public QSortFilterProxyModel
+#define RIDR_ITEM_COLLAPSED        RDR_USER_ROLE+111
+
+ReceiversSortSearchProxyModel::ReceiversSortSearchProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
-public:
-	SortSearchProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent) {
-		setSortLocaleAware(true);
-		setDynamicSortFilter(true);
-		setSortCaseSensitivity(Qt::CaseInsensitive);
-		setFilterCaseSensitivity(Qt::CaseInsensitive);
-	}
-protected:
-	bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight)  const
+	FOfflineVisible = true;
+	setSortLocaleAware(true);
+	setDynamicSortFilter(true);
+	setSortCaseSensitivity(Qt::CaseInsensitive);
+	setFilterCaseSensitivity(Qt::CaseInsensitive);
+}
+
+bool ReceiversSortSearchProxyModel::isOfflineContactsVisible() const
+{
+	return FOfflineVisible;
+}
+
+void ReceiversSortSearchProxyModel::setOfflineContactsVisible(bool AVisible)
+{
+	if (FOfflineVisible != AVisible)
 	{
-		int leftTypeOrder = ALeft.data(RDR_KIND_ORDER).toInt();
-		int rightTypeOrder = ARight.data(RDR_KIND_ORDER).toInt();
-		if (leftTypeOrder == rightTypeOrder)
+		FOfflineVisible = AVisible;
+		invalidate();
+	}
+}
+
+bool ReceiversSortSearchProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
+{
+	int leftTypeOrder = ALeft.data(RDR_KIND_ORDER).toInt();
+	int rightTypeOrder = ARight.data(RDR_KIND_ORDER).toInt();
+	if (leftTypeOrder == rightTypeOrder)
+	{
+		if (leftTypeOrder != RIKO_STREAM_ROOT)
 		{
-			if (leftTypeOrder != RIKO_STREAM_ROOT)
+			int leftShow = ALeft.data(RDR_SHOW).toInt();
+			int rightShow = ARight.data(RDR_SHOW).toInt();
+			if (leftShow != rightShow)
 			{
-				int leftShow = ALeft.data(RDR_SHOW).toInt();
-				int rightShow = ARight.data(RDR_SHOW).toInt();
-				if (leftShow != rightShow)
-				{
-					static const int showOrders[] = {6,2,1,3,4,5,7,8};
-					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
-						return showOrders[leftShow] < showOrders[rightShow];
-				}
+				static const int showOrders[] = {6,2,1,3,4,5,7,8};
+				static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
+				if (leftShow<showOrdersCount && rightShow<showOrdersCount)
+					return showOrders[leftShow] < showOrders[rightShow];
 			}
-			return QSortFilterProxyModel::lessThan(ALeft,ARight);
 		}
-		return leftTypeOrder < rightTypeOrder;
+		return QSortFilterProxyModel::lessThan(ALeft,ARight);
 	}
-	bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
+	return leftTypeOrder < rightTypeOrder;
+}
+
+bool ReceiversSortSearchProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
+{
+	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
+	if (sourceModel()->hasChildren(index))
 	{
-		QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
-		if (sourceModel()->hasChildren(index))
-		{
-			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-				if (filterAcceptsRow(childRow,index))
-					return true;
-			return false;
-		}
-		return QSortFilterProxyModel::filterAcceptsRow(AModelRow,AModelParent);
+		for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+			if (filterAcceptsRow(childRow,index))
+				return true;
+		return false;
 	}
-};
+	else if (!FOfflineVisible && filterRegExp().isEmpty() && index.data(RDR_SHOW).isValid())
+	{
+		int show = index.data(RDR_SHOW).toInt();
+		if (show==IPresence::Offline || show==IPresence::Error)
+			return false;
+	}
+	return QSortFilterProxyModel::filterAcceptsRow(AModelRow,AModelParent);
+}
 
 ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {
@@ -75,22 +94,31 @@ ReceiversWidget::ReceiversWidget(IMessageWidgets *AMessageWidgets, IMessageWindo
 	ui.trvReceivers->setItemDelegate(itemDelegate);
 
 	FModel = new AdvancedItemModel(this);
+	FModel->setRecursiveParentDataChangedSignals(true);
 	connect(FModel,SIGNAL(itemInserted(QStandardItem *)),SLOT(onModelItemInserted(QStandardItem *)));
 	connect(FModel,SIGNAL(itemRemoving(QStandardItem *)),SLOT(onModelItemRemoving(QStandardItem *)));
 	connect(FModel,SIGNAL(itemDataChanged(QStandardItem *,int)),SLOT(onModelItemDataChanged(QStandardItem *,int)));
 
-	FProxyModel = new SortSearchProxyModel(this);
+	FProxyModel = new ReceiversSortSearchProxyModel(this);
 	FProxyModel->setSourceModel(FModel);
 	FProxyModel->sort(0,Qt::AscendingOrder);
 	ui.trvReceivers->setModel(FProxyModel);
 
+	FSelectionSignalTimer.setSingleShot(true);
+	FSelectionSignalTimer.setInterval(0);
+	connect(&FSelectionSignalTimer,SIGNAL(timeout()),SIGNAL(addressSelectionChanged()));
+
 	initialize();
+	qRegisterMetaType< QList<QStandardItem *> >("QList<QStandardItem *>");
 
 	foreach(const Jid &streamJid, FMessageProcessor!=NULL ? FMessageProcessor->activeStreams() : QList<Jid>())
 		onActiveStreamAppended(streamJid);
 
 	connect(ui.sleSearch,SIGNAL(searchStart()),SLOT(onStartSearchContacts()));
-	connect(ui.trvReceivers,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onReceiversContextMenuRequested(const QPoint &)));
+	connect(ui.trvReceivers,SIGNAL(collapsed(const QModelIndex &)),SLOT(onViewIndexCollapsed(const QModelIndex &)));
+	connect(ui.trvReceivers,SIGNAL(expanded(const QModelIndex &)),SLOT(onViewIndexExpanded(const QModelIndex &)));
+	connect(ui.trvReceivers,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onViewContextMenuRequested(const QPoint &)));
+	connect(ui.trvReceivers->model(),SIGNAL(rowsInserted(const QModelIndex &, int , int )),SLOT(onViewModelRowsInserted(const QModelIndex &, int , int )));
 }
 
 ReceiversWidget::~ReceiversWidget()
@@ -144,35 +172,55 @@ QStandardItem *ReceiversWidget::mapViewToModel(const QModelIndex &AIndex)
 	return FModel->itemFromIndex(AIndex);
 }
 
-void ReceiversWidget::contextMenuForItem(QStandardItem *AItem, Menu *AMenu)
+void ReceiversWidget::contextMenuForItems(QList<QStandardItem *> AItems, Menu *AMenu)
 {
-	if (AItem->hasChildren())
+	bool allHasChildren = true;
+	foreach(QStandardItem *item, AItems)
+		if (!item->hasChildren())
+			allHasChildren = false;
+
+	if (allHasChildren)
 	{
+		QVariant items;
+		items.setValue(AItems);
+
 		Action *selectAll = new Action(AMenu);
 		selectAll->setText(tr("Select All Contacts"));
-		selectAll->setData(ADR_ITEM_PTR,(qint64)AItem);
+		selectAll->setData(ADR_ITEMS,items);
 		connect(selectAll,SIGNAL(triggered()),SLOT(onSelectAllContacts()));
 		AMenu->addAction(selectAll,AG_MWRWCM_MWIDGETS_SELECT_ALL);
 
 		Action *selectOnline = new Action(AMenu);
 		selectOnline->setText(tr("Select Online Contact"));
-		selectOnline->setData(ADR_ITEM_PTR,(qint64)AItem);
+		selectOnline->setData(ADR_ITEMS,items);
 		connect(selectOnline,SIGNAL(triggered()),SLOT(onSelectOnlineContacts()));
 		AMenu->addAction(selectOnline,AG_MWRWCM_MWIDGETS_SELECT_ONLINE);
 
 		Action *selectNotBusy = new Action(AMenu);
 		selectNotBusy->setText(tr("Select Available Contacts"));
-		selectNotBusy->setData(ADR_ITEM_PTR,(qint64)AItem);
+		selectNotBusy->setData(ADR_ITEMS,items);
 		connect(selectNotBusy,SIGNAL(triggered()),SLOT(onSelectNotBusyContacts()));
 		AMenu->addAction(selectNotBusy,AG_MWRWCM_MWIDGETS_SELECT_NOTBUSY);
 
 		Action *selectNone = new Action(AMenu);
 		selectNone->setText(tr("Clear Selection"));
-		selectNone->setData(ADR_ITEM_PTR,(qint64)AItem);
+		selectNone->setData(ADR_ITEMS,items);
 		connect(selectNone,SIGNAL(triggered()),SLOT(onSelectNoneContacts()));
 		AMenu->addAction(selectNone,AG_MWRWCM_MWIDGETS_SELECT_CLEAR);
 
-		if (AItem == FModel->invisibleRootItem())
+		Action *expandAll = new Action(AMenu);
+		expandAll->setText(tr("Expand All Groups"));
+		expandAll->setData(ADR_ITEMS,items);
+		connect(expandAll,SIGNAL(triggered()),SLOT(onExpandAllChilds()));
+		AMenu->addAction(expandAll,AG_MWRWCM_MWIDGETS_EXPAND_ALL);
+
+		Action *collapseAll = new Action(AMenu);
+		collapseAll->setText(tr("Collapse All Groups"));
+		collapseAll->setData(ADR_ITEMS,items);
+		connect(collapseAll,SIGNAL(triggered()),SLOT(onCollapseAllChilds()));
+		AMenu->addAction(collapseAll,AG_MWRWCM_MWIDGETS_COLLAPSE_ALL);
+
+		if (AItems.first() == FModel->invisibleRootItem())
 		{
 			Action *selectLast = new Action(AMenu);
 			selectLast->setText(tr("Load Last Selection"));
@@ -189,10 +237,17 @@ void ReceiversWidget::contextMenuForItem(QStandardItem *AItem, Menu *AMenu)
 			selectSave->setText(tr("Save Selection"));
 			connect(selectSave,SIGNAL(triggered()),SLOT(onSelectionSave()));
 			AMenu->addAction(selectSave,AG_MWRWCM_MWIDGETS_SELECT_SAVE);
+
+			Action *hideOffline = new Action(AMenu);
+			hideOffline->setText(tr("Hide Offline Contacts"));
+			hideOffline->setCheckable(true);
+			hideOffline->setChecked(!FProxyModel->isOfflineContactsVisible());
+			connect(hideOffline,SIGNAL(triggered()),SLOT(onHideOfflineContacts()));
+			AMenu->addAction(hideOffline,AG_MWRWCM_MWIDGETS_HIDE_OFFLINE);
 		}
 	}
 
-	emit contextMenuForItemRequested(AItem,AMenu);
+	emit contextMenuForItemsRequested(AItems,AMenu);
 }
 
 QMultiMap<Jid, Jid> ReceiversWidget::selectedAddresses() const
@@ -551,67 +606,145 @@ void ReceiversWidget::selectionSave(const QString &AFileName)
 	}
 }
 
-void ReceiversWidget::selectAllContacts(QStandardItem *AParent)
+void ReceiversWidget::selectAllContacts(QList<QStandardItem *> AParents)
 {
-	for (int row=0; row<AParent->rowCount(); row++)
+	foreach(QStandardItem *parentItem, AParents)
 	{
-		QStandardItem *item = AParent->child(row);
-		if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
-			item->setCheckState(Qt::Checked);
-		else if (item->hasChildren())
-			selectAllContacts(item);
+		for (int row=0; row<parentItem->rowCount(); row++)
+		{
+			QStandardItem *item = parentItem->child(row);
+			if (mapModelToView(item).isValid())
+			{
+				if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
+					item->setCheckState(Qt::Checked);
+				else if (item->hasChildren())
+					selectAllContacts(QList<QStandardItem *>() << item);
+			}
+		}
 	}
 }
 
-void ReceiversWidget::selectOnlineContacts(QStandardItem *AParent)
+void ReceiversWidget::selectOnlineContacts(QList<QStandardItem *> AParents)
 {
-	for (int row=0; row<AParent->rowCount(); row++)
+	foreach(QStandardItem *parentItem, AParents)
 	{
-		QStandardItem *item = AParent->child(row);
-		if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
+		for (int row=0; row<parentItem->rowCount(); row++)
 		{
-			int show = item->data(RDR_SHOW).toInt();
-			if (show!=IPresence::Offline && show!=IPresence::Error)
-				item->setCheckState(Qt::Checked);
+			QStandardItem *item = parentItem->child(row);
+			if (mapModelToView(item).isValid())
+			{
+				if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
+				{
+					int show = item->data(RDR_SHOW).toInt();
+					if (show!=IPresence::Offline && show!=IPresence::Error)
+						item->setCheckState(Qt::Checked);
+					else
+						item->setCheckState(Qt::Unchecked);
+				}
+				else if (item->hasChildren())
+				{
+					selectOnlineContacts(QList<QStandardItem *>() << item);
+				}
+			}
+		}
+	}
+}
+
+void ReceiversWidget::selectNotBusyContacts(QList<QStandardItem *> AParents)
+{
+	foreach(QStandardItem *parentItem, AParents)
+	{
+		for (int row=0; row<parentItem->rowCount(); row++)
+		{
+			QStandardItem *item = parentItem->child(row);
+			if (mapModelToView(item).isValid())
+			{
+				if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
+				{
+					int show = item->data(RDR_SHOW).toInt();
+					if (show!=IPresence::Offline && show!=IPresence::Error && show!=IPresence::DoNotDisturb)
+						item->setCheckState(Qt::Checked);
+					else
+						item->setCheckState(Qt::Unchecked);
+				}
+				else if (item->hasChildren())
+				{
+					selectNotBusyContacts(QList<QStandardItem *>() << item);
+				}
+			}
+		}
+	}
+}
+
+void ReceiversWidget::selectNoneContacts(QList<QStandardItem *> AParents)
+{
+	foreach(QStandardItem *parentItem, AParents)
+	{
+		for (int row=0; row<parentItem->rowCount(); row++)
+		{
+			QStandardItem *item = parentItem->child(row);
+			if (mapModelToView(item).isValid())
+			{
+				if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
+					item->setCheckState(Qt::Unchecked);
+				else if (item->hasChildren())
+					selectNoneContacts(QList<QStandardItem *>() << item);
+			}
+		}
+	}
+}
+
+void ReceiversWidget::expandAllChilds(QList<QStandardItem *> AParents)
+{
+	foreach(QStandardItem *parentItem, AParents)
+	{
+		QModelIndex index = mapModelToView(parentItem);
+		if (index.isValid())
+			ui.trvReceivers->expand(index);
+
+		for (int row=0; row<parentItem->rowCount(); row++)
+		{
+			QStandardItem *item = parentItem->child(row);
+			if (item->hasChildren())
+				expandAllChilds(QList<QStandardItem *>() << item);
+		}
+	}
+}
+
+void ReceiversWidget::collapseAllChilds(QList<QStandardItem *> AParents)
+{
+	foreach(QStandardItem *parentItem, AParents)
+	{
+		for (int row=0; row<parentItem->rowCount(); row++)
+		{
+			QStandardItem *item = parentItem->child(row);
+			if (item->hasChildren())
+				collapseAllChilds(QList<QStandardItem *>() << item);
+			if (item->parent() != NULL)
+				ui.trvReceivers->collapse(mapModelToView(item));
+		}
+	}
+}
+
+void ReceiversWidget::restoreExpandState(QList<QStandardItem *> AParents)
+{
+	foreach(QStandardItem *parentItem, AParents)
+	{
+		QModelIndex index = mapModelToView(parentItem);
+		if (index.isValid())
+		{
+			if (index.data(RIDR_ITEM_COLLAPSED).toBool())
+				ui.trvReceivers->collapse(index);
 			else
-				item->setCheckState(Qt::Unchecked);
+				ui.trvReceivers->expand(index);
 		}
-		else if (item->hasChildren())
-		{
-			selectOnlineContacts(item);
-		}
-	}
-}
 
-void ReceiversWidget::selectNotBusyContacts(QStandardItem *AParent)
-{
-	for (int row=0; row<AParent->rowCount(); row++)
-	{
-		QStandardItem *item = AParent->child(row);
-		if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
+		for (int row=0; row<parentItem->rowCount(); row++)
 		{
-			int show = item->data(RDR_SHOW).toInt();
-			if (show!=IPresence::Offline && show!=IPresence::Error && show!=IPresence::DoNotDisturb)
-				item->setCheckState(Qt::Checked);
-			else
-				item->setCheckState(Qt::Unchecked);
+			QStandardItem *item = parentItem->child(row);
+			if (item->hasChildren())
+				restoreExpandState(QList<QStandardItem *>() << item);
 		}
-		else if (item->hasChildren())
-		{
-			selectNotBusyContacts(item);
-		}
-	}
-}
-
-void ReceiversWidget::selectNoneContacts(QStandardItem *AParent)
-{
-	for (int row=0; row<AParent->rowCount(); row++)
-	{
-		QStandardItem *item = AParent->child(row);
-		if (item->data(RDR_KIND).toInt() == RIK_CONTACT)
-			item->setCheckState(Qt::Unchecked);
-		else if (item->hasChildren())
-			selectNoneContacts(item);
 	}
 }
 
@@ -669,22 +802,73 @@ void ReceiversWidget::onModelItemDataChanged(QStandardItem *AItem, int ARole)
 				{
 					foreach(QStandardItem *contactItem, contactItems)
 						contactItem->setCheckState(AItem->checkState());
-					emit addressSelectionChanged(streamJid,contactJid,AItem->checkState()==Qt::Checked);
+					FSelectionSignalTimer.start();
 				}
 				else if (contactItems.count() < 2)
 				{
-					emit addressSelectionChanged(streamJid,contactJid,false);
+					FSelectionSignalTimer.start();
 				}
 				block = false;
 			}
 		}
 
+		bool updateSelfState = false;
 		Qt::CheckState state = AItem->checkState();
 		if (state != Qt::PartiallyChecked)
+		{
 			for (int row=0; row<AItem->rowCount(); row++)
-				AItem->child(row)->setCheckState(state);
+			{
+				QStandardItem *childItem = AItem->child(row);
+				if (mapModelToView(childItem).isValid())
+					childItem->setCheckState(state);
+				else
+					updateSelfState = true;
+			}
+		}
+
+		if (updateSelfState)
+			updateCheckState(AItem);
 		updateCheckState(AItem->parent());
 	}
+}
+
+void ReceiversWidget::onViewIndexExpanded(const QModelIndex &AIndex)
+{
+	QStandardItem *item = mapViewToModel(AIndex);
+	if (item && FProxyModel->filterRegExp().isEmpty())
+		item->setData(false,RIDR_ITEM_COLLAPSED);
+}
+
+void ReceiversWidget::onViewIndexCollapsed( const QModelIndex &AIndex )
+{
+	QStandardItem *item = mapViewToModel(AIndex);
+	if (item && FProxyModel->filterRegExp().isEmpty())
+		item->setData(true,RIDR_ITEM_COLLAPSED);
+}
+
+void ReceiversWidget::onViewContextMenuRequested(const QPoint &APos)
+{
+	if (ui.trvReceivers->selectionModel()->hasSelection())
+	{
+		Menu *menu = new Menu(this);
+		menu->setAttribute(Qt::WA_DeleteOnClose,true);
+
+		QList<QStandardItem *> items;
+		foreach(const QModelIndex &index, ui.trvReceivers->selectionModel()->selectedIndexes())
+			items.append(mapViewToModel(index));
+		contextMenuForItems(items,menu);
+
+		if (!menu->isEmpty())
+			menu->popup(ui.trvReceivers->mapToGlobal(APos));
+		else
+			delete menu;
+	}
+}
+
+void ReceiversWidget::onViewModelRowsInserted(const QModelIndex &AParent, int AStart, int AEnd)
+{
+	Q_UNUSED(AStart); Q_UNUSED(AEnd);
+	restoreExpandState(QList<QStandardItem *>() << (AParent.isValid() ? mapViewToModel(AParent) : FModel->invisibleRootItem()));
 }
 
 void ReceiversWidget::onActiveStreamAppended(const Jid &AStreamJid)
@@ -816,43 +1000,51 @@ void ReceiversWidget::onSelectAllContacts()
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-		selectAllContacts((QStandardItem *)action->data(ADR_ITEM_PTR).toLongLong());
+		selectAllContacts(action->data(ADR_ITEMS).value< QList<QStandardItem *> >());
 }
 
 void ReceiversWidget::onSelectOnlineContacts()
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-		selectOnlineContacts((QStandardItem *)action->data(ADR_ITEM_PTR).toLongLong());
+		selectOnlineContacts(action->data(ADR_ITEMS).value< QList<QStandardItem *> >());
 }
 
 void ReceiversWidget::onSelectNotBusyContacts()
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-		selectNotBusyContacts((QStandardItem *)action->data(ADR_ITEM_PTR).toLongLong());
+		selectNotBusyContacts(action->data(ADR_ITEMS).value< QList<QStandardItem *> >());
 }
 
 void ReceiversWidget::onSelectNoneContacts()
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-		selectNoneContacts((QStandardItem *)action->data(ADR_ITEM_PTR).toLongLong());
+		selectNoneContacts(action->data(ADR_ITEMS).value< QList<QStandardItem *> >());
 }
 
-void ReceiversWidget::onReceiversContextMenuRequested(const QPoint &APos)
+void ReceiversWidget::onExpandAllChilds()
 {
-	QModelIndex index = ui.trvReceivers->indexAt(APos);
-	if (index.isValid())
-	{
-		Menu *menu = new Menu(this);
-		menu->setAttribute(Qt::WA_DeleteOnClose,true);
-		contextMenuForItem(mapViewToModel(index),menu);
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+		expandAllChilds(action->data(ADR_ITEMS).value< QList<QStandardItem *> >());
+}
 
-		if (!menu->isEmpty())
-			menu->popup(ui.trvReceivers->mapToGlobal(APos));
-		else
-			delete menu;
+void ReceiversWidget::onCollapseAllChilds()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+		collapseAllChilds(action->data(ADR_ITEMS).value< QList<QStandardItem *> >());
+}
+
+void ReceiversWidget::onHideOfflineContacts()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		FProxyModel->setOfflineContactsVisible(!action->isChecked());
+		restoreExpandState(QList<QStandardItem *>() << FModel->invisibleRootItem());
 	}
 }
 
@@ -869,5 +1061,10 @@ void ReceiversWidget::onDeleteDelayedItems()
 void ReceiversWidget::onStartSearchContacts()
 {
 	FProxyModel->setFilterWildcard(ui.sleSearch->text());
-	ui.trvReceivers->expandAll();
+	if (!FProxyModel->filterRegExp().isEmpty())
+		ui.trvReceivers->expandAll();
+	else
+		restoreExpandState(QList<QStandardItem *>() << FModel->invisibleRootItem());
 }
+
+Q_DECLARE_METATYPE(QList<QStandardItem *>);

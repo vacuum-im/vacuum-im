@@ -1,6 +1,13 @@
 [Requirements]
-  - Qt 4.5.x
-  - OpenSSL 0.9.8k
+  ==Common==
+    Qt 4.8.x
+    OpenSSL 1.0.0
+  ==Linux==
+    libidn
+    libXScrnSaver
+    zlib with minizip
+    hunspell or enchant or aspell
+
 
 [Common]
   ==qmake parametrs==

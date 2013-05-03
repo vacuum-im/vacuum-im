@@ -4,7 +4,6 @@
 #include <definitions/namespaces.h>
 #include <interfaces/ivcard.h>
 
-#define VCARD_FILE_ROOT_TAGNAME         "VCard"
 #define VCARD_TAGNAME                   "vCard"
 
 class VCardPlugin;
@@ -16,16 +15,16 @@ class VCard :
 	Q_OBJECT;
 	Q_INTERFACES(IVCard);
 public:
-	VCard(const Jid &AContactJid, VCardPlugin *APlugin);
+	VCard(VCardPlugin *APlugin, const Jid &AContactJid);
 	~VCard();
 	virtual QObject *instance() { return this; }
 	virtual bool isValid() const;
 	virtual bool isEmpty() const;
-	virtual const Jid &contactJid() const;
+	virtual Jid contactJid() const;
 	virtual QDomElement vcardElem() const;
 	virtual QDateTime loadDateTime() const;
-	virtual QString value(const QString &AName, const QStringList &ATags = QStringList(), const QStringList &ATagList = QStringList()) const;
 	virtual QMultiHash<QString,QStringList> values(const QString &AName, const QStringList &ATagList) const;
+	virtual QString value(const QString &AName, const QStringList &ATags = QStringList(), const QStringList &ATagList = QStringList()) const;
 	virtual void setTagsForValue(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(), const QStringList &ATagList = QStringList());
 	virtual void setValueForTags(const QString &AName, const QString &AValue, const QStringList &ATags = QStringList(), const QStringList &ATagList = QStringList());
 	virtual void clear();

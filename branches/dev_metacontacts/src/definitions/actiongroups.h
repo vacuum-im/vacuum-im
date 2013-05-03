@@ -77,10 +77,13 @@
 #define AG_MWRWCM_MWIDGETS_SELECT_ONLINE                        500
 #define AG_MWRWCM_MWIDGETS_SELECT_NOTBUSY                       500
 #define AG_MWRWCM_MWIDGETS_SELECT_ALL                           500
+#define AG_MWRWCM_MWIDGETS_SELECT_CLEAR                         500
 #define AG_MWRWCM_MWIDGETS_SELECT_LAST                          700
 #define AG_MWRWCM_MWIDGETS_SELECT_LOAD                          700
 #define AG_MWRWCM_MWIDGETS_SELECT_SAVE                          700
-#define AG_MWRWCM_MWIDGETS_SELECT_CLEAR                         900
+#define AG_MWRWCM_MWIDGETS_EXPAND_ALL                           800
+#define AG_MWRWCM_MWIDGETS_COLLAPSE_ALL                         800
+#define AG_MWRWCM_MWIDGETS_HIDE_OFFLINE                         900
 
 //MultiuserChat - MultiUserContextMenu
 #define AG_MUCM_MULTIUSERCHAT_UTILS                             100

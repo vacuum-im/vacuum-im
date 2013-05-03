@@ -29,8 +29,11 @@
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::ExtendedSelection</enum>
+     </property>
      <property name="indentation">
-      <number>6</number>
+      <number>10</number>
      </property>
      <property name="rootIsDecorated">
       <bool>false</bool>

@@ -7,6 +7,7 @@
 #include <definitions/shortcuts.h>
 #include <definitions/optionvalues.h>
 #include <definitions/messagedataroles.h>
+#include <definitions/messagechatwindowwidgets.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/options.h>
@@ -50,10 +51,9 @@ public:
 	virtual IMessageTabPageNotifier *tabPageNotifier() const;
 	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
 	// IMessageChatWindow
+	virtual BoxWidget *messageWidgetsBox() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
-	// IMessageChatWindow
-	void messageReady();
 	// IMessageWindow
 	void widgetLayoutChanged();
 	// ITabWindowPage
@@ -75,7 +75,6 @@ protected:
 	void showEvent(QShowEvent *AEvent);
 	void closeEvent(QCloseEvent *AEvent);
 protected slots:
-	void onMessageReady();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	Ui::ChatWindowClass ui;

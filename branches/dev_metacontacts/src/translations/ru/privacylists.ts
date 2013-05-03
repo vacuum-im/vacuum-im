@@ -271,7 +271,7 @@
     </message>
     <message>
         <source>Invisible to Contact</source>
-        <translation>Невиди для контакта</translation>
+        <translation>Невидим для контакта</translation>
     </message>
     <message>
         <source>Ignore Contact</source>
@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>Set Active List</source>
-        <translation>Установить активный спосок</translation>
+        <translation>Установить активный список</translation>
     </message>
     <message>
         <source>Set Default List</source>

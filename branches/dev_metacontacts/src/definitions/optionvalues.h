@@ -158,8 +158,6 @@
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
 #define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
-// UrlProcessor
-#define OPV_MISC_URLPROXY                               "misc.url-proxy"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
@@ -240,6 +238,9 @@
 #define OPV_STATUSICONS_RULE_ITEM                       "statusicons.rules.rule"
 #define OPV_STATUSICONS_RULE_PATTERN                    "statusicons.rules.rule.pattern"
 #define OPV_STATUSICONS_RULE_ICONSET                    "statusicons.rules.rule.iconset"
+
+// Statistics
+#define OPV_STATISTICS_PROFILEID                        "statistics.profile-id"
 
 // XmppStreams
 #define OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE               "xmppstreams.timeout.handshake"

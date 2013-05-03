@@ -251,7 +251,7 @@ bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AInd
 	return false;
 }
 
-bool FileTransfer::viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool FileTransfer::messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
 	if (isSupported(AWidget->messageWindow()->streamJid(), AWidget->messageWindow()->contactJid()) && AEvent->mimeData()->hasUrls())
 	{
@@ -262,20 +262,20 @@ bool FileTransfer::viewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEv
 	return false;
 }
 
-bool FileTransfer::viewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
+bool FileTransfer::messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 	return true;
 }
 
-void FileTransfer::viewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
+void FileTransfer::messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 }
 
-bool FileTransfer::viewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
+bool FileTransfer::messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
 {
 	if (AEvent->dropAction() != Qt::IgnoreAction)
 	{

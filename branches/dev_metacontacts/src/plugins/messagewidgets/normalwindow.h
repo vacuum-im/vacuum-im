@@ -7,6 +7,7 @@
 #include <definitions/messagedataroles.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
+#include <definitions/messagenormalwindowwidgets.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ixmppstreams.h>
@@ -60,10 +61,10 @@ public:
 	virtual void setSubject(const QString &ASubject);
 	virtual QString threadId() const;
 	virtual void setThreadId(const QString &AThreadId);
+	virtual BoxWidget *messageWidgetsBox() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	// IMessageNormalWindow
-	void messageReady();
 	void modeChanged(int AMode);
 	// IMessageWindow
 	void widgetLayoutChanged();
@@ -86,14 +87,14 @@ protected:
 	void showEvent(QShowEvent *AEvent);
 	void closeEvent(QCloseEvent *AEvent);
 protected slots:
-	void onMessageReady();
 	void onSelectReceiversMenuAboutToShow();
+	void onReceiverslAddressSelectionChanged();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onReceiverslAddressSelectionChanged(const Jid &AStreamJid, const Jid &AContactJid, bool ASelected);
 private:
 	Ui::NormalWindowClass ui;
 private:
 	IMessageAddress *FAddress;
+	QLineEdit *FSubjectWidget;
 	IMessageInfoWidget *FInfoWidget;
 	IMessageViewWidget *FViewWidget;
 	IMessageEditWidget *FEditWidget;

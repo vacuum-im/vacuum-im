@@ -5,6 +5,8 @@
 #define ADR_RULE                          Action::DR_Parametr1
 #define ADR_SUBSTORAGE                    Action::DR_Parametr2
 
+#define STATUSICONS_STORAGE_PATTERN      "pattern"
+
 StatusIcons::StatusIcons()
 {
 	FPresencePlugin = NULL;
@@ -129,8 +131,8 @@ bool StatusIcons::initObjects()
 
 bool StatusIcons::initSettings()
 {
-	Options::setDefaultValue(OPV_STATUSICONS_DEFAULT,STORAGE_SHARED_DIR);
-	Options::setDefaultValue(OPV_STATUSICONS_RULE_ICONSET,STORAGE_SHARED_DIR);
+	Options::setDefaultValue(OPV_STATUSICONS_DEFAULT,FILE_STORAGE_SHARED_DIR);
+	Options::setDefaultValue(OPV_STATUSICONS_RULE_ICONSET,FILE_STORAGE_SHARED_DIR);
 
 	if (FOptionsManager)
 	{
@@ -197,9 +199,9 @@ QString StatusIcons::ruleIconset(const QString &APattern, RuleType ARuleType) co
 	switch (ARuleType)
 	{
 	case UserRule:
-		return FUserRules.value(APattern,STORAGE_SHARED_DIR);
+		return FUserRules.value(APattern,FILE_STORAGE_SHARED_DIR);
 	case DefaultRule:
-		return FDefaultRules.value(APattern,STORAGE_SHARED_DIR);
+		return FDefaultRules.value(APattern,FILE_STORAGE_SHARED_DIR);
 	}
 	return QString::null;
 }
@@ -296,7 +298,7 @@ QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 
 		if (substorage.isEmpty())
 		{
-			substorage = FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : STORAGE_SHARED_DIR;
+			substorage = FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : FILE_STORAGE_SHARED_DIR;
 		}
 
 		FJid2Storage.insert(AContactJid,substorage);
@@ -376,18 +378,17 @@ void StatusIcons::loadStorages()
 		IconStorage *storage = new IconStorage(RSR_STORAGE_STATUSICONS,substorage,this);
 		FStorages.insert(substorage,storage);
 
-		QString pattern = storage->option(STO_PATTERN);
+		QString pattern = storage->storageProperty(STATUSICONS_STORAGE_PATTERN);
 		if (!pattern.isEmpty())
 		{
 			insertRule(pattern,substorage,IStatusIcons::DefaultRule);
 			FStatusRules += pattern;
 		}
 
-		QString name = storage->option(STORAGE_NAME);
 		Action *action = new Action(FCustomIconMenu);
 		action->setCheckable(true);
 		action->setIcon(storage->getIcon(iconKeyByStatus(IPresence::Online,QString::null,false)));
-		action->setText(!name.isEmpty() ? name : substorage);
+		action->setText(storage->storageProperty(FILE_STORAGE_NAME,substorage));
 		action->setData(ADR_SUBSTORAGE,substorage);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
 		FCustomIconActions.insert(substorage,action);
@@ -539,7 +540,7 @@ void StatusIcons::onOptionsChanged(const OptionsNode &ANode)
 		if (IconStorage::availSubStorages(RSR_STORAGE_STATUSICONS).contains(ANode.value().toString()))
 			FDefaultStorage->setSubStorage(ANode.value().toString());
 		else
-			FDefaultStorage->setSubStorage(STORAGE_SHARED_DIR);
+			FDefaultStorage->setSubStorage(FILE_STORAGE_SHARED_DIR);
 	}
 }
 

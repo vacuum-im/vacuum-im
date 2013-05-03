@@ -152,7 +152,7 @@ QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid
 	{
 		if (!FStreamNames.contains(AStreamJid.bare()))
 		{
-			IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
+			IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
 			if (vcard!=NULL)
 			{
 				name = vcard->value(VVN_NICKNAME);
@@ -252,7 +252,7 @@ void MessageStyles::onVCardChanged(const Jid &AContactJid)
 {
 	if (FStreamNames.contains(AContactJid.bare()))
 	{
-		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AContactJid) : NULL;
+		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AContactJid) : NULL;
 		if (vcard!=NULL)
 		{
 			FStreamNames.insert(AContactJid.bare(),vcard->value(VVN_NICKNAME));

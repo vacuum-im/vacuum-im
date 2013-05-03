@@ -318,8 +318,16 @@ QMultiMap<int, IOptionsWidget *> MultiUserChatPlugin::optionsWidgets(const QStri
 
 bool MultiUserChatPlugin::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
-		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
+	Q_UNUSED(AOrder);
+	if (AEvent->modifiers()==Qt::NoModifier && Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool() )
+	{
+		IMultiUserChatWindow *window = findMultiChatWindowForIndex(AIndex);
+		if (window)
+		{
+			window->showTabPage();
+			return true;
+		}
+	}
 	return false;
 }
 
@@ -639,7 +647,7 @@ QList<IMultiUserChat *> MultiUserChatPlugin::multiUserChats() const
 IMultiUserChat *MultiUserChatPlugin::findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const
 {
 	foreach(IMultiUserChat *chat, FChats)
-		if (chat->streamJid() == AStreamJid && chat->roomJid() == ARoomJid)
+		if (chat->streamJid()==AStreamJid && chat->roomJid()==ARoomJid)
 			return chat;
 	return NULL;
 }
@@ -850,7 +858,7 @@ QString MultiUserChatPlugin::streamVCardNick(const Jid &AStreamJid) const
 	QString nick;
 	if (FVCardPlugin!=NULL && FVCardPlugin->hasVCard(AStreamJid.bare()))
 	{
-		IVCard *vCard = FVCardPlugin->vcard(AStreamJid.bare());
+		IVCard *vCard = FVCardPlugin->getVCard(AStreamJid.bare());
 		nick = vCard->value(VVN_NICKNAME);
 		vCard->unlock();
 	}
@@ -942,6 +950,16 @@ Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &
 	action->setData(ADR_ROOM,ARoomJid.node());
 	connect(action,SIGNAL(triggered(bool)),SLOT(onJoinRoomActionTriggered(bool)));
 	return action;
+}
+
+IMultiUserChatWindow *MultiUserChatPlugin::findMultiChatWindowForIndex(const IRosterIndex *AIndex) const
+{
+	IMultiUserChatWindow *window = NULL;
+	if (AIndex->kind() == RIK_MUC_ITEM)
+		window = findMultiChatWindow(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString());
+	else if (AIndex->kind() == RIK_RECENT_ITEM)
+		window = findMultiChatWindow(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_RECENT_REFERENCE).toString());
+	return window;
 }
 
 IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindowForIndex(const IRosterIndex *AIndex)
@@ -1345,7 +1363,7 @@ void MultiUserChatPlugin::onRostersViewClipboardMenu(const QList<IRosterIndex *>
 	{
 		foreach(IRosterIndex *index, AIndexes)
 		{
-			IMultiUserChatWindow *window = getMultiChatWindowForIndex(index);
+			IMultiUserChatWindow *window = findMultiChatWindowForIndex(index);
 			if (window)
 			{
 				QString name = window->multiUserChat()->roomName().trimmed();
