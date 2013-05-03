@@ -78,7 +78,7 @@ signals:
 	void vcardError(const Jid &AContactJid, const QString &AError);
 protected:
 	void unlockVCard(const Jid &AContactJid);
-	void saveVCardFile(const QDomElement &AElem, const Jid &AContactJid) const;
+	void saveVCardFile(const Jid &AContactJid, const QDomElement &AElem) const;
 	void removeEmptyChildElements(QDomElement &AElem) const;
 	void registerDiscoFeatures();
 protected slots:

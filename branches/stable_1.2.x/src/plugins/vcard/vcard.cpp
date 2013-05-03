@@ -188,7 +188,7 @@ void VCard::loadVCardFile()
 	if (vcardElem().isNull())
 	{
 		FDoc.clear();
-		QDomElement elem = FDoc.appendChild(FDoc.createElement(VCARD_FILE_ROOT_TAGNAME)).toElement();
+		QDomElement elem = FDoc.appendChild(FDoc.createElement(VCARD_TAGNAME)).toElement();
 		elem.setAttribute("jid",FContactJid.full());
 		elem.appendChild(FDoc.createElementNS(NS_VCARD_TEMP,VCARD_TAGNAME));
 	}
