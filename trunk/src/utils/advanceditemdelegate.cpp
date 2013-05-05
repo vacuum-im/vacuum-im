@@ -14,11 +14,17 @@
 #include <QItemEditorFactory>
 #include <QWindowsVistaStyle>
 
-const qreal BlinkHideSteps[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
-const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.0 };
-const int BlinkStepsCount = sizeof(BlinkHideSteps)/sizeof(BlinkHideSteps[0]);
-const int BlinkStepsTime = 1000;
+static const qreal BlinkHideSteps[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+static const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.0 };
+static const int BlinkStepsCount = sizeof(BlinkHideSteps)/sizeof(BlinkHideSteps[0]);
+static const int BlinkStepsTime = 1000;
 #define BLINK_STEP ((QDateTime::currentMSecsSinceEpoch() % BlinkStepsTime) * BlinkStepsCount / BlinkStepsTime)
+
+const quint32 AdvancedDelegateItem::NullId        = 0;
+const quint32 AdvancedDelegateItem::BranchId      = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,10);
+const quint32 AdvancedDelegateItem::CheckStateId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,100);
+const quint32 AdvancedDelegateItem::DecorationId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,500);
+const quint32 AdvancedDelegateItem::DisplayId     = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,500);
 
 void registerAdvancedDelegateItemStreamOperators()
 {
@@ -65,12 +71,6 @@ QString getSingleLineText(const QString &AText)
 /*********************
  AdvancedDelegateItem
 **********************/
-const quint32 AdvancedDelegateItem::NullId        = 0;
-const quint32 AdvancedDelegateItem::BranchId      = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,10);
-const quint32 AdvancedDelegateItem::CheckStateId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,100);
-const quint32 AdvancedDelegateItem::DecorationId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,500);
-const quint32 AdvancedDelegateItem::DisplayId     = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,500);
-
 QDataStream &operator<<(QDataStream &AStream, const AdvancedDelegateItem &AItem)
 {
 	AStream 

@@ -191,7 +191,7 @@ bool ClientInfo::initSettings()
 
 bool ClientInfo::startPlugin()
 {
-	SystemManager::instance()->startSystemIdle();
+	SystemManager::startSystemIdle();
 	return true;
 }
 

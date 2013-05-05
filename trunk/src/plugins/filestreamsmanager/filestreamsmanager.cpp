@@ -74,18 +74,22 @@ bool FileStreamsManager::initObjects()
 	{
 		FDataManager->insertProfile(this);
 	}
+
 	if (FTrayManager || FMainWindowPlugin)
 	{
-		Action *action = new Action;
+		Action *action = new Action(this);
 		action->setText(tr("File Transfers"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILESTREAMSMANAGER);
 		action->setShortcutId(SCT_APP_SHOWFILETRANSFERS);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowFileStreamsWindow(bool)));
+	
 		if (FMainWindowPlugin)
 			FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);
+		
 		if (FTrayManager)
 			FTrayManager->contextMenu()->addAction(action, AG_TMTM_FILESTREAMSMANAGER, true);
 	}
+	
 	return true;
 }
 

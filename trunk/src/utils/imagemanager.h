@@ -15,6 +15,8 @@ public:
 	static QImage opacitized(const QImage &AImage, double AOpacity = 0.5);
 	static QImage addSpace(const QImage &AImage, int ALeft, int ATop, int ARight, int ABottom);
 	static QImage rotatedImage(const QImage &AImage, qreal AAngle);
+private:
+	ImageManager();
 };
 
 #endif // IMAGEMANAGER_H

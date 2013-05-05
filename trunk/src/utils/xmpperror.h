@@ -61,7 +61,7 @@ public:
 	QString errorString(const QString &AContext = QString::null) const;
 	QString errorMessage(const QString &AContext = QString::null, const QString &ALang = QString::null) const;
 public:
-	static XmppError null;
+	static const XmppError null;
 	static QString getErrorMessage(const QString &AErrorString, const QString &AErrorText);
 	static QString getErrorString(const QString &ANsUri, const QString &ACondition, const QString &AContext = QString::null);
 	static void registerError(const QString &ANsUri, const QString &ACondition, const QString &AErrorString, const QString &AContext = QString::null);
@@ -77,6 +77,7 @@ protected:
 class UTILS_EXPORT XmppStreamError :
 	public XmppError
 {
+	friend class XmppError;
 public:
 	enum ErrorCondition {
 		EC_UNDEFINED_CONDITION,
@@ -112,7 +113,7 @@ public:
 	ErrorCondition conditionCode() const;
 	void setCondition(ErrorCondition ACondition);
 public:
-	static XmppStreamError null;
+	static const XmppStreamError null;
 	static QString conditionByCode(ErrorCondition ACode);
 	static ErrorCondition codeByCondition(const QString &ACondition);
 private:
@@ -120,13 +121,13 @@ private:
 	static void registerStreamErrors();
 	static QMap<ErrorCondition,QString> FErrorConditions;
 private:
-	friend class XmppError;
 	XmppStreamError(const XmppErrorDataPointer &AData);
 };
 
 class UTILS_EXPORT XmppStanzaError :
 	public XmppError
 {
+	friend class XmppError;
 public:
 	enum ErrorType {
 		ET_UNKNOWN,
@@ -173,7 +174,7 @@ public:
 	ErrorCondition conditionCode() const;
 	void setCondition(ErrorCondition ACondition);
 public:
-	static XmppStanzaError null;
+	static const XmppStanzaError null;
 	static QString typeByCode(ErrorType ACode);
 	static ErrorType codeByType(const QString &AType);
 	static ErrorType typeByCondition(ErrorCondition ACondition);
@@ -186,7 +187,6 @@ private:
 	static QMap<ErrorCondition,QString> FErrorConditions;
 	static QMap<ErrorCondition,ErrorType> FConditionTypes;
 private:
-	friend class XmppError;
 	XmppStanzaError(const XmppErrorDataPointer &AData);
 };
 

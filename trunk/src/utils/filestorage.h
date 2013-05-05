@@ -65,10 +65,6 @@ private:
 	static QList<QString> FResourceDirs;
 	static QList<FileStorage *> FInstances;
 	static QHash<QString, FileStorage *> FStaticStorages;
-private:
-	static QList<QString> FKeyTags;
-	static QList<QString> FFileTags;
-	static QList<QString> FObjectTags;
 };
 
 #endif // FILESTORAGE_H

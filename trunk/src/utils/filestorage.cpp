@@ -5,6 +5,11 @@
 #include <QDomDocument>
 #include <QApplication>
 
+QList<QString> FileStorage::FMimeTypes;
+QList<QString> FileStorage::FResourceDirs;
+QList<FileStorage *> FileStorage::FInstances;
+QHash<QString, FileStorage *> FileStorage::FStaticStorages;
+
 struct FileStorage::StorageObject 
 {
 	int prefix;
@@ -12,15 +17,6 @@ struct FileStorage::StorageObject
 	QList<QString> fileNames;
 	QHash<QString, QString> fileProperties;
 };
-
-QList<QString> FileStorage::FMimeTypes;
-QList<QString> FileStorage::FResourceDirs;
-QList<FileStorage *> FileStorage::FInstances;
-QHash<QString, FileStorage *> FileStorage::FStaticStorages;
-
-QList<QString> FileStorage::FKeyTags    = QList<QString>() << "key"  << "text" << "name";
-QList<QString> FileStorage::FFileTags   = QList<QString>() << "object";
-QList<QString> FileStorage::FObjectTags = QList<QString>() << "file" << "icon";
 
 FileStorage::FileStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : QObject(AParent)
 {
@@ -301,6 +297,10 @@ FileStorage *FileStorage::staticStorage(const QString &ASubStorage)
 
 void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 {
+	static const QList<QString> keyTags = QList<QString>() << "key"  << "text" << "name";
+	static const QList<QString> fileTags = QList<QString>() << "object";
+	static const QList<QString> objectTags = QList<QString>() << "file" << "icon";
+
 	QDomDocument doc;
 	QFile file(ADefFile);
 	if (file.open(QFile::ReadOnly) && doc.setContent(file.readAll(),false))
@@ -308,7 +308,7 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 		QDomElement objElem = doc.documentElement().firstChildElement();
 		while (!objElem.isNull())
 		{
-			if (FObjectTags.contains(objElem.tagName()))
+			if (objectTags.contains(objElem.tagName()))
 			{
 				StorageObject object;
 				object.prefix = APrefixIndex;
@@ -317,13 +317,13 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 				QDomElement keyElem = objElem.firstChildElement();
 				while (!keyElem.isNull())
 				{
-					if (FKeyTags.contains(keyElem.tagName()))
+					if (keyTags.contains(keyElem.tagName()))
 					{
 						QString key = keyElem.text();
 						if (!FKey2Object.contains(key))
 							objKeys.append(key);
 					}
-					else if (FFileTags.contains(keyElem.tagName()))
+					else if (fileTags.contains(keyElem.tagName()))
 					{
 						if (!keyElem.text().isEmpty())
 						{

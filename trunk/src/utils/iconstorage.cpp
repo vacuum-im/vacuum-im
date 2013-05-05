@@ -5,6 +5,11 @@
 #include <QVariant>
 #include <QApplication>
 
+QHash<QString, IconStorage*> IconStorage::FStaticStorages;
+QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
+QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
+QHash<QString, QHash<QString, QList<IconStorage::IconAnimateFrame> > > IconStorage::FAnimateCache;
+
 struct IconStorage::IconAnimateFrame {
 	int delay;
 	QIcon icon;
@@ -42,11 +47,6 @@ struct IconStorage::IconUpdateParams {
 	QString prop;
 	IconAnimateParams *animation;
 };
-
-QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
-QHash<QString, IconStorage*> IconStorage::FStaticStorages;
-QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
-QHash<QString, QHash<QString, QList<IconStorage::IconAnimateFrame> > > IconStorage::FAnimateCache;
 
 IconStorage::IconStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : FileStorage(AStorage,ASubStorage,AParent)
 {

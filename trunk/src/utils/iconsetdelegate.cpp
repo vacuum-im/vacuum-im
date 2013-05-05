@@ -3,7 +3,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
-#define DEFAULT_ROWS              2
+#define DEFAULT_ROWS 2
 
 IconsetDelegate::IconsetDelegate(QObject *AParent) : QItemDelegate(AParent)
 {
