@@ -27,6 +27,7 @@ RostersModel::RostersModel()
 
 RostersModel::~RostersModel()
 {
+	delete FContactsRoot->instance();
 	FRootIndex->removeChildren();
 	delete FRootIndex;
 }

@@ -158,11 +158,11 @@ public:
 	QRect itemRect(quint32 AItemId, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 	quint32 itemAt(const QPoint &APoint, const ItemsLayout *ALayout, const QRect &AGeometry) const;
 	quint32 itemAt(const QPoint &APoint, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
+signals:
+	void updateBlinkItems();
 public:
 	static bool isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
 	static QSize itemSizeHint(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption);
-signals:
-	void updateBlinkItems();
 protected:
 	void drawBackground(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption) const;
 	void drawFocusRect(QPainter *APainter, const QStyleOptionViewItemV4 &AIndexOption, const QRect &ARect) const;

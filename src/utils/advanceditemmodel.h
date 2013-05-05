@@ -32,6 +32,8 @@ class UTILS_EXPORT AdvancedItemModel :
 	public QStandardItemModel
 {
 	Q_OBJECT;
+	friend class AdvancedItem;
+	friend class AdvancedItemDataHolder;
 public:
 	enum AdvancedRole {
 		AnyRole = -1,
@@ -77,9 +79,6 @@ protected slots:
 	void onRowsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 	void onColumnsAboutToBeRemoved(const QModelIndex &AParent, int AStart, int AEnd);
 	void onRowsOrColumnsRemoved(const QModelIndex &AParent, int AStart, int AEnd);
-private:
-	friend class AdvancedItem;
-	friend class AdvancedItemDataHolder;
 private:
 	bool FDelayedDataChangedSignals;
 	bool FRecursiveParentDataChangedSignals;

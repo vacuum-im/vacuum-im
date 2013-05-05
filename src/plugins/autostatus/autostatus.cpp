@@ -80,7 +80,7 @@ bool AutoStatus::initSettings()
 
 bool AutoStatus::startPlugin()
 {
-	SystemManager::instance()->startSystemIdle();
+	SystemManager::startSystemIdle();
 	connect(SystemManager::instance(),SIGNAL(systemIdleChanged(int)),SLOT(onSystemIdleChanged(int)));
 	return true;
 }

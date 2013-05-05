@@ -76,7 +76,8 @@ RecentContacts::RecentContacts()
 
 RecentContacts::~RecentContacts()
 {
-
+	if (FRootIndex)
+		delete FRootIndex->instance();
 }
 
 void RecentContacts::pluginInfo(IPluginInfo *APluginInfo)
@@ -185,6 +186,7 @@ bool RecentContacts::initObjects()
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFAVORITE,FRostersView->instance());
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_REMOVEFROMRECENT,FRostersView->instance());
 	}
+
 	if (FRostersModel)
 	{
 		FRootIndex = FRostersModel->newRosterIndex(RIK_RECENT_ROOT);
@@ -194,6 +196,7 @@ bool RecentContacts::initObjects()
 
 		FRostersModel->insertRosterDataHolder(RDHO_RECENTCONTACTS,this);
 	}
+	
 	registerItemHandler(REIT_CONTACT,this);
 	return true;
 }
@@ -360,7 +363,7 @@ QList<quint32> RecentContacts::rosterLabels(int AOrder, const IRosterIndex *AInd
 AdvancedDelegateItem RecentContacts::rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const
 {
 	Q_UNUSED(AOrder); Q_UNUSED(ALabelId); Q_UNUSED(AIndex);
-	static AdvancedDelegateItem null = AdvancedDelegateItem();
+	static const AdvancedDelegateItem null = AdvancedDelegateItem();
 	return null;
 }
 

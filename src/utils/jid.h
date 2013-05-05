@@ -59,7 +59,7 @@ public:
 	bool operator <(const Jid &AJid) const;
 	bool operator >(const Jid &AJid) const;
 public:
-	static Jid null;
+	static const Jid null;
 	static Jid fromUserInput(const QString &AJidStr);
 	static QString escape(const QString &AUserNode);
 	static QString unescape(const QString &AEscNode);
@@ -72,6 +72,8 @@ protected:
 	Jid &parseFromString(const QString &AJidStr);
 private:
 	QSharedDataPointer<JidData> d;
+private:
+	static QHash<QString,Jid> FJidCache;
 };
 
 UTILS_EXPORT uint qHash(const Jid &AKey);

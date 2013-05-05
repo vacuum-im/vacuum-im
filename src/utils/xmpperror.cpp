@@ -8,9 +8,9 @@ QMap<XmppStanzaError::ErrorType,QString> XmppStanzaError::FErrorTypes;
 QMap<XmppStanzaError::ErrorCondition,QString> XmppStanzaError::FErrorConditions;
 QMap<XmppStanzaError::ErrorCondition,XmppStanzaError::ErrorType> XmppStanzaError::FConditionTypes;
 
-XmppError XmppError::null = XmppError();
-XmppStreamError XmppStreamError::null = XmppStreamError();
-XmppStanzaError XmppStanzaError::null = XmppStanzaError();
+const XmppError XmppError::null;
+const XmppStreamError XmppStreamError::null;
+const XmppStanzaError XmppStanzaError::null;
 
 //*********
 //XmppError

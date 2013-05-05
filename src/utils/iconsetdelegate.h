@@ -16,7 +16,7 @@ enum IconsetDataRoles {
 };
 
 class UTILS_EXPORT IconsetDelegate :
-			public QItemDelegate
+	public QItemDelegate
 {
 public:
 	IconsetDelegate(QObject *AParent = NULL);
