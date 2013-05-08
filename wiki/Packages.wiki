@@ -58,7 +58,7 @@ https://code.google.com/p/vacuum-im/downloads/list?q=Package:Mandriva
 
 = openSUSE =
 
-https://build.opensuse.org/project/show?project=home%3AEGDFree
+https://build.opensuse.org/project/show?project=home%3AEGDFree%3Avacuum-im%3Agit
 
 == Подключение ==
 
