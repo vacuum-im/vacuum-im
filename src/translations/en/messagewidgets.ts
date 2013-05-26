@@ -251,7 +251,7 @@
     </message>
     <message>
         <source>Subject</source>
-        <translation type="unfinished">Subject</translation>
+        <translation>Subject</translation>
     </message>
 </context>
 <context>
