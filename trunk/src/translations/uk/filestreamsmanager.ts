@@ -48,7 +48,7 @@
     </message>
     <message>
         <source>File input/output error</source>
-        <translation type="unfinished"></translation>
+        <translation>Помилка введення/виводу в файл</translation>
     </message>
     <message>
         <source>File size unexpectedly changed</source>

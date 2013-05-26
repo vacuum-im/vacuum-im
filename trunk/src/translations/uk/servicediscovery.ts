@@ -237,13 +237,13 @@
     </message>
     <message>
         <source>Show Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Показати особисті дані</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
         <comment>Show Profile</comment>
         <translatorcomment>Показать личные данные</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+I</translation>
     </message>
 </context>
 </TS>

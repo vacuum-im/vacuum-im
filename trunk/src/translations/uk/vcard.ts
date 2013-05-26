@@ -60,27 +60,27 @@
     </message>
     <message>
         <source>Profile - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Особисті дані - %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Помилка</translation>
     </message>
     <message>
         <source>Failed to publish your profile: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалось опублікувати ваші особисті дані: %1</translation>
     </message>
     <message>
         <source>Failed to publish your profile.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалось опублікувати ваші особисті дані.</translation>
     </message>
     <message>
         <source>Failed to load profile.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалось завантажити особисті дані.</translation>
     </message>
     <message>
         <source>Failed to load profile: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалось завантажити особисті дані: %1</translation>
     </message>
 </context>
 <context>
@@ -246,21 +246,21 @@
     </message>
     <message>
         <source>Show Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Показати особисті дані</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
         <comment>Show Profile</comment>
         <translatorcomment>Показать личные данные</translatorcomment>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+I</translation>
     </message>
     <message>
         <source>Contact Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Особисті дані контакту</translation>
     </message>
     <message>
         <source>Edit Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>Редагувати особисті дані</translation>
     </message>
 </context>
 </TS>

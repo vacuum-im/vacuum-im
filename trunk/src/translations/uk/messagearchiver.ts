@@ -649,19 +649,19 @@
     </message>
     <message>
         <source>Failed to load conversation headers</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити заголовки розмов</translation>
     </message>
     <message>
         <source>Failed to save conversation</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося зберегти розмову</translation>
     </message>
     <message>
         <source>Failed to remove conversation</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося видалити розмову</translation>
     </message>
     <message>
         <source>Failed to load archive modifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити список змін до архіву</translation>
     </message>
 </context>
 </TS>
