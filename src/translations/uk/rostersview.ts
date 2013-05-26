@@ -5,7 +5,7 @@
     <name>RostersView</name>
     <message>
         <source>Copy to clipboard</source>
-        <translation>Копіювати в буфер</translation>
+        <translation>Копіювати до буферу</translation>
     </message>
     <message>
         <source>Contacts</source>
@@ -52,63 +52,63 @@
     </message>
     <message>
         <source>Show/Hide disconnected contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Показати/Сховати відключені контакти</translation>
     </message>
     <message>
         <source>Show status message in roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати статус контактів</translation>
     </message>
     <message>
         <source>Show disconnected contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати відключені контакти</translation>
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Absent</source>
-        <translation type="unfinished"></translation>
+        <translation>Відсутня</translation>
     </message>
     <message>
         <source>Mutual</source>
-        <translation type="unfinished"></translation>
+        <translation>Двохстороння</translation>
     </message>
     <message>
         <source>Provided to you</source>
-        <translation type="unfinished"></translation>
+        <translation>Надана Вам</translation>
     </message>
     <message>
         <source>Provided from you</source>
-        <translation type="unfinished"></translation>
+        <translation>Надана Вами</translation>
     </message>
     <message>
         <source>&lt;b&gt;Subscription:&lt;/b&gt; %1, request sent</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Підписка:&lt;/b&gt; %1, запит відправлено</translation>
     </message>
     <message>
         <source>&lt;b&gt;Subscription:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Підписка:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Resource:&lt;/b&gt; %1 (%2)</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Ресурс:&lt;/b&gt; %1 (%2)</translation>
     </message>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>Unite contacts of all accounts</source>
-        <translation type="unfinished"></translation>
+        <translation>Об&apos;єднати контакти всіх аккаунтів</translation>
     </message>
     <message>
         <source>Show list of united accounts</source>
-        <translation type="unfinished"></translation>
+        <translation>Показати список об&apos;єднаних аккаунтів</translation>
     </message>
     <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Аккаунт:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

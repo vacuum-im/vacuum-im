@@ -37,7 +37,7 @@
     </message>
     <message>
         <source>Search for Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Пошук контактів</translation>
     </message>
 </context>
 </TS>

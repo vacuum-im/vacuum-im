@@ -66,31 +66,31 @@
     </message>
     <message>
         <source>Send</source>
-        <translation type="unfinished"></translation>
+        <translation>Надіслати</translation>
     </message>
     <message>
         <source>Reply</source>
-        <translation type="unfinished"></translation>
+        <translation>Відповісти</translation>
     </message>
     <message>
         <source>Forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Переслати</translation>
     </message>
     <message>
         <source>Show Chat Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Відкрити діалог чату</translation>
     </message>
     <message>
         <source>Send Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Надіслати повідомлення</translation>
     </message>
     <message>
         <source>Show Next (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Показати наступне (%1)</translation>
     </message>
     <message>
         <source>Send as Chat Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Відправити як повідомлення чату</translation>
     </message>
 </context>
 </TS>

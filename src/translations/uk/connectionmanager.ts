@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>Помилка підключення</translation>
     </message>
 </context>
 <context>
@@ -97,7 +97,7 @@
     </message>
     <message>
         <source>Default proxy:</source>
-        <translation type="unfinished"></translation>
+        <translation>Проксі за замовчуванням:</translation>
     </message>
 </context>
 <context>

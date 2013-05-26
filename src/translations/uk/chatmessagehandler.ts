@@ -62,11 +62,11 @@
     </message>
     <message>
         <source>Contact resource</source>
-        <translation type="unfinished"></translation>
+        <translation>Ресурс контакту</translation>
     </message>
     <message>
         <source>&lt;Absent&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Відсутній&gt;</translation>
     </message>
 </context>
 </TS>

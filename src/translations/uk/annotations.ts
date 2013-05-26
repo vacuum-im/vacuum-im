@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Annotation:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Комментар:&lt;/b&gt;</translation>
     </message>
 </context>
 <context>

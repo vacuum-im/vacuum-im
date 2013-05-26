@@ -5,51 +5,51 @@
     <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Закладки</translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволяє створювати закладки для конференцій та веб-сторінок</translation>
     </message>
     <message>
         <source>Edit bookmark</source>
-        <translation type="unfinished">Редагувати закладку</translation>
+        <translation>Редагувати закладку</translation>
     </message>
     <message>
         <source>Disable autojoin to conferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Не входити автоматично до конференцій</translation>
     </message>
     <message>
         <source>Automatically show window of conferences connected at startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати вікна конференцій, що підключаються автоматично, при старті</translation>
     </message>
     <message>
         <source>Edit Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Редагувати закладки</translation>
     </message>
     <message>
         <source>Add to Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Додати до закладок</translation>
     </message>
     <message>
         <source>Remove from Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити з закладок</translation>
     </message>
     <message>
         <source>Edit Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Редагувати закладку</translation>
     </message>
     <message>
         <source>Rename Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Перейменувати закладку</translation>
     </message>
     <message>
         <source>Enter bookmark name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Введіть ім&apos;я закладки:</translation>
     </message>
     <message>
         <source>Join to Conference at Startup</source>
-        <translation type="unfinished"></translation>
+        <translation>Входити до конференції під час запуску</translation>
     </message>
 </context>
 <context>
