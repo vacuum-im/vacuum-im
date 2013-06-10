@@ -96,13 +96,12 @@ void SimpleOptionsWidget::updateOptionsWidgets()
 void SimpleOptionsWidget::onStyleChanged(int AIndex)
 {
 	QString styleId = ui.cmbStyle->itemData(AIndex).toString();
+	FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);
 
 	ui.cmbVariant->clear();
 	foreach(QString variant, FStylePlugin->styleVariants(styleId))
 		ui.cmbVariant->addItem(variant,variant);
 	ui.cmbVariant->setEnabled(ui.cmbVariant->count() > 0);
-
-	FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);
 
 	QMap<QString, QVariant> info = FStylePlugin->styleInfo(styleId);
 	if (info.contains(MSIV_DEFAULT_VARIANT))
@@ -111,20 +110,14 @@ void SimpleOptionsWidget::onStyleChanged(int AIndex)
 		ui.cmbVariant->setCurrentIndex(index>=0 ? index : 0);
 	}
 
-	if (info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool())
-	{
-		ui.tlbSetImage->setEnabled(false);
-		ui.tlbDefaultImage->setEnabled(false);
-		ui.cmbBackgoundColor->setEnabled(false);
-		onDefaultImageClicked();
-	}
-	else
-	{
-		ui.tlbSetImage->setEnabled(true);
-		ui.tlbDefaultImage->setEnabled(true);
-		ui.cmbBackgoundColor->setEnabled(true);
-		emit modified();
-	}
+	bool backgroundEnabled = !info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
+	ui.tlbSetImage->setEnabled(backgroundEnabled);
+	ui.tlbDefaultImage->setEnabled(backgroundEnabled);
+	ui.cmbBackgoundColor->setEnabled(backgroundEnabled);
+
+	ui.cmbBackgoundColor->setItemData(0,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
+
+	onDefaultImageClicked();
 }
 
 void SimpleOptionsWidget::onVariantChanged(int AIndex)
@@ -177,9 +170,7 @@ void SimpleOptionsWidget::onDefaultImageClicked()
 {
 	FStyleOptions.extended.remove(MSO_BG_IMAGE_FILE);
 
-	QMap<QString,QVariant> info = FStylePlugin->styleInfo(ui.cmbStyle->itemData(ui.cmbStyle->currentIndex()).toString());
-	FStyleOptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
-	ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
+	ui.cmbBackgoundColor->setCurrentIndex(0);
 
 	updateOptionsWidgets();
 	emit modified();
