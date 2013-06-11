@@ -6,6 +6,8 @@
 #include <QRegExp>
 #include <QMimeData>
 #include <QWebFrame>
+#include <QTextBlock>
+#include <QWebElement>
 #include <QByteArray>
 #include <QClipboard>
 #include <QStringList>
@@ -16,7 +18,10 @@
 #include <QTextDocument>
 #include <QWebHitTestResult>
 
-#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"STORAGE_SHARED_DIR
+#define SCROLL_TIMEOUT                      100
+#define EVALUTE_TIMEOUT                     10
+
+#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_ADIUMMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
 #define STYLE_CONTENTS_PATH                 "Contents"
 #define STYLE_RESOURCES_PATH                STYLE_CONTENTS_PATH"/Resources"
 
@@ -42,11 +47,20 @@ static const char *SenderColors[] =  {
 	"purple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "seagreen", "sienna", "slateblue",
 	"steelblue", "teal", "tomato", "violet"
 };
-
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
+
+QString AdiumMessageStyle::FSharedPath = QString::null;
 
 AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
 {
+	if (FSharedPath.isEmpty())
+	{
+		if (QDir::isRelativePath(SHARED_STYLE_PATH))
+			FSharedPath = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH;
+		else
+			FSharedPath = SHARED_STYLE_PATH;
+	}
+
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
 	FResourcePath = AStylePath+"/"STYLE_RESOURCES_PATH;
@@ -57,8 +71,12 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessMa
 	loadSenderColors();
 
 	FScrollTimer.setSingleShot(true);
-	FScrollTimer.setInterval(100);
+	FScrollTimer.setInterval(SCROLL_TIMEOUT);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
+
+	FPendingTimer.setSingleShot(true);
+	FPendingTimer.setInterval(EVALUTE_TIMEOUT);
+	connect(&FPendingTimer,SIGNAL(timeout()),SLOT(onEvaluateNextPendingScript()));
 
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
 }
@@ -115,23 +133,32 @@ QTextDocumentFragment AdiumMessageStyle::selection(QWidget *AWidget) const
 	return QTextDocumentFragment();
 }
 
-QTextDocumentFragment AdiumMessageStyle::textUnderPosition(const QPoint &APosition, QWidget *AWidget) const
+QTextCharFormat AdiumMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &APosition) const
+{
+	QTextDocumentFragment fragment = textFragmentAt(AWidget,APosition);
+	if (!fragment.isEmpty())
+	{
+		QTextDocument doc;
+		QTextCursor cursor(&doc);
+		cursor.insertFragment(fragment);
+		cursor.setPosition(0);
+		return cursor.charFormat();
+	}
+	return QTextCharFormat();
+}
+
+QTextDocumentFragment AdiumMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view)
 	{
-#if QT_VERSION >= 0x040800
-		QWebHitTestResult result = view->page()->currentFrame()->hitTestContent(APosition);
-		if (!result.isContentSelected())
-		{
-			if (result.linkUrl().isValid())
-				return QTextDocumentFragment::fromHtml(QString("<a href='%1'>%2</a>").arg(result.linkUrl().toString(),result.linkText()));
-		}
-		else
-#endif
-		{
-			return selection(AWidget);
-		}
+		QWebHitTestResult result = hitTest(AWidget,APosition);
+		if (result.linkUrl().isValid())
+			return QTextDocumentFragment::fromHtml(result.linkElement().toOuterXml());
+		else if (!result.element().isNull())
+			return QTextDocumentFragment::fromHtml(result.element().toOuterXml());
+		else if (!result.enclosingBlockElement().isNull())
+			return QTextDocumentFragment::fromHtml(result.enclosingBlockElement().toOuterXml());
 	}
 	return QTextDocumentFragment();
 }
@@ -205,10 +232,9 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		escapeStringForScript(html);
 		QString script = scriptForAppendContent(sameSender,AOptions.noScroll).arg(html);
 
-		if (wstatus.wait > 0)
-			wstatus.pending.append(script);
-		else
-			view->page()->mainFrame()->evaluateJavaScript(script);
+		if (wstatus.pending.isEmpty())
+			FPendingTimer.start();
+		wstatus.pending.append(script);
 
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
@@ -277,6 +303,13 @@ QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
 	return info;
 }
 
+QWebHitTestResult AdiumMessageStyle::hitTest(QWidget *AWidget, const QPoint &APosition) const
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	QWebFrame *frame = view!=NULL ? view->page()->frameAt(APosition) : NULL;
+	return frame!=NULL ? frame->hitTestContent(APosition) : QWebHitTestResult();
+}
+
 bool AdiumMessageStyle::isSameSender(QWidget *AWidget, const IMessageContentOptions &AOptions) const
 {
 	if (!FCombineConsecutive)
@@ -316,7 +349,7 @@ QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOption
 	if (!QFile::exists(htmlFileName))
 	{
 		FUsingCustomTemplate = false;
-		htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
+		htmlFileName = FSharedPath+"/Template.html";
 	}
 
 	QString html = loadFileData(htmlFileName,QString::null);
@@ -704,6 +737,25 @@ void AdiumMessageStyle::onScrollAfterResize()
 	}
 }
 
+void AdiumMessageStyle::onEvaluateNextPendingScript()
+{
+	bool restart = false;
+	for(QMap<QWidget *, WidgetStatus>::iterator it=FWidgetStatus.begin(); it!=FWidgetStatus.end(); ++it)
+	{
+		StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
+		if (view && it->wait==0 && !it->pending.isEmpty())
+		{
+			QString script = it->pending.takeFirst();
+			restart = restart || !it->pending.isEmpty();
+			view->page()->mainFrame()->evaluateJavaScript(script);
+		}
+	}
+	if (restart)
+	{
+		FPendingTimer.start();
+	}
+}
+
 void AdiumMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget)
 {
 	if (AStyle!=this && FWidgetStatus.contains(AWidget))
@@ -730,10 +782,9 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 		{
 			if (AOk)
 			{
-				foreach(QString script, wstatus.pending)
-					view->page()->mainFrame()->evaluateJavaScript(script);
+				if (!wstatus.pending.isEmpty())
+					FPendingTimer.start();
 				view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
-				wstatus.pending.clear();
 			}
 			else
 			{

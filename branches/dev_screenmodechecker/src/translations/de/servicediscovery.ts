@@ -227,15 +227,6 @@
         <translation>Eintrag zum Roster hinzufügen</translation>
     </message>
     <message>
-        <source>Show vCard</source>
-        <translation>vCard anzeigen</translation>
-    </message>
-    <message>
-        <source>Ctrl+I</source>
-        <comment>Show vCard</comment>
-        <translation>Strg+I</translation>
-    </message>
-    <message>
         <source>Close discovery window</source>
         <translation>Ermittlungsfenster schließen</translation>
     </message>
@@ -245,8 +236,14 @@
         <translation>Esc</translation>
     </message>
     <message>
-        <source>Category: %1; Type: %2</source>
-        <translation>Kategorie: %1, Typ: %2</translation>
+        <source>Show Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show Profile</comment>
+        <translatorcomment>Показать личные данные</translatorcomment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

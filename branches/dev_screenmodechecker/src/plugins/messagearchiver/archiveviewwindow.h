@@ -118,7 +118,7 @@ protected slots:
 	void onRemoveCollectionsByAction();
 	void onHeaderContextMenuRequested(const QPoint &APos);
 protected slots:
-	void onArchiveRequestFailed(const QString &AId, const QString &AError);
+	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 	void onArchiveHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	void onArchiveCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);

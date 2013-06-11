@@ -37,28 +37,5 @@
         <source>History of conversations is stored in local files</source>
         <translation>History of conversations is stored in local files</translation>
     </message>
-    <message>
-        <source>Internal error</source>
-        <translation>Internal error</translation>
-    </message>
-</context>
-<context>
-    <name>WorkingThread</name>
-    <message>
-        <source>Failed to save conversation to file</source>
-        <translation>Failed to save conversation to file</translation>
-    </message>
-    <message>
-        <source>Failed to remove conversation file</source>
-        <translation>Failed to remove conversation file</translation>
-    </message>
-    <message>
-        <source>Failed to load conversation from file</source>
-        <translation>Failed to load conversation from file</translation>
-    </message>
-    <message>
-        <source>Internal error</source>
-        <translation>Internal error</translation>
-    </message>
 </context>
 </TS>

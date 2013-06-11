@@ -53,8 +53,8 @@ public:
 	virtual bool setPriority(int APriority) =0;
 	virtual bool setPresence(int AShow, const QString &AStatus, int APriority) =0;
 	virtual bool sendPresence(const Jid &AContactJid, int AShow, const QString &AStatus, int APriority) =0;
-	virtual IPresenceItem presenceItem(const Jid &AItemJid) const =0;
-	virtual QList<IPresenceItem> presenceItems(const Jid &AItemJid = Jid::null) const =0;
+	virtual IPresenceItem findItem(const Jid &AItemFullJid) const =0;
+	virtual QList<IPresenceItem> findItems(const Jid &AItemBareJid = Jid::null) const =0;
 protected:
 	virtual void opened() =0;
 	virtual void changed(int AShow, const QString &AStatus, int APriority) =0;
@@ -70,10 +70,11 @@ public:
 	virtual QObject *instance() =0;
 	virtual IPresence *getPresence(IXmppStream *AXmppStream) =0;
 	virtual IPresence *findPresence(const Jid &AStreamJid) const =0;
-	virtual bool isContactOnline(const Jid &AContactJid) const =0;
-	virtual QList<Jid> contactsOnline() const =0;
-	virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const =0;
 	virtual void removePresence(IXmppStream *AXmppStream) =0;
+	virtual QList<Jid> onlineContacts() const =0;
+	virtual bool isOnlineContact(const Jid &AContactJid) const =0;
+	virtual QList<IPresence *> contactPresences(const Jid &AContactJid) const =0;
+	virtual QList<IPresenceItem> sortPresenceItems(const QList<IPresenceItem> &AItems) const =0;
 protected:
 	virtual void streamStateChanged(const Jid &AStreamJid, bool AStateOnline) =0;
 	virtual void contactStateChanged(const Jid &AStreamJid, const Jid &AContactJid, bool AStateOnline) =0;
@@ -87,7 +88,7 @@ protected:
 	virtual void presenceRemoved(IPresence *APresence) =0;
 };
 
-Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.2")
-Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.2")
+Q_DECLARE_INTERFACE(IPresence,"Vacuum.Plugin.IPresence/1.3")
+Q_DECLARE_INTERFACE(IPresencePlugin,"Vacuum.Plugin.IPresencePlugin/1.3")
 
 #endif  //IPRESENCE_H

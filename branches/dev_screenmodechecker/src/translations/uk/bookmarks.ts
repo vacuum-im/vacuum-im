@@ -2,34 +2,54 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>BookMarks</name>
+    <name>Bookmarks</name>
     <message>
         <source>Bookmarks</source>
         <translation>Закладки</translation>
-    </message>
-    <message>
-        <source>Edit bookmarks</source>
-        <translation>Редагувати закладки</translation>
     </message>
     <message>
         <source>Allows to create bookmarks at the jabber conference and web pages</source>
         <translation>Дозволяє створювати закладки для конференцій та веб-сторінок</translation>
     </message>
     <message>
-        <source>Append to bookmarks</source>
-        <translation>Додати до закладок</translation>
+        <source>Edit bookmark</source>
+        <translation>Редагувати закладку</translation>
     </message>
     <message>
         <source>Disable autojoin to conferences</source>
         <translation>Не входити автоматично до конференцій</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
+        <source>Automatically show window of conferences connected at startup</source>
+        <translation>Показувати вікна конференцій, що підключаються автоматично, при старті</translation>
+    </message>
+    <message>
+        <source>Edit Bookmarks</source>
+        <translation>Редагувати закладки</translation>
+    </message>
+    <message>
+        <source>Add to Bookmarks</source>
+        <translation>Додати до закладок</translation>
+    </message>
+    <message>
+        <source>Remove from Bookmarks</source>
+        <translation>Видалити з закладок</translation>
+    </message>
+    <message>
+        <source>Edit Bookmark</source>
         <translation>Редагувати закладку</translation>
     </message>
     <message>
-        <source>Automatically show window of conferences connected at startup</source>
-        <translation>Показувати вікна конференцій, що підключаються автоматично, при старті</translation>
+        <source>Rename Bookmark</source>
+        <translation>Перейменувати закладку</translation>
+    </message>
+    <message>
+        <source>Enter bookmark name:</source>
+        <translation>Введіть ім&apos;я закладки:</translation>
+    </message>
+    <message>
+        <source>Join to Conference at Startup</source>
+        <translation>Входити до конференції під час запуску</translation>
     </message>
 </context>
 <context>
@@ -99,10 +119,6 @@
     <message>
         <source>Cant save bookmarks to server</source>
         <translation>Не вдалося зберегти закладку на сервері</translation>
-    </message>
-    <message>
-        <source>Cant save bookmarks to server. %1</source>
-        <translation>Не вдалося зберегти закладку &quot;%1&quot; на сервері</translation>
     </message>
     <message>
         <source>Edit bookmarks - %1</source>

@@ -1,9 +1,14 @@
 #Loader and library names
-VACUUM_LOADER_NAME      = vacuum
-VACUUM_UTILS_NAME       = vacuumutils
+VACUUM_LOADER_NAME       = vacuum
+VACUUM_UTILS_NAME        = vacuumutils
 
 #Library ABI version
-unix:VACUUM_UTILS_ABI   = 21
+unix:VACUUM_UTILS_ABI    = 28
+
+#Build config
+CONFIG(debug, debug|release) {
+  DEFINES               += DEBUG_MODE
+}
 
 
 #Configurable values
@@ -43,17 +48,17 @@ isEmpty(INSTALL_SDK_DIR) {
 }
 
 
-#Preprocessor definitions
-!macx:CONFIG(debug, debug|release) {
+#Resources directories
+!macx:contains(DEFINES,DEBUG_MODE) {
   DEFINES               += PLUGINS_DIR='\\\"./plugins\\\"'
-  DEFINES               += RESOURCES_DIR='\\\"./resources\\\"'
+  DEFINES               += RESOURCES_DIR='\\\"$${PWD}/../../resources\\\"'
   DEFINES               += TRANSLATIONS_DIR='\\\"./src/translations\\\"'
 } else:win32 {
   DEFINES               += PLUGINS_DIR='\\\"./$${INSTALL_LIB_DIR}/plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"./$${INSTALL_RES_DIR}/resources\\\"'
   DEFINES               += TRANSLATIONS_DIR='\\\"./$${INSTALL_RES_DIR}/translations\\\"'
 } else:haiku {
-  DEFINES               += PLUGINS_DIR='\\\"./$${INSTALL_RES_DIR}/plugins\\\"'
+  DEFINES               += PLUGINS_DIR='\\\"./$${INSTALL_LIB_DIR}/plugins\\\"'
   DEFINES               += RESOURCES_DIR='\\\"./$${INSTALL_RES_DIR}/resources\\\"'
   DEFINES               += TRANSLATIONS_DIR='\\\"./$${INSTALL_RES_DIR}/translations\\\"'
 } else:macx {
@@ -74,20 +79,20 @@ win32 {
   INSTALL_INCLUDES       = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_SDK_DIR
   INSTALL_PLUGINS        = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_LIB_DIR/plugins
   INSTALL_RESOURCES      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_RES_DIR/resources
-  INSTALL_DOCUMENTS      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR
+  INSTALL_DOCUMENTS      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_RES_DIR
   INSTALL_TRANSLATIONS   = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_RES_DIR/translations
 } else:haiku {
   INSTALL_BINS           = $$INSTALL_PREFIX/$$INSTALL_APP_DIR
   INSTALL_LIBS           = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_LIB_DIR
   INSTALL_INCLUDES       = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_SDK_DIR
-  INSTALL_PLUGINS        = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/plugins
+  INSTALL_PLUGINS        = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_LIB_DIR/plugins
   INSTALL_RESOURCES      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_RES_DIR/resources
-  INSTALL_DOCUMENTS      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR
+  INSTALL_DOCUMENTS      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_RES_DIR/doc
   INSTALL_TRANSLATIONS   = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/$$INSTALL_RES_DIR/translations
 } else:macx {
   INSTALL_BINS           = $$INSTALL_PREFIX
   INSTALL_LIBS           = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/Contents/$$INSTALL_LIB_DIR
-  INSTALL_INCLUDES       = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/Contents/${INSTALL_RES_DIR}/$$INSTALL_SDK_DIR
+  INSTALL_INCLUDES       = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/Contents/$$INSTALL_RES_DIR/$$INSTALL_SDK_DIR
   INSTALL_PLUGINS        = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/Contents/PlugIns
   INSTALL_RESOURCES      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/Contents/$$INSTALL_RES_DIR
   INSTALL_DOCUMENTS      = $$INSTALL_PREFIX/$$INSTALL_APP_DIR/Contents/$$INSTALL_RES_DIR

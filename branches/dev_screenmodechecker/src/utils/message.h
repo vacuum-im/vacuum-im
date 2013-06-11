@@ -11,15 +11,12 @@
 #include "datetime.h"
 
 class MessageData :
-   public QSharedData
+	public QSharedData
 {
 public:
 	MessageData();
 	MessageData(const Stanza &AStanza);
 	MessageData(const MessageData &AOther);
-protected:
-	void updateDateTime();
-public:
 	Stanza FStanza;
 	QDateTime FDateTime;
 	QHash<int, QVariant> FData;
@@ -79,6 +76,5 @@ private:
 };
 
 Q_DECLARE_METATYPE(Message);
-#define MESSAGE_METATYPE_ID qMetaTypeId<Message>()
 
 #endif // MESSAGE_H

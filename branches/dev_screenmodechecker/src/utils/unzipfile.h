@@ -9,17 +9,15 @@
 #include "utilsexport.h"
 
 class UnzipFileData :
-   public QSharedData
+	public QSharedData
 {
-public:
-	struct ZippedFile;
 public:
 	UnzipFileData();
 	UnzipFileData(const UnzipFileData &AOther);
 	~UnzipFileData();
-public:
 	bool FFilesReaded;
 	void *FUNZFile;
+	struct ZippedFile;
 	QString FZipFileName;
 	QHash<QString, ZippedFile *> FZippedFiles;
 };
@@ -44,6 +42,5 @@ private:
 };
 
 Q_DECLARE_METATYPE(UnzipFile);
-#define UNZIPFILE_METATYPE_ID qMetaTypeId<UnzipFile>()
 
 #endif // UNZIPFILE_H

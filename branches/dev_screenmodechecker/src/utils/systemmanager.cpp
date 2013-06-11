@@ -1,70 +1,58 @@
 #include "systemmanager.h"
 #include <thirdparty/idle/idle.h>
-#include <thirdparty/screenmodechecker/screenmodechecker.h>
-#include <QDebug>
 
 struct SystemManager::SystemManagerData
 {
 	SystemManagerData() {
-		idle = NULL;
-		screenmode = NULL;
+		idle = new Idle;
 		idleSeconds = 0;
 	}
+	~SystemManagerData() {
+		delete idle;
+	}
 	Idle *idle;
-	ScreenModeChecker *screenmode;
-
 	int idleSeconds;
 };
 
-SystemManager::SystemManagerData *SystemManager::d = new SystemManager::SystemManagerData;
+SystemManager::SystemManager()
+{
+	d = new SystemManagerData;
+	connect(d->idle,SIGNAL(secondsIdle(int)),SLOT(onIdleChanged(int)));
+}
+
+SystemManager::~SystemManager()
+{
+	delete d;
+}
 
 SystemManager *SystemManager::instance()
 {
-	static SystemManager *manager = NULL;
-	if (!manager)
-	{
-		manager = new SystemManager;
-		manager->d->idle = new Idle;
-		manager->d->screenmode = new ScreenModeChecker;
-		connect(manager->d->idle,SIGNAL(secondsIdle(int)),manager,SLOT(onIdleChanged(int)));
-	}
-	return manager;
+	static SystemManager *inst = new SystemManager;
+	return inst;
 }
 
 int SystemManager::systemIdle()
 {
-	return d->idleSeconds;
+	return instance()->d->idleSeconds;
 }
 
 bool SystemManager::isSystemIdleActive()
 {
-	return d->idle!=NULL ? d->idle->isActive() : false;
+	return instance()->d->idle->isActive();
 }
 
 void SystemManager::startSystemIdle()
 {
-	if (d->idle && !d->idle->isActive())
-		d->idle->start();
-}
-
-bool SystemManager::isScreenSaverRunning()
-{
-	qDebug() << "------------------------";
-	qDebug() << "isScreen?" << d->screenmode->isScreensaverActive();
-	return !d->screenmode->isDummy() ? d->screenmode->isScreensaverActive() : false;
-}
-
-bool SystemManager::isFullScreenMode()
-{
-	qDebug() << "------------------------";
-	qDebug() << "isFull?" << d->screenmode->isFullscreenAppActive();
-	return !d->screenmode->isDummy() ? d->screenmode->isFullscreenAppActive() : false;
+	SystemManagerData *q = instance()->d;
+	if (!q->idle->isActive())
+		q->idle->start();
 }
 
 void SystemManager::stopSystemIdle()
 {
-	if (d->idle && d->idle->isActive())
-		d->idle->stop();
+	SystemManagerData *q = instance()->d;
+	if (q->idle->isActive())
+		q->idle->stop();
 }
 
 void SystemManager::onIdleChanged(int ASeconds)

@@ -46,7 +46,14 @@ bool PrivateStorage::initConnections(IPluginManager *APluginManager, int &AInitO
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
+	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		if (FPresencePlugin)
+		{
+			connect(FPresencePlugin->instance(),SIGNAL(presenceAboutToClose(IPresence *, int, const QString &)),
+				SLOT(onPresenceAboutToClose(IPresence *, int, const QString &)));
+		}
+	}
 
 	return FStanzaProcessor!=NULL;
 }
@@ -96,9 +103,9 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 		QDomElement dataElem; 
 		QDomElement loadElem = FLoadRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
-			dataElem = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement();
-		else
-			dataElem = loadOptionsElement(AStreamJid, loadElem.tagName(),loadElem.namespaceURI());
+			dataElem = AStanza.firstElement("query",NS_JABBER_PRIVATE).firstChildElement(loadElem.tagName());
+		if (dataElem.isNull())
+			dataElem = loadOptionsElement(AStreamJid,loadElem.tagName(),loadElem.namespaceURI());
 		emit dataLoaded(AStanza.id(),AStreamJid,insertElement(AStreamJid,dataElem));
 	}
 	else if (FRemoveRequests.contains(AStanza.id()))
@@ -140,6 +147,8 @@ QString PrivateStorage::saveData(const Jid &AStreamJid, const QDomElement &AElem
 		elem.appendChild(AElement.cloneNode(true));
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,PRIVATE_STORAGE_TIMEOUT))
 		{
+			if (FPreClosedStreams.contains(AStreamJid))
+				notifyDataChanged(AStreamJid,AElement.tagName(),AElement.namespaceURI());
 			FSaveRequests.insert(stanza.id(),insertElement(AStreamJid,AElement));
 			return stanza.id();
 		}
@@ -177,6 +186,8 @@ QString PrivateStorage::removeData(const Jid &AStreamJid, const QString &ATagNam
 			QDomElement dataElem = getData(AStreamJid,ATagName,ANamespace);
 			if (dataElem.isNull())
 				dataElem = insertElement(AStreamJid,elem);
+			if (FPreClosedStreams.contains(AStreamJid))
+				notifyDataChanged(AStreamJid,ATagName,ANamespace);
 			FRemoveRequests.insert(stanza.id(),dataElem);
 			return stanza.id();
 		}
@@ -189,7 +200,7 @@ void PrivateStorage::notifyDataChanged(const Jid &AStreamJid, const QString &ATa
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (FStanzaProcessor && presence && presence->isOpen())
 	{
-		foreach(IPresenceItem item, presence->presenceItems(AStreamJid.bare()))
+		foreach(IPresenceItem item, presence->findItems(AStreamJid.bare()))
 		{
 			if (item.itemJid != AStreamJid)
 			{
@@ -266,8 +277,16 @@ void PrivateStorage::onStreamAboutToClose(IXmppStream *AXmppStream)
 
 void PrivateStorage::onStreamClosed(IXmppStream *AXmppStream)
 {
+	FPreClosedStreams -= AXmppStream->streamJid();
 	emit storageClosed(AXmppStream->streamJid());
 	FStorage.removeChild(FStreamElements.take(AXmppStream->streamJid()));
+}
+
+void PrivateStorage::onPresenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus)
+{
+	Q_UNUSED(AShow); Q_UNUSED(AStatus);
+	FPreClosedStreams += APresence->streamJid();
+	emit storageNotifyAboutToClose(APresence->streamJid());
 }
 
 Q_EXPORT_PLUGIN2(plg_privatestorage, PrivateStorage)

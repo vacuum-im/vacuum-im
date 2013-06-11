@@ -5,26 +5,22 @@
 #include <interfaces/imessagewidgets.h>
 
 class MenuBarWidget :
-			public QMenuBar,
-			public IMenuBarWidget
+	public QMenuBar,
+	public IMessageMenuBarWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMenuBarWidget);
+	Q_INTERFACES(IMessageWidget IMessageMenuBarWidget);
 public:
-	MenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
+	MenuBarWidget(IMessageWindow *AWindow, QWidget *AParent);
 	~MenuBarWidget();
+	// IMessageWidget
 	virtual QMenuBar *instance() { return this; }
-	virtual MenuBarChanger *menuBarChanger() const { return FMenuBarChanger; }
-	virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
-	virtual IViewWidget *viewWidget() const { return FViewWidget; }
-	virtual IEditWidget *editWidget() const { return FEditWidget; }
-	virtual IReceiversWidget *receiversWidget() const { return FReceiversWidget; }
+	virtual bool isVisibleOnWindow() const;
+	virtual IMessageWindow *messageWindow() const;
+	// IMessageMenuBarWidget
+	virtual MenuBarChanger *menuBarChanger() const;
 private:
-	IInfoWidget *FInfoWidget;
-	IViewWidget *FViewWidget;
-	IEditWidget *FEditWidget;
-	IReceiversWidget *FReceiversWidget;
-private:
+	IMessageWindow *FWindow;
 	MenuBarChanger *FMenuBarChanger;
 };
 

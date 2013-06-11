@@ -13,7 +13,7 @@
 class Action;
 
 class UTILS_EXPORT Menu :
-			public QMenu
+	public QMenu
 {
 	Q_OBJECT;
 public:
@@ -32,14 +32,14 @@ public:
 	void setIcon(const QIcon &AIcon);
 	void setIcon(const QString &AStorageName, const QString &AIconKey, int AIconIndex = 0);
 	void setTitle(const QString &ATitle);
-public:
-	static bool copyStandardMenu(Menu *ADestination, QMenu *ASource, int AGroup = AG_DEFAULT);
 signals:
 	void actionInserted(QAction *ABefore, Action *AAction, int AGroup, bool ASort);
 	void actionRemoved(Action *AAction);
 	void separatorInserted(Action *ABefore, QAction *ASeparator);
 	void separatorRemoved(QAction *ASeparator);
 	void menuDestroyed(Menu *AMenu);
+public:
+	static bool copyStandardMenu(Menu *ADestination, QMenu *ASource, int AGroup = AG_DEFAULT);
 protected slots:
 	void onActionDestroyed(Action *AAction);
 private:

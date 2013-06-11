@@ -7,8 +7,8 @@
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/rosterindextyperole.h>
-#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
@@ -72,7 +72,7 @@ protected slots:
 	void onShowAccountOptions(bool);
 	void onAccountActiveChanged(bool AActive);
 	void onAccountOptionsChanged(const OptionsNode &ANode);
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 private:
 	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;

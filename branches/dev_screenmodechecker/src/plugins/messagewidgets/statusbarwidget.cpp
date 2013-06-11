@@ -1,15 +1,27 @@
 #include "statusbarwidget.h"
 
-StatusBarWidget::StatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) : QStatusBar(AParent)
+StatusBarWidget::StatusBarWidget(IMessageWindow *AWindow, QWidget *AParent) : QStatusBar(AParent)
 {
-	FInfoWidget = AInfo;
-	FViewWidget = AView;
-	FEditWidget = AEdit;
-	FReceiversWidget = AReceivers;
+	FWindow = AWindow;
 	FStatusBarChanger = new StatusBarChanger(this);
 }
 
 StatusBarWidget::~StatusBarWidget()
 {
 
+}
+
+bool StatusBarWidget::isVisibleOnWindow() const
+{
+	return isVisibleTo(FWindow->instance());
+}
+
+IMessageWindow *StatusBarWidget::messageWindow() const
+{
+	return FWindow;
+}
+
+StatusBarChanger *StatusBarWidget::statusBarChanger() const
+{
+	return FStatusBarChanger;
 }

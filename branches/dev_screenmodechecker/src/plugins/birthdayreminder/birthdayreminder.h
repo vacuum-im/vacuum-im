@@ -10,9 +10,10 @@
 #include <definitions/resources.h>
 #include <definitions/optionvalues.h>
 #include <definitions/vcardvaluenames.h>
-#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/rostertooltiporders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibirthdayreminder.h>
 #include <interfaces/ivcard.h>
@@ -58,7 +59,7 @@ protected slots:
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
 	void onVCardReceived(const Jid &AContactJid);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onOptionsOpened();
@@ -73,7 +74,7 @@ private:
 	IRostersViewPlugin *FRostersViewPlugin;
 	IMessageProcessor *FMessageProcessor;
 private:
-	int FBirthdayLabelId;
+	quint32 FBirthdayLabelId;
 	QDate FNotifyDate;
 	QTimer FNotifyTimer;
 	QMap<int, Jid> FNotifies;

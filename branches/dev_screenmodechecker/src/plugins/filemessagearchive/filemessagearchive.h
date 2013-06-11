@@ -60,7 +60,7 @@ public:
 signals:
 	//IArchiveEngine
 	void capabilitiesChanged(const Jid &AStreamJid);
-	void requestFailed(const QString &AId, const QString &AError);
+	void requestFailed(const QString &AId, const XmppError &AError);
 	void collectionSaved(const QString &AId, const IArchiveHeader &AHeader);
 	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
@@ -79,6 +79,7 @@ protected:
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
 	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
 	CollectionWriter *newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName);
+	void removeCollectionWriter(CollectionWriter *AWriter);
 protected slots:
 	void onWorkingThreadFinished();
 	void onArchivePrefsOpened(const Jid &AStreamJid);

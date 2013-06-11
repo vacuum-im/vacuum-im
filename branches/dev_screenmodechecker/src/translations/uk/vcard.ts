@@ -11,18 +11,6 @@
 <context>
     <name>VCardDialog</name>
     <message>
-        <source>vCard - %1</source>
-        <translation>vCard - %1</translation>
-    </message>
-    <message>
-        <source>vCard error</source>
-        <translation>Помилка vCard</translation>
-    </message>
-    <message>
-        <source>vCard request or publish failed.&lt;br&gt;%1</source>
-        <translation>Запит або публікація vCard провалено.&lt;br&gt;%1</translation>
-    </message>
-    <message>
         <source>Save image</source>
         <translation>Зберегти зображення</translation>
     </message>
@@ -51,14 +39,6 @@
         <translation>Сервіс недоступний</translation>
     </message>
     <message>
-        <source>Failed to publish vCard</source>
-        <translation>Не вдалось опублікувати vCard</translation>
-    </message>
-    <message>
-        <source>Failed to update vCard</source>
-        <translation>Не вдалось поновити vCard</translation>
-    </message>
-    <message>
         <source>&lt;Unset&gt;</source>
         <translation>&lt;Не встановлено&gt;</translation>
     </message>
@@ -77,6 +57,30 @@
     <message>
         <source>Image Files (*.%1)</source>
         <translation>Зображення (*.%1)</translation>
+    </message>
+    <message>
+        <source>Profile - %1</source>
+        <translation>Особисті дані - %1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Помилка</translation>
+    </message>
+    <message>
+        <source>Failed to publish your profile: %1</source>
+        <translation>Не вдалось опублікувати ваші особисті дані: %1</translation>
+    </message>
+    <message>
+        <source>Failed to publish your profile.</source>
+        <translation>Не вдалось опублікувати ваші особисті дані.</translation>
+    </message>
+    <message>
+        <source>Failed to load profile.</source>
+        <translation>Не вдалось завантажити особисті дані.</translation>
+    </message>
+    <message>
+        <source>Failed to load profile: %1</source>
+        <translation>Не вдалось завантажити особисті дані: %1</translation>
     </message>
 </context>
 <context>
@@ -241,17 +245,22 @@
         <translation>Менеджер візитних карток</translation>
     </message>
     <message>
-        <source>Show vCard</source>
-        <translation>Показати vCard</translation>
+        <source>Show Profile</source>
+        <translation>Показати особисті дані</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <comment>Show vCard</comment>
+        <comment>Show Profile</comment>
+        <translatorcomment>Показать личные данные</translatorcomment>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <source>Visit Card</source>
-        <translation>Візитка</translation>
+        <source>Contact Profile</source>
+        <translation>Особисті дані контакту</translation>
+    </message>
+    <message>
+        <source>Edit Profile</source>
+        <translation>Редагувати особисті дані</translation>
     </message>
 </context>
 </TS>

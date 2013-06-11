@@ -32,7 +32,23 @@
     </message>
 </context>
 <context>
-    <name>InBandStream</name>
+    <name>InBandStreams</name>
+    <message>
+        <source>Data is broken down into smaller chunks and transported in-band over XMPP</source>
+        <translation>Daten sind in kleinere Stücke aufgeteilt und werden intern über XMPP transportiert</translation>
+    </message>
+    <message>
+        <source>In-Band Data Stream</source>
+        <translation>Interner Datenstrom</translation>
+    </message>
+    <message>
+        <source>Allows to initiate in-band stream of data between two XMPP entities</source>
+        <translation>Erlaubt den Aufbau von internen Datenströmen zwischen zwei XMPP Endpunkten</translation>
+    </message>
+    <message>
+        <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
+        <translation>Unterstützt den Aufbau von internen Datenströmen zwischen zwei XMPP Endpunkten</translation>
+    </message>
     <message>
         <source>Stream destroyed</source>
         <translation>Datenstrom abgeschlossen</translation>
@@ -52,25 +68,6 @@
     <message>
         <source>Failed to send data</source>
         <translation>Senden der Daten fehlgeschlagen</translation>
-    </message>
-</context>
-<context>
-    <name>InBandStreams</name>
-    <message>
-        <source>Data is broken down into smaller chunks and transported in-band over XMPP</source>
-        <translation>Daten sind in kleinere Stücke aufgeteilt und werden intern über XMPP transportiert</translation>
-    </message>
-    <message>
-        <source>In-Band Data Stream</source>
-        <translation>Interner Datenstrom</translation>
-    </message>
-    <message>
-        <source>Allows to initiate in-band stream of data between two XMPP entities</source>
-        <translation>Erlaubt den Aufbau von internen Datenströmen zwischen zwei XMPP Endpunkten</translation>
-    </message>
-    <message>
-        <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
-        <translation>Unterstützt den Aufbau von internen Datenströmen zwischen zwei XMPP Endpunkten</translation>
     </message>
 </context>
 </TS>

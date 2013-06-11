@@ -32,6 +32,9 @@ bool StartTLSPlugin::initConnections(IPluginManager *APluginManager, int &/*AIni
 
 bool StartTLSPlugin::initObjects()
 {
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_STARTTLS_INVALID_RESPONCE,tr("Wrong StartTLS negotiation response"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_STARTTLS_NEGOTIATION_FAILED,tr("StartTLS negotiation failed"));
+
 	if (FXmppStreams)
 	{
 		FXmppStreams->registerXmppFeature(XFO_STARTTLS,NS_FEATURE_STARTTLS);

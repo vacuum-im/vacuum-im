@@ -19,6 +19,10 @@
         <source>New Proxy</source>
         <translation>Новий проксі</translation>
     </message>
+    <message>
+        <source>Connection error</source>
+        <translation>Помилка підключення</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
@@ -77,10 +81,6 @@
         <translation>Пароль:</translation>
     </message>
     <message>
-        <source>Default Proxy:</source>
-        <translation>Проксі за замовчуванням:</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Додати</translation>
     </message>
@@ -94,6 +94,10 @@
     <message>
         <source>&lt;Default Proxy&gt;</source>
         <translation>&lt;Проксі за замовчуванням&gt;</translation>
+    </message>
+    <message>
+        <source>Default proxy:</source>
+        <translation>Проксі за замовчуванням:</translation>
     </message>
 </context>
 <context>

@@ -1,5 +1,23 @@
 #include "presenceplugin.h"
 
+bool presenceItemLessThen(const IPresenceItem &AItem1, const IPresenceItem &AItem2)
+{
+	if (AItem1.show != AItem2.show)
+	{
+		static const int showOrders[] = {6,2,1,3,4,5,7,8};
+		static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
+		if (AItem1.show<showOrdersCount && AItem2.show<showOrdersCount)
+			return showOrders[AItem1.show] < showOrders[AItem2.show];
+	}
+	
+	if (AItem1.priority != AItem2.priority)
+	{
+		return AItem1.priority > AItem2.priority;
+	}
+
+	return AItem1.itemJid < AItem2.itemJid;
+}
+
 PresencePlugin::PresencePlugin()
 {
 	FXmppStreams = NULL;
@@ -8,7 +26,7 @@ PresencePlugin::PresencePlugin()
 
 PresencePlugin::~PresencePlugin()
 {
-
+	FCleanupHandler.clear();
 }
 
 //IPlugin
@@ -76,6 +94,32 @@ void PresencePlugin::removePresence(IXmppStream *AXmppStream)
 		FPresences.removeAt(FPresences.indexOf(presence));
 		delete presence->instance();
 	}
+}
+
+QList<Jid> PresencePlugin::onlineContacts() const
+{
+	return FContactPresences.keys();
+}
+
+bool PresencePlugin::isOnlineContact(const Jid &AContactJid) const
+{
+	return FContactPresences.contains(AContactJid);
+}
+
+QList<IPresence *> PresencePlugin::contactPresences(const Jid &AContactJid) const
+{
+	return FContactPresences.value(AContactJid).toList();
+}
+
+QList<IPresenceItem> PresencePlugin::sortPresenceItems(const QList<IPresenceItem> &AItems) const
+{
+	if (AItems.count() > 1)
+	{
+		QList<IPresenceItem> items = AItems;
+		qSort(items.begin(),items.end(),presenceItemLessThen);
+		return items;
+	}
+	return AItems;
 }
 
 void PresencePlugin::onPresenceOpened()

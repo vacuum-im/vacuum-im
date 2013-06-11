@@ -12,12 +12,12 @@
         <translation>Allows to setup user defined shortcuts</translation>
     </message>
     <message>
-        <source>Hide all windows, tray icon and notifications</source>
-        <translation>Hide all windows, tray icon and notifications</translation>
-    </message>
-    <message>
         <source>Shortcuts</source>
         <translation>Shortcuts</translation>
+    </message>
+    <message>
+        <source>Hide all windows, tray icon and notifications</source>
+        <translation>Hide all windows, tray icon and notifications</translation>
     </message>
     <message>
         <source>Enter profile password:</source>

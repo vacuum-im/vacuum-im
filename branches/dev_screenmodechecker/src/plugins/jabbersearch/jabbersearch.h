@@ -16,12 +16,12 @@
 #include "searchdialog.h"
 
 class JabberSearch :
-			public QObject,
-			public IPlugin,
-			public IJabberSearch,
-			public IStanzaRequestOwner,
-			public IDiscoFeatureHandler,
-			public IDataLocalizer
+	public QObject,
+	public IPlugin,
+	public IJabberSearch,
+	public IStanzaRequestOwner,
+	public IDiscoFeatureHandler,
+	public IDataLocalizer
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IJabberSearch IStanzaRequestOwner IDiscoFeatureHandler IDataLocalizer);
@@ -50,7 +50,7 @@ public:
 signals:
 	void searchFields(const QString &AId, const ISearchFields &AFields);
 	void searchResult(const QString &AId, const ISearchResult &AResult);
-	void searchError(const QString &AId, const QString &AError);
+	void searchError(const QString &AId, const XmppError &AError);
 protected:
 	void registerDiscoFeatures();
 protected slots:

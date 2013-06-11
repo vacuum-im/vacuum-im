@@ -31,7 +31,7 @@ protected slots:
 	void onActiveListChanged(const Jid &AStreamJid, const QString &AName);
 	void onDefaultListChanged(const Jid &AStreamJid, const QString &AName);
 	void onRequestCompleted(const QString &AId);
-	void onRequestFailed(const QString &AId, const QString &AError);
+	void onRequestFailed(const QString &AId, const XmppError &AError);
 	void onAddListClicked();
 	void onDeleteListClicked();
 	void onAddRuleClicked();

@@ -10,7 +10,7 @@ DataForms::DataForms()
 
 DataForms::~DataForms()
 {
-
+	FCleanupHandler.clear();
 }
 
 void DataForms::pluginInfo(IPluginInfo *APluginInfo)
@@ -41,6 +41,11 @@ bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 
 bool DataForms::initObjects()
 {
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_MEDIA_INVALID_TYPE,tr("Unsupported media type"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_MEDIA_INVALID_FORMAT,tr("Unsupported data format"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_URL_INVALID_SCHEME,tr("Unsupported url scheme"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_URL_NETWORK_ERROR,tr("Url load failed"));
+
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
@@ -843,7 +848,7 @@ IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASu
 
 			if (sfield.type == DATAFIELD_TYPE_BOOLEAN)
 			{
-				sfield.type == DATAFIELD_TYPE_TEXTSINGLE;
+				sfield.type = DATAFIELD_TYPE_TEXTSINGLE;
 				sfield.value = sfield.value.toBool() ? tr("Yes") : tr("No");
 			}
 			else if (sfield.type == DATAFIELD_TYPE_LISTSINGLE)
@@ -882,13 +887,13 @@ bool DataForms::loadUrl(const QUrl &AUrl)
 			}
 			else
 			{
-				urlLoadFailure(AUrl,tr("Url load failed"));
+				urlLoadFailure(AUrl,XmppError(IERR_DATAFORMS_URL_NETWORK_ERROR));
 				return false;
 			}
 		}
 		else
 		{
-			urlLoadFailure(AUrl,tr("Unsupported url scheme"));
+			urlLoadFailure(AUrl,XmppError(IERR_DATAFORMS_URL_INVALID_SCHEME));
 			return false;
 		}
 	}
@@ -1024,7 +1029,7 @@ void DataForms::urlLoadSuccess(const QUrl &AUrl, const QByteArray &AData)
 	emit urlLoaded(AUrl,AData);
 }
 
-void DataForms::urlLoadFailure(const QUrl &AUrl, const QString &AError)
+void DataForms::urlLoadFailure(const QUrl &AUrl, const XmppError &AError)
 {
 	FUrlRequests.remove(AUrl);
 	emit urlLoadFailed(AUrl,AError);
@@ -1071,7 +1076,7 @@ void DataForms::onNetworkReplyError(QNetworkReply::NetworkError ACode)
 	QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
 	if (reply)
 	{
-		urlLoadFailure(reply->url(),reply->errorString());
+		urlLoadFailure(reply->url(),XmppError(IERR_DATAFORMS_URL_NETWORK_ERROR,reply->errorString()));
 		reply->close();
 		reply->deleteLater();
 	}

@@ -20,18 +20,23 @@ macx:QMAKE_INFO_PLIST = ../../src/packages/macosx/Info.plist
 #SVN Info
 isEmpty(SVN_REVISION) {
   SVN_REVISION=$$system(svnversion -n -c ./../../)
+  SVN_REVISION_INVALID = $$find(SVN_REVISION,Unversioned) $$find(SVN_REVISION,exported)
 }
 win32 {
   exists(svninfo.h):system(del svninfo.h)
-  !isEmpty(SVN_REVISION):system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
-    DEFINES         += SVNINFO
-    QMAKE_DISTCLEAN += svninfo.h
+  !isEmpty(SVN_REVISION):count(SVN_REVISION_INVALID,0) {
+    system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
+      DEFINES         += SVNINFO
+      QMAKE_DISTCLEAN += svninfo.h
+    }
   }
 } else {
   exists(svninfo.h):system(rm -f svninfo.h)
-  !isEmpty(SVN_REVISION):system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h) {
-    DEFINES         += SVNINFO
-    QMAKE_DISTCLEAN += svninfo.h
+  !isEmpty(SVN_REVISION)::count(SVN_REVISION_INVALID,0) {
+    system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h) {
+      DEFINES         += SVNINFO
+      QMAKE_DISTCLEAN += svninfo.h
+    }
   }
 }
 
@@ -44,6 +49,7 @@ documents.files    = ../../AUTHORS ../../CHANGELOG ../../README ../../COPYING ..
 INSTALLS           += target resources documents
 
 #Translation
+TRANS_BUILD_ROOT   = $${OUT_PWD}/../..
 TRANS_SOURCE_ROOT  = ..
 include(../translations/languages.inc)
 

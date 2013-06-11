@@ -2,7 +2,7 @@
 
 ConnectionManager::ConnectionManager()
 {
-	FEncryptedLabelId = -1;
+	FEncryptedLabelId = 0;
 	FAccountManager = NULL;
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
@@ -22,8 +22,10 @@ void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	QList<IPlugin *> plugins = APluginManager->pluginInterface("IConnectionPlugin");
 	foreach (IPlugin *plugin, plugins)
 	{
@@ -44,7 +46,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &/*A
 		{
 			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
 			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),
-			        SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+				SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 		}
 	}
 
@@ -81,15 +83,17 @@ bool ConnectionManager::initObjects()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_TYPE,QString("DefaultConnection"));
 
-	Options::setDefaultValue(OPV_PROXY_DEFAULT,QString(APPLICATION_PROXY_REF_UUID));
+	Options::setDefaultValue(OPV_PROXY_DEFAULT,QString());
 	Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
 	Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
 
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_CONNECTIONS_CONNECT_ERROR,tr("Connection error"));
+
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_CONNECTION_ENCRYPTED;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
+		AdvancedDelegateItem label(RLID_CONNECTION_ENCRYPTED);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
 		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;
@@ -97,10 +101,8 @@ bool ConnectionManager::initObjects()
 
 bool ConnectionManager::initSettings()
 {
-	if (FAccountManager && FOptionsManager)
-	{
+	if (FOptionsManager)
 		FOptionsManager->insertOptionsHolder(this);
-	}
 	return true;
 }
 
@@ -111,6 +113,10 @@ QMultiMap<int, IOptionsWidget *> ConnectionManager::optionsWidgets(const QString
 	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 	{
 		widgets.insertMulti(OWO_ACCOUNT_CONNECTION, new ConnectionOptionsWidget(this,Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)),AParent));
+	}
+	else if (ANodeId == OPN_MISC)
+	{
+		widgets.insertMulti(OWO_MISC_DEFAULTPROXY, proxySettingsWidget(Options::node(OPV_PROXY_DEFAULT),AParent));
 	}
 	return widgets;
 }
@@ -128,8 +134,8 @@ IConnectionPlugin *ConnectionManager::pluginById(const QString &APluginId) const
 QList<QUuid> ConnectionManager::proxyList() const
 {
 	QList<QUuid> plist;
-	foreach(QString proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy")) {
-		plist.append(proxyId); }
+	foreach(QString proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy"))
+		plist.append(proxyId);
 	return plist;
 }
 
@@ -195,9 +201,7 @@ QUuid ConnectionManager::defaultProxy() const
 void ConnectionManager::setDefaultProxy(const QUuid &AProxyId)
 {
 	if (defaultProxy()!=AProxyId && (AProxyId.isNull() || proxyList().contains(AProxyId)))
-	{
 		Options::node(OPV_PROXY_DEFAULT).setValue(AProxyId.toString());
-	}
 }
 
 QDialog *ConnectionManager::showEditProxyDialog(QWidget *AParent)
@@ -273,13 +277,9 @@ void ConnectionManager::onAccountOptionsChanged(IAccount *AAccount, const Option
 	const OptionsNode &aoptions = AAccount->optionsNode();
 	const OptionsNode &coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
 	if (aoptions.childPath(ANode) == "connection-type")
-	{
 		updateAccountConnection(AAccount);
-	}
 	else if (coptions.isChildNode(ANode))
-	{
 		updateConnectionSettings(AAccount);
-	}
 }
 
 void ConnectionManager::onStreamOpened(IXmppStream *AXmppStream)
@@ -287,9 +287,9 @@ void ConnectionManager::onStreamOpened(IXmppStream *AXmppStream)
 	if (FRostersViewPlugin && AXmppStream->connection() && AXmppStream->connection()->isEncrypted())
 	{
 		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
-		IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->streamJid()) : NULL;
-		if (index!=NULL)
-			FRostersViewPlugin->rostersView()->insertLabel(FEncryptedLabelId,index);
+		IRosterIndex *sindex = model!=NULL ? model->streamIndex(AXmppStream->streamJid()) : NULL;
+		if (sindex)
+			FRostersViewPlugin->rostersView()->insertLabel(FEncryptedLabelId,sindex);
 	}
 }
 
@@ -298,15 +298,15 @@ void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
 	if (FRostersViewPlugin)
 	{
 		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
-		IRosterIndex *index = model!=NULL ? model->streamRoot(AXmppStream->streamJid()) : NULL;
-		if (index!=NULL)
-			FRostersViewPlugin->rostersView()->removeLabel(FEncryptedLabelId,index);
+		IRosterIndex *sindex = model!=NULL ? model->streamIndex(AXmppStream->streamJid()) : NULL;
+		if (sindex)
+			FRostersViewPlugin->rostersView()->removeLabel(FEncryptedLabelId,sindex);
 	}
 }
 
 void ConnectionManager::onOptionsOpened()
 {
-	QNetworkProxy::setApplicationProxy(proxyById(defaultProxy()).proxy);
+	onOptionsChanged(Options::node(OPV_PROXY_DEFAULT));
 }
 
 void ConnectionManager::onOptionsChanged(const OptionsNode &ANode)
@@ -315,8 +315,8 @@ void ConnectionManager::onOptionsChanged(const OptionsNode &ANode)
 	{
 		QUuid proxyId = ANode.value().toString();
 		QNetworkProxy::setApplicationProxy(proxyById(proxyId).proxy);
-		emit defaultProxyChanged(proxyId);
 		updateConnectionSettings();
+		emit defaultProxyChanged(proxyId);
 	}
 	else if (Options::node(OPV_PROXY_ROOT).isChildNode(ANode))
 	{

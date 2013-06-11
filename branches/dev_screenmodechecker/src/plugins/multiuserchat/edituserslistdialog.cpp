@@ -54,9 +54,9 @@ EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QLis
 		ui.tbwTable->hideColumn(1);
 		ui.tbwTable->horizontalHeader()->setResizeMode(0,QHeaderView::Stretch);
 	}
-// default sort to JID column
-    ui.tbwTable->setSortingEnabled(true);
-    ui.tbwTable->sortByColumn(JID_COLUMN_NUM, Qt::AscendingOrder);
+	// default sort to JID column
+	ui.tbwTable->setSortingEnabled(true);
+	ui.tbwTable->sortByColumn(JID_COLUMN_NUM, Qt::AscendingOrder);
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddClicked()));
 	connect(ui.pbtDelete,SIGNAL(clicked()),SLOT(onDeleteClicked()));

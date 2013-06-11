@@ -1,6 +1,7 @@
 #include "rostersearch.h"
 
 #include <QKeyEvent>
+#include <QMouseEvent>
 
 RosterSearch::RosterSearch()
 {
@@ -34,7 +35,7 @@ RosterSearch::RosterSearch()
 	FSearchEdit->setSearchMenuVisible(true);
 	FSearchEdit->setSelectTextOnFocusEnabled(false);
 	FSearchEdit->searchMenu()->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTERSEARCH_MENU);
-	FSearchEdit->setToolTip(tr("Search by regular expression"));
+	FSearchEdit->setPlaceholderText(tr("Search for Contacts"));
 	connect(FSearchEdit,SIGNAL(searchStart()),SLOT(onSearchEditStart()));
 	FSearchToolBarChanger->insertWidget(FSearchEdit);
 }
@@ -107,24 +108,29 @@ bool RosterSearch::initSettings()
 	return true;
 }
 
-bool RosterSearch::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool RosterSearch::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(AEvent);
+	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+		return rosterIndexDoubleClicked(AOrder, AIndex, AEvent);
 	return false;
 }
 
-bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent)
+bool RosterSearch::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	Q_UNUSED(AIndex); Q_UNUSED(AEvent);
-	if (AOrder == RCHO_ROSTERSEARCH)
+	Q_UNUSED(AEvent);
+	if (AOrder==RCHO_ROSTERSEARCH && AEvent->modifiers()==Qt::NoModifier)
 	{
 		if (!searchPattern().isEmpty() && AIndex->childCount()==0)
+		{
+			FSelectedIndexes.clear();
+			FSelectedIndexes.append(AIndex);
 			setSearchPattern(QString::null);
+		}
 	}
 	return false;
 }
 
-bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent)
+bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent)
 {
 	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
@@ -139,7 +145,7 @@ bool RosterSearch::rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIn
 	return false;
 }
 
-bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent)
+bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent)
 {
 	Q_UNUSED(AIndexes);
 	if (AOrder == RKHO_ROSTERSEARCH)
@@ -151,15 +157,12 @@ bool RosterSearch::rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AI
 			{
 				if (!isSearchEnabled())
 				{
-					FSearchEdit->setText(AEvent->text().trimmed());
+					FSearchEdit->clear();
 					setSearchEnabled(true);
 					FAutoEnabled = true;
 				}
-				else
-				{
-					FSearchEdit->setText(FSearchEdit->text()+AEvent->text().trimmed());
-				}
 				FSearchEdit->setFocus();
+				FSearchEdit->setText(FSearchEdit->text()+AEvent->text().trimmed());
 				return true;
 			}
 		}
@@ -191,15 +194,18 @@ void RosterSearch::startSearch()
 	}
 
 	if (filterRegExp().pattern() != pattern)
-		setFilterRegExp(pattern);
+	{
+		QRegExp regExp(pattern,Qt::CaseInsensitive,QRegExp::Wildcard);
+		setFilterRegExp(regExp);
+	}
 	invalidate();
 
 	if (FRostersViewPlugin)
 	{
 		if (FSearchStarted)
 		{
-			foreach(IRosterIndex *index, FSelectedIndexes)
-				FRostersViewPlugin->rostersView()->selectRosterIndex(index);
+			FRostersViewPlugin->rostersView()->setSelectedRosterIndexes(FSelectedIndexes);
+			FRostersViewPlugin->rostersView()->instance()->expandAll();
 			FRostersViewPlugin->rostersView()->instance()->expandAll();
 		}
 
@@ -258,8 +264,6 @@ void RosterSearch::setSearchEnabled(bool AEnabled)
 			FRostersViewPlugin->rostersView()->removeProxyModel(this);
 	}
 	FSearchToolBarChanger->toolBar()->setVisible(AEnabled);
-
-	startSearch();
 	emit searchStateChanged(AEnabled);
 }
 
@@ -337,37 +341,29 @@ bool RosterSearch::eventFilter(QObject *AObject, QEvent *AEvent)
 
 bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 {
-	if (!searchPattern().isEmpty())
+	if (!searchPattern().isEmpty() && AParent.isValid() && sourceModel()!=NULL)
 	{
-		QModelIndex index = sourceModel()!=NULL ? sourceModel()->index(ARow,0,AParent) : QModelIndex();
-		switch (index.data(RDR_TYPE).toInt())
+		QModelIndex index = sourceModel()->index(ARow,0,AParent);
+		if (!sourceModel()->hasChildren(index))
 		{
-		case RIT_CONTACT:
-		case RIT_AGENT:
-		case RIT_MY_RESOURCE:
+			bool accept = true;
+			foreach(int dataField, FFieldActions.keys())
 			{
-				bool accept = true;
-				foreach(int dataField, FFieldActions.keys())
+				if (isSearchFieldEnabled(dataField))
 				{
-					if (isSearchFieldEnabled(dataField))
-					{
-						accept = false;
-						if (filterRegExp().indexIn(index.data(dataField).toString())>=0)
-							return true;
-					}
-				}
-				return accept;
-			}
-		case RIT_GROUP:
-		case RIT_GROUP_AGENTS:
-		case RIT_GROUP_BLANK:
-		case RIT_GROUP_NOT_IN_ROSTER:
-			{
-				for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-					if (filterAcceptsRow(childRow,index))
+					accept = false;
+					if (filterRegExp().indexIn(index.data(dataField).toString())>=0)
 						return true;
-				return false;
+				}
 			}
+			return accept;
+		}
+		else
+		{
+			for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+				if (filterAcceptsRow(childRow,index))
+					return true;
+			return false;
 		}
 	}
 	return true;
@@ -381,6 +377,7 @@ void RosterSearch::onFieldActionTriggered(bool)
 void RosterSearch::onEnableActionTriggered(bool AChecked)
 {
 	setSearchEnabled(AChecked);
+	startSearch();
 }
 
 void RosterSearch::onRosterIndexDestroyed(IRosterIndex *AIndex)
@@ -396,16 +393,16 @@ void RosterSearch::onSearchEditStart()
 
 void RosterSearch::onOptionsOpened()
 {
-	setSearchEnabled(Options::node(OPV_ROSTER_SEARCH_ENABLED).value().toBool());
 	foreach(int dataRole, FFieldActions.keys())
 		setSearchFieldEnabled(dataRole,Options::node(OPV_ROSTER_SEARCH_FIELDEBANLED,QString::number(dataRole)).value().toBool());
+	setSearchEnabled(Options::node(OPV_ROSTER_SEARCH_ENABLED).value().toBool());
 }
 
 void RosterSearch::onOptionsClosed()
 {
-	Options::node(OPV_ROSTER_SEARCH_ENABLED).setValue(isSearchEnabled());
 	foreach(int dataRole, FFieldActions.keys())
 		Options::node(OPV_ROSTER_SEARCH_FIELDEBANLED,QString::number(dataRole)).setValue(isSearchFieldEnabled(dataRole));
+	Options::node(OPV_ROSTER_SEARCH_ENABLED).setValue(isSearchEnabled());
 }
 
 Q_EXPORT_PLUGIN2(plg_rostersearch, RosterSearch)

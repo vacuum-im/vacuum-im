@@ -64,5 +64,33 @@
         <source>Mark all single messages from user as read when you read the first one</source>
         <translation>Позначити прочитаними всі одиночні повідомлення від користувача при прочитанні першого</translation>
     </message>
+    <message>
+        <source>Send</source>
+        <translation>Надіслати</translation>
+    </message>
+    <message>
+        <source>Reply</source>
+        <translation>Відповісти</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation>Переслати</translation>
+    </message>
+    <message>
+        <source>Show Chat Dialog</source>
+        <translation>Відкрити діалог чату</translation>
+    </message>
+    <message>
+        <source>Send Message</source>
+        <translation>Надіслати повідомлення</translation>
+    </message>
+    <message>
+        <source>Show Next (%1)</source>
+        <translation>Показати наступне (%1)</translation>
+    </message>
+    <message>
+        <source>Send as Chat Message</source>
+        <translation>Відправити як повідомлення чату</translation>
+    </message>
 </context>
 </TS>

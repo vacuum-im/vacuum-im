@@ -60,5 +60,13 @@
         <source>Failed to load history: %1</source>
         <translation>Не вдалося завантажити історію: %1</translation>
     </message>
+    <message>
+        <source>Contact resource</source>
+        <translation>Ресурс контакту</translation>
+    </message>
+    <message>
+        <source>&lt;Absent&gt;</source>
+        <translation>&lt;Відсутній&gt;</translation>
+    </message>
 </context>
 </TS>

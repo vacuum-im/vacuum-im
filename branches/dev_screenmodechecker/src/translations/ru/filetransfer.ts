@@ -91,6 +91,10 @@
         <source>When receiving a prompt to accept the file</source>
         <translation>При получении запроса на прием файла</translation>
     </message>
+    <message>
+        <source>Data transmission terminated</source>
+        <translation>Передача данных прервана</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>
@@ -193,10 +197,6 @@
     <message>
         <source>Please select at least one data stream</source>
         <translation>Пожалуйста, выберите хотя бы один поток данных</translation>
-    </message>
-    <message>
-        <source>Data transmission terminated</source>
-        <translation>Передача данных прервана</translation>
     </message>
     <message>
         <source>A file with this name, but a smaller size already exists.</source>

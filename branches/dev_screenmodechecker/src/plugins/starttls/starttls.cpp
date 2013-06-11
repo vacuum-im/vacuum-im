@@ -24,11 +24,11 @@ bool StartTLS::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 		}
 		else if (AStanza.tagName() == "failure")
 		{
-			emit error(tr("StartTLS negotiation failed"));
+			emit error(XmppError(IERR_STARTTLS_NEGOTIATION_FAILED));
 		}
 		else
 		{
-			emit error(tr("Wrong StartTLS negotiation response"));
+			emit error(XmppError(IERR_STARTTLS_INVALID_RESPONCE));
 		}
 		return true;
 	}
@@ -41,6 +41,16 @@ bool StartTLS::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrd
 	Q_UNUSED(AStanza);
 	Q_UNUSED(AOrder);
 	return false;
+}
+
+QString StartTLS::featureNS() const
+{
+	return NS_FEATURE_STARTTLS;
+}
+
+IXmppStream *StartTLS::xmppStream() const
+{
+	return FXmppStream;
 }
 
 bool StartTLS::start(const QDomElement &AElem)

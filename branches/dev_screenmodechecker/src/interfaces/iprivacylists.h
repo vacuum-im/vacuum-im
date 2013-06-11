@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <interfaces/iroster.h>
 #include <utils/jid.h>
+#include <utils/xmpperror.h>
 
 #define PRIVACYLISTS_UUID "{B7B7F21A-DF0E-4f3e-B0C2-AA14976B546F}"
 
@@ -66,12 +67,12 @@ class IPrivacyLists
 public:
 	virtual QObject *instance() =0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
-	virtual IPrivacyRule autoListRule(const Jid &AContactJid, const QString &AAutoList) const =0;
-	virtual IPrivacyRule autoListRule(const QString &AGroup, const QString &AAutoList) const =0;
-	virtual bool isAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const =0;
-	virtual bool isAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const =0;
-	virtual void setAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool AInserted) =0;
-	virtual void setAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool AInserted) =0;
+	virtual IPrivacyRule groupAutoListRule(const QString &AGroup, const QString &AAutoList) const =0;
+	virtual IPrivacyRule contactAutoListRule(const Jid &AContactJid, const QString &AAutoList) const =0;
+	virtual bool isGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const =0;
+	virtual bool isContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const =0;
+	virtual void setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool APresent) =0;
+	virtual void setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool APresent) =0;
 	virtual IPrivacyRule offRosterRule() const =0;
 	virtual bool isOffRosterBlocked(const Jid &AStreamJid) const =0;
 	virtual void setOffRosterBlocked(const Jid &AStreamJid, bool ABlocked) =0;
@@ -97,9 +98,9 @@ protected:
 	virtual void activeListChanged(const Jid &AStreamJid, const QString &AList) =0;
 	virtual void defaultListChanged(const Jid &AStreamJid, const QString &AList) =0;
 	virtual void requestCompleted(const QString &AId) =0;
-	virtual void requestFailed(const QString &AId, const QString &AError) =0;
+	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.0")
+Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.2")
 
 #endif

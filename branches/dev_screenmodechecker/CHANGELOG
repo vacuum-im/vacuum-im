@@ -5,16 +5,23 @@ LEGEND
   [*] Enhancement
   [-] Bug fix
 
-
 ------
   [!] Added new plugin for spell checking
   [!] Adden new plugin for keeping all user IM clients engaged in a conversation
+  [!] Added new plugin for viewing recently used contacts in main window
+  [!] Added new plugin for collecting statistics
   [-] The application may fail in some cases after unsuccessful Stanza-session initialization
   [-] In private chats history of communication are loaded even if the relevant setting has been disabled
   [-] When changing the nickname in the conference the nickname was not changed in the active conferences menu in the roster window
   [-] When requesting delivery of unread messages via RemoteControl in the message list fell messages from conferences and received on a different account
   [-] The saved status messages including about a file transfer, were displayed with incorrect date when loading from history in windows of a usual chat and a private chat of conferences
   [-] The exit from conference occurred incorrectly if was requested after a send of request for an entrance, but before receiving confirmation on an entrance
+  [-] Full text search in file archive of messages in certain cases worked not correctly
+  [-] Proxy authorization in certain cases was not working
+  [-] The application will fail if the server terminates the connection before the user enters the password
+  [-] In very rare cases renaming, moving and copying of nested groups not working correctly
+  [-] Removing of avatars in several selected accounts or contacts was not working
+  [-] The application may fail on removing from history active conversation
 
 
 v1.2.0

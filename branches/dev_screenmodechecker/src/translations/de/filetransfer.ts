@@ -91,6 +91,10 @@
         <source>When receiving a prompt to accept the file</source>
         <translation>Bei Erhalt einer Dateitransferanfrage</translation>
     </message>
+    <message>
+        <source>Data transmission terminated</source>
+        <translation>Datentransfer abgebrochen</translation>
+    </message>
 </context>
 <context>
     <name>StreamDialog</name>
@@ -193,10 +197,6 @@
     <message>
         <source>Please select at least one data stream</source>
         <translation>Bitte mindestens einen Datenstrom auswählen</translation>
-    </message>
-    <message>
-        <source>Data transmission terminated</source>
-        <translation>Datentransfer abgebrochen</translation>
     </message>
     <message>
         <source>A file with this name, but a smaller size already exists.</source>

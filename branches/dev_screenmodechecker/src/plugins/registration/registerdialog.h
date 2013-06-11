@@ -28,7 +28,7 @@ protected:
 protected slots:
 	void onRegisterFields(const QString &AId, const IRegisterFields &AFields);
 	void onRegisterSuccessful(const QString &AId);
-	void onRegisterError(const QString &AId, const QString &AError);
+	void onRegisterError(const QString &AId, const XmppError &AError);
 	void onDialogButtonsClicked(QAbstractButton *AButton);
 private:
 	Ui::RegisterDialogClass ui;

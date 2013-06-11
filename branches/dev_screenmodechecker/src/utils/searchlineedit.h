@@ -41,6 +41,7 @@ private slots:
 	void onLineEditTextChanged(const QString &AText);
 private:
 	bool FSelectText;
+	bool FTextChanged;
 	int FStartTimeout;
 	Menu *FSearchMenu;
 	QTimer FStartTimer;

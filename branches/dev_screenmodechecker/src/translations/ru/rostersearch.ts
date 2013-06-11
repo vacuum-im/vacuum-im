@@ -8,10 +8,6 @@
         <translation>Панель поиска</translation>
     </message>
     <message>
-        <source>Search by regular expression</source>
-        <translation>Поиск контакта по регулярному выражению</translation>
-    </message>
-    <message>
         <source>Roster Search</source>
         <translation>Поиск по контакт-листу</translation>
     </message>
@@ -38,6 +34,10 @@
     <message>
         <source>Group</source>
         <translation>Группа</translation>
+    </message>
+    <message>
+        <source>Search for Contacts</source>
+        <translation>Поиск контактов</translation>
     </message>
 </context>
 </TS>

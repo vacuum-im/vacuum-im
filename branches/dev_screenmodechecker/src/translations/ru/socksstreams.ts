@@ -73,45 +73,6 @@
     </message>
 </context>
 <context>
-    <name>SocksStream</name>
-    <message>
-        <source>Stream destroyed</source>
-        <translation>Поток удалён</translation>
-    </message>
-    <message>
-        <source>Unsupported stream mode</source>
-        <translation>Не поддерживаемый режим потока</translation>
-    </message>
-    <message>
-        <source>Remote client cant connect to given hosts</source>
-        <translation>Удалённый клиент не смог подключиться к полученным хостам</translation>
-    </message>
-    <message>
-        <source>Failed to activate stream</source>
-        <translation>Не удалось активировать поток</translation>
-    </message>
-    <message>
-        <source>Failed to create hosts</source>
-        <translation>Не удалось создать хост</translation>
-    </message>
-    <message>
-        <source>Direct connection not established</source>
-        <translation>Прямое подключение не установлено</translation>
-    </message>
-    <message>
-        <source>Invalid host</source>
-        <translation>Неверный хост</translation>
-    </message>
-    <message>
-        <source>Cant connect to given hosts</source>
-        <translation>Не удалось подключиться к полученным хостам</translation>
-    </message>
-    <message>
-        <source>Failed to connect to host</source>
-        <translation>Не удалось подключиться к хосту</translation>
-    </message>
-</context>
-<context>
     <name>SocksStreams</name>
     <message>
         <source>SOCKS5 Data Stream</source>
@@ -128,6 +89,54 @@
     <message>
         <source>Data is transferred out-band over TCP or UDP connection</source>
         <translation>Данные передаются по отдельному TCP или UDP подключению</translation>
+    </message>
+    <message>
+        <source>Stream destroyed</source>
+        <translation>Поток удалён</translation>
+    </message>
+    <message>
+        <source>Unsupported stream mode</source>
+        <translation>Не поддерживаемый режим потока</translation>
+    </message>
+    <message>
+        <source>Remote client cant connect to given hosts</source>
+        <translation>Удалённый клиент не смог подключиться к полученным хостам</translation>
+    </message>
+    <message>
+        <source>Cant connect to given hosts</source>
+        <translation>Не удалось подключиться к полученным хостам</translation>
+    </message>
+    <message>
+        <source>Failed to create hosts</source>
+        <translation>Не удалось создать хост</translation>
+    </message>
+    <message>
+        <source>Failed to activate stream</source>
+        <translation>Не удалось активировать поток</translation>
+    </message>
+    <message>
+        <source>Failed to send data to socket</source>
+        <translation>Не удалось отправить данные в сокет</translation>
+    </message>
+    <message>
+        <source>Direct connection not established</source>
+        <translation>Прямое подключение не установлено</translation>
+    </message>
+    <message>
+        <source>Invalid host</source>
+        <translation>Неверный хост</translation>
+    </message>
+    <message>
+        <source>Invalid host address</source>
+        <translation>Неверный адрес хоста</translation>
+    </message>
+    <message>
+        <source>Failed to connect to host</source>
+        <translation>Не удалось подключиться к хосту</translation>
+    </message>
+    <message>
+        <source>Host disconnected</source>
+        <translation>Хост отключен</translation>
     </message>
 </context>
 </TS>

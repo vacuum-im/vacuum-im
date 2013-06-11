@@ -5,11 +5,11 @@
     <name>MessageCarbons</name>
     <message>
         <source>Message Carbons</source>
-        <translation type="unfinished"></translation>
+        <translation>Дублікати повідомлень</translation>
     </message>
     <message>
         <source>Allows to keep all user IM clients engaged in a conversation</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволяє підтримувати розмову на всіх клієнтах користувача одночасно</translation>
     </message>
 </context>
 </TS>

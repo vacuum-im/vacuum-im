@@ -3,15 +3,15 @@
 
 #include <QHash>
 #include <QStringList>
+#include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
-#include <definitions/messagewriterorders.h>
-#include <definitions/editcontentshandlerorders.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
-#include <definitions/menuicons.h>
+#include <definitions/messagewriterorders.h>
+#include <definitions/messageeditcontentshandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iemoticons.h>
 #include <interfaces/imessageprocessor.h>
@@ -23,8 +23,7 @@
 #include "selecticonmenu.h"
 #include "emoticonsoptions.h"
 
-struct EmoticonTreeItem
-{
+struct EmoticonTreeItem {
 	QUrl url;
 	QMap<QChar, EmoticonTreeItem *> childs;
 };
@@ -35,10 +34,10 @@ class Emoticons :
 	public IEmoticons,
 	public IMessageWriter,
 	public IOptionsHolder,
-	public IEditContentsHandler
+	public IMessageEditContentsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsHolder IEditContentsHandler);
+	Q_INTERFACES(IPlugin IEmoticons IMessageWriter IOptionsHolder IMessageEditContentsHandler);
 public:
 	Emoticons();
 	~Emoticons();
@@ -55,11 +54,11 @@ public:
 	virtual void writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
-	//IEditContentsHandler
-	virtual bool editContentsCreate(int AOrder, IEditWidget *AWidget, QMimeData *AData);
-	virtual bool editContentsCanInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData);
-	virtual bool editContentsInsert(int AOrder, IEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
-	virtual bool editContentsChanged(int AOrder, IEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
+	//IMessageEditContentsHandler
+	virtual bool messageEditContentsCreate(int AOrder, IMessageEditWidget *AWidget, QMimeData *AData);
+	virtual bool messageEditContentsCanInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData);
+	virtual bool messageEditContentsInsert(int AOrder, IMessageEditWidget *AWidget, const QMimeData *AData, QTextDocument *ADocument);
+	virtual bool messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded);
 	//IEmoticons
 	virtual QList<QString> activeIconsets() const;
 	virtual QUrl urlByKey(const QString &AKey) const;
@@ -77,7 +76,8 @@ protected:
 	void insertSelectIconMenu(const QString &ASubStorage);
 	void removeSelectIconMenu(const QString &ASubStorage);
 protected slots:
-	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
+	void onToolBarWindowLayoutChanged();
+	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onToolBarWidgetDestroyed(QObject *AObject);
 	void onIconSelected(const QString &ASubStorage, const QString &AIconKey);
 	void onSelectIconMenuDestroyed(QObject *AObject);
@@ -92,8 +92,8 @@ private:
 	QHash<QString, QUrl> FUrlByKey;
 	QHash<QString, QString> FKeyByUrl;
 	QMap<QString, IconStorage *> FStorages;
-	QList<IToolBarWidget *> FToolBarsWidgets;
-	QMap<SelectIconMenu *, IToolBarWidget *> FToolBarWidgetByMenu;
+	QList<IMessageToolBarWidget *> FToolBarsWidgets;
+	QMap<SelectIconMenu *, IMessageToolBarWidget *> FToolBarWidgetByMenu;
 };
 
 #endif // EMOTICONS_H

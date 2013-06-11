@@ -4,16 +4,16 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
-#include <definitions/viewurlhandlerorders.h>
+#include <definitions/messageviewurlhandlerorders.h>
 
 class XmppUriQueries :
 			public QObject,
 			public IPlugin,
 			public IXmppUriQueries,
-			public IViewUrlHandler
+			public IMessageViewUrlHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IXmppUriQueries IViewUrlHandler);
+	Q_INTERFACES(IPlugin IXmppUriQueries IMessageViewUrlHandler);
 public:
 	XmppUriQueries();
 	~XmppUriQueries();
@@ -25,8 +25,8 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
-	//IViewUrlHandler
-	virtual bool viewUrlOpen(int AOrder, IViewWidget *AWidget, const QUrl &AUrl);
+	//IMessageViewUrlHandler
+	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IXmppUriQueries
 	virtual bool openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const;
 	virtual void insertUriHandler(IXmppUriHandler *AHandler, int AOrder);

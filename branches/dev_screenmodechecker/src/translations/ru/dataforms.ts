@@ -66,20 +66,20 @@
         <source>Supports the layouting of the form, including the layout of form fields, pages and sections</source>
         <translation>Поддерживает форматирование форм, включая форматирование полей, страниц и секций форм</translation>
     </message>
-</context>
-<context>
-    <name>DataMediaWidget</name>
     <message>
         <source>Unsupported media type</source>
         <translation>Неподдерживаемый тип медиа</translation>
     </message>
     <message>
-        <source>Loading data...</source>
-        <translation>Загрузка данных...</translation>
-    </message>
-    <message>
         <source>Unsupported data format</source>
         <translation>Неподдерживаемый формат данных</translation>
+    </message>
+</context>
+<context>
+    <name>DataMediaWidget</name>
+    <message>
+        <source>Loading data...</source>
+        <translation>Загрузка данных...</translation>
     </message>
 </context>
 </TS>

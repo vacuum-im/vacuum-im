@@ -61,22 +61,6 @@
         <source>Registration on %1</source>
         <translation>Регистрация на %1</translation>
     </message>
-    <message>
-        <source>Invalid registration form</source>
-        <translation>Неверная форма регистрации</translation>
-    </message>
-    <message>
-        <source>Invalid registration dialog</source>
-        <translation>Неверный диалог регистрации</translation>
-    </message>
-    <message>
-        <source>Registration rejected by user</source>
-        <translation>Регистрация отменена пользователем</translation>
-    </message>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Защищенное подключение не установлено</translation>
-    </message>
 </context>
 <context>
     <name>Registration</name>
@@ -163,6 +147,18 @@
     <message>
         <source>Your Web Page</source>
         <translation>Ваша Web страница</translation>
+    </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation>Неверная форма регистрации</translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation>Неверный диалог регистрации</translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation>Регистрация отменена пользователем</translation>
     </message>
 </context>
 </TS>

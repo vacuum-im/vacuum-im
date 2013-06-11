@@ -3,70 +3,100 @@
 #include <QKeyEvent>
 #include <QCoreApplication>
 
-#define ADR_SELECTED_TEXT    Action::DR_Parametr1
-
 ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, false);
+	ui.bwtMessageBox->layout()->setSpacing(3);
 
 	FMessageWidgets = AMessageWidgets;
 
-	FStreamJid = AStreamJid;
-	FContactJid = AContactJid;
 	FShownDetached = false;
-
 	FTabPageNotifier = NULL;
 
-	ui.wdtInfo->setLayout(new QVBoxLayout);
-	ui.wdtInfo->layout()->setMargin(0);
-	FInfoWidget = FMessageWidgets->newInfoWidget(AStreamJid,AContactJid,ui.wdtInfo);
-	ui.wdtInfo->layout()->addWidget(FInfoWidget->instance());
-	onOptionsChanged(Options::node(OPV_MESSAGES_SHOWINFOWIDGET));
+	FAddress = FMessageWidgets->newAddress(AStreamJid,AContactJid,this);
+	
+	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.bwtMessageBox);
+	ui.bwtMessageBox->insertWidget(MCWW_INFOWIDGET,FInfoWidget->instance());
 
-	ui.wdtView->setLayout(new QVBoxLayout);
-	ui.wdtView->layout()->setMargin(0);
-	FViewWidget = FMessageWidgets->newViewWidget(AStreamJid,AContactJid,ui.wdtView);
-	connect(FViewWidget->instance(),SIGNAL(viewContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)),
-		SLOT(onViewWidgetContextMenu(const QPoint &, const QTextDocumentFragment &, Menu *)));
-	ui.wdtView->layout()->addWidget(FViewWidget->instance());
+	FViewWidget = FMessageWidgets->newViewWidget(this,ui.bwtMessageBox);
+	ui.bwtMessageBox->insertWidget(MCWW_VIEWWIDGET,FViewWidget->instance(),100);
 
-	ui.wdtEdit->setLayout(new QVBoxLayout);
-	ui.wdtEdit->layout()->setMargin(0);
-	FEditWidget = FMessageWidgets->newEditWidget(AStreamJid,AContactJid,ui.wdtEdit);
-	FEditWidget->setSendShortcut(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
-	ui.wdtEdit->layout()->addWidget(FEditWidget->instance());
-	connect(FEditWidget->instance(),SIGNAL(messageReady()),SLOT(onMessageReady()));
+	FEditWidget = FMessageWidgets->newEditWidget(this,ui.bwtMessageBox);
+	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
+	ui.bwtMessageBox->insertWidget(MCWW_EDITWIDGET,FEditWidget->instance());
 
-	ui.wdtToolBar->setLayout(new QVBoxLayout);
-	ui.wdtToolBar->layout()->setMargin(0);
-	FToolBarWidget = FMessageWidgets->newToolBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL,ui.wdtToolBar);
+	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.bwtMessageBox);
 	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-	ui.wdtToolBar->layout()->addWidget(FToolBarWidget->instance());
-
-	FMenuBarWidget = FMessageWidgets->newMenuBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL,this);
+	ui.bwtMessageBox->insertWidget(MCWW_TOOLBARWIDGET,FToolBarWidget->instance());
+	
+	FMenuBarWidget = FMessageWidgets->newMenuBarWidget(this,this);
 	setMenuBar(FMenuBarWidget->instance());
 
-	FStatusBarWidget = FMessageWidgets->newStatusBarWidget(FInfoWidget,FViewWidget,FEditWidget,NULL,this);
+	FStatusBarWidget = FMessageWidgets->newStatusBarWidget(this,this);
 	setStatusBar(FStatusBarWidget->instance());
 
-	initialize();
+	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
 
 ChatWindow::~ChatWindow()
 {
 	emit tabPageDestroyed();
-	delete FInfoWidget->instance();
-	delete FViewWidget->instance();
-	delete FEditWidget->instance();
-	delete FMenuBarWidget->instance();
-	delete FToolBarWidget->instance();
-	delete FStatusBarWidget->instance();
+}
+
+Jid ChatWindow::streamJid() const
+{
+	return FAddress->streamJid();
+}
+
+Jid ChatWindow::contactJid() const
+{
+	return FAddress->contactJid();
+}
+
+IMessageAddress *ChatWindow::address() const
+{
+	return FAddress;
+}
+
+IMessageInfoWidget *ChatWindow::infoWidget() const
+{
+	return FInfoWidget;
+}
+
+IMessageViewWidget *ChatWindow::viewWidget() const
+{
+	return FViewWidget;
+}
+
+IMessageEditWidget *ChatWindow::editWidget() const
+{
+	return FEditWidget;
+}
+
+IMessageMenuBarWidget *ChatWindow::menuBarWidget() const
+{
+	return FMenuBarWidget;
+}
+
+IMessageToolBarWidget *ChatWindow::toolBarWidget() const
+{
+	return FToolBarWidget;
+}
+
+IMessageStatusBarWidget *ChatWindow::statusBarWidget() const
+{
+	return FStatusBarWidget;
+}
+
+IMessageReceiversWidget *ChatWindow::receiversWidget() const
+{
+	return NULL;
 }
 
 QString ChatWindow::tabPageId() const
 {
-	return "ChatWindow|"+FStreamJid.pBare()+"|"+FContactJid.pBare();
+	return "ChatWindow|"+streamJid().pBare()+"|"+contactJid().pBare();
 }
 
 bool ChatWindow::isVisibleTabPage() const
@@ -128,12 +158,12 @@ QString ChatWindow::tabPageToolTip() const
 	return FTabPageToolTip;
 }
 
-ITabPageNotifier *ChatWindow::tabPageNotifier() const
+IMessageTabPageNotifier *ChatWindow::tabPageNotifier() const
 {
 	return FTabPageNotifier;
 }
 
-void ChatWindow::setTabPageNotifier(ITabPageNotifier *ANotifier)
+void ChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 {
 	if (FTabPageNotifier != ANotifier)
 	{
@@ -144,17 +174,9 @@ void ChatWindow::setTabPageNotifier(ITabPageNotifier *ANotifier)
 	}
 }
 
-void ChatWindow::setContactJid(const Jid &AContactJid)
+BoxWidget *ChatWindow::messageWidgetsBox() const
 {
-	if (FMessageWidgets->findChatWindow(FStreamJid,AContactJid) == NULL)
-	{
-		Jid before = FContactJid;
-		FContactJid = AContactJid;
-		FInfoWidget->setContactJid(FContactJid);
-		FViewWidget->setContactJid(FContactJid);
-		FEditWidget->setContactJid(FContactJid);
-		emit contactJidChanged(before);
-	}
+	return ui.bwtMessageBox;
 }
 
 void ChatWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)
@@ -166,27 +188,7 @@ void ChatWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const
 	emit tabPageChanged();
 }
 
-void ChatWindow::initialize()
-{
-	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
-	if (plugin)
-	{
-		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (xmppStreams)
-		{
-			IXmppStream *xmppStream = xmppStreams->xmppStream(FStreamJid);
-			if (xmppStream)
-			{
-				connect(xmppStream->instance(),SIGNAL(jidChanged(const Jid &)), SLOT(onStreamJidChanged(const Jid &)));
-			}
-		}
-	}
-
-	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
-	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
-}
-
-void ChatWindow::saveWindowGeometry()
+void ChatWindow::saveWindowGeometryAndState()
 {
 	if (isWindow())
 	{
@@ -195,7 +197,7 @@ void ChatWindow::saveWindowGeometry()
 	}
 }
 
-void ChatWindow::loadWindowGeometry()
+void ChatWindow::loadWindowGeometryAndState()
 {
 	if (isWindow())
 	{
@@ -237,7 +239,7 @@ void ChatWindow::showEvent(QShowEvent *AEvent)
 	if (isWindow())
 	{
 		if (!FShownDetached)
-			loadWindowGeometry();
+			loadWindowGeometryAndState();
 		FShownDetached = true;
 		Shortcuts::insertWidgetShortcut(SCT_MESSAGEWINDOWS_CLOSEWINDOW,this);
 	}
@@ -256,46 +258,9 @@ void ChatWindow::showEvent(QShowEvent *AEvent)
 void ChatWindow::closeEvent(QCloseEvent *AEvent)
 {
 	if (FShownDetached)
-		saveWindowGeometry();
+		saveWindowGeometryAndState();
 	QMainWindow::closeEvent(AEvent);
 	emit tabPageClosed();
-}
-
-void ChatWindow::onMessageReady()
-{
-	emit messageReady();
-}
-
-void ChatWindow::onStreamJidChanged(const Jid &ABefore)
-{
-	IXmppStream *xmppStream = qobject_cast<IXmppStream *>(sender());
-	if (xmppStream)
-	{
-		if (FStreamJid && xmppStream->streamJid())
-		{
-			FStreamJid = xmppStream->streamJid();
-			FInfoWidget->setStreamJid(FStreamJid);
-			FViewWidget->setStreamJid(FStreamJid);
-			FEditWidget->setStreamJid(FStreamJid);
-			emit streamJidChanged(ABefore);
-		}
-		else
-		{
-			deleteLater();
-		}
-	}
-}
-
-void ChatWindow::onOptionsChanged(const OptionsNode &ANode)
-{
-	if (ANode.path() == OPV_MESSAGES_SHOWINFOWIDGET)
-	{
-		FInfoWidget->instance()->setVisible(ANode.value().toBool());
-	}
-	else if (ANode.path() == OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS)
-	{
-		FInfoWidget->setField(IInfoWidget::ContactStatus,FInfoWidget->field(IInfoWidget::ContactStatus));
-	}
 }
 
 void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
@@ -303,32 +268,5 @@ void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
 	{
 		closeTabPage();
-	}
-}
-
-void ChatWindow::onViewContextQuoteActionTriggered(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-	{
-		QTextDocumentFragment fragment = QTextDocumentFragment::fromHtml(action->data(ADR_SELECTED_TEXT).toString());
-		fragment = TextManager::getTrimmedTextFragment(editWidget()->prepareTextFragment(fragment),!editWidget()->isRichTextEnabled());
-		TextManager::insertQuotedFragment(editWidget()->textEdit()->textCursor(),fragment);
-		editWidget()->textEdit()->setFocus();
-	}
-}
-
-void ChatWindow::onViewWidgetContextMenu(const QPoint &APosition, const QTextDocumentFragment &AText, Menu *AMenu)
-{
-	Q_UNUSED(APosition);
-	if (!AText.toPlainText().trimmed().isEmpty())
-	{
-		Action *quoteAction = new Action(AMenu);
-		quoteAction->setText(tr("Quote selected text"));
-		quoteAction->setData(ADR_SELECTED_TEXT, AText.toHtml());
-		quoteAction->setIcon(RSR_STORAGE_MENUICONS, MNI_MESSAGEWIDGETS_QUOTE);
-		quoteAction->setShortcutId(SCT_MESSAGEWINDOWS_QUOTE);
-		connect(quoteAction,SIGNAL(triggered(bool)),SLOT(onViewContextQuoteActionTriggered(bool)));
-		AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
 	}
 }

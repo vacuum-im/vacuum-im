@@ -41,7 +41,7 @@ protected:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
-	void onShutdownStarted();
+	void onApplicationShutdownStarted();
 	void onShowMainWindowOnStart();
 	void onShowMainWindowByAction(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -50,6 +50,7 @@ private:
 	IPluginManager *FPluginManager;
 	ITrayManager *FTrayManager;
 private:
+	int FStartShowLoopCount;
 	MainWindow *FMainWindow;
 	QTime FActivationChanged;
 };

@@ -4,11 +4,12 @@
 #include <QReadWriteLock>
 #include <QWaitCondition>
 #include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
 #include <interfaces/iinbandstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <utils/xmpperror.h>
 #include <utils/ringbuffer.h>
+#include <utils/xmpperror.h>
 #include <utils/jid.h>
 
 #define MINIMUM_BLOCK_SIZE        128
@@ -18,10 +19,10 @@
 #define DEFAULT_DATA_STANZA_TYPE  IInBandStream::StanzaIq
 
 class InBandStream :
-			public QIODevice,
-			public IInBandStream,
-			public IStanzaHandler,
-			public IStanzaRequestOwner
+	public QIODevice,
+	public IInBandStream,
+	public IStanzaHandler,
+	public IStanzaRequestOwner
 {
 	Q_OBJECT;
 	Q_INTERFACES(IInBandStream IDataStreamSocket IStanzaHandler IStanzaRequestOwner);
@@ -46,13 +47,12 @@ public:
 	virtual Jid contactJid() const;
 	virtual int streamKind() const;
 	virtual int streamState() const;
+	virtual XmppError error() const;
 	virtual bool isOpen() const;
 	virtual bool open(QIODevice::OpenMode AMode);
 	virtual bool flush();
 	virtual void close();
-	virtual void abort(const QString &AError, int ACode = UnknownError);
-	virtual int errorCode() const;
-	virtual QString errorString() const;
+	virtual void abort(const XmppError &AError);
 	//IInBandStream
 	virtual int blockSize() const;
 	virtual void setBlockSize(int ASize);
@@ -71,17 +71,17 @@ protected:
 protected:
 	bool sendNextPaket(bool AFlush = false);
 	void setStreamState(int AState);
-	void setStreamError(const QString &AError, int ACode);
+	void setStreamError(const XmppError &AError);
 	int insertStanzaHandle(const QString &ACondition);
 	void removeStanzaHandle(int &AHandleId);
 private:
 	IStanzaProcessor *FStanzaProcessor;
 private:
-	int FErrorCode;
 	Jid FStreamJid;
 	Jid FContactJid;
 	int FStreamKind;
 	int FStreamState;
+	XmppError FError;
 	QString FStreamId;
 private:
 	int FSHIOpen;

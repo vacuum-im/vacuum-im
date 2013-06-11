@@ -4,32 +4,8 @@
 <context>
     <name>RostersView</name>
     <message>
-        <source>Priority: %1</source>
-        <translation>Приоритет: %1</translation>
-    </message>
-    <message>
-        <source>Subscription: %1 %2</source>
-        <translation>Авторизация: %1 %2</translation>
-    </message>
-    <message>
-        <source>Status:</source>
-        <translation>Статус:</translation>
-    </message>
-    <message>
-        <source>Jabber ID</source>
-        <translation>Jabber ID</translation>
-    </message>
-    <message>
-        <source>Status</source>
-        <translation>Статус</translation>
-    </message>
-    <message>
         <source>Copy to clipboard</source>
         <translation>Копировать в буфер</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Имя</translation>
     </message>
     <message>
         <source>Contacts</source>
@@ -43,10 +19,6 @@
         <translation>Контакт-лист</translation>
     </message>
     <message>
-        <source>Show/Hide offline contacts</source>
-        <translation>Скрыть/показать отключённые контакты</translation>
-    </message>
-    <message>
         <source>Roster View</source>
         <translation>Отображение ростера</translation>
     </message>
@@ -55,16 +27,8 @@
         <translation>Отображает иерархическую модель ростера</translation>
     </message>
     <message>
-        <source>Show offline contact</source>
-        <translation>Показывать отключённые контакты</translation>
-    </message>
-    <message>
         <source>Show contact resource in roster</source>
         <translation>Показывать ресурс контактов</translation>
-    </message>
-    <message>
-        <source>Show status message in roster</source>
-        <translation>Показывать статус контактов</translation>
     </message>
     <message>
         <source>Sort contacts by status</source>
@@ -85,6 +49,66 @@
     <message>
         <source>Do not show the scroll bars</source>
         <translation>Не показывать полосы прокрутки</translation>
+    </message>
+    <message>
+        <source>Show/Hide disconnected contacts</source>
+        <translation>Показать/Скрыть отключенные контакты</translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation>Показывать статус контактов</translation>
+    </message>
+    <message>
+        <source>Show disconnected contact</source>
+        <translation>Показывать отключенные контакты</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>Absent</source>
+        <translation>Отсутствует</translation>
+    </message>
+    <message>
+        <source>Mutual</source>
+        <translation>Обоюдная</translation>
+    </message>
+    <message>
+        <source>Provided to you</source>
+        <translation>Предоставлена Вам</translation>
+    </message>
+    <message>
+        <source>Provided from you</source>
+        <translation>Предоставлена Вами</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Subscription:&lt;/b&gt; %1, request sent</source>
+        <translation>&lt;b&gt;Подписка:&lt;/b&gt; %1, запрос отправлен</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Subscription:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Подписка:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Resource:&lt;/b&gt; %1 (%2)</source>
+        <translation>&lt;b&gt;Ресурс:&lt;/b&gt; %1 (%2)</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>Unite contacts of all accounts</source>
+        <translation>Объединить контакты всех аккаунтов</translation>
+    </message>
+    <message>
+        <source>Show list of united accounts</source>
+        <translation>Показывать список объединенных аккаунтов</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Аккаунт:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

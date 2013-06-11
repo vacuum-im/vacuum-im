@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>ChatWindow</name>
-    <message>
-        <source>Quote selected text</source>
-        <translation>Цитувати виділений текст</translation>
-    </message>
-</context>
-<context>
     <name>EditWidget</name>
     <message>
         <source>Send</source>
@@ -56,10 +49,6 @@
     <message>
         <source>Auto resize input field</source>
         <translation>Автоматично змінювати розмір поля вводу</translation>
-    </message>
-    <message>
-        <source>Show contact information in chat windows</source>
-        <translation>Показувати інформацію про контакт в вікні чату</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
@@ -217,57 +206,19 @@
     </message>
     <message>
         <source>Combine/Split with message windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Об&apos;єднати/Розділити з вікнами повідомлень</translation>
     </message>
     <message>
         <source>Combine message windows with contact-list</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>MessageWindow</name>
-    <message>
-        <source>Next - %1</source>
-        <translation>Наступний - %1</translation>
+        <translation>Об&apos;єднати вікна повідомлень з контакт-листом</translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation>Закрити</translation>
-    </message>
-</context>
-<context>
-    <name>MessageWindowClass</name>
-    <message>
-        <source>Message</source>
-        <translation>Повідомлення</translation>
+        <source>Show tabs in combined message windows with contact-list mode</source>
+        <translation>Показувати вкладки в режимі об&apos;єднання вікон повідомлень з ростером</translation>
     </message>
     <message>
-        <source>To:</source>
-        <translation>Кому:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Тема:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation>Відповісти</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Переслати</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Чат</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Відіслати</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Наступне</translation>
+        <source>Quote Selected Text</source>
+        <translation>Цитувати виділений текст</translation>
     </message>
 </context>
 <context>
@@ -290,6 +241,28 @@
     </message>
 </context>
 <context>
+    <name>NormalWindow</name>
+    <message numerus="yes">
+        <source>Selected %n contact(s)</source>
+        <translation>
+            <numerusform>Вибрано %n контакт</numerusform>
+            <numerusform>Вибрано %n контактів</numerusform>
+            <numerusform>Вибрано %n контактів</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Subject</source>
+        <translation>Тема</translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindowClass</name>
+    <message>
+        <source>Fast choice</source>
+        <translation>Швидкий вибір</translation>
+    </message>
+</context>
+<context>
     <name>ReceiversWidget</name>
     <message>
         <source>Receivers</source>
@@ -300,55 +273,91 @@
         <translation>Не в ростері</translation>
     </message>
     <message>
-        <source>Contact</source>
-        <translation>Контакт</translation>
-    </message>
-    <message>
-        <source>Jid</source>
-        <translation>JID</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Агенти</translation>
-    </message>
-    <message>
-        <source>My Resources</source>
-        <translation>Мої ресурси</translation>
-    </message>
-    <message>
-        <source>Add receiver</source>
-        <translation>Додати Отримувача</translation>
-    </message>
-    <message>
-        <source>Enter valid contact jid:</source>
-        <translation>Введіть коректний JID:</translation>
     </message>
     <message>
         <source>Without Groups</source>
         <translation>Без груп</translation>
     </message>
+    <message>
+        <source>Select All Contacts</source>
+        <translation>Вибрати всі контакти</translation>
+    </message>
+    <message>
+        <source>Select Online Contact</source>
+        <translation>Вибрати підключені контакти</translation>
+    </message>
+    <message>
+        <source>Select Available Contacts</source>
+        <translation>Вибрати незайняті контакти</translation>
+    </message>
+    <message>
+        <source>Clear Selection</source>
+        <translation>Очистити виділення</translation>
+    </message>
+    <message>
+        <source>Load Selection</source>
+        <translation>Завантажити вибір</translation>
+    </message>
+    <message>
+        <source>Save Selection</source>
+        <translation>Зберегти вибір</translation>
+    </message>
+    <message>
+        <source>Load Contacts from File</source>
+        <translation>Завантажити контакти з файлу</translation>
+    </message>
+    <message>
+        <source>Failed to Load Contacts</source>
+        <translation>Не вдалося завантажити контакти</translation>
+    </message>
+    <message>
+        <source>Incorrect file format</source>
+        <translation>Невірний формат файлу</translation>
+    </message>
+    <message>
+        <source>Failed to read file: %1</source>
+        <translation>Не вдалося прочитати файл: %1</translation>
+    </message>
+    <message>
+        <source>Failed to open file: %1</source>
+        <translation>Не вдалося відкрити файл: %1</translation>
+    </message>
+    <message>
+        <source>Save Contacts to File</source>
+        <translation>Зберегти контакти до файлу</translation>
+    </message>
+    <message>
+        <source>Failed to Save Contacts</source>
+        <translation>Не вдалося зберегти контакти до файлу</translation>
+    </message>
+    <message>
+        <source>Failed to create file: %1</source>
+        <translation>Не вдалося створити файл: %1</translation>
+    </message>
+    <message>
+        <source>Load Last Selection</source>
+        <translation>Завантажити останній вибір</translation>
+    </message>
+    <message>
+        <source>Expand All Groups</source>
+        <translation>Розвернути всі групи</translation>
+    </message>
+    <message>
+        <source>Collapse All Groups</source>
+        <translation>Згорнути всі групи</translation>
+    </message>
+    <message>
+        <source>Hide Offline Contacts</source>
+        <translation>Не показувати відключені контакти</translation>
+    </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Додати</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>Поновити</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Всі</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Нікого</translation>
-    </message>
-    <message>
-        <source>All Online</source>
-        <translation>Всі в мережі</translation>
+        <source>Search Contacts</source>
+        <translation>Пошук контактів</translation>
     </message>
 </context>
 <context>

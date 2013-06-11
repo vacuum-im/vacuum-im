@@ -1,9 +1,11 @@
 #ifndef DEFAULTCONNECTION_H
 #define DEFAULTCONNECTION_H
 
+#include <definitions/internalerrors.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <thirdparty/jdns/qjdns.h>
+#include <utils/xmpperror.h>
 
 class DefaultConnection :
 			public QObject,
@@ -47,7 +49,7 @@ signals:
 	void connected();
 	void encrypted();
 	void readyRead(qint64 ABytes);
-	void error(const QString &AMessage);
+	void error(const XmppError &AError);
 	void aboutToDisconnect();
 	void disconnected();
 	void connectionDestroyed();
@@ -61,6 +63,7 @@ protected slots:
 	void onDnsResultsReady(int AId, const QJDns::Response &AResults);
 	void onDnsError(int AId, QJDns::Error AError);
 	void onDnsShutdownFinished();
+	void onSocketProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
 	void onSocketConnected();
 	void onSocketEncrypted();
 	void onSocketReadyRead();

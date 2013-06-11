@@ -6,29 +6,28 @@
 #include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
-#include <definitions/shortcuts.h>
+#include <definitions/rosterlabels.h>
 #include <definitions/rostertooltiporders.h>
-#include <definitions/rosterlabelorders.h>
-#include <definitions/rosterindextyperole.h>
-#include <definitions/rosterfootertextorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterlabelholderorders.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imainwindow.h>
 #include <utils/options.h>
-#include <utils/shortcuts.h>
 #include <utils/iconstorage.h>
-#include "rosterindexdelegate.h"
 
 class RostersView :
 	public QTreeView,
 	public IMainTabPage,
 	public IRostersView,
-	public IRosterDataHolder
+	public IRosterDataHolder,
+	public IRostersLabelHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMainTabPage IRostersView IRosterDataHolder);
+	Q_INTERFACES(IMainTabPage IRostersView IRosterDataHolder IRostersLabelHolder);
 public:
 	RostersView(QWidget *AParent = NULL);
 	~RostersView();
@@ -38,22 +37,32 @@ public:
 	virtual QString tabPageCaption() const;
 	virtual QString tabPageToolTip() const;
 	//IRosterDataHolder
-	virtual int rosterDataOrder() const;
-	virtual QList<int> rosterDataRoles() const;
-	virtual QList<int> rosterDataTypes() const;
-	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
+	//IRostersLabelHolder
+	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
+	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IRostersView
 	virtual IRostersModel *rostersModel() const;
 	virtual void setRostersModel(IRostersModel *AModel);
 	virtual bool repaintRosterIndex(IRosterIndex *AIndex);
 	virtual void expandIndexParents(IRosterIndex *AIndex);
 	virtual void expandIndexParents(const QModelIndex &AIndex);
-	virtual bool editRosterIndex(int ADataRole, IRosterIndex *AIndex);
+	virtual bool editRosterIndex(IRosterIndex *AIndex, int ADataRole);
+	virtual bool singleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool doubleClickOnIndex(IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool keyPressForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
+	virtual bool keyReleaseForIndex(const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
+	virtual void toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEvent, QMap<int,QString> &AToolTips);
+	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu);
+	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, const QContextMenuEvent *AEvent, Menu *AMenu);
+	//--IndexSelection
 	virtual bool hasMultiSelection() const;
+	virtual bool isSelectionAcceptable(const QList<IRosterIndex *> &AIndexes);
 	virtual QList<IRosterIndex *> selectedRosterIndexes() const;
-	virtual void selectRosterIndex(IRosterIndex *AIndex);
-	virtual QMap<int, QStringList > indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1) const;
+	virtual bool setSelectedRosterIndexes(const QList<IRosterIndex *> &AIndexes, bool APartial=true);
+	virtual QMap<int, QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles, int AUniqueRole=-1, int AGroupByRole=-1) const;
 	//--ProxyModels
 	virtual void insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder);
 	virtual QList<QAbstractProxyModel *> proxyModels() const;
@@ -63,13 +72,12 @@ public:
 	virtual QModelIndex mapToProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AModelIndex) const;
 	virtual QModelIndex mapFromProxy(QAbstractProxyModel *AProxyModel, const QModelIndex &AProxyIndex) const;
 	//--IndexLabel
-	virtual int registerLabel(const IRostersLabel &ALabel);
-	virtual void updateLabel(int ALabelId, const IRostersLabel &ALabel);
-	virtual void insertLabel(int ALabelId, IRosterIndex *AIndex);
-	virtual void removeLabel(int ALabelId, IRosterIndex *AIndex);
-	virtual void destroyLabel(int ALabelId);
-	virtual int labelAt(const QPoint &APoint, const QModelIndex &AIndex) const;
-	virtual QRect labelRect(int ALabeld, const QModelIndex &AIndex) const;
+	virtual AdvancedDelegateItem registeredLabel(quint32 ALabelId) const;
+	virtual quint32 registerLabel(const AdvancedDelegateItem &ALabel);
+	virtual void insertLabel(quint32 ALabelId, IRosterIndex *AIndex);
+	virtual void removeLabel(quint32 ALabelId, IRosterIndex *AIndex = NULL);
+	virtual quint32 labelAt(const QPoint &APoint, const QModelIndex &AIndex) const;
+	virtual QRect labelRect(quint32 ALabeld, const QModelIndex &AIndex) const;
 	//--IndexNotify
 	virtual int activeNotify(IRosterIndex *AIndex) const;
 	virtual QList<int> notifyQueue(IRosterIndex *Index) const;
@@ -78,32 +86,27 @@ public:
 	virtual int insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes);
 	virtual void activateNotify(int ANotifyId);
 	virtual void removeNotify(int ANotifyId);
+	//--DragDrop
+	virtual QList<IRostersDragDropHandler *> dragDropHandlers() const;
+	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler);
+	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler);
+	//--LabelHolders
+	virtual QMultiMap<int, IRostersLabelHolder *> labelHolders() const;
+	virtual void insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder);
+	virtual void removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder);
 	//--ClickHookers
+	virtual QMultiMap<int, IRostersClickHooker *> clickHookers() const;
 	virtual void insertClickHooker(int AOrder, IRostersClickHooker *AHooker);
 	virtual void removeClickHooker(int AOrder, IRostersClickHooker *AHooker);
 	//--KeyHookers
+	virtual QMultiMap<int, IRostersKeyHooker *> keyHookers() const;
 	virtual void insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker);
 	virtual void removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker);
-	//--DragDrop
-	virtual void insertDragDropHandler(IRostersDragDropHandler *AHandler);
-	virtual void removeDragDropHandler(IRostersDragDropHandler *AHandler);
 	//--EditHandlers
+	virtual QMultiMap<int, IRostersEditHandler *> editHandlers() const;
 	virtual void insertEditHandler(int AOrder, IRostersEditHandler *AHandler);
 	virtual void removeEditHandler(int AOrder, IRostersEditHandler *AHandler);
-	//--FooterText
-	virtual void insertFooterText(int AOrderAndId, const QVariant &AValue, IRosterIndex *AIndex);
-	virtual void removeFooterText(int AOrderAndId, IRosterIndex *AIndex);
-	//--ContextMenu
-	virtual void contextMenuForIndex(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
-	//--ClipboardMenu
-	virtual void clipboardMenuForIndex(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
 signals:
-	//IMainTabPage
-	void tabPageChanged();
-	void tabPageDestroyed();
-	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
-	//IRostersView
 	void modelAboutToBeSeted(IRostersModel *AModel);
 	void modelSeted(IRostersModel *AModel);
 	void proxyModelAboutToBeInserted(QAbstractProxyModel *AProxyModel, int AOrder);
@@ -113,27 +116,29 @@ signals:
 	void viewModelAboutToBeChanged(QAbstractItemModel *AModel);
 	void viewModelChanged(QAbstractItemModel *AModel);
 	void indexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
-	void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
-	void indexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
-	void indexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
-	void indexClicked(IRosterIndex *AIndex, int ALabelId);
-	void indexDoubleClicked(IRosterIndex *AIndex, int ALabelId);
+	void indexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void indexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void indexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 	void notifyInserted(int ANotifyId);
 	void notifyActivated(int ANotifyId);
 	void notifyRemoved(int ANotifyId);
-public:
-	void updateStatusText(IRosterIndex *AIndex = NULL);
+	//IMainTabPage
+	void tabPageChanged();
+	void tabPageDestroyed();
+	//IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
+	//IRostersLabelHolder
+	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
-	QStyleOptionViewItemV4 indexOption(const QModelIndex &AIndex) const;
-	void appendBlinkItem(int ALabelId, int ANotifyId);
-	void removeBlinkItem(int ALabelId, int ANotifyId);
-	QString intId2StringId(int AIntId) const;
-	void removeLabels();
+	void clearLabels();
+	void appendBlinkItem(quint32 ALabelId, int ANotifyId);
+	void removeBlinkItem(quint32 ALabelId, int ANotifyId);
 	void setDropIndicatorRect(const QRect &ARect);
-	IRostersEditHandler *findEditHandler(int ADataRole, const QModelIndex &AIndex) const;
+	QStyleOptionViewItemV4 indexOption(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const;
 protected:
 	//QTreeView
 	void drawBranches(QPainter *APainter, const QRect &ARect, const QModelIndex &AIndex) const;
+	void drawRow(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex ) const;
 	//QAbstractItemView
 	bool viewportEvent(QEvent *AEvent);
 	void resizeEvent(QResizeEvent *AEvent);
@@ -155,50 +160,44 @@ protected slots:
 	//QAbstractItemView
 	void closeEditor(QWidget *AEditor, QAbstractItemDelegate::EndEditHint AHint);
 protected slots:
-	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected);
-	void onCopyToClipboardActionTriggered(bool);
-	void onIndexInserted(IRosterIndex *AIndex);
+	void onRosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex);
 	void onIndexDestroyed(IRosterIndex *AIndex);
-	void onRemoveIndexNotifyTimeout();
 	void onUpdateIndexNotifyTimeout();
-	void onBlinkTimerTimeout();
+	void onRemoveIndexNotifyTimeout();
+	void onUpdateBlinkLabels();
 	void onDragExpandTimer();
-	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IRostersModel *FRostersModel;
 private:
-	int FPressedLabel;
 	QPoint FPressedPos;
+	quint32 FPressedLabel;
 	QModelIndex FPressedIndex;
 private:
-	bool FBlinkVisible;
-	QTimer FBlinkTimer;
-	QSet<int> FBlinkLabels;
+	QSet<quint32> FBlinkLabels;
+	QMap<quint32, AdvancedDelegateItem> FLabelItems;
+	QMultiMap<IRosterIndex *, quint32> FIndexLabels;
+private:
 	QSet<int> FBlinkNotifies;
-private:
-	QMap<int, IRostersLabel> FLabelItems;
-	QMultiMap<IRosterIndex *, int> FIndexLabels;
-private:
 	QMap<QTimer *, int> FNotifyTimer;
 	QSet<IRosterIndex *> FNotifyUpdates;
 	QMap<int, IRostersNotify> FNotifyItems;
 	QMap<IRosterIndex *, int> FActiveNotifies;
 	QMultiMap<IRosterIndex *, int> FIndexNotifies;
 private:
-	QMultiMap<int, IRostersKeyHooker *> FKeyHookers;
-	QMultiMap<int, IRostersClickHooker *> FClickHookers;
-	QMultiMap<int, IRostersEditHandler *> FEditHandlers;
-private:
-	RosterIndexDelegate *FRosterIndexDelegate;
-	QMultiMap<int, QAbstractProxyModel *> FProxyModels;
-private:
 	bool FStartDragFailed;
 	QTimer FDragExpandTimer;
 	QRect FDropIndicatorRect;
 	QList<IRostersDragDropHandler *> FDragDropHandlers;
 	QList<IRostersDragDropHandler *> FActiveDragHandlers;
+private:
+	AdvancedItemDelegate *FAdvancedItemDelegate;
+	QMultiMap<int, QAbstractProxyModel *> FProxyModels;
+private:
+	QMultiMap<int, IRostersKeyHooker *> FKeyHookers;
+	QMultiMap<int, IRostersClickHooker *> FClickHookers;
+	QMultiMap<int, IRostersEditHandler *> FEditHandlers;
+	QMultiMap<int, IRostersLabelHolder *> FLabelHolders;
 };
 
 #endif // ROSTERSVIEW_H

@@ -13,11 +13,11 @@
 #include <utils/menu.h>
 
 class ChatWindowMenu :
-			public Menu
+	public Menu
 {
 	Q_OBJECT;
 public:
-	ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IToolBarWidget *AToolBarWidget, QWidget *AParent);
+	ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IMessageToolBarWidget *AToolBarWidget, QWidget *AParent);
 	~ChatWindowMenu();
 	Jid streamJid() const;
 	Jid contactJid() const;
@@ -32,14 +32,13 @@ protected slots:
 	void onActionTriggered(bool);
 	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
-	void onArchiveRequestFailed(const QString &AId, const QString &AError);
+	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 	void onDiscoInfoChanged(const IDiscoInfo &ADiscoInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
-	void onEditWidgetContactJidChanged(const Jid &ABefore);
+	void onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 private:
-	IEditWidget *FEditWidget;
-	IToolBarWidget *FToolBarWidget;
+	IMessageToolBarWidget *FToolBarWidget;
 	IDataForms *FDataForms;
 	IMessageArchiver *FArchiver;
 	IServiceDiscovery *FDiscovery;

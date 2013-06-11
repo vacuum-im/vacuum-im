@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl" sourcelanguage="en">
 <context>
-    <name>IqAuth</name>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Brak możliwości bezpiecznego połączenia</translation>
-    </message>
-    <message>
-        <source>Server requested plain text password over insecure connection</source>
-        <translation>Serwer zarządał podania hasła jawnym tekstem w niezabezpieczonym połączeniu</translation>
-    </message>
-</context>
-<context>
     <name>IqAuthPlugin</name>
     <message>
         <source>Query Authentication</source>

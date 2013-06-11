@@ -35,19 +35,22 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 					query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
 					FXmppStream->sendStanza(auth);
 				}
-				else if (!reqElem.firstChildElement("password").isNull() && FXmppStream->connection()->isEncrypted())
-				{
-					query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->getSessionPassword()));
-					FXmppStream->sendStanza(auth);
-				}
 				else if (!reqElem.firstChildElement("password").isNull())
 				{
-					emit error(tr("Server requested plain text password over insecure connection"));
+					if (FXmppStream->connection()->isEncrypted())
+					{
+						query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->getSessionPassword()));
+						FXmppStream->sendStanza(auth);
+					}
+					else
+					{
+						emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
+					}
 				}
 			}
 			else if (AStanza.type() == "error")
 			{
-				emit error(XmppStanzaError(AStanza).errorMessage());
+				emit error(XmppStanzaError(AStanza));
 			}
 			return true;
 		}
@@ -61,7 +64,7 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 			}
 			else if (AStanza.type() == "error")
 			{
-				emit error(XmppStanzaError(AStanza).errorMessage());
+				emit error(XmppStanzaError(AStanza));
 			}
 			return true;
 		}
@@ -102,7 +105,7 @@ bool IqAuth::start(const QDomElement &AElem)
 		}
 		else
 		{
-			emit error(tr("Secure connection is not established"));
+			emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
 		}
 	}
 	deleteLater();

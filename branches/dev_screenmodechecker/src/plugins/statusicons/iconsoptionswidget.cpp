@@ -62,7 +62,7 @@ IconsOptionsWidget::IconsOptionsWidget(IStatusIcons *AStatusIcons, QWidget *APar
 {
 	ui.setupUi(this);
 	FStatusIcons = AStatusIcons;
-	FSubStorages.append(STORAGE_SHARED_DIR);
+	FSubStorages.append(FILE_STORAGE_SHARED_DIR);
 	FSubStorages += FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS);
 
 	ui.lwtDefaultIconset->setItemDelegate(new IconsetDelegate(ui.lwtDefaultIconset));
@@ -160,7 +160,7 @@ void IconsOptionsWidget::onAddUserRule()
 	QTableWidgetItem *rulePattern = new QTableWidgetItem();
 	QTableWidgetItem *ruleStorage = new QTableWidgetItem();
 	ruleStorage->setData(IDR_STORAGE_NAME,RSR_STORAGE_STATUSICONS);
-	ruleStorage->setData(IDR_STORAGE_SUBDIR,STORAGE_SHARED_DIR);
+	ruleStorage->setData(IDR_STORAGE_SUBDIR,FILE_STORAGE_SHARED_DIR);
 	ruleStorage->setData(IDR_ICON_ROWS,1);
 	int row = ui.twtUserRules->rowCount();
 	ui.twtUserRules->insertRow(row);

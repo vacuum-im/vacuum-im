@@ -17,13 +17,12 @@ win32 {
 }
 
 LIBS              += -L../libs
-LIBS              += -lzlib -lidn -lminizip -lqxtglobalshortcut -lidle -lscreenmodechecker
+LIBS              += -lzlib -lidn -lminizip -lqxtglobalshortcut -lidle
 macx {
   QMAKE_LFLAGS    += -framework Carbon -framework IOKit -framework Cocoa
 } else:unix:!haiku {
   LIBS            += -lXss
   CONFIG          += x11
-  QT              += dbus
 } else:win32 {
   LIBS            += -luser32
 }
@@ -40,6 +39,7 @@ include(utils.pri)
   INSTALLS        += sdk_utils
 
   #Translation
+  TRANS_BUILD_ROOT   = $${OUT_PWD}/../..
   TRANS_SOURCE_ROOT  = ..
   include(../translations/languages.inc)
 }

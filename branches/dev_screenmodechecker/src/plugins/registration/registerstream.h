@@ -2,6 +2,7 @@
 #define REGISTERSTREAM_H
 
 #include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iregistraton.h>
@@ -26,12 +27,12 @@ public:
 	virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IXmppFeature
-	virtual QString featureNS() const { return NS_FEATURE_REGISTER; }
-	virtual IXmppStream *xmppStream() const { return FXmppStream; }
+	virtual QString featureNS() const;
+	virtual IXmppStream *xmppStream() const;
 	virtual bool start(const QDomElement &AElem);
 signals:
 	void finished(bool ARestart);
-	void error(const QString &AMessage);
+	void error(const XmppError &AError);
 	void featureDestroyed();
 protected slots:
 	void onXmppStreamClosed();

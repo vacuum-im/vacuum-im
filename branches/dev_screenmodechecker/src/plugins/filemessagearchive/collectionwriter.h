@@ -12,7 +12,7 @@
 #include <utils/options.h>
 
 class CollectionWriter :
-			public QObject
+	public QObject
 {
 	Q_OBJECT;
 public:
@@ -26,6 +26,7 @@ public:
 	int secondsFromStart() const;
 	bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
 	bool writeNote(const QString &ANote);
+	void closeAndDeleteLater();
 signals:
 	void writerDestroyed(CollectionWriter *AWriter);
 protected:

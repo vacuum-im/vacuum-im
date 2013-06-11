@@ -5,22 +5,18 @@
 #include <QDomDocument>
 #include <QApplication>
 
-struct FileStorage::StorageObject 
-{
-	int prefix;
-	QList<int> fileTypes;
-	QList<QString> fileNames;
-	QHash<QString, QString> fileOptions;
-};
-
 QList<QString> FileStorage::FMimeTypes;
 QList<QString> FileStorage::FResourceDirs;
 QList<FileStorage *> FileStorage::FInstances;
 QHash<QString, FileStorage *> FileStorage::FStaticStorages;
 
-QList<QString> FileStorage::FKeyTags    = QList<QString>() << "key"  << "text" << "name";
-QList<QString> FileStorage::FFileTags   = QList<QString>() << "object";
-QList<QString> FileStorage::FObjectTags = QList<QString>() << "file" << "icon";
+struct FileStorage::StorageObject 
+{
+	int prefix;
+	QList<int> fileTypes;
+	QList<QString> fileNames;
+	QHash<QString, QString> fileProperties;
+};
 
 FileStorage::FileStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : QObject(AParent)
 {
@@ -33,6 +29,11 @@ FileStorage::FileStorage(const QString &AStorage, const QString &ASubStorage, QO
 FileStorage::~FileStorage()
 {
 	FInstances.removeAll(this);
+}
+
+bool FileStorage::isExist() const
+{
+	return !subStorageDirs(FStorage,FSubStorage).isEmpty();
 }
 
 QString FileStorage::storage() const
@@ -49,14 +50,9 @@ void FileStorage::setSubStorage(const QString &ASubStorage)
 {
 	if (FSubStorage.isNull() || FSubStorage!=ASubStorage)
 	{
-		FSubStorage = !ASubStorage.isEmpty() ? ASubStorage : STORAGE_SHARED_DIR;
-		updateDefinitions();
+		FSubStorage = !ASubStorage.isEmpty() ? ASubStorage : FILE_STORAGE_SHARED_DIR;
+		reloadDefinitions();
 	}
-}
-
-QString FileStorage::option(const QString &AOption) const
-{
-	return FOptions.value(AOption);
 }
 
 QList<QString> FileStorage::fileKeys() const
@@ -111,17 +107,49 @@ QString FileStorage::fileMime(const QString &AKey, int AIndex) const
 	return FMimeTypes.at(FObjects.value(FKey2Object.value(AKey)).fileTypes.value(AIndex));
 }
 
-QString FileStorage::fileOption(const QString &AKey, const QString &AOption) const
-{
-	return FObjects.value(FKey2Object.value(AKey)).fileOptions.value(AOption);
-}
-
 QString FileStorage::fileCacheKey(const QString &AKey, int AIndex) const
 {
 	QString name = fileName(AKey,AIndex);
 	if (!name.isEmpty())
 		return FSubStorage + "/" + name;
 	return QString::null;
+}
+
+QString FileStorage::storageProperty(const QString &AName, const QString &ADefValue) const
+{
+	return FProperties.value(AName,ADefValue);
+}
+
+QString FileStorage::fileProperty(const QString &AKey, const QString &AName, const QString &ADefValue) const
+{
+	return FObjects.value(FKey2Object.value(AKey)).fileProperties.value(AName,ADefValue);
+}
+
+void FileStorage::reloadDefinitions()
+{
+	FPrefixes.clear();
+	FProperties.clear();
+	FObjects.clear();
+	FKey2Object.clear();
+
+	QList<QString> subDirs = subStorageDirs(FStorage,FSubStorage);
+	if (FSubStorage != FILE_STORAGE_SHARED_DIR)
+		subDirs += subStorageDirs(FStorage,FILE_STORAGE_SHARED_DIR);
+
+	int prefixIndex = 0;
+	foreach(QString subDir, subDirs)
+	{
+		QDir dir(subDir);
+		if (dir.exists())
+		{
+			FPrefixes.append(subDir+"/");
+			foreach(QString file, dir.entryList(QStringList() << FILE_STORAGE_DEFINITIONS_MASK))
+				loadDefinitions(dir.absoluteFilePath(file),prefixIndex);
+			prefixIndex++;
+		}
+	}
+
+	emit storageChanged();
 }
 
 QList<QString> FileStorage::availStorages()
@@ -131,9 +159,15 @@ QList<QString> FileStorage::availStorages()
 	{
 		QDir dir(dirPath);
 		QList<QString> dirStorages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-		for (QList<QString>::iterator it=dirStorages.begin(); it!=dirStorages.end(); ++it)
+
+		QList<QString>::iterator it = dirStorages.begin();
+		while(it != dirStorages.end())
+		{
 			if (storages.contains(*it))
 				it = dirStorages.erase(it);
+			else
+				++it;
+		}
 		storages.append(dirStorages);
 	}
 	return storages;
@@ -148,16 +182,16 @@ QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool AChec
 		if (dir.exists() && dir.cd(AStorage))
 		{
 			QList<QString> dirStorages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
-			dirStorages.removeAll(STORAGE_SHARED_DIR);
+			dirStorages.removeAll(FILE_STORAGE_SHARED_DIR);
 
-			QList<QString>::iterator it=dirStorages.begin();
-			while (it!=dirStorages.end())
+			QList<QString>::iterator it = dirStorages.begin();
+			while (it != dirStorages.end())
 			{
 				if (dir.cd(*it))
 				{
 					if (storages.contains(*it))
 						it = dirStorages.erase(it);
-					else if (ACheckDefs && dir.entryList(QStringList()<<STORAGE_DEFFILES_MASK).isEmpty())
+					else if (ACheckDefs && dir.entryList(QStringList()<<FILE_STORAGE_DEFINITIONS_MASK).isEmpty())
 						it = dirStorages.erase(it);
 					else
 						++it;
@@ -245,7 +279,7 @@ void FileStorage::setResourcesDirs(const QList<QString> &ADirs)
 	
 		foreach(FileStorage *fileStorage, updateStorages)
 		{
-			fileStorage->updateDefinitions();
+			fileStorage->reloadDefinitions();
 		}
 	}
 }
@@ -255,41 +289,18 @@ FileStorage *FileStorage::staticStorage(const QString &ASubStorage)
 	FileStorage *fileStorage = FStaticStorages.value(ASubStorage,NULL);
 	if (!fileStorage)
 	{
-		fileStorage = new FileStorage(ASubStorage,STORAGE_SHARED_DIR,qApp);
+		fileStorage = new FileStorage(ASubStorage,FILE_STORAGE_SHARED_DIR,qApp);
 		FStaticStorages.insert(ASubStorage,fileStorage);
 	}
 	return fileStorage;
 }
 
-void FileStorage::updateDefinitions()
-{
-	FPrefixes.clear();
-	FOptions.clear();
-	FObjects.clear();
-	FKey2Object.clear();
-
-	QList<QString> subDirs = subStorageDirs(FStorage,FSubStorage);
-	if (FSubStorage != STORAGE_SHARED_DIR)
-		subDirs += subStorageDirs(FStorage,STORAGE_SHARED_DIR);
-
-	int prefixIndex = 0;
-	foreach(QString subDir, subDirs)
-	{
-		QDir dir(subDir);
-		if (dir.exists())
-		{
-			FPrefixes.append(subDir+"/");
-			foreach(QString file, dir.entryList(QStringList() << STORAGE_DEFFILES_MASK)) {
-				loadDefinitions(dir.absoluteFilePath(file),prefixIndex); }
-			prefixIndex++;
-		}
-	}
-
-	emit storageChanged();
-}
-
 void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 {
+	static const QList<QString> keyTags = QList<QString>() << "key"  << "text" << "name";
+	static const QList<QString> fileTags = QList<QString>() << "object";
+	static const QList<QString> objectTags = QList<QString>() << "file" << "icon";
+
 	QDomDocument doc;
 	QFile file(ADefFile);
 	if (file.open(QFile::ReadOnly) && doc.setContent(file.readAll(),false))
@@ -297,7 +308,7 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 		QDomElement objElem = doc.documentElement().firstChildElement();
 		while (!objElem.isNull())
 		{
-			if (FObjectTags.contains(objElem.tagName()))
+			if (objectTags.contains(objElem.tagName()))
 			{
 				StorageObject object;
 				object.prefix = APrefixIndex;
@@ -306,13 +317,13 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 				QDomElement keyElem = objElem.firstChildElement();
 				while (!keyElem.isNull())
 				{
-					if (FKeyTags.contains(keyElem.tagName()))
+					if (keyTags.contains(keyElem.tagName()))
 					{
 						QString key = keyElem.text();
 						if (!FKey2Object.contains(key))
 							objKeys.append(key);
 					}
-					else if (FFileTags.contains(keyElem.tagName()))
+					else if (fileTags.contains(keyElem.tagName()))
 					{
 						if (!keyElem.text().isEmpty())
 						{
@@ -329,7 +340,7 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 					}
 					else if (keyElem.firstChildElement().isNull() && keyElem.attributes().count()==0)
 					{
-						object.fileOptions.insert(keyElem.tagName(),keyElem.text());
+						object.fileProperties.insert(keyElem.tagName(),keyElem.text());
 					}
 					keyElem = keyElem.nextSiblingElement();
 				}
@@ -352,9 +363,9 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 					}
 				}
 			}
-			else if (objElem.firstChildElement().isNull() && objElem.attributes().count()==0 && !FOptions.contains(objElem.tagName()))
+			else if (objElem.firstChildElement().isNull() && objElem.attributes().count()==0 && !FProperties.contains(objElem.tagName()))
 			{
-				FOptions.insert(objElem.tagName(),objElem.text());
+				FProperties.insert(objElem.tagName(),objElem.text());
 			}
 			objElem = objElem.nextSiblingElement();
 		}

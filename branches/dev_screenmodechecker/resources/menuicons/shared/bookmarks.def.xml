@@ -9,6 +9,10 @@
     <object mime="image/png">bookmarksadd.png</object>
   </icon>
   <icon>
+    <key>bookmarksRemove</key>
+    <object mime="image/png">bookmarksremove.png</object>
+  </icon>
+  <icon>
     <key>bookmarksRoom</key>
     <object mime="image/png">bookmarksroom.png</object>
   </icon>

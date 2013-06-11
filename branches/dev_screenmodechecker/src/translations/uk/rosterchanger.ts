@@ -94,18 +94,6 @@
         <translation>%1 видалив вашу авторизацію на отримання статусу.</translation>
     </message>
     <message>
-        <source>This group</source>
-        <translation>В цю групу</translation>
-    </message>
-    <message>
-        <source>Create new...</source>
-        <translation>Створити нову...</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation>В корінь</translation>
-    </message>
-    <message>
         <source>Subscription</source>
         <translation>Авторизація</translation>
     </message>
@@ -122,48 +110,8 @@
         <translation>Запитати</translation>
     </message>
     <message>
-        <source>Copy contact</source>
-        <translation>Копіювати контакт</translation>
-    </message>
-    <message>
-        <source>Move contact</source>
-        <translation>Перемістити контакт</translation>
-    </message>
-    <message>
-        <source>Copy group</source>
-        <translation>Копіювати групу</translation>
-    </message>
-    <message>
-        <source>Move group</source>
-        <translation>Перемістити групу</translation>
-    </message>
-    <message>
         <source>Refuse</source>
         <translation>Відмовитись</translation>
-    </message>
-    <message>
-        <source>Copy to group</source>
-        <translation>Копіювати в групу</translation>
-    </message>
-    <message>
-        <source>Move to group</source>
-        <translation>Перемістити в групу</translation>
-    </message>
-    <message>
-        <source>Remove from group</source>
-        <translation>Видалити з групи</translation>
-    </message>
-    <message>
-        <source>Remove from roster</source>
-        <translation>Видалити з ростеру</translation>
-    </message>
-    <message>
-        <source>Remove group</source>
-        <translation>Видалити групу</translation>
-    </message>
-    <message>
-        <source>Remove contacts</source>
-        <translation>Видалити контакти</translation>
     </message>
     <message>
         <source>Subscription message from %1</source>
@@ -174,16 +122,8 @@
         <translation>Повідомлення авторизації</translation>
     </message>
     <message>
-        <source>Rename contact</source>
-        <translation>Перейменувати контакт</translation>
-    </message>
-    <message>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Введіть ім&apos;я для: &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Create new group</source>
-        <translation>Створити нову групу</translation>
     </message>
     <message>
         <source>Enter group name:</source>
@@ -196,14 +136,6 @@
     <message>
         <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
         <translation>Ви впевнені, що хочете видалити контакт &lt;b&gt;%1&lt;/b&gt; з ростеру?</translation>
-    </message>
-    <message>
-        <source>Rename group</source>
-        <translation>Перейменувати групу</translation>
-    </message>
-    <message>
-        <source>Enter new group name:</source>
-        <translation>Введіть нове ім&apos;я групи:</translation>
     </message>
     <message>
         <source>You are now subscribed for %1 presence.</source>
@@ -286,14 +218,6 @@
         <translation>Shift+Del</translation>
     </message>
     <message>
-        <source>Add contact...</source>
-        <translation>Додати контакт...</translation>
-    </message>
-    <message>
-        <source>Blank Group</source>
-        <translation>Пуста група</translation>
-    </message>
-    <message>
         <source>When receiving authorization request</source>
         <translation>При отриманні запиту на авторизацію</translation>
     </message>
@@ -304,6 +228,114 @@
             <numerusform>Ви впевнені що хочете видалити &lt;b&gt;%n контакти&lt;/b&gt; з ростеру?</numerusform>
             <numerusform>Ви впевнені що хочете видалити &lt;b&gt;%n контактів&lt;/b&gt; з ростеру?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Add Contact</source>
+        <translation>Додати контакт</translation>
+    </message>
+    <message>
+        <source>Add Group with Contacts</source>
+        <translation>Додати групу з контактами</translation>
+    </message>
+    <message>
+        <source>Copy Group to Root</source>
+        <translation>Копіювати групу в корінь</translation>
+    </message>
+    <message>
+        <source>Move Group to Root</source>
+        <translation>Перемістити групу в корінь</translation>
+    </message>
+    <message>
+        <source>Copy Contact to Group</source>
+        <translation>Скопіювати контакт в групу</translation>
+    </message>
+    <message>
+        <source>Move Contact to Group</source>
+        <translation>Перемістити контакт в групу</translation>
+    </message>
+    <message>
+        <source>Copy Group to Group</source>
+        <translation>Копіювати групу в групу</translation>
+    </message>
+    <message>
+        <source>Move Group to Group</source>
+        <translation>Перемістити групу в групу</translation>
+    </message>
+    <message>
+        <source>Create New...</source>
+        <translation>Створити нову...</translation>
+    </message>
+    <message>
+        <source>To Root</source>
+        <translation>В корінь</translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation>Без груп</translation>
+    </message>
+    <message>
+        <source>Add Contact...</source>
+        <translation>Додати контакт...</translation>
+    </message>
+    <message>
+        <source>Subscribe Contact</source>
+        <translation>Авторизувати контакт</translation>
+    </message>
+    <message>
+        <source>Unsubscribe Contact</source>
+        <translation>Видалити авторизацію</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Перейменувати</translation>
+    </message>
+    <message>
+        <source>Add to Roster...</source>
+        <translation>Додати до ростеру</translation>
+    </message>
+    <message>
+        <source>Copy to Group</source>
+        <translation>Копіювати в групу</translation>
+    </message>
+    <message>
+        <source>Move to Group</source>
+        <translation>Перемістити в групу</translation>
+    </message>
+    <message>
+        <source>Remove from Group</source>
+        <translation>Видалити з групи</translation>
+    </message>
+    <message>
+        <source>Remove from Roster</source>
+        <translation>Видалити з ростеру</translation>
+    </message>
+    <message>
+        <source>Remove Group</source>
+        <translation>Видалити групу</translation>
+    </message>
+    <message>
+        <source>Remove Contacts</source>
+        <translation>Видалити контакти</translation>
+    </message>
+    <message>
+        <source>Rename Contact</source>
+        <translation>Перейменувати контакт</translation>
+    </message>
+    <message>
+        <source>Create Group</source>
+        <translation>Створити групу</translation>
+    </message>
+    <message>
+        <source>Remove Contact</source>
+        <translation>Видалити контакт</translation>
+    </message>
+    <message>
+        <source>Rename Group</source>
+        <translation>Перейменувати групу</translation>
+    </message>
+    <message>
+        <source>In this Group</source>
+        <translation>В цю групу</translation>
     </message>
 </context>
 <context>

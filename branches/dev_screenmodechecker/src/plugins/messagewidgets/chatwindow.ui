@@ -19,28 +19,20 @@
      <number>3</number>
     </property>
     <item>
-     <widget class="QWidget" name="wdtInfo" native="true"/>
-    </item>
-    <item>
-     <widget class="QWidget" name="wdtView" native="true">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QWidget" name="wdtToolBar" native="true"/>
-    </item>
-    <item>
-     <widget class="QWidget" name="wdtEdit" native="true"/>
+     <widget class="BoxWidget" name="bwtMessageBox"/>
     </item>
    </layout>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>BoxWidget</class>
+   <extends>QFrame</extends>
+   <header location="global">utils/boxwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -61,7 +61,7 @@ signals:
 	void challengeReceived(const QString &AChallengeId, const IDataForm &AForm);
 	void challengeSubmited(const QString &AChallengeId, const IDataForm &ASubmit);
 	void challengeAccepted(const QString &AChallengeId);
-	void challengeRejected(const QString &AChallengeId, const QString &AError);
+	void challengeRejected(const QString &AChallengeId, const XmppError &AError);
 	void challengeCanceled(const QString &AChallengeId);
 protected:
 	bool isSupportedChallenge(IDataForm &AForm) const;
@@ -69,6 +69,7 @@ protected:
 	void notifyChallenge(const ChallengeItem &AChallenge);
 	QString findChallenge(IDataDialogWidget *ADialog) const;
 	QString findChallenge(const Jid &AStreamJid, const Jid &AContactJid) const;
+	bool setFocusToEditableWidget(QWidget *AWidget);
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:

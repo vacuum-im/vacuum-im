@@ -5,6 +5,8 @@
 #define ADR_RULE                          Action::DR_Parametr1
 #define ADR_SUBSTORAGE                    Action::DR_Parametr2
 
+#define STATUSICONS_STORAGE_PATTERN      "pattern"
+
 StatusIcons::StatusIcons()
 {
 	FPresencePlugin = NULL;
@@ -74,9 +76,9 @@ bool StatusIcons::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -120,7 +122,7 @@ bool StatusIcons::initObjects()
 
 	if (FRostersModel)
 	{
-		FRostersModel->insertDefaultDataHolder(this);
+		FRostersModel->insertRosterDataHolder(RDHO_STATUSICONS,this);
 	}
 
 	loadStorages();
@@ -129,8 +131,8 @@ bool StatusIcons::initObjects()
 
 bool StatusIcons::initSettings()
 {
-	Options::setDefaultValue(OPV_STATUSICONS_DEFAULT,STORAGE_SHARED_DIR);
-	Options::setDefaultValue(OPV_STATUSICONS_RULE_ICONSET,STORAGE_SHARED_DIR);
+	Options::setDefaultValue(OPV_STATUSICONS_DEFAULT,FILE_STORAGE_SHARED_DIR);
+	Options::setDefaultValue(OPV_STATUSICONS_RULE_ICONSET,FILE_STORAGE_SHARED_DIR);
 
 	if (FOptionsManager)
 	{
@@ -145,48 +147,38 @@ QMultiMap<int, IOptionsWidget *> StatusIcons::optionsWidgets(const QString &ANod
 {
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (ANodeId == OPN_STATUSICONS)
-	{
 		widgets.insertMulti(OWO_STATUSICONS, new IconsOptionsWidget(this,AParent));
-	}
 	return widgets;
 }
 
-int StatusIcons::rosterDataOrder() const
+QList<int> StatusIcons::rosterDataRoles(int AOrder) const
 {
-	return RDHO_DEFAULT;
+	if (AOrder == RDHO_STATUSICONS)
+		return QList<int>() << Qt::DecorationRole;
+	return QList<int>();
 }
 
-QList<int> StatusIcons::rosterDataRoles() const
+QVariant StatusIcons::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	static QList<int> dataRoles = QList<int>()
-	                              << Qt::DecorationRole;
-	return dataRoles;
-}
-
-QList<int> StatusIcons::rosterDataTypes() const
-{
-	static QList<int> indexTypes = QList<int>()
-	                               << RIT_STREAM_ROOT
-	                               << RIT_CONTACT
-	                               << RIT_AGENT
-	                               << RIT_MY_RESOURCE;
-	return indexTypes;
-}
-
-QVariant StatusIcons::rosterData(const IRosterIndex *AIndex, int ARole) const
-{
-	if (ARole == Qt::DecorationRole)
+	if (AOrder==RDHO_STATUSICONS && ARole==Qt::DecorationRole)
 	{
-		return iconByJid(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString());
+		switch (AIndex->kind())
+		{
+		case RIK_CONTACTS_ROOT:
+			return iconByStatus(AIndex->data(RDR_SHOW).toInt(),SUBSCRIPTION_BOTH,false);
+		case RIK_STREAM_ROOT:
+		case RIK_CONTACT:
+		case RIK_AGENT:
+		case RIK_MY_RESOURCE:
+			return iconByJid(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString());
+		}
 	}
 	return QVariant();
 }
 
-bool StatusIcons::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool StatusIcons::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex);
-	Q_UNUSED(ARole);
-	Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
 }
 
@@ -207,9 +199,9 @@ QString StatusIcons::ruleIconset(const QString &APattern, RuleType ARuleType) co
 	switch (ARuleType)
 	{
 	case UserRule:
-		return FUserRules.value(APattern,STORAGE_SHARED_DIR);
+		return FUserRules.value(APattern,FILE_STORAGE_SHARED_DIR);
 	case DefaultRule:
-		return FDefaultRules.value(APattern,STORAGE_SHARED_DIR);
+		return FDefaultRules.value(APattern,FILE_STORAGE_SHARED_DIR);
 	}
 	return QString::null;
 }
@@ -306,7 +298,7 @@ QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 
 		if (substorage.isEmpty())
 		{
-			substorage = FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : STORAGE_SHARED_DIR;
+			substorage = FDefaultStorage!=NULL ? FDefaultStorage->subStorage() : FILE_STORAGE_SHARED_DIR;
 		}
 
 		FJid2Storage.insert(AContactJid,substorage);
@@ -330,7 +322,7 @@ QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid)
 	else if (AStreamJid && AContactJid)
 	{
 		subscription = SUBSCRIPTION_BOTH;
-		show = presence!=NULL ? presence->presenceItem(AContactJid).show : show;
+		show = presence!=NULL ? presence->findItem(AContactJid).show : show;
 	}
 	else
 	{
@@ -338,7 +330,7 @@ QString StatusIcons::iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid)
 		IRosterItem ritem = roster!=NULL ? roster->rosterItem(AContactJid) : IRosterItem();
 		ask = !ritem.ask.isEmpty();
 		subscription = ritem.subscription;
-		show = presence!=NULL ? presence->presenceItem(AContactJid).show : show;
+		show = presence!=NULL ? presence->findItem(AContactJid).show : show;
 	}
 	return iconKeyByStatus(show,subscription,ask);
 }
@@ -386,18 +378,17 @@ void StatusIcons::loadStorages()
 		IconStorage *storage = new IconStorage(RSR_STORAGE_STATUSICONS,substorage,this);
 		FStorages.insert(substorage,storage);
 
-		QString pattern = storage->option(STO_PATTERN);
+		QString pattern = storage->storageProperty(STATUSICONS_STORAGE_PATTERN);
 		if (!pattern.isEmpty())
 		{
 			insertRule(pattern,substorage,IStatusIcons::DefaultRule);
 			FStatusRules += pattern;
 		}
 
-		QString name = storage->option(STORAGE_NAME);
 		Action *action = new Action(FCustomIconMenu);
 		action->setCheckable(true);
 		action->setIcon(storage->getIcon(iconKeyByStatus(IPresence::Online,QString::null,false)));
-		action->setText(!name.isEmpty() ? name : substorage);
+		action->setText(storage->storageProperty(FILE_STORAGE_NAME,substorage));
 		action->setData(ADR_SUBSTORAGE,substorage);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
 		FCustomIconActions.insert(substorage,action);
@@ -439,17 +430,14 @@ void StatusIcons::updateCustomIconMenu(const QStringList &APatterns)
 
 bool StatusIcons::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_CONTACT << RIT_AGENT;
-	if (!ASelected.isEmpty())
+	foreach(IRosterIndex *index, ASelected)
 	{
-		foreach(IRosterIndex *index, ASelected)
-		{
-			if (!acceptTypes.contains(index->type()))
-				return false;
-		}
-		return true;
+		Jid streamJid = index->data(RDR_STREAM_JID).toString();
+		Jid contactJid = index->data(RDR_PREP_BARE_JID).toString();
+		if (!contactJid.isValid() || contactJid.pBare()==streamJid.pBare())
+			return false;
 	}
-	return false;
+	return !ASelected.isEmpty();
 }
 
 void StatusIcons::onStatusIconsChangedTimer()
@@ -462,16 +450,16 @@ void StatusIcons::onStatusIconsChangedTimer()
 void StatusIcons::onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority)
 {
 	Q_UNUSED(AShow); Q_UNUSED(AStatus); Q_UNUSED(APriority);
-	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->streamRoot(APresence->streamJid()) : NULL;
-	if (index)
-		emit rosterDataChanged(index,Qt::DecorationRole);
+	IRosterIndex *sindex = FRostersModel!=NULL ? FRostersModel->streamIndex(APresence->streamJid()) : NULL;
+	if (sindex)
+		emit rosterDataChanged(sindex,Qt::DecorationRole);
 }
 
 void StatusIcons::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
 {
 	if (FRostersModel && (AItem.subscription!=ABefore.subscription || AItem.ask!=ABefore.ask))
 	{
-		foreach (IRosterIndex *index, FRostersModel->getContactIndexList(ARoster->streamJid(),AItem.itemJid))
+		foreach (IRosterIndex *index, FRostersModel->findContactIndexes(ARoster->streamJid(),AItem.itemJid))
 			emit rosterDataChanged(index,Qt::DecorationRole);
 	}
 }
@@ -480,19 +468,19 @@ void StatusIcons::onPresenceItemReceived(IPresence *APresence, const IPresenceIt
 {
 	if (FRostersModel && AItem.show!=ABefore.show)
 	{
-		foreach (IRosterIndex *index, FRostersModel->getContactIndexList(APresence->streamJid(),AItem.itemJid))
+		foreach (IRosterIndex *index, FRostersModel->findContactIndexes(APresence->streamJid(),AItem.itemJid))
 			emit rosterDataChanged(index,Qt::DecorationRole);
 	}
 }
 
-void StatusIcons::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void StatusIcons::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void StatusIcons::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void StatusIcons::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
 		
@@ -552,7 +540,7 @@ void StatusIcons::onOptionsChanged(const OptionsNode &ANode)
 		if (IconStorage::availSubStorages(RSR_STORAGE_STATUSICONS).contains(ANode.value().toString()))
 			FDefaultStorage->setSubStorage(ANode.value().toString());
 		else
-			FDefaultStorage->setSubStorage(STORAGE_SHARED_DIR);
+			FDefaultStorage->setSubStorage(FILE_STORAGE_SHARED_DIR);
 	}
 }
 

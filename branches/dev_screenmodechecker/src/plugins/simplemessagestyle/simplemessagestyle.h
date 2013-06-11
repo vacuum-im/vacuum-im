@@ -61,8 +61,8 @@
 struct MessageContentOptions;
 
 class SimpleMessageStyle :
-			public QObject,
-			public IMessageStyle
+	public QObject,
+	public IMessageStyle
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMessageStyle);
@@ -84,7 +84,8 @@ public:
 	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent);
 	virtual QString senderColor(const QString &ASenderId) const;
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
-	virtual QTextDocumentFragment textUnderPosition(const QPoint &APosition, QWidget *AWidget) const;
+	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const;
+	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
 	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 	//ISimpleMessageStyle
@@ -112,7 +113,7 @@ protected:
 	void loadSenderColors();
 	void initStyleSettings();
 protected:
-	virtual bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
 	void onLinkClicked(const QUrl &AUrl);
 	void onScrollAfterResize();
@@ -137,6 +138,8 @@ private:
 	QMap<QString, QVariant> FInfo;
 	QMap<QWidget *, WidgetStatus> FWidgetStatus;
 	QNetworkAccessManager *FNetworkAccessManager;
+private:
+	static QString FSharedPath;
 };
 
 #endif // SIMPLEMESSAGESTYLE_H

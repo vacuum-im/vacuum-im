@@ -7,13 +7,13 @@
 
 #define DEFAUL_IMAGE_FORMAT       "png"
 
-VCard::VCard(const Jid &AContactJid, VCardPlugin *APlugin) : QObject(APlugin)
+VCard::VCard(VCardPlugin *APlugin, const Jid &AContactJid) : QObject(APlugin)
 {
 	FContactJid = AContactJid;
 	FVCardPlugin = APlugin;
 	connect(FVCardPlugin,SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
 	connect(FVCardPlugin,SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardPublished(const Jid &)));
-	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const QString &)),SLOT(onVCardError(const Jid &, const QString &)));
+	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const XmppError &)),SLOT(onVCardError(const Jid &, const XmppError &)));
 	loadVCardFile();
 }
 
@@ -32,7 +32,7 @@ bool VCard::isEmpty() const
 	return !isValid() || !vcardElem().hasChildNodes();
 }
 
-const Jid & VCard::contactJid() const
+Jid VCard::contactJid() const
 {
 	return FContactJid;
 }
@@ -45,28 +45,6 @@ QDomElement VCard::vcardElem() const
 QDateTime VCard::loadDateTime() const
 {
 	return FLoadDateTime;
-}
-
-QString VCard::value(const QString &AName, const QStringList &ATags, const QStringList &ATagList) const
-{
-	bool tagsFaild = true;
-	QDomElement elem = firstElementByName(AName);
-	while (!elem.isNull() && tagsFaild)
-	{
-		tagsFaild = false;
-		QDomElement parentElem = elem.parentNode().toElement();
-		foreach(QString tag, ATagList)
-		{
-			QDomElement tagElem = parentElem.firstChildElement(tag);
-			if ((tagElem.isNull() && ATags.contains(tag)) || (!tagElem.isNull() && !ATags.contains(tag)))
-			{
-				tagsFaild = true;
-				elem = nextElementByName(AName,elem);
-				break;
-			}
-		}
-	}
-	return elem.text();
 }
 
 QMultiHash<QString,QStringList> VCard::values(const QString &AName, const QStringList &ATagList) const
@@ -87,6 +65,28 @@ QMultiHash<QString,QStringList> VCard::values(const QString &AName, const QStrin
 		elem = nextElementByName(AName, elem);
 	}
 	return result;
+}
+
+QString VCard::value(const QString &AName, const QStringList &ATags, const QStringList &ATagList) const
+{
+	bool tagsFailed = true;
+	QDomElement elem = firstElementByName(AName);
+	while (!elem.isNull() && tagsFailed)
+	{
+		tagsFailed = false;
+		QDomElement parentElem = elem.parentNode().toElement();
+		foreach(QString tag, ATagList)
+		{
+			QDomElement tagElem = parentElem.firstChildElement(tag);
+			if ((tagElem.isNull() && ATags.contains(tag)) || (!tagElem.isNull() && !ATags.contains(tag)))
+			{
+				tagsFailed = true;
+				elem = nextElementByName(AName,elem);
+				break;
+			}
+		}
+	}
+	return elem.text();
 }
 
 void VCard::setTagsForValue(const QString &AName, const QString &AValue, const QStringList &ATags, const QStringList &ATagList)
@@ -179,16 +179,16 @@ void VCard::unlock()
 
 void VCard::loadVCardFile()
 {
-	QFile vcardFile(FVCardPlugin->vcardFileName(FContactJid));
-	if (vcardFile.exists() && vcardFile.open(QIODevice::ReadOnly))
+	QFile file(FVCardPlugin->vcardFileName(FContactJid));
+	if (file.open(QIODevice::ReadOnly))
 	{
-		FDoc.setContent(vcardFile.readAll());
-		vcardFile.close();
+		FDoc.setContent(file.readAll());
+		file.close();
 	}
 	if (vcardElem().isNull())
 	{
 		FDoc.clear();
-		QDomElement elem = FDoc.appendChild(FDoc.createElement(VCARD_FILE_ROOT_TAGNAME)).toElement();
+		QDomElement elem = FDoc.appendChild(FDoc.createElement(VCARD_TAGNAME)).toElement();
 		elem.setAttribute("jid",FContactJid.full());
 		elem.appendChild(FDoc.createElementNS(NS_VCARD_TEMP,VCARD_TAGNAME));
 	}
@@ -196,7 +196,6 @@ void VCard::loadVCardFile()
 	{
 		FLoadDateTime = QDateTime::fromString(FDoc.documentElement().attribute("dateTime"),Qt::ISODate);
 	}
-
 	emit vcardUpdated();
 }
 
@@ -281,11 +280,11 @@ void VCard::onVCardReceived(const Jid &AContactJid)
 
 void VCard::onVCardPublished(const Jid &AContactJid)
 {
-	if (FContactJid && AContactJid)
+	if (FContactJid == AContactJid)
 		emit vcardPublished();
 }
 
-void VCard::onVCardError(const Jid &AContactJid, const QString &AError)
+void VCard::onVCardError(const Jid &AContactJid, const XmppError &AError)
 {
 	if (FContactJid == AContactJid)
 		emit vcardError(AError);

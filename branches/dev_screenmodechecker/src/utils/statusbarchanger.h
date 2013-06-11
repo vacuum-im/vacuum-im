@@ -10,7 +10,7 @@
 #define SBG_DEFAULT     500
 
 class UTILS_EXPORT StatusBarChanger :
-			public QObject
+	public QObject
 {
 	Q_OBJECT;
 public:
@@ -32,7 +32,7 @@ signals:
 protected slots:
 	void updateVisible();
 protected:
-	virtual bool eventFilter(QObject *AObject, QEvent *AEvent);
+	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
 	void onWidgetDestroyed(QObject *AObject);
 	void onChangeVisible();

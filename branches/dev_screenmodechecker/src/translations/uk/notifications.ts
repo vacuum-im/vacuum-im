@@ -51,10 +51,6 @@
         <source>Enable animation in notification pop-up</source>
         <translation>Дозволити анімацію в спливаючому вікні</translation>
     </message>
-    <message>
-        <source>Disable all pop-up windows when watching fullscreen movies or games</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>
@@ -96,7 +92,7 @@
     </message>
     <message>
         <source>Allowed types of notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Дозволені типи сповіщень</translation>
     </message>
 </context>
 <context>

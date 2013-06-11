@@ -39,20 +39,20 @@
         <translation>Status Icons Manager</translation>
     </message>
     <message>
-        <source>Allows to set the status icons for contacts on the basis of standard rules or user-defined</source>
-        <translation>Allows to set the status icons for contacts on the basis of standard rules or user-defined</translation>
-    </message>
-    <message>
         <source>Status icon</source>
         <translation>Status icon</translation>
+    </message>
+    <message>
+        <source>Status icons</source>
+        <translation>Status icons</translation>
     </message>
     <message>
         <source>Default</source>
         <translation>Default</translation>
     </message>
     <message>
-        <source>Status icons</source>
-        <translation>Status icons</translation>
+        <source>Allows to set the status icons for contacts on the basis of standard rules or user-defined</source>
+        <translation>Allows to set the status icons for contacts on the basis of standard rules or user-defined</translation>
     </message>
 </context>
 </TS>

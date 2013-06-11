@@ -20,10 +20,6 @@
         <translation>Jabber ID для %1 - %2</translation>
     </message>
     <message>
-        <source>Received Jabber ID is not valid</source>
-        <translation>Получен неверный Jabber ID</translation>
-    </message>
-    <message>
         <source>Requested operation failed: %1</source>
         <translation>Запрошенная операция завершилась с ошибкой: %1</translation>
     </message>

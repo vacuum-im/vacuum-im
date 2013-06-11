@@ -11,18 +11,6 @@
 <context>
     <name>VCardDialog</name>
     <message>
-        <source>vCard - %1</source>
-        <translation>vCard - %1</translation>
-    </message>
-    <message>
-        <source>vCard error</source>
-        <translation>Ошибка vCard</translation>
-    </message>
-    <message>
-        <source>vCard request or publish failed.&lt;br&gt;%1</source>
-        <translation>Запрос или публикация VCard не удалась.&lt;br&gt;%1</translation>
-    </message>
-    <message>
         <source>Save image</source>
         <translation>Сохранить изображение</translation>
     </message>
@@ -51,14 +39,6 @@
         <translation>Сервис недоступен</translation>
     </message>
     <message>
-        <source>Failed to publish vCard</source>
-        <translation>Не удалось опубликовать vCard</translation>
-    </message>
-    <message>
-        <source>Failed to update vCard</source>
-        <translation>Не удалось обновить vCard</translation>
-    </message>
-    <message>
         <source>&lt;Unset&gt;</source>
         <translation>&lt;Не установлен&gt;</translation>
     </message>
@@ -77,6 +57,30 @@
     <message>
         <source>Image Files (*.%1)</source>
         <translation>Картинки (*.%1)</translation>
+    </message>
+    <message>
+        <source>Profile - %1</source>
+        <translation>Личные данные - %1</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Ошибка</translation>
+    </message>
+    <message>
+        <source>Failed to publish your profile: %1</source>
+        <translation>Не удалось опубликовать ваши личные данные: %1</translation>
+    </message>
+    <message>
+        <source>Failed to publish your profile.</source>
+        <translation>Не удалось опубликовать ваши личные данные.</translation>
+    </message>
+    <message>
+        <source>Failed to load profile.</source>
+        <translation>Не удалось загрузить личные данные.</translation>
+    </message>
+    <message>
+        <source>Failed to load profile: %1</source>
+        <translation>Не удалось загрузить личные данные: %1</translation>
     </message>
 </context>
 <context>
@@ -241,17 +245,22 @@
         <translation>Менеджер визитных карточек</translation>
     </message>
     <message>
-        <source>Show vCard</source>
-        <translation>Показать vCard</translation>
+        <source>Show Profile</source>
+        <translation>Показать личные данные</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <comment>Show vCard</comment>
+        <comment>Show Profile</comment>
+        <translatorcomment>Показать личные данные</translatorcomment>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <source>Visit Card</source>
-        <translation>Визитная карточка</translation>
+        <source>Contact Profile</source>
+        <translation>Личные данные контакта</translation>
+    </message>
+    <message>
+        <source>Edit Profile</source>
+        <translation>Редактировать личные данные</translation>
     </message>
 </context>
 </TS>

@@ -7,7 +7,8 @@
 #include <QDragLeaveEvent>
 #include <definitions/namespaces.h>
 #include <definitions/fshandlerorders.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/discofeaturehandlerorders.h>
 #include <definitions/notificationtypes.h>
 #include <definitions/notificationdataroles.h>
@@ -21,6 +22,7 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifiletransfer.h>
 #include <interfaces/ifilestreamsmanager.h>
@@ -43,17 +45,17 @@
 #include "streamdialog.h"
 
 class FileTransfer :
-			public QObject,
-			public IPlugin,
-			public IFileTransfer,
-			public IOptionsHolder,
-			public IDiscoFeatureHandler,
-			public IRostersDragDropHandler,
-			public IViewDropHandler,
-			public IFileStreamsHandler
+	public QObject,
+	public IPlugin,
+	public IFileTransfer,
+	public IOptionsHolder,
+	public IDiscoFeatureHandler,
+	public IRostersDragDropHandler,
+	public IMessageViewDropHandler,
+	public IFileStreamsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IViewDropHandler IFileStreamsHandler);
+	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IMessageViewDropHandler IFileStreamsHandler);
 public:
 	FileTransfer();
 	~FileTransfer();
@@ -71,16 +73,16 @@ public:
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IRostersDragDropHandler
-	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag);
+	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
-	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover);
+	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
-	virtual bool rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu);
-	//IViewDropHandler
-	virtual bool viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent);
-	virtual bool viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent);
-	virtual void viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent);
-	virtual bool viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu);
+	//IMessageViewDropHandler
+	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
+	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);
+	virtual void messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent);
+	virtual bool messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu);
 	//IFileTransferHandler
 	virtual bool fileStreamRequest(int AOrder, const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods);
 	virtual bool fileStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS);
@@ -92,9 +94,8 @@ protected:
 	void registerDiscoFeatures();
 	void notifyStream(IFileStream *AStream, bool ANewStream = false);
 	void autoStartStream(IFileStream *AStream);
-	void insertToolBarAction(IToolBarWidget *AWidget);
-	void removeToolBarAction(IToolBarWidget *AWidget);
-	QList<IToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
+	void updateToolBarAction(IMessageToolBarWidget *AWidget);
+	QList<IMessageToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
 	StreamDialog *getStreamDialog(IFileStream *ASession);
 	IFileStream *createStream(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IFileStream::StreamKind AStreamKind);
 	QString dirNameByUserName(const QString &AUserName) const;
@@ -109,8 +110,8 @@ protected slots:
 	void onNotificationRemoved(int ANotifyId);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 	void onDiscoInfoRemoved(const IDiscoInfo &AInfo);
-	void onToolBarWidgetCreated(IToolBarWidget *AWidget);
-	void onEditWidgetContactJidChanged(const Jid &ABefore);
+	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
+	void onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore);
 	void onToolBarWidgetDestroyed(QObject *AObject);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
@@ -126,7 +127,7 @@ private:
 private:
 	QMap<QString, int> FStreamNotify;
 	QMap<QString, StreamDialog *> FStreamDialog;
-	QMap<IToolBarWidget *, Action *> FToolBarActions;
+	QMap<IMessageToolBarWidget *, Action *> FToolBarActions;
 };
 
 #endif // FILETRANSFER_H

@@ -59,7 +59,7 @@ public:
 	bool operator <(const Jid &AJid) const;
 	bool operator >(const Jid &AJid) const;
 public:
-	static Jid null;
+	static const Jid null;
 	static Jid fromUserInput(const QString &AJidStr);
 	static QString escape(const QString &AUserNode);
 	static QString unescape(const QString &AEscNode);
@@ -72,21 +72,14 @@ protected:
 	Jid &parseFromString(const QString &AJidStr);
 private:
 	QSharedDataPointer<JidData> d;
+private:
+	static QHash<QString,Jid> FJidCache;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-	UTILS_EXPORT uint qHash(const Jid &Akey);
-	UTILS_EXPORT QDataStream &operator<<(QDataStream &AStream, const Jid &AJid);
-	UTILS_EXPORT QDataStream &operator>>(QDataStream &AStream, Jid &AJid);
-
-#ifdef __cplusplus
-}
-#endif
+UTILS_EXPORT uint qHash(const Jid &AKey);
+UTILS_EXPORT QDataStream &operator>>(QDataStream &AStream, Jid &AJid);
+UTILS_EXPORT QDataStream &operator<<(QDataStream &AStream, const Jid &AJid);
 
 Q_DECLARE_METATYPE(Jid);
-#define JID_METATYPE_ID qMetaTypeId<Jid>()
 
 #endif // JID_H

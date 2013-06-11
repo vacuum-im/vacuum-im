@@ -3,6 +3,7 @@
 
 #include <QMenuBar>
 #include <interfaces/idataforms.h>
+#include <interfaces/irostersmodel.h>
 #include <interfaces/imessagewidgets.h>
 #include <utils/jid.h>
 #include <utils/menu.h>
@@ -93,6 +94,7 @@ public:
 	virtual QObject *instance() = 0;
 	virtual Jid streamJid() const =0;
 	virtual Jid roomJid() const =0;
+	virtual QString roomName() const =0;
 	virtual bool isOpen() const =0;
 	virtual bool isConnected() const =0;
 	virtual bool autoPresence() const =0;
@@ -109,7 +111,7 @@ public:
 	virtual void setPassword(const QString &APassword) =0;
 	virtual int show() const =0;
 	virtual QString status() const =0;
-	virtual XmppStanzaError roomError() const =0;
+	virtual XmppError roomError() const =0;
 	virtual bool sendStreamPresence() =0;
 	virtual bool sendPresence(int AShow, const QString &AStatus) =0;
 	virtual bool sendMessage(const Message &AMessage, const QString &AToNick = QString::null) =0;
@@ -134,6 +136,7 @@ protected:
 	virtual void chatError(const QString &AMessage) =0;
 	virtual void chatClosed() =0;
 	virtual void chatDestroyed() =0;
+	virtual void roomNameChanged(const QString &AName) =0;
 	virtual void streamJidChanged(const Jid &ABefore, const Jid &AAfter) =0;
 	//Occupant
 	virtual void userPresence(IMultiUser *AUser, int AShow, const QString &AStatus) =0;
@@ -157,31 +160,28 @@ protected:
 	virtual void configFormReceived(const IDataForm &AForm) =0;
 	virtual void configFormSent(const IDataForm &AForm) =0;
 	virtual void configFormAccepted() =0;
-	virtual void configFormRejected(const QString &AError) =0;
+	virtual void configFormRejected(const XmppError &AError) =0;
 	virtual void roomDestroyed(const QString &AReason) =0;
 };
 
 class IMultiUserChatWindow :
-	public ITabPage
+	public IMessageWindow
 {
 public:
-	//virtual QMainWindow *instance() =0;
-	virtual Jid streamJid() const =0;
-	virtual Jid roomJid() const =0;
-	virtual IViewWidget *viewWidget() const =0;
-	virtual IEditWidget *editWidget() const =0;
-	virtual IMenuBarWidget *menuBarWidget() const =0;
-	virtual IToolBarWidget *toolBarWidget() const =0;
-	virtual IStatusBarWidget *statusBarWidget() const =0;
+	virtual QMainWindow *instance() =0;
 	virtual IMultiUserChat *multiUserChat() const =0;
-	virtual IChatWindow *openChatWindow(const Jid &AContactJid) =0;
-	virtual IChatWindow *findChatWindow(const Jid &AContactJid) const =0;
+	virtual IMessageChatWindow *openChatWindow(const Jid &AContactJid) =0;
+	virtual IMessageChatWindow *findChatWindow(const Jid &AContactJid) const =0;
+	virtual void contextMenuForRoom(Menu *AMenu) =0;
 	virtual void contextMenuForUser(IMultiUser *AUser, Menu *AMenu) =0;
+	virtual void toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
 	virtual void exitAndDestroy(const QString &AStatus, int AWaitClose = 15000) =0;
 protected:
-	virtual void chatWindowCreated(IChatWindow *AWindow) =0;
-	virtual void chatWindowDestroyed(IChatWindow *AWindow) =0;
+	virtual void multiChatContextMenu(Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUser *AUser, Menu *AMenu) =0;
+	virtual void multiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
+	virtual void privateChatWindowCreated(IMessageChatWindow *AWindow) =0;
+	virtual void privateChatWindowDestroyed(IMessageChatWindow *AWindow) =0;
 };
 
 class IMultiUserChatPlugin
@@ -190,12 +190,15 @@ public:
 	virtual QObject *instance() = 0;
 	virtual IPluginManager *pluginManager() const =0;
 	virtual bool requestRoomNick(const Jid &AStreamJid, const Jid &ARoomJid) =0;
-	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual QList<IMultiUserChat *> multiUserChats() const =0;
-	virtual IMultiUserChat *multiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
-	virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
+	virtual IMultiUserChat *findMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
+	virtual IMultiUserChat *getMultiUserChat(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual QList<IMultiUserChatWindow *> multiChatWindows() const =0;
-	virtual IMultiUserChatWindow *multiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
+	virtual IMultiUserChatWindow *findMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
+	virtual IMultiUserChatWindow *getMultiChatWindow(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
+	virtual QList<IRosterIndex *> multiChatRosterIndexes() const =0;
+	virtual IRosterIndex *findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const =0;
+	virtual IRosterIndex *getMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 	virtual void showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword) =0;
 protected:
 	virtual void roomNickReceived(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick) =0;
@@ -203,12 +206,16 @@ protected:
 	virtual void multiUserChatDestroyed(IMultiUserChat *AMultiChat) =0;
 	virtual void multiChatWindowCreated(IMultiUserChatWindow *AWindow) =0;
 	virtual void multiChatWindowDestroyed(IMultiUserChatWindow *AWindow) =0;
+	virtual void multiChatRosterIndexCreated(IRosterIndex *AIndex) =0;
+	virtual void multiChatRosterIndexDestroyed(IRosterIndex *AIndex) =0;
+	virtual void multiChatContextMenu(IMultiUserChatWindow *AWindow, Menu *AMenu) =0;
 	virtual void multiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu) =0;
+	virtual void multiUserToolTips(IMultiUserChatWindow *AWindow, IMultiUser *AUser, QMap<int,QString> &AToolTips) =0;
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
-Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.2")
-Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.1")
-Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.1")
+Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.4")
+Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.3")
+Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.5")
 
-#endif
+#endif //IMULTIUSERCHAT_H

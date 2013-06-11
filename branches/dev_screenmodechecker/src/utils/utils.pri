@@ -23,7 +23,12 @@ HEADERS  = utilsexport.h \
            animatedtextbrowser.h \
            closebutton.h \
            searchlineedit.h \
-           imagemanager.h
+           imagemanager.h \
+           advanceditem.h \
+           advanceditemmodel.h \
+           advanceditemdelegate.h \
+           filecookiejar.h \
+           boxwidget.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -49,4 +54,9 @@ SOURCES  = jid.cpp \
            animatedtextbrowser.cpp \
            closebutton.cpp \
            searchlineedit.cpp \
-           imagemanager.cpp
+           imagemanager.cpp \
+           advanceditem.cpp \
+           advanceditemmodel.cpp \
+           advanceditemdelegate.cpp \
+           filecookiejar.cpp \
+           boxwidget.cpp

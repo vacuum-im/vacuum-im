@@ -47,6 +47,12 @@ bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 bool InBandStreams::initObjects()
 {
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_DESTROYED,tr("Stream destroyed"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_INVALID_DATA,tr("Malformed data packet"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_NOT_OPENED,tr("Failed to open stream"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_INVALID_BLOCK_SIZE,tr("Block size is not acceptable"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_DATA_NOT_SENT,tr("Failed to send data"));
+
 	if (FDataManager)
 	{
 		FDataManager->insertMethod(this);
@@ -86,8 +92,7 @@ QString InBandStreams::methodDescription() const
 	return tr("Data is broken down into smaller chunks and transported in-band over XMPP");
 }
 
-IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid,
-    IDataStreamSocket::StreamKind AKind, QObject *AParent)
+IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
 {
 	if (FStanzaProcessor)
 	{

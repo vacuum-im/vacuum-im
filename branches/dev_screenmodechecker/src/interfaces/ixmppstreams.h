@@ -5,6 +5,7 @@
 #include <QStringList>
 #include <utils/jid.h>
 #include <utils/stanza.h>
+#include <utils/xmpperror.h>
 
 #define XMPPSTREAMS_UUID "{8074A197-3B77-4bb0-9BD3-6F06D5CB8D15}"
 
@@ -34,7 +35,7 @@ public:
 	virtual bool start(const QDomElement &AFeatureElem) =0;
 protected:
 	virtual void finished(bool ARestart) =0;
-	virtual void error(const QString &AError) =0;
+	virtual void error(const XmppError &AError) =0;
 	virtual void featureDestroyed() =0;
 };
 
@@ -55,11 +56,11 @@ public:
 	virtual QObject *instance() =0;
 	virtual bool open() =0;
 	virtual void close() =0;
-	virtual void abort(const QString &AError) =0;
+	virtual void abort(const XmppError &AError) =0;
 	virtual bool isOpen() const =0;
 	virtual bool isConnected() const =0;
 	virtual QString streamId() const =0;
-	virtual QString errorString() const =0;
+	virtual XmppError error() const =0;
 	virtual Jid streamJid() const=0;
 	virtual void setStreamJid(const Jid &AStreamJid) =0;
 	virtual QString password() const =0;
@@ -82,7 +83,7 @@ protected:
 	virtual void opened() =0;
 	virtual void aboutToClose() =0;
 	virtual void closed() =0;
-	virtual void error(const QString &AError) =0;
+	virtual void error(const XmppError &AError) =0;
 	virtual void jidAboutToBeChanged(const Jid &AAfter) =0;
 	virtual void jidChanged(const Jid &ABefore) =0;
 	virtual void connectionChanged(IConnection *AConnection) =0;
@@ -114,7 +115,7 @@ protected:
 	virtual void opened(IXmppStream *AXmppStream) =0;
 	virtual void aboutToClose(IXmppStream *AXmppStream) =0;
 	virtual void closed(IXmppStream *AXmppStream) =0;
-	virtual void error(IXmppStream *AXmppStream, const QString &AError) =0;
+	virtual void error(IXmppStream *AXmppStream, const XmppError &AError) =0;
 	virtual void jidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter) =0;
 	virtual void jidChanged(IXmppStream *AXmppStream, const Jid &ABefore) =0;
 	virtual void connectionChanged(IXmppStream *AXmppStream, IConnection *AConnection) =0;
@@ -126,9 +127,9 @@ protected:
 
 Q_DECLARE_INTERFACE(IXmppDataHandler,"Vacuum.Plugin.IXmppDataHandler/1.0");
 Q_DECLARE_INTERFACE(IXmppStanzaHadler,"Vacuum.Plugin.IXmppStanzaHadler/1.0");
-Q_DECLARE_INTERFACE(IXmppFeature,"Vacuum.Plugin.IXmppFeature/1.0");
+Q_DECLARE_INTERFACE(IXmppFeature,"Vacuum.Plugin.IXmppFeature/1.1");
 Q_DECLARE_INTERFACE(IXmppFeaturesPlugin,"Vacuum.Plugin.IXmppFeaturesPlugin/1.0");
-Q_DECLARE_INTERFACE(IXmppStream, "Vacuum.Plugin.IXmppStream/1.2")
-Q_DECLARE_INTERFACE(IXmppStreams,"Vacuum.Plugin.IXmppStreams/1.2")
+Q_DECLARE_INTERFACE(IXmppStream, "Vacuum.Plugin.IXmppStream/1.3")
+Q_DECLARE_INTERFACE(IXmppStreams,"Vacuum.Plugin.IXmppStreams/1.3")
 
 #endif

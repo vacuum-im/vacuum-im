@@ -94,18 +94,6 @@
         <translation>Sie Sind nun von %1 Präsenz ausgetragen.</translation>
     </message>
     <message>
-        <source>This group</source>
-        <translation>Diese Gruppe</translation>
-    </message>
-    <message>
-        <source>Create new...</source>
-        <translation>Neue erstellen...</translation>
-    </message>
-    <message>
-        <source>Root</source>
-        <translation>Root</translation>
-    </message>
-    <message>
         <source>Subscription</source>
         <translation>Abonnement</translation>
     </message>
@@ -122,48 +110,8 @@
         <translation>Anfrage</translation>
     </message>
     <message>
-        <source>Copy contact</source>
-        <translation>Kontakt kopieren</translation>
-    </message>
-    <message>
-        <source>Move contact</source>
-        <translation>Kontakt verschieben</translation>
-    </message>
-    <message>
-        <source>Copy group</source>
-        <translation>Gruppe kopieren</translation>
-    </message>
-    <message>
-        <source>Move group</source>
-        <translation>Gruppe verschieben</translation>
-    </message>
-    <message>
         <source>Refuse</source>
         <translation>Abweisen</translation>
-    </message>
-    <message>
-        <source>Copy to group</source>
-        <translation>Zu Gruppe kopieren</translation>
-    </message>
-    <message>
-        <source>Move to group</source>
-        <translation>Zu Gruppe verschieben</translation>
-    </message>
-    <message>
-        <source>Remove from group</source>
-        <translation>Aus Gruppe entfernen</translation>
-    </message>
-    <message>
-        <source>Remove from roster</source>
-        <translation>vom Roster entfernen</translation>
-    </message>
-    <message>
-        <source>Remove group</source>
-        <translation>Gruppe entfernen</translation>
-    </message>
-    <message>
-        <source>Remove contacts</source>
-        <translation>Entferne Kontakte</translation>
     </message>
     <message>
         <source>Subscription message from %1</source>
@@ -174,16 +122,8 @@
         <translation>Abonnements Nachricht von</translation>
     </message>
     <message>
-        <source>Rename contact</source>
-        <translation>Kontakt umbenennen</translation>
-    </message>
-    <message>
         <source>Enter name for: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Gebenen Sie einen Namen ein: &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Create new group</source>
-        <translation>Neue Gruppe erstellen</translation>
     </message>
     <message>
         <source>Enter group name:</source>
@@ -196,14 +136,6 @@
     <message>
         <source>You are assured that wish to remove a contact &lt;b&gt;%1&lt;/b&gt; from roster?</source>
         <translation>Sind Sie sicher, dass sie den Kontakt &lt;b&gt;%1&lt;/b&gt; vom Roster löschen wollen?</translation>
-    </message>
-    <message>
-        <source>Rename group</source>
-        <translation>Gruppe umbenennen</translation>
-    </message>
-    <message>
-        <source>Enter new group name:</source>
-        <translation>Neuen Gruppennamen eingeben:</translation>
     </message>
     <message>
         <source>You are now subscribed for %1 presence.</source>
@@ -286,14 +218,6 @@
         <translation>Shift+Del</translation>
     </message>
     <message>
-        <source>Add contact...</source>
-        <translation>Kontakt Hinzufügen ...</translation>
-    </message>
-    <message>
-        <source>Blank Group</source>
-        <translation>Sonstige</translation>
-    </message>
-    <message>
         <source>When receiving authorization request</source>
         <translation>Wenn sie eine unauthorisierte Anfrage empfangen</translation>
     </message>
@@ -303,6 +227,114 @@
             <numerusform>Sind sie sicher, daß sie &lt;b&gt;den Kontakt&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
             <numerusform>Sind sie sicher, daß sie &lt;b&gt;%n Kontakte&lt;/b&gt; aus dem Roster entfernen möchten?</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Add Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Group with Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Group to Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Group to Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Contact to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Contact to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy Group to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move Group to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create New...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Without Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Contact...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subscribe Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsubscribe Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add to Roster...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Move to Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Roster</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In this Group</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

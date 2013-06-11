@@ -13,7 +13,7 @@
 #define TBG_ALLIGN_CHANGE   10000
 
 class UTILS_EXPORT ToolBarChanger :
-			public QObject
+	public QObject
 {
 	Q_OBJECT;
 public:

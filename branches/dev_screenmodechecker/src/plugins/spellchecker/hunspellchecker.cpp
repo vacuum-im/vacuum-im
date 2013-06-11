@@ -137,7 +137,7 @@ void HunspellChecker::loadHunspell(const QString &ALang)
 		if (QFileInfo(dictFile).exists())
 		{
 			QString rulesFile = QString("%1/%2.aff").arg(dictsPath).arg(ALang);
-			FHunSpell = new Hunspell(rulesFile.toUtf8().constData(), dictFile.toUtf8().constData());
+			FHunSpell = new Hunspell(rulesFile.toLocal8Bit().constData(), dictFile.toLocal8Bit().constData());
 			FDictCodec = QTextCodec::codecForName(FHunSpell->get_dic_encoding());
 			loadPersonalDict();
 			break;

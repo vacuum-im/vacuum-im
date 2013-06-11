@@ -9,7 +9,7 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("vCard - %1").arg(AContactJid.uFull()));
+	setWindowTitle(tr("Profile - %1").arg(AContactJid.uFull()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_VCARD,0,0,"windowIcon");
 
 	FContactJid = AContactJid;
@@ -29,10 +29,10 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	ui.btbButtons->addButton(tr("Reload"),QDialogButtonBox::ResetRole);
 	connect(ui.btbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-	FVCard = FVCardPlugin->vcard(FContactJid);
+	FVCard = FVCardPlugin->getVCard(FContactJid);
 	connect(FVCard->instance(),SIGNAL(vcardUpdated()),SLOT(onVCardUpdated()));
 	connect(FVCard->instance(),SIGNAL(vcardPublished()),SLOT(onVCardPublished()));
-	connect(FVCard->instance(),SIGNAL(vcardError(const QString &)),SLOT(onVCardError(const QString &)));
+	connect(FVCard->instance(),SIGNAL(vcardError(const XmppError &)),SLOT(onVCardError(const XmppError &)));
 
 	connect(ui.tlbPhotoSave,SIGNAL(clicked()),SLOT(onPhotoSaveClicked()));
 	connect(ui.tlbPhotoLoad,SIGNAL(clicked()),SLOT(onPhotoLoadClicked()));
@@ -320,9 +320,12 @@ void VCardDialog::onVCardPublished()
 	}
 }
 
-void VCardDialog::onVCardError(const QString &AError)
+void VCardDialog::onVCardError(const XmppError &AError)
 {
-	QMessageBox::critical(this,tr("vCard error"),tr("vCard request or publish failed.<br>%1").arg(Qt::escape(AError)));
+	QMessageBox::critical(this,tr("Error"),
+		streamJid().pBare() != contactJid().pBare() ? 
+		tr("Failed to load profile: %1").arg(Qt::escape(AError.errorMessage())) :
+		tr("Failed to publish your profile: %1").arg(Qt::escape(AError.errorMessage())));
 
 	if (!FSaveClicked)
 		deleteLater();
@@ -472,7 +475,7 @@ void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 		}
 		else
 		{
-			QMessageBox::warning(this,tr("vCard error"),tr("Failed to publish vCard"));
+			QMessageBox::warning(this,tr("Error"),tr("Failed to publish your profile."));
 		}
 	}
 	else if (ui.btbButtons->buttonRole(AButton) == QDialogButtonBox::ResetRole)
@@ -484,7 +487,7 @@ void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 		}
 		else
 		{
-			QMessageBox::warning(this,tr("vCard error"),tr("Failed to update vCard"));
+			QMessageBox::warning(this,tr("Error"),tr("Failed to load profile."));
 		}
 	}
 }

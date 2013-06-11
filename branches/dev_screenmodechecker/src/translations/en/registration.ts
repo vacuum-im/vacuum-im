@@ -12,10 +12,6 @@
         <translation>Waiting for host response ...</translation>
     </message>
     <message>
-        <source>Error: Can&apos;t send request to host.</source>
-        <translation>Error: Can&apos;t send request to host.</translation>
-    </message>
-    <message>
         <source>Do you really want to remove registration from %1?</source>
         <translation>Do you really want to remove registration from %1?</translation>
     </message>
@@ -39,6 +35,10 @@
         <source>Requested operation failed: %1</source>
         <translation>Requested operation failed: %1</translation>
     </message>
+    <message>
+        <source>Error: Can&apos;t send request to host.</source>
+        <translation>Error: Can&apos;t send request to host.</translation>
+    </message>
 </context>
 <context>
     <name>RegisterDialogClass</name>
@@ -61,32 +61,12 @@
         <source>Registration on %1</source>
         <translation>Registration on %1</translation>
     </message>
-    <message>
-        <source>Invalid registration form</source>
-        <translation>Invalid registration form</translation>
-    </message>
-    <message>
-        <source>Secure connection is not established</source>
-        <translation>Secure connection is not established</translation>
-    </message>
-    <message>
-        <source>Invalid registration dialog</source>
-        <translation>Invalid registration dialog</translation>
-    </message>
-    <message>
-        <source>Registration rejected by user</source>
-        <translation>Registration rejected by user</translation>
-    </message>
 </context>
 <context>
     <name>Registration</name>
     <message>
         <source>Registration</source>
         <translation>Registration</translation>
-    </message>
-    <message>
-        <source>Allows to register on the Jabber servers and services</source>
-        <translation>Allows to register on the Jabber servers and services</translation>
     </message>
     <message>
         <source>Register</source>
@@ -125,14 +105,6 @@
         <translation>Full Name</translation>
     </message>
     <message>
-        <source>Given Name</source>
-        <translation>Given Name</translation>
-    </message>
-    <message>
-        <source>Family Name</source>
-        <translation>Family Name</translation>
-    </message>
-    <message>
         <source>Email Address</source>
         <translation>Email Address</translation>
     </message>
@@ -157,12 +129,36 @@
         <translation>Telephone Number</translation>
     </message>
     <message>
-        <source>Your Web Page</source>
-        <translation>Your Web Page</translation>
+        <source>Allows to register on the Jabber servers and services</source>
+        <translation>Allows to register on the Jabber servers and services</translation>
     </message>
     <message>
         <source>Supports the registration</source>
         <translation>Supports the registration</translation>
+    </message>
+    <message>
+        <source>Given Name</source>
+        <translation>Given Name</translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation>Family Name</translation>
+    </message>
+    <message>
+        <source>Your Web Page</source>
+        <translation>Your Web Page</translation>
+    </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation>Invalid registration form</translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation>Invalid registration dialog</translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation>Registration rejected by user</translation>
     </message>
 </context>
 </TS>

@@ -2,6 +2,11 @@
 
 #include <QTextBlock>
 
+TextManager::TextManager()
+{
+
+}
+
 QString TextManager::getDocumentBody(const QTextDocument &ADocument)
 {
 	QRegExp body("<body.*>(.*)</body>");
@@ -90,4 +95,37 @@ QTextDocumentFragment TextManager::getTrimmedTextFragment(const QTextDocumentFra
 
 	cursor.select(QTextCursor::Document);
 	return cursor.selection();
+}
+
+QString TextManager::getElidedString(const QString &AString, Qt::TextElideMode AMode, int AMaxChars)
+{
+	if (AString.length()>AMaxChars && AMaxChars>3)
+	{
+		int stringChars = AMode!=Qt::ElideNone ? AMaxChars-3 : AMaxChars;
+
+		QString string;
+		if (AMode == Qt::ElideRight)
+		{
+			string = AString.left(stringChars);
+			string.append("...");
+		}
+		else if (AMode == Qt::ElideLeft)
+		{
+			string = AString.right(stringChars);
+			string.prepend("...");
+		}
+		else if (AMode == Qt::ElideMiddle)
+		{
+			QString leftString = AString.left(stringChars/2);
+			QString rightString = AString.right(stringChars - stringChars/2);
+			string = leftString+"..."+rightString;
+		}
+		else
+		{
+			string = AString.left(stringChars);
+		}
+
+		return string;
+	}
+	return AString;
 }

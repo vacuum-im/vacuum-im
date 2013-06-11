@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QTimer>
 #include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
@@ -16,12 +17,12 @@
 #include <utils/stanza.h>
 
 class BitsOfBinary :
-			public QObject,
-			public IPlugin,
-			public IBitsOfBinary,
-			public IXmppStanzaHadler,
-			public IStanzaHandler,
-			public IStanzaRequestOwner
+	public QObject,
+	public IPlugin,
+	public IBitsOfBinary,
+	public IXmppStanzaHadler,
+	public IStanzaHandler,
+	public IStanzaRequestOwner
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IBitsOfBinary IXmppStanzaHadler IStanzaHandler IStanzaRequestOwner);
@@ -54,7 +55,7 @@ public:
 	virtual bool removeBinary(const QString &AContentId);
 signals:
 	void binaryCached(const QString &AContentId, const QString &AType, const QByteArray &AData, quint64 AMaxAge);
-	void binaryError(const QString &AContentId, const QString &AError);
+	void binaryError(const QString &AContentId, const XmppError &AError);
 	void binaryRemoved(const QString &AContentId);
 protected:
 	QString contentFileName(const QString &AContentId) const;

@@ -4,6 +4,18 @@
 <context>
     <name>Notifications</name>
     <message>
+        <source>Notifications</source>
+        <translation>Notifications</translation>
+    </message>
+    <message>
+        <source>Remove All Notifications</source>
+        <translation>Remove All Notifications</translation>
+    </message>
+    <message>
+        <source>Pending Notifications</source>
+        <translation>Pending Notifications</translation>
+    </message>
+    <message>
         <source>Notifications Manager</source>
         <translation>Notifications Manager</translation>
     </message>
@@ -16,28 +28,8 @@
         <translation>Enable/Disable notifications sound</translation>
     </message>
     <message>
-        <source>Activate notification</source>
-        <translation>Activate notification</translation>
-    </message>
-    <message>
         <source>Remove all notifications</source>
         <translation>Remove all notifications</translation>
-    </message>
-    <message>
-        <source>Activate Notification</source>
-        <translation>Activate Notification</translation>
-    </message>
-    <message>
-        <source>Remove All Notifications</source>
-        <translation>Remove All Notifications</translation>
-    </message>
-    <message>
-        <source>Pending Notifications</source>
-        <translation>Pending Notifications</translation>
-    </message>
-    <message>
-        <source>Notifications</source>
-        <translation>Notifications</translation>
     </message>
     <message>
         <source>Expand contact groups in roster</source>
@@ -48,27 +40,39 @@
         <translation>Disable sounds when status is &apos;Do not disturb&apos;</translation>
     </message>
     <message>
-        <source>Enable animation in notification pop-up</source>
-        <translation>Enable animation in notification pop-up</translation>
+        <source>Activate notification</source>
+        <translation>Activate notification</translation>
     </message>
     <message>
-        <source>Disable all pop-up windows when watching fullscreen movies or games</source>
-        <translation>Disable all pop-up windows when watching fullscreen movies or games</translation>
+        <source>Activate Notification</source>
+        <translation>Activate Notification</translation>
+    </message>
+    <message>
+        <source>Enable animation in notification pop-up</source>
+        <translation>Enable animation in notification pop-up</translation>
     </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>
     <message>
+        <source>Display a notification in your roster</source>
+        <translation>Display a notification in your roster</translation>
+    </message>
+    <message>
         <source>Display a notification in popup window</source>
         <translation>Display a notification in popup window</translation>
     </message>
     <message>
-        <source>Play sound at the notification</source>
-        <translation>Play sound at the notification</translation>
+        <source>Display a notification in tray</source>
+        <translation>Display a notification in tray</translation>
     </message>
     <message>
-        <source>Show the corresponding window minimized in the taskbar</source>
-        <translation>Show the corresponding window minimized in the taskbar</translation>
+        <source>Display a notification in tray context menu</source>
+        <translation>Display a notification in tray context menu</translation>
+    </message>
+    <message>
+        <source>Play sound at the notification</source>
+        <translation>Play sound at the notification</translation>
     </message>
     <message>
         <source>Highlight the corresponding window in the taskbar</source>
@@ -79,16 +83,8 @@
         <translation>Display a notification in tab</translation>
     </message>
     <message>
-        <source>Display a notification in your roster</source>
-        <translation>Display a notification in your roster</translation>
-    </message>
-    <message>
-        <source>Display a notification in tray</source>
-        <translation>Display a notification in tray</translation>
-    </message>
-    <message>
-        <source>Display a notification in tray context menu</source>
-        <translation>Display a notification in tray context menu</translation>
+        <source>Show the corresponding window minimized in the taskbar</source>
+        <translation>Show the corresponding window minimized in the taskbar</translation>
     </message>
     <message>
         <source>Immediately activate the notification</source>

@@ -14,6 +14,8 @@ BirthdayReminder::BirthdayReminder()
 	FRostersViewPlugin = NULL;
 	FMessageProcessor = NULL;
 
+	FBirthdayLabelId = 0;
+
 	FNotifyTimer.setSingleShot(false);
 	FNotifyTimer.setInterval(NOTIFY_TIMEOUT);
 	connect(&FNotifyTimer,SIGNAL(timeout()),SLOT(onShowNotificationTimer()));
@@ -60,8 +62,8 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		}
 	}
 
@@ -129,9 +131,9 @@ bool BirthdayReminder::initObjects()
 	}
 	if (FRostersViewPlugin)
 	{
-		IRostersLabel label;
-		label.order = RLO_BIRTHDAY_NOTIFY;
-		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
+		AdvancedDelegateItem label(RLID_BIRTHDAY_NOTIFY);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_BIRTHDAY_NOTIFY);
 		FBirthdayLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 	return true;
@@ -217,7 +219,7 @@ bool BirthdayReminder::updateBirthdayState(const Jid &AContactJid)
 	if (isStateChanged && FRostersViewPlugin && FRostersModel)
 	{
 		QMultiMap<int, QVariant> findData;
-		findData.insert(RDR_TYPE,RIT_CONTACT);
+		findData.insert(RDR_KIND,RIK_CONTACT);
 		findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		foreach (IRosterIndex *index, FRostersModel->rootIndex()->findChilds(findData,true))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,index);
@@ -294,7 +296,7 @@ void BirthdayReminder::onNotificationActivated(int ANotifyId)
 			Jid contactJid = FNotifies.value(ANotifyId);
 			Jid streamJid = findContactStream(contactJid);
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
-			QList<IPresenceItem> presences = presence!=NULL ? presence->presenceItems(contactJid) : QList<IPresenceItem>();
+			QList<IPresenceItem> presences = presence!=NULL ? presence->findItems(contactJid) : QList<IPresenceItem>();
 			FMessageProcessor->createMessageWindow(streamJid, !presences.isEmpty() ? presences.first().itemJid : contactJid, Message::Chat, IMessageHandler::SM_SHOW);
 		}
 		FNotifications->removeNotification(ANotifyId);
@@ -311,16 +313,16 @@ void BirthdayReminder::onNotificationRemoved(int ANotifyId)
 
 void BirthdayReminder::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin && AIndex->type() == RIT_CONTACT)
+	if (FRostersViewPlugin && AIndex->kind() == RIK_CONTACT)
 	{
 		if (FUpcomingBirthdays.contains(AIndex->data(RDR_PREP_BARE_JID).toString()))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,AIndex);
 	}
 }
 
-void BirthdayReminder::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void BirthdayReminder::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if (ALabelId==RLID_DISPLAY || ALabelId==FBirthdayLabelId)
+	if (ALabelId==AdvancedDelegateItem::DisplayId || ALabelId==FBirthdayLabelId)
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		int daysLeft = contactBithdayDaysLeft(contactJid);
@@ -342,7 +344,7 @@ void BirthdayReminder::onVCardReceived(const Jid &AContactJid)
 {
 	if (findContactStream(AContactJid).isValid())
 	{
-		IVCard *vcard = FVCardPlugin->vcard(AContactJid);
+		IVCard *vcard = FVCardPlugin->getVCard(AContactJid);
 		setContactBithday(AContactJid,DateTime(vcard->value(VVN_BIRTHDAY)).dateTime().date());
 		vcard->unlock();
 	}
@@ -353,7 +355,7 @@ void BirthdayReminder::onRosterItemReceived(IRoster *ARoster, const IRosterItem 
 	Q_UNUSED(ARoster);
 	if (!ABefore.isValid && FVCardPlugin && FVCardPlugin->hasVCard(AItem.itemJid))
 	{
-		IVCard *vcard = FVCardPlugin->vcard(AItem.itemJid);
+		IVCard *vcard = FVCardPlugin->getVCard(AItem.itemJid);
 		setContactBithday(AItem.itemJid,DateTime(vcard->value(VVN_BIRTHDAY)).dateTime().date());
 		vcard->unlock();
 	}

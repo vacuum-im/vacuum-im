@@ -107,6 +107,9 @@
 #define   SCT_ROSTERVIEW_SHOWCHATDIALOG                            "roster-view.show-chat-dialog"
 //NormalMessageHandler
 #define   SCT_ROSTERVIEW_SHOWNORMALDIALOG                          "roster-view.show-normal-dialog"
+//MultiUserChat
+#define   SCT_ROSTERVIEW_ENTERCONFERENCE                           "roster-view.enter-conference"
+#define   SCT_ROSTERVIEW_EXITCONFERENCE                            "roster-view.exit-conference"
 //RosterChanger
 #define   SCT_ROSTERVIEW_ADDCONTACT                                "roster-view.add-contact"
 #define   SCT_ROSTERVIEW_RENAME                                    "roster-view.rename"
@@ -125,5 +128,9 @@
 #define   SCT_ROSTERVIEW_GATELOGOUT                                "roster-view.gate-logout"
 //Annotations
 #define   SCT_ROSTERVIEW_EDITANNOTATION                            "roster-view.edit-annotation"
+//RecentContacts
+#define   SCT_ROSTERVIEW_INSERTFAVORITE                            "roster-view.insert-favorite"
+#define   SCT_ROSTERVIEW_REMOVEFAVORITE                            "roster-view.remove-favorite"
+#define   SCT_ROSTERVIEW_REMOVEFROMRECENT                          "roster-view.remove-from-recent"
 
 #endif // DEF_SHORTCUTS_H

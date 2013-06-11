@@ -647,5 +647,21 @@
         <source>Save Only Messages Text</source>
         <translation>Сохранять только текст сообщений</translation>
     </message>
+    <message>
+        <source>Failed to load conversation headers</source>
+        <translation>Не удалось загрузить заголовки разговоров</translation>
+    </message>
+    <message>
+        <source>Failed to save conversation</source>
+        <translation>Не удалось сохранить разговор</translation>
+    </message>
+    <message>
+        <source>Failed to remove conversation</source>
+        <translation>Не удалось удалить разговор</translation>
+    </message>
+    <message>
+        <source>Failed to load archive modifications</source>
+        <translation>Не удалось загрузить список изменений в архиве</translation>
+    </message>
 </context>
 </TS>

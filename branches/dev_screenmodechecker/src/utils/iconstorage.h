@@ -7,12 +7,13 @@
 #include <QImageReader>
 #include "filestorage.h"
 
-#define OPTION_ANIMATE "animate"
+#define ICON_STORAGE_ANIMATE_INTERVAL "animate"
 
 class UTILS_EXPORT IconStorage :
-			public FileStorage
+	public FileStorage
 {
 	Q_OBJECT;
+	struct IconAnimateFrame;
 	struct IconAnimateParams;
 	struct IconUpdateParams;
 public:
@@ -37,9 +38,10 @@ private:
 	QHash<QTimer *, QObject *> FTimerObject;
 	QHash<QObject *, IconUpdateParams *> FUpdateParams;
 private:
-	static QHash<QString, QHash<QString, QIcon> > FIconCache;
 	static QHash<QString, IconStorage *> FStaticStorages;
 	static QHash<QObject *, IconStorage *> FObjectStorage;
+	static QHash<QString, QHash<QString, QIcon> > FIconCache;
+	static QHash<QString, QHash<QString, QList<IconAnimateFrame> > > FAnimateCache;
 };
 
 #endif // ICONSTORAGE_H

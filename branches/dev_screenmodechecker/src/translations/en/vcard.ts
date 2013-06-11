@@ -11,8 +11,32 @@
 <context>
     <name>VCardDialog</name>
     <message>
-        <source>vCard - %1</source>
-        <translation>vCard - %1</translation>
+        <source>Save image</source>
+        <translation>Save image</translation>
+    </message>
+    <message>
+        <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
+        <translation>Image Files (*.png *.jpg *.bmp *.gif)</translation>
+    </message>
+    <message>
+        <source>Open image</source>
+        <translation>Open image</translation>
+    </message>
+    <message>
+        <source>EMail:</source>
+        <translation>EMail:</translation>
+    </message>
+    <message>
+        <source>Phone:</source>
+        <translation>Phone:</translation>
+    </message>
+    <message>
+        <source>Reload</source>
+        <translation>Reload</translation>
+    </message>
+    <message>
+        <source>Service unavailable</source>
+        <translation>Service unavailable</translation>
     </message>
     <message>
         <source>&lt;Unset&gt;</source>
@@ -27,56 +51,36 @@
         <translation>Female</translation>
     </message>
     <message>
-        <source>Reload</source>
-        <translation>Reload</translation>
-    </message>
-    <message>
-        <source>Service unavailable</source>
-        <translation>Service unavailable</translation>
-    </message>
-    <message>
         <source>Size: %1 Kb</source>
         <translation>Size: %1 Kb</translation>
-    </message>
-    <message>
-        <source>vCard error</source>
-        <translation>vCard error</translation>
-    </message>
-    <message>
-        <source>vCard request or publish failed.&lt;br&gt;%1</source>
-        <translation>vCard request or publish failed.&lt;br&gt;%1</translation>
-    </message>
-    <message>
-        <source>Save image</source>
-        <translation>Save image</translation>
     </message>
     <message>
         <source>Image Files (*.%1)</source>
         <translation>Image Files (*.%1)</translation>
     </message>
     <message>
-        <source>Open image</source>
-        <translation>Open image</translation>
+        <source>Profile - %1</source>
+        <translation>Profile - %1</translation>
     </message>
     <message>
-        <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
-        <translation>Image Files (*.png *.jpg *.bmp *.gif)</translation>
+        <source>Error</source>
+        <translation>Error</translation>
     </message>
     <message>
-        <source>EMail:</source>
-        <translation>EMail:</translation>
+        <source>Failed to publish your profile: %1</source>
+        <translation>Failed to publish your profile: %1</translation>
     </message>
     <message>
-        <source>Phone:</source>
-        <translation>Phone:</translation>
+        <source>Failed to publish your profile.</source>
+        <translation>Failed to publish your profile.</translation>
     </message>
     <message>
-        <source>Failed to publish vCard</source>
-        <translation>Failed to publish vCard</translation>
+        <source>Failed to load profile.</source>
+        <translation>Failed to load profile.</translation>
     </message>
     <message>
-        <source>Failed to update vCard</source>
-        <translation>Failed to update vCard</translation>
+        <source>Failed to load profile: %1</source>
+        <translation>Failed to load profile: %1</translation>
     </message>
 </context>
 <context>
@@ -126,10 +130,6 @@
         <translation>Gender</translation>
     </message>
     <message>
-        <source>Marital status</source>
-        <translation>Marital status</translation>
-    </message>
-    <message>
         <source>Occupation</source>
         <translation>Occupation</translation>
     </message>
@@ -148,10 +148,6 @@
     <message>
         <source>Home page</source>
         <translation>Home page</translation>
-    </message>
-    <message>
-        <source>Address</source>
-        <translation>Address</translation>
     </message>
     <message>
         <source>Home</source>
@@ -225,33 +221,46 @@
         <source>Comments</source>
         <translation>Comments</translation>
     </message>
+    <message>
+        <source>Marital status</source>
+        <translation>Marital status</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Address</translation>
+    </message>
 </context>
 <context>
     <name>VCardPlugin</name>
-    <message>
-        <source>Visit Card Manager</source>
-        <translation>Visit Card Manager</translation>
-    </message>
     <message>
         <source>Allows to obtain personal contact information</source>
         <translation>Allows to obtain personal contact information</translation>
     </message>
     <message>
-        <source>Show vCard</source>
-        <translation>Show vCard</translation>
+        <source>Supports the requesting of the personal contact information</source>
+        <translation>Supports the requesting of the personal contact information</translation>
+    </message>
+    <message>
+        <source>Visit Card Manager</source>
+        <translation>Visit Card Manager</translation>
+    </message>
+    <message>
+        <source>Show Profile</source>
+        <translation>Show Profile</translation>
     </message>
     <message>
         <source>Ctrl+I</source>
-        <comment>Show vCard</comment>
+        <comment>Show Profile</comment>
+        <translatorcomment>Показать личные данные</translatorcomment>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <source>Visit Card</source>
-        <translation>Visit Card</translation>
+        <source>Contact Profile</source>
+        <translation>Contact Profile</translation>
     </message>
     <message>
-        <source>Supports the requesting of the personal contact information</source>
-        <translation>Supports the requesting of the personal contact information</translation>
+        <source>Edit Profile</source>
+        <translation>Edit Profile</translation>
     </message>
 </context>
 </TS>

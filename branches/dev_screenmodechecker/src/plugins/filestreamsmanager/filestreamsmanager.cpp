@@ -65,22 +65,31 @@ bool FileStreamsManager::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_APP_SHOWFILETRANSFERS,tr("Show file transfers"),QKeySequence::UnknownKey,Shortcuts::ApplicationShortcut);
 
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_IO_ERROR,tr("File input/output error"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED,tr("File size unexpectedly changed"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_CONNECTION_TIMEOUT,tr("Connection timed out"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILESTREAMS_STREAM_TERMINATED_BY_REMOTE_USER,tr("Data transmission terminated by remote user"));
+
 	if (FDataManager)
 	{
 		FDataManager->insertProfile(this);
 	}
+
 	if (FTrayManager || FMainWindowPlugin)
 	{
-		Action *action = new Action;
+		Action *action = new Action(this);
 		action->setText(tr("File Transfers"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILESTREAMSMANAGER);
 		action->setShortcutId(SCT_APP_SHOWFILETRANSFERS);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowFileStreamsWindow(bool)));
+	
 		if (FMainWindowPlugin)
 			FMainWindowPlugin->mainWindow()->mainMenu()->addAction(action,AG_MMENU_FILESTREAMSMANAGER,true);
+		
 		if (FTrayManager)
 			FTrayManager->contextMenu()->addAction(action, AG_TMTM_FILESTREAMSMANAGER, true);
 	}
+	
 	return true;
 }
 
@@ -193,7 +202,7 @@ bool FileStreamsManager::dataStreamResponce(const QString &AStreamId, const Stan
 	return handler!=NULL ? handler->fileStreamResponce(AStreamId,AResponce,AMethod) : false;
 }
 
-bool FileStreamsManager::dataStreamError(const QString &AStreamId, const QString &AError)
+bool FileStreamsManager::dataStreamError(const QString &AStreamId, const XmppError &AError)
 {
 	IFileStream *stream = streamById(AStreamId);
 	if (stream)

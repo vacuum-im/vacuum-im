@@ -3,6 +3,7 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
+#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iinbandstreams.h>
 #include <interfaces/idatastreamsmanager.h>
@@ -13,9 +14,9 @@
 #include "inbandoptions.h"
 
 class InBandStreams :
-			public QObject,
-			public IPlugin,
-			public IInBandStreams
+	public QObject,
+	public IPlugin,
+	public IInBandStreams
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IInBandStreams IDataStreamMethod);
@@ -34,8 +35,7 @@ public:
 	virtual QString methodNS() const;
 	virtual QString methodName() const;
 	virtual QString methodDescription() const;
-	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid,
-	    const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL);
+	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL);
 	virtual IOptionsWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent);
 	virtual IOptionsWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent);
 	virtual void saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);

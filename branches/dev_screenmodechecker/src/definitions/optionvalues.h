@@ -31,7 +31,7 @@
 // Compress
 #define OPV_ACCOUNT_STREAMCOMPRESS                      "accounts.account.stream-compress"
 
-//BirthdayReminder
+// BirthdayReminder
 #define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
 #define OPV_BIRTHDAYREMINDER_STOPTIME                   "birthdayreminder.stop-time"
 
@@ -82,12 +82,11 @@
 #define OPV_MESSAGES_ROOT                               "messages"
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status"
 #define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
-#define OPV_MESSAGES_SHOWINFOWIDGET                     "messages.show-info-widget"
-#define OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS           "messages.info-widget-max-status-chars"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
 #define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
 #define OPV_MESSAGES_COMBINEWITHROSTER                  "messages.combine-with-roster"
+#define OPV_MESSAGES_SHOWTABSINCOMBINEDMODE             "messages.show-tabs-in-combined-mode"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
 #define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
@@ -105,9 +104,9 @@
 #define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
 // NormalMessageHandler
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
-//MessageStyles
+// MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
-//SpellChecker
+// SpellChecker
 #define OPV_MESSAGES_SPELL_LANG                         "messages.spell.lang"
 #define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"
 
@@ -159,14 +158,11 @@
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
 #define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
-// UrlProcessor
-#define OPV_MISC_URLPROXY                               "misc.url-proxy"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
-#define OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN           "notifications.no-popup-if-fullscreen"
 #define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
 #define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
@@ -188,24 +184,34 @@
 #define OPV_ROSTER_ROOT                                 "roster"
 #define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
 #define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
-#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
 #define OPV_ROSTER_SORTBYSTATUS                         "roster.sort-by-status"
-#define OPV_ROSTER_HIDE_SCROLLBAR                       "roster.always-hide-scrollbar"
+#define OPV_ROSTER_HIDESCROLLBAR                        "roster.always-hide-scrollbar"
+#define OPV_ROSTER_MERGESTREAMS                         "roster.merge-streams"
+#define OPV_ROSTER_SHOWMERGEDSTREAMS                    "roster.show-merged-streams"
 // RosterChanger
 #define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
 #define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"
 // Avatars
-#define OPV_AVATARS_SHOW                                "roster.avatars.show"
-#define OPV_AVATARS_SHOWEMPTY                           "roster.avatars.show-empty"
-#define OPV_AVATARS_SHOWGRAY                            "roster.avatars.show-gray"
-#define OPV_AVATARS_CUSTOM_ITEM                         "roster.avatars.custom"
+#define OPV_ROSTER_AVATARS_SHOW                         "roster.avatars.show"
+#define OPV_ROSTER_AVATARS_SHOWEMPTY                    "roster.avatars.show-empty"
+#define OPV_ROSTER_AVATARS_SHOWGRAY                     "roster.avatars.show-gray"
 // RosterSearch
 #define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
-//RosterItemExchange
+// RosterItemExchange
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
+//StatusChanger
+#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
+//RecentContact
+#define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
+#define OPV_ROSTER_RECENT_HIDEINACTIVEITEMS             "roster.recent.hide-inactive-items"
+#define OPV_ROSTER_RECENT_SIMPLEITEMSVIEW               "roster.recent.simple-items-view"
+#define OPV_ROSTER_RECENT_SORTBYACTIVETIME              "roster.recent.sort-by-active-time"
+#define OPV_ROSTER_RECENT_SHOWONLYFAVORITE              "roster.recent.show-only-favorite"
+#define OPV_ROSTER_RECENT_MAXVISIBLEITEMS               "roster.recent.max-visible-items"
+#define OPV_ROSTER_RECENT_INACTIVEDAYSTIMEOUT           "roster.recent.inactive-days-timeout"
 
-//ShortcutManager
+// ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"
 
 // StatusChanger
@@ -232,5 +238,15 @@
 #define OPV_STATUSICONS_RULE_ITEM                       "statusicons.rules.rule"
 #define OPV_STATUSICONS_RULE_PATTERN                    "statusicons.rules.rule.pattern"
 #define OPV_STATUSICONS_RULE_ICONSET                    "statusicons.rules.rule.iconset"
+
+// Statistics
+#define OPV_STATISTICS_PROFILEID                        "statistics.profile-id"
+
+// XmppStreams
+#define OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE               "xmppstreams.timeout.handshake"
+#define OPV_XMPPSTREAMS_TIMEOUT_KEEPALIVE               "xmppstreams.timeout.keepalive"
+#define OPV_XMPPSTREAMS_TIMEOUT_DISCONNECT              "xmppstreams.timeout.disconnect"
+// RosterPlugin
+#define OPV_XMPPSTREAMS_TIMEOUT_ROSTERREQUEST           "xmppstreams.timeout.roster-request"
 
 #endif // DEF_OPTIONVALUES_H

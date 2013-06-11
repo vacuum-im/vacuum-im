@@ -23,18 +23,6 @@
         <source>Data transmission finished</source>
         <translation>Передача даних завершена</translation>
     </message>
-    <message>
-        <source>Data transmission terminated by remote user</source>
-        <translation>Передача даних перервана віддаленим користувачем</translation>
-    </message>
-    <message>
-        <source>Connection timed out</source>
-        <translation>Перевищено час встановлення з&apos;єднання</translation>
-    </message>
-    <message>
-        <source>File size unexpectedly changed</source>
-        <translation>Розмір файлу раптово змінено</translation>
-    </message>
 </context>
 <context>
     <name>FileStreamsManager</name>
@@ -57,6 +45,22 @@
     <message>
         <source>Show file transfers</source>
         <translation>Показати передачі файлів</translation>
+    </message>
+    <message>
+        <source>File input/output error</source>
+        <translation>Помилка введення/виводу в файл</translation>
+    </message>
+    <message>
+        <source>File size unexpectedly changed</source>
+        <translation>Розмір файлу раптово змінено</translation>
+    </message>
+    <message>
+        <source>Connection timed out</source>
+        <translation>Перевищено час встановлення з&apos;єднання</translation>
+    </message>
+    <message>
+        <source>Data transmission terminated by remote user</source>
+        <translation>Передача даних перервана віддаленим користувачем</translation>
     </message>
 </context>
 <context>

@@ -6,6 +6,7 @@
 #include <QTableWidget>
 #include <QDomDocument>
 #include <QDialogButtonBox>
+#include <utils/xmpperror.h>
 #include <utils/toolbarchanger.h>
 
 #define DATAFORMS_UUID "{2B8F89D0-EAA7-46eb-B2FD-AE30DF60E440}"
@@ -167,7 +168,7 @@ public:
 	virtual IDataMediaURI mediaUri() const =0;
 protected:
 	virtual void mediaShown() =0;
-	virtual void mediaError(const QString &AError) =0;
+	virtual void mediaError(const XmppError &AError) =0;
 };
 
 class IDataFieldWidget
@@ -277,15 +278,15 @@ protected:
 	virtual void formWidgetCreated(IDataFormWidget *AForm) =0;
 	virtual void dialogWidgetCreated(IDataDialogWidget *ADialog) =0;
 	virtual void urlLoaded(const QUrl &AUrl, const QByteArray &AData) =0;
-	virtual void urlLoadFailed(const QUrl &AUrl, const QString &AError) =0;
+	virtual void urlLoadFailed(const QUrl &AUrl, const XmppError &AError) =0;
 };
 
 Q_DECLARE_INTERFACE(IDataTableWidget,"Vacuum.Plugin.IDataTableWidget/1.0")
-Q_DECLARE_INTERFACE(IDataMediaWidget,"Vacuum.Plugin.IDataMediaWidget/1.0")
+Q_DECLARE_INTERFACE(IDataMediaWidget,"Vacuum.Plugin.IDataMediaWidget/1.1")
 Q_DECLARE_INTERFACE(IDataFieldWidget,"Vacuum.Plugin.IDataFieldWidget/1.0")
 Q_DECLARE_INTERFACE(IDataFormWidget,"Vacuum.Plugin.IDataFormWidget/1.0")
 Q_DECLARE_INTERFACE(IDataDialogWidget,"Vacuum.Plugin.IDataDialogWidget/1.0")
 Q_DECLARE_INTERFACE(IDataLocalizer,"Vacuum.Plugin.IDataLocalizer/1.0")
-Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.0")
+Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.1")
 
 #endif

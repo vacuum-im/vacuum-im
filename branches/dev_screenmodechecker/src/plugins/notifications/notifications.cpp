@@ -1,5 +1,4 @@
 #include "notifications.h"
-#include <QDebug>
 
 #include <QProcess>
 #include <QVBoxLayout>
@@ -171,7 +170,6 @@ bool Notifications::initSettings()
 {
 	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPTIMEOUT,8);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,0);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_KINDENABLED_ITEM,true);
@@ -202,8 +200,6 @@ QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &AN
 	{
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN),
-	tr("Disable all pop-up windows when watching fullscreen movies or games"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE),tr("Enable animation in notification pop-up"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new NotifyOptionsWidget(this,AParent));
 	}
@@ -236,10 +232,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
-			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
 			Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
 			Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
-			QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,createIndex);
+			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
+			QList<IRosterIndex *> indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
 			if (!indexes.isEmpty())
 			{
 				IRostersNotify rnotify;
@@ -247,7 +243,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 				rnotify.order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
 				rnotify.flags = record.notification.data.value(NDR_ROSTER_FLAGS).toInt();
 				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool())
-					rnotify.flags |= IRostersLabel::ExpandParents;
+					rnotify.flags |= IRostersNotify::ExpandParents;
 				rnotify.timeout = record.notification.data.value(NDR_ROSTER_TIMEOUT).toInt();
 				rnotify.footer = record.notification.data.value(NDR_ROSTER_FOOTER).toString();
 				rnotify.background = record.notification.data.value(NDR_ROSTER_BACKGROUND).value<QBrush>();
@@ -258,11 +254,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 
 	if ((record.notification.kinds & INotification::PopupWindow)>0)
 	{
-		bool isFullScreen = SystemManager::isScreenSaverRunning() && Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN).value().toBool();
-		isFullScreen |= SystemManager::isFullScreenMode() && Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN).value().toBool();
-		if (!isFullScreen && !showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
+		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
-			qDebug() << "NOTIFY CREATED";
 			record.popupWidget = new NotifyWidget(record.notification);
 			connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
 			connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
@@ -312,17 +305,12 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
 			if (!soundFile.isEmpty())
 			{
-				if (QSound::isAvailable())
-				{
-					delete FSound;
-					FSound = new QSound(soundFile);
-					FSound->play();
-				}
 #ifdef Q_WS_X11
-				else
-				{
-					QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND).value().toString(),QStringList()<<soundFile);
-				}
+				QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND).value().toString(),QStringList()<<soundFile);
+#else
+				delete FSound;
+				FSound = new QSound(soundFile);
+				FSound->play();
 #endif
 			}
 		}
@@ -335,11 +323,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_SHOWMINIMIZED_WIDGET).toLongLong());
 			if (widget)
 			{
-				ITabPage *page = qobject_cast<ITabPage *>(widget);
-				if (page)
-					page->showMinimizedTabPage();
-				else if (widget->isWindow() && !widget->isVisible())
-					widget->showMinimized();
+				FDelayedShowMinimized.append(widget);
+				QTimer::singleShot(0,this,SLOT(onDelayedShowMinimized()));
 			}
 		}
 	}
@@ -358,10 +343,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::TabPageNotify,notifyId,record.notification))
 		{
-			ITabPage *page = qobject_cast<ITabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_WIDGET).toLongLong());
+			IMessageTabPage *page = qobject_cast<IMessageTabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_WIDGET).toLongLong());
 			if (page && page->tabPageNotifier())
 			{
-				ITabPageNotify notify;
+				IMessageTabPageNotify notify;
 				notify.icon = icon;
 				notify.toolTip = toolTip;
 				notify.priority = record.notification.data.value(NDR_TABPAGE_PRIORITY).toInt();
@@ -375,7 +360,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	if ((record.notification.kinds & INotification::AutoActivate)>0)
 	{
 		FDelayedActivations.append(notifyId);
-		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
+		QTimer::singleShot(0,this,SLOT(onDelayedActivations()));
 	}
 
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
@@ -419,7 +404,7 @@ void Notifications::removeNotification(int ANotifyId)
 		}
 		if (!record.tabPageNotifier.isNull())
 		{
-			ITabPageNotifier *notifier =  qobject_cast<ITabPageNotifier *>(record.tabPageNotifier);
+			IMessageTabPageNotifier *notifier =  qobject_cast<IMessageTabPageNotifier *>(record.tabPageNotifier);
 			if (notifier)
 				notifier->removeNotify(record.tabPageId);
 		}
@@ -609,11 +594,24 @@ void Notifications::removeInvisibleNotification(int ANotifyId)
 	}
 }
 
-void Notifications::onActivateDelayedActivations()
+void Notifications::onDelayedActivations()
 {
 	foreach(int notifyId, FDelayedActivations)
 		activateNotification(notifyId);
 	FDelayedActivations.clear();
+}
+
+void Notifications::onDelayedShowMinimized()
+{
+	foreach(QWidget *widget, FDelayedShowMinimized)
+	{
+		IMessageTabPage *page = qobject_cast<IMessageTabPage *>(widget);
+		if (page)
+			page->showMinimizedTabPage();
+		else if (widget->isWindow() && !widget->isVisible())
+			widget->showMinimized();
+	}
+	FDelayedShowMinimized.clear();
 }
 
 void Notifications::onSoundOnOffActionTriggered(bool)

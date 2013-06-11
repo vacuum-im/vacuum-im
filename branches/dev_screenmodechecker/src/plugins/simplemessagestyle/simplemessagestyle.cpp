@@ -9,7 +9,8 @@
 #include <QCoreApplication>
 #include <QTextDocumentFragment>
 
-#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
+#define SCROLL_TIMEOUT                      100
+#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
 
 static const char *SenderColors[] =  {
 	"blue", "blueviolet", "brown", "cadetblue", "chocolate", "coral", "cornflowerblue", "crimson",
@@ -22,11 +23,20 @@ static const char *SenderColors[] =  {
 	"purple", "red", "rosybrown", "royalblue", "saddlebrown", "salmon", "seagreen", "sienna", "slateblue",
 	"steelblue", "teal", "tomato", "violet"
 };
-
 static int SenderColorsCount = sizeof(SenderColors)/sizeof(SenderColors[0]);
+
+QString SimpleMessageStyle::FSharedPath = QString::null;
 
 SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent) : QObject(AParent)
 {
+	if (FSharedPath.isEmpty())
+	{
+		if (QDir::isRelativePath(SHARED_STYLE_PATH))
+			FSharedPath = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH;
+		else
+			FSharedPath = SHARED_STYLE_PATH;
+	}
+
 	FStylePath = AStylePath;
 	FInfo = styleInfo(AStylePath);
 	FVariants = styleVariants(AStylePath);
@@ -37,7 +47,7 @@ SimpleMessageStyle::SimpleMessageStyle(const QString &AStylePath, QNetworkAccess
 	loadSenderColors();
 
 	FScrollTimer.setSingleShot(true);
-	FScrollTimer.setInterval(100);
+	FScrollTimer.setInterval(SCROLL_TIMEOUT);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
 
 	connect(AParent,SIGNAL(styleWidgetAdded(IMessageStyle *, QWidget *)),SLOT(onStyleWidgetAdded(IMessageStyle *, QWidget *)));
@@ -84,40 +94,31 @@ QTextDocumentFragment SimpleMessageStyle::selection(QWidget *AWidget) const
 	return view!=NULL ? view->textCursor().selection() : QTextDocumentFragment();
 }
 
-QTextDocumentFragment SimpleMessageStyle::textUnderPosition(const QPoint &APosition, QWidget *AWidget) const
+QTextCharFormat SimpleMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &APosition) const
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
+	return view!=NULL ? view->cursorForPosition(APosition).charFormat() : QTextCharFormat();
+}
+
+QTextDocumentFragment SimpleMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view)
 	{
 		QTextCursor cursor = view->cursorForPosition(APosition);
-		if (view->textCursor().selection().isEmpty() || view->textCursor().selectionStart()>cursor.position() || view->textCursor().selectionEnd()<cursor.position())
+		for (QTextBlock::iterator it = cursor.block().begin(); !it.atEnd(); ++it)
 		{
-			if (!view->anchorAt(APosition).isEmpty())
+			if (it.fragment().contains(cursor.position()))
 			{
-				QTextBlock block = cursor.block();
-				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
-				{
-					if (it.fragment().contains(cursor.position()))
-					{
-						cursor.setPosition(it.fragment().position());
-						cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
-						break;
-					}
-				}
+				cursor.setPosition(it.fragment().position());
+				cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
+				return cursor.selection();
 			}
-			else
-			{
-				cursor.select(QTextCursor::WordUnderCursor);
-			}
-			return cursor.selection();
-		}
-		else
-		{
-			return selection(AWidget);
 		}
 	}
 	return QTextDocumentFragment();
 }
+
 
 bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
@@ -286,8 +287,7 @@ QString SimpleMessageStyle::makeStyleTemplate() const
 {
 	QString htmlFileName = FStylePath+"/Template.html";
 	if (!QFile::exists(htmlFileName))
-		htmlFileName = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/Template.html";
-
+		htmlFileName =FSharedPath+"/Template.html";
 	return loadFileData(htmlFileName,QString::null);
 }
 
@@ -415,7 +415,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
 		if (!isDirectionIn && !QFile::exists(avatar))
 			avatar = FStylePath+"/Incoming/buddy_icon.png";
 		if (!QFile::exists(avatar))
-			avatar = qApp->applicationDirPath()+"/"SHARED_STYLE_PATH"/buddy_icon.png";
+			avatar = FSharedPath+"/buddy_icon.png";
 	}
 	AHtml.replace("%userIconPath%",avatar);
 

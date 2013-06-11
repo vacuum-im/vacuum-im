@@ -424,7 +424,7 @@
     </message>
     <message>
         <source>Search in text</source>
-        <translation type="unfinished"></translation>
+        <translation>Пошук по тексту</translation>
     </message>
 </context>
 <context>
@@ -646,6 +646,22 @@
     <message>
         <source>Save Only Messages Text</source>
         <translation>Зберігати тільки текст повідомлень</translation>
+    </message>
+    <message>
+        <source>Failed to load conversation headers</source>
+        <translation>Не вдалося завантажити заголовки розмов</translation>
+    </message>
+    <message>
+        <source>Failed to save conversation</source>
+        <translation>Не вдалося зберегти розмову</translation>
+    </message>
+    <message>
+        <source>Failed to remove conversation</source>
+        <translation>Не вдалося видалити розмову</translation>
+    </message>
+    <message>
+        <source>Failed to load archive modifications</source>
+        <translation>Не вдалося завантажити список змін до архіву</translation>
     </message>
 </context>
 </TS>

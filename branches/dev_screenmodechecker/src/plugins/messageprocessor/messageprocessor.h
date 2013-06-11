@@ -36,6 +36,10 @@ public:
 	virtual void writeTextToMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	virtual void writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang);
 	//IMessageProcessor
+	virtual QList<Jid> activeStreams() const;
+	virtual bool isActiveStream(const Jid &AStreamJid) const;
+	virtual void appendActiveStream(const Jid &AStreamJid);
+	virtual void removeActiveStream(const Jid &AStreamJid);
 	virtual bool sendMessage(const Jid &AStreamJid, Message &AMessage, int ADirection);
 	virtual bool processMessage(const Jid &AStreamJid, Message &AMessage, int ADirection);
 	virtual bool displayMessage(const Jid &AStreamJid, Message &AMessage, int ADirection);
@@ -48,10 +52,13 @@ public:
 	virtual void textToMessage(Message &AMessage, const QTextDocument *ADocument, const QString &ALang = QString::null) const;
 	virtual void messageToText(QTextDocument *ADocument, const Message &AMessage, const QString &ALang = QString::null) const;
 	virtual bool createMessageWindow(const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode) const;
+	virtual QMultiMap<int, IMessageHandler *> messageHandlers() const;
 	virtual void insertMessageHandler(int AOrder, IMessageHandler *AHandler);
 	virtual void removeMessageHandler(int AOrder, IMessageHandler *AHandler);
+	virtual QMultiMap<int, IMessageWriter *> messageWriters() const;
 	virtual void insertMessageWriter(int AOrder, IMessageWriter *AWriter);
 	virtual void removeMessageWriter(int AOrder, IMessageWriter *AWriter);
+	virtual QMultiMap<int, IMessageEditor *> messageEditors() const;
 	virtual void insertMessageEditor(int AOrder, IMessageEditor *AEditor);
 	virtual void removeMessageEditor(int AOrder, IMessageEditor *AEditor);
 signals:
@@ -59,12 +66,8 @@ signals:
 	void messageReceived(const Message &AMessage);
 	void messageNotifyInserted(int AMessageId);
 	void messageNotifyRemoved(int AMessageid);
-	void messageHandlerInserted(int AOrder, IMessageHandler *AHandler);
-	void messageHandlerRemoved(int AOrder, IMessageHandler *AHandler);
-	void messageWriterInserted(int AOrder, IMessageWriter *AWriter);
-	void messageWriterRemoved(int AOrder, IMessageWriter *AWriter);
-	void messageEditorInserted(int AOrder, IMessageEditor *AEditor);
-	void messageEditorRemoved(int AOrder, IMessageEditor *AEditor);
+	void activeStreamAppended(const Jid &AStreamJid);
+	void activeStreamRemoved(const Jid &AStreamJid);
 protected:
 	int newMessageId();
 	IMessageHandler *findMessageHandler(const Message &AMessage, int ADirection);
@@ -72,24 +75,24 @@ protected:
 	QString prepareBodyForSend(const QString &AString) const;
 	QString prepareBodyForReceive(const QString &AString) const;
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
-	void onStreamRemoved(IXmppStream *AXmppStream);
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
+	void onXmppStreamAdded(IXmppStream *AXmppStream);
+	void onXmppStreamRemoved(IXmppStream *AXmppStream);
+	void onXmppStreamJidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 private:
 	IXmppStreams *FXmppStreams;
 	INotifications *FNotifications;
 	IStanzaProcessor *FStanzaProcessor;
 private:
-	QMap<Jid, int> FSHIMessages;
+	QMap<int, int> FNotifyId2MessageId;
+	QMap<int, Message> FNotifiedMessages;
+private:
+	QMap<Jid, int> FActiveStreams;
 	QMap<int, IMessageHandler *> FHandlerForMessage;
 	QMultiMap<int, IMessageHandler *> FMessageHandlers;
 	QMultiMap<int, IMessageWriter *> FMessageWriters;
 	QMultiMap<int, IMessageEditor *> FMessageEditors;
-private:
-	QMap<int, int> FNotifyId2MessageId;
-	QMap<int, Message> FNotifiedMessages;
 };
 
 #endif // MESSAGEPROCESSOR_H

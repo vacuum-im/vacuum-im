@@ -170,10 +170,6 @@ Check values and try again</source>
         <translation>Пригласить</translation>
     </message>
     <message>
-        <source>%1 as %2</source>
-        <translation>%1 как %2</translation>
-    </message>
-    <message>
         <source>Hidden room</source>
         <translation>Скрытая комната</translation>
     </message>
@@ -284,10 +280,6 @@ Check values and try again</source>
     <message>
         <source>Enter a reason</source>
         <translation>Введите причину</translation>
-    </message>
-    <message>
-        <source>You are welcome here</source>
-        <translation>Вас здесь ждут</translation>
     </message>
     <message>
         <source>Invite user</source>
@@ -520,7 +512,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Clear window</source>
-        <translation>Отчистить окно</translation>
+        <translation>Очистить окно</translation>
     </message>
     <message>
         <source>Change nick</source>
@@ -568,10 +560,6 @@ Check values and try again</source>
         <translation>При получении нового сообщения в конференции</translation>
     </message>
     <message>
-        <source>Select the user to refer in the Bash style</source>
-        <translation>Выбирать пользователя для обращения в стиле Bash</translation>
-    </message>
-    <message>
         <source>Add this suffix when referring to the user:</source>
         <translation>Добавлять этот суффикс при обращении к пользователю:</translation>
     </message>
@@ -580,8 +568,36 @@ Check values and try again</source>
         <translation>Выходить из конференции при закрытии окна</translation>
     </message>
     <message>
-        <source>Rejoin in chat room after kick</source>
+        <source>Enter conference</source>
+        <translation>Войти в конференцию</translation>
+    </message>
+    <message>
+        <source>Exit conference</source>
+        <translation>Выйти из конференции</translation>
+    </message>
+    <message>
+        <source>Rejoin in conference after kick</source>
         <translation>Автоматически перезаходить в конференцию после кика</translation>
+    </message>
+    <message>
+        <source>Select the user to refer without menu</source>
+        <translation>Выбирать пользователя для обращения без меню</translation>
+    </message>
+    <message>
+        <source>Enter</source>
+        <translation>Войти</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Выйти</translation>
+    </message>
+    <message>
+        <source>Open Conference Dialog</source>
+        <translation>Открыть диалог конференции</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference!</source>
+        <translation>Пожалуйста, войдите в эту конференцию!</translation>
     </message>
 </context>
 <context>
@@ -615,56 +631,8 @@ Check values and try again</source>
         <translation>Получена форма данных от: %1</translation>
     </message>
     <message>
-        <source>Change room nick</source>
-        <translation>Изменить ник</translation>
-    </message>
-    <message>
         <source>Change topic</source>
         <translation>Изменить тему</translation>
-    </message>
-    <message>
-        <source>Clear chat window</source>
-        <translation>Очистить окно чата</translation>
-    </message>
-    <message>
-        <source>Invite to this room</source>
-        <translation>Пригласить в эту комнату</translation>
-    </message>
-    <message>
-        <source>Request voice</source>
-        <translation>Запросить голос</translation>
-    </message>
-    <message>
-        <source>Edit ban list</source>
-        <translation>Редактировать список банов</translation>
-    </message>
-    <message>
-        <source>Edit members list</source>
-        <translation>Редактировать список участников</translation>
-    </message>
-    <message>
-        <source>Edit administrators list</source>
-        <translation>Редактировать список администраторов</translation>
-    </message>
-    <message>
-        <source>Edit owners list</source>
-        <translation>Редактировать список владельцев</translation>
-    </message>
-    <message>
-        <source>Configure room</source>
-        <translation>Настроить комнату</translation>
-    </message>
-    <message>
-        <source>Destroy room</source>
-        <translation>Уничтожить комнату</translation>
-    </message>
-    <message>
-        <source>Kick user</source>
-        <translation>Выгнать</translation>
-    </message>
-    <message>
-        <source>Ban user</source>
-        <translation>Забанить</translation>
     </message>
     <message>
         <source>Change Role</source>
@@ -827,18 +795,6 @@ Check values and try again</source>
         <translation>Изменить ник</translation>
     </message>
     <message>
-        <source>Enter your new nick name in room %1</source>
-        <translation>Введите ваш новый ник в комнате %1</translation>
-    </message>
-    <message>
-        <source>Change subject</source>
-        <translation>Изменить тему</translation>
-    </message>
-    <message>
-        <source>Enter new subject for room %1</source>
-        <translation>Введите новую тему для комнаты %1</translation>
-    </message>
-    <message>
         <source>Invite user</source>
         <translation>Пригласить пользователя</translation>
     </message>
@@ -847,16 +803,8 @@ Check values and try again</source>
         <translation>Введите JID пользователя:</translation>
     </message>
     <message>
-        <source>You are welcome here</source>
-        <translation>Вас здесь ждут</translation>
-    </message>
-    <message>
         <source>Enter a reason:</source>
         <translation>Введите причину:</translation>
-    </message>
-    <message>
-        <source>Destroying room</source>
-        <translation>Уничтожение комнаты</translation>
     </message>
     <message>
         <source>Kick reason</source>
@@ -877,10 +825,6 @@ Check values and try again</source>
     <message>
         <source>%1 - Conference</source>
         <translation>%1 - Конференция</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>Инструменты</translation>
     </message>
     <message>
         <source>None</source>
@@ -927,26 +871,6 @@ Check values and try again</source>
         <translation>%1 изменил статус на [%2] %3</translation>
     </message>
     <message>
-        <source>Role: %1</source>
-        <translation>Тип: %1</translation>
-    </message>
-    <message>
-        <source>Affiliation: %1</source>
-        <translation>Членство: %1</translation>
-    </message>
-    <message>
-        <source>Status:</source>
-        <translation>Статус:</translation>
-    </message>
-    <message>
-        <source>Enter room</source>
-        <translation>Войти в комнату</translation>
-    </message>
-    <message>
-        <source>Exit room</source>
-        <translation>Выйти из комнаты</translation>
-    </message>
-    <message>
         <source>Mention message in conference: %1</source>
         <translation>Сообщение с обращением в конференции: %1</translation>
     </message>
@@ -971,14 +895,6 @@ Check values and try again</source>
         <translation>%1 вышел из комнаты</translation>
     </message>
     <message>
-        <source>Quote selected text</source>
-        <translation>Цитировать выделенный текст</translation>
-    </message>
-    <message>
-        <source>Open chat dialog</source>
-        <translation>Открыть диалог чата</translation>
-    </message>
-    <message>
         <source>Loading history...</source>
         <translation>Загрузка истории...</translation>
     </message>
@@ -993,6 +909,106 @@ Check values and try again</source>
     <message>
         <source>Exit</source>
         <translation>Выйти</translation>
+    </message>
+    <message>
+        <source>Open Chat Dialog</source>
+        <translation>Открыть диалог чата</translation>
+    </message>
+    <message>
+        <source>Kick User</source>
+        <translation>Выгнать</translation>
+    </message>
+    <message>
+        <source>Ban User</source>
+        <translation>Забанить</translation>
+    </message>
+    <message>
+        <source>Change Nick</source>
+        <translation>Изменить ник</translation>
+    </message>
+    <message>
+        <source>Change Topic</source>
+        <translation>Изменить тему</translation>
+    </message>
+    <message>
+        <source>Invite to Conference</source>
+        <translation>Пригласить в конференцию</translation>
+    </message>
+    <message>
+        <source>Request Voice</source>
+        <translation>Запросить голос</translation>
+    </message>
+    <message>
+        <source>Clear Conference Window</source>
+        <translation>Очистить окно конференции</translation>
+    </message>
+    <message>
+        <source>Edit Ban List</source>
+        <translation>Редактировать список банов</translation>
+    </message>
+    <message>
+        <source>Edit Members List</source>
+        <translation>Редактировать список участников</translation>
+    </message>
+    <message>
+        <source>Edit Administrators List</source>
+        <translation>Редактировать список администраторов</translation>
+    </message>
+    <message>
+        <source>Edit Owners List</source>
+        <translation>Редактировать список владельцев</translation>
+    </message>
+    <message>
+        <source>Configure Conference</source>
+        <translation>Настроить конференцию</translation>
+    </message>
+    <message>
+        <source>Destroy Conference</source>
+        <translation>Удалить конференцию</translation>
+    </message>
+    <message>
+        <source>Enter conference</source>
+        <translation>Войти в конференцию</translation>
+    </message>
+    <message>
+        <source>Exit conference</source>
+        <translation>Выйти из конференции</translation>
+    </message>
+    <message>
+        <source>Clear Chat Window</source>
+        <translation>Очистить окно чата</translation>
+    </message>
+    <message>
+        <source>Enter your new nick name in conference %1</source>
+        <translation>Введите Ваш новый ник в конференции %1</translation>
+    </message>
+    <message>
+        <source>Enter new topic for conference %1</source>
+        <translation>Введите новую тему для конференции %1</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference!</source>
+        <translation>Пожалуйста, войдите в эту конференцию!</translation>
+    </message>
+    <message>
+        <source>Destroying conference</source>
+        <translation>Уничтожить конференцию</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Тип:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Членство:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

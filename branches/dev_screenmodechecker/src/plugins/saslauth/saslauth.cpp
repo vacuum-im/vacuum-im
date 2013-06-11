@@ -115,18 +115,17 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			}
 			else if (AStanza.tagName() == "failure")
 			{
-				XmppStanzaError err(AStanza.element());
-				emit error(err.errorMessage());
+				emit error(XmppStanzaError(AStanza.element()));
 			}
 			else if (AStanza.tagName() == "abort")
 			{
 				XmppStanzaError err(XmppStanzaError::EC_NOT_AUTHORIZED);
-				err.setAppCondition(NS_FEATURE_SASL,"aborted");
-				emit error(err.errorMessage());
+				err.setAppCondition(NS_FEATURE_SASL,XERR_SASL_ABORTED);
+				emit error(err);
 			}
 			else
 			{
-				emit error(tr("Wrong SASL authentication response"));
+				emit error(XmppError(IERR_SASL_AUTH_INVALID_RESPONCE));
 			}
 		}
 		return true;
@@ -140,6 +139,16 @@ bool SASLAuth::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrd
 	Q_UNUSED(AStanza);
 	Q_UNUSED(AOrder);
 	return false;
+}
+
+QString SASLAuth::featureNS() const
+{
+	return NS_FEATURE_SASL;
+}
+
+IXmppStream *SASLAuth::xmppStream() const
+{
+	return FXmppStream;
 }
 
 bool SASLAuth::start(const QDomElement &AElem)
@@ -189,7 +198,7 @@ bool SASLAuth::start(const QDomElement &AElem)
 		}
 		else
 		{
-			emit error(tr("Secure connection is not established"));
+			emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
 		}
 	}
 	deleteLater();

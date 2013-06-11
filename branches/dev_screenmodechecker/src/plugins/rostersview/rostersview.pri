@@ -1,9 +1,7 @@
-HEADERS = rosterindexdelegate.h \
-          rostersview.h \
+HEADERS = rostersview.h \
           rostersviewplugin.h \
           sortfilterproxymodel.h
 
-SOURCES = rosterindexdelegate.cpp \
-          rostersview.cpp \
+SOURCES = rostersview.cpp \
           rostersviewplugin.cpp \
           sortfilterproxymodel.cpp

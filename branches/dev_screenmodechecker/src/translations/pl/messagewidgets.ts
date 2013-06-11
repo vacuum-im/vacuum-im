@@ -2,13 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl" sourcelanguage="en">
 <context>
-    <name>ChatWindow</name>
-    <message>
-        <source>Quote selected text</source>
-        <translation>Cytuj zaznaczony tekst</translation>
-    </message>
-</context>
-<context>
     <name>EditWidget</name>
     <message>
         <source>Send</source>
@@ -56,10 +49,6 @@
     <message>
         <source>Auto resize input field</source>
         <translation>Automatyczna zmiana rozmiaru pola wpisywania wiadomości</translation>
-    </message>
-    <message>
-        <source>Show contact information in chat windows</source>
-        <translation>Pokaż informacje o kontakcie w oknie rozmów</translation>
     </message>
     <message>
         <source>Save status messages to history</source>
@@ -223,51 +212,13 @@
         <source>Combine message windows with contact-list</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>MessageWindow</name>
     <message>
-        <source>Next - %1</source>
-        <translation>Następna - %1</translation>
+        <source>Show tabs in combined message windows with contact-list mode</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation>Zamknij</translation>
-    </message>
-</context>
-<context>
-    <name>MessageWindowClass</name>
-    <message>
-        <source>Message</source>
-        <translation>Wiadomość</translation>
-    </message>
-    <message>
-        <source>To:</source>
-        <translation>Do:</translation>
-    </message>
-    <message>
-        <source>Subject:</source>
-        <translation>Temat:</translation>
-    </message>
-    <message>
-        <source>Reply</source>
-        <translation>Odpowiedz</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Przekaż</translation>
-    </message>
-    <message>
-        <source>Chat</source>
-        <translation>Czat</translation>
-    </message>
-    <message>
-        <source>Send</source>
-        <translation>Wyślij</translation>
-    </message>
-    <message>
-        <source>Next</source>
-        <translation>Następna</translation>
+        <source>Quote Selected Text</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -290,6 +241,28 @@
     </message>
 </context>
 <context>
+    <name>NormalWindow</name>
+    <message numerus="yes">
+        <source>Selected %n contact(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Subject</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NormalWindowClass</name>
+    <message>
+        <source>Fast choice</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ReceiversWidget</name>
     <message>
         <source>Receivers</source>
@@ -300,55 +273,91 @@
         <translation>Poza listą kontaktów</translation>
     </message>
     <message>
-        <source>Contact</source>
-        <translation>Kontakt</translation>
-    </message>
-    <message>
-        <source>Jid</source>
-        <translation>JID</translation>
-    </message>
-    <message>
         <source>Agents</source>
         <translation>Transporty</translation>
-    </message>
-    <message>
-        <source>My Resources</source>
-        <translation>Moje zasoby</translation>
-    </message>
-    <message>
-        <source>Add receiver</source>
-        <translation>Dodaj odbiorcę</translation>
-    </message>
-    <message>
-        <source>Enter valid contact jid:</source>
-        <translation>Wprowadź poprawny JID:</translation>
     </message>
     <message>
         <source>Without Groups</source>
         <translation>Bez grup</translation>
     </message>
+    <message>
+        <source>Select All Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Online Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Available Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Contacts from File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to Load Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect file format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to read file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Contacts to File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to Save Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Last Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expand All Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Collapse All Groups</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Offline Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>
     <message>
-        <source>Add</source>
-        <translation>Dodaj</translation>
-    </message>
-    <message>
-        <source>Update</source>
-        <translation>Odśwież</translation>
-    </message>
-    <message>
-        <source>All</source>
-        <translation>Wszystkie</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Żaden</translation>
-    </message>
-    <message>
-        <source>All Online</source>
-        <translation>Wszyscy aktywni</translation>
+        <source>Search Contacts</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

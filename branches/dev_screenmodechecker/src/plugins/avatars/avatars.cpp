@@ -20,6 +20,8 @@
 #define UNKNOWN_AVATAR            QString::null
 #define EMPTY_AVATAR              QString("")
 
+static const QList<int> RosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
+
 Avatars::Avatars()
 {
 	FPluginManager = NULL;
@@ -31,7 +33,7 @@ Avatars::Avatars()
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
 
-	FAvatarLabelId = -1;
+	FAvatarLabelId = 0;
 	FAvatarsVisible = false;
 	FShowEmptyAvatars = true;
 	FShowGrayAvatars = true;
@@ -104,11 +106,11 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*
 		if (FRostersViewPlugin)
 		{
 			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-				SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
-				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
-				SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
+				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
+				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+				SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
 		}
 	}
 
@@ -137,16 +139,27 @@ bool Avatars::initObjects()
 
 	if (FRostersModel)
 	{
-		FRostersModel->insertDefaultDataHolder(this);
+		FRostersModel->insertRosterDataHolder(RDHO_AVATARS,this);
 	}
+
+	if (FRostersViewPlugin)
+	{
+		AdvancedDelegateItem label(RLID_AVATAR_IMAGE);
+		label.d->kind = AdvancedDelegateItem::CustomData;
+		label.d->data = RDR_AVATAR_IMAGE;
+		FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
+		
+		FRostersViewPlugin->rostersView()->insertLabelHolder(RLHO_AVATARS,this);
+	}
+
 	return true;
 }
 
 bool Avatars::initSettings()
 {
-	Options::setDefaultValue(OPV_AVATARS_SHOW,true);
-	Options::setDefaultValue(OPV_AVATARS_SHOWEMPTY,true);
-	Options::setDefaultValue(OPV_AVATARS_SHOWGRAY,true);
+	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOW,true);
+	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWEMPTY,true);
+	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWGRAY,true);
 
 	if (FOptionsManager)
 	{
@@ -276,47 +289,61 @@ void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	}
 }
 
-int Avatars::rosterDataOrder() const
+QList<int> Avatars::rosterDataRoles(int AOrder) const
 {
-	return RDHO_DEFAULT;
+	if (AOrder == RDHO_AVATARS)
+		return QList<int>() << RDR_AVATAR_HASH << RDR_AVATAR_IMAGE;
+	return QList<int>();
 }
 
-QList<int> Avatars::rosterDataRoles() const
+QVariant Avatars::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	static const QList<int> indexRoles = QList<int>() << RDR_AVATAR_HASH << RDR_AVATAR_IMAGE;
-	return indexRoles;
-}
-
-QList<int> Avatars::rosterDataTypes() const
-{
-	static const QList<int> indexTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT;
-	return indexTypes;
-}
-
-QVariant Avatars::rosterData(const IRosterIndex *AIndex, int ARole) const
-{
-	if (ARole == RDR_AVATAR_IMAGE)
+	if (AOrder == RDHO_AVATARS)
 	{
-		bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
-		QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
-		if (avatar.isNull() && FShowEmptyAvatars)
-			avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
-		return avatar;
-	}
-	else if (ARole == RDR_AVATAR_HASH)
-	{
-		return avatarHash(AIndex->data(RDR_FULL_JID).toString());
+		switch (AIndex->kind())
+		{
+		case RIK_STREAM_ROOT:
+		case RIK_CONTACT:
+			switch (ARole)
+			{
+			case RDR_AVATAR_IMAGE:
+				{
+					bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
+					QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
+					if (avatar.isNull() && FShowEmptyAvatars)
+						avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
+					return avatar;
+				}
+			case RDR_AVATAR_HASH:
+				{
+					return avatarHash(AIndex->data(RDR_FULL_JID).toString());
+				}
+			}
+			break;
+		}
 	}
 	return QVariant();
 }
 
 
-bool Avatars::setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue)
+bool Avatars::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
 {
-	Q_UNUSED(AIndex);
-	Q_UNUSED(ARole);
-	Q_UNUSED(AValue);
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex); Q_UNUSED(ARole); Q_UNUSED(AValue);
 	return false;
+}
+
+QList<quint32> Avatars::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
+{
+	QList<quint32> labels;
+	if (AOrder==RLHO_AVATARS && FAvatarsVisible && !AIndex->data(RDR_AVATAR_IMAGE).isNull())
+		labels.append(FAvatarLabelId);
+	return labels;
+}
+
+AdvancedDelegateItem Avatars::rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AIndex);
+	return FRostersViewPlugin->rostersView()->registeredLabel(ALabelId);
 }
 
 QMultiMap<int, IOptionsWidget *> Avatars::optionsWidgets(const QString &ANodeId, QWidget *AParent)
@@ -324,9 +351,9 @@ QMultiMap<int, IOptionsWidget *> Avatars::optionsWidgets(const QString &ANodeId,
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_ROSTER)
 	{
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOW),tr("Show avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOWEMPTY),tr("Show empty avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_AVATARS_SHOWGRAY),tr("Show grayscaled avatars for offline contacts"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOW),tr("Show avatars"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY),tr("Show empty avatars"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY),tr("Show grayscaled avatars for offline contacts"),AParent));
 	}
 	return widgets;
 }
@@ -380,7 +407,7 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 	QString format = getImageFormat(AData);
 	if (AData.isEmpty() || !format.isEmpty())
 	{
-		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->vcard(AStreamJid.bare()) : NULL;
+		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
 		if (vcard)
 		{
 			if (!AData.isEmpty())
@@ -421,6 +448,14 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &ADat
 		emit avatarChanged(AContactJid);
 	}
 	return EMPTY_AVATAR;
+}
+
+QImage Avatars::emptyAvatarImage(const QSize &AMaxSize, bool AGray) const
+{
+	QImage image = AGray ? FGrayEmptyAvatar : FEmptyAvatar;
+	if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
+		image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+	return image;
 }
 
 QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, bool AGray) const
@@ -509,10 +544,11 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 	if (FRostersModel)
 	{
 		QMultiMap<int,QVariant> findData;
-		foreach(int type, rosterDataTypes())
-			findData.insert(RDR_TYPE,type);
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
+		findData.insert(RDR_KIND,RIK_STREAM_ROOT);
+		findData.insert(RDR_KIND,RIK_CONTACT);
+
 		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
 		foreach (IRosterIndex *index, indexes)
 		{
@@ -584,24 +620,21 @@ bool Avatars::updateIqAvatar(const Jid &AContactJid, const QString &AHash)
 
 bool Avatars::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT;
-	if (!ASelected.isEmpty())
+	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
+
+	int singleKind = -1;
+	foreach(IRosterIndex *index, ASelected)
 	{
-		int singleType = -1;
-		foreach(IRosterIndex *index, ASelected)
-		{
-			int indexType = index->type();
-			if (!acceptTypes.contains(indexType))
-				return false;
-			else if (singleType!=-1 && singleType!=indexType)
-				return false;
-			else if (!FStreamAvatars.contains(index->data(RDR_STREAM_JID).toString()))
-				return false;
-			singleType = indexType;
-		}
-		return true;
+		int indexKind = index->kind();
+		if (!acceptTypes.contains(indexKind))
+			return false;
+		else if (singleKind!=-1 && singleKind!=indexKind)
+			return false;
+		else if (!FStreamAvatars.contains(index->data(RDR_STREAM_JID).toString()))
+			return false;
+		singleKind = indexKind;
 	}
-	return false;
+	return !ASelected.isEmpty();
 }
 
 void Avatars::onStreamOpened(IXmppStream *AXmppStream)
@@ -655,28 +688,26 @@ void Avatars::onVCardChanged(const Jid &AContactJid)
 
 void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin &&  rosterDataTypes().contains(AIndex->type()))
+	if (FRostersViewPlugin && RosterKinds.contains(AIndex->kind()))
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		if (!FVCardAvatars.contains(contactJid))
 			onVCardChanged(contactJid);
-		if (FAvatarsVisible)
-			FRostersViewPlugin->rostersView()->insertLabel(FAvatarLabelId, AIndex);
 	}
 }
 
-void Avatars::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void Avatars::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
+void Avatars::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
-	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		int indexType = AIndexes.first()->type();
+		int indexKind = AIndexes.first()->kind();
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID);
-		if (indexType == RIT_STREAM_ROOT)
+		if (indexKind == RIK_STREAM_ROOT)
 		{
 			Menu *avatar = new Menu(AMenu);
 			avatar->setTitle(tr("Avatar"));
@@ -698,7 +729,7 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, in
 
 			AMenu->addAction(avatar->menuAction(),AG_RVCM_AVATARS,true);
 		}
-		else if (indexType == RIT_CONTACT)
+		else if (indexKind == RIK_CONTACT)
 		{
 			Menu *picture = new Menu(AMenu);
 			picture->setTitle(tr("Custom picture"));
@@ -723,9 +754,9 @@ void Avatars::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, in
 	}
 }
 
-void Avatars::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+void Avatars::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if ((ALabelId == RLID_DISPLAY || ALabelId == FAvatarLabelId) && rosterDataTypes().contains(AIndex->type()))
+	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && RosterKinds.contains(AIndex->kind()))
 	{
 		QString hash = AIndex->data(RDR_AVATAR_HASH).toString();
 		if (hasAvatar(hash))
@@ -770,13 +801,13 @@ void Avatars::onClearAvatarByAction(bool)
 	{
 		if (!action->data(ADR_STREAM_JID).isNull())
 		{
-			Jid streamJid = action->data(ADR_STREAM_JID).toString();
-			setAvatar(streamJid,QByteArray());
+			foreach(Jid streamJid, action->data(ADR_STREAM_JID).toStringList())
+				setAvatar(streamJid,QByteArray());
 		}
 		else if (!action->data(ADR_CONTACT_JID).isNull())
 		{
-			Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-			setCustomPictire(contactJid,QByteArray());
+			foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
+				setCustomPictire(contactJid,QByteArray());
 		}
 	}
 }
@@ -801,9 +832,9 @@ void Avatars::onOptionsOpened()
 			++it;
 	}
 
-	onOptionsChanged(Options::node(OPV_AVATARS_SHOW));
-	onOptionsChanged(Options::node(OPV_AVATARS_SHOWEMPTY));
-	onOptionsChanged(Options::node(OPV_AVATARS_SHOWGRAY));
+	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOW));
+	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY));
+	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY));
 }
 
 void Avatars::onOptionsClosed()
@@ -821,40 +852,17 @@ void Avatars::onOptionsClosed()
 
 void Avatars::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_AVATARS_SHOW)
+	if (ANode.path() == OPV_ROSTER_AVATARS_SHOW)
 	{
 		FAvatarsVisible = ANode.value().toBool();
-		if (FRostersViewPlugin && FRostersModel)
-		{
-			if (FAvatarsVisible)
-			{
-				QMultiMap<int,QVariant> findData;
-				foreach(int type, rosterDataTypes())
-					findData.insertMulti(RDR_TYPE,type);
-				QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData, true);
-
-				IRostersLabel label;
-				label.order = RLO_AVATAR_IMAGE;
-				label.value = RDR_AVATAR_IMAGE;
-				FAvatarLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
-
-				foreach (IRosterIndex *index, indexes)
-					FRostersViewPlugin->rostersView()->insertLabel(FAvatarLabelId, index);
-			}
-			else
-			{
-				FRostersViewPlugin->rostersView()->destroyLabel(FAvatarLabelId);
-				FAvatarLabelId = -1;
-				FAvatarImages.clear();
-			}
-		}
+		emit rosterLabelChanged(FAvatarLabelId,NULL);
 	}
-	else if (ANode.path() == OPV_AVATARS_SHOWEMPTY)
+	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWEMPTY)
 	{
 		FShowEmptyAvatars = ANode.value().toBool();
 		updateDataHolder();
 	}
-	else if (ANode.path() == OPV_AVATARS_SHOWGRAY)
+	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWGRAY)
 	{
 		FShowGrayAvatars = ANode.value().toBool();
 		updateDataHolder();

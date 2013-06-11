@@ -18,6 +18,8 @@
 #define SUBSCRIPTION_UNSUBSCRIBED     "unsubscribed"
 #define SUBSCRIPTION_REMOVE           "remove"
 
+#define ROSTER_GROUP_DELIMITER        "::"
+
 struct IRosterItem 
 {
 	IRosterItem() { 
@@ -55,9 +57,11 @@ public:
 	virtual QString groupDelimiter() const =0;
 	virtual IRosterItem rosterItem(const Jid &AItemJid) const =0;
 	virtual QList<IRosterItem> rosterItems() const =0;
-	virtual QSet<QString> groups() const =0;
-	virtual QList<IRosterItem> groupItems(const QString &AGroup) const =0;
+	virtual QSet<QString> allGroups() const =0;
+	virtual bool hasGroup(const QString &AGroup) const =0;
 	virtual QSet<QString> itemGroups(const Jid &AItemJid) const =0;
+	virtual QList<IRosterItem> groupItems(const QString &AGroup) const =0;
+	virtual bool isSubgroup(const QString &ASubGroup, const QString &AGroup) const =0;
 	virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups) =0;
 	virtual void setItems(const QList<IRosterItem> &AItems) =0;
 	virtual void removeItem(const Jid &AItemJid) =0;
@@ -107,7 +111,7 @@ protected:
 	virtual void rosterRemoved(IRoster *ARoster) =0;
 };
 
-Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.2")
-Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.2")
+Q_DECLARE_INTERFACE(IRoster,"Vacuum.Plugin.IRoster/1.3")
+Q_DECLARE_INTERFACE(IRosterPlugin,"Vacuum.Plugin.IRosterPlugin/1.3")
 
-#endif
+#endif //IROSTER_H

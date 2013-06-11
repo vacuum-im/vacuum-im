@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Entered item JID is not valid or already exists.</source>
-        <translation>Return</translation>
+        <translation>Введено невірний чи вже існуючий JID.   </translation>
     </message>
     <message>
         <source>Wrong item JID</source>
@@ -53,7 +53,8 @@
     <message>
         <source>Conference parameters is not acceptable.
 Check values and try again</source>
-        <translation>Параметри конференції неприйнятні перевірте параметри та спробуйте ще раз</translation>
+        <translation>Параметри конференції неприйнятні.
+Перевірте параметри та спробуйте ще раз</translation>
     </message>
 </context>
 <context>
@@ -169,10 +170,6 @@ Check values and try again</source>
         <translation>Запросити</translation>
     </message>
     <message>
-        <source>%1 as %2</source>
-        <translation>%1 як %2</translation>
-    </message>
-    <message>
         <source>Hidden room</source>
         <translation>Прихована кімната</translation>
     </message>
@@ -285,10 +282,6 @@ Check values and try again</source>
         <translation>Введіть причину</translation>
     </message>
     <message>
-        <source>You are welcome here</source>
-        <translation>Вас тут чекають</translation>
-    </message>
-    <message>
         <source>Invite user</source>
         <translation>Запросити користувача</translation>
     </message>
@@ -310,7 +303,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Desired Nickname</source>
-        <translation>Бажаний прізвисько</translation>
+        <translation>Бажане прізвисько</translation>
     </message>
     <message>
         <source>Your URL</source>
@@ -515,7 +508,7 @@ Check values and try again</source>
     <message>
         <source>Return</source>
         <comment>Send message</comment>
-        <translation>Повернутися</translation>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Clear window</source>
@@ -567,10 +560,6 @@ Check values and try again</source>
         <translation>При отриманні нового повідомлення в конференції</translation>
     </message>
     <message>
-        <source>Select the user to refer in the Bash style</source>
-        <translation>Обирати користувача для звернення в стилі Bash</translation>
-    </message>
-    <message>
         <source>Add this suffix when referring to the user:</source>
         <translation>Додавати цей суфікс при зверненні до користувача:</translation>
     </message>
@@ -579,8 +568,36 @@ Check values and try again</source>
         <translation>Виходити з конференції при закритті вікна</translation>
     </message>
     <message>
-        <source>Rejoin in chat room after kick</source>
+        <source>Enter conference</source>
+        <translation>Зайти до конференції</translation>
+    </message>
+    <message>
+        <source>Exit conference</source>
+        <translation>Залишити конференцію</translation>
+    </message>
+    <message>
+        <source>Rejoin in conference after kick</source>
         <translation>Автоматично заходити до конференції після кіка</translation>
+    </message>
+    <message>
+        <source>Select the user to refer without menu</source>
+        <translation>Обирати користувача для звернення без меню</translation>
+    </message>
+    <message>
+        <source>Enter</source>
+        <translation>Ввійти</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Вийти</translation>
+    </message>
+    <message>
+        <source>Open Conference Dialog</source>
+        <translation>Відкрити діалог конференції</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference!</source>
+        <translation>Будь ласка, ввійдіть до цієї конференції!</translation>
     </message>
 </context>
 <context>
@@ -614,56 +631,8 @@ Check values and try again</source>
         <translation>Отримана форма даних від: %1</translation>
     </message>
     <message>
-        <source>Change room nick</source>
-        <translation>Змінити прізвисько</translation>
-    </message>
-    <message>
         <source>Change topic</source>
         <translation>Змінити тему</translation>
-    </message>
-    <message>
-        <source>Clear chat window</source>
-        <translation>Очистити вікно чату</translation>
-    </message>
-    <message>
-        <source>Invite to this room</source>
-        <translation>Запросити до цієї кімнати</translation>
-    </message>
-    <message>
-        <source>Request voice</source>
-        <translation>Запитати голос</translation>
-    </message>
-    <message>
-        <source>Edit ban list</source>
-        <translation>Редагувати список банів</translation>
-    </message>
-    <message>
-        <source>Edit members list</source>
-        <translation>Редагувати список учасників</translation>
-    </message>
-    <message>
-        <source>Edit administrators list</source>
-        <translation>Редагувати список адміністраторів</translation>
-    </message>
-    <message>
-        <source>Edit owners list</source>
-        <translation>Редагувати список власників</translation>
-    </message>
-    <message>
-        <source>Configure room</source>
-        <translation>Налаштувати кімнату</translation>
-    </message>
-    <message>
-        <source>Destroy room</source>
-        <translation>Знищити кімнату</translation>
-    </message>
-    <message>
-        <source>Kick user</source>
-        <translation>Вигнати</translation>
-    </message>
-    <message>
-        <source>Ban user</source>
-        <translation>Забанити</translation>
     </message>
     <message>
         <source>Change Role</source>
@@ -826,18 +795,6 @@ Check values and try again</source>
         <translation>Змінити прізвисько</translation>
     </message>
     <message>
-        <source>Enter your new nick name in room %1</source>
-        <translation>Введіть ваш новий прізвисько в кімнаті %1</translation>
-    </message>
-    <message>
-        <source>Change subject</source>
-        <translation>Змінити тему</translation>
-    </message>
-    <message>
-        <source>Enter new subject for room %1</source>
-        <translation>Введіть нову тему для кімнати %1</translation>
-    </message>
-    <message>
         <source>Invite user</source>
         <translation>Запросити користувача</translation>
     </message>
@@ -846,16 +803,8 @@ Check values and try again</source>
         <translation>Введіть JID користувача:</translation>
     </message>
     <message>
-        <source>You are welcome here</source>
-        <translation>Вас тут чекають</translation>
-    </message>
-    <message>
         <source>Enter a reason:</source>
         <translation>Введіть причину:</translation>
-    </message>
-    <message>
-        <source>Destroying room</source>
-        <translation>Знищення кімнати</translation>
     </message>
     <message>
         <source>Kick reason</source>
@@ -876,10 +825,6 @@ Check values and try again</source>
     <message>
         <source>%1 - Conference</source>
         <translation>%1 - Конференція</translation>
-    </message>
-    <message>
-        <source>Tools</source>
-        <translation>Інструменти</translation>
     </message>
     <message>
         <source>None</source>
@@ -926,26 +871,6 @@ Check values and try again</source>
         <translation>%1 змінив статус на [%2] %3</translation>
     </message>
     <message>
-        <source>Role: %1</source>
-        <translation>Тип: %1</translation>
-    </message>
-    <message>
-        <source>Affiliation: %1</source>
-        <translation>Членство: %1</translation>
-    </message>
-    <message>
-        <source>Status:</source>
-        <translation>Статус:</translation>
-    </message>
-    <message>
-        <source>Enter room</source>
-        <translation>Зайти до кімнати</translation>
-    </message>
-    <message>
-        <source>Exit room</source>
-        <translation>Вийти з кімнати</translation>
-    </message>
-    <message>
         <source>Mention message in conference: %1</source>
         <translation>Повідомлення з звертанням в конференції: %1</translation>
     </message>
@@ -970,14 +895,6 @@ Check values and try again</source>
         <translation>%1 залишив кімнату</translation>
     </message>
     <message>
-        <source>Quote selected text</source>
-        <translation>Цитувати виділений текст</translation>
-    </message>
-    <message>
-        <source>Open chat dialog</source>
-        <translation>Відкрити діалог чату</translation>
-    </message>
-    <message>
         <source>Loading history...</source>
         <translation>Завантаження історії</translation>
     </message>
@@ -987,11 +904,111 @@ Check values and try again</source>
     </message>
     <message>
         <source>Enter</source>
-        <translation type="unfinished"></translation>
+        <translation>Ввійти</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Вийти</translation>
+    </message>
+    <message>
+        <source>Open Chat Dialog</source>
+        <translation>Відкрити діалог чату</translation>
+    </message>
+    <message>
+        <source>Kick User</source>
+        <translation>Вигнати</translation>
+    </message>
+    <message>
+        <source>Ban User</source>
+        <translation>Забанити</translation>
+    </message>
+    <message>
+        <source>Change Nick</source>
+        <translation>Змінити прізвисько</translation>
+    </message>
+    <message>
+        <source>Change Topic</source>
+        <translation>Змінити тему</translation>
+    </message>
+    <message>
+        <source>Invite to Conference</source>
+        <translation>Запросити до конференції</translation>
+    </message>
+    <message>
+        <source>Request Voice</source>
+        <translation>Запитати голос</translation>
+    </message>
+    <message>
+        <source>Clear Conference Window</source>
+        <translation>Очистити вікно конференції</translation>
+    </message>
+    <message>
+        <source>Edit Ban List</source>
+        <translation>Редагувати список банів</translation>
+    </message>
+    <message>
+        <source>Edit Members List</source>
+        <translation>Редагувати список учасників</translation>
+    </message>
+    <message>
+        <source>Edit Administrators List</source>
+        <translation>Редагувати список адміністраторів</translation>
+    </message>
+    <message>
+        <source>Edit Owners List</source>
+        <translation>Редагувати список власників</translation>
+    </message>
+    <message>
+        <source>Configure Conference</source>
+        <translation>Налаштувати конференцію</translation>
+    </message>
+    <message>
+        <source>Destroy Conference</source>
+        <translation>Видалити конференцію</translation>
+    </message>
+    <message>
+        <source>Enter conference</source>
+        <translation>Зайти до конференції</translation>
+    </message>
+    <message>
+        <source>Exit conference</source>
+        <translation>Залишити конференцію</translation>
+    </message>
+    <message>
+        <source>Clear Chat Window</source>
+        <translation>Очистити вікно чату</translation>
+    </message>
+    <message>
+        <source>Enter your new nick name in conference %1</source>
+        <translation>Введіть ваше нове прізвисько в кімнаті %1</translation>
+    </message>
+    <message>
+        <source>Enter new topic for conference %1</source>
+        <translation>Введіть нову тему для конференції %1</translation>
+    </message>
+    <message>
+        <source>Please, enter this conference!</source>
+        <translation>Будь ласка, ввійдіть до цієї конференції!</translation>
+    </message>
+    <message>
+        <source>Destroying conference</source>
+        <translation>Знищити конференцію</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Тип:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Членство:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

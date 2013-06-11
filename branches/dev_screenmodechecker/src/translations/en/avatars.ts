@@ -4,22 +4,6 @@
 <context>
     <name>Avatars</name>
     <message>
-        <source>Avatars</source>
-        <translation>Avatars</translation>
-    </message>
-    <message>
-        <source>Allows to set and display avatars</source>
-        <translation>Allows to set and display avatars</translation>
-    </message>
-    <message>
-        <source>Show avatars</source>
-        <translation>Show avatars</translation>
-    </message>
-    <message>
-        <source>Show empty avatars</source>
-        <translation>Show empty avatars</translation>
-    </message>
-    <message>
         <source>Avatar</source>
         <translation>Avatar</translation>
     </message>
@@ -50,6 +34,22 @@
     <message>
         <source>Image Files (*.png *.jpg *.bmp *.gif)</source>
         <translation>Image Files (*.png *.jpg *.bmp *.gif)</translation>
+    </message>
+    <message>
+        <source>Avatars</source>
+        <translation>Avatars</translation>
+    </message>
+    <message>
+        <source>Allows to set and display avatars</source>
+        <translation>Allows to set and display avatars</translation>
+    </message>
+    <message>
+        <source>Show avatars</source>
+        <translation>Show avatars</translation>
+    </message>
+    <message>
+        <source>Show empty avatars</source>
+        <translation>Show empty avatars</translation>
     </message>
     <message>
         <source>Show grayscaled avatars for offline contacts</source>

@@ -44,8 +44,8 @@ EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster,
 	        SLOT(onDefaultListChanged(const Jid &, const QString &)));
 	connect(FPrivacyLists->instance(),SIGNAL(requestCompleted(const QString &)),
 	        SLOT(onRequestCompleted(const QString &)));
-	connect(FPrivacyLists->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
-	        SLOT(onRequestFailed(const QString &, const QString &)));
+	connect(FPrivacyLists->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
+	        SLOT(onRequestFailed(const QString &, const XmppError &)));
 
 	connect(ui.tlbAddList,SIGNAL(clicked()),SLOT(onAddListClicked()));
 	connect(ui.tlbDeleteList,SIGNAL(clicked()),SLOT(onDeleteListClicked()));
@@ -360,26 +360,26 @@ void EditListsDialog::onRequestCompleted(const QString &AId)
 	updateEnabledState();
 }
 
-void EditListsDialog::onRequestFailed(const QString &AId, const QString &AError)
+void EditListsDialog::onRequestFailed(const QString &AId, const XmppError &AError)
 {
 	QString warning;
 	if (FActiveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be active: %2").arg(Qt::escape(FActiveRequests.take(AId))).arg(Qt::escape(AError));
+		warning = tr("Privacy list '%1' could not be active: %2").arg(Qt::escape(FActiveRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
 		onActiveListChanged(FStreamJid,FPrivacyLists->activeList(FStreamJid));
 	}
 	else if (FDefaultRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be default: %2").arg(Qt::escape(FDefaultRequests.take(AId))).arg(Qt::escape(AError));
+		warning = tr("Privacy list '%1' could not be default: %2").arg(Qt::escape(FDefaultRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
 		onDefaultListChanged(FStreamJid,FPrivacyLists->defaultList(FStreamJid));
 	}
 	else if (FSaveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be saved: %2").arg(Qt::escape(FSaveRequests.take(AId))).arg(Qt::escape(AError));
+		warning = tr("Privacy list '%1' could not be saved: %2").arg(Qt::escape(FSaveRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
 	}
 	else if (FRemoveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be removed: %2").arg(Qt::escape(FRemoveRequests.take(AId))).arg(Qt::escape(AError));
+		warning = tr("Privacy list '%1' could not be removed: %2").arg(Qt::escape(FRemoveRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
 	}
 	if (!warning.isEmpty())
 		FWarnings.append(warning);
@@ -534,9 +534,9 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 		}
 		else if (type == PRIVACY_TYPE_GROUP)
 		{
-			QSet<QString> groupItems = FRoster!=NULL ? FRoster->groups() : QSet<QString>();
-			foreach(QString group, groupItems)
-				ui.cmbValue->addItem(group.replace(FRoster->groupDelimiter(),"::"),group);
+			QSet<QString> groups = FRoster!=NULL ? FRoster->allGroups() : QSet<QString>();
+			foreach(QString group, groups)
+				ui.cmbValue->addItem(group,group);
 		}
 		ui.cmbValue->setEditable(true);
 		ui.cmbValue->blockSignals(false);

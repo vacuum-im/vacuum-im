@@ -6,7 +6,8 @@
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
 #include <definitions/mainwindowwidgets.h>
-#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosterproxyorders.h>
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosterkeyhookerorders.h>
@@ -23,11 +24,11 @@
 #include <utils/searchlineedit.h>
 
 class RosterSearch :
-			public QSortFilterProxyModel,
-			public IPlugin,
-			public IRosterSearch,
-			public IRostersClickHooker,
-			public IRostersKeyHooker
+	public QSortFilterProxyModel,
+	public IPlugin,
+	public IRosterSearch,
+	public IRostersClickHooker,
+	public IRostersKeyHooker
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterSearch IRostersClickHooker IRostersKeyHooker);
@@ -43,11 +44,11 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	//IRostersKeyHooker
-	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent);
-	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent);
+	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
+	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
 	//IRosterSearch
 	virtual void startSearch();
 	virtual QString searchPattern() const;

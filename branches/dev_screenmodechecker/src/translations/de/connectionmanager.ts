@@ -19,6 +19,10 @@
         <source>New Proxy</source>
         <translation>Neuer Proxy</translation>
     </message>
+    <message>
+        <source>Connection error</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
@@ -77,10 +81,6 @@
         <translation>Passwort:</translation>
     </message>
     <message>
-        <source>Default Proxy:</source>
-        <translation>Standard Proxy:</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
@@ -94,6 +94,10 @@
     <message>
         <source>&lt;Default Proxy&gt;</source>
         <translation>&lt;Standard Proxy&gt;</translation>
+    </message>
+    <message>
+        <source>Default proxy:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

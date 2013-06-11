@@ -37,10 +37,10 @@
 
 
 class OptionsManager :
-			public QObject,
-			public IPlugin,
-			public IOptionsManager,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IOptionsManager,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsManager IOptionsHolder);
@@ -107,7 +107,7 @@ protected slots:
 	void onShowOptionsDialogByAction(bool);
 	void onLoginDialogRejected();
 	void onAutoSaveTimerTimeout();
-	void onAboutToQuit();
+	void onApplicationAboutToQuit();
 private:
 	IPluginManager *FPluginManager;
 	ITrayManager *FTrayManager;

@@ -41,7 +41,7 @@ signals:
 	void enableChanged(const Jid &AStreamJid, bool AEnable);
 	void messageSent(const Jid &AStreamJid, const Message &AMessage);
 	void messageReceived(const Jid &AStreamJid, const Message &AMessage);
-	void errorReceived(const Jid &AStreamJid, const XmppStanzaError &AError);
+	void errorReceived(const Jid &AStreamJid, const XmppError &AError);
 protected slots:
 	void onXmppStreamOpened(IXmppStream *AXmppStream);
 	void onXmppStreamClosed(IXmppStream *AXmppStream);

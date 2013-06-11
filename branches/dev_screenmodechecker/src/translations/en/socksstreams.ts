@@ -4,36 +4,8 @@
 <context>
     <name>SocksOptionsClass</name>
     <message>
-        <source>Outgoing Connections</source>
-        <translation>Outgoing Connections</translation>
-    </message>
-    <message>
-        <source>Connect timeout:</source>
-        <translation>Connect timeout:</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation>seconds</translation>
-    </message>
-    <message>
-        <source>Connection Proxy</source>
-        <translation>Connection Proxy</translation>
-    </message>
-    <message>
-        <source>Use account connection proxy settings</source>
-        <translation>Use account connection proxy settings</translation>
-    </message>
-    <message>
-        <source>Incoming Connections</source>
-        <translation>Incoming Connections</translation>
-    </message>
-    <message>
         <source>Disable direct connections</source>
         <translation>Disable direct connections</translation>
-    </message>
-    <message>
-        <source>Listening port:</source>
-        <translation>Listening port:</translation>
     </message>
     <message>
         <source>Port Forwarding</source>
@@ -52,10 +24,6 @@
         <translation>Stream Proxy</translation>
     </message>
     <message>
-        <source>Use proxy on account server</source>
-        <translation>Use proxy on account server</translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation>Add</translation>
     </message>
@@ -71,44 +39,37 @@
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
-</context>
-<context>
-    <name>SocksStream</name>
     <message>
-        <source>Stream destroyed</source>
-        <translation>Stream destroyed</translation>
+        <source>Connection Proxy</source>
+        <translation>Connection Proxy</translation>
     </message>
     <message>
-        <source>Unsupported stream mode</source>
-        <translation>Unsupported stream mode</translation>
+        <source>Use account connection proxy settings</source>
+        <translation>Use account connection proxy settings</translation>
     </message>
     <message>
-        <source>Remote client cant connect to given hosts</source>
-        <translation>Remote client cant connect to given hosts</translation>
+        <source>Listening port:</source>
+        <translation>Listening port:</translation>
     </message>
     <message>
-        <source>Failed to activate stream</source>
-        <translation>Failed to activate stream</translation>
+        <source>Use proxy on account server</source>
+        <translation>Use proxy on account server</translation>
     </message>
     <message>
-        <source>Failed to create hosts</source>
-        <translation>Failed to create hosts</translation>
+        <source>Outgoing Connections</source>
+        <translation>Outgoing Connections</translation>
     </message>
     <message>
-        <source>Direct connection not established</source>
-        <translation>Direct connection not established</translation>
+        <source>Connect timeout:</source>
+        <translation>Connect timeout:</translation>
     </message>
     <message>
-        <source>Invalid host</source>
-        <translation>Invalid host</translation>
+        <source>seconds</source>
+        <translation>seconds</translation>
     </message>
     <message>
-        <source>Cant connect to given hosts</source>
-        <translation>Cant connect to given hosts</translation>
-    </message>
-    <message>
-        <source>Failed to connect to host</source>
-        <translation>Failed to connect to host</translation>
+        <source>Incoming Connections</source>
+        <translation>Incoming Connections</translation>
     </message>
 </context>
 <context>
@@ -128,6 +89,54 @@
     <message>
         <source>Data is transferred out-band over TCP or UDP connection</source>
         <translation>Data is transferred out-band over TCP or UDP connection</translation>
+    </message>
+    <message>
+        <source>Stream destroyed</source>
+        <translation>Stream destroyed</translation>
+    </message>
+    <message>
+        <source>Unsupported stream mode</source>
+        <translation>Unsupported stream mode</translation>
+    </message>
+    <message>
+        <source>Remote client cant connect to given hosts</source>
+        <translation>Remote client cant connect to given hosts</translation>
+    </message>
+    <message>
+        <source>Cant connect to given hosts</source>
+        <translation>Cant connect to given hosts</translation>
+    </message>
+    <message>
+        <source>Failed to create hosts</source>
+        <translation>Failed to create hosts</translation>
+    </message>
+    <message>
+        <source>Failed to activate stream</source>
+        <translation>Failed to activate stream</translation>
+    </message>
+    <message>
+        <source>Failed to send data to socket</source>
+        <translation>Failed to send data to socket</translation>
+    </message>
+    <message>
+        <source>Direct connection not established</source>
+        <translation>Direct connection not established</translation>
+    </message>
+    <message>
+        <source>Invalid host</source>
+        <translation>Invalid host</translation>
+    </message>
+    <message>
+        <source>Invalid host address</source>
+        <translation>Invalid host address</translation>
+    </message>
+    <message>
+        <source>Failed to connect to host</source>
+        <translation>Failed to connect to host</translation>
+    </message>
+    <message>
+        <source>Host disconnected</source>
+        <translation>Host disconnected</translation>
     </message>
 </context>
 </TS>

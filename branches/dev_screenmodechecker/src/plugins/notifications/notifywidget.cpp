@@ -19,11 +19,17 @@ QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
 IMainWindow *NotifyWidget::FMainWindow = NULL;
 QRect NotifyWidget::FDisplay = QRect();
 
-NotifyWidget::NotifyWidget(const INotification &ANotification) : QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
+NotifyWidget::NotifyWidget(const INotification &ANotification)
+#if defined(Q_OS_MAC)
+	: QWidget(NULL, Qt::FramelessWindowHint|Qt::WindowSystemMenuHint|Qt::WindowStaysOnTopHint)
+#else
+	: QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
+#endif
 {
 	ui.setupUi(this);
 	setFocusPolicy(Qt::NoFocus);
 	setAttribute(Qt::WA_DeleteOnClose,true);
+	setAttribute(Qt::WA_ShowWithoutActivating,true);
 
 	QPalette pallete = ui.frmWindowFrame->palette();
 	pallete.setColor(QPalette::Window, pallete.color(QPalette::Base));

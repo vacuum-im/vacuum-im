@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <interfaces/idataforms.h>
 #include <utils/jid.h>
+#include <utils/xmpperror.h>
 
 #define REGISTRATION_UUID "{441F0DD4-C2DF-4417-B2F7-1D180C125EE3}"
 
@@ -56,9 +57,9 @@ public:
 protected:
 	virtual void registerFields(const QString &AId, const IRegisterFields &AFields) =0;
 	virtual void registerSuccessful(const QString &AId) =0;
-	virtual void registerError(const QString &AId, const QString &AError) =0;
+	virtual void registerError(const QString &AId, const XmppError &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IRegistration,"Vacuum.Plugin.IRegistration/1.0")
+Q_DECLARE_INTERFACE(IRegistration,"Vacuum.Plugin.IRegistration/1.1")
 
 #endif

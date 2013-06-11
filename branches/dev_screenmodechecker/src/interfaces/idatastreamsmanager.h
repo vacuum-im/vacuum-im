@@ -9,6 +9,7 @@
 #include <utils/jid.h>
 #include <utils/stanza.h>
 #include <utils/options.h>
+#include <utils/xmpperror.h>
 
 #define DATASTREAMSMANAGER_UUID "{b293dfe1-d8c3-445f-8e7f-b94cc78ec51b}"
 
@@ -25,10 +26,6 @@ public:
 		Opened,
 		Closing
 	};
-	enum StreamError {
-		NoError         = -1,
-		UnknownError    = 0
-	};
 public:
 	virtual QIODevice *instance() =0;
 	virtual QString methodNS() const =0;
@@ -37,13 +34,12 @@ public:
 	virtual Jid contactJid() const =0;
 	virtual int streamKind() const =0;
 	virtual int streamState() const =0;
+	virtual XmppError error() const =0;
 	virtual bool isOpen() const =0;
 	virtual bool open(QIODevice::OpenMode AMode) =0;
 	virtual bool flush() =0;
 	virtual void close() =0;
-	virtual void abort(const QString &AError, int ACode = UnknownError) =0;
-	virtual int errorCode() const =0;
-	virtual QString errorString() const =0;
+	virtual void abort(const XmppError &AError) =0;
 protected:
 	virtual void stateChanged(int AState) =0;
 };
@@ -72,7 +68,7 @@ public:
 	virtual bool responceDataStream(const QString &AStreamId, Stanza &AResponce) const =0;
 	virtual bool dataStreamRequest(const QString &AStreamId, const Stanza &ARequest, const QList<QString> &AMethods) =0;
 	virtual bool dataStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethodNS) =0;
-	virtual bool dataStreamError(const QString &AStreamId, const QString &AError) =0;
+	virtual bool dataStreamError(const QString &AStreamId, const XmppError &AError) =0;
 };
 
 class IDataStreamsManager
@@ -94,7 +90,7 @@ public:
 	virtual void removeSettingsProfile(const QUuid &AProfileId) =0;
 	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout =0) =0;
 	virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS) =0;
-	virtual bool rejectStream(const QString &AStreamId, const QString &AError) =0;
+	virtual bool rejectStream(const QString &AStreamId, const XmppStanzaError &AError) =0;
 protected:
 	virtual void methodInserted(IDataStreamMethod *AMethod) =0;
 	virtual void methodRemoved(IDataStreamMethod *AMethod) =0;
@@ -104,9 +100,9 @@ protected:
 	virtual void settingsProfileRemoved(const QUuid &AProfileId) =0;
 };
 
-Q_DECLARE_INTERFACE(IDataStreamSocket,"Vacuum.Plugin.IDataStreamSocket/1.0")
+Q_DECLARE_INTERFACE(IDataStreamSocket,"Vacuum.Plugin.IDataStreamSocket/1.1")
 Q_DECLARE_INTERFACE(IDataStreamMethod,"Vacuum.Plugin.IDataStreamMethod/1.0")
-Q_DECLARE_INTERFACE(IDataStreamProfile,"Vacuum.Plugin.IDataStreamProfile/1.0")
-Q_DECLARE_INTERFACE(IDataStreamsManager,"Vacuum.Plugin.IDataStreamsManager/1.0")
+Q_DECLARE_INTERFACE(IDataStreamProfile,"Vacuum.Plugin.IDataStreamProfile/1.1")
+Q_DECLARE_INTERFACE(IDataStreamsManager,"Vacuum.Plugin.IDataStreamsManager/1.1")
 
 #endif  //IDATASTREAMSMANAGER_H

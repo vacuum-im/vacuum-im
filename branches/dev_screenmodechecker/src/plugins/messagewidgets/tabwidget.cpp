@@ -27,7 +27,7 @@ void TabWidget::setTabBarVisible(bool AVisible)
 	if (AVisible != FTabBarVisible)
 	{
 		FTabBarVisible = AVisible;
-		tabBar()->setVisible(FTabBarVisible);
+		tabBar()->setVisible(AVisible);
 	}
 }
 

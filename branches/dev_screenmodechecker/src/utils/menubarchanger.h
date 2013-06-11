@@ -10,7 +10,7 @@
 #define MBG_DEFAULT     500
 
 class UTILS_EXPORT MenuBarChanger :
-			public QObject
+	public QObject
 {
 	Q_OBJECT;
 public:

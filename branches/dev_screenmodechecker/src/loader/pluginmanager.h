@@ -42,8 +42,8 @@ struct PluginItem
 };
 
 class PluginManager :
-			public QObject,
-			public IPluginManager
+	public QObject,
+	public IPluginManager
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPluginManager);
@@ -77,9 +77,12 @@ protected:
 	void loadPlugins();
 	bool initPlugins();
 	void startPlugins();
+	void unloadPlugins();
 protected:
-	void startShutdown();
-	void finishShutdown();
+	void startClose();
+	void finishClose();
+	void startQuit();
+	void finishQuit();
 	void closeTopLevelWidgets();
 protected:
 	void removePluginItem(const QUuid &AUuid, const QString &AError);
@@ -106,6 +109,9 @@ private:
 	QPointer<AboutBox> FAboutDialog;
 	QPointer<SetupPluginsDialog> FPluginsDialog;
 private:
+	bool FQuitReady;
+	bool FQuitStarted;
+	bool FCloseStarted;
 	int FShutdownKind;
 	int FShutdownDelayCount;
 	QTimer FShutdownTimer;
@@ -120,4 +126,4 @@ private:
 	mutable QMultiHash<QString, IPlugin *> FPlugins;
 };
 
-#endif
+#endif //PLUGINMANAGER_H

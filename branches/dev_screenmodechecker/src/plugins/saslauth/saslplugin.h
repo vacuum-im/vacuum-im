@@ -2,6 +2,8 @@
 #define SASLPLUGIN_H
 
 #include <definitions/namespaces.h>
+#include <definitions/xmpperrors.h>
+#include <definitions/internalerrors.h>
 #include <definitions/xmppfeatureorders.h>
 #include <definitions/xmppfeaturepluginorders.h>
 #include <definitions/xmppstanzahandlerorders.h>
@@ -16,10 +18,10 @@
 #define SASLAUTH_UUID "{E583F155-BE87-4919-8769-5C87088F0F57}"
 
 class SASLPlugin :
-			public QObject,
-			public IPlugin,
-			public IXmppFeaturesPlugin,
-			public IXmppStanzaHadler
+	public QObject,
+	public IPlugin,
+	public IXmppFeaturesPlugin,
+	public IXmppStanzaHadler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeaturesPlugin IXmppStanzaHadler);
