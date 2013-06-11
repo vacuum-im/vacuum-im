@@ -163,6 +163,7 @@
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
 #define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
+#define OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN			"notifications.no-popip-if-fullscreen"
 #define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
 #define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"

@@ -170,6 +170,7 @@ bool Notifications::initSettings()
 {
 	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPTIMEOUT,8);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,0);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_KINDENABLED_ITEM,true);
@@ -200,6 +201,8 @@ QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &AN
 	{
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN),
+	tr("Disable pop-up window when the fullscreen application is active"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE),tr("Enable animation in notification pop-up"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new NotifyOptionsWidget(this,AParent));
 	}
@@ -256,13 +259,19 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
-			record.popupWidget = new NotifyWidget(record.notification);
-			connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
-			connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
-			connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
-			record.popupWidget->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
-			record.popupWidget->setNetworkAccessManager(FNetworkAccessManager);
-			record.popupWidget->appear();
+			bool isFullScreen = SystemManager::isScreenSaverRunning();
+			isFullScreen |= SystemManager::isFullscreenAppActive();
+
+			if (!isFullScreen || !Options::node(OPV_NOTIFICATIONS_NOPOPUPIFFULLSCREEN).value().toBool())
+			{
+				record.popupWidget = new NotifyWidget(record.notification);
+				connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
+				connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
+				connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
+				record.popupWidget->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
+				record.popupWidget->setNetworkAccessManager(FNetworkAccessManager);
+				record.popupWidget->appear();
+			}
 		}
 	}
 

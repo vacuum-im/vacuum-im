@@ -17,12 +17,13 @@ win32 {
 }
 
 LIBS              += -L../libs
-LIBS              += -lzlib -lidn -lminizip -lqxtglobalshortcut -lidle
+LIBS              += -lzlib -lidn -lminizip -lqxtglobalshortcut -lidle -lscreenstate
 macx {
   QMAKE_LFLAGS    += -framework Carbon -framework IOKit -framework Cocoa
 } else:unix:!haiku {
   LIBS            += -lXss
   CONFIG          += x11
+  QT              += dbus
 } else:win32 {
   LIBS            += -luser32
 }

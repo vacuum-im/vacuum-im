@@ -30,6 +30,7 @@
 #include <utils/action.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
+#include <utils/systemmanager.h>
 #include <utils/widgetmanager.h>
 #include "notifywidget.h"
 #include "notifyoptionswidget.h"

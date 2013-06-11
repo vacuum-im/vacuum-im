@@ -51,6 +51,10 @@
         <source>Enable animation in notification pop-up</source>
         <translation>Дозволити анімацію в спливаючому вікні</translation>
     </message>
+    <message>
+        <source>Disable pop-up window when the fullscreen application is active</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>

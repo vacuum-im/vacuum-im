@@ -11,8 +11,13 @@ class UTILS_EXPORT SystemManager :
 	struct SystemManagerData;
 public:
 	static SystemManager *instance();
+	//Idle
 	static int systemIdle();
 	static bool isSystemIdleActive();
+	//ScreenModeChecker
+	static bool isScreenSaverRunning();
+	static bool isFullscreenAppActive();
+public:
 	static void startSystemIdle();
 	static void stopSystemIdle();
 signals:
@@ -20,9 +25,7 @@ signals:
 protected slots:
 	void onIdleChanged(int ASeconds);
 private:
-	SystemManager();
-	~SystemManager();
-	SystemManagerData *d;
+	static SystemManagerData *d;
 };
 
 #endif // SYSTEMMANAGER_H
