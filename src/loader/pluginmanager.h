@@ -83,6 +83,7 @@ protected:
 	void finishClose();
 	void startQuit();
 	void finishQuit();
+	void closeAndQuit();
 	void closeTopLevelWidgets();
 protected:
 	void removePluginItem(const QUuid &AUuid, const QString &AError);
