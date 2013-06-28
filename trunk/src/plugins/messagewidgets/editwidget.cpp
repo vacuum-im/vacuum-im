@@ -209,7 +209,7 @@ ToolBarChanger *EditWidget::editToolBarChanger() const
 void EditWidget::contextMenuForEdit(const QPoint &APosition, Menu *AMenu)
 {
 	QMenu *stdMenu = ui.medEditor->createStandardContextMenu(APosition);
-	Menu::copyStandardMenu(AMenu,stdMenu,AG_EWCM_MESSAGEWIDGETS_DEFAULT);
+	Menu::copyStandardMenu(AMenu,stdMenu,AG_MWEWCM_MESSAGEWIDGETS_DEFAULT);
 	connect(AMenu,SIGNAL(destroyed(QObject *)),stdMenu,SLOT(deleteLater()));
 	emit contextMenuRequested(APosition,AMenu);
 }

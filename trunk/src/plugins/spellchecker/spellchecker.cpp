@@ -251,7 +251,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 					suggestAction->setText(suggests.at(i));
 					suggestAction->setProperty("suggestion", suggests.at(i));
 					connect(suggestAction,SIGNAL(triggered()),SLOT(onRepairWordUnderCursor()));
-					AMenu->addAction(suggestAction,AG_EWCM_SPELLCHECKER_SUGGESTS);
+					AMenu->addAction(suggestAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
 				}
 
 				if (canAddWordToPersonalDict(word))
@@ -260,7 +260,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 					appendAction->setText(tr("Add '%1' to Dictionary").arg(word));
 					appendAction->setProperty("word",word);
 					connect(appendAction,SIGNAL(triggered()),SLOT(onAddUnknownWordToDictionary()));
-					AMenu->addAction(appendAction,AG_EWCM_SPELLCHECKER_SUGGESTS);
+					AMenu->addAction(appendAction,AG_MWEWCM_SPELLCHECKER_SUGGESTS);
 				}
 			}
 		}
@@ -271,13 +271,13 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 		enableAction->setChecked(isSpellEnabled() && isSpellAvailable());
 		enableAction->setEnabled(isSpellAvailable());
 		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
-		AMenu->addAction(enableAction,AG_EWCM_SPELLCHECKER_OPTIONS);
+		AMenu->addAction(enableAction,AG_MWEWCM_SPELLCHECKER_OPTIONS);
 
 		if (isSpellEnabled())
 		{
 			Menu *dictsMenu = new Menu(AMenu);
 			dictsMenu->setTitle(tr("Dictionary"));
-			AMenu->addAction(dictsMenu->menuAction(),AG_EWCM_SPELLCHECKER_OPTIONS);
+			AMenu->addAction(dictsMenu->menuAction(),AG_MWEWCM_SPELLCHECKER_OPTIONS);
 			QActionGroup *dictGroup = new QActionGroup(dictsMenu);
 
 			QString curDict = currentDictionary();

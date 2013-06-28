@@ -4,7 +4,15 @@
 #define CHATMESSAGEHANDLER_UUID "{b60cc0e4-8006-4909-b926-fcb3cbc506f0}"
 
 #include <QTimer>
-#include <definitions/messagehandlerorders.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosterclickhookerorders.h>
@@ -15,16 +23,7 @@
 #include <definitions/notificationtypeorders.h>
 #include <definitions/tabpagenotifypriorities.h>
 #include <definitions/messagedataroles.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/toolbargroups.h>
+#include <definitions/messagehandlerorders.h>
 #include <definitions/messageeditsendhandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
