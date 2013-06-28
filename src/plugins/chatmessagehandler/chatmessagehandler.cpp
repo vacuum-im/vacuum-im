@@ -755,12 +755,13 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 		QMap<Jid, QList<Jid> > addresses = getSortedAddresses(widget->messageWindow()->address()->availAddresses());
 
 		Jid lastStreamJid;
-		int streamGroup = AG_DEFAULT-1;
+		int streamGroup = AG_MWIWAM_CHATMHANDLER_ADDRESSES-1;
 		foreach(const Jid &streamJid, addresses.keys())
 		{
 			IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
 			QString accountName = account!=NULL ? account->name() : streamJid.uBare();
 
+			streamGroup++;
 			Action *accountAction = new Action(AMenu);
 			accountAction->setText(QString("<%1>").arg(accountName));
 			accountAction->setEnabled(false);

@@ -587,14 +587,14 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 		urlAction->setText(isMailto ? tr("Send mail") : tr("Open link"));
 		urlAction->setData(ADR_CONTEXT_DATA,href);
 		connect(urlAction,SIGNAL(triggered(bool)),SLOT(onViewContextUrlActionTriggered(bool)));
-		AMenu->addAction(urlAction,AG_VWCM_MESSAGEWIDGETS_URL,true);
+		AMenu->addAction(urlAction,AG_MWVWCM_MESSAGEWIDGETS_URL,true);
 		AMenu->setDefaultAction(urlAction);
 
 		Action *copyHrefAction = new Action(AMenu);
 		copyHrefAction->setText(tr("Copy address"));
 		copyHrefAction->setData(ADR_CONTEXT_DATA,isMailto ? link.path() : href);
 		connect(copyHrefAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
-		AMenu->addAction(copyHrefAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
+		AMenu->addAction(copyHrefAction,AG_MWVWCM_MESSAGEWIDGETS_COPY,true);
 	}
 	
 	if (!textSelection.isEmpty())
@@ -604,18 +604,18 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 		copyAction->setShortcut(QKeySequence::Copy);
 		copyAction->setData(ADR_CONTEXT_DATA,textSelection.toHtml());
 		connect(copyAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
-		AMenu->addAction(copyAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
+		AMenu->addAction(copyAction,AG_MWVWCM_MESSAGEWIDGETS_COPY,true);
 
 		Action *quoteAction = createQuouteAction(widget->messageWindow(),AMenu);
 		if (quoteAction)
-			AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
+			AMenu->addAction(quoteAction,AG_MWVWCM_MESSAGEWIDGETS_QUOTE,true);
 
 		QString plainSelection = textSelection.toPlainText().trimmed();
 		Action *searchAction = new Action(AMenu);
 		searchAction->setText(tr("Search on Google '%1'").arg(TextManager::getElidedString(plainSelection,Qt::ElideRight,30)));
 		searchAction->setData(ADR_CONTEXT_DATA, plainSelection);
 		connect(searchAction,SIGNAL(triggered(bool)),SLOT(onViewContextSearchActionTriggered(bool)));
-		AMenu->addAction(searchAction,AG_VWCM_MESSAGEWIDGETS_SEARCH,true);
+		AMenu->addAction(searchAction,AG_MWVWCM_MESSAGEWIDGETS_SEARCH,true);
 	}
 }
 
