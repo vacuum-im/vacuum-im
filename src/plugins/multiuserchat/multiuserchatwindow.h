@@ -145,9 +145,9 @@ protected:
 protected:
 	bool isMentionMessage(const Message &AMessage) const;
 	void setMultiChatMessageStyle();
-	void showMultiChatTopic(const QString &ATopic);
+	void showMultiChatTopic(const QString &ATopic, const QString &ANick = QString::null);
 	void showMultiChatStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
-	bool showMultiChatStatusCodes(const QString &ANick, const QList<int> &ACodes);
+	bool showMultiChatStatusCodes(const QList<int> &ACodes, const QString &ANick=QString::null, const QString &AMessage=QString::null);
 	void showMultiChatUserMessage(const Message &AMessage, const QString &ANick);
 	void showMultiChatHistory();
 	void updateMultiChatWindow();
@@ -202,8 +202,6 @@ protected slots:
 	void onPrivateChatContextMenuRequested(Menu *AMenu);
 	void onPrivateChatToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onPrivateChatNotifierActiveNotifyChanged(int ANotifyId);
-	void onPrivateChatArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
-	void onPrivateChatArchiveRequestFailed(const QString &AId, const XmppError &AError);
 protected slots:
 	void onRoomActionTriggered(bool);
 	void onNickCompleteMenuActionTriggered(bool);
@@ -217,6 +215,8 @@ protected slots:
 	void onStatusIconsChanged();
 	void onAutoRejoinAfterKick();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
+	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
+	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
 	Ui::MultiUserChatWindowClass ui;
@@ -260,6 +260,7 @@ private:
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
 	QString FTabPageToolTip;
+	QDateTime FLastMessageTimestamp;
 	QList<int> FActiveMessages;
 	QList<IMessageChatWindow *> FChatWindows;
 	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;

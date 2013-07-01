@@ -655,10 +655,6 @@ Check values and try again</source>
         <translation>Изменить членство</translation>
     </message>
     <message>
-        <source>Any occupant is allowed to see the user&apos;s full JID</source>
-        <translation>Каждый может видеть реальный JID пользователей</translation>
-    </message>
-    <message>
         <source>%1 affiliation changed while not in the room</source>
         <translation>У %1 членство изменилось во время отсутствия</translation>
     </message>
@@ -676,15 +672,15 @@ Check values and try again</source>
     </message>
     <message>
         <source>The room is now non-anonymous</source>
-        <translation>Комната не анонимная</translation>
+        <translation>Эта комната теперь не анонимная</translation>
     </message>
     <message>
         <source>The room is now semi-anonymous</source>
-        <translation>Комната полуанонимная</translation>
+        <translation>Эта комната теперь полуанонимная</translation>
     </message>
     <message>
         <source>The room is now fully-anonymous</source>
-        <translation>Комната полностью анонимная</translation>
+        <translation>Эта комната теперь полностью анонимная</translation>
     </message>
     <message>
         <source>A new room has been created</source>
@@ -713,10 +709,6 @@ Check values and try again</source>
     <message>
         <source>%1 is not valid room JID</source>
         <translation>%1 не является правильным JID комнаты</translation>
-    </message>
-    <message>
-        <source>Disconnected</source>
-        <translation>Отключён</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -1009,6 +1001,18 @@ Check values and try again</source>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>This room is non-anonymous</source>
+        <translation>Эта комната не анонимная</translation>
+    </message>
+    <message>
+        <source>You entered into the room</source>
+        <translation>Вы вошли в комнату</translation>
+    </message>
+    <message>
+        <source>You left the room</source>
+        <translation>Вы вышли из комнаты</translation>
     </message>
 </context>
 </TS>

@@ -655,10 +655,6 @@ Check values and try again</source>
         <translation>Змінити членство</translation>
     </message>
     <message>
-        <source>Any occupant is allowed to see the user&apos;s full JID</source>
-        <translation>Кожний може бачити реальний JID користувачів</translation>
-    </message>
-    <message>
         <source>%1 affiliation changed while not in the room</source>
         <translation>У %1 членство змінилось за час відсутності</translation>
     </message>
@@ -713,10 +709,6 @@ Check values and try again</source>
     <message>
         <source>%1 is not valid room JID</source>
         <translation>%1 не являється правильним JID кімнати</translation>
-    </message>
-    <message>
-        <source>Disconnected</source>
-        <translation>Від&apos;єднаний</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -1009,6 +1001,18 @@ Check values and try again</source>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>This room is non-anonymous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You entered into the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You left the room</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

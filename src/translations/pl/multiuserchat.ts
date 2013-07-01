@@ -655,10 +655,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Zmień członkostwo</translation>
     </message>
     <message>
-        <source>Any occupant is allowed to see the user&apos;s full JID</source>
-        <translation>Każdy może widzieć pełny JID uczestników</translation>
-    </message>
-    <message>
         <source>%1 affiliation changed while not in the room</source>
         <translation>U %1 członkostwo zmieniło się podczas nieobecności w pokoju</translation>
     </message>
@@ -713,10 +709,6 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     <message>
         <source>%1 is not valid room JID</source>
         <translation>%1 nieprawidłowy JID pokoju</translation>
-    </message>
-    <message>
-        <source>Disconnected</source>
-        <translation>Rozłączony</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -1008,6 +1000,18 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     </message>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This room is non-anonymous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You entered into the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You left the room</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
