@@ -73,6 +73,7 @@ void Delegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
 		QSpinBox *spinBox = qobject_cast<QSpinBox *>(AEditor);
 		if (spinBox)
 			spinBox->setValue(AIndex.data(TIR_VALUE).toInt());
+		break;
 	}
 	default:
 		QStyledItemDelegate::setEditorData(AEditor,AIndex);
@@ -117,6 +118,7 @@ void Delegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const 
 			AModel->setData(AIndex, spinBox->value(), Qt::DisplayRole);
 			AModel->setData(AIndex, spinBox->value(), TIR_VALUE);
 		}
+		break;
 	}
 	default:
 		QStyledItemDelegate::setModelData(AEditor,AModel,AIndex);
