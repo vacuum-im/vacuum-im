@@ -60,6 +60,7 @@ void Delegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
 		QTimeEdit *timeEdit = qobject_cast<QTimeEdit *>(AEditor);
 		if (timeEdit)
 			timeEdit->setTime(QTime(0,0).addSecs(AIndex.data(SDR_VALUE).toInt()));
+		break;
 	}
 	case COL_SHOW:
 	{
