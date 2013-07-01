@@ -221,17 +221,17 @@ IMultiUser *MultiUserChat::mainUser() const
 	return FMainUser;
 }
 
-IMultiUser *MultiUserChat::userByNick(const QString &ANick) const
-{
-	return FUsers.value(ANick,NULL);
-}
-
 QList<IMultiUser *> MultiUserChat::allUsers() const
 {
 	QList<IMultiUser *> result;
 	foreach(MultiUser *user, FUsers)
 		result.append(user);
 	return result;
+}
+
+IMultiUser *MultiUserChat::userByNick(const QString &ANick) const
+{
+	return FUsers.value(ANick,NULL);
 }
 
 QString MultiUserChat::nickName() const
@@ -267,6 +267,16 @@ QString MultiUserChat::password() const
 void MultiUserChat::setPassword(const QString &APassword)
 {
 	FPassword = APassword;
+}
+
+IMultiUserChatHistory MultiUserChat::history() const
+{
+	return FHistory;
+}
+
+void MultiUserChat::setHistory(const IMultiUserChatHistory &AHistory)
+{
+	FHistory = AHistory;
 }
 
 int MultiUserChat::show() const
@@ -329,6 +339,25 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 		{
 			FRoomError = XmppError::null;
 			QDomElement xelem = presence.addElement("x",NS_MUC);
+			if (FHistory.empty || FHistory.maxChars>0 || FHistory.maxStanzas>0 || FHistory.seconds>0 || FHistory.since.isValid())
+			{
+				QDomElement histElem = xelem.appendChild(presence.createElement("history")).toElement();
+				if (!FHistory.empty)
+				{
+					if (FHistory.maxChars > 0)
+						histElem.setAttribute("maxchars",FHistory.maxChars);
+					if (FHistory.maxStanzas > 0)
+						histElem.setAttribute("maxstanzas",FHistory.maxStanzas);
+					if (FHistory.seconds > 0)
+						histElem.setAttribute("seconds",FHistory.seconds);
+					if (FHistory.since.isValid())
+						histElem.setAttribute("since",DateTime(FHistory.since).toX85UTC());
+				}
+				else
+				{
+					histElem.setAttribute("maxchars",0);
+				}
+			}
 			if (!FPassword.isEmpty())
 				xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));
 			if (FDiscovery && !FDiscovery->hasDiscoInfo(streamJid(),roomJid()))
@@ -697,15 +726,19 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 	}
 
 	Message message(AStanza);
-	if (AStanza.type()=="error")
+	if (AStanza.type() == "error")
 	{
 		XmppStanzaError err(AStanza);
 		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.errorMessage()) : err.errorMessage());
 	}
-	else if (message.type() == Message::GroupChat && !message.stanza().firstElement("subject").isNull())
+	else if (message.type()==Message::GroupChat && !message.stanza().firstElement("subject").isNull())
 	{
-		FSubject = message.subject();
-		emit subjectChanged(fromNick, FSubject);
+		QString newSubject = message.subject();
+		if (FSubject != newSubject)
+		{
+			FSubject = newSubject;
+			emit subjectChanged(fromNick, FSubject);
+		}
 	}
 	else if (fromNick.isEmpty())
 	{
@@ -774,7 +807,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			else if (showText == "xa")
 				show = IPresence::ExtendedAway;
 			else
-				show = IPresence::Online;     //Костыль под кривые клиенты и транспорты
+				show = IPresence::Online;
 
 			QString status = AStanza.firstElement("status").text();
 			Jid realJid = itemElem.attribute("jid");

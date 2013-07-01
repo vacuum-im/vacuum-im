@@ -655,10 +655,6 @@ Check values and try again</translation>
         <translation>Change Affiliation</translation>
     </message>
     <message>
-        <source>Any occupant is allowed to see the user&apos;s full JID</source>
-        <translation>Any occupant is allowed to see the user&apos;s full JID</translation>
-    </message>
-    <message>
         <source>%1 affiliation changed while not in the room</source>
         <translation>%1 affiliation changed while not in the room</translation>
     </message>
@@ -713,10 +709,6 @@ Check values and try again</translation>
     <message>
         <source>%1 is not valid room JID</source>
         <translation>%1 is not valid room JID</translation>
-    </message>
-    <message>
-        <source>Disconnected</source>
-        <translation>Disconnected</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -1009,6 +1001,18 @@ Check values and try again</translation>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
         <translation>&lt;b&gt;Status:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>This room is non-anonymous</source>
+        <translation>This room is non-anonymous</translation>
+    </message>
+    <message>
+        <source>You entered into the room</source>
+        <translation>You entered into the room</translation>
+    </message>
+    <message>
+        <source>You left the room</source>
+        <translation>You left the room</translation>
     </message>
 </context>
 </TS>

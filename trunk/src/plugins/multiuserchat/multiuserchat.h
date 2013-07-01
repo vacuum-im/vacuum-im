@@ -45,13 +45,15 @@ public:
 	virtual QList<int> statusCodes() const;
 	virtual bool isUserPresent(const Jid &AContactJid) const;
 	virtual IMultiUser *mainUser() const;
-	virtual IMultiUser *userByNick(const QString &ANick) const;
 	virtual QList<IMultiUser *> allUsers() const;
+	virtual IMultiUser *userByNick(const QString &ANick) const;
 	//Occupant
 	virtual QString nickName() const;
 	virtual bool setNickName(const QString &ANick);
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
+	virtual IMultiUserChatHistory history() const;
+	virtual void setHistory(const IMultiUserChatHistory &AHistory);
 	virtual int show() const;
 	virtual QString status() const;
 	virtual XmppError roomError() const;
@@ -147,6 +149,7 @@ private:
 	MultiUser *FMainUser;
 	XmppError FRoomError;
 	QList<int> FStatusCodes;
+	IMultiUserChatHistory FHistory;
 	QHash<QString, MultiUser *> FUsers;
 };
 
