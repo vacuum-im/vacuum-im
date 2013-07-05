@@ -19,10 +19,10 @@
 #include "statusoptionswidget.h"
 
 class AutoStatus :
-			public QObject,
-			public IPlugin,
-			public IAutoStatus,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IAutoStatus,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAutoStatus IOptionsHolder);

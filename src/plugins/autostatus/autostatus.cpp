@@ -29,8 +29,10 @@ void AutoStatus::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(ACCOUNTMANAGER_UUID);
 }
 
-bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool AutoStatus::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
 	{
@@ -65,9 +67,10 @@ bool AutoStatus::initObjects()
 bool AutoStatus::initSettings()
 {
 	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_ENABLED,false);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,15*60);
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,10*60);
 	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_SHOW,IPresence::Away);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,tr("Status changed automatically to 'away'"));
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_PRIORITY,20);
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,tr("Auto status 'Away' due to inactivity for more than #(m) minutes"));
 
 	if (FOptionsManager)
 	{
@@ -117,6 +120,7 @@ IAutoStatusRule AutoStatus::ruleValue(const QUuid &ARuleId) const
 		rule.time = ruleNode.value("time").toInt();
 		rule.show = ruleNode.value("show").toInt();
 		rule.text = ruleNode.value("text").toString();
+		rule.priority = ruleNode.value("priority").toInt();
 	}
 	return rule;
 }
@@ -145,6 +149,7 @@ QUuid AutoStatus::insertRule(const IAutoStatusRule &ARule)
 	ruleNode.setValue(ARule.time,"time");
 	ruleNode.setValue(ARule.show,"show");
 	ruleNode.setValue(ARule.text,"text");
+	ruleNode.setValue(ARule.priority,"priority");
 	emit ruleInserted(ruleId);
 	return ruleId;
 }
@@ -157,6 +162,7 @@ void AutoStatus::updateRule(const QUuid &ARuleId, const IAutoStatusRule &ARule)
 		ruleNode.setValue(ARule.time,"time");
 		ruleNode.setValue(ARule.show,"show");
 		ruleNode.setValue(ARule.text,"text");
+		ruleNode.setValue(ARule.priority,"priority");
 		emit ruleChanged(ARuleId);
 	}
 }
@@ -200,7 +206,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 			prepareRule(rule);
 			if (FAutoStatusId == STATUS_NULL_ID)
 			{
-				FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(STATUS_MAIN_ID));
+				FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,rule.priority);
 				foreach(IAccount *account, FAccountManager->accounts())
 				{
 					if (account->isActive() && account->xmppStream()->isOpen())
@@ -218,7 +224,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 			}
 			else
 			{
-				FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(STATUS_MAIN_ID));
+				FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,rule.priority);
 			}
 		}
 		else
