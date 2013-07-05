@@ -1,0 +1,12 @@
+language: cpp
+compiler:
+ - gcc
+ - clang
+env:
+ - BUILD_SYSTEM=cmake
+ - BUILD_SYSTEM=qmake
+before_install:
+ - sudo apt-get update -qq
+ - sudo apt-get install -qq gdb cmake libqt4-dev qt4-dev-tools libqtcore4 libqtgui4 libqtwebkit-dev openssl libenchant-dev libidn11-dev libx11-dev libxss-dev zlib1g-dev
+# TODO use system minizip https://bugs.launchpad.net/ubuntu/+bug/1182025
+script: export CXXFLAGS="-O2 -fstack-protector --param=ssp-buffer-size=4 -Wformat -Werror=format-security -D_FORTIFY_SOURCE=2" && export LDFLAGS="-Wl,-z,relro -Wl,--as-needed" && mkdir _build && cd _build && sh -c "if [ '$BUILD_SYSTEM' = 'cmake' ]; then rm -r ../src/thirdparty/hunspell ../src/thirdparty/idn ../src/thirdparty/zlib && cmake -DCMAKE_CXX_FLAGS=\"${CXXFLAGS}\" -DCMAKE_SHARED_LINKER_FLAGS=\"${LDFLAGS}\" -DCMAKE_EXE_LINKER_FLAGS=\"${LDFLAGS}\" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DINSTALL_LIB_DIR=lib64 -DINSTALL_SDK=ON -DSPELLCHECKER_BACKEND=enchant ../; else qmake QMAKE_CC=$CC QMAKE_CXX=$CXX CONFIG+=debug_and_release INSTALL_PREFIX=/usr INSTALL_LIB_DIR=lib64 ../vacuum.pro; fi" && make -j2 VERBOSE=1 && sudo make install && du -sc /usr/bin/vacuum /usr/include/vacuum/ /usr/lib64/libvacuumutils.so* /usr/lib*/vacuum/plugins/ /usr/share/vacuum/{resources,translations}/
