@@ -230,6 +230,7 @@
 #define OPV_AUTOSTARTUS_RULE_TIME                       "statuses.autostatus.rule.time"
 #define OPV_AUTOSTARTUS_RULE_SHOW                       "statuses.autostatus.rule.show"
 #define OPV_AUTOSTARTUS_RULE_TEXT                       "statuses.autostatus.rule.text"
+#define OPV_AUTOSTARTUS_RULE_PRIORITY                   "statuses.autostatus.rule.priority"
 
 // StatusIcons
 #define OPV_STATUSICONS                                 "statusicons"
