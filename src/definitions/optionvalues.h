@@ -126,6 +126,8 @@
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
 #define OPV_HISTORY_CAPABILITY_ITEM                     "history.capability"
 #define OPV_HISTORY_CAPABILITY_DEFAULT                  "history.capability.default"
+#define OPV_HISTORY_STREAM_ITEM                         "history.stream"
+#define OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING         "history.stream.force-direct-archiving"
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
 
 // FileMessageArchive

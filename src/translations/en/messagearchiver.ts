@@ -266,6 +266,10 @@
         <source>Add</source>
         <translation>Add</translation>
     </message>
+    <message>
+        <source>Duplicate messages in local archive (not recommended)</source>
+        <translation>Duplicate messages in local archive (not recommended)</translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>

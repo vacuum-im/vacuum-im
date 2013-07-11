@@ -269,6 +269,10 @@
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
+    <message>
+        <source>Duplicate messages in local archive (not recommended)</source>
+        <translation>Дублировать сообщения в локальном архиве (не рекомендуется)</translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>

@@ -285,6 +285,7 @@ ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Ji
 	connect(ui.cmbExpireTime,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbExpireTime->lineEdit(),SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.chbAutoSave,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+	connect(ui.chbForceDirect,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(delegat,SIGNAL(commitData(QWidget *)),SIGNAL(modified()));
 }
 
@@ -347,18 +348,25 @@ void ArchiveStreamOptions::apply()
 		FLastError = XmppError::null;
 		updateWidget();
 	}
+
+	Options::node(OPV_HISTORY_STREAM_ITEM,FStreamJid.pBare()).node("force-direct-archiving").setValue(ui.chbForceDirect->isChecked());
+
 	emit childApply();
 }
 
 void ArchiveStreamOptions::reset()
 {
-	FLastError = XmppError::null;
 	FTableItems.clear();
 	ui.tbwItemPrefs->clearContents();
 	ui.tbwItemPrefs->setRowCount(0);
 	if (FArchiver->isReady(FStreamJid))
 		onArchivePrefsChanged(FStreamJid);
+
+	FLastError = XmppError::null;
 	updateWidget();
+
+	ui.chbForceDirect->setChecked(Options::node(OPV_HISTORY_STREAM_ITEM,FStreamJid.pBare()).value("force-direct-archiving").toBool());
+
 	emit childReset();
 }
 

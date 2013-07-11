@@ -19,7 +19,7 @@
      <property name="title">
       <string>Auto Archiving Preferences</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="margin">
        <number>5</number>
       </property>
@@ -27,6 +27,13 @@
        <widget class="QCheckBox" name="chbAutoSave">
         <property name="text">
          <string>Enable automatic archiving of messages on the server</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chbForceDirect">
+        <property name="text">
+         <string>Duplicate messages in local archive (not recommended)</string>
         </property>
        </widget>
       </item>
