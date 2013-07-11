@@ -228,6 +228,7 @@ bool MessageArchiver::initSettings()
 	Options::setDefaultValue(OPV_ACCOUNT_HISTORYREPLICATION,false);
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_ENABLED,true);
 	Options::setDefaultValue(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE,10);
+	Options::setDefaultValue(OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING,false);
 
 	if (FOptionsManager)
 	{
@@ -899,29 +900,18 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
-	if (!isArchiveAutoSave(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
+	if (!isArchiveAutoSave(AStreamJid) || Options::node(OPV_HISTORY_STREAM_ITEM,AStreamJid.pBare()).value("force-direct-archiving").toBool())
 	{
-		QString errMessage;
-		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
-		if (engine)
+		if (isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
 		{
-			Message message = AMessage;
-			bool directionIn = AItemJid==message.from() || AStreamJid==message.to();
-			if (prepareMessage(AStreamJid,message,directionIn))
+			IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
+			if (engine)
 			{
-				if (!engine->saveMessage(AStreamJid,message,directionIn))
-					errMessage = "Engine failed to save message";
-				else
-					return true;
+				Message message = AMessage;
+				bool directionIn = AItemJid==message.from() || AStreamJid==message.to();
+				if (prepareMessage(AStreamJid,message,directionIn))
+					return engine->saveMessage(AStreamJid,message,directionIn);
 			}
-		}
-		else
-		{
-			errMessage = "Engine not found";
-		}
-		if (!errMessage.isEmpty())
-		{
-			notifyInChatWindow(AStreamJid,AItemJid,QString("Message was not saved to history: %1. Please join to conference xmpp:vacuum@conference.jabber.ru?join to notify developers about this bug!").arg(errMessage));
 		}
 	}
 	return false;
@@ -929,14 +919,17 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 
 bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
-	if (!isArchiveAutoSave(AStreamJid) && isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
+	if (!isArchiveAutoSave(AStreamJid) || Options::node(OPV_HISTORY_STREAM_ITEM,AStreamJid.pBare()).value("force-direct-archiving").toBool())
 	{
-		IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
-		if (engine)
+		if (isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
 		{
-			Message message;
-			message.setTo(AStreamJid.full()).setFrom(AItemJid.full()).setBody(ANote).setThreadId(AThreadId);
-			return engine->saveNote(AStreamJid,message,true);
+			IArchiveEngine *engine = findEngineByCapability(IArchiveEngine::DirectArchiving,AStreamJid);
+			if (engine)
+			{
+				Message message;
+				message.setTo(AStreamJid.full()).setFrom(AItemJid.full()).setBody(ANote).setThreadId(AThreadId);
+				return engine->saveNote(AStreamJid,message,true);
+			}
 		}
 	}
 	return false;

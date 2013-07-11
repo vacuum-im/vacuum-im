@@ -269,6 +269,10 @@
         <source>Add</source>
         <translation>Додати</translation>
     </message>
+    <message>
+        <source>Duplicate messages in local archive (not recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>
