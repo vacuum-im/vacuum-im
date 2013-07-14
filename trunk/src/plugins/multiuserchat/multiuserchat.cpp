@@ -311,8 +311,12 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 		presence.setTo(userJid.full());
 
 		QString showText;
+		bool isConnecting = true;
 		switch (AShow)
 		{
+		case IPresence::Online:
+			showText = QString::null;
+			break;
 		case IPresence::Chat:
 			showText = "chat";
 			break;
@@ -325,9 +329,12 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 		case IPresence::ExtendedAway:
 			showText = "xa";
 			break;
+		default:
+			isConnecting = false;
+			showText = "unavailable";
 		}
 
-		if (AShow == IPresence::Offline || AShow == IPresence::Error || AShow == IPresence::Invisible)
+		if (!isConnecting)
 			presence.setType("unavailable");
 		else if (!showText.isEmpty())
 			presence.addElement("show").appendChild(presence.createTextNode(showText));
@@ -335,9 +342,11 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 		if (!AStatus.isEmpty())
 			presence.addElement("status").appendChild(presence.createTextNode(AStatus));
 
-		if (!isOpen() && AShow!=IPresence::Offline && AShow!=IPresence::Error)
+		if (!isConnected() && isConnecting)
 		{
 			FRoomError = XmppError::null;
+			emit chatAboutToConnect();
+
 			QDomElement xelem = presence.addElement("x",NS_MUC);
 			if (FHistory.empty || FHistory.maxChars>0 || FHistory.maxStanzas>0 || FHistory.seconds>0 || FHistory.since.isValid())
 			{
@@ -363,10 +372,14 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 			if (FDiscovery && !FDiscovery->hasDiscoInfo(streamJid(),roomJid()))
 				FDiscovery->requestDiscoInfo(streamJid(),roomJid());
 		}
+		else if (isConnected() && !isConnecting)
+		{
+			emit chatAboutToDisconnect();
+		}
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
 		{
-			FConnected = presence.type()!="unavailable";
+			FConnected = isConnecting;
 			return true;
 		}
 	}
@@ -916,7 +929,9 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 					delete user;
 				}
 				else
+				{
 					closeChat(show,status);
+				}
 			}
 			accepted = true;
 		}
@@ -947,7 +962,7 @@ void MultiUserChat::closeChat(int AShow, const QString &AStatus)
 	{
 		FMainUser->setData(MUDR_SHOW,AShow);
 		FMainUser->setData(MUDR_STATUS,AStatus);
-		emit userPresence(FMainUser,IPresence::Offline,QString::null);
+		emit userPresence(FMainUser,AShow,AStatus);
 		delete FMainUser;
 	}
 	FMainUser = NULL;

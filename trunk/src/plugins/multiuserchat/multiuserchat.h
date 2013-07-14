@@ -76,9 +76,11 @@ public:
 	virtual bool sendConfigForm(const IDataForm &AForm);
 	virtual bool destroyRoom(const QString &AReason);
 signals:
+	void chatAboutToConnect();
 	void chatOpened();
 	void chatNotify(const QString &ANotify);
 	void chatError(const QString &AMessage);
+	void chatAboutToDisconnect();
 	void chatClosed();
 	void chatDestroyed();
 	void roomNameChanged(const QString &AName);
