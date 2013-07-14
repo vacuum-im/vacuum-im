@@ -12,6 +12,7 @@
 #include <definitions/actiongroups.h>
 #include <definitions/recentitemtypes.h>
 #include <definitions/rosternotifyorders.h>
+#include <definitions/stanzahandlerorders.h>
 #include <definitions/multiuserdataroles.h>
 #include <definitions/multiusertooltiporders.h>
 #include <definitions/notificationtypes.h>
@@ -33,6 +34,7 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/irecentcontacts.h>
+#include <interfaces/istanzaprocessor.h>
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/textmanager.h>
@@ -56,11 +58,12 @@ struct UserStatus {
 class MultiUserChatWindow :
 	public QMainWindow,
 	public IMultiUserChatWindow,
+	public IStanzaHandler,
 	public IMessageHandler,
 	public IMessageEditSendHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IMessageHandler IMessageEditSendHandler);
+	Q_INTERFACES(IMessageWindow IMultiUserChatWindow IMessageTabPage IStanzaHandler IMessageHandler IMessageEditSendHandler);
 public:
 	MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMultiUserChat *AMultiChat);
 	~MultiUserChatWindow();
@@ -89,6 +92,8 @@ public:
 	virtual QString tabPageToolTip() const;
 	virtual IMessageTabPageNotifier *tabPageNotifier() const;
 	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
+	//IStanzaHandler
+	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IMessageEditSendHandler
 	virtual bool messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget);
 	virtual bool messageEditSendProcesse(int AOrder, IMessageEditWidget *AWidget);
@@ -118,7 +123,7 @@ signals:
 	void tabPageDeactivated();
 	void tabPageDestroyed();
 	void tabPageNotifierChanged();
-	// IMessageWindow
+	//IMessageWindow
 	void widgetLayoutChanged();
 	//IMultiUserChatWindow
 	void multiChatContextMenu(Menu *AMenu);
@@ -167,6 +172,7 @@ protected:
 	void closeEvent(QCloseEvent *AEvent);
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
+	void onChatAboutToConnect();
 	void onChatOpened();
 	void onChatNotify(const QString &ANotify);
 	void onChatError(const QString &AMessage);
@@ -229,8 +235,9 @@ private:
 	IStatusIcons *FStatusIcons;
 	IStatusChanger *FStatusChanger;
 	IMultiUserChat *FMultiChat;
-	IMultiUserChatPlugin *FChatPlugin;
+	IMultiUserChatPlugin *FMultiChatPlugin;
 	IRecentContacts *FRecentContacts;
+	IStanzaProcessor *FStanzaProcessor;
 private:
 	IMessageAddress *FAddress;
 	IMessageInfoWidget *FInfoWidget;
@@ -256,11 +263,14 @@ private:
 	Action *FConfigRoom;
 	Action *FDestroyRoom;
 private:
+	int FSHIAnyStanza;
+	QString FLastAffiliation;
+	QDateTime FLastStanzaTime;
+private:
 	int FUsersListWidth;
 	bool FShownDetached;
 	bool FDestroyOnChatClosed;
 	QString FTabPageToolTip;
-	QDateTime FLastMessageTimestamp;
 	QList<int> FActiveMessages;
 	QList<IMessageChatWindow *> FChatWindows;
 	QMap<IMessageChatWindow *, QTimer *> FDestroyTimers;

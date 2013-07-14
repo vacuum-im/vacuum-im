@@ -37,8 +37,9 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FStatusChanger = NULL;
 	FMessageArchiver = NULL;
 	FRecentContacts = NULL;
+	FStanzaProcessor = NULL;
 
-	FChatPlugin = AChatPlugin;
+	FMultiChatPlugin = AChatPlugin;
 	FMultiChat = AMultiChat;
 	FMultiChat->instance()->setParent(this);
 	FMultiChat->setAutoPresence(true);
@@ -50,6 +51,9 @@ MultiUserChatWindow::MultiUserChatWindow(IMultiUserChatPlugin *AChatPlugin, IMul
 	FToolBarWidget = NULL;
 	FStatusBarWidget = NULL;
 	FTabPageNotifier = NULL;
+
+	FSHIAnyStanza = -1;
+	FLastAffiliation = MUC_AFFIL_NONE;
 
 	FShownDetached = false;
 	FDestroyOnChatClosed = false;
@@ -233,6 +237,20 @@ void MultiUserChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 		FTabPageNotifier = ANotifier;
 		emit tabPageNotifierChanged();
 	}
+}
+
+bool MultiUserChatWindow::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
+{
+	Q_UNUSED(AAccept);
+	Q_UNUSED(AStreamJid);
+	if (AHandlerId==FSHIAnyStanza && FMultiChat->roomJid().pBare()==Jid(AStanza.from()).pBare())
+	{
+		if (AStanza.tagName() == "message")
+			FLastStanzaTime = QDateTime::currentDateTime().addSecs(1);
+		else
+			FLastStanzaTime = QDateTime::currentDateTime();
+	}
+	return false;
 }
 
 bool MultiUserChatWindow::messageEditSendPrepare(int AOrder, IMessageEditWidget *AWidget)
@@ -757,7 +775,7 @@ void MultiUserChatWindow::exitAndDestroy(const QString &AStatus, int AWaitClose)
 
 void MultiUserChatWindow::initialize()
 {
-	IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
+	IPlugin *plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
 	{
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
@@ -767,15 +785,15 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageWidgets").value(0,NULL);
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageWidgets").value(0,NULL);
 	if (plugin)
 	{
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
@@ -787,7 +805,7 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
@@ -795,7 +813,7 @@ void MultiUserChatWindow::initialize()
 			FMessageProcessor->insertMessageHandler(MHO_MULTIUSERCHAT_GROUPCHAT,this);
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageStyles").value(0,NULL);
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageStyles").value(0,NULL);
 	if (plugin)
 	{
 		FMessageStyles = qobject_cast<IMessageStyles *>(plugin->instance());
@@ -806,7 +824,7 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageArchiver").value(0,NULL);
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IMessageArchiver").value(0,NULL);
 	if (plugin)
 	{
 		FMessageArchiver = qobject_cast<IMessageArchiver *>(plugin->instance());
@@ -819,15 +837,20 @@ void MultiUserChatWindow::initialize()
 		}
 	}
 
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IRecentContacts").value(0,NULL);
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IRecentContacts").value(0,NULL);
 	if (plugin)
 		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
+
+	plugin = FMultiChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 }
 
 void MultiUserChatWindow::connectMultiChatSignals()
 {
+	connect(FMultiChat->instance(),SIGNAL(chatAboutToConnect()),SLOT(onChatAboutToConnect()));
 	connect(FMultiChat->instance(),SIGNAL(chatOpened()),SLOT(onChatOpened()));
 	connect(FMultiChat->instance(),SIGNAL(chatNotify(const QString &)),SLOT(onChatNotify(const QString &)));
 	connect(FMultiChat->instance(),SIGNAL(chatError(const QString &)), SLOT(onChatError(const QString &)));
@@ -1161,7 +1184,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 		parts.removeFirst();
 		Jid joinRoomJid = Jid::fromUserInput(parts.takeFirst() + "@" + FMultiChat->roomJid().domain());
 		if (joinRoomJid.isValid())
-			FChatPlugin->showJoinMultiChatDialog(streamJid(),joinRoomJid,FMultiChat->nickName(),parts.join(" "));
+			FMultiChatPlugin->showJoinMultiChatDialog(streamJid(),joinRoomJid,FMultiChat->nickName(),parts.join(" "));
 		else
 			showMultiChatStatusMessage(tr("%1 is not valid room JID").arg(joinRoomJid.uBare()),IMessageContentOptions::TypeNotification,IMessageContentOptions::StatusError);
 		hasCommand = true;
@@ -1274,7 +1297,6 @@ void MultiUserChatWindow::setMultiChatMessageStyle()
 			FViewWidget->setMessageStyle(style,soptions);
 		}
 		FWindowStatus[FViewWidget].lastDateSeparator = QDate();
-		FLastMessageTimestamp = QDateTime();
 	}
 }
 
@@ -1419,8 +1441,6 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 	{
 		options.direction = IMessageContentOptions::DirectionOut;
 	}
-
-	FLastMessageTimestamp = qMax<QDateTime>(FLastMessageTimestamp,AMessage.dateTime());
 
 	showDateSeparator(FViewWidget,options.time);
 	FViewWidget->appendMessage(AMessage,options);
@@ -1796,8 +1816,34 @@ bool MultiUserChatWindow::eventFilter(QObject *AObject, QEvent *AEvent)
 	return QMainWindow::eventFilter(AObject,AEvent);
 }
 
+void MultiUserChatWindow::onChatAboutToConnect()
+{
+	IMultiUserChatHistory history;
+	if (FLastStanzaTime.isValid())
+	{
+		if (FLastAffiliation != MUC_AFFIL_NONE)
+			history.seconds = FLastStanzaTime.secsTo(QDateTime::currentDateTime());
+		else
+			history.since = FLastStanzaTime; // Time lost is possible if CAPTCHA enabled
+	}
+	FMultiChat->setHistory(history);
+}
+
 void MultiUserChatWindow::onChatOpened()
 {
+	if (FStanzaProcessor)
+	{
+		IStanzaHandle shandle;
+		shandle.handler = this;
+		shandle.order = qMin(SHO_MI_MULTIUSERCHAT,SHO_PI_MULTIUSERCHAT)-1;
+		shandle.direction = IStanzaHandle::DirectionIn;
+		shandle.streamJid = FMultiChat->streamJid();
+		shandle.conditions.append("/iq");
+		shandle.conditions.append("/message");
+		shandle.conditions.append("/presence");
+		FSHIAnyStanza = FStanzaProcessor->insertStanzaHandle(shandle);
+	}
+
 	if (FMultiChat->statusCodes().contains(MUC_SC_ROOM_CREATED))
 		FMultiChat->requestConfigForm();
 	showMultiChatStatusMessage(tr("You entered into the room"),IMessageContentOptions::TypeEvent,IMessageContentOptions::StatusOnline);
@@ -1815,6 +1861,12 @@ void MultiUserChatWindow::onChatError(const QString &AMessage)
 
 void MultiUserChatWindow::onChatClosed()
 {
+	if (FStanzaProcessor)
+	{
+		FStanzaProcessor->removeStanzaHandle(FSHIAnyStanza);
+		FSHIAnyStanza = -1;
+	}
+
 	if (!FDestroyOnChatClosed)
 	{
 		bool isConflictError = FMultiChat->roomError().toStanzaError().conditionCode()==XmppStanzaError::EC_CONFLICT;
@@ -1825,9 +1877,6 @@ void MultiUserChatWindow::onChatClosed()
 		}
 		else
 		{
-			IMultiUserChatHistory history;
-			history.since = FLastMessageTimestamp.addSecs(1);
-			FMultiChat->setHistory(history);
 			showMultiChatStatusMessage(tr("You left the room"),IMessageContentOptions::TypeEvent,IMessageContentOptions::StatusOffline);
 		}
 		updateMultiChatWindow();
@@ -1910,6 +1959,9 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 
 	if (FMultiChat->isConnected())
 		updateMultiChatWindow();
+
+	if (FMultiChat->mainUser() == AUser)
+		FLastAffiliation = AUser->affiliation();
 
 	IMessageChatWindow *window = findChatWindow(AUser->contactJid());
 	if (window)
