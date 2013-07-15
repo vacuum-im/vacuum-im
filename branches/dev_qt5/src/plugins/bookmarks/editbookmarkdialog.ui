@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EditBookmarkDialogClass</class>
+ <widget class="QDialog" name="EditBookmarkDialogClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>448</width>
+    <height>255</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Edit bookmark</string>
+  </property>
+  <layout class="QVBoxLayout">
+   <property name="margin">
+    <number>3</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <widget class="QLabel" name="lblName">
+       <property name="text">
+        <string>Name:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::PlainText</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lneName"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grbConference">
+     <property name="title">
+      <string>Conference bookmark</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lblRoomJid">
+        <property name="text">
+         <string>Room:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lneRoom"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lblNick">
+        <property name="text">
+         <string>Nick:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="lneNick"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lblPassword">
+        <property name="text">
+         <string>Password:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="lnePassword">
+        <property name="echoMode">
+         <enum>QLineEdit::PasswordEchoOnEdit</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="chbAutoJoin">
+        <property name="text">
+         <string>Auto join</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="grbURL">
+     <property name="title">
+      <string>URL bookmark</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+     <layout class="QHBoxLayout">
+      <item>
+       <widget class="QLabel" name="lblUrl">
+        <property name="text">
+         <string>URL:</string>
+        </property>
+        <property name="textFormat">
+         <enum>Qt::PlainText</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lneUrl"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="bbxButtons">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lneName</tabstop>
+  <tabstop>grbConference</tabstop>
+  <tabstop>lneRoom</tabstop>
+  <tabstop>lneNick</tabstop>
+  <tabstop>lnePassword</tabstop>
+  <tabstop>chbAutoJoin</tabstop>
+  <tabstop>grbURL</tabstop>
+  <tabstop>lneUrl</tabstop>
+  <tabstop>bbxButtons</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>bbxButtons</sender>
+   <signal>rejected()</signal>
+   <receiver>EditBookmarkDialogClass</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>402</x>
+     <y>234</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>emoticons</key>
+    <object mime="image/png">emoticons.png</object>
+  </icon>
+  <icon>
+    <key>emoticonsArrowUp</key>
+    <object mime="image/png">arrowup.png</object>
+  </icon>
+  <icon>
+    <key>emoticonsArrowDown</key>
+    <object mime="image/png">arrowdown.png</object>
+  </icon>
+</icondef>
