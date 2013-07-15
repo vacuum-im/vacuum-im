@@ -200,7 +200,7 @@ void AccountManager::onProfileOpened(const QString &AProfile)
 {
 	Q_UNUSED(AProfile);
 	foreach(IAccount *account, FAccounts)
-		account->setActive(Options::node(OPV_ACCOUNT_ITEM,account->accountId()).value("active").toBool());
+		account->setActive(Options::node(OPV_ACCOUNT_ITEM,account->accountId().toString()).value("active").toBool());
 }
 
 void AccountManager::onProfileClosed(const QString &AProfile)
@@ -208,7 +208,7 @@ void AccountManager::onProfileClosed(const QString &AProfile)
 	Q_UNUSED(AProfile);
 	foreach(IAccount *account, FAccounts)
 	{
-		Options::node(OPV_ACCOUNT_ITEM,account->accountId()).setValue(account->isActive(),"active");
+		Options::node(OPV_ACCOUNT_ITEM,account->accountId().toString()).setValue(account->isActive(),"active");
 		account->setActive(false);
 	}
 }
@@ -272,4 +272,6 @@ void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_accountmanager, AccountManager)
+#endif

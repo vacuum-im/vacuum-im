@@ -2,6 +2,7 @@
 
 #include <QTimer>
 #include <QToolButton>
+#include <utils/QtEscape.h>
 
 #define MAX_TEMP_STATUS_ID                  -10
 
@@ -1276,4 +1277,6 @@ void StatusChanger::onNotificationActivated(int ANotifyId)
 		FNotifications->removeNotification(ANotifyId);
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_statuschanger, StatusChanger)
+#endif

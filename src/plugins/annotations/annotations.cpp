@@ -2,6 +2,7 @@
 
 #include <QClipboard>
 #include <QApplication>
+#include <utils/QtEscape.h>
 
 #define PST_ANNOTATIONS       "storage"
 #define PSN_ANNOTATIONS       "storage:rosternotes"
@@ -455,4 +456,6 @@ void Annotations::onEditNoteDialogDestroyed()
 		FEditDialogs[dialog->streamJid()].remove(dialog->contactJid());
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_annotations, Annotations)
+#endif

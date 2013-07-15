@@ -165,4 +165,6 @@ void MainWindowPlugin::onTrayNotifyActivated(int ANotifyId, QSystemTrayIcon::Act
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_mainwindow, MainWindowPlugin)
+#endif

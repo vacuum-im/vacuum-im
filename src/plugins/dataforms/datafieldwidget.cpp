@@ -2,6 +2,7 @@
 
 #include <QFocusEvent>
 #include <QVBoxLayout>
+#include <utils/QtEscape.h>
 
 DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AField, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {

@@ -2,6 +2,7 @@
 
 #include <QMouseEvent>
 #include <QApplication>
+#include <utils/QtEscape.h>
 
 #define HISTORY_MESSAGES          10
 #define HISTORY_TIME_DELTA        5
@@ -1009,4 +1010,6 @@ void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOpti
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_chatmessagehandler, ChatMessageHandler)
+#endif

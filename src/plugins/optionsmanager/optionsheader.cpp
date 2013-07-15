@@ -1,6 +1,6 @@
 #include "optionsheader.h"
 
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 OptionsHeader::OptionsHeader(const QString &ACaption, QWidget *AParent) : QLabel(AParent)
 {

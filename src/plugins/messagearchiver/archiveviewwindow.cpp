@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QItemSelectionModel>
 #include <QNetworkAccessManager>
+#include <utils/QtEscape.h>
 
 enum HistoryItemType {
 	HIT_CONTACT,

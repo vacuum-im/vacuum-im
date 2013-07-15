@@ -176,4 +176,6 @@ void IqAuthPlugin::onFeatureDestroyed()
 		emit featureDestroyed(feature);
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_iqauth, IqAuthPlugin)
+#endif

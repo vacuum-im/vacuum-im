@@ -31,6 +31,9 @@ class AccountManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAccountManager IOptionsHolder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IAccountManager");
+#endif
 public:
 	AccountManager();
 	~AccountManager();

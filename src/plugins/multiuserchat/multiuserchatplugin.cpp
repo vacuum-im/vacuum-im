@@ -4,6 +4,7 @@
 #include <QInputDialog>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_HOST                  Action::DR_Parametr1
@@ -1486,4 +1487,6 @@ void MultiUserChatPlugin::onInviteActionTriggered(bool)
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_multiuserchat, MultiUserChatPlugin)
+#endif

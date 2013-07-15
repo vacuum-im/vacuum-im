@@ -4,7 +4,7 @@
 #include <QClipboard>
 #include <QScrollBar>
 #include <QApplication>
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 #define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
@@ -852,4 +852,6 @@ void RostersViewPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_rostersview, RostersViewPlugin)
+#endif

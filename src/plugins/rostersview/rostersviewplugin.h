@@ -43,6 +43,9 @@ class RostersViewPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder IRosterDataHolder IRostersLabelHolder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRostersViewPlugin");
+#endif
 public:
 	RostersViewPlugin();
 	~RostersViewPlugin();

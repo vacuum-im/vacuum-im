@@ -17,6 +17,9 @@ class RosterPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterPlugin);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterPlugin");
+#endif
 public:
 	RosterPlugin();
 	~RosterPlugin();

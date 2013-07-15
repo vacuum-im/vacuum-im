@@ -26,6 +26,9 @@ class BitsOfBinary :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IBitsOfBinary IXmppStanzaHadler IStanzaHandler IStanzaRequestOwner);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IBitsOfBinary");
+#endif
 public:
 	BitsOfBinary();
 	~BitsOfBinary();

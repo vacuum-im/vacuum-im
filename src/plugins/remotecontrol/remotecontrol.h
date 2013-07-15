@@ -28,6 +28,9 @@ class RemoteControl :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICommandServer IStanzaHandler IDataLocalizer);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.RemoteControl");
+#endif
 public:
 	RemoteControl();
 	~RemoteControl();

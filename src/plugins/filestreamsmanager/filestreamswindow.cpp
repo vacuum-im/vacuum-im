@@ -38,7 +38,11 @@ FileStreamsWindow::FileStreamsWindow(IFileStreamsManager *AManager, QWidget *APa
 	FProxy.setSortLocaleAware(true);
 
 	ui.tbvStreams->setModel(&FProxy);
+#if QT_VERSION < 0x050000
 	ui.tbvStreams->verticalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+#else
+	ui.tbvStreams->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
 	connect(ui.tbvStreams,SIGNAL(activated(const QModelIndex &)),SLOT(onTableIndexActivated(const QModelIndex &)));
 
 	connect(FManager->instance(),SIGNAL(streamCreated(IFileStream *)),SLOT(onStreamCreated(IFileStream *)));
@@ -63,7 +67,11 @@ void FileStreamsWindow::initialize()
 	FStreamsModel.setHorizontalHeaderLabels(QStringList()<<tr("File Name")<<tr("State")<<tr("Size")<<tr("Progress")<<tr("Speed"));
 
 	for (int column=0; column<CMN_COUNT; column++)
+#if QT_VERSION < 0x050000
 		ui.tbvStreams->horizontalHeader()->setResizeMode(column,column!=CMN_FILENAME ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
+#else
+		ui.tbvStreams->horizontalHeader()->setSectionResizeMode(column,column!=CMN_FILENAME ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
+#endif
 
 	foreach(IFileStream *stream, FManager->streams()) {
 		appendStream(stream); }

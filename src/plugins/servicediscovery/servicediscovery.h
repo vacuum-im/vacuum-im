@@ -71,6 +71,9 @@ class ServiceDiscovery :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IServiceDiscovery IStanzaHandler IStanzaRequestOwner IXmppUriHandler IRostersClickHooker IDiscoHandler IDiscoFeatureHandler);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IServiceDiscovery");
+#endif
 public:
 	ServiceDiscovery();
 	~ServiceDiscovery();

@@ -4,7 +4,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 #define DR_NAME       Qt::UserRole
 #define DR_INDEX      Qt::UserRole+1
@@ -216,16 +216,16 @@ QString EditListsDialog::ruleName(const IPrivacyRule &ARule)
 	{
 		return tr("%1: if %2 = '%3' then %4 [%5 ]")
 		       .arg(ARule.order)
-		       .arg(tr(ARule.type.toAscii()))
+			   .arg(tr(ARule.type.toLatin1()))
 		       .arg(ARule.value)
-		       .arg(!ARule.action.isEmpty() ? tr(ARule.action.toAscii()) : tr("<action>"))
+			   .arg(!ARule.action.isEmpty() ? tr(ARule.action.toLatin1()) : tr("<action>"))
 		       .arg(stanzas);
 	}
 	else
 	{
 		return tr("%1: always %2 [%3 ]")
 		       .arg(ARule.order)
-		       .arg(!ARule.action.isEmpty() ? tr(ARule.action.toAscii()) : tr("<action>"))
+			   .arg(!ARule.action.isEmpty() ? tr(ARule.action.toLatin1()) : tr("<action>"))
 		       .arg(stanzas);
 	}
 	return QString::null;

@@ -1,5 +1,7 @@
 #include "clientinfodialog.h"
 
+#include <utils/QtEscape.h>
+
 ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid,
                                    const QString &AContactName, int AInfoTypes, QWidget *AParent) : QDialog(AParent)
 {

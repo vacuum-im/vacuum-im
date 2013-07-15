@@ -140,4 +140,6 @@ void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, const Options
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_inbandstreams, InBandStreams);
+#endif

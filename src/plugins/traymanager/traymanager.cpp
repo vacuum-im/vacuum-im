@@ -222,4 +222,6 @@ void TrayManager::onApplicationShutdownStarted()
 	FSystemIcon.hide();
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_traymanager, TrayManager)
+#endif

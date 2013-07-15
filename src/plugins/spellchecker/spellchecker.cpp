@@ -332,4 +332,6 @@ void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_spellchecker, SpellChecker)
+#endif

@@ -42,6 +42,9 @@ class Avatars :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner IOptionsHolder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IAvatars");
+#endif
 public:
 	Avatars();
 	~Avatars();

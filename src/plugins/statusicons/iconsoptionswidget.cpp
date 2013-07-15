@@ -147,11 +147,20 @@ void IconsOptionsWidget::populateRulesTable(QTableWidget *ATable, IStatusIcons::
 		ATable->insertRow(row);
 		ATable->setItem(row,0,rulePattern);
 		ATable->setItem(row,1,ruleStorage);
+#if QT_VERSION < 0x050000
 		ATable->verticalHeader()->setResizeMode(row,QHeaderView::ResizeToContents);
+#else
+		ATable->verticalHeader()->setSectionResizeMode(row,QHeaderView::ResizeToContents);
+#endif
 		row++;
 	}
+#if QT_VERSION < 0x050000
 	ATable->horizontalHeader()->setResizeMode(0,QHeaderView::Interactive);
 	ATable->horizontalHeader()->setResizeMode(1,QHeaderView::Stretch);
+#else
+	ATable->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Interactive);
+	ATable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+#endif
 	ATable->verticalHeader()->hide();
 }
 
@@ -166,7 +175,11 @@ void IconsOptionsWidget::onAddUserRule()
 	ui.twtUserRules->insertRow(row);
 	ui.twtUserRules->setItem(row,0,rulePattern);
 	ui.twtUserRules->setItem(row,1,ruleStorage);
+#if QT_VERSION < 0x050000
 	ui.twtUserRules->verticalHeader()->setResizeMode(row,QHeaderView::ResizeToContents);
+#else
+	ui.twtUserRules->verticalHeader()->setSectionResizeMode(row,QHeaderView::ResizeToContents);
+#endif
 	emit modified();
 }
 

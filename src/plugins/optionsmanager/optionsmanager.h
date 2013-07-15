@@ -44,6 +44,9 @@ class OptionsManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsManager IOptionsHolder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.OptionsManager");
+#endif
 public:
 	OptionsManager();
 	~OptionsManager();

@@ -383,4 +383,6 @@ void BirthdayReminder::onOptionsClosed()
 	Options::setFileValue(notified,"birthdays.notify.notified");
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_birthdayreminder, BirthdayReminder)
+#endif

@@ -545,4 +545,6 @@ void ServerMessageArchive::onServerModificationsLoaded(const QString &AId, const
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_servermessagearchive, ServerMessageArchive)
+#endif

@@ -123,9 +123,15 @@ void DiscoInfoWindow::updateWindow()
 		ui.lblError->setVisible(false);
 	}
 
+#if QT_VERSION < 0x050000
 	ui.twtIdentity->horizontalHeader()->setResizeMode(0,QHeaderView::ResizeToContents);
 	ui.twtIdentity->horizontalHeader()->setResizeMode(1,QHeaderView::ResizeToContents);
 	ui.twtIdentity->horizontalHeader()->setResizeMode(2,QHeaderView::Stretch);
+#else
+	ui.twtIdentity->horizontalHeader()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+	ui.twtIdentity->horizontalHeader()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
+	ui.twtIdentity->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
+#endif
 
 	ui.pbtUpdate->setEnabled(true);
 }

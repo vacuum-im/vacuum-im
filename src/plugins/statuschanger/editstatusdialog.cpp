@@ -8,6 +8,7 @@
 #include <QInputDialog>
 #include <QTextDocument>
 #include <QTableWidgetItem>
+#include <utils/QtEscape.h>
 
 #define TIR_STATUSID    Qt::UserRole
 #define TIR_DELEGATE    Qt::UserRole + 1
@@ -222,10 +223,18 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 		row++;
 	}
 
+
+#if QT_VERSION < 0x050000
 	tblStatus->horizontalHeader()->setResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
 	tblStatus->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
 	tblStatus->horizontalHeader()->setResizeMode(COL_MESSAGE,QHeaderView::Stretch);
 	tblStatus->horizontalHeader()->setResizeMode(COL_PRIORITY,QHeaderView::ResizeToContents);
+#else
+	tblStatus->horizontalHeader()->setSectionResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
+	tblStatus->horizontalHeader()->setSectionResizeMode(COL_NAME,QHeaderView::ResizeToContents);
+	tblStatus->horizontalHeader()->setSectionResizeMode(COL_MESSAGE,QHeaderView::Stretch);
+	tblStatus->horizontalHeader()->setSectionResizeMode(COL_PRIORITY,QHeaderView::ResizeToContents);
+#endif
 
 	connect(pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddbutton(bool)));
 	connect(pbtDelete,SIGNAL(clicked(bool)),SLOT(onDeleteButton(bool)));

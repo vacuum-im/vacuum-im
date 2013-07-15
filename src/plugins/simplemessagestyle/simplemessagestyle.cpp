@@ -8,6 +8,7 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 #include <QTextDocumentFragment>
+#include <utils/QtEscape.h>
 
 #define SCROLL_TIMEOUT                      100
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR

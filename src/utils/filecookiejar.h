@@ -2,6 +2,7 @@
 #define FILECOOKIEJAR_H
 
 #include <QNetworkCookieJar>
+#include <QNetworkCookie>
 #include "utilsexport.h"
 
 class UTILS_EXPORT FileCookieJar : 

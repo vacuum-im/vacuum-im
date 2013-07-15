@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QImageReader>
+#include <utils/QtEscape.h>
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
 {

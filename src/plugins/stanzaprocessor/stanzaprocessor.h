@@ -28,6 +28,9 @@ class StanzaProcessor :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStanzaProcessor IXmppStanzaHadler);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IStanzaProcessor");
+#endif
 public:
 	StanzaProcessor();
 	~StanzaProcessor();

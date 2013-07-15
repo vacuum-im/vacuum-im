@@ -1097,4 +1097,6 @@ uint qHash(const QUrl &key)
 }
 #endif
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_dataforms, DataForms);
+#endif

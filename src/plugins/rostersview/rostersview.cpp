@@ -1,18 +1,20 @@
 #include "rostersview.h"
 
-#include <QCursor>
-#include <QToolTip>
-#include <QPainter>
-#include <QDropEvent>
-#include <QHelpEvent>
-#include <QClipboard>
-#include <QHeaderView>
-#include <QResizeEvent>
 #include <QApplication>
-#include <QDragMoveEvent>
+#include <QClipboard>
+#include <QContextMenuEvent>
+#include <QCursor>
+#include <QDrag>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
-#include <QContextMenuEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QHeaderView>
+#include <QHelpEvent>
+#include <QMimeData>
+#include <QPainter>
+#include <QResizeEvent>
+#include <QToolTip>
 
 #define BLINK_VISIBLE_TIME      750
 #define BLINK_INVISIBLE_TIME    250

@@ -2,6 +2,7 @@
 
 #include <QVariant>
 #include <QTextCursor>
+#include <utils/QtEscape.h>
 
 #define SHC_MESSAGE         "/message"
 
@@ -420,4 +421,6 @@ void MessageProcessor::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Ji
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_messageprocessor, MessageProcessor)
+#endif

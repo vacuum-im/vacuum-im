@@ -1,10 +1,12 @@
 #include "recentcontacts.h"
 
 #include <QDir>
+#include <QDrag>
 #include <QFile>
-#include <QStyle>
-#include <QPalette>
+#include <QMimeData>
 #include <QMouseEvent>
+#include <QPalette>
+#include <QStyle>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>
@@ -1528,4 +1530,6 @@ uint qHash(const IRecentItem &AKey)
 	return qHash(AKey.type+"~"+AKey.streamJid.pFull()+"~"+AKey.reference);
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_recentcontacts, RecentContacts)
+#endif

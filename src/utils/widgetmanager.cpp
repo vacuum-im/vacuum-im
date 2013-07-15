@@ -4,8 +4,8 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
-#ifdef Q_WS_X11
-	#include <QX11Info>
+#ifdef Q_OS_LINUX
+#include "qx11info_x11.h"
 	#include <X11/Xutil.h>
 	#include <X11/Xlib.h>
 	#include <X11/Xatom.h>
@@ -146,7 +146,7 @@ WidgetManager *WidgetManager::instance()
 
 void WidgetManager::raiseWidget(QWidget *AWidget)
 {
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
 	static Atom         NET_ACTIVE_WINDOW = 0;
 	XClientMessageEvent xev;
 

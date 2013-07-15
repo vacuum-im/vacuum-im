@@ -17,6 +17,9 @@ class SpellChecker :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ISpellChecker);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ISpellChecker");
+#endif
 public:
 	SpellChecker();
 	~SpellChecker();

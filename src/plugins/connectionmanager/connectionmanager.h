@@ -30,6 +30,9 @@ class ConnectionManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IConnectionManager IOptionsHolder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IConnectionManager");
+#endif
 public:
 	ConnectionManager();
 	~ConnectionManager();

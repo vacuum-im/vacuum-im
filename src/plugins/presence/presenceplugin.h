@@ -14,6 +14,9 @@ class PresencePlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPresencePlugin);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IPresencePlugin");
+#endif
 public:
 	PresencePlugin();
 	~PresencePlugin();

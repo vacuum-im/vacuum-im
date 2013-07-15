@@ -3,7 +3,7 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 #include <QDesktopServices>
 
 enum TableColumns
@@ -24,9 +24,14 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	updateLanguage();
 	connect(ui.cmbLanguage,SIGNAL(currentIndexChanged(int)),SLOT(onCurrentLanguageChanged(int)));
 
-	updatePlugins();
+	updatePlugins(); 
+#if QT_VERSION < 0x050000
 	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::Stretch);
 	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_FILE,QHeaderView::ResizeToContents);
+#else
+	ui.twtPlugins->horizontalHeader()->setSectionResizeMode(COL_NAME,QHeaderView::Stretch);
+	ui.twtPlugins->horizontalHeader()->setSectionResizeMode(COL_FILE,QHeaderView::ResizeToContents);
+#endif
 	connect(ui.twtPlugins,SIGNAL(currentItemChanged(QTableWidgetItem *, QTableWidgetItem *)),SLOT(onCurrentPluginChanged(QTableWidgetItem *, QTableWidgetItem *)));
 
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));

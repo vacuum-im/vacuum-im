@@ -2,6 +2,7 @@
 
 #include <QSet>
 #include <QMessageBox>
+#include <utils/QtEscape.h>
 
 AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {

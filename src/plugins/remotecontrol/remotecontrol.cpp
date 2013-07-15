@@ -713,4 +713,6 @@ QList<Message> RemoteControl::notifiedMessages(const Jid &AStreamJid, const Jid 
 	return messages;
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_remotecontrol, RemoteControl)
+#endif

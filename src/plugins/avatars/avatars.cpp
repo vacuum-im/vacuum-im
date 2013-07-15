@@ -273,7 +273,7 @@ void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		if (AStanza.type() == "result")
 		{
 			QDomElement dataElem = AStanza.firstElement("query",NS_JABBER_IQ_AVATAR).firstChildElement("data");
-			QByteArray avatarData = QByteArray::fromBase64(dataElem.text().toAscii());
+			QByteArray avatarData = QByteArray::fromBase64(dataElem.text().toLatin1());
 			if (!avatarData.isEmpty())
 			{
 				QString hash = saveAvatarData(avatarData);
@@ -874,4 +874,6 @@ inline bool operator<(const QSize &ASize1, const QSize &ASize2)
 	return ASize1.width()==ASize2.width() ? ASize1.height()<ASize2.height() : ASize1.width()<ASize2.width();
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_avatars, Avatars)
+#endif

@@ -2,7 +2,7 @@
 
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 #define COL_NAME                0
 #define COL_JID                 1
@@ -13,8 +13,13 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
 	FManager = AManager;
 
 	ui.trwAccounts->setHeaderLabels(QStringList() << tr("Name") << tr("Jabber ID"));
+#if QT_VERSION < 0x050000
 	ui.trwAccounts->header()->setResizeMode(COL_NAME, QHeaderView::ResizeToContents);
 	ui.trwAccounts->header()->setResizeMode(COL_JID, QHeaderView::Stretch);
+#else
+	ui.trwAccounts->header()->setSectionResizeMode(COL_NAME, QHeaderView::ResizeToContents);
+	ui.trwAccounts->header()->setSectionResizeMode(COL_JID, QHeaderView::Stretch);
+#endif
 	ui.trwAccounts->sortByColumn(COL_NAME,Qt::AscendingOrder);
 	connect(ui.trwAccounts,SIGNAL(itemChanged(QTreeWidgetItem *, int)),SIGNAL(modified()));
 
@@ -29,8 +34,8 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
 
 AccountsOptions::~AccountsOptions()
 {
-	foreach(QString accountId, FAccountItems.keys())
-		if (FManager->accountById(accountId) == NULL)
+	foreach(QUuid accountId, FAccountItems.keys())
+		if (FManager->accountById(accountId.toString()) == NULL)
 			removeAccount(accountId);
 }
 

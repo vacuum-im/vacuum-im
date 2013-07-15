@@ -9,6 +9,10 @@
 #include <QTextDocument>
 #include <QTextDocumentWriter>
 
+#ifdef HAVE_QT5
+#  include <QUrlQuery>
+#endif
+
 #define ADR_QUOTE_WINDOW        Action::DR_Parametr1
 #define ADR_CONTEXT_DATA        Action::DR_Parametr1
 
@@ -648,7 +652,13 @@ void MessageWidgets::onViewContextSearchActionTriggered(bool)
 	{
 		QString domain = tr("google.com","Your google domain");
 		QUrl url = QString("http://www.%1/search").arg(domain);
+#if QT_VERSION < 0x050000
 		url.setQueryItems(QList<QPair<QString,QString> >() << qMakePair<QString,QString>(QString("q"),action->data(ADR_CONTEXT_DATA).toString()));
+#else
+		QUrlQuery query;
+		query.setQueryItems(QList<QPair<QString,QString> >() << qMakePair<QString,QString>(QString("q"),action->data(ADR_CONTEXT_DATA).toString()));
+		url.setQuery(query);
+#endif
 		QDesktopServices::openUrl(url);
 	}
 }
@@ -842,4 +852,6 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_messagewidgets, MessageWidgets)
+#endif

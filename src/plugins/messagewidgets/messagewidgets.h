@@ -44,6 +44,9 @@ class MessageWidgets :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IMessageViewUrlHandler IMessageEditContentsHandler);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageWidgets");
+#endif
 public:
 	MessageWidgets();
 	~MessageWidgets();

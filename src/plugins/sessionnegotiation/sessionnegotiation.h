@@ -33,6 +33,9 @@ class SessionNegotiation :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ISessionNegotiation IStanzaHandler IDiscoFeatureHandler ISessionNegotiator IDataLocalizer);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ISessionNegotiation");
+#endif
 public:
 	SessionNegotiation();
 	~SessionNegotiation();

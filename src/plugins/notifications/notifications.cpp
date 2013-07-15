@@ -739,4 +739,6 @@ void Notifications::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_notifications, Notifications)
+#endif

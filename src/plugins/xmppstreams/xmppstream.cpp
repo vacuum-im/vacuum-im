@@ -1,6 +1,6 @@
 #include "xmppstream.h"
 
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObject(AXmppStreams->instance())
 {

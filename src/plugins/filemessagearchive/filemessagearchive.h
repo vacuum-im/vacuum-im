@@ -19,6 +19,9 @@ class FileMessageArchive :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IArchiveEngine IFileMessageArchive);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IFileMessageArchive");
+#endif
 public:
 	FileMessageArchive();
 	~FileMessageArchive();

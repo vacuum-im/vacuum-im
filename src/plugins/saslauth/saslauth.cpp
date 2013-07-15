@@ -73,7 +73,7 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			if (FChallengeStep == 0)
 			{
 				FChallengeStep++;
-				QMap<QByteArray, QByteArray> challengeMap = parseChallenge(QByteArray::fromBase64(AStanza.element().text().toAscii()));
+				QMap<QByteArray, QByteArray> challengeMap = parseChallenge(QByteArray::fromBase64(AStanza.element().text().toLatin1()));
 
 				QMap<QByteArray, QByteArray> responseMap;
 				QByteArray randBytes(32,' ');

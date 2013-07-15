@@ -1,13 +1,15 @@
 #include "rosterchanger.h"
 
-#include <QMap>
-#include <QDropEvent>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QInputDialog>
 #include <QItemEditorFactory>
+#include <QMap>
+#include <QMessageBox>
+#include <QMimeData>
+#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_CONTACT_JID             Action::DR_Parametr1
@@ -1979,4 +1981,6 @@ void RosterChanger::onSubscriptionDialogDestroyed()
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_rosterchanger, RosterChanger)
+#endif

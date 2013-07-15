@@ -1,12 +1,13 @@
 #include "streamdialog.h"
 
-#include <QUrl>
+#include <QDesktopServices>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QFileDialog>
+#include <QUrl>
 #include <QVBoxLayout>
-#include <QDesktopServices>
+#include <utils/QtEscape.h>
 
 StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
 {

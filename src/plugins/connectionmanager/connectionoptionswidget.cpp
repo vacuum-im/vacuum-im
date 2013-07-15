@@ -53,7 +53,7 @@ void ConnectionOptionsWidget::setPluginById(const QString &APluginId)
 			FPluginSettings->instance()->setParent(NULL);
 			delete FPluginSettings->instance();
 			FPluginSettings = NULL;
-			FPluginId = QUuid();
+			FPluginId = QUuid().toString();
 		}
 
 		IConnectionPlugin *plugin = FManager->pluginById(APluginId);
@@ -80,5 +80,5 @@ void ConnectionOptionsWidget::onComboConnectionsChanged(int AIndex)
 	if (AIndex != -1)
 		setPluginById(ui.cmbConnections->itemData(AIndex).toString());
 	else
-		setPluginById(QUuid());
+		setPluginById(QUuid().toString());
 }

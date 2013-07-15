@@ -8,6 +8,7 @@
 #include <QTabWidget>
 #include <QTextDocument>
 #include <QMessageBox>
+#include <utils/QtEscape.h>
 
 class ScrollArea : 
    public QScrollArea

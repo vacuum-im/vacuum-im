@@ -60,3 +60,8 @@ SOURCES  = jid.cpp \
            advanceditemdelegate.cpp \
            filecookiejar.cpp \
            boxwidget.cpp
+
+unix:!mac:!haiku {
+  HEADERS += qx11info_x11.h
+  SOURCES += qx11info_x11.cpp
+}

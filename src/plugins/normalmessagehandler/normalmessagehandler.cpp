@@ -2,6 +2,7 @@
 
 #include <QLineEdit>
 #include <QMouseEvent>
+#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
@@ -1095,4 +1096,6 @@ void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOp
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_normalmessagehandler, NormalMessageHandler)
+#endif

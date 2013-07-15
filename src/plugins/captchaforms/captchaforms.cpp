@@ -1,6 +1,6 @@
 #include "captchaforms.h"
 
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 #define SHC_MESSAGE_CAPTCHA         "/message/captcha[@xmlns='" NS_CAPTCHA_FORMS "']"
 
@@ -435,4 +435,6 @@ void CaptchaForms::onNotificationRemoved(int ANotifyId)
 	FChallengeNotify.remove(ANotifyId);
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_captchaforms, CaptchaForms)
+#endif

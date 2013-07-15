@@ -668,5 +668,6 @@ void OptionsManager::onApplicationAboutToQuit()
 {
 	closeProfile();
 }
-
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_optionsmanager, OptionsManager)
+#endif

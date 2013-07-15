@@ -62,4 +62,6 @@ void StartTLSPlugin::onFeatureDestroyed()
 		emit featureDestroyed(feature);
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_starttls, StartTLSPlugin)
+#endif

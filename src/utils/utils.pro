@@ -7,6 +7,10 @@ CONFIG            += dll
 QT                += xml network
 DEFINES           += UTILS_DLL QXT_STATIC
 
+isEqual(QT_MAJOR_VERSION, 5) {
+	QT += gui-private
+}
+
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
 

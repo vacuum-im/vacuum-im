@@ -29,6 +29,9 @@ class DataForms :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IDataForms);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IDataForms");
+#endif
 public:
 	DataForms();
 	~DataForms();

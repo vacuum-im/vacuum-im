@@ -284,4 +284,6 @@ void AutoStatus::onProfileClosed(const QString &AName)
 	setActiveRule(QUuid());
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_autostatus, AutoStatus)
+#endif

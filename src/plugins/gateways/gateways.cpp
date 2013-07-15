@@ -1,7 +1,7 @@
 #include "gateways.h"
 
 #include <QMessageBox>
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 #define GATEWAY_TIMEOUT           30000
 
@@ -1047,4 +1047,6 @@ void Gateways::onRegisterError(const QString &AId, const XmppError &AError)
 	FShowRegisterRequests.remove(AId);
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_gateways, Gateways)
+#endif

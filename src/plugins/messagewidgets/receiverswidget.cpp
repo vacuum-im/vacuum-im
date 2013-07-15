@@ -4,10 +4,15 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QDomDocument>
+#include <utils/QtEscape.h>
 
 #define ADR_ITEMS                  Action::DR_Parametr1
 
 #define RIDR_ITEM_COLLAPSED        RDR_USER_ROLE+111
+
+#ifdef HAVE_QT5
+  Q_DECLARE_METATYPE(QList<QStandardItem *>)
+#endif
 
 ReceiversSortSearchProxyModel::ReceiversSortSearchProxyModel(QObject *AParent) : QSortFilterProxyModel(AParent)
 {
@@ -1067,4 +1072,6 @@ void ReceiversWidget::onStartSearchContacts()
 		restoreExpandState(QList<QStandardItem *>() << FModel->invisibleRootItem());
 }
 
+#ifndef HAVE_QT5
 Q_DECLARE_METATYPE(QList<QStandardItem *>);
+#endif

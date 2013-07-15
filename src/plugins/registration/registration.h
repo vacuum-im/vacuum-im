@@ -42,6 +42,9 @@ class Registration :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IOptionsHolder IDataLocalizer);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRegistration");
+#endif
 public:
 	Registration();
 	~Registration();

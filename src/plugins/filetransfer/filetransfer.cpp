@@ -3,6 +3,8 @@
 #include <QDir>
 #include <QTimer>
 #include <QFileInfo>
+#include <QMimeData>
+#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_CONTACT_JID               Action::DR_Parametr1
@@ -748,4 +750,6 @@ void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_filetransfer, FileTransfer);
+#endif

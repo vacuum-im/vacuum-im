@@ -1,13 +1,14 @@
 #include "multiuserchatwindow.h"
 
+#include <QContextMenuEvent>
+#include <QCoreApplication>
+#include <QInputDialog>
+#include <QKeyEvent>
 #include <QPair>
+#include <QResizeEvent>
 #include <QTimer>
 #include <QToolTip>
-#include <QKeyEvent>
-#include <QResizeEvent>
-#include <QInputDialog>
-#include <QCoreApplication>
-#include <QContextMenuEvent>
+#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_ROOM_JID                Action::DR_Parametr1

@@ -18,6 +18,9 @@ class MessageCarbons :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageCarbons IStanzaHandler IStanzaRequestOwner);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageCarbons");
+#endif
 public:
 	MessageCarbons();
 	~MessageCarbons();

@@ -19,6 +19,9 @@ class MessageProcessor :
 {
 	Q_OBJECT
 	Q_INTERFACES(IPlugin IMessageProcessor IMessageWriter IStanzaHandler)
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageProcessor");
+#endif
 public:
 	MessageProcessor();
 	~MessageProcessor();

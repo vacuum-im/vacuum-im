@@ -1,8 +1,8 @@
 #include "sessionnegotiation.h"
 
 #include <QUuid>
-#include <QTextDocument>
 #include <QCryptographicHash>
+#include <utils/QtEscape.h>
 
 #define SHC_STANZA_SESSION            "/message/feature[@xmlns='"NS_FEATURENEG"']"
 
@@ -1242,4 +1242,6 @@ void SessionNegotiation::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_sessionnegotiation, SessionNegotiation)
+#endif

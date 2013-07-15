@@ -325,4 +325,6 @@ void SocksStreams::onServerConnectionDisconnected()
 		tcpsocket->deleteLater();
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_socksstreams, SocksStreams);
+#endif

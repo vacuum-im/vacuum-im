@@ -3,6 +3,7 @@
 #include <QRegExp>
 #include <QLineEdit>
 #include <QInputDialog>
+#include <utils/QtEscape.h>
 
 #define MAX_HILIGHT_ITEMS            10
 #define TEXT_SEARCH_TIMEOUT          500

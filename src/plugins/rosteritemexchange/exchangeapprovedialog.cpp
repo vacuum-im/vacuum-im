@@ -24,7 +24,11 @@ ExchangeApproveDialog::ExchangeApproveDialog(IRoster *ARoster, const IRosterExch
 	ui.tbwItems->setTextElideMode(Qt::ElideNone);
 	ui.tbwItems->setColumnCount(COL_COUNT);
 	ui.tbwItems->setHorizontalHeaderLabels(QStringList()<<tr("Modification"));
+#if QT_VERSION < 0x050000
 	ui.tbwItems->horizontalHeader()->setResizeMode(COL_ACTION,QHeaderView::Stretch);
+#else
+	ui.tbwItems->horizontalHeader()->setSectionResizeMode(COL_ACTION,QHeaderView::Stretch);
+#endif
 
 	ui.chbSubscribe->setChecked(true);
 	ui.chbSubscribe->setVisible(false);
@@ -147,7 +151,11 @@ void ExchangeApproveDialog::appendRequestItems(const QList<IRosterExchangeItem> 
 
 			ui.tbwItems->setRowCount(ui.tbwItems->rowCount()+1);
 			ui.tbwItems->setItem(ui.tbwItems->rowCount()-1,COL_ACTION,actionItem);
+#if QT_VERSION < 0x050000
 			ui.tbwItems->verticalHeader()->setResizeMode(actionItem->row(),QHeaderView::ResizeToContents);
+#else
+			ui.tbwItems->verticalHeader()->setSectionResizeMode(actionItem->row(),QHeaderView::ResizeToContents);
+#endif
 
 			FItems.insert(actionItem,*it);
 		}

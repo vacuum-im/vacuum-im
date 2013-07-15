@@ -59,7 +59,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	Shortcuts::insertWidgetShortcut(SCT_TABWINDOW_DETACHTAB,this);
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
-	FOptionsNode = Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId);
+	FOptionsNode = Options::node(OPV_MESSAGES_TABWINDOW_ITEM,FWindowId.toString());
 	onOptionsChanged(FOptionsNode.node("tabs-closable"));
 	onOptionsChanged(FOptionsNode.node("tabs-bottom"));
 	onOptionsChanged(FOptionsNode.node("show-indices"));

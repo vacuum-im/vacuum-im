@@ -27,6 +27,9 @@ class MessageStyles :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStyles IOptionsHolder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageStyles");
+#endif
 public:
 	MessageStyles();
 	~MessageStyles();

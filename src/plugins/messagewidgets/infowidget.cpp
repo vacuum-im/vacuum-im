@@ -9,6 +9,7 @@
 #include <QContextMenuEvent>
 #include <definitions/toolbargroups.h>
 #include <utils/textmanager.h>
+#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID           Action::DR_StreamJid
 #define ADR_CONTACT_JID          Action::DR_Parametr1

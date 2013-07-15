@@ -40,6 +40,9 @@ class DataStreamsManger :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IDataStreamsManager IStanzaHandler IStanzaRequestOwner IOptionsHolder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IDataStreamsManager");
+#endif
 public:
 	DataStreamsManger();
 	~DataStreamsManger();

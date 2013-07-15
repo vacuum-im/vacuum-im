@@ -2,7 +2,7 @@
 
 #include <QMessageBox>
 #include <QInputDialog>
-#include <QTextDocument>
+#include <utils/QtEscape.h>
 
 EditProfilesDialog::EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget *AParent) : QDialog(AParent)
 {

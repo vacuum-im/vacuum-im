@@ -17,6 +17,9 @@ class XmppStreams :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppStreams);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IXmppStreams");
+#endif
 public:
 	XmppStreams();
 	~XmppStreams();

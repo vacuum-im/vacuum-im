@@ -35,6 +35,9 @@ class BirthdayReminder :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IBirthdayReminder);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IBirthdayReminder");
+#endif
 public:
 	BirthdayReminder();
 	~BirthdayReminder();

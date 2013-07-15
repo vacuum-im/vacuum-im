@@ -46,6 +46,9 @@ class RosterItemExchange :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsHolder IStanzaHandler IStanzaRequestOwner IMessageViewDropHandler IRostersDragDropHandler);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterItemExchange");
+#endif
 public:
 	RosterItemExchange();
 	~RosterItemExchange();

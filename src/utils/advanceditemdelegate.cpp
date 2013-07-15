@@ -12,7 +12,9 @@
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QItemEditorFactory>
-#include <QWindowsVistaStyle>
+#if defined(Q_WS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
+	#include <QWindowsVistaStyle>
+#endif
 
 static const qreal BlinkHideSteps[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
 static const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.0 };

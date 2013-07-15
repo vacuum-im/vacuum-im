@@ -290,4 +290,6 @@ void MessageStyles::onApplyPendingChanges()
 	FPendingChages.clear();
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_messagestyles, MessageStyles)
+#endif

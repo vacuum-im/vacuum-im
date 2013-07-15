@@ -1,6 +1,7 @@
 #include "editwidget.h"
 
 #include <QKeyEvent>
+#include <QMimeData>
 
 #define MAX_BUFFERED_MESSAGES     10
 

@@ -73,6 +73,9 @@ class ClientInfo :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IClientInfo IOptionsHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
+#ifdef HAVE_QT5
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IClientInfo");
+#endif
 public:
 	ClientInfo();
 	~ClientInfo();

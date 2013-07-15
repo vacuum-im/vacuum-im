@@ -506,4 +506,6 @@ void VCardPlugin::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIte
 	}
 }
 
+#ifndef HAVE_QT5
 Q_EXPORT_PLUGIN2(plg_vcard, VCardPlugin)
+#endif

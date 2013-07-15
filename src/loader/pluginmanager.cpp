@@ -34,7 +34,7 @@
 #  define ENV_APP_DATA              "APPDATA"
 #  define DIR_APP_DATA              APPLICATION_NAME
 #  define PATH_APP_DATA             ORGANIZATION_NAME"/"DIR_APP_DATA
-#elif defined(Q_WS_X11)
+#elif defined(Q_OS_LINUX)
 #  define ENV_APP_DATA              "HOME"
 #  define DIR_APP_DATA              ".vacuum"
 #  define PATH_APP_DATA             DIR_APP_DATA

@@ -32,8 +32,13 @@ ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent
 	ui.trvShortcuts->setItemDelegate(new ShortcutOptionsDelegate(ui.trvShortcuts));
 	ui.trvShortcuts->setModel(&FSortModel);
 	ui.trvShortcuts->header()->setSortIndicatorShown(false);
+#if QT_VERSION < 0x050000
 	ui.trvShortcuts->header()->setResizeMode(COL_NAME,QHeaderView::Stretch);
 	ui.trvShortcuts->header()->setResizeMode(COL_KEY,QHeaderView::ResizeToContents);
+#else
+	ui.trvShortcuts->header()->setSectionResizeMode(COL_NAME,QHeaderView::Stretch);
+	ui.trvShortcuts->header()->setSectionResizeMode(COL_KEY,QHeaderView::ResizeToContents);
+#endif
 	ui.trvShortcuts->sortByColumn(COL_NAME,Qt::AscendingOrder);
 	ui.trvShortcuts->expandAll();
 
