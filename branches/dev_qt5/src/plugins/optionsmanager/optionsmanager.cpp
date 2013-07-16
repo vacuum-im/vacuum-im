@@ -145,7 +145,7 @@ QMultiMap<int, IOptionsWidget *> OptionsManager::optionsWidgets(const QString &A
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (ANodeId == OPN_MISC)
 	{
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 		widgets.insertMulti(OWO_MISC_AUTOSTART, optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent));
 #else
 		Q_UNUSED(AParent);
@@ -626,7 +626,7 @@ void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_MISC_AUTOSTART)
 	{
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 		QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
 		if (ANode.value().toBool())
 			reg.setValue(CLIENT_NAME, QDir::toNativeSeparators(QApplication::applicationFilePath()));

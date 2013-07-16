@@ -12,7 +12,7 @@
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QItemEditorFactory>
-#if defined(Q_WS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if defined(Q_OS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
 	#include <QWindowsVistaStyle>
 #endif
 
@@ -546,7 +546,7 @@ void AdvancedItemDelegate::paint(QPainter *APainter, const QStyleOptionViewItem 
 {
 	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
 
-#if defined(Q_WS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if defined(Q_OS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
 	QStyle *style = indexOption.widget ? indexOption.widget->style() : QApplication::style();
 	if (qobject_cast<QWindowsVistaStyle *>(style))
 	{

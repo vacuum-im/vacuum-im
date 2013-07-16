@@ -13,7 +13,7 @@
 	#define MESSAGE_SOURCE_OLD            0
 	#define MESSAGE_SOURCE_APPLICATION    1
 	#define MESSAGE_SOURCE_PAGER          2
-#endif //Q_WS_X11
+#endif //Q_OS_LINUX
 
 // WindowSticker
 class WindowSticker : 
@@ -165,7 +165,7 @@ void WidgetManager::raiseWidget(QWidget *AWidget)
 	xev.data.l[2]    = xev.data.l[3] = xev.data.l[4] = 0;
 
 	XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
-#endif //Q_WS_X11
+#endif //Q_OS_LINUX
 
 	AWidget->raise();
 }
@@ -198,7 +198,7 @@ void WidgetManager::showActivateRaiseWindow(QWidget *AWindow)
 
 void WidgetManager::setWindowSticky( QWidget *AWindow, bool ASticky )
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 	if (ASticky)
 		WindowSticker::insertWindow(AWindow);
 	else
