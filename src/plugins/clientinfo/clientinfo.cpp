@@ -370,7 +370,7 @@ QString ClientInfo::osVersion() const
 	static QString osver;
 	if (osver.isEmpty())
 	{
-#if defined(Q_WS_MAC)
+#if defined(Q_OS_MAC)
 		switch (QSysInfo::MacintoshVersion)
 		{
 		# if QT_VERSION >= 0x040803
@@ -410,7 +410,7 @@ QString ClientInfo::osVersion() const
 			osver = "MacOS (unknown)";
 			break;
 		}
-#elif defined(Q_WS_X11)
+#elif defined(Q_OS_LINUX)
 		QStringList path;
 		foreach(QString env, QProcess::systemEnvironment())
 			if (env.startsWith("PATH="))
@@ -457,7 +457,7 @@ QString ClientInfo::osVersion() const
 				osver = QLatin1String("Linux/Unix (unknown)");
 			}
 		}
-#elif defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
+#elif defined(Q_OS_WIN) || defined(Q_OS_CYGWIN)
 		switch (QSysInfo::WindowsVersion)
 		{
 		case QSysInfo::WV_CE_6:

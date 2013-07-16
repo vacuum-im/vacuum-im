@@ -38,7 +38,7 @@
 #  define ENV_APP_DATA              "HOME"
 #  define DIR_APP_DATA              ".vacuum"
 #  define PATH_APP_DATA             DIR_APP_DATA
-#elif defined(Q_WS_MAC)
+#elif defined(Q_OS_MAC)
 #  define ENV_APP_DATA              "HOME"
 #  define DIR_APP_DATA              APPLICATION_NAME
 #  define PATH_APP_DATA             "Library/Application Support/"DIR_APP_DATA

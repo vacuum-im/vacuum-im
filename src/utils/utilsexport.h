@@ -1,6 +1,6 @@
 #ifndef UTILS_EXPORT
 #include <qglobal.h>
-# if defined Q_WS_WIN
+# if defined Q_OS_WIN
 #   ifdef UTILS_DLL
 #     define UTILS_EXPORT __declspec(dllexport)  //Export to dll
 #   else

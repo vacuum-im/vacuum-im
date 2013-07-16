@@ -305,7 +305,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QString soundFile = FileStorage::staticStorage(RSR_STORAGE_SOUNDS)->fileFullName(soundName);
 			if (!soundFile.isEmpty())
 			{
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
 				QProcess::startDetached(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND).value().toString(),QStringList()<<soundFile);
 #else
 				delete FSound;

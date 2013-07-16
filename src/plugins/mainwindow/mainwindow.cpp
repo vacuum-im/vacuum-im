@@ -263,7 +263,7 @@ void MainWindow::correctWindowPosition()
 
 void MainWindow::restoreAcceptDrops(QWidget *AParent)
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
 	foreach(QObject *object, AParent->children())
 	{
 		if (object->isWidgetType())

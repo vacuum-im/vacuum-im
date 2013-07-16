@@ -14,12 +14,12 @@
 
 HunspellChecker::HunspellChecker() : FHunSpell(NULL), FDictCodec(NULL)
 {
-#if defined (Q_WS_WIN)
+#if defined (Q_OS_WIN)
 	FDictsPaths.append(QString("%1/hunspell").arg(QCoreApplication::applicationDirPath()));
-#elif defined (Q_WS_X11)
+#elif defined (Q_OS_LINUX)
 	FDictsPaths.append("/usr/share/hunspell");
 	FDictsPaths.append("/usr/share/myspell");
-#elif defined (Q_WS_MAC)
+#elif defined (Q_OS_MAC)
 	FDictsPaths.append(QString("%1/Library/Spelling").arg(QDir::homePath()));
 #endif
 }
