@@ -1,12 +1,13 @@
 #ifndef JID_H
 #define JID_H
 
-#include <QList>
+#include <QDataStream>
 #include <QHash>
-#include <QString>
+#include <QList>
 #include <QMetaType>
-#include <QStringRef>
 #include <QSharedData>
+#include <QString>
+#include <QStringRef>
 #include "utilsexport.h"
 
 class JidData :
