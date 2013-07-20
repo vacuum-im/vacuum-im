@@ -28,7 +28,7 @@ HEADERS  = utilsexport.h \
            advanceditemmodel.h \
            advanceditemdelegate.h \
            filecookiejar.h \
-           boxwidget.h
+		   boxwidget.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -59,9 +59,9 @@ SOURCES  = jid.cpp \
            advanceditemmodel.cpp \
            advanceditemdelegate.cpp \
            filecookiejar.cpp \
-           boxwidget.cpp
+		   boxwidget.cpp
 
 unix:!mac:!haiku {
-  HEADERS += qx11info_x11.h
-  SOURCES += qx11info_x11.cpp
+  HEADERS += x11info.h
+  SOURCES += x11info.cpp
 }

@@ -32,12 +32,10 @@
 #include <QVector>
 
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
-#   include <QX11Info>
+#  include <QX11Info>
 #else
-#   include <QApplication>
-//#   include <qpa/qplatformnativeinterface.h>
-# include <QtGui/qpa/qplatformnativeinterface.h>
-#   include <xcb/xcb.h>
+#  include <utils/x11info.h>
+#  include <xcb/xcb.h>
 #endif
 #include <X11/Xlib.h>
 
@@ -96,10 +94,7 @@ public:
 #if QT_VERSION < QT_VERSION_CHECK(5,0,0)
         m_display = QX11Info::display();
 #else
-        QPlatformNativeInterface *native = qApp->platformNativeInterface();
-        void *display = native->nativeResourceForScreen(QByteArray("display"),
-                                                        QGuiApplication::primaryScreen());
-        m_display = reinterpret_cast<Display *>(display);
+        m_display = X11Info::display();
 #endif
     }
 
