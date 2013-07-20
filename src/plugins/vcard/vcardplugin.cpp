@@ -505,7 +505,3 @@ void VCardPlugin::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIte
 			FUpdateQueue.insertMulti(ARoster->streamJid(),AItem.itemJid);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_vcard, VCardPlugin)
-#endif

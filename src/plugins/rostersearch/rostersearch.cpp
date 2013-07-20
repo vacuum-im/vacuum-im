@@ -404,7 +404,3 @@ void RosterSearch::onOptionsClosed()
 		Options::node(OPV_ROSTER_SEARCH_FIELDEBANLED,QString::number(dataRole)).setValue(isSearchFieldEnabled(dataRole));
 	Options::node(OPV_ROSTER_SEARCH_ENABLED).setValue(isSearchEnabled());
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_rostersearch, RosterSearch)
-#endif

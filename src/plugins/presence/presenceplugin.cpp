@@ -220,7 +220,3 @@ void PresencePlugin::onStreamRemoved(IXmppStream *AXmppStream)
 		removePresence(AXmppStream);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_presence, PresencePlugin)
-#endif

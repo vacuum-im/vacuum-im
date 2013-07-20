@@ -1,11 +1,9 @@
 #include "optionsheader.h"
 
-#include <utils/QtEscape.h>
-
 OptionsHeader::OptionsHeader(const QString &ACaption, QWidget *AParent) : QLabel(AParent)
 {
 	setTextFormat(Qt::RichText);
-	setText(QString("<h3>%1</h3>").arg(Qt::escape(ACaption)));
+	setText(QString("<h3>%1</h3>").arg(ACaption.toHtmlEscaped()));
 }
 
 OptionsHeader::~OptionsHeader()

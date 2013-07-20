@@ -139,7 +139,3 @@ void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, const Options
 		stream->setDataStanzaType(ANode.value("stanza-type").toInt());
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_inbandstreams, InBandStreams);
-#endif

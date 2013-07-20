@@ -9,7 +9,6 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QMimeData>
-#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_CONTACT_JID             Action::DR_Parametr1
@@ -612,7 +611,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && roster->rosterItem(AContactJid).isValid)
 		{
 			if (QMessageBox::question(NULL, tr("Remove contact"),
-				tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(Qt::escape(AContactJid.uBare())),
+				tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->removeItem(AContactJid);
@@ -627,7 +626,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO)
 		{
 			if (QMessageBox::question(NULL, tr("Subscribe for contact presence"),
-				tr("You are assured that wish to subscribe for a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.uBare())),
+				tr("You are assured that wish to subscribe for a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Subscribe);
@@ -642,7 +641,7 @@ bool RosterChanger::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, c
 		if (roster && roster->isOpen() && ritem.subscription!=SUBSCRIPTION_NONE && ritem.subscription!=SUBSCRIPTION_FROM)
 		{
 			if (QMessageBox::question(NULL, tr("Unsubscribe from contact presence"),
-				tr("You are assured that wish to unsubscribe from a contact <b>%1</b> presence?").arg(Qt::escape(AContactJid.uBare())),
+				tr("You are assured that wish to unsubscribe from a contact <b>%1</b> presence?").arg(AContactJid.uBare().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 			{
 				roster->sendSubscription(AContactJid, IRoster::Unsubscribe);
@@ -1409,7 +1408,7 @@ void RosterChanger::renameContact(const Jid &AStreamJid, const Jid &AContactJid,
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen() && roster->rosterItem(AContactJid).isValid)
 	{
-		QString newName = QInputDialog::getText(NULL,tr("Rename Contact"),tr("Enter name for: <b>%1</b>").arg(Qt::escape(AContactJid.uBare())),QLineEdit::Normal,AOldName);
+		QString newName = QInputDialog::getText(NULL,tr("Rename Contact"),tr("Enter name for: <b>%1</b>").arg(AContactJid.uBare().toHtmlEscaped()),QLineEdit::Normal,AOldName);
 		if (!newName.isEmpty() && newName!=AOldName)
 			roster->renameItem(AContactJid,newName);
 	}
@@ -1505,7 +1504,7 @@ void RosterChanger::removeContactsFromRoster(const QStringList &AStreams, const 
 			if (ritem.isValid)
 			{
 				button = QMessageBox::question(NULL,tr("Remove Contact"),
-					tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(Qt::escape(name)),
+					tr("You are assured that wish to remove a contact <b>%1</b> from roster?").arg(name.toHtmlEscaped()),
 					QMessageBox::Yes | QMessageBox::No);
 			}
 			else 
@@ -1710,7 +1709,7 @@ void RosterChanger::onSubscriptionReceived(IRoster *ARoster, const Jid &AItemJid
 		notify.data.insert(NDR_POPUP_CAPTION, tr("Subscription message"));
 		notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(ARoster->streamJid(),AItemJid));
 		notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(AItemJid));
-		notify.data.insert(NDR_POPUP_HTML,Qt::escape(subscriptionNotify(ASubsType,AItemJid)));
+		notify.data.insert(NDR_POPUP_HTML,subscriptionNotify(ASubsType,AItemJid).toHtmlEscaped());
 		notify.data.insert(NDR_SOUND_FILE,SDF_RCHANGER_SUBSCRIPTION);
 	}
 
@@ -1980,7 +1979,3 @@ void RosterChanger::onSubscriptionDialogDestroyed()
 		FNotifications->removeNotification(notifyId);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_rosterchanger, RosterChanger)
-#endif

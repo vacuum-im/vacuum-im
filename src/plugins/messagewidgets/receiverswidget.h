@@ -139,4 +139,6 @@ private:
 	QMap<Jid, QMultiHash<Jid, QStandardItem *> > FContactItems;
 };
 
+Q_DECLARE_METATYPE(QList<QStandardItem *>)
+
 #endif // RECEIVERSWIDGET_H

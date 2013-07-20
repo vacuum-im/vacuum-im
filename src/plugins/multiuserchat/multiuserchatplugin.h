@@ -72,9 +72,7 @@ class MultiUserChatPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsHolder IRostersClickHooker IRecentItemHandler);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMultiUserChatPlugin");
-#endif
 public:
 	MultiUserChatPlugin();
 	~MultiUserChatPlugin();

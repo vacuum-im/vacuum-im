@@ -1,15 +1,12 @@
 include(../make/config.inc)
 
-TARGET             = $$VACUUM_UTILS_NAME
 TEMPLATE           = lib
+TARGET             = $$VACUUM_UTILS_NAME
 VERSION            = $$VACUUM_UTILS_ABI
-CONFIG            += dll
-QT                += xml network
-DEFINES           += UTILS_DLL QXT_STATIC
 
-isEqual(QT_MAJOR_VERSION, 5) {
-	QT += gui-private
-}
+CONFIG            += dll
+QT                += widgets xml network
+DEFINES           += UTILS_DLL QXT_STATIC
 
 DEPENDPATH        += ..
 INCLUDEPATH       += ..

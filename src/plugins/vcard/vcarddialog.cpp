@@ -4,7 +4,6 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QImageReader>
-#include <utils/QtEscape.h>
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
 {
@@ -325,8 +324,8 @@ void VCardDialog::onVCardError(const XmppError &AError)
 {
 	QMessageBox::critical(this,tr("Error"),
 		streamJid().pBare() != contactJid().pBare() ? 
-		tr("Failed to load profile: %1").arg(Qt::escape(AError.errorMessage())) :
-		tr("Failed to publish your profile: %1").arg(Qt::escape(AError.errorMessage())));
+		tr("Failed to load profile: %1").arg(AError.errorMessage().toHtmlEscaped()) :
+		tr("Failed to publish your profile: %1").arg(AError.errorMessage().toHtmlEscaped()));
 
 	if (!FSaveClicked)
 		deleteLater();

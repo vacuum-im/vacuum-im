@@ -873,7 +873,3 @@ inline bool operator<(const QSize &ASize1, const QSize &ASize2)
 {
 	return ASize1.width()==ASize2.width() ? ASize1.height()<ASize2.height() : ASize1.width()<ASize2.width();
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_avatars, Avatars)
-#endif

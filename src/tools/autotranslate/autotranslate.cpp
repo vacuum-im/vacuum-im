@@ -5,35 +5,13 @@
 #include <QDirIterator>
 #include <QDomDocument>
 #include <QCoreApplication>
-#if QT_VERSION >= 0x050000
-#  include <QMessageLogContext>
-#endif
+#include <QMessageLogContext>
 
-#if QT_VERSION < 0x050000
-void myMessageOutput(QtMsgType type, const char *msg)
+void myMessageOutput(QtMsgType AType, const QMessageLogContext &AContext, const QString &AMessage)
 {
-	switch (type)
-	{
-		 case QtDebugMsg:
-			 fprintf(stderr, "%s\n", msg);
-			 break;
-		 case QtWarningMsg:
-			 fprintf(stderr, "Warning: %s\n", msg);
-			 break;
-		 case QtCriticalMsg:
-			 fprintf(stderr, "Critical: %s\n", msg);
-			 break;
-		 case QtFatalMsg:
-			 fprintf(stderr, "Fatal: %s\n", msg);
-			 abort();
-	}
-}
-#else
-void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-	Q_UNUSED(context)
-	QByteArray localMsg = msg.toLocal8Bit();
-	switch (type)
+	Q_UNUSED(AContext)
+	QByteArray localMsg = AMessage.toLocal8Bit();
+	switch (AType)
 	{
 		 case QtDebugMsg:
 			 fprintf(stderr, "%s\n", localMsg.constData());
@@ -49,15 +27,10 @@ void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QS
 			 abort();
 	}
 }
-#endif
 
 int main(int argc, char *argv[])
 {
-#if QT_VERSION < 0x050000
-	qInstallMsgHandler(myMessageOutput);
-#else
 	qInstallMessageHandler(myMessageOutput);
-#endif
 	QCoreApplication app(argc, argv);
 
 	if (argc != 2)

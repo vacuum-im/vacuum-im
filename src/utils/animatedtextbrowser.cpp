@@ -197,11 +197,7 @@ void AnimatedTextBrowser::onUpdateDocumentAnimation()
 	if (isVisible())
 	{
 		static const int minUpdateTimeout = qRound(1000/15.0);
-#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
 		qint64 timeout = FLastUpdate.isValid() ? qAbs(FLastUpdate.msecsTo(QDateTime::currentDateTime())) : minUpdateTimeout;
-#else
-		qint64 timeout = FLastUpdate.isValid() ? qAbs(FLastUpdate.time().msecsTo(QDateTime::currentDateTime().time())) : minUpdateTimeout;
-#endif
 		if (timeout >= minUpdateTimeout)
 		{
 			QList<int> dirtyBlocks;
@@ -336,10 +332,3 @@ void AnimatedTextBrowser::onDocumentContentsChanged(int APosition, int ARemoved,
 		onVerticalScrollBarChanged();
 	}
 }
-
-#if QT_VERSION < 0x040700
-uint qHash(const QUrl &key)
-{
-	return qHash(key.toEncoded((QUrl::FormattingOptions)0x100));
-}
-#endif

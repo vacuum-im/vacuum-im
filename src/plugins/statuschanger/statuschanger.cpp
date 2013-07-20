@@ -2,7 +2,6 @@
 
 #include <QTimer>
 #include <QToolButton>
-#include <utils/QtEscape.h>
 
 #define MAX_TEMP_STATUS_ID                  -10
 
@@ -939,7 +938,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 			notify.data.insert(NDR_STREAM_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_CONTACT_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
-			notify.data.insert(NDR_POPUP_HTML,Qt::escape(APresence->status()));
+			notify.data.insert(NDR_POPUP_HTML,APresence->status().toHtmlEscaped());
 			notify.data.insert(NDR_SOUND_FILE,SDF_SCHANGER_CONNECTION_ERROR);
 			FNotifyId.insert(APresence,FNotifications->appendNotification(notify));
 		}
@@ -1276,7 +1275,3 @@ void StatusChanger::onNotificationActivated(int ANotifyId)
 	if (FNotifyId.values().contains(ANotifyId))
 		FNotifications->removeNotification(ANotifyId);
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_statuschanger, StatusChanger)
-#endif

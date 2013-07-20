@@ -2,7 +2,6 @@
 
 #include <QFocusEvent>
 #include <QVBoxLayout>
-#include <utils/QtEscape.h>
 
 DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AField, bool AReadOnly, QWidget *AParent) : QWidget(AParent)
 {
@@ -21,7 +20,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	}
 
 	QString label = !FField.label.isEmpty() ? FField.label : FField.desc;
-	QString desc = !FField.desc.isEmpty() ? QString("<span>%1</span>").arg(Qt::escape(FField.desc)) : QString::null;
+	QString desc = !FField.desc.isEmpty() ? QString("<span>%1</span>").arg(FField.desc.toHtmlEscaped()) : QString::null;
 	if (!FReadOnly && FField.type == DATAFIELD_TYPE_BOOLEAN)
 	{
 		FCheckBox = new QCheckBox(this);

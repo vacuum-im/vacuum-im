@@ -138,35 +138,19 @@ void DefaultConnectionPlugin::onConnectionSSLErrorsOccured(const QList<QSslError
 			errorList += "</ul>";
 
 			QStringList certInfo = QStringList()
-#if QT_VERSION < 0x050000
-				<< tr("Organization: %1").arg(peerCert.subjectInfo(QSslCertificate::Organization)
-				<< tr("Subunit: %1").arg(peerCert.subjectInfo(QSslCertificate::OrganizationalUnitName))
-				<< tr("Country: %1").arg(peerCert.subjectInfo(QSslCertificate::CountryName))
-				<< tr("Locality: %1").arg(peerCert.subjectInfo(QSslCertificate::LocalityName))
-				<< tr("State/Province: %1").arg(peerCert.subjectInfo(QSslCertificate::StateOrProvinceName))
-				<< tr("Common Name: %1").arg(peerCert.subjectInfo(QSslCertificate::CommonName))
+				<< tr("Organization: %1").arg(peerCert.subjectInfo(QSslCertificate::Organization).join("; "))
+				<< tr("Subunit: %1").arg(peerCert.subjectInfo(QSslCertificate::OrganizationalUnitName).join("; "))
+				<< tr("Country: %1").arg(peerCert.subjectInfo(QSslCertificate::CountryName).join("; "))
+				<< tr("Locality: %1").arg(peerCert.subjectInfo(QSslCertificate::LocalityName).join("; "))
+				<< tr("State/Province: %1").arg(peerCert.subjectInfo(QSslCertificate::StateOrProvinceName).join("; "))
+				<< tr("Common Name: %1").arg(peerCert.subjectInfo(QSslCertificate::CommonName).join("; "))
 				<< QString::null
-				<< tr("Issuer Organization: %1").arg(peerCert.issuerInfo(QSslCertificate::Organization))
-				<< tr("Issuer Unit Name: %1").arg(peerCert.issuerInfo(QSslCertificate::OrganizationalUnitName))
-				<< tr("Issuer Country: %1").arg(peerCert.issuerInfo(QSslCertificate::CountryName))
-				<< tr("Issuer Locality: %1").arg(peerCert.issuerInfo(QSslCertificate::LocalityName))
-				<< tr("Issuer State/Province: %1").arg(peerCert.issuerInfo(QSslCertificate::StateOrProvinceName))
-				<< tr("Issuer Common Name: %1").arg(peerCert.issuerInfo(QSslCertificate::CommonName));
-#else
-				<< tr("Organization: %1").arg(peerCert.subjectInfo(QSslCertificate::Organization).join("\n"))
-				<< tr("Subunit: %1").arg(peerCert.subjectInfo(QSslCertificate::OrganizationalUnitName).join("\n"))
-				<< tr("Country: %1").arg(peerCert.subjectInfo(QSslCertificate::CountryName).join("\n"))
-				<< tr("Locality: %1").arg(peerCert.subjectInfo(QSslCertificate::LocalityName).join("\n"))
-				<< tr("State/Province: %1").arg(peerCert.subjectInfo(QSslCertificate::StateOrProvinceName).join("\n"))
-				<< tr("Common Name: %1").arg(peerCert.subjectInfo(QSslCertificate::CommonName).join("\n"))
-				<< QString::null
-				<< tr("Issuer Organization: %1").arg(peerCert.issuerInfo(QSslCertificate::Organization).join("\n"))
-				<< tr("Issuer Unit Name: %1").arg(peerCert.issuerInfo(QSslCertificate::OrganizationalUnitName).join("\n"))
-				<< tr("Issuer Country: %1").arg(peerCert.issuerInfo(QSslCertificate::CountryName).join("\n"))
-				<< tr("Issuer Locality: %1").arg(peerCert.issuerInfo(QSslCertificate::LocalityName).join("\n"))
-				<< tr("Issuer State/Province: %1").arg(peerCert.issuerInfo(QSslCertificate::StateOrProvinceName).join("\n"))
-				<< tr("Issuer Common Name: %1").arg(peerCert.issuerInfo(QSslCertificate::CommonName).join("\n"));
-#endif
+				<< tr("Issuer Organization: %1").arg(peerCert.issuerInfo(QSslCertificate::Organization).join("; "))
+				<< tr("Issuer Unit Name: %1").arg(peerCert.issuerInfo(QSslCertificate::OrganizationalUnitName).join("; "))
+				<< tr("Issuer Country: %1").arg(peerCert.issuerInfo(QSslCertificate::CountryName).join("; "))
+				<< tr("Issuer Locality: %1").arg(peerCert.issuerInfo(QSslCertificate::LocalityName).join("; "))
+				<< tr("Issuer State/Province: %1").arg(peerCert.issuerInfo(QSslCertificate::StateOrProvinceName).join("; "))
+				<< tr("Issuer Common Name: %1").arg(peerCert.issuerInfo(QSslCertificate::CommonName).join("; "));
 
 			QMessageBox dialog;
 			dialog.setIcon(QMessageBox::Warning);
@@ -204,7 +188,3 @@ void DefaultConnectionPlugin::onConnectionDestroyed()
 	if (connection)
 		emit connectionDestroyed(connection);
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_defaultconnection, DefaultConnectionPlugin)
-#endif

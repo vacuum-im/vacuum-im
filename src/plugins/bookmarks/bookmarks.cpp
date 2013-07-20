@@ -1,12 +1,9 @@
 #include "bookmarks.h"
 
+#include <QUrlQuery>
 #include <QInputDialog>
 #include <QDesktopServices>
 #include <QItemEditorFactory>
-
-#ifdef HAVE_QT5
-#  include <QUrlQuery>
-#endif
 
 #define PST_BOOKMARKS                    "storage"
 
@@ -937,26 +934,17 @@ void Bookmarks::onDiscoWindowAddBookmarkActionTriggered(bool)
 		{
 			QUrl url;
 			url.setScheme("xmpp");
-#if QT_VERSION < 0x050000
-			url.setQueryDelimiters('=',';');
-#else
-			QUrlQuery urlQueryDelimiters;
-			urlQueryDelimiters.setQueryDelimiters('=',';');
-			url.setQuery(urlQueryDelimiters);
-#endif
 			url.setPath(discoJid);
 
 			QList< QPair<QString, QString> > queryItems;
 			queryItems << qMakePair(QString("disco"),QString()) << qMakePair(QString("type"),QString("get")) << qMakePair(QString("request"),QString("items"));
 			if (!discoNode.isEmpty())
 				queryItems << qMakePair(QString("node"),discoNode);
-#if QT_VERSION < 0x050000
-			url.setQueryItems(queryItems);
-#else
+
 			QUrlQuery urlQueryItems;
+			urlQueryItems.setQueryDelimiters('=',';');
 			urlQueryItems.setQueryItems(queryItems);
 			url.setQuery(urlQueryItems);
-#endif
 
 			IBookmark bookmark;
 			bookmark.type = IBookmark::Url;
@@ -1009,7 +997,3 @@ uint qHash(const IBookmark &AKey)
 		return qHash(QString::null);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_bookmarks, Bookmarks)
-#endif

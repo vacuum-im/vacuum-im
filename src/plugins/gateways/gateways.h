@@ -40,9 +40,7 @@ class Gateways :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IGateways IStanzaRequestOwner IDiscoFeatureHandler);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IGateways");
-#endif
 public:
 	Gateways();
 	~Gateways();

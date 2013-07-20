@@ -571,7 +571,3 @@ void StatusIcons::onSetCustomIconset(bool)
 		}
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_statusicons, StatusIcons)
-#endif

@@ -354,7 +354,3 @@ void BitsOfBinary::onOfflineTimerTimeout()
 			emit binaryError(contentId,XmppError(IERR_BOB_INVALID_CACHED_DATA));
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_bitsofbinary, BitsOfBinary)
-#endif

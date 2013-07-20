@@ -13,9 +13,7 @@ class UrlProcessor :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IUrlProcessor);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IUrlProcessor");
-#endif
 public:
 	UrlProcessor();
 	~UrlProcessor();

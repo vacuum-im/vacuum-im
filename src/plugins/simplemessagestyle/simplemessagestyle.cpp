@@ -8,7 +8,6 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 #include <QTextDocumentFragment>
-#include <utils/QtEscape.h>
 
 #define SCROLL_TIMEOUT                      100
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
@@ -407,7 +406,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
 	AHtml.replace("%messageClasses%", messageClasses.join(" "));
 
 	AHtml.replace("%senderStatusIcon%",AOptions.senderIcon);
-	AHtml.replace("%shortTime%", Qt::escape(AOptions.time.toString(tr("hh:mm"))));
+	AHtml.replace("%shortTime%", AOptions.time.toString(tr("hh:mm")).toHtmlEscaped());
 
 	QString avatar = AOptions.senderAvatar;
 	if (!QFile::exists(avatar))
@@ -421,7 +420,7 @@ void SimpleMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConte
 	AHtml.replace("%userIconPath%",avatar);
 
 	QString timeFormat = !AOptions.timeFormat.isEmpty() ? AOptions.timeFormat : tr("hh:mm:ss");
-	QString time = Qt::escape(AOptions.time.toString(timeFormat));
+	QString time = AOptions.time.toString(timeFormat).toHtmlEscaped();
 	AHtml.replace("%time%", time);
 
 	QString sColor = !AOptions.senderColor.isEmpty() ? AOptions.senderColor : senderColor(AOptions.senderId);

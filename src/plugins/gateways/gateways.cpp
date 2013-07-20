@@ -1,7 +1,6 @@
 #include "gateways.h"
 
 #include <QMessageBox>
-#include <utils/QtEscape.h>
 
 #define GATEWAY_TIMEOUT           30000
 
@@ -365,7 +364,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 		IRosterItem ritemOld = roster->rosterItem(AServiceFrom);
 		IRosterItem ritemNew = roster->rosterItem(AServiceTo);
 
-		//Разлогиниваемся на старом транспорте
+		//� азлогиниваемся на старом транспорте
 		if (!presence->findItems(AServiceFrom).isEmpty())
 			sendLogPresence(AStreamJid,AServiceFrom,false);
 
@@ -633,7 +632,7 @@ void Gateways::onRemoveActionTriggered(bool)
 		{
 			Jid serviceJid = services.first();
 			button = QMessageBox::question(NULL,tr("Remove transport and its contacts"),
-				tr("You are assured that wish to remove a transport '<b>%1</b>' and its <b>%n contacts</b> from roster?","",serviceContacts(streams.first(),serviceJid).count()).arg(Qt::escape(serviceJid.domain())),
+				tr("You are assured that wish to remove a transport '<b>%1</b>' and its <b>%n contacts</b> from roster?","",serviceContacts(streams.first(),serviceJid).count()).arg(serviceJid.domain().toHtmlEscaped()),
 				QMessageBox::Yes | QMessageBox::No);
 		}
 		else if (services.count() > 1)
@@ -1046,7 +1045,3 @@ void Gateways::onRegisterError(const QString &AId, const XmppError &AError)
 	Q_UNUSED(AError);
 	FShowRegisterRequests.remove(AId);
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_gateways, Gateways)
-#endif

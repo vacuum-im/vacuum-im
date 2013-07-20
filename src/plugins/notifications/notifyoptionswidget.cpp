@@ -36,13 +36,8 @@ NotifyOptionsWidget::NotifyOptionsWidget(INotifications *ANotifications, QWidget
 
 	ui.trvNotifies->setModel(&FSortModel);
 	ui.trvNotifies->header()->hide();
-#if QT_VERSION < 0x050000
-	ui.trvNotifies->header()->setResizeMode(COL_NAME,QHeaderView::Stretch);
-	ui.trvNotifies->header()->setResizeMode(COL_ENABLE,QHeaderView::ResizeToContents);
-#else
 	ui.trvNotifies->header()->setSectionResizeMode(COL_NAME,QHeaderView::Stretch);
 	ui.trvNotifies->header()->setSectionResizeMode(COL_ENABLE,QHeaderView::ResizeToContents);
-#endif
 	ui.trvNotifies->sortByColumn(COL_NAME,Qt::AscendingOrder);
 	ui.trvNotifies->setItemsExpandable(false);
 	ui.trvNotifies->expandAll();

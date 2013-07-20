@@ -20,9 +20,7 @@ class InBandStreams :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IInBandStreams IDataStreamMethod);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IInBandStreams");
-#endif
 public:
 	InBandStreams();
 	~InBandStreams();

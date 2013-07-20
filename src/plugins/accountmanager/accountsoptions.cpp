@@ -2,7 +2,6 @@
 
 #include <QMessageBox>
 #include <QHeaderView>
-#include <utils/QtEscape.h>
 
 #define COL_NAME                0
 #define COL_JID                 1
@@ -13,13 +12,8 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
 	FManager = AManager;
 
 	ui.trwAccounts->setHeaderLabels(QStringList() << tr("Name") << tr("Jabber ID"));
-#if QT_VERSION < 0x050000
-	ui.trwAccounts->header()->setResizeMode(COL_NAME, QHeaderView::ResizeToContents);
-	ui.trwAccounts->header()->setResizeMode(COL_JID, QHeaderView::Stretch);
-#else
 	ui.trwAccounts->header()->setSectionResizeMode(COL_NAME, QHeaderView::ResizeToContents);
 	ui.trwAccounts->header()->setSectionResizeMode(COL_JID, QHeaderView::Stretch);
-#endif
 	ui.trwAccounts->sortByColumn(COL_NAME,Qt::AscendingOrder);
 	connect(ui.trwAccounts,SIGNAL(itemChanged(QTreeWidgetItem *, int)),SIGNAL(modified()));
 
@@ -117,9 +111,9 @@ void AccountsOptions::onRemoveButtonClicked(bool)
 	if (item)
 	{
 		QMessageBox::StandardButton res = QMessageBox::warning(this,
-		                                  tr("Confirm removal of an account"),
-		                                  tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(Qt::escape(item->text(0))),
-		                                  QMessageBox::Ok | QMessageBox::Cancel);
+		tr("Confirm removal of an account"),
+		tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(item->text(0).toHtmlEscaped()),
+		QMessageBox::Ok | QMessageBox::Cancel);
 
 		if (res == QMessageBox::Ok)
 		{

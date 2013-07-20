@@ -198,6 +198,3 @@ void XmppStreams::onStreamDestroyed()
 		emit streamDestroyed(stream);
 	}
 }
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_xmppstreams, XmppStreams)
-#endif

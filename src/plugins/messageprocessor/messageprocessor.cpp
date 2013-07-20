@@ -2,7 +2,6 @@
 
 #include <QVariant>
 #include <QTextCursor>
-#include <utils/QtEscape.h>
 
 #define SHC_MESSAGE         "/message"
 
@@ -383,7 +382,7 @@ QString MessageProcessor::prepareBodyForSend(const QString &AString) const
 
 QString MessageProcessor::prepareBodyForReceive(const QString &AString) const
 {
-	QString result = Qt::escape(AString);
+	QString result = AString.toHtmlEscaped();
 	result.replace('\n',"<br>");
 	result.replace("  ","&nbsp; ");
 	result.replace('\t',"&nbsp; &nbsp; ");
@@ -420,7 +419,3 @@ void MessageProcessor::onXmppStreamJidChanged(IXmppStream *AXmppStream, const Ji
 		FActiveStreams.insert(AXmppStream->streamJid(),handleId);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_messageprocessor, MessageProcessor)
-#endif

@@ -175,7 +175,7 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 				FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
 
 			QDomNamedNodeMap map = elem.attributes();
-			for (uint i =0; i<map.length(); i++)
+			for (int i=0; i<map.length(); i++)
 			{
 				QDomNode attrNode = map.item(i);
 				FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());

@@ -2,11 +2,7 @@
 
 #include <QSet>
 #include <QDir>
-#ifndef HAVE_QT5
-#  include <QDesktopServices>
-#else
-#  include <QStandardPaths>
-#endif
+#include <QStandardPaths>
 
 FileStreamsManager::FileStreamsManager()
 {
@@ -100,11 +96,7 @@ bool FileStreamsManager::initObjects()
 bool FileStreamsManager::initSettings()
 {
 	QStringList availMethods = FDataManager!=NULL ? FDataManager->methods() : QStringList();
-#if QT_VERSION < 0x050000
-	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation));
-#else
 	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTDIR,QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
-#endif
 	Options::setDefaultValue(OPV_FILESTREAMS_GROUPBYSENDER,false);
 	Options::setDefaultValue(OPV_FILESTREAMS_DEFAULTMETHOD,availMethods.contains(NS_SOCKS5_BYTESTREAMS) ? QString(NS_SOCKS5_BYTESTREAMS) : QString::null);
 	Options::setDefaultValue(OPV_FILESTREAMS_ACCEPTABLEMETHODS,availMethods);
@@ -293,7 +285,3 @@ void FileStreamsManager::onProfileClosed(const QString &AName)
 	foreach(IFileStream *stream, FStreams.values())
 		delete stream->instance();
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_filestreamsmanager, FileStreamsManager);
-#endif

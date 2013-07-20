@@ -740,13 +740,8 @@ bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IAr
 
 					if (textState != Qt::Checked)
 					{
-#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
 						if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
 							textState = Qt::Checked;
-#else
-						if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
-							textState = Qt::Checked;
-#endif
 					}
 				}
 				else if (textState != Qt::Checked)
@@ -758,13 +753,8 @@ bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IAr
 			{
 				if (checkElemText)
 				{
-#if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
 					if (reader.text().contains(ARequest.text,Qt::CaseInsensitive))
 						textState = Qt::Checked;
-#else
-					if (reader.text().toString().contains(ARequest.text,Qt::CaseInsensitive))
-						textState = Qt::Checked;
-#endif
 				}
 			}
 			else if (reader.isEndElement())
@@ -967,7 +957,3 @@ void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 		}
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_filemessagearchive, FileMessageArchive)
-#endif

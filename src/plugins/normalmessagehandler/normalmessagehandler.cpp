@@ -2,7 +2,6 @@
 
 #include <QLineEdit>
 #include <QMouseEvent>
-#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
@@ -293,7 +292,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 				}
 				else
 				{
-					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
+					notify.data.insert(NDR_POPUP_HTML,AMessage.body().toHtmlEscaped());
 				}
 
 				FNotifiedMessages.insertMulti(window,AMessage.data(MDR_MESSAGE_ID).toInt());
@@ -681,7 +680,7 @@ void NormalMessageHandler::fillContentOptions(IMessageNormalWindow *AWindow, IMe
 {
 	AOptions.senderColor = "blue";
 	AOptions.senderId = AWindow->contactJid().full();
-	AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()));
+	AOptions.senderName = FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()).toHtmlEscaped();
 	AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->contactJid());
 	AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 }
@@ -705,7 +704,7 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 	{
 		XmppStanzaError err(AMessage.stanza());
 		QString html = tr("<b>The message with a error is received</b>");
-		html += "<p style='color:red;'>"+Qt::escape(err.errorMessage())+"</p>";
+		html += "<p style='color:red;'>"+err.errorMessage().toHtmlEscaped()+"</p>";
 		html += "<hr>";
 		options.kind = IMessageContentOptions::KindMessage;
 		AWindow->viewWidget()->appendHtml(html,options);
@@ -1095,7 +1094,3 @@ void NormalMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOp
 		}
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_normalmessagehandler, NormalMessageHandler)
-#endif

@@ -212,7 +212,3 @@ void MessageCarbons::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 			setEnabled(AInfo.streamJid,true);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_messagecarbons, MessageCarbons)
-#endif

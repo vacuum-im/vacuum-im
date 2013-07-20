@@ -20,9 +20,7 @@ class SimpleMessageStylePlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStylePlugin);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageStylePlugin");
-#endif
 public:
 	SimpleMessageStylePlugin();
 	~SimpleMessageStylePlugin();

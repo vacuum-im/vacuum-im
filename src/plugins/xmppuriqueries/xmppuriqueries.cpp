@@ -1,10 +1,7 @@
 #include "xmppuriqueries.h"
 
 #include <QPair>
-
-#ifdef HAVE_QT5
-#  include <QUrlQuery>
-#endif
+#include <QUrlQuery>
 
 XmppUriQueries::XmppUriQueries()
 {
@@ -59,11 +56,7 @@ bool XmppUriQueries::openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const
 		QUrl url =  QUrl::fromEncoded(AUrl.toEncoded().replace(';','&'), QUrl::StrictMode);
 		Jid contactJid = url.path();
 
-#if QT_VERSION < 0x050000
-		QList< QPair<QString, QString> > keyValues = url.queryItems();
-#else
 		QList< QPair<QString, QString> > keyValues = QUrlQuery(url).queryItems();
-#endif
 		if (keyValues.count() > 0)
 		{
 			QString action = keyValues.takeAt(0).first;
@@ -99,7 +92,3 @@ void XmppUriQueries::removeUriHandler(IXmppUriHandler *AHandler, int AOrder)
 		emit uriHandlerRemoved(AHandler, AOrder);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_xmppuriqueries, XmppUriQueries)
-#endif

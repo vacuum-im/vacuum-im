@@ -572,7 +572,3 @@ void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 		createIconsetUrls();
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_emoticons, Emoticons)
-#endif

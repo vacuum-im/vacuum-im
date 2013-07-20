@@ -49,9 +49,7 @@ class IqAuthPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeaturesPlugin);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IqAuthPlugin");
-#endif
 public:
 	IqAuthPlugin();
 	~IqAuthPlugin();

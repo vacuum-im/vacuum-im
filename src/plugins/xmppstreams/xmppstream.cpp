@@ -1,7 +1,5 @@
 #include "xmppstream.h"
 
-#include <utils/QtEscape.h>
-
 XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObject(AXmppStreams->instance())
 {
 	FXmppStreams = AXmppStreams;
@@ -195,7 +193,7 @@ QString XmppStream::getSessionPassword(bool AAskIfNeed)
 
 		FPasswordDialog = new QInputDialog(NULL,Qt::Dialog);
 		FPasswordDialog->setWindowTitle(tr("Password request"));
-		FPasswordDialog->setLabelText(tr("Enter password for <b>%1</b>").arg(Qt::escape(FStreamJid.uBare())));
+		FPasswordDialog->setLabelText(tr("Enter password for <b>%1</b>").arg(FStreamJid.uBare().toHtmlEscaped()));
 		FPasswordDialog->setTextEchoMode(QLineEdit::Password);
 		if (FPasswordDialog->exec() == QDialog::Accepted)
 			FSessionPassword = FPasswordDialog->textValue();

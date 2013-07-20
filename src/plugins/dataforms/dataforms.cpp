@@ -1089,14 +1089,3 @@ void DataForms::onNetworkReplySSLErrors(const QList<QSslError> &AErrors)
 	if (reply)
 		reply->ignoreSslErrors();
 }
-
-#if QT_VERSION < 0x040700
-uint qHash(const QUrl &key)
-{
-	return qHash(key.toEncoded((QUrl::FormattingOptions)0x100));
-}
-#endif
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_dataforms, DataForms);
-#endif

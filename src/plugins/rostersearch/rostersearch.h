@@ -32,9 +32,7 @@ class RosterSearch :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterSearch IRostersClickHooker IRostersKeyHooker);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRosterSearch");
-#endif
 public:
 	RosterSearch();
 	~RosterSearch();

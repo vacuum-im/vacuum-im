@@ -8,7 +8,6 @@
 #include <QInputDialog>
 #include <QTextDocument>
 #include <QTableWidgetItem>
-#include <utils/QtEscape.h>
 
 #define TIR_STATUSID    Qt::UserRole
 #define TIR_DELEGATE    Qt::UserRole + 1
@@ -223,18 +222,10 @@ EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 		row++;
 	}
 
-
-#if QT_VERSION < 0x050000
-	tblStatus->horizontalHeader()->setResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
-	tblStatus->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
-	tblStatus->horizontalHeader()->setResizeMode(COL_MESSAGE,QHeaderView::Stretch);
-	tblStatus->horizontalHeader()->setResizeMode(COL_PRIORITY,QHeaderView::ResizeToContents);
-#else
 	tblStatus->horizontalHeader()->setSectionResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
 	tblStatus->horizontalHeader()->setSectionResizeMode(COL_NAME,QHeaderView::ResizeToContents);
 	tblStatus->horizontalHeader()->setSectionResizeMode(COL_MESSAGE,QHeaderView::Stretch);
 	tblStatus->horizontalHeader()->setSectionResizeMode(COL_PRIORITY,QHeaderView::ResizeToContents);
-#endif
 
 	connect(pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddbutton(bool)));
 	connect(pbtDelete,SIGNAL(clicked(bool)),SLOT(onDeleteButton(bool)));
@@ -288,8 +279,9 @@ void EditStatusDialog::onAddbutton(bool)
 			tblStatus->editItem(message);
 		}
 		else
-			QMessageBox::warning(this,tr("Wrong status name"),tr("Status with name '<b>%1</b>' already exists").arg(Qt::escape(statusName)));
-
+		{
+			QMessageBox::warning(this,tr("Wrong status name"),tr("Status with name '<b>%1</b>' already exists").arg(statusName.toHtmlEscaped()));
+		}
 	}
 }
 
@@ -316,8 +308,8 @@ void EditStatusDialog::onDeleteButton(bool)
 			else if (FStatusItems.contains(statusId))
 			{
 				int button = QMessageBox::question(this,tr("Delete status"),
-				                                   tr("You are assured that wish to remove a status '<b>%1</b>'?").arg(Qt::escape(FStatusItems.value(statusId)->name)),
-				                                   QMessageBox::Yes | QMessageBox::No);
+					tr("You are assured that wish to remove a status '<b>%1</b>'?").arg(FStatusItems.value(statusId)->name.toHtmlEscaped()),
+					QMessageBox::Yes | QMessageBox::No);
 				if (button == QMessageBox::Yes)
 				{
 					FDeletedStatuses.append(statusId);

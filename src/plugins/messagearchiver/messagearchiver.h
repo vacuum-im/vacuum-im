@@ -92,9 +92,7 @@ class MessageArchiver :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageArchiver IStanzaHandler IStanzaRequestOwner IOptionsHolder ISessionNegotiator);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IMessageArchiver");
-#endif
 public:
 	MessageArchiver();
 	~MessageArchiver();

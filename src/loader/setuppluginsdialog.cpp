@@ -3,7 +3,6 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <utils/QtEscape.h>
 #include <QDesktopServices>
 
 enum TableColumns
@@ -25,13 +24,8 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	connect(ui.cmbLanguage,SIGNAL(currentIndexChanged(int)),SLOT(onCurrentLanguageChanged(int)));
 
 	updatePlugins(); 
-#if QT_VERSION < 0x050000
-	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::Stretch);
-	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_FILE,QHeaderView::ResizeToContents);
-#else
 	ui.twtPlugins->horizontalHeader()->setSectionResizeMode(COL_NAME,QHeaderView::Stretch);
 	ui.twtPlugins->horizontalHeader()->setSectionResizeMode(COL_FILE,QHeaderView::ResizeToContents);
-#endif
 	connect(ui.twtPlugins,SIGNAL(currentItemChanged(QTableWidgetItem *, QTableWidgetItem *)),SLOT(onCurrentPluginChanged(QTableWidgetItem *, QTableWidgetItem *)));
 
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
@@ -147,7 +141,7 @@ void SetupPluginsDialog::onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTab
 		QDomElement pluginElem = FItemElement.value(nameItem);
 
 		QString name = pluginElem.firstChildElement("name").text().isEmpty() ? pluginElem.tagName() : pluginElem.firstChildElement("name").text();
-		ui.lblName->setText(QString("<b>%1</b> %2").arg(Qt::escape(name)).arg(Qt::escape(pluginElem.firstChildElement("version").text())));
+		ui.lblName->setText(QString("<b>%1</b> %2").arg(name.toHtmlEscaped()).arg(pluginElem.firstChildElement("version").text().toHtmlEscaped()));
 		ui.lblDescription->setText(pluginElem.firstChildElement("desc").text());
 		ui.lblError->setText(pluginElem.firstChildElement("error").text());
 		ui.lblError->setVisible(!ui.lblError->text().isEmpty());
@@ -184,7 +178,7 @@ void SetupPluginsDialog::onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTab
 
 		const IPluginInfo *info = FPluginManager->pluginInfo(pluginElem.attribute("uuid"));
 		if (info)
-			ui.lblHomePage->setText(QString("<a href='%1'>%2</a>").arg(info->homePage.toString()).arg(Qt::escape(info->homePage.toString())));
+			ui.lblHomePage->setText(QString("<a href='%1'>%2</a>").arg(info->homePage.toString()).arg(info->homePage.toString().toHtmlEscaped()));
 	}
 }
 

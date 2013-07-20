@@ -215,5 +215,3 @@ void MetaContacts::onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid)
 {
 	saveContactsToStorage(AStreamJid);
 }
-
-Q_EXPORT_PLUGIN2(plg_metacontacts, MetaContacts)

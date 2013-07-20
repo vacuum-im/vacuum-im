@@ -66,9 +66,7 @@ class ChatMessageHandler :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsHolder IXmppUriHandler IMessageHandler IRostersClickHooker IMessageEditSendHandler);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ChatMessageHandler");
-#endif
 public:
 	ChatMessageHandler();
 	~ChatMessageHandler();

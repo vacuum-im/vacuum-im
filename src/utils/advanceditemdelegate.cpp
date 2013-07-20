@@ -12,9 +12,6 @@
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QItemEditorFactory>
-#if defined(Q_OS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
-	#include <QWindowsVistaStyle>
-#endif
 
 static const qreal BlinkHideSteps[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
 static const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.0 };
@@ -546,9 +543,9 @@ void AdvancedItemDelegate::paint(QPainter *APainter, const QStyleOptionViewItem 
 {
 	QStyleOptionViewItemV4 indexOption = indexStyleOption(AOption,AIndex);
 
-#if defined(Q_OS_WIN) && !defined(QT_NO_STYLE_WINDOWSVISTA)
+#if defined(Q_OS_WIN)
 	QStyle *style = indexOption.widget ? indexOption.widget->style() : QApplication::style();
-	if (qobject_cast<QWindowsVistaStyle *>(style))
+	if (style && style->objectName()=="windowsvista")
 	{
 		indexOption.palette.setColor(QPalette::All, QPalette::HighlightedText, indexOption.palette.color(QPalette::Active, QPalette::Text));
 		indexOption.palette.setColor(QPalette::All, QPalette::Highlight, indexOption.palette.base().color().darker(108));

@@ -2,7 +2,6 @@
 
 #include <QUuid>
 #include <QCryptographicHash>
-#include <utils/QtEscape.h>
 
 #define SHC_STANZA_SESSION            "/message/feature[@xmlns='"NS_FEATURENEG"']"
 
@@ -873,7 +872,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 				notify.data.insert(NDR_STREAM_JID,ASession.streamJid.full());
 				notify.data.insert(NDR_CONTACT_JID,ASession.contactJid.full());
 				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
-				notify.data.insert(NDR_POPUP_HTML, Qt::escape(notify.data.value(NDR_TOOLTIP).toString()));
+				notify.data.insert(NDR_POPUP_HTML, notify.data.value(NDR_TOOLTIP).toString().toHtmlEscaped());
 				notify.data.insert(NDR_SOUND_FILE, SDF_SNEGOTIATION_REQUEST);
 				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());
@@ -1241,7 +1240,3 @@ void SessionNegotiation::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 			resumeSession(session.streamJid,session.contactJid);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_sessionnegotiation, SessionNegotiation)
-#endif

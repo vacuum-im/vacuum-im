@@ -37,9 +37,7 @@ class CaptchaForms :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICaptchaForms IStanzaHandler IStanzaRequestOwner IDataLocalizer);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ICaptchaForms");
-#endif
 public:
 	CaptchaForms();
 	~CaptchaForms();

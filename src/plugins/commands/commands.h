@@ -30,9 +30,7 @@ class Commands :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICommands IStanzaHandler IStanzaRequestOwner IXmppUriHandler IDiscoHandler IDiscoFeatureHandler);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ICommands");
-#endif
 public:
 	Commands();
 	~Commands();

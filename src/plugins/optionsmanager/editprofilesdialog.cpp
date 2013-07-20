@@ -2,7 +2,6 @@
 
 #include <QMessageBox>
 #include <QInputDialog>
-#include <utils/QtEscape.h>
 
 EditProfilesDialog::EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget *AParent) : QDialog(AParent)
 {
@@ -96,8 +95,8 @@ void EditProfilesDialog::onRemoveProfileClicked()
 	{
 		QString profile = listItem->text();
 		if (QMessageBox::question(this,tr("Remove Profile"),
-		                          tr("Are you sure you want to delete profile '<b>%1</b>'?").arg(Qt::escape(profile)),
-		                          QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+			tr("Are you sure you want to delete profile '<b>%1</b>'?").arg(profile.toHtmlEscaped()),
+			QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
 		{
 			if (!FManager->removeProfile(profile))
 				QMessageBox::warning(this,tr("Error"),tr("Failed to remove profile"));
