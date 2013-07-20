@@ -5,7 +5,7 @@
 #include <QDesktopWidget>
 
 #ifdef Q_OS_LINUX
-#include "qx11info_x11.h"
+	#include "x11info.h"
 	#include <X11/Xutil.h>
 	#include <X11/Xlib.h>
 	#include <X11/Xatom.h>
@@ -152,7 +152,7 @@ void WidgetManager::raiseWidget(QWidget *AWidget)
 
 	if (NET_ACTIVE_WINDOW == 0)
 	{
-		Display *dpy      = QX11Info::display();
+		Display *dpy      = X11Info::display();
 		NET_ACTIVE_WINDOW = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
 	}
 
@@ -161,10 +161,10 @@ void WidgetManager::raiseWidget(QWidget *AWidget)
 	xev.message_type = NET_ACTIVE_WINDOW;
 	xev.format       = 32;
 	xev.data.l[0]    = MESSAGE_SOURCE_PAGER;
-	xev.data.l[1]    = QX11Info::appUserTime();
+	xev.data.l[1]    = 0;//X11Info::appUserTime();
 	xev.data.l[2]    = xev.data.l[3] = xev.data.l[4] = 0;
 
-	XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
+	XSendEvent(X11Info::display(), X11Info::appRootWindow(), False, SubstructureNotifyMask | SubstructureRedirectMask, (XEvent*)&xev);
 #endif //Q_OS_LINUX
 
 	AWidget->raise();

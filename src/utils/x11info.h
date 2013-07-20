@@ -39,39 +39,21 @@
 **
 ****************************************************************************/
 
-#ifndef QX11INFO_X11_H
-#define QX11INFO_X11_H
-
-#include <QtCore/qnamespace.h>
+#ifndef X11INFO_H
+#define X11INFO_H
 
 typedef struct _XDisplay Display;
-struct xcb_connection_t;
 
-QT_BEGIN_NAMESPACE
-
-class QX11Info
+class X11Info
 {
 public:
-    static int appDpiX(int screen=-1);
-    static int appDpiY(int screen=-1);
-
-    static unsigned long appRootWindow(int screen=-1);
-    static int appScreen();
-
-    static unsigned long appTime();
-    static unsigned long appUserTime();
-
-    static void setAppTime(unsigned long time);
-    static void setAppUserTime(unsigned long time);
-
-    static Display *display();
-    static xcb_connection_t *connection();
-
+	static int appDpiX(int AScreen=-1);
+	static int appDpiY(int AScreen=-1);
+	static unsigned long appRootWindow(int AScreen=-1);
+	static int appScreen();
+	static Display *display();
 private:
-    QX11Info();
+	X11Info();
 };
 
-QT_END_NAMESPACE
-
-#endif // QX11INFO_X11_H
-
+#endif // X11INFO_H
