@@ -1,13 +1,12 @@
 #include "streamdialog.h"
 
-#include <QDesktopServices>
-#include <QFile>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QMessageBox>
 #include <QUrl>
+#include <QFile>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QVBoxLayout>
-#include <utils/QtEscape.h>
+#include <QDesktopServices>
 
 StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
 {
@@ -36,7 +35,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 		ui.lblContactLabel->setText(tr("From:"));
 	}
 
-	ui.lblContact->setText(Qt::escape(FFileStream->contactJid().uFull()));
+	ui.lblContact->setText(FFileStream->contactJid().uFull().toHtmlEscaped());
 
 	if (AFileStream->streamState() == IFileStream::Creating)
 	{

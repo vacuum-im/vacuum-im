@@ -177,19 +177,11 @@ StatusOptionsWidget::StatusOptionsWidget(IAutoStatus *AAutoStatus, IStatusChange
 	ui.tbwRules->setHorizontalHeaderLabels(QStringList() << QString::null << tr("Time") << tr("Status") << tr("Text") << tr("Priority"));
 
 	ui.tbwRules->sortItems(COL_TIME);
-#if QT_VERSION < 0x050000
-	ui.tbwRules->horizontalHeader()->setResizeMode(COL_ENABLED,QHeaderView::ResizeToContents);
-	ui.tbwRules->horizontalHeader()->setResizeMode(COL_TIME,QHeaderView::ResizeToContents);
-	ui.tbwRules->horizontalHeader()->setResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
-	ui.tbwRules->horizontalHeader()->setResizeMode(COL_TEXT,QHeaderView::Stretch);
-	ui.tbwRules->horizontalHeader()->setResizeMode(COL_PRIORITY,QHeaderView::ResizeToContents);
-#else
 	ui.tbwRules->horizontalHeader()->setSectionResizeMode(COL_ENABLED,QHeaderView::ResizeToContents);
 	ui.tbwRules->horizontalHeader()->setSectionResizeMode(COL_TIME,QHeaderView::ResizeToContents);
 	ui.tbwRules->horizontalHeader()->setSectionResizeMode(COL_SHOW,QHeaderView::ResizeToContents);
 	ui.tbwRules->horizontalHeader()->setSectionResizeMode(COL_TEXT,QHeaderView::Stretch);
 	ui.tbwRules->horizontalHeader()->setSectionResizeMode(COL_PRIORITY,QHeaderView::ResizeToContents);
-#endif
 	ui.tbwRules->horizontalHeader()->setSortIndicatorShown(false);
 	ui.tbwRules->horizontalHeader()->setHighlightSections(false);
 	ui.tbwRules->verticalHeader()->hide();

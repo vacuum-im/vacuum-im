@@ -1,7 +1,5 @@
 #include "captchaforms.h"
 
-#include <utils/QtEscape.h>
-
 #define SHC_MESSAGE_CAPTCHA         "/message/captcha[@xmlns='" NS_CAPTCHA_FORMS "']"
 
 #define ACCEPT_CHALLENGE_TIMEOUT    30000
@@ -276,7 +274,7 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
 			notify.data.insert(NDR_POPUP_CAPTION, tr("CAPTCHA Challenge"));
-			notify.data.insert(NDR_POPUP_HTML,Qt::escape(tr("You have received the CAPTCHA challenge")));
+			notify.data.insert(NDR_POPUP_HTML,tr("You have received the CAPTCHA challenge"));
 			notify.data.insert(NDR_SOUND_FILE,SDF_CAPTCHAFORMS_REQUEST);
 			notify.data.insert(NDR_ALERT_WIDGET,(qint64)AChallenge.dialog->instance());
 			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)AChallenge.dialog->instance());
@@ -434,7 +432,3 @@ void CaptchaForms::onNotificationRemoved(int ANotifyId)
 	}
 	FChallengeNotify.remove(ANotifyId);
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_captchaforms, CaptchaForms)
-#endif

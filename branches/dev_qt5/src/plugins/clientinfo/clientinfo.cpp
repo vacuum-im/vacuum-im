@@ -373,11 +373,9 @@ QString ClientInfo::osVersion() const
 #if defined(Q_OS_MAC)
 		switch (QSysInfo::MacintoshVersion)
 		{
-		# if QT_VERSION >= 0x040803
-			case QSysInfo::MV_MOUNTAINLION:
-				osver = "OS X 10.8 Mountain Lion";
-				break;
-		# endif
+		case QSysInfo::MV_MOUNTAINLION:
+			osver = "OS X 10.8 Mountain Lion";
+			break;
 		case QSysInfo::MV_LION:
 			osver = "OS X 10.7 Lion";
 			break;
@@ -472,11 +470,9 @@ QString ClientInfo::osVersion() const
 		case QSysInfo::WV_CE:
 			osver = "Windows CE";
 			break;
-		# if QT_VERSION >= 0x040803
-			case QSysInfo::WV_WINDOWS8:
-				osver = "Windows 8";
-				break;
-		# endif
+		case QSysInfo::WV_WINDOWS8:
+			osver = "Windows 8";
+			break;
 		case QSysInfo::WV_WINDOWS7:
 			osver = "Windows 7";
 			break;
@@ -900,7 +896,3 @@ void ClientInfo::onOptionsChanged(const OptionsNode &ANode)
 		FDiscovery->updateSelfEntityCapabilities();
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_clientinfo, ClientInfo)
-#endif

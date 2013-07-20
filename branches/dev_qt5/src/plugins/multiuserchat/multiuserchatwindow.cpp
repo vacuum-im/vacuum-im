@@ -8,7 +8,6 @@
 #include <QResizeEvent>
 #include <QTimer>
 #include <QToolTip>
-#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID              Action::DR_StreamJid
 #define ADR_ROOM_JID                Action::DR_Parametr1
@@ -445,7 +444,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 				}
 				else
 				{
-					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
+					notify.data.insert(NDR_POPUP_HTML,AMessage.body().toHtmlEscaped());
 				}
 			}
 			if (page)
@@ -469,7 +468,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Data form received"));
 				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(FMultiChat->streamJid(),contactJid));
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(contactJid));
-				notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text()));
+				notify.data.insert(NDR_POPUP_HTML,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text().toHtmlEscaped());
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_DATA_MESSAGE);
 				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());
@@ -710,11 +709,11 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 {
 	if (FUsers.contains(AUser))
 	{
-		AToolTips.insert(MUTTO_MUC_NICKNAME,QString("<big><b>%1</b></big>").arg(Qt::escape(AUser->nickName())));
+		AToolTips.insert(MUTTO_MUC_NICKNAME,QString("<big><b>%1</b></big>").arg(AUser->nickName().toHtmlEscaped()));
 
 		Jid realJid = AUser->data(MUDR_REAL_JID).toString();
 		if (!realJid.isEmpty())
-			AToolTips.insert(MUTTO_MUC_REALJID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(realJid.uBare())));
+			AToolTips.insert(MUTTO_MUC_REALJID,tr("<b>Jabber ID:</b> %1").arg(realJid.uBare().toHtmlEscaped()));
 
 		QString role = AUser->data(MUDR_ROLE).toString();
 		if (!role.isEmpty())
@@ -726,7 +725,7 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 				roleName = tr("Participant");
 			else if (role == MUC_ROLE_MODERATOR)
 				roleName = tr("Moderator");
-			AToolTips.insert(MUTTO_MUC_ROLE,tr("<b>Role:</b> %1").arg(Qt::escape(roleName)));
+			AToolTips.insert(MUTTO_MUC_ROLE,tr("<b>Role:</b> %1").arg(roleName.toHtmlEscaped()));
 		}
 
 		QString affiliation = AUser->data(MUDR_AFFILIATION).toString();
@@ -741,15 +740,15 @@ void MultiUserChatWindow::toolTipsForUser(IMultiUser *AUser, QMap<int,QString> &
 				affilName = tr("Administrator");
 			else if (affiliation == MUC_AFFIL_OWNER)
 				affilName = tr("Owner");
-			AToolTips.insert(MUTTO_MUC_AFFILIATION,tr("<b>Affiliation:</b> %1").arg(Qt::escape(affilName)));
+			AToolTips.insert(MUTTO_MUC_AFFILIATION,tr("<b>Affiliation:</b> %1").arg(affilName.toHtmlEscaped()));
 		}
 
 		QString ttStatus;
 		QString statusText = AUser->data(MUDR_STATUS).toString();
 		QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(AUser->data(MUDR_SHOW).toInt()) : QString::null;
-		ttStatus = tr("<b>Status:</b> %1").arg(Qt::escape(statusName));
+		ttStatus = tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped());
 		if (!statusText.isEmpty())
-			ttStatus +="<br>"+Qt::escape(statusText).replace('\n',"<br>");
+			ttStatus +="<br>"+statusText.toHtmlEscaped().replace('\n',"<br>");
 		AToolTips.insert(MUTTO_MUC_STATUS,ttStatus);
 
 		emit multiUserToolTips(AUser,AToolTips);
@@ -1423,7 +1422,7 @@ void MultiUserChatWindow::showMultiChatUserMessage(const Message &AMessage, cons
 	else
 		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
-	options.senderName = Qt::escape(ANick);
+	options.senderName = ANick.toHtmlEscaped();
 	options.senderId = options.senderName;
 
 	IMultiUser *user = FMultiChat->nickName()!=ANick ? FMultiChat->userByNick(ANick) : FMultiChat->mainUser();
@@ -1558,12 +1557,12 @@ void MultiUserChatWindow::fillPrivateChatContentOptions(IMessageChatWindow *AWin
 	if (AOptions.direction == IMessageContentOptions::DirectionIn)
 	{
 		AOptions.senderColor = "blue";
-		AOptions.senderName = Qt::escape(AWindow->contactJid().resource());
+		AOptions.senderName = AWindow->contactJid().resource().toHtmlEscaped();
 	}
 	else
 	{
 		AOptions.senderColor = "red";
-		AOptions.senderName = Qt::escape(FMultiChat->nickName());
+		AOptions.senderName = FMultiChat->nickName().toHtmlEscaped();
 	}
 	AOptions.senderId = AOptions.senderName;
 }

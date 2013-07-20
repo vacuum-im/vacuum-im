@@ -30,7 +30,7 @@
 #  define SVN_REVISION              "0"
 #endif
 
-#if defined(Q_OS_WIN32)
+#if defined(Q_OS_WIN)
 #  define ENV_APP_DATA              "APPDATA"
 #  define DIR_APP_DATA              APPLICATION_NAME
 #  define PATH_APP_DATA             ORGANIZATION_NAME"/"DIR_APP_DATA
@@ -48,7 +48,7 @@
 #  define PATH_APP_DATA             ORGANIZATION_NAME"/"DIR_APP_DATA
 #endif
 
-#if defined(Q_OS_WIN32)
+#if defined(Q_OS_WIN)
 #  define LIB_PREFIX_SIZE           0
 #else
 #  define LIB_PREFIX_SIZE           3

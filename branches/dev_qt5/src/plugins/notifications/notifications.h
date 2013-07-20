@@ -64,9 +64,7 @@ class Notifications :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin INotifications IOptionsHolder);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.INotifications");
-#endif
 public:
 	Notifications();
 	~Notifications();

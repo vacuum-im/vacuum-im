@@ -25,9 +25,7 @@ class SocksStreams :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ISocksStreams IDataStreamMethod);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.ISocksStreams");
-#endif
 public:
 	SocksStreams();
 	~SocksStreams();

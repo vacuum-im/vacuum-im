@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <QApplication>
 #include <QDesktopWidget>
-#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_HOST                  Action::DR_Parametr1
@@ -506,7 +505,7 @@ INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications,
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
 				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));
-				notify.data.insert(NDR_POPUP_HTML,Qt::escape(notify.data.value(NDR_TOOLTIP).toString()));
+				notify.data.insert(NDR_POPUP_HTML,notify.data.value(NDR_TOOLTIP).toString().toHtmlEscaped());
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
 				FActiveInvites.insert(AMessage.data(MDR_MESSAGE_ID).toInt(),AMessage);
 			}
@@ -532,7 +531,7 @@ bool MultiUserChatPlugin::messageShowWindow(int AMessageId)
 			fields.password = inviteElem.firstChildElement("password").text();
 
 			QString reason = inviteElem.firstChildElement("reason").text();
-			QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(Qt::escape(roomJid.uBare())).arg(Qt::escape(fromJid.uBare())).arg(Qt::escape(reason));
+			QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(roomJid.uBare().toHtmlEscaped()).arg(fromJid.uBare().toHtmlEscaped()).arg(reason.toHtmlEscaped());
 			msg += "<br><br>";
 			msg += tr("Do you want to join this conference?");
 
@@ -1486,7 +1485,3 @@ void MultiUserChatPlugin::onInviteActionTriggered(bool)
 		}
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_multiuserchat, MultiUserChatPlugin)
-#endif

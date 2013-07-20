@@ -38,9 +38,7 @@ class FileStreamsManager :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IOptionsHolder IFileStreamsManager IDataStreamProfile);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IFileStreamsManager");
-#endif
 public:
 	FileStreamsManager();
 	~FileStreamsManager();

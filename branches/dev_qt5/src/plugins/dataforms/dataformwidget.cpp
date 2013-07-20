@@ -8,7 +8,6 @@
 #include <QTabWidget>
 #include <QTextDocument>
 #include <QMessageBox>
-#include <utils/QtEscape.h>
 
 class ScrollArea : 
    public QScrollArea
@@ -143,7 +142,7 @@ bool DataFormWidget::checkForm(bool AAllowInvalid) const
 			if (!field.var.isEmpty() && !FDataForms->isFieldValid(field,DATAFORM_TYPE_SUBMIT))
 			{
 				invalidCount++;
-				message += QString("- <b>%2</b><br>").arg(Qt::escape(!field.label.isEmpty() ? field.label : field.var));
+				message += QString("- <b>%2</b><br>").arg(!field.label.isEmpty() ? field.label.toHtmlEscaped() : field.var.toHtmlEscaped());
 			}
 		}
 		if (invalidCount > 0)

@@ -2,7 +2,6 @@
 
 #include <QMouseEvent>
 #include <QApplication>
-#include <utils/QtEscape.h>
 
 #define HISTORY_MESSAGES          10
 #define HISTORY_TIME_DELTA        5
@@ -329,7 +328,7 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 				}
 				else
 				{
-					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
+					notify.data.insert(NDR_POPUP_HTML,AMessage.body().toHtmlEscaped());
 				}
 
 				FNotifiedMessages.insertMulti(window, AMessage.data(MDR_MESSAGE_ID).toInt());
@@ -552,7 +551,7 @@ void ChatMessageHandler::fillContentOptions(IMessageChatWindow *AWindow, IMessag
 	if (AOptions.direction == IMessageContentOptions::DirectionIn)
 	{
 		AOptions.senderId = AWindow->contactJid().full();
-		AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()));
+		AOptions.senderName = FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()).toHtmlEscaped();
 		AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->contactJid());
 		AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
 		AOptions.senderColor = "blue";
@@ -561,9 +560,9 @@ void ChatMessageHandler::fillContentOptions(IMessageChatWindow *AWindow, IMessag
 	{
 		AOptions.senderId = AWindow->streamJid().full();
 		if (AWindow->streamJid() && AWindow->contactJid())
-			AOptions.senderName = Qt::escape(!AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource() : AWindow->streamJid().uNode());
+			AOptions.senderName = !AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource().toHtmlEscaped() : AWindow->streamJid().uNode().toHtmlEscaped();
 		else
-			AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid()));
+			AOptions.senderName = FMessageStyles->contactName(AWindow->streamJid()).toHtmlEscaped();
 		AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->streamJid());
 		AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid());
 		AOptions.senderColor = "red";
@@ -1009,7 +1008,3 @@ void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOpti
 		}
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_chatmessagehandler, ChatMessageHandler)
-#endif

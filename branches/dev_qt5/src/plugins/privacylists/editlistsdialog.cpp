@@ -4,7 +4,6 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <utils/QtEscape.h>
 
 #define DR_NAME       Qt::UserRole
 #define DR_INDEX      Qt::UserRole+1
@@ -365,21 +364,21 @@ void EditListsDialog::onRequestFailed(const QString &AId, const XmppError &AErro
 	QString warning;
 	if (FActiveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be active: %2").arg(Qt::escape(FActiveRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
+		warning = tr("Privacy list '%1' could not be active: %2").arg(FActiveRequests.take(AId)).toHtmlEscaped().arg(AError.errorMessage().toHtmlEscaped());
 		onActiveListChanged(FStreamJid,FPrivacyLists->activeList(FStreamJid));
 	}
 	else if (FDefaultRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be default: %2").arg(Qt::escape(FDefaultRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
+		warning = tr("Privacy list '%1' could not be default: %2").arg(FDefaultRequests.take(AId).toHtmlEscaped()).arg(AError.errorMessage().toHtmlEscaped());
 		onDefaultListChanged(FStreamJid,FPrivacyLists->defaultList(FStreamJid));
 	}
 	else if (FSaveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be saved: %2").arg(Qt::escape(FSaveRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
+		warning = tr("Privacy list '%1' could not be saved: %2").arg(FSaveRequests.take(AId).toHtmlEscaped()).arg(AError.errorMessage().toHtmlEscaped());
 	}
 	else if (FRemoveRequests.contains(AId))
 	{
-		warning = tr("Privacy list '%1' could not be removed: %2").arg(Qt::escape(FRemoveRequests.take(AId))).arg(Qt::escape(AError.errorMessage()));
+		warning = tr("Privacy list '%1' could not be removed: %2").arg(FRemoveRequests.take(AId).toHtmlEscaped()).arg(AError.errorMessage().toHtmlEscaped());
 	}
 	if (!warning.isEmpty())
 		FWarnings.append(warning);

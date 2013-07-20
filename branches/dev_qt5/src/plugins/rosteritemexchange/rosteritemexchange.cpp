@@ -8,7 +8,6 @@
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
 #include <QMimeData>
-#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID         Action::DR_StreamJid
 #define ADR_CONTACT_JID        Action::DR_Parametr1
@@ -549,11 +548,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 			{
 				if (!ritem.isValid)
 					approveList.append(*it);
-#if QT_VERSION >= QT_VERSION_CHECK(4,6,0)
 				else if (!it->groups.isEmpty() && !ritem.groups.contains(it->groups))
-#else
-				else if (!it->groups.isEmpty())
-#endif
 					approveList.append(*it);
 			}
 			else if (ritem.isValid && it->action==ROSTEREXCHANGE_ACTION_DELETE)
@@ -624,7 +619,7 @@ void RosterItemExchange::notifyExchangeRequest(ExchangeApproveDialog *ADialog)
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Roster modification"));
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(request.streamJid,request.contactJid));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(request.contactJid));
-			notify.data.insert(NDR_POPUP_HTML,Qt::escape(tr("%1 offers you to make some changes in your contact list.").arg(FNotifications->contactName(request.streamJid,request.contactJid))));
+			notify.data.insert(NDR_POPUP_HTML,tr("%1 offers you to make some changes in your contact list.").arg(FNotifications->contactName(request.streamJid,request.contactJid)).toHtmlEscaped());
 			notify.data.insert(NDR_SOUND_FILE,SDF_ROSTEREXCHANGE_REQUEST);
 			notify.data.insert(NDR_ALERT_WIDGET,(qint64)ADialog);
 			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)ADialog);
@@ -664,11 +659,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 							roster->sendSubscription(it->itemJid,IRoster::Subscribe);
 					}
 				}
-#if QT_VERSION >= QT_VERSION_CHECK(4,6,0)
 				else if (!it->groups.isEmpty() && !ritem.groups.contains(it->groups))
-#else
-				else if (!it->groups.isEmpty())
-#endif
 				{
 					applied = true;
 					roster->setItem(ritem.itemJid,ritem.name,ritem.groups+it->groups);
@@ -825,7 +816,3 @@ void RosterItemExchange::onExchangeApproveDialogDestroyed()
 		FNotifications->removeNotification(notifyId);
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_rosteritemexchange, RosterItemExchange)
-#endif

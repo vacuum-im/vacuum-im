@@ -2,7 +2,6 @@
 
 #include <QHeaderView>
 #include <QMessageBox>
-#include <utils/QtEscape.h>
 
 enum Columns {
 	COL_NAME,
@@ -38,17 +37,10 @@ EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStr
 	}
 
 	QHeaderView *header = ui.tbwBookmarks->horizontalHeader();
-#if QT_VERSION < 0x050000
-	header->setClickable(true);
-	header->setResizeMode(COL_NAME,QHeaderView::ResizeToContents);
-	header->setResizeMode(COL_VALUE,QHeaderView::Stretch);
-	header->setResizeMode(COL_NICK,QHeaderView::ResizeToContents);
-#else
 	header->setSectionsClickable(true);
 	header->setSectionResizeMode(COL_NAME,QHeaderView::ResizeToContents);
 	header->setSectionResizeMode(COL_VALUE,QHeaderView::Stretch);
 	header->setSectionResizeMode(COL_NICK,QHeaderView::ResizeToContents);
-#endif
 	header->hideSection(COL_SORT);
 	connect(header,SIGNAL(sectionClicked(int)),SLOT(onSortingStateChange(int)));
 

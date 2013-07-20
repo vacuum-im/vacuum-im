@@ -24,9 +24,7 @@ class RecentContacts :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRecentContacts IRosterDataHolder IRostersDragDropHandler IRostersLabelHolder IRostersClickHooker IRecentItemHandler);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IRecentContacts");
-#endif
 public:
 	RecentContacts();
 	~RecentContacts();

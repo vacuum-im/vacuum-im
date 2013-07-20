@@ -21,6 +21,7 @@ class AdiumMessageStylePlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStylePlugin);
+	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.AdiumMessageStyle");
 public:
 	AdiumMessageStylePlugin();
 	~AdiumMessageStylePlugin();

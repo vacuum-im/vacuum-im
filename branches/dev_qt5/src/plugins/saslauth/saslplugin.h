@@ -25,9 +25,7 @@ class SASLPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeaturesPlugin IXmppStanzaHadler);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.SASLPlugin");
-#endif
 public:
 	SASLPlugin();
 	~SASLPlugin();

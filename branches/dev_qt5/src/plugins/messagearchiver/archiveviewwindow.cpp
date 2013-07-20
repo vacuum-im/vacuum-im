@@ -4,7 +4,6 @@
 #include <QMessageBox>
 #include <QItemSelectionModel>
 #include <QNetworkAccessManager>
-#include <utils/QtEscape.h>
 
 enum HistoryItemType {
 	HIT_CONTACT,
@@ -366,9 +365,9 @@ QStandardItem *ArchiveViewWindow::createHeaderItem(const IArchiveHeader &AHeader
 	item->setData(AHeader.version,HDR_HEADER_VERSION);
 	item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_DATE));
 
-	QString itemToolTip = Qt::escape(AHeader.with.uFull());
+	QString itemToolTip = AHeader.with.uFull().toHtmlEscaped();
 	if (!AHeader.subject.isEmpty())
-		itemToolTip += "<hr>" + Qt::escape(AHeader.subject);
+		itemToolTip += "<hr>" + AHeader.subject.toHtmlEscaped();
 	item->setToolTip(itemToolTip);
 
 	QStandardItem *parentItem = createParentItem(AHeader);
@@ -608,21 +607,21 @@ QString ArchiveViewWindow::showCollectionInfo(const IArchiveCollection &ACollect
 		"</table>";
 
 	QString info;
-	QString startDate = Qt::escape(ACollection.header.start.toString());
+	QString startDate = ACollection.header.start.toString().toHtmlEscaped();
 	if (FViewOptions.isPrivateChat)
 	{
-		QString withName = Qt::escape(ACollection.header.with.resource());
-		QString confName = Qt::escape(ACollection.header.with.uBare());
+		QString withName = ACollection.header.with.resource().toHtmlEscaped();
+		QString confName = ACollection.header.with.uBare().toHtmlEscaped();
 		info = tr("Conversation with <b>%1</b> in conference %2 started at <b>%3</b>.").arg(withName,confName,startDate);
 	}
 	else if (FViewOptions.isGroupChat)
 	{
-		QString confName = Qt::escape(ACollection.header.with.uBare());
+		QString confName = ACollection.header.with.uBare().toHtmlEscaped();
 		info = tr("Conversation in conference %1 started at <b>%2</b>.").arg(confName,startDate);
 	}
 	else
 	{
-		QString withName = Qt::escape(contactName(ACollection.header.with,true));
+		QString withName = contactName(ACollection.header.with,true).toHtmlEscaped();
 		info = tr("Conversation with %1 started at <b>%2</b>.").arg(withName,startDate);
 	}
 
@@ -640,7 +639,7 @@ QString ArchiveViewWindow::showCollectionInfo(const IArchiveCollection &ACollect
 		}
 		else
 		{
-			subject += Qt::escape(ACollection.header.subject);
+			subject += ACollection.header.subject.toHtmlEscaped();
 		}
 	}
 
@@ -668,7 +667,7 @@ QString ArchiveViewWindow::showNote(const QString &ANote, const IMessageContentO
 
 	QString tmpl = statusTmpl;
 	tmpl.replace("%time%",AOptions.time.toString(AOptions.timeFormat));
-	tmpl.replace("%message%",Qt::escape(ANote));
+	tmpl.replace("%message%",ANote.toHtmlEscaped());
 
 	return tmpl;
 }
@@ -760,10 +759,10 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 		}
 
 		if (!FViewOptions.isPrivateChat)
-			FViewOptions.contactName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid(),ACollection.header.with) : contactName(ACollection.header.with));
+			FViewOptions.contactName = FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid(),ACollection.header.with).toHtmlEscaped() : contactName(ACollection.header.with).toHtmlEscaped();
 		else
-			FViewOptions.contactName = Qt::escape(ACollection.header.with.resource());
-		FViewOptions.selfName = Qt::escape(FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid()) : streamJid().uBare());
+			FViewOptions.contactName = ACollection.header.with.resource().toHtmlEscaped();
+		FViewOptions.selfName = FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid()).toHtmlEscaped() : streamJid().uBare().toHtmlEscaped();
 	}
 
 	FViewOptions.lastTime = QDateTime();
@@ -790,7 +789,7 @@ void ArchiveViewWindow::showCollection(const IArchiveCollection &ACollection)
 			{
 				options.type |= IMessageContentOptions::TypeGroupchat;
 				options.direction = IMessageContentOptions::DirectionIn;
-				options.senderName = Qt::escape(senderJid.resource());
+				options.senderName =senderJid.resource().toHtmlEscaped();
 				options.senderColor = FViewOptions.style!=NULL ? FViewOptions.style->senderColor(options.senderName) : "blue";
 			}
 			else if (ACollection.header.with == senderJid)
@@ -1086,20 +1085,20 @@ void ArchiveViewWindow::onRemoveCollectionsByAction()
 		if (request.end.isValid())
 		{
 			message = tr("Do you want to remove conversation history with <b>%1</b> for <b>%2 %3</b>?")
-				.arg(Qt::escape(contactName(request.with)))
+				.arg(contactName(request.with).toHtmlEscaped())
 				.arg(QLocale().monthName(request.start.date().month()))
 				.arg(request.start.date().year());
 		}
 		else if (request.start.isValid())
 		{
 			message = tr("Do you want to remove conversation with <b>%1</b> started at <b>%2</b>?")
-				.arg(Qt::escape(contactName(request.with,true)))
+				.arg(contactName(request.with,true).toHtmlEscaped())
 				.arg(request.start.toString());
 		}
 		else
 		{
 			message = tr("Do you want to remove <b>all</b> conversation history with <b>%1</b>?")
-				.arg(Qt::escape(contactName(request.with,true)));
+				.arg(contactName(request.with,true).toHtmlEscaped());
 		}
 
 		if (QMessageBox::question(this, tr("Remove conversation history"), message, QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)

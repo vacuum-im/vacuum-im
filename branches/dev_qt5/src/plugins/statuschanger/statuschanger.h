@@ -56,9 +56,7 @@ class StatusChanger :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IStatusChanger");
-#endif
 public:
 	StatusChanger();
 	~StatusChanger();

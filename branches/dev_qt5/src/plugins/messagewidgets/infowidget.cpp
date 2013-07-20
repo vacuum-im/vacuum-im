@@ -9,7 +9,6 @@
 #include <QContextMenuEvent>
 #include <definitions/toolbargroups.h>
 #include <utils/textmanager.h>
-#include <utils/QtEscape.h>
 
 #define ADR_STREAM_JID           Action::DR_StreamJid
 #define ADR_CONTACT_JID          Action::DR_Parametr1
@@ -197,11 +196,11 @@ void InfoWidget::updateFieldView(int AField)
 			QString name = fieldValue(IMessageInfoWidget::Name).toString();
 			QString status = fieldValue(IMessageInfoWidget::StatusText).toString();
 			if (!name.isEmpty() && !status.isEmpty())
-				info = QString("<big><b>%1</b></big> - %2").arg(Qt::escape(name),Qt::escape(status));
+				info = QString("<big><b>%1</b></big> - %2").arg(name.toHtmlEscaped(),status.toHtmlEscaped());
 			else if (!name.isEmpty())
-				info = QString("<big><b>%1</b></big>").arg(Qt::escape(name));
+				info = QString("<big><b>%1</b></big>").arg(name.toHtmlEscaped());
 			else if (!status.isEmpty())
-				info = Qt::escape(status);
+				info = status.toHtmlEscaped();
 			ui.lblInfo->setText(info);
 			break;
 		}

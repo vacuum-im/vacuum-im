@@ -2,7 +2,6 @@
 
 #include <QSet>
 #include <QMessageBox>
-#include <utils/QtEscape.h>
 
 AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
@@ -176,12 +175,12 @@ void AddContactDialog::onDialogAccepted()
 		}
 		else
 		{
-			QMessageBox::information(NULL,FStreamJid.uBare(),tr("Contact <b>%1</b> already exists.").arg(Qt::escape(contactJid().uBare())));
+			QMessageBox::information(NULL,FStreamJid.uBare(),tr("Contact <b>%1</b> already exists.").arg(contactJid().uBare().toHtmlEscaped()));
 		}
 	}
 	else if (!contactJid().isEmpty())
 	{
-		QMessageBox::warning(this,FStreamJid.uBare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(Qt::escape(contactJid().uBare())));
+		QMessageBox::warning(this,FStreamJid.uBare(),tr("Can't add contact '<b>%1</b>' because it is not a valid Jabber ID").arg(contactJid().uBare().toHtmlEscaped()));
 	}
 }
 

@@ -1,6 +1,7 @@
 #include "statistics.h"
 
 #include <QDir>
+#include <QUrlQuery>
 #include <QWebFrame>
 #include <QDataStream>
 #include <QAuthenticator>
@@ -190,77 +191,79 @@ bool Statistics::sendStatisticsHit(const IStatisticsHit &AHit)
 QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 {
 	QUrl url(MP_URL);
-	url.setQueryDelimiters('=','&');
 
-	QList< QPair<QByteArray,QByteArray> > query;
-	query.append(qMakePair<QByteArray,QByteArray>("v",QUrl::toPercentEncoding(MP_VER)));
-	query.append(qMakePair<QByteArray,QByteArray>("tid",QUrl::toPercentEncoding(MP_ID)));
+	QList< QPair<QString,QString> > query;
+	query.append(qMakePair<QString,QString>("v",MP_VER));
+	query.append(qMakePair<QString,QString>("tid",MP_ID));
 
 	QString cid = FProfileId.toString();
 	cid.remove(0,1); cid.chop(1);
-	query.append(qMakePair<QByteArray,QByteArray>("cid",QUrl::toPercentEncoding(cid)));
+	query.append(qMakePair<QString,QString>("cid",cid));
 
 	qint64 qt = AHit.timestamp.msecsTo(QDateTime::currentDateTime());
 	if (qt > 0)
-		query.append(qMakePair<QByteArray,QByteArray>("qt",QUrl::toPercentEncoding(QString::number(qt))));
+		query.append(qMakePair<QString,QString>("qt",QString::number(qt)));
 
 	if (!AHit.description.isEmpty())
-		query.append(qMakePair<QByteArray,QByteArray>("cd",QUrl::toPercentEncoding(AHit.description)));
+		query.append(qMakePair<QString,QString>("cd",AHit.description));
 
 	if (AHit.session == IStatisticsHit::SessionStart)
-		query.append(qMakePair<QByteArray,QByteArray>("sc",QUrl::toPercentEncoding("start")));
+		query.append(qMakePair<QString,QString>("sc","start"));
 	else if (AHit.session == IStatisticsHit::SessionEnd)
-		query.append(qMakePair<QByteArray,QByteArray>("sc",QUrl::toPercentEncoding("end")));
+		query.append(qMakePair<QString,QString>("sc","end"));
 
-	query.append(qMakePair<QByteArray,QByteArray>("an",QUrl::toPercentEncoding(CLIENT_NAME)));
-	query.append(qMakePair<QByteArray,QByteArray>("av",QUrl::toPercentEncoding(QString("%1.%2").arg(FPluginManager->version(),FPluginManager->revision()))));
+	query.append(qMakePair<QString,QString>("an",CLIENT_NAME));
+	query.append(qMakePair<QString,QString>("av",QString("%1.%2").arg(FPluginManager->version(),FPluginManager->revision())));
 
 	if (AHit.type == IStatisticsHit::HitView)
 	{
-		query.append(qMakePair<QByteArray,QByteArray>("t",QUrl::toPercentEncoding("appview")));
+		query.append(qMakePair<QString,QString>("t","appview"));
 
-		query.append(qMakePair<QByteArray,QByteArray>("dt",QUrl::toPercentEncoding(AHit.view.title)));
+		query.append(qMakePair<QString,QString>("dt",AHit.view.title));
 
 		if (!AHit.view.location.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("dl",QUrl::toPercentEncoding(AHit.view.location)));
+			query.append(qMakePair<QString,QString>("dl",AHit.view.location));
 
 		if (!AHit.view.host.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("dh",QUrl::toPercentEncoding(AHit.view.host)));
+			query.append(qMakePair<QString,QString>("dh",AHit.view.host));
 
 		if (!AHit.view.path.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("dp",QUrl::toPercentEncoding(AHit.view.path)));
+			query.append(qMakePair<QString,QString>("dp",AHit.view.path));
 	}
 	else if (AHit.type == IStatisticsHit::HitEvent)
 	{
-		query.append(qMakePair<QByteArray,QByteArray>("t",QUrl::toPercentEncoding("event")));
+		query.append(qMakePair<QString,QString>("t","event"));
 
-		query.append(qMakePair<QByteArray,QByteArray>("ec",QUrl::toPercentEncoding(AHit.event.category)));
-		query.append(qMakePair<QByteArray,QByteArray>("ea",QUrl::toPercentEncoding(AHit.event.action)));
+		query.append(qMakePair<QString,QString>("ec",AHit.event.category));
+		query.append(qMakePair<QString,QString>("ea",AHit.event.action));
 
 		if (!AHit.event.label.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("el",QUrl::toPercentEncoding(AHit.event.label)));
+			query.append(qMakePair<QString,QString>("el",AHit.event.label));
 
 		if (AHit.event.value >= 0)
-			query.append(qMakePair<QByteArray,QByteArray>("ev",QUrl::toPercentEncoding(QString::number(AHit.event.value))));
+			query.append(qMakePair<QString,QString>("ev",QString::number(AHit.event.value)));
 	}
 	else if (AHit.type == IStatisticsHit::HitTiming)
 	{
-		query.append(qMakePair<QByteArray,QByteArray>("t",QUrl::toPercentEncoding("timing")));
-		query.append(qMakePair<QByteArray,QByteArray>("utc",QUrl::toPercentEncoding(AHit.timing.category)));
-		query.append(qMakePair<QByteArray,QByteArray>("utv",QUrl::toPercentEncoding(AHit.timing.variable)));
-		query.append(qMakePair<QByteArray,QByteArray>("utt",QUrl::toPercentEncoding(QString::number(AHit.timing.time))));
+		query.append(qMakePair<QString,QString>("t","timing"));
+		query.append(qMakePair<QString,QString>("utc",AHit.timing.category));
+		query.append(qMakePair<QString,QString>("utv",AHit.timing.variable));
+		query.append(qMakePair<QString,QString>("utt",QString::number(AHit.timing.time)));
 
 		if (!AHit.timing.label.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("utl",QUrl::toPercentEncoding(AHit.timing.label)));
+			query.append(qMakePair<QString,QString>("utl",AHit.timing.label));
 	}
 	else if (AHit.type == IStatisticsHit::HitException)
 	{
-		query.append(qMakePair<QByteArray,QByteArray>("t",QUrl::toPercentEncoding("exception")));
-		query.append(qMakePair<QByteArray,QByteArray>("exd",QUrl::toPercentEncoding(AHit.exception.errString)));
-		query.append(qMakePair<QByteArray,QByteArray>("exf",QUrl::toPercentEncoding(AHit.exception.fatal ? "1" : "0")));
+		query.append(qMakePair<QString,QString>("t","exception"));
+		query.append(qMakePair<QString,QString>("exd",AHit.exception.errString));
+		query.append(qMakePair<QString,QString>("exf",AHit.exception.fatal ? "1" : "0"));
 	}
 
-	url.setEncodedQueryItems(query);
+	QUrlQuery urlQuery;
+	urlQuery.setQueryDelimiters('=','&');
+	urlQuery.setQueryItems(query);
+	url.setQuery(urlQuery);
 
 	return url;
 }
@@ -375,5 +378,3 @@ void Statistics::onDefaultConnectionProxyChanged( const QUuid &AProxyId )
 {
 	FNetworkManager->setProxy(FConnectionManager->proxyById(AProxyId).proxy);
 }
-
-Q_EXPORT_PLUGIN2(plg_statistics, Statistics)

@@ -25,9 +25,7 @@ class JabberSearch :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IJabberSearch IStanzaRequestOwner IDiscoFeatureHandler IDataLocalizer);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IJabberSearch");
-#endif
 public:
 	JabberSearch();
 	~JabberSearch();

@@ -49,9 +49,7 @@ class VCardPlugin :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IVCardPlugin IStanzaRequestOwner IXmppUriHandler);
-#ifdef HAVE_QT5
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IVCardPlugin");
-#endif
 	friend class VCard;
 public:
 	VCardPlugin();

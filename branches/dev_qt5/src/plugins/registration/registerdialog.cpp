@@ -2,7 +2,6 @@
 
 #include <QVBoxLayout>
 #include <QMessageBox>
-#include <utils/QtEscape.h>
 
 RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid,
                                const Jid &AServiceJid, int AOperation, QWidget *AParent) : QDialog(AParent)
@@ -84,7 +83,7 @@ void RegisterDialog::doRegister()
 void RegisterDialog::doUnregister()
 {
 	resetDialog();
-	ui.lblInstuctions->setText(tr("Do you really want to remove registration from %1?").arg(Qt::escape(FServiceJid.uFull())));
+	ui.lblInstuctions->setText(tr("Do you really want to remove registration from %1?").arg(FServiceJid.uFull().toHtmlEscaped()));
 	ui.dbbButtons->setStandardButtons(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 }
 
@@ -144,11 +143,11 @@ void RegisterDialog::onRegisterSuccessful(const QString &AId)
 	{
 		resetDialog();
 		if (FOperation == IRegistration::Register)
-			ui.lblInstuctions->setText(tr("You are successfully registered at %1").arg(Qt::escape(FSubmit.serviceJid.uFull())));
+			ui.lblInstuctions->setText(tr("You are successfully registered at %1").arg(FSubmit.serviceJid.uFull().toHtmlEscaped()));
 		else if (FOperation == IRegistration::Unregister)
-			ui.lblInstuctions->setText(tr("You are successfully unregistered from %1").arg(Qt::escape(FSubmit.serviceJid.uFull())));
+			ui.lblInstuctions->setText(tr("You are successfully unregistered from %1").arg(FSubmit.serviceJid.uFull().toHtmlEscaped()));
 		else if (FOperation == IRegistration::ChangePassword)
-			ui.lblInstuctions->setText(tr("Password was successfully changed at %1").arg(Qt::escape(FSubmit.serviceJid.uFull())));
+			ui.lblInstuctions->setText(tr("Password was successfully changed at %1").arg(FSubmit.serviceJid.uFull().toHtmlEscaped()));
 
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Close);
 	}

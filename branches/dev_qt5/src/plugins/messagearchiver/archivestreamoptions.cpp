@@ -6,7 +6,6 @@
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QMessageBox>
-#include <utils/QtEscape.h>
 
 #define ONE_DAY           (24*60*60)
 #define ONE_MONTH         (ONE_DAY*31)
@@ -239,19 +238,11 @@ ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Ji
 
 	ArchiveDelegate *delegat = new ArchiveDelegate(AArchiver,ui.tbwItemPrefs);
 	ui.tbwItemPrefs->setItemDelegate(delegat);
-#if QT_VERSION < 0x050000
-	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(JID_COLUMN,QHeaderView::Stretch);
-	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(SAVE_COLUMN,QHeaderView::ResizeToContents);
-	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(OTR_COLUMN,QHeaderView::ResizeToContents);
-	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(EXPIRE_COLUMN,QHeaderView::ResizeToContents);
-	ui.tbwItemPrefs->horizontalHeader()->setResizeMode(EXACT_COLUMN,QHeaderView::ResizeToContents);
-#else
 	ui.tbwItemPrefs->horizontalHeader()->setSectionResizeMode(JID_COLUMN,QHeaderView::Stretch);
 	ui.tbwItemPrefs->horizontalHeader()->setSectionResizeMode(SAVE_COLUMN,QHeaderView::ResizeToContents);
 	ui.tbwItemPrefs->horizontalHeader()->setSectionResizeMode(OTR_COLUMN,QHeaderView::ResizeToContents);
 	ui.tbwItemPrefs->horizontalHeader()->setSectionResizeMode(EXPIRE_COLUMN,QHeaderView::ResizeToContents);
 	ui.tbwItemPrefs->horizontalHeader()->setSectionResizeMode(EXACT_COLUMN,QHeaderView::ResizeToContents);
-#endif
 
 	ui.cmbMethodAuto->addItem(tr("Yes, if supported by server"),ARCHIVE_METHOD_PREFER);
 	ui.cmbMethodAuto->addItem(tr("Yes, if other archive is not available"),ARCHIVE_METHOD_CONCEDE);
@@ -417,11 +408,7 @@ void ArchiveStreamOptions::updateItemPrefs(const Jid &AItemJid, const IArchiveIt
 		ui.tbwItemPrefs->setItem(jidItem->row(),OTR_COLUMN,otrItem);
 		ui.tbwItemPrefs->setItem(jidItem->row(),EXPIRE_COLUMN,expireItem);
 		ui.tbwItemPrefs->setItem(jidItem->row(),EXACT_COLUMN,exactItem);
-#if QT_VERSION < 0x050000
-		ui.tbwItemPrefs->verticalHeader()->setResizeMode(jidItem->row(),QHeaderView::ResizeToContents);
-#else
 		ui.tbwItemPrefs->verticalHeader()->setSectionResizeMode(jidItem->row(),QHeaderView::ResizeToContents);
-#endif
 		FTableItems.insert(AItemJid,jidItem);
 	}
 	QTableWidgetItem *jidItem = FTableItems.value(AItemJid);
@@ -501,7 +488,7 @@ void ArchiveStreamOptions::onAddItemPrefClicked()
 	}
 	else if (!itemJid.isEmpty())
 	{
-		QMessageBox::warning(this,tr("Unacceptable item JID"),tr("'%1' is not valid JID or already exists").arg(Qt::escape(itemJid.uFull())));
+		QMessageBox::warning(this,tr("Unacceptable item JID"),tr("'%1' is not valid JID or already exists").arg(itemJid.uFull().toHtmlEscaped()));
 	}
 }
 

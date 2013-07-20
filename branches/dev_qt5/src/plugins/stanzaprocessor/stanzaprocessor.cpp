@@ -414,7 +414,3 @@ void StanzaProcessor::onStanzaHandlerDestroyed(QObject *AHandler)
 		if (FHandles.value(shandleId).handler->instance() == AHandler)
 			removeStanzaHandle(shandleId);
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_stanzaprocessor, StanzaProcessor)
-#endif

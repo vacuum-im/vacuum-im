@@ -3,7 +3,6 @@
 #include <QRegExp>
 #include <QLineEdit>
 #include <QInputDialog>
-#include <utils/QtEscape.h>
 
 #define MAX_HILIGHT_ITEMS            10
 #define TEXT_SEARCH_TIMEOUT          500
@@ -167,13 +166,8 @@ void ConsoleWidget::colorXml(QString &AXml) const
 		{ "\n",                                 "<br>"                                          ,                     false      },
 		{ "&lt;([\\w:-]+)((\\s|/|&gt))",        "&lt;<span style='color:navy;'>\\1</span>\\2"   ,                     false      },   //open tagName
 		{ "&lt;/([\\w:-]+)&gt;",                "&lt;/<span style='color:navy;'>\\1</span>&gt;" ,                     false      },   //close tagName
-#if QT_VERSION <= 0x040503
-		{ "\\sxmlns\\s?=\\s?\"(.+)\"",          " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
-		{ "\\s([\\w:-]+\\s?)=\\s?\"",           " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
-#else
 		{ "\\sxmlns\\s?=\\s?&quot;(.+)&quot;",  " <u><span style='color:darkred;'>xmlns</span>=\"<i>\\1</i>\"</u>",   true       },   //xmlns
 		{ "\\s([\\w:-]+\\s?)=\\s?&quot;",       " <span style='color:darkred;'>\\1</span>=\"",                        false      }    //attribute
-#endif
 	};
 	static const int changesCount = sizeof(changes)/sizeof(changes[0]);
 
@@ -204,17 +198,17 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 
 		if (accepted)
 		{
-			static QString sended =   Qt::escape(">>>>") + " <b>%1</b> %2 +%3 " + Qt::escape(">>>>");
-			static QString received = Qt::escape("<<<<") + " <b>%1</b> %2 +%3 " + Qt::escape("<<<<");
+			static QString sended =   QString(">>>>").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString(">>>>").toHtmlEscaped();
+			static QString received = QString("<<<<").toHtmlEscaped() + " <b>%1</b> %2 +%3 " + QString("<<<<").toHtmlEscaped();
 
 			int delta = FTimePoint.isValid() ? FTimePoint.msecsTo(QTime::currentTime()) : 0;
 			FTimePoint = QTime::currentTime();
-			QString caption = (ASended ? sended : received).arg(Qt::escape(AXmppStream->streamJid().uFull())).arg(FTimePoint.toString()).arg(delta);
+			QString caption = (ASended ? sended : received).arg(AXmppStream->streamJid().uFull().toHtmlEscaped()).arg(FTimePoint.toString()).arg(delta);
 			ui.tbrConsole->append(caption);
 
 			QString xml = stanza.toString(2);
 			hidePasswords(xml);
-			xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
+			xml = "<pre>"+xml.toHtmlEscaped().replace('\n',"<br>")+"</pre>";
 			if (ui.chbHilightXML->checkState() == Qt::Checked)
 				colorXml(xml);
 			else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)

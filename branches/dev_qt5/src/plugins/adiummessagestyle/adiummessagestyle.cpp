@@ -380,8 +380,8 @@ QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOption
 void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
 {
 	AHtml.replace("%chatName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
-	AHtml.replace("%timeOpened%",Qt::escape(AOptions.extended.value(MSO_START_DATE_TIME).toDateTime().time().toString()));
-	AHtml.replace("%dateOpened%",Qt::escape(AOptions.extended.value(MSO_START_DATE_TIME).toDateTime().date().toString()));
+	AHtml.replace("%timeOpened%",AOptions.extended.value(MSO_START_DATE_TIME).toDateTime().time().toString().toHtmlEscaped());
+	AHtml.replace("%dateOpened%",AOptions.extended.value(MSO_START_DATE_TIME).toDateTime().date().toString().toHtmlEscaped());
 	AHtml.replace("%sourceName%",AOptions.extended.value(MSO_ACCOUNT_NAME).toString());
 	AHtml.replace("%destinationName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
 	AHtml.replace("%destinationDisplayName%",AOptions.extended.value(MSO_CHAT_NAME).toString());
@@ -532,7 +532,7 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 
 	//AHtml.replace("%messageDirection%", AOptions.isAlignLTR ? "ltr" : "rtl" );
 	AHtml.replace("%senderStatusIcon%",AOptions.senderIcon);
-	AHtml.replace("%shortTime%", Qt::escape(AOptions.time.toString(tr("hh:mm"))));
+	AHtml.replace("%shortTime%", AOptions.time.toString(tr("hh:mm")).toHtmlEscaped());
 	AHtml.replace("%service%",QString::null);
 
 	QString avatar = AOptions.senderAvatar;
@@ -542,10 +542,10 @@ void AdiumMessageStyle::fillContentKeywords(QString &AHtml, const IMessageConten
 		if (!isDirectionIn && !QFile::exists(FResourcePath+"/"+avatar))
 			avatar = "Incoming/buddy_icon.png";
 	}
-	AHtml.replace("%userIconPath%",avatar);
+	AHtml.replace("%userIconPath%",QUrl::fromLocalFile(avatar).toString());
 
 	QString timeFormat = !AOptions.timeFormat.isEmpty() ? AOptions.timeFormat : tr("hh:mm:ss");
-	QString time = Qt::escape(AOptions.time.toString(timeFormat));
+	QString time = AOptions.time.toString(timeFormat).toHtmlEscaped();
 	AHtml.replace("%time%", time);
 
 	QRegExp timeRegExp("%time\\{([^}]*)\\}%");

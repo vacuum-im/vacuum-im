@@ -4,7 +4,6 @@
 #include <QClipboard>
 #include <QScrollBar>
 #include <QApplication>
-#include <utils/QtEscape.h>
 
 #define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
@@ -643,18 +642,18 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 		{
 			QString name = AIndex->data(RDR_NAME).toString();
 			if (!name.isEmpty())
-				ttInfo += "<big><b>" + Qt::escape(name) + "</b></big><br>";
+				ttInfo += "<big><b>" + name.toHtmlEscaped() + "</b></big><br>";
 
 			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 			if (!streamJid.isEmpty() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
 			{
 				IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
-				ttInfo += tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())) + "<br>";
+				ttInfo += tr("<b>Account:</b> %1").arg(account!=NULL ? account->name().toHtmlEscaped() : streamJid.uBare().toHtmlEscaped()) + "<br>";
 			}
 
 			Jid itemJid = AIndex->data(RDR_FULL_JID).toString();
 			if (!itemJid.isEmpty())
-				ttInfo += tr("<b>Jabber ID:</b> %1").arg(Qt::escape(itemJid.uBare())) + "<br>";
+				ttInfo += tr("<b>Jabber ID:</b> %1").arg(itemJid.uBare().toHtmlEscaped()) + "<br>";
 
 			QString ask = AIndex->data(RDR_ASK).toString();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
@@ -669,9 +668,9 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 					subsName = tr("Provided from you");
 
 				if (ask == SUBSCRIPTION_SUBSCRIBE)
-					ttInfo += tr("<b>Subscription:</b> %1, request sent").arg(Qt::escape(subsName)) + "<br>";
+					ttInfo += tr("<b>Subscription:</b> %1, request sent").arg(subsName.toHtmlEscaped()) + "<br>";
 				else
-					ttInfo += tr("<b>Subscription:</b> %1").arg(Qt::escape(subsName)) + "<br>";
+					ttInfo += tr("<b>Subscription:</b> %1").arg(subsName.toHtmlEscaped()) + "<br>";
 			}
 		}
 
@@ -692,10 +691,10 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 				IPresenceItem pitem = presence!=NULL ? presence->findItem(itemJid) : IPresenceItem();
 				if (pitem.isValid)
 				{
-					ttResources += tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(pitem.itemJid.resource())).arg(pitem.priority) + "<br>";
+					ttResources += tr("<b>Resource:</b> %1 (%2)").arg(pitem.itemJid.resource().toHtmlEscaped()).arg(pitem.priority) + "<br>";
 					QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(pitem.show) : QString::null;
-					ttResources += tr("<b>Status:</b> %1").arg(Qt::escape(statusName)) + "<br>";
-					ttResources += Qt::escape(pitem.status).replace('\n',"<br>");
+					ttResources += tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped()) + "<br>";
+					ttResources += pitem.status.toHtmlEscaped().replace('\n',"<br>");
 
 					if (ttResources.endsWith("<br>"))
 						ttResources.chop(4);
@@ -712,12 +711,12 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			int priority = AIndex->data(RDR_PRIORITY).toInt();
 			QString resource = Jid(AIndex->data(RDR_FULL_JID).toString()).resource();
 			if (show!=IPresence::Offline && show!=IPresence::Error)
-				ttResource += tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(resource)).arg(priority) + "<br>";
+				ttResource += tr("<b>Resource:</b> %1 (%2)").arg(resource.toHtmlEscaped()).arg(priority) + "<br>";
 
 			QString status = AIndex->data(RDR_STATUS).toString();
 			QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(show) : QString::null;
-			ttResource += tr("<b>Status:</b> %1").arg(Qt::escape(statusName)) + "<br>";
-			ttResource += Qt::escape(status).replace('\n',"<br>");
+			ttResource += tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped()) + "<br>";
+			ttResource += status.toHtmlEscaped().replace('\n',"<br>");
 
 			if (ttResource.endsWith("<br>"))
 				ttResource.chop(4);
@@ -851,7 +850,3 @@ void RostersViewPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget
 		}
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_rostersview, RostersViewPlugin)
-#endif

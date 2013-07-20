@@ -288,7 +288,3 @@ void PrivateStorage::onPresenceAboutToClose(IPresence *APresence, int AShow, con
 	FPreClosedStreams += APresence->streamJid();
 	emit storageNotifyAboutToClose(APresence->streamJid());
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_privatestorage, PrivateStorage)
-#endif

@@ -177,7 +177,3 @@ void PEPManager::onPEPHandlerDestroyed(QObject *AHandler)
 		}
 	}
 }
-
-#ifndef HAVE_QT5
-Q_EXPORT_PLUGIN2(plg_pepmanager, PEPManager)
-#endif

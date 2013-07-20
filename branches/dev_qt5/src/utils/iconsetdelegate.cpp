@@ -40,11 +40,7 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
 
 		if (!AIndex.data(IDR_HIDE_ICONSET_NAME).toBool())
 		{
-#if QT_VERSION < 0x050000
-			QRect checkRect(drawRect.topLeft(),check(AOption,drawRect,AIndex.data(Qt::CheckStateRole)).size());
-#else
 			QRect checkRect(drawRect.topLeft(),doCheck(AOption,drawRect,AIndex.data(Qt::CheckStateRole)).size());
-#endif
 			drawCheck(APainter,AOption,checkRect,static_cast<Qt::CheckState>(AIndex.data(Qt::CheckStateRole).toInt()));
 			drawRect.setLeft(checkRect.right()+space);
 
@@ -118,11 +114,7 @@ QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QMode
 
 		if (!AIndex.data(IDR_HIDE_ICONSET_NAME).toBool())
 		{
-#if QT_VERSION < 0x050000
-			QSize checkSize = check(AOption,AOption.rect,AIndex.data(Qt::CheckStateRole)).size();
-#else
 			QSize checkSize = doCheck(AOption,AOption.rect,AIndex.data(Qt::CheckStateRole)).size();
-#endif
 			QString displayText = storage->storageProperty(FILE_STORAGE_NAME,name+"/"+subdir);
 			QSize textSize = AOption.fontMetrics.size(Qt::TextSingleLine,displayText);
 			size.setHeight(qMax(checkSize.height(),textSize.height()));
@@ -159,16 +151,11 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
 	if (!value.isValid())
 		return false;
 
-
 	if ((AEvent->type() == QEvent::MouseButtonRelease) || (AEvent->type() == QEvent::MouseButtonDblClick))
 	{
 		int space = 2;
 		QRect drawRect = AOption.rect.adjusted(space,space,-space,-space);
-#if QT_VERSION < 0x050000
-		QRect checkRect(drawRect.topLeft(),check(AOption, AOption.rect, Qt::Checked).size());
-#else
 		QRect checkRect(drawRect.topLeft(),doCheck(AOption, AOption.rect, Qt::Checked).size());
-#endif
 		if (!checkRect.contains(static_cast<QMouseEvent*>(AEvent)->pos()))
 			return false;
 
@@ -182,7 +169,9 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
 			return false;
 	}
 	else
+	{
 		return false;
+	}
 
 	Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
 	return AModel->setData(AIndex, state, Qt::CheckStateRole);

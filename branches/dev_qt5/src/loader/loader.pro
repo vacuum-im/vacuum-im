@@ -2,7 +2,7 @@ include(../make/config.inc)
 
 TARGET             = $$VACUUM_LOADER_NAME
 TEMPLATE           = app
-QT                += xml
+QT                += widgets xml
 LIBS              += -L../libs
 LIBS              += -l$$VACUUM_UTILS_NAME
 DEPENDPATH        += ..

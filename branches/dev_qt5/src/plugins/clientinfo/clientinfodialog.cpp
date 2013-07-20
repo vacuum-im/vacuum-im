@@ -1,7 +1,5 @@
 #include "clientinfodialog.h"
 
-#include <utils/QtEscape.h>
-
 ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid,
                                    const QString &AContactName, int AInfoTypes, QWidget *AParent) : QDialog(AParent)
 {
@@ -43,7 +41,7 @@ void ClientInfoDialog::setInfoTypes(int AInfoTypes)
 void ClientInfoDialog::updateText()
 {
 	QString itemMask = "%1 %2<br>";
-	QString html = QString("<b>%1</b> (%2)<br><br>").arg(Qt::escape(FContactName)).arg(Qt::escape(FContactJid.uFull()));
+	QString html = QString("<b>%1</b> (%2)<br><br>").arg(FContactName.toHtmlEscaped()).arg(FContactJid.uFull().toHtmlEscaped());
 
 	//Software Info
 	if ((FInfoTypes & IClientInfo::SoftwareVersion)>0)
@@ -51,11 +49,11 @@ void ClientInfoDialog::updateText()
 		html += "<b>" + tr("Software Version") + "</b><br>";
 		if (FClientInfo->hasSoftwareInfo(FContactJid))
 		{
-			html += itemMask.arg(tr("Name:")).arg(Qt::escape(FClientInfo->softwareName(FContactJid)));
+			html += itemMask.arg(tr("Name:")).arg(FClientInfo->softwareName(FContactJid).toHtmlEscaped());
 			if (!FClientInfo->softwareVersion(FContactJid).isEmpty())
-				html += itemMask.arg(tr("Version:")).arg(Qt::escape(FClientInfo->softwareVersion(FContactJid)));
+				html += itemMask.arg(tr("Version:")).arg(FClientInfo->softwareVersion(FContactJid).toHtmlEscaped());
 			if (!FClientInfo->softwareOs(FContactJid).isEmpty())
-				html += itemMask.arg(tr("OS:")).arg(Qt::escape(FClientInfo->softwareOs(FContactJid)));
+				html += itemMask.arg(tr("OS:")).arg(FClientInfo->softwareOs(FContactJid).toHtmlEscaped());
 		}
 		else if (FClientInfo->softwareStatus(FContactJid) == IClientInfo::SoftwareError)
 		{
@@ -89,7 +87,7 @@ void ClientInfoDialog::updateText()
 			{
 				html += itemMask.arg(tr("Inactive:")).arg(secsToString(FClientInfo->lastActivityTime(FContactJid).secsTo(QDateTime::currentDateTime())));
 				if (!FClientInfo->lastActivityText(FContactJid).isEmpty())
-					html += itemMask.arg(tr("Status:")).arg(Qt::escape(FClientInfo->lastActivityText(FContactJid)));
+					html += itemMask.arg(tr("Status:")).arg(FClientInfo->lastActivityText(FContactJid).toHtmlEscaped());
 			}
 			else
 			{
