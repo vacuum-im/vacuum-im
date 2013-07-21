@@ -47,10 +47,7 @@ typedef struct _XDisplay Display;
 class X11Info
 {
 public:
-	static int appDpiX(int AScreen=-1);
-	static int appDpiY(int AScreen=-1);
 	static unsigned long appRootWindow(int AScreen=-1);
-	static int appScreen();
 	static Display *display();
 private:
 	X11Info();
