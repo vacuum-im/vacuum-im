@@ -14,6 +14,5 @@ if (NOT SYSTEM_QTLOCKEDFILE_FOUND)
 	add_subdirectory(qtlockedfile)
 endif (NOT SYSTEM_QTLOCKEDFILE_FOUND)
 
-add_subdirectory(jdns)
 add_subdirectory(idle)
 add_subdirectory(qxtglobalshortcut)
