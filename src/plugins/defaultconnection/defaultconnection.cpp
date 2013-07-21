@@ -13,10 +13,8 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 	FPlugin = APlugin;
 	FDisconnecting = false;
 	
-	FSrvQueryId = START_QUERY_ID;
-	connect(&FDns, SIGNAL(resultsReady(int, const QJDns::Response &)),SLOT(onDnsResultsReady(int, const QJDns::Response &)));
-	connect(&FDns, SIGNAL(error(int, QJDns::Error)),SLOT(onDnsError(int, QJDns::Error)));
-	connect(&FDns, SIGNAL(shutdownFinished()),SLOT(onDnsShutdownFinished()));
+	FDnsLookup.setType(QDnsLookup::SRV);
+	connect(&FDnsLookup,SIGNAL(finished()),SLOT(onDnsLookupFinished()));
 
 	FSocket.setProtocol(QSsl::AnyProtocol);
 	FSocket.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
@@ -29,6 +27,10 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 	connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
 	connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
 	connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
+
+	// Make FDnsLookup.isFinished to be true
+	FDnsLookup.lookup();
+	FDnsLookup.abort();
 }
 
 DefaultConnection::~DefaultConnection()
@@ -49,7 +51,7 @@ bool DefaultConnection::isEncrypted() const
 
 bool DefaultConnection::connectToHost()
 {
-	if (FSrvQueryId==START_QUERY_ID && FSocket.state()==QAbstractSocket::UnconnectedState)
+	if (FDnsLookup.isFinished() && FSocket.state()==QAbstractSocket::UnconnectedState)
 	{
 		emit aboutToConnect();
 
@@ -61,17 +63,15 @@ bool DefaultConnection::connectToHost()
 		QString domain = option(IDefaultConnection::COR_DOMAINE).toString();
 		FUseLegacySSL = option(IDefaultConnection::COR_USE_LEGACY_SSL).toBool();
 
-		QJDns::Record record;
-		record.name = !host.isEmpty() ? host.toLatin1() : domain.toLatin1();
+		SrvRecord record;
+		record.target = !host.isEmpty() ? host : domain;
 		record.port = port;
-		record.priority = 0;
-		record.weight = 0;
 		FRecords.append(record);
 
-		if (host.isEmpty() && FDns.init(QJDns::Unicast, QHostAddress::Any))
+		if (host.isEmpty())
 		{
-			FDns.setNameServers(QJDns::systemInfo().nameServers);
-			FSrvQueryId = FDns.queryStart(QString("_xmpp-client._tcp.%1.").arg(domain).toLatin1(),QJDns::Srv);
+			FDnsLookup.setName(QString("_xmpp-client._tcp.%1.").arg(domain));
+			FDnsLookup.lookup();
 		}
 		else
 		{
@@ -97,24 +97,21 @@ void DefaultConnection::disconnectFromHost()
 				FSocket.flush();
 				FSocket.disconnectFromHost();
 			}
-			else
+			else if (FSocket.state() != QSslSocket::ClosingState)
 			{
 				FSocket.abort();
-				emit disconnected();
+			}
+			if (FSocket.state()!=QSslSocket::UnconnectedState && !FSocket.waitForDisconnected(DISCONNECT_TIMEOUT))
+			{
+				FSocket.abort();
 			}
 		}
-		else if (FSrvQueryId != START_QUERY_ID)
+		else if (!FDnsLookup.isFinished())
 		{
-			FSrvQueryId = STOP_QUERY_ID;
-			FDns.shutdown();
+			FDnsLookup.abort();
 		}
 
-		if (FSocket.state()!=QSslSocket::UnconnectedState && !FSocket.waitForDisconnected(DISCONNECT_TIMEOUT))
-		{
-			FSocket.abort();
-			emit disconnected();
-		}
-
+		emit disconnected();
 		FDisconnecting = false;
 	}
 }
@@ -223,49 +220,32 @@ void DefaultConnection::connectToNextHost()
 {
 	if (!FRecords.isEmpty())
 	{
-		QJDns::Record record = FRecords.takeFirst();
-
-		while (record.name.endsWith('.'))
-			record.name.chop(1);
+		SrvRecord record = FRecords.takeFirst();
 
 		if (FUseLegacySSL)
-			FSocket.connectToHostEncrypted(record.name, record.port);
+			FSocket.connectToHostEncrypted(record.target, record.port);
 		else
-			FSocket.connectToHost(record.name, record.port);
+			FSocket.connectToHost(record.target, record.port);
 	}
 }
 
-void DefaultConnection::onDnsResultsReady(int AId, const QJDns::Response &AResults)
+void DefaultConnection::onDnsLookupFinished()
 {
-	if (FSrvQueryId == AId)
+	if (!FRecords.isEmpty())
 	{
-		if (!AResults.answerRecords.isEmpty())
+		QList<QDnsServiceRecord> dnsRecords = FDnsLookup.serviceRecords();
+		if (!dnsRecords.isEmpty())
 		{
-			FUseLegacySSL = false;
-			FRecords = AResults.answerRecords;
+			FRecords.clear();
+			foreach (const QDnsServiceRecord &dnsRecord, dnsRecords)
+			{
+				SrvRecord srvRecord;
+				srvRecord.target = dnsRecord.target();
+				srvRecord.port = dnsRecord.port();
+				FRecords.append(srvRecord);
+			}
 		}
-		FDns.shutdown();
-	}
-}
-
-void DefaultConnection::onDnsError(int AId, QJDns::Error AError)
-{
-	Q_UNUSED(AError);
-	if (FSrvQueryId == AId)
-		FDns.shutdown();
-}
-
-void DefaultConnection::onDnsShutdownFinished()
-{
-	if (FSrvQueryId != STOP_QUERY_ID)
-	{
-		FSrvQueryId = START_QUERY_ID;
 		connectToNextHost();
-	}
-	else
-	{
-		FSrvQueryId = START_QUERY_ID;
-		emit disconnected();
 	}
 }
 
@@ -327,5 +307,6 @@ void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 
 void DefaultConnection::onSocketDisconnected()
 {
+	FRecords.clear();
 	emit disconnected();
 }

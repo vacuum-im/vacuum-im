@@ -3,6 +3,7 @@
 
 #define DEFAULTCONNECTION_UUID "{68F9B5F2-5898-43f8-9DD1-19F37E9779AC}"
 
+#include <QSslKey>
 #include <QSslSocket>
 
 class IDefaultConnection
