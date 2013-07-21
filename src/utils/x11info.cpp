@@ -6,55 +6,11 @@
 #include <QDesktopWidget>
 #include <X11/Xlib.h>
 
+#include <QtGui/qpa/qplatformwindow.h>
+#include <QtGui/qpa/qplatformnativeinterface.h>
 
 X11Info::X11Info()
 {
-}
-
-/*!
-	Returns the horizontal resolution of the given \a screen in terms of the
-	number of dots per inch.
-
-	The \a screen argument is an X screen number. Be aware that if
-	the user's system uses Xinerama (as opposed to traditional X11
-	multiscreen), there is only one X screen. Use QDesktopWidget to
-	query for information about Xinerama screens.
-
-	\sa setAppDpiX(), appDpiY()
-*/
-int X11Info::appDpiX(int AScreen)
-{
-	if (AScreen == -1)
-	{
-		const QScreen *scr = QGuiApplication::primaryScreen();
-		return scr!=NULL ? qRound(scr->logicalDotsPerInchX()) : 75;
-	}
-
-	QList<QScreen *> screens = QGuiApplication::screens();
-	return AScreen < screens.size() ? screens[AScreen]->logicalDotsPerInchX() : 0;
-}
-
-/*!
-	Returns the vertical resolution of the given \a screen in terms of the
-	number of dots per inch.
-
-	The \a screen argument is an X screen number. Be aware that if
-	the user's system uses Xinerama (as opposed to traditional X11
-	multiscreen), there is only one X screen. Use QDesktopWidget to
-	query for information about Xinerama screens.
-
-	\sa setAppDpiY(), appDpiX()
-*/
-int X11Info::appDpiY(int AScreen)
-{
-	if (AScreen == -1)
-	{
-		const QScreen *scr = QGuiApplication::primaryScreen();
-		return scr !=NULL ? qRound(scr->logicalDotsPerInchY()) : 75;
-	}
-
-	QList<QScreen *> screens = QGuiApplication::screens();
-	return AScreen < screens.size() ? screens[AScreen]->logicalDotsPerInchY() : 0;
 }
 
 /*!
@@ -83,24 +39,13 @@ unsigned long X11Info::appRootWindow(int AScreen)
 }
 
 /*!
-	Returns the number of the screen where the application is being
-	displayed.
-
-	\sa display(), screen()
-*/
-int X11Info::appScreen()
-{
-	QDesktopWidget *desktop = QApplication::desktop();
-	return desktop->primaryScreen();
-}
-
-/*!
 	Returns the default display for the application.
 
 	\sa appScreen()
 */
 Display *X11Info::display()
 {
-	static Display *xdisplay = XOpenDisplay(NULL);
-	return xdisplay;
+	QPlatformNativeInterface *native = QApplication::platformNativeInterface();
+	void *display = native!=NULL ? native->nativeResourceForScreen(QByteArray("display"), QGuiApplication::primaryScreen()) : NULL;
+	return reinterpret_cast<Display *>(display);
 }
