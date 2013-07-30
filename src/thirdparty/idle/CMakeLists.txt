@@ -4,8 +4,6 @@ project(idle CXX)
 
 set(SOURCES "idle.cpp")
 
-include(${QT_USE_FILE})
-
 if (APPLE)
 	set(SOURCES ${SOURCES} "idle_mac.cpp")
 elseif (UNIX)
@@ -19,12 +17,12 @@ elseif (WIN32)
 	set(SOURCES ${SOURCES} "idle_win.cpp")
 endif (APPLE)
 
-qt4_wrap_cpp(MOC_SOURCES "idle.h")
+qt5_wrap_cpp(MOC_SOURCES "idle.h")
 
 add_definitions(-DUNICODE)
 
 add_library(idle STATIC ${SOURCES} ${MOC_SOURCES})
-target_link_libraries(idle ${QT_LIBRARIES})
+qt5_use_modules(idle Widgets)
 set_target_properties(idle PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs"
 	COMPILE_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}"
 	LINK_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}")

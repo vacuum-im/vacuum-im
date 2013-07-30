@@ -20,4 +20,4 @@ set(HEADERS "action.h"
             "filecookiejar.h"
             "boxwidget.h")
 
-qt4_wrap_cpp(MOC_SOURCES ${HEADERS})
+qt5_wrap_cpp(MOC_SOURCES ${HEADERS})

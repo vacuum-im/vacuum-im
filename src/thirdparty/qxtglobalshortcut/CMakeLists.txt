@@ -4,8 +4,6 @@ project(qxtglobalshortcut CXX)
 
 set(SOURCES "qxtglobal.cpp" "qxtglobalshortcut.cpp")
 
-include(${QT_USE_FILE})
-
 if (APPLE)
 	set(SOURCES ${SOURCES} "qxtglobalshortcut_mac.cpp")
 elseif (HAIKU)
@@ -18,13 +16,13 @@ elseif (WIN32)
 	set(SOURCES ${SOURCES} "qxtglobalshortcut_win.cpp")
 endif (APPLE)
 
-qt4_wrap_cpp(MOC_SOURCES "qxtglobalshortcut.h")
+qt5_wrap_cpp(MOC_SOURCES "qxtglobalshortcut.h")
 
 add_definitions(-DUNICODE)
 add_definitions(-DQXT_STATIC)
 
 add_library(qxtglobalshortcut STATIC ${SOURCES} ${MOC_SOURCES})
-target_link_libraries(qxtglobalshortcut ${QT_LIBRARIES})
+qt5_use_modules(qxtglobalshortcut Widgets)
 set_target_properties(qxtglobalshortcut PROPERTIES ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs"
 	COMPILE_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}"
 	LINK_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}")
