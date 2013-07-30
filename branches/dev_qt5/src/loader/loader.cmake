@@ -4,8 +4,8 @@ set(HEADERS "aboutbox.h"
 		"pluginmanager.h"
 		"setuppluginsdialog.h")
 
-qt4_wrap_cpp(MOC_SOURCES ${HEADERS})
-qt4_wrap_ui(UI_HEADERS ${UIS})
+qt5_wrap_cpp(MOC_SOURCES ${HEADERS})
+qt5_wrap_ui(UI_HEADERS ${UIS})
 if (NOT MSVC)
-	qt4_add_resources(RC_SOURCES "loader.rc")
+	qt5_add_resources(RC_SOURCES "loader.rc")
 endif (NOT MSVC)

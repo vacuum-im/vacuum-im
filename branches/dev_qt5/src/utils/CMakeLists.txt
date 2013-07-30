@@ -8,14 +8,13 @@ include("utils.cmake")
 
 project(${VACUUM_UTILS_NAME})
 
-set(QT_USE_QTXML YES)
-set(QT_USE_QTNETWORK YES)
-include(${QT_USE_FILE})
-
 add_definitions("-DUTILS_DLL")
 add_definitions("-DQXT_STATIC") 
 link_directories("${CMAKE_BINARY_DIR}/libs")
 include_directories(AFTER  "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
+if (UNIX AND NOT APPLE)
+	include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
+endif (UNIX AND NOT APPLE)
 include(FindX11)
 include_directories(AFTER ${X11_INCLUDE_DIR})
 if (NOT SYSTEM_IDN_FOUND)
@@ -28,7 +27,7 @@ set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES
 	VERSION "${VACUUM_UTILS_ABI}"
 	SOVERSION "${VACUUM_UTILS_ABI}")
 
-set(ADD_LIBS qxtglobalshortcut idle)
+set(ADD_LIBS qxtglobalshortcut idle ${X11_LIBRARIES})
 if (SYSTEM_ZLIB_FOUND)
 	list(APPEND ADD_LIBS "${SYSTEM_ZLIB_FOUND}")
 else (SYSTEM_ZLIB_FOUND)
@@ -59,8 +58,10 @@ if (APPLE)
 	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
 endif (APPLE)
 
-target_link_libraries(${VACUUM_UTILS_NAME} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
-target_link_libraries(${VACUUM_UTILS_NAME} ${QT_LIBRARIES} ${ADD_LIBS})
+target_link_libraries(${VACUUM_UTILS_NAME} LINK_INTERFACE_LIBRARIES)
+target_link_libraries(${VACUUM_UTILS_NAME} ${ADD_LIBS})
+target_link_libraries(${VACUUM_UTILS_NAME} ${Qt5Gui_LIBRARY} LINK_PRIVATE)
+qt5_use_modules(${VACUUM_UTILS_NAME} Widgets Xml Network)
 
 if (WIN32)
 	set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")

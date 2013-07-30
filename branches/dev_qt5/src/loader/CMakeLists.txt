@@ -9,9 +9,6 @@ include("loader.cmake")
 project(loader CXX)
 
 include_directories("${CMAKE_SOURCE_DIR}/src" "${CMAKE_BINARY_DIR}/src/loader")
-set(QT_USE_QTXML YES)
-set(QT_USE_QTMAIN YES)
-include(${QT_USE_FILE})
 
 set(VER_STRING "" CACHE STRING "This string will be appended to program version (defaults to SVN revision number)")
 
@@ -44,7 +41,8 @@ endif (WIN32)
 add_translations(TRANSLATIONS "${VACUUM_LOADER_NAME}" ${SOURCES} ${UIS})
 add_executable(${VACUUM_LOADER_NAME} WIN32 ${SOURCES} ${MOC_SOURCES} ${UI_HEADERS} ${TRANSLATIONS})
 set_target_properties(${VACUUM_LOADER_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-target_link_libraries(${VACUUM_LOADER_NAME} ${VACUUM_UTILS_NAME} ${QT_LIBRARIES})
+target_link_libraries(${VACUUM_LOADER_NAME} ${VACUUM_UTILS_NAME})
+qt5_use_modules(${VACUUM_LOADER_NAME} Widgets Xml Network)
 
 install(TARGETS ${VACUUM_LOADER_NAME}
 	RUNTIME	DESTINATION "${INSTALL_BINS}"
