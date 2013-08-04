@@ -1,11 +1,11 @@
 FORMS   = filearchiveoptions.ui
 
 HEADERS = filemessagearchive.h \
-          collectionwriter.h \
-          workingthread.h \
+          filewriter.h \
+          filetask.h \
           filearchiveoptions.h
 
 SOURCES = filemessagearchive.cpp \
-          collectionwriter.cpp \
-          workingthread.cpp \
+          filewriter.cpp \
+          filetask.cpp \
           filearchiveoptions.cpp
