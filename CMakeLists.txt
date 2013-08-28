@@ -65,43 +65,62 @@ add_subdirectory(src)
 
 # runtime deps on Windows
 if (WIN32)
-	set(WEBKIT_WITHOUT_PHONON NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without Phonon support")
-	set(WEBKIT_WITHOUT_XMLPATTERNS NO CACHE BOOL "Turn this flag ON if you use QtWebKit built without QtXmlPatterns")
 	cpack_add_component_group(libs
 		DISPLAY_NAME "Shared libraries"
 		DESCRIPTION "Required libraries that already may be present in your system")
-	set(QT_LIBS "${QT_LIBRARY_DIR}/../bin/QtCore4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtGui4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtNetwork4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtXml4.dll"
-		"${QT_LIBRARY_DIR}/../bin/QtWebkit4.dll")
-	if (NOT WEBKIT_WITHOUT_PHONON)
-		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/phonon4.dll")
-	endif (NOT WEBKIT_WITHOUT_PHONON)
-	if (NOT WEBKIT_WITHOUT_XMLPATTERNS)
-		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/QtXmlPatterns4.dll")
-	endif (NOT WEBKIT_WITHOUT_XMLPATTERNS)
+	set(QT_LIBS "${_qt5Core_install_prefix}/bin/icudt51.dll"
+		"${_qt5Core_install_prefix}/bin/icuin51.dll"
+		"${_qt5Core_install_prefix}/bin/icuuc51.dll"
+		"${_qt5Core_install_prefix}/bin/libEGL.dll"
+		"${_qt5Core_install_prefix}/bin/libGLESv2.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Core.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Gui.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Multimedia.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Network.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5OpenGL.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5PrintSupport.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Qml.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Quick.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Sensors.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Sql.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5V8.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5WebKit.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5WebKitWidgets.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Widgets.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Xml.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5XmlPatterns.dll")
 	install(FILES ${QT_LIBS}
 		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs)
-	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats"
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/imageformats"
 		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs
 		FILES_MATCHING
 		PATTERN "*.dll"
-		PATTERN "*d4.dll" EXCLUDE)
+		PATTERN "*d.dll" EXCLUDE)
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/platforms"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "qwindows.dll")
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/sensors"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "*.dll"
+		PATTERN "*d.dll" EXCLUDE)
 	cpack_add_component(qt_libs
-		DISPLAY_NAME "Qt4 libraries"
-		DESCRIPTION "May be unchecked if you already have working Qt4 installation"
+		DISPLAY_NAME "Qt5 libraries"
+		DESCRIPTION "May be unchecked if you already have working Qt5 installation"
 		GROUP libs)
 	# Qt localization
 	foreach(LANG ${LOCALIZED_LANGS})
 		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
-		install(FILES "${QT_TRANSLATIONS_DIR}/qt_${SHORTLANG}.qm"
+		install(FILES "${_qt5Core_install_prefix}/translations/qt_${SHORTLANG}.qm"
 			DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
 			COMPONENT qt_${LANG})
 		cpack_add_component(qt_${LANG}
-			DISPLAY_NAME "Qt4 translation"
+			DISPLAY_NAME "Qt5 translation"
 			GROUP ${LANG}_translation
 			DEPENDS qt_libs)
 	endforeach(LANG)
@@ -123,7 +142,7 @@ if (WIN32)
 			DESCRIPTION "May be unchecked if you already have MinGW installed"
 			GROUP libs)
 	elseif (MSVC)
-		# TODO: check these patterns
+		# TODO: check these patterns, indeed, don't work.
 		file(GLOB MSVC_DLLS "msvc*.dll")
 		file(GLOB MANIFEST "Microsoft.VC*.CRT.manifest")
 		install(FILES ${MSVC_DLLS} ${MANIFEST}

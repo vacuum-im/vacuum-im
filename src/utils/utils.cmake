@@ -1,4 +1,37 @@
-file(GLOB SOURCES "*.cpp")
+set(SOURCES "action.cpp"
+			"advanceditem.cpp"
+			"advanceditemdelegate.cpp"
+			"advanceditemmodel.cpp"
+			"animatedtextbrowser.cpp"
+			"boxwidget.cpp"
+			"closebutton.cpp"
+			"datetime.cpp"
+			"filecookiejar.cpp"
+			"filestorage.cpp"
+			"iconsetdelegate.cpp"
+			"iconstorage.cpp"
+			"imagemanager.cpp"
+			"jid.cpp"
+			"menu.cpp"
+			"menubarchanger.cpp"
+			"message.cpp"
+			"options.cpp"
+			"ringbuffer.cpp"
+			"searchlineedit.cpp"
+			"shortcuts.cpp"
+			"stanza.cpp"
+			"statusbarchanger.cpp"
+			"systemmanager.cpp"
+			"textmanager.cpp"
+			"toolbarchanger.cpp"
+			"unzipfile.cpp"
+			"versionparser.cpp"
+			"widgetmanager.cpp"
+			"xmpperror.cpp")
+
+if (UNIX AND NOT APPLE)
+	set(SOURCES ${SOURCES} "x11info.cpp")
+endif (UNIX AND NOT APPLE)
 
 set(HEADERS "action.h"
             "filestorage.h"
