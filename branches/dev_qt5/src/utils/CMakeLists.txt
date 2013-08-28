@@ -12,11 +12,21 @@ add_definitions("-DUTILS_DLL")
 add_definitions("-DQXT_STATIC") 
 link_directories("${CMAKE_BINARY_DIR}/libs")
 include_directories(AFTER  "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
+
 if (UNIX AND NOT APPLE)
 	include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
+	include(FindX11)
+	include_directories(AFTER ${X11_INCLUDE_DIR})
+	set(ADD_LIBS ${X11_LIBRARIES})
+	
+	if (X11_Xscreensaver_FOUND)
+		message(STATUS "Found Xscreensaver: ${X11_Xscreensaver_LIB}")
+		list(APPEND ADD_LIBS "${X11_Xscreensaver_LIB}")
+	else (X11_Xscreensaver_FOUND)
+		message(STATUS "Xscreensaver not found")
+	endif (X11_Xscreensaver_FOUND)
 endif (UNIX AND NOT APPLE)
-include(FindX11)
-include_directories(AFTER ${X11_INCLUDE_DIR})
+
 if (NOT SYSTEM_IDN_FOUND)
 	include_directories("${CMAKE_SOURCE_DIR}/src/thirdparty/idn")
 endif (NOT SYSTEM_IDN_FOUND)
@@ -27,7 +37,8 @@ set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES
 	VERSION "${VACUUM_UTILS_ABI}"
 	SOVERSION "${VACUUM_UTILS_ABI}")
 
-set(ADD_LIBS qxtglobalshortcut idle ${X11_LIBRARIES})
+set(ADD_LIBS qxtglobalshortcut idle)
+
 if (SYSTEM_ZLIB_FOUND)
 	list(APPEND ADD_LIBS "${SYSTEM_ZLIB_FOUND}")
 else (SYSTEM_ZLIB_FOUND)
@@ -46,21 +57,15 @@ else (SYSTEM_MINIZIP_FOUND)
 	list(APPEND ADD_LIBS minizip)
 endif (SYSTEM_MINIZIP_FOUND)
 
-
-if (X11_Xscreensaver_FOUND)
-	message(STATUS "Found Xscreensaver: ${X11_Xscreensaver_LIB}")
-	list(APPEND ADD_LIBS "${X11_Xscreensaver_LIB}")
-else (X11_Xscreensaver_FOUND)
-	message(STATUS "Xscreensaver not found")
-endif (X11_Xscreensaver_FOUND)
-
 if (APPLE)
 	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
 endif (APPLE)
 
 target_link_libraries(${VACUUM_UTILS_NAME} LINK_INTERFACE_LIBRARIES)
 target_link_libraries(${VACUUM_UTILS_NAME} ${ADD_LIBS})
+if (UNIX AND NOT APPLE)
 target_link_libraries(${VACUUM_UTILS_NAME} ${Qt5Gui_LIBRARY} LINK_PRIVATE)
+endif (UNIX AND NOT APPLE)
 qt5_use_modules(${VACUUM_UTILS_NAME} Widgets Xml Network)
 
 if (WIN32)
