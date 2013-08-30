@@ -2,9 +2,9 @@
 
 #include <QDir>
 #include <QStringRef>
+#include <QThreadPool>
 #include <QDirIterator>
 #include <QXmlStreamReader>
-#include "workingthread.h"
 
 #define ARCHIVE_DIR_NAME      "archive"
 #define COLLECTION_EXT        ".xml"
@@ -22,6 +22,8 @@ FileMessageArchive::FileMessageArchive()
 	FPluginManager = NULL;
 	FArchiver = NULL;
 	FDiscovery = NULL;
+
+	qRegisterMetaType<FileTask *>("FileTask *");
 }
 
 FileMessageArchive::~FileMessageArchive()
@@ -169,14 +171,14 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
 		FThreadLock.lockForWrite();
-		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
+		FileWriter *writer = findFileWriter(AStreamJid,with,AMessage.threadId());
 		if (!writer)
 		{
 			FThreadLock.unlock();
 			IArchiveHeader header = makeHeader(with,AMessage);
 			QString fileName = collectionFilePath(AStreamJid,header.with,header.start);
 			FThreadLock.lockForWrite();
-			writer = newCollectionWriter(AStreamJid,header,fileName);
+			writer = newFileWriter(AStreamJid,header,fileName);
 		}
 		if (writer)
 		{
@@ -197,14 +199,14 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
 		FThreadLock.lockForWrite();
-		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
+		FileWriter *writer = findFileWriter(AStreamJid,with,AMessage.threadId());
 		if (!writer)
 		{
 			FThreadLock.unlock();
 			IArchiveHeader header = makeHeader(with,AMessage);
 			QString fileName = collectionFilePath(AStreamJid,header.with,header.start);
 			FThreadLock.lockForWrite();
-			writer = newCollectionWriter(AStreamJid,header,fileName);
+			writer = newFileWriter(AStreamJid,header,fileName);
 		}
 		if (writer)
 		{
@@ -219,11 +221,10 @@ QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchive
 {
 	if (isCapable(AStreamJid,ManualArchiving) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
-		wthread->setStreamJid(AStreamJid);
-		wthread->setArchiveCollection(ACollection);
-		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
-		return wthread->executeAction(WorkingThread::SaveCollection);
+		QString saveMode = FArchiver->archiveItemPrefs(AStreamJid,ACollection.header.with,ACollection.header.threadId).save;
+		FileTaskSaveCollection *task = new FileTaskSaveCollection(this,AStreamJid,ACollection,saveMode);
+		QThreadPool::globalInstance()->start(task);
+		return task->taskId();
 	}
 	return QString::null;
 }
@@ -232,11 +233,9 @@ QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveReq
 {
 	if (isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
-		wthread->setStreamJid(AStreamJid);
-		wthread->setArchiveRequest(ARequest);
-		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
-		return wthread->executeAction(WorkingThread::LoadHeaders);
+		FileTaskLoadHeaders *task = new FileTaskLoadHeaders(this,AStreamJid,ARequest);
+		QThreadPool::globalInstance()->start(task);
+		return task->taskId();
 	}
 	return QString::null;
 }
@@ -245,11 +244,9 @@ QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchive
 {
 	if (isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
-		wthread->setStreamJid(AStreamJid);
-		wthread->setArchiveHeader(AHeader);
-		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
-		return wthread->executeAction(WorkingThread::LoadCollection);
+		FileTaskLoadCollection *task = new FileTaskLoadCollection(this,AStreamJid,AHeader);
+		QThreadPool::globalInstance()->start(task);
+		return task->taskId();
 	}
 	return QString::null;
 }
@@ -258,11 +255,9 @@ QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArch
 {
 	if (isCapable(AStreamJid,ArchiveManagement))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
-		wthread->setStreamJid(AStreamJid);
-		wthread->setArchiveRequest(ARequest);
-		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
-		return wthread->executeAction(WorkingThread::RemoveCollection);
+		FileTaskRemoveCollection *task = new FileTaskRemoveCollection(this,AStreamJid,ARequest);
+		QThreadPool::globalInstance()->start(task);
+		return task->taskId();
 	}
 	return QString::null;
 }
@@ -271,12 +266,9 @@ QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDate
 {
 	if (isCapable(AStreamJid,Replication))
 	{
-		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
-		wthread->setStreamJid(AStreamJid);
-		wthread->setModificationsStart(AStart);
-		wthread->setModificationsCount(ACount);
-		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
-		return wthread->executeAction(WorkingThread::LoadModifications);
+		FileTaskLoadModifications *task = new FileTaskLoadModifications(this,AStreamJid,AStart,ACount);
+		QThreadPool::globalInstance()->start(task);
+		return task->taskId();
 	}
 	return QString::null;
 }
@@ -450,7 +442,7 @@ IArchiveHeader FileMessageArchive::loadHeaderFromFile(const QString &AFileName) 
 {
 	FThreadLock.lockForRead();
 	IArchiveHeader header;
-	CollectionWriter *writer = FWritingFiles.value(AFileName,NULL);
+	FileWriter *writer = FWritingFiles.value(AFileName,NULL);
 	if (writer == NULL)
 	{
 		QFile file(AFileName);
@@ -490,7 +482,7 @@ IArchiveCollection FileMessageArchive::loadCollectionFromFile(const QString &AFi
 {
 	FThreadLock.lockForRead();
 	IArchiveCollection collection;
-	CollectionWriter *writer = FWritingFiles.value(AFileName,NULL);
+	FileWriter *writer = FWritingFiles.value(AFileName,NULL);
 	if (writer==NULL || writer->recordsCount()>0)
 	{
 		QFile file(AFileName);
@@ -641,11 +633,11 @@ bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &
 	{
 		IArchiveHeader header = loadHeaderFromFile(fileName);
 		FThreadLock.lockForWrite();
-		CollectionWriter *writer = findCollectionWriter(AStreamJid,header);
+		FileWriter *writer = findFileWriter(AStreamJid,header);
 		if (writer)
 		{
 			FThreadLock.unlock();
-			removeCollectionWriter(writer);
+			removeFileWriter(writer);
 			FThreadLock.lockForWrite();
 		}
 		if (QFile::remove(fileName))
@@ -795,34 +787,34 @@ bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArch
 	return false;
 }
 
-CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const
+FileWriter *FileMessageArchive::findFileWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const
 {
-	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AHeader.with);
-	foreach(CollectionWriter *writer, writers)
+	QList<FileWriter *> writers = FFileWriters.value(AStreamJid).values(AHeader.with);
+	foreach(FileWriter *writer, writers)
 		if (writer->header() == AHeader)
 			return writer;
 	return NULL;
 }
 
-CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const
+FileWriter *FileMessageArchive::findFileWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const
 {
-	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AWith);
-	foreach(CollectionWriter *writer, writers)
+	QList<FileWriter *> writers = FFileWriters.value(AStreamJid).values(AWith);
+	foreach(FileWriter *writer, writers)
 		if (writer->header().threadId == AThreadId)
 			return writer;
 	return NULL;
 }
 
-CollectionWriter *FileMessageArchive::newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName)
+FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName)
 {
 	if (AHeader.with.isValid() && AHeader.start.isValid() && !AFileName.isEmpty() && !FWritingFiles.contains(AFileName))
 	{
-		CollectionWriter *writer = new CollectionWriter(AStreamJid,AFileName,AHeader,this);
+		FileWriter *writer = new FileWriter(AStreamJid,AFileName,AHeader,this);
 		if (writer->isOpened())
 		{
 			FWritingFiles.insert(writer->fileName(),writer);
-			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
-			connect(writer,SIGNAL(writerDestroyed(CollectionWriter *)),SLOT(onCollectionWriterDestroyed(CollectionWriter *)));
+			FFileWriters[AStreamJid].insert(AHeader.with,writer);
+			connect(writer,SIGNAL(writerDestroyed(FileWriter *)),SLOT(onFileWriterDestroyed(FileWriter *)));
 			emit fileCollectionOpened(AStreamJid,AHeader);
 		}
 		else
@@ -835,14 +827,14 @@ CollectionWriter *FileMessageArchive::newCollectionWriter(const Jid &AStreamJid,
 	return NULL;
 }
 
-void FileMessageArchive::removeCollectionWriter(CollectionWriter *AWriter)
+void FileMessageArchive::removeFileWriter(FileWriter *AWriter)
 {
 	FThreadLock.lockForWrite();
 	if (FWritingFiles.contains(AWriter->fileName()))
 	{
 		AWriter->closeAndDeleteLater();
 		FWritingFiles.remove(AWriter->fileName());
-		FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
+		FFileWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
 		if (AWriter->recordsCount() > 0)
 		{
 			FThreadLock.unlock();
@@ -860,38 +852,34 @@ void FileMessageArchive::removeCollectionWriter(CollectionWriter *AWriter)
 	}
 }
 
-void FileMessageArchive::onWorkingThreadFinished()
+void FileMessageArchive::onFileTaskFinished(FileTask *ATask)
 {
-	WorkingThread *wthread = qobject_cast<WorkingThread *>(sender());
-	if (wthread)
+	if (!ATask->hasError())
 	{
-		if (!wthread->hasError())
+		switch (ATask->type())
 		{
-			switch (wthread->workAction())
-			{
-			case WorkingThread::SaveCollection:
-				emit collectionSaved(wthread->workId(),wthread->archiveHeader());
-				break;
-			case WorkingThread::RemoveCollection:
-				emit collectionsRemoved(wthread->workId(),wthread->archiveRequest());
-				break;
-			case WorkingThread::LoadHeaders:
-				emit headersLoaded(wthread->workId(),wthread->archiveHeaders());
-				break;
-			case WorkingThread::LoadCollection:
-				emit collectionLoaded(wthread->workId(),wthread->archiveCollection());
-				break;
-			case WorkingThread::LoadModifications:
-				emit modificationsLoaded(wthread->workId(),wthread->archiveModifications());
-				break;
-			}
+		case FileTask::SaveCollection:
+			emit collectionSaved(ATask->taskId(),static_cast<FileTaskSaveCollection *>(ATask)->archiveHeader());
+			break;
+		case FileTask::LoadHeaders:
+			emit headersLoaded(ATask->taskId(),static_cast<FileTaskLoadHeaders *>(ATask)->archiveHeaders());
+			break;
+		case FileTask::LoadCollection:
+			emit collectionLoaded(ATask->taskId(),static_cast<FileTaskLoadCollection *>(ATask)->archiveCollection());
+			break;
+		case FileTask::RemoveCollections:
+			emit collectionsRemoved(ATask->taskId(),static_cast<FileTaskRemoveCollection *>(ATask)->archiveRequest());
+			break;
+		case FileTask::LoadModifications:
+			emit modificationsLoaded(ATask->taskId(),static_cast<FileTaskLoadModifications *>(ATask)->archiveModifications());
+			break;
 		}
-		else
-		{
-			emit requestFailed(wthread->workId(),wthread->error());
-		}
-		wthread->deleteLater();
 	}
+	else
+	{
+		emit requestFailed(ATask->taskId(),ATask->error());
+	}
+	delete ATask;
 }
 
 void FileMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
@@ -901,14 +889,14 @@ void FileMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
 
 void FileMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 {
-	foreach(Jid streamJid, FCollectionWriters.keys())
-		qDeleteAll(FCollectionWriters.take(streamJid));
+	foreach(Jid streamJid, FFileWriters.keys())
+		qDeleteAll(FFileWriters.take(streamJid));
 	emit capabilitiesChanged(AStreamJid);
 }
 
-void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
+void FileMessageArchive::onFileWriterDestroyed(FileWriter *AWriter)
 {
-	removeCollectionWriter(AWriter);
+	removeFileWriter(AWriter);
 }
 
 void FileMessageArchive::onOptionsOpened()

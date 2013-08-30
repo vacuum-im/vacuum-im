@@ -225,8 +225,9 @@ QList<int> RecentContacts::rosterDataRoles(int AOrder) const
 	if (AOrder == RDHO_RECENTCONTACTS)
 	{
 		return QList<int>() 
-			<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole 
-			<< RDR_NAME << RDR_RESOURCES << RDR_SHOW << RDR_STATUS 
+			<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole
+			<< RDR_FULL_JID << RDR_PREP_FULL_JID << RDR_PREP_BARE_JID << RDR_RESOURCES
+			<< RDR_NAME << RDR_SHOW << RDR_STATUS 
 			<< RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_FORCE_VISIBLE;
 	}
 	return QList<int>();
