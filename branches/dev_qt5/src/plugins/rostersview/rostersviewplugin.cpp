@@ -835,8 +835,9 @@ void RostersViewPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget
 		QModelIndex index = FRostersView->instance()->currentIndex();
 		if (AId==SCT_ROSTERVIEW_COPYJID && AWidget==FRostersView)
 		{
-			if (!index.data(RDR_FULL_JID).toString().isEmpty())
-				QApplication::clipboard()->setText(index.data(RDR_FULL_JID).toString());
+			Jid jid = index.data(RDR_FULL_JID).toString();
+			if (!jid.isEmpty())
+				QApplication::clipboard()->setText(jid.uBare());
 		}
 		else if (AId==SCT_ROSTERVIEW_COPYNAME && AWidget==FRostersView)
 		{

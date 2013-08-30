@@ -1,6 +1,6 @@
-#include "collectionwriter.h"
+#include "filewriter.h"
 
-CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
+FileWriter::FileWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
 {
 	FXmlFile = NULL;
 	FXmlWriter = NULL;
@@ -31,43 +31,43 @@ CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileNa
 		deleteLater();
 }
 
-CollectionWriter::~CollectionWriter()
+FileWriter::~FileWriter()
 {
 	stopCollection();
 	emit writerDestroyed(this);
 }
 
-bool CollectionWriter::isOpened() const
+bool FileWriter::isOpened() const
 {
 	return FXmlWriter!=NULL;
 }
 
-const Jid &CollectionWriter::streamJid() const
+const Jid &FileWriter::streamJid() const
 {
 	return FStreamJid;
 }
 
-const QString &CollectionWriter::fileName() const
+const QString &FileWriter::fileName() const
 {
 	return FFileName;
 }
 
-const IArchiveHeader &CollectionWriter::header() const
+const IArchiveHeader &FileWriter::header() const
 {
 	return FHeader;
 }
 
-int CollectionWriter::recordsCount() const
+int FileWriter::recordsCount() const
 {
 	return FMessagesCount + FNotesCount;
 }
 
-int CollectionWriter::secondsFromStart() const
+int FileWriter::secondsFromStart() const
 {
 	return FSecsSum;
 }
 
-bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
+bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
 {
 	if (isOpened() && ASaveMode!=ARCHIVE_SAVE_FALSE)
 	{
@@ -107,7 +107,7 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
 	return false;
 }
 
-bool CollectionWriter::writeNote(const QString &ANote)
+bool FileWriter::writeNote(const QString &ANote)
 {
 	if (isOpened() && !ANote.isEmpty())
 	{
@@ -123,13 +123,13 @@ bool CollectionWriter::writeNote(const QString &ANote)
 	return false;
 }
 
-void CollectionWriter::closeAndDeleteLater()
+void FileWriter::closeAndDeleteLater()
 {
 	stopCollection();
 	deleteLater();
 }
 
-void CollectionWriter::startCollection()
+void FileWriter::startCollection()
 {
 	FXmlWriter->setAutoFormatting(true);
 	FXmlWriter->writeStartElement("chat");
@@ -143,7 +143,7 @@ void CollectionWriter::startCollection()
 	checkLimits();
 }
 
-void CollectionWriter::stopCollection()
+void FileWriter::stopCollection()
 {
 	if (FXmlWriter)
 	{
@@ -162,7 +162,7 @@ void CollectionWriter::stopCollection()
 	}
 }
 
-void CollectionWriter::writeElementChilds(const QDomElement &AElem)
+void FileWriter::writeElementChilds(const QDomElement &AElem)
 {
 	QDomNode node = AElem.firstChild();
 	while (!node.isNull())
@@ -175,7 +175,7 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 				FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
 
 			QDomNamedNodeMap map = elem.attributes();
-			for (int i=0; i<map.length(); i++)
+			for (uint i =0; i<map.length(); i++)
 			{
 				QDomNode attrNode = map.item(i);
 				FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
@@ -193,7 +193,7 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 	}
 }
 
-void CollectionWriter::checkLimits()
+void FileWriter::checkLimits()
 {
 	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_SIZE).value().toInt())
 		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT).value().toInt());

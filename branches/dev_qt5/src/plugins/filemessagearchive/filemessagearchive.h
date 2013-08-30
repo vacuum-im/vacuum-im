@@ -9,7 +9,8 @@
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/iservicediscovery.h>
 #include <utils/options.h>
-#include "collectionwriter.h"
+#include "filetask.h"
+#include "filewriter.h"
 #include "filearchiveoptions.h"
 
 class FileMessageArchive : 
@@ -77,15 +78,16 @@ protected:
 	IArchiveHeader makeHeader(const Jid &AItemJid, const Message &AMessage) const;
 	bool checkCollectionFile(const QString &AFileName, const IArchiveRequest &ARequest) const;
 	bool saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const;
-	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
-	CollectionWriter *findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
-	CollectionWriter *newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName);
-	void removeCollectionWriter(CollectionWriter *AWriter);
+protected:
+	FileWriter *findFileWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
+	FileWriter *findFileWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const;
+	FileWriter *newFileWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName);
+	void removeFileWriter(FileWriter *AWriter);
 protected slots:
-	void onWorkingThreadFinished();
+	void onFileTaskFinished(FileTask *ATask);
 	void onArchivePrefsOpened(const Jid &AStreamJid);
 	void onArchivePrefsClosed(const Jid &AStreamJid);
-	void onCollectionWriterDestroyed(CollectionWriter *AWriter);
+	void onFileWriterDestroyed(FileWriter *AWriter);
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -96,14 +98,12 @@ private:
 	IServiceDiscovery *FDiscovery;
 private:
 	mutable QReadWriteLock FThreadLock;
-	QList<IArchiveHeader> FSavedCollections;
-	QList<IArchiveHeader> FRemovedCollections;
 private:
 	QString FArchiveHomePath;
 	mutable QList<QString> FNewDirs;
 	QMap<Jid, QString> FGatewayTypes;
-	QMap<QString, CollectionWriter *> FWritingFiles;
-	QMap<Jid, QMultiMap<Jid,CollectionWriter *> > FCollectionWriters;
+	QMap<QString, FileWriter *> FWritingFiles;
+	QMap<Jid, QMultiMap<Jid,FileWriter *> > FFileWriters;
 };
 
 #endif // FILEMESSAGEARCHIVE_H
