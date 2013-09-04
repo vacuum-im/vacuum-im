@@ -8,6 +8,7 @@ LEGEND
 
 v1.2.3
 ------
+  [*] Improved recognition of links in the text
   [-] The application will fail if the server terminates the connection before the user enters the password
   [-] Removing of avatars in several selected accounts or contacts was not working
   [-] The application may fail on removing from history active conversation
