@@ -524,6 +524,25 @@ void PluginManager::finishQuit()
 	}
 }
 
+void PluginManager::closeAndQuit()
+{
+	if (!FQuitReady)
+	{
+		FShutdownKind = SK_QUIT;
+		startClose();
+
+		QDateTime closeTimeout = QDateTime::currentDateTime().addMSecs(DELAYED_SHUTDOWN_TIMEOUT);
+		while (closeTimeout>QDateTime::currentDateTime() && FShutdownDelayCount>0)
+			QApplication::processEvents();
+		finishClose();
+
+		QDateTime quitTimeout = QDateTime::currentDateTime().addMSecs(DELAYED_SHUTDOWN_TIMEOUT);
+		while (quitTimeout>QDateTime::currentDateTime() && FShutdownDelayCount>0)
+			QApplication::processEvents();
+		finishQuit();
+	}
+}
+
 void PluginManager::closeTopLevelWidgets()
 {
 	if (!FPluginsDialog.isNull())
@@ -783,27 +802,13 @@ void PluginManager::declareShortcuts()
 
 void PluginManager::onApplicationAboutToQuit()
 {
-	if (!FQuitReady)
-	{
-		FShutdownKind = SK_QUIT;
-		startClose();
-	
-		QDateTime closeTimeout = QDateTime::currentDateTime().addMSecs(DELAYED_SHUTDOWN_TIMEOUT);
-		while (closeTimeout>QDateTime::currentDateTime() && FShutdownDelayCount>0)
-			QApplication::processEvents();
-		finishClose();
-		
-		QDateTime quitTimeout = QDateTime::currentDateTime().addMSecs(DELAYED_SHUTDOWN_TIMEOUT);
-		while (quitTimeout>QDateTime::currentDateTime() && FShutdownDelayCount>0)
-			QApplication::processEvents();
-		finishQuit();
-	}
+	closeAndQuit();
 }
 
 void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
 {
 	Q_UNUSED(AManager);
-	qApp->quit();
+	closeAndQuit();
 }
 
 void PluginManager::onShowSetupPluginsDialog(bool)
