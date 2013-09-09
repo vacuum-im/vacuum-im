@@ -1,0 +1,18 @@
+
+.xxxhead
+{
+	padding-bottom: 8px;
+	background-color: rgba(63, 63, 63, .12);
+	position: fixed;
+	top: 0px;
+	width: 100%;
+}
+
+.xxxfoot
+{
+	padding-top: 8px;
+	background-color: rgba(63, 63, 63, .12);
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
+}
