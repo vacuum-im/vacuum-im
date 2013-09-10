@@ -3,12 +3,17 @@ include(../make/config.inc)
 TARGET             = $$VACUUM_LOADER_NAME
 TEMPLATE           = app
 QT                += xml
-LIBS              += -L../libs -l$$VACUUM_UTILS_NAME -lbreakpad
+LIBS              += -L../libs -l$$VACUUM_UTILS_NAME
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
-INCLUDEPATH       += ../thirdparty/breakpad
 DESTDIR            = ../..
 include(loader.pri)
+
+#Google Breakpad
+!isEmpty(BREAKPAD_DEV_DIR) {
+  LIBS            += -L$${BREAKPAD_DEV_DIR}/lib -lbreakpad
+  INCLUDEPATH     += $${BREAKPAD_DEV_DIR}/src
+}
 
 #Appication icon
 win32:RC_FILE      = loader.rc

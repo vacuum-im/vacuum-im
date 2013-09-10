@@ -5,11 +5,11 @@
 #include <QtCore/QCoreApplication>
 
 #if defined(Q_OS_MAC)
-#include <thirdparty/breakpad/client/mac/handler/exception_handler.h>
+#include <client/mac/handler/exception_handler.h>
 #elif defined(Q_OS_LINUX)
-#include <thirdparty/breakpad/client/linux/handler/exception_handler.h>
+#include <client/linux/handler/exception_handler.h>
 #elif defined(Q_OS_WIN32)
-#include <thirdparty/breakpad/client/windows/handler/exception_handler.h>
+#include <client/windows/handler/exception_handler.h>
 #endif
 
 // CrashHandlerPrivate

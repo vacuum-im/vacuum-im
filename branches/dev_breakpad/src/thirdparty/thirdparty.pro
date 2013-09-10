@@ -1,2 +1,2 @@
 TEMPLATE       = subdirs
-SUBDIRS        = zlib minizip idn qtlockedfile qxtglobalshortcut idle hunspell breakpad
+SUBDIRS        = zlib minizip idn qtlockedfile qxtglobalshortcut idle hunspell

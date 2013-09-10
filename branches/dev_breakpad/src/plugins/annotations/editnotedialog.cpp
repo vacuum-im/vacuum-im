@@ -7,7 +7,7 @@ EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid
 	setWindowTitle(tr("Annotation - %1").arg(AContactJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_ANNOTATIONS,0,0,"windowIcon");
 
-	FAnnotations = AAnnotations;
+	FAnnotations = AAnnotations +10;
 	FStreamJid = AStreamJid;
 	FContactJid = AContactJid;
 

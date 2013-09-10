@@ -10,6 +10,14 @@ CONFIG(debug, debug|release) {
   DEFINES               += DEBUG_MODE
 }
 
+#Google Breakpad
+!isEmpty(BREAKPAD_DEV_DIR) {
+  CONFIG(release, debug|release) {
+      QMAKE_CXXFLAGS *= /Zi /DNDEBUG
+      QMAKE_CFLAGS *= /Zi /DNDEBUG
+      QMAKE_LFLAGS *= /DEBUG /OPT:REF /OPT:ICF
+  }
+}
 
 #Configurable values
 isEmpty(INSTALL_PREFIX) {
