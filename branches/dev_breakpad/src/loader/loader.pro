@@ -11,6 +11,7 @@ include(loader.pri)
 
 #Google Breakpad
 !isEmpty(BREAKPAD_DEV_DIR) {
+  DEFINES         += WITH_BREAKPAD
   LIBS            += -L$${BREAKPAD_DEV_DIR}/lib -lbreakpad
   INCLUDEPATH     += $${BREAKPAD_DEV_DIR}/src
 }

@@ -13,6 +13,12 @@ if (WIN32)
 	set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif (WIN32)
 
+if (MSVC)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:wchar_t-")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Zc:wchar_t-")
+endif (MSVC)
+
+#Google Breakpad
 if(NOT (BREAKPAD_DEV_DIR STREQUAL ""))
 	if (WIN32)
 		set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "/DEBUG /OPT:REF /OPT:ICF")

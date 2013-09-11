@@ -13,9 +13,11 @@ set(QT_USE_QTXML YES)
 set(QT_USE_QTMAIN YES)
 include(${QT_USE_FILE})
 
+#Google Breakpad
 if(NOT (BREAKPAD_DEV_DIR STREQUAL ""))
 	include_directories("${BREAKPAD_DEV_DIR}/src/")
-	set(${ADD_LIBS} "breakpad")
+	link_directories("${BREAKPAD_DEV_DIR}/lib/")
+	set(ADD_LIBS "breakpad")
 endif(NOT (BREAKPAD_DEV_DIR STREQUAL ""))
 
 set(VER_STRING "" CACHE STRING "This string will be appended to program version (defaults to SVN revision number)")
