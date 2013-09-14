@@ -11,6 +11,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
+#include <definitions/vcardvaluenames.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <definitions/toolbargroups.h>
 #include <interfaces/ipluginmanager.h>
@@ -23,11 +24,12 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
-#include <utils/widgetmanager.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include <utils/shortcuts.h>
 #include <utils/xmpperror.h>
+#include <utils/textmanager.h>
+#include <utils/widgetmanager.h>
 #include "vcard.h"
 #include "vcarddialog.h"
 
@@ -82,9 +84,12 @@ protected:
 	void saveVCardFile(const Jid &AContactJid, const QDomElement &AElem) const;
 	void removeEmptyChildElements(QDomElement &AElem) const;
 	void insertMessageToolBarAction(IMessageToolBarWidget *AWidget);
+	QList<Action *> createClipboardActions(const QSet<QString> &AStrings, QObject *AParent) const;
 protected slots:
+	void onCopyToClipboardActionTriggered(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onShowVCardDialogByAction(bool);
 	void onShowVCardDialogByMessageWindowAction(bool);
