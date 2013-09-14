@@ -37,6 +37,8 @@ enum RosterIndexDataRoles {
 	//MultiUser Chats
 	RDR_MUC_NICK,
 	RDR_MUC_PASSWORD,
+	//vCard
+	RDR_VCARD_SEARCH,
 	//Other Roles
 	RDR_USER_ROLE = 128
 };
