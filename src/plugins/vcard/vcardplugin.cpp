@@ -3,7 +3,9 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QClipboard>
 #include <QDomDocument>
+#include <QApplication>
 
 #define DIR_VCARDS                "vcards"
 #define VCARD_TIMEOUT             60000
@@ -13,6 +15,7 @@
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
+#define ADR_CLIPBOARD_DATA        Action::DR_Parametr1
 
 VCardPlugin::VCardPlugin()
 {
@@ -87,6 +90,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 			FRostersView = FRostersViewPlugin->rostersView();
 			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
+				SLOT(onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
 		}
 	}
 
@@ -364,6 +369,32 @@ void VCardPlugin::insertMessageToolBarAction(IMessageToolBarWidget *AWidget)
 	}
 }
 
+QList<Action *> VCardPlugin::createClipboardActions(const QSet<QString> &AStrings, QObject *AParent) const
+{
+	QList<Action *> actions;
+
+	foreach(const QString &string, AStrings)
+	{
+		if (!string.isEmpty())
+		{
+			Action *action = new Action(AParent);
+			action->setText(TextManager::getElidedString(string,Qt::ElideRight,50));
+			action->setData(ADR_CLIPBOARD_DATA,string);
+			connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
+			actions.append(action);
+		}
+	}
+
+	return actions;
+}
+
+void VCardPlugin::onCopyToClipboardActionTriggered(bool)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+		QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
+}
+
 void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
@@ -401,6 +432,46 @@ void VCardPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 			action->setShortcutId(SCT_ROSTERVIEW_SHOWVCARD);
 			AMenu->addAction(action,AG_RVCM_VCARD,true);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
+		}
+	}
+}
+
+void VCardPlugin::onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+{
+	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	{
+		foreach(IRosterIndex *index, AIndexes)
+		{
+			Jid contactJid = index->data(RDR_FULL_JID).toString();
+			if (hasVCard(contactJid))
+			{
+				IVCard *vcard = getVCard(contactJid);
+
+				QSet<QString> commonStrings;
+				commonStrings += vcard->value(VVN_FULL_NAME);
+				commonStrings += vcard->value(VVN_NICKNAME);
+				commonStrings += vcard->value(VVN_ORG_NAME);
+				commonStrings += vcard->value(VVN_ORG_UNIT);
+				commonStrings += vcard->value(VVN_TITLE);
+				commonStrings += vcard->value(VVN_DESCRIPTION);
+
+				static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
+				QSet<QString> emailStrings = vcard->values(VVN_EMAIL,emailTagList).keys().toSet();
+
+				static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
+				QSet<QString> phoneStrings = vcard->values(VVN_TELEPHONE,phoneTagList).keys().toSet();
+
+				foreach(Action *action, createClipboardActions(commonStrings,AMenu))
+					AMenu->addAction(action,AG_RVCBM_VCARD_COMMON,true);
+
+				foreach(Action *action, createClipboardActions(emailStrings,AMenu))
+					AMenu->addAction(action,AG_RVCBM_VCARD_EMAIL,true);
+
+				foreach(Action *action, createClipboardActions(phoneStrings,AMenu))
+					AMenu->addAction(action,AG_RVCBM_VCARD_PHONE,true);
+
+				vcard->unlock();
+			}
 		}
 	}
 }
