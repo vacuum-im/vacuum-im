@@ -14,16 +14,19 @@
 #include <definitions/vcardvaluenames.h>
 #include <definitions/xmppurihandlerorders.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ivcard.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
+#include <interfaces/irostersmodel.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/irostersearch.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include <utils/shortcuts.h>
@@ -47,10 +50,11 @@ class VCardPlugin :
 	public IPlugin,
 	public IVCardPlugin,
 	public IStanzaRequestOwner,
-	public IXmppUriHandler
+	public IXmppUriHandler,
+	public IRosterDataHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IVCardPlugin IStanzaRequestOwner IXmppUriHandler);
+	Q_INTERFACES(IPlugin IVCardPlugin IRosterDataHolder IStanzaRequestOwner IXmppUriHandler);
 	friend class VCard;
 public:
 	VCardPlugin();
@@ -63,6 +67,10 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin()  { return true; }
+	//IRosterDataHolder
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IXmppUriHandler
@@ -78,6 +86,8 @@ signals:
 	void vcardReceived(const Jid &AContactJid);
 	void vcardPublished(const Jid &AContactJid);
 	void vcardError(const Jid &AContactJid, const XmppError &AError);
+	// IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	void registerDiscoFeatures();
 	void unlockVCard(const Jid &AContactJid);
@@ -106,6 +116,7 @@ private:
 	IPluginManager *FPluginManager;
 	IXmppStreams *FXmppStreams;
 	IRosterPlugin *FRosterPlugin;
+	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IStanzaProcessor *FStanzaProcessor;
@@ -113,6 +124,7 @@ private:
 	IServiceDiscovery *FDiscovery;
 	IXmppUriQueries *FXmppUriQueries;
 	IMessageWidgets *FMessageWidgets;
+	IRosterSearch *FRosterSearch;
 private:
 	QTimer FUpdateTimer;
 	QMap<Jid,VCardItem> FVCards;
@@ -121,6 +133,7 @@ private:
 	QMap<QString,Jid> FVCardPublishId;
 	QMap<QString,Stanza> FVCardPublishStanza;
 	QMap<Jid,VCardDialog *> FVCardDialogs;
+	mutable QHash<Jid,QStringList> FSearchStrings;
 };
 
 #endif // VCARDPLUGIN_H

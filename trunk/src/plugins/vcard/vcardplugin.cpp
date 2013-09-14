@@ -22,6 +22,7 @@ VCardPlugin::VCardPlugin()
 	FPluginManager = NULL;
 	FXmppStreams = NULL;
 	FRosterPlugin = NULL;
+	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
 	FStanzaProcessor = NULL;
@@ -29,6 +30,7 @@ VCardPlugin::VCardPlugin()
 	FDiscovery = NULL;
 	FXmppUriQueries = NULL;
 	FMessageWidgets = NULL;
+	FRosterSearch = NULL;
 
 	FUpdateTimer.setSingleShot(false);
 	FUpdateTimer.start(UPDATE_REQUEST_TIMEOUT);
@@ -81,6 +83,12 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		}
 	}
 
+	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
+	if (plugin)
+	{
+		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+	}
+
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
 	{
@@ -129,6 +137,12 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		}
 	}
 
+	plugin = APluginManager->pluginInterface("IRosterSearch").value(0,NULL);
+	if (plugin)
+	{
+		FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
+	}
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return true;
@@ -149,9 +163,87 @@ bool VCardPlugin::initObjects()
 	}
 	if (FXmppUriQueries)
 	{
-		FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
+		FXmppUriQueries->insertUriHandler(this,XUHO_DEFAULT);
+	}
+	if (FRostersModel)
+	{
+		FRostersModel->insertRosterDataHolder(RDHO_VCARD_SEARCH,this);
+	}
+	if (FRosterSearch)
+	{
+		FRosterSearch->insertSearchField(RDR_VCARD_SEARCH,tr("User Profile"));
 	}
 	return true;
+}
+
+QList<int> VCardPlugin::rosterDataRoles(int AOrder) const
+{
+	if (AOrder == RDHO_VCARD_SEARCH)
+	{
+		static const QList<int> dataRoles = QList<int>() << RDR_VCARD_SEARCH;
+		return dataRoles;
+	}
+	return QList<int>();
+}
+
+QVariant VCardPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
+{
+	if (AOrder==RDHO_VCARD_SEARCH && ARole==RDR_VCARD_SEARCH)
+	{
+		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
+		if (FSearchStrings.contains(contactJid))
+		{
+			return FSearchStrings.value(contactJid);
+		}
+		else if (hasVCard(contactJid))
+		{
+			VCard *vcard = new VCard(const_cast<VCardPlugin *>(this),contactJid);
+
+			QStringList strings;
+			strings += vcard->value(VVN_FULL_NAME);
+			strings += vcard->value(VVN_FAMILY_NAME);
+			strings += vcard->value(VVN_GIVEN_NAME);
+			strings += vcard->value(VVN_MIDDLE_NAME);
+			strings += vcard->value(VVN_NICKNAME);
+			strings += vcard->value(VVN_ORG_NAME);
+			strings += vcard->value(VVN_ORG_UNIT);
+			strings += vcard->value(VVN_TITLE);
+			strings += vcard->value(VVN_ROLE);
+			strings += vcard->value(VVN_DESCRIPTION);
+
+			static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
+			strings += vcard->values(VVN_EMAIL,emailTagList).keys();
+
+			static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
+			strings += vcard->values(VVN_TELEPHONE,phoneTagList).keys();
+
+			static const QStringList tagHome = QStringList() << "HOME";
+			static const QStringList tagWork = QStringList() << "WORK";
+			static const QStringList tagsAdres = tagHome+tagWork;
+			strings += vcard->value(VVN_ADR_COUNTRY,tagHome,tagsAdres);
+			strings += vcard->value(VVN_ADR_REGION,tagHome,tagsAdres);
+			strings += vcard->value(VVN_ADR_CITY,tagHome,tagsAdres);
+			strings += vcard->value(VVN_ADR_STREET,tagHome,tagsAdres);
+			strings += vcard->value(VVN_ADR_COUNTRY,tagWork,tagsAdres);
+			strings += vcard->value(VVN_ADR_REGION,tagWork,tagsAdres);
+			strings += vcard->value(VVN_ADR_CITY,tagWork,tagsAdres);
+			strings += vcard->value(VVN_ADR_STREET,tagWork,tagsAdres);
+
+			delete vcard;
+
+			strings.removeAll(QString::null);
+			FSearchStrings.insert(contactJid, strings);
+
+			return strings;
+		}
+	}
+	return QVariant();
+}
+
+bool VCardPlugin::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AValue); Q_UNUSED(AIndex); Q_UNUSED(ARole);
+	return false;
 }
 
 void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
@@ -163,11 +255,13 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		QDomElement elem = AStanza.firstElement(VCARD_TAGNAME,NS_VCARD_TEMP);
 		if (AStanza.type() == "result")
 		{
+			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,elem);
 			emit vcardReceived(fromJid);
 		}
 		else if (AStanza.type() == "error")
 		{
+			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,QDomElement());
 			emit vcardError(fromJid,XmppStanzaError(AStanza));
 		}
@@ -178,6 +272,7 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		Stanza stanza = FVCardPublishStanza.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
+			FSearchStrings.remove(streamJid);
 			saveVCardFile(streamJid,stanza.element().firstChildElement(VCARD_TAGNAME));
 			emit vcardPublished(streamJid);
 		}
@@ -442,7 +537,7 @@ void VCardPlugin::onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &A
 	{
 		foreach(IRosterIndex *index, AIndexes)
 		{
-			Jid contactJid = index->data(RDR_FULL_JID).toString();
+			Jid contactJid = index->data(RDR_PREP_BARE_JID).toString();
 			if (hasVCard(contactJid))
 			{
 				IVCard *vcard = getVCard(contactJid);

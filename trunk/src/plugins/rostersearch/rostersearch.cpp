@@ -347,12 +347,15 @@ bool RosterSearch::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 		if (!sourceModel()->hasChildren(index))
 		{
 			bool accept = true;
+			const QRegExp regExp = filterRegExp();
 			foreach(int dataField, FFieldActions.keys())
 			{
 				if (isSearchFieldEnabled(dataField))
 				{
 					accept = false;
-					if (filterRegExp().indexIn(index.data(dataField).toString())>=0)
+					QVariant fieldData = index.data(dataField);
+					QString string = fieldData.type()==QVariant::StringList ? fieldData.toStringList().join("\t") : fieldData.toString();
+					if (string.contains(regExp))
 						return true;
 				}
 			}
