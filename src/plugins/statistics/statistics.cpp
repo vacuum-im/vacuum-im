@@ -171,7 +171,7 @@ bool Statistics::isValidHit(const IStatisticsHit &AHit) const
 bool Statistics::sendStatisticsHit(const IStatisticsHit &AHit)
 {
 #ifndef DEBUG_MODE
-	if (false && isValidHit(AHit) && !FProfileId.isNull())
+	if (isValidHit(AHit) && !FProfileId.isNull())
 	{
 		QNetworkReply *reply = FNetworkManager->get(QNetworkRequest(buildHitUrl(AHit)));
 		if (!reply->isFinished())
