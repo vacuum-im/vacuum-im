@@ -110,11 +110,4 @@
         <translation>Сбросить по умолчанию</translation>
     </message>
 </context>
-<context>
-    <name>NotifyWidget</name>
-    <message>
-        <source>Notification</source>
-        <translation>Уведомление</translation>
-    </message>
-</context>
 </TS>

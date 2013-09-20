@@ -106,9 +106,7 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 	plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
 	if (plugin)
-	{
 		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
-	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -160,9 +158,10 @@ bool Notifications::initObjects()
 	}
 
 	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
-
-	NotifyWidget::setMainWindow(FMainWindowPlugin->mainWindow());
-
+	
+	NotifyWidget::setNetworkManager(FNetworkAccessManager);
+	NotifyWidget::setMainWindow(FMainWindowPlugin!=NULL ? FMainWindowPlugin->mainWindow() : NULL);
+	
 	return true;
 }
 
@@ -182,6 +181,7 @@ bool Notifications::initSettings()
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
+
 	return true;
 }
 
@@ -260,8 +260,6 @@ int Notifications::appendNotification(const INotification &ANotification)
 			connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
 			connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
 			connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
-			record.popupWidget->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
-			record.popupWidget->setNetworkAccessManager(FNetworkAccessManager);
 			record.popupWidget->appear();
 		}
 	}
@@ -421,6 +419,7 @@ void Notifications::removeNotification(int ANotifyId)
 				FActivateLast->setVisible(false);
 			}
 		}
+		qDeleteAll(record.notification.actions);
 
 		FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
 		FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
