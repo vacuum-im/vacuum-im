@@ -87,6 +87,7 @@ void InfoWidget::setAddressMenuVisible(bool AVisible)
 				{
 					button->setMenu(FAddressMenu);
 					button->setPopupMode(QToolButton::MenuButtonPopup);
+					button->setIconSize(messageWindow()->editWidget()->editToolBarChanger()->toolBar()->iconSize());
 				}
 			}
 

@@ -7,7 +7,7 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 {
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, false);
-	ui.bwtMessageBox->layout()->setSpacing(3);
+	ui.spwMessageBox->setSpacing(3);
 
 	FMessageWidgets = AMessageWidgets;
 
@@ -16,19 +16,19 @@ ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, 
 
 	FAddress = FMessageWidgets->newAddress(AStreamJid,AContactJid,this);
 	
-	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.bwtMessageBox);
-	ui.bwtMessageBox->insertWidget(MCWW_INFOWIDGET,FInfoWidget->instance());
+	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.spwMessageBox);
+	ui.spwMessageBox->insertWidget(MCWW_INFOWIDGET,FInfoWidget->instance());
 
-	FViewWidget = FMessageWidgets->newViewWidget(this,ui.bwtMessageBox);
-	ui.bwtMessageBox->insertWidget(MCWW_VIEWWIDGET,FViewWidget->instance(),100);
+	FViewWidget = FMessageWidgets->newViewWidget(this,ui.spwMessageBox);
+	ui.spwMessageBox->insertWidget(MCWW_VIEWWIDGET,FViewWidget->instance(),100);
 
-	FEditWidget = FMessageWidgets->newEditWidget(this,ui.bwtMessageBox);
+	FEditWidget = FMessageWidgets->newEditWidget(this,ui.spwMessageBox);
 	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_CHAT_SENDMESSAGE);
-	ui.bwtMessageBox->insertWidget(MCWW_EDITWIDGET,FEditWidget->instance());
-
-	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.bwtMessageBox);
+	ui.spwMessageBox->insertWidget(MCWW_EDITWIDGET,FEditWidget->instance());
+	
+	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.spwMessageBox);
 	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-	ui.bwtMessageBox->insertWidget(MCWW_TOOLBARWIDGET,FToolBarWidget->instance());
+	ui.spwMessageBox->insertWidget(MCWW_TOOLBARWIDGET,FToolBarWidget->instance());
 	
 	FMenuBarWidget = FMessageWidgets->newMenuBarWidget(this,this);
 	setMenuBar(FMenuBarWidget->instance());
@@ -174,9 +174,9 @@ void ChatWindow::setTabPageNotifier(IMessageTabPageNotifier *ANotifier)
 	}
 }
 
-BoxWidget *ChatWindow::messageWidgetsBox() const
+SplitterWidget *ChatWindow::messageWidgetsBox() const
 {
-	return ui.bwtMessageBox;
+	return ui.spwMessageBox;
 }
 
 void ChatWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)

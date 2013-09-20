@@ -28,7 +28,8 @@ HEADERS  = utilsexport.h \
            advanceditemmodel.h \
            advanceditemdelegate.h \
            filecookiejar.h \
-           boxwidget.h
+           boxwidget.h \
+           splitterwidget.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -59,4 +60,5 @@ SOURCES  = jid.cpp \
            advanceditemmodel.cpp \
            advanceditemdelegate.cpp \
            filecookiejar.cpp \
-           boxwidget.cpp
+           boxwidget.cpp \
+           splitterwidget.cpp
