@@ -26,6 +26,12 @@
 #define IERR_DATASTREAMS_STREAM_STREAMID_EXISTS              "datastreams-stream-streamid-exists"
 #define IERR_DATASTREAMS_STREAM_INVALID_INIT_RESPONCE        "datastreams-stream-invalid-init-responce"
 
+// FileMessageArchive
+#define IERR_FILEARCHIVE_DATABASE_NOT_CREATED                "filearchive-database-not-created"
+#define IERR_FILEARCHIVE_DATABASE_NOT_OPENED                 "filearchive-database-not-opened"
+#define IERR_FILEARCHIVE_DATABASE_NOT_COMPATIBLE             "filearchive-database-not-compatible"
+#define IERR_FILEARCHIVE_DATABASE_EXEC_FAILED                "filearchive-database-exec-failed"
+
 // FileStreamsManager
 #define IERR_FILESTREAMS_STREAM_FILE_IO_ERROR                "filestreams-stream-file-io-error"
 #define IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED            "filestreams-stream-file-size-changed"

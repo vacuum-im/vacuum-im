@@ -57,6 +57,16 @@ const IArchiveHeader &FileWriter::header() const
 	return FHeader;
 }
 
+int FileWriter::notesCount() const
+{
+	return FNotesCount;
+}
+
+int FileWriter::messagesCount() const
+{
+	return FMessagesCount;
+}
+
 int FileWriter::recordsCount() const
 {
 	return FMessagesCount + FNotesCount;
@@ -155,8 +165,6 @@ void FileWriter::stopCollection()
 	if (FXmlFile)
 	{
 		FXmlFile->close();
-		if (FMessagesCount == 0)
-			QFile::remove(FFileName);
 		FXmlFile->deleteLater();
 		FXmlFile = NULL;
 	}

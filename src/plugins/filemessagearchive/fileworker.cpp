@@ -1,18 +1,24 @@
-#include "filetask.h"
+#include "fileworker.h"
 
 #include <QMetaObject>
+#include <definitions/internalerrors.h>
 
-quint32 FileTask::FTaskCount = 0;
+#define THREAD_WAIT_TIME   10000
 
 // FileTask
+quint32 FileTask::FTaskCount = 0;
 FileTask::FileTask(IFileMessageArchive *AArchive, const Jid &AStreamJid, Type AType)
 {
 	FType = AType;
 	FFileArchive = AArchive;
 	FStreamJid = AStreamJid;
-	FTaskId = QString("task_%1").arg(++FTaskCount);
-
+	FTaskId = QString("FileTask_%1").arg(++FTaskCount);
 	setAutoDelete(false);
+}
+
+FileTask::~FileTask()
+{
+
 }
 
 FileTask::Type FileTask::type() const
@@ -25,7 +31,7 @@ QString FileTask::taskId() const
 	return FTaskId;
 }
 
-bool FileTask::hasError() const
+bool FileTask::isFailed() const
 {
 	return !FError.isNull();
 }
@@ -33,11 +39,6 @@ bool FileTask::hasError() const
 XmppError FileTask::error() const
 {
 	return FError;
-}
-
-void FileTask::emitFinished()
-{
-	QMetaObject::invokeMethod(FFileArchive->instance(),"onFileTaskFinished",Qt::QueuedConnection,Q_ARG(FileTask *,this));
 }
 
 // FileTaskSaveCollection
@@ -54,9 +55,8 @@ IArchiveHeader FileTaskSaveCollection::archiveHeader() const
 
 void FileTaskSaveCollection::run()
 {
-	if (!FFileArchive->saveCollectionToFile(FStreamJid,FCollection,FSaveMode))
+	if (!FFileArchive->saveFileCollection(FStreamJid,FCollection,FSaveMode))
 		FError = XmppError(IERR_HISTORY_CONVERSATION_SAVE_ERROR);
-	emitFinished();
 }
 
 // FileTaskLoadHeaders
@@ -72,9 +72,10 @@ QList<IArchiveHeader> FileTaskLoadHeaders::archiveHeaders() const
 
 void FileTaskLoadHeaders::run()
 {
-	foreach(QString file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
-		FHeaders.append(FFileArchive->loadHeaderFromFile(file));
-	emitFinished();
+	if (FFileArchive->isDatabaseReady(FStreamJid))
+		FHeaders = FFileArchive->loadDatabaseHeaders(FStreamJid,FRequest);
+	else
+		FHeaders = FFileArchive->loadFileHeaders(FStreamJid,FRequest);
 }
 
 // FileTaskLoadCollection
@@ -90,11 +91,10 @@ IArchiveCollection FileTaskLoadCollection::archiveCollection() const
 
 void FileTaskLoadCollection::run()
 {
-	QString file = FFileArchive->collectionFilePath(FStreamJid,FHeader.with,FHeader.start);
-	FCollection = FFileArchive->loadCollectionFromFile(file);
+	QString filePath = FFileArchive->collectionFilePath(FStreamJid,FHeader.with,FHeader.start);
+	FCollection = FFileArchive->loadFileCollection(filePath);
 	if (!FCollection.header.with.isValid() || !FCollection.header.start.isValid())
 		FError = XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR);
-	emitFinished();
 }
 
 // FileTaskRemoveCollection
@@ -111,13 +111,18 @@ IArchiveRequest FileTaskRemoveCollection::archiveRequest() const
 void FileTaskRemoveCollection::run()
 {
 	FRequest.end = !FRequest.end.isValid() ? FRequest.start : FRequest.end;
-	foreach(QString file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
+
+	QList<IArchiveHeader> headers;
+	if (FFileArchive->isDatabaseReady(FStreamJid))
+		headers = FFileArchive->loadDatabaseHeaders(FStreamJid,FRequest); 
+	else
+		headers = FFileArchive->loadFileHeaders(FStreamJid,FRequest);
+
+	foreach(const IArchiveHeader &header, headers)
 	{
-		IArchiveHeader header = FFileArchive->loadHeaderFromFile(file);
-		if (!FFileArchive->removeCollectionFile(FStreamJid,header.with,header.start))
+		if (!FFileArchive->removeFileCollection(FStreamJid,header.with,header.start))
 			FError = XmppError(IERR_HISTORY_CONVERSATION_REMOVE_ERROR);
 	}
-	emitFinished();
 }
 
 // FileTaskLoadModifications
@@ -134,6 +139,56 @@ IArchiveModifications FileTaskLoadModifications::archiveModifications() const
 
 void FileTaskLoadModifications::run()
 {
-	FModifications = FFileArchive->loadFileModifications(FStreamJid,FStart,FCount);
-	emitFinished();
+	if (FFileArchive->isDatabaseReady(FStreamJid))
+		FModifications = FFileArchive->loadDatabaseModifications(FStreamJid,FStart,FCount);
+	else
+		FError = XmppError(IERR_HISTORY_MODIFICATIONS_LOAD_ERROR);
+}
+
+// FileWorker
+FileWorker::FileWorker(QObject *AParent) : QThread(AParent)
+{
+	FQuit = false;
+}
+
+FileWorker::~FileWorker()
+{
+	quit();
+	wait();
+}
+
+bool FileWorker::startTask(FileTask *ATask)
+{
+	QMutexLocker locker(&FMutex);
+	if (!FQuit)
+	{
+		FTasks.enqueue(ATask);
+		FTaskReady.wakeAll();
+		start();
+		return true;
+	}
+	return false;
+}
+
+void FileWorker::run()
+{
+	QMutexLocker locker(&FMutex);
+	while (!FQuit && !FTasks.isEmpty())
+	{
+		FileTask *task = FTasks.dequeue();
+
+		locker.unlock();
+		task->run();
+		QMetaObject::invokeMethod(this,"taskFinished",Qt::QueuedConnection,Q_ARG(FileTask *,task));
+		locker.relock();
+
+		if (FTasks.isEmpty())
+			FTaskReady.wait(locker.mutex(),THREAD_WAIT_TIME);
+	}
+}
+
+void FileWorker::quit()
+{
+	QMutexLocker locker(&FMutex);
+	FQuit = true;
 }
