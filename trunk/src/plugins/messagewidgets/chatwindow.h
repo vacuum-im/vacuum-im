@@ -51,7 +51,7 @@ public:
 	virtual IMessageTabPageNotifier *tabPageNotifier() const;
 	virtual void setTabPageNotifier(IMessageTabPageNotifier *ANotifier);
 	// IMessageChatWindow
-	virtual BoxWidget *messageWidgetsBox() const;
+	virtual SplitterWidget *messageWidgetsBox() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	// IMessageWindow

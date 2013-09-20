@@ -19,7 +19,7 @@
      <number>3</number>
     </property>
     <item>
-     <widget class="BoxWidget" name="bwtMessageBox"/>
+     <widget class="SplitterWidget" name="spwMessageBox"/>
     </item>
    </layout>
   </widget>
@@ -27,9 +27,9 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>BoxWidget</class>
+   <class>SplitterWidget</class>
    <extends>QFrame</extends>
-   <header location="global">utils/boxwidget.h</header>
+   <header location="global">utils/splitterwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
