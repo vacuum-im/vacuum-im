@@ -844,7 +844,7 @@ void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 		{
 			IArchiveRequest request;
 			request.with = isConferencePrivateChat(FContactJid) ? FContactJid : FContactJid.bare();
-			request.exactmatch = request.with.node().isEmpty();
+			request.exactmatch = request.with.isValid() && request.with.node().isEmpty();
 			request.start = QDateTime(start);
 			request.end = QDateTime(end);
 			request.text = searchString();
