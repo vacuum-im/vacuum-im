@@ -88,6 +88,7 @@ private:
 	IMessageProcessor *FMessageProcessor;
 	IOptionsManager *FOptionsManager;
 private:
+	int FMaxEmoticonsInMessage;
 	EmoticonTreeItem FRootTreeItem;
 	QHash<QString, QUrl> FUrlByKey;
 	QHash<QString, QString> FKeyByUrl;
