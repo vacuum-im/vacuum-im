@@ -345,7 +345,7 @@ QString Jid::decode(const QString &AEncJid)
 			}
 		}
 
-		for (int i = jidStr.length(); i >= 3; i--)
+		for (int i = jidStr.length(); i >= 0; i--)
 		{
 			if (jidStr.mid(i, 4) == "_at_")
 			{
