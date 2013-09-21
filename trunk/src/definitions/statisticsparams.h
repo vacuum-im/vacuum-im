@@ -1,9 +1,8 @@
 #ifndef DEF_STATISTICSPARAMS_H
 #define DEF_STATISTICSPARAMS_H
 
-// Hit-Event
-#define SEVC_APPLICATION                           "Application"
-#define   SEVA_APPLICATION_LAUNCH                  "Launch"
-#define   SEVA_APPLICATION_SHUTDOWN                "Shutdown"
+// Hit-AppView
+#define SAVD_PROFILE_OPENED                        "Profile Opened"
+#define SAVD_PROFILE_CLOSED                        "Profile Closed"
 
 #endif // DEF_STATISTICSPARAMS_H
