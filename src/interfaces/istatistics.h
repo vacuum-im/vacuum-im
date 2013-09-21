@@ -26,10 +26,11 @@ struct IStatisticsHit {
 	QString description;
 	QDateTime timestamp;
 	struct {
+		QString descr;
 		QString title;
-		QString location;
 		QString host;
 		QString path;
+		QString location;
 	} view;
 	struct {
 		QString category;
@@ -44,8 +45,8 @@ struct IStatisticsHit {
 		qint64 time;
 	} timing;
 	struct {
-		QString errString;
 		bool fatal;
+		QString descr;
 	} exception;
 	IStatisticsHit() {
 		type = HitNone;
