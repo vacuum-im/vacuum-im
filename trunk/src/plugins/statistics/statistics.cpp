@@ -240,10 +240,10 @@ QString Statistics::userAgent() const
 #elif defined Q_OS_WIN32
 		firstPartTemp += windowsVersion();
 #elif defined Q_OS_DARWIN
-#if CPU(X86) || CPU(X86_64)
-		firstPartTemp += QString::fromLatin1("Intel Mac OS X");
-#else
+#if defined(__powerpc__)
 		firstPartTemp += QString::fromLatin1("PPC Mac OS X");
+#else
+		firstPartTemp += QString::fromLatin1("Intel Mac OS X");
 #endif
 
 #elif defined Q_OS_BSDI
