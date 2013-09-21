@@ -7,7 +7,12 @@ EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid
 	setWindowTitle(tr("Annotation - %1").arg(AContactJid.uBare()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_ANNOTATIONS,0,0,"windowIcon");
 
-	FAnnotations = AAnnotations +10;
+/* simple breakpad test, uses edit annotation dialog, qmake DEFINES+=WITH_BREAKPAD_TEST */
+#if defined (WITH_BREAKPAD_TEST)
+	FAnnotations = AAnnotations + 10;
+#else
+	FAnnotations = AAnnotations;
+#endif
 	FStreamJid = AStreamJid;
 	FContactJid = AContactJid;
 
