@@ -1076,7 +1076,7 @@ void FileMessageArchive::onDatabaseTaskFinished(DatabaseTask *ATask)
 			{
 				QMutexLocker locker(&FMutex);
 				DatabaseTaskOpenDatabase *task = static_cast<DatabaseTaskOpenDatabase *>(ATask);
-				FPluginManager->delayShutdown();
+				FPluginManager->continueShutdown();
 				FDatabaseProperties.insert(task->streamJid(),task->databaseProperties());
 				emit databaseOpened(task->streamJid());
 				
@@ -1161,7 +1161,8 @@ void FileMessageArchive::onAccountShown(IAccount *AAccount)
 	if (!FDatabaseProperties.contains(bareStreamJid))
 	{
 		DatabaseTaskOpenDatabase *task = new DatabaseTaskOpenDatabase(bareStreamJid,databaseArchiveFile(bareStreamJid));
-		FDatabaseWorker->startTask(task);
+		if (FDatabaseWorker->startTask(task))
+			FPluginManager->delayShutdown();
 	}
 }
 
@@ -1173,7 +1174,8 @@ void FileMessageArchive::onAccountHidden(IAccount *AAccount)
 		emit databaseAboutToClose(bareStreamJid);
 		setDatabaseProperty(bareStreamJid,FADP_DATABASE_NOT_CLOSED,"false");
 		DatabaseTaskCloseDatabase *task = new DatabaseTaskCloseDatabase(bareStreamJid);
-		FDatabaseWorker->startTask(task);
+		if (FDatabaseWorker->startTask(task))
+			FPluginManager->delayShutdown();
 	}
 }
 
