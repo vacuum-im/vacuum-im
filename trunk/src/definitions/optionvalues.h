@@ -134,12 +134,9 @@
 // FileMessageArchive
 #define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
 #define OPV_FILEARCHIVE_FORCEDATABASESYNC               "filearchive.force-database-sync"
-#define OPV_FILEARCHIVE_COLLECTION_SIZE                 "filearchive.collection.size"
+#define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "filearchive.collection.min-size"
 #define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
-#define OPV_FILEARCHIVE_COLLECTION_TIMEOUT              "filearchive.collection.timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT           "filearchive.collection.min-timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT           "filearchive.collection.max-timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MINMESSAGES          "filearchive.collection.min-messages"
+#define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "filearchive.collection.critical-size"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"
