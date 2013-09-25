@@ -16,11 +16,31 @@ http://prometheus.altlinux.org/en/Sisyphus/srpms/vacuum-im
 
 = Arch Linux =
 
-== vacuum (stable) ==
-http://aur.archlinux.org/packages.php?ID=34088
+== Подключение ==
 
-== vacuum-svn (unstable, vcs) ==
-http://aur.archlinux.org/packages.php?ID=32402
+_* Не добавляйте оба репозитория одновременно! Do not add both repositories at the same time! *_
+
+=== Vacuum-IM (release) ===
+
+{{{
+[home_vacuum-im_release_Arch_Extra]
+SigLevel = Never
+Server = http://download.opensuse.org/repositories/home:/vacuum-im:/release/Arch_Extra/$arch
+}}}
+
+=== Vacuum-IM (unstable) ===
+
+{{{
+[home_vacuum-im_unstable_Arch_Extra]
+SigLevel = Never
+Server = http://download.opensuse.org/repositories/home:/vacuum-im:/unstable/Arch_Extra/$arch
+}}}
+
+== Установка ==
+{{{
+pacman -Sy
+pacman -S vacuum
+}}}
 
 = Debian =
 http://www.notesalexp.org/
