@@ -18,7 +18,11 @@ http://prometheus.altlinux.org/en/Sisyphus/srpms/vacuum-im
 
 == Подключение ==
 
-_* Не добавляйте оба репозитория одновременно! Do not add both repositories at the same time! *_
+_* Не добавляйте оба репозитория одновременно!<br>
+Do not add both repositories at the same time! *_
+
+Добавить строки в конец файла */etc/pacman.conf*<br>
+Add lines to the end of file */etc/pacman.conf*
 
 === Vacuum-IM (release) ===
 
