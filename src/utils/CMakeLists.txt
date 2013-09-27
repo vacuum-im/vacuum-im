@@ -13,20 +13,6 @@ add_definitions("-DQXT_STATIC")
 link_directories("${CMAKE_BINARY_DIR}/libs")
 include_directories(AFTER  "${CMAKE_SOURCE_DIR}/src" "${CMAKE_SOURCE_DIR}/src/thirdparty/zlib")
 
-if (UNIX AND NOT APPLE)
-	include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
-	include(FindX11)
-	include_directories(AFTER ${X11_INCLUDE_DIR})
-	set(ADD_LIBS ${X11_LIBRARIES})
-	
-	if (X11_Xscreensaver_FOUND)
-		message(STATUS "Found Xscreensaver: ${X11_Xscreensaver_LIB}")
-		list(APPEND ADD_LIBS "${X11_Xscreensaver_LIB}")
-	else (X11_Xscreensaver_FOUND)
-		message(STATUS "Xscreensaver not found")
-	endif (X11_Xscreensaver_FOUND)
-endif (UNIX AND NOT APPLE)
-
 if (NOT SYSTEM_IDN_FOUND)
 	include_directories("${CMAKE_SOURCE_DIR}/src/thirdparty/idn")
 endif (NOT SYSTEM_IDN_FOUND)
@@ -38,6 +24,21 @@ set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES
 	SOVERSION "${VACUUM_UTILS_ABI}")
 
 set(ADD_LIBS qxtglobalshortcut idle)
+
+if (UNIX AND NOT APPLE)
+        include_directories(${Qt5Gui_PRIVATE_INCLUDE_DIRS})
+        include(FindX11)
+        include_directories(AFTER ${X11_INCLUDE_DIR})
+        list(APPEND ADD_LIBS ${X11_LIBRARIES})
+
+        if (X11_Xscreensaver_FOUND)
+                message(STATUS "Found Xscreensaver: ${X11_Xscreensaver_LIB}")
+                list(APPEND ADD_LIBS "${X11_Xscreensaver_LIB}")
+        else (X11_Xscreensaver_FOUND)
+                message(STATUS "Xscreensaver not found")
+        endif (X11_Xscreensaver_FOUND)
+endif (UNIX AND NOT APPLE)
+
 
 if (SYSTEM_ZLIB_FOUND)
 	list(APPEND ADD_LIBS "${SYSTEM_ZLIB_FOUND}")
