@@ -13,7 +13,7 @@
 #include <utils/menu.h>
 #include <utils/action.h>
 #include <utils/message.h>
-#include <utils/boxwidget.h>
+#include <utils/splitterwidget.h>
 #include <utils/menubarchanger.h>
 #include <utils/toolbarchanger.h>
 #include <utils/statusbarchanger.h>
@@ -306,7 +306,7 @@ public:
 	virtual void setSubject(const QString &ASubject) =0;
 	virtual QString threadId() const =0;
 	virtual void setThreadId(const QString &AThreadId) =0;
-	virtual BoxWidget *messageWidgetsBox() const =0;
+	virtual SplitterWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 protected:
 	virtual void modeChanged(int AMode) =0;
@@ -317,7 +317,7 @@ class IMessageChatWindow :
 {
 public:
 	virtual QMainWindow *instance() =0;
-	virtual BoxWidget *messageWidgetsBox() const =0;
+	virtual SplitterWidget *messageWidgetsBox() const =0;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip) =0;
 };
 
@@ -427,12 +427,12 @@ Q_DECLARE_INTERFACE(IMessageTabPageNotifier,"Vacuum.Plugin.IMessageTabPageNotifi
 Q_DECLARE_INTERFACE(IMessageTabPage,"Vacuum.Plugin.IMessageTabPage/1.4")
 Q_DECLARE_INTERFACE(IMessageTabWindow,"Vacuum.Plugin.IMessageTabWindow/1.5")
 Q_DECLARE_INTERFACE(IMessageWindow,"Vacuum.Plugin.IMessageWindow/1.3")
-Q_DECLARE_INTERFACE(IMessageNormalWindow,"Vacuum.Plugin.IMessageNormalWindow/1.5")
-Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.5")
+Q_DECLARE_INTERFACE(IMessageNormalWindow,"Vacuum.Plugin.IMessageNormalWindow/1.6")
+Q_DECLARE_INTERFACE(IMessageChatWindow,"Vacuum.Plugin.IMessageChatWindow/1.6")
 Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandler/1.2")
 Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.2")
 Q_DECLARE_INTERFACE(IMessageEditSendHandler,"QIP.Plugin.IMessageEditSendHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.3")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.9")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.10")
 
 #endif // IMESSAGEWIDGETS_H

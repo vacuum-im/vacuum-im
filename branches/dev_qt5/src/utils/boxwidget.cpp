@@ -12,6 +12,11 @@ BoxWidget::~BoxWidget()
 
 }
 
+bool BoxWidget::isEmpty() const
+{
+	return FWidgetOrders.isEmpty();
+}
+
 QList<QWidget *> BoxWidget::widgets() const
 {
 	return FWidgetOrders.values();
@@ -53,6 +58,26 @@ void BoxWidget::removeWidget(QWidget *AWidget)
 	}
 }
 
+int BoxWidget::spacing() const
+{
+	return FLayout->spacing();
+}
+
+void BoxWidget::setSpacing(int ASpace)
+{
+	FLayout->setSpacing(ASpace);
+}
+
+int BoxWidget::stretch(QWidget *AWidget) const
+{
+	return FLayout->stretch(FLayout->indexOf(AWidget));
+}
+
+void BoxWidget::setStretch(QWidget *AWidget, int AStretch)
+{
+	FLayout->setStretch(FLayout->indexOf(AWidget),AStretch);
+}
+
 QBoxLayout::Direction BoxWidget::direction() const
 {
 	return FLayout->direction();
@@ -69,8 +94,9 @@ void BoxWidget::onWidgetDestroyed(QObject *AObject)
 	{
 		if (it.value() == AObject)
 		{
-			it = FWidgetOrders.erase(it);
-			emit widgetRemoved(it.value());
+			QWidget *widget = it.value();
+			FWidgetOrders.erase(it);
+			emit widgetRemoved(widget);
 			break;
 		}
 		else

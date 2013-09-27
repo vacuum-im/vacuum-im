@@ -27,30 +27,44 @@ set(SOURCES "action.cpp"
 			"unzipfile.cpp"
 			"versionparser.cpp"
 			"widgetmanager.cpp"
-			"xmpperror.cpp")
+			"xmpperror.cpp"
+			"splitterwidget.cpp")
+
+set(HEADERS "action.h"
+			"advanceditem.h"
+			"advanceditemdelegate.h"
+			"advanceditemmodel.h"
+			"animatedtextbrowser.h"
+			"boxwidget.h"
+			"closebutton.h"
+			"datetime.h"
+			"filecookiejar.h"
+			"filestorage.h"
+			"iconsetdelegate.h"
+			"iconstorage.h"
+			"imagemanager.h"
+			"jid.h"
+			"menu.h"
+			"menubarchanger.h"
+			"message.h"
+			"options.h"
+			"ringbuffer.h"
+			"searchlineedit.h"
+			"shortcuts.h"
+			"stanza.h"
+			"statusbarchanger.h"
+			"systemmanager.h"
+			"textmanager.h"
+			"toolbarchanger.h"
+			"unzipfile.h"
+			"versionparser.h"
+			"widgetmanager.h"
+			"xmpperror.h"
+			"splitterwidget.h")
 
 if (UNIX AND NOT APPLE)
 	set(SOURCES ${SOURCES} "x11info.cpp")
+	set(HEADERS ${HEADERS} "x11info.h")
 endif (UNIX AND NOT APPLE)
-
-set(HEADERS "action.h"
-            "filestorage.h"
-            "iconstorage.h"
-            "menu.h"
-            "menubarchanger.h"
-            "options.h"
-            "shortcuts.h"
-            "statusbarchanger.h"
-            "systemmanager.h"
-            "toolbarchanger.h"
-            "animatedtextbrowser.h"
-            "closebutton.h"
-            "searchlineedit.h"
-            "imagemanager.h"
-            "advanceditem.h"
-            "advanceditemmodel.h"
-            "advanceditemdelegate.h"
-            "filecookiejar.h"
-            "boxwidget.h")
 
 qt5_wrap_cpp(MOC_SOURCES ${HEADERS})

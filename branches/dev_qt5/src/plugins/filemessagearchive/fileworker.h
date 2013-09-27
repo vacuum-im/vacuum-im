@@ -1,8 +1,11 @@
-#ifndef FILETASK_H
-#define FILETASK_H
+#ifndef FILEWORKER_H
+#define FILEWORKER_H
 
+#include <QQueue>
+#include <QMutex>
+#include <QThread>
 #include <QRunnable>
-#include <definitions/internalerrors.h>
+#include <QWaitCondition>
 #include <interfaces/ifilemessagearchive.h>
 #include <utils/xmpperror.h>
 
@@ -19,12 +22,11 @@ public:
 	};
 public:
 	FileTask(IFileMessageArchive *AArchive, const Jid &AStreamJid, Type AType);
+	virtual ~FileTask();
 	Type type() const;
 	QString taskId() const;
-	bool hasError() const;
+	bool isFailed() const;
 	XmppError error() const;
-protected:
-	void emitFinished();
 protected:
 	Type FType;
 	QString FTaskId;
@@ -105,4 +107,25 @@ private:
 	IArchiveModifications FModifications;
 };
 
-#endif // FILETASK_H
+
+class FileWorker :
+	public QThread
+{
+	Q_OBJECT;
+public:
+	FileWorker(QObject *AParent);
+	~FileWorker();
+	bool startTask(FileTask *ATask);
+signals:
+	void taskFinished(FileTask *ATask);
+protected:
+	void run();
+	void quit();
+private:
+	bool FQuit;
+	QMutex FMutex;
+	QWaitCondition FTaskReady;
+	QQueue<FileTask *> FTasks;
+};
+
+#endif // FILEWORKER_H

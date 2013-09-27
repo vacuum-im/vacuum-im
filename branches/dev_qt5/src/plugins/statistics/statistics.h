@@ -3,13 +3,12 @@
 
 #include <QMap>
 #include <QTimer>
-#include <QWebView>
 #include <QNetworkReply>
+#include <QDesktopWidget>
 #include <QNetworkAccessManager>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatistics.h>
 #include <interfaces/iconnectionmanager.h>
-#include "statisticswebpage.h"
 
 class Statistics : 
 	public QObject,
@@ -27,7 +26,7 @@ public:
 	virtual QUuid pluginUuid() const { return STATISTICS_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects() { return true; }
+	virtual bool initObjects();
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	// IStatistics
@@ -35,10 +34,11 @@ public:
 	virtual bool isValidHit(const IStatisticsHit &AHit) const;
 	virtual bool sendStatisticsHit(const IStatisticsHit &AHit);
 protected:
+	QString userAgent() const;
+	QString windowsVersion() const;
+protected:
 	QUrl buildHitUrl(const IStatisticsHit &AHit) const;
 	QString getStatisticsFilePath(const QString &AFileName) const;
-protected slots:
-	void onStatisticsViewLoadFinished(bool AOk);
 protected slots:
 	void onNetworkManagerFinished(QNetworkReply *AReply);
 	void onNetworkManagerProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
@@ -52,8 +52,10 @@ private:
 	IConnectionManager *FConnectionManager;
 private:
 	QUuid FProfileId;
+	QDesktopWidget *FDesktopWidget;
 	QNetworkAccessManager *FNetworkManager;
 private:
+	QString FUserAgent;
 	QTimer FPendingTimer;
 	QList<IStatisticsHit> FPendingHits;
 	QMap<QNetworkReply *, IStatisticsHit> FReplyHits;

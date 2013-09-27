@@ -12,6 +12,8 @@ Emoticons::Emoticons()
 	FMessageWidgets = NULL;
 	FMessageProcessor = NULL;
 	FOptionsManager = NULL;
+
+	FMaxEmoticonsInMessage = 20;
 }
 
 Emoticons::~Emoticons()
@@ -75,6 +77,7 @@ bool Emoticons::initObjects()
 
 bool Emoticons::initSettings()
 {
+	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS_MAXINMESSAGE,20);
 	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS,QStringList() << DEFAULT_ICONSET);
 
 	if (FOptionsManager)
@@ -334,7 +337,7 @@ int Emoticons::replaceTextToImage(QTextDocument *ADocument, int AStartPos, int A
 {
 	int posOffset = 0;
 	QMap<int,QString> emoticons = findTextEmoticons(ADocument,AStartPos,ALength);
-	if (!emoticons.isEmpty())
+	if (!emoticons.isEmpty() && emoticons.count()<=FMaxEmoticonsInMessage)
 	{
 		QTextCursor cursor(ADocument);
 		cursor.beginEditBlock();
@@ -541,6 +544,7 @@ void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
 void Emoticons::onOptionsOpened()
 {
 	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS));
+	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS_MAXINMESSAGE));
 }
 
 void Emoticons::onOptionsChanged(const OptionsNode &ANode)
@@ -570,5 +574,9 @@ void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 		}
 
 		createIconsetUrls();
+	}
+	else if (ANode.path() == OPV_MESSAGES_EMOTICONS_MAXINMESSAGE)
+	{
+		FMaxEmoticonsInMessage = ANode.value().toInt();
 	}
 }

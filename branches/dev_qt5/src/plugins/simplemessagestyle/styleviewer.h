@@ -11,6 +11,8 @@ class StyleViewer:
 public:
 	StyleViewer(QWidget *AParent);
 	~StyleViewer();
+	QSize sizeHint() const;
+	QSize minimumSizeHint() const;
 };
 
 #endif // STYLEVIEWER_H

@@ -1040,6 +1040,7 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 	}
 
 	secsLast = 0;
+	QDateTime lastMessageDT;
 	nodeElem = AChatElem.firstChildElement();
 	while (!nodeElem.isNull())
 	{
@@ -1068,7 +1069,13 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			if (utc.isEmpty())
 			{
 				int secs = nodeElem.attribute("secs").toInt();
-				message.setDateTime(ACollection.header.start.addSecs(isSecsFromStart ? secs : secsLast+secs));
+				QDateTime messageDT = ACollection.header.start.addSecs(isSecsFromStart ? secs : secsLast+secs);
+
+				if (lastMessageDT.isValid() && lastMessageDT>=messageDT)
+					messageDT = lastMessageDT.addMSecs(1);
+
+				message.setDateTime(messageDT);
+				lastMessageDT = messageDT;
 			}
 			else
 			{

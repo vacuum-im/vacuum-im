@@ -262,5 +262,9 @@
         <source>Edit Profile</source>
         <translation>Редагувати особисті дані</translation>
     </message>
+    <message>
+        <source>User Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

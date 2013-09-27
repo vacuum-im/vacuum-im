@@ -620,8 +620,6 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
-		QString ttInfo;
-
 		if (AIndex->kind() == RIK_CONTACTS_ROOT)
 		{
 			QStringList streamsToolTips;
@@ -636,24 +634,24 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 					streamsToolTips.append(tooltip);
 				}
 			}
-			ttInfo = QString("<span>%1</span>").arg(streamsToolTips.join("<hr><p/><nbsp>"));
+			AToolTips.insert(RTTO_ROSTERSVIEW_INFO_STREAMS,QString("<span>%1</span>").arg(streamsToolTips.join("<hr><p/><nbsp>")));
 		}
 		else
 		{
 			QString name = AIndex->data(RDR_NAME).toString();
 			if (!name.isEmpty())
-				ttInfo += "<big><b>" + name.toHtmlEscaped() + "</b></big><br>";
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,"<big><b>" + name.toHtmlEscaped() + "</b></big>");
 
 			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 			if (!streamJid.isEmpty() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
 			{
 				IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
-				ttInfo += tr("<b>Account:</b> %1").arg(account!=NULL ? account->name().toHtmlEscaped() : streamJid.uBare().toHtmlEscaped()) + "<br>";
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(account!=NULL ? account->name().toHtmlEscaped() : streamJid.uBare()));
 			}
 
 			Jid itemJid = AIndex->data(RDR_FULL_JID).toString();
 			if (!itemJid.isEmpty())
-				ttInfo += tr("<b>Jabber ID:</b> %1").arg(itemJid.uBare().toHtmlEscaped()) + "<br>";
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,tr("<b>Jabber ID:</b> %1").arg(itemJid.uBare().toHtmlEscaped()));
 
 			QString ask = AIndex->data(RDR_ASK).toString();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
@@ -668,59 +666,51 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 					subsName = tr("Provided from you");
 
 				if (ask == SUBSCRIPTION_SUBSCRIBE)
-					ttInfo += tr("<b>Subscription:</b> %1, request sent").arg(subsName.toHtmlEscaped()) + "<br>";
+					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1, request sent").arg(subsName.toHtmlEscaped()));
 				else
-					ttInfo += tr("<b>Subscription:</b> %1").arg(subsName.toHtmlEscaped()) + "<br>";
+					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1").arg(subsName.toHtmlEscaped()));
 			}
-		}
-
-		if (!ttInfo.isEmpty())
-		{
-			if (ttInfo.endsWith("<br>"))
-				ttInfo.chop(4);
-			AToolTips.insert(RTTO_ROSTERSVIEW_INFO,ttInfo);
 		}
 
 		QStringList resources = AIndex->data(RDR_RESOURCES).toStringList();
 		if (!resources.isEmpty())
 		{
-			QString ttResources = "<hr>";
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE,"<hr>");
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
-			foreach(QString itemJid, resources)
+			for(int resIndex=0; resIndex<10 && resIndex<resources.count(); resIndex++)
 			{
-				IPresenceItem pitem = presence!=NULL ? presence->findItem(itemJid) : IPresenceItem();
+				int orderShift = resIndex*100;
+				IPresenceItem pitem = presence!=NULL ? presence->findItem(resources.at(resIndex)) : IPresenceItem();
 				if (pitem.isValid)
 				{
-					ttResources += tr("<b>Resource:</b> %1 (%2)").arg(pitem.itemJid.resource().toHtmlEscaped()).arg(pitem.priority) + "<br>";
-					QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(pitem.show) : QString::null;
-					ttResources += tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped()) + "<br>";
-					ttResources += pitem.status.toHtmlEscaped().replace('\n',"<br>");
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,tr("<b>Resource:</b> %1 (%2)").arg(pitem.itemJid.resource().toHtmlEscaped()).arg(pitem.priority));
 
-					if (ttResources.endsWith("<br>"))
-						ttResources.chop(4);
-					ttResources += "<hr>";
+					QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(pitem.show) : QString::null;
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME+orderShift,tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped()));
+
+					if (!pitem.status.isEmpty())
+						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,pitem.status.toHtmlEscaped().replace('\n',"<br>"));
+
+					if (resIndex < resources.count()-1)
+						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
 				}
 			}
-			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCES,ttResources);
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE,"<hr>");
 		}
 		else if (!AIndex->data(RDR_FULL_JID).isNull() && !AIndex->data(RDR_SHOW).isNull())
 		{
-			QString ttResource;
-
 			int show = AIndex->data(RDR_SHOW).toInt();
 			int priority = AIndex->data(RDR_PRIORITY).toInt();
 			QString resource = Jid(AIndex->data(RDR_FULL_JID).toString()).resource();
-			if (show!=IPresence::Offline && show!=IPresence::Error)
-				ttResource += tr("<b>Resource:</b> %1 (%2)").arg(resource.toHtmlEscaped()).arg(priority) + "<br>";
+			if (!resource.isEmpty() && show!=IPresence::Offline && show!=IPresence::Error)
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,tr("<b>Resource:</b> %1 (%2)").arg(resource.toHtmlEscaped()).arg(priority));
 
-			QString status = AIndex->data(RDR_STATUS).toString();
 			QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(show) : QString::null;
-			ttResource += tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped()) + "<br>";
-			ttResource += status.toHtmlEscaped().replace('\n',"<br>");
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME,tr("<b>Status:</b> %1").arg(statusName.toHtmlEscaped()));
 
-			if (ttResource.endsWith("<br>"))
-				ttResource.chop(4);
-			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCES,ttResource);
+			QString statusText = AIndex->data(RDR_STATUS).toString();
+			if (!statusText.isEmpty())
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT,statusText.toHtmlEscaped().replace('\n',"<br>"));
 		}
 	}
 }

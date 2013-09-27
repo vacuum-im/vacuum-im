@@ -23,6 +23,11 @@ QSize StyleViewer::sizeHint() const
 	return QSize(256,192);
 }
 
+QSize StyleViewer::minimumSizeHint() const
+{
+	return QSize(70,50);
+}
+
 void StyleViewer::onShortcutActivated()
 {
 	triggerPageAction(QWebPage::Copy);

@@ -98,6 +98,7 @@
 #define OPV_MESSAGES_TABWINDOW_REMOVETABSONCLOSE        "messages.tab-windows.window.remove-tabs-on-close"
 // Emoticons
 #define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
+#define OPV_MESSAGES_EMOTICONS_MAXINMESSAGE             "messages.emoticons.max-in-message"
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
 // ChatMessageHandler
@@ -132,12 +133,10 @@
 
 // FileMessageArchive
 #define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
-#define OPV_FILEARCHIVE_COLLECTION_SIZE                 "filearchive.collection.size"
+#define OPV_FILEARCHIVE_FORCEDATABASESYNC               "filearchive.force-database-sync"
+#define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "filearchive.collection.min-size"
 #define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
-#define OPV_FILEARCHIVE_COLLECTION_TIMEOUT              "filearchive.collection.timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT           "filearchive.collection.min-timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT           "filearchive.collection.max-timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MINMESSAGES          "filearchive.collection.min-messages"
+#define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "filearchive.collection.critical-size"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"

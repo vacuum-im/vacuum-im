@@ -14,28 +14,31 @@
 #include "ui_notifywidget.h"
 
 class NotifyWidget :
-			public QWidget
+	public QFrame
 {
 	Q_OBJECT;
 public:
 	NotifyWidget(const INotification &ANotification);
 	~NotifyWidget();
 	void appear();
-	void animateTo(int AYPos);
-	void setAnimated(bool AAnimated);
-	void setNetworkAccessManager(QNetworkAccessManager *ANetworkAccessManager);
 	static void setMainWindow(IMainWindow *AMainWindow);
+	static void setNetworkManager(QNetworkAccessManager *ANetworkManager);
 signals:
 	void notifyActivated();
 	void notifyRemoved();
 	void windowDestroyed();
 protected:
-	virtual void resizeEvent(QResizeEvent *AEvent);
-	virtual void mouseReleaseEvent(QMouseEvent *AEvent);
+	void animateTo(int AYPos);
+	void enterEvent(QEvent *AEvent);
+	void leaveEvent(QEvent *AEvent);
+	void resizeEvent(QResizeEvent *AEvent);
+	void mouseReleaseEvent(QMouseEvent *AEvent);
 protected slots:
-	void onAnimateStep();
 	void adjustHeight();
 	void updateElidedText();
+protected slots:
+	void onAnimateStep();
+	void onCloseTimerTimeout();
 private:
 	Ui::NotifyWidgetClass ui;
 private:
@@ -43,13 +46,17 @@ private:
 	int FTimeOut;
 	int FAnimateStep;
 	QString FTitle;
+	QString FNotice;
 	QString FCaption;
+	QTimer FCloseTimer;
 private:
-	static void layoutWidgets();
-	static IMainWindow *FMainWindow;
+	static QRect FDisplay;
 	static QDesktopWidget *FDesktop;
 	static QList<NotifyWidget *> FWidgets;
-	static QRect FDisplay;
+	static void layoutWidgets();
+private:
+	static IMainWindow *FMainWindow;
+	static QNetworkAccessManager *FNetworkManager;
 };
 
 #endif // NOTIFYWIDGET_H
