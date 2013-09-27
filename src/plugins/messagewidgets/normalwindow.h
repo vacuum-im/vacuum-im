@@ -61,7 +61,7 @@ public:
 	virtual void setSubject(const QString &ASubject);
 	virtual QString threadId() const;
 	virtual void setThreadId(const QString &AThreadId);
-	virtual BoxWidget *messageWidgetsBox() const;
+	virtual SplitterWidget *messageWidgetsBox() const;
 	virtual void updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip);
 signals:
 	// IMessageNormalWindow

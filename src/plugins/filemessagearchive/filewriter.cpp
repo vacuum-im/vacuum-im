@@ -1,5 +1,10 @@
 #include "filewriter.h"
 
+#define MIN_SIZE_CLOSE_TIMEOUT        120*60*1000
+#define MAX_SIZE_CLOSE_TIMEOUT        60*1000
+#define NORMAL_SIZE_CLOSE_TIMEOUT     20*60*1000
+#define CRITICAL_SIZE_CLOSE_TIMEOUT   0
+
 FileWriter::FileWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
 {
 	FXmlFile = NULL;
@@ -55,6 +60,16 @@ const QString &FileWriter::fileName() const
 const IArchiveHeader &FileWriter::header() const
 {
 	return FHeader;
+}
+
+int FileWriter::notesCount() const
+{
+	return FNotesCount;
+}
+
+int FileWriter::messagesCount() const
+{
+	return FMessagesCount;
 }
 
 int FileWriter::recordsCount() const
@@ -155,8 +170,6 @@ void FileWriter::stopCollection()
 	if (FXmlFile)
 	{
 		FXmlFile->close();
-		if (FMessagesCount == 0)
-			QFile::remove(FFileName);
 		FXmlFile->deleteLater();
 		FXmlFile = NULL;
 	}
@@ -175,7 +188,7 @@ void FileWriter::writeElementChilds(const QDomElement &AElem)
 				FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
 
 			QDomNamedNodeMap map = elem.attributes();
-			for (uint i =0; i<map.length(); i++)
+			for (int i =0; i<map.length(); i++)
 			{
 				QDomNode attrNode = map.item(i);
 				FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
@@ -195,12 +208,12 @@ void FileWriter::writeElementChilds(const QDomElement &AElem)
 
 void FileWriter::checkLimits()
 {
-	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_SIZE).value().toInt())
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT).value().toInt());
+	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE).value().toInt())
+		FCloseTimer.start(CRITICAL_SIZE_CLOSE_TIMEOUT);
 	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MAXSIZE).value().toInt())
-		FCloseTimer.start(0);
-	else if (FMessagesCount > Options::node(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES).value().toInt())
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_TIMEOUT).value().toInt());
+		FCloseTimer.start(MAX_SIZE_CLOSE_TIMEOUT);
+	else if (FMessagesCount > Options::node(OPV_FILEARCHIVE_COLLECTION_MINSIZE).value().toInt())
+		FCloseTimer.start(NORMAL_SIZE_CLOSE_TIMEOUT);
 	else
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT).value().toInt());
+		FCloseTimer.start(MIN_SIZE_CLOSE_TIMEOUT);
 }

@@ -18,6 +18,10 @@
         <source>Location:</source>
         <translation>Расположение:</translation>
     </message>
+    <message>
+        <source>Update archive database at startup</source>
+        <translation>Обновлять базу данных архива при старте</translation>
+    </message>
 </context>
 <context>
     <name>FileMessageArchive</name>
@@ -36,6 +40,22 @@
     <message>
         <source>History of conversations is stored in local files</source>
         <translation>История общения сохраняется в локальных файлах</translation>
+    </message>
+    <message>
+        <source>Failed to create database</source>
+        <translation>Не удалось создать базу данных</translation>
+    </message>
+    <message>
+        <source>Failed to open database</source>
+        <translation>Не удалось открыть базу данных</translation>
+    </message>
+    <message>
+        <source>Database format is not compatible</source>
+        <translation>Несовместимый формат базы данных</translation>
+    </message>
+    <message>
+        <source>Failed to to execute SQL query</source>
+        <translation>Не удалось выполнить SQL запрос</translation>
     </message>
 </context>
 </TS>

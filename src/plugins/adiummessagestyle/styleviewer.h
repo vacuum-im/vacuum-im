@@ -11,8 +11,8 @@ class StyleViewer :
 public:
 	StyleViewer(QWidget *AParent);
 	~StyleViewer();
-public:
-	virtual QSize sizeHint() const;
+	QSize sizeHint() const;
+	QSize minimumSizeHint() const;
 protected slots:
 	void onShortcutActivated();
 };

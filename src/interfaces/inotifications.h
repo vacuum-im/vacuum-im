@@ -5,6 +5,7 @@
 #include <QIcon>
 #include <QImage>
 #include <utils/jid.h>
+#include <utils/action.h>
 
 #define NOTIFICATIONS_UUID  "{59887A91-A483-4a7c-A2DE-227A01D6BC5E}"
 
@@ -31,6 +32,7 @@ struct INotification
 	QString typeId;
 	ushort kinds;
 	ushort flags;
+	QList<Action *> actions;
 	QMap<int, QVariant> data;
 };
 
@@ -87,6 +89,6 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(INotificationHandler,"Vacuum.Plugin.INotificationHandler/1.1")
-Q_DECLARE_INTERFACE(INotifications,"Vacuum.Plugin.INotifications/1.3")
+Q_DECLARE_INTERFACE(INotifications,"Vacuum.Plugin.INotifications/1.4")
 
 #endif //INOTIFICATIONS_H

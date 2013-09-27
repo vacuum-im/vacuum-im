@@ -74,6 +74,7 @@ function process_binary {
 				local l="$str.framework/Versions/4/$str"
 				echo -e "$tab\t Resolving dependency: $str"
 				#install_name_tool -change "$SYS_FW_DIR/$l" "$DYLD_PREFIX/$l" "$binary"
+				echo "install_name_tool -change \"$l\" \"$DYLD_PREFIX/$l\" \"$binary\""
 				install_name_tool -change "$l" "$DYLD_PREFIX/$l" "$binary"
 				process_lib "$l" "$tab\t"
 			fi
@@ -94,6 +95,7 @@ function process_lib {
 			echo -en "$tab\t Copying " `basename "$lib"` " to bundle... " 
 			cp -Rf $SYS_FW_DIR/`basename $lib`.framework $FW_DIR
 			echo "copied!"
+			echo "install_name_tool -id \"$DYLD_PREFIX/$lib\" \"$FW_DIR/$lib\""
 			install_name_tool -id "$DYLD_PREFIX/$lib" "$FW_DIR/$lib"
 			strip -x "$FW_DIR/$lib"
 			process_binary "$FW_DIR/$lib" "$tab\t"
@@ -122,6 +124,9 @@ echo "Build done!"
 cd $SCRIPT_DIR
 echo -e "\033[7m Copying Qt plugins to bundle... \033[0m"
 cp -R "$SYS_PLUGINS_DIR/imageformats" "$CONTENTS_DIR/PlugIns"
+#cp -R "$SYS_PLUGINS_DIR/sqldrivers" "$CONTENTS_DIR/PlugIns"
+mkdir "$CONTENTS_DIR/PlugIns/sqldrivers"
+cp "$SYS_PLUGINS_DIR/sqldrivers/libqsqlite.dylib" "$CONTENTS_DIR/PlugIns/sqldrivers"
 echo "done!"
 
 echo -e "\033[7m Copying Qt locales to bundle... \033[0m"

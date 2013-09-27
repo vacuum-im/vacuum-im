@@ -9,6 +9,7 @@
 #define RDHO_ROSTERSVIEW                  1000
 #define RDHO_STATUSICONS                  1000
 #define RDHO_RECENTCONTACTS               1000
+#define RDHO_VCARD_SEARCH                 1000
 #define RDHO_ROSTERSMODEL                 1000
 
 #endif // DEF_ROSTERDATAHOLDERORDERS_H

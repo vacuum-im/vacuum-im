@@ -22,6 +22,8 @@ public:
 	const Jid &streamJid() const;
 	const QString &fileName() const;
 	const IArchiveHeader &header() const;
+	int notesCount() const;
+	int messagesCount() const;
 	int recordsCount() const;
 	int secondsFromStart() const;
 	bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);

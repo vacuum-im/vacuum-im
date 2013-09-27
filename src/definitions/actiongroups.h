@@ -97,6 +97,9 @@
 #define AG_RVCBM_STATUS                                         300
 #define AG_RVCBM_ANNOTATION                                     400
 #define AG_RVCBM_MUC_SUBJECT                                    500
+#define AG_RVCBM_VCARD_COMMON                                   600
+#define AG_RVCBM_VCARD_EMAIL                                    610
+#define AG_RVCBM_VCARD_PHONE                                    620
 
 //StatusChanger - StatusMenu, StreamMenu
 #define AG_SCSM_STATUSCHANGER_ACTIONS                           200
