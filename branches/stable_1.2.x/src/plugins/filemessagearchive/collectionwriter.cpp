@@ -1,5 +1,10 @@
 #include "collectionwriter.h"
 
+#define MIN_SIZE_CLOSE_TIMEOUT        120*60*1000
+#define MAX_SIZE_CLOSE_TIMEOUT        60*1000
+#define NORMAL_SIZE_CLOSE_TIMEOUT     20*60*1000
+#define CRITICAL_SIZE_CLOSE_TIMEOUT   0
+
 CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
 {
 	FXmlFile = NULL;
@@ -193,12 +198,12 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 
 void CollectionWriter::checkLimits()
 {
-	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_SIZE).value().toInt())
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT).value().toInt());
+	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE).value().toInt())
+		FCloseTimer.start(CRITICAL_SIZE_CLOSE_TIMEOUT);
 	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MAXSIZE).value().toInt())
-		FCloseTimer.start(0);
-	else if (FMessagesCount > Options::node(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES).value().toInt())
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_TIMEOUT).value().toInt());
+		FCloseTimer.start(MAX_SIZE_CLOSE_TIMEOUT);
+	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MINSIZE).value().toInt())
+		FCloseTimer.start(NORMAL_SIZE_CLOSE_TIMEOUT);
 	else
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT).value().toInt());
+		FCloseTimer.start(MIN_SIZE_CLOSE_TIMEOUT);
 }
