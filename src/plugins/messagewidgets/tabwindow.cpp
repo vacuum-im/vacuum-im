@@ -503,7 +503,7 @@ void TabWindow::onTabMenuRequested(int AIndex)
 			joinTab->setTitle(tr("Join to"));
 			menu->addAction(joinTab->menuAction(),AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
 
-			foreach(QUuid id,FMessageWidgets->tabWindowList())
+			foreach(const QUuid &id, FMessageWidgets->tabWindowList())
 			{
 				if (id != FWindowId)
 				{

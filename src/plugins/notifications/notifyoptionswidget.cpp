@@ -122,7 +122,7 @@ void NotifyOptionsWidget::createTreeModel()
 
 	QMap<QString,INotificationType> notifyTypes;
 	notifyTypes.insert(QString::null,globalType);
-	foreach(QString typeId, FNotifications->notificationTypes())
+	foreach(const QString &typeId, FNotifications->notificationTypes())
 		notifyTypes.insert(typeId,FNotifications->notificationType(typeId));
 
 	for(QMap<QString,INotificationType>::const_iterator it=notifyTypes.constBegin(); it!=notifyTypes.constEnd(); ++it)

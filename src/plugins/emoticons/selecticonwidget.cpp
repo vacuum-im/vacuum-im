@@ -31,7 +31,7 @@ void SelectIconWidget::createLabels()
 
 	int row =0;
 	int column = 0;
-	foreach(QString key, keys)
+	foreach(const QString &key, keys)
 	{
 		QLabel *label = new QLabel(this);
 		label->setMargin(2);

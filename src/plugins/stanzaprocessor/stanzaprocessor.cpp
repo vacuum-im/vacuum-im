@@ -350,7 +350,7 @@ void StanzaProcessor::insertErrorElement(Stanza &AStanza, const XmppStanzaError 
 	}
 	if (!AError.errorText().isEmpty())
 		errElem.appendChild(AStanza.createElement("text",NS_XMPP_STANZA_ERROR)).appendChild(AStanza.createTextNode(AError.errorText()));
-	foreach(QString appCondNs, AError.appConditionNsList())
+	foreach(const QString &appCondNs, AError.appConditionNsList())
 		errElem.appendChild(AStanza.createElement(AError.appCondition(appCondNs),appCondNs));
 }
 
@@ -368,7 +368,7 @@ void StanzaProcessor::onStreamJidChanged(IXmppStream *AXmppStream, const Jid &AB
 
 void StanzaProcessor::onStreamClosed(IXmppStream *AXmppStream)
 {
-	foreach(QString stanzaId, FRequests.keys())
+	foreach(const QString &stanzaId, FRequests.keys())
 	{
 		const StanzaRequest &request = FRequests.value(stanzaId);
 		if (request.streamJid == AXmppStream->streamJid())
@@ -403,7 +403,7 @@ void StanzaProcessor::onStanzaRequestTimeout()
 
 void StanzaProcessor::onStanzaRequestOwnerDestroyed(QObject *AOwner)
 {
-	foreach(QString stanzaId, FRequests.keys())
+	foreach(const QString &stanzaId, FRequests.keys())
 		if (FRequests.value(stanzaId).owner->instance() == AOwner)
 			removeStanzaRequest(stanzaId);
 }

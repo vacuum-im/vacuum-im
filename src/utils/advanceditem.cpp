@@ -128,11 +128,13 @@ QMap<int, QVariant> AdvancedItem::itemData() const
 		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(AdvancedItemModel::AnyRole);
 		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); it!=holders.constEnd(); ++it)
 		{
-			foreach(int role, it.value()->advancedItemDataRoles(it.key()))
+			int order = it.key();
+			AdvancedItemDataHolder *holder = it.value();
+			foreach(int role, holder->advancedItemDataRoles(order))
 			{
 				if (!presentRoles.contains(role))
 				{
-					QVariant value = it.value()->advancedItemData(it.key(),this,role);
+					QVariant value = holder->advancedItemData(order,this,role);
 					if (!value.isNull())
 					{
 						values.insert(role,value);

@@ -62,7 +62,7 @@ bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)
 		if (!AResult.notes.isEmpty())
 		{
 			QStringList notes;
-			foreach(ICommandNote note, AResult.notes)
+			foreach(const ICommandNote &note, AResult.notes)
 				notes.append(note.message);
 			ui.lblInfo->setText(notes.join("\n"));
 		}

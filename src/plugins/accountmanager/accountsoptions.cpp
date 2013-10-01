@@ -29,7 +29,7 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
 
 AccountsOptions::~AccountsOptions()
 {
-	foreach(QString accountId, FAccountItems.keys())
+	foreach(const QString &accountId, FAccountItems.keys())
 		if (FManager->accountById(accountId) == NULL)
 			removeAccount(accountId);
 }
@@ -71,7 +71,7 @@ void AccountsOptions::reset()
 		curAccounts.append(account->accountId());
 	}
 
-	foreach(QUuid accountId, FAccountItems.keys())
+	foreach(const QUuid &accountId, FAccountItems.keys())
 		if (!curAccounts.contains(accountId))
 			removeAccount(accountId);
 

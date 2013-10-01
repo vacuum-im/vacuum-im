@@ -650,7 +650,7 @@ bool SocksStream::negotiateConnection(int ACommand)
 bool SocksStream::requestProxyAddress()
 {
 	bool requested = false;
-	foreach(Jid proxy, FProxyList)
+	foreach(const Jid &proxy, FProxyList)
 	{
 		Stanza request("iq");
 		request.setType("get").setTo(proxy.full()).setId(FStanzaProcessor->newId());
@@ -684,7 +684,7 @@ bool SocksStream::sendAvailHosts()
 			info.port = FForwardPort;
 			FHosts.prepend(info);
 		}
-		else foreach(QHostAddress address, QNetworkInterface::allAddresses())
+		else foreach(const QHostAddress &address, QNetworkInterface::allAddresses())
 		{
 			if (address.protocol()!=QAbstractSocket::IPv6Protocol && address!=QHostAddress::LocalHost)
 			{
@@ -697,7 +697,7 @@ bool SocksStream::sendAvailHosts()
 		}
 	}
 
-	foreach(HostInfo info, FHosts)
+	foreach(const HostInfo &info, FHosts)
 	{
 		QDomElement hostElem = queryElem.appendChild(request.createElement("streamhost")).toElement();
 		hostElem.setAttribute("jid",info.jid.full());

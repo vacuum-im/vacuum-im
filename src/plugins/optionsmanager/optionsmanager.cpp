@@ -163,7 +163,7 @@ QList<QString> OptionsManager::profiles() const
 {
 	QList<QString> profileList;
 
-	foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
+	foreach(const QString &dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
 		if (FProfilesDir.exists(dirName + "/" FILE_PROFILE))
 			profileList.append(dirName);
 
@@ -179,7 +179,7 @@ QString OptionsManager::lastActiveProfile() const
 {
 	QDateTime lastModified;
 	QString lastProfile = DEFAULT_PROFILE;
-	foreach(QString profile, profiles())
+	foreach(const QString &profile, profiles())
 	{
 		QFileInfo info(profilePath(profile) + "/" FILE_OPTIONS);
 		if (info.exists() && info.lastModified()>lastModified)
@@ -566,7 +566,7 @@ void OptionsManager::importOldSettings()
 	IAccountManager *accountManager = plugin!=NULL ? qobject_cast<IAccountManager *>(plugin->instance()) : NULL;
 	if (accountManager)
 	{
-		foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
+		foreach(const QString &dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
 		{
 			QFile settings(FProfilesDir.absoluteFilePath(dirName + "/settings.xml"));
 			if (!FProfilesDir.exists(dirName + "/" FILE_PROFILE) && settings.open(QFile::ReadOnly))

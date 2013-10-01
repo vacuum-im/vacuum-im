@@ -323,7 +323,7 @@ void Roster::removeItems(const QList<IRosterItem> &AItems)
 		Stanza query("iq");
 		query.setType("set").setId(FStanzaProcessor->newId());
 		QDomElement elem = query.addElement("query",NS_JABBER_ROSTER);
-		foreach(IRosterItem ritem, AItems)
+		foreach(const IRosterItem &ritem, AItems)
 		{
 			QDomElement itemElem = elem.appendChild(query.createElement("item")).toElement();
 			itemElem.setAttribute("jid", ritem.itemJid.bare());
@@ -340,7 +340,7 @@ void Roster::saveRosterItems(const QString &AFileName) const
 	elem.setAttribute("ver",FRosterVer);
 	elem.setAttribute("streamJid",streamJid().pBare());
 	elem.setAttribute("groupDelimiter",FGroupDelim);
-	foreach(IRosterItem ritem, FRosterItems)
+	foreach(const IRosterItem &ritem, FRosterItems)
 	{
 		QDomElement itemElem = elem.appendChild(xml.createElement("item")).toElement();
 		itemElem.setAttribute("jid",ritem.itemJid.bare());
@@ -507,7 +507,7 @@ void Roster::removeGroup(const QString &AGroup)
 	QList<IRosterItem> allGroupItems = groupItems(AGroup);
 	for (QList<IRosterItem>::iterator it=allGroupItems.begin(); it!=allGroupItems.end(); ++it)
 	{
-		foreach(QString group, it->groups)
+		foreach(const QString &group, it->groups)
 			if (isSubgroup(AGroup,group))
 				it->groups -= group;
 	}
@@ -516,7 +516,7 @@ void Roster::removeGroup(const QString &AGroup)
 
 void Roster::clearRosterItems()
 {
-	foreach(Jid itemJid, FRosterItems.keys())
+	foreach(const Jid &itemJid, FRosterItems.keys())
 	{
 		IRosterItem ritem = FRosterItems.take(itemJid);
 		IRosterItem before = ritem;
@@ -603,7 +603,7 @@ void Roster::processItemsElement(const QDomElement &AItemsElem, bool ACompleteRo
 			itemElem = itemElem.nextSiblingElement("item");
 		}
 
-		foreach(Jid itemJid, oldItems) 
+		foreach(const Jid &itemJid, oldItems) 
 		{
 			IRosterItem ritem = FRosterItems.take(itemJid);
 			IRosterItem before = ritem;

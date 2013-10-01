@@ -338,8 +338,8 @@ void SessionNegotiation::sessionLocalize(const IStanzaSession &/*ASession*/, IDa
 
 IStanzaSession SessionNegotiation::getSession(const QString &ASessionId) const
 {
-	foreach (Jid streamJid, FSessions.keys())
-		foreach (IStanzaSession session, FSessions.value(streamJid))
+	foreach(const Jid &streamJid, FSessions.keys())
+		foreach(const IStanzaSession &session, FSessions.value(streamJid))
 			if (session.sessionId == ASessionId)
 				return session;
 	return IStanzaSession();
@@ -353,7 +353,7 @@ IStanzaSession SessionNegotiation::getSession(const Jid &AStreamJid, const Jid &
 QList<IStanzaSession> SessionNegotiation::getSessions(const Jid &AStreamJid, int AStatus) const
 {
 	QList<IStanzaSession> sessions;
-	foreach(IStanzaSession session, FSessions.value(AStreamJid).values())
+	foreach(const IStanzaSession &session, FSessions.value(AStreamJid).values())
 		if (session.status == AStatus)
 			sessions.append(session);
 	return sessions;
@@ -547,7 +547,7 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 		if (!ASession.errorFields.isEmpty())
 		{
 			QDomElement featureElem = error.firstElement("error").appendChild(error.createElement("feature",NS_FEATURENEG)).toElement();
-			foreach(QString var, ASession.errorFields)
+			foreach(const QString &var, ASession.errorFields)
 				featureElem.appendChild(error.createElement("field")).toElement().setAttribute("var",var);
 		}
 		return FStanzaProcessor->sendStanzaOut(ASession.streamJid,error);
@@ -946,7 +946,7 @@ void SessionNegotiation::updateFields(const IDataForm &ASourse, IDataForm &ADest
 		    << SESSION_FIELD_TERMINATE << SESSION_FIELD_REASON << "FORM_TYPE";
 
 		QStringList updated;
-		foreach(IDataField field, ASourse.fields)
+		foreach(const IDataField &field, ASourse.fields)
 		{
 			int index = FDataForms->fieldIndex(field.var,ADestination.fields);
 			if (index >= 0)
@@ -991,14 +991,14 @@ IDataForm SessionNegotiation::clearForm(const IDataForm &AForm) const
 {
 	IDataForm form;
 	form.type = AForm.type;
-	foreach(IDataField field, AForm.fields)
+	foreach(const IDataField &field, AForm.fields)
 	{
 		IDataField clearField;
 		clearField.type = field.type;
 		clearField.var = field.var;
 		clearField.value = field.value;
 		clearField.required = field.required;
-		foreach (IDataOption option, field.options)
+		foreach (const IDataOption &option, field.options)
 		{
 			IDataOption clearOption;
 			clearOption.value = option.value;
@@ -1012,7 +1012,7 @@ IDataForm SessionNegotiation::clearForm(const IDataForm &AForm) const
 QStringList SessionNegotiation::unsubmitedFields(const IDataForm &ARequest, const IDataForm &ASubmit, bool ARequired) const
 {
 	QStringList fields;
-	foreach(IDataField rField, ARequest.fields)
+	foreach(const IDataField &rField, ARequest.fields)
 	{
 		int index = FDataForms->fieldIndex(rField.var,ASubmit.fields);
 		IDataField sField = index>=0 ? ASubmit.fields.at(index) : IDataField();
@@ -1024,7 +1024,7 @@ QStringList SessionNegotiation::unsubmitedFields(const IDataForm &ARequest, cons
 
 IStanzaSession &SessionNegotiation::dialogSession(IDataDialogWidget *ADialog)
 {
-	foreach(Jid streamJid, FDialogs.keys())
+	foreach(const Jid &streamJid, FDialogs.keys())
 		if (FDialogs.value(streamJid).values().contains(ADialog))
 			return FSessions[streamJid][FDialogs.value(streamJid).key(ADialog)];
 	return FSessions[Jid::null][Jid::null];
@@ -1070,7 +1070,7 @@ void SessionNegotiation::onPresenceItemReceived(IPresence *APresence, const IPre
 void SessionNegotiation::onStreamAboutToClose(IXmppStream *AXmppStream)
 {
 	QList<IStanzaSession> sessions = FSessions.value(AXmppStream->streamJid()).values();
-	foreach(IStanzaSession session, sessions)
+	foreach(const IStanzaSession &session, sessions)
 	{
 		terminateSession(session.streamJid,session.contactJid);
 		removeSession(session);
@@ -1234,7 +1234,7 @@ void SessionNegotiation::onSessionActionTriggered(bool)
 
 void SessionNegotiation::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 {
-	foreach(QString sessionId, FSuspended.keys())
+	foreach(const QString &sessionId, FSuspended.keys())
 	{
 		IStanzaSession session = getSession(sessionId);
 		if (session.status==IStanzaSession::Init && session.contactJid==AInfo.contactJid)

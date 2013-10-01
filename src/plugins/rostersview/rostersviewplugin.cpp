@@ -800,7 +800,7 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 		FShowMergedStreams = ANode.value().toBool();
 		if (FRostersView->rostersModel())
 		{
-			foreach(Jid streamJid, FRostersView->rostersModel()->streams())
+			foreach(const Jid &streamJid, FRostersView->rostersModel()->streams())
 				emit rosterDataChanged(FRostersView->rostersModel()->streamIndex(streamJid),RDR_FORCE_VISIBLE);
 		}
 	}
