@@ -137,13 +137,13 @@ void FileStorage::reloadDefinitions()
 		subDirs += subStorageDirs(FStorage,FILE_STORAGE_SHARED_DIR);
 
 	int prefixIndex = 0;
-	foreach(QString subDir, subDirs)
+	foreach(const QString &subDir, subDirs)
 	{
 		QDir dir(subDir);
 		if (dir.exists())
 		{
 			FPrefixes.append(subDir+"/");
-			foreach(QString file, dir.entryList(QStringList() << FILE_STORAGE_DEFINITIONS_MASK))
+			foreach(const QString &file, dir.entryList(QStringList() << FILE_STORAGE_DEFINITIONS_MASK))
 				loadDefinitions(dir.absoluteFilePath(file),prefixIndex);
 			prefixIndex++;
 		}
@@ -155,7 +155,7 @@ void FileStorage::reloadDefinitions()
 QList<QString> FileStorage::availStorages()
 {
 	QList<QString> storages;
-	foreach(QString dirPath, FResourceDirs)
+	foreach(const QString &dirPath, FResourceDirs)
 	{
 		QDir dir(dirPath);
 		QList<QString> dirStorages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
@@ -176,7 +176,7 @@ QList<QString> FileStorage::availStorages()
 QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool ACheckDefs)
 {
 	QList<QString> storages;
-	foreach(QString dirPath, FResourceDirs)
+	foreach(const QString &dirPath, FResourceDirs)
 	{
 		QDir dir(dirPath);
 		if (dir.exists() && dir.cd(AStorage))
@@ -211,7 +211,7 @@ QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool AChec
 QList<QString> FileStorage::subStorageDirs(const QString &AStorage, const QString &ASubStorage)
 {
 	QList<QString> subDirs;
-	foreach(QString dirPath, FResourceDirs)
+	foreach(const QString &dirPath, FResourceDirs)
 	{
 		QDir dir(dirPath);
 		if (dir.exists() && dir.cd(AStorage))
@@ -231,7 +231,7 @@ QList<QString> FileStorage::resourcesDirs()
 void FileStorage::setResourcesDirs(const QList<QString> &ADirs)
 {
 	QList<QString> cleanDirs;
-	foreach(QString dir, ADirs)
+	foreach(const QString &dir, ADirs)
 	{
 		if (!dir.isEmpty() && !cleanDirs.contains(dir) && QDir(dir).exists())
 			cleanDirs.append(QDir::cleanPath(dir));
@@ -354,7 +354,7 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 					}
 					if (valid)
 					{
-						foreach (QString key, objKeys)
+						foreach (const QString &key, objKeys)
 						{
 							FKeys.append(key);
 							FKey2Object.insert(key,FObjects.count());

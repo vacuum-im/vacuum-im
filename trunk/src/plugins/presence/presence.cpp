@@ -313,7 +313,7 @@ QList<IPresenceItem> Presence::findItems(const Jid &AItemBareJid) const
 	if (!AItemBareJid.isEmpty())
 	{
 		QList<IPresenceItem> pitems;
-		foreach(IPresenceItem pitem, FItems)
+		foreach(const IPresenceItem &pitem, FItems)
 			if (AItemBareJid && pitem.itemJid)
 				pitems.append(pitem);
 		return pitems;

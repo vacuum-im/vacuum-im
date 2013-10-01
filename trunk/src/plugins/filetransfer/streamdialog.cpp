@@ -39,7 +39,7 @@ StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManage
 
 	if (AFileStream->streamState() == IFileStream::Creating)
 	{
-		foreach(QUuid profileId, FDataManager->settingsProfiles())
+		foreach(const QUuid &profileId, FDataManager->settingsProfiles())
 			ui.cmbSettingsProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
 		ui.cmbSettingsProfile->setCurrentIndex(0);
 
@@ -97,7 +97,7 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
 {
 	qDeleteAll(FMethodButtons.keys());
 	FMethodButtons.clear();
-	foreach(QString methodNS, AMethods)
+	foreach(const QString &methodNS, AMethods)
 	{
 		IDataStreamMethod *stremMethod = FDataManager->method(methodNS);
 		if (stremMethod)
@@ -342,19 +342,22 @@ void StreamDialog::onDialogButtonClicked(QAbstractButton *AButton)
 					IDataStreamMethod *streamMethod = FDataManager->method(methods.first());
 					if (streamMethod)
 					{
-						QString file = ui.lneFile->text();
 						FFileStream->setFileName(ui.lneFile->text());
 						FFileStream->setFileDescription(ui.pteDescription->toPlainText());
 						if (!FFileStream->startStream(methods.first()))
 							QMessageBox::warning(this,tr("Warning"),tr("Unable to start the file transfer, check settings and try again!"));
 					}
 					else
+					{
 						QMessageBox::warning(this,tr("Warning"),tr("Selected data stream is not available"));
+					}
 				}
 			}
 		}
 		else
+		{
 			QMessageBox::warning(this,tr("Warning"),tr("Please select at least one data stream"));
+		}
 	}
 	else if (ui.bbxButtons->standardButton(AButton) == QDialogButtonBox::Abort)
 	{

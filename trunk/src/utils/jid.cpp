@@ -393,6 +393,8 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 	{
 		if (!d)
 			d = new JidData;
+		JidData *dd = d.data();
+
 		if (!AJidStr.isEmpty())
 		{
 			int slash = AJidStr.indexOf(CharSlash);
@@ -401,138 +403,138 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 			int at = AJidStr.lastIndexOf(CharDog,slash-AJidStr.size()-1);
 
 			// Build normal JID
-			d->FFull = QString::null;
+			dd->FFull = QString::null;
 
 			if (at > 0)
 			{
-				d->FFull += AJidStr.left(at);
-				d->FNode = QStringRef(&d->FFull,0,d->FFull.size());
-				d->FFull.append(CharDog);
+				dd->FFull += AJidStr.left(at);
+				dd->FNode = QStringRef(&dd->FFull,0,dd->FFull.size());
+				dd->FFull.append(CharDog);
 			}
 			else
 			{
-				d->FNode = QStringRef(NULL,0,0);
+				dd->FNode = QStringRef(NULL,0,0);
 			}
 
 			if (slash-at-1 > 0)
 			{
-				int nodeSize = d->FFull.size();
-				d->FFull += AJidStr.mid(at+1,slash-at-1);
-				d->FDomain = QStringRef(&d->FFull,nodeSize,d->FFull.size()-nodeSize);
+				int nodeSize = dd->FFull.size();
+				dd->FFull += AJidStr.mid(at+1,slash-at-1);
+				dd->FDomain = QStringRef(&dd->FFull,nodeSize,dd->FFull.size()-nodeSize);
 			}
 			else
 			{
-				d->FDomain = QStringRef(NULL,0,0);
+				dd->FDomain = QStringRef(NULL,0,0);
 			}
 
-			if (!d->FFull.isEmpty())
+			if (!dd->FFull.isEmpty())
 			{
-				d->FBare = QStringRef(&d->FFull,0,d->FFull.size());
+				dd->FBare = QStringRef(&dd->FFull,0,dd->FFull.size());
 			}
 			else
 			{
-				d->FBare = QStringRef(NULL,0,0);
+				dd->FBare = QStringRef(NULL,0,0);
 			}
 
 			if (slash<AJidStr.size()-1)
 			{
-				d->FFull.append(CharSlash);
-				int bareSize = d->FFull.size();
-				d->FFull += AJidStr.right(AJidStr.size()-slash-1);
-				d->FResource = QStringRef(&d->FFull,bareSize,d->FFull.size()-bareSize);
+				dd->FFull.append(CharSlash);
+				int bareSize = dd->FFull.size();
+				dd->FFull += AJidStr.right(AJidStr.size()-slash-1);
+				dd->FResource = QStringRef(&dd->FFull,bareSize,dd->FFull.size()-bareSize);
 			}
 			else
 			{
-				d->FResource = QStringRef(NULL,0,0);
+				dd->FResource = QStringRef(NULL,0,0);
 			}
 
 			//Build prepared JID
-			d->FPrepFull = QString::null;
+			dd->FPrepFull = QString::null;
 
-			if (d->FNode.string())
+			if (dd->FNode.string())
 			{
-				QString prepNode = nodePrepare(d->FNode.toString());
+				QString prepNode = nodePrepare(dd->FNode.toString());
 				if (!prepNode.isEmpty())
 				{
-					d->FPrepFull += prepNode;
-					d->FNodeValid = !prepNode.startsWith("\\20") && !prepNode.endsWith("\\20");
+					dd->FPrepFull += prepNode;
+					dd->FNodeValid = !prepNode.startsWith("\\20") && !prepNode.endsWith("\\20");
 				}
 				else
 				{
-					d->FPrepFull += d->FNode.toString();
-					d->FNodeValid = false;
+					dd->FPrepFull += dd->FNode.toString();
+					dd->FNodeValid = false;
 				}
-				d->FPrepNode = QStringRef(&d->FPrepFull,0,d->FPrepFull.size());
-				d->FPrepFull.append(CharDog);
+				dd->FPrepNode = QStringRef(&dd->FPrepFull,0,dd->FPrepFull.size());
+				dd->FPrepFull.append(CharDog);
 			}
 			else
 			{
-				d->FPrepNode = QStringRef(NULL,0,0);
-				d->FNodeValid = true;
+				dd->FPrepNode = QStringRef(NULL,0,0);
+				dd->FNodeValid = true;
 			}
 
-			if (d->FDomain.string())
+			if (dd->FDomain.string())
 			{
-				int nodeSize = d->FPrepFull.size();
-				QString prepDomain = domainPrepare(d->FDomain.toString());
+				int nodeSize = dd->FPrepFull.size();
+				QString prepDomain = domainPrepare(dd->FDomain.toString());
 				if (!prepDomain.isEmpty())
 				{
-					d->FPrepFull += prepDomain;
-					d->FDomainValid = true;
+					dd->FPrepFull += prepDomain;
+					dd->FDomainValid = true;
 				}
 				else
 				{
-					d->FPrepFull += d->FDomain.toString();
-					d->FDomainValid = false;
+					dd->FPrepFull += dd->FDomain.toString();
+					dd->FDomainValid = false;
 				}
-				d->FPrepDomain = QStringRef(&d->FPrepFull,nodeSize,d->FPrepFull.size()-nodeSize);
+				dd->FPrepDomain = QStringRef(&dd->FPrepFull,nodeSize,dd->FPrepFull.size()-nodeSize);
 			}
 			else
 			{
-				d->FPrepDomain = QStringRef(NULL,0,0);
-				d->FDomainValid = false;
+				dd->FPrepDomain = QStringRef(NULL,0,0);
+				dd->FDomainValid = false;
 			}
 
-			if (!d->FPrepFull.isEmpty())
+			if (!dd->FPrepFull.isEmpty())
 			{
-				d->FPrepBare = QStringRef(&d->FPrepFull,0,d->FPrepFull.size());
+				dd->FPrepBare = QStringRef(&dd->FPrepFull,0,dd->FPrepFull.size());
 			}
-			else	
+			else
 			{
-				d->FPrepBare = QStringRef(NULL,0,0);
+				dd->FPrepBare = QStringRef(NULL,0,0);
 			}
 
-			if (d->FResource.string())
+			if (dd->FResource.string())
 			{
-				d->FPrepFull.append(CharSlash);
-				int bareSize = d->FPrepFull.size();
-				QString prepResource = resourcePrepare(d->FResource.toString());
+				dd->FPrepFull.append(CharSlash);
+				int bareSize = dd->FPrepFull.size();
+				QString prepResource = resourcePrepare(dd->FResource.toString());
 				if (!prepResource.isEmpty())
 				{
-					d->FPrepFull += prepResource;
-					d->FResourceValid = true;
+					dd->FPrepFull += prepResource;
+					dd->FResourceValid = true;
 				}
 				else
 				{
-					d->FPrepFull += d->FResource.toString();
-					d->FResourceValid = false;
+					dd->FPrepFull += dd->FResource.toString();
+					dd->FResourceValid = false;
 				}
-				d->FPrepResource = QStringRef(&d->FPrepFull,bareSize,d->FPrepFull.size()-bareSize);
+				dd->FPrepResource = QStringRef(&dd->FPrepFull,bareSize,dd->FPrepFull.size()-bareSize);
 			}
 			else
 			{
-				d->FPrepResource = QStringRef(NULL,0,0);
-				d->FResourceValid = true;
+				dd->FPrepResource = QStringRef(NULL,0,0);
+				dd->FResourceValid = true;
 			}
 		}
 		else
 		{
-			d->FFull = d->FPrepFull = QString::null;
-			d->FBare = d->FPrepBare = QStringRef(NULL,0,0);
-			d->FNode = d->FPrepNode = QStringRef(NULL,0,0);
-			d->FDomain = d->FPrepDomain = QStringRef(NULL,0,0);
-			d->FResource = d->FPrepResource = QStringRef(NULL,0,0);
-			d->FNodeValid = d->FDomainValid = d->FResourceValid = false;
+			dd->FFull = dd->FPrepFull = QString::null;
+			dd->FBare = dd->FPrepBare = QStringRef(NULL,0,0);
+			dd->FNode = dd->FPrepNode = QStringRef(NULL,0,0);
+			dd->FDomain = dd->FPrepDomain = QStringRef(NULL,0,0);
+			dd->FResource = dd->FPrepResource = QStringRef(NULL,0,0);
+			dd->FNodeValid = dd->FDomainValid = dd->FResourceValid = false;
 		}
 		FJidCache.insert(AJidStr,*this);
 	}

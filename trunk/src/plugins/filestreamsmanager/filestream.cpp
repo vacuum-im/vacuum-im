@@ -77,8 +77,8 @@ qint64 FileStream::speed() const
 {
 	if (FStreamState == Transfering)
 	{
-		qreal secs = (SPEED_INTERVAL * (SPEED_POINTS - 1)) / 1000;
 		qreal bytes = 0;
+		qreal secs = (qreal)(SPEED_INTERVAL * (SPEED_POINTS - 1)) / 1000;
 		for (int i=0; i<SPEED_POINTS; i++)
 			if (i!=FSpeedIndex)
 				bytes += FSpeed[i];

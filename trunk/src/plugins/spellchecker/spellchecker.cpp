@@ -281,7 +281,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 			QActionGroup *dictGroup = new QActionGroup(dictsMenu);
 
 			QString curDict = currentDictionary();
-			foreach(QString dict, availDictionaries())
+			foreach(const QString &dict, availDictionaries())
 			{
 				Action *action = new Action(dictsMenu);
 				action->setText(dictionaryName(dict));

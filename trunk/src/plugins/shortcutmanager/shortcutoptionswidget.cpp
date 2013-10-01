@@ -58,7 +58,7 @@ ShortcutOptionsWidget::~ShortcutOptionsWidget()
 
 void ShortcutOptionsWidget::apply()
 {
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)
@@ -78,7 +78,7 @@ void ShortcutOptionsWidget::apply()
 
 void ShortcutOptionsWidget::reset()
 {
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)
@@ -98,7 +98,7 @@ void ShortcutOptionsWidget::createTreeModel()
 	FModel.setColumnCount(2);
 	FModel.setHorizontalHeaderLabels(QStringList() << tr("Action") << tr("Shortcut"));
 
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 		if (!descriptor.description.isEmpty())
@@ -113,7 +113,7 @@ void ShortcutOptionsWidget::createTreeModel()
 		}
 	}
 
-	foreach(QString shortcut, Shortcuts::globalShortcuts())
+	foreach(const QString &shortcut, Shortcuts::globalShortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)
@@ -189,7 +189,7 @@ void ShortcutOptionsWidget::onClearClicked()
 
 void ShortcutOptionsWidget::onRestoreDefaultsClicked()
 {
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)

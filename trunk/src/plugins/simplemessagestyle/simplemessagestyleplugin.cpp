@@ -179,7 +179,7 @@ QMap<QString,QVariant> SimpleMessageStylePlugin::styleInfo(const QString &AStyle
 
 void SimpleMessageStylePlugin::updateAvailStyles()
 {
-	foreach(QString substorage, FileStorage::availSubStorages(RSR_STORAGE_SIMPLEMESSAGESTYLES, false))
+	foreach(const QString &substorage, FileStorage::availSubStorages(RSR_STORAGE_SIMPLEMESSAGESTYLES, false))
 	{
 		QDir dir(FileStorage::subStorageDirs(RSR_STORAGE_SIMPLEMESSAGESTYLES,substorage).value(0));
 		if (dir.exists())

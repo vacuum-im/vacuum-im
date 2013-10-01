@@ -673,10 +673,10 @@ void RecentContacts::updateVisibleItems()
 		QSet<IRecentItem> addItems = newVisible - curVisible;
 		QSet<IRecentItem> removeItems = curVisible - newVisible;
 
-		foreach(IRecentItem item, removeItems)
+		foreach(const IRecentItem &item, removeItems)
 			removeItemIndex(item);
 
-		foreach(IRecentItem item, addItems)
+		foreach(const IRecentItem &item, addItems)
 			createItemIndex(item);
 
 		if (!addItems.isEmpty() || !removeItems.isEmpty())
@@ -794,15 +794,21 @@ void RecentContacts::updateItemProperties(const IRecentItem &AItem)
 IRecentItem &RecentContacts::findRealItem(const IRecentItem &AItem)
 {
 	static IRecentItem nullItem;
-	int index = FStreamItems.value(AItem.streamJid).indexOf(AItem);
-	return index>=0 ? FStreamItems[AItem.streamJid][index] : nullItem;
+	if (FStreamItems.contains(AItem.streamJid))
+	{
+		QList<IRecentItem> &items = FStreamItems[AItem.streamJid];
+		int index = items.indexOf(AItem);
+		return index>=0 ? items[index] : nullItem;
+	}
+	return nullItem;
 }
 
 IRecentItem RecentContacts::findRealItem(const IRecentItem &AItem) const
 {
 	static IRecentItem nullItem;
-	int index = FStreamItems.value(AItem.streamJid).indexOf(AItem);
-	return index>=0 ? FStreamItems[AItem.streamJid].value(index) : nullItem;
+	const QList<IRecentItem> items = FStreamItems.value(AItem.streamJid);
+	int index = items.indexOf(AItem);
+	return index>=0 ? items.value(index) : nullItem;
 }
 
 void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems, bool AReplace)
@@ -1391,7 +1397,7 @@ void RecentContacts::onSaveItemsToStorageTimerTimeout()
 		if (saveItemsToStorage(*it))
 			it = FSaveStreams.erase(it);
 		else
-			it++;
+			++it;
 	}
 }
 
@@ -1479,7 +1485,7 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 	else if (ANode.path() == OPV_ROSTER_RECENT_SORTBYACTIVETIME)
 	{
 		FSortByLastActivity = ANode.value().toBool();
-		foreach(IRecentItem item, FVisibleItems.keys())
+		foreach(const IRecentItem &item, FVisibleItems.keys())
 			updateItemIndex(item);
 	}
 	else if (ANode.path() == OPV_ROSTER_RECENT_SHOWONLYFAVORITE)

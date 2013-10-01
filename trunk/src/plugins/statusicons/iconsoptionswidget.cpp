@@ -105,7 +105,7 @@ void IconsOptionsWidget::apply()
 		rules -= rule;
 	}
 
-	foreach(QString rule,rules)
+	foreach(const QString &rule,rules)
 		FStatusIcons->removeRule(rule,IStatusIcons::UserRule);
 
 	emit childApply();
@@ -136,7 +136,7 @@ void IconsOptionsWidget::populateRulesTable(QTableWidget *ATable, IStatusIcons::
 	int row= 0;
 	QStringList rules = FStatusIcons->rules(ARuleType);
 	ATable->setItemDelegateForColumn(1,new IconsetSelectableDelegate(RSR_STORAGE_STATUSICONS,FSubStorages,ATable));
-	foreach(QString rule, rules)
+	foreach(const QString &rule, rules)
 	{
 		QString substorage = FStatusIcons->ruleIconset(rule,ARuleType);
 		QTableWidgetItem *rulePattern = new QTableWidgetItem(rule);
