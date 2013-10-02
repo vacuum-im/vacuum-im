@@ -24,7 +24,7 @@ EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QLis
 
 	int row = 0;
 	ui.tbwTable->setRowCount(AList.count());
-	foreach(IMultiUserListItem listItem, AList)
+	foreach(const IMultiUserListItem &listItem, AList)
 	{
 		Jid itemJid = listItem.jid;
 		QTableWidgetItem *jidItem = new QTableWidgetItem();
@@ -80,7 +80,7 @@ QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 			listItem.notes = ui.tbwTable->item(jidItem->row(),1)->text();
 		result.append(listItem);
 	}
-	foreach(Jid userJid, FDeletedItems)
+	foreach(const Jid &userJid, FDeletedItems)
 	{
 		IMultiUserListItem listItem;
 		listItem.jid = userJid.full();

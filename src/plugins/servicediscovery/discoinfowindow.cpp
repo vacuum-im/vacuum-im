@@ -54,7 +54,7 @@ void DiscoInfoWindow::updateWindow()
 
 	int row = 0;
 	ui.twtIdentity->clearContents();
-	foreach(IDiscoIdentity identity, dinfo.identity)
+	foreach(const IDiscoIdentity &identity, dinfo.identity)
 	{
 		ui.twtIdentity->setRowCount(row+1);
 		ui.twtIdentity->setItem(row,0,new QTableWidgetItem(identity.category));
@@ -66,7 +66,7 @@ void DiscoInfoWindow::updateWindow()
 
 	qSort(dinfo.features);
 	ui.lwtFearures->clear();
-	foreach(QString featureVar, dinfo.features)
+	foreach(const QString &featureVar, dinfo.features)
 	{
 		IDiscoFeature dfeature = FDiscovery->discoFeature(featureVar);
 		dfeature.var = featureVar;

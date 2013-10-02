@@ -2025,7 +2025,7 @@ void MultiUserChatWindow::onEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHook
 			{
 				Menu *nickMenu = new Menu(this);
 				nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);
-				foreach(QString nick, FCompleteNicks)
+				foreach(const QString &nick, FCompleteNicks)
 				{
 					IMultiUser *user = FMultiChat->userByNick(nick);
 					if (user)
@@ -2254,7 +2254,7 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 		if (!window)
 			showTopic(FMultiChat->subject());
 
-		foreach(Message message, pendingMessages)
+		foreach(const Message &message, pendingMessages)
 		{
 			if (window)
 				showChatMessage(window,message);

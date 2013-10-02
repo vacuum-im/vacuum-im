@@ -103,12 +103,12 @@ void JoinMultiChatDialog::loadRecentConferences()
 	stream >> FRecentRooms;
 
 	QMultiMap<int, Jid> enters;
-	foreach (Jid roomJid, FRecentRooms.keys())
+	foreach (const Jid &roomJid, FRecentRooms.keys())
 		enters.insertMulti(FRecentRooms.value(roomJid).enters,roomJid);
 
 	ui.cmbHistory->blockSignals(true);
 	ui.cmbHistory->clear();
-	foreach(Jid roomJid, enters)
+	foreach(const Jid &roomJid, enters)
 	{
 		RoomParams params = FRecentRooms.value(roomJid);
 		ui.cmbHistory->addItem(tr("%1 as %2","room as nick").arg(roomJid.uBare()).arg(params.nick),roomJid.bare());

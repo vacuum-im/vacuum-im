@@ -273,7 +273,7 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 	if (FRostersModel && !AContactJids.isEmpty() && FRostersModel->streamRoot(AStreamJid))
 	{
 		QMultiMap<int,QVariant> findData;
-		foreach(Jid contactJid, AContactJids)
+		foreach(const Jid &contactJid, AContactJids)
 			findData.insertMulti(RDR_PREP_BARE_JID,contactJid.pBare());
 
 		QList<IRosterIndex *> indexes = FRostersModel->streamRoot(AStreamJid)->findChilds(findData,true);
@@ -284,7 +284,7 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 
 void Annotations::onSaveAnnotationsTimerTimeout()
 {
-	foreach(Jid streamJid, FSavePendingStreams)
+	foreach(const Jid &streamJid, FSavePendingStreams)
 		saveAnnotations(streamJid);
 	FSavePendingStreams.clear();
 }

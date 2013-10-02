@@ -381,7 +381,7 @@ void MessageWindow::onReceiversChanged(const Jid &AReceiver)
 {
 	Q_UNUSED(AReceiver);
 	QString receiversStr;
-	foreach(Jid contactJid,FReceiversWidget->receivers())
+	foreach(const Jid &contactJid,FReceiversWidget->receivers())
 		receiversStr += QString("%1; ").arg(FReceiversWidget->receiverName(contactJid));
 	ui.lblReceivers->setText(receiversStr);
 }

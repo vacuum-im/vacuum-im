@@ -13,14 +13,14 @@ AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, const O
 	FOptions = ANode;
 	FMessageType = AMessageType;
 
-	foreach(QString styleId, FStylePlugin->styles())
+	foreach(const QString &styleId, FStylePlugin->styles())
 		ui.cmbStyle->addItem(styleId,styleId);
 	ui.cmbStyle->setCurrentIndex(-1);
 
 	ui.cmbBackgoundColor->addItem(tr("Default"));
 	QStringList colors = QColor::colorNames();
 	colors.sort();
-	foreach(QString color, colors)
+	foreach(const QString &color, colors)
 	{
 		ui.cmbBackgoundColor->addItem(color,color);
 		ui.cmbBackgoundColor->setItemData(ui.cmbBackgoundColor->count()-1,QColor(color),Qt::DecorationRole);
@@ -106,7 +106,7 @@ void AdiumOptionsWidget::onStyleChanged(int AIndex)
 	FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);
 
 	ui.cmbVariant->clear();
-	foreach(QString variant, FStylePlugin->styleVariants(styleId))
+	foreach(const QString &variant, FStylePlugin->styleVariants(styleId))
 		ui.cmbVariant->addItem(variant,variant);
 	ui.cmbVariant->setEnabled(ui.cmbVariant->count() > 0);
 

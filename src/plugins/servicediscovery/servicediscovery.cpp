@@ -209,10 +209,11 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 	bool hooked = false;
 	if (FSHIPresenceOut.value(AStreamJid)==AHandlerId && !FSelfCaps.value(AStreamJid).ver.isEmpty())
 	{
+		const EntityCapabilities selfCaps = FSelfCaps.value(AStreamJid);
 		QDomElement capsElem = AStanza.addElement("c",NS_CAPS);
-		capsElem.setAttribute("node",FSelfCaps.value(AStreamJid).node);
-		capsElem.setAttribute("ver",FSelfCaps.value(AStreamJid).ver);
-		capsElem.setAttribute("hash",FSelfCaps.value(AStreamJid).hash);
+		capsElem.setAttribute("node",selfCaps.node);
+		capsElem.setAttribute("ver",selfCaps.ver);
+		capsElem.setAttribute("hash",selfCaps.hash);
 	}
 	else if (FSHIInfo.value(AStreamJid) == AHandlerId)
 	{
@@ -260,7 +261,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			QDomElement query = result.addElement("query",NS_DISCO_ITEMS);
 			if (!ditems.node.isEmpty())
 				query.setAttribute("node",ditems.node);
-			foreach(IDiscoItem ditem, ditems.items)
+			foreach(const IDiscoItem &ditem, ditems.items)
 			{
 				QDomElement elem = query.appendChild(result.createElement("item")).toElement();
 				elem.setAttribute("jid",ditem.itemJid.full());
@@ -377,7 +378,7 @@ void ServiceDiscovery::fillDiscoInfo(IDiscoInfo &ADiscoInfo)
 		didentity.name = CLIENT_NAME;
 		ADiscoInfo.identity.append(didentity);
 
-		foreach(IDiscoFeature feature, FDiscoFeatures)
+		foreach(const IDiscoFeature &feature, FDiscoFeatures)
 			if (feature.active)
 				ADiscoInfo.features.append(feature.var);
 	}
@@ -460,11 +461,11 @@ QList<IDiscoInfo> ServiceDiscovery::findDiscoInfo(const Jid &AStreamJid, const I
 {
 	QList<IDiscoInfo> result;
 	QList<Jid> searchJids = AParent.itemJid.isValid() ? QList<Jid>()<<AParent.itemJid : FDiscoInfo.value(AStreamJid).keys();
-	foreach(Jid itemJid, searchJids)
+	foreach(const Jid &itemJid, searchJids)
 	{
 		QMap<QString, IDiscoInfo> itemInfos = FDiscoInfo.value(AStreamJid).value(itemJid);
 		QList<QString> searchNodes = !AParent.node.isEmpty() ? QList<QString>()<<AParent.node : itemInfos.keys();
-		foreach(QString itemNode, searchNodes)
+		foreach(const QString &itemNode, searchNodes)
 		{
 			IDiscoInfo itemInfo = itemInfos.value(itemNode);
 			if (compareIdentities(itemInfo.identity,AIdentity) && compareFeatures(itemInfo.features,AFeatures))
@@ -698,7 +699,7 @@ bool ServiceDiscovery::requestDiscoItems(const Jid &AStreamJid, const Jid &ACont
 void ServiceDiscovery::discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const
 {
 	QDomDocument doc = AElem.ownerDocument();
-	foreach(IDiscoIdentity identity, AInfo.identity)
+	foreach(const IDiscoIdentity &identity, AInfo.identity)
 	{
 		QDomElement elem = AElem.appendChild(doc.createElement("identity")).toElement();
 		elem.setAttribute("category",identity.category);
@@ -709,17 +710,15 @@ void ServiceDiscovery::discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AEl
 			elem.setAttribute("xml:lang",identity.lang);
 
 	}
-	foreach(QString feature, AInfo.features)
+	foreach(const QString &feature, AInfo.features)
 	{
 		QDomElement elem = AElem.appendChild(doc.createElement("feature")).toElement();
 		elem.setAttribute("var",feature);
 	}
 	if (FDataForms)
 	{
-		foreach(IDataForm form, AInfo.extensions)
-		{
+		foreach(const IDataForm &form, AInfo.extensions)
 			FDataForms->xmlForm(form,AElem);
-		}
 	}
 }
 
@@ -989,7 +988,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 		QStringList hashList;
 		QStringList sortList;
 
-		foreach(IDiscoIdentity identity, AInfo.identity)
+		foreach(const IDiscoIdentity &identity, AInfo.identity)
 			sortList.append(identity.category+"/"+identity.type+"/"+identity.lang+"/"+identity.name);
 		qSort(sortList);
 		hashList += sortList;
@@ -1009,7 +1008,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 			{
 				hashList += iforms.key();
 				QMultiMap<QString,QStringList> sortFields;
-				foreach(IDataField field, AInfo.extensions.at(iforms.value()).fields)
+				foreach(const IDataField &field, AInfo.extensions.at(iforms.value()).fields)
 				{
 					if (field.var != "FORM_TYPE")
 					{
@@ -1043,7 +1042,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 
 bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const
 {
-	foreach(IDiscoIdentity identity,AIdentities)
+	foreach(const IDiscoIdentity &identity, AIdentities)
 		if (
 			(AWith.category.isEmpty() || AWith.category==identity.category) &&
 			(AWith.type.isEmpty() || AWith.type==identity.type) &&
@@ -1057,7 +1056,7 @@ bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentitie
 bool ServiceDiscovery::compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const
 {
 	if (!AWith.isEmpty())
-		foreach(QString feature, AWith)
+		foreach(const QString &feature, AWith)
 			if (!AFeatures.contains(feature))
 				return false;
 	return true;
@@ -1154,7 +1153,7 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AXmppStream->streamJid()) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
-	foreach(IRosterItem ritem, ritems)
+	foreach(const IRosterItem &ritem, ritems)
 	{
 		if (ritem.itemJid.node().isEmpty())
 		{
@@ -1190,8 +1189,8 @@ void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
 
 	removeStreamMenu(AXmppStream->streamJid());
 
-	foreach(Jid contactJid, FDiscoInfo.value(AXmppStream->streamJid()).keys()) {
-		foreach(QString node, FDiscoInfo.value(AXmppStream->streamJid()).value(contactJid).keys()) {
+	foreach(const Jid &contactJid, FDiscoInfo.value(AXmppStream->streamJid()).keys()) {
+		foreach(const QString &node, FDiscoInfo.value(AXmppStream->streamJid()).value(contactJid).keys()) {
 			removeDiscoInfo(AXmppStream->streamJid(),contactJid,node);
 		};
 	};
@@ -1301,7 +1300,7 @@ void ServiceDiscovery::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIn
 			}
 
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
-			foreach(QString feature, dinfo.features)
+			foreach(const QString &feature, dinfo.features)
 			{
 				foreach(Action *action, createFeatureActions(streamJid,feature,dinfo,AMenu))
 					AMenu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,true);
@@ -1319,7 +1318,7 @@ void ServiceDiscovery::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId,
 		if (hasDiscoInfo(streamJid,contactJid))
 		{
 			IDiscoInfo dinfo = discoInfo(streamJid,contactJid);
-			foreach(IDiscoIdentity identity, dinfo.identity)
+			foreach(const IDiscoIdentity &identity, dinfo.identity)
 				if (identity.category != DIC_CLIENT)
 					AToolTips.insertMulti(RTTO_DISCO_IDENTITY,tr("Category: %1; Type: %2").arg(Qt::escape(identity.category)).arg(Qt::escape(identity.type)));
 		}
@@ -1385,7 +1384,7 @@ void ServiceDiscovery::onQueueTimerTimeout()
 
 void ServiceDiscovery::onSelfCapsChanged()
 {
-	foreach(Jid streamJid, FSelfCaps.keys())
+	foreach(const Jid &streamJid, FSelfCaps.keys())
 	{
 		EntityCapabilities &myCaps = FSelfCaps[streamJid];
 		QString newVer = calcCapsHash(selfDiscoInfo(streamJid),myCaps.hash);

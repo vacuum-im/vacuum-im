@@ -128,7 +128,7 @@ QTreeWidgetItem *ReceiversWidget::getReceiversGroup(const QString &AGroup)
 	QString groupDelim = FRoster->groupDelimiter();
 	QTreeWidgetItem *parentGroupItem = ui.trwReceivers->invisibleRootItem();
 	QStringList subGroups = AGroup.split(groupDelim,QString::SkipEmptyParts);
-	foreach(QString subGroup,subGroups)
+	foreach(const QString &subGroup, subGroups)
 	{
 		curGroup = curGroup.isEmpty() ? subGroup : curGroup+groupDelim+subGroup;
 		QTreeWidgetItem *groupItem = FGroupItems.value(curGroup,NULL);
@@ -183,7 +183,7 @@ void ReceiversWidget::createRosterTree()
 	ui.trwReceivers->setHeaderLabels(QStringList() << tr("Contact") << tr("Jid"));
 
 	QList<IRosterItem> ritems = FRoster->rosterItems();
-	foreach (IRosterItem ritem, ritems)
+	foreach (const IRosterItem &ritem, ritems)
 	{
 		QSet<QString> groups;
 		if (ritem.itemJid.node().isEmpty())
@@ -193,19 +193,19 @@ void ReceiversWidget::createRosterTree()
 		else
 			groups = ritem.groups;
 
-		foreach(QString group,groups)
+		foreach(const QString &group,groups)
 		{
 			QTreeWidgetItem *groupItem = getReceiversGroup(group);
 
 			QMap<Jid,int> itemJids;
 			QList<IPresenceItem> pitems = FPresence->presenceItems(ritem.itemJid);
-			foreach(IPresenceItem pitem,pitems)
+			foreach(const IPresenceItem &pitem, pitems)
 				itemJids.insert(pitem.itemJid, pitem.show);
 
 			if (itemJids.isEmpty())
 				itemJids.insert(ritem.itemJid, IPresence::Offline);
 
-			foreach(Jid itemJid, itemJids.keys())
+			foreach(const Jid &itemJid, itemJids.keys())
 			{
 				QString bareName = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.uBare();
 				QString fullName = itemJid.resource().isEmpty() ? bareName : bareName+"/"+itemJid.resource();
@@ -217,7 +217,7 @@ void ReceiversWidget::createRosterTree()
 	}
 
 	QList<IPresenceItem> myResources = FPresence->presenceItems(FStreamJid);
-	foreach(IPresenceItem pitem, myResources)
+	foreach(const IPresenceItem &pitem, myResources)
 	{
 		QTreeWidgetItem *groupItem = getReceiversGroup(FRostersModel!=NULL ? FRostersModel->singleGroupName(RIT_GROUP_MY_RESOURCES) : tr("My Resources"));
 		QString name = pitem.itemJid.resource();
@@ -320,6 +320,6 @@ void ReceiversWidget::onUpdateClicked()
 {
 	QList<Jid> savedReceivers = FReceivers;
 	createRosterTree();
-	foreach(Jid receiver, savedReceivers)
+	foreach(const Jid &receiver, savedReceivers)
 		addReceiver(receiver);
 }

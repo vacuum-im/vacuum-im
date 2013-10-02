@@ -148,7 +148,7 @@ void VCardDialog::updateDialog()
 	ui.ltwEmails->clear();
 	static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
 	QHash<QString,QStringList> emails = FVCard->values(VVN_EMAIL,emailTagList);
-	foreach(QString email, emails.keys())
+	foreach(const QString &email, emails.keys())
 	{
 		QListWidgetItem *listItem = new QListWidgetItem(email,ui.ltwEmails);
 		listItem->setData(Qt::UserRole,emails.value(email));
@@ -160,7 +160,7 @@ void VCardDialog::updateDialog()
 	ui.ltwPhones->clear();
 	static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
 	QHash<QString,QStringList> phones = FVCard->values(VVN_TELEPHONE,phoneTagList);
-	foreach(QString phone, phones.keys())
+	foreach(const QString &phone, phones.keys())
 	{
 		QListWidgetItem *listItem = new QListWidgetItem(phone,ui.ltwPhones);
 		listItem->setData(Qt::UserRole,phones.value(phone));

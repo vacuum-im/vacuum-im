@@ -56,8 +56,8 @@ IconStorage::IconStorage(const QString &AStorage, const QString &ASubStorage, QO
 IconStorage::~IconStorage()
 {
 	QList<QObject*> objects = FUpdateParams.keys();
-	foreach(QObject *object, objects) {
-		removeObject(object); }
+	foreach(QObject *object, objects)
+		removeObject(object);
 }
 
 QIcon IconStorage::getIcon(const QString &AKey, int AIndex) const
@@ -116,7 +116,6 @@ void IconStorage::insertAutoIcon(QObject *AObject, const QString &AKey, int AInd
 		params->index = AIndex;
 		params->prop = AProperty;
 		params->animate = AAnimate;
-		QString file = fileFullName(AKey,AIndex);
 		initAnimation(AObject,params);
 		updateObject(AObject);
 		connect(AObject,SIGNAL(destroyed(QObject *)),SLOT(onObjectDestroyed(QObject *)));

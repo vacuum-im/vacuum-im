@@ -127,8 +127,9 @@ void Shortcuts::bindObjectShortcut(const QString &AId, QObject *AObject)
 QList<QString> Shortcuts::widgetShortcuts(QWidget *AWidget)
 {
 	QList<QString> shortcuts;
-	foreach(QShortcut *shortcut, d->widgetShortcutsWidget.keys(AWidget))
-		shortcuts.append(d->widgetShortcutsId.value(shortcut));
+	QMap<QShortcut *, QString> shortcutsId = instance()->d->widgetShortcutsId;
+	foreach(QShortcut *shortcut, instance()->d->widgetShortcutsWidget.keys(AWidget))
+		shortcuts.append(shortcutsId.value(shortcut));
 	return shortcuts;
 }
 

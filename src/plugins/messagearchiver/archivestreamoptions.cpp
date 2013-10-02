@@ -305,7 +305,7 @@ void ArchiveStreamOptions::apply()
 		prefs.defaultPrefs.save = ui.cmbModeSave->itemData(ui.cmbModeSave->currentIndex()).toString();
 		prefs.defaultPrefs.expire = ui.cmbExpireTime->currentText().toInt()*ONE_DAY;
 
-		foreach(Jid itemJid, FTableItems.keys())
+		foreach(const Jid &itemJid, FTableItems.keys())
 		{
 			QTableWidgetItem *jidItem = FTableItems.value(itemJid);
 			prefs.itemPrefs[itemJid].save = ui.tbwItemPrefs->item(jidItem->row(),SAVE_COLUMN)->data(Qt::UserRole).toString();
@@ -314,7 +314,7 @@ void ArchiveStreamOptions::apply()
 			prefs.itemPrefs[itemJid].exactmatch = ui.tbwItemPrefs->item(jidItem->row(),EXACT_COLUMN)->data(Qt::UserRole).toBool();
 		}
 
-		foreach(Jid itemJid, prefs.itemPrefs.keys())
+		foreach(const Jid &itemJid, prefs.itemPrefs.keys())
 		{
 			if (!FTableItems.contains(itemJid))
 			{
@@ -531,13 +531,13 @@ void ArchiveStreamOptions::onArchivePrefsChanged(const Jid &AStreamJid)
 		ui.cmbExpireTime->setCurrentIndex(expireIndex);
 
 		QSet<Jid> oldItems = FTableItems.keys().toSet();
-		foreach(Jid itemJid, prefs.itemPrefs.keys())
+		foreach(const Jid &itemJid, prefs.itemPrefs.keys())
 		{
 			oldItems -= itemJid;
 			updateItemPrefs(itemJid,prefs.itemPrefs.value(itemJid));
 		}
 
-		foreach(Jid itemJid, oldItems)
+		foreach(const Jid &itemJid, oldItems)
 		{
 			removeItemPrefs(itemJid);
 		}

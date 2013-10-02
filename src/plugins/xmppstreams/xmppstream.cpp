@@ -14,8 +14,8 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 	FStreamState = SS_OFFLINE;
 	FPasswordDialog = NULL;
 
-	connect(&FParser,SIGNAL(opened(QDomElement)), SLOT(onParserOpened(QDomElement)));
-	connect(&FParser,SIGNAL(element(QDomElement)), SLOT(onParserElement(QDomElement)));
+	connect(&FParser,SIGNAL(opened(const QDomElement &)), SLOT(onParserOpened(const QDomElement &)));
+	connect(&FParser,SIGNAL(element(const QDomElement &)), SLOT(onParserElement(const QDomElement &)));
 	connect(&FParser,SIGNAL(error(const QString &)), SLOT(onParserError(const QString &)));
 	connect(&FParser,SIGNAL(closed()), SLOT(onParserClosed()));
 
@@ -532,13 +532,13 @@ void XmppStream::onConnectionDisconnected()
 	}
 }
 
-void XmppStream::onParserOpened(QDomElement AElem)
+void XmppStream::onParserOpened(const QDomElement &AElem)
 {
 	Stanza stanza(AElem);
 	processStanzaHandlers(stanza,false);
 }
 
-void XmppStream::onParserElement(QDomElement AElem)
+void XmppStream::onParserElement(const QDomElement &AElem)
 {
 	Stanza stanza(AElem);
 	processStanzaHandlers(stanza,false);

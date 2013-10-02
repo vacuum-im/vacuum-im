@@ -634,11 +634,11 @@ Menu *RosterChanger::createGroupMenu(const QHash<int,QVariant> &AData, const QSe
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AData.value(ADR_STREAM_JID).toString()) : NULL;
 	if (roster)
 	{
-		QString group;
+		;
 		QString groupDelim = roster->groupDelimiter();
 		QHash<QString,Menu *> menus;
 		QSet<QString> allGroups = roster->groups();
-		foreach(group,allGroups)
+		foreach(const QString &group,allGroups)
 		{
 			Menu *parentMenu = menu;
 			QList<QString> groupTree = group.split(groupDelim,QString::SkipEmptyParts);
@@ -994,7 +994,7 @@ void RosterChanger::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				bool isAllItemsValid = true;
 				bool isAllInEmptyGroup = true;
 				QSet<QString> exceptGroups;
-				foreach(QString contactJid, data.value(ADR_CONTACT_JID).toStringList())
+				foreach(const QString &contactJid, data.value(ADR_CONTACT_JID).toStringList())
 				{
 					IRosterItem ritem = roster->rosterItem(contactJid);
 					if (!ritem.isValid)
@@ -1144,7 +1144,7 @@ void RosterChanger::changeContactsSubscription(const Jid &AStreamJid, const QStr
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen())
 	{
-		foreach(QString contactJid, AContacts)
+		foreach(const QString &contactJid, AContacts)
 		{
 			if (ASubsc == IRoster::Subscribe)
 				subscribeContact(AStreamJid,contactJid);
@@ -1159,7 +1159,7 @@ void RosterChanger::sendSubscription(const Jid &AStreamJid, const QStringList &A
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen())
 	{
-		foreach(QString contactJid, AContacts)
+		foreach(const QString &contactJid, AContacts)
 			roster->sendSubscription(contactJid,ASubsc);
 	}
 }
@@ -1266,7 +1266,7 @@ void RosterChanger::removeContactsFromRoster(const Jid &AStreamJid, const QStrin
 		QMultiMap<int, QVariant> findData;
 		findData.insertMulti(RDR_TYPE,RIT_CONTACT);
 		findData.insertMulti(RDR_TYPE,RIT_AGENT);
-		foreach(QString contactJid, AContacts)
+		foreach(const QString &contactJid, AContacts)
 		{
 			IRosterItem ritem = roster->rosterItem(contactJid);
 			if (!ritem.isValid)
@@ -1300,10 +1300,10 @@ void RosterChanger::addGroupToGroup(const Jid &AToStreamJid, const Jid &AFromStr
 		QList<IRosterItem> toItems;
 		QList<IRosterItem> fromItems = fromRoster->groupItems(AGroup);
 		QString fromGroupLast = AGroup.split(fromRoster->groupDelimiter(),QString::SkipEmptyParts).last();
-		foreach(IRosterItem fromItem, fromItems)
+		foreach(const IRosterItem &fromItem, fromItems)
 		{
 			QSet<QString> newGroups;
-			foreach(QString group, fromItem.groups)
+			foreach(const QString &group, fromItem.groups)
 			{
 				if (group.startsWith(AGroup))
 				{
@@ -1398,7 +1398,7 @@ void RosterChanger::removeGroups(const Jid &AStreamJid, const QStringList &AGrou
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen() && !AGroups.isEmpty())
 	{
-		foreach(QString group, AGroups)
+		foreach(const QString &group, AGroups)
 			roster->removeGroup(group);
 	}
 }
@@ -1409,15 +1409,15 @@ void RosterChanger::removeGroupsContacts(const Jid &AStreamJid, const QStringLis
 	if (roster && roster->isOpen() && !AGroups.isEmpty())
 	{
 		QSet<Jid> items;
-		foreach(QString group, AGroups)
-			foreach(IRosterItem ritem, roster->groupItems(group))
+		foreach(const QString &group, AGroups)
+			foreach(const IRosterItem &ritem, roster->groupItems(group))
 				items += ritem.itemJid;
 
 		if (items.count()>0 &&	QMessageBox::question(NULL,tr("Remove contacts"),
 			tr("You are assured that wish to remove <b>%n contact(s)</b> from roster?","",items.count()),
 			QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
 		{
-			foreach(Jid itemJid, items)
+			foreach(const Jid &itemJid, items)
 				roster->removeItem(itemJid);
 		}
 	}

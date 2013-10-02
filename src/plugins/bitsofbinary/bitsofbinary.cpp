@@ -100,7 +100,7 @@ bool BitsOfBinary::initObjects()
 
 bool BitsOfBinary::initSettings()
 {
-	foreach(QFileInfo fileInfo, FDataDir.entryInfoList(QDir::Files))
+	foreach(const QFileInfo &fileInfo, FDataDir.entryInfoList(QDir::Files))
 	{
 		QFile file(fileInfo.absoluteFilePath());
 		if (file.open(QFile::ReadOnly))
@@ -342,7 +342,7 @@ void BitsOfBinary::onOfflineTimerTimeout()
 {
 	QSet<QString> offlineRequests = FOfflineRequests.toSet();
 	FOfflineRequests.clear();
-	foreach(QString contentId, offlineRequests)
+	foreach(const QString &contentId, offlineRequests)
 	{
 		QString type; QByteArray data; quint64 maxAge;
 		if (loadBinary(contentId,type,data,maxAge))

@@ -174,7 +174,7 @@ Jid BirthdayReminder::findContactStream(const Jid &AContactJid) const
 {
 	if (FRostersModel && FRosterPlugin)
 	{
-		foreach(Jid streamJid, FRostersModel->streams())
+		foreach(const Jid &streamJid, FRostersModel->streams())
 		{
 			IRoster *roster = FRosterPlugin->findRoster(streamJid);
 			if (roster && roster->rosterItem(AContactJid).isValid)
@@ -191,8 +191,8 @@ void BirthdayReminder::updateBirthdaysStates()
 		FNotifiedContacts.clear();
 		FNotifyDate = QDate::currentDate();
 
-		foreach(Jid contactJid, FBirthdays.keys()) {
-			updateBirthdayState(contactJid); }
+		foreach(const Jid &contactJid, FBirthdays.keys())
+			updateBirthdayState(contactJid);
 	}
 }
 
@@ -254,7 +254,7 @@ void BirthdayReminder::onShowNotificationTimer()
 				updateBirthdaysStates();
 				notify.typeId = NNT_BIRTHDAY;
 				QSet<Jid> notifyList = FUpcomingBirthdays.keys().toSet() - FNotifiedContacts.toSet();
-				foreach(Jid contactJid, notifyList)
+				foreach(const Jid &contactJid, notifyList)
 				{
 					Jid streamJid = findContactStream(contactJid);
 
@@ -365,7 +365,7 @@ void BirthdayReminder::onOptionsOpened()
 	QStringList notified = Options::fileValue("birthdays.notify.notified").toStringList();
 
 	FNotifiedContacts.clear();
-	foreach(QString contactJid, notified)
+	foreach(const QString &contactJid, notified)
 		FNotifiedContacts.append(contactJid);
 
 	updateBirthdaysStates();
@@ -374,7 +374,7 @@ void BirthdayReminder::onOptionsOpened()
 void BirthdayReminder::onOptionsClosed()
 {
 	QStringList notified;
-	foreach (Jid contactJid, FNotifiedContacts)
+	foreach (const Jid &contactJid, FNotifiedContacts)
 		notified.append(contactJid.bare());
 
 	Options::setFileValue(FNotifyDate,"birthdays.notify.date");

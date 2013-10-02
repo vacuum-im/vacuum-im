@@ -88,8 +88,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	connect(ui.lneSearch,SIGNAL(editingFinished()),SLOT(onSearchTimerTimeout()));
 
 	connect(ui.trvItems,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onViewContextMenu(const QPoint &)));
-	connect(ui.trvItems->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-	        SLOT(onCurrentIndexChanged(const QModelIndex &, const QModelIndex &)));
+	connect(ui.trvItems->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),SLOT(onCurrentIndexChanged(const QModelIndex &, const QModelIndex &)));
 
 	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 	connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
@@ -234,7 +233,7 @@ void DiscoItemsWindow::updateActionsBar()
 	if (index.isValid())
 	{
 		IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
-		foreach(QString feature, dinfo.features)
+		foreach(const QString &feature, dinfo.features)
 		{
 			foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,this))
 			{
@@ -275,7 +274,7 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
 		menu->addAction(FShowVCard,TBG_DIWT_DISCOVERY_ACTIONS,false);
 
 		IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
-		foreach(QString feature, dinfo.features)
+		foreach(const QString &feature, dinfo.features)
 		{
 			foreach(Action *action, FDiscovery->createFeatureActions(FStreamJid,feature,dinfo,menu))
 				menu->addAction(action,TBG_DIWT_DISCOVERY_FEATURE_ACTIONS,true);
@@ -285,7 +284,7 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
 	}
 }
 
-void DiscoItemsWindow::onCurrentIndexChanged(QModelIndex ACurrent, QModelIndex APrevious)
+void DiscoItemsWindow::onCurrentIndexChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious)
 {
 	if (ACurrent.parent()!=APrevious.parent() || ACurrent.row()!=APrevious.row())
 	{

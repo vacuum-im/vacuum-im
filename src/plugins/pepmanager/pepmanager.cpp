@@ -128,7 +128,7 @@ bool PEPManager::removeNodeHandler(int AHandleId)
 	if (handlersById.contains(AHandleId))
 	{
 		QList<QString> nodes = handlersByNode.keys(AHandleId);
-		foreach(QString node, nodes)
+		foreach(const QString &node, nodes)
 		{
 			handlersByNode.remove(node, AHandleId);
 		}

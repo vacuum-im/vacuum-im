@@ -490,7 +490,7 @@ void NormalMessageHandler::onMessageReady()
 		if (!message.body().isEmpty())
 		{
 			bool sent = false;
-			foreach(Jid receiver, window->receiversWidget()->receivers())
+			foreach(const Jid &receiver, window->receiversWidget()->receivers())
 			{
 				message.setTo(receiver.full());
 				sent = FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::MessageOut) ? true : sent;
@@ -598,10 +598,10 @@ void NormalMessageHandler::onShowWindowAction(bool)
 			IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
 			if (window)
 			{
-				foreach(QString group, action->data(ADR_GROUP).toStringList())
+				foreach(const QString &group, action->data(ADR_GROUP).toStringList())
 					window->receiversWidget()->addReceiversGroup(group);
 
-				foreach(QString contactJid, action->data(ADR_CONTACT_JID).toStringList())
+				foreach(const QString &contactJid, action->data(ADR_CONTACT_JID).toStringList())
 					window->receiversWidget()->addReceiver(contactJid);
 			}
 		}
@@ -637,10 +637,10 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 					IMessageWindow *window = FMessageWidgets->findMessageWindow(streamJid,contactJid);
 					if (window)
 					{
-						foreach(QString group, groups)
+						foreach(const QString &group, groups)
 							window->receiversWidget()->addReceiversGroup(group);
 
-						foreach(QString contactJid, contacts)
+						foreach(const QString &contactJid, contacts)
 							window->receiversWidget()->addReceiver(contactJid);
 					}
 				}

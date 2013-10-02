@@ -148,7 +148,7 @@ void WorkingThread::run()
 	else if (FAction == RemoveCollection)
 	{
 		FRequest.end = !FRequest.end.isValid() ? FRequest.start : FRequest.end;
-		foreach(QString file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
+		foreach(const QString &file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
 		{
 			IArchiveHeader header = FFileArchive->loadHeaderFromFile(file);
 			if (!FFileArchive->removeCollectionFile(FStreamJid,header.with,header.start))
@@ -158,7 +158,7 @@ void WorkingThread::run()
 	else if (FAction == LoadHeaders)
 	{
 		FHeaders.clear();
-		foreach(QString file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
+		foreach(const QString &file, FFileArchive->findCollectionFiles(FStreamJid,FRequest))
 			FHeaders.append(FFileArchive->loadHeaderFromFile(file));
 	}
 	else if (FAction == LoadCollection)

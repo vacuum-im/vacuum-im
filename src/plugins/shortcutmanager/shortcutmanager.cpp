@@ -204,7 +204,7 @@ void ShortcutManager::showHiddenWidgets(bool ACheckPassword)
 void ShortcutManager::onOptionsOpened()
 {
 	OptionsNode options = Options::node(OPV_SHORTCUTS);
-	foreach(QString shortcutId, Shortcuts::shortcuts())
+	foreach(const QString &shortcutId, Shortcuts::shortcuts())
 	{
 		if (options.hasNode(shortcutId))
 		{
@@ -219,7 +219,7 @@ void ShortcutManager::onOptionsClosed()
 		showHiddenWidgets(false);
 
 	OptionsNode options = Options::node(OPV_SHORTCUTS);
-	foreach(QString shortcutId, Shortcuts::shortcuts())
+	foreach(const QString &shortcutId, Shortcuts::shortcuts())
 	{
 		Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcutId);
 		if (descriptor.activeKey != descriptor.defaultKey)

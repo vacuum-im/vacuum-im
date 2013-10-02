@@ -20,7 +20,7 @@ StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *
 	ui.cmbMessageType->addItem(tr("Headline"),Message::Headline);
 	ui.cmbMessageType->addItem(tr("Error"),Message::Error);
 
-	foreach(QString spluginId, FMessageStyles->pluginList())
+	foreach(const QString &spluginId, FMessageStyles->pluginList())
 		ui.cmbStyleEngine->addItem(FMessageStyles->pluginById(spluginId)->pluginName(),spluginId);
 
 	ui.wdtStyleOptions->setLayout(new QVBoxLayout);

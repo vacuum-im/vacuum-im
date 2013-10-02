@@ -360,7 +360,7 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 				itemElem.setAttribute("jid",it->itemJid.full());
 				if (!it->name.isEmpty())
 					itemElem.setAttribute("name",it->name);
-				foreach(QString group, it->groups)
+				foreach(const QString &group, it->groups)
 				{
 					if (!group.isEmpty())
 						itemElem.appendChild(request.createElement("group")).appendChild(request.createTextNode(group));

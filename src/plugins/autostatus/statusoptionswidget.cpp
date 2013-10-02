@@ -197,7 +197,7 @@ void StatusOptionsWidget::apply()
 		FAutoStatus->setRuleEnabled(ruleId,ui.tbwRules->item(i,COL_ENABLED)->checkState()==Qt::Checked);
 	}
 
-	foreach(QUuid ruleId, oldRules)
+	foreach(const QUuid &ruleId, oldRules)
 		FAutoStatus->removeRule(ruleId);
 
 	emit childApply();
@@ -208,8 +208,8 @@ void StatusOptionsWidget::reset()
   ui.pbtDelete->setEnabled(false);
 	ui.tbwRules->clearContents();
 	ui.tbwRules->setRowCount(0);
-	foreach(QUuid ruleId, FAutoStatus->rules()) {
-		appendTableRow(ruleId, FAutoStatus->ruleValue(ruleId)); }
+	foreach(const QUuid &ruleId, FAutoStatus->rules())
+		appendTableRow(ruleId, FAutoStatus->ruleValue(ruleId));
 	ui.tbwRules->horizontalHeader()->doItemsLayout();
 	emit childReset();
 }

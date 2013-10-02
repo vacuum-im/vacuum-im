@@ -23,8 +23,8 @@ DataStreamsOptions::DataStreamsOptions(IDataStreamsManager *ADataManager, QWidge
 DataStreamsOptions::~DataStreamsOptions()
 {
 	FCleanupHandler.clear();
-	foreach(QUuid profileId, FNewProfiles) {
-		Options::node(OPV_DATASTREAMS_ROOT).removeChilds("settings-profile",profileId.toString()); }
+	foreach(const QUuid &profileId, FNewProfiles)
+		Options::node(OPV_DATASTREAMS_ROOT).removeChilds("settings-profile",profileId.toString());
 }
 
 void DataStreamsOptions::apply()
@@ -38,7 +38,7 @@ void DataStreamsOptions::apply()
 		FDataManager->insertSettingsProfile(profileId, name);
 
 		QMap<QString, IOptionsWidget *> &widgets = FMethodWidgets[profileId];
-		foreach(QString smethodNS, widgets.keys())
+		foreach(const QString &smethodNS, widgets.keys())
 		{
 			IOptionsWidget *widget = widgets.value(smethodNS);
 			if (widget)
@@ -52,7 +52,7 @@ void DataStreamsOptions::apply()
 		oldProfiles.removeAll(profileId);
 	}
 
-	foreach(QUuid profileId, oldProfiles)
+	foreach(const QUuid &profileId, oldProfiles)
 		FDataManager->removeSettingsProfile(profileId);
 
 	FNewProfiles.clear();
@@ -62,7 +62,7 @@ void DataStreamsOptions::apply()
 
 void DataStreamsOptions::reset()
 {
-	foreach(QUuid profileId, FNewProfiles)
+	foreach(const QUuid &profileId, FNewProfiles)
 	{
 		foreach(IOptionsWidget *widget, FMethodWidgets.take(profileId))
 		{
@@ -79,7 +79,7 @@ void DataStreamsOptions::reset()
 	}
 	FNewProfiles.clear();
 
-	foreach(QUuid profileId, FDataManager->settingsProfiles())
+	foreach(const QUuid &profileId, FDataManager->settingsProfiles())
 	{
 		if (ui.cmbProfile->findData(profileId.toString())<0)
 			ui.cmbProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
@@ -139,7 +139,7 @@ void DataStreamsOptions::onCurrentProfileChanged(int AIndex)
 
 	FCurProfileId = ui.cmbProfile->itemData(AIndex).toString();
 
-	foreach(QString smethodNS, FDataManager->methods())
+	foreach(const QString &smethodNS, FDataManager->methods())
 	{
 		IOptionsWidget *widget = FMethodWidgets[FCurProfileId].value(smethodNS);
 		if (!widget)
