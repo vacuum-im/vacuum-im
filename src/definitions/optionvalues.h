@@ -107,6 +107,7 @@
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
 // MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
+#define OPV_MESSAGES_MAXMESSAGESINWINDOW                "messages.max-messages-in-window"
 // SpellChecker
 #define OPV_MESSAGES_SPELL_LANG                         "messages.spell.lang"
 #define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"

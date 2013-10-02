@@ -8,6 +8,11 @@
 #include <QDomDocument>
 #include <QCoreApplication>
 #include <QTextDocumentFragment>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
+#include <utils/filestorage.h>
+#include <utils/textmanager.h>
+#include <utils/options.h>
 
 #define SCROLL_TIMEOUT                      100
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
@@ -130,7 +135,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 			AClean = true;
 			FWidgetStatus[view].scrollStarted = false;
 			view->installEventFilter(this);
-			connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onLinkClicked(const QUrl &)));
+			connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onStyleWidgetLinkClicked(const QUrl &)));
 			connect(view,SIGNAL(destroyed(QObject *)),SLOT(onStyleWidgetDestroyed(QObject *)));
 			emit widgetAdded(AWidget);
 		}
@@ -145,10 +150,16 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 			wstatus.lastKind = -1;
 			wstatus.lastId = QString::null;
 			wstatus.lastTime = QDateTime();
-			setVariant(AWidget, AOptions.extended.value(MSO_VARIANT).toString());
+			wstatus.content.clear();
+
 			QString html = makeStyleTemplate();
 			fillStyleKeywords(html,AOptions);
 			view->setHtml(html);
+			setVariant(AWidget, AOptions.extended.value(MSO_VARIANT).toString());
+
+			QTextCursor cursor(view->document());
+			cursor.movePosition(QTextCursor::End);
+			wstatus.contentStartPosition = cursor.position();
 		}
 
 		QFont font;
@@ -172,24 +183,47 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 	StyleViewer *view = FWidgetStatus.contains(AWidget) ? qobject_cast<StyleViewer *>(AWidget) : NULL;
 	if (view)
 	{
+		WidgetStatus &wstatus = FWidgetStatus[AWidget];
+		bool scrollAtEnd = !AOptions.noScroll && view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
+		
+		QTextCursor cursor(view->document());
+		int maxMessages = Options::node(OPV_MESSAGES_MAXMESSAGESINWINDOW).value().toInt();
+		if (maxMessages>0 && wstatus.content.count()>maxMessages+10)
+		{
+			int scrollMax = view->verticalScrollBar()->maximum();
+
+			int removeSize = 0;
+			while(wstatus.content.count() > maxMessages)
+				removeSize += wstatus.content.takeFirst().size;
+			cursor.setPosition(wstatus.contentStartPosition);
+			cursor.setPosition(wstatus.contentStartPosition+removeSize,QTextCursor::KeepAnchor);
+			cursor.removeSelectedText();
+
+			if (!scrollAtEnd)
+			{
+				int newScrollPos = qMax(view->verticalScrollBar()->sliderPosition()-(scrollMax-view->verticalScrollBar()->maximum()),0);
+				view->verticalScrollBar()->setSliderPosition(newScrollPos);
+			}
+		}
+		cursor.movePosition(QTextCursor::End);
+
 		bool sameSender = isSameSender(AWidget,AOptions);
 		QString html = makeContentTemplate(AOptions,sameSender);
 		fillContentKeywords(html,AOptions,sameSender);
 		html.replace("%message%",prepareMessage(AHtml,AOptions));
 
-		bool scrollAtEnd = view->verticalScrollBar()->sliderPosition()==view->verticalScrollBar()->maximum();
-
-		QTextCursor cursor(view->document());
-		cursor.movePosition(QTextCursor::End);
+		ContentItem content;
+		int startPos = cursor.position();
 		cursor.insertHtml(html);
+		content.size = cursor.position()-startPos;
 
-		if (!AOptions.noScroll && scrollAtEnd)
+		if (scrollAtEnd)
 			view->verticalScrollBar()->setSliderPosition(view->verticalScrollBar()->maximum());
 
-		WidgetStatus &wstatus = FWidgetStatus[AWidget];
 		wstatus.lastKind = AOptions.kind;
 		wstatus.lastId = AOptions.senderId;
 		wstatus.lastTime = AOptions.time;
+		wstatus.content.append(content);
 
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
@@ -502,12 +536,6 @@ bool SimpleMessageStyle::eventFilter(QObject *AWatched, QEvent *AEvent)
 	return QObject::eventFilter(AWatched,AEvent);
 }
 
-void SimpleMessageStyle::onLinkClicked(const QUrl &AUrl)
-{
-	StyleViewer *view = qobject_cast<StyleViewer *>(sender());
-	emit urlClicked(view,AUrl);
-}
-
 void SimpleMessageStyle::onScrollAfterResize()
 {
 	for (QMap<QWidget*,WidgetStatus>::iterator it = FWidgetStatus.begin(); it!= FWidgetStatus.end(); ++it)
@@ -522,6 +550,18 @@ void SimpleMessageStyle::onScrollAfterResize()
 	}
 }
 
+void SimpleMessageStyle::onStyleWidgetLinkClicked(const QUrl &AUrl)
+{
+	StyleViewer *view = qobject_cast<StyleViewer *>(sender());
+	emit urlClicked(view,AUrl);
+}
+
+void SimpleMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
+{
+	FWidgetStatus.remove((QWidget *)AObject);
+	emit widgetRemoved((QWidget *)AObject);
+}
+
 void SimpleMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget)
 {
 	if (AStyle!=this && FWidgetStatus.contains(AWidget))
@@ -530,10 +570,4 @@ void SimpleMessageStyle::onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWid
 		FWidgetStatus.remove(AWidget);
 		emit widgetRemoved(AWidget);
 	}
-}
-
-void SimpleMessageStyle::onStyleWidgetDestroyed(QObject *AObject)
-{
-	FWidgetStatus.remove((QWidget *)AObject);
-	emit widgetRemoved((QWidget *)AObject);
 }
