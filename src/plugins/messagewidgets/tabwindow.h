@@ -12,6 +12,7 @@
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
 #include "ui_tabwindow.h"
 
 class TabWindow :
