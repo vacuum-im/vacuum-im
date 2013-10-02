@@ -407,6 +407,7 @@ void TabWindow::updateTab(int AIndex)
 
 		if (FShowIndices->isChecked() && AIndex<10)
 			tabCaption = tr("%1) %2").arg(QString::number((AIndex+1) % 10)).arg(tabCaption);
+		tabCaption = TextManager::getElidedString(tabCaption,Qt::ElideRight,20);
 
 		ui.twtTabs->setTabIcon(AIndex,tabIcon);
 		ui.twtTabs->setTabText(AIndex,tabCaption);
