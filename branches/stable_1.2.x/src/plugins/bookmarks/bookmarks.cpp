@@ -183,7 +183,7 @@ QString BookMarks::setBookmarks(const Jid &AStreamJid, const QList<IBookMark> &A
 	QDomDocument doc;
 	doc.appendChild(doc.createElement("bookmarks"));
 	QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(NS_STORAGE_BOOKMARKS,PST_BOOKMARKS)).toElement();
-	foreach(IBookMark bookmark, ABookmarks)
+	foreach(const IBookMark &bookmark, ABookmarks)
 	{
 		if (!bookmark.name.isEmpty())
 		{

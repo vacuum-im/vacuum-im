@@ -507,7 +507,7 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
 		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
-		foreach (IRosterIndex *index, indexes)
+		foreach(IRosterIndex *index, indexes)
 		{
 			emit rosterDataChanged(index,RDR_AVATAR_HASH);
 			emit rosterDataChanged(index,RDR_AVATAR_IMAGE);
@@ -517,7 +517,7 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 
 bool Avatars::updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bool AFromVCard)
 {
-	foreach(Jid streamJid, FStreamAvatars.keys())
+	foreach(const Jid &streamJid, FStreamAvatars.keys())
 	{
 		if (!FBlockingResources.contains(streamJid) && (AContactJid && streamJid))
 		{
@@ -744,12 +744,12 @@ void Avatars::onSetAvatarByAction(bool)
 			QByteArray data = loadFromFile(fileName);
 			if (!action->data(ADR_STREAM_JID).isNull())
 			{
-				foreach(Jid streamJid, action->data(ADR_STREAM_JID).toStringList())
+				foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
 					setAvatar(streamJid,data);
 			}
 			else if (!action->data(ADR_CONTACT_JID).isNull())
 			{
-				foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
+				foreach(const Jid &contactJid, action->data(ADR_CONTACT_JID).toStringList())
 					setCustomPictire(contactJid,data);
 			}
 		}
@@ -763,12 +763,12 @@ void Avatars::onClearAvatarByAction(bool)
 	{
 		if (!action->data(ADR_STREAM_JID).isNull())
 		{
-			foreach(Jid streamJid, action->data(ADR_STREAM_JID).toStringList())
+			foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
 				setAvatar(streamJid,QByteArray());
 		}
 		else if (!action->data(ADR_CONTACT_JID).isNull())
 		{
-			foreach(Jid contactJid, action->data(ADR_CONTACT_JID).toStringList())
+			foreach(const Jid &contactJid, action->data(ADR_CONTACT_JID).toStringList())
 				setCustomPictire(contactJid,QByteArray());
 		}
 	}

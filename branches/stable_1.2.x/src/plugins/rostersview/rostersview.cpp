@@ -278,7 +278,7 @@ QList<IRosterIndex *> RostersView::selectedRosterIndexes() const
 	QList<IRosterIndex *> rosterIndexes;
 	if (FRostersModel)
 	{
-		foreach(QModelIndex modelIndex, selectionModel()->selectedIndexes())
+		foreach(const QModelIndex &modelIndex, selectionModel()->selectedIndexes())
 		{
 			IRosterIndex *index = FRostersModel->rosterIndexByModelIndex(mapToModel(modelIndex));
 			if (index)

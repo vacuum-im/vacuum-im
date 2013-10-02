@@ -189,7 +189,7 @@ void PrivateStorage::notifyDataChanged(const Jid &AStreamJid, const QString &ATa
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (FStanzaProcessor && presence && presence->isOpen())
 	{
-		foreach(IPresenceItem item, presence->presenceItems(AStreamJid.bare()))
+		foreach(const IPresenceItem &item, presence->presenceItems(AStreamJid.bare()))
 		{
 			if (item.itemJid != AStreamJid)
 			{

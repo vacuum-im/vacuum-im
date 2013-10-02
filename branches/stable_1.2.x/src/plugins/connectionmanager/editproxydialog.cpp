@@ -21,7 +21,7 @@ EditProxyDialog::EditProxyDialog(IConnectionManager *AManager, QWidget *AParent)
 	IConnectionProxy noproxy = FManager->proxyById(QUuid());
 
 	ui.ltwProxyList->addItem(createProxyItem(QUuid(),noproxy));
-	foreach(QUuid id, FManager->proxyList())
+	foreach(const QUuid &id, FManager->proxyList())
 	{
 		IConnectionProxy proxy = FManager->proxyById(id);
 		ui.ltwProxyList->addItem(createProxyItem(id, proxy));
@@ -144,7 +144,7 @@ void EditProxyDialog::onDialogButtonBoxAccepted()
 
 	FManager->setDefaultProxy(ui.cmbDefault->itemData(ui.cmbDefault->currentIndex()).toString());
 
-	foreach(QUuid id, oldProxy)
+	foreach(const QUuid &id, oldProxy)
 		FManager->removeProxy(id);
 
 	accept();

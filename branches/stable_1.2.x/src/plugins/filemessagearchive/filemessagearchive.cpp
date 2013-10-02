@@ -26,7 +26,7 @@ FileMessageArchive::FileMessageArchive()
 
 FileMessageArchive::~FileMessageArchive()
 {
-	foreach(QString newDir, FNewDirs)
+	foreach(const QString &newDir, FNewDirs)
 	{
 		QDir dir(newDir);
 		if (dir.entryList(QDir::NoDotAndDotDot).isEmpty())
@@ -330,7 +330,7 @@ QString FileMessageArchive::collectionDirPath(const Jid &AStreamJid, const Jid &
 			if (!dir.exists(withDir))
 			{
 				FThreadLock.lockForWrite();
-				foreach(QString subDir, withDir.split("/"))
+				foreach(const QString &subDir, withDir.split("/"))
 				{
 					if (!dir.exists(subDir))
 					{
@@ -584,10 +584,10 @@ bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArch
 			if (!ACollection.body.messages.isEmpty())
 			{
 				QMultiMap<QDateTime, QString> curMessages;
-				foreach(Message message, collection.body.messages)
+				foreach(const Message &message, collection.body.messages)
 					curMessages.insertMulti(message.dateTime(),message.body());
 					
-				foreach(Message message, ACollection.body.messages)
+				foreach(const Message &message, ACollection.body.messages)
 					if (!curMessages.contains(message.dateTime(),message.body()))
 						collection.body.messages.append(message);
 
@@ -904,7 +904,7 @@ void FileMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
 
 void FileMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 {
-	foreach(Jid streamJid, FCollectionWriters.keys())
+	foreach(const Jid &streamJid, FCollectionWriters.keys())
 		qDeleteAll(FCollectionWriters.take(streamJid));
 	emit capabilitiesChanged(AStreamJid);
 }
@@ -939,7 +939,7 @@ void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
 	if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() &&  AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid))
 	{
-		foreach(IDiscoIdentity identity, AInfo.identity)
+		foreach(const IDiscoIdentity &identity, AInfo.identity)
 		{
 			if (identity.category==CATEGORY_GATEWAY && !identity.type.isEmpty())
 			{

@@ -495,8 +495,8 @@ void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid,
 
 void ChatStates::resetSupported(const Jid &AContactJid)
 {
-	foreach (Jid streamJid, FNotSupported.keys())
-		foreach (Jid contactJid, FNotSupported.value(streamJid))
+	foreach (const Jid &streamJid, FNotSupported.keys())
+		foreach (const Jid &contactJid, FNotSupported.value(streamJid))
 			if (AContactJid.isEmpty() || (AContactJid && contactJid))
 				setSupported(streamJid,contactJid,true);
 }
@@ -634,7 +634,7 @@ void ChatStates::onPresenceItemReceived(IPresence *APresence, const IPresenceIte
 
 void ChatStates::onPresenceClosed(IPresence *APresence)
 {
-	foreach(Jid contactJid, FChatParams.value(APresence->streamJid()).keys())
+	foreach(const Jid &contactJid, FChatParams.value(APresence->streamJid()).keys())
 	{
 		setUserState(APresence->streamJid(),contactJid,IChatStates::StateUnknown);
 		setSelfState(APresence->streamJid(),contactJid,IChatStates::StateUnknown,false);

@@ -321,7 +321,7 @@ bool MultiUserChatPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContact
 		IMultiUserChat *mchat = multiUserChat(AStreamJid, AContactJid);
 		if (mchat != NULL)
 		{
-			foreach(QString userJid, AParams.values("jid"))
+			foreach(const QString &userJid, AParams.values("jid"))
 				mchat->inviteContact(userJid, QString::null);
 		}
 		return true;
@@ -756,7 +756,7 @@ void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 		if (FDiscovery && FDiscovery->hasDiscoInfo(chatWindow->streamJid(), AUser->contactJid()))
 		{
 			IDiscoInfo info = FDiscovery->discoInfo(chatWindow->streamJid(), AUser->contactJid());
-			foreach(QString feature, info.features)
+			foreach(const QString &feature, info.features)
 			{
 				foreach(Action *action, FDiscovery->createFeatureActions(chatWindow->streamJid(),feature,info,AMenu))
 					AMenu->addAction(action, AG_MUCM_DISCOVERY_FEATURES, true);

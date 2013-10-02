@@ -345,7 +345,7 @@ IChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const Jid &AC
 QList<QUuid> MessageWidgets::tabWindowList() const
 {
 	QList<QUuid> list;
-	foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
+	foreach(const QString &tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
 		list.append(tabWindowId);
 	return list;
 }
@@ -357,7 +357,7 @@ QUuid MessageWidgets::appendTabWindow(const QString &AName)
 	if (name.isEmpty())
 	{
 		QList<QString> names;
-		foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
+		foreach(const QString &tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
 			names.append(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,tabWindowId).value().toString());
 
 		int i = 0;

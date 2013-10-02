@@ -62,7 +62,7 @@ void NotifyOptionsWidget::apply()
 			enabledKinds |= it.key();
 	FNotifications->setEnabledNotificationKinds(enabledKinds);
 
-	foreach(QString typeId, FTypeItems.uniqueKeys())
+	foreach(const QString &typeId, FTypeItems.uniqueKeys())
 	{
 		ushort kinds = FNotifications->typeNotificationKinds(typeId);
 		foreach(QStandardItem *typeItem, FTypeItems.values(typeId))
@@ -110,7 +110,7 @@ void NotifyOptionsWidget::createTreeModel()
 	FModel.clear();
 	FModel.setColumnCount(2);
 
-	foreach(QString typeId, FNotifications->notificationTypes())
+	foreach(const QString &typeId, FNotifications->notificationTypes())
 	{
 		INotificationType notifyType = FNotifications->notificationType(typeId);
 		if (!notifyType.title.isEmpty() && notifyType.kindMask>0)

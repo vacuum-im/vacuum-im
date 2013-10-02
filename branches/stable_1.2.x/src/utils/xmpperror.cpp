@@ -183,7 +183,7 @@ void XmppStreamError::setCondition(ErrorCondition ACondition)
 QString XmppStreamError::errorString(const QString &AContext) const
 {
 	initialize();
-	foreach(QString appNs, appConditionNsList())
+	foreach(const QString &appNs, appConditionNsList())
 	{
 		QString errString = XmppError::errorString(appNs,appCondition(appNs),AContext);
 		if (!errString.isEmpty())
@@ -362,7 +362,7 @@ void XmppStanzaError::setCondition(ErrorCondition ACondition)
 QString XmppStanzaError::errorString(const QString &AContext) const
 {
 	initialize();
-	foreach(QString appNs, appConditionNsList())
+	foreach(const QString &appNs, appConditionNsList())
 	{
 		QString errString = XmppError::errorString(appNs,appCondition(appNs),AContext);
 		if (!errString.isEmpty())

@@ -355,7 +355,7 @@ bool RemoteControl::processLeaveMUC(const ICommandRequest &ARequest)
 		int index = FDataForms!=NULL ? FDataForms->fieldIndex(FIELD_GROUPCHATS,ARequest.form.fields) : -1;
 		if (index>=0)
 		{
-			foreach(QString roomJid, ARequest.form.fields.value(index).value.toStringList())
+			foreach(const QString &roomJid, ARequest.form.fields.value(index).value.toStringList())
 			{
 				IMultiUserChatWindow *window = FMultiUserChatPlugin->multiChatWindow(ARequest.streamJid, roomJid);
 				if (window != NULL)
@@ -511,7 +511,7 @@ bool RemoteControl::processFileTransfers(const ICommandRequest &ARequest)
 		int index = (FDataForms != NULL) ? FDataForms->fieldIndex(FIELD_FILES, ARequest.form.fields) : -1;
 		if (index >= 0)
 		{
-			foreach(QString streamId, ARequest.form.fields.value(index).value.toStringList())
+			foreach(const QString &streamId, ARequest.form.fields.value(index).value.toStringList())
 			{
 				IFileStream *stream = FFileStreamManager->streamById(streamId);
 				QString defaultMethod = Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString();
@@ -558,7 +558,7 @@ bool RemoteControl::processSetOptions(const ICommandRequest &ARequest)
 		result.form.fields.append(field);
 
 		field.type = DATAFIELD_TYPE_BOOLEAN;
-		foreach(QString fieldName, optionItems.keys())
+		foreach(const QString &fieldName, optionItems.keys())
 		{
 			field.var = fieldName;
 			field.label = optionItems[fieldName].label;
@@ -571,7 +571,7 @@ bool RemoteControl::processSetOptions(const ICommandRequest &ARequest)
 	}
 	else if (ARequest.action == COMMAND_ACTION_COMPLETE || ARequest.action == COMMAND_ACTION_EXECUTE)
 	{
-		foreach(IDataField field, ARequest.form.fields)
+		foreach(const IDataField &field, ARequest.form.fields)
 		{
 			if (optionItems.contains(field.var) && Options::node(optionItems[field.var].node).value().toBool() != field.value.toBool())
 			{
@@ -613,7 +613,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		field.required = true;
 
 		QMap<Jid, int> unread;
-		foreach(Message message, notifiedMessages(ARequest.streamJid))
+		foreach(const Message &message, notifiedMessages(ARequest.streamJid))
 		{
 			if (ARequest.contactJid != message.from())
 				unread[message.from()]++;
@@ -656,7 +656,7 @@ bool RemoteControl::processForwardMessages(const ICommandRequest &ARequest)
 		int index = (FDataForms != NULL) ? FDataForms->fieldIndex(FIELD_MESSAGES, ARequest.form.fields) : -1;
 		if (index >= 0)
 		{
-			foreach(QString senderJid, ARequest.form.fields.value(index).value.toStringList())
+			foreach(const QString &senderJid, ARequest.form.fields.value(index).value.toStringList())
 			{
 				foreach(Message message, notifiedMessages(ARequest.streamJid,senderJid))
 				{

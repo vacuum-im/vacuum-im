@@ -9,7 +9,7 @@ EditItemDialog::EditItemDialog(const QString &AValue, QStringList ATags,
 	ui.lneEdit->setText(AValue);
 	QVBoxLayout *layout = new QVBoxLayout;
 	ui.grbTags->setLayout(layout);
-	foreach(QString tag, ATagList)
+	foreach(const QString &tag, ATagList)
 	{
 		QCheckBox *checkBox = new QCheckBox(ui.grbTags);
 		checkBox->setText(tag);

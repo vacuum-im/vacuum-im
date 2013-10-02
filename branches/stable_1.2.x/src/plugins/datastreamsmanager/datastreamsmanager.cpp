@@ -145,7 +145,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 			QList<QString> smethods;
 			int index = FDataForms->fieldIndex(DFV_STREAM_METHOD,form.fields);
 			if (index>=0)
-				foreach(IDataOption option, form.fields.at(index).options)
+				foreach(const IDataOption &option, form.fields.at(index).options)
 					if (FMethods.contains(option.value))
 						smethods.append(option.value);
 
@@ -293,7 +293,7 @@ QList<QUuid> DataStreamsManger::settingsProfiles() const
 {
 	QList<QUuid> sprofiles;
 	sprofiles.append(QUuid().toString());
-	foreach(QString sprofile, Options::node(OPV_DATASTREAMS_ROOT).childNSpaces("settings-profile"))
+	foreach(const QString &sprofile, Options::node(OPV_DATASTREAMS_ROOT).childNSpaces("settings-profile"))
 		if (!sprofiles.contains(sprofile))
 			sprofiles.append(sprofile);
 	return sprofiles;
@@ -344,7 +344,7 @@ bool DataStreamsManger::initStream(const Jid &AStreamJid, const Jid &AContactJid
 			IDataField field;
 			field.var = DFV_STREAM_METHOD;
 			field.type = DATAFIELD_TYPE_LISTSINGLE;
-			foreach(QString smethod, AMethods)
+			foreach(const QString &smethod, AMethods)
 			{
 				if (FMethods.contains(smethod))
 				{

@@ -101,7 +101,7 @@ IDataMedia DataForms::dataMedia(const QDomElement &AMediaElem) const
 			if (!uri.url.isEmpty())
 			{
 				QStringList params = uriElem.attribute("type").split(';',QString::SkipEmptyParts);
-				foreach(QString param, params)
+				foreach(const QString &param, params)
 				{
 					if (param.startsWith("codecs="))
 					{
@@ -328,7 +328,7 @@ void DataForms::xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) cons
 	if (AMedia.width>0)
 		mediaElem.setAttribute("width",AMedia.width);
 
-	foreach(IDataMediaURI uri, AMedia.uris)
+	foreach(const IDataMediaURI &uri, AMedia.uris)
 	{
 		if (!uri.url.isEmpty())
 		{
@@ -352,9 +352,8 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, const
 
 	if (AField.value.type()==QVariant::StringList && !AField.value.toStringList().isEmpty())
 	{
-		foreach(QString value, AField.value.toStringList()) {
+		foreach(const QString &value, AField.value.toStringList())
 			fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(value));
-		}
 	}
 	else if (AField.value.type() == QVariant::Bool)
 	{
@@ -382,7 +381,7 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, const
 		if (!AField.desc.isEmpty())
 			fieldElem.appendChild(doc.createElement("desc")).appendChild(doc.createTextNode(AField.desc));
 
-		foreach(IDataOption option, AField.options)
+		foreach(const IDataOption &option, AField.options)
 		{
 			QDomElement optionElem = fieldElem.appendChild(doc.createElement("option")).toElement();
 			if (!option.label.isEmpty())
@@ -400,10 +399,10 @@ void DataForms::xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const
 	QDomDocument doc = AFormElem.ownerDocument();
 	QDomElement reportElem = AFormElem.appendChild(doc.createElement("reported")).toElement();
 
-	foreach(IDataField column, ATable.columns) {
+	foreach(const IDataField &column, ATable.columns) {
 		xmlField(column,reportElem,DATAFORM_TYPE_TABLE); }
 
-	foreach(QStringList rowValues,ATable.rows)
+	foreach(const QStringList &rowValues,ATable.rows)
 	{
 		QDomElement itemElem = AFormElem.appendChild(doc.createElement("item")).toElement();
 		for (int col=0;col<rowValues.count();col++)
@@ -438,17 +437,17 @@ void DataForms::xmlForm(const IDataForm &AForm, QDomElement &AParentElem) const
 	if (!AForm.title.isEmpty())
 		formElem.appendChild(doc.createElement("title")).appendChild(doc.createTextNode(AForm.title));
 
-	foreach(QString instruction, AForm.instructions) {
-		formElem.appendChild(doc.createElement("instructions")).appendChild(doc.createTextNode(instruction)); }
+	foreach(const QString &instruction, AForm.instructions)
+		formElem.appendChild(doc.createElement("instructions")).appendChild(doc.createTextNode(instruction));
 
-	foreach(IDataLayout layout, AForm.pages) {
-		xmlPage(layout,AParentElem); }
+	foreach(const IDataLayout &layout, AForm.pages)
+		xmlPage(layout,AParentElem);
 
-	if (!AForm.tabel.columns.isEmpty()) {
-		xmlTable(AForm.tabel,formElem); }
+	if (!AForm.tabel.columns.isEmpty())
+		xmlTable(AForm.tabel,formElem);
 
-	foreach(IDataField field, AForm.fields) {
-		xmlField(field,formElem,AForm.type); }
+	foreach(const IDataField &field, AForm.fields)
+		xmlField(field,formElem,AForm.type);
 }
 
 bool DataForms::isDataValid(const IDataValidate &AValidate, const QString &AValue) const
@@ -581,7 +580,7 @@ bool DataForms::isOptionValid(const QList<IDataOption> &AOptions, const QString 
 
 bool DataForms::isMediaValid(const IDataMedia &AMedia) const
 {
-	foreach(IDataMediaURI uri, AMedia.uris)
+	foreach(const IDataMediaURI &uri, AMedia.uris)
 		if (!uri.type.isEmpty() && !uri.subtype.isEmpty() && !uri.url.isEmpty())
 			return true;
 	return false;
@@ -600,7 +599,7 @@ bool DataForms::isFieldValid(const IDataField &AField, const QString &AFormType)
 	{
 		static const QStringList boolValues = QStringList() << "0" << "false" << "1" << "true";
 		QString value = AField.value.toString();
-		valid = valid && boolValues.contains(AField.value.toString());
+		valid = valid && boolValues.contains(value);
 	}
 	else if (AField.type == DATAFIELD_TYPE_JIDSINGLE)
 	{
@@ -764,7 +763,7 @@ void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &AType
 {
 	if (ALocalizer!=NULL && ATypeField.isEmpty())
 	{
-		foreach (QString formType, FLocalizers.keys(ALocalizer))
+		foreach (const QString &formType, FLocalizers.keys(ALocalizer))
 			FLocalizers.remove(formType);
 	}
 	else if (FLocalizers.value(ATypeField)==ALocalizer)
@@ -789,7 +788,7 @@ IDataForm DataForms::dataSubmit(const IDataForm &AForm) const
 {
 	IDataForm form;
 	form.type = DATAFORM_TYPE_SUBMIT;
-	foreach(IDataField field, AForm.fields)
+	foreach(const IDataField &field, AForm.fields)
 	{
 		if (!field.var.isEmpty() && field.type!=DATAFIELD_TYPE_FIXED && !isFieldEmpty(field))
 		{
@@ -820,7 +819,7 @@ IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASu
 			sfield.label = ffield.label;
 			sfield.validate = ffield.validate;
 
-			foreach(IDataOption option, ffield.options)
+			foreach(const IDataOption &option, ffield.options)
 			{
 				if (sfield.value.type()==QVariant::StringList)
 				{
@@ -995,7 +994,7 @@ void DataForms::xmlLayout(const IDataLayout &ALayout, QDomElement &ALayoutElem) 
 	int textCounter = 0;
 	int fieldCounter = 0;
 	int sectionCounter = 0;
-	foreach(QString childName, ALayout.childOrder)
+	foreach(const QString &childName, ALayout.childOrder)
 	{
 		if (childName == DATALAYOUT_CHILD_TEXT)
 		{

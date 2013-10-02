@@ -49,7 +49,7 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			else if (showText == "xa")
 				show = ExtendedAway;
 			else
-				show = Online;    //Костыль под кривые клиенты и транспорты
+				show = Online;
 
 			status = AStanza.firstElement("status").text();
 			priority = AStanza.firstElement("priority").text().toInt();
@@ -106,7 +106,7 @@ QList<IPresenceItem> Presence::presenceItems(const Jid &AItemJid) const
 	if (!AItemJid.isEmpty())
 	{
 		QList<IPresenceItem> pitems;
-		foreach(IPresenceItem pitem, FItems)
+		foreach(const IPresenceItem &pitem, FItems)
 			if (AItemJid && pitem.itemJid)
 				pitems.append(pitem);
 		return pitems;
@@ -287,7 +287,7 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 void Presence::clearItems()
 {
 	QList<Jid> items = FItems.keys();
-	foreach(Jid itemJid, items)
+	foreach(const Jid &itemJid, items)
 	{
 		IPresenceItem &pitem = FItems[itemJid];
 		IPresenceItem before = pitem;

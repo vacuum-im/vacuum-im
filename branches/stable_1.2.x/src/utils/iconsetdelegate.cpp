@@ -12,8 +12,8 @@ IconsetDelegate::IconsetDelegate(QObject *AParent) : QItemDelegate(AParent)
 
 IconsetDelegate::~IconsetDelegate()
 {
-	foreach(QString name, FStorages.keys()) {
-		qDeleteAll(FStorages[name]); }
+	foreach(const QString &name, FStorages.keys())
+		qDeleteAll(FStorages[name]);
 }
 
 void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const

@@ -141,9 +141,9 @@ void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
 	}
 
 	QString cname, spath, nspace;
-	foreach(QString childName, ANode.childNames())
+	foreach(const QString &childName, ANode.childNames())
 	{
-		foreach (QString childNSpace, ANode.childNSpaces(childName))
+		foreach (const QString &childNSpace, ANode.childNSpaces(childName))
 		{
 			QDomElement childElem = findChildElement(AToElem,childName,childNSpace,cname,spath,nspace);
 			if (childElem.isNull())

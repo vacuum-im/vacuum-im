@@ -147,7 +147,7 @@ void EditListsDialog::apply()
 			FDefaultRequests.insert(requestId,newDefaultList);
 	}
 
-	foreach(QString listName, notValidLists)
+	foreach(const QString &listName, notValidLists)
 	{
 		IPrivacyList oldList = FPrivacyLists->privacyList(FStreamJid,listName);
 		if (oldList.name == listName)
@@ -157,7 +157,7 @@ void EditListsDialog::apply()
 	}
 
 	QList<IPrivacyList> oldLists = FPrivacyLists->privacyLists(FStreamJid);
-	foreach(IPrivacyList oldList, oldLists)
+	foreach(const IPrivacyList &oldList, oldLists)
 	{
 		if (!FLists.contains(oldList.name))
 		{
@@ -172,13 +172,13 @@ void EditListsDialog::apply()
 
 void EditListsDialog::reset()
 {
-	foreach(IPrivacyList list, FLists)
+	foreach(const IPrivacyList &list, FLists)
 	{
 		onListRemoved(FStreamJid,list.name);
 	}
 
 	QList<IPrivacyList> lists = FPrivacyLists->privacyLists(FStreamJid);
-	foreach(IPrivacyList list, lists)
+	foreach(const IPrivacyList &list, lists)
 	{
 		onListLoaded(FStreamJid,list.name);
 	}
@@ -526,7 +526,7 @@ void EditListsDialog::onRuleConditionTypeChanged(int AIndex)
 		if (type == PRIVACY_TYPE_JID)
 		{
 			QList<IRosterItem> ritems = FRoster!=NULL ? FRoster->rosterItems() : QList<IRosterItem>();
-			foreach(IRosterItem ritem, ritems)
+			foreach(const IRosterItem &ritem, ritems)
 			{
 				QString itemName = !ritem.name.isEmpty() ? ritem.name + " <"+ritem.itemJid.uFull()+">" : ritem.itemJid.uFull();
 				ui.cmbValue->addItem(itemName,ritem.itemJid.full());

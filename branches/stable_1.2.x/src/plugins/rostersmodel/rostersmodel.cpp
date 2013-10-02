@@ -185,8 +185,8 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 			if (roster)
 			{
 				IRosterItem empty;
-				foreach(IRosterItem ritem, roster->rosterItems()) {
-					onRosterItemReceived(roster,ritem,empty); }
+				foreach(const IRosterItem &ritem, roster->rosterItems())
+					onRosterItemReceived(roster,ritem,empty);
 			}
 		}
 	}
@@ -538,7 +538,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 
 			QString groupDelim = ARoster->groupDelimiter();
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(ARoster->streamJid()) : NULL;
-			foreach(QString group, itemGroups)
+			foreach(const QString &group, itemGroups)
 			{
 				IRosterIndex *groupIndex = createGroupIndex(groupType,group,groupDelim,streamIndex);
 
@@ -719,7 +719,7 @@ void RostersModel::onPresenceItemReceived(IPresence *APresence, const IPresenceI
 					itemGroups += QString::null;
 				}
 
-				foreach(QString group, itemGroups)
+				foreach(const QString &group, itemGroups)
 				{
 					IRosterIndex *groupIndex = NULL;
 					if (itemType == RIT_MY_RESOURCE)
@@ -848,11 +848,11 @@ void RostersModel::onIndexDestroyed(IRosterIndex *AIndex)
 
 void RostersModel::onDelayedDataChanged()
 {
-	//Р—Р°РјРµРЅР° СЃРёРіРЅР°Р»РѕРІ РёР·РјРµРЅРµРЅРёСЏ Р±РѕР»СЊС€РѕРіРѕ С‡РёСЃР»Р° РёРЅРґРµРєСЃРѕРІ РЅР° СЃР±СЂРѕСЃ РјРѕРґРµР»Рё
-	//РёР·-Р·Р° С‚РѕСЂРјРѕР·РѕРІ РІ СЃРѕСЂС‚РёСЂРѕРІРєРµ РІ QSortFilterProxyModel
+	//Замена сигналов изменения большого числа индексов на сброс модели
+	//из-за тормозов в сортировке в QSortFilterProxyModel
 	if (FChangedIndexes.count() < INDEX_CHANGES_FOR_RESET)
 	{
-		//Р’С‹Р·С‹РІР°РµС‚ dataChanged Сѓ РІСЃРµС… СЂРѕРґРёС‚РµР»РµР№ РґР»СЏ РїРѕРґРґРµСЂР¶РєРё SortFilterProxyModel
+		//Вызывает dataChanged у всех родителей для поддержки SortFilterProxyModel
 		QSet<IRosterIndex *> childIndexes = FChangedIndexes;
 		foreach(IRosterIndex *rindex, childIndexes)
 		{

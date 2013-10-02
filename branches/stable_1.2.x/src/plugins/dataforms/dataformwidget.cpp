@@ -45,7 +45,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 	else
 		FTableWidget = NULL;
 
-	foreach(IDataField field, FForm.fields)
+	foreach(const IDataField &field, FForm.fields)
 	{
 		IDataFieldWidget *fwidget = FDataForms->fieldWidget(field,!FForm.type.isEmpty() && FForm.type!=DATAFORM_TYPE_FORM,this);
 		fwidget->instance()->setVisible(false);
@@ -57,7 +57,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 	setLayout(new QVBoxLayout(this));
 	layout()->setMargin(0);
 
-	foreach(QString text, FForm.instructions)
+	foreach(const QString &text, FForm.instructions)
 	{
 		QLabel *label = new QLabel(this);
 		label->setWordWrap(true);
@@ -108,7 +108,7 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 		QTabWidget *tabs = new QTabWidget(this);
 		layout()->addWidget(tabs);
 
-		foreach(IDataLayout page, FForm.pages)
+		foreach(const IDataLayout &page, FForm.pages)
 		{
 			ScrollArea *scroll = new ScrollArea(tabs);
 			scroll->setWidgetResizable(true);
@@ -137,7 +137,7 @@ bool DataFormWidget::checkForm(bool AAllowInvalid) const
 		QString message;
 		int invalidCount = 0;
 		QList<IDataField> fields = userDataForm().fields;
-		foreach(IDataField field, fields)
+		foreach(const IDataField &field, fields)
 		{
 			if (!field.var.isEmpty() && !FDataForms->isFieldValid(field,DATAFORM_TYPE_SUBMIT))
 			{
@@ -201,7 +201,7 @@ bool DataFormWidget::insertLayout(const IDataLayout &ALayout, QWidget *AWidget)
 	int textCounter = 0;
 	int fieldCounter = 0;
 	int sectionCounter = 0;
-	foreach(QString childName, ALayout.childOrder)
+	foreach(const QString &childName, ALayout.childOrder)
 	{
 		if (childName == "text")
 		{

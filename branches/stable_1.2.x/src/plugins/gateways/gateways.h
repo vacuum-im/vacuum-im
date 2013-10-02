@@ -101,7 +101,7 @@ protected slots:
 	void onVCardReceived(const Jid &AContactJid);
 	void onVCardError(const Jid &AContactJid, const QString &AError);
 	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
-	void onDiscoItemContextMenu(const QModelIndex AIndex, Menu *AMenu);
+	void onDiscoItemContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 	void onRegisterFields(const QString &AId, const IRegisterFields &AFields);
 	void onRegisterError(const QString &AId, const QString &AError);
 private:
