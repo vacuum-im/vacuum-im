@@ -71,6 +71,7 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
 bool MessageStyles::initSettings()
 {
 	Options::setDefaultValue(OPV_MESSAGES_SHOWDATESEPARATORS,true);
+	Options::setDefaultValue(OPV_MESSAGES_MAXMESSAGESINWINDOW,500);
 
 	if (FOptionsManager)
 	{

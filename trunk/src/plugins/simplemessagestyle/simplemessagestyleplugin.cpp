@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QCoreApplication>
+#include <utils/filestorage.h>
 
 SimpleMessageStylePlugin::SimpleMessageStylePlugin(): FNetworkAccessManager(NULL)
 {
