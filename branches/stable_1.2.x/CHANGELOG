@@ -8,10 +8,25 @@ LEGEND
 
 v1.2.3
 ------
-  [*] Improved recognition of links in the text
+  [+] Added twitter status icons
+  [*] Added the periodic vCard updating
+  [*] Conference name is added to the title of conference settings window
+  [*] Improved the recognition of links in the text
+  [*] Limited the maximum number of recognizable smiles in the message
+  [*] Limited the maximum number of messages (500 messages) in the chat window for simple message styles
+  [*] Limited the maximum number of visible chars in the name of the tab in message tab window
   [-] The application will fail if the server terminates the connection before the user enters the password
   [-] Removing of avatars in several selected accounts or contacts was not working
   [-] The application may fail on removing from history active conversation
+  [-] Corrected URL copying from Chrome in to the message entry field
+  [-] Added correct support of CDATA in XML stream parser
+  [-] Fixed admission of letters in contacts search line at a fast typing
+  [-] The notice of a mention in conferences didn't work if the nickname ends not with a letter and not with digit
+  [-] Some offline messages may not be stored in the history
+  [-] Fixed endless request of privacy list rules if server returns list without rules
+  [-] The application was not completed correctly when current session in OS is closing
+  [-] Messages load from history could follow in the chat window in the wrong order when they received within one second
+  [-] Restrictions on the maximum size of the file in file archive didn't work
 
 
 v1.2.2
