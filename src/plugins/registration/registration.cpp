@@ -73,10 +73,6 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &/*AInitO
 
 bool Registration::initObjects()
 {
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_INVALID_FORM,tr("Invalid registration form"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_INVALID_DIALOG,tr("Invalid registration dialog"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_REGISTER_REJECTED_BY_USER,tr("Registration rejected by user"));
-
 	if (FXmppStreams)
 	{
 		FXmppStreams->registerXmppFeature(XFO_REGISTER,NS_FEATURE_REGISTER);
@@ -168,7 +164,7 @@ void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			emit registerError(AStanza.id(),XmppStanzaError(AStanza));
+			emit registerError(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 		}
 		FSendRequests.removeAll(AStanza.id());
 		FSubmitRequests.removeAll(AStanza.id());

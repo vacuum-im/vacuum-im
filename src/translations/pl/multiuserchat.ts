@@ -170,6 +170,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Zaproś</translation>
     </message>
     <message>
+        <source>%1 as %2</source>
+        <translation>%1 jako %2</translation>
+    </message>
+    <message>
         <source>Hidden room</source>
         <translation>Ukryty pokój</translation>
     </message>
@@ -280,6 +284,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     <message>
         <source>Enter a reason</source>
         <translation>Podaj powód</translation>
+    </message>
+    <message>
+        <source>You are welcome here</source>
+        <translation>Witamy Cię tutaj</translation>
     </message>
     <message>
         <source>Invite user</source>
@@ -560,6 +568,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Po otrzymaniu nowej wiadomości w konferencji</translation>
     </message>
     <message>
+        <source>Select the user to refer in the Bash style</source>
+        <translation>Wybierz użytkownika dla dostępu w stylu Bash</translation>
+    </message>
+    <message>
         <source>Add this suffix when referring to the user:</source>
         <translation>Dodaj przyrostek, odnosząc się do użytkownika:</translation>
     </message>
@@ -568,36 +580,8 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Opuszczaj konferencje przy zamknięciu okna</translation>
     </message>
     <message>
-        <source>Enter conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rejoin in conference after kick</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the user to refer without menu</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Conference Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please, enter this conference!</source>
-        <translation type="unfinished"></translation>
+        <source>Rejoin in chat room after kick</source>
+        <translation>Automatycznie wracaj do konferencji po wyrzuceniu</translation>
     </message>
 </context>
 <context>
@@ -631,8 +615,56 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Otrzymano formularz od: %1</translation>
     </message>
     <message>
+        <source>Change room nick</source>
+        <translation>Zmień nick</translation>
+    </message>
+    <message>
         <source>Change topic</source>
         <translation>Zmień temat</translation>
+    </message>
+    <message>
+        <source>Clear chat window</source>
+        <translation>Wyczyść okno rozmowy</translation>
+    </message>
+    <message>
+        <source>Invite to this room</source>
+        <translation>Zaproś do tego pokoju</translation>
+    </message>
+    <message>
+        <source>Request voice</source>
+        <translation>Poproś o głos</translation>
+    </message>
+    <message>
+        <source>Edit ban list</source>
+        <translation>Edytuj listę banitów</translation>
+    </message>
+    <message>
+        <source>Edit members list</source>
+        <translation>Edytuj listę uczestników</translation>
+    </message>
+    <message>
+        <source>Edit administrators list</source>
+        <translation>Edytuj listę administratorów</translation>
+    </message>
+    <message>
+        <source>Edit owners list</source>
+        <translation>Edytuj listę właścicieli</translation>
+    </message>
+    <message>
+        <source>Configure room</source>
+        <translation>Konfiguruj pokój</translation>
+    </message>
+    <message>
+        <source>Destroy room</source>
+        <translation>Zniszcz pokój</translation>
+    </message>
+    <message>
+        <source>Kick user</source>
+        <translation>Wyrzuć</translation>
+    </message>
+    <message>
+        <source>Ban user</source>
+        <translation>Skaż na banicję</translation>
     </message>
     <message>
         <source>Change Role</source>
@@ -653,6 +685,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     <message>
         <source>Change Affiliation</source>
         <translation>Zmień członkostwo</translation>
+    </message>
+    <message>
+        <source>Any occupant is allowed to see the user&apos;s full JID</source>
+        <translation>Każdy może widzieć pełny JID uczestników</translation>
     </message>
     <message>
         <source>%1 affiliation changed while not in the room</source>
@@ -709,6 +745,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     <message>
         <source>%1 is not valid room JID</source>
         <translation>%1 nieprawidłowy JID pokoju</translation>
+    </message>
+    <message>
+        <source>Disconnected</source>
+        <translation>Rozłączony</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -787,6 +827,18 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Zmień nick</translation>
     </message>
     <message>
+        <source>Enter your new nick name in room %1</source>
+        <translation>Wprowadź swój nowy nick w tym pokoju %1</translation>
+    </message>
+    <message>
+        <source>Change subject</source>
+        <translation>Zmień temat</translation>
+    </message>
+    <message>
+        <source>Enter new subject for room %1</source>
+        <translation>Wprowadź nowy temat dla pokoju %1</translation>
+    </message>
+    <message>
         <source>Invite user</source>
         <translation>Zaproś użytkownika</translation>
     </message>
@@ -795,8 +847,16 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>Wprowadź JID użytkownika:</translation>
     </message>
     <message>
+        <source>You are welcome here</source>
+        <translation>Witamy Cię tutaj</translation>
+    </message>
+    <message>
         <source>Enter a reason:</source>
         <translation>Podaj powód:</translation>
+    </message>
+    <message>
+        <source>Destroying room</source>
+        <translation>Niszczenie pokoju</translation>
     </message>
     <message>
         <source>Kick reason</source>
@@ -817,6 +877,10 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
     <message>
         <source>%1 - Conference</source>
         <translation>%1 - Konferencja</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>Narzędzia</translation>
     </message>
     <message>
         <source>None</source>
@@ -863,6 +927,26 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>%1 zmienił status na [%2] %3</translation>
     </message>
     <message>
+        <source>Role: %1</source>
+        <translation>Rola: %1</translation>
+    </message>
+    <message>
+        <source>Affiliation: %1</source>
+        <translation>Członkostwo: %1</translation>
+    </message>
+    <message>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <source>Enter room</source>
+        <translation>Wejdź do pokoju</translation>
+    </message>
+    <message>
+        <source>Exit room</source>
+        <translation>Opuść pokój</translation>
+    </message>
+    <message>
         <source>Mention message in conference: %1</source>
         <translation>Wiadomość z uwagą na twój temat na konferencji: %1</translation>
     </message>
@@ -887,132 +971,20 @@ Sprawdź wartości i spróbuj jeszcze raz</translation>
         <translation>%1 opuścił pokój</translation>
     </message>
     <message>
+        <source>Quote selected text</source>
+        <translation>Cytuj zaznaczony tekst</translation>
+    </message>
+    <message>
+        <source>Open chat dialog</source>
+        <translation>Otwórz czat dialogu</translation>
+    </message>
+    <message>
         <source>Loading history...</source>
         <translation>Ładowanie historii...</translation>
     </message>
     <message>
         <source>Failed to load history: %1</source>
         <translation>Nie udało się załadować historii: %1</translation>
-    </message>
-    <message>
-        <source>Enter</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Chat Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Kick User</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ban User</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Nick</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Topic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invite to Conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Request Voice</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Clear Conference Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Ban List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Members List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Administrators List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Edit Owners List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Configure Conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Destroy Conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Exit conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Clear Chat Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter your new nick name in conference %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter new topic for conference %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please, enter this conference!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Destroying conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This room is non-anonymous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You entered into the room</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You left the room</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

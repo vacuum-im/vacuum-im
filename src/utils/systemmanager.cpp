@@ -4,55 +4,47 @@
 struct SystemManager::SystemManagerData
 {
 	SystemManagerData() {
-		idle = new Idle;
+		idle = NULL;
 		idleSeconds = 0;
-	}
-	~SystemManagerData() {
-		delete idle;
 	}
 	Idle *idle;
 	int idleSeconds;
 };
 
-SystemManager::SystemManager()
-{
-	d = new SystemManagerData;
-	connect(d->idle,SIGNAL(secondsIdle(int)),SLOT(onIdleChanged(int)));
-}
-
-SystemManager::~SystemManager()
-{
-	delete d;
-}
+SystemManager::SystemManagerData *SystemManager::d = new SystemManager::SystemManagerData;
 
 SystemManager *SystemManager::instance()
 {
-	static SystemManager *inst = new SystemManager;
-	return inst;
+	static SystemManager *manager = NULL;
+	if (!manager)
+	{
+		manager = new SystemManager;
+		manager->d->idle = new Idle;
+		connect(manager->d->idle,SIGNAL(secondsIdle(int)),manager,SLOT(onIdleChanged(int)));
+	}
+	return manager;
 }
 
 int SystemManager::systemIdle()
 {
-	return instance()->d->idleSeconds;
+	return d->idleSeconds;
 }
 
 bool SystemManager::isSystemIdleActive()
 {
-	return instance()->d->idle->isActive();
+	return d->idle!=NULL ? d->idle->isActive() : false;
 }
 
 void SystemManager::startSystemIdle()
 {
-	SystemManagerData *q = instance()->d;
-	if (!q->idle->isActive())
-		q->idle->start();
+	if (d->idle && !d->idle->isActive())
+		d->idle->start();
 }
 
 void SystemManager::stopSystemIdle()
 {
-	SystemManagerData *q = instance()->d;
-	if (q->idle->isActive())
-		q->idle->stop();
+	if (d->idle && d->idle->isActive())
+		d->idle->stop();
 }
 
 void SystemManager::onIdleChanged(int ASeconds)

@@ -6,15 +6,13 @@ find_package(Qt4 REQUIRED)
 
 add_custom_target(updatets)
 
-include("src/make/config.cmake")
-include("src/translations/languages.cmake")
-include_directories("${CMAKE_SOURCE_DIR}/src")
+include("config.cmake")
 
 install(DIRECTORY "resources/menuicons"
 	DESTINATION "${INSTALL_RESOURCES}"
 	PATTERN ".svn" EXCLUDE)
 
-include("src/packages/package.cmake")
+include("package.cmake")
 
 set(INSTALL_SDK YES CACHE BOOL "Install files needed to build custom plugins")
 set(INSTALL_DOCS YES CACHE BOOL "Install documentation (currently it's only AUTHORS, CHANGELOG, README and COPYING)")
@@ -49,6 +47,7 @@ if (SYSTEM_QTLOCKEDFILE_FOUND)
 	add_definitions(-DUSE_SYSTEM_QTLOCKEDFILE)
 endif (SYSTEM_QTLOCKEDFILE_FOUND)
 
+
 if ("${LANGS}" STREQUAL "")
 	process_lang_options()
 else ("${LANGS}" STREQUAL "")
@@ -81,10 +80,10 @@ if (WIN32)
 		set(QT_LIBS ${QT_LIBS} "${QT_LIBRARY_DIR}/../bin/QtXmlPatterns4.dll")
 	endif (NOT WEBKIT_WITHOUT_XMLPATTERNS)
 	install(FILES ${QT_LIBS}
-		DESTINATION "${INSTALL_LIBS}"
+		DESTINATION "."
 		COMPONENT qt_libs)
 	install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats"
-		DESTINATION "${INSTALL_LIBS}"
+		DESTINATION "."
 		COMPONENT qt_libs
 		FILES_MATCHING
 		PATTERN "*.dll"
@@ -105,17 +104,17 @@ if (WIN32)
 			DEPENDS qt_libs)
 	endforeach(LANG)
 
-#	install(FILES "libeay32.dll" "ssleay32.dll"
-#		DESTINATION "${INSTALL_LIBS}"
-#		COMPONENT openssl_libs)
-#	cpack_add_component(openssl_libs
-#		DISPLAY_NAME "OpenSSL libraries"
-#		DESCRIPTION "May be unchecked if you already have OpenSSL installed"
-#		GROUP libs)
+	install(FILES "libeay32.dll" "ssleay32.dll"
+		DESTINATION "."
+		COMPONENT openssl_libs)
+	cpack_add_component(openssl_libs
+		DISPLAY_NAME "OpenSSL libraries"
+		DESCRIPTION "May be unchecked if you already have OpenSSL installed"
+		GROUP libs)
 
 	if (MINGW)
 		install(FILES "mingwm10.dll" "libgcc_s_dw2-1.dll"
-			DESTINATION "${INSTALL_LIBS}"
+			DESTINATION "."
 			COMPONENT mingw_runtime)
 		cpack_add_component(mingw_runtime
 			DISPLAY_NAME "MinGW runtime libraries"
@@ -126,7 +125,7 @@ if (WIN32)
 		file(GLOB MSVC_DLLS "msvc*.dll")
 		file(GLOB MANIFEST "Microsoft.VC*.CRT.manifest")
 		install(FILES ${MSVC_DLLS} ${MANIFEST}
-			DESTINATION "${INSTALL_LIBS}"
+			DESTINATION "."
 			COMPONENT msvc_runtime)
 		cpack_add_component(msvc_runtime
 			DISPLAY_NAME "MSVC runtime libraries"

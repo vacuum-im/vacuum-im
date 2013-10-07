@@ -63,8 +63,8 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onChatWindowCreated(IMessageChatWindow *)));
-			connect(FMessageWidgets->instance(),SIGNAL(chatWindowDestroyed(IMessageChatWindow *)),SLOT(onChatWindowDestroyed(IMessageChatWindow *)));
+			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
+			connect(FMessageWidgets->instance(),SIGNAL(chatWindowDestroyed(IChatWindow *)),SLOT(onChatWindowDestroyed(IChatWindow *)));
 		}
 	}
 
@@ -341,7 +341,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		Jid contactJid = AStanza.to();
 		if (isSupported(AStreamJid,contactJid))
 		{
-			IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid,true) : NULL;
+			IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid) : NULL;
 			if (window)
 			{
 				stateSent = true;
@@ -559,7 +559,7 @@ void ChatStates::notifyUserState(const Jid &AStreamJid, const Jid &AContactJid)
 		ChatParams &params = FChatParams[AStreamJid][AContactJid];
 		if (params.userState==IChatStates::StateComposing && params.notifyId<=0)
 		{
-			IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
+			IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
 			if (window)
 			{
 				INotification notify;
@@ -672,7 +672,7 @@ void ChatStates::onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const
 	}
 }
 
-void ChatStates::onChatWindowCreated(IMessageChatWindow *AWindow)
+void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 {
 	StateWidget *widget = new StateWidget(this,AWindow,AWindow->toolBarWidget()->toolBarChanger()->toolBar());
 	AWindow->toolBarWidget()->toolBarChanger()->insertWidget(widget,TBG_MWTBW_CHATSTATES);
@@ -687,7 +687,7 @@ void ChatStates::onChatWindowCreated(IMessageChatWindow *AWindow)
 
 void ChatStates::onChatWindowActivated()
 {
-	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
+	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
 	if (window)
 	{
 		int state = selfChatState(window->streamJid(),window->contactJid());
@@ -699,7 +699,7 @@ void ChatStates::onChatWindowActivated()
 void ChatStates::onChatWindowTextChanged()
 {
 	QTextEdit *editor = qobject_cast<QTextEdit *>(sender());
-	IMessageChatWindow *window = FChatByEditor.value(editor,NULL);
+	IChatWindow *window = FChatByEditor.value(editor,NULL);
 	if (editor && window)
 	{
 		if (!editor->document()->isEmpty())
@@ -711,7 +711,7 @@ void ChatStates::onChatWindowTextChanged()
 
 void ChatStates::onChatWindowClosed()
 {
-	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
+	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
 	if (window)
 	{
 		int state = selfChatState(window->streamJid(),window->contactJid());
@@ -720,7 +720,7 @@ void ChatStates::onChatWindowClosed()
 	}
 }
 
-void ChatStates::onChatWindowDestroyed(IMessageChatWindow *AWindow)
+void ChatStates::onChatWindowDestroyed(IChatWindow *AWindow)
 {
 	setSelfState(AWindow->streamJid(),AWindow->contactJid(),IChatStates::StateGone);
 	FChatByEditor.remove(AWindow->editWidget()->textEdit());
@@ -728,8 +728,8 @@ void ChatStates::onChatWindowDestroyed(IMessageChatWindow *AWindow)
 
 void ChatStates::onUpdateSelfStates()
 {
-	QList<IMessageChatWindow *> windows = FMessageWidgets!=NULL ? FMessageWidgets->chatWindows() : QList<IMessageChatWindow *>();
-	foreach (IMessageChatWindow *window, windows)
+	QList<IChatWindow *> windows = FMessageWidgets!=NULL ? FMessageWidgets->chatWindows() : QList<IChatWindow *>();
+	foreach (IChatWindow *window, windows)
 	{
 		if (FChatParams.value(window->streamJid()).contains(window->contactJid()))
 		{

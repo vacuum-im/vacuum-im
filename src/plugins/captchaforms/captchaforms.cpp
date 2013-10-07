@@ -135,7 +135,7 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		if (AStanza.type() == "result")
 			emit challengeAccepted(cid);
 		else
-			emit challengeRejected(cid, XmppStanzaError(AStanza));
+			emit challengeRejected(cid, XmppStanzaError(AStanza).errorMessage());
 	}
 }
 

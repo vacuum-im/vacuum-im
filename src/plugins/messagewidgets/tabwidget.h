@@ -1,5 +1,5 @@
-#ifndef MAINTABWIDGET_H
-#define MAINTABWIDGET_H
+#ifndef TABWIDGET_H
+#define TABWIDGET_H
 
 #include <QTabWidget>
 
@@ -10,8 +10,6 @@ class TabWidget :
 public:
 	TabWidget(QWidget *AParent = NULL);
 	~TabWidget();
-	bool isTabBarVisible() const;
-	void setTabBarVisible(bool AVisible);
 signals:
 	void tabMoved(int AFrom, int ATo);
 	void tabMenuRequested(int AIndex);
@@ -21,7 +19,6 @@ protected:
 protected slots:
 	void onTabBarContextMenuRequested(const QPoint &APos);
 private:
-	bool FTabBarVisible;
 	int FPressedTabIndex;
 };
 

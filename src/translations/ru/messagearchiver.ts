@@ -269,10 +269,6 @@
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
-    <message>
-        <source>Duplicate messages in local archive (not recommended)</source>
-        <translation>Дублировать сообщения в локальном архиве (не рекомендуется)</translation>
-    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>
@@ -426,16 +422,20 @@
         <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation>dd MMM yyyy</translation>
     </message>
-    <message>
-        <source>Search in text</source>
-        <translation>Поиск по тексту</translation>
-    </message>
 </context>
 <context>
     <name>ArchiveViewWindowClass</name>
     <message>
+        <source>Search</source>
+        <translation>Поиск</translation>
+    </message>
+    <message>
         <source>Update</source>
         <translation>Обновить</translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation>Поиск:</translation>
     </message>
     <message>
         <source>Next</source>
@@ -650,22 +650,6 @@
     <message>
         <source>Save Only Messages Text</source>
         <translation>Сохранять только текст сообщений</translation>
-    </message>
-    <message>
-        <source>Failed to load conversation headers</source>
-        <translation>Не удалось загрузить заголовки разговоров</translation>
-    </message>
-    <message>
-        <source>Failed to save conversation</source>
-        <translation>Не удалось сохранить разговор</translation>
-    </message>
-    <message>
-        <source>Failed to remove conversation</source>
-        <translation>Не удалось удалить разговор</translation>
-    </message>
-    <message>
-        <source>Failed to load archive modifications</source>
-        <translation>Не удалось загрузить список изменений в архиве</translation>
     </message>
 </context>
 </TS>

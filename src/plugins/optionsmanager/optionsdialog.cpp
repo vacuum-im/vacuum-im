@@ -46,7 +46,8 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	FProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 
 	ui.trvNodes->setModel(FProxyModel);
-	connect(ui.trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
+	connect(ui.trvNodes->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
+	        SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
 
 	ui.dbbButtons->button(QDialogButtonBox::Apply)->setEnabled(false);
 	ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);

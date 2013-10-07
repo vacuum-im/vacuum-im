@@ -76,17 +76,18 @@
 #define OPV_FILETRANSFER_REMOVEONFINISH                 "filestreams.filetransfer.remove-stream-on-finish"
 
 // MainWindow
-#define OPV_MAINWINDOW_SHOWONSTART                      "mainwindow.show-on-start"
+#define OPV_MAINWINDOW_SHOW                             "mainwindow.show"
+#define OPV_MAINWINDOW_ALIGN                            "mainwindow.align"
 
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status"
 #define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
+#define OPV_MESSAGES_SHOWINFOWIDGET                     "messages.show-info-widget"
+#define OPV_MESSAGES_INFOWIDGETMAXSTATUSCHARS           "messages.info-widget-max-status-chars"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
 #define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
-#define OPV_MESSAGES_COMBINEWITHROSTER                  "messages.combine-with-roster"
-#define OPV_MESSAGES_SHOWTABSINCOMBINEDMODE             "messages.show-tabs-in-combined-mode"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
 #define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
@@ -108,9 +109,6 @@
 // MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
 #define OPV_MESSAGES_MAXMESSAGESINWINDOW                "messages.max-messages-in-window"
-// SpellChecker
-#define OPV_MESSAGES_SPELL_LANG                         "messages.spell.lang"
-#define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"
 
 // MultiUserChat
 #define OPV_MUC_GROUPCHAT_SHOWENTERS                    "muc.groupchat.show-enters"
@@ -128,13 +126,10 @@
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
 #define OPV_HISTORY_CAPABILITY_ITEM                     "history.capability"
 #define OPV_HISTORY_CAPABILITY_DEFAULT                  "history.capability.default"
-#define OPV_HISTORY_STREAM_ITEM                         "history.stream"
-#define OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING         "history.stream.force-direct-archiving"
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
 
 // FileMessageArchive
 #define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
-#define OPV_FILEARCHIVE_FORCEDATABASESYNC               "filearchive.force-database-sync"
 #define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "filearchive.collection.min-size"
 #define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
 #define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "filearchive.collection.critical-size"
@@ -160,6 +155,8 @@
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
 #define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
+// UrlProcessor
+#define OPV_MISC_URLPROXY                               "misc.url-proxy"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
@@ -186,32 +183,21 @@
 #define OPV_ROSTER_ROOT                                 "roster"
 #define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
 #define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
+#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
 #define OPV_ROSTER_SORTBYSTATUS                         "roster.sort-by-status"
-#define OPV_ROSTER_HIDESCROLLBAR                        "roster.always-hide-scrollbar"
-#define OPV_ROSTER_MERGESTREAMS                         "roster.merge-streams"
-#define OPV_ROSTER_SHOWMERGEDSTREAMS                    "roster.show-merged-streams"
+#define OPV_ROSTER_HIDE_SCROLLBAR                       "roster.always-hide-scrollbar"
 // RosterChanger
 #define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
 #define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"
 // Avatars
-#define OPV_ROSTER_AVATARS_SHOW                         "roster.avatars.show"
-#define OPV_ROSTER_AVATARS_SHOWEMPTY                    "roster.avatars.show-empty"
-#define OPV_ROSTER_AVATARS_SHOWGRAY                     "roster.avatars.show-gray"
+#define OPV_AVATARS_SHOW                                "roster.avatars.show"
+#define OPV_AVATARS_SHOWEMPTY                           "roster.avatars.show-empty"
+#define OPV_AVATARS_CUSTOM_ITEM                         "roster.avatars.custom"
 // RosterSearch
 #define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
 // RosterItemExchange
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
-//StatusChanger
-#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
-//RecentContact
-#define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
-#define OPV_ROSTER_RECENT_HIDEINACTIVEITEMS             "roster.recent.hide-inactive-items"
-#define OPV_ROSTER_RECENT_SIMPLEITEMSVIEW               "roster.recent.simple-items-view"
-#define OPV_ROSTER_RECENT_SORTBYACTIVETIME              "roster.recent.sort-by-active-time"
-#define OPV_ROSTER_RECENT_SHOWONLYFAVORITE              "roster.recent.show-only-favorite"
-#define OPV_ROSTER_RECENT_MAXVISIBLEITEMS               "roster.recent.max-visible-items"
-#define OPV_ROSTER_RECENT_INACTIVEDAYSTIMEOUT           "roster.recent.inactive-days-timeout"
 
 // ShortcutManager
 #define OPV_SHORTCUTS                                   "shortcuts"
@@ -232,7 +218,6 @@
 #define OPV_AUTOSTARTUS_RULE_TIME                       "statuses.autostatus.rule.time"
 #define OPV_AUTOSTARTUS_RULE_SHOW                       "statuses.autostatus.rule.show"
 #define OPV_AUTOSTARTUS_RULE_TEXT                       "statuses.autostatus.rule.text"
-#define OPV_AUTOSTARTUS_RULE_PRIORITY                   "statuses.autostatus.rule.priority"
 
 // StatusIcons
 #define OPV_STATUSICONS                                 "statusicons"
@@ -241,9 +226,6 @@
 #define OPV_STATUSICONS_RULE_ITEM                       "statusicons.rules.rule"
 #define OPV_STATUSICONS_RULE_PATTERN                    "statusicons.rules.rule.pattern"
 #define OPV_STATUSICONS_RULE_ICONSET                    "statusicons.rules.rule.iconset"
-
-// Statistics
-#define OPV_STATISTICS_PROFILEID                        "statistics.profile-id"
 
 // XmppStreams
 #define OPV_XMPPSTREAMS_TIMEOUT_HANDSHAKE               "xmppstreams.timeout.handshake"

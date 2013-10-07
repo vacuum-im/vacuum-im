@@ -4,16 +4,16 @@
 <context>
     <name>ConsolePlugin</name>
     <message>
-        <source>XML Console</source>
-        <translation>XML Console</translation>
-    </message>
-    <message>
         <source>Console</source>
         <translation>Console</translation>
     </message>
     <message>
         <source>Allows to view XML stream between the client and server</source>
         <translation>Allows to view XML stream between the client and server</translation>
+    </message>
+    <message>
+        <source>XML Console</source>
+        <translation>XML Console</translation>
     </message>
     <message>
         <source>Default Context</source>
@@ -35,6 +35,10 @@
         <translation>Start sending user stanza...</translation>
     </message>
     <message>
+        <source>User stanza sent.</source>
+        <translation>User stanza sent.</translation>
+    </message>
+    <message>
         <source>Stanza is not well formed.</source>
         <translation>Stanza is not well formed.</translation>
     </message>
@@ -49,14 +53,6 @@
     <message>
         <source>Enter context name</source>
         <translation>Enter context name</translation>
-    </message>
-    <message>
-        <source>User stanza sent.</source>
-        <translation>User stanza sent.</translation>
-    </message>
-    <message>
-        <source>Search</source>
-        <translation>Search</translation>
     </message>
 </context>
 <context>
@@ -102,12 +98,12 @@
         <translation>Word wrap</translation>
     </message>
     <message>
-        <source>Send</source>
-        <translation>Send</translation>
-    </message>
-    <message>
         <source>Highlight XML</source>
         <translation>Highlight XML</translation>
+    </message>
+    <message>
+        <source>Send</source>
+        <translation>Send</translation>
     </message>
 </context>
 </TS>

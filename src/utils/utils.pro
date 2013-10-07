@@ -1,8 +1,9 @@
-include(../make/config.inc)
+include(../config.inc)
+include(../install.inc)
 
-TARGET             = $$VACUUM_UTILS_NAME
+TARGET             = $$TARGET_UTILS
 TEMPLATE           = lib
-VERSION            = $$VACUUM_UTILS_ABI
+VERSION            = $$VERSION_UTILS
 CONFIG            += dll
 QT                += xml network
 DEFINES           += UTILS_DLL QXT_STATIC
@@ -34,12 +35,7 @@ include(utils.pri)
   target.path      = $$INSTALL_LIBS
   INSTALLS        += target
 
-  sdk_utils.path   = $$INSTALL_INCLUDES/utils
-  sdk_utils.files  = *.h
-  INSTALLS        += sdk_utils
-
   #Translation
-  TRANS_BUILD_ROOT   = $${OUT_PWD}/../..
   TRANS_SOURCE_ROOT  = ..
-  include(../translations/languages.inc)
+  include(../translations.inc)
 }

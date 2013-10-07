@@ -53,7 +53,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 					}
 					else
 					{
-						emit error(XmppError(IERR_REGISTER_INVALID_FORM));
+						emit error(tr("Invalid registration form"));
 					}
 				}
 				else
@@ -72,7 +72,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 			}
 			else if (AStanza.type() == "error")
 			{
-				emit error(XmppStanzaError(AStanza));
+				emit error(XmppStanzaError(AStanza).errorMessage());
 			}
 			return true;
 		}
@@ -86,7 +86,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 			}
 			else if (AStanza.type() == "error")
 			{
-				emit error(XmppStanzaError(AStanza));
+				emit error(XmppStanzaError(AStanza).errorMessage());
 			}
 			return true;
 		}
@@ -100,16 +100,6 @@ bool RegisterStream::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, in
 	Q_UNUSED(AStanza);
 	Q_UNUSED(AOrder);
 	return false;
-}
-
-QString RegisterStream::featureNS() const
-{
-	return NS_FEATURE_REGISTER;
-}
-
-IXmppStream *RegisterStream::xmppStream() const
-{
-	return FXmppStream;
 }
 
 bool RegisterStream::start(const QDomElement &AElem)
@@ -127,7 +117,7 @@ bool RegisterStream::start(const QDomElement &AElem)
 		}
 		else
 		{
-			emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
+			emit error(tr("Secure connection is not established"));
 		}
 	}
 	deleteLater();
@@ -156,7 +146,7 @@ void RegisterStream::onRegisterDialogAccepred()
 	}
 	else
 	{
-		emit error(XmppError(IERR_REGISTER_INVALID_DIALOG));
+		emit error(tr("Invalid registration dialog"));
 	}
 	FDialog = NULL;
 }
@@ -164,6 +154,6 @@ void RegisterStream::onRegisterDialogAccepred()
 void RegisterStream::onRegisterDialogRejected()
 {
 	FXmppStream->setKeepAliveTimerActive(true);
-	emit error(XmppError(IERR_REGISTER_REJECTED_BY_USER));
+	emit error(tr("Registration rejected by user"));
 	FDialog = NULL;
 }

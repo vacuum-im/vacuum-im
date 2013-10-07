@@ -70,9 +70,6 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &/*AInitO
 
 bool BitsOfBinary::initObjects()
 {
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_BOB_INVALID_RESPONCE,tr("Invalid response"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_BOB_INVALID_CACHED_DATA,tr("Failed to read cached data"));
-
 	FDataDir.setPath(FPluginManager->homePath());
 	if (!FDataDir.exists(DIR_DATA))
 		FDataDir.mkdir(DIR_DATA);
@@ -103,7 +100,7 @@ bool BitsOfBinary::initObjects()
 
 bool BitsOfBinary::initSettings()
 {
-	foreach(QFileInfo fileInfo, FDataDir.entryInfoList(QDir::Files))
+	foreach(const QFileInfo &fileInfo, FDataDir.entryInfoList(QDir::Files))
 	{
 		QFile file(fileInfo.absoluteFilePath());
 		if (file.open(QFile::ReadOnly))
@@ -209,11 +206,11 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			QByteArray data = QByteArray::fromBase64(dataElem.text().toLatin1());
 			quint64 maxAge = dataElem.attribute("max-age").toLongLong();
 			if (cid!=dataElem.attribute("cid") || !saveBinary(cid,type,data,maxAge))
-				emit binaryError(cid,XmppError(IERR_BOB_INVALID_RESPONCE));
+				emit binaryError(cid,tr("Invalid response"));
 		}
 		else
 		{
-			emit binaryError(cid,XmppStanzaError(AStanza));
+			emit binaryError(cid,XmppStanzaError(AStanza).errorMessage());
 		}
 	}
 }
@@ -351,7 +348,7 @@ void BitsOfBinary::onOfflineTimerTimeout()
 		if (loadBinary(contentId,type,data,maxAge))
 			emit binaryCached(contentId,type,data,maxAge);
 		else
-			emit binaryError(contentId,XmppError(IERR_BOB_INVALID_CACHED_DATA));
+			emit binaryError(contentId,tr("Failed to read cached data"));
 	}
 }
 

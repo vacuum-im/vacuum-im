@@ -19,10 +19,6 @@
         <source>New Proxy</source>
         <translation>Nowe Proxy</translation>
     </message>
-    <message>
-        <source>Connection error</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
@@ -81,6 +77,10 @@
         <translation>Hasło:</translation>
     </message>
     <message>
+        <source>Default Proxy:</source>
+        <translation>Domyślne Proxy:</translation>
+    </message>
+    <message>
         <source>Add</source>
         <translation>Dodaj</translation>
     </message>
@@ -94,10 +94,6 @@
     <message>
         <source>&lt;Default Proxy&gt;</source>
         <translation>&lt;Domyślne Proxy&gt;</translation>
-    </message>
-    <message>
-        <source>Default proxy:</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

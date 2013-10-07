@@ -7,8 +7,6 @@
 #include <QKeySequence>
 #include <QCryptographicHash>
 
-const OptionsNode OptionsNode::null = OptionsNode(QDomElement());
-
 QDomElement findChildElement(const QDomElement &AParent, const QString &APath, const QString &ANSpace, QString &ChildName, QString &SubPath, QString &NSpace)
 {
 	int dotIndex = APath.indexOf('.');
@@ -237,6 +235,8 @@ struct OptionsNode::OptionsNodeData
 	QString path;
 	QDomElement node;
 };
+
+const OptionsNode OptionsNode::null = OptionsNode(QDomElement());
 
 OptionsNode::OptionsNode()
 {
@@ -502,35 +502,29 @@ struct Options::OptionsData
 	QHash<QString, OptionItem> items;
 };
 
-Options::Options()
-{
-	d = new OptionsData;
-}
-
-Options::~Options()
-{
-	delete d;
-}
+Options::OptionsData *Options::d = new Options::OptionsData;
 
 Options *Options::instance()
 {
-	static Options *inst = new Options;
-	return inst;
+	static Options *options = NULL;
+	if (!options)
+		options = new Options;
+	return options;
 }
 
 bool Options::isNull()
 {
-	return instance()->d->options.isNull();
+	return d->options.isNull();
 }
 
 QString Options::filesPath()
 {
-	return instance()->d->filesPath;
+	return d->filesPath;
 }
 
 QByteArray Options::cryptKey()
 {
-	return instance()->d->cryptKey;
+	return d->cryptKey;
 }
 
 QString Options::cleanNSpaces(const QString &APath)
@@ -543,12 +537,12 @@ QString Options::cleanNSpaces(const QString &APath)
 
 bool Options::hasNode(const QString &APath, const QString &ANSpace)
 {
-	return OptionsNode(instance()->d->options.documentElement()).hasNode(APath,ANSpace);
+	return OptionsNode(d->options.documentElement()).hasNode(APath,ANSpace);
 }
 
 OptionsNode Options::node(const QString &APath, const QString &ANSpace)
 {
-	return APath.isEmpty() ? OptionsNode(instance()->d->options.documentElement()) : OptionsNode(instance()->d->options.documentElement()).node(APath,ANSpace);
+	return APath.isEmpty() ? OptionsNode(d->options.documentElement()) : OptionsNode(d->options.documentElement()).node(APath,ANSpace);
 }
 
 QVariant Options::fileValue(const QString &APath, const QString &ANSpace)
@@ -591,27 +585,25 @@ void Options::setFileValue(const QVariant &AValue, const QString &APath, const Q
 
 void Options::setOptions(QDomDocument AOptions, const QString &AFilesPath, const QByteArray &ACryptKey)
 {
-	OptionsData *q = instance()->d;
-
-	if (!q->options.isNull())
+	if (!d->options.isNull())
 		emit instance()->optionsClosed();
 
-	q->options = AOptions;
-	q->filesPath = AFilesPath;
-	q->cryptKey = ACryptKey;
+	d->options = AOptions;
+	d->filesPath = AFilesPath;
+	d->cryptKey = ACryptKey;
 
-	if (!q->options.isNull())
+	if (!d->options.isNull())
 		emit instance()->optionsOpened();
 }
 
 QVariant Options::defaultValue(const QString &APath)
 {
-	return instance()->d->items.value(cleanNSpaces(APath)).defValue;
+	return d->items.value(cleanNSpaces(APath)).defValue;
 }
 
 void Options::setDefaultValue(const QString &APath, const QVariant &ADefault)
 {
-	OptionItem &item = instance()->d->items[cleanNSpaces(APath)];
+	OptionItem &item = d->items[cleanNSpaces(APath)];
 	item.defValue = ADefault;
 	emit instance()->defaultValueChanged(APath,ADefault);
 }

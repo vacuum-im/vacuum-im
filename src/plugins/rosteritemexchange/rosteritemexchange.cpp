@@ -232,7 +232,7 @@ bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, S
 			}
 			else if (!request.id.isEmpty())
 			{
-				replyRequestError(request,XmppStanzaError::EC_BAD_REQUEST);
+				replyRequestError(request,XmppStanzaError(XmppStanzaError::EC_BAD_REQUEST));
 			}
 
 			return true;
@@ -248,9 +248,14 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 	{
 		IRosterExchangeRequest request = FSentRequests.take(AStanza.id());
 		if (AStanza.type()=="result")
+		{
 			emit exchangeRequestApproved(request);
+		}
 		else
-			emit exchangeRequestFailed(request,XmppStanzaError(AStanza));
+		{
+			XmppStanzaError err(AStanza);
+			emit exchangeRequestFailed(request,err);
+		}
 	}
 }
 
@@ -264,34 +269,35 @@ QMultiMap<int, IOptionsWidget *> RosterItemExchange::optionsWidgets(const QStrin
 	return widgets;
 }
 
-bool RosterItemExchange::messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool RosterItemExchange::viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
-	return !dropDataContacts(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData()).isEmpty();
+	return isAcceptableDropData(AWidget->streamJid(),AWidget->contactJid(),AEvent->mimeData());
 }
 
-bool RosterItemExchange::messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
+bool RosterItemExchange::viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 	return true;
 }
 
-void RosterItemExchange::messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
+void RosterItemExchange::viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent)
 {
 	Q_UNUSED(AWidget);
 	Q_UNUSED(AEvent);
 }
 
-bool RosterItemExchange::messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
+bool RosterItemExchange::viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
 {
-	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid(),AEvent->mimeData(),AMenu) : false;
+	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AWidget->streamJid(),AWidget->contactJid(),AEvent->mimeData(),AMenu) : false;
 }
 
-Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
+Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
 {
-	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	int indexKind = AIndex->data(RDR_KIND).toInt();
-	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
+	Q_UNUSED(AEvent);
+	Q_UNUSED(ADrag);
+	int indexType = AIndex.data(RDR_TYPE).toInt();
+	if (indexType==RIT_CONTACT || indexType==RIT_GROUP || indexType==RIT_AGENT)
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -304,24 +310,16 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 
-		int indexKind = indexData.value(RDR_KIND).toInt();
-		if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
-		{
-			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
-			if (!indexJid.node().isEmpty())
-			{
-				QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
-				return !services.contains(indexJid.domain());
-			}
+		int indexType = indexData.value(RDR_TYPE).toInt();
+		if (indexType==RIT_CONTACT || indexType==RIT_GROUP || indexType==RIT_AGENT)
 			return true;
-		}
 	}
 	return false;
 }
 
-bool RosterItemExchange::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
+bool RosterItemExchange::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
 {
-	return !dropDataContacts(AHover->data(RDR_STREAM_JID).toString(),AHover->data(RDR_FULL_JID).toString(),AEvent->mimeData()).isEmpty();
+	return isAcceptableDropData(AHover.data(RDR_STREAM_JID).toString(),AHover.data(RDR_FULL_JID).toString(),AEvent->mimeData());
 }
 
 void RosterItemExchange::rosterDragLeave(const QDragLeaveEvent *AEvent)
@@ -329,11 +327,9 @@ void RosterItemExchange::rosterDragLeave(const QDragLeaveEvent *AEvent)
 	Q_UNUSED(AEvent);
 }
 
-bool RosterItemExchange::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu)
+bool RosterItemExchange::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
 {
-	if (AEvent->dropAction() != Qt::IgnoreAction)
-		return insertDropActions(AHover->data(RDR_STREAM_JID).toString(),AHover->data(RDR_FULL_JID).toString(),AEvent->mimeData(),AMenu);
-	return false;
+	return AEvent->dropAction()!=Qt::IgnoreAction ? insertDropActions(AIndex.data(RDR_STREAM_JID).toString(),AIndex.data(RDR_FULL_JID).toString(),AEvent->mimeData(),AMenu) : false;
 }
 
 bool RosterItemExchange::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -397,112 +393,90 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 	return QString::null;
 }
 
-QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) const
+bool RosterItemExchange::isAcceptableDropData(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData) const
 {
-	QList<IRosterItem> contactList;
-	if (AData->hasFormat(DDT_ROSTERSVIEW_INDEX_DATA))
-	{
-		QMap<int, QVariant> indexData;
-		QDataStream stream(AData->data(DDT_ROSTERSVIEW_INDEX_DATA));
-		operator>>(stream,indexData);
-		
-		int indexKind = indexData.value(RDR_KIND).toInt();
-		if (indexKind == RIK_GROUP)
-		{
-			QList<Jid> totalContacts;
-			foreach(const Jid &streamJid, indexData.value(RDR_STREAMS).toStringList())
-			{
-				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
-				QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
-				for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
-				{
-					if (!totalContacts.contains(it->itemJid))
-					{
-						it->groups.clear();
-						it->groups += indexData.value(RDR_NAME).toString();
-						contactList.append(*it);
-						totalContacts.append(it->itemJid);
-					}
-				}
-			}
-		}
-		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
-		{
-			IRosterItem ritem;
-			ritem.isValid = true;
-			ritem.itemJid = indexData.value(RDR_PREP_BARE_JID).toString();
-			ritem.name = indexData.value(RDR_NAME).toString();
-			contactList.append(ritem);
-		}
-
-		if (!contactList.isEmpty())
-		{
-			QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
-			for (QList<IRosterItem>::iterator it=contactList.begin(); it!=contactList.end(); )
-			{
-				if (!it->itemJid.node().isEmpty() && services.contains(it->itemJid.domain()))
-					it = contactList.erase(it);
-				else
-					++it;
-			}
-		}
-	}
-	return contactList;
-}
-
-QList<IRosterItem> RosterItemExchange::dropDataContacts(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData) const
-{
-	QList<IRosterItem> contactList;
 	if (isSupported(AStreamJid,AContactJid) && AData->hasFormat(DDT_ROSTERSVIEW_INDEX_DATA))
 	{
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AData->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
-		
-		if (AStreamJid!=AContactJid || AStreamJid!=indexData.value(RDR_STREAM_JID).toString())
+
+		bool accepted = false;
+		int indexType = indexData.value(RDR_TYPE).toInt();
+		if (indexType == RIT_GROUP)
 		{
-			contactList = dragDataContacts(AData);
-			for (QList<IRosterItem>::iterator it = contactList.begin(); it!=contactList.end(); )
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(indexData.value(RDR_STREAM_JID).toString()) : NULL;
+			QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
+			QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
+			for (QList<IRosterItem>::const_iterator it = ritems.constBegin(); !accepted && it!=ritems.constEnd(); ++it)
 			{
-				if (AContactJid.pBare() == it->itemJid.pBare())
-					it = contactList.erase(it);
-				else
-					++it;
+				if (AContactJid.pBare()!=it->itemJid.pBare() && (it->itemJid.node().isEmpty() || !services.contains(it->itemJid.domain())))
+					accepted = true;
 			}
 		}
+		else if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+		{
+			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
+			accepted = AContactJid.pBare()!=indexJid.pBare();
+			accepted = accepted && (FGateways==NULL || indexJid.node().isEmpty() || !FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()).contains(indexJid.domain()));
+		}
+		return accepted;
 	}
-	return contactList;
+	return false;
 }
 
 bool RosterItemExchange::insertDropActions(const Jid &AStreamJid, const Jid &AContactJid, const QMimeData *AData, Menu *AMenu) const
 {
-	QList<IRosterItem> contactList = dropDataContacts(AStreamJid,AContactJid,AData);
-
-	QStringList itemsJids;
-	QStringList itemsNames;
-	QStringList itemsGroups;
-	for (QList<IRosterItem>::const_iterator it = contactList.constBegin(); it!=contactList.constEnd(); ++it)
+	if (isSupported(AStreamJid,AContactJid) && AData->hasFormat(DDT_ROSTERSVIEW_INDEX_DATA))
 	{
-		itemsJids.append(it->itemJid.pBare());
-		itemsNames.append(it->name);
-		itemsGroups.append(it->groups.toList().value(0));
-	}
+		QMap<int, QVariant> indexData;
+		QDataStream stream(AData->data(DDT_ROSTERSVIEW_INDEX_DATA));
+		operator>>(stream,indexData);
 
-	if (!itemsJids.isEmpty())
-	{
-		Action *action = new Action(AMenu);
-		action->setText(tr("Send %n Contact(s)","",itemsJids.count()));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTEREXCHANGE_REQUEST);
-		action->setData(ADR_STREAM_JID,AStreamJid.full());
-		action->setData(ADR_CONTACT_JID,AContactJid.full());
-		action->setData(ADR_ITEMS_JIDS, itemsJids);
-		action->setData(ADR_ITEMS_NAMES, itemsNames);
-		action->setData(ADR_ITEMS_GROUPS, itemsGroups);
-		connect(action,SIGNAL(triggered()),SLOT(onSendExchangeRequestByAction()));
-		AMenu->addAction(action, AG_DEFAULT, true);
-		return true;
+		QStringList itemsJids;
+		QStringList itemsNames;
+		QStringList itemsGroups;
+		int indexType = indexData.value(RDR_TYPE).toInt();
+		if(indexType == RIT_GROUP)
+		{
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(indexData.value(RDR_STREAM_JID).toString()) : NULL;
+			QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
+			QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
+			for (QList<IRosterItem>::const_iterator it = ritems.constBegin(); it!=ritems.constEnd(); ++it)
+			{
+				if (AContactJid.pBare()!=it->itemJid.pBare() && (it->itemJid.node().isEmpty() || !services.contains(it->itemJid.domain())))
+				{
+					itemsJids.append(it->itemJid.bare());
+					itemsNames.append(it->name);
+					itemsGroups.append(indexData.value(RDR_NAME).toString());
+				}
+			}
+		}
+		else if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+		{
+			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
+			if (AContactJid.pBare()!=indexJid.pBare() && (FGateways==NULL || indexJid.node().isEmpty() || !FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()).contains(indexJid.domain())))
+			{
+				itemsJids.append(indexJid.bare());
+				itemsNames.append(indexData.value(RDR_NAME).toString());
+			}
+		}
+
+		if (!itemsJids.isEmpty())
+		{
+			Action *action = new Action(AMenu);
+			action->setText(tr("Send %n Contact(s)","",itemsJids.count()));
+			action->setIcon(RSR_STORAGE_MENUICONS,MNI_ROSTEREXCHANGE_REQUEST);
+			action->setData(ADR_STREAM_JID,AStreamJid.full());
+			action->setData(ADR_CONTACT_JID,AContactJid.full());
+			action->setData(ADR_ITEMS_JIDS, itemsJids);
+			action->setData(ADR_ITEMS_NAMES, itemsNames);
+			action->setData(ADR_ITEMS_GROUPS, itemsGroups);
+			connect(action,SIGNAL(triggered()),SLOT(onSendExchangeRequestByAction()));
+			AMenu->addAction(action, AG_DEFAULT, true);
+			return true;
+		}
 	}
-	
 	return false;
 }
 
@@ -567,7 +541,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 
 		if (isForbidden)
 		{
-			replyRequestError(ARequest,XmppStanzaError::EC_FORBIDDEN);
+			replyRequestError(ARequest,XmppStanzaError(XmppStanzaError::EC_FORBIDDEN));
 		}
 		else if (!approveList.isEmpty())
 		{
@@ -597,7 +571,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 	}
 	else
 	{
-		replyRequestError(ARequest,XmppStanzaError::EC_NOT_AUTHORIZED);
+		replyRequestError(ARequest,XmppStanzaError(XmppStanzaError::EC_NOT_AUTHORIZED));
 	}
 }
 
@@ -720,7 +694,7 @@ void RosterItemExchange::replyRequestError(const IRosterExchangeRequest &AReques
 
 void RosterItemExchange::notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const
 {
-	IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
+	IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
 	if (window)
 	{
 		IMessageContentOptions options;
@@ -810,7 +784,7 @@ void RosterItemExchange::onExchangeApproveDialogRejected()
 	ExchangeApproveDialog *dialog = qobject_cast<ExchangeApproveDialog *>(sender());
 	if (dialog)
 	{
-		replyRequestError(dialog->receivedRequest(),XmppStanzaError::EC_NOT_ALLOWED);
+		replyRequestError(dialog->receivedRequest(),XmppStanzaError(XmppStanzaError::EC_NOT_ALLOWED));
 	}
 }
 

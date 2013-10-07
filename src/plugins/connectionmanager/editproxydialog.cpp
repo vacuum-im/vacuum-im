@@ -28,9 +28,12 @@ EditProxyDialog::EditProxyDialog(IConnectionManager *AManager, QWidget *AParent)
 	}
 	ui.ltwProxyList->sortItems();
 
-	ui.cmbType->addItem(noproxy.name,QNetworkProxy::NoProxy);
-	ui.cmbType->addItem(tr("HTTP Proxy"),QNetworkProxy::HttpProxy);
-	ui.cmbType->addItem(tr("Socks5 Proxy"),QNetworkProxy::Socks5Proxy);
+	ui.cmbType->addItem(noproxy.name, QNetworkProxy::NoProxy);
+	ui.cmbType->addItem(tr("HTTP Proxy"), QNetworkProxy::HttpProxy);
+	ui.cmbType->addItem(tr("Socks5 Proxy"), QNetworkProxy::Socks5Proxy);
+
+	ui.cmbDefault->setModel(ui.ltwProxyList->model());
+	ui.cmbDefault->setCurrentIndex(ui.cmbDefault->findData(FManager->defaultProxy().toString(), PDR_UUID));
 
 	connect(ui.pbtAdd, SIGNAL(clicked(bool)),SLOT(onAddButtonClicked(bool)));
 	connect(ui.pbtDelete, SIGNAL(clicked(bool)),SLOT(onDeleteButtonClicked(bool)));
@@ -38,7 +41,7 @@ EditProxyDialog::EditProxyDialog(IConnectionManager *AManager, QWidget *AParent)
 	connect(ui.btbButtons,SIGNAL(rejected()),SLOT(reject()));
 
 	connect(ui.ltwProxyList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-		SLOT(onCurrentProxyItemChanged(QListWidgetItem *, QListWidgetItem *)));
+	        SLOT(onCurrentProxyItemChanged(QListWidgetItem *, QListWidgetItem *)));
 	onCurrentProxyItemChanged(ui.ltwProxyList->currentItem(), NULL);
 }
 
@@ -95,7 +98,6 @@ void EditProxyDialog::onAddButtonClicked(bool)
 	proxy.name = tr("New Proxy");
 	proxy.proxy.setType(QNetworkProxy::Socks5Proxy);
 	proxy.proxy.setPort(1080);
-
 	QListWidgetItem *item = createProxyItem(QUuid::createUuid(),proxy);
 	ui.ltwProxyList->addItem(item);
 	ui.ltwProxyList->setCurrentItem(item);
@@ -106,7 +108,9 @@ void EditProxyDialog::onDeleteButtonClicked(bool)
 {
 	QListWidgetItem *item = ui.ltwProxyList->currentItem();
 	if (item)
+	{
 		delete ui.ltwProxyList->takeItem(ui.ltwProxyList->currentRow());
+	}
 }
 
 void EditProxyDialog::onCurrentProxyItemChanged(QListWidgetItem *ACurrent, QListWidgetItem *APrevious)
@@ -137,6 +141,8 @@ void EditProxyDialog::onDialogButtonBoxAccepted()
 		}
 		oldProxy -= id;
 	}
+
+	FManager->setDefaultProxy(ui.cmbDefault->itemData(ui.cmbDefault->currentIndex()).toString());
 
 	foreach(const QUuid &id, oldProxy)
 		FManager->removeProxy(id);

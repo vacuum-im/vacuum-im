@@ -1,6 +1,6 @@
 #include "tabpagenotifier.h"
 
-TabPageNotifier::TabPageNotifier(IMessageTabPage *ATabPage) : QObject(ATabPage->instance())
+TabPageNotifier::TabPageNotifier(ITabPage *ATabPage) : QObject(ATabPage->instance())
 {
 	FTabPage = ATabPage;
 	FActiveNotify = -1;
@@ -16,7 +16,7 @@ TabPageNotifier::~TabPageNotifier()
 		removeNotify(FNotifies.keys().first());
 }
 
-IMessageTabPage *TabPageNotifier::tabPage() const
+ITabPage *TabPageNotifier::tabPage() const
 {
 	return FTabPage;
 }
@@ -31,12 +31,12 @@ QList<int> TabPageNotifier::notifies() const
 	return FNotifies.keys();
 }
 
-IMessageTabPageNotify TabPageNotifier::notifyById(int ANotifyId) const
+ITabPageNotify TabPageNotifier::notifyById(int ANotifyId) const
 {
 	return FNotifies.value(ANotifyId);
 }
 
-int TabPageNotifier::insertNotify(const IMessageTabPageNotify &ANotify)
+int TabPageNotifier::insertNotify(const ITabPageNotify &ANotify)
 {
 	if (ANotify.priority > 0)
 	{
@@ -56,7 +56,7 @@ void TabPageNotifier::removeNotify(int ANotifyId)
 {
 	if (FNotifies.contains(ANotifyId))
 	{
-		IMessageTabPageNotify notify = FNotifies.take(ANotifyId);
+		ITabPageNotify notify = FNotifies.take(ANotifyId);
 		FNotifyIdByPriority.remove(notify.priority, ANotifyId);
 		FUpdateTimer.start();
 		emit notifyRemoved(ANotifyId);

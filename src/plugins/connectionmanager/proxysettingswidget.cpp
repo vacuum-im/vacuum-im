@@ -1,27 +1,20 @@
 #include "proxysettingswidget.h"
 
-#include <definitions/optionvalues.h>
-
 ProxySettingsWidget::ProxySettingsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	FManager = AManager;
 	FOptions = ANode;
 
-	if (ANode.path() == OPV_PROXY_DEFAULT)
-		ui.lblProxy->setText(tr("Default proxy:"));
-	else
-		ui.cmbProxy->addItem(" "+tr("<Default Proxy>"), APPLICATION_PROXY_REF_UUID);
+	ui.cmbProxy->addItem(" "+tr("<Default Proxy>"), APPLICATION_PROXY_REF_UUID);
 	ui.cmbProxy->addItem(FManager->proxyById(QUuid()).name, QUuid().toString());
-
 	foreach(const QUuid &id, FManager->proxyList())
 		ui.cmbProxy->addItem(FManager->proxyById(id).name, id.toString());
+	connect(ui.cmbProxy,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 
 	connect(FManager->instance(),SIGNAL(proxyChanged(const QUuid &, const IConnectionProxy &)),
-		SLOT(onProxyChanged(const QUuid &, const IConnectionProxy &)));
+	        SLOT(onProxyChanged(const QUuid &, const IConnectionProxy &)));
 	connect(FManager->instance(),SIGNAL(proxyRemoved(const QUuid &)),SLOT(onProxyRemoved(const QUuid &)));
-
-	connect(ui.cmbProxy,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.pbtEditProxy,SIGNAL(clicked(bool)),SLOT(onEditButtonClicked(bool)));
 
 	reset();

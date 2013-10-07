@@ -15,14 +15,14 @@ class StateWidget :
 {
 	Q_OBJECT;
 public:
-	StateWidget(IChatStates *AChatStates, IMessageChatWindow *AWindow, QWidget *AParent);
+	StateWidget(IChatStates *AChatStates, IChatWindow *AWindow, QWidget *AParent);
 	~StateWidget();
 protected slots:
 	void onStatusActionTriggered(bool);
 	void onPermitStatusChanged(const Jid &AContactJid, int AStatus);
 	void onUserChatStateChanged(const Jid &AStreamJid, const Jid &AContactJid, int AState);
 private:
-	IMessageChatWindow *FWindow;
+	IChatWindow *FWindow;
 	IChatStates *FChatStates;
 private:
 	Menu *FMenu;

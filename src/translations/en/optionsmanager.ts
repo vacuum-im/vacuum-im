@@ -167,8 +167,20 @@
         <translation>Allows to save, load and manage user preferences</translation>
     </message>
     <message>
+        <source>Show change profile dialog</source>
+        <translation>Show change profile dialog</translation>
+    </message>
+    <message>
+        <source>Show options dialog</source>
+        <translation>Show options dialog</translation>
+    </message>
+    <message>
         <source>Change Profile</source>
         <translation>Change Profile</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Options</translation>
     </message>
     <message>
         <source>Misc</source>
@@ -177,18 +189,6 @@
     <message>
         <source>Auto run on system startup</source>
         <translation>Auto run on system startup</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation>Options</translation>
-    </message>
-    <message>
-        <source>Show change profile dialog</source>
-        <translation>Show change profile dialog</translation>
-    </message>
-    <message>
-        <source>Show options dialog</source>
-        <translation>Show options dialog</translation>
     </message>
 </context>
 </TS>

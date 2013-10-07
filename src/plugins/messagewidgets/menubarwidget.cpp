@@ -1,8 +1,11 @@
 #include "menubarwidget.h"
 
-MenuBarWidget::MenuBarWidget(IMessageWindow *AWindow, QWidget *AParent) : QMenuBar(AParent)
+MenuBarWidget::MenuBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent) : QMenuBar(AParent)
 {
-	FWindow = AWindow;
+	FInfoWidget = AInfo;
+	FViewWidget = AView;
+	FEditWidget = AEdit;
+	FReceiversWidget = AReceivers;
 	FMenuBarChanger = new MenuBarChanger(this);
 
 	// On Ubuntu 11.10 empty menubar cause segmentation fault
@@ -12,19 +15,4 @@ MenuBarWidget::MenuBarWidget(IMessageWindow *AWindow, QWidget *AParent) : QMenuB
 MenuBarWidget::~MenuBarWidget()
 {
 
-}
-
-bool MenuBarWidget::isVisibleOnWindow() const
-{
-	return isVisibleTo(FWindow->instance());
-}
-
-IMessageWindow *MenuBarWidget::messageWindow() const
-{
-	return FWindow;
-}
-
-MenuBarChanger * MenuBarWidget::menuBarChanger() const
-{
-	return FMenuBarChanger;
 }

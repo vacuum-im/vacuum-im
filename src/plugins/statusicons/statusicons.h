@@ -10,8 +10,8 @@
 #include <definitions/optionwidgetorders.h>
 #include <definitions/actiongroups.h>
 #include <definitions/menuicons.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterindextyperole.h>
 #include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatusicons.h>
@@ -25,11 +25,11 @@
 #include "iconsoptionswidget.h"
 
 class StatusIcons :
-	public QObject,
-	public IPlugin,
-	public IStatusIcons,
-	public IOptionsHolder,
-	public IRosterDataHolder
+			public QObject,
+			public IPlugin,
+			public IStatusIcons,
+			public IOptionsHolder,
+			public IRosterDataHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatusIcons IOptionsHolder IRosterDataHolder);
@@ -47,9 +47,11 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
-	virtual QList<int> rosterDataRoles(int AOrder) const;
-	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
+	virtual int rosterDataOrder() const;
+	virtual QList<int> rosterDataRoles() const;
+	virtual QList<int> rosterDataTypes() const;
+	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
 	//IStatusIcons
 	virtual QList<QString> rules(RuleType ARuleType) const;
 	virtual QString ruleIconset(const QString &APattern, RuleType ARuleType) const;
@@ -69,7 +71,7 @@ signals:
 	void defaultIconsChanged();
 	void statusIconsChanged();
 	//IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
+	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = RDR_ANY_ROLE);
 protected:
 	void loadStorages();
 	void clearStorages();
@@ -81,8 +83,8 @@ protected slots:
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
-	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu);
 	void onOptionsOpened();
 	void onOptionsClosed();

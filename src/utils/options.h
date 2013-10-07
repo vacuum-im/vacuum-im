@@ -44,7 +44,7 @@ private:
 };
 
 class UTILS_EXPORT Options :
-	public QObject
+			public QObject
 {
 	Q_OBJECT;
 	friend class OptionsNode;
@@ -74,9 +74,7 @@ signals:
 	void optionsRemoved(const OptionsNode &ANode);
 	void defaultValueChanged(const QString &APath, const QVariant &ADefault);
 private:
-	Options();
-	~Options();
-	OptionsData *d;
+	static OptionsData *d;
 };
 
 #endif // OPTIONS_H

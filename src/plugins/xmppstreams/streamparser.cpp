@@ -100,7 +100,7 @@ void StreamParser::parseData(const QByteArray &AData)
 
 	if (FReader.hasError() && FReader.error()!=QXmlStreamReader::PrematureEndOfDocumentError)
 	{
-		emit error(XmppStreamError(XmppStreamError::EC_NOT_WELL_FORMED,FReader.errorString()));
+		emit error(FReader.errorString());
 	}
 }
 

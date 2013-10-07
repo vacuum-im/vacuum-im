@@ -4,18 +4,6 @@
 <context>
     <name>RostersModel</name>
     <message>
-        <source>Agents</source>
-        <translation>Agents</translation>
-    </message>
-    <message>
-        <source>My Resources</source>
-        <translation>My Resources</translation>
-    </message>
-    <message>
-        <source>Not in Roster</source>
-        <translation>Not in Roster</translation>
-    </message>
-    <message>
         <source>Roster Model</source>
         <translation>Roster Model</translation>
     </message>
@@ -28,12 +16,16 @@
         <translation>Without Groups</translation>
     </message>
     <message>
-        <source>Accounts</source>
-        <translation>Accounts</translation>
+        <source>Agents</source>
+        <translation>Agents</translation>
     </message>
     <message>
-        <source>All Contacts</source>
-        <translation>All Contacts</translation>
+        <source>My Resources</source>
+        <translation>My Resources</translation>
+    </message>
+    <message>
+        <source>Not in Roster</source>
+        <translation>Not in Roster</translation>
     </message>
 </context>
 </TS>

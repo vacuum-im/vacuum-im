@@ -18,10 +18,6 @@
         <source>Location:</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Update archive database at startup</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>FileMessageArchive</name>
@@ -34,6 +30,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Internal error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Allows to save the history of conversations in to local files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -41,20 +41,23 @@
         <source>History of conversations is stored in local files</source>
         <translation type="unfinished"></translation>
     </message>
+</context>
+<context>
+    <name>WorkingThread</name>
     <message>
-        <source>Failed to create database</source>
+        <source>Internal error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to open database</source>
+        <source>Failed to save conversation to file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Database format is not compatible</source>
+        <source>Failed to remove conversation file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to to execute SQL query</source>
+        <source>Failed to load conversation from file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

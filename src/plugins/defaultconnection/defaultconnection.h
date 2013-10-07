@@ -1,11 +1,9 @@
 #ifndef DEFAULTCONNECTION_H
 #define DEFAULTCONNECTION_H
 
-#include <definitions/internalerrors.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <thirdparty/jdns/qjdns.h>
-#include <utils/xmpperror.h>
 
 class DefaultConnection :
 			public QObject,
@@ -49,7 +47,7 @@ signals:
 	void connected();
 	void encrypted();
 	void readyRead(qint64 ABytes);
-	void error(const XmppError &AError);
+	void error(const QString &AMessage);
 	void aboutToDisconnect();
 	void disconnected();
 	void connectionDestroyed();

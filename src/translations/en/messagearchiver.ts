@@ -84,30 +84,6 @@
 <context>
     <name>ArchiveStreamOptions</name>
     <message>
-        <source>Waiting for host response...</source>
-        <translation>Waiting for host response...</translation>
-    </message>
-    <message>
-        <source>Preferences accepted</source>
-        <translation>Preferences accepted</translation>
-    </message>
-    <message>
-        <source>New item preferences</source>
-        <translation>New item preferences</translation>
-    </message>
-    <message>
-        <source>Enter item JID:</source>
-        <translation>Enter item JID:</translation>
-    </message>
-    <message>
-        <source>Unacceptable item JID</source>
-        <translation>Unacceptable item JID</translation>
-    </message>
-    <message>
-        <source>&apos;%1&apos; is not valid JID or already exists</source>
-        <translation>&apos;%1&apos; is not valid JID or already exists</translation>
-    </message>
-    <message>
         <source>Yes, if supported by server</source>
         <translation>Yes, if supported by server</translation>
     </message>
@@ -140,6 +116,14 @@
         <translation>No, do not copy local archive to the server</translation>
     </message>
     <message>
+        <source>Save messages with formatting</source>
+        <translation>Save messages with formatting</translation>
+    </message>
+    <message>
+        <source>Save only messages text</source>
+        <translation>Save only messages text</translation>
+    </message>
+    <message>
         <source>Do not save messages</source>
         <translation>Do not save messages</translation>
     </message>
@@ -156,6 +140,10 @@
         <translation>Manually approve Off-The-Record sessions</translation>
     </message>
     <message>
+        <source>Waiting for host response...</source>
+        <translation>Waiting for host response...</translation>
+    </message>
+    <message>
         <source>History preferences is not available</source>
         <translation>History preferences is not available</translation>
     </message>
@@ -164,12 +152,24 @@
         <translation>Failed to save archive preferences: %1</translation>
     </message>
     <message>
-        <source>Save messages with formatting</source>
-        <translation>Save messages with formatting</translation>
+        <source>New item preferences</source>
+        <translation>New item preferences</translation>
     </message>
     <message>
-        <source>Save only messages text</source>
-        <translation>Save only messages text</translation>
+        <source>Enter item JID:</source>
+        <translation>Enter item JID:</translation>
+    </message>
+    <message>
+        <source>Unacceptable item JID</source>
+        <translation>Unacceptable item JID</translation>
+    </message>
+    <message>
+        <source>&apos;%1&apos; is not valid JID or already exists</source>
+        <translation>&apos;%1&apos; is not valid JID or already exists</translation>
+    </message>
+    <message>
+        <source>Preferences accepted</source>
+        <translation>Preferences accepted</translation>
     </message>
 </context>
 <context>
@@ -266,10 +266,6 @@
         <source>Add</source>
         <translation>Add</translation>
     </message>
-    <message>
-        <source>Duplicate messages in local archive (not recommended)</source>
-        <translation>Duplicate messages in local archive (not recommended)</translation>
-    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>
@@ -282,8 +278,22 @@
         <translation>Conversation history - %1</translation>
     </message>
     <message>
+        <source>Load earlier messages</source>
+        <translation>Load earlier messages</translation>
+    </message>
+    <message>
         <source>Conversation history with %1 - %2</source>
         <translation>Conversation history with %1 - %2</translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Date group name</comment>
+        <translation>MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>dd MMM, dddd</source>
+        <comment>Conversation name</comment>
+        <translation>dd MMM, dddd</translation>
     </message>
     <message>
         <source>Conversation headers loaded</source>
@@ -324,6 +334,18 @@
         <source>Archive is not accessible</source>
         <translation>Archive is not accessible</translation>
     </message>
+    <message>
+        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</source>
+        <translation>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
+        <translation>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</translation>
+    </message>
     <message numerus="yes">
         <source>Found %n occurrence(s)</source>
         <translation>
@@ -360,6 +382,10 @@
         <translation>Failed to remove conversations: %1</translation>
     </message>
     <message>
+        <source>Show history for this contact</source>
+        <translation>Show history for this contact</translation>
+    </message>
+    <message>
         <source>Remove all History</source>
         <translation>Remove all History</translation>
     </message>
@@ -372,65 +398,36 @@
         <translation>Remove this Conversation</translation>
     </message>
     <message>
-        <source>Conversation history removed successfully</source>
-        <translation>Conversation history removed successfully</translation>
-    </message>
-    <message>
-        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</source>
-        <translation>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Load earlier messages</source>
-        <translation>Load earlier messages</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <comment>Date group name</comment>
-        <translatorcomment>Наименование группы даты</translatorcomment>
-        <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>dd MMM, dddd</source>
-        <comment>Conversation name</comment>
-        <translatorcomment>Наименование разговора</translatorcomment>
-        <translation>dd MMM, dddd</translation>
-    </message>
-    <message>
-        <source>Show history for this contact</source>
-        <translation>Show history for this contact</translation>
-    </message>
-    <message>
-        <source>All messages loaded</source>
-        <translation>All messages loaded</translation>
-    </message>
-    <message>
         <source>Load message earlier %1</source>
         <translation>Load message earlier %1</translation>
     </message>
     <message>
         <source>dd MMM yyyy</source>
         <comment>Load messages earlier date</comment>
-        <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation>dd MMM yyyy</translation>
     </message>
     <message>
-        <source>Search in text</source>
-        <translation>Search in text</translation>
+        <source>All messages loaded</source>
+        <translation>All messages loaded</translation>
+    </message>
+    <message>
+        <source>Conversation history removed successfully</source>
+        <translation>Conversation history removed successfully</translation>
     </message>
 </context>
 <context>
     <name>ArchiveViewWindowClass</name>
     <message>
+        <source>Search</source>
+        <translation>Search</translation>
+    </message>
+    <message>
         <source>Update</source>
         <translation>Update</translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation>Search:</translation>
     </message>
     <message>
         <source>Next</source>
@@ -494,12 +491,41 @@
         <translation>History</translation>
     </message>
     <message>
-        <source>View History</source>
-        <translation>View History</translation>
+        <source>Allows to save the history of communications</source>
+        <translation>Allows to save the history of communications</translation>
     </message>
     <message>
-        <source>Options...</source>
-        <translation>Options...</translation>
+        <source>Show history</source>
+        <translation>Show history</translation>
+    </message>
+    <message>
+        <source>Ctrl+H</source>
+        <comment>Show history</comment>
+        <translation>Ctrl+H</translation>
+    </message>
+    <message>
+        <source>Enable message archiving</source>
+        <translation>Enable message archiving</translation>
+    </message>
+    <message>
+        <source>Disable message archiving</source>
+        <translation>Disable message archiving</translation>
+    </message>
+    <message>
+        <source>Start Off-The-Record session</source>
+        <translation>Start Off-The-Record session</translation>
+    </message>
+    <message>
+        <source>Terminate Off-The-Record session</source>
+        <translation>Terminate Off-The-Record session</translation>
+    </message>
+    <message>
+        <source>Off-The-Record session not ready, please wait...</source>
+        <translation>Off-The-Record session not ready, please wait...</translation>
+    </message>
+    <message>
+        <source>Negotiating Off-The-Record session...</source>
+        <translation>Negotiating Off-The-Record session...</translation>
     </message>
     <message>
         <source>Message logging</source>
@@ -512,26 +538,6 @@
     <message>
         <source>Disallow all message logging</source>
         <translation>Disallow all message logging</translation>
-    </message>
-    <message>
-        <source>allowed</source>
-        <translation>allowed</translation>
-    </message>
-    <message>
-        <source>Session terminated</source>
-        <translation>Session terminated</translation>
-    </message>
-    <message>
-        <source>Session failed: %1</source>
-        <translation>Session failed: %1</translation>
-    </message>
-    <message>
-        <source>disallowed</source>
-        <translation>disallowed</translation>
-    </message>
-    <message>
-        <source>Session negotiated: message logging %1</source>
-        <translation>Session negotiated: message logging %1</translation>
     </message>
     <message>
         <source>Messages Archiving</source>
@@ -566,33 +572,28 @@
         <translation>Supports the manual archiving of the messages</translation>
     </message>
     <message>
-        <source>Supports the storing of the archive preferences</source>
-        <translation>Supports the storing of the archive preferences</translation>
-    </message>
-    <message>
         <source>Messages Archive Preferences</source>
         <translation>Messages Archive Preferences</translation>
     </message>
     <message>
-        <source>Show history</source>
-        <translation>Show history</translation>
+        <source>Supports the storing of the archive preferences</source>
+        <translation>Supports the storing of the archive preferences</translation>
     </message>
     <message>
-        <source>Ctrl+H</source>
-        <comment>Show history</comment>
-        <translation>Ctrl+H</translation>
-    </message>
-    <message>
-        <source>Terminate Off-The-Record session</source>
-        <translation>Terminate Off-The-Record session</translation>
-    </message>
-    <message>
-        <source>Allows to save the history of communications</source>
-        <translation>Allows to save the history of communications</translation>
+        <source>View History</source>
+        <translation>View History</translation>
     </message>
     <message>
         <source>Automatic Archiving</source>
         <translation>Automatic Archiving</translation>
+    </message>
+    <message>
+        <source>Save Messages with Formatting</source>
+        <translation>Save Messages with Formatting</translation>
+    </message>
+    <message>
+        <source>Save Only Messages Text</source>
+        <translation>Save Only Messages Text</translation>
     </message>
     <message>
         <source>Do not Save Messages</source>
@@ -615,52 +616,32 @@
         <translation>Use Default Options</translation>
     </message>
     <message>
-        <source>Enable message archiving</source>
-        <translation>Enable message archiving</translation>
-    </message>
-    <message>
-        <source>Disable message archiving</source>
-        <translation>Disable message archiving</translation>
-    </message>
-    <message>
-        <source>Start Off-The-Record session</source>
-        <translation>Start Off-The-Record session</translation>
-    </message>
-    <message>
-        <source>Off-The-Record session not ready, please wait...</source>
-        <translation>Off-The-Record session not ready, please wait...</translation>
-    </message>
-    <message>
-        <source>Negotiating Off-The-Record session...</source>
-        <translation>Negotiating Off-The-Record session...</translation>
+        <source>Options...</source>
+        <translation>Options...</translation>
     </message>
     <message>
         <source>Failed to load conversation</source>
         <translation>Failed to load conversation</translation>
     </message>
     <message>
-        <source>Save Messages with Formatting</source>
-        <translation>Save Messages with Formatting</translation>
+        <source>Session negotiated: message logging %1</source>
+        <translation>Session negotiated: message logging %1</translation>
     </message>
     <message>
-        <source>Save Only Messages Text</source>
-        <translation>Save Only Messages Text</translation>
+        <source>disallowed</source>
+        <translation>disallowed</translation>
     </message>
     <message>
-        <source>Failed to load conversation headers</source>
-        <translation>Failed to load conversation headers</translation>
+        <source>allowed</source>
+        <translation>allowed</translation>
     </message>
     <message>
-        <source>Failed to save conversation</source>
-        <translation>Failed to save conversation</translation>
+        <source>Session terminated</source>
+        <translation>Session terminated</translation>
     </message>
     <message>
-        <source>Failed to remove conversation</source>
-        <translation>Failed to remove conversation</translation>
-    </message>
-    <message>
-        <source>Failed to load archive modifications</source>
-        <translation>Failed to load archive modifications</translation>
+        <source>Session failed: %1</source>
+        <translation>Session failed: %1</translation>
     </message>
 </context>
 </TS>

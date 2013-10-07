@@ -106,7 +106,9 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 	plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
 	if (plugin)
+	{
 		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -158,10 +160,9 @@ bool Notifications::initObjects()
 	}
 
 	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
-	
-	NotifyWidget::setNetworkManager(FNetworkAccessManager);
-	NotifyWidget::setMainWindow(FMainWindowPlugin!=NULL ? FMainWindowPlugin->mainWindow() : NULL);
-	
+
+	NotifyWidget::setMainWindow(FMainWindowPlugin->mainWindow());
+
 	return true;
 }
 
@@ -181,7 +182,6 @@ bool Notifications::initSettings()
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
-
 	return true;
 }
 
@@ -232,10 +232,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
+			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
 			Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
 			Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
-			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
-			QList<IRosterIndex *> indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
+			QList<IRosterIndex *> indexes = FRostersModel->getContactIndexList(streamJid,contactJid,createIndex);
 			if (!indexes.isEmpty())
 			{
 				IRostersNotify rnotify;
@@ -243,7 +243,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 				rnotify.order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
 				rnotify.flags = record.notification.data.value(NDR_ROSTER_FLAGS).toInt();
 				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool())
-					rnotify.flags |= IRostersNotify::ExpandParents;
+					rnotify.flags |= IRostersLabel::ExpandParents;
 				rnotify.timeout = record.notification.data.value(NDR_ROSTER_TIMEOUT).toInt();
 				rnotify.footer = record.notification.data.value(NDR_ROSTER_FOOTER).toString();
 				rnotify.background = record.notification.data.value(NDR_ROSTER_BACKGROUND).value<QBrush>();
@@ -260,6 +260,8 @@ int Notifications::appendNotification(const INotification &ANotification)
 			connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
 			connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
 			connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
+			record.popupWidget->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
+			record.popupWidget->setNetworkAccessManager(FNetworkAccessManager);
 			record.popupWidget->appear();
 		}
 	}
@@ -321,8 +323,11 @@ int Notifications::appendNotification(const INotification &ANotification)
 			QWidget *widget = qobject_cast<QWidget *>((QWidget *)record.notification.data.value(NDR_SHOWMINIMIZED_WIDGET).toLongLong());
 			if (widget)
 			{
-				FDelayedShowMinimized.append(widget);
-				QTimer::singleShot(0,this,SLOT(onDelayedShowMinimized()));
+				ITabPage *page = qobject_cast<ITabPage *>(widget);
+				if (page)
+					page->showMinimizedTabPage();
+				else if (widget->isWindow() && !widget->isVisible())
+					widget->showMinimized();
 			}
 		}
 	}
@@ -341,10 +346,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::TabPageNotify,notifyId,record.notification))
 		{
-			IMessageTabPage *page = qobject_cast<IMessageTabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_WIDGET).toLongLong());
+			ITabPage *page = qobject_cast<ITabPage *>((QWidget *)record.notification.data.value(NDR_TABPAGE_WIDGET).toLongLong());
 			if (page && page->tabPageNotifier())
 			{
-				IMessageTabPageNotify notify;
+				ITabPageNotify notify;
 				notify.icon = icon;
 				notify.toolTip = toolTip;
 				notify.priority = record.notification.data.value(NDR_TABPAGE_PRIORITY).toInt();
@@ -358,7 +363,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	if ((record.notification.kinds & INotification::AutoActivate)>0)
 	{
 		FDelayedActivations.append(notifyId);
-		QTimer::singleShot(0,this,SLOT(onDelayedActivations()));
+		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
 	}
 
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
@@ -402,7 +407,7 @@ void Notifications::removeNotification(int ANotifyId)
 		}
 		if (!record.tabPageNotifier.isNull())
 		{
-			IMessageTabPageNotifier *notifier =  qobject_cast<IMessageTabPageNotifier *>(record.tabPageNotifier);
+			ITabPageNotifier *notifier =  qobject_cast<ITabPageNotifier *>(record.tabPageNotifier);
 			if (notifier)
 				notifier->removeNotify(record.tabPageId);
 		}
@@ -419,7 +424,6 @@ void Notifications::removeNotification(int ANotifyId)
 				FActivateLast->setVisible(false);
 			}
 		}
-		qDeleteAll(record.notification.actions);
 
 		FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
 		FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
@@ -518,7 +522,7 @@ void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *
 
 QImage Notifications::contactAvatar(const Jid &AContactJid) const
 {
-	return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(AContactJid), QSize(32,32)) : QImage();
+	return FAvatars!=NULL ? FAvatars->loadAvatarImage(FAvatars->avatarHash(AContactJid),QSize(32,32)) : QImage();
 }
 
 QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -593,24 +597,11 @@ void Notifications::removeInvisibleNotification(int ANotifyId)
 	}
 }
 
-void Notifications::onDelayedActivations()
+void Notifications::onActivateDelayedActivations()
 {
 	foreach(int notifyId, FDelayedActivations)
 		activateNotification(notifyId);
 	FDelayedActivations.clear();
-}
-
-void Notifications::onDelayedShowMinimized()
-{
-	foreach(QWidget *widget, FDelayedShowMinimized)
-	{
-		IMessageTabPage *page = qobject_cast<IMessageTabPage *>(widget);
-		if (page)
-			page->showMinimizedTabPage();
-		else if (widget->isWindow() && !widget->isVisible())
-			widget->showMinimized();
-	}
-	FDelayedShowMinimized.clear();
 }
 
 void Notifications::onSoundOnOffActionTriggered(bool)

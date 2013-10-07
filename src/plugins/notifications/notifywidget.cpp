@@ -3,79 +3,55 @@
 #include <QTimer>
 #include <QScrollBar>
 #include <QTextFrame>
-#include <QSizePolicy>
-#include <QToolButton>
 #include <QTextDocument>
-#include <definitions/optionvalues.h>
-#include <utils/options.h>
 
 #define ANIMATE_STEPS             17
 #define ANIMATE_TIME              700
 #define ANIMATE_STEP_TIME         (ANIMATE_TIME/ANIMATE_STEPS)
 #define ANIMATE_OPACITY_START     0.0
-#define ANIMATE_OPACITY_END       0.95
+#define ANIMATE_OPACITY_END       0.9
 #define ANIMATE_OPACITY_STEP      (ANIMATE_OPACITY_END - ANIMATE_OPACITY_START)/ANIMATE_STEPS
-
-#define LEFT_MARGIN               5
-#define BOTTOM_MARGIN             5
 
 #define MAX_TEXT_LINES            5
 
-#define UNDER_MOUSE_ADD_TIMEOUT   15
-
-QRect NotifyWidget::FDisplay = QRect();
 QList<NotifyWidget *> NotifyWidget::FWidgets;
 QDesktopWidget *NotifyWidget::FDesktop = new QDesktopWidget;
-
 IMainWindow *NotifyWidget::FMainWindow = NULL;
-QNetworkAccessManager *NotifyWidget::FNetworkManager = NULL;
+QRect NotifyWidget::FDisplay = QRect();
 
 NotifyWidget::NotifyWidget(const INotification &ANotification)
 #if defined(Q_OS_MAC)
-	: QFrame(NULL, Qt::FramelessWindowHint|Qt::WindowSystemMenuHint|Qt::WindowStaysOnTopHint)
+	: QWidget(NULL, Qt::FramelessWindowHint|Qt::WindowSystemMenuHint|Qt::WindowStaysOnTopHint)
 #else
-	: QFrame(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
+	: QWidget(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
 #endif
 {
 	ui.setupUi(this);
 	setFocusPolicy(Qt::NoFocus);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setAttribute(Qt::WA_ShowWithoutActivating,true);
-	setAttribute(Qt::WA_TransparentForMouseEvents,true);
 
-	QPalette windowPalette = palette();
-	windowPalette.setColor(QPalette::Window, windowPalette.color(QPalette::Base));
-	setPalette(windowPalette);
-
-	QPalette noticePalette = ui.lblNotice->palette();
-	noticePalette.setColor(QPalette::WindowText,noticePalette.color(QPalette::Disabled,QPalette::WindowText));
-	ui.lblNotice->setPalette(noticePalette);
+	QPalette pallete = ui.frmWindowFrame->palette();
+	pallete.setColor(QPalette::Window, pallete.color(QPalette::Base));
+	ui.frmWindowFrame->setPalette(pallete);
+	ui.frmWindowFrame->setAutoFillBackground(true);
+	ui.frmWindowFrame->setAttribute(Qt::WA_TransparentForMouseEvents,true);
 
 	FYPos = -1;
 	FAnimateStep = -1;
-	FTimeOut = ANotification.data.value(NDR_POPUP_TIMEOUT,Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()).toInt();
+	FTimeOut = ANotification.data.value(NDR_POPUP_TIMEOUT,Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000).toInt();
 
-	FCaption = ANotification.data.value(NDR_POPUP_CAPTION).toString();
+	FCaption = ANotification.data.value(NDR_POPUP_CAPTION,tr("Notification")).toString();
 	ui.lblCaption->setVisible(!FCaption.isEmpty());
-	ui.hlnCaptionLine->setVisible(!FCaption.isEmpty());
 
 	FTitle = ANotification.data.value(NDR_POPUP_TITLE).toString();
 	ui.lblTitle->setVisible(!FTitle.isEmpty());
-
-	FNotice = ANotification.data.value(NDR_POPUP_NOTICE).toString();
-	ui.lblNotice->setVisible(!FNotice.isEmpty());
 
 	QIcon icon = qvariant_cast<QIcon>(ANotification.data.value(NDR_ICON));
 	if (!icon.isNull())
 		ui.lblIcon->setPixmap(icon.pixmap(QSize(32,32)));
 	else
 		ui.lblIcon->setVisible(false);
-
-	QImage image = qvariant_cast<QImage>(ANotification.data.value(NDR_POPUP_IMAGE));
-	if (!image.isNull())
-		ui.lblAvatar->setPixmap(QPixmap::fromImage(image.scaled(ui.lblAvatar->minimumSize(),Qt::KeepAspectRatio,Qt::SmoothTransformation)));
-	else
-		ui.lblAvatar->setVisible(false);
 
 	QString text = ANotification.data.value(NDR_POPUP_HTML).toString();
 	if (!text.isEmpty())
@@ -93,40 +69,20 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 		}
 		ui.ntbText->setHtml(text);
 		ui.ntbText->setContentsMargins(0,0,0,0);
-		ui.ntbText->document()->setDocumentMargin(0);
-		ui.ntbText->setNetworkAccessManager(FNetworkManager);
 		ui.ntbText->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 		ui.ntbText->setMaxHeight(ui.ntbText->fontMetrics().height()*MAX_TEXT_LINES + (ui.ntbText->frameWidth() + qRound(ui.ntbText->document()->documentMargin()))*2);
-		ui.ntbText->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
+
+		QImage image = qvariant_cast<QImage>(ANotification.data.value(NDR_POPUP_IMAGE));
+		if (!image.isNull())
+			ui.lblImage->setPixmap(QPixmap::fromImage(image.scaled(ui.lblImage->maximumSize(),Qt::KeepAspectRatio)));
+		else
+			ui.lblImage->setVisible(false);
 	}
 	else
 	{
+		ui.lblImage->setVisible(false);
 		ui.ntbText->setVisible(false);
 	}
-
-	if (!ANotification.actions.isEmpty())
-	{
-		QHBoxLayout *buttonsLayout = new QHBoxLayout;
-		ui.wdtButtons->setLayout(buttonsLayout);
-		buttonsLayout->setMargin(0);
-		for (int i=0; i<ANotification.actions.count(); i++)
-		{
-			QToolButton *button = new QToolButton(ui.wdtButtons);
-			button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-			button->setDefaultAction(ANotification.actions.at(i));
-			button->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
-			ui.wdtButtons->layout()->addWidget(button);
-		}
-		buttonsLayout->addStretch();
-	}
-	else
-	{
-		ui.wdtButtons->setVisible(false);
-	}
-
-	FCloseTimer.setInterval(1000);
-	FCloseTimer.setSingleShot(false);
-	connect(&FCloseTimer,SIGNAL(timeout()),SLOT(onCloseTimerTimeout()));
 
 	updateElidedText();
 }
@@ -149,25 +105,15 @@ void NotifyWidget::appear()
 		connect(timer,SIGNAL(timeout()),SLOT(onAnimateStep()));
 
 		if (FTimeOut > 0)
-			FCloseTimer.start();
+			QTimer::singleShot(FTimeOut,this,SLOT(deleteLater()));
 
 		setWindowOpacity(ANIMATE_OPACITY_START);
 
-		if (FMainWindow!=NULL && FWidgets.isEmpty())
+		if (FWidgets.isEmpty())
 			FDisplay = FDesktop->availableGeometry(FMainWindow->instance());
 		FWidgets.prepend(this);
 		layoutWidgets();
 	}
-}
-
-void NotifyWidget::setMainWindow(IMainWindow *AMainWindow)
-{
-	FMainWindow = AMainWindow;
-}
-
-void NotifyWidget::setNetworkManager(QNetworkAccessManager *ANetworkManager)
-{
-	FNetworkManager = ANetworkManager;
 }
 
 void NotifyWidget::animateTo(int AYPos)
@@ -179,16 +125,19 @@ void NotifyWidget::animateTo(int AYPos)
 	}
 }
 
-void NotifyWidget::enterEvent(QEvent *AEvent)
+void NotifyWidget::setAnimated(bool AAnimated)
 {
-	FTimeOut += UNDER_MOUSE_ADD_TIMEOUT;
-	QFrame::enterEvent(AEvent);
+	ui.ntbText->setAnimated(AAnimated);
 }
 
-void NotifyWidget::leaveEvent(QEvent *AEvent)
+void NotifyWidget::setNetworkAccessManager(QNetworkAccessManager *ANetworkAccessManager)
 {
-	FTimeOut -= UNDER_MOUSE_ADD_TIMEOUT;
-	QFrame::leaveEvent(AEvent);
+	ui.ntbText->setNetworkAccessManager(ANetworkAccessManager);
+}
+
+void NotifyWidget::setMainWindow(IMainWindow *AMainWindow)
+{
+	FMainWindow = AMainWindow;
 }
 
 void NotifyWidget::resizeEvent(QResizeEvent *AEvent)
@@ -202,13 +151,10 @@ void NotifyWidget::resizeEvent(QResizeEvent *AEvent)
 void NotifyWidget::mouseReleaseEvent(QMouseEvent *AEvent)
 {
 	QWidget::mouseReleaseEvent(AEvent);
-	if (geometry().contains(AEvent->globalPos()))
-	{
-		if (AEvent->button() == Qt::LeftButton)
-			emit notifyActivated();
-		else if (AEvent->button() == Qt::RightButton)
-			emit notifyRemoved();
-	}
+	if (AEvent->button() == Qt::LeftButton)
+		emit notifyActivated();
+	else if (AEvent->button() == Qt::RightButton)
+		emit notifyRemoved();
 }
 
 void NotifyWidget::onAnimateStep()
@@ -228,40 +174,31 @@ void NotifyWidget::onAnimateStep()
 	}
 }
 
-void NotifyWidget::adjustHeight()
-{
-	resize(width(),minimumSizeHint().height());
-}
-
-void NotifyWidget::updateElidedText()
-{
-	ui.lblCaption->setText(ui.lblCaption->fontMetrics().elidedText(FCaption,Qt::ElideRight,ui.lblCaption->width() - ui.lblCaption->frameWidth()*2));
-	ui.lblTitle->setText(ui.lblTitle->fontMetrics().elidedText(FTitle,Qt::ElideRight,ui.lblTitle->width() - ui.lblTitle->frameWidth()*2));
-	ui.lblNotice->setText(ui.lblNotice->fontMetrics().elidedText(FNotice,Qt::ElideRight,ui.lblTitle->width() - ui.lblTitle->frameWidth()*2));
-}
-
-void NotifyWidget::onCloseTimerTimeout()
-{
-	if (FTimeOut > 0)
-		FTimeOut--;
-	else
-		deleteLater();
-}
-
 void NotifyWidget::layoutWidgets()
 {
-	int ypos = FDisplay.bottom() - BOTTOM_MARGIN;
+	int ypos = FDisplay.bottom();
 	for (int i=0; ypos>0 && i<FWidgets.count(); i++)
 	{
 		NotifyWidget *widget = FWidgets.at(i);
 		if (!widget->isVisible())
 		{
 			widget->show();
-			widget->move(FDisplay.right() - widget->frameGeometry().width() - LEFT_MARGIN, FDisplay.bottom() - BOTTOM_MARGIN);
+			widget->move(FDisplay.right() - widget->frameGeometry().width(), FDisplay.bottom());
 			QTimer::singleShot(0,widget,SLOT(adjustHeight()));
 			QTimer::singleShot(10,widget,SLOT(adjustHeight()));
 		}
 		ypos -=  widget->frameGeometry().height();
 		widget->animateTo(ypos);
 	}
+}
+
+void NotifyWidget::adjustHeight()
+{
+	resize(width(),sizeHint().height());
+}
+
+void NotifyWidget::updateElidedText()
+{
+	ui.lblCaption->setText(ui.lblCaption->fontMetrics().elidedText(FCaption,Qt::ElideRight,ui.lblCaption->width() - ui.lblCaption->frameWidth()*2));
+	ui.lblTitle->setText(ui.lblTitle->fontMetrics().elidedText(FTitle,Qt::ElideRight,ui.lblTitle->width() - ui.lblTitle->frameWidth()*2));
 }

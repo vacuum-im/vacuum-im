@@ -14,21 +14,18 @@ MultiUserChat::MultiUserChat(IMultiUserChatPlugin *AChatPlugin, const Jid &AStre
 	FXmppStream = NULL;
 	FStanzaProcessor = NULL;
 	FMessageProcessor = NULL;
-	FDiscovery = NULL;
 	FChatPlugin = AChatPlugin;
 
 	FMainUser = NULL;
+	FAutoPresence = false;
 	FSHIPresence = -1;
 	FSHIMessage = -1;
-	FConnected = false;
-	FAutoPresence = false;
 
 	FRoomJid = ARoomJid;
 	FStreamJid = AStreamJid;
 	FNickName = ANickName;
 	FPassword = APassword;
 	FShow = IPresence::Offline;
-	FRoomName = FRoomJid.uBare();
 
 	initialize();
 }
@@ -100,7 +97,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else if (AStanza.type() == "error")
 		{
 			XmppStanzaError err(AStanza);
-			emit configFormRejected(err);
+			emit configFormRejected(err.errorMessage());
 			emit chatError(err.errorMessage());
 		}
 		FConfigSubmitId.clear();
@@ -174,19 +171,9 @@ Jid MultiUserChat::roomJid() const
 	return FRoomJid;
 }
 
-QString MultiUserChat::roomName() const
-{
-	return FRoomName;
-}
-
 bool MultiUserChat::isOpen() const
 {
 	return FMainUser!=NULL;
-}
-
-bool MultiUserChat::isConnected() const
-{
-	return FConnected;
 }
 
 bool MultiUserChat::autoPresence() const
@@ -196,7 +183,12 @@ bool MultiUserChat::autoPresence() const
 
 void MultiUserChat::setAutoPresence(bool AAuto)
 {
-	FAutoPresence = AAuto;
+	if (FAutoPresence != AAuto)
+	{
+		FAutoPresence = AAuto;
+		if (FPresence && FAutoPresence)
+			setPresence(FPresence->show(),FPresence->status());
+	}
 }
 
 QList<int> MultiUserChat::statusCodes() const
@@ -221,6 +213,11 @@ IMultiUser *MultiUserChat::mainUser() const
 	return FMainUser;
 }
 
+IMultiUser *MultiUserChat::userByNick(const QString &ANick) const
+{
+	return FUsers.value(ANick,NULL);
+}
+
 QList<IMultiUser *> MultiUserChat::allUsers() const
 {
 	QList<IMultiUser *> result;
@@ -229,33 +226,26 @@ QList<IMultiUser *> MultiUserChat::allUsers() const
 	return result;
 }
 
-IMultiUser *MultiUserChat::userByNick(const QString &ANick) const
-{
-	return FUsers.value(ANick,NULL);
-}
-
 QString MultiUserChat::nickName() const
 {
 	return FNickName;
 }
 
-bool MultiUserChat::setNickName(const QString &ANick)
+void MultiUserChat::setNickName(const QString &ANick)
 {
-	if (isConnected())
+	if (isOpen())
 	{
 		if (!ANick.isEmpty() && FNickName!=ANick)
 		{
 			Jid userJid(FRoomJid.node(),FRoomJid.domain(),ANick);
 			Stanza presence("presence");
 			presence.setTo(userJid.full());
-			return FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
+			FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
 		}
-		return !FNickName.isEmpty();
 	}
 	else
 	{
 		FNickName = ANick;
-		return true;
 	}
 }
 
@@ -269,16 +259,6 @@ void MultiUserChat::setPassword(const QString &APassword)
 	FPassword = APassword;
 }
 
-IMultiUserChatHistory MultiUserChat::history() const
-{
-	return FHistory;
-}
-
-void MultiUserChat::setHistory(const IMultiUserChatHistory &AHistory)
-{
-	FHistory = AHistory;
-}
-
 int MultiUserChat::show() const
 {
 	return FShow;
@@ -289,19 +269,12 @@ QString MultiUserChat::status() const
 	return FStatus;
 }
 
-XmppError MultiUserChat::roomError() const
+XmppStanzaError MultiUserChat::roomError() const
 {
 	return FRoomError;
 }
 
-bool MultiUserChat::sendStreamPresence()
-{
-	if (FPresence)
-		return sendPresence(FPresence->show(),FPresence->status());
-	return false;
-}
-
-bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
+void MultiUserChat::setPresence(int AShow, const QString &AStatus)
 {
 	if (FStanzaProcessor)
 	{
@@ -311,12 +284,8 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 		presence.setTo(userJid.full());
 
 		QString showText;
-		bool isConnecting = true;
 		switch (AShow)
 		{
-		case IPresence::Online:
-			showText = QString::null;
-			break;
 		case IPresence::Chat:
 			showText = "chat";
 			break;
@@ -329,12 +298,9 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 		case IPresence::ExtendedAway:
 			showText = "xa";
 			break;
-		default:
-			isConnecting = false;
-			showText = "unavailable";
 		}
 
-		if (!isConnecting)
+		if (AShow == IPresence::Offline || AShow == IPresence::Error || AShow == IPresence::Invisible)
 			presence.setType("unavailable");
 		else if (!showText.isEmpty())
 			presence.addElement("show").appendChild(presence.createTextNode(showText));
@@ -342,48 +308,16 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 		if (!AStatus.isEmpty())
 			presence.addElement("status").appendChild(presence.createTextNode(AStatus));
 
-		if (!isConnected() && isConnecting)
+		if (!isOpen() && AShow!=IPresence::Offline && AShow!=IPresence::Error)
 		{
-			FRoomError = XmppError::null;
-			emit chatAboutToConnect();
-
+			FRoomError = XmppStanzaError::null;
 			QDomElement xelem = presence.addElement("x",NS_MUC);
-			if (FHistory.empty || FHistory.maxChars>0 || FHistory.maxStanzas>0 || FHistory.seconds>0 || FHistory.since.isValid())
-			{
-				QDomElement histElem = xelem.appendChild(presence.createElement("history")).toElement();
-				if (!FHistory.empty)
-				{
-					if (FHistory.maxChars > 0)
-						histElem.setAttribute("maxchars",FHistory.maxChars);
-					if (FHistory.maxStanzas > 0)
-						histElem.setAttribute("maxstanzas",FHistory.maxStanzas);
-					if (FHistory.seconds > 0)
-						histElem.setAttribute("seconds",FHistory.seconds);
-					if (FHistory.since.isValid())
-						histElem.setAttribute("since",DateTime(FHistory.since).toX85UTC());
-				}
-				else
-				{
-					histElem.setAttribute("maxchars",0);
-				}
-			}
 			if (!FPassword.isEmpty())
 				xelem.appendChild(presence.createElement("password")).appendChild(presence.createTextNode(FPassword));
-			if (FDiscovery && !FDiscovery->hasDiscoInfo(streamJid(),roomJid()))
-				FDiscovery->requestDiscoInfo(streamJid(),roomJid());
-		}
-		else if (isConnected() && !isConnecting)
-		{
-			emit chatAboutToDisconnect();
 		}
 
-		if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
-		{
-			FConnected = isConnecting;
-			return true;
-		}
+		FStanzaProcessor->sendStanzaOut(FStreamJid,presence);
 	}
-	return false;
 }
 
 bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
@@ -463,18 +397,17 @@ QString MultiUserChat::subject() const
 	return FSubject;
 }
 
-bool MultiUserChat::sendSubject(const QString &ASubject)
+void MultiUserChat::setSubject(const QString &ASubject)
 {
 	if (FStanzaProcessor && isOpen())
 	{
 		Message message;
 		message.setTo(FRoomJid.bare()).setType(Message::GroupChat).setSubject(ASubject);
-		return FStanzaProcessor->sendStanzaOut(FStreamJid,message.stanza());
+		FStanzaProcessor->sendStanzaOut(FStreamJid,message.stanza());
 	}
-	return false;
 }
 
-bool MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
+void MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
 {
 	if (FStanzaProcessor && FDataForms && isOpen())
 	{
@@ -483,15 +416,11 @@ bool MultiUserChat::sendDataFormMessage(const IDataForm &AForm)
 		QDomElement elem = message.stanza().element();
 		FDataForms->xmlForm(AForm,elem);
 		if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,message.stanza(),0))
-		{
 			emit dataFormMessageSent(AForm);
-			return true;
-		}
 	}
-	return false;
 }
 
-bool MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QString &AReason)
+void MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QString &AReason)
 {
 	IMultiUser *user = userByNick(ANick);
 	if (FStanzaProcessor && user)
@@ -505,12 +434,11 @@ bool MultiUserChat::setRole(const QString &ANick, const QString &ARole, const QS
 			itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
 		if (!AReason.isEmpty())
 			itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
-		return FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
+		FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
 	}
-	return false;
 }
 
-bool MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason)
+void MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffiliation, const QString &AReason)
 {
 	IMultiUser *user = userByNick(ANick);
 	if (FStanzaProcessor && user)
@@ -524,9 +452,8 @@ bool MultiUserChat::setAffiliation(const QString &ANick, const QString &AAffilia
 			itemElem.setAttribute("jid",user->data(MUDR_REAL_JID).toString());
 		if (!AReason.isEmpty())
 			itemElem.appendChild(role.createElement("reason")).appendChild(role.createTextNode(AReason));
-		return FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
+		FStanzaProcessor->sendStanzaRequest(this,FStreamJid,role,0);
 	}
-	return false;
 }
 
 bool MultiUserChat::requestAffiliationList(const QString &AAffiliation)
@@ -644,86 +571,6 @@ bool MultiUserChat::destroyRoom(const QString &AReason)
 	return false;
 }
 
-void MultiUserChat::initialize()
-{
-	IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
-		if (FMessageProcessor)
-			FMessageProcessor->insertMessageEditor(MEO_MULTIUSERCHAT,this);
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor)
-		{
-			IStanzaHandle shandle;
-			shandle.handler = this;
-			shandle.order = SHO_PI_MULTIUSERCHAT;
-			shandle.direction = IStanzaHandle::DirectionIn;
-			shandle.streamJid = FStreamJid;
-			shandle.conditions.append(SHC_PRESENCE);
-			FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
-
-			if (FMessageProcessor==NULL || !FMessageProcessor->isActiveStream(streamJid()))
-			{
-				shandle.conditions.clear();
-				shandle.order = SHO_MI_MULTIUSERCHAT;
-				shandle.conditions.append(SHC_MESSAGE);
-				FSHIMessage = FStanzaProcessor->insertStanzaHandle(shandle);
-			}
-		}
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
-	if (plugin)
-	{
-		IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-		if (presencePlugin)
-		{
-			FPresence = presencePlugin->findPresence(FStreamJid);
-			if (FPresence)
-			{
-				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
-				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),SLOT(onPresenceAboutToClose(int , const QString &)));
-			}
-		}
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
-	if (plugin)
-	{
-		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (xmppStreams)
-		{
-			FXmppStream = xmppStreams->xmppStream(FStreamJid);
-			if (FXmppStream)
-			{
-				connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
-				connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
-			}
-		}
-	}
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
-	if (plugin)
-		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-
-	plugin = FChatPlugin->pluginManager()->pluginInterface("IServiceDiscovery").value(0,NULL);
-	if (plugin)
-	{
-		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-		if (FDiscovery)
-		{
-			onDiscoveryInfoReceived(FDiscovery->discoInfo(streamJid(),roomJid()));
-			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoveryInfoReceived(const IDiscoInfo &)));
-		}
-	}
-}
-
 bool MultiUserChat::processMessage(const Stanza &AStanza)
 {
 	bool hooked = true;
@@ -739,19 +586,15 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 	}
 
 	Message message(AStanza);
-	if (AStanza.type() == "error")
+	if (AStanza.type()=="error")
 	{
 		XmppStanzaError err(AStanza);
 		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.errorMessage()) : err.errorMessage());
 	}
-	else if (message.type()==Message::GroupChat && !message.stanza().firstElement("subject").isNull())
+	else if (message.type() == Message::GroupChat && !message.stanza().firstElement("subject").isNull())
 	{
-		QString newSubject = message.subject();
-		if (FSubject != newSubject)
-		{
-			FSubject = newSubject;
-			emit subjectChanged(fromNick, FSubject);
-		}
+		FSubject = message.subject();
+		emit subjectChanged(fromNick, FSubject);
 	}
 	else if (fromNick.isEmpty())
 	{
@@ -820,7 +663,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			else if (showText == "xa")
 				show = IPresence::ExtendedAway;
 			else
-				show = IPresence::Online;
+				show = IPresence::Online;     //Костыль под кривые клиенты и транспорты
 
 			QString status = AStanza.firstElement("status").text();
 			Jid realJid = itemElem.attribute("jid");
@@ -893,7 +736,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 					if (user == FMainUser)
 					{
 						FNickName = newNick;
-						sendPresence(FShow,FStatus);
+						setPresence(FShow,FStatus);
 					}
 				}
 			}
@@ -929,9 +772,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 					delete user;
 				}
 				else
-				{
 					closeChat(show,status);
-				}
 			}
 			accepted = true;
 		}
@@ -954,15 +795,82 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	return accepted;
 }
 
+void MultiUserChat::initialize()
+{
+	IPlugin *plugin = FChatPlugin->pluginManager()->pluginInterface("IMessageProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+		if (FMessageProcessor)
+			FMessageProcessor->insertMessageEditor(MEO_MULTIUSERCHAT,this);
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+		if (FStanzaProcessor)
+		{
+			IStanzaHandle shandle;
+			shandle.handler = this;
+			shandle.order = SHO_PI_MULTIUSERCHAT;
+			shandle.direction = IStanzaHandle::DirectionIn;
+			shandle.streamJid = FStreamJid;
+			shandle.conditions.append(SHC_PRESENCE);
+			FSHIPresence = FStanzaProcessor->insertStanzaHandle(shandle);
+
+			if (FMessageProcessor == NULL)
+			{
+				shandle.conditions.clear();
+				shandle.order = SHO_MI_MULTIUSERCHAT;
+				shandle.conditions.append(SHC_MESSAGE);
+				FSHIMessage = FStanzaProcessor->insertStanzaHandle(shandle);
+			}
+		}
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IPresencePlugin").value(0,NULL);
+	if (plugin)
+	{
+		IPresencePlugin *presencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		if (presencePlugin)
+		{
+			FPresence = presencePlugin->findPresence(FStreamJid);
+			if (FPresence)
+			{
+				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
+				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),SLOT(onPresenceAboutToClose(int , const QString &)));
+			}
+		}
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IXmppStreams").value(0,NULL);
+	if (plugin)
+	{
+		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		if (xmppStreams)
+		{
+			FXmppStream = xmppStreams->xmppStream(FStreamJid);
+			if (FXmppStream)
+			{
+				connect(FXmppStream->instance(),SIGNAL(jidChanged(const Jid &)),SLOT(onStreamJidChanged(const Jid &)));
+				connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onStreamClosed()));
+			}
+		}
+	}
+
+	plugin = FChatPlugin->pluginManager()->pluginInterface("IDataForms").value(0,NULL);
+	if (plugin)
+		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+}
+
 void MultiUserChat::closeChat(int AShow, const QString &AStatus)
 {
-	FConnected = false;
-
 	if (FMainUser)
 	{
 		FMainUser->setData(MUDR_SHOW,AShow);
 		FMainUser->setData(MUDR_STATUS,AStatus);
-		emit userPresence(FMainUser,AShow,AStatus);
+		emit userPresence(FMainUser,IPresence::Offline,QString::null);
 		delete FMainUser;
 	}
 	FMainUser = NULL;
@@ -995,26 +903,13 @@ void MultiUserChat::onPresenceChanged(int AShow, const QString &AStatus, int APr
 {
 	Q_UNUSED(APriority);
 	if (FAutoPresence)
-		sendPresence(AShow,AStatus);
-}
-
-void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
-{
-	if (AInfo.streamJid==streamJid() && AInfo.contactJid==roomJid())
-	{
-		int index = FDiscovery->findIdentity(AInfo.identity,"conference","text");
-		if (index>=0 && !AInfo.identity.at(index).name.isEmpty())
-		{
-			FRoomName = AInfo.identity.at(index).name;
-			emit roomNameChanged(FRoomName);
-		}
-	}
+		setPresence(AShow,AStatus);
 }
 
 void MultiUserChat::onPresenceAboutToClose(int AShow, const QString &AStatus)
 {
-	if (isConnected())
-		sendPresence(AShow,AStatus);
+	if (FAutoPresence && isOpen())
+		setPresence(AShow,AStatus);
 }
 
 void MultiUserChat::onStreamClosed()

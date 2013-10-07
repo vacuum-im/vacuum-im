@@ -275,7 +275,7 @@ ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Ji
 	connect(ui.pbtRemove,SIGNAL(clicked()),SLOT(onRemoveItemPrefClicked()));
 	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
 	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onArchiveRequestFailed(const QString &, const QString &)));
 
 	connect(ui.cmbMethodLocal,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbMethodManual,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
@@ -285,7 +285,6 @@ ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Ji
 	connect(ui.cmbExpireTime,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
 	connect(ui.cmbExpireTime->lineEdit(),SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.chbAutoSave,SIGNAL(stateChanged(int)),SIGNAL(modified()));
-	connect(ui.chbForceDirect,SIGNAL(stateChanged(int)),SIGNAL(modified()));
 	connect(delegat,SIGNAL(commitData(QWidget *)),SIGNAL(modified()));
 }
 
@@ -345,28 +344,21 @@ void ArchiveStreamOptions::apply()
 				FSaveRequests.append(requestId);
 		}
 
-		FLastError = XmppError::null;
+		FLastError.clear();
 		updateWidget();
 	}
-
-	Options::node(OPV_HISTORY_STREAM_ITEM,FStreamJid.pBare()).node("force-direct-archiving").setValue(ui.chbForceDirect->isChecked());
-
 	emit childApply();
 }
 
 void ArchiveStreamOptions::reset()
 {
+	FLastError.clear();
 	FTableItems.clear();
 	ui.tbwItemPrefs->clearContents();
 	ui.tbwItemPrefs->setRowCount(0);
 	if (FArchiver->isReady(FStreamJid))
 		onArchivePrefsChanged(FStreamJid);
-
-	FLastError = XmppError::null;
 	updateWidget();
-
-	ui.chbForceDirect->setChecked(Options::node(OPV_HISTORY_STREAM_ITEM,FStreamJid.pBare()).value("force-direct-archiving").toBool());
-
 	emit childReset();
 }
 
@@ -383,8 +375,8 @@ void ArchiveStreamOptions::updateWidget()
 		ui.lblStatus->setText(tr("Waiting for host response..."));
 	if (!FArchiver->isReady(FStreamJid))
 		ui.lblStatus->setText(tr("History preferences is not available"));
-	else if (!FLastError.isNull())
-		ui.lblStatus->setText(tr("Failed to save archive preferences: %1").arg(FLastError.errorMessage()));
+	else if (!FLastError.isEmpty())
+		ui.lblStatus->setText(tr("Failed to save archive preferences: %1").arg(FLastError));
 	else
 		ui.lblStatus->clear();
 }
@@ -565,7 +557,7 @@ void ArchiveStreamOptions::onArchiveRequestCompleted(const QString &AId)
 	}
 }
 
-void ArchiveStreamOptions::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
+void ArchiveStreamOptions::onArchiveRequestFailed(const QString &AId, const QString &AError)
 {
 	if (FSaveRequests.contains(AId))
 	{

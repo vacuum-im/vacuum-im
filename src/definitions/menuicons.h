@@ -25,7 +25,6 @@
 //Bookmarks
 #define MNI_BOOKMARKS                   "bookmarks"
 #define MNI_BOOKMARKS_ADD               "bookmarksAdd"
-#define MNI_BOOKMARKS_REMOVE            "bookmarksRemove"
 #define MNI_BOOKMARKS_ROOM              "bookmarksRoom"
 #define MNI_BOOKMARKS_URL               "bookmarksURL"
 #define MNI_BOOKMARKS_EDIT              "bookmarksEdit"
@@ -57,8 +56,9 @@
 #define MNI_CONSOLE                     "console"
 
 //ChatMessageHandler
-#define MNI_CHATMHANDLER_MESSAGE        "chatmessagehandlerMessage"
-#define MNI_CHATMHANDLER_CLEAR_CHAT     "chatmessagehandlerClearChat"
+#define MNI_CHAT_MHANDLER_MESSAGE       "chatmessagehandlerMessage"
+#define MNI_CHAT_MHANDLER_USER_MENU     "chatmessagehandlerUserMenu"
+#define MNI_CHAT_MHANDLER_CLEAR_CHAT    "chatmessagehandlerClearChat"
 
 //DataStreamsManager
 #define MNI_DATASTREAMSMANAGER          "dataStreamsManager"
@@ -111,13 +111,13 @@
 #define MNI_MESSAGEWIDGETS_SEND         "messagewidgetsSend"
 #define MNI_MESSAGEWIDGETS_TAB_MENU     "messagewidgetsTabMenu"
 #define MNI_MESSAGEWIDGETS_QUOTE        "messagewidgetsQuote"
-#define MNI_MESSAGEWIDGETS_SELECT       "messagewidgetsSelect"
 
 //MultiUserChat
 #define MNI_MUC_CONFERENCE              "mucConference"
 #define MNI_MUC_JOIN                    "mucJoin"
 #define MNI_MUC_SHOW_ALL_ROOMS          "mucShowAllRooms"
 #define MNI_MUC_LEAVE_HIDDEN_ROOMS      "mucLeaveHiddenRooms"
+#define MNI_MUC_TOOLS_MENU              "mucToolsMenu"
 #define MNI_MUC_INVITE                  "mucInvite"
 #define MNI_MUC_CHANGE_NICK             "mucChangeNick"
 #define MNI_MUC_CHANGE_TOPIC            "mucChangeTopic"
@@ -137,11 +137,7 @@
 #define MNI_MUC_USER_MENU               "mucUserMenu"
 
 //NormalMessageHandler
-#define MNI_NORMALMHANDLER_MESSAGE      "normalmessagehandlerMessage"
-#define MNI_NORMALMHANDLER_SEND         "normalmessagehandlerSend"
-#define MNI_NORMALMHANDLER_REPLY        "normalmessagehandlerReply"
-#define MNI_NORMALMHANDLER_FORWARD      "normalmessagehandlerForward"
-#define MNI_NORMALMHANDLER_NEXT         "normalmessagehandlerNext"
+#define MNI_NORMAL_MHANDLER_MESSAGE     "normalmessagehandlerMessage"
 
 //Notifications
 #define MNI_NOTIFICATIONS               "notifications"
@@ -171,13 +167,6 @@
 #define MNI_PLUGINMANAGER_SETUP         "pluginmanagerSetup"
 #define MNI_PLUGINMANAGER_ABOUT         "pluginmanagerAbout"
 #define MNI_PLUGINMANAGER_ABOUT_QT      "pluginmanagerAboutQt"
-
-//RecentContact
-#define MNI_RECENT                      "recentcontacts"
-#define MNI_RECENT_FAVORITE             "recentcontactsFavorite"
-#define MNI_RECENT_INSERT_FAVORITE      "recentcontactsInsertFavorite"
-#define MNI_RECENT_REMOVE_FAVORITE      "recentcontactsRemoveFavorite"
-#define MNI_RECENT_REMOVE_RECENT        "recentcontactsRemoveRecent"
 
 //Registration
 #define MNI_REGISTERATION               "register"
@@ -212,7 +201,6 @@
 #define MNI_ROSTERSEARCH_MENU           "rostersearchMenu"
 
 //RosterView
-#define MNI_ROSTERVIEW_CONTACTS         "rosterviewContacts"
 #define MNI_ROSTERVIEW_OPTIONS          "rosterviewOptions"
 #define MNI_ROSTERVIEW_SHOW_OFFLINE     "rosterviewShowOffline"
 #define MNI_ROSTERVIEW_HIDE_OFFLINE     "rosterviewHideOffline"

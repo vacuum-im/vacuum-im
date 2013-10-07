@@ -29,8 +29,8 @@ protected:
 	QList<int> findUrlPositions(const QUrl &AName) const;
 	QPixmap addAnimation(const QUrl &AName, const QVariant &AImageData);
 protected:
-	void showEvent(QShowEvent *AEvent);
-	QVariant loadResource(int AType, const QUrl &AName);
+	virtual void showEvent(QShowEvent *AEvent);
+	virtual QVariant loadResource(int AType, const QUrl &AName);
 protected slots:
 	void onAnimationFrameChanged();
 	void onResourceLoadFinished();

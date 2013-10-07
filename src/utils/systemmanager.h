@@ -13,16 +13,15 @@ public:
 	static SystemManager *instance();
 	static int systemIdle();
 	static bool isSystemIdleActive();
-	static void startSystemIdle();
-	static void stopSystemIdle();
+public:
+	void startSystemIdle();
+	void stopSystemIdle();
 signals:
 	void systemIdleChanged(int ASeconds);
 protected slots:
 	void onIdleChanged(int ASeconds);
 private:
-	SystemManager();
-	~SystemManager();
-	SystemManagerData *d;
+	static SystemManagerData *d;
 };
 
 #endif // SYSTEMMANAGER_H

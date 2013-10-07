@@ -4,12 +4,9 @@
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <definitions/optionvalues.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/iconstorage.h>
 #include "ui_notifyoptionswidget.h"
 
 class SortFilterProxyModel : 
@@ -40,7 +37,6 @@ protected:
 	void createTreeModel();
 	void setItemGray(QStandardItem *AItem, bool AGray) const;
 	void setItemBold(QStandardItem *AItem, bool ABold) const;
-	void setItemItalic(QStandardItem *AItem, bool AItalic) const;
 protected slots:
 	void onRestoreDefaultsClicked();
 	void onModelItemChanged(QStandardItem *AItem);
@@ -52,7 +48,8 @@ private:
 	int FBlockChangesCheck;
 	QStandardItemModel FModel;
 	SortFilterProxyModel FSortModel;
-	QMap<QString, QStandardItem *> FTypeItems;
+	QMap<int, QStandardItem *> FKindItems;
+	QMultiMap<QString, QStandardItem *> FTypeItems;
 };
 
 #endif // NOTIFYOPTIONSWIDGET_H

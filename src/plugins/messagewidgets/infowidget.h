@@ -1,60 +1,66 @@
 #ifndef INFOWIDGET_H
 #define INFOWIDGET_H
 
+#include <definitions/optionvalues.h>
 #include <interfaces/imessagewidgets.h>
-#include <interfaces/iavatars.h>
+#include <interfaces/iaccountmanager.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
-#include <interfaces/istatusicons.h>
-#include <interfaces/iaccountmanager.h>
+#include <interfaces/iavatars.h>
+#include <interfaces/istatuschanger.h>
+#include <utils/options.h>
 #include "ui_infowidget.h"
 
 class InfoWidget :
-	public QWidget,
-	public IMessageInfoWidget
+			public QWidget,
+			public IInfoWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageWidget IMessageInfoWidget);
+	Q_INTERFACES(IInfoWidget);
 public:
-	InfoWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent);
+	InfoWidget(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, QWidget *AParent);
 	~InfoWidget();
-	//IMessageWidget
 	virtual QWidget *instance() { return this; }
-	virtual bool isVisibleOnWindow() const;
-	virtual IMessageWindow *messageWindow() const;
-	//IMessageInfoWidget
-	virtual Menu *addressMenu() const;
-	virtual bool isAddressMenuVisible() const;
-	virtual void setAddressMenuVisible(bool AVisible);
-	virtual QVariant fieldValue(int AField) const;
-	virtual void setFieldValue(int AField, const QVariant &AValue);
-	virtual ToolBarChanger *infoToolBarChanger() const;
+	virtual const Jid &streamJid() const;
+	virtual void setStreamJid(const Jid &AStreamJid);
+	virtual const Jid &contactJid() const;
+	virtual void setContactJid(const Jid &AContactJid);
+	virtual void autoUpdateFields();
+	virtual void autoUpdateField(InfoField AField);
+	virtual QVariant field(InfoField AField) const;
+	virtual void setField(InfoField AField, const QVariant &AValue);
+	virtual int autoUpdatedFields() const;
+	virtual bool isFiledAutoUpdated(IInfoWidget::InfoField AField) const;
+	virtual void setFieldAutoUpdated(IInfoWidget::InfoField AField, bool AAuto);
+	virtual int visibleFields() const;
+	virtual bool isFieldVisible(IInfoWidget::InfoField AField) const;
+	virtual void setFieldVisible(IInfoWidget::InfoField AField, bool AVisible);
 signals:
-	void fieldValueChanged(int AField);
-	void addressMenuVisibleChanged(bool AVisible);
-	void addressMenuRequested(Menu *AMenu);
-	void contextMenuRequested(Menu *AMenu);
-	void toolTipsRequested(QMap<int,QString> &AToolTips);
+	void streamJidChanged(const Jid &ABefore);
+	void contactJidChanged(const Jid &ABefore);
+	void fieldChanged(int AField, const QVariant &AValue);
 protected:
 	void initialize();
-	void updateFieldView(int AField);
-protected:
-	bool event(QEvent *AEvent);
-	void contextMenuEvent(QContextMenuEvent *AEvent);
-	bool eventFilter(QObject *AWatched, QEvent *AEvent);
+	void updateFieldLabel(IInfoWidget::InfoField AField);
 protected slots:
-	void onAddressMenuAboutToShow();
-	void onUpdateInfoToolBarMaxWidth();
+	void onAccountChanged(const OptionsNode &ANode);
+	void onRosterItemReceived(const IRosterItem &AItem, const IRosterItem &ABefore);
+	void onPresenceItemReceived(const IPresenceItem &AItem, const IPresenceItem &ABefore);
+	void onAvatarChanged(const Jid &AContactJid);
 private:
 	Ui::InfoWidgetClass ui;
 private:
+	IAccount *FAccount;
+	IRoster *FRoster;
+	IPresence *FPresence;
 	IAvatars *FAvatars;
+	IStatusChanger *FStatusChanger;
 	IMessageWidgets *FMessageWidgets;
 private:
-	Menu *FAddressMenu;
-	bool FAddressMenuVisible;
-	IMessageWindow *FWindow;
-	ToolBarChanger *FInfoToolBar;
+	int FAutoFields;
+	int FVisibleFields;
+	Jid FStreamJid;
+	Jid FContactJid;
 	QMap<int, QVariant> FFieldValues;
 };
 

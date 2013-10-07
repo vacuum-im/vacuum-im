@@ -6,11 +6,8 @@
 
 class UTILS_EXPORT WidgetManager
 {
-	struct WidgetManagerData;
 public:
-	static WidgetManager *instance();
 	static void raiseWidget(QWidget *AWidget);
-	static bool isActiveWindow(const QWidget *AWindow);
 	static void showActivateRaiseWindow(QWidget *AWindow);
 	static void setWindowSticky(QWidget *AWindow, bool ASticky);
 	static void alertWidget(QWidget *AWidget);
@@ -20,10 +17,6 @@ public:
 	static bool alignWindow(QWidget *AWindow, Qt::Alignment AAlign);
 	static QRect alignRect(const QRect &ARect, const QRect &ABoundary, Qt::Alignment AAlign=Qt::AlignCenter);
 	static QRect alignGeometry(const QSize &ASize, const QWidget *AWidget=NULL, Qt::Alignment AAlign=Qt::AlignCenter);
-private:
-	WidgetManager();
-	~WidgetManager();
-	WidgetManagerData *d;
 };
 
 #endif //WIDGETMANAGER_H

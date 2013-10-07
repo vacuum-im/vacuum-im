@@ -2,6 +2,13 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="de" sourcelanguage="en">
 <context>
+    <name>Roster</name>
+    <message>
+        <source>Roster request failed</source>
+        <translation>Rosteranfrage fehlgeschlagen</translation>
+    </message>
+</context>
+<context>
     <name>RosterPlugin</name>
     <message>
         <source>Roster Manager</source>
@@ -10,10 +17,6 @@
     <message>
         <source>Allows other modules to get information about contacts in the roster</source>
         <translation>Erlaubt anderen Modulen Informationen über Kontakte im Roste zu erlangen</translation>
-    </message>
-    <message>
-        <source>Roster request failed</source>
-        <translation>Rosteranfrage fehlgeschlagen</translation>
     </message>
 </context>
 </TS>

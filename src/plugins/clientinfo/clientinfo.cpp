@@ -43,7 +43,6 @@ ClientInfo::ClientInfo()
 	FDiscovery = NULL;
 	FDataForms = NULL;
 	FOptionsManager = NULL;
-	FStatusIcons = NULL;
 
 	FPingHandle = 0;
 	FTimeHandle = 0;
@@ -90,7 +89,8 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)), SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
+			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
+			        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
 		}
 	}
 
@@ -104,11 +104,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 	if (plugin)
 	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-		if (FRostersViewPlugin)
-		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -125,12 +120,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 	if (plugin)
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
-	if (plugin)
-	{
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -163,6 +152,14 @@ bool ClientInfo::initObjects()
 		FPingHandle = FStanzaProcessor->insertStanzaHandle(shandle);
 	}
 
+	if (FRostersViewPlugin)
+	{
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
+			SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+	}
+
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
@@ -191,7 +188,7 @@ bool ClientInfo::initSettings()
 
 bool ClientInfo::startPlugin()
 {
-	SystemManager::startSystemIdle();
+	SystemManager::instance()->startSystemIdle();
 	return true;
 }
 
@@ -827,26 +824,46 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
 	}
 }
 
-void ClientInfo::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
-		if (index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT || index->kind()==RIK_MY_RESOURCE)
+		if (index->type() == RIT_CONTACT || index->type() == RIT_AGENT || index->type() == RIT_MY_RESOURCE)
 		{
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 			{
-				int show = index->data(RDR_SHOW).toInt();
 				Jid contactJid = index->data(RDR_FULL_JID).toString();
-				if (show==IPresence::Offline || show==IPresence::Error)
+				int show = index->data(RDR_SHOW).toInt();
+				QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(streamJid,contactJid).features : QStringList();
+				if (show!=IPresence::Offline && show!=IPresence::Error && !features.contains(NS_JABBER_VERSION))
+				{
+					Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);
+					AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
+				}
+				if ((show == IPresence::Offline || show == IPresence::Error) && !features.contains(NS_JABBER_LAST))
 				{
 					Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_LAST,AMenu);
 					AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
 				}
 			}
 		}
+	}
+}
+
+void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+{
+	if (ALabelId == RLID_DISPLAY)
+	{
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+
+		if (hasSoftwareInfo(contactJid))
+			AToolTips.insert(RTTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(Qt::escape(softwareName(contactJid))).arg(Qt::escape(softwareVersion(contactJid))));
+
+		if (hasEntityTime(contactJid))
+			AToolTips.insert(RTTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
 	}
 }
 

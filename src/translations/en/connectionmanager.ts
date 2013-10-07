@@ -12,16 +12,12 @@
         <translation>Allows to use different types of connections to a Jabber server</translation>
     </message>
     <message>
-        <source>&lt;No Proxy&gt;</source>
-        <translation>&lt;No Proxy&gt;</translation>
-    </message>
-    <message>
         <source>New Proxy</source>
         <translation>New Proxy</translation>
     </message>
     <message>
-        <source>Connection error</source>
-        <translation>Connection error</translation>
+        <source>&lt;No Proxy&gt;</source>
+        <translation>&lt;No Proxy&gt;</translation>
     </message>
 </context>
 <context>
@@ -81,6 +77,10 @@
         <translation>Password:</translation>
     </message>
     <message>
+        <source>Default Proxy:</source>
+        <translation>Default Proxy:</translation>
+    </message>
+    <message>
         <source>Add</source>
         <translation>Add</translation>
     </message>
@@ -94,10 +94,6 @@
     <message>
         <source>&lt;Default Proxy&gt;</source>
         <translation>&lt;Default Proxy&gt;</translation>
-    </message>
-    <message>
-        <source>Default proxy:</source>
-        <translation>Default proxy:</translation>
     </message>
 </context>
 <context>

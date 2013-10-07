@@ -163,7 +163,7 @@ void DiscoInfoWindow::onListItemDoubleClicked(QListWidgetItem *AItem)
 	if (FDiscovery->hasFeatureHandler(feature))
 	{
 		IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,FContactJid,FNode);
-		FDiscovery->execFeatureAction(FStreamJid,feature,dinfo);
+		FDiscovery->execFeatureHandler(FStreamJid,feature,dinfo);
 	}
 }
 

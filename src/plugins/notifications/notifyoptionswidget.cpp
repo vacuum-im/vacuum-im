@@ -11,8 +11,7 @@ enum ModelColumns
 
 enum ModelDataRoles
 {
-	MDR_TYPE = Qt::UserRole + 1,
-	MDR_KIND,
+	MDR_KIND = Qt::UserRole + 1,
 	MDR_SORT
 };
 
@@ -42,7 +41,6 @@ NotifyOptionsWidget::NotifyOptionsWidget(INotifications *ANotifications, QWidget
 	ui.trvNotifies->setItemsExpandable(false);
 	ui.trvNotifies->expandAll();
 
-	connect(ui.spbPopupTimeout,SIGNAL(valueChanged(int)),SIGNAL(modified()));
 	connect(ui.pbtRestoreDefaults,SIGNAL(clicked()),SLOT(onRestoreDefaultsClicked()));
 	connect(&FModel,SIGNAL(itemChanged(QStandardItem *)),SLOT(onModelItemChanged(QStandardItem *)));
 
@@ -51,30 +49,30 @@ NotifyOptionsWidget::NotifyOptionsWidget(INotifications *ANotifications, QWidget
 
 NotifyOptionsWidget::~NotifyOptionsWidget()
 {
-
+	connect(ui.spbPopupTimeout,SIGNAL(valueChanged(int)),SIGNAL(modified()));
 }
 
 void NotifyOptionsWidget::apply()
 {
 	Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).setValue(ui.spbPopupTimeout->value());
 
-	for(QMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
-	{
-		QStandardItem *typeNameItem = it.value();
-		ushort kinds = !it.key().isEmpty() ? FNotifications->typeNotificationKinds(it.key()) : 0;
-		for (int row=0; row<typeNameItem->rowCount(); row++)
-		{
-			QStandardItem *kindEnableItem = typeNameItem->child(row, COL_ENABLE);
-			if (kindEnableItem->checkState() == Qt::Checked)
-				kinds |= (ushort)kindEnableItem->data(MDR_KIND).toInt();
-			else
-				kinds &= ~((ushort)kindEnableItem->data(MDR_KIND).toInt());
-		}
+	ushort enabledKinds = 0;
+	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); ++it)
+		if (it.value()->checkState() == Qt::Checked)
+			enabledKinds |= it.key();
+	FNotifications->setEnabledNotificationKinds(enabledKinds);
 
-		if (!it.key().isEmpty())
-			FNotifications->setTypeNotificationKinds(it.key(),kinds);
-		else
-			FNotifications->setEnabledNotificationKinds(kinds);
+	foreach(const QString &typeId, FTypeItems.uniqueKeys())
+	{
+		ushort kinds = FNotifications->typeNotificationKinds(typeId);
+		foreach(QStandardItem *typeItem, FTypeItems.values(typeId))
+		{
+			if (typeItem->checkState() == Qt::Checked)
+				kinds |= (ushort)typeItem->data(MDR_KIND).toInt();
+			else
+				kinds &= ~((ushort)typeItem->data(MDR_KIND).toInt());
+		}
+		FNotifications->setTypeNotificationKinds(typeId,kinds);
 	}
 
 	emit childApply();
@@ -83,16 +81,14 @@ void NotifyOptionsWidget::apply()
 void NotifyOptionsWidget::reset()
 {
 	ui.spbPopupTimeout->setValue(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt());
-	for(QMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
-	{
-		QStandardItem *typeNameItem = it.value();
-		ushort kinds = !it.key().isEmpty() ? FNotifications->typeNotificationKinds(it.key()) : FNotifications->enabledNotificationKinds();
-		for (int row=0; row<typeNameItem->rowCount(); row++)
-		{
-			QStandardItem *kindEnableItem = typeNameItem->child(row, COL_ENABLE);
-			kindEnableItem->setCheckState((kinds & (ushort)kindEnableItem->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);
-		}
-	}
+	
+	ushort enabledKinds = FNotifications->enabledNotificationKinds();
+	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); ++it)
+		it.value()->setCheckState((enabledKinds & it.key())>0 ? Qt::Checked : Qt::Unchecked);
+	
+	for (QMultiMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
+		it.value()->setCheckState((FNotifications->typeNotificationKinds(it.key()) & it.value()->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);
+
 	void childReset();
 }
 
@@ -114,51 +110,47 @@ void NotifyOptionsWidget::createTreeModel()
 	FModel.clear();
 	FModel.setColumnCount(2);
 
-	INotificationType globalType;
-	globalType.order = 0;
-	globalType.kindMask = 0xFFFF;
-	globalType.title = tr("Allowed types of notifications");
-	globalType.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_NOTIFICATIONS);
-
-	QMap<QString,INotificationType> notifyTypes;
-	notifyTypes.insert(QString::null,globalType);
 	foreach(const QString &typeId, FNotifications->notificationTypes())
-		notifyTypes.insert(typeId,FNotifications->notificationType(typeId));
-
-	for(QMap<QString,INotificationType>::const_iterator it=notifyTypes.constBegin(); it!=notifyTypes.constEnd(); ++it)
 	{
-		if (!it->title.isEmpty() && it->kindMask>0)
+		INotificationType notifyType = FNotifications->notificationType(typeId);
+		if (!notifyType.title.isEmpty() && notifyType.kindMask>0)
 		{
-			QStandardItem *typeNameItem = new QStandardItem(it->title);
-			typeNameItem->setFlags(Qt::ItemIsEnabled);
-			typeNameItem->setData(it.key(),MDR_TYPE);
-			typeNameItem->setData(it->order,MDR_SORT);
-			typeNameItem->setIcon(it->icon);
-			setItemBold(typeNameItem,true);
-
-			QStandardItem *typeEnableItem = new QStandardItem;
-			typeEnableItem->setFlags(Qt::ItemIsEnabled);
-
-			FTypeItems.insert(it.key(),typeNameItem);
-			FModel.invisibleRootItem()->appendRow(QList<QStandardItem *>() << typeNameItem << typeEnableItem);
-
 			for (int index =0; KindsList[index].kind!=0; index++)
 			{
-				if ((it->kindMask & KindsList[index].kind)>0)
+				if ((notifyType.kindMask & KindsList[index].kind)>0)
 				{
-					QStandardItem *kindNameItem = new QStandardItem(KindsList[index].name);
-					kindNameItem->setFlags(Qt::ItemIsEnabled);
-					kindNameItem->setData(index,MDR_SORT);
+					QStandardItem *kindEnableItem = FKindItems.value(KindsList[index].kind);
+					if (kindEnableItem == NULL)
+					{
+						QStandardItem *kindNameItem = new QStandardItem(KindsList[index].name);
+						kindNameItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+						kindNameItem->setData(index,MDR_SORT);
 
-					QStandardItem *kindEnableItem = new QStandardItem();
-					kindEnableItem->setFlags(Qt::ItemIsEnabled);
-					kindEnableItem->setTextAlignment(Qt::AlignCenter);
-					kindEnableItem->setCheckable(true);
-					kindEnableItem->setCheckState(Qt::PartiallyChecked);
-					kindEnableItem->setData(it.key(),MDR_TYPE);
-					kindEnableItem->setData(KindsList[index].kind,MDR_KIND);
+						kindEnableItem = new QStandardItem();
+						kindEnableItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+						kindEnableItem->setTextAlignment(Qt::AlignCenter);
+						kindEnableItem->setCheckable(true);
+						kindEnableItem->setCheckState(Qt::PartiallyChecked);
 
-					typeNameItem->appendRow(QList<QStandardItem *>() << kindNameItem << kindEnableItem);
+						FKindItems.insert(KindsList[index].kind,kindEnableItem);
+						FModel.invisibleRootItem()->appendRow(QList<QStandardItem *>() << kindNameItem << kindEnableItem);
+					}
+					QStandardItem *kindNameItem = FModel.item(kindEnableItem->row(),COL_NAME);
+
+					QStandardItem *typeNameItem = new QStandardItem(notifyType.title);
+					typeNameItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+					typeNameItem->setData(notifyType.order,MDR_SORT);
+					typeNameItem->setIcon(notifyType.icon);
+
+					QStandardItem *typeEnableItem = new QStandardItem;
+					typeEnableItem->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
+					typeEnableItem->setData(KindsList[index].kind,MDR_KIND);
+					typeEnableItem->setTextAlignment(Qt::AlignCenter);
+					typeEnableItem->setCheckable(true);
+					typeEnableItem->setCheckState(Qt::PartiallyChecked);
+
+					FTypeItems.insertMulti(typeId,typeEnableItem);
+					kindNameItem->appendRow(QList<QStandardItem *>() << typeNameItem << typeEnableItem);
 				}
 			}
 		}
@@ -177,63 +169,43 @@ void NotifyOptionsWidget::setItemBold(QStandardItem *AItem, bool ABold) const
 	AItem->setFont(font);
 }
 
-void NotifyOptionsWidget::setItemItalic(QStandardItem *AItem, bool AItalic) const
-{
-	QFont font = AItem->font();
-	font.setItalic(AItalic);
-	AItem->setFont(font);
-}
-
 void NotifyOptionsWidget::onRestoreDefaultsClicked()
 {
-	for(QMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
+	for (QMap<int, QStandardItem *>::const_iterator it=FKindItems.constBegin(); it!=FKindItems.constEnd(); ++it)
+		it.value()->setCheckState(Qt::Checked);
+
+	for (QMultiMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
 	{
-		QStandardItem *typeNameItem = it.value();
-		ushort kinds = !it.key().isEmpty() ? FNotifications->notificationType(it.key()).kindDefs : 0xFFFF;
-		for (int row=0; row<typeNameItem->rowCount(); row++)
-		{
-			QStandardItem *kindEnableItem = typeNameItem->child(row, COL_ENABLE);
-			kindEnableItem->setCheckState((kinds & (ushort)kindEnableItem->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);
-		}
+		INotificationType notifyType = FNotifications->notificationType(it.key());
+		it.value()->setCheckState((notifyType.kindDefs & it.value()->data(MDR_KIND).toInt())>0 ? Qt::Checked : Qt::Unchecked);
 	}
 }
 
 void NotifyOptionsWidget::onModelItemChanged(QStandardItem *AItem)
 {
-	if (FBlockChangesCheck<=0 && AItem->column()==COL_ENABLE)
+	if (FBlockChangesCheck<=0)
 	{
 		FBlockChangesCheck++;
 
-		QStandardItem *typeNameItem = AItem->parent();
-		QString typeId = AItem->data(MDR_TYPE).toString();
-		ushort kindId = (ushort)AItem->data(MDR_KIND).toInt();
-
-		bool enabled = AItem->checkState()==Qt::Checked;
-		QStandardItem *kindNameItem = typeNameItem->child(AItem->row(),COL_NAME);
-		ushort kinds = !typeId.isEmpty() ? FNotifications->notificationType(typeId).kindDefs : 0xFFFF;
-		setItemItalic(kindNameItem,((kinds & kindId)>0)!=enabled);
-
-		if (typeId.isEmpty())
+		if (FKindItems.values().contains(AItem))
 		{
-			for(QMap<QString, QStandardItem *>::const_iterator it=FTypeItems.constBegin(); it!=FTypeItems.constEnd(); ++it)
+			bool enabled = AItem->checkState() == Qt::Checked;
+			QStandardItem *kindNameItem = FModel.item(AItem->row(),COL_NAME);
+			setItemBold(kindNameItem,!enabled);
+			for(int row=0; row<kindNameItem->rowCount(); row++)
 			{
-				if (!it.key().isEmpty())
-				{
-					QStandardItem *typeNameItem = it.value();
-					for (int row=0; row<typeNameItem->rowCount(); row++)
-					{
-						QStandardItem *kindEnableItem = typeNameItem->child(row, COL_ENABLE);
-						if (kindId == (ushort)kindEnableItem->data(MDR_KIND).toInt())
-						{
-							QStandardItem *kindNameItem = typeNameItem->child(row, COL_NAME);
-							setItemGray(kindNameItem,!enabled);
-						}
-					}
-				}
+				setItemGray(kindNameItem->child(row,COL_NAME),!enabled);
 			}
 		}
+		else if (FTypeItems.values().contains(AItem))
+		{
+			bool enabled = AItem->checkState() == Qt::Checked;
+			INotificationType notifyType = FNotifications->notificationType(FTypeItems.key(AItem));
+			QStandardItem *typeNameItem = AItem->parent()->child(AItem->row(),COL_NAME);
+			setItemBold(typeNameItem, ((AItem->data(MDR_KIND).toInt() & notifyType.kindDefs)>0)!=enabled);
+		}
 
-		FBlockChangesCheck--;
 		emit modified();
+		FBlockChangesCheck--;
 	}
 }

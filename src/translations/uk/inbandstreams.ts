@@ -32,23 +32,7 @@
     </message>
 </context>
 <context>
-    <name>InBandStreams</name>
-    <message>
-        <source>Data is broken down into smaller chunks and transported in-band over XMPP</source>
-        <translation>Дані розбиваються на маленькі пакети і передаються через XMPP-канал</translation>
-    </message>
-    <message>
-        <source>In-Band Data Stream</source>
-        <translation>Внутрішньоканальний потік даних</translation>
-    </message>
-    <message>
-        <source>Allows to initiate in-band stream of data between two XMPP entities</source>
-        <translation>Дозволяє ініціювати внутрішньоканальний потік даних між двома XMPP-сутностями</translation>
-    </message>
-    <message>
-        <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
-        <translation>Підтримує ініціалізацію внутрішньоканального потоку даних між двома XMPP-сутностями</translation>
-    </message>
+    <name>InBandStream</name>
     <message>
         <source>Stream destroyed</source>
         <translation>Підключення видалене</translation>
@@ -68,6 +52,25 @@
     <message>
         <source>Failed to send data</source>
         <translation>Не вдалось відправити дані</translation>
+    </message>
+</context>
+<context>
+    <name>InBandStreams</name>
+    <message>
+        <source>Data is broken down into smaller chunks and transported in-band over XMPP</source>
+        <translation>Дані розбиваються на маленькі пакети і передаються через XMPP-канал</translation>
+    </message>
+    <message>
+        <source>In-Band Data Stream</source>
+        <translation>Внутрішньоканальний потік даних</translation>
+    </message>
+    <message>
+        <source>Allows to initiate in-band stream of data between two XMPP entities</source>
+        <translation>Дозволяє ініціювати внутрішньоканальний потік даних між двома XMPP-сутностями</translation>
+    </message>
+    <message>
+        <source>Supports the initiating of the in-band stream of data between two XMPP entities</source>
+        <translation>Підтримує ініціалізацію внутрішньоканального потоку даних між двома XMPP-сутностями</translation>
     </message>
 </context>
 </TS>

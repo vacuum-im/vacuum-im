@@ -5,11 +5,6 @@
 #include <QVariant>
 #include <QApplication>
 
-QHash<QString, IconStorage*> IconStorage::FStaticStorages;
-QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
-QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
-QHash<QString, QHash<QString, QList<IconStorage::IconAnimateFrame> > > IconStorage::FAnimateCache;
-
 struct IconStorage::IconAnimateFrame {
 	int delay;
 	QIcon icon;
@@ -47,6 +42,11 @@ struct IconStorage::IconUpdateParams {
 	QString prop;
 	IconAnimateParams *animation;
 };
+
+QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
+QHash<QString, IconStorage*> IconStorage::FStaticStorages;
+QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
+QHash<QString, QHash<QString, QList<IconStorage::IconAnimateFrame> > > IconStorage::FAnimateCache;
 
 IconStorage::IconStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : FileStorage(AStorage,ASubStorage,AParent)
 {
@@ -87,7 +87,7 @@ IconStorage *IconStorage::staticStorage(const QString &AStorage)
 	IconStorage *iconStorage = FStaticStorages.value(AStorage,NULL);
 	if (!iconStorage)
 	{
-		iconStorage = new IconStorage(AStorage,FILE_STORAGE_SHARED_DIR,qApp);
+		iconStorage = new IconStorage(AStorage,STORAGE_SHARED_DIR,qApp);
 		FStaticStorages.insert(AStorage,iconStorage);
 	}
 	return iconStorage;
@@ -146,7 +146,7 @@ void IconStorage::initAnimation(QObject *AObject, IconUpdateParams *AParams)
 		QString file = fileFullName(AParams->key,AParams->index);
 		if (iconCount > 1)
 		{
-			int interval = AParams->animate > 0 ? AParams->animate : fileProperty(AParams->key,ICON_STORAGE_ANIMATE_INTERVAL).toInt();
+			int interval = AParams->animate > 0 ? AParams->animate : fileOption(AParams->key,OPTION_ANIMATE).toInt();
 			if (interval > 0)
 			{
 				AParams->animation = new IconAnimateParams;

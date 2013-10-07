@@ -5,22 +5,26 @@
 #include <interfaces/imessagewidgets.h>
 
 class StatusBarWidget :
-	public QStatusBar,
-	public IMessageStatusBarWidget
+			public QStatusBar,
+			public IStatusBarWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageWidget IMessageStatusBarWidget);
+	Q_INTERFACES(IStatusBarWidget);
 public:
-	StatusBarWidget(IMessageWindow *AWindow, QWidget *AParent);
+	StatusBarWidget(IInfoWidget *AInfo, IViewWidget *AView, IEditWidget *AEdit, IReceiversWidget *AReceivers, QWidget *AParent);
 	~StatusBarWidget();
-	// IMessageWidget
 	virtual QStatusBar *instance() { return this; }
-	virtual bool isVisibleOnWindow() const;
-	virtual IMessageWindow *messageWindow() const;
-	// IMessageStatusBarWidget
-	virtual StatusBarChanger *statusBarChanger() const;
+	virtual StatusBarChanger *statusBarChanger() const { return FStatusBarChanger; }
+	virtual IInfoWidget *infoWidget() const { return FInfoWidget; }
+	virtual IViewWidget *viewWidget() const { return FViewWidget; }
+	virtual IEditWidget *editWidget() const { return FEditWidget; }
+	virtual IReceiversWidget *receiversWidget() const { return FReceiversWidget; }
 private:
-	IMessageWindow *FWindow;
+	IInfoWidget *FInfoWidget;
+	IViewWidget *FViewWidget;
+	IEditWidget *FEditWidget;
+	IReceiversWidget *FReceiversWidget;
+private:
 	StatusBarChanger *FStatusBarChanger;
 };
 

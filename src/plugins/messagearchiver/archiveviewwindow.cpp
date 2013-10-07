@@ -28,6 +28,7 @@ enum HistoryDataRoles {
 
 #define HEADERS_LOAD_TIMEOUT         500
 #define COLLECTIONS_LOAD_TIMEOUT     200
+#define TEXT_SEARCH_TIMEOUT          500
 
 #define MAX_HILIGHT_ITEMS            10
 #define LOAD_EARLIER_COUNT           100
@@ -56,8 +57,8 @@ void SortFilterProxyModel::setVisibleInterval(const QDateTime &AStart, const QDa
 bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent) const
 {
 	QModelIndex index = sourceModel()->index(ARow,0,AParent);
-	int indexKind = index.data(HDR_TYPE).toInt();
-	if (indexKind == HIT_HEADER)
+	int indexType = index.data(HDR_TYPE).toInt();
+	if (indexType == HIT_HEADER)
 	{
 		if (FStart.isValid() && FEnd.isValid())
 		{
@@ -117,7 +118,6 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 
 	FRoster = ARoster;
 	FArchiver = AArchiver;
-	FFocusWidget = NULL;
 
 	FStatusIcons = NULL;
 	FUrlProcessor = NULL;
@@ -160,29 +160,34 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	FCollectionsRequestTimer.setSingleShot(true);
 	connect(&FCollectionsRequestTimer,SIGNAL(timeout()),SLOT(onCollectionsRequestTimerTimeout()));
 
+	FTextSearchTimer.setSingleShot(true);
+	connect(&FTextSearchTimer,SIGNAL(timeout()),SLOT(onTextSearchTimerTimeout()));
+
 	FTextHilightTimer.setSingleShot(true);
 	connect(&FTextHilightTimer,SIGNAL(timeout()),SLOT(onTextHilightTimerTimeout()));
 	connect(ui.tbrMessages,SIGNAL(visiblePositionBoundaryChanged()),SLOT(onTextVisiblePositionBoundaryChanged()));
 
-	ui.lneTextSearch->setPlaceholderText(tr("Search in text"));
 	ui.tlbTextSearchNext->setIcon(style()->standardIcon(QStyle::SP_ArrowDown, NULL, this));
 	ui.tlbTextSearchPrev->setIcon(style()->standardIcon(QStyle::SP_ArrowUp, NULL, this));
 	connect(ui.tlbTextSearchNext,SIGNAL(clicked()),SLOT(onTextSearchNextClicked()));
 	connect(ui.tlbTextSearchPrev,SIGNAL(clicked()),SLOT(onTextSearchPreviousClicked()));
-	connect(ui.lneTextSearch,SIGNAL(searchStart()),SLOT(onTextSearchStart()));
-	connect(ui.lneTextSearch,SIGNAL(searchNext()),SLOT(onTextSearchNextClicked()));
+	connect(ui.lneTextSearch,SIGNAL(returnPressed()),SLOT(onTextSearchNextClicked()));
+	connect(ui.lneTextSearch,SIGNAL(textChanged(const QString &)),SLOT(onTextSearchTextChanged(const QString &)));
 	connect(ui.chbTextSearchCaseSensitive,SIGNAL(stateChanged(int)),SLOT(onTextSearchCaseSensitivityChanged()));
 
-	ui.lneArchiveSearch->setStartSearchTimeout(-1);
+#if QT_VERSION >= QT_VERSION_CHECK(4,7,0)
 	ui.lneArchiveSearch->setPlaceholderText(tr("Search in history"));
-	ui.lneArchiveSearch->setSelectTextOnFocusEnabled(false);
-	connect(ui.lneArchiveSearch,SIGNAL(searchStart()),SLOT(onArchiveSearchStart()));
+#endif
+	ui.tlbArchiveSearchUpdate->setIcon(style()->standardIcon(QStyle::SP_BrowserReload, NULL, this));
+	connect(ui.tlbArchiveSearchUpdate,SIGNAL(clicked()),SLOT(onArchiveSearchUpdate()));
+	connect(ui.lneArchiveSearch,SIGNAL(returnPressed()),SLOT(onArchiveSearchUpdate()));
+	connect(ui.lneArchiveSearch,SIGNAL(textChanged(const QString &)),SLOT(onArchiveSearchChanged(const QString &)));
 
 	ui.pbtHeadersUpdate->setIcon(style()->standardIcon(QStyle::SP_BrowserReload, NULL, this));
 	connect(ui.pbtHeadersUpdate,SIGNAL(clicked()),SLOT(onHeadersUpdateButtonClicked()));
 
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
-		SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),
+		SLOT(onArchiveRequestFailed(const QString &, const QString &)));
 	connect(FArchiver->instance(),SIGNAL(headersLoaded(const QString &, const QList<IArchiveHeader> &)),
 		SLOT(onArchiveHeadersLoaded(const QString &, const QList<IArchiveHeader> &)));
 	connect(FArchiver->instance(),SIGNAL(collectionLoaded(const QString &, const IArchiveCollection &)),
@@ -461,18 +466,14 @@ void ArchiveViewWindow::setRequestStatus(RequestStatus AStatus, const QString &A
 
 void ArchiveViewWindow::setPageStatus(RequestStatus AStatus, const QString &AMessage)
 {
-	if (AStatus == RequestStarted)
-		FFocusWidget = focusWidget();
-
-	ui.wdtArchiveSearch->setEnabled(AStatus == RequestFinished);
 	ui.trvHeaders->setEnabled(AStatus == RequestFinished);
+	ui.wdtArchiveSearch->setEnabled(AStatus == RequestFinished);
 	ui.pbtHeadersUpdate->setEnabled(AStatus != RequestStarted);
 	ui.pbtLoadEarlierMessages->setEnabled(AStatus != RequestStarted);
 
 	if (AStatus == RequestFinished)
 	{
-		if (FFocusWidget)
-			FFocusWidget->setFocus(Qt::MouseFocusReason);
+		ui.trvHeaders->setFocus(Qt::MouseFocusReason);
 		ui.trvHeaders->selectionModel()->clearSelection();
 		ui.trvHeaders->setCurrentIndex(QModelIndex());
 		ui.stbStatusBar->showMessage(tr("Conversation headers loaded"));
@@ -483,10 +484,10 @@ void ArchiveViewWindow::setPageStatus(RequestStatus AStatus, const QString &AMes
 	}
 	else if (AStatus == RequestError)
 	{
-		if (FFocusWidget)
-			FFocusWidget->setFocus(Qt::MouseFocusReason);
 		ui.stbStatusBar->showMessage(tr("Failed to load conversation headers: %1").arg(AMessage));
 	}
+
+	onArchiveSearchChanged(ui.lneArchiveSearch->text());
 }
 
 void ArchiveViewWindow::setMessagesStatus(RequestStatus AStatus, const QString &AMessage)
@@ -497,7 +498,7 @@ void ArchiveViewWindow::setMessagesStatus(RequestStatus AStatus, const QString &
 			ui.stbStatusBar->showMessage(tr("Select contact or single conversation"));
 		else
 			ui.stbStatusBar->showMessage(tr("%n conversation(s) loaded",0,FCurrentHeaders.count()));
-		onTextSearchStart();
+		onTextSearchTimerTimeout();
 	}
 	else if(AStatus == RequestStarted)
 	{
@@ -844,7 +845,7 @@ void ArchiveViewWindow::onHeadersRequestTimerTimeout()
 		{
 			IArchiveRequest request;
 			request.with = isConferencePrivateChat(FContactJid) ? FContactJid : FContactJid.bare();
-			request.exactmatch = request.with.isValid() && request.with.node().isEmpty();
+			request.exactmatch = request.with.node().isEmpty();
 			request.start = QDateTime(start);
 			request.end = QDateTime(end);
 			request.text = searchString();
@@ -946,10 +947,15 @@ void ArchiveViewWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const 
 	}
 }
 
-void ArchiveViewWindow::onArchiveSearchStart()
+void ArchiveViewWindow::onArchiveSearchUpdate()
 {
 	setSearchString(ui.lneArchiveSearch->text());
 	ui.lneTextSearch->setText(ui.lneArchiveSearch->text());
+}
+
+void ArchiveViewWindow::onArchiveSearchChanged(const QString &AText)
+{
+	ui.tlbArchiveSearchUpdate->setEnabled(searchString()!=AText);
 }
 
 void ArchiveViewWindow::onTextHilightTimerTimeout()
@@ -973,7 +979,7 @@ void ArchiveViewWindow::onTextVisiblePositionBoundaryChanged()
 	FTextHilightTimer.start(0);
 }
 
-void ArchiveViewWindow::onTextSearchStart()
+void ArchiveViewWindow::onTextSearchTimerTimeout()
 {
 	FSearchResults.clear();
 	if (!ui.lneTextSearch->text().isEmpty())
@@ -1019,7 +1025,7 @@ void ArchiveViewWindow::onTextSearchStart()
 
 	if (!ui.lneTextSearch->text().isEmpty() && FSearchResults.isEmpty())
 	{
-		QPalette palette = ui.lneTextSearch->palette();
+		QPalette palette = ui.lblTextSearch->palette();
 		palette.setColor(QPalette::Active,QPalette::Base,QColor("orangered"));
 		palette.setColor(QPalette::Active,QPalette::Text,Qt::white);
 		ui.lneTextSearch->setPalette(palette);
@@ -1058,7 +1064,13 @@ void ArchiveViewWindow::onTextSearchPreviousClicked()
 
 void ArchiveViewWindow::onTextSearchCaseSensitivityChanged()
 {
-	QTimer::singleShot(0,this,SLOT(onTextSearchStart()));
+	FTextSearchTimer.start(0);
+}
+
+void ArchiveViewWindow::onTextSearchTextChanged(const QString &AText)
+{
+	Q_UNUSED(AText);
+	FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 }
 
 void ArchiveViewWindow::onSetContactJidByAction()
@@ -1164,7 +1176,7 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 	}
 }
 
-void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
+void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const QString &AError)
 {
 	if (FHeadersRequests.contains(AId))
 	{
@@ -1172,12 +1184,12 @@ void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const XmppErr
 		if (FContactJid.isEmpty())
 		{
 			if (currentPage() == start)
-				setPageStatus(RequestError, AError.errorMessage());
+				setPageStatus(RequestError, AError);
 		}
 		else
 		{
 			FHeadersRequests.clear();
-			setPageStatus(RequestError, AError.errorMessage());
+			setPageStatus(RequestError, AError);
 		}
 		FLoadedPages.removeAll(start);
 	}
@@ -1185,14 +1197,14 @@ void ArchiveViewWindow::onArchiveRequestFailed(const QString &AId, const XmppErr
 	{
 		IArchiveHeader header = FCollectionsRequests.take(AId);
 		if (currentLoadingHeader() == header)
-			setMessagesStatus(RequestError, AError.errorMessage());
+			setMessagesStatus(RequestError, AError);
 	}
 	else if (FRemoveRequests.contains(AId))
 	{
 		IArchiveRequest request = FRemoveRequests.take(AId);
 		request.text = searchString();
 		request.end = !request.end.isValid() ? request.start : request.end;
-		setRequestStatus(RequestError,tr("Failed to remove conversations: %1").arg(AError.errorMessage()));
+		setRequestStatus(RequestError,tr("Failed to remove conversations: %1").arg(AError));
 		updateHeaders(request);
 		removeHeaderItems(request);
 	}
@@ -1233,7 +1245,6 @@ void ArchiveViewWindow::onArchiveHeadersLoaded(const QString &AId, const QList<I
 				ui.pbtLoadEarlierMessages->setEnabled(false);
 				ui.pbtLoadEarlierMessages->setText(tr("All messages loaded"));
 			}
-			ui.pbtLoadEarlierMessages->setToolTip(ui.pbtLoadEarlierMessages->text());
 		}
 	}
 }

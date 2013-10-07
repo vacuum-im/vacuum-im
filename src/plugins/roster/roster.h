@@ -3,20 +3,18 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
 #include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/iroster.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 #include <utils/options.h>
-#include <utils/xmpperror.h>
 
 class Roster :
-	public QObject,
-	public IRoster,
-	public IStanzaHandler,
-	public IStanzaRequestOwner,
-	public IXmppStanzaHadler
+			public QObject,
+			public IRoster,
+			public IStanzaHandler,
+			public IStanzaRequestOwner,
+			public IXmppStanzaHadler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IRoster IStanzaHandler IStanzaRequestOwner IXmppStanzaHadler);
@@ -32,17 +30,15 @@ public:
 	virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IRoster
-	virtual Jid streamJid() const;
-	virtual IXmppStream *xmppStream() const;
-	virtual bool isOpen() const;
-	virtual QString groupDelimiter() const;
+	virtual Jid streamJid() const { return FXmppStream->streamJid(); }
+	virtual IXmppStream *xmppStream() const { return FXmppStream; }
+	virtual bool isOpen() const { return FOpened; }
+	virtual QString groupDelimiter() const { return FGroupDelim; }
 	virtual IRosterItem rosterItem(const Jid &AItemJid) const;
 	virtual QList<IRosterItem> rosterItems() const;
-	virtual QSet<QString> allGroups() const;
-	virtual bool hasGroup(const QString &AGroup) const;
-	virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
+	virtual QSet<QString> groups() const;
 	virtual QList<IRosterItem> groupItems(const QString &AGroup) const;
-	virtual bool isSubgroup(const QString &ASubGroup, const QString &AGroup) const;
+	virtual QSet<QString> itemGroups(const Jid &AItemJid) const;
 	virtual void setItem(const Jid &AItemJid, const QString &AName, const QSet<QString> &AGroups);
 	virtual void setItems(const QList<IRosterItem> &AItems);
 	virtual void removeItem(const Jid &AItemJid);
@@ -54,9 +50,9 @@ public:
 	virtual void sendSubscription(const Jid &AItemJid, int AType, const QString &AText = QString::null);
 	//Operations on items
 	virtual void renameItem(const Jid &AItemJid, const QString &AName);
-	virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroupTo);
+	virtual void copyItemToGroup(const Jid &AItemJid, const QString &AGroup);
 	virtual void moveItemToGroup(const Jid &AItemJid, const QString &AGroupFrom, const QString &AGroupTo);
-	virtual void removeItemFromGroup(const Jid &AItemJid, const QString &AGroupFrom);
+	virtual void removeItemFromGroup(const Jid &AItemJid, const QString &AGroup);
 	//Operations on group
 	virtual void renameGroup(const QString &AGroup, const QString &AGroupTo);
 	virtual void copyGroupToGroup(const QString &AGroup, const QString &AGroupTo);
@@ -71,12 +67,13 @@ signals:
 	void streamJidAboutToBeChanged(const Jid &AAfter);
 	void streamJidChanged(const Jid &ABefore);
 protected:
-	void clearRosterItems();
-	void requestRosterItems();
+	void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
 	void requestGroupDelimiter();
 	void setGroupDelimiter(const QString &ADelimiter);
-	void processItemsElement(const QDomElement &AItemsElem, bool ACompleteRoster);
-	QString replaceGroupDelimiter(const QString &AGroup, const QString &AFrom, const QString &ATo) const;
+	void requestRosterItems();
+	void clearItems();
+	void setStanzaHandlers();
+	void removeStanzaHandlers();
 protected slots:
 	void onStreamOpened();
 	void onStreamClosed();
@@ -99,4 +96,4 @@ private:
 	QHash<Jid, IRosterItem> FRosterItems;
 };
 
-#endif //ROSTER_H
+#endif

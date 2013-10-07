@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ifiletransfer.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
@@ -14,7 +13,7 @@
 #include "ui_streamdialog.h"
 
 class StreamDialog :
-	public QDialog
+			public QDialog
 {
 	Q_OBJECT;
 public:

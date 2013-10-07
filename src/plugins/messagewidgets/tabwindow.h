@@ -12,54 +12,39 @@
 #include <utils/options.h>
 #include <utils/shortcuts.h>
 #include <utils/widgetmanager.h>
-#include <utils/textmanager.h>
 #include "ui_tabwindow.h"
 
 class TabWindow :
 	public QMainWindow,
-	public IMessageTabWindow
+	public ITabWindow
 {
 	Q_OBJECT;
-	Q_INTERFACES(IMessageTabWindow IMainCentralPage);
+	Q_INTERFACES(ITabWindow);
 public:
 	TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId);
 	~TabWindow();
 	virtual QMainWindow *instance() { return this; }
-	// IMainCentralPage
-	virtual void showCentralPage(bool AMinimized = false);
-	virtual QIcon centralPageIcon() const;
-	virtual QString centralPageCaption() const;
-	// IMessageTabWindow
 	virtual void showWindow();
 	virtual void showMinimizedWindow();
 	virtual QUuid windowId() const;
 	virtual QString windowName() const;
 	virtual Menu *windowMenu() const;
-	virtual bool isTabBarVisible() const;
-	virtual void setTabBarVisible(bool AVisible);
-	virtual bool isAutoCloseEnabled() const;
-	virtual void setAutoCloseEnabled(bool AEnabled);
 	virtual int tabPageCount() const;
-	virtual IMessageTabPage *tabPage(int AIndex) const;
-	virtual void addTabPage(IMessageTabPage *APage);
-	virtual bool hasTabPage(IMessageTabPage *APage) const;
-	virtual IMessageTabPage *currentTabPage() const;
-	virtual void setCurrentTabPage(IMessageTabPage *APage);
-	virtual void detachTabPage(IMessageTabPage *APage);
-	virtual void removeTabPage(IMessageTabPage *APage);
+	virtual ITabPage *tabPage(int AIndex) const;
+	virtual void addTabPage(ITabPage *APage);
+	virtual bool hasTabPage(ITabPage *APage) const;
+	virtual ITabPage *currentTabPage() const;
+	virtual void setCurrentTabPage(ITabPage *APage);
+	virtual void detachTabPage(ITabPage *APage);
+	virtual void removeTabPage(ITabPage *APage);
 signals:
-	// IMessageTabWindow
-	void currentTabPageChanged(IMessageTabPage *APage);
-	void tabPageMenuRequested(IMessageTabPage *APage, Menu *AMenu);
-	void tabPageAdded(IMessageTabPage *APage);
-	void tabPageRemoved(IMessageTabPage *APage);
-	void tabPageDetached(IMessageTabPage *APage);
+	void currentTabPageChanged(ITabPage *APage);
+	void tabPageMenuRequested(ITabPage *APage, Menu *AMenu);
+	void tabPageAdded(ITabPage *APage);
+	void tabPageRemoved(ITabPage *APage);
+	void tabPageDetached(ITabPage *APage);
 	void windowChanged();
 	void windowDestroyed();
-	// IMainCentralPage
-	void centralPageShow(bool AMinimized);
-	void centralPageChanged();
-	void centralPageDestroyed();
 protected:
 	void createActions();
 	void saveWindowStateAndGeometry();
@@ -68,9 +53,6 @@ protected:
 	void clearTabs();
 	void updateTab(int AIndex);
 	void updateTabs(int AFrom, int ATo);
-protected:
-	void showEvent(QShowEvent *AEvent);
-	void closeEvent(QCloseEvent *AEvent);
 protected slots:
 	void onTabMoved(int AFrom, int ATo);
 	void onTabChanged(int AIndex);
@@ -89,7 +71,6 @@ protected slots:
 	void onTabMenuActionTriggered(bool);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onBlinkTabNotifyTimerTimeout();
-	void onCloseWindowIfEmpty();
 private:
 	Ui::TabWindowClass ui;
 private:
@@ -106,14 +87,11 @@ private:
 	Action *FRenameWindow;
 	Action *FCloseWindow;
 	Action *FDeleteWindow;
-	QToolButton *FCornerButton;
 private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;
 private:
-	bool FAutoClose;
 	bool FBlinkVisible;
-	bool FShownDetached;
 	QTimer FBlinkTimer;
 };
 

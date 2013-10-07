@@ -39,12 +39,12 @@
         <translation>Description:</translation>
     </message>
     <message>
-        <source>Update</source>
-        <translation>Update</translation>
-    </message>
-    <message>
         <source>Extensions</source>
         <translation>Extensions</translation>
+    </message>
+    <message>
+        <source>Update</source>
+        <translation>Update</translation>
     </message>
 </context>
 <context>
@@ -89,6 +89,10 @@
 <context>
     <name>DiscoItemsWindow</name>
     <message>
+        <source>Service Discovery - %1</source>
+        <translation>Service Discovery - %1</translation>
+    </message>
+    <message>
         <source>Back</source>
         <translation>Back</translation>
     </message>
@@ -116,28 +120,24 @@
         <source>vCard</source>
         <translation>vCard</translation>
     </message>
-    <message>
-        <source>Service Discovery - %1</source>
-        <translation>Service Discovery - %1</translation>
-    </message>
 </context>
 <context>
     <name>DiscoItemsWindowClass</name>
-    <message>
-        <source>Node:</source>
-        <translation>Node:</translation>
-    </message>
-    <message>
-        <source>Actions</source>
-        <translation>Actions</translation>
-    </message>
     <message>
         <source>Item:</source>
         <translation>Item:</translation>
     </message>
     <message>
+        <source>Node:</source>
+        <translation>Node:</translation>
+    </message>
+    <message>
         <source>Search:</source>
         <translation>Search:</translation>
+    </message>
+    <message>
+        <source>Actions</source>
+        <translation>Actions</translation>
     </message>
 </context>
 <context>
@@ -147,56 +147,8 @@
         <translation>Service Discovery</translation>
     </message>
     <message>
-        <source>JID Escaping</source>
-        <translation>JID Escaping</translation>
-    </message>
-    <message>
-        <source>Discovery Info</source>
-        <translation>Discovery Info</translation>
-    </message>
-    <message>
-        <source>Entity Capabilities</source>
-        <translation>Entity Capabilities</translation>
-    </message>
-    <message>
         <source>Allows to receive information about Jabber entities</source>
         <translation>Allows to receive information about Jabber entities</translation>
-    </message>
-    <message>
-        <source>Supports the exchange of the discovery information and items</source>
-        <translation>Supports the exchange of the discovery information and items</translation>
-    </message>
-    <message>
-        <source>Discovery Information</source>
-        <translation>Discovery Information</translation>
-    </message>
-    <message>
-        <source>Supports the exchange of the discovery information</source>
-        <translation>Supports the exchange of the discovery information</translation>
-    </message>
-    <message>
-        <source>Discovery Items</source>
-        <translation>Discovery Items</translation>
-    </message>
-    <message>
-        <source>Supports the exchange of the discovery items</source>
-        <translation>Supports the exchange of the discovery items</translation>
-    </message>
-    <message>
-        <source>Publish Items</source>
-        <translation>Publish Items</translation>
-    </message>
-    <message>
-        <source>Supports the publishing of the discovery items</source>
-        <translation>Supports the publishing of the discovery items</translation>
-    </message>
-    <message>
-        <source>Supports the caching of the discovery information</source>
-        <translation>Supports the caching of the discovery information</translation>
-    </message>
-    <message>
-        <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
-        <translation>Supports the displaying of the jabber identifiers with disallowed characters</translation>
     </message>
     <message>
         <source>Service discovery window</source>
@@ -227,6 +179,15 @@
         <translation>Add item to roster</translation>
     </message>
     <message>
+        <source>Show vCard</source>
+        <translation>Show vCard</translation>
+    </message>
+    <message>
+        <source>Ctrl+I</source>
+        <comment>Show vCard</comment>
+        <translation>Ctrl+I</translation>
+    </message>
+    <message>
         <source>Close discovery window</source>
         <translation>Close discovery window</translation>
     </message>
@@ -236,14 +197,56 @@
         <translation>Esc</translation>
     </message>
     <message>
-        <source>Show Profile</source>
-        <translation>Show Profile</translation>
+        <source>Supports the exchange of the discovery information and items</source>
+        <translation>Supports the exchange of the discovery information and items</translation>
     </message>
     <message>
-        <source>Ctrl+I</source>
-        <comment>Show Profile</comment>
-        <translatorcomment>Показать личные данные</translatorcomment>
-        <translation>Ctrl+I</translation>
+        <source>Discovery Information</source>
+        <translation>Discovery Information</translation>
+    </message>
+    <message>
+        <source>Supports the exchange of the discovery information</source>
+        <translation>Supports the exchange of the discovery information</translation>
+    </message>
+    <message>
+        <source>Discovery Items</source>
+        <translation>Discovery Items</translation>
+    </message>
+    <message>
+        <source>Supports the exchange of the discovery items</source>
+        <translation>Supports the exchange of the discovery items</translation>
+    </message>
+    <message>
+        <source>Publish Items</source>
+        <translation>Publish Items</translation>
+    </message>
+    <message>
+        <source>Supports the publishing of the discovery items</source>
+        <translation>Supports the publishing of the discovery items</translation>
+    </message>
+    <message>
+        <source>Entity Capabilities</source>
+        <translation>Entity Capabilities</translation>
+    </message>
+    <message>
+        <source>Supports the caching of the discovery information</source>
+        <translation>Supports the caching of the discovery information</translation>
+    </message>
+    <message>
+        <source>JID Escaping</source>
+        <translation>JID Escaping</translation>
+    </message>
+    <message>
+        <source>Supports the displaying of the jabber identifiers with disallowed characters</source>
+        <translation>Supports the displaying of the jabber identifiers with disallowed characters</translation>
+    </message>
+    <message>
+        <source>Discovery Info</source>
+        <translation>Discovery Info</translation>
+    </message>
+    <message>
+        <source>Category: %1; Type: %2</source>
+        <translation>Category: %1; Type: %2</translation>
     </message>
 </context>
 </TS>
