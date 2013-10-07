@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>rosterviewOptions</key>
+    <object mime="image/png">rosterviewoptions.png</object>
+  </icon>
+  <icon>
+    <key>rosterviewShowOffline</key>
+    <object mime="image/png">rosterviewshowoffline.png</object>
+  </icon>
+  <icon>
+    <key>rosterviewHideOffline</key>
+    <object mime="image/png">rosterviewhideoffline.png</object>
+  </icon>
+  <icon>
+    <key>rosterviewClipboard</key>
+    <object mime="image/png">rosterviewclipboard.png</object>
+  </icon>
+</icondef>
