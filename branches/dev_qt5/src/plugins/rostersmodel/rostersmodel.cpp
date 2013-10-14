@@ -211,7 +211,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 			if (roster)
 			{
 				IRosterItem empty;
-				foreach(IRosterItem ritem, roster->rosterItems())
+				foreach(const IRosterItem &ritem, roster->rosterItems())
 					onRosterItemReceived(roster,ritem,empty);
 			}
 
@@ -735,7 +735,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 				if (pitem.show != IPresence::Offline)
 					resources.append(pitem.itemJid.pFull());
 
-			foreach(QString group, itemGroups)
+			foreach(const QString &group, itemGroups)
 			{
 				IRosterIndex *groupIndex = getGroupIndex(groupKind,group,sroot);
 

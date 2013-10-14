@@ -240,7 +240,7 @@ void Gateways::resolveNickName(const Jid &AStreamJid, const Jid &AContactJid)
 		{
 			static const QList<QString> nickFields = QList<QString>() << VVN_NICKNAME << VVN_FULL_NAME << VVN_GIVEN_NAME << VVN_FAMILY_NAME;
 			IVCard *vcard = FVCardPlugin->getVCard(ritem.itemJid);
-			foreach(QString field, nickFields)
+			foreach(const QString &field, nickFields)
 			{
 				QString nick = vcard->value(field);
 				if (!nick.isEmpty())
@@ -294,14 +294,14 @@ QList<Jid> Gateways::streamServices(const Jid &AStreamJid, const IDiscoIdentity 
 	QList<Jid> services;
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
-	foreach(IRosterItem ritem, ritems)
+	foreach(const IRosterItem &ritem, ritems)
 	{
 		if (ritem.itemJid.node().isEmpty())
 		{
 			if (FDiscovery && (!AIdentity.category.isEmpty() || !AIdentity.type.isEmpty()))
 			{
 				IDiscoInfo dinfo = FDiscovery->discoInfo(AStreamJid, ritem.itemJid);
-				foreach(IDiscoIdentity identity, dinfo.identity)
+				foreach(const IDiscoIdentity &identity, dinfo.identity)
 				{
 					if ((AIdentity.category.isEmpty() || AIdentity.category == identity.category) && (AIdentity.type.isEmpty() || AIdentity.type == identity.type))
 					{
@@ -322,7 +322,7 @@ QList<Jid> Gateways::serviceContacts(const Jid &AStreamJid, const Jid &AServiceJ
 	QList<Jid> contacts;
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
-	foreach(IRosterItem ritem, ritems)
+	foreach(const IRosterItem &ritem, ritems)
 		if (!ritem.itemJid.node().isEmpty() && ritem.itemJid.pDomain()==AServiceJid.pDomain())
 			contacts.append(ritem.itemJid);
 	return contacts;
@@ -343,7 +343,7 @@ bool Gateways::removeService(const Jid &AStreamJid, const Jid &AServiceJid, bool
 		
 		if (AWithContacts)
 		{
-			foreach(Jid contactJid, serviceContacts(AStreamJid,AServiceJid))
+			foreach(const Jid &contactJid, serviceContacts(AStreamJid,AServiceJid))
 			{
 				if (FRosterChanger)
 					FRosterChanger->insertAutoSubscribe(AStreamJid, contactJid, true, false, true);
@@ -378,7 +378,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
 		//Добавляем контакты нового транспорта и удаляем старые
 		QList<IRosterItem> newItems, oldItems, curItems;
-		foreach(IRosterItem ritem, roster->rosterItems())
+		foreach(const IRosterItem &ritem, roster->rosterItems())
 		{
 			if (ritem.itemJid.pDomain() == AServiceFrom.pDomain())
 			{
@@ -406,7 +406,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 			savePrivateStorageSubscribe(AStreamJid);
 
 			curItems+=newItems;
-			foreach(IRosterItem ritem, curItems)
+			foreach(const IRosterItem &ritem, curItems)
 				FRosterChanger->insertAutoSubscribe(AStreamJid,ritem.itemJid, true, true, false);
 			FRosterChanger->insertAutoSubscribe(AStreamJid,AServiceTo,true,true,false);
 			roster->sendSubscription(AServiceTo,IRoster::Subscribe);
@@ -481,7 +481,7 @@ void Gateways::savePrivateStorageKeep(const Jid &AStreamJid)
 		doc.appendChild(doc.createElement("services"));
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_KEEP,PST_GATEWAYS_SERVICES)).toElement();
 		QSet<Jid> services = FPrivateStorageKeep.value(AStreamJid);
-		foreach(Jid service, services)
+		foreach(const Jid &service, services)
 			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
 		FPrivateStorage->saveData(AStreamJid,elem);
 	}
@@ -494,7 +494,7 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 		QDomDocument doc;
 		doc.appendChild(doc.createElement("services"));
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_SUBSCRIBE,PST_GATEWAYS_SERVICES)).toElement();
-		foreach(Jid service, FSubscribeServices.values(AStreamJid))
+		foreach(const Jid &service, FSubscribeServices.values(AStreamJid))
 			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
 		FPrivateStorage->saveData(AStreamJid,elem);
 	}
@@ -560,7 +560,7 @@ void Gateways::onResolveActionTriggered(bool)
 			if (serviceJid.node().isEmpty())
 			{
 				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streams.at(i)) : NULL;
-				foreach(Jid contactJid, serviceContacts(streams.at(i),serviceJid))
+				foreach(const Jid &contactJid, serviceContacts(streams.at(i),serviceJid))
 				{
 					IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
 					if (ritem.isValid && ritem.name.trimmed().isEmpty())
@@ -696,7 +696,7 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 				IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(index->data(RDR_STREAM_JID).toString()) : NULL;
 				if (presence && presence->isOpen())
 				{
-					foreach(IPresenceItem pitem, presence->findItems())
+					foreach(const IPresenceItem &pitem, presence->findItems())
 					{
 						if (pitem.show!=IPresence::Error && pitem.itemJid.node().isEmpty() && FDiscovery->discoInfo(presence->streamJid(),pitem.itemJid).features.contains(NS_JABBER_GATEWAY))
 						{
@@ -824,7 +824,7 @@ void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
 		{
 			FSubscribeServices.remove(AStreamJid,AContactJid.bare());
 			savePrivateStorageSubscribe(AStreamJid);
-			foreach(IRosterItem ritem, roster->rosterItems())
+			foreach(const IRosterItem &ritem, roster->rosterItems())
 			{
 				if (ritem.itemJid.pDomain()==AContactJid.pDomain())
 				{
@@ -851,8 +851,8 @@ void Gateways::onRosterOpened(IRoster *ARoster)
 {
 	if (FRosterChanger)
 	{
-		foreach(Jid serviceJid, FSubscribeServices.values(ARoster->streamJid()))
-			foreach(Jid contactJid, serviceContacts(ARoster->streamJid(),serviceJid))
+		foreach(const Jid &serviceJid, FSubscribeServices.values(ARoster->streamJid()))
+			foreach(const Jid &contactJid, serviceContacts(ARoster->streamJid(),serviceJid))
 				FRosterChanger->insertAutoSubscribe(ARoster->streamJid(),contactJid,true,true,false);
 	}
 }
@@ -908,7 +908,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 			}
 
 			QSet<Jid> oldServices = FPrivateStorageKeep.value(AStreamJid) - newServices;
-			foreach(Jid service, oldServices)
+			foreach(const Jid &service, oldServices)
 				setKeepConnection(AStreamJid,service,false);
 			FPrivateStorageKeep[AStreamJid] = newServices;
 
@@ -942,14 +942,14 @@ void Gateways::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagNa
 void Gateways::onKeepTimerTimeout()
 {
 	QList<Jid> streamJids = FKeepConnections.uniqueKeys();
-	foreach(Jid streamJid, streamJids)
+	foreach(const Jid &streamJid, streamJids)
 	{
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 		if (roster && presence && presence->isOpen())
 		{
 			QList<Jid> services = FKeepConnections.values(streamJid);
-			foreach(Jid service, services)
+			foreach(const Jid &service, services)
 			{
 				if (roster->rosterItem(service).isValid)
 				{
@@ -970,7 +970,7 @@ void Gateways::onVCardReceived(const Jid &AContactJid)
 	if (FResolveNicks.contains(AContactJid))
 	{
 		QList<Jid> streamJids = FResolveNicks.values(AContactJid);
-		foreach(Jid streamJid, streamJids)
+		foreach(const Jid &streamJid, streamJids)
 			resolveNickName(streamJid,AContactJid);
 		FResolveNicks.remove(AContactJid);
 	}
@@ -987,7 +987,7 @@ void Gateways::onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow)
 	connect(AWindow->instance(),SIGNAL(indexContextMenu(const QModelIndex &, Menu *)),SLOT(onDiscoItemContextMenu(const QModelIndex &, Menu *)));
 }
 
-void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
+void Gateways::onDiscoItemContextMenu(const QModelIndex &AIndex, Menu *AMenu)
 {
 	Jid itemJid = AIndex.data(DIDR_JID).toString();
 	QString itemNode = AIndex.data(DIDR_NODE).toString();
@@ -998,10 +998,10 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 		if (dinfo.error.isNull() && !dinfo.identity.isEmpty())
 		{
 			QList<Jid> services;
-			foreach(IDiscoIdentity ident, dinfo.identity)
+			foreach(const IDiscoIdentity &ident, dinfo.identity)
 				services += streamServices(streamJid,ident);
 
-			foreach(Jid service, streamServices(streamJid))
+			foreach(const Jid &service, streamServices(streamJid))
 				if (!services.contains(service) && FDiscovery->discoInfo(streamJid,service).identity.isEmpty())
 					services.append(service);
 
@@ -1010,7 +1010,7 @@ void Gateways::onDiscoItemContextMenu(QModelIndex AIndex, Menu *AMenu)
 				Menu *change = new Menu(AMenu);
 				change->setTitle(tr("Use instead of"));
 				change->setIcon(RSR_STORAGE_MENUICONS,MNI_GATEWAYS_CHANGE);
-				foreach(Jid service, services)
+				foreach(const Jid &service, services)
 				{
 					Action *action = new Action(change);
 					action->setText(service.uFull());

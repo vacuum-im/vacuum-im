@@ -336,7 +336,7 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 		QSet<IBookmark> curBookarks = FBookmarkIndexes.value(AStreamJid).values().toSet();
 		QSet<IBookmark> removeBookmarks = curBookarks - newBookmarks;
 
-		foreach(IBookmark bookmark, newBookmarks)
+		foreach(const IBookmark &bookmark, newBookmarks)
 		{
 			if (bookmark.type == IBookmark::Conference)
 			{
@@ -348,7 +348,7 @@ void Bookmarks::updateConferenceIndexes(const Jid &AStreamJid)
 			}
 		}
 
-		foreach(IBookmark bookmark, removeBookmarks)
+		foreach(const IBookmark &bookmark, removeBookmarks)
 		{
 			IRosterIndex *index = FBookmarkIndexes.value(AStreamJid).key(bookmark);
 			IMultiUserChatWindow *window = FMultiChatPlugin->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid);
@@ -418,7 +418,7 @@ QList<IBookmark> Bookmarks::loadBookmarksFromXML(const QDomElement &AElement) co
 
 void Bookmarks::saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const
 {
-	foreach(IBookmark bookmark, ABookmarks)
+	foreach(const IBookmark &bookmark, ABookmarks)
 	{
 		if (bookmark.type == IBookmark::Conference)
 		{

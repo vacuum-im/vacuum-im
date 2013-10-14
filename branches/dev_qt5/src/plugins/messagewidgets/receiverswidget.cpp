@@ -515,7 +515,7 @@ void ReceiversWidget::updateContactItemsPresence(const Jid &AStreamJid, const Ji
 
 Jid ReceiversWidget::findAvailStream(const Jid &AStreamJid) const
 {
-	foreach(const Jid streamJid, FStreamItems.keys())
+	foreach(const Jid &streamJid, FStreamItems.keys())
 		if (streamJid.pBare() == AStreamJid.pBare())
 			return streamJid;
 	return Jid::null;

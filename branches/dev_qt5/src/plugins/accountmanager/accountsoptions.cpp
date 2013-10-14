@@ -28,7 +28,7 @@ AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : Q
 
 AccountsOptions::~AccountsOptions()
 {
-	foreach(QUuid accountId, FAccountItems.keys())
+	foreach(const QUuid &accountId, FAccountItems.keys())
 		if (FManager->accountById(accountId.toString()) == NULL)
 			removeAccount(accountId);
 }
@@ -70,7 +70,7 @@ void AccountsOptions::reset()
 		curAccounts.append(account->accountId());
 	}
 
-	foreach(QUuid accountId, FAccountItems.keys())
+	foreach(const QUuid &accountId, FAccountItems.keys())
 		if (!curAccounts.contains(accountId))
 			removeAccount(accountId);
 
@@ -111,9 +111,9 @@ void AccountsOptions::onRemoveButtonClicked(bool)
 	if (item)
 	{
 		QMessageBox::StandardButton res = QMessageBox::warning(this,
-		tr("Confirm removal of an account"),
-		tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(item->text(0).toHtmlEscaped()),
-		QMessageBox::Ok | QMessageBox::Cancel);
+		                                  tr("Confirm removal of an account"),
+		                                  tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(item->text(0).toHtmlEscaped()),
+		                                  QMessageBox::Ok | QMessageBox::Cancel);
 
 		if (res == QMessageBox::Ok)
 		{

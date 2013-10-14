@@ -410,12 +410,12 @@ QString ClientInfo::osVersion() const
 		}
 #elif defined(Q_OS_LINUX)
 		QStringList path;
-		foreach(QString env, QProcess::systemEnvironment())
+		foreach(const QString &env, QProcess::systemEnvironment())
 			if (env.startsWith("PATH="))
 				path = env.split('=').value(1).split(':');
 
 		QString found;
-		foreach(QString dirname, path)
+		foreach(const QString &dirname, path)
 		{
 			QDir dir(dirname);
 			QFileInfo cand(dir.filePath("lsb_release"));
@@ -872,7 +872,7 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
 	if (FDataForms && AInfo.node.isEmpty() && !hasSoftwareInfo(AInfo.contactJid))
 	{
-		foreach(IDataForm form, AInfo.extensions)
+		foreach(const IDataForm &form, AInfo.extensions)
 		{
 			if (FDataForms->fieldValue("FORM_TYPE",form.fields).toString() == DATA_FORM_SOFTWAREINFO)
 			{

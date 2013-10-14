@@ -274,7 +274,7 @@ void Commands::fillDiscoItems(IDiscoItems &ADiscoItems)
 {
 	if (ADiscoItems.node == NS_COMMANDS)
 	{
-		foreach(QString node, FServers.keys())
+		foreach(const QString &node, FServers.keys())
 		{
 			ICommandServer *server = FServers.value(node);
 			if (server && server->isCommandPermitted(ADiscoItems.streamJid,ADiscoItems.contactJid,node))
@@ -333,7 +333,7 @@ Action *Commands::createDiscoFeatureAction(const Jid &AStreamJid, const QString 
 				Menu *execMenu = new Menu(AParent);
 				execMenu->setTitle(tr("Commands"));
 				execMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_COMMANDS);
-				foreach (ICommand command, commands)
+				foreach (const ICommand &command, commands)
 				{
 					Action *action = new Action(execMenu);
 					action->setText(command.name);
@@ -445,14 +445,14 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 		{
 			QDomElement actElem = cmdElem.appendChild(result.createElement("actions")).toElement();
 			actElem.setAttribute("execute",AResult.execute);
-			foreach(QString action,AResult.actions)
+			foreach(const QString &action, AResult.actions)
 				actElem.appendChild(result.createElement(action));
 		}
 
 		if (FDataForms && !AResult.form.type.isEmpty())
 			FDataForms->xmlForm(AResult.form,cmdElem);
 
-		foreach(ICommandNote note,AResult.notes)
+		foreach(const ICommandNote &note, AResult.notes)
 		{
 			QDomElement noteElem = cmdElem.appendChild(result.createElement("note")).toElement();
 			noteElem.setAttribute("type",note.type);
@@ -546,7 +546,7 @@ void Commands::onDiscoItemsReceived(const IDiscoItems &AItems)
 	{
 		QList<ICommand> &commands = FCommands[AItems.streamJid][AItems.contactJid];
 		commands.clear();
-		foreach(IDiscoItem ditem, AItems.items)
+		foreach(const IDiscoItem &ditem, AItems.items)
 		{
 			if (!ditem.node.isEmpty() && ditem.itemJid.isValid())
 			{

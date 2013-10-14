@@ -47,7 +47,7 @@ void FileStreamsOptions::reset()
 	ui.chbGroupBySender->setChecked(Options::node(OPV_FILESTREAMS_GROUPBYSENDER).value().toBool());
 
 	QStringList acceptableMethods = Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList();
-	foreach(QString methodNS, FDataManager->methods())
+	foreach(const QString &methodNS, FDataManager->methods())
 	{
 		IDataStreamMethod *streamMethod = FDataManager->method(methodNS);
 		if (streamMethod)

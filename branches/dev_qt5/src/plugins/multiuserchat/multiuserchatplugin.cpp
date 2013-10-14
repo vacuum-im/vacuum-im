@@ -359,7 +359,7 @@ bool MultiUserChatPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContact
 		IMultiUserChat *chat = findMultiUserChat(AStreamJid, AContactJid);
 		if (chat != NULL)
 		{
-			foreach(QString userJid, AParams.values("jid"))
+			foreach(const QString &userJid, AParams.values("jid"))
 				chat->inviteContact(userJid, QString::null);
 		}
 		return true;

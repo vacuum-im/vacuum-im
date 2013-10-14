@@ -250,7 +250,7 @@ void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)
 	{
 		FStreamProxy.remove(AItems.streamJid);
 		Jid proxyJid = "proxy." + AItems.streamJid.domain();
-		foreach(IDiscoItem item, AItems.items)
+		foreach(const IDiscoItem &item, AItems.items)
 		{
 			if (item.itemJid == proxyJid)
 			{

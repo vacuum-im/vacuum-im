@@ -69,7 +69,7 @@ bool SASLBind::start(const QDomElement &AElem)
 		if (!FXmppStream->streamJid().resource().isEmpty())
 		{
 			QString resource = FXmppStream->streamJid().resource();
-			foreach(QString env, QProcess::systemEnvironment())
+			foreach(const QString &env, QProcess::systemEnvironment())
 			{
 				QList<QString> param_value = env.split("=");
 				resource.replace("%"+param_value.value(0)+"%",param_value.value(1));

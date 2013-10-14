@@ -13,4 +13,3 @@ SOURCES = filemessagearchive.cpp \
           filearchiveoptions.cpp \
           databaseworker.cpp \
           databasesynchronizer.cpp
-

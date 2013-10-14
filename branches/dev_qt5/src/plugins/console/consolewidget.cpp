@@ -425,7 +425,7 @@ void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
 void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle)
 {
 	Q_UNUSED(AHandleId);
-	foreach(QString condition, AHandle.conditions)
+	foreach(const QString &condition, AHandle.conditions)
 		if (ui.cmbCondition->findText(condition) < 0)
 			ui.cmbCondition->addItem(condition);
 }
@@ -433,7 +433,7 @@ void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &A
 void ConsoleWidget::onOptionsOpened()
 {
 	ui.cmbContext->clear();
-	foreach(QString contextId, Options::node(OPV_CONSOLE_ROOT).childNSpaces("context"))
+	foreach(const QString &contextId, Options::node(OPV_CONSOLE_ROOT).childNSpaces("context"))
 		ui.cmbContext->addItem(Options::node(OPV_CONSOLE_CONTEXT_ITEM,contextId).value("name").toString(),contextId);
 
 	FContext = QUuid();

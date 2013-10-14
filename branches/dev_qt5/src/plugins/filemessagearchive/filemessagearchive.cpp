@@ -42,7 +42,7 @@ FileMessageArchive::~FileMessageArchive()
 	delete FDatabaseWorker;
 	delete FFileWorker;
 
-	foreach(QString newDir, FNewDirs)
+	foreach(const QString &newDir, FNewDirs)
 	{
 		QDir dir(newDir);
 		if (dir.entryList(QDir::NoDotAndDotDot).isEmpty())
@@ -384,7 +384,7 @@ QString FileMessageArchive::collectionDirPath(const Jid &AStreamJid, const Jid &
 		{
 			QMutexLocker locker(&FMutex);
 			QString path = dir.absolutePath();
-			foreach(QString subDir, withDir.split("/"))
+			foreach(const QString &subDir, withDir.split("/"))
 			{
 				path += '/'+subDir;
 				FNewDirs.prepend(path);
@@ -565,10 +565,10 @@ bool FileMessageArchive::saveFileCollection(const Jid &AStreamJid, const IArchiv
 			if (!ACollection.body.messages.isEmpty())
 			{
 				QMultiMap<QDateTime, QString> curMessages;
-				foreach(Message message, collection.body.messages)
+				foreach(const Message &message, collection.body.messages)
 					curMessages.insertMulti(message.dateTime(),message.body());
 					
-				foreach(Message message, ACollection.body.messages)
+				foreach(const Message &message, ACollection.body.messages)
 					if (!curMessages.contains(message.dateTime(),message.body()))
 						collection.body.messages.append(message);
 
@@ -1091,6 +1091,8 @@ void FileMessageArchive::onDatabaseTaskFinished(DatabaseTask *ATask)
 				emit databaseClosed(task->streamJid());
 			}
 			break;
+		default:
+			break;
 		}
 	}
 	else
@@ -1122,7 +1124,7 @@ void FileMessageArchive::onDatabaseSyncFinished(const Jid &AStreamJid, bool AFai
 {
 	if (!AFailed)
 	{
-		int caps = capabilities(AStreamJid);
+		quint32 caps = capabilities(AStreamJid);
 		setDatabaseProperty(AStreamJid,FADP_LAST_SYNC_TIME,DateTime(QDateTime::currentDateTime()).toX85UTC());
 		if (caps != capabilities(AStreamJid))
 			emit capabilitiesChanged(AStreamJid);
@@ -1180,7 +1182,7 @@ void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
 	if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() && AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid.pDomain()))
 	{
-		foreach(IDiscoIdentity identity, AInfo.identity)
+		foreach(const IDiscoIdentity &identity, AInfo.identity)
 		{
 			if (identity.category==CATEGORY_GATEWAY && !identity.type.isEmpty())
 			{

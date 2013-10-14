@@ -273,7 +273,7 @@ QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 		regExp.setCaseSensitivity(Qt::CaseInsensitive);
 
 		QString substorage;
-		foreach (QString pattern, FUserRules.keys())
+		foreach (const QString &pattern, FUserRules.keys())
 		{
 			regExp.setPattern(pattern);
 			if (AContactJid.pFull().contains(regExp))
@@ -285,7 +285,7 @@ QString StatusIcons::iconsetByJid(const Jid &AContactJid) const
 
 		if (substorage.isEmpty())
 		{
-			foreach (QString pattern, FDefaultRules.keys())
+			foreach (const QString &pattern, FDefaultRules.keys())
 			{
 				regExp.setPattern(pattern);
 				if (AContactJid.pFull().contains(regExp))
@@ -373,7 +373,7 @@ void StatusIcons::loadStorages()
 	clearStorages();
 
 	QList<QString> storages = FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS);
-	foreach(QString substorage, storages)
+	foreach(const QString &substorage, storages)
 	{
 		IconStorage *storage = new IconStorage(RSR_STORAGE_STATUSICONS,substorage,this);
 		FStorages.insert(substorage,storage);
@@ -398,7 +398,7 @@ void StatusIcons::loadStorages()
 
 void StatusIcons::clearStorages()
 {
-	foreach(QString rule, FStatusRules)
+	foreach(const QString &rule, FStatusRules)
 		removeRule(rule,IStatusIcons::DefaultRule);
 	FStatusRules.clear();
 	FCustomIconActions.clear();
@@ -485,7 +485,7 @@ void StatusIcons::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
 		
 		QStringList patterns;
-		foreach(QString contactJid, rolesMap.value(RDR_PREP_BARE_JID))
+		foreach(const QString &contactJid, rolesMap.value(RDR_PREP_BARE_JID))
 			patterns.append(QRegExp::escape(contactJid));
 		updateCustomIconMenu(patterns);
 
@@ -509,7 +509,7 @@ void StatusIcons::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUs
 
 void StatusIcons::onOptionsOpened()
 {
-	foreach(QString nspace, Options::node(OPV_STATUSICONS_RULES_ROOT).childNSpaces("rule"))
+	foreach(const QString &nspace, Options::node(OPV_STATUSICONS_RULES_ROOT).childNSpaces("rule"))
 	{
 		OptionsNode ruleNode = Options::node(OPV_STATUSICONS_RULES_ROOT).node("rule",nspace);
 		insertRule(ruleNode.value("pattern").toString(),ruleNode.value("iconset").toString(),IStatusIcons::UserRule);
@@ -562,7 +562,7 @@ void StatusIcons::onSetCustomIconset(bool)
 	if (action)
 	{
 		QString substorage = action->data(ADR_SUBSTORAGE).toString();
-		foreach(QString rule, action->data(ADR_RULE).toStringList())
+		foreach(const QString &rule, action->data(ADR_RULE).toStringList())
 		{
 			if (substorage.isEmpty())
 				removeRule(rule,IStatusIcons::UserRule);

@@ -257,11 +257,12 @@ QMap<int, QString> Emoticons::findImageEmoticons(const QTextDocument *ADocument,
 	{
 		for (QTextBlock::iterator it = block.begin(); !it.atEnd() && it.fragment().position()<stopPos; ++it)
 		{
-			if (it.fragment().charFormat().isImageFormat())
+			const QTextFragment fragment = it.fragment();
+			if (fragment.charFormat().isImageFormat())
 			{
-				QString key = FKeyByUrl.value(it.fragment().charFormat().toImageFormat().name());
-				if (!key.isEmpty() && it.fragment().length()==1)
-					emoticons.insert(it.fragment().position(),key);
+				QString key = FKeyByUrl.value(fragment.charFormat().toImageFormat().name());
+				if (!key.isEmpty() && fragment.length()==1)
+					emoticons.insert(fragment.position(),key);
 			}
 		}
 		block = block.next();
@@ -274,16 +275,16 @@ void Emoticons::createIconsetUrls()
 	FUrlByKey.clear();
 	FKeyByUrl.clear();
 	clearTreeItem(&FRootTreeItem);
-	foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
+	foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
 	{
 		IconStorage *storage = FStorages.value(substorage);
 		if (storage)
 		{
 			QHash<QString, QString> fileFirstKey;
-			foreach(QString key, storage->fileFirstKeys())
+			foreach(const QString &key, storage->fileFirstKeys())
 				fileFirstKey.insert(storage->fileFullName(key), key);
 
-			foreach(QString key, storage->fileKeys())
+			foreach(const QString &key, storage->fileKeys())
 			{
 				if (!FUrlByKey.contains(key)) 
 				{
@@ -320,7 +321,7 @@ void Emoticons::createTreeItem(const QString &AKey, const QUrl &AUrl)
 
 void Emoticons::clearTreeItem(EmoticonTreeItem *AItem) const
 {
-	foreach(QChar itemChar, AItem->childs.keys())
+	foreach(const QChar &itemChar, AItem->childs.keys())
 	{
 		EmoticonTreeItem *childItem = AItem->childs.take(itemChar);
 		clearTreeItem(childItem);
@@ -459,7 +460,7 @@ void Emoticons::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
 		FToolBarsWidgets.append(AWidget);
 		if (AWidget->messageWindow()->editWidget()->isVisibleOnWindow())
 		{
-			foreach(QString substorage, activeIconsets())
+			foreach(const QString &substorage, activeIconsets())
 			{
 				SelectIconMenu *menu = createSelectIconMenu(substorage,AWidget->instance());
 				FToolBarWidgetByMenu.insert(menu,AWidget);
@@ -554,7 +555,7 @@ void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 		QList<QString> oldStorages = FStorages.keys();
 		QList<QString> availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
 
-		foreach(QString substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
+		foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
 		{
 			if (availStorages.contains(substorage))
 			{
@@ -567,7 +568,7 @@ void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 			}
 		}
 
-		foreach (QString substorage, oldStorages)
+		foreach (const QString &substorage, oldStorages)
 		{
 			removeSelectIconMenu(substorage);
 			delete FStorages.take(substorage);
