@@ -732,7 +732,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 			newPrefs.methodManual = APrefs.methodManual;
 
 		bool itemsChanged = false;
-		foreach(Jid itemJid, APrefs.itemPrefs.keys())
+		foreach(const Jid &itemJid, APrefs.itemPrefs.keys())
 		{
 			IArchiveItemPrefs newItemPrefs = APrefs.itemPrefs.value(itemJid);
 			if (!newItemPrefs.save.isEmpty() && !newItemPrefs.otr.isEmpty())
@@ -749,7 +749,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 		}
 
 		bool sessionsChanged = false;
-		foreach(QString threadId, APrefs.sessionPrefs.keys())
+		foreach(const QString &threadId, APrefs.sessionPrefs.keys())
 		{
 			IArchiveSessionPrefs newSessionPrefs = APrefs.sessionPrefs.value(threadId);
 			if (!newSessionPrefs.save.isEmpty() && !newSessionPrefs.otr.isEmpty())
@@ -794,7 +794,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 			methodManual.setAttribute("use",newPrefs.methodManual);
 		}
 
-		foreach(Jid itemJid, newPrefs.itemPrefs.keys())
+		foreach(const Jid &itemJid, newPrefs.itemPrefs.keys())
 		{
 			IArchiveItemPrefs newItemPrefs = newPrefs.itemPrefs.value(itemJid);
 			IArchiveItemPrefs oldItemPrefs = oldPrefs.itemPrefs.value(itemJid);
@@ -813,7 +813,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 			itemsChanged |= itemChanged;
 		}
 
-		foreach(QString threadId, newPrefs.sessionPrefs.keys())
+		foreach(const QString &threadId, newPrefs.sessionPrefs.keys())
 		{
 			IArchiveSessionPrefs newSessionPrefs = newPrefs.sessionPrefs.value(threadId);
 			IArchiveSessionPrefs oldSessionPrefs = oldPrefs.sessionPrefs.value(threadId);
@@ -1151,7 +1151,7 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 
 	int secLast = 0;
 	bool groupChat = false;
-	foreach(Message message, ACollection.body.messages)
+	foreach(const Message &message, ACollection.body.messages)
 	{
 		Jid fromJid = message.from();
 		groupChat |= message.type()==Message::GroupChat;
@@ -1413,9 +1413,9 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 
 		if (FInStoragePrefs.contains(AStreamJid))
 		{
-			foreach(Jid itemJid, oldItemJids)
+			foreach(const Jid &itemJid, oldItemJids)
 				prefs.itemPrefs.remove(itemJid);
-			foreach(QString threadId, oldSessionIds)
+			foreach(const QString &threadId, oldSessionIds)
 				prefs.sessionPrefs.remove(threadId);
 		}
 
@@ -1607,7 +1607,7 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 			QList<IArchiveHeader> headers;
 			foreach(IArchiveEngine *engine, ARequest.engines)
 			{
-				foreach(IArchiveHeader header, ARequest.headers.value(engine))
+				foreach(const IArchiveHeader &header, ARequest.headers.value(engine))
 				{
 					if (!headers.contains(header))
 						headers.append(header);
@@ -1803,7 +1803,7 @@ void MessageArchiver::startSuspendedStanzaSession(const Jid &AStreamJid, const Q
 {
 	if (FSessionNegotiation)
 	{
-		foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
+		foreach(const Jid &contactJid, FSessions.value(AStreamJid).keys())
 		{
 			const StanzaSession &session = FSessions.value(AStreamJid).value(contactJid);
 			if (session.requestId == ARequestId)
@@ -1820,7 +1820,7 @@ void MessageArchiver::cancelSuspendedStanzaSession(const Jid &AStreamJid, const 
 {
 	if (FSessionNegotiation)
 	{
-		foreach(Jid contactJid, FSessions.value(AStreamJid).keys())
+		foreach(const Jid &contactJid, FSessions.value(AStreamJid).keys())
 		{
 			StanzaSession &session = FSessions[AStreamJid][contactJid];
 			if (session.requestId == ARequestId)
@@ -1838,7 +1838,7 @@ void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
 	if (FSessionNegotiation)
 	{
 		QList<IStanzaSession> sessions = FSessionNegotiation->getSessions(AStreamJid,IStanzaSession::Active);
-		foreach(IStanzaSession session, sessions)
+		foreach(const IStanzaSession &session, sessions)
 		{
 			bool isOTRSession = isOTRStanzaSession(session);
 			IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid,session.contactJid);
@@ -2486,7 +2486,7 @@ void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 	if (!FNamespaces.contains(AInfo.streamJid) && !FInStoragePrefs.contains(AInfo.streamJid) && AInfo.node.isEmpty() && AInfo.streamJid.pDomain()==AInfo.contactJid.pFull())
 	{
 		QList<QString> &features = FFeatures[AInfo.streamJid];
-		foreach(QString feature, AInfo.features)
+		foreach(const QString &feature, AInfo.features)
 		{
 			if (feature==NS_ARCHIVE || feature==NS_ARCHIVE_OLD)
 				features.append(NS_ARCHIVE);

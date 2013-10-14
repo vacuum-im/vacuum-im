@@ -114,35 +114,33 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 
 QStandardItem *OptionsDialog::createNodeItem(const QString &ANodeID)
 {
-	QString curNodeID;
+	QString curNodeId;
 	QStandardItem *item = NULL;
-	foreach(QString nodeID, ANodeID.split(NodeDelimiter,QString::SkipEmptyParts))
+	foreach(const QString &nodeId, ANodeID.split(NodeDelimiter,QString::SkipEmptyParts))
 	{
-		if (curNodeID.isEmpty())
-			curNodeID = nodeID;
+		if (curNodeId.isEmpty())
+			curNodeId = nodeId;
 		else
-			curNodeID += NodeDelimiter+nodeID;
+			curNodeId += NodeDelimiter+nodeId;
 
-		if (!FNodeItems.contains(curNodeID))
+		if (!FNodeItems.contains(curNodeId))
 		{
 			if (item)
 			{
-				QStandardItem *newlItem = new QStandardItem(nodeID);
+				QStandardItem *newlItem = new QStandardItem(nodeId);
 				item->appendRow(newlItem);
 				item = newlItem;
 			}
 			else
 			{
-				item = new QStandardItem(nodeID);
+				item = new QStandardItem(nodeId);
 				FItemsModel->appendRow(item);
 			}
-			//item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-			//item->setData(Qt::Unchecked, Qt::CheckStateRole);
-			FNodeItems.insert(curNodeID,item);
+			FNodeItems.insert(curNodeId,item);
 		}
 		else
 		{
-			item = FNodeItems.value(curNodeID);
+			item = FNodeItems.value(curNodeId);
 		}
 	}
 	return item;
@@ -176,7 +174,7 @@ void OptionsDialog::onOptionsDialogNodeRemoved(const IOptionsDialogNode &ANode)
 {
 	if (FNodeItems.contains(ANode.nodeId))
 	{
-		foreach(QString nodeId, FNodeItems.keys())
+		foreach(const QString &nodeId, FNodeItems.keys())
 		{
 			if (nodeId.left(nodeId.lastIndexOf('.')+1) == ANode.nodeId+".")
 			{

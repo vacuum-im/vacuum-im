@@ -40,8 +40,8 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	{
 		FComboBox = new QComboBox(this);
 		appendLabel(label,FComboBox);
-		foreach(IDataOption option, FField.options) {
-			FComboBox->addItem(option.label, option.value); }
+		foreach(const IDataOption &option, FField.options)
+			FComboBox->addItem(option.label, option.value);
 		if (FField.validate.method == DATAVALIDATE_METHOD_OPEN)
 		{
 			FComboBox->setEditable(true);
@@ -56,7 +56,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	{
 		FListWidget = new ListWidget(this);
 		appendLabel(label,FListWidget);
-		foreach(IDataOption option, FField.options)
+		foreach(const IDataOption &option, FField.options)
 		{
 			QListWidgetItem *item = new QListWidgetItem(option.label);
 			item->setData(Qt::UserRole,option.value);
@@ -233,7 +233,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	{
 		QString text = FField.label;
 		QString prefix = !text.isEmpty() ? QString("\n   ") :  QString("\n");
-		foreach(QString line, AValue.toStringList())
+		foreach(const QString &line, AValue.toStringList())
 			text += !text.isEmpty() ? prefix + line : line;
 		FLabel->setText(text);
 	}
@@ -244,7 +244,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	else if (FField.type == DATAFIELD_TYPE_JIDMULTI)
 	{
 		FTextEdit->clear();
-		foreach(QString line, AValue.toStringList())
+		foreach(const QString &line, AValue.toStringList())
 			FTextEdit->append(Jid(line).uFull());
 	}
 	else if (!FReadOnly && FField.type == DATAFIELD_TYPE_LISTSINGLE)
@@ -267,7 +267,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	else if (FField.type == DATAFIELD_TYPE_TEXTMULTI)
 	{
 		FTextEdit->clear();
-		foreach(QString line, AValue.toStringList())
+		foreach(const QString &line, AValue.toStringList())
 			FTextEdit->append(line);
 	}
 	else if (FField.validate.type == DATAVALIDATE_TYPE_DATE)

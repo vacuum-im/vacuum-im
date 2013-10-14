@@ -8,7 +8,7 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FOptions = ANode;
 	FPluginSettings = NULL;
 
-	foreach (QString pluginId, FManager->pluginList())
+	foreach(const QString &pluginId, FManager->pluginList())
 		ui.cmbConnections->addItem(FManager->pluginById(pluginId)->pluginName(),pluginId);
 	connect(ui.cmbConnections, SIGNAL(currentIndexChanged(int)),SLOT(onComboConnectionsChanged(int)));
 	ui.wdtSelectConnection->setVisible(ui.cmbConnections->count() > 1);

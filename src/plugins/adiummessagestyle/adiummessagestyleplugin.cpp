@@ -180,7 +180,7 @@ QMap<QString,QVariant> AdiumMessageStylePlugin::styleInfo(const QString &AStyleI
 
 void AdiumMessageStylePlugin::updateAvailStyles()
 {
-	foreach(QString substorage, FileStorage::availSubStorages(RSR_STORAGE_ADIUMMESSAGESTYLES, false))
+	foreach(const QString &substorage, FileStorage::availSubStorages(RSR_STORAGE_ADIUMMESSAGESTYLES, false))
 	{
 		QDir dir(FileStorage::subStorageDirs(RSR_STORAGE_ADIUMMESSAGESTYLES,substorage).value(0));
 		if (dir.exists())

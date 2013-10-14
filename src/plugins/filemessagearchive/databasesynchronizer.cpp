@@ -58,7 +58,6 @@ void DatabaseSynchronizer::run()
 
 		bool syncFailed = false;
 		QDateTime syncTime = QDateTime::currentDateTime();
-		QString syncTimeFileName = FFileArchive->collectionFileName(syncTime);
 
 		QString archivePath = FFileArchive->fileArchivePath(streamJid);
 		if (!archivePath.isEmpty())

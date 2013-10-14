@@ -215,13 +215,13 @@ void AccountManager::onProfileClosed(const QString &AProfile)
 
 void AccountManager::onOptionsOpened()
 {
-	foreach(QString id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
+	foreach(const QString &id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
 		appendAccount(id);
 }
 
 void AccountManager::onOptionsClosed()
 {
-	foreach(QUuid id, FAccounts.keys())
+	foreach(const QUuid &id, FAccounts.keys())
 		removeAccount(id);
 }
 

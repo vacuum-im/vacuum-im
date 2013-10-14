@@ -256,7 +256,7 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
 		{
 			int row = 0;
 			ui.tbwResult->setRowCount(AResult.items.count());
-			foreach(ISearchItem item, AResult.items)
+			foreach(const ISearchItem &item, AResult.items)
 			{
 				QTableWidgetItem *itemJid = new QTableWidgetItem(item.itemJid.uFull());
 				itemJid->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);

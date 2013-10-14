@@ -407,6 +407,7 @@ void TabWindow::updateTab(int AIndex)
 
 		if (FShowIndices->isChecked() && AIndex<10)
 			tabCaption = tr("%1) %2").arg(QString::number((AIndex+1) % 10)).arg(tabCaption);
+		tabCaption = TextManager::getElidedString(tabCaption,Qt::ElideRight,20);
 
 		ui.twtTabs->setTabIcon(AIndex,tabIcon);
 		ui.twtTabs->setTabText(AIndex,tabCaption);
@@ -503,7 +504,7 @@ void TabWindow::onTabMenuRequested(int AIndex)
 			joinTab->setTitle(tr("Join to"));
 			menu->addAction(joinTab->menuAction(),AG_MWTWTM_MWIDGETS_TAB_ACTIONS);
 
-			foreach(QUuid id,FMessageWidgets->tabWindowList())
+			foreach(const QUuid &id, FMessageWidgets->tabWindowList())
 			{
 				if (id != FWindowId)
 				{

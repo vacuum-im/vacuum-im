@@ -174,7 +174,7 @@ QString XmppError::appCondition(const QString &ANsUri) const
 
 QString XmppError::errorString(const QString &AContext) const
 {
-	foreach(QString appNs, appConditionNsList())
+	foreach(const QString &appNs, appConditionNsList())
 	{
 		QString errString = getErrorString(appNs,appCondition(appNs),AContext);
 		if (!errString.isEmpty())

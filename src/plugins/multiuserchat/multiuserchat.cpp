@@ -561,7 +561,7 @@ bool MultiUserChat::changeAffiliationList(const QList<IMultiUserListItem> &ADelt
 		Stanza iq("iq");
 		iq.setTo(FRoomJid.bare()).setType("set").setId(FStanzaProcessor->newId());
 		QDomElement query = iq.addElement("query",NS_MUC_ADMIN);
-		foreach(IMultiUserListItem listItem, ADeltaList)
+		foreach(const IMultiUserListItem &listItem, ADeltaList)
 		{
 			QDomElement itemElem = query.appendChild(iq.createElement("item")).toElement();
 			itemElem.setAttribute("affiliation",listItem.affiliation);

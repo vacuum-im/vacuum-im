@@ -345,7 +345,7 @@ void BitsOfBinary::onOfflineTimerTimeout()
 {
 	QSet<QString> offlineRequests = FOfflineRequests.toSet();
 	FOfflineRequests.clear();
-	foreach(QString contentId, offlineRequests)
+	foreach(const QString &contentId, offlineRequests)
 	{
 		QString type; QByteArray data; quint64 maxAge;
 		if (loadBinary(contentId,type,data,maxAge))

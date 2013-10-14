@@ -212,7 +212,7 @@ void FileWriter::checkLimits()
 		FCloseTimer.start(CRITICAL_SIZE_CLOSE_TIMEOUT);
 	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MAXSIZE).value().toInt())
 		FCloseTimer.start(MAX_SIZE_CLOSE_TIMEOUT);
-	else if (FMessagesCount > Options::node(OPV_FILEARCHIVE_COLLECTION_MINSIZE).value().toInt())
+	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MINSIZE).value().toInt())
 		FCloseTimer.start(NORMAL_SIZE_CLOSE_TIMEOUT);
 	else
 		FCloseTimer.start(MIN_SIZE_CLOSE_TIMEOUT);

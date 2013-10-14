@@ -97,8 +97,8 @@ protected slots:
 	void onConnectionError(const XmppError &AError);
 	void onConnectionDisconnected();
 	//StreamParser
-	void onParserOpened(QDomElement AElem);
-	void onParserElement(QDomElement AElem);
+	void onParserOpened(const QDomElement &AElem);
+	void onParserElement(const QDomElement &AElem);
 	void onParserError(const XmppError &AError);
 	void onParserClosed();
 	//IXmppFeature

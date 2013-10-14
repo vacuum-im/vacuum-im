@@ -960,7 +960,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 			}
 		}
 
-		foreach(Message message, pendingMessages)
+		foreach(const Message &message, pendingMessages)
 			showStyledMessage(window,message);
 
 		WindowStatus &wstatus = FWindowStatus[window];

@@ -129,7 +129,7 @@ QList<IPlugin *> PluginManager::pluginInterface(const QString &AInterface) const
 	QList<IPlugin *> plugins;
 	if (!FPlugins.contains(AInterface))
 	{
-		foreach(PluginItem pluginItem, FPluginItems)
+		foreach(const PluginItem &pluginItem, FPluginItems)
 			if (AInterface.isEmpty() || pluginItem.plugin->instance()->inherits(AInterface.toLatin1().data()))
 				FPlugins.insertMulti(AInterface,pluginItem.plugin);
 	}
@@ -171,7 +171,7 @@ QList<QUuid> PluginManager::pluginDependencesFor(const QUuid &AUuid) const
 	if (FPluginItems.contains(AUuid))
 	{
 		QList<QUuid> dependences = FPluginItems.value(AUuid).info->dependences;
-		foreach(QUuid depend, dependences)
+		foreach(const QUuid &depend, dependences)
 		{
 			if (!deepStack.contains(depend) && FPluginItems.contains(depend))
 			{
@@ -257,7 +257,7 @@ void PluginManager::loadSettings()
 	}
 	if (FDataPath.isNull())
 	{
-		foreach(QString env, QProcess::systemEnvironment())
+		foreach(const QString &env, QProcess::systemEnvironment())
 		{
 			if (env.startsWith(ENV_APP_DATA"="))
 			{
@@ -319,7 +319,7 @@ void PluginManager::loadPlugins()
 		QStringList files = pluginsDir.entryList(QDir::Files);
 		removePluginsInfo(files);
 
-		foreach (QString file, files)
+		foreach (const QString &file, files)
 		{
 			if (QLibrary::isLibrary(file) && isPluginEnabled(file))
 			{
@@ -388,8 +388,8 @@ void PluginManager::loadPlugins()
 			}
 			else if (!checkConflicts(puid))
 			{
-				foreach(QUuid uid, getConflicts(puid)) {
-					unloadPlugin(uid, tr("Conflict with plugin %1").arg(puid.toString())); }
+				foreach(const QUuid &uid, getConflicts(puid))
+					unloadPlugin(uid, tr("Conflict with plugin %1").arg(puid.toString()));
 				it = FPluginItems.constBegin();
 			}
 			else
@@ -441,7 +441,7 @@ bool PluginManager::initPlugins()
 
 void PluginManager::startPlugins()
 {
-	foreach(PluginItem pluginItem, FPluginItems)
+	foreach(const PluginItem &pluginItem, FPluginItems)
 		pluginItem.plugin->startPlugin();
 }
 
@@ -578,7 +578,7 @@ void PluginManager::unloadPlugin(const QUuid &AUuid, const QString &AError)
 {
 	if (FPluginItems.contains(AUuid))
 	{
-		foreach(QUuid uid, pluginDependencesOn(AUuid))
+		foreach(const QUuid &uid, pluginDependencesOn(AUuid))
 			removePluginItem(uid, AError);
 		removePluginItem(AUuid, AError);
 		FPlugins.clear();
@@ -590,7 +590,7 @@ bool PluginManager::checkDependences(const QUuid &AUuid) const
 	if (FPluginItems.contains(AUuid))
 	{
 		QList<QUuid> dependences = FPluginItems.value(AUuid).info->dependences;
-		foreach(QUuid depend, dependences)
+		foreach(const QUuid &depend, dependences)
 		{
 			if (!FPluginItems.contains(depend))
 			{
@@ -609,16 +609,16 @@ bool PluginManager::checkDependences(const QUuid &AUuid) const
 	return true;
 }
 
-bool PluginManager::checkConflicts(const QUuid AUuid) const
+bool PluginManager::checkConflicts(const QUuid &AUuid) const
 {
 	if (FPluginItems.contains(AUuid))
 	{
 		QList<QUuid> conflicts = FPluginItems.value(AUuid).info->conflicts;
-		foreach (QUuid conflict, conflicts)
+		foreach (const QUuid &conflict, conflicts)
 		{
 			if (!FPluginItems.contains(conflict))
 			{
-				foreach(PluginItem pluginItem, FPluginItems)
+				foreach(const PluginItem &pluginItem, FPluginItems)
 					if (pluginItem.info->implements.contains(conflict))
 						return false;
 			}
@@ -637,7 +637,7 @@ QList<QUuid> PluginManager::getConflicts(const QUuid &AUuid) const
 	if (FPluginItems.contains(AUuid))
 	{
 		QList<QUuid> conflicts = FPluginItems.value(AUuid).info->conflicts;
-		foreach (QUuid conflict, conflicts)
+		foreach (const QUuid &conflict, conflicts)
 		{
 			QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
 			while (it!=FPluginItems.constEnd())
@@ -707,7 +707,7 @@ QDomElement PluginManager::savePluginInfo(const QString &AFile, const IPluginInf
 	if (!AInfo->dependences.isEmpty())
 	{
 		QDomElement dependsElem = pluginElem.appendChild(FPluginsSetup.createElement("depends")).toElement();
-		foreach(QUuid uid, AInfo->dependences)
+		foreach(const QUuid &uid, AInfo->dependences)
 			dependsElem.appendChild(FPluginsSetup.createElement("uuid")).appendChild(FPluginsSetup.createTextNode(uid.toString()));
 	}
 

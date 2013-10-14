@@ -14,9 +14,9 @@
 #define SIMPLEMESSAGESTYLE_UUID   "{cfad7d10-58d0-4638-9940-dda64c1dd509}"
 
 class SimpleMessageStylePlugin :
-			public QObject,
-			public IPlugin,
-			public IMessageStylePlugin
+	public QObject,
+	public IPlugin,
+	public IMessageStylePlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStylePlugin);

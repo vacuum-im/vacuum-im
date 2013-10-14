@@ -134,7 +134,7 @@ IConnectionPlugin *ConnectionManager::pluginById(const QString &APluginId) const
 QList<QUuid> ConnectionManager::proxyList() const
 {
 	QList<QUuid> plist;
-	foreach(QString proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy"))
+	foreach(const QString &proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy"))
 		plist.append(proxyId);
 	return plist;
 }

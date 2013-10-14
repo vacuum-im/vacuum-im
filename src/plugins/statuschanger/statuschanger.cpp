@@ -1118,7 +1118,7 @@ void StatusChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 
 void StatusChanger::onDefaultStatusIconsChanged()
 {
-	foreach (StatusItem status, FStatusItems)
+	foreach (const StatusItem &status, FStatusItems)
 		updateStatusActions(status.code);
 
 	foreach (IPresence *presence, FStreamMenu.keys())
@@ -1132,7 +1132,7 @@ void StatusChanger::onOptionsOpened()
 {
 	removeAllCustomStatuses();
 
-	foreach (QString ns, Options::node(OPV_STATUSES_ROOT).childNSpaces("status"))
+	foreach (const QString &ns, Options::node(OPV_STATUSES_ROOT).childNSpaces("status"))
 	{
 		int statusId = ns.toInt();
 		OptionsNode soptions = Options::node(OPV_STATUS_ITEM, ns);
@@ -1170,7 +1170,7 @@ void StatusChanger::onOptionsClosed()
 	delete FModifyStatusDialog;
 
 	QList<QString> oldNS = Options::node(OPV_STATUSES_ROOT).childNSpaces("status");
-	foreach (StatusItem status, FStatusItems)
+	foreach (const StatusItem &status, FStatusItems)
 	{
 		if (status.code > STATUS_NULL_ID)
 		{
@@ -1184,7 +1184,7 @@ void StatusChanger::onOptionsClosed()
 		oldNS.removeAll(QString::number(status.code));
 	}
 
-	foreach(QString ns, oldNS)
+	foreach(const QString &ns, oldNS)
 		Options::node(OPV_STATUSES_ROOT).removeChilds("status",ns);
 
 	Options::node(OPV_STATUSES_MAINSTATUS).setValue(FStatusItems.value(STATUS_MAIN_ID).code);

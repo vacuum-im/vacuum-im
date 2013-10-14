@@ -283,7 +283,7 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 	if (sroot && !AContactJids.isEmpty())
 	{
 		QMultiMap<int,QVariant> findData;
-		foreach(Jid contactJid, AContactJids)
+		foreach(const Jid &contactJid, AContactJids)
 			findData.insertMulti(RDR_PREP_BARE_JID,contactJid.pBare());
 		findData.insertMulti(RDR_STREAM_JID,AStreamJid.pFull());
 
@@ -295,7 +295,7 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 
 void Annotations::onSaveAnnotationsTimerTimeout()
 {
-	foreach(Jid streamJid, FSavePendingStreams)
+	foreach(const Jid &streamJid, FSavePendingStreams)
 		saveAnnotations(streamJid);
 	FSavePendingStreams.clear();
 }
