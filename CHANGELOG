@@ -6,6 +6,10 @@ LEGEND
   [-] Bug fix
 
 
+------
+  [-] Not all messages from server archive were displayed in a view history window
+
+
 v1.2.3
 ------
   [+] Added twitter status icons

@@ -465,6 +465,11 @@ void ServerMessageArchive::onServerRequestFailed(const QString &AId, const QStri
 		CollectionRequest request = FCollectionRequests.take(AId);
 		emit requestFailed(request.id,AError);
 	}
+	else if (FModificationsRequests.contains(AId))
+	{
+		ModificationsRequest request = FModificationsRequests.take(AId);
+		emit requestFailed(request.id,AError);
+	}
 }
 
 void ServerMessageArchive::onServerHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders, const IArchiveResultSet &AResult)
@@ -473,7 +478,9 @@ void ServerMessageArchive::onServerHeadersLoaded(const QString &AId, const QList
 	{
 		HeadersRequest request = FHeadersRequests.take(AId);
 		request.headers += AHeaders;
-		if (!AResult.last.isEmpty() && AResult.index+AHeaders.count()<AResult.count && (request.request.maxItems<=0 || request.headers.count()<request.request.maxItems))
+
+		int maxCount = request.request.maxItems>0 ? qMin(request.request.maxItems,RESULTSET_MAX) : RESULTSET_MAX;
+		if (!AResult.last.isEmpty() && AHeaders.count()>=maxCount && (request.request.maxItems<=0 || request.headers.count()<request.request.maxItems))
 		{
 			QString id = loadServerHeaders(request.streamJid,request.request,AResult);
 			if (!id.isEmpty())
@@ -498,7 +505,9 @@ void ServerMessageArchive::onServerCollectionLoaded(const QString &AId, const IA
 		request.collection.header = ACollection.header;
 		request.collection.body.messages += ACollection.body.messages;
 		request.collection.body.notes += ACollection.body.notes;
-		if (!AResult.last.isEmpty() && AResult.index+ACollection.body.messages.count()+ACollection.body.notes.count()<AResult.count)
+
+		int maxCount = RESULTSET_MAX;
+		if (!AResult.last.isEmpty() && ACollection.body.messages.count()+ACollection.body.notes.count()>=maxCount)
 		{
 			QString id = loadServerCollection(request.streamJid,request.header,AResult);
 			if (!id.isEmpty())
@@ -521,7 +530,9 @@ void ServerMessageArchive::onServerModificationsLoaded(const QString &AId, const
 		request.modifications.startTime = !request.modifications.startTime.isValid() ? AModifs.startTime : request.modifications.startTime;
 		request.modifications.endTime = AModifs.endTime;
 		request.modifications.items += AModifs.items;
-		if (!AResult.last.isEmpty() && AResult.index+AModifs.items.count()<AResult.count && AModifs.items.count()<request.count)
+
+		int maxCount = qMin(request.count,RESULTSET_MAX);
+		if (!AResult.last.isEmpty() && AModifs.items.count()>=maxCount && AModifs.items.count()<request.count)
 		{
 			QString id = loadServerModifications(request.streamJid,request.start,request.count-request.modifications.items.count(),AResult);
 			if (!id.isEmpty())
