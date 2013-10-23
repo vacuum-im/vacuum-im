@@ -7,11 +7,15 @@ HEADERS = archivestreamoptions.h \
           chatwindowmenu.h \
           archiveviewwindow.h \
           messagearchiver.h \
-          selectpagewidget.h
+          selectpagewidget.h \
+          archivereplicator.h \
+          replicateworker.h
           
 SOURCES = archivestreamoptions.cpp \
           archiveenginesoptions.cpp \
           chatwindowmenu.cpp \
           archiveviewwindow.cpp \
           messagearchiver.cpp \
-          selectpagewidget.cpp
+          selectpagewidget.cpp \
+          archivereplicator.cpp \
+          replicateworker.cpp

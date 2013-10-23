@@ -25,7 +25,6 @@ public:
 	int notesCount() const;
 	int messagesCount() const;
 	int recordsCount() const;
-	int secondsFromStart() const;
 	bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
 	bool writeNote(const QString &ANote);
 	void closeAndDeleteLater();
@@ -41,7 +40,6 @@ private:
 	QTimer FCloseTimer;
 	QXmlStreamWriter *FXmlWriter;
 private:
-	int FSecsSum;
 	bool FGroupchat;
 	int FNotesCount;
 	int FMessagesCount;

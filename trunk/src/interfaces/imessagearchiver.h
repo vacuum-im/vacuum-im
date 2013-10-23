@@ -84,7 +84,7 @@ struct IArchiveStreamPrefs
 struct IArchiveHeader
 {
 	IArchiveHeader() { 
-		version = 0; 
+		version = 0;
 	}
 	Jid with;
 	QDateTime start;
@@ -133,8 +133,7 @@ struct IArchiveCollection
 struct IArchiveModification
 {
 	enum ModifyAction {
-		Created,
-		Modified,
+		Changed,
 		Removed
 	};
 	ModifyAction action;
@@ -143,41 +142,33 @@ struct IArchiveModification
 
 struct IArchiveModifications
 {
-	DateTime startTime;
-	DateTime endTime;
+	IArchiveModifications() {
+		isValid = false;
+	}
+	bool isValid;
+	QString next;
+	QDateTime start;
 	QList<IArchiveModification> items;
 };
 
 struct IArchiveRequest
 {
 	IArchiveRequest() {
-		opened = false;
+		openOnly = false;
 		exactmatch = false;
-		maxItems = 0;
+		maxItems = 0xFFFFFFFF;
 		threadId = QString::null;
 		order = Qt::AscendingOrder;
 	}
 	Jid with;
 	QDateTime start;
 	QDateTime end;
-	bool opened;
+	bool openOnly;
 	bool exactmatch;
 	QString text;
-	qint32 maxItems;
+	quint32 maxItems;
 	QString threadId;
 	Qt::SortOrder order;
-};
-
-struct IArchiveResultSet 
-{
-	IArchiveResultSet() {
-		index = 0;
-		count = 0;
-	}
-	int index;
-	int count;
-	QString first;
-	QString last;
 };
 
 class IArchiveHandler
@@ -190,13 +181,13 @@ public:
 class IArchiveEngine
 {
 public:
-	enum Capabilities {
+	enum Capability {
 		DirectArchiving     = 0x0001,
 		ManualArchiving     = 0x0002,
 		AutomaticArchiving  = 0x0004,
 		ArchiveManagement   = 0x0008,
-		Replication         = 0x0010,
-		TextSearch          = 0x0020
+		ArchiveReplication  = 0x0010,
+		FullTextSearch      = 0x0020
 	};
 public:
 	virtual QObject *instance() =0;
@@ -216,16 +207,16 @@ public:
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
-	//Replication
-	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) =0;
+	//Archive Replication
+	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef) =0;
 protected:
 	virtual void capabilitiesChanged(const Jid &AStreamJid) =0;
 	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
-	virtual void collectionSaved(const QString &AId, const IArchiveHeader &AHeader) =0;
 	virtual void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders) =0;
+	virtual void collectionSaved(const QString &AId, const IArchiveCollection &ACollection) =0;
 	virtual void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection) =0;
 	virtual void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest) =0;
-	virtual void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs) =0;
+	virtual void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifications) =0;
 };
 
 class IMessageArchiver
@@ -233,16 +224,17 @@ class IMessageArchiver
 public:
 	virtual QObject *instance() =0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
-	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
+	virtual QString archiveDirPath(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const =0;
-	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const =0;
-	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
 	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) =0;
 	//Archive Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const =0;
+	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
+	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;
-	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto) =0;
+	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const =0;
+	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto, bool AGlobal=true) =0;
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs) =0;
 	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid) =0;
 	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId) =0;
@@ -287,7 +279,7 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")
-Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.1")
-Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.1")
+Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.2")
+Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.2")
 
 #endif // IMESSAGEARCHIVER_H

@@ -12,8 +12,7 @@ FileTask::FileTask(IFileMessageArchive *AArchive, const Jid &AStreamJid, Type AT
 	FType = AType;
 	FFileArchive = AArchive;
 	FStreamJid = AStreamJid;
-	FTaskId = QString("FileTask_%1").arg(++FTaskCount);
-	setAutoDelete(false);
+	FTaskId = QString("FileArchiveFileTask_%1").arg(++FTaskCount);
 }
 
 FileTask::~FileTask()
@@ -41,24 +40,6 @@ XmppError FileTask::error() const
 	return FError;
 }
 
-// FileTaskSaveCollection
-FileTaskSaveCollection::FileTaskSaveCollection(IFileMessageArchive *AArchive, const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode) : FileTask(AArchive,AStreamJid,SaveCollection)
-{
-	FSaveMode = ASaveMode;
-	FCollection = ACollection;
-}
-
-IArchiveHeader FileTaskSaveCollection::archiveHeader() const
-{
-	return FCollection.header;
-}
-
-void FileTaskSaveCollection::run()
-{
-	if (!FFileArchive->saveFileCollection(FStreamJid,FCollection,FSaveMode))
-		FError = XmppError(IERR_HISTORY_CONVERSATION_SAVE_ERROR);
-}
-
 // FileTaskLoadHeaders
 FileTaskLoadHeaders::FileTaskLoadHeaders(IFileMessageArchive *AArchive, const Jid &AStreamJid, const IArchiveRequest &ARequest) : FileTask(AArchive,AStreamJid,LoadHeaders)
 {
@@ -78,6 +59,24 @@ void FileTaskLoadHeaders::run()
 		FHeaders = FFileArchive->loadFileHeaders(FStreamJid,FRequest);
 }
 
+// FileTaskSaveCollection
+FileTaskSaveCollection::FileTaskSaveCollection(IFileMessageArchive *AArchive, const Jid &AStreamJid, const IArchiveCollection &ACollection) : FileTask(AArchive,AStreamJid,SaveCollection)
+{
+	FCollection = ACollection;
+}
+
+IArchiveCollection FileTaskSaveCollection::archiveCollection() const
+{
+	return FCollection;
+}
+
+void FileTaskSaveCollection::run()
+{
+	FCollection.header = FFileArchive->saveFileCollection(FStreamJid,FCollection);
+	if (!FCollection.header.with.isValid() || !FCollection.header.start.isValid())
+		FError = XmppError(IERR_HISTORY_CONVERSATION_SAVE_ERROR);
+}
+
 // FileTaskLoadCollection
 FileTaskLoadCollection::FileTaskLoadCollection(IFileMessageArchive *AArchive, const Jid &AStreamJid, const IArchiveHeader &AHeader) : FileTask(AArchive,AStreamJid,LoadCollection)
 {
@@ -91,8 +90,7 @@ IArchiveCollection FileTaskLoadCollection::archiveCollection() const
 
 void FileTaskLoadCollection::run()
 {
-	QString filePath = FFileArchive->collectionFilePath(FStreamJid,FHeader.with,FHeader.start);
-	FCollection = FFileArchive->loadFileCollection(filePath);
+	FCollection = FFileArchive->loadFileCollection(FStreamJid,FHeader);
 	if (!FCollection.header.with.isValid() || !FCollection.header.start.isValid())
 		FError = XmppError(IERR_HISTORY_CONVERSATION_LOAD_ERROR);
 }
@@ -114,22 +112,23 @@ void FileTaskRemoveCollection::run()
 
 	QList<IArchiveHeader> headers;
 	if (FFileArchive->isDatabaseReady(FStreamJid))
-		headers = FFileArchive->loadDatabaseHeaders(FStreamJid,FRequest); 
+		headers = FFileArchive->loadDatabaseHeaders(FStreamJid,FRequest);
 	else
 		headers = FFileArchive->loadFileHeaders(FStreamJid,FRequest);
 
 	foreach(const IArchiveHeader &header, headers)
 	{
-		if (!FFileArchive->removeFileCollection(FStreamJid,header.with,header.start))
+		if (!FFileArchive->removeFileCollection(FStreamJid,header))
 			FError = XmppError(IERR_HISTORY_CONVERSATION_REMOVE_ERROR);
 	}
 }
 
 // FileTaskLoadModifications
-FileTaskLoadModifications::FileTaskLoadModifications(IFileMessageArchive *AArchive, const Jid &AStreamJid, const QDateTime &AStart, int ACount) : FileTask(AArchive,AStreamJid,LoadModifications)
+FileTaskLoadModifications::FileTaskLoadModifications(IFileMessageArchive *AArchive, const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef) : FileTask(AArchive,AStreamJid,LoadModifications)
 {
-	FCount = ACount;
 	FStart = AStart;
+	FCount = ACount;
+	FNextRef = ANextRef;
 }
 
 IArchiveModifications FileTaskLoadModifications::archiveModifications() const
@@ -139,9 +138,8 @@ IArchiveModifications FileTaskLoadModifications::archiveModifications() const
 
 void FileTaskLoadModifications::run()
 {
-	if (FFileArchive->isDatabaseReady(FStreamJid))
-		FModifications = FFileArchive->loadDatabaseModifications(FStreamJid,FStart,FCount);
-	else
+	FModifications = FFileArchive->loadDatabaseModifications(FStreamJid,FStart,FCount,FNextRef);
+	if (!FModifications.isValid)
 		FError = XmppError(IERR_HISTORY_MODIFICATIONS_LOAD_ERROR);
 }
 
@@ -157,6 +155,13 @@ FileWorker::~FileWorker()
 	wait();
 }
 
+void FileWorker::quit()
+{
+	QMutexLocker locker(&FMutex);
+	FQuit = true;
+	FTaskReady.wakeAll();
+}
+
 bool FileWorker::startTask(FileTask *ATask)
 {
 	QMutexLocker locker(&FMutex);
@@ -167,28 +172,26 @@ bool FileWorker::startTask(FileTask *ATask)
 		start();
 		return true;
 	}
+	delete ATask;
 	return false;
 }
 
 void FileWorker::run()
 {
 	QMutexLocker locker(&FMutex);
-	while (!FQuit && !FTasks.isEmpty())
+	while (!FQuit || !FTasks.isEmpty())
 	{
-		FileTask *task = FTasks.dequeue();
-
-		locker.unlock();
-		task->run();
-		QMetaObject::invokeMethod(this,"taskFinished",Qt::QueuedConnection,Q_ARG(FileTask *,task));
-		locker.relock();
-
-		if (FTasks.isEmpty())
-			FTaskReady.wait(locker.mutex(),THREAD_WAIT_TIME);
+		FileTask *task = !FTasks.isEmpty() ? FTasks.dequeue() : NULL;
+		if (task)
+		{
+			locker.unlock();
+			task->run();
+			QMetaObject::invokeMethod(this,"taskFinished",Qt::QueuedConnection,Q_ARG(FileTask *,task));
+			locker.relock();
+		}
+		else if (!FTaskReady.wait(locker.mutex(),THREAD_WAIT_TIME))
+		{
+			break;
+		}
 	}
-}
-
-void FileWorker::quit()
-{
-	QMutexLocker locker(&FMutex);
-	FQuit = true;
 }

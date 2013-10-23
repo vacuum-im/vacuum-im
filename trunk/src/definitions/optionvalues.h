@@ -24,8 +24,6 @@
 #define OPV_ACCOUNT_AUTORECONNECT                       "accounts.account.auto-reconnect"
 #define OPV_ACCOUNT_STATUS_ISMAIN                       "accounts.account.status.is-main"
 #define OPV_ACCOUNT_STATUS_LASTONLINE                   "accounts.account.status.last-online"
-// MessageArchiver
-#define OPV_ACCOUNT_HISTORYREPLICATION                  "accounts.account.history-replication"
 // BookMarks
 #define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
 // Compress
@@ -126,18 +124,20 @@
 // MessageArchiver
 #define OPV_HISTORY_ENGINE_ITEM                         "history.engine"
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
-#define OPV_HISTORY_CAPABILITY_ITEM                     "history.capability"
-#define OPV_HISTORY_CAPABILITY_DEFAULT                  "history.capability.default"
+#define OPV_HISTORY_ENGINE_REPLICATEAPPEND              "history.engine.replicate-append"
+#define OPV_HISTORY_ENGINE_REPLICATEREMOVE              "history.engine.replicate-remove"
 #define OPV_HISTORY_STREAM_ITEM                         "history.stream"
+#define OPV_HISTORY_STREAM_REPLICATE                    "history.stream.replicate"
 #define OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING         "history.stream.force-direct-archiving"
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
-
 // FileMessageArchive
 #define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
 #define OPV_FILEARCHIVE_FORCEDATABASESYNC               "filearchive.force-database-sync"
 #define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "filearchive.collection.min-size"
 #define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
 #define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "filearchive.collection.critical-size"
+// ServerMessageArchive
+#define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "serverarchive.max-upload-size"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"
