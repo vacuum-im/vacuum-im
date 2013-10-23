@@ -1,10 +1,9 @@
 #ifndef DATABASEWORKER_H
 #define DATABASEWORKER_H
 
-#include <QMutex>
 #include <QQueue>
+#include <QMutex>
 #include <QThread>
-#include <QRunnable>
 #include <QSqlError>
 #include <QSqlDatabase>
 #include <QWaitCondition>
@@ -18,8 +17,7 @@ struct DatabaseArchiveHeader :
 	QDateTime timestamp;
 };
 
-class DatabaseTask :
-	public QRunnable
+class DatabaseTask
 {
 	friend class DatabaseWorker;
 public:
@@ -47,6 +45,8 @@ protected:
 	void setSQLError(const QSqlError &AError);
 	void addBindQueryValue(QSqlQuery &AQuery, const QVariant &AValue) const;
 	void bindQueryValue(QSqlQuery &AQuery, const QString &APlaceHolder, const QVariant &AValue) const;
+protected:
+	virtual void run() = 0;
 protected:
 	bool FAsync;
 	bool FFinished;
@@ -155,13 +155,14 @@ class DatabaseTaskLoadModifications :
 	public DatabaseTask
 {
 public:
-	DatabaseTaskLoadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount);
+	DatabaseTaskLoadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef);
 	IArchiveModifications modifications() const;
 protected:
 	void run();
 private:
 	int FCount;
 	QDateTime FStart;
+	QString FNextRef;
 	IArchiveModifications FModifications;
 };
 

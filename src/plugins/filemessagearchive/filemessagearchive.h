@@ -47,7 +47,7 @@ public:
 	virtual QString loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
-	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount);
+	virtual QString loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef);
 	//IFileMessageArchive
 	virtual QString fileArchiveRootPath() const;
 	virtual QString fileArchivePath(const Jid &AStreamJid) const;
@@ -57,31 +57,33 @@ public:
 	virtual QString collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const;
 	virtual QString collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) const;
 	virtual IArchiveHeader loadFileHeader(const QString &AFilePath) const;
-	virtual IArchiveCollection loadFileCollection(const QString &AFilePath) const;
+	virtual IArchiveCollection loadFileCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;
 	virtual QList<IArchiveHeader> loadFileHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
-	virtual bool saveFileCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend = true);
-	virtual bool removeFileCollection(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart);
+	virtual IArchiveHeader saveFileCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection);
+	virtual bool removeFileCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	// Database
 	virtual bool isDatabaseReady(const Jid &AStreamJid) const;
 	virtual QString databaseArchiveFile(const Jid &AStreamJid) const;
 	virtual QString databaseProperty(const Jid &AStreamJid, const QString &AProperty) const;
 	virtual bool setDatabaseProperty(const Jid &AStreamJid, const QString &AProperty, const QString &AValue);
 	virtual QList<IArchiveHeader> loadDatabaseHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) const;
-	virtual IArchiveModifications loadDatabaseModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const;
+	virtual IArchiveModifications loadDatabaseModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef) const;
 signals:
 	//IArchiveEngine
 	void capabilitiesChanged(const Jid &AStreamJid);
 	void requestFailed(const QString &AId, const XmppError &AError);
-	void collectionSaved(const QString &AId, const IArchiveHeader &AHeader);
 	void headersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
+	void collectionSaved(const QString &AId, const IArchiveCollection &ACollection);
 	void collectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	void collectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
-	void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifs);
+	void modificationsLoaded(const QString &AId, const IArchiveModifications &AModifications);
 	//IFileMessageArchive
 	void databaseOpened(const Jid &AStreamJid);
 	void databaseAboutToClose(const Jid &AStreamJid);
 	void databaseClosed(const Jid &AStreamJid);
 	void databasePropertyChanged(const Jid &AStreamJid, const QString &AProperty);
+	void fileCollectionChanged(const Jid &AStreamJid, const IArchiveHeader &AHeader);
+	void fileCollectionRemoved(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 protected:
 	void loadGatewayTypes();
 	Jid gatewayJid(const Jid &AJid) const;
@@ -89,7 +91,7 @@ protected:
 	bool startDatabaseSync(const Jid &AStreamJid, bool AForce = false);
 	IArchiveHeader makeHeader(const Jid &AItemJid, const Message &AMessage) const;
 	bool checkRequestHeader(const IArchiveHeader &AHeader, const IArchiveRequest &ARequest) const;
-	bool checkRequesFile(const QString &AFileName, const IArchiveRequest &ARequest, IArchiveHeader *AHeader=NULL) const;
+	bool checkRequestFile(const QString &AFileName, const IArchiveRequest &ARequest, IArchiveHeader *AHeader=NULL) const;
 	bool saveModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, IArchiveModification::ModifyAction AAction);
 protected:
 	FileWriter *findFileWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const;

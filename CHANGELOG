@@ -10,6 +10,7 @@ LEGEND
   [!] Adden new plugin for keeping all user IM clients engaged in a conversation
   [!] Added new plugin for viewing recently used contacts in main window
   [!] Added new plugin for collecting statistics
+  [+] Added history archive replication
   [*] Increased speed of access to local message history
   [-] The application may fail in some cases after unsuccessful Stanza-session initialization
   [-] In private chats history of communication are loaded even if the relevant setting has been disabled

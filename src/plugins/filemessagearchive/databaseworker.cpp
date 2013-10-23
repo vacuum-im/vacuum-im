@@ -20,9 +20,7 @@ DatabaseTask::DatabaseTask(const Jid &AStreamJid, Type AType)
 
 	FType = AType;
 	FStreamJid = AStreamJid;
-	FTaskId = QString("DatabaseTask_%1").arg(++FTaskCount);
-
-	setAutoDelete(false);
+	FTaskId = QString("FileArchiveDatabaseTask_%1").arg(++FTaskCount);
 }
 
 DatabaseTask::~DatabaseTask()
@@ -143,60 +141,66 @@ bool DatabaseTaskOpenDatabase::initializeDatabase(QSqlDatabase &ADatabase)
 		}
 	}
 
-	int structureVersion = FProperties.value("StructureVersion").toInt();
-	int compatibleVersion = FProperties.value("CompatibleVersion").toInt();
+	int structureVersion = FProperties.value(FADP_STRUCTURE_VERSION).toInt();
+	int compatibleVersion = FProperties.value(FADP_COMPATIBLE_VERSION).toInt();
 	if (structureVersion < DATABASE_STRUCTURE_VERSION)
 	{
 		static const struct { QString createQuery; int compatible; } databaseUpdates[] = 
 		{
 			{
 				"CREATE TABLE properties ("
-					"  property         TEXT NOT NULL,"
-					"  value            TEXT"
-					");"
+				"  property         TEXT NOT NULL,"
+				"  value            TEXT"
+				");"
 
-					"CREATE TABLE headers ("
-					"  with_node        TEXT,"
-					"  with_domain      TEXT NOT NULL,"
-					"  with_resource    TEXT,"
-					"  start            DATETIME NOT NULL,"
-					"  subject          TEXT,"
-					"  thread           TEXT,"
-					"  version          INTEGER NOT NULL,"
-					"  gateway          TEXT,"
-					"  timestamp        DATETIME NOT NULL"
-					");"
+				"CREATE TABLE headers ("
+				"  with_node        TEXT,"
+				"  with_domain      TEXT NOT NULL,"
+				"  with_resource    TEXT,"
+				"  start            DATETIME NOT NULL,"
+				"  subject          TEXT,"
+				"  thread           TEXT,"
+				"  version          INTEGER NOT NULL,"
+				"  gateway          TEXT,"
+				"  timestamp        DATETIME NOT NULL"
+				");"
 
-					"CREATE TABLE modifications ("
-					"  timestamp        DATETIME NOT NULL,"
-					"  action           INTEGER NOT NULL,"
-					"  with             TEXT NOT NULL,"
-					"  start            DATETIME NOT NULL,"
-					"  version          INTEGER NOT NULL"
-					");"
+				"CREATE TABLE modifications ("
+				"  id               INTEGER PRIMARY KEY,"
+				"  timestamp        DATETIME NOT NULL,"
+				"  action           INTEGER NOT NULL,"
+				"  with             TEXT NOT NULL,"
+				"  start            DATETIME NOT NULL,"
+				"  version          INTEGER NOT NULL"
+				");"
 
-					"CREATE UNIQUE INDEX properties_property ON properties ("
-					"  property         ASC"
-					");"
+				"CREATE UNIQUE INDEX properties_property ON properties ("
+				"  property         ASC"
+				");"
 
-					"CREATE UNIQUE INDEX headers_with_start ON headers ("
-					"  with_node        ASC,"
-					"  with_domain      ASC,"
-					"  with_resource    ASC,"
-					"  start            DESC"
-					");"
+				"CREATE UNIQUE INDEX headers_with_start ON headers ("
+				"  with_node        ASC,"
+				"  with_domain      ASC,"
+				"  with_resource    ASC,"
+				"  start            DESC"
+				");"
 
-					"CREATE INDEX headers_start ON headers ("
-					"  start            DESC"
-					");"
+				"CREATE INDEX headers_start ON headers ("
+				"  start            DESC"
+				");"
 
-					"CREATE INDEX modifications_timestamp ON modifications ("
-					"  timestamp        ASC"
-					");"
+				"CREATE INDEX modifications_timestamp ON modifications ("
+				"  timestamp        ASC"
+				");"
 
-					"INSERT INTO properties(property,value) VALUES('StructureVersion','1');"
-					"INSERT INTO properties(property,value) VALUES('CompatibleVersion','1');"
-					, 1
+				"CREATE UNIQUE INDEX modifications_start_with ON modifications ("
+				"  start            ASC,"
+				"  with             ASC"
+				");"
+
+				"INSERT INTO properties(property,value) VALUES('StructureVersion','1');"
+				"INSERT INTO properties(property,value) VALUES('CompatibleVersion','1');"
+				, 1
 			} 
 		};
 
@@ -324,97 +328,99 @@ void DatabaseTaskLoadHeaders::run()
 	QSqlDatabase db = QSqlDatabase::database(databaseConnection());
 	if (db.isOpen())
 	{
-		QString command = "SELECT with_node, with_domain, with_resource, start, subject, thread, version, gateway, timestamp FROM headers";
+		if (!FRequest.openOnly)
+		{
+			QString command = "SELECT with_node, with_domain, with_resource, start, subject, thread, version, gateway, timestamp FROM headers";
 
-		QStringList conditions;
-		QVariantList bindValues;
-		
-		if (!FRequest.with.node().isEmpty())
-		{
-			conditions.append("(with_node = ?)");
-			bindValues.append(FRequest.with.pNode());
-		}
-		else if (FRequest.exactmatch)
-		{
-			conditions.append("(with_node = '')");
-		}
-		if (!FGateType.isEmpty())
-		{
-			conditions.append("(gateway = ?)");
-			bindValues.append(FGateType);
-		}
-		else if (!FRequest.with.domain().isEmpty())
-		{
-			conditions.append("(with_domain = ?)");
-			bindValues.append(FRequest.with.pDomain());
-		}
-		else if (FRequest.exactmatch)
-		{
-			conditions.append("(with_domain = '')");
-		}
-		if (!FRequest.with.resource().isEmpty())
-		{
-			conditions.append("(with_resource = ?)");
-			bindValues.append(FRequest.with.pResource());
-		}
-		else if (FRequest.exactmatch)
-		{
-			conditions.append("(with_resource = '')");
-		}
+			QStringList conditions;
+			QVariantList bindValues;
 
-		if (FRequest.start.isValid())
-		{
-			conditions.append("(start >= ?)");
-			bindValues.append(DateTime(FRequest.start).toX85UTC());
-		}
-		if (FRequest.end.isValid())
-		{
-			conditions.append("(start <= ?)");
-			bindValues.append(DateTime(FRequest.end).toX85UTC());
-		}
+			if (!FRequest.with.node().isEmpty())
+			{
+				conditions.append("(with_node = ?)");
+				bindValues.append(FRequest.with.pNode());
+			}
+			else if (FRequest.exactmatch)
+			{
+				conditions.append("(with_node = '')");
+			}
+			if (!FGateType.isEmpty())
+			{
+				conditions.append("(gateway = ?)");
+				bindValues.append(FGateType);
+			}
+			else if (!FRequest.with.domain().isEmpty())
+			{
+				conditions.append("(with_domain = ?)");
+				bindValues.append(FRequest.with.pDomain());
+			}
+			else if (FRequest.exactmatch)
+			{
+				conditions.append("(with_domain = '')");
+			}
+			if (!FRequest.with.resource().isEmpty())
+			{
+				conditions.append("(with_resource = ?)");
+				bindValues.append(FRequest.with.pResource());
+			}
+			else if (FRequest.exactmatch)
+			{
+				conditions.append("(with_resource = '')");
+			}
 
-		if (!FRequest.threadId.isEmpty())
-		{
-			conditions.append("(thread = ?)");
-			bindValues.append(FRequest.threadId);
-		}
+			if (FRequest.start.isValid())
+			{
+				conditions.append("(start >= ?)");
+				bindValues.append(DateTime(FRequest.start).toX85UTC());
+			}
+			if (FRequest.end.isValid())
+			{
+				conditions.append("(start <= ?)");
+				bindValues.append(DateTime(FRequest.end).toX85UTC());
+			}
 
-		if (!conditions.isEmpty())
-		{
-			command += QString (" WHERE %1").arg(conditions.join(" AND "));
-		}
+			if (!FRequest.threadId.isEmpty())
+			{
+				conditions.append("(thread = ?)");
+				bindValues.append(FRequest.threadId);
+			}
 
-		command += QString(" ORDER BY start %1").arg(FRequest.order==Qt::AscendingOrder ? "ASC" : "DESC");
+			if (!conditions.isEmpty())
+			{
+				command += QString (" WHERE %1").arg(conditions.join(" AND "));
+			}
 
-		if (FRequest.maxItems > 0)
+			command += QString(" ORDER BY start %1").arg(FRequest.order==Qt::AscendingOrder ? "ASC" : "DESC");
+
 			command += QString(" LIMIT %1").arg(FRequest.maxItems);
 
-		QSqlQuery selectQuery(db);
-		if (!selectQuery.prepare(command))
-		{
-			setSQLError(selectQuery.lastError());
-		}
-		else
-		{
-			foreach(const QVariant &value, bindValues)
-				addBindQueryValue(selectQuery,value);
-
-			if (!selectQuery.exec())
+			QSqlQuery selectQuery(db);
+			if (!selectQuery.prepare(command))
 			{
 				setSQLError(selectQuery.lastError());
 			}
-			else while (selectQuery.next())
+			else
 			{
-				DatabaseArchiveHeader header;
-				header.engineId = FILEMESSAGEARCHIVE_UUID;
-				header.with = Jid(selectQuery.value(0).toString(),selectQuery.value(1).toString(),selectQuery.value(2).toString());
-				header.start = DateTime(selectQuery.value(3).toString()).toLocal();
-				header.subject = selectQuery.value(4).toString();
-				header.threadId = selectQuery.value(5).toString();
-				header.version = selectQuery.value(6).toInt();
-				header.gateway = selectQuery.value(7).toString();
-				header.timestamp = DateTime(selectQuery.value(8).toString()).toLocal();
-				FHeaders.append(header);
+				foreach(const QVariant &value, bindValues)
+					addBindQueryValue(selectQuery,value);
+
+				if (!selectQuery.exec())
+				{
+					setSQLError(selectQuery.lastError());
+				}
+				else while (selectQuery.next())
+				{
+					DatabaseArchiveHeader header;
+					header.engineId = FILEMESSAGEARCHIVE_UUID;
+					header.with = Jid(selectQuery.value(0).toString(),selectQuery.value(1).toString(),selectQuery.value(2).toString());
+					header.start = DateTime(selectQuery.value(3).toString()).toLocal();
+					header.subject = selectQuery.value(4).toString();
+					header.threadId = selectQuery.value(5).toString();
+					header.version = selectQuery.value(6).toInt();
+					header.gateway = selectQuery.value(7).toString();
+					header.timestamp = DateTime(selectQuery.value(8).toString()).toLocal();
+					FHeaders.append(header);
+				}
 			}
 		}
 	}
@@ -450,7 +456,7 @@ void DatabaseTaskInsertHeaders::run()
 			setSQLError(insertQuery.lastError());
 		}
 		else if (!modifyQuery.prepare(
-			"INSERT INTO modifications (timestamp, action, with, start, version) "
+			"INSERT OR REPLACE INTO modifications (timestamp, action, with, start, version) "
 			"VALUES (:timestamp, :action, :with, :start, :version)"))
 		{
 			setSQLError(modifyQuery.lastError());
@@ -473,7 +479,7 @@ void DatabaseTaskInsertHeaders::run()
 				bindQueryValue(insertQuery,":timestamp",timestamp);
 
 				bindQueryValue(modifyQuery,":timestamp",timestamp);
-				bindQueryValue(modifyQuery,":action",IArchiveModification::Created);
+				bindQueryValue(modifyQuery,":action",IArchiveModification::Changed);
 				bindQueryValue(modifyQuery,":with",header.with.pFull());
 				bindQueryValue(modifyQuery,":start",DateTime(header.start).toX85UTC());
 				bindQueryValue(modifyQuery,":version",header.version);
@@ -534,7 +540,7 @@ void DatabaseTaskUpdateHeaders::run()
 			setSQLError(insertQuery.lastError());
 		}
 		else if (!modifyQuery.prepare(
-			"INSERT INTO modifications (timestamp, action, with, start, version) "
+			"INSERT OR REPLACE INTO modifications (timestamp, action, with, start, version) "
 			"VALUES (:timestamp, :action, :with, :start, :version)"))
 		{
 			setSQLError(updateQuery.lastError());
@@ -556,7 +562,7 @@ void DatabaseTaskUpdateHeaders::run()
 				bindQueryValue(updateQuery,":start",DateTime(header.start).toX85UTC());
 
 				bindQueryValue(modifyQuery,":timestamp",timestamp);
-				bindQueryValue(modifyQuery,":action",IArchiveModification::Modified);
+				bindQueryValue(modifyQuery,":action",IArchiveModification::Changed);
 				bindQueryValue(modifyQuery,":with",header.with.pFull());
 				bindQueryValue(modifyQuery,":start",DateTime(header.start).toX85UTC());
 				bindQueryValue(modifyQuery,":version",header.version);
@@ -580,8 +586,6 @@ void DatabaseTaskUpdateHeaders::run()
 						bindQueryValue(insertQuery,":version",header.version);
 						bindQueryValue(insertQuery,":gateway",FGateType);
 						bindQueryValue(insertQuery,":timestamp",timestamp);
-
-						bindQueryValue(modifyQuery,":action",IArchiveModification::Created);
 
 						if (!insertQuery.exec())
 						{
@@ -643,7 +647,7 @@ void DatabaseTaskRemoveHeaders::run()
 			setSQLError(removeQuery.lastError());
 		}
 		else if (!modifyQuery.prepare(
-			"INSERT INTO modifications (timestamp, action, with, start, version) "
+			"INSERT OR REPLACE INTO modifications (timestamp, action, with, start, version) "
 			"VALUES (:timestamp, :action, :with, :start, :version)"))
 		{
 			setSQLError(removeQuery.lastError());
@@ -687,10 +691,11 @@ void DatabaseTaskRemoveHeaders::run()
 }
 
 // DatabaseTaskLoadModifications
-DatabaseTaskLoadModifications::DatabaseTaskLoadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) : DatabaseTask(AStreamJid,LoadModifications)
+DatabaseTaskLoadModifications::DatabaseTaskLoadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef) : DatabaseTask(AStreamJid,LoadModifications)
 {
-	FCount = ACount;
 	FStart = AStart;
+	FCount = ACount;
+	FNextRef = ANextRef;
 }
 
 IArchiveModifications DatabaseTaskLoadModifications::modifications() const
@@ -704,18 +709,17 @@ void DatabaseTaskLoadModifications::run()
 	if (db.isOpen())
 	{
 		QSqlQuery loadQuery(db);
-		if (!loadQuery.prepare("SELECT timestamp, action, with, start, version WHERE timestamp>? ORDER BY timestamp LIMIT ?"))
+		if (!loadQuery.prepare("SELECT id, action, with, start, version FROM modifications WHERE id>? AND timestamp>? ORDER BY id LIMIT ?"))
 		{
 			setSQLError(loadQuery.lastError());
 		}
 		else
 		{
+			addBindQueryValue(loadQuery,FNextRef.isEmpty() ? 0 : FNextRef.toInt());
 			addBindQueryValue(loadQuery,DateTime(FStart).toX85UTC());
 			addBindQueryValue(loadQuery,FCount);
 
-			FModifications.startTime = FStart;
-			FModifications.endTime = FStart;
-
+			QDateTime requestTime = QDateTime::currentDateTime();
 			if (!loadQuery.exec())
 			{
 				setSQLError(loadQuery.lastError());
@@ -730,8 +734,11 @@ void DatabaseTaskLoadModifications::run()
 				item.header.version = loadQuery.value(4).toInt();
 				FModifications.items.append(item);
 
-				FModifications.endTime = DateTime(loadQuery.value(0).toString()).toLocal();
+				FModifications.next = loadQuery.value(0).toString();
 			}
+
+			FModifications.isValid = !isFailed();
+			FModifications.start = !FModifications.items.isEmpty() ? FStart : requestTime;
 		}
 	}
 	else
@@ -781,13 +788,14 @@ bool DatabaseWorker::startTask(DatabaseTask *ATask)
 		FTaskReady.wakeAll();
 		return true;
 	}
+	delete ATask;
 	return false;
 }
 
 void DatabaseWorker::run()
 {
 	QMutexLocker locker(&FMutex);
-	while (!FQuit)
+	while (!FQuit || !FTasks.isEmpty())
 	{
 		DatabaseTask *task = !FTasks.isEmpty() ? FTasks.dequeue() : NULL;
 		if (task)

@@ -4,14 +4,13 @@
 #include <QQueue>
 #include <QMutex>
 #include <QThread>
-#include <QRunnable>
 #include <QWaitCondition>
 #include <interfaces/ifilemessagearchive.h>
 #include <utils/xmpperror.h>
 
-class FileTask : 
-	public QRunnable
+class FileTask
 {
+	friend class FileWorker;
 public:
 	enum Type {
 		SaveCollection,
@@ -28,6 +27,8 @@ public:
 	bool isFailed() const;
 	XmppError error() const;
 protected:
+	virtual void run() = 0;
+protected:
 	Type FType;
 	QString FTaskId;
 	Jid FStreamJid;
@@ -36,21 +37,6 @@ protected:
 private:
 	static quint32 FTaskCount;
 };
-
-
-class FileTaskSaveCollection :
-	public FileTask
-{
-public:
-	FileTaskSaveCollection(IFileMessageArchive *AArchive, const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode);
-	IArchiveHeader archiveHeader() const;
-protected:
-	void run();
-private:
-	QString FSaveMode;
-	IArchiveCollection FCollection;
-};
-
 
 class FileTaskLoadHeaders :
 	public FileTask
@@ -65,6 +51,17 @@ private:
 	QList<IArchiveHeader> FHeaders;
 };
 
+class FileTaskSaveCollection :
+	public FileTask
+{
+public:
+	FileTaskSaveCollection(IFileMessageArchive *AArchive, const Jid &AStreamJid, const IArchiveCollection &ACollection);
+	IArchiveCollection archiveCollection() const;
+protected:
+	void run();
+private:
+	IArchiveCollection FCollection;
+};
 
 class FileTaskLoadCollection :
 	public FileTask
@@ -79,7 +76,6 @@ private:
 	IArchiveCollection FCollection;
 };
 
-
 class FileTaskRemoveCollection :
 	public FileTask
 {
@@ -92,21 +88,20 @@ private:
 	IArchiveRequest FRequest;
 };
 
-
 class FileTaskLoadModifications :
 	public FileTask
 {
 public:
-	FileTaskLoadModifications(IFileMessageArchive *AArchive, const Jid &AStreamJid, const QDateTime &AStart, int ACount);
+	FileTaskLoadModifications(IFileMessageArchive *AArchive, const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef);
 	IArchiveModifications archiveModifications() const;
 protected:
 	void run();
 private:
 	int FCount;
 	QDateTime FStart;
+	QString FNextRef;
 	IArchiveModifications FModifications;
 };
-
 
 class FileWorker :
 	public QThread
@@ -115,12 +110,12 @@ class FileWorker :
 public:
 	FileWorker(QObject *AParent);
 	~FileWorker();
+	void quit();
 	bool startTask(FileTask *ATask);
 signals:
 	void taskFinished(FileTask *ATask);
 protected:
 	void run();
-	void quit();
 private:
 	bool FQuit;
 	QMutex FMutex;
