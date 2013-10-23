@@ -23,7 +23,6 @@ public:
 	const QString &fileName() const;
 	const IArchiveHeader &header() const;
 	int recordsCount() const;
-	int secondsFromStart() const;
 	bool writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn);
 	bool writeNote(const QString &ANote);
 	void closeAndDeleteLater();
@@ -35,11 +34,10 @@ protected:
 	void writeElementChilds(const QDomElement &AElem);
 	void checkLimits();
 private:
-	QTimer FCloseTimer;
 	QFile *FXmlFile;
+	QTimer FCloseTimer;
 	QXmlStreamWriter *FXmlWriter;
 private:
-	int FSecsSum;
 	bool FGroupchat;
 	int FNotesCount;
 	int FMessagesCount;

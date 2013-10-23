@@ -691,6 +691,7 @@ QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
 		autoSave.setType("set").setId(FStanzaProcessor->newId());
 		QDomElement autoElem = autoSave.addElement("auto",FNamespaces.value(AStreamJid));
 		autoElem.setAttribute("save",QVariant(AAuto).toString());
+		autoElem.setAttribute("scope",ARCHIVE_SCOPE_GLOBAL);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,autoSave,ARCHIVE_TIMEOUT))
 		{
 			FPrefsAutoRequests.insert(autoSave.id(),AAuto);
@@ -1013,22 +1014,31 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 	ACollection.header.threadId = AChatElem.attribute("thread");
 	ACollection.header.version = AChatElem.attribute("version").toUInt();
 
-	int secsLast = 0;
 	QDomElement nodeElem = AChatElem.firstChildElement();
-	bool isSecsFromStart = AChatElem.attribute("secsFromLast")!="true";
-	while (!nodeElem.isNull() && isSecsFromStart)
+
+	bool isSecsFromStart;
+	if (!AChatElem.hasAttribute("secsFromLast"))
 	{
-		if (nodeElem.hasAttribute("secs"))
+		int secsLast = 0;
+		isSecsFromStart = true;
+		while (!nodeElem.isNull() && isSecsFromStart)
 		{
-			int secs = nodeElem.attribute("secs").toInt();
-			if (secs < secsLast)
-				isSecsFromStart = false;
-			secsLast = secs;
+			if (nodeElem.hasAttribute("secs"))
+			{
+				int secs = nodeElem.attribute("secs").toInt();
+				if (secs < secsLast)
+					isSecsFromStart = false;
+				secsLast = secs;
+			}
+			nodeElem = nodeElem.nextSiblingElement();
 		}
-		nodeElem = nodeElem.nextSiblingElement();
+	}
+	else
+	{
+		isSecsFromStart = AChatElem.attribute("secsFromLast")!="true";
 	}
 
-	secsLast = 0;
+	int secsLast = 0;
 	QDateTime lastMessageDT;
 	nodeElem = AChatElem.firstChildElement();
 	while (!nodeElem.isNull())
@@ -1073,14 +1083,13 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			}
 			secsLast = ACollection.header.start.secsTo(message.dateTime());
 
-			message.setThreadId(ACollection.header.threadId);
-
 			QDomElement childElem = nodeElem.firstChildElement();
 			while (!childElem.isNull())
 			{
 				message.stanza().element().appendChild(childElem.cloneNode(true));
 				childElem = childElem.nextSiblingElement();
 			}
+			message.setThreadId(ACollection.header.threadId);
 
 			ACollection.body.messages.append(message);
 		}
@@ -1117,7 +1126,68 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 		AChatElem.setAttribute("subject",ACollection.header.subject);
 	if (!ACollection.header.threadId.isEmpty())
 		AChatElem.setAttribute("thread",ACollection.header.threadId);
-	AChatElem.setAttribute("secsFromLast","true");
+	AChatElem.setAttribute("secsFromLast","false");
+
+	bool groupChat = false;
+	QList<Message>::const_iterator messageIt = ACollection.body.messages.constBegin();
+	QMultiMap<QDateTime,QString>::const_iterator noteIt = ACollection.body.notes.constBegin();
+	while(messageIt!=ACollection.body.messages.constEnd() || noteIt!=ACollection.body.notes.constEnd())
+	{
+		bool writeNote = false;
+		bool writeMessage = false;
+		if (noteIt == ACollection.body.notes.constEnd())
+			writeMessage = true;
+		else if (messageIt == ACollection.body.messages.constEnd())
+			writeNote = true;
+		else if (messageIt->dateTime() <= noteIt.key())
+			writeMessage = true;
+		else
+			writeNote = true;
+
+		if (writeMessage)
+		{
+			Jid fromJid = messageIt->from();
+			groupChat |= messageIt->type()==Message::GroupChat;
+			if (!groupChat || !fromJid.resource().isEmpty())
+			{
+				bool directionIn = ACollection.header.with && messageIt->from();
+				QDomElement messageElem = AChatElem.appendChild(ownerDoc.createElement(directionIn ? "from" : "to")).toElement();
+
+				int secs = ACollection.header.start.secsTo(messageIt->dateTime());
+				if (secs >= 0)
+					messageElem.setAttribute("secs",secs);
+				else
+					messageElem.setAttribute("utc",DateTime(messageIt->dateTime()).toX85UTC());
+
+				if (groupChat)
+					messageElem.setAttribute("name",fromJid.resource());
+
+				if (ASaveMode==ARCHIVE_SAVE_MESSAGE || ASaveMode==ARCHIVE_SAVE_STREAM)
+				{
+					QDomElement childElem = messageIt->stanza().element().firstChildElement();
+					while (!childElem.isNull())
+					{
+						if (childElem.tagName() != "thread")
+							messageElem.appendChild(childElem.cloneNode(true));
+						childElem = childElem.nextSiblingElement();
+					}
+				}
+				else if (ASaveMode == ARCHIVE_SAVE_BODY)
+				{
+					messageElem.appendChild(ownerDoc.createElement("body")).appendChild(ownerDoc.createTextNode(messageIt->body()));
+				}
+			}
+			++messageIt;
+		}
+
+		if (writeNote)
+		{
+			QDomElement noteElem = AChatElem.appendChild(ownerDoc.createElement("note")).toElement();
+			noteElem.setAttribute("utc",DateTime(noteIt.key()).toX85UTC());
+			noteElem.appendChild(ownerDoc.createTextNode(noteIt.value()));
+			++noteIt;
+		}
+	}
 
 	if (ACollection.previous.with.isValid() && ACollection.previous.start.isValid())
 	{
@@ -1136,54 +1206,6 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 	if (FDataForms && FDataForms->isFormValid(ACollection.attributes))
 	{
 		FDataForms->xmlForm(ACollection.attributes,AChatElem);
-	}
-
-	int secLast = 0;
-	bool groupChat = false;
-	foreach(const Message &message, ACollection.body.messages)
-	{
-		Jid fromJid = message.from();
-		groupChat |= message.type()==Message::GroupChat;
-		if (!groupChat || !fromJid.resource().isEmpty())
-		{
-			bool directionIn = ACollection.header.with && message.from();
-			QDomElement messageElem = AChatElem.appendChild(ownerDoc.createElement(directionIn ? "from" : "to")).toElement();
-
-			int secs = ACollection.header.start.secsTo(message.dateTime());
-			if (secs >= secLast)
-			{
-				messageElem.setAttribute("secs",secs-secLast);
-				secLast = secs;
-			}
-			else
-				messageElem.setAttribute("utc",DateTime(message.dateTime()).toX85UTC());
-
-			if (groupChat)
-				messageElem.setAttribute("name",fromJid.resource());
-
-			if (ASaveMode==ARCHIVE_SAVE_MESSAGE || ASaveMode==ARCHIVE_SAVE_STREAM)
-			{
-				QDomElement childElem = message.stanza().element().firstChildElement();
-				while (!childElem.isNull())
-				{
-					messageElem.appendChild(childElem.cloneNode(true));
-					childElem = childElem.nextSiblingElement();
-				}
-			}
-			else if (ASaveMode == ARCHIVE_SAVE_BODY)
-			{
-				messageElem.appendChild(ownerDoc.createElement("body")).appendChild(ownerDoc.createTextNode(message.body()));
-			}
-		}
-	}
-
-	QMultiMap<QDateTime,QString>::const_iterator it = ACollection.body.notes.constBegin();
-	while (it != ACollection.body.notes.constEnd())
-	{
-		QDomElement noteElem = AChatElem.appendChild(ownerDoc.createElement("note")).toElement();
-		noteElem.setAttribute("utc",DateTime(it.key()).toX85UTC());
-		noteElem.appendChild(ownerDoc.createTextNode(it.value()));
-		++it;
 	}
 }
 
@@ -1317,7 +1339,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 		if (!autoElem.isNull())
 		{
 			prefs.autoSave = QVariant(autoElem.attribute("save","false")).toBool();
-			prefs.autoScope = autoElem.attribute("scope",ARCHIVE_SCOPE_GLOBAL);
+			prefs.autoScope = autoElem.attribute("scope",ARCHIVE_SCOPE_STREAM);
 		}
 		else if (initPrefs)
 		{

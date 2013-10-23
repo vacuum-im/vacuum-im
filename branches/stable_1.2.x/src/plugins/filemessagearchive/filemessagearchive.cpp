@@ -410,13 +410,16 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 			{
 				QString fpath = dirIt.next();
 				QString fname = dirIt.fileName();
-				if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
+				if (!ARequest.opened || FWritingFiles.contains(fpath))
 				{
-					if (checkCollectionFile(fpath,ARequest))
+					if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
 					{
-						filesMap.insertMulti(fname,fpath);
-						if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
-							filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
+						if (checkCollectionFile(fpath,ARequest))
+						{
+							filesMap.insertMulti(fname,fpath);
+							if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
+								filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
+						}
 					}
 				}
 			}
@@ -427,11 +430,8 @@ QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const
 			fileIt.toBack();
 		while (ARequest.order==Qt::AscendingOrder ? fileIt.hasNext() : fileIt.hasPrevious())
 		{
-			if (ARequest.order == Qt::AscendingOrder)
-				fileIt.next();
-			else
-				fileIt.previous();
-			files.append(fileIt.value());
+			QString fpath = ARequest.order==Qt::AscendingOrder ? fileIt.next().value() : fileIt.previous().value();
+			files.append(fpath);
 		}
 	}
 	return files;
