@@ -163,14 +163,14 @@ QTextDocumentFragment AdiumMessageStyle::textFragmentAt(QWidget *AWidget, const 
 	return QTextDocumentFragment();
 }
 
-bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
+bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear)
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
 	{
 		if (!FWidgetStatus.contains(view))
 		{
-			AClean = true;
+			AClear = true;
 			FWidgetStatus[view].wait = 0;
 			FWidgetStatus[view].scrollStarted = false;
 			view->installEventFilter(this);
@@ -184,7 +184,7 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 			FWidgetStatus[view].lastKind = -1;
 		}
 
-		if (AClean)
+		if (AClear)
 		{
 			WidgetStatus &wstatus = FWidgetStatus[view];
 			wstatus.wait++;
@@ -206,7 +206,7 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 		view->page()->settings()->setFontSize(QWebSettings::DefaultFontSize, fontSize!=0 ? fontSize : QWebSettings::globalSettings()->fontSize(QWebSettings::DefaultFontSize));
 		view->page()->settings()->setFontFamily(QWebSettings::StandardFont, !fontFamily.isEmpty() ? fontFamily : QWebSettings::globalSettings()->fontFamily(QWebSettings::StandardFont));
 
-		emit optionsChanged(AWidget,AOptions,AClean);
+		emit optionsChanged(AWidget,AOptions,AClear);
 		return true;
 	}
 	return false;

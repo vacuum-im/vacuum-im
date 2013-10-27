@@ -81,6 +81,7 @@ class IMessageViewWidget :
 {
 public:
 	virtual QWidget *instance() = 0;
+	virtual void clearContent() =0;
 	virtual QWidget *styleWidget() const =0;
 	virtual IMessageStyle *messageStyle() const =0;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions) =0;
@@ -92,10 +93,11 @@ public:
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const =0;
 	virtual QTextDocumentFragment textFragmentAt(const QPoint &APosition) const =0;
 protected:
-	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
-	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
+	virtual void urlClicked(const QUrl &AUrl) =0;
 	virtual void viewContextMenu(const QPoint &APosition, Menu *AMenu) =0;
-	virtual void urlClicked(const QUrl &AUrl) const =0;
+	virtual void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions) =0;
+	virtual void messageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared) =0;
+	virtual void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions) =0;
 };
 
 class IMessageEditWidget :
@@ -417,7 +419,7 @@ protected:
 Q_DECLARE_INTERFACE(IMessageAddress,"Vacuum.Plugin.IMessageAddress/1.0")
 Q_DECLARE_INTERFACE(IMessageWidget,"Vacuum.Plugin.IMessageWidget/1.0")
 Q_DECLARE_INTERFACE(IMessageInfoWidget,"Vacuum.Plugin.IMessageInfoWidget/1.2")
-Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.3")
+Q_DECLARE_INTERFACE(IMessageViewWidget,"Vacuum.Plugin.IMessageViewWidget/1.4")
 Q_DECLARE_INTERFACE(IMessageEditWidget,"Vacuum.Plugin.IMessageEditWidget/1.4")
 Q_DECLARE_INTERFACE(IMessageReceiversWidget,"Vacuum.Plugin.IMessageReceiversWidget/1.3")
 Q_DECLARE_INTERFACE(IMessageMenuBarWidget,"Vacuum.Plugin.IMessageMenuBarWidget/1.1")
@@ -433,6 +435,6 @@ Q_DECLARE_INTERFACE(IMessageViewDropHandler,"Vacuum.Plugin.IMessageViewDropHandl
 Q_DECLARE_INTERFACE(IMessageViewUrlHandler,"Vacuum.Plugin.IMessageViewUrlHandler/1.2")
 Q_DECLARE_INTERFACE(IMessageEditSendHandler,"QIP.Plugin.IMessageEditSendHandler/1.0")
 Q_DECLARE_INTERFACE(IMessageEditContentsHandler,"Vacuum.Plugin.IMessageEditContentsHandler/1.3")
-Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.10")
+Q_DECLARE_INTERFACE(IMessageWidgets,"Vacuum.Plugin.IMessageWidgets/1.11")
 
 #endif // IMESSAGEWIDGETS_H

@@ -51,6 +51,11 @@ struct WindowStatus {
 	QDate lastDateSeparator;
 };
 
+struct WindowContent {
+	QString html;
+	IMessageContentOptions options;
+};
+
 struct UserStatus {
 	QString lastStatusShow;
 };
@@ -200,6 +205,8 @@ protected slots:
 	void onMultiChatWindowActivated();
 	void onMultiChatHorizontalSplitterMoved(int APos, int AIndex);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
+	void onMultiChatContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 protected slots:
 	void onPrivateChatWindowActivated();
 	void onPrivateChatWindowClosed();
@@ -208,6 +215,8 @@ protected slots:
 	void onPrivateChatContextMenuRequested(Menu *AMenu);
 	void onPrivateChatToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onPrivateChatNotifierActiveNotifyChanged(int ANotifyId);
+	void onPrivateChatContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onPrivateChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 protected slots:
 	void onRoomActionTriggered(bool);
 	void onNickCompleteMenuActionTriggered(bool);
@@ -280,6 +289,7 @@ private:
 	QMap<IMessageViewWidget *, WindowStatus> FWindowStatus;
 	QMap<QString, IMessageChatWindow *> FHistoryRequests;
 	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
+	QMap<IMessageChatWindow *, QList<WindowContent> > FPendingContent;
 private:
 	UsersProxyModel *FUsersProxy;
 	QStandardItemModel *FUsersModel;

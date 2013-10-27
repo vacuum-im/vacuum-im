@@ -698,7 +698,7 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 	AWindow->setSubject(AMessage.subject());
 	AWindow->setThreadId(AMessage.threadId());
 
-	setMessageStyle(AWindow);
+	AWindow->viewWidget()->clearContent();
 
 	if (AMessage.type() == Message::Error)
 	{
