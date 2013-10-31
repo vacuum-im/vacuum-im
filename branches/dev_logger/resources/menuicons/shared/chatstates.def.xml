@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>chatstatesUnknown</key>
+    <object mime="image/png">chatstatesunknown.png</object>
+  </icon>
+  <icon>
+    <key>chatstatesActive</key>
+    <object mime="image/png">chatstatesactive.png</object>
+  </icon>
+  <icon>
+    <key>chatstatesComposing</key>
+    <object mime="image/png">chatstatescomposing.png</object>
+  </icon>
+  <icon>
+    <key>chatstatesPaused</key>
+    <object mime="image/png">chatstatespaused.png</object>
+  </icon>
+  <icon>
+    <key>chatstatesInactive</key>
+    <object mime="image/png">chatstatesinactive.png</object>
+  </icon>
+  <icon>
+    <key>chatstatesGone</key>
+    <object mime="image/png">chatstatesgone.png</object>
+  </icon>
+</icondef>

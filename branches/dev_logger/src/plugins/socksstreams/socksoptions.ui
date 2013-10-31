@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SocksOptionsClass</class>
+ <widget class="QWidget" name="SocksOptionsClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>333</width>
+    <height>466</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="grbSocksStreams">
+     <layout class="QVBoxLayout" name="verticalLayout_8">
+      <item>
+       <widget class="QGroupBox" name="grbOutgoingConnections">
+        <property name="title">
+         <string>Outgoing Connections</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QLabel" name="lblConnectTimeout">
+             <property name="text">
+              <string>Connect timeout:</string>
+             </property>
+             <property name="buddy">
+              <cstring>spbConnectTimeout</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spbConnectTimeout">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>60</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="lblSeconds">
+             <property name="text">
+              <string>seconds</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="grbConnectionProxy">
+           <property name="title">
+            <string>Connection Proxy</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QCheckBox" name="chbUseAccountNetworkProxy">
+              <property name="text">
+               <string>Use account connection proxy settings</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="wdtProxySettings" native="true"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="grbIncomingConnections">
+        <property name="title">
+         <string>Incoming Connections</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <widget class="QCheckBox" name="chbDisableDirectConnect">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Disable direct connections</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="pblPort">
+             <property name="text">
+              <string>Listening port:</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::PlainText</enum>
+             </property>
+             <property name="buddy">
+              <cstring>spbPort</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spbPort">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>65535</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="grbPortForward">
+           <property name="title">
+            <string>Port Forwarding</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="lblForwardHost">
+              <property name="text">
+               <string>Host:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::PlainText</enum>
+              </property>
+              <property name="buddy">
+               <cstring>lneForwardHost</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="lneForwardHost"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="pblForwardPort">
+              <property name="text">
+               <string>Port:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::PlainText</enum>
+              </property>
+              <property name="buddy">
+               <cstring>spbForwardPort</cstring>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spbForwardPort">
+              <property name="maximum">
+               <number>65536</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="grbStreamProxy">
+        <property name="title">
+         <string>Stream Proxy</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <item>
+          <widget class="QCheckBox" name="chbUseAccountStreamProxy">
+           <property name="text">
+            <string>Use proxy on account server</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
+             <item>
+              <widget class="QLineEdit" name="lneStreamProxy"/>
+             </item>
+             <item>
+              <widget class="QListWidget" name="ltwStreamProxy">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout">
+             <item>
+              <widget class="QPushButton" name="pbtAddStreamProxy">
+               <property name="text">
+                <string>Add</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pbtStreamProxyUp">
+               <property name="text">
+                <string>Up</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pbtStreamProxyDown">
+               <property name="text">
+                <string>Down</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pbtDeleteStreamProxy">
+               <property name="text">
+                <string>Delete</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>spbConnectTimeout</tabstop>
+  <tabstop>chbUseAccountNetworkProxy</tabstop>
+  <tabstop>chbDisableDirectConnect</tabstop>
+  <tabstop>spbPort</tabstop>
+  <tabstop>lneForwardHost</tabstop>
+  <tabstop>spbForwardPort</tabstop>
+  <tabstop>chbUseAccountStreamProxy</tabstop>
+  <tabstop>lneStreamProxy</tabstop>
+  <tabstop>ltwStreamProxy</tabstop>
+  <tabstop>pbtAddStreamProxy</tabstop>
+  <tabstop>pbtStreamProxyUp</tabstop>
+  <tabstop>pbtStreamProxyDown</tabstop>
+  <tabstop>pbtDeleteStreamProxy</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>chbDisableDirectConnect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spbPort</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>312</x>
+     <y>182</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>146</x>
+     <y>209</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chbDisableDirectConnect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>grbPortForward</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>312</x>
+     <y>182</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>274</x>
+     <y>269</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chbUseAccountNetworkProxy</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>wdtProxySettings</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>302</x>
+     <y>100</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>302</x>
+     <y>116</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
