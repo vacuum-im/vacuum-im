@@ -1,6 +1,10 @@
 #include "editbookmarkdialog.h"
 
 #include <QMessageBox>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 EditBookmarkDialog::EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) : QDialog(AParent)
 {
@@ -29,6 +33,8 @@ EditBookmarkDialog::EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) :
 	connect(ui.grbConference,SIGNAL(clicked(bool)),SLOT(onGroupBoxClicked(bool)));
 	connect(ui.grbURL,SIGNAL(clicked(bool)),SLOT(onGroupBoxClicked(bool)));
 	connect(ui.bbxButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
+
+	REPORT_VIEW;
 }
 
 EditBookmarkDialog::~EditBookmarkDialog()

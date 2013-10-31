@@ -3,6 +3,12 @@
 #include <QDir>
 #include <QTimer>
 #include <QCoreApplication>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
+#include <utils/filestorage.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 AdiumMessageStylePlugin::AdiumMessageStylePlugin()
 {
@@ -71,6 +77,7 @@ IMessageStyle *AdiumMessageStylePlugin::styleForOptions(const IMessageStyleOptio
 			AdiumMessageStyle *style = new AdiumMessageStyle(stylePath, FNetworkAccessManager, this);
 			if (style->isValid())
 			{
+				LOG_INFO(QString("Style created, id=%1").arg(style->styleId()));
 				FStyles.insert(styleId,style);
 				connect(style,SIGNAL(widgetAdded(QWidget *)),SLOT(onStyleWidgetAdded(QWidget *)));
 				connect(style,SIGNAL(widgetRemoved(QWidget *)),SLOT(onStyleWidgetRemoved(QWidget *)));
@@ -79,7 +86,12 @@ IMessageStyle *AdiumMessageStylePlugin::styleForOptions(const IMessageStyleOptio
 			else
 			{
 				delete style;
+				REPORT_ERROR(QString("Failed to create style id=%1: Invalid style").arg(styleId));
 			}
+		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to create style id=%1: Style not found").arg(styleId));
 		}
 	}
 	return FStyles.value(styleId,NULL);
@@ -141,6 +153,11 @@ IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(const OptionsNode &AN
 		if (soptions.extended.value(MSO_FONT_SIZE).toInt()==0)
 			soptions.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
 	}
+	else
+	{
+		REPORT_ERROR(QString("Failed to find suitable style for message type=%1").arg(AMessageType));
+	}
+
 	return soptions;
 }
 
@@ -155,6 +172,8 @@ void AdiumMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, Options
 	AdiumOptionsWidget *widget = qobject_cast<AdiumOptionsWidget *>(AWidget->instance());
 	if (widget)
 		widget->apply(ANode);
+	else
+		REPORT_ERROR("Failed to cast options widget instance on saving settings from options node");
 }
 
 void AdiumMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions)
@@ -162,6 +181,8 @@ void AdiumMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, IMessag
 	AdiumOptionsWidget *widget = qobject_cast<AdiumOptionsWidget *>(AWidget->instance());
 	if (widget)
 		AOptions = widget->styleOptions();
+	else
+		REPORT_ERROR("Failed to cast options widget instance on saving settings from style options");
 }
 
 QList<QString> AdiumMessageStylePlugin::styleVariants(const QString &AStyleId) const
@@ -192,10 +213,26 @@ void AdiumMessageStylePlugin::updateAvailStyles()
 				if (valid)
 				{
 					QMap<QString, QVariant> info = AdiumMessageStyle::styleInfo(dir.absolutePath());
-					if (!info.value(MSIV_NAME).toString().isEmpty())
-						FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
+					QString styleId = info.value(MSIV_NAME).toString();
+					if (!styleId.isEmpty())
+					{
+						LOG_DEBUG(QString("Style added, id=%1").arg(styleId));
+						FStylePaths.insert(styleId,dir.absolutePath());
+					}
+					else
+					{
+						LOG_WARNING(QString("Failed to add style from directory=%1: Style name is empty").arg(dir.absolutePath()));
+					}
+				}
+				else
+				{
+					LOG_WARNING(QString("Failed to add style from directory=%1: Invalid style").arg(dir.absolutePath()));
 				}
 			}
+		}
+		else
+		{
+			LOG_WARNING(QString("Failed to find root substorage=%1 directory").arg(substorage));
 		}
 	}
 }
@@ -205,6 +242,8 @@ void AdiumMessageStylePlugin::onStyleWidgetAdded(QWidget *AWidget)
 	AdiumMessageStyle *style = qobject_cast<AdiumMessageStyle *>(sender());
 	if (style)
 		emit styleWidgetAdded(style,AWidget);
+	else
+		REPORT_ERROR("Failed to cast style instance on adding style widget");
 }
 
 void AdiumMessageStylePlugin::onStyleWidgetRemoved(QWidget *AWidget)
@@ -216,22 +255,29 @@ void AdiumMessageStylePlugin::onStyleWidgetRemoved(QWidget *AWidget)
 			QTimer::singleShot(0,this,SLOT(onClearEmptyStyles()));
 		emit styleWidgetRemoved(style,AWidget);
 	}
+	else
+	{
+		REPORT_ERROR("Failed to cast style instance on removing style widget");
+	}
 }
 
 void AdiumMessageStylePlugin::onClearEmptyStyles()
 {
 	QMap<QString, AdiumMessageStyle *>::iterator it = FStyles.begin();
-	while (it!=FStyles.end())
+	while (it != FStyles.end())
 	{
 		AdiumMessageStyle *style = it.value();
 		if (style->styleWidgets().isEmpty())
 		{
+			LOG_INFO(QString("Style destroyed, id=%1").arg(style->styleId()));
 			it = FStyles.erase(it);
 			emit styleDestroyed(style);
 			delete style;
 		}
 		else
+		{
 			++it;
+		}
 	}
 }
 

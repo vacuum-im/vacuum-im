@@ -1,5 +1,10 @@
 #include "editnotedialog.h"
 
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
+
 EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
@@ -17,11 +22,23 @@ EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid
 
 	connect(ui.dbbButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 	connect(ui.dbbButtons,SIGNAL(rejected()),SLOT(reject()));
+
+	REPORT_VIEW;
 }
 
 EditNoteDialog::~EditNoteDialog()
 {
 	emit dialogDestroyed();
+}
+
+Jid EditNoteDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid EditNoteDialog::contactJid() const
+{
+	return FContactJid;
 }
 
 void EditNoteDialog::onDialogAccepted()

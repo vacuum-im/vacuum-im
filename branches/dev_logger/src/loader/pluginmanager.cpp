@@ -1,7 +1,5 @@
 #include "pluginmanager.h"
 
-#include <QtDebug>
-
 #include <QTimer>
 #include <QStack>
 #include <QThread>
@@ -10,6 +8,21 @@
 #include <QFileInfo>
 #include <QSettings>
 #include <QLibraryInfo>
+#include <definitions/plugininitorders.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/actiongroups.h>
+#include <definitions/version.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <definitions/commandline.h>
+#include <definitions/statisticsparams.h>
+#include <utils/widgetmanager.h>
+#include <utils/systemmanager.h>
+#include <utils/filestorage.h>
+#include <utils/shortcuts.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define START_SHUTDOWN_TIMEOUT      100
 #define DELAYED_SHUTDOWN_TIMEOUT    5000
@@ -30,6 +43,7 @@
 #  define SVN_REVISION              "0"
 #endif
 
+#define DIR_LOGS                    "logs"
 #if defined(Q_WS_WIN)
 #  define ENV_APP_DATA              "APPDATA"
 #  define DIR_APP_DATA              APPLICATION_NAME
@@ -75,7 +89,7 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 
 PluginManager::~PluginManager()
 {
-
+	Logger::closeLog();
 }
 
 QString PluginManager::version() const
@@ -189,6 +203,7 @@ void PluginManager::quit()
 {
 	if (!isShutingDown())
 	{
+		LOG_INFO("Application quit requested");
 		FShutdownKind = SK_QUIT;
 		startClose();
 	}
@@ -198,6 +213,7 @@ void PluginManager::restart()
 {
 	if (!isShutingDown())
 	{
+		Logger::startTiming(STMP_APPLICATION_START);
 		FShutdownKind = SK_RESTART;
 		startClose();
 	}
@@ -205,14 +221,15 @@ void PluginManager::restart()
 
 void PluginManager::delayShutdown()
 {
+	FShutdownDelayCount++;
 	if (isShutingDown())
 		FShutdownTimer.start(DELAYED_SHUTDOWN_TIMEOUT);
-	FShutdownDelayCount++;
 }
 
 void PluginManager::continueShutdown()
 {
-	if (--FShutdownDelayCount<=0 && isShutingDown())
+	FShutdownDelayCount--;
+	if (FShutdownDelayCount<=0 && isShutingDown())
 		FShutdownTimer.start(START_SHUTDOWN_TIMEOUT);
 }
 
@@ -277,6 +294,25 @@ void PluginManager::loadSettings()
 		<< (QDir::isAbsolutePath(RESOURCES_DIR) ? RESOURCES_DIR : qApp->applicationDirPath()+"/"+RESOURCES_DIR)
 		<< FDataPath+"/resources");
 
+	QDir logDir(FDataPath);
+	if (logDir.exists() && (logDir.exists(DIR_LOGS) || logDir.mkpath(DIR_LOGS)) && logDir.cd(DIR_LOGS))
+	{
+#ifndef DEBUG_MODE
+		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info|Logger::View|Logger::Event|Logger::Timing;
+#else
+		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info|Logger::View|Logger::Event|Logger::Timing|Logger::Debug;
+#endif
+
+		if (args.contains(CLO_LOG_TYPES))
+			logTypes = args.value(args.indexOf(CLO_LOG_TYPES)+1).toUInt();
+
+		if (logTypes > 0)
+		{
+			Logger::setEnabledTypes(logTypes);
+			Logger::openLog(logDir.absolutePath());
+		}
+	}
+
 	FPluginsSetup.clear();
 	QDir homeDir(FDataPath);
 	QFile file(homeDir.absoluteFilePath(FILE_PLUGINS_SETTINGS));
@@ -289,6 +325,8 @@ void PluginManager::loadSettings()
 		FPluginsSetup.clear();
 		FPluginsSetup.appendChild(FPluginsSetup.createElement("plugins"));
 	}
+
+	LOG_INFO(QString("%1: %2.%3, Qt: %4/%5, OS: %6, Locale: %7").arg(CLIENT_NAME,CLIENT_VERSION).arg(revision(),QT_VERSION_STR,qVersion(),SystemManager::osVersion(),QLocale().name()));
 }
 
 void PluginManager::saveSettings()
@@ -303,10 +341,14 @@ void PluginManager::saveSettings()
 			file.flush();
 			file.close();
 		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to open plugins settings file: %1").arg(file.errorString()));
+		}
 	}
 }
 
-void PluginManager::loadPlugins()
+bool PluginManager::loadPlugins()
 {
 	QDir pluginsDir(QApplication::applicationDirPath());
 	if (pluginsDir.cd(PLUGINS_DIR))
@@ -321,7 +363,15 @@ void PluginManager::loadPlugins()
 
 		foreach (const QString &file, files)
 		{
-			if (QLibrary::isLibrary(file) && isPluginEnabled(file))
+			if (!QLibrary::isLibrary(file))
+			{
+				LOG_WARNING(QString("Failed to load plugin, file=%1: Not a library").arg(file));
+			}
+			else if (!isPluginEnabled(file))
+			{
+				LOG_DEBUG(QString("Skipping disabled plugin file %1").arg(file));
+			}
+			else
 			{
 				QPluginLoader *loader = new QPluginLoader(pluginsDir.absoluteFilePath(file),this);
 
@@ -335,6 +385,7 @@ void PluginManager::loadPlugins()
 				{
 					delete translator;
 					translator = NULL;
+					LOG_DEBUG(QString("Translation for '%1' not found").arg(file));
 				}
 
 				if (loader->load())
@@ -356,6 +407,7 @@ void PluginManager::loadPlugins()
 							savePluginInfo(file, pluginItem.info).setAttribute("uuid", uid.toString());
 
 							FPluginItems.insert(uid,pluginItem);
+							LOG_DEBUG(QString("Plugin loaded '%1' v%2").arg(file,pluginItem.info->version));
 						}
 						else
 						{
@@ -378,7 +430,7 @@ void PluginManager::loadPlugins()
 		}
 
 		QHash<QUuid,PluginItem>::const_iterator it = FPluginItems.constBegin();
-		while (it!=FPluginItems.constEnd())
+		while (it != FPluginItems.constEnd())
 		{
 			QUuid puid = it.key();
 			if (!checkDependences(puid))
@@ -400,9 +452,9 @@ void PluginManager::loadPlugins()
 	}
 	else
 	{
-		qDebug() << tr("Plugins directory not found");
-		quit();
+		REPORT_FATAL(QString("Plugins directory=%1 not found").arg(PLUGINS_DIR));
 	}
+	return !FPluginItems.isEmpty();
 }
 
 bool PluginManager::initPlugins()
@@ -423,7 +475,7 @@ bool PluginManager::initPlugins()
 		{
 			initOk = false;
 			FBlockedPlugins.append(QFileInfo(it.value().loader->fileName()).fileName());
-			unloadPlugin(it.key(), tr("Initialization failed"));
+			unloadPlugin(it.key(),tr("Initialization failed"));
 		}
 	}
 
@@ -439,10 +491,15 @@ bool PluginManager::initPlugins()
 	return initOk;
 }
 
-void PluginManager::startPlugins()
+bool PluginManager::startPlugins()
 {
+	bool allStarted = true;
 	foreach(const PluginItem &pluginItem, FPluginItems)
-		pluginItem.plugin->startPlugin();
+	{
+		bool started = pluginItem.plugin->startPlugin();
+		allStarted = allStarted && started;
+	}
+	return allStarted;
 }
 
 void PluginManager::unloadPlugins()
@@ -459,6 +516,9 @@ void PluginManager::startClose()
 {
 	if (!FCloseStarted)
 	{
+		LOG_INFO(QString("Starting quit stage 1, delay: %1").arg(FShutdownDelayCount));
+		Logger::startTiming(STMP_APPLICATION_QUIT);
+
 		FCloseStarted = true;
 		delayShutdown();
 		emit shutdownStarted();
@@ -472,6 +532,7 @@ void PluginManager::finishClose()
 	FShutdownTimer.stop();
 	if (FCloseStarted)
 	{
+		LOG_INFO(QString("Finished quit stage 1, delay: %1").arg(FShutdownDelayCount));
 		FCloseStarted = false;
 		startQuit();
 	}
@@ -481,6 +542,7 @@ void PluginManager::startQuit()
 {
 	if (!FQuitStarted)
 	{
+		LOG_INFO(QString("Starting quit stage 2, delay: %1").arg(FShutdownDelayCount));
 		FQuitStarted = true;
 		delayShutdown();
 		emit aboutToQuit();
@@ -493,6 +555,8 @@ void PluginManager::finishQuit()
 	FShutdownTimer.stop();
 	if (FQuitStarted)
 	{
+		LOG_INFO(QString("Finished quit stage 2, delay: %1").arg(FShutdownDelayCount));
+
 		FQuitStarted = false;
 		unloadPlugins();
 		
@@ -502,24 +566,29 @@ void PluginManager::finishQuit()
 			FShutdownDelayCount = 0;
 
 			loadSettings();
-			loadPlugins();
-			if (initPlugins())
+			if (!loadPlugins())
+			{
+				quit();
+			}
+			else if (!initPlugins())
+			{
+				QTimer::singleShot(0,this,SLOT(restart()));
+			}
+			else 
 			{
 				saveSettings();
 				createMenuActions();
 				declareShortcuts();
 				startPlugins();
 				FBlockedPlugins.clear();
-			}
-			else
-			{
-				QTimer::singleShot(0,this,SLOT(restart()));
+				REPORT_TIMING(STMP_APPLICATION_START,Logger::finishTiming(STMP_APPLICATION_START));
 			}
 		}
 		else if (FShutdownKind == SK_QUIT)
 		{
 			FQuitReady = true;
 			QTimer::singleShot(0,qApp,SLOT(quit()));
+			REPORT_TIMING(STMP_APPLICATION_QUIT,Logger::finishTiming(STMP_APPLICATION_QUIT));
 		}
 	}
 }
@@ -561,13 +630,9 @@ void PluginManager::removePluginItem(const QUuid &AUuid, const QString &AError)
 	{
 		PluginItem pluginItem = FPluginItems.take(AUuid);
 		if (!AError.isEmpty())
-		{
 			savePluginError(QFileInfo(pluginItem.loader->fileName()).fileName(), AError);
-		}
 		if (pluginItem.translator)
-		{
 			qApp->removeTranslator(pluginItem.translator);
-		}
 		delete pluginItem.translator;
 		delete pluginItem.info;
 		delete pluginItem.loader;
@@ -579,8 +644,8 @@ void PluginManager::unloadPlugin(const QUuid &AUuid, const QString &AError)
 	if (FPluginItems.contains(AUuid))
 	{
 		foreach(const QUuid &uid, pluginDependencesOn(AUuid))
-			removePluginItem(uid, AError);
-		removePluginItem(AUuid, AError);
+			removePluginItem(uid,AError);
+		removePluginItem(AUuid,AError);
 		FPlugins.clear();
 	}
 }
@@ -589,8 +654,7 @@ bool PluginManager::checkDependences(const QUuid &AUuid) const
 {
 	if (FPluginItems.contains(AUuid))
 	{
-		QList<QUuid> dependences = FPluginItems.value(AUuid).info->dependences;
-		foreach(const QUuid &depend, dependences)
+		foreach(const QUuid &depend, FPluginItems.value(AUuid).info->dependences)
 		{
 			if (!FPluginItems.contains(depend))
 			{
@@ -657,12 +721,18 @@ void PluginManager::loadCoreTranslations(const QDir &ADir, const QString &ALocal
 		qApp->installTranslator(FQtTranslator);
 	else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
 		qApp->installTranslator(FQtTranslator);
+	else
+		LOG_DEBUG("Translation for 'qt' not found");
 
 	if (FLoaderTranslator->load("vacuum",ADir.absoluteFilePath(ALocaleName)) || FLoaderTranslator->load("vacuum",ADir.absoluteFilePath(ALocaleName.left(2))))
 		qApp->installTranslator(FLoaderTranslator);
+	else
+		LOG_DEBUG("Translation for 'vacuum' not found");
 
 	if (FUtilsTranslator->load("vacuumutils",ADir.absoluteFilePath(ALocaleName)) || FUtilsTranslator->load("vacuumutils",ADir.absoluteFilePath(ALocaleName.left(2))))
 		qApp->installTranslator(FUtilsTranslator);
+	else
+		LOG_DEBUG("Translation for 'vacuumutils' not found");
 }
 
 bool PluginManager::isPluginEnabled(const QString &AFile) const
@@ -683,7 +753,9 @@ QDomElement PluginManager::savePluginInfo(const QString &AFile, const IPluginInf
 		nameElem.appendChild(FPluginsSetup.createTextNode(AInfo->name));
 	}
 	else
+	{
 		nameElem.firstChild().toCharacterData().setData(AInfo->name);
+	}
 
 	QDomElement descElem = pluginElem.firstChildElement("desc");
 	if (descElem.isNull())
@@ -692,7 +764,9 @@ QDomElement PluginManager::savePluginInfo(const QString &AFile, const IPluginInf
 		descElem.appendChild(FPluginsSetup.createTextNode(AInfo->description));
 	}
 	else
+	{
 		descElem.firstChild().toCharacterData().setData(AInfo->description);
+	}
 
 	QDomElement versionElem = pluginElem.firstChildElement("version");
 	if (versionElem.isNull())
@@ -701,7 +775,9 @@ QDomElement PluginManager::savePluginInfo(const QString &AFile, const IPluginInf
 		versionElem.appendChild(FPluginsSetup.createTextNode(AInfo->version));
 	}
 	else
+	{
 		versionElem.firstChild().toCharacterData().setData(AInfo->version);
+	}
 
 	pluginElem.removeChild(pluginElem.firstChildElement("depends"));
 	if (!AInfo->dependences.isEmpty())
@@ -723,18 +799,22 @@ void PluginManager::savePluginError(const QString &AFile, const QString &AError)
 		pluginElem = FPluginsSetup.firstChildElement("plugins").appendChild(FPluginsSetup.createElement(AFile)).toElement();
 
 	QDomElement errorElem = pluginElem.firstChildElement("error");
-	if (AError.isEmpty())
+	if (!AError.isEmpty())
 	{
-		pluginElem.removeChild(errorElem);
-	}
-	else if (errorElem.isNull())
-	{
-		errorElem = pluginElem.appendChild(FPluginsSetup.createElement("error")).toElement();
-		errorElem.appendChild(FPluginsSetup.createTextNode(AError));
+		if (errorElem.isNull())
+		{
+			errorElem = pluginElem.appendChild(FPluginsSetup.createElement("error")).toElement();
+			errorElem.appendChild(FPluginsSetup.createTextNode(AError));
+		}
+		else
+		{
+			errorElem.firstChild().toCharacterData().setData(AError);
+		}
+		LOG_WARNING(QString("Failed to load plugin file=%1: %2").arg(AFile,AError));
 	}
 	else
 	{
-		errorElem.firstChild().toCharacterData().setData(AError);
+		pluginElem.removeChild(errorElem);
 	}
 }
 
@@ -760,7 +840,6 @@ void PluginManager::createMenuActions()
 {
 	IPlugin *plugin = pluginInterface("IMainWindowPlugin").value(0);
 	IMainWindowPlugin *mainWindowPlugin = plugin!=NULL ? qobject_cast<IMainWindowPlugin *>(plugin->instance()) : NULL;
-
 	if (mainWindowPlugin)
 	{
 		Action *aboutQt = new Action(mainWindowPlugin->mainWindow()->mainMenu());
@@ -784,10 +863,6 @@ void PluginManager::createMenuActions()
 		connect(pluginsDialog,SIGNAL(triggered(bool)),SLOT(onShowSetupPluginsDialog(bool)));
 		mainWindowPlugin->mainWindow()->mainMenu()->addAction(pluginsDialog,AG_MMENU_PLUGINMANAGER_SETUP,true);
 	}
-	else
-	{
-		onShowSetupPluginsDialog(false);
-	}
 }
 
 void PluginManager::declareShortcuts()
@@ -802,12 +877,14 @@ void PluginManager::declareShortcuts()
 
 void PluginManager::onApplicationAboutToQuit()
 {
+	LOG_INFO("Application about to quit");
 	closeAndQuit();
 }
 
 void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
 {
 	Q_UNUSED(AManager);
+	LOG_INFO("Application commit session data requested");
 	closeAndQuit();
 }
 

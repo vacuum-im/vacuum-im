@@ -1,6 +1,7 @@
 #include "aboutbox.h"
 
 #include <QDesktopServices>
+#include <utils/logger.h>
 
 AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(AParent)
 {
@@ -12,6 +13,8 @@ AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(A
 
 	connect(ui.lblHomePage,SIGNAL(linkActivated(const QString &)),SLOT(onLabelLinkActivated(const QString &)));
 	connect(ui.lblSourcePage,SIGNAL(linkActivated(const QString &)),SLOT(onLabelLinkActivated(const QString &)));
+
+	REPORT_VIEW;
 }
 
 AboutBox::~AboutBox()

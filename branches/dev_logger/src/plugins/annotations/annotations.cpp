@@ -2,6 +2,19 @@
 
 #include <QClipboard>
 #include <QApplication>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/resources.h>
+#include <utils/advanceditemdelegate.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/logger.h>
 
 #define PST_ANNOTATIONS       "storage"
 #define PSN_ANNOTATIONS       "storage:rosternotes"
@@ -58,6 +71,10 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 				SLOT(onPrivateDataChanged(const Jid &, const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageClosed(const Jid &)),SLOT(onPrivateStorageClosed(const Jid &)));
 		}
+		else
+		{
+			LOG_WARNING("Failed to find required interface: IPrivateStorage");
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
@@ -73,7 +90,9 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
 	if (plugin)
+	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
@@ -92,7 +111,9 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 	plugin = APluginManager->pluginInterface("IRosterSearch").value(0,NULL);
 	if (plugin)
+	{
 		FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
+	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
@@ -214,6 +235,10 @@ bool Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, c
 		FSaveTimer.start();
 		return true;
 	}
+	else
+	{
+		REPORT_ERROR("Failed to set annotation: Stream is not ready");
+	}
 	return false;
 }
 
@@ -231,6 +256,10 @@ QDialog *Annotations::showAnnotationDialog(const Jid &AStreamJid, const Jid &ACo
 		WidgetManager::showActivateRaiseWindow(dialog);
 		return dialog;
 	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,"Failed to open annotation dialog: Stream is not ready");
+	}
 	return NULL;
 }
 
@@ -241,8 +270,13 @@ bool Annotations::loadAnnotations(const Jid &AStreamJid)
 		QString id = FPrivateStorage->loadData(AStreamJid,PST_ANNOTATIONS,PSN_ANNOTATIONS);
 		if (!id.isEmpty())
 		{
+			LOG_STRM_INFO(AStreamJid,"Annotations load request sent");
 			FLoadRequests.insert(id,AStreamJid);
 			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send load annotations request");
 		}
 	}
 	return false;
@@ -270,9 +304,18 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
 		QString id = FPrivateStorage->saveData(AStreamJid,doc.documentElement());
 		if (!id.isEmpty())
 		{
+			LOG_STRM_INFO(AStreamJid,"Annotations save request sent");
 			FSaveRequests.insert(id,AStreamJid);
 			return true;
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send save annotations request");
+		}
+	}
+	else
+	{
+		REPORT_ERROR("Failed to save annotations: Stream is not ready");
 	}
 	return false;
 }
@@ -310,6 +353,7 @@ void Annotations::onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, 
 	Q_UNUSED(AElement);
 	if (FSaveRequests.contains(AId))
 	{
+		LOG_STRM_INFO(AStreamJid,"Annotations saved");
 		FSaveRequests.remove(AId);
 		emit annotationsSaved(AStreamJid);
 	}
@@ -319,6 +363,7 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
 {
 	if (FLoadRequests.contains(AId))
 	{
+		LOG_STRM_INFO(AStreamJid,"Annotations loaded");
 		FLoadRequests.remove(AId);
 
 		QMap<Jid, Annotation> &items = FAnnotations[AStreamJid];
@@ -346,9 +391,7 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
 void Annotations::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
 	if (isEnabled(AStreamJid) && ATagName==PST_ANNOTATIONS && ANamespace==PSN_ANNOTATIONS)
-	{
 		loadAnnotations(AStreamJid);
-	}
 }
 
 void Annotations::onPrivateStorageClosed(const Jid &AStreamJid)

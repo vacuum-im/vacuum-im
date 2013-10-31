@@ -1,6 +1,14 @@
 #include "autostatus.h"
 
 #include <QCursor>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/menuicons.h>
+#include <utils/systemmanager.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define IDLE_TIMER_TIMEOUT  1000
 
@@ -37,12 +45,16 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	if (plugin)
 	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+		if (FStatusChanger == NULL)
+			LOG_WARNING("Failed to find required interface: IStatusChanger");
 	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
 	if (plugin)
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+		if (FAccountManager == NULL)
+			LOG_WARNING("Failed to find required interface: IAccountManager");
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -56,6 +68,7 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+
 	return FStatusChanger!=NULL && FAccountManager!=NULL;
 }
 
@@ -122,6 +135,10 @@ IAutoStatusRule AutoStatus::ruleValue(const QUuid &ARuleId) const
 		rule.text = ruleNode.value("text").toString();
 		rule.priority = ruleNode.value("priority").toInt();
 	}
+	else
+	{
+		REPORT_ERROR("Failed to get auto status rule: Invalid id");
+	}
 	return rule;
 }
 
@@ -138,6 +155,10 @@ void AutoStatus::setRuleEnabled(const QUuid &ARuleId, bool AEnabled)
 	{
 		Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ARuleId.toString()).setValue(AEnabled,"enabled");
 		emit ruleChanged(ARuleId);
+	}
+	else
+	{
+		REPORT_ERROR("Failed to change auto status rule enable state: Invalid rule id");
 	}
 }
 
@@ -165,6 +186,10 @@ void AutoStatus::updateRule(const QUuid &ARuleId, const IAutoStatusRule &ARule)
 		ruleNode.setValue(ARule.priority,"priority");
 		emit ruleChanged(ARuleId);
 	}
+	else
+	{
+		REPORT_ERROR("Failed to update auto status rule: Invalid id");
+	}
 }
 
 void AutoStatus::removeRule(const QUuid &ARuleId)
@@ -173,6 +198,10 @@ void AutoStatus::removeRule(const QUuid &ARuleId)
 	{
 		Options::node(OPV_AUTOSTARTUS_ROOT).removeChilds("rule",ARuleId.toString());
 		emit ruleRemoved(ARuleId);
+	}
+	else
+	{
+		REPORT_ERROR("Failed to remove auto status rule: Invalid id");
 	}
 }
 
@@ -204,6 +233,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 		{
 			IAutoStatusRule rule = ruleValue(ARuleId);
 			prepareRule(rule);
+			LOG_INFO(QString("Activating auto status, show=%1, text=%2").arg(rule.show).arg(rule.text));
 			if (FAutoStatusId == STATUS_NULL_ID)
 			{
 				FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,rule.priority);
@@ -216,6 +246,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 						int show = FStatusChanger->statusItemShow(status);
 						if (show==IPresence::Online || show==IPresence::Chat)
 						{
+							LOG_STRM_INFO(streamJid,"Applying active auto status");
 							FStreamStatus.insert(streamJid,status);
 							FStatusChanger->setStreamStatus(streamJid, FAutoStatusId);
 						}
@@ -224,11 +255,13 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 			}
 			else
 			{
+				LOG_INFO(QString("Updating active auto status, show=%1, text=%2").arg(rule.show).arg(rule.text));
 				FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,rule.priority);
 			}
 		}
 		else
 		{
+			LOG_INFO("Deactivating auto status");
 			foreach(const Jid &streamJid, FStreamStatus.keys())
 				FStatusChanger->setStreamStatus(streamJid, FStreamStatus.take(streamJid));
 			foreach(const Jid &streamJid, FStatusChanger->statusStreams(FAutoStatusId))

@@ -10,6 +10,7 @@
 #include <definitions/statisticsparams.h>
 #include <utils/filecookiejar.h>
 #include <utils/options.h>
+#include <utils/logger.h>
 
 #ifdef Q_OS_WIN32
 #	include <windows.h>
@@ -23,20 +24,16 @@
 
 #define DIR_STATISTICS               "statistics"
 #define FILE_COOKIES                 "cookies.dat"
-#define RESEND_TIMEOUT               60000
+#define RESEND_TIMEOUT               60*1000
+#define SESSION_TIMEOUT              5*60*1000
 
 QDataStream &operator>>(QDataStream &AStream, IStatisticsHit& AHit)
 {
 	AStream >> AHit.type;
 	AStream >> AHit.session;
-	AStream >> AHit.description;
+	AStream >> AHit.profile;
+	AStream >> AHit.screen;
 	AStream >> AHit.timestamp;
-
-	AStream >> AHit.view.descr;
-	AStream >> AHit.view.title;
-	AStream >> AHit.view.host;
-	AStream >> AHit.view.path;
-	AStream >> AHit.view.location;
 
 	AStream >> AHit.event.category;
 	AStream >> AHit.event.action;
@@ -58,15 +55,10 @@ QDataStream &operator<<(QDataStream &AStream, const IStatisticsHit &AHit)
 {
 	AStream << AHit.type;
 	AStream << AHit.session;
-	AStream << AHit.description;
+	AStream << AHit.profile;
+	AStream << AHit.screen;
 	AStream << AHit.timestamp;
 	
-	AStream << AHit.view.descr;
-	AStream << AHit.view.title;
-	AStream << AHit.view.host;
-	AStream << AHit.view.path;
-	AStream << AHit.view.location;
-
 	AStream << AHit.event.category;
 	AStream << AHit.event.action;
 	AStream << AHit.event.label;
@@ -97,10 +89,25 @@ Statistics::Statistics()
 
 	FPendingTimer.setSingleShot(true);
 	connect(&FPendingTimer,SIGNAL(timeout()),SLOT(onPendingTimerTimeout()));
+
+	FSessionTimer.setSingleShot(false);
+	FSessionTimer.setInterval(SESSION_TIMEOUT);
+	connect(&FSessionTimer,SIGNAL(timeout()),SLOT(onSessionTimerTimeout()));
+
+	connect(Logger::instance(),SIGNAL(viewReported(const QString &)),
+		SLOT(onLoggerViewReported(const QString &)));
+	connect(Logger::instance(),SIGNAL(errorReported(const QString &, const QString &, bool)),
+		SLOT(onLoggerErrorReported(const QString &, const QString &, bool)));
+	connect(Logger::instance(),SIGNAL(eventReported(const QString &, const QString &, const QString &, const QString &, qint64)),
+		SLOT(onLoggerEventReported(const QString &, const QString &, const QString &, const QString &, qint64)));
+	connect(Logger::instance(),SIGNAL(timingReported(const QString &, const QString &, const QString &, const QString &, qint64)),
+		SLOT(onLoggerTimingReported(const QString &, const QString &, const QString &, const QString &, qint64)));
 }
 
 Statistics::~Statistics()
 {
+	if (!FPendingHits.isEmpty())
+		LOG_WARNING(QString("Pending statistics hints (%1) not sent").arg(FPendingHits.count()));
 	delete FDesktopWidget;
 }
 
@@ -135,6 +142,7 @@ bool Statistics::initConnections(IPluginManager *APluginManager, int &AInitOrder
 bool Statistics::initObjects()
 {
 	FUserAgent = userAgent();
+	LOG_DEBUG(QString("User-Aget header - %1").arg(FUserAgent));
 	return true;
 }
 
@@ -151,9 +159,7 @@ bool Statistics::isValidHit(const IStatisticsHit &AHit) const
 	switch (AHit.type)
 	{
 	case IStatisticsHit::HitView:
-		if (AHit.view.descr.isEmpty())
-			return false;
-		if (!AHit.view.path.isEmpty() && !AHit.view.path.startsWith('/'))
+		if (AHit.screen.isEmpty())
 			return false;
 		break;
 	case IStatisticsHit::HitEvent:
@@ -180,17 +186,25 @@ bool Statistics::isValidHit(const IStatisticsHit &AHit) const
 bool Statistics::sendStatisticsHit(const IStatisticsHit &AHit)
 {
 #if !defined(DEBUG_MODE) || defined(DEBUG_STATISTICS)
-	if (isValidHit(AHit) && !FProfileId.isNull())
+	if (isValidHit(AHit))
 	{
-		QNetworkRequest request(buildHitUrl(AHit));
-		request.setRawHeader("User-Agent",FUserAgent.toUtf8());
-		QNetworkReply *reply = FNetworkManager->get(request);
-		if (!reply->isFinished())
+		if (!FProfileId.isNull() || !AHit.profile.isNull())
 		{
-			FReplyHits.insert(reply,AHit);
-			FPluginManager->delayShutdown();
-			return true;
+			QNetworkRequest request(buildHitUrl(AHit));
+			request.setRawHeader("User-Agent",FUserAgent.toUtf8());
+			QNetworkReply *reply = FNetworkManager->get(request);
+			if (!reply->isFinished())
+			{
+				FReplyHits.insert(reply,AHit);
+				FPluginManager->delayShutdown();
+			}
 		}
+		else
+		{
+			FPendingHits.append(AHit);
+			FPendingTimer.start(RESEND_TIMEOUT);
+		}
+		return true;
 	}
 #else
 	Q_UNUSED(AHit);
@@ -356,16 +370,18 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 	query.append(qMakePair<QByteArray,QByteArray>("v",QUrl::toPercentEncoding(MP_VER)));
 	query.append(qMakePair<QByteArray,QByteArray>("tid",QUrl::toPercentEncoding(MP_ID)));
 
-	QString cid = FProfileId.toString();
+	QString cid = !AHit.profile.isNull() ? AHit.profile.toString() : FProfileId.toString();
 	cid.remove(0,1); cid.chop(1);
 	query.append(qMakePair<QByteArray,QByteArray>("cid",QUrl::toPercentEncoding(cid)));
+
+	query.append(qMakePair<QByteArray,QByteArray>("fl",QUrl::toPercentEncoding(qVersion())));
 
 	qint64 qt = AHit.timestamp.msecsTo(QDateTime::currentDateTime());
 	if (qt > 0)
 		query.append(qMakePair<QByteArray,QByteArray>("qt",QUrl::toPercentEncoding(QString::number(qt))));
 
-	if (!AHit.description.isEmpty())
-		query.append(qMakePair<QByteArray,QByteArray>("cd",QUrl::toPercentEncoding(AHit.description)));
+	if (!AHit.screen.isEmpty())
+		query.append(qMakePair<QByteArray,QByteArray>("cd",QUrl::toPercentEncoding(AHit.screen)));
 
 	if (AHit.session == IStatisticsHit::SessionStart)
 		query.append(qMakePair<QByteArray,QByteArray>("sc",QUrl::toPercentEncoding("start")));
@@ -383,20 +399,6 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 	if (AHit.type == IStatisticsHit::HitView)
 	{
 		query.append(qMakePair<QByteArray,QByteArray>("t",QUrl::toPercentEncoding("appview")));
-
-		query.append(qMakePair<QByteArray,QByteArray>("cd",QUrl::toPercentEncoding(AHit.view.descr)));
-
-		if (!AHit.view.title.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("dt",QUrl::toPercentEncoding(AHit.view.title)));
-
-		if (!AHit.view.location.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("dl",QUrl::toPercentEncoding(AHit.view.location)));
-
-		if (!AHit.view.host.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("dh",QUrl::toPercentEncoding(AHit.view.host)));
-
-		if (!AHit.view.path.isEmpty())
-			query.append(qMakePair<QByteArray,QByteArray>("dp",QUrl::toPercentEncoding(AHit.view.path)));
 	}
 	else if (AHit.type == IStatisticsHit::HitEvent)
 	{
@@ -461,12 +463,16 @@ void Statistics::onNetworkManagerFinished(QNetworkReply *AReply)
 		IStatisticsHit hit = FReplyHits.take(AReply);
 		if (AReply->error() != QNetworkReply::NoError)
 		{
+			hit.profile = FProfileId;
 			FPendingHits.append(hit);
 			FPendingTimer.start(RESEND_TIMEOUT);
+			LOG_WARNING(QString("Failed to send statistics hit: %1").arg(AReply->errorString()));
 		}
-		else if (!FPendingHits.isEmpty())
+		else 
 		{
-			FPendingTimer.start(0);
+			if (!FPendingHits.isEmpty())
+				FPendingTimer.start(0);
+			LOG_DEBUG(QString("Statistics hit sent, type=%1, screen=%2").arg(hit.type).arg(hit.screen));
 		}
 		FPluginManager->continueShutdown();
 	}
@@ -491,35 +497,89 @@ void Statistics::onOptionsOpened()
 		FNetworkManager->cookieJar()->deleteLater();
 	FNetworkManager->setCookieJar(new FileCookieJar(getStatisticsFilePath(FILE_COOKIES)));
 
-	IStatisticsHit hit;
-	hit.type = IStatisticsHit::HitView;
-	hit.view.descr = SAVD_PROFILE_OPENED;
-	hit.session = IStatisticsHit::SessionStart;
-	sendStatisticsHit(hit);
+	REPORT_EVENT(SEVP_SESSION_STARTED,1);
+	FSessionTimer.start();
 }
 
 void Statistics::onOptionsClosed()
 {
-	IStatisticsHit hit;
-	hit.type = IStatisticsHit::HitView;
-	hit.view.descr = SAVD_PROFILE_CLOSED;
-	hit.session = IStatisticsHit::SessionEnd;
-	sendStatisticsHit(hit);
+	REPORT_EVENT(SEVP_SESSION_FINISHED,1);
+	FSessionTimer.stop();
 }
 
 void Statistics::onPendingTimerTimeout()
 {
-	while (!FPendingHits.isEmpty())
+	bool sent = false;
+	while (!FPendingHits.isEmpty() && !sent)
 	{
 		IStatisticsHit hit = FPendingHits.takeFirst();
-		if (sendStatisticsHit(hit))
-			break;
+		sent = sendStatisticsHit(hit);
 	}
+}
+
+void Statistics::onSessionTimerTimeout()
+{
+	REPORT_EVENT(SEVP_SESSION_CONTINUED,1);
 }
 
 void Statistics::onDefaultConnectionProxyChanged(const QUuid &AProxyId)
 {
 	FNetworkManager->setProxy(FConnectionManager->proxyById(AProxyId).proxy);
+}
+
+void Statistics::onLoggerViewReported(const QString &AClass)
+{
+	if (!AClass.isEmpty())
+	{
+		IStatisticsHit hit;
+		hit.type = IStatisticsHit::HitView;
+		hit.screen = AClass;
+		sendStatisticsHit(hit);
+	}
+}
+
+void Statistics::onLoggerErrorReported(const QString &AClass, const QString &AMessage, bool AFatal)
+{
+	if (!AClass.isEmpty() && !AMessage.isEmpty() && !FReportedErrors.contains(AClass,AMessage))
+	{
+		IStatisticsHit hit;
+		hit.type = IStatisticsHit::HitException;
+		hit.screen = AClass;
+		hit.exception.fatal = AFatal;
+		hit.exception.descr = AMessage;
+		sendStatisticsHit(hit);
+		FReportedErrors.insertMulti(AClass,AMessage);
+	}
+}
+
+void Statistics::onLoggerEventReported(const QString &AClass, const QString &ACategory, const QString &AAction, const QString &ALabel, qint64 AValue)
+{
+	if (!ACategory.isEmpty() && !AAction.isEmpty())
+	{
+		IStatisticsHit hit;
+		hit.type = IStatisticsHit::HitEvent;
+		hit.screen = AClass;
+		hit.event.category = ACategory;
+		hit.event.action = AAction;
+		hit.event.label = ALabel;
+		hit.event.value = AValue;
+		sendStatisticsHit(hit);
+	}
+}
+
+void Statistics::onLoggerTimingReported(const QString &AClass, const QString &ACategory, const QString &AVariable, const QString &ALabel, qint64 ATime)
+{
+	if (!ACategory.isEmpty() && !AVariable.isEmpty() && ATime>=0)
+	{
+		IStatisticsHit hit;
+		hit.type = IStatisticsHit::HitTiming;
+		hit.screen = AClass;
+		hit.timing.category = ACategory;
+		hit.timing.variable = AVariable;
+		hit.timing.label = ALabel;
+		hit.timing.time = ATime;
+		sendStatisticsHit(hit);
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_statistics, Statistics)

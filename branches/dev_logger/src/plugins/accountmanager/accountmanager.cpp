@@ -1,5 +1,17 @@
 #include "accountmanager.h"
 
+#include <definitions/actiongroups.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/action.h>
+#include <utils/logger.h>
+
 #define ADR_ACCOUNT_ID              Action::DR_Parametr1
 
 AccountManager::AccountManager()
@@ -31,7 +43,11 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &AInitO
 
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
+	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		if (!FXmppStreams)
+			LOG_WARNING("Failed to find required interface: IXmppStreams");
+	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
@@ -123,9 +139,18 @@ IAccount *AccountManager::appendAccount(const QUuid &AAccountId)
 		connect(account,SIGNAL(activeChanged(bool)),SLOT(onAccountActiveChanged(bool)));
 		connect(account,SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
 		FAccounts.insert(AAccountId,account);
+
+		LOG_STRM_DEBUG(account->streamJid(),QString("Appending account=%1").arg(account->name()));
 		openAccountOptionsNode(AAccountId,account->name());
 		emit appended(account);
-		return account;
+	}
+	else if (AAccountId.isNull())
+	{
+		REPORT_ERROR("Failed to append account: Invalid id");
+	}
+	else if (FAccounts.contains(AAccountId))
+	{
+		REPORT_ERROR("Failed to append account: Duplicate id");
 	}
 	return FAccounts.value(AAccountId);
 }
@@ -135,6 +160,8 @@ void AccountManager::showAccount(const QUuid &AAccountId)
 	IAccount *account = FAccounts.value(AAccountId);
 	if (account)
 		account->setActive(true);
+	else
+		REPORT_ERROR("Failed to show account: Account not found");
 }
 
 void AccountManager::hideAccount(const QUuid &AAccountId)
@@ -142,6 +169,8 @@ void AccountManager::hideAccount(const QUuid &AAccountId)
 	IAccount *account = FAccounts.value(AAccountId);
 	if (account)
 		account->setActive(false);
+	else
+		REPORT_ERROR("Failed to hide account: Account not found");
 }
 
 void AccountManager::removeAccount(const QUuid &AAccountId)
@@ -149,11 +178,16 @@ void AccountManager::removeAccount(const QUuid &AAccountId)
 	IAccount *account = FAccounts.value(AAccountId);
 	if (account)
 	{
+		LOG_STRM_DEBUG(account->streamJid(),QString("Removing account=%1").arg(account->name()));
 		hideAccount(AAccountId);
 		closeAccountOptionsNode(AAccountId);
 		emit removed(account);
 		FAccounts.remove(AAccountId);
 		delete account->instance();
+	}
+	else
+	{
+		REPORT_ERROR("Failed to remove account: Account not found");
 	}
 }
 
@@ -162,19 +196,22 @@ void AccountManager::destroyAccount(const QUuid &AAccountId)
 	IAccount *account = FAccounts.value(AAccountId);
 	if (account)
 	{
+		LOG_STRM_DEBUG(account->streamJid(),QString("Destroying account=%1").arg(account->name()));
 		hideAccount(AAccountId);
 		removeAccount(AAccountId);
 		Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",AAccountId.toString());
 		emit destroyed(AAccountId);
+	}
+	else
+	{
+		REPORT_ERROR("Failed to destroy account: Account not found");
 	}
 }
 
 void AccountManager::showAccountOptionsDialog(const QUuid &AAccountId)
 {
 	if (FOptionsManager)
-	{
 		FOptionsManager->showOptionsDialog(OPN_ACCOUNTS "." + AAccountId.toString());
-	}
 }
 
 void AccountManager::openAccountOptionsNode(const QUuid &AAccountId, const QString &AName)

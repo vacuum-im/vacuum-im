@@ -2,21 +2,18 @@
 #define EDITNOTEDIALOG_H
 
 #include <QDialog>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
 #include <interfaces/iannotations.h>
-#include <utils/iconstorage.h>
 #include "ui_editnotedialog.h"
 
 class EditNoteDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
 	EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent = NULL);
 	~EditNoteDialog();
-	const Jid &streamJid() { return FStreamJid; }
-	const Jid &contactJid() { return FContactJid; }
+	Jid streamJid() const;
+	Jid contactJid() const;
 signals:
 	void dialogDestroyed();
 protected slots:

@@ -2,6 +2,10 @@
 
 #include <QHeaderView>
 #include <QMessageBox>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 enum Columns {
 	COL_NAME,
@@ -52,11 +56,18 @@ EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStr
 	connect(ui.bbxButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 
 	connect(ui.tbwBookmarks,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),SLOT(onTableItemDoubleClicked(QTableWidgetItem *)));
+
+	REPORT_VIEW;
 }
 
 EditBookmarksDialog::~EditBookmarksDialog()
 {
 	emit dialogDestroyed();
+}
+
+Jid EditBookmarksDialog::streamJid() const
+{
+	return FStreamJid;
 }
 
 IBookmark EditBookmarksDialog::getBookmarkFromRow(int ARow) const

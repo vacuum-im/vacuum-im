@@ -2,18 +2,6 @@
 #define BIRTHDAYREMINDER_H
 
 #include <QTimer>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/soundfiles.h>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/optionvalues.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/rostertooltiporders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibirthdayreminder.h>
 #include <interfaces/ivcard.h>
@@ -24,9 +12,6 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imessageprocessor.h>
-#include <utils/options.h>
-#include <utils/datetime.h>
-#include <utils/iconstorage.h>
 
 class BirthdayReminder : 
 	public QObject,

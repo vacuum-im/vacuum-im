@@ -45,7 +45,13 @@ protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
 	void onPendingTimerTimeout();
+	void onSessionTimerTimeout();
 	void onDefaultConnectionProxyChanged(const QUuid &AProxyId);
+protected slots:
+	void onLoggerViewReported(const QString &AClass);
+	void onLoggerErrorReported(const QString &AClass, const QString &AMessage, bool AFatal);
+	void onLoggerEventReported(const QString &AClass, const QString &ACategory, const QString &AAction, const QString &ALabel, qint64 AValue);
+	void onLoggerTimingReported(const QString &AClass, const QString &ACategory, const QString &AVariable, const QString &ALabel, qint64 ATime);
 private:
 	IPluginManager *FPluginManager;
 	IConnectionManager *FConnectionManager;
@@ -56,8 +62,11 @@ private:
 private:
 	QString FUserAgent;
 	QTimer FPendingTimer;
+	QTimer FSessionTimer;
 	QList<IStatisticsHit> FPendingHits;
 	QMap<QNetworkReply *, IStatisticsHit> FReplyHits;
+private:
+	QMultiMap<QString,QString> FReportedErrors;
 };
 
 #endif // STATISTICS_H

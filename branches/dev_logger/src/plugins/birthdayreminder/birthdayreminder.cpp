@@ -1,7 +1,24 @@
 #include "birthdayreminder.h"
 
-#define NOTIFY_WITHIN_DAYS 4
-#define NOTIFY_TIMEOUT     90000
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/soundfiles.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <utils/iconstorage.h>
+#include <utils/datetime.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+
+#define NOTIFY_WITHIN_DAYS   4
+#define NOTIFY_TIMEOUT       90000
 
 BirthdayReminder::BirthdayReminder()
 {
@@ -45,9 +62,9 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 	{
 		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
 		if (FVCardPlugin)
-		{
 			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
-		}
+		else
+			LOG_WARNING("Failed to find required interface: IVCardPlugin");
 	}
 
 	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);

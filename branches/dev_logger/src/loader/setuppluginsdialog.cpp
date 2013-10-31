@@ -5,9 +5,14 @@
 #include <QHeaderView>
 #include <QTextDocument>
 #include <QDesktopServices>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/statisticsparams.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
-enum TableColumns
-{
+enum TableColumns {
 	COL_NAME,
 	COL_FILE
 };
@@ -33,6 +38,8 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	connect(ui.lblHomePage, SIGNAL(linkActivated(const QString &)),SLOT(onHomePageLinkActivated(const QString &)));
 
 	restoreGeometry(Options::fileValue("misc.setup-plugins-dialog.geometry").toByteArray());
+
+	REPORT_VIEW;
 }
 
 SetupPluginsDialog::~SetupPluginsDialog()
@@ -190,7 +197,10 @@ void SetupPluginsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 	case QDialogButtonBox::Ok:
 		saveSettings();
 		if (QMessageBox::question(this,tr("Restart Application"),tr("Settings saved. Do you want to restart application?"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+		{
+			REPORT_EVENT(SEVP_APPLICATION_RESTART,1);
 			QTimer::singleShot(0,FPluginManager->instance(), SLOT(restart()));
+		}
 		accept();
 		break;
 	default:
