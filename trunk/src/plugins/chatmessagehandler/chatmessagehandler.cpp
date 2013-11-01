@@ -995,7 +995,10 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 		}
 
 		foreach(const WindowContent &content, FPendingContent.take(window))
+		{
+			showDateSeparator(window,content.options.time);
 			window->viewWidget()->appendHtml(content.html,content.options);
+		}
 
 		WindowStatus &wstatus = FWindowStatus[window];
 		wstatus.startTime = !ABody.messages.isEmpty() ? ABody.messages.last().dateTime() : QDateTime();
