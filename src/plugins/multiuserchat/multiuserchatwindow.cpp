@@ -2570,9 +2570,15 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 		foreach(const WindowContent &content, FPendingContent.take(window))
 		{
 			if (window)
+			{
+				showDateSeparator(window->viewWidget(),content.options.time);
 				window->viewWidget()->appendHtml(content.html,content.options);
+			}
 			else
+			{
+				showDateSeparator(FViewWidget,content.options.time);
 				FViewWidget->appendHtml(content.html,content.options);
+			}
 		}
 
 		WindowStatus &wstatus = FWindowStatus[window!=NULL ? window->viewWidget() : FViewWidget];
