@@ -97,9 +97,14 @@ protected:
 	void openProfile(const QString &AProfile, const QString &APassword);
 	void closeProfile();
 	bool saveOptions() const;
-	bool saveProfile(const QString &AProfile, const QDomDocument &AProfileDoc) const;
 	QDomDocument profileDocument(const QString &AProfile) const;
+	bool saveProfile(const QString &AProfile, const QDomDocument &AProfileDoc) const;
 	void importOldSettings();
+protected:
+	void importOptionValues() const;
+	void importOptionDefaults() const;
+	QMap<QString,QVariant> getOptionValues(const OptionsNode &ANode) const;
+	QMap<QString,QVariant> loadOptionValues(const QString &AFileName) const;
 protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onOptionsDialogApplied();
@@ -121,14 +126,15 @@ private:
 	QDomDocument FProfileOptions;
 	QtLockedFile *FProfileLocker;
 private:
-	Action *FChangeProfileAction;
 	QPointer<LoginDialog> FLoginDialog;
+	QPointer<OptionsDialog> FOptionsDialog;
 	QPointer<EditProfilesDialog> FEditProfilesDialog;
 private:
+	Action *FChangeProfileAction;
 	Action *FShowOptionsDialogAction;
+	QMap<QString,QVariant> FDefaultOptions;
 	QList<IOptionsHolder *> FOptionsHolders;
 	QMap<QString, IOptionsDialogNode> FOptionsDialogNodes;
-	QPointer<OptionsDialog> FOptionsDialog;
 };
 
 #endif // OPTIONSMANAGER_H
