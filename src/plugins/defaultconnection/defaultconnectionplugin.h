@@ -2,21 +2,18 @@
 #define DEFAULTCONNECTIONPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
-#include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "defaultconnection.h"
 #include "connectionoptionswidget.h"
 
 class DefaultConnectionPlugin :
-			public QObject,
-			public IPlugin,
-			public IConnectionPlugin,
-			public IDefaultConnectionPlugin
+	public QObject,
+	public IPlugin,
+	public IConnectionPlugin,
+	public IDefaultConnectionPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IConnectionPlugin IDefaultConnectionPlugin);
@@ -28,7 +25,7 @@ public:
 	virtual QUuid pluginUuid() const { return DEFAULTCONNECTION_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects() { return true; }
+	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IConnectionPlugin
@@ -42,7 +39,7 @@ signals:
 	void connectionCreated(IConnection *AConnection);
 	void connectionDestroyed(IConnection *AConnection);
 protected:
-	IXmppStream *findXmppStream(IConnection *AConnection) const;
+	IXmppStream *findConnectionStream(IConnection *AConnection) const;
 protected slots:
 	void onConnectionAboutToConnect();
 	void onConnectionSSLErrorsOccured(const QList<QSslError> &AErrors);
