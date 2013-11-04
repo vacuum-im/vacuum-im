@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>449</width>
-    <height>67</height>
+    <height>56</height>
    </rect>
   </property>
   <layout class="QVBoxLayout">
@@ -20,6 +20,9 @@
       <string>Connection</string>
      </property>
      <layout class="QVBoxLayout">
+      <property name="margin">
+       <number>5</number>
+      </property>
       <item>
        <widget class="QWidget" name="wdtSelectConnection" native="true">
         <layout class="QVBoxLayout">

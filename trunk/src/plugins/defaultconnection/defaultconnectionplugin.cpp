@@ -2,6 +2,10 @@
 
 #include <QPushButton>
 #include <QMessageBox>
+#include <QTextDocument>
+#include <definitions/optionvalues.h>
+#include <definitions/internalerrors.h>
+#include <utils/options.h>
 
 DefaultConnectionPlugin::DefaultConnectionPlugin()
 {
@@ -24,8 +28,10 @@ void DefaultConnectionPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
@@ -41,12 +47,19 @@ bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, in
 	return true;
 }
 
+bool DefaultConnectionPlugin::initObjects()
+{
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DEFAULTCONNECTION_CERT_NOT_TRUSTED,tr("Host certificate is not in trusted list"));
+	return true;
+}
+
 bool DefaultConnectionPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_HOST,QString());
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PORT,5222);
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PROXY,QString(APPLICATION_PROXY_REF_UUID));
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_USELEGACYSSL,false);
+	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE,IDefaultConnection::Manual);
 	return true;
 }
 
@@ -76,7 +89,7 @@ IConnection *DefaultConnectionPlugin::newConnection(const OptionsNode &ANode, QO
 
 IOptionsWidget *DefaultConnectionPlugin::connectionSettingsWidget(const OptionsNode &ANode, QWidget *AParent)
 {
-	return new ConnectionOptionsWidget(FConnectionManager, ANode, AParent);
+	return FConnectionManager!=NULL ? new ConnectionOptionsWidget(FConnectionManager, ANode, AParent) : NULL;
 }
 
 void DefaultConnectionPlugin::saveConnectionSettings(IOptionsWidget *AWidget, OptionsNode ANode)
@@ -91,15 +104,16 @@ void DefaultConnectionPlugin::loadConnectionSettings(IConnection *AConnection, c
 	IDefaultConnection *connection = qobject_cast<IDefaultConnection *>(AConnection->instance());
 	if (connection)
 	{
-		connection->setOption(IDefaultConnection::COR_HOST,ANode.value("host").toString());
-		connection->setOption(IDefaultConnection::COR_PORT,ANode.value("port").toInt());
-		connection->setOption(IDefaultConnection::COR_USE_LEGACY_SSL,ANode.value("use-legacy-ssl").toBool());
 		if (FConnectionManager)
 			connection->setProxy(FConnectionManager->proxyById(FConnectionManager->loadProxySettings(ANode.node("proxy"))).proxy);
+		connection->setOption(IDefaultConnection::Host,ANode.value("host").toString());
+		connection->setOption(IDefaultConnection::Port,ANode.value("port").toInt());
+		connection->setOption(IDefaultConnection::UseLegacySsl,ANode.value("use-legacy-ssl").toBool());
+		connection->setOption(IDefaultConnection::CertVerifyMode,ANode.value("cert-verify-mode").toInt());
 	}
 }
 
-IXmppStream *DefaultConnectionPlugin::findXmppStream(IConnection *AConnection) const
+IXmppStream *DefaultConnectionPlugin::findConnectionStream(IConnection *AConnection) const
 {
 	if (FXmppStreams && AConnection)
 	{
@@ -112,68 +126,110 @@ IXmppStream *DefaultConnectionPlugin::findXmppStream(IConnection *AConnection) c
 
 void DefaultConnectionPlugin::onConnectionAboutToConnect()
 {
-	DefaultConnection *connection = qobject_cast<DefaultConnection*>(sender());
-	IXmppStream *stream = findXmppStream(connection);
+	IDefaultConnection *connection = qobject_cast<IDefaultConnection*>(sender());
+	IXmppStream *stream = findConnectionStream(connection);
 	if (connection && stream)
-		connection->setOption(IDefaultConnection::COR_DOMAINE,stream->streamJid().pDomain());
+	{
+		if (FConnectionManager)
+		{
+			bool withUsers = connection->option(IDefaultConnection::CertVerifyMode).toInt()!=IDefaultConnection::TrustedOnly;
+			connection->addCaSertificates(FConnectionManager->trustedCaCertificates(withUsers));
+		}
+		connection->setOption(IDefaultConnection::Domain,stream->streamJid().pDomain());
+	}
 }
 
 void DefaultConnectionPlugin::onConnectionSSLErrorsOccured(const QList<QSslError> &AErrors)
 {
-	DefaultConnection *connection = qobject_cast<DefaultConnection*>(sender());
-	if (connection && !connection->peerCertificate().isNull())
+	IDefaultConnection *connection = qobject_cast<IDefaultConnection*>(sender());
+	QSslCertificate peerCert = connection!=NULL ? connection->hostCertificate() : QSslCertificate();
+	if (!peerCert.isNull())
 	{
-		QString domain = connection->option(IDefaultConnection::COR_DOMAINE).toString();
-		QSslCertificate peerCert = connection->peerCertificate();
-		QSslCertificate trustCert(Options::fileValue("connection.trusted-ssl-certificate",domain).toByteArray());
-		if (peerCert != trustCert)
+		if (!connection->caCertificates().contains(peerCert))
 		{
-			IXmppStream *stream = findXmppStream(connection);
-			if (stream)
-				stream->setKeepAliveTimerActive(false);
-
-			QString errorList = "<ul>";
-			foreach(const QSslError &error, AErrors)
-				errorList += "<li>"+error.errorString()+"</li>";
-			errorList += "</ul>";
-
-			QStringList certInfo = QStringList()
-				<< tr("Organization: %1").arg(peerCert.subjectInfo(QSslCertificate::Organization))
-				<< tr("Subunit: %1").arg(peerCert.subjectInfo(QSslCertificate::OrganizationalUnitName))
-				<< tr("Country: %1").arg(peerCert.subjectInfo(QSslCertificate::CountryName))
-				<< tr("Locality: %1").arg(peerCert.subjectInfo(QSslCertificate::LocalityName))
-				<< tr("State/Province: %1").arg(peerCert.subjectInfo(QSslCertificate::StateOrProvinceName))
-				<< tr("Common Name: %1").arg(peerCert.subjectInfo(QSslCertificate::CommonName))
-				<< QString::null
-				<< tr("Issuer Organization: %1").arg(peerCert.issuerInfo(QSslCertificate::Organization))
-				<< tr("Issuer Unit Name: %1").arg(peerCert.issuerInfo(QSslCertificate::OrganizationalUnitName))
-				<< tr("Issuer Country: %1").arg(peerCert.issuerInfo(QSslCertificate::CountryName))
-				<< tr("Issuer Locality: %1").arg(peerCert.issuerInfo(QSslCertificate::LocalityName))
-				<< tr("Issuer State/Province: %1").arg(peerCert.issuerInfo(QSslCertificate::StateOrProvinceName))
-				<< tr("Issuer Common Name: %1").arg(peerCert.issuerInfo(QSslCertificate::CommonName));
-
-			QMessageBox dialog;
-			dialog.setIcon(QMessageBox::Warning);
-			dialog.setWindowTitle(tr("SSL Authentication Error"));
-			dialog.setText(tr("Unable to validate the connection to %1 due to errors:").arg(domain));
-			dialog.setInformativeText(errorList);
-			dialog.setDetailedText(certInfo.join("\n"));
-			dialog.addButton(QMessageBox::Yes)->setText(tr("Connect"));
-			dialog.addButton(QMessageBox::No)->setText(tr("Disconnect"));
-			dialog.addButton(QMessageBox::Save)->setText(tr("Trust this certificate"));
-
-			switch (dialog.exec())
+			QString domain = connection->option(IDefaultConnection::Domain).toString();
+			QSslCertificate trustCert(Options::fileValue("connection.trusted-ssl-certificate",domain).toByteArray());
+			if (peerCert != trustCert)
 			{
-			case QMessageBox::Save:
-				Options::setFileValue(connection->peerCertificate().toPem(),"connection.trusted-ssl-certificate",domain);
-			case QMessageBox::Yes:
-				connection->ignoreSslErrors();
-			default:
-				break;
-			}
+				static const struct { QSslCertificate::SubjectInfo info; QString name; } certInfoNames[] = {
+					QSslCertificate::CommonName,             tr("Name: %1"),
+					QSslCertificate::Organization,           tr("Organization: %1"),
+					QSslCertificate::OrganizationalUnitName, tr("Subunit: %1"),
+					QSslCertificate::CountryName,            tr("Country: %1"),
+					QSslCertificate::LocalityName,           tr("Locality: %1"),
+					QSslCertificate::StateOrProvinceName,    tr("State/Province: %1"),
+				};
+				static const uint certInfoNamesCount = sizeof(certInfoNames)/sizeof(certInfoNames[0]);
 
-			if (stream)
-				stream->setKeepAliveTimerActive(true);
+				IXmppStream *stream = findConnectionStream(connection);
+				if (stream)
+					stream->setKeepAliveTimerActive(false);
+
+				int verifyMode = connection->option(IDefaultConnection::CertVerifyMode).toInt();
+
+				QString errorList = "<ul>";
+				foreach(const QSslError &error, AErrors)
+					errorList += "<li>"+error.errorString()+"</li>";
+				errorList += "</ul>";
+
+				QStringList certInfo;
+				certInfo += tr("Certificate holder:");
+				for (int i=0; i<certInfoNamesCount; i++)
+				{
+					QString value = peerCert.subjectInfo(certInfoNames[i].info);
+					if (!value.isEmpty())
+						certInfo += "   " + certInfoNames[i].name.arg(Qt::escape(value));
+				}
+				certInfo += "\n" + tr("Certificate issuer:");
+				for (int i=0; i<certInfoNamesCount; i++)
+				{
+					QString value = peerCert.issuerInfo(certInfoNames[i].info);
+					if (!value.isEmpty())
+						certInfo += "   " + certInfoNames[i].name.arg(Qt::escape(value));
+				}
+				certInfo += "\n" + tr("Certificate details:");
+				certInfo += "   " + tr("Effective from: %1").arg(peerCert.effectiveDate().date().toString());
+				certInfo += "   " + tr("Expired at: %1").arg(peerCert.expiryDate().date().toString());
+				certInfo += "   " + tr("Serial number: %1").arg(QString::fromLocal8Bit(peerCert.serialNumber().toUpper()));
+
+				QMessageBox dialog;
+				dialog.setIcon(QMessageBox::Warning);
+				dialog.setWindowTitle(tr("SSL Authentication Error"));
+				dialog.setText(tr("Connection to <b>%1</b> can not be considered completely safe due to errors in servers certificate check:").arg(domain));
+				dialog.setInformativeText(errorList);
+				dialog.setDetailedText(certInfo.join("\n"));
+				dialog.addButton(QMessageBox::No)->setText(tr("Disconnect"));
+				connect(connection->instance(),SIGNAL(disconnected()),&dialog,SLOT(reject()));
+
+				QPushButton *connectOnce = dialog.addButton(QMessageBox::Yes);
+				connectOnce->setText(tr("Connect Once"));
+				connectOnce->setEnabled(verifyMode==IDefaultConnection::Manual);
+
+				QPushButton *connectAlways = dialog.addButton(QMessageBox::Save);
+				connectAlways->setText(tr("Connect Always"));
+				connectAlways->setEnabled(verifyMode==IDefaultConnection::Manual);
+
+				switch (dialog.exec())
+				{
+				case QMessageBox::Save:
+					if (FConnectionManager)
+						FConnectionManager->addTrustedCaCertificate(peerCert);
+				case QMessageBox::Yes:
+					connection->ignoreSslErrors();
+					break;
+				default:
+					break;
+				}
+
+				if (stream)
+					stream->setKeepAliveTimerActive(true);
+			}
+			else
+			{
+				if (FConnectionManager)
+					FConnectionManager->addTrustedCaCertificate(peerCert);
+				connection->ignoreSslErrors();
+			}
 		}
 		else
 		{
@@ -184,7 +240,7 @@ void DefaultConnectionPlugin::onConnectionSSLErrorsOccured(const QList<QSslError
 
 void DefaultConnectionPlugin::onConnectionDestroyed()
 {
-	IConnection *connection = qobject_cast<IConnection *>(sender());
+	IDefaultConnection *connection = qobject_cast<IDefaultConnection *>(sender());
 	if (connection)
 		emit connectionDestroyed(connection);
 }
