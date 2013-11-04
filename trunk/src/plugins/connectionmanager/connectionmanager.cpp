@@ -433,12 +433,12 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 		if (connection && !connection->hostCertificate().isNull())
 		{
 			static const struct { QSslCertificate::SubjectInfo info; QString name; } certInfoNames[] = {
-				QSslCertificate::CommonName,             tr("Name: %1"),
-				QSslCertificate::Organization,           tr("Organization: %1"),
-				QSslCertificate::OrganizationalUnitName, tr("Subunit: %1"),
-				QSslCertificate::CountryName,            tr("Country: %1"),
-				QSslCertificate::LocalityName,           tr("Locality: %1"),
-				QSslCertificate::StateOrProvinceName,    tr("State/Province: %1"),
+				{ QSslCertificate::CommonName,             tr("Name: %1")           },
+				{ QSslCertificate::Organization,           tr("Organization: %1")   },
+				{ QSslCertificate::OrganizationalUnitName, tr("Subunit: %1")        },
+				{ QSslCertificate::CountryName,            tr("Country: %1")        },
+				{ QSslCertificate::LocalityName,           tr("Locality: %1")       },
+				{ QSslCertificate::StateOrProvinceName,    tr("State/Province: %1") },
 			};
 			static const uint certInfoNamesCount = sizeof(certInfoNames)/sizeof(certInfoNames[0]);
 
@@ -446,7 +446,7 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 			QSslCertificate cert = connection->hostCertificate();
 
 			tooltips += tr("<b>Certificate holder:</b>");
-			for (int i=0; i<certInfoNamesCount; i++)
+			for (uint i=0; i<certInfoNamesCount; i++)
 			{
 				QString value = cert.subjectInfo(certInfoNames[i].info);
 				if (!value.isEmpty())
@@ -454,7 +454,7 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 			}
 
 			tooltips += "<br>" + tr("<b>Certificate issuer:</b>");
-			for (int i=0; i<certInfoNamesCount; i++)
+			for (uint i=0; i<certInfoNamesCount; i++)
 			{
 				QString value = cert.issuerInfo(certInfoNames[i].info);
 				if (!value.isEmpty())

@@ -149,7 +149,9 @@ void SocksStream::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		{
 			QDomElement hostElem = AStanza.firstElement("query",NS_SOCKS5_BYTESTREAMS).firstChildElement("streamhost-used");
 			Jid hostJid = hostElem.attribute("jid");
-			for (FHostIndex = 0; FHostIndex<FHosts.count() && FHosts.at(FHostIndex).jid!=hostJid; FHostIndex++);
+			for (FHostIndex = 0; FHostIndex<FHosts.count(); FHostIndex++)
+				if (FHosts.at(FHostIndex).jid == hostJid)
+					break;
 			negotiateConnection(NCMD_CONNECT_TO_HOST);
 		}
 		else
