@@ -14,7 +14,10 @@
 #define IERR_COMPRESS_INVALID_COMPRESSION_LEVEL              "compress-invalid-compression-level"
 
 // ConnectionManager
-#define IERR_CONNECTIONS_CONNECT_ERROR                       "connections-connect-error"
+#define IERR_CONNECTIONMANAGER_CONNECT_ERROR                 "connectionmanager-connect-error"
+
+// DefaultConnection
+#define IERR_DEFAULTCONNECTION_CERT_NOT_TRUSTED              "defaultconnection-cert-not-trusted"
 
 // DataForms
 #define IERR_DATAFORMS_MEDIA_INVALID_TYPE                    "dataforms-media-invalid-type"

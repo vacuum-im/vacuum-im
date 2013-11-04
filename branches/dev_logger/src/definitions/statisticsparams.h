@@ -11,5 +11,6 @@
 // Hit-Timing
 #define STMP_APPLICATION_START                     "application|start|Application Start"
 #define STMP_APPLICATION_QUIT                      "application|quit|Application Quit"
+#define STMP_HISTORY_MESSAGES_LOAD                 "history|messages-load|History Messages Load"
 
 #endif // DEF_STATISTICSPARAMS_H

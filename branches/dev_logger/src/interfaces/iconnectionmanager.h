@@ -8,14 +8,14 @@
 #include <QUuid>
 #include <QDialog>
 #include <QNetworkProxy>
+#include <QSslCertificate>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/options.h>
 #include <utils/xmpperror.h>
 
 class IConnectionPlugin;
 
-struct IConnectionProxy
-{
+struct IConnectionProxy {
 	QString name;
 	QNetworkProxy proxy;
 };
@@ -28,9 +28,11 @@ public:
 	virtual bool isEncrypted() const =0;
 	virtual bool connectToHost() =0;
 	virtual void disconnectFromHost() =0;
+	virtual void abortConnection(const XmppError &AError) =0;
 	virtual qint64 write(const QByteArray &AData) =0;
 	virtual QByteArray read(qint64 ABytes) =0;
 	virtual IConnectionPlugin *ownerPlugin() const =0;
+	virtual QSslCertificate hostCertificate() const =0;
 protected:
 	virtual void aboutToConnect() =0;
 	virtual void connected() =0;
@@ -73,6 +75,8 @@ public:
 	virtual IOptionsWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent) =0;
 	virtual void saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
 	virtual QUuid loadProxySettings(const OptionsNode &ANode) const =0;
+	virtual QList<QSslCertificate> trustedCaCertificates(bool AWithUsers=true) const =0;
+	virtual void addTrustedCaCertificate(const QSslCertificate &ACertificate) =0;
 protected:
 	virtual void connectionCreated(IConnection *AConnection) =0;
 	virtual void connectionDestroyed(IConnection *AConnection) =0;
@@ -81,8 +85,8 @@ protected:
 	virtual void defaultProxyChanged(const QUuid &AProxyId) =0;
 };
 
-Q_DECLARE_INTERFACE(IConnection,"Vacuum.Plugin.IConnection/1.1")
-Q_DECLARE_INTERFACE(IConnectionPlugin,"Vacuum.Plugin.IConnectionPlugin/1.0")
-Q_DECLARE_INTERFACE(IConnectionManager,"Vacuum.Plugin.IConnectionManager/1.1")
+Q_DECLARE_INTERFACE(IConnection,"Vacuum.Plugin.IConnection/1.2")
+Q_DECLARE_INTERFACE(IConnectionPlugin,"Vacuum.Plugin.IConnectionPlugin/1.1")
+Q_DECLARE_INTERFACE(IConnectionManager,"Vacuum.Plugin.IConnectionManager/1.2")
 
 #endif
