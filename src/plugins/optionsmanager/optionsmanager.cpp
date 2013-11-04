@@ -128,15 +128,11 @@ bool OptionsManager::initSettings()
 
 bool OptionsManager::startPlugin()
 {
-	FDefaultOptions = loadOptionValues(FProfilesDir.absoluteFilePath(FILE_OPTIONS));
-	if (FDefaultOptions.isEmpty())
+	FDefaultOptions.clear();
+	foreach(const QString &resDir, FileStorage::resourcesDirs())
 	{
-#ifdef Q_WS_WIN
-		QDir globalDir(QCoreApplication::applicationDirPath());
-#else
-		QDir globalDir(QString("/etc/"CLIENT_NAME).toLower());
-#endif
-		FDefaultOptions = loadOptionValues(globalDir.absoluteFilePath(FILE_OPTIONS));
+		QDir dir(resDir);
+		FDefaultOptions.unite(loadOptionValues(dir.absoluteFilePath(FILE_OPTIONS)));
 	}
 	importOptionDefaults();
 
