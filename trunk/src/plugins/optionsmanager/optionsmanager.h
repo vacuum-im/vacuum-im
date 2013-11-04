@@ -22,6 +22,7 @@
 #include <interfaces/iaccountmanager.h>
 #include <utils/action.h>
 #include <utils/shortcuts.h>
+#include <utils/filestorage.h>
 #include <utils/widgetmanager.h>
 #include "logindialog.h"
 #include "editprofilesdialog.h"
