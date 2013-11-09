@@ -310,6 +310,10 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
 	}
+	else
+	{
+		REPORT_ERROR("Received unexpected stanza");
+	}
 	return false;
 }
 

@@ -2,6 +2,10 @@
 
 #include <QMessageBox>
 #include <QTextDocument>
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/logger.h>
 
 CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode, QWidget *AParent)  : QDialog(AParent)
 {
@@ -28,6 +32,8 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
 	FCommands->insertClient(this);
+
+	REPORT_VIEW;
 }
 
 CommandDialog::~CommandDialog()
@@ -36,6 +42,26 @@ CommandDialog::~CommandDialog()
 	delete FPrevButton;
 	delete FNextButton;
 	delete FCompleteButton;
+}
+
+Jid CommandDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid CommandDialog::commandJid() const
+{
+	return FCommandJid;
+}
+
+QString CommandDialog::node() const
+{
+	return FNode;
+}
+
+QString CommandDialog::sessionId() const
+{
+	return FSessionId;
 }
 
 bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)

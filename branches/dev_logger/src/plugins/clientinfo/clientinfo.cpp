@@ -4,6 +4,26 @@
 #include <QProcess>
 #include <QFileInfo>
 #include <QTextStream>
+#include <definitions/version.h>
+#include <definitions/namespaces.h>
+#include <definitions/actiongroups.h>
+#include <definitions/dataformtypes.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/systemmanager.h>
+#include <utils/xmpperror.h>
+#include <utils/datetime.h>
+#include <utils/options.h>
+#include <utils/stanza.h>
+#include <utils/logger.h>
+#include <utils/menu.h>
 
 #define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
 #define SHC_LAST_ACTIVITY               "/iq[@type='get']/query[@xmlns='" NS_JABBER_LAST "']"
@@ -56,13 +76,18 @@ void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool ClientInfo::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+		if (FStanzaProcessor == NULL)
+			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
+	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
@@ -206,7 +231,10 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		elem.appendChild(result.createElement("version")).appendChild(result.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
 		if (Options::node(OPV_MISC_SHAREOSVERSION).value().toBool())
 			elem.appendChild(result.createElement("os")).appendChild(result.createTextNode(osVersion()));
-		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
+			LOG_STRM_INFO(AStreamJid,QString("Software version sent to=%1").arg(AStanza.from()));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send software version to=%1").arg(AStanza.from()));
 	}
 	else if (AHandlerId == FActivityHandler)
 	{
@@ -214,7 +242,10 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 		QDomElement elem = result.addElement("query",NS_JABBER_LAST);
 		elem.setAttribute("seconds", SystemManager::systemIdle());
-		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
+			LOG_STRM_INFO(AStreamJid,QString("Last activity sent to=%1").arg(AStanza.from()));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send last activity to=%1").arg(AStanza.from()));
 	}
 	else if (AHandlerId == FTimeHandle)
 	{
@@ -224,13 +255,23 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		DateTime dateTime(QDateTime::currentDateTime());
 		elem.appendChild(result.createElement("tzo")).appendChild(result.createTextNode(dateTime.toX85TZD()));
 		elem.appendChild(result.createElement("utc")).appendChild(result.createTextNode(dateTime.toX85UTC()));
-		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
+			LOG_STRM_INFO(AStreamJid,QString("Current time sent to=%1").arg(AStanza.from()));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send current time to=%1").arg(AStanza.from()));
 	}
 	else if (AHandlerId == FPingHandle)
 	{
 		AAccept = true;
 		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
-		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
+			LOG_STRM_INFO(AStreamJid,QString("Ping answer sent to=%1").arg(AStanza.from()));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send ping answer to=%1").arg(AStanza.from()));
+	}
+	else
+	{
+		REPORT_ERROR("Received unexpected stanza");
 	}
 	return false;
 }
@@ -249,6 +290,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			software.version = query.firstChildElement("version").text();
 			software.os = query.firstChildElement("os").text();
 			software.status = SoftwareLoaded;
+			LOG_STRM_INFO(AStreamJid,QString("Received software version from=%1").arg(AStanza.from()));
 		}
 		else if (AStanza.type() == "error")
 		{
@@ -256,6 +298,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			software.version.clear();
 			software.os.clear();
 			software.status = SoftwareError;
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request software version from=%1: %s").arg(AStanza.from(),software.name));
 		}
 		emit softwareInfoChanged(contactJid);
 	}
@@ -268,11 +311,13 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			QDomElement query = AStanza.firstElement("query");
 			activity.dateTime = QDateTime::currentDateTime().addSecs(0-query.attribute("seconds","0").toInt());
 			activity.text = query.text();
+			LOG_STRM_INFO(AStreamJid,QString("Received last activity from=%1").arg(AStanza.from()));
 		}
 		else if (AStanza.type() == "error")
 		{
 			activity.dateTime = QDateTime();
 			activity.text = XmppStanzaError(AStanza).errorMessage();
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request last activity from=%1: %2").arg(AStanza.from(),activity.text));
 		}
 		emit lastActivityChanged(contactJid);
 	}
@@ -288,10 +333,12 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			tItem.zone = DateTime::tzdFromX85(tzo);
 			tItem.delta = QDateTime::currentDateTime().secsTo(DateTime(utc).toLocal());
 			tItem.ping = tItem.ping - QTime::currentTime().msecsTo(QTime(0,0,0,0));
+			LOG_STRM_INFO(AStreamJid,QString("Received current time from=%1").arg(AStanza.from()));
 		}
 		else
 		{
 			FTimeItems.remove(contactJid);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request current time from=%1: %2").arg(AStanza.from(),XmppStanzaError(AStanza).errorMessage()));
 		}
 		emit entityTimeChanged(contactJid);
 	}
@@ -362,16 +409,17 @@ QString ClientInfo::osVersion() const
 
 void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes)
 {
-	if (AInfoTypes>0 && AContactJid.isValid() && AStreamJid.isValid())
+	if (AStreamJid.isValid() && AContactJid.isValid() && AInfoTypes>0)
 	{
 		ClientInfoDialog *dialog = FClientInfoDialogs.value(AContactJid,NULL);
 		if (!dialog)
 		{
 			QString contactName =  AContactJid.uNode();
-			if (FDiscovery!=NULL && FDiscovery->discoInfo(AStreamJid,AContactJid.bare()).identity.value(0).category == "conference")
+			if (FDiscovery!=NULL && FDiscovery->discoInfo(AStreamJid,AContactJid.bare()).identity.value(0).category=="conference")
 				contactName = AContactJid.resource();
 			if (contactName.isEmpty())
 				contactName = FDiscovery!=NULL ? FDiscovery->discoInfo(AStreamJid,AContactJid).identity.value(0).name : AContactJid.domain();
+			
 			if (FRosterPlugin)
 			{
 				IRoster *roster = FRosterPlugin->findRoster(AStreamJid);
@@ -382,6 +430,7 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
 						contactName = ritem.name;
 				}
 			}
+
 			dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,!contactName.isEmpty() ? contactName : AContactJid.uFull(),AInfoTypes);
 			connect(dialog,SIGNAL(clientInfoDialogClosed(const Jid &)),SLOT(onClientInfoDialogClosed(const Jid &)));
 			FClientInfoDialogs.insert(AContactJid,dialog);
@@ -413,6 +462,11 @@ bool ClientInfo::requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJ
 		{
 			FSoftwareId.insert(iq.id(),AContactJid);
 			FSoftwareItems[AContactJid].status = SoftwareLoading;
+			LOG_STRM_INFO(AStreamJid,QString("Software version request sent to=%1").arg(AContactJid.full()));
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to sent software request to=%1").arg(AContactJid.full()));
 		}
 	}
 	return sent;
@@ -453,7 +507,14 @@ bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJ
 		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
 		if (sent)
+		{
 			FActivityId.insert(iq.id(),AContactJid);
+			LOG_STRM_INFO(AStreamJid,QString("Last activity request sent to=%1").arg(AContactJid.full()));
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send last activity request to=%1").arg(AContactJid.full()));
+		}
 	}
 	return sent;
 }
@@ -487,7 +548,12 @@ bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid
 			TimeItem &tItem = FTimeItems[AContactJid];
 			tItem.ping = QTime::currentTime().msecsTo(QTime(0,0,0,0));
 			FTimeId.insert(iq.id(),AContactJid);
+			LOG_STRM_INFO(AStreamJid,QString("Current time request sent to=%1").arg(AContactJid.full()));
 			emit entityTimeChanged(AContactJid);
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send current time request to=%1").arg(AContactJid.full()));
 		}
 	}
 	return sent;
@@ -695,6 +761,7 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 				software.os = FDataForms->fieldValue(FORM_FIELD_OS,form.fields).toString() + " ";
 				software.os += FDataForms->fieldValue(FORM_FIELD_OS_VERSION,form.fields).toString();
 				software.status = SoftwareLoaded;
+				LOG_STRM_INFO(AInfo.streamJid,QString("Software version in disco info received from=%1").arg(AInfo.contactJid.full()));
 				emit softwareInfoChanged(AInfo.contactJid);
 				break;
 			}

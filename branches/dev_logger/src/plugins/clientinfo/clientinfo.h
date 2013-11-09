@@ -3,18 +3,6 @@
 
 #include <QSet>
 #include <QPointer>
-#include <definitions/version.h>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/dataformtypes.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iclientinfo.h>
 #include <interfaces/istanzaprocessor.h>
@@ -25,13 +13,6 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/istatusicons.h>
-#include <utils/xmpperror.h>
-#include <utils/stanza.h>
-#include <utils/menu.h>
-#include <utils/options.h>
-#include <utils/datetime.h>
-#include <utils/widgetmanager.h>
-#include <utils/systemmanager.h>
 #include "clientinfodialog.h"
 
 struct SoftwareItem {

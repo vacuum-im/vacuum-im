@@ -155,6 +155,10 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			return true;
 		}
 	}
+	else if (FDataForms)
+	{
+		REPORT_ERROR("Received unexpected stanza");
+	}
 	return false;
 }
 

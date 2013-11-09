@@ -207,6 +207,10 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 		}
 	}
+	else
+	{
+		REPORT_ERROR("Received unexpected stanza");
+	}
 	return false;
 }
 
