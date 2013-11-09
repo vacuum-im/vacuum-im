@@ -356,13 +356,41 @@ void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEven
 {
 	if (AIndex != NULL)
 	{
+		static const QString separator = "<hr>";
+
 		quint32 labelId = AdvancedDelegateItem::DisplayId;
 		if (FRostersModel && AEvent!=NULL)
 			labelId = labelAt(AEvent->pos(),mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex)));
 
 		emit indexToolTips(AIndex,labelId,AToolTips);
-		if (labelId!=AdvancedDelegateItem::DisplayId && AToolTips.isEmpty())
+		if (AToolTips.isEmpty() && labelId!=AdvancedDelegateItem::DisplayId)
 			emit indexToolTips(AIndex,AdvancedDelegateItem::DisplayId,AToolTips);
+
+		bool isEndsWithSeparator = false;
+		int toolTipsLast = AToolTips.count();
+		for (QMap<int, QString>::iterator it=AToolTips.begin(); it!=AToolTips.end(); toolTipsLast--)
+		{
+			QString &tooltip = it.value();
+			QStringList parts = tooltip.split(separator,QString::KeepEmptyParts,Qt::CaseInsensitive);
+			if (parts.count() > 1)
+			{
+				if (it==AToolTips.begin() && parts.first().isEmpty())
+					parts.removeFirst();
+				else if (isEndsWithSeparator && parts.first().isEmpty())
+					parts.removeFirst();
+				if (toolTipsLast==1 && parts.last().isEmpty())
+					parts.removeLast();
+				isEndsWithSeparator = !parts.isEmpty() ? parts.last().isEmpty() : isEndsWithSeparator;
+
+				tooltip	= parts.join(separator);
+				it = tooltip.isEmpty() ? AToolTips.erase(it) : ++it;
+			}
+			else
+			{
+				isEndsWithSeparator = false;
+				++it;
+			}
+		}
 	}
 }
 
