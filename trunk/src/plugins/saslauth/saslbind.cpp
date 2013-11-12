@@ -20,16 +20,26 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 		FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		if (AStanza.type() == "result")
 		{
-			Jid streamJid = AStanza.firstElement().firstChild().toElement().text();
-			if (streamJid.isValid())
+			Jid bindJid = AStanza.firstElement().firstChild().toElement().text();
+			if (!bindJid.isValid() || bindJid.node().isEmpty())
 			{
+				emit error(XmppError(IERR_SASL_BIND_INVALID_STREAM_JID));
+			}
+			else if (bindJid.pBare() == FXmppStream->streamJid().pBare())
+			{
+				FXmppStream->setStreamJid(bindJid);
+
 				deleteLater();
-				FXmppStream->setStreamJid(streamJid);
 				emit finished(false);
 			}
 			else
 			{
-				emit error(XmppError(IERR_SASL_BIND_INVALID_STREAM_JID));
+				Jid sessionJid = FXmppStream->streamJid();
+				sessionJid.setResource(bindJid.resource());
+				FXmppStream->setStreamJid(sessionJid);
+
+				deleteLater();
+				emit finished(false);
 			}
 		}
 		else
