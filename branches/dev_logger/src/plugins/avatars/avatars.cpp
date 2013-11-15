@@ -602,7 +602,7 @@ bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) cons
 QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 {
 	QString fileName = FVCardPlugin!=NULL ? FVCardPlugin->vcardFileName(AContactJid.bare()) : QString::null;
-	if (!fileName.isEmpty())
+	if (!fileName.isEmpty() && QFile::exists(fileName))
 	{
 		QFile file(fileName);
 		if (file.open(QFile::ReadOnly))
@@ -616,12 +616,12 @@ QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 			}
 			else
 			{
-				REPORT_ERROR("Failed to load vCrad content");
+				REPORT_ERROR("Failed to load vCard content");
 			}
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to open vCard file").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to open vCard file: %1").arg(file.errorString()));
 		}
 	}
 	return QByteArray();

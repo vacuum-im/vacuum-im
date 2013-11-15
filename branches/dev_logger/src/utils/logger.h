@@ -34,7 +34,7 @@ public:
 	static void setEnabledTypes(quint32 ATypes);
 	static void writeLog(quint32 AType, const QString &AClass, const QString &AMessage);
 public:
-	static void startTiming(const QString &AVariable, const QString &AContext = QString::null);
+	static QString startTiming(const QString &AVariable, const QString &AContext = QString::null);
 	static qint64 checkTiming(const QString &AVariable, const QString &AContext = QString::null);
 	static qint64 finishTiming(const QString &AVariable, const QString &AContext = QString::null);
 public:

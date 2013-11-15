@@ -298,7 +298,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			software.version.clear();
 			software.os.clear();
 			software.status = SoftwareError;
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to request software version from=%1: %s").arg(AStanza.from(),software.name));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request software version from=%1: %2").arg(AStanza.from(),software.name));
 		}
 		emit softwareInfoChanged(contactJid);
 	}

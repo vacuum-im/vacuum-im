@@ -16,8 +16,6 @@
 #	include <windows.h>
 #endif
 
-//#define DEBUG_STATISTICS
-
 #define MP_VER                       "1"
 #define MP_ID                        "UA-11825394-10"
 #define MP_URL                       "http://www.google-analytics.com/collect"

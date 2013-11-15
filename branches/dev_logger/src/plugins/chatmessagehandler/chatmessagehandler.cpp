@@ -615,7 +615,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
 		if (!reqId.isEmpty())
 		{
-			Logger::startTiming(STMP_HISTORY_MESSAGES_LOAD,reqId);
+			Logger::startTiming(STMP_HISTORY_CHAT_MESSAGES_LOAD,reqId);
 			LOG_STRM_INFO(AWindow->streamJid(),QString("Load chat history request sent, with=%1").arg(request.with.bare()));
 			showStyledStatus(AWindow,tr("Loading history..."),true);
 			FHistoryRequests.insert(reqId,AWindow);
@@ -720,10 +720,16 @@ void ChatMessageHandler::showStyledMessage(IMessageChatWindow *AWindow, const Me
 	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
 		options.type |= IMessageContentOptions::TypeHistory;
 
-	if (AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid()!=AMessage.to() : !(AWindow->contactJid() && AMessage.to()))
+	if (AWindow->streamJid()==AMessage.to() || AMessage.to().isEmpty())
+		options.direction = IMessageContentOptions::DirectionIn;
+	else if (AWindow->streamJid()==AMessage.from() || AMessage.from().isEmpty())
+		options.direction = IMessageContentOptions::DirectionOut;
+	else if (AWindow->contactJid() == AMessage.to())
+		options.direction = IMessageContentOptions::DirectionOut;
+	else if (AWindow->contactJid() == AMessage.from())
 		options.direction = IMessageContentOptions::DirectionIn;
 	else
-		options.direction = IMessageContentOptions::DirectionOut;
+		options.direction = IMessageContentOptions::DirectionIn;
 
 	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);
@@ -1067,7 +1073,7 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppEr
 	if (FHistoryRequests.contains(AId))
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
-		Logger::finishTiming(STMP_HISTORY_MESSAGES_LOAD,AId);
+		Logger::finishTiming(STMP_HISTORY_CHAT_MESSAGES_LOAD,AId);
 		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, with=%1: %2").arg(window->contactJid().bare(),AError.errorMessage()));
 
 		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
@@ -1080,7 +1086,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 {
 	if (FHistoryRequests.contains(AId))
 	{
-		REPORT_TIMING(STMP_HISTORY_MESSAGES_LOAD,Logger::finishTiming(STMP_HISTORY_MESSAGES_LOAD,AId));
+		REPORT_TIMING(STMP_HISTORY_CHAT_MESSAGES_LOAD,Logger::finishTiming(STMP_HISTORY_CHAT_MESSAGES_LOAD,AId));
 
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
 		window->viewWidget()->clearContent();

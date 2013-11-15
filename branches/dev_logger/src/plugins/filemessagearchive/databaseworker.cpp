@@ -7,6 +7,7 @@
 #include <definitions/internalerrors.h>
 #include <definitions/filearchivedatabaseproperties.h>
 #include <utils/datetime.h>
+#include <utils/logger.h>
 
 #define DATABASE_STRUCTURE_VERSION     1
 #define DATABASE_COMPATIBLE_VERSION    1
@@ -119,7 +120,10 @@ void DatabaseTaskOpenDatabase::run()
 		}
 
 		if (!initialized)
+		{
 			QSqlDatabase::removeDatabase(connection);
+			Logger::reportError("DatabaseTaskOpenDatabase",QString("Failed to initialize database: %1").arg(FError.errorMessage()),false);
+		}
 	}
 }
 

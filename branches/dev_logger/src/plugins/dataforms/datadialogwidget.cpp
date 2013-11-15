@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <utils/logger.h>
 
 DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent) : QDialog(AParent)
 {
@@ -33,6 +34,8 @@ DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AFor
 	layout()->addWidget(FDialogButtons);
 
 	setForm(AForm);
+
+	REPORT_VIEW;
 }
 
 DataDialogWidget::~DataDialogWidget()
@@ -63,6 +66,7 @@ void DataDialogWidget::setForm(const IDataForm &AForm)
 		emit formWidgetDestroyed(FFormWidget);
 		FFormWidget->instance()->deleteLater();
 	}
+
 	setWindowTitle(AForm.title);
 	FFormWidget = FDataForms->formWidget(AForm,this);
 	FFormHolder->layout()->addWidget(FFormWidget->instance());
@@ -74,7 +78,7 @@ bool DataDialogWidget::allowInvalid() const
    return FAllowInvalid;
 }
 
-void DataDialogWidget::setAllowInvalid( bool AAllowInvalid )
+void DataDialogWidget::setAllowInvalid(bool AAllowInvalid)
 {
    FAllowInvalid = AAllowInvalid;
 }

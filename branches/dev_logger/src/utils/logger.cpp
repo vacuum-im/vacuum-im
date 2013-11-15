@@ -160,13 +160,14 @@ void Logger::writeLog(quint32 AType, const QString &AClass, const QString &AMess
 	}
 }
 
-void Logger::startTiming(const QString &AVariable, const QString &AContext)
+QString Logger::startTiming(const QString &AVariable, const QString &AContext)
 {
 	if (!AVariable.isEmpty())
 	{
 		QMutexLocker locker(&FMutex);
 		instance()->d->timings[AVariable][AContext] = QDateTime::currentDateTime();
 	}
+	return AContext;
 }
 
 qint64 Logger::checkTiming( const QString &AVariable, const QString &AContext)

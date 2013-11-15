@@ -573,7 +573,7 @@ void ChatStates::setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int
 		params.selfLastActive = QDateTime::currentDateTime().toTime_t();
 		if (params.selfState != AState)
 		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Self chat state changed, contact=%1, state=%1").arg(AContactJid.full()).arg(AState));
+			LOG_STRM_DEBUG(AStreamJid,QString("Self chat state changed, contact=%1, state=%2").arg(AContactJid.full()).arg(AState));
 			params.selfState = AState;
 			if (ASend)
 				sendStateMessage(AStreamJid,AContactJid,AState);

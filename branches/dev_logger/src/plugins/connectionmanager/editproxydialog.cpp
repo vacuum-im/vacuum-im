@@ -1,7 +1,8 @@
 #include "editproxydialog.h"
 
-enum ProxyItemDataRoles
-{
+#include <utils/logger.h>
+
+enum ProxyItemDataRoles {
 	PDR_UUID = Qt::UserRole,
 	PDR_NAME,
 	PDR_TYPE,
@@ -40,6 +41,8 @@ EditProxyDialog::EditProxyDialog(IConnectionManager *AManager, QWidget *AParent)
 	connect(ui.ltwProxyList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
 		SLOT(onCurrentProxyItemChanged(QListWidgetItem *, QListWidgetItem *)));
 	onCurrentProxyItemChanged(ui.ltwProxyList->currentItem(), NULL);
+
+	REPORT_VIEW;
 }
 
 EditProxyDialog::~EditProxyDialog()

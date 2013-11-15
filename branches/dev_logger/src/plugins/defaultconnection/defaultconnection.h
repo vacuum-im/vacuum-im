@@ -1,7 +1,6 @@
 #ifndef DEFAULTCONNECTION_H
 #define DEFAULTCONNECTION_H
 
-#include <definitions/internalerrors.h>
 #include <interfaces/idefaultconnection.h>
 #include <thirdparty/jdns/qjdns.h>
 #include <utils/xmpperror.h>
@@ -72,17 +71,17 @@ protected slots:
 private:
 	IConnectionPlugin *FPlugin;
 private:
-	int FSrvQueryId;
 	QJDns FDns;
+	int FSrvQueryId;
 	QList<QJDns::Record> FRecords;
 private:
 	bool FSSLError;
-	bool FUseLegacySSL;
 	bool FDisconnecting;
 	QSslSocket FSocket;
-	CertificateVerifyMode FVerifyMode;
 private:
+	bool FUseLegacySSL;
 	QMap<int, QVariant> FOptions;
+	CertificateVerifyMode FVerifyMode;
 };
 
 #endif // DEFAULTCONNECTION_H

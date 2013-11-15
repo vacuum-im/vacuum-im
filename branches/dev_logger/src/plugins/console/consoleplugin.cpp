@@ -1,8 +1,19 @@
 #include "consoleplugin.h"
 
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
+
 ConsolePlugin::ConsolePlugin()
 {
 	FPluginManager = NULL;
+	FXmppStreams = NULL;
 	FMainWindowPlugin = NULL;
 }
 
@@ -22,15 +33,28 @@ void ConsolePlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(MAINWINDOW_UUID);
 }
 
-bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	IPlugin *plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
-		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+	{
+		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+		if (FXmppStreams == NULL)
+			LOG_WARNING("Failed to load required interface: IXmppStreams");
+	}
 
-	return FMainWindowPlugin!=NULL;
+	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
+	if (plugin)
+	{
+		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+		if (FMainWindowPlugin == NULL)
+			LOG_WARNING("Failed to load required interface: IMainWindowPlugin");
+	}
+
+	return FXmppStreams!=NULL && FMainWindowPlugin!=NULL;
 }
 
 bool ConsolePlugin::initObjects()

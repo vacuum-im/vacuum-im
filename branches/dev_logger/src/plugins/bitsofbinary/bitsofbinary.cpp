@@ -202,7 +202,7 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Rejected request for absent data, id=%1, from=%1").arg(cid,AStanza.from()));
+			LOG_STRM_WARNING(AStreamJid,QString("Rejected request for absent data, id=%1, from=%2").arg(cid,AStanza.from()));
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_ITEM_NOT_FOUND);
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 		}
