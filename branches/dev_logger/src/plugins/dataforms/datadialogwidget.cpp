@@ -7,6 +7,7 @@
 
 DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AForm, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setLayout(new QVBoxLayout(this));
 	layout()->setMargin(5);
@@ -34,8 +35,6 @@ DataDialogWidget::DataDialogWidget(IDataForms *ADataForms, const IDataForm &AFor
 	layout()->addWidget(FDialogButtons);
 
 	setForm(AForm);
-
-	REPORT_VIEW;
 }
 
 DataDialogWidget::~DataDialogWidget()

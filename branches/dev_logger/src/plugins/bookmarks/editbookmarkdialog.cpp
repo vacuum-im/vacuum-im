@@ -8,6 +8,7 @@
 
 EditBookmarkDialog::EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_BOOKMARKS_EDIT,0,0,"windowIcon");
@@ -33,8 +34,6 @@ EditBookmarkDialog::EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) :
 	connect(ui.grbConference,SIGNAL(clicked(bool)),SLOT(onGroupBoxClicked(bool)));
 	connect(ui.grbURL,SIGNAL(clicked(bool)),SLOT(onGroupBoxClicked(bool)));
 	connect(ui.bbxButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
-
-	REPORT_VIEW;
 }
 
 EditBookmarkDialog::~EditBookmarkDialog()

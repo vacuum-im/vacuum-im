@@ -7,6 +7,7 @@
 
 EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Annotation - %1").arg(AContactJid.uBare()));
@@ -22,8 +23,6 @@ EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid
 
 	connect(ui.dbbButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 	connect(ui.dbbButtons,SIGNAL(rejected()),SLOT(reject()));
-
-	REPORT_VIEW;
 }
 
 EditNoteDialog::~EditNoteDialog()

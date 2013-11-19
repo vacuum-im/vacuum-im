@@ -3,16 +3,14 @@
 
 #include <QWidget>
 #include <QCheckBox>
-#include <definitions/optionvalues.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "ui_filestreamsoptions.h"
 
 class FileStreamsOptions :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

@@ -3,6 +3,24 @@
 #include <QSet>
 #include <QDir>
 #include <QDesktopServices>
+#include <definitions/namespaces.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/shortcuts.h>
+#include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/internalerrors.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/shortcuts.h>
+#include <utils/datetime.h>
+#include <utils/options.h>
+#include <utils/stanza.h>
+#include <utils/logger.h>
+#include <utils/jid.h>
 
 FileStreamsManager::FileStreamsManager()
 {
@@ -34,6 +52,8 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &AI
 	if (plugin)
 	{
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
+		if (FDataManager == NULL)
+			LOG_WARNING("Failed to load required interface: IDataStreamsManager");
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
@@ -149,7 +169,23 @@ bool FileStreamsManager::requestDataStream(const QString &AStreamId, Stanza &ARe
 					fileElem.appendChild(ARequest.createElement("range"));
 				return true;
 			}
+			else
+			{
+				LOG_STRM_ERROR(stream->streamJid(),QString("Failed to insert data stream request, sid=%1: SI element not found").arg(AStreamId));
+			}
 		}
+		else
+		{
+			LOG_STRM_ERROR(stream->streamJid(),QString("Failed to insert data stream request, sid=%1: File not found or empty").arg(AStreamId));
+		}
+	}
+	else if (stream)
+	{
+		LOG_STRM_ERROR(stream->streamJid(),QString("Failed to insert data stream request, sid=%1: Invalid stream kind").arg(AStreamId));
+	}
+	else
+	{
+		LOG_ERROR(QString("Failed to insert data stream request, sid=%1: Stream not found").arg(AStreamId));
 	}
 	return false;
 }
@@ -171,8 +207,20 @@ bool FileStreamsManager::responceDataStream(const QString &AStreamId, Stanza &AR
 				if (stream->rangeLength()>0)
 					rangeElem.setAttribute("length",stream->rangeLength());
 			}
+			else
+			{
+				LOG_STRM_ERROR(stream->streamJid(),QString("Failed to set range in data stream response, sid=%1: SI element not found").arg(AStreamId));
+			}
 		}
 		return true;
+	}
+	else if (stream)
+	{
+		LOG_STRM_ERROR(stream->streamJid(),QString("Failed to insert data stream response, sid=%1: Invalid stream kind").arg(AStreamId));
+	}
+	else
+	{
+		LOG_ERROR(QString("Failed to insert data stream response, sid=%1: Stream not found").arg(AStreamId));
 	}
 	return false;
 }
@@ -187,11 +235,18 @@ bool FileStreamsManager::dataStreamRequest(const QString &AStreamId, const Stanz
 			{
 				IFileStreamsHandler *handler = it.value();
 				if (handler->fileStreamRequest(it.key(),AStreamId,ARequest,AMethods))
-				{
 					return true;
-				}
 			}
+			LOG_STRM_WARNING(ARequest.to(),QString("Failed to process file stream request, sid=%1: Stream handler not found").arg(AStreamId));
 		}
+		else
+		{
+			LOG_STRM_ERROR(ARequest.to(),QString("Failed to process file stream request, sid=%1: No valid stream methods").arg(AStreamId));
+		}
+	}
+	else
+	{
+		LOG_STRM_ERROR(ARequest.to(),QString("Failed to process file stream request, sid=%1: Duplicate stream id").arg(AStreamId));
 	}
 	return false;
 }
@@ -199,7 +254,11 @@ bool FileStreamsManager::dataStreamRequest(const QString &AStreamId, const Stanz
 bool FileStreamsManager::dataStreamResponce(const QString &AStreamId, const Stanza &AResponce, const QString &AMethod)
 {
 	IFileStreamsHandler *handler = streamHandler(AStreamId);
-	return handler!=NULL ? handler->fileStreamResponce(AStreamId,AResponce,AMethod) : false;
+	if (handler)
+		return handler->fileStreamResponce(AStreamId,AResponce,AMethod);
+	else
+		LOG_STRM_ERROR(AResponce.to(),QString("Failed to process file stream response, sid=%1: Stream handler not found").arg(AStreamId));
+	return false;
 }
 
 bool FileStreamsManager::dataStreamError(const QString &AStreamId, const XmppError &AError)
@@ -209,6 +268,10 @@ bool FileStreamsManager::dataStreamError(const QString &AStreamId, const XmppErr
 	{
 		stream->abortStream(AError);
 		return true;
+	}
+	else
+	{
+		LOG_ERROR(QString("Failed to process file stream error, sid=%1: Stream not found").arg(AStreamId));
 	}
 	return false;
 }
@@ -228,6 +291,7 @@ IFileStream *FileStreamsManager::createStream(IFileStreamsHandler *AHandler, con
 {
 	if (FDataManager && AHandler && !AStreamId.isEmpty() && !FStreams.contains(AStreamId))
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Creating file stream, sid=%1, with=%2, kind=%3").arg(AStreamId,AContactJid.full()).arg(AKind));
 		IFileStream *stream = new FileStream(FDataManager,AStreamId,AStreamJid,AContactJid,AKind,AParent);
 		connect(stream->instance(),SIGNAL(streamDestroyed()),SLOT(onStreamDestroyed()));
 		FStreams.insert(AStreamId,stream);
@@ -235,6 +299,11 @@ IFileStream *FileStreamsManager::createStream(IFileStreamsHandler *AHandler, con
 		emit streamCreated(stream);
 		return stream;
 	}
+	else if (FDataManager)
+	{
+		LOG_STRM_ERROR(AStreamJid,QString("Failed to create file stream, sid=%1: Invalid params").arg(AStreamId));
+	}
+
 	return NULL;
 }
 
@@ -259,6 +328,7 @@ void FileStreamsManager::onStreamDestroyed()
 	IFileStream *stream = qobject_cast<IFileStream *>(sender());
 	if (stream)
 	{
+		LOG_STRM_INFO(stream->streamJid(),QString("File stream destroyed, sid=%1").arg(stream->streamId()));
 		FStreams.remove(stream->streamId());
 		FStreamHandler.remove(stream->streamId());
 		emit streamDestroyed(stream);

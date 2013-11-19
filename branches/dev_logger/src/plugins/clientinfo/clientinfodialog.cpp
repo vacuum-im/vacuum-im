@@ -6,6 +6,7 @@
 
 ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid, const QString &AContactName, int AInfoTypes, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Client info - %1").arg(AContactName));
@@ -22,8 +23,6 @@ ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJ
 	connect(FClientInfo->instance(),SIGNAL(entityTimeChanged(const Jid &)),SLOT(onClientInfoChanged(const Jid &)));
 
 	setInfoTypes(AInfoTypes);
-
-	REPORT_VIEW;
 }
 
 ClientInfoDialog::~ClientInfoDialog()

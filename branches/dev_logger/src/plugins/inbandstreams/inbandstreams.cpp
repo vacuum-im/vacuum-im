@@ -1,5 +1,11 @@
 #include "inbandstreams.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
+#include <definitions/internalerrors.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+
 InBandStreams::InBandStreams()
 {
 	FDataManager = NULL;
@@ -22,8 +28,9 @@ void InBandStreams::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool InBandStreams::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
 	if (plugin)
 	{
@@ -34,6 +41,8 @@ bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInit
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+		if (FStanzaProcessor == NULL)
+			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -92,11 +101,11 @@ QString InBandStreams::methodDescription() const
 	return tr("Data is broken down into smaller chunks and transported in-band over XMPP");
 }
 
-IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
+IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
 {
 	if (FStanzaProcessor)
 	{
-		InBandStream *stream = new InBandStream(FStanzaProcessor,ASocketId,AStreamJid,AContactJid,AKind,AParent);
+		InBandStream *stream = new InBandStream(FStanzaProcessor,AStreamId,AStreamJid,AContactJid,AKind,AParent);
 		emit socketCreated(stream);
 		return stream;
 	}

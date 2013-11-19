@@ -14,6 +14,7 @@ enum ProxyItemDataRoles {
 
 EditProxyDialog::EditProxyDialog(IConnectionManager *AManager, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 	setWindowModality(Qt::WindowModal);
@@ -41,8 +42,6 @@ EditProxyDialog::EditProxyDialog(IConnectionManager *AManager, QWidget *AParent)
 	connect(ui.ltwProxyList, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
 		SLOT(onCurrentProxyItemChanged(QListWidgetItem *, QListWidgetItem *)));
 	onCurrentProxyItemChanged(ui.ltwProxyList->currentItem(), NULL);
-
-	REPORT_VIEW;
 }
 
 EditProxyDialog::~EditProxyDialog()

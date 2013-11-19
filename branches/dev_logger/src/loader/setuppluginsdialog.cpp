@@ -19,6 +19,7 @@ enum TableColumns {
 
 SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocument APluginsSetup, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_PLUGINMANAGER_SETUP,0,0,"windowIcon");
@@ -38,8 +39,6 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	connect(ui.lblHomePage, SIGNAL(linkActivated(const QString &)),SLOT(onHomePageLinkActivated(const QString &)));
 
 	restoreGeometry(Options::fileValue("misc.setup-plugins-dialog.geometry").toByteArray());
-
-	REPORT_VIEW;
 }
 
 SetupPluginsDialog::~SetupPluginsDialog()

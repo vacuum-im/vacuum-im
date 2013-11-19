@@ -210,7 +210,7 @@ bool DataStreamsManger::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, S
 			}
 			else
 			{
-				LOG_STRM_WARNING(AStreamJid,QString("Rejected stream initiation from=%1: No valid streams").arg(AStanza.from()));
+				LOG_STRM_WARNING(AStreamJid,QString("Rejected stream initiation from=%1: No valid stream methods").arg(AStanza.from()));
 				XmppStanzaError err(XmppStanzaError::EC_BAD_REQUEST);
 				err.setAppCondition(NS_STREAM_INITIATION,XERR_SI_NO_VALID_STREAMS);
 				Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);

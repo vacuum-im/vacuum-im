@@ -17,6 +17,7 @@
 
 ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) : QWidget(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_CONSOLE,0,0,"windowIcon");
@@ -65,8 +66,6 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 	connect(ui.tlbClearConsole,SIGNAL(clicked()),ui.tbrConsole,SLOT(clear()));
 	connect(ui.tlbClearConsole,SIGNAL(clicked()),SLOT(onTextSearchStart()));
 	connect(ui.chbWordWrap,SIGNAL(toggled(bool)),SLOT(onWordWrapButtonToggled(bool)));
-
-	REPORT_VIEW;
 }
 
 ConsoleWidget::~ConsoleWidget()

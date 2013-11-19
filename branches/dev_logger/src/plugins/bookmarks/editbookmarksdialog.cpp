@@ -25,6 +25,7 @@ enum Columns {
 
 EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStreamJid, const QList<IBookmark> &AList, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Edit bookmarks - %1").arg(AStreamJid.uBare()));
@@ -56,8 +57,6 @@ EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStr
 	connect(ui.bbxButtons,SIGNAL(accepted()),SLOT(onDialogAccepted()));
 
 	connect(ui.tbwBookmarks,SIGNAL(itemDoubleClicked(QTableWidgetItem *)),SLOT(onTableItemDoubleClicked(QTableWidgetItem *)));
-
-	REPORT_VIEW;
 }
 
 EditBookmarksDialog::~EditBookmarksDialog()

@@ -97,10 +97,9 @@ void DefaultConnection::disconnectFromHost()
 		FRecords.clear();
 		FDisconnecting = true;
 
-		LOG_INFO(QString("Disconnecting from host=%1").arg(FSocket.peerName()));
-
 		if (FSocket.state() != QSslSocket::UnconnectedState)
 		{
+			LOG_INFO(QString("Disconnecting from host=%1").arg(FSocket.peerName()));
 			if (FSocket.state() == QSslSocket::ConnectedState)
 			{
 				emit aboutToDisconnect();

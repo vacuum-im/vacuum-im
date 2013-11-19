@@ -1232,10 +1232,6 @@ void FileMessageArchive::removeFileWriter(FileWriter *AWriter)
 		else
 			QFile::remove(AWriter->fileName());
 	}
-	else
-	{
-		REPORT_ERROR("Failed to destroy file writer: Invalid params");
-	}
 }
 
 void FileMessageArchive::onFileTaskFinished(FileTask *ATask)

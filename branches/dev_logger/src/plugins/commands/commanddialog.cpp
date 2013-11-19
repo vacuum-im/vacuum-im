@@ -9,6 +9,7 @@
 
 CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode, QWidget *AParent)  : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_COMMANDS,0,0,"windowIcon");
@@ -32,8 +33,6 @@ CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
 	FCommands->insertClient(this);
-
-	REPORT_VIEW;
 }
 
 CommandDialog::~CommandDialog()
