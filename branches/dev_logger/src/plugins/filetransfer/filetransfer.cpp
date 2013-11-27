@@ -431,7 +431,7 @@ bool FileTransfer::fileStreamShowDialog(const QString &AStreamId)
 	{
 		LOG_STRM_ERROR(stream->streamJid(),QString("Failed to show file transfer dialog, sid=%1: Invalid handler").arg(AStreamId));
 	}
-	else
+	else if (!AStreamId.isEmpty())
 	{
 		LOG_ERROR(QString("Failed to show file transfer dialog, sid=%1: Stream not found").arg(AStreamId));
 	}

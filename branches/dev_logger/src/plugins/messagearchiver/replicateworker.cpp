@@ -1,11 +1,10 @@
 #include "replicateworker.h"
 
-#include <QtDebug>
-
 #include <QSqlQuery>
 #include <QMetaObject>
 #include <QMutexLocker>
 #include <utils/datetime.h>
+#include <utils/logger.h>
 
 #define DATABASE_STRUCTURE_VERSION      1
 #define DATABASE_COMPATIBLE_VERSION     1
@@ -42,12 +41,16 @@ bool ReplicateTask::isFailed() const
 	return FFailed;
 }
 
+QSqlError ReplicateTask::error() const
+{
+	return FError;
+}
+
 void ReplicateTask::setSQLError(const QSqlError &AError)
 {
-	Q_UNUSED(AError);
 	FFailed = true;
-
-	qDebug() << AError.databaseText();
+	FError = AError;
+	Logger::reportError("ReplicateTask",QString("Failed to execute SQL command: %1").arg(AError.databaseText()),false);
 }
 
 // ReplicateTaskLoadState
@@ -493,10 +496,21 @@ void ReplicateWorker::run()
 					}
 				}
 			}
-
+			else if (!db.isValid())
+			{
+				REPORT_ERROR("Failed to start replicate worker: Invalid DB");
+			}
+			else if (!db.isOpen())
+			{
+				REPORT_ERROR("Failed to start replicate worker: DB not opened");
+			}
 			db.close();
 		}
 		QSqlDatabase::removeDatabase(FConnection);
+	}
+	else
+	{
+		REPORT_ERROR("Failed to start replicate worker: DB connection already exists");
 	}
 }
 
@@ -514,6 +528,7 @@ bool ReplicateWorker::initializeDatabase(QSqlDatabase &ADatabase)
 		}
 		else
 		{
+			REPORT_ERROR(QString("Failed to initialize DB: %1").arg(query.lastError().databaseText()));
 			return false;
 		}
 	}
@@ -590,7 +605,7 @@ bool ReplicateWorker::initializeDatabase(QSqlDatabase &ADatabase)
 			{
 				if (!createQuery.exec(command))
 				{
-					qDebug() << createQuery.lastError().databaseText();
+					REPORT_ERROR(QString("Failed to initialize DB: %1").arg(query.lastError().databaseText()));
 					ADatabase.rollback();
 					return false;
 				}
@@ -600,6 +615,7 @@ bool ReplicateWorker::initializeDatabase(QSqlDatabase &ADatabase)
 	}
 	else if (compatibleVersion > DATABASE_STRUCTURE_VERSION)
 	{
+		LOG_ERROR(QString("Failed to initialize DB=%1: Incompatible version").arg(ADatabase.databaseName()));
 		return false;
 	}
 	return true;

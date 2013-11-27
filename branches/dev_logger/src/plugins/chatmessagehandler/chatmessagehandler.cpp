@@ -24,7 +24,6 @@
 #include <definitions/messagehandlerorders.h>
 #include <definitions/messageeditsendhandlerorders.h>
 #include <definitions/xmppurihandlerorders.h>
-#include <definitions/statisticsparams.h>
 #include <utils/widgetmanager.h>
 #include <utils/textmanager.h>
 #include <utils/shortcuts.h>
@@ -615,8 +614,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
 		if (!reqId.isEmpty())
 		{
-			Logger::startTiming(STMP_HISTORY_CHAT_MESSAGES_LOAD,reqId);
-			LOG_STRM_INFO(AWindow->streamJid(),QString("Load chat history request sent, with=%1").arg(request.with.bare()));
+			LOG_STRM_INFO(AWindow->streamJid(),QString("Load chat history request sent, with=%1, id=%2").arg(request.with.bare(),reqId));
 			showStyledStatus(AWindow,tr("Loading history..."),true);
 			FHistoryRequests.insert(reqId,AWindow);
 		}
@@ -1073,9 +1071,7 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppEr
 	if (FHistoryRequests.contains(AId))
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
-		Logger::finishTiming(STMP_HISTORY_CHAT_MESSAGES_LOAD,AId);
-		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, with=%1: %2").arg(window->contactJid().bare(),AError.errorMessage()));
-
+		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, with=%1, id=%2: %3").arg(window->contactJid().bare(),AId,AError.errorMessage()));
 		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
 		FPendingMessages.remove(window);
 		FPendingContent.remove(window);
@@ -1086,8 +1082,6 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 {
 	if (FHistoryRequests.contains(AId))
 	{
-		REPORT_TIMING(STMP_HISTORY_CHAT_MESSAGES_LOAD,Logger::finishTiming(STMP_HISTORY_CHAT_MESSAGES_LOAD,AId));
-
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
 		window->viewWidget()->clearContent();
 
@@ -1128,7 +1122,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 		WindowStatus &wstatus = FWindowStatus[window];
 		wstatus.startTime = !ABody.messages.isEmpty() ? ABody.messages.last().dateTime() : QDateTime();
 
-		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded and shown, with=%1").arg(window->contactJid().bare()));
+		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded and shown, with=%1, id=%2").arg(window->contactJid().bare()).arg(AId));
 	}
 }
 

@@ -518,7 +518,7 @@ IArchiveHeader FileMessageArchive::loadFileHeader(const QString &AFilePath) cons
 				}
 				file.close();
 			}
-			else
+			else if (file.exists())
 			{
 				LOG_ERROR(QString("Failed to load file header: %1").arg(file.errorString()));
 			}
@@ -554,7 +554,7 @@ IArchiveCollection FileMessageArchive::loadFileCollection(const Jid &AStreamJid,
 				collection.header.engineId = engineId();
 				file.close();
 			}
-			else
+			else if (file.exists())
 			{
 				LOG_STRM_ERROR(AStreamJid,QString("Failed to load file collection with=%1: %2").arg(AHeader.with.full(),file.errorString()));
 			}

@@ -16,7 +16,9 @@
 #define STMP_APPLICATION_START                               "application|start|Application Start"
 #define STMP_APPLICATION_QUIT                                "application|quit|Application Quit"
 
-#define STMP_HISTORY_CHAT_MESSAGES_LOAD                      "history|chat-messages-load|History Chat Messages Load"
+#define STMP_HISTORY_REPLICATE                               "history|replicate|History Replicate"
+#define STMP_HISTORY_HEADERS_LOAD                            "history|headers-load|History Headers Load"
+#define STMP_HISTORY_MESSAGES_LOAD                           "history|messages-load|History Messages Load"
 #define STMP_HISTORY_FILE_DATABASE_SYNC                      "history|file-database-sync|History File Database Sync"
 
 #endif // DEF_STATISTICSPARAMS_H

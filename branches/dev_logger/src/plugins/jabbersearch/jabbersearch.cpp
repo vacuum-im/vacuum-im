@@ -1,5 +1,13 @@
 #include "jabbersearch.h"
 
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/namespaces.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/dataformtypes.h>
+#include <utils/xmpperror.h>
+#include <utils/logger.h>
+
 #define SEARCH_TIMEOUT          30000
 
 #define ADR_StreamJid           Action::DR_StreamJid
@@ -29,25 +37,36 @@ void JabberSearch::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool JabberSearch::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool JabberSearch::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
-		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-
-	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
+	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+		if (FStanzaProcessor == NULL)
+			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
+	}
+
+	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
+	if (plugin)
+	{
+		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
+	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
+	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+	}
 
 	return FStanzaProcessor!=NULL;
 }
@@ -66,13 +85,14 @@ bool JabberSearch::initObjects()
 	return true;
 }
 
-void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &AStanza)
+void JabberSearch::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
+	Q_UNUSED(AStreamJid);
 	if (FRequests.contains(AStanza.id()))
 	{
-		FRequests.removeAt(FRequests.indexOf(AStanza.id()));
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Search request result received, id=%1").arg(AStanza.id()));
 			QDomElement query = AStanza.firstElement("query",NS_JABBER_SEARCH);
 
 			ISearchFields fields;
@@ -113,14 +133,17 @@ void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &
 		}
 		else
 		{
-			emit searchError(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_INFO(AStreamJid,QString("Failed to receive search request result, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			emit searchError(AStanza.id(),err);
 		}
+		FRequests.removeAll(AStanza.id());
 	}
 	else if (FSubmits.contains(AStanza.id()))
 	{
-		FSubmits.removeAt(FRequests.indexOf(AStanza.id()));
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Search submit result received, id=%1").arg(AStanza.id()));
 			QDomElement query = AStanza.firstElement("query",NS_JABBER_SEARCH);
 
 			ISearchResult result;
@@ -150,8 +173,11 @@ void JabberSearch::stanzaRequestResult(const Jid &/*AStreamJid*/, const Stanza &
 		}
 		else
 		{
-			emit searchError(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_INFO(AStreamJid,QString("Failed to receive search submit result, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			emit searchError(AStanza.id(),err);
 		}
+		FSubmits.removeAll(AStanza.id());
 	}
 }
 
@@ -196,41 +222,59 @@ IDataFormLocale JabberSearch::dataFormLocale(const QString &AFormType)
 
 QString JabberSearch::sendRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
-	Stanza request("iq");
-	request.setTo(AServiceJid.full()).setType("get").setId(FStanzaProcessor->newId());
-	request.addElement("query",NS_JABBER_SEARCH);
-	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,SEARCH_TIMEOUT))
+	if (FStanzaProcessor)
 	{
-		FRequests.append(request.id());
-		return request.id();
+		Stanza request("iq");
+		request.setTo(AServiceJid.full()).setType("get").setId(FStanzaProcessor->newId());
+		request.addElement("query",NS_JABBER_SEARCH);
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,SEARCH_TIMEOUT))
+		{
+			LOG_STRM_INFO(AStreamJid,QString("Search request sent to=%1, id=%2").arg(AServiceJid.full(),request.id()));
+			FRequests.append(request.id());
+			return request.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send search request to=%1").arg(AServiceJid.full()));
+		}
 	}
 	return QString::null;
 }
 
 QString JabberSearch::sendSubmit(const Jid &AStreamJid, const ISearchSubmit &ASubmit)
 {
-	Stanza submit("iq");
-	submit.setTo(ASubmit.serviceJid.full()).setType("set").setId(FStanzaProcessor->newId());
-
-	QDomElement query = submit.addElement("query",NS_JABBER_SEARCH);
-	if (ASubmit.form.type.isEmpty())
+	if (FStanzaProcessor)
 	{
-		if (!ASubmit.item.firstName.isEmpty())
-			query.appendChild(submit.createElement("first")).appendChild(submit.createTextNode(ASubmit.item.firstName));
-		if (!ASubmit.item.lastName.isEmpty())
-			query.appendChild(submit.createElement("last")).appendChild(submit.createTextNode(ASubmit.item.lastName));
-		if (!ASubmit.item.nick.isEmpty())
-			query.appendChild(submit.createElement("nick")).appendChild(submit.createTextNode(ASubmit.item.nick));
-		if (!ASubmit.item.email.isEmpty())
-			query.appendChild(submit.createElement("email")).appendChild(submit.createTextNode(ASubmit.item.email));
-	}
-	else if (FDataForms)
-		FDataForms->xmlForm(ASubmit.form,query);
+		Stanza submit("iq");
+		submit.setTo(ASubmit.serviceJid.full()).setType("set").setId(FStanzaProcessor->newId());
 
-	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,submit,SEARCH_TIMEOUT))
-	{
-		FSubmits.append(submit.id());
-		return submit.id();
+		QDomElement query = submit.addElement("query",NS_JABBER_SEARCH);
+		if (FDataForms && !ASubmit.form.type.isEmpty())
+		{
+			FDataForms->xmlForm(ASubmit.form,query);
+		}
+		else
+		{
+			if (!ASubmit.item.firstName.isEmpty())
+				query.appendChild(submit.createElement("first")).appendChild(submit.createTextNode(ASubmit.item.firstName));
+			if (!ASubmit.item.lastName.isEmpty())
+				query.appendChild(submit.createElement("last")).appendChild(submit.createTextNode(ASubmit.item.lastName));
+			if (!ASubmit.item.nick.isEmpty())
+				query.appendChild(submit.createElement("nick")).appendChild(submit.createTextNode(ASubmit.item.nick));
+			if (!ASubmit.item.email.isEmpty())
+				query.appendChild(submit.createElement("email")).appendChild(submit.createTextNode(ASubmit.item.email));
+		}
+
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,submit,SEARCH_TIMEOUT))
+		{
+			LOG_STRM_INFO(AStreamJid,QString("Search submit sent to=%1, id=%2").arg(ASubmit.serviceJid.full(),submit.id()));
+			FSubmits.append(submit.id());
+			return submit.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send search submit to=%1").arg(ASubmit.serviceJid.full()));
+		}
 	}
 	return QString::null;
 }
