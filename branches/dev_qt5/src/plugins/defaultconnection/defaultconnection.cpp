@@ -2,6 +2,7 @@
 
 #include <QNetworkProxy>
 #include <QAuthenticator>
+#include <definitions/internalerrors.h>
 
 #define START_QUERY_ID        0
 #define STOP_QUERY_ID         -1
@@ -17,13 +18,12 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 	connect(&FDnsLookup,SIGNAL(finished()),SLOT(onDnsLookupFinished()));
 
 	FSocket.setProtocol(QSsl::AnyProtocol);
-	FSocket.setSocketOption(QAbstractSocket::KeepAliveOption, 1);
+	FSocket.setSocketOption(QAbstractSocket::KeepAliveOption,1);
 	connect(&FSocket, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
 		SLOT(onSocketProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
 	connect(&FSocket, SIGNAL(connected()), SLOT(onSocketConnected()));
 	connect(&FSocket, SIGNAL(encrypted()), SLOT(onSocketEncrypted()));
 	connect(&FSocket, SIGNAL(readyRead()), SLOT(onSocketReadyRead()));
-	connect(&FSocket, SIGNAL(modeChanged(QSslSocket::SslMode)), SIGNAL(modeChanged(QSslSocket::SslMode)));
 	connect(&FSocket, SIGNAL(error(QAbstractSocket::SocketError)), SLOT(onSocketError(QAbstractSocket::SocketError)));
 	connect(&FSocket, SIGNAL(sslErrors(const QList<QSslError> &)), SLOT(onSocketSSLErrors(const QList<QSslError> &)));
 	connect(&FSocket, SIGNAL(disconnected()), SLOT(onSocketDisconnected()));
@@ -58,10 +58,11 @@ bool DefaultConnection::connectToHost()
 		FRecords.clear();
 		FSSLError = false;
 
-		QString host = option(IDefaultConnection::COR_HOST).toString();
-		quint16 port = option(IDefaultConnection::COR_PORT).toInt();
-		QString domain = option(IDefaultConnection::COR_DOMAINE).toString();
-		FUseLegacySSL = option(IDefaultConnection::COR_USE_LEGACY_SSL).toBool();
+		QString host = option(IDefaultConnection::Host).toString();
+		quint16 port = option(IDefaultConnection::Port).toInt();
+		QString domain = option(IDefaultConnection::Domain).toString();
+		FUseLegacySSL = option(IDefaultConnection::UseLegacySsl).toBool();
+		FVerifyMode = (CertificateVerifyMode)option(IDefaultConnection::CertVerifyMode).toInt();
 
 		SrvRecord record;
 		record.target = !host.isEmpty() ? host : domain;
@@ -116,6 +117,15 @@ void DefaultConnection::disconnectFromHost()
 	}
 }
 
+void DefaultConnection::abortConnection(const XmppError &AError)
+{
+	if (!FDisconnecting && FSocket.state()!=QSslSocket::UnconnectedState)
+	{
+		emit error(AError);
+		disconnectFromHost();
+	}
+}
+
 qint64 DefaultConnection::write(const QByteArray &AData)
 {
 	return FSocket.write(AData);
@@ -129,6 +139,11 @@ QByteArray DefaultConnection::read(qint64 ABytes)
 IConnectionPlugin *DefaultConnection::ownerPlugin() const
 {
 	return FPlugin;
+}
+
+QSslCertificate DefaultConnection::hostCertificate() const
+{
+	return FSocket.peerCertificate();
 }
 
 void DefaultConnection::startClientEncryption()
@@ -145,11 +160,6 @@ void DefaultConnection::ignoreSslErrors()
 QList<QSslError> DefaultConnection::sslErrors() const
 {
 	return FSocket.sslErrors();
-}
-
-QSslCertificate DefaultConnection::peerCertificate() const
-{
-	return FSocket.peerCertificate();
 }
 
 QSsl::SslProtocol DefaultConnection::protocol() const
@@ -185,6 +195,16 @@ void DefaultConnection::setLocalCertificate(const QSslCertificate &ACertificate)
 QList<QSslCertificate> DefaultConnection::caCertificates() const
 {
 	return FSocket.caCertificates();
+}
+
+void DefaultConnection::addCaSertificates(const QList<QSslCertificate> &ACertificates)
+{
+	QList<QSslCertificate> curSerts = caCertificates();
+	foreach(const QSslCertificate &cert, ACertificates)
+	{
+		if (!cert.isNull() && !curSerts.contains(cert))
+			FSocket.addCaCertificate(cert);
+	}
 }
 
 void DefaultConnection::setCaCertificates(const QList<QSslCertificate> &ACertificates)
@@ -266,11 +286,18 @@ void DefaultConnection::onSocketConnected()
 
 void DefaultConnection::onSocketEncrypted()
 {
-	emit encrypted();
-	if (FUseLegacySSL)
+	if (FVerifyMode==IDefaultConnection::TrustedOnly && !caCertificates().contains(hostCertificate()))
 	{
-		FRecords.clear();
-		emit connected();
+		abortConnection(XmppError(IERR_DEFAULTCONNECTION_CERT_NOT_TRUSTED));
+	}
+	else
+	{
+		emit encrypted();
+		if (FUseLegacySSL)
+		{
+			FRecords.clear();
+			emit connected();
+		}
 	}
 }
 
@@ -281,8 +308,19 @@ void DefaultConnection::onSocketReadyRead()
 
 void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 {
-	FSSLError = true;
-	emit sslErrorsOccured(AErrors);
+	if (FVerifyMode == IDefaultConnection::Disabled)
+	{
+		ignoreSslErrors();
+	}
+	else if (FVerifyMode == IDefaultConnection::TrustedOnly)
+	{
+		ignoreSslErrors();
+	}
+	else
+	{
+		FSSLError = true;
+		emit sslErrorsOccured(AErrors);
+	}
 }
 
 void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
@@ -291,12 +329,12 @@ void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 	{
 		if (FSocket.state()!=QSslSocket::ConnectedState || FSSLError)
 		{
-			emit error(XmppError(IERR_CONNECTIONS_CONNECT_ERROR,FSocket.errorString()));
+			emit error(XmppError(IERR_CONNECTIONMANAGER_CONNECT_ERROR,FSocket.errorString()));
 			emit disconnected();
 		}
 		else
 		{
-			emit error(XmppError(IERR_CONNECTIONS_CONNECT_ERROR,FSocket.errorString()));
+			emit error(XmppError(IERR_CONNECTIONMANAGER_CONNECT_ERROR,FSocket.errorString()));
 		}
 	}
 	else

@@ -8,7 +8,7 @@ Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor)
 	FStanzaProcessor = AStanzaProcessor;
 
 	FOpened = false;
-	FShow = Offline;
+	FShow = IPresence::Offline;
 	FPriority = 0;
 
 	IStanzaHandle shandle;
@@ -30,7 +30,7 @@ Presence::~Presence()
 
 bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (AHandlerId == FSHIPresence)
+	if (AHandlerId==FSHIPresence && FOpened)
 	{
 		int show;
 		int priority;
@@ -39,31 +39,31 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		{
 			QString showText = AStanza.firstElement("show").text();
 			if (showText.isEmpty())
-				show = Online;
+				show = IPresence::Online;
 			else if (showText == "chat")
-				show = Chat;
+				show = IPresence::Chat;
 			else if (showText == "away")
-				show = Away;
+				show = IPresence::Away;
 			else if (showText == "dnd")
-				show = DoNotDisturb;
+				show = IPresence::DoNotDisturb;
 			else if (showText == "xa")
-				show = ExtendedAway;
+				show = IPresence::ExtendedAway;
 			else
-				show = Online;
+				show = IPresence::Online;
 
 			status = AStanza.firstElement("status").text();
 			priority = AStanza.firstElement("priority").text().toInt();
 		}
 		else if (AStanza.type() == "unavailable")
 		{
-			show = Offline;
+			show = IPresence::Offline;
 			status = AStanza.firstElement("status").text();
 			priority = 0;
 		}
 		else if (AStanza.type() == "error")
 		{
 			XmppStanzaError err(AStanza);
-			show = Error;
+			show = IPresence::Error;
 			status = err.errorMessage();
 			priority = 0;
 		}
@@ -88,7 +88,7 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			if (pitem != before)
 				emit itemReceived(pitem,before);
 
-			if (show == Offline)
+			if (show == IPresence::Offline)
 				FItems.remove(fromJid);
 		}
 		else if (show!=IPresence::Offline && (FShow != show || FStatus != status || FPriority != priority))
@@ -150,30 +150,30 @@ bool Presence::setPriority(int APriority)
 
 bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 {
-	if (FXmppStream->isOpen() && AShow != Error)
+	if (FXmppStream->isOpen() && AShow!=IPresence::Error)
 	{
 		QString show;
 		switch (AShow)
 		{
-		case Online:
+		case IPresence::Online:
 			show = QString::null;
 			break;
-		case Chat:
+		case IPresence::Chat:
 			show = "chat";
 			break;
-		case Away:
+		case IPresence::Away:
 			show = "away";
 			break;
-		case DoNotDisturb:
+		case IPresence::DoNotDisturb:
 			show = "dnd";
 			break;
-		case ExtendedAway:
+		case IPresence::ExtendedAway:
 			show = "xa";
 			break;
-		case Invisible:
+		case IPresence::Invisible:
 			show = QString::null;
 			break;
-		case Offline:
+		case IPresence::Offline:
 			show = QString::null;
 			break;
 		default:
@@ -181,11 +181,11 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 		}
 
 		Stanza pres("presence");
-		if (AShow == Invisible)
+		if (AShow == IPresence::Invisible)
 		{
 			pres.setType("invisible");
 		}
-		else if (AShow == Offline)
+		else if (AShow == IPresence::Offline)
 		{
 			pres.setType("unavailable");
 		}
@@ -199,7 +199,7 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 		if (!AStatus.isEmpty())
 			pres.addElement("status").appendChild(pres.createTextNode(AStatus));
 
-		if (FOpened && AShow==Offline)
+		if (FOpened && AShow==IPresence::Offline)
 			emit aboutToClose(AShow, AStatus);
 
 		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), pres))
@@ -207,7 +207,8 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 			FShow = AShow;
 			FStatus = AStatus;
 			FPriority = APriority;
-			if (!FOpened && AShow!=Offline)
+
+			if (!FOpened && AShow!=IPresence::Offline)
 			{
 				FOpened = true;
 				emit opened();
@@ -215,27 +216,30 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 
 			emit changed(FShow,FStatus,FPriority);
 
-			if (FOpened && AShow==Offline)
+			if (FOpened && AShow==IPresence::Offline)
 			{
-				clearItems();
 				FOpened = false;
+				clearItems();
 				emit closed();
 			}
+
 			return true;
 		}
 	}
-	else if (AShow == Offline || AShow == Error)
+	else if (AShow==IPresence::Offline || AShow==IPresence::Error)
 	{
 		FShow = AShow;
 		FStatus = AStatus;
 		FPriority = 0;
+
 		if (FOpened)
 		{
 			emit aboutToClose(AShow,AStatus);
-			clearItems();
 			FOpened = false;
+			clearItems();
 			emit closed();
 		}
+
 		emit changed(FShow,FStatus,FPriority);
 		return true;
 	}
@@ -249,25 +253,25 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 		QString show;
 		switch (AShow)
 		{
-		case Online:
+		case IPresence::Online:
 			show = QString::null;
 			break;
-		case Chat:
+		case IPresence::Chat:
 			show = "chat";
 			break;
-		case Away:
+		case IPresence::Away:
 			show = "away";
 			break;
-		case DoNotDisturb:
+		case IPresence::DoNotDisturb:
 			show = "dnd";
 			break;
-		case ExtendedAway:
+		case IPresence::ExtendedAway:
 			show = "xa";
 			break;
-		case Invisible:
+		case IPresence::Invisible:
 			show = QString::null;
 			break;
-		case Offline:
+		case IPresence::Offline:
 			show = QString::null;
 			break;
 		default:
@@ -276,11 +280,11 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 
 		Stanza pres("presence");
 		pres.setTo(AContactJid.full());
-		if (AShow == Invisible)
+		if (AShow == IPresence::Invisible)
 		{
 			pres.setType("invisible");
 		}
-		else if (AShow == Offline)
+		else if (AShow == IPresence::Offline)
 		{
 			pres.setType("unavailable");
 		}
@@ -326,7 +330,7 @@ void Presence::clearItems()
 	for (QHash<Jid, IPresenceItem>::iterator it=FItems.begin(); it!=FItems.end(); it = FItems.erase(it))
 	{
 		IPresenceItem before = it.value();
-		it->show = Offline;
+		it->show = IPresence::Offline;
 		it->priority = 0;
 		it->status = QString::null;
 		emit itemReceived(it.value(),before);
@@ -335,11 +339,11 @@ void Presence::clearItems()
 
 void Presence::onStreamError(const XmppError &AError)
 {
-	setPresence(Error,AError.errorMessage(),0);
+	setPresence(IPresence::Error,AError.errorMessage(),0);
 }
 
 void Presence::onStreamClosed()
 {
 	if (isOpen())
-		setPresence(Offline,tr("XMPP stream closed unexpectedly"),0);
+		setPresence(IPresence::Offline,tr("XMPP stream closed unexpectedly"),0);
 }

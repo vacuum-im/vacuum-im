@@ -9,14 +9,18 @@
 #include <QTextDocument>
 #include <QTableWidgetItem>
 
-#define TIR_STATUSID    Qt::UserRole
-#define TIR_DELEGATE    Qt::UserRole + 1
-#define TIR_VALUE       Qt::UserRole + 2
+enum {
+	TIR_STATUSID = Qt::UserRole,
+	TIR_DELEGATE,
+	TIR_VALUE
+};
 
-#define COL_SHOW        0
-#define COL_NAME        1
-#define COL_MESSAGE     2
-#define COL_PRIORITY    3
+enum {
+	COL_SHOW,
+	COL_NAME,
+	COL_MESSAGE,
+	COL_PRIORITY,
+};
 
 Delegate::Delegate(IStatusChanger *AStatusChanger, QObject *AParent) : QStyledItemDelegate(AParent)
 {
@@ -29,25 +33,25 @@ QWidget *Delegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AO
 	switch (type)
 	{
 	case DelegateShow:
-	{
-		QComboBox *comboBox = new QComboBox(AParent);
-		comboBox->addItem(FStatusChanger->iconByShow(IPresence::Online),FStatusChanger->nameByShow(IPresence::Online),IPresence::Online);
-		comboBox->addItem(FStatusChanger->iconByShow(IPresence::Chat),FStatusChanger->nameByShow(IPresence::Chat),IPresence::Chat);
-		comboBox->addItem(FStatusChanger->iconByShow(IPresence::Away),FStatusChanger->nameByShow(IPresence::Away),IPresence::Away);
-		comboBox->addItem(FStatusChanger->iconByShow(IPresence::DoNotDisturb),FStatusChanger->nameByShow(IPresence::DoNotDisturb),IPresence::DoNotDisturb);
-		comboBox->addItem(FStatusChanger->iconByShow(IPresence::ExtendedAway),FStatusChanger->nameByShow(IPresence::ExtendedAway),IPresence::ExtendedAway);
-		comboBox->addItem(FStatusChanger->iconByShow(IPresence::Invisible),FStatusChanger->nameByShow(IPresence::Invisible),IPresence::Invisible);
-		comboBox->addItem(FStatusChanger->iconByShow(IPresence::Offline),FStatusChanger->nameByShow(IPresence::Offline),IPresence::Offline);
-		comboBox->setEditable(false);
-		return comboBox;
-	}
+		{
+			QComboBox *comboBox = new QComboBox(AParent);
+			comboBox->addItem(FStatusChanger->iconByShow(IPresence::Online),FStatusChanger->nameByShow(IPresence::Online),IPresence::Online);
+			comboBox->addItem(FStatusChanger->iconByShow(IPresence::Chat),FStatusChanger->nameByShow(IPresence::Chat),IPresence::Chat);
+			comboBox->addItem(FStatusChanger->iconByShow(IPresence::Away),FStatusChanger->nameByShow(IPresence::Away),IPresence::Away);
+			comboBox->addItem(FStatusChanger->iconByShow(IPresence::DoNotDisturb),FStatusChanger->nameByShow(IPresence::DoNotDisturb),IPresence::DoNotDisturb);
+			comboBox->addItem(FStatusChanger->iconByShow(IPresence::ExtendedAway),FStatusChanger->nameByShow(IPresence::ExtendedAway),IPresence::ExtendedAway);
+			comboBox->addItem(FStatusChanger->iconByShow(IPresence::Invisible),FStatusChanger->nameByShow(IPresence::Invisible),IPresence::Invisible);
+			comboBox->addItem(FStatusChanger->iconByShow(IPresence::Offline),FStatusChanger->nameByShow(IPresence::Offline),IPresence::Offline);
+			comboBox->setEditable(false);
+			return comboBox;
+		}
 	case DelegatePriority:
-	{
-		QSpinBox *spinBox = new QSpinBox(AParent);
-		spinBox->setMinimum(-128);
-		spinBox->setMaximum(128);
-		return spinBox;
-	}
+		{
+			QSpinBox *spinBox = new QSpinBox(AParent);
+			spinBox->setMinimum(-128);
+			spinBox->setMaximum(128);
+			return spinBox;
+		}
 	default:
 		return QStyledItemDelegate::createEditor(AParent,AOption,AIndex);
 	}
@@ -59,22 +63,22 @@ void Delegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex) const
 	switch (type)
 	{
 	case DelegateShow:
-	{
-		QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-		if (comboBox)
 		{
-			int show = AIndex.data(TIR_VALUE).toInt();
-			comboBox->setCurrentIndex(comboBox->findData(show));
+			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
+			if (comboBox)
+			{
+				int show = AIndex.data(TIR_VALUE).toInt();
+				comboBox->setCurrentIndex(comboBox->findData(show));
+			}
+			break;
 		}
-		break;
-	}
 	case DelegatePriority:
-	{
-		QSpinBox *spinBox = qobject_cast<QSpinBox *>(AEditor);
-		if (spinBox)
-			spinBox->setValue(AIndex.data(TIR_VALUE).toInt());
-		break;
-	}
+		{
+			QSpinBox *spinBox = qobject_cast<QSpinBox *>(AEditor);
+			if (spinBox)
+				spinBox->setValue(AIndex.data(TIR_VALUE).toInt());
+			break;
+		}
 	default:
 		QStyledItemDelegate::setEditorData(AEditor,AIndex);
 	}
@@ -89,37 +93,39 @@ void Delegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const 
 	case DelegateName:
 		allowEmptyText = false;
 	case DelegateMessage:
-	{
-		QLineEdit *lineEdit = qobject_cast<QLineEdit *>(AEditor);
-		if (lineEdit && (allowEmptyText || !lineEdit->text().trimmed().isEmpty()))
 		{
-			AModel->setData(AIndex, lineEdit->text(), Qt::DisplayRole);
-			AModel->setData(AIndex, lineEdit->text(), TIR_VALUE);
+			QLineEdit *lineEdit = qobject_cast<QLineEdit *>(AEditor);
+			if (lineEdit && (allowEmptyText || !lineEdit->text().trimmed().isEmpty()))
+			{
+				QString data = lineEdit->text();
+				AModel->setData(AIndex,data,Qt::DisplayRole);
+				AModel->setData(AIndex,data,TIR_VALUE);
+			}
+			break;
 		}
-		break;
-	}
 	case DelegateShow:
-	{
-		QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-		if (comboBox)
 		{
-			int show = comboBox->itemData(comboBox->currentIndex()).toInt();
-			AModel->setData(AIndex, FStatusChanger->iconByShow(show), Qt::DecorationRole);
-			AModel->setData(AIndex, FStatusChanger->nameByShow(show), Qt::DisplayRole);
-			AModel->setData(AIndex, show, TIR_VALUE);
+			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
+			if (comboBox)
+			{
+				int data = comboBox->itemData(comboBox->currentIndex()).toInt();
+				AModel->setData(AIndex,FStatusChanger->iconByShow(data),Qt::DecorationRole);
+				AModel->setData(AIndex,FStatusChanger->nameByShow(data),Qt::DisplayRole);
+				AModel->setData(AIndex,data,TIR_VALUE);
+			}
+			break;
 		}
-		break;
-	}
 	case DelegatePriority:
-	{
-		QSpinBox *spinBox = qobject_cast<QSpinBox *>(AEditor);
-		if (spinBox)
 		{
-			AModel->setData(AIndex, spinBox->value(), Qt::DisplayRole);
-			AModel->setData(AIndex, spinBox->value(), TIR_VALUE);
+			QSpinBox *spinBox = qobject_cast<QSpinBox *>(AEditor);
+			if (spinBox)
+			{
+				int data = spinBox->value();
+				AModel->setData(AIndex,data,Qt::DisplayRole);
+				AModel->setData(AIndex,data,TIR_VALUE);
+			}
+			break;
 		}
-		break;
-	}
 	default:
 		QStyledItemDelegate::setModelData(AEditor,AModel,AIndex);
 	}
@@ -131,10 +137,12 @@ void Delegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem
 	switch (type)
 	{
 	case DelegateShow:
-	{
-		AEditor->setGeometry(AOption.rect);
-		break;
-	}
+		{
+			QRect rect = AOption.rect;
+			rect.setWidth(qMax(rect.width(),AEditor->sizeHint().width()));
+			AEditor->setGeometry(rect);
+			break;
+		}
 	default:
 		QStyledItemDelegate::updateEditorGeometry(AEditor,AOption,AIndex);
 	}

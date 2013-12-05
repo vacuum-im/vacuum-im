@@ -10,15 +10,36 @@
 
 static QMap<QByteArray, QByteArray> parseChallenge(const QByteArray &AChallenge)
 {
+	int startPos = 0;
+	bool quoting = false;
+	QList<QByteArray> paramsList;
+	for (int pos = 1; pos<AChallenge.size(); pos++)
+	{
+		const char c = AChallenge.at(pos);
+		if (c == '\"')
+		{
+			if (quoting && AChallenge.at(pos-1)!='\\')
+				quoting = false;
+			else if (!quoting)
+				quoting = true;
+		}
+		else if (c==',' && !quoting)
+		{
+			paramsList.append(AChallenge.mid(startPos,pos-startPos));
+			startPos=pos+1;
+		}
+	}
+
 	QMap<QByteArray, QByteArray> map;
-	QList<QByteArray> paramsList = AChallenge.split(',');
 	for (int i = 0; i<paramsList.count(); i++)
 	{
 		QByteArray param = paramsList.at(i).trimmed();
 		int delimIndex = param.indexOf('=');
+		if (delimIndex > 0)
+		{
 		QByteArray key = param.left(delimIndex);
 		QByteArray value = param.right(param.length()-delimIndex-1);
-		if (value.startsWith('"'))
+			if (value.startsWith('"') && value.endsWith('"'))
 		{
 			value.remove(0,1).chop(1);
 			value.replace("\\\"", "\"");
@@ -26,6 +47,8 @@ static QMap<QByteArray, QByteArray> parseChallenge(const QByteArray &AChallenge)
 		}
 		map.insert(key,value);
 	}
+	}
+
 	return map;
 }
 
@@ -77,9 +100,9 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 
 				QMap<QByteArray, QByteArray> responseMap;
 				QByteArray randBytes(32,' ');
-				for (int i=0; i<31; i++)
+				for (int i=0; i<randBytes.size(); i++)
 					randBytes[i] = (char) (256.0 * qrand() / (RAND_MAX + 1.0));
-				responseMap["cnonce"] = randBytes.toBase64();
+				responseMap["cnonce"] = randBytes.toHex();
 				if (challengeMap.contains("realm"))
 					responseMap["realm"] = challengeMap.value("realm");
 				else
@@ -87,7 +110,7 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 				responseMap["username"] = FXmppStream->streamJid().pNode().toUtf8();
 				responseMap["nonce"] = challengeMap.value("nonce");
 				responseMap["nc"] = "00000001";
-				responseMap["qop"] = challengeMap.value("qop");
+				responseMap["qop"] = "auth";
 				responseMap["digest-uri"] = QString("xmpp/%1").arg(FXmppStream->streamJid().pDomain()).toUtf8();
 				responseMap["charset"] = "utf-8";
 				responseMap["response"] = getResponseValue(responseMap,FXmppStream->getSessionPassword());

@@ -20,4 +20,7 @@
 //Privacy label
 #define RTTO_PRIVACYLISTS                           100
 
+//Connection Encrypted
+#define RTTO_CONNECTIONMANAGER_HOSTCERT             500
+
 #endif // DEF_ROSTERTOOLTIPORDERS_H

@@ -124,15 +124,14 @@ QTextDocumentFragment SimpleMessageStyle::textFragmentAt(QWidget *AWidget, const
 	return QTextDocumentFragment();
 }
 
-
-bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
+bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear)
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
 	{
 		if (!FWidgetStatus.contains(view))
 		{
-			AClean = true;
+			AClear = true;
 			FWidgetStatus[view].scrollStarted = false;
 			view->installEventFilter(this);
 			connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onStyleWidgetLinkClicked(const QUrl &)));
@@ -144,7 +143,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 			FWidgetStatus[view].lastKind = -1;
 		}
 
-		if (AClean)
+		if (AClear)
 		{
 			WidgetStatus &wstatus = FWidgetStatus[view];
 			wstatus.lastKind = -1;
@@ -172,7 +171,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 		view->document()->setDefaultFont(font);
 		view->setAnimated(!AOptions.extended.value(MSO_ANIMATION_DISABLED).toBool());
 
-		emit optionsChanged(AWidget,AOptions,AClean);
+		emit optionsChanged(AWidget,AOptions,AClear);
 		return true;
 	}
 	return false;

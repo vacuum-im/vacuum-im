@@ -433,6 +433,7 @@ IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, con
 
 			FWindows.append(window);
 			updateWindow(window);
+			setMessageStyle(window);
 		}
 		else
 		{
@@ -669,7 +670,7 @@ void NormalMessageHandler::removeNotifiedMessages(IMessageNormalWindow *AWindow,
 void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 {
 	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
-	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
+	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,false))
 	{
 		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
 		AWindow->viewWidget()->setMessageStyle(style,soptions);
@@ -698,7 +699,7 @@ void NormalMessageHandler::showStyledMessage(IMessageNormalWindow *AWindow, cons
 	AWindow->setSubject(AMessage.subject());
 	AWindow->setThreadId(AMessage.threadId());
 
-	setMessageStyle(AWindow);
+	AWindow->viewWidget()->clearContent();
 
 	if (AMessage.type() == Message::Error)
 	{

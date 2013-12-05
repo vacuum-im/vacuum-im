@@ -23,6 +23,54 @@
         <source>Connection error</source>
         <translation>Помилка підключення</translation>
     </message>
+    <message>
+        <source>Name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Certificate holder:&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Certificate issuer:&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Certificate details:&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Effective from: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expired at: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Serial number: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
