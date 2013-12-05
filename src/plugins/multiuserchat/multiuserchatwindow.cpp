@@ -895,6 +895,10 @@ void MultiUserChatWindow::createMessageWidgets()
 		ui.wdtView->layout()->setMargin(0);
 		FViewWidget = FMessageWidgets->newViewWidget(this,ui.wdtView);
 		ui.wdtView->layout()->addWidget(FViewWidget->instance());
+		connect(FViewWidget->instance(),SIGNAL(contentAppended(const QString &, const IMessageContentOptions &)),
+			SLOT(onMultiChatContentAppended(const QString &, const IMessageContentOptions &)));
+		connect(FViewWidget->instance(),SIGNAL(messageStyleOptionsChanged(const IMessageStyleOptions &, bool)),
+			SLOT(onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &, bool)));
 		FWindowStatus[FViewWidget].createTime = QDateTime::currentDateTime();
 
 		ui.wdtEdit->setLayout(new QVBoxLayout);
@@ -1512,6 +1516,10 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 				connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onPrivateChatWindowDestroyed()));
 				connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onPrivateChatContextMenuRequested(Menu *)));
 				connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onPrivateChatToolTipsRequested(QMap<int,QString> &)));
+				connect(window->viewWidget()->instance(),SIGNAL(contentAppended(const QString &, const IMessageContentOptions &)),
+					SLOT(onPrivateChatContentAppended(const QString &, const IMessageContentOptions &)));
+				connect(window->viewWidget()->instance(),SIGNAL(messageStyleOptionsChanged(const IMessageStyleOptions &, bool)),
+					SLOT(onPrivateChatMessageStyleOptionsChanged(const IMessageStyleOptions &, bool)));
 				connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onPrivateChatNotifierActiveNotifyChanged(int)));
 
 				FChatWindows.append(window);
@@ -2194,6 +2202,29 @@ void MultiUserChatWindow::onMultiChatUserItemDoubleClicked(const QModelIndex &AI
 		openChatWindow(user->contactJid());
 }
 
+void MultiUserChatWindow::onMultiChatContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions)
+{
+	IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
+	if (widget==FViewWidget && FHistoryRequests.values().contains(NULL))
+	{
+		WindowContent content;
+		content.html = AHtml;
+		content.options = AOptions;
+		FPendingContent[NULL].append(content);
+	}
+}
+
+void MultiUserChatWindow::onMultiChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared)
+{
+	Q_UNUSED(AOptions);
+	if (ACleared)
+	{
+		IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
+		if (widget==FViewWidget)
+			FWindowStatus[FViewWidget].lastDateSeparator = QDate();
+	}
+}
+
 void MultiUserChatWindow::onMultiChatWindowActivated()
 {
 	removeMultiChatActiveMessages();
@@ -2245,6 +2276,7 @@ void MultiUserChatWindow::onPrivateChatWindowDestroyed()
 		FChatWindows.removeAt(FChatWindows.indexOf(window));
 		FWindowStatus.remove(window->viewWidget());
 		FPendingMessages.remove(window);
+		FPendingContent.remove(window);
 		FHistoryRequests.remove(FHistoryRequests.key(window));
 		emit privateChatWindowDestroyed(window);
 	}
@@ -2255,14 +2287,7 @@ void MultiUserChatWindow::onPrivateChatClearWindowActionTriggered(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	IMessageChatWindow *window = action!=NULL ? qobject_cast<IMessageChatWindow *>(action->parent()) : NULL;
 	if (window)
-	{
-		IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
-		if (style!=NULL)
-		{
-			IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-			style->changeOptions(window->viewWidget()->styleWidget(),soptions,true);
-		}
-	}
+		window->viewWidget()->clearContent();
 }
 
 void MultiUserChatWindow::onPrivateChatContextMenuRequested(Menu *AMenu)
@@ -2290,6 +2315,31 @@ void MultiUserChatWindow::onPrivateChatNotifierActiveNotifyChanged(int ANotifyId
 		updatePrivateChatWindow(window);
 }
 
+void MultiUserChatWindow::onPrivateChatContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions)
+{
+	IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
+	IMessageChatWindow *window = widget!=NULL ? qobject_cast<IMessageChatWindow *>(widget->messageWindow()->instance()) : NULL;
+	if (window && FHistoryRequests.values().contains(window))
+	{
+		WindowContent content;
+		content.html = AHtml;
+		content.options = AOptions;
+		FPendingContent[window].append(content);
+	}
+}
+
+void MultiUserChatWindow::onPrivateChatMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared)
+{
+	Q_UNUSED(AOptions);
+	if (ACleared)
+	{
+		IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
+		IMessageChatWindow *window = widget!=NULL ? qobject_cast<IMessageChatWindow *>(widget->messageWindow()->instance()) : NULL;
+		if (window)
+			FWindowStatus[widget].lastDateSeparator = QDate();
+	}
+}
+
 void MultiUserChatWindow::onRoomActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
@@ -2312,7 +2362,7 @@ void MultiUserChatWindow::onRoomActionTriggered(bool)
 	}
 	else if (action == FClearChat)
 	{
-		setMultiChatMessageStyle();
+		FViewWidget->clearContent();
 	}
 	else if (action == FEnterRoom)
 	{
@@ -2475,9 +2525,9 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
 
 		if (window)
-			setPrivateChatMessageStyle(window);
+			window->viewWidget()->clearContent();
 		else
-			setMultiChatMessageStyle();
+			FViewWidget->clearContent();
 
 		int messageItEnd = 0;
 		QList<Message> pendingMessages = FPendingMessages.take(window);
@@ -2517,12 +2567,18 @@ void MultiUserChatWindow::onArchiveMessagesLoaded(const QString &AId, const IArc
 		if (!window && !FMultiChat->subject().isEmpty())
 			showMultiChatTopic(FMultiChat->subject());
 
-		foreach(const Message &message, pendingMessages)
+		foreach(const WindowContent &content, FPendingContent.take(window))
 		{
 			if (window)
-				showPrivateChatMessage(window,message);
+			{
+				showDateSeparator(window->viewWidget(),content.options.time);
+				window->viewWidget()->appendHtml(content.html,content.options);
+			}
 			else
-				showMultiChatUserMessage(message,Jid(message.from()).resource());
+			{
+				showDateSeparator(FViewWidget,content.options.time);
+				FViewWidget->appendHtml(content.html,content.options);
+			}
 		}
 
 		WindowStatus &wstatus = FWindowStatus[window!=NULL ? window->viewWidget() : FViewWidget];
@@ -2540,6 +2596,7 @@ void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const XmppE
 		else
 			showMultiChatStatusMessage(tr("Failed to load history: %1").arg(AError.errorMessage()),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
 		FPendingMessages.remove(window);
+		FPendingContent.remove(window);
 	}
 }
 

@@ -41,6 +41,25 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="grbReplication">
+     <property name="title">
+      <string>Replication Preferences</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="margin">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QCheckBox" name="chbReplicate">
+        <property name="text">
+         <string>Synchronize history between archives</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="grbMethod">
      <property name="title">
       <string>Archiving Policy</string>

@@ -2,13 +2,6 @@
 #define CONNECTIONMANAGER_H
 
 #include <QComboBox>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
@@ -16,8 +9,6 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/widgetmanager.h>
-#include <utils/xmpperror.h>
 #include "editproxydialog.h"
 #include "proxysettingswidget.h"
 #include "connectionoptionswidget.h"
@@ -57,6 +48,8 @@ public:
 	virtual IOptionsWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent);
 	virtual void saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);
 	virtual QUuid loadProxySettings(const OptionsNode &ANode) const;
+	virtual QList<QSslCertificate> trustedCaCertificates(bool AWithUsers=true) const;
+	virtual void addTrustedCaCertificate(const QSslCertificate &ACertificate);
 signals:
 	void connectionCreated(IConnection *AConnection);
 	void connectionDestroyed(IConnection *AConnection);
@@ -66,14 +59,21 @@ signals:
 protected:
 	void updateAccountConnection(IAccount *AAccount) const;
 	void updateConnectionSettings(IAccount *AAccount = NULL) const;
+	IXmppStream *findConnectionStream(IConnection *AConnection) const;
 protected slots:
-	void onAccountShown(IAccount *AAccount);
-	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onConnectionEncrypted();
+	void onConnectionDisconnected();
+	void onConnectionCreated(IConnection *AConnection);
+	void onConnectionDestroyed(IConnection *AConnection);
+protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
+	void onAccountShown(IAccount *AAccount);
+	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 private:
+	IPluginManager *FPluginManager;
+	IXmppStreams *FXmppStreams;
 	IAccountManager *FAccountManager;
 	IOptionsManager *FOptionsManager;
 	IRostersViewPlugin *FRostersViewPlugin;

@@ -270,6 +270,14 @@
         <source>Duplicate messages in local archive (not recommended)</source>
         <translation>Duplicate messages in local archive (not recommended)</translation>
     </message>
+    <message>
+        <source>Replication Preferences</source>
+        <translation>Replication Preferences</translation>
+    </message>
+    <message>
+        <source>Synchronize history between archives</source>
+        <translation>Synchronize history between archives</translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>

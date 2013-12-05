@@ -46,6 +46,7 @@
 #include "chatwindowmenu.h"
 #include "archiveviewwindow.h"
 #include "archiveenginesoptions.h"
+#include "archivereplicator.h"
 
 struct StanzaSession {
 	QString sessionId;
@@ -117,16 +118,17 @@ public:
 	virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
 	//IMessageArchiver
 	virtual bool isReady(const Jid &AStreamJid) const;
-	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
+	virtual QString archiveDirPath(const Jid &AStreamJid = Jid::null) const;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const;
-	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const;
-	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const;
 	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null);
   //Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const;
+	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
+	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const;
-	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto);
+	virtual bool isArchiveAutoSave(const Jid &AStreamJid) const;
+	virtual QString setArchiveAutoSave(const Jid &AStreamJid, bool AAuto, bool AGlobal=true);
 	virtual QString setArchivePrefs(const Jid &AStreamJid, const IArchiveStreamPrefs &APrefs);
 	virtual QString removeArchiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid);
 	virtual QString removeArchiveSessionPrefs(const Jid &AStreamJid, const QString &AThreadId);
@@ -169,8 +171,7 @@ signals:
 	void archiveEngineRegistered(IArchiveEngine *AEngine);
 	void archiveEngineEnableChanged(const QUuid &AId, bool AEnabled);
 protected:
-	QString archiveStreamDirPath(const Jid &AStreamJid) const;
-	QString archiveStreamFilePath(const Jid &AStreamJid, const QString &AFileName) const;
+	QString archiveFilePath(const Jid &AStreamJid, const QString &AFileName) const;
 protected:
 	QString loadServerPrefs(const Jid &AStreamJid);
 	QString loadStoragePrefs(const Jid &AStreamJid);
@@ -218,6 +219,7 @@ protected slots:
 protected slots:
 	void onStreamOpened(IXmppStream *AXmppStream);
 	void onStreamClosed(IXmppStream *AXmppStream);
+	void onStreamAboutToClose(IXmppStream *AXmppStream);
 	void onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -267,6 +269,7 @@ private:
 	QMap<QString,CollectionRequest> FCollectionRequests;
 	QMap<QString,MessagesRequest> FMesssagesRequests;
 private:
+	mutable QString FArchiveDirPath;
 	QList<Jid> FInStoragePrefs;
 	QMap<Jid,QString> FNamespaces;
 	QMap<Jid,QList<QString> > FFeatures;
@@ -276,6 +279,7 @@ private:
 	QMap<QString,QString> FRestoreRequests;
 	QMap<Jid,QMap<Jid,StanzaSession> > FSessions;
 private:
+	QMap<Jid, ArchiveReplicator *> FReplicators;
 	QMap<QUuid,IArchiveEngine *> FArchiveEngines;
 	QMultiMap<int,IArchiveHandler *> FArchiveHandlers;
 };

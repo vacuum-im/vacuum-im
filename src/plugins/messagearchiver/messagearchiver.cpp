@@ -3,38 +3,38 @@
 #include <QDir>
 #include <QFile>
 
-#define ARCHIVE_TIMEOUT       30000
-#define ARCHIVE_DIR_NAME      "archive"
-#define PENDING_FILE_NAME     "pending.xml"
-#define SESSIONS_FILE_NAME    "sessions.xml"
+#define ARCHIVE_DIR_NAME           "archive"
+#define PENDING_FILE_NAME          "pending.xml"
+#define SESSIONS_FILE_NAME         "sessions.xml"
+#define ARCHIVE_REQUEST_TIMEOUT    30000
 
-#define SHC_MESSAGE_BODY      "/message/body"
-#define SHC_PREFS             "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE"]"
-#define SHC_PREFS_OLD         "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE_OLD"]"
+#define SHC_MESSAGE_BODY           "/message/body"
+#define SHC_PREFS                  "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE"]"
+#define SHC_PREFS_OLD              "/iq[@type='set']/pref[@xmlns="NS_ARCHIVE_OLD"]"
 
-#define ADR_STREAM_JID        Action::DR_StreamJid
-#define ADR_CONTACT_JID       Action::DR_Parametr1
-#define ADR_ITEM_SAVE         Action::DR_Parametr2
-#define ADR_ITEM_OTR          Action::DR_Parametr3
-#define ADR_METHOD_LOCAL      Action::DR_Parametr1
-#define ADR_METHOD_AUTO       Action::DR_Parametr2
-#define ADR_METHOD_MANUAL     Action::DR_Parametr3
-#define ADR_FILTER_START      Action::DR_Parametr2
-#define ADR_FILTER_END        Action::DR_Parametr3
-#define ADR_GROUP_KIND        Action::DR_Parametr4
+#define ADR_STREAM_JID             Action::DR_StreamJid
+#define ADR_CONTACT_JID            Action::DR_Parametr1
+#define ADR_ITEM_SAVE              Action::DR_Parametr2
+#define ADR_ITEM_OTR               Action::DR_Parametr3
+#define ADR_METHOD_LOCAL           Action::DR_Parametr1
+#define ADR_METHOD_AUTO            Action::DR_Parametr2
+#define ADR_METHOD_MANUAL          Action::DR_Parametr3
+#define ADR_FILTER_START           Action::DR_Parametr2
+#define ADR_FILTER_END             Action::DR_Parametr3
+#define ADR_GROUP_KIND             Action::DR_Parametr4
 
-#define SFP_LOGGING           "logging"
-#define SFV_MAY_LOGGING       "may"
-#define SFV_MUSTNOT_LOGGING   "mustnot"
+#define SFP_LOGGING                "logging"
+#define SFV_MAY_LOGGING            "may"
+#define SFV_MUSTNOT_LOGGING        "mustnot"
 
-#define PST_ARCHIVE_PREFS     "pref"
-#define PSN_ARCHIVE_PREFS     NS_ARCHIVE
+#define PST_ARCHIVE_PREFS          "pref"
+#define PSN_ARCHIVE_PREFS          NS_ARCHIVE
 
-#define NS_ARCHIVE_OLD        "http://www.xmpp.org/extensions/xep-0136.html#ns"
-#define NS_ARCHIVE_OLD_AUTO   "http://www.xmpp.org/extensions/xep-0136.html#ns-auto"
-#define NS_ARCHIVE_OLD_MANAGE "http://www.xmpp.org/extensions/xep-0136.html#ns-manage"
-#define NS_ARCHIVE_OLD_MANUAL "http://www.xmpp.org/extensions/xep-0136.html#ns-manual"
-#define NS_ARCHIVE_OLD_PREF   "http://www.xmpp.org/extensions/xep-0136.html#ns-pref"
+#define NS_ARCHIVE_OLD             "http://www.xmpp.org/extensions/xep-0136.html#ns"
+#define NS_ARCHIVE_OLD_AUTO        "http://www.xmpp.org/extensions/xep-0136.html#ns-auto"
+#define NS_ARCHIVE_OLD_MANAGE      "http://www.xmpp.org/extensions/xep-0136.html#ns-manage"
+#define NS_ARCHIVE_OLD_MANUAL      "http://www.xmpp.org/extensions/xep-0136.html#ns-manual"
+#define NS_ARCHIVE_OLD_PREF        "http://www.xmpp.org/extensions/xep-0136.html#ns-pref"
 
 MessageArchiver::MessageArchiver()
 {
@@ -82,6 +82,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		{
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(aboutToClose(IXmppStream *)),SLOT(onStreamAboutToClose(IXmppStream *)));
 		}
 	}
 
@@ -225,10 +226,12 @@ bool MessageArchiver::initObjects()
 
 bool MessageArchiver::initSettings()
 {
-	Options::setDefaultValue(OPV_ACCOUNT_HISTORYREPLICATION,false);
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_ENABLED,true);
-	Options::setDefaultValue(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE,10);
+	Options::setDefaultValue(OPV_HISTORY_ENGINE_REPLICATEAPPEND,true);
+	Options::setDefaultValue(OPV_HISTORY_ENGINE_REPLICATEREMOVE,true);
+	Options::setDefaultValue(OPV_HISTORY_STREAM_REPLICATE,false);
 	Options::setDefaultValue(OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING,false);
+	Options::setDefaultValue(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE,10);
 
 	if (FOptionsManager)
 	{
@@ -579,29 +582,28 @@ bool MessageArchiver::isReady(const Jid &AStreamJid) const
 	return FArchivePrefs.contains(AStreamJid);
 }
 
-bool MessageArchiver::isArchivePrefsEnabled(const Jid &AStreamJid) const
+QString MessageArchiver::archiveDirPath(const Jid &AStreamJid) const
 {
-	return isReady(AStreamJid) && (isSupported(AStreamJid,NS_ARCHIVE_PREF) || !isArchiveAutoSave(AStreamJid));
+	if (FArchiveDirPath.isEmpty())
+	{
+		QDir dir(FPluginManager->homePath());
+		dir.mkdir(ARCHIVE_DIR_NAME);
+		FArchiveDirPath = dir.cd(ARCHIVE_DIR_NAME) ? dir.absolutePath() : QString::null;
+	}
+	if (AStreamJid.isValid() && !FArchiveDirPath.isEmpty())
+	{
+		QString streamDir = Jid::encode(AStreamJid.pBare());
+
+		QDir dir(FArchiveDirPath);
+		dir.mkdir(streamDir);
+		return dir.cd(streamDir) ? dir.absolutePath() : QString::null;
+	}
+	return FArchiveDirPath;
 }
 
 bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const
 {
 	return isReady(AStreamJid) && FFeatures.value(AStreamJid).contains(AFeatureNS);
-}
-
-bool MessageArchiver::isArchiveAutoSave(const Jid &AStreamJid) const
-{
-	return isSupported(AStreamJid,NS_ARCHIVE_AUTO) && archivePrefs(AStreamJid).autoSave;
-}
-
-bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const
-{
-	if (isReady(AStreamJid) && AItemJid.isValid())
-	{
-		IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid, AItemJid, AThreadId);
-		return itemPrefs.save != ARCHIVE_SAVE_FALSE;
-	}
-	return false;
 }
 
 QWidget *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid)
@@ -620,6 +622,21 @@ QWidget *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const Jid &AC
 QString MessageArchiver::prefsNamespace(const Jid &AStreamJid) const
 {
 	return FNamespaces.value(AStreamJid);
+}
+
+bool MessageArchiver::isArchivePrefsEnabled(const Jid &AStreamJid) const
+{
+	return isReady(AStreamJid) && (isSupported(AStreamJid,NS_ARCHIVE_PREF) || !isArchiveAutoSave(AStreamJid));
+}
+
+bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const
+{
+	if (isReady(AStreamJid) && AItemJid.isValid())
+	{
+		IArchiveItemPrefs itemPrefs = archiveItemPrefs(AStreamJid, AItemJid, AThreadId);
+		return itemPrefs.save != ARCHIVE_SAVE_FALSE;
+	}
+	return false;
 }
 
 IArchiveStreamPrefs MessageArchiver::archivePrefs(const Jid &AStreamJid) const
@@ -688,7 +705,12 @@ IArchiveItemPrefs MessageArchiver::archiveItemPrefs(const Jid &AStreamJid, const
 	return itemPrefs;
 }
 
-QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
+bool MessageArchiver::isArchiveAutoSave(const Jid &AStreamJid) const
+{
+	return isSupported(AStreamJid,NS_ARCHIVE_AUTO) && archivePrefs(AStreamJid).autoSave;
+}
+
+QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto, bool AGlobal)
 {
 	if (isSupported(AStreamJid,NS_ARCHIVE_AUTO))
 	{
@@ -696,7 +718,8 @@ QString MessageArchiver::setArchiveAutoSave(const Jid &AStreamJid, bool AAuto)
 		autoSave.setType("set").setId(FStanzaProcessor->newId());
 		QDomElement autoElem = autoSave.addElement("auto",FNamespaces.value(AStreamJid));
 		autoElem.setAttribute("save",QVariant(AAuto).toString());
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,autoSave,ARCHIVE_TIMEOUT))
+		autoElem.setAttribute("scope",AGlobal ? ARCHIVE_SCOPE_GLOBAL : ARCHIVE_SCOPE_STREAM);
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,autoSave,ARCHIVE_REQUEST_TIMEOUT))
 		{
 			FPrefsAutoRequests.insert(autoSave.id(),AAuto);
 			return autoSave.id();
@@ -832,7 +855,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 			QString requestId;
 			if (storage)
 				requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString::null;
-			else if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_TIMEOUT))
+			else if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_REQUEST_TIMEOUT))
 				requestId = save.id();
 			if (!requestId.isEmpty())
 			{
@@ -854,7 +877,7 @@ QString MessageArchiver::removeArchiveItemPrefs(const Jid &AStreamJid, const Jid
 			remove.setType("set").setId(FStanzaProcessor->newId());
 			QDomElement itemElem = remove.addElement("itemremove",FNamespaces.value(AStreamJid)).appendChild(remove.createElement("item")).toElement();
 			itemElem.setAttribute("jid",AItemJid.full());
-			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,ARCHIVE_REQUEST_TIMEOUT))
 			{
 				FPrefsRemoveItemRequests.insert(remove.id(),AItemJid);
 				return remove.id();
@@ -881,7 +904,7 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 			remove.setType("set").setId(FStanzaProcessor->newId());
 			QDomElement sessionElem = remove.addElement("sessionremove",FNamespaces.value(AStreamJid)).appendChild(remove.createElement("session")).toElement();
 			sessionElem.setAttribute("thread",AThreadId);
-			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,ARCHIVE_TIMEOUT))
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,ARCHIVE_REQUEST_TIMEOUT))
 			{
 				FPrefsRemoveSessionRequests.insert(remove.id(),AThreadId);
 				return remove.id();
@@ -957,7 +980,7 @@ QString MessageArchiver::loadHeaders(const Jid &AStreamJid, const IArchiveReques
 	QString localId = QUuid::createUuid().toString();
 	foreach(IArchiveEngine *engine, engineOrderByCapability(IArchiveEngine::ArchiveManagement,AStreamJid))
 	{
-		if (ARequest.text.isEmpty() || engine->isCapable(AStreamJid,IArchiveEngine::TextSearch))
+		if (ARequest.text.isEmpty() || engine->isCapable(AStreamJid,IArchiveEngine::FullTextSearch))
 		{
 			QString id = engine->loadHeaders(AStreamJid,ARequest);
 			if (!id.isEmpty())
@@ -1024,22 +1047,31 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 	ACollection.header.threadId = AChatElem.attribute("thread");
 	ACollection.header.version = AChatElem.attribute("version").toUInt();
 
-	int secsLast = 0;
 	QDomElement nodeElem = AChatElem.firstChildElement();
-	bool isSecsFromStart = AChatElem.attribute("secsFromLast")!="true";
-	while (!nodeElem.isNull() && isSecsFromStart)
+
+	bool isSecsFromStart;
+	if (!AChatElem.hasAttribute("secsFromLast"))
 	{
-		if (nodeElem.hasAttribute("secs"))
+		int secsLast = 0;
+		isSecsFromStart = true;
+		while (!nodeElem.isNull() && isSecsFromStart)
 		{
-			int secs = nodeElem.attribute("secs").toInt();
-			if (secs < secsLast)
-				isSecsFromStart = false;
-			secsLast = secs;
+			if (nodeElem.hasAttribute("secs"))
+			{
+				int secs = nodeElem.attribute("secs").toInt();
+				if (secs < secsLast)
+					isSecsFromStart = false;
+				secsLast = secs;
+			}
+			nodeElem = nodeElem.nextSiblingElement();
 		}
-		nodeElem = nodeElem.nextSiblingElement();
+	}
+	else
+	{
+		isSecsFromStart = AChatElem.attribute("secsFromLast")!="true";
 	}
 
-	secsLast = 0;
+	int secsLast = 0;
 	QDateTime lastMessageDT;
 	nodeElem = AChatElem.firstChildElement();
 	while (!nodeElem.isNull())
@@ -1084,14 +1116,13 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			}
 			secsLast = ACollection.header.start.secsTo(message.dateTime());
 
-			message.setThreadId(ACollection.header.threadId);
-
 			QDomElement childElem = nodeElem.firstChildElement();
 			while (!childElem.isNull())
 			{
 				message.stanza().element().appendChild(childElem.cloneNode(true));
 				childElem = childElem.nextSiblingElement();
 			}
+			message.setThreadId(ACollection.header.threadId);
 
 			ACollection.body.messages.append(message);
 		}
@@ -1128,7 +1159,68 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 		AChatElem.setAttribute("subject",ACollection.header.subject);
 	if (!ACollection.header.threadId.isEmpty())
 		AChatElem.setAttribute("thread",ACollection.header.threadId);
-	AChatElem.setAttribute("secsFromLast","true");
+	AChatElem.setAttribute("secsFromLast","false");
+
+	bool groupChat = false;
+	QList<Message>::const_iterator messageIt = ACollection.body.messages.constBegin();
+	QMultiMap<QDateTime,QString>::const_iterator noteIt = ACollection.body.notes.constBegin();
+	while(messageIt!=ACollection.body.messages.constEnd() || noteIt!=ACollection.body.notes.constEnd())
+	{
+		bool writeNote = false;
+		bool writeMessage = false;
+		if (noteIt == ACollection.body.notes.constEnd())
+			writeMessage = true;
+		else if (messageIt == ACollection.body.messages.constEnd())
+			writeNote = true;
+		else if (messageIt->dateTime() <= noteIt.key())
+			writeMessage = true;
+		else
+			writeNote = true;
+
+		if (writeMessage)
+		{
+			Jid fromJid = messageIt->from();
+			groupChat |= messageIt->type()==Message::GroupChat;
+			if (!groupChat || !fromJid.resource().isEmpty())
+			{
+				bool directionIn = ACollection.header.with && messageIt->from();
+				QDomElement messageElem = AChatElem.appendChild(ownerDoc.createElement(directionIn ? "from" : "to")).toElement();
+
+				int secs = ACollection.header.start.secsTo(messageIt->dateTime());
+				if (secs >= 0)
+					messageElem.setAttribute("secs",secs);
+				else
+					messageElem.setAttribute("utc",DateTime(messageIt->dateTime()).toX85UTC());
+
+				if (groupChat)
+					messageElem.setAttribute("name",fromJid.resource());
+
+				if (ASaveMode==ARCHIVE_SAVE_MESSAGE || ASaveMode==ARCHIVE_SAVE_STREAM)
+				{
+					QDomElement childElem = messageIt->stanza().element().firstChildElement();
+					while (!childElem.isNull())
+					{
+						if (childElem.tagName() != "thread")
+							messageElem.appendChild(childElem.cloneNode(true));
+						childElem = childElem.nextSiblingElement();
+					}
+				}
+				else if (ASaveMode == ARCHIVE_SAVE_BODY)
+				{
+					messageElem.appendChild(ownerDoc.createElement("body")).appendChild(ownerDoc.createTextNode(messageIt->body()));
+				}
+			}
+			++messageIt;
+		}
+
+		if (writeNote)
+		{
+			QDomElement noteElem = AChatElem.appendChild(ownerDoc.createElement("note")).toElement();
+			noteElem.setAttribute("utc",DateTime(noteIt.key()).toX85UTC());
+			noteElem.appendChild(ownerDoc.createTextNode(noteIt.value()));
+			++noteIt;
+		}
+	}
 
 	if (ACollection.previous.with.isValid() && ACollection.previous.start.isValid())
 	{
@@ -1147,54 +1239,6 @@ void MessageArchiver::collectionToElement(const IArchiveCollection &ACollection,
 	if (FDataForms && FDataForms->isFormValid(ACollection.attributes))
 	{
 		FDataForms->xmlForm(ACollection.attributes,AChatElem);
-	}
-
-	int secLast = 0;
-	bool groupChat = false;
-	foreach(const Message &message, ACollection.body.messages)
-	{
-		Jid fromJid = message.from();
-		groupChat |= message.type()==Message::GroupChat;
-		if (!groupChat || !fromJid.resource().isEmpty())
-		{
-			bool directionIn = ACollection.header.with && message.from();
-			QDomElement messageElem = AChatElem.appendChild(ownerDoc.createElement(directionIn ? "from" : "to")).toElement();
-
-			int secs = ACollection.header.start.secsTo(message.dateTime());
-			if (secs >= secLast)
-			{
-				messageElem.setAttribute("secs",secs-secLast);
-				secLast = secs;
-			}
-			else
-				messageElem.setAttribute("utc",DateTime(message.dateTime()).toX85UTC());
-
-			if (groupChat)
-				messageElem.setAttribute("name",fromJid.resource());
-
-			if (ASaveMode==ARCHIVE_SAVE_MESSAGE || ASaveMode==ARCHIVE_SAVE_STREAM)
-			{
-				QDomElement childElem = message.stanza().element().firstChildElement();
-				while (!childElem.isNull())
-				{
-					messageElem.appendChild(childElem.cloneNode(true));
-					childElem = childElem.nextSiblingElement();
-				}
-			}
-			else if (ASaveMode == ARCHIVE_SAVE_BODY)
-			{
-				messageElem.appendChild(ownerDoc.createElement("body")).appendChild(ownerDoc.createTextNode(message.body()));
-			}
-		}
-	}
-
-	QMultiMap<QDateTime,QString>::const_iterator it = ACollection.body.notes.constBegin();
-	while (it != ACollection.body.notes.constEnd())
-	{
-		QDomElement noteElem = AChatElem.appendChild(ownerDoc.createElement("note")).toElement();
-		noteElem.setAttribute("utc",DateTime(it.key()).toX85UTC());
-		noteElem.appendChild(ownerDoc.createTextNode(it.value()));
-		++it;
 	}
 }
 
@@ -1261,28 +1305,14 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 	}
 }
 
-QString MessageArchiver::archiveStreamDirPath(const Jid &AStreamJid) const
+QString MessageArchiver::archiveFilePath(const Jid &AStreamJid, const QString &AFileName) const
 {
-	bool noError = true;
-
-	QDir dir(FPluginManager->homePath());
-	if (!dir.exists(ARCHIVE_DIR_NAME))
-		noError &= dir.mkdir(ARCHIVE_DIR_NAME);
-	noError &= dir.cd(ARCHIVE_DIR_NAME);
-
-	QString streamDir = Jid::encode(AStreamJid.pBare());
-	if (!dir.exists(streamDir))
-		noError &= dir.mkdir(streamDir);
-	noError &= dir.cd(streamDir);
-
-	return noError ? dir.path() : QString::null;
-}
-
-QString MessageArchiver::archiveStreamFilePath(const Jid &AStreamJid, const QString &AFileName) const
-{
-	QString dirPath = archiveStreamDirPath(AStreamJid);
-	if (!dirPath.isEmpty() && !AFileName.isEmpty())
-		return dirPath+"/"+AFileName;
+	if (AStreamJid.isValid() && !AFileName.isEmpty())
+	{
+		QString dirPath = archiveDirPath(AStreamJid);
+		if (!dirPath.isEmpty())
+			return dirPath+"/"+AFileName;
+	}
 	return QString::null;
 }
 
@@ -1291,7 +1321,7 @@ QString MessageArchiver::loadServerPrefs(const Jid &AStreamJid)
 	Stanza load("iq");
 	load.setType("get").setId(FStanzaProcessor!=NULL ? FStanzaProcessor->newId() : QString::null);
 	load.addElement(PST_ARCHIVE_PREFS,FNamespaces.value(AStreamJid));
-	if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,ARCHIVE_TIMEOUT))
+	if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,ARCHIVE_REQUEST_TIMEOUT))
 	{
 		FPrefsLoadRequests.insert(load.id(),AStreamJid);
 		return load.id();
@@ -1328,7 +1358,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 		if (!autoElem.isNull())
 		{
 			prefs.autoSave = QVariant(autoElem.attribute("save","false")).toBool();
-			prefs.autoScope = autoElem.attribute("scope",ARCHIVE_SCOPE_GLOBAL);
+			prefs.autoScope = autoElem.attribute("scope",ARCHIVE_SCOPE_STREAM);
 		}
 		else if (initPrefs)
 		{
@@ -1447,7 +1477,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 
 void MessageArchiver::loadPendingMessages(const Jid &AStreamJid)
 {
-	QFile file(archiveStreamFilePath(AStreamJid,PENDING_FILE_NAME));
+	QFile file(archiveFilePath(AStreamJid,PENDING_FILE_NAME));
 	if (file.open(QFile::ReadOnly))
 	{
 		QDomDocument doc;
@@ -1497,7 +1527,7 @@ void MessageArchiver::savePendingMessages(const Jid &AStreamJid)
 			}
 		}
 
-		QFile file(archiveStreamFilePath(AStreamJid,PENDING_FILE_NAME));
+		QFile file(archiveFilePath(AStreamJid,PENDING_FILE_NAME));
 		if (file.open(QFile::WriteOnly|QFile::Truncate))
 		{
 			file.write(doc.toByteArray());
@@ -1514,7 +1544,7 @@ void MessageArchiver::processPendingMessages(const Jid &AStreamJid)
 		QPair<Message, bool> message = messages.at(i);
 		processMessage(AStreamJid, message.first, message.second);
 	}
-	QFile::remove(archiveStreamFilePath(AStreamJid,PENDING_FILE_NAME));
+	QFile::remove(archiveFilePath(AStreamJid,PENDING_FILE_NAME));
 }
 
 bool MessageArchiver::prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn)
@@ -1562,13 +1592,8 @@ bool MessageArchiver::processMessage(const Jid &AStreamJid, const Message &AMess
 
 IArchiveEngine *MessageArchiver::findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const
 {
-	IArchiveEngine *engine = findArchiveEngine(Options::node(OPV_HISTORY_CAPABILITY_ITEM,QString::number(ACapability)).value("default").toString());
-	if (engine==NULL || !isArchiveEngineEnabled(engine->engineId()) || engine->capabilityOrder(ACapability,AStreamJid)<=0)
-	{
-		QMultiMap<int, IArchiveEngine *> order = engineOrderByCapability(ACapability,AStreamJid);
-		engine = !order.isEmpty() ? order.constBegin().value() : NULL;
-	}
-	return engine;
+	QMultiMap<int, IArchiveEngine *> order = engineOrderByCapability(ACapability,AStreamJid);
+	return !order.isEmpty() ? order.constBegin().value() : NULL;
 }
 
 QMultiMap<int, IArchiveEngine *> MessageArchiver::engineOrderByCapability(quint32 ACapability, const Jid &AStreamJid) const
@@ -1619,7 +1644,7 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 			else
 				qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
 
-			if (ARequest.request.maxItems>0 && headers.count()>ARequest.request.maxItems)
+			if ((quint32)headers.count() > ARequest.request.maxItems)
 				headers = headers.mid(0,ARequest.request.maxItems);
 
 			emit headersLoaded(ALocalId,headers);
@@ -1648,7 +1673,7 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 		emit requestFailed(ALocalId,ARequest.lastError);
 		FMesssagesRequests.remove(ALocalId);
 	}
-	else if (ARequest.headers.isEmpty() || (ARequest.request.maxItems>0 && ARequest.body.messages.count()>ARequest.request.maxItems))
+	else if (ARequest.headers.isEmpty() || (quint32)ARequest.body.messages.count()>ARequest.request.maxItems)
 	{
 		if (ARequest.request.order == Qt::AscendingOrder)
 			qSort(ARequest.body.messages.begin(),ARequest.body.messages.end(),qLess<Message>());
@@ -1702,7 +1727,7 @@ bool MessageArchiver::isOTRStanzaSession(const Jid &AStreamJid, const Jid &ACont
 void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	QDomDocument sessions;
-	QFile file(archiveStreamFilePath(AStreamJid,SESSIONS_FILE_NAME));
+	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
 	if (file.open(QFile::ReadOnly))
 	{
 		if (!sessions.setContent(&file))
@@ -1726,7 +1751,7 @@ void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid 
 
 void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId)
 {
-	QFile file(archiveStreamFilePath(AStreamJid,SESSIONS_FILE_NAME));
+	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
 	if (file.open(QFile::ReadOnly))
 	{
 		QDomDocument sessions;
@@ -1768,7 +1793,7 @@ void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const Q
 void MessageArchiver::removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const
 {
 	QDomDocument sessions;
-	QFile file(archiveStreamFilePath(AStreamJid,SESSIONS_FILE_NAME));
+	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
 	if (file.open(QFile::ReadOnly))
 	{
 		if (!sessions.setContent(&file))
@@ -2257,6 +2282,9 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 
 	if (!FDiscovery || !FDiscovery->requestDiscoInfo(AXmppStream->streamJid(),AXmppStream->streamJid().domain()))
 		applyArchivePrefs(AXmppStream->streamJid(),QDomElement());
+
+	ArchiveReplicator *replicator = new ArchiveReplicator(this,AXmppStream->streamJid(),this);
+	FReplicators.insert(AXmppStream->streamJid(),replicator);
 }
 
 void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
@@ -2278,6 +2306,13 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 
 	emit archivePrefsChanged(AXmppStream->streamJid());
 	emit archivePrefsClosed(AXmppStream->streamJid());
+}
+
+void MessageArchiver::onStreamAboutToClose(IXmppStream *AXmppStream)
+{
+	ArchiveReplicator *replicator = FReplicators.take(AXmppStream->streamJid());
+	if (replicator)
+		replicator->quitAndDestroy();
 }
 
 void MessageArchiver::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)

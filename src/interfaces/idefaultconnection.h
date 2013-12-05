@@ -5,22 +5,30 @@
 
 #include <QSslKey>
 #include <QSslSocket>
+#include <interfaces/iconnectionmanager.h>
 
-class IDefaultConnection
+class IDefaultConnection :
+	public IConnection
 {
 public:
-	enum OptionRoles {
-		COR_HOST,
-		COR_PORT,
-		COR_DOMAINE,
-		COR_USE_LEGACY_SSL
+	enum OptionRole {
+		Host,
+		Port,
+		Domain,
+		UseLegacySsl,
+		CertVerifyMode,
+	};
+	enum CertificateVerifyMode {
+		Disabled,
+		Manual,
+		Forbid,
+		TrustedOnly
 	};
 public:
 	virtual QObject *instance() =0;
 	virtual void startClientEncryption() =0;
 	virtual void ignoreSslErrors() =0;
 	virtual QList<QSslError> sslErrors() const =0;
-	virtual QSslCertificate peerCertificate() const =0;
 	virtual QSsl::SslProtocol protocol() const =0;
 	virtual void setProtocol(QSsl::SslProtocol AProtocol) =0;
 	virtual QSslKey privateKey() const =0;
@@ -28,13 +36,13 @@ public:
 	virtual QSslCertificate localCertificate() const =0;
 	virtual void setLocalCertificate(const QSslCertificate &ACertificate) =0;
 	virtual QList<QSslCertificate> caCertificates() const =0;
+	virtual void addCaSertificates(const QList<QSslCertificate> &ACertificates) =0;
 	virtual void setCaCertificates(const QList<QSslCertificate> &ACertificates) =0;
 	virtual QNetworkProxy proxy() const =0;
 	virtual void setProxy(const QNetworkProxy &AProxy) =0;
 	virtual QVariant option(int ARole) const =0;
 	virtual void setOption(int ARole, const QVariant &AValue) =0;
 protected:
-	virtual void modeChanged(QSslSocket::SslMode AMode) =0;
 	virtual void proxyChanged(const QNetworkProxy &AProxy) =0;
 	virtual void sslErrorsOccured(const QList<QSslError> &AErrors) =0;
 };
@@ -45,7 +53,7 @@ public:
 	virtual QObject *instance() =0;
 };
 
-Q_DECLARE_INTERFACE(IDefaultConnection,"Vacuum.Plugin.IDefaultConnection/1.0")
-Q_DECLARE_INTERFACE(IDefaultConnectionPlugin,"Vacuum.Plugin.IDefaultConnectionPlugin/1.0")
+Q_DECLARE_INTERFACE(IDefaultConnection,"Vacuum.Plugin.IDefaultConnection/1.1")
+Q_DECLARE_INTERFACE(IDefaultConnectionPlugin,"Vacuum.Plugin.IDefaultConnectionPlugin/1.1")
 
-#endif
+#endif // IDEFAULTCONNECTION_H

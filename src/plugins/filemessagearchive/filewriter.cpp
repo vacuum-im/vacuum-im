@@ -10,7 +10,6 @@ FileWriter::FileWriter(const Jid &AStreamJid, const QString &AFileName, const IA
 	FXmlFile = NULL;
 	FXmlWriter = NULL;
 
-	FSecsSum = 0;
 	FGroupchat = false;
 	FNotesCount = 0;
 	FMessagesCount = 0;
@@ -77,11 +76,6 @@ int FileWriter::recordsCount() const
 	return FMessagesCount + FNotesCount;
 }
 
-int FileWriter::secondsFromStart() const
-{
-	return FSecsSum;
-}
-
 bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
 {
 	if (isOpened() && ASaveMode!=ARCHIVE_SAVE_FALSE)
@@ -94,15 +88,10 @@ bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode,
 			FXmlWriter->writeStartElement(ADirectionIn ? "from" : "to");
 
 			int secs = FHeader.start.secsTo(AMessage.dateTime());
-			if (secs >= FSecsSum)
-			{
-				FXmlWriter->writeAttribute("secs",QString::number(secs-FSecsSum));
-				FSecsSum += secs-FSecsSum;
-			}
+			if (secs >= 0)
+				FXmlWriter->writeAttribute("secs",QString::number(secs));
 			else
-			{
 				FXmlWriter->writeAttribute("utc",DateTime(AMessage.dateTime()).toX85UTC());
-			}
 
 			if (FGroupchat)
 				FXmlWriter->writeAttribute("name",contactJid.resource());
@@ -155,6 +144,7 @@ void FileWriter::startCollection()
 		FXmlWriter->writeAttribute("subject",FHeader.subject);
 	if (!FHeader.threadId.isEmpty())
 		FXmlWriter->writeAttribute("thread",FHeader.threadId);
+	FXmlWriter->writeAttribute("secsFromLast","false");
 	checkLimits();
 }
 
@@ -183,19 +173,22 @@ void FileWriter::writeElementChilds(const QDomElement &AElem)
 		if (node.isElement())
 		{
 			QDomElement elem = node.toElement();
-			FXmlWriter->writeStartElement(elem.nodeName());
-			if (!elem.namespaceURI().isEmpty())
-				FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
-
-			QDomNamedNodeMap map = elem.attributes();
-			for (int i =0; i<map.length(); i++)
+			if (elem.tagName() != "thread")
 			{
-				QDomNode attrNode = map.item(i);
-				FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
-			}
+				FXmlWriter->writeStartElement(elem.nodeName());
+				if (!elem.namespaceURI().isEmpty())
+					FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
 
-			writeElementChilds(elem);
-			FXmlWriter->writeEndElement();
+				QDomNamedNodeMap attrMap = elem.attributes();
+				for (int i =0; i<attrMap.length(); i++)
+				{
+					QDomNode attrNode = attrMap.item(i);
+					FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
+				}
+
+				writeElementChilds(elem);
+				FXmlWriter->writeEndElement();
+			}
 		}
 		else if (node.isCharacterData())
 		{

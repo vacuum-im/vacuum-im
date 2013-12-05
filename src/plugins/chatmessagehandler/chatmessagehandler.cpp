@@ -440,6 +440,10 @@ IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const J
 				connect(window->infoWidget()->instance(),SIGNAL(addressMenuRequested(Menu *)),SLOT(onWindowAddressMenuRequested(Menu *)));
 				connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onWindowContextMenuRequested(Menu *)));
 				connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onWindowToolTipsRequested(QMap<int,QString> &)));
+				connect(window->viewWidget()->instance(),SIGNAL(contentAppended(const QString &, const IMessageContentOptions &)),
+					SLOT(onWindowContentAppended(const QString &, const IMessageContentOptions &)));
+				connect(window->viewWidget()->instance(),SIGNAL(messageStyleOptionsChanged(const IMessageStyleOptions &, bool)),
+					SLOT(onWindowMessageStyleOptionsChanged(const IMessageStyleOptions &, bool)));
 				connect(window->tabPageNotifier()->instance(),SIGNAL(activeNotifyChanged(int)),this,SLOT(onWindowNotifierActiveNotifyChanged(int)));
 
 				FWindows.append(window);
@@ -626,10 +630,16 @@ void ChatMessageHandler::showStyledMessage(IMessageChatWindow *AWindow, const Me
 	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
 		options.type |= IMessageContentOptions::TypeHistory;
 
-	if (AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid()!=AMessage.to() : !(AWindow->contactJid() && AMessage.to()))
+	if (AWindow->streamJid()==AMessage.to() || AMessage.to().isEmpty())
+		options.direction = IMessageContentOptions::DirectionIn;
+	else if (AWindow->streamJid()==AMessage.from() || AMessage.from().isEmpty())
+		options.direction = IMessageContentOptions::DirectionOut;
+	else if (AWindow->contactJid() == AMessage.to())
+		options.direction = IMessageContentOptions::DirectionOut;
+	else if (AWindow->contactJid() == AMessage.from())
 		options.direction = IMessageContentOptions::DirectionIn;
 	else
-		options.direction = IMessageContentOptions::DirectionOut;
+		options.direction = IMessageContentOptions::DirectionIn;
 
 	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);
@@ -717,6 +727,7 @@ void ChatMessageHandler::onWindowDestroyed()
 		FWindows.removeAt(FWindows.indexOf(window));
 		FWindowStatus.remove(window);
 		FPendingMessages.remove(window);
+		FPendingContent.remove(window);
 		FHistoryRequests.remove(FHistoryRequests.key(window));
 	}
 }
@@ -823,6 +834,31 @@ void ChatMessageHandler::onWindowNotifierActiveNotifyChanged(int ANotifyId)
 		updateWindow(window);
 }
 
+void ChatMessageHandler::onWindowContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions)
+{
+	IMessageViewWidget *viewWidget = qobject_cast<IMessageViewWidget *>(sender());
+	IMessageChatWindow *window = viewWidget!=NULL ? qobject_cast<IMessageChatWindow *>(viewWidget->messageWindow()->instance()) : NULL;
+	if (window && FHistoryRequests.values().contains(window))
+	{
+		WindowContent content;
+		content.html = AHtml;
+		content.options = AOptions;
+		FPendingContent[window].append(content);
+	}
+}
+
+void ChatMessageHandler::onWindowMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared)
+{
+	Q_UNUSED(AOptions);
+	if (ACleared)
+	{
+		IMessageViewWidget *viewWidget = qobject_cast<IMessageViewWidget *>(sender());
+		IMessageChatWindow *window = viewWidget!=NULL ? qobject_cast<IMessageChatWindow *>(viewWidget->messageWindow()->instance()) : NULL;
+		if (window)
+			FWindowStatus[window].lastDateSeparator = QDate();
+	}
+}
+
 void ChatMessageHandler::onStatusIconsChanged()
 {
 	foreach(IMessageChatWindow *window, FWindows)
@@ -883,14 +919,7 @@ void ChatMessageHandler::onClearWindowAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	IMessageChatWindow *window = action!=NULL ? qobject_cast<IMessageChatWindow *>(action->parent()) : NULL;
 	if (window)
-	{
-		IMessageStyle *style = window->viewWidget()!=NULL ? window->viewWidget()->messageStyle() : NULL;
-		if (style!=NULL)
-		{
-			IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-			style->changeOptions(window->viewWidget()->styleWidget(),soptions,true);
-		}
-	}
+		window->viewWidget()->clearContent();
 }
 
 void ChatMessageHandler::onChangeWindowAddressAction()
@@ -925,12 +954,23 @@ void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidge
 	}
 }
 
+void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
+{
+	if (FHistoryRequests.contains(AId))
+	{
+		IMessageChatWindow *window = FHistoryRequests.take(AId);
+		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
+		FPendingMessages.remove(window);
+		FPendingContent.remove(window);
+	}
+}
+
 void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody)
 {
 	if (FHistoryRequests.contains(AId))
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
-		setMessageStyle(window);
+		window->viewWidget()->clearContent();
 
 		int messageItEnd = 0;
 		QList<Message> pendingMessages = FPendingMessages.take(window);
@@ -960,21 +1000,14 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 			}
 		}
 
-		foreach(const Message &message, pendingMessages)
-			showStyledMessage(window,message);
+		foreach(const WindowContent &content, FPendingContent.take(window))
+		{
+			showDateSeparator(window,content.options.time);
+			window->viewWidget()->appendHtml(content.html,content.options);
+		}
 
 		WindowStatus &wstatus = FWindowStatus[window];
 		wstatus.startTime = !ABody.messages.isEmpty() ? ABody.messages.last().dateTime() : QDateTime();
-	}
-}
-
-void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
-{
-	if (FHistoryRequests.contains(AId))
-	{
-		IMessageChatWindow *window = FHistoryRequests.take(AId);
-		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
-		FPendingMessages.remove(window);
 	}
 }
 
