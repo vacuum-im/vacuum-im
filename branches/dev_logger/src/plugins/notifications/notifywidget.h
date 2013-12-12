@@ -4,13 +4,8 @@
 #include <QMouseEvent>
 #include <QDesktopWidget>
 #include <QNetworkAccessManager>
-#include <definitions/optionvalues.h>
-#include <definitions/notificationdataroles.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/imainwindow.h>
-#include <utils/message.h>
-#include <utils/options.h>
-#include <utils/textmanager.h>
 #include "ui_notifywidget.h"
 
 class NotifyWidget :

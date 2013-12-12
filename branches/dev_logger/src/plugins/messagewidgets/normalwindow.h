@@ -1,23 +1,11 @@
 #ifndef MESSAGEWINDOW_H
 #define MESSAGEWINDOW_H
 
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/messagenormalwindowwidgets.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/istatusicons.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/xmpperror.h>
-#include <utils/iconstorage.h>
-#include <utils/widgetmanager.h>
 #include "ui_normalwindow.h"
 
 class NormalWindow :

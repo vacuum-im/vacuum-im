@@ -7,7 +7,12 @@
 #include <QToolButton>
 #include <QTextDocument>
 #include <definitions/optionvalues.h>
+#include <definitions/notificationdataroles.h>
+#include <utils/textmanager.h>
 #include <utils/options.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define ANIMATE_STEPS             17
 #define ANIMATE_TIME              700
@@ -37,6 +42,7 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 	: QFrame(NULL, Qt::ToolTip|Qt::WindowStaysOnTopHint|Qt::X11BypassWindowManagerHint)
 #endif
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setFocusPolicy(Qt::NoFocus);
 	setAttribute(Qt::WA_DeleteOnClose,true);

@@ -549,7 +549,10 @@ void Gateways::savePrivateStorageKeep(const Jid &AStreamJid)
 		QSet<Jid> services = FPrivateStorageKeep.value(AStreamJid);
 		foreach(const Jid &service, services)
 			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
-		FPrivateStorage->saveData(AStreamJid,elem);
+		if (!FPrivateStorage->saveData(AStreamJid,elem).isEmpty())
+			LOG_STRM_INFO(AStreamJid,QString("Save gateways with keep connection request sent"));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send save gateways with keep connection request"));
 	}
 }
 
@@ -562,7 +565,10 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_SUBSCRIBE,PST_GATEWAYS_SERVICES)).toElement();
 		foreach(const Jid &service, FSubscribeServices.values(AStreamJid))
 			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
-		FPrivateStorage->saveData(AStreamJid,elem);
+		if (!FPrivateStorage->saveData(AStreamJid,elem).isEmpty())
+			LOG_STRM_INFO(AStreamJid,QString("Save gateways with auto subscribe request sent"));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send save gateways with auto subscribe request"));
 	}
 }
 
@@ -878,8 +884,10 @@ void Gateways::onPresenceOpened(IPresence *APresence)
 {
 	if (FPrivateStorage)
 	{
-		FPrivateStorage->loadData(APresence->streamJid(),PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP);
-		LOG_STRM_DEBUG(APresence->streamJid(),QString("Gateways with keep connection load request sent"));
+		if (!FPrivateStorage->loadData(APresence->streamJid(),PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP).isEmpty())
+			LOG_STRM_INFO(APresence->streamJid(),QString("Gateways with keep connection load request sent"));
+		else
+			LOG_STRM_WARNING(APresence->streamJid(),QString("Failed to send load gateways with keep connection request"));
 	}
 	FKeepTimer.start(KEEP_INTERVAL);
 }
@@ -942,8 +950,10 @@ void Gateways::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AA
 
 void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
 {
-	FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE);
-	LOG_STRM_DEBUG(AStreamJid,QString("Gateways with auto subscribe load request sent"));
+	if (!FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE).isEmpty())
+		LOG_STRM_INFO(AStreamJid,QString("Load gateways with auto subscribe request sent"));
+	else
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to send load gateways with auto subscribe request"));
 }
 
 void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
@@ -1004,9 +1014,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 void Gateways::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
 	if (ATagName==PST_GATEWAYS_SERVICES && ANamespace==PSN_GATEWAYS_KEEP)
-	{
 		FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP);
-	}
 }
 
 void Gateways::onKeepTimerTimeout()

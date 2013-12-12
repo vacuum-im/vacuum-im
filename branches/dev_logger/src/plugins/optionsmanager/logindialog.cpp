@@ -1,9 +1,11 @@
 #include "logindialog.h"
 
 #include <QMessageBox>
+#include <utils/logger.h>
 
 LoginDialog::LoginDialog(IOptionsManager *AOptionsManager, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setWindowModality(Qt::WindowModal);
 	setAttribute(Qt::WA_DeleteOnClose, true);
@@ -14,8 +16,7 @@ LoginDialog::LoginDialog(IOptionsManager *AOptionsManager, QWidget *AParent) : Q
 	ui.cmbProfile->setCurrentIndex(ui.cmbProfile->findText(!FManager->currentProfile().isEmpty() ? FManager->currentProfile() : FManager->lastActiveProfile()));
 
 	connect(FManager->instance(),SIGNAL(profileAdded(const QString &)),SLOT(onProfileAdded(const QString &)));
-	connect(FManager->instance(),SIGNAL(profileRenamed(const QString &, const QString &)),
-	        SLOT(onProfileRenamed(const QString &, const QString &)));
+	connect(FManager->instance(),SIGNAL(profileRenamed(const QString &, const QString &)),SLOT(onProfileRenamed(const QString &, const QString &)));
 	connect(FManager->instance(),SIGNAL(profileRemoved(const QString &)),SLOT(onProfileRemoved(const QString &)));
 
 	connect(ui.pbtProfiles,SIGNAL(clicked(bool)),SLOT(onEditProfilesClicked(bool)));
@@ -56,13 +57,9 @@ void LoginDialog::onDialogAccepted()
 	if (FManager->checkProfilePassword(profile, password))
 	{
 		if (FManager->setCurrentProfile(profile, password))
-		{
 			accept();
-		}
 		else
-		{
 			QMessageBox::warning(this,tr("Profile Blocked"), tr("This profile is now blocked by another program"));
-		}
 	}
 	else
 	{

@@ -1,5 +1,14 @@
 #include "registerstream.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <definitions/statisticsparams.h>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/xmpperror.h>
+#include <utils/stanza.h>
+#include <utils/logger.h>
+
 RegisterStream::RegisterStream(IDataForms *ADataForms, IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
 	FDialog = NULL;
@@ -22,6 +31,8 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 		{
 			if (AStanza.type() == "result")
 			{
+				LOG_STRM_INFO(AXmppStream->streamJid(),"Account registration fileds loaded");
+
 				QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_REGISTER);
 				QDomElement formElem = Stanza::findElement(queryElem,"x",NS_JABBER_DATA);
 				if (FDataForms && !formElem.isNull())
@@ -50,9 +61,12 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 						connect(FDialog->instance(),SIGNAL(rejected()),SLOT(onRegisterDialogRejected()));
 						WidgetManager::showActivateRaiseWindow(FDialog->instance());
 						FXmppStream->setKeepAliveTimerActive(false);
+
+						LOG_STRM_INFO(AXmppStream->streamJid(),"Account registration form dialog shown");
 					}
 					else
 					{
+						LOG_STRM_WARNING(AXmppStream->streamJid(),"Failed to register new account on server: Invalid registration form received");
 						emit error(XmppError(IERR_REGISTER_INVALID_FORM));
 					}
 				}
@@ -68,11 +82,15 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 					if (!queryElem.firstChildElement("key").isNull())
 						querySubmit.appendChild(submit.createElement("key")).appendChild(submit.createTextNode(AStanza.firstElement("query").attribute("key")));
 					FXmppStream->sendStanza(submit);
+
+					LOG_STRM_INFO(AXmppStream->streamJid(),"Account registration submit request sent");
 				}
 			}
-			else if (AStanza.type() == "error")
+			else
 			{
-				emit error(XmppStanzaError(AStanza));
+				XmppStanzaError err(AStanza);
+				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Failed to load account registration fields: %1").arg(err.errorMessage()));
+				emit error(err);
 			}
 			return true;
 		}
@@ -81,12 +99,16 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			if (AStanza.type() == "result")
 			{
+				REPORT_EVENT(SEVP_REGISTRATION_STREAM_SUCCESS,1);
+				LOG_STRM_INFO(AXmppStream->streamJid(),"Account registration submit accepted");
 				deleteLater();
 				emit finished(false);
 			}
-			else if (AStanza.type() == "error")
+			else
 			{
-				emit error(XmppStanzaError(AStanza));
+				XmppStanzaError err(AStanza);
+				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Account registration submit rejected: %1").arg(err.errorMessage()));
+				emit error(err);
 			}
 			return true;
 		}
@@ -96,9 +118,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 
 bool RegisterStream::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -118,15 +138,20 @@ bool RegisterStream::start(const QDomElement &AElem)
 	{
 		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
-			Stanza reg("iq");
-			reg.setType("get").setId("getReg");
-			reg.addElement("query",NS_JABBER_REGISTER);
+			Stanza request("iq");
+			request.setType("get").setId("getReg");
+			request.addElement("query",NS_JABBER_REGISTER);
 			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-			FXmppStream->sendStanza(reg);
+			FXmppStream->sendStanza(request);
+
+			REPORT_EVENT(SEVP_REGISTRATION_STREAM_BEGIN,1);
+			LOG_STRM_INFO(FXmppStream->streamJid(),"Account registration fields request sent");
+
 			return true;
 		}
 		else
 		{
+			LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to register new account on server: Connection not secure"));
 			emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
 		}
 	}
@@ -153,9 +178,12 @@ void RegisterStream::onRegisterDialogAccepred()
 		QDomElement query = submit.addElement("query",NS_JABBER_REGISTER);
 		FDataForms->xmlForm(FDataForms->dataSubmit(FDialog->formWidget()->userDataForm()),query);
 		FXmppStream->sendStanza(submit);
+
+		LOG_STRM_INFO(FXmppStream->streamJid(),"Account registration submit request sent");
 	}
 	else
 	{
+		LOG_STRM_WARNING(FXmppStream->streamJid(),"Account registration form dialog destroyed");
 		emit error(XmppError(IERR_REGISTER_INVALID_DIALOG));
 	}
 	FDialog = NULL;
@@ -163,6 +191,7 @@ void RegisterStream::onRegisterDialogAccepred()
 
 void RegisterStream::onRegisterDialogRejected()
 {
+	LOG_STRM_INFO(FXmppStream->streamJid(),"Account registration terminated by user");
 	FXmppStream->setKeepAliveTimerActive(true);
 	emit error(XmppError(IERR_REGISTER_REJECTED_BY_USER));
 	FDialog = NULL;

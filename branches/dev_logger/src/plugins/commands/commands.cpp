@@ -455,13 +455,13 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
 			FDataForms->xmlForm(ARequest.form,cmdElem);
 		if (FStanzaProcessor->sendStanzaRequest(this,ARequest.streamJid,request,COMMANDS_TIMEOUT))
 		{
-			LOG_STRM_INFO(ARequest.streamJid,QString("Command request sent to=%1, id=%2, node=%3").arg(ARequest.contactJid.full(),request.id(),ARequest.node));
+			LOG_STRM_INFO(ARequest.streamJid,QString("Command request sent to=%1, node=%2, sid=%3, id=%4").arg(ARequest.contactJid.full(),ARequest.node,ARequest.sessionId,request.id()));
 			FRequests.append(request.id());
 			return request.id();
 		}
 		else
 		{
-			LOG_STRM_WARNING(ARequest.streamJid,QString("Failed to send command request to=%1, node=%2").arg(ARequest.contactJid.full(),ARequest.node));
+			LOG_STRM_WARNING(ARequest.streamJid,QString("Failed to send command request to=%1, node=%2, sid=%3").arg(ARequest.contactJid.full(),ARequest.node,ARequest.sessionId));
 		}
 	}
 	return QString::null;
@@ -499,12 +499,12 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 
 		if (FStanzaProcessor->sendStanzaOut(AResult.streamJid,result))
 		{
-			LOG_STRM_INFO(AResult.streamJid,QString("Command result sent to=%1, id=%2, node=%3").arg(AResult.contactJid.full(),AResult.stanzaId,AResult.node));
+			LOG_STRM_INFO(AResult.streamJid,QString("Command result sent to=%1, node=%2, sid=%3, id=%4").arg(AResult.contactJid.full(),AResult.node,AResult.sessionId,AResult.stanzaId));
 			return true;
 		}
 		else
 		{
-			LOG_STRM_WARNING(AResult.streamJid,QString("Failed to send command result to=%1, id=%2, node=%3").arg(AResult.contactJid.full(),AResult.stanzaId,AResult.node));
+			LOG_STRM_WARNING(AResult.streamJid,QString("Failed to send command result to=%1, node=%2, sid=%3, id=%4").arg(AResult.contactJid.full(),AResult.node,AResult.sessionId,AResult.stanzaId));
 		}
 	}
 	return false;

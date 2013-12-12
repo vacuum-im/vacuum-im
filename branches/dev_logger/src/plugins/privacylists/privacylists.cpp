@@ -1,5 +1,15 @@
 #include "privacylists.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/logger.h>
+
 #define SHC_PRIVACY         "/iq[@type='set']/query[@xmlns='"NS_JABBER_PRIVACY"']"
 #define SHC_ROSTER          "/iq/query[@xmlns='"NS_JABBER_ROSTER"']"
 
@@ -11,7 +21,7 @@
 #define ADR_GROUP_NAME      Action::DR_Parametr2
 #define ADR_LISTNAME        Action::DR_Parametr3
 
-QStringList AutoLists = QStringList() << PRIVACY_LIST_VISIBLE << PRIVACY_LIST_CONFERENCES << PRIVACY_LIST_INVISIBLE << PRIVACY_LIST_IGNORE << PRIVACY_LIST_SUBSCRIPTION;
+static const QStringList AutoLists = QStringList() << PRIVACY_LIST_VISIBLE << PRIVACY_LIST_CONFERENCES << PRIVACY_LIST_INVISIBLE << PRIVACY_LIST_IGNORE << PRIVACY_LIST_SUBSCRIPTION;
 
 PrivacyLists::PrivacyLists()
 {
@@ -50,11 +60,17 @@ void PrivacyLists::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+		if (FStanzaProcessor == NULL)
+			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
+	}
 
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
@@ -64,6 +80,10 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitO
 		{
 			connect(FXmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+		}
+		else
+		{
+			LOG_WARNING("Failed to load required interface: IXmppStreams");
 		}
 	}
 
@@ -79,15 +99,21 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitO
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
+	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
 	if (plugin)
@@ -127,6 +153,8 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 		QString listName = listElem.attribute("name");
 		if (!listName.isEmpty())
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Privacy list update notification received, list=%1").arg(listName));
+
 			bool needLoad = FRemoveRequests.key(listName).isEmpty();
 			for (QMap<QString,IPrivacyList>::const_iterator it = FSaveRequests.constBegin(); needLoad && it!=FSaveRequests.constEnd(); ++it)
 				needLoad = it.value().name != listName;
@@ -136,6 +164,10 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 			AAccept = true;
 			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Empty privacy list update notification received");
 		}
 	}
 	else if (FSHIRosterIn.value(AStreamJid)==AHandlerId || FSHIRosterOut.value(AStreamJid)==AHandlerId)
@@ -164,14 +196,18 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 					bool denied = (stanzas & IPrivacyRule::PresencesOut)>0;
 					if (denied && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
+						LOG_STRM_DEBUG(AStreamJid,QString("Sending offline presence to contact=%1").arg(ritem.itemJid.full()));
 						presence->sendPresence(ritem.itemJid,IPresence::Offline,QString::null,0);
-						FOfflinePresences[AStreamJid]+=ritem.itemJid;
+						FOfflinePresences[AStreamJid] += ritem.itemJid;
 					}
 					else if (!denied && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
 						if (ritem.subscription==SUBSCRIPTION_BOTH || ritem.subscription==SUBSCRIPTION_FROM)
+						{
+							LOG_STRM_DEBUG(AStreamJid,QString("Sending online presence to contact=%1").arg(ritem.itemJid.full()));
 							presence->sendPresence(ritem.itemJid,presence->show(),presence->status(),presence->priority());
-						FOfflinePresences[AStreamJid]-=ritem.itemJid;
+						}
+						FOfflinePresences[AStreamJid] -= ritem.itemJid;
 					}
 
 					if (directionIn)
@@ -180,6 +216,10 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 						if (FLabeledContacts.value(AStreamJid).contains(ritem.itemJid)!=denied)
 							setPrivacyLabel(AStreamJid,ritem.itemJid,denied);
 					}
+				}
+				else
+				{
+					LOG_STRM_WARNING(AStreamJid,QString("Invalid roster item received, jid=%1").arg(ritem.itemJid.full()));
 				}
 
 				itemElem = itemElem.nextSiblingElement("item");
@@ -191,9 +231,11 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 
 void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
+	XmppStanzaError err = AStanza.type()!="result" ? XmppStanzaError(AStanza) : XmppStanzaError::null;
+
 	if (FLoadRequests.contains(AStanza.id()))
 	{
-		QString loadListName = FLoadRequests.value(AStanza.id());
+		QString loadListName = FLoadRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
 			QMap<QString,IPrivacyList> &lists = FPrivacyLists[AStreamJid];
@@ -235,9 +277,15 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 				qSort(list.rules);
 
 				if (loadListName.isEmpty())
+				{
+					LOG_STRM_INFO(AStreamJid,QString("Privacy list found, list=%1, id=%2").arg(list.name,AStanza.id()));
 					loadPrivacyList(AStreamJid,list.name);
+				}
 				else
+				{
+					LOG_STRM_INFO(AStreamJid,QString("Privacy list loaded, list=%1, id=%2").arg(list.name,AStanza.id()));
 					emit listLoaded(AStreamJid,list.name);
+				}
 
 				listElem = listElem.nextSiblingElement("list");
 			}
@@ -247,6 +295,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			{
 				QString activeListName = activeElem.attribute("name");
 				FActiveLists.insert(AStreamJid,activeListName);
+				LOG_STRM_INFO(AStreamJid,QString("Active privacy list changed to=%1, id=%2").arg(activeListName,AStanza.id()));
 				emit activeListChanged(AStreamJid,activeListName);
 			}
 
@@ -255,73 +304,100 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			{
 				QString defaultListName = defaultElem.attribute("name");
 				FDefaultLists.insert(AStreamJid,defaultListName);
+				LOG_STRM_INFO(AStreamJid,QString("Default privacy list changed to=%1, id=%2").arg(defaultListName,AStanza.id()));
 				emit defaultListChanged(AStreamJid,defaultListName);
 			}
 
 			if (loadListName.isEmpty())
 			{
 				if (lists.isEmpty())
+				{
+					LOG_STRM_INFO(AStreamJid,QString("Initializing default privacy list=%1").arg(PRIVACY_LIST_AUTO_VISIBLE));
 					setAutoPrivacy(AStreamJid,PRIVACY_LIST_AUTO_VISIBLE);
-				else if (defaultList(AStreamJid)!=activeList(AStreamJid))
+				}
+				else if (defaultList(AStreamJid) != activeList(AStreamJid))
+				{
+					LOG_STRM_INFO(AStreamJid,QString("Setup default list as active, list=%1").arg(defaultList(AStreamJid)));
 					setActiveList(AStreamJid,defaultList(AStreamJid));
+				}
 			}
 		}
-		else if (AStanza.type() == "error")
+		else if (!loadListName.isEmpty())
 		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load privacy list=%1, id=%2: %3").arg(loadListName,AStanza.id(),err.errorMessage()));
 			if (FPrivacyLists.value(AStreamJid).contains(loadListName))
 			{
 				FPrivacyLists[AStreamJid].remove(loadListName);
 				emit listRemoved(AStreamJid,loadListName);
 			}
 		}
-		FLoadRequests.remove(AStanza.id());
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load list of privacy lists, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+		}
 	}
 	else if (FSaveRequests.contains(AStanza.id()))
 	{
+		IPrivacyList list = FSaveRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			IPrivacyList list = FSaveRequests.value(AStanza.id());
+			LOG_STRM_INFO(AStreamJid,QString("Privacy list saved, list=%1, id=%2").arg(list.name,AStanza.id()));
 			FPrivacyLists[AStreamJid].insert(list.name,list);
 			emit listLoaded(AStreamJid,list.name);
 		}
-		FSaveRequests.remove(AStanza.id());
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to save privacy list=%1, id=%2: %3").arg(list.name,AStanza.id(),err.errorMessage()));
+		}
 	}
 	else if (FActiveRequests.contains(AStanza.id()))
 	{
+		QString activeListName = FActiveRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			QString activeListName = FActiveRequests.value(AStanza.id());
+			LOG_STRM_INFO(AStreamJid,QString("Active privacy list changed to=%1, id=%2").arg(activeListName,AStanza.id()));
 			FActiveLists.insert(AStreamJid,activeListName);
 			emit activeListChanged(AStreamJid,activeListName);
 		}
-		FActiveRequests.remove(AStanza.id());
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to change active privacy list to=%1, id=%2: %3").arg(activeListName,AStanza.id(),err.errorMessage()));
+		}
 	}
 	else if (FDefaultRequests.contains(AStanza.id()))
 	{
+		QString defaultListName = FDefaultRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			QString defaultListName = FDefaultRequests.value(AStanza.id());
+			LOG_STRM_INFO(AStreamJid,QString("Default privacy list changed to=%1, id=%2").arg(defaultListName,AStanza.id()));
 			FDefaultLists.insert(AStreamJid,defaultListName);
 			emit defaultListChanged(AStreamJid,defaultListName);
 		}
-		FDefaultRequests.remove(AStanza.id());
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to change default privacy list to=%1, id=%2: %3").arg(defaultListName,AStanza.id(),err.errorMessage()));
+		}
 	}
 	else if (FRemoveRequests.contains(AStanza.id()))
 	{
+		QString listName = FRemoveRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			QString listName = FRemoveRequests.value(AStanza.id());
+			LOG_STRM_INFO(AStreamJid,QString("Privacy list removed, list=%1, id=%2").arg(listName,AStanza.id()));
 			FPrivacyLists[AStreamJid].remove(listName);
 			emit listRemoved(AStreamJid,listName);
 		}
-		FRemoveRequests.remove(AStanza.id());
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove privacy list=%1, id=%2: %3").arg(listName,AStanza.id(),err.errorMessage()));
+		}
 	}
-	FStreamRequests[AStreamJid].removeAt(FStreamRequests[AStreamJid].indexOf(AStanza.id()));
+	FStreamRequests[AStreamJid].removeAll(AStanza.id());
 
 	if (AStanza.type() == "result")
 		emit requestCompleted(AStanza.id());
 	else
-		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
+		emit requestFailed(AStanza.id(),err);
 }
 
 bool PrivacyLists::isReady(const Jid &AStreamJid) const
@@ -379,16 +455,18 @@ bool PrivacyLists::isContactAutoListed(const Jid &AStreamJid, const Jid &AContac
 	return privacyList(AStreamJid,AList,true).rules.contains(rule);
 }
 
-void PrivacyLists::setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AListName, bool APresent)
+void PrivacyLists::setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool APresent)
 {
-	IPrivacyRule rule = groupAutoListRule(AGroup,AListName);
+	IPrivacyRule rule = groupAutoListRule(AGroup,AList);
 	if (isReady(AStreamJid) && !AGroup.isEmpty() && rule.stanzas!=IPrivacyRule::EmptyType)
 	{
-		IPrivacyList list = privacyList(AStreamJid,AListName,true);
-		list.name = AListName;
+		IPrivacyList list = privacyList(AStreamJid,AList,true);
+		list.name = AList;
 
 		if (APresent != list.rules.contains(rule))
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Changing group present in auto list, group=%1, list=%2, present=%3").arg(AGroup,AList).arg(APresent));
+
 			if (APresent)
 			{
 				setGroupAutoListed(AStreamJid,AGroup,PRIVACY_LIST_VISIBLE,false);
@@ -416,15 +494,18 @@ void PrivacyLists::setGroupAutoListed(const Jid &AStreamJid, const QString &AGro
 					}
 					else
 					{
-						list.rules.removeAt(list.rules.indexOf(rule));
+						list.rules.removeAll(rule);
 					}
 				}
 			}
 
 			for (int i=0; i<list.rules.count();i++)
-				list.rules[i].order=i;
+				list.rules[i].order = i;
 
-			!list.rules.isEmpty() ? savePrivacyList(AStreamJid,list) : removePrivacyList(AStreamJid,AListName);
+			if (list.rules.isEmpty())
+				removePrivacyList(AStreamJid,AList);
+			else
+				savePrivacyList(AStreamJid,list);
 		}
 	}
 }
@@ -439,6 +520,8 @@ void PrivacyLists::setContactAutoListed(const Jid &AStreamJid, const Jid &AConta
 
 		if (APresent != list.rules.contains(rule))
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Changing contact present in auto list, contact=%1, list=%2, present=%3").arg(AContactJid.full(),AList).arg(APresent));
+
 			if (APresent)
 			{
 				setContactAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_VISIBLE,false);
@@ -449,13 +532,16 @@ void PrivacyLists::setContactAutoListed(const Jid &AStreamJid, const Jid &AConta
 			}
 			else
 			{
-				list.rules.removeAt(list.rules.indexOf(rule));
+				list.rules.removeAll(rule);
 			}
 
 			for (int i=0; i<list.rules.count();i++)
-				list.rules[i].order=i;
+				list.rules[i].order = i;
 
-			!list.rules.isEmpty() ? savePrivacyList(AStreamJid,list) : removePrivacyList(AStreamJid,AList);
+			if (list.rules.isEmpty())
+				removePrivacyList(AStreamJid,AList);
+			else
+				savePrivacyList(AStreamJid,list);
 		}
 	}
 }
@@ -481,18 +567,23 @@ void PrivacyLists::setOffRosterBlocked(const Jid &AStreamJid, bool ABlocked)
 {
 	IPrivacyRule rule = offRosterRule();
 	IPrivacyList list = privacyList(AStreamJid,PRIVACY_LIST_SUBSCRIPTION,true);
-	if (list.rules.contains(rule) != ABlocked)
+	if (ABlocked != list.rules.contains(rule))
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Changing off roster contacts blocking to=%1").arg(ABlocked));
+
 		list.name = PRIVACY_LIST_SUBSCRIPTION;
 		if (ABlocked)
 			list.rules.append(rule);
 		else
-			list.rules.removeAt(list.rules.indexOf(rule));
+			list.rules.removeAll(rule);
 
 		for (int i=0; i<list.rules.count();i++)
 			list.rules[i].order = i;
 
-		!list.rules.isEmpty() ? savePrivacyList(AStreamJid,list) : removePrivacyList(AStreamJid,list.name);
+		if (list.rules.isEmpty())
+			removePrivacyList(AStreamJid,list.name);
+		else
+			savePrivacyList(AStreamJid,list);
 	}
 }
 
@@ -510,6 +601,7 @@ void PrivacyLists::setAutoPrivacy(const Jid &AStreamJid, const QString &AAutoLis
 {
 	if (isReady(AStreamJid) && activeList(AStreamJid,true)!=AAutoList)
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Changing auto privacy list to=%1").arg(AAutoList));
 		if (AAutoList == PRIVACY_LIST_AUTO_VISIBLE)
 		{
 			FApplyAutoLists.insert(AStreamJid,AAutoList);
@@ -599,19 +691,24 @@ QString PrivacyLists::setActiveList(const Jid &AStreamJid, const QString &AList)
 {
 	if (isReady(AStreamJid) && AList!=activeList(AStreamJid))
 	{
-		Stanza set("iq");
-		set.setType("set").setId(FStanzaProcessor->newId());
-		QDomElement queryElem = set.addElement("query",NS_JABBER_PRIVACY);
-		QDomElement activeElem = queryElem.appendChild(set.createElement("active")).toElement();
+		Stanza request("iq");
+		request.setType("set").setId(FStanzaProcessor->newId());
+		QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
+		QDomElement activeElem = queryElem.appendChild(request.createElement("active")).toElement();
 		if (!AList.isEmpty())
 			activeElem.setAttribute("name",AList);
 
 		emit activeListAboutToBeChanged(AStreamJid,AList);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,set,PRIVACY_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
 		{
-			FStreamRequests[AStreamJid].prepend(set.id());
-			FActiveRequests.insert(set.id(),AList);
-			return set.id();
+			LOG_STRM_INFO(AStreamJid,QString("Change active list request sent, list=%1, id=%2").arg(AList,request.id()));
+			FStreamRequests[AStreamJid].prepend(request.id());
+			FActiveRequests.insert(request.id(),AList);
+			return request.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send change active list request, list=%1").arg(AList));
 		}
 	}
 	return QString::null;
@@ -634,17 +731,22 @@ QString PrivacyLists::setDefaultList(const Jid &AStreamJid, const QString &AList
 {
 	if (isReady(AStreamJid) && AList!=defaultList(AStreamJid))
 	{
-		Stanza set("iq");
-		set.setType("set").setId(FStanzaProcessor->newId());
-		QDomElement queryElem = set.addElement("query",NS_JABBER_PRIVACY);
-		QDomElement defaultElem = queryElem.appendChild(set.createElement("default")).toElement();
+		Stanza request("iq");
+		request.setType("set").setId(FStanzaProcessor->newId());
+		QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
+		QDomElement defaultElem = queryElem.appendChild(request.createElement("default")).toElement();
 		if (!AList.isEmpty())
 			defaultElem.setAttribute("name",AList);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,set,PRIVACY_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
 		{
-			FStreamRequests[AStreamJid].prepend(set.id());
-			FDefaultRequests.insert(set.id(),AList);
-			return set.id();
+			LOG_STRM_INFO(AStreamJid,QString("Change default list request sent, list=%1, id=%2").arg(AList,request.id()));
+			FStreamRequests[AStreamJid].prepend(request.id());
+			FDefaultRequests.insert(request.id(),AList);
+			return request.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send change default list request, list=%1").arg(AList));
 		}
 	}
 	return QString::null;
@@ -690,15 +792,20 @@ QString PrivacyLists::loadPrivacyList(const Jid &AStreamJid, const QString &ALis
 {
 	if (isReady(AStreamJid) && !AList.isEmpty())
 	{
-		Stanza load("iq");
-		load.setType("get").setId(FStanzaProcessor->newId());
-		QDomElement elem = load.addElement("query",NS_JABBER_PRIVACY);
-		elem.appendChild(load.createElement("list")).toElement().setAttribute("name",AList);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,PRIVACY_TIMEOUT))
+		Stanza request("iq");
+		request.setType("get").setId(FStanzaProcessor->newId());
+		QDomElement elem = request.addElement("query",NS_JABBER_PRIVACY);
+		elem.appendChild(request.createElement("list")).toElement().setAttribute("name",AList);
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
 		{
-			FStreamRequests[AStreamJid].prepend(load.id());
-			FLoadRequests.insert(load.id(),AList);
-			return load.id();
+			LOG_STRM_INFO(AStreamJid,QString("Load privacy list request sent, list=%1, id=%2").arg(AList,request.id()));
+			FStreamRequests[AStreamJid].prepend(request.id());
+			FLoadRequests.insert(request.id(),AList);
+			return request.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send load privacy list request, list=%1").arg(AList));
 		}
 	}
 	return QString::null;
@@ -710,15 +817,15 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
 	{
 		if (privacyList(AStreamJid,AList.name,true) != AList)
 		{
-			Stanza save("iq");
-			save.setType("set").setId(FStanzaProcessor->newId());
-			QDomElement queryElem = save.addElement("query",NS_JABBER_PRIVACY);
-			QDomElement listElem =  queryElem.appendChild(save.createElement("list")).toElement();
+			Stanza request("iq");
+			request.setType("set").setId(FStanzaProcessor->newId());
+			QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
+			QDomElement listElem =  queryElem.appendChild(request.createElement("list")).toElement();
 			listElem.setAttribute("name",AList.name);
 
 			foreach(const IPrivacyRule &item, AList.rules)
 			{
-				QDomElement itemElem = listElem.appendChild(save.createElement("item")).toElement();
+				QDomElement itemElem = listElem.appendChild(request.createElement("item")).toElement();
 				itemElem.setAttribute("order",item.order);
 				itemElem.setAttribute("action",item.action);
 				if (!item.type.isEmpty())
@@ -728,26 +835,33 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
 				if (item.stanzas != IPrivacyRule::AnyStanza)
 				{
 					if (item.stanzas & IPrivacyRule::Messages)
-						itemElem.appendChild(save.createElement("message"));
+						itemElem.appendChild(request.createElement("message"));
 					if (item.stanzas & IPrivacyRule::Queries)
-						itemElem.appendChild(save.createElement("iq"));
+						itemElem.appendChild(request.createElement("iq"));
 					if (item.stanzas & IPrivacyRule::PresencesIn)
-						itemElem.appendChild(save.createElement("presence-in"));
+						itemElem.appendChild(request.createElement("presence-in"));
 					if (item.stanzas & IPrivacyRule::PresencesOut)
-						itemElem.appendChild(save.createElement("presence-out"));
+						itemElem.appendChild(request.createElement("presence-out"));
 				}
 			}
 
 			emit listAboutToBeChanged(AStreamJid,AList);
-			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,PRIVACY_TIMEOUT))
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
 			{
-				FStreamRequests[AStreamJid].prepend(save.id());
-				FSaveRequests.insert(save.id(),AList);
-				return save.id();
+				LOG_STRM_INFO(AStreamJid,QString("Save privacy list request sent, list=%1, id=%2").arg(AList.name,request.id()));
+				FStreamRequests[AStreamJid].prepend(request.id());
+				FSaveRequests.insert(request.id(),AList);
+				return request.id();
+			}
+			else
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to send save privacy list request, list=%1").arg(AList.name));
 			}
 		}
 		else
+		{
 			return QString("");
+		}
 	}
 	return QString::null;
 }
@@ -762,9 +876,14 @@ QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AL
 		queryElem.appendChild(remove.createElement("list")).toElement().setAttribute("name",AList);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,PRIVACY_TIMEOUT))
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Remove privacy list request sent, list=%1, id=%2").arg(AList,remove.id()));
 			FStreamRequests[AStreamJid].prepend(remove.id());
 			FRemoveRequests.insert(remove.id(),AList);
 			return remove.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send privacy list remove request, list=%1").arg(AList));
 		}
 	}
 	return QString::null;
@@ -790,13 +909,18 @@ QString PrivacyLists::loadPrivacyLists(const Jid &AStreamJid)
 {
 	if (FStanzaProcessor)
 	{
-		Stanza load("iq");
-		load.setType("get").setId(FStanzaProcessor->newId());
-		load.addElement("query",NS_JABBER_PRIVACY);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,PRIVACY_TIMEOUT))
+		Stanza request("iq");
+		request.setType("get").setId(FStanzaProcessor->newId());
+		request.addElement("query",NS_JABBER_PRIVACY);
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
 		{
-			FLoadRequests.insert(load.id(),QString::null);
-			return load.id();
+			LOG_STRM_INFO(AStreamJid,QString("Load list of privacy lists request sent, id=%1").arg(request.id()));
+			FLoadRequests.insert(request.id(),QString::null);
+			return request.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send load list of privacy lists request"));
 		}
 	}
 	return QString::null;
@@ -1072,7 +1196,7 @@ bool PrivacyLists::isMatchedJid(const Jid &AMask, const Jid &AJid) const
 {
 	return  ( (AMask.pDomain() == AJid.pDomain()) &&
 	          (AMask.node().isEmpty() || AMask.pNode()==AJid.pNode()) &&
-	          (AMask.resource().isEmpty() || AMask.resource()==AJid.resource()) );
+	          (AMask.resource().isEmpty() || AMask.pResource()==AJid.pResource()) );
 }
 
 void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList)
@@ -1085,6 +1209,7 @@ void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList
 		QSet<Jid> online = FOfflinePresences.value(AStreamJid) - denied;
 		if (presence->isOpen())
 		{
+			LOG_STRM_INFO(AStreamJid,"Sending online presence to all not denied contacts");
 			foreach(const Jid &contactJid, online)
 			{
 				IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
@@ -1106,6 +1231,7 @@ void PrivacyLists::sendOfflinePresences(const Jid &AStreamJid, const IPrivacyLis
 		QSet<Jid> offline = denied - FOfflinePresences.value(AStreamJid);
 		if (presence->isOpen())
 		{
+			LOG_STRM_INFO(AStreamJid,"Sending offline presence to all denied contacts");
 			foreach(const Jid &contactJid, offline)
 				presence->sendPresence(contactJid,IPresence::Offline,QString::null,0);
 		}
@@ -1201,9 +1327,7 @@ bool PrivacyLists::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) c
 void PrivacyLists::onListAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList)
 {
 	if (AList.name == activeList(AStreamJid))
-	{
 		sendOfflinePresences(AStreamJid,AList);
-	}
 }
 
 void PrivacyLists::onListChanged(const Jid &AStreamJid, const QString &AList)
@@ -1239,6 +1363,8 @@ void PrivacyLists::onApplyAutoLists()
 		IPrivacyList list;
 		list.name = FApplyAutoLists.value(streamJid);
 
+		LOG_STRM_INFO(streamJid,QString("Applying auto list=%1").arg(list.name));
+
 		IPrivacyRule selfAllow;
 		selfAllow.type = PRIVACY_TYPE_JID;
 		selfAllow.value = streamJid.pBare();
@@ -1249,7 +1375,7 @@ void PrivacyLists::onApplyAutoLists()
 		foreach(const QString &listName, AutoLists)
 		{
 			IPrivacyList autoList = privacyList(streamJid,listName,true);
-			list.rules+=autoList.rules;
+			list.rules += autoList.rules;
 		}
 
 		if (list.name == PRIVACY_LIST_AUTO_VISIBLE)
@@ -1297,9 +1423,9 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
 
 		shandle.direction = IStanzaHandle::DirectionOut;
 		FSHIRosterOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
-
-		loadPrivacyLists(AXmppStream->streamJid());
 	}
+
+	loadPrivacyLists(AXmppStream->streamJid());
 }
 
 void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)

@@ -2,6 +2,34 @@
 
 #include <QLineEdit>
 #include <QMouseEvent>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/soundfiles.h>
+#include <definitions/shortcuts.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/messagehandlerorders.h>
+#include <definitions/messageeditsendhandlerorders.h>
+#include <definitions/xmppurihandlerorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosternotifyorders.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/recentitemtypes.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/tabpagenotifypriorities.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/xmpperror.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
@@ -48,16 +76,20 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
 	if (plugin)
+	{
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
+		if (FMessageWidgets == NULL)
+			LOG_WARNING("Failed to load required interface: IMessageWidgets");
+	}
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
 		if (FMessageProcessor)
-		{
 			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
-		}
+		else
+			LOG_WARNING("Failed to load required interface: IMessageProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
@@ -68,6 +100,10 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		{
 			connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
 				SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
+		}
+		else
+		{
+			LOG_WARNING("Failed to load required interface: IMessageStyles");
 		}
 	}
 
@@ -104,7 +140,9 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
+	{
 		FNotifications = qobject_cast<INotifications *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
@@ -122,19 +160,27 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
 	if (plugin)
+	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
 	if (plugin)
+	{
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
+	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
 	if (plugin)
+	{
 		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
+	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
@@ -208,7 +254,10 @@ bool NormalMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidge
 				for (QMultiMap<Jid, Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
 				{
 					message.setTo(it->full());
-					sent = FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::MessageOut) ? true : sent;
+					if (!FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::MessageOut))
+						LOG_STRM_WARNING(it.key(),QString("Failed to send message to=%1").arg(it->full()));
+					else
+						sent = true;
 				}
 				return sent;
 			}
@@ -246,6 +295,10 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 
 			updateWindow(window);
 			return true;
+		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to display message type=%1: Window not created").arg(AMessage.type()));
 		}
 	}
 	return false;
@@ -298,6 +351,10 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 				FNotifiedMessages.insertMulti(window,AMessage.data(MDR_MESSAGE_ID).toInt());
 			}
 		}
+		else
+		{
+			LOG_STRM_ERROR(AMessage.to(),QString("Failed to notify message from=%1: Window not found").arg(AMessage.from()));
+		}
 	}
 	return notify;
 }
@@ -305,7 +362,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 bool NormalMessageHandler::messageShowWindow(int AMessageId)
 {
 	IMessageNormalWindow *window = FNotifiedMessages.key(AMessageId);
-	if (window == NULL)
+	if (window)
 	{
 		Message message = FMessageProcessor->notifiedMessage(AMessageId);
 		if (messageDisplay(message,IMessageProcessor::MessageIn))
@@ -318,8 +375,9 @@ bool NormalMessageHandler::messageShowWindow(int AMessageId)
 				return true;
 			}
 		}
+		REPORT_ERROR("Failed to show notified normal message window: Window not found");
 	}
-	else 
+	else
 	{
 		window->showTabPage();
 		return true;
@@ -342,6 +400,10 @@ bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, 
 			else if (AShowMode == IMessageHandler::SM_MINIMIZED)
 				window->showMinimizedTabPage();
 			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to show normal message window, with=%1: Window not created").arg(AContactJid.bare()));
 		}
 	}
 	return false;
@@ -402,6 +464,10 @@ bool NormalMessageHandler::xmppUriOpen(const Jid &AStreamJid, const Jid &AContac
 				window->showTabPage();
 				return true;
 			}
+			else
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to open normal window by XMPP URI, with=%1: Window not created").arg(AContactJid.bare()));
+			}
 		}
 	}
 	return false;
@@ -415,6 +481,8 @@ IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, con
 		window = FMessageWidgets->getNormalWindow(AStreamJid,AContactJid,AMode);
 		if (window)
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Normal window created, with=%1").arg(AContactJid.bare()));
+
 			window->setTabPageNotifier(FMessageWidgets->newTabPageNotifier(window));
 
 			connect(window->instance(),SIGNAL(tabPageActivated()),SLOT(onWindowActivated()));
@@ -439,6 +507,18 @@ IMessageNormalWindow *NormalMessageHandler::getWindow(const Jid &AStreamJid, con
 		{
 			window = findWindow(AStreamJid,AContactJid);
 		}
+	}
+	else if (FMessageProcessor == NULL)
+	{
+		REPORT_ERROR("Failed to create normal window: IMessageProcessor is NULL");
+	}
+	else if (!FMessageProcessor->isActiveStream(AStreamJid))
+	{
+		REPORT_ERROR("Failed to create normal window: Stream is not active");
+	}
+	else if (!AContactJid.isValid())
+	{
+		REPORT_ERROR("Failed to create normal window: Contact is not valid");
 	}
 	return window;
 }
@@ -669,11 +749,15 @@ void NormalMessageHandler::removeNotifiedMessages(IMessageNormalWindow *AWindow,
 
 void NormalMessageHandler::setMessageStyle(IMessageNormalWindow *AWindow)
 {
-	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
-	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,false))
+	if (FMessageStyles)
 	{
-		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
-		AWindow->viewWidget()->setMessageStyle(style,soptions);
+		LOG_STRM_DEBUG(AWindow->streamJid(),QString("Changing message style for normal window, with=%1").arg(AWindow->contactJid().bare()));
+		IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Normal);
+		if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,false))
+		{
+			IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
+			AWindow->viewWidget()->setMessageStyle(style,soptions);
+		}
 	}
 }
 
@@ -822,6 +906,7 @@ void NormalMessageHandler::onWindowActivated()
 	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FWindows.contains(window))
 	{
+		LOG_STRM_DEBUG(window->streamJid(),QString("Normal window activated, with=%1").arg(window->contactJid().bare()));
 		if (Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL).value().toBool())
 			removeNotifiedMessages(window);
 		else
@@ -834,6 +919,7 @@ void NormalMessageHandler::onWindowDestroyed()
 	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender());
 	if (FWindows.contains(window))
 	{
+		LOG_STRM_INFO(window->streamJid(),QString("Normal window destroyed, with=%1").arg(window->contactJid().bare()));
 		FWindows.removeAll(window);
 		FMessageQueue.remove(window);
 		FNotifiedMessages.remove(window);
@@ -844,7 +930,10 @@ void NormalMessageHandler::onWindowAddressChanged()
 {
 	IMessageNormalWindow *window = qobject_cast<IMessageNormalWindow *>(sender()->parent());
 	if (window)
+	{
+		LOG_STRM_DEBUG(window->streamJid(),QString("Normal window address changed, with=%1").arg(window->contactJid().bare()));
 		updateWindow(window);
+	}
 }
 
 void NormalMessageHandler::onWindowAvailAddressesChanged()
@@ -854,7 +943,14 @@ void NormalMessageHandler::onWindowAvailAddressesChanged()
 	{
 		QMultiMap<Jid,Jid> addresses = window->address()->availAddresses();
 		if (addresses.isEmpty())
+		{
+			LOG_STRM_DEBUG(window->streamJid(),QString("Destroying normal window due to avail addresses is empty, with=%1").arg(window->contactJid().bare()));
 			window->instance()->deleteLater();
+		}
+		else
+		{
+			LOG_STRM_DEBUG(window->streamJid(),QString("Normal window avail addresses changed, with=%1").arg(window->contactJid().bare()));
+		}
 	}
 }
 

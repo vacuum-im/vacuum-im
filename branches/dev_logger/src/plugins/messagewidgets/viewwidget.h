@@ -7,7 +7,6 @@
 #include <QDragLeaveEvent>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
-#include <utils/textmanager.h>
 #include "ui_viewwidget.h"
 
 class ViewWidget :

@@ -21,8 +21,9 @@
 #include <definitions/recentitemtypes.h>
 #include <definitions/recentitemproperties.h>
 #include <utils/iconstorage.h>
-#include <utils/datetime.h>
 #include <utils/shortcuts.h>
+#include <utils/datetime.h>
+#include <utils/logger.h>
 
 #define DIR_RECENT                   "recent"
 
@@ -33,7 +34,7 @@
 #define MIN_VISIBLE_CONTACTS         5
 
 #define MAX_INACTIVE_TIMEOUT         31
-#define MIX_INACTIVE_TIMEOUT         1
+#define MIN_INACTIVE_TIMEOUT         1
 
 #define STORAGE_SAVE_TIMEOUT         100
 #define STORAGE_FIRST_SAVE_TIMEOUT   5000
@@ -44,7 +45,7 @@
 #define ADR_RECENT_TYPE              Action::DR_UserDefined + 3
 #define ADR_RECENT_REFERENCE         Action::DR_UserDefined + 4
 
-bool recentItemLessThen(const IRecentItem &AItem1, const IRecentItem &AItem2) 
+bool recentItemLessThen(const IRecentItem &AItem1, const IRecentItem &AItem2)
 {
 	bool favorite1 = AItem1.properties.value(REIP_FAVORITE).toBool();
 	bool favorite2 = AItem2.properties.value(REIP_FAVORITE).toBool();
@@ -107,6 +108,10 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
 				SLOT(onPrivateStorageDataChanged(const Jid &, const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageNotifyAboutToClose(const Jid &)),SLOT(onPrivateStorageNotifyAboutToClose(const Jid &)));
+		}
+		else
+		{
+			LOG_WARNING("Failed to load required interface: IPrivateStorage");
 		}
 	}
 
@@ -279,7 +284,7 @@ bool RecentContacts::setRosterData(int AOrder, const QVariant &AValue, IRosterIn
 Qt::DropActions RecentContacts::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Qt::DropActions actions = Qt::IgnoreAction;
-	if (AIndex->data(RDR_KIND).toInt()==RIK_RECENT_ITEM)
+	if (AIndex->data(RDR_KIND).toInt() == RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
@@ -370,7 +375,7 @@ AdvancedDelegateItem RecentContacts::rosterLabel(int AOrder, quint32 ALabelId, c
 
 bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	if (AOrder == RCHO_RECENTCONTACTS && AIndex->kind()==RIK_RECENT_ITEM)
+	if (AOrder==RCHO_RECENTCONTACTS && AIndex->kind()==RIK_RECENT_ITEM)
 	{
 		QModelIndex modelIndex = FRostersView->mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex));
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
@@ -380,9 +385,7 @@ bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, 
 		}
 		else if (AIndex->data(RDR_RECENT_TYPE)==REIT_CONTACT && Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
 		{
-			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-			Jid contactJid = AIndex->data(RDR_RECENT_REFERENCE).toString();
-			return FMessageProcessor->createMessageWindow(streamJid,contactJid,Message::Chat,IMessageHandler::SM_SHOW);
+			return rosterIndexDoubleClicked(AOrder,AIndex,AEvent);
 		}
 	}
 	return false;
@@ -390,7 +393,7 @@ bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, 
 
 bool RecentContacts::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	if (AOrder == RCHO_RECENTCONTACTS && AIndex->kind()==RIK_RECENT_ITEM)
+	if (AOrder==RCHO_RECENTCONTACTS && AIndex->kind()==RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
@@ -512,10 +515,15 @@ void RecentContacts::setItemProperty(const IRecentItem &AItem, const QString &AN
 	
 		if (itemChanged)
 		{
+			LOG_STRM_DEBUG(AItem.streamJid,QString("Recent item property changed, type=%1, ref=%2, property=%3, value=%4").arg(AItem.type,AItem.reference,AName,AValue.toString()));
 			item.updateTime = QDateTime::currentDateTime();
 			mergeRecentItems(item.streamJid, QList<IRecentItem>() << item, false);
 			startSaveItemsToStorage(item.streamJid);
 		}
+	}
+	else
+	{
+		LOG_STRM_WARNING(AItem.streamJid,QString("Failed to change recent item property, type=%1, ref=%2, property=%3, value=%4: Stream not ready").arg(AItem.type,AItem.reference,AName,AValue.toString()));
 	}
 }
 
@@ -523,6 +531,7 @@ void RecentContacts::setItemActiveTime(const IRecentItem &AItem, const QDateTime
 {
 	if (isReady(AItem.streamJid))
 	{
+		LOG_STRM_DEBUG(AItem.streamJid,QString("Changing recent item active time, type=%1, ref=%2, time=%3").arg(AItem.type,AItem.reference,ATime.toString(Qt::ISODate)));
 		IRecentItem item = findRealItem(AItem);
 		if (item.type.isEmpty())
 		{
@@ -537,20 +546,29 @@ void RecentContacts::setItemActiveTime(const IRecentItem &AItem, const QDateTime
 			mergeRecentItems(item.streamJid, QList<IRecentItem>() << item, false);
 		}
 	}
+	else
+	{
+		LOG_STRM_WARNING(AItem.streamJid,QString("Failed to change recent item active time, type=%1, ref=%2, time=%3: Stream not ready").arg(AItem.type,AItem.reference,ATime.toString(Qt::ISODate)));
+	}
 }
 
 void RecentContacts::removeItem(const IRecentItem &AItem)
 {
 	if (isReady(AItem.streamJid))
 	{
-		int index = FStreamItems.value(AItem.streamJid).indexOf(AItem);
+		QList<IRecentItem> newItems = FStreamItems.value(AItem.streamJid);
+		int index = newItems.indexOf(AItem);
 		if (index >= 0)
 		{
-			QList<IRecentItem> newItems = FStreamItems.value(AItem.streamJid);
+			LOG_STRM_DEBUG(AItem.streamJid,QString("Removing recent item, type=%1, ref=%2").arg(AItem.type,AItem.reference));
 			newItems.removeAt(index);
 			mergeRecentItems(AItem.streamJid,newItems,true);
 			startSaveItemsToStorage(AItem.streamJid);
 		}
+	}
+	else
+	{
+		LOG_STRM_WARNING(AItem.streamJid,QString("Failed to remove recent item, type=%1, ref=%2: Stream not ready").arg(AItem.type,AItem.reference));
 	}
 }
 
@@ -561,7 +579,7 @@ QList<IRecentItem> RecentContacts::visibleItems() const
 
 IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 {
-	static IRecentItem nullItem;
+	static const IRecentItem nullItem;
 	if (AIndex->kind() == RIK_RECENT_ITEM)
 	{
 		IRecentItem item;
@@ -570,14 +588,11 @@ IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 		item.reference = AIndex->data(RDR_RECENT_REFERENCE).toString();
 		return item;
 	}
-	else
+	else foreach(IRecentItemHandler *handler, FItemHandlers)
 	{
-		foreach(IRecentItemHandler *handler, FItemHandlers)
-		{
-			IRecentItem item = handler->recentItemForIndex(AIndex);
-			if (isValidItem(item))
-				return item;
-		}
+		IRecentItem item = handler->recentItemForIndex(AIndex);
+		if (isValidItem(item))
+			return item;
 	}
 	return nullItem;
 }
@@ -606,6 +621,7 @@ void RecentContacts::registerItemHandler(const QString &AType, IRecentItemHandle
 {
 	if (AHandler != NULL)
 	{
+		LOG_INFO(QString("Recent item handler registered, type=%1").arg(AType));
 		if (!FItemHandlers.values().contains(AHandler))
 			connect(AHandler->instance(),SIGNAL(recentItemUpdated(const IRecentItem &)),SLOT(onHandlerRecentItemUpdated(const IRecentItem &)));
 		FItemHandlers.insert(AType,AHandler);
@@ -933,8 +949,19 @@ bool RecentContacts::saveItemsToStorage(const Jid &AStreamJid)
 		QDomDocument doc;
 		QDomElement itemsElem = doc.appendChild(doc.createElementNS(PSN_RECENTCONTACTS,PST_RECENTCONTACTS)).toElement();
 		saveItemsToXML(itemsElem,streamItems(AStreamJid));
-		FPrivateStorage->saveData(AStreamJid,itemsElem);
-		return true;
+		if (!FPrivateStorage->saveData(AStreamJid,itemsElem).isEmpty())
+		{
+			LOG_STRM_INFO(AStreamJid,"Save recent items request sent");
+			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send save recent items request");
+		}
+	}
+	else if (FPrivateStorage)
+	{
+		REPORT_ERROR("Failed to save recent items to storage: Stream not ready");
 	}
 	return false;
 }
@@ -1002,13 +1029,22 @@ QList<IRecentItem> RecentContacts::loadItemsFromFile(const QString &AFileName) c
 	QFile file(AFileName);
 	if (file.exists() && file.open(QIODevice::ReadOnly))
 	{
+		QString xmlError;
 		QDomDocument doc;
-		if (doc.setContent(file.readAll()))
+		if (doc.setContent(file.readAll(),&xmlError))
 		{
 			QDomElement itemsElem = doc.firstChildElement(PST_RECENTCONTACTS);
 			items = loadItemsFromXML(itemsElem);
 		}
+		else
+		{
+			LOG_ERROR(QString("Failed to load recent items content from file=%1: %2").arg(AFileName,xmlError));
+		}
 		file.close();
+	}
+	else if (file.exists())
+	{
+		LOG_ERROR(QString("Failed to load recent items from file=%1: %2").arg(AFileName,file.errorString()));
 	}
 
 	return items;
@@ -1017,13 +1053,17 @@ QList<IRecentItem> RecentContacts::loadItemsFromFile(const QString &AFileName) c
 void RecentContacts::saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const
 {
 	QFile file(AFileName);
-	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 	{
 		QDomDocument doc;
 		QDomElement itemsElem = doc.appendChild(doc.createElementNS(PSN_RECENTCONTACTS,PST_RECENTCONTACTS)).toElement();
 		saveItemsToXML(itemsElem,AItems);
 		file.write(doc.toByteArray());
 		file.close();
+	}
+	else
+	{
+		LOG_ERROR(QString("Failed to save recent items to file=%1: %2").arg(AFileName,file.errorString()));
 	}
 }
 
@@ -1143,14 +1183,20 @@ void RecentContacts::onRostersModelIndexRemoving(IRosterIndex *AIndex)
 
 void RecentContacts::onPrivateStorageOpened(const Jid &AStreamJid)
 {
-	FPrivateStorage->loadData(AStreamJid,PST_RECENTCONTACTS,PSN_RECENTCONTACTS);
+	if (!FPrivateStorage->loadData(AStreamJid,PST_RECENTCONTACTS,PSN_RECENTCONTACTS).isEmpty())
+		LOG_STRM_INFO(AStreamJid,"Recent items load request sent");
+	else
+		LOG_STRM_WARNING(AStreamJid,"Failed to send load roster items request");
 }
 
 void RecentContacts::onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
 	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_RECENTCONTACTS && AElement.namespaceURI()==PSN_RECENTCONTACTS)
+	{
+		LOG_STRM_INFO(AStreamJid,"Recent items loaded or updated");
 		mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+	}
 }
 
 void RecentContacts::onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
@@ -1500,7 +1546,7 @@ void RecentContacts::onOptionsChanged(const OptionsNode &ANode)
 	}
 	else if (ANode.path() == OPV_ROSTER_RECENT_INACTIVEDAYSTIMEOUT)
 	{
-		FInactiveDaysTimeout = qMin(qMax(ANode.value().toInt(),MIX_INACTIVE_TIMEOUT),MAX_INACTIVE_TIMEOUT);
+		FInactiveDaysTimeout = qMin(qMax(ANode.value().toInt(),MIN_INACTIVE_TIMEOUT),MAX_INACTIVE_TIMEOUT);
 		updateVisibleItems();
 	}
 }

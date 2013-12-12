@@ -1,18 +1,15 @@
 #ifndef STYLEOPTIONSWIDGET_H
 #define STYLEOPTIONSWIDGET_H
 
-#include <definitions/optionvalues.h>
 #include <interfaces/imessagestyles.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/iroster.h>
-#include <utils/message.h>
-#include <utils/options.h>
 #include "ui_styleoptionswidget.h"
 
 class StyleOptionsWidget :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

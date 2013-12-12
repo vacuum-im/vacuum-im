@@ -121,10 +121,6 @@ bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode,
 			checkLimits();
 			return true;
 		}
-		else
-		{
-			LOG_STRM_ERROR(FStreamJid,QString("Failed to save groupchat message without resource from=%1").arg(contactJid.full()));
-		}
 	}
 	return false;
 }

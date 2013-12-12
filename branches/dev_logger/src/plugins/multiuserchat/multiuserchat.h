@@ -1,10 +1,6 @@
 #ifndef MULTIUSERCHAT_H
 #define MULTIUSERCHAT_H
 
-#include <definitions/multiuserdataroles.h>
-#include <definitions/namespaces.h>
-#include <definitions/messageeditororders.h>
-#include <definitions/stanzahandlerorders.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
@@ -12,7 +8,6 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
-#include <utils/xmpperror.h>
 #include "multiuser.h"
 
 class MultiUserChat :

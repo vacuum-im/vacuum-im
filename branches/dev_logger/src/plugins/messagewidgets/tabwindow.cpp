@@ -4,9 +4,19 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSignalMapper>
+#include <definitions/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/shortcuts.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
-#define BLINK_VISIBLE_TIME              750
-#define BLINK_INVISIBLE_TIME            250
+#define BLINK_VISIBLE_TIME          750
+#define BLINK_INVISIBLE_TIME        250
 
 #define ADR_TAB_INDEX               Action::DR_Parametr1
 #define ADR_TAB_MENU_ACTION         Action::DR_Parametr2
@@ -22,6 +32,7 @@ enum TabMenuActions {
 
 TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,false);
 

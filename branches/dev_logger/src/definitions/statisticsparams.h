@@ -11,6 +11,8 @@
 #define SEVP_FILESTREAM_SUCCESS                              "file-stream|success|File Stream Success"
 #define SEVP_FILESTREAM_FAILURE                              "file-stream|failure|File Stream Failure"
 
+#define SEVP_REGISTRATION_STREAM_BEGIN                       "registration|stream-begin|Registration stream begin"
+#define SEVP_REGISTRATION_STREAM_SUCCESS                     "registration|stream-success|Registration stream success"
 
 // Hit-Timing
 #define STMP_APPLICATION_START                               "application|start|Application Start"

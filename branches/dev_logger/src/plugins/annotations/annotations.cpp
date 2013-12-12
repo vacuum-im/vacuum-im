@@ -304,7 +304,7 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
 		QString id = FPrivateStorage->saveData(AStreamJid,doc.documentElement());
 		if (!id.isEmpty())
 		{
-			LOG_STRM_INFO(AStreamJid,"Annotations save request sent");
+			LOG_STRM_INFO(AStreamJid,QString("Save annotations request sent, id=%1").arg(id));
 			FSaveRequests.insert(id,AStreamJid);
 			return true;
 		}

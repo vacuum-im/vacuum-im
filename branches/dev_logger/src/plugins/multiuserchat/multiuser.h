@@ -1,13 +1,12 @@
 #ifndef MULTIUSER_H
 #define MULTIUSER_H
 
-#include <definitions/multiuserdataroles.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipresence.h>
 
 class MultiUser :
-			public QObject,
-			public IMultiUser
+	public QObject,
+	public IMultiUser
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMultiUser);

@@ -931,7 +931,7 @@ QString MessageArchiver::setArchivePrefs(const Jid &AStreamJid, const IArchiveSt
 			QString requestId;
 			if (storage)
 				requestId = FPrivateStorage!=NULL ? FPrivateStorage->saveData(AStreamJid,prefElem) : QString::null;
-			else if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_REQUEST_TIMEOUT))
+			else if (FStanzaProcessor && FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,ARCHIVE_REQUEST_TIMEOUT))
 				requestId = save.id();
 			if (!requestId.isEmpty())
 			{

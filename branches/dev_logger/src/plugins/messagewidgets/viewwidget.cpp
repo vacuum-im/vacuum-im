@@ -5,6 +5,7 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 #include <QTextDocumentFragment>
+#include <utils/textmanager.h>
 
 ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
 {

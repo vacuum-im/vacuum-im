@@ -183,7 +183,7 @@ IXmppFeature *IqAuthPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStrea
 {
 	if (AFeatureNS == NS_FEATURE_IQAUTH)
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),"Iq-Auth authenticator created");
+		LOG_STRM_INFO(AXmppStream->streamJid(),"Iq-Auth XMPP stream feature created");
 		IXmppFeature *feature = new IqAuth(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -197,7 +197,7 @@ void IqAuthPlugin::onFeatureDestroyed()
 	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
 	if (feature)
 	{
-		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"Iq-Auth authenticator destroyed");
+		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"Iq-Auth XMPP stream feature destroyed");
 		emit featureDestroyed(feature);
 	}
 }

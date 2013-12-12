@@ -385,6 +385,10 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 				FNotifiedMessages.insertMulti(window, AMessage.data(MDR_MESSAGE_ID).toInt());
 			}
 		}
+		else if (window == NULL)
+		{
+			LOG_STRM_ERROR(AMessage.to(),QString("Failed to notify message from=%1: Window not found").arg(AMessage.from()));
+		}
 	}
 	return notify;
 }
@@ -527,7 +531,7 @@ IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const J
 			}
 			else
 			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to create chat window, with=%1: Instance is not created").arg(AContactJid.bare()));
+				LOG_STRM_ERROR(AStreamJid,QString("Failed to create chat window, with=%1: Instance is not created").arg(AContactJid.bare()));
 			}
 		}
 	}
@@ -627,15 +631,17 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 
 void ChatMessageHandler::setMessageStyle(IMessageChatWindow *AWindow)
 {
-	LOG_STRM_DEBUG(AWindow->streamJid(),QString("Setting message style for chat window, with=%1").arg(AWindow->contactJid().bare()));
-
-	IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
-	if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
+	if (FMessageStyles)
 	{
-		IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
-		AWindow->viewWidget()->setMessageStyle(style,soptions);
+		LOG_STRM_DEBUG(AWindow->streamJid(),QString("Changing message style for chat window, with=%1").arg(AWindow->contactJid().bare()));
+		IMessageStyleOptions soptions = FMessageStyles->styleOptions(Message::Chat);
+		if (AWindow->viewWidget()->messageStyle()==NULL || !AWindow->viewWidget()->messageStyle()->changeOptions(AWindow->viewWidget()->styleWidget(),soptions,true))
+		{
+			IMessageStyle *style = FMessageStyles->styleForOptions(soptions);
+			AWindow->viewWidget()->setMessageStyle(style,soptions);
+		}
+		FWindowStatus[AWindow].lastDateSeparator = QDate();
 	}
-	FWindowStatus[AWindow].lastDateSeparator = QDate();
 }
 
 void ChatMessageHandler::fillContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const
@@ -944,11 +950,11 @@ void ChatMessageHandler::onWindowContentAppended(const QString &AHtml, const IMe
 	IMessageChatWindow *window = viewWidget!=NULL ? qobject_cast<IMessageChatWindow *>(viewWidget->messageWindow()->instance()) : NULL;
 	if (window && FHistoryRequests.values().contains(window))
 	{
-		LOG_STRM_DEBUG(window->streamJid(),QString("Adding pending content to chat window, with=%1").arg(window->contactJid().bare()));
 		WindowContent content;
 		content.html = AHtml;
 		content.options = AOptions;
 		FPendingContent[window].append(content);
+		LOG_STRM_DEBUG(window->streamJid(),QString("Added pending content to chat window, with=%1").arg(window->contactJid().bare()));
 	}
 }
 
@@ -1025,10 +1031,7 @@ void ChatMessageHandler::onClearWindowAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	IMessageChatWindow *window = action!=NULL ? qobject_cast<IMessageChatWindow *>(action->parent()) : NULL;
 	if (window)
-	{
-		LOG_STRM_DEBUG(window->streamJid(),QString("Clearing chat window content by action, with=%1").arg(window->contactJid().bare()));
 		window->viewWidget()->clearContent();
-	}
 }
 
 void ChatMessageHandler::onChangeWindowAddressAction()
@@ -1122,7 +1125,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 		WindowStatus &wstatus = FWindowStatus[window];
 		wstatus.startTime = !ABody.messages.isEmpty() ? ABody.messages.last().dateTime() : QDateTime();
 
-		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded and shown, with=%1, id=%2").arg(window->contactJid().bare()).arg(AId));
+		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded and shown, with=%1, id=%2").arg(window->contactJid().bare(),AId));
 	}
 }
 
@@ -1152,10 +1155,6 @@ void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOpti
 			{
 				setMessageStyle(window);
 				showHistory(window);
-			}
-			else
-			{
-				LOG_STRM_DEBUG(window->streamJid(),QString("Changed message style options for chat window, with=%1").arg(window->contactJid().full()));
 			}
 		}
 	}

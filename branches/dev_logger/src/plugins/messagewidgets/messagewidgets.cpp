@@ -8,6 +8,22 @@
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextDocumentWriter>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <definitions/messageviewurlhandlerorders.h>
+#include <definitions/messageeditcontentshandlerorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
 
 #define ADR_QUOTE_WINDOW        Action::DR_Parametr1
 #define ADR_CONTEXT_DATA        Action::DR_Parametr1
@@ -205,11 +221,7 @@ bool MessageWidgets::messageEditContentsInsert(int AOrder, IMessageEditWidget *A
 
 bool MessageWidgets::messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
 {
-	Q_UNUSED(AOrder);
-	Q_UNUSED(AWidget);
-	Q_UNUSED(APosition);
-	Q_UNUSED(ARemoved);
-	Q_UNUSED(AAdded);
+	Q_UNUSED(AOrder); Q_UNUSED(AWidget); Q_UNUSED(APosition); Q_UNUSED(ARemoved); Q_UNUSED(AAdded);
 	return false;
 }
 
@@ -636,9 +648,7 @@ void MessageWidgets::onViewContextUrlActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-	{
 		QDesktopServices::openUrl(action->data(ADR_CONTEXT_DATA).toString());
-	}
 }
 
 void MessageWidgets::onViewContextSearchActionTriggered(bool)
@@ -750,9 +760,7 @@ void MessageWidgets::onTabWindowDestroyed()
 void MessageWidgets::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MAINWINDOW_COMBINEWITHMESSAGES && FMainWindow && AWidget==FMainWindow->instance())
-	{
 		Options::node(OPV_MESSAGES_COMBINEWITHROSTER).setValue(!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool());
-	}
 }
 
 void MessageWidgets::onOptionsOpened()

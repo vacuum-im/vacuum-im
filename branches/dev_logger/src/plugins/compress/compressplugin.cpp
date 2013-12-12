@@ -117,7 +117,7 @@ IXmppFeature *CompressPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStr
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AXmppStream->streamJid()) : NULL;
 		if (account==NULL || account->optionsNode().value("stream-compress").toBool())
 		{
-			LOG_STRM_INFO(AXmppStream->streamJid(),"Creating stream compression feature");
+			LOG_STRM_INFO(AXmppStream->streamJid(),"Compression XMPP stream feature created");
 			IXmppFeature *feature = new Compression(AXmppStream);
 			connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 			emit featureCreated(feature);
@@ -132,7 +132,7 @@ void CompressPlugin::onFeatureDestroyed()
 	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
 	if (feature)
 	{
-		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"Stream compression feature destroyed");
+		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"Compression XMPP stream feature destroyed");
 		emit featureDestroyed(feature);
 	}
 }
