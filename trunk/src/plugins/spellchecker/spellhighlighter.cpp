@@ -21,11 +21,11 @@ void SpellHighlighter::setEnabled(bool AEnabled)
 
 void SpellHighlighter::highlightBlock(const QString &AText)
 {
-	// Match words (minimally) excluding digits within a word
-	static const QRegExp expression("\\b[^\\s\\d]+\\b");
-
 	if (FEnabled)
 	{
+		// Match words (minimally) excluding digits within a word
+		static const QRegExp expression("\\b[^\\s\\d]+\\b");
+
 		int index = 0;
 		while ((index = expression.indexIn(AText, index)) != -1)
 		{
