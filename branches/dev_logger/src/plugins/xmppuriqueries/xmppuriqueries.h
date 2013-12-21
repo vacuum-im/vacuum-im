@@ -4,13 +4,12 @@
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
-#include <definitions/messageviewurlhandlerorders.h>
 
 class XmppUriQueries :
-			public QObject,
-			public IPlugin,
-			public IXmppUriQueries,
-			public IMessageViewUrlHandler
+	public QObject,
+	public IPlugin,
+	public IXmppUriQueries,
+	public IMessageViewUrlHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppUriQueries IMessageViewUrlHandler);

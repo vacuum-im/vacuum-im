@@ -6,15 +6,8 @@
 #include <QMultiMap>
 #include <QDomDocument>
 #include <QInputDialog>
-#include <definitions/namespaces.h>
-#include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
-#include <utils/options.h>
-#include <utils/xmpperror.h>
-#include <utils/versionparser.h>
 #include "streamparser.h"
 
 enum StreamState {
