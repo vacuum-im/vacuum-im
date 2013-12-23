@@ -89,7 +89,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 			else
 			{
 				XmppStanzaError err(AStanza);
-				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Failed to load account registration fields: %1").arg(err.errorMessage()));
+				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Failed to load account registration fields: %1").arg(err.condition()));
 				emit error(err);
 			}
 			return true;
@@ -107,7 +107,7 @@ bool RegisterStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int
 			else
 			{
 				XmppStanzaError err(AStanza);
-				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Account registration submit rejected: %1").arg(err.errorMessage()));
+				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Account registration submit rejected: %1").arg(err.condition()));
 				emit error(err);
 			}
 			return true;

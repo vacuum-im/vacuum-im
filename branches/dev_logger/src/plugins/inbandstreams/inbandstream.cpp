@@ -369,7 +369,7 @@ void InBandStream::abort(const XmppError &AError)
 {
 	if (streamState() != IDataStreamSocket::Closed)
 	{
-		LOG_STRM_INFO(FStreamJid,QString("Aborting stream, sid=%1: %2").arg(FStreamId,AError.errorMessage()));
+		LOG_STRM_WARNING(FStreamJid,QString("Aborting stream, sid=%1: %2").arg(FStreamId,AError.errorMessage()));
 		setStreamError(AError);
 		close();
 		setStreamState(IDataStreamSocket::Closed);

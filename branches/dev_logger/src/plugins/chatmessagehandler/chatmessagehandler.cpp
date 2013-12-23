@@ -1074,7 +1074,7 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppEr
 	if (FHistoryRequests.contains(AId))
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
-		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, with=%1, id=%2: %3").arg(window->contactJid().bare(),AId,AError.errorMessage()));
+		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, with=%1, id=%2: %3").arg(window->contactJid().bare(),AId,AError.condition()));
 		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
 		FPendingMessages.remove(window);
 		FPendingContent.remove(window);

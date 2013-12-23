@@ -137,7 +137,7 @@ void XmppStream::abort(const XmppError &AError)
 {
 	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
-		LOG_STRM_INFO(streamJid(),QString("Aborting XMPP stream: %1").arg(AError.condition()));
+		LOG_STRM_WARNING(streamJid(),QString("Aborting XMPP stream: %1").arg(AError.condition()));
 
 		if (FStreamState != SS_DISCONNECTING)
 		{
@@ -242,7 +242,7 @@ void XmppStream::setDefaultLang(const QString &ADefLang)
 	if (FStreamState == SS_OFFLINE)
 	{
 		FDefLang = ADefLang;
-		LOG_STRM_INFO(streamJid(),QString("Default stream language changed to=%1").arg(ADefLang));
+		LOG_STRM_DEBUG(streamJid(),QString("Default stream language changed to=%1").arg(ADefLang));
 	}
 }
 
@@ -256,7 +256,7 @@ void XmppStream::setEncryptionRequired(bool ARequire)
 	if (FStreamState == SS_OFFLINE)
 	{
 		FEncrypt = ARequire;
-		LOG_STRM_INFO(streamJid(),QString("XMPP stream encryption require changed to=%1").arg(ARequire));
+		LOG_STRM_DEBUG(streamJid(),QString("XMPP stream encryption require changed to=%1").arg(ARequire));
 	}
 }
 
@@ -426,6 +426,7 @@ void XmppStream::processFeatures()
 		{
 			FReady = true;
 			setStreamState(SS_ONLINE);
+			LOG_STRM_INFO(streamJid(),"XMPP stream opened");
 			emit opened();
 		}
 		else

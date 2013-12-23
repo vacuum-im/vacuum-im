@@ -90,7 +90,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive conference configuration form, room=%1: %2").arg(FRoomJid.bare(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive conference configuration form, room=%1: %2").arg(FRoomJid.bare(),err.condition()));
 			emit chatError(err.errorMessage());
 		}
 		FConfigRequestId.clear();
@@ -106,7 +106,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to accept conference configuration submit, room=%1: %2").arg(FRoomJid.bare(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to accept conference configuration submit, room=%1: %2").arg(FRoomJid.bare(),err.condition()));
 			emit configFormRejected(err);
 			emit chatError(err.errorMessage());
 		}
@@ -138,7 +138,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive conference affiliation list, room=%1, affiliation=%2, id=%3: %4").arg(FRoomJid.bare(),affiliation,AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive conference affiliation list, room=%1, affiliation=%2, id=%3: %4").arg(FRoomJid.bare(),affiliation,AStanza.id(),err.condition()));
 			emit chatError(tr("Request for list of %1s is failed: %2").arg(affiliation).arg(err.errorMessage()));
 		}
 	}
@@ -153,14 +153,14 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to accept conference affiliation list changes, room=%1, affiliation=%2, id=%3: %4").arg(FRoomJid.bare(),affiliation,AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to accept conference affiliation list changes, room=%1, affiliation=%2, id=%3: %4").arg(FRoomJid.bare(),affiliation,AStanza.id(),err.condition()));
 			emit chatError(tr("Changes in list of %1s was not accepted: %2").arg(affiliation).arg(err.errorMessage()));
 		}
 	}
 	else if (AStanza.type() == "error")
 	{
 		XmppStanzaError err(AStanza);
-		LOG_STRM_WARNING(AStreamJid,QString("Unexpected error received in conference, room=%1, id=%2: %3").arg(FRoomJid.bare(),AStanza.id(),err.errorMessage()));
+		LOG_STRM_WARNING(AStreamJid,QString("Unexpected error received in conference, room=%1, id=%2: %3").arg(FRoomJid.bare(),AStanza.id(),err.condition()));
 		emit chatError(err.errorMessage());
 	}
 }
@@ -400,7 +400,7 @@ bool MultiUserChat::sendPresence(int AShow, const QString &AStatus)
 
 		if (FStanzaProcessor->sendStanzaOut(FStreamJid,presence))
 		{
-			LOG_STRM_DEBUG(FStreamJid,QString("Presence sent to conference, room=%1, show=%2").arg(FRoomJid.bare()).arg(AShow));
+			LOG_STRM_INFO(FStreamJid,QString("Presence sent to conference, room=%1, show=%2").arg(FRoomJid.bare()).arg(AShow));
 			FConnected = isConnecting;
 			return true;
 		}
@@ -862,7 +862,7 @@ bool MultiUserChat::processMessage(const Stanza &AStanza)
 	if (AStanza.type() == "error")
 	{
 		XmppStanzaError err(AStanza);
-		LOG_STRM_WARNING(FStreamJid,QString("Error message received in conefernce, room=%1, from=%2: %3").arg(FRoomJid.bare(),fromNick,err.errorMessage()));
+		LOG_STRM_WARNING(FStreamJid,QString("Error message received in conefernce, room=%1, from=%2: %3").arg(FRoomJid.bare(),fromNick,err.condition()));
 		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.errorMessage()) : err.errorMessage());
 	}
 	else if (message.type()==Message::GroupChat && !message.stanza().firstElement("subject").isNull())
@@ -1086,7 +1086,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 	else if (AStanza.type() == "error")
 	{
 		XmppStanzaError err(AStanza);
-		LOG_STRM_WARNING(FStreamJid,QString("Error precence received in conference, room=%1, user=%2: %3").arg(FRoomJid.bare(),fromNick,err.errorMessage()));
+		LOG_STRM_WARNING(FStreamJid,QString("Error presence received in conference, room=%1, user=%2: %3").arg(FRoomJid.bare(),fromNick,err.condition()));
 		emit chatError(!fromNick.isEmpty() ? QString("%1 - %2").arg(fromNick).arg(err.errorMessage()) : err.errorMessage());
 
 		if (fromNick == FNickName)

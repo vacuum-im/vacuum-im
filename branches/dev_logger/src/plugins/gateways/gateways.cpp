@@ -215,7 +215,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive legacy user prompt, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive legacy user prompt, id=%1: %2").arg(AStanza.id(),err.condition()));
 			emit errorReceived(AStanza.id(),err);
 		}
 		FPromptRequests.removeAll(AStanza.id());
@@ -231,7 +231,7 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive legacy user JID, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive legacy user JID, id=%1: %2").arg(AStanza.id(),err.condition()));
 			emit errorReceived(AStanza.id(),err);
 		}
 		FUserJidRequests.removeAll(AStanza.id());
@@ -961,7 +961,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_GATEWAYS_SERVICES && AElement.namespaceURI()==PSN_GATEWAYS_KEEP)
 	{
-		LOG_STRM_DEBUG(AStreamJid,"Gateways with keep connection loaded");
+		LOG_STRM_INFO(AStreamJid,"Gateways with keep connection loaded");
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 		if (roster)
 		{
@@ -997,7 +997,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 	}
 	else if (AElement.tagName()==PST_GATEWAYS_SERVICES && AElement.namespaceURI()==PSN_GATEWAYS_SUBSCRIBE)
 	{
-		LOG_STRM_DEBUG(AStreamJid,"Gateways with auto subscribe loaded");
+		LOG_STRM_INFO(AStreamJid,"Gateways with auto subscribe loaded");
 		QDomElement elem = AElement.firstChildElement("service");
 		while (!elem.isNull())
 		{

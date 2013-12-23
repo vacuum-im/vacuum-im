@@ -7,6 +7,7 @@
 #include <definitions/internalerrors.h>
 #include <definitions/archivecapabilityorders.h>
 #include <utils/options.h>
+#include <utils/logger.h>
 
 #define MAX_HEADER_ITEMS          50
 #define MAX_MESSAGE_ITEMS         25
@@ -48,12 +49,18 @@ bool ServerMessageArchive::initConnections(IPluginManager *APluginManager, int &
 			connect(FArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
 			connect(FArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
 		}
+		else
+		{
+			LOG_WARNING("Failed to load required interface: IMessageArchiver");
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+		if (FStanzaProcessor == NULL)
+			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	connect(this,SIGNAL(serverHeadersLoaded(const QString &, const QList<IArchiveHeader> &, const QString &)),
@@ -72,9 +79,7 @@ bool ServerMessageArchive::initConnections(IPluginManager *APluginManager, int &
 bool ServerMessageArchive::initObjects()
 {
 	if (FArchiver)
-	{
 		FArchiver->registerArchiveEngine(this);
-	}
 	return true;
 }
 
@@ -92,6 +97,8 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		IArchiveRequest request = FServerLoadHeadersRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Headers loaded, id=%1").arg(AStanza.id()));
+
 			QList<IArchiveHeader> headers;
 			QDomElement listElem = AStanza.firstElement("list");
 			QDomElement chatElem = listElem.firstChildElement("chat");
@@ -121,7 +128,9 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		}
 		else
 		{
-			emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load headers, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit requestFailed(AStanza.id(),err);
 		}
 	}
 	else if (FServerSaveCollectionRequests.contains(AStanza.id()))
@@ -129,6 +138,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		ServerCollectionRequest request = FServerSaveCollectionRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Collection saved, id=%1").arg(AStanza.id()));
 			QDomElement chatElem = AStanza.firstElement("save").firstChildElement("chat");
 			request.collection.header.engineId = engineId();
 			request.collection.header.subject = chatElem.attribute("subject",request.collection.header.subject);
@@ -138,7 +148,9 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		}
 		else
 		{
-			emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to save collection, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit requestFailed(AStanza.id(),err);
 		}
 	}
 	else if (FServerLoadCollectionRequests.contains(AStanza.id()))
@@ -146,6 +158,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		FServerLoadCollectionRequests.remove(AStanza.id());
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Collection loaded, id=%1").arg(AStanza.id()));
 			IArchiveCollection collection;
 			QDomElement chatElem = AStanza.firstElement("chat");
 			FArchiver->elementToCollection(chatElem,collection);
@@ -156,22 +169,33 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		}
 		else
 		{
-			emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load collection, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit requestFailed(AStanza.id(),err);
 		}
 	}
 	else if (FServerRemoveCollectionsRequests.contains(AStanza.id()))
 	{
 		IArchiveRequest request = FServerRemoveCollectionsRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
+		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Collections removed, id=%1").arg(AStanza.id()));
 			emit collectionsRemoved(AStanza.id(),request);
+		}
 		else
-			emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
+		{
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove collections, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit requestFailed(AStanza.id(),err);
+		}
 	}
 	else if (FServerLoadModificationsRequests.contains(AStanza.id()))
 	{
 		ServerModificationsRequest request = FServerLoadModificationsRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Modifications loaded, id=%1").arg(AStanza.id()));
+
 			IArchiveModifications modifications;
 			modifications.isValid = true;
 
@@ -206,7 +230,9 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 		}
 		else
 		{
-			emit requestFailed(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load modifications, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit requestFailed(AStanza.id(),err);
 		}
 	}
 }
@@ -277,17 +303,13 @@ int ServerMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStrea
 
 bool ServerMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AMessage);
-	Q_UNUSED(ADirectionIn);
+	Q_UNUSED(AStreamJid); Q_UNUSED(AMessage); Q_UNUSED(ADirectionIn);
 	return false;
 }
 
 bool ServerMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
-	Q_UNUSED(AStreamJid);
-	Q_UNUSED(AMessage);
-	Q_UNUSED(ADirectionIn);
+	Q_UNUSED(AStreamJid); Q_UNUSED(AMessage); Q_UNUSED(ADirectionIn);
 	return false;
 }
 
@@ -357,9 +379,18 @@ QString ServerMessageArchive::removeCollections(const Jid &AStreamJid, const IAr
 
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Remove collections request sent, id=%1").arg(stanza.id()));
 			FServerRemoveCollectionsRequests.insert(stanza.id(),ARequest);
 			return stanza.id();
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send remove collections request");
+		}
+	}
+	else if (FStanzaProcessor)
+	{
+		LOG_STRM_ERROR(AStreamJid,"Failed to remove collections: Not capable");
 	}
 	return QString::null;
 }
@@ -400,9 +431,18 @@ QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IAr
 		
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Load headers request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
 			FServerLoadHeadersRequests.insert(stanza.id(),ARequest);
 			return stanza.id();
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send load headers request");
+		}
+	}
+	else if (FStanzaProcessor)
+	{
+		LOG_STRM_ERROR(AStreamJid,"Failed to load headers: Not capable");
 	}
 	return QString::null;
 }
@@ -470,12 +510,25 @@ QString ServerMessageArchive::saveServerCollection(const Jid &AStreamJid, const 
 
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
-			ServerCollectionRequest requets;
-			requets.nextRef = nextRef;
-			requets.collection = ACollection;
-			FServerSaveCollectionRequests.insert(stanza.id(),requets);
+			LOG_STRM_DEBUG(AStreamJid,QString("Save collection request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
+			ServerCollectionRequest requet;
+			requet.nextRef = nextRef;
+			requet.collection = ACollection;
+			FServerSaveCollectionRequests.insert(stanza.id(),requet);
 			return stanza.id();
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send save collection request");
+		}
+	}
+	else if (!isCapable(AStreamJid,ManualArchiving))
+	{
+		LOG_STRM_ERROR(AStreamJid,"Failed to save collection: Not capable");
+	}
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to save collection: Invalid params");
 	}
 	return QString::null;
 }
@@ -494,9 +547,22 @@ QString ServerMessageArchive::loadServerCollection(const Jid &AStreamJid, const 
 
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Load collection request sent, id=%1").arg(stanza.id()));
 			FServerLoadCollectionRequests.insert(stanza.id(),AHeader);
 			return stanza.id();
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send load collection request");
+		}
+	}
+	else if (!isCapable(AStreamJid,ArchiveManagement))
+	{
+		LOG_STRM_ERROR(AStreamJid,"Failed to load collection: Not capable");
+	}
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to load collection: Invalid params");
 	}
 	return QString::null;
 }
@@ -514,10 +580,23 @@ QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, con
 		
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Load server modifications request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
 			ServerModificationsRequest request = {AStart,ACount};
 			FServerLoadModificationsRequests.insert(stanza.id(),request);
 			return stanza.id();
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send load modifications request");
+		}
+	}
+	else if (!isCapable(AStreamJid,ArchiveManagement))
+	{
+		LOG_STRM_ERROR(AStreamJid,"Failed to load modifications: Not capable");
+	}
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to load modifications: Invalid params");
 	}
 	return QString::null;
 }

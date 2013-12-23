@@ -1,6 +1,12 @@
 #include "saslbind.h"
 
 #include <QProcess>
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/xmpperror.h>
+#include <utils/stanza.h>
+#include <utils/logger.h>
 
 SASLBind::SASLBind(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
@@ -23,10 +29,13 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			Jid bindJid = AStanza.firstElement().firstChild().toElement().text();
 			if (!bindJid.isValid() || bindJid.node().isEmpty())
 			{
+				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to bind resource, jid=%1: Invalid JID").arg(bindJid.full()));
 				emit error(XmppError(IERR_SASL_BIND_INVALID_STREAM_JID));
 			}
 			else if (bindJid.pBare() == FXmppStream->streamJid().pBare())
 			{
+				LOG_STRM_INFO(FXmppStream->streamJid(),QString("Resource binding finished, jid=%1").arg(bindJid.full()));
+
 				FXmppStream->setStreamJid(bindJid);
 
 				deleteLater();
@@ -34,6 +43,8 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			}
 			else
 			{
+				LOG_STRM_INFO(FXmppStream->streamJid(),QString("Resource binding finished (bare JID changed!), jid=%1").arg(bindJid.full()));
+
 				Jid sessionJid = FXmppStream->streamJid();
 				sessionJid.setResource(bindJid.resource());
 				FXmppStream->setStreamJid(sessionJid);
@@ -44,7 +55,9 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 		}
 		else
 		{
-			emit error(XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to bind resource: %1").arg(err.condition()));
+			emit error(err);
 		}
 		return true;
 	}
@@ -53,9 +66,7 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 
 bool SASLBind::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -76,7 +87,9 @@ bool SASLBind::start(const QDomElement &AElem)
 		Stanza bind("iq");
 		bind.setType("set").setId("bind");
 		bind.addElement("bind",NS_FEATURE_BIND);
-		if (!FXmppStream->streamJid().resource().isEmpty())
+
+		QString resource = FXmppStream->streamJid().resource();
+		if (!resource.isEmpty())
 		{
 			QString resource = FXmppStream->streamJid().resource();
 			foreach(const QString &env, QProcess::systemEnvironment())
@@ -86,9 +99,16 @@ bool SASLBind::start(const QDomElement &AElem)
 			}
 			bind.firstElement("bind",NS_FEATURE_BIND).appendChild(bind.createElement("resource")).appendChild(bind.createTextNode(resource));
 		}
+
 		FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		FXmppStream->sendStanza(bind);
+		LOG_STRM_INFO(FXmppStream->streamJid(),QString("Resource binding request sent, resource='%1'").arg(resource));
+
 		return true;
+	}
+	else
+	{
+		LOG_STRM_ERROR(FXmppStream->streamJid(),QString("Failed to send resource binding request: Invalid element=%1").arg(AElem.tagName()));
 	}
 	deleteLater();
 	return false;

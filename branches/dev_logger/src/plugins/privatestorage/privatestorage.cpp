@@ -116,7 +116,7 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Private data saved in local storage, ns=%1, id=%2: %3").arg(dataElem.namespaceURI(),AStanza.id(),XmppStanzaError(AStanza).errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Private data saved in local storage, ns=%1, id=%2: %3").arg(dataElem.namespaceURI(),AStanza.id(),XmppStanzaError(AStanza).condition()));
 		}
 		saveOptionsElement(AStreamJid,dataElem);
 		emit dataSaved(AStanza.id(),AStreamJid,dataElem);
@@ -132,7 +132,7 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Private data loaded from local storage, ns=%1, id=%2: %3").arg(loadElem.namespaceURI(),AStanza.id(),XmppStanzaError(AStanza).errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Private data loaded from local storage, ns=%1, id=%2: %3").arg(loadElem.namespaceURI(),AStanza.id(),XmppStanzaError(AStanza).condition()));
 		}
 		if (dataElem.isNull())
 			dataElem = loadOptionsElement(AStreamJid,loadElem.tagName(),loadElem.namespaceURI());
@@ -148,7 +148,7 @@ void PrivateStorage::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Private data removed from local storage, ns=%1, id=%2: %3").arg(dataElem.namespaceURI(),AStanza.id(),XmppStanzaError(AStanza).errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Private data removed from local storage, ns=%1, id=%2: %3").arg(dataElem.namespaceURI(),AStanza.id(),XmppStanzaError(AStanza).condition()));
 		}
 		removeElement(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());
 		removeOptionsElement(AStreamJid,dataElem.tagName(),dataElem.namespaceURI());

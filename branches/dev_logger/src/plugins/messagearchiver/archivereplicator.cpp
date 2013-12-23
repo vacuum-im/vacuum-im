@@ -444,21 +444,21 @@ void ArchiveReplicator::onEngineRequestFailed(const QString &AId, const XmppErro
 	if (FLoadModifsRequests.contains(AId))
 	{
 		QUuid engineId = FLoadModifsRequests.take(AId);
-		LOG_STRM_WARNING(FStreamJid,QString("Failed to load engine modifications, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.errorMessage()));
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to load engine modifications, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.condition()));
 		stopReplication(engineId);
 		startSyncCollections();
 	}
 	else if (FLoadCollectionRequests.contains(AId))
 	{
 		QUuid engineId = FLoadCollectionRequests.take(AId);
-		LOG_STRM_WARNING(FStreamJid,QString("Failed to load collection, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.errorMessage()));
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to load collection, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.condition()));
 		FDestinations.clear();
 		startNextModification();
 	}
 	else if (FSaveCollectionRequests.contains(AId))
 	{
 		QUuid engineId = FSaveCollectionRequests.take(AId);
-		LOG_STRM_WARNING(FStreamJid,QString("Failed to save collection, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.errorMessage()));
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to save collection, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.condition()));
 		FDestinations.removeAll(engineId);
 		startNextModification();
 	}
@@ -467,7 +467,7 @@ void ArchiveReplicator::onEngineRequestFailed(const QString &AId, const XmppErro
 		if (AError.condition() != "item-not-found")
 		{
 			QUuid engineId = FRemoveCollectionRequests.take(AId);
-			LOG_STRM_WARNING(FStreamJid,QString("Failed to remove collection, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.errorMessage()));
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to remove collection, engine=%1, id=%2: %3").arg(engineId.toString(),AId,AError.condition()));
 			FDestinations.removeAll(engineId);
 			startNextModification();
 		}

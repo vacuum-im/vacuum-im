@@ -298,11 +298,10 @@ void PluginManager::loadSettings()
 	if (logDir.exists() && (logDir.exists(DIR_LOGS) || logDir.mkpath(DIR_LOGS)) && logDir.cd(DIR_LOGS))
 	{
 #ifndef DEBUG_MODE
-		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info|Logger::View|Logger::Event|Logger::Timing;
+		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info;
 #else
-		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info|Logger::View|Logger::Event|Logger::Timing|Logger::Debug;
+		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info|Logger::View|Logger::Event|Logger::Timing|Logger::Debug|Logger::Stanza;
 #endif
-
 		if (args.contains(CLO_LOG_TYPES))
 			logTypes = args.value(args.indexOf(CLO_LOG_TYPES)+1).toUInt();
 

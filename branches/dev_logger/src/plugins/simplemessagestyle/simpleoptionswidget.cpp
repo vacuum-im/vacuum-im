@@ -45,7 +45,6 @@ SimpleOptionsWidget::~SimpleOptionsWidget()
 void SimpleOptionsWidget::apply(OptionsNode ANode)
 {
 	OptionsNode node = ANode.isNull() ? FOptions : ANode;
-
 	node.setValue(FStyleOptions.extended.value(MSO_STYLE_ID),"style-id");
 	node.setValue(FStyleOptions.extended.value(MSO_VARIANT),"variant");
 	node.setValue(FStyleOptions.extended.value(MSO_FONT_FAMILY),"font-family");

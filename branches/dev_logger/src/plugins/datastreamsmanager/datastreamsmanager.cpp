@@ -270,7 +270,7 @@ void DataStreamsManger::stanzaRequestResult(const Jid &AStreamJid, const Stanza 
 			else
 			{
 				XmppStanzaError err(AStanza);
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to receive stream initiation response, sid=%1: %2").arg(sid,err.errorMessage()));
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to receive stream initiation response, sid=%1: %2").arg(sid,err.condition()));
 				sprofile->dataStreamError(sid,err);
 			}
 		}
@@ -511,7 +511,7 @@ bool DataStreamsManger::rejectStream(const QString &AStreamId, const XmppStanzaE
 
 		if (FStanzaProcessor->sendStanzaOut(params.streamJid,error))
 		{
-			LOG_STRM_INFO(params.streamJid,QString("Stream reject response sent, sid=%1: %2").arg(AStreamId,AError.errorMessage()));
+			LOG_STRM_INFO(params.streamJid,QString("Stream reject response sent, sid=%1: %2").arg(AStreamId,AError.condition()));
 			return true;
 		}
 		else

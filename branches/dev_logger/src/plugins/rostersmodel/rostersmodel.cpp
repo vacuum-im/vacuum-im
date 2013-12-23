@@ -5,6 +5,8 @@
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosterindexkindorders.h>
 #include <definitions/rosterdataholderorders.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 RostersModel::RostersModel()
 {
@@ -137,7 +139,7 @@ QVariant RostersModel::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 					}
 				}
 			}
-			else
+			else //if (FLayout == LayoutSeparately)
 			{
 				for(IRosterIndex *pindex = AIndex->parentIndex(); pindex!=NULL; pindex=pindex->parentIndex())
 				{
@@ -176,6 +178,8 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 
 		if (roster || presence)
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Adding stream to model"));
+
 			sindex = newRosterIndex(RIK_STREAM_ROOT);
 			sindex->setData(AStreamJid.pFull(),RDR_STREAM_JID);
 			sindex->setData(AStreamJid.full(),RDR_FULL_JID);
@@ -214,7 +218,10 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 				foreach(const IRosterItem &ritem, roster->rosterItems())
 					onRosterItemReceived(roster,ritem,empty);
 			}
-
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to add stream to model: Roster and Presence not found"));
 		}
 	}
 	return sindex;
@@ -225,6 +232,8 @@ void RostersModel::removeStream(const Jid &AStreamJid)
 	IRosterIndex *sindex =streamIndex(AStreamJid);
 	if (sindex)
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Removing stream from model"));
+
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
 		if (account)
 			disconnect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),this,SLOT(onAccountOptionsChanged(const OptionsNode &)));
@@ -259,6 +268,7 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 {
 	if (ALayout != FLayout)
 	{
+		LOG_INFO(QString("Changing streams layout to=%1").arg(ALayout));
 		emit streamsLayoutAboutToBeChanged(ALayout);
 
 		StreamsLayout before = FLayout;
@@ -270,7 +280,7 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 			{
 				insertRosterIndex(FContactsRoot,FRootIndex);
 			}
-			else if (ALayout == LayoutSeparately)
+			else //if (ALayout == LayoutSeparately)
 			{
 				foreach(IRosterIndex *sindex, FStreamIndexes.values())
 					insertRosterIndex(sindex,FRootIndex);
@@ -305,7 +315,7 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 					insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,FContactsRoot));
 				}
 			}
-			else if (ALayout == LayoutSeparately)
+			else //if (ALayout == LayoutSeparately)
 			{
 				FContactsRoot->removeChildren();
 				removeRosterIndex(FContactsRoot,false);
@@ -501,6 +511,7 @@ QList<IRosterIndex *> RostersModel::getContactIndexes(const Jid &AStreamJid, con
 			itemIndex->setData(groupIndex->data(RDR_GROUP),RDR_GROUP);
 			itemIndex->setData(IPresence::Offline,RDR_SHOW);
 			insertRosterIndex(itemIndex,groupIndex);
+
 			indexes.append(itemIndex);
 		}
 	}
@@ -537,7 +548,10 @@ QString RostersModel::singleGroupName(int AKind) const
 void RostersModel::registerSingleGroup(int AKind, const QString &AName)
 {
 	if (!FSingleGroups.contains(AKind) && !AName.trimmed().isEmpty())
+	{
+		LOG_DEBUG(QString("Single group registered, kind=%1, name=%2").arg(AKind).arg(AName));
 		FSingleGroups.insert(AKind,AName);
+	}
 }
 
 QMultiMap<int, IRosterDataHolder *> RostersModel::rosterDataHolders() const
@@ -556,6 +570,8 @@ void RostersModel::insertRosterDataHolder(int AOrder, IRosterDataHolder *AHolder
 			proxyHolder = new DataHolder(AHolder,this);
 			FAdvancedDataHolders.insert(AHolder,proxyHolder);
 		}
+
+		LOG_DEBUG(QString("Roster data holder inserted, order=%1, class=%2").arg(AOrder).arg(AHolder->instance()->metaObject()->className()));
 		AdvancedItemModel::insertItemDataHolder(AOrder,proxyHolder);
 	}
 }
@@ -566,6 +582,8 @@ void RostersModel::removeRosterDataHolder(int AOrder, IRosterDataHolder *AHolder
 	{
 		FRosterDataHolders.remove(AOrder,AHolder);
 		DataHolder *proxyHolder = FRosterDataHolders.values().contains(AHolder) ? FAdvancedDataHolders.value(AHolder) : FAdvancedDataHolders.take(AHolder);
+
+		LOG_DEBUG(QString("Roster data holder removed, order=%1, class=%2").arg(AOrder).arg(AHolder->instance()->metaObject()->className()));
 		AdvancedItemModel::removeItemDataHolder(AOrder,proxyHolder);
 	}
 }

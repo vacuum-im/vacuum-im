@@ -88,7 +88,7 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 		else
 		{
-			LOG_WARNING("Failed to find required interface: IPrivateStorage");
+			LOG_WARNING("Failed to load required interface: IPrivateStorage");
 		}
 	}
 
@@ -328,7 +328,7 @@ bool Bookmarks::addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark)
 	}
 	else if (!isReady(AStreamJid))
 	{
-		REPORT_ERROR("Failed to add bookmark: Stream is not ready");
+		LOG_STRM_WARNING(AStreamJid,"Failed to add bookmark: Stream is not ready");
 	}
 	else if (!isValidBookmark(ABookmark))
 	{
@@ -357,7 +357,7 @@ bool Bookmarks::setBookmarks(const Jid &AStreamJid, const QList<IBookmark> &ABoo
 	}
 	else
 	{
-		REPORT_ERROR("Failed to save bookmarks: Stream is not ready");
+		LOG_STRM_WARNING(AStreamJid,"Failed to save bookmarks: Stream is not ready");
 	}
 	return false;
 }
@@ -380,10 +380,6 @@ void Bookmarks::showEditBookmarksDialog(const Jid &AStreamJid)
 			connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onEditBookmarksDialogDestroyed()));
 		}
 		dialog->show();
-	}
-	else
-	{
-		REPORT_ERROR("Failed to open edit bookmarks dialog: Stream is not ready");
 	}
 }
 

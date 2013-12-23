@@ -6,22 +6,6 @@
 #include <QPair>
 #include <QTimer>
 #include <QMultiMap>
-#include <definitions/version.h>
-#include <definitions/namespaces.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterclickhookerorders.h>
-#include <definitions/multiuserdataroles.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/serviceicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/shortcutgrouporders.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/xmppurihandlerorders.h>
-#include <definitions/discofeaturehandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ixmppstreams.h>
@@ -34,9 +18,6 @@
 #include <interfaces/itraymanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/ixmppuriqueries.h>
-#include <utils/widgetmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/shortcuts.h>
 #include "discoinfowindow.h"
 #include "discoitemswindow.h"
 

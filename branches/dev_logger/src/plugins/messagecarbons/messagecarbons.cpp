@@ -148,7 +148,7 @@ void MessageCarbons::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to enable message carbons, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to enable message carbons, id=%1: %2").arg(AStanza.id(),err.condition()));
 			emit errorReceived(AStreamJid,err);
 		}
 		FEnableRequests.removeAll(AStanza.id());
@@ -164,7 +164,7 @@ void MessageCarbons::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AS
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to disable message carbons, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to disable message carbons, id=%1: %2").arg(AStanza.id(),err.condition()));
 			emit errorReceived(AStreamJid,err);
 		}
 		FDisableRequests.removeAll(AStanza.id());

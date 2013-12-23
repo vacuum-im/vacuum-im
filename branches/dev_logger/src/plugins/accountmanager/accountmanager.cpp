@@ -45,8 +45,8 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &AInitO
 	if (plugin)
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (!FXmppStreams)
-			LOG_WARNING("Failed to find required interface: IXmppStreams");
+		if (FXmppStreams == NULL)
+			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -144,13 +144,9 @@ IAccount *AccountManager::appendAccount(const QUuid &AAccountId)
 		openAccountOptionsNode(AAccountId,account->name());
 		emit appended(account);
 	}
-	else if (AAccountId.isNull())
+	else
 	{
-		REPORT_ERROR("Failed to append account: Invalid id");
-	}
-	else if (FAccounts.contains(AAccountId))
-	{
-		REPORT_ERROR("Failed to append account: Duplicate id");
+		REPORT_ERROR("Failed to append account: Invalid params");
 	}
 	return FAccounts.value(AAccountId);
 }

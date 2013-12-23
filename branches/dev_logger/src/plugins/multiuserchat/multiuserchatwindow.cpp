@@ -2697,12 +2697,12 @@ void MultiUserChatWindow::onArchiveRequestFailed(const QString &AId, const XmppE
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
 		if (window)
 		{
-			LOG_STRM_WARNING(streamJid(),QString("Failed to load private chat history, room=%1, user=%2, id=%3: %4").arg(contactJid().bare(),window->contactJid().resource(),AId,AError.errorMessage()));
+			LOG_STRM_WARNING(streamJid(),QString("Failed to load private chat history, room=%1, user=%2, id=%3: %4").arg(contactJid().bare(),window->contactJid().resource(),AId,AError.condition()));
 			showPrivateChatStatusMessage(window,tr("Failed to load history: %1").arg(AError.errorMessage()));
 		}
 		else
 		{
-			LOG_STRM_WARNING(streamJid(),QString("Failed to loaf multi chat history, room=%1, id=%2: %3").arg(contactJid().bare(),AId,AError.errorMessage()));
+			LOG_STRM_WARNING(streamJid(),QString("Failed to loaf multi chat history, room=%1, id=%2: %3").arg(contactJid().bare(),AId,AError.condition()));
 			showMultiChatStatusMessage(tr("Failed to load history: %1").arg(AError.errorMessage()),IMessageContentOptions::TypeEmpty,IMessageContentOptions::StatusEmpty,true);
 		}
 		FPendingMessages.remove(window);

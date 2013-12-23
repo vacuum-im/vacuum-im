@@ -56,7 +56,7 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to find required interface: IStanzaProcessor");
+			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 	
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
@@ -66,7 +66,7 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		if (FXmppStreams)
 			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
 		else
-			LOG_WARNING("Failed to find required interface: IXmppStreams");
+			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -174,9 +174,7 @@ bool BitsOfBinary::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int A
 
 bool BitsOfBinary::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -191,7 +189,7 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		QString type;	QByteArray data; quint64 maxAge;
 		if (!cid.isEmpty() && loadBinary(cid,type,data,maxAge))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Sending data, id=%1, to=%2").arg(cid,AStanza.from()));
+			LOG_STRM_INFO(AStreamJid,QString("Sending data, cid=%1, to=%2").arg(cid,AStanza.from()));
 			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 			dataElem = result.addElement("data",NS_BITS_OF_BINARY);
 			dataElem.setAttribute("cid",cid);
@@ -202,14 +200,10 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Rejected request for absent data, id=%1, from=%2").arg(cid,AStanza.from()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send requested data, cid=%1, from=%2: Data not found").arg(cid,AStanza.from()));
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_ITEM_NOT_FOUND);
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 		}
-	}
-	else
-	{
-		REPORT_ERROR("Received unexpected stanza");
 	}
 	return false;
 }
@@ -228,12 +222,12 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			quint64 maxAge = dataElem.attribute("max-age").toLongLong();
 			if (cid!=dataElem.attribute("cid") || type.isEmpty() || data.isEmpty())
 			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, id=%1, from=%2: Invalid response").arg(cid,AStanza.from()));
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, cid=%1, from=%2: Invalid response").arg(cid,AStanza.from()));
 				emit binaryError(cid,XmppError(IERR_BOB_INVALID_RESPONCE));
 			}
 			else if(!saveBinary(cid,type,data,maxAge))
 			{
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to request data, id=%1, from=%2: Failed to save data").arg(cid,AStanza.from()));
+				LOG_STRM_ERROR(AStreamJid,QString("Failed to request data, cid=%1, from=%2: Failed to save data").arg(cid,AStanza.from()));
 				emit binaryError(cid,XmppError(IERR_BOB_DATA_SAVE_ERROR));
 			}
 			else
@@ -243,8 +237,9 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, id=%1, from=%2: %3").arg(cid,AStanza.from(),XmppStanzaError(AStanza).errorMessage()));
-			emit binaryError(cid,XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, cid=%1, from=%2: %3").arg(cid,AStanza.from(),err.condition()));
+			emit binaryError(cid,err);
 		}
 	}
 }
@@ -272,19 +267,19 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, const Jid &AStreamJid, 
 		{
 			if (!FLoadRequests.values().contains(AContentId))
 			{
-				Stanza request("iq");
-				request.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
-				QDomElement dataElem = request.addElement("data",NS_BITS_OF_BINARY);
+				Stanza stanza("iq");
+				stanza.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
+				QDomElement dataElem = stanza.addElement("data",NS_BITS_OF_BINARY);
 				dataElem.setAttribute("cid",AContentId);
-				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,LOAD_TIMEOUT))
+				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,LOAD_TIMEOUT))
 				{
-					LOG_STRM_INFO(AStreamJid,QString("Data request sent, id=%1, from=%2").arg(AContentId,AContactJid.full()));
-					FLoadRequests.insert(request.id(),AContentId);
+					LOG_STRM_INFO(AStreamJid,QString("Data load request sent, cid=%1, from=%2").arg(AContentId,AContactJid.full()));
+					FLoadRequests.insert(stanza.id(),AContentId);
 					return true;
 				}
 				else
 				{
-					LOG_STRM_WARNING(AStreamJid,QString("Failed to send data request, id=%1, to=%2").arg(AContentId,AContactJid.full()));
+					LOG_STRM_WARNING(AStreamJid,QString("Failed to send data load request, cid=%1, to=%2").arg(AContentId,AContactJid.full()));
 				}
 			}
 			else
@@ -320,7 +315,7 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, QString &AType, QByteAr
 			REPORT_ERROR("Failed to load data from file: Invalid format");
 		}
 	}
-	else
+	else if (file.exists())
 	{
 		REPORT_ERROR(QString("Failed to load data from file: %1").arg(file.errorString()));
 	}
@@ -342,7 +337,6 @@ bool BitsOfBinary::saveBinary(const QString &AContentId, const QString &AType, c
 			dataElem.appendChild(doc.createTextNode(AData.toBase64()));
 			if (file.write(doc.toByteArray()) > 0)
 			{
-				file.close();
 				emit binaryCached(AContentId,AType,AData,AMaxAge);
 				return true;
 			}

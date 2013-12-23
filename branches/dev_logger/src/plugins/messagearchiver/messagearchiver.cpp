@@ -332,7 +332,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load server archive prefs, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load server archive prefs, id=%1: %2").arg(AStanza.id(),err.condition()));
 			applyArchivePrefs(AStreamJid,QDomElement());
 		}
 		FPrefsLoadRequests.remove(AStanza.id());
@@ -347,7 +347,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to save server archive prefs, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to save server archive prefs, id=%1: %2").arg(AStanza.id(),err.condition()));
 			cancelSuspendedStanzaSession(AStreamJid,AStanza.id(),err);
 		}
 	}
@@ -369,7 +369,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to update auto save state, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to update auto save state, id=%1: %2").arg(AStanza.id(),err.condition()));
 		}
 		FPrefsAutoRequests.remove(AStanza.id());
 	}
@@ -384,7 +384,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove item prefs, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove item prefs, id=%1: %2").arg(AStanza.id(),err.condition()));
 		}
 		FPrefsRemoveItemRequests.remove(AStanza.id());
 	}
@@ -399,7 +399,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove session prefs, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove session prefs, id=%1: %2").arg(AStanza.id(),err.condition()));
 		}
 		FPrefsRemoveSessionRequests.remove(AStanza.id());
 	}
@@ -414,7 +414,7 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to restore stanza session context, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to restore stanza session context, id=%1: %2").arg(AStanza.id(),err.condition()));
 		}
 	}
 
@@ -1418,7 +1418,7 @@ void MessageArchiver::registerArchiveEngine(IArchiveEngine *AEngine)
 {
 	if (AEngine!=NULL && !FArchiveEngines.contains(AEngine->engineId()))
 	{
-		LOG_INFO(QString("Registering archive engine=%1").arg(AEngine->engineName()));
+		LOG_DEBUG(QString("Archive engine registered, id=%1, name=%2").arg(AEngine->engineId(),AEngine->engineName()));
 		connect(AEngine->instance(),SIGNAL(capabilitiesChanged(const Jid &)),
 			SLOT(onEngineCapabilitiesChanged(const Jid &)));
 		connect(AEngine->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
@@ -1774,7 +1774,7 @@ void MessageArchiver::processMessagesRequest(const QString &ALocalId, MessagesRe
 	if (!ARequest.lastError.isNull())
 	{
 		Logger::finishTiming(STMP_HISTORY_MESSAGES_LOAD,ALocalId);
-		LOG_WARNING(QString("Failed to load messages, id=%1: %2").arg(ALocalId,ARequest.lastError.errorMessage()));
+		LOG_WARNING(QString("Failed to load messages, id=%1: %2").arg(ALocalId,ARequest.lastError.condition()));
 
 		emit requestFailed(ALocalId,ARequest.lastError);
 		FMesssagesRequests.remove(ALocalId);
@@ -1839,7 +1839,7 @@ void MessageArchiver::processHeadersRequest(const QString &ALocalId, HeadersRequ
 		else
 		{
 			Logger::finishTiming(STMP_HISTORY_HEADERS_LOAD,ALocalId);
-			LOG_WARNING(QString("Failed to load headers, id=%1: %2").arg(ALocalId,ARequest.lastError.errorMessage()));
+			LOG_WARNING(QString("Failed to load headers, id=%1: %2").arg(ALocalId,ARequest.lastError.condition()));
 
 			emit requestFailed(ALocalId,ARequest.lastError);
 		}
@@ -1873,7 +1873,7 @@ void MessageArchiver::processRemoveRequest(const QString &ALocalId, RemoveReques
 		}
 		else
 		{
-			LOG_WARNING(QString("Failed to remove collections, id=%1: %2").arg(ALocalId,ARequest.lastError.errorMessage()));
+			LOG_WARNING(QString("Failed to remove collections, id=%1: %2").arg(ALocalId,ARequest.lastError.condition()));
 			emit requestFailed(ALocalId,ARequest.lastError);
 		}
 		FRemoveRequests.remove(ALocalId);

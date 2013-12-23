@@ -134,7 +134,7 @@ void JabberSearch::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_INFO(AStreamJid,QString("Failed to receive search request result, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive search request result, id=%1: %2").arg(AStanza.id(),err.condition()));
 			emit searchError(AStanza.id(),err);
 		}
 		FRequests.removeAll(AStanza.id());
@@ -174,7 +174,7 @@ void JabberSearch::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_INFO(AStreamJid,QString("Failed to receive search submit result, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive search submit result, id=%1: %2").arg(AStanza.id(),err.condition()));
 			emit searchError(AStanza.id(),err);
 		}
 		FSubmits.removeAll(AStanza.id());

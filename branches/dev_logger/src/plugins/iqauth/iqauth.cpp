@@ -60,10 +60,10 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 					}
 				}
 			}
-			else if (AStanza.type() == "error")
+			else
 			{
 				XmppStanzaError err(AStanza);
-				LOG_STRM_ERROR(AXmppStream->streamJid(),QString("Failed to receive authentication initialization: %1").arg(err.errorMessage()));
+				LOG_STRM_ERROR(AXmppStream->streamJid(),QString("Failed to receive authentication initialization: %1").arg(err.condition()));
 				emit error(err);
 			}
 			return true;
@@ -77,10 +77,10 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 				deleteLater();
 				emit finished(false);
 			}
-			else if (AStanza.type() == "error")
+			else
 			{
 				XmppStanzaError err(AStanza);
-				LOG_STRM_INFO(AXmppStream->streamJid(),QString("Username and password rejected: %1").arg(err.errorMessage()));
+				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Username and password rejected: %1").arg(err.condition()));
 				emit error(XmppStanzaError(AStanza));
 			}
 			return true;

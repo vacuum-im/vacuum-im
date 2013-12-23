@@ -1,6 +1,10 @@
 #include "exchangeapprovedialog.h"
 
 #include <QTableWidgetItem>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 enum ItemsTableColumns {
 	COL_ACTION,
@@ -9,6 +13,7 @@ enum ItemsTableColumns {
 
 ExchangeApproveDialog::ExchangeApproveDialog(IRoster *ARoster, const IRosterExchangeRequest &ARequest, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 

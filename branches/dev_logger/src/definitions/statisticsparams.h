@@ -23,4 +23,6 @@
 #define STMP_HISTORY_MESSAGES_LOAD                           "history|messages-load|History Messages Load"
 #define STMP_HISTORY_FILE_DATABASE_SYNC                      "history|file-database-sync|History File Database Sync"
 
+#define STMP_SOCKSSTREAM_CONNECTED                           "socks-stream|connected|Socks Stream Connected"
+
 #endif // DEF_STATISTICSPARAMS_H

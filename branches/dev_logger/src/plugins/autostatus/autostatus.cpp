@@ -46,7 +46,7 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 		if (FStatusChanger == NULL)
-			LOG_WARNING("Failed to find required interface: IStatusChanger");
+			LOG_WARNING("Failed to load required interface: IStatusChanger");
 	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
@@ -54,7 +54,7 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager == NULL)
-			LOG_WARNING("Failed to find required interface: IAccountManager");
+			LOG_WARNING("Failed to load required interface: IAccountManager");
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -137,7 +137,7 @@ IAutoStatusRule AutoStatus::ruleValue(const QUuid &ARuleId) const
 	}
 	else
 	{
-		REPORT_ERROR("Failed to get auto status rule: Invalid id");
+		REPORT_ERROR("Failed to get auto status rule: Invalid rule id");
 	}
 	return rule;
 }
@@ -188,7 +188,7 @@ void AutoStatus::updateRule(const QUuid &ARuleId, const IAutoStatusRule &ARule)
 	}
 	else
 	{
-		REPORT_ERROR("Failed to update auto status rule: Invalid id");
+		REPORT_ERROR("Failed to update auto status rule: Invalid rule id");
 	}
 }
 
@@ -198,10 +198,6 @@ void AutoStatus::removeRule(const QUuid &ARuleId)
 	{
 		Options::node(OPV_AUTOSTARTUS_ROOT).removeChilds("rule",ARuleId.toString());
 		emit ruleRemoved(ARuleId);
-	}
-	else
-	{
-		REPORT_ERROR("Failed to remove auto status rule: Invalid id");
 	}
 }
 
@@ -306,9 +302,7 @@ void AutoStatus::onSystemIdleChanged(int ASeconds)
 void AutoStatus::onOptionsOpened()
 {
 	if (Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule").isEmpty())
-	{
 		Options::node(OPV_AUTOSTARTUS_RULE_ITEM,QUuid::createUuid().toString()).setValue(true,"enabled");
-	}
 }
 
 void AutoStatus::onProfileClosed(const QString &AName)

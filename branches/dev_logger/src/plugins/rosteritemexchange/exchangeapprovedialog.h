@@ -2,11 +2,8 @@
 #define EXCHANGEAPPROVEDIALOG_H
 
 #include <QDialog>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/iroster.h>
 #include <interfaces/irosteritemexchange.h>
-#include <utils/iconstorage.h>
 #include "ui_exchangeapprovedialog.h"
 
 class ExchangeApproveDialog : 

@@ -225,7 +225,7 @@ void SpellChecker::onEditWidgetCreated(IMessageEditWidget *AWidget)
 		parent = parent->parentWidget();
 	}
 	SpellHighlighter *liter = new SpellHighlighter(AWidget->document(), mucWindow!=NULL ? mucWindow->multiUserChat() : NULL);
-	liter->setEnabled(isSpellEnabled());
+	liter->setEnabled(isSpellEnabled() && isSpellAvailable());
 	FSpellHighlighters.insert(textEdit, liter);
 }
 
@@ -273,7 +273,7 @@ void SpellChecker::onEditWidgetContextMenuRequested(const QPoint &APosition, Men
 		connect(enableAction,SIGNAL(triggered()),SLOT(onChangeSpellEnable()));
 		AMenu->addAction(enableAction,AG_MWEWCM_SPELLCHECKER_OPTIONS);
 
-		if (isSpellEnabled())
+		if (isSpellEnabled() && isSpellAvailable())
 		{
 			Menu *dictsMenu = new Menu(AMenu);
 			dictsMenu->setTitle(tr("Dictionary"));

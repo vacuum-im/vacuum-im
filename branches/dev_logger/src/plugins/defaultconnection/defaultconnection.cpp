@@ -76,7 +76,7 @@ bool DefaultConnection::connectToHost()
 		}
 		else if (FDns.init(QJDns::Unicast, QHostAddress::Any))
 		{
-			LOG_INFO(QString("Starting DNS SRV lookup, domain=%1").arg(domain));
+			LOG_DEBUG(QString("Starting DNS SRV lookup, domain=%1").arg(domain));
 			FDns.setNameServers(QJDns::systemInfo().nameServers);
 			FSrvQueryId = FDns.queryStart(QString("_xmpp-client._tcp.%1.").arg(domain).toLatin1(),QJDns::Srv);
 		}
@@ -132,7 +132,7 @@ void DefaultConnection::abortConnection(const XmppError &AError)
 {
 	if (!FDisconnecting && FSocket.state()!=QSslSocket::UnconnectedState)
 	{
-		LOG_INFO(QString("Aborting connection to host=%1: %2").arg(FSocket.peerName(),AError.errorMessage()));
+		LOG_WARNING(QString("Aborting connection to host=%1: %2").arg(FSocket.peerName(),AError.condition()));
 		emit error(AError);
 		disconnectFromHost();
 	}
@@ -275,7 +275,7 @@ void DefaultConnection::onDnsResultsReady(int AId, const QJDns::Response &AResul
 {
 	if (FSrvQueryId == AId)
 	{
-		LOG_INFO(QString("SRV records received, count=%1").arg(AResults.answerRecords.count()));
+		LOG_DEBUG(QString("SRV records received, count=%1").arg(AResults.answerRecords.count()));
 		if (!AResults.answerRecords.isEmpty())
 		{
 			FUseLegacySSL = false;
@@ -297,7 +297,7 @@ void DefaultConnection::onDnsError(int AId, QJDns::Error AError)
 
 void DefaultConnection::onDnsShutdownFinished()
 {
-	LOG_INFO("DNS SRV lookup finished");
+	LOG_DEBUG("DNS SRV lookup finished");
 	if (FSrvQueryId != STOP_QUERY_ID)
 	{
 		FSrvQueryId = START_QUERY_ID;

@@ -324,7 +324,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else if (!loadListName.isEmpty())
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load privacy list=%1, id=%2: %3").arg(loadListName,AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load privacy list=%1, id=%2: %3").arg(loadListName,AStanza.id(),err.condition()));
 			if (FPrivacyLists.value(AStreamJid).contains(loadListName))
 			{
 				FPrivacyLists[AStreamJid].remove(loadListName);
@@ -333,7 +333,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load list of privacy lists, id=%1: %2").arg(AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load list of privacy lists, id=%1: %2").arg(AStanza.id(),err.condition()));
 		}
 	}
 	else if (FSaveRequests.contains(AStanza.id()))
@@ -347,7 +347,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to save privacy list=%1, id=%2: %3").arg(list.name,AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to save privacy list=%1, id=%2: %3").arg(list.name,AStanza.id(),err.condition()));
 		}
 	}
 	else if (FActiveRequests.contains(AStanza.id()))
@@ -361,7 +361,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to change active privacy list to=%1, id=%2: %3").arg(activeListName,AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to change active privacy list to=%1, id=%2: %3").arg(activeListName,AStanza.id(),err.condition()));
 		}
 	}
 	else if (FDefaultRequests.contains(AStanza.id()))
@@ -375,7 +375,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to change default privacy list to=%1, id=%2: %3").arg(defaultListName,AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to change default privacy list to=%1, id=%2: %3").arg(defaultListName,AStanza.id(),err.condition()));
 		}
 	}
 	else if (FRemoveRequests.contains(AStanza.id()))
@@ -389,7 +389,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove privacy list=%1, id=%2: %3").arg(listName,AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove privacy list=%1, id=%2: %3").arg(listName,AStanza.id(),err.condition()));
 		}
 	}
 	FStreamRequests[AStreamJid].removeAll(AStanza.id());

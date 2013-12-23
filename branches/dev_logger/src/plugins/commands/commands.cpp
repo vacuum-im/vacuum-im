@@ -250,7 +250,7 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 				if (client->receiveCommandError(err))
 					break;
 
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to received command request answer from=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),err.error.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to received command request answer from=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),err.error.condition()));
 		}
 	}
 }

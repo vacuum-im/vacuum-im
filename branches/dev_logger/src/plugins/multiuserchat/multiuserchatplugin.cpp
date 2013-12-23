@@ -1488,7 +1488,7 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 		}
 		else if (FDataForms && FRegistration)
 		{
-			LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to receive room nick in discovery from=%1: %2").arg(ADiscoInfo.contactJid.full(),ADiscoInfo.error.errorMessage()));
+			LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to receive room nick in discovery from=%1: %2").arg(ADiscoInfo.contactJid.full(),ADiscoInfo.error.condition()));
 			QString requestId = FRegistration->sendRegiterRequest(ADiscoInfo.streamJid,ADiscoInfo.contactJid.domain());
 			if (!requestId.isEmpty())
 			{
@@ -1503,7 +1503,7 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 		}
 		else
 		{
-			LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to receive room nick in discovery from=%1: %2").arg(ADiscoInfo.contactJid.full(),ADiscoInfo.error.errorMessage()));
+			LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to receive room nick in discovery from=%1: %2").arg(ADiscoInfo.contactJid.full(),ADiscoInfo.error.condition()));
 			emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,streamVCardNick(ADiscoInfo.streamJid));
 		}
 	}
@@ -1528,7 +1528,7 @@ void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const Xmpp
 	if (FNickRequests.contains(AId))
 	{
 		QPair<Jid,Jid> params = FNickRequests.take(AId);
-		LOG_STRM_WARNING(params.first,QString("Failed to receive room nick in register fields from=%1: %2").arg(params.second.full(),AError.errorMessage()));
+		LOG_STRM_WARNING(params.first,QString("Failed to receive room nick in register fields from=%1: %2").arg(params.second.full(),AError.condition()));
 		emit roomNickReceived(params.first,params.second,streamVCardNick(params.first));
 	}
 }

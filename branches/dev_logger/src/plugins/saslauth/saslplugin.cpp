@@ -1,5 +1,14 @@
 #include "saslplugin.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/xmpperrors.h>
+#include <definitions/internalerrors.h>
+#include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppfeaturepluginorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/xmpperror.h>
+#include <utils/logger.h>
+
 SASLPlugin::SASLPlugin()
 {
 	FXmppStreams = NULL;
@@ -20,16 +29,18 @@ void SASLPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
-bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
-		{
 			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
-		}
+		else
+			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	return FXmppStreams!=NULL;
@@ -67,9 +78,7 @@ bool SASLPlugin::initObjects()
 
 bool SASLPlugin::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -100,6 +109,7 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
 {
 	if (AFeatureNS == NS_FEATURE_SASL)
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"SASLAuth XMPP stream feature created");
 		IXmppFeature *feature = new SASLAuth(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -107,6 +117,7 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
 	}
 	else if (AFeatureNS == NS_FEATURE_BIND)
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"SASLBind XMPP stream feature created");
 		IXmppFeature *feature = new SASLBind(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -114,6 +125,7 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
 	}
 	else if (AFeatureNS == NS_FEATURE_SESSION)
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"SASLSession XMPP stream feature created");
 		IXmppFeature *feature = new SASLSession(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -131,7 +143,15 @@ void SASLPlugin::onFeatureDestroyed()
 {
 	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
 	if (feature)
+	{
+		if (qobject_cast<SASLAuth *>(feature->instance()))
+			LOG_STRM_INFO(feature->xmppStream()->streamJid(),"SASLAuth XMPP stream feature destroyed");
+		else if (qobject_cast<SASLBind *>(feature->instance()))
+			LOG_STRM_INFO(feature->xmppStream()->streamJid(),"SASLBind XMPP stream feature destroyed");
+		else if (qobject_cast<SASLSession *>(feature->instance()))
+			LOG_STRM_INFO(feature->xmppStream()->streamJid(),"SASLSession XMPP stream feature destroyed");
 		emit featureDestroyed(feature);
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_sasl, SASLPlugin)

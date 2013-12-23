@@ -338,7 +338,7 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 		else
 		{
 			FTimeItems.remove(contactJid);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to request current time from=%1: %2").arg(AStanza.from(),XmppStanzaError(AStanza).errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request current time from=%1: %2").arg(AStanza.from(),XmppStanzaError(AStanza).condition()));
 		}
 		emit entityTimeChanged(contactJid);
 	}

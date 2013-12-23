@@ -105,13 +105,15 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 		else
 		{
-			LOG_WARNING("Failed to find required interface: IVCardPlugin");
+			LOG_WARNING("Failed to load required interface: IVCardPlugin");
 		}
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
+	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
 	if (plugin)
@@ -264,12 +266,12 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 					query.addElement("query",NS_JABBER_IQ_AVATAR);
 					if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,query,AVATAR_IQ_TIMEOUT))
 					{
-						LOG_STRM_INFO(AStreamJid,QString("Avatar request sent, jid=%1").arg(contactJid.full()));
+						LOG_STRM_INFO(AStreamJid,QString("Load iq avatar request sent, jid=%1").arg(contactJid.full()));
 						FIqAvatarRequests.insert(query.id(),contactJid);
 					}
 					else
 					{
-						LOG_STRM_WARNING(AStreamJid,QString("Failed to send avatar request, jid=%1").arg(contactJid.full()));
+						LOG_STRM_WARNING(AStreamJid,QString("Failed to send load iq avatar request, jid=%1").arg(contactJid.full()));
 						FIqAvatars.remove(contactJid);
 					}
 				}
@@ -298,21 +300,17 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 			}
 			else
 			{
-				REPORT_ERROR("Failed to open file with self avatar");
+				REPORT_ERROR(QString("Failed to open file with self avatar: %1").arg(file.errorString()));
 				Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_INTERNAL_SERVER_ERROR);
 				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 			}
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Rejected request for empty avatar from contact, jid=%1").arg(AStanza.from()));
+			LOG_STRM_WARNING(AStreamJid,QString("Rejected iq avatar request from contact, jid=%1: Avatar is empty").arg(AStanza.from()));
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_ITEM_NOT_FOUND);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
-	}
-	else
-	{
-		REPORT_ERROR("Received unexpected stanza");
 	}
 	return false;
 }
@@ -340,8 +338,8 @@ void Avatars::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 		}
 		else
 		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive iq avatar from contact, jid=%1: %2").arg(AStanza.from(),XmppStanzaError(AStanza).condition()));
 			FIqAvatars.remove(contactJid);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive iq avatar from contact, jid=%1: %2").arg(AStanza.from(),XmppStanzaError(AStanza).errorMessage()));
 		}
 	}
 }
@@ -489,18 +487,22 @@ bool Avatars::setAvatar(const Jid &AStreamJid, const QByteArray &AData)
 			vcard->unlock();
 		}
 	}
+	else
+	{
+		REPORT_ERROR("Failed to set self avatar: Invalid format");
+	}
 	return published;
 }
 
 QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &AData)
 {
 	Jid contactJid = AContactJid.bare();
-	LOG_INFO(QString("Changing custom picture for contact, jid=%1").arg(contactJid.full()));
 	if (!AData.isEmpty())
 	{
 		QString hash = saveAvatarData(AData);
 		if (FCustomPictures.value(contactJid) != hash)
 		{
+			LOG_INFO(QString("Changed custom picture for contact, jid=%1").arg(AContactJid.bare()));
 			FCustomPictures[contactJid] = hash;
 			updateDataHolder(contactJid);
 			emit avatarChanged(AContactJid);
@@ -509,6 +511,7 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &ADat
 	}
 	else if (FCustomPictures.contains(contactJid))
 	{
+		LOG_INFO(QString("Removed custom picture for contact, jid=%1").arg(AContactJid.bare()));
 		FCustomPictures.remove(contactJid);
 		updateDataHolder(contactJid);
 		emit avatarChanged(AContactJid);
@@ -543,17 +546,13 @@ QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, boo
 			}
 			else
 			{
-				REPORT_ERROR("Failed to load avatar image from file: QImage::load failed");
+				REPORT_ERROR("Failed to load avatar image from file: Image not loaded");
 			}
 		}
 		else
 		{
 			image = images.value(AMaxSize);
 		}
-	}
-	else if (!fileName.isEmpty())
-	{
-		LOG_WARNING("Failed to load avatar image: File not exist");
 	}
 	return image;
 }
@@ -574,7 +573,7 @@ QByteArray Avatars::loadFromFile(const QString &AFileName) const
 		QFile file(AFileName);
 		if (file.open(QFile::ReadOnly))
 			return file.readAll();
-		else
+		else if (file.exists())
 			REPORT_ERROR(QString("Failed to load data from file: %1").arg(file.errorString()));
 	}
 	return QByteArray();
@@ -607,21 +606,22 @@ QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 		QFile file(fileName);
 		if (file.open(QFile::ReadOnly))
 		{
-			QDomDocument vcard;
-			if (vcard.setContent(&file,true))
+			QString xmlError;
+			QDomDocument doc;
+			if (doc.setContent(&file,true,&xmlError))
 			{
-				QDomElement binElem = vcard.documentElement().firstChildElement("vCard").firstChildElement("PHOTO").firstChildElement("BINVAL");
+				QDomElement binElem = doc.documentElement().firstChildElement("vCard").firstChildElement("PHOTO").firstChildElement("BINVAL");
 				if (!binElem.isNull())
 					return QByteArray::fromBase64(binElem.text().toLatin1());
 			}
 			else
 			{
-				REPORT_ERROR("Failed to load vCard content");
+				REPORT_ERROR(QString("Failed to load avatar from vCard file content: %1").arg(xmlError));
 			}
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to open vCard file: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to load avatar from vCard file: %1").arg(file.errorString()));
 		}
 	}
 	return QByteArray();
@@ -765,8 +765,10 @@ void Avatars::onStreamOpened(IXmppStream *AXmppStream)
 
 	if (FVCardPlugin)
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),"Requesting self avatar");
-		FVCardPlugin->requestVCard(AXmppStream->streamJid(),AXmppStream->streamJid().bare());
+		if (FVCardPlugin->requestVCard(AXmppStream->streamJid(),AXmppStream->streamJid().bare()))
+			LOG_STRM_INFO(AXmppStream->streamJid(),"Load self avatar from vCard request sent");
+		else
+			LOG_STRM_WARNING(AXmppStream->streamJid(),"Failed to send load self avatar from vCard");
 	}
 }
 

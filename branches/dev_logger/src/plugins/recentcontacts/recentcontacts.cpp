@@ -621,7 +621,7 @@ void RecentContacts::registerItemHandler(const QString &AType, IRecentItemHandle
 {
 	if (AHandler != NULL)
 	{
-		LOG_INFO(QString("Recent item handler registered, type=%1").arg(AType));
+		LOG_DEBUG(QString("Recent item handler registered, type=%1").arg(AType));
 		if (!FItemHandlers.values().contains(AHandler))
 			connect(AHandler->instance(),SIGNAL(recentItemUpdated(const IRecentItem &)),SLOT(onHandlerRecentItemUpdated(const IRecentItem &)));
 		FItemHandlers.insert(AType,AHandler);

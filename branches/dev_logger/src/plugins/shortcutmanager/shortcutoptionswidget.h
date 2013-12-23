@@ -6,7 +6,6 @@
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/shortcuts.h>
 #include "shortcutoptionsdelegate.h"
 #include "ui_shortcutoptionswidget.h"
 

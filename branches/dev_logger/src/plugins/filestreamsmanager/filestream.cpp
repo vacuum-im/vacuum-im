@@ -383,7 +383,7 @@ void FileStream::abortStream(const XmppError &AError)
 		{
 			FAborted = true;
 			FError = AError;
-			LOG_STRM_INFO(FStreamJid,QString("Aborting file stream, sid=%1: %2").arg(FStreamId,AError.errorMessage()));
+			LOG_STRM_WARNING(FStreamJid,QString("Aborting file stream, sid=%1: %2").arg(FStreamId,AError.condition()));
 		}
 		if (FThread && FThread->isRunning())
 		{

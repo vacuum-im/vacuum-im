@@ -73,7 +73,7 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		}
 		else
 		{
-			LOG_WARNING("Failed to find required interface: IPrivateStorage");
+			LOG_WARNING("Failed to load required interface: IPrivateStorage");
 		}
 	}
 
@@ -237,7 +237,7 @@ bool Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, c
 	}
 	else
 	{
-		REPORT_ERROR("Failed to set annotation: Stream is not ready");
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to set annotation to=%1: Annotations is not enabled").arg(AContactJid.bare()));
 	}
 	return false;
 }
@@ -258,7 +258,7 @@ QDialog *Annotations::showAnnotationDialog(const Jid &AStreamJid, const Jid &ACo
 	}
 	else
 	{
-		LOG_STRM_WARNING(AStreamJid,"Failed to open annotation dialog: Stream is not ready");
+		LOG_STRM_WARNING(AStreamJid,"Failed to open annotation dialog: Annotations is not enabled");
 	}
 	return NULL;
 }
@@ -270,7 +270,7 @@ bool Annotations::loadAnnotations(const Jid &AStreamJid)
 		QString id = FPrivateStorage->loadData(AStreamJid,PST_ANNOTATIONS,PSN_ANNOTATIONS);
 		if (!id.isEmpty())
 		{
-			LOG_STRM_INFO(AStreamJid,"Annotations load request sent");
+			LOG_STRM_INFO(AStreamJid,QString("Annotations load request sent, id=%1").arg(id));
 			FLoadRequests.insert(id,AStreamJid);
 			return true;
 		}
@@ -315,7 +315,7 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
 	}
 	else
 	{
-		REPORT_ERROR("Failed to save annotations: Stream is not ready");
+		LOG_STRM_WARNING(AStreamJid,"Failed to save annotations: Annotations is not ready");
 	}
 	return false;
 }
@@ -353,7 +353,7 @@ void Annotations::onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, 
 	Q_UNUSED(AElement);
 	if (FSaveRequests.contains(AId))
 	{
-		LOG_STRM_INFO(AStreamJid,"Annotations saved");
+		LOG_STRM_INFO(AStreamJid,QString("Annotations saved, id=%1").arg(AId));
 		FSaveRequests.remove(AId);
 		emit annotationsSaved(AStreamJid);
 	}
@@ -363,7 +363,7 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
 {
 	if (FLoadRequests.contains(AId))
 	{
-		LOG_STRM_INFO(AStreamJid,"Annotations loaded");
+		LOG_STRM_INFO(AStreamJid,QString("Annotations loaded, id=%1").arg(AId));
 		FLoadRequests.remove(AId);
 
 		QMap<Jid, Annotation> &items = FAnnotations[AStreamJid];

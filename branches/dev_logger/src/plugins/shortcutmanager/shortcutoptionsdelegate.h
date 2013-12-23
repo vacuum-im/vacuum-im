@@ -3,13 +3,17 @@
 
 #include <QStyledItemDelegate>
 
-#define COL_NAME  0
-#define COL_KEY   1
+enum ShortcutColumns {
+	COL_NAME,
+	COL_KEY
+};
 
-#define MDR_SHORTCUTID              Qt::UserRole+1
-#define MDR_ACTIVE_KEYSEQUENCE      Qt::UserRole+2
-#define MDR_DEFAULT_KEYSEQUENCE     Qt::UserRole+3
-#define MDR_SORTROLE                Qt::UserRole+4
+enum ShortcutDataRoles {
+	MDR_SHORTCUTID              =Qt::UserRole+1,
+	MDR_ACTIVE_KEYSEQUENCE      =Qt::UserRole+2,
+	MDR_DEFAULT_KEYSEQUENCE     =Qt::UserRole+3,
+	MDR_SORTROLE                =Qt::UserRole+4
+};
 
 class ShortcutOptionsDelegate : 
 	public QStyledItemDelegate

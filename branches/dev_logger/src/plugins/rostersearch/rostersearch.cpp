@@ -2,6 +2,20 @@
 
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/mainwindowwidgets.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterproxyorders.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/rosterkeyhookerorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 RosterSearch::RosterSearch()
 {
@@ -61,16 +75,20 @@ bool RosterSearch::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin == NULL)
+			LOG_WARNING("Failed to load required interface: IRostersViewPlugin");
+	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
 	{
 		IMainWindowPlugin *mainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 		if (mainWindowPlugin)
-		{
 			FMainWindow = mainWindowPlugin->mainWindow();
-		}
+		else
+			LOG_WARNING("Failed to load required interface: IMainWindowPlugin");
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
@@ -195,6 +213,7 @@ void RosterSearch::startSearch()
 
 	if (filterRegExp().pattern() != pattern)
 	{
+		LOG_DEBUG(QString("Changing roster search pattern to='%1'").arg(pattern));
 		QRegExp regExp(pattern,Qt::CaseInsensitive,QRegExp::Wildcard);
 		setFilterRegExp(regExp);
 	}
@@ -269,6 +288,7 @@ void RosterSearch::setSearchEnabled(bool AEnabled)
 
 void RosterSearch::insertSearchField(int ADataRole, const QString &AName)
 {
+	LOG_DEBUG(QString("Roster search field inserted, role=%1, name=%2").arg(ADataRole).arg(AName));
 	Action *action = FFieldActions.value(ADataRole,NULL);
 	if (action == NULL)
 	{
@@ -303,6 +323,7 @@ void RosterSearch::setSearchFieldEnabled(int ADataRole, bool AEnabled)
 {
 	if (FFieldActions.contains(ADataRole))
 	{
+		LOG_DEBUG(QString("Roster search field enabled changed, role=%1, enabled=%2").arg(ADataRole).arg(AEnabled));
 		FFieldActions.value(ADataRole)->setChecked(AEnabled);
 		emit searchFieldChanged(ADataRole);
 	}
@@ -312,6 +333,7 @@ void RosterSearch::removeSearchField(int ADataRole)
 {
 	if (FFieldActions.contains(ADataRole))
 	{
+		LOG_DEBUG(QString("Roster search field removed, role=%1").arg(ADataRole));
 		Action *action = FFieldActions.take(ADataRole);
 		searchFieldsMenu()->removeAction(action);
 		delete action;

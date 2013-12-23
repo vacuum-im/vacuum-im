@@ -220,7 +220,7 @@ void Registration::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Registration submit rejected, from=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),err.errorMessage()));
+			LOG_STRM_WARNING(AStreamJid,QString("Registration submit rejected, from=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),err.condition()));
 			emit registerError(AStanza.id(),err);
 		}
 		FSubmitRequests.removeAll(AStanza.id());

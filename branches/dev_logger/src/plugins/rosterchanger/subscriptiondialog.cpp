@@ -1,8 +1,14 @@
 #include "subscriptiondialog.h"
 
+#include <definitions/toolbargroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/logger.h>
+
 SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AContactJid,
-                                       const QString &ANotify, const QString &AMessage, QWidget *AParent) : QDialog(AParent)
+	const QString &ANotify, const QString &AMessage, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Subscription request - %1").arg(AStreamJid.uBare()));
@@ -156,4 +162,3 @@ void SubscriptionDialog::onToolBarActionTriggered( bool )
 		}
 	}
 }
-

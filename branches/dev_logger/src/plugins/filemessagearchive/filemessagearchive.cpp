@@ -231,7 +231,7 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 		}
 		else
 		{
-			REPORT_ERROR("Failed to write message: File writer is NULL");
+			REPORT_ERROR("Failed to write message: File writer is not created");
 		}
 	}
 	else
@@ -260,7 +260,7 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 		if (writer)
 			written = writer->writeNote(AMessage.body());
 		else
-			REPORT_ERROR("Failed to write note: File writer is NULL");
+			REPORT_ERROR("Failed to write note: File writer is not created");
 	}
 	else
 	{
@@ -334,7 +334,7 @@ QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchive
 	}
 	else if (!isCapable(AStreamJid,ArchiveManagement))
 	{
-		LOG_STRM_WARNING(AStreamJid,"Failed to load collection: Not capable");
+		LOG_STRM_ERROR(AStreamJid,"Failed to load collection: Not capable");
 	}
 	else
 	{
@@ -789,7 +789,7 @@ bool FileMessageArchive::setDatabaseProperty(const Jid &AStreamJid, const QStrin
 			}
 			else if (task->isFailed())
 			{
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to change database property=%1: %2").arg(AProperty,task->error().errorMessage()));
+				LOG_STRM_ERROR(AStreamJid,QString("Failed to change database property=%1: %2").arg(AProperty,task->error().condition()));
 			}
 			else
 			{
@@ -851,7 +851,7 @@ QList<IArchiveHeader> FileMessageArchive::loadDatabaseHeaders(const Jid &AStream
 		}
 		else if (task->isFailed())
 		{
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to load database headers: %1").arg(task->error().errorMessage()));
+			LOG_STRM_ERROR(AStreamJid,QString("Failed to load database headers: %1").arg(task->error().condition()));
 		}
 		else
 		{
@@ -875,7 +875,7 @@ IArchiveModifications FileMessageArchive::loadDatabaseModifications(const Jid &A
 		if (FDatabaseWorker->execTask(task) && !task->isFailed())
 			modifs = task->modifications();
 		else if (task->isFailed())
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to load database modifications: %1").arg(task->error().errorMessage()));
+			LOG_STRM_ERROR(AStreamJid,QString("Failed to load database modifications: %1").arg(task->error().condition()));
 		else
 			LOG_STRM_WARNING(AStreamJid,QString("Failed to load database modifications: Task not started"));
 		delete task;
@@ -1137,7 +1137,7 @@ bool FileMessageArchive::saveModification(const Jid &AStreamJid, const IArchiveH
 			if (FDatabaseWorker->execTask(task) && !task->isFailed())
 				saved = true;
 			else if (task->isFailed())
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to save modification: %1").arg(task->error().errorMessage()));
+				LOG_STRM_ERROR(AStreamJid,QString("Failed to save modification: %1").arg(task->error().condition()));
 			else
 				LOG_STRM_WARNING(AStreamJid,QString("Failed to save modification: Task not started"));
 			delete task;
@@ -1148,7 +1148,7 @@ bool FileMessageArchive::saveModification(const Jid &AStreamJid, const IArchiveH
 			if (FDatabaseWorker->execTask(task) && !task->isFailed())
 				saved = true;
 			else if (task->isFailed())
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to save modification: %1").arg(task->error().errorMessage()));
+				LOG_STRM_ERROR(AStreamJid,QString("Failed to save modification: %1").arg(task->error().condition()));
 			else
 				LOG_STRM_WARNING(AStreamJid,QString("Failed to save modification: Task not started"));
 			delete task;
@@ -1199,7 +1199,7 @@ FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArch
 		FileWriter *writer = new FileWriter(AStreamJid,AFileName,AHeader,this);
 		if (writer->isOpened())
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Creating file writer with=%1").arg(AHeader.with.full()));
+			LOG_STRM_DEBUG(AStreamJid,QString("Creating file writer with=%1").arg(AHeader.with.full()));
 			FWritingFiles.insert(writer->fileName(),writer);
 			FFileWriters[AStreamJid].insert(AHeader.with,writer);
 			connect(writer,SIGNAL(writerDestroyed(FileWriter *)),SLOT(onFileWriterDestroyed(FileWriter *)));
@@ -1223,7 +1223,7 @@ void FileMessageArchive::removeFileWriter(FileWriter *AWriter)
 	QMutexLocker locker(&FMutex);
 	if (AWriter && FWritingFiles.contains(AWriter->fileName()))
 	{
-		LOG_STRM_INFO(AWriter->streamJid(),QString("Destroying file writer with=%1").arg(AWriter->header().with.full()));
+		LOG_STRM_DEBUG(AWriter->streamJid(),QString("Destroying file writer with=%1").arg(AWriter->header().with.full()));
 		AWriter->closeAndDeleteLater();
 		FWritingFiles.remove(AWriter->fileName());
 		FFileWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
@@ -1260,7 +1260,7 @@ void FileMessageArchive::onFileTaskFinished(FileTask *ATask)
 	}
 	else
 	{
-		LOG_STRM_ERROR(ATask->streamJid(),QString("Failed to execute file task, type=%1, id=%2: %3").arg(ATask->type()).arg(ATask->taskId(),ATask->error().errorMessage()));
+		LOG_STRM_ERROR(ATask->streamJid(),QString("Failed to execute file task, type=%1, id=%2: %3").arg(ATask->type()).arg(ATask->taskId(),ATask->error().condition()));
 		emit requestFailed(ATask->taskId(),ATask->error());
 	}
 	delete ATask;
@@ -1301,7 +1301,7 @@ void FileMessageArchive::onDatabaseTaskFinished(DatabaseTask *ATask)
 	}
 	else
 	{
-		LOG_STRM_ERROR(ATask->streamJid(),QString("Failed to execute database task, type=%1, id=%2: %3").arg(ATask->type()).arg(ATask->taskId(),ATask->error().errorMessage()));
+		LOG_STRM_ERROR(ATask->streamJid(),QString("Failed to execute database task, type=%1, id=%2: %3").arg(ATask->type()).arg(ATask->taskId(),ATask->error().condition()));
 		emit requestFailed(ATask->taskId(),ATask->error());
 	}
 	delete ATask;

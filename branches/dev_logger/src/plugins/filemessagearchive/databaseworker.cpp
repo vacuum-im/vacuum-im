@@ -122,7 +122,7 @@ void DatabaseTaskOpenDatabase::run()
 		if (!initialized)
 		{
 			QSqlDatabase::removeDatabase(connection);
-			Logger::reportError("DatabaseTaskOpenDatabase",QString("Failed to initialize database: %1").arg(FError.errorMessage()),false);
+			Logger::reportError("DatabaseTaskOpenDatabase",QString("Failed to initialize database: %1").arg(FError.condition()),false);
 		}
 	}
 }
