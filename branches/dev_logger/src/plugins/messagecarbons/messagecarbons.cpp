@@ -47,18 +47,12 @@ bool MessageCarbons::initConnections(IPluginManager *APluginManager, int &AInitO
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -66,13 +60,7 @@ bool MessageCarbons::initConnections(IPluginManager *APluginManager, int &AInitO
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 		if (FDiscovery)
-		{
 			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
-		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IServiceDiscovery");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);

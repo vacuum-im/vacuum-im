@@ -102,18 +102,12 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &AIni
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);

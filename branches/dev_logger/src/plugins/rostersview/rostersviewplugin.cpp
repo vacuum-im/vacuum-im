@@ -90,8 +90,6 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
 			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex *, int)));
-		else
-			LOG_WARNING("Failed to load required interface: IRostersModel");
 	}
 
 	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);

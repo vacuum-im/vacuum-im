@@ -55,8 +55,6 @@ bool Emoticons::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 			connect(FMessageWidgets->instance(),SIGNAL(toolBarWidgetCreated(IMessageToolBarWidget *)),SLOT(onToolBarWidgetCreated(IMessageToolBarWidget *)));
-		else
-			LOG_WARNING("Failed to load required interface: IMessageWidgets");
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);

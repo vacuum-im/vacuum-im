@@ -77,8 +77,6 @@ bool RosterSearch::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	if (plugin)
 	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-		if (FRostersViewPlugin == NULL)
-			LOG_WARNING("Failed to load required interface: IRostersViewPlugin");
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
@@ -87,8 +85,6 @@ bool RosterSearch::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		IMainWindowPlugin *mainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
 		if (mainWindowPlugin)
 			FMainWindow = mainWindowPlugin->mainWindow();
-		else
-			LOG_WARNING("Failed to load required interface: IMainWindowPlugin");
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));

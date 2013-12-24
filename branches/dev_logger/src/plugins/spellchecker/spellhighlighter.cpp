@@ -1,4 +1,5 @@
 #include "spellhighlighter.h"
+
 #include "spellchecker.h"
 #include "spellbackend.h"
 
@@ -33,9 +34,7 @@ void SpellHighlighter::highlightBlock(const QString &AText)
 			if (!isUserNickName(expression.cap()))
 			{
 				if (!SpellBackend::instance()->isCorrect(expression.cap()))
-				{
 					setFormat(index, length, FCharFormat);
-				}
 			}
 			index += length;
 		}
@@ -44,5 +43,5 @@ void SpellHighlighter::highlightBlock(const QString &AText)
 
 bool SpellHighlighter::isUserNickName(const QString &AText)
 {
-	return FMultiUserChat != NULL && FMultiUserChat->userByNick(AText) != NULL;
+	return FMultiUserChat!=NULL && FMultiUserChat->userByNick(AText)!=NULL;
 }

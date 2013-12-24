@@ -1,6 +1,11 @@
 #include "traymanager.h"
 
 #include <QApplication>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <utils/versionparser.h>
+#include <utils/logger.h>
 
 #define BLINK_VISIBLE_TIME      750
 #define BLINK_INVISIBLE_TIME    250
@@ -64,11 +69,10 @@ bool TrayManager::initObjects()
 
 bool TrayManager::startPlugin()
 {
-	FSystemIcon.show();
+	setTrayIconVisible(true);
 	return true;
 }
 
-//ITrayManager
 QRect TrayManager::geometry() const
 {
 	return FSystemIcon.geometry();
@@ -114,6 +118,7 @@ bool TrayManager::isTrayIconVisible() const
 
 void TrayManager::setTrayIconVisible(bool AVisible)
 {
+	LOG_INFO(QString("Tray icon visibitity changed to=%1").arg(AVisible));
 	FSystemIcon.setVisible(AVisible);
 }
 
@@ -127,30 +132,36 @@ QList<int> TrayManager::notifies() const
 	return FNotifyOrder;
 }
 
-ITrayNotify TrayManager::notifyById( int ANotifyId ) const
+ITrayNotify TrayManager::notifyById(int ANotifyId) const
 {
 	return FNotifyItems.value(ANotifyId);
 }
 
-int TrayManager::appendNotify( const ITrayNotify &ANotify )
+int TrayManager::appendNotify(const ITrayNotify &ANotify)
 {
 	int notifyId = qrand();
 	while (notifyId<=0 || FNotifyItems.contains(notifyId))
 		notifyId = qrand();
+
 	FNotifyOrder.append(notifyId);
 	FNotifyItems.insert(notifyId,ANotify);
 	updateTray();
+
+	LOG_INFO(QString("Tray notification inserted, id=%1, blink=%2").arg(notifyId).arg(ANotify.blink));
 	emit notifyAppended(notifyId);
+
 	return notifyId;
 }
 
-void TrayManager::removeNotify( int ANotifyId )
+void TrayManager::removeNotify(int ANotifyId)
 {
 	if (FNotifyItems.contains(ANotifyId))
 	{
 		FNotifyItems.remove(ANotifyId);
 		FNotifyOrder.removeAll(ANotifyId);
 		updateTray();
+
+		LOG_INFO(QString("Tray notification removed, id=%1").arg(ANotifyId));
 		emit notifyRemoved(ANotifyId);
 	}
 }
@@ -219,7 +230,7 @@ void TrayManager::onBlinkTimerTimeout()
 
 void TrayManager::onApplicationShutdownStarted()
 {
-	FSystemIcon.hide();
+	setTrayIconVisible(false);
 }
 
 Q_EXPORT_PLUGIN2(plg_traymanager, TrayManager)

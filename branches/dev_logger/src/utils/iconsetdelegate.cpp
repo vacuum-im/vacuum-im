@@ -93,7 +93,9 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
 		APainter->restore();
 	}
 	else
+	{
 		QItemDelegate::paint(APainter,AOption,AIndex);
+	}
 }
 
 QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
@@ -126,8 +128,7 @@ QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QMode
 		int iconHeight = (AOption.decorationSize.height()+space)*rows;
 		return QSize(qMax(size.width(),iconWidth)+space,size.height()+iconHeight+space);
 	}
-	else
-		return QItemDelegate::sizeHint(AOption,AIndex);
+	return QItemDelegate::sizeHint(AOption,AIndex);
 }
 
 void IconsetDelegate::drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &/*AIndex*/) const
@@ -151,7 +152,6 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
 	if (!value.isValid())
 		return false;
 
-
 	if ((AEvent->type() == QEvent::MouseButtonRelease) || (AEvent->type() == QEvent::MouseButtonDblClick))
 	{
 		int space = 2;
@@ -171,9 +171,10 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
 			return false;
 	}
 	else
+	{
 		return false;
+	}
 
 	Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
 	return AModel->setData(AIndex, state, Qt::CheckStateRole);
 }
-

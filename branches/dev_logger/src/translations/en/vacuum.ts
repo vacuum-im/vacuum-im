@@ -50,10 +50,6 @@
         <translation>About the program</translation>
     </message>
     <message>
-        <source>Plugins directory not found</source>
-        <translation>Plugins directory not found</translation>
-    </message>
-    <message>
         <source>Application</source>
         <translation>Application</translation>
     </message>

@@ -86,10 +86,6 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 				SLOT(onPrivateDataChanged(const Jid &, const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageClosed(const Jid &)),SLOT(onPrivateStorageClosed(const Jid &)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IPrivateStorage");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);

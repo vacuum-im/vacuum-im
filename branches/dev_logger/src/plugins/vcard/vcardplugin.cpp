@@ -6,6 +6,25 @@
 #include <QClipboard>
 #include <QDomDocument>
 #include <QApplication>
+#include <definitions/namespaces.h>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/multiuserdataroles.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/xmppurihandlerorders.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/rosterdataholderorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/xmpperror.h>
+#include <utils/shortcuts.h>
+#include <utils/stanza.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define DIR_VCARDS                "vcards"
 #define VCARD_TIMEOUT             60000
@@ -255,15 +274,18 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		QDomElement elem = AStanza.firstElement(VCARD_TAGNAME,NS_VCARD_TEMP);
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_INFO(AStreamJid,QString("User vCard loaded, jid=%1, id=%2").arg(fromJid.full(),AStanza.id()));
 			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,elem);
 			emit vcardReceived(fromJid);
 		}
-		else if (AStanza.type() == "error")
+		else
 		{
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load user vCard, jid=%1, id=%2: %3").arg(fromJid.full(),AStanza.id(),err.condition()));
 			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,QDomElement());
-			emit vcardError(fromJid,XmppStanzaError(AStanza));
+			emit vcardError(fromJid,err);
 		}
 	}
 	else if (FVCardPublishId.contains(AStanza.id()))
@@ -272,13 +294,16 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		Stanza stanza = FVCardPublishStanza.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Self vCard published, id=%1").arg(AStanza.id()));
 			FSearchStrings.remove(streamJid);
 			saveVCardFile(streamJid,stanza.element().firstChildElement(VCARD_TAGNAME));
 			emit vcardPublished(streamJid);
 		}
-		else if (AStanza.type() == "error")
+		else
 		{
-			emit vcardError(streamJid,XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to publish self vCard, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit vcardError(streamJid,err);
 		}
 	}
 }
@@ -330,13 +355,18 @@ bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 	{
 		if (FVCardRequestId.key(AContactJid).isEmpty())
 		{
-			Stanza request("iq");
-			request.setTo(AContactJid.full()).setType("get").setId(FStanzaProcessor->newId());
-			request.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
-			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,VCARD_TIMEOUT))
+			Stanza stanza("iq");
+			stanza.setTo(AContactJid.full()).setType("get").setId(FStanzaProcessor->newId());
+			stanza.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,VCARD_TIMEOUT))
 			{
-				FVCardRequestId.insert(request.id(),AContactJid);
+				LOG_STRM_INFO(AStreamJid,QString("User vCard load request sent to=%1, id=%2").arg(stanza.to(),stanza.id()));
+				FVCardRequestId.insert(stanza.id(),AContactJid);
 				return true;
+			}
+			else
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to send user vCard load request to=%1").arg(stanza.to()));
 			}
 			return false;
 		}
@@ -349,15 +379,20 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
 {
 	if (FStanzaProcessor && AVCard->isValid() && FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
 	{
-		Stanza publish("iq");
-		publish.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
-		QDomElement elem = publish.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
+		Stanza stanza("iq");
+		stanza.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
+		QDomElement elem = stanza.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
 		removeEmptyChildElements(elem);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,publish,VCARD_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,VCARD_TIMEOUT))
 		{
-			FVCardPublishId.insert(publish.id(),AStreamJid.pBare());
-			FVCardPublishStanza.insert(publish.id(),publish);
+			LOG_STRM_INFO(AStreamJid,QString("Self vCard publish request sent, id=%1").arg(stanza.id()));
+			FVCardPublishId.insert(stanza.id(),AStreamJid.pBare());
+			FVCardPublishStanza.insert(stanza.id(),stanza);
 			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send self vCard publish request");
 		}
 	}
 	return false;
@@ -433,6 +468,14 @@ void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem)
 			}
 			file.close();
 		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to save vCard to file: %1").arg(file.errorString()));
+		}
+	}
+	else
+	{
+		REPORT_ERROR("Failed to save vCard to file: Invalid params");
 	}
 }
 

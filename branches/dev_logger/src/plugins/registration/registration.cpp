@@ -59,16 +59,12 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-		if (FDataForms == NULL)
-			LOG_WARNING("Failed to load required interface: IDataForms");
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);

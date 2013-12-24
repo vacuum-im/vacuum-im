@@ -45,16 +45,12 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	if (plugin)
 	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
-		if (FStatusChanger == NULL)
-			LOG_WARNING("Failed to load required interface: IStatusChanger");
 	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
 	if (plugin)
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
-		if (FAccountManager == NULL)
-			LOG_WARNING("Failed to load required interface: IAccountManager");
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);

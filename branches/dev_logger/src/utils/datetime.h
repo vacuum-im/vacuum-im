@@ -7,7 +7,7 @@
 #include "utilsexport.h"
 
 class DateTimeData :
-   public QSharedData
+	public QSharedData
 {
 public:
 	DateTimeData(const QDateTime &ADT, int ATZD);

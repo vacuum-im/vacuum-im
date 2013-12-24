@@ -80,16 +80,12 @@ bool RemoteControl::initConnections(IPluginManager *APluginManager, int &AInitOr
 	if (plugin)
 	{
 		FCommands = qobject_cast<ICommands *>(plugin->instance());
-		if (FCommands == NULL)
-			LOG_WARNING("Failed to load required interface: ICommands");
 	}
 	
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-		if (FDataForms == NULL)
-			LOG_WARNING("Failed to load required interface: IDataForms");
 	}
 
 	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);

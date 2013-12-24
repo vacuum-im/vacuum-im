@@ -45,18 +45,12 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AIni
 			connect(FXmppStreams->instance(),SIGNAL(removed(IXmppStream *)),SLOT(onXmppStreamRemoved(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(jidChanged(IXmppStream *, const Jid &)),SLOT(onXmppStreamJidChanged(IXmppStream *, const Jid &)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);

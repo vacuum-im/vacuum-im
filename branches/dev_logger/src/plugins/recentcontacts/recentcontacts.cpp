@@ -109,10 +109,6 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 				SLOT(onPrivateStorageDataChanged(const Jid &, const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageNotifyAboutToClose(const Jid &)),SLOT(onPrivateStorageNotifyAboutToClose(const Jid &)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IPrivateStorage");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);

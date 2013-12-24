@@ -52,8 +52,6 @@ bool FileStreamsManager::initConnections(IPluginManager *APluginManager, int &AI
 	if (plugin)
 	{
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
-		if (FDataManager == NULL)
-			LOG_WARNING("Failed to load required interface: IDataStreamsManager");
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);

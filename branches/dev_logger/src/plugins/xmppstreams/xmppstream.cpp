@@ -501,6 +501,9 @@ bool XmppStream::processDataHandlers(QByteArray &AData, bool ADataOut)
 
 bool XmppStream::processStanzaHandlers(Stanza &AStanza, bool AStanzaOut)
 {
+	if (!AStanzaOut)
+		LOG_STRM_TYPE(Logger::Stanza,streamJid(),QString("Stanza received:\n\n%1").arg(AStanza.toString(2)));
+
 	bool hooked = false;
 	QMapIterator<int, IXmppStanzaHadler *> it(FStanzaHandlers);
 	if (!AStanzaOut)
@@ -521,6 +524,10 @@ bool XmppStream::processStanzaHandlers(Stanza &AStanza, bool AStanzaOut)
 			hooked = it.value()->xmppStanzaIn(this, AStanza, it.key());
 		}
 	}
+
+	if (AStanzaOut && !hooked)
+		LOG_STRM_TYPE(Logger::Stanza,streamJid(),QString("Stanza sent:\n\n%1").arg(AStanza.toString(2)));
+
 	return hooked;
 }
 

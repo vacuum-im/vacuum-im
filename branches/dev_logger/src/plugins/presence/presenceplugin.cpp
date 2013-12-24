@@ -55,18 +55,12 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 			connect(FXmppStreams->instance(), SIGNAL(added(IXmppStream *)), SLOT(onStreamAdded(IXmppStream *)));
 			connect(FXmppStreams->instance(), SIGNAL(removed(IXmppStream *)), SLOT(onStreamRemoved(IXmppStream *)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;

@@ -48,8 +48,6 @@ bool ShortcutManager::initConnections(IPluginManager *APluginManager, int &AInit
 	if (plugin)
 	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-		if (FOptionsManager == NULL)
-			LOG_WARNING("Failed to load required interface: IOptionsManager");
 	}
 
 	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);

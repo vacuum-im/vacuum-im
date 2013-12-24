@@ -42,16 +42,12 @@ bool ConsolePlugin::initConnections(IPluginManager *APluginManager, int &AInitOr
 	if (plugin)
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams == NULL)
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
 	{
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
-		if (FMainWindowPlugin == NULL)
-			LOG_WARNING("Failed to load required interface: IMainWindowPlugin");
 	}
 
 	return FXmppStreams!=NULL && FMainWindowPlugin!=NULL;

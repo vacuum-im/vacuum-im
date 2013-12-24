@@ -20,8 +20,12 @@
         <translation>Supports the exchange of a small amount of binary data in XMPP stanza</translation>
     </message>
     <message>
-        <source>Failed to read cached data</source>
-        <translation>Failed to read cached data</translation>
+        <source>Failed to load data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

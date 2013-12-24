@@ -55,8 +55,6 @@ bool PrivateStorage::initConnections(IPluginManager *APluginManager, int &AInitO
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);

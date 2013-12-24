@@ -104,8 +104,6 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 	if (plugin)
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams == NULL)
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
@@ -125,9 +123,7 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 		if (FDiscovery)
-		{
 			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);

@@ -97,9 +97,6 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	if (FPlugins.isEmpty())
-		LOG_WARNING("Failed to load any required interface: IConnectionPlugin");
-
 	return !FPlugins.isEmpty();
 }
 

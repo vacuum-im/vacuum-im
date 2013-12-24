@@ -84,18 +84,12 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &AInitOrder
 			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onChatWindowCreated(IMessageChatWindow *)));
 			connect(FMessageWidgets->instance(),SIGNAL(chatWindowDestroyed(IMessageChatWindow *)),SLOT(onChatWindowDestroyed(IMessageChatWindow *)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IMessageWidgets");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0);
@@ -108,10 +102,6 @@ bool ChatStates::initConnections(IPluginManager *APluginManager, int &AInitOrder
 			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
 				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
 			connect(FPresencePlugin->instance(),SIGNAL(presenceClosed(IPresence *)),SLOT(onPresenceClosed(IPresence *)));
-		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IPresencePlugin");
 		}
 	}
 

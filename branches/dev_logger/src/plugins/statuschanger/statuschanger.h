@@ -5,19 +5,6 @@
 #include <QPair>
 #include <QPointer>
 #include <QDateTime>
-#include <definitions/actiongroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ipresence.h>
@@ -30,12 +17,10 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/inotifications.h>
-#include <utils/options.h>
 #include "editstatusdialog.h"
 #include "modifystatusdialog.h"
 
-struct StatusItem 
-{
+struct StatusItem {
 	StatusItem() {
 		code = STATUS_NULL_ID;
 		show = IPresence::Offline;

@@ -4,6 +4,11 @@
 #include <QApplication>
 #include <QActionGroup>
 
+#include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+
 #include "spellbackend.h"
 #include "spellchecker.h"
 
@@ -45,9 +50,7 @@ bool SpellChecker::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	{
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
-		{
 			connect(FMessageWidgets->instance(),SIGNAL(editWidgetCreated(IMessageEditWidget *)),SLOT(onEditWidgetCreated(IMessageEditWidget *)));
-		}
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
@@ -63,11 +66,13 @@ bool SpellChecker::initObjects()
 		dictsDir.mkdir(SPELLDICTS_DIR);
 	dictsDir.cd(SPELLDICTS_DIR);
 	SpellBackend::instance()->setCustomDictPath(dictsDir.absolutePath());
+	LOG_DEBUG(QString("Custom dictionary path set to=%1").arg(dictsDir.absolutePath()));
 
 	if (!dictsDir.exists(PERSONALDICTS_DIR))
 		dictsDir.mkdir(PERSONALDICTS_DIR);
 	dictsDir.cd(PERSONALDICTS_DIR);
 	SpellBackend::instance()->setPersonalDictPath(dictsDir.absolutePath());
+	LOG_DEBUG(QString("Personal dictionary path set to=%1").arg(dictsDir.absolutePath()));
 
 	return true;
 }
@@ -313,6 +318,7 @@ void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 	if (ANode.path() == OPV_MESSAGES_SPELL_ENABLED)
 	{
 		bool enabled = ANode.value().toBool();
+		LOG_INFO(QString("Spell check enable changed to=%1").arg(enabled));
 		foreach(SpellHighlighter *liter, FSpellHighlighters.values())
 			liter->setEnabled(enabled);
 		emit spellEnableChanged(enabled);
@@ -325,6 +331,7 @@ void SpellChecker::onOptionsChanged(const OptionsNode &ANode)
 		QString dict = availDicts.contains(fullDict) ? fullDict : partDict;
 		if (availDicts.contains(dict))
 		{
+			LOG_INFO(QString("Spell check language changed to=%1").arg(dict));
 			SpellBackend::instance()->setLang(dict);
 			emit currentDictionaryChanged(currentDictionary());
 			rehightlightAll();

@@ -1,13 +1,10 @@
 #ifndef SPELLCHECKER_H
 #define SPELLCHECKER_H
 
-#include <definitions/actiongroups.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/ispellchecker.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imultiuserchat.h>
-#include <utils/options.h>
 #include "spellhighlighter.h"
 
 class SpellChecker : 

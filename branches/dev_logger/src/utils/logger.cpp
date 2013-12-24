@@ -7,7 +7,7 @@
 #include <QMutexLocker>
 #include "datetime.h"
 
-#define DEBUG_LOGGER
+#define MAX_LOG_FILES  10
 
 void qtMessagesHandler(QtMsgType AType, const char *AMessage)
 {
@@ -63,10 +63,15 @@ void Logger::openLog(const QString &APath)
 	LoggerData *q = instance()->d;
 	if (!q->logFile.isOpen() && !APath.isEmpty())
 	{
+		QDir logDir(APath);
+		QStringList logFiles = logDir.entryList(QStringList()<<"*.log",QDir::Files,QDir::Name);
+		while (logFiles.count() > MAX_LOG_FILES)
+			QFile::remove(logDir.absoluteFilePath(logFiles.takeFirst()));
+
 #ifndef DEBUG_MODE
 		qInstallMsgHandler(qtMessagesHandler);
 #endif
-		q->logFile.setFileName(APath +"/"+ DateTime(QDateTime::currentDateTime()).toX85DateTime().replace(":","-") +".log");
+		q->logFile.setFileName(logDir.absoluteFilePath(DateTime(QDateTime::currentDateTime()).toX85DateTime().replace(":","-") +".log"));
 		q->logFile.open(QFile::WriteOnly|QFile::Truncate);
 	}
 }

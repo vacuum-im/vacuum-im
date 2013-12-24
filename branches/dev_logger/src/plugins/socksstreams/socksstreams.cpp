@@ -42,8 +42,6 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);

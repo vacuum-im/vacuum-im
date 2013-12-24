@@ -103,10 +103,6 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardChanged(const Jid &)));
 			connect(FVCardPlugin->instance(),SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardChanged(const Jid &)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IVCardPlugin");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);

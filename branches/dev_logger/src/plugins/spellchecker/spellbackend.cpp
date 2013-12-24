@@ -27,6 +27,7 @@
 #include "spellbackend.h"
 
 #include <QCoreApplication>
+#include <utils/logger.h>
 
 #if defined(HAVE_MACSPELL)
 #	include "macspellchecker.h"
@@ -56,14 +57,19 @@ SpellBackend *SpellBackend::instance()
 	{
 #if defined(HAVE_MACSPELL)
 		FInstance = new MacSpellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","MacSpell backend created");
 #elif defined (HAVE_ENCHANT)
 		FInstance = new EnchantChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Enchant backend created");
 #elif defined(HAVE_ASPELL)
 		FInstance = new ASpellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Aspell backend created");
 #elif defined(HAVE_HUNSPELL)
 		FInstance = new HunspellChecker();
+		Logger::writeLog(Logger::Info,"SpellBackend","Hunspell backend created");
 #else
 		FInstance = new SpellBackend();
+		Logger::writeLog(Logger::Warning,"SpellBackend","Empty backend created");
 #endif
 	}
 	return FInstance;

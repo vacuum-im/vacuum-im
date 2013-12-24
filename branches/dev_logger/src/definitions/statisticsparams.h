@@ -8,11 +8,14 @@
 #define SEVP_SESSION_CONTINUED                               "session|continued|Session Continued"
 #define SEVP_SESSION_FINISHED                                "session|finished|Session Finished"
 
+#define SEVP_STATISTICS_ENABLED                              "statistics|enabled|Statistics Enabled"
+#define SEVP_STATISTICS_DISABLED                             "statistics|disabled|Statistics Disabled"
+
 #define SEVP_FILESTREAM_SUCCESS                              "file-stream|success|File Stream Success"
 #define SEVP_FILESTREAM_FAILURE                              "file-stream|failure|File Stream Failure"
 
-#define SEVP_REGISTRATION_STREAM_BEGIN                       "registration|stream-begin|Registration stream begin"
-#define SEVP_REGISTRATION_STREAM_SUCCESS                     "registration|stream-success|Registration stream success"
+#define SEVP_REGISTRATION_STREAM_BEGIN                       "registration|stream-begin|Registration Stream Begin"
+#define SEVP_REGISTRATION_STREAM_SUCCESS                     "registration|stream-success|Registration Stream Success"
 
 // Hit-Timing
 #define STMP_APPLICATION_START                               "application|start|Application Start"

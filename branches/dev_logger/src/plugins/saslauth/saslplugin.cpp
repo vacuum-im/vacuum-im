@@ -39,8 +39,6 @@ bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
-		else
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	return FXmppStreams!=NULL;

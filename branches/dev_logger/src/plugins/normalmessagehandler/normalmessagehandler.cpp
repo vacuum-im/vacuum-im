@@ -78,8 +78,6 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 	if (plugin)
 	{
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
-		if (FMessageWidgets == NULL)
-			LOG_WARNING("Failed to load required interface: IMessageWidgets");
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
@@ -88,8 +86,6 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
 		if (FMessageProcessor)
 			connect(FMessageProcessor->instance(),SIGNAL(activeStreamRemoved(const Jid &)),SLOT(onActiveStreamRemoved(const Jid &)));
-		else
-			LOG_WARNING("Failed to load required interface: IMessageProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageStyles").value(0,NULL);
@@ -101,10 +97,6 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 			connect(FMessageStyles->instance(),SIGNAL(styleOptionsChanged(const IMessageStyleOptions &, int, const QString &)),
 				SLOT(onStyleOptionsChanged(const IMessageStyleOptions &, int, const QString &)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IMessageStyles");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
@@ -112,9 +104,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 	{
 		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
 		if (FAvatars)
-		{
 			connect(FAvatars->instance(),SIGNAL(avatarChanged(const Jid &)),SLOT(onAvatarChanged(const Jid &)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
@@ -122,9 +112,7 @@ bool NormalMessageHandler::initConnections(IPluginManager *APluginManager, int &
 	{
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 		if (FStatusIcons)
-		{
 			connect(FStatusIcons->instance(),SIGNAL(statusIconsChanged()),SLOT(onStatusIconsChanged()));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);

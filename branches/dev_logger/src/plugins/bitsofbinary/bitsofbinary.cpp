@@ -55,8 +55,6 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 	
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
@@ -65,8 +63,6 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
-		else
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);

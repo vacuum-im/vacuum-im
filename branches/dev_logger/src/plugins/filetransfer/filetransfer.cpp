@@ -75,16 +75,12 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	if (plugin)
 	{
 		FFileManager = qobject_cast<IFileStreamsManager *>(plugin->instance());
-		if (FFileManager == NULL)
-			LOG_WARNING("Failed to load required interface: IFileStreamsManager");
 	}
 
 	plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
 	if (plugin)
 	{
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
-		if (FDataManager == NULL)
-			LOG_WARNING("Failed to load required interface: IDataStreamsManager");
 	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);

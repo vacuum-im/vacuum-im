@@ -63,8 +63,6 @@ bool BirthdayReminder::initConnections(IPluginManager *APluginManager, int &AIni
 		FVCardPlugin = qobject_cast<IVCardPlugin *>(plugin->instance());
 		if (FVCardPlugin)
 			connect(FVCardPlugin->instance(),SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
-		else
-			LOG_WARNING("Failed to load required interface: IVCardPlugin");
 	}
 
 	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);

@@ -6,7 +6,9 @@
 #include <QNetworkProxy>
 #include <QNetworkRequest>
 #include <definitions/version.h>
+#include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
 #include <definitions/statisticsparams.h>
 #include <utils/filecookiejar.h>
 #include <utils/options.h>
@@ -76,8 +78,10 @@ QDataStream &operator<<(QDataStream &AStream, const IStatisticsHit &AHit)
 Statistics::Statistics()
 {
 	FPluginManager = NULL;
+	FOptionsManager = NULL;
 	FConnectionManager = NULL;
 
+	FSendHits = true;
 	FDesktopWidget = new QDesktopWidget;
 
 	FNetworkManager = new QNetworkAccessManager(this);
@@ -105,7 +109,7 @@ Statistics::Statistics()
 Statistics::~Statistics()
 {
 	if (!FPendingHits.isEmpty())
-		LOG_WARNING(QString("Pending statistics hints (%1) not sent").arg(FPendingHits.count()));
+		LOG_WARNING(QString("Failed to send pending statistics hints, count=%1").arg(FPendingHits.count()));
 	delete FDesktopWidget;
 }
 
@@ -131,8 +135,15 @@ bool Statistics::initConnections(IPluginManager *APluginManager, int &AInitOrder
 			connect(FConnectionManager->instance(),SIGNAL(defaultProxyChanged(const QUuid &)),SLOT(onDefaultConnectionProxyChanged(const QUuid &)));
 	}
 
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+	{
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
+
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	return true;
 }
@@ -140,8 +151,30 @@ bool Statistics::initConnections(IPluginManager *APluginManager, int &AInitOrder
 bool Statistics::initObjects()
 {
 	FUserAgent = userAgent();
-	LOG_DEBUG(QString("User-Aget header - %1").arg(FUserAgent));
+	LOG_DEBUG(QString("Statistics User-Aget header - %1").arg(FUserAgent));
+
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsHolder(this);
+	}
+
 	return true;
+}
+
+bool Statistics::initSettings()
+{
+	Options::setDefaultValue(OPV_MISC_STATISTICTS_ENABLED,true);
+	return true;
+}
+
+QMultiMap<int, IOptionsWidget *> Statistics::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (ANodeId == OPN_MISC)
+	{
+		widgets.insertMulti(OWO_MISC_STATISTICS,FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_STATISTICTS_ENABLED),tr("Send anonymous statistics information to developer"),AParent));
+	}
+	return widgets;
 }
 
 QUuid Statistics::profileId() const
@@ -184,7 +217,7 @@ bool Statistics::isValidHit(const IStatisticsHit &AHit) const
 bool Statistics::sendStatisticsHit(const IStatisticsHit &AHit)
 {
 #if !defined(DEBUG_MODE) || defined(DEBUG_STATISTICS)
-	if (isValidHit(AHit))
+	if (FSendHits && isValidHit(AHit))
 	{
 		if (!FProfileId.isNull() || !AHit.profile.isNull())
 		{
@@ -484,6 +517,8 @@ void Statistics::onNetworkManagerProxyAuthenticationRequired(const QNetworkProxy
 
 void Statistics::onOptionsOpened()
 {
+	FSendHits = Options::node(OPV_MISC_STATISTICTS_ENABLED).value().toBool();
+
 	FProfileId = Options::node(OPV_STATISTICS_PROFILEID).value().toString();
 	if (FProfileId.isNull())
 	{
@@ -503,6 +538,23 @@ void Statistics::onOptionsClosed()
 {
 	REPORT_EVENT(SEVP_SESSION_FINISHED,1);
 	FSessionTimer.stop();
+}
+
+void Statistics::onOptionsChanged(const OptionsNode &ANode)
+{
+	if (ANode.path() == OPV_MISC_STATISTICTS_ENABLED)
+	{
+		if (ANode.value().toBool())
+		{
+			FSendHits = true;
+			onLoggerEventReported("Statistics","statistics","statistics-enabled","Statistics Enabled",1); // SEVP_STATISTICS_ENABLED
+		}
+		else
+		{
+			onLoggerEventReported("Statistics","statistics","statistics-disabled","Statistics Disabled",1); // SEVP_STATISTICS_DISABLED
+			FSendHits = false;
+		}
+	}
 }
 
 void Statistics::onPendingTimerTimeout()

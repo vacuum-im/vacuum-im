@@ -82,8 +82,6 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);

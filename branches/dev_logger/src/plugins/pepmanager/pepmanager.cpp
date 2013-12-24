@@ -41,16 +41,12 @@ bool PEPManager::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	if (plugin)
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-		if (FDiscovery == NULL)
-			LOG_WARNING("Failed to load required interface: IServiceDiscovery");
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
@@ -61,10 +57,6 @@ bool PEPManager::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		{
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
-		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
 		}
 	}
 	return FDiscovery!=NULL && FStanzaProcessor!=NULL && FXmppStreams!=NULL;

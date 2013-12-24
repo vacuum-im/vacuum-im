@@ -8,15 +8,17 @@
 #include <QNetworkAccessManager>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatistics.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iconnectionmanager.h>
 
 class Statistics : 
 	public QObject,
 	public IPlugin,
-	public IStatistics
+	public IStatistics,
+	public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IStatistics);
+	Q_INTERFACES(IPlugin IStatistics IOptionsHolder);
 public:
 	Statistics();
 	~Statistics();
@@ -26,8 +28,10 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
+	// IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	// IStatistics
 	virtual QUuid profileId() const;
 	virtual bool isValidHit(const IStatisticsHit &AHit) const;
@@ -44,6 +48,7 @@ protected slots:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
+	void onOptionsChanged(const OptionsNode &ANode);
 	void onPendingTimerTimeout();
 	void onSessionTimerTimeout();
 	void onDefaultConnectionProxyChanged(const QUuid &AProxyId);
@@ -54,12 +59,14 @@ protected slots:
 	void onLoggerTimingReported(const QString &AClass, const QString &ACategory, const QString &AVariable, const QString &ALabel, qint64 ATime);
 private:
 	IPluginManager *FPluginManager;
+	IOptionsManager *FOptionsManager;
 	IConnectionManager *FConnectionManager;
 private:
 	QUuid FProfileId;
 	QDesktopWidget *FDesktopWidget;
 	QNetworkAccessManager *FNetworkManager;
 private:
+	bool FSendHits;
 	QString FUserAgent;
 	QTimer FPendingTimer;
 	QTimer FSessionTimer;

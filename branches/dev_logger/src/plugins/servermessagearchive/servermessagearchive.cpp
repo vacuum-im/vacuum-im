@@ -49,18 +49,12 @@ bool ServerMessageArchive::initConnections(IPluginManager *APluginManager, int &
 			connect(FArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
 			connect(FArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IMessageArchiver");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	connect(this,SIGNAL(serverHeadersLoaded(const QString &, const QList<IArchiveHeader> &, const QString &)),

@@ -1,14 +1,9 @@
 #ifndef STARTTLSPLUGIN_H
 #define STARTTLSPLUGIN_H
 
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/idefaultconnection.h>
-#include <utils/xmpperror.h>
 #include "starttls.h"
 
 #define STARTTLS_UUID "{F554544C-0851-4e2a-9158-99191911E468}"
@@ -32,7 +27,7 @@ public:
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IXmppFeaturesPlugin
-	virtual QList<QString> xmppFeatures() const { return QList<QString>() << NS_FEATURE_STARTTLS; }
+	virtual QList<QString> xmppFeatures() const;
 	virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 signals:
 	void featureCreated(IXmppFeature *AFeature);

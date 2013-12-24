@@ -82,10 +82,6 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 			connect(FArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
 			connect(FArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IMessageArchiver");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);

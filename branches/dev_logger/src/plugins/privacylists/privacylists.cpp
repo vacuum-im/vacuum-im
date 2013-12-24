@@ -68,8 +68,6 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
@@ -80,10 +78,6 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		{
 			connect(FXmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
-		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
 		}
 	}
 

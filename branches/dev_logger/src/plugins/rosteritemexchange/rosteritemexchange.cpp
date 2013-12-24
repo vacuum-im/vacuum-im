@@ -76,16 +76,12 @@ bool RosterItemExchange::initConnections(IPluginManager *APluginManager, int &AI
 	if (plugin)
 	{
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-		if (FRosterPlugin == NULL)
-			LOG_WARNING("Failed to load required interface: IRosterPlugin");
 	}
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-		if (FStanzaProcessor == NULL)
-			LOG_WARNING("Failed to load required interface: IStanzaProcessor");
 	}
 
 	plugin = APluginManager->pluginInterface("IRosterChanger").value(0,NULL);

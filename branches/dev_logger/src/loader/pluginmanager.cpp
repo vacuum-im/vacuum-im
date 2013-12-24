@@ -300,7 +300,7 @@ void PluginManager::loadSettings()
 #ifndef DEBUG_MODE
 		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info;
 #else
-		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info|Logger::View|Logger::Event|Logger::Timing|Logger::Debug|Logger::Stanza;
+		quint32 logTypes = Logger::Fatal|Logger::Error|Logger::Warning|Logger::Info|Logger::View|Logger::Event|Logger::Timing|Logger::Debug;
 #endif
 		if (args.contains(CLO_LOG_TYPES))
 			logTypes = args.value(args.indexOf(CLO_LOG_TYPES)+1).toUInt();
@@ -342,7 +342,7 @@ void PluginManager::saveSettings()
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to open plugins settings file: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to save plugins settings: %1").arg(file.errorString()));
 		}
 	}
 }
@@ -364,7 +364,7 @@ bool PluginManager::loadPlugins()
 		{
 			if (!QLibrary::isLibrary(file))
 			{
-				LOG_WARNING(QString("Failed to load plugin, file=%1: Not a library").arg(file));
+				LOG_WARNING(QString("Failed to load plugin %1: Invalid library format").arg(file));
 			}
 			else if (!isPluginEnabled(file))
 			{
@@ -384,7 +384,7 @@ bool PluginManager::loadPlugins()
 				{
 					delete translator;
 					translator = NULL;
-					LOG_DEBUG(QString("Translation for '%1' not found").arg(file));
+					LOG_DEBUG(QString("Failed to load translation for plugin %1").arg(file));
 				}
 
 				if (loader->load())
@@ -406,23 +406,26 @@ bool PluginManager::loadPlugins()
 							savePluginInfo(file, pluginItem.info).setAttribute("uuid", uid.toString());
 
 							FPluginItems.insert(uid,pluginItem);
-							LOG_DEBUG(QString("Plugin loaded '%1' v%2").arg(file,pluginItem.info->version));
+							LOG_DEBUG(QString("Loaded plugin from file=%1, version=%2, uuid=%3").arg(file,pluginItem.info->version,uid.toString()));
 						}
 						else
 						{
+							LOG_ERROR(QString("Failed to load plugin %1: Duplicate uuid=%2").arg(file,uid.toString()));
 							savePluginError(file, tr("Duplicate plugin uuid"));
 							delete loader;
 						}
 					}
 					else
 					{
+						LOG_ERROR(QString("Failed to load plugin %1: Invalid interface").arg(file));
 						savePluginError(file, tr("Wrong plugin interface"));
 						delete loader;
 					}
 				}
 				else
 				{
-					savePluginError(file, loader->errorString());
+					LOG_ERROR(QString("Failed to load plugin %1: %2").arg(file,loader->errorString()));
+					savePluginError(file,loader->errorString());
 					delete loader;
 				}
 			}
@@ -434,11 +437,13 @@ bool PluginManager::loadPlugins()
 			QUuid puid = it.key();
 			if (!checkDependences(puid))
 			{
+				LOG_WARNING(QString("Dependences not found for plugin, uuid=%1").arg(puid.toString()));
 				unloadPlugin(puid, tr("Dependences not found"));
 				it = FPluginItems.constBegin();
 			}
 			else if (!checkConflicts(puid))
 			{
+				LOG_WARNING(QString("Conflicts found for plugin, uuid=%1").arg(puid.toString()));
 				foreach(const QUuid &uid, getConflicts(puid))
 					unloadPlugin(uid, tr("Conflict with plugin %1").arg(puid.toString()));
 				it = FPluginItems.constBegin();
@@ -451,7 +456,7 @@ bool PluginManager::loadPlugins()
 	}
 	else
 	{
-		REPORT_FATAL(QString("Plugins directory=%1 not found").arg(PLUGINS_DIR));
+		REPORT_FATAL("Plugins directory not found");
 	}
 	return !FPluginItems.isEmpty();
 }
@@ -473,6 +478,7 @@ bool PluginManager::initPlugins()
 		else
 		{
 			initOk = false;
+			LOG_WARNING(QString("Failed to initialize plugin, uuid=%1").arg(plugin->pluginUuid().toString()));
 			FBlockedPlugins.append(QFileInfo(it.value().loader->fileName()).fileName());
 			unloadPlugin(it.key(),tr("Initialization failed"));
 		}
@@ -635,6 +641,7 @@ void PluginManager::removePluginItem(const QUuid &AUuid, const QString &AError)
 		delete pluginItem.translator;
 		delete pluginItem.info;
 		delete pluginItem.loader;
+		LOG_DEBUG(QString("Plugin destroyed, uuid=%1, error=%2").arg(AUuid.toString(),AError));
 	}
 }
 
@@ -721,7 +728,7 @@ void PluginManager::loadCoreTranslations(const QDir &ADir, const QString &ALocal
 	else if (FQtTranslator->load("qt_"+QLocale().name(), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
 		qApp->installTranslator(FQtTranslator);
 	else
-		LOG_DEBUG("Translation for 'qt' not found");
+		LOG_DEBUG("Translation for 'Qt' not found");
 
 	if (FLoaderTranslator->load("vacuum",ADir.absoluteFilePath(ALocaleName)) || FLoaderTranslator->load("vacuum",ADir.absoluteFilePath(ALocaleName.left(2))))
 		qApp->installTranslator(FLoaderTranslator);
@@ -809,7 +816,6 @@ void PluginManager::savePluginError(const QString &AFile, const QString &AError)
 		{
 			errorElem.firstChild().toCharacterData().setData(AError);
 		}
-		LOG_WARNING(QString("Failed to load plugin file=%1: %2").arg(AFile,AError));
 	}
 	else
 	{

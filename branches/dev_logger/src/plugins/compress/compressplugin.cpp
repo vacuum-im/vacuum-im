@@ -41,8 +41,6 @@ bool CompressPlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 	if (plugin)
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (FXmppStreams == NULL)
-			LOG_WARNING("Failed to load required interface: IXmppStreams");
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);

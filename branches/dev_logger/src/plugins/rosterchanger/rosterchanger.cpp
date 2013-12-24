@@ -88,10 +88,6 @@ bool RosterChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 				SLOT(onSubscriptionReceived(IRoster *, const Jid &, int, const QString &)));
 			connect(FRosterPlugin->instance(),SIGNAL(rosterClosed(IRoster *)),SLOT(onRosterClosed(IRoster *)));
 		}
-		else
-		{
-			LOG_WARNING("Failed to load required interface: IRosterPlugin");
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
