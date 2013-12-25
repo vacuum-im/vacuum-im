@@ -147,7 +147,7 @@ int TrayManager::appendNotify(const ITrayNotify &ANotify)
 	FNotifyItems.insert(notifyId,ANotify);
 	updateTray();
 
-	LOG_INFO(QString("Tray notification inserted, id=%1, blink=%2").arg(notifyId).arg(ANotify.blink));
+	LOG_DEBUG(QString("Tray notification inserted, id=%1, blink=%2").arg(notifyId).arg(ANotify.blink));
 	emit notifyAppended(notifyId);
 
 	return notifyId;
@@ -161,7 +161,7 @@ void TrayManager::removeNotify(int ANotifyId)
 		FNotifyOrder.removeAll(ANotifyId);
 		updateTray();
 
-		LOG_INFO(QString("Tray notification removed, id=%1").arg(ANotifyId));
+		LOG_DEBUG(QString("Tray notification removed, id=%1").arg(ANotifyId));
 		emit notifyRemoved(ANotifyId);
 	}
 }
@@ -204,6 +204,7 @@ void TrayManager::updateTray()
 
 void TrayManager::onTrayIconActivated(QSystemTrayIcon::ActivationReason AReason)
 {
+	LOG_DEBUG(QString("Tray notification activated, id=%1").arg(FActiveNotify));
 	emit notifyActivated(FActiveNotify,AReason);
 }
 

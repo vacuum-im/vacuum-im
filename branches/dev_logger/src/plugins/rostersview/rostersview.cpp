@@ -809,7 +809,7 @@ QList<IRosterIndex *> RostersView::notifyIndexes(int ANotifyId) const
 
 int RostersView::insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes)
 {
-	int notifyId = -1;
+	int notifyId = qrand();
 	while(notifyId<=0 || FNotifyItems.contains(notifyId))
 		notifyId = qrand();
 
@@ -833,7 +833,7 @@ int RostersView::insertNotify(const IRostersNotify &ANotify, const QList<IRoster
 	FNotifyItems.insert(notifyId, ANotify);
 	QTimer::singleShot(0,this,SLOT(onUpdateIndexNotifyTimeout()));
 
-	LOG_INFO(QString("Roster notify inserted, id=%1, order=%2, flags=%3").arg(notifyId).arg(ANotify.order).arg(ANotify.flags));
+	LOG_DEBUG(QString("Roster notify inserted, id=%1, order=%2, flags=%3").arg(notifyId).arg(ANotify.order).arg(ANotify.flags));
 	emit notifyInserted(notifyId);
 
 	return notifyId;
@@ -843,7 +843,7 @@ void RostersView::activateNotify(int ANotifyId)
 {
 	if (FNotifyItems.contains(ANotifyId))
 	{
-		LOG_INFO(QString("Roster notify activated, id=%1").arg(ANotifyId));
+		LOG_DEBUG(QString("Roster notify activated, id=%1").arg(ANotifyId));
 		emit notifyActivated(ANotifyId);
 	}
 }
@@ -869,7 +869,7 @@ void RostersView::removeNotify(int ANotifyId)
 		FNotifyItems.remove(ANotifyId);
 		QTimer::singleShot(0,this,SLOT(onUpdateIndexNotifyTimeout()));
 
-		LOG_INFO(QString("Roster notify removed, id=%1").arg(ANotifyId));
+		LOG_DEBUG(QString("Roster notify removed, id=%1").arg(ANotifyId));
 		emit notifyRemoved(ANotifyId);
 	}
 }

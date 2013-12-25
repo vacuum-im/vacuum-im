@@ -1,4 +1,11 @@
 #include "systemmanager.h"
+
+#include <QDir>
+#include <QSysInfo>
+#include <QProcess>
+#include <QFileInfo>
+#include <QTextStream>
+#include <QStringList>
 #include <thirdparty/idle/idle.h>
 
 #if defined(Q_OS_UNIX)

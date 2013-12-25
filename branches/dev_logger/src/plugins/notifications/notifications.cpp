@@ -539,7 +539,7 @@ void Notifications::insertNotificationHandler(int AOrder, INotificationHandler *
 {
 	if (AHandler != NULL)
 	{
-		LOG_INFO(QString("Notification handler inserted, order=%1").arg(AOrder));
+		LOG_DEBUG(QString("Notification handler inserted, order=%1").arg(AOrder));
 		FHandlers.insertMulti(AOrder, AHandler);
 		emit notificationHandlerInserted(AOrder,AHandler);
 	}
@@ -549,7 +549,7 @@ void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *
 {
 	if (FHandlers.contains(AOrder,AHandler))
 	{
-		LOG_INFO(QString("Notification handler removed, order=%1").arg(AOrder));
+		LOG_DEBUG(QString("Notification handler removed, order=%1").arg(AOrder));
 		FHandlers.remove(AOrder,AHandler);
 		emit notificationHandlerRemoved(AOrder,AHandler);
 	}
