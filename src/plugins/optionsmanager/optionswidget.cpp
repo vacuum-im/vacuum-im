@@ -4,6 +4,7 @@
 #include <QKeySequence>
 #include <QIntValidator>
 #include <QDoubleValidator>
+#include <utils/options.h>
 
 OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) : QWidget(AParent)
 {

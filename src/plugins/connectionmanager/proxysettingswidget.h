@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "ui_proxysettingswidget.h"
 
 class ProxySettingsWidget :

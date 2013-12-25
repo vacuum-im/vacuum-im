@@ -4,7 +4,7 @@
 #include <QWebPage>
 
 class WebPage :
-			public QWebPage
+	public QWebPage
 {
 	Q_OBJECT;
 public:

@@ -1,5 +1,12 @@
 #include "compression.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <definitions/xmppdatahandlerorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/xmpperror.h>
+#include <utils/logger.h>
+
 #define CHUNK 5120
 
 Compression::Compression(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
@@ -19,18 +26,14 @@ Compression::~Compression()
 bool Compression::xmppDataIn(IXmppStream *AXmppStream, QByteArray &AData, int AOrder)
 {
 	if (AXmppStream==FXmppStream && AOrder==XDHO_FEATURE_COMPRESS)
-	{
 		processData(AData, false);
-	}
 	return false;
 }
 
 bool Compression::xmppDataOut(IXmppStream *AXmppStream, QByteArray &AData, int AOrder)
 {
 	if (AXmppStream==FXmppStream && AOrder==XDHO_FEATURE_COMPRESS)
-	{
 		processData(AData, true);
-	}
 	return false;
 }
 
@@ -41,11 +44,13 @@ bool Compression::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AO
 		FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		if (AStanza.tagName() == "compressed")
 		{
+			LOG_STRM_INFO(AXmppStream->streamJid(),"Stream compression started");
 			FXmppStream->insertXmppDataHandler(XDHO_FEATURE_COMPRESS,this);
 			emit finished(true);
 		}
 		else
 		{
+			LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Failed to start stream compression: %1").arg(AStanza.tagName()));
 			deleteLater();
 			emit finished(false);
 		}
@@ -56,10 +61,18 @@ bool Compression::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AO
 
 bool Compression::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
+}
+
+QString Compression::featureNS() const
+{
+	return NS_FEATURE_COMPRESS;
+}
+
+IXmppStream * Compression::xmppStream() const
+{
+	return FXmppStream;
 }
 
 bool Compression::start(const QDomElement &AElem)
@@ -73,6 +86,7 @@ bool Compression::start(const QDomElement &AElem)
 			{
 				if (startZlib())
 				{
+					LOG_STRM_INFO(FXmppStream->streamJid(),QString("Starting stream compression with ZLib=%1").arg(ZLIB_VERSION));
 					Stanza compress("compress");
 					compress.setAttribute("xmlns",NS_PROTOCOL_COMPRESS);
 					compress.addElement("method").appendChild(compress.createTextNode("zlib"));
@@ -80,10 +94,20 @@ bool Compression::start(const QDomElement &AElem)
 					FXmppStream->sendStanza(compress);
 					return true;
 				}
+				else
+				{
+					LOG_STRM_ERROR(FXmppStream->streamJid(),"Failed to initialize ZLib");
+				}
 				break;
 			}
 			elem = elem.nextSiblingElement("method");
 		}
+		if (elem.isNull())
+			LOG_STRM_WARNING(FXmppStream->streamJid(),"Failed to start stream compression: Method not supported");
+	}
+	else
+	{
+		LOG_STRM_ERROR(FXmppStream->streamJid(),QString("Failed to start stream compression: Invalid element name %1").arg(AElem.tagName()));
 	}
 	deleteLater();
 	return false;
@@ -114,8 +138,13 @@ bool Compression::startZlib()
 		{
 			if (retDef == Z_OK)
 				deflateEnd(&FDefStruc);
+			else
+				REPORT_ERROR(QString("Failed to init ZLib=%1 deflate: %2").arg(ZLIB_VERSION,retDef));
+
 			if (retInf == Z_OK)
 				inflateEnd(&FInfStruc);
+			else
+				REPORT_ERROR(QString("Failed to init ZLib=%1 inflate: %2").arg(ZLIB_VERSION,retInf));
 		}
 	}
 	return FZlibInited;
@@ -148,6 +177,10 @@ void Compression::processData(QByteArray &AData, bool ADataOut)
 			zstream->avail_out = FOutBuffer.capacity() - dataPosOut;
 			zstream->next_out = (Bytef *)(FOutBuffer.data() + dataPosOut);
 			ret = ADataOut ? deflate(zstream,Z_SYNC_FLUSH) : inflate(zstream,Z_SYNC_FLUSH);
+
+			if (ret != Z_OK)
+				REPORT_ERROR(QString("Failed to deflate/inflate data, ZLib=%1: %2").arg(ZLIB_VERSION,ret));
+
 			switch (ret)
 			{
 			case Z_OK:
@@ -171,6 +204,7 @@ void Compression::processData(QByteArray &AData, bool ADataOut)
 				emit error(XmppError(IERR_COMPRESS_UNKNOWN_ERROR,tr("Error code: %1").arg(ret)));
 			}
 		} while (ret == Z_OK && zstream->avail_out == 0);
+		
 		AData.resize(dataPosOut);
 		memcpy(AData.data(),FOutBuffer.constData(),dataPosOut);
 	}

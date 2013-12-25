@@ -1,7 +1,9 @@
 #include "inputtextdialog.h"
+#include <utils/logger.h>
 
 InputTextDialog::InputTextDialog(QWidget *AParent, const QString &ATitle, const QString &ALabel, QString &AText) : QDialog(AParent), FText(AText)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 

@@ -2,6 +2,8 @@
 
 #include <QKeyEvent>
 #include <QFontDialog>
+#include <definitions/optionvalues.h>
+#include <utils/options.h>
 
 MessengerOptions::MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AParent) : QWidget(AParent)
 {

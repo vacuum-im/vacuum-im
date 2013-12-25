@@ -1,6 +1,15 @@
 #include "editwidget.h"
 
 #include <QKeyEvent>
+#include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/toolbargroups.h>
+#include <utils/toolbarchanger.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
 
 #define MAX_BUFFERED_MESSAGES     10
 

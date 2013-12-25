@@ -2,7 +2,6 @@
 #define SOCKSOPTIONS_H
 
 #include <QWidget>
-#include <definitions/optionvalues.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/ioptionsmanager.h>
@@ -10,8 +9,8 @@
 #include "ui_socksoptions.h"
 
 class SocksOptions :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

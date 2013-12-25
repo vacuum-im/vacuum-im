@@ -7,9 +7,16 @@
 #include <QFileDialog>
 #include <QVBoxLayout>
 #include <QDesktopServices>
+#include <definitions/optionvalues.h>
+#include <definitions/internalerrors.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+#include <utils/jid.h>
 
 StreamDialog::StreamDialog(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, IFileTransfer *AFileTransfer, IFileStream *AFileStream, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 
@@ -97,6 +104,7 @@ void StreamDialog::setSelectableMethods(const QList<QString> &AMethods)
 {
 	qDeleteAll(FMethodButtons.keys());
 	FMethodButtons.clear();
+
 	foreach(const QString &methodNS, AMethods)
 	{
 		IDataStreamMethod *stremMethod = FDataManager->method(methodNS);
@@ -120,11 +128,11 @@ bool StreamDialog::acceptFileName(const QString &AFile)
 		if (FFileStream->isRangeSupported() && fileInfo.size()<FFileStream->fileSize())
 		{
 			QMessageBox::StandardButton button = QMessageBox::question(this,tr("Continue file transfer"),
-			                                     tr("A file with this name, but a smaller size already exists.")+"<br>"+
-			                                     tr("If you want to download the rest of file press 'Yes'")+"<br>"+
-			                                     tr("If you want to start download from the beginning press 'Retry'")+"<br>"+
-			                                     tr("If you want to change file name press 'Cancel'"),
-			                                     QMessageBox::Yes|QMessageBox::Retry|QMessageBox::Cancel);
+				tr("A file with this name, but a smaller size already exists.")+"<br>"+
+				tr("If you want to download the rest of file press 'Yes'")+"<br>"+
+				tr("If you want to start download from the beginning press 'Retry'")+"<br>"+
+				tr("If you want to change file name press 'Cancel'"),
+				QMessageBox::Yes|QMessageBox::Retry|QMessageBox::Cancel);
 			if (button == QMessageBox::Yes)
 			{
 				FFileStream->setRangeOffset(fileInfo.size());
@@ -145,8 +153,8 @@ bool StreamDialog::acceptFileName(const QString &AFile)
 		else
 		{
 			QMessageBox::StandardButton button = QMessageBox::question(this,tr("Remove file"),
-			                                     tr("A file with this name already exists. Do you want to remove existing file?"),
-			                                     QMessageBox::Yes|QMessageBox::Cancel);
+				tr("A file with this name already exists. Do you want to remove existing file?"),
+				QMessageBox::Yes|QMessageBox::Cancel);
 			if (button == QMessageBox::Yes)
 			{
 				if (!QFile::remove(AFile))
@@ -273,8 +281,7 @@ void StreamDialog::onStreamSpeedChanged()
 	if (FFileStream->streamState() == IFileStream::Transfering)
 	{
 		ui.pgbPrgress->setValue(curPercentPosition());
-		ui.lblProgress->setText(tr("Transferred %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition()))
-		                        + " " + tr("Speed %1.").arg(sizeName(FFileStream->speed())+tr("/sec")));
+		ui.lblProgress->setText(tr("Transferred %1 of %2.").arg(sizeName(curPosition())).arg(sizeName(maxPosition())) + " " + tr("Speed %1.").arg(sizeName(FFileStream->speed())+tr("/sec")));
 	}
 	else if (FFileStream->fileSize() > 0)
 	{

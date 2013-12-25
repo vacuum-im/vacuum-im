@@ -11,5 +11,9 @@
         <source>Allows to collect application statistics</source>
         <translation>Allows to collect application statistics</translation>
     </message>
+    <message>
+        <source>Send anonymous statistics information to developer</source>
+        <translation>Send anonymous statistics information to developer</translation>
+    </message>
 </context>
 </TS>

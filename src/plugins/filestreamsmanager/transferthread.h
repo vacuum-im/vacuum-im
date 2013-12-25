@@ -7,7 +7,7 @@
 #include <interfaces/idatastreamsmanager.h>
 
 class TransferThread :
-			public QThread
+	public QThread
 {
 	Q_OBJECT;
 public:

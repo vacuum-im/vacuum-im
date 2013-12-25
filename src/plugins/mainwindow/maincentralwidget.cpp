@@ -8,7 +8,7 @@ MainCentralWidget::MainCentralWidget(IMainWindow *AMainWindow, QWidget *AParent)
 
 MainCentralWidget::~MainCentralWidget()
 {
-	while (currentCentralPage()!=NULL)
+	while (currentCentralPage() != NULL)
 		removeCentralPage(currentCentralPage());
 }
 
@@ -57,7 +57,6 @@ void MainCentralWidget::onCurrentIndexChanged(int AIndex)
 {
 	IMainCentralPage *page = qobject_cast<IMainCentralPage *>(widget(AIndex));
 	emit currentCentralPageChanged(page);
-	emit currentCentralPageChanged();
 }
 
 void MainCentralWidget::onCentralPageShow(bool AMinimized)
@@ -74,7 +73,7 @@ void MainCentralWidget::onCentralPageChanged()
 {
 	IMainCentralPage *page = qobject_cast<IMainCentralPage *>(sender());
 	if (page && page==currentCentralPage())
-		emit currentCentralPageChanged();
+		emit currentCentralPageChanged(page);
 }
 
 void MainCentralWidget::onCentralPageDestroyed()

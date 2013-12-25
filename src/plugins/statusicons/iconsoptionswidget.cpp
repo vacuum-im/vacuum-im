@@ -3,8 +3,12 @@
 #include <QSet>
 #include <QComboBox>
 #include <QHeaderView>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
 
-//IconsetSelectableDelegate
+// IconsetSelectableDelegate
 IconsetSelectableDelegate::IconsetSelectableDelegate(const QString &AStorage, const QStringList &ASubStorages, QObject *AParent) : IconsetDelegate(AParent)
 {
 	FStorage = AStorage;
@@ -13,8 +17,7 @@ IconsetSelectableDelegate::IconsetSelectableDelegate(const QString &AStorage, co
 
 QWidget *IconsetSelectableDelegate::createEditor(QWidget *AParent, const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
 {
-	Q_UNUSED(AOption);
-	Q_UNUSED(AIndex);
+	Q_UNUSED(AOption); Q_UNUSED(AIndex);
 	if (!FSubStorages.isEmpty())
 	{
 		QComboBox *comboBox = new QComboBox(AParent);
@@ -89,11 +92,13 @@ IconsOptionsWidget::IconsOptionsWidget(IStatusIcons *AStatusIcons, QWidget *APar
 void IconsOptionsWidget::apply()
 {
 	for (int row=0; row<ui.lwtDefaultIconset->count(); row++)
+	{
 		if (ui.lwtDefaultIconset->item(row)->checkState() == Qt::Checked)
 		{
 			Options::node(OPV_STATUSICONS_DEFAULT).setValue(ui.lwtDefaultIconset->item(row)->data(IDR_STORAGE_SUBDIR));
 			break;
 		}
+	}
 
 	QSet<QString> rules = FStatusIcons->rules(IStatusIcons::UserRule).toSet();
 	for (int row =0; row<ui.twtUserRules->rowCount(); row++)
@@ -180,8 +185,8 @@ void IconsOptionsWidget::onDefaultListItemChanged(QListWidgetItem *AItem)
 {
 	if (AItem->checkState() == Qt::Checked)
 	{
-		for (int i=0; i<ui.lwtDefaultIconset->count();i++)
-			if (ui.lwtDefaultIconset->item(i)!=AItem)
+		for (int i=0; i<ui.lwtDefaultIconset->count(); i++)
+			if (ui.lwtDefaultIconset->item(i) != AItem)
 				ui.lwtDefaultIconset->item(i)->setCheckState(Qt::Unchecked);
 		emit modified();
 	}

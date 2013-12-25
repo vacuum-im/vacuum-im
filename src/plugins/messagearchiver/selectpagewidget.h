@@ -3,10 +3,6 @@
 
 #include <QDate>
 #include <QWidget>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <utils/iconstorage.h>
-#include <utils/menu.h>
 #include "ui_selectpagewidget.h"
 
 class SelectPageWidget : 

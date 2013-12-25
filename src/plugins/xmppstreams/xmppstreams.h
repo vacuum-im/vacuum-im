@@ -6,14 +6,12 @@
 #include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/options.h>
-#include <utils/xmpperror.h>
 #include "xmppstream.h"
 
 class XmppStreams :
-			public QObject,
-			public IPlugin,
-			public IXmppStreams
+	public QObject,
+	public IPlugin,
+	public IXmppStreams
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppStreams);

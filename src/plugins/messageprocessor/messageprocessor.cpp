@@ -2,6 +2,10 @@
 
 #include <QVariant>
 #include <QTextCursor>
+#include <definitions/messagedataroles.h>
+#include <definitions/messagewriterorders.h>
+#include <definitions/notificationdataroles.h>
+#include <utils/logger.h>
 
 #define SHC_MESSAGE         "/message"
 
@@ -45,7 +49,9 @@ bool MessageProcessor::initConnections(IPluginManager *APluginManager, int &AIni
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
@@ -200,12 +206,8 @@ bool MessageProcessor::displayMessage(const Jid &AStreamJid, Message &AMessage, 
 	IMessageHandler *handler = findMessageHandler(AMessage, ADirection);
 	if (handler)
 	{
-		int messageId = AMessage.data(MDR_MESSAGE_ID).toInt();
-		if (messageId <= 0)
-		{
-			messageId = newMessageId();
-			AMessage.setData(MDR_MESSAGE_ID,messageId);
-		}
+		if (AMessage.data(MDR_MESSAGE_ID).toInt() <= 0)
+			AMessage.setData(MDR_MESSAGE_ID,newMessageId());
 		AMessage.setData(MDR_MESSAGE_DIRECTION,ADirection);
 
 		if (handler->messageDisplay(AMessage,ADirection))
@@ -278,7 +280,7 @@ void MessageProcessor::messageToText(QTextDocument *ADocument, const Message &AM
 	while (it.hasNext())
 	{
 		it.next();
-		it.value()->writeMessageToText(it.key(), messageCopy,ADocument,ALang);
+		it.value()->writeMessageToText(it.key(),messageCopy,ADocument,ALang);
 	}
 }
 

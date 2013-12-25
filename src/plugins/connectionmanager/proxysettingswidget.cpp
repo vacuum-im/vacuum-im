@@ -1,6 +1,7 @@
 #include "proxysettingswidget.h"
 
 #include <definitions/optionvalues.h>
+#include <utils/options.h>
 
 ProxySettingsWidget::ProxySettingsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent) : QWidget(AParent)
 {

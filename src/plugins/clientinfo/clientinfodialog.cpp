@@ -1,8 +1,12 @@
 #include "clientinfodialog.h"
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
-ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid,
-                                   const QString &AContactName, int AInfoTypes, QWidget *AParent) : QDialog(AParent)
+ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid, const QString &AContactName, int AInfoTypes, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Client info - %1").arg(AContactName));
@@ -24,6 +28,21 @@ ClientInfoDialog::ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJ
 ClientInfoDialog::~ClientInfoDialog()
 {
 	emit clientInfoDialogClosed(FContactJid);
+}
+
+Jid ClientInfoDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid ClientInfoDialog::contactJid() const
+{
+	return FContactJid;
+}
+
+int ClientInfoDialog::infoTypes() const
+{
+	return FInfoTypes;
 }
 
 void ClientInfoDialog::setInfoTypes(int AInfoTypes)

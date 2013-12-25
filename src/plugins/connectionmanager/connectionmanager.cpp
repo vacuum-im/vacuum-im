@@ -15,6 +15,7 @@
 #include <utils/widgetmanager.h>
 #include <utils/filestorage.h>
 #include <utils/xmpperror.h>
+#include <utils/logger.h>
 
 #define DIR_CERTIFICATES   "cacertificates"
 
@@ -110,6 +111,7 @@ bool ConnectionManager::initObjects()
 		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
 		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
+
 	return true;
 }
 
@@ -185,6 +187,7 @@ IConnectionProxy ConnectionManager::proxyById(const QUuid &AProxyId) const
 			return proxy;
 		}
 	}
+
 	return noProxy;
 }
 
@@ -192,6 +195,7 @@ void ConnectionManager::setProxy(const QUuid &AProxyId, const IConnectionProxy &
 {
 	if (!AProxyId.isNull() && AProxyId!=APPLICATION_PROXY_REF_UUID)
 	{
+		LOG_INFO(QString("Proxy added or updated, id=%1").arg(AProxyId.toString()));
 		OptionsNode pnode = Options::node(OPV_PROXY_ITEM,AProxyId.toString());
 		pnode.setValue(AProxy.name,"name");
 		pnode.setValue(AProxy.proxy.type(),"type");
@@ -201,12 +205,17 @@ void ConnectionManager::setProxy(const QUuid &AProxyId, const IConnectionProxy &
 		pnode.setValue(Options::encrypt(AProxy.proxy.password()),"pass");
 		emit proxyChanged(AProxyId, AProxy);
 	}
+	else
+	{
+		LOG_ERROR(QString("Failed to add or change proxy, id=%1: Invalid proxy Id").arg(AProxyId.toString()));
+	}
 }
 
 void ConnectionManager::removeProxy(const QUuid &AProxyId)
 {
 	if (proxyList().contains(AProxyId))
 	{
+		LOG_INFO(QString("Proxy removed, id=%1").arg(AProxyId.toString()));
 		if (defaultProxy() == AProxyId)
 			setDefaultProxy(QUuid());
 		Options::node(OPV_PROXY_ROOT).removeChilds("proxy",AProxyId.toString());
@@ -222,7 +231,10 @@ QUuid ConnectionManager::defaultProxy() const
 void ConnectionManager::setDefaultProxy(const QUuid &AProxyId)
 {
 	if (defaultProxy()!=AProxyId && (AProxyId.isNull() || proxyList().contains(AProxyId)))
+	{
+		LOG_INFO(QString("Default proxy changed, id=%1").arg(AProxyId.toString()));
 		Options::node(OPV_PROXY_DEFAULT).setValue(AProxyId.toString());
+	}
 }
 
 QDialog *ConnectionManager::showEditProxyDialog(QWidget *AParent)
@@ -271,6 +283,12 @@ QList<QSslCertificate> ConnectionManager::trustedCaCertificates(bool AWithUsers)
 					QSslCertificate cert(&file,QSsl::Pem);
 					if (!cert.isNull())
 						certs.append(cert);
+					else
+						LOG_ERROR(QString("Failed to load CA certificate from file=%1: Invalid format").arg(file.fileName()));
+				}
+				else
+				{
+					LOG_ERROR(QString("Failed to load CA certificate from file=%1: %2").arg(file.fileName(),file.errorString()));
 				}
 			}
 		}
@@ -289,8 +307,13 @@ void ConnectionManager::addTrustedCaCertificate(const QSslCertificate &ACertific
 			QFile file(dir.absoluteFilePath(certFile));
 			if (file.open(QFile::WriteOnly|QFile::Truncate))
 			{
+				LOG_INFO(QString("Saved trusted CA certificate to file=%1").arg(file.fileName()));
 				file.write(ACertificate.toPem());
 				file.close();
+			}
+			else
+			{
+				LOG_ERROR(QString("Failed to save CA certificate to file=%1: %2").arg(file.fileName(),file.errorString()));
 			}
 		}
 	}
@@ -306,12 +329,14 @@ void ConnectionManager::updateAccountConnection(IAccount *AAccount) const
 		IConnection *connection = AAccount->xmppStream()->connection();
 		if (connection && connection->ownerPlugin()!=plugin)
 		{
+			LOG_STRM_INFO(AAccount->streamJid(),QString("Removing current stream connection"));
 			AAccount->xmppStream()->setConnection(NULL);
 			delete connection->instance();
 			connection = NULL;
 		}
 		if (plugin!=NULL && connection==NULL)
 		{
+			LOG_STRM_INFO(AAccount->streamJid(),QString("Setting new stream connection=%1").arg(plugin->pluginId()));
 			connection = plugin->newConnection(aoptions.node("connection",pluginId),AAccount->xmppStream()->instance());
 			AAccount->xmppStream()->setConnection(connection);
 		}

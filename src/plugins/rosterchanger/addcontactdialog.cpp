@@ -2,9 +2,16 @@
 
 #include <QSet>
 #include <QMessageBox>
+#include <definitions/toolbargroups.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 AddContactDialog::AddContactDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Add contact - %1").arg(AStreamJid.uBare()));

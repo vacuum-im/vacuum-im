@@ -3,6 +3,10 @@
 #include <QStyle>
 #include <QLocale>
 #include <QMouseEvent>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/menu.h>
 
 #define ADR_MONTH      Action::DR_Parametr1
 

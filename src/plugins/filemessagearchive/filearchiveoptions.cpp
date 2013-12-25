@@ -1,6 +1,8 @@
 #include "filearchiveoptions.h"
 
 #include <QFileDialog>
+#include <definitions/optionvalues.h>
+#include <utils/options.h>
 
 FileArchiveOptions::FileArchiveOptions(IPluginManager *APluginManager, QWidget *AParent) : QWidget(AParent)
 {

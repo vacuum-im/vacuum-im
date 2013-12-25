@@ -3,7 +3,6 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
-#include <definitions/internalerrors.h>
 #include <interfaces/idataforms.h>
 
 class DataMediaWidget :
@@ -30,7 +29,7 @@ protected slots:
 private:
 	IDataForms *FDataForms;
 private:
-	int uriIndex;
+	int FUriIndex;
 	IDataMedia FMedia;
 	XmppError FLastError;
 };

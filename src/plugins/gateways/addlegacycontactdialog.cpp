@@ -1,10 +1,14 @@
 #include "addlegacycontactdialog.h"
 
 #include <QTextDocument>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
-AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid,
-    const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
+AddLegacyContactDialog::AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Add Legacy User to %1").arg(AServiceJid.uFull()));
@@ -31,6 +35,16 @@ AddLegacyContactDialog::~AddLegacyContactDialog()
 
 }
 
+Jid AddLegacyContactDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid AddLegacyContactDialog::serviceJid() const
+{
+	return FServiceJid;
+}
+
 void AddLegacyContactDialog::resetDialog()
 {
 	ui.lblPrompt->setVisible(false);
@@ -41,6 +55,7 @@ void AddLegacyContactDialog::requestPrompt()
 {
 	FRequestId = FGateways->sendPromptRequest(FStreamJid,FServiceJid);
 	resetDialog();
+
 	if (!FRequestId.isEmpty())
 		ui.lblDescription->setText(tr("Waiting for host response ..."));
 	else

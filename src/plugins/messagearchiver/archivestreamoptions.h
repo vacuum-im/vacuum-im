@@ -2,8 +2,6 @@
 #define ARCHIVEOPTIONS_H
 
 #include <QItemDelegate>
-#include <definitions/namespaces.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/ioptionsmanager.h>
 #include "ui_archivestreamoptions.h"
@@ -30,7 +28,6 @@ protected slots:
 private:
 	IMessageArchiver *FArchiver;
 };
-
 
 class ArchiveStreamOptions :
 	public QWidget,

@@ -13,7 +13,7 @@ public:
 	~NotifyTextBrowser();
 	void setMaxHeight(int AMax);
 public:
-	virtual void mouseReleaseEvent(QMouseEvent *AEvent);
+	void mouseReleaseEvent(QMouseEvent *AEvent);
 protected slots:
 	void onTextChanged();
 private:

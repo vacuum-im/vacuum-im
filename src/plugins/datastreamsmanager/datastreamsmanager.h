@@ -1,14 +1,6 @@
 #ifndef DATASTREAMSMANAGER_H
 #define DATASTREAMSMANAGER_H
 
-#include <definitions/namespaces.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/menuicons.h>
-#include <definitions/xmpperrors.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/idataforms.h>
@@ -16,10 +8,6 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/jid.h>
-#include <utils/stanza.h>
-#include <utils/options.h>
-#include <utils/xmpperror.h>
 #include "datastreamsoptions.h"
 
 struct StreamParams {

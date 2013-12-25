@@ -1,12 +1,7 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppdatahandlerorders.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/xmpperror.h>
 
 #ifdef USE_SYSTEM_ZLIB
 #	include <zlib.h>
@@ -33,8 +28,8 @@ public:
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IXmppFeature
 	virtual QObject *instance() { return this; }
-	virtual QString featureNS() const { return NS_FEATURE_COMPRESS; }
-	virtual IXmppStream *xmppStream() const { return FXmppStream; }
+	virtual QString featureNS() const;
+	virtual IXmppStream *xmppStream() const;
 	virtual bool start(const QDomElement &AElem);
 signals:
 	void finished(bool ARestart);

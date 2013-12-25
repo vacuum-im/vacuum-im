@@ -17,6 +17,10 @@
 #include <QApplication>
 #include <QTextDocument>
 #include <QWebHitTestResult>
+#include <definitions/resources.h>
+#include <utils/filestorage.h>
+#include <utils/textmanager.h>
+#include <utils/logger.h>
 
 #define SCROLL_TIMEOUT                      100
 #define EVALUTE_TIMEOUT                     10
@@ -209,6 +213,14 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 		emit optionsChanged(AWidget,AOptions,AClear);
 		return true;
 	}
+	else if (view == NULL)
+	{
+		REPORT_ERROR("Failed to change adium style options: Invalid style view");
+	}
+	else
+	{
+		REPORT_ERROR("Failed to change adium style options: Invalid style id");
+	}
 	return false;
 }
 
@@ -239,6 +251,10 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
 	}
+	else
+	{
+		REPORT_ERROR("Failed to append adium style content: Invalid view");
+	}
 	return false;
 }
 
@@ -267,13 +283,16 @@ QList<QString> AdiumMessageStyle::styleVariants(const QString &AStylePath)
 		for (int i=0; i<files.count();i++)
 			files[i].chop(4);
 	}
+	else
+	{
+		REPORT_ERROR("Failed to get adium style variants: Style path is empty");
+	}
 	return files;
 }
 
 QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
 {
 	QMap<QString, QVariant> info;
-
 	QFile file(AStylePath+"/"STYLE_CONTENTS_PATH"/Info.plist");
 	if (!AStylePath.isEmpty() && file.open(QFile::ReadOnly))
 	{
@@ -299,6 +318,14 @@ QMap<QString, QVariant> AdiumMessageStyle::styleInfo(const QString &AStylePath)
 				elem = elem.nextSiblingElement("key");
 			}
 		}
+	}
+	else if (AStylePath.isEmpty())
+	{
+		REPORT_ERROR("Failed to get adium style info: Style path is empty");
+	}
+	else
+	{
+		LOG_ERROR(QString("Failed to load adium style info from file: %1").arg(file.errorString()));
 	}
 	return info;
 }
@@ -340,6 +367,10 @@ void AdiumMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
 		QString script = QString("setStylesheet(\"%1\",\"%2\");").arg("mainStyle").arg(variant);
 		view->page()->mainFrame()->evaluateJavaScript(script);
 	}
+	else
+	{
+		REPORT_ERROR("Failed to change adium style variant: Invalid style view");
+	}
 }
 
 QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOptions)
@@ -374,6 +405,10 @@ QString AdiumMessageStyle::makeStyleTemplate(const IMessageStyleOptions &AOption
 		html.replace(html.indexOf("%@"),2,headerHTML);
 		html.replace(html.indexOf("%@"),2,footerHTML);
 	}
+	else
+	{
+		LOG_ERROR(QString("Failed to make adium style template, id=%1, file=%2: Template is empty").arg(styleId(),htmlFileName));
+	}
 	return html;
 }
 
@@ -390,8 +425,7 @@ void AdiumMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOpt
 	AHtml.replace("%outgoingColor%",AOptions.extended.value(MSO_SELF_COLOR).toString());
 	AHtml.replace("%incomingColor%",AOptions.extended.value(MSO_CONTACT_COLOR).toString());
 	AHtml.replace("%serviceIconPath%", AOptions.extended.value(MSO_SERVICE_ICON_PATH).toString());
-	AHtml.replace("%serviceIconImg%", QString("<img class=\"serviceIcon\" src=\"%1\">")
-		.arg(AOptions.extended.value(MSO_SERVICE_ICON_PATH,"outgoing_icon.png").toString()));
+	AHtml.replace("%serviceIconImg%", QString("<img class=\"serviceIcon\" src=\"%1\">").arg(AOptions.extended.value(MSO_SERVICE_ICON_PATH,"outgoing_icon.png").toString()));
 
 	QString background;
 	if (FAllowCustomBackground)
@@ -653,14 +687,15 @@ QString AdiumMessageStyle::prepareMessage(const QString &AHtml, const IMessageCo
 
 QString AdiumMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
 {
-	if (QFile::exists(AFileName))
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
 	{
-		QFile file(AFileName);
-		if (file.open(QFile::ReadOnly))
-		{
-			QByteArray html = file.readAll();
-			return QString::fromUtf8(html.data(),html.size());
-		}
+		QByteArray html = file.readAll();
+		return QString::fromUtf8(html.data(),html.size());
+	}
+	else if (file.exists())
+	{
+		LOG_ERROR(QString("Failed to load adium style file data, file=%1: %2").arg(AFileName,file.errorString()));
 	}
 	return DefValue;
 }
@@ -790,6 +825,7 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 			{
 				wstatus.wait++;
 				view->setHtml("Style Template Load Error!");
+				REPORT_ERROR(QString("Failed to load adium style template, styleId=%1").arg(styleId()));
 			}
 		}
 	}

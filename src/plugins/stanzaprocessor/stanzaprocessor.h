@@ -4,13 +4,12 @@
 #include <QTimer>
 #include <QMultiMap>
 #include <QDomDocument>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 
 struct StanzaRequest {
-	StanzaRequest() { 
+	StanzaRequest() {
 		timer=NULL;
 		owner=NULL;
 	}
@@ -21,10 +20,10 @@ struct StanzaRequest {
 };
 
 class StanzaProcessor :
-			public QObject,
-			public IPlugin,
-			public IStanzaProcessor,
-			public IXmppStanzaHadler
+	public QObject,
+	public IPlugin,
+	public IStanzaProcessor,
+	public IXmppStanzaHadler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStanzaProcessor IXmppStanzaHadler);
@@ -82,4 +81,4 @@ private:
 	QMultiMap<int, int> FHandleIdByOrder;
 };
 
-#endif
+#endif // STANZAPROCESSOR_H

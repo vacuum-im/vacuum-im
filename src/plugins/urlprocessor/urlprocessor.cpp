@@ -1,6 +1,7 @@
 #include "urlprocessor.h"
 
 #include <QAuthenticator>
+#include <utils/logger.h>
 
 UrlProcessor::UrlProcessor() : QNetworkAccessManager(NULL)
 {
@@ -33,9 +34,7 @@ bool UrlProcessor::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	{
 		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
 		if (FConnectionManager)
-		{
 			connect(FConnectionManager->instance(),SIGNAL(defaultProxyChanged(const QUuid &)),SLOT(onDefaultConnectionProxyChanged(const QUuid &)));
-		}
 	}
 
 	return true;
@@ -45,6 +44,7 @@ bool UrlProcessor::registerUrlHandler(const QString &AScheme, IUrlHandler *AUrlH
 {
 	if (!AScheme.isEmpty() && AUrlHandler!=NULL)
 	{
+		LOG_DEBUG(QString("Url handler registered, cheme=%1, address=%2").arg(AScheme).arg((quint64)AUrlHandler));
 		FHandlerList.insertMulti(AScheme, AUrlHandler);
 		return true;
 	}

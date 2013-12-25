@@ -6,8 +6,8 @@
 #include <interfaces/ioptionsmanager.h>
 
 class Account :
-			public QObject,
-			public IAccount
+	public QObject,
+	public IAccount
 {
 	Q_OBJECT;
 	Q_INTERFACES(IAccount);

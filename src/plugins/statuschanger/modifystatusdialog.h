@@ -2,16 +2,12 @@
 #define MODIFYSTATUSDIALOG_H
 
 #include <QDialog>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ipresence.h>
-#include <utils/iconstorage.h>
-#include <utils/jid.h>
 #include "ui_modifystatusdialog.h"
 
 class ModifyStatusDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:

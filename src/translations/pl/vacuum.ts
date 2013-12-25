@@ -50,10 +50,6 @@
         <translation>O programie</translation>
     </message>
     <message>
-        <source>Plugins directory not found</source>
-        <translation>Nie znaleziono folderu wtyczek</translation>
-    </message>
-    <message>
         <source>Application</source>
         <translation>Program</translation>
     </message>

@@ -5,6 +5,11 @@
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <QCoreApplication>
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <utils/xmpperror.h>
+#include <utils/logger.h>
+#include <utils/jid.h>
 
 #define BUFFER_INCREMENT_SIZE     1024
 #define MAX_BUFFER_SIZE           8192
@@ -22,9 +27,15 @@ class DataEvent :
 	public QEvent
 {
 public:
-	DataEvent(bool AFlush) : QEvent(FEventType) { FFlush = AFlush; }
-	inline bool isFlush() { return FFlush; }
-	static int registeredType() { return FEventType; }
+	DataEvent(bool AFlush) : QEvent(FEventType) { 
+		FFlush = AFlush;
+	}
+	inline bool isFlush() {
+		return FFlush;
+	}
+	static int registeredType() {
+		return FEventType; 
+	}
 private:
 	bool FFlush;
 	static QEvent::Type FEventType;
@@ -51,11 +62,14 @@ InBandStream::InBandStream(IStanzaProcessor *AProcessor, const QString &AStreamI
 	FMaxBlockSize = DEFAULT_MAX_BLOCK_SIZE;
 	FStanzaType = DEFAULT_DATA_STANZA_TYPE;
 	FStreamState = IDataStreamSocket::Closed;
+
+	LOG_STRM_INFO(AStreamJid,QString("In-band stream created, sid=%1, kind=%2").arg(FStreamId).arg(FStreamKind));
 }
 
 InBandStream::~InBandStream()
 {
 	abort(XmppError(IERR_INBAND_STREAM_DESTROYED));
+	LOG_STRM_INFO(FStreamJid,QString("In-band stream destroyed, sid=%1, kind=%2").arg(FStreamId).arg(FStreamKind));
 }
 
 bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
@@ -130,6 +144,7 @@ bool InBandStream::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
+			LOG_STRM_WARNING(AStreamJid,QString("Unexpected open request from=%1, sid=%2: Invalid state").arg(AStanza.from(),FStreamId));
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_UNEXPECTED_REQUEST);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 		}
@@ -279,10 +294,15 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 			elem.setAttribute("stanza",FStanzaType==StanzaMessage ? "message" : "iq");
 			if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,openRequest,OPEN_TIMEOUT))
 			{
+				LOG_STRM_INFO(FStreamJid,QString("Open stream request sent, sid=%1").arg(FStreamId));
 				FOpenRequestId = openRequest.id();
 				setOpenMode(AMode);
 				setStreamState(IDataStreamSocket::Opening);
 				return true;
+			}
+			else
+			{
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to send open stream request, sid=%1").arg(FStreamId));
 			}
 		}
 		else
@@ -290,9 +310,14 @@ bool InBandStream::open(QIODevice::OpenMode AMode)
 			FSHIOpen = insertStanzaHandle(SHC_INBAND_OPEN);
 			if (FSHIOpen != -1)
 			{
+				LOG_STRM_INFO(FStreamJid,QString("Open stanza handler inserted, sid=%1").arg(FStreamId));
 				setOpenMode(AMode);
 				setStreamState(IDataStreamSocket::Opening);
 				return true;
+			}
+			else
+			{
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to insert open stanza handler, sid=%1").arg(FStreamId));
 			}
 		}
 	}
@@ -323,11 +348,13 @@ void InBandStream::close()
 			closeRequest.addElement("close",NS_INBAND_BYTESTREAMS).setAttribute("sid",FStreamId);
 			if (FStanzaProcessor->sendStanzaRequest(this,FStreamJid,closeRequest,CLOSE_TIMEOUT))
 			{
+				LOG_STRM_INFO(FStreamJid,QString("Close stream request sent, sid=%1").arg(FStreamId));
 				FCloseRequestId = closeRequest.id();
 				setStreamState(IDataStreamSocket::Closing);
 			}
 			else
 			{
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to send close stream request, sid=%1").arg(FStreamId));
 				setStreamState(IDataStreamSocket::Closed);
 			}
 		}
@@ -342,6 +369,7 @@ void InBandStream::abort(const XmppError &AError)
 {
 	if (streamState() != IDataStreamSocket::Closed)
 	{
+		LOG_STRM_WARNING(FStreamJid,QString("Aborting stream, sid=%1: %2").arg(FStreamId,AError.errorMessage()));
 		setStreamError(AError);
 		close();
 		setStreamState(IDataStreamSocket::Closed);
@@ -493,6 +521,7 @@ void InBandStream::setStreamState(int AState)
 			FThreadLock.lockForWrite();
 			QIODevice::open(openMode());
 			FThreadLock.unlock();
+			LOG_STRM_INFO(FStreamJid,QString("In-band stream opened, sid=%1, stanzaType=%2").arg(FStreamId).arg(FStanzaType));
 		}
 		else if (AState == IDataStreamSocket::Closed)
 		{
@@ -512,6 +541,7 @@ void InBandStream::setStreamState(int AState)
 
 			FReadyReadCondition.wakeAll();
 			FBytesWrittenCondition.wakeAll();
+			LOG_STRM_INFO(FStreamJid,QString("In-band stream closed, sid=%1").arg(FStreamId));
 		}
 
 		FThreadLock.lockForWrite();
