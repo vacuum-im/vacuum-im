@@ -533,7 +533,7 @@ void RecentContacts::setItemActiveTime(const IRecentItem &AItem, const QDateTime
 		{
 			item = AItem;
 			item.activeTime = ATime;
-			mergeRecentItems(item.streamJid,QList<IRecentItem>() << item, false);
+			mergeRecentItems(item.streamJid, QList<IRecentItem>() << item, false);
 			startSaveItemsToStorage(item.streamJid);
 		}
 		else if (item.activeTime < ATime)
@@ -903,14 +903,29 @@ void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecent
 		updateVisibleItems();
 	}
 
+	bool isStreamReady = isReady(AStreamJid);
+
 	foreach(const IRecentItem &item, addedItems)
+	{
+		if (isStreamReady)
+			LOG_STRM_INFO(AStreamJid,QString("Recent item added, type=%1, ref=%2").arg(item.type,item.reference));
+		else
+			LOG_STRM_DEBUG(AStreamJid,QString("Recent item added, type=%1, ref=%2").arg(item.type,item.reference));
 		emit recentItemAdded(item);
+	}
  
 	foreach(const IRecentItem &item, removedItems)
+	{
+		if (isStreamReady)
+			LOG_STRM_INFO(AStreamJid,QString("Recent item removed, type=%1, ref=%2").arg(item.type,item.reference));
+		else
+			LOG_STRM_DEBUG(AStreamJid,QString("Recent item removed, type=%1, ref=%2").arg(item.type,item.reference));
 		emit recentItemRemoved(item);
+	}
 
 	foreach(const IRecentItem &item, changedItems)
 	{
+		LOG_STRM_DEBUG(AStreamJid,QString("Recent item changed, type=%1, ref=%2").arg(item.type,item.reference));
 		updateItemIndex(item);
 		emit recentItemChanged(item);
 	}

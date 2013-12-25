@@ -1155,7 +1155,7 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 	}
 	else if (!AHash.isEmpty())
 	{
-		REPORT_ERROR(QString("Failed to calculate caps hash: Invalid type=%1").arg(AHash));
+		LOG_STRM_WARNING(AInfo.streamJid,QString("Failed to calculate caps hash, jid=%1: Invalid type=%2").arg(AInfo.contactJid.full(),AHash));
 	}
 	return QString::null;
 }

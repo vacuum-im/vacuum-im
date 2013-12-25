@@ -71,7 +71,6 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		}
 		else
 		{
-			REPORT_ERROR(QString("Invalid presence type received, type=%1").arg(AStanza.type()));
 			return false;
 		}
 

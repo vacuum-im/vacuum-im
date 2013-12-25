@@ -349,6 +349,8 @@ void PluginManager::saveSettings()
 
 bool PluginManager::loadPlugins()
 {
+	LOG_INFO("Loading plugins");
+
 	QDir pluginsDir(QApplication::applicationDirPath());
 	if (pluginsDir.cd(PLUGINS_DIR))
 	{
@@ -463,6 +465,8 @@ bool PluginManager::loadPlugins()
 
 bool PluginManager::initPlugins()
 {
+	LOG_INFO("Initializing plugins");
+
 	bool initOk = true;
 	QMultiMap<int,IPlugin *> pluginOrder;
 	QHash<QUuid, PluginItem>::const_iterator it = FPluginItems.constBegin();
@@ -498,6 +502,8 @@ bool PluginManager::initPlugins()
 
 bool PluginManager::startPlugins()
 {
+	LOG_INFO("Starting plugins");
+
 	bool allStarted = true;
 	foreach(const PluginItem &pluginItem, FPluginItems)
 	{
@@ -587,6 +593,7 @@ void PluginManager::finishQuit()
 				startPlugins();
 				FBlockedPlugins.clear();
 				REPORT_TIMING(STMP_APPLICATION_START,Logger::finishTiming(STMP_APPLICATION_START));
+				LOG_INFO("Application started");
 			}
 		}
 		else if (FShutdownKind == SK_QUIT)

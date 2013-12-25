@@ -1155,7 +1155,7 @@ void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 		if (index>=0 && !AInfo.identity.at(index).name.isEmpty())
 		{
 			FRoomName = AInfo.identity.at(index).name;
-			LOG_STRM_INFO(FStreamJid,QString("Conference name changed, room=%1: %2").arg(FRoomJid.bare(),FRoomName));
+			LOG_STRM_DEBUG(FStreamJid,QString("Conference name changed, room=%1: %2").arg(FRoomJid.bare(),FRoomName));
 			emit roomNameChanged(FRoomName);
 		}
 	}

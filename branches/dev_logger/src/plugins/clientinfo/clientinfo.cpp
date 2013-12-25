@@ -759,7 +759,7 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 				software.os = FDataForms->fieldValue(FORM_FIELD_OS,form.fields).toString() + " ";
 				software.os += FDataForms->fieldValue(FORM_FIELD_OS_VERSION,form.fields).toString();
 				software.status = SoftwareLoaded;
-				LOG_STRM_INFO(AInfo.streamJid,QString("Software version in disco info received from=%1").arg(AInfo.contactJid.full()));
+				LOG_STRM_DEBUG(AInfo.streamJid,QString("Software version in disco info received from=%1").arg(AInfo.contactJid.full()));
 				emit softwareInfoChanged(AInfo.contactJid);
 				break;
 			}
