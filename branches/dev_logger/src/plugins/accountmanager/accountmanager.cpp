@@ -138,7 +138,7 @@ IAccount *AccountManager::appendAccount(const QUuid &AAccountId)
 		connect(account,SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
 		FAccounts.insert(AAccountId,account);
 
-		LOG_STRM_DEBUG(account->streamJid(),QString("Appending account=%1").arg(account->name()));
+		LOG_DEBUG(QString("Appending account, id=%1").arg(AAccountId.toString()));
 		openAccountOptionsNode(AAccountId,account->name());
 		emit appended(account);
 	}

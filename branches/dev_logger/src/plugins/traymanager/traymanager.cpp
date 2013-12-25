@@ -204,7 +204,8 @@ void TrayManager::updateTray()
 
 void TrayManager::onTrayIconActivated(QSystemTrayIcon::ActivationReason AReason)
 {
-	LOG_DEBUG(QString("Tray notification activated, id=%1").arg(FActiveNotify));
+	if (FActiveNotify > 0)
+		LOG_DEBUG(QString("Tray notification activated, id=%1").arg(FActiveNotify));
 	emit notifyActivated(FActiveNotify,AReason);
 }
 

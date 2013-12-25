@@ -892,19 +892,19 @@ void FileMessageArchive::loadGatewayTypes()
 	QMutexLocker locker(&FMutex);
 
 	QDir dir(fileArchiveRootPath());
-	QFile gateways(dir.absoluteFilePath(GATEWAY_FILE_NAME));
-	if (gateways.open(QFile::ReadOnly|QFile::Text))
+	QFile file(dir.absoluteFilePath(GATEWAY_FILE_NAME));
+	if (file.open(QFile::ReadOnly|QFile::Text))
 	{
 		FGatewayTypes.clear();
-		while (!gateways.atEnd())
+		while (!file.atEnd())
 		{
-			QStringList gateway = QString::fromUtf8(gateways.readLine()).split(" ");
+			QStringList gateway = QString::fromUtf8(file.readLine()).split(" ");
 			if (!gateway.value(0).isEmpty() && !gateway.value(1).isEmpty())
 				FGatewayTypes.insert(gateway.value(0),gateway.value(1));
 		}
-		gateways.close();
+		file.close();
 	}
-	else
+	else if (file.exists())
 	{
 		REPORT_ERROR("Failed to load gateway types: File not opened");
 	}
