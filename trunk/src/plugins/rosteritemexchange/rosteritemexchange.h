@@ -1,21 +1,6 @@
 #ifndef ROSTERITEMEXCHANGE_H
 #define ROSTERITEMEXCHANGE_H
 
-#include <definitions/namespaces.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosternotifyorders.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/rosterdragdropmimetypes.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irosteritemexchange.h>
 #include <interfaces/iroster.h>
@@ -28,10 +13,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/igateways.h>
 #include <interfaces/imessagewidgets.h>
-#include <utils/message.h>
-#include <utils/options.h>
-#include <utils/iconstorage.h>
-#include <utils/widgetmanager.h>
 #include "exchangeapprovedialog.h"
 
 class RosterItemExchange : 

@@ -3,6 +3,26 @@
 #include <QDir>
 #include <QFile>
 #include <QCryptographicHash>
+#include <definitions/version.h>
+#include <definitions/namespaces.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/multiuserdataroles.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/serviceicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <definitions/stanzahandlerorders.h>
+#include <definitions/xmppurihandlerorders.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/shortcuts.h>
+#include <utils/logger.h>
 
 #define SHC_DISCO_INFO          "/iq[@type='get']/query[@xmlns='" NS_DISCO_INFO "']"
 #define SHC_DISCO_ITEMS         "/iq[@type='get']/query[@xmlns='" NS_DISCO_ITEMS "']"
@@ -68,8 +88,9 @@ void ServiceDiscovery::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
@@ -81,6 +102,12 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 		}
+	}
+
+	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
@@ -118,10 +145,6 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
 	{
@@ -136,23 +159,33 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
+	{
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
 	if (plugin)
+	{
 		FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
+	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
 	if (plugin)
+	{
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+	}
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
@@ -206,14 +239,20 @@ bool ServiceDiscovery::initObjects()
 
 bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	bool hooked = false;
-	if (FSHIPresenceOut.value(AStreamJid)==AHandlerId && !FSelfCaps.value(AStreamJid).ver.isEmpty())
+	if (FSHIPresenceOut.value(AStreamJid) == AHandlerId)
 	{
 		const EntityCapabilities selfCaps = FSelfCaps.value(AStreamJid);
-		QDomElement capsElem = AStanza.addElement("c",NS_CAPS);
-		capsElem.setAttribute("node",selfCaps.node);
-		capsElem.setAttribute("ver",selfCaps.ver);
-		capsElem.setAttribute("hash",selfCaps.hash);
+		if (!selfCaps.ver.isEmpty())
+		{
+			QDomElement capsElem = AStanza.addElement("c",NS_CAPS);
+			capsElem.setAttribute("ver",selfCaps.ver);
+			capsElem.setAttribute("node",selfCaps.node);
+			capsElem.setAttribute("hash",selfCaps.hash);
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to insert self entity caps: Version is empty");
+		}
 	}
 	else if (FSHIInfo.value(AStreamJid) == AHandlerId)
 	{
@@ -225,6 +264,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			AAccept = true;
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,dinfo.error);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send self discovery info to=%1, node=%2: %3").arg(AStanza.from(),dinfo.node,dinfo.error.condition()));
 		}
 		else if (!dinfo.identity.isEmpty() || !dinfo.features.isEmpty() || !dinfo.extensions.isEmpty())
 		{
@@ -235,6 +275,11 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 				query.setAttribute("node",dinfo.node);
 			discoInfoToElem(dinfo,query);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+			LOG_STRM_DEBUG(AStreamJid,QString("Self discovery info sent to=%1, node=%2").arg(AStanza.from(),dinfo.node));
+		}
+		else
+		{
+			REPORT_ERROR("Failed to send self discovery info: Invalid params");
 		}
 	}
 	else if (FSHIItems.value(AStreamJid) == AHandlerId)
@@ -245,6 +290,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 		ditems.streamJid = AStreamJid;
 		ditems.contactJid = AStanza.from();
 		ditems.node = query.attribute("node");
+
 		foreach(IDiscoHandler *AHandler, FDiscoHandlers)
 			AHandler->fillDiscoItems(ditems);
 
@@ -253,6 +299,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			AAccept = true;
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,ditems.error);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send self discovery items to=%1, node=%2: %3").arg(AStanza.from(),ditems.node,ditems.error.condition()));
 		}
 		else
 		{
@@ -271,6 +318,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 					elem.setAttribute("name",ditem.name);
 			}
 			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
+			LOG_STRM_DEBUG(AStreamJid,QString("Self discovery items sent to=%1, node=%2: %3").arg(AStanza.from(),ditems.node,ditems.error.condition()));
 		}
 	}
 	else if (FSHIPresenceIn.value(AStreamJid) == AHandlerId)
@@ -310,6 +358,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 					dinfo.streamJid = AStreamJid;
 					dinfo.contactJid = contactJid;
 					FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
+					LOG_STRM_DEBUG(AStreamJid,QString("Discovery info received from caps, from=%1, node=%2").arg(dinfo.contactJid.full(),dinfo.node));
 					emit discoInfoReceived(dinfo);
 				}
 				else if (capsChanged || !hasDiscoInfo(AStreamJid,contactJid))
@@ -326,7 +375,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			}
 		}
 	}
-	return hooked;
+	return false;
 }
 
 void ServiceDiscovery::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
@@ -338,12 +387,14 @@ void ServiceDiscovery::stanzaRequestResult(const Jid &AStreamJid, const Stanza &
 		IDiscoInfo dinfo = parseDiscoInfo(AStanza,drequest);
 		FDiscoInfo[dinfo.streamJid][dinfo.contactJid].insert(dinfo.node,dinfo);
 		saveCapsInfo(dinfo);
+		LOG_STRM_DEBUG(AStreamJid,QString("Discovery info received, from=%1, node=%2, id=%3").arg(dinfo.contactJid.full(),dinfo.node,AStanza.id()));
 		emit discoInfoReceived(dinfo);
 	}
 	else if (FItemsRequestsId.contains(AStanza.id()))
 	{
 		DiscoveryRequest drequest = FItemsRequestsId.take(AStanza.id());
 		IDiscoItems ditems = parseDiscoItems(AStanza,drequest);
+		LOG_STRM_DEBUG(AStreamJid,QString("Discovery items received, from=%1, node=%2, id=%3").arg(ditems.contactJid.full(),ditems.node,AStanza.id()));
 		emit discoItemsReceived(ditems);
 	}
 }
@@ -356,13 +407,11 @@ bool ServiceDiscovery::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid
 		QString request = AParams.value("request");
 		QString type = AParams.value("type");
 		if (request=="info" && type=="get")
-		{
-			showDiscoInfo(AStreamJid, AContactJid, node);
-		}
+			showDiscoInfo(AStreamJid,AContactJid,node);
 		else if (request=="items" && type=="get")
-		{
-			showDiscoItems(AStreamJid, AContactJid, node);
-		}
+			showDiscoItems(AStreamJid,AContactJid,node);
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to process XMPP URI, request=%1, type=%2: Invalid params").arg(request,type));
 		return true;
 	}
 	return false;
@@ -379,9 +428,7 @@ bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex
 	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	if (AIndex->kind()==RIK_AGENT && FSelfCaps.contains(streamJid))
-	{
 		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
-	}
 	return false;
 }
 
@@ -418,9 +465,10 @@ bool ServiceDiscovery::execDiscoFeature(const Jid &AStreamJid, const QString &AF
 
 Action *ServiceDiscovery::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
-	if (AFeature==NS_DISCO_INFO && FSelfCaps.contains(AStreamJid))
+	if (AFeature == NS_DISCO_INFO)
 	{
-		return createDiscoInfoAction(AStreamJid,ADiscoInfo.contactJid,ADiscoInfo.node,AParent);
+		if (FSelfCaps.contains(AStreamJid))
+			return createDiscoInfoAction(AStreamJid,ADiscoInfo.contactJid,ADiscoInfo.node,AParent);
 	}
 	return NULL;
 }
@@ -540,6 +588,7 @@ void ServiceDiscovery::insertDiscoHandler(IDiscoHandler *AHandler)
 {
 	if (!FDiscoHandlers.contains(AHandler))
 	{
+		LOG_DEBUG(QString("Discovery handler inserted, address=%1").arg((quint64)AHandler));
 		FDiscoHandlers.append(AHandler);
 		emit discoHandlerInserted(AHandler);
 	}
@@ -549,7 +598,8 @@ void ServiceDiscovery::removeDiscoHandler(IDiscoHandler *AHandler)
 {
 	if (FDiscoHandlers.contains(AHandler))
 	{
-		FDiscoHandlers.removeAt(FDiscoHandlers.indexOf(AHandler));
+		LOG_DEBUG(QString("Discovery handler removed, address=%1").arg((quint64)AHandler));
+		FDiscoHandlers.removeAll(AHandler);
 		emit discoHandlerRemoved(AHandler);
 	}
 }
@@ -563,6 +613,7 @@ void ServiceDiscovery::insertFeatureHandler(const QString &AFeature, IDiscoFeatu
 {
 	if (!FFeatureHandlers.value(AFeature).values().contains(AHandler))
 	{
+		LOG_DEBUG(QString("Feature handler inserted, order=%1, feature=%2, address=%3").arg(AOrder).arg(AFeature).arg((quint64)AHandler));
 		FFeatureHandlers[AFeature].insertMulti(AOrder,AHandler);
 		emit featureHandlerInserted(AFeature,AHandler);
 	}
@@ -572,6 +623,7 @@ void ServiceDiscovery::removeFeatureHandler(const QString &AFeature, IDiscoFeatu
 {
 	if (FFeatureHandlers.value(AFeature).values().contains(AHandler))
 	{
+		LOG_DEBUG(QString("Feature handler removed, feature=%1, address=%2").arg(AFeature).arg((quint64)AHandler));
 		FFeatureHandlers[AFeature].remove(FFeatureHandlers[AFeature].key(AHandler),AHandler);
 		if (FFeatureHandlers.value(AFeature).isEmpty())
 			FFeatureHandlers.remove(AFeature);
@@ -601,6 +653,8 @@ void ServiceDiscovery::insertDiscoFeature(const IDiscoFeature &AFeature)
 	if (!AFeature.var.isEmpty())
 	{
 		removeDiscoFeature(AFeature.var);
+
+		LOG_DEBUG(QString("Discovery feature inserted, var=%1, active=%2").arg(AFeature.var).arg(AFeature.active));
 		FDiscoFeatures.insert(AFeature.var,AFeature);
 		emit discoFeatureInserted(AFeature);
 		updateSelfEntityCapabilities();
@@ -621,6 +675,7 @@ void ServiceDiscovery::removeDiscoFeature(const QString &AFeatureVar)
 {
 	if (FDiscoFeatures.contains(AFeatureVar))
 	{
+		LOG_DEBUG(QString("Discovery feature removed, var=%1").arg(AFeatureVar));
 		IDiscoFeature dfeature = FDiscoFeatures.take(AFeatureVar);
 		emit discoFeatureRemoved(dfeature);
 		updateSelfEntityCapabilities();
@@ -639,28 +694,45 @@ IDiscoInfo ServiceDiscovery::discoInfo(const Jid &AStreamJid, const Jid &AContac
 
 bool ServiceDiscovery::requestDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode)
 {
-	bool sended = false;
+	if (FStanzaProcessor && FSelfCaps.contains(AStreamJid) && AStreamJid.isValid() && AContactJid.isValid())
+	{
+		DiscoveryRequest drequest;
+		drequest.streamJid = AStreamJid;
+		drequest.contactJid = AContactJid;
+		drequest.node = ANode;
 
-	DiscoveryRequest drequest;
-	drequest.streamJid = AStreamJid;
-	drequest.contactJid = AContactJid;
-	drequest.node = ANode;
-	if (FInfoRequestsId.values().contains(drequest))
-	{
-		sended = true;
+		if (!FInfoRequestsId.values().contains(drequest))
+		{
+			Stanza stanza("iq");
+			stanza.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
+			QDomElement query =  stanza.addElement("query",NS_DISCO_INFO);
+			if (!ANode.isEmpty())
+				query.setAttribute("node",ANode);
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,DISCO_TIMEOUT))
+			{
+				LOG_STRM_DEBUG(AStreamJid,QString("Discovery info request sent, to=%1, node=%2, id=%3").arg(AContactJid.full(),ANode,stanza.id()));
+				FInfoRequestsId.insert(stanza.id(),drequest);
+				return true;
+			}
+			else
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to send discovery info request, to=%1, node=%2").arg(AContactJid.full(),ANode));
+			}
+		}
+		else
+		{
+			return true;
+		}
 	}
-	else if (FStanzaProcessor && AStreamJid.isValid() && AContactJid.isValid())
+	else if (!FSelfCaps.contains(AStreamJid))
 	{
-		Stanza iq("iq");
-		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
-		QDomElement query =  iq.addElement("query",NS_DISCO_INFO);
-		if (!ANode.isEmpty())
-			query.setAttribute("node",ANode);
-		sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,DISCO_TIMEOUT);
-		if (sended)
-			FInfoRequestsId.insert(iq.id(),drequest);
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to request discovery info, from=%1, node=%2: Stream is not ready").arg(AContactJid.full(),ANode));
 	}
-	return sended;
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to request discovery info: Invalid params");
+	}
+	return false;
 }
 
 void ServiceDiscovery::removeDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode)
@@ -671,6 +743,7 @@ void ServiceDiscovery::removeDiscoInfo(const Jid &AStreamJid, const Jid &AContac
 		IDiscoInfo dinfo = dnodeInfo.take(ANode);
 		if (dnodeInfo.isEmpty())
 			FDiscoInfo[AStreamJid].remove(AContactJid);
+		LOG_STRM_DEBUG(AStreamJid,QString("Discovery info removed, from=%1, node=%2").arg(AContactJid.full(),ANode));
 		emit discoInfoRemoved(dinfo);
 	}
 }
@@ -686,28 +759,45 @@ int ServiceDiscovery::findIdentity(const QList<IDiscoIdentity> &AIdentity, const
 
 bool ServiceDiscovery::requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode)
 {
-	bool sended = false;
+	if (FStanzaProcessor && FSelfCaps.contains(AStreamJid) && AStreamJid.isValid() && AContactJid.isValid())
+	{
+		DiscoveryRequest drequest;
+		drequest.streamJid = AStreamJid;
+		drequest.contactJid = AContactJid;
+		drequest.node = ANode;
 
-	DiscoveryRequest drequest;
-	drequest.streamJid = AStreamJid;
-	drequest.contactJid = AContactJid;
-	drequest.node = ANode;
-	if (FItemsRequestsId.values().contains(drequest))
-	{
-		sended = true;
+		if (!FItemsRequestsId.values().contains(drequest))
+		{
+			Stanza stanza("iq");
+			stanza.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
+			QDomElement query =  stanza.addElement("query",NS_DISCO_ITEMS);
+			if (!ANode.isEmpty())
+				query.setAttribute("node",ANode);
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,DISCO_TIMEOUT))
+			{
+				LOG_STRM_DEBUG(AStreamJid,QString("Discovery items request sent, to=%1, node=%2, id=%3").arg(AContactJid.full(),ANode,stanza.id()));
+				FItemsRequestsId.insert(stanza.id(),drequest);
+				return true;
+			}
+			else
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to send discovery items request, to=%1, node=%2").arg(AContactJid.full(),ANode));
+			}
+		}
+		else
+		{
+			return true;
+		}
 	}
-	else if (FStanzaProcessor && AStreamJid.isValid() && AContactJid.isValid())
+	else if (!FSelfCaps.contains(AStreamJid))
 	{
-		Stanza iq("iq");
-		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
-		QDomElement query =  iq.addElement("query",NS_DISCO_ITEMS);
-		if (!ANode.isEmpty())
-			query.setAttribute("node",ANode);
-		sended = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,DISCO_TIMEOUT);
-		if (sended)
-			FItemsRequestsId.insert(iq.id(),drequest);
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to request discovery items, from=%1, node=%2: Stream is not ready").arg(AContactJid.full(),ANode));
 	}
-	return sended;
+	else if (FStanzaProcessor)
+	{
+		REPORT_ERROR("Failed to request discovery items: Invalid params");
+	}
+	return false;
 }
 
 void ServiceDiscovery::discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const
@@ -883,24 +973,27 @@ void ServiceDiscovery::appendQueuedRequest(const QDateTime &ATimeStart, const Di
 			return;
 		++it;
 	}
-	FQueuedRequests.insert(ATimeStart,ARequest);
+
 	if (!FQueueTimer.isActive())
 		FQueueTimer.start();
+	FQueuedRequests.insert(ATimeStart,ARequest);
 }
 
 void ServiceDiscovery::removeQueuedRequest(const DiscoveryRequest &ARequest)
 {
 	QMultiMap<QDateTime,DiscoveryRequest>::iterator it = FQueuedRequests.begin();
-	while (it!=FQueuedRequests.end())
+	while (it != FQueuedRequests.end())
 	{
-		if (
-		  (ARequest.streamJid.isEmpty() || it.value().streamJid == ARequest.streamJid) &&
-		  (ARequest.contactJid.isEmpty() || it.value().contactJid == ARequest.contactJid) &&
-		  (ARequest.node.isEmpty() || it.value().node == ARequest.node)
-		)
+		if ((ARequest.streamJid.isEmpty() || it.value().streamJid == ARequest.streamJid) &&
+		    (ARequest.contactJid.isEmpty() || it.value().contactJid == ARequest.contactJid) &&
+		    (ARequest.node.isEmpty() || it.value().node == ARequest.node))
+		{
 			it = FQueuedRequests.erase(it);
+		}
 		else
+		{
 			++it;
+		}
 	}
 }
 
@@ -946,15 +1039,25 @@ IDiscoInfo ServiceDiscovery::loadCapsInfo(const EntityCapabilities &ACaps) const
 	IDiscoInfo dinfo;
 	foreach(const QString &fileName, QStringList() << capsFileName(ACaps,true) << capsFileName(ACaps,false))
 	{
-		QFile capsFile(fileName);
-		if (capsFile.open(QIODevice::ReadOnly))
+		QFile file(fileName);
+		if (file.open(QIODevice::ReadOnly))
 		{
+			QString xmlError;
 			QDomDocument doc;
-			doc.setContent(capsFile.readAll(),true);
-			QDomElement capsElem = doc.documentElement();
-			discoInfoFromElem(capsElem,dinfo);
-			capsFile.close();
-			break;
+			if (doc.setContent(file.readAll(),true,&xmlError))
+			{
+				QDomElement capsElem = doc.documentElement();
+				discoInfoFromElem(capsElem,dinfo);
+				break;
+			}
+			else
+			{
+				REPORT_ERROR(QString("Failed to load caps info from file content: %1").arg(xmlError));
+			}
+		}
+		else if (file.exists())
+		{
+			REPORT_ERROR(QString("Failed to load caps info from file: %1").arg(file.errorString()));
 		}
 	}
 
@@ -982,12 +1085,11 @@ bool ServiceDiscovery::saveCapsInfo(const IDiscoInfo &AInfo) const
 				if (!checked)
 					capsElem.setAttribute("jid",caps.owner);
 
-				QFile capsFile(capsFileName(caps,!checked));
-				if (capsFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
-				{
-					capsFile.write(doc.toByteArray());
-					capsFile.close();
-				}
+				QFile file(capsFileName(caps,!checked));
+				if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+					file.write(doc.toByteArray());
+				else
+					REPORT_ERROR(QString("Failed to write caps info to file: %1").arg(file.errorString()));
 			}
 			return true;
 		}
@@ -1051,28 +1153,36 @@ QString ServiceDiscovery::calcCapsHash(const IDiscoInfo &AInfo, const QString &A
 		QByteArray hashData = hashList.join("<").toUtf8();
 		return QCryptographicHash::hash(hashData, AHash==CAPS_HASH_SHA1 ? QCryptographicHash::Sha1 : QCryptographicHash::Md5).toBase64();
 	}
+	else if (!AHash.isEmpty())
+	{
+		LOG_STRM_WARNING(AInfo.streamJid,QString("Failed to calculate caps hash, jid=%1: Invalid type=%2").arg(AInfo.contactJid.full(),AHash));
+	}
 	return QString::null;
 }
 
 bool ServiceDiscovery::compareIdentities(const QList<IDiscoIdentity> &AIdentities, const IDiscoIdentity &AWith) const
 {
 	foreach(const IDiscoIdentity &identity, AIdentities)
-		if (
-			(AWith.category.isEmpty() || AWith.category==identity.category) &&
-			(AWith.type.isEmpty() || AWith.type==identity.type) &&
-			(AWith.lang.isEmpty() || AWith.lang==identity.lang) &&
-			(AWith.name.isEmpty() || AWith.name==identity.name)
-		)
+	{
+		if ((AWith.category.isEmpty() || AWith.category==identity.category) &&
+			  (AWith.type.isEmpty() || AWith.type==identity.type) &&
+			  (AWith.lang.isEmpty() || AWith.lang==identity.lang) &&
+			  (AWith.name.isEmpty() || AWith.name==identity.name))
+		{
 			return true;
+		}
+	}
 	return false;
 }
 
 bool ServiceDiscovery::compareFeatures(const QStringList &AFeatures, const QStringList &AWith) const
 {
 	if (!AWith.isEmpty())
+	{
 		foreach(const QString &feature, AWith)
 			if (!AFeatures.contains(feature))
 				return false;
+	}
 	return true;
 }
 
@@ -1161,9 +1271,9 @@ void ServiceDiscovery::onStreamOpened(IXmppStream *AXmppStream)
 	myCaps.hash = CAPS_HASH_SHA1;
 	myCaps.ver = calcCapsHash(selfDiscoInfo(myCaps.streamJid),myCaps.hash);
 
-	Jid streamDomane = AXmppStream->streamJid().domain();
-	requestDiscoInfo(AXmppStream->streamJid(),streamDomane);
-	requestDiscoItems(AXmppStream->streamJid(),streamDomane);
+	Jid server = AXmppStream->streamJid().domain();
+	requestDiscoInfo(AXmppStream->streamJid(),server);
+	requestDiscoItems(AXmppStream->streamJid(),server);
 
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AXmppStream->streamJid()) : NULL;
 	QList<IRosterItem> ritems = roster!=NULL ? roster->rosterItems() : QList<IRosterItem>();
@@ -1203,11 +1313,9 @@ void ServiceDiscovery::onStreamClosed(IXmppStream *AXmppStream)
 
 	removeStreamMenu(AXmppStream->streamJid());
 
-	foreach(const Jid &contactJid, FDiscoInfo.value(AXmppStream->streamJid()).keys()) {
-		foreach(const QString &node, FDiscoInfo.value(AXmppStream->streamJid()).value(contactJid).keys()) {
+	foreach(const Jid &contactJid, FDiscoInfo.value(AXmppStream->streamJid()).keys())
+		foreach(const QString &node, FDiscoInfo.value(AXmppStream->streamJid()).value(contactJid).keys())
 			removeDiscoInfo(AXmppStream->streamJid(),contactJid,node);
-		};
-	};
 
 	FSelfCaps.remove(AXmppStream->streamJid());
 	FEntityCaps.remove(AXmppStream->streamJid());
@@ -1402,7 +1510,7 @@ void ServiceDiscovery::onDiscoItemsWindowDestroyed(IDiscoItemsWindow *AWindow)
 	DiscoItemsWindow *itemsWindow = static_cast<DiscoItemsWindow *>(AWindow->instance());
 	if (itemsWindow)
 	{
-		FDiscoItemsWindows.removeAt(FDiscoItemsWindows.indexOf(itemsWindow));
+		FDiscoItemsWindows.removeAll(itemsWindow);
 		emit discoItemsWindowDestroyed(itemsWindow);
 	}
 }
@@ -1419,9 +1527,7 @@ void ServiceDiscovery::onQueueTimerTimeout()
 	}
 
 	if (FQueuedRequests.isEmpty())
-	{
 		FQueueTimer.stop();
-	}
 }
 
 void ServiceDiscovery::onSelfCapsChanged()

@@ -1,19 +1,8 @@
 #ifndef CHATWINDOW_H
 #define CHATWINDOW_H
 
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionvalues.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/messagechatwindowwidgets.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/textmanager.h>
-#include <utils/widgetmanager.h>
 #include "ui_chatwindow.h"
 
 class ChatWindow :

@@ -4,13 +4,9 @@
 #include <QTimer>
 #include <QWaitCondition>
 #include <QReadWriteLock>
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/istanzaprocessor.h>
-#include <utils/stanza.h>
-#include <utils/xmpperror.h>
 #include <utils/ringbuffer.h>
 
 struct HostInfo {

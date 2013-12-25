@@ -4,6 +4,13 @@
 #include <QMessageBox>
 #include <QItemSelectionModel>
 #include <QNetworkAccessManager>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 enum HistoryItemType {
 	HIT_CONTACT,
@@ -111,6 +118,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 
 ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArchiver *AArchiver, IRoster *ARoster, QWidget *AParent) : QMainWindow(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_HISTORY,0,0,"windowIcon");

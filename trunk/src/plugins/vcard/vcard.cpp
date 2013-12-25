@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QBuffer>
 #include <QImageReader>
+#include <definitions/namespaces.h>
+#include <utils/logger.h>
 
 #define DEFAUL_IMAGE_FORMAT       "png"
 
@@ -182,9 +184,16 @@ void VCard::loadVCardFile()
 	QFile file(FVCardPlugin->vcardFileName(FContactJid));
 	if (file.open(QIODevice::ReadOnly))
 	{
-		FDoc.setContent(file.readAll());
+		QString xmlError;
+		if (!FDoc.setContent(file.readAll(),&xmlError))
+			REPORT_ERROR(QString("Failed to load vCard from file content: %1").arg(xmlError));
 		file.close();
 	}
+	else
+	{
+		REPORT_ERROR(QString("Failed to load vCard from file: %1").arg(file.errorString()));
+	}
+
 	if (vcardElem().isNull())
 	{
 		FDoc.clear();
@@ -196,6 +205,7 @@ void VCard::loadVCardFile()
 	{
 		FLoadDateTime = QDateTime::fromString(FDoc.documentElement().attribute("dateTime"),Qt::ISODate);
 	}
+
 	emit vcardUpdated();
 }
 

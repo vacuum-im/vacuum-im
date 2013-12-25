@@ -1,5 +1,11 @@
 #include "chatwindowmenu.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <utils/menu.h>
+
 #define SFP_LOGGING           "logging"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 

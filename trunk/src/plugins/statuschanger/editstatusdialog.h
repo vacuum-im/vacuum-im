@@ -4,11 +4,8 @@
 #include <QIcon>
 #include <QDialog>
 #include <QStyledItemDelegate>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ipresence.h>
-#include <utils/iconstorage.h>
 #include "ui_editstatusdialog.h"
 
 using namespace Ui;
@@ -22,7 +19,7 @@ struct RowStatus {
 };
 
 class Delegate :
-			public QStyledItemDelegate
+	public QStyledItemDelegate
 {
 	Q_OBJECT;
 public:
@@ -43,8 +40,8 @@ private:
 };
 
 class EditStatusDialog :
-			public QDialog,
-			public EditStatusDialogClass
+	public QDialog,
+	public EditStatusDialogClass
 {
 	Q_OBJECT;
 public:

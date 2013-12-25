@@ -2,11 +2,10 @@
 #define USERSPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include <definitions/multiuserdataroles.h>
 #include <interfaces/imultiuserchat.h>
 
 class UsersProxyModel :
-			public QSortFilterProxyModel
+	public QSortFilterProxyModel
 {
 	Q_OBJECT;
 public:

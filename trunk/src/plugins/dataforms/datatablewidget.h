@@ -4,8 +4,8 @@
 #include <interfaces/idataforms.h>
 
 class DataTableWidget :
-			public QTableWidget,
-			public IDataTableWidget
+	public QTableWidget,
+	public IDataTableWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IDataTableWidget);
@@ -13,7 +13,7 @@ public:
 	DataTableWidget(IDataForms *ADataForms, const IDataTable &ATable, QWidget *AParent);
 	~DataTableWidget();
 	virtual QTableWidget *instance() { return this; }
-	virtual const IDataTable &dataTable() const { return FTable; }
+	virtual const IDataTable &dataTable() const;
 	virtual IDataField currentField() const;
 	virtual IDataField dataField(int ARow, int AColumn) const;
 	virtual IDataField dataField(int ARow, const QString &AVar) const;

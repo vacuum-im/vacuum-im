@@ -1,6 +1,7 @@
 #include "rosterindex.h"
 
 #include <definitions/rosterindexroles.h>
+
 #include "rostersmodel.h"
 
 RosterIndex::RosterIndex(int AKind, RostersModel *AModel)

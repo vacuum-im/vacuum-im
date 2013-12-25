@@ -20,8 +20,12 @@
         <translation>Підтримує обмін невеликими об&apos;ємами бінарних даних</translation>
     </message>
     <message>
-        <source>Failed to read cached data</source>
-        <translation>Не вдалося прочитати кешовані дані</translation>
+        <source>Failed to load data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

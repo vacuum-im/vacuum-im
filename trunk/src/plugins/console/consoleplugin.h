@@ -2,22 +2,16 @@
 #define CONSOLEPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/imainwindow.h>
-#include <utils/widgetmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/action.h>
 #include "consolewidget.h"
 
 #define CONSOLE_UUID  "{2572D474-5F3E-8d24-B10A-BAA57C2BC693}"
 
 class ConsolePlugin :
-			public QObject,
-			public IPlugin
+	public QObject,
+	public IPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin);
@@ -36,6 +30,7 @@ protected slots:
 	void onShowXMLConsole(bool);
 private:
 	IPluginManager *FPluginManager;
+	IXmppStreams *FXmppStreams;
 	IMainWindowPlugin *FMainWindowPlugin;
 private:
 	QObjectCleanupHandler FCleanupHandler;

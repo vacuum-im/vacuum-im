@@ -1,18 +1,6 @@
 #ifndef REGISTRATION_H
 #define REGISTRATION_H
 
-#include <definitions/namespaces.h>
-#include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/dataformtypes.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/xmppurihandlerorders.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>
@@ -23,9 +11,6 @@
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ixmppuriqueries.h>
-#include <utils/stanza.h>
-#include <utils/options.h>
-#include <utils/xmpperror.h>
 #include "registerdialog.h"
 #include "registerstream.h"
 
@@ -61,7 +46,7 @@ public:
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IXmppFeaturesPlugin
-	virtual QList<QString> xmppFeatures() const { return QList<QString>() << NS_FEATURE_REGISTER; }
+	virtual QList<QString> xmppFeatures() const;
 	virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);

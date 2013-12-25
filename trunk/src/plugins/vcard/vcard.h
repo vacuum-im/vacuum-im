@@ -1,7 +1,6 @@
 #ifndef VCARD_H
 #define VCARD_H
 
-#include <definitions/namespaces.h>
 #include <interfaces/ivcard.h>
 
 #define VCARD_TAGNAME                   "vCard"

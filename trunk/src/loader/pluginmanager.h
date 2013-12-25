@@ -9,21 +9,9 @@
 #include <QApplication>
 #include <QPluginLoader>
 #include <QSessionManager>
-#include <definitions/plugininitorders.h>
-#include <definitions/commandline.h>
-#include <definitions/actiongroups.h>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/version.h>
-#include <definitions/shortcuts.h>
-#include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
-#include <utils/widgetmanager.h>
-#include <utils/filestorage.h>
-#include <utils/shortcuts.h>
-#include <utils/action.h>
 #include "setuppluginsdialog.h"
 #include "aboutbox.h"
 
@@ -33,8 +21,7 @@ enum ShutdownKind {
 	SK_RESTART
 };
 
-struct PluginItem
-{
+struct PluginItem {
 	IPlugin *plugin;
 	IPluginInfo *info;
 	QPluginLoader *loader;
@@ -74,9 +61,9 @@ signals:
 protected:
 	void loadSettings();
 	void saveSettings();
-	void loadPlugins();
+	bool loadPlugins();
 	bool initPlugins();
-	void startPlugins();
+	bool startPlugins();
 	void unloadPlugins();
 protected:
 	void startClose();

@@ -1,6 +1,8 @@
 #include "stanzaprocessor.h"
 
 #include <QSet>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/logger.h>
 
 StanzaProcessor::StanzaProcessor()
 {
@@ -47,6 +49,7 @@ bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 	{
 		if (!sendStanzaIn(AXmppStream->streamJid(),AStanza))
 		{
+			LOG_STRM_DEBUG(AXmppStream->streamJid(),QString("Incoming stanza not accepted, from=%1, tag=%2, ns=%3").arg(AStanza.from(),AStanza.tagName(),AStanza.firstElement().namespaceURI()));
 			if (AStanza.tagName()=="iq" && (AStanza.type()=="set" || AStanza.type()=="get"))
 			{
 				Stanza error = makeReplyError(AStanza,XmppStanzaError::EC_SERVICE_UNAVAILABLE);
@@ -59,9 +62,7 @@ bool StanzaProcessor::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, in
 
 bool StanzaProcessor::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -76,6 +77,7 @@ QString StanzaProcessor::newId() const
 bool StanzaProcessor::sendStanzaIn(const Jid &AStreamJid, Stanza &AStanza)
 {
 	emit stanzaReceived(AStreamJid, AStanza);
+
 	bool acceptedIn = processStanza(AStreamJid,AStanza,IStanzaHandle::DirectionIn);
 	bool acceptedIq = processStanzaRequest(AStreamJid,AStanza);
 	return acceptedIn || acceptedIq;
@@ -159,9 +161,12 @@ int StanzaProcessor::insertStanzaHandle(const IStanzaHandle &AHandle)
 		handleId++;
 		while(handleId <= 0 || FHandles.contains(handleId))
 			handleId = (handleId > 0) ? handleId+1 : 1;
+
 		FHandles.insert(handleId,AHandle);
 		FHandleIdByOrder.insertMulti(AHandle.order,handleId);
 		connect(AHandle.handler->instance(),SIGNAL(destroyed(QObject *)),SLOT(onStanzaHandlerDestroyed(QObject *)));
+
+		LOG_DEBUG(QString("Stanza handle inserted, id=%1, handler=%2, order=%3, direction=%4, stream=%5, conditions=%6").arg(handleId).arg(AHandle.handler->instance()->metaObject()->className()).arg(AHandle.order).arg(AHandle.direction).arg(AHandle.streamJid.full()).arg(QStringList(AHandle.conditions).join("; ")));
 		emit stanzaHandleInserted(handleId,AHandle);
 		return handleId;
 	}
@@ -172,6 +177,7 @@ void StanzaProcessor::removeStanzaHandle(int AHandleId)
 {
 	if (FHandles.contains(AHandleId))
 	{
+		LOG_DEBUG(QString("Stanza handle removed, id=%1").arg(AHandleId));
 		IStanzaHandle shandle = FHandles.take(AHandleId);
 		FHandleIdByOrder.remove(shandle.order,AHandleId);
 		emit stanzaHandleRemoved(AHandleId, shandle);
@@ -214,20 +220,26 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 					while (pos<ACondition.count() && !delimiters.contains(ACondition[pos]))
 						attrName.append(ACondition[pos++]);
 				}
-				else if (ACondition[pos] == '"' || ACondition[pos] == '\'')
+				else if (ACondition[pos]=='"' || ACondition[pos]=='\'')
 				{
 					QChar end = ACondition[pos++];
-					while (pos<ACondition.count() && ACondition[pos] != end)
+					while (pos<ACondition.count() && ACondition[pos]!=end)
 						attrValue.append(ACondition[pos++]);
 					pos++;
 				}
-				else pos++;
+				else 
+				{
+					pos++;
+				}
 			}
 			if (!attrName.isEmpty())
 				attributes.insertMulti(attrName,attrValue);
 			pos++;
 		}
-		else pos++;
+		else 
+		{
+			pos++;
+		}
 	}
 
 	if (pos < ACondition.count() && !elem.hasChildNodes())
@@ -242,6 +254,7 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 			QString attrName = attrNames.at(attr);
 			QList<QString> attrValues = attributes.values(attrName);
 			bool attrBlankValue = attrValues.contains(QString::null);
+
 			bool elemHasAttr;
 			QString elemAttrValue;
 			if (elem.hasAttribute(attrName))
@@ -255,17 +268,22 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 				elemAttrValue = elem.namespaceURI();
 			}
 			else
+			{
 				elemHasAttr = false;
+			}
 
 			if (!elemHasAttr || (!attrValues.contains(elemAttrValue) && !attrBlankValue))
 			{
 				elem = elem.nextSiblingElement(tagName);
 				attr = 0;
 			}
-			else attr++;
+			else 
+			{
+				attr++;
+			}
 		}
 
-		if (!elem.isNull() && pos < ACondition.count())
+		if (!elem.isNull() && pos<ACondition.count())
 		{
 			if (checkCondition(elem.firstChildElement(),ACondition,pos))
 				return true;
@@ -273,7 +291,9 @@ bool StanzaProcessor::checkCondition(const QDomElement &AElem, const QString &AC
 				elem = elem.nextSiblingElement(tagName);
 		}
 		else if (!elem.isNull())
+		{
 			return true;
+		}
 	}
 
 	return false;
@@ -373,6 +393,7 @@ void StanzaProcessor::onStreamClosed(IXmppStream *AXmppStream)
 		const StanzaRequest &request = FRequests.value(stanzaId);
 		if (request.streamJid == AXmppStream->streamJid())
 		{
+			LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Failed to receive request reply, id=%1: Stream is closed").arg(stanzaId));
 			processRequestTimeout(stanzaId);
 			removeStanzaRequest(stanzaId);
 		}
@@ -410,7 +431,7 @@ void StanzaProcessor::onStanzaRequestOwnerDestroyed(QObject *AOwner)
 
 void StanzaProcessor::onStanzaHandlerDestroyed(QObject *AHandler)
 {
-	foreach (int shandleId, FHandles.keys())
+	foreach(int shandleId, FHandles.keys())
 		if (FHandles.value(shandleId).handler->instance() == AHandler)
 			removeStanzaHandle(shandleId);
 }

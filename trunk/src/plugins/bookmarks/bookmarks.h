@@ -1,20 +1,6 @@
 #ifndef BOOKMARKS_H
 #define BOOKMARKS_H
 
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/discoitemdataroles.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterdataholderorders.h>
-#include <definitions/rosteredithandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibookmarks.h>
 #include <interfaces/iprivatestorage.h>
@@ -26,11 +12,6 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
-#include <utils/advanceditemdelegate.h>
-#include <utils/textmanager.h>
-#include <utils/shortcuts.h>
-#include <utils/options.h>
-#include <utils/menu.h>
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
 

@@ -3,16 +3,7 @@
 
 #include <QTimer>
 #include <QMainWindow>
-#include <definitions/optionvalues.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/actiongroups.h>
-#include <definitions/shortcuts.h>
 #include <interfaces/imessagewidgets.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/widgetmanager.h>
-#include <utils/textmanager.h>
 #include "ui_tabwindow.h"
 
 class TabWindow :

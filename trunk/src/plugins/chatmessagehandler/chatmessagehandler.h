@@ -4,28 +4,6 @@
 #define CHATMESSAGEHANDLER_UUID "{b60cc0e4-8006-4909-b926-fcb3cbc506f0}"
 
 #include <QTimer>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterclickhookerorders.h>
-#include <definitions/rosternotifyorders.h>
-#include <definitions/recentitemtypes.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/messagehandlerorders.h>
-#include <definitions/messageeditsendhandlerorders.h>
-#include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
@@ -44,10 +22,6 @@
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/irecentcontacts.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/textmanager.h>
-#include <utils/widgetmanager.h>
 
 struct WindowStatus {
 	QDateTime startTime;

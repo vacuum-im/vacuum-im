@@ -2,9 +2,14 @@
 
 #include <QMessageBox>
 #include <QTextDocument>
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/logger.h>
 
 CommandDialog::CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode, QWidget *AParent)  : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_COMMANDS,0,0,"windowIcon");
@@ -36,6 +41,26 @@ CommandDialog::~CommandDialog()
 	delete FPrevButton;
 	delete FNextButton;
 	delete FCompleteButton;
+}
+
+Jid CommandDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid CommandDialog::commandJid() const
+{
+	return FCommandJid;
+}
+
+QString CommandDialog::node() const
+{
+	return FNode;
+}
+
+QString CommandDialog::sessionId() const
+{
+	return FSessionId;
 }
 
 bool CommandDialog::receiveCommandResult(const ICommandResult &AResult)

@@ -4,12 +4,8 @@
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/iconstorage.h>
 #include "ui_notifyoptionswidget.h"
 
 class SortFilterProxyModel : 

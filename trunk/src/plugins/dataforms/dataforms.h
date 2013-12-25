@@ -5,8 +5,6 @@
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QObjectCleanupHandler>
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/ibitsofbinary.h>
@@ -17,8 +15,7 @@
 #include "dataformwidget.h"
 #include "datadialogwidget.h"
 
-struct UrlRequest
-{
+struct UrlRequest {
 	QNetworkReply *reply;
 };
 

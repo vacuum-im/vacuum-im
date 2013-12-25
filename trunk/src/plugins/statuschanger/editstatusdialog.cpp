@@ -8,6 +8,10 @@
 #include <QInputDialog>
 #include <QTextDocument>
 #include <QTableWidgetItem>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 enum {
 	TIR_STATUSID = Qt::UserRole,
@@ -91,7 +95,9 @@ void Delegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel, const 
 	switch (type)
 	{
 	case DelegateName:
-		allowEmptyText = false;
+		{
+			allowEmptyText = false;
+		}
 	case DelegateMessage:
 		{
 			QLineEdit *lineEdit = qobject_cast<QLineEdit *>(AEditor);
@@ -151,6 +157,7 @@ void Delegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionViewItem
 //EditStatusDialog
 EditStatusDialog::EditStatusDialog(IStatusChanger *AStatusChanger)
 {
+	REPORT_VIEW;
 	setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SCHANGER_EDIT_STATUSES,0,0,"windowIcon");

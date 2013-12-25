@@ -1,11 +1,8 @@
 #ifndef ADDLEGACYCONTACTDIALOG_H
 #define ADDLEGACYCONTACTDIALOG_H
 
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/igateways.h>
 #include <interfaces/irosterchanger.h>
-#include <utils/iconstorage.h>
 #include "ui_addlegacycontactdialog.h"
 
 class AddLegacyContactDialog :
@@ -16,8 +13,8 @@ public:
 	AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
 	~AddLegacyContactDialog();
 public:
-	virtual const Jid &streamJid() const { return FStreamJid; }
-	virtual const Jid &serviceJid() const { return FServiceJid; }
+	virtual Jid streamJid() const;
+	virtual Jid serviceJid() const;
 protected:
 	void resetDialog();
 	void requestPrompt();

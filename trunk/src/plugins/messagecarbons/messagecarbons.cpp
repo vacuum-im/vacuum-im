@@ -2,7 +2,9 @@
 
 #include <definitions/namespaces.h>
 #include <definitions/stanzahandlerorders.h>
+#include <utils/message.h>
 #include <utils/stanza.h>
+#include <utils/logger.h>
 
 #define CARBONS_TIMEOUT               30000
 
@@ -58,9 +60,7 @@ bool MessageCarbons::initConnections(IPluginManager *APluginManager, int &AInitO
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 		if (FDiscovery)
-		{
 			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
@@ -125,25 +125,38 @@ bool MessageCarbons::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanz
 
 void MessageCarbons::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	if (AStanza.type() == "result")
+	if (FEnableRequests.contains(AStanza.id()))
 	{
-		if (FEnableRequests.contains(AStanza.id()))
+		if (AStanza.type() == "result")
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Message carbons enabled, id=%1").arg(AStanza.id()));
 			FEnabled[AStreamJid] = true;
 			emit enableChanged(AStreamJid,true);
 		}
-		else if(FDisableRequests.contains(AStanza.id()))
+		else
 		{
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to enable message carbons, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit errorReceived(AStreamJid,err);
+		}
+		FEnableRequests.removeAll(AStanza.id());
+	}
+	else if(FDisableRequests.contains(AStanza.id()))
+	{
+		if (AStanza.type() == "result")
+		{
+			LOG_STRM_INFO(AStreamJid,QString("Message carbons disabled, id=%1").arg(AStanza.id()));
 			FEnabled[AStreamJid] = false;
 			emit enableChanged(AStreamJid,false);
 		}
+		else
+		{
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to disable message carbons, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit errorReceived(AStreamJid,err);
+		}
+		FDisableRequests.removeAll(AStanza.id());
 	}
-	else
-	{
-		emit errorReceived(AStreamJid,XmppStanzaError(AStanza));
-	}
-	FEnableRequests.removeAll(AStanza.id());
-	FDisableRequests.removeAll(AStanza.id());
 }
 
 bool MessageCarbons::isSupported(const Jid &AStreamJid) const
@@ -168,10 +181,20 @@ bool MessageCarbons::setEnabled(const Jid &AStreamJid, bool AEnable)
 			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,CARBONS_TIMEOUT))
 			{
 				if (AEnable)
+				{
+					LOG_STRM_INFO(AStreamJid,QString("Enable message carbons request sent, id=%1").arg(request.id()));
 					FEnableRequests.append(request.id());
+				}
 				else
+				{
+					LOG_STRM_INFO(AStreamJid,QString("Disable message carbons request sent, id=%1").arg(request.id()));
 					FDisableRequests.append(request.id());
+				}
 				return true;
+			}
+			else
+			{
+				LOG_STRM_WARNING(AStreamJid,"Failed to send enable/disable message carbons request");
 			}
 			return false;
 		}
@@ -197,9 +220,7 @@ void MessageCarbons::onXmppStreamOpened(IXmppStream *AXmppStream)
 void MessageCarbons::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
-	{
 		FStanzaProcessor->removeStanzaHandle(FSHIForwards.take(AXmppStream->streamJid()));
-	}
 	FEnabled.remove(AXmppStream->streamJid());
 }
 

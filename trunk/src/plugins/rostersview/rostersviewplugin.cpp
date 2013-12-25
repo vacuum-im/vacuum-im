@@ -5,6 +5,29 @@
 #include <QScrollBar>
 #include <QApplication>
 #include <QTextDocument>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/mainwindowtabpages.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterproxyorders.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterlabelholderorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
@@ -66,30 +89,38 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
-		{
 			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex *, int)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
+	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
+	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
+	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
 	if (plugin)
+	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -134,6 +165,7 @@ bool RostersViewPlugin::initObjects()
 	}
 
 	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW,this);
+	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,FRostersView);
 
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYJID,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
@@ -282,7 +314,7 @@ QList<quint32> RostersViewPlugin::rosterLabels(int AOrder, const IRosterIndex *A
 
 		if (FRostersModel)
 		{
-			if (AIndex->parentIndex()==FRostersModel->rootIndex())
+			if (AIndex->parentIndex() == FRostersModel->rootIndex())
 				labels.append(AdvancedDelegateItem::DisplayId);
 			else if (FRostersModel->isGroupKind(AIndex->kind()))
 				labels.append(AdvancedDelegateItem::DisplayId);
@@ -301,7 +333,7 @@ AdvancedDelegateItem RostersViewPlugin::rosterLabel(int AOrder, quint32 ALabelId
 			displayLabel.d->id = AdvancedDelegateItem::DisplayId;
 			displayLabel.d->kind = AdvancedDelegateItem::Display;
 			displayLabel.d->data = AIndex->data(Qt::DisplayRole);
-			if (AIndex->parentIndex()==FRostersModel->rootIndex())
+			if (AIndex->parentIndex() == FRostersModel->rootIndex())
 				displayLabel.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
 			else if (FRostersModel->isGroupKind(AIndex->kind()))
 				displayLabel.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::DemiBold);
@@ -361,7 +393,10 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 void RostersViewPlugin::registerExpandableRosterIndexKind(int AKind, int AUniqueRole)
 {
 	if (!FExpandableKinds.contains(AKind))
+	{
+		LOG_DEBUG(QString("Expandable roster index registered, kind=%1, role=%2").arg(AKind).arg(AUniqueRole));
 		FExpandableKinds.insert(AKind,AUniqueRole);
+	}
 }
 
 QString RostersViewPlugin::rootExpandId(const QModelIndex &AIndex) const

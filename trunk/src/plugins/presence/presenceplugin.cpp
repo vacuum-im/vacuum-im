@@ -1,5 +1,7 @@
 #include "presenceplugin.h"
 
+#include <utils/logger.h>
+
 bool presenceItemLessThen(const IPresenceItem &AItem1, const IPresenceItem &AItem2)
 {
 	if (AItem1.show != AItem2.show)
@@ -57,7 +59,9 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+	}
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
@@ -67,8 +71,9 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 IPresence *PresencePlugin::getPresence(IXmppStream *AXmppStream)
 {
 	IPresence *presence = findPresence(AXmppStream->streamJid());
-	if (!presence)
+	if (!presence && FStanzaProcessor)
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),QString("Presence created"));
 		presence = new Presence(AXmppStream,FStanzaProcessor);
 		connect(presence->instance(),SIGNAL(destroyed(QObject *)),SLOT(onPresenceDestroyed(QObject *)));
 		FCleanupHandler.add(presence->instance());
@@ -90,6 +95,7 @@ void PresencePlugin::removePresence(IXmppStream *AXmppStream)
 	IPresence *presence = findPresence(AXmppStream->streamJid());
 	if (presence)
 	{
+		LOG_STRM_INFO(presence->streamJid(),QString("Presence removed and destroyed"));
 		disconnect(presence->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onPresenceDestroyed(QObject *)));
 		FPresences.removeAt(FPresences.indexOf(presence));
 		delete presence->instance();
@@ -127,6 +133,7 @@ void PresencePlugin::onPresenceOpened()
 	Presence *presence = qobject_cast<Presence *>(sender());
 	if (presence)
 	{
+		LOG_STRM_INFO(presence->streamJid(),QString("Presence opened"));
 		emit streamStateChanged(presence->streamJid(),true);
 		emit presenceOpened(presence);
 	}
@@ -176,7 +183,10 @@ void PresencePlugin::onPresenceAboutToClose(int AShow, const QString &AStatus)
 {
 	Presence *presence = qobject_cast<Presence *>(sender());
 	if (presence)
+	{
+		LOG_STRM_INFO(presence->streamJid(),QString("Presence about to close"));
 		emit presenceAboutToClose(presence,AShow,AStatus);
+	}
 }
 
 void PresencePlugin::onPresenceClosed()
@@ -184,6 +194,7 @@ void PresencePlugin::onPresenceClosed()
 	Presence *presence = qobject_cast<Presence *>(sender());
 	if (presence)
 	{
+		LOG_STRM_INFO(presence->streamJid(),QString("Presence closed"));
 		emit streamStateChanged(presence->streamJid(),false);
 		emit presenceClosed(presence);
 	}
@@ -192,7 +203,11 @@ void PresencePlugin::onPresenceClosed()
 void PresencePlugin::onPresenceDestroyed(QObject *AObject)
 {
 	IPresence *presence = qobject_cast<IPresence *>(AObject);
-	FPresences.removeAt(FPresences.indexOf(presence));
+	if (presence)
+	{
+		LOG_STRM_INFO(presence->streamJid(),QString("Presence destroyed"));
+		FPresences.removeAt(FPresences.indexOf(presence));
+	}
 }
 
 void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)

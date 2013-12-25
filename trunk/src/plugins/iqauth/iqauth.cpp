@@ -1,6 +1,15 @@
 #include "iqauth.h"
 
 #include <QCryptographicHash>
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppfeaturepluginorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/xmpperror.h>
+#include <utils/stanza.h>
+#include <utils/logger.h>
+#include <utils/jid.h>
 
 IqAuth::IqAuth(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
@@ -34,6 +43,7 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 					QByteArray shaDigest = QCryptographicHash::hash(shaData,QCryptographicHash::Sha1).toHex();
 					query.appendChild(auth.createElement("digest")).appendChild(auth.createTextNode(shaDigest.toLower().trimmed()));
 					FXmppStream->sendStanza(auth);
+					LOG_STRM_INFO(AXmppStream->streamJid(),"Username and encrypted password sent");
 				}
 				else if (!reqElem.firstChildElement("password").isNull())
 				{
@@ -41,16 +51,20 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 					{
 						query.appendChild(auth.createElement("password")).appendChild(auth.createTextNode(FXmppStream->getSessionPassword()));
 						FXmppStream->sendStanza(auth);
+						LOG_STRM_INFO(AXmppStream->streamJid(),"Username and plain text password sent");
 					}
 					else
 					{
+						LOG_STRM_ERROR(AXmppStream->streamJid(),"Failed to send username and plain text password: Connection not encrypted");
 						emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
 					}
 				}
 			}
-			else if (AStanza.type() == "error")
+			else
 			{
-				emit error(XmppStanzaError(AStanza));
+				XmppStanzaError err(AStanza);
+				LOG_STRM_ERROR(AXmppStream->streamJid(),QString("Failed to receive authentication initialization: %1").arg(err.condition()));
+				emit error(err);
 			}
 			return true;
 		}
@@ -59,11 +73,14 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			if (AStanza.type() == "result")
 			{
+				LOG_STRM_INFO(AXmppStream->streamJid(),"Username and password accepted");
 				deleteLater();
 				emit finished(false);
 			}
-			else if (AStanza.type() == "error")
+			else
 			{
+				XmppStanzaError err(AStanza);
+				LOG_STRM_WARNING(AXmppStream->streamJid(),QString("Username and password rejected: %1").arg(err.condition()));
 				emit error(XmppStanzaError(AStanza));
 			}
 			return true;
@@ -74,9 +91,7 @@ bool IqAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 
 bool IqAuth::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -92,7 +107,7 @@ IXmppStream *IqAuth::xmppStream() const
 
 bool IqAuth::start(const QDomElement &AElem)
 {
-	if (AElem.tagName()=="auth")
+	if (AElem.tagName() == "auth")
 	{
 		if (!xmppStream()->isEncryptionRequired() || xmppStream()->connection()->isEncrypted())
 		{
@@ -101,10 +116,12 @@ bool IqAuth::start(const QDomElement &AElem)
 			request.addElement("query",NS_JABBER_IQ_AUTH).appendChild(request.createElement("username")).appendChild(request.createTextNode(FXmppStream->streamJid().node()));
 			FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			FXmppStream->sendStanza(request);
+			LOG_STRM_INFO(FXmppStream->streamJid(),"Authentication initialization request sent");
 			return true;
 		}
 		else
 		{
+			LOG_STRM_WARNING(FXmppStream->streamJid(),"Failed to send authentication initialization request: Connection not encrypted");
 			emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
 		}
 	}
@@ -133,11 +150,14 @@ void IqAuthPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
-bool IqAuthPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool IqAuthPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
+	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+	}
 
 	return FXmppStreams!=NULL;
 }
@@ -161,6 +181,7 @@ IXmppFeature *IqAuthPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStrea
 {
 	if (AFeatureNS == NS_FEATURE_IQAUTH)
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"Iq-Auth XMPP stream feature created");
 		IXmppFeature *feature = new IqAuth(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -173,7 +194,10 @@ void IqAuthPlugin::onFeatureDestroyed()
 {
 	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
 	if (feature)
+	{
+		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"Iq-Auth XMPP stream feature destroyed");
 		emit featureDestroyed(feature);
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_iqauth, IqAuthPlugin)

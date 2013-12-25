@@ -221,7 +221,6 @@ void IconStorage::updateObject(QObject *AObject)
 			delete params->animation->reader;
 			params->animation->reader = NULL;
 			params->animation->frameIndex = 0;
-			
 		}
 	}
 

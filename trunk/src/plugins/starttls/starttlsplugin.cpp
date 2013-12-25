@@ -1,5 +1,12 @@
 #include "starttlsplugin.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppfeaturepluginorders.h>
+#include <utils/xmpperror.h>
+#include <utils/logger.h>
+
 StartTLSPlugin::StartTLSPlugin()
 {
 	FXmppStreams = NULL;
@@ -21,11 +28,15 @@ void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(DEFAULTCONNECTION_UUID);
 }
 
-bool StartTLSPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool StartTLSPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
+	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+	}
 
 	return FXmppStreams!=NULL;
 }
@@ -43,10 +54,17 @@ bool StartTLSPlugin::initObjects()
 	return true;
 }
 
+QList<QString> StartTLSPlugin::xmppFeatures() const
+{
+	static const QList<QString> features = QList<QString>() << NS_FEATURE_STARTTLS;
+	return features;
+}
+
 IXmppFeature *StartTLSPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream)
 {
 	if (AFeatureNS == NS_FEATURE_STARTTLS)
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"StartTLS XMPP stream feature created");
 		IXmppFeature *feature = new StartTLS(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -59,7 +77,10 @@ void StartTLSPlugin::onFeatureDestroyed()
 {
 	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
 	if (feature)
+	{
+		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"StartTLS XMPP stream feature destroyed");
 		emit featureDestroyed(feature);
+	}
 }
 
 Q_EXPORT_PLUGIN2(plg_starttls, StartTLSPlugin)

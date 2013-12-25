@@ -1,5 +1,7 @@
 #include "usersproxymodel.h"
 
+#include <definitions/multiuserdataroles.h>
+
 UsersProxyModel::UsersProxyModel(IMultiUserChat *AMultiChat, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 	FMultiChat = AMultiChat;

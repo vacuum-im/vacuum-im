@@ -2,9 +2,22 @@
 
 #include <QKeyEvent>
 #include <QCoreApplication>
+#include <definitions/actiongroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/optionvalues.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/messagechatwindowwidgets.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 ChatWindow::ChatWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, false);
 	ui.spwMessageBox->setSpacing(3);
@@ -266,7 +279,5 @@ void ChatWindow::closeEvent(QCloseEvent *AEvent)
 void ChatWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
-	{
 		closeTabPage();
-	}
 }

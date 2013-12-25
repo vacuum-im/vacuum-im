@@ -7,6 +7,26 @@
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/soundfiles.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosternotifyorders.h>
+#include <definitions/stanzahandlerorders.h>
+#include <definitions/rosterdragdropmimetypes.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define ADR_STREAM_JID         Action::DR_StreamJid
 #define ADR_CONTACT_JID        Action::DR_Parametr1
@@ -58,6 +78,12 @@ bool RosterItemExchange::initConnections(IPluginManager *APluginManager, int &AI
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
 	}
 
+	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+	}
+
 	plugin = APluginManager->pluginInterface("IRosterChanger").value(0,NULL);
 	if (plugin)
 	{
@@ -74,12 +100,6 @@ bool RosterItemExchange::initConnections(IPluginManager *APluginManager, int &AI
 	if (plugin)
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -188,6 +208,8 @@ bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, S
 		{
 			AAccept = true;
 
+			LOG_STRM_INFO(AStreamJid,QString("Roster exchange request received, from=%1, type=%2, id=%3").arg(AStanza.from(),AStanza.tagName(),AStanza.id()));
+
 			IRosterExchangeRequest request;
 			request.streamJid = AStreamJid;
 			request.contactJid = AStanza.from();
@@ -221,19 +243,16 @@ bool RosterItemExchange::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, S
 				else
 				{
 					isItemsValid = false;
+					LOG_STRM_WARNING(AStreamJid,QString("Failed to append roster exchange item, jid=%1, action=%2: Invalid item").arg(item.itemJid.bare(),item.action));
 				}
 
 				itemElem = itemElem.nextSiblingElement("item");
 			}
 
 			if (isItemsValid && !request.items.isEmpty())
-			{
 				processRequest(request);
-			}
-			else if (!request.id.isEmpty())
-			{
+			else
 				replyRequestError(request,XmppStanzaError::EC_BAD_REQUEST);
-			}
 
 			return true;
 		}
@@ -248,9 +267,16 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 	{
 		IRosterExchangeRequest request = FSentRequests.take(AStanza.id());
 		if (AStanza.type()=="result")
+		{
+			LOG_STRM_INFO(AStreamJid,QString("Roster exchange request accepted by=%1, id=%2").arg(AStanza.from(),AStanza.id()));
 			emit exchangeRequestApproved(request);
+		}
 		else
-			emit exchangeRequestFailed(request,XmppStanzaError(AStanza));
+		{
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Roster exchange request rejected by=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),err.condition()));
+			emit exchangeRequestFailed(request,err);
+		}
 	}
 }
 
@@ -271,15 +297,13 @@ bool RosterItemExchange::messagaeViewDragEnter(IMessageViewWidget *AWidget, cons
 
 bool RosterItemExchange::messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
 {
-	Q_UNUSED(AWidget);
-	Q_UNUSED(AEvent);
+	Q_UNUSED(AWidget); Q_UNUSED(AEvent);
 	return true;
 }
 
 void RosterItemExchange::messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
 {
-	Q_UNUSED(AWidget);
-	Q_UNUSED(AEvent);
+	Q_UNUSED(AWidget); Q_UNUSED(AEvent);
 }
 
 bool RosterItemExchange::messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
@@ -373,6 +397,7 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 			else
 			{
 				isItemsValid = false;
+				LOG_STRM_ERROR(ARequest.streamJid,QString("Failed to send roster exchange item, jid=%1, action=%2: Invalid item").arg(it->itemJid.bare(),it->action));
 			}
 		}
 
@@ -383,14 +408,20 @@ QString RosterItemExchange::sendExchangeRequest(const IRosterExchangeRequest &AR
 
 			if (AIqQuery && FStanzaProcessor->sendStanzaRequest(this,ARequest.streamJid,request,0))
 			{
+				LOG_STRM_INFO(ARequest.streamJid,QString("Roster exchange request sent (iq), to=%1, count=%2, id=%3").arg(ARequest.contactJid.full()).arg(ARequest.items.count()).arg(request.id()));
 				FSentRequests.insert(sentRequest.id,sentRequest);
 				emit exchangeRequestSent(sentRequest);
 				return request.id();
 			}
 			else if (!AIqQuery && FStanzaProcessor->sendStanzaOut(ARequest.streamJid,request))
 			{
+				LOG_STRM_INFO(ARequest.streamJid,QString("Roster exchange request sent (message), to=%1, count=%2, id=%3").arg(ARequest.contactJid.full()).arg(ARequest.items.count()).arg(request.id()));
 				emit exchangeRequestSent(sentRequest);
 				return request.id();
+			}
+			else
+			{
+				LOG_STRM_WARNING(ARequest.streamJid,QString("Failed to send roster exchange request, to=%1").arg(ARequest.contactJid.full()));
 			}
 		}
 	}
@@ -533,7 +564,7 @@ void RosterItemExchange::processRequest(const IRosterExchangeRequest &ARequest)
 		bool isForbidden = false;
 		QList<IRosterExchangeItem> approveList;
 		bool autoApprove = (isGateway || isDirectory) && Options::node(OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED).value().toBool();
-		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); ++it)
+		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); !isForbidden && it!=ARequest.items.constEnd(); ++it)
 		{
 			if (autoApprove && !isDirectory && isGateway && it->itemJid.pDomain()!=ARequest.contactJid.pDomain())
 				autoApprove = false;
@@ -644,6 +675,8 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(ARequest.streamJid) : NULL;
 	if (roster && roster->isOpen())
 	{
+		LOG_STRM_INFO(ARequest.streamJid,QString("Applying roster exchange request from=%1, id=%2").arg(ARequest.contactJid.full(),ARequest.id));
+
 		bool applied = false;
 		for(QList<IRosterExchangeItem>::const_iterator it=ARequest.items.constBegin(); it!=ARequest.items.constEnd(); ++it)
 		{
@@ -697,6 +730,7 @@ bool RosterItemExchange::applyRequest(const IRosterExchangeRequest &ARequest, bo
 
 void RosterItemExchange::replyRequestResult(const IRosterExchangeRequest &ARequest)
 {
+	LOG_STRM_INFO(ARequest.streamJid,QString("Roster exchange request processed, from=%1, id=%2").arg(ARequest.contactJid.full(),ARequest.id));
 	if (FStanzaProcessor && !ARequest.id.isEmpty())
 	{
 		Stanza result("iq");
@@ -708,6 +742,7 @@ void RosterItemExchange::replyRequestResult(const IRosterExchangeRequest &AReque
 
 void RosterItemExchange::replyRequestError(const IRosterExchangeRequest &ARequest, const XmppStanzaError &AError)
 {
+	LOG_STRM_WARNING(ARequest.streamJid,QString("Failed to process roster exchange request from=%1, id=%2: %3").arg(ARequest.contactJid.full(),ARequest.id,AError.errorMessage()));
 	if (FStanzaProcessor && !ARequest.id.isEmpty())
 	{
 		Stanza error("iq");
@@ -809,9 +844,7 @@ void RosterItemExchange::onExchangeApproveDialogRejected()
 {
 	ExchangeApproveDialog *dialog = qobject_cast<ExchangeApproveDialog *>(sender());
 	if (dialog)
-	{
 		replyRequestError(dialog->receivedRequest(),XmppStanzaError::EC_NOT_ALLOWED);
-	}
 }
 
 void RosterItemExchange::onExchangeApproveDialogDestroyed()

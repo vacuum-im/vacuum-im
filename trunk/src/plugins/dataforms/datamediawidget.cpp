@@ -5,6 +5,7 @@
 #include <QPixmap>
 #include <QImageReader>
 #include <QTextDocument>
+#include <definitions/internalerrors.h>
 
 DataMediaWidget::DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedia, QWidget *AParent) : QLabel(AParent)
 {
@@ -18,8 +19,9 @@ DataMediaWidget::DataMediaWidget(IDataForms *ADataForms, const IDataMedia &AMedi
 	connect(FDataForms->instance(),SIGNAL(urlLoaded(const QUrl &, const QByteArray &)),SLOT(onUrlLoaded(const QUrl &, const QByteArray &)));
 	connect(FDataForms->instance(),SIGNAL(urlLoadFailed(const QUrl &, const XmppError &)),SLOT(onUrlLoadFailed(const QUrl &, const XmppError &)));
 
-	uriIndex = 0;
+	FUriIndex = 0;
 	FLastError = XmppError(IERR_DATAFORMS_MEDIA_INVALID_TYPE);
+
 	loadUri();
 }
 
@@ -35,14 +37,14 @@ IDataMedia DataMediaWidget::media() const
 
 IDataMediaURI DataMediaWidget::mediaUri() const
 {
-	return FMedia.uris.value(uriIndex);
+	return FMedia.uris.value(FUriIndex);
 }
 
 void DataMediaWidget::loadUri()
 {
-	if (uriIndex < FMedia.uris.count())
+	if (FUriIndex < FMedia.uris.count())
 	{
-		const IDataMediaURI &uri = FMedia.uris.at(uriIndex);
+		const IDataMediaURI &uri = FMedia.uris.at(FUriIndex);
 		if (FDataForms->isSupportedUri(uri))
 		{
 			setToolTip(uri.url.toString());
@@ -51,7 +53,7 @@ void DataMediaWidget::loadUri()
 		}
 		else
 		{
-			uriIndex++;
+			FUriIndex++;
 			loadUri();
 		}
 	}
@@ -83,7 +85,9 @@ bool DataMediaWidget::updateWidget(const IDataMediaURI &AUri, const QByteArray &
 				movie->start();
 			}
 			else
+			{
 				delete movie;
+			}
 		}
 		else
 		{
@@ -112,12 +116,12 @@ bool DataMediaWidget::updateWidget(const IDataMediaURI &AUri, const QByteArray &
 
 void DataMediaWidget::onUrlLoaded(const QUrl &AUrl, const QByteArray &AData)
 {
-	if (uriIndex<FMedia.uris.count() && FMedia.uris.at(uriIndex).url == AUrl)
+	if (FUriIndex<FMedia.uris.count() && FMedia.uris.at(FUriIndex).url == AUrl)
 	{
-		const IDataMediaURI &uri = FMedia.uris.at(uriIndex);
+		const IDataMediaURI &uri = FMedia.uris.at(FUriIndex);
 		if (!updateWidget(uri, AData))
 		{
-			uriIndex++;
+			FUriIndex++;
 			FLastError = XmppError(IERR_DATAFORMS_MEDIA_INVALID_FORMAT);
 			loadUri();
 		}
@@ -126,9 +130,9 @@ void DataMediaWidget::onUrlLoaded(const QUrl &AUrl, const QByteArray &AData)
 
 void DataMediaWidget::onUrlLoadFailed(const QUrl &AUrl, const XmppError &AError)
 {
-	if (uriIndex<FMedia.uris.count() && FMedia.uris.at(uriIndex).url == AUrl)
+	if (FUriIndex<FMedia.uris.count() && FMedia.uris.at(FUriIndex).url == AUrl)
 	{
-		uriIndex++;
+		FUriIndex++;
 		FLastError = AError;
 		loadUri();
 	}

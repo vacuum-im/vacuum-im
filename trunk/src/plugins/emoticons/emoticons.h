@@ -3,23 +3,11 @@
 
 #include <QHash>
 #include <QStringList>
-#include <definitions/menuicons.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/messagewriterorders.h>
-#include <definitions/messageeditcontentshandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iemoticons.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/options.h>
-#include <utils/menu.h>
 #include "selecticonmenu.h"
 #include "emoticonsoptions.h"
 

@@ -3,20 +3,17 @@
 
 #include <QList>
 #include <QDialog>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ibookmarks.h>
-#include <utils/iconstorage.h>
 #include "ui_editbookmarksdialog.h"
 
 class EditBookmarksDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
 	EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStreamJid, const QList<IBookmark> &AList, QWidget *AParent = NULL);
 	~EditBookmarksDialog();
-	const Jid  &streamJid() const { return FStreamJid; }
+	Jid streamJid() const;
 signals:
 	void dialogDestroyed();
 protected:

@@ -2,9 +2,23 @@
 
 #include <QLineEdit>
 #include <QHeaderView>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/messagenormalwindowwidgets.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/xmpperror.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	ui.spwMessageBox->setSpacing(3);
@@ -282,13 +296,9 @@ void NormalWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, con
 bool NormalWindow::event(QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::WindowActivate)
-	{
 		emit tabPageActivated();
-	}
 	else if (AEvent->type() == QEvent::WindowDeactivate)
-	{
 		emit tabPageDeactivated();
-	}
 	return QMainWindow::event(AEvent);
 }
 
@@ -340,7 +350,5 @@ void NormalWindow::onReceiverslAddressSelectionChanged()
 void NormalWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
-	{
 		closeTabPage();
-	}
 }

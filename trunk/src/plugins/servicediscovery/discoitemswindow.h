@@ -5,33 +5,24 @@
 #include <QHeaderView>
 #include <QMainWindow>
 #include <QSortFilterProxyModel>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/discoitemdataroles.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/ivcard.h>
-#include <utils/action.h>
-#include <utils/options.h>
-#include <utils/widgetmanager.h>
 #include "discoitemsmodel.h"
 #include "ui_discoitemswindow.h"
 
 class SortFilterProxyModel :
-			public QSortFilterProxyModel
+	public QSortFilterProxyModel
 {
 public:
-	SortFilterProxyModel(QObject *AParent):QSortFilterProxyModel(AParent) {};
+	SortFilterProxyModel(QObject *AParent);
 	virtual bool hasChildren(const QModelIndex &AParent) const;
 	virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 };
 
 class DiscoItemsWindow :
-			public QMainWindow,
-			public IDiscoItemsWindow
+	public QMainWindow,
+	public IDiscoItemsWindow
 {
 	Q_OBJECT;
 	Q_INTERFACES(IDiscoItemsWindow);
@@ -39,9 +30,9 @@ public:
 	DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QWidget *AParent = NULL);
 	~DiscoItemsWindow();
 	virtual QWidget *instance() { return this; }
-	virtual Jid streamJid() const { return FStreamJid; }
-	virtual ToolBarChanger *toolBarChanger() const { return FToolBarChanger; }
-	virtual ToolBarChanger *actionsBarChanger() const { return FActionsBarChanger; }
+	virtual Jid streamJid() const;
+	virtual ToolBarChanger *toolBarChanger() const;
+	virtual ToolBarChanger *actionsBarChanger() const;
 	virtual void discover(const Jid &AContactJid, const QString &ANode);
 signals:
 	void discoverChanged(const Jid AContactJid, const QString &ANode);
@@ -49,7 +40,7 @@ signals:
 	void indexContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 	void windowDestroyed(IDiscoItemsWindow *AWindow);
 public:
-	virtual QMenu *createPopupMenu() { return NULL; }
+	QMenu *createPopupMenu();
 protected:
 	void initialize();
 	void createToolBarActions();

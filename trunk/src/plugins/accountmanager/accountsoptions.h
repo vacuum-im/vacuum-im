@@ -3,18 +3,16 @@
 
 #include <QMap>
 #include <QWidget>
-#include <definitions/optionvalues.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "ui_accountsoptions.h"
 #include "accountmanager.h"
 
 class AccountManager;
 
 class AccountsOptions :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

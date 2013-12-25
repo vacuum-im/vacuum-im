@@ -1,15 +1,11 @@
 #ifndef JOINMULTICHATDIALOG_H
 #define JOINMULTICHATDIALOG_H
 
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ixmppstreams.h>
-#include <utils/options.h>
 #include "ui_joinmultichatdialog.h"
 
-struct RoomParams
-{
+struct RoomParams {
 	RoomParams() {
 		enters = 0;
 	};
@@ -19,12 +15,11 @@ struct RoomParams
 };
 
 class JoinMultiChatDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
-	JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid,
-	                    const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
+	JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent = NULL);
 	~JoinMultiChatDialog();
 protected:
 	void initialize();

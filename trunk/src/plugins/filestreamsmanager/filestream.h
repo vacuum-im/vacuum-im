@@ -2,11 +2,8 @@
 #define FILESTREAM_H
 
 #include <QFile>
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
-#include <utils/jid.h>
 #include "transferthread.h"
 
 #define SPEED_POINTS      10

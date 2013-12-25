@@ -1,6 +1,10 @@
 #include "statewidget.h"
 
 #include <QDateTime>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <utils/iconstorage.h>
+#include <utils/menu.h>
 
 #define ADR_PERMIT_STATUS     Action::DR_Parametr1
 
@@ -36,9 +40,9 @@ StateWidget::StateWidget(IChatStates *AChatStates, IMessageChatWindow *AWindow, 
 	setToolTip(tr("User chat status"));
 
 	connect(FChatStates->instance(),SIGNAL(permitStatusChanged(const Jid &, int)),
-	        SLOT(onPermitStatusChanged(const Jid &, int)));
+		SLOT(onPermitStatusChanged(const Jid &, int)));
 	connect(FChatStates->instance(),SIGNAL(userChatStateChanged(const Jid &, const Jid &, int)),
-	        SLOT(onUserChatStateChanged(const Jid &, const Jid &, int)));
+		SLOT(onUserChatStateChanged(const Jid &, const Jid &, int)));
 
 	onPermitStatusChanged(FWindow->contactJid(),FChatStates->permitStatus(FWindow->contactJid()));
 	onUserChatStateChanged(FWindow->streamJid(),FWindow->contactJid(),FChatStates->userChatState(FWindow->streamJid(),FWindow->contactJid()));
