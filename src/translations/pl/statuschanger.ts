@@ -208,5 +208,9 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
         <source>On loss of connection to the server</source>
         <translation>W momencie utraty połączenia z serwerem</translation>
     </message>
+    <message>
+        <source>Left the Vacuum-IM</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

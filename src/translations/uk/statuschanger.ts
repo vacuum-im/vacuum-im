@@ -208,5 +208,9 @@ You can set status class for additional statuses defined by you.</source>
         <source>On loss of connection to the server</source>
         <translation>При обриві з’єднання з сервером</translation>
     </message>
+    <message>
+        <source>Left the Vacuum-IM</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
