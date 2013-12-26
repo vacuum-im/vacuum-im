@@ -217,10 +217,6 @@ bool AdiumMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptio
 	{
 		REPORT_ERROR("Failed to change adium style options: Invalid style view");
 	}
-	else
-	{
-		REPORT_ERROR("Failed to change adium style options: Invalid style id");
-	}
 	return false;
 }
 

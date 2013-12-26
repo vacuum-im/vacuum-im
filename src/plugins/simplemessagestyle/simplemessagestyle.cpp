@@ -179,10 +179,6 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 	{
 		REPORT_ERROR("Failed to change simple style options: Invalid style view");
 	}
-	else
-	{
-		REPORT_ERROR("Failed to change simple style options: Invalid style id");
-	}
 	return false;
 }
 
