@@ -188,29 +188,29 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 			return false;
 		}
 
-		Stanza pres("presence");
+		Stanza stanza("presence");
 		if (AShow == IPresence::Invisible)
 		{
-			pres.setType("invisible");
+			stanza.setType("invisible");
 		}
 		else if (AShow == IPresence::Offline)
 		{
-			pres.setType("unavailable");
+			stanza.setType("unavailable");
 		}
 		else
 		{
 			if (!show.isEmpty())
-				pres.addElement("show").appendChild(pres.createTextNode(show));
-			pres.addElement("priority").appendChild(pres.createTextNode(QString::number(APriority)));
+				stanza.addElement("show").appendChild(stanza.createTextNode(show));
+			stanza.addElement("priority").appendChild(stanza.createTextNode(QString::number(APriority)));
 		}
 
 		if (!AStatus.isEmpty())
-			pres.addElement("status").appendChild(pres.createTextNode(AStatus));
+			stanza.addElement("status").appendChild(stanza.createTextNode(AStatus));
 
 		if (FOpened && AShow==IPresence::Offline)
 			emit aboutToClose(AShow, AStatus);
 
-		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), pres))
+		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),stanza))
 		{
 			FShow = AShow;
 			FStatus = AStatus;
@@ -250,7 +250,6 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 
 		if (FOpened)
 		{
-			emit aboutToClose(AShow,AStatus);
 			FOpened = false;
 			clearItems();
 			emit closed();
@@ -374,5 +373,5 @@ void Presence::onStreamError(const XmppError &AError)
 void Presence::onStreamClosed()
 {
 	if (isOpen())
-		setPresence(IPresence::Offline,tr("XMPP stream closed unexpectedly"),0);
+		setPresence(IPresence::Error,tr("XMPP stream closed unexpectedly"),0);
 }
