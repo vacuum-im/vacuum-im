@@ -607,7 +607,7 @@ void PluginManager::finishQuit()
 
 void PluginManager::closeAndQuit()
 {
-	if (!FQuitReady)
+	if (!isShutingDown())
 	{
 		FShutdownKind = SK_QUIT;
 		startClose();
@@ -896,7 +896,7 @@ void PluginManager::onApplicationAboutToQuit()
 void PluginManager::onApplicationCommitDataRequested(QSessionManager &AManager)
 {
 	Q_UNUSED(AManager);
-	LOG_INFO("Application commit session data requested");
+	LOG_INFO("Application session about to close");
 	closeAndQuit();
 }
 
