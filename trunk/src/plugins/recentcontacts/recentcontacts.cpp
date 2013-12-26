@@ -795,11 +795,14 @@ void RecentContacts::updateItemProxy(const IRecentItem &AItem)
 
 void RecentContacts::updateItemProperties(const IRecentItem &AItem)
 {
-	IRosterIndex *index = FVisibleItems.value(AItem);
-	if (index)
+	if (isValidItem(AItem) && isReady(AItem.streamJid))
 	{
-		IRosterIndex *proxy = FIndexToProxy.value(index);
-		setItemProperty(AItem, REIP_NAME, proxy!=NULL ? proxy->data(RDR_NAME).toString() : index->data(RDR_NAME).toString());
+		IRosterIndex *index = FVisibleItems.value(AItem);
+		if (index)
+		{
+			IRosterIndex *proxy = FIndexToProxy.value(index);
+			setItemProperty(AItem, REIP_NAME, proxy!=NULL ? proxy->data(RDR_NAME).toString() : index->data(RDR_NAME).toString());
+		}
 	}
 }
 
