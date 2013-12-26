@@ -78,7 +78,7 @@ AdiumMessageStyle::AdiumMessageStyle(const QString &AStylePath, QNetworkAccessMa
 	FScrollTimer.setInterval(SCROLL_TIMEOUT);
 	connect(&FScrollTimer,SIGNAL(timeout()),SLOT(onScrollAfterResize()));
 
-	FPendingTimer.setSingleShot(true);
+	FPendingTimer.setSingleShot(false);
 	FPendingTimer.setInterval(EVALUTE_TIMEOUT);
 	connect(&FPendingTimer,SIGNAL(timeout()),SLOT(onEvaluateNextPendingScript()));
 
@@ -243,9 +243,6 @@ bool AdiumMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, co
 
 		escapeStringForScript(html);
 		QString script = scriptForAppendContent(sameSender,AOptions.noScroll).arg(html);
-
-		if (wstatus.pending.isEmpty())
-			FPendingTimer.start();
 		wstatus.pending.append(script);
 
 		emit contentAppended(AWidget,AHtml,AOptions);
@@ -774,20 +771,16 @@ void AdiumMessageStyle::onScrollAfterResize()
 
 void AdiumMessageStyle::onEvaluateNextPendingScript()
 {
-	bool restart = false;
 	for(QMap<QWidget *, WidgetStatus>::iterator it=FWidgetStatus.begin(); it!=FWidgetStatus.end(); ++it)
 	{
-		StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
-		if (view && it->wait==0 && !it->pending.isEmpty())
+		if (it->wait==0 && !it->pending.isEmpty())
 		{
-			QString script = it->pending.takeFirst();
-			restart = restart || !it->pending.isEmpty();
-			view->page()->mainFrame()->evaluateJavaScript(script);
+			StyleViewer *view = qobject_cast<StyleViewer *>(it.key());
+			if (view)
+				view->page()->mainFrame()->evaluateJavaScript(it->pending.takeFirst());
+			else
+				REPORT_ERROR("Failed to append pending adium style content: Invalid view");
 		}
-	}
-	if (restart)
-	{
-		FPendingTimer.start();
 	}
 }
 
@@ -817,8 +810,7 @@ void AdiumMessageStyle::onStyleWidgetLoadFinished(bool AOk)
 		{
 			if (AOk)
 			{
-				if (!wstatus.pending.isEmpty())
-					FPendingTimer.start();
+				FPendingTimer.start();
 				view->page()->mainFrame()->evaluateJavaScript("alignChat(false);");
 			}
 			else
