@@ -962,7 +962,7 @@ void MultiUserChatPlugin::updateRecentItemProxy(IRosterIndex *AIndex)
 
 void MultiUserChatPlugin::updateRecentItemProperties(IRosterIndex *AIndex)
 {
-	if (FRecentContacts)
+	if (FRecentContacts && FRecentContacts->isReady(AIndex->data(RDR_STREAM_JID).toString()))
 	{
 		IRecentItem item = recentItemForIndex(AIndex);
 		FRecentContacts->setItemProperty(item,REIP_CONFERENCE_NICK,AIndex->data(RDR_MUC_NICK).toString());
