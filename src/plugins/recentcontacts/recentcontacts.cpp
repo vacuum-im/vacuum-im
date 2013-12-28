@@ -575,7 +575,7 @@ QList<IRecentItem> RecentContacts::visibleItems() const
 
 IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 {
-	static const IRecentItem nullItem;
+	static const IRecentItem nullItem = IRecentItem();
 	if (AIndex->kind() == RIK_RECENT_ITEM)
 	{
 		IRecentItem item;
