@@ -113,7 +113,6 @@ protected slots:
 	void onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
 	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
-	void onPresenceAboutToClose(int AShow, const QString &AStatus);
 	void onStreamClosed();
 	void onStreamJidChanged(const Jid &ABefore);
 private:

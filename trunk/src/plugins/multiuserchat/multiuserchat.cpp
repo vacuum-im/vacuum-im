@@ -806,7 +806,6 @@ void MultiUserChat::initialize()
 			if (FPresence)
 			{
 				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
-				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),SLOT(onPresenceAboutToClose(int , const QString &)));
 			}
 		}
 	}
@@ -1159,12 +1158,6 @@ void MultiUserChat::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 			emit roomNameChanged(FRoomName);
 		}
 	}
-}
-
-void MultiUserChat::onPresenceAboutToClose(int AShow, const QString &AStatus)
-{
-	if (isConnected())
-		sendPresence(AShow,AStatus);
 }
 
 void MultiUserChat::onStreamClosed()
