@@ -1,6 +1,7 @@
 #include "systemmanager.h"
 
 #include <QDir>
+#include <QSettings>
 #include <QSysInfo>
 #include <QProcess>
 #include <QFileInfo>
@@ -116,50 +117,62 @@ QString SystemManager::osVersion()
 			break;
 		}
 #elif defined(Q_WS_X11)
-		QStringList path;
-		foreach(const QString &env, QProcess::systemEnvironment())
-			if (env.startsWith("PATH="))
-				path = env.split('=').value(1).split(':');
-
-		QString found;
-		foreach(const QString &dirname, path)
+		if (QFile::exists(QLatin1String("/etc/os-release")))
 		{
-			QDir dir(dirname);
-			QFileInfo cand(dir.filePath("lsb_release"));
-			if (cand.isExecutable())
-			{
-				found = cand.absoluteFilePath();
-				break;
-			}
+			QSettings s(QLatin1String("/etc/os-release"), QSettings::IniFormat);
+			s.setIniCodec("UTF-8");
+			QString pretty = s.value(QLatin1String("PRETTY_NAME")).toString();
+			QString name = s.value(QLatin1String("NAME")).toString();
+			QString version = s.value(QLatin1String("VERSION")).toString();
+			osver = !pretty.isEmpty () ? pretty : QString(name + " " + version);
 		}
-
-		if (!found.isEmpty())
+		else
 		{
-			QProcess process;
-			process.start(found, QStringList()<<"--description"<<"--short", QIODevice::ReadOnly);
-			if (process.waitForStarted())
-			{
-				QTextStream stream(&process);
-				while (process.waitForReadyRead())
-					osver += stream.readAll();
-				process.close();
-				osver = osver.trimmed();
-			}
-		}
+			QStringList path;
+			foreach(const QString &env, QProcess::systemEnvironment())
+				if (env.startsWith("PATH="))
+					path = env.split('=').value(1).split(':');
 
-		if (osver.isEmpty())
-		{
-			utsname buf;
-			if (uname(&buf) != -1)
+			QString found;
+			foreach(const QString &dirname, path)
 			{
-				osver.append(buf.release).append(QLatin1Char(' '));
-				osver.append(buf.sysname).append(QLatin1Char(' '));
-				osver.append(buf.machine).append(QLatin1Char(' '));
-				osver.append(QLatin1String(" (")).append(buf.machine).append(QLatin1Char(')'));
+				QDir dir(dirname);
+				QFileInfo cand(dir.filePath("lsb_release"));
+				if (cand.isExecutable())
+				{
+					found = cand.absoluteFilePath();
+					break;
+				}
 			}
-			else
+
+			if (!found.isEmpty())
 			{
-				osver = QLatin1String("Linux/Unix (unknown)");
+				QProcess process;
+				process.start(found, QStringList()<<"--description"<<"--short", QIODevice::ReadOnly);
+				if (process.waitForStarted())
+				{
+					QTextStream stream(&process);
+					while (process.waitForReadyRead())
+						osver += stream.readAll();
+					process.close();
+					osver = osver.trimmed();
+				}
+			}
+
+			if (osver.isEmpty())
+			{
+				utsname buf;
+				if (uname(&buf) != -1)
+				{
+					osver.append(buf.release).append(QLatin1Char(' '));
+					osver.append(buf.sysname).append(QLatin1Char(' '));
+					osver.append(buf.machine).append(QLatin1Char(' '));
+					osver.append(QLatin1String(" (")).append(buf.machine).append(QLatin1Char(')'));
+				}
+				else
+				{
+					osver = QLatin1String("Linux/Unix (unknown)");
+				}
 			}
 		}
 #elif defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
