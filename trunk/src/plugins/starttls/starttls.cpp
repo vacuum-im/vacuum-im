@@ -8,7 +8,6 @@
 
 StartTLS::StartTLS(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
-	FConnection = NULL;
 	FXmppStream = AXmppStream;
 }
 
@@ -25,9 +24,16 @@ bool StartTLS::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 		FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		if (AStanza.tagName() == "proceed")
 		{
-			LOG_STRM_INFO(FXmppStream->streamJid(),"Starting StartTLS encryption");
-			connect(FConnection->instance(),SIGNAL(encrypted()),SLOT(onConnectionEncrypted()));
-			FConnection->startClientEncryption();
+			if (FXmppStream->connection()->startEncryption())
+			{
+				LOG_STRM_INFO(FXmppStream->streamJid(),"Starting StartTLS encryption");
+				connect(FXmppStream->connection()->instance(),SIGNAL(encrypted()),SLOT(onConnectionEncrypted()));
+			}
+			else
+			{
+				LOG_STRM_ERROR(FXmppStream->streamJid(),"Failed to negotiate StartTLS encryption: Handshake not started");
+				emit error(XmppError(IERR_STARTTLS_NOT_STARTED));
+			}
 		}
 		else if (AStanza.tagName() == "failure")
 		{
@@ -64,8 +70,7 @@ bool StartTLS::start(const QDomElement &AElem)
 {
 	if (AElem.tagName() == "starttls")
 	{
-		FConnection = qobject_cast<IDefaultConnection *>(FXmppStream->connection()->instance());
-		if (FConnection)
+		if (FXmppStream->connection()->isEncryptionSupported() && !FXmppStream->connection()->isEncrypted())
 		{
 			Stanza request("starttls");
 			request.setAttribute("xmlns",NS_FEATURE_STARTTLS);
@@ -74,9 +79,9 @@ bool StartTLS::start(const QDomElement &AElem)
 			LOG_STRM_INFO(FXmppStream->streamJid(),"StartTLS negotiation request sent");
 			return true;
 		}
-		else
+		else if (!FXmppStream->connection()->isEncryptionSupported())
 		{
-			LOG_STRM_ERROR(FXmppStream->streamJid(),"Failed to send StartTLS negotiation request: Unsupported connection instance");
+			LOG_STRM_WARNING(FXmppStream->streamJid(),"Failed to send StartTLS negotiation request: Encryption is not supported");
 		}
 	}
 	else

@@ -19,5 +19,9 @@
         <source>StartTLS negotiation failed</source>
         <translation>Inicjalizacja StartTLS nie powiodła się</translation>
     </message>
+    <message>
+        <source>Failed to begin StartTLS handshake</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

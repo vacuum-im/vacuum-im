@@ -25,7 +25,6 @@ void StartTLSPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
-	APluginInfo->dependences.append(DEFAULTCONNECTION_UUID);
 }
 
 bool StartTLSPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
@@ -43,6 +42,7 @@ bool StartTLSPlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 
 bool StartTLSPlugin::initObjects()
 {
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_STARTTLS_NOT_STARTED,tr("Failed to begin StartTLS handshake"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_STARTTLS_INVALID_RESPONCE,tr("Wrong StartTLS negotiation response"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_STARTTLS_NEGOTIATION_FAILED,tr("StartTLS negotiation failed"));
 
