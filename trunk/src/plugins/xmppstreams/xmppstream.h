@@ -107,7 +107,10 @@ private:
 	bool FReady;
 	bool FClosed;
 	bool FEncrypt;
+	bool FNodeChanged;
+	bool FDomainChanged;
 	Jid FStreamJid;
+	Jid FOnlineJid;
 	Jid FOfflineJid;
 	QString FStreamId;
 	QString FPassword;
