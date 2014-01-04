@@ -428,7 +428,10 @@ bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex
 	Q_UNUSED(AOrder); Q_UNUSED(AEvent);
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 	if (AIndex->kind()==RIK_AGENT && FSelfCaps.contains(streamJid))
+	{
 		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
+		return true;
+	}
 	return false;
 }
 
