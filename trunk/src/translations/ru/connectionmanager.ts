@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Certificate issuer:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Сертификат выпушен:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Сертификат выпущен:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate details:&lt;/b&gt;</source>
