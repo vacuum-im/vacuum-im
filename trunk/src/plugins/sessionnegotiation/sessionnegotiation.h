@@ -45,9 +45,10 @@ public:
 	virtual int sessionApply(const IStanzaSession &ASession);
 	virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
 	//ISessionNegotiation
-	virtual IStanzaSession getSession(const QString &ASessionId) const;
-	virtual IStanzaSession getSession(const Jid &AStreamJid, const Jid &AContactJid) const;
-	virtual QList<IStanzaSession> getSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const;
+	virtual bool isReady(const Jid &AStreamJid) const;
+	virtual IStanzaSession findSession(const QString &ASessionId) const;
+	virtual IStanzaSession findSession(const Jid &AStreamJid, const Jid &AContactJid) const;
+	virtual QList<IStanzaSession> findSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const;
 	virtual int initSession(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual void resumeSession(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual void terminateSession(const Jid &AStreamJid, const Jid &AContactJid);
@@ -97,9 +98,9 @@ private:
 	INotifications *FNotifications;
 private:
 	QHash<Jid,int> FSHISession;
-	QMultiMap<int,ISessionNegotiator *> FNegotiators;
 	QHash<QString, IDataForm> FSuspended;
 	QHash<QString, IDataForm> FRenegotiate;
+	QMultiMap<int, ISessionNegotiator *> FNegotiators;
 	QHash<Jid, QHash<Jid, IStanzaSession> > FSessions;
 	QHash<Jid, QHash<Jid, IDataDialogWidget *> > FDialogs;
 	QHash<int, IDataDialogWidget *> FDialogByNotify;
