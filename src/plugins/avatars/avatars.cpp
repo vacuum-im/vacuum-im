@@ -232,12 +232,12 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 					}
 				}
 			}
-			else if (AStreamJid && contactJid)
+			else if (AStreamJid.pBare() == contactJid.pBare())
 			{
 				if (AStanza.type().isEmpty() && !FBlockingResources.contains(AStreamJid,contactJid))
 				{
 					LOG_STRM_INFO(AStreamJid,QString("Resource %1 is blocking avatar update notify mechanism").arg(contactJid.resource()));
-					FBlockingResources.insert(AStreamJid, contactJid);
+					FBlockingResources.insertMulti(AStreamJid,contactJid);
 					if (!FStreamAvatars.value(AStreamJid).isNull())
 					{
 						FStreamAvatars[AStreamJid] = UNKNOWN_AVATAR;
@@ -247,9 +247,9 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 				else if (AStanza.type() == "unavailable")
 				{
 					LOG_STRM_INFO(AStreamJid,QString("Resource %1 is stopped blocking avatar update notify mechanism").arg(contactJid.resource()));
-					FBlockingResources.remove(AStreamJid, contactJid);
+					FBlockingResources.remove(AStreamJid,contactJid);
 					if (!FBlockingResources.contains(AStreamJid))
-						FVCardPlugin->requestVCard(AStreamJid, contactJid.bare());
+						FVCardPlugin->requestVCard(AStreamJid,contactJid.bare());
 				}
 			}
 			else if (!iqUpdate.isNull())
@@ -653,7 +653,7 @@ bool Avatars::updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bo
 {
 	foreach(const Jid &streamJid, FStreamAvatars.keys())
 	{
-		if (!FBlockingResources.contains(streamJid) && (AContactJid && streamJid))
+		if (!FBlockingResources.contains(streamJid) && streamJid.pBare()==AContactJid.pBare())
 		{
 			QString curHash = FStreamAvatars.value(streamJid);
 			if (curHash.isNull() || curHash!=AHash)
