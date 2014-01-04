@@ -12,6 +12,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
+#include <interfaces/ipresence.h>
 #include "editbookmarkdialog.h"
 #include "editbookmarksdialog.h"
 
@@ -76,7 +77,8 @@ protected slots:
 protected slots:
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-protected slots: 
+protected slots:
+	void onPresenceOpened(IPresence *APresence);
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onMultiChatWindowCreated(IMultiUserChatWindow *AWindow);
 	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
@@ -102,6 +104,7 @@ private:
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
+	IPresencePlugin *FPresencePlugin;
 private:
 	QMap<Jid, QList<IBookmark> > FBookmarks;
 	QMap<Jid, EditBookmarksDialog *> FDialogs;

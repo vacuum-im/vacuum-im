@@ -48,6 +48,7 @@ Bookmarks::Bookmarks()
 	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
+	FPresencePlugin = NULL;
 }
 
 Bookmarks::~Bookmarks()
@@ -148,6 +149,16 @@ bool Bookmarks::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 				SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
 			connect(FRostersView->instance(), SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)),
 				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32 , Menu *)));
+		}
+	}
+
+	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0, NULL);
+	if (plugin)
+	{
+		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		if (FPresencePlugin)
+		{
+			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
 		}
 	}
 
@@ -566,22 +577,6 @@ void Bookmarks::onPrivateDataUpdated(const QString &AId, const Jid &AStreamJid, 
 	{
 		LOG_STRM_INFO(AStreamJid,"Bookmarks loaded");
 		FBookmarks[AStreamJid] = loadBookmarksFromXML(AElement);
-
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-		if (account==NULL || !account->optionsNode().value("ignore-autojoin").toBool())
-		{
-			bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
-			foreach(const IBookmark &bookmark, FBookmarks.value(AStreamJid))
-			{
-				if (bookmark.type==IBookmark::Conference && bookmark.conference.autojoin)
-				{
-					if (showAutoJoined && FMultiChatPlugin && FMultiChatPlugin->findMultiChatWindow(AStreamJid,bookmark.conference.roomJid)!=NULL)
-						showAutoJoined = false;
-					startBookmark(AStreamJid,bookmark,showAutoJoined);
-				}
-			}
-		}
-
 		updateConferenceIndexes(AStreamJid);
 		emit bookmarksChanged(AStreamJid);
 	}
@@ -740,6 +735,33 @@ void Bookmarks::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInde
 				AMenu->addAction(autoJoinAction,AG_RVCM_BOOKMARS_TOOLS);
 			}
 		}
+	}
+}
+
+void Bookmarks::onPresenceOpened(IPresence *APresence)
+{
+	if (isReady(APresence->streamJid()))
+	{
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+		if (account==NULL || !account->optionsNode().value("ignore-autojoin").toBool())
+		{
+			LOG_STRM_INFO(APresence->streamJid(),"Auto joining bookmark conferences");
+			bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
+			foreach(const IBookmark &bookmark, FBookmarks.value(APresence->streamJid()))
+			{
+				if (bookmark.type==IBookmark::Conference && bookmark.conference.autojoin)
+				{
+					if (showAutoJoined && FMultiChatPlugin && FMultiChatPlugin->findMultiChatWindow(APresence->streamJid(),bookmark.conference.roomJid)!=NULL)
+						startBookmark(APresence->streamJid(),bookmark,true);
+					else
+						startBookmark(APresence->streamJid(),bookmark,false);
+				}
+			}
+		}
+	}
+	else
+	{
+		REPORT_ERROR("Failed to auto join conference bookmarks: Stream is not ready");
 	}
 }
 
