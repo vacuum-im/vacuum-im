@@ -16,10 +16,14 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 	FReady = false;
 	FClosed = true;
 	FEncrypt = true;
-	FStreamJid = AStreamJid;
+	FNodeChanged = false;
+	FDomainChanged = false;
 	FConnection = NULL;
 	FStreamState = SS_OFFLINE;
 	FPasswordDialog = NULL;
+
+	FStreamJid = AStreamJid;
+	FOfflineJid = FStreamJid;
 
 	connect(&FParser,SIGNAL(opened(const QDomElement &)), SLOT(onParserOpened(const QDomElement &)));
 	connect(&FParser,SIGNAL(element(const QDomElement &)), SLOT(onParserElement(const QDomElement &)));
@@ -91,9 +95,13 @@ bool XmppStream::open()
 	if (FConnection && FStreamState==SS_OFFLINE)
 	{
 		FError = XmppError::null;
+
 		LOG_STRM_INFO(streamJid(),"Opening XMPP stream");
 		if (FConnection->connectToHost())
 		{
+			FNodeChanged = false;
+			FDomainChanged = false;
+			FOnlineJid = FOfflineJid;
 			setStreamState(SS_CONNECTING);
 			return true;
 		}
@@ -168,24 +176,38 @@ Jid XmppStream::streamJid() const
 
 void XmppStream::setStreamJid(const Jid &AJid)
 {
-	if (FStreamJid!=AJid && (FStreamState==SS_OFFLINE || FStreamState==SS_FEATURES))
+	if (FStreamState==SS_OFFLINE && FStreamJid!=AJid)
 	{
-		LOG_STRM_INFO(streamJid(),QString("Changing XMPP stream JID, from=%1, to=%1").arg(FStreamJid.full(),AJid.full()));
-
-		if (FStreamState==SS_FEATURES && !FOfflineJid.isValid())
-			FOfflineJid = FStreamJid;
-
-		if (FStreamJid.pBare() != AJid.pBare())
-			FSessionPassword.clear();
+		LOG_STRM_INFO(streamJid(),QString("Changing offline XMPP stream JID, from=%1, to=%2").arg(FOfflineJid.full(),AJid.full()));
 
 		Jid before = FStreamJid;
-		emit jidAboutToBeChanged(AJid);
-		FStreamJid = AJid;
+		Jid after = AJid;
+		emit jidAboutToBeChanged(after);
+
+		if (before.pBare() != after.pBare())
+			FSessionPassword.clear();
+
+		FOfflineJid = after;
+		FStreamJid = after;
+		emit jidChanged(before);
+	}
+	else if (FStreamState==SS_FEATURES && FStreamJid!=AJid)
+	{
+		LOG_STRM_INFO(streamJid(),QString("Changing online XMPP stream JID, from=%1, to=%2").arg(FOnlineJid.full(),AJid.full()));
+		
+		Jid before = FStreamJid;
+		Jid after(FStreamJid.node(),FStreamJid.domain(),AJid.resource());
+		emit jidAboutToBeChanged(after);
+
+		FOnlineJid = AJid;
+		FStreamJid = after;
+		FNodeChanged = FOnlineJid.pNode()!=FOfflineJid.pNode();
+		FDomainChanged = FOnlineJid.pDomain()!=FOfflineJid.pDomain();
 		emit jidChanged(before);
 	}
 	else if (FStreamJid != AJid)
 	{
-		LOG_STRM_WARNING(streamJid(),QString("Failed to change stream jid to=%1: Stream is not offline").arg(AJid.full()));
+		LOG_STRM_WARNING(streamJid(),QString("Failed to change stream jid to=%1: Wrong stream state").arg(AJid.full()));
 	}
 }
 
@@ -333,9 +355,29 @@ qint64 XmppStream::sendStanza(Stanza &AStanza)
 	if (FStreamState!=SS_OFFLINE && FStreamState!=SS_ERROR)
 	{
 		if (!FClosed && !processStanzaHandlers(AStanza,true))
+		{
+			if (FNodeChanged || FDomainChanged)
+			{
+				Jid toJid = AStanza.to();
+				if (FNodeChanged && toJid.pBare()==FOfflineJid.pBare())
+				{
+					// Replace node and domain of destination
+					Jid newToJid = Jid(FOnlineJid.node(),FOnlineJid.domain(),toJid.resource());
+					AStanza.setTo(newToJid.full());
+				}
+				else if (FDomainChanged && toJid.pBare()==FOfflineJid.pDomain())
+				{
+					// Replace domain of destination
+					Jid newToJid = Jid(toJid.node(),FOnlineJid.domain(),toJid.resource());
+					AStanza.setTo(newToJid.full());
+				}
+			}
 			return sendData(AStanza.toByteArray());
+		}
 		else if (FClosed)
+		{
 			LOG_STRM_WARNING(streamJid(),"Failed to send XMPP stream stanza: XML stream is finished");
+		}
 	}
 	else
 	{
@@ -590,11 +632,11 @@ void XmppStream::onConnectionDisconnected()
 		emit closed();
 
 		clearActiveFeatures();
-		if (FOfflineJid.isValid())
-		{
-			setStreamJid(FOfflineJid);
-			FOfflineJid = Jid::null;
-		}
+		setStreamJid(FOfflineJid);
+
+		FNodeChanged = false;
+		FDomainChanged = false;
+		FOnlineJid = Jid::null;
 	}
 }
 

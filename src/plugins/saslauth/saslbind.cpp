@@ -32,23 +32,10 @@ bool SASLBind::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to bind resource, jid=%1: Invalid JID").arg(bindJid.full()));
 				emit error(XmppError(IERR_SASL_BIND_INVALID_STREAM_JID));
 			}
-			else if (bindJid.pBare() == FXmppStream->streamJid().pBare())
-			{
-				LOG_STRM_INFO(FXmppStream->streamJid(),QString("Resource binding finished, jid=%1").arg(bindJid.full()));
-
-				FXmppStream->setStreamJid(bindJid);
-
-				deleteLater();
-				emit finished(false);
-			}
 			else
 			{
-				LOG_STRM_INFO(FXmppStream->streamJid(),QString("Resource binding finished (bare JID changed!), jid=%1").arg(bindJid.full()));
-
-				Jid sessionJid = FXmppStream->streamJid();
-				sessionJid.setResource(bindJid.resource());
-				FXmppStream->setStreamJid(sessionJid);
-
+				LOG_STRM_INFO(FXmppStream->streamJid(),QString("Resource binding finished, jid=%1").arg(bindJid.full()));
+				FXmppStream->setStreamJid(bindJid);
 				deleteLater();
 				emit finished(false);
 			}
