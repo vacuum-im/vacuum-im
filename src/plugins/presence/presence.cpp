@@ -90,7 +90,16 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			pitem.status = status;
 
 			if (pitem != before)
+			{
+				for (QHash<Jid,IPresenceItem>::iterator it = FItems.begin(); it!=FItems.end(); )
+				{
+					if (it->show==IPresence::Error && it.key()==fromJid.bare() && it.key()!=fromJid)
+						it = FItems.erase(it);
+					else
+						++it;
+				}
 				emit itemReceived(pitem,before);
+			}
 			
 			if (show == IPresence::Offline)
 				FItems.remove(fromJid);
