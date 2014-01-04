@@ -1876,7 +1876,7 @@ void MessageArchiver::processRemoveRequest(const QString &ALocalId, RemoveReques
 
 bool MessageArchiver::hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	return FSessionNegotiation!=NULL ? FSessionNegotiation->getSession(AStreamJid,AContactJid).status==IStanzaSession::Active : false;
+	return FSessionNegotiation!=NULL ? FSessionNegotiation->findSession(AStreamJid,AContactJid).status==IStanzaSession::Active : false;
 }
 
 bool MessageArchiver::isOTRStanzaSession(const IStanzaSession &ASession) const
@@ -1894,7 +1894,7 @@ bool MessageArchiver::isOTRStanzaSession(const Jid &AStreamJid, const Jid &ACont
 {
 	if (FSessionNegotiation && FDataForms)
 	{
-		IStanzaSession session = FSessionNegotiation->getSession(AStreamJid,AContactJid);
+		IStanzaSession session = FSessionNegotiation->findSession(AStreamJid,AContactJid);
 		if (session.status == IStanzaSession::Active)
 			return isOTRStanzaSession(session);
 	}
@@ -2049,7 +2049,7 @@ void MessageArchiver::renegotiateStanzaSessions(const Jid &AStreamJid) const
 {
 	if (FSessionNegotiation)
 	{
-		QList<IStanzaSession> sessions = FSessionNegotiation->getSessions(AStreamJid,IStanzaSession::Active);
+		QList<IStanzaSession> sessions = FSessionNegotiation->findSessions(AStreamJid,IStanzaSession::Active);
 		foreach(const IStanzaSession &session, sessions)
 		{
 			bool isOTRSession = isOTRStanzaSession(session);
