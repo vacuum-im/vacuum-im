@@ -48,6 +48,11 @@ bool DefaultConnection::isEncrypted() const
 	return FSocket.isEncrypted();
 }
 
+bool DefaultConnection::isEncryptionSupported() const
+{
+	return FSocket.supportsSsl();
+}
+
 bool DefaultConnection::connectToHost()
 {
 	if (FSrvQueryId==START_QUERY_ID && FSocket.state()==QAbstractSocket::UnconnectedState)
@@ -88,6 +93,12 @@ bool DefaultConnection::connectToHost()
 		return true;
 	}
 	return false;
+}
+
+bool DefaultConnection::startEncryption()
+{
+	FSocket.startClientEncryption();
+	return true;
 }
 
 void DefaultConnection::disconnectFromHost()
@@ -156,11 +167,6 @@ IConnectionPlugin *DefaultConnection::ownerPlugin() const
 QSslCertificate DefaultConnection::hostCertificate() const
 {
 	return FSocket.peerCertificate();
-}
-
-void DefaultConnection::startClientEncryption()
-{
-	FSocket.startClientEncryption();
 }
 
 void DefaultConnection::ignoreSslErrors()

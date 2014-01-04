@@ -87,6 +87,7 @@
 #define IERR_SOCKS5_STREAM_HOST_DISCONNECTED                 "socks5-stream-host-disconnected"
 
 // StartTLS
+#define IERR_STARTTLS_NOT_STARTED                            "starttls-not-started"
 #define IERR_STARTTLS_INVALID_RESPONCE                       "starttls-invalid-responce"
 #define IERR_STARTTLS_NEGOTIATION_FAILED                     "starttls-negotiation-failed"
 

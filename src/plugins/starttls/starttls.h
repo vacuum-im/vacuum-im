@@ -32,7 +32,6 @@ protected slots:
 	void onConnectionEncrypted();
 private:
 	IXmppStream *FXmppStream;
-	IDefaultConnection *FConnection;
 };
 
 #endif // STARTTLS_H

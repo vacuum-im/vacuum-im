@@ -3,7 +3,6 @@
 
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
-#include <interfaces/idefaultconnection.h>
 #include "starttls.h"
 
 #define STARTTLS_UUID "{F554544C-0851-4e2a-9158-99191911E468}"

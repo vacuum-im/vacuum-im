@@ -18,7 +18,9 @@ public:
 	virtual QObject *instance() { return this; }
 	virtual bool isOpen() const;
 	virtual bool isEncrypted() const;
+	virtual bool isEncryptionSupported() const;
 	virtual bool connectToHost();
+	virtual bool startEncryption();
 	virtual void disconnectFromHost();
 	virtual void abortConnection(const XmppError &AError);
 	virtual qint64 write(const QByteArray &AData);
@@ -26,7 +28,6 @@ public:
 	virtual IConnectionPlugin *ownerPlugin() const;
 	virtual QSslCertificate hostCertificate() const;
 	//IDefaultConnection
-	virtual void startClientEncryption();
 	virtual void ignoreSslErrors();
 	virtual QList<QSslError> sslErrors() const;
 	virtual QSsl::SslProtocol protocol() const;
