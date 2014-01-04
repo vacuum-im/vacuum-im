@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation>Дествителен с: %1</translation>
+        <translation>Действителен с: %1</translation>
     </message>
     <message>
         <source>Expired at: %1</source>
