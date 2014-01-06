@@ -751,7 +751,7 @@ void Bookmarks::onPresenceOpened(IPresence *APresence)
 			{
 				if (bookmark.type==IBookmark::Conference && bookmark.conference.autojoin)
 				{
-					if (showAutoJoined && FMultiChatPlugin && FMultiChatPlugin->findMultiChatWindow(APresence->streamJid(),bookmark.conference.roomJid)!=NULL)
+					if (showAutoJoined && FMultiChatPlugin && FMultiChatPlugin->findMultiChatWindow(APresence->streamJid(),bookmark.conference.roomJid)==NULL)
 						startBookmark(APresence->streamJid(),bookmark,true);
 					else
 						startBookmark(APresence->streamJid(),bookmark,false);
