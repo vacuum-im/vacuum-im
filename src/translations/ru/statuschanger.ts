@@ -209,7 +209,7 @@ You can set status class for additional statuses defined by you.</source>
         <translation>При обрыве подключения к серверу</translation>
     </message>
     <message>
-        <source>Left the Vacuum-IM</source>
+        <source>Left Vacuum-IM</source>
         <translation>Вышел из Vacuum-IM</translation>
     </message>
 </context>

@@ -209,7 +209,7 @@ Sie können Statusklassen für zusätzlich von ihnen definierte Statusmeldungen 
         <translation>Wenn die Verbindung zum Server verloren geht</translation>
     </message>
     <message>
-        <source>Left the Vacuum-IM</source>
+        <source>Left Vacuum-IM</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
