@@ -1262,7 +1262,7 @@ void StatusChanger::onApplicationShutdownStarted()
 		if (presence->isOpen())
 		{
 			LOG_STRM_INFO(presence->streamJid(),QString("Closing XMPP stream due to application shutdown"));
-			presence->setPresence(IPresence::Offline,tr("Left the Vacuum-IM"),0);
+			presence->setPresence(IPresence::Offline,tr("Left Vacuum-IM"),0);
 			presence->xmppStream()->close();
 		}
 	}
