@@ -575,7 +575,7 @@ QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, con
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Load server modifications request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
-			ServerModificationsRequest request = {AStart,ACount};
+			ServerModificationsRequest request = { AStart, (quint32)ACount };
 			FServerLoadModificationsRequests.insert(stanza.id(),request);
 			return stanza.id();
 		}
