@@ -663,7 +663,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			else if (showText == "xa")
 				show = IPresence::ExtendedAway;
 			else
-				show = IPresence::Online;     //РљРѕСЃС‚С‹Р»СЊ РїРѕРґ РєСЂРёРІС‹Рµ РєР»РёРµРЅС‚С‹ Рё С‚СЂР°РЅСЃРїРѕСЂС‚С‹
+				show = IPresence::Online;     //Костыль под кривые клиенты и транспорты
 
 			QString status = AStanza.firstElement("status").text();
 			Jid realJid = itemElem.attribute("jid");
@@ -839,7 +839,6 @@ void MultiUserChat::initialize()
 			if (FPresence)
 			{
 				connect(FPresence->instance(),SIGNAL(changed(int, const QString &, int)),SLOT(onPresenceChanged(int, const QString &, int)));
-				connect(FPresence->instance(),SIGNAL(aboutToClose(int, const QString &)),SLOT(onPresenceAboutToClose(int , const QString &)));
 			}
 		}
 	}
@@ -903,12 +902,6 @@ void MultiUserChat::onPresenceChanged(int AShow, const QString &AStatus, int APr
 {
 	Q_UNUSED(APriority);
 	if (FAutoPresence)
-		setPresence(AShow,AStatus);
-}
-
-void MultiUserChat::onPresenceAboutToClose(int AShow, const QString &AStatus)
-{
-	if (FAutoPresence && isOpen())
 		setPresence(AShow,AStatus);
 }
 

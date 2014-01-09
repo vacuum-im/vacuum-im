@@ -1,6 +1,5 @@
 #include "vcardplugin.h"
 
-#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QDomDocument>
@@ -133,6 +132,11 @@ bool VCardPlugin::initObjects()
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"));
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"), Shortcuts::WidgetShortcut);
 
+	FVCardFilesDir.setPath(FPluginManager->homePath());
+	if (!FVCardFilesDir.exists(DIR_VCARDS))
+		FVCardFilesDir.mkdir(DIR_VCARDS);
+	FVCardFilesDir.cd(DIR_VCARDS);
+
 	if (FRostersView)
 	{
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWVCARD,FRostersView->instance());
@@ -196,18 +200,7 @@ bool VCardPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, con
 
 QString VCardPlugin::vcardFileName(const Jid &AContactJid) const
 {
-	static bool entered = false;
-	static QDir dir(FPluginManager->homePath());
-	
-	if (!entered)
-	{
-		entered = true;
-		if (!dir.exists(DIR_VCARDS))
-			dir.mkdir(DIR_VCARDS);
-		dir.cd(DIR_VCARDS);
-	}
-	
-	return dir.absoluteFilePath(Jid::encode(AContactJid.pFull())+".xml");
+	return FVCardFilesDir.absoluteFilePath(Jid::encode(AContactJid.pFull())+".xml");
 }
 
 bool VCardPlugin::hasVCard(const Jid &AContactJid) const

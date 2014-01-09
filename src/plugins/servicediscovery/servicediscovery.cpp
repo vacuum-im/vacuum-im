@@ -1,6 +1,5 @@
 #include "servicediscovery.h"
 
-#include <QDir>
 #include <QFile>
 #include <QCryptographicHash>
 
@@ -161,6 +160,11 @@ bool ServiceDiscovery::initConnections(IPluginManager *APluginManager, int &/*AI
 
 bool ServiceDiscovery::initObjects()
 {
+	FCapsFilesDir.setPath(FPluginManager->homePath());
+	if (!FCapsFilesDir.exists(CAPS_DIRNAME))
+		FCapsFilesDir.mkdir(CAPS_DIRNAME);
+	FCapsFilesDir.cd(CAPS_DIRNAME);
+
 	Shortcuts::declareGroup(SCTG_DISCOWINDOW,tr("Service discovery window"),SGO_DISCOWINDOW);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_BACK,tr("Move back"),QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_DISCOWINDOW_FORWARD,tr("Move forward"),QKeySequence::UnknownKey);
@@ -402,6 +406,7 @@ bool ServiceDiscovery::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex
 	if (AIndex->type()==RIT_AGENT && FSelfCaps.contains(streamJid))
 	{
 		showDiscoItems(streamJid,AIndex->data(RDR_FULL_JID).toString(),QString::null);
+		return true;
 	}
 	return false;
 }
@@ -897,21 +902,10 @@ bool ServiceDiscovery::hasEntityCaps(const EntityCapabilities &ACaps) const
 
 QString ServiceDiscovery::capsFileName(const EntityCapabilities &ACaps, bool AWithOwner) const
 {
-	static bool entered = false;
-	static QDir dir(FPluginManager->homePath());
-	
-	if (!entered)
-	{
-		entered = true;
-		if (!dir.exists(CAPS_DIRNAME))
-			dir.mkdir(CAPS_DIRNAME);
-		dir.cd(CAPS_DIRNAME);
-	}
-
 	QString hashString = ACaps.hash.isEmpty() ? ACaps.node+ACaps.ver : ACaps.ver+ACaps.hash;
 	hashString += AWithOwner ? ACaps.owner : QString::null;
 	QString fileName = QCryptographicHash::hash(hashString.toUtf8(),QCryptographicHash::Md5).toHex().toLower() + ".xml";
-	return dir.absoluteFilePath(fileName);
+	return FCapsFilesDir.absoluteFilePath(fileName);
 }
 
 IDiscoInfo ServiceDiscovery::loadCapsInfo(const EntityCapabilities &ACaps) const

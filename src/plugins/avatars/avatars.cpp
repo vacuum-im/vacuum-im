@@ -193,11 +193,11 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 					}
 				}
 			}
-			else if (AStreamJid && contactJid)
+			else if (AStreamJid.pBare() == contactJid.pBare())
 			{
 				if (AStanza.type().isEmpty())
 				{
-					FBlockingResources.insert(AStreamJid, contactJid);
+					FBlockingResources.insertMulti(AStreamJid,contactJid);
 					if (!FStreamAvatars.value(AStreamJid).isNull())
 					{
 						FStreamAvatars[AStreamJid] = UNKNOWN_AVATAR;
@@ -206,11 +206,9 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 				}
 				else if (AStanza.type() == "unavailable")
 				{
-					FBlockingResources.remove(AStreamJid, contactJid);
+					FBlockingResources.remove(AStreamJid,contactJid);
 					if (!FBlockingResources.contains(AStreamJid))
-					{
-						FVCardPlugin->requestVCard(AStreamJid, contactJid.bare());
-					}
+						FVCardPlugin->requestVCard(AStreamJid,contactJid.bare());
 				}
 			}
 			else if (!iqUpdate.isNull())
@@ -519,7 +517,7 @@ bool Avatars::updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bo
 {
 	foreach(const Jid &streamJid, FStreamAvatars.keys())
 	{
-		if (!FBlockingResources.contains(streamJid) && (AContactJid && streamJid))
+		if (!FBlockingResources.contains(streamJid) && streamJid.pBare()==AContactJid.pBare())
 		{
 			QString &curHash = FStreamAvatars[streamJid];
 			if (curHash.isNull() || curHash!=AHash)
