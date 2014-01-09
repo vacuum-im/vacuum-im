@@ -21,6 +21,7 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ioptionsmanager.h>
+#include <interfaces/ipresence.h>
 #include <utils/shortcuts.h>
 #include <utils/options.h>
 #include <utils/menu.h>
@@ -61,6 +62,7 @@ protected:
 	void updateBookmarksMenu();
 	void startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark, bool AShowWindow);
 protected slots:
+	void onPresenceOpened(IPresence *APresence);
 	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
@@ -76,7 +78,6 @@ protected slots:
 	void onEditBookmarksActionTriggered(bool);
 	void onEditBookmarksDialogDestroyed();
 	void onAccountOptionsChanged(const OptionsNode &ANode);
-	void onStartTimerTimeout();
 private:
 	IPrivateStorage *FPrivateStorage;
 	ITrayManager *FTrayManager;
@@ -86,14 +87,13 @@ private:
 	IXmppUriQueries *FXmppUriQueries;
 	IServiceDiscovery *FDiscovery;
 	IOptionsManager *FOptionsManager;
+	IPresencePlugin *FPresencePlugin;
 private:
 	Menu *FBookMarksMenu;
 	QMap<Jid, Menu *> FStreamMenu;
 private:
-	QTimer FStartTimer;
 	QMap<Jid, QList<IBookMark> > FBookMarks;
 	QMap<Jid, EditBookmarksDialog *> FDialogs;
-	QMultiMap<Jid, IBookMark> FPendingBookMarks;
 };
 
 #endif // BOOKMARKS_H
