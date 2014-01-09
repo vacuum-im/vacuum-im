@@ -1,5 +1,4 @@
 add_subdirectory(accountmanager)
-add_subdirectory(adiummessagestyle)
 add_subdirectory(annotations)
 add_subdirectory(autostatus)
 add_subdirectory(avatars)
@@ -62,3 +61,7 @@ add_subdirectory(urlprocessor)
 add_subdirectory(vcard)
 add_subdirectory(xmppstreams)
 add_subdirectory(xmppuriqueries)
+
+if (QT_QTWEBKIT_LIBRARY)
+  add_subdirectory(adiummessagestyle)
+endif (QT_QTWEBKIT_LIBRARY)

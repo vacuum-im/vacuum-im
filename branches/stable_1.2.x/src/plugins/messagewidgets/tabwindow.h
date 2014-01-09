@@ -87,6 +87,8 @@ private:
 	Action *FRenameWindow;
 	Action *FCloseWindow;
 	Action *FDeleteWindow;
+	QToolBar *FCornerBar;
+	QToolButton *FMenuButton;
 private:
 	QUuid FWindowId;
 	OptionsNode FOptionsNode;
