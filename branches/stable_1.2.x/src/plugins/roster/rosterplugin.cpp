@@ -89,11 +89,7 @@ void RosterPlugin::removeRoster(IXmppStream *AXmppStream)
 {
 	IRoster *roster = findRoster(AXmppStream->streamJid());
 	if (roster)
-	{
-		disconnect(roster->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onRosterDestroyed(QObject *)));
-		FRosters.removeAt(FRosters.indexOf(roster));
 		delete roster->instance();
-	}
 }
 
 void RosterPlugin::onRosterOpened()
@@ -155,8 +151,14 @@ void RosterPlugin::onRosterStreamJidChanged(const Jid &ABefore)
 
 void RosterPlugin::onRosterDestroyed(QObject *AObject)
 {
-	IRoster *roster = qobject_cast<IRoster *>(AObject);
-	FRosters.removeAt(FRosters.indexOf(roster));
+	foreach(IRoster *roster, FRosters)
+	{
+		if (roster->instance() == AObject)
+		{
+			FRosters.removeAll(roster);
+			break;
+		}
+	}
 }
 
 void RosterPlugin::onStreamAdded(IXmppStream *AXmppStream)

@@ -595,8 +595,30 @@ void Roster::removeStanzaHandlers()
 
 void Roster::onStreamOpened()
 {
+	static const QStringList skipDelimRequestDomains = QStringList() << "facebook.com";
+
 	FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
-	requestGroupDelimiter();
+
+	bool skipDelimRequest = false;
+	QString serverDomain = FXmppStream->streamJid().pDomain();
+	foreach(const QString &skipDomain, skipDelimRequestDomains)
+	{
+		if (serverDomain==skipDomain || serverDomain.endsWith("."+skipDomain))
+		{
+			skipDelimRequest = true;
+			break;
+		}
+	}
+
+	if (skipDelimRequest)
+	{
+		setGroupDelimiter("::");
+		requestRosterItems();
+	}
+	else
+	{
+		requestGroupDelimiter();
+	}
 }
 
 void Roster::onStreamClosed()

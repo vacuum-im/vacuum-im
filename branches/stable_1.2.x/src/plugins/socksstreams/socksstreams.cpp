@@ -237,12 +237,12 @@ void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)
 	if (AItems.contactJid==AItems.streamJid.domain() && AItems.node.isEmpty())
 	{
 		FStreamProxy.remove(AItems.streamJid);
-		Jid proxyJid = "proxy." + AItems.streamJid.domain();
 		foreach(const IDiscoItem &item, AItems.items)
 		{
-			if (item.itemJid == proxyJid)
+			QString itemBareJid = item.itemJid.pBare();
+			if (itemBareJid.startsWith("proxy.") || itemBareJid.startsWith("proxy65."))
 			{
-				FStreamProxy.insert(AItems.streamJid, item.itemJid.pBare());
+				FStreamProxy.insert(AItems.streamJid,itemBareJid);
 				break;
 			}
 		}

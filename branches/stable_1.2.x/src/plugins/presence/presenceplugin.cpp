@@ -71,11 +71,7 @@ void PresencePlugin::removePresence(IXmppStream *AXmppStream)
 {
 	IPresence *presence = findPresence(AXmppStream->streamJid());
 	if (presence)
-	{
-		disconnect(presence->instance(),SIGNAL(destroyed(QObject *)),this,SLOT(onPresenceDestroyed(QObject *)));
-		FPresences.removeAt(FPresences.indexOf(presence));
 		delete presence->instance();
-	}
 }
 
 void PresencePlugin::onPresenceOpened()
@@ -147,8 +143,14 @@ void PresencePlugin::onPresenceClosed()
 
 void PresencePlugin::onPresenceDestroyed(QObject *AObject)
 {
-	IPresence *presence = qobject_cast<IPresence *>(AObject);
-	FPresences.removeAt(FPresences.indexOf(presence));
+	foreach(IPresence *presence, FPresences)
+	{
+		if (presence->instance() == AObject)
+		{
+			FPresences.removeAll(presence);
+			break;
+		}
+	}
 }
 
 void PresencePlugin::onStreamAdded(IXmppStream *AXmppStream)

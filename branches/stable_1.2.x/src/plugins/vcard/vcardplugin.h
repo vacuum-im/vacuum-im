@@ -1,6 +1,7 @@
 #ifndef VCARDPLUGIN_H
 #define VCARDPLUGIN_H
 
+#include <QDir>
 #include <QTimer>
 #include <QObjectCleanupHandler>
 #include <definitions/namespaces.h>
@@ -107,6 +108,7 @@ private:
 	IXmppUriQueries *FXmppUriQueries;
 	IMessageWidgets *FMessageWidgets;
 private:
+	QDir FVCardFilesDir;
 	QTimer FUpdateTimer;
 	QMap<Jid,VCardItem> FVCards;
 	QMultiMap<Jid,Jid> FUpdateQueue;

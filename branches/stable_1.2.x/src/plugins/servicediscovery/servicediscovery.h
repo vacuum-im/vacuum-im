@@ -2,6 +2,7 @@
 #define SERVICEDISCOVERY_H
 
 #include <QSet>
+#include <QDir>
 #include <QHash>
 #include <QPair>
 #include <QTimer>
@@ -197,6 +198,7 @@ private:
 	QMap<QString, DiscoveryRequest > FItemsRequestsId;
 	QMultiMap<QDateTime, DiscoveryRequest> FQueuedRequests;
 private:
+	QDir FCapsFilesDir;
 	bool FUpdateSelfCapsStarted;
 	QMap<Jid, EntityCapabilities> FSelfCaps;
 	QMap<Jid, QHash<Jid, EntityCapabilities> > FEntityCaps;

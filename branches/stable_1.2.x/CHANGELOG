@@ -7,11 +7,13 @@ LEGEND
 
 
 ------
+  [*] Added workarounds for facebook XMPP server
   [-] Fixed same problems with DIGEST-MD5 SASL authentication responce
   [-] Not all messages from server archive were displayed in a view history window
   [-] In a chat window with contact connected through transport all messages were displayed as incoming after transport change
   [-] Fixed problems with editing of a priority of the status in the edit status dialog
   [-] Fixed some possible errors with adding messages in Adium message styles
+  [-] On a double click on the agent in a roaster at the same time opened both a window of service discovery and a normal message window
 
 
 v1.2.3
