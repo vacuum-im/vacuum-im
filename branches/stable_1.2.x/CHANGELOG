@@ -11,6 +11,7 @@ LEGEND
   [-] Not all messages from server archive were displayed in a view history window
   [-] In a chat window with contact connected through transport all messages were displayed as incoming after transport change
   [-] Fixed problems with editing of a priority of the status in the edit status dialog
+  [-] Fixed some possible errors with adding messages in Adium message styles
 
 
 v1.2.3

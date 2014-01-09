@@ -1191,8 +1191,13 @@ void StatusChanger::onProfileOpened(const QString &AProfile)
 void StatusChanger::onApplicationShutdownStarted()
 {
 	foreach(IPresence *presence, FCurrentStatus.keys())
+	{
 		if (presence->isOpen())
+		{
+			presence->setPresence(IPresence::Offline,tr("Left Vacuum-IM"),0);
 			presence->xmppStream()->close();
+		}
+	}
 }
 
 void StatusChanger::onReconnectTimer()
