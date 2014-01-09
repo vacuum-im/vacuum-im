@@ -25,11 +25,9 @@ BookMarks::BookMarks()
 	FXmppUriQueries = NULL;
 	FDiscovery = NULL;
 	FOptionsManager = NULL;
+	FPresencePlugin = NULL;
 
 	FBookMarksMenu = NULL;
-
-	FStartTimer.setSingleShot(true);
-	connect(&FStartTimer,SIGNAL(timeout()),SLOT(onStartTimerTimeout()));
 }
 
 BookMarks::~BookMarks()
@@ -111,6 +109,16 @@ bool BookMarks::initConnections(IPluginManager *APluginManager, int &/*AInitOrde
 	if (plugin)
 	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0, NULL);
+	if (plugin)
+	{
+		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		if (FPresencePlugin)
+		{
+			connect(FPresencePlugin->instance(),SIGNAL(presenceOpened(IPresence *)),SLOT(onPresenceOpened(IPresence *)));
+		}
 	}
 
 	return FPrivateStorage!=NULL;
@@ -261,6 +269,28 @@ void BookMarks::startBookmark(const Jid &AStreamJid, const IBookMark &ABookmark,
 	}
 }
 
+void BookMarks::onPresenceOpened(IPresence *APresence)
+{
+	if (FBookMarks.contains(APresence->streamJid()))
+	{
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+		if (account==NULL || !account->optionsNode().value("ignore-autojoin").toBool())
+		{
+			bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
+			foreach(const IBookMark &bookmark, FBookMarks.value(APresence->streamJid()))
+			{
+				if (!bookmark.conference.isEmpty() && bookmark.autojoin)
+				{
+					if (showAutoJoined && FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(APresence->streamJid(),bookmark.conference)==NULL)
+						startBookmark(APresence->streamJid(),bookmark,true);
+					else
+						startBookmark(APresence->streamJid(),bookmark,false);
+				}
+			}
+		}
+	}
+}
+
 void BookMarks::onPrivateStorageOpened(const Jid &AStreamJid)
 {
 	FPrivateStorage->loadData(AStreamJid,PST_BOOKMARKS,NS_STORAGE_BOOKMARKS);
@@ -273,9 +303,6 @@ void BookMarks::onPrivateDataError(const QString &AId, const QString &AError)
 
 void BookMarks::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
-	bool ignoreAutoJoin = account && account->optionsNode().value("ignore-autojoin").toBool();
-
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
 		QList<IBookMark> &streamBookmarks = FBookMarks[AStreamJid];
@@ -327,11 +354,6 @@ void BookMarks::onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJ
 				bookmark.nick = elem.firstChildElement("nick").text();
 				bookmark.password = elem.firstChildElement("password").text();
 				streamBookmarks.append(bookmark);
-				if (bookmark.autojoin && !ignoreAutoJoin)
-				{
-					FPendingBookMarks.insertMulti(AStreamJid,bookmark);
-					FStartTimer.start(FIRST_START_TIMEOUT);
-			}
 			}
 			else if (elem.tagName() == "url")
 			{
@@ -365,7 +387,6 @@ void BookMarks::onPrivateDataRemoved(const QString &AId, const Jid &AStreamJid, 
 		{
 			qDeleteAll(FStreamMenu[AStreamJid]->groupActions(AG_BMM_BOOKMARKS_ITEMS));
 			FBookMarks[AStreamJid].clear();
-			FPendingBookMarks.remove(AStreamJid);
 		}
 		updateBookmarksMenu();
 		emit bookmarksUpdated(AId,AStreamJid,AElement);
@@ -385,7 +406,6 @@ void BookMarks::onPrivateStorageClosed(const Jid &AStreamJid)
 	delete FDialogs.take(AStreamJid);
 	delete FStreamMenu.take(AStreamJid);
 	FBookMarks.remove(AStreamJid);
-	FPendingBookMarks.remove(AStreamJid);
 	updateBookmarksMenu();
 }
 
@@ -523,22 +543,6 @@ void BookMarks::onAccountOptionsChanged(const OptionsNode &ANode)
 	IAccount *account = qobject_cast<IAccount *>(sender());
 	if (account && account->isActive() && account->optionsNode().childPath(ANode)=="name" &&  FStreamMenu.contains(account->xmppStream()->streamJid()))
 		FStreamMenu[account->xmppStream()->streamJid()]->setTitle(ANode.value().toString());
-}
-
-void BookMarks::onStartTimerTimeout()
-{
-	QMultiMap<Jid, IBookMark>::iterator it = FPendingBookMarks.begin();
-	if (it != FPendingBookMarks.end())
-	{
-		bool showAutoJoined = Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED).value().toBool();
-		if (it->conference.isEmpty())
-			showAutoJoined = false;
-		else if (FMultiChatPlugin && FMultiChatPlugin->multiChatWindow(it.key(),it->conference)!=NULL)
-			showAutoJoined = false;
-		startBookmark(it.key(),it.value(), showAutoJoined);
-		FPendingBookMarks.erase(it);
-		FStartTimer.start(NEXT_START_TIMEOUT);
-	}
 }
 
 Q_EXPORT_PLUGIN2(plg_bookmarks, BookMarks)
