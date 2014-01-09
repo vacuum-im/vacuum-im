@@ -589,10 +589,16 @@ void ChatMessageHandler::showStyledMessage(IChatWindow *AWindow, const Message &
 	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
 		options.type |= IMessageContentOptions::TypeHistory;
 
-	if (AWindow->streamJid() && AWindow->contactJid() ? AWindow->contactJid()!=AMessage.to() : !(AWindow->contactJid() && AMessage.to()))
+	if (AWindow->streamJid()==AMessage.to() || AMessage.to().isEmpty())
+		options.direction = IMessageContentOptions::DirectionIn;
+	else if (AWindow->streamJid()==AMessage.from() || AMessage.from().isEmpty())
+		options.direction = IMessageContentOptions::DirectionOut;
+	else if (AWindow->contactJid() == AMessage.to())
+		options.direction = IMessageContentOptions::DirectionOut;
+	else if (AWindow->contactJid() == AMessage.from())
 		options.direction = IMessageContentOptions::DirectionIn;
 	else
-		options.direction = IMessageContentOptions::DirectionOut;
+		options.direction = IMessageContentOptions::DirectionIn;
 
 	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);

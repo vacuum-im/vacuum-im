@@ -369,6 +369,9 @@ int Notifications::appendNotification(const INotification &ANotification)
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
 	FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
 
+	FDelayedRemovals.append(notifyId);
+	QTimer::singleShot(0,this,SLOT(onDelayedRemovals()));
+
 	FNotifyRecords.insert(notifyId,record);
 	emit notificationAppended(notifyId, record.notification);
 
@@ -597,7 +600,14 @@ void Notifications::removeInvisibleNotification(int ANotifyId)
 	}
 }
 
-void Notifications::onActivateDelayedActivations()
+void Notifications::onDelayedRemovals()
+{
+	foreach(int notifyId, FDelayedRemovals)
+		removeInvisibleNotification(notifyId);
+	FDelayedRemovals.clear();
+}
+
+void Notifications::onDelayedActivations()
 {
 	foreach(int notifyId, FDelayedActivations)
 		activateNotification(notifyId);

@@ -18,7 +18,6 @@ SUBDIRS += privatestorage
 SUBDIRS += messageprocessor
 SUBDIRS += messagewidgets
 SUBDIRS += messagestyles
-SUBDIRS += adiummessagestyle
 SUBDIRS += simplemessagestyle
 SUBDIRS += normalmessagehandler
 SUBDIRS += chatmessagehandler
@@ -64,3 +63,7 @@ SUBDIRS += urlprocessor
 SUBDIRS += filemessagearchive 
 SUBDIRS += servermessagearchive 
 SUBDIRS += rosteritemexchange 
+
+contains(QT_CONFIG, webkit) {
+  SUBDIRS += adiummessagestyle
+}
