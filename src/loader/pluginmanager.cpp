@@ -526,7 +526,7 @@ void PluginManager::finishQuit()
 
 void PluginManager::closeAndQuit()
 {
-	if (!FQuitReady)
+	if (!isShutingDown())
 	{
 		FShutdownKind = SK_QUIT;
 		startClose();

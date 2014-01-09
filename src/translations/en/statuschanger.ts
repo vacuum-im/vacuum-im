@@ -208,5 +208,9 @@ You can set status class for additional statuses defined by you.</translation>
         <source>Status</source>
         <translation>Status</translation>
     </message>
+    <message>
+        <source>Left Vacuum-IM</source>
+        <translation>Left Vacuum-IM</translation>
+    </message>
 </context>
 </TS>
