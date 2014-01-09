@@ -88,7 +88,7 @@ QString SystemManager::osVersion()
 			osver = "OS X 10.7 Lion";
 			break;
 		case QSysInfo::MV_SNOWLEOPARD:
-			osver = "Mac OS X 10.6 Snow Leopard)";
+			osver = "Mac OS X 10.6 Snow Leopard";
 			break;
 		case QSysInfo::MV_LEOPARD:
 			osver = "Mac OS X 10.5 Leopard";
