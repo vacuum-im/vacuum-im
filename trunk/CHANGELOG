@@ -28,6 +28,7 @@ LEGEND
   [-] Removing of avatars in several selected accounts or contacts was not working
   [-] The application may fail on removing from history active conversation
   [-] Fixed problems with editing of a priority of the status in the edit status dialog
+  [-] Fixed rare problems with establishing secure connection with server
 
 
 v1.2.0
