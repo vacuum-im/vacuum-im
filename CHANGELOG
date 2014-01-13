@@ -14,6 +14,7 @@ LEGEND
   [-] Fixed problems with editing of a priority of the status in the edit status dialog
   [-] Fixed some possible errors with adding messages in Adium message styles
   [-] On a double click on the agent in a roaster at the same time opened both a window of service discovery and a normal message window
+  [-] Fixed rare problems with establishing secure connection with server
 
 
 v1.2.3
