@@ -1,12 +1,13 @@
 #include "rosterchanger.h"
 
 #include <QMimeData>
+#include <QMap>
+#include <QDropEvent>
 #include <QMessageBox>
+#include <QInputDialog>
+#include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QInputDialog>
 #include <QItemEditorFactory>
 #include <definitions/actiongroups.h>
 #include <definitions/rosterindexkinds.h>

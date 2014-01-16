@@ -104,9 +104,7 @@ void EditProfilesDialog::onRemoveProfileClicked()
 	if (listItem)
 	{
 		QString profile = listItem->text();
-		if (QMessageBox::question(this,tr("Remove Profile"),
-			tr("Are you sure you want to delete profile '<b>%1</b>'?").arg(profile.toHtmlEscaped()),
-			QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+		if (QMessageBox::question(this,tr("Remove Profile"),tr("Are you sure you want to delete profile '<b>%1</b>'?").arg(profile.toHtmlEscaped()),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
 		{
 			if (!FManager->removeProfile(profile))
 				QMessageBox::warning(this,tr("Error"),tr("Failed to remove profile"));

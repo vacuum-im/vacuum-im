@@ -1,5 +1,7 @@
 #include "archivestreamoptions.h"
 
+#include <QLineEdit>
+#include <QMessageBox>
 #include <QKeyEvent>
 #include <QLineEdit>
 #include <QHeaderView>
@@ -8,8 +10,6 @@
 #include <QIntValidator>
 #include <definitions/namespaces.h>
 #include <definitions/optionvalues.h>
-#include <QLineEdit>
-#include <QMessageBox>
 
 #define ONE_DAY           (24*60*60)
 #define ONE_MONTH         (ONE_DAY*31)

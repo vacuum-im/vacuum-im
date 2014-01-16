@@ -21,6 +21,25 @@
     </message>
 </context>
 <context>
+    <name>ConnectionOptionsWidget</name>
+    <message>
+        <source>Disable check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Request on errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect on errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow only trusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Host:</source>

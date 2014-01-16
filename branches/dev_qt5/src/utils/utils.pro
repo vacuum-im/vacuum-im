@@ -18,7 +18,7 @@ win32 {
 }
 
 LIBS              += -L../libs
-LIBS              += -lzlib -lidn -lminizip -lqxtglobalshortcut -lidle
+LIBS              += -lqxtglobalshortcut -lidle -lidn -lminizip -lzlib
 macx {
   QMAKE_LFLAGS    += -framework Carbon -framework IOKit -framework Cocoa
 } else:unix:!haiku {

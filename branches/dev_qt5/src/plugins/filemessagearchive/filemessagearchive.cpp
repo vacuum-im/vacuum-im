@@ -873,7 +873,7 @@ IArchiveModifications FileMessageArchive::loadDatabaseModifications(const Jid &A
 		else if (task->isFailed())
 			LOG_STRM_ERROR(AStreamJid,QString("Failed to load database modifications: %1").arg(task->error().condition()));
 		else
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to load database modifications: Task not started"));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to load database modifications: Task not started"));
 		delete task;
 	}
 	else if (!isDatabaseReady(AStreamJid))
@@ -886,7 +886,6 @@ IArchiveModifications FileMessageArchive::loadDatabaseModifications(const Jid &A
 	}
 	return modifs;
 }
-
 
 void FileMessageArchive::loadGatewayTypes()
 {

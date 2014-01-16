@@ -474,7 +474,6 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 			for (uint i=0; i<certInfoNamesCount; i++)
 			{
 				QString value = cert.subjectInfo(certInfoNames[i].info).join("; ");
-
 				if (!value.isEmpty())
 					tooltips += certInfoNames[i].name.arg(value.toHtmlEscaped());
 			}
@@ -483,7 +482,6 @@ void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 			for (uint i=0; i<certInfoNamesCount; i++)
 			{
 				QString value = cert.issuerInfo(certInfoNames[i].info).join("; ");
-
 				if (!value.isEmpty())
 					tooltips += certInfoNames[i].name.arg(value.toHtmlEscaped());
 			}

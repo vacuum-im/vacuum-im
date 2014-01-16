@@ -406,7 +406,7 @@ QUrl Statistics::buildHitUrl(const IStatisticsHit &AHit) const
 	cid.remove(0,1); cid.chop(1);
 	query.append(qMakePair<QString,QString>("cid",QUrl::toPercentEncoding(cid)));
 
-	query.append(qMakePair<QByteArray,QByteArray>("fl",QUrl::toPercentEncoding(qVersion())));
+	query.append(qMakePair<QString,QString>("fl",QUrl::toPercentEncoding(qVersion())));
 
 	qint64 qt = AHit.timestamp.msecsTo(QDateTime::currentDateTime());
 	if (qt > 0)

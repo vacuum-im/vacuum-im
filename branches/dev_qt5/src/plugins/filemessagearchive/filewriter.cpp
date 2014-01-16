@@ -1,5 +1,12 @@
 #include "filewriter.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
+#include <utils/datetime.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+
 #define MIN_SIZE_CLOSE_TIMEOUT        120*60*1000
 #define MAX_SIZE_CLOSE_TIMEOUT        60*1000
 #define NORMAL_SIZE_CLOSE_TIMEOUT     20*60*1000
@@ -29,10 +36,17 @@ FileWriter::FileWriter(const Jid &AStreamJid, const QString &AFileName, const IA
 			FXmlWriter = new QXmlStreamWriter(FXmlFile);
 			startCollection();
 		}
+		else
+		{
+			deleteLater();
+			LOG_STRM_ERROR(AStreamJid,QString("Failed to start file writer: %1").arg(FXmlFile->errorString()));
+		}
 	}
-
-	if (!FXmlWriter)
+	else
+	{
 		deleteLater();
+		REPORT_ERROR("Failed to start file writer: File already exists");
+	}
 }
 
 FileWriter::~FileWriter()
@@ -180,7 +194,7 @@ void FileWriter::writeElementChilds(const QDomElement &AElem)
 					FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
 
 				QDomNamedNodeMap attrMap = elem.attributes();
-				for (int i =0; i<attrMap.length(); i++)
+				for (uint i =0; i<attrMap.length(); i++)
 				{
 					QDomNode attrNode = attrMap.item(i);
 					FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
