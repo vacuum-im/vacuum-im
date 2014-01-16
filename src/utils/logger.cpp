@@ -9,8 +9,9 @@
 
 #define MAX_LOG_FILES  10
 
-void qtMessagesHandler(QtMsgType AType, const char *AMessage)
+void qtMessagesHandler(QtMsgType AType, const QMessageLogContext &AContext, const QString &AMessage)
 {
+	Q_UNUSED(AContext);
 	switch (AType)
 	{
 	case QtDebugMsg:
@@ -69,7 +70,7 @@ void Logger::openLog(const QString &APath)
 			QFile::remove(logDir.absoluteFilePath(logFiles.takeFirst()));
 
 #ifndef DEBUG_MODE
-		qInstallMsgHandler(qtMessagesHandler);
+		qInstallMessageHandler(qtMessagesHandler);
 #endif
 		q->logFile.setFileName(logDir.absoluteFilePath(DateTime(QDateTime::currentDateTime()).toX85DateTime().replace(":","-") +".log"));
 		q->logFile.open(QFile::WriteOnly|QFile::Truncate);

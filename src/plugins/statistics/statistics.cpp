@@ -2,7 +2,6 @@
 
 #include <QDir>
 #include <QUrlQuery>
-#include <QWebFrame>
 #include <QDataStream>
 #include <QAuthenticator>
 #include <QNetworkProxy>
