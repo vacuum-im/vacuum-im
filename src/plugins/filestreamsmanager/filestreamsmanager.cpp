@@ -21,24 +21,6 @@
 #include <utils/stanza.h>
 #include <utils/logger.h>
 #include <utils/jid.h>
-#include <definitions/namespaces.h>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/shortcuts.h>
-#include <definitions/actiongroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/internalerrors.h>
-#include <utils/widgetmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/shortcuts.h>
-#include <utils/datetime.h>
-#include <utils/options.h>
-#include <utils/stanza.h>
-#include <utils/logger.h>
-#include <utils/jid.h>
 
 FileStreamsManager::FileStreamsManager()
 {

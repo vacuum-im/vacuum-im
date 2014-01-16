@@ -1,5 +1,6 @@
 #include "rosteritemexchange.h"
 
+#include <QMimeData>
 #include <QDropEvent>
 #include <QDataStream>
 #include <QMessageBox>
@@ -7,7 +8,6 @@
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
-#include <QMimeData>
 #include <definitions/namespaces.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>

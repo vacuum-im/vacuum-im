@@ -17,22 +17,6 @@
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include <utils/logger.h>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/discoitemdataroles.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <utils/xmpperror.h>
-#include <utils/shortcuts.h>
-#include <utils/stanza.h>
-#include <utils/action.h>
-#include <utils/logger.h>
 
 #define GATEWAY_TIMEOUT           30000
 

@@ -29,7 +29,7 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	updateLanguage();
 	connect(ui.cmbLanguage,SIGNAL(currentIndexChanged(int)),SLOT(onCurrentLanguageChanged(int)));
 
-	updatePlugins(); 
+	updatePlugins();
 	ui.twtPlugins->horizontalHeader()->setSectionResizeMode(COL_NAME,QHeaderView::Stretch);
 	ui.twtPlugins->horizontalHeader()->setSectionResizeMode(COL_FILE,QHeaderView::ResizeToContents);
 	connect(ui.twtPlugins,SIGNAL(currentItemChanged(QTableWidgetItem *, QTableWidgetItem *)),SLOT(onCurrentPluginChanged(QTableWidgetItem *, QTableWidgetItem *)));

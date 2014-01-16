@@ -1,11 +1,10 @@
 #include "rostersview.h"
 
-#include <QApplication>
 #include <QDrag>
-#include <QMimeData>
 #include <QCursor>
 #include <QToolTip>
 #include <QPainter>
+#include <QMimeData>
 #include <QDropEvent>
 #include <QHelpEvent>
 #include <QClipboard>
@@ -55,7 +54,6 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	setSelectionMode(ExtendedSelection);
 	setSelectionBehavior(SelectRows);
 	setContextMenuPolicy(Qt::DefaultContextMenu);
-	setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 	FAdvancedItemDelegate = new AdvancedItemDelegate(this);
 	FAdvancedItemDelegate->setVertialSpacing(1);

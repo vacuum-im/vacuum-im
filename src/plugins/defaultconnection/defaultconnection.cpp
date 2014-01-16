@@ -271,6 +271,7 @@ void DefaultConnection::onDnsLookupFinished()
 	if (!FRecords.isEmpty())
 	{
 		QList<QDnsServiceRecord> dnsRecords = FDnsLookup.serviceRecords();
+		LOG_DEBUG(QString("SRV records received, count=%1").arg(dnsRecords.count()));
 		if (!dnsRecords.isEmpty())
 		{
 			FRecords.clear();
@@ -306,11 +307,7 @@ void DefaultConnection::onSocketConnected()
 void DefaultConnection::onSocketEncrypted()
 {
 	LOG_INFO(QString("Socket encrypted, host=%1").arg(FSocket.peerName()));
-	if (FVerifyMode==IDefaultConnection::TrustedOnly && !caCertificates().contains(hostCertificate()))
-	{
-		abortConnection(XmppError(IERR_DEFAULTCONNECTION_CERT_NOT_TRUSTED));
-	}
-	else
+	if (FVerifyMode!=IDefaultConnection::TrustedOnly || caCertificates().contains(hostCertificate()))
 	{
 		emit encrypted();
 		if (FUseLegacySSL)
@@ -318,6 +315,10 @@ void DefaultConnection::onSocketEncrypted()
 			FRecords.clear();
 			emit connected();
 		}
+	}
+	else
+	{
+		abortConnection(XmppError(IERR_DEFAULTCONNECTION_CERT_NOT_TRUSTED));
 	}
 }
 
