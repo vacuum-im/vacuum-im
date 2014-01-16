@@ -134,7 +134,9 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 	plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
 	if (plugin)
+	{
 		FUrlProcessor = qobject_cast<IUrlProcessor *>(plugin->instance());
+	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));

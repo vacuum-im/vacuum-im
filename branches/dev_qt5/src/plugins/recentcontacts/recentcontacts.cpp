@@ -3,10 +3,10 @@
 #include <QDir>
 #include <QDrag>
 #include <QFile>
+#include <QStyle>
+#include <QPalette>
 #include <QMimeData>
 #include <QMouseEvent>
-#include <QPalette>
-#include <QStyle>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/actiongroups.h>

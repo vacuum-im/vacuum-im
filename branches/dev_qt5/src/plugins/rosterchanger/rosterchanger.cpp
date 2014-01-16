@@ -1,7 +1,7 @@
 #include "rosterchanger.h"
 
-#include <QMimeData>
 #include <QMap>
+#include <QMimeData>
 #include <QDropEvent>
 #include <QMessageBox>
 #include <QInputDialog>

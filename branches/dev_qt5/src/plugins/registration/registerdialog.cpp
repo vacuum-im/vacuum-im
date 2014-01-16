@@ -6,10 +6,6 @@
 #include <definitions/menuicons.h>
 #include <utils/iconstorage.h>
 #include <utils/logger.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <utils/iconstorage.h>
-#include <utils/logger.h>
 
 RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid, const Jid &AServiceJid, int AOperation, QWidget *AParent) : QDialog(AParent)
 {

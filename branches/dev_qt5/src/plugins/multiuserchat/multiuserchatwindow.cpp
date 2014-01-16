@@ -1,10 +1,5 @@
 #include "multiuserchatwindow.h"
 
-#include <QContextMenuEvent>
-#include <QCoreApplication>
-#include <QInputDialog>
-#include <QKeyEvent>
-#include <QResizeEvent>
 #include <QPair>
 #include <QTimer>
 #include <QToolTip>
