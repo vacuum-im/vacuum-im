@@ -68,4 +68,7 @@ SUBDIRS += messagecarbons
 SUBDIRS += recentcontacts 
 #SUBDIRS += metacontacts 
 SUBDIRS += statistics 
-SUBDIRS += adiummessagestyle
+
+contains(QT_MODULES, webkit) {
+  SUBDIRS += adiummessagestyle
+}
