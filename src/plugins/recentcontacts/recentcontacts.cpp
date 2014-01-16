@@ -373,7 +373,6 @@ bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, 
 {
 	if (AOrder==RCHO_RECENTCONTACTS && AIndex->kind()==RIK_RECENT_ITEM)
 	{
-		QModelIndex modelIndex = FRostersView->mapFromModel(FRostersModel->modelIndexFromRosterIndex(AIndex));
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
 		{
