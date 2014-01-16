@@ -1,5 +1,11 @@
 #include "sortfilterproxymodel.h"
 
+#include <definitions/optionvalues.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterindexkindorders.h>
+#include <utils/options.h>
+
 SortFilterProxyModel::SortFilterProxyModel(IRostersViewPlugin *ARostersViewPlugin, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 	FShowOffline = true;

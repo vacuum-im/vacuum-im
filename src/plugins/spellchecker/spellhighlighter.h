@@ -3,7 +3,6 @@
 
 #include <QString>
 #include <QSyntaxHighlighter>
-
 #include <interfaces/imultiuserchat.h>
 
 class SpellHighlighter : 

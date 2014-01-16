@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en" sourcelanguage="en">
+<TS version="2.1" language="en" sourcelanguage="en">
 <context>
     <name>ConnectionOptionsWidget</name>
     <message>
         <source>Disable check</source>
-        <translation type="unfinished"></translation>
+        <translation>Disable check</translation>
     </message>
     <message>
         <source>Request on errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Request on errors</translation>
     </message>
     <message>
         <source>Disconnect on errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Disconnect on errors</translation>
     </message>
     <message>
         <source>Allow only trusted</source>
-        <translation type="unfinished"></translation>
+        <translation>Allow only trusted</translation>
     </message>
 </context>
 <context>
@@ -36,7 +36,7 @@
     </message>
     <message>
         <source>Certificate check mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Certificate check mode:</translation>
     </message>
 </context>
 <context>
@@ -119,7 +119,7 @@
     </message>
     <message>
         <source>Host certificate is not in trusted list</source>
-        <translation type="unfinished"></translation>
+        <translation>Host certificate is not in trusted list</translation>
     </message>
 </context>
 </TS>

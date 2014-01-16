@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>ConnectionManager</name>
     <message>
@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Certificate issuer:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Сертификат выпушен:&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;Сертификат выпущен:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Certificate details:&lt;/b&gt;</source>

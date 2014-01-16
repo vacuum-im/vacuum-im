@@ -1,7 +1,9 @@
 #include "shortcutoptionswidget.h"
 
 #include <QHeaderView>
+#include <utils/shortcuts.h>
 
+// SortFilterProxyModel
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
 	bool leftHasChild = ALeft.child(0,0).isValid();
@@ -17,6 +19,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 	return QSortFilterProxyModel::lessThan(ALeft,ARight);
 }
 
+// ShortcutOptionsWidget
 ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);

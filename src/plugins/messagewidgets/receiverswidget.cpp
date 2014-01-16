@@ -4,6 +4,12 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QDomDocument>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexkindorders.h>
+#include <utils/advanceditemdelegate.h>
+#include <utils/options.h>
 
 #define ADR_ITEMS                  Action::DR_Parametr1
 

@@ -6,7 +6,7 @@
 #include "ui_logindialog.h"
 
 class LoginDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:

@@ -1,16 +1,18 @@
 #include "notifyoptionswidget.h"
 
 #include <QHeaderView>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <utils/iconstorage.h>
 
-enum ModelColumns
-{
+enum ModelColumns {
 	COL_NAME,
 	COL_ENABLE,
 	COL_COUNT
 };
 
-enum ModelDataRoles
-{
+enum ModelDataRoles {
 	MDR_TYPE = Qt::UserRole + 1,
 	MDR_KIND,
 	MDR_SORT

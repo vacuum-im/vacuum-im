@@ -5,28 +5,6 @@
 
 #include <QQueue>
 #include <QMultiMap>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/messagehandlerorders.h>
-#include <definitions/messageeditsendhandlerorders.h>
-#include <definitions/xmppurihandlerorders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosternotifyorders.h>
-#include <definitions/rosterclickhookerorders.h>
-#include <definitions/recentitemtypes.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
@@ -39,11 +17,6 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/irecentcontacts.h>
-#include <utils/widgetmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/textmanager.h>
-#include <utils/shortcuts.h>
-#include <utils/options.h>
 
 enum WindowMenuAction {
 	NextAction,

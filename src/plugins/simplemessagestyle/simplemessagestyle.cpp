@@ -13,6 +13,7 @@
 #include <utils/filestorage.h>
 #include <utils/textmanager.h>
 #include <utils/options.h>
+#include <utils/logger.h>
 
 #define SCROLL_TIMEOUT                      100
 #define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
@@ -174,6 +175,10 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 		emit optionsChanged(AWidget,AOptions,AClear);
 		return true;
 	}
+	else if (view == NULL)
+	{
+		REPORT_ERROR("Failed to change simple style options: Invalid style view");
+	}
 	return false;
 }
 
@@ -227,6 +232,10 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
 	}
+	else
+	{
+		REPORT_ERROR("Failed to simple style append content: Invalid view");
+	}
 	return false;
 }
 
@@ -249,6 +258,10 @@ QList<QString> SimpleMessageStyle::styleVariants(const QString &AStylePath)
 		files = dir.entryList(QStringList("*.css"),QDir::Files,QDir::Name);
 		for (int i=0; i<files.count();i++)
 			files[i].chop(4);
+	}
+	else
+	{
+		REPORT_ERROR("Failed to get simple style variants: Style path is empty");
 	}
 	return files;
 }
@@ -283,6 +296,14 @@ QMap<QString, QVariant> SimpleMessageStyle::styleInfo(const QString &AStylePath)
 			}
 		}
 	}
+	else if (AStylePath.isEmpty())
+	{
+		REPORT_ERROR("Failed to get simple style info: Style path is empty");
+	}
+	else
+	{
+		LOG_ERROR(QString("Failed to load simple style info from file: %1").arg(file.errorString()));
+	}
 	return info;
 }
 
@@ -314,6 +335,10 @@ void SimpleMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
 		QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
 		view->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
 	}
+	else
+	{
+		REPORT_ERROR("Failed to change simple style variant: Invalid style view");
+	}
 }
 
 QString SimpleMessageStyle::makeStyleTemplate() const
@@ -321,7 +346,7 @@ QString SimpleMessageStyle::makeStyleTemplate() const
 	QString htmlFileName = FStylePath+"/Template.html";
 	if (!QFile::exists(htmlFileName))
 		htmlFileName =FSharedPath+"/Template.html";
-	return loadFileData(htmlFileName,QString::null);
+	return loadFileData(htmlFileName,QString::null);;
 }
 
 void SimpleMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
@@ -479,14 +504,15 @@ QString SimpleMessageStyle::prepareMessage(const QString &AHtml, const IMessageC
 
 QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
 {
-	if (QFile::exists(AFileName))
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
 	{
-		QFile file(AFileName);
-		if (file.open(QFile::ReadOnly))
-		{
-			QByteArray html = file.readAll();
-			return QString::fromUtf8(html.data(),html.size());
-		}
+		QByteArray html = file.readAll();
+		return QString::fromUtf8(html.data(),html.size());
+	}
+	else if (file.exists())
+	{
+		LOG_ERROR(QString("Failed to load simple style file data, file=%1: %2").arg(AFileName,file.errorString()));
 	}
 	return DefValue;
 }

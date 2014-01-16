@@ -2,6 +2,13 @@
 
 #include <QTimer>
 #include <QVariant>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/statusbargroups.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define UPDATE_STATUSBAR_INTERVAL   500
 
@@ -21,6 +28,7 @@ enum ItemDataRoles {
 
 FileStreamsWindow::FileStreamsWindow(IFileStreamsManager *AManager, QWidget *AParent) : QMainWindow(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 

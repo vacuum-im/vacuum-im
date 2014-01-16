@@ -5,6 +5,13 @@
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QTextDocument>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 static const QString NodeDelimiter = ".";
 
@@ -19,6 +26,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 
 OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Options"));
@@ -52,8 +60,8 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, QWidget *AParent)
 	ui.dbbButtons->button(QDialogButtonBox::Reset)->setEnabled(false);
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-	foreach (const IOptionsDialogNode &node, FOptionsManager->optionsDialogNodes()) {
-		onOptionsDialogNodeInserted(node); }
+	foreach (const IOptionsDialogNode &node, FOptionsManager->optionsDialogNodes())
+		onOptionsDialogNodeInserted(node);
 }
 
 OptionsDialog::~OptionsDialog()

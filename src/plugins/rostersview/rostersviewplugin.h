@@ -1,22 +1,6 @@
 #ifndef ROSTERSVIEWPLUGIN_H
 #define ROSTERSVIEWPLUGIN_H
 
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/mainwindowtabpages.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterproxyorders.h>
-#include <definitions/rosterdataholderorders.h>
-#include <definitions/rosterlabelholderorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/iroster.h>
@@ -26,10 +10,6 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/istatuschanger.h>
-#include <utils/action.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/textmanager.h>
 #include "rostersview.h"
 #include "sortfilterproxymodel.h"
 

@@ -1,5 +1,7 @@
 #include "presence.h"
 
+#include <utils/logger.h>
+
 #define SHC_PRESENCE  "/presence"
 
 Presence::Presence(IXmppStream *AXmppStream, IStanzaProcessor *AStanzaProcessor) : QObject(AXmppStream->instance())
@@ -72,6 +74,8 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			return false;
 		}
 
+		LOG_STRM_DEBUG(streamJid(),QString("Presence received, from=%1, show=%2, status=%3, priority=%4").arg(AStanza.from()).arg(show).arg(status).arg(priority));
+
 		if (AStreamJid != AStanza.from())
 		{
 			Jid fromJid = AStanza.from();
@@ -86,12 +90,21 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			pitem.status = status;
 
 			if (pitem != before)
+			{
+				for (QHash<Jid,IPresenceItem>::iterator it = FItems.begin(); it!=FItems.end(); )
+				{
+					if (it->show==IPresence::Error && it.key()==fromJid.bare() && it.key()!=fromJid)
+						it = FItems.erase(it);
+					else
+						++it;
+				}
 				emit itemReceived(pitem,before);
-
+			}
+			
 			if (show == IPresence::Offline)
 				FItems.remove(fromJid);
 		}
-		else if (show!=IPresence::Offline && (FShow != show || FStatus != status || FPriority != priority))
+		else if (show!=IPresence::Offline && (FShow!=show || FStatus!=status || FPriority!=priority))
 		{
 			FShow = show;
 			FStatus = status;
@@ -99,6 +112,10 @@ bool Presence::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			emit changed(show,status,priority);
 		}
 		AAccept = true;
+	}
+	else if (AHandlerId == FSHIPresence)
+	{
+		LOG_STRM_WARNING(streamJid(),QString("Failed to process presence, from=%1: Presence not opened").arg(AStanza.from()));
 	}
 	return false;
 }
@@ -108,7 +125,7 @@ Jid Presence::streamJid() const
 	return FXmppStream->streamJid();
 }
 
-IXmppStream * Presence::xmppStream() const
+IXmppStream *Presence::xmppStream() const
 {
 	return FXmppStream;
 }
@@ -180,33 +197,35 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 			return false;
 		}
 
-		Stanza pres("presence");
+		Stanza stanza("presence");
 		if (AShow == IPresence::Invisible)
 		{
-			pres.setType("invisible");
+			stanza.setType("invisible");
 		}
 		else if (AShow == IPresence::Offline)
 		{
-			pres.setType("unavailable");
+			stanza.setType("unavailable");
 		}
 		else
 		{
 			if (!show.isEmpty())
-				pres.addElement("show").appendChild(pres.createTextNode(show));
-			pres.addElement("priority").appendChild(pres.createTextNode(QString::number(APriority)));
+				stanza.addElement("show").appendChild(stanza.createTextNode(show));
+			stanza.addElement("priority").appendChild(stanza.createTextNode(QString::number(APriority)));
 		}
 
 		if (!AStatus.isEmpty())
-			pres.addElement("status").appendChild(pres.createTextNode(AStatus));
+			stanza.addElement("status").appendChild(stanza.createTextNode(AStatus));
 
 		if (FOpened && AShow==IPresence::Offline)
 			emit aboutToClose(AShow, AStatus);
 
-		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), pres))
+		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(),stanza))
 		{
 			FShow = AShow;
 			FStatus = AStatus;
 			FPriority = APriority;
+
+			LOG_STRM_INFO(streamJid(),QString("Self presence sent, show=%1, status=%2, priority=%3").arg(AShow).arg(AStatus).arg(APriority));
 
 			if (!FOpened && AShow!=IPresence::Offline)
 			{
@@ -225,6 +244,10 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 
 			return true;
 		}
+		else
+		{
+			LOG_STRM_WARNING(streamJid(),QString("Failed to send self presence, show=%1, status=%2, priority=%3").arg(AShow).arg(AStatus).arg(APriority));
+		}
 	}
 	else if (AShow==IPresence::Offline || AShow==IPresence::Error)
 	{
@@ -232,9 +255,10 @@ bool Presence::setPresence(int AShow, const QString &AStatus, int APriority)
 		FStatus = AStatus;
 		FPriority = 0;
 
+		LOG_STRM_INFO(streamJid(),QString("Self presence changed, show=%1, status=%2, priority=%3").arg(AShow).arg(AStatus).arg(APriority));
+
 		if (FOpened)
 		{
-			emit aboutToClose(AShow,AStatus);
 			FOpened = false;
 			clearItems();
 			emit closed();
@@ -300,9 +324,22 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 
 		if (FStanzaProcessor->sendStanzaOut(FXmppStream->streamJid(), pres))
 		{
+			LOG_STRM_INFO(streamJid(),QString("Direct presence sent, to=%1, show=%2, status=%3, priority=%4").arg(AContactJid.full()).arg(AShow).arg(AStatus).arg(APriority));
 			emit directSent(AContactJid,AShow,AStatus,APriority);
 			return true;
 		}
+		else
+		{
+			LOG_STRM_WARNING(streamJid(),QString("Failed to send direct presence, to=%1, show=%2, status=%3, priority=%4").arg(AContactJid.full()).arg(AShow).arg(AStatus).arg(APriority));
+		}
+	}
+	else if (!FXmppStream->isOpen())
+	{
+		LOG_STRM_WARNING(streamJid(),QString("Failed to send direct presence, to=%1, show=%2, status=%3, priority=%4: Stream not opened").arg(AContactJid.full()).arg(AShow).arg(AStatus).arg(APriority));
+	}
+	else
+	{
+		REPORT_ERROR("Failed to send direct presence: Invalid params");
 	}
 	return false;
 }
@@ -345,5 +382,5 @@ void Presence::onStreamError(const XmppError &AError)
 void Presence::onStreamClosed()
 {
 	if (isOpen())
-		setPresence(IPresence::Offline,tr("XMPP stream closed unexpectedly"),0);
+		setPresence(IPresence::Error,tr("XMPP stream closed unexpectedly"),0);
 }

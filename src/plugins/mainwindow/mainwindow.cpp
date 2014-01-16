@@ -4,6 +4,13 @@
 #include <QResizeEvent>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <definitions/version.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/mainwindowwidgets.h>
+#include <utils/widgetmanager.h>
+#include <utils/options.h>
 
 #define ONE_WINDOW_MODE_OPTIONS_NS "one-window-mode"
 
@@ -43,7 +50,7 @@ MainWindow::MainWindow(QWidget *AParent, Qt::WindowFlags AFlags) : QMainWindow(A
 
 	FCentralWidget = new MainCentralWidget(this,this);
 	FCentralWidget->instance()->setFrameShape(QFrame::StyledPanel);
-	connect(FCentralWidget->instance(),SIGNAL(currentCentralPageChanged()),SLOT(onCurrentCentralPageChanged()));
+	connect(FCentralWidget->instance(),SIGNAL(currentCentralPageChanged(IMainCentralPage *)),SLOT(onCurrentCentralPageChanged()));
 	connect(FCentralWidget->instance(),SIGNAL(centralPageAppended(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
 	connect(FCentralWidget->instance(),SIGNAL(centralPageRemoved(IMainCentralPage *)),SLOT(onCentralPageAddedOrRemoved(IMainCentralPage *)));
 

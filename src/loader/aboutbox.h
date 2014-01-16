@@ -7,7 +7,7 @@
 #include "ui_aboutbox.h"
 
 class AboutBox :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:

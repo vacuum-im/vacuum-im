@@ -2,29 +2,12 @@
 #define FILETSTREAMSMANAGER_H
 
 #include <QPointer>
-#include <definitions/namespaces.h>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/shortcuts.h>
-#include <definitions/actiongroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/itraymanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/jid.h>
-#include <utils/stanza.h>
-#include <utils/options.h>
-#include <utils/datetime.h>
-#include <utils/shortcuts.h>
-#include <utils/iconstorage.h>
-#include <utils/widgetmanager.h>
 #include "filestream.h"
 #include "filestreamswindow.h"
 #include "filestreamsoptions.h"
@@ -50,7 +33,7 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
-	// IOptionsHolder
+	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDataStreamProfile
 	virtual QString profileNS() const;

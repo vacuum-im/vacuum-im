@@ -4,9 +4,15 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QImageReader>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/vcardvaluenames.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Profile - %1").arg(AContactJid.uFull()));
@@ -393,8 +399,7 @@ void VCardDialog::onEmailAddClicked()
 	static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
 	EditItemDialog dialog(QString::null,QStringList(),emailTagList,this);
 	dialog.setLabelText(tr("EMail:"));
-	if (dialog.exec() == QDialog::Accepted && !dialog.value().isEmpty()
-	    && ui.ltwEmails->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
+	if (dialog.exec()==QDialog::Accepted && !dialog.value().isEmpty() && ui.ltwEmails->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
 	{
 		QListWidgetItem *item = new QListWidgetItem(dialog.value(),ui.ltwEmails);
 		item->setData(Qt::UserRole,dialog.tags());
@@ -428,8 +433,7 @@ void VCardDialog::onPhoneAddClicked()
 	static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
 	EditItemDialog dialog(QString::null,QStringList(),phoneTagList,this);
 	dialog.setLabelText(tr("Phone:"));
-	if (dialog.exec() == QDialog::Accepted && !dialog.value().isEmpty()
-	    && ui.ltwPhones->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
+	if (dialog.exec()==QDialog::Accepted && !dialog.value().isEmpty() && ui.ltwPhones->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
 	{
 		QListWidgetItem *item = new QListWidgetItem(dialog.value(),ui.ltwPhones);
 		item->setData(Qt::UserRole,dialog.tags());

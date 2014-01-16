@@ -2,17 +2,6 @@
 #define STATUSICONS_H
 
 #include <QRegExp>
-#include <definitions/resources.h>
-#include <definitions/statusicons.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/actiongroups.h>
-#include <definitions/menuicons.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iroster.h>
@@ -21,7 +10,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "iconsoptionswidget.h"
 
 class StatusIcons :
@@ -100,8 +88,8 @@ private:
 private:
 	Menu *FCustomIconMenu;
 	Action *FDefaultIconAction;
-	QHash<QString,Action *> FCustomIconActions;
 	IconStorage *FDefaultStorage;
+	QHash<QString,Action *> FCustomIconActions;
 private:
 	bool FStatusIconsChangedStarted;
 	QString FDefaultIconset;

@@ -6,6 +6,13 @@
 #include <QDomDocument>
 #include <QXmlStreamReader>
 #include <QCryptographicHash>
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <definitions/stanzahandlerorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/xmpperror.h>
+#include <utils/stanza.h>
+#include <utils/logger.h>
 
 #define DIR_DATA                "bitsofbinary"
 #define LOAD_TIMEOUT            30000
@@ -39,8 +46,9 @@ void BitsOfBinary::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
@@ -54,9 +62,7 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &/*AInitO
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
-		{
 			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -71,7 +77,8 @@ bool BitsOfBinary::initConnections(IPluginManager *APluginManager, int &/*AInitO
 bool BitsOfBinary::initObjects()
 {
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_BOB_INVALID_RESPONCE,tr("Invalid response"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_BOB_INVALID_CACHED_DATA,tr("Failed to read cached data"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_BOB_DATA_LOAD_ERROR,tr("Failed to load data"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_BOB_DATA_SAVE_ERROR,tr("Failed to save data"));
 
 	FDataDir.setPath(FPluginManager->homePath());
 	if (!FDataDir.exists(DIR_DATA))
@@ -109,7 +116,6 @@ bool BitsOfBinary::initSettings()
 		if (file.open(QFile::ReadOnly))
 		{
 			quint64 maxAge = 0;
-
 			QXmlStreamReader reader(&file);
 			while (!reader.atEnd())
 			{
@@ -127,12 +133,14 @@ bool BitsOfBinary::initSettings()
 			file.close();
 
 			if (fileInfo.lastModified().addSecs(maxAge) < QDateTime::currentDateTime())
-			{
 				QFile::remove(fileInfo.absoluteFilePath());
-			}
+		}
+		else
+		{
+			QFile::remove(fileInfo.absoluteFilePath());
+			REPORT_ERROR(QString("Failed to check data file: %1").arg(file.errorString()));
 		}
 	}
-
 	return true;
 }
 
@@ -150,6 +158,8 @@ bool BitsOfBinary::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int A
 				QString type = dataElem.attribute("type");
 				QByteArray data = QByteArray::fromBase64(dataElem.text().toLatin1());
 				quint64 maxAge = dataElem.attribute("max-age").toLongLong();
+
+				LOG_STRM_INFO(AXmppStream->streamJid(),QString("Received data, id=%1, from=%2").arg(cid,AStanza.from()));
 				saveBinary(cid,type,data,maxAge);
 			}
 			dataElem = dataElem.nextSiblingElement("data");
@@ -160,9 +170,7 @@ bool BitsOfBinary::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int A
 
 bool BitsOfBinary::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream);
-	Q_UNUSED(AStanza);
-	Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -173,12 +181,11 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		AAccept = true;
 		QDomElement dataElem = AStanza.firstElement("data",NS_BITS_OF_BINARY);
 
-		QString type;
-		QByteArray data;
-		quint64 maxAge;
 		QString cid = dataElem.attribute("cid");
+		QString type;	QByteArray data; quint64 maxAge;
 		if (!cid.isEmpty() && loadBinary(cid,type,data,maxAge))
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Sending data, cid=%1, to=%2").arg(cid,AStanza.from()));
 			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 			dataElem = result.addElement("data",NS_BITS_OF_BINARY);
 			dataElem.setAttribute("cid",cid);
@@ -189,6 +196,7 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send requested data, cid=%1, from=%2: Data not found").arg(cid,AStanza.from()));
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_ITEM_NOT_FOUND);
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 		}
@@ -208,12 +216,26 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			QString type = dataElem.attribute("type");
 			QByteArray data = QByteArray::fromBase64(dataElem.text().toLatin1());
 			quint64 maxAge = dataElem.attribute("max-age").toLongLong();
-			if (cid!=dataElem.attribute("cid") || !saveBinary(cid,type,data,maxAge))
+			if (cid!=dataElem.attribute("cid") || type.isEmpty() || data.isEmpty())
+			{
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, cid=%1, from=%2: Invalid response").arg(cid,AStanza.from()));
 				emit binaryError(cid,XmppError(IERR_BOB_INVALID_RESPONCE));
+			}
+			else if(!saveBinary(cid,type,data,maxAge))
+			{
+				LOG_STRM_ERROR(AStreamJid,QString("Failed to request data, cid=%1, from=%2: Failed to save data").arg(cid,AStanza.from()));
+				emit binaryError(cid,XmppError(IERR_BOB_DATA_SAVE_ERROR));
+			}
+			else
+			{
+				// Data was saved in xmppStanzaIn
+			}
 		}
 		else
 		{
-			emit binaryError(cid,XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, cid=%1, from=%2: %3").arg(cid,AStanza.from(),err.condition()));
+			emit binaryError(cid,err);
 		}
 	}
 }
@@ -241,13 +263,19 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, const Jid &AStreamJid, 
 		{
 			if (!FLoadRequests.values().contains(AContentId))
 			{
-				Stanza request("iq");
-				request.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
-				QDomElement dataElem = request.addElement("data",NS_BITS_OF_BINARY);
+				Stanza stanza("iq");
+				stanza.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
+				QDomElement dataElem = stanza.addElement("data",NS_BITS_OF_BINARY);
 				dataElem.setAttribute("cid",AContentId);
-				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,LOAD_TIMEOUT))
+				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,LOAD_TIMEOUT))
 				{
-					FLoadRequests.insert(request.id(),AContentId);
+					LOG_STRM_INFO(AStreamJid,QString("Data load request sent, cid=%1, from=%2").arg(AContentId,AContactJid.full()));
+					FLoadRequests.insert(stanza.id(),AContentId);
+					return true;
+				}
+				else
+				{
+					LOG_STRM_WARNING(AStreamJid,QString("Failed to send data load request, cid=%1, to=%2").arg(AContentId,AContactJid.full()));
 				}
 			}
 			else
@@ -278,6 +306,14 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, QString &AType, QByteAr
 			AMaxAge = doc.documentElement().attribute("max-age").toLongLong();
 			return true;
 		}
+		else
+		{
+			REPORT_ERROR("Failed to load data from file: Invalid format");
+		}
+	}
+	else if (file.exists())
+	{
+		REPORT_ERROR(QString("Failed to load data from file: %1").arg(file.errorString()));
 	}
 	return false;
 }
@@ -297,11 +333,22 @@ bool BitsOfBinary::saveBinary(const QString &AContentId, const QString &AType, c
 			dataElem.appendChild(doc.createTextNode(AData.toBase64()));
 			if (file.write(doc.toByteArray()) > 0)
 			{
-				file.close();
 				emit binaryCached(AContentId,AType,AData,AMaxAge);
 				return true;
 			}
+			else
+			{
+				REPORT_ERROR("Failed to save data to file: Write error");
+			}
 		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to save data to file: %1").arg(file.errorString()));
+		}
+	}
+	else
+	{
+		REPORT_ERROR("Failed to save data to file: Invalid params");
 	}
 	return false;
 }
@@ -317,6 +364,10 @@ bool BitsOfBinary::saveBinary(const QString &AContentId, const QString &AType, c
 		dataElem.setAttribute("max-age",AMaxAge);
 		dataElem.appendChild(AStanza.createTextNode(AData.toBase64()));
 		return true;
+	}
+	else
+	{
+		REPORT_ERROR("Failed to save data to stanza: Invalid params");
 	}
 	return false;
 }
@@ -343,14 +394,12 @@ void BitsOfBinary::onXmppStreamCreated(IXmppStream *AXmppStream)
 
 void BitsOfBinary::onOfflineTimerTimeout()
 {
-	QSet<QString> offlineRequests = FOfflineRequests.toSet();
-	FOfflineRequests.clear();
-	foreach(const QString &contentId, offlineRequests)
+	foreach(const QString &contentId, FOfflineRequests.toSet())
 	{
 		QString type; QByteArray data; quint64 maxAge;
 		if (loadBinary(contentId,type,data,maxAge))
 			emit binaryCached(contentId,type,data,maxAge);
 		else
-			emit binaryError(contentId,XmppError(IERR_BOB_INVALID_CACHED_DATA));
+			emit binaryError(contentId,XmppError(IERR_BOB_DATA_LOAD_ERROR));
 	}
 }

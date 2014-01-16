@@ -2,23 +2,19 @@
 #define VCARDDIALOG_H
 
 #include <QDialog>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ivcard.h>
-#include <utils/iconstorage.h>
 #include "edititemdialog.h"
 #include "ui_vcarddialog.h"
 
 class VCardDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
 	VCardDialog(IVCardPlugin *AVCardPlugin,const Jid &AStreamJid, const Jid &AContactJid);
 	~VCardDialog();
-	virtual Jid streamJid() const;
-	virtual Jid contactJid() const;
+	Jid streamJid() const;
+	Jid contactJid() const;
 protected:
 	void updateDialog();
 	void updateVCard();

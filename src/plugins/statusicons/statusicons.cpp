@@ -1,6 +1,19 @@
 #include "statusicons.h"
 
 #include <QTimer>
+#include <definitions/resources.h>
+#include <definitions/statusicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/actiongroups.h>
+#include <definitions/menuicons.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterdataholderorders.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define ADR_RULE                          Action::DR_Parametr1
 #define ADR_SUBSTORAGE                    Action::DR_Parametr2
@@ -208,39 +221,52 @@ QString StatusIcons::ruleIconset(const QString &APattern, RuleType ARuleType) co
 
 void StatusIcons::insertRule(const QString &APattern, const QString &ASubStorage, RuleType ARuleType)
 {
-	if (APattern.isEmpty() || ASubStorage.isEmpty() || !QRegExp(APattern).isValid())
-		return;
-
-	switch (ARuleType)
+	if (!APattern.isEmpty() && !ASubStorage.isEmpty() && QRegExp(APattern).isValid())
 	{
-	case UserRule:
-		FUserRules.insert(APattern,ASubStorage);
-		break;
-	case DefaultRule:
-		FDefaultRules.insert(APattern,ASubStorage);
-		break;
-	}
+		switch (ARuleType)
+		{
+		case UserRule:
+			LOG_DEBUG(QString("User status icon rule inserted, pattern=%1, storage=%2").arg(APattern,ASubStorage));
+			FUserRules.insert(APattern,ASubStorage);
+			break;
+		case DefaultRule:
+			LOG_DEBUG(QString("Default status icon rule inserted, pattern=%1, storage=%2").arg(APattern,ASubStorage));
+			FDefaultRules.insert(APattern,ASubStorage);
+			break;
+		}
 
-	FJid2Storage.clear();
-	emit ruleInserted(APattern,ASubStorage,ARuleType);
-	startStatusIconsChanged();
+		FJid2Storage.clear();
+		emit ruleInserted(APattern,ASubStorage,ARuleType);
+
+		startStatusIconsChanged();
+	}
+	else
+	{
+		REPORT_ERROR("Failed to insert status icon rule: Invalid params");
+	}
 }
 
 void StatusIcons::removeRule(const QString &APattern, RuleType ARuleType)
 {
-	switch (ARuleType)
+	if (rules(ARuleType).contains(APattern))
 	{
-	case UserRule:
-		FUserRules.remove(APattern);
-		break;
-	case DefaultRule:
-		FDefaultRules.remove(APattern);
-		break;
-	}
+		switch (ARuleType)
+		{
+		case UserRule:
+			LOG_DEBUG(QString("User status icon rule removed, pattern=%1").arg(APattern));
+			FUserRules.remove(APattern);
+			break;
+		case DefaultRule:
+			LOG_DEBUG(QString("Default status icon rule removed, pattern=%1").arg(APattern));
+			FDefaultRules.remove(APattern);
+			break;
+		}
 
-	FJid2Storage.clear();
-	emit ruleRemoved(APattern,ARuleType);
-	startStatusIconsChanged();
+		FJid2Storage.clear();
+		emit ruleRemoved(APattern,ARuleType);
+
+		startStatusIconsChanged();
+	}
 }
 
 QIcon StatusIcons::iconByJid(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -375,6 +401,8 @@ void StatusIcons::loadStorages()
 	QList<QString> storages = FileStorage::availSubStorages(RSR_STORAGE_STATUSICONS);
 	foreach(const QString &substorage, storages)
 	{
+		LOG_DEBUG(QString("Status icon storage added, storage=%1").arg(substorage));
+
 		IconStorage *storage = new IconStorage(RSR_STORAGE_STATUSICONS,substorage,this);
 		FStorages.insert(substorage,storage);
 
@@ -391,6 +419,7 @@ void StatusIcons::loadStorages()
 		action->setText(storage->storageProperty(FILE_STORAGE_NAME,substorage));
 		action->setData(ADR_SUBSTORAGE,substorage);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetCustomIconset(bool)));
+		
 		FCustomIconActions.insert(substorage,action);
 		FCustomIconMenu->addAction(action,AG_DEFAULT,true);
 	}
@@ -400,8 +429,10 @@ void StatusIcons::clearStorages()
 {
 	foreach(const QString &rule, FStatusRules)
 		removeRule(rule,IStatusIcons::DefaultRule);
+
 	FStatusRules.clear();
 	FCustomIconActions.clear();
+	
 	qDeleteAll(FStorages);
 	qDeleteAll(FCustomIconMenu->groupActions(AG_DEFAULT));
 }
@@ -418,9 +449,11 @@ void StatusIcons::startStatusIconsChanged()
 void StatusIcons::updateCustomIconMenu(const QStringList &APatterns)
 {
 	QString substorage = ruleIconset(APatterns.value(0),IStatusIcons::UserRule);
+	
 	FDefaultIconAction->setData(ADR_RULE,APatterns);
 	FDefaultIconAction->setIcon(iconByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false));
 	FDefaultIconAction->setChecked(APatterns.count()==1 && FDefaultStorage!=NULL && FDefaultStorage->subStorage()==substorage);
+
 	foreach(Action *action, FCustomIconActions)
 	{
 		action->setData(ADR_RULE, APatterns);
@@ -522,13 +555,11 @@ void StatusIcons::onOptionsClosed()
 	Options::node(OPV_STATUSICONS_RULES_ROOT).removeChilds();
 
 	int nspace = 0;
-	QMap<QString,QString>::const_iterator it = FUserRules.constBegin();
-	while (it != FUserRules.constEnd())
+	for (QMap<QString,QString>::const_iterator it=FUserRules.constBegin(); it!=FUserRules.constEnd(); ++it)
 	{
 		OptionsNode ruleNode = Options::node(OPV_STATUSICONS_RULES_ROOT).node("rule",QString::number(nspace));
 		ruleNode.setValue(it.key(),"pattern");
 		ruleNode.setValue(it.value(),"iconset");
-		++it;
 		nspace++;
 	}
 }
@@ -549,9 +580,12 @@ void StatusIcons::onDefaultIconsetChanged()
 	IconStorage *storage = qobject_cast<IconStorage*>(sender());
 	if (storage)
 	{
+		LOG_INFO(QString("Default status icon storage changed to=%1").arg(storage->subStorage()));
+
 		FJid2Storage.clear();
 		emit defaultIconsetChanged(storage->subStorage());
 		emit defaultIconsChanged();
+
 		startStatusIconsChanged();
 	}
 }

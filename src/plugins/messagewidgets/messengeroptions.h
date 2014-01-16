@@ -1,15 +1,13 @@
 #ifndef MESSENGEROPTIONS_H
 #define MESSENGEROPTIONS_H
 
-#include <definitions/optionvalues.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "ui_messengeroptions.h"
 
 class MessengerOptions :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

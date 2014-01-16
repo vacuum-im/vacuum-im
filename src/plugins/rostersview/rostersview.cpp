@@ -1,20 +1,35 @@
 #include "rostersview.h"
 
 #include <QApplication>
-#include <QClipboard>
-#include <QContextMenuEvent>
-#include <QCursor>
 #include <QDrag>
+#include <QMimeData>
+#include <QCursor>
+#include <QToolTip>
+#include <QPainter>
+#include <QDropEvent>
+#include <QHelpEvent>
+#include <QClipboard>
+#include <QHeaderView>
+#include <QResizeEvent>
+#include <QApplication>
+#include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QHeaderView>
-#include <QHelpEvent>
-#include <QMimeData>
-#include <QPainter>
-#include <QResizeEvent>
-#include <QToolTip>
+#include <QContextMenuEvent>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterdragdropmimetypes.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterlabelholderorders.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define BLINK_VISIBLE_TIME      750
 #define BLINK_INVISIBLE_TIME    250
@@ -54,8 +69,6 @@ RostersView::RostersView(QWidget *AParent) : QTreeView(AParent)
 	FDragExpandTimer.setSingleShot(true);
 	FDragExpandTimer.setInterval(500);
 	connect(&FDragExpandTimer,SIGNAL(timeout()),SLOT(onDragExpandTimer()));
-
-	insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,this);
 }
 
 RostersView::~RostersView()
@@ -124,9 +137,7 @@ QVariant RostersView::rosterData(int AOrder, const IRosterIndex *AIndex, int ARo
 			if (ARole == RDR_FORCE_VISIBLE)
 			{
 				if ((notify.flags & IRostersNotify::AllwaysVisible) > 0)
-				{
 					data = 1;
-				}
 			}
 			else if (ARole == Qt::DecorationRole)
 			{
@@ -193,6 +204,7 @@ void RostersView::setRostersModel(IRostersModel *AModel)
 {
 	if (FRostersModel != AModel)
 	{
+		LOG_INFO(QString("Changing rosters model, class=%1").arg(AModel->instance()->metaObject()->className()));
 		emit modelAboutToBeSeted(AModel);
 
 		if (selectionModel())
@@ -222,7 +234,9 @@ void RostersView::setRostersModel(IRostersModel *AModel)
 			emit viewModelChanged(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
 		}
 		else
+		{
 			FProxyModels.values().first()->setSourceModel(FRostersModel!=NULL ? FRostersModel->instance() : NULL);
+		}
 
 		if (selectionModel())
 		{
@@ -386,7 +400,7 @@ void RostersView::toolTipsForIndex(IRosterIndex *AIndex, const QHelpEvent *AEven
 
 				tooltip	= parts.join(separator);
 				it = tooltip.isEmpty() ? AToolTips.erase(it) : ++it;
-	}
+			}
 			else
 			{
 				isEndsWithSeparator = false;
@@ -544,6 +558,7 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 {
 	if (AProxyModel && !FProxyModels.values().contains(AProxyModel))
 	{
+		LOG_DEBUG(QString("Inserting proxy model, order=%1, class=%2").arg(AOrder).arg(AProxyModel->metaObject()->className()));
 		emit proxyModelAboutToBeInserted(AProxyModel,AOrder);
 
 		bool changeViewModel = FProxyModels.upperBound(AOrder) == FProxyModels.end();
@@ -572,7 +587,7 @@ void RostersView::insertProxyModel(QAbstractProxyModel *AProxyModel, int AOrder)
 		}
 		if (after)
 		{
-			after->setSourceModel(NULL);  //костыли для QSortFilterProxyModel, аналогичные в removeProxyModel
+			after->setSourceModel(NULL);  //fixes in QSortFilterProxyModel
 			after->setSourceModel(AProxyModel);
 		}
 		else
@@ -598,6 +613,7 @@ void RostersView::removeProxyModel(QAbstractProxyModel *AProxyModel)
 {
 	if (FProxyModels.values().contains(AProxyModel))
 	{
+		LOG_DEBUG(QString("Removing proxy model, class=%1").arg(AProxyModel->metaObject()->className()));
 		emit proxyModelAboutToBeRemoved(AProxyModel);
 
 		QList<QAbstractProxyModel *> proxies = FProxyModels.values();
@@ -724,6 +740,8 @@ AdvancedDelegateItem RostersView::registeredLabel(quint32 ALabelId) const
 
 quint32 RostersView::registerLabel(const AdvancedDelegateItem &ALabel)
 {
+	LOG_DEBUG(QString("Label registered, id=%1").arg(ALabel.d->id));
+
 	if (ALabel.d->flags & AdvancedDelegateItem::Blink)
 		appendBlinkItem(ALabel.d->id,0);
 	else
@@ -794,7 +812,7 @@ QList<IRosterIndex *> RostersView::notifyIndexes(int ANotifyId) const
 
 int RostersView::insertNotify(const IRostersNotify &ANotify, const QList<IRosterIndex *> &AIndexes)
 {
-	int notifyId = -1;
+	int notifyId = qrand();
 	while(notifyId<=0 || FNotifyItems.contains(notifyId))
 		notifyId = qrand();
 
@@ -817,6 +835,8 @@ int RostersView::insertNotify(const IRostersNotify &ANotify, const QList<IRoster
 
 	FNotifyItems.insert(notifyId, ANotify);
 	QTimer::singleShot(0,this,SLOT(onUpdateIndexNotifyTimeout()));
+
+	LOG_DEBUG(QString("Roster notify inserted, id=%1, order=%2, flags=%3").arg(notifyId).arg(ANotify.order).arg(ANotify.flags));
 	emit notifyInserted(notifyId);
 
 	return notifyId;
@@ -826,6 +846,7 @@ void RostersView::activateNotify(int ANotifyId)
 {
 	if (FNotifyItems.contains(ANotifyId))
 	{
+		LOG_DEBUG(QString("Roster notify activated, id=%1").arg(ANotifyId));
 		emit notifyActivated(ANotifyId);
 	}
 }
@@ -851,6 +872,7 @@ void RostersView::removeNotify(int ANotifyId)
 		FNotifyItems.remove(ANotifyId);
 		QTimer::singleShot(0,this,SLOT(onUpdateIndexNotifyTimeout()));
 
+		LOG_DEBUG(QString("Roster notify removed, id=%1").arg(ANotifyId));
 		emit notifyRemoved(ANotifyId);
 	}
 }
@@ -863,13 +885,19 @@ QList<IRostersDragDropHandler *> RostersView::dragDropHandlers() const
 void RostersView::insertDragDropHandler(IRostersDragDropHandler *AHandler)
 {
 	if (!FDragDropHandlers.contains(AHandler))
+	{
 		FDragDropHandlers.append(AHandler);
+		LOG_DEBUG(QString("Roster Drag&Drop handler inserted, address=%1").arg((quint64)AHandler));
+	}
 }
 
 void RostersView::removeDragDropHandler(IRostersDragDropHandler *AHandler)
 {
 	if (FDragDropHandlers.contains(AHandler))
+	{
 		FDragDropHandlers.removeAll(AHandler);
+		LOG_DEBUG(QString("Roster Drag&Drop handler removed, address=%1").arg((quint64)AHandler));
+	}
 }
 
 QMultiMap<int, IRostersLabelHolder *> RostersView::labelHolders() const
@@ -884,6 +912,7 @@ void RostersView::insertLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
 		if (!FLabelHolders.values().contains(AHolder))
 			connect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, IRosterIndex *)),SLOT(onRosterLabelChanged(quint32, IRosterIndex *)));
 		FLabelHolders.insertMulti(AOrder,AHolder);
+		LOG_DEBUG(QString("Roster label holder inserted, order=%1, class=%2").arg(AOrder).arg(AHolder->instance()->metaObject()->className()));
 	}
 }
 
@@ -894,6 +923,7 @@ void RostersView::removeLabelHolder(int AOrder, IRostersLabelHolder *AHolder)
 		FLabelHolders.remove(AOrder,AHolder);
 		if (!FLabelHolders.values().contains(AHolder))
 			disconnect(AHolder->instance(),SIGNAL(rosterLabelChanged(quint32, IRosterIndex *)),this,SLOT(onRosterLabelChanged(quint32, IRosterIndex *)));
+		LOG_DEBUG(QString("Roster label holder removed, order=%1, class=%2").arg(AOrder).arg(AHolder->instance()->metaObject()->className()));
 	}
 }
 
@@ -905,12 +935,19 @@ QMultiMap<int, IRostersClickHooker *> RostersView::clickHookers() const
 void RostersView::insertClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
 	if (AHooker)
+	{
 		FClickHookers.insertMulti(AOrder,AHooker);
+		LOG_DEBUG(QString("Roster click hooker inserted, order=%1, address=%2").arg(AOrder).arg((quint64)AHooker));
+	}
 }
 
 void RostersView::removeClickHooker(int AOrder, IRostersClickHooker *AHooker)
 {
-	FClickHookers.remove(AOrder,AHooker);
+	if (FClickHookers.contains(AOrder,AHooker))
+	{
+		FClickHookers.remove(AOrder,AHooker);
+		LOG_DEBUG(QString("Roster click hooker removed, order=%1, address=%2").arg(AOrder).arg((quint64)AHooker));
+	}
 }
 
 QMultiMap<int, IRostersKeyHooker *> RostersView::keyHookers() const
@@ -921,12 +958,19 @@ QMultiMap<int, IRostersKeyHooker *> RostersView::keyHookers() const
 void RostersView::insertKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
 {
 	if (AHooker)
+	{
 		FKeyHookers.insertMulti(AOrder,AHooker);
+		LOG_DEBUG(QString("Roster key hooker inserted, order=%1, address=%2").arg(AOrder).arg((quint64)AHooker));
+	}
 }
 
 void RostersView::removeKeyHooker(int AOrder, IRostersKeyHooker *AHooker)
 {
-	FKeyHookers.remove(AOrder,AHooker);
+	if (FKeyHookers.contains(AOrder,AHooker))
+	{
+		FKeyHookers.remove(AOrder,AHooker);
+		LOG_DEBUG(QString("Roster key hooker removed, order=%1, address=%2").arg(AOrder).arg((quint64)AHooker));
+	}
 }
 
 QMultiMap<int, IRostersEditHandler *> RostersView::editHandlers() const
@@ -937,12 +981,19 @@ QMultiMap<int, IRostersEditHandler *> RostersView::editHandlers() const
 void RostersView::insertEditHandler(int AOrder, IRostersEditHandler *AHandler)
 {
 	if (AHandler)
+	{
 		FEditHandlers.insertMulti(AOrder,AHandler);
+		LOG_DEBUG(QString("Roster edit handler inserted, address=%1").arg((quint64)AHandler));
+	}
 }
 
 void RostersView::removeEditHandler(int AOrder, IRostersEditHandler *AHandler)
 {
-	FEditHandlers.remove(AOrder,AHandler);
+	if (FEditHandlers.contains(AOrder,AHandler))
+	{
+		FEditHandlers.remove(AOrder,AHandler);
+		LOG_DEBUG(QString("Roster edit handler removed, address=%1").arg((quint64)AHandler));
+	}
 }
 
 void RostersView::clearLabels()

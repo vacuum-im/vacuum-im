@@ -3,22 +3,18 @@
 
 #include <QSet>
 #include <QMap>
-#include <definitions/namespaces.h>
-#include <definitions/stanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ipresence.h>
-#include <utils/stanza.h>
-#include <utils/options.h>
 
 class PrivateStorage :
-			public QObject,
-			public IPlugin,
-			public IPrivateStorage,
-			public IStanzaHandler,
-			public IStanzaRequestOwner
+	public QObject,
+	public IPlugin,
+	public IPrivateStorage,
+	public IStanzaHandler,
+	public IStanzaRequestOwner
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IPrivateStorage IStanzaHandler IStanzaRequestOwner);
@@ -68,6 +64,7 @@ protected slots:
 	void onStreamClosed(IXmppStream *AXmppStream);
 	void onPresenceAboutToClose(IPresence *APresence, int AShow, const QString &AStatus);
 private:
+	IXmppStreams *FXmppStreams;
 	IPresencePlugin *FPresencePlugin;
 	IStanzaProcessor *FStanzaProcessor;
 private:

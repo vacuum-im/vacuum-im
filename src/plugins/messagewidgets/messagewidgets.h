@@ -3,23 +3,10 @@
 
 #include <QDesktopServices>
 #include <QObjectCleanupHandler>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/shortcuts.h>
-#include <definitions/shortcutgrouporders.h>
-#include <definitions/messageviewurlhandlerorders.h>
-#include <definitions/messageeditcontentshandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/imainwindow.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/textmanager.h>
 #include "address.h"
 #include "infowidget.h"
 #include "editwidget.h"

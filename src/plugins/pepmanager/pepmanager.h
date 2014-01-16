@@ -1,7 +1,6 @@
 #ifndef PEPMANAGER_H
 #define PEPMANAGER_H
 
-#include <definitions/namespaces.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ipepmanager.h>
 #include <interfaces/istanzaprocessor.h>
@@ -45,9 +44,9 @@ private:
 	IServiceDiscovery *FDiscovery;
 	IStanzaProcessor *FStanzaProcessor;
 private:
-	QMap<Jid, int> stanzaHandles;
-	QMap<int, IPEPHandler *> handlersById;
-	QMultiMap<QString, int> handlersByNode;
+	QMap<Jid, int> FStanzaHandles;
+	QMap<int, IPEPHandler *> FHandlersById;
+	QMultiMap<QString, int> FHandlersByNode;
 };
 
 #endif // PEPMANAGER_H

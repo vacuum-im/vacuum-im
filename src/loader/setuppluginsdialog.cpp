@@ -4,15 +4,21 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QDesktopServices>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/statisticsparams.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
-enum TableColumns
-{
+enum TableColumns {
 	COL_NAME,
 	COL_FILE
 };
 
 SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocument APluginsSetup, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_PLUGINMANAGER_SETUP,0,0,"windowIcon");
@@ -189,7 +195,10 @@ void SetupPluginsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 	case QDialogButtonBox::Ok:
 		saveSettings();
 		if (QMessageBox::question(this,tr("Restart Application"),tr("Settings saved. Do you want to restart application?"),QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+		{
+			REPORT_EVENT(SEVP_APPLICATION_RESTART,1);
 			QTimer::singleShot(0,FPluginManager->instance(), SLOT(restart()));
+		}
 		accept();
 		break;
 	default:

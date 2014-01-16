@@ -10,8 +10,8 @@
 class SimpleMessageStylePlugin;
 
 class SimpleOptionsWidget :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

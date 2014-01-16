@@ -3,6 +3,7 @@
 #include <QNetworkProxy>
 #include <QAuthenticator>
 #include <definitions/internalerrors.h>
+#include <utils/logger.h>
 
 #define START_QUERY_ID        0
 #define STOP_QUERY_ID         -1
@@ -17,7 +18,7 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 	FDnsLookup.setType(QDnsLookup::SRV);
 	connect(&FDnsLookup,SIGNAL(finished()),SLOT(onDnsLookupFinished()));
 
-	FSocket.setProtocol(QSsl::AnyProtocol);
+	FSocket.setProtocol(QSsl::SslV3);
 	FSocket.setSocketOption(QAbstractSocket::KeepAliveOption,1);
 	connect(&FSocket, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
 		SLOT(onSocketProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
@@ -49,6 +50,11 @@ bool DefaultConnection::isEncrypted() const
 	return FSocket.isEncrypted();
 }
 
+bool DefaultConnection::isEncryptionSupported() const
+{
+	return FSocket.supportsSsl();
+}
+
 bool DefaultConnection::connectToHost()
 {
 	if (FDnsLookup.isFinished() && FSocket.state()==QAbstractSocket::UnconnectedState)
@@ -71,6 +77,7 @@ bool DefaultConnection::connectToHost()
 
 		if (host.isEmpty())
 		{
+			LOG_DEBUG(QString("Starting DNS SRV lookup, domain=%1").arg(domain));
 			FDnsLookup.setName(QString("_xmpp-client._tcp.%1.").arg(domain));
 			FDnsLookup.lookup();
 		}
@@ -83,6 +90,12 @@ bool DefaultConnection::connectToHost()
 	return false;
 }
 
+bool DefaultConnection::startEncryption()
+{
+	FSocket.startClientEncryption();
+	return true;
+}
+
 void DefaultConnection::disconnectFromHost()
 {
 	if (!FDisconnecting)
@@ -92,6 +105,7 @@ void DefaultConnection::disconnectFromHost()
 
 		if (FSocket.state() != QSslSocket::UnconnectedState)
 		{
+			LOG_INFO(QString("Disconnecting from host=%1").arg(FSocket.peerName()));
 			if (FSocket.state() == QSslSocket::ConnectedState)
 			{
 				emit aboutToDisconnect();
@@ -121,6 +135,7 @@ void DefaultConnection::abortConnection(const XmppError &AError)
 {
 	if (!FDisconnecting && FSocket.state()!=QSslSocket::UnconnectedState)
 	{
+		LOG_WARNING(QString("Aborting connection to host=%1: %2").arg(FSocket.peerName(),AError.condition()));
 		emit error(AError);
 		disconnectFromHost();
 	}
@@ -144,11 +159,6 @@ IConnectionPlugin *DefaultConnection::ownerPlugin() const
 QSslCertificate DefaultConnection::hostCertificate() const
 {
 	return FSocket.peerCertificate();
-}
-
-void DefaultConnection::startClientEncryption()
-{
-	FSocket.startClientEncryption();
 }
 
 void DefaultConnection::ignoreSslErrors()
@@ -221,6 +231,7 @@ void DefaultConnection::setProxy(const QNetworkProxy &AProxy)
 {
 	if (AProxy!= FSocket.proxy())
 	{
+		LOG_INFO(QString("Connection proxy changed, host=%1, port=%2").arg(AProxy.hostName()).arg(AProxy.port()));
 		FSocket.setProxy(AProxy);
 		emit proxyChanged(AProxy);
 	}
@@ -243,9 +254,15 @@ void DefaultConnection::connectToNextHost()
 		SrvRecord record = FRecords.takeFirst();
 
 		if (FUseLegacySSL)
+		{
+			LOG_INFO(QString("Connecting to host with encryption, host=%1, port=%2").arg(record.target).arg(record.port));
 			FSocket.connectToHostEncrypted(record.target, record.port);
+		}
 		else
+		{
+			LOG_INFO(QString("Connecting to host=%1, port=%2").arg(record.target).arg(record.port));
 			FSocket.connectToHost(record.target, record.port);
+		}
 	}
 }
 
@@ -271,12 +288,14 @@ void DefaultConnection::onDnsLookupFinished()
 
 void DefaultConnection::onSocketProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth)
 {
+	LOG_INFO(QString("Proxy authentication requested, host=%1, proxy=%2, user=%3").arg(FSocket.peerName(),AProxy.hostName(),AProxy.user()));
 	AAuth->setUser(AProxy.user());
 	AAuth->setPassword(AProxy.password());
 }
 
 void DefaultConnection::onSocketConnected()
 {
+	LOG_INFO(QString("Socket connected, host=%1").arg(FSocket.peerName()));
 	if (!FUseLegacySSL)
 	{
 		FRecords.clear();
@@ -308,6 +327,7 @@ void DefaultConnection::onSocketReadyRead()
 
 void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 {
+	LOG_INFO(QString("Socket SSL errors occurred, host=%1, verify=%2").arg(FSocket.peerName()).arg(FVerifyMode));
 	if (FVerifyMode == IDefaultConnection::Disabled)
 	{
 		ignoreSslErrors();
@@ -325,6 +345,7 @@ void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 
 void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 {
+	LOG_INFO(QString("Socket error, host=%1: %2").arg(FSocket.peerName(),FSocket.errorString()));
 	if (FRecords.isEmpty())
 	{
 		if (FSocket.state()!=QSslSocket::ConnectedState || FSSLError)
@@ -345,6 +366,7 @@ void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
 
 void DefaultConnection::onSocketDisconnected()
 {
+	LOG_INFO(QString("Socket disconnected, host=%1").arg(FSocket.peerName()));
 	FRecords.clear();
 	emit disconnected();
 }

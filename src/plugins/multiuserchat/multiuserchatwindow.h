@@ -2,26 +2,6 @@
 #define MULTIUSERCHATWINDOW_H
 
 #include <QStandardItemModel>
-#include <definitions/namespaces.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionvalues.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/actiongroups.h>
-#include <definitions/recentitemtypes.h>
-#include <definitions/rosternotifyorders.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/multiuserdataroles.h>
-#include <definitions/multiusertooltiporders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/messagehandlerorders.h>
-#include <definitions/messageeditsendhandlerorders.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
@@ -35,11 +15,6 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irecentcontacts.h>
 #include <interfaces/istanzaprocessor.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/textmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/widgetmanager.h>
 #include "edituserslistdialog.h"
 #include "inputtextdialog.h"
 #include "usersproxymodel.h"
@@ -200,9 +175,9 @@ protected slots:
 	void onConfigFormReceived(const IDataForm &AForm);
 	void onRoomDestroyed(const QString &AReason);
 protected slots:
+	void onMultiChatWindowActivated();
 	void onMultiChatNotifierActiveNotifyChanged(int ANotifyId);
 	void onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bool &AHooked);
-	void onMultiChatWindowActivated();
 	void onMultiChatHorizontalSplitterMoved(int APos, int AIndex);
 	void onMultiChatUserItemDoubleClicked(const QModelIndex &AIndex);
 	void onMultiChatContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);

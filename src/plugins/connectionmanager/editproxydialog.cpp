@@ -1,7 +1,8 @@
 #include "editproxydialog.h"
 
-enum ProxyItemDataRoles
-{
+#include <utils/logger.h>
+
+enum ProxyItemDataRoles {
 	PDR_UUID = Qt::UserRole,
 	PDR_NAME,
 	PDR_TYPE,
@@ -13,6 +14,7 @@ enum ProxyItemDataRoles
 
 EditProxyDialog::EditProxyDialog(IConnectionManager *AManager, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 	setWindowModality(Qt::WindowModal);

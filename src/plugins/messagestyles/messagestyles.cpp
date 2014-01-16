@@ -2,6 +2,15 @@
 
 #include <QTimer>
 #include <QCoreApplication>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/menuicons.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 MessageStyles::MessageStyles()
 {
@@ -26,8 +35,10 @@ void MessageStyles::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool MessageStyles::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	QList<IPlugin *> plugins = APluginManager->pluginInterface("IMessageStylePlugin");
 	foreach (IPlugin *plugin, plugins)
 	{
@@ -38,19 +49,27 @@ bool MessageStyles::initConnections(IPluginManager *APluginManager, int &/*AInit
 
 	IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
+	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
 	if (plugin)
+	{
 		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
+	{
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IVCardPlugin").value(0,NULL);
 	if (plugin)
@@ -154,7 +173,7 @@ QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid
 		if (!FStreamNames.contains(AStreamJid.bare()))
 		{
 			IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AStreamJid.bare()) : NULL;
-			if (vcard!=NULL)
+			if (vcard)
 			{
 				name = vcard->value(VVN_NICKNAME);
 				vcard->unlock();
@@ -254,7 +273,7 @@ void MessageStyles::onVCardChanged(const Jid &AContactJid)
 	if (FStreamNames.contains(AContactJid.bare()))
 	{
 		IVCard *vcard = FVCardPlugin!=NULL ? FVCardPlugin->getVCard(AContactJid) : NULL;
-		if (vcard!=NULL)
+		if (vcard)
 		{
 			FStreamNames.insert(AContactJid.bare(),vcard->value(VVN_NICKNAME));
 			vcard->unlock();

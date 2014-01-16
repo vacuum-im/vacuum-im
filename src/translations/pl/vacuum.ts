@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pl" sourcelanguage="en">
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>AboutBox</name>
     <message>
@@ -48,10 +48,6 @@
     <message>
         <source>About the program</source>
         <translation>O programie</translation>
-    </message>
-    <message>
-        <source>Plugins directory not found</source>
-        <translation>Nie znaleziono folderu wtyczek</translation>
     </message>
     <message>
         <source>Application</source>

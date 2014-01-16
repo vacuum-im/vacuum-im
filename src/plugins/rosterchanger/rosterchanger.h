@@ -2,24 +2,6 @@
 #define ROSTERCHANGER_H
 
 #include <QDateTime>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosternotifyorders.h>
-#include <definitions/rosteredithandlerorders.h>
-#include <definitions/rosterdragdropmimetypes.h>
-#include <definitions/multiuserdataroles.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/shortcuts.h>
-#include <definitions/xmppurihandlerorders.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersmodel.h>
@@ -29,8 +11,6 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppuriqueries.h>
-#include <utils/shortcuts.h>
-#include <utils/widgetmanager.h>
 #include "addcontactdialog.h"
 #include "subscriptiondialog.h"
 

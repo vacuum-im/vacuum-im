@@ -2,14 +2,6 @@
 #define PRIVACYLISTS_H
 
 #include <QTimer>
-#include <definitions/namespaces.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/rostertooltiporders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iprivacylists.h>
 #include <interfaces/istanzaprocessor.h>
@@ -17,7 +9,6 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imultiuserchat.h>
-#include <utils/xmpperror.h>
 #include "editlistsdialog.h"
 
 class PrivacyLists :

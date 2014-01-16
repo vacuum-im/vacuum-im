@@ -1,5 +1,7 @@
 #include "tabpagenotifier.h"
 
+#include <utils/logger.h>
+
 TabPageNotifier::TabPageNotifier(IMessageTabPage *ATabPage) : QObject(ATabPage->instance())
 {
 	FTabPage = ATabPage;
@@ -38,18 +40,19 @@ IMessageTabPageNotify TabPageNotifier::notifyById(int ANotifyId) const
 
 int TabPageNotifier::insertNotify(const IMessageTabPageNotify &ANotify)
 {
-	if (ANotify.priority > 0)
-	{
-		int notifyId = qrand();
-		while (notifyId<=0 || FNotifies.contains(notifyId))
-			notifyId = qrand();
-		FNotifies.insert(notifyId,ANotify);
-		FNotifyIdByPriority.insertMulti(ANotify.priority, notifyId);
-		FUpdateTimer.start();
-		emit notifyInserted(notifyId);
-		return notifyId;
-	}
-	return -1;
+	int notifyId = qrand();
+	while (notifyId<=0 || FNotifies.contains(notifyId))
+		notifyId = qrand();
+
+	FNotifies.insert(notifyId,ANotify);
+	FNotifyIdByPriority.insertMulti(ANotify.priority,notifyId);
+
+	FUpdateTimer.start();
+
+	LOG_DEBUG(QString("Tab page notification inserted, id=%1, priority=%2, blink=%3").arg(notifyId).arg(ANotify.priority).arg(ANotify.blink));
+	emit notifyInserted(notifyId);
+
+	return notifyId;
 }
 
 void TabPageNotifier::removeNotify(int ANotifyId)
@@ -58,7 +61,10 @@ void TabPageNotifier::removeNotify(int ANotifyId)
 	{
 		IMessageTabPageNotify notify = FNotifies.take(ANotifyId);
 		FNotifyIdByPriority.remove(notify.priority, ANotifyId);
+
 		FUpdateTimer.start();
+
+		LOG_DEBUG(QString("Tab page notification removed, id=%1").arg(ANotifyId));
 		emit notifyRemoved(ANotifyId);
 	}
 }

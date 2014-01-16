@@ -4,10 +4,6 @@
 #include <QHash>
 #include <QTimer>
 #include <QSortFilterProxyModel>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexkindorders.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
@@ -15,8 +11,6 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/imessageprocessor.h>
-#include <utils/advanceditemdelegate.h>
-#include <utils/options.h>
 #include "ui_receiverswidget.h"
 
 class ReceiversSortSearchProxyModel : 

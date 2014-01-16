@@ -3,14 +3,6 @@
 
 #include <QTimer>
 #include <QDomDocument>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterdataholderorders.h>
-#include <definitions/rostertooltiporders.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/resources.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iannotations.h>
 #include <interfaces/iroster.h>
@@ -19,10 +11,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/datetime.h>
-#include <utils/shortcuts.h>
-#include <utils/textmanager.h>
-#include <utils/widgetmanager.h>
-#include <utils/advanceditemdelegate.h>
 #include "editnotedialog.h"
 
 struct Annotation {

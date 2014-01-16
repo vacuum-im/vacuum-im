@@ -2,23 +2,19 @@
 #define DISCOINFOWINDOW_H
 
 #include <QDialog>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/iservicediscovery.h>
-#include <utils/menu.h>
 #include "ui_discoinfowindow.h"
 
 class DiscoInfoWindow :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
-	DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, const Jid &AContactJid,
-	                const QString &ANode, QWidget *AParent = NULL);
+	DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
 	~DiscoInfoWindow();
-	virtual Jid streamJid() const { return FStreamJid; }
-	virtual Jid contactJid() const { return FContactJid; }
-	virtual QString node() const { return FNode; }
+	virtual Jid streamJid() const;
+	virtual Jid contactJid() const;
+	virtual QString node() const;
 protected:
 	void initialize();
 	void updateWindow();

@@ -29,7 +29,8 @@ HEADERS  = utilsexport.h \
            advanceditemdelegate.h \
            filecookiejar.h \
            boxwidget.h \
-           splitterwidget.h
+           splitterwidget.h \
+           logger.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -61,7 +62,8 @@ SOURCES  = jid.cpp \
            advanceditemdelegate.cpp \
            filecookiejar.cpp \
            boxwidget.cpp \
-           splitterwidget.cpp
+           splitterwidget.cpp \
+           logger.cpp
 
 unix:!mac:!haiku {
   HEADERS += x11info.h

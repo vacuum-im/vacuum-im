@@ -2,19 +2,10 @@
 #define SHORTCUTMANAGER_H
 
 #include <QPointer>
-#include <definitions/version.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/itraymanager.h>
 #include <interfaces/inotifications.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
 #include "shortcutoptionswidget.h"
 
 #define SHORTCUTMANAGER_UUID "{3F6D20F1-401D-4832-92C3-DB6687891EFD}"

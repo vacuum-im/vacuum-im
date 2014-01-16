@@ -1,21 +1,10 @@
 #ifndef COMPRESSPLUGIN_H
 #define COMPRESSPLUGIN_H
 
-#include <QObject>
-#include <definitions/namespaces.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/xmpperrors.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
-#include <utils/options.h>
-#include <utils/xmpperror.h>
 #include "compression.h"
 
 #define COMPRESS_UUID "{061D0687-B954-416d-B690-D1BA7D845D83}"

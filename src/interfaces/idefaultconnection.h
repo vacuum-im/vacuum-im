@@ -26,7 +26,6 @@ public:
 	};
 public:
 	virtual QObject *instance() =0;
-	virtual void startClientEncryption() =0;
 	virtual void ignoreSslErrors() =0;
 	virtual QList<QSslError> sslErrors() const =0;
 	virtual QSsl::SslProtocol protocol() const =0;
@@ -53,7 +52,7 @@ public:
 	virtual QObject *instance() =0;
 };
 
-Q_DECLARE_INTERFACE(IDefaultConnection,"Vacuum.Plugin.IDefaultConnection/1.1")
-Q_DECLARE_INTERFACE(IDefaultConnectionPlugin,"Vacuum.Plugin.IDefaultConnectionPlugin/1.1")
+Q_DECLARE_INTERFACE(IDefaultConnection,"Vacuum.Plugin.IDefaultConnection/1.2")
+Q_DECLARE_INTERFACE(IDefaultConnectionPlugin,"Vacuum.Plugin.IDefaultConnectionPlugin/1.2")
 
 #endif // IDEFAULTCONNECTION_H

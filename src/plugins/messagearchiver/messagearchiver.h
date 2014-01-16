@@ -5,23 +5,6 @@
 #include <QList>
 #include <QUuid>
 #include <QMultiMap>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/sessionnegotiatororders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/shortcutgrouporders.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/imessagewidgets.h>
@@ -38,13 +21,9 @@
 #include <interfaces/idataforms.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/iroster.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/xmpperror.h>
-#include <utils/widgetmanager.h>
-#include "archivestreamoptions.h"
 #include "chatwindowmenu.h"
 #include "archiveviewwindow.h"
+#include "archivestreamoptions.h"
 #include "archiveenginesoptions.h"
 #include "archivereplicator.h"
 
@@ -183,13 +162,13 @@ protected:
 	bool prepareMessage(const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	bool processMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn);
 protected:
-	IArchiveEngine *findEngineByCapability(quint32 ACapability, const Jid &AStreamJid) const;
-	QMultiMap<int, IArchiveEngine *> engineOrderByCapability(quint32 ACapability, const Jid &AStreamJid) const;
+	IArchiveEngine *findEngineByCapability(const Jid &AStreamJid, quint32 ACapability) const;
+	QMultiMap<int, IArchiveEngine *> engineOrderByCapability(const Jid &AStreamJid, quint32 ACapability) const;
 protected:
-	void processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest);
+	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
 	void processHeadersRequest(const QString &ALocalId, HeadersRequest &ARequest);
 	void processCollectionRequest(const QString &ALocalId, CollectionRequest &ARequest);
-	void processMessagesRequest(const QString &ALocalId, MessagesRequest &ARequest);
+	void processRemoveRequest(const QString &ALocalId, RemoveRequest &ARequest);
 protected:
 	bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
 	bool isOTRStanzaSession(const IStanzaSession &ASession) const;
@@ -210,9 +189,9 @@ protected:
 protected slots:
 	void onEngineCapabilitiesChanged(const Jid &AStreamJid);
 	void onEngineRequestFailed(const QString &AId, const XmppError &AError);
-	void onEngineCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void onEngineHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onEngineCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	void onEngineCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void onSelfRequestFailed(const QString &AId, const XmppError &AError);
 	void onSelfHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onSelfCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);

@@ -1,19 +1,9 @@
 #ifndef VCARDPLUGIN_H
 #define VCARDPLUGIN_H
 
+#include <QDir>
 #include <QTimer>
 #include <QObjectCleanupHandler>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/multiuserdataroles.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/xmppurihandlerorders.h>
-#include <definitions/toolbargroups.h>
 #include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ivcard.h>
@@ -27,11 +17,6 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersearch.h>
-#include <utils/stanza.h>
-#include <utils/action.h>
-#include <utils/shortcuts.h>
-#include <utils/xmpperror.h>
-#include <utils/textmanager.h>
 #include <utils/widgetmanager.h>
 #include "vcard.h"
 #include "vcarddialog.h"
@@ -127,6 +112,7 @@ private:
 	IMessageWidgets *FMessageWidgets;
 	IRosterSearch *FRosterSearch;
 private:
+	QDir FVCardFilesDir;
 	QTimer FUpdateTimer;
 	QMap<Jid,VCardItem> FVCards;
 	QMultiMap<Jid,Jid> FUpdateQueue;

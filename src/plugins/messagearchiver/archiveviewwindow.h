@@ -6,9 +6,6 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/iroster.h>
@@ -18,9 +15,6 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/iurlprocessor.h>
-#include <utils/iconstorage.h>
-#include <utils/textmanager.h>
-#include <utils/widgetmanager.h>
 #include "ui_archiveviewwindow.h"
 
 enum RequestStatus {

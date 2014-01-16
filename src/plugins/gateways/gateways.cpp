@@ -1,6 +1,22 @@
 #include "gateways.h"
 
 #include <QMessageBox>
+#include <definitions/namespaces.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/discoitemdataroles.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <utils/xmpperror.h>
+#include <utils/shortcuts.h>
+#include <utils/stanza.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define GATEWAY_TIMEOUT           30000
 
@@ -63,7 +79,9 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
@@ -95,7 +113,9 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 	plugin = APluginManager->pluginInterface("IRosterChanger").value(0,NULL);
 	if (plugin)
+	{
 		FRosterChanger = qobject_cast<IRosterChanger *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
@@ -137,7 +157,9 @@ bool Gateways::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
+	{
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRegistration").value(0,NULL);
 	if (plugin)
@@ -182,13 +204,16 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	{
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Legacy user prompt received, id=%1").arg(AStanza.id()));
 			QString desc = AStanza.firstElement("query",NS_JABBER_GATEWAY).firstChildElement("desc").text();
 			QString prompt = AStanza.firstElement("query",NS_JABBER_GATEWAY).firstChildElement("prompt").text();
 			emit promptReceived(AStanza.id(),desc,prompt);
 		}
 		else
 		{
-			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive legacy user prompt, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit errorReceived(AStanza.id(),err);
 		}
 		FPromptRequests.removeAll(AStanza.id());
 	}
@@ -196,12 +221,15 @@ void Gateways::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 	{
 		if (AStanza.type() == "result")
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Legacy user JID received, id=%1").arg(AStanza.id()));
 			Jid userJid = AStanza.firstElement("query",NS_JABBER_GATEWAY).firstChildElement("jid").text();
 			emit userJidReceived(AStanza.id(),userJid);
 		}
 		else
 		{
-			emit errorReceived(AStanza.id(),XmppStanzaError(AStanza));
+			XmppStanzaError err(AStanza);
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to receive legacy user JID, id=%1: %2").arg(AStanza.id(),err.condition()));
+			emit errorReceived(AStanza.id(),err);
 		}
 		FUserJidRequests.removeAll(AStanza.id());
 	}
@@ -217,7 +245,7 @@ bool Gateways::execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, 
 Action *Gateways::createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent)
 {
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
-	if (presence && presence->isOpen() && AFeature == NS_JABBER_GATEWAY)
+	if (presence && presence->isOpen() && AFeature==NS_JABBER_GATEWAY)
 	{
 		Action *action = new Action(AParent);
 		action->setText(tr("Add Legacy User"));
@@ -239,13 +267,16 @@ void Gateways::resolveNickName(const Jid &AStreamJid, const Jid &AContactJid)
 		if (FVCardPlugin->hasVCard(ritem.itemJid))
 		{
 			static const QList<QString> nickFields = QList<QString>() << VVN_NICKNAME << VVN_FULL_NAME << VVN_GIVEN_NAME << VVN_FAMILY_NAME;
+			LOG_STRM_INFO(AStreamJid,QString("Resolving contact nick name from vCard, jid=%1").arg(AContactJid.bare()));
+
 			IVCard *vcard = FVCardPlugin->getVCard(ritem.itemJid);
 			foreach(const QString &field, nickFields)
 			{
 				QString nick = vcard->value(field);
 				if (!nick.isEmpty())
 				{
-					roster->renameItem(ritem.itemJid,nick);
+					if (ritem.name != nick)
+						roster->renameItem(ritem.itemJid,nick);
 					break;
 				}
 			}
@@ -253,10 +284,15 @@ void Gateways::resolveNickName(const Jid &AStreamJid, const Jid &AContactJid)
 		}
 		else
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Requesting contact vCard to resolve nick name, jid=%1").arg(AContactJid.bare()));
 			if (!FResolveNicks.contains(ritem.itemJid))
 				FVCardPlugin->requestVCard(AStreamJid,ritem.itemJid);
 			FResolveNicks.insertMulti(ritem.itemJid,AStreamJid);
 		}
+	}
+	else if (!ritem.isValid)
+	{
+		LOG_STRM_ERROR(AStreamJid,QString("Failed to resolve contact nick name, jid=%1: Contact not found").arg(AContactJid.bare()));
 	}
 }
 
@@ -311,7 +347,9 @@ QList<Jid> Gateways::streamServices(const Jid &AStreamJid, const IDiscoIdentity 
 				}
 			}
 			else
+			{
 				services.append(ritem.itemJid);
+			}
 		}
 	}
 	return services;
@@ -333,6 +371,7 @@ bool Gateways::removeService(const Jid &AStreamJid, const Jid &AServiceJid, bool
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	if (roster && roster->isOpen())
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Removing service=%1 with contacts=%2").arg(AServiceJid.bare()).arg(AWithContacts));
 		sendLogPresence(AStreamJid,AServiceJid,false);
 		
 		if (FRosterChanger)
@@ -352,6 +391,10 @@ bool Gateways::removeService(const Jid &AStreamJid, const Jid &AServiceJid, bool
 		}
 		return true;
 	}
+	else if (roster)
+	{
+		LOG_STRM_ERROR(AStreamJid,QString("Failed to remove service=%1: Roster not opened").arg(AServiceJid.bare()));
+	}
 	return false;
 }
 
@@ -359,24 +402,26 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 {
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
-	if (roster && presence && FRosterChanger && presence->isOpen() && AServiceFrom.isValid() && AServiceTo.isValid() && AServiceFrom.pDomain()!=AServiceTo.pDomain())
+	if (FRosterChanger && roster && presence &&  presence->isOpen() && AServiceFrom.isValid() && AServiceTo.isValid() && AServiceFrom.pDomain()!=AServiceTo.pDomain())
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Changing service from=%1 to=%2, remove=%2, subscribe=%4").arg(AServiceFrom.bare(),AServiceTo.bare()).arg(ARemove).arg(ASubscribe));
+
 		IRosterItem ritemOld = roster->rosterItem(AServiceFrom);
 		IRosterItem ritemNew = roster->rosterItem(AServiceTo);
 
-		//� азлогиниваемся на старом транспорте
+		//Logout on old service
 		if (!presence->findItems(AServiceFrom).isEmpty())
 			sendLogPresence(AStreamJid,AServiceFrom,false);
 
-		//Удаляем регистрацию на старом транспорте
+		//Remove registration on old service
 		if (FRegistration && ARemove)
 			FRegistration->sendUnregiterRequest(AStreamJid,AServiceFrom);
 
-		//Удаляем подписку у старого транспорта
+		//Remove subscription from old service
 		if (ritemOld.isValid && !ARemove)
 			FRosterChanger->unsubscribeContact(AStreamJid,AServiceFrom,QString::null,true);
 
-		//Добавляем контакты нового транспорта и удаляем старые
+		//Adding contact of old service to new
 		QList<IRosterItem> newItems, oldItems, curItems;
 		foreach(const IRosterItem &ritem, roster->rosterItems())
 		{
@@ -398,7 +443,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 		roster->removeItems(oldItems);
 		roster->setItems(newItems);
 
-		//Запрашиваем подписку у нового транспорта и контактов
+		//Request subscription from new service and its contacts
 		if (ASubscribe)
 		{
 			FSubscribeServices.remove(AStreamJid,AServiceFrom.bare());
@@ -419,6 +464,10 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
 		return true;
 	}
+	else if (FRosterChanger && roster && presence && presence->isOpen())
+	{
+		LOG_STRM_ERROR(AStreamJid,QString("Failed to change service from=%1 to=%2: Invalid params").arg(AServiceFrom.bare(),AServiceTo.bare()));
+	}
 	return false;
 }
 
@@ -429,8 +478,13 @@ QString Gateways::sendPromptRequest(const Jid &AStreamJid, const Jid &AServiceJi
 	request.addElement("query",NS_JABBER_GATEWAY);
 	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
 	{
+		LOG_STRM_DEBUG(AStreamJid,QString("Legacy user prompt request sent to=%1, id=%2").arg(AServiceJid.full(),request.id()));
 		FPromptRequests.append(request.id());
 		return request.id();
+	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to send legacy user prompt request to=%1").arg(AServiceJid.full()));
 	}
 	return QString::null;
 }
@@ -443,8 +497,13 @@ QString Gateways::sendUserJidRequest(const Jid &AStreamJid, const Jid &AServiceJ
 	elem.appendChild(request.createElement("prompt")).appendChild(request.createTextNode(AContactID));
 	if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,GATEWAY_TIMEOUT))
 	{
+		LOG_STRM_DEBUG(AStreamJid,QString("Legacy user JID request sent to=%1, id=%2").arg(AServiceJid.full(),request.id()));
 		FUserJidRequests.append(request.id());
 		return request.id();
+	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to send legacy user JID request to=%1").arg(AServiceJid.full()));
 	}
 	return QString::null;
 }
@@ -458,6 +517,10 @@ QDialog *Gateways::showAddLegacyContactDialog(const Jid &AStreamJid, const Jid &
 		connect(presence->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
 		dialog->show();
 		return dialog;
+	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,"Failed to open add legacy contact dialog: Presence not opened");
 	}
 	return NULL;
 }
@@ -483,7 +546,10 @@ void Gateways::savePrivateStorageKeep(const Jid &AStreamJid)
 		QSet<Jid> services = FPrivateStorageKeep.value(AStreamJid);
 		foreach(const Jid &service, services)
 			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
-		FPrivateStorage->saveData(AStreamJid,elem);
+		if (!FPrivateStorage->saveData(AStreamJid,elem).isEmpty())
+			LOG_STRM_INFO(AStreamJid,QString("Save gateways with keep connection request sent"));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send save gateways with keep connection request"));
 	}
 }
 
@@ -496,7 +562,10 @@ void Gateways::savePrivateStorageSubscribe(const Jid &AStreamJid)
 		QDomElement elem = doc.documentElement().appendChild(doc.createElementNS(PSN_GATEWAYS_SUBSCRIBE,PST_GATEWAYS_SERVICES)).toElement();
 		foreach(const Jid &service, FSubscribeServices.values(AStreamJid))
 			elem.appendChild(doc.createElement("service")).appendChild(doc.createTextNode(service.bare()));
-		FPrivateStorage->saveData(AStreamJid,elem);
+		if (!FPrivateStorage->saveData(AStreamJid,elem).isEmpty())
+			LOG_STRM_INFO(AStreamJid,QString("Save gateways with auto subscribe request sent"));
+		else
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send save gateways with auto subscribe request"));
 	}
 }
 
@@ -654,7 +723,7 @@ void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_GATELOGIN || AId == SCT_ROSTERVIEW_GATELOGOUT)
+		if (AId==SCT_ROSTERVIEW_GATELOGIN || AId==SCT_ROSTERVIEW_GATELOGOUT)
 		{
 			foreach(IRosterIndex *index, FRostersViewPlugin->rostersView()->selectedRosterIndexes())
 			{
@@ -684,7 +753,7 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 		bool isMultiSelection = AIndexes.count()>1;
 		int indexKind = AIndexes.first()->kind();
 
-		if (indexKind==RIK_STREAM_ROOT && FDiscovery)
+		if (FDiscovery && indexKind==RIK_STREAM_ROOT)
 		{
 			Menu *addUserMenu = new Menu(AMenu);
 			addUserMenu->setTitle(tr("Add Legacy User"));
@@ -811,7 +880,12 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 void Gateways::onPresenceOpened(IPresence *APresence)
 {
 	if (FPrivateStorage)
-		FPrivateStorage->loadData(APresence->streamJid(),PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP);
+	{
+		if (!FPrivateStorage->loadData(APresence->streamJid(),PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP).isEmpty())
+			LOG_STRM_INFO(APresence->streamJid(),QString("Gateways with keep connection load request sent"));
+		else
+			LOG_STRM_WARNING(APresence->streamJid(),QString("Failed to send load gateways with keep connection request"));
+	}
 	FKeepTimer.start(KEEP_INTERVAL);
 }
 
@@ -824,13 +898,13 @@ void Gateways::onContactStateChanged(const Jid &AStreamJid, const Jid &AContactJ
 		{
 			FSubscribeServices.remove(AStreamJid,AContactJid.bare());
 			savePrivateStorageSubscribe(AStreamJid);
+
+			LOG_STRM_DEBUG(AStreamJid,QString("Automatically requesting subscription from service contacts=%1").arg(AContactJid.domain()));
 			foreach(const IRosterItem &ritem, roster->rosterItems())
 			{
-				if (ritem.itemJid.pDomain()==AContactJid.pDomain())
-				{
+				if (ritem.itemJid.pDomain() == AContactJid.pDomain())
 					if (ritem.subscription!=SUBSCRIPTION_BOTH && ritem.subscription!=SUBSCRIPTION_TO && ritem.ask!=SUBSCRIPTION_SUBSCRIBE)
 						roster->sendSubscription(ritem.itemJid,IRoster::Subscribe);
-				}
 			}
 		}
 	}
@@ -861,9 +935,7 @@ void Gateways::onRosterSubscriptionReceived(IRoster *ARoster, const Jid &AItemJi
 {
 	Q_UNUSED(AText);
 	if (ASubsType==IRoster::Subscribed && FSubscribeServices.contains(ARoster->streamJid(),AItemJid))
-	{
 		sendLogPresence(ARoster->streamJid(),AItemJid,true);
-	}
 }
 
 void Gateways::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AAfter)
@@ -875,7 +947,10 @@ void Gateways::onRosterStreamJidAboutToBeChanged(IRoster *ARoster, const Jid &AA
 
 void Gateways::onPrivateStorateOpened(const Jid &AStreamJid)
 {
-	FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE);
+	if (!FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_SUBSCRIBE).isEmpty())
+		LOG_STRM_INFO(AStreamJid,QString("Load gateways with auto subscribe request sent"));
+	else
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to send load gateways with auto subscribe request"));
 }
 
 void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
@@ -883,6 +958,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_GATEWAYS_SERVICES && AElement.namespaceURI()==PSN_GATEWAYS_KEEP)
 	{
+		LOG_STRM_INFO(AStreamJid,"Gateways with keep connection loaded");
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 		if (roster)
 		{
@@ -918,6 +994,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 	}
 	else if (AElement.tagName()==PST_GATEWAYS_SERVICES && AElement.namespaceURI()==PSN_GATEWAYS_SUBSCRIBE)
 	{
+		LOG_STRM_INFO(AStreamJid,"Gateways with auto subscribe loaded");
 		QDomElement elem = AElement.firstChildElement("service");
 		while (!elem.isNull())
 		{
@@ -934,9 +1011,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 void Gateways::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
 	if (ATagName==PST_GATEWAYS_SERVICES && ANamespace==PSN_GATEWAYS_KEEP)
-	{
 		FPrivateStorage->loadData(AStreamJid,PST_GATEWAYS_SERVICES,PSN_GATEWAYS_KEEP);
-	}
 }
 
 void Gateways::onKeepTimerTimeout()

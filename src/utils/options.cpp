@@ -548,9 +548,9 @@ void Options::setDefaultValue(const QString &APath, const QVariant &ADefault)
 	OptionItem &item = instance()->d->items[cleanNSpaces(APath)];
 	if (item.defValue != ADefault)
 	{
-	item.defValue = ADefault;
-	emit instance()->defaultValueChanged(APath,ADefault);
-}
+		item.defValue = ADefault;
+		emit instance()->defaultValueChanged(APath,ADefault);
+	}
 }
 
 QByteArray Options::encrypt(const QVariant &AValue, const QByteArray &AKey)

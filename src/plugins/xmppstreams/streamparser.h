@@ -3,7 +3,6 @@
 
 #include <QDomDocument>
 #include <QXmlStreamReader>
-#include <definitions/namespaces.h>
 #include <utils/xmpperror.h>
 
 class StreamParser :

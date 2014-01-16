@@ -6,8 +6,7 @@
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/istanzaprocessor.h>
 
-struct ResultSet
-{
+struct ResultSet {
 	ResultSet() {
 		index = 0;
 		count = 0;
@@ -51,7 +50,7 @@ struct LocalModificationsRequest {
 	IArchiveModifications modifications;
 };
 
-class ServerMessageArchive : 
+class ServerMessageArchive :
 	public QObject,
 	public IPlugin,
 	public IStanzaRequestOwner,

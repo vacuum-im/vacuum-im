@@ -4,17 +4,11 @@
 #include <QDir>
 #include <QMap>
 #include <QTimer>
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibitsofbinary.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
-#include <utils/xmpperror.h>
-#include <utils/stanza.h>
 
 class BitsOfBinary :
 	public QObject,

@@ -2,29 +2,24 @@
 #define SEARCHDIALOG_H
 
 #include <QDialog>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ijabbersearch.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/ivcard.h>
-#include <utils/toolbarchanger.h>
 #include "ui_searchdialog.h"
 
 class SearchDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
 	SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
 	~SearchDialog();
 public:
-	virtual Jid streamJid() const { return FStreamJid; }
-	virtual Jid serviceJid() const { return FServiceJid; }
+	virtual Jid streamJid() const;
+	virtual Jid serviceJid() const;
 	virtual ISearchItem currentItem() const;
 protected:
 	void resetDialog();

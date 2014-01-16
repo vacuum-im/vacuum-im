@@ -2,13 +2,8 @@
 #define SORTFILTERPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
-#include <definitions/optionvalues.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterindexkindorders.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ipresence.h>
-#include <utils/options.h>
 
 class SortFilterProxyModel :
 	public QSortFilterProxyModel

@@ -2,17 +2,13 @@
 #define ACCOUNTOPTIONS_H
 
 #include <QWidget>
-#include <definitions/version.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/jid.h>
-#include <utils/options.h>
 #include "ui_accountoptions.h"
 
 class AccountOptions :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

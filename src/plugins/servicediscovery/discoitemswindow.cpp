@@ -2,6 +2,22 @@
 
 #include <QRegExp>
 #include <QLineEdit>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/discoitemdataroles.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <utils/widgetmanager.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
+
+// SortFilterProxyModel
+SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) :QSortFilterProxyModel(AParent)
+{
+
+}
 
 bool SortFilterProxyModel::hasChildren( const QModelIndex &AParent ) const
 {
@@ -28,6 +44,7 @@ bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent
 
 DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QWidget *AParent) : QMainWindow(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Service Discovery - %1").arg(AStreamJid.uFull()));
@@ -117,6 +134,21 @@ DiscoItemsWindow::~DiscoItemsWindow()
 	emit windowDestroyed(this);
 }
 
+Jid DiscoItemsWindow::streamJid() const
+{
+	return FStreamJid;
+}
+
+ToolBarChanger *DiscoItemsWindow::toolBarChanger() const
+{
+	return FToolBarChanger;
+}
+
+ToolBarChanger *DiscoItemsWindow::actionsBarChanger() const
+{
+	return FActionsBarChanger;
+}
+
 void DiscoItemsWindow::discover(const Jid &AContactJid, const QString &ANode)
 {
 	ui.cmbJid->setEditText(AContactJid.uFull());
@@ -139,6 +171,11 @@ void DiscoItemsWindow::discover(const Jid &AContactJid, const QString &ANode)
 	ui.trvItems->setCurrentIndex(ui.trvItems->model()->index(0,0));
 
 	emit discoverChanged(AContactJid,ANode);
+}
+
+QMenu * DiscoItemsWindow::createPopupMenu()
+{
+	return NULL;
 }
 
 void DiscoItemsWindow::initialize()

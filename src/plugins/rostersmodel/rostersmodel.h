@@ -6,8 +6,6 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/iaccountmanager.h>
-#include <utils/jid.h>
-#include <utils/options.h>
 #include "rootindex.h"
 #include "rosterindex.h"
 #include "dataholder.h"

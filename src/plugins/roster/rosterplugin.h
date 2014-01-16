@@ -2,12 +2,8 @@
 #define ROSTERPLUGIN_H
 
 #include <QObjectCleanupHandler>
-#include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ipresence.h>
-#include <utils/options.h>
-#include <utils/xmpperror.h>
 #include "roster.h"
 
 class RosterPlugin :

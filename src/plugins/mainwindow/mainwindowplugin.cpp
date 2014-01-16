@@ -1,6 +1,16 @@
 #include "mainwindowplugin.h"
 
 #include <QApplication>
+#include <definitions/actiongroups.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <utils/widgetmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/action.h>
 
 MainWindowPlugin::MainWindowPlugin()
 {
@@ -32,6 +42,7 @@ void MainWindowPlugin::pluginInfo(IPluginInfo *APluginInfo)
 bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
+
 	FPluginManager = APluginManager;
 	connect(FPluginManager->instance(),SIGNAL(shutdownStarted()),SLOT(onApplicationShutdownStarted()));
 
@@ -50,7 +61,7 @@ bool MainWindowPlugin::initConnections(IPluginManager *APluginManager, int &AIni
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
-
+	
 	return true;
 }
 

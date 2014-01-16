@@ -2,21 +2,6 @@
 #define AVATARS_H
 
 #include <QDir>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterdataholderorders.h>
-#include <definitions/rostertooltiporders.h>
-#include <definitions/rosterlabelholderorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/vcardvaluenames.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iavatars.h>
 #include <interfaces/ixmppstreams.h>
@@ -26,9 +11,6 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
-#include <utils/iconstorage.h>
-#include <utils/imagemanager.h>
 
 class Avatars :
 	public QObject,

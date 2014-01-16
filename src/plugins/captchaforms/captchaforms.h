@@ -1,39 +1,26 @@
 #ifndef CAPTCHAFORMS_H
 #define CAPTCHAFORMS_H
 
-#include <definitions/namespaces.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/soundfiles.h>
-#include <definitions/dataformtypes.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icaptchaforms.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/istanzaprocessor.h>
-#include <utils/xmpperror.h>
-#include <utils/iconstorage.h>
-#include <utils/widgetmanager.h>
 
-struct ChallengeItem
-{
+struct ChallengeItem {
 	Jid streamJid;
 	Jid challenger;
 	IDataDialogWidget *dialog;
 };
 
 class CaptchaForms :
-			public QObject,
-			public IPlugin,
-			public ICaptchaForms,
-			public IStanzaHandler,
-			public IStanzaRequestOwner,
-			public IDataLocalizer
+	public QObject,
+	public IPlugin,
+	public ICaptchaForms,
+	public IStanzaHandler,
+	public IStanzaRequestOwner,
+	public IDataLocalizer
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICaptchaForms IStanzaHandler IStanzaRequestOwner IDataLocalizer);

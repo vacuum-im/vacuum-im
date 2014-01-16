@@ -4,7 +4,7 @@
 #include <QTextEdit>
 
 class MessageEditor :
-			public QTextEdit
+	public QTextEdit
 {
 	Q_OBJECT;
 public:
