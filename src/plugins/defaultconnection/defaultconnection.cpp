@@ -305,6 +305,7 @@ void DefaultConnection::onSocketConnected()
 
 void DefaultConnection::onSocketEncrypted()
 {
+	LOG_INFO(QString("Socket encrypted, host=%1").arg(FSocket.peerName()));
 	if (FVerifyMode==IDefaultConnection::TrustedOnly && !caCertificates().contains(hostCertificate()))
 	{
 		abortConnection(XmppError(IERR_DEFAULTCONNECTION_CERT_NOT_TRUSTED));
@@ -343,8 +344,9 @@ void DefaultConnection::onSocketSSLErrors(const QList<QSslError> &AErrors)
 	}
 }
 
-void DefaultConnection::onSocketError(QAbstractSocket::SocketError)
+void DefaultConnection::onSocketError(QAbstractSocket::SocketError AError)
 {
+	Q_UNUSED(AError);
 	LOG_INFO(QString("Socket error, host=%1: %2").arg(FSocket.peerName(),FSocket.errorString()));
 	if (FRecords.isEmpty())
 	{

@@ -2,6 +2,8 @@
 
 #include <QMutexLocker>
 #include <QDirIterator>
+#include <definitions/statisticsparams.h>
+#include <utils/logger.h>
 
 DatabaseSynchronizer::DatabaseSynchronizer(IFileMessageArchive *AFileArchive, DatabaseWorker *ADatabaseWorker, QObject *AParent) : QThread(AParent)
 {
@@ -45,6 +47,8 @@ void DatabaseSynchronizer::run()
 	{
 		Jid streamJid = FStreams.dequeue();
 		locker.unlock();
+
+		Logger::startTiming(STMP_HISTORY_FILE_DATABASE_SYNC);
 
 		int loadHeaders = 0;
 		int fileHeaders = 0;
@@ -252,6 +256,11 @@ void DatabaseSynchronizer::run()
 
 		if (!FQuit)
 			QMetaObject::invokeMethod(this,"syncFinished",Qt::QueuedConnection,Q_ARG(const Jid &,streamJid),Q_ARG(bool,syncFailed));
+
+		if (syncFailed)
+			REPORT_ERROR("Failed to synchronize file archive database");
+		else
+			REPORT_TIMING(STMP_HISTORY_FILE_DATABASE_SYNC,Logger::finishTiming(STMP_HISTORY_FILE_DATABASE_SYNC));
 
 		locker.relock();
 	}

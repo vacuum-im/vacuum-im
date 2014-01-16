@@ -55,7 +55,6 @@ bool XmppUriQueries::openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const
 	{
 		QUrl url =  QUrl::fromEncoded(AUrl.toEncoded().replace(';','&'), QUrl::StrictMode);
 		Jid contactJid = url.path();
-
 		QList< QPair<QString, QString> > keyValues = QUrlQuery(url).queryItems();
 		if (keyValues.count() > 0)
 		{

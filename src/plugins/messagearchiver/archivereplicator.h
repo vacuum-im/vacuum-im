@@ -31,8 +31,8 @@ protected slots:
 	void onReplicateWorkerTaskFinished(ReplicateTask *ATask);
 protected slots:
 	void onEngineRequestFailed(const QString &AId, const XmppError &AError);
-	void onEngineCollectionSaved(const QString &AId, const IArchiveCollection &ACollection);
 	void onEngineCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
+	void onEngineCollectionSaved(const QString &AId, const IArchiveCollection &ACollection);
 	void onEngineCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
 	void onEngineModificationsLoaded(const QString &AId, const IArchiveModifications &AModifications);
 private:

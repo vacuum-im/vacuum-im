@@ -4,12 +4,7 @@
 #include <QFile>
 #include <QTimer>
 #include <QXmlStreamWriter>
-#include <definitions/namespaces.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/imessagearchiver.h>
-#include <utils/message.h>
-#include <utils/datetime.h>
-#include <utils/options.h>
 
 class FileWriter :
 	public QObject

@@ -4,7 +4,6 @@
 #include <QDir>
 #include <QTimer>
 #include <QObjectCleanupHandler>
-#include <definitions/rosterdataholderorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ivcard.h>
 #include <interfaces/iroster.h>
@@ -17,7 +16,6 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersearch.h>
-#include <utils/widgetmanager.h>
 #include "vcard.h"
 #include "vcarddialog.h"
 

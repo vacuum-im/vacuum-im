@@ -76,15 +76,15 @@ protected slots:
 private:
 	IConnectionPlugin *FPlugin;
 private:
-	bool FUseLegacySSL;
+	QDnsLookup FDnsLookup;
+	QList<SrvRecord> FRecords;
 	bool FSSLError;
 	bool FDisconnecting;
 	QSslSocket FSocket;
-	CertificateVerifyMode FVerifyMode;
-	QDnsLookup FDnsLookup;
-	QList<SrvRecord> FRecords;
 private:
+	bool FUseLegacySSL;
 	QMap<int, QVariant> FOptions;
+	CertificateVerifyMode FVerifyMode;
 };
 
 #endif // DEFAULTCONNECTION_H

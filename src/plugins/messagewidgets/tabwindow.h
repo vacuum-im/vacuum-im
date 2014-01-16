@@ -4,7 +4,6 @@
 #include <QTimer>
 #include <QMainWindow>
 #include <interfaces/imessagewidgets.h>
-#include <utils/textmanager.h>
 #include "ui_tabwindow.h"
 
 class TabWindow :

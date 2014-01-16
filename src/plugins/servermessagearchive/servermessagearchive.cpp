@@ -422,7 +422,7 @@ QString ServerMessageArchive::loadServerHeaders(const Jid &AStreamJid, const IAr
 		if (ARequest.end.isValid())
 			listElem.setAttribute("end",DateTime(ARequest.end).toX85UTC());
 		insertResultSetRequest(listElem,ANextRef,MAX_HEADER_ITEMS,ARequest.maxItems,ARequest.order);
-
+		
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Load headers request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));
@@ -571,7 +571,7 @@ QString ServerMessageArchive::loadServerModifications(const Jid &AStreamJid, con
 		QDomElement modifyElem = stanza.addElement("modified",FNamespaces.value(AStreamJid));
 		modifyElem.setAttribute("start",DateTime(AStart).toX85UTC());
 		insertResultSetRequest(modifyElem,ANextRef,MAX_MODIFICATION_ITEMS,ACount);
-
+		
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,ARCHIVE_REQUEST_TIMEOUT))
 		{
 			LOG_STRM_DEBUG(AStreamJid,QString("Load server modifications request sent, id=%1, nextref=%2").arg(stanza.id(),ANextRef));

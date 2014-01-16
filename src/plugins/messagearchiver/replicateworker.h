@@ -33,6 +33,7 @@ public:
 	Type type() const;
 	QString taskId() const;
 	bool isFailed() const;
+	QSqlError error() const;
 protected:
 	void setSQLError(const QSqlError &AError);
 protected:
@@ -41,6 +42,7 @@ protected:
 	Type FType;
 	bool FFailed;
 	QString FTaskId;
+	QSqlError FError;
 private:
 	static quint32 FTaskCount;
 };

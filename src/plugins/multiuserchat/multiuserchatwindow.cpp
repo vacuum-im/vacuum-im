@@ -4,8 +4,8 @@
 #include <QCoreApplication>
 #include <QInputDialog>
 #include <QKeyEvent>
-#include <QPair>
 #include <QResizeEvent>
+#include <QPair>
 #include <QTimer>
 #include <QToolTip>
 #include <QKeyEvent>
