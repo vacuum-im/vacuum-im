@@ -13,10 +13,7 @@ class ScrollArea :
    public QScrollArea
 {
 public:
-   ScrollArea(QWidget *AParent = NULL): QScrollArea(AParent)
-   {
-
-   }
+   ScrollArea(QWidget *AParent = NULL): QScrollArea(AParent) { }
    virtual QSize sizeHint() const 
    {
       QSize sh(2*frameWidth()+1,2*frameWidth()+1);
@@ -43,7 +40,9 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 		connect(FTableWidget->instance(),SIGNAL(changed(int,int,int,int)),SIGNAL(cellChanged(int,int,int,int)));
 	}
 	else
+	{
 		FTableWidget = NULL;
+	}
 
 	foreach(const IDataField &field, FForm.fields)
 	{
@@ -96,7 +95,9 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 			}
 		}
 		else
+		{
 			stretch = insertLayout(FForm.pages.first(),widget);
+		}
 
 		if (stretch)
 			static_cast<QVBoxLayout *>(widget->layout())->addStretch();

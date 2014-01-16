@@ -6,7 +6,7 @@
 #include "ui_editproxydialog.h"
 
 class EditProxyDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:

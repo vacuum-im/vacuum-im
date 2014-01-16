@@ -1,7 +1,13 @@
 #include "editnotedialog.h"
 
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
+
 EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Annotation - %1").arg(AContactJid.uBare()));
@@ -22,6 +28,16 @@ EditNoteDialog::EditNoteDialog(IAnnotations *AAnnotations, const Jid &AStreamJid
 EditNoteDialog::~EditNoteDialog()
 {
 	emit dialogDestroyed();
+}
+
+Jid EditNoteDialog::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid EditNoteDialog::contactJid() const
+{
+	return FContactJid;
 }
 
 void EditNoteDialog::onDialogAccepted()

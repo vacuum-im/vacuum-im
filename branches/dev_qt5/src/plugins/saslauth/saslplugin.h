@@ -1,16 +1,9 @@
 #ifndef SASLPLUGIN_H
 #define SASLPLUGIN_H
 
-#include <definitions/namespaces.h>
-#include <definitions/xmpperrors.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
-#include <utils/xmpperror.h>
 #include "saslauth.h"
 #include "saslbind.h"
 #include "saslsession.h"

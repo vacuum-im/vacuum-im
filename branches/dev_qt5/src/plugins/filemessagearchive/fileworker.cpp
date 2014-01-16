@@ -25,6 +25,11 @@ FileTask::Type FileTask::type() const
 	return FType;
 }
 
+Jid FileTask::streamJid() const
+{
+	return FStreamJid;
+}
+
 QString FileTask::taskId() const
 {
 	return FTaskId;

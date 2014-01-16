@@ -3,18 +3,6 @@
 
 #include <QMap>
 #include <QTimer>
-#include <definitions/namespaces.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/archivehandlerorders.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
-#include <definitions/sessionnegotiatororders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ichatstates.h>
 #include <interfaces/ipresence.h>
@@ -27,8 +15,6 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/imultiuserchat.h>
-#include <utils/options.h>
-#include <utils/iconstorage.h>
 #include "statewidget.h"
 
 struct ChatParams

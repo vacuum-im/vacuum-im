@@ -4,9 +4,19 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QSignalMapper>
+#include <definitions/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/shortcuts.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
-#define BLINK_VISIBLE_TIME              750
-#define BLINK_INVISIBLE_TIME            250
+#define BLINK_VISIBLE_TIME          750
+#define BLINK_INVISIBLE_TIME        250
 
 #define ADR_TAB_INDEX               Action::DR_Parametr1
 #define ADR_TAB_MENU_ACTION         Action::DR_Parametr2
@@ -22,6 +32,7 @@ enum TabMenuActions {
 
 TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,false);
 
@@ -37,15 +48,22 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 	FMessageWidgets = AMessageWidgets;
 	connect(FMessageWidgets->instance(),SIGNAL(tabWindowNameChanged(const QUuid &, const QString &)),SLOT(onTabWindowNameChanged(const QUuid &, const QString &)));
 
-	FCornerButton = new QToolButton(ui.twtTabs);
-	FCornerButton->setAutoRaise(true);
-	FCornerButton->setPopupMode(QToolButton::InstantPopup);
-	FCornerButton->setToolButtonStyle(Qt::ToolButtonIconOnly);
-	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(FCornerButton,MNI_MESSAGEWIDGETS_TAB_MENU);
+	FCornerBar = new QToolBar(ui.twtTabs);
+	FCornerBar->setIconSize(QSize(16, 16));
+	FCornerBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+#if !defined(Q_OS_MAC)
+	FCornerBar->setStyleSheet(QLatin1String("QToolBar {margin: 0px; border: 0px;}"));
+#endif
 
-	FWindowMenu = new Menu(FCornerButton);
-	FCornerButton->setMenu(FWindowMenu);
-	ui.twtTabs->setCornerWidget(FCornerButton);
+	FMenuButton = new QToolButton(FCornerBar);
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(FMenuButton,MNI_MESSAGEWIDGETS_TAB_MENU);
+	FMenuButton->setAutoRaise(true);
+	FMenuButton->setPopupMode(QToolButton::InstantPopup);
+
+	FWindowMenu = new Menu(FMenuButton);
+	FMenuButton->setMenu(FWindowMenu);
+	FCornerBar->addWidget(FMenuButton);
+	ui.twtTabs->setCornerWidget(FCornerBar, Qt::BottomRightCorner);
 
 	FBlinkVisible = true;
 	FBlinkTimer.setSingleShot(true);
@@ -77,7 +95,7 @@ TabWindow::TabWindow(IMessageWidgets *AMessageWidgets, const QUuid &AWindowId)
 TabWindow::~TabWindow()
 {
 	clearTabs();
-	FCornerButton->deleteLater();
+	FCornerBar->deleteLater();
 	emit windowDestroyed();
 	emit centralPageDestroyed();
 }
@@ -143,9 +161,9 @@ void TabWindow::setTabBarVisible(bool AVisible)
 {
 	if (isTabBarVisible() != AVisible)
 	{
-		ui.twtTabs->setCornerWidget(AVisible ? FCornerButton : NULL);
-		FCornerButton->setParent(AVisible ? ui.twtTabs : NULL);
-		FCornerButton->setVisible(AVisible);
+		ui.twtTabs->setCornerWidget(AVisible ? FCornerBar : NULL);
+		FCornerBar->setParent(AVisible ? ui.twtTabs : NULL);
+		FCornerBar->setVisible(AVisible);
 
 		ui.twtTabs->setTabBarVisible(AVisible);
 		emit windowChanged();
@@ -258,7 +276,7 @@ void TabWindow::createActions()
 	{
 		Action *action = new Action(this);
 		action->setShortcutId(QString(SCT_TABWINDOW_QUICKTAB).arg(tabNumber));
-		ui.twtTabs->cornerWidget()->addAction(action);
+		FMenuButton->addAction(action);
 
 		tabMapper->setMapping(action, tabNumber-1); // QTabWidget's indices are 0-based
 		connect(action, SIGNAL(triggered()), tabMapper, SLOT(map()));

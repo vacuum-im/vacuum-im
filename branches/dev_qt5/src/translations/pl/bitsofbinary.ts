@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pl" sourcelanguage="en">
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>BitsOfBinary</name>
     <message>
@@ -20,8 +20,12 @@
         <translation>Obsługa wymiany pakietów danych binarnych w blokach XMPP</translation>
     </message>
     <message>
-        <source>Failed to read cached data</source>
-        <translation>Błąd odczytu pamięci podręcznej</translation>
+        <source>Failed to load data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to save data</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

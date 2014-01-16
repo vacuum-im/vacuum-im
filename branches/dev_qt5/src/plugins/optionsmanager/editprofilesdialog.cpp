@@ -2,9 +2,14 @@
 
 #include <QMessageBox>
 #include <QInputDialog>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 EditProfilesDialog::EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setWindowModality(Qt::WindowModal);
 	setAttribute(Qt::WA_DeleteOnClose,true);
@@ -14,8 +19,7 @@ EditProfilesDialog::EditProfilesDialog(IOptionsManager *AOptionsManager, QWidget
 	ui.lstProfiles->addItems(FManager->profiles());
 
 	connect(FManager->instance(),SIGNAL(profileAdded(const QString &)),SLOT(onProfileAdded(const QString &)));
-	connect(FManager->instance(),SIGNAL(profileRenamed(const QString &, const QString &)),
-	        SLOT(onProfileRenamed(const QString &, const QString &)));
+	connect(FManager->instance(),SIGNAL(profileRenamed(const QString &, const QString &)),SLOT(onProfileRenamed(const QString &, const QString &)));
 	connect(FManager->instance(),SIGNAL(profileRemoved(const QString &)),SLOT(onProfileRemoved(const QString &)));
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddProfileClicked()));
@@ -44,7 +48,9 @@ void EditProfilesDialog::onAddProfileClicked()
 				QMessageBox::warning(this,tr("Error"),tr("Could not create profile, maybe this profile already exists"));
 		}
 		else if (ok)
+		{
 			QMessageBox::warning(this,tr("Error"),tr("Passwords did not match"));
+		}
 	}
 }
 
@@ -65,10 +71,14 @@ void EditProfilesDialog::onPasswordProfileClicked()
 					QMessageBox::warning(this,tr("Error"),tr("Failed to change profile password"));
 			}
 			else if (ok)
+			{
 				QMessageBox::warning(this,tr("Error"),tr("Passwords did not match"));
+			}
 		}
 		else if (ok)
+		{
 			QMessageBox::warning(this,tr("Error"),tr("Entered password is not valid"));
+		}
 	}
 }
 

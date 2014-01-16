@@ -1,5 +1,11 @@
 #include "chatwindowmenu.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <utils/menu.h>
+
 #define SFP_LOGGING           "logging"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 
@@ -134,7 +140,7 @@ void ChatWindowMenu::updateMenu()
 	if (FArchiver->isArchivePrefsEnabled(streamJid()))
 	{
 		IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
-		bool isOTRSession = FSessionNegotiation!=NULL ? isOTRStanzaSession(FSessionNegotiation->getSession(streamJid(),contactJid())) : false;
+		bool isOTRSession = FSessionNegotiation!=NULL ? isOTRStanzaSession(FSessionNegotiation->findSession(streamJid(),contactJid())) : false;
 
 		FEnableArchiving->setChecked(iprefs.save != ARCHIVE_SAVE_FALSE);
 		FEnableArchiving->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty() && !isOTRSession);
@@ -253,7 +259,7 @@ void ChatWindowMenu::onArchiveRequestCompleted(const QString &AId)
 		if (FSessionNegotiation)
 		{
 			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
-			IStanzaSession session = FSessionNegotiation->getSession(streamJid(),contactJid());
+			IStanzaSession session = FSessionNegotiation->findSession(streamJid(),contactJid());
 			if (session.status == IStanzaSession::Active)
 			{
 				bool isOTRSession = isOTRStanzaSession(session);

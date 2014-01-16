@@ -5,7 +5,7 @@
 #include "webpage.h"
 
 class StyleViewer :
-			public QWebView
+	public QWebView
 {
 	Q_OBJECT;
 public:

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en" sourcelanguage="en">
+<TS version="2.1" language="en" sourcelanguage="en">
 <context>
     <name>EditStatusDialog</name>
     <message>
@@ -207,6 +207,10 @@ You can set status class for additional statuses defined by you.</translation>
     <message>
         <source>On loss of connection to the server</source>
         <translation>On loss of connection to the server</translation>
+    </message>
+    <message>
+        <source>Left Vacuum-IM</source>
+        <translation>Left Vacuum-IM</translation>
     </message>
 </context>
 </TS>

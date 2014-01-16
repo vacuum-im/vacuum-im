@@ -2,6 +2,8 @@
 
 #include <QPair>
 #include <QUrlQuery>
+#include <definitions/messageviewurlhandlerorders.h>
+#include <utils/logger.h>
 
 XmppUriQueries::XmppUriQueries()
 {
@@ -36,9 +38,7 @@ bool XmppUriQueries::initConnections(IPluginManager *APluginManager, int &AInitO
 bool XmppUriQueries::initObjects()
 {
 	if (FMessageWidgets)
-	{
 		FMessageWidgets->insertViewUrlHandler(MVUHO_XMPPURIQUERIES, this);
-	}
 	return true;
 }
 
@@ -66,11 +66,15 @@ bool XmppUriQueries::openXmppUri(const Jid &AStreamJid, const QUrl &AUrl) const
 				for (int i=0; i<keyValues.count(); i++)
 					params.insertMulti(keyValues.at(i).first, keyValues.at(i).second);
 
+				LOG_STRM_INFO(AStreamJid,QString("Opening XMPP URI, url=%1").arg(AUrl.toString()));
 				foreach (IXmppUriHandler *handler, FHandlers)
+				{
 					if (handler->xmppUriOpen(AStreamJid, contactJid, action, params))
 						return true;
+				}
 			}
 		}
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to open XMPP URI, url=%1").arg(url.toString()));
 	}
 	return false;
 }
@@ -79,6 +83,7 @@ void XmppUriQueries::insertUriHandler(IXmppUriHandler *AHandler, int AOrder)
 {
 	if (!FHandlers.contains(AOrder, AHandler))
 	{
+		LOG_DEBUG(QString("URI handler inserted, order=%1, address=%2").arg(AOrder).arg((quint64)AHandler));
 		FHandlers.insertMulti(AOrder, AHandler);
 		emit uriHandlerInserted(AHandler, AOrder);
 	}
@@ -88,6 +93,7 @@ void XmppUriQueries::removeUriHandler(IXmppUriHandler *AHandler, int AOrder)
 {
 	if (FHandlers.contains(AOrder, AHandler))
 	{
+		LOG_DEBUG(QString("URI handler removed, order=%1, address=%2").arg(AOrder).arg((quint64)AHandler));
 		FHandlers.remove(AOrder, AHandler);
 		emit uriHandlerRemoved(AHandler, AOrder);
 	}

@@ -2,23 +2,19 @@
 #define REGISTERDIALOG_H
 
 #include <QDialog>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>
-#include <utils/iconstorage.h>
 #include "ui_registerdialog.h"
 
 class RegisterDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
-	RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid,
-	               const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
+	RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);
 	~RegisterDialog();
-	virtual const Jid &streamJid() const { return FStreamJid; }
-	virtual const Jid &serviceJid() const { return FServiceJid; }
+	Jid streamJid() const;
+	Jid serviceJid() const;
 protected:
 	void resetDialog();
 	void doRegisterOperation();

@@ -4,6 +4,10 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QInputDialog>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 #define DR_NAME       Qt::UserRole
 #define DR_INDEX      Qt::UserRole+1
@@ -12,6 +16,7 @@
 
 EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Edit Privacy Lists - %1").arg(AStreamJid.uBare()));
@@ -33,18 +38,12 @@ EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster,
 	ui.cmbAction->addItem(tr("deny"),PRIVACY_ACTION_DENY);
 	ui.cmbAction->addItem(tr("allow"),PRIVACY_ACTION_ALLOW);
 
-	connect(FPrivacyLists->instance(),SIGNAL(listLoaded(const Jid &, const QString &)),
-	        SLOT(onListLoaded(const Jid &, const QString &)));
-	connect(FPrivacyLists->instance(),SIGNAL(listRemoved(const Jid &, const QString &)),
-	        SLOT(onListRemoved(const Jid &, const QString &)));
-	connect(FPrivacyLists->instance(),SIGNAL(activeListChanged(const Jid &, const QString &)),
-	        SLOT(onActiveListChanged(const Jid &, const QString &)));
-	connect(FPrivacyLists->instance(),SIGNAL(defaultListChanged(const Jid &, const QString &)),
-	        SLOT(onDefaultListChanged(const Jid &, const QString &)));
-	connect(FPrivacyLists->instance(),SIGNAL(requestCompleted(const QString &)),
-	        SLOT(onRequestCompleted(const QString &)));
-	connect(FPrivacyLists->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),
-	        SLOT(onRequestFailed(const QString &, const XmppError &)));
+	connect(FPrivacyLists->instance(),SIGNAL(listLoaded(const Jid &, const QString &)),SLOT(onListLoaded(const Jid &, const QString &)));
+	connect(FPrivacyLists->instance(),SIGNAL(listRemoved(const Jid &, const QString &)),SLOT(onListRemoved(const Jid &, const QString &)));
+	connect(FPrivacyLists->instance(),SIGNAL(activeListChanged(const Jid &, const QString &)),SLOT(onActiveListChanged(const Jid &, const QString &)));
+	connect(FPrivacyLists->instance(),SIGNAL(defaultListChanged(const Jid &, const QString &)),SLOT(onDefaultListChanged(const Jid &, const QString &)));
+	connect(FPrivacyLists->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onRequestCompleted(const QString &)));
+	connect(FPrivacyLists->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onRequestFailed(const QString &, const XmppError &)));
 
 	connect(ui.tlbAddList,SIGNAL(clicked()),SLOT(onAddListClicked()));
 	connect(ui.tlbDeleteList,SIGNAL(clicked()),SLOT(onDeleteListClicked()));
@@ -52,7 +51,6 @@ EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster,
 	connect(ui.tlbDeleteRule,SIGNAL(clicked()),SLOT(onDeleteRuleClicked()));
 	connect(ui.tlbRuleUp,SIGNAL(clicked()),SLOT(onRuleUpClicked()));
 	connect(ui.tlbRuleDown,SIGNAL(clicked()),SLOT(onRuleDownClicked()));
-
 
 	connect(ui.cmbType,SIGNAL(currentIndexChanged(int)),SLOT(onRuleConditionTypeChanged(int)));
 	connect(ui.cmbType,SIGNAL(currentIndexChanged(int)),SLOT(onRuleConditionChanged()));
@@ -64,10 +62,8 @@ EditListsDialog::EditListsDialog(IPrivacyLists *APrivacyLists, IRoster *ARoster,
 	connect(ui.chbPresenceIn,SIGNAL(stateChanged(int)),SLOT(onRuleConditionChanged()));
 	connect(ui.chbPresenceOut,SIGNAL(stateChanged(int)),SLOT(onRuleConditionChanged()));
 
-	connect(ui.ltwLists,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-	        SLOT(onCurrentListItemChanged(QListWidgetItem *, QListWidgetItem *)));
-	connect(ui.ltwRules,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-	        SLOT(onCurrentRuleItemChanged(QListWidgetItem *, QListWidgetItem *)));
+	connect(ui.ltwLists,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),SLOT(onCurrentListItemChanged(QListWidgetItem *, QListWidgetItem *)));
+	connect(ui.ltwRules,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),SLOT(onCurrentRuleItemChanged(QListWidgetItem *, QListWidgetItem *)));
 
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
@@ -99,7 +95,9 @@ void EditListsDialog::apply()
 				i--;
 			}
 			else
+			{
 				ruleOrders.append(rule.order);
+			}
 		}
 
 		if (!newList.rules.isEmpty())
@@ -126,7 +124,9 @@ void EditListsDialog::apply()
 			}
 		}
 		else
+		{
 			notValidLists.append(newList.name);
+		}
 		++it;
 	}
 
@@ -172,15 +172,12 @@ void EditListsDialog::apply()
 void EditListsDialog::reset()
 {
 	foreach(const IPrivacyList &list, FLists)
-	{
 		onListRemoved(FStreamJid,list.name);
-	}
 
 	QList<IPrivacyList> lists = FPrivacyLists->privacyLists(FStreamJid);
 	foreach(const IPrivacyList &list, lists)
-	{
 		onListLoaded(FStreamJid,list.name);
-	}
+
 	onActiveListChanged(FStreamJid,FPrivacyLists->activeList(FStreamJid));
 	onDefaultListChanged(FStreamJid,FPrivacyLists->defaultList(FStreamJid));
 
@@ -190,7 +187,9 @@ void EditListsDialog::reset()
 		ui.ltwRules->setCurrentRow(0);
 	}
 	else
+	{
 		ui.grbRuleCondition->setEnabled(false);
+	}
 }
 
 QString EditListsDialog::ruleName(const IPrivacyRule &ARule)
@@ -209,24 +208,15 @@ QString EditListsDialog::ruleName(const IPrivacyRule &ARule)
 		stanzas.chop(1);
 	}
 	else
+	{
 		stanzas += " "+tr("<any stanza>");
+	}
 
 	if (ARule.type != PRIVACY_TYPE_ALWAYS)
-	{
-		return tr("%1: if %2 = '%3' then %4 [%5 ]")
-		       .arg(ARule.order)
-			   .arg(tr(ARule.type.toLatin1()))
-		       .arg(ARule.value)
-			   .arg(!ARule.action.isEmpty() ? tr(ARule.action.toLatin1()) : tr("<action>"))
-		       .arg(stanzas);
-	}
+		return tr("%1: if %2 = '%3' then %4 [%5 ]").arg(ARule.order).arg(tr(ARule.type.toLatin1())).arg(ARule.value).arg(!ARule.action.isEmpty() ? tr(ARule.action.toLatin1()) : tr("<action>")).arg(stanzas);
 	else
-	{
-		return tr("%1: always %2 [%3 ]")
-		       .arg(ARule.order)
-			   .arg(!ARule.action.isEmpty() ? tr(ARule.action.toLatin1()) : tr("<action>"))
-		       .arg(stanzas);
-	}
+		return tr("%1: always %2 [%3 ]").arg(ARule.order).arg(!ARule.action.isEmpty() ? tr(ARule.action.toLatin1()) : tr("<action>")).arg(stanzas);
+
 	return QString::null;
 }
 
@@ -242,12 +232,16 @@ void EditListsDialog::updateListRules()
 			ruleItem->setToolTip(ruleItem->text());
 			ruleItem->setData(DR_INDEX,row);
 		}
+
 		while (list.rules.count() < ui.ltwRules->count())
 			delete ui.ltwRules->takeItem(list.rules.count());
+
 		updateRuleCondition();
 	}
 	else
+	{
 		ui.ltwRules->clear();
+	}
 }
 
 void EditListsDialog::updateRuleCondition()
@@ -337,17 +331,13 @@ void EditListsDialog::onListRemoved(const Jid &AStreamJid, const QString &AName)
 void EditListsDialog::onActiveListChanged(const Jid &AStreamJid, const QString &AName)
 {
 	if (AStreamJid == FStreamJid)
-	{
 		ui.cmbActive->setCurrentIndex(ui.cmbActive->findData(AName));
-	}
 }
 
 void EditListsDialog::onDefaultListChanged(const Jid &AStreamJid, const QString &AName)
 {
 	if (AStreamJid == FStreamJid)
-	{
 		ui.cmbDefault->setCurrentIndex(ui.cmbDefault->findData(AName));
-	}
 }
 
 void EditListsDialog::onRequestCompleted(const QString &AId)
@@ -406,8 +396,7 @@ void EditListsDialog::onDeleteListClicked()
 {
 	if (FLists.contains(FListName))
 	{
-		if (QMessageBox::question(this,tr("Remove Privacy List"),
-		                          tr("Are you really want to delete privacy list '%1' with rules?").arg(FListName), QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
+		if (QMessageBox::question(this,tr("Remove Privacy List"),tr("Are you really want to delete privacy list '%1' with rules?").arg(FListName), QMessageBox::Yes|QMessageBox::No)==QMessageBox::Yes)
 		{
 			FLists.remove(FListName);
 			QListWidgetItem *listWidget = ui.ltwLists->findItems(FListName,Qt::MatchExactly).value(0);
@@ -581,6 +570,5 @@ void EditListsDialog::onDialogButtonClicked(QAbstractButton *AButton)
 
 void EditListsDialog::onUpdateEnabledState()
 {
-	//Откладываем выполнение этой функции т.к. нельзя менять набор кнопок из функции обработки клика
 	updateEnabledState();
 }

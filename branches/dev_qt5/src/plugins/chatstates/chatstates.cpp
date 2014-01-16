@@ -3,6 +3,23 @@
 #include <QSet>
 #include <QDateTime>
 #include <QDataStream>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/namespaces.h>
+#include <definitions/stanzahandlerorders.h>
+#include <definitions/archivehandlerorders.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/tabpagenotifypriorities.h>
+#include <definitions/sessionnegotiatororders.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define SHC_CONTENT_MESSAGES      "/message[@type='chat']/body"
 #define SHC_STATE_MESSAGES        "/message/[@xmlns='" NS_CHATSTATES "']"
@@ -55,8 +72,9 @@ void ChatStates::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool ChatStates::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0);
 	if (plugin)
 	{
@@ -390,6 +408,10 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		}
 		return !hasBody;
 	}
+	else if (FChatParams.contains(AStreamJid) && AStanza.type()!="error")
+	{
+		REPORT_ERROR("Received unexpected stanza");
+	}
 	return false;
 }
 
@@ -402,21 +424,16 @@ void ChatStates::setPermitStatus(const Jid &AContactJid, int AStatus)
 {
 	if (permitStatus(AContactJid) != AStatus)
 	{
+		LOG_INFO(QString("Changing contact chat state permit status, contact=%1, status=%2").arg(AContactJid.bare(),AStatus));
 		bool oldEnabled = isEnabled(Jid::null,AContactJid);
 
 		Jid bareJid = AContactJid.bare();
-		if (AStatus==IChatStates::StatusDisable)
-		{
+		if (AStatus == IChatStates::StatusDisable)
 			FPermitStatus.insert(bareJid,AStatus);
-		}
-		else if (AStatus==IChatStates::StatusEnable)
-		{
+		else if (AStatus == IChatStates::StatusEnable)
 			FPermitStatus.insert(bareJid,AStatus);
-		}
 		else
-		{
 			FPermitStatus.remove(bareJid);
-		}
 
 		if (!oldEnabled && isEnabled(Jid::null,AContactJid))
 			resetSupported(AContactJid);
@@ -434,7 +451,7 @@ bool ChatStates::isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const
 		return false;
 
 	int status = permitStatus(AContactJid);
-	return (Options::node(OPV_MESSAGES_CHATSTATESENABLED).value().toBool() || status==IChatStates::StatusEnable) && status!=IChatStates::StatusDisable;
+	return  status!=IChatStates::StatusDisable && (status==IChatStates::StatusEnable || Options::node(OPV_MESSAGES_CHATSTATESENABLED).value().toBool());
 }
 
 bool ChatStates::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -496,27 +513,28 @@ void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid,
 void ChatStates::resetSupported(const Jid &AContactJid)
 {
 	foreach (const Jid &streamJid, FNotSupported.keys())
+	{
 		foreach (const Jid &contactJid, FNotSupported.value(streamJid))
+		{
 			if (AContactJid.isEmpty() || (AContactJid && contactJid))
 				setSupported(streamJid,contactJid,true);
+		}
+	}
 }
 
 void ChatStates::setSupported(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported)
 {
 	if (FNotSupported.contains(AStreamJid))
 	{
-		QList<Jid> &notSuppotred = FNotSupported[AStreamJid];
-		int index = notSuppotred.indexOf(AContactJid);
+		QList<Jid> &unsuppotred = FNotSupported[AStreamJid];
+		int index = unsuppotred.indexOf(AContactJid);
 		if (ASupported != (index<0))
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Changing contact chat state support status, contact=%1, supported=%2").arg(AContactJid.full()).arg(ASupported));
 			if (ASupported)
-			{
-				notSuppotred.removeAt(index);
-			}
+				unsuppotred.removeAt(index);
 			else
-			{
-				notSuppotred.append(AContactJid);
-			}
+				unsuppotred.append(AContactJid);
 			emit supportStatusChanged(AStreamJid,AContactJid,ASupported);
 		}
 	}
@@ -529,6 +547,7 @@ void ChatStates::setUserState(const Jid &AStreamJid, const Jid &AContactJid, int
 		ChatParams &params = FChatParams[AStreamJid][AContactJid];
 		if (params.userState != AState)
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Contact chat state changed, contact=%1, state=%2").arg(AContactJid.full()).arg(AState));
 			params.userState = AState;
 			emit userChatStateChanged(AStreamJid,AContactJid,AState);
 			notifyUserState(AStreamJid,AContactJid);
@@ -544,6 +563,7 @@ void ChatStates::setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int
 		params.selfLastActive = QDateTime::currentDateTime().toTime_t();
 		if (params.selfState != AState)
 		{
+			LOG_STRM_DEBUG(AStreamJid,QString("Self chat state changed, contact=%1, state=%2").arg(AContactJid.full()).arg(AState));
 			params.selfState = AState;
 			if (ASend)
 				sendStateMessage(AStreamJid,AContactJid,AState);

@@ -15,6 +15,7 @@ public:
 	static bool isSystemIdleActive();
 	static void startSystemIdle();
 	static void stopSystemIdle();
+	static QString osVersion();
 signals:
 	void systemIdleChanged(int ASeconds);
 protected slots:

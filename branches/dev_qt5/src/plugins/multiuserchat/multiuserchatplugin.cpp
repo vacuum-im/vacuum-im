@@ -4,6 +4,41 @@
 #include <QInputDialog>
 #include <QApplication>
 #include <QDesktopWidget>
+#include <definitions/namespaces.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/soundfiles.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/dataformtypes.h>
+#include <definitions/recentitemtypes.h>
+#include <definitions/recentitemproperties.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosternotifyorders.h>
+#include <definitions/rosterindexkindorders.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/messagehandlerorders.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/xmppurihandlerorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_HOST                  Action::DR_Parametr1
@@ -46,6 +81,7 @@ void MultiUserChatPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
+	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
@@ -87,9 +123,7 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 	{
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 		if (FDiscovery)
-		{
 			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
@@ -487,24 +521,28 @@ INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications,
 	if (ADirection == IMessageProcessor::MessageIn)
 	{
 		QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
+
 		Jid roomJid = AMessage.from();
-		if (!findMultiChatWindow(AMessage.to(),roomJid))
+		Jid streamJid = AMessage.to();
+		Jid contactJid = inviteElem.attribute("from");
+		LOG_STRM_DEBUG(streamJid,QString("Received invite to room=%1 from=%2").arg(roomJid.full(),contactJid.full()));
+
+		if (!findMultiChatWindow(streamJid,roomJid))
 		{
 			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_INVITE);
 			if (notify.kinds > 0)
 			{
-				Jid fromJid = inviteElem.attribute("from");
 				notify.typeId = NNT_MUC_MESSAGE_INVITE;
 				notify.data.insert(NDR_ICON,IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_MUC_INVITE));
 				notify.data.insert(NDR_TOOLTIP,tr("You are invited to the conference %1").arg(roomJid.uBare()));
-				notify.data.insert(NDR_STREAM_JID,AMessage.to());
-				notify.data.insert(NDR_CONTACT_JID,fromJid.full());
+				notify.data.insert(NDR_STREAM_JID,streamJid.full());
+				notify.data.insert(NDR_CONTACT_JID,contactJid.full());
 				notify.data.insert(NDR_ROSTER_ORDER,RNO_MUC_INVITE);
 				notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
 				notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
-				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(AMessage.to(),fromJid));
-				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(fromJid));
+				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(streamJid,contactJid));
+				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(contactJid));
 				notify.data.insert(NDR_POPUP_HTML,notify.data.value(NDR_TOOLTIP).toString().toHtmlEscaped());
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
 				FActiveInvites.insert(AMessage.data(MDR_MESSAGE_ID).toInt(),AMessage);
@@ -520,29 +558,26 @@ bool MultiUserChatPlugin::messageShowWindow(int AMessageId)
 	{
 		Message message = FActiveInvites.take(AMessageId);
 		QDomElement inviteElem = message.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
-		Jid roomJid = message.from();
-		Jid fromJid = inviteElem.attribute("from");
-		if (roomJid.isValid() && fromJid.isValid())
-		{
-			InviteFields fields;
-			fields.streamJid = message.to();
-			fields.roomJid = roomJid;
-			fields.fromJid  = fromJid;
-			fields.password = inviteElem.firstChildElement("password").text();
 
-			QString reason = inviteElem.firstChildElement("reason").text();
-			QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(roomJid.uBare().toHtmlEscaped()).arg(fromJid.uBare().toHtmlEscaped()).arg(reason.toHtmlEscaped());
-			msg += "<br><br>";
-			msg += tr("Do you want to join this conference?");
+		InviteFields fields;
+		fields.streamJid = message.to();
+		fields.roomJid = message.from();
+		fields.fromJid  = inviteElem.attribute("from");
+		fields.password = inviteElem.firstChildElement("password").text();
 
-			QMessageBox *inviteDialog = new QMessageBox(QMessageBox::Question,tr("Invite"),msg,QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore);
-			inviteDialog->setAttribute(Qt::WA_DeleteOnClose,true);
-			inviteDialog->setEscapeButton(QMessageBox::Ignore);
-			inviteDialog->setModal(false);
-			connect(inviteDialog,SIGNAL(finished(int)),SLOT(onInviteDialogFinished(int)));
-			FInviteDialogs.insert(inviteDialog,fields);
-			inviteDialog->show();
-		}
+		QString reason = inviteElem.firstChildElement("reason").text();
+		QString msg = tr("You are invited to the conference %1 by %2.<br>Reason: %3").arg(fields.roomJid.uBare().toHtmlEscaped()).arg(fields.fromJid.uBare().toHtmlEscaped()).arg(reason.toHtmlEscaped());
+		msg += "<br><br>";
+		msg += tr("Do you want to join this conference?");
+
+		QMessageBox *inviteDialog = new QMessageBox(QMessageBox::Question,tr("Invite"),msg,QMessageBox::Yes|QMessageBox::No|QMessageBox::Ignore);
+		inviteDialog->setAttribute(Qt::WA_DeleteOnClose,true);
+		inviteDialog->setEscapeButton(QMessageBox::Ignore);
+		inviteDialog->setModal(false);
+		connect(inviteDialog,SIGNAL(finished(int)),SLOT(onInviteDialogFinished(int)));
+		FInviteDialogs.insert(inviteDialog,fields);
+		inviteDialog->show();
+
 		FMessageProcessor->removeMessageNotify(AMessageId);
 		return true;
 	}
@@ -625,16 +660,33 @@ bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoo
 {
 	if (FDiscovery)
 	{
-		return FDiscovery->requestDiscoInfo(AStreamJid,ARoomJid.bare(),MUC_NODE_ROOM_NICK);
+		if (FDiscovery->requestDiscoInfo(AStreamJid,ARoomJid.bare(),MUC_NODE_ROOM_NICK))
+		{
+			LOG_STRM_INFO(AStreamJid,QString("Room nick request sent as discovery request, room=%1").arg(ARoomJid.bare()));
+			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send room nick request as discovery request, room=%1").arg(ARoomJid.bare()));
+		}
 	}
 	else if (FDataForms && FRegistration)
 	{
 		QString requestId = FRegistration->sendRegiterRequest(AStreamJid,ARoomJid.domain());
 		if (!requestId.isEmpty())
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Room nick request sent as register request, room=%1, id=%2").arg(ARoomJid.domain(),requestId));
 			FNickRequests.insert(requestId, qMakePair<Jid,Jid>(AStreamJid,ARoomJid));
 			return true;
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send room nick request as register request, room=%1").arg(ARoomJid.domain()));
+		}
+	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to send room nick request, room=%1: Required interfaces not found").arg(ARoomJid.domain()));
 	}
 	return false;
 }
@@ -657,6 +709,7 @@ IMultiUserChat *MultiUserChatPlugin::getMultiUserChat(const Jid &AStreamJid, con
 	IMultiUserChat *chat = findMultiUserChat(AStreamJid,ARoomJid);
 	if (!chat)
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Creating multi user chat, room=%1, nick=%2").arg(ARoomJid.full(),ANick));
 		chat = new MultiUserChat(this,AStreamJid, ARoomJid, ANick.isEmpty() ? AStreamJid.uNode() : ANick, APassword, this);
 		connect(chat->instance(),SIGNAL(roomNameChanged(const QString &)),SLOT(onMultiUserChatChanged()));
 		connect(chat->instance(),SIGNAL(presenceChanged(int, const QString &)),SLOT(onMultiUserChatChanged()));
@@ -690,18 +743,40 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindow(const Jid &AStream
 		if (!window)
 		{
 			IMultiUserChat *chat = getMultiUserChat(AStreamJid,ARoomJid,ANick,APassword);
-			window = new MultiUserChatWindow(this,chat);
-			WidgetManager::setWindowSticky(window->instance(),true);
-			connect(window->instance(),SIGNAL(multiChatContextMenu(Menu *)),SLOT(onMultiChatContextMenu(Menu *)));
-			connect(window->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
-			connect(window->instance(),SIGNAL(multiUserToolTips(IMultiUser *, QMap<int,QString> &)),SLOT(onMultiUserToolTips(IMultiUser *, QMap<int,QString> &)));
-			connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
-			connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onMultiChatWindowInfoContextMenu(Menu *)));
-			connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onMultiChatWindowInfoToolTips(QMap<int,QString> &)));
-			FChatWindows.append(window);
-			getMultiChatRosterIndex(window->streamJid(),window->contactJid(),window->multiUserChat()->nickName(),window->multiUserChat()->password());
-			emit multiChatWindowCreated(window);
+			if (chat)
+			{
+				LOG_STRM_INFO(AStreamJid,QString("Creating multi user chat window, room=%1, nick=%2").arg(ARoomJid.full(),ANick));
+				
+				window = new MultiUserChatWindow(this,chat);
+				WidgetManager::setWindowSticky(window->instance(),true);
+				connect(window->instance(),SIGNAL(multiChatContextMenu(Menu *)),SLOT(onMultiChatContextMenu(Menu *)));
+				connect(window->instance(),SIGNAL(multiUserContextMenu(IMultiUser *, Menu *)),SLOT(onMultiUserContextMenu(IMultiUser *, Menu *)));
+				connect(window->instance(),SIGNAL(multiUserToolTips(IMultiUser *, QMap<int,QString> &)),SLOT(onMultiUserToolTips(IMultiUser *, QMap<int,QString> &)));
+				connect(window->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMultiChatWindowDestroyed()));
+				connect(window->infoWidget()->instance(),SIGNAL(contextMenuRequested(Menu *)),SLOT(onMultiChatWindowInfoContextMenu(Menu *)));
+				connect(window->infoWidget()->instance(),SIGNAL(toolTipsRequested(QMap<int,QString> &)),SLOT(onMultiChatWindowInfoToolTips(QMap<int,QString> &)));
+				FChatWindows.append(window);
+
+				getMultiChatRosterIndex(window->streamJid(),window->contactJid(),window->multiUserChat()->nickName(),window->multiUserChat()->password());
+				emit multiChatWindowCreated(window);
+			}
+			else
+			{
+				REPORT_ERROR("Failed to get multi user chat window: Multi user chat not created");
+			}
 		}
+	}
+	else if (!ARoomJid.isValid())
+	{
+		REPORT_ERROR("Failed to get multi user chat window: Invalid room jid");
+	}
+	else if (FMessageProcessor)
+	{
+		REPORT_ERROR("Failed to get multi user chat window: Stream is not active");
+	}
+	else
+	{
+		REPORT_ERROR("Failed to get multi user chat window: Required interfaces not found");
 	}
 	return window;
 }
@@ -762,14 +837,22 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 
 			updateRecentItemProxy(chatIndex);
 		}
+		else
+		{
+			REPORT_ERROR("Failed to get multi user chat roster index: Stream root index not found");
+		}
 	}
 	return chatIndex;
 }
 
 void MultiUserChatPlugin::showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
 {
-	JoinMultiChatDialog *dialog = new JoinMultiChatDialog(this,AStreamJid,ARoomJid,ANick,APassword);
-	dialog->show();
+	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+	if (stream && stream->isOpen())
+	{
+		JoinMultiChatDialog *dialog = new JoinMultiChatDialog(this,AStreamJid,ARoomJid,ANick,APassword);
+		dialog->show();
+	}
 }
 
 void MultiUserChatPlugin::registerDiscoFeatures()
@@ -879,7 +962,7 @@ void MultiUserChatPlugin::updateRecentItemProxy(IRosterIndex *AIndex)
 
 void MultiUserChatPlugin::updateRecentItemProperties(IRosterIndex *AIndex)
 {
-	if (FRecentContacts)
+	if (FRecentContacts && FRecentContacts->isReady(AIndex->data(RDR_STREAM_JID).toString()))
 	{
 		IRecentItem item = recentItemForIndex(AIndex);
 		FRecentContacts->setItemProperty(item,REIP_CONFERENCE_NICK,AIndex->data(RDR_MUC_NICK).toString());
@@ -966,6 +1049,7 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindowForIndex(const IRos
 {
 	IMultiUserChatWindow *window = NULL;
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+
 	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
 	if (stream && stream->isOpen())
 	{
@@ -1013,27 +1097,21 @@ void MultiUserChatPlugin::onMultiChatContextMenu(Menu *AMenu)
 {
 	IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(sender());
 	if (window)
-	{
 		emit multiChatContextMenu(window,AMenu);
-	}
 }
 
 void MultiUserChatPlugin::onMultiUserContextMenu(IMultiUser *AUser, Menu *AMenu)
 {
 	IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(sender());
 	if (window)
-	{
 		emit multiUserContextMenu(window,AUser,AMenu);
-	}
 }
 
 void MultiUserChatPlugin::onMultiUserToolTips(IMultiUser *AUser, QMap<int,QString> &AToolTips)
 {
 	IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(sender());
 	if (window)
-	{
 		emit multiUserToolTips(window,AUser,AToolTips);
-	}
 }
 
 void MultiUserChatPlugin::onMultiUserChatChanged()
@@ -1048,6 +1126,7 @@ void MultiUserChatPlugin::onMultiUserChatDestroyed()
 	IMultiUserChat *chat = qobject_cast<IMultiUserChat *>(sender());
 	if (FChats.contains(chat))
 	{
+		LOG_STRM_INFO(chat->streamJid(),QString("Multi user chat destroyed, room=%1").arg(chat->roomJid().full()));
 		FChats.removeAll(chat);
 		emit multiUserChatDestroyed(chat);
 	}
@@ -1058,6 +1137,7 @@ void MultiUserChatPlugin::onMultiChatWindowDestroyed()
 	IMultiUserChatWindow *window = qobject_cast<IMultiUserChatWindow *>(sender());
 	if (window)
 	{
+		LOG_STRM_INFO(window->streamJid(),QString("Multi user chat window destroyed, room=%1").arg(window->multiUserChat()->roomJid().full()));
 		FChatWindows.removeAll(window);
 		emit multiChatWindowDestroyed(window);
 	}
@@ -1065,10 +1145,10 @@ void MultiUserChatPlugin::onMultiChatWindowDestroyed()
 
 void MultiUserChatPlugin::onMultiChatWindowInfoContextMenu(Menu *AMenu)
 {
-	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
-	if (widget && FRostersViewPlugin)
+	if (FRostersViewPlugin)
 	{
-		IRosterIndex *index = findMultiChatRosterIndex(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid());
+		IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+		IRosterIndex *index = widget!=NULL ? findMultiChatRosterIndex(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()) : NULL;
 		if (index)
 			FRostersViewPlugin->rostersView()->contextMenuForIndex(QList<IRosterIndex *>()<<index,NULL,AMenu);
 	}
@@ -1076,10 +1156,10 @@ void MultiUserChatPlugin::onMultiChatWindowInfoContextMenu(Menu *AMenu)
 
 void MultiUserChatPlugin::onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips)
 {
-	IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
-	if (widget && FRostersViewPlugin)
+	if (FRostersViewPlugin)
 	{
-		IRosterIndex *index = findMultiChatRosterIndex(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid());
+		IMessageInfoWidget *widget = qobject_cast<IMessageInfoWidget *>(sender());
+		IRosterIndex *index = widget!=NULL ? findMultiChatRosterIndex(widget->messageWindow()->streamJid(),widget->messageWindow()->contactJid()) : NULL;
 		if (index)
 			FRostersViewPlugin->rostersView()->toolTipsForIndex(index,NULL,AToolTips);
 	}
@@ -1399,20 +1479,27 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 		if (ADiscoInfo.error.isNull())
 		{
 			QString nick = ADiscoInfo.identity.value(FDiscovery->findIdentity(ADiscoInfo.identity,DIC_CONFERENCE,DIT_TEXT)).name;
-			if (nick.isEmpty())
-				nick = streamVCardNick(ADiscoInfo.streamJid);
+			LOG_STRM_INFO(ADiscoInfo.streamJid,QString("Room nick received in discovery from=%1, nick=%2").arg(ADiscoInfo.contactJid.full(),nick));
 			emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,nick);
 		}
 		else if (FDataForms && FRegistration)
 		{
+			LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to receive room nick in discovery from=%1: %2").arg(ADiscoInfo.contactJid.full(),ADiscoInfo.error.condition()));
 			QString requestId = FRegistration->sendRegiterRequest(ADiscoInfo.streamJid,ADiscoInfo.contactJid.domain());
 			if (!requestId.isEmpty())
+			{
+				LOG_STRM_INFO(ADiscoInfo.streamJid,QString("Room nick request sent as register request, room=%1, id=%2").arg(ADiscoInfo.contactJid.domain(),requestId));
 				FNickRequests.insert(requestId, qMakePair<Jid,Jid>(ADiscoInfo.streamJid,ADiscoInfo.contactJid));
+			}
 			else
+			{
+				LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to send room nick request as register request, room=%1").arg(ADiscoInfo.contactJid.domain()));
 				emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,streamVCardNick(ADiscoInfo.streamJid));
+			}
 		}
 		else
 		{
+			LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to receive room nick in discovery from=%1: %2").arg(ADiscoInfo.contactJid.full(),ADiscoInfo.error.condition()));
 			emit roomNickReceived(ADiscoInfo.streamJid,ADiscoInfo.contactJid,streamVCardNick(ADiscoInfo.streamJid));
 		}
 	}
@@ -1424,6 +1511,7 @@ void MultiUserChatPlugin::onRegisterFieldsReceived(const QString &AId, const IRe
 	{
 		QPair<Jid,Jid> params = FNickRequests.take(AId);
 		QString nick = FDataForms!=NULL ? FDataForms->fieldValue("nick",AFields.form.fields).toString() : AFields.username;
+		LOG_STRM_INFO(params.first,QString("Room nick received in register fields from=%1, nick=%2").arg(params.second.full(),nick));
 		if (nick.isEmpty())
 			nick = streamVCardNick(params.first);
 		emit roomNickReceived(params.first,params.second,nick);
@@ -1436,6 +1524,7 @@ void MultiUserChatPlugin::onRegisterErrorReceived(const QString &AId, const Xmpp
 	if (FNickRequests.contains(AId))
 	{
 		QPair<Jid,Jid> params = FNickRequests.take(AId);
+		LOG_STRM_WARNING(params.first,QString("Failed to receive room nick in register fields from=%1: %2").arg(params.second.full(),AError.condition()));
 		emit roomNickReceived(params.first,params.second,streamVCardNick(params.first));
 	}
 }
@@ -1448,20 +1537,27 @@ void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
 		InviteFields fields = FInviteDialogs.take(inviteDialog);
 		if (AResult == QMessageBox::Yes)
 		{
+			LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 accepted").arg(fields.fromJid.full(),fields.roomJid.full()));
 			showJoinMultiChatDialog(fields.streamJid,fields.roomJid,QString::null,fields.password);
 		}
 		else if (AResult == QMessageBox::No)
 		{
 			Message decline;
 			decline.setTo(fields.roomJid.bare());
+
 			Stanza &mstanza = decline.stanza();
 			QDomElement declElem = mstanza.addElement("x",NS_MUC_USER).appendChild(mstanza.createElement("decline")).toElement();
 			declElem.setAttribute("to",fields.fromJid.full());
+
 			QString reason = tr("I'm too busy right now");
 			reason = QInputDialog::getText(inviteDialog,tr("Decline invite"),tr("Enter a reason"),QLineEdit::Normal,reason);
 			if (!reason.isEmpty())
 				declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
-			FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::MessageOut);
+
+			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::MessageOut))
+				LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.full()));
+			else
+				LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));
 		}
 	}
 }
@@ -1474,8 +1570,9 @@ void MultiUserChatPlugin::onInviteActionTriggered(bool)
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		Jid contactJid = action->data(ADR_HOST).toString();
 		Jid roomJid = action->data(ADR_ROOM).toString();
+
 		IMultiUserChatWindow *window = findMultiChatWindow(streamJid,roomJid);
-		if (window && contactJid.isValid())
+		if (window)
 		{
 			bool ok;
 			QString reason = tr("Please, enter this conference!");

@@ -3,25 +3,12 @@
 
 #include <QLineEdit>
 #include <QSortFilterProxyModel>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/mainwindowwidgets.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterproxyorders.h>
-#include <definitions/rosterclickhookerorders.h>
-#include <definitions/rosterkeyhookerorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersearch.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersview.h>
-#include <utils/action.h>
-#include <utils/options.h>
-#include <utils/toolbarchanger.h>
 #include <utils/searchlineedit.h>
+#include <utils/toolbarchanger.h>
 
 class RosterSearch :
 	public QSortFilterProxyModel,

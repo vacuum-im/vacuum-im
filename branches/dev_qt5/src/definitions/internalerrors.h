@@ -2,8 +2,9 @@
 #define DEF_INTERNALERRORS_H
 
 // BitsOfBinary
+#define IERR_BOB_DATA_LOAD_ERROR                             "bob-data-load-error"
+#define IERR_BOB_DATA_SAVE_ERROR                             "bob-data-save-error"
 #define IERR_BOB_INVALID_RESPONCE                            "bob-invalid-responce"
-#define IERR_BOB_INVALID_CACHED_DATA                         "bob-invalid-cached-data"
 
 // Compression
 #define IERR_COMPRESS_UNKNOWN_ERROR                          "compress-unknown-error"
@@ -86,6 +87,7 @@
 #define IERR_SOCKS5_STREAM_HOST_DISCONNECTED                 "socks5-stream-host-disconnected"
 
 // StartTLS
+#define IERR_STARTTLS_NOT_STARTED                            "starttls-not-started"
 #define IERR_STARTTLS_INVALID_RESPONCE                       "starttls-invalid-responce"
 #define IERR_STARTTLS_NEGOTIATION_FAILED                     "starttls-negotiation-failed"
 

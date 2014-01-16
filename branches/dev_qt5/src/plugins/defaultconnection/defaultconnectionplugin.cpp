@@ -6,6 +6,7 @@
 #include <definitions/optionvalues.h>
 #include <definitions/internalerrors.h>
 #include <utils/options.h>
+#include <utils/logger.h>
 
 DefaultConnectionPlugin::DefaultConnectionPlugin()
 {
@@ -32,17 +33,23 @@ bool DefaultConnectionPlugin::initConnections(IPluginManager *APluginManager, in
 {
 	Q_UNUSED(AInitOrder);
 
-	IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IConnectionManager").value(0,NULL);
 	if (plugin)
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	{
+		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
+	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+	}
 
-	plugin = APluginManager->pluginInterface("IConnectionManager").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
-		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
+	{
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	return true;
 }
@@ -76,6 +83,7 @@ QString DefaultConnectionPlugin::pluginName() const
 
 IConnection *DefaultConnectionPlugin::newConnection(const OptionsNode &ANode, QObject *AParent)
 {
+	LOG_DEBUG("Default connection created");
 	DefaultConnection *connection = new DefaultConnection(this,AParent);
 	connect(connection,SIGNAL(aboutToConnect()),SLOT(onConnectionAboutToConnect()));
 	connect(connection,SIGNAL(sslErrorsOccured(const QList<QSslError> &)),
@@ -242,5 +250,8 @@ void DefaultConnectionPlugin::onConnectionDestroyed()
 {
 	IDefaultConnection *connection = qobject_cast<IDefaultConnection *>(sender());
 	if (connection)
+	{
+		LOG_DEBUG("Default connection destroyed");
 		emit connectionDestroyed(connection);
+	}
 }

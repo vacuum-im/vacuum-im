@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>EditStatusDialog</name>
     <message>
@@ -207,6 +207,10 @@ Sie können Statusklassen für zusätzlich von ihnen definierte Statusmeldungen 
     <message>
         <source>On loss of connection to the server</source>
         <translation>Wenn die Verbindung zum Server verloren geht</translation>
+    </message>
+    <message>
+        <source>Left Vacuum-IM</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -1,5 +1,17 @@
 #include "compressplugin.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/xmpperrors.h>
+#include <definitions/internalerrors.h>
+#include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppfeaturepluginorders.h>
+#include <utils/xmpperror.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+
 CompressPlugin::CompressPlugin()
 {
 	FXmppStreams = NULL;
@@ -27,15 +39,21 @@ bool CompressPlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
+	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
+	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
 	if (plugin)
+	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+	}
 
 	return FXmppStreams!=NULL;
 }
@@ -97,6 +115,7 @@ IXmppFeature *CompressPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStr
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AXmppStream->streamJid()) : NULL;
 		if (account==NULL || account->optionsNode().value("stream-compress").toBool())
 		{
+			LOG_STRM_INFO(AXmppStream->streamJid(),"Compression XMPP stream feature created");
 			IXmppFeature *feature = new Compression(AXmppStream);
 			connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 			emit featureCreated(feature);
@@ -110,5 +129,8 @@ void CompressPlugin::onFeatureDestroyed()
 {
 	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
 	if (feature)
+	{
+		LOG_STRM_INFO(feature->xmppStream()->streamJid(),"Compression XMPP stream feature destroyed");
 		emit featureDestroyed(feature);
+	}
 }

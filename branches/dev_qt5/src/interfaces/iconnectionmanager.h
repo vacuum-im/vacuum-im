@@ -26,7 +26,9 @@ public:
 	virtual QObject *instance() =0;
 	virtual bool isOpen() const =0;
 	virtual bool isEncrypted() const =0;
+	virtual bool isEncryptionSupported() const =0;
 	virtual bool connectToHost() =0;
+	virtual bool startEncryption() =0;
 	virtual void disconnectFromHost() =0;
 	virtual void abortConnection(const XmppError &AError) =0;
 	virtual qint64 write(const QByteArray &AData) =0;
@@ -85,8 +87,8 @@ protected:
 	virtual void defaultProxyChanged(const QUuid &AProxyId) =0;
 };
 
-Q_DECLARE_INTERFACE(IConnection,"Vacuum.Plugin.IConnection/1.2")
-Q_DECLARE_INTERFACE(IConnectionPlugin,"Vacuum.Plugin.IConnectionPlugin/1.1")
-Q_DECLARE_INTERFACE(IConnectionManager,"Vacuum.Plugin.IConnectionManager/1.2")
+Q_DECLARE_INTERFACE(IConnection,"Vacuum.Plugin.IConnection/1.3")
+Q_DECLARE_INTERFACE(IConnectionPlugin,"Vacuum.Plugin.IConnectionPlugin/1.3")
+Q_DECLARE_INTERFACE(IConnectionManager,"Vacuum.Plugin.IConnectionManager/1.3")
 
-#endif
+#endif // ICONNECTIONMANAGER_H

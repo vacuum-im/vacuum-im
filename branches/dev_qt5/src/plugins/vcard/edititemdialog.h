@@ -6,7 +6,7 @@
 #include "ui_edititemdialog.h"
 
 class EditItemDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:

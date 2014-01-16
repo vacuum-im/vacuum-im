@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="pl" sourcelanguage="en">
+<TS version="2.1" language="pl" sourcelanguage="en">
 <context>
     <name>EditStatusDialog</name>
     <message>
@@ -207,6 +207,10 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
     <message>
         <source>On loss of connection to the server</source>
         <translation>W momencie utraty połączenia z serwerem</translation>
+    </message>
+    <message>
+        <source>Left Vacuum-IM</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

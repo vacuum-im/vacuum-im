@@ -7,7 +7,6 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/imessageprocessor.h>
-#include <utils/message.h>
 
 class MessageCarbons : 
 	public QObject,

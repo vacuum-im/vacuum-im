@@ -3,6 +3,11 @@
 #include <QDir>
 #include <QTimer>
 #include <QFileInfo>
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
+#include <definitions/statisticsparams.h>
+#include <utils/logger.h>
+#include <utils/jid.h>
 
 #define CONNECTION_TIMEOUT 60000
 
@@ -109,9 +114,9 @@ bool FileStream::isRangeSupported() const
 
 void FileStream::setRangeSupported(bool ASupported)
 {
-	if (FStreamState==Creating)
+	if (FStreamState == Creating)
 	{
-		if (FRangeSupported!=ASupported)
+		if (FRangeSupported != ASupported)
 		{
 			FRangeSupported = ASupported;
 			emit propertiesChanged();
@@ -258,6 +263,16 @@ void FileStream::setSettingsProfile(const QUuid &AProfileId)
 	}
 }
 
+QStringList FileStream::acceptableMethods() const
+{
+	return FAcceptableMethods;
+}
+
+void FileStream::setAcceptableMethods(const QStringList &AMethods)
+{
+	FAcceptableMethods = AMethods;
+}
+
 bool FileStream::initStream(const QList<QString> &AMethods)
 {
 	if (FStreamState==Creating && FStreamKind==SendFile)
@@ -269,6 +284,14 @@ bool FileStream::initStream(const QList<QString> &AMethods)
 				setStreamState(Negotiating,tr("Waiting for a response to send a file request"));
 				return true;
 			}
+			else
+			{
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to init file stream, sid=%1: Request not sent").arg(FStreamId));
+			}
+		}
+		else
+		{
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to init file stream, sid=%1: File not ready").arg(FStreamId));
 		}
 	}
 	return false;
@@ -288,15 +311,25 @@ bool FileStream::startStream(const QString &AMethodNS)
 				connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
 				if (!FSocket->open(QIODevice::WriteOnly))
 				{
+					LOG_STRM_WARNING(FStreamJid,QString("Failed to start file stream, sid=%1: Socket not opened").arg(FStreamId));
 					delete FSocket->instance();
 					FSocket = NULL;
 				}
 				else
 				{
+					LOG_STRM_INFO(FStreamJid,QString("File stream started, sid=%1, method=%2").arg(FStreamId,AMethodNS));
 					return true;
 				}
 			}
+			else
+			{
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to start file stream, sid=%1: Socket not created").arg(FStreamId));
+			}
 			FFile.close();
+		}
+		else
+		{
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to start file stream, sid=%1: File not opened").arg(FStreamId));
 		}
 	}
 	else if (FStreamKind==ReceiveFile && FStreamState==Creating)
@@ -313,16 +346,30 @@ bool FileStream::startStream(const QString &AMethodNS)
 					connect(FSocket->instance(),SIGNAL(stateChanged(int)),SLOT(onSocketStateChanged(int)));
 					if (!FSocket->open(QIODevice::ReadOnly))
 					{
+						LOG_STRM_WARNING(FStreamJid,QString("Failed to start file stream, sid=%1: Socket not opened").arg(FStreamId));
 						delete FSocket->instance();
 						FSocket = NULL;
 					}
 					else
 					{
+						LOG_STRM_INFO(FStreamJid,QString("File stream started, sid=%1, method=%2").arg(FStreamId,AMethodNS));
 						return true;
 					}
 				}
+				else
+				{
+					LOG_STRM_WARNING(FStreamJid,QString("Failed to start file stream, sid=%1: Socket not created").arg(FStreamId));
+				}
+			}
+			else
+			{
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to start file stream, sid=%1: Stream not accepted").arg(FStreamId));
 			}
 			FFile.close();
+		}
+		else
+		{
+			LOG_STRM_WARNING(FStreamJid,QString("Failed to start file stream, sid=%1: File not opened").arg(FStreamId));
 		}
 	}
 	return false;
@@ -336,6 +383,7 @@ void FileStream::abortStream(const XmppError &AError)
 		{
 			FAborted = true;
 			FError = AError;
+			LOG_STRM_WARNING(FStreamJid,QString("Aborting file stream, sid=%1: %2").arg(FStreamId,AError.condition()));
 		}
 		if (FThread && FThread->isRunning())
 		{
@@ -378,7 +426,7 @@ bool FileStream::openFile()
 		{
 			FFile.setFileName(FFileName);
 			QIODevice::OpenMode mode = QIODevice::ReadOnly;
-			if (FStreamKind==IFileStream::ReceiveFile)
+			if (FStreamKind == IFileStream::ReceiveFile)
 			{
 				mode = QIODevice::WriteOnly;
 				mode |= FRangeOffset > 0 ? QIODevice::Append : QIODevice::Truncate;
@@ -390,8 +438,21 @@ bool FileStream::openFile()
 				if (FStreamKind == IFileStream::ReceiveFile)
 					FFile.remove();
 				FFile.close();
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to open stream file, sid=%1: Invalid range").arg(FStreamId));
+			}
+			else
+			{
+				LOG_STRM_ERROR(FStreamJid,QString("Failed to open stream file, sid=%1: %2").arg(FStreamId,FFile.errorString()));
 			}
 		}
+		else
+		{
+			LOG_STRM_ERROR(FStreamJid,QString("Failed to open stream file, sid=%1: File path not created").arg(FStreamId));
+		}
+	}
+	else
+	{
+		LOG_STRM_WARNING(FStreamJid,QString("Failed to open stream file, sid=%1: File not found or empty").arg(FStreamId));
 	}
 	return false;
 }
@@ -411,6 +472,7 @@ bool FileStream::updateFileInfo()
 			}
 			else
 			{
+				LOG_STRM_WARNING(FStreamJid,QString("Failed to update file info: File size changed"));
 				abortStream(XmppError(IERR_FILESTREAMS_STREAM_FILE_SIZE_CHANGED));
 				return false;
 			}
@@ -433,20 +495,19 @@ void FileStream::setStreamState(int AState, const QString &AMessage)
 			memset(&FSpeed,0,sizeof(FSpeed));
 			QTimer::singleShot(SPEED_INTERVAL,this,SLOT(onIncrementSpeedIndex()));
 		}
+
+		if (FStreamState >= Connecting)
+		{
+			if (AState == Finished)
+				REPORT_EVENT(SEVP_FILESTREAM_SUCCESS,1);
+			if (AState == Aborted)
+				REPORT_EVENT(SEVP_FILESTREAM_FAILURE,1);
+		}
+
 		FStreamState = AState;
 		FStateString = AMessage;
 		emit stateChanged();
 	}
-}
-
-QStringList FileStream::acceptableMethods() const
-{
-	return FAcceptableMethods;
-}
-
-void FileStream::setAcceptableMethods(const QStringList &AMethods)
-{
-	FAcceptableMethods = AMethods;
 }
 
 void FileStream::onSocketStateChanged(int AState)
@@ -459,6 +520,7 @@ void FileStream::onSocketStateChanged(int AState)
 	{
 		if (FThread == NULL)
 		{
+			LOG_STRM_DEBUG(FStreamJid,QString("Starting file stream thread, sid=%1").arg(FStreamId));
 			qint64 bytesForTransfer = FRangeLength>0 ? FRangeLength : FFileSize-FRangeOffset;
 			FThread = new TransferThread(FSocket,&FFile,FStreamKind,bytesForTransfer,this);
 			connect(FThread,SIGNAL(transferProgress(qint64)),SLOT(onTransferThreadProgress(qint64)));
@@ -512,6 +574,7 @@ void FileStream::onTransferThreadProgress(qint64 ABytes)
 
 void FileStream::onTransferThreadFinished()
 {
+	LOG_STRM_DEBUG(FStreamJid,QString("File stream thread finished, sid=%1").arg(FStreamId));
 	if (FSocket && FSocket->isOpen())
 	{
 		setStreamState(Disconnecting,tr("Disconnecting"));
@@ -533,7 +596,5 @@ void FileStream::onIncrementSpeedIndex()
 void FileStream::onConnectionTimeout()
 {
 	if (FStreamState == Connecting)
-	{
 		abortStream(XmppError(IERR_FILESTREAMS_STREAM_CONNECTION_TIMEOUT));
-	}
 }

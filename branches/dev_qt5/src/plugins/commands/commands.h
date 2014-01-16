@@ -1,12 +1,6 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
-#include <definitions/namespaces.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/xmpperrors.h>
-#include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/icommands.h>
 #include <interfaces/idataforms.h>
@@ -15,18 +9,17 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/ixmppuriqueries.h>
-#include <utils/menu.h>
 #include "commanddialog.h"
 
 class Commands :
-			public QObject,
-			public IPlugin,
-			public ICommands,
-			public IStanzaHandler,
-			public IStanzaRequestOwner,
-			public IXmppUriHandler,
-			public IDiscoHandler,
-			public IDiscoFeatureHandler
+	public QObject,
+	public IPlugin,
+	public ICommands,
+	public IStanzaHandler,
+	public IStanzaRequestOwner,
+	public IXmppUriHandler,
+	public IDiscoHandler,
+	public IDiscoFeatureHandler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICommands IStanzaHandler IStanzaRequestOwner IXmppUriHandler IDiscoHandler IDiscoFeatureHandler);

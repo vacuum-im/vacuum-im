@@ -28,7 +28,8 @@ set(SOURCES "action.cpp"
 			"versionparser.cpp"
 			"widgetmanager.cpp"
 			"xmpperror.cpp"
-			"splitterwidget.cpp")
+			"splitterwidget.cpp"
+			"logger.cpp")
 
 set(HEADERS "action.h"
 			"advanceditem.h"
@@ -60,7 +61,8 @@ set(HEADERS "action.h"
 			"versionparser.h"
 			"widgetmanager.h"
 			"xmpperror.h"
-			"splitterwidget.h")
+			"splitterwidget.h"
+			"logger.h")
 
 if (UNIX AND NOT APPLE)
 	set(SOURCES ${SOURCES} "x11info.cpp")

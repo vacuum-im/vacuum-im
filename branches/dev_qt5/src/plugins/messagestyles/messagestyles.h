@@ -1,12 +1,6 @@
 #ifndef MESSAGESTYLES_H
 #define MESSAGESTYLES_H
 
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestyles.h>
 #include <interfaces/ioptionsmanager.h>
@@ -15,15 +9,13 @@
 #include <interfaces/iroster.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/istatusicons.h>
-#include <utils/message.h>
-#include <utils/options.h>
 #include "styleoptionswidget.h"
 
 class MessageStyles :
-			public QObject,
-			public IPlugin,
-			public IMessageStyles,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IMessageStyles,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStyles IOptionsHolder);

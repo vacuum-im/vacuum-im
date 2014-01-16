@@ -3,13 +3,6 @@
 
 #include <QSplitter>
 #include <interfaces/imainwindow.h>
-#include <definitions/version.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
-#include <definitions/mainwindowwidgets.h>
-#include <utils/widgetmanager.h>
-#include <utils/options.h>
 #include "maintabwidget.h"
 #include "maincentralwidget.h"
 

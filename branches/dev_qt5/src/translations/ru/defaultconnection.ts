@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>ConnectionOptionsWidget</name>
     <message>
@@ -107,7 +107,7 @@
     </message>
     <message>
         <source>Effective from: %1</source>
-        <translation>Дествителен с: %1</translation>
+        <translation>Действителен с: %1</translation>
     </message>
     <message>
         <source>Expired at: %1</source>

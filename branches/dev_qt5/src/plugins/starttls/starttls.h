@@ -2,14 +2,9 @@
 #define STARTTLS_H
 
 #include <QObject>
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
-#include <utils/stanza.h>
-#include <utils/xmpperror.h>
 
 class StartTLS :
 	public QObject,
@@ -37,7 +32,6 @@ protected slots:
 	void onConnectionEncrypted();
 private:
 	IXmppStream *FXmppStream;
-	IDefaultConnection *FConnection;
 };
 
 #endif // STARTTLS_H

@@ -2,22 +2,9 @@
 #define ROSTERSVIEW_H
 
 #include <QTimer>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/actiongroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/rostertooltiporders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterdragdropmimetypes.h>
-#include <definitions/rosterdataholderorders.h>
-#include <definitions/rosterlabelholderorders.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/imainwindow.h>
-#include <utils/options.h>
-#include <utils/iconstorage.h>
 
 class RostersView :
 	public QTreeView,

@@ -3,17 +3,13 @@
 
 #include <QMap>
 #include <QTimer>
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/itraymanager.h>
-#include <utils/versionparser.h>
 
 class TrayManager :
-			public QObject,
-			public IPlugin,
-			public ITrayManager
+	public QObject,
+	public IPlugin,
+	public ITrayManager
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ITrayManager);

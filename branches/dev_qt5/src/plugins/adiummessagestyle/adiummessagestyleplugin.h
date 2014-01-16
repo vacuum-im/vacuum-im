@@ -1,23 +1,18 @@
 #ifndef ADIUMMESSAGESTYLEPLUGIN_H
 #define ADIUMMESSAGESTYLEPLUGIN_H
 
-#include <definitions/resources.h>
-#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagestyles.h>
 #include <interfaces/iurlprocessor.h>
-#include <utils/filestorage.h>
-#include <utils/message.h>
-#include <utils/options.h>
 #include "adiummessagestyle.h"
 #include "adiumoptionswidget.h"
 
 #define ADIUMMESSAGESTYLE_UUID    "{703bae73-1905-4840-a186-c70b359d4f21}"
 
 class AdiumMessageStylePlugin :
-			public QObject,
-			public IPlugin,
-			public IMessageStylePlugin
+	public QObject,
+	public IPlugin,
+	public IMessageStylePlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMessageStylePlugin);

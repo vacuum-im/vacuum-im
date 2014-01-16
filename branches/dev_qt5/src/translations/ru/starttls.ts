@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ru" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
 <context>
     <name>StartTLSPlugin</name>
     <message>
@@ -18,6 +18,10 @@
     <message>
         <source>StartTLS negotiation failed</source>
         <translation>Инициализация StartTLS завершилась с ошибкой</translation>
+    </message>
+    <message>
+        <source>Failed to begin StartTLS handshake</source>
+        <translation>Не удалось запустить инициализацию StartTLS</translation>
     </message>
 </context>
 </TS>

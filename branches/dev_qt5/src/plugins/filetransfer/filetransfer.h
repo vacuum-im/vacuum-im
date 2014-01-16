@@ -5,24 +5,6 @@
 #include <QDragMoveEvent>
 #include <QDragEnterEvent>
 #include <QDragLeaveEvent>
-#include <definitions/namespaces.h>
-#include <definitions/fshandlerorders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/resources.h>
-#include <definitions/shortcuts.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/internalerrors.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifiletransfer.h>
 #include <interfaces/ifilestreamsmanager.h>
@@ -34,14 +16,6 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/jid.h>
-#include <utils/action.h>
-#include <utils/stanza.h>
-#include <utils/options.h>
-#include <utils/datetime.h>
-#include <utils/shortcuts.h>
-#include <utils/iconstorage.h>
-#include <utils/widgetmanager.h>
 #include "streamdialog.h"
 
 class FileTransfer :
@@ -94,7 +68,7 @@ public:
 protected:
 	void registerDiscoFeatures();
 	void notifyStream(IFileStream *AStream, bool ANewStream = false);
-	void autoStartStream(IFileStream *AStream);
+	bool autoStartStream(IFileStream *AStream) const;
 	void updateToolBarAction(IMessageToolBarWidget *AWidget);
 	QList<IMessageToolBarWidget *> findToolBarWidgets(const Jid &AContactJid) const;
 	StreamDialog *getStreamDialog(IFileStream *ASession);

@@ -6,7 +6,8 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QIntValidator>
-#include <QKeyEvent>
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
 #include <QLineEdit>
 #include <QMessageBox>
 
@@ -180,13 +181,15 @@ void ArchiveDelegate::setEditorData(QWidget *AEditor, const QModelIndex &AIndex)
 	case COL_EXACT:
 		{
 			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-			comboBox->setCurrentIndex(comboBox->findData(AIndex.data(Qt::UserRole)));
+			if (comboBox)
+				comboBox->setCurrentIndex(comboBox->findData(AIndex.data(Qt::UserRole)));
 		}
 		break;
 	case COL_EXPIRE:
 		{
 			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-			comboBox->setEditText(QString::number(AIndex.data(Qt::UserRole).toInt()/ONE_DAY));
+			if (comboBox)
+				comboBox->setEditText(QString::number(AIndex.data(Qt::UserRole).toInt()/ONE_DAY));
 		}
 		break;
 	default:
@@ -203,17 +206,23 @@ void ArchiveDelegate::setModelData(QWidget *AEditor, QAbstractItemModel *AModel,
 	case COL_EXACT:
 		{
 			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-			int index = comboBox->currentIndex();
-			AModel->setData(AIndex,comboBox->itemText(index),Qt::DisplayRole);
-			AModel->setData(AIndex,comboBox->itemData(index),Qt::UserRole);
+			if (comboBox)
+			{
+				int index = comboBox->currentIndex();
+				AModel->setData(AIndex,comboBox->itemText(index),Qt::DisplayRole);
+				AModel->setData(AIndex,comboBox->itemData(index),Qt::UserRole);
+			}
 		}
 		break;
 	case COL_EXPIRE:
 		{
 			QComboBox *comboBox = qobject_cast<QComboBox *>(AEditor);
-			int expire = comboBox->currentText().toInt()*ONE_DAY;
-			AModel->setData(AIndex,expireName(expire),Qt::DisplayRole);
-			AModel->setData(AIndex,expire,Qt::UserRole);
+			if (comboBox)
+			{
+				int expire = comboBox->currentText().toInt()*ONE_DAY;
+				AModel->setData(AIndex,expireName(expire),Qt::DisplayRole);
+				AModel->setData(AIndex,expire,Qt::UserRole);
+			}
 		}
 		break;
 	default:
@@ -232,7 +241,8 @@ void ArchiveDelegate::updateEditorGeometry(QWidget *AEditor, const QStyleOptionV
 void ArchiveDelegate::onExpireIndexChanged(int AIndex)
 {
 	QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
-	comboBox->setEditText(QString::number(comboBox->itemData(AIndex).toInt()/ONE_DAY));
+	if (comboBox)
+		comboBox->setEditText(QString::number(comboBox->itemData(AIndex).toInt()/ONE_DAY));
 }
 
 ArchiveStreamOptions::ArchiveStreamOptions(IMessageArchiver *AArchiver, const Jid &AStreamJid, QWidget *AParent) : QWidget(AParent)

@@ -3,6 +3,16 @@
 #include <QMessageBox>
 #include <QInputDialog>
 #include <QApplication>
+#include <definitions/version.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 ShortcutManager::ShortcutManager()
 {
@@ -36,15 +46,21 @@ bool ShortcutManager::initConnections(IPluginManager *APluginManager, int &AInit
 
 	IPlugin *plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
+	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
 	if (plugin)
+	{
 		FTrayManager = qobject_cast<ITrayManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
+	{
 		FNotifications = qobject_cast<INotifications *>(plugin->instance());
+	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
@@ -80,9 +96,7 @@ QMultiMap<int, IOptionsWidget *> ShortcutManager::optionsWidgets(const QString &
 {
 	QMultiMap<int, IOptionsWidget *> widgets;
 	if (ANodeId == OPN_SHORTCUTS)
-	{
 		widgets.insertMulti(OWO_SHORTCUTS, new ShortcutOptionsWidget(AParent));
-	}
 	return widgets;
 }
 
@@ -90,6 +104,7 @@ void ShortcutManager::hideAllWidgets()
 {
 	if (FOptionsManager==NULL || FOptionsManager->isOpened())
 	{
+		LOG_INFO("Hiding all visible widgets");
 		foreach(QWidget *widget, QApplication::topLevelWidgets())
 		{
 			if (!widget->isHidden())
@@ -143,6 +158,7 @@ void ShortcutManager::showHiddenWidgets(bool ACheckPassword)
 	if (!blocked)
 	{
 		blocked = true;
+		LOG_INFO("Restoring all hidden widgets");
 
 		QString password;
 		QString profile = FOptionsManager!=NULL ? FOptionsManager->currentProfile() : QString::null;

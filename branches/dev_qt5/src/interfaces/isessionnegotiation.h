@@ -14,8 +14,7 @@
 #define SESSION_FIELD_TERMINATE       "terminate"
 #define SESSION_FIELD_REASON          "reason"
 
-struct IStanzaSession
-{
+struct IStanzaSession {
 	enum Status {
 		Empty,
 		Init,
@@ -61,9 +60,10 @@ class ISessionNegotiation
 {
 public:
 	virtual QObject *instance() =0;
-	virtual IStanzaSession getSession(const QString &ASessionId) const =0;
-	virtual IStanzaSession getSession(const Jid &AStreamJid, const Jid &AContactJid) const =0;
-	virtual QList<IStanzaSession> getSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const =0;
+	virtual bool isReady(const Jid &AStreamJid) const =0;
+	virtual IStanzaSession findSession(const QString &ASessionId) const =0;
+	virtual IStanzaSession findSession(const Jid &AStreamJid, const Jid &AContactJid) const =0;
+	virtual QList<IStanzaSession> findSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const =0;
 	virtual int initSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
 	virtual void resumeSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
 	virtual void terminateSession(const Jid &AStreamJid, const Jid &AContactJid) =0;
@@ -76,6 +76,6 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(ISessionNegotiator,"Vacuum.Plugin.ISessionNegotiator/1.0")
-Q_DECLARE_INTERFACE(ISessionNegotiation,"Vacuum.Plugin.ISessionNegotiation/1.0")
+Q_DECLARE_INTERFACE(ISessionNegotiation,"Vacuum.Plugin.ISessionNegotiation/1.1")
 
-#endif
+#endif // ISESSIONNEGOTIATION_H

@@ -1,10 +1,6 @@
 #ifndef MULTIUSERCHAT_H
 #define MULTIUSERCHAT_H
 
-#include <definitions/multiuserdataroles.h>
-#include <definitions/namespaces.h>
-#include <definitions/messageeditororders.h>
-#include <definitions/stanzahandlerorders.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
@@ -12,7 +8,6 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
-#include <utils/xmpperror.h>
 #include "multiuser.h"
 
 class MultiUserChat :
@@ -118,7 +113,6 @@ protected slots:
 	void onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
 	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
-	void onPresenceAboutToClose(int AShow, const QString &AStatus);
 	void onStreamClosed();
 	void onStreamJidChanged(const Jid &ABefore);
 private:

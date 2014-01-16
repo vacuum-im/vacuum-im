@@ -2,18 +2,16 @@
 #define FILEMESSAGEARCHIVE_H
 
 #include <QMutex>
-#include <definitions/optionvalues.h>
-#include <definitions/archivecapabilityorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ifilemessagearchive.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/iaccountmanager.h>
-#include <utils/options.h>
 #include "filewriter.h"
 #include "fileworker.h"
 #include "databaseworker.h"
 #include "databasesynchronizer.h"
+#include "filearchiveoptions.h"
 
 class FileMessageArchive : 
 	public QObject,

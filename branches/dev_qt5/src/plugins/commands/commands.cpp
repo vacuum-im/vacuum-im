@@ -1,5 +1,14 @@
 #include "commands.h"
 
+#include <definitions/namespaces.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/xmpperrors.h>
+#include <definitions/xmppurihandlerorders.h>
+#include <utils/logger.h>
+#include <utils/menu.h>
+
 #define COMMAND_TAG_NAME              "command"
 #define COMMANDS_TIMEOUT              60000
 
@@ -69,11 +78,15 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
+	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
+	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
@@ -88,7 +101,9 @@ bool Commands::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 	plugin = APluginManager->pluginInterface("IXmppUriQueries").value(0,NULL);
 	if (plugin)
+	{
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
+	}
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL && FDataForms!=NULL;
 }
@@ -145,6 +160,7 @@ bool Commands::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 		{
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_FORBIDDEN);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+			LOG_STRM_WARNING(AStreamJid,QString("Regected forbidden command from=%1, node=%2").arg(AStanza.from(),request.node));
 		}
 		else if (!server || !server->receiveCommandRequest(request))
 		{
@@ -152,7 +168,16 @@ bool Commands::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AS
 			err.setAppCondition(NS_COMMANDS,XERR_COMMANDS_MALFORMED_ACTION);
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,err);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,error);
+			LOG_STRM_WARNING(AStreamJid,QString("Regected bad command from=%1, node=%2").arg(AStanza.from(),request.node));
 		}
+		else
+		{
+			LOG_STRM_INFO(AStreamJid,QString("Accepted command request from=%1, id=%2, node=%3").arg(AStanza.from(),request.stanzaId,request.node));
+		}
+	}
+	else
+	{
+		REPORT_ERROR("Received unexpected stanza");
 	}
 	return false;
 }
@@ -205,6 +230,8 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 			foreach(ICommandClient *client, FClients)
 				if (client->receiveCommandResult(result))
 					break;
+
+			LOG_STRM_INFO(AStreamJid,QString("Received command request answer from=%1, id=%2, node=%3").arg(AStanza.from(),AStanza.id(),result.node));
 		}
 		else
 		{
@@ -212,10 +239,10 @@ void Commands::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 			err.stanzaId = AStanza.id();
 			err.error = XmppStanzaError(AStanza);
 			foreach(ICommandClient *client, FClients)
-			{
 				if (client->receiveCommandError(err))
 					break;
-			}
+
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to received command request answer from=%1, id=%2: %3").arg(AStanza.from(),AStanza.id(),err.error.condition()));
 		}
 	}
 }
@@ -229,9 +256,7 @@ bool Commands::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const 
 		{
 			QString action = AParams.value("action","execute");
 			if (action == "execute")
-			{
 				executeCommand(AStreamJid, AContactJid, node);
-			}
 		}
 		return true;
 	}
@@ -422,8 +447,13 @@ QString Commands::sendCommandRequest(const ICommandRequest &ARequest)
 			FDataForms->xmlForm(ARequest.form,cmdElem);
 		if (FStanzaProcessor->sendStanzaRequest(this,ARequest.streamJid,request,COMMANDS_TIMEOUT))
 		{
+			LOG_STRM_INFO(ARequest.streamJid,QString("Command request sent to=%1, node=%2, sid=%3, id=%4").arg(ARequest.contactJid.full(),ARequest.node,ARequest.sessionId,request.id()));
 			FRequests.append(request.id());
 			return request.id();
+		}
+		else
+		{
+			LOG_STRM_WARNING(ARequest.streamJid,QString("Failed to send command request to=%1, node=%2, sid=%3").arg(ARequest.contactJid.full(),ARequest.node,ARequest.sessionId));
 		}
 	}
 	return QString::null;
@@ -459,7 +489,15 @@ bool Commands::sendCommandResult(const ICommandResult &AResult)
 			noteElem.appendChild(result.createTextNode(note.message));
 		}
 
-		return FStanzaProcessor->sendStanzaOut(AResult.streamJid,result);
+		if (FStanzaProcessor->sendStanzaOut(AResult.streamJid,result))
+		{
+			LOG_STRM_INFO(AResult.streamJid,QString("Command result sent to=%1, node=%2, sid=%3, id=%4").arg(AResult.contactJid.full(),AResult.node,AResult.sessionId,AResult.stanzaId));
+			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AResult.streamJid,QString("Failed to send command result to=%1, node=%2, sid=%3, id=%4").arg(AResult.contactJid.full(),AResult.node,AResult.sessionId,AResult.stanzaId));
+		}
 	}
 	return false;
 }
@@ -474,6 +512,7 @@ bool Commands::executeCommand(const Jid &AStreamJid, const Jid &ACommandJid, con
 	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
 	if (FDataForms && stream && stream->isOpen())
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Executing command, server=%1, node=%2").arg(ACommandJid.full(),ANode));
 		CommandDialog *dialog = new CommandDialog(this,FDataForms,AStreamJid,ACommandJid,ANode,NULL);
 		connect(stream->instance(),SIGNAL(closed()),dialog,SLOT(reject()));
 		dialog->executeCommand();

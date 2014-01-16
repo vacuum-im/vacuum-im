@@ -23,6 +23,7 @@ public:
 	FileTask(IFileMessageArchive *AArchive, const Jid &AStreamJid, Type AType);
 	virtual ~FileTask();
 	Type type() const;
+	Jid streamJid() const;
 	QString taskId() const;
 	bool isFailed() const;
 	XmppError error() const;

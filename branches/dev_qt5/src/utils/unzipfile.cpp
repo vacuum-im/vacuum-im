@@ -138,4 +138,3 @@ QByteArray UnzipFile::loadZippedFileData(const QString &AFileName) const
 	}
 	return QByteArray();
 }
-
