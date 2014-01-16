@@ -191,9 +191,11 @@ QString SystemManager::osVersion()
 		case QSysInfo::WV_CE:
 			osver = "Windows CE";
 			break;
+# if QT_VERSION >= 0x050200
 		case QSysInfo::WV_WINDOWS8_1:
 			osver = "Windows 8.1";
 			break;
+# endif
 		case QSysInfo::WV_WINDOWS8:
 			osver = "Windows 8";
 			break;
