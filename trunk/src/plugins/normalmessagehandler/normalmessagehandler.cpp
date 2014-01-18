@@ -350,7 +350,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 bool NormalMessageHandler::messageShowWindow(int AMessageId)
 {
 	IMessageNormalWindow *window = FNotifiedMessages.key(AMessageId);
-	if (window)
+	if (window == NULL)
 	{
 		Message message = FMessageProcessor->notifiedMessage(AMessageId);
 		if (messageDisplay(message,IMessageProcessor::MessageIn))
