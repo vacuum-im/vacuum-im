@@ -1,5 +1,4 @@
 #include "multiuser.h"
-#include <definitions/multiuserdataroles.h>
 
 MultiUser::MultiUser(const Jid &ARoomJid, const QString &ANickName, QObject *AParent) : QObject(AParent)
 {

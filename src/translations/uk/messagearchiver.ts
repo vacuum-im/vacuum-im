@@ -269,18 +269,6 @@
         <source>Add</source>
         <translation>Додати</translation>
     </message>
-    <message>
-        <source>Duplicate messages in local archive (not recommended)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Replication Preferences</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Synchronize history between archives</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>
@@ -434,16 +422,20 @@
         <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
         <translation>dd MMM yyyy</translation>
     </message>
-    <message>
-        <source>Search in text</source>
-        <translation>Пошук по тексту</translation>
-    </message>
 </context>
 <context>
     <name>ArchiveViewWindowClass</name>
     <message>
+        <source>Search</source>
+        <translation>Пошук</translation>
+    </message>
+    <message>
         <source>Update</source>
         <translation>Оновити</translation>
+    </message>
+    <message>
+        <source>Search:</source>
+        <translation>Пошук:</translation>
     </message>
     <message>
         <source>Next</source>
@@ -658,22 +650,6 @@
     <message>
         <source>Save Only Messages Text</source>
         <translation>Зберігати тільки текст повідомлень</translation>
-    </message>
-    <message>
-        <source>Failed to load conversation headers</source>
-        <translation>Не вдалося завантажити заголовки розмов</translation>
-    </message>
-    <message>
-        <source>Failed to save conversation</source>
-        <translation>Не вдалося зберегти розмову</translation>
-    </message>
-    <message>
-        <source>Failed to remove conversation</source>
-        <translation>Не вдалося видалити розмову</translation>
-    </message>
-    <message>
-        <source>Failed to load archive modifications</source>
-        <translation>Не вдалося завантажити список змін до архіву</translation>
     </message>
 </context>
 </TS>

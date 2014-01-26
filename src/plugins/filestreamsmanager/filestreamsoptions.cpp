@@ -2,8 +2,6 @@
 
 #include <QVBoxLayout>
 #include <QFileDialog>
-#include <definitions/optionvalues.h>
-#include <utils/options.h>
 
 FileStreamsOptions::FileStreamsOptions(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, QWidget *AParent) : QWidget(AParent)
 {
@@ -87,7 +85,7 @@ void FileStreamsOptions::onMethodButtonToggled(bool ACkecked)
 	if (streamMethod)
 	{
 		if (ACkecked)
-			ui.cmbMethod->addItem(streamMethod->methodName(),methodNS);
+			ui.cmbMethod->addItem(streamMethod->methodName(), methodNS);
 		else
 			ui.cmbMethod->removeItem(ui.cmbMethod->findData(methodNS));
 	}

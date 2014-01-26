@@ -2,28 +2,7 @@
 
 #include <QFile>
 #include <QFileInfo>
-#include <QClipboard>
 #include <QDomDocument>
-#include <QApplication>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/multiuserdataroles.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/xmppurihandlerorders.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/rosterdataholderorders.h>
-#include <utils/widgetmanager.h>
-#include <utils/textmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/shortcuts.h>
-#include <utils/stanza.h>
-#include <utils/action.h>
-#include <utils/logger.h>
 
 #define DIR_VCARDS                "vcards"
 #define VCARD_TIMEOUT             60000
@@ -33,14 +12,12 @@
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
-#define ADR_CLIPBOARD_DATA        Action::DR_Parametr1
 
 VCardPlugin::VCardPlugin()
 {
 	FPluginManager = NULL;
 	FXmppStreams = NULL;
 	FRosterPlugin = NULL;
-	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
 	FStanzaProcessor = NULL;
@@ -48,7 +25,6 @@ VCardPlugin::VCardPlugin()
 	FDiscovery = NULL;
 	FXmppUriQueries = NULL;
 	FMessageWidgets = NULL;
-	FRosterSearch = NULL;
 
 	FUpdateTimer.setSingleShot(false);
 	FUpdateTimer.start(UPDATE_REQUEST_TIMEOUT);
@@ -101,12 +77,6 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
-	if (plugin)
-	{
-		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
-	}
-
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
 	{
@@ -114,10 +84,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		if (FRostersViewPlugin)
 		{
 			FRostersView = FRostersViewPlugin->rostersView();
-			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)),
-				SLOT(onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
+			connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+				SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 		}
 	}
 
@@ -150,15 +118,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(), SIGNAL(normalWindowCreated(IMessageNormalWindow *)),SLOT(onMessageNormalWindowCreated(IMessageNormalWindow *)));
-			connect(FMessageWidgets->instance(), SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onMessageChatWindowCreated(IMessageChatWindow *)));
+			connect(FMessageWidgets->instance(), SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
 		}
-	}
-
-	plugin = APluginManager->pluginInterface("IRosterSearch").value(0,NULL);
-	if (plugin)
-	{
-		FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
 	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
@@ -168,8 +129,8 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 bool VCardPlugin::initObjects()
 {
-	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show Profile"), tr("Ctrl+I","Show Profile"));
-	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show Profile"), tr("Ctrl+I","Show Profile"), Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"));
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SHOWVCARD, tr("Show vCard"), tr("Ctrl+I","Show vCard"), Shortcuts::WidgetShortcut);
 
 	FVCardFilesDir.setPath(FPluginManager->homePath());
 	if (!FVCardFilesDir.exists(DIR_VCARDS))
@@ -186,87 +147,9 @@ bool VCardPlugin::initObjects()
 	}
 	if (FXmppUriQueries)
 	{
-		FXmppUriQueries->insertUriHandler(this,XUHO_DEFAULT);
-	}
-	if (FRostersModel)
-	{
-		FRostersModel->insertRosterDataHolder(RDHO_VCARD_SEARCH,this);
-	}
-	if (FRosterSearch)
-	{
-		FRosterSearch->insertSearchField(RDR_VCARD_SEARCH,tr("User Profile"));
+		FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
 	}
 	return true;
-}
-
-QList<int> VCardPlugin::rosterDataRoles(int AOrder) const
-{
-	if (AOrder == RDHO_VCARD_SEARCH)
-	{
-		static const QList<int> dataRoles = QList<int>() << RDR_VCARD_SEARCH;
-		return dataRoles;
-	}
-	return QList<int>();
-}
-
-QVariant VCardPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
-{
-	if (AOrder==RDHO_VCARD_SEARCH && ARole==RDR_VCARD_SEARCH)
-	{
-		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
-		if (FSearchStrings.contains(contactJid))
-		{
-			return FSearchStrings.value(contactJid);
-		}
-		else if (hasVCard(contactJid))
-		{
-			VCard *vcard = new VCard(const_cast<VCardPlugin *>(this),contactJid);
-
-			QStringList strings;
-			strings += vcard->value(VVN_FULL_NAME);
-			strings += vcard->value(VVN_FAMILY_NAME);
-			strings += vcard->value(VVN_GIVEN_NAME);
-			strings += vcard->value(VVN_MIDDLE_NAME);
-			strings += vcard->value(VVN_NICKNAME);
-			strings += vcard->value(VVN_ORG_NAME);
-			strings += vcard->value(VVN_ORG_UNIT);
-			strings += vcard->value(VVN_TITLE);
-			strings += vcard->value(VVN_ROLE);
-			strings += vcard->value(VVN_DESCRIPTION);
-
-			static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
-			strings += vcard->values(VVN_EMAIL,emailTagList).keys();
-
-			static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
-			strings += vcard->values(VVN_TELEPHONE,phoneTagList).keys();
-
-			static const QStringList tagHome = QStringList() << "HOME";
-			static const QStringList tagWork = QStringList() << "WORK";
-			static const QStringList tagsAdres = tagHome+tagWork;
-			strings += vcard->value(VVN_ADR_COUNTRY,tagHome,tagsAdres);
-			strings += vcard->value(VVN_ADR_REGION,tagHome,tagsAdres);
-			strings += vcard->value(VVN_ADR_CITY,tagHome,tagsAdres);
-			strings += vcard->value(VVN_ADR_STREET,tagHome,tagsAdres);
-			strings += vcard->value(VVN_ADR_COUNTRY,tagWork,tagsAdres);
-			strings += vcard->value(VVN_ADR_REGION,tagWork,tagsAdres);
-			strings += vcard->value(VVN_ADR_CITY,tagWork,tagsAdres);
-			strings += vcard->value(VVN_ADR_STREET,tagWork,tagsAdres);
-
-			delete vcard;
-
-			strings.removeAll(QString::null);
-			FSearchStrings.insert(contactJid, strings);
-
-			return strings;
-		}
-	}
-	return QVariant();
-}
-
-bool VCardPlugin::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
-{
-	Q_UNUSED(AOrder); Q_UNUSED(AValue); Q_UNUSED(AIndex); Q_UNUSED(ARole);
-	return false;
 }
 
 void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
@@ -278,18 +161,14 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		QDomElement elem = AStanza.firstElement(VCARD_TAGNAME,NS_VCARD_TEMP);
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("User vCard loaded, jid=%1, id=%2").arg(fromJid.full(),AStanza.id()));
-			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,elem);
 			emit vcardReceived(fromJid);
 		}
-		else
+		else if (AStanza.type() == "error")
 		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load user vCard, jid=%1, id=%2: %3").arg(fromJid.full(),AStanza.id(),err.condition()));
-			FSearchStrings.remove(fromJid);
 			saveVCardFile(fromJid,QDomElement());
-			emit vcardError(fromJid,err);
+			XmppStanzaError err(AStanza);
+			emit vcardError(fromJid,err.errorMessage());
 		}
 	}
 	else if (FVCardPublishId.contains(AStanza.id()))
@@ -298,16 +177,12 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 		Stanza stanza = FVCardPublishStanza.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Self vCard published, id=%1").arg(AStanza.id()));
-			FSearchStrings.remove(streamJid);
 			saveVCardFile(streamJid,stanza.element().firstChildElement(VCARD_TAGNAME));
 			emit vcardPublished(streamJid);
 		}
-		else
+		else if (AStanza.type() == "error")
 		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to publish self vCard, id=%1: %2").arg(AStanza.id(),err.condition()));
-			emit vcardError(streamJid,err);
+			emit vcardError(streamJid,XmppStanzaError(AStanza).errorMessage());
 		}
 	}
 }
@@ -333,7 +208,7 @@ bool VCardPlugin::hasVCard(const Jid &AContactJid) const
 	return QFile::exists(vcardFileName(AContactJid));
 }
 
-IVCard *VCardPlugin::getVCard(const Jid &AContactJid)
+IVCard *VCardPlugin::vcard(const Jid &AContactJid)
 {
 	VCardItem &vcardItem = FVCards[AContactJid];
 	if (vcardItem.vcard == NULL)
@@ -348,18 +223,13 @@ bool VCardPlugin::requestVCard(const Jid &AStreamJid, const Jid &AContactJid)
 	{
 		if (FVCardRequestId.key(AContactJid).isEmpty())
 		{
-			Stanza stanza("iq");
-			stanza.setTo(AContactJid.full()).setType("get").setId(FStanzaProcessor->newId());
-			stanza.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
-			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,VCARD_TIMEOUT))
+			Stanza request("iq");
+			request.setTo(AContactJid.full()).setType("get").setId(FStanzaProcessor->newId());
+			request.addElement(VCARD_TAGNAME,NS_VCARD_TEMP);
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,VCARD_TIMEOUT))
 			{
-				LOG_STRM_INFO(AStreamJid,QString("User vCard load request sent to=%1, id=%2").arg(stanza.to(),stanza.id()));
-				FVCardRequestId.insert(stanza.id(),AContactJid);
+				FVCardRequestId.insert(request.id(),AContactJid);
 				return true;
-			}
-			else
-			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to send user vCard load request to=%1").arg(stanza.to()));
 			}
 			return false;
 		}
@@ -372,20 +242,15 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
 {
 	if (FStanzaProcessor && AVCard->isValid() && FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
 	{
-		Stanza stanza("iq");
-		stanza.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
-		QDomElement elem = stanza.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
+		Stanza publish("iq");
+		publish.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
+		QDomElement elem = publish.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
 		removeEmptyChildElements(elem);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,VCARD_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,publish,VCARD_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Self vCard publish request sent, id=%1").arg(stanza.id()));
-			FVCardPublishId.insert(stanza.id(),AStreamJid.pBare());
-			FVCardPublishStanza.insert(stanza.id(),stanza);
+			FVCardPublishId.insert(publish.id(),AStreamJid.pBare());
+			FVCardPublishStanza.insert(publish.id(),publish);
 			return true;
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to send self vCard publish request");
 		}
 	}
 	return false;
@@ -407,24 +272,13 @@ void VCardPlugin::showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid)
 	}
 }
 
-void VCardPlugin::registerDiscoFeatures()
-{
-	IDiscoFeature dfeature;
-	dfeature.active = false;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_VCARD);
-	dfeature.var = NS_VCARD_TEMP;
-	dfeature.name = tr("Contact Profile");
-	dfeature.description = tr("Supports the requesting of the personal contact information");
-	FDiscovery->insertDiscoFeature(dfeature);
-}
-
 void VCardPlugin::unlockVCard(const Jid &AContactJid)
 {
 	VCardItem &vcardItem = FVCards[AContactJid];
 	vcardItem.locks--;
 	if (vcardItem.locks <= 0)
 	{
-		VCard *vcardCopy = vcardItem.vcard;
+		VCard *vcardCopy = vcardItem.vcard;   //После remove vcardItem будет недействителен
 		FVCards.remove(AContactJid);
 		delete vcardCopy;
 	}
@@ -461,14 +315,6 @@ void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem)
 			}
 			file.close();
 		}
-		else
-		{
-			REPORT_ERROR(QString("Failed to save vCard to file: %1").arg(file.errorString()));
-		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to save vCard to file: Invalid params");
 	}
 }
 
@@ -487,43 +333,16 @@ void VCardPlugin::removeEmptyChildElements(QDomElement &AElem) const
 	}
 }
 
-void VCardPlugin::insertMessageToolBarAction(IMessageToolBarWidget *AWidget)
+void VCardPlugin::registerDiscoFeatures()
 {
-	if (AWidget && AWidget->messageWindow()->contactJid().isValid())
-	{
-		Action *action = new Action(AWidget->instance());
-		action->setText(tr("Show Profile"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWVCARD);
-		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByMessageWindowAction(bool)));
-		AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_VCARD_VIEW);
-	}
-}
+	IDiscoFeature dfeature;
 
-QList<Action *> VCardPlugin::createClipboardActions(const QSet<QString> &AStrings, QObject *AParent) const
-{
-	QList<Action *> actions;
-
-	foreach(const QString &string, AStrings)
-	{
-		if (!string.isEmpty())
-		{
-			Action *action = new Action(AParent);
-			action->setText(TextManager::getElidedString(string,Qt::ElideRight,50));
-			action->setData(ADR_CLIPBOARD_DATA,string);
-			connect(action,SIGNAL(triggered(bool)),SLOT(onCopyToClipboardActionTriggered(bool)));
-			actions.append(action);
-		}
-	}
-
-	return actions;
-}
-
-void VCardPlugin::onCopyToClipboardActionTriggered(bool)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-		QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
+	dfeature.active = false;
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_VCARD);
+	dfeature.var = NS_VCARD_TEMP;
+	dfeature.name = tr("Visit Card");
+	dfeature.description = tr("Supports the requesting of the personal contact information");
+	FDiscovery->insertDiscoFeature(dfeature);
 }
 
 void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
@@ -532,77 +351,31 @@ void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
 		{
-			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
-			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
-				showVCardDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
+			QModelIndex index = FRostersView->instance()->currentIndex();
+			int indexType = index.data(RDR_TYPE).toInt();
+			if (indexType==RIT_STREAM_ROOT || indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			{
+				showVCardDialog(index.data(RDR_STREAM_JID).toString(),index.data(RDR_PREP_BARE_JID).toString());
+			}
 		}
 	}
 }
 
-void VCardPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void VCardPlugin::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
-		Jid streamJid = index->data(RDR_STREAM_JID).toString();
-		Jid contactJid = index->data(RDR_FULL_JID).toString();
-		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
-
-		bool canShowDialog = hasVCard(contactJid);
-		canShowDialog = canShowDialog || (stream!=NULL && stream->isOpen() && (index->kind()==RIK_STREAM_ROOT || index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT));
-		canShowDialog = canShowDialog || (FDiscovery!=NULL && FDiscovery->discoInfo(streamJid,contactJid.bare()).features.contains(NS_VCARD_TEMP));
-
-		if (canShowDialog)
+		if (index->type() == RIT_STREAM_ROOT || index->type() == RIT_CONTACT || index->type() == RIT_AGENT)
 		{
 			Action *action = new Action(AMenu);
-			action->setText(streamJid.pBare()==contactJid.pBare() ? tr("Edit Profile") : tr("Show Profile"));
+			action->setText(tr("Show vCard"));
 			action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
-			action->setData(ADR_STREAM_JID,streamJid.full());
-			action->setData(ADR_CONTACT_JID,contactJid.bare());
+			action->setData(ADR_STREAM_JID,index->data(RDR_STREAM_JID));
+			action->setData(ADR_CONTACT_JID,Jid(index->data(RDR_FULL_JID).toString()).bare());
 			action->setShortcutId(SCT_ROSTERVIEW_SHOWVCARD);
 			AMenu->addAction(action,AG_RVCM_VCARD,true);
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByAction(bool)));
-		}
-	}
-}
-
-void VCardPlugin::onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
-{
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
-	{
-		foreach(IRosterIndex *index, AIndexes)
-		{
-			Jid contactJid = index->data(RDR_PREP_BARE_JID).toString();
-			if (hasVCard(contactJid))
-			{
-				IVCard *vcard = getVCard(contactJid);
-
-				QSet<QString> commonStrings;
-				commonStrings += vcard->value(VVN_FULL_NAME);
-				commonStrings += vcard->value(VVN_NICKNAME);
-				commonStrings += vcard->value(VVN_ORG_NAME);
-				commonStrings += vcard->value(VVN_ORG_UNIT);
-				commonStrings += vcard->value(VVN_TITLE);
-				commonStrings += vcard->value(VVN_DESCRIPTION);
-
-				static const QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
-				QSet<QString> emailStrings = vcard->values(VVN_EMAIL,emailTagList).keys().toSet();
-
-				static const QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
-				QSet<QString> phoneStrings = vcard->values(VVN_TELEPHONE,phoneTagList).keys().toSet();
-
-				foreach(Action *action, createClipboardActions(commonStrings,AMenu))
-					AMenu->addAction(action,AG_RVCBM_VCARD_COMMON,true);
-
-				foreach(Action *action, createClipboardActions(emailStrings,AMenu))
-					AMenu->addAction(action,AG_RVCBM_VCARD_EMAIL,true);
-
-				foreach(Action *action, createClipboardActions(phoneStrings,AMenu))
-					AMenu->addAction(action,AG_RVCBM_VCARD_PHONE,true);
-
-				vcard->unlock();
-			}
 		}
 	}
 }
@@ -611,7 +384,7 @@ void VCardPlugin::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUs
 {
 	Q_UNUSED(AWindow);
 	Action *action = new Action(AMenu);
-	action->setText(tr("Show Profile"));
+	action->setText(tr("Show vCard"));
 	action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
 	action->setData(ADR_STREAM_JID,AUser->data(MUDR_STREAM_JID));
 	if (!AUser->data(MUDR_REAL_JID).toString().isEmpty())
@@ -633,20 +406,20 @@ void VCardPlugin::onShowVCardDialogByAction(bool)
 	}
 }
 
-void VCardPlugin::onShowVCardDialogByMessageWindowAction(bool)
+void VCardPlugin::onShowVCardDialogByChatWindowAction(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		IMessageToolBarWidget *widget = qobject_cast<IMessageToolBarWidget *>(action->parent());
-		if (widget)
+		IToolBarWidget *toolBarWidget = qobject_cast<IToolBarWidget *>(action->parent());
+		if (toolBarWidget && toolBarWidget->viewWidget())
 		{
 			bool isMucUser = false;
-			Jid contactJid = widget->messageWindow()->contactJid();
+			Jid contactJid = toolBarWidget->viewWidget()->contactJid();
 			QList<IMultiUserChatWindow *> windows = FMultiUserChatPlugin!=NULL ? FMultiUserChatPlugin->multiChatWindows() : QList<IMultiUserChatWindow *>();
 			for (int i=0; !isMucUser && i<windows.count(); i++)
 				isMucUser = windows.at(i)->findChatWindow(contactJid)!=NULL;
-			showVCardDialog(widget->messageWindow()->streamJid(), isMucUser ? contactJid : contactJid.bare());
+			showVCardDialog(toolBarWidget->viewWidget()->streamJid(), isMucUser ? contactJid : contactJid.bare());
 		}
 	}
 }
@@ -664,14 +437,17 @@ void VCardPlugin::onXmppStreamRemoved(IXmppStream *AXmppStream)
 			delete dialog;
 }
 
-void VCardPlugin::onMessageNormalWindowCreated(IMessageNormalWindow *AWindow)
+void VCardPlugin::onChatWindowCreated(IChatWindow *AWindow)
 {
-	insertMessageToolBarAction(AWindow->toolBarWidget());
-}
-
-void VCardPlugin::onMessageChatWindowCreated(IMessageChatWindow *AWindow)
-{
-	insertMessageToolBarAction(AWindow->toolBarWidget());
+	if (AWindow->toolBarWidget() && AWindow->toolBarWidget()->viewWidget())
+	{
+		Action *action = new Action(AWindow->toolBarWidget()->instance());
+		action->setText(tr("Show vCard"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_VCARD);
+		action->setShortcutId(SCT_MESSAGEWINDOWS_SHOWVCARD);
+		connect(action,SIGNAL(triggered(bool)),SLOT(onShowVCardDialogByChatWindowAction(bool)));
+		AWindow->toolBarWidget()->toolBarChanger()->insertAction(action,TBG_MWTBW_VCARD_VIEW);
+	}
 }
 
 void VCardPlugin::onUpdateTimerTimeout()

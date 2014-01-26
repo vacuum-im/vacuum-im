@@ -27,13 +27,5 @@
         <source>Without Groups</source>
         <translation>Ohne Gruppen</translation>
     </message>
-    <message>
-        <source>Accounts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All Contacts</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>

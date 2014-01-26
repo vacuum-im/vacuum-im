@@ -3,6 +3,18 @@
 
 #include <QMap>
 #include <QTimer>
+#include <definitions/namespaces.h>
+#include <definitions/stanzahandlerorders.h>
+#include <definitions/archivehandlerorders.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/tabpagenotifypriorities.h>
+#include <definitions/sessionnegotiatororders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ichatstates.h>
 #include <interfaces/ipresence.h>
@@ -15,6 +27,8 @@
 #include <interfaces/inotifications.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/imultiuserchat.h>
+#include <utils/options.h>
+#include <utils/iconstorage.h>
 #include "statewidget.h"
 
 struct ChatParams
@@ -93,11 +107,11 @@ protected slots:
 	void onPresenceClosed(IPresence *APresence);
 	void onMultiUserChatCreated(IMultiUserChat *AMultiChat);
 	void onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const QString &AStatus);
-	void onChatWindowCreated(IMessageChatWindow *AWindow);
+	void onChatWindowCreated(IChatWindow *AWindow);
 	void onChatWindowActivated();
 	void onChatWindowTextChanged();
 	void onChatWindowClosed();
-	void onChatWindowDestroyed(IMessageChatWindow *AWindow);
+	void onChatWindowDestroyed(IChatWindow *AWindow);
 	void onUpdateSelfStates();
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -123,7 +137,7 @@ private:
 	QMap<Jid, QList<Jid> > FNotSupported;
 	QMap<Jid, QMap<Jid, ChatParams> > FChatParams;
 	QMap<Jid, QMap<Jid, QString> > FStanzaSessions;
-	QMap<QTextEdit *, IMessageChatWindow *> FChatByEditor;
+	QMap<QTextEdit *, IChatWindow *> FChatByEditor;
 };
 
 #endif // CHATSTATES_H

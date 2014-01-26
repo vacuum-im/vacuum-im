@@ -4,6 +4,16 @@
 #include <QTimer>
 #include <QSound>
 #include <QPointer>
+#include <definitions/notificationdataroles.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/inotifications.h>
 #include <interfaces/irostersview.h>
@@ -17,10 +27,15 @@
 #include <interfaces/imainwindow.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iurlprocessor.h>
+#include <utils/action.h>
+#include <utils/options.h>
+#include <utils/shortcuts.h>
+#include <utils/widgetmanager.h>
 #include "notifywidget.h"
 #include "notifyoptionswidget.h"
 
-struct NotifyRecord {
+struct NotifyRecord 
+{
 	NotifyRecord() {
 		trayId=0;
 		rosterId=0;
@@ -35,7 +50,8 @@ struct NotifyRecord {
 	QPointer<NotifyWidget> popupWidget;
 };
 
-struct TypeRecord {
+struct TypeRecord 
+{
 	ushort kinds;
 	INotificationType type;
 };
@@ -100,7 +116,6 @@ protected:
 protected slots:
 	void onDelayedRemovals();
 	void onDelayedActivations();
-	void onDelayedShowMinimized();
 	void onSoundOnOffActionTriggered(bool);
 	void onTrayActionTriggered(bool);
 	void onRosterNotifyActivated(int ANotifyId);
@@ -136,7 +151,6 @@ private:
 	QSound *FSound;
 	QList<int> FDelayedRemovals;
 	QList<int> FDelayedActivations;
-	QList<QWidget *> FDelayedShowMinimized;
 	QMap<int, NotifyRecord> FNotifyRecords;
 	mutable QMap<QString, TypeRecord> FTypeRecords;
 	QMultiMap<int, INotificationHandler *> FHandlers;

@@ -5,14 +5,14 @@
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include "connectionmanager.h"
 #include "ui_connectionoptionswidget.h"
+#include "connectionmanager.h"
 
 class ConnectionManager;
 
 class ConnectionOptionsWidget :
-	public QWidget,
-	public IOptionsWidget
+			public QWidget,
+			public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

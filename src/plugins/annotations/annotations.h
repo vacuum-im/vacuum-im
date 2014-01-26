@@ -3,6 +3,14 @@
 
 #include <QTimer>
 #include <QDomDocument>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/resources.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iannotations.h>
 #include <interfaces/iroster.h>
@@ -11,6 +19,8 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
 #include <utils/datetime.h>
+#include <utils/shortcuts.h>
+#include <utils/widgetmanager.h>
 #include "editnotedialog.h"
 
 struct Annotation {
@@ -20,10 +30,10 @@ struct Annotation {
 };
 
 class Annotations :
-	public QObject,
-	public IPlugin,
-	public IAnnotations,
-	public IRosterDataHolder
+			public QObject,
+			public IPlugin,
+			public IAnnotations,
+			public IRosterDataHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAnnotations IRosterDataHolder);
@@ -39,9 +49,11 @@ public:
 	virtual bool initSettings() { return true; }
 	virtual bool startPlugin() { return true; }
 	//IRosterDataHolder
-	virtual QList<int> rosterDataRoles(int AOrder) const;
-	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
+	virtual int rosterDataOrder() const;
+	virtual QList<int> rosterDataRoles() const;
+	virtual QList<int> rosterDataTypes() const;
+	virtual QVariant rosterData(const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(IRosterIndex *AIndex, int ARole, const QVariant &AValue);
 	//IAnnotations
 	virtual bool isEnabled(const Jid &AStreamJid) const;
 	virtual QList<Jid> annotations(const Jid &AStreamJid) const;
@@ -53,9 +65,9 @@ public:
 signals:
 	void annotationsLoaded(const Jid &AStreamJid);
 	void annotationsSaved(const Jid &AStreamJid);
+	void annotationsError(const Jid &AStreamJid, const QString &AError);
 	void annotationModified(const Jid &AStreamJid, const Jid &AContactJid);
-	// IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
+	void rosterDataChanged(IRosterIndex *AIndex = NULL, int ARole = 0);
 protected:
 	bool loadAnnotations(const Jid &AStreamJid);
 	bool saveAnnotations(const Jid &AStreamJid);
@@ -63,15 +75,16 @@ protected:
 protected slots:
 	void onSaveAnnotationsTimerTimeout();
 	void onPrivateStorageOpened(const Jid &AStreamJid);
+	void onPrivateDataError(const QString &AId, const QString &AError);
 	void onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageClosed(const Jid &AStreamJid);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
-	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
+	void onRosterIndexClipboardMenu(const QList<IRosterIndex *> &AIndexes, Menu *AMenu);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onCopyToClipboardActionTriggered(bool);
 	void onEditNoteActionTriggered(bool);
 	void onEditNoteDialogDestroyed();

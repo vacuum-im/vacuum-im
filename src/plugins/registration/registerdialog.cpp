@@ -3,14 +3,10 @@
 #include <QVBoxLayout>
 #include <QMessageBox>
 #include <QTextDocument>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <utils/iconstorage.h>
-#include <utils/logger.h>
 
-RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid, const Jid &AServiceJid, int AOperation, QWidget *AParent) : QDialog(AParent)
+RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataForms, const Jid &AStremJid,
+                               const Jid &AServiceJid, int AOperation, QWidget *AParent) : QDialog(AParent)
 {
-	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_REGISTERATION,0,0,"windowIcon");
@@ -27,11 +23,11 @@ RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataFo
 	FCurrentForm = NULL;
 
 	connect(ARegistration->instance(),SIGNAL(registerFields(const QString &, const IRegisterFields &)),
-		SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
+	        SLOT(onRegisterFields(const QString &, const IRegisterFields &)));
 	connect(ARegistration->instance(),SIGNAL(registerSuccessful(const QString &)),
-		SLOT(onRegisterSuccessful(const QString &)));
-	connect(ARegistration->instance(),SIGNAL(registerError(const QString &, const XmppError &)),
-		SLOT(onRegisterError(const QString &, const XmppError &)));
+	        SLOT(onRegisterSuccessful(const QString &)));
+	connect(ARegistration->instance(),SIGNAL(registerError(const QString &, const QString &)),
+	        SLOT(onRegisterError(const QString &, const QString &)));
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonsClicked(QAbstractButton *)));
 
 	doRegisterOperation();
@@ -41,17 +37,6 @@ RegisterDialog::~RegisterDialog()
 {
 
 }
-
-Jid RegisterDialog::streamJid() const
-{
-	return FStreamJid;
-}
-
-Jid RegisterDialog::serviceJid() const
-{
-	return FServiceJid;
-}
-
 
 void RegisterDialog::resetDialog()
 {
@@ -169,12 +154,12 @@ void RegisterDialog::onRegisterSuccessful(const QString &AId)
 	}
 }
 
-void RegisterDialog::onRegisterError(const QString &AId, const XmppError &AError)
+void RegisterDialog::onRegisterError(const QString &AId, const QString &AError)
 {
 	if (FRequestId == AId)
 	{
 		resetDialog();
-		ui.lblInstuctions->setText(tr("Requested operation failed: %1").arg(AError.errorMessage()));
+		ui.lblInstuctions->setText(tr("Requested operation failed: %1").arg(AError));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Cancel);
 	}
 }
@@ -222,3 +207,4 @@ void RegisterDialog::onDialogButtonsClicked(QAbstractButton *AButton)
 		close();
 	}
 }
+

@@ -2,13 +2,14 @@
 #define CONNECTIONOPTIONSWIDGET_H
 
 #include <QWidget>
-#include <interfaces/idefaultconnection.h>
+#include <interfaces/iconnectionmanager.h>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 #include "ui_connectionoptionswidget.h"
 
 class ConnectionOptionsWidget :
-	public QWidget,
-	public IOptionsWidget
+			public QWidget,
+			public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

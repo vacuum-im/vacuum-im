@@ -61,6 +61,22 @@
         <source>Registration on %1</source>
         <translation>Реєстрація на %1</translation>
     </message>
+    <message>
+        <source>Invalid registration form</source>
+        <translation>Невірна форма реєстрації</translation>
+    </message>
+    <message>
+        <source>Invalid registration dialog</source>
+        <translation>Невірний діалог реєстрації</translation>
+    </message>
+    <message>
+        <source>Registration rejected by user</source>
+        <translation>Реєстрація відмінена користувачем</translation>
+    </message>
+    <message>
+        <source>Secure connection is not established</source>
+        <translation>Захищене з&apos;єднання не встановлено</translation>
+    </message>
 </context>
 <context>
     <name>Registration</name>
@@ -147,18 +163,6 @@
     <message>
         <source>Your Web Page</source>
         <translation>Веб-сторінка</translation>
-    </message>
-    <message>
-        <source>Invalid registration form</source>
-        <translation>Невірна форма реєстрації</translation>
-    </message>
-    <message>
-        <source>Invalid registration dialog</source>
-        <translation>Невірний діалог реєстрації</translation>
-    </message>
-    <message>
-        <source>Registration rejected by user</source>
-        <translation>Реєстрація відмінена користувачем</translation>
     </message>
 </context>
 </TS>

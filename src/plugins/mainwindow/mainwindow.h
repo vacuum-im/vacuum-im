@@ -1,14 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QSplitter>
 #include <interfaces/imainwindow.h>
-#include "maintabwidget.h"
-#include "maincentralwidget.h"
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 
 class MainWindow :
-	public QMainWindow,
-	public IMainWindow
+			public QMainWindow,
+			public IMainWindow
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMainWindow);
@@ -18,59 +17,32 @@ public:
 	//IMainWindow
 	virtual QMainWindow *instance() { return this; }
 	virtual bool isActive() const;
-	virtual void showWindow(bool AMinimized = false);
-	virtual void closeWindow();
-	// Menu Management
 	virtual Menu *mainMenu() const;
-	virtual MenuBarChanger *mainMenuBar() const;
-	// Widgets Management
-	virtual BoxWidget *mainLeftWidget() const;
-	virtual IMainTabWidget *mainTabWidget() const;
-	virtual bool isCentralWidgetVisible() const;
-	virtual IMainCentralWidget *mainCentralWidget() const;
-	// Tool Bars Management
+	virtual QVBoxLayout *mainLayout() const;
+	virtual QStackedWidget *upperWidget() const;
+	virtual QStackedWidget *rostersWidget() const;
+	virtual QStackedWidget *bottomWidget() const;
 	virtual ToolBarChanger *topToolBarChanger() const;
+	virtual ToolBarChanger *leftToolBarChanger() const;
 	virtual ToolBarChanger *bottomToolBarChanger() const;
-	virtual QList<ToolBarChanger *> toolBarChangers() const;
-	virtual int toolBarChangerOrder(ToolBarChanger *AChanger) const;
-	virtual ToolBarChanger *toolBarChangerByOrder(int AOrderId) const;
-	virtual void insertToolBarChanger(int AOrderId, ToolBarChanger *AChanger);
-	virtual void removeToolBarChanger(ToolBarChanger *AChanger);
-signals:
-	void toolBarChangerInserted(int AOrderId, ToolBarChanger *AChanger);
-	void toolBarChangerRemoved(ToolBarChanger *AChanger);
-	void centralWidgetVisibleChanged(bool AVisible);
 public:
-	void saveWindowGeometryAndState();
-	void loadWindowGeometryAndState();
+	virtual QMenu *createPopupMenu();
 protected:
-	void updateWindow();
-	QMenu *createPopupMenu();
-	void correctWindowPosition();
-	void restoreAcceptDrops(QWidget *AParent);
-	void setCentralWidgetVisible(bool AVisible);
-protected:
-	void showEvent(QShowEvent *AEvent);
-	bool eventFilter(QObject *AObject, QEvent *AEvent);
+	void createLayouts();
+	void createToolBars();
+	void createMenus();
 protected slots:
-	void onUpdateCentralWidgetVisible();
-	void onCurrentCentralPageChanged();
-	void onCentralPageAddedOrRemoved(IMainCentralPage *APage);
-	void onSplitterMoved(int APos, int AIndex);
+	void onStackedWidgetRemoved(int AIndex);
 private:
-	IMainTabWidget *FTabWidget;
-	IMainCentralWidget *FCentralWidget;
+	Menu           *FMainMenu;
+	ToolBarChanger *FTopToolBarChanger;
+	ToolBarChanger *FLeftToolBarChanger;
+	ToolBarChanger *FBottomToolBarChanger;
 private:
-	Menu *FMainMenu;
-	QSplitter *FSplitter;
-	BoxWidget *FLeftWidget;
-	MenuBarChanger *FMainMenuBar;
-private:
-	bool FAligned;
-	bool FCentralVisible;
-	int FLeftWidgetWidth;
-	int FSplitterHandleWidth;
-	QMap<int, ToolBarChanger *> FToolBarOrders;
+	QVBoxLayout    *FMainLayout;
+	QStackedWidget *FUpperWidget;
+	QStackedWidget *FRostersWidget;
+	QStackedWidget *FBottomWidget;
 };
 
 #endif // MAINWINDOW_H

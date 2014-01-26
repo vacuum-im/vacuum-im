@@ -13,7 +13,7 @@
 class Action;
 
 class UTILS_EXPORT Menu :
-	public QMenu
+			public QMenu
 {
 	Q_OBJECT;
 public:
@@ -38,16 +38,14 @@ signals:
 	void separatorInserted(Action *ABefore, QAction *ASeparator);
 	void separatorRemoved(QAction *ASeparator);
 	void menuDestroyed(Menu *AMenu);
-public:
-	static bool copyStandardMenu(Menu *ADestination, QMenu *ASource, int AGroup = AG_DEFAULT);
 protected slots:
 	void onActionDestroyed(Action *AAction);
 private:
 	Action *FMenuAction;
 	IconStorage *FIconStorage;
 private:
-	QMap<int, QAction *> FSeparators;
 	QMultiMap<int, Action *> FActions;
+	QMap<int, QAction *> FSeparators;
 };
 
 #endif // MENU_H

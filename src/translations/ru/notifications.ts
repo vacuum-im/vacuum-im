@@ -90,10 +90,6 @@
         <source>Immediately activate the notification</source>
         <translation>Сразу активировать уведомление</translation>
     </message>
-    <message>
-        <source>Allowed types of notifications</source>
-        <translation>Разрешенные типы уведомлений</translation>
-    </message>
 </context>
 <context>
     <name>NotifyOptionsWidgetClass</name>
@@ -108,6 +104,13 @@
     <message>
         <source>Restore Defaults</source>
         <translation>Сбросить по умолчанию</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyWidget</name>
+    <message>
+        <source>Notification</source>
+        <translation>Уведомление</translation>
     </message>
 </context>
 </TS>

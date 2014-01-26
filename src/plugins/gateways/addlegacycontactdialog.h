@@ -1,20 +1,23 @@
 #ifndef ADDLEGACYCONTACTDIALOG_H
 #define ADDLEGACYCONTACTDIALOG_H
 
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/igateways.h>
 #include <interfaces/irosterchanger.h>
+#include <utils/iconstorage.h>
 #include "ui_addlegacycontactdialog.h"
 
 class AddLegacyContactDialog :
-	public QDialog
+			public QDialog
 {
 	Q_OBJECT;
 public:
 	AddLegacyContactDialog(IGateways *AGateways, IRosterChanger *ARosterChanger, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent = NULL);
 	~AddLegacyContactDialog();
 public:
-	virtual Jid streamJid() const;
-	virtual Jid serviceJid() const;
+	virtual const Jid &streamJid() const { return FStreamJid; }
+	virtual const Jid &serviceJid() const { return FServiceJid; }
 protected:
 	void resetDialog();
 	void requestPrompt();
@@ -22,7 +25,7 @@ protected:
 protected slots:
 	void onPromptReceived(const QString &AId, const QString &ADesc, const QString &APrompt);
 	void onUserJidReceived(const QString &AId, const Jid &AUserJid);
-	void onErrorReceived(const QString &AId, const XmppError &AError);
+	void onErrorReceived(const QString &AId, const QString &AError);
 	void onDialogButtonsClicked(QAbstractButton *AButton);
 private:
 	Ui::AddLegacyContactDialogClass ui;

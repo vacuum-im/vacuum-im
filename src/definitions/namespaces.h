@@ -28,9 +28,7 @@
 #define NS_VCARD_TEMP                           "vcard-temp"
 #define NS_VCARD_UPDATE                         "vcard-temp:x:update"
 
-#define NS_STORAGE_GROUP_DELIMITER              "roster:delimiter"
 #define NS_STORAGE_BOOKMARKS                    "storage:bookmarks"
-#define NS_STORAGE_METACONTACTS                 "vacuum:metacontacts"
 
 #define NS_FEATURE_IQAUTH                       "http://jabber.org/features/iq-auth"
 #define NS_FEATURE_SASL                         "urn:ietf:params:xml:ns:xmpp-sasl"
@@ -87,9 +85,6 @@
 #define NS_ADDRESS                              "http://jabber.org/protocol/address"
 
 #define NS_ROSTERX                              "http://jabber.org/protocol/rosterx"
-
-#define NS_MESSAGE_CARBONS                      "urn:xmpp:carbons:1"
-#define NS_MESSAGE_FORWARD                      "urn:xmpp:forward:0"
 
 #define NS_VACUUM_PRIVATESTORAGE_UPDATE         "vacuum:privatestorage:update"
 

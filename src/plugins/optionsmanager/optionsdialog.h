@@ -4,11 +4,17 @@
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 #include <QObjectCleanupHandler>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
+#include <utils/iconstorage.h>
+#include <utils/widgetmanager.h>
 #include "ui_optionsdialog.h"
 
 class SortFilterProxyModel :
-	public QSortFilterProxyModel
+			public QSortFilterProxyModel
 {
 	Q_OBJECT;
 public:
@@ -18,7 +24,7 @@ protected:
 };
 
 class OptionsDialog :
-	public QDialog
+			public QDialog
 {
 	Q_OBJECT;
 public:

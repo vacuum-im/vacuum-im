@@ -4,12 +4,32 @@
 <context>
     <name>RostersView</name>
     <message>
+        <source>Priority: %1</source>
+        <translation>Priorität: %1</translation>
+    </message>
+    <message>
+        <source>Subscription: %1 %2</source>
+        <translation>Authorisation: %1 %2</translation>
+    </message>
+    <message>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <source>Jabber ID</source>
+        <translation>Jabber ID</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
         <source>Copy to clipboard</source>
         <translation>In Zwischenablage kopieren</translation>
     </message>
     <message>
-        <source>Contacts</source>
-        <translation type="unfinished"></translation>
+        <source>Name</source>
+        <translation>Name</translation>
     </message>
 </context>
 <context>
@@ -17,6 +37,10 @@
     <message>
         <source>Roster</source>
         <translation>Roster</translation>
+    </message>
+    <message>
+        <source>Show/Hide offline contacts</source>
+        <translation>Zeige/Verstecke offline Kontakte</translation>
     </message>
     <message>
         <source>Roster View</source>
@@ -27,8 +51,16 @@
         <translation>Zeigt ein hierarchisches Roster Modell</translation>
     </message>
     <message>
+        <source>Show offline contact</source>
+        <translation>Zeige Offline Kontakte</translation>
+    </message>
+    <message>
         <source>Show contact resource in roster</source>
         <translation>Zeige Kontakt Resource im Roster</translation>
+    </message>
+    <message>
+        <source>Show status message in roster</source>
+        <translation>Zeige Statusmeldung im Roster</translation>
     </message>
     <message>
         <source>Sort contacts by status</source>
@@ -49,66 +81,6 @@
     <message>
         <source>Do not show the scroll bars</source>
         <translation>Scroll Balken nicht anzeigen</translation>
-    </message>
-    <message>
-        <source>Show/Hide disconnected contacts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show status message in roster</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show disconnected contact</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Absent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mutual</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Provided to you</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Provided from you</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Subscription:&lt;/b&gt; %1, request sent</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Subscription:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Resource:&lt;/b&gt; %1 (%2)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unite contacts of all accounts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show list of united accounts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

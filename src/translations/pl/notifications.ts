@@ -90,10 +90,6 @@
         <source>Immediately activate the notification</source>
         <translation>Natychmiast uaktywnij powiadomienie</translation>
     </message>
-    <message>
-        <source>Allowed types of notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>NotifyOptionsWidgetClass</name>
@@ -108,6 +104,13 @@
     <message>
         <source>Restore Defaults</source>
         <translation>Przywróć ustawienia domyślne</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyWidget</name>
+    <message>
+        <source>Notification</source>
+        <translation>Powiadomienia</translation>
     </message>
 </context>
 </TS>

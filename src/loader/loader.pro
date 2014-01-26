@@ -1,10 +1,11 @@
-include(../make/config.inc)
+include(../config.inc)
+include(../install.inc)
 
-TARGET             = $$VACUUM_LOADER_NAME
+TARGET             = $$TARGET_LOADER
 TEMPLATE           = app
 QT                += xml
 LIBS              += -L../libs
-LIBS              += -l$$VACUUM_UTILS_NAME
+LIBS              += -l$$TARGET_UTILS
 DEPENDPATH        += ..
 INCLUDEPATH       += ..
 DESTDIR            = ../..
@@ -49,9 +50,8 @@ documents.files    = ../../AUTHORS ../../CHANGELOG ../../README ../../COPYING ..
 INSTALLS           += target resources documents
 
 #Translation
-TRANS_BUILD_ROOT   = $${OUT_PWD}/../..
 TRANS_SOURCE_ROOT  = ..
-include(../translations/languages.inc)
+include(../translations.inc)
 
 #Linux desktop install
 unix:!macx {
@@ -66,24 +66,22 @@ unix:!macx {
 
 #MacOS Install
 macx {
-  UTILS_LIB_NAME   = lib$${VACUUM_UTILS_NAME}.$${VACUUM_UTILS_ABI}.dylib
-  UTILS_LIB_LINK   = lib$${VACUUM_UTILS_NAME}.dylib
+	UTILS_LIB_NAME   = lib$${TARGET_UTILS}.$${VERSION_UTILS}.dylib
+  UTILS_LIB_LINK   = lib$${TARGET_UTILS}.1.dylib
+  UTILS_LIB_LINK_EXTERNAL_PLUGINS = lib$${TARGET_UTILS}.dylib
 
   lib_utils.path   = $$INSTALL_LIBS
   lib_utils.extra  = cp -f ../libs/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_NAME && \
-                     ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK
+                     ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK && \
+                     ln -sf $$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_LIBS/$$UTILS_LIB_LINK_EXTERNAL_PLUGINS
   INSTALLS        += lib_utils
 
   name_tool.path   = $$INSTALL_BINS
-  name_tool.extra  = install_name_tool -change $$UTILS_LIB_NAME @executable_path/../Frameworks/$$UTILS_LIB_NAME $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$VACUUM_LOADER_NAME
+  name_tool.extra  = install_name_tool -change $$UTILS_LIB_LINK @executable_path/../Frameworks/$$UTILS_LIB_LINK $(INSTALL_ROOT)$$INSTALL_BINS/$$INSTALL_APP_DIR/Contents/MacOS/$$TARGET_LOADER
   INSTALLS        += name_tool
 
-  sdk_utils.path   = $$INSTALL_INCLUDES/utils
-  sdk_utils.files  = ../utils/*.h
-  INSTALLS        += sdk_utils
-
-  #Dirty hack to install utils translations
-  TARGET           = $$VACUUM_UTILS_NAME
-  include(../translations/languages.inc)
-  TARGET           = $$VACUUM_LOADER_NAME
+	#Dirty hack to install utils translations
+	TARGET           = $$TARGET_UTILS
+	include(../translations.inc)
+	TARGET           = $$TARGET_LOADER
 }

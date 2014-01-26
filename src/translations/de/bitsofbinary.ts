@@ -20,11 +20,7 @@
         <translation>Unterstützt den Austausch kleiner Mengen an Binärdaten über XMPP Packete</translation>
     </message>
     <message>
-        <source>Failed to load data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save data</source>
+        <source>Failed to read cached data</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

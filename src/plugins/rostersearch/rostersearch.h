@@ -1,13 +1,24 @@
 #ifndef ROSTERSEARCH_H
 #define ROSTERSEARCH_H
 
+#include <QTimer>
 #include <QLineEdit>
 #include <QSortFilterProxyModel>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterproxyorders.h>
+#include <definitions/rosterclickhookerorders.h>
+#include <definitions/rosterkeyhookerorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/irostersearch.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/irostersview.h>
-#include <utils/searchlineedit.h>
+#include <utils/action.h>
+#include <utils/options.h>
 #include <utils/toolbarchanger.h>
 
 class RosterSearch :
@@ -31,11 +42,11 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IRostersClickHooker
-	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
-	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, QMouseEvent *AEvent);
 	//IRostersKeyHooker
-	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
-	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, const QKeyEvent *AEvent);
+	virtual bool rosterKeyPressed(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent);
+	virtual bool rosterKeyReleased(int AOrder, const QList<IRosterIndex *> &AIndexes, QKeyEvent *AEvent);
 	//IRosterSearch
 	virtual void startSearch();
 	virtual QString searchPattern() const;
@@ -56,13 +67,12 @@ signals:
 	void searchFieldChanged(int ADataRole);
 	void searchFieldRemoved(int ADataRole);
 protected:
-	bool eventFilter(QObject *AObject, QEvent *AEvent);
-	bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
+	virtual bool filterAcceptsRow(int ARow, const QModelIndex &AParent) const;
 protected slots:
 	void onFieldActionTriggered(bool);
 	void onEnableActionTriggered(bool AChecked);
 	void onRosterIndexDestroyed(IRosterIndex *AIndex);
-	void onSearchEditStart();
+	void onEditTimedOut();
 	void onOptionsOpened();
 	void onOptionsClosed();
 private:
@@ -72,8 +82,10 @@ private:
 	bool FAutoEnabled;
 	bool FSearchStarted;
 	bool FLastShowOffline;
+	Menu *FFieldsMenu;
+	QTimer FEditTimeout;
 	Action *FEnableAction;
-	SearchLineEdit *FSearchEdit;
+	QLineEdit *FSearchEdit;
 	ToolBarChanger *FSearchToolBarChanger;
 	QMap<int,Action *> FFieldActions;
 	QList<IRosterIndex *>FSelectedIndexes;

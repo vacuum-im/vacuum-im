@@ -1,8 +1,6 @@
 #include "streamparser.h"
 
 #include <QMap>
-#include <definitions/namespaces.h>
-#include <utils/logger.h>
 
 StreamParser::StreamParser(QObject *AParent) : QObject(AParent)
 {
@@ -102,8 +100,7 @@ void StreamParser::parseData(const QByteArray &AData)
 
 	if (FReader.hasError() && FReader.error()!=QXmlStreamReader::PrematureEndOfDocumentError)
 	{
-		LOG_ERROR(QString("Failed to parse XML data: %1\n%2").arg(FReader.errorString(),QString::fromUtf8(AData)));
-		emit error(XmppStreamError(XmppStreamError::EC_NOT_WELL_FORMED,FReader.errorString()));
+		emit error(FReader.errorString());
 	}
 }
 

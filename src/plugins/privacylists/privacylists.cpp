@@ -1,15 +1,5 @@
 #include "privacylists.h"
 
-#include <definitions/namespaces.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterlabels.h>
-#include <definitions/rostertooltiporders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <utils/logger.h>
-
 #define SHC_PRIVACY         "/iq[@type='set']/query[@xmlns='"NS_JABBER_PRIVACY"']"
 #define SHC_ROSTER          "/iq/query[@xmlns='"NS_JABBER_ROSTER"']"
 
@@ -21,7 +11,12 @@
 #define ADR_GROUP_NAME      Action::DR_Parametr2
 #define ADR_LISTNAME        Action::DR_Parametr3
 
-static const QStringList AutoLists = QStringList() << PRIVACY_LIST_VISIBLE << PRIVACY_LIST_CONFERENCES << PRIVACY_LIST_INVISIBLE << PRIVACY_LIST_IGNORE << PRIVACY_LIST_SUBSCRIPTION;
+QStringList PrivacyLists::FAutoLists = QStringList()
+                                       << PRIVACY_LIST_VISIBLE
+                                       << PRIVACY_LIST_CONFERENCES
+                                       << PRIVACY_LIST_INVISIBLE
+                                       << PRIVACY_LIST_IGNORE
+                                       << PRIVACY_LIST_SUBSCRIPTION;
 
 PrivacyLists::PrivacyLists()
 {
@@ -32,7 +27,7 @@ PrivacyLists::PrivacyLists()
 	FStanzaProcessor = NULL;
 	FRosterPlugin = NULL;
 
-	FPrivacyLabelId = 0;
+	FPrivacyLabelId = -1;
 	FApplyAutoListsTimer.setSingleShot(true);
 	FApplyAutoListsTimer.setInterval(AUTO_LISTS_TIMEOUT);
 	connect(&FApplyAutoListsTimer,SIGNAL(timeout()),SLOT(onApplyAutoLists()));
@@ -60,15 +55,11 @@ void PrivacyLists::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
-
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
-	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
@@ -87,27 +78,22 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
 		{
-			connect(FRostersModel->instance(),SIGNAL(indexCreated(IRosterIndex *)),SLOT(onRosterIndexCreated(IRosterIndex *)));
+			connect(FRostersModel->instance(),SIGNAL(indexCreated(IRosterIndex *,IRosterIndex *)),
+			        SLOT(onRosterIndexCreated(IRosterIndex *,IRosterIndex *)));
 		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
-	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
-	{
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
-	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IMultiUserChatPlugin").value(0,NULL);
 	if (plugin)
@@ -122,18 +108,18 @@ bool PrivacyLists::initObjects()
 {
 	if (FRostersViewPlugin)
 	{
-		AdvancedDelegateItem label(RLID_PRIVACY_STATUS);
-		label.d->kind = AdvancedDelegateItem::CustomData;
-		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
+		IRostersLabel label;
+		label.order = RLO_PRIVACY;
+		label.value = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_PRIVACYLISTS_INVISIBLE);
 		FPrivacyLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 
 		FRostersView = FRostersViewPlugin->rostersView();
+		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)),
+			SLOT(onRosterIndexToolTips(IRosterIndex *, int, QMultiMap<int,QString> &)));
 		connect(FRostersView->instance(),SIGNAL(indexMultiSelection(const QList<IRosterIndex *> &, bool &)), 
-			SLOT(onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
-		connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-			SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-		connect(FRostersView->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
-			SLOT(onRostersViewIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
+			SLOT(onRosterIndexMultiSelection(const QList<IRosterIndex *> &, bool &)));
+		connect(FRostersView->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
 	}
 	return true;
 }
@@ -147,21 +133,19 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 		QString listName = listElem.attribute("name");
 		if (!listName.isEmpty())
 		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Privacy list update notification received, list=%1").arg(listName));
-
 			bool needLoad = FRemoveRequests.key(listName).isEmpty();
-			for (QMap<QString,IPrivacyList>::const_iterator it = FSaveRequests.constBegin(); needLoad && it!=FSaveRequests.constEnd(); ++it)
+			QHash<QString,IPrivacyList>::const_iterator it = FSaveRequests.constBegin();
+			while (needLoad && it!=FSaveRequests.constEnd())
+			{
 				needLoad = it.value().name != listName;
+				++it;
+			}
 			if (needLoad)
 				loadPrivacyList(AStreamJid,listName);
 
 			AAccept = true;
 			Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Empty privacy list update notification received");
 		}
 	}
 	else if (FSHIRosterIn.value(AStreamJid)==AHandlerId || FSHIRosterOut.value(AStreamJid)==AHandlerId)
@@ -190,18 +174,14 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 					bool denied = (stanzas & IPrivacyRule::PresencesOut)>0;
 					if (denied && !FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
-						LOG_STRM_DEBUG(AStreamJid,QString("Sending offline presence to contact=%1").arg(ritem.itemJid.full()));
 						presence->sendPresence(ritem.itemJid,IPresence::Offline,QString::null,0);
-						FOfflinePresences[AStreamJid] += ritem.itemJid;
+						FOfflinePresences[AStreamJid]+=ritem.itemJid;
 					}
 					else if (!denied && directionIn && FOfflinePresences.value(AStreamJid).contains(ritem.itemJid))
 					{
 						if (ritem.subscription==SUBSCRIPTION_BOTH || ritem.subscription==SUBSCRIPTION_FROM)
-						{
-							LOG_STRM_DEBUG(AStreamJid,QString("Sending online presence to contact=%1").arg(ritem.itemJid.full()));
 							presence->sendPresence(ritem.itemJid,presence->show(),presence->status(),presence->priority());
-						}
-						FOfflinePresences[AStreamJid] -= ritem.itemJid;
+						FOfflinePresences[AStreamJid]-=ritem.itemJid;
 					}
 
 					if (directionIn)
@@ -210,10 +190,6 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 						if (FLabeledContacts.value(AStreamJid).contains(ritem.itemJid)!=denied)
 							setPrivacyLabel(AStreamJid,ritem.itemJid,denied);
 					}
-				}
-				else
-				{
-					LOG_STRM_WARNING(AStreamJid,QString("Invalid roster item received, jid=%1").arg(ritem.itemJid.full()));
 				}
 
 				itemElem = itemElem.nextSiblingElement("item");
@@ -225,14 +201,12 @@ bool PrivacyLists::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza
 
 void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza)
 {
-	XmppStanzaError err = AStanza.type()!="result" ? XmppStanzaError(AStanza) : XmppStanzaError::null;
-
 	if (FLoadRequests.contains(AStanza.id()))
 	{
-		QString loadListName = FLoadRequests.take(AStanza.id());
+		QString loadListName = FLoadRequests.value(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			QMap<QString,IPrivacyList> &lists = FPrivacyLists[AStreamJid];
+			QHash<QString,IPrivacyList> &lists = FPrivacyLists[AStreamJid];
 			QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_PRIVACY);
 
 			QDomElement listElem = queryElem.firstChildElement("list");
@@ -271,15 +245,9 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 				qSort(list.rules);
 
 				if (loadListName.isEmpty())
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Privacy list found, list=%1, id=%2").arg(list.name,AStanza.id()));
 					loadPrivacyList(AStreamJid,list.name);
-				}
 				else
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Privacy list loaded, list=%1, id=%2").arg(list.name,AStanza.id()));
 					emit listLoaded(AStreamJid,list.name);
-				}
 
 				listElem = listElem.nextSiblingElement("list");
 			}
@@ -289,7 +257,6 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			{
 				QString activeListName = activeElem.attribute("name");
 				FActiveLists.insert(AStreamJid,activeListName);
-				LOG_STRM_INFO(AStreamJid,QString("Active privacy list changed to=%1, id=%2").arg(activeListName,AStanza.id()));
 				emit activeListChanged(AStreamJid,activeListName);
 			}
 
@@ -298,100 +265,73 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			{
 				QString defaultListName = defaultElem.attribute("name");
 				FDefaultLists.insert(AStreamJid,defaultListName);
-				LOG_STRM_INFO(AStreamJid,QString("Default privacy list changed to=%1, id=%2").arg(defaultListName,AStanza.id()));
 				emit defaultListChanged(AStreamJid,defaultListName);
 			}
 
 			if (loadListName.isEmpty())
 			{
 				if (lists.isEmpty())
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Initializing default privacy list=%1").arg(PRIVACY_LIST_AUTO_VISIBLE));
 					setAutoPrivacy(AStreamJid,PRIVACY_LIST_AUTO_VISIBLE);
-				}
-				else if (defaultList(AStreamJid) != activeList(AStreamJid))
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Setup default list as active, list=%1").arg(defaultList(AStreamJid)));
+				else if (defaultList(AStreamJid)!=activeList(AStreamJid))
 					setActiveList(AStreamJid,defaultList(AStreamJid));
-				}
 			}
 		}
-		else if (!loadListName.isEmpty())
+		else if (AStanza.type() == "error")
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load privacy list=%1, id=%2: %3").arg(loadListName,AStanza.id(),err.condition()));
 			if (FPrivacyLists.value(AStreamJid).contains(loadListName))
 			{
 				FPrivacyLists[AStreamJid].remove(loadListName);
 				emit listRemoved(AStreamJid,loadListName);
 			}
 		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load list of privacy lists, id=%1: %2").arg(AStanza.id(),err.condition()));
-		}
+		FLoadRequests.remove(AStanza.id());
 	}
 	else if (FSaveRequests.contains(AStanza.id()))
 	{
-		IPrivacyList list = FSaveRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Privacy list saved, list=%1, id=%2").arg(list.name,AStanza.id()));
+			IPrivacyList list = FSaveRequests.value(AStanza.id());
 			FPrivacyLists[AStreamJid].insert(list.name,list);
 			emit listLoaded(AStreamJid,list.name);
 		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to save privacy list=%1, id=%2: %3").arg(list.name,AStanza.id(),err.condition()));
-		}
+		FSaveRequests.remove(AStanza.id());
 	}
 	else if (FActiveRequests.contains(AStanza.id()))
 	{
-		QString activeListName = FActiveRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Active privacy list changed to=%1, id=%2").arg(activeListName,AStanza.id()));
+			QString activeListName = FActiveRequests.value(AStanza.id());
 			FActiveLists.insert(AStreamJid,activeListName);
 			emit activeListChanged(AStreamJid,activeListName);
 		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to change active privacy list to=%1, id=%2: %3").arg(activeListName,AStanza.id(),err.condition()));
-		}
+		FActiveRequests.remove(AStanza.id());
 	}
 	else if (FDefaultRequests.contains(AStanza.id()))
 	{
-		QString defaultListName = FDefaultRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Default privacy list changed to=%1, id=%2").arg(defaultListName,AStanza.id()));
+			QString defaultListName = FDefaultRequests.value(AStanza.id());
 			FDefaultLists.insert(AStreamJid,defaultListName);
 			emit defaultListChanged(AStreamJid,defaultListName);
 		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to change default privacy list to=%1, id=%2: %3").arg(defaultListName,AStanza.id(),err.condition()));
-		}
+		FDefaultRequests.remove(AStanza.id());
 	}
 	else if (FRemoveRequests.contains(AStanza.id()))
 	{
-		QString listName = FRemoveRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Privacy list removed, list=%1, id=%2").arg(listName,AStanza.id()));
+			QString listName = FRemoveRequests.value(AStanza.id());
 			FPrivacyLists[AStreamJid].remove(listName);
 			emit listRemoved(AStreamJid,listName);
 		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to remove privacy list=%1, id=%2: %3").arg(listName,AStanza.id(),err.condition()));
-		}
+		FRemoveRequests.remove(AStanza.id());
 	}
-	FStreamRequests[AStreamJid].removeAll(AStanza.id());
+	FStreamRequests[AStreamJid].removeAt(FStreamRequests[AStreamJid].indexOf(AStanza.id()));
 
 	if (AStanza.type() == "result")
 		emit requestCompleted(AStanza.id());
 	else
-		emit requestFailed(AStanza.id(),err);
+		emit requestFailed(AStanza.id(),XmppStanzaError(AStanza).errorMessage());
 }
 
 bool PrivacyLists::isReady(const Jid &AStreamJid) const
@@ -399,15 +339,7 @@ bool PrivacyLists::isReady(const Jid &AStreamJid) const
 	return FPrivacyLists.contains(AStreamJid);
 }
 
-IPrivacyRule PrivacyLists::groupAutoListRule(const QString &AGroup, const QString &AAutoList) const
-{
-	IPrivacyRule rule = contactAutoListRule(Jid::null,AAutoList);
-	rule.type = PRIVACY_TYPE_GROUP;
-	rule.value = AGroup;
-	return rule;
-}
-
-IPrivacyRule PrivacyLists::contactAutoListRule(const Jid &AContactJid, const QString &AList) const
+IPrivacyRule PrivacyLists::autoListRule(const Jid &AContactJid, const QString &AList) const
 {
 	IPrivacyRule rule;
 	rule.order = 0;
@@ -437,105 +369,97 @@ IPrivacyRule PrivacyLists::contactAutoListRule(const Jid &AContactJid, const QSt
 	return rule;
 }
 
-bool PrivacyLists::isGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const
+IPrivacyRule PrivacyLists::autoListRule(const QString &AGroup, const QString &AAutoList) const
 {
-	IPrivacyRule rule = groupAutoListRule(AGroup,AList);
+	IPrivacyRule rule = autoListRule(Jid::null,AAutoList);
+	rule.type = PRIVACY_TYPE_GROUP;
+	rule.value = AGroup;
+	return rule;
+}
+
+bool PrivacyLists::isAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const
+{
+	IPrivacyRule rule = autoListRule(AContactJid,AList);
 	return privacyList(AStreamJid,AList,true).rules.contains(rule);
 }
 
-bool PrivacyLists::isContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList) const
+bool PrivacyLists::isAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList) const
 {
-	IPrivacyRule rule = contactAutoListRule(AContactJid,AList);
+	IPrivacyRule rule = autoListRule(AGroup,AList);
 	return privacyList(AStreamJid,AList,true).rules.contains(rule);
 }
 
-void PrivacyLists::setGroupAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AList, bool APresent)
+void PrivacyLists::setAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool AInserted)
 {
-	IPrivacyRule rule = groupAutoListRule(AGroup,AList);
-	if (isReady(AStreamJid) && !AGroup.isEmpty() && rule.stanzas!=IPrivacyRule::EmptyType)
+	IPrivacyRule rule = autoListRule(AContactJid,AList);
+	if (isReady(AStreamJid) && rule.stanzas != IPrivacyRule::EmptyType)
 	{
 		IPrivacyList list = privacyList(AStreamJid,AList,true);
 		list.name = AList;
-
-		if (APresent != list.rules.contains(rule))
+		if (AInserted != list.rules.contains(rule))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Changing group present in auto list, group=%1, list=%2, present=%3").arg(AGroup,AList).arg(APresent));
-
-			if (APresent)
+			if (AInserted)
 			{
-				setGroupAutoListed(AStreamJid,AGroup,PRIVACY_LIST_VISIBLE,false);
-				setGroupAutoListed(AStreamJid,AGroup,PRIVACY_LIST_INVISIBLE,false);
-				setGroupAutoListed(AStreamJid,AGroup,PRIVACY_LIST_IGNORE,false);
+				setAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_VISIBLE,false);
+				setAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_CONFERENCES,false);
+				setAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_INVISIBLE,false);
+				setAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_IGNORE,false);
+				list.rules.append(rule);
+			}
+			else
+				list.rules.removeAt(list.rules.indexOf(rule));
+
+			for (int i=0; i<list.rules.count();i++)
+				list.rules[i].order=i;
+
+			!list.rules.isEmpty() ? savePrivacyList(AStreamJid,list) : removePrivacyList(AStreamJid,AList);
+		}
+	}
+}
+
+void PrivacyLists::setAutoListed(const Jid &AStreamJid, const QString &AGroup, const QString &AListName, bool AInserted)
+{
+	IPrivacyRule rule = autoListRule(AGroup,AListName);
+	if (isReady(AStreamJid) && !AGroup.isEmpty() && rule.stanzas != IPrivacyRule::EmptyType)
+	{
+		IPrivacyList list = privacyList(AStreamJid,AListName,true);
+		list.name = AListName;
+		if (AInserted != list.rules.contains(rule))
+		{
+			if (AInserted)
+			{
+				setAutoListed(AStreamJid,AGroup,PRIVACY_LIST_VISIBLE,false);
+				setAutoListed(AStreamJid,AGroup,PRIVACY_LIST_INVISIBLE,false);
+				setAutoListed(AStreamJid,AGroup,PRIVACY_LIST_IGNORE,false);
 			}
 
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-			QStringList groups = roster!=NULL ? (roster->allGroups()<<AGroup).toList() : QStringList(AGroup);
+			QStringList groups = roster!=NULL ? (roster->groups()<<AGroup).toList() : QStringList(AGroup);
+			QString groupWithDelim = roster!=NULL ? AGroup + roster->groupDelimiter() : AGroup;
 			qSort(groups);
-
 			foreach(const QString &group, groups)
 			{
-				if (roster->isSubgroup(AGroup,group))
+				if (group==AGroup || group.startsWith(groupWithDelim))
 				{
 					rule.value = group;
-					if (APresent)
+					if (AInserted)
 					{
-						if (!isGroupAutoListed(AStreamJid,group,PRIVACY_LIST_VISIBLE)    &&
-						    !isGroupAutoListed(AStreamJid,group,PRIVACY_LIST_INVISIBLE)  &&
-						    !isGroupAutoListed(AStreamJid,group,PRIVACY_LIST_IGNORE))
+						if (!isAutoListed(AStreamJid,group,PRIVACY_LIST_VISIBLE)    &&
+						    !isAutoListed(AStreamJid,group,PRIVACY_LIST_INVISIBLE)  &&
+						    !isAutoListed(AStreamJid,group,PRIVACY_LIST_IGNORE))
 						{
 							list.rules.append(rule);
 						}
 					}
 					else
-					{
-						list.rules.removeAll(rule);
-					}
+						list.rules.removeAt(list.rules.indexOf(rule));
 				}
 			}
 
 			for (int i=0; i<list.rules.count();i++)
-				list.rules[i].order = i;
+				list.rules[i].order=i;
 
-			if (list.rules.isEmpty())
-				removePrivacyList(AStreamJid,AList);
-			else
-				savePrivacyList(AStreamJid,list);
-		}
-	}
-}
-
-void PrivacyLists::setContactAutoListed(const Jid &AStreamJid, const Jid &AContactJid, const QString &AList, bool APresent)
-{
-	IPrivacyRule rule = contactAutoListRule(AContactJid,AList);
-	if (isReady(AStreamJid) && rule.stanzas!=IPrivacyRule::EmptyType)
-	{
-		IPrivacyList list = privacyList(AStreamJid,AList,true);
-		list.name = AList;
-
-		if (APresent != list.rules.contains(rule))
-		{
-			LOG_STRM_INFO(AStreamJid,QString("Changing contact present in auto list, contact=%1, list=%2, present=%3").arg(AContactJid.full(),AList).arg(APresent));
-
-			if (APresent)
-			{
-				setContactAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_VISIBLE,false);
-				setContactAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_INVISIBLE,false);
-				setContactAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_IGNORE,false);
-				setContactAutoListed(AStreamJid,AContactJid,PRIVACY_LIST_CONFERENCES,false);
-				list.rules.append(rule);
-			}
-			else
-			{
-				list.rules.removeAll(rule);
-			}
-
-			for (int i=0; i<list.rules.count();i++)
-				list.rules[i].order = i;
-
-			if (list.rules.isEmpty())
-				removePrivacyList(AStreamJid,AList);
-			else
-				savePrivacyList(AStreamJid,list);
+			!list.rules.isEmpty() ? savePrivacyList(AStreamJid,list) : removePrivacyList(AStreamJid,AListName);
 		}
 	}
 }
@@ -561,23 +485,18 @@ void PrivacyLists::setOffRosterBlocked(const Jid &AStreamJid, bool ABlocked)
 {
 	IPrivacyRule rule = offRosterRule();
 	IPrivacyList list = privacyList(AStreamJid,PRIVACY_LIST_SUBSCRIPTION,true);
-	if (ABlocked != list.rules.contains(rule))
+	if (list.rules.contains(rule) != ABlocked)
 	{
-		LOG_STRM_INFO(AStreamJid,QString("Changing off roster contacts blocking to=%1").arg(ABlocked));
-
 		list.name = PRIVACY_LIST_SUBSCRIPTION;
 		if (ABlocked)
 			list.rules.append(rule);
 		else
-			list.rules.removeAll(rule);
+			list.rules.removeAt(list.rules.indexOf(rule));
 
 		for (int i=0; i<list.rules.count();i++)
 			list.rules[i].order = i;
 
-		if (list.rules.isEmpty())
-			removePrivacyList(AStreamJid,list.name);
-		else
-			savePrivacyList(AStreamJid,list);
+		!list.rules.isEmpty() ? savePrivacyList(AStreamJid,list) : removePrivacyList(AStreamJid,list.name);
 	}
 }
 
@@ -595,7 +514,6 @@ void PrivacyLists::setAutoPrivacy(const Jid &AStreamJid, const QString &AAutoLis
 {
 	if (isReady(AStreamJid) && activeList(AStreamJid,true)!=AAutoList)
 	{
-		LOG_STRM_INFO(AStreamJid,QString("Changing auto privacy list to=%1").arg(AAutoList));
 		if (AAutoList == PRIVACY_LIST_AUTO_VISIBLE)
 		{
 			FApplyAutoLists.insert(AStreamJid,AAutoList);
@@ -685,24 +603,19 @@ QString PrivacyLists::setActiveList(const Jid &AStreamJid, const QString &AList)
 {
 	if (isReady(AStreamJid) && AList!=activeList(AStreamJid))
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
-		QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
-		QDomElement activeElem = queryElem.appendChild(request.createElement("active")).toElement();
+		Stanza set("iq");
+		set.setType("set").setId(FStanzaProcessor->newId());
+		QDomElement queryElem = set.addElement("query",NS_JABBER_PRIVACY);
+		QDomElement activeElem = queryElem.appendChild(set.createElement("active")).toElement();
 		if (!AList.isEmpty())
 			activeElem.setAttribute("name",AList);
 
 		emit activeListAboutToBeChanged(AStreamJid,AList);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,set,PRIVACY_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Change active list request sent, list=%1, id=%2").arg(AList,request.id()));
-			FStreamRequests[AStreamJid].prepend(request.id());
-			FActiveRequests.insert(request.id(),AList);
-			return request.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send change active list request, list=%1").arg(AList));
+			FStreamRequests[AStreamJid].prepend(set.id());
+			FActiveRequests.insert(set.id(),AList);
+			return set.id();
 		}
 	}
 	return QString::null;
@@ -725,22 +638,17 @@ QString PrivacyLists::setDefaultList(const Jid &AStreamJid, const QString &AList
 {
 	if (isReady(AStreamJid) && AList!=defaultList(AStreamJid))
 	{
-		Stanza request("iq");
-		request.setType("set").setId(FStanzaProcessor->newId());
-		QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
-		QDomElement defaultElem = queryElem.appendChild(request.createElement("default")).toElement();
+		Stanza set("iq");
+		set.setType("set").setId(FStanzaProcessor->newId());
+		QDomElement queryElem = set.addElement("query",NS_JABBER_PRIVACY);
+		QDomElement defaultElem = queryElem.appendChild(set.createElement("default")).toElement();
 		if (!AList.isEmpty())
 			defaultElem.setAttribute("name",AList);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,set,PRIVACY_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Change default list request sent, list=%1, id=%2").arg(AList,request.id()));
-			FStreamRequests[AStreamJid].prepend(request.id());
-			FDefaultRequests.insert(request.id(),AList);
-			return request.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send change default list request, list=%1").arg(AList));
+			FStreamRequests[AStreamJid].prepend(set.id());
+			FDefaultRequests.insert(set.id(),AList);
+			return set.id();
 		}
 	}
 	return QString::null;
@@ -786,20 +694,15 @@ QString PrivacyLists::loadPrivacyList(const Jid &AStreamJid, const QString &ALis
 {
 	if (isReady(AStreamJid) && !AList.isEmpty())
 	{
-		Stanza request("iq");
-		request.setType("get").setId(FStanzaProcessor->newId());
-		QDomElement elem = request.addElement("query",NS_JABBER_PRIVACY);
-		elem.appendChild(request.createElement("list")).toElement().setAttribute("name",AList);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
+		Stanza load("iq");
+		load.setType("get").setId(FStanzaProcessor->newId());
+		QDomElement elem = load.addElement("query",NS_JABBER_PRIVACY);
+		elem.appendChild(load.createElement("list")).toElement().setAttribute("name",AList);
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,PRIVACY_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Load privacy list request sent, list=%1, id=%2").arg(AList,request.id()));
-			FStreamRequests[AStreamJid].prepend(request.id());
-			FLoadRequests.insert(request.id(),AList);
-			return request.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send load privacy list request, list=%1").arg(AList));
+			FStreamRequests[AStreamJid].prepend(load.id());
+			FLoadRequests.insert(load.id(),AList);
+			return load.id();
 		}
 	}
 	return QString::null;
@@ -811,15 +714,15 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
 	{
 		if (privacyList(AStreamJid,AList.name,true) != AList)
 		{
-			Stanza request("iq");
-			request.setType("set").setId(FStanzaProcessor->newId());
-			QDomElement queryElem = request.addElement("query",NS_JABBER_PRIVACY);
-			QDomElement listElem =  queryElem.appendChild(request.createElement("list")).toElement();
+			Stanza save("iq");
+			save.setType("set").setId(FStanzaProcessor->newId());
+			QDomElement queryElem = save.addElement("query",NS_JABBER_PRIVACY);
+			QDomElement listElem =  queryElem.appendChild(save.createElement("list")).toElement();
 			listElem.setAttribute("name",AList.name);
 
 			foreach(const IPrivacyRule &item, AList.rules)
 			{
-				QDomElement itemElem = listElem.appendChild(request.createElement("item")).toElement();
+				QDomElement itemElem = listElem.appendChild(save.createElement("item")).toElement();
 				itemElem.setAttribute("order",item.order);
 				itemElem.setAttribute("action",item.action);
 				if (!item.type.isEmpty())
@@ -829,33 +732,26 @@ QString PrivacyLists::savePrivacyList(const Jid &AStreamJid, const IPrivacyList 
 				if (item.stanzas != IPrivacyRule::AnyStanza)
 				{
 					if (item.stanzas & IPrivacyRule::Messages)
-						itemElem.appendChild(request.createElement("message"));
+						itemElem.appendChild(save.createElement("message"));
 					if (item.stanzas & IPrivacyRule::Queries)
-						itemElem.appendChild(request.createElement("iq"));
+						itemElem.appendChild(save.createElement("iq"));
 					if (item.stanzas & IPrivacyRule::PresencesIn)
-						itemElem.appendChild(request.createElement("presence-in"));
+						itemElem.appendChild(save.createElement("presence-in"));
 					if (item.stanzas & IPrivacyRule::PresencesOut)
-						itemElem.appendChild(request.createElement("presence-out"));
+						itemElem.appendChild(save.createElement("presence-out"));
 				}
 			}
 
 			emit listAboutToBeChanged(AStreamJid,AList);
-			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
+			if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,save,PRIVACY_TIMEOUT))
 			{
-				LOG_STRM_INFO(AStreamJid,QString("Save privacy list request sent, list=%1, id=%2").arg(AList.name,request.id()));
-				FStreamRequests[AStreamJid].prepend(request.id());
-				FSaveRequests.insert(request.id(),AList);
-				return request.id();
-			}
-			else
-			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to send save privacy list request, list=%1").arg(AList.name));
+				FStreamRequests[AStreamJid].prepend(save.id());
+				FSaveRequests.insert(save.id(),AList);
+				return save.id();
 			}
 		}
 		else
-		{
 			return QString("");
-		}
 	}
 	return QString::null;
 }
@@ -870,14 +766,9 @@ QString PrivacyLists::removePrivacyList(const Jid &AStreamJid, const QString &AL
 		queryElem.appendChild(remove.createElement("list")).toElement().setAttribute("name",AList);
 		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,remove,PRIVACY_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Remove privacy list request sent, list=%1, id=%2").arg(AList,remove.id()));
 			FStreamRequests[AStreamJid].prepend(remove.id());
 			FRemoveRequests.insert(remove.id(),AList);
 			return remove.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send privacy list remove request, list=%1").arg(AList));
 		}
 	}
 	return QString::null;
@@ -903,18 +794,13 @@ QString PrivacyLists::loadPrivacyLists(const Jid &AStreamJid)
 {
 	if (FStanzaProcessor)
 	{
-		Stanza request("iq");
-		request.setType("get").setId(FStanzaProcessor->newId());
-		request.addElement("query",NS_JABBER_PRIVACY);
-		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,request,PRIVACY_TIMEOUT))
+		Stanza load("iq");
+		load.setType("get").setId(FStanzaProcessor->newId());
+		load.addElement("query",NS_JABBER_PRIVACY);
+		if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,load,PRIVACY_TIMEOUT))
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Load list of privacy lists request sent, id=%1").arg(request.id()));
-			FLoadRequests.insert(request.id(),QString::null);
-			return request.id();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send load list of privacy lists request"));
+			FLoadRequests.insert(load.id(),QString::null);
+			return load.id();
 		}
 	}
 	return QString::null;
@@ -929,268 +815,217 @@ Menu *PrivacyLists::createPrivacyMenu(Menu *AMenu) const
 	return pmenu;
 }
 
-void PrivacyLists::createAutoPrivacyStreamActions(const QStringList &AStreams, Menu *AMenu) const
+void PrivacyLists::createAutoPrivacyStreamActions(const Jid &AStreamJid, Menu *AMenu) const
 {
-	if (!AStreams.isEmpty())
+	QString activeListName = activeList(AStreamJid);
+	Action *action = new Action(AMenu);
+	action->setText(tr("Visible Mode"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_VISIBLE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_AUTO_VISIBLE);
+	action->setCheckable(true);
+	action->setChecked(activeListName == PRIVACY_LIST_AUTO_VISIBLE);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onSetAutoPrivacyByAction(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
+
+	action = new Action(AMenu);
+	action->setText(tr("Invisible Mode"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_INVISIBLE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_AUTO_INVISIBLE);
+	action->setCheckable(true);
+	action->setChecked(activeListName == PRIVACY_LIST_AUTO_INVISIBLE);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onSetAutoPrivacyByAction(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
+
+	if (!activeListName.isEmpty())
 	{
-		QStringList activeLists;
-		bool isAllBlockOffRoster = true;
-		foreach(const Jid &streamJid, AStreams)
-		{
-			QString listName = activeList(streamJid);
-			if (!activeLists.contains(listName))
-				activeLists.append(listName);
-			isAllBlockOffRoster = isAllBlockOffRoster && isAutoPrivacy(streamJid) && isOffRosterBlocked(streamJid);
-		}
+		action = new Action(AMenu);
+		action->setText(tr("Disable privacy lists"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_DISABLE);
+		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		action->setData(ADR_LISTNAME,QString());
+		connect(action,SIGNAL(triggered(bool)),SLOT(onSetAutoPrivacyByAction(bool)));
+		AMenu->addAction(action,AG_DEFAULT,false);
+	}
 
-		Action *visibleAction = new Action(AMenu);
-		visibleAction->setText(tr("Visible Mode"));
-		visibleAction->setData(ADR_STREAM_JID,AStreams);
-		visibleAction->setData(ADR_LISTNAME,PRIVACY_LIST_AUTO_VISIBLE);
-		visibleAction->setCheckable(true);
-		visibleAction->setChecked(activeLists.count()==1 && activeLists.value(0)==PRIVACY_LIST_AUTO_VISIBLE);
-		connect(visibleAction,SIGNAL(triggered(bool)),SLOT(onChangeStreamsAutoPrivacy(bool)));
-		AMenu->addAction(visibleAction,AG_DEFAULT);
-
-		Action *invisibleAction = new Action(AMenu);
-		invisibleAction->setText(tr("Invisible Mode"));
-		invisibleAction->setData(ADR_STREAM_JID,AStreams);
-		invisibleAction->setData(ADR_LISTNAME,PRIVACY_LIST_AUTO_INVISIBLE);
-		invisibleAction->setCheckable(true);
-		invisibleAction->setChecked(activeLists.count()==1 && activeLists.value(0)==PRIVACY_LIST_AUTO_INVISIBLE);
-		connect(invisibleAction,SIGNAL(triggered(bool)),SLOT(onChangeStreamsAutoPrivacy(bool)));
-		AMenu->addAction(invisibleAction,AG_DEFAULT);
-
-		Action *disableAction = new Action(AMenu);
-		disableAction->setText(tr("Disable Privacy Lists"));
-		disableAction->setData(ADR_STREAM_JID,AStreams);
-		disableAction->setData(ADR_LISTNAME,QString());
-		disableAction->setCheckable(true);
-		disableAction->setChecked(activeLists.count()==1 && activeLists.value(0).isEmpty());
-		connect(disableAction,SIGNAL(triggered(bool)),SLOT(onChangeStreamsAutoPrivacy(bool)));
-		AMenu->addAction(disableAction,AG_DEFAULT);
-
-		QActionGroup *modeGroup = new QActionGroup(AMenu);
-		modeGroup->addAction(visibleAction);
-		modeGroup->addAction(invisibleAction);
-		modeGroup->addAction(disableAction);
-
-		Action *blockAction = new Action(AMenu);
-		blockAction->setText(tr("Block Contacts Without Subscription"));
-		blockAction->setData(ADR_STREAM_JID,AStreams);
-		blockAction->setData(ADR_LISTNAME,PRIVACY_LIST_SUBSCRIPTION);
-		blockAction->setCheckable(true);
-		blockAction->setChecked(isAllBlockOffRoster);
-		connect(blockAction,SIGNAL(triggered(bool)),SLOT(onChangeStreamsOffRosterBlocked(bool)));
-		AMenu->addAction(blockAction,AG_DEFAULT+100);
+	if (isAutoPrivacy(AStreamJid))
+	{
+		action = new Action(AMenu);
+		action->setText(tr("Block off roster contacts"));
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_BLOCK);
+		action->setData(ADR_STREAM_JID,AStreamJid.full());
+		action->setData(ADR_LISTNAME,PRIVACY_LIST_SUBSCRIPTION);
+		action->setCheckable(true);
+		action->setChecked(isOffRosterBlocked(AStreamJid));
+		connect(action,SIGNAL(triggered(bool)),SLOT(onChangeOffRosterBlocked(bool)));
+		AMenu->addAction(action,AG_DEFAULT+200,false);
 	}
 }
 
-void PrivacyLists::createAutoPrivacyContactActions(const QStringList &AStreams, const QStringList &AContacts, Menu *AMenu) const
+void PrivacyLists::createAutoPrivacyContactActions(const Jid &AStreamJid, const QStringList &AContacts, Menu *AMenu) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count())
+	int allListedMask = 0x01|0x02|0x04;
+	foreach(const Jid &contactJid, AContacts)
 	{
-		int allListedMask = 0x01|0x02|0x04;
-		for(int i=0; i<AStreams.count(); i++)
-		{
-			if (!isAutoPrivacy(AStreams.at(i)))
-				allListedMask &= ~0x07;
-			if (!isContactAutoListed(AStreams.at(i),AContacts.at(i),PRIVACY_LIST_VISIBLE))
-				allListedMask &= ~0x01;
-			if (!isContactAutoListed(AStreams.at(i),AContacts.at(i),PRIVACY_LIST_INVISIBLE))
-				allListedMask &= ~0x02;
-			if (!isContactAutoListed(AStreams.at(i),AContacts.at(i),PRIVACY_LIST_IGNORE))
-				allListedMask &= ~0x04;
-		}
-
-		Action *defaultAction = new Action(AMenu);
-		defaultAction->setText(tr("Default Rule"));
-		defaultAction->setData(ADR_STREAM_JID,AStreams);
-		defaultAction->setData(ADR_CONTACT_JID,AContacts);
-		defaultAction->setCheckable(true);
-		defaultAction->setChecked((allListedMask & 0x07)==0);
-		connect(defaultAction,SIGNAL(triggered(bool)),SLOT(onChangeContactsAutoListed(bool)));
-		AMenu->addAction(defaultAction,AG_DEFAULT);
-
-		Action *visibleAction = new Action(AMenu);
-		visibleAction->setText(tr("Visible to Contact"));
-		visibleAction->setData(ADR_STREAM_JID,AStreams);
-		visibleAction->setData(ADR_CONTACT_JID,AContacts);
-		visibleAction->setData(ADR_LISTNAME,PRIVACY_LIST_VISIBLE);
-		visibleAction->setCheckable(true);
-		visibleAction->setChecked((allListedMask & 0x01)>0);
-		connect(visibleAction,SIGNAL(triggered(bool)),SLOT(onChangeContactsAutoListed(bool)));
-		AMenu->addAction(visibleAction,AG_DEFAULT);
-
-		Action *invisibleAction = new Action(AMenu);
-		invisibleAction->setText(tr("Invisible to Contact"));
-		invisibleAction->setData(ADR_STREAM_JID,AStreams);
-		invisibleAction->setData(ADR_CONTACT_JID,AContacts);
-		invisibleAction->setData(ADR_LISTNAME,PRIVACY_LIST_INVISIBLE);
-		invisibleAction->setCheckable(true);
-		invisibleAction->setChecked((allListedMask & 0x02)>0);
-		connect(invisibleAction,SIGNAL(triggered(bool)),SLOT(onChangeContactsAutoListed(bool)));
-		AMenu->addAction(invisibleAction,AG_DEFAULT);
-
-		Action *ignoreAction = new Action(AMenu);
-		ignoreAction->setText(tr("Ignore Contact"));
-		ignoreAction->setData(ADR_STREAM_JID,AStreams);
-		ignoreAction->setData(ADR_CONTACT_JID,AContacts);
-		ignoreAction->setData(ADR_LISTNAME,PRIVACY_LIST_IGNORE);
-		ignoreAction->setCheckable(true);
-		ignoreAction->setChecked((allListedMask & 0x04)>0);
-		connect(ignoreAction,SIGNAL(triggered(bool)),SLOT(onChangeContactsAutoListed(bool)));
-		AMenu->addAction(ignoreAction,AG_DEFAULT);
-
-		QActionGroup *ruleGroup = new QActionGroup(AMenu);
-		ruleGroup->addAction(defaultAction);
-		ruleGroup->addAction(visibleAction);
-		ruleGroup->addAction(invisibleAction);
-		ruleGroup->addAction(ignoreAction);
+		if (!isAutoListed(AStreamJid,contactJid,PRIVACY_LIST_VISIBLE))
+			allListedMask &= ~0x01;
+		if (!isAutoListed(AStreamJid,contactJid,PRIVACY_LIST_INVISIBLE))
+			allListedMask &= ~0x02;
+		if (!isAutoListed(AStreamJid,contactJid,PRIVACY_LIST_IGNORE))
+			allListedMask &= ~0x04;
 	}
+
+	Action *action = new Action(AMenu);
+	action->setText(tr("Visible to contact"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_VISIBLE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_CONTACT_JID,AContacts);
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_VISIBLE);
+	action->setCheckable(true);
+	action->setChecked((allListedMask & 0x01)>0);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeContactAutoListed(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
+
+	action = new Action(AMenu);
+	action->setText(tr("Invisible to contact"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_INVISIBLE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_CONTACT_JID,AContacts);
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_INVISIBLE);
+	action->setCheckable(true);
+	action->setChecked((allListedMask & 0x02)>0);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeContactAutoListed(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
+
+	action = new Action(AMenu);
+	action->setText(tr("Ignore contact"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_IGNORE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_CONTACT_JID,AContacts);
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_IGNORE);
+	action->setCheckable(true);
+	action->setChecked((allListedMask & 0x04)>0);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeContactAutoListed(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
 }
 
-void PrivacyLists::createAutoPrivacyGroupActions(const QStringList &AStreams, const QStringList &AGroups, Menu *AMenu) const
+void PrivacyLists::createAutoPrivacyGroupActions(const Jid &AStreamJid, const QStringList &AGroups, Menu *AMenu) const
 {
-	if (!AStreams.isEmpty() && AStreams.count()==AGroups.count())
+	int allListedMask = 0x01|0x02|0x04;
+	foreach(const QString &group, AGroups)
 	{
-		int allListedMask = 0x01|0x02|0x04;
-		for(int i=0; i<AStreams.count(); i++)
-		{
-			if (!isAutoPrivacy(AStreams.at(i)))
-				allListedMask &= ~0x07;
-			if (!isGroupAutoListed(AStreams.at(i),AGroups.at(i),PRIVACY_LIST_VISIBLE))
-				allListedMask &= ~0x01;
-			if (!isGroupAutoListed(AStreams.at(i),AGroups.at(i),PRIVACY_LIST_INVISIBLE))
-				allListedMask &= ~0x02;
-			if (!isGroupAutoListed(AStreams.at(i),AGroups.at(i),PRIVACY_LIST_IGNORE))
-				allListedMask &= ~0x04;
-		}
-
-		Action *defaultAction = new Action(AMenu);
-		defaultAction->setText(tr("Default Rule"));
-		defaultAction->setData(ADR_STREAM_JID,AStreams);
-		defaultAction->setData(ADR_GROUP_NAME,AGroups);
-		defaultAction->setCheckable(true);
-		defaultAction->setChecked((allListedMask & 0x07)==0);
-		connect(defaultAction,SIGNAL(triggered(bool)),SLOT(onChangeGroupsAutoListed(bool)));
-		AMenu->addAction(defaultAction,AG_DEFAULT);
-
-		Action *visibleAction = new Action(AMenu);
-		visibleAction->setText(tr("Visible to Group"));
-		visibleAction->setData(ADR_STREAM_JID,AStreams);
-		visibleAction->setData(ADR_GROUP_NAME,AGroups);
-		visibleAction->setData(ADR_LISTNAME,PRIVACY_LIST_VISIBLE);
-		visibleAction->setCheckable(true);
-		visibleAction->setChecked((allListedMask & 0x01)>0);
-		connect(visibleAction,SIGNAL(triggered(bool)),SLOT(onChangeGroupsAutoListed(bool)));
-		AMenu->addAction(visibleAction,AG_DEFAULT);
-
-		Action *invisibleAction = new Action(AMenu);
-		invisibleAction->setText(tr("Invisible to Group"));
-		invisibleAction->setData(ADR_STREAM_JID,AStreams);
-		invisibleAction->setData(ADR_GROUP_NAME,AGroups);
-		invisibleAction->setData(ADR_LISTNAME,PRIVACY_LIST_INVISIBLE);
-		invisibleAction->setCheckable(true);
-		invisibleAction->setChecked((allListedMask & 0x02)>0);
-		connect(invisibleAction,SIGNAL(triggered(bool)),SLOT(onChangeGroupsAutoListed(bool)));
-		AMenu->addAction(invisibleAction,AG_DEFAULT);
-
-		Action *ignoreAction = new Action(AMenu);
-		ignoreAction->setText(tr("Ignore Group"));
-		ignoreAction->setData(ADR_STREAM_JID,AStreams);
-		ignoreAction->setData(ADR_GROUP_NAME,AGroups);
-		ignoreAction->setData(ADR_LISTNAME,PRIVACY_LIST_IGNORE);
-		ignoreAction->setCheckable(true);
-		ignoreAction->setChecked((allListedMask & 0x04)>0);
-		connect(ignoreAction,SIGNAL(triggered(bool)),SLOT(onChangeGroupsAutoListed(bool)));
-		AMenu->addAction(ignoreAction,AG_DEFAULT,false);
-
-		QActionGroup *ruleGroup = new QActionGroup(AMenu);
-		ruleGroup->addAction(defaultAction);
-		ruleGroup->addAction(visibleAction);
-		ruleGroup->addAction(invisibleAction);
-		ruleGroup->addAction(ignoreAction);
+		if (!isAutoListed(AStreamJid,group,PRIVACY_LIST_VISIBLE))
+			allListedMask &= ~0x01;
+		if (!isAutoListed(AStreamJid,group,PRIVACY_LIST_INVISIBLE))
+			allListedMask &= ~0x02;
+		if (!isAutoListed(AStreamJid,group,PRIVACY_LIST_IGNORE))
+			allListedMask &= ~0x04;
 	}
+
+	Action *action = new Action(AMenu);
+	action->setText(tr("Visible to group"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_VISIBLE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_GROUP_NAME,AGroups);
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_VISIBLE);
+	action->setCheckable(true);
+	action->setChecked((allListedMask & 0x01)>0);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupAutoListed(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
+
+	action = new Action(AMenu);
+	action->setText(tr("Invisible to group"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_INVISIBLE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_GROUP_NAME,AGroups);
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_INVISIBLE);
+	action->setCheckable(true);
+	action->setChecked((allListedMask & 0x02)>0);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupAutoListed(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
+
+	action = new Action(AMenu);
+	action->setText(tr("Ignore group"));
+	action->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_IGNORE);
+	action->setData(ADR_STREAM_JID,AStreamJid.full());
+	action->setData(ADR_GROUP_NAME,AGroups);
+	action->setData(ADR_LISTNAME,PRIVACY_LIST_IGNORE);
+	action->setCheckable(true);
+	action->setChecked((allListedMask & 0x04)>0);
+	connect(action,SIGNAL(triggered(bool)),SLOT(onChangeGroupAutoListed(bool)));
+	AMenu->addAction(action,AG_DEFAULT,false);
 }
 
 Menu *PrivacyLists::createSetActiveMenu(const Jid &AStreamJid, const QList<IPrivacyList> &ALists, Menu *AMenu) const
 {
-	QString listName = activeList(AStreamJid);
+	QString alist = activeList(AStreamJid);
 
-	Menu *activeMenu = new Menu(AMenu);
-	activeMenu->setTitle(tr("Set Active List"));
+	Menu *amenu = new Menu(AMenu);
+	amenu->setTitle(tr("Set Active list"));
+	amenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_LIST);
 
-	QActionGroup *listGroup = new QActionGroup(AMenu);
-
-	Action *action = new Action(activeMenu);
+	Action *action = new Action(amenu);
 	action->setData(ADR_STREAM_JID,AStreamJid.full());
 	action->setData(ADR_LISTNAME,QString());
 	action->setCheckable(true);
-	action->setChecked(listName.isEmpty());
+	action->setChecked(alist.isEmpty());
 	action->setText(tr("<None>"));
 	connect(action,SIGNAL(triggered(bool)),SLOT(onSetActiveListByAction(bool)));
-	listGroup->addAction(action);
-	activeMenu->addAction(action,AG_DEFAULT-100,false);
+	amenu->addAction(action,AG_DEFAULT-100,false);
 
 	foreach(const IPrivacyList &list, ALists)
 	{
-		action = new Action(activeMenu);
+		action = new Action(amenu);
 		action->setData(ADR_STREAM_JID,AStreamJid.full());
 		action->setData(ADR_LISTNAME,list.name);
 		action->setCheckable(true);
-		action->setChecked(list.name == listName);
+		action->setChecked(list.name == alist);
 		action->setText(list.name);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetActiveListByAction(bool)));
-		listGroup->addAction(action);
-		activeMenu->addAction(action,AG_DEFAULT,true);
+		amenu->addAction(action,AG_DEFAULT,true);
 	}
-	AMenu->addAction(activeMenu->menuAction(),AG_DEFAULT+200,false);
-
-	return activeMenu;
+	AMenu->addAction(amenu->menuAction(),AG_DEFAULT+200,false);
+	return amenu;
 }
 
 Menu *PrivacyLists::createSetDefaultMenu(const Jid &AStreamJid, const QList<IPrivacyList> &ALists, Menu *AMenu) const
 {
-	QString listName = defaultList(AStreamJid);
+	QString dlist = defaultList(AStreamJid);
 
-	Menu *defaultMenu = new Menu(AMenu);
-	defaultMenu->setTitle(tr("Set Default List"));
+	Menu *dmenu = new Menu(AMenu);
+	dmenu->setTitle(tr("Set Default list"));
+	dmenu->setIcon(RSR_STORAGE_MENUICONS,MNI_PRIVACYLISTS_LIST);
 
-	QActionGroup *listGroup = new QActionGroup(AMenu);
-
-	Action *action = new Action(defaultMenu);
+	Action *action = new Action(dmenu);
 	action->setData(ADR_STREAM_JID,AStreamJid.full());
 	action->setData(ADR_LISTNAME,QString());
 	action->setCheckable(true);
-	action->setChecked(listName.isEmpty());
+	action->setChecked(dlist.isEmpty());
 	action->setText(tr("<None>"));
-	listGroup->addAction(action);
 	connect(action,SIGNAL(triggered(bool)),SLOT(onSetDefaultListByAction(bool)));
-	defaultMenu->addAction(action,AG_DEFAULT-100,false);
+	dmenu->addAction(action,AG_DEFAULT-100,false);
 
 	foreach(const IPrivacyList &list, ALists)
 	{
-		action = new Action(defaultMenu);
+		action = new Action(dmenu);
 		action->setData(ADR_STREAM_JID,AStreamJid.full());
 		action->setData(ADR_LISTNAME,list.name);
 		action->setCheckable(true);
-		action->setChecked(list.name == listName);
+		action->setChecked(list.name == dlist);
 		action->setText(list.name);
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSetDefaultListByAction(bool)));
-		listGroup->addAction(action);
-		defaultMenu->addAction(action,AG_DEFAULT,true);
+		dmenu->addAction(action,AG_DEFAULT,true);
 	}
-	AMenu->addAction(defaultMenu->menuAction(),AG_DEFAULT+200,false);
-
-	return defaultMenu;
+	AMenu->addAction(dmenu->menuAction(),AG_DEFAULT+200,false);
+	return dmenu;
 }
 
 bool PrivacyLists::isMatchedJid(const Jid &AMask, const Jid &AJid) const
 {
 	return  ( (AMask.pDomain() == AJid.pDomain()) &&
 	          (AMask.node().isEmpty() || AMask.pNode()==AJid.pNode()) &&
-	          (AMask.resource().isEmpty() || AMask.pResource()==AJid.pResource()) );
+	          (AMask.resource().isEmpty() || AMask.resource()==AJid.resource()) );
 }
 
 void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList &AAutoList)
@@ -1203,7 +1038,6 @@ void PrivacyLists::sendOnlinePresences(const Jid &AStreamJid, const IPrivacyList
 		QSet<Jid> online = FOfflinePresences.value(AStreamJid) - denied;
 		if (presence->isOpen())
 		{
-			LOG_STRM_INFO(AStreamJid,"Sending online presence to all not denied contacts");
 			foreach(const Jid &contactJid, online)
 			{
 				IRosterItem ritem = roster!=NULL ? roster->rosterItem(contactJid) : IRosterItem();
@@ -1225,7 +1059,6 @@ void PrivacyLists::sendOfflinePresences(const Jid &AStreamJid, const IPrivacyLis
 		QSet<Jid> offline = denied - FOfflinePresences.value(AStreamJid);
 		if (presence->isOpen())
 		{
-			LOG_STRM_INFO(AStreamJid,"Sending offline presence to all denied contacts");
 			foreach(const Jid &contactJid, offline)
 				presence->sendPresence(contactJid,IPresence::Offline,QString::null,0);
 		}
@@ -1237,7 +1070,7 @@ void PrivacyLists::setPrivacyLabel(const Jid &AStreamJid, const Jid &AContactJid
 {
 	if (FRostersModel)
 	{
-		QList<IRosterIndex *> indexList = FRostersModel->findContactIndexes(AStreamJid,AContactJid);
+		QList<IRosterIndex *> indexList = FRostersModel->getContactIndexList(AStreamJid,AContactJid);
 		foreach(IRosterIndex *index, indexList)
 		{
 			if (AVisible)
@@ -1268,14 +1101,14 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 		foreach(const Jid &contactJid, allow)
 			setPrivacyLabel(AStreamJid,contactJid,false);
 
-		IRosterIndex *sroot = FRostersModel->streamRoot(AStreamJid);
-		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIK_GROUP_NOT_IN_ROSTER,QString::null,sroot);
+		IRosterIndex *streamIndex = FRostersModel->streamRoot(AStreamJid);
+		IRosterIndex *groupIndex = FRostersModel->findGroupIndex(RIT_GROUP_NOT_IN_ROSTER,QString::null,QString("::"),streamIndex);
 		if (groupIndex)
 		{
 			for (int i=0;i<groupIndex->childCount();i++)
 			{
-				IRosterIndex *index = groupIndex->childIndex(i);
-				if (index->kind() == RIK_CONTACT || index->kind()==RIK_AGENT)
+				IRosterIndex *index = groupIndex->child(i);
+				if (index->type() == RIT_CONTACT || index->type()==RIT_AGENT)
 				{
 					IRosterItem ritem;
 					ritem.itemJid = index->data(RDR_PREP_BARE_JID).toString();
@@ -1289,44 +1122,42 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 	}
 }
 
-bool PrivacyLists::isAllStreamsReady(const QStringList &AStreams) const
-{
-	foreach(const Jid &streamJid, AStreams)
-		if (!isReady(streamJid))
-			return false;
-	return !AStreams.isEmpty();
-}
-
 bool PrivacyLists::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
-
-	int singleKind = -1;
-	foreach(IRosterIndex *index, ASelected)
+	static const QList<int> acceptTypes = QList<int>() << RIT_STREAM_ROOT << RIT_CONTACT << RIT_AGENT << RIT_GROUP;
+	if (!ASelected.isEmpty())
 	{
-		int indexKind = index->kind();
-		if (!acceptKinds.contains(indexKind))
-			return false;
-		else if (singleKind!=-1 && singleKind!=indexKind)
-			return false;
-		else if (indexKind==RIK_GROUP && !isAllStreamsReady(index->data(RDR_STREAMS).toStringList()))
-			return false;
-		else if (indexKind!=RIK_GROUP && !isAllStreamsReady(index->data(RDR_STREAM_JID).toStringList()))
-			return false;
-		singleKind = indexKind;
+		int singleType = -1;
+		Jid singleStream;
+		foreach(IRosterIndex *index, ASelected)
+		{
+			int indexType = index->type();
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
+			if (!acceptTypes.contains(indexType))
+				return false;
+			else if (singleType!=-1 && singleType!=indexType)
+				return false;
+			else if(!singleStream.isEmpty() && singleStream!=streamJid)
+				return false;
+			singleType = indexType;
+			singleStream = streamJid;
+		}
+		return true;
 	}
-	return !ASelected.isEmpty();
+	return false;
 }
 
 void PrivacyLists::onListAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList)
 {
 	if (AList.name == activeList(AStreamJid))
+	{
 		sendOfflinePresences(AStreamJid,AList);
+	}
 }
 
 void PrivacyLists::onListChanged(const Jid &AStreamJid, const QString &AList)
 {
-	if (isAutoPrivacy(AStreamJid) && AutoLists.contains(AList))
+	if (isAutoPrivacy(AStreamJid) && FAutoLists.contains(AList))
 	{
 		FApplyAutoLists.insert(AStreamJid,activeList(AStreamJid));
 		FApplyAutoListsTimer.start();
@@ -1357,8 +1188,6 @@ void PrivacyLists::onApplyAutoLists()
 		IPrivacyList list;
 		list.name = FApplyAutoLists.value(streamJid);
 
-		LOG_STRM_INFO(streamJid,QString("Applying auto list=%1").arg(list.name));
-
 		IPrivacyRule selfAllow;
 		selfAllow.type = PRIVACY_TYPE_JID;
 		selfAllow.value = streamJid.pBare();
@@ -1366,10 +1195,10 @@ void PrivacyLists::onApplyAutoLists()
 		selfAllow.stanzas = IPrivacyRule::AnyStanza;
 		list.rules.append(selfAllow);
 
-		foreach(const QString &listName, AutoLists)
+		foreach(const QString &listName, FAutoLists)
 		{
 			IPrivacyList autoList = privacyList(streamJid,listName,true);
-			list.rules += autoList.rules;
+			list.rules+=autoList.rules;
 		}
 
 		if (list.name == PRIVACY_LIST_AUTO_VISIBLE)
@@ -1417,9 +1246,9 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
 
 		shandle.direction = IStanzaHandle::DirectionOut;
 		FSHIRosterOut.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
-	}
 
-	loadPrivacyLists(AXmppStream->streamJid());
+		loadPrivacyLists(AXmppStream->streamJid());
+	}
 }
 
 void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
@@ -1444,42 +1273,40 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
 	}
 }
 
-void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex)
+void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex, IRosterIndex *AParent)
 {
-	if (FRostersView && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_AGENT))
+	Q_UNUSED(AParent);
+	if (FRostersView && (AIndex->type()==RIT_CONTACT || AIndex->type()==RIT_AGENT))
 	{
-		if (FNewRosterIndexes.isEmpty())
-			QTimer::singleShot(0,this,SLOT(onUpdateNewRosterIndexes()));
-		FNewRosterIndexes.append(AIndex);
+		if (FCreatedRosterIndexes.isEmpty())
+			QTimer::singleShot(0,this,SLOT(onUpdateCreatedRosterIndexes()));
+		FCreatedRosterIndexes.append(AIndex);
 	}
 }
 
-void PrivacyLists::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
+void PrivacyLists::onRosterIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
 {
 	AAccepted = AAccepted || isSelectionAccepted(ASelected);
 }
 
-void PrivacyLists::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void PrivacyLists::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	bool isMultiSelection = AIndexes.count()>1;
-	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
+	if (ALabelId==RLID_DISPLAY && isSelectionAccepted(AIndexes))
 	{
-		int indexKind = AIndexes.first()->kind();
-		if (indexKind == RIK_STREAM_ROOT)
+		int indexType = AIndexes.first()->type();
+		Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
+		if (isReady(streamJid))
 		{
-			QMap<int,QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID,RDR_STREAM_JID);
-			
-			Menu *pmenu = createPrivacyMenu(AMenu);
-			createAutoPrivacyStreamActions(rolesMap.value(RDR_STREAM_JID),pmenu);
-
-			if (!isMultiSelection)
+			if (indexType == RIT_STREAM_ROOT)
 			{
-				Jid streamJid = AIndexes.first()->data(RDR_STREAM_JID).toString();
+				Menu *pmenu = createPrivacyMenu(AMenu);
+				createAutoPrivacyStreamActions(streamJid,pmenu);
+
 				if (!isAutoPrivacy(streamJid))
 				{
 					QList<IPrivacyList> lists = privacyLists(streamJid);
 					for (int i=0; i<lists.count(); i++)
-						if (AutoLists.contains(lists.at(i).name))
+						if (FAutoLists.contains(lists.at(i).name))
 							lists.removeAt(i--);
 
 					if (!lists.isEmpty())
@@ -1496,37 +1323,26 @@ void PrivacyLists::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				connect(action,SIGNAL(triggered(bool)),SLOT(onShowEditListsDialog(bool)));
 				pmenu->addAction(action,AG_DEFAULT+400,false);
 			}
-		}
-		else
-		{
-			QStringList streams;
-			QStringList contacts;
-			QStringList groups;
-			foreach(IRosterIndex *index, AIndexes)
+			else if (isAutoPrivacy(streamJid))
 			{
-				if (indexKind != RIK_GROUP)
+				if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
 				{
-					QString streamJid = index->data(RDR_STREAM_JID).toString();
-					streams.append(streamJid);
-					contacts.append(index->data(RDR_PREP_BARE_JID).toString());
+					QMap<int,QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID);
+					Menu *pmenu = createPrivacyMenu(AMenu);
+					createAutoPrivacyContactActions(streamJid,rolesMap.value(RDR_PREP_BARE_JID),pmenu);
 				}
-				else foreach(const QString &streamJid, index->data(RDR_STREAMS).toStringList())
+				else if (indexType == RIT_GROUP)
 				{
-					streams.append(streamJid);
-					groups.append(index->data(RDR_GROUP).toString());
+					QMap<int,QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_GROUP,RDR_GROUP);
+					Menu *pmenu = createPrivacyMenu(AMenu);
+					createAutoPrivacyGroupActions(streamJid,rolesMap.value(RDR_GROUP),pmenu);
 				}
 			}
-
-			Menu *pmenu = createPrivacyMenu(AMenu);
-			if (indexKind == RIK_GROUP)
-				createAutoPrivacyGroupActions(streams,groups,pmenu);
-			else
-				createAutoPrivacyContactActions(streams,contacts,pmenu);
 		}
 	}
 }
 
-void PrivacyLists::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
+void PrivacyLists::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
 {
 	if (ALabelId == FPrivacyLabelId)
 	{
@@ -1541,15 +1357,15 @@ void PrivacyLists::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 		toolTip += tr("- messages: %1").arg((stanzas & IPrivacyRule::Messages) >0           ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences in: %1").arg((stanzas & IPrivacyRule::PresencesIn) >0    ? tr("<b>denied</b>") : tr("allowed")) + "<br>";
 		toolTip += tr("- presences out: %1").arg((stanzas & IPrivacyRule::PresencesOut) >0  ? tr("<b>denied</b>") : tr("allowed"));
-		AToolTips.insert(RTTO_PRIVACYLISTS,toolTip);
+		AToolTips.insertMulti(RTTO_PRIVACY,toolTip);
 	}
 }
 
-void PrivacyLists::onUpdateNewRosterIndexes()
+void PrivacyLists::onUpdateCreatedRosterIndexes()
 {
-	while (!FNewRosterIndexes.isEmpty())
+	while (!FCreatedRosterIndexes.isEmpty())
 	{
-		IRosterIndex *index = FNewRosterIndexes.takeFirst();
+		IRosterIndex *index = FCreatedRosterIndexes.takeFirst();
 		Jid streamJid = index->data(RDR_STREAM_JID).toString();
 		if (!activeList(streamJid).isEmpty())
 		{
@@ -1565,7 +1381,7 @@ void PrivacyLists::onUpdateNewRosterIndexes()
 			}
 		}
 	}
-	FNewRosterIndexes.clear();
+	FCreatedRosterIndexes.clear();
 }
 
 void PrivacyLists::onShowEditListsDialog(bool)
@@ -1602,79 +1418,48 @@ void PrivacyLists::onSetDefaultListByAction(bool)
 	}
 }
 
-void PrivacyLists::onChangeStreamsAutoPrivacy(bool)
+void PrivacyLists::onSetAutoPrivacyByAction(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
-			setAutoPrivacy(streamJid,action->data(ADR_LISTNAME).toString());
-	}
-}
-
-void PrivacyLists::onChangeContactsAutoListed(bool APresent)
-{
-	Action *action = qobject_cast<Action *>(sender());
-	if (action)
-	{
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		QString listName = action->data(ADR_LISTNAME).toString();
-		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
-		QStringList contacts = action->data(ADR_CONTACT_JID).toStringList();
-		for (int i=0; i<streams.count(); i++)
-		{
-			if (!listName.isEmpty())
-			{
-				if (!isAutoPrivacy(streams.at(i)))
-					setAutoPrivacy(streams.at(i),PRIVACY_LIST_AUTO_VISIBLE);
-				setContactAutoListed(streams.at(i),contacts.at(i),listName,APresent);
-			}
-			else
-			{
-				static const QStringList ContactAutoLists = QStringList() << PRIVACY_LIST_VISIBLE << PRIVACY_LIST_INVISIBLE << PRIVACY_LIST_IGNORE << PRIVACY_LIST_CONFERENCES;
-				foreach(const QString &listName, ContactAutoLists)
-					setContactAutoListed(streams.at(i),contacts.at(i),listName,false);
-			}
-		}
+		setAutoPrivacy(streamJid,listName);
 	}
 }
 
-void PrivacyLists::onChangeGroupsAutoListed(bool APresent)
+void PrivacyLists::onChangeContactAutoListed(bool AInserted)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		QString listName = action->data(ADR_LISTNAME).toString();
-		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
-		QStringList groups = action->data(ADR_GROUP_NAME).toStringList();
-		for (int i=0; i<streams.count(); i++)
-		{
-			if (!listName.isEmpty())
-			{
-				if (!isAutoPrivacy(streams.at(i)))
-					setAutoPrivacy(streams.at(i),PRIVACY_LIST_AUTO_VISIBLE);
-				setGroupAutoListed(streams.at(i),groups.at(i),listName,APresent);
-			}
-			else
-			{
-				static const QStringList GroupAutoLists = QStringList() << PRIVACY_LIST_VISIBLE << PRIVACY_LIST_INVISIBLE << PRIVACY_LIST_IGNORE;
-				foreach(const QString &listName, GroupAutoLists)
-					setGroupAutoListed(streams.at(i),groups.at(i),listName,false);
-			}
-		}
+		foreach(const Jid &contactJid, action->data(ADR_CONTACT_JID).toStringList())
+			setAutoListed(streamJid,contactJid,listName,AInserted);
 	}
 }
 
-void PrivacyLists::onChangeStreamsOffRosterBlocked(bool ABlocked)
+void PrivacyLists::onChangeGroupAutoListed(bool AInserted)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
-		{
-			if (!isAutoPrivacy(streamJid))
-				setAutoPrivacy(streamJid,PRIVACY_LIST_AUTO_VISIBLE);
-			setOffRosterBlocked(streamJid,ABlocked);
-		}
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		QString listName = action->data(ADR_LISTNAME).toString();
+		foreach(const QString &groupName, action->data(ADR_GROUP_NAME).toStringList())
+			setAutoListed(streamJid,groupName,listName,AInserted);
+	}
+}
+
+void PrivacyLists::onChangeOffRosterBlocked(bool ABlocked)
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		Jid streamJid = action->data(ADR_STREAM_JID).toString();
+		setOffRosterBlocked(streamJid,ABlocked);
 	}
 }
 
@@ -1685,7 +1470,7 @@ void PrivacyLists::onEditListsDialogDestroyed(const Jid &AStreamJid)
 
 void PrivacyLists::onMultiUserChatCreated(IMultiUserChat *AMultiChat)
 {
-	setContactAutoListed(AMultiChat->streamJid(),AMultiChat->roomJid(),PRIVACY_LIST_CONFERENCES,true);
+	setAutoListed(AMultiChat->streamJid(),AMultiChat->roomJid(),PRIVACY_LIST_CONFERENCES,true);
 }
 
 Q_EXPORT_PLUGIN2(plg_privacylists, PrivacyLists)

@@ -1,14 +1,8 @@
 #include "subscriptiondialog.h"
 
-#include <definitions/toolbargroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <utils/logger.h>
-
 SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AContactJid,
-	const QString &ANotify, const QString &AMessage, QWidget *AParent) : QDialog(AParent)
+                                       const QString &ANotify, const QString &AMessage, QWidget *AParent) : QDialog(AParent)
 {
-	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Subscription request - %1").arg(AStreamJid.uBare()));
@@ -87,14 +81,14 @@ void SubscriptionDialog::initialize(IPluginManager *APluginManager)
 			FShowChat = new Action(FToolBarChanger->toolBar());
 			FShowChat->setText(tr("Chat"));
 			FShowChat->setToolTip(tr("Open chat window"));
-			FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHATMHANDLER_MESSAGE);
+			FShowChat->setIcon(RSR_STORAGE_MENUICONS,MNI_CHAT_MHANDLER_MESSAGE);
 			FToolBarChanger->insertAction(FShowChat,TBG_RCSRD_ROSTERCHANGER);
 			connect(FShowChat,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 
 			FSendMessage = new Action(FToolBarChanger->toolBar());
 			FSendMessage->setText(tr("Message"));
 			FSendMessage->setToolTip(tr("Send Message"));
-			FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMALMHANDLER_MESSAGE);
+			FSendMessage->setIcon(RSR_STORAGE_MENUICONS,MNI_NORMAL_MHANDLER_MESSAGE);
 			FToolBarChanger->insertAction(FSendMessage,TBG_RCSRD_ROSTERCHANGER);
 			connect(FSendMessage,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 		}
@@ -162,3 +156,4 @@ void SubscriptionDialog::onToolBarActionTriggered( bool )
 		}
 	}
 }
+

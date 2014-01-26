@@ -2,16 +2,18 @@
 #define FILESTREAM_H
 
 #include <QFile>
+#include <definitions/namespaces.h>
 #include <interfaces/ifilestreamsmanager.h>
 #include <interfaces/idatastreamsmanager.h>
+#include <utils/jid.h>
 #include "transferthread.h"
 
 #define SPEED_POINTS      10
 #define SPEED_INTERVAL    500
 
 class FileStream :
-	public QObject,
-	public IFileStream
+			public QObject,
+			public IFileStream
 {
 	Q_OBJECT;
 	Q_INTERFACES(IFileStream);
@@ -27,7 +29,6 @@ public:
 	virtual QString methodNS() const;
 	virtual qint64 speed() const;
 	virtual qint64 progress() const;
-	virtual XmppError error() const;
 	virtual QString stateString() const;
 	virtual bool isRangeSupported() const;
 	virtual void setRangeSupported(bool ASupported);
@@ -51,7 +52,7 @@ public:
 	virtual void setAcceptableMethods(const QStringList &AMethods);
 	virtual bool initStream(const QList<QString> &AMethods);
 	virtual bool startStream(const QString &AMethodNS);
-	virtual void abortStream(const XmppError &AError);
+	virtual void abortStream(const QString &AError);
 signals:
 	void stateChanged();
 	void speedChanged();
@@ -81,7 +82,7 @@ private:
 	qint64 FProgress;
 	bool FAborted;
 	QUuid FProfileId;
-	XmppError FError;
+	QString FAbortString;
 	QString FStateString;
 	QStringList FAcceptableMethods;
 private:

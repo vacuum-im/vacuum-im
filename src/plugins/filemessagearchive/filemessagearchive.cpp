@@ -1,51 +1,31 @@
 #include "filemessagearchive.h"
 
 #include <QDir>
-#include <QUuid>
 #include <QStringRef>
-#include <QMutexLocker>
 #include <QDirIterator>
-#include <QMapIterator>
 #include <QXmlStreamReader>
-#include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
-#include <definitions/archivecapabilityorders.h>
-#include <definitions/filearchivedatabaseproperties.h>
-#include <utils/options.h>
-#include <utils/logger.h>
+#include "workingthread.h"
 
 #define ARCHIVE_DIR_NAME      "archive"
 #define COLLECTION_EXT        ".xml"
-#define DATABASE_FILE_NAME    "filearchive.db"
+#define LOG_FILE_NAME         "archive.dat"
 #define GATEWAY_FILE_NAME     "gateways.dat"
 
 #define CATEGORY_GATEWAY      "gateway"
 
-FileMessageArchive::FileMessageArchive() : FMutex(QMutex::Recursive)
+#define LOG_ACTION_CREATE     "C"
+#define LOG_ACTION_MODIFY     "M"
+#define LOG_ACTION_REMOVE     "R"
+
+FileMessageArchive::FileMessageArchive()
 {
 	FPluginManager = NULL;
 	FArchiver = NULL;
 	FDiscovery = NULL;
-	FAccountManager = NULL;
-
-	FFileWorker = new FileWorker(this);
-	connect(FFileWorker,SIGNAL(taskFinished(FileTask *)),SLOT(onFileTaskFinished(FileTask *)));
-
-	FDatabaseWorker = new DatabaseWorker(this);
-	connect(FDatabaseWorker,SIGNAL(taskFinished(DatabaseTask *)),SLOT(onDatabaseTaskFinished(DatabaseTask *)));
-
-	FDatabaseSyncWorker = new DatabaseSynchronizer(this,FDatabaseWorker,this);
-	connect(FDatabaseSyncWorker,SIGNAL(syncFinished(const Jid &, bool)),SLOT(onDatabaseSyncFinished(const Jid &, bool)));
-
-	qRegisterMetaType<FileTask *>("FileTask *");
 }
 
 FileMessageArchive::~FileMessageArchive()
 {
-	delete FDatabaseSyncWorker;
-	delete FDatabaseWorker;
-	delete FFileWorker;
-
 	foreach(const QString &newDir, FNewDirs)
 	{
 		QDir dir(newDir);
@@ -94,17 +74,6 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
-	if (plugin)
-	{
-		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
-		if (FAccountManager)
-		{
-			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
-		}
-	}
-
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 
 	return FArchiver!=NULL;
@@ -112,32 +81,21 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 
 bool FileMessageArchive::initObjects()
 {
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILEARCHIVE_DATABASE_NOT_CREATED,tr("Failed to create database"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILEARCHIVE_DATABASE_NOT_OPENED,tr("Failed to open database"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILEARCHIVE_DATABASE_NOT_COMPATIBLE,tr("Database format is not compatible"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILEARCHIVE_DATABASE_EXEC_FAILED,tr("Failed to to execute SQL query"));
-
 	FArchiveHomePath = FPluginManager->homePath();
 
 	if (FArchiver)
+	{
 		FArchiver->registerArchiveEngine(this);
-
+	}
 	return true;
 }
 
 bool FileMessageArchive::initSettings()
 {
-	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString());
-	Options::setDefaultValue(OPV_FILEARCHIVE_FORCEDATABASESYNC,false);
+	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString(""));
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINSIZE,1*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXSIZE,20*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE,25*1024);
-	return true;
-}
-
-bool FileMessageArchive::startPlugin()
-{
-	FDatabaseWorker->start();
 	return true;
 }
 
@@ -163,16 +121,9 @@ IOptionsWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
 
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
 {
-	int caps = 0;
-	if (AStreamJid.isValid())
-	{
-		caps = ArchiveManagement|FullTextSearch;
-		if (FArchiver->isReady(AStreamJid))
-			caps |= DirectArchiving|ManualArchiving;
-		if (isDatabaseReady(AStreamJid))
-			caps |= ArchiveReplication;
-	}
-	return caps;
+	if (AStreamJid.isValid() && !FArchiver->isReady(AStreamJid))
+		return ArchiveManagement|Replication|TextSearch;
+	return DirectArchiving|ManualArchiving|ArchiveManagement|Replication|TextSearch;
 }
 
 bool FileMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability) const
@@ -183,56 +134,47 @@ bool FileMessageArchive::isCapable(const Jid &AStreamJid, quint32 ACapability) c
 int FileMessageArchive::capabilityOrder(quint32 ACapability, const Jid &AStreamJid) const
 {
 	Q_UNUSED(AStreamJid);
-	if (isCapable(AStreamJid,ACapability))
+	switch (ACapability)
 	{
-		switch (ACapability)
-		{
-		case DirectArchiving:
-			return ACO_DIRECT_FILEARCHIVE;
-		case ManualArchiving:
-			return ACO_MANUAL_FILEARCHIVE;
-		case ArchiveManagement:
-			return ACO_MANAGE_FILEARCHIVE;
-		case ArchiveReplication:
-			return ACO_REPLICATION_FILEARCHIVE;
-		case FullTextSearch:
-			return ACO_SEARCH_FILEARCHIVE;
-		default:
-			break;
-		}
+	case DirectArchiving:
+		return ACO_DIRECT_FILEARCHIVE;
+	case ManualArchiving:
+		return ACO_MANUAL_FILEARCHIVE;
+	case ArchiveManagement:
+		return ACO_MANAGE_FILEARCHIVE;
+	case Replication:
+		return ACO_REPLICATION_FILEARCHIVE;
+	case TextSearch:
+		return ACO_SEARCH_FILEARCHIVE;
+	default:
+		return -1;
 	}
-	return -1;
 }
 
 bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
 	bool written = false;
-	if (isCapable(AStreamJid,DirectArchiving))
+	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
-		QMutexLocker locker(&FMutex);
-		FileWriter *writer = findFileWriter(AStreamJid,with,AMessage.threadId());
+		FThreadLock.lockForWrite();
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
 		if (!writer)
 		{
+			FThreadLock.unlock();
 			IArchiveHeader header = makeHeader(with,AMessage);
-			QString filePath = collectionFilePath(AStreamJid,header.with,header.start);
-			writer = newFileWriter(AStreamJid,header,filePath);
+			QString fileName = collectionFilePath(AStreamJid,header.with,header.start);
+			FThreadLock.lockForWrite();
+			writer = newCollectionWriter(AStreamJid,header,fileName);
 		}
 		if (writer)
 		{
 			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
 			written = writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
-		else
-		{
-			REPORT_ERROR("Failed to write message: File writer is not created");
-		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to write message: Not capable");
+		FThreadLock.unlock();
 	}
 	return written;
 }
@@ -240,201 +182,110 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage, bool ADirectionIn)
 {
 	bool written = false;
-	if (isCapable(AStreamJid,DirectArchiving))
+	if (isCapable(AStreamJid,DirectArchiving) && FArchiver->isReady(AStreamJid))
 	{
 		Jid itemJid = ADirectionIn ? AMessage.from() : AMessage.to();
 		Jid with = AMessage.type()==Message::GroupChat ? itemJid.bare() : itemJid;
 
-		QMutexLocker locker(&FMutex);
-		FileWriter *writer = findFileWriter(AStreamJid,with,AMessage.threadId());
+		FThreadLock.lockForWrite();
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,with,AMessage.threadId());
 		if (!writer)
 		{
+			FThreadLock.unlock();
 			IArchiveHeader header = makeHeader(with,AMessage);
-			QString filePath = collectionFilePath(AStreamJid,header.with,header.start);
-			writer = newFileWriter(AStreamJid,header,filePath);
+			QString fileName = collectionFilePath(AStreamJid,header.with,header.start);
+			FThreadLock.lockForWrite();
+			writer = newCollectionWriter(AStreamJid,header,fileName);
 		}
 		if (writer)
+		{
 			written = writer->writeNote(AMessage.body());
-		else
-			REPORT_ERROR("Failed to write note: File writer is not created");
-	}
-	else
-	{
-		REPORT_ERROR("Failed to write note: Not capable");
+		}
+		FThreadLock.unlock();
 	}
 	return written;
 }
 
 QString FileMessageArchive::saveCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
 {
-	if (isCapable(AStreamJid,ManualArchiving) && ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	if (isCapable(AStreamJid,ManualArchiving) && AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
 	{
-		FileTaskSaveCollection *task = new FileTaskSaveCollection(this,AStreamJid,ACollection);
-		if (FFileWorker->startTask(task))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Save collection task started, id=%1").arg(task->taskId()));
-			return task->taskId();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to save collection with=%1: Task not started").arg(ACollection.header.with.full()));
-		}
-	}
-	else if (!isCapable(AStreamJid,ManualArchiving))
-	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to save collection with=%1: Not capable").arg(ACollection.header.with.full()));
-	}
-	else
-	{
-		REPORT_ERROR("Failed to save collection: Invalid params");
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveCollection(ACollection);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
+		return wthread->executeAction(WorkingThread::SaveCollection);
 	}
 	return QString::null;
 }
 
 QString FileMessageArchive::loadHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	if (isCapable(AStreamJid,ArchiveManagement))
+	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		FileTaskLoadHeaders *task = new FileTaskLoadHeaders(this,AStreamJid,ARequest);
-		if (FFileWorker->startTask(task))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Load headers task started, id=%1").arg(task->taskId()));
-			return task->taskId();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to load headers: Task not started");
-		}
-	}
-	else
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to load headers: Not capable");
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveRequest(ARequest);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
+		return wthread->executeAction(WorkingThread::LoadHeaders);
 	}
 	return QString::null;
 }
 
 QString FileMessageArchive::loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
 {
-	if (isCapable(AStreamJid,ArchiveManagement) && AHeader.with.isValid() && AHeader.start.isValid())
+	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		FileTaskLoadCollection *task = new FileTaskLoadCollection(this,AStreamJid,AHeader);
-		if (FFileWorker->startTask(task))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Load collection task started, id=%1").arg(task->taskId()));
-			return task->taskId();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to load collection: Task not started");
-		}
-	}
-	else if (!isCapable(AStreamJid,ArchiveManagement))
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to load collection: Not capable");
-	}
-	else
-	{
-		REPORT_ERROR("Failed to load collection: Invalid params");
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveHeader(AHeader);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
+		return wthread->executeAction(WorkingThread::LoadCollection);
 	}
 	return QString::null;
 }
 
 QString FileMessageArchive::removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest)
 {
-	if (isCapable(AStreamJid,ArchiveManagement))
+	if (AStreamJid.isValid() && isCapable(AStreamJid,ArchiveManagement))
 	{
-		FileTaskRemoveCollection *task = new FileTaskRemoveCollection(this,AStreamJid,ARequest);
-		if (FFileWorker->startTask(task))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Remove collections task started, id=%1").arg(task->taskId()));
-			return task->taskId();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to remove collections: Task not started");
-		}
-	}
-	else
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to remove collections: Not capable");
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setArchiveRequest(ARequest);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
+		return wthread->executeAction(WorkingThread::RemoveCollection);
 	}
 	return QString::null;
 }
 
-QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef)
+QString FileMessageArchive::loadModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount)
 {
-	if (isCapable(AStreamJid,ArchiveReplication) && AStart.isValid() && ACount>0)
+	if (AStreamJid.isValid() && isCapable(AStreamJid,Replication))
 	{
-		FileTaskLoadModifications *task = new FileTaskLoadModifications(this,AStreamJid,AStart,ACount,ANextRef);
-		if (FFileWorker->startTask(task))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Load modifications task started, id=%1").arg(task->taskId()));
-			return task->taskId();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,"Failed to load modifications: Task not started");
-		}
-	}
-	else if (!isCapable(AStreamJid,ArchiveReplication))
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to load modifications: Not capable");
-	}
-	else
-	{
-		REPORT_ERROR("Failed to load modifications: Invalid params");
+		WorkingThread *wthread = new WorkingThread(this,FArchiver,this);
+		wthread->setStreamJid(AStreamJid);
+		wthread->setModificationsStart(AStart);
+		wthread->setModificationsCount(ACount);
+		connect(wthread,SIGNAL(finished()),SLOT(onWorkingThreadFinished()));
+		return wthread->executeAction(WorkingThread::LoadModifications);
 	}
 	return QString::null;
 }
 
-QString FileMessageArchive::fileArchiveRootPath() const
+QString FileMessageArchive::archiveHomePath() const
 {
-	QMutexLocker locker(&FMutex);
-	if (FArchiveRootPath.isEmpty())
-	{
-		QDir dir(FArchiveHomePath);
-		dir.mkdir(ARCHIVE_DIR_NAME);
-		if (!dir.cd(ARCHIVE_DIR_NAME))
-			FArchiveRootPath = FArchiver->archiveDirPath();
-		else
-			FArchiveRootPath = dir.absolutePath();
-	}
-	return FArchiveRootPath;
-}
-
-QString FileMessageArchive::fileArchivePath(const Jid &AStreamJid) const
-{
-	if (AStreamJid.isValid())
-	{
-		QDir dir(fileArchiveRootPath());
-		QString streamDir = Jid::encode(AStreamJid.pBare());
-		if (dir.mkdir(streamDir))
-		{
-			QMutexLocker locker(&FMutex);
-			FNewDirs.prepend(dir.absoluteFilePath(streamDir));
-		}
-		return dir.cd(streamDir) ? dir.absolutePath() : QString::null;
-	}
-	return QString::null;
-}
-
-QString FileMessageArchive::contactGateType(const Jid &AContactJid) const
-{
-	QMutexLocker locker(&FMutex);
-	return FGatewayTypes.value(AContactJid.pDomain());
+	return FArchiveHomePath;
 }
 
 QString FileMessageArchive::collectionDirName(const Jid &AWith) const
 {
-	if (AWith.isValid())
-	{
-		Jid gateWith = gatewayJid(AWith);
-		QString dirName = Jid::encode(gateWith.pBare());
-		if (!gateWith.resource().isEmpty())
-			dirName += "/" + Jid::encode(gateWith.pResource());
-		return dirName;
-	}
-	return QString::null;
+	Jid jid = !AWith.node().isEmpty() ? gatewayJid(AWith) : AWith;
+
+	QString dirName = Jid::encode(jid.pBare());
+	if (!jid.resource().isEmpty())
+		dirName += "/" + Jid::encode(jid.pResource());
+
+	return dirName;
 }
 
 QString FileMessageArchive::collectionFileName(const QDateTime &AStart) const
@@ -450,23 +301,54 @@ QString FileMessageArchive::collectionFileName(const QDateTime &AStart) const
 
 QString FileMessageArchive::collectionDirPath(const Jid &AStreamJid, const Jid &AWith) const
 {
-	if (AStreamJid.isValid() && AWith.isValid())
+	bool noError = true;
+
+	QDir dir(archiveHomePath());
+	if (!dir.exists(ARCHIVE_DIR_NAME))
 	{
-		QDir dir(fileArchivePath(AStreamJid));
-		QString withDir = collectionDirName(AWith);
-		if (!dir.exists(withDir) && dir.mkpath(withDir))
+		FThreadLock.lockForWrite();
+		noError &= dir.mkdir(ARCHIVE_DIR_NAME);
+		FThreadLock.unlock();
+	}
+	noError &= dir.cd(ARCHIVE_DIR_NAME);
+
+	if (noError && AStreamJid.isValid())
+	{
+		QString streamDir = collectionDirName(AStreamJid.bare());
+		if (!dir.exists(streamDir))
 		{
-			QMutexLocker locker(&FMutex);
-			QString path = dir.absolutePath();
-			foreach(const QString &subDir, withDir.split("/"))
+			FThreadLock.lockForWrite();
+			noError &= dir.mkdir(streamDir);
+			FNewDirs.prepend(dir.absoluteFilePath(streamDir));
+			FThreadLock.unlock();
+		}
+		noError &= dir.cd(streamDir);
+
+		if (noError && AWith.isValid())
+		{
+			QString withDir = collectionDirName(AWith);
+			if (!dir.exists(withDir))
 			{
-				path += '/'+subDir;
-				FNewDirs.prepend(path);
+				FThreadLock.lockForWrite();
+				foreach(const QString &subDir, withDir.split("/"))
+				{
+					if (!dir.exists(subDir))
+					{
+						noError &= dir.mkdir(subDir);
+						FNewDirs.prepend(dir.absoluteFilePath(subDir));
+					}
+					noError &= dir.cd(subDir);
+				}
+				FThreadLock.unlock();
+			}
+			else
+			{
+				noError &= dir.cd(withDir);
 			}
 		}
-		return dir.cd(withDir) ? dir.absolutePath() : QString::null;
 	}
-	return QString::null;
+
+	return noError ? dir.path() : QString::null;
 }
 
 QString FileMessageArchive::collectionFilePath(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart) const
@@ -481,115 +363,29 @@ QString FileMessageArchive::collectionFilePath(const Jid &AStreamJid, const Jid 
 	return QString::null;
 }
 
-IArchiveHeader FileMessageArchive::loadFileHeader(const QString &AFilePath) const
-{
-	IArchiveHeader header;
-	if (!AFilePath.isEmpty())
-	{
-		QMutexLocker locker(&FMutex);
-		FileWriter *writer = FWritingFiles.value(AFilePath,NULL);
-		if (writer == NULL)
-		{
-			QFile file(AFilePath);
-			if (file.open(QFile::ReadOnly))
-			{
-				QXmlStreamReader reader(&file);
-				while (!reader.atEnd())
-				{
-					reader.readNext();
-					if (reader.isStartElement() && reader.qualifiedName()=="chat")
-					{
-						header.engineId = engineId();
-						header.with = reader.attributes().value("with").toString();
-						header.start = DateTime(reader.attributes().value("start").toString()).toLocal();
-						header.subject = reader.attributes().value("subject").toString();
-						header.threadId = reader.attributes().value("thread").toString();
-						header.version = reader.attributes().value("version").toString().toInt();
-						break;
-					}
-					else if (!reader.isStartDocument())
-					{
-						break;
-					}
-				}
-				file.close();
-			}
-			else if (file.exists())
-			{
-				LOG_ERROR(QString("Failed to load file header: %1").arg(file.errorString()));
-			}
-		}
-		else
-		{
-			header = writer->header();
-		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to load file header: Invalid params");
-	}
-	return header;
-}
-
-IArchiveCollection FileMessageArchive::loadFileCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) const
-{
-	IArchiveCollection collection;
-	if (AStreamJid.isValid() && AHeader.with.isValid() && AHeader.start.isValid())
-	{
-		QMutexLocker locker(&FMutex);
-		QString filePath = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
-		FileWriter *writer = FWritingFiles.value(filePath,NULL);
-		if (writer==NULL || writer->recordsCount()>0)
-		{
-			QFile file(filePath);
-			if (file.open(QFile::ReadOnly))
-			{
-				QDomDocument doc;
-				doc.setContent(file.readAll(),true);
-				FArchiver->elementToCollection(doc.documentElement(),collection);
-				collection.header.engineId = engineId();
-				file.close();
-			}
-			else if (file.exists())
-			{
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to load file collection with=%1: %2").arg(AHeader.with.full(),file.errorString()));
-			}
-		}
-		else
-		{
-			collection.header = writer->header();
-		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to load file collection: Invalid params");
-	}
-	return collection;
-}
-
-QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
+QStringList FileMessageArchive::findCollectionFiles(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
 {
 	static const QString CollectionExt = COLLECTION_EXT;
 
-	QList<IArchiveHeader> headers;
+	QStringList files;
 	if (AStreamJid.isValid())
 	{
+		QMultiMap<QString,QString> filesMap;
+		QString startName = collectionFileName(ARequest.start);
+		QString endName = collectionFileName(ARequest.end);
+		QDirIterator::IteratorFlags flags = ARequest.with.isValid() && ARequest.exactmatch ? QDirIterator::NoIteratorFlags : QDirIterator::Subdirectories;
+		
 		QList<QString> dirPaths;
-		QString streamPath = fileArchivePath(AStreamJid);
-		if (!ARequest.with.isValid())
-		{
-			dirPaths.append(streamPath);
-		}
-		else if (ARequest.with.node().isEmpty() && !ARequest.exactmatch)
+		if (ARequest.with.node().isEmpty() && !ARequest.exactmatch)
 		{
 			QString gateDomain = gatewayJid(ARequest.with).pDomain();
 			QString encResource = Jid::encode(ARequest.with.pResource());
+			QString streamDirPath = collectionDirPath(AStreamJid,Jid::null);
 			
-			// Check if gateway was saved as not gateway
 			if (ARequest.with.pDomain() != gateDomain)
 				dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
 
-			QDirIterator dirIt(streamPath,QDir::Dirs|QDir::NoDotAndDotDot);
+			QDirIterator dirIt(streamDirPath,QDir::Dirs|QDir::NoDotAndDotDot);
 			while (dirIt.hasNext())
 			{
 				QString dirPath = dirIt.next();
@@ -607,10 +403,6 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 			dirPaths.append(collectionDirPath(AStreamJid,ARequest.with));
 		}
 
-		QMultiMap<QString,IArchiveHeader> filesMap;
-		QString startName = collectionFileName(ARequest.start);
-		QString endName = collectionFileName(ARequest.end);
-		QDirIterator::IteratorFlags flags = ARequest.with.isValid() && ARequest.exactmatch ? QDirIterator::NoIteratorFlags : QDirIterator::Subdirectories;
 		for (int i=0; i<dirPaths.count(); i++)
 		{
 			QDirIterator dirIt(dirPaths.at(i),QDir::Files,flags);
@@ -618,15 +410,14 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 			{
 				QString fpath = dirIt.next();
 				QString fname = dirIt.fileName();
-				if (!ARequest.openOnly || FWritingFiles.contains(fpath))
+				if (!ARequest.opened || FWritingFiles.contains(fpath))
 				{
 					if (fname.endsWith(CollectionExt) && (startName.isEmpty() || startName<=fname) && (endName.isEmpty() || endName>=fname))
 					{
-						IArchiveHeader header;
-						if (checkRequestFile(fpath,ARequest,&header))
+						if (checkCollectionFile(fpath,ARequest))
 						{
-							filesMap.insertMulti(fname,header);
-							if ((quint32)filesMap.count() > ARequest.maxItems)
+							filesMap.insertMulti(fname,fpath);
+							if (ARequest.maxItems>0 && filesMap.count()>ARequest.maxItems)
 								filesMap.erase(ARequest.order==Qt::AscendingOrder ? --filesMap.end() : filesMap.begin());
 						}
 					}
@@ -634,343 +425,257 @@ QList<IArchiveHeader> FileMessageArchive::loadFileHeaders(const Jid &AStreamJid,
 			}
 		}
 
-		QMapIterator<QString,IArchiveHeader> fileIt(filesMap);
+		QMapIterator<QString,QString> fileIt(filesMap);
 		if (ARequest.order == Qt::DescendingOrder)
 			fileIt.toBack();
 		while (ARequest.order==Qt::AscendingOrder ? fileIt.hasNext() : fileIt.hasPrevious())
 		{
-			const IArchiveHeader &header = ARequest.order==Qt::AscendingOrder ? fileIt.next().value() : fileIt.previous().value();
-			headers.append(header);
+			QString fpath = ARequest.order==Qt::AscendingOrder ? fileIt.next().value() : fileIt.previous().value();
+			files.append(fpath);
 		}
 	}
-	else
-	{
-		REPORT_ERROR("Failed to load file headers: Invalid params");
-	}
-	
-	return headers;
+	return files;
 }
 
-IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, const IArchiveCollection &ACollection)
+IArchiveHeader FileMessageArchive::loadHeaderFromFile(const QString &AFileName) const
 {
-	if (AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	FThreadLock.lockForRead();
+	IArchiveHeader header;
+	CollectionWriter *writer = FWritingFiles.value(AFileName,NULL);
+	if (writer == NULL)
 	{
-		QMutexLocker locker(&FMutex);
-		IArchiveCollection collection = loadFileCollection(AStreamJid,ACollection.header);
-
-		// if collection already exist append new messages and notes
-		if (collection.header == ACollection.header)
+		QFile file(AFileName);
+		if (file.open(QFile::ReadOnly))
 		{
-			quint32 newVersion = collection.header.version+1;
-
-			IArchiveCollectionBody newBody = collection.body;
-			if (!ACollection.body.messages.isEmpty())
+			QXmlStreamReader reader(&file);
+			while (!reader.atEnd())
 			{
-				QMultiMap<int, QString> curMessages;
-				foreach(const Message &message, collection.body.messages)
-					curMessages.insertMulti(collection.header.start.secsTo(message.dateTime()),message.body());
-					
-				foreach(const Message &message, ACollection.body.messages)
-					if (!curMessages.contains(collection.header.start.secsTo(message.dateTime()),message.body()))
-						newBody.messages.append(message);
-
-				qSort(newBody.messages);
-			}
-			if (!ACollection.body.notes.isEmpty())
-			{
-				for (QMultiMap<QDateTime, QString>::const_iterator it=ACollection.body.notes.constBegin(); it!=ACollection.body.notes.constEnd(); ++it)
-					if (!collection.body.notes.contains(it.key(),it.value()))
-						newBody.notes.insertMulti(it.key(),it.value());
-			}
-			
-			collection = ACollection;
-			collection.body = newBody;
-			collection.header.version = newVersion;
-		}
-		else
-		{
-			collection = ACollection;
-			collection.header.version = 0;
-		}
-
-		QFile file(collectionFilePath(AStreamJid,ACollection.header.with,ACollection.header.start));
-		if (file.open(QFile::WriteOnly|QFile::Truncate))
-		{
-			QDomDocument doc;
-			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
-			FArchiver->collectionToElement(collection,chatElem,ARCHIVE_SAVE_MESSAGE);
-			file.write(doc.toByteArray(2));
-			file.close();
-
-			saveModification(AStreamJid,collection.header,IArchiveModification::Changed);
-			return collection.header;
-		}
-		else
-		{
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to save file collection with=%1: %2").arg(ACollection.header.with.full(),file.errorString()));
-		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to save file collection: Invalid params");
-	}
-	return IArchiveHeader();
-}
-
-bool FileMessageArchive::removeFileCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader)
-{
-	if (AStreamJid.isValid() && AHeader.with.isValid() && AHeader.start.isValid())
-	{
-		QMutexLocker locker(&FMutex);
-		QString filePath = collectionFilePath(AStreamJid,AHeader.with,AHeader.start);
-		if (QFile::exists(filePath))
-		{
-			removeFileWriter(findFileWriter(AStreamJid,AHeader));
-			if (QFile::remove(filePath))
-			{
-				saveModification(AStreamJid,AHeader,IArchiveModification::Removed);
-				return true;
-			}
-			else
-			{
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to remove file collection with=%1: File not removed").arg(AHeader.with.full()));
-			}
-		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to remove file collection: Invalid params");
-	}
-	return false;
-}
-
-bool FileMessageArchive::isDatabaseReady(const Jid &AStreamJid) const
-{
-	QDateTime lastSync = DateTime(databaseProperty(AStreamJid,FADP_LAST_SYNC_TIME)).toLocal();
-	return lastSync.isValid();
-}
-
-QString FileMessageArchive::databaseArchiveFile(const Jid &AStreamJid) const
-{
-	QString archiveDir = AStreamJid.isValid() ? FArchiver->archiveDirPath(AStreamJid) : QString::null;
-	if (!archiveDir.isEmpty())
-		return archiveDir +"/"DATABASE_FILE_NAME;
-	return QString::null;
-}
-
-QString FileMessageArchive::databaseProperty(const Jid &AStreamJid, const QString &AProperty) const
-{
-	QMutexLocker locker(&FMutex);
-	return FDatabaseProperties.value(AStreamJid.bare()).value(AProperty);
-}
-
-bool FileMessageArchive::setDatabaseProperty(const Jid &AStreamJid, const QString &AProperty, const QString &AValue)
-{
-	QMutexLocker locker(&FMutex);
-
-	bool changed = false;
-	Jid bareStreamJid = AStreamJid.bare();
-	if (FDatabaseProperties.contains(bareStreamJid))
-	{
-		QMap<QString,QString> &properties = FDatabaseProperties[bareStreamJid];
-		if (properties.value(AProperty) != AValue)
-		{
-			DatabaseTaskSetProperty *task = new DatabaseTaskSetProperty(bareStreamJid,AProperty,AValue);
-			if (FDatabaseWorker->execTask(task) && !task->isFailed())
-			{
-				LOG_STRM_DEBUG(AStreamJid,QString("Database property changed, property=%1, value=%2").arg(AProperty,AValue));
-				changed = true;
-				properties[AProperty] = AValue;
-				emit databasePropertyChanged(bareStreamJid,AProperty); // TODO: emit signal from main thread
-			}
-			else if (task->isFailed())
-			{
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to change database property=%1: %2").arg(AProperty,task->error().condition()));
-			}
-			else
-			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to change database property=%1: Task not started").arg(AProperty));
-			}
-			delete task;
-		}
-		else
-		{
-			changed = true;
-		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to set database property: Database not ready");
-	}
-	return changed;
-}
-
-QList<IArchiveHeader> FileMessageArchive::loadDatabaseHeaders(const Jid &AStreamJid, const IArchiveRequest &ARequest) const
-{
-	QList<IArchiveHeader> headers;
-	if (isDatabaseReady(AStreamJid))
-	{
-		DatabaseTaskLoadHeaders *task = new DatabaseTaskLoadHeaders(AStreamJid,ARequest,contactGateType(ARequest.with));
-		if (FDatabaseWorker->execTask(task) && !task->isFailed())
-		{
-			foreach(const IArchiveHeader &header, task->headers())
-			{
-				if (ARequest.text.isEmpty())
-					headers.append(header);
-				else if (checkRequestFile(collectionFilePath(AStreamJid,header.with,header.start),ARequest))
-					headers.append(header);
-			}
-
-			QMutexLocker locker(&FMutex);
-			int dbHeadersCount = headers.count();
-			foreach(FileWriter *writer, FFileWriters.value(AStreamJid).values())
-			{
-				if (writer->messagesCount()>0 && checkRequestHeader(writer->header(),ARequest))
+				reader.readNext();
+				if (reader.isStartElement() && reader.qualifiedName()=="chat")
 				{
-					if (ARequest.text.isEmpty())
-						headers.append(writer->header());
-					else if (checkRequestFile(writer->fileName(),ARequest))
-						headers.append(writer->header());
+					header.engineId = engineId();
+					header.with = reader.attributes().value("with").toString();
+					header.start = DateTime(reader.attributes().value("start").toString()).toLocal();
+					header.subject = reader.attributes().value("subject").toString();
+					header.threadId = reader.attributes().value("thread").toString();
+					header.version = reader.attributes().value("version").toString().toInt();
+					break;
+				}
+				else if (!reader.isStartDocument())
+				{
+					break;
 				}
 			}
-
-			if (headers.count() > dbHeadersCount)
-			{
-				if (ARequest.order == Qt::AscendingOrder)
-					qSort(headers.begin(),headers.end(),qLess<IArchiveHeader>());
-				else
-					qSort(headers.begin(),headers.end(),qGreater<IArchiveHeader>());
-
-				if ((quint32)headers.count() > ARequest.maxItems)
-					headers = headers.mid(0,ARequest.maxItems);
-			}
+			file.close();
 		}
-		else if (task->isFailed())
-		{
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to load database headers: %1").arg(task->error().condition()));
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load database headers: Task not started"));
-		}
-		delete task;
 	}
 	else
 	{
-		REPORT_ERROR("Failed to load database headers: Database not ready");
+		header = writer->header();
 	}
-	return headers;
+	FThreadLock.unlock();
+	return header;
 }
 
-IArchiveModifications FileMessageArchive::loadDatabaseModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount, const QString &ANextRef) const
+IArchiveCollection FileMessageArchive::loadCollectionFromFile(const QString &AFileName) const
 {
-	IArchiveModifications modifs;
-	if (isDatabaseReady(AStreamJid) && AStart.isValid() && ACount>0)
+	FThreadLock.lockForRead();
+	IArchiveCollection collection;
+	CollectionWriter *writer = FWritingFiles.value(AFileName,NULL);
+	if (writer==NULL || writer->recordsCount()>0)
 	{
-		DatabaseTaskLoadModifications *task = new DatabaseTaskLoadModifications(AStreamJid,AStart,ACount,ANextRef);
-		if (FDatabaseWorker->execTask(task) && !task->isFailed())
-			modifs = task->modifications();
-		else if (task->isFailed())
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to load database modifications: %1").arg(task->error().condition()));
-		else
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to load database modifications: Task not started"));
-		delete task;
-	}
-	else if (!isDatabaseReady(AStreamJid))
-	{
-		REPORT_ERROR("Failed to load database modification: Database not ready");
+		QFile file(AFileName);
+		if (file.open(QFile::ReadOnly))
+		{
+			QDomDocument doc;
+			doc.setContent(file.readAll(),true);
+			FArchiver->elementToCollection(doc.documentElement(),collection);
+			collection.header.engineId = engineId();
+			file.close();
+		}
 	}
 	else
 	{
-		REPORT_ERROR("Failed to load database modification: Invalid params");
+		collection.header = writer->header();
+	}
+	FThreadLock.unlock();
+	return collection;
+}
+
+IArchiveModifications FileMessageArchive::loadFileModifications(const Jid &AStreamJid, const QDateTime &AStart, int ACount) const
+{
+	IArchiveModifications modifs;
+	modifs.startTime = AStart.toUTC();
+
+	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
+	if (!dirPath.isEmpty() && AStreamJid.isValid() && AStart.isValid())
+	{
+		FThreadLock.lockForRead();
+		QFile log(dirPath+"/"LOG_FILE_NAME);
+		if (log.open(QFile::ReadOnly|QIODevice::Text))
+		{
+			qint64 sbound = 0;
+			qint64 ebound = log.size();
+			while (ebound - sbound > 1024)
+			{
+				log.seek((ebound + sbound)/2);
+				log.readLine();
+				DateTime logTime = QString::fromUtf8(log.readLine()).split(" ").value(0);
+				if (!logTime.isValid())
+					ebound = sbound;
+				else if (logTime.toLocal() > AStart)
+					ebound = log.pos();
+				else
+					sbound = log.pos();
+			}
+			log.seek(sbound);
+
+			while (!log.atEnd() && modifs.items.count()<ACount)
+			{
+				QString logLine = QString::fromUtf8(log.readLine());
+				QStringList logFields = logLine.split(" ",QString::KeepEmptyParts);
+				if (logFields.count() >= 6)
+				{
+					DateTime logTime = logFields.at(0);
+					if (logTime.toLocal() > AStart)
+					{
+						IArchiveModification modif;
+						modif.header.engineId = engineId();
+						modif.header.with = logFields.at(2);
+						modif.header.start = DateTime(logFields.at(3)).toLocal();
+						modif.header.version = logFields.at(4).toInt();
+						modifs.endTime = logTime;
+						if (logFields.at(1) == LOG_ACTION_CREATE)
+						{
+							modif.action = IArchiveModification::Created;
+							modifs.items.append(modif);
+						}
+						else if (logFields.at(1) == LOG_ACTION_MODIFY)
+						{
+							modif.action = IArchiveModification::Modified;
+							modifs.items.append(modif);
+						}
+						else if (logFields.at(1) == LOG_ACTION_REMOVE)
+						{
+							modif.action = IArchiveModification::Removed;
+							modifs.items.append(modif);
+						}
+					}
+				}
+			}
+		}
+		FThreadLock.unlock();
 	}
 	return modifs;
 }
 
+bool FileMessageArchive::saveCollectionToFile(const Jid &AStreamJid, const IArchiveCollection &ACollection, const QString &ASaveMode, bool AAppend)
+{
+	if (AStreamJid.isValid() && ACollection.header.with.isValid() && ACollection.header.start.isValid())
+	{
+		QString fileName = collectionFilePath(AStreamJid,ACollection.header.with,ACollection.header.start);
+		IArchiveCollection collection = loadCollectionFromFile(fileName);
+		
+		QString logAction = ACollection.header==collection.header ? LOG_ACTION_MODIFY : LOG_ACTION_CREATE;
+		collection.header = ACollection.header;
+
+		if (AAppend)
+		{
+			if (!ACollection.body.messages.isEmpty())
+			{
+				QMultiMap<QDateTime, QString> curMessages;
+				foreach(const Message &message, collection.body.messages)
+					curMessages.insertMulti(message.dateTime(),message.body());
+					
+				foreach(const Message &message, ACollection.body.messages)
+					if (!curMessages.contains(message.dateTime(),message.body()))
+						collection.body.messages.append(message);
+
+				qSort(collection.body.messages);
+			}
+			if (!ACollection.body.notes.isEmpty())
+			{
+				for (QMultiMap<QDateTime, QString>::const_iterator it= ACollection.body.notes.constBegin(); it!=ACollection.body.notes.constEnd(); ++it)
+					if (!collection.body.notes.contains(it.key(),it.value()))
+						collection.body.notes.insertMulti(it.key(),it.value());
+			}
+		}
+		else
+		{
+			collection.body.messages = ACollection.body.messages;
+			collection.body.notes = ACollection.body.notes;
+		}
+
+		FThreadLock.lockForWrite();
+		QFile file(fileName);
+		if (file.open(QFile::WriteOnly|QFile::Truncate))
+		{
+			QDomDocument doc;
+			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
+			FArchiver->collectionToElement(collection,chatElem,ASaveMode);
+			file.write(doc.toByteArray(2));
+			file.close();
+			FThreadLock.unlock();
+			saveFileModification(AStreamJid,collection.header,logAction);
+			emit fileCollectionSaved(AStreamJid,collection.header); // TODO: emit signal from main thread
+			return true;
+		}
+		FThreadLock.unlock();
+	}
+	return false;
+}
+
+bool FileMessageArchive::removeCollectionFile(const Jid &AStreamJid, const Jid &AWith, const QDateTime &AStart)
+{
+	QString fileName = collectionFilePath(AStreamJid,AWith,AStart);
+	if (QFile::exists(fileName))
+	{
+		IArchiveHeader header = loadHeaderFromFile(fileName);
+		FThreadLock.lockForWrite();
+		CollectionWriter *writer = findCollectionWriter(AStreamJid,header);
+		if (writer)
+		{
+			FThreadLock.unlock();
+			removeCollectionWriter(writer);
+			FThreadLock.lockForWrite();
+		}
+		if (QFile::remove(fileName))
+		{
+			FThreadLock.unlock();
+			saveFileModification(AStreamJid,header,LOG_ACTION_REMOVE);
+			emit fileCollectionRemoved(AStreamJid,header);  // TODO: emit signal from main thread
+			return true;
+		}
+		FThreadLock.unlock();
+	}
+	return false;
+}
+
 void FileMessageArchive::loadGatewayTypes()
 {
-	QMutexLocker locker(&FMutex);
-
-	QDir dir(fileArchiveRootPath());
-	QFile file(dir.absoluteFilePath(GATEWAY_FILE_NAME));
-	if (file.open(QFile::ReadOnly|QFile::Text))
+	FGatewayTypes.clear();
+	QString dirPath = collectionDirPath(Jid::null,Jid::null);
+	QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
+	if (!dirPath.isEmpty() && gateways.open(QFile::ReadOnly|QFile::Text))
 	{
-		FGatewayTypes.clear();
-		while (!file.atEnd())
+		while (!gateways.atEnd())
 		{
-			QStringList gateway = QString::fromUtf8(file.readLine()).split(" ");
+			QStringList gateway = QString::fromUtf8(gateways.readLine()).split(" ");
 			if (!gateway.value(0).isEmpty() && !gateway.value(1).isEmpty())
 				FGatewayTypes.insert(gateway.value(0),gateway.value(1));
 		}
-		file.close();
 	}
-	else if (file.exists())
-	{
-		REPORT_ERROR("Failed to load gateway types: File not opened");
-	}
+	gateways.close();
 }
 
 Jid FileMessageArchive::gatewayJid(const Jid &AJid) const
 {
-	if (!AJid.node().isEmpty())
-	{
-		QString gateType = contactGateType(AJid);
-		if (!gateType.isEmpty())
-		{
-			Jid jid = AJid;
-			jid.setDomain(QString("%1.gateway").arg(gateType));
-			return jid;
-		}
-	}
-	return AJid;
-}
-
-void FileMessageArchive::saveGatewayType(const QString &ADomain, const QString &AType)
-{
-	QMutexLocker locker(&FMutex);
-
-	QDir dir(fileArchiveRootPath());
-	QFile gateways(dir.absoluteFilePath(GATEWAY_FILE_NAME));
-	if (gateways.open(QFile::WriteOnly|QFile::Append|QFile::Text))
-	{
-		QStringList gateway;
-		gateway << ADomain;
-		gateway << AType;
-		gateway << "\n";
-		gateways.write(gateway.join(" ").toUtf8());
-		gateways.close();
-		FGatewayTypes.insert(ADomain,AType);
-	}
-	else
-	{
-		REPORT_ERROR("Failed to save gateway type: File not opened");
-	}
-}
-
-bool FileMessageArchive::startDatabaseSync(const Jid &AStreamJid, bool AForce)
-{
-	if (FDatabaseProperties.contains(AStreamJid.bare()))
-	{
-		if (AForce)
-		{
-			LOG_STRM_INFO(AStreamJid,"Database synchronization started");
-			FDatabaseSyncWorker->startSync(AStreamJid);
-			return true;
-		}
-		if (!isDatabaseReady(AStreamJid))
-		{
-			LOG_STRM_INFO(AStreamJid,"Database synchronization started");
-			FDatabaseSyncWorker->startSync(AStreamJid);
-			return true;
-		}
-		if (Options::node(OPV_FILEARCHIVE_FORCEDATABASESYNC).value().toBool())
-		{
-			LOG_STRM_INFO(AStreamJid,"Database synchronization started");
-			FDatabaseSyncWorker->startSync(AStreamJid);
-			return true;
-		}
-	}
-	return false;
+	Jid jid = AJid;
+	FThreadLock.lockForRead();
+	if (FGatewayTypes.contains(jid.domain()))
+		jid.setDomain(QString("%1.gateway").arg(FGatewayTypes.value(jid.domain())));
+	FThreadLock.unlock();
+	return jid;
 }
 
 IArchiveHeader FileMessageArchive::makeHeader(const Jid &AItemJid, const Message &AMessage) const
@@ -988,43 +693,7 @@ IArchiveHeader FileMessageArchive::makeHeader(const Jid &AItemJid, const Message
 	return header;
 }
 
-bool FileMessageArchive::checkRequestHeader(const IArchiveHeader &AHeader, const IArchiveRequest &ARequest) const
-{
-	if (ARequest.start.isValid() && ARequest.start>AHeader.start)
-		return false;
-
-	if (ARequest.end.isValid() && ARequest.end<AHeader.start)
-		return false;
-
-	if (!ARequest.threadId.isEmpty() && ARequest.threadId!=AHeader.threadId)
-		return false;
-
-	if (ARequest.with.isValid() && ARequest.with!=AHeader.with)
-	{
-		if (!ARequest.exactmatch)
-		{
-			if (!ARequest.with.pNode().isEmpty() && ARequest.with.pNode()!=AHeader.with.pNode())
-				return false;
-			if (!ARequest.with.pResource().isEmpty() && ARequest.with.pResource()!=AHeader.with.pResource())
-				return false;
-			
-			QString headerGate = contactGateType(AHeader.with);
-			QString requestGate = contactGateType(ARequest.with);
-			if (requestGate != headerGate)
-				return false;
-			if (requestGate.isEmpty() && ARequest.with.pDomain()!=AHeader.with.pDomain())
-				return false;
-		}
-		else if (gatewayJid(ARequest.with) != gatewayJid(AHeader.with))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-bool FileMessageArchive::checkRequestFile(const QString &AFileName, const IArchiveRequest &ARequest, IArchiveHeader *AHeader) const
+bool FileMessageArchive::checkCollectionFile(const QString &AFileName, const IArchiveRequest &ARequest) const
 {
 	QFile file(AFileName);
 	if (file.open(QFile::ReadOnly))
@@ -1032,14 +701,14 @@ bool FileMessageArchive::checkRequestFile(const QString &AFileName, const IArchi
 		QXmlStreamReader reader(&file);
 		reader.setNamespaceProcessing(false);
 
-		Qt::CheckState validState = Qt::PartiallyChecked;
+		Qt::CheckState validCheck = Qt::PartiallyChecked;
 		Qt::CheckState textState = ARequest.text.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
 		Qt::CheckState threadState = ARequest.threadId.isEmpty() ? Qt::Checked : Qt::PartiallyChecked;
 
 		QStringList elemStack;
 		bool checkElemText = false;
-		while (!reader.atEnd() && validState!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked && 
-			(validState==Qt::PartiallyChecked || textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
+		while (!reader.atEnd() && validCheck!=Qt::Unchecked && textState!=Qt::Unchecked && threadState!=Qt::Unchecked && 
+			(validCheck==Qt::PartiallyChecked || textState==Qt::PartiallyChecked || threadState==Qt::PartiallyChecked))
 		{
 			reader.readNext();
 			if (reader.isStartElement())
@@ -1048,51 +717,30 @@ bool FileMessageArchive::checkRequestFile(const QString &AFileName, const IArchi
 				QString elemPath = elemStack.join("/");
 				if (elemPath == "chat")
 				{
-					if (AHeader)
-					{
-						AHeader->engineId = engineId();
-						AHeader->with = reader.attributes().value("with").toString();
-						AHeader->start = DateTime(reader.attributes().value("start").toString()).toLocal();
-						AHeader->subject = reader.attributes().value("subject").toString();
-						AHeader->threadId = reader.attributes().value("thread").toString();
-						AHeader->version = reader.attributes().value("version").toString().toInt();
-
-						validState = AHeader->with.isValid() && AHeader->start.isValid() ? Qt::Checked : Qt::Unchecked;
-
-						if (threadState == Qt::PartiallyChecked)
-							threadState = AHeader->threadId==ARequest.threadId ? Qt::Checked : Qt::Unchecked;
-
-						if (textState==Qt::PartiallyChecked && AHeader->subject.contains(ARequest.text,Qt::CaseInsensitive))
-							textState = Qt::Checked;
-					}
-					else if (reader.attributes().value("with").isEmpty())
-					{
-						validState = Qt::Unchecked;
-					}
+					if (reader.attributes().value("with").isEmpty())
+						validCheck = Qt::Unchecked;
 					else if (reader.attributes().value("start").isEmpty())
-					{
-						validState = Qt::Unchecked;
-					}
+						validCheck = Qt::Unchecked;
 					else
+						validCheck = Qt::Checked;
+
+					if (reader.attributes().value("thread").compare(ARequest.threadId)==0)
+						threadState = Qt::Checked;
+					else if (threadState == Qt::PartiallyChecked)
+						threadState = Qt::Unchecked;
+
+					if (textState != Qt::Checked)
 					{
-						validState = Qt::Checked;
-
-						if (threadState == Qt::PartiallyChecked)
-							threadState = reader.attributes().value("thread").compare(ARequest.threadId)==0 ? Qt::Checked : Qt::Unchecked;
-
-						if (textState == Qt::PartiallyChecked)
-						{
 #if QT_VERSION >= QT_VERSION_CHECK(4,8,0)
-							if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
-								textState = Qt::Checked;
+						if (reader.attributes().value("subject").contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
 #else
-							if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
-								textState = Qt::Checked;
+						if (reader.attributes().value("subject").toString().contains(ARequest.text,Qt::CaseInsensitive))
+							textState = Qt::Checked;
 #endif
-						}
 					}
 				}
-				else if (textState == Qt::PartiallyChecked)
+				else if (textState != Qt::Checked)
 				{
 					checkElemText = elemPath=="chat/to/body" || elemPath=="chat/from/body" || elemPath=="chat/note";
 				}
@@ -1117,88 +765,66 @@ bool FileMessageArchive::checkRequestFile(const QString &AFileName, const IArchi
 			}
 		}
 		file.close();
-		return validState==Qt::Checked && textState==Qt::Checked && threadState==Qt::Checked;
+		return validCheck==Qt::Checked && textState==Qt::Checked && threadState==Qt::Checked;
 	}
 	return false;
 }
 
-bool FileMessageArchive::saveModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, IArchiveModification::ModifyAction AAction)
+bool FileMessageArchive::saveFileModification(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AAction) const
 {
-	bool saved = false;
-	if (FDatabaseProperties.contains(AStreamJid.bare()) && AHeader.with.isValid() && AHeader.start.isValid())
+	QString dirPath = collectionDirPath(AStreamJid,Jid::null);
+	if (!dirPath.isEmpty() && AStreamJid.isValid() && AHeader.with.isValid() && AHeader.start.isValid())
 	{
-		if (AAction == IArchiveModification::Removed)
+		FThreadLock.lockForWrite();
+		QFile log(dirPath+"/"LOG_FILE_NAME);
+		if (log.open(QFile::WriteOnly|QFile::Append|QIODevice::Text))
 		{
-			DatabaseTaskRemoveHeaders *task = new DatabaseTaskRemoveHeaders(AStreamJid,QList<IArchiveHeader>() << AHeader);
-			if (FDatabaseWorker->execTask(task) && !task->isFailed())
-				saved = true;
-			else if (task->isFailed())
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to save modification: %1").arg(task->error().condition()));
-			else
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to save modification: Task not started"));
-			delete task;
+			QStringList logFields;
+			logFields << DateTime(QDateTime::currentDateTime()).toX85UTC();
+			logFields << AAction;
+			logFields << AHeader.with.full();
+			logFields << DateTime(AHeader.start).toX85UTC();
+			logFields << QString::number(AHeader.version);
+			logFields << "\n";
+			log.write(logFields.join(" ").toUtf8());
+			log.close();
+			FThreadLock.unlock();
+			return true;
 		}
-		else
-		{
-			DatabaseTaskUpdateHeaders *task = new DatabaseTaskUpdateHeaders(AStreamJid,QList<IArchiveHeader>() << AHeader,true,contactGateType(AHeader.with));
-			if (FDatabaseWorker->execTask(task) && !task->isFailed())
-				saved = true;
-			else if (task->isFailed())
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to save modification: %1").arg(task->error().condition()));
-			else
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to save modification: Task not started"));
-			delete task;
-		}
+		FThreadLock.unlock();
 	}
-	else if (!FDatabaseProperties.contains(AStreamJid.bare()))
-	{
-		REPORT_ERROR("Failed to save modification: Database not ready");
-	}
-	else
-	{
-		REPORT_ERROR("Failed to save modification: Invalid params");
-	}
-
-	if (AAction == IArchiveModification::Changed)
-		emit fileCollectionChanged(AStreamJid,AHeader);
-	else if (AAction == IArchiveModification::Removed)
-		emit fileCollectionRemoved(AStreamJid,AHeader);
-
-	return saved;
+	return false;
 }
 
-FileWriter *FileMessageArchive::findFileWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const
+CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader) const
 {
-	QMutexLocker locker(&FMutex);
-	QList<FileWriter *> writers = FFileWriters.value(AStreamJid).values(AHeader.with);
-	foreach(FileWriter *writer, writers)
+	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AHeader.with);
+	foreach(CollectionWriter *writer, writers)
 		if (writer->header() == AHeader)
 			return writer;
 	return NULL;
 }
 
-FileWriter *FileMessageArchive::findFileWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const
+CollectionWriter *FileMessageArchive::findCollectionWriter(const Jid &AStreamJid, const Jid &AWith, const QString &AThreadId) const
 {
-	QMutexLocker locker(&FMutex);
-	QList<FileWriter *> writers = FFileWriters.value(AStreamJid).values(AWith);
-	foreach(FileWriter *writer, writers)
+	QList<CollectionWriter *> writers = FCollectionWriters.value(AStreamJid).values(AWith);
+	foreach(CollectionWriter *writer, writers)
 		if (writer->header().threadId == AThreadId)
 			return writer;
 	return NULL;
 }
 
-FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName)
+CollectionWriter *FileMessageArchive::newCollectionWriter(const Jid &AStreamJid, const IArchiveHeader &AHeader, const QString &AFileName)
 {
-	QMutexLocker locker(&FMutex);
-	if (AStreamJid.isValid() && AHeader.with.isValid() && AHeader.start.isValid() && !AFileName.isEmpty() && !FWritingFiles.contains(AFileName))
+	if (AHeader.with.isValid() && AHeader.start.isValid() && !AFileName.isEmpty() && !FWritingFiles.contains(AFileName))
 	{
-		FileWriter *writer = new FileWriter(AStreamJid,AFileName,AHeader,this);
+		CollectionWriter *writer = new CollectionWriter(AStreamJid,AFileName,AHeader,this);
 		if (writer->isOpened())
 		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Creating file writer with=%1").arg(AHeader.with.full()));
 			FWritingFiles.insert(writer->fileName(),writer);
-			FFileWriters[AStreamJid].insert(AHeader.with,writer);
-			connect(writer,SIGNAL(writerDestroyed(FileWriter *)),SLOT(onFileWriterDestroyed(FileWriter *)));
+			FCollectionWriters[AStreamJid].insert(AHeader.with,writer);
+			connect(writer,SIGNAL(writerDestroyed(CollectionWriter *)),SLOT(onCollectionWriterDestroyed(CollectionWriter *)));
+			emit fileCollectionOpened(AStreamJid,AHeader);
 		}
 		else
 		{
@@ -1207,100 +833,68 @@ FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArch
 		}
 		return writer;
 	}
-	else
-	{
-		REPORT_ERROR("Failed to create file writer: Invalid params");
-	}
 	return NULL;
 }
 
-void FileMessageArchive::removeFileWriter(FileWriter *AWriter)
+void FileMessageArchive::removeCollectionWriter(CollectionWriter *AWriter)
 {
-	QMutexLocker locker(&FMutex);
-	if (AWriter && FWritingFiles.contains(AWriter->fileName()))
+	FThreadLock.lockForWrite();
+	if (FWritingFiles.contains(AWriter->fileName()))
 	{
-		LOG_STRM_DEBUG(AWriter->streamJid(),QString("Destroying file writer with=%1").arg(AWriter->header().with.full()));
 		AWriter->closeAndDeleteLater();
 		FWritingFiles.remove(AWriter->fileName());
-		FFileWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
-		if (AWriter->messagesCount() > 0)
-			saveModification(AWriter->streamJid(),AWriter->header(),IArchiveModification::Changed);
+		FCollectionWriters[AWriter->streamJid()].remove(AWriter->header().with,AWriter);
+		if (AWriter->recordsCount() > 0)
+		{
+			FThreadLock.unlock();
+			saveFileModification(AWriter->streamJid(),AWriter->header(),LOG_ACTION_CREATE);
+			emit fileCollectionSaved(AWriter->streamJid(),AWriter->header());
+		}
 		else
-			QFile::remove(AWriter->fileName());
-	}
-}
-
-void FileMessageArchive::onFileTaskFinished(FileTask *ATask)
-{
-	if (!ATask->isFailed())
-	{
-		LOG_STRM_DEBUG(ATask->streamJid(),QString("File task finished, type=%1, id=%2").arg(ATask->type()).arg(ATask->taskId()));
-		switch (ATask->type())
 		{
-		case FileTask::SaveCollection:
-			emit collectionSaved(ATask->taskId(),static_cast<FileTaskSaveCollection *>(ATask)->archiveCollection());
-			break;
-		case FileTask::LoadHeaders:
-			emit headersLoaded(ATask->taskId(),static_cast<FileTaskLoadHeaders *>(ATask)->archiveHeaders());
-			break;
-		case FileTask::LoadCollection:
-			emit collectionLoaded(ATask->taskId(),static_cast<FileTaskLoadCollection *>(ATask)->archiveCollection());
-			break;
-		case FileTask::RemoveCollections:
-			emit collectionsRemoved(ATask->taskId(),static_cast<FileTaskRemoveCollection *>(ATask)->archiveRequest());
-			break;
-		case FileTask::LoadModifications:
-			emit modificationsLoaded(ATask->taskId(),static_cast<FileTaskLoadModifications *>(ATask)->archiveModifications());
-			break;
+			FThreadLock.unlock();
 		}
 	}
 	else
 	{
-		LOG_STRM_ERROR(ATask->streamJid(),QString("Failed to execute file task, type=%1, id=%2: %3").arg(ATask->type()).arg(ATask->taskId(),ATask->error().condition()));
-		emit requestFailed(ATask->taskId(),ATask->error());
+		FThreadLock.unlock();
 	}
-	delete ATask;
 }
 
-void FileMessageArchive::onDatabaseTaskFinished(DatabaseTask *ATask)
+void FileMessageArchive::onWorkingThreadFinished()
 {
-	if (!ATask->isFailed())
+	WorkingThread *wthread = qobject_cast<WorkingThread *>(sender());
+	if (wthread)
 	{
-		LOG_STRM_DEBUG(ATask->streamJid(),QString("Database task finished, type=%1 id=%2").arg(ATask->type()).arg(ATask->taskId()));
-		switch(ATask->type())
+		if (!wthread->hasError())
 		{
-		case DatabaseTask::OpenDatabase:
+			switch (wthread->workAction())
 			{
-				QMutexLocker locker(&FMutex);
-				DatabaseTaskOpenDatabase *task = static_cast<DatabaseTaskOpenDatabase *>(ATask);
-				FPluginManager->continueShutdown();
-				FDatabaseProperties.insert(task->streamJid(),task->databaseProperties());
-				emit databaseOpened(task->streamJid());
-				
-				startDatabaseSync(task->streamJid(),databaseProperty(task->streamJid(),FADP_DATABASE_NOT_CLOSED)!="false");
-				setDatabaseProperty(task->streamJid(),FADP_DATABASE_NOT_CLOSED,"true");
+			case WorkingThread::SaveCollection:
+				emit collectionSaved(wthread->workId(),wthread->archiveHeader());
+				break;
+			case WorkingThread::RemoveCollection:
+				emit collectionsRemoved(wthread->workId(),wthread->archiveRequest());
+				break;
+			case WorkingThread::LoadHeaders:
+				emit headersLoaded(wthread->workId(),wthread->archiveHeaders());
+				break;
+			case WorkingThread::LoadCollection:
+				emit collectionLoaded(wthread->workId(),wthread->archiveCollection());
+				break;
+			case WorkingThread::LoadModifications:
+				emit modificationsLoaded(wthread->workId(),wthread->archiveModifications());
+				break;
+			default:
+				emit requestFailed(wthread->workId(),tr("Internal error"));
 			}
-			break;
-		case DatabaseTask::CloseDatabase:
-			{
-				QMutexLocker locker(&FMutex);
-				DatabaseTaskCloseDatabase *task = static_cast<DatabaseTaskCloseDatabase *>(ATask);
-				FPluginManager->continueShutdown();
-				FDatabaseProperties.remove(task->streamJid());
-				FDatabaseSyncWorker->removeSync(task->streamJid());
-				emit databaseClosed(task->streamJid());
-			}
-			break;
-		default:
-			break;
 		}
+		else
+		{
+			emit requestFailed(wthread->workId(),wthread->errorString());
+		}
+		wthread->deleteLater();
 	}
-	else
-	{
-		LOG_STRM_ERROR(ATask->streamJid(),QString("Failed to execute database task, type=%1, id=%2: %3").arg(ATask->type()).arg(ATask->taskId(),ATask->error().condition()));
-		emit requestFailed(ATask->taskId(),ATask->error());
-	}
-	delete ATask;
 }
 
 void FileMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
@@ -1310,36 +904,18 @@ void FileMessageArchive::onArchivePrefsOpened(const Jid &AStreamJid)
 
 void FileMessageArchive::onArchivePrefsClosed(const Jid &AStreamJid)
 {
-	QMutexLocker locker(&FMutex);
-	foreach(FileWriter *writer, FFileWriters.value(AStreamJid).values())
-		removeFileWriter(writer);
+	foreach(const Jid &streamJid, FCollectionWriters.keys())
+		qDeleteAll(FCollectionWriters.take(streamJid));
 	emit capabilitiesChanged(AStreamJid);
 }
 
-void FileMessageArchive::onFileWriterDestroyed(FileWriter *AWriter)
+void FileMessageArchive::onCollectionWriterDestroyed(CollectionWriter *AWriter)
 {
-	removeFileWriter(AWriter);
-}
-
-void FileMessageArchive::onDatabaseSyncFinished(const Jid &AStreamJid, bool AFailed)
-{
-	if (!AFailed)
-	{
-		LOG_STRM_INFO(AStreamJid,"Database synchronization finished");
-		quint32 caps = capabilities(AStreamJid);
-		setDatabaseProperty(AStreamJid,FADP_LAST_SYNC_TIME,DateTime(QDateTime::currentDateTime()).toX85UTC());
-		if (caps != capabilities(AStreamJid))
-			emit capabilitiesChanged(AStreamJid);
-	}
-	else
-	{
-		LOG_STRM_ERROR(AStreamJid,"Failed to synchronize database");
-	}
+	removeCollectionWriter(AWriter);
 }
 
 void FileMessageArchive::onOptionsOpened()
 {
-	FArchiveRootPath = QString::null;
 	FArchiveHomePath = Options::node(OPV_FILEARCHIVE_HOMEPATH).value().toString();
 	if (!FArchiveHomePath.isEmpty())
 	{
@@ -1356,57 +932,29 @@ void FileMessageArchive::onOptionsOpened()
 
 void FileMessageArchive::onOptionsClosed()
 {
-	FArchiveRootPath = QString::null;
 	FArchiveHomePath = FPluginManager->homePath();
-}
-
-void FileMessageArchive::onAccountShown(IAccount *AAccount)
-{
-	Jid bareStreamJid = AAccount->streamJid().bare();
-	if (!FDatabaseProperties.contains(bareStreamJid))
-	{
-		DatabaseTaskOpenDatabase *task = new DatabaseTaskOpenDatabase(bareStreamJid,databaseArchiveFile(bareStreamJid));
-		if (FDatabaseWorker->startTask(task))
-		{
-			LOG_STRM_DEBUG(AAccount->streamJid(),QString("Database open task started, id=%1").arg(task->taskId()));
-			FPluginManager->delayShutdown();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AAccount->streamJid(),"Failed to open database: Task not started");
-		}
-	}
-}
-
-void FileMessageArchive::onAccountHidden(IAccount *AAccount)
-{
-	Jid bareStreamJid = AAccount->streamJid().bare();
-	if (FDatabaseProperties.contains(bareStreamJid))
-	{
-		emit databaseAboutToClose(bareStreamJid);
-		setDatabaseProperty(bareStreamJid,FADP_DATABASE_NOT_CLOSED,"false");
-		DatabaseTaskCloseDatabase *task = new DatabaseTaskCloseDatabase(bareStreamJid);
-		if (FDatabaseWorker->startTask(task))
-		{
-			LOG_STRM_DEBUG(AAccount->streamJid(),QString("Database close task started, id=%1").arg(task->taskId()));
-			FPluginManager->delayShutdown();
-		}
-		else
-		{
-			LOG_STRM_WARNING(AAccount->streamJid(),"Failed to close database: Task not started");
-		}
-	}
 }
 
 void FileMessageArchive::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
-	if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() && AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid.pDomain()))
+	if (AInfo.node.isEmpty() && AInfo.contactJid.node().isEmpty() &&  AInfo.contactJid.resource().isEmpty() && !FGatewayTypes.contains(AInfo.contactJid))
 	{
 		foreach(const IDiscoIdentity &identity, AInfo.identity)
 		{
 			if (identity.category==CATEGORY_GATEWAY && !identity.type.isEmpty())
 			{
-				saveGatewayType(AInfo.contactJid.pDomain(),identity.type);
+				QString dirPath = collectionDirPath(Jid::null,Jid::null);
+				QFile gateways(dirPath+"/"GATEWAY_FILE_NAME);
+				if (!dirPath.isEmpty() && gateways.open(QFile::WriteOnly|QFile::Append|QFile::Text))
+				{
+					QStringList gateway;
+					gateway << AInfo.contactJid.pDomain();
+					gateway << identity.type;
+					gateway << "\n";
+					gateways.write(gateway.join(" ").toUtf8());
+					gateways.close();
+				}
+				FGatewayTypes.insert(AInfo.contactJid,identity.type);
 				break;
 			}
 		}

@@ -4,8 +4,6 @@
 #include <QFile>
 #include <QBuffer>
 #include <QImageReader>
-#include <definitions/namespaces.h>
-#include <utils/logger.h>
 
 #define DEFAUL_IMAGE_FORMAT       "png"
 
@@ -15,7 +13,7 @@ VCard::VCard(VCardPlugin *APlugin, const Jid &AContactJid) : QObject(APlugin)
 	FVCardPlugin = APlugin;
 	connect(FVCardPlugin,SIGNAL(vcardReceived(const Jid &)),SLOT(onVCardReceived(const Jid &)));
 	connect(FVCardPlugin,SIGNAL(vcardPublished(const Jid &)),SLOT(onVCardPublished(const Jid &)));
-	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const XmppError &)),SLOT(onVCardError(const Jid &, const XmppError &)));
+	connect(FVCardPlugin,SIGNAL(vcardError(const Jid &, const QString &)),SLOT(onVCardError(const Jid &, const QString &)));
 	loadVCardFile();
 }
 
@@ -34,7 +32,7 @@ bool VCard::isEmpty() const
 	return !isValid() || !vcardElem().hasChildNodes();
 }
 
-Jid VCard::contactJid() const
+const Jid &VCard::contactJid() const
 {
 	return FContactJid;
 }
@@ -184,16 +182,9 @@ void VCard::loadVCardFile()
 	QFile file(FVCardPlugin->vcardFileName(FContactJid));
 	if (file.open(QIODevice::ReadOnly))
 	{
-		QString xmlError;
-		if (!FDoc.setContent(file.readAll(),&xmlError))
-			REPORT_ERROR(QString("Failed to load vCard from file content: %1").arg(xmlError));
+		FDoc.setContent(file.readAll());
 		file.close();
 	}
-	else
-	{
-		REPORT_ERROR(QString("Failed to load vCard from file: %1").arg(file.errorString()));
-	}
-
 	if (vcardElem().isNull())
 	{
 		FDoc.clear();
@@ -205,7 +196,6 @@ void VCard::loadVCardFile()
 	{
 		FLoadDateTime = QDateTime::fromString(FDoc.documentElement().attribute("dateTime"),Qt::ISODate);
 	}
-
 	emit vcardUpdated();
 }
 
@@ -294,7 +284,7 @@ void VCard::onVCardPublished(const Jid &AContactJid)
 		emit vcardPublished();
 }
 
-void VCard::onVCardError(const Jid &AContactJid, const XmppError &AError)
+void VCard::onVCardError(const Jid &AContactJid, const QString &AError)
 {
 	if (FContactJid == AContactJid)
 		emit vcardError(AError);

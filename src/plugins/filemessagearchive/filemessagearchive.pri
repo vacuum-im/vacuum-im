@@ -1,15 +1,11 @@
 FORMS   = filearchiveoptions.ui
 
 HEADERS = filemessagearchive.h \
-          filewriter.h \
-          fileworker.h \
-          filearchiveoptions.h \
-          databaseworker.h \
-          databasesynchronizer.h
+          collectionwriter.h \
+          workingthread.h \
+          filearchiveoptions.h
 
 SOURCES = filemessagearchive.cpp \
-          filewriter.cpp \
-          fileworker.cpp \
-          filearchiveoptions.cpp \
-          databaseworker.cpp \
-          databasesynchronizer.cpp
+          collectionwriter.cpp \
+          workingthread.cpp \
+          filearchiveoptions.cpp

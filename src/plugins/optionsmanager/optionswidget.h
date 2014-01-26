@@ -11,6 +11,7 @@
 #include <QDateTimeEdit>
 #include <QHBoxLayout>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 
 class OptionsWidget :
 	public QWidget,

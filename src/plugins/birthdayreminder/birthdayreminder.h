@@ -2,6 +2,17 @@
 #define BIRTHDAYREMINDER_H
 
 #include <QTimer>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/soundfiles.h>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/rosterindextyperole.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ibirthdayreminder.h>
 #include <interfaces/ivcard.h>
@@ -12,6 +23,9 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/imessageprocessor.h>
+#include <utils/options.h>
+#include <utils/datetime.h>
+#include <utils/iconstorage.h>
 
 class BirthdayReminder : 
 	public QObject,
@@ -44,7 +58,7 @@ protected slots:
 	void onNotificationActivated(int ANotifyId);
 	void onNotificationRemoved(int ANotifyId);
 	void onRosterIndexInserted(IRosterIndex *AIndex);
-	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips);
 	void onVCardReceived(const Jid &AContactJid);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onOptionsOpened();
@@ -59,7 +73,7 @@ private:
 	IRostersViewPlugin *FRostersViewPlugin;
 	IMessageProcessor *FMessageProcessor;
 private:
-	quint32 FBirthdayLabelId;
+	int FBirthdayLabelId;
 	QDate FNotifyDate;
 	QTimer FNotifyTimer;
 	QMap<int, Jid> FNotifies;

@@ -1,25 +1,5 @@
 #include "presenceplugin.h"
 
-#include <utils/logger.h>
-
-bool presenceItemLessThen(const IPresenceItem &AItem1, const IPresenceItem &AItem2)
-{
-	if (AItem1.show != AItem2.show)
-	{
-		static const int showOrders[] = {6,2,1,3,4,5,7,8};
-		static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-		if (AItem1.show<showOrdersCount && AItem2.show<showOrdersCount)
-			return showOrders[AItem1.show] < showOrders[AItem2.show];
-	}
-	
-	if (AItem1.priority != AItem2.priority)
-	{
-		return AItem1.priority > AItem2.priority;
-	}
-
-	return AItem1.itemJid < AItem2.itemJid;
-}
-
 PresencePlugin::PresencePlugin()
 {
 	FXmppStreams = NULL;
@@ -59,9 +39,7 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 
 	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
-	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
 
 	return FXmppStreams!=NULL && FStanzaProcessor!=NULL;
 }
@@ -71,9 +49,8 @@ bool PresencePlugin::initConnections(IPluginManager *APluginManager, int &AInitO
 IPresence *PresencePlugin::getPresence(IXmppStream *AXmppStream)
 {
 	IPresence *presence = findPresence(AXmppStream->streamJid());
-	if (!presence && FStanzaProcessor)
+	if (!presence)
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),QString("Presence created"));
 		presence = new Presence(AXmppStream,FStanzaProcessor);
 		connect(presence->instance(),SIGNAL(destroyed(QObject *)),SLOT(onPresenceDestroyed(QObject *)));
 		FCleanupHandler.add(presence->instance());
@@ -94,36 +71,7 @@ void PresencePlugin::removePresence(IXmppStream *AXmppStream)
 {
 	IPresence *presence = findPresence(AXmppStream->streamJid());
 	if (presence)
-	{
-		LOG_STRM_INFO(presence->streamJid(),QString("Removing presence"));
 		delete presence->instance();
-	}
-}
-
-QList<Jid> PresencePlugin::onlineContacts() const
-{
-	return FContactPresences.keys();
-}
-
-bool PresencePlugin::isOnlineContact(const Jid &AContactJid) const
-{
-	return FContactPresences.contains(AContactJid);
-}
-
-QList<IPresence *> PresencePlugin::contactPresences(const Jid &AContactJid) const
-{
-	return FContactPresences.value(AContactJid).toList();
-}
-
-QList<IPresenceItem> PresencePlugin::sortPresenceItems(const QList<IPresenceItem> &AItems) const
-{
-	if (AItems.count() > 1)
-	{
-		QList<IPresenceItem> items = AItems;
-		qSort(items.begin(),items.end(),presenceItemLessThen);
-		return items;
-	}
-	return AItems;
 }
 
 void PresencePlugin::onPresenceOpened()
@@ -131,7 +79,6 @@ void PresencePlugin::onPresenceOpened()
 	Presence *presence = qobject_cast<Presence *>(sender());
 	if (presence)
 	{
-		LOG_STRM_INFO(presence->streamJid(),QString("Presence opened"));
 		emit streamStateChanged(presence->streamJid(),true);
 		emit presenceOpened(presence);
 	}
@@ -181,10 +128,7 @@ void PresencePlugin::onPresenceAboutToClose(int AShow, const QString &AStatus)
 {
 	Presence *presence = qobject_cast<Presence *>(sender());
 	if (presence)
-	{
-		LOG_STRM_INFO(presence->streamJid(),QString("Presence about to close"));
 		emit presenceAboutToClose(presence,AShow,AStatus);
-	}
 }
 
 void PresencePlugin::onPresenceClosed()
@@ -192,7 +136,6 @@ void PresencePlugin::onPresenceClosed()
 	Presence *presence = qobject_cast<Presence *>(sender());
 	if (presence)
 	{
-		LOG_STRM_INFO(presence->streamJid(),QString("Presence closed"));
 		emit streamStateChanged(presence->streamJid(),false);
 		emit presenceClosed(presence);
 	}
@@ -204,7 +147,6 @@ void PresencePlugin::onPresenceDestroyed(QObject *AObject)
 	{
 		if (presence->instance() == AObject)
 		{
-			LOG_STRM_INFO(presence->streamJid(),QString("Presence destroyed"));
 			FPresences.removeAll(presence);
 			break;
 		}

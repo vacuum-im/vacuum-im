@@ -44,11 +44,6 @@ DataTableWidget::~DataTableWidget()
 
 }
 
-const IDataTable &DataTableWidget::dataTable() const
-{
-	return FTable;
-}
-
 IDataField DataTableWidget::currentField() const
 {
 	return dataField(currentRow(),currentColumn());
@@ -72,3 +67,4 @@ IDataField DataTableWidget::dataField(int ARow, const QString &AVar) const
 {
 	return dataField(ARow,FDataForms->fieldIndex(AVar,FTable.columns));
 }
+

@@ -9,7 +9,6 @@ struct IAutoStatusRule
 {
 	int time;
 	int show;
-	int priority;
 	QString text;
 };
 
@@ -32,6 +31,6 @@ protected:
 	virtual void ruleActivated(const QUuid &ARuleId) =0;
 };
 
-Q_DECLARE_INTERFACE(IAutoStatus,"Vacuum.Plugin.IAutoStatus/1.1")
+Q_DECLARE_INTERFACE(IAutoStatus,"Vacuum.Plugin.IAutoStatus/1.0")
 
 #endif

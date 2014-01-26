@@ -5,6 +5,19 @@
 #include <QPair>
 #include <QPointer>
 #include <QDateTime>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterfootertextorders.h>
+#include <definitions/notificationtypes.h>
+#include <definitions/notificationdataroles.h>
+#include <definitions/notificationtypeorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/soundfiles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ipresence.h>
@@ -17,6 +30,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/inotifications.h>
+#include <utils/options.h>
 #include "editstatusdialog.h"
 #include "modifystatusdialog.h"
 
@@ -34,10 +48,10 @@ struct StatusItem {
 };
 
 class StatusChanger :
-	public QObject,
-	public IPlugin,
-	public IStatusChanger,
-	public IOptionsHolder
+			public QObject,
+			public IPlugin,
+			public IStatusChanger,
+			public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
@@ -112,7 +126,7 @@ protected slots:
 	void onRosterOpened(IRoster *ARoster);
 	void onRosterClosed(IRoster *ARoster);
 	void onStreamJidChanged(const Jid &ABefore, const Jid &AAfter);
-	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 	void onDefaultStatusIconsChanged();
 	void onOptionsOpened();
 	void onOptionsClosed();
@@ -143,7 +157,7 @@ private:
 	QMap<IPresence *, Menu *> FStreamMenu;
 	QMap<IPresence *, Action *> FMainStatusActions;
 private:
-	quint32 FConnectingLabelId;
+	int FConnectingLabel;
 	IPresence *FChangingPresence;
 	QSet<IPresence *> FFastReconnect;
 	QMap<int, StatusItem> FStatusItems;

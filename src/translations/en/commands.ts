@@ -47,6 +47,10 @@
         <translation>Ad-Hoc Commands</translation>
     </message>
     <message>
+        <source>Allows to perform special commands provided by various services</source>
+        <translation>Allows to perform special commands provided by various services</translation>
+    </message>
+    <message>
         <source>Can not understand the specified action</source>
         <translation>Can not understand the specified action</translation>
     </message>
@@ -81,10 +85,6 @@
     <message>
         <source>Request commands</source>
         <translation>Request commands</translation>
-    </message>
-    <message>
-        <source>Allows to perform special commands provided by various services</source>
-        <translation>Allows to perform special commands provided by various services</translation>
     </message>
     <message>
         <source>Supports the running or performing of the special services commands</source>

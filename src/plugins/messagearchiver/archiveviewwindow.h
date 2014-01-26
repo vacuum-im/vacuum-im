@@ -6,6 +6,9 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/iroster.h>
@@ -15,6 +18,9 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/iurlprocessor.h>
+#include <utils/iconstorage.h>
+#include <utils/textmanager.h>
+#include <utils/widgetmanager.h>
 #include "ui_archiveviewwindow.h"
 
 enum RequestStatus {
@@ -100,19 +106,21 @@ protected slots:
 	void onCollectionsRequestTimerTimeout();
 	void onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore);
 protected slots:
-	void onArchiveSearchStart();
+	void onArchiveSearchUpdate();
+	void onArchiveSearchChanged(const QString &AText);
 	void onTextHilightTimerTimeout();
 	void onTextVisiblePositionBoundaryChanged();
-	void onTextSearchStart();
+	void onTextSearchTimerTimeout();
 	void onTextSearchNextClicked();
 	void onTextSearchPreviousClicked();
 	void onTextSearchCaseSensitivityChanged();
+	void onTextSearchTextChanged(const QString &AText);
 protected slots:
 	void onSetContactJidByAction();
 	void onRemoveCollectionsByAction();
 	void onHeaderContextMenuRequested(const QPoint &APos);
 protected slots:
-	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
+	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 	void onArchiveHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onArchiveCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 	void onArchiveCollectionsRemoved(const QString &AId, const IArchiveRequest &ARequest);
@@ -133,10 +141,10 @@ private:
 	QMap<IArchiveHeader,IArchiveCollection> FCollections;
 private:
 	QString FSearchString;
+	QTimer FTextSearchTimer;
 	QTimer FTextHilightTimer;
 	QMap<int,QTextEdit::ExtraSelection> FSearchResults;
 private:
-	QWidget *FFocusWidget;
 	QList<QDate> FLoadedPages;
 	QTimer FHeadersRequestTimer;
 	QMap<QString, QDate> FHeadersRequests;

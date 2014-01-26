@@ -1,10 +1,15 @@
 #ifndef REGISTERSTREAM_H
 #define REGISTERSTREAM_H
 
+#include <definitions/namespaces.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iregistraton.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/iconnectionmanager.h>
+#include <utils/widgetmanager.h>
+#include <utils/xmpperror.h>
+#include <utils/stanza.h>
 
 class RegisterStream :
 	public QObject,
@@ -21,12 +26,12 @@ public:
 	virtual bool xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IXmppFeature
-	virtual QString featureNS() const;
-	virtual IXmppStream *xmppStream() const;
+	virtual QString featureNS() const { return NS_FEATURE_REGISTER; }
+	virtual IXmppStream *xmppStream() const { return FXmppStream; }
 	virtual bool start(const QDomElement &AElem);
 signals:
 	void finished(bool ARestart);
-	void error(const XmppError &AError);
+	void error(const QString &AMessage);
 	void featureDestroyed();
 protected slots:
 	void onXmppStreamClosed();

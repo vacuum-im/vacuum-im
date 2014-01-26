@@ -2,12 +2,15 @@
 #define EDITLISTSDIALOG_H
 
 #include <QDialog>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/iroster.h>
 #include <interfaces/iprivacylists.h>
+#include <utils/iconstorage.h>
 #include "ui_editlistsdialog.h"
 
 class EditListsDialog :
-	public QDialog
+			public QDialog
 {
 	Q_OBJECT;
 public:
@@ -28,7 +31,7 @@ protected slots:
 	void onActiveListChanged(const Jid &AStreamJid, const QString &AName);
 	void onDefaultListChanged(const Jid &AStreamJid, const QString &AName);
 	void onRequestCompleted(const QString &AId);
-	void onRequestFailed(const QString &AId, const XmppError &AError);
+	void onRequestFailed(const QString &AId, const QString &AError);
 	void onAddListClicked();
 	void onDeleteListClicked();
 	void onAddRuleClicked();

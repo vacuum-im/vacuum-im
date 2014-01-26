@@ -1,21 +1,27 @@
 #ifndef JABBERSEARCH_H
 #define JABBERSEARCH_H
 
+#include <definitions/namespaces.h>
+#include <definitions/discofeaturehandlerorders.h>
+#include <definitions/dataformtypes.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ijabbersearch.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
+#include <utils/xmpperror.h>
 #include "searchdialog.h"
 
 class JabberSearch :
-	public QObject,
-	public IPlugin,
-	public IJabberSearch,
-	public IStanzaRequestOwner,
-	public IDiscoFeatureHandler,
-	public IDataLocalizer
+			public QObject,
+			public IPlugin,
+			public IJabberSearch,
+			public IStanzaRequestOwner,
+			public IDiscoFeatureHandler,
+			public IDataLocalizer
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IJabberSearch IStanzaRequestOwner IDiscoFeatureHandler IDataLocalizer);
@@ -44,7 +50,7 @@ public:
 signals:
 	void searchFields(const QString &AId, const ISearchFields &AFields);
 	void searchResult(const QString &AId, const ISearchResult &AResult);
-	void searchError(const QString &AId, const XmppError &AError);
+	void searchError(const QString &AId, const QString &AError);
 protected:
 	void registerDiscoFeatures();
 protected slots:

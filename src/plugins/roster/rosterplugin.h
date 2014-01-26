@@ -2,14 +2,16 @@
 #define ROSTERPLUGIN_H
 
 #include <QObjectCleanupHandler>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ipresence.h>
+#include <utils/options.h>
 #include "roster.h"
 
 class RosterPlugin :
-	public QObject,
-	public IPlugin,
-	public IRosterPlugin
+			public QObject,
+			public IPlugin,
+			public IRosterPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IRosterPlugin);
@@ -21,7 +23,7 @@ public:
 	virtual QUuid pluginUuid() const { return ROSTER_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects();
+	virtual bool initObjects() { return true; }
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IRosterPlugin

@@ -5,14 +5,14 @@
 #include "webpage.h"
 
 class StyleViewer :
-	public QWebView
+			public QWebView
 {
 	Q_OBJECT;
 public:
 	StyleViewer(QWidget *AParent);
 	~StyleViewer();
-	QSize sizeHint() const;
-	QSize minimumSizeHint() const;
+public:
+	virtual QSize sizeHint() const;
 protected slots:
 	void onShortcutActivated();
 };

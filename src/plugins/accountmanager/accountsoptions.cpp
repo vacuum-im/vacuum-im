@@ -3,13 +3,9 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QTextDocument>
-#include <definitions/optionvalues.h>
-#include <utils/options.h>
 
-enum Columns {
-	COL_NAME,
-	COL_JID
-};
+#define COL_NAME                0
+#define COL_JID                 1
 
 AccountsOptions::AccountsOptions(AccountManager *AManager, QWidget *AParent) : QWidget(AParent)
 {
@@ -115,9 +111,11 @@ void AccountsOptions::onRemoveButtonClicked(bool)
 	QTreeWidgetItem *item = ui.trwAccounts->currentItem();
 	if (item)
 	{
-		QMessageBox::StandardButton res = QMessageBox::warning(this, tr("Confirm removal of an account"),
-			tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(Qt::escape(item->text(COL_NAME))),
-			QMessageBox::Ok | QMessageBox::Cancel);
+		QMessageBox::StandardButton res = QMessageBox::warning(this,
+		                                  tr("Confirm removal of an account"),
+		                                  tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(Qt::escape(item->text(0))),
+		                                  QMessageBox::Ok | QMessageBox::Cancel);
+
 		if (res == QMessageBox::Ok)
 		{
 			removeAccount(FAccountItems.key(item));
@@ -130,7 +128,9 @@ void AccountsOptions::onItemDoubleClicked(QTreeWidgetItem *AItem, int AColumn)
 {
 	Q_UNUSED(AColumn);
 	if (AItem)
+	{
 		FManager->showAccountOptionsDialog(FAccountItems.key(AItem));
+	}
 }
 
 void AccountsOptions::onAccountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode)

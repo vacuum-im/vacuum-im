@@ -7,10 +7,10 @@
 #include <QImageReader>
 #include "filestorage.h"
 
-#define ICON_STORAGE_ANIMATE_INTERVAL "animate"
+#define OPTION_ANIMATE "animate"
 
 class UTILS_EXPORT IconStorage :
-	public FileStorage
+			public FileStorage
 {
 	Q_OBJECT;
 	struct IconAnimateFrame;

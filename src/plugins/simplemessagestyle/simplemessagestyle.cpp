@@ -13,10 +13,9 @@
 #include <utils/filestorage.h>
 #include <utils/textmanager.h>
 #include <utils/options.h>
-#include <utils/logger.h>
 
 #define SCROLL_TIMEOUT                      100
-#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"FILE_STORAGE_SHARED_DIR
+#define SHARED_STYLE_PATH                   RESOURCES_DIR"/"RSR_STORAGE_SIMPLEMESSAGESTYLES"/"STORAGE_SHARED_DIR
 
 static const char *SenderColors[] =  {
 	"blue", "blueviolet", "brown", "cadetblue", "chocolate", "coral", "cornflowerblue", "crimson",
@@ -100,39 +99,49 @@ QTextDocumentFragment SimpleMessageStyle::selection(QWidget *AWidget) const
 	return view!=NULL ? view->textCursor().selection() : QTextDocumentFragment();
 }
 
-QTextCharFormat SimpleMessageStyle::textFormatAt(QWidget *AWidget, const QPoint &APosition) const
-{
-	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
-	return view!=NULL ? view->cursorForPosition(APosition).charFormat() : QTextCharFormat();
-}
-
-QTextDocumentFragment SimpleMessageStyle::textFragmentAt(QWidget *AWidget, const QPoint &APosition) const
+QTextDocumentFragment SimpleMessageStyle::textUnderPosition(const QPoint &APosition, QWidget *AWidget) const
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view)
 	{
 		QTextCursor cursor = view->cursorForPosition(APosition);
-		for (QTextBlock::iterator it = cursor.block().begin(); !it.atEnd(); ++it)
+		if (view->textCursor().selection().isEmpty() || view->textCursor().selectionStart()>cursor.position() || view->textCursor().selectionEnd()<cursor.position())
 		{
-			if (it.fragment().contains(cursor.position()))
+			if (!view->anchorAt(APosition).isEmpty())
 			{
-				cursor.setPosition(it.fragment().position());
-				cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
-				return cursor.selection();
+				QTextBlock block = cursor.block();
+				for (QTextBlock::iterator it = block.begin(); !it.atEnd(); ++it)
+				{
+					if (it.fragment().contains(cursor.position()))
+					{
+						cursor.setPosition(it.fragment().position());
+						cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor,it.fragment().length());
+						break;
+					}
+				}
 			}
+			else
+			{
+				cursor.select(QTextCursor::WordUnderCursor);
+			}
+			return cursor.selection();
+		}
+		else
+		{
+			return selection(AWidget);
 		}
 	}
 	return QTextDocumentFragment();
 }
 
-bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear)
+bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
 {
 	StyleViewer *view = qobject_cast<StyleViewer *>(AWidget);
 	if (view && AOptions.extended.value(MSO_STYLE_ID).toString()==styleId())
 	{
 		if (!FWidgetStatus.contains(view))
 		{
-			AClear = true;
+			AClean = true;
 			FWidgetStatus[view].scrollStarted = false;
 			view->installEventFilter(this);
 			connect(view,SIGNAL(anchorClicked(const QUrl &)),SLOT(onStyleWidgetLinkClicked(const QUrl &)));
@@ -144,7 +153,7 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 			FWidgetStatus[view].lastKind = -1;
 		}
 
-		if (AClear)
+		if (AClean)
 		{
 			WidgetStatus &wstatus = FWidgetStatus[view];
 			wstatus.lastKind = -1;
@@ -172,12 +181,8 @@ bool SimpleMessageStyle::changeOptions(QWidget *AWidget, const IMessageStyleOpti
 		view->document()->setDefaultFont(font);
 		view->setAnimated(!AOptions.extended.value(MSO_ANIMATION_DISABLED).toBool());
 
-		emit optionsChanged(AWidget,AOptions,AClear);
+		emit optionsChanged(AWidget,AOptions,AClean);
 		return true;
-	}
-	else if (view == NULL)
-	{
-		REPORT_ERROR("Failed to change simple style options: Invalid style view");
 	}
 	return false;
 }
@@ -232,10 +237,6 @@ bool SimpleMessageStyle::appendContent(QWidget *AWidget, const QString &AHtml, c
 		emit contentAppended(AWidget,AHtml,AOptions);
 		return true;
 	}
-	else
-	{
-		REPORT_ERROR("Failed to simple style append content: Invalid view");
-	}
 	return false;
 }
 
@@ -258,10 +259,6 @@ QList<QString> SimpleMessageStyle::styleVariants(const QString &AStylePath)
 		files = dir.entryList(QStringList("*.css"),QDir::Files,QDir::Name);
 		for (int i=0; i<files.count();i++)
 			files[i].chop(4);
-	}
-	else
-	{
-		REPORT_ERROR("Failed to get simple style variants: Style path is empty");
 	}
 	return files;
 }
@@ -296,14 +293,6 @@ QMap<QString, QVariant> SimpleMessageStyle::styleInfo(const QString &AStylePath)
 			}
 		}
 	}
-	else if (AStylePath.isEmpty())
-	{
-		REPORT_ERROR("Failed to get simple style info: Style path is empty");
-	}
-	else
-	{
-		LOG_ERROR(QString("Failed to load simple style info from file: %1").arg(file.errorString()));
-	}
 	return info;
 }
 
@@ -335,10 +324,6 @@ void SimpleMessageStyle::setVariant(QWidget *AWidget, const QString &AVariant)
 		QString variant = QString("Variants/%1.css").arg(!FVariants.contains(AVariant) ? FInfo.value(MSIV_DEFAULT_VARIANT,"main").toString() : AVariant);
 		view->document()->setDefaultStyleSheet(loadFileData(FStylePath+"/"+variant,QString::null));
 	}
-	else
-	{
-		REPORT_ERROR("Failed to change simple style variant: Invalid style view");
-	}
 }
 
 QString SimpleMessageStyle::makeStyleTemplate() const
@@ -346,7 +331,7 @@ QString SimpleMessageStyle::makeStyleTemplate() const
 	QString htmlFileName = FStylePath+"/Template.html";
 	if (!QFile::exists(htmlFileName))
 		htmlFileName =FSharedPath+"/Template.html";
-	return loadFileData(htmlFileName,QString::null);;
+	return loadFileData(htmlFileName,QString::null);
 }
 
 void SimpleMessageStyle::fillStyleKeywords(QString &AHtml, const IMessageStyleOptions &AOptions) const
@@ -504,15 +489,14 @@ QString SimpleMessageStyle::prepareMessage(const QString &AHtml, const IMessageC
 
 QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString &DefValue) const
 {
-	QFile file(AFileName);
-	if (file.open(QFile::ReadOnly))
+	if (QFile::exists(AFileName))
 	{
-		QByteArray html = file.readAll();
-		return QString::fromUtf8(html.data(),html.size());
-	}
-	else if (file.exists())
-	{
-		LOG_ERROR(QString("Failed to load simple style file data, file=%1: %2").arg(AFileName,file.errorString()));
+		QFile file(AFileName);
+		if (file.open(QFile::ReadOnly))
+		{
+			QByteArray html = file.readAll();
+			return QString::fromUtf8(html.data(),html.size());
+		}
 	}
 	return DefValue;
 }

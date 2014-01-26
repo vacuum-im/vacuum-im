@@ -1,6 +1,12 @@
 #ifndef DATASTREAMSMANAGER_H
 #define DATASTREAMSMANAGER_H
 
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/idataforms.h>
@@ -8,9 +14,14 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ioptionsmanager.h>
+#include <utils/jid.h>
+#include <utils/stanza.h>
+#include <utils/options.h>
+#include <utils/xmpperror.h>
 #include "datastreamsoptions.h"
 
-struct StreamParams {
+struct StreamParams
+{
 	Jid streamJid;
 	Jid contactJid;
 	QString requestId;
@@ -19,12 +30,12 @@ struct StreamParams {
 };
 
 class DataStreamsManger :
-	public QObject,
-	public IPlugin,
-	public IDataStreamsManager,
-	public IStanzaHandler,
-	public IStanzaRequestOwner,
-	public IOptionsHolder
+			public QObject,
+			public IPlugin,
+			public IDataStreamsManager,
+			public IStanzaHandler,
+			public IStanzaRequestOwner,
+			public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IDataStreamsManager IStanzaHandler IStanzaRequestOwner IOptionsHolder);
@@ -61,7 +72,7 @@ public:
 	virtual void removeSettingsProfile(const QUuid &AProfileId);
 	virtual bool initStream(const Jid &AStreamJid, const Jid &AContactJid, const QString &AStreamId, const QString &AProfileNS, const QList<QString> &AMethods, int ATimeout =0);
 	virtual bool acceptStream(const QString &AStreamId, const QString &AMethodNS);
-	virtual bool rejectStream(const QString &AStreamId, const XmppStanzaError &AError);
+	virtual bool rejectStream(const QString &AStreamId, const QString &AError);
 signals:
 	void methodInserted(IDataStreamMethod *AMethod);
 	void methodRemoved(IDataStreamMethod *AMethod);

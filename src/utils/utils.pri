@@ -20,17 +20,7 @@ HEADERS  = utilsexport.h \
            shortcuts.h \
            systemmanager.h \
            textmanager.h \
-           animatedtextbrowser.h \
-           closebutton.h \
-           searchlineedit.h \
-           imagemanager.h \
-           advanceditem.h \
-           advanceditemmodel.h \
-           advanceditemdelegate.h \
-           filecookiejar.h \
-           boxwidget.h \
-           splitterwidget.h \
-           logger.h
+           animatedtextbrowser.h
 
 SOURCES  = jid.cpp \
            versionparser.cpp \
@@ -53,14 +43,4 @@ SOURCES  = jid.cpp \
            shortcuts.cpp \
            systemmanager.cpp \
            textmanager.cpp \
-           animatedtextbrowser.cpp \
-           closebutton.cpp \
-           searchlineedit.cpp \
-           imagemanager.cpp \
-           advanceditem.cpp \
-           advanceditemmodel.cpp \
-           advanceditemdelegate.cpp \
-           filecookiejar.cpp \
-           boxwidget.cpp \
-           splitterwidget.cpp \
-           logger.cpp
+           animatedtextbrowser.cpp

@@ -12,64 +12,12 @@
         <translation>Allows to use different types of connections to a Jabber server</translation>
     </message>
     <message>
-        <source>&lt;No Proxy&gt;</source>
-        <translation>&lt;No Proxy&gt;</translation>
-    </message>
-    <message>
         <source>New Proxy</source>
         <translation>New Proxy</translation>
     </message>
     <message>
-        <source>Connection error</source>
-        <translation>Connection error</translation>
-    </message>
-    <message>
-        <source>Name: %1</source>
-        <translation>Name: %1</translation>
-    </message>
-    <message>
-        <source>Organization: %1</source>
-        <translation>Organization: %1</translation>
-    </message>
-    <message>
-        <source>Subunit: %1</source>
-        <translation>Subunit: %1</translation>
-    </message>
-    <message>
-        <source>Country: %1</source>
-        <translation>Country: %1</translation>
-    </message>
-    <message>
-        <source>Locality: %1</source>
-        <translation>Locality: %1</translation>
-    </message>
-    <message>
-        <source>State/Province: %1</source>
-        <translation>State/Province: %1</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Certificate holder:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Certificate holder:&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Certificate issuer:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Certificate issuer:&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Certificate details:&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Certificate details:&lt;/b&gt;</translation>
-    </message>
-    <message>
-        <source>Effective from: %1</source>
-        <translation>Effective from: %1</translation>
-    </message>
-    <message>
-        <source>Expired at: %1</source>
-        <translation>Expired at: %1</translation>
-    </message>
-    <message>
-        <source>Serial number: %1</source>
-        <translation>Serial number: %1</translation>
+        <source>&lt;No Proxy&gt;</source>
+        <translation>&lt;No Proxy&gt;</translation>
     </message>
 </context>
 <context>
@@ -129,6 +77,10 @@
         <translation>Password:</translation>
     </message>
     <message>
+        <source>Default Proxy:</source>
+        <translation>Default Proxy:</translation>
+    </message>
+    <message>
         <source>Add</source>
         <translation>Add</translation>
     </message>
@@ -142,10 +94,6 @@
     <message>
         <source>&lt;Default Proxy&gt;</source>
         <translation>&lt;Default Proxy&gt;</translation>
-    </message>
-    <message>
-        <source>Default proxy:</source>
-        <translation>Default proxy:</translation>
     </message>
 </context>
 <context>

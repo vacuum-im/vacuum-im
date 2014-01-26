@@ -1,11 +1,5 @@
 #include "inbandstreams.h"
 
-#include <definitions/namespaces.h>
-#include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
-#include <utils/options.h>
-#include <utils/logger.h>
-
 InBandStreams::InBandStreams()
 {
 	FDataManager = NULL;
@@ -28,20 +22,18 @@ void InBandStreams::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool InBandStreams::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool InBandStreams::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
-
-	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
 	if (plugin)
 	{
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -55,12 +47,6 @@ bool InBandStreams::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 bool InBandStreams::initObjects()
 {
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_DESTROYED,tr("Stream destroyed"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_INVALID_DATA,tr("Malformed data packet"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_NOT_OPENED,tr("Failed to open stream"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_INVALID_BLOCK_SIZE,tr("Block size is not acceptable"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_INBAND_STREAM_DATA_NOT_SENT,tr("Failed to send data"));
-
 	if (FDataManager)
 	{
 		FDataManager->insertMethod(this);
@@ -100,11 +86,12 @@ QString InBandStreams::methodDescription() const
 	return tr("Data is broken down into smaller chunks and transported in-band over XMPP");
 }
 
-IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &AStreamId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
+IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid,
+    IDataStreamSocket::StreamKind AKind, QObject *AParent)
 {
 	if (FStanzaProcessor)
 	{
-		InBandStream *stream = new InBandStream(FStanzaProcessor,AStreamId,AStreamJid,AContactJid,AKind,AParent);
+		InBandStream *stream = new InBandStream(FStanzaProcessor,ASocketId,AStreamJid,AContactJid,AKind,AParent);
 		emit socketCreated(stream);
 		return stream;
 	}
@@ -127,8 +114,6 @@ void InBandStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANod
 	InBandOptions *widget = qobject_cast<InBandOptions *>(AWidget->instance());
 	if (widget)
 		widget->apply(ANode);
-	else
-		REPORT_ERROR("Failed to save inband stream settings: Invalid options widget");
 }
 
 void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget)
@@ -137,10 +122,6 @@ void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidge
 	IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
 	if (widget && stream)
 		widget->apply(stream);
-	else if (widget == NULL)
-		REPORT_ERROR("Failed to load inband stream settings: Invalid options widget");
-	else if (stream == NULL)
-		REPORT_ERROR("Failed to load inband stream settings: Invalid socket");
 }
 
 void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode)
@@ -151,10 +132,6 @@ void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, const Options
 		stream->setMaximumBlockSize(ANode.value("max-block-size").toInt());
 		stream->setBlockSize(ANode.value("block-size").toInt());
 		stream->setDataStanzaType(ANode.value("stanza-type").toInt());
-	}
-	else
-	{
-		REPORT_ERROR("Failed to load inband stream settings: Invalid socket");
 	}
 }
 

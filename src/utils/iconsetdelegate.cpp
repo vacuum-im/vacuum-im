@@ -3,7 +3,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 
-#define DEFAULT_ROWS 2
+#define DEFAULT_ROWS              2
 
 IconsetDelegate::IconsetDelegate(QObject *AParent) : QItemDelegate(AParent)
 {
@@ -45,7 +45,7 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
 			drawRect.setLeft(checkRect.right()+space);
 
 
-			QString displayText = storage->storageProperty(FILE_STORAGE_NAME,name+"/"+subdir);
+			QString displayText = storage->option(STORAGE_NAME).isEmpty() ? name+"/"+subdir : storage->option(STORAGE_NAME);
 			QRect textRect(drawRect.topLeft(),AOption.fontMetrics.size(Qt::TextSingleLine,displayText));
 
 			QPalette::ColorGroup cg = AOption.state & QStyle::State_Enabled ? QPalette::Normal : QPalette::Disabled;
@@ -93,9 +93,7 @@ void IconsetDelegate::paint(QPainter *APainter, const QStyleOptionViewItem &AOpt
 		APainter->restore();
 	}
 	else
-	{
 		QItemDelegate::paint(APainter,AOption,AIndex);
-	}
 }
 
 QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QModelIndex &AIndex) const
@@ -117,7 +115,7 @@ QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QMode
 		if (!AIndex.data(IDR_HIDE_ICONSET_NAME).toBool())
 		{
 			QSize checkSize = check(AOption,AOption.rect,AIndex.data(Qt::CheckStateRole)).size();
-			QString displayText = storage->storageProperty(FILE_STORAGE_NAME,name+"/"+subdir);
+			QString displayText = storage->option(STORAGE_NAME).isEmpty() ? name+"/"+subdir : storage->option(STORAGE_NAME);
 			QSize textSize = AOption.fontMetrics.size(Qt::TextSingleLine,displayText);
 			size.setHeight(qMax(checkSize.height(),textSize.height()));
 			size.setWidth(checkSize.width()+textSize.width()+space);
@@ -128,7 +126,8 @@ QSize IconsetDelegate::sizeHint(const QStyleOptionViewItem &AOption, const QMode
 		int iconHeight = (AOption.decorationSize.height()+space)*rows;
 		return QSize(qMax(size.width(),iconWidth)+space,size.height()+iconHeight+space);
 	}
-	return QItemDelegate::sizeHint(AOption,AIndex);
+	else
+		return QItemDelegate::sizeHint(AOption,AIndex);
 }
 
 void IconsetDelegate::drawBackground(QPainter *APainter, const QStyleOptionViewItem &AOption, const QModelIndex &/*AIndex*/) const
@@ -152,6 +151,7 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
 	if (!value.isValid())
 		return false;
 
+
 	if ((AEvent->type() == QEvent::MouseButtonRelease) || (AEvent->type() == QEvent::MouseButtonDblClick))
 	{
 		int space = 2;
@@ -171,10 +171,9 @@ bool IconsetDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AModel, co
 			return false;
 	}
 	else
-	{
 		return false;
-	}
 
 	Qt::CheckState state = (static_cast<Qt::CheckState>(value.toInt()) == Qt::Checked ? Qt::Unchecked : Qt::Checked);
 	return AModel->setData(AIndex, state, Qt::CheckStateRole);
 }
+

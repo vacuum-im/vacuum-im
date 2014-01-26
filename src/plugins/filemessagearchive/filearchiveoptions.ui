@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>388</width>
-    <height>66</height>
+    <height>43</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -64,13 +64,6 @@
        </widget>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QCheckBox" name="chbForceDatabaseSync">
-     <property name="text">
-      <string>Update archive database at startup</string>
-     </property>
     </widget>
    </item>
   </layout>

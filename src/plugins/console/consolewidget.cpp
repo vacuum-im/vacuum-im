@@ -3,21 +3,12 @@
 #include <QRegExp>
 #include <QLineEdit>
 #include <QInputDialog>
-#include <definitions/optionvalues.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/xmppstanzahandlerorders.h>
-#include <utils/widgetmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/options.h>
-#include <utils/logger.h>
 
 #define MAX_HILIGHT_ITEMS            10
 #define TEXT_SEARCH_TIMEOUT          500
 
 ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) : QWidget(AParent)
 {
-	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_CONSOLE,0,0,"windowIcon");
@@ -40,17 +31,18 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 	palette.setColor(QPalette::Inactive,QPalette::HighlightedText,palette.color(QPalette::Active,QPalette::HighlightedText));
 	ui.tbrConsole->setPalette(palette);
 
+	FTextSearchTimer.setSingleShot(true);
+	connect(&FTextSearchTimer,SIGNAL(timeout()),SLOT(onTextSearchTimerTimeout()));
+
 	FTextHilightTimer.setSingleShot(true);
 	connect(&FTextHilightTimer,SIGNAL(timeout()),SLOT(onTextHilightTimerTimeout()));
 	connect(ui.tbrConsole,SIGNAL(visiblePositionBoundaryChanged()),SLOT(onTextVisiblePositionBoundaryChanged()));
 
-	ui.lneTextSearch->setPlaceholderText(tr("Search"));
 	ui.tlbTextSearchNext->setIcon(style()->standardIcon(QStyle::SP_ArrowDown, NULL, this));
 	ui.tlbTextSearchPrev->setIcon(style()->standardIcon(QStyle::SP_ArrowUp, NULL, this));
 	connect(ui.tlbTextSearchNext,SIGNAL(clicked()),SLOT(onTextSearchNextClicked()));
 	connect(ui.tlbTextSearchPrev,SIGNAL(clicked()),SLOT(onTextSearchPreviousClicked()));
-	connect(ui.lneTextSearch,SIGNAL(searchStart()),SLOT(onTextSearchStart()));
-	connect(ui.lneTextSearch,SIGNAL(searchNext()),SLOT(onTextSearchNextClicked()));
+	connect(ui.lneTextSearch,SIGNAL(returnPressed()),SLOT(onTextSearchNextClicked()));
 	connect(ui.lneTextSearch,SIGNAL(textChanged(const QString &)),SLOT(onTextSearchTextChanged(const QString &)));
 
 	connect(ui.tlbAddCondition,SIGNAL(clicked()),SLOT(onAddConditionClicked()));
@@ -64,7 +56,7 @@ ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) :
 
 	connect(ui.tlbSendXML,SIGNAL(clicked()),SLOT(onSendXMLClicked()));
 	connect(ui.tlbClearConsole,SIGNAL(clicked()),ui.tbrConsole,SLOT(clear()));
-	connect(ui.tlbClearConsole,SIGNAL(clicked()),SLOT(onTextSearchStart()));
+	connect(ui.tlbClearConsole,SIGNAL(clicked()),SLOT(onTextSearchTimerTimeout()));
 	connect(ui.chbWordWrap,SIGNAL(toggled(bool)),SLOT(onWordWrapButtonToggled(bool)));
 }
 
@@ -98,9 +90,8 @@ void ConsoleWidget::initialize(IPluginManager *APluginManager)
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 		{
-			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
-				onStreamCreated(stream);
-
+			foreach(IXmppStream *stream, FXmppStreams->xmppStreams()) {
+				onStreamCreated(stream); }
 			connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
 			connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
 			connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
@@ -113,10 +104,12 @@ void ConsoleWidget::initialize(IPluginManager *APluginManager)
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 		if (FStanzaProcessor)
 		{
-			foreach(int shandleId, FStanzaProcessor->stanzaHandles())
-				onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId));
-			connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
+			foreach(int shandleId, FStanzaProcessor->stanzaHandles()) {
+				onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId)); }
 			ui.cmbCondition->clearEditText();
+
+			connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),
+			        SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
 		}
 	}
 
@@ -224,11 +217,11 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 			xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
 			if (ui.chbHilightXML->checkState() == Qt::Checked)
 				colorXml(xml);
-			else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size()<5000)
+			else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
 				colorXml(xml);
 			ui.tbrConsole->append(xml);
 
-			ui.lneTextSearch->restartTimeout(ui.lneTextSearch->startSearchTimeout());
+			FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 		}
 	}
 }
@@ -330,7 +323,7 @@ void ConsoleWidget::onTextVisiblePositionBoundaryChanged()
 	FTextHilightTimer.start(0);
 }
 
-void ConsoleWidget::onTextSearchStart()
+void ConsoleWidget::onTextSearchTimerTimeout()
 {
 	FSearchResults.clear();
 	if (!ui.lneTextSearch->text().isEmpty())
@@ -411,6 +404,7 @@ void ConsoleWidget::onTextSearchTextChanged(const QString &AText)
 {
 	Q_UNUSED(AText);
 	FSearchMoveCursor = true;
+	FTextSearchTimer.start(TEXT_SEARCH_TIMEOUT);
 }
 
 void ConsoleWidget::onStreamCreated(IXmppStream *AXmppStream)

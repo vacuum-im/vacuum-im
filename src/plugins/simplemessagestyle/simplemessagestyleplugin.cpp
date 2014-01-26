@@ -3,12 +3,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QCoreApplication>
-#include <definitions/resources.h>
-#include <definitions/optionvalues.h>
 #include <utils/filestorage.h>
-#include <utils/message.h>
-#include <utils/options.h>
-#include <utils/logger.h>
 
 SimpleMessageStylePlugin::SimpleMessageStylePlugin(): FNetworkAccessManager(NULL)
 {
@@ -77,7 +72,6 @@ IMessageStyle *SimpleMessageStylePlugin::styleForOptions(const IMessageStyleOpti
 			SimpleMessageStyle *style = new SimpleMessageStyle(stylePath, FNetworkAccessManager, this);
 			if (style->isValid())
 			{
-				LOG_INFO(QString("Simple style created, id=%1").arg(style->styleId()));
 				FStyles.insert(styleId,style);
 				connect(style,SIGNAL(widgetAdded(QWidget *)),SLOT(onStyleWidgetAdded(QWidget *)));
 				connect(style,SIGNAL(widgetRemoved(QWidget *)),SLOT(onStyleWidgetRemoved(QWidget *)));
@@ -86,12 +80,7 @@ IMessageStyle *SimpleMessageStylePlugin::styleForOptions(const IMessageStyleOpti
 			else
 			{
 				delete style;
-				REPORT_ERROR(QString("Failed to create simple style id=%1: Invalid style").arg(styleId));
 			}
-		}
-		else
-		{
-			REPORT_ERROR(QString("Failed to create simple style id=%1: Style not found").arg(styleId));
 		}
 	}
 	return FStyles.value(styleId,NULL);
@@ -151,10 +140,6 @@ IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(const OptionsNode &A
 		if (soptions.extended.value(MSO_FONT_SIZE).toInt()==0)
 			soptions.extended.insert(MSO_FONT_SIZE,info.value(MSIV_DEFAULT_FONT_SIZE));
 	}
-	else
-	{
-		REPORT_ERROR(QString("Failed to find suitable simple style for message type=%1").arg(AMessageType));
-	}
 
 	return soptions;
 }
@@ -207,26 +192,10 @@ void SimpleMessageStylePlugin::updateAvailStyles()
 				if (valid)
 				{
 					QMap<QString, QVariant> info = SimpleMessageStyle::styleInfo(dir.absolutePath());
-					QString styleId = info.value(MSIV_NAME).toString();
-					if (!styleId.isEmpty())
-					{
-						LOG_DEBUG(QString("Simple style added, id=%1").arg(styleId));
-						FStylePaths.insert(styleId,dir.absolutePath());
-					}
-					else
-					{
-						LOG_WARNING(QString("Failed to add simple style from directory=%1: Style name is empty").arg(dir.absolutePath()));
-					}
-				}
-				else
-				{
-					LOG_WARNING(QString("Failed to add simple style from directory=%1: Invalid style").arg(dir.absolutePath()));
+					if (!info.value(MSIV_NAME).toString().isEmpty())
+						FStylePaths.insert(info.value(MSIV_NAME).toString(),dir.absolutePath());
 				}
 			}
-		}
-		else
-		{
-			LOG_WARNING(QString("Failed to find root substorage=%1 directory").arg(substorage));
 		}
 	}
 }
@@ -257,15 +226,12 @@ void SimpleMessageStylePlugin::onClearEmptyStyles()
 		SimpleMessageStyle *style = it.value();
 		if (style->styleWidgets().isEmpty())
 		{
-			LOG_INFO(QString("Simple style destroyed, id=%1").arg(style->styleId()));
 			it = FStyles.erase(it);
 			emit styleDestroyed(style);
 			delete style;
 		}
 		else
-		{
 			++it;
-		}
 	}
 }
 

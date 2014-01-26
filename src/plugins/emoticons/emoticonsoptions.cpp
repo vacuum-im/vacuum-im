@@ -1,11 +1,5 @@
 #include "emoticonsoptions.h"
 
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
-#include <utils/iconsetdelegate.h>
-#include <utils/options.h>
-
 EmoticonsOptions::EmoticonsOptions(IEmoticons *AEmoticons, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);

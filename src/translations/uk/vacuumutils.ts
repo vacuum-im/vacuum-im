@@ -2,17 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="uk" sourcelanguage="en">
 <context>
-    <name>SearchLineEdit</name>
-    <message>
-        <source>Search options</source>
-        <translation>Налаштування пошуку</translation>
-    </message>
-    <message>
-        <source>Clear text</source>
-        <translation>Очистити текст</translation>
-    </message>
-</context>
-<context>
     <name>XmppStreamError</name>
     <message>
         <source>Undefined error condition</source>

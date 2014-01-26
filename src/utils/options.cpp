@@ -7,8 +7,6 @@
 #include <QKeySequence>
 #include <QCryptographicHash>
 
-const OptionsNode OptionsNode::null = OptionsNode(QDomElement());
-
 QDomElement findChildElement(const QDomElement &AParent, const QString &APath, const QString &ANSpace, QString &ChildName, QString &SubPath, QString &NSpace)
 {
 	int dotIndex = APath.indexOf('.');
@@ -51,6 +49,79 @@ QString fullFileName(const QString &APath, const QString &ANSpace)
 	return Options::filesPath() + "/" + QCryptographicHash::hash(fileKey.toUtf8(), QCryptographicHash::Sha1).toHex();
 }
 
+QString variantToString(const QVariant &AVariant)
+{
+	if (AVariant.type() == QVariant::Rect)
+	{
+		QRect rect = AVariant.toRect();
+		return QString("%1;%2;%3;%4").arg(rect.left()).arg(rect.top()).arg(rect.width()).arg(rect.height());
+	}
+	else if (AVariant.type() == QVariant::Point)
+	{
+		QPoint point = AVariant.toPoint();
+		return QString("%1;%2").arg(point.x()).arg(point.y());
+	}
+	else if (AVariant.type() == QVariant::Size)
+	{
+		QSize size = AVariant.toSize();
+		return QString("%1;%2").arg(size.width()).arg(size.height());
+	}
+	else if (AVariant.type() == QVariant::ByteArray)
+	{
+		return AVariant.toByteArray().toBase64();
+	}
+	else if (AVariant.type() == QVariant::StringList)
+	{
+		return AVariant.toStringList().join(" ;; ");
+	}
+	else if (AVariant.type() == QVariant::KeySequence)
+	{
+		return AVariant.value<QKeySequence>().toString(QKeySequence::PortableText);
+	}
+	return AVariant.toString();
+}
+
+QVariant stringToVariant(const QString &AString, QVariant::Type AType)
+{
+	if (AType == QVariant::Rect)
+	{
+		QList<QString> parts = AString.split(";",QString::SkipEmptyParts);
+		if (parts.count() == 4)
+			return QRect(parts.at(0).toInt(),parts.at(1).toInt(),parts.at(2).toInt(),parts.at(3).toInt());
+	}
+	else if (AType == QVariant::Point)
+	{
+		QList<QString> parts = AString.split(";",QString::SkipEmptyParts);
+		if (parts.count() == 2)
+			return QPoint(parts.at(0).toInt(),parts.at(1).toInt());
+	}
+	else if (AType == QVariant::Size)
+	{
+		QList<QString> parts = AString.split(";",QString::SkipEmptyParts);
+		if (parts.count() == 2)
+			return QSize(parts.at(0).toInt(),parts.at(1).toInt());
+	}
+	else if (AType == QVariant::ByteArray)
+	{
+		return QByteArray::fromBase64(AString.toLatin1());
+	}
+	else if (AType == QVariant::StringList)
+	{
+		return !AString.isEmpty() ? AString.split(" ;; ") : QStringList();
+	}
+	else if(AType == QVariant::KeySequence)
+	{
+		return QKeySequence::fromString(AString,QKeySequence::PortableText);
+	}
+	else
+	{
+		QVariant var = QVariant(AString);
+		if (var.convert(AType))
+			return var;
+	}
+	return QVariant();
+}
+
 void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
 {
 	QVariant value = ANode.value();
@@ -58,9 +129,9 @@ void exportOptionNode(const OptionsNode &ANode, QDomElement &AToElem)
 	{
 		QDomText text = findChildText(AToElem);
 		if (!text.isNull())
-			text.setData(Options::variantToString(value));
+			text.setData(variantToString(value));
 		else
-			AToElem.appendChild(AToElem.ownerDocument().createTextNode(Options::variantToString(value)));
+			AToElem.appendChild(AToElem.ownerDocument().createTextNode(variantToString(value)));
 		AToElem.setAttribute("type",value.type());
 	}
 	else if (AToElem.hasAttribute("type"))
@@ -91,12 +162,10 @@ void importOptionNode(OptionsNode &ANode, const QDomElement &AFromElem)
 	if (AFromElem.hasAttribute("type"))
 	{
 		QString stringValue = findChildText(AFromElem).data();
-		ANode.setValue(Options::stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)AFromElem.attribute("type").toInt()));
+		ANode.setValue(stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)AFromElem.attribute("type").toInt()));
 	}
 	else
-	{
 		ANode.setValue(QVariant());
-	}
 
 	QDomElement childElem = AFromElem.firstChildElement();
 	while (!childElem.isNull())
@@ -167,6 +236,8 @@ struct OptionsNode::OptionsNodeData
 	QDomElement node;
 };
 
+const OptionsNode OptionsNode::null = OptionsNode(QDomElement());
+
 OptionsNode::OptionsNode()
 {
 	d = NULL;
@@ -200,12 +271,7 @@ bool OptionsNode::isNull() const
 QString OptionsNode::path() const
 {
 	if (d->path.isEmpty())
-	{
-		QDomElement rootElem = d->node;
-		while (!rootElem.parentNode().toElement().isNull())
-			rootElem = rootElem.parentNode().toElement();
-		d->path = OptionsNode(rootElem).childPath(*this);
-	}
+		d->path = Options::node(QString::null).childPath(*this);
 	return d->path;
 }
 
@@ -360,7 +426,7 @@ QVariant OptionsNode::value(const QString &APath, const QString &ANSpace) const
 		if (d->node.hasAttribute("type"))
 		{
 			QString stringValue = findChildText(d->node).data();
-			return Options::stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)d->node.attribute("type").toInt());
+			return stringToVariant(!stringValue.isNull() ? stringValue : QString(""), (QVariant::Type)d->node.attribute("type").toInt());
 		}
 		return Options::defaultValue(path());
 	}
@@ -379,9 +445,9 @@ void OptionsNode::setValue(const QVariant &AValue, const QString &APath, const Q
 				{
 					QDomText text = findChildText(d->node);
 					if (!text.isNull())
-						text.setData(Options::variantToString(AValue));
+						text.setData(variantToString(AValue));
 					else
-						d->node.appendChild(d->node.ownerDocument().createTextNode(Options::variantToString(AValue)));
+						d->node.appendChild(d->node.ownerDocument().createTextNode(variantToString(AValue)));
 					d->node.setAttribute("type",AValue.type());
 					emit Options::instance()->optionsChanged(*this);
 				}
@@ -436,35 +502,29 @@ struct Options::OptionsData
 	QHash<QString, OptionItem> items;
 };
 
-Options::Options()
-{
-	d = new OptionsData;
-}
-
-Options::~Options()
-{
-	delete d;
-}
+Options::OptionsData *Options::d = new Options::OptionsData;
 
 Options *Options::instance()
 {
-	static Options *inst = new Options;
-	return inst;
+	static Options *options = NULL;
+	if (!options)
+		options = new Options;
+	return options;
 }
 
 bool Options::isNull()
 {
-	return instance()->d->options.isNull();
+	return d->options.isNull();
 }
 
 QString Options::filesPath()
 {
-	return instance()->d->filesPath;
+	return d->filesPath;
 }
 
 QByteArray Options::cryptKey()
 {
-	return instance()->d->cryptKey;
+	return d->cryptKey;
 }
 
 QString Options::cleanNSpaces(const QString &APath)
@@ -477,12 +537,12 @@ QString Options::cleanNSpaces(const QString &APath)
 
 bool Options::hasNode(const QString &APath, const QString &ANSpace)
 {
-	return OptionsNode(instance()->d->options.documentElement()).hasNode(APath,ANSpace);
+	return OptionsNode(d->options.documentElement()).hasNode(APath,ANSpace);
 }
 
 OptionsNode Options::node(const QString &APath, const QString &ANSpace)
 {
-	return APath.isEmpty() ? OptionsNode(instance()->d->options.documentElement()) : OptionsNode(instance()->d->options.documentElement()).node(APath,ANSpace);
+	return APath.isEmpty() ? OptionsNode(d->options.documentElement()) : OptionsNode(d->options.documentElement()).node(APath,ANSpace);
 }
 
 QVariant Options::fileValue(const QString &APath, const QString &ANSpace)
@@ -525,32 +585,27 @@ void Options::setFileValue(const QVariant &AValue, const QString &APath, const Q
 
 void Options::setOptions(QDomDocument AOptions, const QString &AFilesPath, const QByteArray &ACryptKey)
 {
-	OptionsData *q = instance()->d;
-
-	if (!q->options.isNull())
+	if (!d->options.isNull())
 		emit instance()->optionsClosed();
 
-	q->options = AOptions;
-	q->filesPath = AFilesPath;
-	q->cryptKey = ACryptKey;
+	d->options = AOptions;
+	d->filesPath = AFilesPath;
+	d->cryptKey = ACryptKey;
 
-	if (!q->options.isNull())
+	if (!d->options.isNull())
 		emit instance()->optionsOpened();
 }
 
 QVariant Options::defaultValue(const QString &APath)
 {
-	return instance()->d->items.value(cleanNSpaces(APath)).defValue;
+	return d->items.value(cleanNSpaces(APath)).defValue;
 }
 
 void Options::setDefaultValue(const QString &APath, const QVariant &ADefault)
 {
-	OptionItem &item = instance()->d->items[cleanNSpaces(APath)];
-	if (item.defValue != ADefault)
-	{
-		item.defValue = ADefault;
-		emit instance()->defaultValueChanged(APath,ADefault);
-	}
+	OptionItem &item = d->items[cleanNSpaces(APath)];
+	item.defValue = ADefault;
+	emit instance()->defaultValueChanged(APath,ADefault);
 }
 
 QByteArray Options::encrypt(const QVariant &AValue, const QByteArray &AKey)
@@ -606,79 +661,6 @@ QVariant Options::decrypt(const QByteArray &AData, const QByteArray &AKey)
 	return QVariant();
 }
 
-QString Options::variantToString(const QVariant &AValue)
-{
-	if (AValue.type() == QVariant::Rect)
-	{
-		QRect rect = AValue.toRect();
-		return QString("%1;%2;%3;%4").arg(rect.left()).arg(rect.top()).arg(rect.width()).arg(rect.height());
-	}
-	else if (AValue.type() == QVariant::Point)
-	{
-		QPoint point = AValue.toPoint();
-		return QString("%1;%2").arg(point.x()).arg(point.y());
-	}
-	else if (AValue.type() == QVariant::Size)
-	{
-		QSize size = AValue.toSize();
-		return QString("%1;%2").arg(size.width()).arg(size.height());
-	}
-	else if (AValue.type() == QVariant::ByteArray)
-	{
-		return AValue.toByteArray().toBase64();
-	}
-	else if (AValue.type() == QVariant::StringList)
-	{
-		return AValue.toStringList().join(" ;; ");
-	}
-	else if (AValue.type() == QVariant::KeySequence)
-	{
-		return AValue.value<QKeySequence>().toString(QKeySequence::PortableText);
-	}
-	return AValue.toString();
-}
-
-QVariant Options::stringToVariant(const QString &AValue, QVariant::Type AType)
-{
-	if (AType == QVariant::Rect)
-	{
-		QList<QString> parts = AValue.split(";",QString::SkipEmptyParts);
-		if (parts.count() == 4)
-			return QRect(parts.at(0).toInt(),parts.at(1).toInt(),parts.at(2).toInt(),parts.at(3).toInt());
-	}
-	else if (AType == QVariant::Point)
-	{
-		QList<QString> parts = AValue.split(";",QString::SkipEmptyParts);
-		if (parts.count() == 2)
-			return QPoint(parts.at(0).toInt(),parts.at(1).toInt());
-	}
-	else if (AType == QVariant::Size)
-	{
-		QList<QString> parts = AValue.split(";",QString::SkipEmptyParts);
-		if (parts.count() == 2)
-			return QSize(parts.at(0).toInt(),parts.at(1).toInt());
-	}
-	else if (AType == QVariant::ByteArray)
-	{
-		return QByteArray::fromBase64(AValue.toLatin1());
-	}
-	else if (AType == QVariant::StringList)
-	{
-		return !AValue.isEmpty() ? AValue.split(" ;; ") : QStringList();
-	}
-	else if(AType == QVariant::KeySequence)
-	{
-		return QKeySequence::fromString(AValue,QKeySequence::PortableText);
-	}
-	else
-	{
-		QVariant var = QVariant(AValue);
-		if (var.convert(AType))
-			return var;
-	}
-	return QVariant();
-}
-
 void Options::exportNode(const QString &APath, QDomElement &AToElem)
 {
 	if (hasNode(APath))
@@ -719,9 +701,4 @@ void Options::importNode(const QString &APath, const QDomElement &AFromElem)
 		OptionsNode node = Options::node(APath);
 		importOptionNode(node,nodeElem);
 	}
-}
-
-OptionsNode Options::createNodeForElement(const QDomElement &AElement)
-{
-	return OptionsNode(AElement);
 }

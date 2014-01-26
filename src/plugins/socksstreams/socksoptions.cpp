@@ -2,7 +2,6 @@
 
 #include <QVBoxLayout>
 #include <QListWidgetItem>
-#include <definitions/optionvalues.h>
 #include <utils/jid.h>
 
 SocksOptions::SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent) : QWidget(AParent)

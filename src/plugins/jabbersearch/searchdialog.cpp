@@ -3,24 +3,16 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QTextDocument>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <utils/toolbarchanger.h>
-#include <utils/logger.h>
 
-enum {
-	COL_JID,
-	COL_FIRST,
-	COL_LAST,
-	COL_NICK,
-	COL_EMAIL
-};
+#define CJID                    0
+#define CFIRST                  1
+#define CLAST                   2
+#define CNICK                   3
+#define CEMAIL                  4
 
-SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid, const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
+SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManager, const Jid &AStreamJid,
+                           const Jid &AServiceJid, QWidget *AParent) : QDialog(AParent)
 {
-	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_JSEARCH,0,0,"windowIcon");
@@ -45,9 +37,12 @@ SearchDialog::SearchDialog(IJabberSearch *ASearch, IPluginManager *APluginManage
 	ui.pgeForm->setLayout(new QVBoxLayout);
 	ui.pgeForm->layout()->setMargin(0);
 
-	connect(FSearch->instance(),SIGNAL(searchFields(const QString &, const ISearchFields &)),SLOT(onSearchFields(const QString &, const ISearchFields &)));
-	connect(FSearch->instance(),SIGNAL(searchResult(const QString &, const ISearchResult &)),SLOT(onSearchResult(const QString &, const ISearchResult &)));
-	connect(FSearch->instance(),SIGNAL(searchError(const QString &, const XmppError &)),SLOT(onSearchError(const QString &, const XmppError &)));
+	connect(FSearch->instance(),SIGNAL(searchFields(const QString &, const ISearchFields &)),
+	        SLOT(onSearchFields(const QString &, const ISearchFields &)));
+	connect(FSearch->instance(),SIGNAL(searchResult(const QString &, const ISearchResult &)),
+	        SLOT(onSearchResult(const QString &, const ISearchResult &)));
+	connect(FSearch->instance(),SIGNAL(searchError(const QString &, const QString &)),
+	        SLOT(onSearchError(const QString &, const QString &)));
 	connect(ui.dbbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
 	initialize();
@@ -60,17 +55,6 @@ SearchDialog::~SearchDialog()
 {
 
 }
-
-Jid SearchDialog::streamJid() const
-{
-	return FStreamJid;
-}
-
-Jid SearchDialog::serviceJid() const
-{
-	return FServiceJid;
-}
-
 
 ISearchItem SearchDialog::currentItem() const
 {
@@ -90,11 +74,11 @@ ISearchItem SearchDialog::currentItem() const
 	else if (ui.tbwResult->currentRow() >= 0)
 	{
 		int row = ui.tbwResult->currentRow();
-		item.itemJid = ui.tbwResult->item(row,COL_JID)->text();
-		item.firstName = ui.tbwResult->item(row,COL_FIRST)->text();
-		item.lastName = ui.tbwResult->item(row,COL_LAST)->text();
-		item.nick = ui.tbwResult->item(row,COL_NICK)->text();
-		item.email = ui.tbwResult->item(row,COL_EMAIL)->text();
+		item.itemJid = ui.tbwResult->item(row,CJID)->text();
+		item.firstName = ui.tbwResult->item(row,CFIRST)->text();
+		item.lastName = ui.tbwResult->item(row,CLAST)->text();
+		item.nick = ui.tbwResult->item(row,CNICK)->text();
+		item.email = ui.tbwResult->item(row,CEMAIL)->text();
 	}
 	return item;
 }
@@ -153,9 +137,7 @@ void SearchDialog::requestResult()
 			submit.item.email = ui.lneEmail->text();
 		}
 		else
-		{
 			submit.form = FDataForms->dataSubmit(FCurrentForm->userDataForm());
-		}
 
 		FRequestId = FSearch->sendSubmit(FStreamJid,submit);
 
@@ -289,11 +271,11 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
 				itemNick->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
 				QTableWidgetItem *itemEmail = new QTableWidgetItem(item.email);
 				itemEmail->setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable);
-				ui.tbwResult->setItem(row,COL_JID,itemJid);
-				ui.tbwResult->setItem(row,COL_FIRST,itemFirst);
-				ui.tbwResult->setItem(row,COL_LAST,itemLast);
-				ui.tbwResult->setItem(row,COL_NICK,itemNick);
-				ui.tbwResult->setItem(row,COL_EMAIL,itemEmail);
+				ui.tbwResult->setItem(row,CJID,itemJid);
+				ui.tbwResult->setItem(row,CFIRST,itemFirst);
+				ui.tbwResult->setItem(row,CLAST,itemLast);
+				ui.tbwResult->setItem(row,CNICK,itemNick);
+				ui.tbwResult->setItem(row,CEMAIL,itemEmail);
 				row++;
 			}
 			ui.tbwResult->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
@@ -305,12 +287,12 @@ void SearchDialog::onSearchResult(const QString &AId, const ISearchResult &AResu
 	}
 }
 
-void SearchDialog::onSearchError(const QString &AId, const XmppError &AError)
+void SearchDialog::onSearchError(const QString &AId, const QString &AError)
 {
 	if (FRequestId == AId)
 	{
 		resetDialog();
-		ui.lblInstructions->setText(tr("Requested operation failed: %1").arg(AError.errorMessage()));
+		ui.lblInstructions->setText(tr("Requested operation failed: %1").arg(AError));
 		ui.dbbButtons->setStandardButtons(QDialogButtonBox::Retry|QDialogButtonBox::Close);
 	}
 }
@@ -352,3 +334,4 @@ void SearchDialog::onDialogButtonClicked(QAbstractButton *AButton)
 	else if (ui.dbbButtons->standardButton(AButton) == QDialogButtonBox::Close)
 		close();
 }
+

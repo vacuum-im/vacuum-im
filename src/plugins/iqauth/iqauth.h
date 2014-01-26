@@ -2,16 +2,23 @@
 #define IQAUTH_H
 
 #include <QDomDocument>
+#include <definitions/namespaces.h>
+#include <definitions/xmppfeatureorders.h>
+#include <definitions/xmppfeaturepluginorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
+#include <utils/xmpperror.h>
+#include <utils/stanza.h>
+#include <utils/jid.h>
 
 #define IQAUTH_UUID "{1E3645BC-313F-49e9-BD00-4CC062EE76A7}"
 
 class IqAuth :
-	public QObject,
-	public IXmppFeature,
-	public IXmppStanzaHadler
+			public QObject,
+			public IXmppFeature,
+			public IXmppStanzaHadler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IXmppFeature IXmppStanzaHadler);
@@ -28,16 +35,16 @@ public:
 	virtual bool start(const QDomElement &AElem);
 signals:
 	void finished(bool ARestart);
-	void error(const XmppError &AError);
+	void error(const QString &AError);
 	void featureDestroyed();
 private:
 	IXmppStream *FXmppStream;
 };
 
 class IqAuthPlugin :
-	public QObject,
-	public IPlugin,
-	public IXmppFeaturesPlugin
+			public QObject,
+			public IPlugin,
+			public IXmppFeaturesPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppFeaturesPlugin);

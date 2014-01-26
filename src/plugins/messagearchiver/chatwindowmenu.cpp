@@ -1,18 +1,12 @@
 #include "chatwindowmenu.h"
 
-#include <definitions/namespaces.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
-#include <utils/menu.h>
-
 #define SFP_LOGGING           "logging"
 #define SFV_MUSTNOT_LOGGING   "mustnot"
 
-ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IMessageToolBarWidget *AToolBarWidget, QWidget *AParent) : Menu(AParent)
+ChatWindowMenu::ChatWindowMenu(IMessageArchiver *AArchiver, IPluginManager *APluginManager, IToolBarWidget *AToolBarWidget, QWidget *AParent) : Menu(AParent)
 {
 	FToolBarWidget = AToolBarWidget;
-	connect(FToolBarWidget->messageWindow()->address()->instance(),SIGNAL(addressChanged(const Jid &,const Jid &)),SLOT(onToolBarWidgetAddressChanged(const Jid &,const Jid &)));
+	FEditWidget = AToolBarWidget->editWidget();
 	
 	FArchiver = AArchiver;
 	FDataForms = NULL;
@@ -34,12 +28,12 @@ ChatWindowMenu::~ChatWindowMenu()
 
 Jid ChatWindowMenu::streamJid() const
 {
-	return FToolBarWidget->messageWindow()->address()->streamJid();
+	return FEditWidget->streamJid();
 }
 
 Jid ChatWindowMenu::contactJid() const
 {
-	return FToolBarWidget->messageWindow()->address()->contactJid();
+	return FEditWidget->contactJid();
 }
 
 void ChatWindowMenu::initialize(IPluginManager *APluginManager)
@@ -74,7 +68,8 @@ void ChatWindowMenu::initialize(IPluginManager *APluginManager)
 
 	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
 	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
-	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
+	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const QString &)),SLOT(onArchiveRequestFailed(const QString &,const QString &)));
+	connect(FEditWidget->instance(),SIGNAL(contactJidChanged(const Jid &)),SLOT(onEditWidgetContactJidChanged(const Jid &)));
 }
 
 void ChatWindowMenu::createActions()
@@ -140,7 +135,7 @@ void ChatWindowMenu::updateMenu()
 	if (FArchiver->isArchivePrefsEnabled(streamJid()))
 	{
 		IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
-		bool isOTRSession = FSessionNegotiation!=NULL ? isOTRStanzaSession(FSessionNegotiation->findSession(streamJid(),contactJid())) : false;
+		bool isOTRSession = FSessionNegotiation!=NULL ? isOTRStanzaSession(FSessionNegotiation->getSession(streamJid(),contactJid())) : false;
 
 		FEnableArchiving->setChecked(iprefs.save != ARCHIVE_SAVE_FALSE);
 		FEnableArchiving->setEnabled(FSaveRequest.isEmpty() && FSessionRequest.isEmpty() && !isOTRSession);
@@ -259,7 +254,7 @@ void ChatWindowMenu::onArchiveRequestCompleted(const QString &AId)
 		if (FSessionNegotiation)
 		{
 			IArchiveItemPrefs iprefs = FArchiver->archiveItemPrefs(streamJid(),contactJid());
-			IStanzaSession session = FSessionNegotiation->findSession(streamJid(),contactJid());
+			IStanzaSession session = FSessionNegotiation->getSession(streamJid(),contactJid());
 			if (session.status == IStanzaSession::Active)
 			{
 				bool isOTRSession = isOTRStanzaSession(session);
@@ -283,18 +278,18 @@ void ChatWindowMenu::onArchiveRequestCompleted(const QString &AId)
 	}
 }
 
-void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const XmppError &AError)
+void ChatWindowMenu::onArchiveRequestFailed(const QString &AId, const QString &AError)
 {
 	if (FSaveRequest==AId || FSessionRequest==AId)
 	{
-		if (FToolBarWidget->messageWindow()->viewWidget() != NULL)
+		if (FToolBarWidget->viewWidget() != NULL)
 		{
 			IMessageContentOptions options;
 			options.kind = IMessageContentOptions::KindStatus;
 			options.type |= IMessageContentOptions::TypeEvent;
 			options.direction = IMessageContentOptions::DirectionIn;
 			options.time = QDateTime::currentDateTime();
-			FToolBarWidget->messageWindow()->viewWidget()->appendText(tr("Failed to change archive preferences: %1").arg(AError.errorMessage()),options);
+			FToolBarWidget->viewWidget()->appendText(tr("Failed to change archive preferences: %1").arg(AError),options);
 		}
 		if (FSessionRequest == AId)
 			FSessionRequest.clear();
@@ -329,9 +324,8 @@ void ChatWindowMenu::onStanzaSessionTerminated(const IStanzaSession &ASession)
 	}
 }
 
-void ChatWindowMenu::onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
+void ChatWindowMenu::onEditWidgetContactJidChanged(const Jid &ABefore)
 {
-	Q_UNUSED(AStreamBefore);
-	restoreSessionPrefs(AContactBefore);
+	restoreSessionPrefs(ABefore);
 	updateMenu();
 }

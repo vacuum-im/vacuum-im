@@ -1,11 +1,6 @@
 #include "socksstreams.h"
 
 #include <QCryptographicHash>
-#include <definitions/namespaces.h>
-#include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
-#include <utils/options.h>
-#include <utils/logger.h>
 
 SocksStreams::SocksStreams() : FServer(this)
 {
@@ -34,27 +29,19 @@ void SocksStreams::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool SocksStreams::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool SocksStreams::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
-
-	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
+	IPlugin *plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
 	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IDataStreamsManager").value(0,NULL);
-	if (plugin)
-	{
 		FDataManager = qobject_cast<IDataStreamsManager *>(plugin->instance());
-	}
+
+	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 
 	plugin = APluginManager->pluginInterface("IConnectionManager").value(0,NULL);
 	if (plugin)
-	{
 		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
@@ -82,19 +69,6 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool SocksStreams::initObjects()
 {
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_DESTROYED,tr("Stream destroyed"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_INVALID_MODE,tr("Unsupported stream mode"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOSTS_REJECTED,tr("Remote client cant connect to given hosts"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOSTS_UNREACHABLE,tr("Cant connect to given hosts"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOSTS_NOT_CREATED,tr("Failed to create hosts"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_NOT_ACTIVATED,tr("Failed to activate stream"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_DATA_NOT_SENT,tr("Failed to send data to socket"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_NO_DIRECT_CONNECTION,tr("Direct connection not established"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_INVALID_HOST,tr("Invalid host"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_INVALID_HOST_ADDRESS,tr("Invalid host address"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOST_NOT_CONNECTED,tr("Failed to connect to host"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SOCKS5_STREAM_HOST_DISCONNECTED,tr("Host disconnected"));
-
 	if (FDataManager)
 	{
 		FDataManager->insertMethod(this);
@@ -139,7 +113,8 @@ QString SocksStreams::methodDescription() const
 	return tr("Data is transferred out-band over TCP or UDP connection");
 }
 
-IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent)
+IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid,
+    IDataStreamSocket::StreamKind AKind, QObject *AParent)
 {
 	if (FStanzaProcessor)
 	{
@@ -166,8 +141,6 @@ void SocksStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode
 	SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget->instance());
 	if (widget)
 		widget->apply(ANode);
-	else
-		REPORT_ERROR("Failed to save socks stream settings: Invalid options widget");
 }
 
 void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget)
@@ -176,10 +149,6 @@ void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget
 	ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
 	if (widget && stream)
 		widget->apply(stream);
-	else if (widget == NULL)
-		REPORT_ERROR("Failed to load socks stream settings: Invalid options widget");
-	else if (stream == NULL)
-		REPORT_ERROR("Failed to load socks stream settings: Invalid socket");
 }
 
 void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode)
@@ -204,10 +173,14 @@ void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, const OptionsN
 		else if (FConnectionManager)
 			stream->setNetworkProxy(FConnectionManager->proxyById(ANode.value("network-proxy").toString()).proxy);
 	}
-	else
-	{
-		REPORT_ERROR("Failed to load socks stream settings: Invalid socket");
-	}
+}
+
+QNetworkProxy SocksStreams::accountNetworkProxy(const Jid &AStreamJid) const
+{
+	QNetworkProxy proxy(QNetworkProxy::NoProxy);
+	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+	IDefaultConnection *connection = stream!=NULL ? qobject_cast<IDefaultConnection *>(stream->connection()->instance()) : NULL;
+	return connection!=NULL ? connection->proxy() : QNetworkProxy(QNetworkProxy::NoProxy);
 }
 
 quint16 SocksStreams::listeningPort() const
@@ -218,14 +191,6 @@ quint16 SocksStreams::listeningPort() const
 QString SocksStreams::accountStreamProxy(const Jid &AStreamJid) const
 {
 	return FStreamProxy.value(AStreamJid);
-}
-
-QNetworkProxy SocksStreams::accountNetworkProxy(const Jid &AStreamJid) const
-{
-	QNetworkProxy proxy(QNetworkProxy::NoProxy);
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
-	IDefaultConnection *connection = stream!=NULL ? qobject_cast<IDefaultConnection *>(stream->connection()->instance()) : NULL;
-	return connection!=NULL ? connection->proxy() : QNetworkProxy(QNetworkProxy::NoProxy);
 }
 
 QString SocksStreams::connectionKey(const QString &ASessionId, const Jid &AInitiator, const Jid &ATarget) const
@@ -244,21 +209,14 @@ bool SocksStreams::appendLocalConnection(const QString &AKey)
 			FLocalKeys.append(AKey);
 			return true;
 		}
-		else if (!FServer.isListening())
-		{
-			LOG_ERROR(QString("Failed to append local socks connection, port=%1: %2").arg(listeningPort()).arg(FServer.errorString()));
-		}
-	}
-	else if (AKey.isEmpty())
-	{
-		REPORT_ERROR("Failed to append local socks connection: Key is empty");
 	}
 	return false;
 }
 
 void SocksStreams::removeLocalConnection(const QString &AKey)
 {
-	FLocalKeys.removeAll(AKey);
+	if (FLocalKeys.contains(AKey))
+		FLocalKeys.removeAll(AKey);
 	if (FLocalKeys.isEmpty())
 		FServer.close();
 }
@@ -284,7 +242,6 @@ void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)
 			QString itemBareJid = item.itemJid.pBare();
 			if (itemBareJid.startsWith("proxy.") || itemBareJid.startsWith("proxy65."))
 			{
-				LOG_STRM_INFO(AItems.streamJid,QString("Found socks proxy on server, jid=%1").arg(itemBareJid));
 				FStreamProxy.insert(AItems.streamJid,itemBareJid);
 				break;
 			}
@@ -297,7 +254,6 @@ void SocksStreams::onNewServerConnection()
 	QTcpSocket *tcpsocket = FServer.nextPendingConnection();
 	connect(tcpsocket, SIGNAL(readyRead()), SLOT(onServerConnectionReadyRead()));
 	connect(tcpsocket, SIGNAL(disconnected()), SLOT(onServerConnectionDisconnected()));
-	LOG_INFO(QString("Socks local connection appended, address=%1").arg(tcpsocket->peerAddress().toString()));
 }
 
 void SocksStreams::onServerConnectionReadyRead()
@@ -313,26 +269,15 @@ void SocksStreams::onServerConnectionReadyRead()
 				QByteArray outData;
 				outData[0] = 5;   // Socks version
 				outData[1] = 0;   // Auth method - no auth
-				if (tcpsocket->write(outData) == outData.length())
-				{
-					LOG_INFO(QString("Socks local connection authentication request sent to=%1").arg(tcpsocket->peerAddress().toString()));
-				}
-				else
-				{
-					LOG_WARNING(QString("Failed to send socks local connection authentication request to=%1: %2").arg(tcpsocket->peerAddress().toString(),tcpsocket->errorString()));
-					tcpsocket->disconnectFromHost();
-				}
+				tcpsocket->write(outData);
 			}
 			else
-			{
-				LOG_WARNING(QString("Failed to accept socks local connection from=%1: Invalid socket version=%2").arg(tcpsocket->peerAddress().toString()).arg((quint8)inData.at(0)));
 				tcpsocket->disconnectFromHost();
-			}
 		}
 		else
 		{
 			unsigned char keyLen = inData.size()>4 ? inData.at(4) : 0;
-			if (inData.size() >= 5+keyLen+2)
+			if (inData.size()>=5+keyLen+2)
 			{
 				QString key = QString::fromUtf8(inData.constData()+5, keyLen).toLower();
 				if (FLocalKeys.contains(key))
@@ -350,21 +295,13 @@ void SocksStreams::onServerConnectionReadyRead()
 
 					tcpsocket->disconnect(this);
 					removeLocalConnection(key);
-
-					LOG_INFO(QString("Authenticated socks local connection from=%1").arg(tcpsocket->peerAddress().toString()));
 					emit localConnectionAccepted(key,tcpsocket);
 				}
 				else
-				{
-					LOG_WARNING(QString("Failed to authenticate socks local connection from=%1: Invalid key=%2").arg(tcpsocket->peerAddress().toString(),key));
 					tcpsocket->disconnectFromHost();
-				}
 			}
 			else
-			{
-				LOG_WARNING(QString("Failed to authenticate socks local connection from=%1: Invalid response size=%2").arg(tcpsocket->peerAddress().toString()).arg(inData.size()));
 				tcpsocket->disconnectFromHost();
-			}
 		}
 	}
 }
@@ -373,10 +310,7 @@ void SocksStreams::onServerConnectionDisconnected()
 {
 	QTcpSocket *tcpsocket = qobject_cast<QTcpSocket *>(sender());
 	if (tcpsocket)
-	{
 		tcpsocket->deleteLater();
-		LOG_INFO(QString("Socks local connection disconnected, address=%1").arg(tcpsocket->peerAddress().toString()));
-	}
 }
 
 Q_EXPORT_PLUGIN2(plg_socksstreams, SocksStreams);

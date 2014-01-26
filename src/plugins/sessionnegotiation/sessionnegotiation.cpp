@@ -3,19 +3,6 @@
 #include <QUuid>
 #include <QTextDocument>
 #include <QCryptographicHash>
-#include <definitions/namespaces.h>
-#include <definitions/dataformtypes.h>
-#include <definitions/sessionnegotiatororders.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <utils/widgetmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/logger.h>
 
 #define SHC_STANZA_SESSION            "/message/feature[@xmlns='"NS_FEATURENEG"']"
 
@@ -60,15 +47,11 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &AI
 	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
-	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
-	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
@@ -155,10 +138,9 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 
 		if (!sessionId.isEmpty() && !formElem.isNull())
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Received stanza session data from=%1, sid=%2").arg(AStanza.from(),sessionId));
-
 			IStanzaSession &session = FSessions[AStreamJid][contactJid];
-			IStanzaSession bareSession = findSession(AStreamJid,contactJid.bare());
+
+			IStanzaSession bareSession = getSession(AStreamJid,contactJid.bare());
 			if (session.sessionId!=sessionId && bareSession.sessionId==sessionId)
 			{
 				session = bareSession;
@@ -188,7 +170,7 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 					bool isRenegotiate = FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE, form.fields) >= 0;
 					bool isContinue = FDataForms->fieldIndex(SESSION_FIELD_CONTINUE, form.fields) >= 0;
 					bool isTerminate = FDataForms->fieldIndex(SESSION_FIELD_TERMINATE, form.fields) >= 0;
-					if (isAccept && session.status!=IStanzaSession::Active)
+					if (isAccept && session.status != IStanzaSession::Active)
 						processAccept(session,form);
 					else if (isRenegotiate && (session.status==IStanzaSession::Active || session.status==IStanzaSession::Renegotiate))
 						processRenegotiate(session,form);
@@ -225,7 +207,6 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 					fieldElem = fieldElem.nextSiblingElement("field");
 				}
 
-				LOG_STRM_INFO(AStreamJid,QString("Stanza session aborted by=%1, sid=%2: %2").arg(AStanza.from(),sessionId,session.error.condition()));
 				emit sessionTerminated(session);
 			}
 			else if (session.status == IStanzaSession::Empty)
@@ -233,10 +214,6 @@ bool SessionNegotiation::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, 
 				removeSession(session);
 			}
 			AAccept = true;
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to process stanza session data from=%1, sid=%2: Invalid params").arg(AStanza.from(),sessionId));
 		}
 	}
 	return false;
@@ -257,8 +234,10 @@ Action *SessionNegotiation::createDiscoFeatureAction(const Jid &AStreamJid, cons
 		action->setData(ADR_CONTACT_JID,ADiscoInfo.contactJid.full());
 		connect(action,SIGNAL(triggered(bool)),SLOT(onSessionActionTriggered(bool)));
 
-		IStanzaSession session = findSession(AStreamJid,ADiscoInfo.contactJid);
-		if (session.status==IStanzaSession::Empty || session.status==IStanzaSession::Terminate || session.status==IStanzaSession::Error)
+		IStanzaSession session = getSession(AStreamJid,ADiscoInfo.contactJid);
+		if (session.status==IStanzaSession::Empty ||
+		    session.status==IStanzaSession::Terminate ||
+		    session.status==IStanzaSession::Error)
 		{
 			action->setData(ADR_SESSION_FIELD,SESSION_FIELD_ACCEPT);
 			action->setText(tr("Negotiate Session"));
@@ -300,7 +279,8 @@ int SessionNegotiation::sessionInit(const IStanzaSession &ASession, IDataForm &A
 {
 	int result = ISessionNegotiator::Skip;
 
-	if (ASession.status == IStanzaSession::Init)
+	//MultiSession
+	if (ASession.status==IStanzaSession::Init)
 	{
 		IDataField multisession;
 		multisession.var = SFP_MULTISESSION;
@@ -314,11 +294,11 @@ int SessionNegotiation::sessionInit(const IStanzaSession &ASession, IDataForm &A
 	return result;
 }
 
-int SessionNegotiation::sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit)
+int SessionNegotiation::sessionAccept(const IStanzaSession &/*ASession*/, const IDataForm &ARequest, IDataForm &ASubmit)
 {
-	Q_UNUSED(ASession);
 	int result = ISessionNegotiator::Skip;
 
+	//Multisession
 	int index = FDataForms->fieldIndex(SFP_MULTISESSION,ARequest.fields);
 	if (index>=0)
 	{
@@ -341,26 +321,22 @@ int SessionNegotiation::sessionAccept(const IStanzaSession &ASession, const IDat
 	return result;
 }
 
-int SessionNegotiation::sessionApply(const IStanzaSession &ASession)
+int SessionNegotiation::sessionApply(const IStanzaSession &/*ASession*/)
 {
-	Q_UNUSED(ASession);
 	return ISessionNegotiator::Auto;
 }
 
-void SessionNegotiation::sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm)
+void SessionNegotiation::sessionLocalize(const IStanzaSession &/*ASession*/, IDataForm &AForm)
 {
-	Q_UNUSED(ASession);
+	//Multi-session
 	int index = FDataForms->fieldIndex(SFP_MULTISESSION,AForm.fields);
 	if (index>=0)
+	{
 		AForm.fields[index].label = tr("Allow multiple sessions?");
+	}
 }
 
-bool SessionNegotiation::isReady(const Jid &AStreamJid) const
-{
-	return FSHISession.contains(AStreamJid);
-}
-
-IStanzaSession SessionNegotiation::findSession(const QString &ASessionId) const
+IStanzaSession SessionNegotiation::getSession(const QString &ASessionId) const
 {
 	foreach(const Jid &streamJid, FSessions.keys())
 		foreach(const IStanzaSession &session, FSessions.value(streamJid))
@@ -369,12 +345,12 @@ IStanzaSession SessionNegotiation::findSession(const QString &ASessionId) const
 	return IStanzaSession();
 }
 
-IStanzaSession SessionNegotiation::findSession(const Jid &AStreamJid, const Jid &AContactJid) const
+IStanzaSession SessionNegotiation::getSession(const Jid &AStreamJid, const Jid &AContactJid) const
 {
 	return FSessions.value(AStreamJid).value(AContactJid);
 }
 
-QList<IStanzaSession> SessionNegotiation::findSessions(const Jid &AStreamJid, int AStatus) const
+QList<IStanzaSession> SessionNegotiation::getSessions(const Jid &AStreamJid, int AStatus) const
 {
 	QList<IStanzaSession> sessions;
 	foreach(const IStanzaSession &session, FSessions.value(AStreamJid).values())
@@ -385,122 +361,92 @@ QList<IStanzaSession> SessionNegotiation::findSessions(const Jid &AStreamJid, in
 
 int SessionNegotiation::initSession(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	if (isReady(AStreamJid))
+	IStanzaSession &session = FSessions[AStreamJid][AContactJid];
+	if (AStreamJid != AContactJid &&
+	    session.status!=IStanzaSession::Accept &&
+	    session.status!=IStanzaSession::Pending &&
+	    session.status!=IStanzaSession::Apply &&
+	    session.status!=IStanzaSession::Renegotiate &&
+	    session.status!=IStanzaSession::Continue)
 	{
-		IStanzaSession &session = FSessions[AStreamJid][AContactJid];
-		if (AStreamJid != AContactJid &&
-			session.status != IStanzaSession::Accept &&
-			session.status != IStanzaSession::Pending &&
-			session.status != IStanzaSession::Apply &&
-			session.status != IStanzaSession::Renegotiate &&
-			session.status != IStanzaSession::Continue)
+		bool isRenegotiate = session.status==IStanzaSession::Active;
+		IDataForm request = defaultForm(isRenegotiate ? SESSION_FIELD_RENEGOTIATE : SESSION_FIELD_ACCEPT);
+		request.type.clear();
+
+		if (!isRenegotiate)
 		{
-			bool isRenegotiate = session.status==IStanzaSession::Active;
-			IDataForm request = defaultForm(isRenegotiate ? SESSION_FIELD_RENEGOTIATE : SESSION_FIELD_ACCEPT);
-			request.type.clear();
-
-			if (!isRenegotiate)
-			{
-				session.status = IStanzaSession::Init;
-				session.sessionId = QUuid::createUuid().toString();
-				session.streamJid = AStreamJid;
-				session.contactJid = AContactJid;
-				session.form = IDataForm();
-				session.error = XmppStanzaError::null;
-				session.errorFields.clear();
-				LOG_STRM_INFO(AStreamJid,QString("Initializing stanza session, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-			}
-			else
-			{
-				session.status = IStanzaSession::Renegotiate;
-				LOG_STRM_INFO(AStreamJid,QString("Renegotiating stanza session, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-			}
-
-			int result = 0;
-			foreach(ISessionNegotiator *negotiator, FNegotiators)
-				result = result | negotiator->sessionInit(session,request);
-
-			if (!isRenegotiate && FDiscovery && !FDiscovery->discoInfo(AStreamJid,AContactJid).features.contains(NS_STANZA_SESSION))
-			{
-				bool infoRequested = !FDiscovery->hasDiscoInfo(AStreamJid,AContactJid) ? FDiscovery->requestDiscoInfo(AStreamJid,AContactJid) : false;
-				if (!infoRequested)
-				{
-					LOG_STRM_WARNING(AStreamJid,QString("Failed to initialize stanza session, with=%1, sid=%2: Stanza sessions not supported").arg(AContactJid.full(),session.sessionId));
-					session.status = IStanzaSession::Error;
-					session.error = XmppStanzaError(XmppStanzaError::EC_SERVICE_UNAVAILABLE);
-					emit sessionTerminated(session);
-					return ISessionNegotiator::Cancel;
-				}
-				else
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Requested stanza session support info from=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-					session.status = IStanzaSession::Init;
-					FSuspended.insert(session.sessionId,IDataForm());
-					return ISessionNegotiator::Wait;
-				}
-			}
-			else if ((result & ISessionNegotiator::Cancel) > 0)
-			{
-				if (!isRenegotiate)
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Stanza session initialization canceled, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-					session.status = IStanzaSession::Terminate;
-					emit sessionTerminated(session);
-				}
-				else
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Stanza session renegotiation canceled, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-					terminateSession(AStreamJid,AContactJid);
-				}
-				return ISessionNegotiator::Cancel;
-			}
-			else if ((result & ISessionNegotiator::Manual) > 0)
-			{
-				if (!isRenegotiate)
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Manually approving stanza session initialization, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-					session.form = clearForm(request);
-				}
-				else
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Manually approving stanza session renegotiation, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-				}
-				localizeSession(session,request);
-				showAcceptDialog(session,request);
-				return ISessionNegotiator::Manual;
-			}
-			else if ((result & ISessionNegotiator::Auto) > 0)
-			{
-				if (!isRenegotiate)
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Sending stanza session initialization request to=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-					session.form = clearForm(request);
-					session.status = IStanzaSession::Pending;
-				}
-				else
-				{
-					LOG_STRM_INFO(AStreamJid,QString("Sending stanza session renegotiation request to=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-					FRenegotiate.insert(session.sessionId,request);
-				}
-				request.type = DATAFORM_TYPE_FORM;
-				localizeSession(session,request);
-				request.title = isRenegotiate ? tr("Session renegotiation") : tr("Session negotiation");
-				sendSessionData(session,request);
-				return ISessionNegotiator::Auto;
-			}
-		}
-		else if (AStreamJid != AContactJid)
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to initialize stanza session, with=%1, sid=%2: Invalid status=%3").arg(session.contactJid.full(),session.sessionId).arg(session.status));
+			session.status = IStanzaSession::Init;
+			session.sessionId = QUuid::createUuid().toString();
+			session.streamJid = AStreamJid;
+			session.contactJid = AContactJid;
+			session.form = IDataForm();
+			session.error = XmppStanzaError::null;
+			session.errorFields.clear();
 		}
 		else
 		{
-			REPORT_ERROR("Failed to initialize stanza session: Invalid params");
+			session.status = IStanzaSession::Renegotiate;
 		}
-	}
-	else
-	{
-		REPORT_ERROR("Failed to initialize stanza session: Stream is not ready");
+
+		int result = 0;
+		foreach(ISessionNegotiator *negotiator, FNegotiators)
+			result = result | negotiator->sessionInit(session,request);
+
+		if (!isRenegotiate && FDiscovery && !FDiscovery->discoInfo(AStreamJid,AContactJid).features.contains(NS_STANZA_SESSION))
+		{
+			bool infoRequested = !FDiscovery->hasDiscoInfo(AStreamJid,AContactJid) ? FDiscovery->requestDiscoInfo(AStreamJid,AContactJid) : false;
+			if (!infoRequested)
+			{
+				session.status = IStanzaSession::Error;
+				session.error = XmppStanzaError(XmppStanzaError::EC_SERVICE_UNAVAILABLE);
+				emit sessionTerminated(session);
+				return ISessionNegotiator::Cancel;
+			}
+			else
+			{
+				session.status = IStanzaSession::Init;
+				FSuspended.insert(session.sessionId,IDataForm());
+				return ISessionNegotiator::Wait;
+			}
+		}
+		else if ((result & ISessionNegotiator::Cancel) > 0)
+		{
+			if (!isRenegotiate)
+			{
+				session.status = IStanzaSession::Terminate;
+				emit sessionTerminated(session);
+			}
+			else
+			{
+				terminateSession(AStreamJid,AContactJid);
+			}
+			return ISessionNegotiator::Cancel;
+		}
+		else if ((result & ISessionNegotiator::Manual) > 0)
+		{
+			if (!isRenegotiate)
+				session.form = clearForm(request);
+			localizeSession(session,request);
+			showAcceptDialog(session,request);
+			return ISessionNegotiator::Manual;
+		}
+		else if ((result & ISessionNegotiator::Auto) > 0)
+		{
+			if (!isRenegotiate)
+			{
+				session.form = clearForm(request);
+				session.status = IStanzaSession::Pending;
+			}
+			else
+			{
+				FRenegotiate.insert(session.sessionId,request);
+			}
+			request.type = DATAFORM_TYPE_FORM;
+			localizeSession(session,request);
+			request.title = isRenegotiate ? tr("Session renegotiation") : tr("Session negotiation");
+			sendSessionData(session,request);
+			return ISessionNegotiator::Auto;
+		}
 	}
 	return ISessionNegotiator::Skip;
 }
@@ -510,8 +456,6 @@ void SessionNegotiation::resumeSession(const Jid &AStreamJid, const Jid &AContac
 	if (FSuspended.contains(FSessions.value(AStreamJid).value(AContactJid).sessionId))
 	{
 		IStanzaSession &session = FSessions[AStreamJid][AContactJid];
-		LOG_STRM_INFO(AStreamJid,QString("Resuming stanza session, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-
 		IDataForm request = FSuspended.take(session.sessionId);
 		if (session.status == IStanzaSession::Init)
 			initSession(session.streamJid,session.contactJid);
@@ -524,35 +468,27 @@ void SessionNegotiation::resumeSession(const Jid &AStreamJid, const Jid &AContac
 		else if (session.status == IStanzaSession::Continue)
 			processContinue(session,request);
 	}
-	else
-	{
-		REPORT_ERROR("Failed to resume stanza session: Session not found");
-	}
 }
 
 void SessionNegotiation::terminateSession(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	if (FSessions.value(AStreamJid).contains(AContactJid))
+	IStanzaSession &session = FSessions[AStreamJid][AContactJid];
+	if (session.status != IStanzaSession::Empty &&
+	    session.status != IStanzaSession::Init &&
+	    session.status != IStanzaSession::Terminate &&
+	    session.status != IStanzaSession::Error)
 	{
-		IStanzaSession &session = FSessions[AStreamJid][AContactJid];
-		if (session.status != IStanzaSession::Empty &&
-			session.status != IStanzaSession::Init &&
-			session.status != IStanzaSession::Terminate &&
-			session.status != IStanzaSession::Error)
-		{
-			LOG_STRM_INFO(AStreamJid,QString("Terminating stanza session, with=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
-			IDataForm request = defaultForm(SESSION_FIELD_TERMINATE);
-			request.type = DATAFORM_TYPE_SUBMIT;
-			session.status = IStanzaSession::Terminate;
-			sendSessionData(session,request);
-			emit sessionTerminated(session);
-		}
+		IDataForm request = defaultForm(SESSION_FIELD_TERMINATE);
+		request.type = DATAFORM_TYPE_SUBMIT;
+		session.status = IStanzaSession::Terminate;
+		sendSessionData(session,request);
+		emit sessionTerminated(session);
 	}
 }
 
 void SessionNegotiation::showSessionParams(const Jid &AStreamJid, const Jid &AContactJid)
 {
-	IStanzaSession session = findSession(AStreamJid,AContactJid);
+	IStanzaSession session = getSession(AStreamJid,AContactJid);
 	if (FDataForms && !session.form.fields.isEmpty())
 	{
 		IDataForm form = session.form;
@@ -568,19 +504,13 @@ void SessionNegotiation::showSessionParams(const Jid &AStreamJid, const Jid &ACo
 void SessionNegotiation::insertNegotiator(ISessionNegotiator *ANegotiator, int AOrder)
 {
 	if (!FNegotiators.contains(AOrder,ANegotiator))
-	{
-		LOG_DEBUG(QString("Stanza session negotiator inserted, order=%1, address=%2").arg(AOrder).arg((quint64)ANegotiator));
 		FNegotiators.insert(AOrder,ANegotiator);
-	}
 }
 
 void SessionNegotiation::removeNegotiator(ISessionNegotiator *ANegotiator, int AOrder)
 {
 	if (FNegotiators.contains(AOrder,ANegotiator))
-	{
-		LOG_DEBUG(QString("Stanza session negotiator removed, order=%1, address=%2").arg(AOrder).arg((quint64)ANegotiator));
 		FNegotiators.remove(AOrder,ANegotiator);
-	}
 }
 
 bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const IDataForm &AForm) const
@@ -594,19 +524,7 @@ bool SessionNegotiation::sendSessionData(const IStanzaSession &ASession, const I
 		IDataForm form = AForm;
 		form.pages.clear();
 		FDataForms->xmlForm(form,featureElem);
-		if (FStanzaProcessor->sendStanzaOut(ASession.streamJid,data))
-		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session data sent to=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-			return true;
-		}
-		else
-		{
-			LOG_STRM_WARNING(ASession.streamJid,QString("Failed to send stanza session data to=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-		}
-	}
-	else if (FStanzaProcessor && FDataForms)
-	{
-		REPORT_ERROR("Failed to send stanza session data: Form fields is empty");
+		return FStanzaProcessor->sendStanzaOut(ASession.streamJid,data);
 	}
 	return false;
 }
@@ -623,8 +541,8 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 		IDataForm request = ARequest;
 		request.pages.clear();
 
-    QDomElement featureElem = error.addElement("feature",NS_FEATURENEG).toElement();
-    FDataForms->xmlForm(request,featureElem);
+        QDomElement featureElem = error.addElement("feature",NS_FEATURENEG).toElement();
+        FDataForms->xmlForm(request,featureElem);
 
 		if (!ASession.errorFields.isEmpty())
 		{
@@ -632,19 +550,7 @@ bool SessionNegotiation::sendSessionError(const IStanzaSession &ASession, const 
 			foreach(const QString &var, ASession.errorFields)
 				featureElem.appendChild(error.createElement("field")).toElement().setAttribute("var",var);
 		}
-		if (FStanzaProcessor->sendStanzaOut(ASession.streamJid,error))
-		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session abort sent to=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-			return true;
-		}
-		else
-		{
-			LOG_STRM_WARNING(ASession.streamJid,QString("Failed to send stanza session abort to=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-		}
-	}
-	else if (FStanzaProcessor && FDataForms)
-	{
-		REPORT_ERROR("Failed to send stanza session abort: Error is empty");
+		return FStanzaProcessor->sendStanzaOut(ASession.streamJid,error);
 	}
 	return false;
 }
@@ -665,7 +571,6 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 
 		if (!FDataForms->isSubmitValid(ARequest,submit))
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Failed to accept stanza session request, with=%1, sid=%2: Required feature not supported").arg(ASession.contactJid.full(),ASession.sessionId));
 			ASession.status = IStanzaSession::Error;
 			ASession.error = XmppStanzaError(XmppStanzaError::EC_FEATURE_NOT_IMPLEMENTED);
 			ASession.errorFields = unsubmitedFields(ARequest,submit,true);
@@ -673,7 +578,6 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 		}
 		else if ((result & ISessionNegotiator::Cancel) > 0)
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session request not accepted, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			ASession.status = IStanzaSession::Terminate;
 			submit.fields[FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,submit.fields)].value = false;
 			updateFields(IDataForm(),submit,false,true);
@@ -681,12 +585,10 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 		}
 		else if ((result & ISessionNegotiator::Wait) > 0)
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session request accept suspended, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			FSuspended.insert(ASession.sessionId,ARequest);
 		}
 		else if ((result & ISessionNegotiator::Manual) > 0)
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Manually accepting stanza session request, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			updateFields(submit,ASession.form,false,true);
 			IDataForm request = ASession.form;
 			request.pages = submit.pages;
@@ -695,7 +597,6 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 		}
 		else
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session request accepted, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			updateFields(submit,ASession.form,false,true);
 			processApply(ASession,submit);
 		}
@@ -715,7 +616,6 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 
 			if (!FDataForms->isSubmitValid(ASession.form,ARequest))
 			{
-				LOG_STRM_WARNING(ASession.streamJid,QString("Failed to accept stanza session submit, with=%1, sid=%2: Required feature not submitted").arg(ASession.contactJid.full(),ASession.sessionId));
 				ASession.status = IStanzaSession::Error;
 				ASession.error = XmppStanzaError(XmppStanzaError::EC_NOT_ACCEPTABLE);
 				ASession.errorFields = unsubmitedFields(ARequest,submit,true);
@@ -724,7 +624,6 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 			}
 			else if ((result & ISessionNegotiator::Cancel) > 0)
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session submit not accepted, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				ASession.status = IStanzaSession::Terminate;
 				submit.fields[FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,submit.fields)].value = false;
 				updateFields(IDataForm(),submit,false,true);
@@ -735,12 +634,10 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 			}
 			else if ((result & ISessionNegotiator::Wait) > 0)
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session submit accept suspended, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				FSuspended.insert(ASession.sessionId,ARequest);
 			}
 			else if ((result & ISessionNegotiator::Manual) > 0)
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Manually accepting stanza session submit, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				updateFields(ARequest,ASession.form,false,false);
 				IDataForm request = ASession.form;
 				request.pages = submit.pages;
@@ -750,14 +647,12 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 			}
 			else
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session submit accepted, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				updateFields(ARequest,ASession.form,false,false);
 				processApply(ASession,submit);
 			}
 		}
 		else
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session canceled by=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			ASession.status = IStanzaSession::Terminate;
 			updateFields(ARequest,ASession.form,true,false);
 			emit sessionTerminated(ASession);
@@ -767,21 +662,15 @@ void SessionNegotiation::processAccept(IStanzaSession &ASession, const IDataForm
 	{
 		if (FDataForms->fieldValue(SESSION_FIELD_ACCEPT,ARequest.fields).toBool())
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session activated, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			ASession.status = IStanzaSession::Active;
 			emit sessionActivated(ASession);
 		}
 		else
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session canceled by=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			ASession.status = IStanzaSession::Terminate;
 			updateFields(ARequest,ASession.form,true,false);
 			emit sessionTerminated(ASession);
 		}
-	}
-	else
-	{
-		LOG_STRM_WARNING(ASession.streamJid,QString("Failed to accept stanza session, with=%1, sid=%2: Invalid form type=%3").arg(ASession.contactJid.full(),ASession.sessionId,ARequest.type));
 	}
 }
 
@@ -802,7 +691,6 @@ void SessionNegotiation::processApply(IStanzaSession &ASession, const IDataForm 
 		{
 			if (isAccept)
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session not applied, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				ASession.status = IStanzaSession::Terminate;
 				IDataForm submit = ASubmit;
 				submit.fields[FDataForms->fieldIndex(SESSION_FIELD_ACCEPT,submit.fields)].value = false;
@@ -811,7 +699,6 @@ void SessionNegotiation::processApply(IStanzaSession &ASession, const IDataForm 
 			}
 			else if (ASubmit.type == DATAFORM_TYPE_SUBMIT)
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation not applied, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				ASession.status = IStanzaSession::Active;
 				IDataForm submit = ASubmit;
 				submit.fields[FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,submit.fields)].value = false;
@@ -819,16 +706,11 @@ void SessionNegotiation::processApply(IStanzaSession &ASession, const IDataForm 
 			}
 			else
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session apply canceled, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				terminateSession(ASession.streamJid,ASession.contactJid);
 			}
 		}
 		else if ((result & ISessionNegotiator::Wait) > 0)
 		{
-			if (isAccept)
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session apply suspended, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-			else
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation apply suspended, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			FSuspended.insert(ASession.sessionId,ASubmit);
 		}
 		else
@@ -838,18 +720,10 @@ void SessionNegotiation::processApply(IStanzaSession &ASession, const IDataForm 
 				ASession.status = ASubmit.type==DATAFORM_TYPE_RESULT ? IStanzaSession::Active : IStanzaSession::Pending;
 				sendSessionData(ASession,ASubmit);
 				if (ASession.status == IStanzaSession::Active)
-				{
-					LOG_STRM_INFO(ASession.streamJid,QString("Stanza session applied and activated, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 					emit sessionActivated(ASession);
-				}
-				else
-				{
-					LOG_STRM_INFO(ASession.streamJid,QString("Stanza session applied, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-				}
 			}
 			else
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation applied and activated, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 				ASession.status = IStanzaSession::Active;
 				if (ASubmit.type == DATAFORM_TYPE_SUBMIT)
 					sendSessionData(ASession,ASubmit);
@@ -872,28 +746,18 @@ void SessionNegotiation::processRenegotiate(IStanzaSession &ASession, const IDat
 		foreach(ISessionNegotiator *negotiator, FNegotiators)
 			result = result | negotiator->sessionAccept(ASession,ARequest,submit);
 
-		if (!FDataForms->isSubmitValid(ARequest,submit))
+		if (!FDataForms->isSubmitValid(ARequest,submit) || (result & ISessionNegotiator::Cancel) > 0)
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Failed to renegotiate stanza session, with=%1, sid=%2: Required feature not supported").arg(ASession.contactJid.full(),ASession.sessionId));
-			ASession.status = IStanzaSession::Active;
-			submit.fields[FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,submit.fields)].value = false;
-			sendSessionData(ASession,submit);
-		}
-		else if ((result & ISessionNegotiator::Cancel) > 0)
-		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation request not accepted, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			ASession.status = IStanzaSession::Active;
 			submit.fields[FDataForms->fieldIndex(SESSION_FIELD_RENEGOTIATE,submit.fields)].value = false;
 			sendSessionData(ASession,submit);
 		}
 		else if ((result & ISessionNegotiator::Wait) > 0)
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation request accept suspended, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			FSuspended.insert(ASession.sessionId,ARequest);
 		}
 		else if ((result & ISessionNegotiator::Manual) > 0)
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Manually accepting stanza session renegotiation request, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			IDataForm request = ARequest;
 			request.pages = submit.pages;
 			updateFields(submit,request,false,false);
@@ -902,45 +766,29 @@ void SessionNegotiation::processRenegotiate(IStanzaSession &ASession, const IDat
 		}
 		else
 		{
-			LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation request accepted, with=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 			updateFields(submit,ASession.form,false,false);
 			processApply(ASession,submit);
 		}
 	}
-	else if (ARequest.type == DATAFORM_TYPE_SUBMIT)
+	else if (ARequest.type == DATAFORM_TYPE_SUBMIT && FRenegotiate.contains(ASession.sessionId))
 	{
-		if (FRenegotiate.contains(ASession.sessionId))
-		{
-			ASession.status = IStanzaSession::Renegotiate;
+		ASession.status = IStanzaSession::Renegotiate;
 
-			IDataForm form = FRenegotiate.take(ASession.sessionId);
-			if (!FDataForms->isSubmitValid(form,ARequest))
-			{
-				LOG_STRM_WARNING(ASession.streamJid,QString("Failed to accept stanza session renegotiation submit, with=%1, sid=%2: Required feature not submitted").arg(ASession.contactJid.full(),ASession.sessionId));
-				terminateSession(ASession.streamJid,ASession.contactJid);
-			}
-			else if (!FDataForms->fieldValue(SESSION_FIELD_RENEGOTIATE,ARequest.fields).toBool())
-			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation canceled, by=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-				terminateSession(ASession.streamJid,ASession.contactJid);
-			}
-			else
-			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session renegotiation accepted, by=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
-				IDataForm submit = defaultForm(SESSION_FIELD_RENEGOTIATE);
-				submit.type = DATAFORM_TYPE_RESULT;
-				updateFields(ARequest,ASession.form,false,false);
-				processApply(ASession,submit);
-			}
+		IDataForm form = FRenegotiate.take(ASession.sessionId);
+		bool accepted = FDataForms->fieldValue(SESSION_FIELD_RENEGOTIATE,ARequest.fields).toBool();
+		if (accepted && FDataForms->isSubmitValid(form,ARequest))
+		{
+
+			IDataForm submit = defaultForm(SESSION_FIELD_RENEGOTIATE);
+			submit.type = DATAFORM_TYPE_RESULT;
+
+			updateFields(ARequest,ASession.form,false,false);
+			processApply(ASession,submit);
 		}
 		else
 		{
-			LOG_STRM_WARNING(ASession.streamJid,QString("Failed to accept stanza session renegotiation submit, with=%1, sid=%2: Renegotiation not requested").arg(ASession.contactJid.full(),ASession.sessionId));
+			terminateSession(ASession.streamJid,ASession.contactJid);
 		}
-	}
-	else
-	{
-		LOG_STRM_WARNING(ASession.streamJid,QString("Failed to renegotiate stanza session with=%1, sid=%2: Invalid form type=%3").arg(ASession.contactJid.full(),ASession.sessionId,ARequest.type));
 	}
 }
 
@@ -960,19 +808,16 @@ void SessionNegotiation::processContinue(IStanzaSession &ASession, const IDataFo
 
 			if ((result & ISessionNegotiator::Cancel) > 0)
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session continue not applied, with=%1, sid=%2, resource=%3").arg(ASession.contactJid.full(),ASession.sessionId,resource));
 				ASession.status = IStanzaSession::Error;
 				ASession.error = XmppStanzaError(XmppStanzaError::EC_NOT_ACCEPTABLE);
 				sendSessionError(ASession,ARequest);
 			}
 			else if ((result & ISessionNegotiator::Wait) > 0)
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session continue suspended, with=%1, sid=%2, resource=%3").arg(ASession.contactJid.full(),ASession.sessionId,resource));
 				FSuspended.insert(ASession.sessionId,ARequest);
 			}
 			else
 			{
-				LOG_STRM_INFO(ASession.streamJid,QString("Stanza session continue applied and activated, with=%1, sid=%2, resource=%3").arg(ASession.contactJid.full(),ASession.sessionId,resource));
 				IDataForm submit = defaultForm(SESSION_FIELD_CONTINUE,resource);
 				submit.type = DATAFORM_TYPE_RESULT;
 				sendSessionData(ASession,submit);
@@ -981,14 +826,6 @@ void SessionNegotiation::processContinue(IStanzaSession &ASession, const IDataFo
 				emit sessionActivated(ASession);
 			}
 		}
-		else
-		{
-			LOG_STRM_WARNING(ASession.streamJid,QString("Failed to continue stanza session, with=%1, sid=%2: Invalid resource=%3").arg(ASession.contactJid.full(),ASession.sessionId,resource));
-		}
-	}
-	else
-	{
-		LOG_STRM_WARNING(ASession.streamJid,QString("Failed to continue stanza session, with=%1, sid=%2: Invalid form type=%3").arg(ASession.contactJid.full(),ASession.sessionId,ARequest.type));
 	}
 }
 
@@ -996,13 +833,8 @@ void SessionNegotiation::processTerminate(IStanzaSession &ASession, const IDataF
 {
 	if (ARequest.type == DATAFORM_TYPE_SUBMIT)
 	{
-		LOG_STRM_INFO(ASession.streamJid,QString("Stanza session terminated, by=%1, sid=%2").arg(ASession.contactJid.full(),ASession.sessionId));
 		ASession.status = IStanzaSession::Terminate;
 		emit sessionTerminated(ASession);
-	}
-	else
-	{
-		LOG_STRM_WARNING(ASession.streamJid,QString("Failed to terminate stanza session, with=%1, sid=%2: Invalid form type=%3").arg(ASession.contactJid.full(),ASession.sessionId,ARequest.type));
 	}
 }
 
@@ -1143,18 +975,15 @@ IDataForm SessionNegotiation::defaultForm(const QString &AActionVar, const QVari
 	form_type.type = DATAFIELD_TYPE_HIDDEN;
 	form_type.value = DATA_FORM_SESSION_NEGOTIATION;
 	form_type.required = false;
-
 	IDataField actionField;
 	actionField.var = AActionVar;
 	actionField.type = AValue.type()==QVariant::Bool ? DATAFIELD_TYPE_BOOLEAN : DATAFIELD_TYPE_TEXTSINGLE;
 	actionField.value = AValue;
 	actionField.required = true;
-
 	IDataForm form;
 	form.fields.append(form_type);
 	form.fields.append(actionField);
 	form.pages.append(IDataLayout());
-
 	return form;
 }
 
@@ -1231,10 +1060,10 @@ void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
 void SessionNegotiation::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
 {
 	Q_UNUSED(ABefore);
-	if (AItem.show==IPresence::Offline || AItem.show==IPresence::Error)
+	if (AItem.show == IPresence::Offline || AItem.show == IPresence::Error)
 	{
 		terminateSession(APresence->streamJid(),AItem.itemJid);
-		removeSession(findSession(APresence->streamJid(),AItem.itemJid));
+		removeSession(getSession(APresence->streamJid(),AItem.itemJid));
 	}
 }
 
@@ -1251,7 +1080,9 @@ void SessionNegotiation::onStreamAboutToClose(IXmppStream *AXmppStream)
 void SessionNegotiation::onStreamClosed(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor && FDataForms)
+	{
 		FStanzaProcessor->removeStanzaHandle(FSHISession.take(AXmppStream->streamJid()));
+	}
 	FDialogs.remove(AXmppStream->streamJid());
 	FSessions.remove(AXmppStream->streamJid());
 }
@@ -1262,7 +1093,7 @@ void SessionNegotiation::onNotificationActivated(int ANotifyId)
 	{
 		IDataDialogWidget *dialog = FDialogByNotify.take(ANotifyId);
 		if (dialog)
-			WidgetManager::showActivateRaiseWindow(dialog->instance());
+		WidgetManager::showActivateRaiseWindow(dialog->instance());
 		FNotifications->removeNotification(ANotifyId);
 	}
 }
@@ -1273,10 +1104,8 @@ void SessionNegotiation::onAcceptDialogAccepted()
 	if (dialog)
 	{
 		IStanzaSession &session = dialogSession(dialog);
-
 		if (session.status == IStanzaSession::Init)
 		{
-			LOG_STRM_INFO(session.streamJid,QString("Stanza session initialization approved by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			session.status = IStanzaSession::Pending;
 			IDataForm request = dialog->formWidget()->userDataForm();
 			request.title = tr("Session negotiation");
@@ -1285,7 +1114,6 @@ void SessionNegotiation::onAcceptDialogAccepted()
 		}
 		else if (session.status == IStanzaSession::Accept)
 		{
-			LOG_STRM_INFO(session.streamJid,QString("Stanza session accept approved by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			if (dialog->formWidget()->dataForm().type == DATAFORM_TYPE_FORM)
 			{
 				IDataForm submit = FDataForms->dataSubmit(dialog->formWidget()->userDataForm());
@@ -1301,7 +1129,6 @@ void SessionNegotiation::onAcceptDialogAccepted()
 		}
 		else if (session.status == IStanzaSession::Renegotiate)
 		{
-			LOG_STRM_INFO(session.streamJid,QString("Stanza session renegotiation approved by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			IDataForm request = dialog->formWidget()->dataForm();
 			if (request.type.isEmpty())
 			{
@@ -1334,13 +1161,11 @@ void SessionNegotiation::onAcceptDialogRejected()
 		IStanzaSession &session = dialogSession(dialog);
 		if (session.status == IStanzaSession::Init)
 		{
-			LOG_STRM_INFO(session.streamJid,QString("Stanza session initialization rejected by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			session.status = IStanzaSession::Terminate;
 			emit sessionTerminated(session);
 		}
 		else if (session.status == IStanzaSession::Accept)
 		{
-			LOG_STRM_INFO(session.streamJid,QString("Stanza session accept rejected by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			if (dialog->formWidget()->dataForm().type == DATAFORM_TYPE_FORM)
 			{
 				session.status = IStanzaSession::Terminate;
@@ -1360,7 +1185,6 @@ void SessionNegotiation::onAcceptDialogRejected()
 		}
 		else if (session.status == IStanzaSession::Renegotiate)
 		{
-			LOG_STRM_INFO(session.streamJid,QString("Stanza session renegotiation rejected by user, with=%1, sid=%2").arg(session.contactJid.full(),session.sessionId));
 			IDataForm request = dialog->formWidget()->dataForm();
 			if (request.type.isEmpty())
 			{
@@ -1412,7 +1236,7 @@ void SessionNegotiation::onDiscoInfoRecieved(const IDiscoInfo &AInfo)
 {
 	foreach(const QString &sessionId, FSuspended.keys())
 	{
-		IStanzaSession session = findSession(sessionId);
+		IStanzaSession session = getSession(sessionId);
 		if (session.status==IStanzaSession::Init && session.contactJid==AInfo.contactJid)
 			resumeSession(session.streamJid,session.contactJid);
 	}

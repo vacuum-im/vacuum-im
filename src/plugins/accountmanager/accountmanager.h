@@ -2,11 +2,21 @@
 #define ACCOUNTMANAGER_H
 
 #include <QPointer>
+#include <definitions/actiongroups.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/rosterindextyperole.h>
+#include <definitions/rosterlabelorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
+#include <utils/action.h>
 #include "account.h"
 #include "accountoptions.h"
 #include "accountsoptions.h"
@@ -14,10 +24,10 @@
 class AccountsOptions;
 
 class AccountManager :
-	public QObject,
-	public IPlugin,
-	public IAccountManager,
-	public IOptionsHolder
+			public QObject,
+			public IPlugin,
+			public IAccountManager,
+			public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAccountManager IOptionsHolder);
@@ -62,7 +72,7 @@ protected slots:
 	void onShowAccountOptions(bool);
 	void onAccountActiveChanged(bool AActive);
 	void onAccountOptionsChanged(const OptionsNode &ANode);
-	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu);
 private:
 	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;

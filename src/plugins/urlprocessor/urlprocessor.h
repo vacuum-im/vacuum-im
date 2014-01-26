@@ -4,36 +4,41 @@
 #include <QNetworkAccessManager>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iurlprocessor.h>
+#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iconnectionmanager.h>
 
 class UrlProcessor : 
 	public QNetworkAccessManager, 
 	public IPlugin, 
-	public IUrlProcessor
+	public IUrlProcessor, 
+	public IOptionsHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IUrlProcessor);
+	Q_INTERFACES(IPlugin IUrlProcessor IOptionsHolder);
 public:
-	UrlProcessor();
-	~UrlProcessor();
+	UrlProcessor(QObject *AParent = 0);
 	// IPlugin
 	QObject *instance() {return this;}
 	virtual QUuid pluginUuid() const { return URLPROCESSOR_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects() { return true; }
-	virtual bool initSettings() { return true; }
+	virtual bool initObjects();
+	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
+	// IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	// IUrlProcessor
+	virtual QNetworkAccessManager *networkAccessManager();
 	virtual bool registerUrlHandler(const QString &AScheme, IUrlHandler *AUrlHandler);
 protected:
 	// QNetworkAccessManager
-	virtual QNetworkAccessManager *networkAccessManager();
 	virtual QNetworkReply *createRequest(QNetworkAccessManager::Operation AOperation, const QNetworkRequest &ARequest, QIODevice *AOutData=NULL);
 protected slots:
-	void onDefaultConnectionProxyChanged(const QUuid &AProxyId);
+	void onOptionsOpened();
+	void onOptionsChanged(const OptionsNode &ANode);
 	void onProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth);
 private:
+	IOptionsManager *FOptionsManager;
 	IConnectionManager *FConnectionManager;
 private:
 	QMultiMap<QString, IUrlHandler *> FHandlerList;

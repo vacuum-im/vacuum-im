@@ -2,13 +2,17 @@
 #define ICONSOPTIONSWIDGET_H
 
 #include <QItemDelegate>
+#include <definitions/resources.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/ioptionsmanager.h>
-#include "ui_iconsoptionswidget.h"
+#include <utils/options.h>
+#include <utils/iconstorage.h>
 #include <utils/iconsetdelegate.h>
+#include "ui_iconsoptionswidget.h"
 
 class IconsetSelectableDelegate :
-	public IconsetDelegate
+			public IconsetDelegate
 {
 public:
 	IconsetSelectableDelegate(const QString &AStorage, const QStringList &ASubStorages, QObject *AParent = NULL);
@@ -21,9 +25,10 @@ private:
 	QStringList FSubStorages;
 };
 
+
 class IconsOptionsWidget :
-	public QWidget,
-	public IOptionsWidget
+			public QWidget,
+			public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

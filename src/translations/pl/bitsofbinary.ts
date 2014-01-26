@@ -20,12 +20,8 @@
         <translation>Obsługa wymiany pakietów danych binarnych w blokach XMPP</translation>
     </message>
     <message>
-        <source>Failed to load data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to save data</source>
-        <translation type="unfinished"></translation>
+        <source>Failed to read cached data</source>
+        <translation>Błąd odczytu pamięci podręcznej</translation>
     </message>
 </context>
 </TS>

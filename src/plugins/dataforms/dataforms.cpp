@@ -1,8 +1,6 @@
 #include "dataforms.h"
 
 #include <QImageReader>
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
 
 DataForms::DataForms()
 {
@@ -24,10 +22,8 @@ void DataForms::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool DataForms::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
-
 	IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
 	if (plugin)
 	{
@@ -45,14 +41,10 @@ bool DataForms::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 
 bool DataForms::initObjects()
 {
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_MEDIA_INVALID_TYPE,tr("Unsupported media type"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_MEDIA_INVALID_FORMAT,tr("Unsupported data format"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_URL_INVALID_SCHEME,tr("Unsupported url scheme"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_URL_NETWORK_ERROR,tr("Url load failed"));
-
 	if (FDiscovery)
+	{
 		registerDiscoFeatures();
-
+	}
 	return true;
 }
 
@@ -208,7 +200,6 @@ IDataTable DataForms::dataTable(const QDomElement &ATableElem) const
 			QStringList rowValues;
 			for (int i=0; i<columnVars.count(); i++)
 				rowValues.append(QString::null);
-
 			QDomElement fieldElem = itemElem.firstChildElement("field");
 			while (!fieldElem.isNull())
 			{
@@ -219,7 +210,6 @@ IDataTable DataForms::dataTable(const QDomElement &ATableElem) const
 				fieldElem = fieldElem.nextSiblingElement("field");
 			}
 			table.rows.insert(row++,rowValues);
-
 			itemElem = itemElem.nextSiblingElement("item");
 		}
 	}
@@ -238,13 +228,18 @@ IDataLayout DataForms::dataLayout(const QDomElement &ALayoutElem) const
 		{
 			QString childName = childElem.tagName();
 			if (childName == DATALAYOUT_CHILD_TEXT)
+			{
 				section.text.append(childElem.text());
+			}
 			else if (childName == DATALAYOUT_CHILD_SECTION)
+			{
 				section.sections.append(dataLayout(childElem));
+			}
 			else if (childName == DATALAYOUT_CHILD_FIELDREF)
+			{
 				section.fieldrefs.append(childElem.attribute("var"));
+			}
 			section.childOrder.append(childName);
-
 			childElem = childElem.nextSiblingElement();
 		}
 	}
@@ -328,9 +323,9 @@ void DataForms::xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) cons
 	QDomDocument doc = AFieldElem.ownerDocument();
 	QDomElement mediaElem = AFieldElem.appendChild(doc.createElementNS(NS_XMPP_MEDIA_ELEMENT,"media")).toElement();
 
-	if (AMedia.height > 0)
+	if (AMedia.height>0)
 		mediaElem.setAttribute("height",AMedia.height);
-	if (AMedia.width > 0)
+	if (AMedia.width>0)
 		mediaElem.setAttribute("width",AMedia.width);
 
 	foreach(const IDataMediaURI &uri, AMedia.uris)
@@ -407,10 +402,10 @@ void DataForms::xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const
 	foreach(const IDataField &column, ATable.columns) {
 		xmlField(column,reportElem,DATAFORM_TYPE_TABLE); }
 
-	foreach(const QStringList &rowValues, ATable.rows)
+	foreach(const QStringList &rowValues,ATable.rows)
 	{
 		QDomElement itemElem = AFormElem.appendChild(doc.createElement("item")).toElement();
-		for (int col=0; col<rowValues.count(); col++)
+		for (int col=0;col<rowValues.count();col++)
 		{
 			QDomElement fieldElem = itemElem.appendChild(doc.createElement("field")).toElement();
 			fieldElem.setAttribute("var",ATable.columns.value(col).var);
@@ -686,14 +681,10 @@ bool DataForms::isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) 
 					valid &= isFieldValid(submField,DATAFORM_TYPE_SUBMIT);
 				}
 				else
-				{
 					valid &= !formField.required;
-				}
 			}
 			else
-			{
 				valid &= !formField.required;
-			}
 		}
 	}
 	return valid;
@@ -763,7 +754,9 @@ IDataForm DataForms::localizeForm(const IDataForm &AForm) const
 void DataForms::insertLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField)
 {
 	if (!ATypeField.isEmpty() && !FLocalizers.contains(ATypeField))
+	{
 		FLocalizers.insert(ATypeField,ALocalizer);
+	}
 }
 
 void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField)
@@ -774,9 +767,7 @@ void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &AType
 			FLocalizers.remove(formType);
 	}
 	else if (FLocalizers.value(ATypeField)==ALocalizer)
-	{
 		FLocalizers.remove(ATypeField);
-	}
 }
 
 int DataForms::fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const
@@ -790,7 +781,7 @@ int DataForms::fieldIndex(const QString &AVar, const QList<IDataField> &AFields)
 QVariant DataForms::fieldValue(const QString &AVar, const QList<IDataField> &AFields) const
 {
 	int index = fieldIndex(AVar,AFields);
-	return index>=0 ? AFields.at(index).value : QVariant();
+	return index >= 0 ? AFields.at(index).value : QVariant();
 }
 
 IDataForm DataForms::dataSubmit(const IDataForm &AForm) const
@@ -890,13 +881,13 @@ bool DataForms::loadUrl(const QUrl &AUrl)
 			}
 			else
 			{
-				urlLoadFailure(AUrl,XmppError(IERR_DATAFORMS_URL_NETWORK_ERROR));
+				urlLoadFailure(AUrl,tr("Url load failed"));
 				return false;
 			}
 		}
 		else
 		{
-			urlLoadFailure(AUrl,XmppError(IERR_DATAFORMS_URL_INVALID_SCHEME));
+			urlLoadFailure(AUrl,tr("Unsupported url scheme"));
 			return false;
 		}
 	}
@@ -1032,7 +1023,7 @@ void DataForms::urlLoadSuccess(const QUrl &AUrl, const QByteArray &AData)
 	emit urlLoaded(AUrl,AData);
 }
 
-void DataForms::urlLoadFailure(const QUrl &AUrl, const XmppError &AError)
+void DataForms::urlLoadFailure(const QUrl &AUrl, const QString &AError)
 {
 	FUrlRequests.remove(AUrl);
 	emit urlLoadFailed(AUrl,AError);
@@ -1079,7 +1070,7 @@ void DataForms::onNetworkReplyError(QNetworkReply::NetworkError ACode)
 	QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
 	if (reply)
 	{
-		urlLoadFailure(reply->url(),XmppError(IERR_DATAFORMS_URL_NETWORK_ERROR,reply->errorString()));
+		urlLoadFailure(reply->url(),reply->errorString());
 		reply->close();
 		reply->deleteLater();
 	}

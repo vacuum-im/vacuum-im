@@ -1,19 +1,6 @@
 #include "captchaforms.h"
 
 #include <QTextDocument>
-#include <definitions/namespaces.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/soundfiles.h>
-#include <definitions/dataformtypes.h>
-#include <utils/widgetmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/xmpperror.h>
-#include <utils/logger.h>
 
 #define SHC_MESSAGE_CAPTCHA         "/message/captcha[@xmlns='" NS_CAPTCHA_FORMS "']"
 
@@ -44,9 +31,8 @@ void CaptchaForms::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool CaptchaForms::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool CaptchaForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IDataForms").value(0,NULL);
 	if (plugin)
 	{
@@ -64,12 +50,6 @@ bool CaptchaForms::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
-	if (plugin)
-	{
-		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
-
 	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
 	if (plugin)
 	{
@@ -79,6 +59,12 @@ bool CaptchaForms::initConnections(IPluginManager *APluginManager, int &AInitOrd
 			connect(FNotifications->instance(),SIGNAL(notificationActivated(int)),SLOT(onNotificationActivated(int)));
 			connect(FNotifications->instance(),SIGNAL(notificationRemoved(int)),SLOT(onNotificationRemoved(int)));
 		}
+	}
+
+	plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
+	if (plugin)
+	{
+		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 	}
 
 	return FDataForms!=NULL && FXmppStreams!=NULL && FStanzaProcessor!=NULL;
@@ -105,24 +91,15 @@ bool CaptchaForms::initObjects()
 
 bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FDataForms && FSHIChallenge.value(AStreamJid)==AHandleId)
+	if (FSHIChallenge.value(AStreamJid) == AHandleId)
 	{
 		AAccept = true;
 		IDataForm form;
-		if (!isValidChallenge(AStreamJid,AStanza,form))
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Received invalid challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
-		}
-		else if (!isSupportedChallenge(form))
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Received unsupported challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
-		}
-		else
+		if (FDataForms && isValidChallenge(AStreamJid, AStanza, form) && isSupportedChallenge(form))
 		{
 			QString cid = findChallenge(AStreamJid, FDataForms->fieldValue("from",form.fields).toString());
 			if (cid.isEmpty())
 			{
-				LOG_STRM_INFO(AStreamJid,QString("Received new challenge from=%1, id=%2").arg(AStanza.from(),AStanza.id()));
 				ChallengeItem &item = FChallenges[AStanza.id()];
 				item.streamJid = AStreamJid;
 				item.challenger = AStanza.from();
@@ -137,7 +114,6 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			}
 			else
 			{
-				LOG_STRM_INFO(AStreamJid,QString("Received challenge update from=%1, id=%2").arg(AStanza.from(),cid));
 				ChallengeItem &challenge = FChallenges[cid];
 				challenge.challenger = AStanza.from();
 				challenge.dialog->setForm(FDataForms->localizeForm(form));
@@ -146,10 +122,6 @@ bool CaptchaForms::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 			emit challengeReceived(AStanza.id(), form);
 			return true;
 		}
-	}
-	else if (FDataForms)
-	{
-		REPORT_ERROR("Received unexpected stanza");
 	}
 	return false;
 }
@@ -161,15 +133,9 @@ void CaptchaForms::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 	{
 		QString cid = FChallengeRequest.take(AStanza.id());
 		if (AStanza.type() == "result")
-		{
-			LOG_STRM_INFO(AStreamJid,QString("Challenge submit accepted by=%1, id=%2").arg(AStanza.from(),cid));
 			emit challengeAccepted(cid);
-		}
 		else
-		{
-			LOG_STRM_INFO(AStreamJid,QString("Challenge submit rejected by=%1, id=%2").arg(AStanza.from(),cid));
-			emit challengeRejected(cid, XmppStanzaError(AStanza));
-		}
+			emit challengeRejected(cid, XmppStanzaError(AStanza).errorMessage());
 	}
 }
 
@@ -193,7 +159,7 @@ IDataFormLocale CaptchaForms::dataFormLocale(const QString &AFormType)
 
 bool CaptchaForms::submitChallenge(const QString &AChallengeId, const IDataForm &ASubmit)
 {
-	if (FDataForms && FStanzaProcessor && FChallenges.contains(AChallengeId))
+	if (FStanzaProcessor && FDataForms && FChallenges.contains(AChallengeId))
 	{
 		ChallengeItem item = FChallenges.take(AChallengeId);
 		if (FNotifications)
@@ -208,26 +174,17 @@ bool CaptchaForms::submitChallenge(const QString &AChallengeId, const IDataForm 
 		FDataForms->xmlForm(ASubmit, captchaElem);
 		if (FStanzaProcessor->sendStanzaRequest(this,item.streamJid,accept,ACCEPT_CHALLENGE_TIMEOUT))
 		{
-			LOG_STRM_INFO(item.streamJid,QString("Challenge submit request sent to=%1, id=%2").arg(item.challenger.full(),AChallengeId));
 			FChallengeRequest.insert(accept.id(),AChallengeId);
 			emit challengeSubmited(AChallengeId, ASubmit);
 			return true;
 		}
-		else
-		{
-			LOG_STRM_WARNING(item.streamJid,QString("Failed to send challenge submit request to=%1, id=%2").arg(item.challenger.full(),AChallengeId));
-		}
-	}
-	else if (!FChallenges.contains(AChallengeId))
-	{
-		REPORT_ERROR("Failed to send challenge submit request: Challenge not found");
 	}
 	return false;
 }
 
 bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 {
-	if (FDataForms && FStanzaProcessor && FChallenges.contains(AChallengeId))
+	if (FStanzaProcessor && FDataForms && FChallenges.contains(AChallengeId))
 	{
 		ChallengeItem item = FChallenges.take(AChallengeId);
 		if (FNotifications)
@@ -240,18 +197,9 @@ bool CaptchaForms::cancelChallenge(const QString &AChallengeId)
 
 		if (FStanzaProcessor->sendStanzaOut(item.streamJid, reject))
 		{
-			LOG_STRM_INFO(item.streamJid,QString("Challenge cancel request sent to=%1, id=%2").arg(item.challenger.full(),AChallengeId));
 			emit challengeCanceled(AChallengeId);
 			return true;
 		}
-		else
-		{
-			LOG_STRM_WARNING(item.streamJid,QString("Failed to send challenge cancel request to=%1, id=%2").arg(item.challenger.full(),AChallengeId));
-		}
-	}
-	else if (!FChallenges.contains(AChallengeId))
-	{
-		REPORT_ERROR("Failed to send challenge cancel request: Challenge not found");
 	}
 	return false;
 }
@@ -363,10 +311,6 @@ QString CaptchaForms::findChallenge(const Jid &AStreamJid, const Jid &AContactJi
 			++it;
 		}
 	}
-	else if (!AContactJid.isValid())
-	{
-		REPORT_ERROR("Failed to find challenge: Invalid contact");
-	}
 	return QString::null;
 }
 
@@ -391,8 +335,6 @@ bool CaptchaForms::setFocusToEditableWidget(QWidget *AWidget)
 	foreach(QObject *child, AWidget->children())
 		if (child->isWidgetType() && setFocusToEditableWidget(qobject_cast<QWidget *>(child)))
 			return true;
-
-	LOG_WARNING("Failed to set focus to editable widget");
 
 	return false;
 }
@@ -442,10 +384,14 @@ void CaptchaForms::onStreamClosed(IXmppStream *AXmppStream)
 	}
 
 	foreach(IDataDialogWidget *dialog, dialogs)
+	{
 		dialog->instance()->reject();
+	}
 
 	if (FStanzaProcessor)
+	{
 		FStanzaProcessor->removeStanzaHandle(FSHIChallenge.take(AXmppStream->streamJid()));
+	}
 }
 
 void CaptchaForms::onChallengeDialogAccepted()
@@ -456,19 +402,15 @@ void CaptchaForms::onChallengeDialogAccepted()
 		const ChallengeItem &item = FChallenges.value(cid);
 		submitChallenge(cid,FDataForms->dataSubmit(item.dialog->formWidget()->userDataForm()));
 	}
-	else
-	{
-		REPORT_ERROR("Failed to accept challenge by dialog: Challenge not found");
-	}
 }
 
 void CaptchaForms::onChallengeDialogRejected()
 {
 	QString cid = findChallenge(qobject_cast<IDataDialogWidget *>(sender()));
 	if (!cid.isEmpty())
+	{
 		cancelChallenge(cid);
-	else
-		REPORT_ERROR("Failed to cancel challenge by dialog: Challenge not found");
+	}
 }
 
 void CaptchaForms::onNotificationActivated(int ANotifyId)

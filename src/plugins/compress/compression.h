@@ -1,6 +1,9 @@
 #ifndef COMPRESSION_H
 #define COMPRESSION_H
 
+#include <definitions/namespaces.h>
+#include <definitions/xmppdatahandlerorders.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 
 #ifdef USE_SYSTEM_ZLIB
@@ -10,10 +13,10 @@
 #endif
 
 class Compression :
-	public QObject,
-	public IXmppFeature,
-	public IXmppDataHandler,
-	public IXmppStanzaHadler
+			public QObject,
+			public IXmppFeature,
+			public IXmppDataHandler,
+			public IXmppStanzaHadler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IXmppFeature IXmppDataHandler IXmppStanzaHadler);
@@ -28,12 +31,12 @@ public:
 	virtual bool xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder);
 	//IXmppFeature
 	virtual QObject *instance() { return this; }
-	virtual QString featureNS() const;
-	virtual IXmppStream *xmppStream() const;
+	virtual QString featureNS() const { return NS_FEATURE_COMPRESS; }
+	virtual IXmppStream *xmppStream() const { return FXmppStream; }
 	virtual bool start(const QDomElement &AElem);
 signals:
 	void finished(bool ARestart);
-	void error(const XmppError &AError);
+	void error(const QString &AError);
 	void featureDestroyed();
 protected:
 	bool startZlib();

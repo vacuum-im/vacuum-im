@@ -1,8 +1,6 @@
 #include "tabpagenotifier.h"
 
-#include <utils/logger.h>
-
-TabPageNotifier::TabPageNotifier(IMessageTabPage *ATabPage) : QObject(ATabPage->instance())
+TabPageNotifier::TabPageNotifier(ITabPage *ATabPage) : QObject(ATabPage->instance())
 {
 	FTabPage = ATabPage;
 	FActiveNotify = -1;
@@ -18,7 +16,7 @@ TabPageNotifier::~TabPageNotifier()
 		removeNotify(FNotifies.keys().first());
 }
 
-IMessageTabPage *TabPageNotifier::tabPage() const
+ITabPage *TabPageNotifier::tabPage() const
 {
 	return FTabPage;
 }
@@ -33,38 +31,34 @@ QList<int> TabPageNotifier::notifies() const
 	return FNotifies.keys();
 }
 
-IMessageTabPageNotify TabPageNotifier::notifyById(int ANotifyId) const
+ITabPageNotify TabPageNotifier::notifyById(int ANotifyId) const
 {
 	return FNotifies.value(ANotifyId);
 }
 
-int TabPageNotifier::insertNotify(const IMessageTabPageNotify &ANotify)
+int TabPageNotifier::insertNotify(const ITabPageNotify &ANotify)
 {
-	int notifyId = qrand();
-	while (notifyId<=0 || FNotifies.contains(notifyId))
-		notifyId = qrand();
-
-	FNotifies.insert(notifyId,ANotify);
-	FNotifyIdByPriority.insertMulti(ANotify.priority,notifyId);
-
-	FUpdateTimer.start();
-
-	LOG_DEBUG(QString("Tab page notification inserted, id=%1, priority=%2, blink=%3").arg(notifyId).arg(ANotify.priority).arg(ANotify.blink));
-	emit notifyInserted(notifyId);
-
-	return notifyId;
+	if (ANotify.priority > 0)
+	{
+		int notifyId = qrand();
+		while (notifyId<=0 || FNotifies.contains(notifyId))
+			notifyId = qrand();
+		FNotifies.insert(notifyId,ANotify);
+		FNotifyIdByPriority.insertMulti(ANotify.priority, notifyId);
+		FUpdateTimer.start();
+		emit notifyInserted(notifyId);
+		return notifyId;
+	}
+	return -1;
 }
 
 void TabPageNotifier::removeNotify(int ANotifyId)
 {
 	if (FNotifies.contains(ANotifyId))
 	{
-		IMessageTabPageNotify notify = FNotifies.take(ANotifyId);
+		ITabPageNotify notify = FNotifies.take(ANotifyId);
 		FNotifyIdByPriority.remove(notify.priority, ANotifyId);
-
 		FUpdateTimer.start();
-
-		LOG_DEBUG(QString("Tab page notification removed, id=%1").arg(ANotifyId));
 		emit notifyRemoved(ANotifyId);
 	}
 }

@@ -1,19 +1,18 @@
 #include "urlprocessor.h"
+#include <definitions/optionwidgetorders.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
 
 #include <QAuthenticator>
-#include <utils/logger.h>
 
-UrlProcessor::UrlProcessor() : QNetworkAccessManager(NULL)
+UrlProcessor::UrlProcessor(QObject *AParent) : QNetworkAccessManager(AParent)
 {
+	FOptionsManager = NULL;
 	FConnectionManager = NULL;
 
 	connect(this, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
 		SLOT(onProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));
-}
-
-UrlProcessor::~UrlProcessor()
-{
-
 }
 
 void UrlProcessor::pluginInfo(IPluginInfo *APluginInfo)
@@ -31,24 +30,42 @@ bool UrlProcessor::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 	IPlugin *plugin = APluginManager->pluginInterface("IConnectionManager").value(0,NULL);
 	if (plugin)
-	{
 		FConnectionManager = qobject_cast<IConnectionManager *>(plugin->instance());
-		if (FConnectionManager)
-			connect(FConnectionManager->instance(),SIGNAL(defaultProxyChanged(const QUuid &)),SLOT(onDefaultConnectionProxyChanged(const QUuid &)));
-	}
+
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+
+	connect(Options::instance(), SIGNAL(optionsOpened()), SLOT(onOptionsOpened()));
+	connect(Options::instance(), SIGNAL(optionsChanged(const OptionsNode &)), SLOT(onOptionsChanged(const OptionsNode &)));
 
 	return true;
 }
 
-bool UrlProcessor::registerUrlHandler(const QString &AScheme, IUrlHandler *AUrlHandler)
+bool UrlProcessor::initObjects()
 {
-	if (!AScheme.isEmpty() && AUrlHandler!=NULL)
+	return true;
+}
+
+bool UrlProcessor::initSettings()
+{
+	Options::setDefaultValue(OPV_MISC_URLPROXY, APPLICATION_PROXY_REF_UUID);
+
+	//if (FOptionsManager)
+	//	FOptionsManager->insertOptionsHolder(this);
+
+	return true;
+}
+
+QMultiMap<int, IOptionsWidget *> UrlProcessor::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (ANodeId == OPN_MISC)
 	{
-		LOG_DEBUG(QString("Url handler registered, cheme=%1, address=%2").arg(AScheme).arg((quint64)AUrlHandler));
-		FHandlerList.insertMulti(AScheme, AUrlHandler);
-		return true;
+		if (FConnectionManager)
+			widgets.insertMulti(OWO_MISC_URLPROXY, FConnectionManager->proxySettingsWidget(Options::node(OPV_MISC_URLPROXY), AParent));
 	}
-	return false;
+	return widgets;
 }
 
 QNetworkAccessManager *UrlProcessor::networkAccessManager()
@@ -56,20 +73,39 @@ QNetworkAccessManager *UrlProcessor::networkAccessManager()
 	return this;
 }
 
-QNetworkReply *UrlProcessor::createRequest(QNetworkAccessManager::Operation AOperation, const QNetworkRequest &ARequerst, QIODevice *AOutData)
+bool UrlProcessor::registerUrlHandler(const QString &AScheme, IUrlHandler *AUrlHandler)
 {
-	foreach (IUrlHandler *urlHandler, FHandlerList.values(ARequerst.url().scheme()))
+	if (!AScheme.isEmpty() && AUrlHandler!=NULL)
 	{
-		QNetworkReply *reply = urlHandler->request(AOperation, ARequerst, AOutData);
-		if (reply) 
-			return reply;
+		FHandlerList.insertMulti(AScheme, AUrlHandler);
+		return true;
 	}
-	return QNetworkAccessManager::createRequest(AOperation, ARequerst, AOutData);
+	return false;
 }
 
-void UrlProcessor::onDefaultConnectionProxyChanged(const QUuid &AProxyId)
+QNetworkReply *UrlProcessor::createRequest(QNetworkAccessManager::Operation AOperation, const QNetworkRequest &ARequerst, QIODevice *AOutData)
 {
-	setProxy(FConnectionManager->proxyById(AProxyId).proxy);
+	foreach (IUrlHandler *urlHandler, FHandlerList.values(ARequerst.url().scheme())) // Iterate thru a list of handlers, asssociated with the scheme
+	{                                                                                // Try every handler:
+		QNetworkReply *reply = urlHandler->request(AOperation, ARequerst, AOutData);  // Get reply
+		if (reply) 
+			return reply;                                                              // If repy received, return it!
+	}
+	return QNetworkAccessManager::createRequest(AOperation, ARequerst, AOutData);    // Fallback to parent createRequext() procedure!
+}
+
+void UrlProcessor::onOptionsOpened()
+{
+	onOptionsChanged(Options::node(OPV_MISC_URLPROXY));
+}
+
+void UrlProcessor::onOptionsChanged(const OptionsNode &ANode)
+{
+	if(ANode.path() == OPV_MISC_URLPROXY) // Proxy
+	{
+		if (FConnectionManager)
+			setProxy(FConnectionManager->proxyById(ANode.value().toString()).proxy);
+	}
 }
 
 void UrlProcessor::onProxyAuthenticationRequired(const QNetworkProxy &AProxy, QAuthenticator *AAuth)

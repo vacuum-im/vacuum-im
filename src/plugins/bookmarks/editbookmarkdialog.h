@@ -6,11 +6,11 @@
 #include "ui_editbookmarkdialog.h"
 
 class EditBookmarkDialog :
-	public QDialog
+			public QDialog
 {
 	Q_OBJECT;
 public:
-	EditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent = NULL);
+	EditBookmarkDialog(IBookMark *ABookmark, QWidget *AParent = NULL);
 	~EditBookmarkDialog();
 protected slots:
 	void onGroupBoxClicked(bool AChecked);
@@ -18,7 +18,7 @@ protected slots:
 private:
 	Ui::EditBookmarkDialogClass ui;
 private:
-	IBookmark *FBookmark;
+	IBookMark *FBookmark;
 };
 
 #endif // EDITBOOKMARKDIALOG_H

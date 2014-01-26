@@ -3,7 +3,6 @@
 #include <QUuid>
 #include <QMessageBox>
 #include <QInputDialog>
-#include <definitions/optionvalues.h>
 
 DataStreamsOptions::DataStreamsOptions(IDataStreamsManager *ADataManager, QWidget *AParent) : QWidget(AParent)
 {

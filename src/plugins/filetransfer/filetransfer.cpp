@@ -3,33 +3,6 @@
 #include <QDir>
 #include <QTimer>
 #include <QFileInfo>
-#include <definitions/namespaces.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/resources.h>
-#include <definitions/shortcuts.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/fshandlerorders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/internalerrors.h>
-#include <utils/widgetmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/shortcuts.h>
-#include <utils/datetime.h>
-#include <utils/options.h>
-#include <utils/stanza.h>
-#include <utils/action.h>
-#include <utils/logger.h>
-#include <utils/jid.h>
 
 #define ADR_STREAM_JID                Action::DR_StreamJid
 #define ADR_CONTACT_JID               Action::DR_Parametr1
@@ -67,10 +40,8 @@ void FileTransfer::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(DATASTREAMSMANAGER_UUID);
 }
 
-bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool FileTransfer::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
-
 	IPlugin *plugin = APluginManager->pluginInterface("IFileStreamsManager").value(0,NULL);
 	if (plugin)
 	{
@@ -123,7 +94,7 @@ bool FileTransfer::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(), SIGNAL(toolBarWidgetCreated(IMessageToolBarWidget *)), SLOT(onToolBarWidgetCreated(IMessageToolBarWidget *)));
+			connect(FMessageWidgets->instance(), SIGNAL(toolBarWidgetCreated(IToolBarWidget *)), SLOT(onToolBarWidgetCreated(IToolBarWidget *)));
 		}
 	}
 
@@ -148,9 +119,6 @@ bool FileTransfer::initObjects()
 {
 	Shortcuts::declareShortcut(SCT_MESSAGEWINDOWS_SENDFILE, tr("Send file"), QKeySequence::UnknownKey);
 	Shortcuts::declareShortcut(SCT_ROSTERVIEW_SENDFILE, tr("Send file"), QKeySequence::UnknownKey, Shortcuts::WidgetShortcut);
-
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_NOT_STARTED,tr("Failed to start file transfer"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_FILETRANSFER_TRANSFER_TERMINATED,tr("Data transmission terminated"));
 
 	if (FDiscovery)
 	{
@@ -233,9 +201,11 @@ Action *FileTransfer::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 	return NULL;
 }
 
-Qt::DropActions FileTransfer::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
+Qt::DropActions FileTransfer::rosterDragStart(const QMouseEvent *AEvent, const QModelIndex &AIndex, QDrag *ADrag)
 {
-	Q_UNUSED(AEvent); Q_UNUSED(AIndex); Q_UNUSED(ADrag);
+	Q_UNUSED(AEvent);
+	Q_UNUSED(AIndex);
+	Q_UNUSED(ADrag);
 	return Qt::IgnoreAction;
 }
 
@@ -250,10 +220,10 @@ bool FileTransfer::rosterDragEnter(const QDragEnterEvent *AEvent)
 	return false;
 }
 
-bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
+bool FileTransfer::rosterDragMove(const QDragMoveEvent *AEvent, const QModelIndex &AHover)
 {
 	Q_UNUSED(AEvent);
-	return AHover->data(RDR_KIND).toInt()!=RIK_STREAM_ROOT && isSupported(AHover->data(RDR_STREAM_JID).toString(), AHover->data(RDR_FULL_JID).toString());
+	return AHover.data(RDR_TYPE).toInt()!=RIT_STREAM_ROOT && isSupported(AHover.data(RDR_STREAM_JID).toString(), AHover.data(RDR_FULL_JID).toString());
 }
 
 void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
@@ -261,17 +231,16 @@ void FileTransfer::rosterDragLeave(const QDragLeaveEvent *AEvent)
 	Q_UNUSED(AEvent);
 }
 
-bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
+bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, const QModelIndex &AIndex, Menu *AMenu)
 {
-	if (AEvent->dropAction()!=Qt::IgnoreAction && AIndex->data(RDR_KIND).toInt()!=RIK_STREAM_ROOT && 
-		isSupported(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString()))
+	if (AEvent->dropAction() != Qt::IgnoreAction)
 	{
 		Action *action = new Action(AMenu);
 		action->setText(tr("Send File"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILETRANSFER_SEND);
-		action->setData(ADR_STREAM_JID,AIndex->data(RDR_STREAM_JID).toString());
-		action->setData(ADR_CONTACT_JID,AIndex->data(RDR_FULL_JID).toString());
-		action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().value(0).toLocalFile());
+		action->setData(ADR_STREAM_JID,AIndex.data(RDR_STREAM_JID).toString());
+		action->setData(ADR_CONTACT_JID,AIndex.data(RDR_FULL_JID).toString());
+		action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().first().toLocalFile());
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
 		AMenu->addAction(action, AG_DEFAULT, true);
 		AMenu->setDefaultAction(action);
@@ -280,9 +249,9 @@ bool FileTransfer::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AInd
 	return false;
 }
 
-bool FileTransfer::messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent)
+bool FileTransfer::viewDragEnter(IViewWidget *AWidget, const QDragEnterEvent *AEvent)
 {
-	if (isSupported(AWidget->messageWindow()->streamJid(), AWidget->messageWindow()->contactJid()) && AEvent->mimeData()->hasUrls())
+	if (isSupported(AWidget->streamJid(), AWidget->contactJid()) && AEvent->mimeData()->hasUrls())
 	{
 		QList<QUrl> urlList = AEvent->mimeData()->urls();
 		if (urlList.count()==1 && QFileInfo(urlList.first().toLocalFile()).isFile())
@@ -291,26 +260,28 @@ bool FileTransfer::messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDra
 	return false;
 }
 
-bool FileTransfer::messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent)
+bool FileTransfer::viewDragMove(IViewWidget *AWidget, const QDragMoveEvent *AEvent)
 {
-	Q_UNUSED(AWidget); Q_UNUSED(AEvent);
+	Q_UNUSED(AWidget);
+	Q_UNUSED(AEvent);
 	return true;
 }
 
-void FileTransfer::messageViewDragLeave(IMessageViewWidget *AWidget, const QDragLeaveEvent *AEvent)
+void FileTransfer::viewDragLeave(IViewWidget *AWidget, const QDragLeaveEvent *AEvent)
 {
-	Q_UNUSED(AWidget); Q_UNUSED(AEvent);
+	Q_UNUSED(AWidget);
+	Q_UNUSED(AEvent);
 }
 
-bool FileTransfer::messageViewDropAction(IMessageViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
+bool FileTransfer::viewDropAction(IViewWidget *AWidget, const QDropEvent *AEvent, Menu *AMenu)
 {
 	if (AEvent->dropAction() != Qt::IgnoreAction)
 	{
 		Action *action = new Action(AMenu);
 		action->setText(tr("Send File"));
 		action->setIcon(RSR_STORAGE_MENUICONS,MNI_FILETRANSFER_SEND);
-		action->setData(ADR_STREAM_JID,AWidget->messageWindow()->streamJid().full());
-		action->setData(ADR_CONTACT_JID,AWidget->messageWindow()->contactJid().full());
+		action->setData(ADR_STREAM_JID,AWidget->streamJid().full());
+		action->setData(ADR_CONTACT_JID,AWidget->contactJid().full());
 		action->setData(ADR_FILE_NAME, AEvent->mimeData()->urls().first().toLocalFile());
 		connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
 		AMenu->addAction(action, AG_DEFAULT, true);
@@ -337,8 +308,6 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
 			IFileStream *stream = createStream(AStreamId,ARequest.to(),ARequest.from(),IFileStream::ReceiveFile);
 			if (stream)
 			{
-				LOG_STRM_INFO(ARequest.to(),QString("Receive file stream created, from=%1, sid=%2").arg(ARequest.from(),AStreamId));
-
 				QString dirName = Options::node(OPV_FILESTREAMS_DEFAULTDIR).value().toString();
 				if (Options::node(OPV_FILESTREAMS_GROUPBYSENDER).value().toBool())
 				{
@@ -364,14 +333,6 @@ bool FileTransfer::fileStreamRequest(int AOrder, const QString &AStreamId, const
 				notifyStream(stream, true);
 				return true;
 			}
-			else
-			{
-				LOG_STRM_ERROR(ARequest.to(),QString("Failed to process file transfer request, sid=%1: Stream not created").arg(AStreamId));
-			}
-		}
-		else
-		{
-			LOG_STRM_WARNING(ARequest.to(),QString("Failed to process file transfer request, sid=%1: Invalid params").arg(AStreamId));
 		}
 	}
 	return false;
@@ -382,34 +343,18 @@ bool FileTransfer::fileStreamResponce(const QString &AStreamId, const Stanza &AR
 	if (FFileManager!=NULL && FFileManager->streamHandler(AStreamId)==this)
 	{
 		IFileStream *stream = FFileManager->streamById(AStreamId);
-		if (stream)
+		QDomElement rangeElem = AResponce.firstElement("si",NS_STREAM_INITIATION).firstChildElement("file").firstChildElement("range");
+		if (!rangeElem.isNull())
 		{
-			QDomElement rangeElem = AResponce.firstElement("si",NS_STREAM_INITIATION).firstChildElement("file").firstChildElement("range");
-			if (!rangeElem.isNull())
-			{
-				if (rangeElem.hasAttribute("offset"))
-					stream->setRangeOffset(rangeElem.attribute("offset").toLongLong());
-				if (rangeElem.hasAttribute("length"))
-					stream->setRangeLength(rangeElem.attribute("length").toLongLong());
-			}
-
-			if (stream->startStream(AMethodNS))
-			{
-				LOG_STRM_INFO(AResponce.to(),QString("Started file transfer to=%1, sid=%2, method=%3").arg(AResponce.from(),AStreamId,AMethodNS));
-				return true;
-			}
-
-			LOG_STRM_WARNING(AResponce.to(),QString("Failed to start file transfer, sid=%1: Stream not started").arg(AStreamId));
-			stream->abortStream(XmppError(IERR_FILETRANSFER_TRANSFER_NOT_STARTED));
+			if (rangeElem.hasAttribute("offset"))
+				stream->setRangeOffset(rangeElem.attribute("offset").toLongLong());
+			if (rangeElem.hasAttribute("length"))
+				stream->setRangeLength(rangeElem.attribute("length").toLongLong());
 		}
+		if (!stream->startStream(AMethodNS))
+			stream->abortStream(tr("Failed to start file transfer"));
 		else
-		{
-			LOG_STRM_ERROR(AResponce.to(),QString("Failed to process file transfer response, sid=%1: Stream not found"));
-		}
-	}
-	else if (FFileManager)
-	{
-		LOG_STRM_ERROR(AResponce.to(),QString("Failed to process file transfer response, sid=%1: Invalid stream handler"));
+			return true;
 	}
 	return false;
 }
@@ -423,19 +368,13 @@ bool FileTransfer::fileStreamShowDialog(const QString &AStreamId)
 		WidgetManager::showActivateRaiseWindow(dialog);
 		return true;
 	}
-	else if (stream)
-	{
-		LOG_STRM_ERROR(stream->streamJid(),QString("Failed to show file transfer dialog, sid=%1: Invalid handler").arg(AStreamId));
-	}
-	else if (!AStreamId.isEmpty())
-	{
-		LOG_ERROR(QString("Failed to show file transfer dialog, sid=%1: Stream not found").arg(AStreamId));
-	}
 	return false;
 }
 
 bool FileTransfer::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
 {
+	Q_UNUSED(AStreamJid);
+
 	if (!FFileManager || !FDataManager)
 		return false;
 
@@ -452,7 +391,6 @@ IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJi
 		IFileStream *stream = createStream(QUuid::createUuid().toString(),AStreamJid,AContactJid,IFileStream::SendFile);
 		if (stream)
 		{
-			LOG_STRM_INFO(AStreamJid,QString("Send file stream created, to=%1, sid=%2").arg(AContactJid.full(),stream->streamId()));
 			stream->setFileName(AFileName);
 			stream->setFileDescription(AFileDesc);
 			StreamDialog *dialog = getStreamDialog(stream);
@@ -460,14 +398,6 @@ IFileStream *FileTransfer::sendFile(const Jid &AStreamJid, const Jid &AContactJi
 			dialog->show();
 			return stream;
 		}
-		else
-		{
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to send file to=%1: Stream not created").arg(AContactJid.full()));
-		}
-	}
-	else
-	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to send file to=%1: Not supported").arg(AContactJid.full()));
 	}
 	return NULL;
 }
@@ -567,7 +497,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 		note = note.arg(!AStream->fileName().isEmpty() ? AStream->fileName().split("/").last() : QString::null);
 		if (FMessageWidgets)
 		{
-			IMessageChatWindow *window = FMessageWidgets->findChatWindow(AStream->streamJid(),AStream->contactJid());
+			IChatWindow *window = FMessageWidgets->findChatWindow(AStream->streamJid(),AStream->contactJid());
 			if (window)
 			{
 				IMessageContentOptions options;
@@ -585,7 +515,7 @@ void FileTransfer::notifyStream(IFileStream *AStream, bool ANewStream)
 	}
 }
 
-bool FileTransfer::autoStartStream(IFileStream *AStream) const
+void FileTransfer::autoStartStream(IFileStream *AStream)
 {
 	if (Options::node(OPV_FILETRANSFER_AUTORECEIVE).value().toBool() && AStream->streamKind()==IFileStream::ReceiveFile)
 	{
@@ -593,43 +523,46 @@ bool FileTransfer::autoStartStream(IFileStream *AStream) const
 		{
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStream->streamJid()) : NULL;
 			if (roster && roster->rosterItem(AStream->contactJid()).isValid)
-				return AStream->startStream(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString());
+				AStream->startStream(Options::node(OPV_FILESTREAMS_DEFAULTMETHOD).value().toString());
 		}
-		else
+	}
+}
+
+void FileTransfer::insertToolBarAction(IToolBarWidget *AWidget)
+{
+	if (FToolBarActions.value(AWidget) == NULL)
+	{
+		Action *action = NULL;
+		if (isSupported(AWidget->editWidget()->streamJid(),AWidget->editWidget()->contactJid()))
 		{
-			LOG_STRM_WARNING(AStream->streamJid(),QString("Failed to auto start file transfer, sid=%1: File already exists").arg(AStream->streamId()));
+			action = new Action(AWidget->toolBarChanger()->toolBar());
+			action->setIcon(RSR_STORAGE_MENUICONS, MNI_FILETRANSFER_SEND);
+			action->setText(tr("Send File"));
+			action->setShortcutId(SCT_MESSAGEWINDOWS_SENDFILE);
+			connect(action,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
+			AWidget->toolBarChanger()->insertAction(action,TBG_MWTBW_FILETRANSFER);
 		}
+		FToolBarActions.insert(AWidget, action);
 	}
-	return false;
+	else
+	{
+		FToolBarActions.value(AWidget)->setEnabled(true);
+	}
 }
 
-void FileTransfer::updateToolBarAction(IMessageToolBarWidget *AWidget)
+void FileTransfer::removeToolBarAction(IToolBarWidget *AWidget)
 {
-	Action *fileAction = FToolBarActions.value(AWidget,NULL);
-	bool supported = isSupported(AWidget->messageWindow()->streamJid(),AWidget->messageWindow()->contactJid());
-	if (supported && fileAction==NULL)
+	if (FToolBarActions.value(AWidget)!=NULL)
 	{
-		fileAction = new Action(AWidget->toolBarChanger()->toolBar());
-		fileAction->setIcon(RSR_STORAGE_MENUICONS, MNI_FILETRANSFER_SEND);
-		fileAction->setText(tr("Send File"));
-		fileAction->setShortcutId(SCT_MESSAGEWINDOWS_SENDFILE);
-		connect(fileAction,SIGNAL(triggered(bool)),SLOT(onShowSendFileDialogByAction(bool)));
-		AWidget->toolBarChanger()->insertAction(fileAction,TBG_MWTBW_FILETRANSFER);
+		FToolBarActions.value(AWidget)->setEnabled(false);
 	}
-	else if (!supported && fileAction!=NULL)
-	{
-		fileAction->deleteLater();
-		AWidget->toolBarChanger()->removeItem(AWidget->toolBarChanger()->actionHandle(fileAction));
-		fileAction = NULL;
-	}
-	FToolBarActions.insert(AWidget,fileAction);
 }
 
-QList<IMessageToolBarWidget *> FileTransfer::findToolBarWidgets(const Jid &AContactJid) const
+QList<IToolBarWidget *> FileTransfer::findToolBarWidgets(const Jid &AContactJid) const
 {
-	QList<IMessageToolBarWidget *> toolBars;
-	foreach (IMessageToolBarWidget *widget, FToolBarActions.keys())
-		if (widget->messageWindow()->contactJid()==AContactJid)
+	QList<IToolBarWidget *> toolBars;
+	foreach (IToolBarWidget *widget, FToolBarActions.keys())
+		if (widget->editWidget()->contactJid()==AContactJid)
 			toolBars.append(widget);
 	return toolBars;
 }
@@ -640,13 +573,10 @@ StreamDialog *FileTransfer::getStreamDialog(IFileStream *AStream)
 	if (dialog == NULL)
 	{
 		dialog = new StreamDialog(FDataManager,FFileManager,this,AStream,NULL);
-		connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onStreamDialogDestroyed()));
-
 		if (AStream->streamKind() == IFileStream::SendFile)
 			IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog,MNI_FILETRANSFER_SEND,0,0,"windowIcon");
 		else
 			IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(dialog,MNI_FILETRANSFER_RECEIVE,0,0,"windowIcon");
-
 		if (FNotifications)
 		{
 			QString name = "<b>"+ Qt::escape(FNotifications->contactName(AStream->streamJid(), AStream->contactJid())) +"</b>";
@@ -655,7 +585,7 @@ StreamDialog *FileTransfer::getStreamDialog(IFileStream *AStream)
 			dialog->setContactName(name);
 			dialog->installEventFilter(this);
 		}
-
+		connect(dialog,SIGNAL(dialogDestroyed()),SLOT(onStreamDialogDestroyed()));
 		FStreamDialog.insert(AStream->streamId(),dialog);
 	}
 	return dialog;
@@ -728,7 +658,6 @@ void FileTransfer::onStreamDestroyed()
 	IFileStream *stream = qobject_cast<IFileStream *>(sender());
 	if (stream)
 	{
-		LOG_STRM_INFO(stream->streamJid(),QString("File transfer stream destroyed, sid=%1").arg(stream->streamId()));
 		if (FNotifications && FStreamNotify.contains(stream->streamId()))
 			FNotifications->removeNotification(FStreamNotify.value(stream->streamId()));
 	}
@@ -746,7 +675,7 @@ void FileTransfer::onShowSendFileDialogByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		IMessageToolBarWidget *widget = FToolBarActions.key(action);
+		IToolBarWidget *widget = FToolBarActions.key(action);
 		if (!widget)
 		{
 			Jid streamJid = action->data(ADR_STREAM_JID).toString();
@@ -755,10 +684,8 @@ void FileTransfer::onShowSendFileDialogByAction(bool)
 			QString desc = action->data(ADR_FILE_DESC).toString();
 			sendFile(streamJid,contactJid,file,desc);
 		}
-		else if (widget->messageWindow() != NULL)
-		{
-			sendFile(widget->messageWindow()->streamJid(), widget->messageWindow()->contactJid());
-		}
+		else if (widget->editWidget() != NULL)
+			sendFile(widget->editWidget()->streamJid(), widget->editWidget()->contactJid());
 	}
 }
 
@@ -775,38 +702,50 @@ void FileTransfer::onNotificationRemoved(int ANotifyId)
 
 void FileTransfer::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 {
-	foreach(IMessageToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
-		updateToolBarAction(widget);
+	foreach(IToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
+	{
+		if (isSupported(widget->editWidget()->streamJid(),widget->editWidget()->contactJid()))
+			insertToolBarAction(widget);
+		else
+			removeToolBarAction(widget);
+	}
 }
 
 void FileTransfer::onDiscoInfoRemoved(const IDiscoInfo &AInfo)
 {
-	foreach(IMessageToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
-		updateToolBarAction(widget);
+	foreach(IToolBarWidget *widget, findToolBarWidgets(AInfo.contactJid))
+		removeToolBarAction(widget);
 }
 
-void FileTransfer::onToolBarWidgetCreated(IMessageToolBarWidget *AWidget)
+void FileTransfer::onToolBarWidgetCreated(IToolBarWidget *AWidget)
 {
-	updateToolBarAction(AWidget);
-	connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
-	connect(AWidget->messageWindow()->address()->instance(),SIGNAL(addressChanged(const Jid &,const Jid &)),SLOT(onToolBarWidgetAddressChanged(const Jid &,const Jid &)));
-}
-
-void FileTransfer::onToolBarWidgetAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
-{
-	Q_UNUSED(AStreamBefore); Q_UNUSED(AContactBefore);
-	IMessageAddress *address = qobject_cast<IMessageAddress *>(sender());
-	if (address)
+	if (AWidget->editWidget() != NULL)
 	{
-		foreach(IMessageToolBarWidget *widget, FToolBarActions.keys())
-			if (widget->messageWindow()->address() == address)
-				updateToolBarAction(widget);
+		insertToolBarAction(AWidget);
+		connect(AWidget->instance(),SIGNAL(destroyed(QObject *)),SLOT(onToolBarWidgetDestroyed(QObject *)));
+		connect(AWidget->editWidget()->instance(),SIGNAL(contactJidChanged(const Jid &)), SLOT(onEditWidgetContactJidChanged(const Jid &)));
+	}
+}
+
+void FileTransfer::onEditWidgetContactJidChanged(const Jid &ABefore)
+{
+	Q_UNUSED(ABefore);
+	IEditWidget *editWidget = qobject_cast<IEditWidget *>(sender());
+	if (editWidget)
+	{
+		foreach(IToolBarWidget *widget, findToolBarWidgets(editWidget->contactJid()))
+		{
+			if (isSupported(widget->editWidget()->streamJid(),widget->editWidget()->contactJid()))
+				insertToolBarAction(widget);
+			else
+				removeToolBarAction(widget);
+		}
 	}
 }
 
 void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 {
-	foreach(IMessageToolBarWidget *widget, FToolBarActions.keys())
+	foreach(IToolBarWidget *widget, FToolBarActions.keys())
 		if (qobject_cast<QObject *>(widget->instance()) == AObject)
 			FToolBarActions.remove(widget);
 }
@@ -817,10 +756,12 @@ void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	{
 		if (AId == SCT_ROSTERVIEW_SENDFILE)
 		{
-			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
-				sendFile(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
+			QModelIndex index = FRostersViewPlugin->rostersView()->instance()->currentIndex();
+			int indexType = index.data(RDR_TYPE).toInt();
+			if (indexType==RIT_CONTACT || indexType==RIT_AGENT)
+			{
+				sendFile(index.data(RDR_STREAM_JID).toString(),index.data(RDR_FULL_JID).toString());
+			}
 		}
 	}
 }

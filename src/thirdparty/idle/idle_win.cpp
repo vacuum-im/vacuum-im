@@ -23,7 +23,7 @@
 #include <qlibrary.h>
 #include <windows.h>
 
-#if defined(Q_OS_WIN) && !defined(Q_CC_GNU) && (_WIN32_WINNT < 0x0500)
+#if defined(Q_OS_WIN32) && !defined(Q_CC_GNU) && (_WIN32_WINNT < 0x0500)
 typedef struct tagLASTINPUTINFO {
 	UINT cbSize;
 	DWORD dwTime;
@@ -40,10 +40,8 @@ public:
 		lib = 0;
 	}
 
-	typedef BOOL (__stdcall * GetLastInputInfoFunc)(PLASTINPUTINFO);
-	typedef DWORD (__stdcall * IdleUIGetLastInputTimeFunc)(void);
-	GetLastInputInfoFunc GetLastInputInfo;
-	IdleUIGetLastInputTimeFunc IdleUIGetLastInputTime;
+	BOOL (__stdcall * GetLastInputInfo)(PLASTINPUTINFO);
+	DWORD (__stdcall * IdleUIGetLastInputTime)(void);
 	QLibrary *lib;
 };
 
@@ -62,10 +60,12 @@ bool IdlePlatform::init()
 {
 	if(d->lib)
 		return true;
+	void *p;
 
 	// try to find the built-in Windows 2000 function
 	d->lib = new QLibrary("user32");
-	if(d->lib->load() && (d->GetLastInputInfo = (Private::GetLastInputInfoFunc)d->lib->resolve("GetLastInputInfo"))) {
+	if(d->lib->load() && (p = d->lib->resolve("GetLastInputInfo"))) {
+		d->GetLastInputInfo = (BOOL (__stdcall *)(PLASTINPUTINFO))p;
 		return true;
 	}
 	else {
@@ -75,7 +75,8 @@ bool IdlePlatform::init()
 
 	// fall back on idleui
 	d->lib = new QLibrary("idleui");
-	if(d->lib->load() && (d->IdleUIGetLastInputTime = (Private::IdleUIGetLastInputTimeFunc)d->lib->resolve("IdleUIGetLastInputTime"))) {
+	if(d->lib->load() && (p = d->lib->resolve("IdleUIGetLastInputTime"))) {
+		d->IdleUIGetLastInputTime = (DWORD (__stdcall *)(void))p;
 		return true;
 	}
 	else {

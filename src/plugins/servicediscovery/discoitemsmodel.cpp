@@ -1,7 +1,5 @@
 #include "discoitemsmodel.h"
 
-#include <definitions/discoitemdataroles.h>
-
 DiscoItemsModel::DiscoItemsModel(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QObject *AParent) : QAbstractItemModel(AParent)
 {
 	FDiscovery = ADiscovery;

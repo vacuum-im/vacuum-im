@@ -2,12 +2,13 @@
 #define ARCHIVEOPTIONS_H
 
 #include <QItemDelegate>
+#include <definitions/namespaces.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/ioptionsmanager.h>
 #include "ui_archivestreamoptions.h"
 
 class ArchiveDelegate :
-	public QItemDelegate
+			public QItemDelegate
 {
 	Q_OBJECT;
 public:
@@ -29,9 +30,10 @@ private:
 	IMessageArchiver *FArchiver;
 };
 
+
 class ArchiveStreamOptions :
-	public QWidget,
-	public IOptionsWidget
+			public QWidget,
+			public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);
@@ -59,14 +61,14 @@ protected slots:
 	void onExpireIndexChanged(int AIndex);
 	void onArchivePrefsChanged(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
-	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
+	void onArchiveRequestFailed(const QString &AId, const QString &AError);
 private:
 	Ui::ArchiveStreamOptionsClass ui;
 private:
 	IMessageArchiver *FArchiver;
 private:
 	Jid FStreamJid;
-	XmppError FLastError;
+	QString FLastError;
 	QList<QString> FSaveRequests;
 	QHash<Jid,QTableWidgetItem *> FTableItems;
 };

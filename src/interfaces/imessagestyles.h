@@ -6,7 +6,6 @@
 #include <QVariant>
 #include <QDateTime>
 #include <QStringList>
-#include <QTextCharFormat>
 #include <QTextDocumentFragment>
 #include <interfaces/ioptionsmanager.h>
 #include <utils/jid.h>
@@ -90,14 +89,13 @@ public:
 	virtual QWidget *createWidget(const IMessageStyleOptions &AOptions, QWidget *AParent) =0;
 	virtual QString senderColor(const QString &ASenderId) const =0;
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const =0;
-	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const =0;
-	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const =0;
-	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear = true) =0;
+	virtual QTextDocumentFragment textUnderPosition(const QPoint &APosition, QWidget *AWidget) const =0;
+	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true) =0;
 	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) =0;
 protected:
 	virtual void widgetAdded(QWidget *AWidget) const =0;
 	virtual void widgetRemoved(QWidget *AWidget) const =0;
-	virtual void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool ACleared) const =0;
+	virtual void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const =0;
 	virtual void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const =0;
 	virtual void urlClicked(QWidget *AWidget, const QUrl &AUrl) const =0;
 };
@@ -140,8 +138,8 @@ protected:
 	virtual void styleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext) const =0;
 };
 
-Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.2")
+Q_DECLARE_INTERFACE(IMessageStyle,"Vacuum.Plugin.IMessageStyle/1.1")
 Q_DECLARE_INTERFACE(IMessageStylePlugin,"Vacuum.Plugin.IMessageStylePlugin/1.1")
-Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.3")
+Q_DECLARE_INTERFACE(IMessageStyles,"Vacuum.Plugin.IMessageStyles/1.2")
 
 #endif

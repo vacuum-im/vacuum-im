@@ -8,21 +8,11 @@
 
 static const QChar CharDog = '@';
 static const QChar CharSlash = '/';
-static const QList<QChar> EscChars =     QList<QChar>()   << 0x5c << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40;
-static const QList<QString> EscStrings = QList<QString>() <<"\\5c"<<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40";
+QHash<QString,Jid> JidCache = QHash<QString,Jid>();
+QList<QChar> EscChars =     QList<QChar>()   << 0x5c << 0x20 << 0x22 << 0x26 << 0x27 << 0x2f << 0x3a << 0x3c << 0x3e << 0x40;
+QList<QString> EscStrings = QList<QString>() <<"\\5c"<<"\\20"<<"\\22"<<"\\26"<<"\\27"<<"\\2f"<<"\\3a"<<"\\3c"<<"\\3e"<<"\\40";
 
-QHash<QString,Jid> Jid::FJidCache;
-const Jid Jid::null;
-
-void registerJidStreamOperators()
-{
-	static bool typeStreamOperatorsRegistered = false;
-	if (!typeStreamOperatorsRegistered)
-	{
-		typeStreamOperatorsRegistered = true;
-		qRegisterMetaTypeStreamOperators<Jid>("Jid");
-	}
-}
+Jid Jid::null = Jid();
 
 QString stringPrepare(const Stringprep_profile *AProfile, const QString &AString)
 {
@@ -69,21 +59,18 @@ Jid::Jid(const char *AJidStr)
 {
 	d = NULL;
 	parseFromString(AJidStr);
-	registerJidStreamOperators();
 }
 
 Jid::Jid(const QString &AJidStr)
 {
 	d = NULL;
 	parseFromString(AJidStr);
-	registerJidStreamOperators();
 }
 
 Jid::Jid(const QString &ANode, const QString &ADomane, const QString &AResource)
 {
 	d = NULL;
 	parseFromString(ANode+CharDog+ADomane+CharSlash+AResource);
-	registerJidStreamOperators();
 }
 
 Jid::~Jid()
@@ -389,7 +376,7 @@ QString Jid::resourcePrepare(const QString &AResource)
 
 Jid &Jid::parseFromString(const QString &AJidStr)
 {
-	if (!FJidCache.contains(AJidStr))
+	if (!JidCache.contains(AJidStr))
 	{
 		if (!d)
 			d = new JidData;
@@ -536,11 +523,11 @@ Jid &Jid::parseFromString(const QString &AJidStr)
 			dd->FResource = dd->FPrepResource = QStringRef(NULL,0,0);
 			dd->FNodeValid = dd->FDomainValid = dd->FResourceValid = false;
 		}
-		FJidCache.insert(AJidStr,*this);
+		JidCache.insert(AJidStr,*this);
 	}
 	else
 	{
-		*this = FJidCache.value(AJidStr);
+		*this = JidCache.value(AJidStr);
 	}
 	return *this;
 }

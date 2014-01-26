@@ -11,23 +11,18 @@ TransferThread::TransferThread(IDataStreamSocket *ASocket, QFile *AFile, int AKi
 	FSocket = ASocket;
 	FBytesToTransfer = ABytes;
 
-	FAborted = false;
+	FAbort = false;
 }
 
 TransferThread::~TransferThread()
 {
-	abort();
+	FAbort = true;
 	wait();
 }
 
 void TransferThread::abort()
 {
-	FAborted = true;
-}
-
-bool TransferThread::isAborted() const
-{
-	return FAborted;
+	FAbort = true;
 }
 
 void TransferThread::run()
@@ -38,13 +33,13 @@ void TransferThread::run()
 	QIODevice *inDevice = FKind==IFileStream::SendFile ? FFile : FSocket->instance();
 	QIODevice *outDevice = FKind==IFileStream::SendFile ? FSocket->instance() : FFile;
 
-	while (!FAborted && transferedBytes<FBytesToTransfer)
+	while (!FAbort && transferedBytes<FBytesToTransfer)
 	{
 		qint64 readedBytes = inDevice->read(buffer,qMin(qint64(TRANSFER_BUFFER_SIZE),FBytesToTransfer-transferedBytes));
 		if (readedBytes > 0)
 		{
 			qint64 writtenBytes = 0;
-			while (!FAborted && writtenBytes<readedBytes)
+			while (!FAbort && writtenBytes<readedBytes)
 			{
 				qint64 bytes = outDevice->write(buffer+writtenBytes, readedBytes-writtenBytes);
 				if (bytes > 0)
@@ -59,9 +54,11 @@ void TransferThread::run()
 				}
 				else
 				{
-					abort();
+					break;
 				}
 			}
+			if (writtenBytes < readedBytes)
+				break;
 		}
 		else if (readedBytes == 0)
 		{
@@ -69,11 +66,11 @@ void TransferThread::run()
 		}
 		else
 		{
-			abort();
+			break;
 		}
 	}
 
-	while (FKind==IFileStream::SendFile && !FAborted && FSocket->flush())
+	while (FKind==IFileStream::SendFile && !FAbort && FSocket->flush())
 		outDevice->waitForBytesWritten(100);
 
 	FFile->close();

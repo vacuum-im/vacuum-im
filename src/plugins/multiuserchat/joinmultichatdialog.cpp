@@ -1,10 +1,6 @@
 #include "joinmultichatdialog.h"
 
 #include <QMessageBox>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <utils/options.h>
-#include <utils/logger.h>
 
 QDataStream &operator<<(QDataStream &AStream, const RoomParams &AParams)
 {
@@ -22,9 +18,9 @@ QDataStream &operator>>(QDataStream &AStream, RoomParams &AParams)
 	return AStream;
 }
 
-JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent) : QDialog(AParent)
+JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid,
+    const QString &ANick, const QString &APassword, QWidget *AParent) : QDialog(AParent)
 {
-	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Join conference"));
@@ -141,7 +137,7 @@ void JoinMultiChatDialog::onDialogAccepted()
 		if (chatWindow)
 		{
 			chatWindow->showTabPage();
-			chatWindow->multiUserChat()->sendStreamPresence();
+			chatWindow->multiUserChat()->setAutoPresence(true);
 		}
 
 		RoomParams &params = FRecentRooms[roomJid];

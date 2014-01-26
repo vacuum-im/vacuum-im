@@ -13,7 +13,4 @@
 // -l <Locale>
 #define CLO_LOCALE                  "-l"
 
-// -logtypes <Logger::Type>
-#define CLO_LOG_TYPES               "-lt"
-
-#endif //DEF_COMMANDLINE_H
+#endif

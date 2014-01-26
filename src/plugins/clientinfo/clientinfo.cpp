@@ -4,26 +4,16 @@
 #include <QProcess>
 #include <QFileInfo>
 #include <QTextStream>
-#include <definitions/version.h>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/dataformtypes.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <utils/widgetmanager.h>
-#include <utils/systemmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/datetime.h>
-#include <utils/options.h>
-#include <utils/stanza.h>
-#include <utils/logger.h>
-#include <utils/menu.h>
+
+#if defined(Q_OS_UNIX)
+# include <sys/utsname.h>
+#endif
+
+#if defined(Q_WS_HAIKU)
+#include <Path.h>
+#include <AppFileInfo.h>
+#include <FindDirectory.h>
+#endif
 
 #define SHC_SOFTWARE_VERSION            "/iq[@type='get']/query[@xmlns='" NS_JABBER_VERSION "']"
 #define SHC_LAST_ACTIVITY               "/iq[@type='get']/query[@xmlns='" NS_JABBER_LAST "']"
@@ -53,7 +43,6 @@ ClientInfo::ClientInfo()
 	FDiscovery = NULL;
 	FDataForms = NULL;
 	FOptionsManager = NULL;
-	FStatusIcons = NULL;
 
 	FPingHandle = 0;
 	FTimeHandle = 0;
@@ -76,16 +65,13 @@ void ClientInfo::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool ClientInfo::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool ClientInfo::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
 	IPlugin *plugin = APluginManager->pluginInterface("IStanzaProcessor").value(0,NULL);
 	if (plugin)
-	{
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
-	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
@@ -103,7 +89,8 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
 		if (FPresencePlugin)
 		{
-			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)), SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
+			connect(FPresencePlugin->instance(),SIGNAL(contactStateChanged(const Jid &, const Jid &, bool)),
+			        SLOT(onContactStateChanged(const Jid &, const Jid &, bool)));
 		}
 	}
 
@@ -117,11 +104,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	if (plugin)
 	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
-		if (FRostersViewPlugin)
-		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)), 
-				SLOT(onRostersViewIndexContextMenu(const QList<IRosterIndex *> &, quint32, Menu *)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
@@ -138,12 +120,6 @@ bool ClientInfo::initConnections(IPluginManager *APluginManager, int &AInitOrder
 	if (plugin)
 	{
 		FDataForms = qobject_cast<IDataForms *>(plugin->instance());
-	}
-
-	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
-	if (plugin)
-	{
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -176,6 +152,14 @@ bool ClientInfo::initObjects()
 		FPingHandle = FStanzaProcessor->insertStanzaHandle(shandle);
 	}
 
+	if (FRostersViewPlugin)
+	{
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexContextMenu(const QList<IRosterIndex *> &, int, Menu *)), 
+			SLOT(onRosterIndexContextMenu(const QList<IRosterIndex *> &, int, Menu *)));
+		connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)),
+			SLOT(onRosterIndexToolTips(IRosterIndex *, int , QMultiMap<int,QString> &)));
+	}
+
 	if (FDiscovery)
 	{
 		registerDiscoFeatures();
@@ -204,7 +188,7 @@ bool ClientInfo::initSettings()
 
 bool ClientInfo::startPlugin()
 {
-	SystemManager::startSystemIdle();
+	SystemManager::instance()->startSystemIdle();
 	return true;
 }
 
@@ -229,10 +213,7 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		elem.appendChild(result.createElement("version")).appendChild(result.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
 		if (Options::node(OPV_MISC_SHAREOSVERSION).value().toBool())
 			elem.appendChild(result.createElement("os")).appendChild(result.createTextNode(osVersion()));
-		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
-			LOG_STRM_INFO(AStreamJid,QString("Software version sent to=%1").arg(AStanza.from()));
-		else
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send software version to=%1").arg(AStanza.from()));
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	else if (AHandlerId == FActivityHandler)
 	{
@@ -240,10 +221,7 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
 		QDomElement elem = result.addElement("query",NS_JABBER_LAST);
 		elem.setAttribute("seconds", SystemManager::systemIdle());
-		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
-			LOG_STRM_INFO(AStreamJid,QString("Last activity sent to=%1").arg(AStanza.from()));
-		else
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send last activity to=%1").arg(AStanza.from()));
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	else if (AHandlerId == FTimeHandle)
 	{
@@ -253,23 +231,13 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		DateTime dateTime(QDateTime::currentDateTime());
 		elem.appendChild(result.createElement("tzo")).appendChild(result.createTextNode(dateTime.toX85TZD()));
 		elem.appendChild(result.createElement("utc")).appendChild(result.createTextNode(dateTime.toX85UTC()));
-		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
-			LOG_STRM_INFO(AStreamJid,QString("Current time sent to=%1").arg(AStanza.from()));
-		else
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send current time to=%1").arg(AStanza.from()));
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	else if (AHandlerId == FPingHandle)
 	{
 		AAccept = true;
 		Stanza result = FStanzaProcessor->makeReplyResult(AStanza);
-		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
-			LOG_STRM_INFO(AStreamJid,QString("Ping answer sent to=%1").arg(AStanza.from()));
-		else
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send ping answer to=%1").arg(AStanza.from()));
-	}
-	else
-	{
-		REPORT_ERROR("Received unexpected stanza");
+		FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 	}
 	return false;
 }
@@ -288,7 +256,6 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			software.version = query.firstChildElement("version").text();
 			software.os = query.firstChildElement("os").text();
 			software.status = SoftwareLoaded;
-			LOG_STRM_INFO(AStreamJid,QString("Received software version from=%1").arg(AStanza.from()));
 		}
 		else if (AStanza.type() == "error")
 		{
@@ -296,7 +263,6 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			software.version.clear();
 			software.os.clear();
 			software.status = SoftwareError;
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to request software version from=%1: %2").arg(AStanza.from(),software.name));
 		}
 		emit softwareInfoChanged(contactJid);
 	}
@@ -309,13 +275,11 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			QDomElement query = AStanza.firstElement("query");
 			activity.dateTime = QDateTime::currentDateTime().addSecs(0-query.attribute("seconds","0").toInt());
 			activity.text = query.text();
-			LOG_STRM_INFO(AStreamJid,QString("Received last activity from=%1").arg(AStanza.from()));
 		}
 		else if (AStanza.type() == "error")
 		{
 			activity.dateTime = QDateTime();
 			activity.text = XmppStanzaError(AStanza).errorMessage();
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to request last activity from=%1: %2").arg(AStanza.from(),activity.text));
 		}
 		emit lastActivityChanged(contactJid);
 	}
@@ -331,12 +295,10 @@ void ClientInfo::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanz
 			tItem.zone = DateTime::tzdFromX85(tzo);
 			tItem.delta = QDateTime::currentDateTime().secsTo(DateTime(utc).toLocal());
 			tItem.ping = tItem.ping - QTime::currentTime().msecsTo(QTime(0,0,0,0));
-			LOG_STRM_INFO(AStreamJid,QString("Received current time from=%1").arg(AStanza.from()));
 		}
 		else
 		{
 			FTimeItems.remove(contactJid);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to request current time from=%1: %2").arg(AStanza.from(),XmppStanzaError(AStanza).condition()));
 		}
 		emit entityTimeChanged(contactJid);
 	}
@@ -402,22 +364,202 @@ Action *ClientInfo::createDiscoFeatureAction(const Jid &AStreamJid, const QStrin
 
 QString ClientInfo::osVersion() const
 {
-	return SystemManager::osVersion();
+	static QString osver;
+	if (osver.isEmpty())
+	{
+#if defined(Q_WS_MAC)
+		switch (QSysInfo::MacintoshVersion)
+		{
+		# if QT_VERSION >= 0x040803
+			case QSysInfo::MV_MOUNTAINLION:
+				osver = "OS X 10.8 Mountain Lion";
+				break;
+		# endif
+		case QSysInfo::MV_LION:
+			osver = "OS X 10.7 Lion";
+			break;
+		case QSysInfo::MV_SNOWLEOPARD:
+			osver = "Mac OS X 10.6 Snow Leopard)";
+			break;
+		case QSysInfo::MV_LEOPARD:
+			osver = "Mac OS X 10.5 Leopard";
+			break;
+		case QSysInfo::MV_TIGER:
+			osver = "Mac OS X 10.4 Tiger";
+			break;
+		case QSysInfo::MV_PANTHER:
+			osver = "Mac OS X 10.3 Panther";
+			break;
+		case QSysInfo::MV_JAGUAR:
+			osver = "Mac OS X 10.2 Jaguar";
+			break;
+		case QSysInfo::MV_PUMA:
+			osver = "Mac OS X 10.1 Puma";
+			break;
+		case QSysInfo::MV_CHEETAH:
+			osver = "Mac OS X 10.0 Cheetah";
+			break;
+		case QSysInfo::MV_9:
+			osver = "Mac OS 9";
+			break;
+		case QSysInfo::MV_Unknown:
+		default:
+			osver = "MacOS (unknown)";
+			break;
+		}
+#elif defined(Q_WS_X11)
+		QStringList path;
+		foreach(const QString &env, QProcess::systemEnvironment())
+			if (env.startsWith("PATH="))
+				path = env.split('=').value(1).split(':');
+
+		QString found;
+		foreach(const QString &dirname, path)
+		{
+			QDir dir(dirname);
+			QFileInfo cand(dir.filePath("lsb_release"));
+			if (cand.isExecutable())
+			{
+				found = cand.absoluteFilePath();
+				break;
+			}
+		}
+
+		if (!found.isEmpty())
+		{
+			QProcess process;
+			process.start(found, QStringList()<<"--description"<<"--short", QIODevice::ReadOnly);
+			if (process.waitForStarted())
+			{
+				QTextStream stream(&process);
+				while (process.waitForReadyRead())
+					osver += stream.readAll();
+				process.close();
+				osver = osver.trimmed();
+			}
+		}
+
+		if (osver.isEmpty())
+		{
+			utsname buf;
+			if (uname(&buf) != -1)
+			{
+				osver.append(buf.release).append(QLatin1Char(' '));
+				osver.append(buf.sysname).append(QLatin1Char(' '));
+				osver.append(buf.machine).append(QLatin1Char(' '));
+				osver.append(QLatin1String(" (")).append(buf.machine).append(QLatin1Char(')'));
+			}
+			else
+			{
+				osver = QLatin1String("Linux/Unix (unknown)");
+			}
+		}
+#elif defined(Q_WS_WIN) || defined(Q_OS_CYGWIN)
+		switch (QSysInfo::WindowsVersion)
+		{
+		case QSysInfo::WV_CE_6:
+			osver = "Windows CE 6.x";
+			break;
+		case QSysInfo::WV_CE_5:
+			osver = "Windows CE 5.x";
+			break;
+		case QSysInfo::WV_CENET:
+			osver = "Windows CE .NET";
+			break;
+		case QSysInfo::WV_CE:
+			osver = "Windows CE";
+			break;
+		# if QT_VERSION >= 0x040803
+			case QSysInfo::WV_WINDOWS8:
+				osver = "Windows 8";
+				break;
+		# endif
+		case QSysInfo::WV_WINDOWS7:
+			osver = "Windows 7";
+			break;
+		case QSysInfo::WV_VISTA:
+			osver = "Windows Vista";
+			break;
+		case QSysInfo::WV_2003:
+			osver = "Windows Server 2003";
+			break;
+		case QSysInfo::WV_XP:
+			osver = "Windows XP";
+			break;
+		case QSysInfo::WV_2000:
+			osver = "Windows 2000";
+			break;
+		case QSysInfo::WV_NT:
+			osver = "Windows NT";
+			break;
+		case QSysInfo::WV_Me:
+			osver = "Windows Me";
+			break;
+		case QSysInfo::WV_98:
+			osver = "Windows 98";
+			break;
+		case QSysInfo::WV_95:
+			osver = "Windows 95";
+			break;
+		case QSysInfo::WV_32s:
+			osver = "Windows 3.1 with Win32s";
+			break;
+		default:
+			osver = "Windows (unknown)";
+			break;
+		}
+#elif defined(Q_WS_HAIKU)
+		BPath path;
+		QString strVersion("Haiku");
+		if (find_directory(B_BEOS_LIB_DIRECTORY, &path) == B_OK) 
+		{
+			path.Append("libbe.so");
+
+			BAppFileInfo appFileInfo;
+			version_info versionInfo;
+			BFile file;
+			if (file.SetTo(path.Path(), B_READ_ONLY) == B_OK
+				&& appFileInfo.SetTo(&file) == B_OK
+				&& appFileInfo.GetVersionInfo(&versionInfo, B_APP_VERSION_KIND) == B_OK
+				&& versionInfo.short_info[0] != '\0')
+			{
+				strVersion = versionInfo.short_info;
+			}
+		}
+
+		utsname uname_info;
+		if (uname(&uname_info) == 0) 
+		{
+			osver = uname_info.sysname;
+			long revision = 0;
+			if (sscanf(uname_info.version, "r%10ld", &revision) == 1)
+			{
+				char version[16];
+				snprintf(version, sizeof(version), "%ld", revision);
+				osver += " ( " + strVersion + " Rev. ";
+				osver += version;
+				osver += ")";
+			}
+		}
+#else
+		osver = "Unknown";
+#endif
+	}
+	return osver;
 }
 
 void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, int AInfoTypes)
 {
-	if (AStreamJid.isValid() && AContactJid.isValid() && AInfoTypes>0)
+	if (AInfoTypes>0 && AContactJid.isValid() && AStreamJid.isValid())
 	{
 		ClientInfoDialog *dialog = FClientInfoDialogs.value(AContactJid,NULL);
 		if (!dialog)
 		{
 			QString contactName =  AContactJid.uNode();
-			if (FDiscovery!=NULL && FDiscovery->discoInfo(AStreamJid,AContactJid.bare()).identity.value(0).category=="conference")
+			if (FDiscovery!=NULL && FDiscovery->discoInfo(AStreamJid,AContactJid.bare()).identity.value(0).category == "conference")
 				contactName = AContactJid.resource();
 			if (contactName.isEmpty())
 				contactName = FDiscovery!=NULL ? FDiscovery->discoInfo(AStreamJid,AContactJid).identity.value(0).name : AContactJid.domain();
-			
 			if (FRosterPlugin)
 			{
 				IRoster *roster = FRosterPlugin->findRoster(AStreamJid);
@@ -428,7 +570,6 @@ void ClientInfo::showClientInfo(const Jid &AStreamJid, const Jid &AContactJid, i
 						contactName = ritem.name;
 				}
 			}
-
 			dialog = new ClientInfoDialog(this,AStreamJid,AContactJid,!contactName.isEmpty() ? contactName : AContactJid.uFull(),AInfoTypes);
 			connect(dialog,SIGNAL(clientInfoDialogClosed(const Jid &)),SLOT(onClientInfoDialogClosed(const Jid &)));
 			FClientInfoDialogs.insert(AContactJid,dialog);
@@ -460,11 +601,6 @@ bool ClientInfo::requestSoftwareInfo(const Jid &AStreamJid, const Jid &AContactJ
 		{
 			FSoftwareId.insert(iq.id(),AContactJid);
 			FSoftwareItems[AContactJid].status = SoftwareLoading;
-			LOG_STRM_INFO(AStreamJid,QString("Software version request sent to=%1").arg(AContactJid.full()));
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to sent software request to=%1").arg(AContactJid.full()));
 		}
 	}
 	return sent;
@@ -505,14 +641,7 @@ bool ClientInfo::requestLastActivity(const Jid &AStreamJid, const Jid &AContactJ
 		iq.setTo(AContactJid.full()).setId(FStanzaProcessor->newId()).setType("get");
 		sent = FStanzaProcessor->sendStanzaRequest(this,AStreamJid,iq,LAST_ACTIVITY_TIMEOUT);
 		if (sent)
-		{
 			FActivityId.insert(iq.id(),AContactJid);
-			LOG_STRM_INFO(AStreamJid,QString("Last activity request sent to=%1").arg(AContactJid.full()));
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send last activity request to=%1").arg(AContactJid.full()));
-		}
 	}
 	return sent;
 }
@@ -546,12 +675,7 @@ bool ClientInfo::requestEntityTime(const Jid &AStreamJid, const Jid &AContactJid
 			TimeItem &tItem = FTimeItems[AContactJid];
 			tItem.ping = QTime::currentTime().msecsTo(QTime(0,0,0,0));
 			FTimeId.insert(iq.id(),AContactJid);
-			LOG_STRM_INFO(AStreamJid,QString("Current time request sent to=%1").arg(AContactJid.full()));
 			emit entityTimeChanged(AContactJid);
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send current time request to=%1").arg(AContactJid.full()));
 		}
 	}
 	return sent;
@@ -700,26 +824,46 @@ void ClientInfo::onContactStateChanged(const Jid &AStreamJid, const Jid &AContac
 	}
 }
 
-void ClientInfo::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
+void ClientInfo::onRosterIndexContextMenu(const QList<IRosterIndex *> &AIndexes, int ALabelId, Menu *AMenu)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
+	if (ALabelId==RLID_DISPLAY && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
-		if (index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT || index->kind()==RIK_MY_RESOURCE)
+		if (index->type() == RIT_CONTACT || index->type() == RIT_AGENT || index->type() == RIT_MY_RESOURCE)
 		{
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 			if (presence && presence->isOpen())
 			{
-				int show = index->data(RDR_SHOW).toInt();
 				Jid contactJid = index->data(RDR_FULL_JID).toString();
-				if (show==IPresence::Offline || show==IPresence::Error)
+				int show = index->data(RDR_SHOW).toInt();
+				QStringList features = FDiscovery!=NULL ? FDiscovery->discoInfo(streamJid,contactJid).features : QStringList();
+				if (show!=IPresence::Offline && show!=IPresence::Error && !features.contains(NS_JABBER_VERSION))
+				{
+					Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_VERSION,AMenu);
+					AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
+				}
+				if ((show == IPresence::Offline || show == IPresence::Error) && !features.contains(NS_JABBER_LAST))
 				{
 					Action *action = createInfoAction(streamJid,contactJid,NS_JABBER_LAST,AMenu);
 					AMenu->addAction(action,AG_RVCM_CLIENTINFO,true);
 				}
 			}
 		}
+	}
+}
+
+void ClientInfo::onRosterIndexToolTips(IRosterIndex *AIndex, int ALabelId, QMultiMap<int,QString> &AToolTips)
+{
+	if (ALabelId == RLID_DISPLAY)
+	{
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+
+		if (hasSoftwareInfo(contactJid))
+			AToolTips.insert(RTTO_SOFTWARE_INFO,tr("Software: %1 %2").arg(Qt::escape(softwareName(contactJid))).arg(Qt::escape(softwareVersion(contactJid))));
+
+		if (hasEntityTime(contactJid))
+			AToolTips.insert(RTTO_ENTITY_TIME,tr("Entity time: %1").arg(entityTime(contactJid).time().toString()));
 	}
 }
 
@@ -759,7 +903,6 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 				software.os = FDataForms->fieldValue(FORM_FIELD_OS,form.fields).toString() + " ";
 				software.os += FDataForms->fieldValue(FORM_FIELD_OS_VERSION,form.fields).toString();
 				software.status = SoftwareLoaded;
-				LOG_STRM_DEBUG(AInfo.streamJid,QString("Software version in disco info received from=%1").arg(AInfo.contactJid.full()));
 				emit softwareInfoChanged(AInfo.contactJid);
 				break;
 			}

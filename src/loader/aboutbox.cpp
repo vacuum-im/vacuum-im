@@ -1,11 +1,9 @@
 #include "aboutbox.h"
 
 #include <QDesktopServices>
-#include <utils/logger.h>
 
 AboutBox::AboutBox(IPluginManager *APluginManager, QWidget *AParent) : QDialog(AParent)
 {
-	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 

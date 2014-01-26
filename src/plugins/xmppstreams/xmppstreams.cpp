@@ -1,9 +1,5 @@
 #include "xmppstreams.h"
 
-#include <definitions/internalerrors.h>
-#include <utils/options.h>
-#include <utils/logger.h>
-
 XmppStreams::XmppStreams()
 {
 
@@ -26,15 +22,6 @@ void XmppStreams::pluginInfo(IPluginInfo *APluginInfo)
 bool XmppStreams::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(APluginManager); Q_UNUSED(AInitOrder);
-	return true;
-}
-
-bool XmppStreams::initObjects()
-{
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_DESTROYED,tr("XMPP stream destroyed"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_NOT_SECURE,tr("Secure connection is not established"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_CLOSED_UNEXPECTEDLY,tr("Connection closed unexpectedly"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_XMPPSTREAM_FAILED_START_CONNECTION,tr("Failed to start connection"));
 	return true;
 }
 
@@ -64,7 +51,6 @@ IXmppStream *XmppStreams::newXmppStream(const Jid &AStreamJid)
 	IXmppStream *stream = xmppStream(AStreamJid);
 	if (!stream)
 	{
-		LOG_STRM_INFO(AStreamJid,"XMPP stream created");
 		stream = new XmppStream(this, AStreamJid);
 		connect(stream->instance(), SIGNAL(streamDestroyed()), SLOT(onStreamDestroyed()));
 		FStreams.append(stream);
@@ -82,11 +68,10 @@ void XmppStreams::addXmppStream(IXmppStream *AXmppStream)
 {
 	if (AXmppStream && !FActiveStreams.contains(AXmppStream))
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),"Registering XMPP stream");
 		connect(AXmppStream->instance(), SIGNAL(opened()), SLOT(onStreamOpened()));
 		connect(AXmppStream->instance(), SIGNAL(aboutToClose()), SLOT(onStreamAboutToClose()));
 		connect(AXmppStream->instance(), SIGNAL(closed()), SLOT(onStreamClosed()));
-		connect(AXmppStream->instance(), SIGNAL(error(const XmppError &)), SLOT(onStreamError(const XmppError &)));
+		connect(AXmppStream->instance(), SIGNAL(error(const QString &)), SLOT(onStreamError(const QString &)));
 		connect(AXmppStream->instance(), SIGNAL(jidAboutToBeChanged(const Jid &)), SLOT(onStreamJidAboutToBeChanged(const Jid &)));
 		connect(AXmppStream->instance(), SIGNAL(jidChanged(const Jid &)), SLOT(onStreamJidChanged(const Jid &)));
 		connect(AXmppStream->instance(), SIGNAL(connectionChanged(IConnection *)), SLOT(onStreamConnectionChanged(IConnection *)));
@@ -99,7 +84,6 @@ void XmppStreams::removeXmppStream(IXmppStream *AXmppStream)
 {
 	if (FActiveStreams.contains(AXmppStream))
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),"Unregistering XMPP stream");
 		if (AXmppStream->isConnected())
 		{
 			AXmppStream->close();
@@ -128,7 +112,6 @@ void XmppStreams::registerXmppFeature(int AOrder, const QString &AFeatureNS)
 {
 	if (!AFeatureNS.isEmpty() && !FFeatureOrders.values().contains(AFeatureNS))
 	{
-		LOG_DEBUG(QString("XMPP feature registered, order=%1, feature=%2").arg(AOrder).arg(AFeatureNS));
 		FFeatureOrders.insertMulti(AOrder,AFeatureNS);
 		emit xmppFeatureRegistered(AOrder,AFeatureNS);
 	}
@@ -143,7 +126,6 @@ void XmppStreams::registerXmppFeaturePlugin(int AOrder, const QString &AFeatureN
 {
 	if (AFeaturePlugin && !AFeatureNS.isEmpty())
 	{
-		LOG_DEBUG(QString("XMPP feature plugin registered, order=%1, feature=%2, class=%3").arg(AOrder).arg(AFeatureNS,AFeaturePlugin->instance()->metaObject()->className()));
 		FFeaturePlugins[AFeatureNS].insertMulti(AOrder,AFeaturePlugin);
 		emit xmppFeaturePluginRegistered(AOrder,AFeatureNS,AFeaturePlugin);
 	}
@@ -169,7 +151,7 @@ void XmppStreams::onStreamClosed()
 		emit closed(stream);
 }
 
-void XmppStreams::onStreamError(const XmppError &AError)
+void XmppStreams::onStreamError(const QString &AError)
 {
 	IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
 	if (stream)
@@ -202,7 +184,6 @@ void XmppStreams::onStreamDestroyed()
 	IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
 	if (stream)
 	{
-		LOG_STRM_INFO(stream->streamJid(),"XMPP stream destroyed");
 		removeXmppStream(stream);
 		FStreams.removeAt(FStreams.indexOf(stream));
 		emit streamDestroyed(stream);

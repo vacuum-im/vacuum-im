@@ -60,13 +60,5 @@
         <source>Failed to load history: %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Contact resource</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Absent&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>

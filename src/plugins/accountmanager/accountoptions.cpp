@@ -3,9 +3,6 @@
 #include <QTimer>
 #include <QMessageBox>
 #include <QTextDocument>
-#include <definitions/version.h>
-#include <definitions/optionvalues.h>
-#include <utils/options.h>
 
 AccountOptions::AccountOptions(IAccountManager *AManager, const QUuid &AAccountId, QWidget *AParent) : QWidget(AParent)
 {

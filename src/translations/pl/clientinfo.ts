@@ -4,6 +4,14 @@
 <context>
     <name>ClientInfo</name>
     <message>
+        <source>Software: %1 %2</source>
+        <translation>Oprogramowanie: %1 %2</translation>
+    </message>
+    <message>
+        <source>Entity time: %1</source>
+        <translation>Czas kontaktu: %1</translation>
+    </message>
+    <message>
         <source>Software information</source>
         <translation>Informacja o oprogramowaniu</translation>
     </message>

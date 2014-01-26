@@ -2,6 +2,8 @@
 #define SOCKSSTREAMS_H
 
 #include <QTcpServer>
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/isocksstreams.h>
 #include <interfaces/idatastreamsmanager.h>
@@ -11,13 +13,14 @@
 #include <interfaces/idefaultconnection.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/iconnectionmanager.h>
+#include <utils/options.h>
 #include "socksstream.h"
 #include "socksoptions.h"
 
 class SocksStreams :
-	public QObject,
-	public IPlugin,
-	public ISocksStreams
+			public QObject,
+			public IPlugin,
+			public ISocksStreams
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ISocksStreams IDataStreamMethod);
@@ -36,7 +39,8 @@ public:
 	virtual QString methodNS() const;
 	virtual QString methodName() const;
 	virtual QString methodDescription() const;
-	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL);
+	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid,
+	    const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent=NULL);
 	virtual IOptionsWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent);
 	virtual IOptionsWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent);
 	virtual void saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);

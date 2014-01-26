@@ -6,11 +6,18 @@
 #include <QMultiMap>
 #include <QDomDocument>
 #include <QInputDialog>
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
+#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
+#include <utils/options.h>
+#include <utils/xmpperror.h>
+#include <utils/versionparser.h>
 #include "streamparser.h"
 
-enum StreamState {
+enum StreamState
+{
 	SS_OFFLINE,
 	SS_CONNECTING,
 	SS_INITIALIZE,
@@ -21,9 +28,9 @@ enum StreamState {
 };
 
 class XmppStream :
-	public QObject,
-	public IXmppStream,
-	public IXmppStanzaHadler
+			public QObject,
+			public IXmppStream,
+			public IXmppStanzaHadler
 {
 	Q_OBJECT;
 	Q_INTERFACES(IXmppStream IXmppStanzaHadler);
@@ -37,11 +44,11 @@ public:
 	//IXmppStream
 	virtual bool open();
 	virtual void close();
-	virtual void abort(const XmppError &AError);
+	virtual void abort(const QString &AError);
 	virtual bool isOpen() const;
 	virtual bool isConnected() const;
 	virtual QString streamId() const;
-	virtual XmppError error() const;
+	virtual QString errorString() const;
 	virtual Jid streamJid() const;
 	virtual void setStreamJid(const Jid &AJid);
 	virtual QString password() const;
@@ -64,7 +71,7 @@ signals:
 	void opened();
 	void aboutToClose();
 	void closed();
-	void error(const XmppError &AError);
+	void error(const QString &AError);
 	void jidAboutToBeChanged(const Jid &AAfter);
 	void jidChanged(const Jid &ABefore);
 	void connectionChanged(IConnection *AConnection);
@@ -87,22 +94,29 @@ protected slots:
 	//IStreamConnection
 	void onConnectionConnected();
 	void onConnectionReadyRead(qint64 ABytes);
-	void onConnectionError(const XmppError &AError);
+	void onConnectionError(const QString &AError);
 	void onConnectionDisconnected();
 	//StreamParser
 	void onParserOpened(const QDomElement &AElem);
 	void onParserElement(const QDomElement &AElem);
-	void onParserError(const XmppError &AError);
+	void onParserError(const QString &AError);
 	void onParserClosed();
 	//IXmppFeature
 	void onFeatureFinished(bool ARestart);
-	void onFeatureError(const XmppError &AError);
+	void onFeatureError(const QString &AError);
 	void onFeatureDestroyed();
 	//KeepAlive
 	void onKeepAliveTimeout();
 private:
-	IConnection *FConnection;
 	IXmppStreams *FXmppStreams;
+	IConnection *FConnection;
+private:
+	QDomElement FServerFeatures;
+	QList<QString>	FAvailFeatures;
+	QList<IXmppFeature *> FActiveFeatures;
+private:
+	QMultiMap<int, IXmppDataHandler *> FDataHandlers;
+	QMultiMap<int, IXmppStanzaHadler *> FStanzaHandlers;
 private:
 	bool FReady;
 	bool FClosed;
@@ -115,7 +129,7 @@ private:
 	QString FStreamId;
 	QString FPassword;
 	QString FDefLang;
-	XmppError FError;
+	QString FErrorString;
 	StreamParser FParser;
 	QTimer FKeepAliveTimer;
 	StreamState FStreamState;
@@ -123,13 +137,6 @@ private:
 	QMutex FPasswordMutex;
 	QString FSessionPassword;
 	QInputDialog *FPasswordDialog;
-private:
-	QDomElement FServerFeatures;
-	QList<QString>	FAvailFeatures;
-	QList<IXmppFeature *> FActiveFeatures;
-private:
-	QMultiMap<int, IXmppDataHandler *> FDataHandlers;
-	QMultiMap<int, IXmppStanzaHadler *> FStanzaHandlers;
 };
 
 #endif // XMPPSTREAM_H

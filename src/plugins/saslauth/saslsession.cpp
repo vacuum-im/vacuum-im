@@ -1,11 +1,5 @@
 #include "saslsession.h"
 
-#include <definitions/namespaces.h>
-#include <definitions/xmppstanzahandlerorders.h>
-#include <utils/xmpperror.h>
-#include <utils/stanza.h>
-#include <utils/logger.h>
-
 SASLSession::SASLSession(IXmppStream *AXmppStream) : QObject(AXmppStream->instance())
 {
 	FXmppStream = AXmppStream;
@@ -23,15 +17,12 @@ bool SASLSession::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AO
 	{
 		if (AStanza.type() == "result")
 		{
-			LOG_STRM_INFO(FXmppStream->streamJid(),"Session started");
 			deleteLater();
 			emit finished(false);
 		}
 		else
 		{
-			XmppStanzaError err(AStanza);
-			LOG_STRM_INFO(FXmppStream->streamJid(),QString("Failed to start session: %1").arg(err.condition()));
-			emit error(err);
+			emit error(XmppStanzaError(AStanza).errorMessage());
 		}
 		return true;
 	}
@@ -40,18 +31,10 @@ bool SASLSession::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AO
 
 bool SASLSession::xmppStanzaOut(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream);
+	Q_UNUSED(AStanza);
+	Q_UNUSED(AOrder);
 	return false;
-}
-
-QString SASLSession::featureNS() const
-{
-	return NS_FEATURE_SESSION;
-}
-
-IXmppStream *SASLSession::xmppStream() const
-{
-	return FXmppStream;
 }
 
 bool SASLSession::start(const QDomElement &AElem)
@@ -63,12 +46,7 @@ bool SASLSession::start(const QDomElement &AElem)
 		session.addElement("session",NS_FEATURE_SESSION);
 		FXmppStream->insertXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 		FXmppStream->sendStanza(session);
-		LOG_STRM_INFO(FXmppStream->streamJid(),"Session start request sent");
 		return true;
-	}
-	else
-	{
-		LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to start session: Invalid element=%1").arg(AElem.tagName()));
 	}
 	deleteLater();
 	return false;

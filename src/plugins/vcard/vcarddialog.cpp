@@ -4,18 +4,12 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QImageReader>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/vcardvaluenames.h>
-#include <utils/iconstorage.h>
-#include <utils/logger.h>
 
 VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, const Jid &AContactJid)
 {
-	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	setWindowTitle(tr("Profile - %1").arg(AContactJid.uFull()));
+	setWindowTitle(tr("vCard - %1").arg(AContactJid.uFull()));
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_VCARD,0,0,"windowIcon");
 
 	FContactJid = AContactJid;
@@ -35,10 +29,10 @@ VCardDialog::VCardDialog(IVCardPlugin *AVCardPlugin, const Jid &AStreamJid, cons
 	ui.btbButtons->addButton(tr("Reload"),QDialogButtonBox::ResetRole);
 	connect(ui.btbButtons,SIGNAL(clicked(QAbstractButton *)),SLOT(onDialogButtonClicked(QAbstractButton *)));
 
-	FVCard = FVCardPlugin->getVCard(FContactJid);
+	FVCard = FVCardPlugin->vcard(FContactJid);
 	connect(FVCard->instance(),SIGNAL(vcardUpdated()),SLOT(onVCardUpdated()));
 	connect(FVCard->instance(),SIGNAL(vcardPublished()),SLOT(onVCardPublished()));
-	connect(FVCard->instance(),SIGNAL(vcardError(const XmppError &)),SLOT(onVCardError(const XmppError &)));
+	connect(FVCard->instance(),SIGNAL(vcardError(const QString &)),SLOT(onVCardError(const QString &)));
 
 	connect(ui.tlbPhotoSave,SIGNAL(clicked()),SLOT(onPhotoSaveClicked()));
 	connect(ui.tlbPhotoLoad,SIGNAL(clicked()),SLOT(onPhotoLoadClicked()));
@@ -326,12 +320,9 @@ void VCardDialog::onVCardPublished()
 	}
 }
 
-void VCardDialog::onVCardError(const XmppError &AError)
+void VCardDialog::onVCardError(const QString &AError)
 {
-	QMessageBox::critical(this,tr("Error"),
-		streamJid().pBare() != contactJid().pBare() ? 
-		tr("Failed to load profile: %1").arg(Qt::escape(AError.errorMessage())) :
-		tr("Failed to publish your profile: %1").arg(Qt::escape(AError.errorMessage())));
+	QMessageBox::critical(this,tr("vCard error"),tr("vCard request or publish failed.<br>%1").arg(Qt::escape(AError)));
 
 	if (!FSaveClicked)
 		deleteLater();
@@ -399,7 +390,8 @@ void VCardDialog::onEmailAddClicked()
 	static QStringList emailTagList = QStringList() << "HOME" << "WORK" << "INTERNET" << "X400";
 	EditItemDialog dialog(QString::null,QStringList(),emailTagList,this);
 	dialog.setLabelText(tr("EMail:"));
-	if (dialog.exec()==QDialog::Accepted && !dialog.value().isEmpty() && ui.ltwEmails->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
+	if (dialog.exec() == QDialog::Accepted && !dialog.value().isEmpty()
+	    && ui.ltwEmails->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
 	{
 		QListWidgetItem *item = new QListWidgetItem(dialog.value(),ui.ltwEmails);
 		item->setData(Qt::UserRole,dialog.tags());
@@ -433,7 +425,8 @@ void VCardDialog::onPhoneAddClicked()
 	static QStringList phoneTagList = QStringList() << "HOME" << "WORK" << "CELL" << "MODEM";
 	EditItemDialog dialog(QString::null,QStringList(),phoneTagList,this);
 	dialog.setLabelText(tr("Phone:"));
-	if (dialog.exec()==QDialog::Accepted && !dialog.value().isEmpty() && ui.ltwPhones->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
+	if (dialog.exec() == QDialog::Accepted && !dialog.value().isEmpty()
+	    && ui.ltwPhones->findItems(dialog.value(),Qt::MatchFixedString).isEmpty())
 	{
 		QListWidgetItem *item = new QListWidgetItem(dialog.value(),ui.ltwPhones);
 		item->setData(Qt::UserRole,dialog.tags());
@@ -479,7 +472,7 @@ void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 		}
 		else
 		{
-			QMessageBox::warning(this,tr("Error"),tr("Failed to publish your profile."));
+			QMessageBox::warning(this,tr("vCard error"),tr("Failed to publish vCard"));
 		}
 	}
 	else if (ui.btbButtons->buttonRole(AButton) == QDialogButtonBox::ResetRole)
@@ -491,7 +484,7 @@ void VCardDialog::onDialogButtonClicked(QAbstractButton *AButton)
 		}
 		else
 		{
-			QMessageBox::warning(this,tr("Error"),tr("Failed to load profile."));
+			QMessageBox::warning(this,tr("vCard error"),tr("Failed to update vCard"));
 		}
 	}
 }

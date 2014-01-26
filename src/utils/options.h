@@ -44,7 +44,7 @@ private:
 };
 
 class UTILS_EXPORT Options :
-	public QObject
+			public QObject
 {
 	Q_OBJECT;
 	friend class OptionsNode;
@@ -64,12 +64,8 @@ public:
 	static void setDefaultValue(const QString &APath, const QVariant &ADefault);
 	static QByteArray encrypt(const QVariant &AValue, const QByteArray &AKey = cryptKey());
 	static QVariant decrypt(const QByteArray &AData, const QByteArray &AKey = cryptKey());
-public:
-	static QString variantToString(const QVariant &AValue);
-	static QVariant stringToVariant(const QString &AValue, QVariant::Type AType);
 	static void exportNode(const QString &APath, QDomElement &AToElem);
 	static void importNode(const QString &APath, const QDomElement &AFromElem);
-	static OptionsNode createNodeForElement(const QDomElement &AElement);
 signals:
 	void optionsOpened();
 	void optionsClosed();
@@ -78,9 +74,7 @@ signals:
 	void optionsRemoved(const OptionsNode &ANode);
 	void defaultValueChanged(const QString &APath, const QVariant &ADefault);
 private:
-	Options();
-	~Options();
-	OptionsData *d;
+	static OptionsData *d;
 };
 
 #endif // OPTIONS_H

@@ -6,12 +6,13 @@
 #include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
+#include <utils/options.h>
 #include "xmppstream.h"
 
 class XmppStreams :
-	public QObject,
-	public IPlugin,
-	public IXmppStreams
+			public QObject,
+			public IPlugin,
+			public IXmppStreams
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IXmppStreams);
@@ -23,7 +24,7 @@ public:
 	virtual QUuid pluginUuid() const { return XMPPSTREAMS_UUID;}
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
-	virtual bool initObjects();
+	virtual bool initObjects() { return true; }
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IXmppStreams
@@ -44,7 +45,7 @@ signals:
 	void opened(IXmppStream *AXmppStream);
 	void aboutToClose(IXmppStream *AXmppStream);
 	void closed(IXmppStream *AXmppStream);
-	void error(IXmppStream *AXmppStream, const XmppError &AError);
+	void error(IXmppStream *AXmppStream, const QString &AError);
 	void jidAboutToBeChanged(IXmppStream *AXmppStream, const Jid &AAfter);
 	void jidChanged(IXmppStream *AXmppStream, const Jid &ABefore);
 	void connectionChanged(IXmppStream *AXmppStream, IConnection *AConnection);
@@ -56,7 +57,7 @@ protected slots:
 	void onStreamOpened();
 	void onStreamAboutToClose();
 	void onStreamClosed();
-	void onStreamError(const XmppError &AError);
+	void onStreamError(const QString &AError);
 	void onStreamJidAboutToBeChanged(const Jid &AAfter);
 	void onStreamJidChanged(const Jid &ABefore);
 	void onStreamConnectionChanged(IConnection *AConnection);

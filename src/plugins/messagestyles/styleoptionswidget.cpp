@@ -2,10 +2,6 @@
 
 #include <QTimer>
 #include <QVBoxLayout>
-#include <definitions/optionvalues.h>
-#include <utils/message.h>
-#include <utils/options.h>
-#include <utils/logger.h>
 
 StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *AParent) : QWidget(AParent)
 {

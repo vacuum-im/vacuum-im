@@ -5,6 +5,7 @@
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QObjectCleanupHandler>
+#include <definitions/namespaces.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/idataforms.h>
 #include <interfaces/ibitsofbinary.h>
@@ -15,14 +16,15 @@
 #include "dataformwidget.h"
 #include "datadialogwidget.h"
 
-struct UrlRequest {
+struct UrlRequest
+{
 	QNetworkReply *reply;
 };
 
 class DataForms :
-	public QObject,
-	public IPlugin,
-	public IDataForms
+			public QObject,
+			public IPlugin,
+			public IDataForms
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IDataForms);
@@ -86,11 +88,11 @@ signals:
 	void formWidgetCreated(IDataFormWidget *AForm);
 	void dialogWidgetCreated(IDataDialogWidget *ADialog);
 	void urlLoaded(const QUrl &AUrl, const QByteArray &AData);
-	void urlLoadFailed(const QUrl &AUrl, const XmppError &AError);
+	void urlLoadFailed(const QUrl &AUrl, const QString &AError);
 protected:
 	void xmlLayout(const IDataLayout &ALayout, QDomElement &ALayoutElem) const;
 	void urlLoadSuccess(const QUrl &AUrl, const QByteArray &AData);
-	void urlLoadFailure(const QUrl &AUrl, const XmppError &AError);
+	void urlLoadFailure(const QUrl &AUrl, const QString &AError);
 	void registerDiscoFeatures();
 protected slots:
 	void onNetworkReplyFinished();

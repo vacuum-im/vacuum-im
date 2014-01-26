@@ -3,23 +3,6 @@
 #include <QSet>
 #include <QDateTime>
 #include <QDataStream>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/namespaces.h>
-#include <definitions/stanzahandlerorders.h>
-#include <definitions/archivehandlerorders.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
-#include <definitions/sessionnegotiatororders.h>
-#include <utils/iconstorage.h>
-#include <utils/options.h>
-#include <utils/logger.h>
 
 #define SHC_CONTENT_MESSAGES      "/message[@type='chat']/body"
 #define SHC_STATE_MESSAGES        "/message/[@xmlns='" NS_CHATSTATES "']"
@@ -72,17 +55,16 @@ void ChatStates::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
 }
 
-bool ChatStates::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool ChatStates::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
 	IPlugin *plugin = APluginManager->pluginInterface("IMessageWidgets").value(0);
 	if (plugin)
 	{
 		FMessageWidgets = qobject_cast<IMessageWidgets *>(plugin->instance());
 		if (FMessageWidgets)
 		{
-			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onChatWindowCreated(IMessageChatWindow *)));
-			connect(FMessageWidgets->instance(),SIGNAL(chatWindowDestroyed(IMessageChatWindow *)),SLOT(onChatWindowDestroyed(IMessageChatWindow *)));
+			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IChatWindow *)),SLOT(onChatWindowCreated(IChatWindow *)));
+			connect(FMessageWidgets->instance(),SIGNAL(chatWindowDestroyed(IChatWindow *)),SLOT(onChatWindowDestroyed(IChatWindow *)));
 		}
 	}
 
@@ -359,7 +341,7 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		Jid contactJid = AStanza.to();
 		if (isSupported(AStreamJid,contactJid))
 		{
-			IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid,true) : NULL;
+			IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,contactJid) : NULL;
 			if (window)
 			{
 				stateSent = true;
@@ -408,10 +390,6 @@ bool ChatStates::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		}
 		return !hasBody;
 	}
-	else if (FChatParams.contains(AStreamJid) && AStanza.type()!="error")
-	{
-		REPORT_ERROR("Received unexpected stanza");
-	}
 	return false;
 }
 
@@ -424,16 +402,21 @@ void ChatStates::setPermitStatus(const Jid &AContactJid, int AStatus)
 {
 	if (permitStatus(AContactJid) != AStatus)
 	{
-		LOG_INFO(QString("Changing contact chat state permit status, contact=%1, status=%2").arg(AContactJid.bare(),AStatus));
 		bool oldEnabled = isEnabled(Jid::null,AContactJid);
 
 		Jid bareJid = AContactJid.bare();
-		if (AStatus == IChatStates::StatusDisable)
+		if (AStatus==IChatStates::StatusDisable)
+		{
 			FPermitStatus.insert(bareJid,AStatus);
-		else if (AStatus == IChatStates::StatusEnable)
+		}
+		else if (AStatus==IChatStates::StatusEnable)
+		{
 			FPermitStatus.insert(bareJid,AStatus);
+		}
 		else
+		{
 			FPermitStatus.remove(bareJid);
+		}
 
 		if (!oldEnabled && isEnabled(Jid::null,AContactJid))
 			resetSupported(AContactJid);
@@ -451,7 +434,7 @@ bool ChatStates::isEnabled(const Jid &AStreamJid, const Jid &AContactJid) const
 		return false;
 
 	int status = permitStatus(AContactJid);
-	return  status!=IChatStates::StatusDisable && (status==IChatStates::StatusEnable || Options::node(OPV_MESSAGES_CHATSTATESENABLED).value().toBool());
+	return (Options::node(OPV_MESSAGES_CHATSTATESENABLED).value().toBool() || status==IChatStates::StatusEnable) && status!=IChatStates::StatusDisable;
 }
 
 bool ChatStates::isSupported(const Jid &AStreamJid, const Jid &AContactJid) const
@@ -513,28 +496,27 @@ void ChatStates::sendStateMessage(const Jid &AStreamJid, const Jid &AContactJid,
 void ChatStates::resetSupported(const Jid &AContactJid)
 {
 	foreach (const Jid &streamJid, FNotSupported.keys())
-	{
 		foreach (const Jid &contactJid, FNotSupported.value(streamJid))
-		{
 			if (AContactJid.isEmpty() || (AContactJid && contactJid))
 				setSupported(streamJid,contactJid,true);
-		}
-	}
 }
 
 void ChatStates::setSupported(const Jid &AStreamJid, const Jid &AContactJid, bool ASupported)
 {
 	if (FNotSupported.contains(AStreamJid))
 	{
-		QList<Jid> &unsuppotred = FNotSupported[AStreamJid];
-		int index = unsuppotred.indexOf(AContactJid);
+		QList<Jid> &notSuppotred = FNotSupported[AStreamJid];
+		int index = notSuppotred.indexOf(AContactJid);
 		if (ASupported != (index<0))
 		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Changing contact chat state support status, contact=%1, supported=%2").arg(AContactJid.full()).arg(ASupported));
 			if (ASupported)
-				unsuppotred.removeAt(index);
+			{
+				notSuppotred.removeAt(index);
+			}
 			else
-				unsuppotred.append(AContactJid);
+			{
+				notSuppotred.append(AContactJid);
+			}
 			emit supportStatusChanged(AStreamJid,AContactJid,ASupported);
 		}
 	}
@@ -547,7 +529,6 @@ void ChatStates::setUserState(const Jid &AStreamJid, const Jid &AContactJid, int
 		ChatParams &params = FChatParams[AStreamJid][AContactJid];
 		if (params.userState != AState)
 		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Contact chat state changed, contact=%1, state=%2").arg(AContactJid.full()).arg(AState));
 			params.userState = AState;
 			emit userChatStateChanged(AStreamJid,AContactJid,AState);
 			notifyUserState(AStreamJid,AContactJid);
@@ -563,7 +544,6 @@ void ChatStates::setSelfState(const Jid &AStreamJid, const Jid &AContactJid, int
 		params.selfLastActive = QDateTime::currentDateTime().toTime_t();
 		if (params.selfState != AState)
 		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Self chat state changed, contact=%1, state=%2").arg(AContactJid.full()).arg(AState));
 			params.selfState = AState;
 			if (ASend)
 				sendStateMessage(AStreamJid,AContactJid,AState);
@@ -579,7 +559,7 @@ void ChatStates::notifyUserState(const Jid &AStreamJid, const Jid &AContactJid)
 		ChatParams &params = FChatParams[AStreamJid][AContactJid];
 		if (params.userState==IChatStates::StateComposing && params.notifyId<=0)
 		{
-			IMessageChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
+			IChatWindow *window = FMessageWidgets!=NULL ? FMessageWidgets->findChatWindow(AStreamJid,AContactJid) : NULL;
 			if (window)
 			{
 				INotification notify;
@@ -692,7 +672,7 @@ void ChatStates::onMultiUserPresenceReceived(IMultiUser *AUser, int AShow, const
 	}
 }
 
-void ChatStates::onChatWindowCreated(IMessageChatWindow *AWindow)
+void ChatStates::onChatWindowCreated(IChatWindow *AWindow)
 {
 	StateWidget *widget = new StateWidget(this,AWindow,AWindow->toolBarWidget()->toolBarChanger()->toolBar());
 	AWindow->toolBarWidget()->toolBarChanger()->insertWidget(widget,TBG_MWTBW_CHATSTATES);
@@ -707,7 +687,7 @@ void ChatStates::onChatWindowCreated(IMessageChatWindow *AWindow)
 
 void ChatStates::onChatWindowActivated()
 {
-	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
+	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
 	if (window)
 	{
 		int state = selfChatState(window->streamJid(),window->contactJid());
@@ -719,7 +699,7 @@ void ChatStates::onChatWindowActivated()
 void ChatStates::onChatWindowTextChanged()
 {
 	QTextEdit *editor = qobject_cast<QTextEdit *>(sender());
-	IMessageChatWindow *window = FChatByEditor.value(editor,NULL);
+	IChatWindow *window = FChatByEditor.value(editor,NULL);
 	if (editor && window)
 	{
 		if (!editor->document()->isEmpty())
@@ -731,7 +711,7 @@ void ChatStates::onChatWindowTextChanged()
 
 void ChatStates::onChatWindowClosed()
 {
-	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
+	IChatWindow *window = qobject_cast<IChatWindow *>(sender());
 	if (window)
 	{
 		int state = selfChatState(window->streamJid(),window->contactJid());
@@ -740,7 +720,7 @@ void ChatStates::onChatWindowClosed()
 	}
 }
 
-void ChatStates::onChatWindowDestroyed(IMessageChatWindow *AWindow)
+void ChatStates::onChatWindowDestroyed(IChatWindow *AWindow)
 {
 	setSelfState(AWindow->streamJid(),AWindow->contactJid(),IChatStates::StateGone);
 	FChatByEditor.remove(AWindow->editWidget()->textEdit());
@@ -748,8 +728,8 @@ void ChatStates::onChatWindowDestroyed(IMessageChatWindow *AWindow)
 
 void ChatStates::onUpdateSelfStates()
 {
-	QList<IMessageChatWindow *> windows = FMessageWidgets!=NULL ? FMessageWidgets->chatWindows() : QList<IMessageChatWindow *>();
-	foreach (IMessageChatWindow *window, windows)
+	QList<IChatWindow *> windows = FMessageWidgets!=NULL ? FMessageWidgets->chatWindows() : QList<IChatWindow *>();
+	foreach (IChatWindow *window, windows)
 	{
 		if (FChatParams.value(window->streamJid()).contains(window->contactJid()))
 		{

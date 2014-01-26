@@ -1,8 +1,5 @@
 #include "selecticonmenu.h"
 
-#include <definitions/resources.h>
-#include <utils/iconstorage.h>
-
 SelectIconMenu::SelectIconMenu(const QString &AIconset, QWidget *AParent) : Menu(AParent)
 {
 	FStorage = NULL;

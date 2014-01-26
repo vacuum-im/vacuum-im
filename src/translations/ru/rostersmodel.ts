@@ -27,13 +27,5 @@
         <source>Without Groups</source>
         <translation>Без групп</translation>
     </message>
-    <message>
-        <source>Accounts</source>
-        <translation>Аккаунты</translation>
-    </message>
-    <message>
-        <source>All Contacts</source>
-        <translation>Все контакты</translation>
-    </message>
 </context>
 </TS>

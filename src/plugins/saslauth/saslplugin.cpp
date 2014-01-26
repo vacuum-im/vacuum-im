@@ -1,14 +1,5 @@
 #include "saslplugin.h"
 
-#include <definitions/namespaces.h>
-#include <definitions/xmpperrors.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
-#include <definitions/xmppstanzahandlerorders.h>
-#include <utils/xmpperror.h>
-#include <utils/logger.h>
-
 SASLPlugin::SASLPlugin()
 {
 	FXmppStreams = NULL;
@@ -29,16 +20,16 @@ void SASLPlugin::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
-bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder)
+bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
 {
-	Q_UNUSED(AInitOrder);
-
 	IPlugin *plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 	{
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
+		{
 			connect(FXmppStreams->instance(),SIGNAL(created(IXmppStream *)),SLOT(onXmppStreamCreated(IXmppStream *)));
+		}
 	}
 
 	return FXmppStreams!=NULL;
@@ -46,20 +37,17 @@ bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder
 
 bool SASLPlugin::initObjects()
 {
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_ABORTED,tr("Authorization aborted"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_ACCOUNT_DISABLED,tr("Account disabled"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_CREDENTIALS_EXPIRED,tr("Credentials expired"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_ENCRYPTION_REQUIRED,tr("Encryption required"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_INCORRECT_ENCODING,tr("Incorrect encoding"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_INVALID_AUTHZID,tr("Invalid authorization id"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_INVALID_MECHANISM,tr("Invalid mechanism"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_MAILFORMED_REQUEST,tr("Malformed request"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_MECHANISM_TOO_WEAK,tr("Mechanism is too weak"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_NOT_AUTHORIZED,tr("Not authorized"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_TEMPORARY_AUTH_FAILURE,tr("Temporary authentication failure"));
-
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SASL_AUTH_INVALID_RESPONCE,tr("Wrong SASL authentication response"));
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SASL_BIND_INVALID_STREAM_JID,tr("Invalid XMPP stream JID in SASL bind response"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"aborted",tr("Authorization aborted"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"account-disabled",tr("Account disabled"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"credentials-expired",tr("Credentials expired"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"encryption-required",tr("Encryption required"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"incorrect-encoding",tr("Incorrect encoding"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"invalid-authzid",tr("Invalid authorization id"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"invalid-mechanism",tr("Invalid mechanism"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"malformed-request",tr("Malformed request"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"mechanism-too-weak",tr("Mechanism is too weak"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"not-authorized",tr("Not authorized"));
+	XmppError::registerErrorString(NS_FEATURE_SASL,"temporary-auth-failure",tr("Temporary authentication failure"));
 
 	if (FXmppStreams)
 	{
@@ -76,7 +64,9 @@ bool SASLPlugin::initObjects()
 
 bool SASLPlugin::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrder)
 {
-	Q_UNUSED(AXmppStream); Q_UNUSED(AStanza); Q_UNUSED(AOrder);
+	Q_UNUSED(AXmppStream);
+	Q_UNUSED(AStanza);
+	Q_UNUSED(AOrder);
 	return false;
 }
 
@@ -107,7 +97,6 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
 {
 	if (AFeatureNS == NS_FEATURE_SASL)
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),"SASLAuth XMPP stream feature created");
 		IXmppFeature *feature = new SASLAuth(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -115,7 +104,6 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
 	}
 	else if (AFeatureNS == NS_FEATURE_BIND)
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),"SASLBind XMPP stream feature created");
 		IXmppFeature *feature = new SASLBind(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -123,7 +111,6 @@ IXmppFeature *SASLPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStream 
 	}
 	else if (AFeatureNS == NS_FEATURE_SESSION)
 	{
-		LOG_STRM_INFO(AXmppStream->streamJid(),"SASLSession XMPP stream feature created");
 		IXmppFeature *feature = new SASLSession(AXmppStream);
 		connect(feature->instance(),SIGNAL(featureDestroyed()),SLOT(onFeatureDestroyed()));
 		emit featureCreated(feature);
@@ -141,15 +128,7 @@ void SASLPlugin::onFeatureDestroyed()
 {
 	IXmppFeature *feature = qobject_cast<IXmppFeature *>(sender());
 	if (feature)
-	{
-		if (qobject_cast<SASLAuth *>(feature->instance()))
-			LOG_STRM_INFO(feature->xmppStream()->streamJid(),"SASLAuth XMPP stream feature destroyed");
-		else if (qobject_cast<SASLBind *>(feature->instance()))
-			LOG_STRM_INFO(feature->xmppStream()->streamJid(),"SASLBind XMPP stream feature destroyed");
-		else if (qobject_cast<SASLSession *>(feature->instance()))
-			LOG_STRM_INFO(feature->xmppStream()->streamJid(),"SASLSession XMPP stream feature destroyed");
 		emit featureDestroyed(feature);
-	}
 }
 
 Q_EXPORT_PLUGIN2(plg_sasl, SASLPlugin)

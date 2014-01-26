@@ -63,11 +63,6 @@ SUBDIRS += urlprocessor
 SUBDIRS += filemessagearchive 
 SUBDIRS += servermessagearchive 
 SUBDIRS += rosteritemexchange 
-SUBDIRS += spellchecker 
-SUBDIRS += messagecarbons
-SUBDIRS += recentcontacts 
-#SUBDIRS += metacontacts 
-SUBDIRS += statistics 
 
 contains(QT_CONFIG, webkit) {
   SUBDIRS += adiummessagestyle

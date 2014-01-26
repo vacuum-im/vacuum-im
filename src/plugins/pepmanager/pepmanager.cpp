@@ -1,8 +1,5 @@
 #include "pepmanager.h"
 
-#include <definitions/namespaces.h>
-#include <utils/logger.h>
-
 #define SHC_PUBSUB_EVENT               "/message/event[@xmlns='" NS_PUBSUB_EVENT "']/items"
 
 #define NODE_NOTIFY_SUFFIX             "+notify"
@@ -29,8 +26,8 @@ void PEPManager::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->version = "0.9";
 	APluginInfo->author = "Maxim Ignatenko";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
-	APluginInfo->dependences.append(SERVICEDISCOVERY_UUID);
 	APluginInfo->dependences.append(STANZAPROCESSOR_UUID);
+	APluginInfo->dependences.append(SERVICEDISCOVERY_UUID);
 	APluginInfo->dependences.append(XMPPSTREAMS_UUID);
 }
 
@@ -59,20 +56,21 @@ bool PEPManager::initConnections(IPluginManager *APluginManager, int &AInitOrder
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
 		}
 	}
-	return FDiscovery!=NULL && FStanzaProcessor!=NULL && FXmppStreams!=NULL;
+	return (FDiscovery != NULL && FStanzaProcessor != NULL);
 }
 
 bool PEPManager::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept)
 {
-	if (FStanzaHandles.value(AStreamJid) == AHandleId)
+	if (stanzaHandles.value(AStreamJid) == AHandleId)
 	{
 		bool hooked = false;
-		QString node = AStanza.firstElement("event",NS_PUBSUB_EVENT).firstChildElement("items").attribute("node",QString::null);
+		QString node = AStanza.firstElement("event", NS_PUBSUB_EVENT).firstChildElement("items").attribute("node", QString::null);
 
-		foreach(int handlerId, FHandlersByNode.values(node))
+		QList<int> handlers = handlersByNode.values(node);
+		foreach(int handlerId, handlers)
 		{
-			if (FHandlersById.contains(handlerId))
-				hooked = FHandlersById[handlerId]->processPEPEvent(AStreamJid,AStanza) || hooked;
+			if (handlersById.contains(handlerId))
+				hooked = handlersById[handlerId]->processPEPEvent(AStreamJid,AStanza) || hooked;
 		}
 		AAccept = AAccept || hooked;
 	}
@@ -100,26 +98,14 @@ bool PEPManager::publishItem(const Jid &AStreamJid, const QString &ANode, const 
 		QDomElement publish = iq.addElement("pubsub", NS_PUBSUB).appendChild(iq.createElement("publish")).toElement();
 		publish.setAttribute("node", ANode);
 		publish.appendChild(AItem.cloneNode(true));
-		if (FStanzaProcessor->sendStanzaOut(AStreamJid,iq))
-		{
-			LOG_STRM_INFO(AStreamJid,QString("PEP item publish request sent, node=%1, id=%2").arg(ANode,iq.id()));
-			return true;
-		}
-		else
-		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send PEP item publish request, node=%1").arg(ANode));
-		}
-	}
-	else if (FStanzaProcessor)
-	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to publish PEP item, node=%1: Not supported").arg(ANode));
+		return FStanzaProcessor->sendStanzaOut(AStreamJid, iq);
 	}
 	return false;
 }
 
 IPEPHandler *PEPManager::nodeHandler(int AHandleId) const
 {
-	return FHandlersById.value(AHandleId, NULL);
+	return handlersById.value(AHandleId, NULL);
 }
 
 int PEPManager::insertNodeHandler(const QString &ANode, IPEPHandler *AHandle)
@@ -127,11 +113,11 @@ int PEPManager::insertNodeHandler(const QString &ANode, IPEPHandler *AHandle)
 	static int handleId = 0;
 
 	handleId++;
-	while(handleId <= 0 || FHandlersById.contains(handleId))
+	while(handleId <= 0 || handlersById.contains(handleId))
 		handleId = (handleId > 0) ? handleId+1 : 1;
 
-	FHandlersById.insert(handleId, AHandle);
-	FHandlersByNode.insertMulti(ANode, handleId);
+	handlersById.insert(handleId, AHandle);
+	handlersByNode.insertMulti(ANode, handleId);
 	connect(AHandle->instance(),SIGNAL(destroyed(QObject *)),SLOT(onPEPHandlerDestroyed(QObject *)));
 
 	return handleId;
@@ -139,12 +125,14 @@ int PEPManager::insertNodeHandler(const QString &ANode, IPEPHandler *AHandle)
 
 bool PEPManager::removeNodeHandler(int AHandleId)
 {
-	if (FHandlersById.contains(AHandleId))
+	if (handlersById.contains(AHandleId))
 	{
-		QList<QString> nodes = FHandlersByNode.keys(AHandleId);
+		QList<QString> nodes = handlersByNode.keys(AHandleId);
 		foreach(const QString &node, nodes)
-			FHandlersByNode.remove(node, AHandleId);
-		FHandlersById.remove(AHandleId);
+		{
+			handlersByNode.remove(node, AHandleId);
+		}
+		handlersById.remove(AHandleId);
 		return true;
 	}
 	return false;
@@ -160,24 +148,28 @@ void PEPManager::onStreamOpened(IXmppStream *AXmppStream)
 		shandle.direction = IStanzaHandle::DirectionIn;
 		shandle.streamJid = AXmppStream->streamJid();
 		shandle.conditions.append(SHC_PUBSUB_EVENT);
-		FStanzaHandles.insert(AXmppStream->streamJid(), FStanzaProcessor->insertStanzaHandle(shandle));
+		stanzaHandles.insert(AXmppStream->streamJid(), FStanzaProcessor->insertStanzaHandle(shandle));
 	}
 
 	if (FDiscovery)
+	{
 		FDiscovery->requestDiscoInfo(AXmppStream->streamJid(), AXmppStream->streamJid().domain());
+	}
 }
 
 void PEPManager::onStreamClosed(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
-		FStanzaProcessor->removeStanzaHandle(FStanzaHandles.take(AXmppStream->streamJid()));
+	{
+		FStanzaProcessor->removeStanzaHandle(stanzaHandles.take(AXmppStream->streamJid()));
+	}
 }
 
 void PEPManager::onPEPHandlerDestroyed(QObject *AHandler)
 {
-	foreach(int id, FHandlersById.keys())
+	foreach(int id, handlersById.keys())
 	{
-		IPEPHandler *handler = FHandlersById.value(id);
+		IPEPHandler *handler = handlersById.value(id);
 		if (handler->instance() == AHandler)
 		{
 			removeNodeHandler(id);

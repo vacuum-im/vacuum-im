@@ -5,9 +5,8 @@
 #include <QScrollBar>
 #include <QVBoxLayout>
 #include <QTextDocumentFragment>
-#include <utils/textmanager.h>
 
-ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow, QWidget *AParent) : QWidget(AParent)
+ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	setAcceptDrops(true);
@@ -17,10 +16,10 @@ ViewWidget::ViewWidget(IMessageWidgets *AMessageWidgets, IMessageWindow *AWindow
 
 	FMessageStyle = NULL;
 	FMessageProcessor = NULL;
-
-	FWindow = AWindow;
 	FMessageWidgets = AMessageWidgets;
 
+	FStreamJid = AStreamJid;
+	FContactJid = AContactJid;
 	FStyleWidget = NULL;
 
 	initialize();
@@ -31,20 +30,24 @@ ViewWidget::~ViewWidget()
 
 }
 
-bool ViewWidget::isVisibleOnWindow() const
+void ViewWidget::setStreamJid(const Jid &AStreamJid)
 {
-	return isVisibleTo(FWindow->instance());
+	if (AStreamJid != FStreamJid)
+	{
+		Jid before = FStreamJid;
+		FStreamJid = AStreamJid;
+		emit streamJidChanged(before);
+	}
 }
 
-IMessageWindow *ViewWidget::messageWindow() const
+void ViewWidget::setContactJid(const Jid &AContactJid)
 {
-	return FWindow;
-}
-
-void ViewWidget::clearContent()
-{
-	if (FMessageStyle)
-		FMessageStyle->changeOptions(FStyleWidget,FStyleOptions,true);
+	if (AContactJid != FContactJid)
+	{
+		Jid before = FContactJid;
+		FContactJid = AContactJid;
+		emit contactJidChanged(before);
+	}
 }
 
 QWidget *ViewWidget::styleWidget() const
@@ -61,42 +64,28 @@ void ViewWidget::setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptio
 {
 	if (FMessageStyle != AStyle)
 	{
-		if (FMessageStyle)
+		IMessageStyle *before = FMessageStyle;
+		FMessageStyle = AStyle;
+		if (before)
 		{
-			disconnect(FMessageStyle->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),
-				this,SLOT(onMessageStyleUrlClicked(QWidget *, const QUrl &)));
-			disconnect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
-				this,SLOT(onMessageStyleWidgetCustomContextMenuRequested(const QPoint &)));
-			disconnect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
-				this, SLOT(onMessageStyleContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
-			disconnect(FMessageStyle->instance(),SIGNAL(optionsChanged(QWidget *, const IMessageStyleOptions &, bool)),
-				this,SLOT(onMessageStyleOptionsChanged(QWidget *, const IMessageStyleOptions &, bool)));
-
+			disconnect(before->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
+				this, SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+			disconnect(before->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),this,SLOT(onUrlClicked(QWidget *, const QUrl &)));
+			disconnect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),this,SLOT(onCustomContextMenuRequested(const QPoint &)));
 			ui.wdtViewer->layout()->removeWidget(FStyleWidget);
 			FStyleWidget->deleteLater();
 			FStyleWidget = NULL;
 		}
-
-		IMessageStyle *before = FMessageStyle;
-		FMessageStyle = AStyle;
-
 		if (FMessageStyle)
 		{
 			FStyleWidget = FMessageStyle->createWidget(AOptions,ui.wdtViewer);
 			FStyleWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-			ui.wdtViewer->layout()->addWidget(FStyleWidget);
-
-			connect(FMessageStyle->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),
-				SLOT(onMessageStyleUrlClicked(QWidget *, const QUrl &)));
-			connect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),
-				SLOT(onMessageStyleWidgetCustomContextMenuRequested(const QPoint &)));
+			connect(FStyleWidget,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onCustomContextMenuRequested(const QPoint &)));
 			connect(FMessageStyle->instance(),SIGNAL(contentAppended(QWidget *, const QString &, const IMessageContentOptions &)),
-				SLOT(onMessageStyleContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
-			connect(FMessageStyle->instance(),SIGNAL(optionsChanged(QWidget *, const IMessageStyleOptions &, bool)),
-				SLOT(onMessageStyleOptionsChanged(QWidget *, const IMessageStyleOptions &, bool)));
+				SLOT(onContentAppended(QWidget *, const QString &, const IMessageContentOptions &)));
+			connect(FMessageStyle->instance(),SIGNAL(urlClicked(QWidget *, const QUrl &)),SLOT(onUrlClicked(QWidget *, const QUrl &)));
+			ui.wdtViewer->layout()->addWidget(FStyleWidget);
 		}
-
-		FStyleOptions = AOptions;
 		emit messageStyleChanged(before,AOptions);
 	}
 }
@@ -138,28 +127,9 @@ void ViewWidget::appendMessage(const Message &AMessage, const IMessageContentOpt
 	appendHtml(TextManager::getDocumentBody(doc),options);
 }
 
-void ViewWidget::contextMenuForView(const QPoint &APosition, Menu *AMenu)
+void ViewWidget::contextMenuForView(const QPoint &APosition, const QTextDocumentFragment &ASelection, Menu *AMenu)
 {
-	emit viewContextMenu(APosition, AMenu);
-}
-
-QTextDocumentFragment ViewWidget::selection() const
-{
-	return FMessageStyle!=NULL ? FMessageStyle->selection(FStyleWidget) : QTextDocumentFragment();
-}
-
-QTextCharFormat ViewWidget::textFormatAt(const QPoint &APosition) const
-{
-	if (FMessageStyle && FStyleWidget)
-		return FMessageStyle->textFormatAt(FStyleWidget,FStyleWidget->mapFromGlobal(mapToGlobal(APosition)));
-	return QTextCharFormat();
-}
-
-QTextDocumentFragment ViewWidget::textFragmentAt(const QPoint &APosition) const
-{
-	if (FMessageStyle && FStyleWidget)
-		return FMessageStyle->textFragmentAt(FStyleWidget,FStyleWidget->mapFromGlobal(mapToGlobal(APosition)));
-	return QTextDocumentFragment();
+	emit viewContextMenu(APosition,ASelection,AMenu);
 }
 
 void ViewWidget::initialize()
@@ -174,29 +144,35 @@ void ViewWidget::dropEvent(QDropEvent *AEvent)
 	Menu *dropMenu = new Menu(this);
 
 	bool accepted = false;
-	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
-		if (handler->messageViewDropAction(this, AEvent, dropMenu))
+	foreach(IViewDropHandler *handler, FActiveDropHandlers)
+		if (handler->viewDropAction(this, AEvent, dropMenu))
 			accepted = true;
 
-	if (accepted && !dropMenu->isEmpty())
+	QList<Action *> actionList = dropMenu->groupActions();
+	if (accepted && !actionList.isEmpty())
 	{
-		if (dropMenu->exec(mapToGlobal(AEvent->pos())))
+		QAction *action = !(AEvent->mouseButtons() & Qt::RightButton) && actionList.count()==1 ? actionList.value(0) : NULL;
+		if (action)
+			action->trigger();
+		else
+			action = dropMenu->exec(mapToGlobal(AEvent->pos()));
+
+		if (action)
 			AEvent->acceptProposedAction();
 		else
 			AEvent->ignore();
 	}
 	else
-	{
 		AEvent->ignore();
-	}
+
 	delete dropMenu;
 }
 
 void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 {
 	FActiveDropHandlers.clear();
-	foreach(IMessageViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
-		if (handler->messagaeViewDragEnter(this, AEvent))
+	foreach(IViewDropHandler *handler, FMessageWidgets->viewDropHandlers())
+		if (handler->viewDragEnter(this, AEvent))
 			FActiveDropHandlers.append(handler);
 
 	if (!FActiveDropHandlers.isEmpty())
@@ -208,8 +184,8 @@ void ViewWidget::dragEnterEvent(QDragEnterEvent *AEvent)
 void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 {
 	bool accepted = false;
-	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
-		if (handler->messageViewDragMove(this, AEvent))
+	foreach(IViewDropHandler *handler, FActiveDropHandlers)
+		if (handler->viewDragMove(this, AEvent))
 			accepted = true;
 
 	if (accepted)
@@ -220,46 +196,31 @@ void ViewWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 
 void ViewWidget::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
-	foreach(IMessageViewDropHandler *handler, FActiveDropHandlers)
-		handler->messageViewDragLeave(this, AEvent);
+	foreach(IViewDropHandler *handler, FActiveDropHandlers)
+		handler->viewDragLeave(this, AEvent);
 }
 
-void ViewWidget::onMessageStyleUrlClicked(QWidget *AWidget, const QUrl &AUrl)
+void ViewWidget::onContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
 {
 	if (AWidget == FStyleWidget)
-	{
-		QMap<int,IMessageViewUrlHandler *> handlers = FMessageWidgets->viewUrlHandlers();
-		for (QMap<int,IMessageViewUrlHandler *>::const_iterator it = handlers.constBegin(); it!=handlers.constEnd(); ++it)
-			if (it.value()->messageViewUrlOpen(it.key(),this,AUrl))
-				break;
-		emit urlClicked(AUrl);
-	}
+		emit contentAppended(AHtml,AOptions);
 }
 
-void ViewWidget::onMessageStyleWidgetCustomContextMenuRequested(const QPoint &APosition)
+void ViewWidget::onUrlClicked(QWidget *AWidget, const QUrl &AUrl)
+{
+	if (AWidget == FStyleWidget)
+		emit urlClicked(AUrl);
+}
+
+void ViewWidget::onCustomContextMenuRequested(const QPoint &APosition)
 {
 	Menu *menu = new Menu(this);
 	menu->setAttribute(Qt::WA_DeleteOnClose, true);
 
-	contextMenuForView(APosition, menu);
+	contextMenuForView(APosition,FMessageStyle->textUnderPosition(APosition,FStyleWidget),menu);
 
 	if (!menu->isEmpty())
 		menu->popup(FStyleWidget->mapToGlobal(APosition));
 	else
 		delete menu;
-}
-
-void ViewWidget::onMessageStyleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean)
-{
-	if (AWidget == FStyleWidget)
-	{
-		FStyleOptions = AOptions;
-		emit messageStyleOptionsChanged(AOptions,AClean);
-	}
-}
-
-void ViewWidget::onMessageStyleContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions)
-{
-	if (AWidget == FStyleWidget)
-		emit contentAppended(AHtml,AOptions);
 }

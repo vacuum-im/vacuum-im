@@ -1,11 +1,5 @@
 #include "sortfilterproxymodel.h"
 
-#include <definitions/optionvalues.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterindexkindorders.h>
-#include <utils/options.h>
-
 SortFilterProxyModel::SortFilterProxyModel(IRostersViewPlugin *ARostersViewPlugin, QObject *AParent) : QSortFilterProxyModel(AParent)
 {
 	FShowOffline = true;
@@ -25,96 +19,61 @@ void SortFilterProxyModel::invalidate()
 	QSortFilterProxyModel::invalidate();
 }
 
-bool SortFilterProxyModel::compareVariant( const QVariant &ALeft, const QVariant &ARight ) const
-{
-	switch (ALeft.userType()) 
-	{
-	case QVariant::Invalid:
-		return (ARight.type() != QVariant::Invalid);
-	case QVariant::Int:
-		return ALeft.toInt() < ARight.toInt();
-	case QVariant::UInt:
-		return ALeft.toUInt() < ARight.toUInt();
-	case QVariant::LongLong:
-		return ALeft.toLongLong() < ARight.toLongLong();
-	case QVariant::ULongLong:
-		return ALeft.toULongLong() < ARight.toULongLong();
-	case QMetaType::Float:
-		return ALeft.toFloat() < ARight.toFloat();
-	case QVariant::Double:
-		return ALeft.toDouble() < ARight.toDouble();
-	case QVariant::Char:
-		return ALeft.toChar() < ARight.toChar();
-	case QVariant::Date:
-		return ALeft.toDate() < ARight.toDate();
-	case QVariant::Time:
-		return ALeft.toTime() < ARight.toTime();
-	case QVariant::DateTime:
-		return ALeft.toDateTime() < ARight.toDateTime();
-	case QVariant::String:
-	default:
-		if (isSortLocaleAware())
-			return ALeft.toString().localeAwareCompare(ARight.toString()) < 0;
-		else
-			return ALeft.toString().compare(ARight.toString(), sortCaseSensitivity()) < 0;
-	}
-	return false;
-}
-
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
-	int leftTypeOrder = ALeft.data(RDR_KIND_ORDER).toInt();
-	int rightTypeOrder = ARight.data(RDR_KIND_ORDER).toInt();
-	if (leftTypeOrder == rightTypeOrder)
+	int leftType = ALeft.data(RDR_TYPE).toInt();
+	int rightType = ARight.data(RDR_TYPE).toInt();
+	if (leftType == rightType)
 	{
-		QVariant leftSortOrder = ALeft.data(RDR_SORT_ORDER);
-		QVariant rightSortOrder = ARight.data(RDR_SORT_ORDER);
-		if (leftSortOrder.isNull() || rightSortOrder.isNull() || leftSortOrder==rightSortOrder)
+		int leftShow = ALeft.data(RDR_SHOW).toInt();
+		int rightShow = ARight.data(RDR_SHOW).toInt();
+		if (FSortByStatus && leftType!=RIT_STREAM_ROOT && leftShow!=rightShow)
 		{
-			if (FSortByStatus && leftTypeOrder!=RIKO_STREAM_ROOT)
-			{
-				int leftShow = ALeft.data(RDR_SHOW).toInt();
-				int rightShow = ARight.data(RDR_SHOW).toInt();
-				if (leftShow != rightShow)
-				{
-					static const int showOrders[] = {6,2,1,3,4,5,7,8};
-					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
-						return showOrders[leftShow] < showOrders[rightShow];
-				}
-			}
-			return compareVariant(ALeft.data(Qt::DisplayRole),ARight.data(Qt::DisplayRole));
+			const static int showOrders[] = {6,2,1,3,4,5,7,8};
+			return showOrders[leftShow] < showOrders[rightShow];
 		}
-		return compareVariant(leftSortOrder,rightSortOrder);
+		else
+			return QSortFilterProxyModel::lessThan(ALeft,ARight);
 	}
-	return leftTypeOrder < rightTypeOrder;
+	else
+		return leftType < rightType;
 }
 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
+	if (FShowOffline)
+		return true;
+
 	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
 
-	int visible = index.data(RDR_FORCE_VISIBLE).toInt();
-	if (visible > 0)
+	if (index.isValid())
 	{
-		return true;
-	}
-	else if (visible < 0)
-	{
-		return false;
-	}
-	else if (sourceModel()->hasChildren(index))
-	{
-		for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
-			if (filterAcceptsRow(childRow,index))
-				return true;
-		return false;
-	}
-	else if (!FShowOffline && !index.data(RDR_SHOW).isNull())
-	{
-		int indexShow = index.data(RDR_SHOW).toInt();
-		return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
-	}
+		if (index.data(RDR_ALLWAYS_INVISIBLE).toInt() > 0)
+			return false;
+		else if (index.data(RDR_ALLWAYS_VISIBLE).toInt() > 0)
+			return true;
 
+		int indexType = index.data(RDR_TYPE).toInt();
+		switch (indexType)
+		{
+		case RIT_CONTACT:
+			{
+				int indexShow = index.data(RDR_SHOW).toInt();
+				return indexShow!=IPresence::Offline && indexShow!=IPresence::Error;
+			}
+		case RIT_GROUP:
+		case RIT_GROUP_AGENTS:
+		case RIT_GROUP_BLANK:
+		case RIT_GROUP_NOT_IN_ROSTER:
+			{
+				for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+					if (filterAcceptsRow(childRow,index))
+						return true;
+				return false;
+			}
+		default:
+			return true;
+		}
+	}
 	return true;
 }
