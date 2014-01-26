@@ -4,7 +4,7 @@
 ;--------------------------------
 
 ; Program Version
-!define PROGRAM_VERSION     "1.2.3"
+!define PROGRAM_VERSION     "1.2.4"
 
 ; Install Folder
 !define PROGRAM_FOLDER      "Vacuum-IM"
