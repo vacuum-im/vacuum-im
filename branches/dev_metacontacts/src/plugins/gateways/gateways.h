@@ -3,17 +3,6 @@
 
 #include <QSet>
 #include <QTimer>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/discoitemdataroles.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/shortcuts.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/igateways.h>
 #include <interfaces/istanzaprocessor.h>
@@ -25,10 +14,6 @@
 #include <interfaces/iprivatestorage.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/iregistraton.h>
-#include <utils/stanza.h>
-#include <utils/action.h>
-#include <utils/shortcuts.h>
-#include <utils/xmpperror.h>
 #include "addlegacycontactdialog.h"
 
 class Gateways :
@@ -101,7 +86,7 @@ protected slots:
 	void onVCardReceived(const Jid &AContactJid);
 	void onVCardError(const Jid &AContactJid, const XmppError &AError);
 	void onDiscoItemsWindowCreated(IDiscoItemsWindow *AWindow);
-	void onDiscoItemContextMenu(const QModelIndex AIndex, Menu *AMenu);
+	void onDiscoItemContextMenu(const QModelIndex &AIndex, Menu *AMenu);
 	void onRegisterFields(const QString &AId, const IRegisterFields &AFields);
 	void onRegisterError(const QString &AId, const XmppError &AError);
 private:

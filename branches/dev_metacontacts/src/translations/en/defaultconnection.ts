@@ -2,6 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
+    <name>ConnectionOptionsWidget</name>
+    <message>
+        <source>Disable check</source>
+        <translation>Disable check</translation>
+    </message>
+    <message>
+        <source>Request on errors</source>
+        <translation>Request on errors</translation>
+    </message>
+    <message>
+        <source>Disconnect on errors</source>
+        <translation>Disconnect on errors</translation>
+    </message>
+    <message>
+        <source>Allow only trusted</source>
+        <translation>Allow only trusted</translation>
+    </message>
+</context>
+<context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Host:</source>
@@ -14,6 +33,10 @@
     <message>
         <source>Use legacy SSL connection</source>
         <translation>Use legacy SSL connection</translation>
+    </message>
+    <message>
+        <source>Certificate check mode:</source>
+        <translation>Certificate check mode:</translation>
     </message>
 </context>
 <context>
@@ -47,52 +70,56 @@
         <translation>State/Province: %1</translation>
     </message>
     <message>
-        <source>Common Name: %1</source>
-        <translation>Common Name: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Organization: %1</source>
-        <translation>Issuer Organization: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Unit Name: %1</source>
-        <translation>Issuer Unit Name: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Country: %1</source>
-        <translation>Issuer Country: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Locality: %1</source>
-        <translation>Issuer Locality: %1</translation>
-    </message>
-    <message>
-        <source>Issuer State/Province: %1</source>
-        <translation>Issuer State/Province: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Common Name: %1</source>
-        <translation>Issuer Common Name: %1</translation>
-    </message>
-    <message>
         <source>SSL Authentication Error</source>
         <translation>SSL Authentication Error</translation>
-    </message>
-    <message>
-        <source>Unable to validate the connection to %1 due to errors:</source>
-        <translation>Unable to validate the connection to %1 due to errors:</translation>
-    </message>
-    <message>
-        <source>Connect</source>
-        <translation>Connect</translation>
     </message>
     <message>
         <source>Disconnect</source>
         <translation>Disconnect</translation>
     </message>
     <message>
-        <source>Trust this certificate</source>
-        <translation>Trust this certificate</translation>
+        <source>Connect Once</source>
+        <translation>Connect Once</translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
+        <translation>Connect Always</translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</translation>
+    </message>
+    <message>
+        <source>Name: %1</source>
+        <translation>Name: %1</translation>
+    </message>
+    <message>
+        <source>Certificate holder:</source>
+        <translation>Certificate holder:</translation>
+    </message>
+    <message>
+        <source>Certificate issuer:</source>
+        <translation>Certificate issuer:</translation>
+    </message>
+    <message>
+        <source>Certificate details:</source>
+        <translation>Certificate details:</translation>
+    </message>
+    <message>
+        <source>Effective from: %1</source>
+        <translation>Effective from: %1</translation>
+    </message>
+    <message>
+        <source>Expired at: %1</source>
+        <translation>Expired at: %1</translation>
+    </message>
+    <message>
+        <source>Serial number: %1</source>
+        <translation>Serial number: %1</translation>
+    </message>
+    <message>
+        <source>Host certificate is not in trusted list</source>
+        <translation>Host certificate is not in trusted list</translation>
     </message>
 </context>
 </TS>

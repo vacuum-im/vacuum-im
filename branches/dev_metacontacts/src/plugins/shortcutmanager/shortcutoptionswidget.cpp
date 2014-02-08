@@ -1,7 +1,9 @@
 #include "shortcutoptionswidget.h"
 
 #include <QHeaderView>
+#include <utils/shortcuts.h>
 
+// SortFilterProxyModel
 bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const
 {
 	bool leftHasChild = ALeft.child(0,0).isValid();
@@ -17,6 +19,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 	return QSortFilterProxyModel::lessThan(ALeft,ARight);
 }
 
+// ShortcutOptionsWidget
 ShortcutOptionsWidget::ShortcutOptionsWidget(QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
@@ -58,7 +61,7 @@ ShortcutOptionsWidget::~ShortcutOptionsWidget()
 
 void ShortcutOptionsWidget::apply()
 {
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)
@@ -78,7 +81,7 @@ void ShortcutOptionsWidget::apply()
 
 void ShortcutOptionsWidget::reset()
 {
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)
@@ -98,7 +101,7 @@ void ShortcutOptionsWidget::createTreeModel()
 	FModel.setColumnCount(2);
 	FModel.setHorizontalHeaderLabels(QStringList() << tr("Action") << tr("Shortcut"));
 
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		Shortcuts::Descriptor descriptor = Shortcuts::shortcutDescriptor(shortcut);
 		if (!descriptor.description.isEmpty())
@@ -113,7 +116,7 @@ void ShortcutOptionsWidget::createTreeModel()
 		}
 	}
 
-	foreach(QString shortcut, Shortcuts::globalShortcuts())
+	foreach(const QString &shortcut, Shortcuts::globalShortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)
@@ -189,7 +192,7 @@ void ShortcutOptionsWidget::onClearClicked()
 
 void ShortcutOptionsWidget::onRestoreDefaultsClicked()
 {
-	foreach(QString shortcut, Shortcuts::shortcuts())
+	foreach(const QString &shortcut, Shortcuts::shortcuts())
 	{
 		QStandardItem *nameItem = FShortcutItem.value(shortcut);
 		if (nameItem)

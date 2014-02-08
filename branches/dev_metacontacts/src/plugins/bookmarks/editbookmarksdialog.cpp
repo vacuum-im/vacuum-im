@@ -2,6 +2,10 @@
 
 #include <QHeaderView>
 #include <QMessageBox>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 enum Columns {
 	COL_NAME,
@@ -21,6 +25,7 @@ enum Columns {
 
 EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStreamJid, const QList<IBookmark> &AList, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Edit bookmarks - %1").arg(AStreamJid.uBare()));
@@ -57,6 +62,11 @@ EditBookmarksDialog::EditBookmarksDialog(IBookmarks *ABookmarks, const Jid &AStr
 EditBookmarksDialog::~EditBookmarksDialog()
 {
 	emit dialogDestroyed();
+}
+
+Jid EditBookmarksDialog::streamJid() const
+{
+	return FStreamJid;
 }
 
 IBookmark EditBookmarksDialog::getBookmarkFromRow(int ARow) const

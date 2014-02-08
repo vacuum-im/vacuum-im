@@ -262,5 +262,9 @@
         <source>Edit Profile</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>User Profile</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

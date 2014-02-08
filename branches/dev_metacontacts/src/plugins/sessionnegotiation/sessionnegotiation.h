@@ -1,16 +1,6 @@
 #ifndef SESSIONNEGOTIATION_H
 #define SESSIONNEGOTIATION_H
 
-#include <definitions/namespaces.h>
-#include <definitions/dataformtypes.h>
-#include <definitions/sessionnegotiatororders.h>
-#include <definitions/discofeaturehandlerorders.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/isessionnegotiation.h>
 #include <interfaces/idataforms.h>
@@ -19,17 +9,15 @@
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
 #include <interfaces/inotifications.h>
-#include <utils/xmpperror.h>
-#include <utils/widgetmanager.h>
 
 class SessionNegotiation :
-			public QObject,
-			public IPlugin,
-			public ISessionNegotiation,
-			public IStanzaHandler,
-			public IDiscoFeatureHandler,
-			public ISessionNegotiator,
-			public IDataLocalizer
+	public QObject,
+	public IPlugin,
+	public ISessionNegotiation,
+	public IStanzaHandler,
+	public IDiscoFeatureHandler,
+	public ISessionNegotiator,
+	public IDataLocalizer
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ISessionNegotiation IStanzaHandler IDiscoFeatureHandler ISessionNegotiator IDataLocalizer);
@@ -57,9 +45,10 @@ public:
 	virtual int sessionApply(const IStanzaSession &ASession);
 	virtual void sessionLocalize(const IStanzaSession &ASession, IDataForm &AForm);
 	//ISessionNegotiation
-	virtual IStanzaSession getSession(const QString &ASessionId) const;
-	virtual IStanzaSession getSession(const Jid &AStreamJid, const Jid &AContactJid) const;
-	virtual QList<IStanzaSession> getSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const;
+	virtual bool isReady(const Jid &AStreamJid) const;
+	virtual IStanzaSession findSession(const QString &ASessionId) const;
+	virtual IStanzaSession findSession(const Jid &AStreamJid, const Jid &AContactJid) const;
+	virtual QList<IStanzaSession> findSessions(const Jid &AStreamJid, int AStatus = IStanzaSession::Active) const;
 	virtual int initSession(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual void resumeSession(const Jid &AStreamJid, const Jid &AContactJid);
 	virtual void terminateSession(const Jid &AStreamJid, const Jid &AContactJid);
@@ -109,9 +98,9 @@ private:
 	INotifications *FNotifications;
 private:
 	QHash<Jid,int> FSHISession;
-	QMultiMap<int,ISessionNegotiator *> FNegotiators;
 	QHash<QString, IDataForm> FSuspended;
 	QHash<QString, IDataForm> FRenegotiate;
+	QMultiMap<int, ISessionNegotiator *> FNegotiators;
 	QHash<Jid, QHash<Jid, IStanzaSession> > FSessions;
 	QHash<Jid, QHash<Jid, IDataDialogWidget *> > FDialogs;
 	QHash<int, IDataDialogWidget *> FDialogByNotify;

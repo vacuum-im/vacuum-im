@@ -269,6 +269,18 @@
         <source>Add</source>
         <translation>Добавить</translation>
     </message>
+    <message>
+        <source>Duplicate messages in local archive (not recommended)</source>
+        <translation>Дублировать сообщения в локальном архиве (не рекомендуется)</translation>
+    </message>
+    <message>
+        <source>Replication Preferences</source>
+        <translation>Настройки репликации</translation>
+    </message>
+    <message>
+        <source>Synchronize history between archives</source>
+        <translation>Синхронизировать историю между архивами</translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>

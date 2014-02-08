@@ -69,7 +69,9 @@ protected slots:
 	void onWidgetDestroyed(QObject *AObject);
 	void onObjectDestroyed(QObject *AObject);
 private:
-	static ShortcutsData *d;
+	Shortcuts();
+	~Shortcuts();
+	ShortcutsData *d;
 };
 
 #endif // SHORTCUTS_H

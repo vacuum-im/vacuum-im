@@ -5,8 +5,8 @@
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include "ui_connectionoptionswidget.h"
 #include "connectionmanager.h"
+#include "ui_connectionoptionswidget.h"
 
 class ConnectionManager;
 

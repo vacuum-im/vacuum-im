@@ -214,11 +214,11 @@
     </message>
     <message>
         <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Показувати вкладки в режимі об&apos;єднання вікон повідомлень з ростером</translation>
     </message>
     <message>
         <source>Quote Selected Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Цитувати виділений текст</translation>
     </message>
 </context>
 <context>
@@ -244,22 +244,22 @@
     <name>NormalWindow</name>
     <message numerus="yes">
         <source>Selected %n contact(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Вибрано %n контакт</numerusform>
+            <numerusform>Вибрано %n контактів</numerusform>
+            <numerusform>Вибрано %n контактів</numerusform>
         </translation>
     </message>
     <message>
         <source>Subject</source>
-        <translation type="unfinished"></translation>
+        <translation>Тема</translation>
     </message>
 </context>
 <context>
     <name>NormalWindowClass</name>
     <message>
         <source>Fast choice</source>
-        <translation type="unfinished"></translation>
+        <translation>Швидкий вибір</translation>
     </message>
 </context>
 <context>
@@ -282,82 +282,82 @@
     </message>
     <message>
         <source>Select All Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Вибрати всі контакти</translation>
     </message>
     <message>
         <source>Select Online Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Вибрати підключені контакти</translation>
     </message>
     <message>
         <source>Select Available Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Вибрати незайняті контакти</translation>
     </message>
     <message>
         <source>Clear Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистити виділення</translation>
     </message>
     <message>
         <source>Load Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Завантажити вибір</translation>
     </message>
     <message>
         <source>Save Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Зберегти вибір</translation>
     </message>
     <message>
         <source>Load Contacts from File</source>
-        <translation type="unfinished"></translation>
+        <translation>Завантажити контакти з файлу</translation>
     </message>
     <message>
         <source>Failed to Load Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити контакти</translation>
     </message>
     <message>
         <source>Incorrect file format</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірний формат файлу</translation>
     </message>
     <message>
         <source>Failed to read file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося прочитати файл: %1</translation>
     </message>
     <message>
         <source>Failed to open file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося відкрити файл: %1</translation>
     </message>
     <message>
         <source>Save Contacts to File</source>
-        <translation type="unfinished"></translation>
+        <translation>Зберегти контакти до файлу</translation>
     </message>
     <message>
         <source>Failed to Save Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося зберегти контакти до файлу</translation>
     </message>
     <message>
         <source>Failed to create file: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося створити файл: %1</translation>
     </message>
     <message>
         <source>Load Last Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Завантажити останній вибір</translation>
     </message>
     <message>
         <source>Expand All Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Розвернути всі групи</translation>
     </message>
     <message>
         <source>Collapse All Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Згорнути всі групи</translation>
     </message>
     <message>
         <source>Hide Offline Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Не показувати відключені контакти</translation>
     </message>
 </context>
 <context>
     <name>ReceiversWidgetClass</name>
     <message>
         <source>Search Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Пошук контактів</translation>
     </message>
 </context>
 <context>

@@ -1,10 +1,6 @@
 #ifndef REMOTECONTROL_H
 #define REMOTECONTROL_H
 
-#include <definitions/namespaces.h>
-#include <definitions/dataformtypes.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/stanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/icommands.h>
@@ -20,11 +16,11 @@
 #define REMOTECONTROL_UUID "{152A3172-9A38-11DF-A3E4-001CBF2EDCFC}"
 
 class RemoteControl :
-			public QObject,
-			public IPlugin,
-			public ICommandServer,
-			public IStanzaHandler,
-			public IDataLocalizer
+	public QObject,
+	public IPlugin,
+	public ICommandServer,
+	public IStanzaHandler,
+	public IDataLocalizer
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin ICommandServer IStanzaHandler IDataLocalizer);

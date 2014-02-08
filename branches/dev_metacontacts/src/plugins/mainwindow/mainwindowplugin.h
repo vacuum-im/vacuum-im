@@ -2,24 +2,15 @@
 #define MAINWINDOWPLUGIN_H
 
 #include <QTime>
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/optionvalues.h>
-#include <definitions/shortcuts.h>
-#include <definitions/shortcutgrouporders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imainwindow.h>
 #include <interfaces/itraymanager.h>
-#include <utils/action.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
 #include "mainwindow.h"
 
 class MainWindowPlugin :
-		public QObject,
-		public IPlugin,
-		public IMainWindowPlugin
+	public QObject,
+	public IPlugin,
+	public IMainWindowPlugin
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IMainWindowPlugin);

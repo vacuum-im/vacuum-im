@@ -1,12 +1,25 @@
 #include "optionsmanager.h"
 
-#include <QtDebug>
-
 #include <QSettings>
 #include <QFileInfo>
 #include <QDateTime>
 #include <QApplication>
 #include <QCryptographicHash>
+#include <definitions/actiongroups.h>
+#include <definitions/commandline.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/version.h>
+#include <definitions/shortcuts.h>
+#include <utils/widgetmanager.h>
+#include <utils/filestorage.h>
+#include <utils/shortcuts.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define DIR_PROFILES                    "profiles"
 #define DIR_BINARY                      "binary"
@@ -46,7 +59,6 @@ void OptionsManager::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo ->version = "1.0";
 	APluginInfo->author = "Potapov S.A. aka Lion";
 	APluginInfo->homePage = "http://www.vacuum-im.org";
-	APluginInfo->conflicts.append("{6030FCB2-9F1E-4ea2-BE2B-B66EBE0C4367}"); // ISettings
 }
 
 bool OptionsManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
@@ -130,6 +142,14 @@ bool OptionsManager::initSettings()
 
 bool OptionsManager::startPlugin()
 {
+	FDefaultOptions.clear();
+	foreach(const QString &resDir, FileStorage::resourcesDirs())
+	{
+		QDir dir(resDir);
+		FDefaultOptions.unite(loadOptionValues(dir.absoluteFilePath(FILE_OPTIONS)));
+	}
+	importOptionDefaults();
+
 	QStringList args = qApp->arguments();
 	int profIndex = args.indexOf(CLO_PROFILE);
 	int passIndex = args.indexOf(CLO_PROFILE_PASSWORD);
@@ -137,6 +157,7 @@ bool OptionsManager::startPlugin()
 	QString password = passIndex>0 ? args.value(passIndex+1) : QString::null;
 	if (profile.isEmpty() || !setCurrentProfile(profile, password))
 		showLoginDialog();
+
 	return true;
 }
 
@@ -162,11 +183,9 @@ bool OptionsManager::isOpened() const
 QList<QString> OptionsManager::profiles() const
 {
 	QList<QString> profileList;
-
-	foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
+	foreach(const QString &dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
 		if (FProfilesDir.exists(dirName + "/" FILE_PROFILE))
 			profileList.append(dirName);
-
 	return profileList;
 }
 
@@ -179,7 +198,7 @@ QString OptionsManager::lastActiveProfile() const
 {
 	QDateTime lastModified;
 	QString lastProfile = DEFAULT_PROFILE;
-	foreach(QString profile, profiles())
+	foreach(const QString &profile, profiles())
 	{
 		QFileInfo info(profilePath(profile) + "/" FILE_OPTIONS);
 		if (info.exists() && info.lastModified()>lastModified)
@@ -203,6 +222,7 @@ QByteArray OptionsManager::currentProfileKey() const
 
 bool OptionsManager::setCurrentProfile(const QString &AProfile, const QString &APassword)
 {
+	LOG_INFO(QString("Changing current profile to=%1").arg(AProfile));
 	if (AProfile.isEmpty())
 	{
 		closeProfile();
@@ -212,27 +232,43 @@ bool OptionsManager::setCurrentProfile(const QString &AProfile, const QString &A
 	{
 		return true;
 	}
-	else if (checkProfilePassword(AProfile, APassword))
+	else if (checkProfilePassword(AProfile,APassword))
 	{
 		closeProfile();
 		FProfileLocker = new QtLockedFile(QDir(profilePath(AProfile)).absoluteFilePath(FILE_BLOCKER));
-		if (FProfileLocker->open(QFile::WriteOnly) && FProfileLocker->lock(QtLockedFile::WriteLock, false))
+		if (FProfileLocker->open(QFile::WriteOnly) && FProfileLocker->lock(QtLockedFile::WriteLock,false))
 		{
+			bool emptyProfile = false;
+
 			QDir profileDir(profilePath(AProfile));
 			if (!profileDir.exists(DIR_BINARY))
 				profileDir.mkdir(DIR_BINARY);
 
 			// Loading options from file
+			QString xmlError;
 			QFile optionsFile(profileDir.filePath(FILE_OPTIONS));
-			if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(optionsFile.readAll(),true))
+			if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(optionsFile.readAll(),true,&xmlError))
 			{
+				if (!xmlError.isEmpty())
+					REPORT_ERROR(QString("Failed to load options file content: %1").arg(xmlError));
+				if (optionsFile.exists())
+					REPORT_ERROR(QString("Failed to open options file: %1").arg(optionsFile.errorString()));
+
 				// Trying to open valid copy of options
+				xmlError.clear();
 				optionsFile.close();
 				optionsFile.setFileName(profileDir.filePath(FILE_OPTIONS_COPY));
-				if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(optionsFile.readAll(),true))
+				if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(optionsFile.readAll(),true,&xmlError))
 				{
+					if (!xmlError.isEmpty())
+						REPORT_ERROR(QString("Failed to load second options file content: %1").arg(xmlError));
+					else if (optionsFile.exists())
+						REPORT_ERROR(QString("Failed to open second options file: %1").arg(optionsFile.errorString()));
+
+					emptyProfile = true;
 					FProfileOptions.clear();
 					FProfileOptions.appendChild(FProfileOptions.createElement("options")).toElement();
+					LOG_INFO(QString("Created new options content for profile=%1").arg(AProfile));
 				}
 				// Renaming invalid options file
 				QFile::remove(profileDir.filePath(FILE_OPTIONS_FAIL));
@@ -249,11 +285,18 @@ bool OptionsManager::setCurrentProfile(const QString &AProfile, const QString &A
 			if (profileKey(AProfile,APassword).size() < 16)
 				changeProfilePassword(AProfile,APassword,APassword);
 
+			if (emptyProfile)
+				importOptionValues();
+
 			openProfile(AProfile, APassword);
 			return true;
 		}
 		FProfileLocker->close();
 		delete FProfileLocker;
+	}
+	else
+	{
+		LOG_WARNING(QString("Failed to change current profile to=%1: Invalid password").arg(AProfile));
 	}
 	return false;
 }
@@ -325,7 +368,10 @@ bool OptionsManager::changeProfilePassword(const QString &AProfile, const QStrin
 		keyValue = Options::encrypt(keyValue, QCryptographicHash::hash(ANewPassword.toUtf8(),QCryptographicHash::Md5));
 		keyText.toText().setData(keyValue.toBase64());
 
-		return saveProfile(AProfile, profileDoc);
+		if (saveProfile(AProfile, profileDoc))
+			LOG_INFO(QString("Profile password changed, profile=%1").arg(AProfile));
+		else
+			LOG_ERROR(QString("Failed to change profile password, profile=%1: Profile not saved").arg(AProfile));
 	}
 	return false;
 }
@@ -354,9 +400,18 @@ bool OptionsManager::addProfile(const QString &AProfile, const QString &APasswor
 
 			if (saveProfile(AProfile, profileDoc))
 			{
+				LOG_INFO(QString("New profile added, profile=%1").arg(AProfile));
 				emit profileAdded(AProfile);
 				return true;
 			}
+			else
+			{
+				LOG_ERROR(QString("Failed to add new profile, profile=%1: Profile not saved").arg(AProfile));
+			}
+		}
+		else
+		{
+			REPORT_ERROR("Failed to add new profile: Directory not created");
 		}
 	}
 	return false;
@@ -366,8 +421,13 @@ bool OptionsManager::renameProfile(const QString &AProfile, const QString &ANewN
 {
 	if (!FProfilesDir.exists(ANewName) && FProfilesDir.rename(AProfile, ANewName))
 	{
+		LOG_INFO(QString("Profile renamed from=%1 to=%2").arg(AProfile,ANewName));
 		emit profileRenamed(AProfile,ANewName);
 		return true;
+	}
+	else
+	{
+		LOG_ERROR(QString("Failed to rename profile=%1 to=%2: Directory not renamed").arg(AProfile,ANewName));
 	}
 	return false;
 }
@@ -382,8 +442,13 @@ bool OptionsManager::removeProfile(const QString &AProfile)
 
 		if (profileDir.remove(FILE_PROFILE))
 		{
+			LOG_INFO(QString("Profile removed, profile=%1").arg(AProfile));
 			emit profileRemoved(AProfile);
 			return true;
+		}
+		else
+		{
+			LOG_ERROR(QString("Failed to remove profile=%1: Directory not removed").arg(AProfile));
 		}
 	}
 	return false;
@@ -445,6 +510,7 @@ void OptionsManager::insertOptionsDialogNode(const IOptionsDialogNode &ANode)
 {
 	if (!ANode.nodeId.isEmpty())
 	{
+		LOG_DEBUG(QString("Options node inserted, id=%1").arg(ANode.nodeId));
 		FOptionsDialogNodes[ANode.nodeId] = ANode;
 		emit optionsDialogNodeInserted(ANode);
 	}
@@ -454,6 +520,7 @@ void OptionsManager::removeOptionsDialogNode(const QString &ANodeId)
 {
 	if (FOptionsDialogNodes.contains(ANodeId))
 	{
+		LOG_DEBUG(QString("Options node removed, id=%1").arg(ANodeId));
 		emit optionsDialogNodeRemoved(FOptionsDialogNodes.take(ANodeId));
 	}
 }
@@ -488,11 +555,15 @@ void OptionsManager::openProfile(const QString &AProfile, const QString &APasswo
 {
 	if (!isOpened())
 	{
+		LOG_INFO(QString("Opening profile=%1").arg(AProfile));
+
 		FProfile = AProfile;
 		FProfileKey = profileKey(AProfile, APassword);
 		Options::setOptions(FProfileOptions, profilePath(AProfile) + "/" DIR_BINARY, FProfileKey);
+
 		FAutoSaveTimer.start();
 		FShowOptionsDialogAction->setEnabled(true);
+
 		emit profileOpened(AProfile);
 	}
 }
@@ -501,7 +572,9 @@ void OptionsManager::closeProfile()
 {
 	if (isOpened())
 	{
+		LOG_INFO(QString("Closing profile=%1").arg(FProfile));
 		emit profileClosed(currentProfile());
+
 		FAutoSaveTimer.stop();
 		if (!FOptionsDialog.isNull())
 		{
@@ -509,8 +582,10 @@ void OptionsManager::closeProfile()
 			delete FOptionsDialog;
 		}
 		FShowOptionsDialogAction->setEnabled(false);
+
 		Options::setOptions(QDomDocument(), QString::null, QByteArray());
 		saveOptions();
+
 		FProfile.clear();
 		FProfileKey.clear();
 		FProfileOptions.clear();
@@ -528,22 +603,19 @@ bool OptionsManager::saveOptions() const
 		QFile file(QDir(profilePath(currentProfile())).filePath(FILE_OPTIONS));
 		if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 		{
+			LOG_INFO(QString("Profile options saved, profile=%1").arg(FProfile));
 			file.write(FProfileOptions.toString(2).toUtf8());
 			file.close();
 			return true;
 		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to save profile options: %1").arg(file.errorString()));
+		}
 	}
-	return false;
-}
-
-bool OptionsManager::saveProfile(const QString &AProfile, const QDomDocument &AProfileDoc) const
-{
-	QFile file(profilePath(AProfile) + "/" FILE_PROFILE);
-	if (file.open(QFile::WriteOnly|QFile::Truncate))
+	else
 	{
-		file.write(AProfileDoc.toString(2).toUtf8());
-		file.close();
-		return true;
+		REPORT_ERROR("Failed to save profile options: Profile not opened");
 	}
 	return false;
 }
@@ -554,10 +626,33 @@ QDomDocument OptionsManager::profileDocument(const QString &AProfile) const
 	QFile file(profilePath(AProfile) + "/" FILE_PROFILE);
 	if (file.open(QFile::ReadOnly))
 	{
-		doc.setContent(file.readAll(),true);
+		QString docError;
+		if (!doc.setContent(file.readAll(),true,&docError))
+			LOG_ERROR(QString("Failed to load profile options content, profile=%1: %2").arg(AProfile,docError));
 		file.close();
 	}
+	else if (file.exists())
+	{
+		LOG_ERROR(QString("Failed to open profile options file, profile=%1: %2").arg(AProfile,file.errorString()));
+	}
 	return doc;
+}
+
+bool OptionsManager::saveProfile(const QString &AProfile, const QDomDocument &AProfileDoc) const
+{
+	QFile file(profilePath(AProfile) + "/" FILE_PROFILE);
+	if (file.open(QFile::WriteOnly|QFile::Truncate))
+	{
+		LOG_INFO(QString("Profile content saved, profile=%1").arg(AProfile));
+		file.write(AProfileDoc.toString(2).toUtf8());
+		file.close();
+		return true;
+	}
+	else
+	{
+		REPORT_ERROR(QString("Failed to save profile content: %1").arg(file.errorString()));
+	}
+	return false;
 }
 
 void OptionsManager::importOldSettings()
@@ -566,11 +661,13 @@ void OptionsManager::importOldSettings()
 	IAccountManager *accountManager = plugin!=NULL ? qobject_cast<IAccountManager *>(plugin->instance()) : NULL;
 	if (accountManager)
 	{
-		foreach(QString dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
+		foreach(const QString &dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
 		{
 			QFile settings(FProfilesDir.absoluteFilePath(dirName + "/settings.xml"));
 			if (!FProfilesDir.exists(dirName + "/" FILE_PROFILE) && settings.open(QFile::ReadOnly))
 			{
+				LOG_INFO(QString("Importing old settings to profile=%1").arg(FProfile));
+
 				QDomDocument doc;
 				if (doc.setContent(&settings,true) && addProfile(dirName,QString::null) && setCurrentProfile(dirName,QString::null))
 				{
@@ -622,6 +719,56 @@ void OptionsManager::importOldSettings()
 	}
 }
 
+void OptionsManager::importOptionValues() const
+{
+	Options::instance()->blockSignals(true);
+	OptionsNode node = Options::createNodeForElement(FProfileOptions.documentElement());
+	for (QMap<QString,QVariant>::const_iterator it=FDefaultOptions.constBegin(); it!=FDefaultOptions.constEnd(); ++it)
+	{
+		if (it.key() != Options::cleanNSpaces(it.key()))
+			node.setValue(it.value(),it.key());
+	}
+	Options::instance()->blockSignals(false);
+}
+
+void OptionsManager::importOptionDefaults() const
+{
+	for (QMap<QString,QVariant>::const_iterator it=FDefaultOptions.constBegin(); it!=FDefaultOptions.constEnd(); ++it)
+	{
+		if (it.key() == Options::cleanNSpaces(it.key()))
+			Options::setDefaultValue(it.key(),it.value());
+	}
+}
+
+QMap<QString,QVariant> OptionsManager::getOptionValues(const OptionsNode &ANode) const
+{
+	QMap<QString,QVariant> values;
+
+	if (ANode.hasValue())
+		values.insert(ANode.path(),ANode.value());
+
+	foreach(const QString &childName, ANode.childNames())
+		foreach(const QString &childNs, ANode.childNSpaces(childName))
+			values.unite(getOptionValues(ANode.node(childName,childNs)));
+
+	return values;
+}
+
+QMap<QString,QVariant> OptionsManager::loadOptionValues(const QString &AFileName) const
+{
+	QFile file(AFileName);
+	if (file.open(QFile::ReadOnly))
+	{
+		QDomDocument doc;
+		if (doc.setContent(&file,true) && doc.documentElement().tagName()=="options")
+		{
+			LOG_INFO(QString("Option values loaded from file=%1").arg(AFileName));
+			return getOptionValues(Options::createNodeForElement(doc.documentElement()));
+		}
+	}
+	return QMap<QString,QVariant>();
+}
+
 void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_MISC_AUTOSTART)
@@ -636,6 +783,7 @@ void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 		reg.remove("Vacuum IM");
 #endif
 	}
+	LOG_DEBUG(QString("Options node value changed, node=%1, value=%2").arg(ANode.path(),ANode.value().toString()));
 }
 
 void OptionsManager::onOptionsDialogApplied()

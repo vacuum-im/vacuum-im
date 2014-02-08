@@ -23,6 +23,54 @@
         <source>Connection error</source>
         <translation>Ошибка подключения</translation>
     </message>
+    <message>
+        <source>Name: %1</source>
+        <translation>Имя: %1</translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation>Организация: %1</translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation>Подразделение: %1</translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation>Страна: %1</translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation>Расположение: %1</translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation>Штат/Провинция: %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Certificate holder:&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Сертификат выдан:&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Certificate issuer:&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Сертификат выпущен:&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Certificate details:&lt;/b&gt;</source>
+        <translation>&lt;b&gt;Сведения о сертификате:&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Effective from: %1</source>
+        <translation>Действителен с: %1</translation>
+    </message>
+    <message>
+        <source>Expired at: %1</source>
+        <translation>Действителен до: %1</translation>
+    </message>
+    <message>
+        <source>Serial number: %1</source>
+        <translation>Серийный номер: %1</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>

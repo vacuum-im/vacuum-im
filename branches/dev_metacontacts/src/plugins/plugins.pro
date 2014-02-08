@@ -18,7 +18,6 @@ SUBDIRS += privatestorage
 SUBDIRS += messageprocessor
 SUBDIRS += messagewidgets
 SUBDIRS += messagestyles
-SUBDIRS += adiummessagestyle
 SUBDIRS += simplemessagestyle
 SUBDIRS += normalmessagehandler
 SUBDIRS += chatmessagehandler
@@ -69,3 +68,7 @@ SUBDIRS += messagecarbons
 SUBDIRS += recentcontacts 
 #SUBDIRS += metacontacts 
 SUBDIRS += statistics 
+
+contains(QT_CONFIG, webkit) {
+  SUBDIRS += adiummessagestyle
+}

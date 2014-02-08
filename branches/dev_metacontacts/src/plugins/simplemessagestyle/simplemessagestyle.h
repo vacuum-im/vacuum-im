@@ -4,10 +4,7 @@
 #include <QList>
 #include <QTimer>
 #include <QNetworkAccessManager>
-#include <definitions/resources.h>
 #include <interfaces/imessagestyles.h>
-#include <utils/filestorage.h>
-#include <utils/textmanager.h>
 #include "styleviewer.h"
 
 //Message Style Info Values
@@ -58,7 +55,18 @@
 #define MSO_BG_IMAGE_FILE                   "bgImageFile"
 #define MSO_ANIMATION_DISABLED              "animationDisabled"
 
-struct MessageContentOptions;
+struct ContentItem {
+	int size;
+};
+
+struct WidgetStatus {
+	int lastKind;
+	QString lastId;
+	QDateTime lastTime;
+	bool scrollStarted;
+	int contentStartPosition;
+	QList<ContentItem> content;
+};
 
 class SimpleMessageStyle :
 	public QObject,
@@ -66,13 +74,6 @@ class SimpleMessageStyle :
 {
 	Q_OBJECT;
 	Q_INTERFACES(IMessageStyle);
-public:
-	struct WidgetStatus {
-		int lastKind;
-		QString lastId;
-		QDateTime lastTime;
-		bool scrollStarted;
-	};
 public:
 	SimpleMessageStyle(const QString &AStylePath, QNetworkAccessManager *ANetworkAccessManager, QObject *AParent);
 	~SimpleMessageStyle();
@@ -86,7 +87,7 @@ public:
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
 	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const;
-	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
+	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear = true);
 	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 	//ISimpleMessageStyle
 	virtual QMap<QString, QVariant> infoValues() const;
@@ -115,10 +116,10 @@ protected:
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 protected slots:
-	void onLinkClicked(const QUrl &AUrl);
 	void onScrollAfterResize();
-	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
+	void onStyleWidgetLinkClicked(const QUrl &AUrl);
 	void onStyleWidgetDestroyed(QObject *AObject);
+	void onStyleWidgetAdded(IMessageStyle *AStyle, QWidget *AWidget);
 private:
 	QTimer FScrollTimer;
 	bool FCombineConsecutive;

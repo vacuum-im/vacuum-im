@@ -2,17 +2,9 @@
 #define IQAUTH_H
 
 #include <QDomDocument>
-#include <definitions/namespaces.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppfeatureorders.h>
-#include <definitions/xmppfeaturepluginorders.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/stanza.h>
-#include <utils/jid.h>
 
 #define IQAUTH_UUID "{1E3645BC-313F-49e9-BD00-4CC062EE76A7}"
 

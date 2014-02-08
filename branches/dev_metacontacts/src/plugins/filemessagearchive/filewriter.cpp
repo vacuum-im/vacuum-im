@@ -1,11 +1,22 @@
-#include "collectionwriter.h"
+#include "filewriter.h"
 
-CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
+#include <definitions/namespaces.h>
+#include <definitions/optionvalues.h>
+#include <utils/datetime.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+
+#define MIN_SIZE_CLOSE_TIMEOUT        120*60*1000
+#define MAX_SIZE_CLOSE_TIMEOUT        60*1000
+#define NORMAL_SIZE_CLOSE_TIMEOUT     20*60*1000
+#define CRITICAL_SIZE_CLOSE_TIMEOUT   0
+
+FileWriter::FileWriter(const Jid &AStreamJid, const QString &AFileName, const IArchiveHeader &AHeader, QObject *AParent) : QObject(AParent)
 {
 	FXmlFile = NULL;
 	FXmlWriter = NULL;
 
-	FSecsSum = 0;
 	FGroupchat = false;
 	FNotesCount = 0;
 	FMessagesCount = 0;
@@ -25,49 +36,61 @@ CollectionWriter::CollectionWriter(const Jid &AStreamJid, const QString &AFileNa
 			FXmlWriter = new QXmlStreamWriter(FXmlFile);
 			startCollection();
 		}
+		else
+		{
+			deleteLater();
+			LOG_STRM_ERROR(AStreamJid,QString("Failed to start file writer: %1").arg(FXmlFile->errorString()));
+		}
 	}
-
-	if (!FXmlWriter)
+	else
+	{
 		deleteLater();
+		REPORT_ERROR("Failed to start file writer: File already exists");
+	}
 }
 
-CollectionWriter::~CollectionWriter()
+FileWriter::~FileWriter()
 {
 	stopCollection();
 	emit writerDestroyed(this);
 }
 
-bool CollectionWriter::isOpened() const
+bool FileWriter::isOpened() const
 {
 	return FXmlWriter!=NULL;
 }
 
-const Jid &CollectionWriter::streamJid() const
+const Jid &FileWriter::streamJid() const
 {
 	return FStreamJid;
 }
 
-const QString &CollectionWriter::fileName() const
+const QString &FileWriter::fileName() const
 {
 	return FFileName;
 }
 
-const IArchiveHeader &CollectionWriter::header() const
+const IArchiveHeader &FileWriter::header() const
 {
 	return FHeader;
 }
 
-int CollectionWriter::recordsCount() const
+int FileWriter::notesCount() const
+{
+	return FNotesCount;
+}
+
+int FileWriter::messagesCount() const
+{
+	return FMessagesCount;
+}
+
+int FileWriter::recordsCount() const
 {
 	return FMessagesCount + FNotesCount;
 }
 
-int CollectionWriter::secondsFromStart() const
-{
-	return FSecsSum;
-}
-
-bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
+bool FileWriter::writeMessage(const Message &AMessage, const QString &ASaveMode, bool ADirectionIn)
 {
 	if (isOpened() && ASaveMode!=ARCHIVE_SAVE_FALSE)
 	{
@@ -79,15 +102,10 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
 			FXmlWriter->writeStartElement(ADirectionIn ? "from" : "to");
 
 			int secs = FHeader.start.secsTo(AMessage.dateTime());
-			if (secs >= FSecsSum)
-			{
-				FXmlWriter->writeAttribute("secs",QString::number(secs-FSecsSum));
-				FSecsSum += secs-FSecsSum;
-			}
+			if (secs >= 0)
+				FXmlWriter->writeAttribute("secs",QString::number(secs));
 			else
-			{
 				FXmlWriter->writeAttribute("utc",DateTime(AMessage.dateTime()).toX85UTC());
-			}
 
 			if (FGroupchat)
 				FXmlWriter->writeAttribute("name",contactJid.resource());
@@ -107,7 +125,7 @@ bool CollectionWriter::writeMessage(const Message &AMessage, const QString &ASav
 	return false;
 }
 
-bool CollectionWriter::writeNote(const QString &ANote)
+bool FileWriter::writeNote(const QString &ANote)
 {
 	if (isOpened() && !ANote.isEmpty())
 	{
@@ -123,13 +141,13 @@ bool CollectionWriter::writeNote(const QString &ANote)
 	return false;
 }
 
-void CollectionWriter::closeAndDeleteLater()
+void FileWriter::closeAndDeleteLater()
 {
 	stopCollection();
 	deleteLater();
 }
 
-void CollectionWriter::startCollection()
+void FileWriter::startCollection()
 {
 	FXmlWriter->setAutoFormatting(true);
 	FXmlWriter->writeStartElement("chat");
@@ -140,10 +158,11 @@ void CollectionWriter::startCollection()
 		FXmlWriter->writeAttribute("subject",FHeader.subject);
 	if (!FHeader.threadId.isEmpty())
 		FXmlWriter->writeAttribute("thread",FHeader.threadId);
+	FXmlWriter->writeAttribute("secsFromLast","false");
 	checkLimits();
 }
 
-void CollectionWriter::stopCollection()
+void FileWriter::stopCollection()
 {
 	if (FXmlWriter)
 	{
@@ -155,14 +174,12 @@ void CollectionWriter::stopCollection()
 	if (FXmlFile)
 	{
 		FXmlFile->close();
-		if (FMessagesCount == 0)
-			QFile::remove(FFileName);
 		FXmlFile->deleteLater();
 		FXmlFile = NULL;
 	}
 }
 
-void CollectionWriter::writeElementChilds(const QDomElement &AElem)
+void FileWriter::writeElementChilds(const QDomElement &AElem)
 {
 	QDomNode node = AElem.firstChild();
 	while (!node.isNull())
@@ -170,19 +187,22 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 		if (node.isElement())
 		{
 			QDomElement elem = node.toElement();
-			FXmlWriter->writeStartElement(elem.nodeName());
-			if (!elem.namespaceURI().isEmpty())
-				FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
-
-			QDomNamedNodeMap map = elem.attributes();
-			for (uint i =0; i<map.length(); i++)
+			if (elem.tagName() != "thread")
 			{
-				QDomNode attrNode = map.item(i);
-				FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
-			}
+				FXmlWriter->writeStartElement(elem.nodeName());
+				if (!elem.namespaceURI().isEmpty())
+					FXmlWriter->writeAttribute("xmlns",elem.namespaceURI());
 
-			writeElementChilds(elem);
-			FXmlWriter->writeEndElement();
+				QDomNamedNodeMap attrMap = elem.attributes();
+				for (uint i =0; i<attrMap.length(); i++)
+				{
+					QDomNode attrNode = attrMap.item(i);
+					FXmlWriter->writeAttribute(attrNode.nodeName(),attrNode.nodeValue());
+				}
+
+				writeElementChilds(elem);
+				FXmlWriter->writeEndElement();
+			}
 		}
 		else if (node.isCharacterData())
 		{
@@ -193,14 +213,14 @@ void CollectionWriter::writeElementChilds(const QDomElement &AElem)
 	}
 }
 
-void CollectionWriter::checkLimits()
+void FileWriter::checkLimits()
 {
-	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_SIZE).value().toInt())
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT).value().toInt());
+	if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE).value().toInt())
+		FCloseTimer.start(CRITICAL_SIZE_CLOSE_TIMEOUT);
 	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MAXSIZE).value().toInt())
-		FCloseTimer.start(0);
-	else if (FMessagesCount > Options::node(OPV_FILEARCHIVE_COLLECTION_MINMESSAGES).value().toInt())
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_TIMEOUT).value().toInt());
+		FCloseTimer.start(MAX_SIZE_CLOSE_TIMEOUT);
+	else if (FXmlFile->size() > Options::node(OPV_FILEARCHIVE_COLLECTION_MINSIZE).value().toInt())
+		FCloseTimer.start(NORMAL_SIZE_CLOSE_TIMEOUT);
 	else
-		FCloseTimer.start(Options::node(OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT).value().toInt());
+		FCloseTimer.start(MIN_SIZE_CLOSE_TIMEOUT);
 }

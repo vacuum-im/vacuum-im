@@ -269,6 +269,18 @@
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Duplicate messages in local archive (not recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replication Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronize history between archives</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>

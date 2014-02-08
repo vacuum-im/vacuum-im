@@ -2,22 +2,19 @@
 #define CLIENTINFODIALOG_H
 
 #include <QDialog>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/iclientinfo.h>
-#include <utils/iconstorage.h>
 #include "ui_clientinfodialog.h"
 
 class ClientInfoDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
 	ClientInfoDialog(IClientInfo *AClientInfo, const Jid &AStreamJid, const Jid &AContactJid, const QString &AContactName, int AInfoTypes, QWidget *AParent = NULL);
 	~ClientInfoDialog();
-	Jid streamJid() const { return FStreamJid; }
-	Jid contactJid() const { return FContactJid; }
-	int infoTypes() const { return FInfoTypes; }
+	Jid streamJid() const;
+	Jid contactJid() const;
+	int infoTypes() const;
 	void setInfoTypes(int AInfoTypes);
 signals:
 	void clientInfoDialogClosed(const Jid &FContactJid);

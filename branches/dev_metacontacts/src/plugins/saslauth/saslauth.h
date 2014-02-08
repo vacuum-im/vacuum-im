@@ -1,14 +1,8 @@
 #ifndef SASLAUTH_H
 #define SASLAUTH_H
 
-#include <definitions/namespaces.h>
-#include <definitions/xmpperrors.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
-#include <utils/xmpperror.h>
-#include <utils/stanza.h>
 
 class SASLAuth :
 	public QObject,

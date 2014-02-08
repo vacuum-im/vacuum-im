@@ -1,16 +1,13 @@
 #ifndef DEFAULTCONNECTION_H
 #define DEFAULTCONNECTION_H
 
-#include <definitions/internalerrors.h>
-#include <interfaces/iconnectionmanager.h>
 #include <interfaces/idefaultconnection.h>
 #include <thirdparty/jdns/qjdns.h>
 #include <utils/xmpperror.h>
 
 class DefaultConnection :
-			public QObject,
-			public IConnection,
-			public IDefaultConnection
+	public QObject,
+	public IDefaultConnection
 {
 	Q_OBJECT;
 	Q_INTERFACES(IConnection IDefaultConnection);
@@ -21,16 +18,18 @@ public:
 	virtual QObject *instance() { return this; }
 	virtual bool isOpen() const;
 	virtual bool isEncrypted() const;
+	virtual bool isEncryptionSupported() const;
 	virtual bool connectToHost();
+	virtual bool startEncryption();
 	virtual void disconnectFromHost();
+	virtual void abortConnection(const XmppError &AError);
 	virtual qint64 write(const QByteArray &AData);
 	virtual QByteArray read(qint64 ABytes);
 	virtual IConnectionPlugin *ownerPlugin() const;
+	virtual QSslCertificate hostCertificate() const;
 	//IDefaultConnection
-	virtual void startClientEncryption();
 	virtual void ignoreSslErrors();
 	virtual QList<QSslError> sslErrors() const;
-	virtual QSslCertificate peerCertificate() const;
 	virtual QSsl::SslProtocol protocol() const;
 	virtual void setProtocol(QSsl::SslProtocol AProtocol);
 	virtual QSslKey privateKey() const;
@@ -38,6 +37,7 @@ public:
 	virtual QSslCertificate localCertificate() const;
 	virtual void setLocalCertificate(const QSslCertificate &ACertificate);
 	virtual QList<QSslCertificate> caCertificates() const;
+	virtual void addCaSertificates(const QList<QSslCertificate> &ACertificates);
 	virtual void setCaCertificates(const QList<QSslCertificate> &ACertificates);
 	virtual QNetworkProxy proxy() const;
 	virtual void setProxy(const QNetworkProxy &AProxy);
@@ -54,7 +54,6 @@ signals:
 	void disconnected();
 	void connectionDestroyed();
 	//IDefaultConnection
-	void modeChanged(QSslSocket::SslMode AMode);
 	void proxyChanged(const QNetworkProxy &AProxy);
 	void sslErrorsOccured(const QList<QSslError> &AErrors);
 protected:
@@ -73,16 +72,17 @@ protected slots:
 private:
 	IConnectionPlugin *FPlugin;
 private:
-	int FSrvQueryId;
 	QJDns FDns;
+	int FSrvQueryId;
 	QList<QJDns::Record> FRecords;
 private:
 	bool FSSLError;
-	bool FUseLegacySSL;
 	bool FDisconnecting;
 	QSslSocket FSocket;
 private:
+	bool FUseLegacySSL;
 	QMap<int, QVariant> FOptions;
+	CertificateVerifyMode FVerifyMode;
 };
 
 #endif // DEFAULTCONNECTION_H

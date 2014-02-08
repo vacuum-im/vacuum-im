@@ -3,12 +3,21 @@
 #include <QRegExp>
 #include <QLineEdit>
 #include <QInputDialog>
+#include <definitions/optionvalues.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/xmppstanzahandlerorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define MAX_HILIGHT_ITEMS            10
 #define TEXT_SEARCH_TIMEOUT          500
 
 ConsoleWidget::ConsoleWidget(IPluginManager *APluginManager, QWidget *AParent) : QWidget(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_CONSOLE,0,0,"windowIcon");
@@ -89,8 +98,9 @@ void ConsoleWidget::initialize(IPluginManager *APluginManager)
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 		{
-			foreach(IXmppStream *stream, FXmppStreams->xmppStreams()) {
-				onStreamCreated(stream); }
+			foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+				onStreamCreated(stream);
+
 			connect(FXmppStreams->instance(), SIGNAL(created(IXmppStream *)), SLOT(onStreamCreated(IXmppStream *)));
 			connect(FXmppStreams->instance(), SIGNAL(jidChanged(IXmppStream *, const Jid &)), SLOT(onStreamJidChanged(IXmppStream *, const Jid &)));
 			connect(FXmppStreams->instance(), SIGNAL(streamDestroyed(IXmppStream *)), SLOT(onStreamDestroyed(IXmppStream *)));
@@ -103,12 +113,10 @@ void ConsoleWidget::initialize(IPluginManager *APluginManager)
 		FStanzaProcessor = qobject_cast<IStanzaProcessor *>(plugin->instance());
 		if (FStanzaProcessor)
 		{
-			foreach(int shandleId, FStanzaProcessor->stanzaHandles()) {
-				onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId)); }
+			foreach(int shandleId, FStanzaProcessor->stanzaHandles())
+				onStanzaHandleInserted(shandleId,FStanzaProcessor->stanzaHandle(shandleId));
+			connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
 			ui.cmbCondition->clearEditText();
-
-			connect(FStanzaProcessor->instance(),SIGNAL(stanzaHandleInserted(int, const IStanzaHandle &)),
-			        SLOT(onStanzaHandleInserted(int, const IStanzaHandle &)));
 		}
 	}
 
@@ -216,7 +224,7 @@ void ConsoleWidget::showElement(IXmppStream *AXmppStream, const QDomElement &AEl
 			xml = "<pre>"+Qt::escape(xml).replace('\n',"<br>")+"</pre>";
 			if (ui.chbHilightXML->checkState() == Qt::Checked)
 				colorXml(xml);
-			else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size() < 5000)
+			else if (ui.chbHilightXML->checkState()==Qt::PartiallyChecked && xml.size()<5000)
 				colorXml(xml);
 			ui.tbrConsole->append(xml);
 
@@ -430,7 +438,7 @@ void ConsoleWidget::onStreamDestroyed(IXmppStream *AXmppStream)
 void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &AHandle)
 {
 	Q_UNUSED(AHandleId);
-	foreach(QString condition, AHandle.conditions)
+	foreach(const QString &condition, AHandle.conditions)
 		if (ui.cmbCondition->findText(condition) < 0)
 			ui.cmbCondition->addItem(condition);
 }
@@ -438,7 +446,7 @@ void ConsoleWidget::onStanzaHandleInserted(int AHandleId, const IStanzaHandle &A
 void ConsoleWidget::onOptionsOpened()
 {
 	ui.cmbContext->clear();
-	foreach(QString contextId, Options::node(OPV_CONSOLE_ROOT).childNSpaces("context"))
+	foreach(const QString &contextId, Options::node(OPV_CONSOLE_ROOT).childNSpaces("context"))
 		ui.cmbContext->addItem(Options::node(OPV_CONSOLE_CONTEXT_ITEM,contextId).value("name").toString(),contextId);
 
 	FContext = QUuid();

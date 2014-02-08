@@ -2,6 +2,11 @@
 
 #include <QTextBlock>
 
+TextManager::TextManager()
+{
+
+}
+
 QString TextManager::getDocumentBody(const QTextDocument &ADocument)
 {
 	QRegExp body("<body.*>(.*)</body>");

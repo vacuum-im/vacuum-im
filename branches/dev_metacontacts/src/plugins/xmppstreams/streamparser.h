@@ -3,7 +3,6 @@
 
 #include <QDomDocument>
 #include <QXmlStreamReader>
-#include <definitions/namespaces.h>
 #include <utils/xmpperror.h>
 
 class StreamParser :
@@ -16,8 +15,8 @@ public:
 	void parseData(const QByteArray &AData);
 	void restart();
 signals:
-	void opened(QDomElement AElem);
-	void element(QDomElement AElem);
+	void opened(const QDomElement &AElem);
+	void element(const QDomElement &AElem);
 	void error(const XmppError &AError);
 	void closed();
 private:

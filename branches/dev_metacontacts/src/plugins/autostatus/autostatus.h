@@ -3,26 +3,19 @@
 
 #include <QTimer>
 #include <QDateTime>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/menuicons.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/iautostatus.h>
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ipresence.h>
-#include <utils/options.h>
-#include <utils/systemmanager.h>
 #include "statusoptionswidget.h"
 
 class AutoStatus :
-			public QObject,
-			public IPlugin,
-			public IAutoStatus,
-			public IOptionsHolder
+	public QObject,
+	public IPlugin,
+	public IAutoStatus,
+	public IOptionsHolder
 {
 	Q_OBJECT;
 	Q_INTERFACES(IPlugin IAutoStatus IOptionsHolder);

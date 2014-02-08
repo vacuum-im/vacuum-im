@@ -4,6 +4,12 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QDomDocument>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexkindorders.h>
+#include <utils/advanceditemdelegate.h>
+#include <utils/options.h>
 
 #define ADR_ITEMS                  Action::DR_Parametr1
 
@@ -515,7 +521,7 @@ void ReceiversWidget::updateContactItemsPresence(const Jid &AStreamJid, const Ji
 
 Jid ReceiversWidget::findAvailStream(const Jid &AStreamJid) const
 {
-	foreach(const Jid streamJid, FStreamItems.keys())
+	foreach(const Jid &streamJid, FStreamItems.keys())
 		if (streamJid.pBare() == AStreamJid.pBare())
 			return streamJid;
 	return Jid::null;

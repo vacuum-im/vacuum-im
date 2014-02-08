@@ -262,5 +262,9 @@
         <source>Edit Profile</source>
         <translation>Edit Profile</translation>
     </message>
+    <message>
+        <source>User Profile</source>
+        <translation>User Profile</translation>
+    </message>
 </context>
 </TS>

@@ -88,6 +88,21 @@ protected:
 	virtual void dataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter) =0;
 };
 
+struct IMultiUserChatHistory
+{
+	IMultiUserChatHistory() {
+		empty = false;
+		maxChars = 0;
+		maxStanzas = 0;
+		seconds = 0;
+	}
+	bool empty;
+	quint32 maxChars;
+	quint32 maxStanzas;
+	quint32 seconds;
+	QDateTime since;
+};
+
 class IMultiUserChat
 {
 public:
@@ -102,13 +117,15 @@ public:
 	virtual QList<int> statusCodes() const =0;
 	virtual bool isUserPresent(const Jid &AContactJid) const =0;
 	virtual IMultiUser *mainUser() const =0;
-	virtual IMultiUser *userByNick(const QString &ANick) const =0;
 	virtual QList<IMultiUser *> allUsers() const =0;
+	virtual IMultiUser *userByNick(const QString &ANick) const =0;
 	//Occupant
 	virtual QString nickName() const =0;
 	virtual bool setNickName(const QString &ANick) =0;
 	virtual QString password() const =0;
 	virtual void setPassword(const QString &APassword) =0;
+	virtual IMultiUserChatHistory history() const =0;
+	virtual void setHistory(const IMultiUserChatHistory &AHistory) =0;
 	virtual int show() const =0;
 	virtual QString status() const =0;
 	virtual XmppError roomError() const =0;
@@ -131,9 +148,11 @@ public:
 	virtual bool sendConfigForm(const IDataForm &AForm) =0;
 	virtual bool destroyRoom(const QString &AReason) =0;
 protected:
+	virtual void chatAboutToConnect() =0;
 	virtual void chatOpened() =0;
 	virtual void chatNotify(const QString &ANotify) =0;
 	virtual void chatError(const QString &AMessage) =0;
+	virtual void chatAboutToDisconnect() =0;
 	virtual void chatClosed() =0;
 	virtual void chatDestroyed() =0;
 	virtual void roomNameChanged(const QString &AName) =0;
@@ -214,8 +233,8 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IMultiUser,"Vacuum.Plugin.IMultiUser/1.0")
-Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.4")
+Q_DECLARE_INTERFACE(IMultiUserChat,"Vacuum.Plugin.IMultiUserChat/1.6")
 Q_DECLARE_INTERFACE(IMultiUserChatWindow,"Vacuum.Plugin.IMultiUserChatWindow/1.3")
-Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.5")
+Q_DECLARE_INTERFACE(IMultiUserChatPlugin,"Vacuum.Plugin.IMultiUserChatPlugin/1.6")
 
 #endif //IMULTIUSERCHAT_H

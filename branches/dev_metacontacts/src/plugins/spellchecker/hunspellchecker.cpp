@@ -55,7 +55,7 @@ void HunspellChecker::setLang(const QString &ALang)
 QList<QString> HunspellChecker::dictionaries()
 {
 	QList<QString> availDicts;
-	foreach(QString dictsPath, FDictsPaths)
+	foreach(const QString &dictsPath, FDictsPaths)
 	{
 		QDir dir(dictsPath);
 		foreach(QString dictFile, dir.entryList(QStringList("*.dic"),QDir::Files|QDir::Readable, QDir::Name|QDir::IgnoreCase))
@@ -131,7 +131,7 @@ void HunspellChecker::loadHunspell(const QString &ALang)
 	delete FHunSpell;
 	FHunSpell = NULL;
 
-	foreach(QString dictsPath, FDictsPaths)
+	foreach(const QString &dictsPath, FDictsPaths)
 	{
 		QString dictFile = QString("%1/%2.dic").arg(dictsPath).arg(ALang);
 		if (QFileInfo(dictFile).exists())

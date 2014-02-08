@@ -2,6 +2,22 @@
 
 #include <QRegExp>
 #include <QLineEdit>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/discoitemdataroles.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <utils/widgetmanager.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
+
+// SortFilterProxyModel
+SortFilterProxyModel::SortFilterProxyModel(QObject *AParent) :QSortFilterProxyModel(AParent)
+{
+
+}
 
 bool SortFilterProxyModel::hasChildren( const QModelIndex &AParent ) const
 {
@@ -28,6 +44,7 @@ bool SortFilterProxyModel::filterAcceptsRow(int ARow, const QModelIndex &AParent
 
 DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QWidget *AParent) : QMainWindow(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Service Discovery - %1").arg(AStreamJid.uFull()));
@@ -88,8 +105,7 @@ DiscoItemsWindow::DiscoItemsWindow(IServiceDiscovery *ADiscovery, const Jid &ASt
 	connect(ui.lneSearch,SIGNAL(editingFinished()),SLOT(onSearchTimerTimeout()));
 
 	connect(ui.trvItems,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onViewContextMenu(const QPoint &)));
-	connect(ui.trvItems->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-	        SLOT(onCurrentIndexChanged(const QModelIndex &, const QModelIndex &)));
+	connect(ui.trvItems->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),SLOT(onCurrentIndexChanged(const QModelIndex &, const QModelIndex &)));
 
 	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 	connect(FDiscovery->instance(),SIGNAL(discoItemsReceived(const IDiscoItems &)),SLOT(onDiscoItemsReceived(const IDiscoItems &)));
@@ -118,6 +134,21 @@ DiscoItemsWindow::~DiscoItemsWindow()
 	emit windowDestroyed(this);
 }
 
+Jid DiscoItemsWindow::streamJid() const
+{
+	return FStreamJid;
+}
+
+ToolBarChanger *DiscoItemsWindow::toolBarChanger() const
+{
+	return FToolBarChanger;
+}
+
+ToolBarChanger *DiscoItemsWindow::actionsBarChanger() const
+{
+	return FActionsBarChanger;
+}
+
 void DiscoItemsWindow::discover(const Jid &AContactJid, const QString &ANode)
 {
 	ui.cmbJid->setEditText(AContactJid.uFull());
@@ -140,6 +171,11 @@ void DiscoItemsWindow::discover(const Jid &AContactJid, const QString &ANode)
 	ui.trvItems->setCurrentIndex(ui.trvItems->model()->index(0,0));
 
 	emit discoverChanged(AContactJid,ANode);
+}
+
+QMenu * DiscoItemsWindow::createPopupMenu()
+{
+	return NULL;
 }
 
 void DiscoItemsWindow::initialize()
@@ -234,7 +270,7 @@ void DiscoItemsWindow::updateActionsBar()
 	if (index.isValid())
 	{
 		IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
-		foreach(QString feature, dinfo.features)
+		foreach(const QString &feature, dinfo.features)
 		{
 			Action *action = FDiscovery->createFeatureAction(FStreamJid,feature,dinfo,this);
 			if (action)
@@ -276,7 +312,7 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
 		menu->addAction(FShowVCard,TBG_DIWT_DISCOVERY_ACTIONS,false);
 
 		IDiscoInfo dinfo = FDiscovery->discoInfo(FStreamJid,index.data(DIDR_JID).toString(),index.data(DIDR_NODE).toString());
-		foreach(QString feature, dinfo.features)
+		foreach(const QString &feature, dinfo.features)
 		{
 			Action *action = FDiscovery->createFeatureAction(FStreamJid,feature,dinfo,menu);
 			if (action)
@@ -287,7 +323,7 @@ void DiscoItemsWindow::onViewContextMenu(const QPoint &APos)
 	}
 }
 
-void DiscoItemsWindow::onCurrentIndexChanged(QModelIndex ACurrent, QModelIndex APrevious)
+void DiscoItemsWindow::onCurrentIndexChanged(const QModelIndex &ACurrent, const QModelIndex &APrevious)
 {
 	if (ACurrent.parent()!=APrevious.parent() || ACurrent.row()!=APrevious.row())
 	{

@@ -4,6 +4,7 @@
 #include <QKeySequence>
 #include <QIntValidator>
 #include <QDoubleValidator>
+#include <utils/options.h>
 
 OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) : QWidget(AParent)
 {
@@ -33,7 +34,7 @@ OptionsWidget::OptionsWidget(const OptionsNode &ANode, const QString &ACaption, 
 	else if (FValue.type() == QVariant::Color)
 	{
 		FComboBox = new QComboBox(this);
-		foreach(QString color, QColor::colorNames())
+		foreach(const QString &color, QColor::colorNames())
 		{
 			FComboBox->addItem(color,QColor(color));
 			FComboBox->setItemData(FComboBox->count()-1,QColor(color),Qt::DecorationRole);

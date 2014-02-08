@@ -1,2 +1,2 @@
-set(SOURCES statistics.cpp statisticswebpage.cpp)
-set(HEADERS statistics.h statisticswebpage.h)
+set(SOURCES statistics.cpp)
+set(HEADERS statistics.h)

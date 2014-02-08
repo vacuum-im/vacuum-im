@@ -1,5 +1,7 @@
 #include "account.h"
 
+#include <utils/logger.h>
+
 Account::Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent) : QObject(AParent)
 {
 	FXmppStreams = AXmppStreams;
@@ -38,6 +40,7 @@ void Account::setActive(bool AActive)
 {
 	if (AActive && FXmppStream==NULL && isValid())
 	{
+		LOG_STRM_INFO(streamJid(),QString("Activating account=%1").arg(name()));
 		FXmppStream = FXmppStreams->newXmppStream(streamJid());
 		connect(FXmppStream->instance(),SIGNAL(closed()),SLOT(onXmppStreamClosed()),Qt::QueuedConnection);
 		onXmppStreamClosed();
@@ -46,6 +49,7 @@ void Account::setActive(bool AActive)
 	}
 	else if (!AActive && FXmppStream!=NULL)
 	{
+		LOG_STRM_INFO(streamJid(),QString("Deactivating account=%1").arg(name()));
 		emit activeChanged(false);
 		FXmppStreams->removeXmppStream(FXmppStream);
 		FXmppStreams->destroyXmppStream(FXmppStream->streamJid());
@@ -110,17 +114,11 @@ void Account::onOptionsChanged(const OptionsNode &ANode)
 		if (FXmppStream && !FXmppStream->isConnected())
 		{
 			if (FOptionsNode.node("streamJid") == ANode)
-			{
 				FXmppStream->setStreamJid(ANode.value().toString());
-			}
 			else if (FOptionsNode.node("password") == ANode)
-			{
 				FXmppStream->setPassword(Options::decrypt(ANode.value().toByteArray()).toString());
-			}
 			else if (FOptionsNode.node("require-encryption") == ANode)
-			{
 				FXmppStream->setEncryptionRequired(ANode.value().toBool());
-			}
 		}
 		emit optionsChanged(ANode);
 	}

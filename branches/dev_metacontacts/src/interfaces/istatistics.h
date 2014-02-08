@@ -23,14 +23,9 @@ struct IStatisticsHit {
 	};
 	int type;
 	int session;
-	QString description;
+	QUuid profile;
+	QString screen;
 	QDateTime timestamp;
-	struct {
-		QString title;
-		QString location;
-		QString host;
-		QString path;
-	} view;
 	struct {
 		QString category;
 		QString action;
@@ -44,8 +39,8 @@ struct IStatisticsHit {
 		qint64 time;
 	} timing;
 	struct {
-		QString errString;
 		bool fatal;
+		QString descr;
 	} exception;
 	IStatisticsHit() {
 		type = HitNone;
@@ -66,6 +61,6 @@ public:
 	virtual bool sendStatisticsHit(const IStatisticsHit &AHit) =0;
 };
 
-Q_DECLARE_INTERFACE(IStatistics,"Vacuum.Plugin.IStatistics/1.0");
+Q_DECLARE_INTERFACE(IStatistics,"Vacuum.Plugin.IStatistics/1.1");
 
 #endif // ISTATISTICS_H

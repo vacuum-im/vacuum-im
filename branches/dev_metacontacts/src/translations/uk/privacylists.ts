@@ -255,47 +255,47 @@
     </message>
     <message>
         <source>Disable Privacy Lists</source>
-        <translation type="unfinished"></translation>
+        <translation>Вимкнути списки приватності</translation>
     </message>
     <message>
         <source>Block Contacts Without Subscription</source>
-        <translation type="unfinished"></translation>
+        <translation>Блокувати контакти без підписки</translation>
     </message>
     <message>
         <source>Default Rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Правило за замовчуванням</translation>
     </message>
     <message>
         <source>Visible to Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Видимий для контакту</translation>
     </message>
     <message>
         <source>Invisible to Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Невидимий для контакту</translation>
     </message>
     <message>
         <source>Ignore Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Ігнорувати контакт</translation>
     </message>
     <message>
         <source>Visible to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Видимий для групи</translation>
     </message>
     <message>
         <source>Invisible to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Невидимий для групи</translation>
     </message>
     <message>
         <source>Ignore Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Ігнорувати групу</translation>
     </message>
     <message>
         <source>Set Active List</source>
-        <translation type="unfinished"></translation>
+        <translation>Встановити активний список</translation>
     </message>
     <message>
         <source>Set Default List</source>
-        <translation type="unfinished"></translation>
+        <translation>Встановити список за замовчуванням</translation>
     </message>
 </context>
 </TS>

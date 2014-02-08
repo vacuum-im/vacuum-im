@@ -2,6 +2,19 @@
 
 #include <QClipboard>
 #include <QApplication>
+#include <definitions/actiongroups.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/resources.h>
+#include <utils/advanceditemdelegate.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/logger.h>
 
 #define PST_ANNOTATIONS       "storage"
 #define PSN_ANNOTATIONS       "storage:rosternotes"
@@ -73,7 +86,9 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
 	if (plugin)
+	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
 	if (plugin)
@@ -92,7 +107,9 @@ bool Annotations::initConnections(IPluginManager *APluginManager, int &AInitOrde
 
 	plugin = APluginManager->pluginInterface("IRosterSearch").value(0,NULL);
 	if (plugin)
+	{
 		FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
+	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
@@ -214,6 +231,10 @@ bool Annotations::setAnnotation(const Jid &AStreamJid, const Jid &AContactJid, c
 		FSaveTimer.start();
 		return true;
 	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,QString("Failed to set annotation to=%1: Annotations is not enabled").arg(AContactJid.bare()));
+	}
 	return false;
 }
 
@@ -231,6 +252,10 @@ QDialog *Annotations::showAnnotationDialog(const Jid &AStreamJid, const Jid &ACo
 		WidgetManager::showActivateRaiseWindow(dialog);
 		return dialog;
 	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,"Failed to open annotation dialog: Annotations is not enabled");
+	}
 	return NULL;
 }
 
@@ -241,8 +266,13 @@ bool Annotations::loadAnnotations(const Jid &AStreamJid)
 		QString id = FPrivateStorage->loadData(AStreamJid,PST_ANNOTATIONS,PSN_ANNOTATIONS);
 		if (!id.isEmpty())
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Annotations load request sent, id=%1").arg(id));
 			FLoadRequests.insert(id,AStreamJid);
 			return true;
+		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send load annotations request");
 		}
 	}
 	return false;
@@ -270,9 +300,18 @@ bool Annotations::saveAnnotations(const Jid &AStreamJid)
 		QString id = FPrivateStorage->saveData(AStreamJid,doc.documentElement());
 		if (!id.isEmpty())
 		{
+			LOG_STRM_INFO(AStreamJid,QString("Save annotations request sent, id=%1").arg(id));
 			FSaveRequests.insert(id,AStreamJid);
 			return true;
 		}
+		else
+		{
+			LOG_STRM_WARNING(AStreamJid,"Failed to send save annotations request");
+		}
+	}
+	else
+	{
+		LOG_STRM_WARNING(AStreamJid,"Failed to save annotations: Annotations is not ready");
 	}
 	return false;
 }
@@ -283,7 +322,7 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 	if (sroot && !AContactJids.isEmpty())
 	{
 		QMultiMap<int,QVariant> findData;
-		foreach(Jid contactJid, AContactJids)
+		foreach(const Jid &contactJid, AContactJids)
 			findData.insertMulti(RDR_PREP_BARE_JID,contactJid.pBare());
 		findData.insertMulti(RDR_STREAM_JID,AStreamJid.pFull());
 
@@ -295,7 +334,7 @@ void Annotations::updateDataHolder(const Jid &AStreamJid, const QList<Jid> &ACon
 
 void Annotations::onSaveAnnotationsTimerTimeout()
 {
-	foreach(Jid streamJid, FSavePendingStreams)
+	foreach(const Jid &streamJid, FSavePendingStreams)
 		saveAnnotations(streamJid);
 	FSavePendingStreams.clear();
 }
@@ -310,6 +349,7 @@ void Annotations::onPrivateDataSaved(const QString &AId, const Jid &AStreamJid, 
 	Q_UNUSED(AElement);
 	if (FSaveRequests.contains(AId))
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Annotations saved, id=%1").arg(AId));
 		FSaveRequests.remove(AId);
 		emit annotationsSaved(AStreamJid);
 	}
@@ -319,6 +359,7 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
 {
 	if (FLoadRequests.contains(AId))
 	{
+		LOG_STRM_INFO(AStreamJid,QString("Annotations loaded, id=%1").arg(AId));
 		FLoadRequests.remove(AId);
 
 		QMap<Jid, Annotation> &items = FAnnotations[AStreamJid];
@@ -346,9 +387,7 @@ void Annotations::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid,
 void Annotations::onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace)
 {
 	if (isEnabled(AStreamJid) && ATagName==PST_ANNOTATIONS && ANamespace==PSN_ANNOTATIONS)
-	{
 		loadAnnotations(AStreamJid);
-	}
 }
 
 void Annotations::onPrivateStorageClosed(const Jid &AStreamJid)

@@ -2,6 +2,25 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="pl" sourcelanguage="en">
 <context>
+    <name>ConnectionOptionsWidget</name>
+    <message>
+        <source>Disable check</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Request on errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect on errors</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow only trusted</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConnectionOptionsWidgetClass</name>
     <message>
         <source>Host:</source>
@@ -14,6 +33,10 @@
     <message>
         <source>Use legacy SSL connection</source>
         <translation>Użyj starszego połączenia SSL</translation>
+    </message>
+    <message>
+        <source>Certificate check mode:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -47,52 +70,56 @@
         <translation>Stan/Prowincja: %1</translation>
     </message>
     <message>
-        <source>Common Name: %1</source>
-        <translation>Nazwa Ogólna: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Organization: %1</source>
-        <translation>Organizacja Emitenta: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Unit Name: %1</source>
-        <translation>Zakład Emitenta: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Country: %1</source>
-        <translation>Kraj Emitenta: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Locality: %1</source>
-        <translation>Rejon Emitenta: %1</translation>
-    </message>
-    <message>
-        <source>Issuer State/Province: %1</source>
-        <translation>Stan/Prowincja Emitenta: %1</translation>
-    </message>
-    <message>
-        <source>Issuer Common Name: %1</source>
-        <translation>Ogólna Nazwa Emitenta: %1</translation>
-    </message>
-    <message>
         <source>SSL Authentication Error</source>
         <translation>Błąd autoryzacji SSL</translation>
-    </message>
-    <message>
-        <source>Unable to validate the connection to %1 due to errors:</source>
-        <translation>Nie można połączyc się z %1 z powodu błędów:</translation>
-    </message>
-    <message>
-        <source>Connect</source>
-        <translation>Połącz</translation>
     </message>
     <message>
         <source>Disconnect</source>
         <translation>Rozłącz</translation>
     </message>
     <message>
-        <source>Trust this certificate</source>
-        <translation>Ufaj temu certyfikatowi</translation>
+        <source>Connect Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate holder:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate issuer:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate details:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Effective from: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Expired at: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Serial number: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Host certificate is not in trusted list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

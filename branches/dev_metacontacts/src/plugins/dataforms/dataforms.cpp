@@ -1,6 +1,8 @@
 #include "dataforms.h"
 
 #include <QImageReader>
+#include <definitions/namespaces.h>
+#include <definitions/internalerrors.h>
 
 DataForms::DataForms()
 {
@@ -22,8 +24,10 @@ void DataForms::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->homePage = "http://www.vacuum-im.org";
 }
 
-bool DataForms::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool DataForms::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IServiceDiscovery").value(0,NULL);
 	if (plugin)
 	{
@@ -47,9 +51,8 @@ bool DataForms::initObjects()
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_DATAFORMS_URL_NETWORK_ERROR,tr("Url load failed"));
 
 	if (FDiscovery)
-	{
 		registerDiscoFeatures();
-	}
+
 	return true;
 }
 
@@ -106,7 +109,7 @@ IDataMedia DataForms::dataMedia(const QDomElement &AMediaElem) const
 			if (!uri.url.isEmpty())
 			{
 				QStringList params = uriElem.attribute("type").split(';',QString::SkipEmptyParts);
-				foreach(QString param, params)
+				foreach(const QString &param, params)
 				{
 					if (param.startsWith("codecs="))
 					{
@@ -205,6 +208,7 @@ IDataTable DataForms::dataTable(const QDomElement &ATableElem) const
 			QStringList rowValues;
 			for (int i=0; i<columnVars.count(); i++)
 				rowValues.append(QString::null);
+
 			QDomElement fieldElem = itemElem.firstChildElement("field");
 			while (!fieldElem.isNull())
 			{
@@ -215,6 +219,7 @@ IDataTable DataForms::dataTable(const QDomElement &ATableElem) const
 				fieldElem = fieldElem.nextSiblingElement("field");
 			}
 			table.rows.insert(row++,rowValues);
+
 			itemElem = itemElem.nextSiblingElement("item");
 		}
 	}
@@ -233,18 +238,13 @@ IDataLayout DataForms::dataLayout(const QDomElement &ALayoutElem) const
 		{
 			QString childName = childElem.tagName();
 			if (childName == DATALAYOUT_CHILD_TEXT)
-			{
 				section.text.append(childElem.text());
-			}
 			else if (childName == DATALAYOUT_CHILD_SECTION)
-			{
 				section.sections.append(dataLayout(childElem));
-			}
 			else if (childName == DATALAYOUT_CHILD_FIELDREF)
-			{
 				section.fieldrefs.append(childElem.attribute("var"));
-			}
 			section.childOrder.append(childName);
+
 			childElem = childElem.nextSiblingElement();
 		}
 	}
@@ -328,12 +328,12 @@ void DataForms::xmlMedia(const IDataMedia &AMedia, QDomElement &AFieldElem) cons
 	QDomDocument doc = AFieldElem.ownerDocument();
 	QDomElement mediaElem = AFieldElem.appendChild(doc.createElementNS(NS_XMPP_MEDIA_ELEMENT,"media")).toElement();
 
-	if (AMedia.height>0)
+	if (AMedia.height > 0)
 		mediaElem.setAttribute("height",AMedia.height);
-	if (AMedia.width>0)
+	if (AMedia.width > 0)
 		mediaElem.setAttribute("width",AMedia.width);
 
-	foreach(IDataMediaURI uri, AMedia.uris)
+	foreach(const IDataMediaURI &uri, AMedia.uris)
 	{
 		if (!uri.url.isEmpty())
 		{
@@ -357,9 +357,8 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, const
 
 	if (AField.value.type()==QVariant::StringList && !AField.value.toStringList().isEmpty())
 	{
-		foreach(QString value, AField.value.toStringList()) {
+		foreach(const QString &value, AField.value.toStringList())
 			fieldElem.appendChild(doc.createElement("value")).appendChild(doc.createTextNode(value));
-		}
 	}
 	else if (AField.value.type() == QVariant::Bool)
 	{
@@ -387,7 +386,7 @@ void DataForms::xmlField(const IDataField &AField, QDomElement &AFormElem, const
 		if (!AField.desc.isEmpty())
 			fieldElem.appendChild(doc.createElement("desc")).appendChild(doc.createTextNode(AField.desc));
 
-		foreach(IDataOption option, AField.options)
+		foreach(const IDataOption &option, AField.options)
 		{
 			QDomElement optionElem = fieldElem.appendChild(doc.createElement("option")).toElement();
 			if (!option.label.isEmpty())
@@ -405,13 +404,13 @@ void DataForms::xmlTable(const IDataTable &ATable, QDomElement &AFormElem) const
 	QDomDocument doc = AFormElem.ownerDocument();
 	QDomElement reportElem = AFormElem.appendChild(doc.createElement("reported")).toElement();
 
-	foreach(IDataField column, ATable.columns) {
+	foreach(const IDataField &column, ATable.columns) {
 		xmlField(column,reportElem,DATAFORM_TYPE_TABLE); }
 
-	foreach(QStringList rowValues,ATable.rows)
+	foreach(const QStringList &rowValues, ATable.rows)
 	{
 		QDomElement itemElem = AFormElem.appendChild(doc.createElement("item")).toElement();
-		for (int col=0;col<rowValues.count();col++)
+		for (int col=0; col<rowValues.count(); col++)
 		{
 			QDomElement fieldElem = itemElem.appendChild(doc.createElement("field")).toElement();
 			fieldElem.setAttribute("var",ATable.columns.value(col).var);
@@ -443,17 +442,17 @@ void DataForms::xmlForm(const IDataForm &AForm, QDomElement &AParentElem) const
 	if (!AForm.title.isEmpty())
 		formElem.appendChild(doc.createElement("title")).appendChild(doc.createTextNode(AForm.title));
 
-	foreach(QString instruction, AForm.instructions) {
-		formElem.appendChild(doc.createElement("instructions")).appendChild(doc.createTextNode(instruction)); }
+	foreach(const QString &instruction, AForm.instructions)
+		formElem.appendChild(doc.createElement("instructions")).appendChild(doc.createTextNode(instruction));
 
-	foreach(IDataLayout layout, AForm.pages) {
-		xmlPage(layout,AParentElem); }
+	foreach(const IDataLayout &layout, AForm.pages)
+		xmlPage(layout,AParentElem);
 
-	if (!AForm.tabel.columns.isEmpty()) {
-		xmlTable(AForm.tabel,formElem); }
+	if (!AForm.tabel.columns.isEmpty())
+		xmlTable(AForm.tabel,formElem);
 
-	foreach(IDataField field, AForm.fields) {
-		xmlField(field,formElem,AForm.type); }
+	foreach(const IDataField &field, AForm.fields)
+		xmlField(field,formElem,AForm.type);
 }
 
 bool DataForms::isDataValid(const IDataValidate &AValidate, const QString &AValue) const
@@ -586,7 +585,7 @@ bool DataForms::isOptionValid(const QList<IDataOption> &AOptions, const QString 
 
 bool DataForms::isMediaValid(const IDataMedia &AMedia) const
 {
-	foreach(IDataMediaURI uri, AMedia.uris)
+	foreach(const IDataMediaURI &uri, AMedia.uris)
 		if (!uri.type.isEmpty() && !uri.subtype.isEmpty() && !uri.url.isEmpty())
 			return true;
 	return false;
@@ -605,7 +604,7 @@ bool DataForms::isFieldValid(const IDataField &AField, const QString &AFormType)
 	{
 		static const QStringList boolValues = QStringList() << "0" << "false" << "1" << "true";
 		QString value = AField.value.toString();
-		valid = valid && boolValues.contains(AField.value.toString());
+		valid = valid && boolValues.contains(value);
 	}
 	else if (AField.type == DATAFIELD_TYPE_JIDSINGLE)
 	{
@@ -687,10 +686,14 @@ bool DataForms::isSubmitValid(const IDataForm &AForm, const IDataForm &ASubmit) 
 					valid &= isFieldValid(submField,DATAFORM_TYPE_SUBMIT);
 				}
 				else
+				{
 					valid &= !formField.required;
+				}
 			}
 			else
+			{
 				valid &= !formField.required;
+			}
 		}
 	}
 	return valid;
@@ -760,20 +763,20 @@ IDataForm DataForms::localizeForm(const IDataForm &AForm) const
 void DataForms::insertLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField)
 {
 	if (!ATypeField.isEmpty() && !FLocalizers.contains(ATypeField))
-	{
 		FLocalizers.insert(ATypeField,ALocalizer);
-	}
 }
 
 void DataForms::removeLocalizer(IDataLocalizer *ALocalizer, const QString &ATypeField)
 {
 	if (ALocalizer!=NULL && ATypeField.isEmpty())
 	{
-		foreach (QString formType, FLocalizers.keys(ALocalizer))
+		foreach (const QString &formType, FLocalizers.keys(ALocalizer))
 			FLocalizers.remove(formType);
 	}
 	else if (FLocalizers.value(ATypeField)==ALocalizer)
+	{
 		FLocalizers.remove(ATypeField);
+	}
 }
 
 int DataForms::fieldIndex(const QString &AVar, const QList<IDataField> &AFields) const
@@ -787,14 +790,14 @@ int DataForms::fieldIndex(const QString &AVar, const QList<IDataField> &AFields)
 QVariant DataForms::fieldValue(const QString &AVar, const QList<IDataField> &AFields) const
 {
 	int index = fieldIndex(AVar,AFields);
-	return index >= 0 ? AFields.at(index).value : QVariant();
+	return index>=0 ? AFields.at(index).value : QVariant();
 }
 
 IDataForm DataForms::dataSubmit(const IDataForm &AForm) const
 {
 	IDataForm form;
 	form.type = DATAFORM_TYPE_SUBMIT;
-	foreach(IDataField field, AForm.fields)
+	foreach(const IDataField &field, AForm.fields)
 	{
 		if (!field.var.isEmpty() && field.type!=DATAFIELD_TYPE_FIXED && !isFieldEmpty(field))
 		{
@@ -825,7 +828,7 @@ IDataForm DataForms::dataShowSubmit(const IDataForm &AForm, const IDataForm &ASu
 			sfield.label = ffield.label;
 			sfield.validate = ffield.validate;
 
-			foreach(IDataOption option, ffield.options)
+			foreach(const IDataOption &option, ffield.options)
 			{
 				if (sfield.value.type()==QVariant::StringList)
 				{
@@ -1000,7 +1003,7 @@ void DataForms::xmlLayout(const IDataLayout &ALayout, QDomElement &ALayoutElem) 
 	int textCounter = 0;
 	int fieldCounter = 0;
 	int sectionCounter = 0;
-	foreach(QString childName, ALayout.childOrder)
+	foreach(const QString &childName, ALayout.childOrder)
 	{
 		if (childName == DATALAYOUT_CHILD_TEXT)
 		{

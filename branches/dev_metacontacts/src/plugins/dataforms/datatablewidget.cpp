@@ -13,7 +13,7 @@ DataTableWidget::DataTableWidget(IDataForms *ADataForms, const IDataTable &ATabl
 	setColumnCount(ATable.columns.count());
 
 	int row = 0;
-	foreach(QStringList values, ATable.rows)
+	foreach(const QStringList &values, ATable.rows)
 	{
 		for (int col=0; col<values.count(); col++)
 		{
@@ -27,7 +27,7 @@ DataTableWidget::DataTableWidget(IDataForms *ADataForms, const IDataTable &ATabl
 	}
 
 	QStringList headers;
-	foreach(IDataField field, ATable.columns)
+	foreach(const IDataField &field, ATable.columns)
 		headers.append(!field.label.isEmpty() ? field.label : field.var);
 
 	setHorizontalHeaderLabels(headers);
@@ -42,6 +42,11 @@ DataTableWidget::DataTableWidget(IDataForms *ADataForms, const IDataTable &ATabl
 DataTableWidget::~DataTableWidget()
 {
 
+}
+
+const IDataTable &DataTableWidget::dataTable() const
+{
+	return FTable;
 }
 
 IDataField DataTableWidget::currentField() const
@@ -67,4 +72,3 @@ IDataField DataTableWidget::dataField(int ARow, const QString &AVar) const
 {
 	return dataField(ARow,FDataForms->fieldIndex(AVar,FTable.columns));
 }
-

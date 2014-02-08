@@ -1,16 +1,18 @@
 #include "notifyoptionswidget.h"
 
 #include <QHeaderView>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/optionvalues.h>
+#include <utils/iconstorage.h>
 
-enum ModelColumns
-{
+enum ModelColumns {
 	COL_NAME,
 	COL_ENABLE,
 	COL_COUNT
 };
 
-enum ModelDataRoles
-{
+enum ModelDataRoles {
 	MDR_TYPE = Qt::UserRole + 1,
 	MDR_KIND,
 	MDR_SORT
@@ -122,7 +124,7 @@ void NotifyOptionsWidget::createTreeModel()
 
 	QMap<QString,INotificationType> notifyTypes;
 	notifyTypes.insert(QString::null,globalType);
-	foreach(QString typeId, FNotifications->notificationTypes())
+	foreach(const QString &typeId, FNotifications->notificationTypes())
 		notifyTypes.insert(typeId,FNotifications->notificationType(typeId));
 
 	for(QMap<QString,INotificationType>::const_iterator it=notifyTypes.constBegin(); it!=notifyTypes.constEnd(); ++it)

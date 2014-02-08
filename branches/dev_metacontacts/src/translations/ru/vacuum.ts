@@ -50,10 +50,6 @@
         <translation>О Программе</translation>
     </message>
     <message>
-        <source>Plugins directory not found</source>
-        <translation>Директория с плагинами не найдена</translation>
-    </message>
-    <message>
         <source>Application</source>
         <translation>Приложение</translation>
     </message>

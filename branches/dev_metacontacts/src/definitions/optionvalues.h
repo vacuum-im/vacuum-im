@@ -17,6 +17,7 @@
 #define OPV_ACCOUNT_CONNECTION_PORT                     "accounts.account.connection.port"
 #define OPV_ACCOUNT_CONNECTION_PROXY                    "accounts.account.connection.proxy"
 #define OPV_ACCOUNT_CONNECTION_USELEGACYSSL             "accounts.account.connection.use-legacy-ssl"
+#define OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE           "accounts.account.connection.cert-verify-mode"
 // Registration
 #define OPV_ACCOUNT_REGISTER                            "accounts.account.register-on-server"
 // StatusChanger
@@ -24,8 +25,6 @@
 #define OPV_ACCOUNT_AUTORECONNECT                       "accounts.account.auto-reconnect"
 #define OPV_ACCOUNT_STATUS_ISMAIN                       "accounts.account.status.is-main"
 #define OPV_ACCOUNT_STATUS_LASTONLINE                   "accounts.account.status.last-online"
-// MessageArchiver
-#define OPV_ACCOUNT_HISTORYREPLICATION                  "accounts.account.history-replication"
 // BookMarks
 #define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
 // Compress
@@ -98,6 +97,7 @@
 #define OPV_MESSAGES_TABWINDOW_REMOVETABSONCLOSE        "messages.tab-windows.window.remove-tabs-on-close"
 // Emoticons
 #define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
+#define OPV_MESSAGES_EMOTICONS_MAXINMESSAGE             "messages.emoticons.max-in-message"
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
 // ChatMessageHandler
@@ -106,6 +106,7 @@
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
 // MessageStyles
 #define OPV_MESSAGES_SHOWDATESEPARATORS                 "messages.show-date-separators"
+#define OPV_MESSAGES_MAXMESSAGESINWINDOW                "messages.max-messages-in-window"
 // SpellChecker
 #define OPV_MESSAGES_SPELL_LANG                         "messages.spell.lang"
 #define OPV_MESSAGES_SPELL_ENABLED                      "messages.spell.enabled"
@@ -124,18 +125,20 @@
 // MessageArchiver
 #define OPV_HISTORY_ENGINE_ITEM                         "history.engine"
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
-#define OPV_HISTORY_CAPABILITY_ITEM                     "history.capability"
-#define OPV_HISTORY_CAPABILITY_DEFAULT                  "history.capability.default"
+#define OPV_HISTORY_ENGINE_REPLICATEAPPEND              "history.engine.replicate-append"
+#define OPV_HISTORY_ENGINE_REPLICATEREMOVE              "history.engine.replicate-remove"
+#define OPV_HISTORY_STREAM_ITEM                         "history.stream"
+#define OPV_HISTORY_STREAM_REPLICATE                    "history.stream.replicate"
+#define OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING         "history.stream.force-direct-archiving"
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
-
 // FileMessageArchive
 #define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
-#define OPV_FILEARCHIVE_COLLECTION_SIZE                 "filearchive.collection.size"
+#define OPV_FILEARCHIVE_FORCEDATABASESYNC               "filearchive.force-database-sync"
+#define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "filearchive.collection.min-size"
 #define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
-#define OPV_FILEARCHIVE_COLLECTION_TIMEOUT              "filearchive.collection.timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MINTIMEOUT           "filearchive.collection.min-timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MAXTIMEOUT           "filearchive.collection.max-timeout"
-#define OPV_FILEARCHIVE_COLLECTION_MINMESSAGES          "filearchive.collection.min-messages"
+#define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "filearchive.collection.critical-size"
+// ServerMessageArchive
+#define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "serverarchive.max-upload-size"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"
@@ -157,6 +160,7 @@
 #define OPV_MISC_ROOT                                   "misc"
 #define OPV_MISC_AUTOSTART                              "misc.autostart"
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
+#define OPV_MISC_STATISTICTS_ENABLED                    "misc.statistics-enabled"
 #define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
 
 // Notifications
@@ -230,6 +234,7 @@
 #define OPV_AUTOSTARTUS_RULE_TIME                       "statuses.autostatus.rule.time"
 #define OPV_AUTOSTARTUS_RULE_SHOW                       "statuses.autostatus.rule.show"
 #define OPV_AUTOSTARTUS_RULE_TEXT                       "statuses.autostatus.rule.text"
+#define OPV_AUTOSTARTUS_RULE_PRIORITY                   "statuses.autostatus.rule.priority"
 
 // StatusIcons
 #define OPV_STATUSICONS                                 "statusicons"

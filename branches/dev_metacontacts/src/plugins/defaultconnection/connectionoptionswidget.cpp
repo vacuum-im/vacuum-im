@@ -1,6 +1,7 @@
 #include "connectionoptionswidget.h"
 
 #include <QVBoxLayout>
+#include <utils/options.h>
 
 ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, const OptionsNode &ANode, QWidget *AParent) : QWidget(AParent)
 {
@@ -8,6 +9,11 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FManager = AManager;
 	FOptions = ANode;
 	FProxySettings = NULL;
+
+	ui.cmbCertCheckMode->addItem(tr("Disable check"),IDefaultConnection::Disabled);
+	ui.cmbCertCheckMode->addItem(tr("Request on errors"),IDefaultConnection::Manual);
+	ui.cmbCertCheckMode->addItem(tr("Disconnect on errors"),IDefaultConnection::Forbid);
+	ui.cmbCertCheckMode->addItem(tr("Allow only trusted"),IDefaultConnection::TrustedOnly);
 
 	FProxySettings = FManager!=NULL ? FManager->proxySettingsWidget(FOptions.node("proxy"), ui.wdtProxy) : NULL;
 	if (FProxySettings)
@@ -18,11 +24,14 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 		connect(FProxySettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
 	}
 	else
+	{
 		ui.wdtProxy->setVisible(false);
+	}
 
 	connect(ui.lneHost,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.spbPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));
 	connect(ui.chbUseLegacySSL,SIGNAL(stateChanged(int)),SLOT(onUseLegacySSLStateChanged(int)));
+	connect(ui.cmbCertCheckMode,SIGNAL(currentIndexChanged (int)),SIGNAL(modified()));
 
 	reset();
 }
@@ -38,8 +47,11 @@ void ConnectionOptionsWidget::apply(OptionsNode ANode)
 	node.setValue(ui.lneHost->text(),"host");
 	node.setValue(ui.spbPort->value(),"port");
 	node.setValue(ui.chbUseLegacySSL->isChecked(),"use-legacy-ssl");
+	node.setValue(ui.cmbCertCheckMode->itemData(ui.cmbCertCheckMode->currentIndex()),"cert-verify-mode");
+
 	if (FProxySettings)
 		FManager->saveProxySettings(FProxySettings, node.node("proxy"));
+
 	emit childApply();
 }
 
@@ -53,8 +65,11 @@ void ConnectionOptionsWidget::reset()
 	ui.lneHost->setText(FOptions.value("host").toString());
 	ui.spbPort->setValue(FOptions.value("port").toInt());
 	ui.chbUseLegacySSL->setChecked(FOptions.value("use-legacy-ssl").toBool());
+	ui.cmbCertCheckMode->setCurrentIndex(ui.cmbCertCheckMode->findData(FOptions.value("cert-verify-mode").toInt()));
+
 	if (FProxySettings)
 		FProxySettings->reset();
+
 	emit childReset();
 }
 

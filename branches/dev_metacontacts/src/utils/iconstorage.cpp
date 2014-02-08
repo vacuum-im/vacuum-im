@@ -5,6 +5,11 @@
 #include <QVariant>
 #include <QApplication>
 
+QHash<QString, IconStorage*> IconStorage::FStaticStorages;
+QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
+QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
+QHash<QString, QHash<QString, QList<IconStorage::IconAnimateFrame> > > IconStorage::FAnimateCache;
+
 struct IconStorage::IconAnimateFrame {
 	int delay;
 	QIcon icon;
@@ -43,11 +48,6 @@ struct IconStorage::IconUpdateParams {
 	IconAnimateParams *animation;
 };
 
-QHash<QString, QHash<QString,QIcon> > IconStorage::FIconCache;
-QHash<QString, IconStorage*> IconStorage::FStaticStorages;
-QHash<QObject*, IconStorage*> IconStorage::FObjectStorage;
-QHash<QString, QHash<QString, QList<IconStorage::IconAnimateFrame> > > IconStorage::FAnimateCache;
-
 IconStorage::IconStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : FileStorage(AStorage,ASubStorage,AParent)
 {
 	connect(this,SIGNAL(storageChanged()),SLOT(onStorageChanged()));
@@ -56,8 +56,8 @@ IconStorage::IconStorage(const QString &AStorage, const QString &ASubStorage, QO
 IconStorage::~IconStorage()
 {
 	QList<QObject*> objects = FUpdateParams.keys();
-	foreach(QObject *object, objects) {
-		removeObject(object); }
+	foreach(QObject *object, objects)
+		removeObject(object);
 }
 
 QIcon IconStorage::getIcon(const QString &AKey, int AIndex) const
@@ -116,7 +116,6 @@ void IconStorage::insertAutoIcon(QObject *AObject, const QString &AKey, int AInd
 		params->index = AIndex;
 		params->prop = AProperty;
 		params->animate = AAnimate;
-		QString file = fileFullName(AKey,AIndex);
 		initAnimation(AObject,params);
 		updateObject(AObject);
 		connect(AObject,SIGNAL(destroyed(QObject *)),SLOT(onObjectDestroyed(QObject *)));
@@ -222,7 +221,6 @@ void IconStorage::updateObject(QObject *AObject)
 			delete params->animation->reader;
 			params->animation->reader = NULL;
 			params->animation->frameIndex = 0;
-			
 		}
 	}
 

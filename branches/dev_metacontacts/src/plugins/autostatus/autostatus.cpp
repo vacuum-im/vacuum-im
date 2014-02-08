@@ -1,6 +1,14 @@
 #include "autostatus.h"
 
 #include <QCursor>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/menuicons.h>
+#include <utils/systemmanager.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 #define IDLE_TIMER_TIMEOUT  1000
 
@@ -29,8 +37,10 @@ void AutoStatus::pluginInfo(IPluginInfo *APluginInfo)
 	APluginInfo->dependences.append(ACCOUNTMANAGER_UUID);
 }
 
-bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrder*/)
+bool AutoStatus::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
+	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
 	{
@@ -54,6 +64,7 @@ bool AutoStatus::initConnections(IPluginManager *APluginManager, int &/*AInitOrd
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
+
 	return FStatusChanger!=NULL && FAccountManager!=NULL;
 }
 
@@ -65,9 +76,10 @@ bool AutoStatus::initObjects()
 bool AutoStatus::initSettings()
 {
 	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_ENABLED,false);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,15*60);
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,10*60);
 	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_SHOW,IPresence::Away);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,tr("Status changed automatically to 'away'"));
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_PRIORITY,20);
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,tr("Auto status 'Away' due to inactivity for more than #(m) minutes"));
 
 	if (FOptionsManager)
 	{
@@ -80,7 +92,7 @@ bool AutoStatus::initSettings()
 
 bool AutoStatus::startPlugin()
 {
-	SystemManager::instance()->startSystemIdle();
+	SystemManager::startSystemIdle();
 	connect(SystemManager::instance(),SIGNAL(systemIdleChanged(int)),SLOT(onSystemIdleChanged(int)));
 	return true;
 }
@@ -103,7 +115,7 @@ QUuid AutoStatus::activeRule() const
 QList<QUuid> AutoStatus::rules() const
 {
 	QList<QUuid> rulesIdList;
-	foreach(QString ruleId, Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule"))
+	foreach(const QString &ruleId, Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule"))
 		rulesIdList.append(ruleId);
 	return rulesIdList;
 }
@@ -117,6 +129,11 @@ IAutoStatusRule AutoStatus::ruleValue(const QUuid &ARuleId) const
 		rule.time = ruleNode.value("time").toInt();
 		rule.show = ruleNode.value("show").toInt();
 		rule.text = ruleNode.value("text").toString();
+		rule.priority = ruleNode.value("priority").toInt();
+	}
+	else
+	{
+		REPORT_ERROR("Failed to get auto status rule: Invalid rule id");
 	}
 	return rule;
 }
@@ -135,6 +152,10 @@ void AutoStatus::setRuleEnabled(const QUuid &ARuleId, bool AEnabled)
 		Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ARuleId.toString()).setValue(AEnabled,"enabled");
 		emit ruleChanged(ARuleId);
 	}
+	else
+	{
+		REPORT_ERROR("Failed to change auto status rule enable state: Invalid rule id");
+	}
 }
 
 QUuid AutoStatus::insertRule(const IAutoStatusRule &ARule)
@@ -145,6 +166,7 @@ QUuid AutoStatus::insertRule(const IAutoStatusRule &ARule)
 	ruleNode.setValue(ARule.time,"time");
 	ruleNode.setValue(ARule.show,"show");
 	ruleNode.setValue(ARule.text,"text");
+	ruleNode.setValue(ARule.priority,"priority");
 	emit ruleInserted(ruleId);
 	return ruleId;
 }
@@ -157,7 +179,12 @@ void AutoStatus::updateRule(const QUuid &ARuleId, const IAutoStatusRule &ARule)
 		ruleNode.setValue(ARule.time,"time");
 		ruleNode.setValue(ARule.show,"show");
 		ruleNode.setValue(ARule.text,"text");
+		ruleNode.setValue(ARule.priority,"priority");
 		emit ruleChanged(ARuleId);
+	}
+	else
+	{
+		REPORT_ERROR("Failed to update auto status rule: Invalid rule id");
 	}
 }
 
@@ -198,9 +225,10 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 		{
 			IAutoStatusRule rule = ruleValue(ARuleId);
 			prepareRule(rule);
+			LOG_INFO(QString("Activating auto status, show=%1, text=%2").arg(rule.show).arg(rule.text));
 			if (FAutoStatusId == STATUS_NULL_ID)
 			{
-				FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(STATUS_MAIN_ID));
+				FAutoStatusId = FStatusChanger->addStatusItem(tr("Auto status"),rule.show,rule.text,rule.priority);
 				foreach(IAccount *account, FAccountManager->accounts())
 				{
 					if (account->isActive() && account->xmppStream()->isOpen())
@@ -210,6 +238,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 						int show = FStatusChanger->statusItemShow(status);
 						if (show==IPresence::Online || show==IPresence::Chat)
 						{
+							LOG_STRM_INFO(streamJid,"Applying active auto status");
 							FStreamStatus.insert(streamJid,status);
 							FStatusChanger->setStreamStatus(streamJid, FAutoStatusId);
 						}
@@ -218,14 +247,16 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 			}
 			else
 			{
-				FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,FStatusChanger->statusItemPriority(STATUS_MAIN_ID));
+				LOG_INFO(QString("Updating active auto status, show=%1, text=%2").arg(rule.show).arg(rule.text));
+				FStatusChanger->updateStatusItem(FAutoStatusId,tr("Auto status"),rule.show,rule.text,rule.priority);
 			}
 		}
 		else
 		{
-			foreach(Jid streamJid, FStreamStatus.keys())
+			LOG_INFO("Deactivating auto status");
+			foreach(const Jid &streamJid, FStreamStatus.keys())
 				FStatusChanger->setStreamStatus(streamJid, FStreamStatus.take(streamJid));
-			foreach(Jid streamJid, FStatusChanger->statusStreams(FAutoStatusId))
+			foreach(const Jid &streamJid, FStatusChanger->statusStreams(FAutoStatusId))
 				FStatusChanger->setStreamStatus(streamJid,STATUS_MAIN_ID);
 			FStatusChanger->removeStatusItem(FAutoStatusId);
 			FAutoStatusId = STATUS_NULL_ID;
@@ -241,7 +272,7 @@ void AutoStatus::updateActiveRule()
 	int ruleTime = 0;
 	int idleSecs = SystemManager::systemIdle();
 
-	foreach(QUuid ruleId, rules())
+	foreach(const QUuid &ruleId, rules())
 	{
 		IAutoStatusRule rule = ruleValue(ruleId);
 		if (isRuleEnabled(ruleId) && rule.time<idleSecs && rule.time>ruleTime)
@@ -267,9 +298,7 @@ void AutoStatus::onSystemIdleChanged(int ASeconds)
 void AutoStatus::onOptionsOpened()
 {
 	if (Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule").isEmpty())
-	{
 		Options::node(OPV_AUTOSTARTUS_RULE_ITEM,QUuid::createUuid().toString()).setValue(true,"enabled");
-	}
 }
 
 void AutoStatus::onProfileClosed(const QString &AName)

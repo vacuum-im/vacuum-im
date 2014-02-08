@@ -5,11 +5,11 @@
 #include "ui_inputtextdialog.h"
 
 class InputTextDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:
-	InputTextDialog(QWidget *AParent,const QString &ATitle,  const QString &ALabel, QString &AText);
+	InputTextDialog(QWidget *AParent, const QString &ATitle, const QString &ALabel, QString &AText);
 	~InputTextDialog();
 private:
 	Ui::InputTextDialogClass ui;

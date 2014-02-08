@@ -8,9 +8,9 @@ QMap<XmppStanzaError::ErrorType,QString> XmppStanzaError::FErrorTypes;
 QMap<XmppStanzaError::ErrorCondition,QString> XmppStanzaError::FErrorConditions;
 QMap<XmppStanzaError::ErrorCondition,XmppStanzaError::ErrorType> XmppStanzaError::FConditionTypes;
 
-XmppError XmppError::null = XmppError();
-XmppStreamError XmppStreamError::null = XmppStreamError();
-XmppStanzaError XmppStanzaError::null = XmppStanzaError();
+const XmppError XmppError::null;
+const XmppStreamError XmppStreamError::null;
+const XmppStanzaError XmppStanzaError::null;
 
 //*********
 //XmppError
@@ -174,7 +174,7 @@ QString XmppError::appCondition(const QString &ANsUri) const
 
 QString XmppError::errorString(const QString &AContext) const
 {
-	foreach(QString appNs, appConditionNsList())
+	foreach(const QString &appNs, appConditionNsList())
 	{
 		QString errString = getErrorString(appNs,appCondition(appNs),AContext);
 		if (!errString.isEmpty())

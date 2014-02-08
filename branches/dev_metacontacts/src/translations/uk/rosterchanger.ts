@@ -231,111 +231,111 @@
     </message>
     <message>
         <source>Add Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Додати контакт</translation>
     </message>
     <message>
         <source>Add Group with Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Додати групу з контактами</translation>
     </message>
     <message>
         <source>Copy Group to Root</source>
-        <translation type="unfinished"></translation>
+        <translation>Копіювати групу в корінь</translation>
     </message>
     <message>
         <source>Move Group to Root</source>
-        <translation type="unfinished"></translation>
+        <translation>Перемістити групу в корінь</translation>
     </message>
     <message>
         <source>Copy Contact to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Скопіювати контакт в групу</translation>
     </message>
     <message>
         <source>Move Contact to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Перемістити контакт в групу</translation>
     </message>
     <message>
         <source>Copy Group to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Копіювати групу в групу</translation>
     </message>
     <message>
         <source>Move Group to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Перемістити групу в групу</translation>
     </message>
     <message>
         <source>Create New...</source>
-        <translation type="unfinished"></translation>
+        <translation>Створити нову...</translation>
     </message>
     <message>
         <source>To Root</source>
-        <translation type="unfinished"></translation>
+        <translation>В корінь</translation>
     </message>
     <message>
         <source>Without Groups</source>
-        <translation type="unfinished"></translation>
+        <translation>Без груп</translation>
     </message>
     <message>
         <source>Add Contact...</source>
-        <translation type="unfinished"></translation>
+        <translation>Додати контакт...</translation>
     </message>
     <message>
         <source>Subscribe Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Авторизувати контакт</translation>
     </message>
     <message>
         <source>Unsubscribe Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити авторизацію</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Перейменувати</translation>
     </message>
     <message>
         <source>Add to Roster...</source>
-        <translation type="unfinished"></translation>
+        <translation>Додати до ростеру</translation>
     </message>
     <message>
         <source>Copy to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Копіювати в групу</translation>
     </message>
     <message>
         <source>Move to Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Перемістити в групу</translation>
     </message>
     <message>
         <source>Remove from Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити з групи</translation>
     </message>
     <message>
         <source>Remove from Roster</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити з ростеру</translation>
     </message>
     <message>
         <source>Remove Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити групу</translation>
     </message>
     <message>
         <source>Remove Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити контакти</translation>
     </message>
     <message>
         <source>Rename Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Перейменувати контакт</translation>
     </message>
     <message>
         <source>Create Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Створити групу</translation>
     </message>
     <message>
         <source>Remove Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити контакт</translation>
     </message>
     <message>
         <source>Rename Group</source>
-        <translation type="unfinished"></translation>
+        <translation>Перейменувати групу</translation>
     </message>
     <message>
         <source>In this Group</source>
-        <translation type="unfinished"></translation>
+        <translation>В цю групу</translation>
     </message>
 </context>
 <context>

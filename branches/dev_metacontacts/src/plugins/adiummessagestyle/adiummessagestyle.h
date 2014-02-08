@@ -5,10 +5,7 @@
 #include <QTimer>
 #include <QWebView>
 #include <QNetworkAccessManager>
-#include <definitions/resources.h>
 #include <interfaces/imessagestyles.h>
-#include <utils/filestorage.h>
-#include <utils/textmanager.h>
 #include "styleviewer.h"
 
 //Message Style Info Values
@@ -119,7 +116,7 @@ public:
 	virtual QTextDocumentFragment selection(QWidget *AWidget) const;
 	virtual QTextCharFormat textFormatAt(QWidget *AWidget, const QPoint &APosition) const;
 	virtual QTextDocumentFragment textFragmentAt(QWidget *AWidget, const QPoint &APosition) const;
-	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean = true);
+	virtual bool changeOptions(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear = true);
 	virtual bool appendContent(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 	//AdiumMessageStyle
 	virtual int version() const;
@@ -128,7 +125,7 @@ public:
 signals:
 	void widgetAdded(QWidget *AWidget) const;
 	void widgetRemoved(QWidget *AWidget) const;
-	void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean) const;
+	void optionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClear) const;
 	void contentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions) const;
 	void urlClicked(QWidget *AWidget, const QUrl &AUrl) const;
 public:

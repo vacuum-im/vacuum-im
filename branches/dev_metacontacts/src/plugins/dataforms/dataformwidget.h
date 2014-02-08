@@ -4,8 +4,8 @@
 #include <interfaces/idataforms.h>
 
 class DataFormWidget :
-			public QWidget,
-			public IDataFormWidget
+	public QWidget,
+	public IDataFormWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IDataFormWidget);

@@ -110,11 +110,4 @@
         <translation>Przywróć ustawienia domyślne</translation>
     </message>
 </context>
-<context>
-    <name>NotifyWidget</name>
-    <message>
-        <source>Notification</source>
-        <translation>Powiadomienia</translation>
-    </message>
-</context>
 </TS>

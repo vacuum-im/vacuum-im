@@ -8,16 +8,16 @@
         <translation>Автостатус</translation>
     </message>
     <message>
-        <source>Status changed automatically to &apos;away&apos;</source>
-        <translation>Статус автоматически изменён на &apos;ушёл&apos;</translation>
-    </message>
-    <message>
         <source>Auto Status</source>
-        <translation>Авто статус</translation>
+        <translation>Автостатус</translation>
     </message>
     <message>
         <source>Allows to change the status in accordance with the time of inactivity</source>
         <translation>Позволяет менять статус в зависимости от времени бездействия</translation>
+    </message>
+    <message>
+        <source>Auto status &apos;Away&apos; due to inactivity for more than #(m) minutes</source>
+        <translation>Автостатус &apos;Ушел&apos; из-за бездействия более #(m) минут</translation>
     </message>
 </context>
 <context>
@@ -33,10 +33,6 @@
     <message>
         <source>Text</source>
         <translation>Текст</translation>
-    </message>
-    <message>
-        <source>Auto status: away</source>
-        <translation>Автостатус: ушёл</translation>
     </message>
     <message>
         <source>You can insert date and time into auto status text:</source>
@@ -161,6 +157,14 @@
     <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
         <translation>   Статус изменён на &apos;ушёл&apos; в %(hh:mm:ss) из-за бездействия с $(hh:mm:ss) в течение #(mm) минут и #(ss) секунд</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation>Приоритет</translation>
+    </message>
+    <message>
+        <source>Auto status</source>
+        <translation>Автостатус</translation>
     </message>
 </context>
 <context>

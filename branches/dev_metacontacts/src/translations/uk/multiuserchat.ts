@@ -13,7 +13,7 @@
     </message>
     <message>
         <source>Entered item JID is not valid or already exists.</source>
-        <translation>Return</translation>
+        <translation>Введено невірний чи вже існуючий JID.   </translation>
     </message>
     <message>
         <source>Wrong item JID</source>
@@ -53,7 +53,8 @@
     <message>
         <source>Conference parameters is not acceptable.
 Check values and try again</source>
-        <translation>Параметри конференції неприйнятні перевірте параметри та спробуйте ще раз</translation>
+        <translation>Параметри конференції неприйнятні.
+Перевірте параметри та спробуйте ще раз</translation>
     </message>
 </context>
 <context>
@@ -302,7 +303,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Desired Nickname</source>
-        <translation>Бажаний прізвисько</translation>
+        <translation>Бажане прізвисько</translation>
     </message>
     <message>
         <source>Your URL</source>
@@ -507,7 +508,7 @@ Check values and try again</source>
     <message>
         <source>Return</source>
         <comment>Send message</comment>
-        <translation>Повернутися</translation>
+        <translation>Return</translation>
     </message>
     <message>
         <source>Clear window</source>
@@ -568,35 +569,35 @@ Check values and try again</source>
     </message>
     <message>
         <source>Enter conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Зайти до конференції</translation>
     </message>
     <message>
         <source>Exit conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Залишити конференцію</translation>
     </message>
     <message>
         <source>Rejoin in conference after kick</source>
-        <translation type="unfinished"></translation>
+        <translation>Автоматично заходити до конференції після кіка</translation>
     </message>
     <message>
         <source>Select the user to refer without menu</source>
-        <translation type="unfinished"></translation>
+        <translation>Обирати користувача для звернення без меню</translation>
     </message>
     <message>
         <source>Enter</source>
-        <translation type="unfinished">Ввійти</translation>
+        <translation>Ввійти</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Вийти</translation>
+        <translation>Вийти</translation>
     </message>
     <message>
         <source>Open Conference Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Відкрити діалог конференції</translation>
     </message>
     <message>
         <source>Please, enter this conference!</source>
-        <translation type="unfinished"></translation>
+        <translation>Будь ласка, ввійдіть до цієї конференції!</translation>
     </message>
 </context>
 <context>
@@ -654,10 +655,6 @@ Check values and try again</source>
         <translation>Змінити членство</translation>
     </message>
     <message>
-        <source>Any occupant is allowed to see the user&apos;s full JID</source>
-        <translation>Кожний може бачити реальний JID користувачів</translation>
-    </message>
-    <message>
         <source>%1 affiliation changed while not in the room</source>
         <translation>У %1 членство змінилось за час відсутності</translation>
     </message>
@@ -712,10 +709,6 @@ Check values and try again</source>
     <message>
         <source>%1 is not valid room JID</source>
         <translation>%1 не являється правильним JID кімнати</translation>
-    </message>
-    <message>
-        <source>Disconnected</source>
-        <translation>Від&apos;єднаний</translation>
     </message>
     <message>
         <source>%1 (%2)</source>
@@ -911,102 +904,114 @@ Check values and try again</source>
     </message>
     <message>
         <source>Open Chat Dialog</source>
-        <translation type="unfinished"></translation>
+        <translation>Відкрити діалог чату</translation>
     </message>
     <message>
         <source>Kick User</source>
-        <translation type="unfinished"></translation>
+        <translation>Вигнати</translation>
     </message>
     <message>
         <source>Ban User</source>
-        <translation type="unfinished"></translation>
+        <translation>Забанити</translation>
     </message>
     <message>
         <source>Change Nick</source>
-        <translation type="unfinished"></translation>
+        <translation>Змінити прізвисько</translation>
     </message>
     <message>
         <source>Change Topic</source>
-        <translation type="unfinished"></translation>
+        <translation>Змінити тему</translation>
     </message>
     <message>
         <source>Invite to Conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Запросити до конференції</translation>
     </message>
     <message>
         <source>Request Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>Запитати голос</translation>
     </message>
     <message>
         <source>Clear Conference Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистити вікно конференції</translation>
     </message>
     <message>
         <source>Edit Ban List</source>
-        <translation type="unfinished"></translation>
+        <translation>Редагувати список банів</translation>
     </message>
     <message>
         <source>Edit Members List</source>
-        <translation type="unfinished"></translation>
+        <translation>Редагувати список учасників</translation>
     </message>
     <message>
         <source>Edit Administrators List</source>
-        <translation type="unfinished"></translation>
+        <translation>Редагувати список адміністраторів</translation>
     </message>
     <message>
         <source>Edit Owners List</source>
-        <translation type="unfinished"></translation>
+        <translation>Редагувати список власників</translation>
     </message>
     <message>
         <source>Configure Conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Налаштувати конференцію</translation>
     </message>
     <message>
         <source>Destroy Conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Видалити конференцію</translation>
     </message>
     <message>
         <source>Enter conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Зайти до конференції</translation>
     </message>
     <message>
         <source>Exit conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Залишити конференцію</translation>
     </message>
     <message>
         <source>Clear Chat Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Очистити вікно чату</translation>
     </message>
     <message>
         <source>Enter your new nick name in conference %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Введіть ваше нове прізвисько в кімнаті %1</translation>
     </message>
     <message>
         <source>Enter new topic for conference %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Введіть нову тему для конференції %1</translation>
     </message>
     <message>
         <source>Please, enter this conference!</source>
-        <translation type="unfinished"></translation>
+        <translation>Будь ласка, ввійдіть до цієї конференції!</translation>
     </message>
     <message>
         <source>Destroying conference</source>
-        <translation type="unfinished"></translation>
+        <translation>Знищити конференцію</translation>
     </message>
     <message>
         <source>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Jabber ID:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Role:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Тип:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Affiliation:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Членство:&lt;/b&gt; %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
+    </message>
+    <message>
+        <source>This room is non-anonymous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You entered into the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You left the room</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

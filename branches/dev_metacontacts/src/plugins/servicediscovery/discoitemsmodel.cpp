@@ -1,5 +1,7 @@
 #include "discoitemsmodel.h"
 
+#include <definitions/discoitemdataroles.h>
+
 DiscoItemsModel::DiscoItemsModel(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, QObject *AParent) : QAbstractItemModel(AParent)
 {
 	FDiscovery = ADiscovery;
@@ -231,7 +233,7 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 		if (!ADiscoInfo.identity.isEmpty())
 		{
 			toolTip+=tr("<li><b>Identity:</b></li>");
-			foreach(IDiscoIdentity identity, ADiscoInfo.identity)
+			foreach(const IDiscoIdentity &identity, ADiscoInfo.identity)
 				toolTip+=tr("<li>%1 (Category: '%2'; Type: '%3')</li>").arg(identity.name).arg(identity.category).arg(identity.type);
 		}
 
@@ -240,7 +242,7 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 			QStringList features = ADiscoInfo.features;
 			qSort(features);
 			toolTip+=tr("<li><b>Features:</b></li>");
-			foreach(QString feature, features)
+			foreach(const QString &feature, features)
 			{
 				IDiscoFeature dfeature = FDiscovery->discoFeature(feature);
 				toolTip+=QString("<li>%1</li>").arg(dfeature.name.isEmpty() ? feature : dfeature.name);
@@ -253,7 +255,7 @@ QString DiscoItemsModel::itemToolTip(const IDiscoInfo &ADiscoInfo) const
 			{
 				IDataForm form = FDataForms->localizeForm(ADiscoInfo.extensions.at(iform));
 				toolTip += QString("<li><b>%1:</b></li>").arg(!form.title.isEmpty() ? form.title : FDataForms->fieldValue("FORM_TYPE",form.fields).toString());
-				foreach(IDataField field, form.fields)
+				foreach(const IDataField &field, form.fields)
 				{
 					if (field.var != "FORM_TYPE")
 					{
@@ -386,7 +388,7 @@ void DiscoItemsModel::onDiscoItemsReceived(const IDiscoItems &ADiscoItems)
 			parentIndex->itemsFetched = true;
 			QList<DiscoItemIndex*> appendList;
 			QList<DiscoItemIndex*> updateList;
-			foreach(IDiscoItem item, ADiscoItems.items)
+			foreach(const IDiscoItem &item, ADiscoItems.items)
 			{
 				QList<DiscoItemIndex *> childIndexes = findIndex(item.itemJid,item.node,parentIndex,false);
 				if (childIndexes.isEmpty())

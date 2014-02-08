@@ -8,16 +8,16 @@
         <translation>Autostatus</translation>
     </message>
     <message>
-        <source>Status changed automatically to &apos;away&apos;</source>
-        <translation>Status zmieniony automatycznie na &apos;Odszedłem od komputera&apos;</translation>
-    </message>
-    <message>
         <source>Auto Status</source>
         <translation>Autostatus</translation>
     </message>
     <message>
         <source>Allows to change the status in accordance with the time of inactivity</source>
         <translation>Pozwala na zmianę statusu w zależności od czasu bezczynności</translation>
+    </message>
+    <message>
+        <source>Auto status &apos;Away&apos; due to inactivity for more than #(m) minutes</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -33,10 +33,6 @@
     <message>
         <source>Text</source>
         <translation>Tekst</translation>
-    </message>
-    <message>
-        <source>Auto status: away</source>
-        <translation>Autostatus: Odszedłem od komputera</translation>
     </message>
     <message>
         <source>You can insert date and time into auto status text:</source>
@@ -161,6 +157,14 @@
     <message>
         <source>   Status is set to &apos;away&apos; at %(hh:mm:ss), because of idle from $(hh:mm:ss) for #(mm) minutes and #(ss) seconds</source>
         <translation>   Status ustawiony jako &apos;odszedłem&apos; o %(hh:mm:ss), z powodu bezczynności od $(hh:mm:ss) przez #(mm) minut i #(ss) sekund</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto status</source>
+        <translation type="unfinished">Autostatus</translation>
     </message>
 </context>
 <context>

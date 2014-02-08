@@ -269,6 +269,18 @@
         <source>Add</source>
         <translation>Додати</translation>
     </message>
+    <message>
+        <source>Duplicate messages in local archive (not recommended)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Replication Preferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronize history between archives</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ArchiveViewWindow</name>
@@ -649,19 +661,19 @@
     </message>
     <message>
         <source>Failed to load conversation headers</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити заголовки розмов</translation>
     </message>
     <message>
         <source>Failed to save conversation</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося зберегти розмову</translation>
     </message>
     <message>
         <source>Failed to remove conversation</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося видалити розмову</translation>
     </message>
     <message>
         <source>Failed to load archive modifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалося завантажити список змін до архіву</translation>
     </message>
 </context>
 </TS>

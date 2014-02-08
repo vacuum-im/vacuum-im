@@ -2,6 +2,21 @@
 
 #include <QProcess>
 #include <QVBoxLayout>
+#include <definitions/notificationdataroles.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <utils/widgetmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define FIRST_KIND         0x0001
 #define LAST_KIND          0x8000
@@ -51,6 +66,7 @@ void Notifications::pluginInfo(IPluginInfo *APluginInfo)
 bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
+
 	IPlugin *plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
 	if (plugin)
 	{
@@ -69,40 +85,52 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOr
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
 		if (FRostersViewPlugin)
 		{
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyActivated(int)),
-				SLOT(onRosterNotifyActivated(int)));
-			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyRemoved(int)),
-				SLOT(onRosterNotifyRemoved(int)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyActivated(int)),SLOT(onRosterNotifyActivated(int)));
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(notifyRemoved(int)),SLOT(onRosterNotifyRemoved(int)));
 		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
 	if (plugin)
+	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IAvatars").value(0,NULL);
 	if (plugin)
+	{
 		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IRosterPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FRosterPlugin = qobject_cast<IRosterPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
+	{
 		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
+	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
+	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IUrlProcessor").value(0);
 	if (plugin)
@@ -112,6 +140,7 @@ bool Notifications::initConnections(IPluginManager *APluginManager, int &AInitOr
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString, QWidget *)),SLOT(onShortcutActivated(const QString, QWidget *)));
 
 	return true;
@@ -160,9 +189,10 @@ bool Notifications::initObjects()
 	}
 
 	FNetworkAccessManager = FUrlProcessor!=NULL ? FUrlProcessor->networkAccessManager() : new QNetworkAccessManager(this);
-
-	NotifyWidget::setMainWindow(FMainWindowPlugin->mainWindow());
-
+	
+	NotifyWidget::setNetworkManager(FNetworkAccessManager);
+	NotifyWidget::setMainWindow(FMainWindowPlugin!=NULL ? FMainWindowPlugin->mainWindow() : NULL);
+	
 	return true;
 }
 
@@ -182,6 +212,7 @@ bool Notifications::initSettings()
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsHolder(this);
 	}
+
 	return true;
 }
 
@@ -218,12 +249,15 @@ INotification Notifications::notificationById(int ANotifyId) const
 
 int Notifications::appendNotification(const INotification &ANotification)
 {
-	NotifyRecord record;
 	int notifyId = ++FNotifyId;
+	LOG_INFO(QString("Appending notification, id=%1, type=%2, kinds=%3, flags=%4").arg(notifyId).arg(ANotification.typeId).arg(ANotification.kinds).arg(ANotification.flags));
+
+	NotifyRecord record;
 	record.notification = ANotification;
 	emit notificationAppend(notifyId, record.notification);
 
 	bool isDND = FStatusChanger!=NULL ? FStatusChanger->statusItemShow(STATUS_MAIN_ID)==IPresence::DoNotDisturb : false;
+	bool diableSound = isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool();
 
 	QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
 	QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
@@ -260,44 +294,39 @@ int Notifications::appendNotification(const INotification &ANotification)
 			connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
 			connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
 			connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
-			record.popupWidget->setAnimated(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE).value().toBool());
-			record.popupWidget->setNetworkAccessManager(FNetworkAccessManager);
 			record.popupWidget->appear();
 		}
 	}
 
-	if (FTrayManager)
+	if (FTrayManager && (record.notification.kinds & INotification::TrayNotify)>0)
 	{
-		if ((record.notification.kinds & INotification::TrayNotify)>0)
+		if (!showNotifyByHandler(INotification::TrayNotify,notifyId,record.notification))
 		{
-			if (!showNotifyByHandler(INotification::TrayNotify,notifyId,record.notification))
-			{
-				ITrayNotify notify;
-				notify.blink = true;
-				notify.icon = icon;
-				notify.toolTip = toolTip;
-				record.trayId = FTrayManager->appendNotify(notify);
-			}
-			FTrayNotifies.append(notifyId);
-			FActivateLast->setIcon(icon);
-			FActivateLast->setVisible(true);
+			ITrayNotify notify;
+			notify.blink = true;
+			notify.icon = icon;
+			notify.toolTip = toolTip;
+			record.trayId = FTrayManager->appendNotify(notify);
 		}
+		FTrayNotifies.append(notifyId);
+		FActivateLast->setIcon(icon);
+		FActivateLast->setVisible(true);
+	}
 
-		if (!toolTip.isEmpty() && (record.notification.kinds & INotification::TrayAction)>0)
+	if (FTrayManager && !toolTip.isEmpty() && (record.notification.kinds & INotification::TrayAction)>0)
+	{
+		if (!showNotifyByHandler(INotification::TrayAction,notifyId,record.notification))
 		{
-			if (!showNotifyByHandler(INotification::TrayAction,notifyId,record.notification))
-			{
-				record.trayAction = new Action(FNotifyMenu);
-				record.trayAction->setIcon(icon);
-				record.trayAction->setText(toolTip);
-				record.trayAction->setData(ADR_NOTIFYID,notifyId);
-				connect(record.trayAction,SIGNAL(triggered(bool)),SLOT(onActionNotifyActivated(bool)));
-				FNotifyMenu->addAction(record.trayAction);
-			}
+			record.trayAction = new Action(FNotifyMenu);
+			record.trayAction->setIcon(icon);
+			record.trayAction->setText(toolTip);
+			record.trayAction->setData(ADR_NOTIFYID,notifyId);
+			connect(record.trayAction,SIGNAL(triggered(bool)),SLOT(onActionNotifyActivated(bool)));
+			FNotifyMenu->addAction(record.trayAction);
 		}
 	}
 
-	if (!(isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool()) && (record.notification.kinds & INotification::SoundPlay)>0)
+	if (!diableSound && (record.notification.kinds & INotification::SoundPlay)>0)
 	{
 		if (!showNotifyByHandler(INotification::SoundPlay,notifyId,record.notification))
 		{
@@ -366,6 +395,9 @@ int Notifications::appendNotification(const INotification &ANotification)
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
 	FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
 
+	FDelayedRemovals.append(notifyId);
+	QTimer::singleShot(0,this,SLOT(onDelayedRemovals()));
+
 	FNotifyRecords.insert(notifyId,record);
 	emit notificationAppended(notifyId, record.notification);
 
@@ -376,6 +408,7 @@ void Notifications::activateNotification(int ANotifyId)
 {
 	if (FNotifyRecords.contains(ANotifyId))
 	{
+		LOG_INFO(QString("Activating notification, id=%1").arg(ANotifyId));
 		emit notificationActivated(ANotifyId);
 	}
 }
@@ -384,6 +417,7 @@ void Notifications::removeNotification(int ANotifyId)
 {
 	if (FNotifyRecords.contains(ANotifyId))
 	{
+		LOG_INFO(QString("Removing notification, id=%1").arg(ANotifyId));
 		NotifyRecord record = FNotifyRecords.take(ANotifyId);
 		if (FRostersViewPlugin && record.rosterId!=0)
 		{
@@ -421,6 +455,7 @@ void Notifications::removeNotification(int ANotifyId)
 				FActivateLast->setVisible(false);
 			}
 		}
+		qDeleteAll(record.notification.actions);
 
 		FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
 		FNotifyMenu->menuAction()->setVisible(!FNotifyMenu->isEmpty());
@@ -437,6 +472,7 @@ void Notifications::registerNotificationType(const QString &ATypeId, const INoti
 		typeRecord.kinds = UNDEFINED_KINDS;
 		typeRecord.type = AType;
 		FTypeRecords.insert(ATypeId,typeRecord);
+		LOG_DEBUG(QString("Registered notification type, id=%1").arg(ATypeId));
 	}
 }
 
@@ -503,6 +539,7 @@ void Notifications::insertNotificationHandler(int AOrder, INotificationHandler *
 {
 	if (AHandler != NULL)
 	{
+		LOG_DEBUG(QString("Notification handler inserted, order=%1").arg(AOrder));
 		FHandlers.insertMulti(AOrder, AHandler);
 		emit notificationHandlerInserted(AOrder,AHandler);
 	}
@@ -512,6 +549,7 @@ void Notifications::removeNotificationHandler(int AOrder, INotificationHandler *
 {
 	if (FHandlers.contains(AOrder,AHandler))
 	{
+		LOG_DEBUG(QString("Notification handler removed, order=%1").arg(AOrder));
 		FHandlers.remove(AOrder,AHandler);
 		emit notificationHandlerRemoved(AOrder,AHandler);
 	}
@@ -592,6 +630,13 @@ void Notifications::removeInvisibleNotification(int ANotifyId)
 		if (invisible)
 			removeNotification(ANotifyId);
 	}
+}
+
+void Notifications::onDelayedRemovals()
+{
+	foreach(int notifyId, FDelayedRemovals)
+		removeInvisibleNotification(notifyId);
+	FDelayedRemovals.clear();
 }
 
 void Notifications::onDelayedActivations()

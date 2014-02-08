@@ -90,7 +90,7 @@
     </message>
     <message>
         <source>Send as Chat Message</source>
-        <translation type="unfinished"></translation>
+        <translation>Send as Chat Message</translation>
     </message>
 </context>
 </TS>

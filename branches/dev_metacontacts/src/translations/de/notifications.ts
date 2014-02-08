@@ -110,11 +110,4 @@
         <translation>Standard wiederherstellen</translation>
     </message>
 </context>
-<context>
-    <name>NotifyWidget</name>
-    <message>
-        <source>Notification</source>
-        <translation>Benachrichtigung</translation>
-    </message>
-</context>
 </TS>

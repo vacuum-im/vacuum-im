@@ -11,10 +11,9 @@
 #include <QListWidget>
 #include <QDateTimeEdit>
 #include <interfaces/idataforms.h>
-#include <utils/jid.h>
 
 class TextEdit :
-			public QTextEdit
+	public QTextEdit
 {
 	Q_OBJECT;
 public:
@@ -25,7 +24,7 @@ public:
 };
 
 class ListWidget :
-			public QListWidget
+	public QListWidget
 {
 	Q_OBJECT;
 public:
@@ -36,8 +35,8 @@ public:
 };
 
 class DataFieldWidget :
-			public QWidget,
-			public IDataFieldWidget
+	public QWidget,
+	public IDataFieldWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IDataFieldWidget);

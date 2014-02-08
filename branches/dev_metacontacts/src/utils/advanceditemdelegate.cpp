@@ -14,11 +14,17 @@
 #include <QItemEditorFactory>
 #include <QWindowsVistaStyle>
 
-const qreal BlinkHideSteps[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
-const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.0 };
-const int BlinkStepsCount = sizeof(BlinkHideSteps)/sizeof(BlinkHideSteps[0]);
-const int BlinkStepsTime = 1000;
+static const qreal BlinkHideSteps[] = { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0 };
+static const qreal BlinkFadeSteps[] = { 1.0, 0.8, 0.6, 0.4, 0.2, 0.2, 0.4, 0.6, 0.8, 1.0 };
+static const int BlinkStepsCount = sizeof(BlinkHideSteps)/sizeof(BlinkHideSteps[0]);
+static const int BlinkStepsTime = 1000;
 #define BLINK_STEP ((QDateTime::currentMSecsSinceEpoch() % BlinkStepsTime) * BlinkStepsCount / BlinkStepsTime)
+
+const quint32 AdvancedDelegateItem::NullId        = 0;
+const quint32 AdvancedDelegateItem::BranchId      = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,10);
+const quint32 AdvancedDelegateItem::CheckStateId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,100);
+const quint32 AdvancedDelegateItem::DecorationId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,500);
+const quint32 AdvancedDelegateItem::DisplayId     = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,500);
 
 void registerAdvancedDelegateItemStreamOperators()
 {
@@ -65,12 +71,6 @@ QString getSingleLineText(const QString &AText)
 /*********************
  AdvancedDelegateItem
 **********************/
-const quint32 AdvancedDelegateItem::NullId        = 0;
-const quint32 AdvancedDelegateItem::BranchId      = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,10);
-const quint32 AdvancedDelegateItem::CheckStateId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,100);
-const quint32 AdvancedDelegateItem::DecorationId  = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleLeft,128,500);
-const quint32 AdvancedDelegateItem::DisplayId     = AdvancedDelegateItem::makeId(AdvancedDelegateItem::MiddleCenter,128,500);
-
 QDataStream &operator<<(QDataStream &AStream, const AdvancedDelegateItem &AItem)
 {
 	AStream 
@@ -693,10 +693,11 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 	AdvancedDelegateItems stretches;
 	for(AdvancedDelegateItems::iterator it=items.begin(); it!=items.end(); ++it)
 	{
-		quint8 position = AdvancedDelegateItem::getPosition(it->d->id);
+		AdvancedDelegateItem::ExplicitData *itd = it->d;
+		quint8 position = AdvancedDelegateItem::getPosition(itd->id);
 		if (position == AdvancedDelegateItem::MiddleCenter)
 		{
-			quint8 floor = AdvancedDelegateItem::getFloor(it->d->id);
+			quint8 floor = AdvancedDelegateItem::getFloor(itd->id);
 			quint32 stretchId = AdvancedDelegateItem::makeStretchId(position,floor);
 			if (!stretches.contains(stretchId) && !items.contains(stretchId))
 			{
@@ -707,12 +708,12 @@ AdvancedDelegateItems AdvancedItemDelegate::getIndexItems(const QModelIndex &AIn
 			}
 		}
 
-		it->c->value = it->d->data;
-		if (it->d->kind==AdvancedDelegateItem::Decoration || it->d->kind==AdvancedDelegateItem::Display || it->d->kind==AdvancedDelegateItem::CustomData)
-			if (it->d->data.type() == QVariant::Int)
-				it->c->value = AIndex.data(it->d->data.toInt());
+		it->c->value = itd->data;
+		if (itd->kind==AdvancedDelegateItem::Decoration || itd->kind==AdvancedDelegateItem::Display || itd->kind==AdvancedDelegateItem::CustomData)
+			if (itd->data.type() == QVariant::Int)
+				it->c->value = AIndex.data(itd->data.toInt());
 		
-		it->c->blinkOpacity = (it->d->flags & AdvancedDelegateItem::Blink)>0 ? FBlinkOpacity : 1.0;
+		it->c->blinkOpacity = (itd->flags & AdvancedDelegateItem::Blink)>0 ? FBlinkOpacity : 1.0;
 	}
 	items.unite(stretches);
 	
@@ -874,9 +875,10 @@ AdvancedItemDelegate::ItemsLayout *AdvancedItemDelegate::createItemsLayout(const
 		QStyleOptionViewItemV4 itemOption = itemStyleOption(it.value(),AIndexOption);
 		if (isItemVisible(it.value(),itemOption))
 		{
-			quint8 position = AdvancedDelegateItem::getPosition(it->d->id);
-			quint8 floor = AdvancedDelegateItem::getFloor(it->d->id);
-			quint16 order = AdvancedDelegateItem::getOrder(it->d->id);
+			quint32 itemId = it->d->id;
+			quint8 position = AdvancedDelegateItem::getPosition(itemId);
+			quint8 floor = AdvancedDelegateItem::getFloor(itemId);
+			quint16 order = AdvancedDelegateItem::getOrder(itemId);
 
 			QMap<int, QBoxLayout *> &posLayouts = layout->positionLayouts;
 			QBoxLayout *&posLayout = posLayouts[position];
@@ -1157,7 +1159,7 @@ bool AdvancedItemDelegate::editorEvent(QEvent *AEvent, QAbstractItemModel *AMode
 void AdvancedItemDelegate::onBlinkTimerTimeout()
 {
 	qreal blinkOpacity = FBlinkMode==BlinkHide ? BlinkHideSteps[BLINK_STEP] : BlinkFadeSteps[BLINK_STEP];
-	if (FBlinkOpacity != blinkOpacity)
+	if (qAbs(FBlinkOpacity-blinkOpacity) > 0.01)
 	{
 		FBlinkOpacity = blinkOpacity;
 		emit updateBlinkItems();

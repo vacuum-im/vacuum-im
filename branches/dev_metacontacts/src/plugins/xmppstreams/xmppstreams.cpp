@@ -1,5 +1,9 @@
 #include "xmppstreams.h"
 
+#include <definitions/internalerrors.h>
+#include <utils/options.h>
+#include <utils/logger.h>
+
 XmppStreams::XmppStreams()
 {
 
@@ -60,6 +64,7 @@ IXmppStream *XmppStreams::newXmppStream(const Jid &AStreamJid)
 	IXmppStream *stream = xmppStream(AStreamJid);
 	if (!stream)
 	{
+		LOG_STRM_INFO(AStreamJid,"XMPP stream created");
 		stream = new XmppStream(this, AStreamJid);
 		connect(stream->instance(), SIGNAL(streamDestroyed()), SLOT(onStreamDestroyed()));
 		FStreams.append(stream);
@@ -77,6 +82,7 @@ void XmppStreams::addXmppStream(IXmppStream *AXmppStream)
 {
 	if (AXmppStream && !FActiveStreams.contains(AXmppStream))
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"Registering XMPP stream");
 		connect(AXmppStream->instance(), SIGNAL(opened()), SLOT(onStreamOpened()));
 		connect(AXmppStream->instance(), SIGNAL(aboutToClose()), SLOT(onStreamAboutToClose()));
 		connect(AXmppStream->instance(), SIGNAL(closed()), SLOT(onStreamClosed()));
@@ -93,6 +99,7 @@ void XmppStreams::removeXmppStream(IXmppStream *AXmppStream)
 {
 	if (FActiveStreams.contains(AXmppStream))
 	{
+		LOG_STRM_INFO(AXmppStream->streamJid(),"Unregistering XMPP stream");
 		if (AXmppStream->isConnected())
 		{
 			AXmppStream->close();
@@ -121,6 +128,7 @@ void XmppStreams::registerXmppFeature(int AOrder, const QString &AFeatureNS)
 {
 	if (!AFeatureNS.isEmpty() && !FFeatureOrders.values().contains(AFeatureNS))
 	{
+		LOG_DEBUG(QString("XMPP feature registered, order=%1, feature=%2").arg(AOrder).arg(AFeatureNS));
 		FFeatureOrders.insertMulti(AOrder,AFeatureNS);
 		emit xmppFeatureRegistered(AOrder,AFeatureNS);
 	}
@@ -135,6 +143,7 @@ void XmppStreams::registerXmppFeaturePlugin(int AOrder, const QString &AFeatureN
 {
 	if (AFeaturePlugin && !AFeatureNS.isEmpty())
 	{
+		LOG_DEBUG(QString("XMPP feature plugin registered, order=%1, feature=%2, class=%3").arg(AOrder).arg(AFeatureNS,AFeaturePlugin->instance()->metaObject()->className()));
 		FFeaturePlugins[AFeatureNS].insertMulti(AOrder,AFeaturePlugin);
 		emit xmppFeaturePluginRegistered(AOrder,AFeatureNS,AFeaturePlugin);
 	}
@@ -193,6 +202,7 @@ void XmppStreams::onStreamDestroyed()
 	IXmppStream *stream = qobject_cast<IXmppStream *>(sender());
 	if (stream)
 	{
+		LOG_STRM_INFO(stream->streamJid(),"XMPP stream destroyed");
 		removeXmppStream(stream);
 		FStreams.removeAt(FStreams.indexOf(stream));
 		emit streamDestroyed(stream);

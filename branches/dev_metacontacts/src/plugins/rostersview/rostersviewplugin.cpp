@@ -5,6 +5,29 @@
 #include <QScrollBar>
 #include <QApplication>
 #include <QTextDocument>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/mainwindowtabpages.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rosterproxyorders.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/rosterdataholderorders.h>
+#include <definitions/rosterlabelholderorders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/action.h>
+#include <utils/logger.h>
 
 #define ADR_CLIPBOARD_DATA      Action::DR_Parametr1
 
@@ -66,30 +89,38 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 	{
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
-		{
 			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex *, int)));
-		}
 	}
 
 	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
+	{
 		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
 	if (plugin)
+	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IMainWindowPlugin").value(0,NULL);
 	if (plugin)
+	{
 		FMainWindowPlugin = qobject_cast<IMainWindowPlugin *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
 	if (plugin)
+	{
 		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
 
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
 	if (plugin)
+	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -134,6 +165,7 @@ bool RostersViewPlugin::initObjects()
 	}
 
 	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW,this);
+	FRostersView->insertLabelHolder(RLHO_ROSTERSVIEW_NOTIFY,FRostersView);
 
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYJID,FRostersView);
 	Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COPYNAME,FRostersView);
@@ -282,7 +314,7 @@ QList<quint32> RostersViewPlugin::rosterLabels(int AOrder, const IRosterIndex *A
 
 		if (FRostersModel)
 		{
-			if (AIndex->parentIndex()==FRostersModel->rootIndex())
+			if (AIndex->parentIndex() == FRostersModel->rootIndex())
 				labels.append(AdvancedDelegateItem::DisplayId);
 			else if (FRostersModel->isGroupKind(AIndex->kind()))
 				labels.append(AdvancedDelegateItem::DisplayId);
@@ -301,7 +333,7 @@ AdvancedDelegateItem RostersViewPlugin::rosterLabel(int AOrder, quint32 ALabelId
 			displayLabel.d->id = AdvancedDelegateItem::DisplayId;
 			displayLabel.d->kind = AdvancedDelegateItem::Display;
 			displayLabel.d->data = AIndex->data(Qt::DisplayRole);
-			if (AIndex->parentIndex()==FRostersModel->rootIndex())
+			if (AIndex->parentIndex() == FRostersModel->rootIndex())
 				displayLabel.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::Bold);
 			else if (FRostersModel->isGroupKind(AIndex->kind()))
 				displayLabel.d->hints.insert(AdvancedDelegateItem::FontWeight,QFont::DemiBold);
@@ -361,7 +393,10 @@ void RostersViewPlugin::restoreExpandState(const QModelIndex &AParent)
 void RostersViewPlugin::registerExpandableRosterIndexKind(int AKind, int AUniqueRole)
 {
 	if (!FExpandableKinds.contains(AKind))
+	{
+		LOG_DEBUG(QString("Expandable roster index registered, kind=%1, role=%2").arg(AKind).arg(AUniqueRole));
 		FExpandableKinds.insert(AKind,AUniqueRole);
+	}
 }
 
 QString RostersViewPlugin::rootExpandId(const QModelIndex &AIndex) const
@@ -621,8 +656,6 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
-		QString ttInfo;
-
 		if (AIndex->kind() == RIK_CONTACTS_ROOT)
 		{
 			QStringList streamsToolTips;
@@ -637,24 +670,24 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 					streamsToolTips.append(tooltip);
 				}
 			}
-			ttInfo = QString("<span>%1</span>").arg(streamsToolTips.join("<hr><p/><nbsp>"));
+			AToolTips.insert(RTTO_ROSTERSVIEW_INFO_STREAMS,QString("<span>%1</span>").arg(streamsToolTips.join("<hr><p/><nbsp>")));
 		}
 		else
 		{
 			QString name = AIndex->data(RDR_NAME).toString();
 			if (!name.isEmpty())
-				ttInfo += "<big><b>" + Qt::escape(name) + "</b></big><br>";
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,"<big><b>" + Qt::escape(name) + "</b></big>");
 
 			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 			if (!streamJid.isEmpty() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
 			{
 				IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
-				ttInfo += tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())) + "<br>";
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())));
 			}
 
 			Jid itemJid = AIndex->data(RDR_FULL_JID).toString();
 			if (!itemJid.isEmpty())
-				ttInfo += tr("<b>Jabber ID:</b> %1").arg(Qt::escape(itemJid.uBare())) + "<br>";
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(itemJid.uBare())));
 
 			QString ask = AIndex->data(RDR_ASK).toString();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
@@ -669,59 +702,51 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 					subsName = tr("Provided from you");
 
 				if (ask == SUBSCRIPTION_SUBSCRIBE)
-					ttInfo += tr("<b>Subscription:</b> %1, request sent").arg(Qt::escape(subsName)) + "<br>";
+					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1, request sent").arg(Qt::escape(subsName)));
 				else
-					ttInfo += tr("<b>Subscription:</b> %1").arg(Qt::escape(subsName)) + "<br>";
+					AToolTips.insert(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION,tr("<b>Subscription:</b> %1").arg(Qt::escape(subsName)));
 			}
-		}
-
-		if (!ttInfo.isEmpty())
-		{
-			if (ttInfo.endsWith("<br>"))
-				ttInfo.chop(4);
-			AToolTips.insert(RTTO_ROSTERSVIEW_INFO,ttInfo);
 		}
 
 		QStringList resources = AIndex->data(RDR_RESOURCES).toStringList();
 		if (!resources.isEmpty())
 		{
-			QString ttResources = "<hr>";
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE,"<hr>");
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
-			foreach(QString itemJid, resources)
+			for(int resIndex=0; resIndex<10 && resIndex<resources.count(); resIndex++)
 			{
-				IPresenceItem pitem = presence!=NULL ? presence->findItem(itemJid) : IPresenceItem();
+				int orderShift = resIndex*100;
+				IPresenceItem pitem = presence!=NULL ? presence->findItem(resources.at(resIndex)) : IPresenceItem();
 				if (pitem.isValid)
 				{
-					ttResources += tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(pitem.itemJid.resource())).arg(pitem.priority) + "<br>";
-					QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(pitem.show) : QString::null;
-					ttResources += tr("<b>Status:</b> %1").arg(Qt::escape(statusName)) + "<br>";
-					ttResources += Qt::escape(pitem.status).replace('\n',"<br>");
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(pitem.itemJid.resource())).arg(pitem.priority));
 
-					if (ttResources.endsWith("<br>"))
-						ttResources.chop(4);
-					ttResources += "<hr>";
+					QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(pitem.show) : QString::null;
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME+orderShift,tr("<b>Status:</b> %1").arg(Qt::escape(statusName)));
+
+					if (!pitem.status.isEmpty())
+						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,Qt::escape(pitem.status).replace('\n',"<br>"));
+
+					if (resIndex < resources.count()-1)
+						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
 				}
 			}
-			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCES,ttResources);
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE,"<hr>");
 		}
 		else if (!AIndex->data(RDR_FULL_JID).isNull() && !AIndex->data(RDR_SHOW).isNull())
 		{
-			QString ttResource;
-
 			int show = AIndex->data(RDR_SHOW).toInt();
 			int priority = AIndex->data(RDR_PRIORITY).toInt();
 			QString resource = Jid(AIndex->data(RDR_FULL_JID).toString()).resource();
-			if (show!=IPresence::Offline && show!=IPresence::Error)
-				ttResource += tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(resource)).arg(priority) + "<br>";
+			if (!resource.isEmpty() && show!=IPresence::Offline && show!=IPresence::Error)
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(resource)).arg(priority));
 
-			QString status = AIndex->data(RDR_STATUS).toString();
 			QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(show) : QString::null;
-			ttResource += tr("<b>Status:</b> %1").arg(Qt::escape(statusName)) + "<br>";
-			ttResource += Qt::escape(status).replace('\n',"<br>");
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME,tr("<b>Status:</b> %1").arg(Qt::escape(statusName)));
 
-			if (ttResource.endsWith("<br>"))
-				ttResource.chop(4);
-			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCES,ttResource);
+			QString statusText = AIndex->data(RDR_STATUS).toString();
+			if (!statusText.isEmpty())
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT,Qt::escape(statusText).replace('\n',"<br>"));
 		}
 	}
 }
@@ -810,7 +835,7 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 		FShowMergedStreams = ANode.value().toBool();
 		if (FRostersView->rostersModel())
 		{
-			foreach(Jid streamJid, FRostersView->rostersModel()->streams())
+			foreach(const Jid &streamJid, FRostersView->rostersModel()->streams())
 				emit rosterDataChanged(FRostersView->rostersModel()->streamIndex(streamJid),RDR_FORCE_VISIBLE);
 		}
 	}
@@ -836,8 +861,9 @@ void RostersViewPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget
 		QModelIndex index = FRostersView->instance()->currentIndex();
 		if (AId==SCT_ROSTERVIEW_COPYJID && AWidget==FRostersView)
 		{
-			if (!index.data(RDR_FULL_JID).toString().isEmpty())
-				QApplication::clipboard()->setText(index.data(RDR_FULL_JID).toString());
+			Jid jid = index.data(RDR_FULL_JID).toString();
+			if (!jid.isEmpty())
+				QApplication::clipboard()->setText(jid.uBare());
 		}
 		else if (AId==SCT_ROSTERVIEW_COPYNAME && AWidget==FRostersView)
 		{

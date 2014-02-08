@@ -4,29 +4,6 @@
 #define CHATMESSAGEHANDLER_UUID "{b60cc0e4-8006-4909-b926-fcb3cbc506f0}"
 
 #include <QTimer>
-#include <definitions/messagehandlerorders.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/rosterclickhookerorders.h>
-#include <definitions/rosternotifyorders.h>
-#include <definitions/recentitemtypes.h>
-#include <definitions/notificationtypes.h>
-#include <definitions/notificationdataroles.h>
-#include <definitions/notificationtypeorders.h>
-#include <definitions/tabpagenotifypriorities.h>
-#include <definitions/messagedataroles.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/actiongroups.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
-#include <definitions/soundfiles.h>
-#include <definitions/shortcuts.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/toolbargroups.h>
-#include <definitions/messageeditsendhandlerorders.h>
-#include <definitions/xmppurihandlerorders.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/imessagewidgets.h>
@@ -45,15 +22,16 @@
 #include <interfaces/istatuschanger.h>
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/irecentcontacts.h>
-#include <utils/options.h>
-#include <utils/shortcuts.h>
-#include <utils/textmanager.h>
-#include <utils/widgetmanager.h>
 
 struct WindowStatus {
 	QDateTime startTime;
 	QDateTime createTime;
 	QDate lastDateSeparator;
+};
+
+struct WindowContent {
+	QString html;
+	IMessageContentOptions options;
 };
 
 class ChatMessageHandler :
@@ -117,6 +95,8 @@ protected slots:
 	void onWindowContextMenuRequested(Menu *AMenu);
 	void onWindowToolTipsRequested(QMap<int,QString> &AToolTips);
 	void onWindowNotifierActiveNotifyChanged(int ANotifyId);
+	void onWindowContentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onWindowMessageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
 protected slots:
 	void onStatusIconsChanged();
 	void onAvatarChanged(const Jid &AContactJid);
@@ -128,8 +108,8 @@ protected slots:
 	void onChangeWindowAddressAction();
 	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
+	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
@@ -157,6 +137,7 @@ private:
 private:
 	QMap<QString, IMessageChatWindow *> FHistoryRequests;
 	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
+	QMap<IMessageChatWindow *, QList<WindowContent> > FPendingContent;
 };
 
 #endif // CHATMESSAGEHANDLER_H

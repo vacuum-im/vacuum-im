@@ -20,7 +20,6 @@ public:
 	virtual void appendCentralPage(IMainCentralPage *APage);
 	virtual void removeCentralPage(IMainCentralPage *APage);
 signals:
-	void currentCentralPageChanged();
 	void currentCentralPageChanged(IMainCentralPage *APage);
 	void centralPageAppended(IMainCentralPage *APage);
 	void centralPageRemoved(IMainCentralPage *APage);

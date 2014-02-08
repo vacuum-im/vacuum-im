@@ -10,7 +10,7 @@
 #include <QMainWindow>
 
 class SelectIconWidget :
-			public QWidget
+	public QWidget
 {
 	Q_OBJECT;
 public:

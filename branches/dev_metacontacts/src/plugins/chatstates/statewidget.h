@@ -3,15 +3,11 @@
 
 #include <QLabel>
 #include <QToolButton>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
 #include <interfaces/ichatstates.h>
 #include <interfaces/imessagewidgets.h>
-#include <utils/menu.h>
-#include <utils/iconstorage.h>
 
 class StateWidget :
-			public QToolButton
+	public QToolButton
 {
 	Q_OBJECT;
 public:

@@ -1,12 +1,16 @@
 #include "discoinfowindow.h"
 
 #include <QHeaderView>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/logger.h>
+#include <utils/menu.h>
 
 #define ADR_FORM_INDEX        Action::DR_Parametr1
 
-DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, const Jid &AContactJid,
-                                 const QString &ANode, QWidget *AParent) : QDialog(AParent)
+DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Discovery Info - %1").arg(AContactJid.uFull()));
@@ -23,11 +27,9 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
 	ui.lblError->setVisible(false);
 
 	initialize();
-	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),
-	        SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+	connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
 	connect(ui.pbtUpdate,SIGNAL(clicked()),SLOT(onUpdateClicked()));
-	connect(ui.lwtFearures,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),
-	        SLOT(onCurrentFeatureChanged(QListWidgetItem *, QListWidgetItem *)));
+	connect(ui.lwtFearures,SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)),SLOT(onCurrentFeatureChanged(QListWidgetItem *, QListWidgetItem *)));
 	connect(ui.lwtFearures,SIGNAL(itemDoubleClicked(QListWidgetItem *)),SLOT(onListItemDoubleClicked(QListWidgetItem *)));
 
 	if (!FDiscovery->hasDiscoInfo(FStreamJid,FContactJid,ANode) || !FDiscovery->discoInfo(FStreamJid,FContactJid,ANode).error.isNull())
@@ -39,6 +41,21 @@ DiscoInfoWindow::DiscoInfoWindow(IServiceDiscovery *ADiscovery, const Jid &AStre
 DiscoInfoWindow::~DiscoInfoWindow()
 {
 
+}
+
+Jid DiscoInfoWindow::streamJid() const
+{
+	return FStreamJid;
+}
+
+Jid DiscoInfoWindow::contactJid() const
+{
+	return FContactJid;
+}
+
+QString DiscoInfoWindow::node() const
+{
+	return FNode;
 }
 
 void DiscoInfoWindow::initialize()
@@ -54,7 +71,7 @@ void DiscoInfoWindow::updateWindow()
 
 	int row = 0;
 	ui.twtIdentity->clearContents();
-	foreach(IDiscoIdentity identity, dinfo.identity)
+	foreach(const IDiscoIdentity &identity, dinfo.identity)
 	{
 		ui.twtIdentity->setRowCount(row+1);
 		ui.twtIdentity->setItem(row,0,new QTableWidgetItem(identity.category));
@@ -66,7 +83,7 @@ void DiscoInfoWindow::updateWindow()
 
 	qSort(dinfo.features);
 	ui.lwtFearures->clear();
-	foreach(QString featureVar, dinfo.features)
+	foreach(const QString &featureVar, dinfo.features)
 	{
 		IDiscoFeature dfeature = FDiscovery->discoFeature(featureVar);
 		dfeature.var = featureVar;

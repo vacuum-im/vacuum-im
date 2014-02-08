@@ -15,22 +15,18 @@
 	#define MESSAGE_SOURCE_PAGER          2
 #endif //Q_WS_X11
 
-namespace WidgetManagerData 
-{
-	static bool isAlertEnabled = true;
-};
-
+// WindowSticker
 class WindowSticker : 
 	public QObject
 {
 public:
-	WindowSticker();
 	static WindowSticker *instance();
-	void insertWindow(QWidget *AWindow);
-	void removeWindow(QWidget *AWindow);
+	static void insertWindow(QWidget *AWindow);
+	static void removeWindow(QWidget *AWindow);
 protected:
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
 private:
+	WindowSticker();
 	int FStickEvent;
 	QPoint FStickPos;
 	QWidget *FCurWindow;
@@ -44,26 +40,20 @@ WindowSticker::WindowSticker()
 
 WindowSticker *WindowSticker::instance()
 {
-	static WindowSticker *sticker = NULL;
-	if (!sticker)
-		sticker = new WindowSticker;
-	return sticker;
+	static WindowSticker *inst = new WindowSticker;
+	return inst;
 }
 
 void WindowSticker::insertWindow(QWidget *AWindow)
 {
 	if (AWindow)
-	{
-		AWindow->installEventFilter(this);
-	}
+		AWindow->installEventFilter(instance());
 }
 
 void WindowSticker::removeWindow(QWidget *AWindow)
 {
 	if (AWindow)
-	{
-		AWindow->removeEventFilter(this);
-	}
+		AWindow->removeEventFilter(instance());
 }
 
 bool WindowSticker::eventFilter(QObject *AWatched, QEvent *AEvent)
@@ -72,9 +62,7 @@ bool WindowSticker::eventFilter(QObject *AWatched, QEvent *AEvent)
 	{
 		QWidget *window = qobject_cast<QWidget *>(AWatched);
 		if (window && window->isWindow())
-		{
 			FCurWindow = window;
-		}
 	}
 	else if (AEvent->type() == QEvent::NonClientAreaMouseButtonRelease)
 	{
@@ -130,6 +118,30 @@ bool WindowSticker::eventFilter(QObject *AWatched, QEvent *AEvent)
 		return true;
 	}
 	return QObject::eventFilter(AWatched,AEvent);
+}
+
+// WidgetManager
+struct WidgetManager::WidgetManagerData {
+	WidgetManagerData() {
+		isAlertEnabled = true;
+	}
+	bool isAlertEnabled;
+};
+
+WidgetManager::WidgetManager()
+{
+	d = new WidgetManagerData;
+}
+
+WidgetManager::~WidgetManager()
+{
+	delete d;
+}
+
+WidgetManager *WidgetManager::instance()
+{
+	static WidgetManager *inst = new WidgetManager;
+	return inst;
 }
 
 void WidgetManager::raiseWidget(QWidget *AWidget)
@@ -188,9 +200,9 @@ void WidgetManager::setWindowSticky( QWidget *AWindow, bool ASticky )
 {
 #ifdef Q_WS_WIN
 	if (ASticky)
-		WindowSticker::instance()->insertWindow(AWindow);
+		WindowSticker::insertWindow(AWindow);
 	else
-		WindowSticker::instance()->removeWindow(AWindow);
+		WindowSticker::removeWindow(AWindow);
 #else
 	Q_UNUSED(AWindow);
 	Q_UNUSED(ASticky);
@@ -205,12 +217,12 @@ void WidgetManager::alertWidget(QWidget *AWidget)
 
 bool WidgetManager::isWidgetAlertEnabled()
 {
-	return WidgetManagerData::isAlertEnabled;
+	return instance()->d->isAlertEnabled;
 }
 
 void WidgetManager::setWidgetAlertEnabled(bool AEnabled)
 {
-	WidgetManagerData::isAlertEnabled = AEnabled;
+	instance()->d->isAlertEnabled = AEnabled;
 }
 
 Qt::Alignment WidgetManager::windowAlignment(const QWidget *AWindow)

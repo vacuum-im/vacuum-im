@@ -1,6 +1,10 @@
 #include "joinmultichatdialog.h"
 
 #include <QMessageBox>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 QDataStream &operator<<(QDataStream &AStream, const RoomParams &AParams)
 {
@@ -18,9 +22,9 @@ QDataStream &operator>>(QDataStream &AStream, RoomParams &AParams)
 	return AStream;
 }
 
-JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid,
-    const QString &ANick, const QString &APassword, QWidget *AParent) : QDialog(AParent)
+JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	setWindowTitle(tr("Join conference"));
@@ -103,12 +107,12 @@ void JoinMultiChatDialog::loadRecentConferences()
 	stream >> FRecentRooms;
 
 	QMultiMap<int, Jid> enters;
-	foreach (Jid roomJid, FRecentRooms.keys())
+	foreach (const Jid &roomJid, FRecentRooms.keys())
 		enters.insertMulti(FRecentRooms.value(roomJid).enters,roomJid);
 
 	ui.cmbHistory->blockSignals(true);
 	ui.cmbHistory->clear();
-	foreach(Jid roomJid, enters)
+	foreach(const Jid &roomJid, enters)
 	{
 		RoomParams params = FRecentRooms.value(roomJid);
 		ui.cmbHistory->addItem(tr("%1 as %2","room as nick").arg(roomJid.uBare()).arg(params.nick),roomJid.bare());

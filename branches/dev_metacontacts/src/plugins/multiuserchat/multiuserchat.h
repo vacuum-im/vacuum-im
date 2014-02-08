@@ -1,10 +1,6 @@
 #ifndef MULTIUSERCHAT_H
 #define MULTIUSERCHAT_H
 
-#include <definitions/multiuserdataroles.h>
-#include <definitions/namespaces.h>
-#include <definitions/messageeditororders.h>
-#include <definitions/stanzahandlerorders.h>
 #include <interfaces/imultiuserchat.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/imessageprocessor.h>
@@ -12,7 +8,6 @@
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
-#include <utils/xmpperror.h>
 #include "multiuser.h"
 
 class MultiUserChat :
@@ -45,13 +40,15 @@ public:
 	virtual QList<int> statusCodes() const;
 	virtual bool isUserPresent(const Jid &AContactJid) const;
 	virtual IMultiUser *mainUser() const;
-	virtual IMultiUser *userByNick(const QString &ANick) const;
 	virtual QList<IMultiUser *> allUsers() const;
+	virtual IMultiUser *userByNick(const QString &ANick) const;
 	//Occupant
 	virtual QString nickName() const;
 	virtual bool setNickName(const QString &ANick);
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
+	virtual IMultiUserChatHistory history() const;
+	virtual void setHistory(const IMultiUserChatHistory &AHistory);
 	virtual int show() const;
 	virtual QString status() const;
 	virtual XmppError roomError() const;
@@ -74,9 +71,11 @@ public:
 	virtual bool sendConfigForm(const IDataForm &AForm);
 	virtual bool destroyRoom(const QString &AReason);
 signals:
+	void chatAboutToConnect();
 	void chatOpened();
 	void chatNotify(const QString &ANotify);
 	void chatError(const QString &AMessage);
+	void chatAboutToDisconnect();
 	void chatClosed();
 	void chatDestroyed();
 	void roomNameChanged(const QString &AName);
@@ -114,7 +113,6 @@ protected slots:
 	void onUserDataChanged(int ARole, const QVariant &ABefore, const QVariant &AAfter);
 	void onPresenceChanged(int AShow, const QString &AStatus, int APriority);
 	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
-	void onPresenceAboutToClose(int AShow, const QString &AStatus);
 	void onStreamClosed();
 	void onStreamJidChanged(const Jid &ABefore);
 private:
@@ -147,6 +145,7 @@ private:
 	MultiUser *FMainUser;
 	XmppError FRoomError;
 	QList<int> FStatusCodes;
+	IMultiUserChatHistory FHistory;
 	QHash<QString, MultiUser *> FUsers;
 };
 

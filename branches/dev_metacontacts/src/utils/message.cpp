@@ -7,17 +7,6 @@ MessageData::MessageData() : FStanza("message")
 
 MessageData::MessageData(const Stanza &AStanza) : FStanza(AStanza)
 {
-	updateDateTime();
-}
-
-MessageData::MessageData(const MessageData &AOther) : QSharedData(AOther), FStanza(AOther.FStanza)
-{
-	FData = AOther.FData;
-	FDateTime = AOther.FDateTime;
-}
-
-void MessageData::updateDateTime()
-{
 	FDateTime = QDateTime::currentDateTime();
 
 	QDomElement delayElem = FStanza.firstElement("delay","urn:xmpp:delay");
@@ -29,6 +18,12 @@ void MessageData::updateDateTime()
 		if (dateTime.isValid())
 			FDateTime = dateTime.toLocal();
 	}
+}
+
+MessageData::MessageData(const MessageData &AOther) : QSharedData(AOther), FStanza(AOther.FStanza)
+{
+	FData = AOther.FData;
+	FDateTime = AOther.FDateTime;
 }
 
 Message::Message()

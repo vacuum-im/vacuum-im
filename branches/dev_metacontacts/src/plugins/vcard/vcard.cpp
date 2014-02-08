@@ -4,6 +4,8 @@
 #include <QFile>
 #include <QBuffer>
 #include <QImageReader>
+#include <definitions/namespaces.h>
+#include <utils/logger.h>
 
 #define DEFAUL_IMAGE_FORMAT       "png"
 
@@ -57,7 +59,7 @@ QMultiHash<QString,QStringList> VCard::values(const QString &AName, const QStrin
 		{
 			QStringList tags;
 			QDomElement parentElem = elem.parentNode().toElement();
-			foreach(QString tag, ATagList)
+			foreach(const QString &tag, ATagList)
 				if (!parentElem.firstChildElement(tag).isNull())
 					tags.append(tag);
 			result.insertMulti(elem.text(),tags);
@@ -75,7 +77,7 @@ QString VCard::value(const QString &AName, const QStringList &ATags, const QStri
 	{
 		tagsFailed = false;
 		QDomElement parentElem = elem.parentNode().toElement();
-		foreach(QString tag, ATagList)
+		foreach(const QString &tag, ATagList)
 		{
 			QDomElement tagElem = parentElem.firstChildElement(tag);
 			if ((tagElem.isNull() && ATags.contains(tag)) || (!tagElem.isNull() && !ATags.contains(tag)))
@@ -104,7 +106,7 @@ void VCard::setTagsForValue(const QString &AName, const QString &AValue, const Q
 	if (!ATags.isEmpty() || !ATagList.isEmpty())
 	{
 		elem = elem.parentNode().toElement();
-		foreach(QString tag, ATags)
+		foreach(const QString &tag, ATags)
 			if (elem.firstChildElement(tag).isNull())
 				elem.appendChild(FDoc.createElement(tag));
 
@@ -127,7 +129,7 @@ void VCard::setValueForTags(const QString &AName, const QString &AValue, const Q
 	{
 		tagsFaild = false;
 		QDomElement parentElem = elem.parentNode().toElement();
-		foreach(QString tag, ATagList)
+		foreach(const QString &tag, ATagList)
 		{
 			QDomElement tagElem = parentElem.firstChildElement(tag);
 			if ((tagElem.isNull() && ATags.contains(tag)) || (!tagElem.isNull() && !ATags.contains(tag)))
@@ -146,7 +148,7 @@ void VCard::setValueForTags(const QString &AName, const QString &AValue, const Q
 	if (!ATags.isEmpty())
 	{
 		elem = elem.parentNode().toElement();
-		foreach(QString tag, ATags)
+		foreach(const QString &tag, ATags)
 			if (elem.firstChildElement(tag).isNull())
 				elem.appendChild(FDoc.createElement(tag));
 	}
@@ -182,9 +184,16 @@ void VCard::loadVCardFile()
 	QFile file(FVCardPlugin->vcardFileName(FContactJid));
 	if (file.open(QIODevice::ReadOnly))
 	{
-		FDoc.setContent(file.readAll());
+		QString xmlError;
+		if (!FDoc.setContent(file.readAll(),&xmlError))
+			REPORT_ERROR(QString("Failed to load vCard from file content: %1").arg(xmlError));
 		file.close();
 	}
+	else
+	{
+		REPORT_ERROR(QString("Failed to load vCard from file: %1").arg(file.errorString()));
+	}
+
 	if (vcardElem().isNull())
 	{
 		FDoc.clear();
@@ -196,6 +205,7 @@ void VCard::loadVCardFile()
 	{
 		FLoadDateTime = QDateTime::fromString(FDoc.documentElement().attribute("dateTime"),Qt::ISODate);
 	}
+
 	emit vcardUpdated();
 }
 
@@ -208,7 +218,7 @@ QDomElement VCard::createElementByName(const QString &AName, const QStringList &
 	while (!elem.isNull() && tagsFaild)
 	{
 		tagsFaild = false;
-		foreach(QString tag, ATagList)
+		foreach(const QString &tag, ATagList)
 		{
 			QDomElement tagElem = elem.firstChildElement(tag);
 			if ((tagElem.isNull() && ATags.contains(tag)) || (!tagElem.isNull() && !ATags.contains(tag)))

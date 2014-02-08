@@ -12,7 +12,7 @@
 class Menu;
 
 class UTILS_EXPORT Action :
-			public QAction
+	public QAction
 {
 	Q_OBJECT;
 public:

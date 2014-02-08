@@ -4,14 +4,13 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QObjectCleanupHandler>
-#include <definitions/optionvalues.h>
 #include <interfaces/idatastreamsmanager.h>
 #include <interfaces/ioptionsmanager.h>
 #include "ui_datastreamsoptions.h"
 
 class DataStreamsOptions :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

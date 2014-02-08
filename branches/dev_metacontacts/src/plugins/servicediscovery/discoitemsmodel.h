@@ -5,14 +5,12 @@
 #include <QList>
 #include <QHash>
 #include <QAbstractItemModel>
-#include <definitions/discoitemdataroles.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/idataforms.h>
 
 #define MAX_ITEMS_FOR_REQUEST   20
 
-struct DiscoItemIndex
-{
+struct DiscoItemIndex {
 	DiscoItemIndex() {
 		parent = NULL;
 		infoFetched = false;
@@ -33,7 +31,7 @@ struct DiscoItemIndex
 };
 
 class DiscoItemsModel :
-			public QAbstractItemModel
+	public QAbstractItemModel
 {
 	Q_OBJECT;
 public:

@@ -6,15 +6,8 @@
 #include <QMultiMap>
 #include <QDomDocument>
 #include <QInputDialog>
-#include <definitions/namespaces.h>
-#include <definitions/optionvalues.h>
-#include <definitions/internalerrors.h>
-#include <definitions/xmppstanzahandlerorders.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/iconnectionmanager.h>
-#include <utils/options.h>
-#include <utils/xmpperror.h>
-#include <utils/versionparser.h>
 #include "streamparser.h"
 
 enum StreamState {
@@ -97,8 +90,8 @@ protected slots:
 	void onConnectionError(const XmppError &AError);
 	void onConnectionDisconnected();
 	//StreamParser
-	void onParserOpened(QDomElement AElem);
-	void onParserElement(QDomElement AElem);
+	void onParserOpened(const QDomElement &AElem);
+	void onParserElement(const QDomElement &AElem);
 	void onParserError(const XmppError &AError);
 	void onParserClosed();
 	//IXmppFeature
@@ -114,7 +107,10 @@ private:
 	bool FReady;
 	bool FClosed;
 	bool FEncrypt;
+	bool FNodeChanged;
+	bool FDomainChanged;
 	Jid FStreamJid;
+	Jid FOnlineJid;
 	Jid FOfflineJid;
 	QString FStreamId;
 	QString FPassword;

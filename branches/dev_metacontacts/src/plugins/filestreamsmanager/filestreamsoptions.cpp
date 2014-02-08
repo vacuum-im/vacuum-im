@@ -2,6 +2,8 @@
 
 #include <QVBoxLayout>
 #include <QFileDialog>
+#include <definitions/optionvalues.h>
+#include <utils/options.h>
 
 FileStreamsOptions::FileStreamsOptions(IDataStreamsManager *ADataManager, IFileStreamsManager *AFileManager, QWidget *AParent) : QWidget(AParent)
 {
@@ -47,7 +49,7 @@ void FileStreamsOptions::reset()
 	ui.chbGroupBySender->setChecked(Options::node(OPV_FILESTREAMS_GROUPBYSENDER).value().toBool());
 
 	QStringList acceptableMethods = Options::node(OPV_FILESTREAMS_ACCEPTABLEMETHODS).value().toStringList();
-	foreach(QString methodNS, FDataManager->methods())
+	foreach(const QString &methodNS, FDataManager->methods())
 	{
 		IDataStreamMethod *streamMethod = FDataManager->method(methodNS);
 		if (streamMethod)
@@ -85,7 +87,7 @@ void FileStreamsOptions::onMethodButtonToggled(bool ACkecked)
 	if (streamMethod)
 	{
 		if (ACkecked)
-			ui.cmbMethod->addItem(streamMethod->methodName(), methodNS);
+			ui.cmbMethod->addItem(streamMethod->methodName(),methodNS);
 		else
 			ui.cmbMethod->removeItem(ui.cmbMethod->findData(methodNS));
 	}

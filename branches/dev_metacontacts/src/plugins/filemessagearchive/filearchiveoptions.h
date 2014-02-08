@@ -1,10 +1,8 @@
 #ifndef FILEARCHIVEOPTIONS_H
 #define FILEARCHIVEOPTIONS_H
 
-#include <definitions/optionvalues.h>
 #include <interfaces/ipluginmanager.h>
 #include <interfaces/ioptionsmanager.h>
-#include <utils/options.h>
 #include "ui_filearchiveoptions.h"
 
 class FileArchiveOptions : 

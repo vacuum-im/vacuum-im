@@ -8,6 +8,22 @@
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextDocumentWriter>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/actiongroups.h>
+#include <definitions/toolbargroups.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/shortcuts.h>
+#include <definitions/shortcutgrouporders.h>
+#include <definitions/messageviewurlhandlerorders.h>
+#include <definitions/messageeditcontentshandlerorders.h>
+#include <utils/widgetmanager.h>
+#include <utils/textmanager.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
 
 #define ADR_QUOTE_WINDOW        Action::DR_Parametr1
 #define ADR_CONTEXT_DATA        Action::DR_Parametr1
@@ -205,11 +221,7 @@ bool MessageWidgets::messageEditContentsInsert(int AOrder, IMessageEditWidget *A
 
 bool MessageWidgets::messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidget, int &APosition, int &ARemoved, int &AAdded)
 {
-	Q_UNUSED(AOrder);
-	Q_UNUSED(AWidget);
-	Q_UNUSED(APosition);
-	Q_UNUSED(ARemoved);
-	Q_UNUSED(AAdded);
+	Q_UNUSED(AOrder); Q_UNUSED(AWidget); Q_UNUSED(APosition); Q_UNUSED(ARemoved); Q_UNUSED(AAdded);
 	return false;
 }
 
@@ -356,7 +368,7 @@ IMessageChatWindow *MessageWidgets::findChatWindow(const Jid &AStreamJid, const 
 QList<QUuid> MessageWidgets::tabWindowList() const
 {
 	QList<QUuid> list;
-	foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
+	foreach(const QString &tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
 		list.append(tabWindowId);
 	return list;
 }
@@ -368,7 +380,7 @@ QUuid MessageWidgets::appendTabWindow(const QString &AName)
 	if (name.isEmpty())
 	{
 		QList<QString> names;
-		foreach(QString tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
+		foreach(const QString &tabWindowId, Options::node(OPV_MESSAGES_TABWINDOWS_ROOT).childNSpaces("window"))
 			names.append(Options::node(OPV_MESSAGES_TABWINDOW_ITEM,tabWindowId).value().toString());
 
 		int i = 0;
@@ -575,29 +587,9 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 	IMessageViewWidget *widget = qobject_cast<IMessageViewWidget *>(sender());
 
 	QTextDocumentFragment textSelection = widget!=NULL ? widget->selection() : QTextDocumentFragment();
-	if (!textSelection.isEmpty())
-	{
-		Action *copyAction = new Action(AMenu);
-		copyAction->setText(tr("Copy"));
-		copyAction->setShortcut(QKeySequence::Copy);
-		copyAction->setData(ADR_CONTEXT_DATA,textSelection.toHtml());
-		connect(copyAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
-		AMenu->addAction(copyAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
-
-		Action *quoteAction = createQuouteAction(widget->messageWindow(),AMenu);
-		if (quoteAction)
-			AMenu->addAction(quoteAction,AG_VWCM_MESSAGEWIDGETS_QUOTE,true);
-
-		QString plainSelection = textSelection.toPlainText().trimmed();
-		Action *searchAction = new Action(AMenu);
-		searchAction->setText(tr("Search on Google '%1'").arg(TextManager::getElidedString(plainSelection,Qt::ElideRight,30)));
-		searchAction->setData(ADR_CONTEXT_DATA, plainSelection);
-		connect(searchAction,SIGNAL(triggered(bool)),SLOT(onViewContextSearchActionTriggered(bool)));
-		AMenu->addAction(searchAction,AG_VWCM_MESSAGEWIDGETS_SEARCH,true);
-	}
-
 	QTextDocumentFragment textFragment = widget!=NULL ? widget->textFragmentAt(APosition) : QTextDocumentFragment();
-	QString href  = TextManager::getTextFragmentHref(!textSelection.isEmpty() ? textSelection : textFragment);
+	QString href  = TextManager::getTextFragmentHref(textFragment.isEmpty() ? textSelection : textFragment);
+
 	QUrl link = href;
 	if (link.isValid())
 	{
@@ -607,14 +599,35 @@ void MessageWidgets::onViewWidgetContextMenu(const QPoint &APosition, Menu *AMen
 		urlAction->setText(isMailto ? tr("Send mail") : tr("Open link"));
 		urlAction->setData(ADR_CONTEXT_DATA,href);
 		connect(urlAction,SIGNAL(triggered(bool)),SLOT(onViewContextUrlActionTriggered(bool)));
-		AMenu->addAction(urlAction,AG_VWCM_MESSAGEWIDGETS_URL,true);
+		AMenu->addAction(urlAction,AG_MWVWCM_MESSAGEWIDGETS_URL,true);
 		AMenu->setDefaultAction(urlAction);
 
 		Action *copyHrefAction = new Action(AMenu);
 		copyHrefAction->setText(tr("Copy address"));
 		copyHrefAction->setData(ADR_CONTEXT_DATA,isMailto ? link.path() : href);
 		connect(copyHrefAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
-		AMenu->addAction(copyHrefAction,AG_VWCM_MESSAGEWIDGETS_COPY,true);
+		AMenu->addAction(copyHrefAction,AG_MWVWCM_MESSAGEWIDGETS_COPY,true);
+	}
+	
+	if (!textSelection.isEmpty())
+	{
+		Action *copyAction = new Action(AMenu);
+		copyAction->setText(tr("Copy"));
+		copyAction->setShortcut(QKeySequence::Copy);
+		copyAction->setData(ADR_CONTEXT_DATA,textSelection.toHtml());
+		connect(copyAction,SIGNAL(triggered(bool)),SLOT(onViewContextCopyActionTriggered(bool)));
+		AMenu->addAction(copyAction,AG_MWVWCM_MESSAGEWIDGETS_COPY,true);
+
+		Action *quoteAction = createQuouteAction(widget->messageWindow(),AMenu);
+		if (quoteAction)
+			AMenu->addAction(quoteAction,AG_MWVWCM_MESSAGEWIDGETS_QUOTE,true);
+
+		QString plainSelection = textSelection.toPlainText().trimmed();
+		Action *searchAction = new Action(AMenu);
+		searchAction->setText(tr("Search on Google '%1'").arg(TextManager::getElidedString(plainSelection,Qt::ElideRight,30)));
+		searchAction->setData(ADR_CONTEXT_DATA, plainSelection);
+		connect(searchAction,SIGNAL(triggered(bool)),SLOT(onViewContextSearchActionTriggered(bool)));
+		AMenu->addAction(searchAction,AG_MWVWCM_MESSAGEWIDGETS_SEARCH,true);
 	}
 }
 
@@ -635,9 +648,7 @@ void MessageWidgets::onViewContextUrlActionTriggered(bool)
 {
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
-	{
 		QDesktopServices::openUrl(action->data(ADR_CONTEXT_DATA).toString());
-	}
 }
 
 void MessageWidgets::onViewContextSearchActionTriggered(bool)
@@ -749,9 +760,7 @@ void MessageWidgets::onTabWindowDestroyed()
 void MessageWidgets::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MAINWINDOW_COMBINEWITHMESSAGES && FMainWindow && AWidget==FMainWindow->instance())
-	{
 		Options::node(OPV_MESSAGES_COMBINEWITHROSTER).setValue(!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool());
-	}
 }
 
 void MessageWidgets::onOptionsOpened()

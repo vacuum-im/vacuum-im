@@ -10,7 +10,7 @@
 #include "ui_statusoptionswidget.h"
 
 class Delegate :
-			public QItemDelegate
+	public QItemDelegate
 {
 	Q_OBJECT;
 public:
@@ -24,8 +24,8 @@ private:
 };
 
 class StatusOptionsWidget :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

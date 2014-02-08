@@ -1,4 +1,5 @@
 #include "spellhighlighter.h"
+
 #include "spellchecker.h"
 #include "spellbackend.h"
 
@@ -21,11 +22,11 @@ void SpellHighlighter::setEnabled(bool AEnabled)
 
 void SpellHighlighter::highlightBlock(const QString &AText)
 {
-	// Match words (minimally) excluding digits within a word
-	static const QRegExp expression("\\b[^\\s\\d]+\\b");
-
 	if (FEnabled)
 	{
+		// Match words (minimally) excluding digits within a word
+		static const QRegExp expression("\\b[^\\s\\d]+\\b");
+
 		int index = 0;
 		while ((index = expression.indexIn(AText, index)) != -1)
 		{
@@ -33,9 +34,7 @@ void SpellHighlighter::highlightBlock(const QString &AText)
 			if (!isUserNickName(expression.cap()))
 			{
 				if (!SpellBackend::instance()->isCorrect(expression.cap()))
-				{
 					setFormat(index, length, FCharFormat);
-				}
 			}
 			index += length;
 		}
@@ -44,5 +43,5 @@ void SpellHighlighter::highlightBlock(const QString &AText)
 
 bool SpellHighlighter::isUserNickName(const QString &AText)
 {
-	return FMultiUserChat != NULL && FMultiUserChat->userByNick(AText) != NULL;
+	return FMultiUserChat!=NULL && FMultiUserChat->userByNick(AText)!=NULL;
 }

@@ -2,13 +2,11 @@
 #define SELECTICONMENU_H
 
 #include <QVBoxLayout>
-#include <definitions/resources.h>
-#include <utils/menu.h>
-#include <utils/iconstorage.h>
 #include "selecticonwidget.h"
+#include <utils/menu.h>
 
 class SelectIconMenu :
-			public Menu
+	public Menu
 {
 	Q_OBJECT;
 public:

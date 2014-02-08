@@ -18,6 +18,10 @@
         <source>Location:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Update archive database at startup</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FileMessageArchive</name>
@@ -35,6 +39,22 @@
     </message>
     <message>
         <source>History of conversations is stored in local files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to create database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Database format is not compatible</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to to execute SQL query</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

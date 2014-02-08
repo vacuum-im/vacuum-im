@@ -2,6 +2,10 @@
 
 #include <QTimer>
 #include <QVBoxLayout>
+#include <definitions/optionvalues.h>
+#include <utils/message.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *AParent) : QWidget(AParent)
 {
@@ -20,7 +24,7 @@ StyleOptionsWidget::StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *
 	ui.cmbMessageType->addItem(tr("Headline"),Message::Headline);
 	ui.cmbMessageType->addItem(tr("Error"),Message::Error);
 
-	foreach(QString spluginId, FMessageStyles->pluginList())
+	foreach(const QString &spluginId, FMessageStyles->pluginList())
 		ui.cmbStyleEngine->addItem(FMessageStyles->pluginById(spluginId)->pluginName(),spluginId);
 
 	ui.wdtStyleOptions->setLayout(new QVBoxLayout);

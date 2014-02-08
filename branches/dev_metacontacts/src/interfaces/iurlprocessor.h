@@ -9,7 +9,6 @@
 class IUrlHandler
 {
 public:
-	virtual QObject *instance() = 0;
 	virtual QNetworkReply *request(QNetworkAccessManager::Operation AOperation, const QNetworkRequest &ARequest, QIODevice *AOutData=NULL) = 0;
 };
 
@@ -21,7 +20,7 @@ public:
 	virtual bool registerUrlHandler(const QString &AScheme, IUrlHandler *AUrlHandler) = 0;
 };
 
-Q_DECLARE_INTERFACE(IUrlHandler, "Vacuum.Plugin.IUrlHandler/1.0")
-Q_DECLARE_INTERFACE(IUrlProcessor, "Vacuum.Plugin.IUrlProcessor/1.0")
+Q_DECLARE_INTERFACE(IUrlHandler, "Vacuum.Plugin.IUrlHandler/1.1")
+Q_DECLARE_INTERFACE(IUrlProcessor, "Vacuum.Plugin.IUrlProcessor/1.1")
 
 #endif	//IURLPROCESSOR_H

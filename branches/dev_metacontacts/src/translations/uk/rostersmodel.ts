@@ -29,11 +29,11 @@
     </message>
     <message>
         <source>Accounts</source>
-        <translation type="unfinished"></translation>
+        <translation>Акаунти</translation>
     </message>
     <message>
         <source>All Contacts</source>
-        <translation type="unfinished"></translation>
+        <translation>Всі контакти</translation>
     </message>
 </context>
 </TS>

@@ -2,8 +2,9 @@
 #define DEF_INTERNALERRORS_H
 
 // BitsOfBinary
+#define IERR_BOB_DATA_LOAD_ERROR                             "bob-data-load-error"
+#define IERR_BOB_DATA_SAVE_ERROR                             "bob-data-save-error"
 #define IERR_BOB_INVALID_RESPONCE                            "bob-invalid-responce"
-#define IERR_BOB_INVALID_CACHED_DATA                         "bob-invalid-cached-data"
 
 // Compression
 #define IERR_COMPRESS_UNKNOWN_ERROR                          "compress-unknown-error"
@@ -13,7 +14,10 @@
 #define IERR_COMPRESS_INVALID_COMPRESSION_LEVEL              "compress-invalid-compression-level"
 
 // ConnectionManager
-#define IERR_CONNECTIONS_CONNECT_ERROR                       "connections-connect-error"
+#define IERR_CONNECTIONMANAGER_CONNECT_ERROR                 "connectionmanager-connect-error"
+
+// DefaultConnection
+#define IERR_DEFAULTCONNECTION_CERT_NOT_TRUSTED              "defaultconnection-cert-not-trusted"
 
 // DataForms
 #define IERR_DATAFORMS_MEDIA_INVALID_TYPE                    "dataforms-media-invalid-type"
@@ -25,6 +29,12 @@
 #define IERR_DATASTREAMS_PROFILE_INVALID_SETTINGS            "datastreams-profile-invalid-settings"
 #define IERR_DATASTREAMS_STREAM_STREAMID_EXISTS              "datastreams-stream-streamid-exists"
 #define IERR_DATASTREAMS_STREAM_INVALID_INIT_RESPONCE        "datastreams-stream-invalid-init-responce"
+
+// FileMessageArchive
+#define IERR_FILEARCHIVE_DATABASE_NOT_CREATED                "filearchive-database-not-created"
+#define IERR_FILEARCHIVE_DATABASE_NOT_OPENED                 "filearchive-database-not-opened"
+#define IERR_FILEARCHIVE_DATABASE_NOT_COMPATIBLE             "filearchive-database-not-compatible"
+#define IERR_FILEARCHIVE_DATABASE_EXEC_FAILED                "filearchive-database-exec-failed"
 
 // FileStreamsManager
 #define IERR_FILESTREAMS_STREAM_FILE_IO_ERROR                "filestreams-stream-file-io-error"
@@ -77,6 +87,7 @@
 #define IERR_SOCKS5_STREAM_HOST_DISCONNECTED                 "socks5-stream-host-disconnected"
 
 // StartTLS
+#define IERR_STARTTLS_NOT_STARTED                            "starttls-not-started"
 #define IERR_STARTTLS_INVALID_RESPONCE                       "starttls-invalid-responce"
 #define IERR_STARTTLS_NEGOTIATION_FAILED                     "starttls-negotiation-failed"
 

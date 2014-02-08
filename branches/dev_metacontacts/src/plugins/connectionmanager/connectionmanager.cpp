@@ -1,8 +1,29 @@
 #include "connectionmanager.h"
 
+#include <QDir>
+#include <QSslSocket>
+#include <QTextDocument>
+#include <definitions/optionvalues.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/rosterlabels.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/rostertooltiporders.h>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/internalerrors.h>
+#include <utils/widgetmanager.h>
+#include <utils/filestorage.h>
+#include <utils/xmpperror.h>
+#include <utils/logger.h>
+
+#define DIR_CERTIFICATES   "cacertificates"
+
 ConnectionManager::ConnectionManager()
 {
 	FEncryptedLabelId = 0;
+	FPluginManager = NULL;
+	FXmppStreams = NULL;
 	FAccountManager = NULL;
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
@@ -25,6 +46,7 @@ void ConnectionManager::pluginInfo(IPluginInfo *APluginInfo)
 bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 {
 	Q_UNUSED(AInitOrder);
+	FPluginManager = APluginManager;
 
 	QList<IPlugin *> plugins = APluginManager->pluginInterface("IConnectionPlugin");
 	foreach (IPlugin *plugin, plugins)
@@ -33,8 +55,8 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 		if (cplugin)
 		{
 			FPlugins.insert(cplugin->pluginId(), cplugin);
-			connect(cplugin->instance(),SIGNAL(connectionCreated(IConnection *)),SIGNAL(connectionCreated(IConnection *)));
-			connect(cplugin->instance(),SIGNAL(connectionDestroyed(IConnection *)),SIGNAL(connectionDestroyed(IConnection *)));
+			connect(cplugin->instance(),SIGNAL(connectionCreated(IConnection *)),SLOT(onConnectionCreated(IConnection *)));
+			connect(cplugin->instance(),SIGNAL(connectionDestroyed(IConnection *)),SLOT(onConnectionDestroyed(IConnection *)));
 		}
 	}
 
@@ -45,8 +67,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 		if (FAccountManager)
 		{
 			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),
-				SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 		}
 	}
 
@@ -54,6 +75,11 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 	if (plugin)
 	{
 		FRostersViewPlugin = qobject_cast<IRostersViewPlugin *>(plugin->instance());
+		if (FRostersViewPlugin)
+		{
+			connect(FRostersViewPlugin->rostersView()->instance(),SIGNAL(indexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)),
+				SLOT(onRosterIndexToolTips(IRosterIndex *, quint32, QMap<int,QString> &)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
@@ -65,12 +91,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 	plugin = APluginManager->pluginInterface("IXmppStreams").value(0,NULL);
 	if (plugin)
 	{
-		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
-		if (xmppStreams)
-		{
-			connect(xmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(xmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
-		}
+		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 	}
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
@@ -81,13 +102,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 
 bool ConnectionManager::initObjects()
 {
-	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_TYPE,QString("DefaultConnection"));
-
-	Options::setDefaultValue(OPV_PROXY_DEFAULT,QString());
-	Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
-	Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
-
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_CONNECTIONS_CONNECT_ERROR,tr("Connection error"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_CONNECTIONMANAGER_CONNECT_ERROR,tr("Connection error"));
 
 	if (FRostersViewPlugin)
 	{
@@ -96,13 +111,21 @@ bool ConnectionManager::initObjects()
 		label.d->data = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CONNECTION_ENCRYPTED);
 		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
+
 	return true;
 }
 
 bool ConnectionManager::initSettings()
 {
+	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_TYPE,QString("DefaultConnection"));
+
+	Options::setDefaultValue(OPV_PROXY_DEFAULT,QString());
+	Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
+	Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
+
 	if (FOptionsManager)
 		FOptionsManager->insertOptionsHolder(this);
+
 	return true;
 }
 
@@ -134,7 +157,7 @@ IConnectionPlugin *ConnectionManager::pluginById(const QString &APluginId) const
 QList<QUuid> ConnectionManager::proxyList() const
 {
 	QList<QUuid> plist;
-	foreach(QString proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy"))
+	foreach(const QString &proxyId, Options::node(OPV_PROXY_ROOT).childNSpaces("proxy"))
 		plist.append(proxyId);
 	return plist;
 }
@@ -164,6 +187,7 @@ IConnectionProxy ConnectionManager::proxyById(const QUuid &AProxyId) const
 			return proxy;
 		}
 	}
+
 	return noProxy;
 }
 
@@ -171,6 +195,7 @@ void ConnectionManager::setProxy(const QUuid &AProxyId, const IConnectionProxy &
 {
 	if (!AProxyId.isNull() && AProxyId!=APPLICATION_PROXY_REF_UUID)
 	{
+		LOG_INFO(QString("Proxy added or updated, id=%1").arg(AProxyId.toString()));
 		OptionsNode pnode = Options::node(OPV_PROXY_ITEM,AProxyId.toString());
 		pnode.setValue(AProxy.name,"name");
 		pnode.setValue(AProxy.proxy.type(),"type");
@@ -180,12 +205,17 @@ void ConnectionManager::setProxy(const QUuid &AProxyId, const IConnectionProxy &
 		pnode.setValue(Options::encrypt(AProxy.proxy.password()),"pass");
 		emit proxyChanged(AProxyId, AProxy);
 	}
+	else
+	{
+		LOG_ERROR(QString("Failed to add or change proxy, id=%1: Invalid proxy Id").arg(AProxyId.toString()));
+	}
 }
 
 void ConnectionManager::removeProxy(const QUuid &AProxyId)
 {
 	if (proxyList().contains(AProxyId))
 	{
+		LOG_INFO(QString("Proxy removed, id=%1").arg(AProxyId.toString()));
 		if (defaultProxy() == AProxyId)
 			setDefaultProxy(QUuid());
 		Options::node(OPV_PROXY_ROOT).removeChilds("proxy",AProxyId.toString());
@@ -201,7 +231,10 @@ QUuid ConnectionManager::defaultProxy() const
 void ConnectionManager::setDefaultProxy(const QUuid &AProxyId)
 {
 	if (defaultProxy()!=AProxyId && (AProxyId.isNull() || proxyList().contains(AProxyId)))
+	{
+		LOG_INFO(QString("Default proxy changed, id=%1").arg(AProxyId.toString()));
 		Options::node(OPV_PROXY_DEFAULT).setValue(AProxyId.toString());
+	}
 }
 
 QDialog *ConnectionManager::showEditProxyDialog(QWidget *AParent)
@@ -229,6 +262,63 @@ QUuid ConnectionManager::loadProxySettings(const OptionsNode &ANode) const
 	return ANode.value().toString();
 }
 
+QList<QSslCertificate> ConnectionManager::trustedCaCertificates(bool AWithUsers) const
+{
+	QList<QSslCertificate> certs;
+
+	QList<QString> certDirs = FileStorage::resourcesDirs();
+	if (AWithUsers)
+		certDirs += FPluginManager->homePath();
+
+	foreach(const QString &certDir, certDirs)
+	{
+		QDir dir(certDir);
+		if (dir.cd(DIR_CERTIFICATES))
+		{
+			foreach(const QString &certFile, dir.entryList(QDir::Files))
+			{
+				QFile file(dir.absoluteFilePath(certFile));
+				if (file.open(QFile::ReadOnly))
+				{
+					QSslCertificate cert(&file,QSsl::Pem);
+					if (!cert.isNull())
+						certs.append(cert);
+					else
+						LOG_ERROR(QString("Failed to load CA certificate from file=%1: Invalid format").arg(file.fileName()));
+				}
+				else
+				{
+					LOG_ERROR(QString("Failed to load CA certificate from file=%1: %2").arg(file.fileName(),file.errorString()));
+				}
+			}
+		}
+	}
+	return certs;
+}
+
+void ConnectionManager::addTrustedCaCertificate(const QSslCertificate &ACertificate)
+{
+	QDir dir(FPluginManager->homePath());
+	if ((dir.exists(DIR_CERTIFICATES) || dir.mkdir(DIR_CERTIFICATES)) && dir.cd(DIR_CERTIFICATES))
+	{
+		QString certFile = QString::fromLocal8Bit(ACertificate.digest().toHex())+".pem";
+		if (!ACertificate.isNull() && !dir.exists(certFile))
+		{
+			QFile file(dir.absoluteFilePath(certFile));
+			if (file.open(QFile::WriteOnly|QFile::Truncate))
+			{
+				LOG_INFO(QString("Saved trusted CA certificate to file=%1").arg(file.fileName()));
+				file.write(ACertificate.toPem());
+				file.close();
+			}
+			else
+			{
+				LOG_ERROR(QString("Failed to save CA certificate to file=%1: %2").arg(file.fileName(),file.errorString()));
+			}
+		}
+	}
+}
+
 void ConnectionManager::updateAccountConnection(IAccount *AAccount) const
 {
 	if (AAccount->isActive())
@@ -239,12 +329,14 @@ void ConnectionManager::updateAccountConnection(IAccount *AAccount) const
 		IConnection *connection = AAccount->xmppStream()->connection();
 		if (connection && connection->ownerPlugin()!=plugin)
 		{
+			LOG_STRM_INFO(AAccount->streamJid(),QString("Removing current stream connection"));
 			AAccount->xmppStream()->setConnection(NULL);
 			delete connection->instance();
 			connection = NULL;
 		}
 		if (plugin!=NULL && connection==NULL)
 		{
+			LOG_STRM_INFO(AAccount->streamJid(),QString("Setting new stream connection=%1").arg(plugin->pluginId()));
 			connection = plugin->newConnection(aoptions.node("connection",pluginId),AAccount->xmppStream()->instance());
 			AAccount->xmppStream()->setConnection(connection);
 		}
@@ -267,41 +359,59 @@ void ConnectionManager::updateConnectionSettings(IAccount *AAccount) const
 	}
 }
 
-void ConnectionManager::onAccountShown(IAccount *AAccount)
+IXmppStream *ConnectionManager::findConnectionStream(IConnection *AConnection) const
 {
-	updateAccountConnection(AAccount);
-}
-
-void ConnectionManager::onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode)
-{
-	const OptionsNode &aoptions = AAccount->optionsNode();
-	const OptionsNode &coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
-	if (aoptions.childPath(ANode) == "connection-type")
-		updateAccountConnection(AAccount);
-	else if (coptions.isChildNode(ANode))
-		updateConnectionSettings(AAccount);
-}
-
-void ConnectionManager::onStreamOpened(IXmppStream *AXmppStream)
-{
-	if (FRostersViewPlugin && AXmppStream->connection() && AXmppStream->connection()->isEncrypted())
+	if (FXmppStreams && AConnection)
 	{
-		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
-		IRosterIndex *sindex = model!=NULL ? model->streamIndex(AXmppStream->streamJid()) : NULL;
-		if (sindex)
-			FRostersViewPlugin->rostersView()->insertLabel(FEncryptedLabelId,sindex);
+		foreach(IXmppStream *stream, FXmppStreams->xmppStreams())
+			if (stream->connection() == AConnection)
+				return stream;
+	}
+	return NULL;
+}
+
+void ConnectionManager::onConnectionEncrypted()
+{
+	IConnection *connection = qobject_cast<IConnection *>(sender());
+	if (FRostersViewPlugin && connection)
+	{
+		IXmppStream *stream = findConnectionStream(connection);
+		if (stream)
+		{
+			IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
+			IRosterIndex *sindex = model!=NULL ? model->streamIndex(stream->streamJid()) : NULL;
+			if (sindex)
+				FRostersViewPlugin->rostersView()->insertLabel(FEncryptedLabelId,sindex);
+		}
 	}
 }
 
-void ConnectionManager::onStreamClosed(IXmppStream *AXmppStream)
+void ConnectionManager::onConnectionDisconnected()
 {
-	if (FRostersViewPlugin)
+	IConnection *connection = qobject_cast<IConnection *>(sender());
+	if (FRostersViewPlugin && connection)
 	{
-		IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
-		IRosterIndex *sindex = model!=NULL ? model->streamIndex(AXmppStream->streamJid()) : NULL;
-		if (sindex)
-			FRostersViewPlugin->rostersView()->removeLabel(FEncryptedLabelId,sindex);
+		IXmppStream *stream = findConnectionStream(connection);
+		if (stream)
+		{
+			IRostersModel *model = FRostersViewPlugin->rostersView()->rostersModel();
+			IRosterIndex *sindex = model!=NULL ? model->streamIndex(stream->streamJid()) : NULL;
+			if (sindex)
+				FRostersViewPlugin->rostersView()->removeLabel(FEncryptedLabelId,sindex);
+		}
 	}
+}
+
+void ConnectionManager::onConnectionCreated(IConnection *AConnection)
+{
+	connect(AConnection->instance(),SIGNAL(encrypted()),SLOT(onConnectionEncrypted()));
+	connect(AConnection->instance(),SIGNAL(disconnected()),SLOT(onConnectionDisconnected()));
+	emit connectionCreated(AConnection);
+}
+
+void ConnectionManager::onConnectionDestroyed(IConnection *AConnection)
+{
+	emit connectionDestroyed(AConnection);
 }
 
 void ConnectionManager::onOptionsOpened()
@@ -321,6 +431,68 @@ void ConnectionManager::onOptionsChanged(const OptionsNode &ANode)
 	else if (Options::node(OPV_PROXY_ROOT).isChildNode(ANode))
 	{
 		updateConnectionSettings();
+	}
+}
+
+void ConnectionManager::onAccountShown(IAccount *AAccount)
+{
+	updateAccountConnection(AAccount);
+}
+
+void ConnectionManager::onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode)
+{
+	const OptionsNode &aoptions = AAccount->optionsNode();
+	const OptionsNode &coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
+	if (aoptions.childPath(ANode) == "connection-type")
+		updateAccountConnection(AAccount);
+	else if (coptions.isChildNode(ANode))
+		updateConnectionSettings(AAccount);
+}
+
+void ConnectionManager::onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
+{
+	if (ALabelId == FEncryptedLabelId)
+	{
+		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
+		IConnection *connection = stream!=NULL ? stream->connection() : NULL;
+		if (connection && !connection->hostCertificate().isNull())
+		{
+			static const struct { QSslCertificate::SubjectInfo info; QString name; } certInfoNames[] = {
+				{ QSslCertificate::CommonName,             tr("Name: %1")           },
+				{ QSslCertificate::Organization,           tr("Organization: %1")   },
+				{ QSslCertificate::OrganizationalUnitName, tr("Subunit: %1")        },
+				{ QSslCertificate::CountryName,            tr("Country: %1")        },
+				{ QSslCertificate::LocalityName,           tr("Locality: %1")       },
+				{ QSslCertificate::StateOrProvinceName,    tr("State/Province: %1") },
+			};
+			static const uint certInfoNamesCount = sizeof(certInfoNames)/sizeof(certInfoNames[0]);
+
+			QStringList tooltips;
+			QSslCertificate cert = connection->hostCertificate();
+
+			tooltips += tr("<b>Certificate holder:</b>");
+			for (uint i=0; i<certInfoNamesCount; i++)
+			{
+				QString value = cert.subjectInfo(certInfoNames[i].info);
+				if (!value.isEmpty())
+					tooltips += certInfoNames[i].name.arg(Qt::escape(value));
+			}
+
+			tooltips += "<br>" + tr("<b>Certificate issuer:</b>");
+			for (uint i=0; i<certInfoNamesCount; i++)
+			{
+				QString value = cert.issuerInfo(certInfoNames[i].info);
+				if (!value.isEmpty())
+					tooltips += certInfoNames[i].name.arg(Qt::escape(value));
+			}
+
+			tooltips += "<br>" + tr("<b>Certificate details:</b>");
+			tooltips += tr("Effective from: %1").arg(cert.effectiveDate().date().toString());
+			tooltips += tr("Expired at: %1").arg(cert.expiryDate().date().toString());
+			tooltips += tr("Serial number: %1").arg(QString::fromLocal8Bit(cert.serialNumber().toUpper()));
+
+			AToolTips.insert(RTTO_CONNECTIONMANAGER_HOSTCERT,tooltips.join("<br>"));
+		}
 	}
 }
 

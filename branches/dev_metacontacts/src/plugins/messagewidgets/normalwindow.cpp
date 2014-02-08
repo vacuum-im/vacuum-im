@@ -2,12 +2,26 @@
 
 #include <QLineEdit>
 #include <QHeaderView>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <definitions/shortcuts.h>
+#include <definitions/messagedataroles.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/messagenormalwindowwidgets.h>
+#include <utils/widgetmanager.h>
+#include <utils/iconstorage.h>
+#include <utils/xmpperror.h>
+#include <utils/shortcuts.h>
+#include <utils/options.h>
+#include <utils/logger.h>
 
 NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJid, const Jid &AContactJid, Mode AMode)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	ui.bwtMessageBox->layout()->setSpacing(3);
+	ui.spwMessageBox->setSpacing(3);
 
 	FMessageWidgets = AMessageWidgets;
 
@@ -18,24 +32,24 @@ NormalWindow::NormalWindow(IMessageWidgets *AMessageWidgets, const Jid& AStreamJ
 
 	FAddress = FMessageWidgets->newAddress(AStreamJid,AContactJid,this);
 
-	FSubjectWidget = new QLineEdit(ui.bwtMessageBox);
+	FSubjectWidget = new QLineEdit(ui.spwMessageBox);
 	FSubjectWidget->setPlaceholderText(tr("Subject"));
-	ui.bwtMessageBox->insertWidget(MNWW_SUBJECTWIDGET,FSubjectWidget);
+	ui.spwMessageBox->insertWidget(MNWW_SUBJECTWIDGET,FSubjectWidget);
 
-	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.bwtMessageBox);
-	ui.bwtMessageBox->insertWidget(MNWW_INFOWIDGET,FInfoWidget->instance());
+	FInfoWidget = FMessageWidgets->newInfoWidget(this,ui.spwMessageBox);
+	ui.spwMessageBox->insertWidget(MNWW_INFOWIDGET,FInfoWidget->instance());
 
-	FViewWidget = FMessageWidgets->newViewWidget(this,ui.bwtMessageBox);
-	ui.bwtMessageBox->insertWidget(MNWW_VIEWWIDGET,FViewWidget->instance(),100);
+	FViewWidget = FMessageWidgets->newViewWidget(this,ui.spwMessageBox);
+	ui.spwMessageBox->insertWidget(MNWW_VIEWWIDGET,FViewWidget->instance(),100);
 
-	FEditWidget = FMessageWidgets->newEditWidget(this,ui.bwtMessageBox);
+	FEditWidget = FMessageWidgets->newEditWidget(this,ui.spwMessageBox);
 	FEditWidget->setEditToolBarVisible(false);
 	FEditWidget->setSendShortcutId(SCT_MESSAGEWINDOWS_NORMAL_SENDMESSAGE);
-	ui.bwtMessageBox->insertWidget(MNWW_EDITWIDGET,FEditWidget->instance(),100);
+	ui.spwMessageBox->insertWidget(MNWW_EDITWIDGET,FEditWidget->instance(),100);
 
-	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.bwtMessageBox);
+	FToolBarWidget = FMessageWidgets->newToolBarWidget(this,ui.spwMessageBox);
 	FToolBarWidget->toolBarChanger()->setSeparatorsVisible(false);
-	ui.bwtMessageBox->insertWidget(MNWW_TOOLBARWIDGET,FToolBarWidget->instance());
+	ui.spwMessageBox->insertWidget(MNWW_TOOLBARWIDGET,FToolBarWidget->instance());
 
 	ui.wdtReceiversTree->setLayout(new QVBoxLayout(ui.wdtReceiversTree));
 	ui.wdtReceiversTree->layout()->setMargin(0);
@@ -265,9 +279,9 @@ void NormalWindow::loadWindowGeometryAndState()
 		ui.sprReceivers->setSizes(QList<int>() << 700 << 300);
 }
 
-BoxWidget *NormalWindow::messageWidgetsBox() const
+SplitterWidget *NormalWindow::messageWidgetsBox() const
 {
-	return ui.bwtMessageBox;
+	return ui.spwMessageBox;
 }
 
 void NormalWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, const QString &ATitle, const QString &AToolTip)
@@ -282,13 +296,9 @@ void NormalWindow::updateWindow(const QIcon &AIcon, const QString &ACaption, con
 bool NormalWindow::event(QEvent *AEvent)
 {
 	if (AEvent->type() == QEvent::WindowActivate)
-	{
 		emit tabPageActivated();
-	}
 	else if (AEvent->type() == QEvent::WindowDeactivate)
-	{
 		emit tabPageDeactivated();
-	}
 	return QMainWindow::event(AEvent);
 }
 
@@ -340,7 +350,5 @@ void NormalWindow::onReceiverslAddressSelectionChanged()
 void NormalWindow::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (AId==SCT_MESSAGEWINDOWS_CLOSEWINDOW && AWidget==this)
-	{
 		closeTabPage();
-	}
 }

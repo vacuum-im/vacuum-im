@@ -3,12 +3,17 @@
 #include <QMessageBox>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
 
 #define TIDR_ITEMJID    Qt::UserRole+1
 #define JID_COLUMN_NUM 0
 
 EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QList<IMultiUserListItem> &AList, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 
@@ -25,7 +30,7 @@ EditUsersListDialog::EditUsersListDialog(const QString &AAffiliation, const QLis
 
 	int row = 0;
 	ui.tbwTable->setRowCount(AList.count());
-	foreach(IMultiUserListItem listItem, AList)
+	foreach(const IMultiUserListItem &listItem, AList)
 	{
 		Jid itemJid = listItem.jid;
 		QTableWidgetItem *jidItem = new QTableWidgetItem();
@@ -84,7 +89,7 @@ QList<IMultiUserListItem> EditUsersListDialog::deltaList() const
 			listItem.notes = ui.tbwTable->item(jidItem->row(),1)->text();
 		result.append(listItem);
 	}
-	foreach(Jid userJid, FDeletedItems)
+	foreach(const Jid &userJid, FDeletedItems)
 	{
 		IMultiUserListItem listItem;
 		listItem.jid = userJid.full();

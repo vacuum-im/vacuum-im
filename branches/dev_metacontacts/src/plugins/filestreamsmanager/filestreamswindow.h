@@ -5,19 +5,13 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
-#include <definitions/statusbargroups.h>
 #include <interfaces/ifilestreamsmanager.h>
-#include <utils/toolbarchanger.h>
-#include <utils/statusbarchanger.h>
-#include <utils/widgetmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/options.h>
 #include "ui_filestreamswindow.h"
+#include <utils/statusbarchanger.h>
+#include <utils/toolbarchanger.h>
 
 class FileStreamsWindow :
-			public QMainWindow
+	public QMainWindow
 {
 	Q_OBJECT;
 public:

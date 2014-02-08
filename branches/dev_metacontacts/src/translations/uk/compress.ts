@@ -25,15 +25,15 @@
     </message>
     <message>
         <source>ZLib error</source>
-        <translation type="unfinished"></translation>
+        <translation>Помилка ZLib</translation>
     </message>
     <message>
         <source>Out of memory for ZLib</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостатньо памяті для ZLib</translation>
     </message>
     <message>
         <source>ZLib version mismatch</source>
-        <translation type="unfinished"></translation>
+        <translation>Версія ZLib не співпадає</translation>
     </message>
     <message>
         <source>Invalid or incomplete deflate data</source>
@@ -48,7 +48,7 @@
     <name>Compression</name>
     <message>
         <source>Error code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Код помилки: %1</translation>
     </message>
 </context>
 </TS>

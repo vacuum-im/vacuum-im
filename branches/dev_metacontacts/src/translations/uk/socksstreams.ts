@@ -116,7 +116,7 @@
     </message>
     <message>
         <source>Failed to send data to socket</source>
-        <translation type="unfinished"></translation>
+        <translation>Не вдалось відправити дані в сокет</translation>
     </message>
     <message>
         <source>Direct connection not established</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
         <source>Invalid host address</source>
-        <translation type="unfinished"></translation>
+        <translation>Невірна адреса хосту</translation>
     </message>
     <message>
         <source>Failed to connect to host</source>
@@ -136,7 +136,7 @@
     </message>
     <message>
         <source>Host disconnected</source>
-        <translation type="unfinished"></translation>
+        <translation>Хост відключений</translation>
     </message>
 </context>
 </TS>

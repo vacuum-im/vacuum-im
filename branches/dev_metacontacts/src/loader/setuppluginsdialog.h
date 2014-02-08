@@ -3,15 +3,11 @@
 
 #include <QDialog>
 #include <QDomDocument>
-#include <definitions/menuicons.h>
-#include <definitions/resources.h>
 #include <interfaces/ipluginmanager.h>
-#include <utils/iconstorage.h>
-#include <utils/options.h>
 #include "ui_setuppluginsdialog.h"
 
 class SetupPluginsDialog :
-			public QDialog
+	public QDialog
 {
 	Q_OBJECT;
 public:

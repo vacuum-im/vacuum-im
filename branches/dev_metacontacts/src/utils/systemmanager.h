@@ -13,15 +13,17 @@ public:
 	static SystemManager *instance();
 	static int systemIdle();
 	static bool isSystemIdleActive();
-public:
-	void startSystemIdle();
-	void stopSystemIdle();
+	static void startSystemIdle();
+	static void stopSystemIdle();
+	static QString osVersion();
 signals:
 	void systemIdleChanged(int ASeconds);
 protected slots:
 	void onIdleChanged(int ASeconds);
 private:
-	static SystemManagerData *d;
+	SystemManager();
+	~SystemManager();
+	SystemManagerData *d;
 };
 
 #endif // SYSTEMMANAGER_H

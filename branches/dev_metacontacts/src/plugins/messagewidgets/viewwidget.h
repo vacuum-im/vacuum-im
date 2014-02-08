@@ -7,7 +7,6 @@
 #include <QDragLeaveEvent>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/imessageprocessor.h>
-#include <utils/textmanager.h>
 #include "ui_viewwidget.h"
 
 class ViewWidget :
@@ -24,6 +23,7 @@ public:
 	virtual bool isVisibleOnWindow() const;
 	virtual IMessageWindow *messageWindow() const;
 	//IMessageViewWidget
+	virtual void clearContent();
 	virtual QWidget *styleWidget() const;
 	virtual IMessageStyle *messageStyle() const;
 	virtual void setMessageStyle(IMessageStyle *AStyle, const IMessageStyleOptions &AOptions);
@@ -35,10 +35,11 @@ public:
 	virtual QTextCharFormat textFormatAt(const QPoint &APosition) const;
 	virtual QTextDocumentFragment textFragmentAt(const QPoint &APosition) const;
 signals:
-	void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
-	void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void urlClicked(const QUrl &AUrl);
 	void viewContextMenu(const QPoint &APosition, Menu *AMenu);
-	void urlClicked(const QUrl &AUrl) const;
+	void contentAppended(const QString &AHtml, const IMessageContentOptions &AOptions);
+	void messageStyleOptionsChanged(const IMessageStyleOptions &AOptions, bool ACleared);
+	void messageStyleChanged(IMessageStyle *ABefore, const IMessageStyleOptions &AOptions);
 protected:
 	void initialize();
 protected:
@@ -47,9 +48,10 @@ protected:
 	void dragMoveEvent(QDragMoveEvent *AEvent);
 	void dragLeaveEvent(QDragLeaveEvent *AEvent);
 protected slots:
-	void onUrlClicked(QWidget *AWidget, const QUrl &AUrl);
-	void onCustomContextMenuRequested(const QPoint &APosition);
-	void onContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
+	void onMessageStyleUrlClicked(QWidget *AWidget, const QUrl &AUrl);
+	void onMessageStyleWidgetCustomContextMenuRequested(const QPoint &APosition);
+	void onMessageStyleOptionsChanged(QWidget *AWidget, const IMessageStyleOptions &AOptions, bool AClean);
+	void onMessageStyleContentAppended(QWidget *AWidget, const QString &AHtml, const IMessageContentOptions &AOptions);
 private:
 	Ui::ViewWidgetClass ui;
 private:
@@ -59,6 +61,7 @@ private:
 private:
 	QWidget *FStyleWidget;
 	IMessageWindow *FWindow;
+	IMessageStyleOptions FStyleOptions;
 	QList<IMessageViewDropHandler *> FActiveDropHandlers;
 };
 

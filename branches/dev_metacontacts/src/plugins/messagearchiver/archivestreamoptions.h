@@ -2,13 +2,12 @@
 #define ARCHIVEOPTIONS_H
 
 #include <QItemDelegate>
-#include <definitions/namespaces.h>
 #include <interfaces/imessagearchiver.h>
 #include <interfaces/ioptionsmanager.h>
 #include "ui_archivestreamoptions.h"
 
 class ArchiveDelegate :
-			public QItemDelegate
+	public QItemDelegate
 {
 	Q_OBJECT;
 public:
@@ -30,10 +29,9 @@ private:
 	IMessageArchiver *FArchiver;
 };
 
-
 class ArchiveStreamOptions :
-			public QWidget,
-			public IOptionsWidget
+	public QWidget,
+	public IOptionsWidget
 {
 	Q_OBJECT;
 	Q_INTERFACES(IOptionsWidget);

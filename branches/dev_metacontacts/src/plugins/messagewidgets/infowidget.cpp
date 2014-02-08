@@ -87,6 +87,7 @@ void InfoWidget::setAddressMenuVisible(bool AVisible)
 				{
 					button->setMenu(FAddressMenu);
 					button->setPopupMode(QToolButton::MenuButtonPopup);
+					button->setIconSize(messageWindow()->editWidget()->editToolBarChanger()->toolBar()->iconSize());
 				}
 			}
 
@@ -139,9 +140,7 @@ void InfoWidget::initialize()
 
 	IPlugin *plugin = FMessageWidgets->pluginManager()->pluginInterface("IAvatars").value(0);
 	if (plugin)
-	{
 		FAvatars = qobject_cast<IAvatars *>(plugin->instance());
-	}
 }
 
 void InfoWidget::updateFieldView(int AField)
@@ -218,14 +217,16 @@ void InfoWidget::updateFieldView(int AField)
 					iconVisible = true;
 					QIcon iconIcon = icon.value<QIcon>();
 					ui.lblIcon->setPixmap(iconIcon.pixmap(iconIcon.actualSize(ui.lblIcon->maximumSize())));
+					break;
 				}
-				break;
 			case QVariant::Pixmap:
 				iconVisible = true;
 				ui.lblIcon->setPixmap(icon.value<QPixmap>());
+				break;
 			case QVariant::Image:
 				iconVisible = true;
 				ui.lblIcon->setPixmap(QPixmap::fromImage(icon.value<QImage>()));
+				break;
 			default:
 				ui.lblIcon->clear();
 			}

@@ -5,6 +5,11 @@
 #include <QDomDocument>
 #include <QApplication>
 
+QList<QString> FileStorage::FMimeTypes;
+QList<QString> FileStorage::FResourceDirs;
+QList<FileStorage *> FileStorage::FInstances;
+QHash<QString, FileStorage *> FileStorage::FStaticStorages;
+
 struct FileStorage::StorageObject 
 {
 	int prefix;
@@ -12,15 +17,6 @@ struct FileStorage::StorageObject
 	QList<QString> fileNames;
 	QHash<QString, QString> fileProperties;
 };
-
-QList<QString> FileStorage::FMimeTypes;
-QList<QString> FileStorage::FResourceDirs;
-QList<FileStorage *> FileStorage::FInstances;
-QHash<QString, FileStorage *> FileStorage::FStaticStorages;
-
-QList<QString> FileStorage::FKeyTags    = QList<QString>() << "key"  << "text" << "name";
-QList<QString> FileStorage::FFileTags   = QList<QString>() << "object";
-QList<QString> FileStorage::FObjectTags = QList<QString>() << "file" << "icon";
 
 FileStorage::FileStorage(const QString &AStorage, const QString &ASubStorage, QObject *AParent) : QObject(AParent)
 {
@@ -141,13 +137,13 @@ void FileStorage::reloadDefinitions()
 		subDirs += subStorageDirs(FStorage,FILE_STORAGE_SHARED_DIR);
 
 	int prefixIndex = 0;
-	foreach(QString subDir, subDirs)
+	foreach(const QString &subDir, subDirs)
 	{
 		QDir dir(subDir);
 		if (dir.exists())
 		{
 			FPrefixes.append(subDir+"/");
-			foreach(QString file, dir.entryList(QStringList() << FILE_STORAGE_DEFINITIONS_MASK))
+			foreach(const QString &file, dir.entryList(QStringList() << FILE_STORAGE_DEFINITIONS_MASK))
 				loadDefinitions(dir.absoluteFilePath(file),prefixIndex);
 			prefixIndex++;
 		}
@@ -159,7 +155,7 @@ void FileStorage::reloadDefinitions()
 QList<QString> FileStorage::availStorages()
 {
 	QList<QString> storages;
-	foreach(QString dirPath, FResourceDirs)
+	foreach(const QString &dirPath, FResourceDirs)
 	{
 		QDir dir(dirPath);
 		QList<QString> dirStorages = dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
@@ -180,7 +176,7 @@ QList<QString> FileStorage::availStorages()
 QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool ACheckDefs)
 {
 	QList<QString> storages;
-	foreach(QString dirPath, FResourceDirs)
+	foreach(const QString &dirPath, FResourceDirs)
 	{
 		QDir dir(dirPath);
 		if (dir.exists() && dir.cd(AStorage))
@@ -215,7 +211,7 @@ QList<QString> FileStorage::availSubStorages(const QString &AStorage, bool AChec
 QList<QString> FileStorage::subStorageDirs(const QString &AStorage, const QString &ASubStorage)
 {
 	QList<QString> subDirs;
-	foreach(QString dirPath, FResourceDirs)
+	foreach(const QString &dirPath, FResourceDirs)
 	{
 		QDir dir(dirPath);
 		if (dir.exists() && dir.cd(AStorage))
@@ -235,7 +231,7 @@ QList<QString> FileStorage::resourcesDirs()
 void FileStorage::setResourcesDirs(const QList<QString> &ADirs)
 {
 	QList<QString> cleanDirs;
-	foreach(QString dir, ADirs)
+	foreach(const QString &dir, ADirs)
 	{
 		if (!dir.isEmpty() && !cleanDirs.contains(dir) && QDir(dir).exists())
 			cleanDirs.append(QDir::cleanPath(dir));
@@ -301,6 +297,10 @@ FileStorage *FileStorage::staticStorage(const QString &ASubStorage)
 
 void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 {
+	static const QList<QString> keyTags = QList<QString>() << "key"  << "text" << "name";
+	static const QList<QString> fileTags = QList<QString>() << "object";
+	static const QList<QString> objectTags = QList<QString>() << "file" << "icon";
+
 	QDomDocument doc;
 	QFile file(ADefFile);
 	if (file.open(QFile::ReadOnly) && doc.setContent(file.readAll(),false))
@@ -308,7 +308,7 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 		QDomElement objElem = doc.documentElement().firstChildElement();
 		while (!objElem.isNull())
 		{
-			if (FObjectTags.contains(objElem.tagName()))
+			if (objectTags.contains(objElem.tagName()))
 			{
 				StorageObject object;
 				object.prefix = APrefixIndex;
@@ -317,13 +317,13 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 				QDomElement keyElem = objElem.firstChildElement();
 				while (!keyElem.isNull())
 				{
-					if (FKeyTags.contains(keyElem.tagName()))
+					if (keyTags.contains(keyElem.tagName()))
 					{
 						QString key = keyElem.text();
 						if (!FKey2Object.contains(key))
 							objKeys.append(key);
 					}
-					else if (FFileTags.contains(keyElem.tagName()))
+					else if (fileTags.contains(keyElem.tagName()))
 					{
 						if (!keyElem.text().isEmpty())
 						{
@@ -354,7 +354,7 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 					}
 					if (valid)
 					{
-						foreach (QString key, objKeys)
+						foreach (const QString &key, objKeys)
 						{
 							FKeys.append(key);
 							FKey2Object.insert(key,FObjects.count());

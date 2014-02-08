@@ -13,14 +13,14 @@ AdiumOptionsWidget::AdiumOptionsWidget(AdiumMessageStylePlugin *APlugin, const O
 	FOptions = ANode;
 	FMessageType = AMessageType;
 
-	foreach(QString styleId, FStylePlugin->styles())
+	foreach(const QString &styleId, FStylePlugin->styles())
 		ui.cmbStyle->addItem(styleId,styleId);
 	ui.cmbStyle->setCurrentIndex(-1);
 
 	ui.cmbBackgoundColor->addItem(tr("Default"));
 	QStringList colors = QColor::colorNames();
 	colors.sort();
-	foreach(QString color, colors)
+	foreach(const QString &color, colors)
 	{
 		ui.cmbBackgoundColor->addItem(color,color);
 		ui.cmbBackgoundColor->setItemData(ui.cmbBackgoundColor->count()-1,QColor(color),Qt::DecorationRole);
@@ -103,13 +103,12 @@ void AdiumOptionsWidget::updateOptionsWidgets()
 void AdiumOptionsWidget::onStyleChanged(int AIndex)
 {
 	QString styleId = ui.cmbStyle->itemData(AIndex).toString();
+	FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);
 
 	ui.cmbVariant->clear();
-	foreach(QString variant, FStylePlugin->styleVariants(styleId))
+	foreach(const QString &variant, FStylePlugin->styleVariants(styleId))
 		ui.cmbVariant->addItem(variant,variant);
 	ui.cmbVariant->setEnabled(ui.cmbVariant->count() > 0);
-
-	FStyleOptions.extended.insert(MSO_STYLE_ID,styleId);
 
 	QMap<QString, QVariant> info = FStylePlugin->styleInfo(styleId);
 	if (info.contains(MSIV_DEFAULT_VARIANT))
@@ -118,23 +117,15 @@ void AdiumOptionsWidget::onStyleChanged(int AIndex)
 		ui.cmbVariant->setCurrentIndex(index>=0 ? index : 0);
 	}
 
-	if (info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool())
-	{
-		ui.tlbSetImage->setEnabled(false);
-		ui.tlbDefaultImage->setEnabled(false);
-		ui.cmbImageLayout->setEnabled(false);
-		ui.cmbBackgoundColor->setEnabled(false);
-		onDefaultImageClicked();
-	}
-	else
-	{
-		ui.tlbSetImage->setEnabled(true);
-		ui.tlbDefaultImage->setEnabled(true);
-		ui.cmbImageLayout->setEnabled(true);
-		ui.cmbBackgoundColor->setEnabled(true);
-		ui.cmbImageLayout->setCurrentIndex(ui.cmbImageLayout->findData(FStyleOptions.extended.value(MSO_BG_IMAGE_LAYOUT).toInt()));
-		emit modified();
-	}
+	bool backgroundEnabled = !info.value(MSIV_DISABLE_CUSTOM_BACKGROUND,false).toBool();
+	ui.tlbSetImage->setEnabled(backgroundEnabled);
+	ui.tlbDefaultImage->setEnabled(backgroundEnabled);
+	ui.cmbImageLayout->setEnabled(backgroundEnabled);
+	ui.cmbBackgoundColor->setEnabled(backgroundEnabled);
+
+	ui.cmbBackgoundColor->setItemData(0,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
+
+	onDefaultImageClicked();
 }
 
 void AdiumOptionsWidget::onVariantChanged(int AIndex)
@@ -193,11 +184,9 @@ void AdiumOptionsWidget::onDefaultImageClicked()
 {
 	FStyleOptions.extended.remove(MSO_BG_IMAGE_FILE);
 	FStyleOptions.extended.remove(MSO_BG_IMAGE_LAYOUT);
-	ui.cmbImageLayout->setCurrentIndex(ui.cmbImageLayout->findData(AdiumMessageStyle::ImageNormal));
 
-	QMap<QString,QVariant> info = FStylePlugin->styleInfo(ui.cmbStyle->itemData(ui.cmbStyle->currentIndex()).toString());
-	FStyleOptions.extended.insert(MSO_BG_COLOR,info.value(MSIV_DEFAULT_BACKGROUND_COLOR));
-	ui.cmbBackgoundColor->setCurrentIndex(ui.cmbBackgoundColor->findData(FStyleOptions.extended.value(MSO_BG_COLOR)));
+	ui.cmbBackgoundColor->setCurrentIndex(0);
+	ui.cmbImageLayout->setCurrentIndex(ui.cmbImageLayout->findData(AdiumMessageStyle::ImageNormal));
 
 	updateOptionsWidgets();
 	emit modified();

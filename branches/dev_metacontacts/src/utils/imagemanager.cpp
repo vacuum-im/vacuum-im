@@ -3,6 +3,11 @@
 #include <QBitmap>
 #include <QPainter>
 
+ImageManager::ImageManager()
+{
+
+}
+
 QImage ImageManager::grayscaled(const QImage &AImage)
 {
 	QImage img = AImage;

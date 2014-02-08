@@ -1,7 +1,13 @@
 #include "modifystatusdialog.h"
 
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
+#include <utils/iconstorage.h>
+#include <utils/logger.h>
+
 ModifyStatusDialog::ModifyStatusDialog(IStatusChanger *AStatusChanger, int AStatusId, const Jid &AStreamJid, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose, true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_SCHANGER_MODIFY_STATUS,0,0,"windowIcon");
@@ -41,15 +47,19 @@ void ModifyStatusDialog::modifyStatus()
 	int priority = ui.spbPriority->value();
 	QString text = ui.pteText->toPlainText();
 
-	if (  FStatusChanger->statusItemShow(FStatusId)!=show         || FStatusChanger->statusItemName(FStatusId)!=name ||
-	      FStatusChanger->statusItemPriority(FStatusId)!=priority || FStatusChanger->statusItemText(FStatusId)!=text)
+	if (FStatusChanger->statusItemShow(FStatusId) != show ||
+			FStatusChanger->statusItemName(FStatusId) != name ||
+			FStatusChanger->statusItemPriority(FStatusId) != priority ||
+			FStatusChanger->statusItemText(FStatusId) != text)
 	{
 		FStatusChanger->updateStatusItem(FStatusId,name,show,text,priority);
 		if (FStatusChanger->streamStatus(FStreamJid) != FStatusId)
 			FStatusChanger->setStreamStatus(FStreamJid, FStatusId);
 	}
 	else
+	{
 		FStatusChanger->setStreamStatus(FStreamJid, FStatusId);
+	}
 }
 
 void ModifyStatusDialog::onDialogButtonBoxClicked(QAbstractButton *AButton)
@@ -65,4 +75,3 @@ void ModifyStatusDialog::onDialogButtonBoxClicked(QAbstractButton *AButton)
 		break;
 	}
 }
-

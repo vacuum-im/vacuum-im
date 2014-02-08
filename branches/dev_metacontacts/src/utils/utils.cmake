@@ -18,6 +18,8 @@ set(HEADERS "action.h"
             "advanceditemmodel.h"
             "advanceditemdelegate.h"
             "filecookiejar.h"
-            "boxwidget.h")
+            "boxwidget.h"
+            "splitterwidget.h"
+            "logger.h")
 
 qt4_wrap_cpp(MOC_SOURCES ${HEADERS})

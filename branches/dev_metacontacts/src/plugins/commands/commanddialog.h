@@ -3,16 +3,13 @@
 
 #include <QDialog>
 #include <QPushButton>
-#include <definitions/namespaces.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <interfaces/icommands.h>
 #include <interfaces/idataforms.h>
 #include "ui_commanddialog.h"
 
 class CommandDialog :
-			public QDialog,
-			public ICommandClient
+	public QDialog,
+	public ICommandClient
 {
 	Q_OBJECT;
 	Q_INTERFACES(ICommandClient);
@@ -20,10 +17,10 @@ public:
 	CommandDialog(ICommands *ACommands, IDataForms *ADataForms, const Jid &AStreamJid, const Jid &ACommandJid, const QString &ANode, QWidget *AParent = NULL);
 	~CommandDialog();
 	//ICommandClient
-	virtual Jid streamJid() const { return FStreamJid; }
-	virtual Jid commandJid() const { return FCommandJid; }
-	virtual QString node() const { return FNode; }
-	virtual QString sessionId() const { return FSessionId; }
+	virtual Jid streamJid() const;
+	virtual Jid commandJid() const;
+	virtual QString node() const;
+	virtual QString sessionId() const;
 	virtual bool receiveCommandResult(const ICommandResult &AResult);
 	virtual bool receiveCommandError(const ICommandError &AError);
 	//CommandDialog
