@@ -67,7 +67,8 @@ protected:
 	QList<IBookmark> loadBookmarksFromXML(const QDomElement &AElement) const;
 	void saveBookmarksToXML(QDomElement &AElement, const QList<IBookmark> &ABookmarks) const;
 	void renameBookmark(const Jid &AStreamJid, const IBookmark &ABookmark);
-	void startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark, bool AShowWindow);
+	void autoStartBookmarks(const Jid &AStreamJid) const;
+	void startBookmark(const Jid &AStreamJid, const IBookmark &ABookmark, bool AShowWindow) const;
 protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateDataUpdated(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
