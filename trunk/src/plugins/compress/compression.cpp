@@ -179,7 +179,7 @@ void Compression::processData(QByteArray &AData, bool ADataOut)
 			ret = ADataOut ? deflate(zstream,Z_SYNC_FLUSH) : inflate(zstream,Z_SYNC_FLUSH);
 
 			if (ret != Z_OK)
-				REPORT_ERROR(QString("Failed to deflate/inflate data, ZLib=%1: %2").arg(ZLIB_VERSION,ret));
+				REPORT_ERROR(QString("Failed to deflate/inflate data, ZLib=%1: %2").arg(ZLIB_VERSION).arg(ret));
 
 			switch (ret)
 			{

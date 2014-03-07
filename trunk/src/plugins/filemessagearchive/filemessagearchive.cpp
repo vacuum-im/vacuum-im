@@ -225,10 +225,6 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
 			written = writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
-		else
-		{
-			REPORT_ERROR("Failed to write message: File writer is not created");
-		}
 	}
 	else
 	{
@@ -254,9 +250,9 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 			writer = newFileWriter(AStreamJid,header,filePath);
 		}
 		if (writer)
+		{
 			written = writer->writeNote(AMessage.body());
-		else
-			REPORT_ERROR("Failed to write note: File writer is not created");
+		}
 	}
 	else
 	{
@@ -1204,8 +1200,13 @@ FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArch
 		{
 			delete writer;
 			writer = NULL;
+			REPORT_ERROR("Failed to create file writer: Writer not opened");
 		}
 		return writer;
+	}
+	else if (FWritingFiles.contains(AFileName))
+	{
+		REPORT_ERROR("Failed to create file writer: File already exists");
 	}
 	else
 	{

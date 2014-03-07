@@ -281,7 +281,7 @@ bool ServiceDiscovery::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 			FStanzaProcessor->sendStanzaOut(AStreamJid,result);
 			LOG_STRM_DEBUG(AStreamJid,QString("Self discovery info sent to=%1, node=%2").arg(AStanza.from(),dinfo.node));
 		}
-		else
+		else if (dinfo.node.isEmpty())
 		{
 			REPORT_ERROR("Failed to send self discovery info: Invalid params");
 		}

@@ -86,6 +86,7 @@ void DatabaseSynchronizer::run()
 			else
 			{
 				syncFailed = true;
+				REPORT_ERROR("Failed to synchronize file archive database: Current headers not loaded");
 			}
 			delete loadTask;
 
@@ -200,9 +201,14 @@ void DatabaseSynchronizer::run()
 					QString gateType = !with.node().isEmpty() ? FFileArchive->contactGateType(with) : QString::null;
 					DatabaseTaskInsertHeaders *insertTask = new DatabaseTaskInsertHeaders(streamJid,newHeaders,gateType);
 					if (FDatabaseWorker->execTask(insertTask) & !insertTask->isFailed())
+					{
 						insertHeaders += newHeaders.count();
+					}
 					else
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: New headers not inserted");
+					}
 					delete insertTask;
 				}
 
@@ -210,9 +216,14 @@ void DatabaseSynchronizer::run()
 				{
 					DatabaseTaskUpdateHeaders *updateTask = new DatabaseTaskUpdateHeaders(streamJid,difHeaders);
 					if (FDatabaseWorker->execTask(updateTask) && !updateTask->isFailed())
+					{
 						updateHeaders += difHeaders.count();
+					}
 					else
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Changed headers not updated");
+					}
 					delete updateTask;
 				}
 
@@ -220,9 +231,14 @@ void DatabaseSynchronizer::run()
 				{
 					DatabaseTaskRemoveHeaders *removeTask = new DatabaseTaskRemoveHeaders(streamJid,oldHeaders);
 					if (FDatabaseWorker->execTask(removeTask) && !removeTask->isFailed())
+					{
 						removeHeaders += oldHeaders.count();
+					}
 					else
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+					}
 					delete removeTask;
 				}
 			}
@@ -242,9 +258,14 @@ void DatabaseSynchronizer::run()
 				{
 					DatabaseTaskRemoveHeaders *removeTask = new DatabaseTaskRemoveHeaders(streamJid,oldHeaders);
 					if (FDatabaseWorker->execTask(removeTask) && !removeTask->isFailed())
+					{
 						removeHeaders += oldHeaders.count();
+					}
 					else
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+					}
 					delete removeTask;
 				}
 			}
@@ -252,14 +273,13 @@ void DatabaseSynchronizer::run()
 		else
 		{
 			syncFailed = true;
+			REPORT_ERROR("Failed to synchronize file archive database: Archive path is empty");
 		}
 
 		if (!FQuit)
 			QMetaObject::invokeMethod(this,"syncFinished",Qt::QueuedConnection,Q_ARG(const Jid &,streamJid),Q_ARG(bool,syncFailed));
 
-		if (syncFailed)
-			REPORT_ERROR("Failed to synchronize file archive database");
-		else
+		if (!syncFailed)
 			REPORT_TIMING(STMP_HISTORY_FILE_DATABASE_SYNC,Logger::finishTiming(STMP_HISTORY_FILE_DATABASE_SYNC));
 
 		locker.relock();

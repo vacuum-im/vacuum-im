@@ -1619,7 +1619,7 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 			}
 		}
 	}
-	else
+	else if (user == NULL)
 	{
 		REPORT_ERROR("Failed to create private chat window: User not found");
 	}

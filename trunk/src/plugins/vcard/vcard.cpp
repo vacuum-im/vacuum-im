@@ -189,7 +189,7 @@ void VCard::loadVCardFile()
 			REPORT_ERROR(QString("Failed to load vCard from file content: %1").arg(xmlError));
 		file.close();
 	}
-	else
+	else if (file.exists())
 	{
 		REPORT_ERROR(QString("Failed to load vCard from file: %1").arg(file.errorString()));
 	}
