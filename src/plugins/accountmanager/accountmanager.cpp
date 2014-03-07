@@ -142,7 +142,7 @@ IAccount *AccountManager::appendAccount(const QUuid &AAccountId)
 		openAccountOptionsNode(AAccountId,account->name());
 		emit appended(account);
 	}
-	else
+	else if (AAccountId.isNull())
 	{
 		REPORT_ERROR("Failed to append account: Invalid params");
 	}
