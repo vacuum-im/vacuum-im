@@ -337,6 +337,10 @@ bool Presence::sendPresence(const Jid &AContactJid, int AShow, const QString &AS
 	{
 		LOG_STRM_WARNING(streamJid(),QString("Failed to send direct presence, to=%1, show=%2, status=%3, priority=%4: Stream not opened").arg(AContactJid.full()).arg(AShow).arg(AStatus).arg(APriority));
 	}
+	else if (AContactJid == FXmppStream->streamJid().domain())
+	{
+		REPORT_ERROR("Failed to send direct presence: Invalid destination");
+	}
 	else
 	{
 		REPORT_ERROR("Failed to send direct presence: Invalid params");
