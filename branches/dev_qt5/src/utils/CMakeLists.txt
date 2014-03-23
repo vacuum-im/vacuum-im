@@ -39,13 +39,6 @@ if (UNIX AND NOT APPLE)
         endif (X11_Xscreensaver_FOUND)
 endif (UNIX AND NOT APPLE)
 
-
-if (SYSTEM_ZLIB_FOUND)
-	list(APPEND ADD_LIBS "${SYSTEM_ZLIB_FOUND}")
-else (SYSTEM_ZLIB_FOUND)
-	list(APPEND ADD_LIBS zlib)
-endif (SYSTEM_ZLIB_FOUND)
-
 if (SYSTEM_IDN_FOUND)
 	list(APPEND ADD_LIBS "${SYSTEM_IDN_FOUND}")
 else (SYSTEM_IDN_FOUND)
@@ -57,6 +50,12 @@ if (SYSTEM_MINIZIP_FOUND)
 else (SYSTEM_MINIZIP_FOUND)
 	list(APPEND ADD_LIBS minizip)
 endif (SYSTEM_MINIZIP_FOUND)
+
+if (SYSTEM_ZLIB_FOUND)
+	list(APPEND ADD_LIBS "${SYSTEM_ZLIB_FOUND}")
+else (SYSTEM_ZLIB_FOUND)
+	list(APPEND ADD_LIBS zlib)
+endif (SYSTEM_ZLIB_FOUND)
 
 if (APPLE)
 	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
