@@ -67,6 +67,6 @@ add_subdirectory(vcard)
 add_subdirectory(xmppstreams)
 add_subdirectory(xmppuriqueries)
 
-if (QT_QTWEBKIT_LIBRARY)
+if (Qt5WebKit_FOUND)
   add_subdirectory(adiummessagestyle)
-endif (QT_QTWEBKIT_LIBRARY)
+endif (Qt5WebKit_FOUND)
