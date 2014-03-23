@@ -64,7 +64,8 @@ void MainCentralWidget::onCentralPageShow(bool AMinimized)
 	IMainCentralPage *page = qobject_cast<IMainCentralPage *>(sender());
 	if (page)
 	{
-		setCurrentCentralPage(page);
+		if (!AMinimized)
+			setCurrentCentralPage(page);
 		FMainWindow->showWindow(AMinimized);
 	}
 }

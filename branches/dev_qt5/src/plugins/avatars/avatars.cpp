@@ -436,7 +436,10 @@ QString Avatars::saveAvatarData(const QByteArray &AData) const
 		QString hash = QCryptographicHash::hash(AData,QCryptographicHash::Sha1).toHex();
 		if (!hasAvatar(hash))
 		{
-			if (saveToFile(avatarFileName(hash),AData))
+			QImage image = QImage::fromData(AData);
+			if (image.isNull())
+				LOG_WARNING(QString("Failed to save avatar data, hash=%1: Unsupported format").arg(hash));
+			else if (saveToFile(avatarFileName(hash),AData))
 				return hash;
 		}
 		else
@@ -542,6 +545,7 @@ QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, boo
 			}
 			else
 			{
+				QFile::remove(fileName);
 				REPORT_ERROR("Failed to load avatar image from file: Image not loaded");
 			}
 		}
