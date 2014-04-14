@@ -1,5 +1,6 @@
 #include "optionsmanager.h"
 
+#include <QProcess>
 #include <QSettings>
 #include <QFileInfo>
 #include <QDateTime>
@@ -759,8 +760,21 @@ QMap<QString,QVariant> OptionsManager::loadOptionValues(const QString &AFileName
 	QFile file(AFileName);
 	if (file.open(QFile::ReadOnly))
 	{
+		QByteArray data = file.readAll();
+
+		foreach(const QString &env, QProcess::systemEnvironment())
+		{
+			int keyPos = env.indexOf('=');
+			if (keyPos > 0)
+			{
+				QString envKey = "%"+env.left(keyPos)+"%";
+				QString envVal = env.right(env.length() - keyPos - 1);
+				data.replace(envKey.toUtf8(),envVal.toUtf8());
+			}
+		}
+
 		QDomDocument doc;
-		if (doc.setContent(&file,true) && doc.documentElement().tagName()=="options")
+		if (doc.setContent(data,true) && doc.documentElement().tagName()=="options")
 		{
 			LOG_INFO(QString("Option values loaded from file=%1").arg(AFileName));
 			return getOptionValues(Options::createNodeForElement(doc.documentElement()));
