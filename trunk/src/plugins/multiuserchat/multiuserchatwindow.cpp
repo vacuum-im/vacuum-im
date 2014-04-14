@@ -2235,7 +2235,14 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 		QTextCursor cursor = textEdit->textCursor();
 		if (FCompleteIt == FCompleteNicks.constEnd())
 		{
-			cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
+			while (cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor))
+			{
+				if (cursor.selectedText().at(0).isSpace())
+				{
+					cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+					break;
+				}
+			}
 			FStartCompletePos = cursor.position();
 			FCompleteNickStarts = cursor.selectedText().toLower();
 			refreshCompleteNicks();
