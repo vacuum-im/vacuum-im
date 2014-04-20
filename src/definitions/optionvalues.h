@@ -162,6 +162,8 @@
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
 #define OPV_MISC_STATISTICTS_ENABLED                    "misc.statistics-enabled"
 #define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
+// VCardPlugin
+#define OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE             "misc.restrict-vcard-images-size"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
