@@ -86,7 +86,7 @@ void DatabaseSynchronizer::run()
 			else
 			{
 				syncFailed = true;
-				REPORT_ERROR("Failed to synchronize file archive database: Current headers not loaded");
+				REPORT_ERROR(QString("Failed to synchronize file archive database: Database headers not loaded - %1").arg(loadTask->error().errorMessage()));
 			}
 			delete loadTask;
 
@@ -207,7 +207,7 @@ void DatabaseSynchronizer::run()
 					else
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: New headers not inserted");
+						REPORT_ERROR(QString("Failed to synchronize file archive database: New headers not inserted - %1").arg(insertTask->error().errorMessage()));
 					}
 					delete insertTask;
 				}
@@ -222,7 +222,7 @@ void DatabaseSynchronizer::run()
 					else
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: Changed headers not updated");
+						REPORT_ERROR(QString("Failed to synchronize file archive database: Changed headers not updated - %1").arg(updateTask->error().errorMessage()));
 					}
 					delete updateTask;
 				}
@@ -237,7 +237,7 @@ void DatabaseSynchronizer::run()
 					else
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+						REPORT_ERROR(QString("Failed to synchronize file archive database: Old headers not removed - %1").arg(removeTask->error().errorMessage()));
 					}
 					delete removeTask;
 				}
@@ -264,7 +264,7 @@ void DatabaseSynchronizer::run()
 					else
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+						REPORT_ERROR(QString("Failed to synchronize file archive database: Old headers not removed - %1").arg(removeTask->error().errorMessage()));
 					}
 					delete removeTask;
 				}
