@@ -668,12 +668,16 @@ bool Avatars::updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bo
 					FStreamAvatars.insert(streamJid,AHash);
 					updatePresence(streamJid);
 				}
-				else
+				else if (!curHash.isNull())
 				{
 					LOG_STRM_INFO(streamJid,"Self avatar setted as unkonwn");
 					FStreamAvatars.insert(streamJid,UNKNOWN_AVATAR);
 					updatePresence(streamJid);
 					return false;
+				}
+				else
+				{
+					return true;
 				}
 			}
 		}
