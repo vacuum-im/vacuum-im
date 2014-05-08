@@ -1,3 +1,16 @@
-= Information =
+= [https://drive.google.com/#folders/0B7A5K_290X8-MTlLSzhpMTNfOUE Downloads] =
 
-Downloads moved to shared Google Drive [https://drive.google.com/folderview?id=0B7A5K_290X8-MTlLSzhpMTNfOUE folder].
+
+== Vacuum-IM ==
+|| *[https://drive.google.com/#folders/0B7A5K_290X8-UEM4OWlZcy13RVU Windows]* || *[https://drive.google.com/#folders/0B7A5K_290X8-eVhldWJER1RNNGs Linux]* || *[https://drive.google.com/#folders/0B7A5K_290X8-SjlPeUk2emREUG8 Mac OS]* || *[https://drive.google.com/#folders/0B7A5K_290X8-SjlPeUk2emREUG8 Source]* ||
+|| [https://drive.google.com/#folders/0B_VbYEyCFxENZ3NyZDF2akpDaTg Nightly] || [https://drive.google.com/#folders/0B_VbYEyCFxENNUpJMkVacHNhb3c Nightly] || [https://drive.google.com/#folders/0B_VbYEyCFxENVktObHpWX1ZoVUk Nightly] || [https://code.google.com/p/vacuum-im/source/checkout SVN] ||
+|| [https://googledrive.com/host/0B7A5K_290X8-SERBdy1CQjRvams/vacuum-im_1.2.4.2369_win32-msvc2010_qt4.8.5.msi v1.2.4] || [https://drive.google.com/#folders/0B7A5K_290X8-eVhldWJER1RNNGs v1.2.4] || [https://googledrive.com/host/0B7A5K_290X8-bDJNdHlCY21HMjQ/vacuum-im_1.2.4.2368_osx.dmg v1.2.4] || [https://googledrive.com/host/0B7A5K_290X8-NE5nLUx5Yl9BTkk/vacuum-1.2.4.tar.gz v1.2.4] ||
+|| [https://googledrive.com/host/0B7A5K_290X8-Qm8yZjh3em55TG8/vacuum-im_1.2.3.2288_win32-msvc2010_qt485.msi v1.2.3] || [https://drive.google.com/#folders/0B7A5K_290X8-bVJEMTJuY2s3S1k v1.2.3] || [https://googledrive.com/host/0B7A5K_290X8-cklyU3JCUkhZZkE/vacuum-im_1.2.3.2288_osx_x64_qt485.dmg v1.2.3] || [https://googledrive.com/host/0B7A5K_290X8-ZjFTZ21zRXpHZkU/vacuum-1.2.3.tar.gz v1.2.3] ||
+
+
+== Additional Plugins ==
+You can download additional plugins for Vacuum-IM [https://code.google.com/p/vacuum-plugins/downloads here].
+
+
+== Additional Resources ==
+You can download additional resources for Vacuum-IM [https://drive.google.com/#folders/0B7A5K_290X8-Ul9IcHFveGNaV3M here].
