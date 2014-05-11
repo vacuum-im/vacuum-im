@@ -1,5 +1,6 @@
 #include "joinmultichatdialog.h"
 
+#include <QClipboard>
 #include <QMessageBox>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -39,6 +40,7 @@ JoinMultiChatDialog::JoinMultiChatDialog(IMultiUserChatPlugin *AChatPlugin, cons
 		foreach(IXmppStream *xmppStream, FXmppStreams->xmppStreams())
 			if (FXmppStreams->isActive(xmppStream))
 				onStreamAdded(xmppStream);
+
 		ui.cmbStreamJid->model()->sort(0,Qt::AscendingOrder);
 		ui.cmbStreamJid->setCurrentIndex(AStreamJid.isValid() ? ui.cmbStreamJid->findData(AStreamJid.pFull()) : 0);
 		connect(ui.cmbStreamJid,SIGNAL(currentIndexChanged(int)),SLOT(onStreamIndexChanged(int)));
@@ -164,6 +166,24 @@ void JoinMultiChatDialog::onStreamIndexChanged(int AIndex)
 	updateResolveNickState();
 	loadRecentConferences();
 	onHistoryIndexChanged(ui.cmbHistory->currentIndex());
+
+	QString buffer = QApplication::clipboard()->text().trimmed();
+	QRegExp regexp = QRegExp(QLatin1String("^xmpp://(([^@]+)@([^/]+))"), Qt::CaseInsensitive, QRegExp::RegExp);
+
+	if (regexp.exactMatch(buffer))
+	{
+		QStringList matches = regexp.capturedTexts();
+		int cmbHistoryIndex = ui.cmbHistory->findData(Jid(matches.at(1)).pBare());
+		if (cmbHistoryIndex == -1)
+		{
+			ui.lneRoom->setText(matches.at(2));
+			ui.lneService->setText(matches.at(3));
+		}
+		else
+		{
+			ui.cmbHistory->setCurrentIndex(cmbHistoryIndex);
+		}
+	}
 }
 
 void JoinMultiChatDialog::onHistoryIndexChanged(int AIndex)
