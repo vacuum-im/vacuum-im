@@ -27,22 +27,22 @@ Add lines to the end of file */etc/pacman.conf*
 === Vacuum-IM (release) ===
 
 {{{
-[home_vacuum-im_release_Arch_Extra]
+[network_messaging_vacuum-im_release_Arch_Extra]
 SigLevel = Never
-Server = http://download.opensuse.org/repositories/home:/vacuum-im:/release/Arch_Extra/$arch
+Server = http://download.opensuse.org/repositories/network:/messaging:/vacuum-im:/release/Arch_Extra/$arch
 }}}
 
 === Vacuum-IM (unstable) ===
 
 {{{
-[home_vacuum-im_unstable_Arch_Extra]
+[network_messaging_vacuum-im_unstable_Arch_Extra]
 SigLevel = Never
-Server = http://download.opensuse.org/repositories/home:/vacuum-im:/unstable/Arch_Extra/$arch
+Server = http://download.opensuse.org/repositories/network:/messaging:/vacuum-im:/unstable/Arch_Extra/$arch
 }}}
 
 == Установка ==
 {{{
-pacman -Sy
+pacman -Syu
 pacman -S vacuum
 }}}
 
