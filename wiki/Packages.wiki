@@ -43,7 +43,7 @@ Server = http://download.opensuse.org/repositories/network:/messaging:/vacuum-im
 == Установка ==
 {{{
 pacman -Syu
-pacman -S vacuum
+pacman -S vacuum-im
 }}}
 
 = Debian =
