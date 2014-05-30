@@ -1,4 +1,6 @@
-= [https://drive.google.com/#folders/0B7A5K_290X8-MTlLSzhpMTNfOUE Downloads] =
+#summary Downloads page
+
+= [https://googledrive.com/host/0B7A5K_290X8-MTlLSzhpMTNfOUE Downloads] =
 
 
 == Vacuum-IM ==
@@ -10,8 +12,8 @@ Linux [https://code.google.com/p/vacuum-im/wiki/Packages packages] also availabl
 
 
 == Additional Plugins ==
-You can download [https://drive.google.com/#folders/0B7A5K_290X8-VHl1eWM2S2dWWVU additional plugins] for Vacuum-IM.
+You can download [https://googledrive.com/host/0B7A5K_290X8-VHl1eWM2S2dWWVU additional plugins] for Vacuum-IM.
 
 
 == Additional Resources ==
-You can download [https://drive.google.com/#folders/0B7A5K_290X8-Ul9IcHFveGNaV3M additional resources] for Vacuum-IM.
+You can download [https://googledrive.com/host/0B7A5K_290X8-Ul9IcHFveGNaV3M additional resources] for Vacuum-IM.
