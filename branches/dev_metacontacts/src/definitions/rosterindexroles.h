@@ -39,6 +39,8 @@ enum RosterIndexDataRoles {
 	RDR_MUC_PASSWORD,
 	//vCard
 	RDR_VCARD_SEARCH,
+	//MetaContacts
+	RDR_METACONTACT_ID,
 	//Other Roles
 	RDR_USER_ROLE = 128
 };

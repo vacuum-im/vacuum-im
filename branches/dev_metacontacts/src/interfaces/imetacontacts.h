@@ -2,6 +2,7 @@
 #define IMETACONTACTS_H
 
 #include <QSet>
+#include <QUuid>
 #include <interfaces/ipresence.h>
 #include <utils/jid.h>
 
@@ -13,6 +14,12 @@ struct IMetaContact {
 	QList<Jid> items;
 	QSet<QString> groups;
 	IPresenceItem presence;
+	bool operator==(const IMetaContact &AOther) const {
+		return id==AOther.id && name==AOther.name && items==AOther.items && groups==AOther.groups && presence==AOther.presence;
+	}
+	bool operator!=(const IMetaContact &AOther) const {
+		return !operator==(AOther);
+	}
 };
 
 class IMetaContacts
