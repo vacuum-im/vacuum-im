@@ -36,7 +36,7 @@ public:
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const QUuid &AMetaId) const;
 	virtual QList<IRosterIndex *> findMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId) const;
 	virtual QUuid createMetaContact(const Jid &AStreamJid, const QList<Jid> &AItems, const QString &AName);
-	virtual QUuid mergeMetaContacts(const Jid &AStreamJid, const QUuid &AMetaId1, const QUuid &AMetaId2);
+	virtual bool mergeMetaContacts(const Jid &AStreamJid, const QUuid &AMetaId1, const QUuid &AMetaId2);
 	virtual bool detachMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
 	virtual bool setMetaContactName(const Jid &AStreamJid, const QUuid &AMetaId, const QString &AName);
 	virtual bool setMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
@@ -45,7 +45,6 @@ signals:
 	void metaContactReceived(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore);
 protected:
 	bool isValidItem(const Jid &AStreamJid, const Jid &AItem) const;
-	QList<Jid> filterValidItems(const Jid &AStreamJid, const QList<Jid> &AItems) const;
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
 	void updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts);
 protected:
@@ -77,6 +76,7 @@ protected slots:
 protected slots:
 	void onCombineContactsByAction();
 protected slots:
+	void onLoadContactsFromFileTimerTimeout();
 	void onSaveContactsToStorageTimerTimeout();
 private:
 	IPluginManager *FPluginManager;
@@ -89,6 +89,7 @@ private:
 private:
 	QTimer FSaveTimer;
 	QSet<Jid> FSaveStreams;
+	QSet<Jid> FLoadStreams;
 private:
 	QMap<Jid, QHash<Jid, QUuid> > FItemMetaContact;
 	QMap<Jid, QHash<QUuid, IMetaContact> > FMetaContacts;

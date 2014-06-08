@@ -163,7 +163,7 @@ QUuid MetaContacts::createMetaContact(const Jid &AStreamJid, const QList<Jid> &A
 	return QUuid();
 }
 
-QUuid MetaContacts::mergeMetaContacts(const Jid &AStreamJid, const QUuid &AMetaId1, const QUuid &AMetaId2)
+bool MetaContacts::mergeMetaContacts(const Jid &AStreamJid, const QUuid &AMetaId1, const QUuid &AMetaId2)
 {
 	if (isReady(AStreamJid))
 	{
@@ -175,11 +175,11 @@ QUuid MetaContacts::mergeMetaContacts(const Jid &AStreamJid, const QUuid &AMetaI
 			if (updateMetaContact(AStreamJid,meta1))
 			{
 				startSaveContactsToStorage(AStreamJid);
-				return meta1.id;
+				return true;
 			}
 		}
 	}
-	return QUuid();
+	return false;
 }
 
 bool MetaContacts::detachMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems)
@@ -191,9 +191,11 @@ bool MetaContacts::detachMetaContactItems(const Jid &AStreamJid, const QUuid &AM
 		{
 			foreach(const Jid &item, AItems)
 				meta.items.removeAll(item);
-			updateMetaContact(AStreamJid,meta);
-			startSaveContactsToStorage(AStreamJid);
-			return true;
+			if (updateMetaContact(AStreamJid,meta))
+			{
+				startSaveContactsToStorage(AStreamJid);
+				return true;
+			}
 		}
 	}
 	return false;
@@ -273,73 +275,50 @@ bool MetaContacts::isValidItem(const Jid &AStreamJid, const Jid &AItem) const
 	return false;
 }
 
-QList<Jid> MetaContacts::filterValidItems(const Jid &AStreamJid, const QList<Jid> &AItems) const
-{
-	QList<Jid> items;
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-	if (roster != NULL)
-	{
-		foreach(const Jid &item, AItems)
-		{
-			if (item.isValid() && !item.node().isEmpty())
-			{
-				IRosterItem ritem = roster->rosterItem(item);
-				if (ritem.isValid)
-					items.append(ritem.itemJid);
-			}
-		}
-	}
-	return items;
-}
-
 bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact)
 {
-	if (!AMetaContact.id.isNull())
+	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+	if (roster!=NULL && !AMetaContact.id.isNull())
 	{
 		IMetaContact meta = AMetaContact;
 		IMetaContact before = findMetaContact(AStreamJid,meta.id);
 
-		meta.items = filterValidItems(AStreamJid,meta.items);
-		if (meta.items != before.items)
+		QHash<Jid, QUuid> &itemMetaHash = FItemMetaContact[AStreamJid];
+
+		QList<IPresenceItem> metaPresences;
+		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
+
+		meta.groups.clear();
+		foreach(const Jid &item, meta.items)
 		{
-			if (!meta.items.isEmpty())
+			IRosterItem ritem = roster->rosterItem(item);
+			if (ritem.isValid && !item.node().isEmpty())
 			{
-				meta.groups.clear();
-				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-
-				QList<IPresenceItem> metaPresences;
-				IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
-
-				foreach(const Jid &item, meta.items)
+				if (!before.items.contains(item))
 				{
-					if (!before.items.contains(item))
-					{
-						IMetaContact oldMeta = findMetaContact(AStreamJid,item);
-						if (!oldMeta.id.isNull())
-							detachMetaContactItems(AStreamJid,oldMeta.id,oldMeta.items);
-					}
-
-					if (roster)
-					{
-						IRosterItem ritem = roster->rosterItem(item);
-						if (meta.name.isEmpty())
-							meta.name = ritem.name;
-						meta.groups += ritem.groups;
-					}
-
-					if (presence)
-						metaPresences += presence->findItems(item);
+					IMetaContact oldMeta = findMetaContact(AStreamJid,item);
+					if (!oldMeta.id.isNull())
+						detachMetaContactItems(AStreamJid,oldMeta.id,meta.items);
+					itemMetaHash.insert(item,meta.id);
 				}
 
-				if (FPresencePlugin)
-					meta.presence = FPresencePlugin->sortPresenceItems(metaPresences).value(0);
+				if (meta.name.isEmpty())
+					meta.name = ritem.name;
+				meta.groups += ritem.groups;
+
+				if (presence)
+					metaPresences += presence->findItems(item);
 			}
 			else
 			{
-				meta = NullMetaContact;
-				meta.id = before.id;
+				meta.items.removeAll(item);
+				itemMetaHash.remove(item);
 			}
 		}
+
+		foreach(const Jid &item, before.items.toSet()-meta.items.toSet())
+			itemMetaHash.remove(item);
+		meta.presence = !metaPresences.isEmpty() ? FPresencePlugin->sortPresenceItems(metaPresences).value(0) : IPresenceItem();
 
 		if (meta != before)
 		{
@@ -353,10 +332,10 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 				FMetaContacts[AStreamJid].remove(meta.id);
 				removeMetaIndex(AStreamJid,meta.id);
 			}
-			emit metaContactReceived(AStreamJid,meta,before);
-		}
 
-		return !meta.items.isEmpty();
+			emit metaContactReceived(AStreamJid,meta,before);
+			return true;
+		}
 	}
 	return false;
 }
@@ -373,11 +352,8 @@ void MetaContacts::updateMetaContacts(const Jid &AStreamJid, const QList<IMetaCo
 
 	foreach(const QUuid &metaId, oldMetaId)
 	{
-		IMetaContact before = FMetaContacts[AStreamJid].take(metaId);
-		IMetaContact meta = NullMetaContact;
-		meta.id = before.id;
-		removeMetaIndex(AStreamJid,metaId);
-		emit metaContactReceived(AStreamJid,meta,before);
+		IMetaContact meta = findMetaContact(AStreamJid,metaId);
+		detachMetaContactItems(AStreamJid,metaId,meta.items);
 	}
 }
 
@@ -407,7 +383,7 @@ void MetaContacts::updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AM
 	IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
 	if (sroot)
 	{
-		QList<IRosterIndex *> indexList = FMetaIndexes[AStreamJid][AMetaContact.id];
+		QList<IRosterIndex *> &indexList = FMetaIndexes[AStreamJid][AMetaContact.id];
 		
 		QMap<QString, IRosterIndex *> indexGroup;
 		foreach(IRosterIndex *index, indexList)
@@ -452,9 +428,10 @@ void MetaContacts::updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AM
 			oldGroupsIt = oldGroups.erase(oldGroupsIt);
 		}
 
+		QString metaName = !AMetaContact.name.isEmpty() ? AMetaContact.name : AMetaContact.items.value(0).bare();
 		foreach(IRosterIndex *index, indexList)
 		{
-			index->setData(AMetaContact.name,RDR_NAME);
+			index->setData(metaName,RDR_NAME);
 			index->setData(AMetaContact.presence.show,RDR_SHOW);
 			index->setData(AMetaContact.presence.status,RDR_STATUS);
 			index->setData(AMetaContact.presence.priority,RDR_PRIORITY);
@@ -582,7 +559,7 @@ QList<IMetaContact> MetaContacts::loadMetaContactsFromFile(const QString &AFileN
 void MetaContacts::saveMetaContactsToFile(const QString &AFileName, const QList<IMetaContact> &AContacts) const
 {
 	QFile file(AFileName);
-	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+	if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 	{
 		QDomDocument doc;
 		QDomElement storageElem = doc.appendChild(doc.createElementNS(NS_STORAGE_METACONTACTS,"storage")).toElement();
@@ -598,8 +575,9 @@ void MetaContacts::saveMetaContactsToFile(const QString &AFileName, const QList<
 
 void MetaContacts::onRosterAdded(IRoster *ARoster)
 {
+	FLoadStreams += ARoster->streamJid();
 	FMetaContacts[ARoster->streamJid()].clear();
-	updateMetaContacts(ARoster->streamJid(),loadMetaContactsFromFile(metaContactsFileName(ARoster->streamJid())));
+	QTimer::singleShot(0,this,SLOT(onLoadContactsFromFileTimerTimeout()));
 }
 
 void MetaContacts::onRosterRemoved(IRoster *ARoster)
@@ -608,6 +586,7 @@ void MetaContacts::onRosterRemoved(IRoster *ARoster)
 	saveMetaContactsToFile(metaContactsFileName(ARoster->streamJid()),metas.values());
 
 	FSaveStreams -= ARoster->streamJid();
+	FLoadStreams -= ARoster->streamJid();
 	FMetaIndexes.remove(ARoster->streamJid());
 	FItemMetaContact.remove(ARoster->streamJid());
 }
@@ -618,6 +597,12 @@ void MetaContacts::onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore
 	{
 		FSaveStreams -= ABefore;
 		FSaveStreams += ARoster->streamJid();
+	}
+
+	if (FLoadStreams.contains(ABefore))
+	{
+		FLoadStreams -= ABefore;
+		FLoadStreams += ARoster->streamJid();
 	}
 
 	FMetaContacts[ARoster->streamJid()] = FMetaContacts.take(ABefore);
@@ -683,7 +668,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 		{
 			Jid streamJid;
 			bool isSameStream = true;
-			foreach(const QString stream, rolesMap.value(RDR_STREAM_JID))
+			foreach(const QString &stream, rolesMap.value(RDR_STREAM_JID))
 			{
 				if (streamJid.isEmpty())
 				{
@@ -715,6 +700,12 @@ void MetaContacts::onCombineContactsByAction()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 		showCombineContactsDialog(action->data(ADR_STREAM_JID).toString(),action->data(ADR_CONTACT_JID).toStringList(),action->data(ADR_METACONTACT_ID).toStringList());
+}
+
+void MetaContacts::onLoadContactsFromFileTimerTimeout()
+{
+	for (QSet<Jid>::iterator it=FLoadStreams.begin(); it!=FLoadStreams.end(); it=FLoadStreams.erase(it))
+		updateMetaContacts(*it,loadMetaContactsFromFile(metaContactsFileName(*it)));
 }
 
 void MetaContacts::onSaveContactsToStorageTimerTimeout()
