@@ -15,6 +15,12 @@ struct IMetaContact {
 	QList<Jid> items;
 	QSet<QString> groups;
 	IPresenceItem presence;
+	inline bool isNull() const {
+		return id.isNull();
+	}
+	inline bool isEmpty() const {
+		return items.isEmpty();
+	}
 	bool operator==(const IMetaContact &AOther) const {
 		return id==AOther.id && name==AOther.name && items==AOther.items && groups==AOther.groups && presence==AOther.presence;
 	}
@@ -38,7 +44,7 @@ public:
 	virtual bool setMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems) =0;
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups) =0;
 protected:
-	virtual void metaContactReceived(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore) =0;
+	virtual void metaContactChanged(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore) =0;
 };
 
 Q_DECLARE_INTERFACE(IMetaContacts,"Vacuum.Plugin.IMetaContacts/1.0")

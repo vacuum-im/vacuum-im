@@ -78,6 +78,8 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 			connect(FRosterPlugin->instance(),SIGNAL(rosterAdded(IRoster *)),SLOT(onRosterAdded(IRoster *)));
 			connect(FRosterPlugin->instance(),SIGNAL(rosterRemoved(IRoster *)),SLOT(onRosterRemoved(IRoster *)));
 			connect(FRosterPlugin->instance(),SIGNAL(rosterStreamJidChanged(IRoster *, const Jid &)),SLOT(onRosterStreamJidChanged(IRoster *, const Jid &)));
+			connect(FRosterPlugin->instance(),SIGNAL(rosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)),
+				SLOT(onRosterItemReceived(IRoster *, const IRosterItem &, const IRosterItem &)));
 		}
 	}
 
@@ -85,6 +87,11 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 	if (plugin)
 	{
 		FPresencePlugin = qobject_cast<IPresencePlugin *>(plugin->instance());
+		if (FPresencePlugin)
+		{
+			connect(FPresencePlugin->instance(),SIGNAL(presenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)),
+				SLOT(onPresenceItemReceived(IPresence *, const IPresenceItem &, const IPresenceItem &)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersModel").value(0,NULL);
@@ -303,7 +310,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 				}
 
 				if (meta.name.isEmpty())
-					meta.name = ritem.name;
+					meta.name = !ritem.name.isEmpty() ? ritem.name : ritem.itemJid.uBare();
 				meta.groups += ritem.groups;
 
 				if (presence)
@@ -322,7 +329,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 
 		if (meta != before)
 		{
-			if (!meta.items.isEmpty())
+			if (!meta.isEmpty())
 			{
 				FMetaContacts[AStreamJid][meta.id] = meta;
 				updateMetaIndex(AStreamJid,meta);
@@ -333,7 +340,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 				removeMetaIndex(AStreamJid,meta.id);
 			}
 
-			emit metaContactReceived(AStreamJid,meta,before);
+			emit metaContactChanged(AStreamJid,meta,before);
 			return true;
 		}
 	}
@@ -383,23 +390,24 @@ void MetaContacts::updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AM
 	IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
 	if (sroot)
 	{
-		QList<IRosterIndex *> &indexList = FMetaIndexes[AStreamJid][AMetaContact.id];
+		QList<IRosterIndex *> &metaIndexList = FMetaIndexes[AStreamJid][AMetaContact.id];
 		
 		QMap<QString, IRosterIndex *> indexGroup;
-		foreach(IRosterIndex *index, indexList)
+		foreach(IRosterIndex *index, metaIndexList)
 		{
 			QString group = index->data(RDR_GROUP).toString();
 			indexGroup.insert(group,index);
 		}
 
+		QSet<QString> metaGroups = !AMetaContact.groups.isEmpty() ? AMetaContact.groups : QSet<QString>()<<QString::null;
 		QSet<QString> curGroups = indexGroup.keys().toSet();
-		QSet<QString> newGroups = AMetaContact.groups - curGroups;
-		QSet<QString> oldGroups = curGroups - AMetaContact.groups;
+		QSet<QString> newGroups = metaGroups - curGroups;
+		QSet<QString> oldGroups = curGroups - metaGroups;
 
 		QSet<QString>::iterator oldGroupsIt = oldGroups.begin();
 		foreach(const QString &group, newGroups)
 		{
-			IRosterIndex *groupIndex = FRostersModel->getGroupIndex(RIK_GROUP,group,sroot);
+			IRosterIndex *groupIndex = FRostersModel->getGroupIndex(!group.isEmpty() ? RIK_GROUP : RIK_GROUP_BLANK,group,sroot);
 
 			IRosterIndex *index;
 			if (oldGroupsIt == oldGroups.end())
@@ -407,7 +415,7 @@ void MetaContacts::updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AM
 				index = FRostersModel->newRosterIndex(RIK_METACONTACT);
 				index->setData(AStreamJid.pFull(),RDR_STREAM_JID);
 				index->setData(AMetaContact.id.toString(),RDR_METACONTACT_ID);
-				indexList.append(index);
+				metaIndexList.append(index);
 			}
 			else
 			{
@@ -423,15 +431,14 @@ void MetaContacts::updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AM
 		while(oldGroupsIt != oldGroups.end())
 		{
 			IRosterIndex *index = indexGroup.value(*oldGroupsIt);
-			indexList.removeAll(index);
+			metaIndexList.removeAll(index);
 			FRostersModel->removeRosterIndex(index);
 			oldGroupsIt = oldGroups.erase(oldGroupsIt);
 		}
 
-		QString metaName = !AMetaContact.name.isEmpty() ? AMetaContact.name : AMetaContact.items.value(0).bare();
-		foreach(IRosterIndex *index, indexList)
+		foreach(IRosterIndex *index, metaIndexList)
 		{
-			index->setData(metaName,RDR_NAME);
+			index->setData(AMetaContact.name,RDR_NAME);
 			index->setData(AMetaContact.presence.show,RDR_SHOW);
 			index->setData(AMetaContact.presence.status,RDR_STATUS);
 			index->setData(AMetaContact.presence.priority,RDR_PRIORITY);
@@ -613,6 +620,28 @@ void MetaContacts::onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore
 		for (QList<IRosterIndex *>::const_iterator indexIt=metaIt->constBegin(); indexIt!=metaIt->constEnd(); ++indexIt)
 			(*indexIt)->setData(ARoster->streamJid().pFull(),RDR_STREAM_JID);
 	FMetaIndexes.insert(ARoster->streamJid(),indexes);
+}
+
+void MetaContacts::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
+{
+	Q_UNUSED(ABefore);
+	if (ARoster->isOpen() && (AItem.subscription!=ABefore.subscription || AItem.groups!=ABefore.groups))
+	{
+		IMetaContact meta = findMetaContact(ARoster->streamJid(),AItem.itemJid);
+		if (!meta.isNull())
+			updateMetaContact(ARoster->streamJid(),meta);
+	}
+}
+
+void MetaContacts::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
+{
+	Q_UNUSED(ABefore);
+	if (AItem.show!=ABefore.show || AItem.priority!=ABefore.priority)
+	{
+		IMetaContact meta = findMetaContact(APresence->streamJid(),AItem.itemJid);
+		if (!meta.isNull())
+			updateMetaContact(APresence->streamJid(),meta);
+	}
 }
 
 void MetaContacts::onPrivateStorageOpened(const Jid &AStreamJid)

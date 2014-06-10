@@ -3,6 +3,7 @@
 CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const Jid &AStreamJid, const QStringList &AContactJids, const QStringList &AMetaIds, QWidget *AParent) : QDialog(AParent)
 {
 	ui.setupUi(this);
+	setAttribute(Qt::WA_DeleteOnClose,true);
 
 	FStreamJid = AStreamJid;
 	FMetaContacts = AMetaContacts;
@@ -40,6 +41,7 @@ CombineContactsDialog::~CombineContactsDialog()
 void CombineContactsDialog::onDialogButtonsBoxAccepted()
 {
 	FMetaContacts->createMetaContact(FStreamJid,FContacts,ui.lneName->text());
+	close();
 }
 
 void CombineContactsDialog::onDialogButtonsBoxRejected()

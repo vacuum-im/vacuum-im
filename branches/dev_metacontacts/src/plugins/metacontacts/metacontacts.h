@@ -42,7 +42,7 @@ public:
 	virtual bool setMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups);
 signals:
-	void metaContactReceived(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore);
+	void metaContactChanged(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore);
 protected:
 	bool isValidItem(const Jid &AStreamJid, const Jid &AItem) const;
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
@@ -65,6 +65,9 @@ protected slots:
 	void onRosterAdded(IRoster *ARoster);
 	void onRosterRemoved(IRoster *ARoster);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
+	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
+protected slots:
+	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 protected slots:
 	void onPrivateStorageOpened(const Jid &AStreamJid);
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
