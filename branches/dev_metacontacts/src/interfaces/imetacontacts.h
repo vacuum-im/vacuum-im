@@ -14,7 +14,7 @@ struct IMetaContact {
 	QString name;
 	QList<Jid> items;
 	QSet<QString> groups;
-	IPresenceItem presence;
+	QList<IPresenceItem> presences;
 	inline bool isNull() const {
 		return id.isNull();
 	}
@@ -22,7 +22,7 @@ struct IMetaContact {
 		return items.isEmpty();
 	}
 	bool operator==(const IMetaContact &AOther) const {
-		return id==AOther.id && name==AOther.name && items==AOther.items && groups==AOther.groups && presence==AOther.presence;
+		return id==AOther.id && name==AOther.name && items==AOther.items && groups==AOther.groups && presences==AOther.presences;
 	}
 	bool operator!=(const IMetaContact &AOther) const {
 		return !operator==(AOther);

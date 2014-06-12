@@ -6,6 +6,7 @@
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosterindexkindorders.h>
+#include <definitions/rosterdataholderorders.h>
 #include <utils/widgetmanager.h>
 #include <utils/logger.h>
 
@@ -114,11 +115,21 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		}
 	}
 
+	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
+	if (plugin)
+	{
+		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+	}
+
 	return FRosterPlugin!=NULL && FPrivateStorage!=NULL;
 }
 
 bool MetaContacts::initObjects()
 {
+	if (FRostersModel)
+	{
+		FRostersModel->insertRosterDataHolder(RDHO_METACONTACTS,this);
+	}
 	return true;
 }
 
@@ -130,6 +141,34 @@ bool MetaContacts::initSettings()
 bool MetaContacts::startPlugin()
 {
 	return true;
+}
+
+QList<int> MetaContacts::rosterDataRoles(int AOrder) const
+{
+	if (AOrder == RDHO_METACONTACTS)
+		return QList<int>() << Qt::DecorationRole;
+	return QList<int>();
+}
+
+QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
+{
+	if (AOrder==RDHO_METACONTACTS && AIndex->kind()==RIK_METACONTACT)
+	{
+		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		Jid metaJid = AIndex->data(RDR_FULL_JID).toString();
+		switch(ARole)
+		{
+		case Qt::DecorationRole:
+			return FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,metaJid) : QIcon();
+		}
+	}
+	return QVariant();
+}
+
+bool MetaContacts::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole)
+{
+	Q_UNUSED(AOrder); Q_UNUSED(AValue); Q_UNUSED(AIndex); Q_UNUSED(ARole);
+	return false;
 }
 
 bool MetaContacts::isReady(const Jid &AStreamJid) const
@@ -289,13 +328,11 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 	{
 		IMetaContact meta = AMetaContact;
 		IMetaContact before = findMetaContact(AStreamJid,meta.id);
-
 		QHash<Jid, QUuid> &itemMetaHash = FItemMetaContact[AStreamJid];
-
-		QList<IPresenceItem> metaPresences;
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 
 		meta.groups.clear();
+		meta.presences.clear();
 		foreach(const Jid &item, meta.items)
 		{
 			IRosterItem ritem = roster->rosterItem(item);
@@ -314,7 +351,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 				meta.groups += ritem.groups;
 
 				if (presence)
-					metaPresences += presence->findItems(item);
+					meta.presences += presence->findItems(item);
 			}
 			else
 			{
@@ -325,7 +362,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 
 		foreach(const Jid &item, before.items.toSet()-meta.items.toSet())
 			itemMetaHash.remove(item);
-		meta.presence = !metaPresences.isEmpty() ? FPresencePlugin->sortPresenceItems(metaPresences).value(0) : IPresenceItem();
+		meta.presences = !meta.presences.isEmpty() ? FPresencePlugin->sortPresenceItems(meta.presences) : meta.presences;
 
 		if (meta != before)
 		{
@@ -436,12 +473,27 @@ void MetaContacts::updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AM
 			oldGroupsIt = oldGroups.erase(oldGroupsIt);
 		}
 
+		QStringList resources;
+		foreach(const IPresenceItem &pitem, AMetaContact.presences)
+			if (pitem.show != IPresence::Offline)
+				resources.append(pitem.itemJid.pFull());
+
+		IPresenceItem metaPresence = AMetaContact.presences.value(0);
+		Jid metaJid = metaPresence.itemJid.isValid() ? metaPresence.itemJid : AMetaContact.items.value(0);
+
 		foreach(IRosterIndex *index, metaIndexList)
 		{
+			index->setData(metaJid.full(),RDR_FULL_JID);
+			index->setData(metaJid.pFull(),RDR_PREP_FULL_JID);
+			index->setData(metaJid.pBare(),RDR_PREP_BARE_JID);
+			index->setData(resources,RDR_RESOURCES);
+
 			index->setData(AMetaContact.name,RDR_NAME);
-			index->setData(AMetaContact.presence.show,RDR_SHOW);
-			index->setData(AMetaContact.presence.status,RDR_STATUS);
-			index->setData(AMetaContact.presence.priority,RDR_PRIORITY);
+			index->setData(metaPresence.show,RDR_SHOW);
+			index->setData(metaPresence.status,RDR_STATUS);
+			index->setData(metaPresence.priority,RDR_PRIORITY);
+
+			emit rosterDataChanged(index,Qt::DecorationRole);
 		}
 	}
 }

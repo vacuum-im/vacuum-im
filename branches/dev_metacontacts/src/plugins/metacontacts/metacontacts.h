@@ -10,15 +10,17 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
+#include <interfaces/istatusicons.h>
 #include "combinecontactsdialog.h"
 
 class MetaContacts : 
 	public QObject,
 	public IPlugin,
-	public IMetaContacts
+	public IMetaContacts,
+	public IRosterDataHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMetaContacts);
+	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder);
 public:
 	MetaContacts();
 	~MetaContacts();
@@ -30,6 +32,10 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin();
+	//IRosterDataHolder
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	// IMetaContacts
 	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const Jid &AItem) const;
@@ -43,6 +49,8 @@ public:
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups);
 signals:
 	void metaContactChanged(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore);
+	// IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 protected:
 	bool isValidItem(const Jid &AStreamJid, const Jid &AItem) const;
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
@@ -89,6 +97,7 @@ private:
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
+	IStatusIcons *FStatusIcons;
 private:
 	QTimer FSaveTimer;
 	QSet<Jid> FSaveStreams;
