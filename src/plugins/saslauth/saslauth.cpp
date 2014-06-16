@@ -147,27 +147,21 @@ bool SASLAuth::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOrde
 			FXmppStream->removeXmppStanzaHandler(XSHO_XMPP_FEATURE,this);
 			if (AStanza.tagName() == "success")
 			{
-				LOG_STRM_INFO(FXmppStream->streamJid(),"Authorization successed");
+				LOG_STRM_INFO(FXmppStream->streamJid(),"Authorization successes");
 				deleteLater();
 				emit finished(true);
 			}
 			else if (AStanza.tagName() == "failure")
 			{
-				XmppStanzaError err(AStanza.element());
+				XmppSaslError err(AStanza.element());
 				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Authorization failed: %1").arg(err.condition()));
-				emit error(err);
-			}
-			else if (AStanza.tagName() == "abort")
-			{
-				LOG_STRM_WARNING(FXmppStream->streamJid(),"Authorization aborted: Not authorized");
-				XmppStanzaError err(XmppStanzaError::EC_NOT_AUTHORIZED);
-				err.setAppCondition(NS_FEATURE_SASL,XERR_SASL_ABORTED);
 				emit error(err);
 			}
 			else
 			{
+				XmppError err(IERR_SASL_AUTH_INVALID_RESPONSE);
 				LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Authorization error: Invalid response=%1").arg(AStanza.tagName()));
-				emit error(XmppError(IERR_SASL_AUTH_INVALID_RESPONCE));
+				emit error(err);
 			}
 		}
 		return true;
@@ -245,8 +239,9 @@ bool SASLAuth::start(const QDomElement &AElem)
 		}
 		else
 		{
-			LOG_STRM_WARNING(FXmppStream->streamJid(),"Failed to send authorization request: Connection not secure");
-			emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
+			XmppError err(IERR_XMPPSTREAM_NOT_SECURE);
+			LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to send authorization request: %1").arg(err.condition()));
+			emit error(err);
 		}
 	}
 	else
