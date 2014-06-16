@@ -69,7 +69,7 @@
 #define IERR_ROSTER_REQUEST_FAILED                           "roster-request-failed"
 
 // SASLAuth
-#define IERR_SASL_AUTH_INVALID_RESPONCE                      "sasl-auth-invalid-responce"
+#define IERR_SASL_AUTH_INVALID_RESPONSE                      "sasl-auth-invalid-response"
 #define IERR_SASL_BIND_INVALID_STREAM_JID                    "sasl-bind-invalid-stream-jid"
 
 // SocksStreams

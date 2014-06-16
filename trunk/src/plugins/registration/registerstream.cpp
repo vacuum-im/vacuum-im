@@ -151,8 +151,9 @@ bool RegisterStream::start(const QDomElement &AElem)
 		}
 		else
 		{
-			LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to register new account on server: Connection not secure"));
-			emit error(XmppError(IERR_XMPPSTREAM_NOT_SECURE));
+			XmppError err(IERR_XMPPSTREAM_NOT_SECURE);
+			LOG_STRM_WARNING(FXmppStream->streamJid(),QString("Failed to register new account on server: %1").arg(err.condition()));
+			emit error(err);
 		}
 	}
 	deleteLater();
