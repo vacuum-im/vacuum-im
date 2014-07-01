@@ -955,7 +955,7 @@ void RecentContacts::startSaveItemsToStorage(const Jid &AStreamJid)
 	}
 }
 
-bool RecentContacts::saveItemsToStorage(const Jid &AStreamJid)
+bool RecentContacts::saveItemsToStorage(const Jid &AStreamJid) const
 {
 	if (FPrivateStorage && isReady(AStreamJid))
 	{
@@ -1221,6 +1221,7 @@ void RecentContacts::onPrivateStorageDataChanged(const Jid &AStreamJid, const QS
 void RecentContacts::onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid)
 {
 	saveItemsToStorage(AStreamJid);
+	FSaveStreams -= AStreamJid;
 }
 
 void RecentContacts::onRostersViewIndexContextMenuAboutToShow()
@@ -1451,13 +1452,9 @@ void RecentContacts::onRemoveFromFavoritesByAction()
 
 void RecentContacts::onSaveItemsToStorageTimerTimeout()
 {
-	for (QSet<Jid>::iterator it=FSaveStreams.begin(); it!=FSaveStreams.end(); )
-	{
-		if (saveItemsToStorage(*it))
-			it = FSaveStreams.erase(it);
-		else
-			++it;
-	}
+	foreach(const Jid &streamJid, FSaveStreams)
+		saveItemsToStorage(streamJid);
+	FSaveStreams.clear();
 }
 
 void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
