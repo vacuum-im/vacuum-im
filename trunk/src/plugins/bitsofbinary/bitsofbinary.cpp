@@ -130,15 +130,16 @@ bool BitsOfBinary::initSettings()
 					break;
 				}
 			}
-			file.close();
 
 			if (fileInfo.lastModified().addSecs(maxAge) < QDateTime::currentDateTime())
-				QFile::remove(fileInfo.absoluteFilePath());
+			{
+				LOG_DEBUG(QString("Binary data file=%1 removed due to age=%2 expired").arg(file.fileName()).arg(maxAge));
+				file.remove();
+			}
 		}
-		else
+		else if (file.exists())
 		{
-			QFile::remove(fileInfo.absoluteFilePath());
-			REPORT_ERROR(QString("Failed to check data file: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to check binary data file age: %1").arg(file.errorString()));
 		}
 	}
 	return true;
@@ -159,7 +160,7 @@ bool BitsOfBinary::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int A
 				QByteArray data = QByteArray::fromBase64(dataElem.text().toLatin1());
 				quint64 maxAge = dataElem.attribute("max-age").toLongLong();
 
-				LOG_STRM_INFO(AXmppStream->streamJid(),QString("Received data, id=%1, from=%2").arg(cid,AStanza.from()));
+				LOG_STRM_INFO(AXmppStream->streamJid(),QString("Received binary data, id=%1, from=%2").arg(cid,AStanza.from()));
 				saveBinary(cid,type,data,maxAge);
 			}
 			dataElem = dataElem.nextSiblingElement("data");
@@ -196,7 +197,7 @@ bool BitsOfBinary::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanza 
 		}
 		else
 		{
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to send requested data, cid=%1, from=%2: Data not found").arg(cid,AStanza.from()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to send requested binary data, cid=%1, from=%2: Data not found").arg(cid,AStanza.from()));
 			Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_ITEM_NOT_FOUND);
 			FStanzaProcessor->sendStanzaOut(AStreamJid, error);
 		}
@@ -218,12 +219,12 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 			quint64 maxAge = dataElem.attribute("max-age").toLongLong();
 			if (cid!=dataElem.attribute("cid") || type.isEmpty() || data.isEmpty())
 			{
-				LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, cid=%1, from=%2: Invalid response").arg(cid,AStanza.from()));
+				LOG_STRM_WARNING(AStreamJid,QString("Failed to request binary data, cid=%1, from=%2: Invalid response").arg(cid,AStanza.from()));
 				emit binaryError(cid,XmppError(IERR_BOB_INVALID_RESPONCE));
 			}
 			else if(!saveBinary(cid,type,data,maxAge))
 			{
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to request data, cid=%1, from=%2: Failed to save data").arg(cid,AStanza.from()));
+				LOG_STRM_ERROR(AStreamJid,QString("Failed to request binary data, cid=%1, from=%2: Failed to save data").arg(cid,AStanza.from()));
 				emit binaryError(cid,XmppError(IERR_BOB_DATA_SAVE_ERROR));
 			}
 			else
@@ -234,7 +235,7 @@ void BitsOfBinary::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		else
 		{
 			XmppStanzaError err(AStanza);
-			LOG_STRM_WARNING(AStreamJid,QString("Failed to request data, cid=%1, from=%2: %3").arg(cid,AStanza.from(),err.condition()));
+			LOG_STRM_WARNING(AStreamJid,QString("Failed to request binary data, cid=%1, from=%2: %3").arg(cid,AStanza.from(),err.condition()));
 			emit binaryError(cid,err);
 		}
 	}
@@ -269,13 +270,13 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, const Jid &AStreamJid, 
 				dataElem.setAttribute("cid",AContentId);
 				if (FStanzaProcessor->sendStanzaRequest(this,AStreamJid,stanza,LOAD_TIMEOUT))
 				{
-					LOG_STRM_INFO(AStreamJid,QString("Data load request sent, cid=%1, from=%2").arg(AContentId,AContactJid.full()));
+					LOG_STRM_INFO(AStreamJid,QString("Binary data load request sent, cid=%1, from=%2").arg(AContentId,AContactJid.full()));
 					FLoadRequests.insert(stanza.id(),AContentId);
 					return true;
 				}
 				else
 				{
-					LOG_STRM_WARNING(AStreamJid,QString("Failed to send data load request, cid=%1, to=%2").arg(AContentId,AContactJid.full()));
+					LOG_STRM_WARNING(AStreamJid,QString("Failed to send binary data load request, cid=%1, to=%2").arg(AContentId,AContactJid.full()));
 				}
 			}
 			else
@@ -298,22 +299,32 @@ bool BitsOfBinary::loadBinary(const QString &AContentId, QString &AType, QByteAr
 	QFile file(contentFileName(AContentId));
 	if (file.open(QFile::ReadOnly))
 	{
+		QString xmlError;
 		QDomDocument doc;
-		if (doc.setContent(&file,true) && AContentId==doc.documentElement().attribute("cid"))
+		if (doc.setContent(&file,true,&xmlError))
 		{
-			AType = doc.documentElement().attribute("type");
-			AData = QByteArray::fromBase64(doc.documentElement().text().toLatin1());
-			AMaxAge = doc.documentElement().attribute("max-age").toLongLong();
-			return true;
+			if (AContentId == doc.documentElement().attribute("cid"))
+			{
+				AType = doc.documentElement().attribute("type");
+				AData = QByteArray::fromBase64(doc.documentElement().text().toLatin1());
+				AMaxAge = doc.documentElement().attribute("max-age").toLongLong();
+				return true;
+			}
+			else
+			{
+				REPORT_ERROR("Failed to load binary data from file content: Invalid content id");
+				file.remove();
+			}
 		}
 		else
 		{
-			REPORT_ERROR("Failed to load data from file: Invalid format");
+			REPORT_ERROR(QString("Failed to load binary data from file content: %1").arg(xmlError));
+			file.remove();
 		}
 	}
 	else if (file.exists())
 	{
-		REPORT_ERROR(QString("Failed to load data from file: %1").arg(file.errorString()));
+		REPORT_ERROR(QString("Failed to load binary data from file: %1").arg(file.errorString()));
 	}
 	return false;
 }
@@ -333,22 +344,24 @@ bool BitsOfBinary::saveBinary(const QString &AContentId, const QString &AType, c
 			dataElem.appendChild(doc.createTextNode(AData.toBase64()));
 			if (file.write(doc.toByteArray()) > 0)
 			{
+				file.close();
 				emit binaryCached(AContentId,AType,AData,AMaxAge);
 				return true;
 			}
 			else
 			{
-				REPORT_ERROR("Failed to save data to file: Write error");
+				REPORT_ERROR(QString("Failed to save binary data to file: %1").arg(file.errorString()));
+				file.remove();
 			}
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to save data to file: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to save binary data to file: %1").arg(file.errorString()));
 		}
 	}
 	else
 	{
-		REPORT_ERROR("Failed to save data to file: Invalid params");
+		REPORT_ERROR("Failed to save binary data to file: Invalid params");
 	}
 	return false;
 }
@@ -367,7 +380,7 @@ bool BitsOfBinary::saveBinary(const QString &AContentId, const QString &AType, c
 	}
 	else
 	{
-		REPORT_ERROR("Failed to save data to stanza: Invalid params");
+		REPORT_ERROR("Failed to save binary data to stanza: Invalid params");
 	}
 	return false;
 }

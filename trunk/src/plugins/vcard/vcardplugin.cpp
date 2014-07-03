@@ -515,12 +515,12 @@ void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem)
 		{
 			rootElem.appendChild(AElem.cloneNode(true));
 			file.write(doc.toByteArray());
-			file.close();
+			file.flush();
 		}
 		else if (AElem.isNull() && !file.exists() && file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 		{
 			file.write(doc.toByteArray());
-			file.close();
+			file.flush();
 		}
 		else if (AElem.isNull() && file.exists() && file.open(QIODevice::ReadWrite))
 		{
@@ -530,7 +530,7 @@ void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem)
 				file.seek(0);
 				file.putChar(data);
 			}
-			file.close();
+			file.flush();
 		}
 		else
 		{

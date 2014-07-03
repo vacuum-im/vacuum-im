@@ -439,7 +439,7 @@ void Roster::saveRosterItems(const QString &AFileName) const
 	{
 		LOG_STRM_INFO(streamJid(),QString("Roster items saved to file=%1").arg(AFileName));
 		file.write(xml.toByteArray());
-		file.close();
+		file.flush();
 	}
 	else
 	{
@@ -454,11 +454,11 @@ void Roster::loadRosterItems(const QString &AFileName)
 		QFile file(AFileName);
 		if (file.open(QIODevice::ReadOnly))
 		{
-			QDomDocument xml;
 			QString xmlError;
-			if (xml.setContent(file.readAll(),&xmlError))
+			QDomDocument doc;
+			if (doc.setContent(&file,true,&xmlError))
 			{
-				QDomElement itemsElem = xml.firstChildElement("roster");
+				QDomElement itemsElem = doc.firstChildElement("roster");
 				if (!itemsElem.isNull() && itemsElem.attribute("streamJid")==streamJid().pBare())
 				{
 					LOG_STRM_INFO(streamJid(),QString("Roster items loaded from file=%1").arg(AFileName));
@@ -467,14 +467,15 @@ void Roster::loadRosterItems(const QString &AFileName)
 				}
 				else if (!itemsElem.isNull())
 				{
-					REPORT_ERROR("Failed to load roster items from file XML content: Invalid stream JID");
+					REPORT_ERROR("Failed to load roster items from file content: Invalid stream JID");
+					file.remove();
 				}
 			}
 			else
 			{
-				REPORT_ERROR(QString("Failed to load roster items XML content from file: %1").arg(xmlError));
+				REPORT_ERROR(QString("Failed to load roster items from file content: %1").arg(xmlError));
+				file.remove();
 			}
-			file.close();
 		}
 		else if (file.exists())
 		{

@@ -1040,24 +1040,24 @@ QList<IRecentItem> RecentContacts::loadItemsFromFile(const QString &AFileName) c
 	QList<IRecentItem> items;
 
 	QFile file(AFileName);
-	if (file.exists() && file.open(QIODevice::ReadOnly))
+	if (file.open(QIODevice::ReadOnly))
 	{
 		QString xmlError;
 		QDomDocument doc;
-		if (doc.setContent(file.readAll(),&xmlError))
+		if (doc.setContent(&file,true,&xmlError))
 		{
 			QDomElement itemsElem = doc.firstChildElement(PST_RECENTCONTACTS);
 			items = loadItemsFromXML(itemsElem);
 		}
 		else
 		{
-			LOG_ERROR(QString("Failed to load recent items content from file=%1: %2").arg(AFileName,xmlError));
+			REPORT_ERROR(QString("Failed to load recent items from file content: %1").arg(xmlError));
+			file.remove();
 		}
-		file.close();
 	}
 	else if (file.exists())
 	{
-		LOG_ERROR(QString("Failed to load recent items from file=%1: %2").arg(AFileName,file.errorString()));
+		REPORT_ERROR(QString("Failed to load recent items from file: %1").arg(file.errorString()));
 	}
 
 	return items;
@@ -1072,11 +1072,11 @@ void RecentContacts::saveItemsToFile(const QString &AFileName, const QList<IRece
 		QDomElement itemsElem = doc.appendChild(doc.createElementNS(PSN_RECENTCONTACTS,PST_RECENTCONTACTS)).toElement();
 		saveItemsToXML(itemsElem,AItems);
 		file.write(doc.toByteArray());
-		file.close();
+		file.flush();
 	}
 	else
 	{
-		LOG_ERROR(QString("Failed to save recent items to file=%1: %2").arg(AFileName,file.errorString()));
+		REPORT_ERROR(QString("Failed to save recent items to file: %1").arg(file.errorString()));
 	}
 }
 

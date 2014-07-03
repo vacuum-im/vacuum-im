@@ -273,8 +273,9 @@ QMap<QString, QVariant> SimpleMessageStyle::styleInfo(const QString &AStylePath)
 	QFile file(AStylePath+"/Info.plist");
 	if (!AStylePath.isEmpty() && file.open(QFile::ReadOnly))
 	{
+		QString xmlError;
 		QDomDocument doc;
-		if (doc.setContent(file.readAll(),true))
+		if (doc.setContent(&file,true,&xmlError))
 		{
 			QDomElement elem = doc.documentElement().firstChildElement("dict").firstChildElement("key");
 			while (!elem.isNull())
@@ -294,6 +295,10 @@ QMap<QString, QVariant> SimpleMessageStyle::styleInfo(const QString &AStylePath)
 				}
 				elem = elem.nextSiblingElement("key");
 			}
+		}
+		else
+		{
+			LOG_ERROR(QString("Failed to load simple style info from file content: %1").arg(xmlError));
 		}
 	}
 	else if (AStylePath.isEmpty())
@@ -512,7 +517,7 @@ QString SimpleMessageStyle::loadFileData(const QString &AFileName, const QString
 	}
 	else if (file.exists())
 	{
-		LOG_ERROR(QString("Failed to load simple style file data, file=%1: %2").arg(AFileName,file.errorString()));
+		LOG_ERROR(QString("Failed to load simple style data from file=%1: %2").arg(AFileName,file.errorString()));
 	}
 	return DefValue;
 }
