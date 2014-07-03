@@ -311,21 +311,30 @@ void PluginManager::loadSettings()
 			Logger::openLog(logDir.absolutePath());
 		}
 	}
+	LOG_INFO(QString("%1: %2.%3, Qt: %4/%5, OS: %6, Locale: %7").arg(CLIENT_NAME,CLIENT_VERSION).arg(revision(),QT_VERSION_STR,qVersion(),SystemManager::osVersion(),QLocale().name()));
 
 	FPluginsSetup.clear();
 	QDir homeDir(FDataPath);
 	QFile file(homeDir.absoluteFilePath(FILE_PLUGINS_SETTINGS));
-	if (file.exists() && file.open(QFile::ReadOnly))
-		FPluginsSetup.setContent(&file,true);
-	file.close();
+	if (file.open(QFile::ReadOnly))
+	{
+		QString xmlError;
+		if (!FPluginsSetup.setContent(&file,true,&xmlError))
+		{
+			REPORT_ERROR(QString("Failed to load plugins settings from file content: %1").arg(xmlError));
+			file.remove();
+		}
+	}
+	else if (file.exists())
+	{
+		REPORT_ERROR(QString("Failed to load plugin settings from file: %1").arg(file.errorString()));
+	}
 
 	if (FPluginsSetup.documentElement().tagName() != "plugins")
 	{
 		FPluginsSetup.clear();
 		FPluginsSetup.appendChild(FPluginsSetup.createElement("plugins"));
 	}
-
-	LOG_INFO(QString("%1: %2.%3, Qt: %4/%5, OS: %6, Locale: %7").arg(CLIENT_NAME,CLIENT_VERSION).arg(revision(),QT_VERSION_STR,qVersion(),SystemManager::osVersion(),QLocale().name()));
 }
 
 void PluginManager::saveSettings()
@@ -338,11 +347,10 @@ void PluginManager::saveSettings()
 		{
 			file.write(FPluginsSetup.toString(3).toUtf8());
 			file.flush();
-			file.close();
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to save plugins settings: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to save plugins settings to file: %1").arg(file.errorString()));
 		}
 	}
 }

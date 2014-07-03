@@ -534,9 +534,9 @@ void ReceiversWidget::selectionLoad(const QString &AFileName)
 		QFile file(AFileName);
 		if (file.open(QFile::ReadOnly))
 		{
-			QString errorMsg;
+			QString xmlError;
 			QDomDocument doc;
-			if (doc.setContent(&file,true,&errorMsg))
+			if (doc.setContent(&file,true,&xmlError))
 			{
 				if (doc.documentElement().namespaceURI() == "vacuum:messagewidgets:receiverswidget:selection")
 				{
@@ -564,7 +564,7 @@ void ReceiversWidget::selectionLoad(const QString &AFileName)
 			}
 			else
 			{
-				QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Failed to read file: %1").arg(errorMsg),QMessageBox::Ok);
+				QMessageBox::critical(this,tr("Failed to Load Contacts"),tr("Failed to read file: %1").arg(xmlError),QMessageBox::Ok);
 			}
 		}
 		else
