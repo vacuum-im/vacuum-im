@@ -8,6 +8,8 @@
 #include <utils/options.h>
 #include <utils/logger.h>
 
+static const QList<int> ContactsCacheIndexKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
+
 RostersModel::RostersModel()
 {
 	FRosterPlugin = NULL;
@@ -645,7 +647,7 @@ void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 			if (pindex)
 				FGroupsCache[pindex].insertMulti(rindex->data(RDR_NAME).toString(),rindex);
 		}
-		else if (!streamJid.isEmpty())
+		else if (!streamJid.isEmpty() && ContactsCacheIndexKinds.contains(rindex->kind()))
 		{
 			QString bareJid = rindex->data(RDR_PREP_BARE_JID).toString();
 			IRosterIndex *sindex = !bareJid.isEmpty() ? streamIndex(streamJid) : NULL;
@@ -668,7 +670,7 @@ void RostersModel::onAdvancedItemRemoving(QStandardItem *AItem)
 			if (pindex)
 				FGroupsCache[pindex].remove(rindex->data(RDR_NAME).toString(),rindex);
 		}
-		else if (!streamJid.isEmpty())
+		else if (!streamJid.isEmpty() && ContactsCacheIndexKinds.contains(rindex->kind()))
 		{
 			QString bareJid = rindex->data(RDR_PREP_BARE_JID).toString();
 			IRosterIndex *sindex = !bareJid.isEmpty() ? streamIndex(streamJid) : NULL;
