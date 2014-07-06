@@ -21,10 +21,10 @@ struct IMetaContact {
 	inline bool isEmpty() const {
 		return items.isEmpty();
 	}
-	bool operator==(const IMetaContact &AOther) const {
+	inline bool operator==(const IMetaContact &AOther) const {
 		return id==AOther.id && name==AOther.name && items==AOther.items && groups==AOther.groups && presences==AOther.presences;
 	}
-	bool operator!=(const IMetaContact &AOther) const {
+	inline bool operator!=(const IMetaContact &AOther) const {
 		return !operator==(AOther);
 	}
 };

@@ -1,46 +1,68 @@
 #include "combinecontactsdialog.h"
 
-CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const Jid &AStreamJid, const QStringList &AContactJids, const QStringList &AMetaIds, QWidget *AParent) : QDialog(AParent)
+#include <utils/logger.h>
+
+CombineContactsDialog::CombineContactsDialog(IMetaContacts *AMetaContacts, const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas, QWidget *AParent) : QDialog(AParent)
 {
+	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 
-	FStreamJid = AStreamJid;
 	FMetaContacts = AMetaContacts;
 
-	foreach(const QString &contact, AContactJids)
+	if (!AStreams.isEmpty() && AStreams.count()==AContacts.count() && AContacts.count()==AMetas.count())
 	{
-		Jid contactJid = contact;
-		if (contactJid.isValid() && !FContacts.contains(contactJid.bare()))
-			FContacts.append(contactJid.bare());
-	}
-
-	foreach(const QUuid &metaId, AMetaIds)
-	{
-		IMetaContact meta = FMetaContacts->findMetaContact(FStreamJid,metaId);
-		if (!meta.id.isNull())
+		for (int i=0; i<AStreams.count(); i++)
 		{
-			foreach(const Jid &contactJid, meta.items)
-				if (!FContacts.contains(contactJid))
-					FContacts.append(contactJid);
+			Jid streamJid = AStreams.at(i);
+			QUuid &metaId = FStreamMeta[streamJid];
+			QList<Jid> &contacts = FStreamContacts[streamJid];
 
-			if (FMetaId.isNull())
-				FMetaId = meta.id;
+			IMetaContact meta = FMetaContacts->findMetaContact(streamJid,QUuid(AMetas.at(i)));
+			if (!meta.id.isNull())
+			{
+				foreach(const Jid &itemJid, meta.items)
+				{
+					if (!contacts.contains(itemJid))
+					{
+						contacts.append(itemJid);
+						ui.lwtContacts->addItem(contacts.last().uBare());
+					}
+				}
+				metaId = metaId.isNull() ? meta.id : metaId;
+			}
+			else if (!contacts.contains(AContacts.at(i)))
+			{
+				contacts.append(AContacts.at(i));
+				ui.lwtContacts->addItem(contacts.last().uBare());
+			}
 		}
+
+		connect(ui.btbButtons,SIGNAL(accepted()),SLOT(onDialogButtonsBoxAccepted()));
+		connect(ui.btbButtons,SIGNAL(rejected()),SLOT(onDialogButtonsBoxRejected()));
 	}
-
-	connect(ui.btbButtons,SIGNAL(accepted()),SLOT(onDialogButtonsBoxAccepted()));
-	connect(ui.btbButtons,SIGNAL(rejected()),SLOT(onDialogButtonsBoxRejected()));
-}
-
-CombineContactsDialog::~CombineContactsDialog()
-{
-
+	else
+	{
+		REPORT_ERROR("Failed to show combine contacts dialog: Invalid Params");
+		deleteLater();
+	}
 }
 
 void CombineContactsDialog::onDialogButtonsBoxAccepted()
 {
-	FMetaContacts->createMetaContact(FStreamJid,FContacts,ui.lneName->text());
+	for (QMap<Jid, QList<Jid> >::const_iterator it=FStreamContacts.constBegin(); it!=FStreamContacts.constEnd(); ++it)
+	{
+		QUuid metaId = FStreamMeta.value(it.key());
+		if (!metaId.isNull())
+		{
+			FMetaContacts->setMetaContactItems(it.key(),metaId,it.value());
+			FMetaContacts->setMetaContactName(it.key(),metaId,ui.lneName->text());
+		}
+		else
+		{
+			FMetaContacts->createMetaContact(it.key(),it.value(),ui.lneName->text());
+		}
+	}
 	close();
 }
 

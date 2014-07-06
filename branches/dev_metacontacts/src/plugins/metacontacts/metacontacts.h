@@ -12,15 +12,18 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
 #include "combinecontactsdialog.h"
+#include "metasortfilterproxymodel.h"
 
 class MetaContacts : 
 	public QObject,
 	public IPlugin,
 	public IMetaContacts,
-	public IRosterDataHolder
+	public IRosterDataHolder,
+	public IRostersLabelHolder,
+	public IRostersClickHooker
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder);
+	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker);
 public:
 	MetaContacts();
 	~MetaContacts();
@@ -32,10 +35,16 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin();
-	//IRosterDataHolder
+	// IRosterDataHolder
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
 	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
+	// IRostersLabelHolder
+	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
+	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
+	// IRostersClickHooker
+	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	// IMetaContacts
 	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const Jid &AItem) const;
@@ -51,16 +60,23 @@ signals:
 	void metaContactChanged(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore);
 	// IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
+	// IRostersLabelHolder
+	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	bool isValidItem(const Jid &AStreamJid, const Jid &AItem) const;
+	void updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AMetaContact);
+	void removeMetaIndex(const Jid &AStreamJid, const QUuid &AMetaId);
+	void updateMetaIndexItems(IRosterIndex *AMetaIndex, const QList<Jid> &AItems);
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
 	void updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts);
 protected:
 	bool isReadyStreams(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
-	void updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AMetaContact);
-	void removeMetaIndex(const Jid &AStreamJid, const QUuid &AMetaId);
-	void showCombineContactsDialog(const Jid &AStreamJid, const QStringList &AContactJids, const QStringList &AMetaIds);
+	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
+protected:
+	void detachMetaItems(const QStringList &AStreams, const QStringList &AContacts);
+	void combineMetaItems(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas);
+	void destroyMetaContacts(const QStringList &AStreams, const QStringList &AMetas);
 protected:
 	void startSaveContactsToStorage(const Jid &AStreamJid);
 	bool saveContactsToStorage(const Jid &AStreamJid) const;
@@ -82,10 +98,19 @@ protected slots:
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
 protected slots:
+	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
+protected slots:
+	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips);
+	void onRostersViewNotifyInserted(int ANotifyId);
+	void onRostersViewNotifyRemoved(int ANotifyId);
+	void onRostersViewNotifyActivated(int ANotifyId);
 protected slots:
-	void onCombineContactsByAction();
+	void onDetachMetaItemsByAction();
+	void onCombineMetaItemsByAction();
+	void onDestroyMetaContactsByAction();
 protected slots:
 	void onLoadContactsFromFileTimerTimeout();
 	void onSaveContactsToStorageTimerTimeout();
@@ -105,6 +130,12 @@ private:
 private:
 	QMap<Jid, QHash<Jid, QUuid> > FItemMetaContact;
 	QMap<Jid, QHash<QUuid, IMetaContact> > FMetaContacts;
+private:
+	QMap<int, int> FProxyToIndexNotify;
+	MetaSortFilterProxyModel *FSortFilterProxyModel;
+	QMap<Menu *, QSet<Action *> > FProxyContextMenuActions;
+	QHash<const IRosterIndex *, IRosterIndex *> FMetaIndexItemProxy;
+	QHash<const IRosterIndex *, QMap<Jid, IRosterIndex *> > FMetaIndexItems;
 	QMap<Jid, QHash<QUuid, QList<IRosterIndex *> > > FMetaIndexes;
 };
 

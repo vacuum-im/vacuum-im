@@ -10,8 +10,7 @@ class CombineContactsDialog :
 {
 	Q_OBJECT;
 public:
-	CombineContactsDialog(IMetaContacts *AMetaContacts, const Jid &AStreamJid, const QStringList &AContactJids, const QStringList &AMetaIds, QWidget *AParent = NULL);
-	~CombineContactsDialog();
+	CombineContactsDialog(IMetaContacts *AMetaContacts, const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas, QWidget *AParent = NULL);
 protected slots:
 	void onDialogButtonsBoxAccepted();
 	void onDialogButtonsBoxRejected();
@@ -20,9 +19,8 @@ private:
 private:
 	IMetaContacts *FMetaContacts;
 private:
-	QUuid FMetaId;
-	Jid FStreamJid;
-	QList<Jid> FContacts;
+	QMap<Jid, QUuid> FStreamMeta;
+	QMap<Jid, QList<Jid> > FStreamContacts;
 };
 
 #endif // COMBINECONTACTSDIALOG_H
