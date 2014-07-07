@@ -65,6 +65,7 @@ bool DefaultConnectionPlugin::initSettings()
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_HOST,QString());
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PORT,5222);
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_PROXY,QString(APPLICATION_PROXY_REF_UUID));
+	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_SSLPROTOCOL,QSsl::SecureProtocols);
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_USELEGACYSSL,false);
 	Options::setDefaultValue(OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE,IDefaultConnection::Manual);
 	return true;
@@ -118,6 +119,7 @@ void DefaultConnectionPlugin::loadConnectionSettings(IConnection *AConnection, c
 		connection->setOption(IDefaultConnection::Port,ANode.value("port").toInt());
 		connection->setOption(IDefaultConnection::UseLegacySsl,ANode.value("use-legacy-ssl").toBool());
 		connection->setOption(IDefaultConnection::CertVerifyMode,ANode.value("cert-verify-mode").toInt());
+		connection->setProtocol((QSsl::SslProtocol)ANode.value("ssl-protocol").toInt());
 	}
 }
 

@@ -13,6 +13,7 @@ LEGEND
   [+] Added history archive replication
   [+] Added option to set host certificate check mode
   [+] Added ability to store additional trusted CA certificates in resources/cacertificates
+  [+] Added ability to select SSL negotiation protocol
   [*] Increased speed of access to local message history
   [*] Added workarounds for facebook XMPP server
   [-] The application may fail in some cases after unsuccessful Stanza-session initialization
@@ -28,7 +29,6 @@ LEGEND
   [-] Removing of avatars in several selected accounts or contacts was not working
   [-] The application may fail on removing from history active conversation
   [-] Fixed problems with editing of a priority of the status in the edit status dialog
-  [-] Fixed rare problems with establishing secure connection with server
   [-] Fixed problems with autocompletion of user nick names in conferences
 
 

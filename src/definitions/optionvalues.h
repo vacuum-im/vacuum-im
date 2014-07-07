@@ -16,6 +16,7 @@
 #define OPV_ACCOUNT_CONNECTION_HOST                     "accounts.account.connection.host"
 #define OPV_ACCOUNT_CONNECTION_PORT                     "accounts.account.connection.port"
 #define OPV_ACCOUNT_CONNECTION_PROXY                    "accounts.account.connection.proxy"
+#define OPV_ACCOUNT_CONNECTION_SSLPROTOCOL              "accounts.account.connection.ssl-protocol"
 #define OPV_ACCOUNT_CONNECTION_USELEGACYSSL             "accounts.account.connection.use-legacy-ssl"
 #define OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE           "accounts.account.connection.cert-verify-mode"
 // Registration
