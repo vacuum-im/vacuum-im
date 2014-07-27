@@ -470,11 +470,17 @@ IRosterIndex *RostersModel::getGroupIndex(int AKind, const QString &AGroup, IRos
 QList<IRosterIndex *> RostersModel::findContactIndexes(const Jid &AStreamJid, const Jid &AContactJid, IRosterIndex *AParent) const
 {
 	QList<IRosterIndex *> indexes = FContactsCache.value(streamIndex(AStreamJid)).values(AContactJid.bare());
-	if (AParent)
+
+	bool checkParent = AParent!=NULL;
+	bool checkResource = AStreamJid.pBare()==AContactJid.pBare() && !AContactJid.resource().isEmpty();
+	if (checkParent || checkResource)
 	{
 		for(QList<IRosterIndex *>::iterator it=indexes.begin(); it!=indexes.end(); )
 		{
-			if ((*it)->parentIndex() != AParent)
+			IRosterIndex *index = *it;
+			if (checkParent && index->parentIndex()!=AParent)
+				it = indexes.erase(it);
+			else if (checkResource && AContactJid!=index->data(RDR_PREP_FULL_JID).toString())
 				it = indexes.erase(it);
 			else
 				++it;

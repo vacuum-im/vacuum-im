@@ -50,16 +50,6 @@ void DatabaseSynchronizer::run()
 
 		Logger::startTiming(STMP_HISTORY_FILE_DATABASE_SYNC);
 
-		int loadHeaders = 0;
-		int fileHeaders = 0;
-		int readHeaders = 0;
-		int checkHeaders = 0;
-		int corruptHeaders = 0;
-		int invalidHeaders = 0;
-		int insertHeaders = 0;
-		int updateHeaders = 0;
-		int removeHeaders = 0;
-
 		bool syncFailed = false;
 		QDateTime syncTime = QDateTime::currentDateTime();
 
@@ -80,12 +70,12 @@ void DatabaseSynchronizer::run()
 						databaseHeadersMap[header.with].append(fileName);
 						databaseFileHeaders.insert(fileName,header);
 					}
-					loadHeaders++;
 				}
 			}
 			else
 			{
 				syncFailed = true;
+				REPORT_ERROR("Failed to synchronize file archive database: Database headers not loaded");
 			}
 			delete loadTask;
 
@@ -111,27 +101,19 @@ void DatabaseSynchronizer::run()
 						if (dbHeaderIt==databaseFileHeaders.end() || dbHeaderIt->timestamp<fileLastModified)
 						{
 							IArchiveHeader header = FFileArchive->loadFileHeader(filesIt.filePath());
-							if (header.with.isValid() && header.start.isValid())
+							if (header.with.isValid() && header.start.isValid() && !fileHeadersMap.value(header.with).contains(header))
 							{
 								if (!isGated && header.with.pBare()==bareWith.pBare())
 									fileHeadersMap[header.with].append(header);
 								else if (isGated && header.with.pNode()==bareWith.pNode())
 									fileHeadersMap[header.with].append(header);
-								else
-									invalidHeaders++;
 							}
-							else
-							{
-								corruptHeaders++;
-							}
-							readHeaders++;
 						}
 						else
 						{
 							databaseFileHeaders.erase(dbHeaderIt);
 						}
 					}
-					fileHeaders++;
 				}
 			}
 
@@ -146,7 +128,6 @@ void DatabaseSynchronizer::run()
 
 				QList<IArchiveHeader> &fileHeaders = it.value();
 				qSort(fileHeaders.begin(),fileHeaders.end());
-				checkHeaders += fileHeaders.count();
 
 				QList<IArchiveHeader> databaseHeaders;
 				foreach(const QString &fileName, databaseHeadersMap.take(with))
@@ -199,30 +180,33 @@ void DatabaseSynchronizer::run()
 				{
 					QString gateType = !with.node().isEmpty() ? FFileArchive->contactGateType(with) : QString::null;
 					DatabaseTaskInsertHeaders *insertTask = new DatabaseTaskInsertHeaders(streamJid,newHeaders,gateType);
-					if (FDatabaseWorker->execTask(insertTask) & !insertTask->isFailed())
-						insertHeaders += newHeaders.count();
-					else
+					if (!FDatabaseWorker->execTask(insertTask) || insertTask->isFailed())
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: New headers not inserted");
+					}
 					delete insertTask;
 				}
 
 				if (!syncFailed && !difHeaders.isEmpty())
 				{
 					DatabaseTaskUpdateHeaders *updateTask = new DatabaseTaskUpdateHeaders(streamJid,difHeaders);
-					if (FDatabaseWorker->execTask(updateTask) && !updateTask->isFailed())
-						updateHeaders += difHeaders.count();
-					else
+					if (!FDatabaseWorker->execTask(updateTask) || updateTask->isFailed())
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Changed headers not updated");
+					}
 					delete updateTask;
 				}
 
 				if (!syncFailed && !oldHeaders.isEmpty())
 				{
 					DatabaseTaskRemoveHeaders *removeTask = new DatabaseTaskRemoveHeaders(streamJid,oldHeaders);
-					if (FDatabaseWorker->execTask(removeTask) && !removeTask->isFailed())
-						removeHeaders += oldHeaders.count();
-					else
+					if (!FDatabaseWorker->execTask(removeTask) || removeTask->isFailed())
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+					}
 					delete removeTask;
 				}
 			}
@@ -241,10 +225,11 @@ void DatabaseSynchronizer::run()
 				if (!oldHeaders.isEmpty())
 				{
 					DatabaseTaskRemoveHeaders *removeTask = new DatabaseTaskRemoveHeaders(streamJid,oldHeaders);
-					if (FDatabaseWorker->execTask(removeTask) && !removeTask->isFailed())
-						removeHeaders += oldHeaders.count();
-					else
+					if (!FDatabaseWorker->execTask(removeTask) || removeTask->isFailed())
+					{
 						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+					}
 					delete removeTask;
 				}
 			}
@@ -252,14 +237,13 @@ void DatabaseSynchronizer::run()
 		else
 		{
 			syncFailed = true;
+			REPORT_ERROR("Failed to synchronize file archive database: Archive path is empty");
 		}
 
 		if (!FQuit)
 			QMetaObject::invokeMethod(this,"syncFinished",Qt::QueuedConnection,Q_ARG(const Jid &,streamJid),Q_ARG(bool,syncFailed));
 
-		if (syncFailed)
-			REPORT_ERROR("Failed to synchronize file archive database");
-		else
+		if (!syncFailed)
 			REPORT_TIMING(STMP_HISTORY_FILE_DATABASE_SYNC,Logger::finishTiming(STMP_HISTORY_FILE_DATABASE_SYNC));
 
 		locker.relock();

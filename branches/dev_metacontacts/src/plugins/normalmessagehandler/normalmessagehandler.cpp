@@ -335,6 +335,7 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 				{
 					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
 				}
+				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 
 				FNotifiedMessages.insertMulti(window,AMessage.data(MDR_MESSAGE_ID).toInt());
 			}

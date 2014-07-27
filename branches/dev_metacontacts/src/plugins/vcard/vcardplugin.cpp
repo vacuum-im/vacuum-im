@@ -5,28 +5,35 @@
 #include <QClipboard>
 #include <QDomDocument>
 #include <QApplication>
-#include <definitions/namespaces.h>
-#include <definitions/actiongroups.h>
-#include <definitions/rosterindexkinds.h>
-#include <definitions/rosterindexroles.h>
-#include <definitions/multiuserdataroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
-#include <definitions/vcardvaluenames.h>
-#include <definitions/xmppurihandlerorders.h>
+#include <definitions/namespaces.h>
+#include <definitions/optionnodes.h>
+#include <definitions/optionvalues.h>
+#include <definitions/optionwidgetorders.h>
+#include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
+#include <definitions/vcardvaluenames.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
+#include <definitions/multiuserdataroles.h>
+#include <definitions/xmppurihandlerorders.h>
 #include <definitions/rosterdataholderorders.h>
 #include <utils/widgetmanager.h>
 #include <utils/textmanager.h>
 #include <utils/xmpperror.h>
 #include <utils/shortcuts.h>
+#include <utils/options.h>
 #include <utils/stanza.h>
 #include <utils/action.h>
 #include <utils/logger.h>
 
 #define DIR_VCARDS                "vcards"
 #define VCARD_TIMEOUT             60000
+
+#define MAX_VCARD_IMAGE_SIZE      QSize(96,96)
+#define DEFAULT_IMAGE_FORMAT     "PNG"
 
 #define UPDATE_VCARD_DAYS         7
 #define UPDATE_REQUEST_TIMEOUT    5000
@@ -51,6 +58,7 @@ VCardPlugin::VCardPlugin()
 	FXmppUriQueries = NULL;
 	FMessageWidgets = NULL;
 	FRosterSearch = NULL;
+	FOptionsManager = NULL;
 
 	FUpdateTimer.setSingleShot(false);
 	FUpdateTimer.start(UPDATE_REQUEST_TIMEOUT);
@@ -163,6 +171,12 @@ bool VCardPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrde
 		FRosterSearch = qobject_cast<IRosterSearch *>(plugin->instance());
 	}
 
+	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
+	if (plugin)
+	{
+		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
+	}
+
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
 
 	return true;
@@ -198,6 +212,17 @@ bool VCardPlugin::initObjects()
 	{
 		FRosterSearch->insertSearchField(RDR_VCARD_SEARCH,tr("User Profile"));
 	}
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsHolder(this);
+	}
+	return true;
+}
+
+bool VCardPlugin::initSettings()
+{
+	Options::setDefaultValue(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE,true);
+
 	return true;
 }
 
@@ -314,6 +339,16 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 	}
 }
 
+QMultiMap<int, IOptionsWidget *> VCardPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+{
+	QMultiMap<int, IOptionsWidget *> widgets;
+	if (FOptionsManager && ANodeId==OPN_MISC)
+	{
+		widgets.insertMulti(OWO_MISC_VCARD,FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE),tr("Restrict maximum vCard images size"),AParent));
+	}
+	return widgets;
+}
+
 bool VCardPlugin::xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams)
 {
 	Q_UNUSED(AParams);
@@ -374,6 +409,8 @@ bool VCardPlugin::publishVCard(IVCard *AVCard, const Jid &AStreamJid)
 {
 	if (FStanzaProcessor && AVCard->isValid() && FVCardPublishId.key(AStreamJid.pBare()).isEmpty())
 	{
+		restrictVCardImagesSize(AVCard);
+
 		Stanza stanza("iq");
 		stanza.setTo(AStreamJid.bare()).setType("set").setId(FStanzaProcessor->newId());
 		QDomElement elem = stanza.element().appendChild(AVCard->vcardElem().cloneNode(true)).toElement();
@@ -432,6 +469,40 @@ void VCardPlugin::unlockVCard(const Jid &AContactJid)
 	}
 }
 
+void VCardPlugin::restrictVCardImagesSize(IVCard *AVCard)
+{
+	static const struct { const char *value; const char *type; } imageTags[] = {
+		{VVN_LOGO_VALUE,  VVN_LOGO_TYPE  },
+		{VVN_PHOTO_VALUE, VVN_PHOTO_TYPE },
+		{NULL,            NULL           },
+	};
+
+	if (Options::node(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE).value().toBool())
+	{
+		for (int i=0; imageTags[i].value!=NULL; i++)
+		{
+			QByteArray data = QByteArray::fromBase64(AVCard->value(imageTags[i].value).toLatin1());
+			if (data.size() > 8*1024)
+			{
+				QImage image = QImage::fromData(data);
+				if (image.width()>MAX_VCARD_IMAGE_SIZE.width() || image.height()>MAX_VCARD_IMAGE_SIZE.height())
+				{
+					QByteArray scaledData;
+					QBuffer buffer(&scaledData);
+					buffer.open(QIODevice::WriteOnly);
+
+					image = image.scaled(MAX_VCARD_IMAGE_SIZE,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+					if (!image.isNull() && image.save(&buffer,DEFAULT_IMAGE_FORMAT))
+					{
+						AVCard->setValueForTags(imageTags[i].value,scaledData.toBase64());
+						AVCard->setValueForTags(imageTags[i].type,QString("image/%1").arg(DEFAULT_IMAGE_FORMAT));
+					}
+				}
+			}
+		}
+	}
+}
+
 void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem) const
 {
 	if (AContactJid.isValid())
@@ -446,12 +517,12 @@ void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem)
 		{
 			rootElem.appendChild(AElem.cloneNode(true));
 			file.write(doc.toByteArray());
-			file.close();
+			file.flush();
 		}
 		else if (AElem.isNull() && !file.exists() && file.open(QIODevice::WriteOnly|QIODevice::Truncate))
 		{
 			file.write(doc.toByteArray());
-			file.close();
+			file.flush();
 		}
 		else if (AElem.isNull() && file.exists() && file.open(QIODevice::ReadWrite))
 		{
@@ -461,7 +532,7 @@ void VCardPlugin::saveVCardFile(const Jid &AContactJid,const QDomElement &AElem)
 				file.seek(0);
 				file.putChar(data);
 			}
-			file.close();
+			file.flush();
 		}
 		else
 		{

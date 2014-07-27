@@ -681,7 +681,9 @@ void XmppStream::onFeatureFinished(bool ARestart)
 
 void XmppStream::onFeatureError(const XmppError &AError)
 {
-	if (AError.errorNs()==NS_FEATURE_SASL || AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
+	if (AError.isSaslError() && AError.toSaslError().conditionCode()==XmppSaslError::EC_NOT_AUTHORIZED)
+		FSessionPassword = QString::null;
+	else if (AError.isStanzaError() && AError.toStanzaError().conditionCode()==XmppStanzaError::EC_NOT_AUTHORIZED)
 		FSessionPassword = QString::null;
 	abort(AError);
 }

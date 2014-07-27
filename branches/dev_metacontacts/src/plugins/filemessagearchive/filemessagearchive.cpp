@@ -225,10 +225,6 @@ bool FileMessageArchive::saveMessage(const Jid &AStreamJid, const Message &AMess
 			IArchiveItemPrefs prefs = FArchiver->archiveItemPrefs(AStreamJid,itemJid,AMessage.threadId());
 			written = writer->writeMessage(AMessage,prefs.save,ADirectionIn);
 		}
-		else
-		{
-			REPORT_ERROR("Failed to write message: File writer is not created");
-		}
 	}
 	else
 	{
@@ -254,9 +250,9 @@ bool FileMessageArchive::saveNote(const Jid &AStreamJid, const Message &AMessage
 			writer = newFileWriter(AStreamJid,header,filePath);
 		}
 		if (writer)
+		{
 			written = writer->writeNote(AMessage.body());
-		else
-			REPORT_ERROR("Failed to write note: File writer is not created");
+		}
 	}
 	else
 	{
@@ -512,11 +508,10 @@ IArchiveHeader FileMessageArchive::loadFileHeader(const QString &AFilePath) cons
 						break;
 					}
 				}
-				file.close();
 			}
 			else if (file.exists())
 			{
-				LOG_ERROR(QString("Failed to load file header: %1").arg(file.errorString()));
+				LOG_ERROR(QString("Failed to load file header from file=%1: %2").arg(file.fileName(),file.errorString()));
 			}
 		}
 		else
@@ -545,14 +540,13 @@ IArchiveCollection FileMessageArchive::loadFileCollection(const Jid &AStreamJid,
 			if (file.open(QFile::ReadOnly))
 			{
 				QDomDocument doc;
-				doc.setContent(file.readAll(),true);
+				doc.setContent(&file,true);
 				FArchiver->elementToCollection(doc.documentElement(),collection);
 				collection.header.engineId = engineId();
-				file.close();
 			}
 			else if (file.exists())
 			{
-				LOG_STRM_ERROR(AStreamJid,QString("Failed to load file collection with=%1: %2").arg(AHeader.with.full(),file.errorString()));
+				LOG_ERROR(QString("Failed to load file collection from file=%1: %2").arg(file.fileName(),file.errorString()));
 			}
 		}
 		else
@@ -700,14 +694,14 @@ IArchiveHeader FileMessageArchive::saveFileCollection(const Jid &AStreamJid, con
 			QDomElement chatElem = doc.appendChild(doc.createElement("chat")).toElement();
 			FArchiver->collectionToElement(collection,chatElem,ARCHIVE_SAVE_MESSAGE);
 			file.write(doc.toByteArray(2));
-			file.close();
+			file.flush();
 
 			saveModification(AStreamJid,collection.header,IArchiveModification::Changed);
 			return collection.header;
 		}
 		else
 		{
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to save file collection with=%1: %2").arg(ACollection.header.with.full(),file.errorString()));
+			LOG_ERROR(QString("Failed to save file collection to file=%1: %2").arg(file.fileName(),file.errorString()));
 		}
 	}
 	else
@@ -902,11 +896,10 @@ void FileMessageArchive::loadGatewayTypes()
 			if (!gateway.value(0).isEmpty() && !gateway.value(1).isEmpty())
 				FGatewayTypes.insert(gateway.value(0),gateway.value(1));
 		}
-		file.close();
 	}
 	else if (file.exists())
 	{
-		REPORT_ERROR("Failed to load gateway types: File not opened");
+		REPORT_ERROR(QString("Failed to load gateway types from file: %1").arg(file.errorString()));
 	}
 }
 
@@ -930,20 +923,22 @@ void FileMessageArchive::saveGatewayType(const QString &ADomain, const QString &
 	QMutexLocker locker(&FMutex);
 
 	QDir dir(fileArchiveRootPath());
-	QFile gateways(dir.absoluteFilePath(GATEWAY_FILE_NAME));
-	if (gateways.open(QFile::WriteOnly|QFile::Append|QFile::Text))
+	QFile file(dir.absoluteFilePath(GATEWAY_FILE_NAME));
+	if (file.open(QFile::WriteOnly|QFile::Append|QFile::Text))
 	{
 		QStringList gateway;
 		gateway << ADomain;
 		gateway << AType;
 		gateway << "\n";
-		gateways.write(gateway.join(" ").toUtf8());
-		gateways.close();
+
+		file.write(gateway.join(" ").toUtf8());
+		file.flush();
+
 		FGatewayTypes.insert(ADomain,AType);
 	}
 	else
 	{
-		REPORT_ERROR("Failed to save gateway type: File not opened");
+		REPORT_ERROR(QString("Failed to save gateway type to file: %1").arg(file.errorString()));
 	}
 }
 
@@ -1116,8 +1111,11 @@ bool FileMessageArchive::checkRequestFile(const QString &AFileName, const IArchi
 				elemStack.removeLast();
 			}
 		}
-		file.close();
 		return validState==Qt::Checked && textState==Qt::Checked && threadState==Qt::Checked;
+	}
+	else if (file.exists())
+	{
+		REPORT_ERROR(QString("Failed to check file for history request: %1").arg(file.errorString()));
 	}
 	return false;
 }
@@ -1204,8 +1202,13 @@ FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArch
 		{
 			delete writer;
 			writer = NULL;
+			REPORT_ERROR("Failed to create file writer: Writer not opened");
 		}
 		return writer;
+	}
+	else if (FWritingFiles.contains(AFileName))
+	{
+		REPORT_ERROR("Failed to create file writer: File already exists");
 	}
 	else
 	{

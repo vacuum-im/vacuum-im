@@ -1,5 +1,6 @@
 #include "optionsmanager.h"
 
+#include <QProcess>
 #include <QSettings>
 #include <QFileInfo>
 #include <QDateTime>
@@ -247,29 +248,36 @@ bool OptionsManager::setCurrentProfile(const QString &AProfile, const QString &A
 			// Loading options from file
 			QString xmlError;
 			QFile optionsFile(profileDir.filePath(FILE_OPTIONS));
-			if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(optionsFile.readAll(),true,&xmlError))
+			if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(&optionsFile,true,&xmlError))
 			{
 				if (!xmlError.isEmpty())
-					REPORT_ERROR(QString("Failed to load options file content: %1").arg(xmlError));
-				if (optionsFile.exists())
-					REPORT_ERROR(QString("Failed to open options file: %1").arg(optionsFile.errorString()));
+					REPORT_ERROR(QString("Failed to load options from file content: %1").arg(xmlError));
+				else if (optionsFile.exists())
+					REPORT_ERROR(QString("Failed to load options from file: %1").arg(optionsFile.errorString()));
 
-				// Trying to open valid copy of options
 				xmlError.clear();
 				optionsFile.close();
+
+				// Trying to open valid copy of options
 				optionsFile.setFileName(profileDir.filePath(FILE_OPTIONS_COPY));
-				if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(optionsFile.readAll(),true,&xmlError))
+				if (!optionsFile.open(QFile::ReadOnly) || !FProfileOptions.setContent(&optionsFile,true,&xmlError))
 				{
 					if (!xmlError.isEmpty())
-						REPORT_ERROR(QString("Failed to load second options file content: %1").arg(xmlError));
+						REPORT_ERROR(QString("Failed to load options backup from file content: %1").arg(xmlError));
 					else if (optionsFile.exists())
-						REPORT_ERROR(QString("Failed to open second options file: %1").arg(optionsFile.errorString()));
+						REPORT_ERROR(QString("Failed to load options backup from file: %1").arg(optionsFile.errorString()));
 
 					emptyProfile = true;
 					FProfileOptions.clear();
 					FProfileOptions.appendChild(FProfileOptions.createElement("options")).toElement();
-					LOG_INFO(QString("Created new options content for profile=%1").arg(AProfile));
+
+					LOG_INFO(QString("Created new options for profile=%1").arg(AProfile));
 				}
+				else
+				{
+					LOG_INFO(QString("Options loaded from backup for profile=%1").arg(AProfile));
+				}
+
 				// Renaming invalid options file
 				QFile::remove(profileDir.filePath(FILE_OPTIONS_FAIL));
 				QFile::rename(profileDir.filePath(FILE_OPTIONS),profileDir.filePath(FILE_OPTIONS_FAIL));
@@ -610,7 +618,7 @@ bool OptionsManager::saveOptions() const
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to save profile options: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to save profile options to file: %1").arg(file.errorString()));
 		}
 	}
 	else
@@ -626,14 +634,16 @@ QDomDocument OptionsManager::profileDocument(const QString &AProfile) const
 	QFile file(profilePath(AProfile) + "/" FILE_PROFILE);
 	if (file.open(QFile::ReadOnly))
 	{
-		QString docError;
-		if (!doc.setContent(file.readAll(),true,&docError))
-			LOG_ERROR(QString("Failed to load profile options content, profile=%1: %2").arg(AProfile,docError));
-		file.close();
+		QString xmlError;
+		if (!doc.setContent(&file,true,&xmlError))
+		{
+			REPORT_ERROR(QString("Failed to load profile options from file content: %1").arg(xmlError));
+			doc.clear();
+		}
 	}
 	else if (file.exists())
 	{
-		LOG_ERROR(QString("Failed to open profile options file, profile=%1: %2").arg(AProfile,file.errorString()));
+		REPORT_ERROR(QString("Failed to load profile options from file: %1").arg(file.errorString()));
 	}
 	return doc;
 }
@@ -643,14 +653,14 @@ bool OptionsManager::saveProfile(const QString &AProfile, const QDomDocument &AP
 	QFile file(profilePath(AProfile) + "/" FILE_PROFILE);
 	if (file.open(QFile::WriteOnly|QFile::Truncate))
 	{
-		LOG_INFO(QString("Profile content saved, profile=%1").arg(AProfile));
+		LOG_INFO(QString("Profile options saved, profile=%1").arg(AProfile));
 		file.write(AProfileDoc.toString(2).toUtf8());
-		file.close();
+		file.flush();
 		return true;
 	}
 	else
 	{
-		REPORT_ERROR(QString("Failed to save profile content: %1").arg(file.errorString()));
+		REPORT_ERROR(QString("Failed to save profile options to file: %1").arg(file.errorString()));
 	}
 	return false;
 }
@@ -663,13 +673,13 @@ void OptionsManager::importOldSettings()
 	{
 		foreach(const QString &dirName, FProfilesDir.entryList(QDir::Dirs|QDir::NoDotAndDotDot))
 		{
-			QFile settings(FProfilesDir.absoluteFilePath(dirName + "/settings.xml"));
-			if (!FProfilesDir.exists(dirName + "/" FILE_PROFILE) && settings.open(QFile::ReadOnly))
+			QFile file(FProfilesDir.absoluteFilePath(dirName + "/settings.xml"));
+			if (!FProfilesDir.exists(dirName + "/" FILE_PROFILE) && file.open(QFile::ReadOnly))
 			{
 				LOG_INFO(QString("Importing old settings to profile=%1").arg(FProfile));
 
 				QDomDocument doc;
-				if (doc.setContent(&settings,true) && addProfile(dirName,QString::null) && setCurrentProfile(dirName,QString::null))
+				if (doc.setContent(&file,true) && addProfile(dirName,QString::null) && setCurrentProfile(dirName,QString::null))
 				{
 					QDomElement accountElem = doc.documentElement().firstChildElement("plugin");
 					while (!accountElem.isNull() &&  QUuid(accountElem.attribute("pluginId"))!=QUuid(ACCOUNTMANAGER_UUID))
@@ -713,7 +723,6 @@ void OptionsManager::importOldSettings()
 					}
 					setCurrentProfile(QString::null,QString::null);
 				}
-				settings.close();
 			}
 		}
 	}
@@ -759,12 +768,41 @@ QMap<QString,QVariant> OptionsManager::loadOptionValues(const QString &AFileName
 	QFile file(AFileName);
 	if (file.open(QFile::ReadOnly))
 	{
-		QDomDocument doc;
-		if (doc.setContent(&file,true) && doc.documentElement().tagName()=="options")
+		QByteArray data = file.readAll();
+
+		foreach(const QString &env, QProcess::systemEnvironment())
 		{
-			LOG_INFO(QString("Option values loaded from file=%1").arg(AFileName));
-			return getOptionValues(Options::createNodeForElement(doc.documentElement()));
+			int keyPos = env.indexOf('=');
+			if (keyPos > 0)
+			{
+				QString envKey = "%"+env.left(keyPos)+"%";
+				QString envVal = env.right(env.length() - keyPos - 1);
+				data.replace(envKey.toUtf8(),envVal.toUtf8());
+			}
 		}
+
+		QString xmlError;
+		QDomDocument doc;
+		if (doc.setContent(data,true,&xmlError))
+		{
+			if (doc.documentElement().tagName() == "options")
+			{
+				LOG_INFO(QString("Option values loaded from file=%1").arg(AFileName));
+				return getOptionValues(Options::createNodeForElement(doc.documentElement()));
+			}
+			else
+			{
+				LOG_ERROR(QString("Failed to load option values from file=%1 content: Invalid tagname").arg(file.fileName()));
+			}
+		}
+		else
+		{
+			LOG_ERROR(QString("Failed to load option values from file=%1 content: %2").arg(file.fileName(),xmlError));
+		}
+	}
+	else if (file.exists())
+	{
+		LOG_ERROR(QString("Failed to load option values from file=%1: %2").arg(file.fileName(),file.errorString()));
 	}
 	return QMap<QString,QVariant>();
 }

@@ -185,11 +185,13 @@ void VCard::loadVCardFile()
 	if (file.open(QIODevice::ReadOnly))
 	{
 		QString xmlError;
-		if (!FDoc.setContent(file.readAll(),&xmlError))
+		if (!FDoc.setContent(&file,true,&xmlError))
+		{
 			REPORT_ERROR(QString("Failed to load vCard from file content: %1").arg(xmlError));
-		file.close();
+			file.remove();
+		}
 	}
-	else
+	else if (file.exists())
 	{
 		REPORT_ERROR(QString("Failed to load vCard from file: %1").arg(file.errorString()));
 	}

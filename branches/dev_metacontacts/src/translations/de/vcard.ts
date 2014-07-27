@@ -266,5 +266,9 @@
         <source>User Profile</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Restrict maximum vCard images size</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

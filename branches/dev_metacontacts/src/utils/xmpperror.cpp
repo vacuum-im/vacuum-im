@@ -3,12 +3,14 @@
 #include <QApplication>
 
 QMap<QString, QMap<QString, QMap<QString,QString> > > XmppError::FErrors;
+QMap<XmppSaslError::ErrorCondition,QString> XmppSaslError::FErrorConditions;
 QMap<XmppStreamError::ErrorCondition,QString> XmppStreamError::FErrorConditions;
 QMap<XmppStanzaError::ErrorType,QString> XmppStanzaError::FErrorTypes;
 QMap<XmppStanzaError::ErrorCondition,QString> XmppStanzaError::FErrorConditions;
 QMap<XmppStanzaError::ErrorCondition,XmppStanzaError::ErrorType> XmppStanzaError::FConditionTypes;
 
 const XmppError XmppError::null;
+const XmppSaslError XmppSaslError::null;
 const XmppStreamError XmppStreamError::null;
 const XmppStanzaError XmppStanzaError::null;
 
@@ -78,6 +80,11 @@ bool XmppError::isNull() const
 	return d==NULL || d->FErrorNS.isEmpty() || d->FCondition.isEmpty();
 }
 
+bool XmppError::isSaslError() const
+{
+	return d->FKind == XmppErrorData::Sasl;
+}
+
 bool XmppError::isStreamError() const
 {
 	return d->FKind == XmppErrorData::Stream;
@@ -91,6 +98,11 @@ bool XmppError::isStanzaError() const
 bool XmppError::isInternalError() const
 {
 	return d->FKind == XmppErrorData::Internal;
+}
+
+XmppSaslError XmppError::toSaslError() const
+{
+	return isSaslError() ? XmppSaslError(d) : XmppSaslError::null;
 }
 
 XmppStreamError XmppError::toStreamError() const
@@ -224,6 +236,7 @@ void XmppError::initialize()
 	if (!initialized)
 	{
 		initialized = true;
+		XmppSaslError::initialize();
 		XmppStreamError::initialize();
 		XmppStanzaError::initialize();
 	}
@@ -235,6 +248,7 @@ void XmppError::registerErrors()
 	if (!registered)
 	{
 		registered = true;
+		XmppSaslError::registerSaslErrors();
 		XmppStreamError::registerStreamErrors();
 		XmppStanzaError::registerStanzaErrors();
 	}
@@ -339,6 +353,80 @@ void XmppStreamError::registerStreamErrors()
 	XmppError::registerError(NS_XMPP_STREAM_ERROR,"unsupported-feature",qApp->translate("XmppStreamError","Unsupported feature"));
 	XmppError::registerError(NS_XMPP_STREAM_ERROR,"unsupported-stanza-type",qApp->translate("XmppStreamError","Unsupported stanza type"));
 	XmppError::registerError(NS_XMPP_STREAM_ERROR,"unsupported-version",qApp->translate("XmppStreamError","Unsupported version"));
+}
+
+//***************
+//XmppSaslError
+//***************
+XmppSaslError::XmppSaslError() : XmppError()
+{
+	d->FKind = XmppErrorData::Sasl;
+}
+
+XmppSaslError::XmppSaslError(QDomElement AErrorElem) : XmppError(AErrorElem,NS_XMPP_SASL_ERROR)
+{
+	d->FKind = XmppErrorData::Sasl;
+}
+
+XmppSaslError::XmppSaslError(ErrorCondition ACondition, const QString &AText) : XmppError(conditionByCode(ACondition),AText,NS_XMPP_SASL_ERROR)
+{
+	d->FKind = XmppErrorData::Sasl;
+}
+
+XmppSaslError::XmppSaslError(const XmppErrorDataPointer &AData) : XmppError(AData)
+{
+
+}
+
+XmppSaslError::ErrorCondition XmppSaslError::conditionCode() const
+{
+	return codeByCondition(condition());
+}
+
+void XmppSaslError::setCondition(ErrorCondition ACondition)
+{
+	XmppError::setCondition(conditionByCode(ACondition));
+}
+
+QString XmppSaslError::conditionByCode(ErrorCondition ACode)
+{
+	return FErrorConditions.value(ACode);
+}
+
+XmppSaslError::ErrorCondition XmppSaslError::codeByCondition(const QString &ACondition)
+{
+	return FErrorConditions.key(ACondition,EC_UNDEFINED_CONDITION);
+}
+
+void XmppSaslError::initialize()
+{
+	FErrorConditions.insert(EC_UNDEFINED_CONDITION,"undefined-condition");
+	FErrorConditions.insert(EC_ABORTED,"aborted");
+	FErrorConditions.insert(EC_ACCOUNT_DISABLED,"account-disabled");
+	FErrorConditions.insert(EC_CREDENTIALS_EXPIRED,"credentials-expired");
+	FErrorConditions.insert(EC_ENCRYPTION_REQUIRED,"encryption-required");
+	FErrorConditions.insert(EC_INCORRECT_ENCODING,"incorrect-encoding");
+	FErrorConditions.insert(EC_INVALID_AUTHZID,"invalid-authzid");
+	FErrorConditions.insert(EC_INVALID_MECHANISM,"invalid-mechanism");
+	FErrorConditions.insert(EC_MAILFORMED_REQUEST,"malformed-request");
+	FErrorConditions.insert(EC_MECHANISM_TOO_WEAK,"mechanism-too-weak");
+	FErrorConditions.insert(EC_NOT_AUTHORIZED,"not-authorized");
+	FErrorConditions.insert(EC_TEMPORARY_AUTH_FAILURE,"temporary-auth-failure");
+}
+
+void XmppSaslError::registerSaslErrors()
+{
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"aborted",qApp->translate("XmppSaslError","Authorization aborted"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"account-disabled",qApp->translate("XmppSaslError","Account disabled"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"credentials-expired",qApp->translate("XmppSaslError","Credentials expired"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"encryption-required",qApp->translate("XmppSaslError","Encryption required"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"incorrect-encoding",qApp->translate("XmppSaslError","Incorrect encoding"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"invalid-authzid",qApp->translate("XmppSaslError","Invalid authorization id"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"invalid-mechanism",qApp->translate("XmppSaslError","Invalid mechanism"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"malformed-request",qApp->translate("XmppSaslError","Malformed request"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"mechanism-too-weak",qApp->translate("XmppSaslError","Mechanism is too weak"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"not-authorized",qApp->translate("XmppSaslError","Not authorized"));
+	XmppError::registerError(NS_XMPP_SASL_ERROR,"temporary-auth-failure",qApp->translate("XmppSaslError","Temporary authentication failure"));
 }
 
 //***************

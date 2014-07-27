@@ -266,5 +266,9 @@
         <source>User Profile</source>
         <translation>Личные данные</translation>
     </message>
+    <message>
+        <source>Restrict maximum vCard images size</source>
+        <translation>Ограничивать максимальный размер изображений в vCard-е</translation>
+    </message>
 </context>
 </TS>

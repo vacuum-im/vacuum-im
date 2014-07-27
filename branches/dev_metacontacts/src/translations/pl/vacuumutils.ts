@@ -13,6 +13,53 @@
     </message>
 </context>
 <context>
+    <name>XmppSaslError</name>
+    <message>
+        <source>Authorization aborted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Credentials expired</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Encryption required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect encoding</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid authorization id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid mechanism</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Malformed request</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mechanism is too weak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized</source>
+        <translation type="unfinished">Brak autoryzacji</translation>
+    </message>
+    <message>
+        <source>Temporary authentication failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>XmppStreamError</name>
     <message>
         <source>Undefined error condition</source>

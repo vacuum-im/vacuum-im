@@ -19,6 +19,22 @@
         <source>Allow only trusted</source>
         <translation>Разрешать только доверенные</translation>
     </message>
+    <message>
+        <source>Auto Select</source>
+        <translation>Выбрать автоматически</translation>
+    </message>
+    <message>
+        <source>TLSv1</source>
+        <translation>TLSv1</translation>
+    </message>
+    <message>
+        <source>SSLv3</source>
+        <translation>SSLv3</translation>
+    </message>
+    <message>
+        <source>SSLv2</source>
+        <translation>SSLv2</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
@@ -37,6 +53,10 @@
     <message>
         <source>Certificate check mode:</source>
         <translation>Режим проверки сертификата:</translation>
+    </message>
+    <message>
+        <source>SSL Protocol:</source>
+        <translation>SSL протокол:</translation>
     </message>
 </context>
 <context>

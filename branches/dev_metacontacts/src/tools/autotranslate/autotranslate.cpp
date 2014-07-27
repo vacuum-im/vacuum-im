@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 		if (file.open(QFile::ReadOnly))
 		{
 			QDomDocument doc;
-			if (doc.setContent(file.readAll(),true))
+			if (doc.setContent(&file,true))
 			{
 				qDebug("Auto translating file '%s'.",file.fileName().toLocal8Bit().constData());
 				QDomElement rootElem = doc.firstChildElement("TS");

@@ -99,7 +99,7 @@ protected:
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
 protected:
 	void startSaveItemsToStorage(const Jid &AStreamJid);
-	bool saveItemsToStorage(const Jid &AStreamJid);
+	bool saveItemsToStorage(const Jid &AStreamJid) const;
 protected:
 	QString recentFileName(const Jid &AStreamJid) const;
 	QList<IRecentItem> loadItemsFromXML(const QDomElement &AElement) const;

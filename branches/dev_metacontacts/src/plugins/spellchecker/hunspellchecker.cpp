@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QLocale>
 #include <QCoreApplication>
+#include <utils/logger.h>
 #include "spellchecker.h"
 
 HunspellChecker::HunspellChecker() : FHunSpell(NULL), FDictCodec(NULL)
@@ -151,7 +152,7 @@ void HunspellChecker::loadPersonalDict()
 	{
 		QDir dictDir(FPersonalDictPath);
 		QFile file(dictDir.absoluteFilePath(PERSONAL_DICT_FILENAME));
-		if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+		if (file.open(QIODevice::ReadOnly|QIODevice::Text))
 		{
 			while (!file.atEnd())
 			{
@@ -162,7 +163,10 @@ void HunspellChecker::loadPersonalDict()
 					FHunSpell->add(encWord.constData());
 				}
 			}
-			file.close();
+		}
+		else if (file.exists())
+		{
+			REPORT_ERROR(QString("Failed to load personal dictionary from file: %1").arg(file.errorString()));
 		}
 	}
 }
@@ -177,7 +181,11 @@ void HunspellChecker::savePersonalDict(const QString &AWord)
 		{
 			file.write(AWord.toUtf8());
 			file.write("\n");
-			file.close();
+			file.flush();
+		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to save personal dictionary to file: %1").arg(file.errorString()));
 		}
 	}
 }
