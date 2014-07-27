@@ -11,6 +11,7 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
+#include <interfaces/imessagewidgets.h>
 #include "combinecontactsdialog.h"
 #include "metasortfilterproxymodel.h"
 
@@ -64,15 +65,18 @@ signals:
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	bool isValidItem(const Jid &AStreamJid, const Jid &AItem) const;
-	void updateMetaIndex(const Jid &AStreamJid, const IMetaContact &AMetaContact);
-	void removeMetaIndex(const Jid &AStreamJid, const QUuid &AMetaId);
+	void updateMetaIndexes(const Jid &AStreamJid, const IMetaContact &AMetaContact);
+	void removeMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId);
 	void updateMetaIndexItems(IRosterIndex *AMetaIndex, const QList<Jid> &AItems);
+	void updateMetaWindows(const Jid &AStreamJid, const IMetaContact &AMetaContact, const QSet<Jid> ANewItems, const QSet<Jid> AOldItems);
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
 	void updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts);
+	void startUpdateMetaContact(const Jid &AStreamJid, const QUuid &AMetaId);
+	void startUpdateMetaContactIndex(const Jid &AStreamJid, const QUuid &AMetaId, IRosterIndex *AIndex);
 protected:
 	bool isReadyStreams(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
-	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
+	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool ASelfProxy=true) const;
 protected:
 	void detachMetaItems(const QStringList &AStreams, const QStringList &AContacts);
 	void combineMetaItems(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas);
@@ -98,6 +102,8 @@ protected slots:
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
 protected slots:
+	void onRostersModelIndexInserted(IRosterIndex *AIndex);
+	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
 	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
 protected slots:
 	void onRostersViewIndexContextMenuAboutToShow();
@@ -108,10 +114,14 @@ protected slots:
 	void onRostersViewNotifyRemoved(int ANotifyId);
 	void onRostersViewNotifyActivated(int ANotifyId);
 protected slots:
+	void onMessageChatWindowCreated(IMessageChatWindow *AWindow);
+	void onMessageChatWindowDestroyed();
+protected slots:
 	void onDetachMetaItemsByAction();
 	void onCombineMetaItemsByAction();
 	void onDestroyMetaContactsByAction();
 protected slots:
+	void onUpdateContactsTimerTimeout();
 	void onLoadContactsFromFileTimerTimeout();
 	void onSaveContactsToStorageTimerTimeout();
 private:
@@ -123,20 +133,26 @@ private:
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
 	IStatusIcons *FStatusIcons;
+	IMessageWidgets *FMessageWidgets;
 private:
 	QTimer FSaveTimer;
+	QTimer FUpdateTimer;
 	QSet<Jid> FSaveStreams;
 	QSet<Jid> FLoadStreams;
+	QMap<Jid, QMap<QUuid, QSet<IRosterIndex *> > > FUpdateContacts;
 private:
 	QMap<Jid, QHash<Jid, QUuid> > FItemMetaContact;
 	QMap<Jid, QHash<QUuid, IMetaContact> > FMetaContacts;
 private:
 	QMap<int, int> FProxyToIndexNotify;
+	QMap<Menu *, Menu *> FProxyContextMenu;
 	MetaSortFilterProxyModel *FSortFilterProxyModel;
-	QMap<Menu *, QSet<Action *> > FProxyContextMenuActions;
 	QHash<const IRosterIndex *, IRosterIndex *> FMetaIndexItemProxy;
+	QMultiHash<const IRosterIndex *, IRosterIndex *> FMetaIndexProxyItem;
 	QHash<const IRosterIndex *, QMap<Jid, IRosterIndex *> > FMetaIndexItems;
 	QMap<Jid, QHash<QUuid, QList<IRosterIndex *> > > FMetaIndexes;
+private:
+	QMap<Jid, QHash<QUuid, IMessageChatWindow *> > FMetaChatWindows;
 };
 
 #endif // METACONTACTS_H

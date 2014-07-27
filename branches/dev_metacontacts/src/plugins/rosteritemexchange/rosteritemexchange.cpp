@@ -315,7 +315,7 @@ Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, I
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
 	int indexKind = AIndex->data(RDR_KIND).toInt();
-	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
+	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP || RIK_METACONTACT_ITEM)
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -329,7 +329,7 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		operator>>(stream,indexData);
 
 		int indexKind = indexData.value(RDR_KIND).toInt();
-		if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
+		if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP || indexKind==RIK_METACONTACT_ITEM)
 		{
 			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
 			if (!indexJid.node().isEmpty())
@@ -457,7 +457,7 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 				}
 			}
 		}
-		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
+		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
 		{
 			IRosterItem ritem;
 			ritem.isValid = true;

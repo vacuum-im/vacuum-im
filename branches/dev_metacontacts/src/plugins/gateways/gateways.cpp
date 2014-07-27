@@ -576,7 +576,7 @@ bool Gateways::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 	foreach(IRosterIndex *index, ASelected)
 	{
 		int indexKind = index->kind();
-		if (indexKind!=RIK_STREAM_ROOT && indexKind!=RIK_CONTACT && indexKind!=RIK_AGENT)
+		if (indexKind!=RIK_STREAM_ROOT && indexKind!=RIK_CONTACT && indexKind!=RIK_AGENT && indexKind!=RIK_METACONTACT_ITEM)
 			return false;
 		else if (singleKind!=-1 && singleKind!=indexKind)
 			return false;
@@ -788,7 +788,7 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 			else
 				delete addUserMenu;
 		}
-		else if (indexKind == RIK_CONTACT || indexKind == RIK_AGENT)
+		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
 		{
 			QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
 
@@ -796,7 +796,7 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 			for(int i=0; showResolve && i<AIndexes.count(); i++)
 			{
 				IRosterIndex *index = AIndexes.at(i);
-				if (indexKind == RIK_CONTACT)
+				if (indexKind==RIK_CONTACT || indexKind==RIK_METACONTACT_ITEM)
 				{
 					IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(index->data(RDR_STREAM_JID).toString()) : NULL;
 					IRosterItem ritem = roster!=NULL ? roster->rosterItem(index->data(RDR_PREP_BARE_JID).toString()) : IRosterItem();

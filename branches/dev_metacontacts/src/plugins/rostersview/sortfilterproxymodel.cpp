@@ -10,7 +10,7 @@ SortFilterProxyModel::SortFilterProxyModel(IRostersViewPlugin *ARostersViewPlugi
 {
 	FShowOffline = true;
 	FSortByStatus = false;
-	FRostersViewPlugin = ARostersViewPlugin;
+	FRostersView = ARostersViewPlugin->rostersView();
 }
 
 SortFilterProxyModel::~SortFilterProxyModel()
@@ -93,6 +93,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
 	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
+	IRostersModel *rootModel = FRostersView->rostersModel();
 
 	int visible = index.data(RDR_FORCE_VISIBLE).toInt();
 	if (visible > 0)
@@ -103,9 +104,9 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
 	{
 		return false;
 	}
-	else if (sourceModel()->hasChildren(index))
+	else if (rootModel!=NULL && rootModel->isGroupKind(index.data(RDR_KIND).toInt()))
 	{
-		for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+		for (int childRow=0; index.child(childRow,0).isValid(); childRow++)
 			if (filterAcceptsRow(childRow,index))
 				return true;
 		return false;

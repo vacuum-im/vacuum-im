@@ -37,6 +37,8 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
+static const QList<int> ChatHandlerRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+
 ChatMessageHandler::ChatMessageHandler()
 {
 	FAvatars = NULL;
@@ -408,6 +410,7 @@ bool ChatMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, co
 		IMessageChatWindow *window = getWindow(AStreamJid,AContactJid);
 		if (window)
 		{
+			window->address()->setAddress(AStreamJid,AContactJid);
 			if (AShowMode == IMessageHandler::SM_ASSIGN)
 				window->assignTabPage();
 			else if (AShowMode == IMessageHandler::SM_SHOW)
@@ -443,7 +446,7 @@ bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AInd
 
 bool ChatMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
 {
-	if (AOrder==RCHO_CHATMESSAGEHANDLER && AEvent->modifiers()==Qt::NoModifier && (AIndex->kind()==RIK_CONTACT || AIndex->kind()==RIK_MY_RESOURCE))
+	if (AOrder==RCHO_CHATMESSAGEHANDLER && AEvent->modifiers()==Qt::NoModifier && ChatHandlerRosterKinds.contains(AIndex->kind()) && AIndex->kind()!=RIK_AGENT)
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
 		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
@@ -734,11 +737,10 @@ void ChatMessageHandler::showStyledMessage(IMessageChatWindow *AWindow, const Me
 
 bool ChatMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> chatDialogKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
 	foreach(IRosterIndex *index, ASelected)
 	{
 		int indexKinds = index->kind();
-		if (!chatDialogKinds.contains(indexKinds))
+		if (!ChatHandlerRosterKinds.contains(indexKinds))
 			return false;
 	}
 	return !ASelected.isEmpty();

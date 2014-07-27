@@ -183,6 +183,8 @@ QVariant StatusIcons::rosterData(int AOrder, const IRosterIndex *AIndex, int ARo
 		case RIK_CONTACT:
 		case RIK_AGENT:
 		case RIK_MY_RESOURCE:
+		case RIK_METACONTACT:
+		case RIK_METACONTACT_ITEM:
 			return iconByJid(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_FULL_JID).toString());
 		}
 	}

@@ -20,6 +20,8 @@
 #define NOTIFY_WITHIN_DAYS   4
 #define NOTIFY_TIMEOUT       90000
 
+static const QList<int> BirthdayRosterKinds = QList<int>() << RIK_CONTACT << RIK_METACONTACT_ITEM;
+
 BirthdayReminder::BirthdayReminder()
 {
 	FAvatars = NULL;
@@ -234,8 +236,9 @@ bool BirthdayReminder::updateBirthdayState(const Jid &AContactJid)
 	if (isStateChanged && FRostersViewPlugin && FRostersModel)
 	{
 		QMultiMap<int, QVariant> findData;
-		findData.insert(RDR_KIND,RIK_CONTACT);
-		findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
+		foreach(int kind, BirthdayRosterKinds)
+			findData.insertMulti(RDR_KIND,kind);
+		findData.insertMulti(RDR_PREP_BARE_JID,AContactJid.pBare());
 		foreach (IRosterIndex *index, FRostersModel->rootIndex()->findChilds(findData,true))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,index);
 	}
@@ -328,7 +331,7 @@ void BirthdayReminder::onNotificationRemoved(int ANotifyId)
 
 void BirthdayReminder::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin && AIndex->kind() == RIK_CONTACT)
+	if (FRostersViewPlugin && BirthdayRosterKinds.contains(AIndex->kind()))
 	{
 		if (FUpcomingBirthdays.contains(AIndex->data(RDR_PREP_BARE_JID).toString()))
 			FRostersViewPlugin->rostersView()->insertLabel(FBirthdayLabelId,AIndex);

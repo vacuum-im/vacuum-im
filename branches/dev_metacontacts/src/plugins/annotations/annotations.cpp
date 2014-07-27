@@ -23,7 +23,7 @@
 #define ADR_CONTACTJID        Action::DR_Parametr1
 #define ADR_CLIPBOARD_DATA    Action::DR_Parametr2
 
-static const QList<int> RosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MUC_ITEM;
+static const QList<int> AnnotationRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MUC_ITEM << RIK_METACONTACT_ITEM;
 
 Annotations::Annotations()
 {
@@ -147,16 +147,10 @@ QVariant Annotations::rosterData(int AOrder, const IRosterIndex *AIndex, int ARo
 	Q_UNUSED(ARole);
 	if (AOrder == RDHO_ANNOTATIONS)
 	{
-		switch (AIndex->kind())
+		if (AnnotationRosterKinds.contains(AIndex->kind()))
 		{
-		case RIK_CONTACT:
-		case RIK_AGENT:
-		case RIK_MUC_ITEM:
-			{
-				QString note = annotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString());
-				return !note.isEmpty() ? QVariant(note) : QVariant();
-			}
-			break;
+			QString note = annotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString());
+			return !note.isEmpty() ? QVariant(note) : QVariant();
 		}
 	}
 	return QVariant();
@@ -167,16 +161,10 @@ bool Annotations::setRosterData(int AOrder, const QVariant &AValue, IRosterIndex
 	Q_UNUSED(ARole);
 	if (AOrder == RDHO_ANNOTATIONS)
 	{
-		switch (AIndex->kind())
+		if (AnnotationRosterKinds.contains(AIndex->kind()))
 		{
-		case RIK_CONTACT:
-		case RIK_AGENT:
-		case RIK_MUC_ITEM:
-			{
-				setAnnotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString(),AValue.toString());
-				return true;
-			}
-			break;
+			setAnnotation(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_PREP_BARE_JID).toString(),AValue.toString());
+			return true;
 		}
 	}
 	return false;
@@ -417,7 +405,7 @@ void Annotations::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		if (AId == SCT_ROSTERVIEW_EDITANNOTATION)
 		{
 			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			if (index!=NULL && RosterKinds.contains(index->data(RDR_KIND).toInt()))
+			if (index!=NULL && AnnotationRosterKinds.contains(index->data(RDR_KIND).toInt()))
 				showAnnotationDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
 	}
@@ -430,7 +418,7 @@ void Annotations::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 		IRosterIndex *index = AIndexes.first();
 		Jid streamJid = index->data(RDR_STREAM_JID).toString();
 		Jid contactJid = index->data(RDR_PREP_BARE_JID).toString();
-		if (RosterKinds.contains(index->kind()) && isEnabled(streamJid) && contactJid.isValid())
+		if (AnnotationRosterKinds.contains(index->kind()) && isEnabled(streamJid) && contactJid.isValid())
 		{
 			Action *action = new Action(AMenu);
 			action->setText(tr("Annotation"));
@@ -465,7 +453,7 @@ void Annotations::onRostersViewIndexClipboardMenu(const QList<IRosterIndex *> &A
 
 void Annotations::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if (ALabelId==AdvancedDelegateItem::DisplayId && RosterKinds.contains(AIndex->kind()))
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AnnotationRosterKinds.contains(AIndex->kind()))
 	{
 		QString note = AIndex->data(RDR_ANNOTATIONS).toString();
 		if (!note.isEmpty())

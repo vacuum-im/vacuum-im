@@ -1275,7 +1275,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 			for (int i=0;i<groupIndex->childCount();i++)
 			{
 				IRosterIndex *index = groupIndex->childIndex(i);
-				if (index->kind() == RIK_CONTACT || index->kind()==RIK_AGENT)
+				if (index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT)
 				{
 					IRosterItem ritem;
 					ritem.itemJid = index->data(RDR_PREP_BARE_JID).toString();
@@ -1299,7 +1299,7 @@ bool PrivacyLists::isAllStreamsReady(const QStringList &AStreams) const
 
 bool PrivacyLists::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
+	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP << RIK_METACONTACT_ITEM;
 
 	int singleKind = -1;
 	foreach(IRosterIndex *index, ASelected)
