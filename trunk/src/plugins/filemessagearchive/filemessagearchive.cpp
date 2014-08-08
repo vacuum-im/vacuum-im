@@ -804,12 +804,17 @@ QList<IArchiveHeader> FileMessageArchive::loadDatabaseHeaders(const Jid &AStream
 	QList<IArchiveHeader> headers;
 	if (isDatabaseReady(AStreamJid))
 	{
-		DatabaseTaskLoadHeaders *task = new DatabaseTaskLoadHeaders(AStreamJid,ARequest,contactGateType(ARequest.with));
+		IArchiveRequest request = ARequest;
+		request.maxItems = request.text.isEmpty() ? request.maxItems : 0xFFFFFFFF;
+
+		DatabaseTaskLoadHeaders *task = new DatabaseTaskLoadHeaders(AStreamJid,request,contactGateType(ARequest.with));
 		if (FDatabaseWorker->execTask(task) && !task->isFailed())
 		{
 			foreach(const IArchiveHeader &header, task->headers())
 			{
-				if (ARequest.text.isEmpty())
+				if ((quint32)headers.count() >= ARequest.maxItems)
+					break;
+				else if (ARequest.text.isEmpty())
 					headers.append(header);
 				else if (checkRequestFile(collectionFilePath(AStreamJid,header.with,header.start),ARequest))
 					headers.append(header);
