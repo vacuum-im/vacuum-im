@@ -18,7 +18,6 @@ DefaultConnection::DefaultConnection(IConnectionPlugin *APlugin, QObject *AParen
 	FDnsLookup.setType(QDnsLookup::SRV);
 	connect(&FDnsLookup,SIGNAL(finished()),SLOT(onDnsLookupFinished()));
 
-	FSocket.setProtocol(QSsl::SslV3);
 	FSocket.setSocketOption(QAbstractSocket::KeepAliveOption,1);
 	connect(&FSocket, SIGNAL(proxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)),
 		SLOT(onSocketProxyAuthenticationRequired(const QNetworkProxy &, QAuthenticator *)));

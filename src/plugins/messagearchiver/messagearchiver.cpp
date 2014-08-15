@@ -1614,38 +1614,47 @@ void MessageArchiver::loadPendingMessages(const Jid &AStreamJid)
 	QFile file(archiveFilePath(AStreamJid,PENDING_FILE_NAME));
 	if (file.open(QFile::ReadOnly))
 	{
+		QString xmlError;
 		QDomDocument doc;
-		if (doc.setContent(file.readAll(),true) && AStreamJid.pBare()==doc.documentElement().attribute("jid"))
+		if (doc.setContent(&file,true,&xmlError))
 		{
-			QList< QPair<Message,bool> > &messages = FPendingMessages[AStreamJid];
-			QDomElement messageElem = doc.documentElement().firstChildElement("message");
-			while (!messageElem.isNull())
+			if (AStreamJid.pBare() == doc.documentElement().attribute("jid"))
 			{
-				bool directionIn = QVariant(messageElem.attribute("x-archive-direction-in")).toBool();
-				messageElem.removeAttribute("x-archive-direction-in");
+				QList< QPair<Message,bool> > &messages = FPendingMessages[AStreamJid];
+				QDomElement messageElem = doc.documentElement().firstChildElement("message");
+				while (!messageElem.isNull())
+				{
+					bool directionIn = QVariant(messageElem.attribute("x-archive-direction-in")).toBool();
+					messageElem.removeAttribute("x-archive-direction-in");
 
-				Stanza stanza(messageElem);
-				Message message(stanza);
+					Stanza stanza(messageElem);
+					Message message(stanza);
 
-				if (directionIn)
-					message.setTo(AStreamJid.full());
-				else
-					message.setFrom(AStreamJid.full());
-				messages.append(qMakePair<Message,bool>(message,directionIn));
+					if (directionIn)
+						message.setTo(AStreamJid.full());
+					else
+						message.setFrom(AStreamJid.full());
+					messages.append(qMakePair<Message,bool>(message,directionIn));
 
-				messageElem = messageElem.nextSiblingElement("message");
+					messageElem = messageElem.nextSiblingElement("message");
+				}
+				LOG_STRM_INFO(AStreamJid,QString("Pending messages loaded, count=%1").arg(messages.count()));
 			}
-			LOG_STRM_INFO(AStreamJid,QString("Pending messages loaded, count=%1").arg(messages.count()));
+			else
+			{
+				REPORT_ERROR("Failed to load pending messages from file content: Invalid stream JID");
+				file.remove();
+			}
 		}
-		else if (doc.isNull())
+		else
 		{
-			REPORT_ERROR("Failed to load pending messages: Invalid file content");
+			REPORT_ERROR(QString("Failed to load pending messages from file content: %1").arg(xmlError));
+			file.remove();
 		}
-		else 
-		{
-			REPORT_ERROR("Failed to load pending messages: Invalid stream JID");
-		}
-		file.close();
+	}
+	else if (file.exists())
+	{
+		REPORT_ERROR(QString("Failed to load pending messages from file: %1").arg(file.errorString()));
 	}
 }
 
@@ -1673,13 +1682,13 @@ void MessageArchiver::savePendingMessages(const Jid &AStreamJid)
 		QFile file(archiveFilePath(AStreamJid,PENDING_FILE_NAME));
 		if (file.open(QFile::WriteOnly|QFile::Truncate))
 		{
-			file.write(doc.toByteArray());
-			file.close();
 			LOG_STRM_INFO(AStreamJid,QString("Pending messages saved, count=%1").arg(messages.count()));
+			file.write(doc.toByteArray());
+			file.flush();
 		}
 		else
 		{
-			REPORT_ERROR("Failed to save pending messages: File not opened");
+			REPORT_ERROR(QString("Failed to save pending messages to file: %1").arg(file.errorString()));
 		}
 	}
 }
@@ -1901,112 +1910,126 @@ bool MessageArchiver::isOTRStanzaSession(const Jid &AStreamJid, const Jid &ACont
 	return false;
 }
 
-void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const
+QDomDocument MessageArchiver::loadStanzaSessionsContexts(const Jid &AStreamJid) const
 {
 	QDomDocument sessions;
+
 	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
 	if (file.open(QFile::ReadOnly))
 	{
-		if (!sessions.setContent(&file))
+		QString xmlError;
+		if (!sessions.setContent(&file,true,&xmlError))
+		{
+			REPORT_ERROR(QString("Failed to load stanza sessions contexts from file content: %1").arg(xmlError));
 			sessions.clear();
-		file.close();
+			file.remove();
+		}
 	}
+	else if (file.exists())
+	{
+		REPORT_ERROR(QString("Failed to load stanza sessions contexts from file: %1").arg(file.errorString()));
+	}
+
+	if (sessions.isNull())
+		sessions.appendChild(sessions.createElement("stanzaSessions"));
+
+	return sessions;
+}
+
+void MessageArchiver::saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+	QDomDocument sessions = loadStanzaSessionsContexts(AStreamJid);
+
+	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
 	if (file.open(QFile::WriteOnly|QFile::Truncate))
 	{
-		if (sessions.isNull())
-			sessions.appendChild(sessions.createElement("stanzaSessions"));
 		const StanzaSession &session = FSessions.value(AStreamJid).value(AContactJid);
 		QDomElement elem = sessions.documentElement().appendChild(sessions.createElement("session")).toElement();
 		elem.setAttribute("id",session.sessionId);
 		elem.appendChild(sessions.createElement("jid")).appendChild(sessions.createTextNode(AContactJid.pFull()));
 		if (!session.defaultPrefs)
 			elem.appendChild(sessions.createElement("saveMode")).appendChild(sessions.createTextNode(session.saveMode));
+		
 		file.write(sessions.toByteArray());
 		file.close();
+
 		LOG_STRM_DEBUG(AStreamJid,QString("Stanza session context saved, jid=%1, sid=%2").arg(AContactJid.full(),session.sessionId));
 	}
 	else
 	{
-		REPORT_ERROR("Failed to save stanza session context: File not opened");
+		REPORT_ERROR(QString("Failed to save stanza session context to file: %1").arg(file.errorString()));
 	}
 }
 
 void MessageArchiver::restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId)
 {
-	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
-	if (file.open(QFile::ReadOnly))
+	LOG_STRM_DEBUG(AStreamJid,QString("Restoring stanza session context, sid=%1").arg(ASessionId));
+
+	QDomDocument sessions = loadStanzaSessionsContexts(AStreamJid);
+	QDomElement elem = sessions.documentElement().firstChildElement("session");
+	while (!elem.isNull())
 	{
-		LOG_STRM_DEBUG(AStreamJid,QString("Restoring stanza session context, sid=%1").arg(ASessionId));
-
-		QDomDocument sessions;
-		sessions.setContent(&file);
-		file.close();
-
-		QDomElement elem = sessions.documentElement().firstChildElement("session");
-		while (!elem.isNull())
+		if (ASessionId.isEmpty() || elem.attribute("id")==ASessionId)
 		{
-			if (ASessionId.isEmpty() || elem.attribute("id")==ASessionId)
+			QString requestId;
+			Jid contactJid = elem.firstChildElement("jid").text();
+			QString saveMode= elem.firstChildElement("saveMode").text();
+
+			if (saveMode.isEmpty() && archivePrefs(AStreamJid).itemPrefs.contains(contactJid))
 			{
-				QString requestId;
-				Jid contactJid = elem.firstChildElement("jid").text();
-				QString saveMode= elem.firstChildElement("saveMode").text();
-
-				if (saveMode.isEmpty() && archivePrefs(AStreamJid).itemPrefs.contains(contactJid))
-				{
-					requestId = removeArchiveItemPrefs(AStreamJid,contactJid);
-				}
-				else if (!saveMode.isEmpty() && archiveItemPrefs(AStreamJid,contactJid).save!=saveMode)
-				{
-					IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
-					prefs.itemPrefs[contactJid].save = saveMode;
-					requestId = setArchivePrefs(AStreamJid,prefs);
-				}
-				else
-				{
-					removeStanzaSessionContext(AStreamJid,elem.attribute("id"));
-				}
-
-				if (!requestId.isEmpty())
-					FRestoreRequests.insert(requestId,elem.attribute("id"));
+				requestId = removeArchiveItemPrefs(AStreamJid,contactJid);
 			}
-			elem = elem.nextSiblingElement("session");
+			else if (!saveMode.isEmpty() && archiveItemPrefs(AStreamJid,contactJid).save!=saveMode)
+			{
+				IArchiveStreamPrefs prefs = archivePrefs(AStreamJid);
+				prefs.itemPrefs[contactJid].save = saveMode;
+				requestId = setArchivePrefs(AStreamJid,prefs);
+			}
+			else
+			{
+				removeStanzaSessionContext(AStreamJid,elem.attribute("id"));
+			}
+
+			if (!requestId.isEmpty())
+				FRestoreRequests.insert(requestId,elem.attribute("id"));
 		}
+		elem = elem.nextSiblingElement("session");
 	}
 }
 
 void MessageArchiver::removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const
 {
-	QDomDocument sessions;
-	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
-	if (file.open(QFile::ReadOnly))
+	LOG_STRM_DEBUG(AStreamJid,QString("Removing stanza session context, sid=%1").arg(ASessionId));
+
+	QDomDocument sessions = loadStanzaSessionsContexts(AStreamJid);
+	QDomElement elem = sessions.documentElement().firstChildElement("session");
+	while (!elem.isNull())
 	{
-		if (!sessions.setContent(&file))
-			sessions.clear();
-		file.close();
-	}
-	if (!sessions.isNull())
-	{
-		QDomElement elem = sessions.documentElement().firstChildElement("session");
-		while (!elem.isNull())
+		if (elem.attribute("id") == ASessionId)
 		{
-			if (elem.attribute("id") == ASessionId)
-			{
-				elem.parentNode().removeChild(elem);
-				break;
-			}
-			elem = elem.nextSiblingElement("session");
+			elem.parentNode().removeChild(elem);
+			break;
+		}
+		elem = elem.nextSiblingElement("session");
+	}
+
+	QFile file(archiveFilePath(AStreamJid,SESSIONS_FILE_NAME));
+	if (sessions.documentElement().hasChildNodes())
+	{
+		if (file.open(QFile::WriteOnly|QFile::Truncate))
+		{
+			file.write(sessions.toByteArray());
+			file.close();
+		}
+		else
+		{
+			REPORT_ERROR(QString("Failed to remove stanza session context: %1").arg(file.errorString()));
 		}
 	}
-	if (sessions.documentElement().hasChildNodes() && file.open(QFile::WriteOnly|QFile::Truncate))
+	else if (!file.remove() && file.exists())
 	{
-		file.write(sessions.toByteArray());
-		file.close();
+		REPORT_ERROR(QString("Failed to remove stanza session context from file: %1").arg(file.errorString()));
 	}
-	else
-	{
-		file.remove();
-	}
-	LOG_STRM_DEBUG(AStreamJid,QString("Stanza session context removed, sid=%1").arg(ASessionId));
 }
 
 void MessageArchiver::startSuspendedStanzaSession(const Jid &AStreamJid, const QString &ARequestId)

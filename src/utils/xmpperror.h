@@ -13,9 +13,11 @@
 #define NS_INTERNAL_ERROR     "urn:vacuum:internal:errors"
 
 #define NS_XMPP_ERRORS        "urn:xmpp:errors"
+#define NS_XMPP_SASL_ERROR    "urn:ietf:params:xml:ns:xmpp-sasl"
 #define NS_XMPP_STREAM_ERROR  "urn:ietf:params:xml:ns:xmpp-streams"
 #define NS_XMPP_STANZA_ERROR  "urn:ietf:params:xml:ns:xmpp-stanzas"
 
+class XmppSaslError;
 class XmppStreamError;
 class XmppStanzaError;
 
@@ -30,7 +32,7 @@ public:
 	QString FConditionText;
 	QMap<QString,QString> FErrorText;
 	QMap<QString,QString> FAppConditions;
-	enum {Internal, Stream, Stanza } FKind;
+	enum {Internal, Stream, Sasl, Stanza } FKind;
 };
 typedef QSharedDataPointer<XmppErrorData> XmppErrorDataPointer;
 
@@ -41,9 +43,11 @@ public:
 	XmppError(QDomElement AErrorElem, const QString &AErrorNS);
 	XmppError(const QString &ACondition, const QString &AText=QString::null, const QString &AErrorNS=NS_INTERNAL_ERROR);
 	bool isNull() const;
+	bool isSaslError() const;
 	bool isStreamError() const;
 	bool isStanzaError() const;
 	bool isInternalError() const;
+	XmppSaslError toSaslError() const;
 	XmppStreamError toStreamError() const;
 	XmppStanzaError toStanzaError() const;
 	QString errorNs() const;
@@ -122,6 +126,42 @@ private:
 	static QMap<ErrorCondition,QString> FErrorConditions;
 private:
 	XmppStreamError(const XmppErrorDataPointer &AData);
+};
+
+class UTILS_EXPORT XmppSaslError :
+	public XmppError
+{
+	friend class XmppError;
+public:
+	enum ErrorCondition {
+		EC_UNDEFINED_CONDITION,
+		EC_ABORTED,
+		EC_ACCOUNT_DISABLED,
+		EC_CREDENTIALS_EXPIRED,
+		EC_ENCRYPTION_REQUIRED,
+		EC_INCORRECT_ENCODING,
+		EC_INVALID_AUTHZID,
+		EC_INVALID_MECHANISM,
+		EC_MAILFORMED_REQUEST,
+		EC_MECHANISM_TOO_WEAK,
+		EC_NOT_AUTHORIZED,
+		EC_TEMPORARY_AUTH_FAILURE
+	};
+	XmppSaslError();
+	XmppSaslError(QDomElement AErrorElem);
+	XmppSaslError(ErrorCondition ACondition, const QString &AText=QString::null);
+	ErrorCondition conditionCode() const;
+	void setCondition(ErrorCondition ACondition);
+public:
+	static const XmppSaslError null;
+	static QString conditionByCode(ErrorCondition ACode);
+	static ErrorCondition codeByCondition(const QString &ACondition);
+private:
+	static void initialize();
+	static void registerSaslErrors();
+	static QMap<ErrorCondition,QString> FErrorConditions;
+private:
+	XmppSaslError(const XmppErrorDataPointer &AData);
 };
 
 class UTILS_EXPORT XmppStanzaError :

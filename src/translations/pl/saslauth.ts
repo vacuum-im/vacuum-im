@@ -12,50 +12,6 @@
         <translation>Umożliwia zalogowanie się przy użyciu serwera uwierzytelniania SASL</translation>
     </message>
     <message>
-        <source>Authorization aborted</source>
-        <translation>Autoryzacja odwołana</translation>
-    </message>
-    <message>
-        <source>Account disabled</source>
-        <translation>Konto nieaktywne</translation>
-    </message>
-    <message>
-        <source>Credentials expired</source>
-        <translation>Poświadczenia wygasły</translation>
-    </message>
-    <message>
-        <source>Encryption required</source>
-        <translation>Wymagane szyfrowanie</translation>
-    </message>
-    <message>
-        <source>Incorrect encoding</source>
-        <translation>Błędne kodowanie</translation>
-    </message>
-    <message>
-        <source>Invalid authorization id</source>
-        <translation>Nieprawidłowy identyfikator autoryzacji</translation>
-    </message>
-    <message>
-        <source>Invalid mechanism</source>
-        <translation>Nieprawidłowy mechanizm</translation>
-    </message>
-    <message>
-        <source>Malformed request</source>
-        <translation>Błędne żądanie</translation>
-    </message>
-    <message>
-        <source>Mechanism is too weak</source>
-        <translation>Mechanizm jest zbyt słaby</translation>
-    </message>
-    <message>
-        <source>Not authorized</source>
-        <translation>Nieudana autoryzacja</translation>
-    </message>
-    <message>
-        <source>Temporary authentication failure</source>
-        <translation>Tymczasowy błąd autoryzacji</translation>
-    </message>
-    <message>
         <source>Wrong SASL authentication response</source>
         <translation>Zła odpowiedź podczas autoryzacji SASL</translation>
     </message>

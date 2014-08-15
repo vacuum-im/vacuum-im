@@ -543,7 +543,7 @@ INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications,
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Invitation received"));
 				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(streamJid,contactJid));
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(contactJid));
-				notify.data.insert(NDR_POPUP_HTML,notify.data.value(NDR_TOOLTIP).toString().toHtmlEscaped());
+				notify.data.insert(NDR_POPUP_TEXT,notify.data.value(NDR_TOOLTIP).toString());
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_INVITE_MESSAGE);
 				FActiveInvites.insert(AMessage.data(MDR_MESSAGE_ID).toInt(),AMessage);
 			}

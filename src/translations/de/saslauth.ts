@@ -12,50 +12,6 @@
         <translation>Erlaubt den Login auf einen Jabberserver mit SASL</translation>
     </message>
     <message>
-        <source>Authorization aborted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Account disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Credentials expired</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Encryption required</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Incorrect encoding</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid authorization id</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid mechanism</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Malformed request</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Mechanism is too weak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not authorized</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Temporary authentication failure</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Wrong SASL authentication response</source>
         <translation>Falsche SASL Authentifizierungsantwort</translation>
     </message>

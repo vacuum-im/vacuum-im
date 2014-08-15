@@ -12,50 +12,6 @@
         <translation>Дозволяє авторизуватись на сервері, використовуючи SASL авторизацію</translation>
     </message>
     <message>
-        <source>Authorization aborted</source>
-        <translation>Авторизація відмінена</translation>
-    </message>
-    <message>
-        <source>Account disabled</source>
-        <translation>Акаунт відключений</translation>
-    </message>
-    <message>
-        <source>Credentials expired</source>
-        <translation>Строк повноважень вичерпано</translation>
-    </message>
-    <message>
-        <source>Encryption required</source>
-        <translation>Потребує шифрування</translation>
-    </message>
-    <message>
-        <source>Incorrect encoding</source>
-        <translation>Невірне кодування</translation>
-    </message>
-    <message>
-        <source>Invalid authorization id</source>
-        <translation>Невірний id авторизації</translation>
-    </message>
-    <message>
-        <source>Invalid mechanism</source>
-        <translation>Невірний механізм</translation>
-    </message>
-    <message>
-        <source>Malformed request</source>
-        <translation>Некоректний запит</translation>
-    </message>
-    <message>
-        <source>Mechanism is too weak</source>
-        <translation>Механізм занадто слабкий</translation>
-    </message>
-    <message>
-        <source>Not authorized</source>
-        <translation>Не пройдена авторизація</translation>
-    </message>
-    <message>
-        <source>Temporary authentication failure</source>
-        <translation>Тимчасовий збій авторизації</translation>
-    </message>
-    <message>
         <source>Wrong SASL authentication response</source>
         <translation>Невірна відповідь під час SASL авторизації</translation>
     </message>

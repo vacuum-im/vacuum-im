@@ -491,10 +491,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					FMessageProcessor->messageToText(&doc,AMessage);
 					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
 				}
-				else
-				{
-					notify.data.insert(NDR_POPUP_HTML,AMessage.body().toHtmlEscaped());
-				}
+				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 			}
 			if (page)
 			{
@@ -517,7 +514,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Data form received"));
 				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(FMultiChat->streamJid(),userJid));
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(userJid));
-				notify.data.insert(NDR_POPUP_HTML,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text().toHtmlEscaped());
+				notify.data.insert(NDR_POPUP_TEXT,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text());
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_DATA_MESSAGE);
 				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());
@@ -2232,7 +2229,14 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 		QTextCursor cursor = textEdit->textCursor();
 		if (FCompleteIt == FCompleteNicks.constEnd())
 		{
-			cursor.movePosition(QTextCursor::StartOfWord, QTextCursor::KeepAnchor);
+			while (cursor.movePosition(QTextCursor::PreviousCharacter, QTextCursor::KeepAnchor))
+			{
+				if (cursor.selectedText().at(0).isSpace())
+				{
+					cursor.movePosition(QTextCursor::NextCharacter,QTextCursor::KeepAnchor);
+					break;
+				}
+			}
 			FStartCompletePos = cursor.position();
 			FCompleteNickStarts = cursor.selectedText().toLower();
 			refreshCompleteNicks();

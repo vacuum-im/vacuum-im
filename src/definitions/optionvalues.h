@@ -16,6 +16,7 @@
 #define OPV_ACCOUNT_CONNECTION_HOST                     "accounts.account.connection.host"
 #define OPV_ACCOUNT_CONNECTION_PORT                     "accounts.account.connection.port"
 #define OPV_ACCOUNT_CONNECTION_PROXY                    "accounts.account.connection.proxy"
+#define OPV_ACCOUNT_CONNECTION_SSLPROTOCOL              "accounts.account.connection.ssl-protocol"
 #define OPV_ACCOUNT_CONNECTION_USELEGACYSSL             "accounts.account.connection.use-legacy-ssl"
 #define OPV_ACCOUNT_CONNECTION_CERTVERIFYMODE           "accounts.account.connection.cert-verify-mode"
 // Registration
@@ -162,6 +163,8 @@
 #define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
 #define OPV_MISC_STATISTICTS_ENABLED                    "misc.statistics-enabled"
 #define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
+// VCardPlugin
+#define OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE             "misc.restrict-vcard-images-size"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"

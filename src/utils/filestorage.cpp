@@ -303,7 +303,7 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 
 	QDomDocument doc;
 	QFile file(ADefFile);
-	if (file.open(QFile::ReadOnly) && doc.setContent(file.readAll(),false))
+	if (file.open(QFile::ReadOnly) && doc.setContent(&file,true))
 	{
 		QDomElement objElem = doc.documentElement().firstChildElement();
 		while (!objElem.isNull())
@@ -369,6 +369,5 @@ void FileStorage::loadDefinitions(const QString &ADefFile, int APrefixIndex)
 			}
 			objElem = objElem.nextSiblingElement();
 		}
-		file.close();
 	}
 }

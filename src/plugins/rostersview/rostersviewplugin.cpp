@@ -282,6 +282,8 @@ QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, i
 				return 1;
 			else if (!FShowMergedStreams)
 				return -1;
+			else
+				return 1;
 		}
 	}
 	return QVariant();

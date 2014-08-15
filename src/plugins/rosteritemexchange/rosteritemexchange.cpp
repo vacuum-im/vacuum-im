@@ -650,7 +650,7 @@ void RosterItemExchange::notifyExchangeRequest(ExchangeApproveDialog *ADialog)
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Roster modification"));
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(request.streamJid,request.contactJid));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(request.contactJid));
-			notify.data.insert(NDR_POPUP_HTML,tr("%1 offers you to make some changes in your contact list.").arg(FNotifications->contactName(request.streamJid,request.contactJid)).toHtmlEscaped());
+			notify.data.insert(NDR_POPUP_TEXT,tr("%1 offers you to make some changes in your contact list.").arg(FNotifications->contactName(request.streamJid,request.contactJid)));
 			notify.data.insert(NDR_SOUND_FILE,SDF_ROSTEREXCHANGE_REQUEST);
 			notify.data.insert(NDR_ALERT_WIDGET,(qint64)ADialog);
 			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)ADialog);
