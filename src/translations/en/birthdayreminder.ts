@@ -15,13 +15,6 @@
         <source>Birthday remind</source>
         <translation>Birthday remind</translation>
     </message>
-    <message numerus="yes">
-        <source>Birthday in %n day(s),&lt;br&gt; %1</source>
-        <translation>
-            <numerusform>Birthday in %n day(s),&lt;br&gt; %1</numerusform>
-            <numerusform>Birthday in %n day(s),&lt;br&gt; %1</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Birthday today!</source>
         <translation>Birthday today!</translation>
@@ -43,6 +36,16 @@
     <message>
         <source>When reminding of upcoming birthdays</source>
         <translation>When reminding of upcoming birthdays</translation>
+    </message>
+    <message numerus="yes">
+        <source>Birthday in %n day(s),
+ %1</source>
+        <translation>
+            <numerusform>Birthday in %n day(s),
+ %1</numerusform>
+            <numerusform>Birthday in %n day(s),
+ %1</numerusform>
+        </translation>
     </message>
 </context>
 </TS>

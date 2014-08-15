@@ -83,11 +83,16 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 	else
 		ui.lblAvatar->setVisible(false);
 
-	QString text = ANotification.data.value(NDR_POPUP_HTML).toString();
-	if (!text.isEmpty())
+	QString htmlText = ANotification.data.value(NDR_POPUP_HTML).toString();
+	QString plainText = ANotification.data.value(NDR_POPUP_TEXT).toString();
+	if (!plainText.isEmpty() || !htmlText.isEmpty())
 	{
 		QTextDocument doc;
-		doc.setHtml(text);
+		if (!htmlText.isEmpty())
+			doc.setHtml(htmlText);
+		else
+			doc.setPlainText(plainText);
+
 		if (doc.rootFrame()->lastPosition() > 140)
 		{
 			QTextCursor cursor(&doc);
@@ -95,9 +100,9 @@ NotifyWidget::NotifyWidget(const INotification &ANotification)
 			cursor.movePosition(QTextCursor::End,QTextCursor::KeepAnchor);
 			cursor.removeSelectedText();
 			cursor.insertText("...");
-			text = TextManager::getDocumentBody(doc);
 		}
-		ui.ntbText->setHtml(text);
+
+		ui.ntbText->setHtml(TextManager::getDocumentBody(doc));
 		ui.ntbText->setContentsMargins(0,0,0,0);
 		ui.ntbText->document()->setDocumentMargin(0);
 		ui.ntbText->setNetworkAccessManager(FNetworkManager);

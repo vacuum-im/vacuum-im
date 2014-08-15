@@ -491,10 +491,6 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					FMessageProcessor->messageToText(&doc,AMessage);
 					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
 				}
-				else
-				{
-					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
-				}
 				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 			}
 			if (page)
@@ -518,9 +514,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 				notify.data.insert(NDR_POPUP_CAPTION,tr("Data form received"));
 				notify.data.insert(NDR_POPUP_TITLE,ANotifications->contactName(FMultiChat->streamJid(),userJid));
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(userJid));
-				QString string = AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text();
-				notify.data.insert(NDR_POPUP_HTML,Qt::escape(string));
-				notify.data.insert(NDR_POPUP_TEXT,string);
+				notify.data.insert(NDR_POPUP_TEXT,AMessage.stanza().firstElement("x",NS_JABBER_DATA).firstChildElement("instructions").text());
 				notify.data.insert(NDR_SOUND_FILE,SDF_MUC_DATA_MESSAGE);
 				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());

@@ -328,9 +328,7 @@ void CaptchaForms::notifyChallenge(const ChallengeItem &AChallenge)
 			notify.data.insert(NDR_POPUP_TITLE,FNotifications->contactName(AChallenge.streamJid,contactJid));
 			notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(contactJid));
 			notify.data.insert(NDR_POPUP_CAPTION, tr("CAPTCHA Challenge"));
-			QString string = tr("You have received the CAPTCHA challenge");
-			notify.data.insert(NDR_POPUP_HTML,Qt::escape(string));
-			notify.data.insert(NDR_POPUP_TEXT,string);
+			notify.data.insert(NDR_POPUP_TEXT,tr("You have received the CAPTCHA challenge"));
 			notify.data.insert(NDR_SOUND_FILE,SDF_CAPTCHAFORMS_REQUEST);
 			notify.data.insert(NDR_ALERT_WIDGET,(qint64)AChallenge.dialog->instance());
 			notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)AChallenge.dialog->instance());
