@@ -173,6 +173,7 @@ protected:
 	bool hasStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
 	bool isOTRStanzaSession(const IStanzaSession &ASession) const;
 	bool isOTRStanzaSession(const Jid &AStreamJid, const Jid &AContactJid) const;
+	QDomDocument loadStanzaSessionsContexts(const Jid &AStreamJid) const;
 	void saveStanzaSessionContext(const Jid &AStreamJid, const Jid &AContactJid) const;
 	void restoreStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId = QString::null);
 	void removeStanzaSessionContext(const Jid &AStreamJid, const QString &ASessionId) const;

@@ -399,6 +399,12 @@ void RosterSearch::onEnableActionTriggered(bool AChecked)
 {
 	setSearchEnabled(AChecked);
 	startSearch();
+
+	if (AChecked)
+	{
+		FSearchEdit->setFocus();
+		FSearchEdit->selectAll();
+	}
 }
 
 void RosterSearch::onRosterIndexDestroyed(IRosterIndex *AIndex)

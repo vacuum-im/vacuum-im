@@ -288,7 +288,7 @@ QList<QSslCertificate> ConnectionManager::trustedCaCertificates(bool AWithUsers)
 				}
 				else
 				{
-					LOG_ERROR(QString("Failed to load CA certificate from file=%1: %2").arg(file.fileName(),file.errorString()));
+					REPORT_ERROR(QString("Failed to load CA certificate from file: %1").arg(file.errorString()));
 				}
 			}
 		}
@@ -309,11 +309,11 @@ void ConnectionManager::addTrustedCaCertificate(const QSslCertificate &ACertific
 			{
 				LOG_INFO(QString("Saved trusted CA certificate to file=%1").arg(file.fileName()));
 				file.write(ACertificate.toPem());
-				file.close();
+				file.flush();
 			}
 			else
 			{
-				LOG_ERROR(QString("Failed to save CA certificate to file=%1: %2").arg(file.fileName(),file.errorString()));
+				REPORT_ERROR(QString("Failed to save trusted CA certificate to file: %1").arg(file.errorString()));
 			}
 		}
 	}

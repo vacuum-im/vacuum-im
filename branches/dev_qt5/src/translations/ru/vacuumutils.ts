@@ -13,6 +13,53 @@
     </message>
 </context>
 <context>
+    <name>XmppSaslError</name>
+    <message>
+        <source>Authorization aborted</source>
+        <translation>Авторизация отменена</translation>
+    </message>
+    <message>
+        <source>Account disabled</source>
+        <translation>Аккаунт отключен</translation>
+    </message>
+    <message>
+        <source>Credentials expired</source>
+        <translation>Истек срок полномочий</translation>
+    </message>
+    <message>
+        <source>Encryption required</source>
+        <translation>Требуется шифрование</translation>
+    </message>
+    <message>
+        <source>Incorrect encoding</source>
+        <translation>Неверная кодировка</translation>
+    </message>
+    <message>
+        <source>Invalid authorization id</source>
+        <translation>Неверный id авторизации</translation>
+    </message>
+    <message>
+        <source>Invalid mechanism</source>
+        <translation>Неверный механизм</translation>
+    </message>
+    <message>
+        <source>Malformed request</source>
+        <translation>Некорректный запрос</translation>
+    </message>
+    <message>
+        <source>Mechanism is too weak</source>
+        <translation>Механиз слишком слаб</translation>
+    </message>
+    <message>
+        <source>Not authorized</source>
+        <translation>Не пройдена авторизация</translation>
+    </message>
+    <message>
+        <source>Temporary authentication failure</source>
+        <translation>Временный сбой авторизации</translation>
+    </message>
+</context>
+<context>
     <name>XmppStreamError</name>
     <message>
         <source>Undefined error condition</source>

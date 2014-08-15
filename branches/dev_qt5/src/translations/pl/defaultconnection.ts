@@ -19,6 +19,30 @@
         <source>Allow only trusted</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Auto Select</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSLv3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSLv2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TLSv1.0</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TLSv1.1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TLSv1.2</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
@@ -36,6 +60,10 @@
     </message>
     <message>
         <source>Certificate check mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSL Protocol:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -10,6 +10,13 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FOptions = ANode;
 	FProxySettings = NULL;
 
+	ui.cmbSslProtocol->addItem(tr("Auto Select"),QSsl::SecureProtocols);
+	ui.cmbSslProtocol->addItem(tr("TLSv1.0"),QSsl::TlsV1_0);
+	ui.cmbSslProtocol->addItem(tr("TLSv1.1"),QSsl::TlsV1_0);
+	ui.cmbSslProtocol->addItem(tr("TLSv1.2"),QSsl::TlsV1_0);
+	ui.cmbSslProtocol->addItem(tr("SSLv2"),QSsl::SslV2);
+	ui.cmbSslProtocol->addItem(tr("SSLv3"),QSsl::SslV3);
+
 	ui.cmbCertCheckMode->addItem(tr("Disable check"),IDefaultConnection::Disabled);
 	ui.cmbCertCheckMode->addItem(tr("Request on errors"),IDefaultConnection::Manual);
 	ui.cmbCertCheckMode->addItem(tr("Disconnect on errors"),IDefaultConnection::Forbid);
@@ -31,6 +38,7 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	connect(ui.lneHost,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
 	connect(ui.spbPort,SIGNAL(valueChanged(int)),SIGNAL(modified()));
 	connect(ui.chbUseLegacySSL,SIGNAL(stateChanged(int)),SLOT(onUseLegacySSLStateChanged(int)));
+	connect(ui.cmbSslProtocol,SIGNAL(currentIndexChanged (int)),SIGNAL(modified()));
 	connect(ui.cmbCertCheckMode,SIGNAL(currentIndexChanged (int)),SIGNAL(modified()));
 
 	reset();
@@ -47,6 +55,7 @@ void ConnectionOptionsWidget::apply(OptionsNode ANode)
 	node.setValue(ui.lneHost->text(),"host");
 	node.setValue(ui.spbPort->value(),"port");
 	node.setValue(ui.chbUseLegacySSL->isChecked(),"use-legacy-ssl");
+	node.setValue(ui.cmbSslProtocol->itemData(ui.cmbSslProtocol->currentIndex()),"ssl-protocol");
 	node.setValue(ui.cmbCertCheckMode->itemData(ui.cmbCertCheckMode->currentIndex()),"cert-verify-mode");
 
 	if (FProxySettings)
@@ -65,6 +74,7 @@ void ConnectionOptionsWidget::reset()
 	ui.lneHost->setText(FOptions.value("host").toString());
 	ui.spbPort->setValue(FOptions.value("port").toInt());
 	ui.chbUseLegacySSL->setChecked(FOptions.value("use-legacy-ssl").toBool());
+	ui.cmbSslProtocol->setCurrentIndex(ui.cmbSslProtocol->findData(FOptions.value("ssl-protocol").toInt()));
 	ui.cmbCertCheckMode->setCurrentIndex(ui.cmbCertCheckMode->findData(FOptions.value("cert-verify-mode").toInt()));
 
 	if (FProxySettings)

@@ -1040,7 +1040,7 @@ IDiscoInfo ServiceDiscovery::loadCapsInfo(const EntityCapabilities &ACaps) const
 		{
 			QString xmlError;
 			QDomDocument doc;
-			if (doc.setContent(file.readAll(),true,&xmlError))
+			if (doc.setContent(&file,true,&xmlError))
 			{
 				QDomElement capsElem = doc.documentElement();
 				discoInfoFromElem(capsElem,dinfo);
@@ -1049,6 +1049,7 @@ IDiscoInfo ServiceDiscovery::loadCapsInfo(const EntityCapabilities &ACaps) const
 			else
 			{
 				REPORT_ERROR(QString("Failed to load caps info from file content: %1").arg(xmlError));
+				file.remove();
 			}
 		}
 		else if (file.exists())
@@ -1083,9 +1084,14 @@ bool ServiceDiscovery::saveCapsInfo(const IDiscoInfo &AInfo) const
 
 				QFile file(capsFileName(caps,!checked));
 				if (file.open(QIODevice::WriteOnly|QIODevice::Truncate))
+				{
 					file.write(doc.toByteArray());
+					file.flush();
+				}
 				else
-					REPORT_ERROR(QString("Failed to write caps info to file: %1").arg(file.errorString()));
+				{
+					REPORT_ERROR(QString("Failed to save caps info to file: %1").arg(file.errorString()));
+				}
 			}
 			return true;
 		}

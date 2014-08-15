@@ -1,7 +1,6 @@
 #include "saslplugin.h"
 
 #include <definitions/namespaces.h>
-#include <definitions/xmpperrors.h>
 #include <definitions/internalerrors.h>
 #include <definitions/xmppfeatureorders.h>
 #include <definitions/xmppfeaturepluginorders.h>
@@ -46,19 +45,7 @@ bool SASLPlugin::initConnections(IPluginManager *APluginManager, int &AInitOrder
 
 bool SASLPlugin::initObjects()
 {
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_ABORTED,tr("Authorization aborted"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_ACCOUNT_DISABLED,tr("Account disabled"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_CREDENTIALS_EXPIRED,tr("Credentials expired"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_ENCRYPTION_REQUIRED,tr("Encryption required"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_INCORRECT_ENCODING,tr("Incorrect encoding"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_INVALID_AUTHZID,tr("Invalid authorization id"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_INVALID_MECHANISM,tr("Invalid mechanism"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_MAILFORMED_REQUEST,tr("Malformed request"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_MECHANISM_TOO_WEAK,tr("Mechanism is too weak"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_NOT_AUTHORIZED,tr("Not authorized"));
-	XmppError::registerError(NS_FEATURE_SASL,XERR_SASL_TEMPORARY_AUTH_FAILURE,tr("Temporary authentication failure"));
-
-	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SASL_AUTH_INVALID_RESPONCE,tr("Wrong SASL authentication response"));
+	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SASL_AUTH_INVALID_RESPONSE,tr("Wrong SASL authentication response"));
 	XmppError::registerError(NS_INTERNAL_ERROR,IERR_SASL_BIND_INVALID_STREAM_JID,tr("Invalid XMPP stream JID in SASL bind response"));
 
 	if (FXmppStreams)

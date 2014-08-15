@@ -16,6 +16,7 @@
 #include <interfaces/ixmppuriqueries.h>
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/irostersearch.h>
+#include <interfaces/ioptionsmanager.h>
 #include "vcard.h"
 #include "vcarddialog.h"
 
@@ -32,12 +33,13 @@ class VCardPlugin :
 	public QObject,
 	public IPlugin,
 	public IVCardPlugin,
+	public IOptionsHolder,
 	public IStanzaRequestOwner,
 	public IXmppUriHandler,
 	public IRosterDataHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IVCardPlugin IRosterDataHolder IStanzaRequestOwner IXmppUriHandler);
+	Q_INTERFACES(IPlugin IVCardPlugin IRosterDataHolder IStanzaRequestOwner IXmppUriHandler IOptionsHolder);
 	Q_PLUGIN_METADATA(IID "org.jrudevels.vacuum.IVCardPlugin");
 	friend class VCard;
 public:
@@ -49,7 +51,7 @@ public:
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
 	virtual bool initConnections(IPluginManager *APluginManager, int &AInitOrder);
 	virtual bool initObjects();
-	virtual bool initSettings() { return true; }
+	virtual bool initSettings();
 	virtual bool startPlugin()  { return true; }
 	//IRosterDataHolder
 	virtual QList<int> rosterDataRoles(int AOrder) const;
@@ -57,6 +59,8 @@ public:
 	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
+	//IOptionsHolder
+	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IVCardPlugin
@@ -75,6 +79,7 @@ signals:
 protected:
 	void registerDiscoFeatures();
 	void unlockVCard(const Jid &AContactJid);
+	void restrictVCardImagesSize(IVCard *AVCard);
 	void saveVCardFile(const Jid &AContactJid, const QDomElement &AElem) const;
 	void removeEmptyChildElements(QDomElement &AElem) const;
 	void insertMessageToolBarAction(IMessageToolBarWidget *AWidget);
@@ -109,6 +114,7 @@ private:
 	IXmppUriQueries *FXmppUriQueries;
 	IMessageWidgets *FMessageWidgets;
 	IRosterSearch *FRosterSearch;
+	IOptionsManager *FOptionsManager;
 private:
 	QDir FVCardFilesDir;
 	QTimer FUpdateTimer;

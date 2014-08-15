@@ -247,7 +247,10 @@ void AccountManager::onProfileClosed(const QString &AProfile)
 void AccountManager::onOptionsOpened()
 {
 	foreach(const QString &id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
-		appendAccount(id);
+	{
+		if (appendAccount(id) == NULL)
+			Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",id);
+	}
 }
 
 void AccountManager::onOptionsClosed()

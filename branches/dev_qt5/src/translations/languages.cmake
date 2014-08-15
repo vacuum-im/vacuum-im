@@ -3,5 +3,6 @@ set(LOCALIZED_LANGS
 	"pl"
 	"de"
 	"uk"
+	"es"
 )
 include("${CMAKE_SOURCE_DIR}/src/make/translations.cmake")

@@ -35,6 +35,7 @@
 //Node = ON_MISC
 #define OWO_MISC_CLIENTINFO                       300
 #define OWO_MISC_AUTOSTART                        500
+#define OWO_MISC_VCARD                            550
 #define OWO_MISC_STATISTICS                       600
 #define OWO_MISC_DEFAULTPROXY                     700
 

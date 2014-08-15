@@ -292,11 +292,10 @@ bool Avatars::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &ASt
 				QDomElement dataElem = result.addElement("query",NS_JABBER_IQ_AVATAR).appendChild(result.createElement("data")).toElement();
 				dataElem.appendChild(result.createTextNode(file.readAll().toBase64()));
 				FStanzaProcessor->sendStanzaOut(AStreamJid,result);
-				file.close();
 			}
 			else
 			{
-				REPORT_ERROR(QString("Failed to open file with self avatar: %1").arg(file.errorString()));
+				REPORT_ERROR(QString("Failed to load self avatar from file: %1").arg(file.errorString()));
 				Stanza error = FStanzaProcessor->makeReplyError(AStanza,XmppStanzaError::EC_INTERNAL_SERVER_ERROR);
 				FStanzaProcessor->sendStanzaOut(AStreamJid,error);
 			}
@@ -574,7 +573,7 @@ QByteArray Avatars::loadFromFile(const QString &AFileName) const
 		if (file.open(QFile::ReadOnly))
 			return file.readAll();
 		else if (file.exists())
-			REPORT_ERROR(QString("Failed to load data from file: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to load avatar data from file: %1").arg(file.errorString()));
 	}
 	return QByteArray();
 }
@@ -587,12 +586,12 @@ bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) cons
 		if (file.open(QFile::WriteOnly|QFile::Truncate))
 		{
 			file.write(AData);
-			file.close();
+			file.flush();
 			return true;
 		}
 		else
 		{
-			REPORT_ERROR(QString("Failed to save data to file: %1").arg(file.errorString()));
+			REPORT_ERROR(QString("Failed to save avatar data to file: %1").arg(file.errorString()));
 		}
 	}
 	return false;
@@ -600,10 +599,9 @@ bool Avatars::saveToFile(const QString &AFileName, const QByteArray &AData) cons
 
 QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 {
-	QString fileName = FVCardPlugin!=NULL ? FVCardPlugin->vcardFileName(AContactJid.bare()) : QString::null;
-	if (!fileName.isEmpty() && QFile::exists(fileName))
+	if (FVCardPlugin)
 	{
-		QFile file(fileName);
+		QFile file(FVCardPlugin->vcardFileName(AContactJid.bare()));
 		if (file.open(QFile::ReadOnly))
 		{
 			QString xmlError;
@@ -617,9 +615,10 @@ QByteArray Avatars::loadAvatarFromVCard(const Jid &AContactJid) const
 			else
 			{
 				REPORT_ERROR(QString("Failed to load avatar from vCard file content: %1").arg(xmlError));
+				file.remove();
 			}
 		}
-		else
+		else if (file.exists())
 		{
 			REPORT_ERROR(QString("Failed to load avatar from vCard file: %1").arg(file.errorString()));
 		}
@@ -668,12 +667,16 @@ bool Avatars::updateVCardAvatar(const Jid &AContactJid, const QString &AHash, bo
 					FStreamAvatars.insert(streamJid,AHash);
 					updatePresence(streamJid);
 				}
-				else
+				else if (!curHash.isNull())
 				{
 					LOG_STRM_INFO(streamJid,"Self avatar setted as unkonwn");
 					FStreamAvatars.insert(streamJid,UNKNOWN_AVATAR);
 					updatePresence(streamJid);
 					return false;
+				}
+				else
+				{
+					return true;
 				}
 			}
 		}
