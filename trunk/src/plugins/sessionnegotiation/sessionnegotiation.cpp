@@ -1041,9 +1041,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 				notify.data.insert(NDR_STREAM_JID,ASession.streamJid.full());
 				notify.data.insert(NDR_CONTACT_JID,ASession.contactJid.full());
 				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
-				QString string = notify.data.value(NDR_TOOLTIP).toString();
-				notify.data.insert(NDR_POPUP_HTML, Qt::escape(string));
-				notify.data.insert(NDR_POPUP_TEXT, string);
+				notify.data.insert(NDR_POPUP_TEXT, notify.data.value(NDR_TOOLTIP).toString());
 				notify.data.insert(NDR_SOUND_FILE, SDF_SNEGOTIATION_REQUEST);
 				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());

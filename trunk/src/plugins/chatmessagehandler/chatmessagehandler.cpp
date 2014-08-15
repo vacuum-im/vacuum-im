@@ -369,10 +369,6 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 					FMessageProcessor->messageToText(&doc,AMessage);
 					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
 				}
-				else
-				{
-					notify.data.insert(NDR_POPUP_HTML,Qt::escape(AMessage.body()));
-				}
 				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 
 				FNotifiedMessages.insertMulti(window, AMessage.data(MDR_MESSAGE_ID).toInt());

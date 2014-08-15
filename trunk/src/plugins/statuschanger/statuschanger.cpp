@@ -973,9 +973,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 			notify.data.insert(NDR_STREAM_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_CONTACT_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
-			QString string = APresence->status();
-			notify.data.insert(NDR_POPUP_HTML,Qt::escape(string));
-			notify.data.insert(NDR_POPUP_TEXT,string);
+			notify.data.insert(NDR_POPUP_TEXT,APresence->status());
 			notify.data.insert(NDR_SOUND_FILE,SDF_SCHANGER_CONNECTION_ERROR);
 			FNotifyId.insert(APresence,FNotifications->appendNotification(notify));
 		}

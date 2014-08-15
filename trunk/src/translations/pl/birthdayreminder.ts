@@ -15,14 +15,6 @@
         <source>Birthday remind</source>
         <translation>Przypomnij o urodzinach</translation>
     </message>
-    <message numerus="yes">
-        <source>Birthday in %n day(s),&lt;br&gt; %1</source>
-        <translation>
-            <numerusform>Urodziny za %n dzień,&lt;br&gt; %1</numerusform>
-            <numerusform>Urodziny za %n dni,&lt;br&gt; %1</numerusform>
-            <numerusform>Urodziny za %n dni,&lt;br&gt; %1</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Birthday today!</source>
         <translation>Dzisiaj urodziny!</translation>
@@ -46,6 +38,15 @@
     <message>
         <source>When reminding of upcoming birthdays</source>
         <translation>Podczas przypominania o nadchodzących urodzinach</translation>
+    </message>
+    <message numerus="yes">
+        <source>Birthday in %n day(s),
+ %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 </TS>

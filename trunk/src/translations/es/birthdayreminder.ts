@@ -15,13 +15,6 @@
         <source>Birthday remind</source>
         <translation>Recordatorio de cumpleaños</translation>
     </message>
-    <message numerus="yes">
-        <source>Birthday in %n day(s),&lt;br&gt; %1</source>
-        <translation>
-            <numerusform>Cumpleaños en %n día, &lt;br&gt; %1</numerusform>
-            <numerusform>Cumpleaños en %n días, &lt;br&gt; %1</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Birthday today!</source>
         <translation>¡Cumpleaños hoy!</translation>
@@ -43,6 +36,14 @@
     <message>
         <source>When reminding of upcoming birthdays</source>
         <translation>Cuándo recordar el próximo cumpleaños</translation>
+    </message>
+    <message numerus="yes">
+        <source>Birthday in %n day(s),
+ %1</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 </TS>
