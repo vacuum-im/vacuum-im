@@ -363,7 +363,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 	if ((record.notification.kinds & INotification::AutoActivate)>0)
 	{
 		FDelayedActivations.append(notifyId);
-		QTimer::singleShot(0,this,SLOT(onActivateDelayedActivations()));
+		QTimer::singleShot(0,this,SLOT(onDelayedActivations()));
 	}
 
 	FRemoveAll->setVisible(!FNotifyMenu->isEmpty());
