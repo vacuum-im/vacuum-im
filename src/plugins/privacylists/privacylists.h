@@ -61,9 +61,11 @@ public:
 	virtual QString removePrivacyList(const Jid &AStreamJid, const QString &AList);
 	virtual QDialog *showEditListsDialog(const Jid &AStreamJid, QWidget *AParent = NULL);
 signals:
-	void listAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList);
+	void privacyOpened(const Jid &AStreamJid);
+	void privacyClosed(const Jid &AStreamJid);
 	void listLoaded(const Jid &AStreamJid, const QString &AList);
 	void listRemoved(const Jid &AStreamJid, const QString &AList);
+	void listAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList);
 	void activeListAboutToBeChanged(const Jid &AStreamJid, const QString &AList);
 	void activeListChanged(const Jid &AStreamJid, const QString &AList);
 	void defaultListChanged(const Jid &AStreamJid, const QString &AList);
@@ -91,8 +93,8 @@ protected slots:
 	void onActiveListChanged(const Jid &AStreamJid, const QString &AList);
 	void onApplyAutoLists();
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onRosterIndexCreated(IRosterIndex *AIndex);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);

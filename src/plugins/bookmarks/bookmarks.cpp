@@ -599,15 +599,21 @@ void Bookmarks::onPrivateDataUpdated(const QString &AId, const Jid &AStreamJid, 
 	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
-		bool autoStart = !isReady(AStreamJid);
+		bool opened = isReady(AStreamJid);
 
-		LOG_STRM_INFO(AStreamJid,"Bookmarks loaded");
+		LOG_STRM_INFO(AStreamJid,"Bookmarks loaded or updated");
 		FBookmarks[AStreamJid] = loadBookmarksFromXML(AElement);
 		updateConferenceIndexes(AStreamJid);
-		emit bookmarksChanged(AStreamJid);
 
-		if (autoStart)
+		if (!opened)
+		{
 			autoStartBookmarks(AStreamJid);
+			emit bookmarksOpened(AStreamJid);
+		}
+		else
+		{
+			emit bookmarksChanged(AStreamJid);
+		}
 	}
 }
 
@@ -637,8 +643,11 @@ void Bookmarks::onPrivateStorageClosed(const Jid &AStreamJid)
 {
 	delete FDialogs.take(AStreamJid);
 	FBookmarks.remove(AStreamJid);
+
 	updateConferenceIndexes(AStreamJid);
 	FBookmarkIndexes.remove(AStreamJid);
+	
+	emit bookmarksClosed(AStreamJid);
 }
 
 void Bookmarks::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)

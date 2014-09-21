@@ -196,9 +196,9 @@ protected slots:
 	void onSelfHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onSelfCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
-	void onStreamAboutToClose(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamAboutToClose(IXmppStream *AXmppStream);
 	void onPrivateDataLoadedSaved(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
@@ -211,7 +211,7 @@ protected slots:
 	void onShowArchiveWindowByAction(bool);
 	void onShowArchiveWindowByToolBarAction(bool);
 	void onShowHistoryOptionsDialogByAction(bool);
-	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
+	void onDiscoveryInfoReceived(const IDiscoInfo &AInfo);
 	void onStanzaSessionActivated(const IStanzaSession &ASession);
 	void onStanzaSessionTerminated(const IStanzaSession &ASession);
 	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);

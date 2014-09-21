@@ -103,9 +103,9 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(aboutToClose(IXmppStream *)),SLOT(onStreamAboutToClose(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(aboutToClose(IXmppStream *)),SLOT(onXmppStreamAboutToClose(IXmppStream *)));
 		}
 	}
 
@@ -161,7 +161,7 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 		FDiscovery = qobject_cast<IServiceDiscovery *>(plugin->instance());
 		if (FDiscovery)
 		{
-			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoInfoReceived(const IDiscoInfo &)));
+			connect(FDiscovery->instance(),SIGNAL(discoInfoReceived(const IDiscoInfo &)),SLOT(onDiscoveryInfoReceived(const IDiscoInfo &)));
 		}
 	}
 
@@ -2464,7 +2464,7 @@ void MessageArchiver::onSelfCollectionLoaded(const QString &AId, const IArchiveC
 	}
 }
 
-void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
+void MessageArchiver::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 	{
@@ -2491,14 +2491,14 @@ void MessageArchiver::onStreamOpened(IXmppStream *AXmppStream)
 
 	loadPendingMessages(AXmppStream->streamJid());
 
-	if (!FDiscovery || !FDiscovery->requestDiscoInfo(AXmppStream->streamJid(),AXmppStream->streamJid().domain()))
+	if (FDiscovery == NULL)
 		applyArchivePrefs(AXmppStream->streamJid(),QDomElement());
 
 	ArchiveReplicator *replicator = new ArchiveReplicator(this,AXmppStream->streamJid(),this);
 	FReplicators.insert(AXmppStream->streamJid(),replicator);
 }
 
-void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
+void MessageArchiver::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 	{
@@ -2509,6 +2509,7 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 
 	savePendingMessages(AXmppStream->streamJid());
 	closeHistoryOptionsNode(AXmppStream->streamJid());
+
 	FFeatures.remove(AXmppStream->streamJid());
 	FNamespaces.remove(AXmppStream->streamJid());
 	FArchivePrefs.remove(AXmppStream->streamJid());
@@ -2519,7 +2520,7 @@ void MessageArchiver::onStreamClosed(IXmppStream *AXmppStream)
 	emit archivePrefsClosed(AXmppStream->streamJid());
 }
 
-void MessageArchiver::onStreamAboutToClose(IXmppStream *AXmppStream)
+void MessageArchiver::onXmppStreamAboutToClose(IXmppStream *AXmppStream)
 {
 	ArchiveReplicator *replicator = FReplicators.take(AXmppStream->streamJid());
 	if (replicator)
@@ -2734,7 +2735,7 @@ void MessageArchiver::onShowHistoryOptionsDialogByAction(bool)
 	}
 }
 
-void MessageArchiver::onDiscoInfoReceived(const IDiscoInfo &AInfo)
+void MessageArchiver::onDiscoveryInfoReceived(const IDiscoInfo &AInfo)
 {
 	if (!FNamespaces.contains(AInfo.streamJid) && !FInStoragePrefs.contains(AInfo.streamJid) && AInfo.node.isEmpty() && AInfo.streamJid.pDomain()==AInfo.contactJid.pFull())
 	{

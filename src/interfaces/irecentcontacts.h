@@ -64,6 +64,8 @@ public:
 	virtual void registerItemHandler(const QString &AType, IRecentItemHandler *AHandler) =0;
 protected:
 	virtual void visibleItemsChanged() =0;
+	virtual void recentContactsOpened(const Jid &AStreamJid) =0;
+	virtual void recentContactsClosed(const Jid &AStreamJid) =0;
 	virtual void recentItemAdded(const IRecentItem &AItem) =0;
 	virtual void recentItemChanged(const IRecentItem &AItem) =0;
 	virtual void recentItemRemoved(const IRecentItem &AItem) =0;
@@ -74,6 +76,6 @@ protected:
 Q_DECLARE_METATYPE(IRecentItem);
 
 Q_DECLARE_INTERFACE(IRecentItemHandler,"Vacuum.Plugin.IRecentItemHandler/1.0")
-Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.2")
+Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.3")
 
 #endif //IRECENTCONTACTS_H

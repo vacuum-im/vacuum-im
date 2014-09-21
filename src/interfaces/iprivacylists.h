@@ -91,9 +91,11 @@ public:
 	virtual QString removePrivacyList(const Jid &AStreamJid, const QString &AList) =0;
 	virtual QDialog *showEditListsDialog(const Jid &AStreamJid, QWidget *AParent = NULL) =0;
 protected:
-	virtual void listAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList) =0;
+	virtual void privacyOpened(const Jid &AStreamJid) =0;
+	virtual void privacyClosed(const Jid &AStreamJid) =0;
 	virtual void listLoaded(const Jid &AStreamJid, const QString &AList) =0;
 	virtual void listRemoved(const Jid &AStreamJid, const QString &AList) =0;
+	virtual void listAboutToBeChanged(const Jid &AStreamJid, const IPrivacyList &AList) =0;
 	virtual void activeListAboutToBeChanged(const Jid &AStreamJid, const QString &AList) =0;
 	virtual void activeListChanged(const Jid &AStreamJid, const QString &AList) =0;
 	virtual void defaultListChanged(const Jid &AStreamJid, const QString &AList) =0;
@@ -101,6 +103,6 @@ protected:
 	virtual void requestFailed(const QString &AId, const XmppError &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.2")
+Q_DECLARE_INTERFACE(IPrivacyLists,"Vacuum.Plugin.IPrivacyLists/1.3")
 
 #endif

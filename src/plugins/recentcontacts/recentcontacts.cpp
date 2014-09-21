@@ -108,6 +108,7 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
 				SLOT(onPrivateStorageDataChanged(const Jid &, const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageNotifyAboutToClose(const Jid &)),SLOT(onPrivateStorageNotifyAboutToClose(const Jid &)));
+			connect(FPrivateStorage->instance(),SIGNAL(storageClosed(const Jid &)),SLOT(onPrivateStorageClosed(const Jid &)));
 		}
 	}
 
@@ -1196,19 +1197,34 @@ void RecentContacts::onRostersModelIndexRemoving(IRosterIndex *AIndex)
 
 void RecentContacts::onPrivateStorageOpened(const Jid &AStreamJid)
 {
-	if (!FPrivateStorage->loadData(AStreamJid,PST_RECENTCONTACTS,PSN_RECENTCONTACTS).isEmpty())
+	QString id = FPrivateStorage->loadData(AStreamJid,PST_RECENTCONTACTS,PSN_RECENTCONTACTS);
+	if (!id.isEmpty())
+	{
+		FLoadRequestId[AStreamJid] = id;
 		LOG_STRM_INFO(AStreamJid,"Recent items load request sent");
+	}
 	else
+	{
 		LOG_STRM_WARNING(AStreamJid,"Failed to send load roster items request");
+	}
 }
 
 void RecentContacts::onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
-	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_RECENTCONTACTS && AElement.namespaceURI()==PSN_RECENTCONTACTS)
 	{
-		LOG_STRM_INFO(AStreamJid,"Recent items loaded or updated");
-		mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+		if (FLoadRequestId.value(AStreamJid) == AId)
+		{
+			FLoadRequestId.remove(AStreamJid);
+			LOG_STRM_INFO(AStreamJid,"Recent items loaded");
+			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+			emit recentContactsOpened(AStreamJid);
+		}
+		else
+		{
+			LOG_STRM_INFO(AStreamJid,"Recent items updated");
+			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+		}
 	}
 }
 
@@ -1222,6 +1238,11 @@ void RecentContacts::onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid)
 {
 	saveItemsToStorage(AStreamJid);
 	FSaveStreams -= AStreamJid;
+}
+
+void RecentContacts::onPrivateStorageClosed(const Jid &AStreamJid)
+{
+	emit recentContactsClosed(AStreamJid);
 }
 
 void RecentContacts::onRostersViewIndexContextMenuAboutToShow()

@@ -55,8 +55,8 @@ bool PEPManager::initConnections(IPluginManager *APluginManager, int &AInitOrder
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 	return FDiscovery!=NULL && FStanzaProcessor!=NULL && FXmppStreams!=NULL;
@@ -150,7 +150,7 @@ bool PEPManager::removeNodeHandler(int AHandleId)
 	return false;
 }
 
-void PEPManager::onStreamOpened(IXmppStream *AXmppStream)
+void PEPManager::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 	{
@@ -162,12 +162,9 @@ void PEPManager::onStreamOpened(IXmppStream *AXmppStream)
 		shandle.conditions.append(SHC_PUBSUB_EVENT);
 		FStanzaHandles.insert(AXmppStream->streamJid(), FStanzaProcessor->insertStanzaHandle(shandle));
 	}
-
-	if (FDiscovery)
-		FDiscovery->requestDiscoInfo(AXmppStream->streamJid(), AXmppStream->streamJid().domain());
 }
 
-void PEPManager::onStreamClosed(IXmppStream *AXmppStream)
+void PEPManager::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 		FStanzaProcessor->removeStanzaHandle(FStanzaHandles.take(AXmppStream->streamJid()));
