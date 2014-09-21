@@ -75,6 +75,8 @@ public:
 	virtual void registerItemHandler(const QString &AType, IRecentItemHandler *AHandler);
 signals:
 	void visibleItemsChanged();
+	void recentContactsOpened(const Jid &AStreamJid);
+	void recentContactsClosed(const Jid &AStreamJid);
 	void recentItemAdded(const IRecentItem &AItem);
 	void recentItemChanged(const IRecentItem &AItem);
 	void recentItemRemoved(const IRecentItem &AItem);
@@ -123,6 +125,7 @@ protected slots:
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
+	void onPrivateStorageClosed(const Jid &AStreamJid);
 protected slots:
 	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -165,6 +168,7 @@ private:
 private:
 	QTimer FSaveTimer;
 	QSet<Jid> FSaveStreams;
+	QMap<Jid, QString> FLoadRequestId;
 private:
 	QMap<int, int> FProxyToIndexNotify;
 	QMap<Menu *, QSet<Action *> > FProxyContextMenuActions;

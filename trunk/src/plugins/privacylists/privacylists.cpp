@@ -76,8 +76,8 @@ bool PrivacyLists::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 		{
-			connect(FXmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
-			connect(FXmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+			connect(FXmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(FXmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -232,6 +232,7 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 		QString loadListName = FLoadRequests.take(AStanza.id());
 		if (AStanza.type() == "result")
 		{
+			bool opened = isReady(AStreamJid);
 			QMap<QString,IPrivacyList> &lists = FPrivacyLists[AStreamJid];
 			QDomElement queryElem = AStanza.firstElement("query",NS_JABBER_PRIVACY);
 
@@ -315,6 +316,9 @@ void PrivacyLists::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASta
 					setActiveList(AStreamJid,defaultList(AStreamJid));
 				}
 			}
+
+			if (!opened)
+				emit privacyOpened(AStreamJid);
 		}
 		else if (!loadListName.isEmpty())
 		{
@@ -1397,7 +1401,7 @@ void PrivacyLists::onApplyAutoLists()
 	FApplyAutoLists.clear();
 }
 
-void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
+void PrivacyLists::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
 	{
@@ -1422,10 +1426,16 @@ void PrivacyLists::onStreamOpened(IXmppStream *AXmppStream)
 	loadPrivacyLists(AXmppStream->streamJid());
 }
 
-void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
+void PrivacyLists::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
-	if (FEditListsDialogs.contains(AXmppStream->streamJid()))
-		delete FEditListsDialogs.take(AXmppStream->streamJid());
+	if (FStanzaProcessor)
+	{
+		FStanzaProcessor->removeStanzaHandle(FSHIPrivacy.take(AXmppStream->streamJid()));
+		FStanzaProcessor->removeStanzaHandle(FSHIRosterIn.take(AXmppStream->streamJid()));
+		FStanzaProcessor->removeStanzaHandle(FSHIRosterOut.take(AXmppStream->streamJid()));
+	}
+
+	delete FEditListsDialogs.take(AXmppStream->streamJid());
 
 	FApplyAutoLists.remove(AXmppStream->streamJid());
 	FOfflinePresences.remove(AXmppStream->streamJid());
@@ -1436,12 +1446,7 @@ void PrivacyLists::onStreamClosed(IXmppStream *AXmppStream)
 
 	updatePrivacyLabels(AXmppStream->streamJid());
 
-	if (FStanzaProcessor)
-	{
-		FStanzaProcessor->removeStanzaHandle(FSHIPrivacy.take(AXmppStream->streamJid()));
-		FStanzaProcessor->removeStanzaHandle(FSHIRosterIn.take(AXmppStream->streamJid()));
-		FStanzaProcessor->removeStanzaHandle(FSHIRosterOut.take(AXmppStream->streamJid()));
-	}
+	emit privacyClosed(AXmppStream->streamJid());
 }
 
 void PrivacyLists::onRosterIndexCreated(IRosterIndex *AIndex)
