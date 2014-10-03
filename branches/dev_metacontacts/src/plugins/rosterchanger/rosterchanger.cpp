@@ -239,8 +239,8 @@ bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *A
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
-		int indexKind = indexData.value(RDR_KIND).toInt();
 
+		int indexKind = indexData.value(RDR_KIND).toInt();
 		if (hoverKind == RIK_STREAM_ROOT)
 		{
 			QString hoverStreamJid = AHover->data(RDR_STREAM_JID).toString();
@@ -324,8 +324,8 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
-		int indexKind = indexData.value(RDR_KIND).toInt();
 
+		int indexKind = indexData.value(RDR_KIND).toInt();
 		if (hoverKind == RIK_STREAM_ROOT)
 		{
 			QString hoverStreamJid = AHover->data(RDR_STREAM_JID).toString();
@@ -1822,7 +1822,7 @@ void RosterChanger::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &A
 					action->setIcon(RSR_STORAGE_MENUICONS,MNI_RCHANGER_RENAME);
 					action->setShortcutId(SCT_ROSTERVIEW_RENAME);
 					connect(action,SIGNAL(triggered(bool)),SLOT(onRenameContact(bool)));
-					AMenu->addAction(action,AG_RVCM_RCHANGER);
+					AMenu->addAction(action,AG_RVCM_RCHANGER,true);
 				}
 				else if (roster)
 				{

@@ -312,14 +312,10 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 			if (ALayout == LayoutMerged)
 			{
 				foreach(IRosterIndex *sindex, FStreamIndexes.values())
-				{
-					sindex->removeChildren();
 					insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,FContactsRoot));
-				}
 			}
 			else //if (ALayout == LayoutSeparately)
 			{
-				FContactsRoot->removeChildren();
 				removeRosterIndex(FContactsRoot,false);
 			}
 		}

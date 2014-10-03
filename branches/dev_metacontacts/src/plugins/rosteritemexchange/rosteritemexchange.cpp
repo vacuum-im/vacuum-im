@@ -315,7 +315,7 @@ Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, I
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
 	int indexKind = AIndex->data(RDR_KIND).toInt();
-	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP || RIK_METACONTACT_ITEM)
+	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP || indexKind==RIK_METACONTACT_ITEM)
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }

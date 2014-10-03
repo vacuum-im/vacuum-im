@@ -44,6 +44,8 @@ public:
 	virtual bool setMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems) =0;
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups) =0;
 protected:
+	virtual void metaContactsOpened(const Jid &AStreamJid) =0;
+	virtual void metaContactsClosed(const Jid &AStreamJid) =0;
 	virtual void metaContactChanged(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore) =0;
 };
 

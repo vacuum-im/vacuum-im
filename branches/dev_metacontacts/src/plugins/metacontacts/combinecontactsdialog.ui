@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>254</width>
-    <height>294</height>
+    <width>332</width>
+    <height>236</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,6 +21,9 @@
     <widget class="QLabel" name="lblNotice">
      <property name="text">
       <string notr="true">Notice</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::RichText</enum>
      </property>
     </widget>
    </item>
@@ -40,6 +43,11 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <tabstops>
+  <tabstop>lneName</tabstop>
+  <tabstop>lwtContacts</tabstop>
+  <tabstop>btbButtons</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

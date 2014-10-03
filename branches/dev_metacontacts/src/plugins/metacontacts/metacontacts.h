@@ -19,12 +19,14 @@ class MetaContacts :
 	public QObject,
 	public IPlugin,
 	public IMetaContacts,
-	public IRosterDataHolder,
 	public IRostersLabelHolder,
-	public IRostersClickHooker
+	public IRostersClickHooker,
+	public IRostersDragDropHandler,
+	public IRostersEditHandler,
+	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker);
+	Q_INTERFACES(IPlugin IMetaContacts IRostersLabelHolder IRostersClickHooker IRostersDragDropHandler IRostersEditHandler);
 public:
 	MetaContacts();
 	~MetaContacts();
@@ -36,16 +38,23 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin();
-	// IRosterDataHolder
-	virtual QList<int> rosterDataRoles(int AOrder) const;
-	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
-	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	// IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	// IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
+	//IRostersDragDropHandler
+	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
+	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
+	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
+	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
+	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu);
+	//IRostersEditHandler
+	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
+	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
+	//AdvancedDelegateEditProxy
+	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	// IMetaContacts
 	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const Jid &AItem) const;
@@ -58,9 +67,9 @@ public:
 	virtual bool setMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups);
 signals:
+	void metaContactsOpened(const Jid &AStreamJid);
+	void metaContactsClosed(const Jid &AStreamJid);
 	void metaContactChanged(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore);
-	// IRosterDataHolder
-	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	// IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
@@ -76,8 +85,10 @@ protected:
 protected:
 	bool isReadyStreams(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	bool isDragDropAccetped(const QDropEvent *AEvent, IRosterIndex *AHover) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool ASelfProxy=true) const;
 protected:
+	void renameMetaContact(const Jid &AStreamJid, const QUuid &AMetaId);
 	void detachMetaItems(const QStringList &AStreams, const QStringList &AContacts);
 	void combineMetaItems(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas);
 	void destroyMetaContacts(const QStringList &AStreams, const QStringList &AMetas);
@@ -101,10 +112,11 @@ protected slots:
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
+	void onPrivateStorageClosed(const Jid &AStreamJid);
 protected slots:
+	void onRostersModelStreamsLayoutChanged(int ABefore);
 	void onRostersModelIndexInserted(IRosterIndex *AIndex);
 	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
-	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
 protected slots:
 	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -119,11 +131,16 @@ protected slots:
 protected slots:
 	void onDetachMetaItemsByAction();
 	void onCombineMetaItemsByAction();
+	void onRenameMetaContactByAction();
 	void onDestroyMetaContactsByAction();
+	void onCopyMetaContactToGroupByAction();
+	void onMoveMetaContactToGroupByAction();
 protected slots:
 	void onUpdateContactsTimerTimeout();
 	void onLoadContactsFromFileTimerTimeout();
 	void onSaveContactsToStorageTimerTimeout();
+protected slots:
+	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
 	IPluginManager *FPluginManager;
 	IPrivateStorage *FPrivateStorage;
@@ -139,18 +156,19 @@ private:
 	QTimer FUpdateTimer;
 	QSet<Jid> FSaveStreams;
 	QSet<Jid> FLoadStreams;
+	QMap<Jid, QString> FLoadRequestId;
 	QMap<Jid, QMap<QUuid, QSet<IRosterIndex *> > > FUpdateContacts;
 private:
-	QMap<Jid, QHash<Jid, QUuid> > FItemMetaContact;
+	QMap<Jid, QHash<Jid, QUuid> > FItemMetaId;
 	QMap<Jid, QHash<QUuid, IMetaContact> > FMetaContacts;
 private:
 	QMap<int, int> FProxyToIndexNotify;
 	QMap<Menu *, Menu *> FProxyContextMenu;
 	MetaSortFilterProxyModel *FSortFilterProxyModel;
+	QMap<Jid, QHash<QUuid, QList<IRosterIndex *> > > FMetaIndexes;
 	QHash<const IRosterIndex *, IRosterIndex *> FMetaIndexItemProxy;
 	QMultiHash<const IRosterIndex *, IRosterIndex *> FMetaIndexProxyItem;
 	QHash<const IRosterIndex *, QMap<Jid, IRosterIndex *> > FMetaIndexItems;
-	QMap<Jid, QHash<QUuid, QList<IRosterIndex *> > > FMetaIndexes;
 private:
 	QMap<Jid, QHash<QUuid, IMessageChatWindow *> > FMetaChatWindows;
 };
