@@ -58,6 +58,8 @@ public:
 	virtual int execEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) const;
 	virtual void showEditBookmarksDialog(const Jid &AStreamJid);
 signals:
+	void bookmarksOpened(const Jid &AStreamJid);
+	void bookmarksClosed(const Jid &AStreamJid);
 	void bookmarksChanged(const Jid &AStreamJid);
 	//IRosterDataHolder
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);

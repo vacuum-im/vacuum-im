@@ -76,9 +76,9 @@ bool SessionNegotiation::initConnections(IPluginManager *APluginManager, int &AI
 		IXmppStreams *xmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (xmppStreams)
 		{
-			connect(xmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onStreamOpened(IXmppStream *)));
-			connect(xmppStreams->instance(), SIGNAL(aboutToClose(IXmppStream *)), SLOT(onStreamAboutToClose(IXmppStream *)));
-			connect(xmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onStreamClosed(IXmppStream *)));
+			connect(xmppStreams->instance(), SIGNAL(opened(IXmppStream *)), SLOT(onXmppStreamOpened(IXmppStream *)));
+			connect(xmppStreams->instance(), SIGNAL(aboutToClose(IXmppStream *)), SLOT(onXmppStreamAboutToClose(IXmppStream *)));
+			connect(xmppStreams->instance(), SIGNAL(closed(IXmppStream *)), SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
 
@@ -1041,9 +1041,7 @@ void SessionNegotiation::showAcceptDialog(const IStanzaSession &ASession, const 
 				notify.data.insert(NDR_STREAM_JID,ASession.streamJid.full());
 				notify.data.insert(NDR_CONTACT_JID,ASession.contactJid.full());
 				notify.data.insert(NDR_POPUP_IMAGE,FNotifications->contactAvatar(ASession.contactJid));
-				QString string = notify.data.value(NDR_TOOLTIP).toString();
-				notify.data.insert(NDR_POPUP_HTML, Qt::escape(string));
-				notify.data.insert(NDR_POPUP_TEXT, string);
+				notify.data.insert(NDR_POPUP_TEXT, notify.data.value(NDR_TOOLTIP).toString());
 				notify.data.insert(NDR_SOUND_FILE, SDF_SNEGOTIATION_REQUEST);
 				notify.data.insert(NDR_ALERT_WIDGET,(qint64)dialog->instance());
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)dialog->instance());
@@ -1216,7 +1214,7 @@ bool SessionNegotiation::eventFilter(QObject *AObject, QEvent *AEvent)
 	return QObject::eventFilter(AObject,AEvent);
 }
 
-void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
+void SessionNegotiation::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor && FDataForms)
 	{
@@ -1228,6 +1226,29 @@ void SessionNegotiation::onStreamOpened(IXmppStream *AXmppStream)
 		shandle.conditions.append(SHC_STANZA_SESSION);
 		FSHISession.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 	}
+
+	emit sessionsOpened(AXmppStream->streamJid());
+}
+
+void SessionNegotiation::onXmppStreamAboutToClose(IXmppStream *AXmppStream)
+{
+	QList<IStanzaSession> sessions = FSessions.value(AXmppStream->streamJid()).values();
+	foreach(const IStanzaSession &session, sessions)
+	{
+		terminateSession(session.streamJid,session.contactJid);
+		removeSession(session);
+	}
+}
+
+void SessionNegotiation::onXmppStreamClosed(IXmppStream *AXmppStream)
+{
+	if (FStanzaProcessor && FDataForms)
+		FStanzaProcessor->removeStanzaHandle(FSHISession.take(AXmppStream->streamJid()));
+
+	FDialogs.remove(AXmppStream->streamJid());
+	FSessions.remove(AXmppStream->streamJid());
+
+	emit sessionsClosed(AXmppStream->streamJid());
 }
 
 void SessionNegotiation::onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore)
@@ -1238,24 +1259,6 @@ void SessionNegotiation::onPresenceItemReceived(IPresence *APresence, const IPre
 		terminateSession(APresence->streamJid(),AItem.itemJid);
 		removeSession(findSession(APresence->streamJid(),AItem.itemJid));
 	}
-}
-
-void SessionNegotiation::onStreamAboutToClose(IXmppStream *AXmppStream)
-{
-	QList<IStanzaSession> sessions = FSessions.value(AXmppStream->streamJid()).values();
-	foreach(const IStanzaSession &session, sessions)
-	{
-		terminateSession(session.streamJid,session.contactJid);
-		removeSession(session);
-	}
-}
-
-void SessionNegotiation::onStreamClosed(IXmppStream *AXmppStream)
-{
-	if (FStanzaProcessor && FDataForms)
-		FStanzaProcessor->removeStanzaHandle(FSHISession.take(AXmppStream->streamJid()));
-	FDialogs.remove(AXmppStream->streamJid());
-	FSessions.remove(AXmppStream->streamJid());
 }
 
 void SessionNegotiation::onNotificationActivated(int ANotifyId)
