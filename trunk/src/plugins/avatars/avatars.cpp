@@ -540,6 +540,7 @@ QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, boo
 					image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
 				if (AGray)
 					image = ImageManager::opacitized(ImageManager::grayscaled(image));
+				image = ImageManager::squared(image, qMax(image.width(),image.height()));
 				images.insert(AMaxSize,image);
 			}
 			else
