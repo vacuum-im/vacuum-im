@@ -36,7 +36,8 @@ class UTILS_EXPORT AdvancedItemModel :
 	friend class AdvancedItemDataHolder;
 public:
 	enum AdvancedRole {
-		AnyRole = -1,
+		AnyRole  = -1,
+		AllRoles = -2,
 		FlagsRole = Qt::UserRole-1
 	};
 public:
@@ -56,7 +57,7 @@ public:
 	void insertItemSortHandler(int AOrder, AdvancedItemSortHandler *AHandler);
 	void removeItemSortHandler(int AOrder, AdvancedItemSortHandler *AHandler);
 	// Data Handlers
-	QMultiMap<int, AdvancedItemDataHolder *> itemDataHolders(int ARole=AnyRole) const;
+	QMultiMap<int, AdvancedItemDataHolder *> itemDataHolders(int ARole) const;
 	void insertItemDataHolder(int AOrder, AdvancedItemDataHolder *AHandler);
 	void removeItemDataHolder(int AOrder, AdvancedItemDataHolder *AHandler);
 signals:

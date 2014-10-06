@@ -639,7 +639,7 @@ bool RostersModel::isChildIndex(IRosterIndex *AIndex, IRosterIndex *AParent) con
 
 void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 	{
 		IRosterIndex *rindex = static_cast<RosterIndex *>(AItem);
 		Jid streamJid = rindex->data(RDR_STREAM_JID).toString();
@@ -662,7 +662,7 @@ void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 
 void RostersModel::onAdvancedItemRemoving(QStandardItem *AItem)
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 	{
 		IRosterIndex *rindex = static_cast<RosterIndex *>(AItem);
 		Jid streamJid = rindex->data(RDR_STREAM_JID).toString();
@@ -685,7 +685,7 @@ void RostersModel::onAdvancedItemRemoving(QStandardItem *AItem)
 
 void RostersModel::onAdvancedItemDataChanged(QStandardItem *AItem, int ARole)
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 		emit indexDataChanged(static_cast<RosterIndex *>(AItem),ARole);
 }
 

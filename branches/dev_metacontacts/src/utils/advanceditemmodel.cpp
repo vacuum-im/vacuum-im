@@ -2,6 +2,8 @@
 
 #include <QTimer>
 
+#define FIRST_VALID_ROLE 0
+
 /************************
  *AdvancedItemSortHandler
  ************************/
@@ -54,7 +56,7 @@ AdvancedItemModel::AdvancedItemModel(QObject *AParent) : QStandardItemModel(APar
 QMap<int, QVariant> AdvancedItemModel::itemData(const QModelIndex &AIndex) const
 {
 	QStandardItem *item = itemFromIndex(AIndex);
-	if (item && item->type()==AdvancedItem::StandardItemTypeValue)
+	if (item!=NULL && item->type()==AdvancedItem::AdvancedItemTypeValue)
 	{
 		AdvancedItem *advItem = static_cast<AdvancedItem *>(item);
 		return advItem->itemData();
@@ -170,7 +172,10 @@ void AdvancedItemModel::removeItemSortHandler(int AOrder, AdvancedItemSortHandle
 
 QMultiMap<int, AdvancedItemDataHolder *> AdvancedItemModel::itemDataHolders(int ARole) const
 {
-	return FItemDataHolders.value(ARole);
+	QMultiMap<int, AdvancedItemDataHolder *> holders = FItemDataHolders.value(ARole);
+	if (ARole >= FIRST_VALID_ROLE)
+		holders.unite(FItemDataHolders.value(AllRoles));
+	return holders;
 }
 
 void AdvancedItemModel::insertItemDataHolder(int AOrder, AdvancedItemDataHolder *AHolder)
@@ -178,7 +183,8 @@ void AdvancedItemModel::insertItemDataHolder(int AOrder, AdvancedItemDataHolder 
 	if (AHolder)
 	{
 		foreach(int role, AHolder->advancedItemDataRoles(AOrder))
-			FItemDataHolders[role].insertMulti(AOrder,AHolder);
+			if (role != AnyRole)
+				FItemDataHolders[role].insertMulti(AOrder,AHolder);
 		FItemDataHolders[AnyRole].insertMulti(AOrder,AHolder);
 	}
 }
@@ -188,7 +194,8 @@ void AdvancedItemModel::removeItemDataHolder(int AOrder, AdvancedItemDataHolder 
 	if (AHolder)
 	{
 		foreach(int role, AHolder->advancedItemDataRoles(AOrder))
-			FItemDataHolders[role].remove(AOrder,AHolder);
+			if (role != AnyRole)
+				FItemDataHolders[role].remove(AOrder,AHolder);
 		FItemDataHolders[AnyRole].remove(AOrder,AHolder);
 	}
 }
@@ -255,7 +262,7 @@ void AdvancedItemModel::emitItemDataChanged(QStandardItem *AItem, int ARole)
 {
 	if (!FDelayedDataChangedSignals)
 	{
-		if (ARole > AnyRole)
+		if (ARole >= FIRST_VALID_ROLE)
 			emit itemDataChanged(AItem,ARole);
 		emitItemChanged(AItem);
 	}
@@ -293,7 +300,7 @@ void AdvancedItemModel::onEmitDelayedDataChangedSignals()
 			if (lastItem != item)
 				emitItemChanged(item);
 
-			if (role > AnyRole)
+			if (role >= FIRST_VALID_ROLE)
 				emit itemDataChanged(item,role);
 
 			lastItem = item;

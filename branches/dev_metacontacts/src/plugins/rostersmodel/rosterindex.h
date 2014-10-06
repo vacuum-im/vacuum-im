@@ -33,6 +33,7 @@ public:
 	virtual void setData(const QVariant &AValue, int ARole = Qt::UserRole+1);
 	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const;
 private:
+	int FKind;
 	RostersModel *FModel;
 };
 

@@ -2,8 +2,9 @@
 #define DEF_ROSTERINDEXROLES_H
 
 enum RosterIndexDataRoles {
-	RDR_ANY_ROLE = 32,
-	RDR_KIND,
+	RDR_ANY_ROLE    = -1, // AdvancedItemModel::AnyRole
+	RDR_ALL_ROLES   = -2, // AdvancedItemModel::AllRoles
+	RDR_KIND        = 32, // Qt::UserRole
 	RDR_KIND_ORDER,
 	RDR_SORT_ORDER,
 	//XMPP Roles
