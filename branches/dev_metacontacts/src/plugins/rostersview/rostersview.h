@@ -176,7 +176,8 @@ private:
 	QTimer FDragExpandTimer;
 	QRect FDropIndicatorRect;
 	QList<IRostersDragDropHandler *> FDragDropHandlers;
-	QList<IRostersDragDropHandler *> FActiveDragHandlers;
+	QList<IRostersDragDropHandler *> FMovedDragHandlers;
+	QList<IRostersDragDropHandler *> FEnteredDragHandlers;
 private:
 	AdvancedItemDelegate *FAdvancedItemDelegate;
 	QMultiMap<int, QAbstractProxyModel *> FProxyModels;
