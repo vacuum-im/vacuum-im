@@ -2154,7 +2154,7 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
 
 bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	int singleKind=-1;
+	int singleKind = -1;
 	foreach(IRosterIndex *index, ASelected)
 	{
 		Jid contactJid = index->data(RDR_FULL_JID).toString();
@@ -2566,18 +2566,16 @@ void MessageArchiver::onPrivateDataChanged(const Jid &AStreamJid, const QString 
 
 void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance() && !FRostersViewPlugin->rostersView()->hasMultiSelection())
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_SHOWHISTORY)
+		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWHISTORY && indexes.count()==1 && isSelectionAccepted(indexes))
 		{
-			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
-			{
-				Jid streamJid = index->data(RDR_STREAM_JID).toString();
-				Jid contactJid = indexKind!=RIK_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : Jid::null;
-				showArchiveWindow(streamJid,contactJid);
-			}
+			IRosterIndex *index = indexes.first();
+			if (index->kind() == RIK_STREAM_ROOT)
+				showArchiveWindow(index->data(RDR_STREAM_JID).toString());
+			else
+				showArchiveWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
 		}
 	}
 }

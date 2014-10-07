@@ -2,6 +2,7 @@
 #define DEF_ROSTERDATAHOLDERORDERS_H
 
 #define RDHO_ROSTERSVIEW_NOTIFY           500
+#define RDHO_METACONTACTS_LABELS          500
 
 #define RDHO_AVATARS                      1000
 #define RDHO_BOOKMARKS                    1000

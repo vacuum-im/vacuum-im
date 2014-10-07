@@ -39,7 +39,7 @@
 #define UNKNOWN_AVATAR            QString::null
 #define EMPTY_AVATAR              QString("")
 
-static const QList<int> AvatarRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> AvatarRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
 
 Avatars::Avatars()
 {
@@ -348,24 +348,21 @@ QList<int> Avatars::rosterDataRoles(int AOrder) const
 
 QVariant Avatars::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	if (AOrder == RDHO_AVATARS)
+	if (AOrder==RDHO_AVATARS && AvatarRosterKinds.contains(AIndex->kind()))
 	{
-		if (AvatarRosterKinds.contains(AIndex->kind()))
+		switch (ARole)
 		{
-			switch (ARole)
+		case RDR_AVATAR_IMAGE:
 			{
-			case RDR_AVATAR_IMAGE:
-				{
-					bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
-					QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
-					if (avatar.isNull() && FShowEmptyAvatars)
-						avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
-					return avatar;
-				}
-			case RDR_AVATAR_HASH:
-				{
-					return avatarHash(AIndex->data(RDR_FULL_JID).toString());
-				}
+				bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
+				QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
+				if (avatar.isNull() && FShowEmptyAvatars)
+					avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
+				return avatar;
+			}
+		case RDR_AVATAR_HASH:
+			{
+				return avatarHash(AIndex->data(RDR_FULL_JID).toString());
 			}
 		}
 	}

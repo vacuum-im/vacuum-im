@@ -176,7 +176,7 @@ private:
 	QMap<const IRosterIndex *, IRosterIndex *> FProxyToIndex;
 	QMap<IRosterIndex *, QList<IRosterIndex *> > FIndexProxies;
 	QList<IRostersDragDropHandler *> FMovedProxyDragHandlers;
-	QList<IRostersDragDropHandler *> FExteredProxyDragHandlers;
+	QList<IRostersDragDropHandler *> FEnteredProxyDragHandlers;
 private:
 	bool FHideLaterContacts;
 	bool FAllwaysShowOffline;

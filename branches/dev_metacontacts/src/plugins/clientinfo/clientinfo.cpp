@@ -43,7 +43,7 @@
 #define FORM_FIELD_OS                   "os"
 #define FORM_FIELD_OS_VERSION           "os_version"
 
-static const QList<int> ClientInfoRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT_ITEM;
+static const QList<int> ClientInfoRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT;
 
 ClientInfo::ClientInfo()
 {

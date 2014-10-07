@@ -1303,7 +1303,7 @@ bool PrivacyLists::isAllStreamsReady(const QStringList &AStreams) const
 
 bool PrivacyLists::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP << RIK_METACONTACT_ITEM;
+	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP;
 
 	int singleKind = -1;
 	foreach(IRosterIndex *index, ASelected)

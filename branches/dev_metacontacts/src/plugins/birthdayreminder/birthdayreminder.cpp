@@ -20,7 +20,7 @@
 #define NOTIFY_WITHIN_DAYS   4
 #define NOTIFY_TIMEOUT       90000
 
-static const QList<int> BirthdayRosterKinds = QList<int>() << RIK_CONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> BirthdayRosterKinds = QList<int>() << RIK_CONTACT;
 
 BirthdayReminder::BirthdayReminder()
 {

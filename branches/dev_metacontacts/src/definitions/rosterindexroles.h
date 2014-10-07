@@ -42,6 +42,7 @@ enum RosterIndexDataRoles {
 	RDR_VCARD_SEARCH,
 	//MetaContacts
 	RDR_METACONTACT_ID,
+	RDR_METACONTACT_ITEMS,
 	//Other Roles
 	RDR_USER_ROLE = 128
 };

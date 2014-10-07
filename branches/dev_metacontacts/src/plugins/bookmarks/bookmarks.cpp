@@ -1111,10 +1111,10 @@ void Bookmarks::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (FRostersView && AWidget==FRostersView->instance())
 	{
 		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_RENAME && !FRostersView->hasMultiSelection())
+		if (AId==SCT_ROSTERVIEW_RENAME && indexes.count()==1 && isSelectionAccepted(indexes))
 		{
 			IRosterIndex *index = indexes.first();
-			if (isSelectionAccepted(indexes) && !FRostersView->editRosterIndex(index,RDR_NAME))
+			if (!FRostersView->editRosterIndex(index,RDR_NAME))
 			{
 				Jid streamJid = index->data(RDR_STREAM_JID).toString();
 				IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(index);

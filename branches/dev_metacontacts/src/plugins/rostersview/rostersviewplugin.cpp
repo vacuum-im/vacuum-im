@@ -858,24 +858,28 @@ void RostersViewPlugin::onShowOfflineContactsAction(bool)
 
 void RostersViewPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (!FRostersView->hasMultiSelection())
+	if (AWidget == FRostersView)
 	{
-		QModelIndex index = FRostersView->instance()->currentIndex();
-		if (AId==SCT_ROSTERVIEW_COPYJID && AWidget==FRostersView)
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
+		if (indexes.count() == 1)
 		{
-			Jid jid = index.data(RDR_FULL_JID).toString();
-			if (!jid.isEmpty())
-				QApplication::clipboard()->setText(jid.uBare());
-		}
-		else if (AId==SCT_ROSTERVIEW_COPYNAME && AWidget==FRostersView)
-		{
-			if (!index.data(RDR_NAME).toString().isEmpty())
-				QApplication::clipboard()->setText(index.data(RDR_NAME).toString());
-		}
-		else if (AId==SCT_ROSTERVIEW_COPYSTATUS && AWidget==FRostersView)
-		{
-			if (!index.data(RDR_STATUS).toString().isEmpty())
-				QApplication::clipboard()->setText(index.data(RDR_STATUS).toString());
+			IRosterIndex *index = indexes.first();
+			if (AId == SCT_ROSTERVIEW_COPYJID)
+			{
+				Jid jid = index->data(RDR_FULL_JID).toString();
+				if (!jid.isEmpty())
+					QApplication::clipboard()->setText(jid.uBare());
+			}
+			else if (AId == SCT_ROSTERVIEW_COPYNAME)
+			{
+				if (!index->data(RDR_NAME).toString().isEmpty())
+					QApplication::clipboard()->setText(index->data(RDR_NAME).toString());
+			}
+			else if (AId == SCT_ROSTERVIEW_COPYSTATUS)
+			{
+				if (!index->data(RDR_STATUS).toString().isEmpty())
+					QApplication::clipboard()->setText(index->data(RDR_STATUS).toString());
+			}
 		}
 	}
 }

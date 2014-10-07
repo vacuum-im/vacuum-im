@@ -38,6 +38,8 @@
 
 #define REMOVE_FINISHED_TIMEOUT       10000
 
+static const QList<int> FileTransferRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+
 FileTransfer::FileTransfer()
 {
 	FRosterPlugin = NULL;
@@ -813,13 +815,13 @@ void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 
 void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance() && !FRostersViewPlugin->rostersView()->hasMultiSelection())
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_SENDFILE)
+		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SENDFILE && indexes.count()==1)
 		{
-			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
+			IRosterIndex *index = indexes.first();
+			if (FileTransferRosterKinds.contains(index->kind()))
 				sendFile(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
 		}
 	}

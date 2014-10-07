@@ -37,7 +37,7 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-static const QList<int> ChatHandlerRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> ChatHandlerRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT;
 
 ChatMessageHandler::ChatMessageHandler()
 {
@@ -736,8 +736,7 @@ bool ChatMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelec
 {
 	foreach(IRosterIndex *index, ASelected)
 	{
-		int indexKinds = index->kind();
-		if (!ChatHandlerRosterKinds.contains(indexKinds))
+		if (!ChatHandlerRosterKinds.contains(index->kind()))
 			return false;
 	}
 	return !ASelected.isEmpty();
@@ -1049,10 +1048,10 @@ void ChatMessageHandler::onActiveStreamRemoved(const Jid &AStreamJid)
 
 void ChatMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
+	if (FRostersView && AWidget==FRostersView->instance())
 	{
 		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && isSelectionAccepted(indexes))
+		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && indexes.count()==1 && isSelectionAccepted(indexes))
 		{
 			IRosterIndex *index = indexes.first();
 			messageShowWindow(MHO_CHATMESSAGEHANDLER,index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString(),Message::Chat,IMessageHandler::SM_SHOW);

@@ -422,7 +422,7 @@ bool NormalMessageHandler::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AI
 			{
 				return messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW);
 			}
-			else if (indexKind==RIK_CONTACT || indexKind==RIK_MY_RESOURCE || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT || indexKind==RIK_METACONTACT_ITEM)
+			else if (indexKind==RIK_CONTACT || indexKind==RIK_MY_RESOURCE || indexKind==RIK_AGENT)
 			{
 				Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
 				return messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW);
@@ -799,18 +799,14 @@ bool NormalMessageHandler::isAnyPresenceOpened(const QStringList &AStreams) cons
 
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptKinds = QList<int>() 
-		<< RIK_STREAM_ROOT 
-		<< RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE
-		<< RIK_METACONTACT << RIK_METACONTACT_ITEM
-		<< RIK_GROUP << RIK_GROUP_BLANK	<< RIK_GROUP_NOT_IN_ROSTER;
-	
 	static const QList<int> contactKinds =  QList<int>() 
-		<< RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE
-		<< RIK_METACONTACT << RIK_METACONTACT_ITEM;
+		<< RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
 
 	static const QList<int> groupKinds = QList<int>() 
 		<< RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_NOT_IN_ROSTER;
+
+	static const QList<int> acceptKinds = QList<int>() 
+		<< RIK_STREAM_ROOT << contactKinds << groupKinds;
 
 	bool hasGroups = false;
 	bool hasContacts = false;
@@ -865,7 +861,7 @@ QMap<int,QStringList> NormalMessageHandler::indexesRolesMap(const QList<IRosterI
 			for (int row=0; row<index->childCount(); row++)
 			{
 				IRosterIndex *child = index->childIndex(row);
-				if (child->kind()==RIK_CONTACT || child->kind()==RIK_METACONTACT_ITEM)
+				if (child->kind() == RIK_CONTACT)
 				{
 					rolesMap[RDR_STREAM_JID].append(child->data(RDR_STREAM_JID).toString());
 					rolesMap[RDR_PREP_BARE_JID].append(child->data(RDR_PREP_BARE_JID).toString());

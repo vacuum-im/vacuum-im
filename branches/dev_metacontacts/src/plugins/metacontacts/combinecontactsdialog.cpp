@@ -71,7 +71,7 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 			if (!ritem.name.isEmpty())
 				contactNames.append(name);
 			else
-				contactNodes.append(name);
+				contactNodes.append(ritem.itemJid.uNode());
 		}
 
 		QString name;

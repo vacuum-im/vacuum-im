@@ -308,11 +308,11 @@ Qt::DropActions RecentContacts::rosterDragStart(const QMouseEvent *AEvent, IRost
 
 bool RecentContacts::rosterDragEnter(const QDragEnterEvent *AEvent)
 {
-	FExteredProxyDragHandlers.clear();
+	FEnteredProxyDragHandlers.clear();
 	foreach(IRostersDragDropHandler *handler, FRostersView->dragDropHandlers())
 		if (handler!=this && handler->rosterDragEnter(AEvent))
-			FExteredProxyDragHandlers.append(handler);
-	return !FExteredProxyDragHandlers.isEmpty();
+			FEnteredProxyDragHandlers.append(handler);
+	return !FEnteredProxyDragHandlers.isEmpty();
 }
 
 bool RecentContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
@@ -323,7 +323,7 @@ bool RecentContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *
 		IRosterIndex *proxy = FIndexToProxy.value(AHover);
 		if (proxy)
 		{
-			foreach(IRostersDragDropHandler *handler, FExteredProxyDragHandlers)
+			foreach(IRostersDragDropHandler *handler, FEnteredProxyDragHandlers)
 				if (handler!=this && handler->rosterDragMove(AEvent,proxy))
 					FMovedProxyDragHandlers.append(handler);
 		}
@@ -1482,13 +1482,13 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (FRostersModel && FRostersView && AWidget==FRostersView->instance())
 	{
-		QList<IRosterIndex *> selectedIndexes = FRostersView->selectedRosterIndexes();
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
 		if (AId==SCT_ROSTERVIEW_INSERTFAVORITE || AId==SCT_ROSTERVIEW_REMOVEFAVORITE)
 		{
-			if (isSelectionAccepted(selectedIndexes))
+			if (isSelectionAccepted(indexes))
 			{
 				QMap<int, QStringList> rolesMap;
-				foreach(IRosterIndex *index, selectedIndexes)
+				foreach(IRosterIndex *index, indexes)
 				{
 					IRecentItem item = rosterIndexItem(index);
 					rolesMap[RDR_RECENT_TYPE].append(item.type);
@@ -1498,13 +1498,13 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 				setItemsFavorite(AId==SCT_ROSTERVIEW_INSERTFAVORITE,rolesMap.value(RDR_RECENT_TYPE),rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_RECENT_REFERENCE));
 			}
 		}
-		else if (isRecentSelectionAccepted(selectedIndexes))
+		else if (isRecentSelectionAccepted(indexes))
 		{
 			if (AId == SCT_ROSTERVIEW_REMOVEFROMRECENT)
 			{
 				bool storageOpened = true;
 				QMap<int, QStringList> rolesMap;
-				foreach(IRosterIndex *index, selectedIndexes)
+				foreach(IRosterIndex *index, indexes)
 				{
 					IRecentItem item = rosterIndexItem(index);
 					rolesMap[RDR_RECENT_TYPE].append(item.type);
@@ -1517,12 +1517,12 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			}
 			else
 			{
-				QList<IRosterIndex *> selectedProxies = indexesProxies(selectedIndexes);
-				if (!selectedProxies.isEmpty() && FRostersView->isSelectionAcceptable(selectedProxies))
+				QList<IRosterIndex *> proxies = indexesProxies(indexes);
+				if (!proxies.isEmpty() && FRostersView->isSelectionAcceptable(proxies))
 				{
-					FRostersView->setSelectedRosterIndexes(selectedProxies);
+					FRostersView->setSelectedRosterIndexes(proxies);
 					Shortcuts::activateShortcut(AId,AWidget);
-					FRostersView->setSelectedRosterIndexes(selectedIndexes);
+					FRostersView->setSelectedRosterIndexes(indexes);
 				}
 			}
 		}

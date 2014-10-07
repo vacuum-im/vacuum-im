@@ -19,6 +19,7 @@ class MetaContacts :
 	public QObject,
 	public IPlugin,
 	public IMetaContacts,
+	public IRosterDataHolder,
 	public IRostersLabelHolder,
 	public IRostersClickHooker,
 	public IRostersDragDropHandler,
@@ -26,7 +27,7 @@ class MetaContacts :
 	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMetaContacts IRostersLabelHolder IRostersClickHooker IRostersDragDropHandler IRostersEditHandler);
+	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker IRostersDragDropHandler IRostersEditHandler);
 public:
 	MetaContacts();
 	~MetaContacts();
@@ -38,19 +39,23 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin();
+	// IRosterDataHolder
+	virtual QList<int> rosterDataRoles(int AOrder) const;
+	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;
+	virtual bool setRosterData(int AOrder, const QVariant &AValue, IRosterIndex *AIndex, int ARole);
 	// IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	// IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
-	//IRostersDragDropHandler
+	// IRostersDragDropHandler
 	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);
 	virtual bool rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover);
 	virtual void rosterDragLeave(const QDragLeaveEvent *AEvent);
 	virtual bool rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu);
-	//IRostersEditHandler
+	// IRostersEditHandler
 	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
 	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
 	//AdvancedDelegateEditProxy
@@ -70,13 +75,14 @@ signals:
 	void metaContactsOpened(const Jid &AStreamJid);
 	void metaContactsClosed(const Jid &AStreamJid);
 	void metaContactChanged(const Jid &AStreamJid, const IMetaContact &AMetaContact, const IMetaContact &ABefore);
+	// IRosterDataHolder
+	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	// IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
 	bool isValidItem(const Jid &AStreamJid, const Jid &AItem) const;
 	void updateMetaIndexes(const Jid &AStreamJid, const IMetaContact &AMetaContact);
-	void removeMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId);
-	void updateMetaIndexItems(IRosterIndex *AMetaIndex, const QList<Jid> &AItems);
+	void updateMetaIndexItems(const Jid &AStreamJid, const IMetaContact &AMetaContact, IRosterIndex *AMetaIndex);
 	void updateMetaWindows(const Jid &AStreamJid, const IMetaContact &AMetaContact, const QSet<Jid> ANewItems, const QSet<Jid> AOldItems);
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
 	void updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts);
@@ -85,7 +91,7 @@ protected:
 protected:
 	bool isReadyStreams(const QStringList &AStreams) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
-	bool isDragDropAccetped(const QDropEvent *AEvent, IRosterIndex *AHover) const;
+	bool hasProxiedIndexes(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool ASelfProxy=true) const;
 protected:
 	void renameMetaContact(const Jid &AStreamJid, const QUuid &AMetaId);
@@ -117,6 +123,7 @@ protected slots:
 	void onRostersModelStreamsLayoutChanged(int ABefore);
 	void onRostersModelIndexInserted(IRosterIndex *AIndex);
 	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
+	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
 protected slots:
 	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -127,6 +134,7 @@ protected slots:
 	void onRostersViewNotifyActivated(int ANotifyId);
 protected slots:
 	void onMessageChatWindowCreated(IMessageChatWindow *AWindow);
+	void onMessageChatWindowChanged();
 	void onMessageChatWindowDestroyed();
 protected slots:
 	void onDetachMetaItemsByAction();

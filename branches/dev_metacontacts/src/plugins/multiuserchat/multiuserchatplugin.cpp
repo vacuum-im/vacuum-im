@@ -1294,12 +1294,12 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 					window->exitAndDestroy(QString::null);
 		}
 	}
-	else if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
+	else if (FRostersViewPlugin!=NULL && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-		if (index)
+		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && indexes.count()==1)
 		{
-			IMultiUserChatWindow *window = getMultiChatWindowForIndex(index);
+			IMultiUserChatWindow *window = getMultiChatWindowForIndex(indexes.first());
 			if (window)
 			{
 				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
@@ -1307,26 +1307,18 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 				window->showTabPage();
 			}
 		}
-	}
-	else if (AId == SCT_ROSTERVIEW_ENTERCONFERENCE)
-	{
-		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
+		else if (AId==SCT_ROSTERVIEW_ENTERCONFERENCE)
 		{
-			foreach(IRosterIndex *index, selected)
+			foreach(IRosterIndex *index, indexes)
 			{
 				IMultiUserChatWindow *window = getMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString(),index->data(RDR_MUC_NICK).toString(),index->data(RDR_MUC_PASSWORD).toString());
 				if (window && !window->multiUserChat()->isConnected())
 					window->multiUserChat()->sendStreamPresence();
 			}
 		}
-	}
-	else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE)
-	{
-		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
+		else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE && isSelectionAccepted(indexes) && indexes.first()->kind()==RIK_MUC_ITEM)
 		{
-			foreach(IRosterIndex *index, selected)
+			foreach(IRosterIndex *index, indexes)
 			{
 				IMultiUserChatWindow *window = findMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 				if (window)

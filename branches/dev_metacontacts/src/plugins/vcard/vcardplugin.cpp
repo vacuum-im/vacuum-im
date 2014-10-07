@@ -42,7 +42,7 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_CLIPBOARD_DATA        Action::DR_Parametr1
 
-static const QList<int> VCardRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> VCardRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT;
 
 VCardPlugin::VCardPlugin()
 {
@@ -601,11 +601,12 @@ void VCardPlugin::onCopyToClipboardActionTriggered(bool)
 
 void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
+	if (FRostersView && AWidget==FRostersView->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWVCARD && indexes.count()==1)
 		{
-			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
+			IRosterIndex *index = indexes.first();
 			if (index!=NULL && VCardRosterKinds.contains(index->kind()))
 				showVCardDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
