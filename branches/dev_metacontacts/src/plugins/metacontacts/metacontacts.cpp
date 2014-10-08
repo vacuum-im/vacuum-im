@@ -182,7 +182,6 @@ bool MetaContacts::initObjects()
 	if (FRostersModel)
 	{
 		FRostersModel->insertRosterDataHolder(RDHO_METACONTACTS,this);
-		FRostersModel->insertRosterDataHolder(RDHO_METACONTACTS_LABELS,this);
 	}
 	if (FRostersView)
 	{
@@ -213,11 +212,6 @@ QList<int> MetaContacts::rosterDataRoles(int AOrder) const
 		static const QList<int> roles = QList<int>() << RDR_ALL_ROLES;
 		return roles;
 	}
-	else if (AOrder == RDHO_METACONTACTS_LABELS)
-	{
-		static const QList<int> roles = QList<int>() << RDR_LABEL_ITEMS;
-		return roles;
-	}
 	return QList<int>();
 }
 
@@ -225,6 +219,8 @@ QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 {
 	if (AOrder == RDHO_METACONTACTS)
 	{
+		static bool labelsBlock = false;
+
 		IRosterIndex *proxy = NULL;
 		switch (AIndex->kind())
 		{
@@ -242,8 +238,24 @@ QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 			case RDR_SHOW:
 			case RDR_STATUS:
 			case RDR_PRIORITY:
-			case RDR_LABEL_ITEMS:
 			case RDR_METACONTACT_ID:
+				break;
+			case RDR_LABEL_ITEMS:
+				proxy = !labelsBlock ? FMetaIndexItems.value(AIndex).value(AIndex->data(RDR_PREP_BARE_JID).toString()) : 0;
+				if (proxy)
+				{
+					labelsBlock = true;
+					AdvancedDelegateItems metaLabels = AIndex->data(RDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
+					AdvancedDelegateItems proxyLabels = proxy->data(RDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
+					labelsBlock = false;
+
+					for (AdvancedDelegateItems::const_iterator it=proxyLabels.constBegin(); it!=proxyLabels.constEnd(); ++it)
+					{
+						if (!metaLabels.contains(it.key()))
+							metaLabels.insert(it.key(),it.value());
+					}
+					return QVariant::fromValue<AdvancedDelegateItems>(metaLabels);
+				}
 				break;
 			default:
 				proxy = FMetaIndexItems.value(AIndex).value(AIndex->data(RDR_PREP_BARE_JID).toString());
@@ -265,27 +277,6 @@ QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 			break;
 		}
 		return proxy!=NULL ? proxy->data(ARole) : QVariant();
-	}
-	else if (AOrder==RDHO_METACONTACTS_LABELS && AIndex->kind()==RIK_METACONTACT && ARole==RDR_LABEL_ITEMS)
-	{
-		static bool block = false;
-
-		IRosterIndex *proxy = !block ? FMetaIndexItems.value(AIndex).value(AIndex->data(RDR_PREP_BARE_JID).toString()) : NULL;
-		if (proxy)
-		{
-			block = true;
-			AdvancedDelegateItems metaLabels = AIndex->data(RDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
-			AdvancedDelegateItems proxyLabels = proxy->data(RDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
-			block = false;
-
-			for (AdvancedDelegateItems::const_iterator it=proxyLabels.constBegin(); it!=proxyLabels.constEnd(); ++it)
-			{
-				if (!metaLabels.contains(it.key()))
-					metaLabels.insert(it.key(),it.value());
-			}
-
-			return QVariant::fromValue<AdvancedDelegateItems>(metaLabels);
-		}
 	}
 	return QVariant();
 }
@@ -1175,10 +1166,14 @@ void MetaContacts::destroyMetaContacts(const QStringList &AStreams, const QStrin
 
 void MetaContacts::startSaveContactsToStorage(const Jid &AStreamJid)
 {
-	if (FPrivateStorage)
+	if (FPrivateStorage && isReady(AStreamJid))
 	{
 		FSaveStreams += AStreamJid;
 		FSaveTimer.start(STORAGE_SAVE_TIMEOUT);
+	}
+	else if (FPrivateStorage)
+	{
+		LOG_STRM_WARNING(AStreamJid,"Failed to start save metacontacts to storage: Stream not ready");
 	}
 }
 
@@ -1201,7 +1196,7 @@ bool MetaContacts::saveContactsToStorage(const Jid &AStreamJid) const
 	}
 	else if (FPrivateStorage)
 	{
-		REPORT_ERROR("Failed to save meta-contacts to storage: Stream not ready");
+		REPORT_ERROR("Failed to save metacontacts to storage: Stream not ready");
 	}
 	return false;
 }

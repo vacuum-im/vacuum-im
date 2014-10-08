@@ -77,10 +77,10 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 				int rightShow = ARight.data(RDR_SHOW).toInt();
 				if (leftShow != rightShow)
 				{
-					static const int showOrders[] = {6,2,1,3,4,5,7,8};
-					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
-						return showOrders[leftShow] < showOrders[rightShow];
+					static const int show2order[] = {6,2,1,3,5,4,7,8};
+					static const int showCount = sizeof(show2order)/sizeof(show2order[0]);
+					if (leftShow<showCount && rightShow<showCount)
+						return show2order[leftShow] < show2order[rightShow];
 				}
 			}
 			return compareVariant(ALeft.data(Qt::DisplayRole),ARight.data(Qt::DisplayRole));
