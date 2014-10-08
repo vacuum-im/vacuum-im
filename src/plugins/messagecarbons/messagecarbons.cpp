@@ -8,7 +8,8 @@
 
 #define CARBONS_TIMEOUT               30000
 
-#define SHC_FORWARDED_MESSAGE         "/message/forwarded[@xmlns='" NS_MESSAGE_FORWARD "']"
+#define SHC_CARBONS_SENT              "/message/sent[@xmlns='" NS_MESSAGE_CARBONS "']"
+#define SHC_CARBONS_RECEIVED          "/message/received[@xmlns='" NS_MESSAGE_CARBONS "']"
 
 MessageCarbons::MessageCarbons()
 {
@@ -213,7 +214,8 @@ void MessageCarbons::onXmppStreamOpened(IXmppStream *AXmppStream)
 		shandle.order = SHO_DEFAULT;
 		shandle.direction = IStanzaHandle::DirectionIn;
 		shandle.streamJid = AXmppStream->streamJid();
-		shandle.conditions.append(SHC_FORWARDED_MESSAGE);
+		shandle.conditions.append(SHC_CARBONS_SENT);
+		shandle.conditions.append(SHC_CARBONS_RECEIVED);
 		FSHIForwards.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 	}
 }
