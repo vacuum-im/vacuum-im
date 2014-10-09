@@ -11,6 +11,7 @@
 
 struct IMetaContact {
 	QUuid id;
+	QUuid link;
 	QString name;
 	QList<Jid> items;
 	QSet<QString> groups;
@@ -22,7 +23,7 @@ struct IMetaContact {
 		return items.isEmpty();
 	}
 	inline bool operator==(const IMetaContact &AOther) const {
-		return id==AOther.id && name==AOther.name && items==AOther.items && groups==AOther.groups && presences==AOther.presences;
+		return id==AOther.id && link==AOther.link && name==AOther.name && items==AOther.items && groups==AOther.groups && presences==AOther.presences;
 	}
 	inline bool operator!=(const IMetaContact &AOther) const {
 		return !operator==(AOther);
@@ -34,15 +35,16 @@ class IMetaContacts
 public:
 	virtual QObject *instance() = 0;
 	virtual bool isReady(const Jid &AStreamJid) const =0;
+	virtual QMultiMap<Jid, QUuid> findLinkedContacts(const QUuid &ALinkId) const =0;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const Jid &AItem) const =0;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const QUuid &AMetaId) const =0;
 	virtual QList<IRosterIndex *> findMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId) const =0;
-	virtual QUuid createMetaContact(const Jid &AStreamJid, const QList<Jid> &AItems, const QString &AName) =0;
-	virtual bool mergeMetaContacts(const Jid &AStreamJid, const QUuid &AMetaId1, const QUuid &AMetaId2) =0;
-	virtual bool detachMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems) =0;
+	virtual QUuid createMetaContact(const Jid &AStreamJid, const QString &AName, const QList<Jid> &AItems) =0;
+	virtual bool setMetaContactLink(const Jid &AStreamJid, const QUuid &AMetaId, const QUuid &ALinkId) =0;
 	virtual bool setMetaContactName(const Jid &AStreamJid, const QUuid &AMetaId, const QString &AName) =0;
-	virtual bool setMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems) =0;
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups) =0;
+	virtual bool insertMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems) =0;
+	virtual bool removeMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems) =0;
 protected:
 	virtual void metaContactsOpened(const Jid &AStreamJid) =0;
 	virtual void metaContactsClosed(const Jid &AStreamJid) =0;

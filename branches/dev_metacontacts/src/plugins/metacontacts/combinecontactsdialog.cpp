@@ -6,9 +6,9 @@
 #include <utils/iconstorage.h>
 #include <utils/imagemanager.h>
 
-#define AVATAR_SIZE QSize(32,32)
+#define AVATAR_SIZE QSize(24,24)
 
-static bool SizeLessThan(const QString &AValue1, const QString &AValue2)
+static bool StringSizeLessThan(const QString &AValue1, const QString &AValue2)
 {
 	return AValue1.size() < AValue2.size();
 }
@@ -45,6 +45,9 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 
 				if (!meta.name.isEmpty())
 					metaNames.append(meta.name);
+
+				if (FMetaLinkId.isNull())
+					FMetaLinkId = meta.link;
 				FStreamMetas.insertMulti(streamJid,meta.id);
 			}
 			else if (!FStreamContacts.contains(streamJid,AContacts.at(i)))
@@ -52,6 +55,7 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 				FStreamContacts.insertMulti(streamJid,AContacts.at(i));
 			}
 		}
+		FMetaLinkId = FMetaLinkId.isNull() && FStreamContacts.uniqueKeys().count()>1 ? QUuid::createUuid() : FMetaLinkId;
 
 		ui.lwtContacts->setIconSize(AVATAR_SIZE);
 		for (QMultiMap<Jid, Jid>::const_iterator it = FStreamContacts.constBegin(); it!=FStreamContacts.constEnd(); ++it)
@@ -75,13 +79,13 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 		}
 
 		QString name;
-		qSort(metaNames.begin(), metaNames.end(), SizeLessThan);
+		qSort(metaNames.begin(), metaNames.end(), StringSizeLessThan);
 		if (metaNames.isEmpty())
 		{
-			qSort(contactNames.begin(), contactNames.end(), SizeLessThan);
+			qSort(contactNames.begin(), contactNames.end(), StringSizeLessThan);
 			if (contactNames.isEmpty())
 			{
-				qSort(contactNodes.begin(), contactNodes.end(), SizeLessThan);
+				qSort(contactNodes.begin(), contactNodes.end(), StringSizeLessThan);
 				name = !contactNodes.isEmpty() ? contactNodes.last(): name;
 			}
 			else
@@ -133,12 +137,14 @@ void CombineContactsDialog::onDialogButtonsBoxAccepted()
 		QUuid metaId = FStreamMetas.value(streamJid);
 		if (!metaId.isNull())
 		{
-			FMetaContacts->setMetaContactItems(streamJid,metaId,FStreamContacts.values(streamJid));
+			FMetaContacts->insertMetaContactItems(streamJid,metaId,FStreamContacts.values(streamJid));
 			FMetaContacts->setMetaContactName(streamJid,metaId,ui.lneName->text());
+			FMetaContacts->setMetaContactLink(streamJid,metaId,FMetaLinkId);
 		}
 		else
 		{
-			FMetaContacts->createMetaContact(streamJid,FStreamContacts.values(streamJid),ui.lneName->text());
+			metaId = FMetaContacts->createMetaContact(streamJid,ui.lneName->text(),FStreamContacts.values(streamJid));
+			FMetaContacts->setMetaContactLink(streamJid,metaId,FMetaLinkId);
 		}
 	}
 	close();

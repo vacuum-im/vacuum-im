@@ -62,15 +62,16 @@ public:
 	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	// IMetaContacts
 	virtual bool isReady(const Jid &AStreamJid) const;
-	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const Jid &AItem) const;
+	virtual QMultiMap<Jid, QUuid> findLinkedContacts(const QUuid &ALinkId) const;
+	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const Jid &AItemJid) const;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const QUuid &AMetaId) const;
 	virtual QList<IRosterIndex *> findMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId) const;
-	virtual QUuid createMetaContact(const Jid &AStreamJid, const QList<Jid> &AItems, const QString &AName);
-	virtual bool mergeMetaContacts(const Jid &AStreamJid, const QUuid &AMetaId1, const QUuid &AMetaId2);
-	virtual bool detachMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
+	virtual QUuid createMetaContact(const Jid &AStreamJid, const QString &AName, const QList<Jid> &AItems);
+	virtual bool setMetaContactLink(const Jid &AStreamJid, const QUuid &AMetaId, const QUuid &ALinkId);
 	virtual bool setMetaContactName(const Jid &AStreamJid, const QUuid &AMetaId, const QString &AName);
-	virtual bool setMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups);
+	virtual bool insertMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
+	virtual bool removeMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
 signals:
 	void metaContactsOpened(const Jid &AStreamJid);
 	void metaContactsClosed(const Jid &AStreamJid);
@@ -80,7 +81,6 @@ signals:
 	// IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
-	bool isValidItem(const Jid &AStreamJid, const Jid &AItem) const;
 	void updateMetaIndexes(const Jid &AStreamJid, const IMetaContact &AMetaContact);
 	void updateMetaIndexItems(const Jid &AStreamJid, const IMetaContact &AMetaContact, IRosterIndex *AMetaIndex);
 	void updateMetaWindows(const Jid &AStreamJid, const IMetaContact &AMetaContact, const QSet<Jid> ANewItems, const QSet<Jid> AOldItems);
@@ -90,12 +90,13 @@ protected:
 	void startUpdateMetaContactIndex(const Jid &AStreamJid, const QUuid &AMetaId, IRosterIndex *AIndex);
 protected:
 	bool isReadyStreams(const QStringList &AStreams) const;
+	bool isValidItem(const Jid &AStreamJid, const Jid &AItemJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	bool hasProxiedIndexes(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool ASelfProxy=true) const;
 protected:
 	void renameMetaContact(const Jid &AStreamJid, const QUuid &AMetaId);
-	void detachMetaItems(const QStringList &AStreams, const QStringList &AContacts);
+	void removeMetaItems(const QStringList &AStreams, const QStringList &AContacts);
 	void combineMetaItems(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas);
 	void destroyMetaContacts(const QStringList &AStreams, const QStringList &AMetas);
 protected:
@@ -137,7 +138,7 @@ protected slots:
 	void onMessageChatWindowChanged();
 	void onMessageChatWindowDestroyed();
 protected slots:
-	void onDetachMetaItemsByAction();
+	void onRemoveMetaItemsByAction();
 	void onCombineMetaItemsByAction();
 	void onRenameMetaContactByAction();
 	void onDestroyMetaContactsByAction();
@@ -165,10 +166,12 @@ private:
 	QSet<Jid> FSaveStreams;
 	QSet<Jid> FLoadStreams;
 	QMap<Jid, QString> FLoadRequestId;
-	QMap<Jid, QMap<QUuid, QSet<IRosterIndex *> > > FUpdateContacts;
+	QMap<Jid, QMap<QUuid, QSet<IRosterIndex *> > > FUpdateMeta;
 private:
 	QMap<Jid, QHash<Jid, QUuid> > FItemMetaId;
 	QMap<Jid, QHash<QUuid, IMetaContact> > FMetaContacts;
+private:
+	QMap<QUuid, QMultiMap<Jid, QUuid> > FLinkMetaId;
 private:
 	QMap<int, int> FProxyToIndexNotify;
 	QMap<Menu *, Menu *> FProxyContextMenu;
