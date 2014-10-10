@@ -108,6 +108,7 @@ signals:
 	void recentItemUpdated(const IRecentItem &AItem);
 protected:
 	void registerDiscoFeatures();
+	bool isReady(const Jid &AStreamJid) const;
 	QString streamVCardNick(const Jid &AStreamJid) const;
 	void updateRecentItemProxy(IRosterIndex *AIndex);
 	void updateRecentItemProperties(IRosterIndex *AIndex);

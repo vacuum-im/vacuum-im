@@ -588,8 +588,7 @@ bool MultiUserChatPlugin::messageShowWindow(int AOrder, const Jid &AStreamJid, c
 {
 	if (AOrder==MHO_MULTIUSERCHAT_GROUPCHAT && AType==Message::GroupChat)
 	{
-		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
-		if (stream && stream->isOpen())
+		if (isReady(AStreamJid))
 		{
 			QString nick = AContactJid.resource().isEmpty() ? AContactJid.node() : AContactJid.resource();
 			IMultiUserChatWindow *window = getMultiChatWindow(AStreamJid,AContactJid.bare(),nick,QString::null);
@@ -847,8 +846,7 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 
 void MultiUserChatPlugin::showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
 {
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
-	if (stream && stream->isOpen())
+	if (isReady(AStreamJid))
 	{
 		JoinMultiChatDialog *dialog = new JoinMultiChatDialog(this,AStreamJid,ARoomJid,ANick,APassword);
 		dialog->show();
@@ -934,6 +932,12 @@ void MultiUserChatPlugin::registerDiscoFeatures()
 	dfeature.name = tr("Unsecured room");
 	dfeature.description = tr("A room that anyone is allowed to enter without first providing the correct password");
 	FDiscovery->insertDiscoFeature(dfeature);
+}
+
+bool MultiUserChatPlugin::isReady(const Jid &AStreamJid) const
+{
+	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+	return stream!=NULL && stream->isOpen();
 }
 
 QString MultiUserChatPlugin::streamVCardNick(const Jid &AStreamJid) const
@@ -1049,9 +1053,7 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindowForIndex(const IRos
 {
 	IMultiUserChatWindow *window = NULL;
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
-	if (stream && stream->isOpen())
+	if (isReady(streamJid))
 	{
 		if (AIndex->kind() == RIK_MUC_ITEM)
 		{
@@ -1347,22 +1349,24 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 	{
 		bool isMultiSelection = AIndexes.count()>1;
 		IRosterIndex *index = AIndexes.first();
-		if (index->kind()==RIK_STREAM_ROOT)
+		if (index->kind() == RIK_STREAM_ROOT)
 		{
-			int show = index->data(RDR_SHOW).toInt();
-			if (show!=IPresence::Offline && show!=IPresence::Error)
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
+			if (isReady(streamJid))
 			{
-				Action *action = createJoinAction(index->data(RDR_STREAM_JID).toString(),Jid::null,AMenu);
+				Action *action = createJoinAction(streamJid,Jid::null,AMenu);
 				AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
 			}
 		}
 		else if (index->kind() == RIK_GROUP_MUC)
 		{
-			int show = index->parentIndex()->data(RDR_SHOW).toInt();
-			if (show!=IPresence::Offline && show!=IPresence::Error)
+			foreach(const Jid &streamJid, index->data(RDR_STREAMS).toStringList())
 			{
-				Action *action = createJoinAction(index->data(RDR_STREAM_JID).toString(),Jid::null,AMenu);
-				AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
+				if (isReady(streamJid))
+				{
+					Action *action = createJoinAction(streamJid,Jid::null,AMenu);
+					AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
+				}
 			}
 		}
 		else if (index->kind() == RIK_MUC_ITEM)
