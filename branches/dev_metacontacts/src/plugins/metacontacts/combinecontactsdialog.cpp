@@ -40,25 +40,23 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 			if (!meta.isNull())
 			{
 				foreach(const Jid &itemJid, meta.items)
-					if (!FStreamContacts.contains(streamJid,itemJid))
-						FStreamContacts.insertMulti(streamJid,itemJid);
+					if (!FMetaItems.contains(streamJid,itemJid))
+						FMetaItems.insertMulti(streamJid,itemJid);
 
 				if (!meta.name.isEmpty())
 					metaNames.append(meta.name);
 
-				if (FMetaLinkId.isNull())
-					FMetaLinkId = meta.link;
-				FStreamMetas.insertMulti(streamJid,meta.id);
+				FMetaId = meta.id;
 			}
-			else if (!FStreamContacts.contains(streamJid,AContacts.at(i)))
+			else if (!FMetaItems.contains(streamJid,AContacts.at(i)))
 			{
-				FStreamContacts.insertMulti(streamJid,AContacts.at(i));
+				FMetaItems.insertMulti(streamJid,AContacts.at(i));
 			}
 		}
-		FMetaLinkId = FMetaLinkId.isNull() && FStreamContacts.uniqueKeys().count()>1 ? QUuid::createUuid() : FMetaLinkId;
+		FMetaId = FMetaId.isNull() ? QUuid::createUuid() : FMetaId;
 
 		ui.lwtContacts->setIconSize(AVATAR_SIZE);
-		for (QMultiMap<Jid, Jid>::const_iterator it = FStreamContacts.constBegin(); it!=FStreamContacts.constEnd(); ++it)
+		for (QMultiMap<Jid, Jid>::const_iterator it = FMetaItems.constBegin(); it!=FMetaItems.constEnd(); ++it)
 		{
 			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(it.key()) : NULL;
 			IRosterItem ritem = roster!=NULL ? roster->rosterItem(it.value()) : IRosterItem();
@@ -132,21 +130,8 @@ void CombineContactsDialog::initialize(IPluginManager *APluginManager)
 
 void CombineContactsDialog::onDialogButtonsBoxAccepted()
 {
-	foreach (const Jid &streamJid, FStreamContacts.uniqueKeys())
-	{
-		QUuid metaId = FStreamMetas.value(streamJid);
-		if (!metaId.isNull())
-		{
-			FMetaContacts->insertMetaContactItems(streamJid,metaId,FStreamContacts.values(streamJid));
-			FMetaContacts->setMetaContactName(streamJid,metaId,ui.lneName->text());
-			FMetaContacts->setMetaContactLink(streamJid,metaId,FMetaLinkId);
-		}
-		else
-		{
-			metaId = FMetaContacts->createMetaContact(streamJid,ui.lneName->text(),FStreamContacts.values(streamJid));
-			FMetaContacts->setMetaContactLink(streamJid,metaId,FMetaLinkId);
-		}
-	}
+	foreach (const Jid &streamJid, FMetaItems.uniqueKeys())
+		FMetaContacts->createMetaContact(streamJid,FMetaId,ui.lneName->text(),FMetaItems.values(streamJid));
 	close();
 }
 
@@ -157,6 +142,6 @@ void CombineContactsDialog::onDialogButtonsBoxRejected()
 
 void CombineContactsDialog::onMetaContactsClosed(const Jid &AStreamJid)
 {
-	if (FStreamContacts.contains(AStreamJid))
+	if (FMetaItems.contains(AStreamJid))
 		close();
 }

@@ -28,9 +28,8 @@ private:
 	IRosterPlugin *FRosterPlugin;
 	IMetaContacts *FMetaContacts;
 private:
-	QUuid FMetaLinkId;
-	QMultiMap<Jid, QUuid> FStreamMetas;
-	QMultiMap<Jid, Jid> FStreamContacts;
+	QUuid FMetaId;
+	QMultiMap<Jid, Jid> FMetaItems;
 };
 
 #endif // COMBINECONTACTSDIALOG_H

@@ -808,7 +808,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 					itemIndex->setData(AItem.itemJid.pBare(),RDR_PREP_BARE_JID);
 					itemIndex->setData(AItem.name,RDR_NAME);
 					itemIndex->setData(AItem.subscription,RDR_SUBSCRIBTION);
-					itemIndex->setData(AItem.ask,RDR_ASK);
+					itemIndex->setData(AItem.ask,RDR_SUBSCRIPTION_ASK);
 					itemIndex->setData(group,RDR_GROUP);
 
 					itemIndex->setData(pitem.show,RDR_SHOW);
@@ -822,7 +822,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 				{
 					itemIndex->setData(AItem.name,RDR_NAME);
 					itemIndex->setData(AItem.subscription,RDR_SUBSCRIBTION);
-					itemIndex->setData(AItem.ask,RDR_ASK);
+					itemIndex->setData(AItem.ask,RDR_SUBSCRIPTION_ASK);
 					itemList.append(itemIndex);
 				}
 			}

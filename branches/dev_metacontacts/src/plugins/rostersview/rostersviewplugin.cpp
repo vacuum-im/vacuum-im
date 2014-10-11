@@ -691,7 +691,7 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			if (!itemJid.isEmpty())
 				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(itemJid.uBare())));
 
-			QString ask = AIndex->data(RDR_ASK).toString();
+			QString ask = AIndex->data(RDR_SUBSCRIPTION_ASK).toString();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
 			if (!subscription.isEmpty())
 			{

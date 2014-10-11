@@ -10,10 +10,21 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/istatusicons.h>
+#include <interfaces/istatuschanger.h>
 #include <interfaces/imessagewidgets.h>
 #include "combinecontactsdialog.h"
 #include "metasortfilterproxymodel.h"
+
+struct MetaMergedContact {
+	QUuid id;
+	Jid stream;
+	Jid itemJid;
+	QString name;
+	QSet<QString> groups;
+	IPresenceItem presence;
+	QMultiMap<Jid, Jid> items;
+	QMultiMap<Jid, IPresenceItem> presences;
+};
 
 class MetaContacts : 
 	public QObject,
@@ -58,16 +69,15 @@ public:
 	// IRostersEditHandler
 	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
 	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
-	//AdvancedDelegateEditProxy
+	// AdvancedDelegateEditProxy
 	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	// IMetaContacts
 	virtual bool isReady(const Jid &AStreamJid) const;
-	virtual QMultiMap<Jid, QUuid> findLinkedContacts(const QUuid &ALinkId) const;
+	virtual QList<Jid> findMetaStreams(const QUuid &AMetaId) const;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const Jid &AItemJid) const;
 	virtual IMetaContact findMetaContact(const Jid &AStreamJid, const QUuid &AMetaId) const;
 	virtual QList<IRosterIndex *> findMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId) const;
-	virtual QUuid createMetaContact(const Jid &AStreamJid, const QString &AName, const QList<Jid> &AItems);
-	virtual bool setMetaContactLink(const Jid &AStreamJid, const QUuid &AMetaId, const QUuid &ALinkId);
+	virtual bool createMetaContact(const Jid &AStreamJid, const QUuid &AMetaId, const QString &AName, const QList<Jid> &AItems);
 	virtual bool setMetaContactName(const Jid &AStreamJid, const QUuid &AMetaId, const QString &AName);
 	virtual bool setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups);
 	virtual bool insertMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems);
@@ -81,21 +91,23 @@ signals:
 	// IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
 protected:
-	void updateMetaIndexes(const Jid &AStreamJid, const IMetaContact &AMetaContact);
-	void updateMetaIndexItems(const Jid &AStreamJid, const IMetaContact &AMetaContact, IRosterIndex *AMetaIndex);
-	void updateMetaWindows(const Jid &AStreamJid, const IMetaContact &AMetaContact, const QSet<Jid> ANewItems, const QSet<Jid> AOldItems);
+	IRosterIndex *getMetaIndexRoot(const Jid &AStreamJid) const;
+	MetaMergedContact getMergedContact(const Jid &AStreamJid, const QUuid &AMetaId) const;
+	void updateMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId);
+	void updateMetaIndexItems(IRosterIndex *AMetaIndex, const MetaMergedContact &AMeta);
+	void updateMetaWindows(const Jid &AStreamJid, const QUuid &AMetaId);
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
 	void updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts);
 	void startUpdateMetaContact(const Jid &AStreamJid, const QUuid &AMetaId);
-	void startUpdateMetaContactIndex(const Jid &AStreamJid, const QUuid &AMetaId, IRosterIndex *AIndex);
 protected:
 	bool isReadyStreams(const QStringList &AStreams) const;
 	bool isValidItem(const Jid &AStreamJid, const Jid &AItemJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	bool hasProxiedIndexes(const QList<IRosterIndex *> &AIndexes) const;
 	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool ASelfProxy=true) const;
+	QMap<int, QStringList> indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles) const;
 protected:
-	void renameMetaContact(const Jid &AStreamJid, const QUuid &AMetaId);
+	void renameMetaContact(const QStringList &AStreams, const QStringList &AMetas);
 	void removeMetaItems(const QStringList &AStreams, const QStringList &AContacts);
 	void combineMetaItems(const QStringList &AStreams, const QStringList &AContacts, const QStringList &AMetas);
 	void destroyMetaContacts(const QStringList &AStreams, const QStringList &AMetas);
@@ -124,7 +136,7 @@ protected slots:
 	void onRostersModelStreamsLayoutChanged(int ABefore);
 	void onRostersModelIndexInserted(IRosterIndex *AIndex);
 	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
-	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole = 0);
+	void onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole);
 protected slots:
 	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -158,7 +170,7 @@ private:
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IStatusIcons *FStatusIcons;
+	IStatusChanger *FStatusChanger;
 	IMessageWidgets *FMessageWidgets;
 private:
 	QTimer FSaveTimer;
@@ -166,22 +178,24 @@ private:
 	QSet<Jid> FSaveStreams;
 	QSet<Jid> FLoadStreams;
 	QMap<Jid, QString> FLoadRequestId;
-	QMap<Jid, QMap<QUuid, QSet<IRosterIndex *> > > FUpdateMeta;
+	QMap<Jid, QSet<QUuid> > FUpdateMeta;
 private:
 	QMap<Jid, QHash<Jid, QUuid> > FItemMetaId;
 	QMap<Jid, QHash<QUuid, IMetaContact> > FMetaContacts;
 private:
-	QMap<QUuid, QMultiMap<Jid, QUuid> > FLinkMetaId;
-private:
-	QMap<int, int> FProxyToIndexNotify;
+	QMap<int, int> FNotifyProxyToIndex;
 	QMap<Menu *, Menu *> FProxyContextMenu;
-	MetaSortFilterProxyModel *FSortFilterProxyModel;
-	QMap<Jid, QHash<QUuid, QList<IRosterIndex *> > > FMetaIndexes;
-	QHash<const IRosterIndex *, IRosterIndex *> FMetaIndexItemProxy;
-	QMultiHash<const IRosterIndex *, IRosterIndex *> FMetaIndexProxyItem;
-	QHash<const IRosterIndex *, QMap<Jid, IRosterIndex *> > FMetaIndexItems;
+	MetaSortFilterProxyModel *FFilterProxyModel;
 private:
-	QMap<Jid, QHash<QUuid, IMessageChatWindow *> > FMetaChatWindows;
+	QHash<const IRosterIndex *, IRosterIndex *> FMetaIndexToProxy;
+	QHash<const IRosterIndex *, IRosterIndex *> FMetaProxyToIndex;
+	QMap<const IRosterIndex *, QHash<QUuid, QList<IRosterIndex *> > > FMetaIndexes;
+private:
+	QHash<const IRosterIndex *, IRosterIndex *> FMetaItemIndexToProxy;
+	QMultiHash<const IRosterIndex *, IRosterIndex *> FMetaItemProxyToIndex;
+	QHash<const IRosterIndex *, QMap<Jid, QMap<Jid, IRosterIndex *> > > FMetaIndexItems;
+private:
+	QMap<const IRosterIndex *, QHash<QUuid, IMessageChatWindow *> > FMetaChatWindows;
 };
 
 #endif // METACONTACTS_H

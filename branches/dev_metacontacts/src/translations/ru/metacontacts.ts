@@ -62,5 +62,13 @@
         <source>Metacontacts</source>
         <translation>Метаконтакты</translation>
     </message>
+    <message>
+        <source>%1 - Chat</source>
+        <translation>%1 - Чат</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
+    </message>
 </context>
 </TS>

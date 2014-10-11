@@ -49,11 +49,11 @@ MetaContacts::MetaContacts()
 	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
-	FStatusIcons = NULL;
+	FStatusChanger = NULL;
 	FMessageWidgets = NULL;
 
-	FSortFilterProxyModel = new MetaSortFilterProxyModel(this,this);
-	FSortFilterProxyModel->setDynamicSortFilter(true);
+	FFilterProxyModel = new MetaSortFilterProxyModel(this,this);
+	FFilterProxyModel->setDynamicSortFilter(true);
 
 	FSaveTimer.setSingleShot(true);
 	connect(&FSaveTimer,SIGNAL(timeout()),SLOT(onSaveContactsToStorageTimerTimeout()));
@@ -64,7 +64,7 @@ MetaContacts::MetaContacts()
 
 MetaContacts::~MetaContacts()
 {
-	delete FSortFilterProxyModel;
+	delete FFilterProxyModel;
 }
 
 void MetaContacts::pluginInfo(IPluginInfo *APluginInfo)
@@ -156,10 +156,10 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
 	if (plugin)
 	{
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
+		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
@@ -189,7 +189,7 @@ bool MetaContacts::initObjects()
 		FRostersView->insertLabelHolder(RLHO_METACONTACTS,this);
 		FRostersView->insertClickHooker(RCHO_METACONTACTS,this);
 		FRostersView->insertEditHandler(REHO_METACONTACTS_RENAME,this);
-		FRostersView->insertProxyModel(FSortFilterProxyModel,RPO_METACONTACTS_FILTER);
+		FRostersView->insertProxyModel(FFilterProxyModel,RPO_METACONTACTS_FILTER);
 		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_METACONTACT,RDR_METACONTACT_ID);
 	}
 	return true;
@@ -209,7 +209,9 @@ QList<int> MetaContacts::rosterDataRoles(int AOrder) const
 {
 	if (AOrder == RDHO_METACONTACTS)
 	{
-		static const QList<int> roles = QList<int>() << RDR_ALL_ROLES;
+		static const QList<int> roles = QList<int>() << RDR_ALL_ROLES
+			<< RDR_FULL_JID << RDR_PREP_FULL_JID << RDR_PREP_BARE_JID
+			<< RDR_SHOW << RDR_STATUS << RDR_PRIORITY;
 		return roles;
 	}
 	return QList<int>();
@@ -228,20 +230,14 @@ QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 			switch (ARole)
 			{
 			case Qt::DisplayRole:
+			case RDR_STREAMS:
 			case RDR_STREAM_JID:
-			case RDR_FULL_JID:
-			case RDR_PREP_FULL_JID:
-			case RDR_PREP_BARE_JID:
-			case RDR_RESOURCES:
 			case RDR_NAME:
 			case RDR_GROUP:
-			case RDR_SHOW:
-			case RDR_STATUS:
-			case RDR_PRIORITY:
 			case RDR_METACONTACT_ID:
 				break;
 			case RDR_LABEL_ITEMS:
-				proxy = !labelsBlock ? FMetaIndexItems.value(AIndex).value(AIndex->data(RDR_PREP_BARE_JID).toString()) : 0;
+				proxy = !labelsBlock ? FMetaIndexToProxy.value(AIndex) : NULL;
 				if (proxy)
 				{
 					labelsBlock = true;
@@ -258,21 +254,18 @@ QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 				}
 				break;
 			default:
-				proxy = FMetaIndexItems.value(AIndex).value(AIndex->data(RDR_PREP_BARE_JID).toString());
+				proxy = FMetaIndexToProxy.value(AIndex);
 			}
 			break;
 		case RIK_METACONTACT_ITEM:
 			switch (ARole)
 			{
 			case RDR_STREAM_JID:
-			case RDR_FULL_JID:
-			case RDR_PREP_FULL_JID:
-			case RDR_PREP_BARE_JID:
 			case RDR_GROUP:
 			case RDR_METACONTACT_ID:
 				break;
 			default:
-				proxy = FMetaIndexItemProxy.value(AIndex);
+				proxy = FMetaItemIndexToProxy.value(AIndex);
 			}
 			break;
 		}
@@ -293,8 +286,8 @@ QList<quint32> MetaContacts::rosterLabels(int AOrder, const IRosterIndex *AIndex
 	if (AOrder==RLHO_METACONTACTS && AIndex->kind()==RIK_METACONTACT)
 	{
 		labels.append(RLID_METACONTACTS_BRANCH);
-		labels.append(RLID_METACONTACTS_BRANCH_ITEMS);
 		labels.append(AdvancedDelegateItem::BranchId);
+		labels.append(RLID_ROSTERSVIEW_RESOURCES);
 	}
 	return labels;
 }
@@ -303,19 +296,29 @@ AdvancedDelegateItem MetaContacts::rosterLabel(int AOrder, quint32 ALabelId, con
 {
 	if (AOrder==RLHO_METACONTACTS && AIndex->kind()==RIK_METACONTACT)
 	{
-		if (ALabelId == RLID_METACONTACTS_BRANCH)
+		if (ALabelId==RLID_ROSTERSVIEW_RESOURCES && FRostersView!=NULL)
+		{
+			int resourceCount = 0;
+			for(int row=0; row<AIndex->childCount(); row++)
+			{
+				IRosterIndex *metaItemIndex = AIndex->childIndex(row);
+				if (metaItemIndex->kind() == RIK_METACONTACT_ITEM)
+					resourceCount += metaItemIndex->data(RDR_RESOURCES).toStringList().count();
+			}
+			if (resourceCount > 1)
+			{
+				AdvancedDelegateItem label(ALabelId);
+				label.d->kind = AdvancedDelegateItem::CustomData;
+				label.d->data = QString("(%1)").arg(resourceCount);
+				label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
+				label.d->hints.insert(AdvancedDelegateItem::Foreground,FRostersView->instance()->palette().color(QPalette::Disabled, QPalette::Text));
+				return label;
+			}
+		}
+		else if (ALabelId == RLID_METACONTACTS_BRANCH)
 		{
 			AdvancedDelegateItem label(ALabelId);
 			label.d->kind = AdvancedDelegateItem::Branch;
-			return label;
-		}
-		else if (ALabelId == RLID_METACONTACTS_BRANCH_ITEMS)
-		{
-			AdvancedDelegateItem label(ALabelId);
-			label.d->kind = AdvancedDelegateItem::CustomData;
-			label.d->data = QString("%1").arg(FMetaIndexItems.value(AIndex).count());
-			label.d->hints.insert(AdvancedDelegateItem::FontSizeDelta,-1);
-			label.d->hints.insert(AdvancedDelegateItem::Foreground,FRostersView->instance()->palette().color(QPalette::Disabled, QPalette::Text));
 			return label;
 		}
 		else if (ALabelId == AdvancedDelegateItem::BranchId)
@@ -337,19 +340,19 @@ bool MetaContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, co
 		{
 			QModelIndex modelIndex = FRostersView->instance()->indexAt(AEvent->pos());
 			quint32 labelId = FRostersView->labelAt(AEvent->pos(),modelIndex);
-			if (labelId==RLID_METACONTACTS_BRANCH || labelId==RLID_METACONTACTS_BRANCH_ITEMS)
+			if (labelId == RLID_METACONTACTS_BRANCH)
 			{
 				FRostersView->instance()->setExpanded(modelIndex,!FRostersView->instance()->isExpanded(modelIndex));
 				return true;
 			}
 
-			IRosterIndex *proxy = FMetaIndexItems.value(AIndex).value(AIndex->data(RDR_PREP_BARE_JID).toString());
+			IRosterIndex *proxy = FMetaIndexToProxy.value(AIndex);
 			if (proxy)
 				return FRostersView->singleClickOnIndex(proxy,AEvent);
 		}
 		else if (AIndex->kind() == RIK_METACONTACT_ITEM)
 		{
-			IRosterIndex *proxy = FMetaIndexItemProxy.value(AIndex);
+			IRosterIndex *proxy = FMetaItemIndexToProxy.value(AIndex);
 			if (proxy)
 				return FRostersView->singleClickOnIndex(proxy,AEvent);
 		}
@@ -363,13 +366,13 @@ bool MetaContacts::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, co
 	{
 		if (AIndex->kind() == RIK_METACONTACT)
 		{
-			IRosterIndex *proxy = FMetaIndexItems.value(AIndex).value(AIndex->data(RDR_PREP_BARE_JID).toString());
+			IRosterIndex *proxy = FMetaIndexToProxy.value(AIndex);
 			if (proxy)
 				return FRostersView->doubleClickOnIndex(proxy,AEvent);
 		}
 		else if (AIndex->kind() == RIK_METACONTACT_ITEM)
 		{
-			IRosterIndex *proxy = FMetaIndexItemProxy.value(AIndex);
+			IRosterIndex *proxy = FMetaItemIndexToProxy.value(AIndex);
 			if (proxy)
 				return FRostersView->doubleClickOnIndex(proxy,AEvent);
 		}
@@ -380,7 +383,7 @@ bool MetaContacts::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, co
 Qt::DropActions MetaContacts::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	if (DragKinds.contains(AIndex->data(RDR_KIND).toInt()))
+	if (DragKinds.contains(AIndex->kind()))
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -400,33 +403,55 @@ bool MetaContacts::rosterDragEnter(const QDragEnterEvent *AEvent)
 
 bool MetaContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
-	int hoverKind = AHover->data(RDR_KIND).toInt();
+	int hoverKind = AHover->kind();
 	if (DropKinds.contains(hoverKind) && (AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0)
 	{
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
-
+		
 		int indexKind = indexData.value(RDR_KIND).toInt();
-		Jid hoverStreamJid = AHover->data(RDR_STREAM_JID).toString();
-		Jid indexStreamJid = indexData.value(RDR_STREAM_JID).toString();
-
-		if (isReady(indexStreamJid))
+		if (indexKind == RIK_METACONTACT)
 		{
-			bool isLayoutMerged = FRostersModel!=NULL ? FRostersModel->streamsLayout()==IRostersModel::LayoutMerged : false;
-			if (indexKind==RIK_CONTACT || indexKind==RIK_METACONTACT_ITEM)
+			QStringList indexStreams = indexData.value(RDR_STREAMS).toStringList();
+			if (isReadyStreams(indexStreams))
 			{
-				if (hoverKind == RIK_CONTACT)
-					return isReady(hoverStreamJid) && (hoverStreamJid!=indexStreamJid || AHover->data(RDR_PREP_BARE_JID)!=indexData.value(RDR_PREP_BARE_JID));
-				if (hoverKind==RIK_METACONTACT_ITEM || hoverKind==RIK_METACONTACT)
-					return isReady(hoverStreamJid) && (hoverStreamJid!=indexStreamJid || AHover->data(RDR_METACONTACT_ID)!=indexData.value(RDR_METACONTACT_ID));
-			}
-			else if (indexKind == RIK_METACONTACT)
-			{
-				if (hoverKind==RIK_CONTACT || hoverKind==RIK_METACONTACT_ITEM || hoverKind==RIK_METACONTACT)
-					return isReady(hoverStreamJid) && (hoverStreamJid!=indexStreamJid || AHover->data(RDR_METACONTACT_ID)!=indexData.value(RDR_METACONTACT_ID));
+				if (hoverKind == RIK_METACONTACT)
+				{
+					QStringList hoverStreams = AHover->data(RDR_STREAMS).toStringList();
+					return isReadyStreams(hoverStreams) && AHover->data(RDR_METACONTACT_ID)!=indexData.value(RDR_METACONTACT_ID);
+				}
+				else if (hoverKind==RIK_CONTACT || hoverKind==RIK_METACONTACT_ITEM)
+				{
+					Jid hoverStreamJid = AHover->data(RDR_STREAM_JID).toString();
+					return isReady(hoverStreamJid) && AHover->data(RDR_METACONTACT_ID)!=indexData.value(RDR_METACONTACT_ID);
+				}
 				else if (hoverKind==RIK_GROUP || hoverKind==RIK_GROUP_BLANK)
-					return indexData.value(RDR_GROUP)!=AHover->data(RDR_GROUP) && (isLayoutMerged || AHover->data(RDR_STREAMS).toStringList().contains(indexStreamJid.pFull()));
+				{
+					return indexData.value(RDR_GROUP) != AHover->data(RDR_GROUP);
+				}
+			}
+		}
+		else if (indexKind==RIK_CONTACT || indexKind==RIK_METACONTACT_ITEM)
+		{
+			Jid indexStreamJid = indexData.value(RDR_STREAM_JID).toString();
+			if (isReady(indexStreamJid))
+			{
+				if (hoverKind == RIK_METACONTACT)
+				{
+					QStringList hoverStreams = AHover->data(RDR_STREAMS).toStringList();
+					return isReadyStreams(hoverStreams) && AHover->data(RDR_METACONTACT_ID)!=indexData.value(RDR_METACONTACT_ID);
+				}
+				else if (hoverKind == RIK_METACONTACT_ITEM)
+				{
+					Jid hoverStreamJid = AHover->data(RDR_STREAM_JID).toString();
+					return isReady(hoverStreamJid) && AHover->data(RDR_METACONTACT_ID)!=indexData.value(RDR_METACONTACT_ID);
+				}
+				else if (hoverKind == RIK_CONTACT)
+				{
+					Jid hoverStreamJid = AHover->data(RDR_STREAM_JID).toString();
+					return isReady(hoverStreamJid) && (indexStreamJid!=hoverStreamJid || AHover->data(RDR_PREP_BARE_JID)!=indexData.value(RDR_PREP_BARE_JID));
+				}
 			}
 		}
 	}
@@ -444,13 +469,13 @@ bool MetaContacts::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHov
 	QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 	operator>>(stream,indexData);
 
-	int hoverKind = AHover->data(RDR_KIND).toInt();
+	int hoverKind = AHover->kind();
 	int indexKind = indexData.value(RDR_KIND).toInt();
 
 	if (indexKind==RIK_METACONTACT && (hoverKind==RIK_GROUP || hoverKind==RIK_GROUP_BLANK))
 	{
 		Action *groupAction = new Action(AMenu);
-		groupAction->setData(ADR_STREAM_JID,indexData.value(RDR_STREAM_JID));
+		groupAction->setData(ADR_STREAM_JID,indexData.value(RDR_STREAMS));
 		groupAction->setData(ADR_METACONTACT_ID,indexData.value(RDR_METACONTACT_ID));
 		groupAction->setData(ADR_TO_GROUP,AHover->data(RDR_GROUP).toString());
 
@@ -471,11 +496,35 @@ bool MetaContacts::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHov
 		AMenu->addAction(groupAction,AG_DEFAULT,true);
 		return true;
 	}
-	else if (AEvent->dropAction() == Qt::MoveAction)
+	else
 	{
-		QStringList streams = QStringList() << indexData.value(RDR_STREAM_JID).toString() << AHover->data(RDR_STREAM_JID).toString();
-		QStringList contacts = QStringList() << indexData.value(RDR_PREP_BARE_JID).toString() << AHover->data(RDR_PREP_BARE_JID).toString();
-		QStringList metas = QStringList() << indexData.value(RDR_METACONTACT_ID).toString() << AHover->data(RDR_METACONTACT_ID).toString();
+		QStringList streams, contacts, metas;
+		
+		if (indexKind != RIK_METACONTACT)
+		{
+			streams.append(indexData.value(RDR_STREAM_JID).toString());
+			contacts.append(indexData.value(RDR_PREP_BARE_JID).toString());
+			metas.append(indexData.value(RDR_METACONTACT_ID).toString());
+		}
+		else foreach(const QString &streamJid, indexData.value(RDR_STREAMS).toStringList())
+		{
+			streams.append(streamJid);
+			contacts.append(indexData.value(RDR_PREP_BARE_JID).toString());
+			metas.append(indexData.value(RDR_METACONTACT_ID).toString());
+		}
+
+		if (hoverKind != RIK_METACONTACT)
+		{
+			streams.append(AHover->data(RDR_STREAM_JID).toString());
+			contacts.append(AHover->data(RDR_PREP_BARE_JID).toString());
+			metas.append(AHover->data(RDR_METACONTACT_ID).toString());
+		}
+		else foreach(const QString &streamJid, AHover->data(RDR_STREAMS).toStringList())
+		{
+			streams.append(streamJid);
+			contacts.append(AHover->data(RDR_PREP_BARE_JID).toString());
+			metas.append(AHover->data(RDR_METACONTACT_ID).toString());
+		}
 
 		Action *combineAction = new Action(AMenu);
 		combineAction->setText(tr("Combine Contacts..."));
@@ -495,7 +544,7 @@ quint32 MetaContacts::rosterEditLabel(int AOrder, int ADataRole, const QModelInd
 {
 	if (AOrder==REHO_METACONTACTS_RENAME && ADataRole==RDR_NAME && AIndex.data(RDR_KIND).toInt()==RIK_METACONTACT)
 	{
-		if (isReady(AIndex.data(RDR_STREAM_JID).toString()))
+		if (isReadyStreams(AIndex.data(RDR_STREAMS).toStringList()))
 			return AdvancedDelegateItem::DisplayId;
 	}
 	return AdvancedDelegateItem::NullId;
@@ -503,8 +552,7 @@ quint32 MetaContacts::rosterEditLabel(int AOrder, int ADataRole, const QModelInd
 
 AdvancedDelegateEditProxy *MetaContacts::rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex)
 {
-	Q_UNUSED(AIndex);
-	if (AOrder==REHO_METACONTACTS_RENAME && ADataRole==RDR_NAME)
+	if (AOrder==REHO_METACONTACTS_RENAME && ADataRole==RDR_NAME && AIndex.data(RDR_KIND).toInt()==RIK_METACONTACT)
 		return this;
 	return NULL;
 }
@@ -519,7 +567,11 @@ bool MetaContacts::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *
 		QString newName = AEditor->property(propertyName).toString();
 		QString oldName = AIndex.data(RDR_NAME).toString();
 		if (!newName.isEmpty() && newName!=oldName)
-			setMetaContactName(AIndex.data(RDR_STREAM_JID).toString(),AIndex.data(RDR_METACONTACT_ID).toString(),newName);
+		{
+			QUuid metaId = AIndex.data(RDR_METACONTACT_ID).toString();
+			foreach(const Jid &streamJid, AIndex.data(RDR_STREAMS).toStringList())
+				setMetaContactName(streamJid,metaId,newName);
+		}
 		return true;
 	}
 	return false;
@@ -530,9 +582,15 @@ bool MetaContacts::isReady(const Jid &AStreamJid) const
 	return FPrivateStorage==NULL || FPrivateStorage->isLoaded(AStreamJid,"storage",NS_STORAGE_METACONTACTS);
 }
 
-QMultiMap<Jid, QUuid> MetaContacts::findLinkedContacts(const QUuid &ALinkId) const
+QList<Jid> MetaContacts::findMetaStreams(const QUuid &AMetaId) const
 {
-	return FLinkMetaId.value(ALinkId);
+	QList<Jid> streams;
+	for (QMap<Jid, QHash<QUuid, IMetaContact> >::const_iterator it=FMetaContacts.constBegin(); it!=FMetaContacts.constEnd(); ++it)
+	{
+		if (it->contains(AMetaId))
+			streams.append(it.key());
+	}
+	return streams;
 }
 
 IMetaContact MetaContacts::findMetaContact(const Jid &AStreamJid, const Jid &AItemJid) const
@@ -547,61 +605,38 @@ IMetaContact MetaContacts::findMetaContact(const Jid &AStreamJid, const QUuid &A
 
 QList<IRosterIndex *> MetaContacts::findMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId) const
 {
-	return FMetaIndexes.value(AStreamJid).value(AMetaId);
+	return FMetaIndexes.value(getMetaIndexRoot(AStreamJid)).value(AMetaId);
 }
 
-QUuid MetaContacts::createMetaContact(const Jid &AStreamJid, const QString &AName, const QList<Jid> &AItems)
+bool MetaContacts::createMetaContact(const Jid &AStreamJid, const QUuid &AMetaId, const QString &AName, const QList<Jid> &AItems)
 {
-	if (isReady(AStreamJid))
-	{
-		IMetaContact meta;
-		meta.id = QUuid::createUuid();
-		meta.name = AName;
-		meta.items = AItems;
-		if (updateMetaContact(AStreamJid,meta))
-		{
-			LOG_STRM_DEBUG(AStreamJid,QString("Metacontact created, metaId=%1, name=%2, items=%3").arg(meta.id.toString(),AName).arg(AItems.count()));
-			startSaveContactsToStorage(AStreamJid);
-			return meta.id;
-		}
-	}
-	else
-	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to create metacontact: Stream is not ready"));
-	}
-	return QUuid();
-}
-
-bool MetaContacts::setMetaContactLink(const Jid &AStreamJid, const QUuid &AMetaId, const QUuid &ALinkId)
-{
-	if (isReady(AStreamJid))
+	if (isReady(AStreamJid) && !AMetaId.isNull())
 	{
 		IMetaContact meta = findMetaContact(AStreamJid,AMetaId);
-		if (meta.id == AMetaId)
+		if (meta.id!=AMetaId || meta.name!=AName || meta.items!=AItems)
 		{
-			if (meta.link != ALinkId)
+			meta.id = AMetaId;
+			meta.name = AName;
+			meta.items = AItems;
+			if (updateMetaContact(AStreamJid,meta))
 			{
-				meta.link = ALinkId;
-				if (updateMetaContact(AStreamJid,meta))
-				{
-					LOG_STRM_DEBUG(AStreamJid,QString("Metacontact lick changed, metaId=%1, link=%2").arg(AMetaId.toString(),ALinkId.toString()));
-					startSaveContactsToStorage(AStreamJid);
-					return true;
-				}
-			}
-			else
-			{
+				LOG_STRM_DEBUG(AStreamJid,QString("Metacontact created, metaId=%1, name=%2, items=%3").arg(meta.id.toString(),AName).arg(AItems.count()));
+				startSaveContactsToStorage(AStreamJid);
 				return true;
 			}
 		}
 		else
 		{
-			LOG_STRM_ERROR(AStreamJid,QString("Failed to change metacontact lick, metaId=%1: Metacontact not found").arg(AMetaId.toString()));
+			return true;
 		}
+	}
+	else if (!AMetaId.isNull())
+	{
+		LOG_STRM_ERROR(AStreamJid,QString("Failed to create metacontact: Stream is not ready"));
 	}
 	else
 	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to change metacontact lick: Stream is not ready"));
+		REPORT_ERROR("Failed to create metacontact: Invalid parameters");
 	}
 	return false;
 }
@@ -684,7 +719,7 @@ bool MetaContacts::setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMet
 	return false;
 }
 
-bool MetaContacts::insertMetaContactItems( const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems )
+bool MetaContacts::insertMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems)
 {
 	if (isReady(AStreamJid))
 	{
@@ -764,20 +799,67 @@ bool MetaContacts::removeMetaContactItems(const Jid &AStreamJid, const QUuid &AM
 	return false;
 }
 
-void MetaContacts::updateMetaIndexes(const Jid &AStreamJid, const IMetaContact &AMetaContact)
+IRosterIndex *MetaContacts::getMetaIndexRoot(const Jid &AStreamJid) const
 {
-	IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
-	if (sroot)
+	bool merged = FRostersModel!=NULL ? FRostersModel->streamsLayout()==IRostersModel::LayoutMerged : false;
+	return FRostersModel!=NULL ? (!merged ? FRostersModel->streamIndex(AStreamJid) : FRostersModel->contactsRoot()) : NULL;
+}
+
+MetaMergedContact MetaContacts::getMergedContact(const Jid &AStreamJid, const QUuid &AMetaId) const
+{
+	MetaMergedContact meta;
+
+	bool merged = FRostersModel!=NULL ? FRostersModel->streamsLayout()==IRostersModel::LayoutMerged : false;
+	for (QMap<Jid, QHash<QUuid, IMetaContact> >::const_iterator streamIt=FMetaContacts.constBegin(); streamIt!=FMetaContacts.constEnd(); ++streamIt)
 	{
-		if (!AMetaContact.isEmpty())
+		if (merged || streamIt.key()==AStreamJid)
 		{
-			QList<IRosterIndex *> &metaIndexList = FMetaIndexes[AStreamJid][AMetaContact.id];
+			QHash<QUuid, IMetaContact>::const_iterator metaIt = streamIt->find(AMetaId);
+			if (metaIt != streamIt->constEnd())
+			{
+				meta.name = metaIt->name;
+				meta.groups += metaIt->groups;
+				foreach(const Jid &itemJid, metaIt->items)
+					meta.items.insertMulti(streamIt.key(),itemJid);
+				foreach(const IPresenceItem &pItem, metaIt->presences)
+					meta.presences.insertMulti(streamIt.key(),pItem);
+			}
+		}
+	}
+
+	meta.id = AMetaId;
+	if (!meta.presences.isEmpty())
+	{
+		meta.presence = FPresencePlugin!=NULL ? FPresencePlugin->sortPresenceItems(meta.presences.values()).value(0) : meta.presences.values().value(0);
+		meta.stream = meta.presences.key(meta.presence);
+		meta.itemJid = meta.presence.itemJid.bare();
+	}
+	else
+	{
+		QList<Jid> items = meta.items.values();
+		qSort(items.begin(),items.end());
+		meta.itemJid = items.value(0);
+		meta.stream = meta.items.key(meta.itemJid);
+	}
+	
+	return meta;
+}
+
+void MetaContacts::updateMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId)
+{
+	IRosterIndex *sRoot = getMetaIndexRoot(AStreamJid);
+	if (sRoot)
+	{
+		MetaMergedContact meta = getMergedContact(AStreamJid,AMetaId);
+		if (!meta.items.isEmpty())
+		{
+			QList<IRosterIndex *> &metaIndexesRef = FMetaIndexes[sRoot][meta.id];
 
 			QMap<QString, IRosterIndex *> groupMetaIndexMap;
-			foreach(IRosterIndex *metaIndex, metaIndexList)
+			foreach(IRosterIndex *metaIndex, metaIndexesRef)
 				groupMetaIndexMap.insert(metaIndex->data(RDR_GROUP).toString(),metaIndex);
 
-			QSet<QString> metaGroups = !AMetaContact.groups.isEmpty() ? AMetaContact.groups : QSet<QString>()<<QString::null;
+			QSet<QString> metaGroups = !meta.groups.isEmpty() ? meta.groups : QSet<QString>()<<QString::null;
 			QSet<QString> curGroups = groupMetaIndexMap.keys().toSet();
 			QSet<QString> newGroups = metaGroups - curGroups;
 			QSet<QString> oldGroups = curGroups - metaGroups;
@@ -785,16 +867,15 @@ void MetaContacts::updateMetaIndexes(const Jid &AStreamJid, const IMetaContact &
 			QSet<QString>::iterator oldGroupsIt = oldGroups.begin();
 			foreach(const QString &group, newGroups)
 			{
-				IRosterIndex *groupIndex = FRostersModel->getGroupIndex(!group.isEmpty() ? RIK_GROUP : RIK_GROUP_BLANK,group,sroot);
+				IRosterIndex *groupIndex = FRostersModel->getGroupIndex(!group.isEmpty() ? RIK_GROUP : RIK_GROUP_BLANK,group,sRoot);
 
 				IRosterIndex *metaIndex;
 				if (oldGroupsIt == oldGroups.end())
 				{
 					metaIndex = FRostersModel->newRosterIndex(RIK_METACONTACT);
-					metaIndexList.append(metaIndex);
+					metaIndexesRef.append(metaIndex);
 
-					metaIndex->setData(AStreamJid.pFull(),RDR_STREAM_JID);
-					metaIndex->setData(AMetaContact.id.toString(),RDR_METACONTACT_ID);
+					metaIndex->setData(meta.id.toString(),RDR_METACONTACT_ID);
 				}
 				else
 				{
@@ -810,141 +891,172 @@ void MetaContacts::updateMetaIndexes(const Jid &AStreamJid, const IMetaContact &
 			while(oldGroupsIt != oldGroups.end())
 			{
 				IRosterIndex *metaIndex = groupMetaIndexMap.value(*oldGroupsIt);
-				updateMetaIndexItems(AStreamJid,NullMetaContact,metaIndex);
-
-				FMetaIndexItems.remove(metaIndex);
-				metaIndexList.removeAll(metaIndex);
+				updateMetaIndexItems(metaIndex,MetaMergedContact());
+				metaIndexesRef.removeAll(metaIndex);
 
 				FRostersModel->removeRosterIndex(metaIndex);
 				oldGroupsIt = oldGroups.erase(oldGroupsIt);
 			}
 
-			QStringList metaItems;
-			foreach(const Jid &itemJid, AMetaContact.items)
-				metaItems.append(itemJid.pBare());
+			QStringList metaStreams;
+			foreach(const Jid &streamJid, meta.items.uniqueKeys())
+				metaStreams.append(streamJid.pFull());
 
-			QStringList metaResources;
-			foreach(const IPresenceItem &pitem, AMetaContact.presences)
+			foreach(IRosterIndex *metaIndex, metaIndexesRef)
 			{
-				if (pitem.show != IPresence::Offline)
-					metaResources.append(pitem.itemJid.pFull());
-			}
+				metaIndex->setData(meta.name,RDR_NAME);
+				metaIndex->setData(metaStreams,RDR_STREAMS);
+				metaIndex->setData(meta.stream.pFull(),RDR_STREAM_JID);
 
-			IPresenceItem metaPresence = AMetaContact.presences.value(0);
-			Jid metaJid = metaPresence.itemJid.isValid() ? metaPresence.itemJid : AMetaContact.items.value(0);
-
-			foreach(IRosterIndex *metaIndex, metaIndexList)
-			{
-				metaIndex->setData(metaJid.full(),RDR_FULL_JID);
-				metaIndex->setData(metaJid.pFull(),RDR_PREP_FULL_JID);
-				metaIndex->setData(metaJid.pBare(),RDR_PREP_BARE_JID);
-				metaIndex->setData(metaResources,RDR_RESOURCES);
-
-				metaIndex->setData(AMetaContact.name,RDR_NAME);
-				metaIndex->setData(metaPresence.show,RDR_SHOW);
-				metaIndex->setData(metaPresence.status,RDR_STATUS);
-				metaIndex->setData(metaPresence.priority,RDR_PRIORITY);
-
-				metaIndex->setData(metaItems, RDR_METACONTACT_ITEMS);
-
-				updateMetaIndexItems(AStreamJid,AMetaContact,metaIndex);
-
-				emit rosterLabelChanged(RLID_METACONTACTS_BRANCH_ITEMS,metaIndex);
+				updateMetaIndexItems(metaIndex,meta);
 			}
 		}
-		else foreach(IRosterIndex *metaIndex, FMetaIndexes[AStreamJid].take(AMetaContact.id))
+		else foreach(IRosterIndex *metaIndex, FMetaIndexes[sRoot].take(meta.id))
 		{
-			updateMetaIndexItems(AStreamJid,AMetaContact,metaIndex);
-			FMetaIndexItems.remove(metaIndex);
-
+			updateMetaIndexItems(metaIndex,meta);
 			FRostersModel->removeRosterIndex(metaIndex);
 		}
 	}
 }
 
-void MetaContacts::updateMetaIndexItems(const Jid &AStreamJid, const IMetaContact &AMetaContact, IRosterIndex *AMetaIndex)
+void MetaContacts::updateMetaIndexItems(IRosterIndex *AMetaIndex, const MetaMergedContact &AMergedContact)
 {
-	QMap<Jid, IRosterIndex *> &metaItemsMap = FMetaIndexItems[AMetaIndex];
+	QMap<Jid, QMap<Jid, IRosterIndex *> > &metaItemsRef = FMetaIndexItems[AMetaIndex];
+	QMap<Jid, QMap<Jid, IRosterIndex *> > oldMetaItems = metaItemsRef;
 
-	QMap<Jid, IRosterIndex *> itemIndexMap = metaItemsMap;
-	foreach(const Jid &itemJid, AMetaContact.items)
+	FMetaProxyToIndex.remove(FMetaIndexToProxy.take(AMetaIndex));
+
+	for(QMultiMap<Jid, Jid>::const_iterator itemIt=AMergedContact.items.constBegin(); itemIt!=AMergedContact.items.constEnd(); ++itemIt)
 	{
 		QMap<IRosterIndex *, IRosterIndex *> proxyIndexMap;
-		foreach(IRosterIndex *index, FRostersModel->findContactIndexes(AStreamJid,itemJid))
+		foreach(IRosterIndex *index, FRostersModel->findContactIndexes(itemIt.key(),itemIt.value()))
 			proxyIndexMap.insert(index->parentIndex(),index);
 
 		IRosterIndex *proxyIndex = !proxyIndexMap.isEmpty() ? proxyIndexMap.value(AMetaIndex->parentIndex(),proxyIndexMap.constBegin().value()) : NULL;
 		if (proxyIndex != NULL)
 		{
-			IRosterIndex *itemIndex = itemIndexMap.take(itemJid);
+			IRosterIndex *itemIndex = oldMetaItems[itemIt.key()].take(itemIt.value());
 			if (itemIndex == NULL)
 			{
 				itemIndex = FRostersModel->newRosterIndex(RIK_METACONTACT_ITEM);
-				itemIndex->setData(AStreamJid.pFull(),RDR_STREAM_JID);
-				itemIndex->setData(AMetaContact.id.toString(),RDR_METACONTACT_ID);
-				metaItemsMap.insert(itemJid,itemIndex);
+				metaItemsRef[itemIt.key()].insert(itemIt.value(),itemIndex);
+
+				itemIndex->setData(itemIt.key().pFull(),RDR_STREAM_JID);
+				itemIndex->setData(AMergedContact.id.toString(),RDR_METACONTACT_ID);
 			}
-
 			itemIndex->setData(AMetaIndex->data(RDR_GROUP),RDR_GROUP);
-			itemIndex->setData(proxyIndex->data(RDR_FULL_JID),RDR_FULL_JID);
-			itemIndex->setData(proxyIndex->data(RDR_PREP_FULL_JID),RDR_PREP_FULL_JID);
-			itemIndex->setData(proxyIndex->data(RDR_PREP_BARE_JID),RDR_PREP_BARE_JID);
 
-			IRosterIndex *prevProxyIndex = FMetaIndexItemProxy.value(itemIndex);
+			IRosterIndex *prevProxyIndex = FMetaItemIndexToProxy.value(itemIndex);
 			if (proxyIndex != prevProxyIndex)
 			{
-				if (prevProxyIndex)
-				{
-					FMetaIndexProxyItem.remove(prevProxyIndex,itemIndex);
-					if (!FMetaIndexProxyItem.contains(prevProxyIndex))
-						prevProxyIndex->setData(QVariant(),RDR_METACONTACT_ID);
-				}
-				proxyIndex->setData(AMetaContact.id.toString(),RDR_METACONTACT_ID);
+				proxyIndex->setData(AMergedContact.id.toString(),RDR_METACONTACT_ID);
+				
+				FMetaItemProxyToIndex.remove(prevProxyIndex,itemIndex);
+				FMetaItemIndexToProxy.insert(itemIndex,proxyIndex);
+				FMetaItemProxyToIndex.insertMulti(proxyIndex,itemIndex);
+			}
 
-				FMetaIndexItemProxy.insert(itemIndex,proxyIndex);
-				FMetaIndexProxyItem.insertMulti(proxyIndex,itemIndex);
+			if (itemIt.key()==AMergedContact.stream && itemIt.value()==AMergedContact.itemJid)
+			{
+				FMetaIndexToProxy.insert(AMetaIndex,itemIndex);
+				FMetaProxyToIndex.insert(itemIndex,AMetaIndex);
 			}
 
 			FRostersModel->insertRosterIndex(itemIndex,AMetaIndex);
 		}
 	}
 
-	for(QMap<Jid, IRosterIndex *>::const_iterator it=itemIndexMap.constBegin(); it!=itemIndexMap.constEnd(); ++it)
+	for(QMap<Jid, QMap<Jid, IRosterIndex *> >::const_iterator streamIt=oldMetaItems.constBegin(); streamIt!=oldMetaItems.constEnd(); ++streamIt)
 	{
-		IRosterIndex *proxyIndex = FMetaIndexItemProxy.take(it.value());
-		if (proxyIndex)
+		QMap<Jid, IRosterIndex *> &metaItemsStreamRef = metaItemsRef[streamIt.key()];
+
+		for(QMap<Jid, IRosterIndex *>::const_iterator itemIt=streamIt->constBegin(); itemIt!=streamIt->constEnd(); ++itemIt)
 		{
-			FMetaIndexProxyItem.remove(proxyIndex,it.value());
-			if (!FMetaIndexProxyItem.contains(proxyIndex))
-				proxyIndex->setData(QVariant(),RDR_METACONTACT_ID);
+			IRosterIndex *metaItemIndex = itemIt.value();
+
+			IRosterIndex *itemProxyIndex = FMetaItemIndexToProxy.take(metaItemIndex);
+			if (itemProxyIndex)
+			{
+				FMetaItemProxyToIndex.remove(itemProxyIndex,metaItemIndex);
+				if (!FMetaItemProxyToIndex.contains(itemProxyIndex))
+					itemProxyIndex->setData(QVariant(),RDR_METACONTACT_ID);
+			}
+
+			metaItemsStreamRef.remove(itemIt.key());
+			FRostersModel->removeRosterIndex(metaItemIndex);
 		}
-		
-		metaItemsMap.remove(it.key());
-		FRostersModel->removeRosterIndex(it.value());
+
+		if (metaItemsStreamRef.isEmpty())
+			metaItemsRef.remove(streamIt.key());
 	}
+
+	if (metaItemsRef.isEmpty())
+		FMetaIndexItems.remove(AMetaIndex);
 }
 
-void MetaContacts::updateMetaWindows(const Jid &AStreamJid, const IMetaContact &AMetaContact, const QSet<Jid> ANewItems, const QSet<Jid> AOldItems)
+void MetaContacts::updateMetaWindows(const Jid &AStreamJid, const QUuid &AMetaId)
 {
 	if (FMessageWidgets)
 	{
-		IMessageChatWindow *chatWindow = FMetaChatWindows.value(AStreamJid).value(AMetaContact.id);
-		
-		foreach(const Jid &itemJid, ANewItems)
+		IRosterIndex *sRoot = getMetaIndexRoot(AStreamJid);
+		MetaMergedContact meta = getMergedContact(AStreamJid,AMetaId);
+		IMessageChatWindow *chatWindow = FMetaChatWindows.value(sRoot).value(meta.id);
+
+		for (QMultiMap<Jid, Jid>::const_iterator itemIt=meta.items.constBegin(); itemIt!=meta.items.constEnd(); ++itemIt)
 		{
-			IMessageChatWindow *window = FMessageWidgets->findChatWindow(AStreamJid,itemJid);
+			IMessageChatWindow *window = FMessageWidgets->findChatWindow(itemIt.key(),itemIt.value());
 			if (window!=NULL && window!=chatWindow)
-				window->address()->removeAddress(AStreamJid,itemJid);
+			{
+				if (chatWindow==NULL && window->address()->availAddresses(true).count()==1)
+				{
+					chatWindow = window;
+					FMetaChatWindows[sRoot].insert(AMetaId,chatWindow);
+					connect(chatWindow->instance(),SIGNAL(tabPageChanged()),SLOT(onMessageChatWindowChanged()));
+					connect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMessageChatWindowDestroyed()));
+				}
+				else
+				{
+					window->address()->removeAddress(itemIt.key(),itemIt.value());
+				}
+			}
 		}
 
 		if (chatWindow)
 		{
-			foreach(const Jid &itemJid, AOldItems)
-				chatWindow->address()->removeAddress(AStreamJid,itemJid);
-			foreach(const Jid &itemJid, ANewItems)
-				chatWindow->address()->appendAddress(AStreamJid,itemJid);
-			if (chatWindow->tabPageCaption() != AMetaContact.name)
-				chatWindow->updateWindow(chatWindow->tabPageIcon(),AMetaContact.name,tr("%1 - Chat").arg(AMetaContact.name),QString::null);
+			if (!meta.items.isEmpty())
+			{
+				QMultiMap<Jid,Jid> newItems;
+				QMultiMap<Jid,Jid> oldItems = chatWindow->address()->availAddresses(true);
+
+				for (QMultiMap<Jid, Jid>::const_iterator itemIt=meta.items.constBegin(); itemIt!=meta.items.constEnd(); ++itemIt)
+				{
+					if (oldItems.contains(itemIt.key(),itemIt.value()))
+						oldItems.remove(itemIt.key(),itemIt.value());
+					else
+						newItems.insertMulti(itemIt.key(),itemIt.value());
+				}
+
+				for (QMultiMap<Jid, Jid>::const_iterator itemIt=newItems.constBegin(); itemIt!=newItems.constEnd(); ++itemIt)
+					chatWindow->address()->appendAddress(itemIt.key(),itemIt.value());
+
+				for (QMultiMap<Jid, Jid>::const_iterator itemIt=oldItems.constBegin(); itemIt!=oldItems.constEnd(); ++itemIt)
+					chatWindow->address()->removeAddress(itemIt.key(),itemIt.value());
+
+				if (chatWindow->tabPageCaption() != meta.name)
+					chatWindow->updateWindow(chatWindow->tabPageIcon(),meta.name,tr("%1 - Chat").arg(meta.name),QString::null);
+			}
+			else
+			{
+				QMultiMap<Jid,Jid> oldItems = chatWindow->address()->availAddresses(true);
+				oldItems.remove(chatWindow->streamJid(),chatWindow->contactJid().bare());
+
+				for (QMultiMap<Jid, Jid>::const_iterator itemIt=oldItems.constBegin(); itemIt!=oldItems.constEnd(); ++itemIt)
+					chatWindow->address()->removeAddress(itemIt.key(),itemIt.value());
+
+				FMetaChatWindows[sRoot].remove(AMetaId);
+				disconnect(chatWindow->instance(),SIGNAL(tabPageChanged()),this,SLOT(onMessageChatWindowChanged()));
+				disconnect(chatWindow->instance(),SIGNAL(tabPageDestroyed()),this,SLOT(onMessageChatWindowDestroyed()));
+			}
 		}
 	}
 }
@@ -957,15 +1069,15 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 		IMetaContact after = AMetaContact;
 		IMetaContact before = findMetaContact(AStreamJid,after.id);
 
-		QHash<Jid, QUuid> &itemMetaHash = FItemMetaId[AStreamJid];
+		QHash<Jid, QUuid> &itemMetaIdRef = FItemMetaId[AStreamJid];
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 
 		after.groups.clear();
 		after.presences.clear();
 		foreach(const Jid &itemJid, after.items)
 		{
-			IRosterItem ritem = roster->rosterItem(itemJid);
-			if (ritem.isValid && !itemJid.node().isEmpty())
+			IRosterItem rItem = roster->rosterItem(itemJid);
+			if (rItem.isValid && !itemJid.node().isEmpty())
 			{
 				if (!before.items.contains(itemJid))
 				{
@@ -976,14 +1088,14 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 							prevMeta.items.removeAll(oldItemJid);
 						updateMetaContact(AStreamJid,prevMeta);
 					}
-					itemMetaHash.insert(itemJid,after.id);
+					itemMetaIdRef.insert(itemJid,after.id);
 				}
 
-				if (after.name.isEmpty() && !ritem.name.isEmpty())
-					after.name = ritem.name;
+				if (after.name.isEmpty() && !rItem.name.isEmpty())
+					after.name = rItem.name;
 
-				if (!ritem.groups.isEmpty())
-					after.groups += ritem.groups;
+				if (!rItem.groups.isEmpty())
+					after.groups += rItem.groups;
 
 				if (presence)
 					after.presences += presence->findItems(itemJid);
@@ -1005,35 +1117,22 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 			QSet<Jid> oldMetaItems = before.items.toSet() - after.items.toSet();
 
 			foreach(const Jid &itemJid, oldMetaItems)
-				itemMetaHash.remove(itemJid);
+				itemMetaIdRef.remove(itemJid);
 
 			if (!after.isEmpty())
-			{
-				if (after.link != before.link)
-				{
-					if (!before.link.isNull())
-						FLinkMetaId[before.link].remove(AStreamJid,before.id);
-					if (!after.link.isNull())
-						FLinkMetaId[before.link].remove(AStreamJid,after.id);
-				}
 				FMetaContacts[AStreamJid][after.id] = after;
-			}
 			else
-			{
-				if (!before.link.isNull())
-					FLinkMetaId[before.link].remove(AStreamJid,before.id);
 				FMetaContacts[AStreamJid].remove(after.id);
-			}
 
-			updateMetaIndexes(AStreamJid,after);
-			updateMetaWindows(AStreamJid,after,newMetaItems,oldMetaItems);
+			updateMetaIndexes(AStreamJid,after.id);
+			updateMetaWindows(AStreamJid,after.id);
 
 			emit metaContactChanged(AStreamJid,after,before);
 			return true;
 		}
 		else
 		{
-			updateMetaIndexes(AStreamJid,after);
+			updateMetaIndexes(AStreamJid,after.id);
 		}
 	}
 	else if (AMetaContact.isNull())
@@ -1063,13 +1162,7 @@ void MetaContacts::updateMetaContacts(const Jid &AStreamJid, const QList<IMetaCo
 
 void MetaContacts::startUpdateMetaContact(const Jid &AStreamJid, const QUuid &AMetaId)
 {
-	FUpdateMeta[AStreamJid][AMetaId] += NULL;
-	FUpdateTimer.start(UPDATE_META_TIMEOUT);
-}
-
-void MetaContacts::startUpdateMetaContactIndex(const Jid &AStreamJid, const QUuid &AMetaId, IRosterIndex *AIndex)
-{
-	FUpdateMeta[AStreamJid][AMetaId] += AIndex;
+	FUpdateMeta[AStreamJid] += AMetaId;
 	FUpdateTimer.start(UPDATE_META_TIMEOUT);
 }
 
@@ -1096,7 +1189,7 @@ bool MetaContacts::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) c
 {
 	foreach(IRosterIndex *index, ASelected)
 	{
-		int kind = index->data(RDR_KIND).toInt();
+		int kind = index->kind();
 		if (kind!=RIK_CONTACT && kind!=RIK_METACONTACT && kind!=RIK_METACONTACT_ITEM)
 			return false;
 		else if (kind==RIK_CONTACT && !isValidItem(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString()))
@@ -1111,7 +1204,7 @@ bool MetaContacts::hasProxiedIndexes(const QList<IRosterIndex *> &AIndexes) cons
 	{
 		if (FMetaIndexItems.contains(index))
 			return true;
-		else if (FMetaIndexItemProxy.contains(index))
+		else if (FMetaItemIndexToProxy.contains(index))
 			return true;
 	}
 	return false;
@@ -1124,12 +1217,12 @@ QList<IRosterIndex *> MetaContacts::indexesProxies(const QList<IRosterIndex *> &
 	{
 		if (FMetaIndexItems.contains(index))
 		{
-			foreach(IRosterIndex *metaItem, FMetaIndexItems.value(index))
-				proxies.append(FMetaIndexItemProxy.value(metaItem));
+			for (int row=0; row<index->childCount(); row++)
+				proxies.append(FMetaItemIndexToProxy.value(index->childIndex(row)));
 		}
-		else if (FMetaIndexItemProxy.contains(index))
+		else if (FMetaItemIndexToProxy.contains(index))
 		{
-			proxies.append(FMetaIndexItemProxy.value(index));
+			proxies.append(FMetaItemIndexToProxy.value(index));
 		}
 		else if (ASelfProxy)
 		{
@@ -1140,14 +1233,47 @@ QList<IRosterIndex *> MetaContacts::indexesProxies(const QList<IRosterIndex *> &
 	return proxies.toSet().toList();
 }
 
-void MetaContacts::renameMetaContact(const Jid &AStreamJid, const QUuid &AMetaId)
+QMap<int, QStringList> MetaContacts::indexesRolesMap(const QList<IRosterIndex *> &AIndexes, const QList<int> &ARoles) const
 {
-	if (isReady(AStreamJid))
+	QMap<int, QStringList> rolesMap;
+	if (FRostersView)
 	{
-		IMetaContact meta = findMetaContact(AStreamJid, AMetaId);
+		rolesMap = FRostersView->indexesRolesMap(AIndexes,ARoles);
+		for (int i=0; i<AIndexes.count(); i++)
+		{
+			IRosterIndex *metaIndex = AIndexes.at(i);
+			if (metaIndex->kind() == RIK_METACONTACT)
+			{
+				foreach(const QString &streamJid, metaIndex->data(RDR_STREAMS).toStringList())
+				{
+					if (rolesMap.value(RDR_STREAM_JID).at(i) != streamJid)
+					{
+						foreach(int role, ARoles)
+						{
+							if (role != RDR_STREAM_JID)
+								rolesMap[role].append(metaIndex->data(role).toString());
+							else
+								rolesMap[role].append(streamJid);
+						}
+					}
+				}
+			}
+		}
+	}
+	return rolesMap;
+}
+
+void MetaContacts::renameMetaContact(const QStringList &AStreams, const QStringList &AMetas)
+{
+	if (isReadyStreams(AStreams) && !AStreams.isEmpty() && AStreams.count()==AMetas.count())
+	{
+		MetaMergedContact meta = getMergedContact(AStreams.value(0),AMetas.value(0));
 		QString newName = QInputDialog::getText(NULL,tr("Rename Metacontact"),tr("Enter name:"),QLineEdit::Normal,meta.name);
 		if (!newName.isEmpty() && newName!=meta.name)
-			setMetaContactName(AStreamJid,AMetaId,newName);
+		{
+			for (int i=0; i<AStreams.count(); i++)
+				setMetaContactName(AStreams.at(i),AMetas.at(i),newName);
+		}
 	}
 }
 
@@ -1250,7 +1376,6 @@ QList<IMetaContact> MetaContacts::loadMetaContactsFromXML(const QDomElement &AEl
 	{
 		IMetaContact meta;
 		meta.id = metaElem.attribute("id");
-		meta.link = metaElem.attribute("link");
 		meta.name = metaElem.attribute("name");
 
 		QDomElement itemElem = metaElem.firstChildElement("item");
@@ -1272,7 +1397,6 @@ void MetaContacts::saveMetaContactsToXML(QDomElement &AElement, const QList<IMet
 	{
 		QDomElement metaElem = AElement.ownerDocument().createElement("meta");
 		metaElem.setAttribute("id",metaIt->id.toString());
-		metaElem.setAttribute("link",metaIt->link.toString());
 		metaElem.setAttribute("name",metaIt->name);
 
 		for (QList<Jid>::const_iterator itemIt=metaIt->items.constBegin(); itemIt!=metaIt->items.constEnd(); ++itemIt)
@@ -1340,28 +1464,15 @@ void MetaContacts::onRosterAdded(IRoster *ARoster)
 
 void MetaContacts::onRosterRemoved(IRoster *ARoster)
 {
-	QHash<QUuid, QList<IRosterIndex *> > metaIndexes = FMetaIndexes.take(ARoster->streamJid());
-	for (QHash<QUuid, QList<IRosterIndex *> >::const_iterator metaIt=metaIndexes.constBegin(); metaIt!=metaIndexes.constEnd(); ++metaIt)
-	{
-		foreach(IRosterIndex *metaIndex, metaIt.value())
-		{
-			foreach(IRosterIndex *itemIndex, FMetaIndexItems.take(metaIndex))
-			{
-				FMetaIndexProxyItem.remove(FMetaIndexItemProxy.take(itemIndex),itemIndex);
-				FRostersModel->removeRosterIndex(itemIndex);
-			}
-			FRostersModel->removeRosterIndex(metaIndex);
-		}
-	}
-
 	FSaveStreams -= ARoster->streamJid();
 	FLoadStreams -= ARoster->streamJid();
 	FUpdateMeta.remove(ARoster->streamJid());
 
 	FItemMetaId.remove(ARoster->streamJid());
-	FMetaChatWindows.remove(ARoster->streamJid());
 
 	QHash<QUuid, IMetaContact> metas = FMetaContacts.take(ARoster->streamJid());
+	foreach(const QUuid &metaId, metas.keys())
+		updateMetaIndexes(ARoster->streamJid(),metaId);
 	saveMetaContactsToFile(metaContactsFileName(ARoster->streamJid()),metas.values());
 }
 
@@ -1377,25 +1488,14 @@ void MetaContacts::onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore
 		FLoadStreams -= ABefore;
 		FLoadStreams += ARoster->streamJid();
 	}
+	FUpdateMeta.insert(ARoster->streamJid(),FUpdateMeta.take(ABefore));
 	
-	QString afterStreamJid = ARoster->streamJid().pFull();
-	QHash<QUuid, QList<IRosterIndex *> > metaIndexes = FMetaIndexes.take(ABefore);
-	for (QHash<QUuid, QList<IRosterIndex *> >::const_iterator metaIt = metaIndexes.constBegin(); metaIt!=metaIndexes.constEnd(); ++metaIt)
-	{
-		for (QList<IRosterIndex *>::const_iterator metaIndexIt=metaIt->constBegin(); metaIndexIt!=metaIt->constEnd(); ++metaIndexIt)
-		{
-			IRosterIndex *metaIndex = *metaIndexIt;
-			foreach(IRosterIndex *itemIndex, FMetaIndexItems.value(metaIndex))
-				itemIndex->setData(afterStreamJid,RDR_STREAM_JID);
-			metaIndex->setData(afterStreamJid,RDR_STREAM_JID);
-		}
-	}
-	FMetaIndexes.insert(ARoster->streamJid(),metaIndexes);
+	for (QHash<const IRosterIndex *, QMap<Jid, QMap<Jid, IRosterIndex *> > >::iterator it=FMetaIndexItems.begin(); it!=FMetaIndexItems.constEnd(); ++it)
+		if (it->contains(ABefore))
+			it->insert(ARoster->streamJid(),it->take(ABefore));
 
-	FMetaChatWindows[ARoster->streamJid()] = FMetaChatWindows.take(ABefore);
-
-	FMetaContacts[ARoster->streamJid()] = FMetaContacts.take(ABefore);
-	FItemMetaId[ARoster->streamJid()] = FItemMetaId.take(ABefore);
+	FItemMetaId.insert(ARoster->streamJid(), FItemMetaId.take(ABefore));
+	FMetaContacts.insert(ARoster->streamJid(), FMetaContacts.take(ABefore));
 }
 
 void MetaContacts::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)
@@ -1480,65 +1580,91 @@ void MetaContacts::onPrivateStorageClosed(const Jid &AStreamJid)
 void MetaContacts::onRostersModelStreamsLayoutChanged(int ABefore)
 {
 	Q_UNUSED(ABefore);
-	for (QMap<Jid, QHash<QUuid, QList<IRosterIndex *> > >::const_iterator streamIt=FMetaIndexes.constBegin(); streamIt!=FMetaIndexes.constEnd(); ++streamIt)
+	for (QMap<const IRosterIndex *, QHash<QUuid, QList<IRosterIndex *> > >::iterator streamIt=FMetaIndexes.begin(); streamIt!=FMetaIndexes.end(); streamIt=FMetaIndexes.erase(streamIt))
 	{
-		IRosterIndex *sroot = FRostersModel->streamsLayout()==IRostersModel::LayoutMerged ? FRostersModel->contactsRoot() : FRostersModel->streamRoot(streamIt.key());
-		for (QHash<QUuid, QList<IRosterIndex *> >::const_iterator metaIt = streamIt->constBegin(); metaIt!=streamIt->constEnd(); ++metaIt)
+		for (QHash<QUuid, QList<IRosterIndex *> >::iterator metaIt = streamIt->begin(); metaIt!=streamIt->end(); metaIt=streamIt->erase(metaIt))
 		{
-			foreach(IRosterIndex *index, metaIt.value())
-			{
-				IRosterIndex *pIndex = index->parentIndex();
-				if (FRostersModel->isGroupKind(pIndex->kind()))
-				{
-					IRosterIndex *groupIndex = FRostersModel->getGroupIndex(pIndex->kind(),pIndex->data(RDR_GROUP).toString(),sroot);
-					FRostersModel->insertRosterIndex(index,groupIndex);
-				}
-				else if (pIndex==FRostersModel->contactsRoot() || pIndex==FRostersModel->streamRoot(streamIt.key()))
-				{
-					FRostersModel->insertRosterIndex(index,sroot);
-				}
-			}
+			foreach(IRosterIndex *metaIndex, metaIt.value())
+				FRostersModel->removeRosterIndex(metaIndex);
 		}
 	}
+	
+	for (QMap<Jid, QHash<QUuid, IMetaContact> >::const_iterator streamIt=FMetaContacts.constBegin(); streamIt!=FMetaContacts.constEnd(); ++streamIt)
+	{
+		for(QHash<QUuid, IMetaContact>::const_iterator metaIt=streamIt->constBegin(); metaIt!=streamIt->constEnd(); ++metaIt)
+			updateMetaIndexes(streamIt.key(),metaIt.key());
+	}
+	
+	QList<IMessageChatWindow *> metaChatWindows;
+	for(QMap<const IRosterIndex *, QHash<QUuid, IMessageChatWindow *> >::iterator streamIt=FMetaChatWindows.begin(); streamIt!=FMetaChatWindows.end(); streamIt=FMetaChatWindows.erase(streamIt))
+		metaChatWindows += streamIt->values();
+
+	foreach(IMessageChatWindow *window, metaChatWindows)
+	{
+		IMetaContact meta = findMetaContact(window->streamJid(),window->contactJid());
+		if (!meta.isNull())
+			updateMetaWindows(window->streamJid(),meta.id);
+	}
+
+	FUpdateMeta.clear();
 }
 
 void MetaContacts::onRostersModelIndexInserted(IRosterIndex *AIndex)
 {
-	if (AIndex->kind()==RIK_CONTACT && !FMetaIndexItemProxy.contains(AIndex))
+	if (AIndex->kind()==RIK_CONTACT && !FMetaItemProxyToIndex.contains(AIndex))
 	{
 		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-		Jid itemJid = AIndex->data(RDR_PREP_BARE_JID).toString();
-
-		QUuid metaId = FItemMetaId.value(streamJid).value(itemJid);
+		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
+		QUuid metaId = FItemMetaId.value(streamJid).value(contactJid);
 		if (!metaId.isNull())
-		{
-			foreach(IRosterIndex *metaIndex, FMetaIndexes.value(streamJid).value(metaId))
-			{
-				if (AIndex->parentIndex() == metaIndex->parentIndex())
-				{
-					startUpdateMetaContactIndex(streamJid,metaId,metaIndex);
-					break;
-				}
-			}
-		}
+			startUpdateMetaContact(streamJid,metaId);
 	}
 }
 
 void MetaContacts::onRostersModelIndexDestroyed(IRosterIndex *AIndex)
 {
-	for (QMultiHash<const IRosterIndex *, IRosterIndex *>::iterator it=FMetaIndexProxyItem.find(AIndex); it!=FMetaIndexProxyItem.end() && it.key()==AIndex; it=FMetaIndexProxyItem.erase(it))
-		FMetaIndexItemProxy.remove(it.value());
-	
-	if (!FMetaIndexItems.take(AIndex).isEmpty())
-		FMetaIndexes[AIndex->data(RDR_STREAM_JID).toString()][AIndex->data(RDR_METACONTACT_ID).toString()].removeAll(AIndex);
-}
+	if (AIndex->kind() == RIK_CONTACT)
+	{
+		for (QMultiHash<const IRosterIndex *, IRosterIndex *>::iterator it=FMetaItemProxyToIndex.find(AIndex); it!=FMetaItemProxyToIndex.end() && it.key()==AIndex; it=FMetaItemProxyToIndex.erase(it))
+			FMetaItemIndexToProxy.remove(it.value());
+	}
+	else if (AIndex->kind() == RIK_METACONTACT_ITEM)
+	{
+		FMetaItemProxyToIndex.remove(FMetaItemIndexToProxy.take(AIndex),AIndex);
 
+		QHash<const IRosterIndex *, QMap<Jid, QMap<Jid, IRosterIndex *> > >::iterator metaIt = FMetaIndexItems.find(AIndex->parentIndex());
+		if (metaIt != FMetaIndexItems.end())
+		{
+			QMap<Jid, QMap<Jid, IRosterIndex *> >::iterator streamIt = metaIt->find(AIndex->data(RDR_STREAM_JID).toString());
+			if (streamIt != metaIt->end())
+				streamIt->remove(AIndex->data(RDR_PREP_BARE_JID).toString());
+		}
+	}
+	else if (AIndex->kind() == RIK_METACONTACT)
+	{
+		FMetaIndexItems.remove(AIndex);
+		FMetaProxyToIndex.remove(FMetaIndexToProxy.take(AIndex));
+
+		QMap<const IRosterIndex *, QHash<QUuid, QList<IRosterIndex *> > >::iterator rootIt = FMetaIndexes.find(getMetaIndexRoot(AIndex->data(RDR_STREAM_JID).toString()));
+		if (rootIt != FMetaIndexes.end())
+		{
+			QHash<QUuid, QList<IRosterIndex *> >::iterator metaIt = rootIt->find(AIndex->data(RDR_METACONTACT_ID).toString());
+			if (metaIt != rootIt->end())
+				metaIt->removeAll(AIndex);
+		}
+	}
+	else if (AIndex->kind()==RIK_STREAM_ROOT || AIndex->kind()==RIK_CONTACTS_ROOT)
+	{
+		FMetaIndexes.remove(AIndex);
+	}
+}
 
 void MetaContacts::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int ARole)
 {
-	if (AIndex->kind() == RIK_METACONTACT_ITEM)
-		emit rosterDataChanged(AIndex->parentIndex(),ARole);
-	else foreach(IRosterIndex *metaItemIndex, FMetaIndexProxyItem.values(AIndex))
+	IRosterIndex *metaIndex = FMetaProxyToIndex.value(AIndex);
+	if (metaIndex != NULL)
+		emit rosterDataChanged(metaIndex,ARole);
+	else foreach(IRosterIndex *metaItemIndex, FMetaItemProxyToIndex.values(AIndex))
 		emit rosterDataChanged(metaItemIndex,ARole);
 }
 
@@ -1573,7 +1699,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 	static bool blocked = false;
 	if (!blocked && ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(AIndexes,QList<int>()<<RDR_KIND<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_METACONTACT_ID);
+		QMap<int, QStringList> rolesMap = indexesRolesMap(AIndexes,QList<int>()<<RDR_KIND<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_METACONTACT_ID);
 		
 		bool isMultiSelection = AIndexes.count()>1;
 
@@ -1650,50 +1776,60 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 	{
 		if (AIndex->kind() == RIK_METACONTACT)
 		{
-			QStringList metaItems;
 			QStringList metaAvatars;
 			QStringList metaToolTips;
+			QMap<Jid, QString> metaAccounts;
+			QMap<Jid, QStringList> metaItems;
+			QList<IPresenceItem> metaResources;
 
-			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
-
-			QMap<Jid, IRosterIndex *> metaItemsMap = FMetaIndexItems.value(AIndex);
-			for(QMap<Jid, IRosterIndex *>::const_iterator it = metaItemsMap.constBegin(); it!=metaItemsMap.constEnd(); ++it)
+			for (int row=0; row<AIndex->childCount(); row++)
 			{
-				QMap<int, QString> toolTips;
-				FRostersView->toolTipsForIndex(it.value(),NULL,toolTips);
-				if (!toolTips.isEmpty())
+				IRosterIndex *metaItemIndex = AIndex->childIndex(row);
+				if (metaItemIndex->kind() == RIK_METACONTACT_ITEM)
 				{
-					static const QList<int> requiredToolTipOrders = QList<int>();
+					Jid streamJid = metaItemIndex->data(RDR_STREAM_JID).toString();
+					Jid itemJid = metaItemIndex->data(RDR_PREP_BARE_JID).toString();
 
-					QString avatarToolTip = toolTips.value(RTTO_AVATAR_IMAGE);
-					if (!avatarToolTip.isEmpty() && metaAvatars.count()<10 && !metaAvatars.contains(avatarToolTip))
-						metaAvatars += avatarToolTip;
-
-					for (QMap<int, QString>::iterator it=toolTips.begin(); it!=toolTips.end(); )
-					{
-						if (!requiredToolTipOrders.contains(it.key()))
-							it = toolTips.erase(it);
-						else
-							++it;
-					}
-
+					QMap<int, QString> toolTips;
+					FRostersView->toolTipsForIndex(metaItemIndex,NULL,toolTips);
 					if (!toolTips.isEmpty())
 					{
-						QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTips.values()).join("<p/><nbsp>"));
-						metaToolTips.append(tooltip);
-					}
-				}
+						static const QList<int> requiredToolTipOrders = QList<int>();
 
-				if (FStatusIcons && presence)
-				{
-					IPresenceItem pitem = FPresencePlugin->sortPresenceItems(presence->findItems(it.key())).value(0);
-					QString iconset = FStatusIcons->iconsetByJid(pitem.isValid ? pitem.itemJid : it.key());
-					QString iconkey = FStatusIcons->iconKeyByJid(presence->streamJid(),pitem.isValid ? pitem.itemJid : it.key());
-					metaItems.append(QString("<img src='%1'><nbsp>%2").arg(FStatusIcons->iconFileName(iconset,iconkey),Qt::escape(it.key().uBare())));
-				}
-				else
-				{
-					metaItems.append(Qt::escape(it.key().uBare()));
+						QString avatarToolTip = toolTips.value(RTTO_AVATAR_IMAGE);
+						if (!avatarToolTip.isEmpty() && metaAvatars.count()<10 && !metaAvatars.contains(avatarToolTip))
+							metaAvatars += avatarToolTip;
+
+						QString accountToolTip = toolTips.value(RTTO_ROSTERSVIEW_INFO_ACCOUNT);
+						if (!accountToolTip.isEmpty())
+							metaAccounts.insert(streamJid,accountToolTip);
+
+						QString jidToolTip = toolTips.value(RTTO_ROSTERSVIEW_INFO_JABBERID);
+						if (!jidToolTip.isEmpty())
+							metaItems[streamJid].append(jidToolTip);
+
+						for (QMap<int, QString>::iterator it=toolTips.begin(); it!=toolTips.end(); )
+						{
+							if (!requiredToolTipOrders.contains(it.key()))
+								it = toolTips.erase(it);
+							else
+								++it;
+						}
+
+						if (!toolTips.isEmpty())
+						{
+							QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTips.values()).join("<p/><nbsp>"));
+							metaToolTips.append(tooltip);
+						}
+					}
+
+					IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
+					if (presence)
+					{
+						foreach(const IPresenceItem &pItem, presence->findItems(itemJid))
+							if (pItem.show!=IPresence::Offline && !metaResources.contains(pItem))
+								metaResources.append(pItem);
+					}
 				}
 			}
 
@@ -1701,23 +1837,42 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 				AToolTips.insert(RTTO_AVATAR_IMAGE,QString("<span>%1</span>").arg(metaAvatars.join("<nbsp>")));
 
 			if (!metaItems.isEmpty())
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,QString("<span>%1</span>").arg(metaItems.join("<p/><nbsp>")));
+			{
+				QStringList accountsToolTip;
+				for (QMap<Jid, QStringList>::const_iterator accountIt=metaItems.constBegin(); accountIt!=metaItems.constEnd(); ++accountIt)
+				{
+					QString accountToolTip = metaAccounts.value(accountIt.key());
+					if (!accountToolTip.isEmpty())
+						accountsToolTip.append(accountToolTip + "<p/><nbsp>" + accountIt->join("<p/><nbsp>"));
+					else
+						accountsToolTip.append(accountIt->join("<p/><nbsp>"));
+				}
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,QString("<span>%1</span>").arg(accountsToolTip.join("<hr><p/><nbsp>")));
+			}
 			else
+			{
 				AToolTips.remove(RTTO_ROSTERSVIEW_INFO_JABBERID);
+			}
 
 			if (!metaToolTips.isEmpty())
 				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_STREAMS,QString("<span><hr>%1</span>").arg(metaToolTips.join("<hr><p/><nbsp>")));
 
-			QStringList resources = AIndex->data(RDR_RESOURCES).toStringList();
-			if (!resources.isEmpty())
+			metaResources = FPresencePlugin!=NULL ? FPresencePlugin->sortPresenceItems(metaResources) : metaResources;
+			for (int resIndex=0; resIndex<10 && resIndex<metaResources.count(); resIndex++)
 			{
-				for(int resIndex=0; resIndex<10 && resIndex<resources.count(); resIndex++)
-				{
-					int orderShift = resIndex*100;
-					IPresenceItem pitem = presence!=NULL ? presence->findItem(resources.at(resIndex)) : IPresenceItem();
-					if (pitem.isValid)
-						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(pitem.itemJid.uFull())).arg(pitem.priority));
-				}
+				int orderShift = resIndex*100;
+				IPresenceItem pItem = metaResources.at(resIndex);
+
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(pItem.itemJid.uFull())).arg(pItem.priority));
+
+				if (FStatusChanger)
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME+orderShift,tr("<b>Status:</b> %1").arg(Qt::escape(FStatusChanger->nameByShow(pItem.show))));
+
+				if (!pItem.status.isEmpty())
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,Qt::escape(pItem.status).replace('\n',"<br>"));
+
+				if (resIndex < metaResources.count()-1)
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
 			}
 
 			if (!AToolTips.contains(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE))
@@ -1725,11 +1880,12 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 				AToolTips.remove(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME);
 				AToolTips.remove(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT);
 			}
+			AToolTips.remove(RTTO_ROSTERSVIEW_INFO_ACCOUNT);
 			AToolTips.remove(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION);
 		}
 		else if (AIndex->kind() == RIK_METACONTACT_ITEM)
 		{
-			IRosterIndex *proxy = FMetaIndexItemProxy.value(AIndex);
+			IRosterIndex *proxy = FMetaItemIndexToProxy.value(AIndex);
 			if (proxy != NULL)
 				FRostersView->toolTipsForIndex(proxy,NULL,AToolTips);
 		}
@@ -1746,7 +1902,7 @@ void MetaContacts::onRostersViewNotifyInserted(int ANotifyId)
 		{
 			indexes.append(notifyIndex->parentIndex());
 		}
-		else foreach(IRosterIndex *itemIndex, FMetaIndexProxyItem.values(notifyIndex))
+		else foreach(IRosterIndex *itemIndex, FMetaItemProxyToIndex.values(notifyIndex))
 		{
 			removeFlags = IRostersNotify::ExpandParents;
 			indexes.append(itemIndex);
@@ -1759,19 +1915,19 @@ void MetaContacts::onRostersViewNotifyInserted(int ANotifyId)
 		notify.flags &= ~(removeFlags);
 
 		int notifyId = FRostersView->insertNotify(notify,indexes);
-		FProxyToIndexNotify.insert(ANotifyId,notifyId);
+		FNotifyProxyToIndex.insert(ANotifyId,notifyId);
 	}
 }
 
 void MetaContacts::onRostersViewNotifyRemoved(int ANotifyId)
 {
-	if (FProxyToIndexNotify.contains(ANotifyId))
-		FRostersView->removeNotify(FProxyToIndexNotify.take(ANotifyId));
+	if (FNotifyProxyToIndex.contains(ANotifyId))
+		FRostersView->removeNotify(FNotifyProxyToIndex.take(ANotifyId));
 }
 
 void MetaContacts::onRostersViewNotifyActivated(int ANotifyId)
 {
-	int notifyId = FProxyToIndexNotify.key(ANotifyId);
+	int notifyId = FNotifyProxyToIndex.key(ANotifyId);
 	if (notifyId > 0)
 		FRostersView->activateNotify(notifyId);
 }
@@ -1780,13 +1936,7 @@ void MetaContacts::onMessageChatWindowCreated(IMessageChatWindow *AWindow)
 {
 	IMetaContact meta = findMetaContact(AWindow->streamJid(),AWindow->contactJid());
 	if (!meta.isNull())
-	{
-		FMetaChatWindows[AWindow->streamJid()].insert(meta.id,AWindow);
-		connect(AWindow->instance(),SIGNAL(tabPageChanged()),SLOT(onMessageChatWindowChanged()));
-		connect(AWindow->instance(),SIGNAL(tabPageDestroyed()),SLOT(onMessageChatWindowDestroyed()));
-
-		updateMetaWindows(AWindow->streamJid(),meta,meta.items.toSet(),QSet<Jid>());
-	}
+		updateMetaWindows(AWindow->streamJid(),meta.id);
 }
 
 void MetaContacts::onMessageChatWindowChanged()
@@ -1796,7 +1946,7 @@ void MetaContacts::onMessageChatWindowChanged()
 	{
 		IMetaContact meta = findMetaContact(window->streamJid(),window->contactJid());
 		if (!meta.isNull())
-			updateMetaWindows(window->streamJid(),meta,QSet<Jid>(),QSet<Jid>());
+			updateMetaWindows(window->streamJid(),meta.id);
 	}
 }
 
@@ -1805,13 +1955,16 @@ void MetaContacts::onMessageChatWindowDestroyed()
 	IMessageChatWindow *window = qobject_cast<IMessageChatWindow *>(sender());
 	if (window)
 	{
-		QHash<QUuid, IMessageChatWindow *> &metaWindowHash = FMetaChatWindows[window->streamJid()];
-		for (QHash<QUuid, IMessageChatWindow *>::iterator it=metaWindowHash.begin(); it!=metaWindowHash.end(); )
+		for(QMap<const IRosterIndex *, QHash<QUuid, IMessageChatWindow *> >::iterator streamIt=FMetaChatWindows.begin(); streamIt!=FMetaChatWindows.end(); ++streamIt)
 		{
-			if (it.value() == window)
-				it = metaWindowHash.erase(it);
-			else
-				++it;
+			for (QHash<QUuid, IMessageChatWindow *>::iterator metaIt=streamIt->begin(); metaIt!=streamIt->end(); ++metaIt)
+			{
+				if (metaIt.value() == window)
+				{
+					metaIt = streamIt->erase(metaIt);
+					return;
+				}
+			}
 		}
 	}
 }
@@ -1835,16 +1988,16 @@ void MetaContacts::onRenameMetaContactByAction()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		if (isReady(streamJid))
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
+		if (isReadyStreams(streams))
 		{
 			bool editInRoster = false;
 
-			QUuid metaId = action->data(ADR_METACONTACT_ID).toString();
+			QUuid metaId = action->data(ADR_METACONTACT_ID).toStringList().value(0);
 			if (FRostersView && FRostersView->instance()->isActiveWindow() && FRostersView->rostersModel())
 			{
 				QString group = action->data(ADR_FROM_GROUP).toStringList().value(0);
-				foreach(IRosterIndex *index, findMetaIndexes(streamJid,metaId))
+				foreach(IRosterIndex *index, findMetaIndexes(streams.value(0),metaId))
 				{
 					if (index->data(RDR_GROUP).toString() == group)
 					{
@@ -1855,7 +2008,7 @@ void MetaContacts::onRenameMetaContactByAction()
 			}
 
 			if (!editInRoster)
-				renameMetaContact(streamJid, metaId);
+				renameMetaContact(streams, action->data(ADR_METACONTACT_ID).toStringList());
 		}
 	}
 }
@@ -1872,14 +2025,15 @@ void MetaContacts::onCopyMetaContactToGroupByAction()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		QUuid metaId = action->data(ADR_METACONTACT_ID).toString();
-
-		IMetaContact meta = findMetaContact(streamJid,metaId);
-		if (!meta.isEmpty())
+		foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
 		{
-			meta.groups += action->data(ADR_TO_GROUP).toString();
-			setMetaContactGroups(streamJid,metaId,meta.groups);
+			IMetaContact meta = findMetaContact(streamJid,metaId);
+			if (!meta.isEmpty())
+			{
+				meta.groups += action->data(ADR_TO_GROUP).toString();
+				setMetaContactGroups(streamJid,metaId,meta.groups);
+			}
 		}
 	}
 }
@@ -1889,39 +2043,29 @@ void MetaContacts::onMoveMetaContactToGroupByAction()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		QUuid metaId = action->data(ADR_METACONTACT_ID).toString();
-
-		IMetaContact meta = findMetaContact(streamJid,metaId);
-		if (!meta.isEmpty())
+		foreach(const Jid &streamJid, action->data(ADR_STREAM_JID).toStringList())
 		{
-			meta.groups += action->data(ADR_TO_GROUP).toString();
-			meta.groups -= action->data(ADR_FROM_GROUP).toString();
-			setMetaContactGroups(streamJid,metaId,meta.groups);
+			IMetaContact meta = findMetaContact(streamJid,metaId);
+			if (!meta.isEmpty())
+			{
+				meta.groups += action->data(ADR_TO_GROUP).toString();
+				meta.groups -= action->data(ADR_FROM_GROUP).toString();
+				setMetaContactGroups(streamJid,metaId,meta.groups);
+			}
 		}
 	}
 }
 
 void MetaContacts::onUpdateContactsTimerTimeout()
 {
-	for (QMap<Jid, QMap<QUuid, QSet<IRosterIndex *> > >::iterator streamIt=FUpdateMeta.begin(); streamIt!=FUpdateMeta.end(); streamIt=FUpdateMeta.erase(streamIt))
+	for (QMap<Jid, QSet<QUuid> >::iterator streamIt=FUpdateMeta.begin(); streamIt!=FUpdateMeta.end(); streamIt=FUpdateMeta.erase(streamIt))
 	{
-		for(QMap<QUuid, QSet<IRosterIndex *> >::const_iterator metaIt=streamIt->constBegin(); metaIt!=streamIt->constEnd(); ++metaIt)
+		foreach(const QUuid &metaId, streamIt.value())
 		{
-			IMetaContact meta = findMetaContact(streamIt.key(),metaIt.key());
+			IMetaContact meta = findMetaContact(streamIt.key(),metaId);
 			if (!meta.isNull())
-			{
-				QList<IRosterIndex *> metaIndexList = findMetaIndexes(streamIt.key(),metaIt.key());
-				if (metaIt->contains(NULL))
-				{
-					updateMetaContact(streamIt.key(),meta);
-				}
-				else foreach(IRosterIndex *metaIndex, metaIt.value())
-				{
-					if (metaIndexList.contains(metaIndex))
-						updateMetaIndexItems(streamIt.key(),meta,metaIndex);
-				}
-			}
+				updateMetaContact(streamIt.key(),meta);
 		}
 	}
 }
@@ -1947,7 +2091,10 @@ void MetaContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		{
 			IRosterIndex *index = indexes.first();
 			if (index->kind()==RIK_METACONTACT && !FRostersView->editRosterIndex(index,RDR_NAME))
-				renameMetaContact(index->data(RDR_STREAM_JID).toString(),index->data(RDR_METACONTACT_ID).toString());
+			{
+				QMap<int, QStringList> rolesMap = indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_METACONTACT_ID);
+				renameMetaContact(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_METACONTACT_ID));
+			}
 		}
 	}
 }

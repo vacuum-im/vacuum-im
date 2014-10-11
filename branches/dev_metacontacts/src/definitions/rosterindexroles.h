@@ -20,7 +20,7 @@ enum RosterIndexDataRoles {
 	RDR_STATUS,
 	RDR_PRIORITY,
 	RDR_SUBSCRIBTION,
-	RDR_ASK,
+	RDR_SUBSCRIPTION_ASK,
 	//View roles
 	RDR_LABEL_ITEMS,
 	RDR_FORCE_VISIBLE,
@@ -42,7 +42,6 @@ enum RosterIndexDataRoles {
 	RDR_VCARD_SEARCH,
 	//MetaContacts
 	RDR_METACONTACT_ID,
-	RDR_METACONTACT_ITEMS,
 	//Other Roles
 	RDR_USER_ROLE = 128
 };
