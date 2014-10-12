@@ -119,7 +119,7 @@ public:
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	//Utilities
-	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
+	virtual void elementToCollection(const Jid &AStreamJid, const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
 	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const;
 	//Handlers
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler);

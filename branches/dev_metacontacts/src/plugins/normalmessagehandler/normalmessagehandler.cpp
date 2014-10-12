@@ -242,7 +242,7 @@ bool NormalMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidge
 				for (QMultiMap<Jid, Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
 				{
 					message.setTo(it->full());
-					if (!FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::MessageOut))
+					if (!FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::DirectionOut))
 						LOG_STRM_WARNING(it.key(),QString("Failed to send message to=%1").arg(it->full()));
 					else
 						sent = true;
@@ -262,7 +262,7 @@ bool NormalMessageHandler::messageCheck(int AOrder, const Message &AMessage, int
 
 bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 {
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		IMessageNormalWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageNormalWindow::ReadMode);
 		if (window)
@@ -295,7 +295,7 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 INotification NormalMessageHandler::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		IMessageNormalWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window)
@@ -350,7 +350,7 @@ bool NormalMessageHandler::messageShowWindow(int AMessageId)
 	if (window == NULL)
 	{
 		Message message = FMessageProcessor->notifiedMessage(AMessageId);
-		if (messageDisplay(message,IMessageProcessor::MessageIn))
+		if (messageDisplay(message,IMessageProcessor::DirectionIn))
 		{
 			IMessageNormalWindow *window = findWindow(message.to(),message.from());
 			if (window)

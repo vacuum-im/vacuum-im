@@ -167,7 +167,7 @@ void MultiUserChat::stanzaRequestResult(const Jid &AStreamJid, const Stanza &ASt
 
 bool MultiUserChat::messageReadWrite(int AOrder, const Jid &AStreamJid, Message &AMessage, int ADirection)
 {
-	if (AOrder==MEO_MULTIUSERCHAT && ADirection==IMessageProcessor::MessageIn && AStreamJid==FStreamJid)
+	if (AOrder==MEO_MULTIUSERCHAT && ADirection==IMessageProcessor::DirectionIn && AStreamJid==FStreamJid)
 	{
 		if (FRoomJid.pBare() == Jid(AMessage.from()).pBare())
 			return processMessage(AMessage.stanza());
@@ -429,7 +429,7 @@ bool MultiUserChat::sendMessage(const Message &AMessage, const QString &AToNick)
 
 		if (FMessageProcessor)
 		{
-			if (FMessageProcessor->sendMessage(FStreamJid,message,IMessageProcessor::MessageOut))
+			if (FMessageProcessor->sendMessage(FStreamJid,message,IMessageProcessor::DirectionOut))
 				return true;
 			else
 				LOG_STRM_WARNING(FStreamJid,QString("Failed to send message to conference, room=%1").arg(FRoomJid.bare()));

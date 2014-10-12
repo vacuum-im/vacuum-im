@@ -134,7 +134,7 @@ protected:
 	void showMultiChatStatusMessage(const QString &AMessage, int AType=0, int AStatus=0, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
 	bool showMultiChatStatusCodes(const QList<int> &ACodes, const QString &ANick=QString::null, const QString &AMessage=QString::null);
 	void showMultiChatUserMessage(const Message &AMessage, const QString &ANick);
-	void showMultiChatHistory();
+	void requestMultiChatHistory();
 	void updateMultiChatWindow();
 	void removeMultiChatActiveMessages();
 protected:
@@ -143,7 +143,7 @@ protected:
 	void fillPrivateChatContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const;
 	void showPrivateChatStatusMessage(IMessageChatWindow *AWindow, const QString &AMessage, int AStatus=0, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showPrivateChatMessage(IMessageChatWindow *AWindow, const Message &AMessage);
-	void showPrivateChatHistory(IMessageChatWindow *AWindow);
+	void requestPrivateChatHistory(IMessageChatWindow *AWindow);
 	void updatePrivateChatWindow(IMessageChatWindow *AWindow);
 	void removePrivateChatActiveMessages(IMessageChatWindow *AWindow);
 protected:
@@ -205,8 +205,8 @@ protected slots:
 	void onStatusIconsChanged();
 	void onAutoRejoinAfterKick();
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
-	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
+	void onArchiveMessagesLoaded(const QString &AId, const IArchiveCollectionBody &ABody);
 	void onStyleOptionsChanged(const IMessageStyleOptions &AOptions, int AMessageType, const QString &AContext);
 private:
 	Ui::MultiUserChatWindowClass ui;

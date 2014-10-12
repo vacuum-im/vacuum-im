@@ -281,7 +281,7 @@ bool ChatMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidget 
 			Message message;
 			message.setTo(window->contactJid().full()).setType(Message::Chat);
 			FMessageProcessor->textToMessage(message,AWidget->document());
-			return !message.body().isEmpty() && FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::MessageOut);
+			return !message.body().isEmpty() && FMessageProcessor->sendMessage(window->streamJid(),message,IMessageProcessor::DirectionOut);
 		}
 	}
 	return false;
@@ -295,7 +295,7 @@ bool ChatMessageHandler::messageCheck(int AOrder, const Message &AMessage, int A
 
 bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 {
-	IMessageChatWindow *window = ADirection==IMessageProcessor::MessageIn ? getWindow(AMessage.to(),AMessage.from()) : getWindow(AMessage.from(),AMessage.to());
+	IMessageChatWindow *window = ADirection==IMessageProcessor::DirectionIn ? getWindow(AMessage.to(),AMessage.from()) : getWindow(AMessage.from(),AMessage.to());
 	if (window)
 	{
 		if (FRecentContacts)
@@ -313,7 +313,7 @@ bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 		if (FHistoryRequests.values().contains(window))
 			FPendingMessages[window].append(AMessage);
 
-		if (ADirection == IMessageProcessor::MessageIn)
+		if (ADirection == IMessageProcessor::DirectionIn)
 		{
 			if (window->streamJid()!=AMessage.to() || window->contactJid()!=AMessage.from())
 			{
@@ -335,7 +335,7 @@ bool ChatMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		IMessageChatWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window && !window->isActiveTabPage())
@@ -519,7 +519,7 @@ IMessageChatWindow *ChatMessageHandler::getWindow(const Jid &AStreamJid, const J
 
 				updateWindow(window);
 				setMessageStyle(window);
-				showHistory(window);
+				requestHistory(window);
 			}
 			else
 			{
@@ -593,13 +593,59 @@ void ChatMessageHandler::removeNotifiedMessages(IMessageChatWindow *AWindow)
 
 void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 {
+	if (!FHistoryRequests.values().contains(AWindow))
+	{
+		AWindow->viewWidget()->clearContent();
+
+		QList<Message> pending = FPendingMessages.take(AWindow);
+		IArchiveCollectionBody history = FHistoryMessages.take(AWindow);
+		qSort(history.messages.begin(),history.messages.end(),qGreater<Message>());
+
+		int messageItEnd = 0;
+		while (messageItEnd<pending.count() && messageItEnd<history.messages.count())
+		{
+			const Message &hmessage = history.messages.at(messageItEnd);
+			const Message &pmessage = pending.at(pending.count()-messageItEnd-1);
+			if (hmessage.body()==pmessage.body() && qAbs(hmessage.dateTime().secsTo(pmessage.dateTime()))<HISTORY_DUBLICATE_DELTA)
+				messageItEnd++;
+			else
+				break;
+		}
+
+		int messageIt = history.messages.count()-1;
+		QMultiMap<QDateTime,QString>::const_iterator noteIt = history.notes.constBegin();
+		while (messageIt>=messageItEnd || noteIt!=history.notes.constEnd())
+		{
+			if (messageIt>=messageItEnd && (noteIt==history.notes.constEnd() || history.messages.at(messageIt).dateTime()<noteIt.key()))
+			{
+				showStyledMessage(AWindow,history.messages.at(messageIt));
+				messageIt--;
+			}
+			else if (noteIt != history.notes.constEnd())
+			{
+				showStyledStatus(AWindow,noteIt.value(),true,noteIt.key());
+				++noteIt;
+			}
+		}
+
+		foreach(const WindowContent &content, FPendingContent.take(AWindow))
+		{
+			showDateSeparator(AWindow,content.options.time);
+			AWindow->viewWidget()->appendHtml(content.html,content.options);
+		}
+
+		WindowStatus &wstatus = FWindowStatus[AWindow];
+		wstatus.startTime = !history.messages.isEmpty() ? history.messages.last().dateTime() : QDateTime();
+	}
+}
+
+void ChatMessageHandler::requestHistory(IMessageChatWindow *AWindow)
+{
 	if (FMessageArchiver && Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool() && !FHistoryRequests.values().contains(AWindow))
 	{
 		WindowStatus &wstatus = FWindowStatus[AWindow];
 
 		IArchiveRequest request;
-		request.with = AWindow->contactJid().bare();
-		request.exactmatch = request.with.node().isEmpty();
 		request.order = Qt::DescendingOrder;
 		if (wstatus.createTime.secsTo(QDateTime::currentDateTime()) > HISTORY_TIME_DELTA)
 			request.start = wstatus.startTime.isValid() ? wstatus.startTime : wstatus.createTime;
@@ -607,16 +653,23 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 			request.maxItems = HISTORY_MESSAGES;
 		request.end = QDateTime::currentDateTime();
 
-		QString reqId = FMessageArchiver->loadMessages(AWindow->streamJid(),request);
-		if (!reqId.isEmpty())
+		showStyledStatus(AWindow,tr("Loading history..."),true);
+		QMultiMap<Jid,Jid> addresses = AWindow->address()->availAddresses(true);
+		for (QMultiMap<Jid,Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
 		{
-			LOG_STRM_INFO(AWindow->streamJid(),QString("Load chat history request sent, with=%1, id=%2").arg(request.with.bare(),reqId));
-			showStyledStatus(AWindow,tr("Loading history..."),true);
-			FHistoryRequests.insert(reqId,AWindow);
-		}
-		else
-		{
-			LOG_STRM_WARNING(AWindow->streamJid(),QString("Failed to send chat history load request, with=%1").arg(request.with.bare()));
+			request.with = it.value();
+			request.exactmatch = request.with.node().isEmpty();
+
+			QString reqId = FMessageArchiver->loadMessages(it.key(),request);
+			if (!reqId.isEmpty())
+			{
+				LOG_STRM_INFO(it.key(),QString("Load chat history request sent, with=%1, id=%2").arg(request.with.bare(),reqId));
+				FHistoryRequests.insert(reqId,AWindow);
+			}
+			else
+			{
+				LOG_STRM_WARNING(it.key(),QString("Failed to send chat history load request, with=%1").arg(request.with.bare()));
+			}
 		}
 	}
 }
@@ -633,29 +686,6 @@ void ChatMessageHandler::setMessageStyle(IMessageChatWindow *AWindow)
 			AWindow->viewWidget()->setMessageStyle(style,soptions);
 		}
 		FWindowStatus[AWindow].lastDateSeparator = QDate();
-	}
-}
-
-void ChatMessageHandler::fillContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const
-{
-	if (AOptions.direction == IMessageContentOptions::DirectionIn)
-	{
-		AOptions.senderId = AWindow->contactJid().full();
-		AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid(),AWindow->contactJid()));
-		AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->contactJid());
-		AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid(),AWindow->contactJid());
-		AOptions.senderColor = "blue";
-	}
-	else
-	{
-		AOptions.senderId = AWindow->streamJid().full();
-		if (AWindow->streamJid() && AWindow->contactJid())
-			AOptions.senderName = Qt::escape(!AWindow->streamJid().resource().isEmpty() ? AWindow->streamJid().resource() : AWindow->streamJid().uNode());
-		else
-			AOptions.senderName = Qt::escape(FMessageStyles->contactName(AWindow->streamJid()));
-		AOptions.senderAvatar = FMessageStyles->contactAvatar(AWindow->streamJid());
-		AOptions.senderIcon = FMessageStyles->contactIcon(AWindow->streamJid());
-		AOptions.senderColor = "red";
 	}
 }
 
@@ -682,23 +712,46 @@ void ChatMessageHandler::showDateSeparator(IMessageChatWindow *AWindow, const QD
 	}
 }
 
+void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AContactJid, IMessageContentOptions &AOptions) const
+{
+	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
+		AOptions.timeFormat = FMessageStyles->timeFormat(AOptions.time,AOptions.time);
+	else
+		AOptions.timeFormat = FMessageStyles->timeFormat(AOptions.time);
+
+	if (AOptions.direction == IMessageContentOptions::DirectionIn)
+	{
+		AOptions.senderId = AContactJid.full();
+		AOptions.senderAvatar = FMessageStyles->contactAvatar(AContactJid);
+		AOptions.senderIcon = FMessageStyles->contactIcon(AStreamJid,AContactJid);
+		AOptions.senderName = Qt::escape(FMessageStyles->contactName(AStreamJid,AContactJid));
+		AOptions.senderColor = "blue";
+	}
+	else
+	{
+		AOptions.senderId = AStreamJid.full();
+		AOptions.senderAvatar = FMessageStyles->contactAvatar(AStreamJid);
+		AOptions.senderIcon = FMessageStyles->contactIcon(AStreamJid);
+		if (AStreamJid.pBare() != AContactJid.pBare())
+			AOptions.senderName = Qt::escape(FMessageStyles->contactName(AStreamJid));
+		else
+			AOptions.senderName = Qt::escape(!AStreamJid.resource().isEmpty() ? AStreamJid.resource() : AStreamJid.uNode());
+		AOptions.senderColor = "red";
+	}
+}
+
 void ChatMessageHandler::showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, bool ADontSave, const QDateTime &ATime)
 {
 	IMessageContentOptions options;
 	options.kind = IMessageContentOptions::KindStatus;
 	options.direction = IMessageContentOptions::DirectionIn;
-
 	options.time = ATime;
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
-		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
-	else
-		options.timeFormat = FMessageStyles->timeFormat(options.time);
 
 	if (!ADontSave && FMessageArchiver && Options::node(OPV_MESSAGES_ARCHIVESTATUS).value().toBool())
 		FMessageArchiver->saveNote(AWindow->streamJid(), AWindow->contactJid(), AMessage);
 
-	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);
+	fillContentOptions(AWindow->streamJid(),AWindow->contactJid(),options);
 	AWindow->viewWidget()->appendText(AMessage,options);
 }
 
@@ -708,26 +761,20 @@ void ChatMessageHandler::showStyledMessage(IMessageChatWindow *AWindow, const Me
 	options.kind = IMessageContentOptions::KindMessage;
 
 	options.time = AMessage.dateTime();
-	if (Options::node(OPV_MESSAGES_SHOWDATESEPARATORS).value().toBool())
-		options.timeFormat = FMessageStyles->timeFormat(options.time,options.time);
-	else
-		options.timeFormat = FMessageStyles->timeFormat(options.time);
-
 	if (options.time.secsTo(FWindowStatus.value(AWindow).createTime)>HISTORY_TIME_DELTA)
 		options.type |= IMessageContentOptions::TypeHistory;
 
-	if (AWindow->streamJid()==AMessage.to() || AMessage.to().isEmpty())
-		options.direction = IMessageContentOptions::DirectionIn;
-	else if (AWindow->streamJid()==AMessage.from() || AMessage.from().isEmpty())
+	if (AMessage.data(MDR_MESSAGE_DIRECTION).toInt() == IMessageProcessor::DirectionOut)
+	{
 		options.direction = IMessageContentOptions::DirectionOut;
-	else if (AWindow->contactJid() == AMessage.to())
-		options.direction = IMessageContentOptions::DirectionOut;
-	else if (AWindow->contactJid() == AMessage.from())
-		options.direction = IMessageContentOptions::DirectionIn;
+		fillContentOptions(AMessage.from(),AMessage.to(),options);
+	}
 	else
+	{
 		options.direction = IMessageContentOptions::DirectionIn;
+		fillContentOptions(AMessage.to(),AMessage.from(),options);
+	}
 
-	fillContentOptions(AWindow,options);
 	showDateSeparator(AWindow,options.time);
 	AWindow->viewWidget()->appendMessage(AMessage,options);
 }
@@ -813,13 +860,18 @@ void ChatMessageHandler::onWindowDestroyed()
 	{
 		LOG_STRM_INFO(window->streamJid(),QString("Chat window destroyed, with=%1").arg(window->contactJid().bare()));
 		removeNotifiedMessages(window);
+
 		if (FDestroyTimers.contains(window))
 			delete FDestroyTimers.take(window);
+
+		foreach(const QString &reqId, FHistoryRequests.keys(window))
+			FHistoryRequests.remove(reqId);
+		FHistoryMessages.remove(window);
+
 		FWindows.removeAt(FWindows.indexOf(window));
 		FWindowStatus.remove(window);
 		FPendingMessages.remove(window);
 		FPendingContent.remove(window);
-		FHistoryRequests.remove(FHistoryRequests.key(window));
 	}
 }
 
@@ -1064,10 +1116,9 @@ void ChatMessageHandler::onArchiveRequestFailed(const QString &AId, const XmppEr
 	if (FHistoryRequests.contains(AId))
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
-		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, with=%1, id=%2: %3").arg(window->contactJid().bare(),AId,AError.condition()));
+		LOG_STRM_WARNING(window->streamJid(),QString("Failed to load chat history, id=%1: %2").arg(AId,AError.condition()));
+		showHistory(window);
 		showStyledStatus(window,tr("Failed to load history: %1").arg(AError.errorMessage()),true);
-		FPendingMessages.remove(window);
-		FPendingContent.remove(window);
 	}
 }
 
@@ -1076,46 +1127,11 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 	if (FHistoryRequests.contains(AId))
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
-		window->viewWidget()->clearContent();
+		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded, id=%1").arg(AId));
 
-		int messageItEnd = 0;
-		QList<Message> pendingMessages = FPendingMessages.take(window);
-		while (messageItEnd<pendingMessages.count() && messageItEnd<ABody.messages.count())
-		{
-			const Message &hmessage = ABody.messages.at(messageItEnd);
-			const Message &pmessage = pendingMessages.at(pendingMessages.count()-messageItEnd-1);
-			if (hmessage.body()==pmessage.body() && qAbs(hmessage.dateTime().secsTo(pmessage.dateTime()))<HISTORY_DUBLICATE_DELTA)
-				messageItEnd++;
-			else
-				break;
-		}
-
-		int messageIt = ABody.messages.count()-1;
-		QMultiMap<QDateTime,QString>::const_iterator noteIt = ABody.notes.constBegin();
-		while (messageIt>=messageItEnd || noteIt!=ABody.notes.constEnd())
-		{
-			if (messageIt>=messageItEnd && (noteIt==ABody.notes.constEnd() || ABody.messages.at(messageIt).dateTime()<noteIt.key()))
-			{
-				showStyledMessage(window,ABody.messages.at(messageIt));
-				messageIt--;
-			}
-			else if (noteIt != ABody.notes.constEnd())
-			{
-				showStyledStatus(window,noteIt.value(),true,noteIt.key());
-				++noteIt;
-			}
-		}
-
-		foreach(const WindowContent &content, FPendingContent.take(window))
-		{
-			showDateSeparator(window,content.options.time);
-			window->viewWidget()->appendHtml(content.html,content.options);
-		}
-
-		WindowStatus &wstatus = FWindowStatus[window];
-		wstatus.startTime = !ABody.messages.isEmpty() ? ABody.messages.last().dateTime() : QDateTime();
-
-		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded and shown, with=%1, id=%2").arg(window->contactJid().bare(),AId));
+		FHistoryMessages[window].messages += ABody.messages;
+		FHistoryMessages[window].notes.unite(ABody.notes);
+		showHistory(window);
 	}
 }
 
@@ -1144,7 +1160,7 @@ void ChatMessageHandler::onStyleOptionsChanged(const IMessageStyleOptions &AOpti
 			if (style==NULL || !style->changeOptions(window->viewWidget()->styleWidget(),AOptions,false))
 			{
 				setMessageStyle(window);
-				showHistory(window);
+				requestHistory(window);
 			}
 		}
 	}

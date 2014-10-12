@@ -247,7 +247,7 @@ public:
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader) =0;
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest) =0;
 	//Archive Utilities
-	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const =0;
+	virtual void elementToCollection(const Jid &AStreamJid, const QDomElement &AChatElem, IArchiveCollection &ACollection) const =0;
 	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const =0;
 	//Archive Handlers
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler) =0;
@@ -280,6 +280,6 @@ protected:
 
 Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")
 Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.2")
-Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.2")
+Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.3")
 
 #endif // IMESSAGEARCHIVER_H

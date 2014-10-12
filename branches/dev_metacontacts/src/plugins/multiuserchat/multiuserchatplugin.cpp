@@ -512,13 +512,13 @@ bool MultiUserChatPlugin::messageCheck(int AOrder, const Message &AMessage, int 
 bool MultiUserChatPlugin::messageDisplay(const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AMessage);
-	return ADirection == IMessageProcessor::MessageIn;
+	return ADirection == IMessageProcessor::DirectionIn;
 }
 
 INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
 
@@ -1546,7 +1546,7 @@ void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
 			if (!reason.isEmpty())
 				declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
 
-			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::MessageOut))
+			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::DirectionOut))
 				LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.full()));
 			else
 				LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));

@@ -181,9 +181,11 @@ QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid
 			FStreamNames.insert(AStreamJid.bare(),name);
 		}
 		else
+		{
 			name = FStreamNames.value(AStreamJid.bare());
+		}
 	}
-	else if (AStreamJid && AContactJid)
+	else if (AStreamJid.pBare() == AContactJid.pBare())
 	{
 		name = !AContactJid.resource().isEmpty() ? AContactJid.resource() : AContactJid.uNode();
 	}

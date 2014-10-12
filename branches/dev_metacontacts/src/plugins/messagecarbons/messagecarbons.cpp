@@ -103,8 +103,8 @@ bool MessageCarbons::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanz
 				message.stanza().addElement("sent",NS_MESSAGE_CARBONS);
 				if (FMessageProcessor)
 				{
-					if (FMessageProcessor->processMessage(AStreamJid,message,IMessageProcessor::MessageOut))
-						FMessageProcessor->displayMessage(AStreamJid,message,IMessageProcessor::MessageOut);
+					if (FMessageProcessor->processMessage(AStreamJid,message,IMessageProcessor::DirectionOut))
+						FMessageProcessor->displayMessage(AStreamJid,message,IMessageProcessor::DirectionOut);
 				}
 				emit messageSent(AStreamJid,message);
 			}
@@ -113,8 +113,8 @@ bool MessageCarbons::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanz
 				message.stanza().addElement("received",NS_MESSAGE_CARBONS);
 				if (FMessageProcessor)
 				{
-					if (FMessageProcessor->processMessage(AStreamJid,message,IMessageProcessor::MessageIn))
-						FMessageProcessor->displayMessage(AStreamJid,message,IMessageProcessor::MessageIn);
+					if (FMessageProcessor->processMessage(AStreamJid,message,IMessageProcessor::DirectionIn))
+						FMessageProcessor->displayMessage(AStreamJid,message,IMessageProcessor::DirectionIn);
 				}
 				emit messageReceived(AStreamJid,message);
 			}
