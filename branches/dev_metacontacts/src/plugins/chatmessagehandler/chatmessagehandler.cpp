@@ -33,6 +33,7 @@
 #define HISTORY_MESSAGES          10
 #define HISTORY_TIME_DELTA        5
 #define HISTORY_DUBLICATE_DELTA   2*60
+#define HISTORY_COLLECTION_TIME   20*60
 
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
@@ -599,8 +600,21 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 
 		QList<Message> pending = FPendingMessages.take(AWindow);
 		IArchiveCollectionBody history = FHistoryMessages.take(AWindow);
-		qSort(history.messages.begin(),history.messages.end(),qGreater<Message>());
+		qStableSort(history.messages.begin(),history.messages.end(),qGreater<Message>());
+		
+		// Remove extra history messages
+		if (history.messages.count() > HISTORY_MESSAGES)
+		{
+			QDateTime removeTime;
+			for(QList<Message>::iterator it=history.messages.begin()+HISTORY_MESSAGES; it!=history.messages.end(); it = removeTime.isValid() ? history.messages.erase(it) : it+1)
+				if (it->dateTime().secsTo((it-1)->dateTime()) > HISTORY_COLLECTION_TIME)
+					removeTime = (it-1)->dateTime().addSecs(HISTORY_COLLECTION_TIME);
 
+			for(QMultiMap<QDateTime,QString>::iterator it=history.notes.upperBound(removeTime); removeTime.isValid() && it!=history.notes.end(); )
+				it = history.notes.erase(it);
+		}
+
+		// Remove duplicate history messages
 		int messageItEnd = 0;
 		while (messageItEnd<pending.count() && messageItEnd<history.messages.count())
 		{
@@ -612,6 +626,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 				break;
 		}
 
+		// Show history messages
 		int messageIt = history.messages.count()-1;
 		QMultiMap<QDateTime,QString>::const_iterator noteIt = history.notes.constBegin();
 		while (messageIt>=messageItEnd || noteIt!=history.notes.constEnd())
@@ -628,6 +643,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 			}
 		}
 
+		// Show pending content
 		foreach(const WindowContent &content, FPendingContent.take(AWindow))
 		{
 			showDateSeparator(AWindow,content.options.time);
@@ -1128,7 +1144,7 @@ void ChatMessageHandler::onArchiveMessagesLoaded(const QString &AId, const IArch
 	{
 		IMessageChatWindow *window = FHistoryRequests.take(AId);
 		LOG_STRM_INFO(window->streamJid(),QString("Chat history loaded, id=%1").arg(AId));
-
+		
 		FHistoryMessages[window].messages += ABody.messages;
 		FHistoryMessages[window].notes.unite(ABody.notes);
 		showHistory(window);

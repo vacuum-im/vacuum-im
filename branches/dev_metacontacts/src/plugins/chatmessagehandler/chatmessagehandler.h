@@ -139,7 +139,7 @@ private:
 	QMap<QString, IMessageChatWindow *> FHistoryRequests;
 	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
 	QMap<IMessageChatWindow *, QList<WindowContent> > FPendingContent;
-	QMap<IMessageChatWindow *, IArchiveCollectionBody > FHistoryMessages;
+	QMap<IMessageChatWindow *, IArchiveCollectionBody> FHistoryMessages;
 };
 
 #endif // CHATMESSAGEHANDLER_H
