@@ -1,6 +1,7 @@
 #ifndef ADVANCEDITEMMODEL_H
 #define ADVANCEDITEMMODEL_H
 
+#include <QPair>
 #include <QStandardItemModel>
 #include "advanceditem.h"
 #include "utilsexport.h"
@@ -84,7 +85,7 @@ private:
 	bool FDelayedDataChangedSignals;
 	bool FRecursiveParentDataChangedSignals;
 	QList<const QStandardItem *> FRemovingItems;
-	QMultiMap<QStandardItem *, int> FChangedItems;
+	QList<QPair<QStandardItem *, int> > FChangedItems;
 	QMultiMap<int, AdvancedItemSortHandler *> FItemSortHandlers;
 	QMap<int, QMultiMap<int, AdvancedItemDataHolder *> > FItemDataHolders;
 };

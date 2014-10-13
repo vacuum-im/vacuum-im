@@ -202,20 +202,28 @@ void AdvancedItemModel::removeItemDataHolder(int AOrder, AdvancedItemDataHolder 
 
 void AdvancedItemModel::insertChangedItem(QStandardItem *AItem, int ARole)
 {
+	QPair<QStandardItem *, int> item = qMakePair<QStandardItem *, int>(AItem,ARole);
 	if (FChangedItems.isEmpty())
 	{
+		FChangedItems.append(item);
 		QTimer::singleShot(0,this,SLOT(onEmitDelayedDataChangedSignals()));
-		FChangedItems.insertMulti(AItem,ARole);
 	}
-	else if (!FChangedItems.contains(AItem,ARole))
+	else
 	{
-		FChangedItems.insertMulti(AItem,ARole);
+		FChangedItems.removeOne(item);
+		FChangedItems.append(item);
 	}
 }
 
 void AdvancedItemModel::removeChangedItem(QStandardItem *AItem)
 {
-	FChangedItems.remove(AItem);
+	for (QList<QPair<QStandardItem *, int> >::iterator it=FChangedItems.begin(); it!=FChangedItems.end(); )
+	{
+		if (it->first == AItem)
+			it = FChangedItems.erase(it);
+		else
+			++it;
+	}
 }
 
 void AdvancedItemModel::emitItemInserted(QStandardItem *AItem)
@@ -289,22 +297,15 @@ void AdvancedItemModel::emitRecursiveParentDataChanged(QStandardItem *AParent)
 
 void AdvancedItemModel::onEmitDelayedDataChangedSignals()
 {
+	QStandardItem *lastItem = NULL;
 	while (!FChangedItems.isEmpty())
 	{
-		QStandardItem *lastItem = NULL;
-		for (QMultiMap<QStandardItem *, int>::iterator it=FChangedItems.begin(); it!=FChangedItems.end(); it=FChangedItems.erase(it))
-		{
-			int role = it.value();
-			QStandardItem *item = it.key();
-
-			if (lastItem != item)
-				emitItemChanged(item);
-
-			if (role >= FIRST_VALID_ROLE)
-				emit itemDataChanged(item,role);
-
-			lastItem = item;
-		}
+		QPair<QStandardItem *, int> item = FChangedItems.takeFirst();
+		if (lastItem != item.first)
+			emitItemChanged(item.first);
+		if (item.second >= FIRST_VALID_ROLE)
+			emit itemDataChanged(item.first,item.second);
+		lastItem = item.first;
 	}
 }
 
@@ -345,17 +346,12 @@ void AdvancedItemModel::onColumnsAboutToBeRemoved(const QModelIndex &AParent, in
 void AdvancedItemModel::onRowsOrColumnsRemoved(const QModelIndex &AParent, int AStart, int AEnd)
 {
 	Q_UNUSED(AStart); Q_UNUSED(AEnd);
-	for (QMap<QStandardItem *, int>::iterator it=FChangedItems.begin(); it!=FChangedItems.end(); )
+	for (QList<QPair<QStandardItem *, int> >::iterator it=FChangedItems.begin(); it!=FChangedItems.end(); )
 	{
-		if (FRemovingItems.contains(it.key()))
-		{
-			for (QStandardItem *item=it.key(); item==it.key() && it!=FChangedItems.end(); it=FChangedItems.erase(it))
-				;
-		}
+		if (FRemovingItems.contains(it->first))
+			it = FChangedItems.erase(it);
 		else
-		{
 			++it;
-		}
 	}
 	FRemovingItems.clear();
 	emitRecursiveParentDataChanged(itemFromIndex(AParent));
