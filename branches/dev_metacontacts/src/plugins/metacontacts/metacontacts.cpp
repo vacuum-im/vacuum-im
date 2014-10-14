@@ -49,7 +49,7 @@ MetaContacts::MetaContacts()
 	FRostersModel = NULL;
 	FRostersView = NULL;
 	FRostersViewPlugin = NULL;
-	FStatusChanger = NULL;
+	FStatusIcons = NULL;
 	FMessageWidgets = NULL;
 
 	FFilterProxyModel = new MetaSortFilterProxyModel(this,this);
@@ -156,10 +156,10 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
 	{
-		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
@@ -1701,14 +1701,26 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 	{
 		QMap<int, QStringList> rolesMap = indexesRolesMap(AIndexes,QList<int>()<<RDR_KIND<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_METACONTACT_ID);
 		
-		bool isMultiSelection = AIndexes.count()>1;
-
-		QStringList uniqueKinds = rolesMap.value(RDR_KIND).toSet().toList();
-		QStringList uniqueMetas = rolesMap.value(RDR_METACONTACT_ID).toSet().toList();
-
 		if (isReadyStreams(rolesMap.value(RDR_STREAM_JID)))
 		{
-			if (isMultiSelection && (uniqueMetas.count()>1 || uniqueMetas.value(0).isEmpty()))
+			bool isMultiSelection = AIndexes.count()>1;
+
+			QList<QUuid> uniqueMetas;
+			QMultiMap<Jid, Jid> uniqueContacts;
+			QStringList uniqueKinds = rolesMap.value(RDR_KIND).toSet().toList();
+			for(int i=0; i<rolesMap.value(RDR_STREAM_JID).count(); i++)
+			{
+				Jid streamJid = rolesMap.value(RDR_STREAM_JID).at(i);
+				Jid contactJid = rolesMap.value(RDR_PREP_BARE_JID).at(i);
+				QUuid metaId = rolesMap.value(RDR_METACONTACT_ID).at(i);
+
+				if (!metaId.isNull() && !uniqueMetas.contains(metaId))
+					uniqueMetas.append(metaId);
+				else if (metaId.isNull() && !uniqueContacts.contains(streamJid,contactJid))
+					uniqueContacts.insertMulti(streamJid,contactJid);
+			}
+
+			if (isMultiSelection && uniqueMetas.count()+uniqueContacts.count()>1)
 			{
 				Action *combineAction = new Action(AMenu);
 				combineAction->setText(tr("Combine Contacts..."));
@@ -1777,10 +1789,9 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 		if (AIndex->kind() == RIK_METACONTACT)
 		{
 			QStringList metaAvatars;
-			QStringList metaToolTips;
 			QMap<Jid, QString> metaAccounts;
 			QMap<Jid, QStringList> metaItems;
-			QList<IPresenceItem> metaResources;
+			QList<IPresenceItem> metaPresences;
 
 			for (int row=0; row<AIndex->childCount(); row++)
 			{
@@ -1794,8 +1805,6 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 					FRostersView->toolTipsForIndex(metaItemIndex,NULL,toolTips);
 					if (!toolTips.isEmpty())
 					{
-						static const QList<int> requiredToolTipOrders = QList<int>();
-
 						QString avatarToolTip = toolTips.value(RTTO_AVATAR_IMAGE);
 						if (!avatarToolTip.isEmpty() && metaAvatars.count()<10 && !metaAvatars.contains(avatarToolTip))
 							metaAvatars += avatarToolTip;
@@ -1807,28 +1816,14 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 						QString jidToolTip = toolTips.value(RTTO_ROSTERSVIEW_INFO_JABBERID);
 						if (!jidToolTip.isEmpty())
 							metaItems[streamJid].append(jidToolTip);
-
-						for (QMap<int, QString>::iterator it=toolTips.begin(); it!=toolTips.end(); )
-						{
-							if (!requiredToolTipOrders.contains(it.key()))
-								it = toolTips.erase(it);
-							else
-								++it;
-						}
-
-						if (!toolTips.isEmpty())
-						{
-							QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTips.values()).join("<p/><nbsp>"));
-							metaToolTips.append(tooltip);
-						}
 					}
 
 					IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;
 					if (presence)
 					{
 						foreach(const IPresenceItem &pItem, presence->findItems(itemJid))
-							if (pItem.show!=IPresence::Offline && !metaResources.contains(pItem))
-								metaResources.append(pItem);
+							if (pItem.show!=IPresence::Offline && !metaPresences.contains(pItem))
+								metaPresences.append(pItem);
 					}
 				}
 			}
@@ -1854,32 +1849,28 @@ void MetaContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALab
 				AToolTips.remove(RTTO_ROSTERSVIEW_INFO_JABBERID);
 			}
 
-			if (!metaToolTips.isEmpty())
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_STREAMS,QString("<span><hr>%1</span>").arg(metaToolTips.join("<hr><p/><nbsp>")));
-
-			metaResources = FPresencePlugin!=NULL ? FPresencePlugin->sortPresenceItems(metaResources) : metaResources;
-			for (int resIndex=0; resIndex<10 && resIndex<metaResources.count(); resIndex++)
+			metaPresences = FPresencePlugin!=NULL ? FPresencePlugin->sortPresenceItems(metaPresences) : metaPresences;
+			for (int resIndex=0; resIndex<10 && resIndex<metaPresences.count(); resIndex++)
 			{
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE,"<hr>");
+
 				int orderShift = resIndex*100;
-				IPresenceItem pItem = metaResources.at(resIndex);
+				IPresenceItem pItem = metaPresences.at(resIndex);
 
-				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(pItem.itemJid.uFull())).arg(pItem.priority));
-
-				if (FStatusChanger)
-					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME+orderShift,tr("<b>Status:</b> %1").arg(Qt::escape(FStatusChanger->nameByShow(pItem.show))));
+				QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(pItem.itemJid) : QString::null;
+				QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(pItem.show,SUBSCRIPTION_BOTH,false) : QString::null;
+				QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString::null;
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(Qt::escape(pItem.itemJid.uFull())).arg(pItem.priority));
 
 				if (!pItem.status.isEmpty())
 					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,Qt::escape(pItem.status).replace('\n',"<br>"));
 
-				if (resIndex < metaResources.count()-1)
+				if (resIndex < metaPresences.count()-1)
 					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
+
+				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE,"<hr>");
 			}
 
-			if (!AToolTips.contains(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE))
-			{
-				AToolTips.remove(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME);
-				AToolTips.remove(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT);
-			}
 			AToolTips.remove(RTTO_ROSTERSVIEW_INFO_ACCOUNT);
 			AToolTips.remove(RTTO_ROSTERSVIEW_INFO_SUBCRIPTION);
 		}

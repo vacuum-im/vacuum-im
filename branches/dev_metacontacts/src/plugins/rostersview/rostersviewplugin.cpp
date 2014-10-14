@@ -33,8 +33,8 @@
 
 RostersViewPlugin::RostersViewPlugin()
 {
+	FStatusIcons = NULL;
 	FRostersModel = NULL;
-	FStatusChanger = NULL;
 	FPresencePlugin = NULL;
 	FOptionsManager = NULL;
 	FAccountManager = NULL;
@@ -92,10 +92,10 @@ bool RostersViewPlugin::initConnections(IPluginManager *APluginManager, int &AIn
 			connect(FRostersModel->instance(),SIGNAL(indexDataChanged(IRosterIndex *, int)),SLOT(onRostersModelIndexDataChanged(IRosterIndex *, int)));
 	}
 
-	plugin = APluginManager->pluginInterface("IStatusChanger").value(0,NULL);
+	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
 	if (plugin)
 	{
-		FStatusChanger = qobject_cast<IStatusChanger *>(plugin->instance());
+		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
 	plugin = APluginManager->pluginInterface("IPresencePlugin").value(0,NULL);
@@ -658,21 +658,40 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 {
 	if (ALabelId == AdvancedDelegateItem::DisplayId)
 	{
+		Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+		Jid contactJid = AIndex->data(RDR_FULL_JID).toString();
+		QStringList resources = AIndex->data(RDR_RESOURCES).toStringList();
+
 		if (AIndex->kind() == RIK_CONTACTS_ROOT)
 		{
+			QStringList avatarsToolTips;
 			QStringList streamsToolTips;
-			foreach(const Jid &streamJid, FRostersView->rostersModel()->streams())
+			QList<Jid> streams = FRostersModel!=NULL ? FRostersModel->streams() : QList<Jid>();
+			foreach(const Jid &streamJid, streams)
 			{
 				QMap<int, QString> toolTips;
 				FRostersView->toolTipsForIndex(FRostersView->rostersModel()->streamIndex(streamJid),NULL,toolTips);
 				if (!toolTips.isEmpty())
 				{
-					toolTips.remove(RTTO_AVATAR_IMAGE);
+					QString avatarToolTip = toolTips.take(RTTO_AVATAR_IMAGE);
+					if (!avatarToolTip.isEmpty() && !avatarsToolTips.contains(avatarToolTip))
+						avatarsToolTips.append(avatarToolTip);
+
+					for (int resIndex=0; resIndex<10; resIndex++)
+					{
+						toolTips.remove(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE+(resIndex*100));
+						toolTips.remove(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE+(resIndex*100));
+					}
+
 					QString tooltip = QString("<span>%1</span>").arg(QStringList(toolTips.values()).join("<p/><nbsp>"));
 					streamsToolTips.append(tooltip);
 				}
 			}
-			AToolTips.insert(RTTO_ROSTERSVIEW_INFO_STREAMS,QString("<span>%1</span>").arg(streamsToolTips.join("<hr><p/><nbsp>")));
+
+			if (!avatarsToolTips.isEmpty())
+				AToolTips.insert(RTTO_AVATAR_IMAGE,QString("<span>%1</span>").arg(avatarsToolTips.join("<nbsp>")));
+			if (!streamsToolTips.isEmpty())
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_STREAMS,QString("<span>%1</span>").arg(streamsToolTips.join("<hr><p/><nbsp>")));
 		}
 		else
 		{
@@ -680,16 +699,14 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			if (!name.isEmpty())
 				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_NAME,"<big><b>" + Qt::escape(name) + "</b></big>");
 
-			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-			if (!streamJid.isEmpty() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
+			if (streamJid.isValid() && AIndex->kind()!=RIK_STREAM_ROOT && FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged)
 			{
 				IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
 				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())));
 			}
 
-			Jid itemJid = AIndex->data(RDR_FULL_JID).toString();
-			if (!itemJid.isEmpty())
-				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(itemJid.uBare())));
+			if (!contactJid.isEmpty())
+				AToolTips.insert(RTTO_ROSTERSVIEW_INFO_JABBERID,tr("<b>Jabber ID:</b> %1").arg(Qt::escape(contactJid.uBare())));
 
 			QString ask = AIndex->data(RDR_SUBSCRIPTION_ASK).toString();
 			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
@@ -710,45 +727,51 @@ void RostersViewPlugin::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32
 			}
 		}
 
-		QStringList resources = AIndex->data(RDR_RESOURCES).toStringList();
-		if (!resources.isEmpty())
+		if (streamJid.isValid() && !resources.isEmpty())
 		{
 			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE,"<hr>");
+
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AIndex->data(RDR_STREAM_JID).toString()) : NULL;
 			for(int resIndex=0; resIndex<10 && resIndex<resources.count(); resIndex++)
 			{
 				int orderShift = resIndex*100;
-				IPresenceItem pitem = presence!=NULL ? presence->findItem(resources.at(resIndex)) : IPresenceItem();
-				if (pitem.isValid)
+				IPresenceItem pItem = presence!=NULL ? presence->findItem(resources.at(resIndex)) : IPresenceItem();
+				if (pItem.isValid)
 				{
-					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(pitem.itemJid.resource())).arg(pitem.priority));
-
-					QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(pitem.show) : QString::null;
-					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME+orderShift,tr("<b>Status:</b> %1").arg(Qt::escape(statusName)));
-
-					if (!pitem.status.isEmpty())
-						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,Qt::escape(pitem.status).replace('\n',"<br>"));
+					QString resource = !pItem.itemJid.resource().isEmpty() ? pItem.itemJid.resource() : pItem.itemJid.uBare();
+					QString statusIcon = FStatusIcons!=NULL ? FStatusIcons->iconFileName(streamJid,pItem.itemJid) : QString::null;
+					AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME+orderShift,QString("<img src='%1'> %2 (%3)").arg(statusIcon).arg(Qt::escape(resource)).arg(pItem.priority));
+					
+					if (!pItem.status.isEmpty())
+						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT+orderShift,Qt::escape(pItem.status).replace('\n',"<br>"));
 
 					if (resIndex < resources.count()-1)
 						AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_MIDDLELINE+orderShift,"<hr>");
 				}
 			}
+
 			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE,"<hr>");
 		}
-		else if (!AIndex->data(RDR_FULL_JID).isNull() && !AIndex->data(RDR_SHOW).isNull())
+		else if (streamJid.isValid() && contactJid.isValid() && AIndex->data(RDR_SHOW).toInt()!=IPresence::Offline)
 		{
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_TOPLINE,"<hr>");
+
 			int show = AIndex->data(RDR_SHOW).toInt();
 			int priority = AIndex->data(RDR_PRIORITY).toInt();
-			QString resource = Jid(AIndex->data(RDR_FULL_JID).toString()).resource();
-			if (!resource.isEmpty() && show!=IPresence::Offline && show!=IPresence::Error)
-				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,tr("<b>Resource:</b> %1 (%2)").arg(Qt::escape(resource)).arg(priority));
+			QString subscription = AIndex->data(RDR_SUBSCRIBTION).toString();
+			bool subscription_ask = AIndex->data(RDR_SUBSCRIPTION_ASK).toString() == SUBSCRIPTION_SUBSCRIBE;
+			QString resource = !contactJid.resource().isEmpty() ? contactJid.resource() : contactJid.uBare();
 
-			QString statusName = FStatusChanger!=NULL ? FStatusChanger->nameByShow(show) : QString::null;
-			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_NAME,tr("<b>Status:</b> %1").arg(Qt::escape(statusName)));
+			QString statusIconSet = FStatusIcons!=NULL ? FStatusIcons->iconsetByJid(contactJid) : QString::null;
+			QString statusIconKey = FStatusIcons!=NULL ? FStatusIcons->iconKeyByStatus(show,subscription,subscription_ask) : QString::null;
+			QString statusIconFile = FStatusIcons!=NULL ? FStatusIcons->iconFileName(statusIconSet,statusIconKey) : QString::null;
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_NAME,QString("<img src='%1'> %2 (%3)").arg(statusIconFile).arg(Qt::escape(resource)).arg(priority));
 
 			QString statusText = AIndex->data(RDR_STATUS).toString();
 			if (!statusText.isEmpty())
 				AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_STATUS_TEXT,Qt::escape(statusText).replace('\n',"<br>"));
+
+			AToolTips.insert(RTTO_ROSTERSVIEW_RESOURCE_BOTTOMLINE,"<hr>");
 		}
 	}
 }

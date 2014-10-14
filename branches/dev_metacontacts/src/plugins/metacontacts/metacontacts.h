@@ -10,7 +10,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
-#include <interfaces/istatuschanger.h>
+#include <interfaces/istatusicons.h>
 #include <interfaces/imessagewidgets.h>
 #include "combinecontactsdialog.h"
 #include "metasortfilterproxymodel.h"
@@ -170,7 +170,7 @@ private:
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IStatusChanger *FStatusChanger;
+	IStatusIcons *FStatusIcons;
 	IMessageWidgets *FMessageWidgets;
 private:
 	QTimer FSaveTimer;
