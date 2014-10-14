@@ -160,7 +160,8 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
 		{
-			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
+			connect(FRostersModel->instance(),SIGNAL(layoutChanged(int)),SLOT(onRostersModelLayoutChanged(int)));
+			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRostersModelIndexDestroyed(IRosterIndex *)));
 		}
 	}
 
@@ -787,10 +788,10 @@ QList<IRosterIndex *> MultiUserChatPlugin::multiChatRosterIndexes() const
 
 IRosterIndex *MultiUserChatPlugin::findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const
 {
-	for (QList<IRosterIndex *>::const_iterator it= FChatIndexes.constBegin(); it!=FChatIndexes.constEnd(); ++it)
+	for (QList<IRosterIndex *>::const_iterator it=FChatIndexes.constBegin(); it!=FChatIndexes.constEnd(); ++it)
 	{
 		IRosterIndex *index = *it;
-		if (AStreamJid==index->data(RDR_STREAM_JID).toString() && (ARoomJid.isEmpty() || ARoomJid==index->data(RDR_PREP_BARE_JID).toString()))
+		if (AStreamJid==index->data(RDR_STREAM_JID).toString() && ARoomJid==index->data(RDR_PREP_BARE_JID).toString())
 			return index;
 	}
 	return NULL;
@@ -801,12 +802,9 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 	IRosterIndex *chatIndex = findMultiChatRosterIndex(AStreamJid,ARoomJid);
 	if (chatIndex == NULL)
 	{
-		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
-		if (sroot)
+		IRosterIndex *chatGroup = getConferencesGroupIndex(AStreamJid);
+		if (chatGroup)
 		{
-			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),sroot);
-			chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
-
 			chatIndex = FRostersModel->newRosterIndex(RIK_MUC_ITEM);
 			FChatIndexes.append(chatIndex);
 
@@ -838,7 +836,7 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 		}
 		else
 		{
-			REPORT_ERROR("Failed to get multi user chat roster index: Stream root index not found");
+			REPORT_ERROR("Failed to get multi user chat roster index: Conferences group index not created");
 		}
 	}
 	return chatIndex;
@@ -1039,6 +1037,18 @@ Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &
 	return action;
 }
 
+IRosterIndex *MultiUserChatPlugin::getConferencesGroupIndex(const Jid &AStreamJid) const
+{
+	IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
+	if (sroot)
+	{
+		IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),sroot);
+		chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
+		return chatGroup;
+	}
+	return NULL;
+}
+
 IMultiUserChatWindow *MultiUserChatPlugin::findMultiChatWindowForIndex(const IRosterIndex *AIndex) const
 {
 	IMultiUserChatWindow *window = NULL;
@@ -1167,6 +1177,26 @@ void MultiUserChatPlugin::onMultiChatWindowInfoToolTips(QMap<int,QString> &ATool
 	}
 }
 
+void MultiUserChatPlugin::onRostersModelLayoutChanged(int ABefore)
+{
+	Q_UNUSED(ABefore);
+	for (QList<IRosterIndex *>::const_iterator it=FChatIndexes.constBegin(); it!=FChatIndexes.constEnd(); ++it)
+	{
+		IRosterIndex *chatGroup = getConferencesGroupIndex((*it)->data(RDR_STREAM_JID).toString());
+		if (chatGroup)
+			FRostersModel->insertRosterIndex(*it,chatGroup);
+	}
+}
+
+void MultiUserChatPlugin::onRostersModelIndexDestroyed(IRosterIndex *AIndex)
+{
+	if (FChatIndexes.removeOne(AIndex))
+	{
+		emit multiChatRosterIndexDestroyed(AIndex);
+		updateRecentItemProxy(AIndex);
+	}
+}
+
 void MultiUserChatPlugin::onStatusIconsChanged()
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
@@ -1238,17 +1268,6 @@ void MultiUserChatPlugin::onCopyToClipboardActionTriggered( bool )
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 		QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
-}
-
-void MultiUserChatPlugin::onRosterIndexDestroyed(IRosterIndex *AIndex)
-{
-	int index = FChatIndexes.indexOf(AIndex);
-	if (index >= 0)
-	{
-		FChatIndexes.removeAt(index);
-		emit multiChatRosterIndexDestroyed(AIndex);
-		updateRecentItemProxy(AIndex);
-	}
 }
 
 void MultiUserChatPlugin::onActiveStreamRemoved(const Jid &AStreamJid)
