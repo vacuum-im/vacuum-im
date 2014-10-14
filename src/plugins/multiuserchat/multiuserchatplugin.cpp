@@ -160,7 +160,7 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
 		{
-			connect(FRostersModel->instance(),SIGNAL(layoutChanged(int)),SLOT(onRostersModelLayoutChanged(int)));
+			connect(FRostersModel->instance(),SIGNAL(streamsLayoutChanged(int)),SLOT(onRostersModelStreamsLayoutChanged(int)));
 			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRostersModelIndexDestroyed(IRosterIndex *)));
 		}
 	}
@@ -1177,7 +1177,7 @@ void MultiUserChatPlugin::onMultiChatWindowInfoToolTips(QMap<int,QString> &ATool
 	}
 }
 
-void MultiUserChatPlugin::onRostersModelLayoutChanged(int ABefore)
+void MultiUserChatPlugin::onRostersModelStreamsLayoutChanged(int ABefore)
 {
 	Q_UNUSED(ABefore);
 	for (QList<IRosterIndex *>::const_iterator it=FChatIndexes.constBegin(); it!=FChatIndexes.constEnd(); ++it)
