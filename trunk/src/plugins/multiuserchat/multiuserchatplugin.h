@@ -131,7 +131,7 @@ protected slots:
 	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
 protected slots:
-	void onRostersModelLayoutChanged(int ABefore);
+	void onRostersModelStreamsLayoutChanged(int ABefore);
 	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
 protected slots:
 	void onStatusIconsChanged();
