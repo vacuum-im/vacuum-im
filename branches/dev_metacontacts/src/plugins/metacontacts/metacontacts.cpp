@@ -1841,6 +1841,9 @@ void MetaContacts::onRostersViewIndexContextMenuAboutToShow()
 	Menu *proxyMenu = FProxyContextMenu.value(menu);
 	if (proxyMenu != NULL)
 	{
+		// Emit aboutToShow in proxyMenu
+		proxyMenu->popup(QPoint(0,0));
+
 		QStringList proxyActions;
 		foreach(Action *action, proxyMenu->groupActions())
 		{
@@ -1853,6 +1856,8 @@ void MetaContacts::onRostersViewIndexContextMenuAboutToShow()
 			if (proxyActions.contains(action->text()) && proxyMenu->actionGroup(action)==AG_NULL)
 				menu->removeAction(action);
 		}
+
+		proxyMenu->hide();
 	}
 }
 
