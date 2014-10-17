@@ -996,8 +996,6 @@ void MetaContacts::updateMetaIndexItems(IRosterIndex *AMetaIndex, const MetaMerg
 	QMap<Jid, QMap<Jid, IRosterIndex *> > &metaItemsRef = FMetaIndexItems[AMetaIndex];
 	QMap<Jid, QMap<Jid, IRosterIndex *> > oldMetaItems = metaItemsRef;
 
-	FMetaProxyToIndex.remove(FMetaIndexToProxy.take(AMetaIndex));
-
 	for(QMultiMap<Jid, Jid>::const_iterator itemIt=AMergedContact.items.constBegin(); itemIt!=AMergedContact.items.constEnd(); ++itemIt)
 	{
 		QMap<IRosterIndex *, IRosterIndex *> proxyIndexMap;
@@ -1028,10 +1026,12 @@ void MetaContacts::updateMetaIndexItems(IRosterIndex *AMetaIndex, const MetaMerg
 				FMetaItemProxyToIndex.insertMulti(proxyIndex,itemIndex);
 			}
 
-			if (itemIt.key()==AMergedContact.stream && itemIt.value()==AMergedContact.itemJid)
+			if (itemIt.key()==AMergedContact.stream && itemIt.value()==AMergedContact.itemJid && FMetaIndexToProxy.value(AMetaIndex)!=itemIndex)
 			{
+				FMetaProxyToIndex.remove(FMetaIndexToProxy.take(AMetaIndex));
 				FMetaIndexToProxy.insert(AMetaIndex,itemIndex);
 				FMetaProxyToIndex.insert(itemIndex,AMetaIndex);
+				emit rosterDataChanged(AMetaIndex,RDR_ANY_ROLE);
 			}
 
 			FRostersModel->insertRosterIndex(itemIndex,AMetaIndex);
@@ -1044,18 +1044,21 @@ void MetaContacts::updateMetaIndexItems(IRosterIndex *AMetaIndex, const MetaMerg
 
 		for(QMap<Jid, IRosterIndex *>::const_iterator itemIt=streamIt->constBegin(); itemIt!=streamIt->constEnd(); ++itemIt)
 		{
-			IRosterIndex *metaItemIndex = itemIt.value();
+			IRosterIndex *itemIndex = itemIt.value();
 
-			IRosterIndex *itemProxyIndex = FMetaItemIndexToProxy.take(metaItemIndex);
+			if (FMetaProxyToIndex.contains(itemIndex))
+				FMetaIndexToProxy.remove(FMetaProxyToIndex.take(itemIndex));
+
+			IRosterIndex *itemProxyIndex = FMetaItemIndexToProxy.take(itemIndex);
 			if (itemProxyIndex)
 			{
-				FMetaItemProxyToIndex.remove(itemProxyIndex,metaItemIndex);
+				FMetaItemProxyToIndex.remove(itemProxyIndex,itemIndex);
 				if (!FMetaItemProxyToIndex.contains(itemProxyIndex))
 					itemProxyIndex->setData(QVariant(),RDR_METACONTACT_ID);
 			}
 
 			metaItemsStreamRef.remove(itemIt.key());
-			FRostersModel->removeRosterIndex(metaItemIndex);
+			FRostersModel->removeRosterIndex(itemIndex);
 		}
 
 		if (metaItemsStreamRef.isEmpty())
