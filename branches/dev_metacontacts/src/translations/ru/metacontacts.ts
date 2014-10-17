@@ -47,10 +47,6 @@
         <translation>Разделить метаконтакт</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Resource:&lt;/b&gt; %1 (%2)</source>
-        <translation>&lt;b&gt;Ресурс:&lt;/b&gt; %1 (%2)</translation>
-    </message>
-    <message>
         <source>Rename</source>
         <translation>Переименовать</translation>
     </message>
@@ -65,10 +61,6 @@
     <message>
         <source>%1 - Chat</source>
         <translation>%1 - Чат</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Статус:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

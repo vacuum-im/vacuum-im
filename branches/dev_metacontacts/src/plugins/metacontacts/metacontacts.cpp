@@ -21,6 +21,8 @@
 #include <definitions/rosterclickhookerorders.h>
 #include <definitions/rosterdragdropmimetypes.h>
 #include <definitions/rosteredithandlerorders.h>
+#include <definitions/recentitemtypes.h>
+#include <definitions/recentitemproperties.h>
 #include <utils/widgetmanager.h>
 #include <utils/logger.h>
 
@@ -51,6 +53,7 @@ MetaContacts::MetaContacts()
 	FRostersViewPlugin = NULL;
 	FStatusIcons = NULL;
 	FMessageWidgets = NULL;
+	FRecentContacts = NULL;
 
 	FFilterProxyModel = new MetaSortFilterProxyModel(this,this);
 	FFilterProxyModel->setDynamicSortFilter(true);
@@ -156,12 +159,6 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
-	if (plugin)
-	{
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-	}
-
 	plugin = APluginManager->pluginInterface("IMessageWidgets").value(0,NULL);
 	if (plugin)
 	{
@@ -170,6 +167,25 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		{
 			connect(FMessageWidgets->instance(),SIGNAL(chatWindowCreated(IMessageChatWindow *)),SLOT(onMessageChatWindowCreated(IMessageChatWindow *)));
 		}
+	}
+
+	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
+	if (plugin)
+	{
+		FRecentContacts = qobject_cast<IRecentContacts *>(plugin->instance());
+		if (FRecentContacts)
+		{
+			connect(FRecentContacts->instance(),SIGNAL(recentContactsOpened(const Jid &)),SLOT(onRecentContactsOpened(const Jid &)));
+			connect(FRecentContacts->instance(),SIGNAL(recentItemAdded(const IRecentItem &)),SLOT(onRecentItemChanged(const IRecentItem &)));
+			connect(FRecentContacts->instance(),SIGNAL(recentItemChanged(const IRecentItem &)),SLOT(onRecentItemChanged(const IRecentItem &)));
+			connect(FRecentContacts->instance(),SIGNAL(recentItemRemoved(const IRecentItem &)),SLOT(onRecentItemRemoved(const IRecentItem &)));
+		}
+	}
+
+	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
+	if (plugin)
+	{
+		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
@@ -192,6 +208,10 @@ bool MetaContacts::initObjects()
 		FRostersView->insertProxyModel(FFilterProxyModel,RPO_METACONTACTS_FILTER);
 		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_METACONTACT,RDR_METACONTACT_ID);
 	}
+	if (FRecentContacts)
+	{
+		FRecentContacts->registerItemHandler(REIT_METACONTACT,this);
+	}
 	return true;
 }
 
@@ -210,8 +230,7 @@ QList<int> MetaContacts::rosterDataRoles(int AOrder) const
 	if (AOrder == RDHO_METACONTACTS)
 	{
 		static const QList<int> roles = QList<int>() << RDR_ALL_ROLES
-			<< RDR_FULL_JID << RDR_PREP_FULL_JID << RDR_PREP_BARE_JID
-			<< RDR_SHOW << RDR_STATUS << RDR_PRIORITY;
+			<< RDR_FULL_JID << RDR_PREP_FULL_JID << RDR_PREP_BARE_JID;
 		return roles;
 	}
 	return QList<int>();
@@ -234,6 +253,7 @@ QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 			case RDR_STREAM_JID:
 			case RDR_NAME:
 			case RDR_GROUP:
+			case RDR_FORCE_VISIBLE:
 			case RDR_METACONTACT_ID:
 				break;
 			case RDR_LABEL_ITEMS:
@@ -264,6 +284,8 @@ QVariant MetaContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int AR
 			case RDR_GROUP:
 			case RDR_METACONTACT_ID:
 				break;
+			case RDR_FORCE_VISIBLE:
+				return 1;
 			default:
 				proxy = FMetaItemIndexToProxy.value(AIndex);
 			}
@@ -557,6 +579,41 @@ AdvancedDelegateEditProxy *MetaContacts::rosterEditProxy(int AOrder, int ADataRo
 	return NULL;
 }
 
+bool MetaContacts::recentItemValid(const IRecentItem &AItem) const
+{
+	return FMetaContacts.contains(AItem.streamJid) ? FMetaContacts.value(AItem.streamJid).contains(AItem.reference) : true;
+}
+
+bool MetaContacts::recentItemCanShow(const IRecentItem &AItem) const
+{
+	return FMetaContacts.value(AItem.streamJid).contains(AItem.reference);
+}
+
+QIcon MetaContacts::recentItemIcon(const IRecentItem &AItem) const
+{
+	Q_UNUSED(AItem);
+	return QIcon();
+}
+
+QString MetaContacts::recentItemName(const IRecentItem &AItem) const
+{
+	QString name = AItem.properties.value(REIP_NAME).toString();
+	return !name.isEmpty() ? name : AItem.reference;
+}
+
+IRecentItem MetaContacts::recentItemForIndex(const IRosterIndex *AIndex) const
+{
+	IRecentItem item;
+	if (AIndex->kind() == RIK_METACONTACT)
+		item = FMetaRecentItems.value(getMetaIndexRoot(AIndex->data(RDR_STREAM_JID).toString())).value(AIndex->data(RDR_METACONTACT_ID).toString());
+	return item;
+}
+
+QList<IRosterIndex *> MetaContacts::recentItemProxyIndexes(const IRecentItem &AItem) const
+{
+	return findMetaIndexes(AItem.streamJid,QUuid(AItem.reference));
+}
+
 bool MetaContacts::setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex)
 {
 	Q_UNUSED(AModel);
@@ -845,6 +902,21 @@ MetaMergedContact MetaContacts::getMergedContact(const Jid &AStreamJid, const QU
 	return meta;
 }
 
+QList<IRecentItem> MetaContacts::findMetaRecentContacts(const Jid &AStreamJid, const QUuid &AMetaId) const
+{
+	QList<IRecentItem> items;
+	MetaMergedContact meta = getMergedContact(AStreamJid,AMetaId);
+	foreach(const Jid &streamJid, meta.items.uniqueKeys())
+	{
+		foreach(const IRecentItem &item, FRecentContacts->streamItems(streamJid))
+		{
+			if (item.type==REIT_CONTACT && FItemMetaId.value(item.streamJid).value(item.reference)==meta.id)
+				items.append(item);
+		}
+	}
+	return items;
+}
+
 void MetaContacts::updateMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId)
 {
 	IRosterIndex *sRoot = getMetaIndexRoot(AStreamJid);
@@ -1061,6 +1133,93 @@ void MetaContacts::updateMetaWindows(const Jid &AStreamJid, const QUuid &AMetaId
 	}
 }
 
+void MetaContacts::updateMetaRecentItems(const Jid &AStreamJid, const QUuid &AMetaId)
+{
+	if (FRecentContacts)
+	{
+		IRosterIndex *sRoot = getMetaIndexRoot(AStreamJid);
+		MetaMergedContact meta = getMergedContact(AStreamJid,AMetaId);
+		if (!meta.items.isEmpty())
+		{
+			int contactFavorite = 0;
+			IRecentItem recentContact;
+			QList<IRecentItem> recentMetas;
+			foreach(const Jid &streamJid, meta.items.uniqueKeys())
+			{
+				foreach(const IRecentItem &item, FRecentContacts->streamItems(streamJid))
+				{
+					if (item.type == REIT_CONTACT)
+					{
+						if (meta.items.contains(streamJid,item.reference))
+						{
+							if (recentContact.reference.isEmpty())
+								recentContact = item;
+							else if (recentContact.activeTime < item.activeTime)
+								recentContact = item;
+							if (item.properties.value(REIP_FAVORITE).toBool())
+								contactFavorite++;
+						}
+					}
+					else if (item.type == REIT_METACONTACT)
+					{
+						if (meta.id == item.reference)
+							recentMetas.append(item);
+					}
+				}
+			}
+
+			foreach(const IRecentItem &item, recentMetas)
+			{
+				if (recentContact.isNull() || recentContact.streamJid!=item.streamJid)
+				{
+					FUpdatingRecentItem = item;
+					FMetaRecentItems[sRoot].remove(AMetaId);
+
+					if (FRecentContacts->isReady(item.streamJid))
+						FRecentContacts->removeItem(item);
+					else
+						emit recentItemUpdated(item);
+				}
+			}
+
+			if (!recentContact.isNull())
+			{
+				IRecentItem item;
+				item.type = REIT_METACONTACT;
+				item.streamJid = recentContact.streamJid;
+				item.reference = meta.id.toString();
+
+				FUpdatingRecentItem = item;
+				FMetaRecentItems[sRoot].insert(AMetaId,item);
+
+				if (FRecentContacts->isReady(recentContact.streamJid))
+				{
+					FRecentContacts->setItemActiveTime(item,recentContact.activeTime);
+					FRecentContacts->setItemProperty(item,REIP_FAVORITE,contactFavorite>0);
+				}
+
+				emit recentItemUpdated(item);
+			}
+		}
+		else foreach(const IRecentItem &item, FRecentContacts->streamItems(AStreamJid))
+		{
+			if (item.type==REIT_METACONTACT && item.reference==meta.id)
+			{
+				FUpdatingRecentItem = item;
+				FMetaRecentItems[sRoot].remove(AMetaId);
+
+				if (FRecentContacts->isReady(item.streamJid))
+					FRecentContacts->removeItem(item);
+				else
+					emit recentItemUpdated(item);
+
+				break;
+			}
+		}
+		FUpdatingRecentItem = IRecentItem();
+	}
+}
+
 bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact)
 {
 	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
@@ -1126,6 +1285,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 
 			updateMetaIndexes(AStreamJid,after.id);
 			updateMetaWindows(AStreamJid,after.id);
+			updateMetaRecentItems(AStreamJid,after.id);
 
 			emit metaContactChanged(AStreamJid,after,before);
 			return true;
@@ -1144,7 +1304,7 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 
 void MetaContacts::updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts)
 {
-	QSet<QUuid> oldMetaId = FMetaContacts.value(AStreamJid).keys().toSet();
+	QSet<QUuid> oldMetaId = FMetaContacts[AStreamJid].keys().toSet();
 
 	foreach(const IMetaContact &meta, AMetaContacts)
 	{
@@ -1458,7 +1618,6 @@ void MetaContacts::saveMetaContactsToFile(const QString &AFileName, const QList<
 void MetaContacts::onRosterAdded(IRoster *ARoster)
 {
 	FLoadStreams += ARoster->streamJid();
-	FMetaContacts[ARoster->streamJid()].clear();
 	QTimer::singleShot(0,this,SLOT(onLoadContactsFromFileTimerTimeout()));
 }
 
@@ -1472,7 +1631,11 @@ void MetaContacts::onRosterRemoved(IRoster *ARoster)
 
 	QHash<QUuid, IMetaContact> metas = FMetaContacts.take(ARoster->streamJid());
 	foreach(const QUuid &metaId, metas.keys())
+	{
 		updateMetaIndexes(ARoster->streamJid(),metaId);
+		updateMetaRecentItems(ARoster->streamJid(),metaId);
+	}
+
 	saveMetaContactsToFile(metaContactsFileName(ARoster->streamJid()),metas.values());
 }
 
@@ -1589,10 +1752,14 @@ void MetaContacts::onRostersModelStreamsLayoutChanged(int ABefore)
 		}
 	}
 	
+	FMetaRecentItems.clear();
 	for (QMap<Jid, QHash<QUuid, IMetaContact> >::const_iterator streamIt=FMetaContacts.constBegin(); streamIt!=FMetaContacts.constEnd(); ++streamIt)
 	{
 		for(QHash<QUuid, IMetaContact>::const_iterator metaIt=streamIt->constBegin(); metaIt!=streamIt->constEnd(); ++metaIt)
+		{
 			updateMetaIndexes(streamIt.key(),metaIt.key());
+			updateMetaRecentItems(streamIt.key(),metaIt.key());
+		}
 	}
 	
 	QList<IMessageChatWindow *> metaChatWindows;
@@ -1956,6 +2123,87 @@ void MetaContacts::onMessageChatWindowDestroyed()
 					return;
 				}
 			}
+		}
+	}
+}
+
+void MetaContacts::onRecentContactsOpened(const Jid &AStreamJid)
+{
+	QSet<QUuid> updatedMetas;
+	foreach(const IRecentItem &item, FRecentContacts->streamItems(AStreamJid))
+	{
+		if (item.type == REIT_CONTACT)
+		{
+			QUuid metaId = FItemMetaId.value(AStreamJid).value(item.reference);
+			if (!metaId.isNull() && updatedMetas.contains(metaId))
+			{
+				updateMetaRecentItems(AStreamJid,metaId);
+				updatedMetas += metaId;
+			}
+		}
+		else if (item.type==REIT_METACONTACT && updatedMetas.contains(item.reference))
+		{
+			updateMetaRecentItems(AStreamJid,item.reference);
+			updatedMetas += item.reference;
+		}
+	}
+}
+
+void MetaContacts::onRecentItemChanged(const IRecentItem &AItem)
+{
+	if (FUpdatingRecentItem != AItem)
+	{
+		if (AItem.type == REIT_METACONTACT)
+		{
+			IRosterIndex *sRoot = getMetaIndexRoot(AItem.streamJid);
+			IRecentItem prevItem = FMetaRecentItems.value(sRoot).value(AItem.reference);
+			if (!prevItem.isNull() && prevItem.properties.value(REIP_FAVORITE)!=AItem.properties.value(REIP_FAVORITE))
+			{
+				bool isFavorite = AItem.properties.value(REIP_FAVORITE).toBool();
+				foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,AItem.reference))
+				{
+					if (FRecentContacts->isReady(item.streamJid))
+					{
+						FUpdatingRecentItem = item;
+						FRecentContacts->setItemProperty(item,REIP_FAVORITE,isFavorite);
+					}
+				}
+				FUpdatingRecentItem = IRecentItem();
+			}
+			FMetaRecentItems[sRoot].insert(AItem.reference,AItem);
+		}
+		else if (AItem.type == REIT_CONTACT)
+		{
+			QUuid metaId = FItemMetaId.value(AItem.streamJid).value(AItem.reference);
+			if (!metaId.isNull())
+				updateMetaRecentItems(AItem.streamJid,metaId);
+		}
+	}
+}
+
+void MetaContacts::onRecentItemRemoved(const IRecentItem &AItem)
+{
+	if (FUpdatingRecentItem != AItem)
+	{
+		if (AItem.type == REIT_METACONTACT)
+		{
+			IRosterIndex *sRoot = getMetaIndexRoot(AItem.streamJid);
+			FMetaRecentItems[sRoot].remove(AItem.reference);
+			foreach(const IRecentItem &item, findMetaRecentContacts(AItem.streamJid,AItem.reference))
+			{
+				if (FRecentContacts->isReady(item.streamJid))
+				{
+					FUpdatingRecentItem = item;
+					FRecentContacts->removeItem(item);
+				}
+			}
+			FUpdatingRecentItem = IRecentItem();
+		}
+		else if (AItem.type == REIT_CONTACT)
+		{
+			QUuid metaId = FItemMetaId.value(AItem.streamJid).value(AItem.reference);
+			if (!metaId.isNull())
+				updateMetaRecentItems(AItem.streamJid,metaId);
 		}
 	}
 }

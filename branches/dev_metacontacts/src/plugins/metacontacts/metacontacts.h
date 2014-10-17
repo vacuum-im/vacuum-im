@@ -12,6 +12,7 @@
 #include <interfaces/irostersview.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/imessagewidgets.h>
+#include <interfaces/irecentcontacts.h>
 #include "combinecontactsdialog.h"
 #include "metasortfilterproxymodel.h"
 
@@ -35,10 +36,11 @@ class MetaContacts :
 	public IRostersClickHooker,
 	public IRostersDragDropHandler,
 	public IRostersEditHandler,
+	public IRecentItemHandler,
 	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker IRostersDragDropHandler IRostersEditHandler);
+	Q_INTERFACES(IPlugin IMetaContacts IRosterDataHolder IRostersLabelHolder IRostersClickHooker IRostersDragDropHandler IRostersEditHandler IRecentItemHandler);
 public:
 	MetaContacts();
 	~MetaContacts();
@@ -69,6 +71,13 @@ public:
 	// IRostersEditHandler
 	virtual quint32 rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const;
 	virtual AdvancedDelegateEditProxy *rosterEditProxy(int AOrder, int ADataRole, const QModelIndex &AIndex);
+	// IRecentItemHandler
+	virtual bool recentItemValid(const IRecentItem &AItem) const;
+	virtual bool recentItemCanShow(const IRecentItem &AItem) const;
+	virtual QIcon recentItemIcon(const IRecentItem &AItem) const;
+	virtual QString recentItemName(const IRecentItem &AItem) const;
+	virtual IRecentItem recentItemForIndex(const IRosterIndex *AIndex) const;
+	virtual QList<IRosterIndex *> recentItemProxyIndexes(const IRecentItem &AItem) const;
 	// AdvancedDelegateEditProxy
 	virtual bool setModelData(const AdvancedItemDelegate *ADelegate, QWidget *AEditor, QAbstractItemModel *AModel, const QModelIndex &AIndex);
 	// IMetaContacts
@@ -90,12 +99,17 @@ signals:
 	void rosterDataChanged(IRosterIndex *AIndex, int ARole);
 	// IRostersLabelHolder
 	void rosterLabelChanged(quint32 ALabelId, IRosterIndex *AIndex = NULL);
+	// IRecentItemHandler
+	void recentItemUpdated(const IRecentItem &AItem);
 protected:
 	IRosterIndex *getMetaIndexRoot(const Jid &AStreamJid) const;
 	MetaMergedContact getMergedContact(const Jid &AStreamJid, const QUuid &AMetaId) const;
+	QList<IRecentItem> findMetaRecentContacts(const Jid &StreamJid, const QUuid &AMetaId) const;
+protected:
 	void updateMetaIndexes(const Jid &AStreamJid, const QUuid &AMetaId);
 	void updateMetaIndexItems(IRosterIndex *AMetaIndex, const MetaMergedContact &AMeta);
 	void updateMetaWindows(const Jid &AStreamJid, const QUuid &AMetaId);
+	void updateMetaRecentItems(const Jid &AStreamJid, const QUuid &AMetaId);
 	bool updateMetaContact(const Jid &AStreamJid, const IMetaContact &AMetaContact);
 	void updateMetaContacts(const Jid &AStreamJid, const QList<IMetaContact> &AMetaContacts);
 	void startUpdateMetaContact(const Jid &AStreamJid, const QUuid &AMetaId);
@@ -150,6 +164,10 @@ protected slots:
 	void onMessageChatWindowChanged();
 	void onMessageChatWindowDestroyed();
 protected slots:
+	void onRecentContactsOpened(const Jid &AStreamJid);
+	void onRecentItemChanged(const IRecentItem &AItem);
+	void onRecentItemRemoved(const IRecentItem &AItem);
+protected slots:
 	void onRemoveMetaItemsByAction();
 	void onCombineMetaItemsByAction();
 	void onRenameMetaContactByAction();
@@ -172,6 +190,7 @@ private:
 	IRostersViewPlugin *FRostersViewPlugin;
 	IStatusIcons *FStatusIcons;
 	IMessageWidgets *FMessageWidgets;
+	IRecentContacts *FRecentContacts;
 private:
 	QTimer FSaveTimer;
 	QTimer FUpdateTimer;
@@ -196,6 +215,9 @@ private:
 	QHash<const IRosterIndex *, QMap<Jid, QMap<Jid, IRosterIndex *> > > FMetaIndexItems;
 private:
 	QMap<const IRosterIndex *, QHash<QUuid, IMessageChatWindow *> > FMetaChatWindows;
+private:
+	IRecentItem FUpdatingRecentItem;
+	QMap<const IRosterIndex *, QHash<QUuid, IRecentItem> > FMetaRecentItems;
 };
 
 #endif // METACONTACTS_H

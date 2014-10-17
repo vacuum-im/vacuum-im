@@ -55,5 +55,9 @@
         <source>Hide Inactive Contacts</source>
         <translation>Hide Inactive Contacts</translation>
     </message>
+    <message>
+        <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

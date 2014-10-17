@@ -7,8 +7,9 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/iprivatestorage.h>
-#include <interfaces/istatusicons.h>
 #include <interfaces/imessageprocessor.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/istatusicons.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
 
@@ -158,6 +159,8 @@ private:
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
+	IMessageProcessor *FMessageProcessor;
+	IAccountManager *FAccountManager;
 	IStatusIcons *FStatusIcons;
 private:
 	quint32 FShowFavoriteLabelId;

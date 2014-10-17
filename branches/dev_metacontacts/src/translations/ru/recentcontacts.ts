@@ -55,5 +55,9 @@
         <source>Hide Inactive Contacts</source>
         <translation>Прятать неактивные контакты</translation>
     </message>
+    <message>
+        <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
+        <translation>&lt;b&gt;Аккаунт:&lt;/b&gt; %1</translation>
+    </message>
 </context>
 </TS>
