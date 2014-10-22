@@ -289,14 +289,6 @@
         <translation>Пошук в історії</translation>
     </message>
     <message>
-        <source>Conversation history - %1</source>
-        <translation>Історія повідомлення - %1</translation>
-    </message>
-    <message>
-        <source>Conversation history with %1 - %2</source>
-        <translation>Історія повідомлення з %1 - %2</translation>
-    </message>
-    <message>
         <source>Conversation headers loaded</source>
         <translation>Заголовки розмов завантажено</translation>
     </message>
@@ -373,36 +365,12 @@
         <translation>Не вдалося видалити розмови: %1</translation>
     </message>
     <message>
-        <source>Remove all History</source>
-        <translation>Видалити всю історію</translation>
-    </message>
-    <message>
-        <source>Remove History for %1 %2</source>
-        <translation>Видалити історію за %1 %2</translation>
-    </message>
-    <message>
         <source>Remove this Conversation</source>
         <translation>Видалити цю розмову</translation>
     </message>
     <message>
         <source>Conversation history removed successfully</source>
         <translation>Історія розмов успішно видалена</translation>
-    </message>
-    <message>
-        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</source>
-        <translation>Розмову з &lt;b&gt;%1&lt;/b&gt; в конференції %2 розпочато о &lt;b&gt;%3&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Розмову в конференції %1 розпочато о &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Розмову з %1 розпочато о &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Load earlier messages</source>
-        <translation>Завантажити більш ранні повідомлення</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
@@ -417,45 +385,64 @@
         <translation>dd MMM, dddd</translation>
     </message>
     <message>
-        <source>Show history for this contact</source>
-        <translation>Показати історію для цього контакту</translation>
-    </message>
-    <message>
-        <source>All messages loaded</source>
-        <translation>Всі повідомлення завантажені</translation>
-    </message>
-    <message>
-        <source>Load message earlier %1</source>
-        <translation>Завантажити повідомлення раніше %1</translation>
-    </message>
-    <message>
-        <source>dd MMM yyyy</source>
-        <comment>Load messages earlier date</comment>
-        <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
-        <translation>dd MMM yyyy</translation>
-    </message>
-    <message>
         <source>Search in text</source>
         <translation>Пошук по тексту</translation>
     </message>
-</context>
-<context>
-    <name>ArchiveViewWindowClass</name>
     <message>
-        <source>Update</source>
-        <translation>Оновити</translation>
+        <source>Conversation History</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Next</source>
-        <translation>Наступне</translation>
+        <source>Conversations are not found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Previous</source>
-        <translation>Попереднє</translation>
+        <source>Conversation is not selected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Case sensitively</source>
-        <translation>Із врахуванням регістру</translation>
+        <source>Search is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load more conversations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All conversations loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversation headers are not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Contact History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all History with %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove History for %1</source>
+        <translation type="unfinished">Видалити історію за %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

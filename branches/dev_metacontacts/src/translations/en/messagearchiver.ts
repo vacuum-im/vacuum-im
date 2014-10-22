@@ -286,14 +286,6 @@
         <translation>Search in history</translation>
     </message>
     <message>
-        <source>Conversation history - %1</source>
-        <translation>Conversation history - %1</translation>
-    </message>
-    <message>
-        <source>Conversation history with %1 - %2</source>
-        <translation>Conversation history with %1 - %2</translation>
-    </message>
-    <message>
         <source>Conversation headers loaded</source>
         <translation>Conversation headers loaded</translation>
     </message>
@@ -368,36 +360,12 @@
         <translation>Failed to remove conversations: %1</translation>
     </message>
     <message>
-        <source>Remove all History</source>
-        <translation>Remove all History</translation>
-    </message>
-    <message>
-        <source>Remove History for %1 %2</source>
-        <translation>Remove History for %1 %2</translation>
-    </message>
-    <message>
         <source>Remove this Conversation</source>
         <translation>Remove this Conversation</translation>
     </message>
     <message>
         <source>Conversation history removed successfully</source>
         <translation>Conversation history removed successfully</translation>
-    </message>
-    <message>
-        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</source>
-        <translation>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Load earlier messages</source>
-        <translation>Load earlier messages</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
@@ -412,45 +380,64 @@
         <translation>dd MMM, dddd</translation>
     </message>
     <message>
-        <source>Show history for this contact</source>
-        <translation>Show history for this contact</translation>
-    </message>
-    <message>
-        <source>All messages loaded</source>
-        <translation>All messages loaded</translation>
-    </message>
-    <message>
-        <source>Load message earlier %1</source>
-        <translation>Load message earlier %1</translation>
-    </message>
-    <message>
-        <source>dd MMM yyyy</source>
-        <comment>Load messages earlier date</comment>
-        <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
-        <translation>dd MMM yyyy</translation>
-    </message>
-    <message>
         <source>Search in text</source>
         <translation>Search in text</translation>
     </message>
-</context>
-<context>
-    <name>ArchiveViewWindowClass</name>
     <message>
-        <source>Update</source>
-        <translation>Update</translation>
+        <source>Conversation History</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Next</source>
-        <translation>Next</translation>
+        <source>Conversations are not found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Previous</source>
-        <translation>Previous</translation>
+        <source>Conversation is not selected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Case sensitively</source>
-        <translation>Case sensitively</translation>
+        <source>Search is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load more conversations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All conversations loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversation headers are not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Contact History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all History with %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove History for %1</source>
+        <translation type="unfinished">Remove History for %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

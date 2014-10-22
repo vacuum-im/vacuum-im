@@ -119,9 +119,9 @@ struct IArchiveCollection
 {
 	IArchiveHeader header;
 	IDataForm attributes;
+	IArchiveCollectionBody body;
 	IArchiveCollectionLink next;
 	IArchiveCollectionLink previous;
-	IArchiveCollectionBody body;
 	bool operator<(const IArchiveCollection &AOther) const {
 		return header<AOther.header;
 	}
@@ -226,7 +226,7 @@ public:
 	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual QString archiveDirPath(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const =0;
-	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null) =0;
+	virtual QWidget *showArchiveWindow(const QMultiMap<Jid,Jid> &AAddresses) =0;
 	//Archive Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const =0;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
@@ -280,6 +280,6 @@ protected:
 
 Q_DECLARE_INTERFACE(IArchiveHandler,"Vacuum.Plugin.IArchiveHandler/1.1")
 Q_DECLARE_INTERFACE(IArchiveEngine,"Vacuum.Plugin.IArchiveEngine/1.2")
-Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.3")
+Q_DECLARE_INTERFACE(IMessageArchiver,"Vacuum.Plugin.IMessageArchiver/1.4")
 
 #endif // IMESSAGEARCHIVER_H

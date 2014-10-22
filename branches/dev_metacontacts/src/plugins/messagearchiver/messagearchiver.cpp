@@ -671,17 +671,11 @@ bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeature
 	return isReady(AStreamJid) && FFeatures.value(AStreamJid).contains(AFeatureNS);
 }
 
-QWidget *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid)
+QWidget *MessageArchiver::showArchiveWindow(const QMultiMap<Jid,Jid> &AAddresses)
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-	if (roster)
-	{
-		ArchiveViewWindow *window = new ArchiveViewWindow(FPluginManager,this,roster);
-		window->setContactJid(AContactJid);
-		WidgetManager::showActivateRaiseWindow(window);
-		return window;
-	}
-	return NULL;
+	ArchiveViewWindow *window = new ArchiveViewWindow(FPluginManager,this,AAddresses);
+	WidgetManager::showActivateRaiseWindow(window);
+	return window;
 }
 
 QString MessageArchiver::prefsNamespace(const Jid &AStreamJid) const
@@ -2167,14 +2161,14 @@ bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected
 		singleKind = index->kind();
 	}
 	return !ASelected.isEmpty();
-
 }
 
 Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const
 {
 	bool isMultiSelection = AStreams.count()>1;
-	bool isStreamMenu = Jid(AStreams.first()).pBare()==Jid(AContacts.first()).pBare();
+	bool isStreamMenu = AContacts.first().isEmpty();
 
+	bool isAnyMangement = false;
 	bool isAllAutoSave = true;
 	bool isAllSupported = true;
 	bool isAllPrefsEnabled = true;
@@ -2203,20 +2197,21 @@ Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStr
 
 			isAllDefaultPrefs = isAllDefaultPrefs && !archivePrefs(AStreams.at(i)).itemPrefs.contains(AContacts.at(i));
 		}
+
+		isAnyMangement = isAnyMangement || !engineOrderByCapability(AStreams.at(i),IArchiveEngine::ArchiveManagement).isEmpty();
 	}
 
 	Menu *menu = new Menu(AParent);
 	menu->setTitle(tr("History"));
 	menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
 
-	if (!isMultiSelection && !engineOrderByCapability(AStreams.at(0),IArchiveEngine::ArchiveManagement).isEmpty())
+	if (isAnyMangement)
 	{
 		Action *viewAction = new Action(menu);
 		viewAction->setText(tr("View History"));
 		viewAction->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
-		viewAction->setData(ADR_STREAM_JID,AStreams.first());
-		if (!isStreamMenu)
-			viewAction->setData(ADR_CONTACT_JID,AContacts.first());
+		viewAction->setData(ADR_STREAM_JID,AStreams);
+		viewAction->setData(ADR_CONTACT_JID,AContacts);
 		viewAction->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
 		connect(viewAction,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByAction(bool)));
 		menu->addAction(viewAction,AG_DEFAULT,false);
@@ -2571,13 +2566,17 @@ void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
 		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_SHOWHISTORY && indexes.count()==1 && isSelectionAccepted(indexes))
+		if (AId==SCT_ROSTERVIEW_SHOWHISTORY && isSelectionAccepted(indexes))
 		{
-			IRosterIndex *index = indexes.first();
-			if (index->kind() == RIK_STREAM_ROOT)
-				showArchiveWindow(index->data(RDR_STREAM_JID).toString());
-			else
-				showArchiveWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
+			QMultiMap<Jid,Jid> addresses;
+			foreach(IRosterIndex *index, indexes)
+			{
+				if (index->kind() == RIK_STREAM_ROOT)
+					addresses.insertMulti(index->data(RDR_STREAM_JID).toString(),Jid::null);
+				else
+					addresses.insertMulti(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
+			}
+			showArchiveWindow(addresses);
 		}
 	}
 }
@@ -2591,9 +2590,16 @@ void MessageArchiver::onRostersViewIndexContextMenu(const QList<IRosterIndex *> 
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
+		int indexKind = AIndexes.first()->kind();
+		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,
+			QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_ANY_ROLE,RDR_PREP_BARE_JID,RDR_STREAM_JID);
 		
-		Menu *menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),AMenu);
+		Menu *menu;
+		if (indexKind == RIK_STREAM_ROOT)
+			menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_ANY_ROLE),AMenu);
+		else
+			menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),AMenu);
+
 		if (!menu->isEmpty())
 			AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
 		else
@@ -2603,7 +2609,7 @@ void MessageArchiver::onRostersViewIndexContextMenu(const QList<IRosterIndex *> 
 
 void MessageArchiver::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
-	Menu *menu = createContextMenu(QStringList()<<AWindow->streamJid().full(),QStringList()<<AUser->contactJid().full(),AMenu);
+	Menu *menu = createContextMenu(QStringList()<<AWindow->streamJid().pFull(),QStringList()<<AUser->contactJid().pFull(),AMenu);
 	if (!menu->isEmpty())
 		AMenu->addAction(menu->menuAction(),AG_MUCM_ARCHIVER,true);
 	else
@@ -2706,9 +2712,12 @@ void MessageArchiver::onShowArchiveWindowByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-		showArchiveWindow(streamJid,contactJid);
+		QMultiMap<Jid,Jid> addresses;
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
+		QStringList contacts = action->data(ADR_CONTACT_JID).toStringList();
+		for(int i=0; i<streams.count() && i<contacts.count(); i++)
+			addresses.insertMulti(streams.at(i),contacts.at(i));
+		showArchiveWindow(addresses);
 	}
 }
 
@@ -2719,7 +2728,7 @@ void MessageArchiver::onShowArchiveWindowByToolBarAction(bool)
 	{
 		IMessageToolBarWidget *toolBarWidget = qobject_cast<IMessageToolBarWidget *>(action->parent());
 		if (toolBarWidget)
-			showArchiveWindow(toolBarWidget->messageWindow()->streamJid(),toolBarWidget->messageWindow()->contactJid());
+			showArchiveWindow(toolBarWidget->messageWindow()->address()->availAddresses(true));
 	}
 }
 
