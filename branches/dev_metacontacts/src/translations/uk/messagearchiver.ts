@@ -289,10 +289,6 @@
         <translation>Пошук в історії</translation>
     </message>
     <message>
-        <source>Conversation headers loaded</source>
-        <translation>Заголовки розмов завантажено</translation>
-    </message>
-    <message>
         <source>Loading conversation headers...</source>
         <translation>Завантаження заголовків розмов...</translation>
     </message>
@@ -301,24 +297,8 @@
         <translation>Не вдалося завантажити заголовки розмов: %1</translation>
     </message>
     <message>
-        <source>Select contact or single conversation</source>
-        <translation>Виберіть контакт чи окрему розмову</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n conversation(s) loaded</source>
-        <translation>
-            <numerusform>%n розмова завантажена</numerusform>
-            <numerusform>%n розмови завантажено</numerusform>
-            <numerusform>%n розмов завантажено</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Loading conversations...</source>
         <translation>Завантаження розмов...</translation>
-    </message>
-    <message>
-        <source>Loading %1 of %2 conversations...</source>
-        <translation>Завантаження %1 з %2 розмов...</translation>
     </message>
     <message>
         <source>Failed to load conversations: %1</source>
@@ -371,18 +351,6 @@
     <message>
         <source>Conversation history removed successfully</source>
         <translation>Історія розмов успішно видалена</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <comment>Date group name</comment>
-        <translatorcomment>Наименование группы даты</translatorcomment>
-        <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>dd MMM, dddd</source>
-        <comment>Conversation name</comment>
-        <translatorcomment>Наименование разговора</translatorcomment>
-        <translation>dd MMM, dddd</translation>
     </message>
     <message>
         <source>Search in text</source>
@@ -442,6 +410,30 @@
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation header(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Select conversation to show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation(s) shown</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Shown %1 of %2 conversations...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -138,6 +138,7 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	FModel = new QStandardItemModel(this);
 	FProxyModel = new SortFilterProxyModel(FModel);
 	FProxyModel->setSourceModel(FModel);
+	FProxyModel->setDynamicSortFilter(true);
 	FProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
 
 	QFont messagesFont = ui.tbrMessages->font();
@@ -548,7 +549,7 @@ void ArchiveViewWindow::setHeaderStatus(RequestStatus AStatus, const QString &AM
 		connect(FHeaderActionLabel,SIGNAL(linkActivated(QString)),SLOT(onHeadersLoadMoreLinkClicked()));
 
 		if (!FCollections.isEmpty())
-			ui.stbStatusBar->showMessage(tr("Conversation headers loaded"));
+			ui.stbStatusBar->showMessage(tr("%n conversation header(s) found",0,FCollections.count()));
 		else
 			ui.stbStatusBar->showMessage(tr("Conversation headers are not found"));
 
@@ -579,9 +580,9 @@ void ArchiveViewWindow::setMessageStatus(RequestStatus AStatus, const QString &A
 	if (AStatus == RequestFinished)
 	{
 		if (FSelectedHeaders.isEmpty())
-			ui.stbStatusBar->showMessage(tr("Select contact or single conversation"));
+			ui.stbStatusBar->showMessage(tr("Select conversation to show"));
 		else
-			ui.stbStatusBar->showMessage(tr("%n conversation(s) loaded",0,FSelectedHeaders.count()));
+			ui.stbStatusBar->showMessage(tr("%n conversation(s) shown",0,FSelectedHeaders.count()));
 		onTextSearchStart();
 	}
 	else if(AStatus == RequestStarted)
@@ -589,7 +590,7 @@ void ArchiveViewWindow::setMessageStatus(RequestStatus AStatus, const QString &A
 		if (FSelectedHeaders.isEmpty())
 			ui.stbStatusBar->showMessage(tr("Loading conversations..."));
 		else
-			ui.stbStatusBar->showMessage(tr("Loading %1 of %2 conversations...").arg(FSelectedHeaderIndex+1).arg(FSelectedHeaders.count()));
+			ui.stbStatusBar->showMessage(tr("Shown %1 of %2 conversations...").arg(FSelectedHeaderIndex+1).arg(FSelectedHeaders.count()));
 	}
 	else if (AStatus == RequestError)
 	{
@@ -599,7 +600,7 @@ void ArchiveViewWindow::setMessageStatus(RequestStatus AStatus, const QString &A
 
 QStandardItem *ArchiveViewWindow::createHeaderItem(const ArchiveHeader &AHeader)
 {
-	QStandardItem *item = new QStandardItem(AHeader.start.toString(tr("dd MMM, dddd","Conversation name")));
+	QStandardItem *item = new QStandardItem(AHeader.start.toString("dd MMM, ddd"));
 	
 	item->setData(HIT_HEADER,HDR_TYPE);
 	item->setData(AHeader.stream.pFull(),HDR_HEADER_STREAM);
@@ -633,11 +634,11 @@ QStandardItem *ArchiveViewWindow::createParentItem(const ArchiveHeader &AHeader)
 		else
 			item = createContactItem(AHeader.stream,AHeader.with,item);
 	}
-	
-	item = createDateGroupItem(AHeader.start,item);
 
 	if (!FAddresses.contains(AHeader.stream,AHeader.with) && isConferencePrivateChat(AHeader.with))
 		item = createPrivateChatItem(AHeader.stream,AHeader.with,item);
+
+	item = createDateGroupItem(AHeader.start,item);
 
 	return item;
 }
@@ -648,7 +649,7 @@ QStandardItem *ArchiveViewWindow::createDateGroupItem(const QDateTime &ADateTime
 	QStandardItem *item = findItem(HIT_DATEGROUP,HDR_DATEGROUP_DATE,date,AParent);
 	if (item == NULL)
 	{
-		item = new QStandardItem(date.toString(tr("MMMM yyyy","Date group name")));
+		item = new QStandardItem(date.toString("MMMM yyyy"));
 		item->setData(HIT_DATEGROUP,HDR_TYPE);
 		item->setData(date,HDR_DATEGROUP_DATE);
 		item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_HISTORY_DATE));
@@ -892,7 +893,7 @@ QString ArchiveViewWindow::showInfo(const ArchiveCollection &ACollection)
 		}
 		FViewOptions.lastSubject = ACollection.header.subject;
 	}
-	infoHash += "~"+ACollection.header.subject;
+	infoHash += "~"+subject;
 
 	QString html;
 	if (FViewOptions.lastInfo != infoHash)

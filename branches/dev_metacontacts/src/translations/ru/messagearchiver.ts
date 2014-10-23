@@ -289,10 +289,6 @@
         <translation>Поиск в истории</translation>
     </message>
     <message>
-        <source>Conversation headers loaded</source>
-        <translation>Заголовки разговоров загружены</translation>
-    </message>
-    <message>
         <source>Loading conversation headers...</source>
         <translation>Загрузка заголовков разговоров...</translation>
     </message>
@@ -301,24 +297,8 @@
         <translation>Не удалось загрузить заголовки разговоров: %1</translation>
     </message>
     <message>
-        <source>Select contact or single conversation</source>
-        <translation>Выберите контакт или отдельный разговор</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n conversation(s) loaded</source>
-        <translation>
-            <numerusform>%n разговор загружен</numerusform>
-            <numerusform>%n разговора загружено</numerusform>
-            <numerusform>%n разговоров загружено</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Loading conversations...</source>
         <translation>Загрузка разговоров...</translation>
-    </message>
-    <message>
-        <source>Loading %1 of %2 conversations...</source>
-        <translation>Загрузка %1 из %2 разговоров...</translation>
     </message>
     <message>
         <source>Failed to load conversations: %1</source>
@@ -371,18 +351,6 @@
     <message>
         <source>Conversation history removed successfully</source>
         <translation>История разговоров успешно удалена</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <comment>Date group name</comment>
-        <translatorcomment>Наименование группы даты</translatorcomment>
-        <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>dd MMM, dddd</source>
-        <comment>Conversation name</comment>
-        <translatorcomment>Наименование разговора</translatorcomment>
-        <translation>dd MMM, dddd</translation>
     </message>
     <message>
         <source>Search in text</source>
@@ -443,6 +411,30 @@
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
         <translation>&lt;b&gt;%1&lt;/b&gt; с %2</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation header(s) found</source>
+        <translation>
+            <numerusform>%n заголовок разговоров найден</numerusform>
+            <numerusform>%n заголовка разговоров найдено</numerusform>
+            <numerusform>%n заголовков разговоров найдено</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Select conversation to show</source>
+        <translation>Выберите разговор для отображения</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation(s) shown</source>
+        <translation>
+            <numerusform>%n разговор показан</numerusform>
+            <numerusform>%n разговора показано</numerusform>
+            <numerusform>%n разговоров показано</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Shown %1 of %2 conversations...</source>
+        <translation>Показано %1 из %2 разговоров...</translation>
     </message>
 </context>
 <context>

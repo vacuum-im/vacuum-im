@@ -286,10 +286,6 @@
         <translation>Search in history</translation>
     </message>
     <message>
-        <source>Conversation headers loaded</source>
-        <translation>Conversation headers loaded</translation>
-    </message>
-    <message>
         <source>Loading conversation headers...</source>
         <translation>Loading conversation headers...</translation>
     </message>
@@ -298,23 +294,8 @@
         <translation>Failed to load conversation headers: %1</translation>
     </message>
     <message>
-        <source>Select contact or single conversation</source>
-        <translation>Select contact or single conversation</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n conversation(s) loaded</source>
-        <translation>
-            <numerusform>%n conversation(s) loaded</numerusform>
-            <numerusform>%n conversation(s) loaded</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Loading conversations...</source>
         <translation>Loading conversations...</translation>
-    </message>
-    <message>
-        <source>Loading %1 of %2 conversations...</source>
-        <translation>Loading %1 of %2 conversations...</translation>
     </message>
     <message>
         <source>Failed to load conversations: %1</source>
@@ -366,18 +347,6 @@
     <message>
         <source>Conversation history removed successfully</source>
         <translation>Conversation history removed successfully</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <comment>Date group name</comment>
-        <translatorcomment>Наименование группы даты</translatorcomment>
-        <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>dd MMM, dddd</source>
-        <comment>Conversation name</comment>
-        <translatorcomment>Наименование разговора</translatorcomment>
-        <translation>dd MMM, dddd</translation>
     </message>
     <message>
         <source>Search in text</source>
@@ -437,6 +406,28 @@
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation header(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Select conversation to show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation(s) shown</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Shown %1 of %2 conversations...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
