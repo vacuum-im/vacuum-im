@@ -10,11 +10,14 @@ class MetaSortFilterProxyModel :
 	Q_OBJECT;
 public:
 	MetaSortFilterProxyModel(IMetaContacts *AMetaContacts, QObject *AParent);
+	bool isHideContacts() const;
+	void setHideContacts(bool AHide);
 protected:
-	bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
 	bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
 private:
 	IMetaContacts *FMetaContacts;
+private:
+	bool FHideContacts;
 };
 
 #endif // METASORTFILTERPROXYMODEL_H

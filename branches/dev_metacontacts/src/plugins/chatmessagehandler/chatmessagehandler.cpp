@@ -408,7 +408,6 @@ bool ChatMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, co
 		IMessageChatWindow *window = getWindow(AStreamJid,AContactJid);
 		if (window)
 		{
-			window->address()->setAddress(AStreamJid,AContactJid);
 			if (AShowMode == IMessageHandler::SM_ASSIGN)
 				window->assignTabPage();
 			else if (AShowMode == IMessageHandler::SM_SHOW)

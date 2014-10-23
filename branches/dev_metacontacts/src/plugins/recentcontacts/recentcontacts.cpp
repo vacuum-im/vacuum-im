@@ -1350,27 +1350,33 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 		}
 		else if (isSelectionAccepted(AIndexes))
 		{
-			bool ready = true;
-
+			bool allReady = true;
+			bool allFavorite = true;
+			bool anyFavorite = false;
 			QMap<int, QStringList> rolesMap;
 			foreach(IRosterIndex *index, AIndexes)
 			{
-				IRecentItem item = rosterIndexItem(index);
+				IRecentItem item = findRealItem(rosterIndexItem(index));
+
+				if (item.properties.value(REIP_FAVORITE).toBool())
+					anyFavorite = true;
+				else
+					allFavorite = false;
+
 				rolesMap[RDR_RECENT_TYPE].append(item.type);
 				rolesMap[RDR_STREAM_JID].append(item.streamJid.full());
 				rolesMap[RDR_RECENT_REFERENCE].append(item.reference);
-				ready = ready && isReady(item.streamJid);
+				allReady = allReady && isReady(item.streamJid);
 			}
 
-			if (ready)
+			if (allReady)
 			{
 				QHash<int,QVariant> data;
 				data.insert(ADR_RECENT_TYPE,rolesMap.value(RDR_RECENT_TYPE));
 				data.insert(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
 				data.insert(ADR_RECENT_REFERENCE,rolesMap.value(RDR_RECENT_REFERENCE));
 
-				bool favorite = findRealItem(rosterIndexItem(AIndexes.value(0))).properties.value(REIP_FAVORITE).toBool();
-				if (isMultiSelection || !favorite)
+				if (!allFavorite)
 				{
 					Action *insertFavorite = new Action(AMenu);
 					insertFavorite->setText(tr("Add to Favorites"));
@@ -1381,7 +1387,7 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 					AMenu->addAction(insertFavorite,AG_RVCM_RECENT_FAVORITES);
 
 				}
-				if (isMultiSelection || favorite)
+				if (anyFavorite)
 				{
 					Action *removeFavorite = new Action(AMenu);
 					removeFavorite->setText(tr("Remove from Favorites"));

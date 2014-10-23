@@ -766,6 +766,9 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 		{
 			FViewOptions.style = NULL;
 		}
+
+		FViewOptions.lastInfo = QString::null;
+		FViewOptions.lastSubject = QString::null;
 	}
 
 	FViewOptions.lastTime = QDateTime();
@@ -799,7 +802,7 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 			{
 				options.type |= IMessageContentOptions::TypeGroupchat;
 				options.direction = IMessageContentOptions::DirectionIn;
-				options.senderName = Qt::escape(senderJid.resource());
+				options.senderName = Qt::escape(!senderJid.resource().isEmpty() ? senderJid.resource() : senderJid.uNode());
 				options.senderColor = FViewOptions.style!=NULL ? FViewOptions.style->senderColor(options.senderName) : "blue";
 			}
 			else if (direction == IMessageProcessor::DirectionIn)

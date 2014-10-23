@@ -39,8 +39,8 @@
 
 static const IMetaContact NullMetaContact = IMetaContact();
 
-static const QList<int> DragKinds = QList<int>() << RIK_CONTACT << RIK_METACONTACT_ITEM << RIK_METACONTACT;
-static const QList<int> DropKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_CONTACT << RIK_METACONTACT_ITEM << RIK_METACONTACT;
+static const QList<int> DragKinds = QList<int>() << RIK_CONTACT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> DropKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_CONTACT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
 
 MetaContacts::MetaContacts()
 {
@@ -2341,6 +2341,20 @@ void MetaContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			{
 				QMap<int, QStringList> rolesMap = indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_METACONTACT_ID);
 				renameMetaContact(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_METACONTACT_ID));
+			}
+		}
+		else if (false && hasProxiedIndexes(indexes))
+		{
+			QList<IRosterIndex *> proxies = indexesProxies(indexes);
+			if (!proxies.isEmpty() && FRostersView->isSelectionAcceptable(proxies))
+			{
+				FFilterProxyModel->setHideContacts(false);
+
+				FRostersView->setSelectedRosterIndexes(proxies);
+				Shortcuts::activateShortcut(AId,AWidget);
+				FRostersView->setSelectedRosterIndexes(indexes);
+
+				FFilterProxyModel->setHideContacts(true);
 			}
 		}
 	}

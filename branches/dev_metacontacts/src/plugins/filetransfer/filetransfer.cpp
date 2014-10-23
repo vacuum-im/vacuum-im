@@ -38,8 +38,6 @@
 
 #define REMOVE_FINISHED_TIMEOUT       10000
 
-static const QList<int> FileTransferRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
-
 FileTransfer::FileTransfer()
 {
 	FRosterPlugin = NULL;
@@ -820,9 +818,10 @@ void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
 		if (AId==SCT_ROSTERVIEW_SENDFILE && indexes.count()==1)
 		{
-			IRosterIndex *index = indexes.first();
-			if (FileTransferRosterKinds.contains(index->kind()))
-				sendFile(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
+			Jid streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
+			Jid contactJid = indexes.first()->data(RDR_FULL_JID).toString();
+			if (isSupported(streamJid,contactJid))
+				sendFile(streamJid,contactJid);
 		}
 	}
 }

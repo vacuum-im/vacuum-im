@@ -44,8 +44,10 @@ StateWidget::StateWidget(IChatStates *AChatStates, IMessageChatWindow *AWindow, 
 	connect(FChatStates->instance(),SIGNAL(userChatStateChanged(const Jid &, const Jid &, int)),
 		SLOT(onUserChatStateChanged(const Jid &, const Jid &, int)));
 
-	onPermitStatusChanged(FWindow->contactJid(),FChatStates->permitStatus(FWindow->contactJid()));
-	onUserChatStateChanged(FWindow->streamJid(),FWindow->contactJid(),FChatStates->userChatState(FWindow->streamJid(),FWindow->contactJid()));
+	connect(FWindow->address()->instance(),SIGNAL(addressChanged(const Jid &, const Jid &)),
+		SLOT(onWindowAddressChanged(const Jid &, const Jid &)));
+
+	onWindowAddressChanged(FWindow->streamJid(),FWindow->contactJid());
 }
 
 StateWidget::~StateWidget()
@@ -65,7 +67,7 @@ void StateWidget::onStatusActionTriggered(bool)
 
 void StateWidget::onPermitStatusChanged(const Jid &AContactJid, int AStatus)
 {
-	if (FWindow->contactJid() && AContactJid)
+	if (FWindow->contactJid().pBare() == AContactJid.pBare())
 	{
 		foreach(Action *action, FMenu->groupActions(AG_DEFAULT))
 			action->setChecked(action->data(ADR_PERMIT_STATUS).toInt()==AStatus);
@@ -113,4 +115,11 @@ void StateWidget::onUserChatStateChanged(const Jid &AStreamJid, const Jid &ACont
 		setText(state);
 		IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,iconKey);
 	}
+}
+
+void StateWidget::onWindowAddressChanged(const Jid &AStreamBefore, const Jid &AContactBefore)
+{
+	Q_UNUSED(AStreamBefore); Q_UNUSED(AContactBefore);
+	onPermitStatusChanged(FWindow->contactJid(),FChatStates->permitStatus(FWindow->contactJid()));
+	onUserChatStateChanged(FWindow->streamJid(),FWindow->contactJid(),FChatStates->userChatState(FWindow->streamJid(),FWindow->contactJid()));
 }

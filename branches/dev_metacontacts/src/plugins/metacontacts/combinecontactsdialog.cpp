@@ -34,19 +34,22 @@ CombineContactsDialog::CombineContactsDialog(IPluginManager *APluginManager, IMe
 
 		for (int i=0; i<AStreams.count(); i++)
 		{
+			QUuid metaId = AMetas.at(i);
 			Jid streamJid = AStreams.at(i);
-
-			IMetaContact meta = FMetaContacts->findMetaContact(streamJid,QUuid(AMetas.at(i)));
-			if (!meta.isNull())
+			if (!metaId.isNull())
 			{
-				foreach(const Jid &itemJid, meta.items)
-					if (!FMetaItems.contains(streamJid,itemJid))
-						FMetaItems.insertMulti(streamJid,itemJid);
+				foreach(const Jid &metaStream, FMetaContacts->findMetaStreams(metaId))
+				{
+					IMetaContact meta = FMetaContacts->findMetaContact(metaStream,metaId);
 
-				if (!meta.name.isEmpty())
-					metaNames.append(meta.name);
+					foreach(const Jid &itemJid, meta.items)
+						if (!FMetaItems.contains(metaStream,itemJid))
+							FMetaItems.insertMulti(metaStream,itemJid);
 
-				FMetaId = meta.id;
+					if (!meta.name.isEmpty())
+						metaNames.append(meta.name);
+				}
+				FMetaId = metaId;
 			}
 			else if (!FMetaItems.contains(streamJid,AContacts.at(i)))
 			{

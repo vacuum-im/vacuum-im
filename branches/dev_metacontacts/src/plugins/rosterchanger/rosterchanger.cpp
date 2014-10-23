@@ -551,8 +551,10 @@ bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHo
 
 quint32 RosterChanger::rosterEditLabel(int AOrder, int ADataRole, const QModelIndex &AIndex) const
 {
+	static const QList<int> acceptKinds = QList<int>() << RIK_GROUP << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT_ITEM;
+
 	int indexKind = AIndex.data(RDR_KIND).toInt();
-	if (AOrder==REHO_ROSTERCHANGER_RENAME && ADataRole==RDR_NAME && (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP || indexKind==RIK_METACONTACT_ITEM))
+	if (AOrder==REHO_ROSTERCHANGER_RENAME && ADataRole==RDR_NAME && acceptKinds.contains(indexKind))
 	{
 		if (indexKind == RIK_GROUP)
 		{
