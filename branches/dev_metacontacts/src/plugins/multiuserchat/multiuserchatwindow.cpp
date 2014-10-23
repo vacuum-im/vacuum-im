@@ -17,6 +17,8 @@
 #include <definitions/toolbargroups.h>
 #include <definitions/actiongroups.h>
 #include <definitions/recentitemtypes.h>
+#include <definitions/rosterindexkinds.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/rosternotifyorders.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/multiuserdataroles.h>
@@ -482,6 +484,14 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					FActiveChatMessages.insertMulti(window, messageId);
 					updateListItem(userJid);
 				}
+			}
+			if (notify.kinds & INotification::RosterNotify)
+			{
+				QMap<QString,QVariant> searchData;
+				searchData.insert(QString::number(RDR_KIND),RIK_MUC_ITEM);
+				searchData.insert(QString::number(RDR_STREAM_JID),streamJid().pFull());
+				searchData.insert(QString::number(RDR_PREP_BARE_JID),userJid.pBare());
+				notify.data.insert(NDR_ROSTER_SEARCH_DATA,searchData);
 			}
 			if (notify.kinds & INotification::PopupWindow)
 			{
