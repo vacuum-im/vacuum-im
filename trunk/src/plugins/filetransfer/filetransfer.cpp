@@ -813,14 +813,15 @@ void FileTransfer::onToolBarWidgetDestroyed(QObject *AObject)
 
 void FileTransfer::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance() && !FRostersViewPlugin->rostersView()->hasMultiSelection())
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_SENDFILE)
+		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SENDFILE && indexes.count()==1)
 		{
-			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
-				sendFile(index->data(RDR_STREAM_JID).toString(),index->data(RDR_FULL_JID).toString());
+			Jid streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
+			Jid contactJid = indexes.first()->data(RDR_FULL_JID).toString();
+			if (isSupported(streamJid,contactJid))
+				sendFile(streamJid,contactJid);
 		}
 	}
 }

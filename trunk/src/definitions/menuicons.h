@@ -113,6 +113,11 @@
 #define MNI_MESSAGEWIDGETS_QUOTE        "messagewidgetsQuote"
 #define MNI_MESSAGEWIDGETS_SELECT       "messagewidgetsSelect"
 
+//MetaContacts
+#define MNI_METACONTACTS_COMBINE        "metacontactsCombine"
+#define MNI_METACONTACTS_DETACH         "metacontactsDetach"
+#define MNI_METACONTACTS_DESTROY        "metacontactsDestroy"
+
 //MultiUserChat
 #define MNI_MUC_CONFERENCE              "mucConference"
 #define MNI_MUC_JOIN                    "mucJoin"

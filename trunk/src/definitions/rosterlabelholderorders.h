@@ -6,5 +6,6 @@
 
 #define RLHO_AVATARS                             1000
 #define RLHO_ROSTERSVIEW                         1000
+#define RLHO_METACONTACTS                        1000
 
 #endif //DEF_ROSTERLABELHOLDERORDERS_H

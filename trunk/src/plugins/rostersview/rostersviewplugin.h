@@ -9,7 +9,7 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
-#include <interfaces/istatuschanger.h>
+#include <interfaces/istatusicons.h>
 #include "rostersview.h"
 #include "sortfilterproxymodel.h"
 
@@ -82,8 +82,8 @@ protected slots:
 	void onShowOfflineContactsAction(bool AChecked);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 private:
+	IStatusIcons *FStatusIcons;
 	IRostersModel *FRostersModel;
-	IStatusChanger *FStatusChanger;
 	IPresencePlugin *FPresencePlugin;
 	IOptionsManager *FOptionsManager;
 	IAccountManager *FAccountManager;

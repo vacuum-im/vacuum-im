@@ -720,7 +720,7 @@ QList<Message> RemoteControl::notifiedMessages(const Jid &AStreamJid, const Jid 
 		foreach(int messageId, FMessageProcessor->notifiedMessages())
 		{
 			Message message = FMessageProcessor->notifiedMessage(messageId);
-			if(AStreamJid==message.to() && message.data(MDR_MESSAGE_DIRECTION).toInt()==IMessageProcessor::MessageIn)
+			if(AStreamJid==message.to() && message.data(MDR_MESSAGE_DIRECTION).toInt()==IMessageProcessor::DirectionIn)
 			{
 				if (message.type()!=Message::Error && !message.body().isEmpty())
 				{

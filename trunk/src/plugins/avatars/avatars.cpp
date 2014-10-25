@@ -39,7 +39,7 @@
 #define UNKNOWN_AVATAR            QString::null
 #define EMPTY_AVATAR              QString("")
 
-static const QList<int> RosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
+static const QList<int> AvatarRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
 
 Avatars::Avatars()
 {
@@ -348,28 +348,22 @@ QList<int> Avatars::rosterDataRoles(int AOrder) const
 
 QVariant Avatars::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const
 {
-	if (AOrder == RDHO_AVATARS)
+	if (AOrder==RDHO_AVATARS && AvatarRosterKinds.contains(AIndex->kind()))
 	{
-		switch (AIndex->kind())
+		switch (ARole)
 		{
-		case RIK_STREAM_ROOT:
-		case RIK_CONTACT:
-			switch (ARole)
+		case RDR_AVATAR_IMAGE:
 			{
-			case RDR_AVATAR_IMAGE:
-				{
-					bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
-					QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
-					if (avatar.isNull() && FShowEmptyAvatars)
-						avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
-					return avatar;
-				}
-			case RDR_AVATAR_HASH:
-				{
-					return avatarHash(AIndex->data(RDR_FULL_JID).toString());
-				}
+				bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
+				QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
+				if (avatar.isNull() && FShowEmptyAvatars)
+					avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
+				return avatar;
 			}
-			break;
+		case RDR_AVATAR_HASH:
+			{
+				return avatarHash(AIndex->data(RDR_FULL_JID).toString());
+			}
 		}
 	}
 	return QVariant();
@@ -641,8 +635,8 @@ void Avatars::updateDataHolder(const Jid &AContactJid)
 		QMultiMap<int,QVariant> findData;
 		if (!AContactJid.isEmpty())
 			findData.insert(RDR_PREP_BARE_JID,AContactJid.pBare());
-		findData.insert(RDR_KIND,RIK_STREAM_ROOT);
-		findData.insert(RDR_KIND,RIK_CONTACT);
+		foreach(int kind, AvatarRosterKinds)
+			findData.insertMulti(RDR_KIND,kind);
 
 		QList<IRosterIndex *> indexes = FRostersModel->rootIndex()->findChilds(findData,true);
 		foreach(IRosterIndex *index, indexes)
@@ -725,13 +719,11 @@ bool Avatars::updateIqAvatar(const Jid &AContactJid, const QString &AHash)
 
 bool Avatars::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptTypes = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT;
-
 	int singleKind = -1;
 	foreach(IRosterIndex *index, ASelected)
 	{
 		int indexKind = index->kind();
-		if (!acceptTypes.contains(indexKind))
+		if (!AvatarRosterKinds.contains(indexKind))
 			return false;
 		else if (singleKind!=-1 && singleKind!=indexKind)
 			return false;
@@ -796,7 +788,7 @@ void Avatars::onVCardChanged(const Jid &AContactJid)
 
 void Avatars::onRosterIndexInserted(IRosterIndex *AIndex)
 {
-	if (FRostersViewPlugin && RosterKinds.contains(AIndex->kind()))
+	if (FRostersViewPlugin && AvatarRosterKinds.contains(AIndex->kind()))
 	{
 		Jid contactJid = AIndex->data(RDR_PREP_BARE_JID).toString();
 		if (!FVCardAvatars.contains(contactJid))
@@ -837,7 +829,7 @@ void Avatars::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 
 			AMenu->addAction(avatar->menuAction(),AG_RVCM_AVATARS,true);
 		}
-		else if (indexKind == RIK_CONTACT)
+		else
 		{
 			Menu *picture = new Menu(AMenu);
 			picture->setTitle(tr("Custom picture"));
@@ -864,7 +856,7 @@ void Avatars::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexe
 
 void Avatars::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips)
 {
-	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && RosterKinds.contains(AIndex->kind()))
+	if ((ALabelId==AdvancedDelegateItem::DisplayId || ALabelId == FAvatarLabelId) && AvatarRosterKinds.contains(AIndex->kind()))
 	{
 		QString hash = AIndex->data(RDR_AVATAR_HASH).toString();
 		if (hasAvatar(hash))

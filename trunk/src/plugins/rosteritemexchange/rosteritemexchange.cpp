@@ -37,6 +37,8 @@
 #define SHC_ROSTERX_IQ         "/iq/x[@xmlns='" NS_ROSTERX "']"
 #define SHC_ROSTERX_MESSAGE    "/message/x[@xmlns='" NS_ROSTERX "']"
 
+static const QList<int> DragRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_GROUP << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+
 RosterItemExchange::RosterItemExchange()
 {
 	FGateways = NULL;
@@ -314,8 +316,7 @@ bool RosterItemExchange::messageViewDropAction(IMessageViewWidget *AWidget, cons
 Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	int indexKind = AIndex->data(RDR_KIND).toInt();
-	if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
+	if (DragRosterKinds.contains(AIndex->kind()))
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -328,8 +329,7 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 
-		int indexKind = indexData.value(RDR_KIND).toInt();
-		if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_GROUP)
+		if (DragRosterKinds.contains(indexData.value(RDR_KIND).toInt()))
 		{
 			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
 			if (!indexJid.node().isEmpty())
@@ -438,43 +438,46 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 		operator>>(stream,indexData);
 		
 		int indexKind = indexData.value(RDR_KIND).toInt();
-		if (indexKind == RIK_GROUP)
+		if (DragRosterKinds.contains(indexKind))
 		{
-			QList<Jid> totalContacts;
-			foreach(const Jid &streamJid, indexData.value(RDR_STREAMS).toStringList())
+			if (indexKind == RIK_GROUP)
 			{
-				IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
-				QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
-				for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
+				QList<Jid> totalContacts;
+				foreach(const Jid &streamJid, indexData.value(RDR_STREAMS).toStringList())
 				{
-					if (!totalContacts.contains(it->itemJid))
+					IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+					QList<IRosterItem> ritems = roster!=NULL ? roster->groupItems(indexData.value(RDR_GROUP).toString()) : QList<IRosterItem>();
+					for (QList<IRosterItem>::iterator it = ritems.begin(); it!=ritems.end(); ++it)
 					{
-						it->groups.clear();
-						it->groups += indexData.value(RDR_NAME).toString();
-						contactList.append(*it);
-						totalContacts.append(it->itemJid);
+						if (!totalContacts.contains(it->itemJid))
+						{
+							it->groups.clear();
+							it->groups += indexData.value(RDR_NAME).toString();
+							contactList.append(*it);
+							totalContacts.append(it->itemJid);
+						}
 					}
 				}
 			}
-		}
-		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
-		{
-			IRosterItem ritem;
-			ritem.isValid = true;
-			ritem.itemJid = indexData.value(RDR_PREP_BARE_JID).toString();
-			ritem.name = indexData.value(RDR_NAME).toString();
-			contactList.append(ritem);
-		}
-
-		if (!contactList.isEmpty())
-		{
-			QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
-			for (QList<IRosterItem>::iterator it=contactList.begin(); it!=contactList.end(); )
+			else
 			{
-				if (!it->itemJid.node().isEmpty() && services.contains(it->itemJid.domain()))
-					it = contactList.erase(it);
-				else
-					++it;
+				IRosterItem ritem;
+				ritem.isValid = true;
+				ritem.itemJid = indexData.value(RDR_PREP_BARE_JID).toString();
+				ritem.name = indexData.value(RDR_NAME).toString();
+				contactList.append(ritem);
+			}
+
+			if (!contactList.isEmpty())
+			{
+				QList<Jid> services = FGateways!=NULL ? FGateways->streamServices(indexData.value(RDR_STREAM_JID).toString()) : QList<Jid>();
+				for (QList<IRosterItem>::iterator it=contactList.begin(); it!=contactList.end(); )
+				{
+					if (!it->itemJid.node().isEmpty() && services.contains(it->itemJid.domain()))
+						it = contactList.erase(it);
+					else
+						++it;
+				}
 			}
 		}
 	}

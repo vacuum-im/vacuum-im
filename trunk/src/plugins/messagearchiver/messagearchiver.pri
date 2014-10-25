@@ -1,21 +1,20 @@
 FORMS = archivestreamoptions.ui \
-        archiveviewwindow.ui \
-        selectpagewidget.ui
+        archiveviewwindow.ui
 
 HEADERS = archivestreamoptions.h \ 
           archiveenginesoptions.h\
           chatwindowmenu.h \
+          archiveviewtreeview.h \
           archiveviewwindow.h \
           messagearchiver.h \
-          selectpagewidget.h \
           archivereplicator.h \
           replicateworker.h
           
 SOURCES = archivestreamoptions.cpp \
           archiveenginesoptions.cpp \
           chatwindowmenu.cpp \
+          archiveviewtreeview.cpp \
           archiveviewwindow.cpp \
           messagearchiver.cpp \
-          selectpagewidget.cpp \
           archivereplicator.cpp \
           replicateworker.cpp

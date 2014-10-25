@@ -26,6 +26,7 @@ public:
 	virtual QString iconsetByJid(const Jid &AContactJid) const =0;
 	virtual QString iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QString iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const =0;
+	virtual QString iconFileName(const Jid &AStreamJid, const Jid &AContactJid) const =0;
 	virtual QString iconFileName(const QString &ASubStorage, const QString &AIconKey) const =0;
 protected:
 	virtual void defaultIconsetChanged(const QString &ASubStorage) =0;
@@ -35,6 +36,6 @@ protected:
 	virtual void statusIconsChanged() =0;
 };
 
-Q_DECLARE_INTERFACE(IStatusIcons,"Vacuum.Plugin.IStatusIcons/1.0")
+Q_DECLARE_INTERFACE(IStatusIcons,"Vacuum.Plugin.IStatusIcons/1.1")
 
-#endif
+#endif // ISTATUSICONS_H

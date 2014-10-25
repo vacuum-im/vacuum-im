@@ -1182,8 +1182,8 @@ void RostersView::mousePressEvent(QMouseEvent *AEvent)
 
 void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 {
-	if (FRostersModel && !FStartDragFailed && AEvent->buttons()!=Qt::NoButton && FPressedIndex.isValid() && 
-		(AEvent->pos()-FPressedPos).manhattanLength()>QApplication::startDragDistance() && selectedIndexes().count()==1)
+	if (FRostersModel && !FStartDragFailed && FPressedIndex.isValid() && AEvent->buttons()!=Qt::NoButton &&
+		 (AEvent->pos()-FPressedPos).manhattanLength()>QApplication::startDragDistance() && selectedIndexes().count()==1)
 	{
 		IRosterIndex *index = FRostersModel->rosterIndexFromModelIndex(mapToModel(FPressedIndex));
 		
@@ -1209,11 +1209,13 @@ void RostersView::mouseMoveEvent(QMouseEvent *AEvent)
 				option.state &= ~QStyle::State_Selected;
 				option.state &= ~QStyle::State_MouseOver;
 				option.rect = QRect(QPoint(0,0),option.rect.size());
+
 				QPixmap pixmap(option.rect.size());
 				QPainter painter(&pixmap);
 				painter.fillRect(option.rect,style()->standardPalette().color(QPalette::Normal,QPalette::Base));
 				itemDeletage->paint(&painter,option,FPressedIndex);
 				painter.drawRect(option.rect.adjusted(0,0,-1,-1));
+
 				drag->setPixmap(pixmap);
 				drag->setHotSpot(FPressedPos - indexPos);
 			}
@@ -1275,7 +1277,7 @@ void RostersView::dropEvent(QDropEvent *AEvent)
 		Menu *dropMenu = new Menu(this);
 		
 		bool accepted = false;
-		foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+		foreach(IRostersDragDropHandler *handler, FMovedDragHandlers)
 			if (handler->rosterDropAction(AEvent,index,dropMenu))
 				accepted = true;
 		
@@ -1302,12 +1304,14 @@ void RostersView::dropEvent(QDropEvent *AEvent)
 
 void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 {
-	FActiveDragHandlers.clear();
+	FMovedDragHandlers.clear();
+	FEnteredDragHandlers.clear();
+
 	foreach (IRostersDragDropHandler *handler, FDragDropHandlers)
 		if (handler->rosterDragEnter(AEvent))
-			FActiveDragHandlers.append(handler);
+			FEnteredDragHandlers.append(handler);
 
-	if (!FActiveDragHandlers.isEmpty())
+	if (!FEnteredDragHandlers.isEmpty())
 	{
 		if (hasAutoScroll())
 			startAutoScroll();
@@ -1321,31 +1325,35 @@ void RostersView::dragEnterEvent(QDragEnterEvent *AEvent)
 
 void RostersView::dragMoveEvent(QDragMoveEvent *AEvent)
 {
+	FMovedDragHandlers.clear();
 	QModelIndex modelIndex = indexAt(AEvent->pos());
 	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->rosterIndexFromModelIndex(mapToModel(modelIndex)) : NULL;
 	if (index)
 	{
-		bool accepted = false;
-		foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+		foreach(IRostersDragDropHandler *handler, FEnteredDragHandlers)
 			if (handler->rosterDragMove(AEvent,index))
-				accepted = true;
-		
-		if (accepted)
+				FMovedDragHandlers.append(handler);
+	
+		if (!FMovedDragHandlers.isEmpty())
 			AEvent->acceptProposedAction();
 		else
 			AEvent->ignore();
-		
+
 		if (!isExpanded(modelIndex))
 			FDragExpandTimer.start();
 		else
 			FDragExpandTimer.stop();
+	}
+	else
+	{
+		AEvent->ignore();
 	}
 	setDropIndicatorRect(visualRect(modelIndex));
 }
 
 void RostersView::dragLeaveEvent(QDragLeaveEvent *AEvent)
 {
-	foreach(IRostersDragDropHandler *handler, FActiveDragHandlers)
+	foreach(IRostersDragDropHandler *handler, FEnteredDragHandlers)
 		handler->rosterDragLeave(AEvent);
 	stopAutoScroll();
 	setDropIndicatorRect(QRect());

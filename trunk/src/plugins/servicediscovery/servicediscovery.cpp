@@ -1439,6 +1439,8 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 			int indexKind = index->kind();
 			Jid contactJid = indexKind!=RIK_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : streamJid.domain();
 
+			IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(streamJid) : NULL;
+
 			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_AGENT)
 			{
 				Action *action = createDiscoItemsAction(streamJid,contactJid,QString::null,AMenu);
@@ -1454,6 +1456,9 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 			foreach(const Jid &itemJid, resources)
 			{
 				IDiscoInfo dinfo = discoInfo(streamJid,itemJid);
+
+				IRosterItem ritem = roster!=NULL ? roster->rosterItem(itemJid) : IRosterItem();
+				QString resName = (!ritem.name.isEmpty() ? ritem.name : itemJid.uBare()) + (!itemJid.resource().isEmpty() ? QString("/")+itemJid.resource() : QString::null);
 
 				// Many clients support version info but don`t show it in disco info
 				if (dinfo.streamJid.isValid() && !dinfo.features.contains(NS_JABBER_VERSION))
@@ -1475,9 +1480,9 @@ void ServiceDiscovery::onRostersViewIndexContextMenu(const QList<IRosterIndex *>
 								resMenu.insert(action->text(),menu);
 								AMenu->addAction(menu->menuAction(),AG_RVCM_DISCOVERY_FEATURES,true);
 							}
+							action->setText(resName);
 							action->setParent(action->parent()==AMenu ? menu : action->parent());
 							action->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,itemJid) : QIcon());
-							action->setText(!itemJid.resource().isEmpty() ? itemJid.resource() : itemJid.uBare());
 							menu->addAction(action,AG_RVCM_DISCOVERY_FEATURES,false); 
 						}
 						else

@@ -671,17 +671,11 @@ bool MessageArchiver::isSupported(const Jid &AStreamJid, const QString &AFeature
 	return isReady(AStreamJid) && FFeatures.value(AStreamJid).contains(AFeatureNS);
 }
 
-QWidget *MessageArchiver::showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid)
+QWidget *MessageArchiver::showArchiveWindow(const QMultiMap<Jid,Jid> &AAddresses)
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
-	if (roster)
-	{
-		ArchiveViewWindow *window = new ArchiveViewWindow(FPluginManager,this,roster);
-		window->setContactJid(AContactJid);
-		WidgetManager::showActivateRaiseWindow(window);
-		return window;
-	}
-	return NULL;
+	ArchiveViewWindow *window = new ArchiveViewWindow(FPluginManager,this,AAddresses);
+	WidgetManager::showActivateRaiseWindow(window);
+	return window;
 }
 
 QString MessageArchiver::prefsNamespace(const Jid &AStreamJid) const
@@ -1162,7 +1156,7 @@ QString MessageArchiver::removeCollections(const Jid &AStreamJid, const IArchive
 	return QString::null;
 }
 
-void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const
+void MessageArchiver::elementToCollection(const Jid &AStreamJid, const QDomElement &AChatElem, IArchiveCollection &ACollection) const
 {
 	ACollection.header.with = AChatElem.attribute("with");
 	ACollection.header.start = DateTime(AChatElem.attribute("start")).toLocal();
@@ -1210,12 +1204,14 @@ void MessageArchiver::elementToCollection(const QDomElement &AChatElem, IArchive
 			if (nodeElem.tagName()=="to")
 			{
 				message.setTo(contactJid.full());
-				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageOut);
+				message.setFrom(AStreamJid.full());
+				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::DirectionOut);
 			}
 			else
 			{
+				message.setTo(AStreamJid.full());
 				message.setFrom(contactJid.full());
-				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::MessageIn);
+				message.setData(MDR_MESSAGE_DIRECTION,IMessageProcessor::DirectionIn);
 			}
 
 			message.setType(nick.isEmpty() ? Message::Chat : Message::GroupChat);
@@ -2154,7 +2150,7 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
 
 bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	int singleKind=-1;
+	int singleKind = -1;
 	foreach(IRosterIndex *index, ASelected)
 	{
 		Jid contactJid = index->data(RDR_FULL_JID).toString();
@@ -2165,14 +2161,14 @@ bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected
 		singleKind = index->kind();
 	}
 	return !ASelected.isEmpty();
-
 }
 
 Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const
 {
 	bool isMultiSelection = AStreams.count()>1;
-	bool isStreamMenu = Jid(AStreams.first()).pBare()==Jid(AContacts.first()).pBare();
+	bool isStreamMenu = AContacts.first().isEmpty();
 
+	bool isAnyMangement = false;
 	bool isAllAutoSave = true;
 	bool isAllSupported = true;
 	bool isAllPrefsEnabled = true;
@@ -2201,20 +2197,21 @@ Menu *MessageArchiver::createContextMenu(const QStringList &AStreams, const QStr
 
 			isAllDefaultPrefs = isAllDefaultPrefs && !archivePrefs(AStreams.at(i)).itemPrefs.contains(AContacts.at(i));
 		}
+
+		isAnyMangement = isAnyMangement || !engineOrderByCapability(AStreams.at(i),IArchiveEngine::ArchiveManagement).isEmpty();
 	}
 
 	Menu *menu = new Menu(AParent);
 	menu->setTitle(tr("History"));
 	menu->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
 
-	if (!isMultiSelection && !engineOrderByCapability(AStreams.at(0),IArchiveEngine::ArchiveManagement).isEmpty())
+	if (isAnyMangement)
 	{
 		Action *viewAction = new Action(menu);
 		viewAction->setText(tr("View History"));
 		viewAction->setIcon(RSR_STORAGE_MENUICONS,MNI_HISTORY);
-		viewAction->setData(ADR_STREAM_JID,AStreams.first());
-		if (!isStreamMenu)
-			viewAction->setData(ADR_CONTACT_JID,AContacts.first());
+		viewAction->setData(ADR_STREAM_JID,AStreams);
+		viewAction->setData(ADR_CONTACT_JID,AContacts);
 		viewAction->setShortcutId(SCT_ROSTERVIEW_SHOWHISTORY);
 		connect(viewAction,SIGNAL(triggered(bool)),SLOT(onShowArchiveWindowByAction(bool)));
 		menu->addAction(viewAction,AG_DEFAULT,false);
@@ -2566,18 +2563,32 @@ void MessageArchiver::onPrivateDataChanged(const Jid &AStreamJid, const QString 
 
 void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance() && !FRostersViewPlugin->rostersView()->hasMultiSelection())
+	if (FRostersViewPlugin && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_SHOWHISTORY)
+		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWHISTORY && isSelectionAccepted(indexes))
 		{
-			IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
+			QMultiMap<Jid,Jid> addresses;
+			foreach(IRosterIndex *index, indexes)
 			{
-				Jid streamJid = index->data(RDR_STREAM_JID).toString();
-				Jid contactJid = indexKind!=RIK_STREAM_ROOT ? index->data(RDR_FULL_JID).toString() : Jid::null;
-				showArchiveWindow(streamJid,contactJid);
+				if (index->kind() == RIK_STREAM_ROOT)
+				{
+					addresses.insertMulti(index->data(RDR_STREAM_JID).toString(),Jid::null);
+				}
+				else if (index->kind() == RIK_METACONTACT)
+				{
+					for (int row=0; row<index->childCount(); row++)
+					{
+						IRosterIndex *metaItemIndex = index->childIndex(row);
+						addresses.insertMulti(metaItemIndex->data(RDR_STREAM_JID).toString(),metaItemIndex->data(RDR_PREP_BARE_JID).toString());
+					}
+				}
+				else
+				{
+					addresses.insertMulti(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
+				}
 			}
+			showArchiveWindow(addresses);
 		}
 	}
 }
@@ -2591,9 +2602,16 @@ void MessageArchiver::onRostersViewIndexContextMenu(const QList<IRosterIndex *> 
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && isSelectionAccepted(AIndexes))
 	{
-		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
+		int indexKind = AIndexes.first()->kind();
+		QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,
+			QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_ANY_ROLE,RDR_PREP_BARE_JID,RDR_STREAM_JID);
 		
-		Menu *menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),AMenu);
+		Menu *menu;
+		if (indexKind == RIK_STREAM_ROOT)
+			menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_ANY_ROLE),AMenu);
+		else
+			menu = createContextMenu(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),AMenu);
+
 		if (!menu->isEmpty())
 			AMenu->addAction(menu->menuAction(),AG_RVCM_ARCHIVER,true);
 		else
@@ -2603,7 +2621,7 @@ void MessageArchiver::onRostersViewIndexContextMenu(const QList<IRosterIndex *> 
 
 void MessageArchiver::onMultiUserContextMenu(IMultiUserChatWindow *AWindow, IMultiUser *AUser, Menu *AMenu)
 {
-	Menu *menu = createContextMenu(QStringList()<<AWindow->streamJid().full(),QStringList()<<AUser->contactJid().full(),AMenu);
+	Menu *menu = createContextMenu(QStringList()<<AWindow->streamJid().pFull(),QStringList()<<AUser->contactJid().pFull(),AMenu);
 	if (!menu->isEmpty())
 		AMenu->addAction(menu->menuAction(),AG_MUCM_ARCHIVER,true);
 	else
@@ -2706,9 +2724,12 @@ void MessageArchiver::onShowArchiveWindowByAction(bool)
 	Action *action = qobject_cast<Action *>(sender());
 	if (action)
 	{
-		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		Jid contactJid = action->data(ADR_CONTACT_JID).toString();
-		showArchiveWindow(streamJid,contactJid);
+		QMultiMap<Jid,Jid> addresses;
+		QStringList streams = action->data(ADR_STREAM_JID).toStringList();
+		QStringList contacts = action->data(ADR_CONTACT_JID).toStringList();
+		for(int i=0; i<streams.count() && i<contacts.count(); i++)
+			addresses.insertMulti(streams.at(i),contacts.at(i));
+		showArchiveWindow(addresses);
 	}
 }
 
@@ -2719,7 +2740,7 @@ void MessageArchiver::onShowArchiveWindowByToolBarAction(bool)
 	{
 		IMessageToolBarWidget *toolBarWidget = qobject_cast<IMessageToolBarWidget *>(action->parent());
 		if (toolBarWidget)
-			showArchiveWindow(toolBarWidget->messageWindow()->streamJid(),toolBarWidget->messageWindow()->contactJid());
+			showArchiveWindow(toolBarWidget->messageWindow()->address()->availAddresses(true));
 	}
 }
 

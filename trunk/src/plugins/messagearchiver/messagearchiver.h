@@ -98,7 +98,7 @@ public:
 	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual QString archiveDirPath(const Jid &AStreamJid = Jid::null) const;
 	virtual bool isSupported(const Jid &AStreamJid, const QString &AFeatureNS) const;
-	virtual QWidget *showArchiveWindow(const Jid &AStreamJid, const Jid &AContactJid = Jid::null);
+	virtual QWidget *showArchiveWindow(const QMultiMap<Jid,Jid> &AAddresses);
   //Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
@@ -119,7 +119,7 @@ public:
 	virtual QString loadCollection(const Jid &AStreamJid, const IArchiveHeader &AHeader);
 	virtual QString removeCollections(const Jid &AStreamJid, const IArchiveRequest &ARequest);
 	//Utilities
-	virtual void elementToCollection(const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
+	virtual void elementToCollection(const Jid &AStreamJid, const QDomElement &AChatElem, IArchiveCollection &ACollection) const;
 	virtual void collectionToElement(const IArchiveCollection &ACollection, QDomElement &AChatElem, const QString &ASaveMode) const;
 	//Handlers
 	virtual void insertArchiveHandler(int AOrder, IArchiveHandler *AHandler);

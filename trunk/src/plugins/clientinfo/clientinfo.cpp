@@ -43,6 +43,8 @@
 #define FORM_FIELD_OS                   "os"
 #define FORM_FIELD_OS_VERSION           "os_version"
 
+static const QList<int> ClientInfoRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT;
+
 ClientInfo::ClientInfo()
 {
 	FPluginManager = NULL;
@@ -705,7 +707,7 @@ void ClientInfo::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AInd
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1)
 	{
 		IRosterIndex *index = AIndexes.first();
-		if (index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT || index->kind()==RIK_MY_RESOURCE)
+		if (ClientInfoRosterKinds.contains(index->kind()))
 		{
 			Jid streamJid = index->data(RDR_STREAM_JID).toString();
 			IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(streamJid) : NULL;

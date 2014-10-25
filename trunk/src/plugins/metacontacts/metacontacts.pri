@@ -1,3 +1,11 @@
-HEADERS = metacontacts.h
+FORMS = combinecontactsdialog.ui
 
-SOURCES = metacontacts.cpp
+HEADERS = metacontacts.h \
+          metasortfilterproxymodel.h \
+          combinecontactsdialog.h
+
+SOURCES = metacontacts.cpp \
+          metasortfilterproxymodel.cpp \
+          combinecontactsdialog.cpp
+
+

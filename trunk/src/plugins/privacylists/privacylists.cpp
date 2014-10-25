@@ -1279,7 +1279,7 @@ void PrivacyLists::updatePrivacyLabels(const Jid &AStreamJid)
 			for (int i=0;i<groupIndex->childCount();i++)
 			{
 				IRosterIndex *index = groupIndex->childIndex(i);
-				if (index->kind() == RIK_CONTACT || index->kind()==RIK_AGENT)
+				if (index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT)
 				{
 					IRosterItem ritem;
 					ritem.itemJid = index->data(RDR_PREP_BARE_JID).toString();

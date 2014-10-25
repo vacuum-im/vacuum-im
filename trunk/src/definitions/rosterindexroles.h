@@ -2,8 +2,9 @@
 #define DEF_ROSTERINDEXROLES_H
 
 enum RosterIndexDataRoles {
-	RDR_ANY_ROLE = 32,
-	RDR_KIND,
+	RDR_ANY_ROLE    = -1, // AdvancedItemModel::AnyRole
+	RDR_ALL_ROLES   = -2, // AdvancedItemModel::AllRoles
+	RDR_KIND        = 32, // Qt::UserRole
 	RDR_KIND_ORDER,
 	RDR_SORT_ORDER,
 	//XMPP Roles
@@ -19,7 +20,7 @@ enum RosterIndexDataRoles {
 	RDR_STATUS,
 	RDR_PRIORITY,
 	RDR_SUBSCRIBTION,
-	RDR_ASK,
+	RDR_SUBSCRIPTION_ASK,
 	//View roles
 	RDR_LABEL_ITEMS,
 	RDR_FORCE_VISIBLE,
@@ -39,6 +40,8 @@ enum RosterIndexDataRoles {
 	RDR_MUC_PASSWORD,
 	//vCard
 	RDR_VCARD_SEARCH,
+	//MetaContacts
+	RDR_METACONTACT_ID,
 	//Other Roles
 	RDR_USER_ROLE = 128
 };

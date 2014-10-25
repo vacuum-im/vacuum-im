@@ -49,6 +49,7 @@ public:
 	virtual QString iconsetByJid(const Jid &AContactJid) const;
 	virtual QString iconKeyByJid(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QString iconKeyByStatus(int AShow, const QString &ASubscription, bool AAsk) const;
+	virtual QString iconFileName(const Jid &AStreamJid, const Jid &AContactJid) const;
 	virtual QString iconFileName(const QString &ASubStorage, const QString &AIconKey) const;
 signals:
 	void defaultIconsetChanged(const QString &ASubStorage);
