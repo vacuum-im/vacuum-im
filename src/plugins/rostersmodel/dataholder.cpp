@@ -21,7 +21,7 @@ QList<int> DataHolder::advancedItemDataRoles(int AOrder) const
 
 QVariant DataHolder::advancedItemData(int AOrder, const QStandardItem *AItem, int ARole) const
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 	{
 		const IRosterIndex *index = static_cast<const RosterIndex *>(AItem);
 		return FDataHolder->rosterData(AOrder,index,ARole);
@@ -31,7 +31,7 @@ QVariant DataHolder::advancedItemData(int AOrder, const QStandardItem *AItem, in
 
 bool DataHolder::setAdvancedItemData(int AOrder, const QVariant &AValue, QStandardItem *AItem, int ARole)
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 	{
 		IRosterIndex *index = static_cast<RosterIndex *>(AItem);
 		return FDataHolder->setRosterData(AOrder,AValue,index,ARole);

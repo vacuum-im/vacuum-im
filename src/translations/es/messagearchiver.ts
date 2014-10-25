@@ -286,18 +286,6 @@
         <translation>Buscar en el historial</translation>
     </message>
     <message>
-        <source>Conversation history - %1</source>
-        <translation>Historial de conversación - %1</translation>
-    </message>
-    <message>
-        <source>Conversation history with %1 - %2</source>
-        <translation>Historial de conversación con %1 - %2</translation>
-    </message>
-    <message>
-        <source>Conversation headers loaded</source>
-        <translation>Titulares de conversación cargados</translation>
-    </message>
-    <message>
         <source>Loading conversation headers...</source>
         <translation>Cargando titulares de conversación...</translation>
     </message>
@@ -306,23 +294,8 @@
         <translation>No se pueden cargar los titulares de conversación: %1</translation>
     </message>
     <message>
-        <source>Select contact or single conversation</source>
-        <translation>Seleccionar contacto o una sola conversación</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n conversation(s) loaded</source>
-        <translation>
-            <numerusform>una conversación cargada</numerusform>
-            <numerusform>%n conversaciones cargadas</numerusform>
-        </translation>
-    </message>
-    <message>
         <source>Loading conversations...</source>
         <translation>Cargando conversaciones...</translation>
-    </message>
-    <message>
-        <source>Loading %1 of %2 conversations...</source>
-        <translation>Cargando %1 de %2 conversaciones...</translation>
     </message>
     <message>
         <source>Failed to load conversations: %1</source>
@@ -368,14 +341,6 @@
         <translation>Error al borrar las conversaciones: %1</translation>
     </message>
     <message>
-        <source>Remove all History</source>
-        <translation>Borrar todo el historial</translation>
-    </message>
-    <message>
-        <source>Remove History for %1 %2</source>
-        <translation>Borrar el historial para %1 %2</translation>
-    </message>
-    <message>
         <source>Remove this Conversation</source>
         <translation>Borrar esta conversación</translation>
     </message>
@@ -384,73 +349,86 @@
         <translation>Historial de conversación borrado satisfactoriamente</translation>
     </message>
     <message>
-        <source>Conversation with &lt;b&gt;%1&lt;/b&gt; in conference %2 started at &lt;b&gt;%3&lt;/b&gt;.</source>
-        <translation>Conversación con &lt;b&gt;%1&lt;/b&gt; en la sala %2 iniciada en &lt;b&gt;%3&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation in conference %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Conversación en la sala %1 iniciada en &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Conversation with %1 started at &lt;b&gt;%2&lt;/b&gt;.</source>
-        <translation>Conversación con %1 iniciada en &lt;b&gt;%2&lt;/b&gt;.</translation>
-    </message>
-    <message>
-        <source>Load earlier messages</source>
-        <translation>Cargar entradas antiguas</translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <comment>Date group name</comment>
-        <translatorcomment>Наименование группы даты</translatorcomment>
-        <translation>MMMM yyyy</translation>
-    </message>
-    <message>
-        <source>dd MMM, dddd</source>
-        <comment>Conversation name</comment>
-        <translatorcomment>Наименование разговора</translatorcomment>
-        <translation>dd MMM, dddd</translation>
-    </message>
-    <message>
-        <source>Show history for this contact</source>
-        <translation>Mostrar el historial para este contacto</translation>
-    </message>
-    <message>
-        <source>All messages loaded</source>
-        <translation>Todos los mensajes cargados</translation>
-    </message>
-    <message>
-        <source>Load message earlier %1</source>
-        <translation>Cargar los mensajes anteriores a %1</translation>
-    </message>
-    <message>
-        <source>dd MMM yyyy</source>
-        <comment>Load messages earlier date</comment>
-        <translatorcomment>Загрузить сообщения ранее даты</translatorcomment>
-        <translation>dd MMM yyyy</translation>
-    </message>
-    <message>
         <source>Search in text</source>
         <translation>Buscar en el texto</translation>
     </message>
-</context>
-<context>
-    <name>ArchiveViewWindowClass</name>
     <message>
-        <source>Update</source>
-        <translation>Actualizar</translation>
+        <source>Conversation History</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Next</source>
-        <translation>Próximo</translation>
+        <source>Conversations are not found</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Previous</source>
-        <translation>Anterior</translation>
+        <source>Conversation is not selected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Case sensitively</source>
-        <translation>Mayúsculas y minúsculas</translation>
+        <source>Search is not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load more conversations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All conversations loaded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conversation headers are not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Contact History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove all History with %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove History for %1</source>
+        <translation type="unfinished">Borrar el historial para %1</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; in %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation header(s) found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Select conversation to show</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n conversation(s) shown</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Shown %1 of %2 conversations...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -999,10 +999,13 @@ quint32 AdvancedItemDelegate::itemAt(const QPoint &APoint, const QStyleOptionVie
 
 bool AdvancedItemDelegate::isItemVisible(const AdvancedDelegateItem &AItem, const QStyleOptionViewItemV4 &AItemOption)
 {
-	if (( AItemOption.state & AItem.d->showStates) != AItem.d->showStates)
+	if ((AItem.d->flags & AdvancedDelegateItem::Hidden) > 0)
 		return false;
 
-	if (( AItemOption.state & AItem.d->hideStates) > 0)
+	if ((AItemOption.state & AItem.d->showStates) != AItem.d->showStates)
+		return false;
+
+	if ((AItemOption.state & AItem.d->hideStates) > 0)
 		return false;
 
 	switch (AItem.d->kind)

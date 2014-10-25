@@ -1,6 +1,10 @@
 #ifndef ADVANCEDITEM_H
 #define ADVANCEDITEM_H
 
+#include <QMap>
+#include <QList>
+#include <QVariant>
+#include <QDataStream>
 #include <QStandardItem>
 #include "utilsexport.h"
 
@@ -25,7 +29,7 @@ public:
 	virtual void setItemData(const QMap<int, QVariant> &AData);
 	virtual QList<QStandardItem *> findChilds(const QMultiMap<int, QVariant> &AData, Qt::MatchFlags AFlags=Qt::MatchExactly, int AColumn=0) const;
 public:
-	static const int StandardItemTypeValue = QStandardItem::UserType+100;
+	static const int AdvancedItemTypeValue = QStandardItem::UserType+111;
 private:
 	QMap<int, QVariant> FData;
 };

@@ -181,9 +181,11 @@ QString MessageStyles::contactName(const Jid &AStreamJid, const Jid &AContactJid
 			FStreamNames.insert(AStreamJid.bare(),name);
 		}
 		else
+		{
 			name = FStreamNames.value(AStreamJid.bare());
+		}
 	}
-	else if (AStreamJid && AContactJid)
+	else if (AStreamJid.pBare() == AContactJid.pBare())
 	{
 		name = !AContactJid.resource().isEmpty() ? AContactJid.resource() : AContactJid.uNode();
 	}
@@ -213,8 +215,8 @@ QString MessageStyles::contactIcon(const Jid &AStreamJid, const Jid &AContactJid
 			iconKey = FStatusIcons->iconKeyByJid(AStreamJid,AContactJid);
 		else
 			iconKey = FStatusIcons->iconKeyByStatus(IPresence::Online,SUBSCRIPTION_BOTH,false);
-		QString substorage = FStatusIcons->iconsetByJid(AContactJid.isValid() ? AContactJid : AStreamJid);
-		return FStatusIcons->iconFileName(substorage,iconKey);
+		QString iconset = FStatusIcons->iconsetByJid(AContactJid.isValid() ? AContactJid : AStreamJid);
+		return FStatusIcons->iconFileName(iconset,iconKey);
 	}
 	return QString::null;
 }
@@ -223,9 +225,9 @@ QString MessageStyles::contactIcon(const Jid &AContactJid, int AShow, const QStr
 {
 	if (FStatusIcons)
 	{
+		QString iconset = FStatusIcons->iconsetByJid(AContactJid);
 		QString iconKey = FStatusIcons->iconKeyByStatus(AShow,ASubscription,AAsk);
-		QString substorage = FStatusIcons->iconsetByJid(AContactJid);
-		return FStatusIcons->iconFileName(substorage,iconKey);
+		return FStatusIcons->iconFileName(iconset,iconKey);
 	}
 	return QString::null;
 }

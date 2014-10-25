@@ -388,6 +388,11 @@ QString StatusIcons::iconKeyByStatus(int AShow, const QString &ASubscription, bo
 	}
 }
 
+QString StatusIcons::iconFileName(const Jid &AStreamJid, const Jid &AContactJid) const
+{
+	return iconFileName(iconsetByJid(AContactJid),iconKeyByJid(AStreamJid,AContactJid));
+}
+
 QString StatusIcons::iconFileName(const QString &ASubStorage, const QString &AIconKey) const
 {
 	IconStorage *storage = FStorages.value(ASubStorage,FDefaultStorage);

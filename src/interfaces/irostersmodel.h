@@ -41,7 +41,7 @@ public:
 	virtual void setData(const QVariant &AValue, int ARole = Qt::UserRole+1) =0;
 	virtual QList<IRosterIndex *> findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive = false) const =0;
 public:
-	static const int StandardItemTypeValue = QStandardItem::UserType+110;
+	static const int RosterItemTypeValue = QStandardItem::UserType+222;
 };
 
 class IRostersModel

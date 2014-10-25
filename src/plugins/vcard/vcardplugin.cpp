@@ -42,6 +42,8 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_CLIPBOARD_DATA        Action::DR_Parametr1
 
+static const QList<int> VCardRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+
 VCardPlugin::VCardPlugin()
 {
 	FPluginManager = NULL;
@@ -599,13 +601,13 @@ void VCardPlugin::onCopyToClipboardActionTriggered(bool)
 
 void VCardPlugin::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
-	if (FRostersView && AWidget==FRostersView->instance() && !FRostersView->hasMultiSelection())
+	if (FRostersView && AWidget==FRostersView->instance())
 	{
-		if (AId == SCT_ROSTERVIEW_SHOWVCARD)
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWVCARD && indexes.count()==1)
 		{
-			IRosterIndex *index = !FRostersView->hasMultiSelection() ? FRostersView->selectedRosterIndexes().value(0) : NULL;
-			int indexKind = index!=NULL ? index->data(RDR_KIND).toInt() : -1;
-			if (indexKind==RIK_STREAM_ROOT || indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
+			IRosterIndex *index = indexes.first();
+			if (index!=NULL && VCardRosterKinds.contains(index->kind()))
 				showVCardDialog(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 		}
 	}
@@ -621,7 +623,7 @@ void VCardPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIn
 		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
 
 		bool canShowDialog = hasVCard(contactJid);
-		canShowDialog = canShowDialog || (stream!=NULL && stream->isOpen() && (index->kind()==RIK_STREAM_ROOT || index->kind()==RIK_CONTACT || index->kind()==RIK_AGENT));
+		canShowDialog = canShowDialog || (stream!=NULL && stream->isOpen() && VCardRosterKinds.contains(index->kind()));
 		canShowDialog = canShowDialog || (FDiscovery!=NULL && FDiscovery->discoInfo(streamJid,contactJid.bare()).features.contains(NS_VCARD_TEMP));
 
 		if (canShowDialog)

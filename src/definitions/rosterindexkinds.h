@@ -3,8 +3,8 @@
 
 enum RosterIndexKind {
 	RIK_ANY_KIND,
+	// RostersModel
 	RIK_ROOT,
-	RIK_RECENT_ROOT,
 	RIK_STREAM_ROOT,
 	RIK_CONTACTS_ROOT,
 	RIK_GROUP,
@@ -17,8 +17,15 @@ enum RosterIndexKind {
 	RIK_CONTACT,
 	RIK_AGENT,
 	RIK_MY_RESOURCE,
+	// RecentContacts
+	RIK_RECENT_ROOT,
 	RIK_RECENT_ITEM,
+	// MetaContacts
+	RIK_METACONTACT,
+	RIK_METACONTACT_ITEM,
+	// MultiUserChat
 	RIK_MUC_ITEM,
+	// Other Plugins
 	RIK_USER_KIND = 128
 };
 

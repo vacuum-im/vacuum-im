@@ -20,7 +20,7 @@ protected:
 	bool lessThan(const QModelIndex &ALeft, const QModelIndex &ARight) const;
 	bool filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const;
 private:
-	IRostersViewPlugin *FRostersViewPlugin;
+	IRostersView *FRostersView;
 private:
 	bool FShowOffline;
 	bool FSortByStatus;

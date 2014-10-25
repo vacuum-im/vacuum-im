@@ -132,5 +132,9 @@
 #define   SCT_ROSTERVIEW_INSERTFAVORITE                            "roster-view.insert-favorite"
 #define   SCT_ROSTERVIEW_REMOVEFAVORITE                            "roster-view.remove-favorite"
 #define   SCT_ROSTERVIEW_REMOVEFROMRECENT                          "roster-view.remove-from-recent"
+//Metacontacts
+#define   SCT_ROSTERVIEW_COMBINECONTACTS                           "roster-view.combine-contacts"
+#define   SCT_ROSTERVIEW_DESTROYMETACONTACT                        "roster-view.destroy-metacontact"
+#define   SCT_ROSTERVIEW_DETACHFROMMETACONTACT                     "roster-view.detach-from-metacontact"
 
 #endif // DEF_SHORTCUTS_H

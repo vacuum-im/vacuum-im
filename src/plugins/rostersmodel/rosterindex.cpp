@@ -6,9 +6,10 @@
 
 RosterIndex::RosterIndex(int AKind, RostersModel *AModel)
 {
+	FKind = AKind;
 	FModel = AModel;
-	setData(AKind,RDR_KIND);
-	setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsEditable);
+	AdvancedItem::setData(AKind,RDR_KIND);
+	AdvancedItem::setFlags(Qt::ItemIsEnabled|Qt::ItemIsSelectable|Qt::ItemIsEditable);
 }
 
 RosterIndex::~RosterIndex()
@@ -18,12 +19,12 @@ RosterIndex::~RosterIndex()
 
 int RosterIndex::type() const
 {
-	return IRosterIndex::StandardItemTypeValue;
+	return IRosterIndex::RosterItemTypeValue;
 }
 
 int RosterIndex::kind() const
 {
-	return data(RDR_KIND).toInt();
+	return FKind;
 }
 
 int RosterIndex::row() const
@@ -38,11 +39,11 @@ bool RosterIndex::isRemoved() const
 
 IRosterIndex *RosterIndex::parentIndex() const
 {
-	QStandardItem *pitem = AdvancedItem::parent();
-	if (pitem == NULL)
+	QStandardItem *pItem = AdvancedItem::parent();
+	if (pItem == NULL)
 		return model()!=NULL ? FModel->rootIndex() : NULL;
-	else if (pitem->type() == IRosterIndex::StandardItemTypeValue)
-		return static_cast<RosterIndex *>(pitem);
+	else if (pItem->type() == IRosterIndex::RosterItemTypeValue)
+		return static_cast<RosterIndex *>(pItem);
 	return NULL;
 }
 
@@ -78,13 +79,13 @@ void RosterIndex::removeChildren()
 
 void RosterIndex::remove(bool ADestroy)
 {
-	IRosterIndex *pindex = parentIndex();
-	if (pindex)
+	IRosterIndex *pIndex = parentIndex();
+	if (pIndex)
 	{
 		if (ADestroy)
-			pindex->removeChild(row());
+			pIndex->removeChild(row());
 		else
-			pindex->takeIndex(row());
+			pIndex->takeIndex(row());
 	}
 }
 
@@ -95,19 +96,20 @@ QMap<int,QVariant> RosterIndex::indexData() const
 
 QVariant RosterIndex::data(int ARole) const
 {
-	return AdvancedItem::data(ARole);
+	return ARole!=RDR_KIND ? AdvancedItem::data(ARole) : FKind;
 }
 
 void RosterIndex::setData(const QVariant &AValue, int ARole)
 {
-	return AdvancedItem::setData(AValue,ARole);
+	if (ARole != RDR_KIND)
+		AdvancedItem::setData(AValue,ARole);
 }
 
 QList<IRosterIndex *> RosterIndex::findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive) const
 {
 	QList<IRosterIndex *> indexes;
 	foreach(QStandardItem *item, AdvancedItem::findChilds(AFindData, ARecursive ? Qt::MatchRecursive : Qt::MatchExactly))
-		if (item->type() == IRosterIndex::StandardItemTypeValue)
+		if (item->type() == IRosterIndex::RosterItemTypeValue)
 			indexes.append(static_cast<RosterIndex *>(item));
 	return indexes;
 }

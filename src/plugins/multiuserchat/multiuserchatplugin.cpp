@@ -513,13 +513,13 @@ bool MultiUserChatPlugin::messageCheck(int AOrder, const Message &AMessage, int 
 bool MultiUserChatPlugin::messageDisplay(const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AMessage);
-	return ADirection == IMessageProcessor::MessageIn;
+	return ADirection == IMessageProcessor::DirectionIn;
 }
 
 INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
 
@@ -1315,12 +1315,12 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 					window->exitAndDestroy(QString::null);
 		}
 	}
-	else if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
+	else if (FRostersViewPlugin!=NULL && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-		if (index)
+		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && indexes.count()==1)
 		{
-			IMultiUserChatWindow *window = getMultiChatWindowForIndex(index);
+			IMultiUserChatWindow *window = getMultiChatWindowForIndex(indexes.first());
 			if (window)
 			{
 				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
@@ -1328,26 +1328,18 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 				window->showTabPage();
 			}
 		}
-	}
-	else if (AId == SCT_ROSTERVIEW_ENTERCONFERENCE)
-	{
-		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
+		else if (AId==SCT_ROSTERVIEW_ENTERCONFERENCE)
 		{
-			foreach(IRosterIndex *index, selected)
+			foreach(IRosterIndex *index, indexes)
 			{
 				IMultiUserChatWindow *window = getMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString(),index->data(RDR_MUC_NICK).toString(),index->data(RDR_MUC_PASSWORD).toString());
 				if (window && !window->multiUserChat()->isConnected())
 					window->multiUserChat()->sendStreamPresence();
 			}
 		}
-	}
-	else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE)
-	{
-		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
+		else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE && isSelectionAccepted(indexes) && indexes.first()->kind()==RIK_MUC_ITEM)
 		{
-			foreach(IRosterIndex *index, selected)
+			foreach(IRosterIndex *index, indexes)
 			{
 				IMultiUserChatWindow *window = findMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 				if (window)
@@ -1577,7 +1569,7 @@ void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
 			if (!reason.isEmpty())
 				declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
 
-			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::MessageOut))
+			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::DirectionOut))
 				LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.full()));
 			else
 				LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));

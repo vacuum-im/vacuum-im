@@ -266,10 +266,23 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
-			Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
-			Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
-			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
-			QList<IRosterIndex *> indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
+			QList<IRosterIndex *> indexes;
+			QMap<QString,QVariant> searchData = record.notification.data.value(NDR_ROSTER_SEARCH_DATA).toMap();
+			if (searchData.isEmpty())
+			{
+				Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
+				Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
+				bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
+				indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
+			}
+			else
+			{
+				QMultiMap<int,QVariant> findData;
+				for (QMap<QString,QVariant>::const_iterator it=searchData.constBegin(); it!=searchData.constEnd(); ++it)
+					findData.insertMulti(it.key().toInt(),it.value());
+				indexes = FRostersModel->rootIndex()->findChilds(findData,true);
+			}
+
 			if (!indexes.isEmpty())
 			{
 				IRostersNotify rnotify;

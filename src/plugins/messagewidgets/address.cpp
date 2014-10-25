@@ -51,7 +51,7 @@ QMultiMap<Jid, Jid> Address::availAddresses(bool AUnique) const
 	QMap<Jid,Jid> addresses;
 	for (QMap<Jid, QMultiMap<Jid,Jid> >::const_iterator streamIt=FAddresses.constBegin(); streamIt!=FAddresses.constEnd(); ++streamIt)
 	{
-		QList<Jid> contacts = AUnique ? streamIt->keys() : streamIt->values();
+		QList<Jid> contacts = AUnique ? streamIt->uniqueKeys() : streamIt->values();
 		foreach(const Jid &contact, contacts)
 			addresses.insertMulti(streamIt.key(),contact);
 	}
