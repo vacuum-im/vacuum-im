@@ -2572,9 +2572,21 @@ void MessageArchiver::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			foreach(IRosterIndex *index, indexes)
 			{
 				if (index->kind() == RIK_STREAM_ROOT)
+				{
 					addresses.insertMulti(index->data(RDR_STREAM_JID).toString(),Jid::null);
+				}
+				else if (index->kind() == RIK_METACONTACT)
+				{
+					for (int row=0; row<index->childCount(); row++)
+					{
+						IRosterIndex *metaItemIndex = index->childIndex(row);
+						addresses.insertMulti(metaItemIndex->data(RDR_STREAM_JID).toString(),metaItemIndex->data(RDR_PREP_BARE_JID).toString());
+					}
+				}
 				else
+				{
 					addresses.insertMulti(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
+				}
 			}
 			showArchiveWindow(addresses);
 		}

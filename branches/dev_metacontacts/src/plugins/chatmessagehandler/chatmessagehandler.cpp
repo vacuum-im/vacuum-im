@@ -38,7 +38,7 @@
 #define ADR_STREAM_JID            Action::DR_StreamJid
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 
-static const QList<int> ChatHandlerRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT;
+static const QList<int> ChatHandlerRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT << RIK_METACONTACT_ITEM;
 
 ChatMessageHandler::ChatMessageHandler()
 {

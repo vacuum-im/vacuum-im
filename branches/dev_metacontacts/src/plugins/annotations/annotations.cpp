@@ -23,7 +23,7 @@
 #define ADR_CONTACTJID        Action::DR_Parametr1
 #define ADR_CLIPBOARD_DATA    Action::DR_Parametr2
 
-static const QList<int> AnnotationRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MUC_ITEM;
+static const QList<int> AnnotationRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MUC_ITEM << RIK_METACONTACT_ITEM;
 
 Annotations::Annotations()
 {

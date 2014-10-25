@@ -37,7 +37,7 @@
 #define SHC_ROSTERX_IQ         "/iq/x[@xmlns='" NS_ROSTERX "']"
 #define SHC_ROSTERX_MESSAGE    "/message/x[@xmlns='" NS_ROSTERX "']"
 
-static const QList<int> DragKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_GROUP << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> DragRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_GROUP << RIK_METACONTACT << RIK_METACONTACT_ITEM;
 
 RosterItemExchange::RosterItemExchange()
 {
@@ -316,7 +316,7 @@ bool RosterItemExchange::messageViewDropAction(IMessageViewWidget *AWidget, cons
 Qt::DropActions RosterItemExchange::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	if (DragKinds.contains(AIndex->kind()))
+	if (DragRosterKinds.contains(AIndex->kind()))
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -329,7 +329,7 @@ bool RosterItemExchange::rosterDragEnter(const QDragEnterEvent *AEvent)
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 
-		if (DragKinds.contains(indexData.value(RDR_KIND).toInt()))
+		if (DragRosterKinds.contains(indexData.value(RDR_KIND).toInt()))
 		{
 			Jid indexJid = indexData.value(RDR_PREP_BARE_JID).toString();
 			if (!indexJid.node().isEmpty())
@@ -438,7 +438,7 @@ QList<IRosterItem> RosterItemExchange::dragDataContacts(const QMimeData *AData) 
 		operator>>(stream,indexData);
 		
 		int indexKind = indexData.value(RDR_KIND).toInt();
-		if (DragKinds.contains(indexKind))
+		if (DragRosterKinds.contains(indexKind))
 		{
 			if (indexKind == RIK_GROUP)
 			{

@@ -62,5 +62,9 @@
         <source>%1 - Chat</source>
         <translation>%1 - Чат</translation>
     </message>
+    <message>
+        <source>Combine Contacts</source>
+        <translation>Объединить контакты</translation>
+    </message>
 </context>
 </TS>

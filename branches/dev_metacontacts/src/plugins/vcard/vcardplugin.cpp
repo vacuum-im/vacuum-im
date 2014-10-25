@@ -42,7 +42,7 @@
 #define ADR_CONTACT_JID           Action::DR_Parametr1
 #define ADR_CLIPBOARD_DATA        Action::DR_Parametr1
 
-static const QList<int> VCardRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT;
+static const QList<int> VCardRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
 
 VCardPlugin::VCardPlugin()
 {

@@ -37,8 +37,8 @@
 #define ADR_GROUP                   Action::DR_Parametr3
 #define ADR_TO_GROUP                Action::DR_Parametr4
 
-static const QList<int> DragKinds = QList<int>() << RIK_CONTACT << RIK_GROUP << RIK_METACONTACT_ITEM;
-static const QList<int> DropKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACTS_ROOT << RIK_GROUP << RIK_GROUP_BLANK;
+static const QList<int> DragRosterKinds = QList<int>() << RIK_CONTACT << RIK_GROUP << RIK_METACONTACT_ITEM;
+static const QList<int> DropRosterKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACTS_ROOT << RIK_GROUP << RIK_GROUP_BLANK;
 
 RosterChanger::RosterChanger()
 {
@@ -212,7 +212,7 @@ QMultiMap<int, IOptionsWidget *> RosterChanger::optionsWidgets(const QString &AN
 Qt::DropActions RosterChanger::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	if (DragKinds.contains(AIndex->data(RDR_KIND).toInt()))
+	if (DragRosterKinds.contains(AIndex->data(RDR_KIND).toInt()))
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -225,7 +225,7 @@ bool RosterChanger::rosterDragEnter(const QDragEnterEvent *AEvent)
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 
-		if (DragKinds.contains(indexData.value(RDR_KIND).toInt()))
+		if (DragRosterKinds.contains(indexData.value(RDR_KIND).toInt()))
 			return true;
 	}
 	return false;
@@ -234,7 +234,7 @@ bool RosterChanger::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool RosterChanger::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
 	int hoverKind = AHover->data(RDR_KIND).toInt();
-	if (DropKinds.contains(hoverKind))
+	if (DropRosterKinds.contains(hoverKind))
 	{
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
@@ -317,7 +317,7 @@ void RosterChanger::rosterDragLeave(const QDragLeaveEvent *AEvent)
 bool RosterChanger::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AHover, Menu *AMenu)
 {
 	int hoverKind = AHover->data(RDR_KIND).toInt();
-	if (DropKinds.contains(hoverKind) && (AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0)
+	if (DropRosterKinds.contains(hoverKind) && (AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0)
 	{
 		bool isLayoutMerged = FRostersModel!=NULL && FRostersModel->streamsLayout()==IRostersModel::LayoutMerged;
 
@@ -889,7 +889,7 @@ bool RosterChanger::isAllRostersOpened(const QStringList &AStreams) const
 
 bool RosterChanger::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP << RIK_METACONTACT_ITEM;
+	static const QList<int> acceptKinds = QList<int>() << RIK_STREAM_ROOT << RIK_CONTACT << RIK_AGENT << RIK_GROUP << RIK_METACONTACT << RIK_METACONTACT_ITEM;
 
 	int singleKind = -1;
 	foreach(IRosterIndex *index, ASelected)
@@ -908,6 +908,23 @@ bool RosterChanger::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) 
 		singleKind = indexKind;
 	}
 	return !ASelected.isEmpty();
+}
+
+QMap<int, QStringList> RosterChanger::metaIndexesRolesMap(const QList<IRosterIndex *> &AIndexes) const
+{
+	QMap<int, QStringList> rolesMap;
+	foreach(IRosterIndex *index, AIndexes)
+	{
+		for(int row=0; row<index->childCount(); row++)
+		{
+			IRosterIndex *metaItemIndex = index->childIndex(row);
+			rolesMap[RDR_STREAM_JID].append(metaItemIndex->data(RDR_STREAM_JID).toString());
+			rolesMap[RDR_PREP_FULL_JID].append(metaItemIndex->data(RDR_PREP_FULL_JID).toString());
+			rolesMap[RDR_PREP_BARE_JID].append(metaItemIndex->data(RDR_PREP_BARE_JID).toString());
+			rolesMap[RDR_GROUP].append(metaItemIndex->data(RDR_GROUP).toString());
+		}
+	}
+	return rolesMap;
 }
 
 QMap<int, QStringList> RosterChanger::groupIndexesRolesMap(const QList<IRosterIndex *> &AIndexes) const
@@ -1661,17 +1678,18 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			}
 			else if (AId==SCT_ROSTERVIEW_RENAME && indexes.count()==1)
 			{
-				if (!FRostersView->editRosterIndex(index, RDR_NAME))
+				if (indexKind == RIK_GROUP)
 				{
-					if (indexKind == RIK_GROUP)
+					if (!FRostersView->editRosterIndex(index, RDR_NAME))
 					{
 						QMap<int, QStringList> rolesMap = groupIndexesRolesMap(indexes);
 						renameGroups(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_GROUP),index->data(RDR_NAME).toString());
 					}
-					else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
-					{
+				}
+				else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
+				{
+					if (!FRostersView->editRosterIndex(index, RDR_NAME))
 						renameContact(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString(),index->data(RDR_NAME).toString());
-					}
 				}
 			}
 			else if (AId == SCT_ROSTERVIEW_REMOVEFROMGROUP)
@@ -1680,6 +1698,11 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 				{
 					QMap<int, QStringList> rolesMap = groupIndexesRolesMap(indexes);
 					removeGroups(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_GROUP));
+				}
+				else if (indexKind == RIK_METACONTACT)
+				{
+					QMap<int, QStringList> rolesMap = metaIndexesRolesMap(indexes);
+					removeContactsFromGroups(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),rolesMap.value(RDR_GROUP));
 				}
 				else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
 				{
@@ -1694,6 +1717,11 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 					QMap<int, QStringList> rolesMap = groupIndexesRolesMap(indexes);
 					removeGroupsContacts(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_GROUP));
 				}
+				else if (indexKind == RIK_METACONTACT)
+				{
+					QMap<int, QStringList> rolesMap = metaIndexesRolesMap(indexes);
+					removeContactsFromRoster(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID));
+				}
 				else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
 				{
 					QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
@@ -1702,7 +1730,12 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			}
 			else if (AId == SCT_ROSTERVIEW_SUBSCRIBE)
 			{
-				if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
+				if (indexKind == RIK_METACONTACT)
+				{
+					QMap<int, QStringList> rolesMap = metaIndexesRolesMap(indexes);
+					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Subscribe);
+				}
+				else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
 				{
 					QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
 					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Subscribe);
@@ -1710,7 +1743,12 @@ void RosterChanger::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			}
 			else if (AId == SCT_ROSTERVIEW_UNSUBSCRIBE)
 			{
-				if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
+				if (indexKind == RIK_METACONTACT)
+				{
+					QMap<int, QStringList> rolesMap = metaIndexesRolesMap(indexes);
+					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Unsubscribe);
+				}
+				else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT || indexKind==RIK_METACONTACT_ITEM)
 				{
 					QMap<int, QStringList> rolesMap = FRostersView->indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
 					changeSubscription(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),IRoster::Unsubscribe);

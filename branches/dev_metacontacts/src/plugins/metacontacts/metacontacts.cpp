@@ -24,6 +24,7 @@
 #include <definitions/recentitemtypes.h>
 #include <definitions/recentitemproperties.h>
 #include <utils/widgetmanager.h>
+#include <utils/shortcuts.h>
 #include <utils/logger.h>
 
 #define UPDATE_META_TIMEOUT     0
@@ -39,8 +40,8 @@
 
 static const IMetaContact NullMetaContact = IMetaContact();
 
-static const QList<int> DragKinds = QList<int>() << RIK_CONTACT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
-static const QList<int> DropKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_CONTACT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> DragRosterKinds = QList<int>() << RIK_CONTACT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+static const QList<int> DropRosterKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_CONTACT << RIK_METACONTACT << RIK_METACONTACT_ITEM;
 
 MetaContacts::MetaContacts()
 {
@@ -195,6 +196,10 @@ bool MetaContacts::initConnections(IPluginManager *APluginManager, int &AInitOrd
 
 bool MetaContacts::initObjects()
 {
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,tr("Combine Contacts"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,tr("Destroy Metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+	Shortcuts::declareShortcut(SCT_ROSTERVIEW_DETACHFROMMETACONTACT,tr("Detach from Metacontact"),QKeySequence::UnknownKey,Shortcuts::WidgetShortcut);
+
 	if (FRostersModel)
 	{
 		FRostersModel->insertRosterDataHolder(RDHO_METACONTACTS,this);
@@ -207,6 +212,10 @@ bool MetaContacts::initObjects()
 		FRostersView->insertEditHandler(REHO_METACONTACTS_RENAME,this);
 		FRostersView->insertProxyModel(FFilterProxyModel,RPO_METACONTACTS_FILTER);
 		FRostersViewPlugin->registerExpandableRosterIndexKind(RIK_METACONTACT,RDR_METACONTACT_ID);
+
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_COMBINECONTACTS,FRostersView->instance());
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_DESTROYMETACONTACT,FRostersView->instance());
+		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_DETACHFROMMETACONTACT,FRostersView->instance());
 	}
 	if (FRecentContacts)
 	{
@@ -405,7 +414,7 @@ bool MetaContacts::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, co
 Qt::DropActions MetaContacts::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Q_UNUSED(AEvent); Q_UNUSED(ADrag);
-	if (DragKinds.contains(AIndex->kind()))
+	if (DragRosterKinds.contains(AIndex->kind()))
 		return Qt::CopyAction|Qt::MoveAction;
 	return Qt::IgnoreAction;
 }
@@ -418,7 +427,7 @@ bool MetaContacts::rosterDragEnter(const QDragEnterEvent *AEvent)
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
 		operator>>(stream,indexData);
 
-		return DragKinds.contains(indexData.value(RDR_KIND).toInt());
+		return DragRosterKinds.contains(indexData.value(RDR_KIND).toInt());
 	}
 	return false;
 }
@@ -426,7 +435,7 @@ bool MetaContacts::rosterDragEnter(const QDragEnterEvent *AEvent)
 bool MetaContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
 {
 	int hoverKind = AHover->kind();
-	if (DropKinds.contains(hoverKind) && (AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0)
+	if (DropRosterKinds.contains(hoverKind) && (AEvent->dropAction() & (Qt::CopyAction|Qt::MoveAction))>0)
 	{
 		QMap<int, QVariant> indexData;
 		QDataStream stream(AEvent->mimeData()->data(DDT_ROSTERSVIEW_INDEX_DATA));
@@ -1352,10 +1361,10 @@ bool MetaContacts::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) c
 {
 	foreach(IRosterIndex *index, ASelected)
 	{
-		int kind = index->kind();
-		if (kind!=RIK_CONTACT && kind!=RIK_METACONTACT && kind!=RIK_METACONTACT_ITEM)
+		int indexKind = index->kind();
+		if (indexKind!=RIK_CONTACT && indexKind!=RIK_METACONTACT && indexKind!=RIK_METACONTACT_ITEM)
 			return false;
-		else if (kind==RIK_CONTACT && !isValidItem(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString()))
+		else if (indexKind==RIK_CONTACT && !isValidItem(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString()))
 			return false;
 	}
 	return !ASelected.isEmpty();
@@ -1903,6 +1912,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				combineAction->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
 				combineAction->setData(ADR_CONTACT_JID,rolesMap.value(RDR_PREP_BARE_JID));
 				combineAction->setData(ADR_METACONTACT_ID,rolesMap.value(RDR_METACONTACT_ID));
+				combineAction->setShortcutId(SCT_ROSTERVIEW_COMBINECONTACTS);
 				connect(combineAction,SIGNAL(triggered()),SLOT(onCombineMetaItemsByAction()));
 				AMenu->addAction(combineAction,AG_RVCM_METACONTACTS,true);
 			}
@@ -1914,6 +1924,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				detachAction->setIcon(RSR_STORAGE_MENUICONS,MNI_METACONTACTS_DETACH);
 				detachAction->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
 				detachAction->setData(ADR_CONTACT_JID,rolesMap.value(RDR_PREP_BARE_JID));
+				detachAction->setShortcutId(SCT_ROSTERVIEW_DETACHFROMMETACONTACT);
 				connect(detachAction,SIGNAL(triggered()),SLOT(onRemoveMetaItemsByAction()));
 				AMenu->addAction(detachAction,AG_RVCM_METACONTACTS,true);
 			}
@@ -1925,6 +1936,7 @@ void MetaContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AI
 				destroyAction->setIcon(RSR_STORAGE_MENUICONS,MNI_METACONTACTS_DESTROY);
 				destroyAction->setData(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
 				destroyAction->setData(ADR_METACONTACT_ID,rolesMap.value(RDR_METACONTACT_ID));
+				destroyAction->setShortcutId(SCT_ROSTERVIEW_DESTROYMETACONTACT);
 				connect(destroyAction,SIGNAL(triggered()),SLOT(onDestroyMetaContactsByAction()));
 				AMenu->addAction(destroyAction,AG_RVCM_METACONTACTS,true);
 			}
@@ -2334,27 +2346,30 @@ void MetaContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (FRostersView && AWidget==FRostersView->instance())
 	{
 		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_RENAME && indexes.count()==1)
+		QMap<int, QStringList> rolesMap = indexesRolesMap(indexes,QList<int>()<<RDR_KIND<<RDR_STREAM_JID<<RDR_PREP_BARE_JID<<RDR_METACONTACT_ID);
+		if (isSelectionAccepted(indexes) && isReadyStreams(rolesMap.value(RDR_STREAM_JID)))
 		{
-			IRosterIndex *index = indexes.first();
-			if (index->kind()==RIK_METACONTACT && !FRostersView->editRosterIndex(index,RDR_NAME))
+			QStringList uniqueKinds = rolesMap.value(RDR_KIND).toSet().toList();
+			if (AId==SCT_ROSTERVIEW_RENAME && indexes.count()==1)
 			{
-				QMap<int, QStringList> rolesMap = indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_METACONTACT_ID);
-				renameMetaContact(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_METACONTACT_ID));
+				IRosterIndex *index = indexes.first();
+				if (index->kind()==RIK_METACONTACT && !FRostersView->editRosterIndex(index,RDR_NAME))
+				{
+					QMap<int, QStringList> rolesMap = indexesRolesMap(indexes,QList<int>()<<RDR_STREAM_JID<<RDR_METACONTACT_ID);
+					renameMetaContact(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_METACONTACT_ID));
+				}
 			}
-		}
-		else if (false && hasProxiedIndexes(indexes))
-		{
-			QList<IRosterIndex *> proxies = indexesProxies(indexes);
-			if (!proxies.isEmpty() && FRostersView->isSelectionAcceptable(proxies))
+			else if (AId==SCT_ROSTERVIEW_COMBINECONTACTS && indexes.count()>1)
 			{
-				FFilterProxyModel->setHideContacts(false);
-
-				FRostersView->setSelectedRosterIndexes(proxies);
-				Shortcuts::activateShortcut(AId,AWidget);
-				FRostersView->setSelectedRosterIndexes(indexes);
-
-				FFilterProxyModel->setHideContacts(true);
+				combineMetaItems(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID),rolesMap.value(RDR_METACONTACT_ID));
+			}
+			else if (AId==SCT_ROSTERVIEW_DESTROYMETACONTACT && uniqueKinds.count()==1 && uniqueKinds.at(0).toInt()==RIK_METACONTACT)
+			{
+				destroyMetaContacts(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_METACONTACT_ID));
+			}
+			else if (AId==SCT_ROSTERVIEW_DETACHFROMMETACONTACT && uniqueKinds.count()==1 && uniqueKinds.at(0).toInt()==RIK_METACONTACT_ITEM)
+			{
+				removeMetaItems(rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_PREP_BARE_JID));
 			}
 		}
 	}

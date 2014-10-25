@@ -62,5 +62,9 @@
         <source>%1 - Chat</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Combine Contacts</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>
