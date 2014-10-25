@@ -8,7 +8,8 @@
 
 #define CARBONS_TIMEOUT               30000
 
-#define SHC_FORWARDED_MESSAGE         "/message/forwarded[@xmlns='" NS_MESSAGE_FORWARD "']"
+#define SHC_CARBONS_SENT              "/message/sent[@xmlns='" NS_MESSAGE_CARBONS "']"
+#define SHC_CARBONS_RECEIVED          "/message/received[@xmlns='" NS_MESSAGE_CARBONS "']"
 
 MessageCarbons::MessageCarbons()
 {
@@ -90,15 +91,16 @@ bool MessageCarbons::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanz
 {
 	if (isEnabled(AStreamJid) && FSHIForwards.value(AStreamJid)==AHandleId)
 	{
-		bool isSent = !AStanza.firstElement("sent",NS_MESSAGE_CARBONS).isNull();
-		bool isReceived = !AStanza.firstElement("received",NS_MESSAGE_CARBONS).isNull();
-		QDomElement msgElem = AStanza.firstElement("forwarded",NS_MESSAGE_FORWARD).firstChildElement("message");
-		if (!msgElem.isNull() && (isSent || isReceived))
+		QDomElement sentElem = AStanza.firstElement("sent",NS_MESSAGE_CARBONS);
+		QDomElement recvElem = AStanza.firstElement("received",NS_MESSAGE_CARBONS);
+		QDomElement carbonElem = !sentElem.isNull() ? sentElem : recvElem;
+		QDomElement messageElem =  AStanza.findElement(carbonElem,"forwarded",NS_MESSAGE_FORWARD).firstChildElement("message");
+		if (!messageElem.isNull())
 		{
 			AAccept = true;
-			Stanza stanza(msgElem);
+			Stanza stanza(messageElem);
 			Message message(stanza);
-			if (isSent)
+			if (!sentElem.isNull())
 			{
 				message.stanza().addElement("sent",NS_MESSAGE_CARBONS);
 				if (FMessageProcessor)
@@ -108,7 +110,7 @@ bool MessageCarbons::stanzaReadWrite(int AHandleId, const Jid &AStreamJid, Stanz
 				}
 				emit messageSent(AStreamJid,message);
 			}
-			else
+			else if (!recvElem.isNull())
 			{
 				message.stanza().addElement("received",NS_MESSAGE_CARBONS);
 				if (FMessageProcessor)
@@ -212,7 +214,8 @@ void MessageCarbons::onXmppStreamOpened(IXmppStream *AXmppStream)
 		shandle.order = SHO_DEFAULT;
 		shandle.direction = IStanzaHandle::DirectionIn;
 		shandle.streamJid = AXmppStream->streamJid();
-		shandle.conditions.append(SHC_FORWARDED_MESSAGE);
+		shandle.conditions.append(SHC_CARBONS_SENT);
+		shandle.conditions.append(SHC_CARBONS_RECEIVED);
 		FSHIForwards.insert(shandle.streamJid,FStanzaProcessor->insertStanzaHandle(shandle));
 	}
 }
