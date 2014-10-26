@@ -46,6 +46,8 @@
 #define ADR_RECENT_TYPE              Action::DR_UserDefined + 3
 #define ADR_RECENT_REFERENCE         Action::DR_UserDefined + 4
 
+static const IRecentItem NullRecentItem = IRecentItem();
+
 bool recentItemLessThen(const IRecentItem &AItem1, const IRecentItem &AItem2)
 {
 	bool favorite1 = AItem1.properties.value(REIP_FAVORITE).toBool();
@@ -587,7 +589,6 @@ QList<IRecentItem> RecentContacts::visibleItems() const
 
 IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 {
-	static const IRecentItem nullItem;
 	if (AIndex->kind() == RIK_RECENT_ITEM)
 	{
 		IRecentItem item;
@@ -602,7 +603,7 @@ IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 		if (isValidItem(item))
 			return item;
 	}
-	return nullItem;
+	return NullRecentItem;
 }
 
 IRosterIndex *RecentContacts::itemRosterIndex(const IRecentItem &AItem) const
@@ -833,10 +834,9 @@ IRecentItem &RecentContacts::findRealItem(const IRecentItem &AItem)
 
 IRecentItem RecentContacts::findRealItem(const IRecentItem &AItem) const
 {
-	static const IRecentItem nullItem;
 	const QList<IRecentItem> items = FStreamItems.value(AItem.streamJid);
 	int index = items.indexOf(AItem);
-	return index>=0 ? items.value(index) : nullItem;
+	return index>=0 ? items.value(index) : NullRecentItem;
 }
 
 void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems, bool AReplace)
