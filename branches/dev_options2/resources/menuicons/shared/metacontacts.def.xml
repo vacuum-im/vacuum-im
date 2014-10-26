@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>metacontactsCombine</key>
+    <object mime="image/png">metacontactscombine.png</object>
+  </icon>
+  <icon>
+    <key>metacontactsDetach</key>
+    <object mime="image/png">metacontactsdetach.png</object>
+  </icon>
+  <icon>
+    <key>metacontactsDestroy</key>
+    <object mime="image/png">metacontactsdestroy.png</object>
+  </icon>
+</icondef>

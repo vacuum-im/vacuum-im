@@ -1,0 +1,6 @@
+#ifndef DEF_DISCOFEATUREHANDLERORDERS_H
+#define DEF_DISCOFEATUREHANDLERORDERS_H
+
+#define DFO_DEFAULT                   1000
+
+#endif

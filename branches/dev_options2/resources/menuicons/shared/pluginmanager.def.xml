@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<icondef>
+  <icon>
+    <key>pluginmanagerSetup</key>
+    <object mime="image/png">pluginmanagersetup.png</object>
+  </icon>
+  <icon>
+    <key>pluginmanagerAbout</key>
+    <object mime="image/png">pluginmanagerabout.png</object>
+  </icon>
+  <icon>
+    <key>pluginmanagerAboutQt</key>
+    <object mime="image/png">pluginmanageraboutqt.png</object>
+  </icon>
+</icondef>
