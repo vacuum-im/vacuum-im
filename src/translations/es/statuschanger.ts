@@ -209,8 +209,8 @@ Puedes establecer clases de estados para los estados adicionales definidos por t
         <translation>Al perder la conexión con el servidor</translation>
     </message>
     <message>
-        <source>Left Vacuum-IM</source>
-        <translation>Salir de Vacuum-IM</translation>
+        <source>Left %1</source>
+        <translation>Salir de %1</translation>
     </message>
 </context>
 </TS>
