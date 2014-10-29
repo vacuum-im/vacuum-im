@@ -9,6 +9,7 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
@@ -578,13 +579,21 @@ QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) 
 	return FStatusIcons!=NULL ? FStatusIcons->iconByJid(AStreamJid,AContactJid) : QIcon();
 }
 
-QString Notifications::contactName(const Jid &AStreamJId, const Jid &AContactJid) const
+QString Notifications::contactName(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJId) : NULL;
-	QString name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
+	QString name;
+
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->findContactIndexes(AStreamJid, AContactJid).value(0) : NULL;
+	if (index != NULL)
+		name = index->data(RDR_NAME).toString();
+
 	if (name.isEmpty())
-		name = AContactJid.uBare();
-	return name;
+	{
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+		name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
+	}
+
+	return name.isEmpty() ? AContactJid.uBare() : name;
 }
 
 int Notifications::notifyIdByRosterId(int ARosterId) const
