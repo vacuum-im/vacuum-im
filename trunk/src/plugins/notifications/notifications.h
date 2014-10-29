@@ -83,7 +83,7 @@ public:
 	//Notification Utilities
 	virtual QImage contactAvatar(const Jid &AContactJid) const;
 	virtual QIcon contactIcon(const Jid &AStreamJid, const Jid &AContactJid) const;
-	virtual QString contactName(const Jid &AStreamJId, const Jid &AContactJid) const;
+	virtual QString contactName(const Jid &AStreamJid, const Jid &AContactJid) const;
 signals:
 	void notificationActivated(int ANotifyId);
 	void notificationRemoved(int ANotifyId);
