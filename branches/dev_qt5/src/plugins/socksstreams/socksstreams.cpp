@@ -62,7 +62,6 @@ bool SocksStreams::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 		if (FXmppStreams)
 		{
-			connect(FXmppStreams->instance(),SIGNAL(opened(IXmppStream *)),SLOT(onXmppStreamOpened(IXmppStream *)));
 			connect(FXmppStreams->instance(),SIGNAL(closed(IXmppStream *)),SLOT(onXmppStreamClosed(IXmppStream *)));
 		}
 	}
@@ -263,15 +262,9 @@ void SocksStreams::removeLocalConnection(const QString &AKey)
 		FServer.close();
 }
 
-void SocksStreams::onXmppStreamOpened(IXmppStream *AStream)
+void SocksStreams::onXmppStreamClosed(IXmppStream *AXmppStream)
 {
-	if (FDiscovery)
-		FDiscovery->requestDiscoItems(AStream->streamJid(), AStream->streamJid().domain());
-}
-
-void SocksStreams::onXmppStreamClosed(IXmppStream *AStream)
-{
-	FStreamProxy.remove(AStream->streamJid());
+	FStreamProxy.remove(AXmppStream->streamJid());
 }
 
 void SocksStreams::onDiscoItemsReceived(const IDiscoItems &AItems)

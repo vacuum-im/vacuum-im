@@ -541,7 +541,7 @@ IArchiveCollection FileMessageArchive::loadFileCollection(const Jid &AStreamJid,
 			{
 				QDomDocument doc;
 				doc.setContent(&file,true);
-				FArchiver->elementToCollection(doc.documentElement(),collection);
+				FArchiver->elementToCollection(AStreamJid,doc.documentElement(),collection);
 				collection.header.engineId = engineId();
 			}
 			else if (file.exists())

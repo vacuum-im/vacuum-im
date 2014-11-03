@@ -93,6 +93,7 @@ class IServiceDiscovery
 public:
 	virtual QObject *instance() =0;
 	virtual IPluginManager *pluginManager() const =0;
+	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const =0;
 	virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
 	virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL) =0;
@@ -124,22 +125,24 @@ public:
 	//DiscoItems
 	virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString::null) =0;
 protected:
+	virtual void discoOpened(const Jid &AStreamJid) =0;
+	virtual void discoClosed(const Jid &AStreamJid) =0;
+	virtual void discoInfoReceived(const IDiscoInfo &ADiscoInfo) =0;
+	virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo) =0;
+	virtual void discoItemsReceived(const IDiscoItems &ADiscoItems) =0;
+	virtual void discoFeatureInserted(const IDiscoFeature &AFeature) =0;
+	virtual void discoFeatureRemoved(const IDiscoFeature &AFeature) =0;
 	virtual void discoItemsWindowCreated(IDiscoItemsWindow *AWindow) =0;
 	virtual void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow) =0;
 	virtual void discoHandlerInserted(IDiscoHandler *AHandler) =0;
 	virtual void discoHandlerRemoved(IDiscoHandler *AHandler) =0;
 	virtual void featureHandlerInserted(const QString &AFeature, IDiscoFeatureHandler *AHandler) =0;
 	virtual void featureHandlerRemoved(const QString &AFeature, IDiscoFeatureHandler *AHandler) =0;
-	virtual void discoFeatureInserted(const IDiscoFeature &AFeature) =0;
-	virtual void discoFeatureRemoved(const IDiscoFeature &AFeature) =0;
-	virtual void discoInfoReceived(const IDiscoInfo &ADiscoInfo) =0;
-	virtual void discoInfoRemoved(const IDiscoInfo &ADiscoInfo) =0;
-	virtual void discoItemsReceived(const IDiscoItems &ADiscoItems) =0;
 };
 
 Q_DECLARE_INTERFACE(IDiscoHandler,"Vacuum.Plugin.IDiscoHandler/1.0")
 Q_DECLARE_INTERFACE(IDiscoFeatureHandler,"Vacuum.Plugin.IDiscoFeatureHandler/1.0")
 Q_DECLARE_INTERFACE(IDiscoItemsWindow,"Vacuum.Plugin.IDiscoItemsWindow/1.1")
-Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.2")
+Q_DECLARE_INTERFACE(IServiceDiscovery,"Vacuum.Plugin.IServiceDiscovery/1.3")
 
 #endif

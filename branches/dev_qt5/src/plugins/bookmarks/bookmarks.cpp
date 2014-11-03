@@ -600,15 +600,21 @@ void Bookmarks::onPrivateDataUpdated(const QString &AId, const Jid &AStreamJid, 
 	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_BOOKMARKS && AElement.namespaceURI()==NS_STORAGE_BOOKMARKS)
 	{
-		bool autoStart = !isReady(AStreamJid);
+		bool opened = isReady(AStreamJid);
 
-		LOG_STRM_INFO(AStreamJid,"Bookmarks loaded");
+		LOG_STRM_INFO(AStreamJid,"Bookmarks loaded or updated");
 		FBookmarks[AStreamJid] = loadBookmarksFromXML(AElement);
 		updateConferenceIndexes(AStreamJid);
-		emit bookmarksChanged(AStreamJid);
 
-		if (autoStart)
+		if (!opened)
+		{
 			autoStartBookmarks(AStreamJid);
+			emit bookmarksOpened(AStreamJid);
+		}
+		else
+		{
+			emit bookmarksChanged(AStreamJid);
+		}
 	}
 }
 
@@ -638,8 +644,11 @@ void Bookmarks::onPrivateStorageClosed(const Jid &AStreamJid)
 {
 	delete FDialogs.take(AStreamJid);
 	FBookmarks.remove(AStreamJid);
+
 	updateConferenceIndexes(AStreamJid);
 	FBookmarkIndexes.remove(AStreamJid);
+	
+	emit bookmarksClosed(AStreamJid);
 }
 
 void Bookmarks::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
@@ -1106,10 +1115,10 @@ void Bookmarks::onShortcutActivated(const QString &AId, QWidget *AWidget)
 	if (FRostersView && AWidget==FRostersView->instance())
 	{
 		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
-		if (AId==SCT_ROSTERVIEW_RENAME && !FRostersView->hasMultiSelection())
+		if (AId==SCT_ROSTERVIEW_RENAME && indexes.count()==1 && isSelectionAccepted(indexes))
 		{
 			IRosterIndex *index = indexes.first();
-			if (isSelectionAccepted(indexes) && !FRostersView->editRosterIndex(index,RDR_NAME))
+			if (!FRostersView->editRosterIndex(index,RDR_NAME))
 			{
 				Jid streamJid = index->data(RDR_STREAM_JID).toString();
 				IBookmark bookmark = FBookmarkIndexes.value(streamJid).value(index);

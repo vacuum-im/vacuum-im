@@ -36,8 +36,8 @@ public:
 	virtual int insertNodeHandler(const QString &ANode, IPEPHandler *AHandle);
 	virtual bool removeNodeHandler(int AHandleId);
 private slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onPEPHandlerDestroyed(QObject *AHandler);
 private:
 	IXmppStreams *FXmppStreams;

@@ -109,6 +109,7 @@ signals:
 	void recentItemUpdated(const IRecentItem &AItem);
 protected:
 	void registerDiscoFeatures();
+	bool isReady(const Jid &AStreamJid) const;
 	QString streamVCardNick(const Jid &AStreamJid) const;
 	void updateRecentItemProxy(IRosterIndex *AIndex);
 	void updateRecentItemProperties(IRosterIndex *AIndex);
@@ -116,6 +117,7 @@ protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createInviteMenu(const Jid &AContactJid, QWidget *AParent) const;
 	Action *createJoinAction(const Jid &AStreamJid, const Jid &ARoomJid, QObject *AParent) const;
+	IRosterIndex *getConferencesGroupIndex(const Jid &AStreamJid) const;
 	IMultiUserChatWindow *findMultiChatWindowForIndex(const IRosterIndex *AIndex) const;
 	IMultiUserChatWindow *getMultiChatWindowForIndex(const IRosterIndex *AIndex);
 	QString getRoomName(const Jid &AStreamJid, const Jid &ARoomJid) const;
@@ -130,13 +132,15 @@ protected slots:
 	void onMultiChatWindowInfoContextMenu(Menu *AMenu);
 	void onMultiChatWindowInfoToolTips(QMap<int,QString> &AToolTips);
 protected slots:
+	void onRostersModelStreamsLayoutChanged(int ABefore);
+	void onRostersModelIndexDestroyed(IRosterIndex *AIndex);
+protected slots:
 	void onStatusIconsChanged();
 	void onJoinRoomActionTriggered(bool);
 	void onOpenRoomActionTriggered(bool);
 	void onEnterRoomActionTriggered(bool);
 	void onExitRoomActionTriggered(bool);
 	void onCopyToClipboardActionTriggered(bool);
-	void onRosterIndexDestroyed(IRosterIndex *AIndex);
 	void onActiveStreamRemoved(const Jid &AStreamJid);
 	void onShortcutActivated(const QString &AId, QWidget *AWidget);
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);

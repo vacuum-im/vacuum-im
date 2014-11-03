@@ -88,7 +88,7 @@
 
 #define NS_ROSTERX                              "http://jabber.org/protocol/rosterx"
 
-#define NS_MESSAGE_CARBONS                      "urn:xmpp:carbons:1"
+#define NS_MESSAGE_CARBONS                      "urn:xmpp:carbons:2"
 #define NS_MESSAGE_FORWARD                      "urn:xmpp:forward:0"
 
 #define NS_VACUUM_PRIVATESTORAGE_UPDATE         "vacuum:privatestorage:update"

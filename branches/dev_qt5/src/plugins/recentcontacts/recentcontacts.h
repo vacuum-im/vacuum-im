@@ -7,8 +7,9 @@
 #include <interfaces/irostersmodel.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/iprivatestorage.h>
-#include <interfaces/istatusicons.h>
 #include <interfaces/imessageprocessor.h>
+#include <interfaces/iaccountmanager.h>
+#include <interfaces/istatusicons.h>
 #include <interfaces/ipresence.h>
 #include <utils/options.h>
 
@@ -76,6 +77,8 @@ public:
 	virtual void registerItemHandler(const QString &AType, IRecentItemHandler *AHandler);
 signals:
 	void visibleItemsChanged();
+	void recentContactsOpened(const Jid &AStreamJid);
+	void recentContactsClosed(const Jid &AStreamJid);
 	void recentItemAdded(const IRecentItem &AItem);
 	void recentItemChanged(const IRecentItem &AItem);
 	void recentItemRemoved(const IRecentItem &AItem);
@@ -97,7 +100,6 @@ protected:
 	IRecentItem &findRealItem(const IRecentItem &AItem);
 	IRecentItem findRealItem(const IRecentItem &AItem) const;
 	void mergeRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems, bool AReplace);
-	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive=true) const;
 protected:
 	void startSaveItemsToStorage(const Jid &AStreamJid);
 	bool saveItemsToStorage(const Jid &AStreamJid) const;
@@ -109,7 +111,10 @@ protected:
 	void saveItemsToFile(const QString &AFileName, const QList<IRecentItem> &AItems) const;
 protected:
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
-	bool isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const;
+	bool isRecentSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
+	bool hasProxiedIndexes(const QList<IRosterIndex *> &AIndexes) const;
+	QList<IRosterIndex *> indexesProxies(const QList<IRosterIndex *> &AIndexes, bool ASelfProxy=true) const;
+protected:
 	void removeRecentItems(const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 	void setItemsFavorite(bool AFavorite, const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences);
 protected slots:
@@ -124,6 +129,7 @@ protected slots:
 	void onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement);
 	void onPrivateStorageDataChanged(const Jid &AStreamJid, const QString &ATagName, const QString &ANamespace);
 	void onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid);
+	void onPrivateStorageClosed(const Jid &AStreamJid);
 protected slots:
 	void onRostersViewIndexContextMenuAboutToShow();
 	void onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted);
@@ -154,8 +160,9 @@ private:
 	IRostersModel *FRostersModel;
 	IRostersView *FRostersView;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IStatusIcons *FStatusIcons;
 	IMessageProcessor *FMessageProcessor;
+	IAccountManager *FAccountManager;
+	IStatusIcons *FStatusIcons;
 private:
 	quint32 FShowFavoriteLabelId;
 private:
@@ -166,14 +173,15 @@ private:
 private:
 	QTimer FSaveTimer;
 	QSet<Jid> FSaveStreams;
+	QMap<Jid, QString> FLoadRequestId;
 private:
 	QMap<int, int> FProxyToIndexNotify;
-	QMap<Menu *, QSet<Action *> > FProxyContextMenuActions;
+	QMap<Menu *, Menu *> FProxyContextMenu;
 	QMap<const IRosterIndex *, IRosterIndex *> FIndexToProxy;
 	QMap<const IRosterIndex *, IRosterIndex *> FProxyToIndex;
 	QMap<IRosterIndex *, QList<IRosterIndex *> > FIndexProxies;
 	QList<IRostersDragDropHandler *> FMovedProxyDragHandlers;
-	QList<IRostersDragDropHandler *> FExteredProxyDragHandlers;
+	QList<IRostersDragDropHandler *> FEnteredProxyDragHandlers;
 private:
 	bool FHideLaterContacts;
 	bool FAllwaysShowOffline;

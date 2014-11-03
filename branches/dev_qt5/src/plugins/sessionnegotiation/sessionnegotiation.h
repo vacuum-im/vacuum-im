@@ -57,6 +57,8 @@ public:
 	virtual void insertNegotiator(ISessionNegotiator *ANegotiator, int AOrder);
 	virtual void removeNegotiator(ISessionNegotiator *ANegotiator, int AOrder);
 signals:
+	void sessionsOpened(const Jid &AStreamJid);
+	void sessionsClosed(const Jid &AStreamJid);
 	void sessionActivated(const IStanzaSession &ASession);
 	void sessionTerminated(const IStanzaSession &ASession);
 protected:
@@ -81,10 +83,10 @@ protected:
 protected:
 	bool eventFilter(QObject *AObject, QEvent *AEvent);
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamAboutToClose(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
-	void onStreamAboutToClose(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
 	void onNotificationActivated(int ANotifyId);
 	void onAcceptDialogAccepted();
 	void onAcceptDialogRejected();

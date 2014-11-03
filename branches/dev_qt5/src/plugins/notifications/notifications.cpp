@@ -9,6 +9,7 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
@@ -266,10 +267,23 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::RosterNotify,notifyId,record.notification))
 		{
-			Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
-			Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
-			bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
-			QList<IRosterIndex *> indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
+			QList<IRosterIndex *> indexes;
+			QMap<QString,QVariant> searchData = record.notification.data.value(NDR_ROSTER_SEARCH_DATA).toMap();
+			if (searchData.isEmpty())
+			{
+				Jid streamJid = record.notification.data.value(NDR_STREAM_JID).toString();
+				Jid contactJid = record.notification.data.value(NDR_CONTACT_JID).toString();
+				bool createIndex = record.notification.data.value(NDR_ROSTER_CREATE_INDEX).toBool();
+				indexes = createIndex ? FRostersModel->getContactIndexes(streamJid,contactJid) : FRostersModel->findContactIndexes(streamJid,contactJid);
+			}
+			else
+			{
+				QMultiMap<int,QVariant> findData;
+				for (QMap<QString,QVariant>::const_iterator it=searchData.constBegin(); it!=searchData.constEnd(); ++it)
+					findData.insertMulti(it.key().toInt(),it.value());
+				indexes = FRostersModel->rootIndex()->findChilds(findData,true);
+			}
+
 			if (!indexes.isEmpty())
 			{
 				IRostersNotify rnotify;
@@ -565,13 +579,21 @@ QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) 
 	return FStatusIcons!=NULL ? FStatusIcons->iconByJid(AStreamJid,AContactJid) : QIcon();
 }
 
-QString Notifications::contactName(const Jid &AStreamJId, const Jid &AContactJid) const
+QString Notifications::contactName(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJId) : NULL;
-	QString name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
+	QString name;
+
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->findContactIndexes(AStreamJid, AContactJid).value(0) : NULL;
+	if (index != NULL)
+		name = index->data(RDR_NAME).toString();
+
 	if (name.isEmpty())
-		name = AContactJid.uBare();
-	return name;
+	{
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+		name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
+	}
+
+	return name.isEmpty() ? AContactJid.uBare() : name;
 }
 
 int Notifications::notifyIdByRosterId(int ARosterId) const

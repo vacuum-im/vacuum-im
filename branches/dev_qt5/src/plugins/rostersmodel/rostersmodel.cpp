@@ -8,6 +8,8 @@
 #include <utils/options.h>
 #include <utils/logger.h>
 
+static const QList<int> ContactsCacheRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
+
 RostersModel::RostersModel()
 {
 	FRosterPlugin = NULL;
@@ -310,14 +312,10 @@ void RostersModel::setStreamsLayout(StreamsLayout ALayout)
 			if (ALayout == LayoutMerged)
 			{
 				foreach(IRosterIndex *sindex, FStreamIndexes.values())
-				{
-					sindex->removeChildren();
 					insertRosterIndex(sindex,getGroupIndex(RIK_GROUP_ACCOUNTS,QString::null,FContactsRoot));
-				}
 			}
 			else //if (ALayout == LayoutSeparately)
 			{
-				FContactsRoot->removeChildren();
 				removeRosterIndex(FContactsRoot,false);
 			}
 		}
@@ -641,7 +639,7 @@ bool RostersModel::isChildIndex(IRosterIndex *AIndex, IRosterIndex *AParent) con
 
 void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 	{
 		IRosterIndex *rindex = static_cast<RosterIndex *>(AItem);
 		Jid streamJid = rindex->data(RDR_STREAM_JID).toString();
@@ -651,7 +649,7 @@ void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 			if (pindex)
 				FGroupsCache[pindex].insertMulti(rindex->data(RDR_NAME).toString(),rindex);
 		}
-		else if (!streamJid.isEmpty())
+		else if (!streamJid.isEmpty() && ContactsCacheRosterKinds.contains(rindex->kind()))
 		{
 			QString bareJid = rindex->data(RDR_PREP_BARE_JID).toString();
 			IRosterIndex *sindex = !bareJid.isEmpty() ? streamIndex(streamJid) : NULL;
@@ -664,7 +662,7 @@ void RostersModel::onAdvancedItemInserted(QStandardItem *AItem)
 
 void RostersModel::onAdvancedItemRemoving(QStandardItem *AItem)
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 	{
 		IRosterIndex *rindex = static_cast<RosterIndex *>(AItem);
 		Jid streamJid = rindex->data(RDR_STREAM_JID).toString();
@@ -674,7 +672,7 @@ void RostersModel::onAdvancedItemRemoving(QStandardItem *AItem)
 			if (pindex)
 				FGroupsCache[pindex].remove(rindex->data(RDR_NAME).toString(),rindex);
 		}
-		else if (!streamJid.isEmpty())
+		else if (!streamJid.isEmpty() && ContactsCacheRosterKinds.contains(rindex->kind()))
 		{
 			QString bareJid = rindex->data(RDR_PREP_BARE_JID).toString();
 			IRosterIndex *sindex = !bareJid.isEmpty() ? streamIndex(streamJid) : NULL;
@@ -687,7 +685,7 @@ void RostersModel::onAdvancedItemRemoving(QStandardItem *AItem)
 
 void RostersModel::onAdvancedItemDataChanged(QStandardItem *AItem, int ARole)
 {
-	if (AItem->type() == IRosterIndex::StandardItemTypeValue)
+	if (AItem->type() == IRosterIndex::RosterItemTypeValue)
 		emit indexDataChanged(static_cast<RosterIndex *>(AItem),ARole);
 }
 
@@ -810,7 +808,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 					itemIndex->setData(AItem.itemJid.pBare(),RDR_PREP_BARE_JID);
 					itemIndex->setData(AItem.name,RDR_NAME);
 					itemIndex->setData(AItem.subscription,RDR_SUBSCRIBTION);
-					itemIndex->setData(AItem.ask,RDR_ASK);
+					itemIndex->setData(AItem.ask,RDR_SUBSCRIPTION_ASK);
 					itemIndex->setData(group,RDR_GROUP);
 
 					itemIndex->setData(pitem.show,RDR_SHOW);
@@ -824,7 +822,7 @@ void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AIt
 				{
 					itemIndex->setData(AItem.name,RDR_NAME);
 					itemIndex->setData(AItem.subscription,RDR_SUBSCRIBTION);
-					itemIndex->setData(AItem.ask,RDR_ASK);
+					itemIndex->setData(AItem.ask,RDR_SUBSCRIPTION_ASK);
 					itemList.append(itemIndex);
 				}
 			}

@@ -160,7 +160,8 @@ bool MultiUserChatPlugin::initConnections(IPluginManager *APluginManager, int &A
 		FRostersModel = qobject_cast<IRostersModel *>(plugin->instance());
 		if (FRostersModel)
 		{
-			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRosterIndexDestroyed(IRosterIndex *)));
+			connect(FRostersModel->instance(),SIGNAL(streamsLayoutChanged(int)),SLOT(onRostersModelStreamsLayoutChanged(int)));
+			connect(FRostersModel->instance(),SIGNAL(indexDestroyed(IRosterIndex *)),SLOT(onRostersModelIndexDestroyed(IRosterIndex *)));
 		}
 	}
 
@@ -512,13 +513,13 @@ bool MultiUserChatPlugin::messageCheck(int AOrder, const Message &AMessage, int 
 bool MultiUserChatPlugin::messageDisplay(const Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AMessage);
-	return ADirection == IMessageProcessor::MessageIn;
+	return ADirection == IMessageProcessor::DirectionIn;
 }
 
 INotification MultiUserChatPlugin::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		QDomElement inviteElem = AMessage.stanza().firstElement("x",NS_MUC_USER).firstChildElement("invite");
 
@@ -588,8 +589,7 @@ bool MultiUserChatPlugin::messageShowWindow(int AOrder, const Jid &AStreamJid, c
 {
 	if (AOrder==MHO_MULTIUSERCHAT_GROUPCHAT && AType==Message::GroupChat)
 	{
-		IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
-		if (stream && stream->isOpen())
+		if (isReady(AStreamJid))
 		{
 			QString nick = AContactJid.resource().isEmpty() ? AContactJid.node() : AContactJid.resource();
 			IMultiUserChatWindow *window = getMultiChatWindow(AStreamJid,AContactJid.bare(),nick,QString::null);
@@ -788,10 +788,10 @@ QList<IRosterIndex *> MultiUserChatPlugin::multiChatRosterIndexes() const
 
 IRosterIndex *MultiUserChatPlugin::findMultiChatRosterIndex(const Jid &AStreamJid, const Jid &ARoomJid) const
 {
-	for (QList<IRosterIndex *>::const_iterator it= FChatIndexes.constBegin(); it!=FChatIndexes.constEnd(); ++it)
+	for (QList<IRosterIndex *>::const_iterator it=FChatIndexes.constBegin(); it!=FChatIndexes.constEnd(); ++it)
 	{
 		IRosterIndex *index = *it;
-		if (AStreamJid==index->data(RDR_STREAM_JID).toString() && (ARoomJid.isEmpty() || ARoomJid==index->data(RDR_PREP_BARE_JID).toString()))
+		if (AStreamJid==index->data(RDR_STREAM_JID).toString() && ARoomJid==index->data(RDR_PREP_BARE_JID).toString())
 			return index;
 	}
 	return NULL;
@@ -802,12 +802,9 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 	IRosterIndex *chatIndex = findMultiChatRosterIndex(AStreamJid,ARoomJid);
 	if (chatIndex == NULL)
 	{
-		IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
-		if (sroot)
+		IRosterIndex *chatGroup = getConferencesGroupIndex(AStreamJid);
+		if (chatGroup)
 		{
-			IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),sroot);
-			chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
-
 			chatIndex = FRostersModel->newRosterIndex(RIK_MUC_ITEM);
 			FChatIndexes.append(chatIndex);
 
@@ -839,7 +836,7 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 		}
 		else
 		{
-			REPORT_ERROR("Failed to get multi user chat roster index: Stream root index not found");
+			REPORT_ERROR("Failed to get multi user chat roster index: Conferences group index not created");
 		}
 	}
 	return chatIndex;
@@ -847,8 +844,7 @@ IRosterIndex *MultiUserChatPlugin::getMultiChatRosterIndex(const Jid &AStreamJid
 
 void MultiUserChatPlugin::showJoinMultiChatDialog(const Jid &AStreamJid, const Jid &ARoomJid, const QString &ANick, const QString &APassword)
 {
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
-	if (stream && stream->isOpen())
+	if (isReady(AStreamJid))
 	{
 		JoinMultiChatDialog *dialog = new JoinMultiChatDialog(this,AStreamJid,ARoomJid,ANick,APassword);
 		dialog->show();
@@ -934,6 +930,12 @@ void MultiUserChatPlugin::registerDiscoFeatures()
 	dfeature.name = tr("Unsecured room");
 	dfeature.description = tr("A room that anyone is allowed to enter without first providing the correct password");
 	FDiscovery->insertDiscoFeature(dfeature);
+}
+
+bool MultiUserChatPlugin::isReady(const Jid &AStreamJid) const
+{
+	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(AStreamJid) : NULL;
+	return stream!=NULL && stream->isOpen();
 }
 
 QString MultiUserChatPlugin::streamVCardNick(const Jid &AStreamJid) const
@@ -1035,6 +1037,18 @@ Action *MultiUserChatPlugin::createJoinAction(const Jid &AStreamJid, const Jid &
 	return action;
 }
 
+IRosterIndex *MultiUserChatPlugin::getConferencesGroupIndex(const Jid &AStreamJid) const
+{
+	IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AStreamJid) : NULL;
+	if (sroot)
+	{
+		IRosterIndex *chatGroup = FRostersModel->getGroupIndex(RIK_GROUP_MUC,tr("Conferences"),sroot);
+		chatGroup->setData(RIKO_GROUP_MUC,RDR_KIND_ORDER);
+		return chatGroup;
+	}
+	return NULL;
+}
+
 IMultiUserChatWindow *MultiUserChatPlugin::findMultiChatWindowForIndex(const IRosterIndex *AIndex) const
 {
 	IMultiUserChatWindow *window = NULL;
@@ -1049,9 +1063,7 @@ IMultiUserChatWindow *MultiUserChatPlugin::getMultiChatWindowForIndex(const IRos
 {
 	IMultiUserChatWindow *window = NULL;
 	Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-
-	IXmppStream *stream = FXmppStreams!=NULL ? FXmppStreams->xmppStream(streamJid) : NULL;
-	if (stream && stream->isOpen())
+	if (isReady(streamJid))
 	{
 		if (AIndex->kind() == RIK_MUC_ITEM)
 		{
@@ -1165,6 +1177,26 @@ void MultiUserChatPlugin::onMultiChatWindowInfoToolTips(QMap<int,QString> &ATool
 	}
 }
 
+void MultiUserChatPlugin::onRostersModelStreamsLayoutChanged(int ABefore)
+{
+	Q_UNUSED(ABefore);
+	for (QList<IRosterIndex *>::const_iterator it=FChatIndexes.constBegin(); it!=FChatIndexes.constEnd(); ++it)
+	{
+		IRosterIndex *chatGroup = getConferencesGroupIndex((*it)->data(RDR_STREAM_JID).toString());
+		if (chatGroup)
+			FRostersModel->insertRosterIndex(*it,chatGroup);
+	}
+}
+
+void MultiUserChatPlugin::onRostersModelIndexDestroyed(IRosterIndex *AIndex)
+{
+	if (FChatIndexes.removeOne(AIndex))
+	{
+		emit multiChatRosterIndexDestroyed(AIndex);
+		updateRecentItemProxy(AIndex);
+	}
+}
+
 void MultiUserChatPlugin::onStatusIconsChanged()
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
@@ -1238,17 +1270,6 @@ void MultiUserChatPlugin::onCopyToClipboardActionTriggered( bool )
 		QApplication::clipboard()->setText(action->data(ADR_CLIPBOARD_DATA).toString());
 }
 
-void MultiUserChatPlugin::onRosterIndexDestroyed(IRosterIndex *AIndex)
-{
-	int index = FChatIndexes.indexOf(AIndex);
-	if (index >= 0)
-	{
-		FChatIndexes.removeAt(index);
-		emit multiChatRosterIndexDestroyed(AIndex);
-		updateRecentItemProxy(AIndex);
-	}
-}
-
 void MultiUserChatPlugin::onActiveStreamRemoved(const Jid &AStreamJid)
 {
 	foreach(IMultiUserChatWindow *window, FChatWindows)
@@ -1294,12 +1315,12 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 					window->exitAndDestroy(QString::null);
 		}
 	}
-	else if (AId == SCT_ROSTERVIEW_SHOWCHATDIALOG)
+	else if (FRostersViewPlugin!=NULL && AWidget==FRostersViewPlugin->rostersView()->instance())
 	{
-		IRosterIndex *index = !FRostersViewPlugin->rostersView()->hasMultiSelection() ? FRostersViewPlugin->rostersView()->selectedRosterIndexes().value(0) : NULL;
-		if (index)
+		QList<IRosterIndex *> indexes = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
+		if (AId==SCT_ROSTERVIEW_SHOWCHATDIALOG && indexes.count()==1)
 		{
-			IMultiUserChatWindow *window = getMultiChatWindowForIndex(index);
+			IMultiUserChatWindow *window = getMultiChatWindowForIndex(indexes.first());
 			if (window)
 			{
 				if (!window->multiUserChat()->isConnected() && window->multiUserChat()->roomError().isNull())
@@ -1307,26 +1328,18 @@ void MultiUserChatPlugin::onShortcutActivated(const QString &AId, QWidget *AWidg
 				window->showTabPage();
 			}
 		}
-	}
-	else if (AId == SCT_ROSTERVIEW_ENTERCONFERENCE)
-	{
-		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
+		else if (AId==SCT_ROSTERVIEW_ENTERCONFERENCE)
 		{
-			foreach(IRosterIndex *index, selected)
+			foreach(IRosterIndex *index, indexes)
 			{
 				IMultiUserChatWindow *window = getMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString(),index->data(RDR_MUC_NICK).toString(),index->data(RDR_MUC_PASSWORD).toString());
 				if (window && !window->multiUserChat()->isConnected())
 					window->multiUserChat()->sendStreamPresence();
 			}
 		}
-	}
-	else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE)
-	{
-		QList<IRosterIndex *> selected = FRostersViewPlugin->rostersView()->selectedRosterIndexes();
-		if (isSelectionAccepted(selected) && selected.at(0)->kind()==RIK_MUC_ITEM)
+		else if (AId == SCT_ROSTERVIEW_EXITCONFERENCE && isSelectionAccepted(indexes) && indexes.first()->kind()==RIK_MUC_ITEM)
 		{
-			foreach(IRosterIndex *index, selected)
+			foreach(IRosterIndex *index, indexes)
 			{
 				IMultiUserChatWindow *window = findMultiChatWindow(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString());
 				if (window)
@@ -1347,22 +1360,24 @@ void MultiUserChatPlugin::onRostersViewIndexContextMenu(const QList<IRosterIndex
 	{
 		bool isMultiSelection = AIndexes.count()>1;
 		IRosterIndex *index = AIndexes.first();
-		if (index->kind()==RIK_STREAM_ROOT)
+		if (index->kind() == RIK_STREAM_ROOT)
 		{
-			int show = index->data(RDR_SHOW).toInt();
-			if (show!=IPresence::Offline && show!=IPresence::Error)
+			Jid streamJid = index->data(RDR_STREAM_JID).toString();
+			if (isReady(streamJid))
 			{
-				Action *action = createJoinAction(index->data(RDR_STREAM_JID).toString(),Jid::null,AMenu);
+				Action *action = createJoinAction(streamJid,Jid::null,AMenu);
 				AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
 			}
 		}
 		else if (index->kind() == RIK_GROUP_MUC)
 		{
-			int show = index->parentIndex()->data(RDR_SHOW).toInt();
-			if (show!=IPresence::Offline && show!=IPresence::Error)
+			foreach(const Jid &streamJid, index->data(RDR_STREAMS).toStringList())
 			{
-				Action *action = createJoinAction(index->data(RDR_STREAM_JID).toString(),Jid::null,AMenu);
-				AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
+				if (isReady(streamJid))
+				{
+					Action *action = createJoinAction(streamJid,Jid::null,AMenu);
+					AMenu->addAction(action,AG_RVCM_MULTIUSERCHAT_JOIN,true);
+				}
 			}
 		}
 		else if (index->kind() == RIK_MUC_ITEM)
@@ -1554,7 +1569,7 @@ void MultiUserChatPlugin::onInviteDialogFinished(int AResult)
 			if (!reason.isEmpty())
 				declElem.appendChild(mstanza.createElement("reason")).appendChild(mstanza.createTextNode(reason));
 
-			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::MessageOut))
+			if (FMessageProcessor->sendMessage(fields.streamJid,decline,IMessageProcessor::DirectionOut))
 				LOG_STRM_INFO(fields.streamJid,QString("Invite request from=%1 to room=%2 rejected").arg(fields.fromJid.full(),fields.roomJid.full()));
 			else
 				LOG_STRM_WARNING(fields.streamJid,QString("Failed to send invite reject message to=%1").arg(fields.fromJid.full()));

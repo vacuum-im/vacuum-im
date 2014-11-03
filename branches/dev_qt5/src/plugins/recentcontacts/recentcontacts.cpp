@@ -15,6 +15,7 @@
 #include <definitions/rosterlabels.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
+#include <definitions/rostertooltiporders.h>
 #include <definitions/rosterindexkindorders.h>
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rosterclickhookerorders.h>
@@ -47,6 +48,8 @@
 #define ADR_RECENT_TYPE              Action::DR_UserDefined + 3
 #define ADR_RECENT_REFERENCE         Action::DR_UserDefined + 4
 
+static const IRecentItem NullRecentItem = IRecentItem();
+
 bool recentItemLessThen(const IRecentItem &AItem1, const IRecentItem &AItem2)
 {
 	bool favorite1 = AItem1.properties.value(REIP_FAVORITE).toBool();
@@ -59,8 +62,10 @@ RecentContacts::RecentContacts()
 	FPrivateStorage = NULL;
 	FRostersModel = NULL;
 	FRostersView = NULL;
-	FStatusIcons = NULL;
 	FRostersViewPlugin = NULL;
+	FMessageProcessor = NULL;
+	FAccountManager = NULL;
+	FStatusIcons = NULL;
 
 	FRootIndex = NULL;
 	FShowFavoriteLabelId = 0;
@@ -110,6 +115,7 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 			connect(FPrivateStorage->instance(),SIGNAL(dataChanged(const Jid &, const QString &, const QString &)),
 				SLOT(onPrivateStorageDataChanged(const Jid &, const QString &, const QString &)));
 			connect(FPrivateStorage->instance(),SIGNAL(storageNotifyAboutToClose(const Jid &)),SLOT(onPrivateStorageNotifyAboutToClose(const Jid &)));
+			connect(FPrivateStorage->instance(),SIGNAL(storageClosed(const Jid &)),SLOT(onPrivateStorageClosed(const Jid &)));
 		}
 	}
 
@@ -147,16 +153,22 @@ bool RecentContacts::initConnections(IPluginManager *APluginManager, int &AInitO
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
-	if (plugin)
-	{
-		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
-	}
-
 	plugin = APluginManager->pluginInterface("IMessageProcessor").value(0,NULL);
 	if (plugin)
 	{
 		FMessageProcessor = qobject_cast<IMessageProcessor *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
+	if (plugin)
+	{
+		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+	}
+
+	plugin = APluginManager->pluginInterface("IStatusIcons").value(0,NULL);
+	if (plugin)
+	{
+		FStatusIcons = qobject_cast<IStatusIcons *>(plugin->instance());
 	}
 
 	connect(Shortcuts::instance(),SIGNAL(shortcutActivated(const QString &, QWidget *)),SLOT(onShortcutActivated(const QString &, QWidget *)));
@@ -225,11 +237,9 @@ QList<int> RecentContacts::rosterDataRoles(int AOrder) const
 {
 	if (AOrder == RDHO_RECENTCONTACTS)
 	{
-		return QList<int>() 
-			<< Qt::DisplayRole << Qt::DecorationRole << Qt::ForegroundRole << Qt::BackgroundColorRole
-			<< RDR_FULL_JID << RDR_PREP_FULL_JID << RDR_PREP_BARE_JID << RDR_RESOURCES
-			<< RDR_NAME << RDR_SHOW << RDR_STATUS 
-			<< RDR_AVATAR_HASH << RDR_AVATAR_IMAGE << RDR_FORCE_VISIBLE;
+		static const QList<int> roles = QList<int>() << RDR_ALL_ROLES
+			<< RDR_FULL_JID << RDR_PREP_FULL_JID << RDR_PREP_BARE_JID;
+		return roles;
 	}
 	return QList<int>();
 }
@@ -238,6 +248,8 @@ QVariant RecentContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int 
 {
 	if (AOrder == RDHO_RECENTCONTACTS)
 	{
+		static bool labelsBlock = false;
+
 		switch (AIndex->kind())
 		{
 		case RIK_RECENT_ROOT:
@@ -256,17 +268,37 @@ QVariant RecentContacts::rosterData(int AOrder, const IRosterIndex *AIndex, int 
 			}
 		case RIK_RECENT_ITEM:
 			{
-				IRosterIndex *proxy = FIndexToProxy.value(AIndex);
+				IRosterIndex *proxy = NULL;
 				switch (ARole)
 				{
-				case RDR_SHOW:
-					return proxy!=NULL ? proxy->data(ARole) : IPresence::Offline;
+				case RDR_STREAM_JID:
+				case RDR_RECENT_TYPE:
+				case RDR_RECENT_REFERENCE:
+				case RDR_RECENT_DATETIME:
+					break;
 				case RDR_FORCE_VISIBLE:
-					return (proxy!=NULL ? proxy->data(ARole).toInt() : 0) + (FAllwaysShowOffline ? 1 : 0);
+					return FAllwaysShowOffline ? 1 : 0;
+				case RDR_LABEL_ITEMS:
+					proxy = !labelsBlock ? FIndexToProxy.value(AIndex) : NULL;
+					if (proxy != NULL)
+					{
+						labelsBlock = true;
+						AdvancedDelegateItems proxyLabels = proxy->data(RDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
+						AdvancedDelegateItems recentLabels = AIndex->data(RDR_LABEL_ITEMS).value<AdvancedDelegateItems>();
+						labelsBlock = false;
+
+						for (AdvancedDelegateItems::const_iterator it=proxyLabels.constBegin(); it!=proxyLabels.constEnd(); ++it)
+						{
+							if (!recentLabels.contains(it.key()))
+								recentLabels.insert(it.key(),it.value());
+						}
+						return QVariant::fromValue<AdvancedDelegateItems>(recentLabels);
+					}
+					break;
 				default:
-					return proxy!=NULL ? proxy->data(ARole) : QVariant();
+					proxy = FIndexToProxy.value(AIndex);
 				}
-				break;
+				return proxy!=NULL ? proxy->data(ARole) : QVariant();
 			}
 		}
 	}
@@ -282,7 +314,7 @@ bool RecentContacts::setRosterData(int AOrder, const QVariant &AValue, IRosterIn
 Qt::DropActions RecentContacts::rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag)
 {
 	Qt::DropActions actions = Qt::IgnoreAction;
-	if (AIndex->data(RDR_KIND).toInt() == RIK_RECENT_ITEM)
+	if (AIndex->kind() == RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
@@ -309,11 +341,11 @@ Qt::DropActions RecentContacts::rosterDragStart(const QMouseEvent *AEvent, IRost
 
 bool RecentContacts::rosterDragEnter(const QDragEnterEvent *AEvent)
 {
-	FExteredProxyDragHandlers.clear();
+	FEnteredProxyDragHandlers.clear();
 	foreach(IRostersDragDropHandler *handler, FRostersView->dragDropHandlers())
 		if (handler!=this && handler->rosterDragEnter(AEvent))
-			FExteredProxyDragHandlers.append(handler);
-	return !FExteredProxyDragHandlers.isEmpty();
+			FEnteredProxyDragHandlers.append(handler);
+	return !FEnteredProxyDragHandlers.isEmpty();
 }
 
 bool RecentContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *AHover)
@@ -324,7 +356,7 @@ bool RecentContacts::rosterDragMove(const QDragMoveEvent *AEvent, IRosterIndex *
 		IRosterIndex *proxy = FIndexToProxy.value(AHover);
 		if (proxy)
 		{
-			foreach(IRostersDragDropHandler *handler, FExteredProxyDragHandlers)
+			foreach(IRostersDragDropHandler *handler, FEnteredProxyDragHandlers)
 				if (handler!=this && handler->rosterDragMove(AEvent,proxy))
 					FMovedProxyDragHandlers.append(handler);
 		}
@@ -340,7 +372,7 @@ void RecentContacts::rosterDragLeave(const QDragLeaveEvent *AEvent)
 bool RecentContacts::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AIndex, Menu *AMenu)
 {
 	bool accepted = false;
-	if (AIndex->data(RDR_KIND).toInt() == RIK_RECENT_ITEM)
+	if (AIndex->kind() == RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
@@ -356,10 +388,14 @@ bool RecentContacts::rosterDropAction(const QDropEvent *AEvent, IRosterIndex *AI
 QList<quint32> RecentContacts::rosterLabels(int AOrder, const IRosterIndex *AIndex) const
 {
 	QList<quint32> labels;
-	if (AOrder==RLHO_RECENT_FILTER && FSimpleContactsView && AIndex->kind()==RIK_RECENT_ITEM)
+	if (AOrder==RLHO_RECENT_FILTER && AIndex->kind()==RIK_RECENT_ITEM)
 	{
-		labels.append(RLID_AVATAR_IMAGE);
-		labels.append(RLID_ROSTERSVIEW_STATUS);
+		if (FSimpleContactsView)
+		{
+			labels.append(RLID_AVATAR_IMAGE);
+			labels.append(RLID_ROSTERSVIEW_STATUS);
+		}
+		labels.append(RLID_METACONTACTS_BRANCH);
 	}
 	return labels;
 }
@@ -377,13 +413,9 @@ bool RecentContacts::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, 
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
-		{
 			return FRostersView->singleClickOnIndex(proxy,AEvent);
-		}
 		else if (AIndex->data(RDR_RECENT_TYPE)==REIT_CONTACT && Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
-		{
 			return rosterIndexDoubleClicked(AOrder,AIndex,AEvent);
-		}
 	}
 	return false;
 }
@@ -394,15 +426,9 @@ bool RecentContacts::rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, 
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
 		if (proxy)
-		{
 			return FRostersView->doubleClickOnIndex(proxy,AEvent);
-		}
 		else if (AIndex->data(RDR_RECENT_TYPE) == REIT_CONTACT)
-		{
-			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-			Jid contactJid = AIndex->data(RDR_RECENT_REFERENCE).toString();
-			return FMessageProcessor->createMessageWindow(streamJid,contactJid,Message::Chat,IMessageHandler::SM_SHOW);
-		}
+			return FMessageProcessor->createMessageWindow(AIndex->data(RDR_STREAM_JID).toString(),AIndex->data(RDR_RECENT_REFERENCE).toString(),Message::Chat,IMessageHandler::SM_SHOW);
 	}
 	return false;
 }
@@ -420,9 +446,7 @@ bool RecentContacts::recentItemCanShow(const IRecentItem &AItem) const
 
 QIcon RecentContacts::recentItemIcon(const IRecentItem &AItem) const
 {
-	if (FStatusIcons)
-		return FStatusIcons->iconByJid(AItem.streamJid,AItem.reference);
-	return QIcon();
+	return FStatusIcons!=NULL ? FStatusIcons->iconByJid(AItem.streamJid,AItem.reference) : QIcon();
 }
 
 QString RecentContacts::recentItemName(const IRecentItem &AItem) const
@@ -445,17 +469,8 @@ IRecentItem RecentContacts::recentItemForIndex(const IRosterIndex *AIndex) const
 
 QList<IRosterIndex *> RecentContacts::recentItemProxyIndexes(const IRecentItem &AItem) const
 {
-	QList<IRosterIndex *> proxies;
-	IRosterIndex *sroot = FRostersModel!=NULL ? FRostersModel->streamRoot(AItem.streamJid) : NULL;
-	if (sroot)
-	{
-		QMultiMap<int, QVariant> findData;
-		findData.insertMulti(RDR_KIND,RIK_CONTACT);
-		findData.insertMulti(RDR_STREAM_JID,AItem.streamJid.pFull());
-		findData.insertMulti(RDR_PREP_BARE_JID,AItem.reference);
-		proxies = sroot->findChilds(findData,true);
-		qSort(proxies.begin(),proxies.end());
-	}
+	QList<IRosterIndex *> proxies = FRostersModel!=NULL ? FRostersModel->findContactIndexes(AItem.streamJid,AItem.reference) : QList<IRosterIndex *>();
+	qSort(proxies.begin(),proxies.end());
 	return proxies;
 }
 
@@ -466,7 +481,7 @@ bool RecentContacts::isReady(const Jid &AStreamJid) const
 
 bool RecentContacts::isValidItem(const IRecentItem &AItem) const
 {
-	if (AItem.type.isEmpty())
+	if (AItem.isNull())
 		return false;
 	if (!FStreamItems.contains(AItem.streamJid))
 		return false;
@@ -493,7 +508,7 @@ void RecentContacts::setItemProperty(const IRecentItem &AItem, const QString &AN
 		bool itemChanged = false;
 		IRecentItem item = findRealItem(AItem);
 
-		if (item.type.isEmpty())
+		if (item.isNull())
 		{
 			itemChanged = true;
 			item = AItem;
@@ -530,7 +545,7 @@ void RecentContacts::setItemActiveTime(const IRecentItem &AItem, const QDateTime
 	{
 		LOG_STRM_DEBUG(AItem.streamJid,QString("Changing recent item active time, type=%1, ref=%2, time=%3").arg(AItem.type,AItem.reference,ATime.toString(Qt::ISODate)));
 		IRecentItem item = findRealItem(AItem);
-		if (item.type.isEmpty())
+		if (item.isNull())
 		{
 			item = AItem;
 			item.activeTime = ATime;
@@ -576,7 +591,6 @@ QList<IRecentItem> RecentContacts::visibleItems() const
 
 IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 {
-	static const IRecentItem nullItem = IRecentItem();
 	if (AIndex->kind() == RIK_RECENT_ITEM)
 	{
 		IRecentItem item;
@@ -591,7 +605,7 @@ IRecentItem RecentContacts::rosterIndexItem(const IRosterIndex *AIndex) const
 		if (isValidItem(item))
 			return item;
 	}
-	return nullItem;
+	return NullRecentItem;
 }
 
 IRosterIndex *RecentContacts::itemRosterIndex(const IRecentItem &AItem) const
@@ -706,12 +720,13 @@ void RecentContacts::createItemIndex(const IRecentItem &AItem)
 		if (handler)
 		{
 			index = FRostersModel->newRosterIndex(RIK_RECENT_ITEM);
-			index->setData(AItem.type,RDR_RECENT_TYPE);
-			index->setData(AItem.streamJid.pFull(),RDR_STREAM_JID);
-			index->setData(AItem.reference,RDR_RECENT_REFERENCE);
-			FRostersModel->insertRosterIndex(index,FRootIndex);
-
 			FVisibleItems.insert(AItem,index);
+
+			index->setData(AItem.type,RDR_RECENT_TYPE);
+			index->setData(AItem.reference,RDR_RECENT_REFERENCE);
+			index->setData(AItem.streamJid.pFull(),RDR_STREAM_JID);
+
+			FRostersModel->insertRosterIndex(index,FRootIndex);
 			emit recentItemIndexCreated(AItem,index);
 
 			updateItemProxy(AItem);
@@ -796,7 +811,7 @@ void RecentContacts::updateItemProxy(const IRecentItem &AItem)
 
 void RecentContacts::updateItemProperties(const IRecentItem &AItem)
 {
-	if (isValidItem(AItem) && isReady(AItem.streamJid))
+	if (isReady(AItem.streamJid) && isValidItem(AItem))
 	{
 		IRosterIndex *index = FVisibleItems.value(AItem);
 		if (index)
@@ -821,10 +836,9 @@ IRecentItem &RecentContacts::findRealItem(const IRecentItem &AItem)
 
 IRecentItem RecentContacts::findRealItem(const IRecentItem &AItem) const
 {
-	static IRecentItem nullItem;
 	const QList<IRecentItem> items = FStreamItems.value(AItem.streamJid);
 	int index = items.indexOf(AItem);
-	return index>=0 ? items.value(index) : nullItem;
+	return index>=0 ? items.value(index) : NullRecentItem;
 }
 
 void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecentItem> &AItems, bool AReplace)
@@ -908,7 +922,6 @@ void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecent
 	}
 
 	bool isStreamReady = isReady(AStreamJid);
-
 	foreach(const IRecentItem &item, addedItems)
 	{
 		if (isStreamReady)
@@ -935,25 +948,16 @@ void RecentContacts::mergeRecentItems(const Jid &AStreamJid, const QList<IRecent
 	}
 }
 
-QList<IRosterIndex *> RecentContacts::indexesProxies(const QList<IRosterIndex *> &AIndexes, bool AExclusive) const
-{
-	QList<IRosterIndex *> proxies;
-	foreach(IRosterIndex *index, AIndexes)
-	{
-		if (FIndexToProxy.contains(index))
-			proxies.append(FIndexToProxy.value(index));
-		else if (!AExclusive)
-			proxies.append(index);
-	}
-	return proxies;
-}
-
 void RecentContacts::startSaveItemsToStorage(const Jid &AStreamJid)
 {
-	if (FPrivateStorage)
+	if (FPrivateStorage && isReady(AStreamJid))
 	{
 		FSaveTimer.start(STORAGE_SAVE_TIMEOUT);
 		FSaveStreams += AStreamJid;
+	}
+	else if (FPrivateStorage)
+	{
+		LOG_STRM_WARNING(AStreamJid,"Failed to start save recent items to storage: Stream not ready");
 	}
 }
 
@@ -1090,12 +1094,34 @@ bool RecentContacts::isSelectionAccepted(const QList<IRosterIndex *> &ASelected)
 	return !ASelected.isEmpty();
 }
 
-bool RecentContacts::isRecentSelectionAccepted(const QList<IRosterIndex *> &AIndexes) const
+bool RecentContacts::isRecentSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
-	foreach(IRosterIndex *index, AIndexes)
+	foreach(IRosterIndex *index, ASelected)
 		if (index->kind() != RIK_RECENT_ITEM)
 			return false;
-	return true;
+	return !ASelected.isEmpty();
+}
+
+bool RecentContacts::hasProxiedIndexes(const QList<IRosterIndex *> &AIndexes) const
+{
+	foreach(IRosterIndex *index, AIndexes)
+		if (FIndexToProxy.contains(index))
+			return true;
+	return false;
+}
+
+QList<IRosterIndex *> RecentContacts::indexesProxies(const QList<IRosterIndex *> &AIndexes, bool ASelfProxy) const
+{
+	QList<IRosterIndex *> proxies;
+	foreach(IRosterIndex *index, AIndexes)
+	{
+		if (FIndexToProxy.contains(index))
+			proxies.append(FIndexToProxy.value(index));
+		else if (ASelfProxy)
+			proxies.append(index);
+	}
+	proxies.removeAll(NULL);
+	return proxies;
 }
 
 void RecentContacts::removeRecentItems(const QStringList &ATypes, const QStringList &AStreamJids, const QStringList &AReferences)
@@ -1133,8 +1159,8 @@ void RecentContacts::onRostersModelStreamAdded(const Jid &AStreamJid)
 
 void RecentContacts::onRostersModelStreamRemoved(const Jid &AStreamJid)
 {
-	saveItemsToFile(recentFileName(AStreamJid),FStreamItems.value(AStreamJid));
-	FStreamItems.remove(AStreamJid);
+	saveItemsToFile(recentFileName(AStreamJid),FStreamItems.take(AStreamJid));
+
 	FSaveStreams -= AStreamJid;
 	updateVisibleItems();
 	
@@ -1144,6 +1170,12 @@ void RecentContacts::onRostersModelStreamRemoved(const Jid &AStreamJid)
 
 void RecentContacts::onRostersModelStreamJidChanged(const Jid &ABefore, const Jid &AAfter)
 {
+	if (FSaveStreams.contains(ABefore))
+	{
+		FSaveStreams -= ABefore;
+		FSaveStreams += AAfter;
+	}
+
 	QList<IRecentItem> items = FStreamItems.take(ABefore);
 	for (QList<IRecentItem>::iterator it=items.begin(); it!=items.end(); ++it)
 	{
@@ -1156,17 +1188,11 @@ void RecentContacts::onRostersModelStreamJidChanged(const Jid &ABefore, const Ji
 		}
 	}
 	FStreamItems.insert(AAfter,items);
-	
-	if (FSaveStreams.contains(ABefore))
-	{
-		FSaveStreams -= ABefore;
-		FSaveStreams += AAfter;
-	}
 }
 
 void RecentContacts::onRostersModelIndexInserted(IRosterIndex *AIndex)
 {
-	if (AIndex->kind() != RIK_RECENT_ITEM)
+	if (AIndex->kind() == RIK_CONTACT)
 	{
 		IRecentItem item = recentItemForIndex(AIndex);
 		if (FVisibleItems.contains(item))
@@ -1179,38 +1205,57 @@ void RecentContacts::onRostersModelIndexDataChanged(IRosterIndex *AIndex, int AR
 	if (FProxyToIndex.contains(AIndex))
 	{
 		static const QList<int> updateItemRoles = QList<int>() << RDR_SHOW << RDR_PRIORITY;
-		static const QList<int> updateDataRoles = QList<int>() << Qt::DecorationRole << Qt::DisplayRole;
 		static const QList<int> updatePropertiesRoles = QList<int>() << RDR_NAME;
 		
 		if (updateItemRoles.contains(ARole))
 			emit recentItemUpdated(recentItemForIndex(AIndex));
-		if (updateDataRoles.contains(ARole))
-			emit rosterDataChanged(FProxyToIndex.value(AIndex),ARole);
 		if (updatePropertiesRoles.contains(ARole))
 			updateItemProperties(rosterIndexItem(AIndex));
+		emit rosterDataChanged(FProxyToIndex.value(AIndex),ARole);
 	}
 }
 
 void RecentContacts::onRostersModelIndexRemoving(IRosterIndex *AIndex)
 {
+	IRosterIndex *index = FProxyToIndex.take(AIndex);
+	if (index)
+	{
+		FIndexToProxy.remove(index);
+		FIndexProxies[index].removeAll(AIndex);
+	}
 	onRostersModelIndexInserted(AIndex);
 }
 
 void RecentContacts::onPrivateStorageOpened(const Jid &AStreamJid)
 {
-	if (!FPrivateStorage->loadData(AStreamJid,PST_RECENTCONTACTS,PSN_RECENTCONTACTS).isEmpty())
+	QString id = FPrivateStorage->loadData(AStreamJid,PST_RECENTCONTACTS,PSN_RECENTCONTACTS);
+	if (!id.isEmpty())
+	{
+		FLoadRequestId[AStreamJid] = id;
 		LOG_STRM_INFO(AStreamJid,"Recent items load request sent");
+	}
 	else
+	{
 		LOG_STRM_WARNING(AStreamJid,"Failed to send load roster items request");
+	}
 }
 
 void RecentContacts::onPrivateStorageDataLoaded(const QString &AId, const Jid &AStreamJid, const QDomElement &AElement)
 {
-	Q_UNUSED(AId);
 	if (AElement.tagName()==PST_RECENTCONTACTS && AElement.namespaceURI()==PSN_RECENTCONTACTS)
 	{
-		LOG_STRM_INFO(AStreamJid,"Recent items loaded or updated");
-		mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+		if (FLoadRequestId.value(AStreamJid) == AId)
+		{
+			FLoadRequestId.remove(AStreamJid);
+			LOG_STRM_INFO(AStreamJid,"Recent items loaded");
+			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+			emit recentContactsOpened(AStreamJid);
+		}
+		else
+		{
+			LOG_STRM_INFO(AStreamJid,"Recent items updated");
+			mergeRecentItems(AStreamJid,loadItemsFromXML(AElement),true);
+		}
 	}
 }
 
@@ -1226,17 +1271,35 @@ void RecentContacts::onPrivateStorageNotifyAboutToClose(const Jid &AStreamJid)
 	FSaveStreams -= AStreamJid;
 }
 
+void RecentContacts::onPrivateStorageClosed(const Jid &AStreamJid)
+{
+	emit recentContactsClosed(AStreamJid);
+}
+
 void RecentContacts::onRostersViewIndexContextMenuAboutToShow()
 {
 	Menu *menu = qobject_cast<Menu *>(sender());
-	if (menu)
+	Menu *proxyMenu = FProxyContextMenu.value(menu);
+	if (proxyMenu != NULL)
 	{
-		QSet<Action *> proxyActions = FProxyContextMenuActions.take(menu);
+		// Emit aboutToShow in proxyMenu
+		proxyMenu->popup(QPoint(0,0));
+
+		QStringList proxyActions;
+		foreach(Action *action, proxyMenu->groupActions())
+		{
+			proxyActions.append(action->text());
+			menu->addAction(action,proxyMenu->actionGroup(action),true);
+		}
+
 		foreach(Action *action, menu->groupActions())
-			if (!proxyActions.contains(action))
-				action->setVisible(false);
+		{
+			if (proxyActions.contains(action->text()) && proxyMenu->actionGroup(action)==AG_NULL)
+				menu->removeAction(action);
+		}
+
+		proxyMenu->hide();
 	}
-	FProxyContextMenuActions.clear();
 }
 
 void RecentContacts::onRostersViewIndexMultiSelection(const QList<IRosterIndex *> &ASelected, bool &AAccepted)
@@ -1249,7 +1312,6 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 	static bool blocked = false;
 	if (!blocked && ALabelId==AdvancedDelegateItem::DisplayId)
 	{
-		QSet<Action *> recentActions;
 		bool isMultiSelection = AIndexes.count()>1;
 		if (!isMultiSelection && AIndexes.value(0)->kind()==RIK_RECENT_ROOT)
 		{
@@ -1259,7 +1321,6 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			hideInactive->setChecked(FHideLaterContacts);
 			connect(hideInactive,SIGNAL(triggered()),SLOT(onChangeHideInactiveItems()));
 			AMenu->addAction(hideInactive,AG_RVCM_RECENT_OPTIONS);
-			recentActions += hideInactive;
 
 			Action *showOffline = new Action(AMenu);
 			showOffline->setText(tr("Always Show Offline Contacts"));
@@ -1267,7 +1328,6 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			showOffline->setChecked(FAllwaysShowOffline);
 			connect(showOffline,SIGNAL(triggered()),SLOT(onChangeAlwaysShowOfflineItems()));
 			AMenu->addAction(showOffline,AG_RVCM_RECENT_OPTIONS);
-			recentActions += showOffline;
 			
 			Action *simpleView = new Action(AMenu);
 			simpleView->setText(tr("Simplify Contacts View"));
@@ -1275,7 +1335,6 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			simpleView->setChecked(FSimpleContactsView);
 			connect(simpleView,SIGNAL(triggered()),SLOT(onChangeSimpleContactsView()));
 			AMenu->addAction(simpleView,AG_RVCM_RECENT_OPTIONS);
-			recentActions += simpleView;
 			
 			Action *sortByActivity = new Action(AMenu);
 			sortByActivity->setText(tr("Sort by Last Activity"));
@@ -1283,7 +1342,6 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			sortByActivity->setChecked(FSortByLastActivity);
 			connect(sortByActivity,SIGNAL(triggered()),SLOT(onChangeSortByLastActivity()));
 			AMenu->addAction(sortByActivity,AG_RVCM_RECENT_OPTIONS);
-			recentActions += sortByActivity;
 
 			Action *showFavorite = new Action(AMenu);
 			showFavorite->setText(tr("Show Only Favorite Contacts"));
@@ -1291,31 +1349,36 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			showFavorite->setChecked(FShowOnlyFavorite);
 			connect(showFavorite,SIGNAL(triggered()),SLOT(onChangeShowOnlyFavorite()));
 			AMenu->addAction(showFavorite,AG_RVCM_RECENT_OPTIONS);
-			recentActions += showFavorite;
 		}
 		else if (isSelectionAccepted(AIndexes))
 		{
-			bool ready = true;
-
+			bool allReady = true;
+			bool allFavorite = true;
+			bool anyFavorite = false;
 			QMap<int, QStringList> rolesMap;
 			foreach(IRosterIndex *index, AIndexes)
 			{
-				IRecentItem item = rosterIndexItem(index);
+				IRecentItem item = findRealItem(rosterIndexItem(index));
+
+				if (item.properties.value(REIP_FAVORITE).toBool())
+					anyFavorite = true;
+				else
+					allFavorite = false;
+
 				rolesMap[RDR_RECENT_TYPE].append(item.type);
 				rolesMap[RDR_STREAM_JID].append(item.streamJid.full());
 				rolesMap[RDR_RECENT_REFERENCE].append(item.reference);
-				ready = ready && isReady(item.streamJid);
+				allReady = allReady && isReady(item.streamJid);
 			}
 
-			if (ready)
+			if (allReady)
 			{
 				QHash<int,QVariant> data;
 				data.insert(ADR_RECENT_TYPE,rolesMap.value(RDR_RECENT_TYPE));
 				data.insert(ADR_STREAM_JID,rolesMap.value(RDR_STREAM_JID));
 				data.insert(ADR_RECENT_REFERENCE,rolesMap.value(RDR_RECENT_REFERENCE));
 
-				bool favorite = findRealItem(rosterIndexItem(AIndexes.value(0))).properties.value(REIP_FAVORITE).toBool();
-				if (isMultiSelection || !favorite)
+				if (!allFavorite)
 				{
 					Action *insertFavorite = new Action(AMenu);
 					insertFavorite->setText(tr("Add to Favorites"));
@@ -1324,10 +1387,9 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 					insertFavorite->setShortcutId(SCT_ROSTERVIEW_INSERTFAVORITE);
 					connect(insertFavorite,SIGNAL(triggered(bool)),SLOT(onInsertToFavoritesByAction()));
 					AMenu->addAction(insertFavorite,AG_RVCM_RECENT_FAVORITES);
-					recentActions += insertFavorite;
 
 				}
-				if (isMultiSelection || favorite)
+				if (anyFavorite)
 				{
 					Action *removeFavorite = new Action(AMenu);
 					removeFavorite->setText(tr("Remove from Favorites"));
@@ -1336,7 +1398,6 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 					removeFavorite->setShortcutId(SCT_ROSTERVIEW_REMOVEFAVORITE);
 					connect(removeFavorite,SIGNAL(triggered(bool)),SLOT(onRemoveFromFavoritesByAction()));
 					AMenu->addAction(removeFavorite,AG_RVCM_RECENT_FAVORITES);
-					recentActions += removeFavorite;
 				}
 				if (isRecentSelectionAccepted(AIndexes))
 				{
@@ -1347,21 +1408,20 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 					removeRecent->setShortcutId(SCT_ROSTERVIEW_REMOVEFROMRECENT);
 					connect(removeRecent,SIGNAL(triggered(bool)),SLOT(onRemoveFromRecentByAction()));
 					AMenu->addAction(removeRecent,AG_RVCM_RECENT_FAVORITES);
-					recentActions += removeRecent;
 				}
 			}
 
-			if (isRecentSelectionAccepted(AIndexes))
+			if (hasProxiedIndexes(AIndexes))
 			{
-				QList<IRosterIndex *> proxies = indexesProxies(AIndexes,false);
+				QList<IRosterIndex *> proxies = indexesProxies(AIndexes);
 				if (!proxies.isEmpty())
 				{
 					blocked = true;
 
-					QSet<Action *> oldActions = AMenu->groupActions().toSet();
-					FRostersView->contextMenuForIndex(proxies,NULL,AMenu);
-					connect(AMenu,SIGNAL(aboutToShow()),SLOT(onRostersViewIndexContextMenuAboutToShow()));
-					FProxyContextMenuActions[AMenu] = AMenu->groupActions().toSet() - oldActions + recentActions;
+					Menu *proxyMenu = new Menu(AMenu);
+					FProxyContextMenu.insert(AMenu,proxyMenu);
+					FRostersView->contextMenuForIndex(proxies,NULL,proxyMenu);
+					connect(AMenu,SIGNAL(aboutToShow()),SLOT(onRostersViewIndexContextMenuAboutToShow()),Qt::UniqueConnection);
 
 					blocked = false;
 				}
@@ -1372,11 +1432,18 @@ void RecentContacts::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 
 void RecentContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int, QString> &AToolTips)
 {
-	if (ALabelId == AdvancedDelegateItem::DisplayId)
+	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndex->kind()==RIK_RECENT_ITEM)
 	{
 		IRosterIndex *proxy = FIndexToProxy.value(AIndex);
-		if (proxy != NULL)
+		if (proxy)
 			FRostersView->toolTipsForIndex(proxy,NULL,AToolTips);
+
+		if (FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutSeparately)
+		{
+			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
+			IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
+			AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(QString(account!=NULL ? account->name() : streamJid.uBare()).toHtmlEscaped()));
+		}
 	}
 }
 
@@ -1404,9 +1471,7 @@ void RecentContacts::onRostersViewNotifyInserted(int ANotifyId)
 void RecentContacts::onRostersViewNotifyRemoved(int ANotifyId)
 {
 	if (FProxyToIndexNotify.contains(ANotifyId))
-	{
 		FRostersView->removeNotify(FProxyToIndexNotify.take(ANotifyId));
-	}
 }
 
 void RecentContacts::onRostersViewNotifyActivated(int ANotifyId)
@@ -1419,15 +1484,20 @@ void RecentContacts::onRostersViewNotifyActivated(int ANotifyId)
 void RecentContacts::onHandlerRecentItemUpdated(const IRecentItem &AItem)
 {
 	IRecentItemHandler *handler = FItemHandlers.value(AItem.type);
-	if (handler && handler->recentItemCanShow(AItem))
+	if (handler)
 	{
-		updateItemProxy(AItem);
-		updateItemIndex(AItem);
-		updateItemProperties(AItem);
-	}
-	else
-	{
-		updateVisibleItems();
+		bool show = handler->recentItemCanShow(AItem);
+		bool visible = FVisibleItems.contains(AItem);
+		if (show != visible)
+		{
+			updateVisibleItems();
+		}
+		else if (visible)
+		{
+			updateItemProxy(AItem);
+			updateItemIndex(AItem);
+			updateItemProperties(AItem);
+		}
 	}
 }
 
@@ -1463,13 +1533,13 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 {
 	if (FRostersModel && FRostersView && AWidget==FRostersView->instance())
 	{
-		QList<IRosterIndex *> selectedIndexes = FRostersView->selectedRosterIndexes();
+		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
 		if (AId==SCT_ROSTERVIEW_INSERTFAVORITE || AId==SCT_ROSTERVIEW_REMOVEFAVORITE)
 		{
-			if (isSelectionAccepted(selectedIndexes))
+			if (isSelectionAccepted(indexes))
 			{
 				QMap<int, QStringList> rolesMap;
-				foreach(IRosterIndex *index, selectedIndexes)
+				foreach(IRosterIndex *index, indexes)
 				{
 					IRecentItem item = rosterIndexItem(index);
 					rolesMap[RDR_RECENT_TYPE].append(item.type);
@@ -1479,32 +1549,29 @@ void RecentContacts::onShortcutActivated(const QString &AId, QWidget *AWidget)
 				setItemsFavorite(AId==SCT_ROSTERVIEW_INSERTFAVORITE,rolesMap.value(RDR_RECENT_TYPE),rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_RECENT_REFERENCE));
 			}
 		}
-		else if (isRecentSelectionAccepted(selectedIndexes))
+		else if (AId == SCT_ROSTERVIEW_REMOVEFROMRECENT)
 		{
-			if (AId == SCT_ROSTERVIEW_REMOVEFROMRECENT)
+			if (isRecentSelectionAccepted(indexes))
 			{
-				bool storageOpened = true;
 				QMap<int, QStringList> rolesMap;
-				foreach(IRosterIndex *index, selectedIndexes)
+				foreach(IRosterIndex *index, indexes)
 				{
 					IRecentItem item = rosterIndexItem(index);
 					rolesMap[RDR_RECENT_TYPE].append(item.type);
 					rolesMap[RDR_STREAM_JID].append(item.streamJid.full());
 					rolesMap[RDR_RECENT_REFERENCE].append(item.reference);
-					storageOpened = storageOpened && FPrivateStorage!=NULL && FPrivateStorage->isOpen(item.streamJid);
 				}
-				if (storageOpened)
-					removeRecentItems(rolesMap.value(RDR_RECENT_TYPE),rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_RECENT_REFERENCE));
+				removeRecentItems(rolesMap.value(RDR_RECENT_TYPE),rolesMap.value(RDR_STREAM_JID),rolesMap.value(RDR_RECENT_REFERENCE));
 			}
-			else
+		}
+		else if (hasProxiedIndexes(indexes))
+		{
+			QList<IRosterIndex *> proxies = indexesProxies(indexes);
+			if (!proxies.isEmpty() && FRostersView->isSelectionAcceptable(proxies))
 			{
-				QList<IRosterIndex *> selectedProxies = indexesProxies(selectedIndexes);
-				if (!selectedProxies.isEmpty() && FRostersView->isSelectionAcceptable(selectedProxies))
-				{
-					FRostersView->setSelectedRosterIndexes(selectedProxies);
-					Shortcuts::activateShortcut(AId,AWidget);
-					FRostersView->setSelectedRosterIndexes(selectedIndexes);
-				}
+				FRostersView->setSelectedRosterIndexes(proxies);
+				Shortcuts::activateShortcut(AId,AWidget);
+				FRostersView->setSelectedRosterIndexes(indexes);
 			}
 		}
 	}

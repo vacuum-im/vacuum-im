@@ -209,7 +209,7 @@ You can set status class for additional statuses defined by you.</source>
         <translation>При обриві з’єднання з сервером</translation>
     </message>
     <message>
-        <source>Left Vacuum-IM</source>
+        <source>Left %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -10,7 +10,7 @@ SortFilterProxyModel::SortFilterProxyModel(IRostersViewPlugin *ARostersViewPlugi
 {
 	FShowOffline = true;
 	FSortByStatus = false;
-	FRostersViewPlugin = ARostersViewPlugin;
+	FRostersView = ARostersViewPlugin->rostersView();
 }
 
 SortFilterProxyModel::~SortFilterProxyModel()
@@ -77,10 +77,10 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 				int rightShow = ARight.data(RDR_SHOW).toInt();
 				if (leftShow != rightShow)
 				{
-					static const int showOrders[] = {6,2,1,3,4,5,7,8};
-					static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-					if (leftShow<showOrdersCount && rightShow<showOrdersCount)
-						return showOrders[leftShow] < showOrders[rightShow];
+					static const int show2order[] = {6,2,1,3,5,4,7,8};
+					static const int showCount = sizeof(show2order)/sizeof(show2order[0]);
+					if (leftShow<showCount && rightShow<showCount)
+						return show2order[leftShow] < show2order[rightShow];
 				}
 			}
 			return compareVariant(ALeft.data(Qt::DisplayRole),ARight.data(Qt::DisplayRole));
@@ -93,6 +93,7 @@ bool SortFilterProxyModel::lessThan(const QModelIndex &ALeft, const QModelIndex 
 bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AModelParent) const
 {
 	QModelIndex index = sourceModel()->index(AModelRow,0,AModelParent);
+	IRostersModel *rootModel = FRostersView->rostersModel();
 
 	int visible = index.data(RDR_FORCE_VISIBLE).toInt();
 	if (visible > 0)
@@ -103,9 +104,9 @@ bool SortFilterProxyModel::filterAcceptsRow(int AModelRow, const QModelIndex &AM
 	{
 		return false;
 	}
-	else if (sourceModel()->hasChildren(index))
+	else if (rootModel!=NULL && rootModel->isGroupKind(index.data(RDR_KIND).toInt()))
 	{
-		for (int childRow = 0; index.child(childRow,0).isValid(); childRow++)
+		for (int childRow=0; index.child(childRow,0).isValid(); childRow++)
 			if (filterAcceptsRow(childRow,index))
 				return true;
 		return false;

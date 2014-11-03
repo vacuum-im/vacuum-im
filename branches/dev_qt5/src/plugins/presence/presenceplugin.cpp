@@ -6,16 +6,15 @@ bool presenceItemLessThen(const IPresenceItem &AItem1, const IPresenceItem &AIte
 {
 	if (AItem1.show != AItem2.show)
 	{
-		static const int showOrders[] = {6,2,1,3,4,5,7,8};
-		static const int showOrdersCount = sizeof(showOrders)/sizeof(showOrders[0]);
-		if (AItem1.show<showOrdersCount && AItem2.show<showOrdersCount)
-			return showOrders[AItem1.show] < showOrders[AItem2.show];
+		static const int show2order[] = {6,2,1,3,5,4,7,8};
+		static const int showCount = sizeof(show2order)/sizeof(show2order[0]);
+
+		if (AItem1.show<showCount && AItem2.show<showCount)
+			return show2order[AItem1.show] < show2order[AItem2.show];
 	}
 	
 	if (AItem1.priority != AItem2.priority)
-	{
 		return AItem1.priority > AItem2.priority;
-	}
 
 	return AItem1.itemJid < AItem2.itemJid;
 }

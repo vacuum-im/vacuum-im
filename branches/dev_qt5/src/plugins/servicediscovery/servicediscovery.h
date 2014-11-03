@@ -81,7 +81,8 @@ public:
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);
 	//IServiceDiscovery
-	virtual IPluginManager *pluginManager() const { return FPluginManager; }
+	virtual IPluginManager *pluginManager() const;
+	virtual bool isReady(const Jid &AStreamJid) const;
 	virtual IDiscoInfo selfDiscoInfo(const Jid &AStreamJid, const QString &ANode = QString::null) const;
 	virtual void showDiscoInfo(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
 	virtual void showDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QWidget *AParent = NULL);
@@ -113,17 +114,19 @@ public:
 	//DiscoItems
 	virtual bool requestDiscoItems(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode = QString::null);
 signals:
+	void discoOpened(const Jid &AStreamJid);
+	void discoClosed(const Jid &AStreamJid);
+	void discoInfoReceived(const IDiscoInfo &ADiscoInfo);
+	void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
+	void discoItemsReceived(const IDiscoItems &ADiscoItems);
+	void discoFeatureInserted(const IDiscoFeature &AFeature);
+	void discoFeatureRemoved(const IDiscoFeature &AFeature);
 	void discoItemsWindowCreated(IDiscoItemsWindow *AWindow);
 	void discoItemsWindowDestroyed(IDiscoItemsWindow *AWindow);
 	void discoHandlerInserted(IDiscoHandler *AHandler);
 	void discoHandlerRemoved(IDiscoHandler *AHandler);
 	void featureHandlerInserted(const QString &AFeature, IDiscoFeatureHandler *AHandler);
 	void featureHandlerRemoved(const QString &AFeature, IDiscoFeatureHandler *AHandler);
-	void discoFeatureInserted(const IDiscoFeature &AFeature);
-	void discoFeatureRemoved(const IDiscoFeature &AFeature);
-	void discoInfoReceived(const IDiscoInfo &ADiscoInfo);
-	void discoInfoRemoved(const IDiscoInfo &ADiscoInfo);
-	void discoItemsReceived(const IDiscoItems &ADiscoItems);
 protected:
 	void discoInfoToElem(const IDiscoInfo &AInfo, QDomElement &AElem) const;
 	void discoInfoFromElem(const QDomElement &AElem, IDiscoInfo &AInfo) const;
@@ -144,8 +147,8 @@ protected:
 	Action *createDiscoInfoAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const;
 	Action *createDiscoItemsAction(const Jid &AStreamJid, const Jid &AContactJid, const QString &ANode, QObject *AParent) const;
 protected slots:
-	void onStreamOpened(IXmppStream *AXmppStream);
-	void onStreamClosed(IXmppStream *AXmppStream);
+	void onXmppStreamOpened(IXmppStream *AXmppStream);
+	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onPresenceItemReceived(IPresence *APresence, const IPresenceItem &AItem, const IPresenceItem &ABefore);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo);

@@ -79,7 +79,7 @@ bool MessageProcessor::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, St
 	if (FActiveStreams.value(AStreamJid) == AHandlerId)
 	{
 		Message message(AStanza);
-		AAccept = sendMessage(AStreamJid,message,IMessageProcessor::MessageIn) || AAccept;
+		AAccept = sendMessage(AStreamJid,message,IMessageProcessor::DirectionIn) || AAccept;
 	}
 	return false;
 }
@@ -161,7 +161,7 @@ bool MessageProcessor::sendMessage(const Jid &AStreamJid, Message &AMessage, int
 {
 	if (processMessage(AStreamJid,AMessage,ADirection))
 	{
-		if (ADirection == IMessageProcessor::MessageOut)
+		if (ADirection == IMessageProcessor::DirectionOut)
 		{
 			Stanza stanza = AMessage.stanza(); // Ignore changes in StanzaProcessor
 			if (FStanzaProcessor && FStanzaProcessor->sendStanzaOut(AStreamJid,stanza))
@@ -183,17 +183,21 @@ bool MessageProcessor::sendMessage(const Jid &AStreamJid, Message &AMessage, int
 
 bool MessageProcessor::processMessage(const Jid &AStreamJid, Message &AMessage, int ADirection)
 {
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 		AMessage.setTo(AStreamJid.full());
 	else
 		AMessage.setFrom(AStreamJid.full());
 
+	if (AMessage.data(MDR_MESSAGE_ID).isNull())
+		AMessage.setData(MDR_MESSAGE_ID,newMessageId());
+	AMessage.setData(MDR_MESSAGE_DIRECTION,ADirection);
+
 	bool hooked = false;
 	QMapIterator<int,IMessageEditor *> it(FMessageEditors);
-	ADirection == MessageIn ? it.toFront() : it.toBack();
-	while (!hooked && (ADirection == MessageIn ? it.hasNext() : it.hasPrevious()))
+	ADirection == DirectionIn ? it.toFront() : it.toBack();
+	while (!hooked && (ADirection==DirectionIn ? it.hasNext() : it.hasPrevious()))
 	{
-		ADirection == MessageIn ? it.next() : it.previous();
+		ADirection == DirectionIn ? it.next() : it.previous();
 		hooked = it.value()->messageReadWrite(it.key(), AStreamJid, AMessage, ADirection);
 	}
 
@@ -203,13 +207,9 @@ bool MessageProcessor::processMessage(const Jid &AStreamJid, Message &AMessage, 
 bool MessageProcessor::displayMessage(const Jid &AStreamJid, Message &AMessage, int ADirection)
 {
 	Q_UNUSED(AStreamJid);
-	IMessageHandler *handler = findMessageHandler(AMessage, ADirection);
+	IMessageHandler *handler = findMessageHandler(AMessage,ADirection);
 	if (handler)
 	{
-		if (AMessage.data(MDR_MESSAGE_ID).toInt() <= 0)
-			AMessage.setData(MDR_MESSAGE_ID,newMessageId());
-		AMessage.setData(MDR_MESSAGE_DIRECTION,ADirection);
-
 		if (handler->messageDisplay(AMessage,ADirection))
 		{
 			notifyMessage(handler,AMessage,ADirection);
