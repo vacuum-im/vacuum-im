@@ -37,6 +37,9 @@
 #define ADR_WINDOW                Action::DR_Parametr1
 #define ADR_ACTION_ID             Action::DR_Parametr2
 
+static const QList<int> GroupRosterKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_NOT_IN_ROSTER;
+static const QList<int> ContactRosterKinds = QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE << RIK_METACONTACT << RIK_METACONTACT_ITEM;
+
 NormalMessageHandler::NormalMessageHandler()
 {
 	FAvatars = NULL;
@@ -242,7 +245,7 @@ bool NormalMessageHandler::messageEditSendProcesse(int AOrder, IMessageEditWidge
 				for (QMultiMap<Jid, Jid>::const_iterator it=addresses.constBegin(); it!=addresses.constEnd(); ++it)
 				{
 					message.setTo(it->full());
-					if (!FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::MessageOut))
+					if (!FMessageProcessor->sendMessage(it.key(),message,IMessageProcessor::DirectionOut))
 						LOG_STRM_WARNING(it.key(),QString("Failed to send message to=%1").arg(it->full()));
 					else
 						sent = true;
@@ -262,7 +265,7 @@ bool NormalMessageHandler::messageCheck(int AOrder, const Message &AMessage, int
 
 bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirection)
 {
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		IMessageNormalWindow *window = getWindow(AMessage.to(),AMessage.from(),IMessageNormalWindow::ReadMode);
 		if (window)
@@ -295,7 +298,7 @@ bool NormalMessageHandler::messageDisplay(const Message &AMessage, int ADirectio
 INotification NormalMessageHandler::messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection)
 {
 	INotification notify;
-	if (ADirection == IMessageProcessor::MessageIn)
+	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		IMessageNormalWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window)
@@ -350,7 +353,7 @@ bool NormalMessageHandler::messageShowWindow(int AMessageId)
 	if (window == NULL)
 	{
 		Message message = FMessageProcessor->notifiedMessage(AMessageId);
-		if (messageDisplay(message,IMessageProcessor::MessageIn))
+		if (messageDisplay(message,IMessageProcessor::DirectionIn))
 		{
 			IMessageNormalWindow *window = findWindow(message.to(),message.from());
 			if (window)
@@ -800,11 +803,7 @@ bool NormalMessageHandler::isAnyPresenceOpened(const QStringList &AStreams) cons
 bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
 {
 	static const QList<int> acceptKinds = QList<int>() 
-		<< RIK_STREAM_ROOT 
-		<< RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE
-		<< RIK_GROUP << RIK_GROUP_BLANK	<< RIK_GROUP_NOT_IN_ROSTER;
-	static const QList<int> contactKinds =  QList<int>() << RIK_CONTACT << RIK_AGENT << RIK_MY_RESOURCE;
-	static const QList<int> groupKinds = QList<int>() << RIK_GROUP << RIK_GROUP_BLANK << RIK_GROUP_NOT_IN_ROSTER;
+		<< RIK_STREAM_ROOT << ContactRosterKinds << GroupRosterKinds;
 
 	bool hasGroups = false;
 	bool hasContacts = false;
@@ -815,20 +814,20 @@ bool NormalMessageHandler::isSelectionAccepted(const QList<IRosterIndex *> &ASel
 		int indexKind = index->kind();
 		if (!acceptKinds.contains(indexKind))
 			return false;
-		else if (hasGroups && !groupKinds.contains(indexKind))
+		else if (hasGroups && !GroupRosterKinds.contains(indexKind))
 			return false;
-		else if (hasContacts && !contactKinds.contains(indexKind))
+		else if (hasContacts && !ContactRosterKinds.contains(indexKind))
 			return false;
-		else if (groupKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAMS).toStringList()))
+		else if (GroupRosterKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAMS).toStringList()))
 			return false;
-		else if (contactKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
+		else if (ContactRosterKinds.contains(indexKind) && !isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
 			return false;
 		else if (indexKind==RIK_STREAM_ROOT && isAnyPresenceOpened(index->data(RDR_STREAM_JID).toStringList()))
 			hasOpenedStreams = true;
 		else if (indexKind==RIK_STREAM_ROOT && !hasOpenedStreams && i==ASelected.count()-1)
 			return false;
-		hasGroups = hasGroups || groupKinds.contains(indexKind);
-		hasContacts = hasContacts || contactKinds.contains(indexKind);
+		hasGroups = hasGroups || GroupRosterKinds.contains(indexKind);
+		hasContacts = hasContacts || ContactRosterKinds.contains(indexKind);
 	}
 	return !ASelected.isEmpty();
 }
@@ -1111,23 +1110,33 @@ void NormalMessageHandler::onShortcutActivated(const QString &AId, QWidget *AWid
 		QList<IRosterIndex *> indexes = FRostersView->selectedRosterIndexes();
 		if (AId==SCT_ROSTERVIEW_SHOWNORMALDIALOG && isSelectionAccepted(indexes))
 		{
-			QMap<int, QStringList> rolesMap = indexesRolesMap(indexes);
-			Jid streamJid = rolesMap.value(RDR_STREAM_JID).value(0);
+			Jid streamJid;
+			if (GroupRosterKinds.contains(indexes.first()->kind()))
+				streamJid = indexes.first()->data(RDR_STREAMS).toStringList().value(0);
+			else
+				streamJid = indexes.first()->data(RDR_STREAM_JID).toString();
+
 			if (messageShowWindow(MHO_NORMALMESSAGEHANDLER,streamJid,Jid::null,Message::Normal,IMessageHandler::SM_SHOW))
 			{
 				IMessageNormalWindow *window = FMessageWidgets->findNormalWindow(streamJid,Jid::null,true);
 				if (window)
 				{
-					for (int i=0; i<rolesMap.value(RDR_STREAM_JID).count(); i++)
+					foreach(IRosterIndex *index, indexes)
 					{
-						Jid streamJid = rolesMap.value(RDR_STREAM_JID).at(i);
-						Jid contactJid = rolesMap.value(RDR_PREP_BARE_JID).at(i);
-						QString group = rolesMap.value(RDR_GROUP).at(i);
-
-						if (!contactJid.isEmpty())
-							window->receiversWidget()->setAddressSelection(streamJid,contactJid,true);
-						if (!group.isEmpty())
-							window->receiversWidget()->setGroupSelection(streamJid,group,true);
+						if (index->kind() == RIK_METACONTACT)
+						{
+							for (int row=0; row<index->childCount(); row++)
+								window->receiversWidget()->setAddressSelection(index->childIndex(row)->data(RDR_STREAM_JID).toString(),index->childIndex(row)->data(RDR_PREP_BARE_JID).toString(),true);
+						}
+						else if (GroupRosterKinds.contains(index->kind()))
+						{
+							foreach(const Jid &streamJid, index->data(RDR_STREAMS).toStringList())
+								window->receiversWidget()->setGroupSelection(streamJid,index->data(RDR_GROUP).toString(),true);
+						}
+						else if (ContactRosterKinds.contains(index->kind()))
+						{
+							window->receiversWidget()->setAddressSelection(index->data(RDR_STREAM_JID).toString(),index->data(RDR_PREP_BARE_JID).toString(),true);
+						}
 					}
 				}
 			}

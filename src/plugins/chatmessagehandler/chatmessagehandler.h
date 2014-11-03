@@ -79,9 +79,10 @@ protected:
 	void updateWindow(IMessageChatWindow *AWindow);
 	void removeNotifiedMessages(IMessageChatWindow *AWindow);
 	void showHistory(IMessageChatWindow *AWindow);
+	void requestHistory(IMessageChatWindow *AWindow);
 	void setMessageStyle(IMessageChatWindow *AWindow);
-	void fillContentOptions(IMessageChatWindow *AWindow, IMessageContentOptions &AOptions) const;
 	void showDateSeparator(IMessageChatWindow *AWindow, const QDateTime &ADateTime);
+	void fillContentOptions(const Jid &AStreamJid, const Jid &AContactJid, IMessageContentOptions &AOptions) const;
 	void showStyledStatus(IMessageChatWindow *AWindow, const QString &AMessage, bool ADontSave=false, const QDateTime &ATime=QDateTime::currentDateTime());
 	void showStyledMessage(IMessageChatWindow *AWindow, const Message &AMessage);
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
@@ -139,6 +140,7 @@ private:
 	QMap<QString, IMessageChatWindow *> FHistoryRequests;
 	QMap<IMessageChatWindow *, QList<Message> > FPendingMessages;
 	QMap<IMessageChatWindow *, QList<WindowContent> > FPendingContent;
+	QMap<IMessageChatWindow *, IArchiveCollectionBody> FHistoryMessages;
 };
 
 #endif // CHATMESSAGEHANDLER_H

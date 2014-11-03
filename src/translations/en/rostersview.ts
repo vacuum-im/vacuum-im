@@ -91,14 +91,6 @@
         <translation>&lt;b&gt;Subscription:&lt;/b&gt; %1</translation>
     </message>
     <message>
-        <source>&lt;b&gt;Resource:&lt;/b&gt; %1 (%2)</source>
-        <translation>&lt;b&gt;Resource:&lt;/b&gt; %1 (%2)</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Status:&lt;/b&gt; %1</source>
-        <translation>&lt;b&gt;Status:&lt;/b&gt; %1</translation>
-    </message>
-    <message>
         <source>Unite contacts of all accounts</source>
         <translation>Unite contacts of all accounts</translation>
     </message>

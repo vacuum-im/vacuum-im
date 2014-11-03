@@ -1,6 +1,7 @@
 #ifndef ADVANCEDITEMMODEL_H
 #define ADVANCEDITEMMODEL_H
 
+#include <QPair>
 #include <QStandardItemModel>
 #include "advanceditem.h"
 #include "utilsexport.h"
@@ -36,7 +37,8 @@ class UTILS_EXPORT AdvancedItemModel :
 	friend class AdvancedItemDataHolder;
 public:
 	enum AdvancedRole {
-		AnyRole = -1,
+		AnyRole  = -1,
+		AllRoles = -2,
 		FlagsRole = Qt::UserRole-1
 	};
 public:
@@ -56,7 +58,7 @@ public:
 	void insertItemSortHandler(int AOrder, AdvancedItemSortHandler *AHandler);
 	void removeItemSortHandler(int AOrder, AdvancedItemSortHandler *AHandler);
 	// Data Handlers
-	QMultiMap<int, AdvancedItemDataHolder *> itemDataHolders(int ARole=AnyRole) const;
+	QMultiMap<int, AdvancedItemDataHolder *> itemDataHolders(int ARole) const;
 	void insertItemDataHolder(int AOrder, AdvancedItemDataHolder *AHandler);
 	void removeItemDataHolder(int AOrder, AdvancedItemDataHolder *AHandler);
 signals:
@@ -83,7 +85,7 @@ private:
 	bool FDelayedDataChangedSignals;
 	bool FRecursiveParentDataChangedSignals;
 	QList<const QStandardItem *> FRemovingItems;
-	QMultiMap<QStandardItem *, int> FChangedItems;
+	QList<QPair<QStandardItem *, int> > FChangedItems;
 	QMultiMap<int, AdvancedItemSortHandler *> FItemSortHandlers;
 	QMap<int, QMultiMap<int, AdvancedItemDataHolder *> > FItemDataHolders;
 };

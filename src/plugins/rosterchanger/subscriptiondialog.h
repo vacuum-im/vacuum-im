@@ -2,6 +2,7 @@
 #define SUBSCRIPTIONDIALOG_H
 
 #include <interfaces/ipluginmanager.h>
+#include <interfaces/inotifications.h>
 #include <interfaces/imessageprocessor.h>
 #include <interfaces/irosterchanger.h>
 #include <interfaces/iroster.h>
@@ -35,9 +36,10 @@ private:
 	Ui::SubscriptionDialogClass ui;
 private:
 	IRoster *FRoster;
-	IMessageProcessor *FMessageProcessor;
 	IVCardPlugin *FVcardPlugin;
 	IRosterChanger *FRosterChanger;
+	INotifications *FNotifications;
+	IMessageProcessor *FMessageProcessor;
 private:
 	Action *FShowChat;
 	Action *FSendMessage;

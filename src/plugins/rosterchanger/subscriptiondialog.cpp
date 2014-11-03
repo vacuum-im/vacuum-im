@@ -16,6 +16,7 @@ SubscriptionDialog::SubscriptionDialog(IRosterChanger *ARosterChanger, IPluginMa
 
 	FRoster = NULL;
 	FVcardPlugin = NULL;
+	FNotifications = NULL;
 	FMessageProcessor = NULL;
 
 	FRosterChanger = ARosterChanger;
@@ -114,6 +115,10 @@ void SubscriptionDialog::initialize(IPluginManager *APluginManager)
 			connect(FShowVCard,SIGNAL(triggered(bool)),SLOT(onToolBarActionTriggered(bool)));
 		}
 	}
+
+	plugin = APluginManager->pluginInterface("INotifications").value(0,NULL);
+	if (plugin)
+		FNotifications = qobject_cast<INotifications *>(plugin->instance());
 }
 
 void SubscriptionDialog::onDialogAccepted()
@@ -124,7 +129,7 @@ void SubscriptionDialog::onDialogAccepted()
 		if (dialog)
 		{
 			dialog->setContactJid(FContactJid);
-			dialog->setNickName(FContactJid.uNode());
+			dialog->setNickName(FNotifications!=NULL ? FNotifications->contactName(FStreamJid,FContactJid) : FContactJid.uNode());
 		}
 	}
 	else if (ui.rbtSendAndRequest->isChecked())

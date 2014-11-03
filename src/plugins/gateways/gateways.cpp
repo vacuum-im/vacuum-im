@@ -729,9 +729,9 @@ void Gateways::onShortcutActivated(const QString &AId, QWidget *AWidget)
 			{
 				if (index->kind() == RIK_AGENT)
 				{
+					bool logIn = AId==SCT_ROSTERVIEW_GATELOGIN;
 					Jid streamJid = index->data(RDR_STREAM_JID).toString();
 					Jid serviceJid = index->data(RDR_PREP_BARE_JID).toString();
-					bool logIn = AId==SCT_ROSTERVIEW_GATELOGIN;
 					if (FPrivateStorageKeep.value(streamJid).contains(serviceJid))
 						setKeepConnection(streamJid,serviceJid,logIn);
 					sendLogPresence(streamJid,serviceJid,logIn);
@@ -787,7 +787,7 @@ void Gateways::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndex
 			else
 				delete addUserMenu;
 		}
-		else if (indexKind == RIK_CONTACT || indexKind == RIK_AGENT)
+		else if (indexKind==RIK_CONTACT || indexKind==RIK_AGENT)
 		{
 			QMap<int, QStringList> rolesMap = FRostersViewPlugin->rostersView()->indexesRolesMap(AIndexes,QList<int>()<<RDR_STREAM_JID<<RDR_PREP_BARE_JID,RDR_PREP_BARE_JID,RDR_STREAM_JID);
 

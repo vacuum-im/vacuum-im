@@ -18,15 +18,21 @@ struct IRecentItem
 	QDateTime activeTime;
 	QDateTime updateTime;
 	QMap<QString, QVariant> properties;
-	bool operator<(const IRecentItem &AOther) const {
+	inline bool isNull() const {
+		return type.isEmpty();
+	}
+	inline bool operator<(const IRecentItem &AOther) const {
 		if (type != AOther.type)
 			return type < AOther.type;
 		if (streamJid != AOther.streamJid)
 			return streamJid < AOther.streamJid;
 		return reference < AOther.reference;
 	}
-	bool operator==(const IRecentItem &AOther) const {
+	inline bool operator==(const IRecentItem &AOther) const {
 		return type==AOther.type && streamJid==AOther.streamJid && reference==AOther.reference;
+	}
+	inline bool operator!=(const IRecentItem &AOther) const {
+		return !operator==(AOther);
 	}
 };
 
@@ -64,6 +70,8 @@ public:
 	virtual void registerItemHandler(const QString &AType, IRecentItemHandler *AHandler) =0;
 protected:
 	virtual void visibleItemsChanged() =0;
+	virtual void recentContactsOpened(const Jid &AStreamJid) =0;
+	virtual void recentContactsClosed(const Jid &AStreamJid) =0;
 	virtual void recentItemAdded(const IRecentItem &AItem) =0;
 	virtual void recentItemChanged(const IRecentItem &AItem) =0;
 	virtual void recentItemRemoved(const IRecentItem &AItem) =0;
@@ -74,6 +82,6 @@ protected:
 Q_DECLARE_METATYPE(IRecentItem);
 
 Q_DECLARE_INTERFACE(IRecentItemHandler,"Vacuum.Plugin.IRecentItemHandler/1.0")
-Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.2")
+Q_DECLARE_INTERFACE(IRecentContacts,"Vacuum.Plugin.IRecentContacts/1.4")
 
 #endif //IRECENTCONTACTS_H

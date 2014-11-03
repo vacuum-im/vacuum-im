@@ -81,17 +81,17 @@ signals:
 	void optionsDialogNodeInserted(const IOptionsDialogNode &ANode);
 	void optionsDialogNodeRemoved(const IOptionsDialogNode &ANode);
 protected:
-	void openProfile(const QString &AProfile, const QString &APassword);
 	void closeProfile();
-	bool saveOptions() const;
+	void openProfile(const QString &AProfile, const QString &APassword);
 	QDomDocument profileDocument(const QString &AProfile) const;
 	bool saveProfile(const QString &AProfile, const QDomDocument &AProfileDoc) const;
-	void importOldSettings();
+	bool saveCurrentProfileOptions() const;
 protected:
-	void importOptionValues() const;
-	void importOptionDefaults() const;
-	QMap<QString,QVariant> getOptionValues(const OptionsNode &ANode) const;
-	QMap<QString,QVariant> loadOptionValues(const QString &AFileName) const;
+	QMap<QString, QVariant> getOptionValues(const OptionsNode &ANode) const;
+	QMap<QString, QVariant> loadOptionValues(const QString &AFilePath) const;
+	QMap<QString, QVariant> loadAllOptionValues(const QString &AFileName) const;
+	void updateOptionValues(const QMap<QString, QVariant> &AOptions) const;
+	void updateOptionDefaults(const QMap<QString, QVariant> &AOptions) const;
 protected slots:
 	void onOptionsChanged(const OptionsNode &ANode);
 	void onOptionsDialogApplied();
@@ -119,7 +119,6 @@ private:
 private:
 	Action *FChangeProfileAction;
 	Action *FShowOptionsDialogAction;
-	QMap<QString,QVariant> FDefaultOptions;
 	QList<IOptionsHolder *> FOptionsHolders;
 	QMap<QString, IOptionsDialogNode> FOptionsDialogNodes;
 };

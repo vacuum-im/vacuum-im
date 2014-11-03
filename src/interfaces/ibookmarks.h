@@ -55,6 +55,7 @@ class IBookmarks
 {
 public:
 	virtual QObject *instance() =0;
+	virtual bool isReady(const Jid &AStreamJid) const =0;
 	virtual bool isValidBookmark(const IBookmark &ABookmark) const =0;
 	virtual QList<IBookmark> bookmarks(const Jid &AStreamJid) const =0;
 	virtual bool addBookmark(const Jid &AStreamJid, const IBookmark &ABookmark) =0;
@@ -62,9 +63,11 @@ public:
 	virtual int execEditBookmarkDialog(IBookmark *ABookmark, QWidget *AParent) const =0;
 	virtual void showEditBookmarksDialog(const Jid &AStreamJid) =0;
 protected:
+	virtual void bookmarksOpened(const Jid &AStreamJid) =0;
+	virtual void bookmarksClosed(const Jid &AStreamJid) =0;
 	virtual void bookmarksChanged(const Jid &AStreamJid) =0;
 };
 
-Q_DECLARE_INTERFACE(IBookmarks,"Vacuum.Plugin.IBookmarks/1.1")
+Q_DECLARE_INTERFACE(IBookmarks,"Vacuum.Plugin.IBookmarks/1.2")
 
 #endif // IBOOKMARKS_H

@@ -56,7 +56,6 @@ signals:
 	//ISocksStreams
 	void localConnectionAccepted(const QString &AKey, QTcpSocket *ATcpSocket);
 protected slots:
-	void onXmppStreamOpened(IXmppStream *AStream);
 	void onXmppStreamClosed(IXmppStream *AStream);
 	void onDiscoItemsReceived(const IDiscoItems &AItems);
 	void onNewServerConnection();

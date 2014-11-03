@@ -71,11 +71,13 @@ public:
 	virtual void insertNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
 	virtual void removeNegotiator(ISessionNegotiator *ANegotiator, int AOrder) =0;
 protected:
+	virtual void sessionsOpened(const Jid &AStreamJid) =0;
+	virtual void sessionsClosed(const Jid &AStreamJid) =0;
 	virtual void sessionActivated(const IStanzaSession &ASession) =0;
 	virtual void sessionTerminated(const IStanzaSession &ASession) =0;
 };
 
 Q_DECLARE_INTERFACE(ISessionNegotiator,"Vacuum.Plugin.ISessionNegotiator/1.0")
-Q_DECLARE_INTERFACE(ISessionNegotiation,"Vacuum.Plugin.ISessionNegotiation/1.1")
+Q_DECLARE_INTERFACE(ISessionNegotiation,"Vacuum.Plugin.ISessionNegotiation/1.2")
 
 #endif // ISESSIONNEGOTIATION_H

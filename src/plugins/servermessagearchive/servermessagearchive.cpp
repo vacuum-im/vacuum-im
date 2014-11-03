@@ -155,7 +155,7 @@ void ServerMessageArchive::stanzaRequestResult(const Jid &AStreamJid, const Stan
 			LOG_STRM_DEBUG(AStreamJid,QString("Collection loaded, id=%1").arg(AStanza.id()));
 			IArchiveCollection collection;
 			QDomElement chatElem = AStanza.firstElement("chat");
-			FArchiver->elementToCollection(chatElem,collection);
+			FArchiver->elementToCollection(AStreamJid,chatElem,collection);
 			collection.header.engineId = engineId();
 
 			QString nextRef = getNextRef(readResultSetAnswer(chatElem),collection.body.messages.count()+collection.body.notes.count(),MAX_MESSAGE_ITEMS);

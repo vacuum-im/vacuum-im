@@ -1,6 +1,9 @@
 #include "advanceditem.h"
 
+#include <QSet>
 #include "advanceditemmodel.h"
+
+#define FIRST_VALID_ROLE 0
 
 static const qint32 DefaultItemFlags = Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled;
 
@@ -21,7 +24,7 @@ AdvancedItem::AdvancedItem(const QIcon &AIcon, const QString &AText) : QStandard
 
 int AdvancedItem::type() const
 {
-	return StandardItemTypeValue;
+	return AdvancedItemTypeValue;
 }
 
 QStandardItem *AdvancedItem::clone() const
@@ -48,50 +51,57 @@ void AdvancedItem::write(QDataStream &AOut) const
 QVariant AdvancedItem::data(int ARole) const
 {
 	QVariant value;
-	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
-	if (advModel)
+	if (ARole >= FIRST_VALID_ROLE)
 	{
-		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(ARole);
-		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); value.isNull() && it!=holders.constEnd(); ++it)
-			value = it.value()->advancedItemData(it.key(),this,ARole);
+		const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
+		if (advModel)
+		{
+			const QMultiMap<int, AdvancedItemDataHolder *> holders = advModel->itemDataHolders(ARole);
+			for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); value.isNull() && it!=holders.constEnd(); ++it)
+				value = it.value()->advancedItemData(it.key(),this,ARole);
+		}
+		return value.isNull() ? FData.value(ARole) : value;
 	}
-	return value.isNull() ? FData.value(ARole) : value;
+	return value;
 }
 
 void AdvancedItem::setData(const QVariant &AValue, int ARole)
 {
-	AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
-	if (advModel)
+	if (ARole >= FIRST_VALID_ROLE)
 	{
-		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(ARole);
-		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); it!=holders.constEnd(); ++it)
-			if (it.value()->setAdvancedItemData(it.key(),AValue,this,ARole))
-				return;
-	}
+		AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
+		if (advModel)
+		{
+			const QMultiMap<int, AdvancedItemDataHolder *> holders = advModel->itemDataHolders(ARole);
+			for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); it!=holders.constEnd(); ++it)
+				if (it.value()->setAdvancedItemData(it.key(),AValue,this,ARole))
+					return;
+		}
 
-	bool changed = false;
-	QMap<int, QVariant>::iterator valueIt = FData.find(ARole);
-	if (!AValue.isNull())
-	{
-		if (valueIt == FData.end())
+		bool changed = false;
+		QMap<int, QVariant>::iterator valueIt = FData.find(ARole);
+		if (!AValue.isNull())
+		{
+			if (valueIt == FData.end())
+			{
+				changed = true;
+				FData.insert(ARole,AValue);
+			}
+			else if (AValue != valueIt.value())
+			{
+				changed = true;
+				*valueIt = AValue;
+			}
+		}
+		else if (valueIt != FData.end())
 		{
 			changed = true;
-			FData.insert(ARole,AValue);
+			FData.erase(valueIt);
 		}
-		else if (AValue != valueIt.value())
-		{
-			changed = true;
-			*valueIt = AValue;
-		}
-	}
-	else if (valueIt != FData.end())
-	{
-		changed = true;
-		FData.erase(valueIt);
-	}
 
-	if (changed && advModel)
-		advModel->emitItemDataChanged(this,ARole);
+		if (changed && advModel)
+			advModel->emitItemDataChanged(this,ARole);
+	}
 }
 
 bool AdvancedItem::operator <(const QStandardItem &AOther) const
@@ -99,7 +109,7 @@ bool AdvancedItem::operator <(const QStandardItem &AOther) const
 	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
 	if (advModel)
 	{
-		const QMultiMap<int, AdvancedItemSortHandler *> &handlers = advModel->itemSortHandlers();
+		const QMultiMap<int, AdvancedItemSortHandler *> handlers = advModel->itemSortHandlers();
 		for(QMultiMap<int, AdvancedItemSortHandler *>::const_iterator it=handlers.constBegin(); it!=handlers.constEnd(); ++it)
 		{
 			AdvancedItemSortHandler::SortResult res = it.value()->advancedItemSort(it.key(),this,&AOther);
@@ -124,22 +134,30 @@ QMap<int, QVariant> AdvancedItem::itemData() const
 	const AdvancedItemModel *advModel = qobject_cast<AdvancedItemModel *>(model());
 	if (advModel)
 	{
-		QList<int> presentRoles;
-		const QMultiMap<int, AdvancedItemDataHolder *> &holders = advModel->itemDataHolders(AdvancedItemModel::AnyRole);
-		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator it=holders.constBegin(); it!=holders.constEnd(); ++it)
+		QMultiMap<int, AdvancedItemDataHolder *> allHolders = advModel->itemDataHolders(AdvancedItemModel::AllRoles);
+		const QMultiMap<int, AdvancedItemDataHolder *> anyHolders = advModel->itemDataHolders(AdvancedItemModel::AnyRole);
+
+		QSet<int> presentRoles;
+		for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator anyIt=anyHolders.constBegin(); anyIt!=anyHolders.constEnd(); ++anyIt)
 		{
-			int order = it.key();
-			AdvancedItemDataHolder *holder = it.value();
-			foreach(int role, holder->advancedItemDataRoles(order))
+			int anyOrder = anyIt.key();
+			AdvancedItemDataHolder *anyHolder = anyIt.value();
+			foreach(int role, anyHolder->advancedItemDataRoles(anyOrder))
 			{
-				if (!presentRoles.contains(role))
+				if (role>=FIRST_VALID_ROLE && !presentRoles.contains(role))
 				{
-					QVariant value = holder->advancedItemData(order,this,role);
-					if (!value.isNull())
+					QMultiMap<int, AdvancedItemDataHolder *>::iterator tmpIt = allHolders.insert(anyOrder,anyHolder);
+					for(QMultiMap<int, AdvancedItemDataHolder *>::const_iterator allIt=allHolders.constBegin(); allIt!=allHolders.constEnd(); ++allIt)
 					{
-						values.insert(role,value);
-						presentRoles.append(role);
+						QVariant value = allIt.value()->advancedItemData(allIt.key(),this,role);
+						if (!value.isNull())
+						{
+							values.insert(role,value);
+							presentRoles +=  role;
+							break;
+						}
 					}
+					allHolders.erase(tmpIt);
 				}
 			}
 		}
