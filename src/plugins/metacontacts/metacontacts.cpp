@@ -686,7 +686,7 @@ bool MetaContacts::createMetaContact(const Jid &AStreamJid, const QUuid &AMetaId
 			meta.items = AItems;
 			if (updateMetaContact(AStreamJid,meta))
 			{
-				LOG_STRM_DEBUG(AStreamJid,QString("Metacontact created, metaId=%1, name=%2, items=%3").arg(meta.id.toString(),AName).arg(AItems.count()));
+				LOG_STRM_INFO(AStreamJid,QString("Metacontact created, metaId=%1, name=%2, items=%3").arg(meta.id.toString(),AName).arg(AItems.count()));
 				startSaveContactsToStorage(AStreamJid);
 				return true;
 			}
@@ -698,7 +698,7 @@ bool MetaContacts::createMetaContact(const Jid &AStreamJid, const QUuid &AMetaId
 	}
 	else if (!AMetaId.isNull())
 	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to create metacontact: Stream is not ready"));
+		REPORT_ERROR("Failed to create metacontact: Stream is not ready");
 	}
 	else
 	{
@@ -709,7 +709,7 @@ bool MetaContacts::createMetaContact(const Jid &AStreamJid, const QUuid &AMetaId
 
 bool MetaContacts::setMetaContactName(const Jid &AStreamJid, const QUuid &AMetaId, const QString &AName)
 {
-	if (isReady(AStreamJid))
+	if (isReady(AStreamJid) && !AMetaId.isNull())
 	{
 		IMetaContact meta = findMetaContact(AStreamJid,AMetaId);
 		if (meta.id == AMetaId)
@@ -719,7 +719,7 @@ bool MetaContacts::setMetaContactName(const Jid &AStreamJid, const QUuid &AMetaI
 				meta.name = AName;
 				if (updateMetaContact(AStreamJid,meta))
 				{
-					LOG_STRM_DEBUG(AStreamJid,QString("Metacontact name changed, metaId=%1, name=%2").arg(AMetaId.toString(),AName));
+					LOG_STRM_INFO(AStreamJid,QString("Metacontact name changed, metaId=%1, name=%2").arg(AMetaId.toString(),AName));
 					startSaveContactsToStorage(AStreamJid);
 					return true;
 				}
@@ -734,16 +734,20 @@ bool MetaContacts::setMetaContactName(const Jid &AStreamJid, const QUuid &AMetaI
 			LOG_STRM_ERROR(AStreamJid,QString("Failed to change metacontact name, metaId=%1: Metacontact not found").arg(AMetaId.toString()));
 		}
 	}
+	else if (!AMetaId.isNull())
+	{
+		REPORT_ERROR("Failed to change metacontact name: Stream is not ready");
+	}
 	else
 	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to change metacontact name: Stream is not ready"));
+		REPORT_ERROR("Failed to change metacontact name: Invalid parameters");
 	}
 	return false;
 }
 
 bool MetaContacts::setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMetaId, const QSet<QString> &AGroups)
 {
-	if (isReady(AStreamJid))
+	if (isReady(AStreamJid) && !AMetaId.isNull())
 	{
 		IMetaContact meta = findMetaContact(AStreamJid,AMetaId);
 		if (meta.id == AMetaId)
@@ -760,7 +764,7 @@ bool MetaContacts::setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMet
 						IRosterItem ritem = roster->rosterItem(item);
 						roster->setItem(ritem.itemJid,ritem.name,ritem.groups + newGroups - oldGroups);
 					}
-					LOG_STRM_DEBUG(AStreamJid,QString("Metacontact groups changed, metaId=%1, groups=%2").arg(AMetaId.toString()).arg(AGroups.count()));
+					LOG_STRM_INFO(AStreamJid,QString("Metacontact groups changed, metaId=%1, groups=%2").arg(AMetaId.toString()).arg(AGroups.count()));
 					return true;
 				}
 				else
@@ -778,16 +782,20 @@ bool MetaContacts::setMetaContactGroups(const Jid &AStreamJid, const QUuid &AMet
 			LOG_STRM_ERROR(AStreamJid,QString("Failed to change metacontact groups, metaId=%1: Metacontact not found").arg(AMetaId.toString()));
 		}
 	}
+	else if (!AMetaId.isNull())
+	{
+		REPORT_ERROR("Failed to change metacontact groups: Stream is not ready");
+	}
 	else
 	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to change metacontact groups: Stream is not ready"));
+		REPORT_ERROR("Failed to change metacontact groups: Invalid parameters");
 	}
 	return false;
 }
 
 bool MetaContacts::insertMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems)
 {
-	if (isReady(AStreamJid))
+	if (isReady(AStreamJid) && !AMetaId.isNull())
 	{
 		IMetaContact meta = findMetaContact(AStreamJid,AMetaId);
 		if (meta.id == AMetaId)
@@ -806,7 +814,7 @@ bool MetaContacts::insertMetaContactItems(const Jid &AStreamJid, const QUuid &AM
 			{
 				if (updateMetaContact(AStreamJid,meta))
 				{
-					LOG_STRM_DEBUG(AStreamJid,QString("Metacontact items inserted, metaId=%1, items=%2").arg(AMetaId.toString()).arg(insertCount));
+					LOG_STRM_INFO(AStreamJid,QString("Metacontact items inserted, metaId=%1, items=%2").arg(AMetaId.toString()).arg(insertCount));
 					startSaveContactsToStorage(AStreamJid);
 					return true;
 				}
@@ -821,16 +829,20 @@ bool MetaContacts::insertMetaContactItems(const Jid &AStreamJid, const QUuid &AM
 			LOG_STRM_ERROR(AStreamJid,QString("Failed to insert metacontact items, metaId=%1: Metacontact not found").arg(AMetaId.toString()));
 		}
 	}
+	else if (!AMetaId.isNull())
+	{
+		REPORT_ERROR("Failed to insert metacontact items: Stream is not ready");
+	}
 	else
 	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to insert metacontact items: Stream is not ready"));
+		REPORT_ERROR("Failed to insert metacontact items: Invalid parameters");
 	}
 	return false;
 }
 
 bool MetaContacts::removeMetaContactItems(const Jid &AStreamJid, const QUuid &AMetaId, const QList<Jid> &AItems)
 {
-	if (isReady(AStreamJid))
+	if (isReady(AStreamJid) && !AMetaId.isNull())
 	{
 		IMetaContact meta = findMetaContact(AStreamJid,AMetaId);
 		if (meta.id == AMetaId)
@@ -843,7 +855,7 @@ bool MetaContacts::removeMetaContactItems(const Jid &AStreamJid, const QUuid &AM
 			{
 				if (updateMetaContact(AStreamJid,meta))
 				{
-					LOG_STRM_DEBUG(AStreamJid,QString("Metacontact items removed, metaId=%1, items=%2").arg(AMetaId.toString()).arg(removeCount));
+					LOG_STRM_INFO(AStreamJid,QString("Metacontact items removed, metaId=%1, items=%2").arg(AMetaId.toString()).arg(removeCount));
 					startSaveContactsToStorage(AStreamJid);
 					return true;
 				}
@@ -858,9 +870,13 @@ bool MetaContacts::removeMetaContactItems(const Jid &AStreamJid, const QUuid &AM
 			LOG_STRM_ERROR(AStreamJid,QString("Failed to remove metacontact items, metaId=%1: Metacontact not found").arg(AMetaId.toString()));
 		}
 	}
+	else if (!AMetaId.isNull())
+	{
+		REPORT_ERROR("Failed to remove metacontact items: Stream is not ready");
+	}
 	else
 	{
-		LOG_STRM_ERROR(AStreamJid,QString("Failed to remove metacontact items: Stream is not ready"));
+		REPORT_ERROR("Failed to remove metacontact items: Invalid parameters");
 	}
 	return false;
 }
@@ -1284,7 +1300,6 @@ bool MetaContacts::updateMetaContact(const Jid &AStreamJid, const IMetaContact &
 
 		if (after != before)
 		{
-			QSet<Jid> newMetaItems = after.items.toSet() - before.items.toSet();
 			QSet<Jid> oldMetaItems = before.items.toSet() - after.items.toSet();
 
 			foreach(const Jid &itemJid, oldMetaItems)
