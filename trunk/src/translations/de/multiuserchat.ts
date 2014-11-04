@@ -138,6 +138,10 @@ Werte überprüfen und neu probieren</translation>
         <source>Room destruction request was sent.</source>
         <translation>Raum Auflösungs Anforderung wurde gesendet.</translation>
     </message>
+    <message>
+        <source>Your nick was changed by server to &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatPlugin</name>
@@ -294,14 +298,6 @@ Werte überprüfen und neu probieren</translation>
         <translation>Erlaube dieser Person sich mit dem Raum zu registrieren?</translation>
     </message>
     <message>
-        <source>First Name</source>
-        <translation>Vorname</translation>
-    </message>
-    <message>
-        <source>Last Name</source>
-        <translation>Nachname</translation>
-    </message>
-    <message>
         <source>Desired Nickname</source>
         <translation>Gewünschter Spitzname</translation>
     </message>
@@ -358,16 +354,8 @@ Werte überprüfen und neu probieren</translation>
         <translation>Persistenter Raum?</translation>
     </message>
     <message>
-        <source>Roles for which Presence is Broadcast:</source>
-        <translation>Roles for which Presence is Broadcast:</translation>
-    </message>
-    <message>
         <source>Allow Public Searching for Room?</source>
         <translation>Erlaube öffentliches Suchen nach Raum?</translation>
-    </message>
-    <message>
-        <source>Full List of Room Admins</source>
-        <translation>Komplette Liste der Raumadmins</translation>
     </message>
     <message>
         <source>Description of Room</source>
@@ -440,30 +428,6 @@ Werte überprüfen und neu probieren</translation>
     <message>
         <source>Grant Voice?</source>
         <translation>Voice gewähren?</translation>
-    </message>
-    <message>
-        <source>Make participants list public?</source>
-        <translation>Teilnehmerliste publizieren?</translation>
-    </message>
-    <message>
-        <source>Allow visitors to send status text in presence updates?</source>
-        <translation>Erlaube Besuchern Statustext zu senden?</translation>
-    </message>
-    <message>
-        <source>Allow visitors to change nickname?</source>
-        <translation>Erlaube Besuchern Spitznamenwechsel?</translation>
-    </message>
-    <message>
-        <source>Default occupants as participants?</source>
-        <translation>Standardbenutzer als Teilnehmer?</translation>
-    </message>
-    <message>
-        <source>Allow occupants to send private messages?</source>
-        <translation>Erlaube Benutzern das Senden privater Nachrichten?</translation>
-    </message>
-    <message>
-        <source>Allow occupants to query other occupants?</source>
-        <translation>Allow occupants to query other occupants?</translation>
     </message>
     <message>
         <source>Multi-User Conferences</source>
@@ -599,6 +563,74 @@ Werte überprüfen und neu probieren</translation>
         <source>Please, enter this conference!</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Given Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Number of History Messages Returned by Room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Affiliations that May Retrieve Member List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMPP URI of Associated Publish-Subscribe Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Roles for which Presence is Broadcasted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full List of Room Administrators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Participants List Public?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Send Private Messages?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Query Other Occupants?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Login Only With Registered Nickname?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Nicknames?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Users to Register with the Room?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make all Occupants as Participants?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make this Room CAPTCHA Protected?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -677,10 +709,6 @@ Werte überprüfen und neu probieren</translation>
     <message>
         <source>The room is now semi-anonymous</source>
         <translation>Der Raum ist nun halb-anonym</translation>
-    </message>
-    <message>
-        <source>The room is now fully-anonymous</source>
-        <translation>Der Raum ist nun voll-anonym</translation>
     </message>
     <message>
         <source>A new room has been created</source>
@@ -1012,6 +1040,14 @@ Werte überprüfen und neu probieren</translation>
     </message>
     <message>
         <source>You left the room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Room now shows unavailable members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Room now does not show unavailable members</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

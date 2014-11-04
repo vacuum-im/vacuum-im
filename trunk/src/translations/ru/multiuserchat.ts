@@ -138,6 +138,10 @@ Check values and try again</source>
         <source>Room destruction request was sent.</source>
         <translation>Запрос на уничтожение комнаты послан.</translation>
     </message>
+    <message>
+        <source>Your nick was changed by server to &apos;%1&apos;</source>
+        <translation>Ваш ник был изменен сервером на &apos;%1&apos;</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatPlugin</name>
@@ -294,14 +298,6 @@ Check values and try again</source>
         <translation>Разрешить этому посетителю зарегистрироваться в комнате?</translation>
     </message>
     <message>
-        <source>First Name</source>
-        <translation>Имя</translation>
-    </message>
-    <message>
-        <source>Last Name</source>
-        <translation>Фамилия</translation>
-    </message>
-    <message>
         <source>Desired Nickname</source>
         <translation>Желаемый ник</translation>
     </message>
@@ -358,16 +354,8 @@ Check values and try again</source>
         <translation>Сделать комнату постоянной?</translation>
     </message>
     <message>
-        <source>Roles for which Presence is Broadcast:</source>
-        <translation>Типы пользователей, которым рассылается статус:</translation>
-    </message>
-    <message>
         <source>Allow Public Searching for Room?</source>
         <translation>Сделать комнату видимой всем?</translation>
-    </message>
-    <message>
-        <source>Full List of Room Admins</source>
-        <translation>Полный список администраторов комнаты</translation>
     </message>
     <message>
         <source>Description of Room</source>
@@ -387,7 +375,7 @@ Check values and try again</source>
     </message>
     <message>
         <source>Affiliations that May Discover Real JIDs of Occupants</source>
-        <translation>Сделать реальные JID пользователей видимыми</translation>
+        <translation>Участники, которым виден реальный JID пользователей</translation>
     </message>
     <message>
         <source>Conference information</source>
@@ -440,30 +428,6 @@ Check values and try again</source>
     <message>
         <source>Grant Voice?</source>
         <translation>Предоставить &apos;голос&apos;?</translation>
-    </message>
-    <message>
-        <source>Make participants list public?</source>
-        <translation>Сделать список участников видимым всем?</translation>
-    </message>
-    <message>
-        <source>Allow visitors to send status text in presence updates?</source>
-        <translation>Разрешить гостям вставлять текст статуса в сообщения о присутствии?</translation>
-    </message>
-    <message>
-        <source>Allow visitors to change nickname?</source>
-        <translation>Разрешить гостям изменять ник?</translation>
-    </message>
-    <message>
-        <source>Default occupants as participants?</source>
-        <translation>Сделать пользователей участниками по умолчанию?</translation>
-    </message>
-    <message>
-        <source>Allow occupants to send private messages?</source>
-        <translation>Разрешить пользователям посылать приватные сообщения?</translation>
-    </message>
-    <message>
-        <source>Allow occupants to query other occupants?</source>
-        <translation>Разрешить пользователям посылать iq-запросы?</translation>
     </message>
     <message>
         <source>Multi-User Conferences</source>
@@ -599,6 +563,74 @@ Check values and try again</source>
         <source>Please, enter this conference!</source>
         <translation>Пожалуйста, войдите в эту конференцию!</translation>
     </message>
+    <message>
+        <source>Given Name</source>
+        <translation>Имя</translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation>Фамилия</translation>
+    </message>
+    <message>
+        <source>Maximum Number of History Messages Returned by Room</source>
+        <translation>Максимальное количество сообщений истории возвращаемое комнатой</translation>
+    </message>
+    <message>
+        <source>Affiliations that May Retrieve Member List</source>
+        <translation>Участники, которые могу получить список членов комнаты</translation>
+    </message>
+    <message>
+        <source>XMPP URI of Associated Publish-Subscribe Node</source>
+        <translation>XMPP URI ассоциированного Publish-Subscribe узла</translation>
+    </message>
+    <message>
+        <source>Roles for which Presence is Broadcasted</source>
+        <translation>Участники, котрым будут транслироваться сообщения о присутствии</translation>
+    </message>
+    <message>
+        <source>Full List of Room Administrators</source>
+        <translation>Полный список администраторов комнаты</translation>
+    </message>
+    <message>
+        <source>Make Participants List Public?</source>
+        <translation>Сделать список участников комнаты публичным?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Send Private Messages?</source>
+        <translation>Разрешить пользователям посылать приватные сообщения?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Query Other Occupants?</source>
+        <translation>Разрешить пользователям отправлять запросы другим пользователям?</translation>
+    </message>
+    <message>
+        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
+        <translation>Разрешить гостям вставлять текст статуса в сообщения о присутствии?</translation>
+    </message>
+    <message>
+        <source>Allow Login Only With Registered Nickname?</source>
+        <translation>Разрешить вход только с зарегистрированным ником?</translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Nicknames?</source>
+        <translation>Разрешить пользователям менять ник?</translation>
+    </message>
+    <message>
+        <source>Allow Users to Register with the Room?</source>
+        <translation>Разрешить пользователям регистрироваться в комнате?</translation>
+    </message>
+    <message>
+        <source>Make all Occupants as Participants?</source>
+        <translation>Сделать всех пользователей участниками?</translation>
+    </message>
+    <message>
+        <source>Make this Room CAPTCHA Protected?</source>
+        <translation>Сделать комнату защищенной CAPTCHA?</translation>
+    </message>
+    <message>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
+        <translation>Не показывать CAPTCHA для следующего списка Jabber ID</translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -677,10 +709,6 @@ Check values and try again</source>
     <message>
         <source>The room is now semi-anonymous</source>
         <translation>Эта комната теперь полуанонимная</translation>
-    </message>
-    <message>
-        <source>The room is now fully-anonymous</source>
-        <translation>Эта комната теперь полностью анонимная</translation>
     </message>
     <message>
         <source>A new room has been created</source>
@@ -1013,6 +1041,14 @@ Check values and try again</source>
     <message>
         <source>You left the room</source>
         <translation>Вы вышли из комнаты</translation>
+    </message>
+    <message>
+        <source>Room now shows unavailable members</source>
+        <translation>Комната теперь показывает отключенных участников</translation>
+    </message>
+    <message>
+        <source>Room now does not show unavailable members</source>
+        <translation>Комната теперь не показывает отключенных участников</translation>
     </message>
 </context>
 </TS>
