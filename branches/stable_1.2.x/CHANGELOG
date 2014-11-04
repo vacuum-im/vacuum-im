@@ -7,6 +7,7 @@ LEGEND
 
 ------
   [-] Fixed automatic activation of notifications
+  [-] Fixed conference entrance detection by status codes
 
 
 v1.2.4
