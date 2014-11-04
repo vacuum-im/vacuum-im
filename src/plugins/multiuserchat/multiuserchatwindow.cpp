@@ -667,7 +667,7 @@ void MultiUserChatWindow::contextMenuForUser(IMultiUser *AUser, Menu *AMenu)
 {
 	if (FUsers.contains(AUser))
 	{
-		if (AUser != FMultiChat->mainUser())
+		if (FMultiChat->isOpen() && AUser!=FMultiChat->mainUser())
 		{
 			Action *openChat = new Action(AMenu);
 			openChat->setIcon(RSR_STORAGE_MENUICONS,MNI_MUC_PRIVATE_MESSAGE);
@@ -1427,6 +1427,12 @@ bool MultiUserChatWindow::showMultiChatStatusCodes(const QList<int> &ACodes, con
 		if (ACodes.contains(MUC_SC_AFFIL_CHANGED))
 			statuses.append(qMakePair<QString,int>(tr("%1 affiliation changed while not in the room").arg(ANick),IMessageContentOptions::TypeNotification));
 
+		if (ACodes.contains(MUC_SC_MEMBERS_SHOW))
+			statuses.append(qMakePair<QString,int>(tr("Room now shows unavailable members"),IMessageContentOptions::TypeNotification));
+
+		if (ACodes.contains(MUC_SC_MEMBERS_HIDE))
+			statuses.append(qMakePair<QString,int>(tr("Room now does not show unavailable members"),IMessageContentOptions::TypeNotification));
+
 		if (ACodes.contains(MUC_SC_CONFIG_CHANGED))
 			statuses.append(qMakePair<QString,int>(tr("Room configuration change has occurred"),IMessageContentOptions::TypeNotification));
 
@@ -1442,23 +1448,8 @@ bool MultiUserChatWindow::showMultiChatStatusCodes(const QList<int> &ACodes, con
 		if (ACodes.contains(MUC_SC_NOW_SEMI_ANONYMOUS))
 			statuses.append(qMakePair<QString,int>(tr("The room is now semi-anonymous"),IMessageContentOptions::TypeNotification));
 
-		if (ACodes.contains(MUC_SC_NOW_FULLY_ANONYMOUS))
-			statuses.append(qMakePair<QString,int>(tr("The room is now fully-anonymous"),IMessageContentOptions::TypeNotification));
-
 		if (ACodes.contains(MUC_SC_ROOM_CREATED))
 			statuses.append(qMakePair<QString,int>(tr("A new room has been created"),IMessageContentOptions::TypeNotification));
-
-		if (ACodes.contains(MUC_SC_NICK_CHANGED))
-			statuses.append(qMakePair<QString,int>(QString::null,0));
-
-		if (ACodes.contains(MUC_SC_USER_BANNED))
-			statuses.append(qMakePair<QString,int>(QString::null,0));
-
-		if (ACodes.contains(MUC_SC_ROOM_ENTER))
-			statuses.append(qMakePair<QString,int>(QString::null,0));
-
-		if (ACodes.contains(MUC_SC_USER_KICKED))
-			statuses.append(qMakePair<QString,int>(QString::null,0));
 
 		if (ACodes.contains(MUC_SC_AFFIL_CHANGE))
 			statuses.append(qMakePair<QString,int>(tr("%1 has been removed from the room because of an affiliation change").arg(ANick),IMessageContentOptions::TypeEvent));
@@ -1469,11 +1460,26 @@ bool MultiUserChatWindow::showMultiChatStatusCodes(const QList<int> &ACodes, con
 		if (ACodes.contains(MUC_SC_SYSTEM_SHUTDOWN))
 			statuses.append(qMakePair<QString,int>(tr("%1 is being removed from the room because of a system shutdown").arg(ANick),IMessageContentOptions::TypeEvent));
 
+		if (ACodes.contains(MUC_SC_SELF_PRESENCE))
+			statuses.append(qMakePair<QString,int>(QString::null,0));
+
+		if (ACodes.contains(MUC_SC_NICK_CHANGED))
+			statuses.append(qMakePair<QString,int>(QString::null,0));
+
+		if (ACodes.contains(MUC_SC_USER_BANNED))
+			statuses.append(qMakePair<QString,int>(QString::null,0));
+
+		if (ACodes.contains(MUC_SC_NICK_ASSIGNED))
+			statuses.append(qMakePair<QString,int>(QString::null,0));
+
+		if (ACodes.contains(MUC_SC_USER_KICKED))
+			statuses.append(qMakePair<QString,int>(QString::null,0));
+
 		for (QList< QPair<QString,int> >::const_iterator it=statuses.constBegin(); it!=statuses.constEnd(); ++it)
 		{
-			if (!it->first.isEmpty())
+			QString status = it->first;
+			if (!status.isEmpty())
 			{
-				QString status = it->first;
 				if (!AMessage.isEmpty())
 					status += QString(" (%1)").arg(AMessage);
 				showMultiChatStatusMessage(status,it->second);
@@ -1582,7 +1588,7 @@ IMessageChatWindow *MultiUserChatWindow::getPrivateChatWindow(const Jid &AContac
 {
 	IMessageChatWindow *window = NULL;
 	IMultiUser *user = FMultiChat->userByNick(AContactJid.resource());
-	if (user && user!=FMultiChat->mainUser())
+	if (user!=NULL && user!=FMultiChat->mainUser())
 	{
 		window = findChatWindow(AContactJid);
 		if (!window)
@@ -2066,7 +2072,7 @@ void MultiUserChatWindow::onUserPresence(IMultiUser *AUser, int AShow, const QSt
 	if (FMultiChat->isConnected())
 		updateMultiChatWindow();
 
-	if (FMultiChat->mainUser() == AUser)
+	if (AUser == FMultiChat->mainUser())
 		FLastAffiliation = AUser->affiliation();
 
 	IMessageChatWindow *window = findChatWindow(AUser->contactJid());
@@ -2158,16 +2164,14 @@ void MultiUserChatWindow::onUserKicked(const QString &ANick, const QString &ARea
 {
 	IMultiUser *user = FMultiChat->userByNick(ANick);
 	Jid realJid = user!=NULL ? user->data(MUDR_REAL_JID).toString() : Jid::null;
+
 	showMultiChatStatusMessage(tr("%1 has been kicked from the room%2. %3")
 		.arg(!realJid.isEmpty() ? ANick + QString(" <%1>").arg(realJid.uFull()) : ANick)
 		.arg(!AByUser.isEmpty() ? tr(" by %1").arg(AByUser) : QString::null)
 		.arg(AReason), IMessageContentOptions::TypeEvent);
 
-	if (Options::node(OPV_MUC_GROUPCHAT_REJOINAFTERKICK).value().toBool()
-		&& ANick == FMultiChat->mainUser()->nickName())
-	{
+	if (Options::node(OPV_MUC_GROUPCHAT_REJOINAFTERKICK).value().toBool() && user==FMultiChat->mainUser())
 		QTimer::singleShot(REJOIN_AFTER_KICK_MSEC,this,SLOT(onAutoRejoinAfterKick()));
-	}
 }
 
 void MultiUserChatWindow::onUserBanned(const QString &ANick, const QString &AReason, const QString &AByUser)
