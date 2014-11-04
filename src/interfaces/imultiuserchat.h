@@ -26,6 +26,7 @@
 #define MUC_SC_NON_ANONYMOUS            100
 #define MUC_SC_AFFIL_CHANGED            101
 #define MUC_SC_CONFIG_CHANGED           104
+#define MUC_SC_SELF_PRESENCE            110
 #define MUC_SC_NOW_LOGGING_ENABLED      170
 #define MUC_SC_NOW_LOGGING_DISABLED     171
 #define MUC_SC_NOW_NON_ANONYMOUS        172

@@ -663,7 +663,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			else if (showText == "xa")
 				show = IPresence::ExtendedAway;
 			else
-				show = IPresence::Online;     // остыль под кривые клиенты и транспорты
+				show = IPresence::Online;
 
 			QString status = AStanza.firstElement("status").text();
 			Jid realJid = itemElem.attribute("jid");
@@ -690,7 +690,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 				FUsers.insert(fromNick,user);
 			}
 
-			if (!isOpen() && (fromNick == FNickName || FStatusCodes.contains(MUC_SC_ROOM_ENTER)))
+			if (!isOpen() && (fromNick == FNickName || FStatusCodes.contains(MUC_SC_SELF_PRESENCE)))
 			{
 				FNickName = fromNick;
 				FMainUser = user;
@@ -742,15 +742,15 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_KICKED))   //User kicked
 			{
-				QString byUser = itemElem.firstChildElement("actor").attribute("jid");
+				QString actor = itemElem.firstChildElement("actor").attribute("nick");
 				QString reason = itemElem.firstChildElement("reason").text();
-				emit userKicked(fromNick,reason,byUser);
+				emit userKicked(fromNick,reason,actor);
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_BANNED))   //User baned
 			{
-				QString byUser = itemElem.firstChildElement("actor").attribute("jid");
+				QString actor = itemElem.firstChildElement("actor").attribute("nick");
 				QString reason = itemElem.firstChildElement("reason").text();
-				emit userBanned(fromNick,reason,byUser);
+				emit userBanned(fromNick,reason,actor);
 			}
 			else if (!xelem.firstChildElement("destroy").isNull())
 			{
