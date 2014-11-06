@@ -444,40 +444,57 @@ IDataFormLocale MultiUserChatPlugin::dataFormLocale(const QString &AFormType)
 	{
 		locale.title = tr("Register in conference");
 		locale.fields["muc#register_allow"].label = tr("Allow this person to register with the room?");
-		locale.fields["muc#register_first"].label = tr("First Name");
-		locale.fields["muc#register_last"].label = tr("Last Name");
-		locale.fields["muc#register_roomnick"].label = tr("Desired Nickname");
-		locale.fields["muc#register_url"].label = tr("Your URL");
 		locale.fields["muc#register_email"].label = tr("EMail Address");
 		locale.fields["muc#register_faqentry"].label = tr("Rules and Notes");
+		locale.fields["muc#register_first"].label = tr("Given Name");
+		locale.fields["muc#register_last"].label = tr("Family Name");
+		locale.fields["muc#register_roomnick"].label = tr("Desired Nickname");
+		locale.fields["muc#register_url"].label = tr("Your URL");
+	}
+	else if (AFormType == DATA_FORM_MUC_REQUEST)
+	{
+		locale.title = tr("Request for voice");
+		locale.fields["muc#role"].label = tr("Requested Role");
+		locale.fields["muc#jid"].label = tr("User ID");
+		locale.fields["muc#roomnick"].label = tr("Room Nickname");
+		locale.fields["muc#request_allow"].label = tr("Grant Voice?");
 	}
 	else if (AFormType == DATA_FORM_MUC_ROOMCONFIG)
 	{
 		locale.title = tr("Configure conference");
+		locale.fields["muc#maxhistoryfetch"].label = tr("Maximum Number of History Messages Returned by Room");
+		locale.fields["muc#roomconfig_allowpm"].label = tr("Allow Occupants to Send Private Messages?");
 		locale.fields["muc#roomconfig_allowinvites"].label = tr("Allow Occupants to Invite Others?");
 		locale.fields["muc#roomconfig_changesubject"].label = tr("Allow Occupants to Change Subject?");
 		locale.fields["muc#roomconfig_enablelogging"].label = tr("Enable Logging of Room Conversations?");
+		locale.fields["muc#roomconfig_getmemberlist"].label = tr("Affiliations that May Retrieve Member List");
+		locale.fields["muc#roomconfig_pubsub"].label = tr("XMPP URI of Associated Publish-Subscribe Node");
 		locale.fields["muc#roomconfig_lang"].label = tr("Natural Language for Room Discussions");
 		locale.fields["muc#roomconfig_maxusers"].label = tr("Maximum Number of Room Occupants");
 		locale.fields["muc#roomconfig_membersonly"].label = tr("Make Room Members-Only?");
 		locale.fields["muc#roomconfig_moderatedroom"].label = tr("Make Room Moderated?");
 		locale.fields["muc#roomconfig_passwordprotectedroom"].label = tr("Password is Required to Enter?");
 		locale.fields["muc#roomconfig_persistentroom"].label = tr("Make Room Persistent?");
-		locale.fields["muc#roomconfig_presencebroadcast"].label = tr("Roles for which Presence is Broadcast:");
+		locale.fields["muc#roomconfig_presencebroadcast"].label = tr("Roles for which Presence is Broadcasted");
 		locale.fields["muc#roomconfig_publicroom"].label = tr("Allow Public Searching for Room?");
-		locale.fields["muc#roomconfig_roomadmins"].label = tr("Full List of Room Admins");
+		locale.fields["muc#roomconfig_roomadmins"].label = tr("Full List of Room Administrators");
 		locale.fields["muc#roomconfig_roomdesc"].label = tr("Description of Room");
 		locale.fields["muc#roomconfig_roomname"].label = tr("Natural-Language Room Name");
 		locale.fields["muc#roomconfig_roomowners"].label = tr("Full List of Room Owners");
 		locale.fields["muc#roomconfig_roomsecret"].label = tr("The Room Password");
 		locale.fields["muc#roomconfig_whois"].label = tr("Affiliations that May Discover Real JIDs of Occupants");
-		//ejabberd muc extension
-		locale.fields["public_list"].label = tr("Make participants list public?");
-		locale.fields["members_by_default"].label = tr("Default occupants as participants?");
-		locale.fields["allow_private_messages"].label = tr("Allow occupants to send private messages?");
-		locale.fields["allow_query_users"].label = tr("Allow occupants to query other occupants?");
-		locale.fields["muc#roomconfig_allowvisitorstatus"].label = tr("Allow visitors to send status text in presence updates?");
-		locale.fields["muc#roomconfig_allowvisitornickchange"].label = tr("Allow visitors to change nickname?");
+		//EJabberd extension
+		locale.fields["public_list"].label = tr("Make Participants List Public?");
+		locale.fields["members_by_default"].label = tr("Make all Occupants as Participants?");
+		locale.fields["allow_private_messages"].label = tr("Allow Occupants to Send Private Messages?");
+		locale.fields["allow_query_users"].label = tr("Allow Occupants to Query Other Occupants?");
+		locale.fields["muc#roomconfig_allowvisitorstatus"].label = tr("Allow Visitors to Send Status Text in Presence Updates?");
+		locale.fields["captcha_protected"].label = tr("Make this Room CAPTCHA Protected?");
+		locale.fields["muc#roomconfig_captcha_whitelist"].label = tr("Do not Request CAPTCHA for Followed Jabber ID");
+		//OpenFire extension
+		locale.fields["x-muc#roomconfig_reservednick"].label = tr("Allow Login Only With Registered Nickname?");
+		locale.fields["x-muc#roomconfig_canchangenick"].label = tr("Allow Occupants to Change Nicknames?");
+		locale.fields["x-muc#roomconfig_registration"].label = tr("Allow Users to Register with the Room?");
 	}
 	else if (AFormType == DATA_FORM_MUC_ROOM_INFO)
 	{
@@ -490,14 +507,6 @@ IDataFormLocale MultiUserChatPlugin::dataFormLocale(const QString &AFormType)
 		locale.fields["muc#roominfo_occupants"].label = tr("Current Number of Occupants in Room");
 		locale.fields["muc#roominfo_subject"].label = tr("Current Subject or Discussion Topic in Room");
 		locale.fields["muc#roominfo_subjectmod"].label = tr("The Room Subject Can be Modified by Participants?");
-	}
-	else if (AFormType == DATA_FORM_MUC_REQUEST)
-	{
-		locale.title = tr("Request for voice");
-		locale.fields["muc#role"].label = tr("Requested Role");
-		locale.fields["muc#jid"].label = tr("User ID");
-		locale.fields["muc#roomnick"].label = tr("Room Nickname");
-		locale.fields["muc#request_allow"].label = tr("Grant Voice?");
 	}
 	return locale;
 }
