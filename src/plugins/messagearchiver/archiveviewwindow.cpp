@@ -775,10 +775,10 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 	FViewOptions.lastSenderId = QString::null;
 
 	if (!FViewOptions.isPrivateChat)
-		FViewOptions.senderName = QString(FMessageStyles!=NULL ? FMessageStyles->contactName(ACollection.header.stream,ACollection.header.with) : contactName(ACollection.header.stream,ACollection.header.with)).toHtmlEscaped();
+		FViewOptions.senderName = FMessageStyles!=NULL ? FMessageStyles->contactName(ACollection.header.stream,ACollection.header.with).toHtmlEscaped() : contactName(ACollection.header.stream,ACollection.header.with).toHtmlEscaped();
 	else
 		FViewOptions.senderName = ACollection.header.with.resource().toHtmlEscaped();
-	FViewOptions.selfName = QString(FMessageStyles!=NULL ? FMessageStyles->contactName(ACollection.header.stream) : ACollection.header.stream.uBare()).toHtmlEscaped();
+	FViewOptions.selfName = FMessageStyles!=NULL ? FMessageStyles->contactName(ACollection.header.stream).toHtmlEscaped() : ACollection.header.stream.uBare().toHtmlEscaped();
 
 	QString html = showInfo(ACollection);
 
@@ -802,7 +802,7 @@ void ArchiveViewWindow::showCollection(const ArchiveCollection &ACollection)
 			{
 				options.type |= IMessageContentOptions::TypeGroupchat;
 				options.direction = IMessageContentOptions::DirectionIn;
-				options.senderName = QString(!senderJid.resource().isEmpty() ? senderJid.resource() : senderJid.uNode()).toHtmlEscaped();
+				options.senderName = !senderJid.resource().isEmpty() ? senderJid.resource().toHtmlEscaped() : senderJid.uNode().toHtmlEscaped();
 				options.senderColor = FViewOptions.style!=NULL ? FViewOptions.style->senderColor(options.senderName) : "blue";
 			}
 			else if (direction == IMessageProcessor::DirectionIn)

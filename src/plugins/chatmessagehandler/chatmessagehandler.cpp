@@ -750,7 +750,7 @@ void ChatMessageHandler::fillContentOptions(const Jid &AStreamJid, const Jid &AC
 		if (AStreamJid.pBare() != AContactJid.pBare())
 			AOptions.senderName = FMessageStyles->contactName(AStreamJid).toHtmlEscaped();
 		else
-			AOptions.senderName = QString(!AStreamJid.resource().isEmpty() ? AStreamJid.resource() : AStreamJid.uNode()).toHtmlEscaped();
+			AOptions.senderName = !AStreamJid.resource().isEmpty() ? AStreamJid.resource().toHtmlEscaped() : AStreamJid.uNode().toHtmlEscaped();
 		AOptions.senderColor = "red";
 	}
 }
