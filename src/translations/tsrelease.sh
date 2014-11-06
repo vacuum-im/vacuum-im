@@ -10,5 +10,5 @@ fi
 
 find "${TS_DIR}" -name '*.ts' | sed "s,^${TS_DIR}/,," | \
 while read ts; do
-	${lrelease} -compress ${TS_DIR}/${ts} -qm ${QM_DIR}/${ts%.ts}.qm 
+	${lrelease} ${TS_DIR}/${ts} -qm ${QM_DIR}/${ts%.ts}.qm 
 done

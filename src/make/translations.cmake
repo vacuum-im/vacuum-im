@@ -41,7 +41,7 @@ macro(lang_display_name outvar langname)
 endmacro(lang_display_name)
 
 set(LUPDATE_OPTS -no-obsolete -locations none -source-language en)
-set(LRELEASE_OPTS -silent -compress)
+set(LRELEASE_OPTS -silent)
 
 macro(add_translations outvar tsname)
 	set(TS_SRCS "")

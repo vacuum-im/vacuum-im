@@ -11,7 +11,7 @@ for(LANG, TRANS_LANGS) {
   win32: LRELEASE = $$replace(LRELEASE, /, \\\\)
   
   QM_COMMAND = $(MKDIR) $${QM_DIR} && $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE}
-  win32: QM_COMMAND = ( if not exist $${QM_DIR} ( $(MKDIR) $${QM_DIR} ) ) & $${LRELEASE} -compress $${TS_FILE} -qm $${QM_FILE}
+  win32: QM_COMMAND = ( if not exist $${QM_DIR} ( $(MKDIR) $${QM_DIR} ) ) & $${LRELEASE} $${TS_FILE} -qm $${QM_FILE}
 
   eval(qm_$${TRANS_TARGET}_build_$${LANG}.target   = $${QM_FILE})
   eval(qm_$${TRANS_TARGET}_build_$${LANG}.depends  = $${TS_FILE})

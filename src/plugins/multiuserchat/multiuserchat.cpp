@@ -952,7 +952,7 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			QString affiliation = itemElem.attribute("affiliation");
 
 			MultiUser *user = FUsers.value(fromNick);
-			if (!user)
+			if (user == NULL)
 			{
 				user = new MultiUser(FRoomJid,fromNick,this);
 				user->setData(MUDR_STREAM_JID,FStreamJid.full());
@@ -974,16 +974,21 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 
 			if (!FUsers.contains(fromNick))
 			{
-				connect(user->instance(),SIGNAL(dataChanged(int,const QVariant &, const QVariant &)),
-					SLOT(onUserDataChanged(int,const QVariant &, const QVariant &)));
 				FUsers.insert(fromNick,user);
+				connect(user->instance(),SIGNAL(dataChanged(int,const QVariant &, const QVariant &)),SLOT(onUserDataChanged(int,const QVariant &, const QVariant &)));
 			}
 
-			if (!isOpen() && (fromNick==FNickName || FStatusCodes.contains(MUC_SC_ROOM_ENTER)))
+			if (!isOpen() && (fromNick==FNickName || FStatusCodes.contains(MUC_SC_SELF_PRESENCE)))
 			{
-				LOG_STRM_INFO(FStreamJid,QString("You entered the conference, room=%1, nick=%2, role=%3, affiliation=%4").arg(FRoomJid.bare(),fromNick,role,affiliation));
-				FNickName = fromNick;
 				FMainUser = user;
+				if (FNickName != fromNick)
+				{
+					LOG_STRM_WARNING(FStreamJid,QString("Main user nick was changed by server, room=%1, from=%2, to=%3").arg(FRoomJid.bare(),FNickName,fromNick));
+
+					FNickName = fromNick;
+					emit chatNotify(tr("Your nick was changed by server to '%1'").arg(FNickName));
+				}
+				LOG_STRM_INFO(FStreamJid,QString("Received initial conference presence, room=%1, nick=%2, role=%3, affiliation=%4").arg(FRoomJid.bare(),fromNick,role,affiliation));
 				emit chatOpened();
 			}
 
@@ -1039,17 +1044,17 @@ bool MultiUserChat::processPresence(const Stanza &AStanza)
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_KICKED))
 			{
-				QString byUser = itemElem.firstChildElement("actor").attribute("jid");
+				QString actor = itemElem.firstChildElement("actor").attribute("nick");
 				QString reason = itemElem.firstChildElement("reason").text();
-				LOG_STRM_DEBUG(FStreamJid,QString("User was kicked from conference, room=%1, user=%2, by=%3: %4").arg(FRoomJid.bare(),fromNick,byUser,reason));
-				emit userKicked(fromNick,reason,byUser);
+				LOG_STRM_DEBUG(FStreamJid,QString("User was kicked from conference, room=%1, user=%2, by=%3: %4").arg(FRoomJid.bare(),fromNick,actor,reason));
+				emit userKicked(fromNick,reason,actor);
 			}
 			else if (FStatusCodes.contains(MUC_SC_USER_BANNED))
 			{
-				QString byUser = itemElem.firstChildElement("actor").attribute("jid");
+				QString actor = itemElem.firstChildElement("actor").attribute("nick");
 				QString reason = itemElem.firstChildElement("reason").text();
-				LOG_STRM_DEBUG(FStreamJid,QString("User was banned in conference, room=%1, user=%2, by=%3: %4").arg(FRoomJid.bare(),fromNick,byUser,reason));
-				emit userBanned(fromNick,reason,byUser);
+				LOG_STRM_DEBUG(FStreamJid,QString("User was banned in conference, room=%1, user=%2, by=%3: %4").arg(FRoomJid.bare(),fromNick,actor,reason));
+				emit userBanned(fromNick,reason,actor);
 			}
 			else if (!xelem.firstChildElement("destroy").isNull())
 			{
@@ -1106,7 +1111,7 @@ void MultiUserChat::closeChat(int AShow, const QString &AStatus)
 	FConnected = false;
 	LOG_STRM_INFO(FStreamJid,QString("Closing conference, room=%1").arg(FRoomJid.bare()));
 
-	if (FMainUser)
+	if (isOpen())
 	{
 		FMainUser->setData(MUDR_SHOW,AShow);
 		FMainUser->setData(MUDR_STATUS,AStatus);
