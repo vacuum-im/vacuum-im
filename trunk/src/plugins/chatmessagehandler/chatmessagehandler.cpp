@@ -932,7 +932,6 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 	{
 		QMap<Jid, QList<Jid> > addresses = getSortedAddresses(widget->messageWindow()->address()->availAddresses());
 
-		Jid lastStreamJid;
 		int streamGroup = AG_MWIWAM_CHATMHANDLER_ADDRESSES-1;
 		foreach(const Jid &streamJid, addresses.keys())
 		{
@@ -948,6 +947,7 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 			accountAction->setFont(font);
 			AMenu->addAction(accountAction,streamGroup);
 
+			QActionGroup *addressGroup = new QActionGroup(AMenu);
 			foreach(const Jid &contactJid, addresses.value(streamJid))
 			{
 				QString addressName = FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid,contactJid) : contactJid.uBare();
@@ -960,6 +960,7 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 				addressAction->setCheckable(true);
 				addressAction->setChecked(isCurAddress);
 				addressAction->setText(addressName);
+				addressAction->setActionGroup(addressGroup);
 				addressAction->setData(ADR_STREAM_JID,streamJid.full());
 				addressAction->setData(ADR_CONTACT_JID,contactJid.full());
 				addressAction->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,contactJid) : QIcon());
