@@ -49,8 +49,8 @@ public:
 	};
 public:
 	virtual QObject *instance() =0;
-	virtual QString sendRegiterRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
-	virtual QString sendUnregiterRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
+	virtual QString sendRegisterRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
+	virtual QString sendUnregisterRequest(const Jid &AStreamJid, const Jid &AServiceJid) =0;
 	virtual QString sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AUserName, const QString &APassword) =0;
 	virtual QString sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit) =0;
 	virtual bool showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL) =0;
@@ -60,6 +60,6 @@ protected:
 	virtual void registerError(const QString &AId, const XmppError &AError) =0;
 };
 
-Q_DECLARE_INTERFACE(IRegistration,"Vacuum.Plugin.IRegistration/1.1")
+Q_DECLARE_INTERFACE(IRegistration,"Vacuum.Plugin.IRegistration/1.2")
 
 #endif

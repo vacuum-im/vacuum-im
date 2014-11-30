@@ -122,7 +122,7 @@ struct IDataForm
 {
 	QString type;
 	QString title;
-	IDataTable tabel;
+	IDataTable table;
 	QList<QString> instructions;
 	QList<IDataField> fields;
 	QList<IDataLayout> pages;
@@ -287,6 +287,6 @@ Q_DECLARE_INTERFACE(IDataFieldWidget,"Vacuum.Plugin.IDataFieldWidget/1.0")
 Q_DECLARE_INTERFACE(IDataFormWidget,"Vacuum.Plugin.IDataFormWidget/1.0")
 Q_DECLARE_INTERFACE(IDataDialogWidget,"Vacuum.Plugin.IDataDialogWidget/1.0")
 Q_DECLARE_INTERFACE(IDataLocalizer,"Vacuum.Plugin.IDataLocalizer/1.0")
-Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.1")
+Q_DECLARE_INTERFACE(IDataForms,"Vacuum.Plugin.IDataForms/1.2")
 
 #endif

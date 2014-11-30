@@ -681,7 +681,7 @@ bool MultiUserChatPlugin::requestRoomNick(const Jid &AStreamJid, const Jid &ARoo
 	}
 	else if (FDataForms && FRegistration)
 	{
-		QString requestId = FRegistration->sendRegiterRequest(AStreamJid,ARoomJid.domain());
+		QString requestId = FRegistration->sendRegisterRequest(AStreamJid,ARoomJid.domain());
 		if (!requestId.isEmpty())
 		{
 			LOG_STRM_INFO(AStreamJid,QString("Room nick request sent as register request, room=%1, id=%2").arg(ARoomJid.domain(),requestId));
@@ -1509,7 +1509,7 @@ void MultiUserChatPlugin::onDiscoInfoReceived(const IDiscoInfo &ADiscoInfo)
 		else if (FDataForms && FRegistration)
 		{
 			LOG_STRM_WARNING(ADiscoInfo.streamJid,QString("Failed to receive room nick in discovery from=%1: %2").arg(ADiscoInfo.contactJid.full(),ADiscoInfo.error.condition()));
-			QString requestId = FRegistration->sendRegiterRequest(ADiscoInfo.streamJid,ADiscoInfo.contactJid.domain());
+			QString requestId = FRegistration->sendRegisterRequest(ADiscoInfo.streamJid,ADiscoInfo.contactJid.domain());
 			if (!requestId.isEmpty())
 			{
 				LOG_STRM_INFO(ADiscoInfo.streamJid,QString("Room nick request sent as register request, room=%1, id=%2").arg(ADiscoInfo.contactJid.domain(),requestId));
