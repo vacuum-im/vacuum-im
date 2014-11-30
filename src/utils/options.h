@@ -59,7 +59,7 @@ public:
 	static OptionsNode node(const QString &APath, const QString &ANSpace = QString::null);
 	static QVariant fileValue(const QString &APath, const QString &ANSpace = QString::null);
 	static void setFileValue(const QVariant &AValue, const QString &APath, const QString &ANSpace = QString::null);
-	static void setOptions(QDomDocument AOptions, const QString &AFilesPath, const QByteArray &ACryptKey);
+	static void setOptions(const QDomDocument &AOptions, const QString &AFilesPath, const QByteArray &ACryptKey);
 	static QVariant defaultValue(const QString &APath);
 	static void setDefaultValue(const QString &APath, const QVariant &ADefault);
 	static QByteArray encrypt(const QVariant &AValue, const QByteArray &AKey = cryptKey());
