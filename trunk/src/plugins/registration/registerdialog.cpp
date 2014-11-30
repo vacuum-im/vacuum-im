@@ -13,7 +13,7 @@ RegisterDialog::RegisterDialog(IRegistration *ARegistration, IDataForms *ADataFo
 	REPORT_VIEW;
 	ui.setupUi(this);
 	setAttribute(Qt::WA_DeleteOnClose,true);
-	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_REGISTERATION,0,0,"windowIcon");
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_REGISTRATION,0,0,"windowIcon");
 
 	ui.spgDataForm->setLayout(new QVBoxLayout);
 	ui.spgDataForm->layout()->setMargin(0);
@@ -86,7 +86,7 @@ void RegisterDialog::doRegisterOperation()
 
 void RegisterDialog::doRegister()
 {
-	FRequestId = FRegistration->sendRegiterRequest(FStreamJid,FServiceJid);
+	FRequestId = FRegistration->sendRegisterRequest(FStreamJid,FServiceJid);
 
 	resetDialog();
 	if (!FRequestId.isEmpty())
@@ -196,7 +196,7 @@ void RegisterDialog::onDialogButtonsClicked(QAbstractButton *AButton)
 			}
 		}
 		else if (FOperation == IRegistration::Unregister)
-			FRequestId = FRegistration->sendUnregiterRequest(FStreamJid,FServiceJid);
+			FRequestId = FRegistration->sendUnregisterRequest(FStreamJid,FServiceJid);
 		else if (FOperation == IRegistration::ChangePassword)
 			FRequestId = FRegistration->sendChangePasswordRequest(FStreamJid,FServiceJid,ui.lneUserName->text(),ui.lnePassword->text());
 

@@ -185,9 +185,9 @@
 #define MNI_RECENT_REMOVE_RECENT        "recentcontactsRemoveRecent"
 
 //Registration
-#define MNI_REGISTERATION               "register"
-#define MNI_REGISTERATION_REMOVE        "registerRemove"
-#define MNI_REGISTERATION_CHANGE        "registerChange"
+#define MNI_REGISTRATION                "register"
+#define MNI_REGISTRATION_REMOVE         "registerRemove"
+#define MNI_REGISTRATION_CHANGE         "registerChange"
 
 //RosterChanger
 #define MNI_RCHANGER_ADD_CONTACT        "rchangerAddContact"

@@ -32,9 +32,9 @@ DataFormWidget::DataFormWidget(IDataForms *ADataForms, const IDataForm &AForm, Q
 	FForm = AForm;
 	FDataForms = ADataForms;
 
-	if (FForm.tabel.columns.count()>0)
+	if (FForm.table.columns.count()>0)
 	{
-		FTableWidget = FDataForms->tableWidget(FForm.tabel,this);
+		FTableWidget = FDataForms->tableWidget(FForm.table,this);
 		FTableWidget->instance()->setVisible(false);
 		connect(FTableWidget->instance(),SIGNAL(activated(int, int)),SIGNAL(cellActivated(int, int)));
 		connect(FTableWidget->instance(),SIGNAL(changed(int,int,int,int)),SIGNAL(cellChanged(int,int,int,int)));

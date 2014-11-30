@@ -276,7 +276,7 @@ IDataForm DataForms::dataForm(const QDomElement &AFormElem) const
 		QDomElement tableElem = AFormElem.firstChildElement("reported");
 		if (!tableElem.isNull())
 		{
-			form.tabel = dataTable(tableElem);
+			form.table = dataTable(tableElem);
 		}
 
 		QDomElement pageElem = AFormElem.firstChildElement("page");
@@ -448,8 +448,8 @@ void DataForms::xmlForm(const IDataForm &AForm, QDomElement &AParentElem) const
 	foreach(const IDataLayout &layout, AForm.pages)
 		xmlPage(layout,AParentElem);
 
-	if (!AForm.tabel.columns.isEmpty())
-		xmlTable(AForm.tabel,formElem);
+	if (!AForm.table.columns.isEmpty())
+		xmlTable(AForm.table,formElem);
 
 	foreach(const IDataField &field, AForm.fields)
 		xmlField(field,formElem,AForm.type);

@@ -256,11 +256,11 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 	{
 		Menu *regMenu = new Menu(AParent);
 		regMenu->setTitle(tr("Registration"));
-		regMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION);
+		regMenu->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTRATION);
 
 		Action *action = new Action(regMenu);
 		action->setText(tr("Register"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION);
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTRATION);
 		action->setData(ADR_StreamJid,AStreamJid.full());
 		action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
 		action->setData(ADR_Operation,IRegistration::Register);
@@ -269,7 +269,7 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 
 		action = new Action(regMenu);
 		action->setText(tr("Unregister"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION_REMOVE);
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTRATION_REMOVE);
 		action->setData(ADR_StreamJid,AStreamJid.full());
 		action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
 		action->setData(ADR_Operation,IRegistration::Unregister);
@@ -278,7 +278,7 @@ Action *Registration::createDiscoFeatureAction(const Jid &AStreamJid, const QStr
 
 		action = new Action(regMenu);
 		action->setText(tr("Change password"));
-		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTERATION_CHANGE);
+		action->setIcon(RSR_STORAGE_MENUICONS,MNI_REGISTRATION_CHANGE);
 		action->setData(ADR_StreamJid,AStreamJid.full());
 		action->setData(ADR_ServiceJid,ADiscoInfo.contactJid.full());
 		action->setData(ADR_Operation,IRegistration::ChangePassword);
@@ -347,7 +347,7 @@ IDataFormLocale Registration::dataFormLocale(const QString &AFormType)
 	return locale;
 }
 
-QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
+QString Registration::sendRegisterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
 	{
@@ -368,7 +368,7 @@ QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServ
 	return QString::null;
 }
 
-QString Registration::sendUnregiterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
+QString Registration::sendUnregisterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
 	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
 	{
@@ -466,7 +466,7 @@ void Registration::registerDiscoFeatures()
 {
 	IDiscoFeature dfeature;
 	dfeature.active = false;
-	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_REGISTERATION);
+	dfeature.icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_REGISTRATION);
 	dfeature.var = NS_JABBER_REGISTER;
 	dfeature.name = tr("Registration");
 	dfeature.description = tr("Supports the registration");
