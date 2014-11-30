@@ -523,7 +523,7 @@ void Options::setFileValue(const QVariant &AValue, const QString &APath, const Q
 	}
 }
 
-void Options::setOptions(QDomDocument AOptions, const QString &AFilesPath, const QByteArray &ACryptKey)
+void Options::setOptions(const QDomDocument &AOptions, const QString &AFilesPath, const QByteArray &ACryptKey)
 {
 	OptionsData *q = instance()->d;
 

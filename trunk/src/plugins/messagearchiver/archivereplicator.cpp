@@ -218,7 +218,7 @@ void ArchiveReplicator::stopReplication(const QUuid &AEngineId)
 			if (it->destinations.isEmpty())
 				it = FModifications.erase(it);
 			else
-				it ++;
+				++it;
 		}
 
 		FDestinations.removeAll(AEngineId);

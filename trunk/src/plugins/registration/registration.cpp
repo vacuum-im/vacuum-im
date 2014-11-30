@@ -349,7 +349,7 @@ IDataFormLocale Registration::dataFormLocale(const QString &AFormType)
 
 QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
-	if (FStanzaProcessor && AStreamJid.isValid() && AStreamJid.isValid())
+	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
 	{
 		Stanza request("iq");
 		request.setTo(AServiceJid.full()).setType("get").setId(FStanzaProcessor->newId());
@@ -370,7 +370,7 @@ QString Registration::sendRegiterRequest(const Jid &AStreamJid, const Jid &AServ
 
 QString Registration::sendUnregiterRequest(const Jid &AStreamJid, const Jid &AServiceJid)
 {
-	if (FStanzaProcessor && AStreamJid.isValid() && AStreamJid.isValid())
+	if (FStanzaProcessor && AStreamJid.isValid() && AServiceJid.isValid())
 	{
 		Stanza request("iq");
 		request.setTo(AServiceJid.full()).setType("set").setId(FStanzaProcessor->newId());
