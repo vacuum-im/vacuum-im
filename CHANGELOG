@@ -8,6 +8,7 @@ LEGEND
 ------
   [-] Fixed automatic activation of notifications
   [-] Fixed conference entrance detection by status codes
+  [-] The application may fail on changing discovery entity in discovery items window
 
 
 v1.2.4
