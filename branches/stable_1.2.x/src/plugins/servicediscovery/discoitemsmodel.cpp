@@ -331,6 +331,8 @@ void DiscoItemsModel::removeChildren(DiscoItemIndex *AParent, QList<DiscoItemInd
 			int row = AParent->childs.indexOf(index);
 			if (row >= 0)
 				rows.append(row);
+			if (!index->childs.isEmpty())
+				removeChildren(index,index->childs);
 		}
 		qSort(rows);
 
