@@ -108,7 +108,8 @@ void RosterIndex::setData(const QVariant &AValue, int ARole)
 QList<IRosterIndex *> RosterIndex::findChilds(const QMultiMap<int, QVariant> &AFindData, bool ARecursive) const
 {
 	QList<IRosterIndex *> indexes;
-	foreach(QStandardItem *item, AdvancedItem::findChilds(AFindData, ARecursive ? Qt::MatchRecursive : Qt::MatchExactly))
+	QList<QStandardItem *> avdancedChilds = AdvancedItem::findChilds(AFindData, ARecursive ? Qt::MatchRecursive : Qt::MatchExactly);
+	foreach(QStandardItem *item, avdancedChilds)
 		if (item->type() == IRosterIndex::RosterItemTypeValue)
 			indexes.append(static_cast<RosterIndex *>(item));
 	return indexes;
