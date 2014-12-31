@@ -172,6 +172,10 @@ void TrayManager::showMessage(const QString &ATitle, const QString &AMessage, QS
 	emit messageShown(ATitle,AMessage,AIcon,ATimeout);
 }
 
+bool TrayManager::supportsMessages() const {
+	return FSystemIcon.supportsMessages();
+}
+
 void TrayManager::updateTray()
 {
 	int notifyId = !FNotifyOrder.isEmpty() ? FNotifyOrder.last() : -1;

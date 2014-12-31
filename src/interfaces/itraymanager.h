@@ -33,6 +33,7 @@ public:
 	virtual int appendNotify(const ITrayNotify &ANotify) =0;
 	virtual void removeNotify(int ANotifyId) =0;
 	virtual void showMessage(const QString &ATitle, const QString &AMessage, QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000) =0;
+	virtual bool supportsMessages() const =0;
 protected:
 	virtual void notifyAppended(int ANotifyId) =0;
 	virtual void notifyRemoved(int ANotifyId) =0;
@@ -42,6 +43,6 @@ protected:
 	virtual void messageShown(const QString &ATitle, const QString &AMessage,QSystemTrayIcon::MessageIcon AIcon, int ATimeout) =0;
 };
 
-Q_DECLARE_INTERFACE(ITrayManager,"Vacuum.Plugin.ITrayManager/1.0")
+Q_DECLARE_INTERFACE(ITrayManager,"Vacuum.Plugin.ITrayManager/1.1")
 
 #endif
