@@ -38,8 +38,8 @@ public:
 	virtual ITrayNotify notifyById(int ANotifyId) const;
 	virtual int appendNotify(const ITrayNotify &ANotify);
 	virtual void removeNotify(int ANotifyId);
+	virtual bool isMessagesSupported() const;
 	virtual void showMessage(const QString &ATitle, const QString &AMessage, QSystemTrayIcon::MessageIcon AIcon = QSystemTrayIcon::Information, int ATimeout = 10000);
-	virtual bool supportsMessages() const;
 signals:
 	void notifyAppended(int ANotifyId);
 	void notifyRemoved(int ANotifyId);

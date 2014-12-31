@@ -307,13 +307,16 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
-			if (Options::node(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS).value().toBool()
-				&& FTrayManager && FTrayManager->supportsMessages()) {
-				QString title = record.notification.data.value(NDR_POPUP_TITLE).toString()
-					+ " - " + record.notification.data.value(NDR_POPUP_CAPTION).toString();
-				FTrayManager->showMessage(title,record.notification.data.value(NDR_POPUP_TEXT).toString(),
-					QSystemTrayIcon::Information,Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000);
-			} else {
+			if (Options::node(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS).value().toBool() && FTrayManager && FTrayManager->isMessagesSupported())
+			{
+				QString title = record.notification.data.value(NDR_POPUP_TITLE).toString();
+				QString caption = record.notification.data.value(NDR_POPUP_CAPTION).toString();
+				QString text = record.notification.data.value(NDR_POPUP_TEXT).toString();
+				int timeout = Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000;
+				FTrayManager->showMessage(title+" - "+caption,text,QSystemTrayIcon::Information,timeout);
+			}
+			else
+			{
 				record.popupWidget = new NotifyWidget(record.notification);
 				connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
 				connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));

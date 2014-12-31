@@ -51,6 +51,10 @@
         <source>Enable animation in notification pop-up</source>
         <translation>Habilitar notificación en la ventana emergente</translation>
     </message>
+    <message>
+        <source>Use native popup notifications if available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>
