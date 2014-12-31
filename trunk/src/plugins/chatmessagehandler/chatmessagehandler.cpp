@@ -235,6 +235,9 @@ bool ChatMessageHandler::initObjects()
 		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
 		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE,notifyType);
+
+		notifyType.kindDefs = 0;
+		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
 		notifyType.title = tr("When receiving new chat message in current chat window");
 		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW,notifyType);
 	}
@@ -343,18 +346,14 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 		IMessageChatWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window)
 		{
-			QString notificationType = NNT_CHAT_MESSAGE;
-			if (window->isActiveTabPage())
-			{
-				notificationType = NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW;
-			}
-			notify.kinds = ANotifications->enabledTypeNotificationKinds(notificationType);
+			QString typeId = window->isActiveTabPage() ? NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW : NNT_CHAT_MESSAGE;
+			notify.kinds = ANotifications->enabledTypeNotificationKinds(typeId);
 			if (notify.kinds > 0)
 			{
 				QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATMHANDLER_MESSAGE);
 				QString name = ANotifications->contactName(AMessage.to(),AMessage.from());
 
-				notify.typeId = notificationType;
+				notify.typeId = typeId;
 				notify.data.insert(NDR_ICON,icon);
 				notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
 				notify.data.insert(NDR_STREAM_JID,AMessage.to());

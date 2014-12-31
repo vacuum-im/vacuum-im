@@ -166,14 +166,15 @@ void TrayManager::removeNotify(int ANotifyId)
 	}
 }
 
+bool TrayManager::isMessagesSupported() const
+{
+	return FSystemIcon.supportsMessages();
+}
+
 void TrayManager::showMessage(const QString &ATitle, const QString &AMessage, QSystemTrayIcon::MessageIcon AIcon, int ATimeout)
 {
 	FSystemIcon.showMessage(ATitle,AMessage,AIcon,ATimeout);
 	emit messageShown(ATitle,AMessage,AIcon,ATimeout);
-}
-
-bool TrayManager::supportsMessages() const {
-	return FSystemIcon.supportsMessages();
 }
 
 void TrayManager::updateTray()
