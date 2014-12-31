@@ -235,6 +235,8 @@ bool ChatMessageHandler::initObjects()
 		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
 		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE,notifyType);
+		notifyType.title = tr("When receiving new chat message in current chat window");
+		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW,notifyType);
 	}
 	if (FRostersView)
 	{
@@ -339,15 +341,20 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		IMessageChatWindow *window = findWindow(AMessage.to(),AMessage.from());
-		if (window && !window->isActiveTabPage())
+		if (window)
 		{
-			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_CHAT_MESSAGE);
+			QString notificationType = NNT_CHAT_MESSAGE;
+			if (window->isActiveTabPage())
+			{
+				notificationType = NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW;
+			}
+			notify.kinds = ANotifications->enabledTypeNotificationKinds(notificationType);
 			if (notify.kinds > 0)
 			{
 				QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATMHANDLER_MESSAGE);
 				QString name = ANotifications->contactName(AMessage.to(),AMessage.from());
 
-				notify.typeId = NNT_CHAT_MESSAGE;
+				notify.typeId = notificationType;
 				notify.data.insert(NDR_ICON,icon);
 				notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
 				notify.data.insert(NDR_STREAM_JID,AMessage.to());
