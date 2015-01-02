@@ -59,7 +59,6 @@ if (APPLE)
 	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
 endif (APPLE)
 
-target_link_libraries(${VACUUM_UTILS_NAME} LINK_INTERFACE_LIBRARIES ${QT_LIBRARIES})
 target_link_libraries(${VACUUM_UTILS_NAME} ${QT_LIBRARIES} ${ADD_LIBS})
 
 if (WIN32)
