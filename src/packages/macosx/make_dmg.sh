@@ -37,7 +37,7 @@ VERSION="${VER_NUMBER}.${REVISION}"
 ### Namespace
 ORIG_NAME="vacuum"
 PRODUCT_NAME="Vacuum-IM"
-DMG_NAME="${PRODUCT_NAME}_${VERSION}_macosx" 
+DMG_NAME="${PRODUCT_NAME}_${VERSION}_osx" 
 
 ### Environment
 SVN_ROOT="../../.." 
@@ -46,7 +46,7 @@ SVN_ROOT="../../.."
 PATH_TO_QMAKE="qmake"
 
 # Build options
-BUILDOPTS=" -recursive -spec macx-g++ CONFIG+=release CONFIG+=x86_64"
+BUILDOPTS=" -recursive -spec macx-clang CONFIG+=release CONFIG+=x86_64"
 
 # Directories
 TMP_DIR="Applications"
@@ -64,24 +64,22 @@ function process_binary {
 	local binary=$1
 	local tab="$2"
 	
-	echo -e "$tab Processing" `basename $binary`
+	echo "$tab Processing" `basename $binary`
 	
 	if [ -f "$binary" ]; then
-		#for str1 in `otool -LX "$binary" | grep $SYS_FW_DIR | cut -d " " -f 1`; do
-		for str1 in `otool -LX "$binary" | grep Qt | cut -d " " -f 1`; do
+		for str1 in `otool -LX "$binary" | grep $SYS_FW_DIR/Qt | cut -d " " -f 1`; do
 			local str=`basename "$str1"`
 			if [ `basename $binary` != $str ]; then
-				local l="$str.framework/Versions/4/$str"
-				echo -e "$tab\t Resolving dependency: $str"
-				#install_name_tool -change "$SYS_FW_DIR/$l" "$DYLD_PREFIX/$l" "$binary"
-				echo "install_name_tool -change \"$l\" \"$DYLD_PREFIX/$l\" \"$binary\""
-				install_name_tool -change "$l" "$DYLD_PREFIX/$l" "$binary"
+				local l="$str.framework/Versions/5/$str"
+				echo "$tab\t Resolving dependency: $str"
+				echo "install_name_tool -change \"$str1\" \"$DYLD_PREFIX/$l\" \"$binary\""
+				install_name_tool -change "$SYS_FW_DIR/$l" "$DYLD_PREFIX/$l" "$binary"
 				process_lib "$l" "$tab\t"
 			fi
 		done;
-		echo -e "$tab Processed" `basename $binary`
+		echo "$tab Processed" `basename $binary`
 	else
-		echo -e "$tab File not found: $binary"
+		echo "$tab File not found: $binary"
 	fi
 }
 
@@ -91,15 +89,15 @@ function process_lib {
 	
 	if [ ! -f "$FW_DIR/$lib" ]; then			
 		if [ -f "$SYS_FW_DIR/$lib" ]; then
-			echo -e "$tab" `basename $lib` "still not in the bundle, fixing..."
-			echo -en "$tab\t Copying " `basename "$lib"` " to bundle... " 
+			echo "$tab" `basename $lib` "still not in the bundle, fixing..."
+			echo "$tab\t Copying " `basename "$lib"` " to bundle... " 
 			cp -Rf $SYS_FW_DIR/`basename $lib`.framework $FW_DIR
 			echo "copied!"
 			echo "install_name_tool -id \"$DYLD_PREFIX/$lib\" \"$FW_DIR/$lib\""
 			install_name_tool -id "$DYLD_PREFIX/$lib" "$FW_DIR/$lib"
 			strip -x "$FW_DIR/$lib"
 			process_binary "$FW_DIR/$lib" "$tab\t"
-			echo -e "$tab fixed" `basename $lib!`
+			echo "$tab fixed" `basename $lib!`
 		else
 			echo "$tab ERROR: Library $lib not found"
 		fi
@@ -116,27 +114,29 @@ then
 fi
 mkdir $TMP_DIR
 
-echo -e "\033[7m Building... \033[0m"
+echo "Building..."
 cd $SVN_ROOT
 $PATH_TO_QMAKE $BUILDOPTS $ORIG_NAME.pro && make -j4 && make INSTALL_ROOT=$SCRIPT_DIR install
 echo "Build done!"
 
 cd $SCRIPT_DIR
-echo -e "\033[7m Copying Qt plugins to bundle... \033[0m"
+echo "Copying Qt plugins to bundle..."
 cp -R "$SYS_PLUGINS_DIR/imageformats" "$CONTENTS_DIR/PlugIns"
-#cp -R "$SYS_PLUGINS_DIR/sqldrivers" "$CONTENTS_DIR/PlugIns"
+rm "$CONTENTS_DIR/PlugIns/imageformats/*debug"
+cp -R "$SYS_PLUGINS_DIR/audio" "$CONTENTS_DIR/PlugIns"
+cp -R "$SYS_PLUGINS_DIR/platforms" "$CONTENTS_DIR/PlugIns"
 mkdir "$CONTENTS_DIR/PlugIns/sqldrivers"
 cp "$SYS_PLUGINS_DIR/sqldrivers/libqsqlite.dylib" "$CONTENTS_DIR/PlugIns/sqldrivers"
 echo "done!"
 
-echo -e "\033[7m Copying Qt locales to bundle... \033[0m"
+echo "Copying Qt locales to bundle..."
 AVAIBLE_LANGUAGES=`ls $CONTENTS_DIR/Resources/translations/`
 for lang in $AVAIBLE_LANGUAGES ; do
 	cp "$SYS_TRANSLATIONS_DIR/qt_$lang.qm" "$CONTENTS_DIR/Resources/translations/$lang/qt_$lang.qm"
 done
 echo "done!"
 
-echo -e "\033[7m Copying Qt libraries to bundle... \033[0m"
+echo "Copying Qt libraries to bundle..."
 strip "$CONTENTS_DIR/MacOS/vacuum"
 process_binary "$CONTENTS_DIR/MacOS/vacuum" ""
 for pl in `find "$CONTENTS_DIR" | egrep "\.dylib"` ; do
@@ -144,17 +144,17 @@ for pl in `find "$CONTENTS_DIR" | egrep "\.dylib"` ; do
 	process_binary "$pl" ""
 done
 
-echo -e "\033[7m Creating qt.conf... \033[0m"
-echo -e "[Paths]\nPlugins = PlugIns" > "$CONTENTS_DIR/Resources/qt.conf"
+echo "Creating qt.conf..."
+echo "[Paths]\nPlugins = PlugIns" > "$CONTENTS_DIR/Resources/qt.conf"
 echo "done!"
 
-echo -e "\033[7m Cleaning up bundle... \033[0m"
+echo "Cleaning up bundle..."
 find "$CONTENTS_DIR/Frameworks" | egrep "debug|Headers" | xargs rm -rf
 find "$CONTENTS_DIR/Frameworks" | egrep ".prl" | xargs rm
 find "$CONTENTS_DIR" -type d -name .svn | xargs rm -rf
 echo "done!"
 
-echo -e "\033[7m Setting program version to Info.plist and copy InfoPlist.strings... \033[0m"
+echo "Setting program version to Info.plist and copy InfoPlist.strings..."
 sed -i.bak "s/1.0.0.0/$VERSION/" $CONTENTS_DIR/Info.plist ; rm $CONTENTS_DIR/Info.plist.bak
 mkdir $CONTENTS_DIR/Resources/en.lproj
 cp $SCRIPT_DIR/InfoPlist.strings $CONTENTS_DIR/Resources/en.lproj/InfoPlist.strings
@@ -169,10 +169,10 @@ then
 	rm $TMP_DMG_NAME
 fi
 
-echo -e "\033[7m Creating temporary dmg disk image... \033[0m"
+echo "Creating temporary dmg disk image..."
 hdiutil create -ov -srcfolder $TMP_DIR -format UDRW -volname "$PRODUCT_NAME" "$TMP_DMG_NAME"
 
-echo -e "\033[7m Mounting temporary image... \033[0m"
+echo "Mounting temporary image..."
 for i in /Volumes/${PRODUCT_NAME}*
 do
 	if [[ -d $i ]]
@@ -183,10 +183,10 @@ done
 device=$(hdiutil attach -readwrite -noverify -noautoopen "$TMP_DMG_NAME" | egrep '^/dev/' | sed 1q | awk '{print $1}')
 echo "done! (device ${device})"
 
-echo -e "\033[7m Sleeping for 5 seconds... \033[0m"
+echo "Sleeping for 5 seconds..."
 sleep 5
 
-echo -e "\033[7m Setting style for temporary dmg image... \033[0m"
+echo "Setting style for temporary dmg image..."
 echo "* Copying background image... "
 BG_FOLDER="/Volumes/$PRODUCT_NAME/.background"
 mkdir "$BG_FOLDER"
@@ -212,7 +212,7 @@ WINDOW_TOP=100
 WINDOW_RIGHT=$(($WINDOW_LEFT + $WINDOW_WIDTH))
 WINDOW_BOTTOM=$(($WINDOW_TOP + $WINDOW_HEIGHT))
 
-echo -e "\033[7m Executing applescript for further customization... \033[0m"
+echo "Executing applescript for further customization..."
 APPLESCRIPT="
 tell application \"Finder\"
 	tell disk \"$PRODUCT_NAME\"
@@ -248,12 +248,12 @@ end tell
 echo "$APPLESCRIPT" | osascript
 echo "done!"
 
-echo -e "\033[7m Fixing permissins and syncing... \033[0m"
+echo "Fixing permissins and syncing..."
 chmod -Rf go-w /Volumes/"$PRODUCT_NAME" &> /dev/null || true
 sync
 echo "done!"
 
-echo -e "\033[7m Converting... \033[0m"
+echo "Converting..."
 if [ -f $DMG_NAME ]
 then
 	rm $DMG_NAME
@@ -261,9 +261,9 @@ fi
 hdiutil convert "$TMP_DMG_NAME" -format UDBZ -o "$SCRIPT_DIR/$DMG_NAME"
 echo "done!"
 
-echo -e "\033[7m Removing temporary folder... \033[0m"
+echo "Removing temporary folder..."
 rm $TMP_DMG_NAME
 rm -rf $TMP_DIR
 echo "done!"
 
-echo -e "\033[7m Everything done. DMG disk image is ready for distribution. \033[0m"
+echo "Everything done. DMG disk image is ready for distribution."
