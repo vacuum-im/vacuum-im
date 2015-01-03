@@ -41,7 +41,7 @@ macro(lang_display_name outvar langname)
 endmacro(lang_display_name)
 
 set(LUPDATE_OPTS -no-obsolete -locations none -source-language en)
-set(LRELEASE_OPTS -silent -compress)
+set(LRELEASE_OPTS -silent)
 
 macro(add_translations outvar tsname)
 	set(TS_SRCS "")
@@ -52,7 +52,11 @@ macro(add_translations outvar tsname)
 	add_dependencies(updatets updatets_${tsname})
 	foreach(LANG ${USED_LANGS})
 		set(TS "${CMAKE_SOURCE_DIR}/src/translations/${LANG}/${tsname}.ts")
-		set(QM "${CMAKE_BINARY_DIR}/translations/${LANG}/${tsname}.qm")
+		if (APPLE)
+			set(QM "${CMAKE_BINARY_DIR}/${INSTALL_TRANSLATIONS}/${LANG}/${tsname}.qm")
+		else (APPLE)
+			set(QM "${CMAKE_BINARY_DIR}/translations/${LANG}/${tsname}.qm")
+		endif (APPLE)
 		# Update *.ts
 		add_custom_command(TARGET updatets_${tsname} POST_BUILD
 				COMMAND "${QT_LUPDATE_EXECUTABLE}" ${LUPDATE_OPTS} ${TS_SRCS} -ts "${TS}" 
@@ -66,8 +70,10 @@ macro(add_translations outvar tsname)
 				DEPENDS ${TS})
 		set(QMS ${QMS} "${QM}")
 		# Install *.qm
-		install(FILES "${QM}" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
-			COMPONENT ${PLUGIN_NAME}_${LANG})
+		if (NOT APPLE) # on Mac OS X they are writted to the bundle directly
+			install(FILES "${QM}" DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}"
+				COMPONENT ${PLUGIN_NAME}_${LANG})
+		endif (NOT APPLE)
 		lang_display_name(LANG_NAME ${LANG})
 		cpack_add_component(${PLUGIN_NAME}_${LANG}
 			DISPLAY_NAME "${PLUGIN_DISPLAY_NAME}"

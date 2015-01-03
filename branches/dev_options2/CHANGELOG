@@ -32,6 +32,7 @@ LEGEND
   [-] The application may fail on removing from history active conversation
   [-] Fixed problems with editing of a priority of the status in the edit status dialog
   [-] Fixed problems with autocompletion of user nick names in conferences
+  [-] The application may fail on changing discovery entity in discovery items window
 
 
 v1.2.0

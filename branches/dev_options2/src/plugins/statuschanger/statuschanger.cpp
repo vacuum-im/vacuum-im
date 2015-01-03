@@ -15,6 +15,7 @@
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
+#include <definitions/version.h>
 #include <utils/options.h>
 #include <utils/logger.h>
 
@@ -1262,7 +1263,7 @@ void StatusChanger::onApplicationShutdownStarted()
 		if (presence->isOpen())
 		{
 			LOG_STRM_INFO(presence->streamJid(),QString("Closing XMPP stream due to application shutdown"));
-			presence->setPresence(IPresence::Offline,tr("Left Vacuum-IM"),0);
+			presence->setPresence(IPresence::Offline,tr("Left %1").arg(CLIENT_NAME), 0);
 			presence->xmppStream()->close();
 		}
 	}

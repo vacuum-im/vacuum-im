@@ -138,6 +138,10 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <source>Room destruction request was sent.</source>
         <translation>Se ha enviado la solicitud de destrucción de la sala.</translation>
     </message>
+    <message>
+        <source>Your nick was changed by server to &apos;%1&apos;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatPlugin</name>
@@ -294,14 +298,6 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <translation>¿Permitir a esta persona inscribirse en la sala?</translation>
     </message>
     <message>
-        <source>First Name</source>
-        <translation>Nombre</translation>
-    </message>
-    <message>
-        <source>Last Name</source>
-        <translation>Apellido</translation>
-    </message>
-    <message>
         <source>Desired Nickname</source>
         <translation>Apodo deseado</translation>
     </message>
@@ -358,16 +354,8 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <translation>¿Hacer la sala persistente?</translation>
     </message>
     <message>
-        <source>Roles for which Presence is Broadcast:</source>
-        <translation>Roles de usuarios cuya presencia es difundida:</translation>
-    </message>
-    <message>
         <source>Allow Public Searching for Room?</source>
         <translation>¿Hacer la sala pública?</translation>
-    </message>
-    <message>
-        <source>Full List of Room Admins</source>
-        <translation>Lista completa de los administradores de la sala</translation>
     </message>
     <message>
         <source>Description of Room</source>
@@ -440,30 +428,6 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     <message>
         <source>Grant Voice?</source>
         <translation>¿Dar &apos;voz&apos;?</translation>
-    </message>
-    <message>
-        <source>Make participants list public?</source>
-        <translation>¿Hacer pública la lista de participantes?</translation>
-    </message>
-    <message>
-        <source>Allow visitors to send status text in presence updates?</source>
-        <translation>¿Permitir visitantes enviar textos en los estados de presencia?</translation>
-    </message>
-    <message>
-        <source>Allow visitors to change nickname?</source>
-        <translation>¿Permitir a los visitantes cambiar de apodo?</translation>
-    </message>
-    <message>
-        <source>Default occupants as participants?</source>
-        <translation>¿Hacer a los usuarios participantes por defecto?</translation>
-    </message>
-    <message>
-        <source>Allow occupants to send private messages?</source>
-        <translation>¿Permitir a los ocupantes enviar mensajes privados?</translation>
-    </message>
-    <message>
-        <source>Allow occupants to query other occupants?</source>
-        <translation>¿Permitir a los usuarios de la sala enviar solicitudes iq a otros?</translation>
     </message>
     <message>
         <source>Multi-User Conferences</source>
@@ -599,6 +563,74 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <source>Please, enter this conference!</source>
         <translation>¡Por favor, entra a esta sala!</translation>
     </message>
+    <message>
+        <source>Given Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Family Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum Number of History Messages Returned by Room</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Affiliations that May Retrieve Member List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>XMPP URI of Associated Publish-Subscribe Node</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Roles for which Presence is Broadcasted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full List of Room Administrators</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Participants List Public?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Send Private Messages?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Query Other Occupants?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Visitors to Send Status Text in Presence Updates?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Login Only With Registered Nickname?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Occupants to Change Nicknames?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Users to Register with the Room?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make all Occupants as Participants?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do not Request CAPTCHA for Followed Jabber ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make this Room CAPTCHA Protected?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultiUserChatWindow</name>
@@ -677,10 +709,6 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     <message>
         <source>The room is now semi-anonymous</source>
         <translation>Ahora la sala es semianónima</translation>
-    </message>
-    <message>
-        <source>The room is now fully-anonymous</source>
-        <translation>Ahora esta sala es completamente anónima</translation>
     </message>
     <message>
         <source>A new room has been created</source>
@@ -1013,6 +1041,14 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     <message>
         <source>You left the room</source>
         <translation>Has abandonado la sala</translation>
+    </message>
+    <message>
+        <source>Room now shows unavailable members</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Room now does not show unavailable members</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

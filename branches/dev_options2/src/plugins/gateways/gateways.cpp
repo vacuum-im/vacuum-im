@@ -378,7 +378,7 @@ bool Gateways::removeService(const Jid &AStreamJid, const Jid &AServiceJid, bool
 		if (FRosterChanger)
 			FRosterChanger->insertAutoSubscribe(AStreamJid, AServiceJid, true, false, true);
 		if (FRegistration)
-			FRegistration->sendUnregiterRequest(AStreamJid,AServiceJid);
+			FRegistration->sendUnregisterRequest(AStreamJid,AServiceJid);
 		roster->removeItem(AServiceJid);
 		
 		if (AWithContacts)
@@ -416,7 +416,7 @@ bool Gateways::changeService(const Jid &AStreamJid, const Jid &AServiceFrom, con
 
 		//Remove registration on old service
 		if (FRegistration && ARemove)
-			FRegistration->sendUnregiterRequest(AStreamJid,AServiceFrom);
+			FRegistration->sendUnregisterRequest(AStreamJid,AServiceFrom);
 
 		//Remove subscription from old service
 		if (ritemOld.isValid && !ARemove)
@@ -682,7 +682,7 @@ void Gateways::onChangeActionTriggered(bool)
 		Jid serviceTo = action->data(ADR_NEW_SERVICE_JID).toString();
 		if (changeService(streamJid,serviceFrom,serviceTo,true,true))
 		{
-			QString id = FRegistration!=NULL ?  FRegistration->sendRegiterRequest(streamJid,serviceTo) : QString::null;
+			QString id = FRegistration!=NULL ?  FRegistration->sendRegisterRequest(streamJid,serviceTo) : QString::null;
 			if (!id.isEmpty())
 				FShowRegisterRequests.insert(id,streamJid);
 		}
@@ -1001,7 +1001,7 @@ void Gateways::onPrivateDataLoaded(const QString &AId, const Jid &AStreamJid, co
 		{
 			Jid serviceJid = elem.text();
 			FSubscribeServices.insertMulti(AStreamJid,serviceJid);
-			QString id = FRegistration!=NULL ? FRegistration->sendRegiterRequest(AStreamJid,serviceJid) : QString::null;
+			QString id = FRegistration!=NULL ? FRegistration->sendRegisterRequest(AStreamJid,serviceJid) : QString::null;
 			if (!id.isEmpty())
 				FShowRegisterRequests.insert(id,AStreamJid);
 			elem = elem.nextSiblingElement("service");

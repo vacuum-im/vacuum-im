@@ -1,6 +1,7 @@
 #include "notifications.h"
 
 #include <QProcess>
+#include <QSystemTrayIcon>
 #include <QVBoxLayout>
 #include <definitions/notificationdataroles.h>
 #include <definitions/actiongroups.h>
@@ -9,6 +10,7 @@
 #include <definitions/optionnodes.h>
 #include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
+#include <definitions/rosterindexroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
 #include <definitions/shortcuts.h>
@@ -205,6 +207,7 @@ bool Notifications::initSettings()
 	Options::setDefaultValue(OPV_NOTIFICATIONS_KINDENABLED_ITEM,true);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUNDCOMMAND,QString("aplay"));
 	Options::setDefaultValue(OPV_NOTIFICATIONS_ANIMATIONENABLE,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS,false);
 
 	if (FOptionsManager)
 	{
@@ -232,6 +235,7 @@ QMultiMap<int, IOptionsWidget *> Notifications::optionsWidgets(const QString &AN
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE),tr("Enable animation in notification pop-up"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->optionsNodeWidget(Options::node(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS),tr("Use native popup notifications if available"),AParent));
 		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new NotifyOptionsWidget(this,AParent));
 	}
 	return widgets;
@@ -303,11 +307,22 @@ int Notifications::appendNotification(const INotification &ANotification)
 	{
 		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
-			record.popupWidget = new NotifyWidget(record.notification);
-			connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
-			connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
-			connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
-			record.popupWidget->appear();
+			if (Options::node(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS).value().toBool() && FTrayManager && FTrayManager->isMessagesSupported())
+			{
+				QString title = record.notification.data.value(NDR_POPUP_TITLE).toString();
+				QString caption = record.notification.data.value(NDR_POPUP_CAPTION).toString();
+				QString text = record.notification.data.value(NDR_POPUP_TEXT).toString();
+				int timeout = Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000;
+				FTrayManager->showMessage(title+" - "+caption,text,QSystemTrayIcon::Information,timeout);
+			}
+			else
+			{
+				record.popupWidget = new NotifyWidget(record.notification);
+				connect(record.popupWidget,SIGNAL(notifyActivated()),SLOT(onWindowNotifyActivated()));
+				connect(record.popupWidget,SIGNAL(notifyRemoved()),SLOT(onWindowNotifyRemoved()));
+				connect(record.popupWidget,SIGNAL(windowDestroyed()),SLOT(onWindowNotifyDestroyed()));
+				record.popupWidget->appear();
+			}
 		}
 	}
 
@@ -578,13 +593,21 @@ QIcon Notifications::contactIcon(const Jid &AStreamJid, const Jid &AContactJid) 
 	return FStatusIcons!=NULL ? FStatusIcons->iconByJid(AStreamJid,AContactJid) : QIcon();
 }
 
-QString Notifications::contactName(const Jid &AStreamJId, const Jid &AContactJid) const
+QString Notifications::contactName(const Jid &AStreamJid, const Jid &AContactJid) const
 {
-	IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJId) : NULL;
-	QString name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
+	QString name;
+
+	IRosterIndex *index = FRostersModel!=NULL ? FRostersModel->findContactIndexes(AStreamJid, AContactJid).value(0) : NULL;
+	if (index != NULL)
+		name = index->data(RDR_NAME).toString();
+
 	if (name.isEmpty())
-		name = AContactJid.uBare();
-	return name;
+	{
+		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
+		name = roster!=NULL ? roster->rosterItem(AContactJid).name : AContactJid.uNode();
+	}
+
+	return name.isEmpty() ? AContactJid.uBare() : name;
 }
 
 int Notifications::notifyIdByRosterId(int ARosterId) const

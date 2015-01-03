@@ -3,6 +3,7 @@
 
 #define NNT_CAPTCHA_REQUEST           "CaptchaRequest"
 #define NNT_CHAT_MESSAGE              "ChatMessage"
+#define NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW  "ChatMessageInCurrentWindow"
 #define NNT_NORMAL_MESSAGE            "NormalMessage"
 #define NNT_FILETRANSFER              "FileTransfer"
 #define NNT_MUC_MESSAGE_INVITE        "MucMessageInvite"

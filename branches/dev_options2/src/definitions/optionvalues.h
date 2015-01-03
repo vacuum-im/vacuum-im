@@ -175,6 +175,7 @@
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
 #define OPV_NOTIFICATIONS_KINDENABLED_ITEM              "notifications.kind-enabled.kind"
 #define OPV_NOTIFICATIONS_ANIMATIONENABLE               "notifications.animation-enable"
+#define OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS             "notifications.try-native-popups"
 
 // ConnectionManager
 #define OPV_PROXY_ROOT                                  "proxy"
