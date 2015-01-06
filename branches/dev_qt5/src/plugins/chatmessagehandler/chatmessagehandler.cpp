@@ -235,6 +235,11 @@ bool ChatMessageHandler::initObjects()
 		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
 		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE,notifyType);
+
+		notifyType.kindDefs = 0;
+		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
+		notifyType.title = tr("When receiving new chat message in current chat window");
+		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW,notifyType);
 	}
 	if (FRostersView)
 	{
@@ -339,15 +344,16 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 	if (ADirection == IMessageProcessor::DirectionIn)
 	{
 		IMessageChatWindow *window = findWindow(AMessage.to(),AMessage.from());
-		if (window && !window->isActiveTabPage())
+		if (window)
 		{
-			notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_CHAT_MESSAGE);
+			QString typeId = window->isActiveTabPage() ? NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW : NNT_CHAT_MESSAGE;
+			notify.kinds = ANotifications->enabledTypeNotificationKinds(typeId);
 			if (notify.kinds > 0)
 			{
 				QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATMHANDLER_MESSAGE);
 				QString name = ANotifications->contactName(AMessage.to(),AMessage.from());
 
-				notify.typeId = NNT_CHAT_MESSAGE;
+				notify.typeId = typeId;
 				notify.data.insert(NDR_ICON,icon);
 				notify.data.insert(NDR_TOOLTIP,tr("Message from %1").arg(name));
 				notify.data.insert(NDR_STREAM_JID,AMessage.to());
@@ -932,7 +938,6 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 	{
 		QMap<Jid, QList<Jid> > addresses = getSortedAddresses(widget->messageWindow()->address()->availAddresses());
 
-		Jid lastStreamJid;
 		int streamGroup = AG_MWIWAM_CHATMHANDLER_ADDRESSES-1;
 		foreach(const Jid &streamJid, addresses.keys())
 		{
@@ -948,6 +953,7 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 			accountAction->setFont(font);
 			AMenu->addAction(accountAction,streamGroup);
 
+			QActionGroup *addressGroup = new QActionGroup(AMenu);
 			foreach(const Jid &contactJid, addresses.value(streamJid))
 			{
 				QString addressName = FMessageStyles!=NULL ? FMessageStyles->contactName(streamJid,contactJid) : contactJid.uBare();
@@ -960,6 +966,7 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 				addressAction->setCheckable(true);
 				addressAction->setChecked(isCurAddress);
 				addressAction->setText(addressName);
+				addressAction->setActionGroup(addressGroup);
 				addressAction->setData(ADR_STREAM_JID,streamJid.full());
 				addressAction->setData(ADR_CONTACT_JID,contactJid.full());
 				addressAction->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJid(streamJid,contactJid) : QIcon());

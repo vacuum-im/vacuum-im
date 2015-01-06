@@ -51,6 +51,10 @@
         <source>Enable animation in notification pop-up</source>
         <translation>Разрешить анимацию во всплывающем окне</translation>
     </message>
+    <message>
+        <source>Use native popup notifications if available</source>
+        <translation>Использовать системные всплывающие уведомления если доступны</translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>

@@ -54,8 +54,8 @@ public:
 	//IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
 	//IRegistration
-	virtual QString sendRegiterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
-	virtual QString sendUnregiterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
+	virtual QString sendRegisterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
+	virtual QString sendUnregisterRequest(const Jid &AStreamJid, const Jid &AServiceJid);
 	virtual QString sendChangePasswordRequest(const Jid &AStreamJid, const Jid &AServiceJid, const QString &AUserName, const QString &APassword);
 	virtual QString sendSubmit(const Jid &AStreamJid, const IRegisterSubmit &ASubmit);
 	virtual bool showRegisterDialog(const Jid &AStreamJid, const Jid &AServiceJid, int AOperation, QWidget *AParent = NULL);

@@ -21,7 +21,8 @@ add_translations(TRANSLATIONS "${VACUUM_UTILS_NAME}" ${SOURCES})
 add_library(${VACUUM_UTILS_NAME} SHARED ${SOURCES} ${MOC_SOURCES} ${TRANSLATIONS})
 set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES
 	VERSION "${VACUUM_UTILS_ABI}"
-	SOVERSION "${VACUUM_UTILS_ABI}")
+	SOVERSION "${VACUUM_UTILS_ABI}"
+	FRAMEWORK TRUE)
 
 set(ADD_LIBS qxtglobalshortcut idle)
 
@@ -61,10 +62,9 @@ if (APPLE)
 	list(APPEND ADD_LIBS "-framework Carbon -framework IOKit -framework Cocoa")
 endif (APPLE)
 
-target_link_libraries(${VACUUM_UTILS_NAME} LINK_INTERFACE_LIBRARIES)
 target_link_libraries(${VACUUM_UTILS_NAME} ${ADD_LIBS})
 if (UNIX AND NOT APPLE)
-target_link_libraries(${VACUUM_UTILS_NAME} ${Qt5Gui_LIBRARY} LINK_PRIVATE)
+	target_link_libraries(${VACUUM_UTILS_NAME} ${Qt5Gui_LIBRARY} LINK_PRIVATE)
 endif (UNIX AND NOT APPLE)
 qt5_use_modules(${VACUUM_UTILS_NAME} Widgets Xml Network)
 
@@ -73,6 +73,8 @@ if (WIN32)
 	install(TARGETS ${VACUUM_UTILS_NAME}
 		RUNTIME DESTINATION "${INSTALL_LIBS}"
 		COMPONENT ${VACUUM_UTILS_NAME})
+elseif (APPLE)
+	set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${INSTALL_LIBS}")
 else (WIN32)
 	set_target_properties(${VACUUM_UTILS_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/src/libs")
 	install(TARGETS ${VACUUM_UTILS_NAME}
