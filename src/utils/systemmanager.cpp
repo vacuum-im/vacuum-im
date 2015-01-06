@@ -79,6 +79,11 @@ QString SystemManager::osVersion()
 #if defined(Q_OS_MAC)
 		switch (QSysInfo::MacintoshVersion)
 		{
+#if QT_VERSION >= 0x050400
+		case QSysInfo::MV_YOSEMITE:
+			osver = "OS X 10.10 Yosemite";
+			break;
+#endif
 		case QSysInfo::MV_MAVERICKS:
 			osver = "OS X 10.9 Mavericks";
 			break;

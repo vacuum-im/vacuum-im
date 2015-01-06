@@ -8,8 +8,14 @@ include("emoticons.cmake")
 include("${CMAKE_SOURCE_DIR}/src/plugins/plugins.cmake")
 
 if (IS_ENABLED)
-	install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/emoticons"
-		DESTINATION "${INSTALL_RESOURCES}"
-		COMPONENT ${PLUGIN_NAME}
-		PATTERN ".svn" EXCLUDE)
+	if (APPLE)
+		file(COPY "${CMAKE_SOURCE_DIR}/resources/emoticons"
+			DESTINATION "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}"
+			PATTERN ".svn" EXCLUDE)
+	else (APPLE)
+		install(DIRECTORY "${CMAKE_SOURCE_DIR}/resources/emoticons"
+			DESTINATION "${INSTALL_RESOURCES}"
+			COMPONENT ${PLUGIN_NAME}
+			PATTERN ".svn" EXCLUDE)
+	endif (APPLE)
 endif (IS_ENABLED)

@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(vacuum-im)
 
+if(POLICY CMP0020)
+	CMAKE_POLICY(SET CMP0020 NEW)
+endif()
+
+if(POLICY CMP0043)
+   cmake_policy(SET CMP0043 NEW)
+endif()
+
 find_package (Qt5Widgets REQUIRED)
 find_package (Qt5WebKit)
 find_package (Qt5LinguistTools REQUIRED)
@@ -12,9 +20,15 @@ include("src/make/config.cmake")
 include("src/translations/languages.cmake")
 include_directories("${CMAKE_SOURCE_DIR}/src")
 
-install(DIRECTORY "resources/menuicons"
-	DESTINATION "${INSTALL_RESOURCES}"
-	PATTERN ".svn" EXCLUDE)
+if (APPLE)
+	file(COPY "resources/menuicons"
+		DESTINATION "${INSTALL_RESOURCES}"
+		PATTERN ".svn" EXCLUDE)
+else (APPLE)
+	install(DIRECTORY "resources/menuicons"
+		DESTINATION "${INSTALL_RESOURCES}"
+		PATTERN ".svn" EXCLUDE)
+endif (APPLE)
 
 include("src/packages/package.cmake")
 
@@ -69,22 +83,24 @@ if (WIN32)
 	cpack_add_component_group(libs
 		DISPLAY_NAME "Shared libraries"
 		DESCRIPTION "Required libraries that already may be present in your system")
-	set(QT_LIBS "${_qt5Core_install_prefix}/bin/icudt51.dll"
-		"${_qt5Core_install_prefix}/bin/icuin51.dll"
-		"${_qt5Core_install_prefix}/bin/icuuc51.dll"
+	set(QT_LIBS "${_qt5Core_install_prefix}/bin/icudt53.dll"
+		"${_qt5Core_install_prefix}/bin/icuin53.dll"
+		"${_qt5Core_install_prefix}/bin/icuuc53.dll"
 		"${_qt5Core_install_prefix}/bin/libEGL.dll"
 		"${_qt5Core_install_prefix}/bin/libGLESv2.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Core.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Gui.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Multimedia.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5MultimediaWidgets.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Network.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5OpenGL.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Positioning.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5PrintSupport.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Qml.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Quick.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Sensors.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Sql.dll"
-		"${_qt5Core_install_prefix}/bin/Qt5V8.dll"
+		"${_qt5Core_install_prefix}/bin/Qt5Svg.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5WebKit.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5WebKitWidgets.dll"
 		"${_qt5Core_install_prefix}/bin/Qt5Widgets.dll"
@@ -93,6 +109,12 @@ if (WIN32)
 	install(FILES ${QT_LIBS}
 		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs)
+	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/audio"
+		DESTINATION "${INSTALL_LIBS}"
+		COMPONENT qt_libs
+		FILES_MATCHING
+		PATTERN "*.dll"
+		PATTERN "*d.dll" EXCLUDE)
 	install(DIRECTORY "${_qt5Core_install_prefix}/plugins/imageformats"
 		DESTINATION "${INSTALL_LIBS}"
 		COMPONENT qt_libs
@@ -155,6 +177,38 @@ if (WIN32)
 			GROUP libs)
 	endif (MINGW)
 endif (WIN32)
+
+if (APPLE)
+	set_target_properties(${VACUUM_LOADER_NAME} PROPERTIES
+		MACOSX_BUNDLE_BUNDLE_NAME "vacuum"
+		MACOSX_BUNDLE_INFO_STRING "Vacuum-IM"
+		MACOSX_BUNDLE_BUNDLE_VERSION "${VERSION}"
+		MACOSX_BUNDLE_ICON_FILE "vacuum"
+		MACOSX_BUNDLE_GUI_IDENTIFIER "com.jrudevels.vacuum"
+		MACOSX_BUNDLE_COPYRIGHT "Copyright 2010-2012, Potapov S.A.")
+	list(APPEND DIRS
+		${QT_LIBRARY_DIR}
+		${CMAKE_INSTALL_PREFIX}/${LIBDIR})
+	install(CODE "
+		include(BundleUtilities)
+		file(GLOB_RECURSE PLUGINS \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}/Contents/PlugIns/*.dylib\")
+		fixup_bundle(\"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${INSTALL_APP_DIR}\"   \"\${PLUGINS}\"   \"${DIRS}\")"
+		COMPONENT xxx-this_should_be_the_last_component_in_lexicographical_order_because_cmake_sucks)
+	file(COPY vacuum.icns
+		DESTINATION "${INSTALL_RESOURCES}")
+
+	file(WRITE "${CMAKE_BINARY_DIR}/${INSTALL_RESOURCES}/qt.conf" "[Paths]\nPlugins = PlugIns")
+	file(COPY "${QT_PLUGINS_DIR}/imageformats"
+		DESTINATION "${INSTALL_PLUGINS}")
+	file(COPY "${QT_PLUGINS_DIR}/sqldrivers/libqsqlite.dylib"
+		DESTINATION "${INSTALL_PLUGINS}/sqldrivers")
+	# Qt localization
+	foreach(LANG ${LOCALIZED_LANGS})
+		string(SUBSTRING ${LANG} 0 2 SHORTLANG)
+		file(COPY "${QT_TRANSLATIONS_DIR}/qt_${SHORTLANG}.qm"
+			DESTINATION "${INSTALL_TRANSLATIONS}/${LANG}")
+	endforeach(LANG)
+endif (APPLE)
 
 if (INSTALL_SDK)
 	cpack_add_component(sdk

@@ -140,7 +140,7 @@ Check values and try again</translation>
     </message>
     <message>
         <source>Your nick was changed by server to &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Your nick was changed by server to &apos;%1&apos;</translation>
     </message>
 </context>
 <context>
@@ -625,11 +625,11 @@ Check values and try again</translation>
     </message>
     <message>
         <source>Do not Request CAPTCHA for Followed Jabber ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Do not Request CAPTCHA for Followed Jabber ID</translation>
     </message>
     <message>
         <source>Make this Room CAPTCHA Protected?</source>
-        <translation type="unfinished"></translation>
+        <translation>Make this Room CAPTCHA Protected?</translation>
     </message>
 </context>
 <context>

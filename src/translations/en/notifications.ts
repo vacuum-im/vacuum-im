@@ -51,6 +51,10 @@
         <source>Enable animation in notification pop-up</source>
         <translation>Enable animation in notification pop-up</translation>
     </message>
+    <message>
+        <source>Use native popup notifications if available</source>
+        <translation>Use native popup notifications if available</translation>
+    </message>
 </context>
 <context>
     <name>NotifyOptionsWidget</name>
