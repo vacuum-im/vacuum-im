@@ -168,7 +168,7 @@ bool RosterItemExchange::initObjects()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
 	if (FNotifications)
@@ -282,12 +282,12 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 	}
 }
 
-QMultiMap<int, IOptionsWidget *> RosterItemExchange::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> RosterItemExchange::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_ROSTER)
 	{
-		widgets.insertMulti(OWO_ROSTER_EXCHANGE,FOptionsManager->optionsNodeWidget(Options::node(OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED),tr("Automatically accept roster modifications from gateways and group services"),AParent));
+		widgets.insertMulti(OWO_ROSTER_EXCHANGE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED),tr("Automatically accept roster modifications from gateways and group services"),AParent));
 	}
 	return widgets;
 }

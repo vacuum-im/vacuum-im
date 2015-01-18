@@ -23,10 +23,10 @@ private:
 
 class IconsOptionsWidget :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	IconsOptionsWidget(IStatusIcons *AStatusIcons, QWidget *AParent);
 	virtual QWidget* instance() { return this; }

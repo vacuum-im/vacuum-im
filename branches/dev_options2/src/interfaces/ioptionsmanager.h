@@ -10,15 +10,14 @@
 
 #define OPTIONSMANAGER_UUID "{d29856c7-8f74-4e95-9aba-b95f4fb42f00}"
 
-struct IOptionsDialogNode
-{
+struct IOptionsDialogNode {
 	int order;
 	QString nodeId;
-	QString name;
 	QString iconkey;
+	QString caption;
 };
 
-class IOptionsWidget
+class IOptionsDialogWidget
 {
 public:
 	virtual QWidget* instance() =0;
@@ -31,17 +30,17 @@ protected:
 	virtual void childReset() =0;
 };
 
-class IOptionsHolder
+class IOptionsDialogHolder
 {
 public:
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent) =0;
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent) =0;
 };
 
 class IOptionsManager
 {
 public:
 	virtual QObject* instance() =0;
-	//Profiles
+	// Profiles
 	virtual bool isOpened() const =0;
 	virtual QList<QString> profiles() const =0;
 	virtual QString profilePath(const QString &AProfile) const =0;
@@ -57,32 +56,34 @@ public:
 	virtual bool removeProfile(const QString &AProfile) =0;
 	virtual QDialog *showLoginDialog(QWidget *AParent = NULL) =0;
 	virtual QDialog *showEditProfilesDialog(QWidget *AParent = NULL) =0;
-	//OptionsDialog
-	virtual QList<IOptionsHolder *> optionsHolders() const =0;
-	virtual void insertOptionsHolder(IOptionsHolder *AHolder) =0;
-	virtual void removeOptionsHolder(IOptionsHolder *AHolder) =0;
+	// OptionsDialog
+	virtual QList<IOptionsDialogHolder *> optionsDialogHolders() const =0;
+	virtual void insertOptionsDialogHolder(IOptionsDialogHolder *AHolder) =0;
+	virtual void removeOptionsDialogHolder(IOptionsDialogHolder *AHolder) =0;
 	virtual QList<IOptionsDialogNode> optionsDialogNodes() const =0;
 	virtual IOptionsDialogNode optionsDialogNode(const QString &ANodeId) const =0;
 	virtual void insertOptionsDialogNode(const IOptionsDialogNode &ANode) =0;
 	virtual void removeOptionsDialogNode(const QString &ANodeId) =0;
 	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, QWidget *AParent = NULL) =0;
-	//OptionsWidgets
-	virtual IOptionsWidget *optionsHeaderWidget(const QString &ACaption, QWidget *AParent) const =0;
-	virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const =0;
+	// OptionsDialogWidgets
+	virtual IOptionsDialogWidget *newOptionsDialogHeader(const QString &ACaption, QWidget *AParent) const =0;
+	virtual IOptionsDialogWidget *newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const =0;
 protected:
+	// Profiles
 	virtual void profileAdded(const QString &AProfile) =0;
 	virtual void profileOpened(const QString &AProfile) =0;
 	virtual void profileClosed(const QString &AProfile) =0;
 	virtual void profileRenamed(const QString &AProfile, const QString &ANewName) =0;
 	virtual void profileRemoved(const QString &AProfile) =0;
-	virtual void optionsHolderInserted(IOptionsHolder *AHolder) =0;
-	virtual void optionsHolderRemoved(IOptionsHolder *AHolder) =0;
+	// OptionsDialog
+	virtual void optionsDialogHolderInserted(IOptionsDialogHolder *AHolder) =0;
+	virtual void optionsDialogHolderRemoved(IOptionsDialogHolder *AHolder) =0;
 	virtual void optionsDialogNodeInserted(const IOptionsDialogNode &ANode) =0;
 	virtual void optionsDialogNodeRemoved(const IOptionsDialogNode &ANode) =0;
 };
 
-Q_DECLARE_INTERFACE(IOptionsWidget,"Vacuum.Plugin.IOptionsWidget/1.0")
-Q_DECLARE_INTERFACE(IOptionsHolder,"Vacuum.Plugin.IOptionsHolder/1.0")
+Q_DECLARE_INTERFACE(IOptionsDialogWidget,"Vacuum.Plugin.IOptionsDialogWidget/1.0")
+Q_DECLARE_INTERFACE(IOptionsDialogHolder,"Vacuum.Plugin.IOptionsDialogWidget/1.0")
 Q_DECLARE_INTERFACE(IOptionsManager,"Vacuum.Plugin.IOptionsManager/1.0")
 
 #endif //IOPTIONSMANAGER_H

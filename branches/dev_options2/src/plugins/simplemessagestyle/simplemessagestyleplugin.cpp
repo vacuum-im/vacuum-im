@@ -159,20 +159,20 @@ IMessageStyleOptions SimpleMessageStylePlugin::styleOptions(const OptionsNode &A
 	return soptions;
 }
 
-IOptionsWidget *SimpleMessageStylePlugin::styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent)
+IOptionsDialogWidget *SimpleMessageStylePlugin::styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent)
 {
 	updateAvailStyles();
 	return new SimpleOptionsWidget(this,ANode,AMessageType,AParent);
 }
 
-void SimpleMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+void SimpleMessageStylePlugin::saveStyleSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode)
 {
 	SimpleOptionsWidget *widget = qobject_cast<SimpleOptionsWidget *>(AWidget->instance());
 	if (widget)
 		widget->apply(ANode);
 }
 
-void SimpleMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions)
+void SimpleMessageStylePlugin::saveStyleSettings(IOptionsDialogWidget *AWidget, IMessageStyleOptions &AOptions)
 {
 	SimpleOptionsWidget *widget = qobject_cast<SimpleOptionsWidget *>(AWidget->instance());
 	if (widget)

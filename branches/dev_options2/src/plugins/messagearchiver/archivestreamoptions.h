@@ -31,10 +31,10 @@ private:
 
 class ArchiveStreamOptions :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	ArchiveStreamOptions(IMessageArchiver *AArchiver, const Jid &AStreamJid, QWidget *AParent);
 	~ArchiveStreamOptions();

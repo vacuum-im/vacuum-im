@@ -266,9 +266,9 @@ bool MessageArchiver::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, tr("History"), MNI_HISTORY };
+		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, MNI_HISTORY, tr("History") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -418,9 +418,9 @@ void MessageArchiver::stanzaRequestResult(const Jid &AStreamJid, const Stanza &A
 		emit requestFailed(AStanza.id(),err);
 }
 
-QMultiMap<int, IOptionsWidget *> MessageArchiver::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *>  widgets;
+	QMultiMap<int, IOptionsDialogWidget *>  widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_HISTORY)
 	{
@@ -2134,7 +2134,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
 	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
 	if (FOptionsManager && account)
 	{
-		IOptionsDialogNode node = { ONO_HISTORY, OPN_HISTORY"." + account->accountId().toString(), account->name(), MNI_HISTORY };
+		IOptionsDialogNode node = { ONO_HISTORY, OPN_HISTORY"." + account->accountId().toString(), MNI_HISTORY, account->name() };
 		FOptionsManager->insertOptionsDialogNode(node);
 	}
 }

@@ -10,10 +10,10 @@
 
 class DataStreamsOptions :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	DataStreamsOptions(IDataStreamsManager *ADataManager, QWidget *AParent);
 	~DataStreamsOptions();
@@ -39,7 +39,7 @@ private:
 	QList<QUuid> FNewProfiles;
 	QVBoxLayout *FWidgetLayout;
 	QObjectCleanupHandler FCleanupHandler;
-	QMap<QUuid, QMap<QString, IOptionsWidget *> > FMethodWidgets;
+	QMap<QUuid, QMap<QString, IOptionsDialogWidget *> > FMethodWidgets;
 };
 
 #endif // DATASTREAMSOPTIONS_H

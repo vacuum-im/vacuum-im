@@ -9,10 +9,10 @@
 
 class StyleOptionsWidget :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	StyleOptionsWidget(IMessageStyles *AMessageStyles, QWidget *AParent);
 	~StyleOptionsWidget();
@@ -41,9 +41,9 @@ private:
 	bool FUpdateStarted;
 	QWidget *FActiveView;
 	IMessageStyle *FActiveStyle;
-	IOptionsWidget *FActiveSettings;
+	IOptionsDialogWidget *FActiveSettings;
 	QMap<int, QString> FMessagePlugin;
-	QMap<int, IOptionsWidget *> FMessageWidget;
+	QMap<int, IOptionsDialogWidget *> FMessageWidget;
 };
 
 #endif // STYLEOPTIONSWIDGET_H

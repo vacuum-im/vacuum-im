@@ -15,10 +15,10 @@ class AutoStatus :
 	public QObject,
 	public IPlugin,
 	public IAutoStatus,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IAutoStatus IOptionsHolder);
+	Q_INTERFACES(IPlugin IAutoStatus IOptionsDialogHolder);
 public:
 	AutoStatus();
 	~AutoStatus();
@@ -31,7 +31,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAutoStatus
 	virtual QUuid activeRule() const;
 	virtual QList<QUuid> rules() const;

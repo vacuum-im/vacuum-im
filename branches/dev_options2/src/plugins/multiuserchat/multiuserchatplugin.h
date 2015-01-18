@@ -38,12 +38,12 @@ class MultiUserChatPlugin :
 	public IDiscoFeatureHandler,
 	public IMessageHandler,
 	public IDataLocalizer,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IRostersClickHooker,
 	public IRecentItemHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsHolder IRostersClickHooker IRecentItemHandler);
+	Q_INTERFACES(IPlugin IMultiUserChatPlugin IXmppUriHandler IDiscoFeatureHandler IMessageHandler IDataLocalizer IOptionsDialogHolder IRostersClickHooker IRecentItemHandler);
 public:
 	MultiUserChatPlugin();
 	~MultiUserChatPlugin();
@@ -56,7 +56,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);

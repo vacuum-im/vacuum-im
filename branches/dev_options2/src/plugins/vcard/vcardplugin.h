@@ -33,13 +33,13 @@ class VCardPlugin :
 	public QObject,
 	public IPlugin,
 	public IVCardPlugin,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IStanzaRequestOwner,
 	public IXmppUriHandler,
 	public IRosterDataHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IVCardPlugin IRosterDataHolder IStanzaRequestOwner IXmppUriHandler IOptionsHolder);
+	Q_INTERFACES(IPlugin IVCardPlugin IRosterDataHolder IStanzaRequestOwner IXmppUriHandler IOptionsDialogHolder);
 	friend class VCard;
 public:
 	VCardPlugin();
@@ -59,7 +59,7 @@ public:
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IXmppUriHandler
 	virtual bool xmppUriOpen(const Jid &AStreamJid, const Jid &AContactJid, const QString &AAction, const QMultiMap<QString, QString> &AParams);
 	//IVCardPlugin

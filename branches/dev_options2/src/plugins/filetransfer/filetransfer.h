@@ -22,14 +22,14 @@ class FileTransfer :
 	public QObject,
 	public IPlugin,
 	public IFileTransfer,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IDiscoFeatureHandler,
 	public IRostersDragDropHandler,
 	public IMessageViewDropHandler,
 	public IFileStreamsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IFileTransfer IOptionsHolder IDiscoFeatureHandler  IRostersDragDropHandler IMessageViewDropHandler IFileStreamsHandler);
+	Q_INTERFACES(IPlugin IFileTransfer IOptionsDialogHolder IDiscoFeatureHandler  IRostersDragDropHandler IMessageViewDropHandler IFileStreamsHandler);
 public:
 	FileTransfer();
 	~FileTransfer();
@@ -42,7 +42,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDiscoFeatureHandler
 	virtual bool execDiscoFeature(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo);
 	virtual Action *createDiscoFeatureAction(const Jid &AStreamJid, const QString &AFeature, const IDiscoInfo &ADiscoInfo, QWidget *AParent);

@@ -39,11 +39,11 @@ class ChatStates :
 	public IChatStates,
 	public IStanzaHandler,
 	public IArchiveHandler,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public ISessionNegotiator
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsHolder ISessionNegotiator);
+	Q_INTERFACES(IPlugin IChatStates IStanzaHandler IArchiveHandler IOptionsDialogHolder ISessionNegotiator);
 public:
 	ChatStates();
 	~ChatStates();
@@ -58,7 +58,7 @@ public:
 	//IArchiveHandler
 	virtual bool archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &AMessage, bool ADirectionIn);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//ISessionNegotiator
 	virtual int sessionInit(const IStanzaSession &ASession, IDataForm &ARequest);
 	virtual int sessionAccept(const IStanzaSession &ASession, const IDataForm &ARequest, IDataForm &ASubmit);

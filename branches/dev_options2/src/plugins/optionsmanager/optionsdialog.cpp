@@ -88,11 +88,11 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 	nodeWidget->setLayout(new QVBoxLayout);
 	nodeWidget->layout()->setMargin(5);
 
-	QMultiMap<int, IOptionsWidget *> orderedWidgets;
-	foreach(IOptionsHolder *optionsHolder,FOptionsManager->optionsHolders())
+	QMultiMap<int, IOptionsDialogWidget *> orderedWidgets;
+	foreach(IOptionsDialogHolder *optionsHolder,FOptionsManager->optionsDialogHolders())
 	{
-		QMultiMap<int, IOptionsWidget *> widgets = optionsHolder->optionsWidgets(ANodeId,nodeWidget);
-		for (QMultiMap<int, IOptionsWidget *>::const_iterator  it = widgets.constBegin(); it!=widgets.constEnd(); ++it)
+		QMultiMap<int, IOptionsDialogWidget *> widgets = optionsHolder->optionsDialogWidgets(ANodeId,nodeWidget);
+		for (QMultiMap<int, IOptionsDialogWidget *>::const_iterator  it = widgets.constBegin(); it!=widgets.constEnd(); ++it)
 		{
 			orderedWidgets.insertMulti(it.key() ,it.value());
 			connect(this,SIGNAL(applied()),it.value()->instance(),SLOT(apply()));
@@ -103,7 +103,7 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 
 	if (!orderedWidgets.isEmpty())
 	{
-		foreach(IOptionsWidget *widget, orderedWidgets)
+		foreach(IOptionsDialogWidget *widget, orderedWidgets)
 			nodeWidget->layout()->addWidget(widget->instance());
 		if (!canExpandVertically(nodeWidget))
 			nodeWidget->setMaximumHeight(nodeWidget->sizeHint().height());
@@ -169,11 +169,11 @@ bool OptionsDialog::canExpandVertically(const QWidget *AWidget) const
 
 void OptionsDialog::onOptionsDialogNodeInserted(const IOptionsDialogNode &ANode)
 {
-	if (!ANode.nodeId.isEmpty() && !ANode.name.isEmpty())
+	if (!ANode.nodeId.isEmpty() && !ANode.caption.isEmpty())
 	{
 		QStandardItem *item = FNodeItems.contains(ANode.nodeId) ? FNodeItems.value(ANode.nodeId) : createNodeItem(ANode.nodeId);
 		item->setData(ANode.order, IDR_ORDER);
-		item->setText(ANode.name);
+		item->setText(ANode.caption);
 		item->setIcon(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(ANode.iconkey));
 	}
 }
@@ -207,15 +207,15 @@ void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QMod
 	ui.scaScroll->takeWidget();
 
 	QStandardItem *curItem = FItemsModel->itemFromIndex(FProxyModel->mapToSource(ACurrent));
-	QString nodeID = FNodeItems.key(curItem);
+	QString nodeId = FNodeItems.key(curItem);
 	if (curItem && !FItemWidgets.contains(curItem))
-		FItemWidgets.insert(curItem,createNodeWidget(nodeID));
+		FItemWidgets.insert(curItem,createNodeWidget(nodeId));
 
 	QWidget *curWidget = FItemWidgets.value(curItem);
 	if (curWidget)
 		ui.scaScroll->setWidget(curWidget);
 
-	Options::node(OPV_MISC_OPTIONS_DIALOG_LASTNODE).setValue(nodeID);
+	Options::node(OPV_MISC_OPTIONS_DIALOG_LASTNODE).setValue(nodeId);
 }
 
 void OptionsDialog::onOptionsWidgetModified()

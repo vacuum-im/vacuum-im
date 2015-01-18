@@ -38,10 +38,10 @@ void DataStreamsOptions::apply()
 		QString name = ui.cmbProfile->itemText(index);
 		FDataManager->insertSettingsProfile(profileId, name);
 
-		QMap<QString, IOptionsWidget *> &widgets = FMethodWidgets[profileId];
+		QMap<QString, IOptionsDialogWidget *> &widgets = FMethodWidgets[profileId];
 		foreach(const QString &smethodNS, widgets.keys())
 		{
-			IOptionsWidget *widget = widgets.value(smethodNS);
+			IOptionsDialogWidget *widget = widgets.value(smethodNS);
 			if (widget)
 			{
 				IDataStreamMethod *smethod = FDataManager->method(smethodNS);
@@ -65,7 +65,7 @@ void DataStreamsOptions::reset()
 {
 	foreach(const QUuid &profileId, FNewProfiles)
 	{
-		foreach(IOptionsWidget *widget, FMethodWidgets.take(profileId))
+		foreach(IOptionsDialogWidget *widget, FMethodWidgets.take(profileId))
 		{
 			if (widget)
 			{
@@ -85,7 +85,7 @@ void DataStreamsOptions::reset()
 		if (ui.cmbProfile->findData(profileId.toString())<0)
 			ui.cmbProfile->addItem(FDataManager->settingsProfileName(profileId), profileId.toString());
 
-		foreach(IOptionsWidget *widget, FMethodWidgets.value(profileId))
+		foreach(IOptionsDialogWidget *widget, FMethodWidgets.value(profileId))
 			if (widget)
 				widget->reset();
 	}
@@ -111,7 +111,7 @@ void DataStreamsOptions::onDeleteProfileButtonClicked(bool)
 	QMessageBox::StandardButton button = QMessageBox::warning(this,tr("Delete Profile"),tr("Do you really want to delete a current data streams profile?"),QMessageBox::Yes|QMessageBox::No);
 	if (button == QMessageBox::Yes)
 	{
-		foreach(IOptionsWidget *widget, FMethodWidgets.take(FCurProfileId).values())
+		foreach(IOptionsDialogWidget *widget, FMethodWidgets.take(FCurProfileId).values())
 		{
 			if (widget)
 			{
@@ -132,7 +132,7 @@ void DataStreamsOptions::onDeleteProfileButtonClicked(bool)
 
 void DataStreamsOptions::onCurrentProfileChanged(int AIndex)
 {
-	foreach(IOptionsWidget *widget, FMethodWidgets.value(FCurProfileId))
+	foreach(IOptionsDialogWidget *widget, FMethodWidgets.value(FCurProfileId))
 	{
 		FWidgetLayout->removeWidget(widget->instance());
 		widget->instance()->setParent(NULL);
@@ -142,7 +142,7 @@ void DataStreamsOptions::onCurrentProfileChanged(int AIndex)
 
 	foreach(const QString &smethodNS, FDataManager->methods())
 	{
-		IOptionsWidget *widget = FMethodWidgets[FCurProfileId].value(smethodNS);
+		IOptionsDialogWidget *widget = FMethodWidgets[FCurProfileId].value(smethodNS);
 		if (!widget)
 		{
 			IDataStreamMethod *smethod = FDataManager->method(smethodNS);

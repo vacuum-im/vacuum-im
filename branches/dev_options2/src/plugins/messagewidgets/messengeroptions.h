@@ -7,10 +7,10 @@
 
 class MessengerOptions :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	MessengerOptions(IMessageWidgets *AMessageWidgets, QWidget *AParent);
 	~MessengerOptions();

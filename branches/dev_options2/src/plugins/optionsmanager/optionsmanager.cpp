@@ -134,9 +134,9 @@ bool OptionsManager::initSettings()
 	if (profiles().count() == 0)
 		addProfile(DEFAULT_PROFILE, QString::null);
 
-	IOptionsDialogNode dnode = { ONO_MISC, OPN_MISC, tr("Misc"), MNI_OPTIONS_DIALOG };
+	IOptionsDialogNode dnode = { ONO_MISC, OPN_MISC, MNI_OPTIONS_DIALOG, tr("Misc") };
 	insertOptionsDialogNode(dnode);
-	insertOptionsHolder(this);
+	insertOptionsDialogHolder(this);
 
 	return true;
 }
@@ -156,13 +156,13 @@ bool OptionsManager::startPlugin()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> OptionsManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_MISC)
 	{
 #ifdef Q_WS_WIN
-		widgets.insertMulti(OWO_MISC_AUTOSTART, optionsNodeWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent));
+		widgets.insertMulti(OWO_MISC_AUTOSTART, newOptionsDialogWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent));
 #else
 		Q_UNUSED(AParent);
 #endif
@@ -476,26 +476,26 @@ QDialog *OptionsManager::showEditProfilesDialog(QWidget *AParent)
 	return FEditProfilesDialog;
 }
 
-QList<IOptionsHolder *> OptionsManager::optionsHolders() const
+QList<IOptionsDialogHolder *> OptionsManager::optionsDialogHolders() const
 {
 	return FOptionsHolders;
 }
 
-void OptionsManager::insertOptionsHolder(IOptionsHolder *AHolder)
+void OptionsManager::insertOptionsDialogHolder(IOptionsDialogHolder *AHolder)
 {
 	if (!FOptionsHolders.contains(AHolder))
 	{
 		FOptionsHolders.append(AHolder);
-		emit optionsHolderInserted(AHolder);
+		emit optionsDialogHolderInserted(AHolder);
 	}
 }
 
-void OptionsManager::removeOptionsHolder(IOptionsHolder *AHolder)
+void OptionsManager::removeOptionsDialogHolder(IOptionsDialogHolder *AHolder)
 {
 	if (FOptionsHolders.contains(AHolder))
 	{
 		FOptionsHolders.removeAll(AHolder);
-		emit optionsHolderRemoved(AHolder);
+		emit optionsDialogHolderRemoved(AHolder);
 	}
 }
 
@@ -544,14 +544,14 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *APar
 	return FOptionsDialog;
 }
 
-IOptionsWidget *OptionsManager::optionsHeaderWidget(const QString &ACaption, QWidget *AParent) const
+IOptionsDialogWidget *OptionsManager::newOptionsDialogHeader(const QString &ACaption, QWidget *AParent) const
 {
-	return new OptionsHeader(ACaption,AParent);
+	return new OptionsDialogHeader(ACaption,AParent);
 }
 
-IOptionsWidget *OptionsManager::optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const
+IOptionsDialogWidget *OptionsManager::newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const
 {
-	return new OptionsWidget(ANode, ACaption, AParent);
+	return new OptionsDialogWidget(ANode, ACaption, AParent);
 }
 
 void OptionsManager::closeProfile()

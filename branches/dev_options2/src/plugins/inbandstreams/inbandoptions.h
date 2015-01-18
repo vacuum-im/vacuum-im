@@ -8,10 +8,10 @@
 
 class InBandOptions :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	InBandOptions(IInBandStreams *AInBandStreams, IInBandStream *AStream, bool AReadOnly, QWidget *AParent);
 	InBandOptions(IInBandStreams *AInBandStreams, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent);

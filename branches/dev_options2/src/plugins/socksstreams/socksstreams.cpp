@@ -149,18 +149,18 @@ IDataStreamSocket *SocksStreams::dataStreamSocket(const QString &ASocketId, cons
 	return NULL;
 }
 
-IOptionsWidget *SocksStreams::methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent)
+IOptionsDialogWidget *SocksStreams::methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent)
 {
 	return new SocksOptions(this,FConnectionManager,ANode,AReadOnly,AParent);
 }
 
-IOptionsWidget *SocksStreams::methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent)
+IOptionsDialogWidget *SocksStreams::methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent)
 {
 	ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());
 	return stream!=NULL ? new SocksOptions(this,stream,AReadOnly,AParent) : NULL;
 }
 
-void SocksStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+void SocksStreams::saveMethodSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode)
 {
 	SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget->instance());
 	if (widget)
@@ -169,7 +169,7 @@ void SocksStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode
 		REPORT_ERROR("Failed to save socks stream settings: Invalid options widget");
 }
 
-void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget)
+void SocksStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsDialogWidget *AWidget)
 {
 	SocksOptions *widget = qobject_cast<SocksOptions *>(AWidget->instance());
 	ISocksStream *stream = qobject_cast<ISocksStream *>(ASocket->instance());

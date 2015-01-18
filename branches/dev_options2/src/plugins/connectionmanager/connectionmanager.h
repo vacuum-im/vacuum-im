@@ -17,10 +17,10 @@ class ConnectionManager :
 	public QObject,
 	public IPlugin,
 	public IConnectionManager,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IConnectionManager IOptionsHolder);
+	Q_INTERFACES(IPlugin IConnectionManager IOptionsDialogHolder);
 public:
 	ConnectionManager();
 	~ConnectionManager();
@@ -33,7 +33,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IConnectionManager
 	virtual QList<QString> pluginList() const;
 	virtual IConnectionPlugin *pluginById(const QString &APluginId) const;
@@ -44,8 +44,8 @@ public:
 	virtual QUuid defaultProxy() const;
 	virtual void setDefaultProxy(const QUuid &AProxyId);
 	virtual QDialog *showEditProxyDialog(QWidget *AParent = NULL);
-	virtual IOptionsWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent);
-	virtual void saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);
+	virtual IOptionsDialogWidget *proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent);
+	virtual void saveProxySettings(IOptionsDialogWidget *AWidget, OptionsNode ANode = OptionsNode::null);
 	virtual QUuid loadProxySettings(const OptionsNode &ANode) const;
 	virtual QList<QSslCertificate> trustedCaCertificates(bool AWithUsers=true) const;
 	virtual void addTrustedCaCertificate(const QSslCertificate &ACertificate);

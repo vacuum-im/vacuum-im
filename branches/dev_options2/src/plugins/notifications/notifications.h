@@ -44,10 +44,10 @@ class Notifications :
 	public QObject,
 	public IPlugin,
 	public INotifications,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin INotifications IOptionsHolder);
+	Q_INTERFACES(IPlugin INotifications IOptionsDialogHolder);
 public:
 	Notifications();
 	~Notifications();
@@ -60,7 +60,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//INotifications
 	virtual QList<int> notifications() const;
 	virtual INotification notificationById(int ANotifyId) const;

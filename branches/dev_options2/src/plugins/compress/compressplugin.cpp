@@ -77,7 +77,7 @@ bool CompressPlugin::initObjects()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -88,16 +88,16 @@ bool CompressPlugin::initSettings()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> CompressPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> CompressPlugin::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager)
 	{
 		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 		if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 		{
 			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-			widgets.insertMulti(OWO_ACCOUNT_COMPRESS, FOptionsManager->optionsNodeWidget(aoptions.node("stream-compress"),tr("Enable data compression transferred between client and server"),AParent));
+			widgets.insertMulti(OWO_ACCOUNT_COMPRESS, FOptionsManager->newOptionsDialogWidget(aoptions.node("stream-compress"),tr("Enable data compression transferred between client and server"),AParent));
 		}
 	}
 	return widgets;

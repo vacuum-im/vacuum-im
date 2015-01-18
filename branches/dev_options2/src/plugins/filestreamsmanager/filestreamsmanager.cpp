@@ -121,16 +121,16 @@ bool FileStreamsManager::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode fileNode = { ONO_FILETRANSFER, OPN_FILETRANSFER, tr("File Transfer"), MNI_FILESTREAMSMANAGER };
+		IOptionsDialogNode fileNode = { ONO_FILETRANSFER, OPN_FILETRANSFER, MNI_FILESTREAMSMANAGER, tr("File Transfer") };
 		FOptionsManager->insertOptionsDialogNode(fileNode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> FileStreamsManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> FileStreamsManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FDataManager && ANodeId == OPN_FILETRANSFER)
 	{
 		widgets.insertMulti(OWO_FILESTREAMSMANAGER, new FileStreamsOptions(FDataManager, this, AParent));

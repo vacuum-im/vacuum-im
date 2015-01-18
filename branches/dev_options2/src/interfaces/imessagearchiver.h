@@ -194,7 +194,7 @@ public:
 	virtual QUuid engineId() const =0;
 	virtual QString engineName() const =0;
 	virtual QString engineDescription() const =0;
-	virtual IOptionsWidget *engineSettingsWidget(QWidget *AParent) = 0;
+	virtual IOptionsDialogWidget *engineSettingsWidget(QWidget *AParent) = 0;
 	virtual quint32 capabilities(const Jid &AStreamJid = Jid::null) const =0;
 	virtual bool isCapable(const Jid &AStreamJid, quint32 ACapability) const =0;
 	virtual int capabilityOrder(quint32 ACapability, const Jid &AStreamJid = Jid::null) const =0;

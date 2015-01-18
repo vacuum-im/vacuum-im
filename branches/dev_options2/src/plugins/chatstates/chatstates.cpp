@@ -195,7 +195,7 @@ bool ChatStates::initSettings()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -220,12 +220,12 @@ bool ChatStates::archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &
 	return false;
 }
 
-QMultiMap<int, IOptionsWidget *> ChatStates::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> ChatStates::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_CHATSTATES, FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send chat state notifications"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_CHATSTATES, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send chat state notifications"),AParent));
 	}
 	return widgets;
 }

@@ -7,10 +7,10 @@
 
 class FileArchiveOptions : 
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	FileArchiveOptions(IPluginManager *APluginManager, QWidget *AParent = NULL);
 	~FileArchiveOptions();

@@ -214,7 +214,7 @@ bool VCardPlugin::initObjects()
 	}
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -339,12 +339,12 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 	}
 }
 
-QMultiMap<int, IOptionsWidget *> VCardPlugin::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> VCardPlugin::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_MISC)
 	{
-		widgets.insertMulti(OWO_MISC_VCARD,FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE),tr("Restrict maximum vCard images size"),AParent));
+		widgets.insertMulti(OWO_MISC_VCARD,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE),tr("Restrict maximum vCard images size"),AParent));
 	}
 	return widgets;
 }

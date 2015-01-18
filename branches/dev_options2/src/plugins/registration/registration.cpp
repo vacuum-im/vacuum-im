@@ -138,7 +138,7 @@ bool Registration::initSettings()
 	Options::setDefaultValue(OPV_ACCOUNT_REGISTER,false);
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -313,13 +313,13 @@ IXmppFeature *Registration::newXmppFeature(const QString &AFeatureNS, IXmppStrea
 	return NULL;
 }
 
-QMultiMap<int, IOptionsWidget *> Registration::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> Registration::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 	{
-		widgets.insertMulti(OWO_ACCOUNT_REGISTER, FOptionsManager->optionsNodeWidget(Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)).node("register-on-server"),tr("Register new account on server"),AParent));
+		widgets.insertMulti(OWO_ACCOUNT_REGISTER, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)).node("register-on-server"),tr("Register new account on server"),AParent));
 	}
 	return widgets;
 }

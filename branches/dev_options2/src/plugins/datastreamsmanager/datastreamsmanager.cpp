@@ -125,16 +125,16 @@ bool DataStreamsManger::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_DATASTREAMS, OPN_DATASTREAMS, tr("Data Streams"), MNI_DATASTREAMSMANAGER };
+		IOptionsDialogNode dnode = { ONO_DATASTREAMS, OPN_DATASTREAMS, MNI_DATASTREAMSMANAGER, tr("Data Streams") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> DataStreamsManger::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> DataStreamsManger::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_DATASTREAMS)
 	{
 		widgets.insertMulti(OWO_DATASTREAMS, new DataStreamsOptions(this,AParent));

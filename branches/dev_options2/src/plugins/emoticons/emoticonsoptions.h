@@ -8,10 +8,10 @@
 
 class EmoticonsOptions :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	EmoticonsOptions(IEmoticons *AEmoticons, QWidget *AParent);
 	~EmoticonsOptions();

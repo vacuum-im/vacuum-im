@@ -111,9 +111,9 @@ public:
 	virtual QList<QString> styles() const =0;
 	virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions) =0;
 	virtual IMessageStyleOptions styleOptions(const OptionsNode &ANode, int AMessageType) const =0;
-	virtual IOptionsWidget *styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent) =0;
-	virtual void saveStyleSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
-	virtual void saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions) = 0;
+	virtual IOptionsDialogWidget *styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent) =0;
+	virtual void saveStyleSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
+	virtual void saveStyleSettings(IOptionsDialogWidget *AWidget, IMessageStyleOptions &AOptions) = 0;
 protected:
 	virtual void styleCreated(IMessageStyle *AStyle) const =0;
 	virtual void styleDestroyed(IMessageStyle *AStyle) const =0;

@@ -79,9 +79,9 @@ bool ShortcutManager::initSettings()
 {
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_SHORTCUTS, OPN_SHORTCUTS, tr("Shortcuts"), MNI_SHORTCUTS };
+		IOptionsDialogNode dnode = { ONO_SHORTCUTS, OPN_SHORTCUTS, MNI_SHORTCUTS, tr("Shortcuts") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -92,9 +92,9 @@ bool ShortcutManager::startPlugin()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> ShortcutManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> ShortcutManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_SHORTCUTS)
 		widgets.insertMulti(OWO_SHORTCUTS, new ShortcutOptionsWidget(AParent));
 	return widgets;

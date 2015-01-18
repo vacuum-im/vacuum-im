@@ -17,10 +17,10 @@ class AccountManager :
 	public QObject,
 	public IPlugin,
 	public IAccountManager,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IAccountManager IOptionsHolder);
+	Q_INTERFACES(IPlugin IAccountManager IOptionsDialogHolder);
 public:
 	AccountManager();
 	~AccountManager();
@@ -33,7 +33,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAccountManager
 	virtual QList<IAccount *> accounts() const;
 	virtual IAccount *accountById(const QUuid &AAcoountId) const;

@@ -34,7 +34,7 @@ EngineWidget::EngineWidget(IMessageArchiver *AArchiver, IArchiveEngine *AEngine,
 	vlayout->setMargin(5);
 	vlayout->addLayout(hlayout);
 
-	IOptionsWidget *engineOptions = FEngine->engineSettingsWidget(this);
+	IOptionsDialogWidget *engineOptions = FEngine->engineSettingsWidget(this);
 	if (engineOptions)
 	{
 		vlayout->addWidget(engineOptions->instance());

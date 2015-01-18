@@ -12,8 +12,8 @@
 #include <interfaces/iaccountmanager.h>
 #include "logindialog.h"
 #include "editprofilesdialog.h"
-#include "optionswidget.h"
-#include "optionsheader.h"
+#include "optionsdialogwidget.h"
+#include "optionsdialogheader.h"
 #include "optionsdialog.h"
 
 #ifdef USE_SYSTEM_QTLOCKEDFILE
@@ -26,10 +26,10 @@ class OptionsManager :
 	public QObject,
 	public IPlugin,
 	public IOptionsManager,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IOptionsManager IOptionsHolder);
+	Q_INTERFACES(IPlugin IOptionsManager IOptionsDialogHolder);
 public:
 	OptionsManager();
 	~OptionsManager();
@@ -42,7 +42,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IOptionsManager
 	virtual bool isOpened() const;
 	virtual QList<QString> profiles() const;
@@ -59,24 +59,24 @@ public:
 	virtual bool removeProfile(const QString &AProfile);
 	virtual QDialog *showLoginDialog(QWidget *AParent = NULL);
 	virtual QDialog *showEditProfilesDialog(QWidget *AParent = NULL);
-	virtual QList<IOptionsHolder *> optionsHolders() const;
-	virtual void insertOptionsHolder(IOptionsHolder *AHolder);
-	virtual void removeOptionsHolder(IOptionsHolder *AHolder);
+	virtual QList<IOptionsDialogHolder *> optionsDialogHolders() const;
+	virtual void insertOptionsDialogHolder(IOptionsDialogHolder *AHolder);
+	virtual void removeOptionsDialogHolder(IOptionsDialogHolder *AHolder);
 	virtual QList<IOptionsDialogNode> optionsDialogNodes() const;
 	virtual IOptionsDialogNode optionsDialogNode(const QString &ANodeId) const;
 	virtual void insertOptionsDialogNode(const IOptionsDialogNode &ANode);
 	virtual void removeOptionsDialogNode(const QString &ANodeId);
 	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, QWidget *AParent = NULL);
-	virtual IOptionsWidget *optionsHeaderWidget(const QString &ACaption, QWidget *AParent) const;
-	virtual IOptionsWidget *optionsNodeWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const;
+	virtual IOptionsDialogWidget *newOptionsDialogHeader(const QString &ACaption, QWidget *AParent) const;
+	virtual IOptionsDialogWidget *newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const;
 signals:
 	void profileAdded(const QString &AProfile);
 	void profileOpened(const QString &AProfile);
 	void profileClosed(const QString &AProfile);
 	void profileRenamed(const QString &AProfile, const QString &ANewName);
 	void profileRemoved(const QString &AProfile);
-	void optionsHolderInserted(IOptionsHolder *AHolder);
-	void optionsHolderRemoved(IOptionsHolder *AHolder);
+	void optionsDialogHolderInserted(IOptionsDialogHolder *AHolder);
+	void optionsDialogHolderRemoved(IOptionsDialogHolder *AHolder);
 	void optionsDialogNodeInserted(const IOptionsDialogNode &ANode);
 	void optionsDialogNodeRemoved(const IOptionsDialogNode &ANode);
 protected:
@@ -118,7 +118,7 @@ private:
 private:
 	Action *FChangeProfileAction;
 	Action *FShowOptionsDialogAction;
-	QList<IOptionsHolder *> FOptionsHolders;
+	QList<IOptionsDialogHolder *> FOptionsHolders;
 	QMap<QString, IOptionsDialogNode> FOptionsDialogNodes;
 };
 

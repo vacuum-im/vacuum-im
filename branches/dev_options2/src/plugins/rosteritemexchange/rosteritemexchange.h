@@ -19,14 +19,14 @@ class RosterItemExchange :
 	public QObject,
 	public IPlugin,
 	public IRosterItemExchange,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
 	public IMessageViewDropHandler,
 	public IRostersDragDropHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsHolder IStanzaHandler IStanzaRequestOwner IMessageViewDropHandler IRostersDragDropHandler);
+	Q_INTERFACES(IPlugin IRosterItemExchange IOptionsDialogHolder IStanzaHandler IStanzaRequestOwner IMessageViewDropHandler IRostersDragDropHandler);
 public:
 	RosterItemExchange();
 	~RosterItemExchange();
@@ -43,7 +43,7 @@ public:
 	//IStanzaRequestOwner
 	virtual void stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStanza);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageViewDropHandler
 	virtual bool messagaeViewDragEnter(IMessageViewWidget *AWidget, const QDragEnterEvent *AEvent);
 	virtual bool messageViewDragMove(IMessageViewWidget *AWidget, const QDragMoveEvent *AEvent);

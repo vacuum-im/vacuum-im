@@ -29,14 +29,14 @@ class RosterChanger :
 	public QObject,
 	public IPlugin,
 	public IRosterChanger,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IRostersEditHandler,
 	public IRostersDragDropHandler,
 	public IXmppUriHandler,
 	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRosterChanger IOptionsHolder IRostersDragDropHandler IRostersEditHandler IXmppUriHandler);
+	Q_INTERFACES(IPlugin IRosterChanger IOptionsDialogHolder IRostersDragDropHandler IRostersEditHandler IXmppUriHandler);
 public:
 	RosterChanger();
 	~RosterChanger();
@@ -49,7 +49,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRostersDragDropHandler
 	virtual Qt::DropActions rosterDragStart(const QMouseEvent *AEvent, IRosterIndex *AIndex, QDrag *ADrag);
 	virtual bool rosterDragEnter(const QDragEnterEvent *AEvent);

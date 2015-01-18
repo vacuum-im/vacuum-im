@@ -17,10 +17,10 @@ protected:
 
 class NotifyOptionsWidget : 
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	NotifyOptionsWidget(INotifications *ANotifications, QWidget *AParent = NULL);
 	~NotifyOptionsWidget();

@@ -8,10 +8,10 @@
 
 class AccountOptions :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	AccountOptions(IAccountManager *AManager, const QUuid &AAccountId, QWidget *AParent);
 	~AccountOptions();

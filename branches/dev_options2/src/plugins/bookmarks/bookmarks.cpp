@@ -173,7 +173,7 @@ bool Bookmarks::initObjects()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
 	if (FRostersModel)
@@ -196,20 +196,20 @@ bool Bookmarks::initSettings()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> Bookmarks::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> Bookmarks::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (FOptionsManager)
 	{
 		if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 		{
 			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-			widgets.insertMulti(OWO_ACCOUNT_BOOKMARKS, FOptionsManager->optionsNodeWidget(aoptions.node("ignore-autojoin"),tr("Disable autojoin to conferences"),AParent));
+			widgets.insertMulti(OWO_ACCOUNT_BOOKMARKS, FOptionsManager->newOptionsDialogWidget(aoptions.node("ignore-autojoin"),tr("Disable autojoin to conferences"),AParent));
 		}
 		else if (ANodeId == OPN_CONFERENCES)
 		{
-			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->optionsNodeWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Automatically show window of conferences connected at startup"),AParent));
+			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Automatically show window of conferences connected at startup"),AParent));
 		}
 	}
 	return widgets;

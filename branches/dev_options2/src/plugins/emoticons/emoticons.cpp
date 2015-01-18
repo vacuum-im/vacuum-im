@@ -93,9 +93,9 @@ bool Emoticons::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_EMOTICONS, OPN_EMOTICONS, tr("Emoticons"), MNI_EMOTICONS };
+		IOptionsDialogNode dnode = { ONO_EMOTICONS, OPN_EMOTICONS, MNI_EMOTICONS, tr("Emoticons") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -114,9 +114,9 @@ void Emoticons::writeMessageToText(int AOrder, Message &AMessage, QTextDocument 
 		replaceTextToImage(ADocument);
 }
 
-QMultiMap<int, IOptionsWidget *> Emoticons::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> Emoticons::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_EMOTICONS)
 	{
 		widgets.insertMulti(OWO_EMOTICONS, new EmoticonsOptions(this,AParent));

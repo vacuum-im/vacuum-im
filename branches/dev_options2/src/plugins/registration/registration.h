@@ -22,11 +22,11 @@ class Registration :
 	public IXmppUriHandler,
 	public IDiscoFeatureHandler,
 	public IXmppFeaturesPlugin,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IDataLocalizer
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IOptionsHolder IDataLocalizer);
+	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IOptionsDialogHolder IDataLocalizer);
 public:
 	Registration();
 	~Registration();
@@ -49,7 +49,7 @@ public:
 	virtual QList<QString> xmppFeatures() const;
 	virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
 	//IRegistration

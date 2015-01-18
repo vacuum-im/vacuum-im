@@ -46,14 +46,14 @@ class ClientInfo :
 	public QObject,
 	public IPlugin,
 	public IClientInfo,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
 	public IDataLocalizer,
 	public IDiscoFeatureHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IClientInfo IOptionsHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
+	Q_INTERFACES(IPlugin IClientInfo IOptionsDialogHolder IStanzaHandler IStanzaRequestOwner IDataLocalizer IDiscoFeatureHandler);
 public:
 	ClientInfo();
 	~ClientInfo();
@@ -66,7 +66,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IStanzaHandler
 	virtual bool stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &AStanza, bool &AAccept);
 	//IStanzaRequestOwner

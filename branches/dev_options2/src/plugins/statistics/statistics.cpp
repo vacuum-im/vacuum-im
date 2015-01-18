@@ -155,7 +155,7 @@ bool Statistics::initObjects()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
 	return true;
@@ -167,12 +167,12 @@ bool Statistics::initSettings()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> Statistics::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> Statistics::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_MISC)
 	{
-		widgets.insertMulti(OWO_MISC_STATISTICS,FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_STATISTICTS_ENABLED),tr("Send anonymous statistics information to developer"),AParent));
+		widgets.insertMulti(OWO_MISC_STATISTICS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MISC_STATISTICTS_ENABLED),tr("Send anonymous statistics information to developer"),AParent));
 	}
 	return widgets;
 }

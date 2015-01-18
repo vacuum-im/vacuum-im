@@ -48,7 +48,7 @@ void StyleOptionsWidget::apply()
 {
 	foreach(int messageType, FMessagePlugin.keys())
 	{
-		IOptionsWidget *widget = FMessageWidget.value(messageType);
+		IOptionsDialogWidget *widget = FMessageWidget.value(messageType);
 		IMessageStylePlugin *plugin = FMessageStyles->pluginById(FMessagePlugin.value(messageType));
 		if (plugin && widget)
 		{
@@ -63,7 +63,7 @@ void StyleOptionsWidget::apply()
 void StyleOptionsWidget::reset()
 {
 	FActiveSettings = NULL;
-	foreach(IOptionsWidget *widget, FMessageWidget.values())
+	foreach(IOptionsDialogWidget *widget, FMessageWidget.values())
 	{
 		widget->instance()->setParent(NULL);
 		delete widget->instance();

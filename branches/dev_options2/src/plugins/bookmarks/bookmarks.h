@@ -20,13 +20,13 @@ class Bookmarks :
 	public QObject,
 	public IPlugin,
 	public IBookmarks,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IRosterDataHolder,
 	public IRostersEditHandler,
 	public AdvancedDelegateEditProxy
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IBookmarks IOptionsHolder IRosterDataHolder IRostersEditHandler);
+	Q_INTERFACES(IPlugin IBookmarks IOptionsDialogHolder IRosterDataHolder IRostersEditHandler);
 public:
 	Bookmarks();
 	~Bookmarks();
@@ -39,7 +39,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;

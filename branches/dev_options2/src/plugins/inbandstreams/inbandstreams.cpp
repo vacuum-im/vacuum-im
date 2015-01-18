@@ -111,18 +111,18 @@ IDataStreamSocket *InBandStreams::dataStreamSocket(const QString &AStreamId, con
 	return NULL;
 }
 
-IOptionsWidget *InBandStreams::methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent)
+IOptionsDialogWidget *InBandStreams::methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent)
 {
 	return new InBandOptions(this,ANode,AReadOnly,AParent);
 }
 
-IOptionsWidget *InBandStreams::methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent)
+IOptionsDialogWidget *InBandStreams::methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent)
 {
 	IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());
 	return stream!=NULL ? new InBandOptions(this,stream,AReadOnly,AParent) : NULL;
 }
 
-void InBandStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+void InBandStreams::saveMethodSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode)
 {
 	InBandOptions *widget = qobject_cast<InBandOptions *>(AWidget->instance());
 	if (widget)
@@ -131,7 +131,7 @@ void InBandStreams::saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANod
 		REPORT_ERROR("Failed to save inband stream settings: Invalid options widget");
 }
 
-void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget)
+void InBandStreams::loadMethodSettings(IDataStreamSocket *ASocket, IOptionsDialogWidget *AWidget)
 {
 	InBandOptions *widget = qobject_cast<InBandOptions *>(AWidget->instance());
 	IInBandStream *stream = qobject_cast<IInBandStream *>(ASocket->instance());

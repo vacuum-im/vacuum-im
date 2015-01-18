@@ -199,7 +199,7 @@ bool ClientInfo::initSettings()
 	Options::setDefaultValue(OPV_MISC_SHAREOSVERSION,true);
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
@@ -210,12 +210,12 @@ bool ClientInfo::startPlugin()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> ClientInfo::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> ClientInfo::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_MISC)
 	{
-		widgets.insertMulti(OWO_MISC_CLIENTINFO, FOptionsManager->optionsNodeWidget(Options::node(OPV_MISC_SHAREOSVERSION),tr("Share information about OS version"),AParent));
+		widgets.insertMulti(OWO_MISC_CLIENTINFO, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MISC_SHAREOSVERSION),tr("Share information about OS version"),AParent));
 	}
 	return widgets;
 }

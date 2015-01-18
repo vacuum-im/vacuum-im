@@ -188,7 +188,7 @@ bool StatusChanger::initObjects()
 	updateTrayToolTip();
 
 	if (FOptionsManager)
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 
 	if (FMainWindowPlugin)
 	{
@@ -241,7 +241,7 @@ bool StatusChanger::initSettings()
 
 	if (FOptionsManager)
 	{
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
 	return true;
@@ -253,15 +253,15 @@ bool StatusChanger::startPlugin()
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> StatusChanger::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> StatusChanger::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 	{
 		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-connect"),tr("Auto connect on startup"),AParent));
-		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->optionsNodeWidget(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"),AParent));
+		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->newOptionsDialogWidget(aoptions.node("auto-connect"),tr("Auto connect on startup"),AParent));
+		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->newOptionsDialogWidget(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"),AParent));
 	}
 	return widgets;
 }

@@ -149,16 +149,16 @@ bool StatusIcons::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_STATUSICONS, OPN_STATUSICONS, tr("Status icons"), MNI_STATUSICONS_OPTIONS };
+		IOptionsDialogNode dnode = { ONO_STATUSICONS, OPN_STATUSICONS, MNI_STATUSICONS_OPTIONS, tr("Status icons") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> StatusIcons::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> StatusIcons::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_STATUSICONS)
 		widgets.insertMulti(OWO_STATUSICONS, new IconsOptionsWidget(this,AParent));
 	return widgets;

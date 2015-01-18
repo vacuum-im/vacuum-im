@@ -156,7 +156,7 @@ QString FileMessageArchive::engineDescription() const
 	return tr("History of conversations is stored in local files");
 }
 
-IOptionsWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
+IOptionsDialogWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
 {
 	return new FileArchiveOptions(FPluginManager,AParent);
 }

@@ -124,14 +124,14 @@ bool ConnectionManager::initSettings()
 	Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
 
 	if (FOptionsManager)
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> ConnectionManager::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> ConnectionManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
 	{
@@ -244,13 +244,13 @@ QDialog *ConnectionManager::showEditProxyDialog(QWidget *AParent)
 	return dialog;
 }
 
-IOptionsWidget *ConnectionManager::proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent)
+IOptionsDialogWidget *ConnectionManager::proxySettingsWidget(const OptionsNode &ANode, QWidget *AParent)
 {
 	ProxySettingsWidget *widget = new ProxySettingsWidget(this,ANode,AParent);
 	return widget;
 }
 
-void ConnectionManager::saveProxySettings(IOptionsWidget *AWidget, OptionsNode ANode)
+void ConnectionManager::saveProxySettings(IOptionsDialogWidget *AWidget, OptionsNode ANode)
 {
 	ProxySettingsWidget *widget = qobject_cast<ProxySettingsWidget *>(AWidget->instance());
 	if (widget)

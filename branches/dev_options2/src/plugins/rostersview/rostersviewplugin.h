@@ -17,12 +17,12 @@ class RostersViewPlugin :
 	public QObject,
 	public IPlugin,
 	public IRostersViewPlugin,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IRosterDataHolder,
 	public IRostersLabelHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsHolder IRosterDataHolder IRostersLabelHolder);
+	Q_INTERFACES(IPlugin IRostersViewPlugin IOptionsDialogHolder IRosterDataHolder IRostersLabelHolder);
 public:
 	RostersViewPlugin();
 	~RostersViewPlugin();
@@ -35,7 +35,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRosterDataHolder
 	virtual QList<int> rosterDataRoles(int AOrder) const;
 	virtual QVariant rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) const;

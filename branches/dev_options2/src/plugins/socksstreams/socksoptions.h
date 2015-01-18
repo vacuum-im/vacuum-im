@@ -10,10 +10,10 @@
 
 class SocksOptions :
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	SocksOptions(ISocksStreams *ASocksStreams, ISocksStream *ASocksStream, bool AReadOnly, QWidget *AParent = NULL);
 	SocksOptions(ISocksStreams *ASocksStreams, IConnectionManager *AConnectionManager, const OptionsNode &ANode, bool AReadOnly, QWidget *AParent = NULL);
@@ -43,7 +43,7 @@ private:
 private:
 	OptionsNode FOptions;
 	ISocksStream *FSocksStream;
-	IOptionsWidget *FProxySettings;
+	IOptionsDialogWidget *FProxySettings;
 };
 
 #endif // SOCKSOPTIONS_H

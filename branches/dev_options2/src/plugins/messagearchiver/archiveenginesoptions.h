@@ -8,10 +8,10 @@
 
 class EngineWidget : 
 	public QGroupBox,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	EngineWidget(IMessageArchiver *AArchiver, IArchiveEngine *AEngine, QWidget *AParent);
 	~EngineWidget();
@@ -39,10 +39,10 @@ private:
 
 class ArchiveEnginesOptions : 
 	public QWidget,
-	public IOptionsWidget
+	public IOptionsDialogWidget
 {
 	Q_OBJECT;
-	Q_INTERFACES(IOptionsWidget);
+	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	ArchiveEnginesOptions(IMessageArchiver *AArchiver, QWidget *AParent = NULL);
 	~ArchiveEnginesOptions();

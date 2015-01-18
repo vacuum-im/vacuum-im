@@ -33,9 +33,9 @@ public:
 	virtual QList<QString> styles() const;
 	virtual IMessageStyle *styleForOptions(const IMessageStyleOptions &AOptions);
 	virtual IMessageStyleOptions styleOptions(const OptionsNode &ANode, int AMessageType) const;
-	virtual IOptionsWidget *styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent);
-	virtual void saveStyleSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null);
-	virtual void saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions);
+	virtual IOptionsDialogWidget *styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent);
+	virtual void saveStyleSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode = OptionsNode::null);
+	virtual void saveStyleSettings(IOptionsDialogWidget *AWidget, IMessageStyleOptions &AOptions);
 	//SimpleMessageStylePlugin
 	QList<QString> styleVariants(const QString &AStyleId) const;
 	QMap<QString,QVariant> styleInfo(const QString &AStyleId) const;

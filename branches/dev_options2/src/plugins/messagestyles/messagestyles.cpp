@@ -94,23 +94,23 @@ bool MessageStyles::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, tr("Message Styles"), MNI_MESSAGE_STYLES };
+		IOptionsDialogNode dnode = { ONO_MESSAGE_STYLES, OPN_MESSAGE_STYLES, MNI_MESSAGE_STYLES, tr("Message Styles") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsHolder(this);
+		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 	return true;
 }
 
-QMultiMap<int, IOptionsWidget *> MessageStyles::optionsWidgets(const QString &ANodeId, QWidget *AParent)
+QMultiMap<int, IOptionsDialogWidget *> MessageStyles::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
-	QMultiMap<int, IOptionsWidget *> widgets;
+	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (ANodeId == OPN_MESSAGE_STYLES && !FStylePlugins.isEmpty())
 	{
 		widgets.insertMulti(OWO_MESSAGE_STYLES, new StyleOptionsWidget(this,AParent));
 	}
 	else if (ANodeId == OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_SHOWDATESEPARATORS,FOptionsManager->optionsNodeWidget(Options::node(OPV_MESSAGES_SHOWDATESEPARATORS),tr("Show date separators in chat window"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_SHOWDATESEPARATORS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWDATESEPARATORS),tr("Show date separators in chat window"),AParent));
 	}
 	return widgets;
 }

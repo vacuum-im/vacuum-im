@@ -20,10 +20,10 @@ class Avatars :
 	public IStanzaRequestOwner,
 	public IRosterDataHolder,
 	public IRostersLabelHolder,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner IOptionsHolder);
+	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner IOptionsDialogHolder);
 public:
 	Avatars();
 	~Avatars();
@@ -47,7 +47,7 @@ public:
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAvatars
 	virtual QString avatarHash(const Jid &AContactJid) const;
 	virtual bool hasAvatar(const QString &AHash) const;

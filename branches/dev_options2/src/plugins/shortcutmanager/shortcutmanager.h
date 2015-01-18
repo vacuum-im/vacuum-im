@@ -13,10 +13,10 @@
 class ShortcutManager : 
 	public QObject,
 	public IPlugin,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IOptionsHolder);
+	Q_INTERFACES(IPlugin IOptionsDialogHolder);
 public:
 	ShortcutManager();
 	~ShortcutManager();
@@ -29,7 +29,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 protected:
 	void hideAllWidgets();
 	void showHiddenWidgets(bool ACheckPassword = true);

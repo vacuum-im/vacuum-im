@@ -96,12 +96,12 @@ IConnection *DefaultConnectionPlugin::newConnection(const OptionsNode &ANode, QO
 	return connection;
 }
 
-IOptionsWidget *DefaultConnectionPlugin::connectionSettingsWidget(const OptionsNode &ANode, QWidget *AParent)
+IOptionsDialogWidget *DefaultConnectionPlugin::connectionSettingsWidget(const OptionsNode &ANode, QWidget *AParent)
 {
 	return FConnectionManager!=NULL ? new ConnectionOptionsWidget(FConnectionManager, ANode, AParent) : NULL;
 }
 
-void DefaultConnectionPlugin::saveConnectionSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+void DefaultConnectionPlugin::saveConnectionSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode)
 {
 	ConnectionOptionsWidget *widget = qobject_cast<ConnectionOptionsWidget *>(AWidget->instance());
 	if (widget)

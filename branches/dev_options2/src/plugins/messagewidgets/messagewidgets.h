@@ -25,12 +25,12 @@ class MessageWidgets :
 	public QObject,
 	public IPlugin,
 	public IMessageWidgets,
-	public IOptionsHolder,
+	public IOptionsDialogHolder,
 	public IMessageViewUrlHandler,
 	public IMessageEditContentsHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageWidgets IOptionsHolder IMessageViewUrlHandler IMessageEditContentsHandler);
+	Q_INTERFACES(IPlugin IMessageWidgets IOptionsDialogHolder IMessageViewUrlHandler IMessageEditContentsHandler);
 public:
 	MessageWidgets();
 	~MessageWidgets();
@@ -43,7 +43,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageViewUrlHandler
 	virtual bool messageViewUrlOpen(int AOrder, IMessageViewWidget *AWidget, const QUrl &AUrl);
 	//IMessageEditContentsHandler

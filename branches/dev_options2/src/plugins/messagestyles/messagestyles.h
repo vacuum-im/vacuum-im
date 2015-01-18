@@ -15,10 +15,10 @@ class MessageStyles :
 	public QObject,
 	public IPlugin,
 	public IMessageStyles,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IMessageStyles IOptionsHolder);
+	Q_INTERFACES(IPlugin IMessageStyles IOptionsDialogHolder);
 public:
 	MessageStyles();
 	~MessageStyles();
@@ -31,7 +31,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin() { return true; }
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IMessageStyles
 	virtual QList<QString> pluginList() const;
 	virtual IMessageStylePlugin *pluginById(const QString &APluginId) const;

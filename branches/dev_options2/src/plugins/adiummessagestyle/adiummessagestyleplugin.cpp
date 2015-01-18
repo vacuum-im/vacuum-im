@@ -161,20 +161,20 @@ IMessageStyleOptions AdiumMessageStylePlugin::styleOptions(const OptionsNode &AN
 	return soptions;
 }
 
-IOptionsWidget *AdiumMessageStylePlugin::styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent)
+IOptionsDialogWidget *AdiumMessageStylePlugin::styleSettingsWidget(const OptionsNode &ANode, int AMessageType, QWidget *AParent)
 {
 	updateAvailStyles();
 	return new AdiumOptionsWidget(this,ANode,AMessageType,AParent);
 }
 
-void AdiumMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, OptionsNode ANode)
+void AdiumMessageStylePlugin::saveStyleSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode)
 {
 	AdiumOptionsWidget *widget = qobject_cast<AdiumOptionsWidget *>(AWidget->instance());
 	if (widget)
 		widget->apply(ANode);
 }
 
-void AdiumMessageStylePlugin::saveStyleSettings(IOptionsWidget *AWidget, IMessageStyleOptions &AOptions)
+void AdiumMessageStylePlugin::saveStyleSettings(IOptionsDialogWidget *AWidget, IMessageStyleOptions &AOptions)
 {
 	AdiumOptionsWidget *widget = qobject_cast<AdiumOptionsWidget *>(AWidget->instance());
 	if (widget)

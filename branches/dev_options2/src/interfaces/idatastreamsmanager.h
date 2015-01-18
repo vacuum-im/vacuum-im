@@ -51,10 +51,10 @@ public:
 	virtual QString methodName() const =0;
 	virtual QString methodDescription() const =0;
 	virtual IDataStreamSocket *dataStreamSocket(const QString &ASocketId, const Jid &AStreamJid, const Jid &AContactJid, IDataStreamSocket::StreamKind AKind, QObject *AParent = NULL) =0;
-	virtual IOptionsWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) =0;
-	virtual IOptionsWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent) =0;
-	virtual void saveMethodSettings(IOptionsWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
-	virtual void loadMethodSettings(IDataStreamSocket *ASocket, IOptionsWidget *AWidget) =0;
+	virtual IOptionsDialogWidget *methodSettingsWidget(const OptionsNode &ANode, bool AReadOnly, QWidget *AParent) =0;
+	virtual IOptionsDialogWidget *methodSettingsWidget(IDataStreamSocket *ASocket, bool AReadOnly, QWidget *AParent) =0;
+	virtual void saveMethodSettings(IOptionsDialogWidget *AWidget, OptionsNode ANode = OptionsNode::null) =0;
+	virtual void loadMethodSettings(IDataStreamSocket *ASocket, IOptionsDialogWidget *AWidget) =0;
 	virtual void loadMethodSettings(IDataStreamSocket *ASocket, const OptionsNode &ANode) =0;
 protected:
 	virtual void socketCreated(IDataStreamSocket *ASocket) =0;

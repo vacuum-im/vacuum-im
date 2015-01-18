@@ -37,10 +37,10 @@ class StatusChanger :
 	public QObject,
 	public IPlugin,
 	public IStatusChanger,
-	public IOptionsHolder
+	public IOptionsDialogHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IStatusChanger IOptionsHolder);
+	Q_INTERFACES(IPlugin IStatusChanger IOptionsDialogHolder);
 public:
 	StatusChanger();
 	~StatusChanger();
@@ -53,7 +53,7 @@ public:
 	virtual bool initSettings();
 	virtual bool startPlugin();
 	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsWidget *> optionsWidgets(const QString &ANodeId, QWidget *AParent);
+	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IStatusChanger
 	virtual Menu *statusMenu() const;
 	virtual Menu *streamMenu(const Jid &AStreamJid) const;
