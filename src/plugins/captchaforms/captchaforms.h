@@ -24,6 +24,7 @@ struct ChallengeItem
 {
 	Jid streamJid;
 	Jid challenger;
+	QString challengeId;
 	IDataDialogWidget *dialog;
 };
 
