@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QImage>
+#include <QDialog>
 #include <QDateTime>
 #include <QStringList>
 #include <QDomDocument>
@@ -45,8 +46,8 @@ public:
 	virtual bool hasVCard(const Jid &AContactJid) const =0;
 	virtual bool requestVCard(const Jid &AStreamJid, const Jid &AContactJid) =0;
 	virtual IVCard *getVCard(const Jid &AContactJid) =0;
-	virtual bool publishVCard(IVCard *AVCard, const Jid &AStreamJid) =0;
-	virtual void showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid) =0;
+	virtual bool publishVCard(const Jid &AStreamJid, IVCard *AVCard) =0;
+	virtual QDialog *showVCardDialog(const Jid &AStreamJid, const Jid &AContactJid, QWidget *AParent = NULL) =0;
 protected:
 	virtual void vcardReceived(const Jid &AContactJid) =0;
 	virtual void vcardPublished(const Jid &AContactJid) =0;
@@ -54,6 +55,6 @@ protected:
 };
 
 Q_DECLARE_INTERFACE(IVCard,"Vacuum.Plugin.IVCard/1.3")
-Q_DECLARE_INTERFACE(IVCardPlugin,"Vacuum.Plugin.IVCardPlugin/1.3")
+Q_DECLARE_INTERFACE(IVCardPlugin,"Vacuum.Plugin.IVCardPlugin/1.4")
 
 #endif //IVCARD_H
