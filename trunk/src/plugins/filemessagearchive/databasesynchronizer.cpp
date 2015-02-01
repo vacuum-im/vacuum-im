@@ -60,22 +60,24 @@ void DatabaseSynchronizer::run()
 			QHash<Jid, QList<QString> > databaseHeadersMap;
 			QHash<QString, DatabaseArchiveHeader> databaseFileHeaders;
 			DatabaseTaskLoadHeaders *loadTask = new DatabaseTaskLoadHeaders(streamJid,loadRequest,QString::null);
-			if (FDatabaseWorker->execTask(loadTask) && !loadTask->isFailed())
-			{
-				foreach(const DatabaseArchiveHeader &header, loadTask->headers())
-				{
-					if (header.timestamp < syncTime)
-					{
-						QString fileName = (FFileArchive->collectionDirName(header.with)+"/"+FFileArchive->collectionFileName(header.start)).toLower();
-						databaseHeadersMap[header.with].append(fileName);
-						databaseFileHeaders.insert(fileName,header);
-					}
-				}
-			}
-			else
+			if (!FDatabaseWorker->execTask(loadTask))
 			{
 				syncFailed = true;
-				REPORT_ERROR("Failed to synchronize file archive database: Database headers not loaded");
+				REPORT_ERROR("Failed to synchronize file archive database: Load database headers task not executed");
+			}
+			else if (loadTask->isFailed())
+			{
+				syncFailed = true;
+				REPORT_ERROR("Failed to synchronize file archive database: Load database headers task failed");
+			}
+			else foreach(const DatabaseArchiveHeader &header, loadTask->headers())
+			{
+				if (header.timestamp < syncTime)
+				{
+					QString fileName = (FFileArchive->collectionDirName(header.with)+"/"+FFileArchive->collectionFileName(header.start)).toLower();
+					databaseHeadersMap[header.with].append(fileName);
+					databaseFileHeaders.insert(fileName,header);
+				}
 			}
 			delete loadTask;
 
@@ -180,10 +182,15 @@ void DatabaseSynchronizer::run()
 				{
 					QString gateType = !with.node().isEmpty() ? FFileArchive->contactGateType(with) : QString::null;
 					DatabaseTaskInsertHeaders *insertTask = new DatabaseTaskInsertHeaders(streamJid,newHeaders,gateType);
-					if (!FDatabaseWorker->execTask(insertTask) || insertTask->isFailed())
+					if (!FDatabaseWorker->execTask(insertTask))
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: New headers not inserted");
+						REPORT_ERROR("Failed to synchronize file archive database: Insert new headers task not executed");
+					}
+					else if(insertTask->isFailed())
+					{
+						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Insert new headers task failed");
 					}
 					delete insertTask;
 				}
@@ -191,10 +198,15 @@ void DatabaseSynchronizer::run()
 				if (!syncFailed && !difHeaders.isEmpty())
 				{
 					DatabaseTaskUpdateHeaders *updateTask = new DatabaseTaskUpdateHeaders(streamJid,difHeaders);
-					if (!FDatabaseWorker->execTask(updateTask) || updateTask->isFailed())
+					if (!FDatabaseWorker->execTask(updateTask))
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: Changed headers not updated");
+						REPORT_ERROR("Failed to synchronize file archive database: Update changed headers task not executed");
+					}
+					else if (updateTask->isFailed())
+					{
+						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Update changed headers task failed");
 					}
 					delete updateTask;
 				}
@@ -202,10 +214,15 @@ void DatabaseSynchronizer::run()
 				if (!syncFailed && !oldHeaders.isEmpty())
 				{
 					DatabaseTaskRemoveHeaders *removeTask = new DatabaseTaskRemoveHeaders(streamJid,oldHeaders);
-					if (!FDatabaseWorker->execTask(removeTask) || removeTask->isFailed())
+					if (!FDatabaseWorker->execTask(removeTask))
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+						REPORT_ERROR("Failed to synchronize file archive database: Remove old headers task not executed");
+					}
+					else if (removeTask->isFailed())
+					{
+						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Remove old headers task failed");
 					}
 					delete removeTask;
 				}
@@ -225,10 +242,15 @@ void DatabaseSynchronizer::run()
 				if (!oldHeaders.isEmpty())
 				{
 					DatabaseTaskRemoveHeaders *removeTask = new DatabaseTaskRemoveHeaders(streamJid,oldHeaders);
-					if (!FDatabaseWorker->execTask(removeTask) || removeTask->isFailed())
+					if (!FDatabaseWorker->execTask(removeTask))
 					{
 						syncFailed = true;
-						REPORT_ERROR("Failed to synchronize file archive database: Old headers not removed");
+						REPORT_ERROR("Failed to synchronize file archive database: Remove old headers task not executed");
+					}
+					else if (removeTask->isFailed())
+					{
+						syncFailed = true;
+						REPORT_ERROR("Failed to synchronize file archive database: Remove old headers task failed");
 					}
 					delete removeTask;
 				}

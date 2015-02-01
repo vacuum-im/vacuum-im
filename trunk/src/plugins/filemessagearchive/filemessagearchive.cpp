@@ -1207,17 +1207,16 @@ FileWriter *FileMessageArchive::newFileWriter(const Jid &AStreamJid, const IArch
 		{
 			delete writer;
 			writer = NULL;
-			REPORT_ERROR("Failed to create file writer: Writer not opened");
 		}
 		return writer;
 	}
 	else if (FWritingFiles.contains(AFileName))
 	{
-		REPORT_ERROR("Failed to create file writer: File already exists");
+		REPORT_ERROR("Failed to create file writer: Writer already exists");
 	}
 	else
 	{
-		REPORT_ERROR("Failed to create file writer: Invalid params");
+		REPORT_ERROR("Failed to create file writer: Invalid parameters");
 	}
 	return NULL;
 }
