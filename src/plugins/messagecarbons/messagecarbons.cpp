@@ -79,7 +79,7 @@ bool MessageCarbons::initObjects()
 	{
 		IDiscoFeature dfeature;
 		dfeature.var = NS_MESSAGE_CARBONS;
-		dfeature.active = false;
+		dfeature.active = true;
 		dfeature.name = tr("Message Carbons");
 		dfeature.description = tr("Allows to keep all user IM clients engaged in a conversation");
 		FDiscovery->insertDiscoFeature(dfeature);
