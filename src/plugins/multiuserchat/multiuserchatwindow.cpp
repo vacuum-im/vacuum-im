@@ -1187,7 +1187,7 @@ bool MultiUserChatWindow::execShortcutCommand(const QString &AText)
 	{
 		QStringList parts = AText.split(" ");
 		parts.removeFirst();
-		QString nick = parts.takeFirst();
+		QString nick = parts.join(" ");
 		FMultiChat->setNickName(nick);
 		hasCommand = true;
 	}
