@@ -74,11 +74,16 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 {
 	QAction *before = NULL;
 	QAction *separator = NULL;
+
 	QMultiMap<int,Action *>::iterator it = qFind(FActions.begin(),FActions.end(),AAction);
 	if (it != FActions.end())
 	{
 		if (FActions.values(it.key()).count() == 1)
-			FSeparators.remove(it.key());
+		{
+			QAction *sep = FSeparators.take(it.key());
+			QMenu::removeAction(sep);
+			emit separatorRemoved(sep);
+		}
 		FActions.erase(it);
 		QMenu::removeAction(AAction);
 	}
@@ -87,7 +92,10 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 	if (it == FActions.end())
 	{
 		before = nextGroupSeparator(AGroup);
-		before != NULL ? QMenu::insertAction(before,AAction) : QMenu::addAction(AAction);
+		if (before != NULL)
+			QMenu::insertAction(before,AAction);
+		else
+			QMenu::addAction(AAction);
 		separator = insertSeparator(AAction);
 		FSeparators.insert(AGroup,separator);
 	}
@@ -108,7 +116,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 			for (int i = 0; !before && i<actionList.count(); ++i)
 			{
 				Action *action = qobject_cast<Action *>(actionList.at(i));
-				if (FActions.key(action)==AGroup)
+				if (FActions.key(action) == AGroup)
 				{
 					QString curSortString = action->text();
 					if (sortRole)
@@ -121,12 +129,12 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 
 		if (!before)
 		{
-			QMap<int,QAction *>::const_iterator sepIt= FSeparators.upperBound(AGroup);
+			QMap<int,QAction *>::const_iterator sepIt = FSeparators.upperBound(AGroup);
 			if (sepIt != FSeparators.constEnd())
 				before = sepIt.value();
 		}
 
-		if (before)
+		if (before != NULL)
 			QMenu::insertAction(before,AAction);
 		else
 			QMenu::addAction(AAction);
@@ -134,6 +142,7 @@ void Menu::addAction(Action *AAction, int AGroup, bool ASort)
 
 	FActions.insertMulti(AGroup,AAction);
 	connect(AAction,SIGNAL(actionDestroyed(Action *)),SLOT(onActionDestroyed(Action *)));
+
 	emit actionInserted(before,AAction,AGroup,ASort);
 	if (separator) emit separatorInserted(AAction,separator);
 }
@@ -153,28 +162,20 @@ void Menu::removeAction(Action *AAction)
 
 		if (FActions.values(it.key()).count() == 1)
 		{
-			QAction *separator = FSeparators.value(it.key());
-			FSeparators.remove(it.key());
+			QAction *separator = FSeparators.take(it.key());
 			QMenu::removeAction(separator);
 			emit separatorRemoved(separator);
 		}
 
 		FActions.erase(it);
 		QMenu::removeAction(AAction);
-
 		emit actionRemoved(AAction);
-
-		Menu *menu = AAction->menu();
-		if (menu && menu->parent() == this)
-			menu->deleteLater();
-		else if (AAction->parent() == this)
-			AAction->deleteLater();
 	}
 }
 
 void Menu::clear()
 {
-	foreach(Action *action,FActions.values())
+	foreach(Action *action, FActions.values())
 		removeAction(action);
 	QMenu::clear();
 }
