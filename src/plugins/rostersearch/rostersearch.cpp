@@ -332,7 +332,7 @@ void RosterSearch::removeSearchField(int ADataRole)
 		LOG_DEBUG(QString("Roster search field removed, role=%1").arg(ADataRole));
 		Action *action = FFieldActions.take(ADataRole);
 		searchFieldsMenu()->removeAction(action);
-		delete action;
+		action->deleteLater();
 		emit searchFieldRemoved(ADataRole);
 	}
 }

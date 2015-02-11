@@ -1870,18 +1870,24 @@ void MetaContacts::onRostersViewIndexContextMenuAboutToShow()
 	if (proxyMenu != NULL)
 	{
 		// Emit aboutToShow in proxyMenu
+		proxyMenu->setMaximumSize(0,0);
 		proxyMenu->popup(QPoint(0,0));
 
-		QStringList proxyActions;
+		QStringList proxyCaptions;
+		QList<Action *> proxyActions;
 		foreach(Action *action, proxyMenu->groupActions())
 		{
-			proxyActions.append(action->text());
-			menu->addAction(action,proxyMenu->actionGroup(action),true);
+			proxyActions.append(action);
+			proxyCaptions.append(action->text());
+			int proxyGroup = proxyMenu->actionGroup(action);
+
+			proxyMenu->removeAction(action);
+			menu->addAction(action,proxyGroup,true);
 		}
 
 		foreach(Action *action, menu->groupActions())
 		{
-			if (proxyActions.contains(action->text()) && proxyMenu->actionGroup(action)==AG_NULL)
+			if (proxyCaptions.contains(action->text()) && !proxyActions.contains(action))
 				menu->removeAction(action);
 		}
 
