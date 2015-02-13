@@ -1,7 +1,11 @@
 #include "archiveviewwindow.h"
 
 #include <QLocale>
+#include <QCursor>
+#include <QPrinter>
 #include <QMessageBox>
+#include <QFileDialog>
+#include <QPrintDialog>
 #include <QItemSelectionModel>
 #include <QNetworkAccessManager>
 #include <definitions/menuicons.h>
@@ -17,6 +21,8 @@
 #define ADR_HEADER_WITH              Action::DR_Parametr1
 #define ADR_HEADER_START             Action::DR_Parametr2
 #define ADR_HEADER_END               Action::DR_Parametr3
+
+#define ADR_EXPORT_AS_HTML           Action::DR_Parametr1
 
 #define MIN_LOAD_HEADERS             50
 #define MAX_HILIGHT_ITEMS            10
@@ -155,10 +161,16 @@ ArchiveViewWindow::ArchiveViewWindow(IPluginManager *APluginManager, IMessageArc
 	ui.trvHeaders->setModel(FProxyModel);
 	ui.trvHeaders->setBottomWidget(FHeaderActionLabel);
 	ui.trvHeaders->header()->setSortIndicator(0,Qt::AscendingOrder);
-	connect(ui.trvHeaders->selectionModel(),SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)),
-		SLOT(onCurrentItemChanged(const QModelIndex &, const QModelIndex &)));
+	connect(ui.trvHeaders->selectionModel(),SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+		SLOT(onCurrentSelectionChanged(const QItemSelection &, const QItemSelection &)));
 	connect(ui.trvHeaders,SIGNAL(customContextMenuRequested(const QPoint &)),SLOT(onHeaderContextMenuRequested(const QPoint &)));
 	
+	FExportLabel = new QLabel(ui.stbStatusBar);
+	FExportLabel->setTextFormat(Qt::RichText);
+	FExportLabel->setText(QString("<a href='export'>%1</a>").arg(tr("Export")));
+	connect(FExportLabel,SIGNAL(linkActivated(const QString &)),SLOT(onExportLabelLinkActivated(const QString &)));
+	ui.stbStatusBar->addPermanentWidget(FExportLabel);
+
 	FHeadersRequestTimer.setSingleShot(true);
 	connect(&FHeadersRequestTimer,SIGNAL(timeout()),SLOT(onHeadersRequestTimerTimeout()));
 
@@ -427,6 +439,14 @@ QMultiMap<Jid,Jid> ArchiveViewWindow::itemAddresses(const QStandardItem *AItem) 
 	return address;
 }
 
+QList<ArchiveHeader> ArchiveViewWindow::itemsHeaders(const QList<QStandardItem *> &AItems) const
+{
+	QList<ArchiveHeader> headers;
+	foreach(QStandardItem *item, filterChildItems(AItems))
+		headers.append(itemHeaders(item));
+	return headers;
+}
+
 QStandardItem *ArchiveViewWindow::findItem(int AType, int ARole, const QVariant &AValue, QStandardItem *AParent) const
 {
 	QStandardItem *parent = AParent!=NULL ? AParent : FModel->invisibleRootItem();
@@ -439,30 +459,60 @@ QStandardItem *ArchiveViewWindow::findItem(int AType, int ARole, const QVariant 
 	return NULL;
 }
 
-void ArchiveViewWindow::removeRequestItems(const Jid &AStreamJid, const IArchiveRequest &ARequest)
+QList<QStandardItem *> ArchiveViewWindow::selectedItems() const
 {
-	foreach(QStandardItem *item, findRequestItems(AStreamJid, ARequest))
+	QList<QStandardItem *> items;
+	foreach(const QModelIndex &proxyIndex, ui.trvHeaders->selectionModel()->selectedIndexes())
 	{
-		FCollections.remove(itemHeader(item));
+		QModelIndex sourceIndex = FProxyModel->mapToSource(proxyIndex);
+		if (sourceIndex.isValid())
+			items.append(FModel->itemFromIndex(sourceIndex));
+	}
+	return items;
+}
 
+QList<QStandardItem *> ArchiveViewWindow::filterChildItems(const QList<QStandardItem *> &AItems) const
+{
+	QList<QStandardItem *> items;
+
+	QSet<QStandardItem *> acceptParents;
+	QSet<QStandardItem *> declineParents;
+	foreach(QStandardItem *item, AItems)
+	{
 		QStandardItem *parentItem = item->parent();
-		while (parentItem != NULL)
+		if (parentItem == NULL)
 		{
-			if (parentItem->rowCount() > 1)
+			items.append(item);
+		}
+		else if (acceptParents.contains(parentItem))
+		{
+			items.append(item);
+		}
+		else if (!declineParents.contains(parentItem))
+		{
+			QSet<QStandardItem *> parents;
+
+			bool isChild = false;
+			while (!isChild && parentItem!=NULL)
 			{
-				parentItem->removeRow(item->row());
-				break;
+				parents += parentItem;
+				isChild = AItems.contains(parentItem);
+				parentItem = parentItem->parent();
+			}
+
+			if (!isChild)
+			{
+				acceptParents += parents;
+				items.append(item);
 			}
 			else
 			{
-				item = parentItem;
-				parentItem = parentItem->parent();
+				declineParents += parents;
 			}
 		}
-
-		if (parentItem == NULL)
-			qDeleteAll(FModel->takeRow(item->row()));
 	}
+
+	return items;
 }
 
 QList<QStandardItem *> ArchiveViewWindow::findStreamItems(const Jid &AStreamJid, QStandardItem *AParent) const
@@ -514,6 +564,32 @@ QList<QStandardItem *> ArchiveViewWindow::findRequestItems(const Jid &AStreamJid
 		}
 	}
 	return items;
+}
+
+void ArchiveViewWindow::removeRequestItems(const Jid &AStreamJid, const IArchiveRequest &ARequest)
+{
+	foreach(QStandardItem *item, findRequestItems(AStreamJid, ARequest))
+	{
+		FCollections.remove(itemHeader(item));
+
+		QStandardItem *parentItem = item->parent();
+		while (parentItem != NULL)
+		{
+			if (parentItem->rowCount() > 1)
+			{
+				parentItem->removeRow(item->row());
+				break;
+			}
+			else
+			{
+				item = parentItem;
+				parentItem = parentItem->parent();
+			}
+		}
+
+		if (parentItem == NULL)
+			qDeleteAll(FModel->takeRow(item->row()));
+	}
 }
 
 void ArchiveViewWindow::setRequestStatus(RequestStatus AStatus, const QString &AMessage)
@@ -576,6 +652,7 @@ void ArchiveViewWindow::setMessageStatus(RequestStatus AStatus, const QString &A
 {
 	ui.wdtTextSearch->setEnabled(AStatus!=RequestStarted && !ui.tbrMessages->document()->isEmpty());
 	FMessagesEmptyLabel->setVisible(AStatus!=RequestStarted && ui.tbrMessages->document()->isEmpty());
+	FExportLabel->setVisible(AStatus!=RequestStarted && !ui.tbrMessages->document()->isEmpty());
 
 	if (AStatus == RequestFinished)
 	{
@@ -1125,44 +1202,54 @@ void ArchiveViewWindow::onRemoveCollectionsByAction()
 	Action *action = qobject_cast<Action *>(sender());
 	if (action!=NULL && FRemoveRequests.isEmpty())
 	{
-		IArchiveRequest request;
-		request.start = action->data(ADR_HEADER_START).toDateTime();
-		request.end = action->data(ADR_HEADER_END).toDateTime();
+		QVariantList headerStream = action->data(ADR_HEADER_STREAM).toList();
+		QVariantList headerWith = action->data(ADR_HEADER_WITH).toList();
+		QVariantList headerStart = action->data(ADR_HEADER_START).toList();
+		QVariantList headerEnd = action->data(ADR_HEADER_END).toList();
 
-		QStringList streams = action->data(ADR_HEADER_STREAM).toStringList();
-		QStringList contacts = action->data(ADR_HEADER_WITH).toStringList();
-
-		QStringList namesList;
-		for (int i=0; i<streams.count() && i<contacts.count(); i++)
-			namesList.append(contactName(streams.value(i),contacts.value(i),!request.end.isValid()));
-		QString names = namesList.join(", ");
-
-		QString message;
-		if (request.end.isValid())
+		QSet<QString> conversationSet;
+		for (int i=0; i<headerStream.count() && i<headerWith.count() && i<headerStart.count() && i<headerEnd.count(); i++)
 		{
-			message = tr("Do you want to remove conversation history with <b>%1</b> for <b>%2 %3</b>?").arg(Qt::escape(names))
-				.arg(QLocale().monthName(request.start.date().month()))
-				.arg(request.start.date().year());
-		}
-		else if (request.start.isValid())
-		{
-			message = tr("Do you want to remove conversation with <b>%1</b> started at <b>%2</b>?").arg(Qt::escape(names)).arg(request.start.toString());
-		}
-		else
-		{
-			message = tr("Do you want to remove <b>all</b> conversation history with <b>%1</b>?").arg(Qt::escape(names));
-		}
-
-		if (QMessageBox::question(this, tr("Remove conversation history"), message, QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
-		{
-			for (int i=0; i<streams.count() && i<contacts.count(); i++)
+			QString name = contactName(headerStream.value(i).toString(),headerWith.value(i).toString(),headerEnd.at(i).isNull());
+			if (!headerEnd.at(i).isNull())
 			{
-				request.with = contacts.at(i);
+				conversationSet += tr("with <b>%1</b> for <b>%2 %3</b>?").arg(Qt::escape(name))
+					.arg(QLocale().monthName(headerStart.at(i).toDate().month()))
+					.arg(headerStart.at(i).toDate().year());
+			}
+			else if (!headerStart.at(i).isNull())
+			{
+				conversationSet += tr("with <b>%1</b> started at <b>%2</b>?").arg(Qt::escape(name)).arg(headerStart.at(i).toDateTime().toString());
+			}
+			else
+			{
+				conversationSet += tr("with <b>%1</b> for all time?").arg(Qt::escape(name));
+			}
+		}
+		
+		QStringList conversationList = conversationSet.toList();
+		if (conversationSet.count() > 15)
+		{
+			conversationList = conversationList.mid(0,10);
+			conversationList += tr("And %n other conversations","",conversationSet.count()-conversationList.count());
+		}
+
+		if (QMessageBox::question(this,
+			tr("Remove conversation history"),
+			tr("Do you want to remove the following conversations?") + QString("<ul><li>%1</li></ul>").arg(conversationList.join("</li><li>")),
+			QMessageBox::Yes|QMessageBox::No) == QMessageBox::Yes)
+		{
+			for (int i=0; i<headerStream.count() && i<headerWith.count() && i<headerStart.count() && i<headerEnd.count(); i++)
+			{
+				IArchiveRequest request;
+				request.with = headerWith.at(i).toString();
+				request.start = headerStart.at(i).toDateTime();
+				request.end = headerEnd.at(i).toDateTime();
 				request.exactmatch = !request.with.isEmpty() && request.with.node().isEmpty();
 
-				QString reqId = FArchiver->removeCollections(streams.at(i),request);
+				QString reqId = FArchiver->removeCollections(headerStream.at(i).toString(),request);
 				if (!reqId.isEmpty())
-					FRemoveRequests.insert(reqId,streams.at(i));
+					FRemoveRequests.insert(reqId,headerStream.at(i).toString());
 
 				if (!FRemoveRequests.isEmpty())
 					setRequestStatus(RequestStarted,tr("Removing conversations..."));
@@ -1175,35 +1262,72 @@ void ArchiveViewWindow::onRemoveCollectionsByAction()
 
 void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 {
-	QStandardItem *item =  FModel->itemFromIndex(FProxyModel->mapToSource(ui.trvHeaders->indexAt(APos)));
-	if (item)
+	QList<QStandardItem *> items = filterChildItems(selectedItems());
+	if (!items.isEmpty())
 	{
 		Menu *menu = new Menu(this);
 		menu->setAttribute(Qt::WA_DeleteOnClose,true);
 
-		QStringList streams;
-		QStringList contacts;
-		QMultiMap<Jid,Jid> address = itemAddresses(item);
-		for (QMultiMap<Jid,Jid>::const_iterator it=address.constBegin(); it!=address.constEnd(); ++it)
+		QVariantList headerStream;
+		QVariantList headerWith;
+		QVariantList headerStart;
+		QVariantList headerEnd;
+		foreach(QStandardItem *item, items)
 		{
-			streams.append(it.key().pFull());
-			contacts.append(it.value().pFull());
+			QMultiMap<Jid,Jid> address = itemAddresses(item);
+			for (QMultiMap<Jid,Jid>::const_iterator it=address.constBegin(); it!=address.constEnd(); ++it)
+			{
+				headerStream.append(it.key().pFull());
+				headerWith.append(it.value().pFull());
+
+				int itemType = item->data(HDR_TYPE).toInt();
+				if (itemType == HIT_DATEGROUP)
+				{
+					QDate date = item->data(HDR_DATEGROUP_DATE).toDate();
+					headerStart.append(QDateTime(date));
+					headerEnd.append(QDateTime(date).addMonths(1));
+				}
+				else if (itemType == HIT_HEADER)
+				{
+					headerStart.append(item->data(HDR_HEADER_START));
+					headerEnd.append(QVariant());
+				}
+				else
+				{
+					headerStart.append(QVariant());
+					headerEnd.append(QVariant());
+				}
+			}
 		}
 
+		QStandardItem *item = items.value(0);
 		int itemType = item->data(HDR_TYPE).toInt();
-		if (itemType == HIT_CONTACT)
+		if (items.count() > 1)
+		{
+			Action *removeSelected = new Action(menu);
+			removeSelected->setText(tr("Remove Selected Conversations"));
+			removeSelected->setData(ADR_HEADER_STREAM,headerStream);
+			removeSelected->setData(ADR_HEADER_WITH,headerWith);
+			removeSelected->setData(ADR_HEADER_START,headerStart);
+			removeSelected->setData(ADR_HEADER_END,headerEnd);
+			connect(removeSelected,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
+			menu->addAction(removeSelected,AG_DEFAULT+500);
+		}
+		else if (itemType == HIT_CONTACT)
 		{
 			Action *setContact = new Action(menu);
 			setContact->setText(tr("Show Contact History"));
-			setContact->setData(ADR_HEADER_STREAM,streams);
-			setContact->setData(ADR_HEADER_WITH,contacts);
+			setContact->setData(ADR_HEADER_STREAM,headerStream);
+			setContact->setData(ADR_HEADER_WITH,headerWith);
 			connect(setContact,SIGNAL(triggered()),SLOT(onSetContactJidByAction()));
 			menu->addAction(setContact,AG_DEFAULT);
 
 			Action *removeAll = new Action(menu);
 			removeAll->setText(tr("Remove all History with %1").arg(item->text()));
-			removeAll->setData(ADR_HEADER_STREAM,streams);
-			removeAll->setData(ADR_HEADER_WITH,contacts);
+			removeAll->setData(ADR_HEADER_STREAM,headerStream);
+			removeAll->setData(ADR_HEADER_WITH,headerWith);
+			removeAll->setData(ADR_HEADER_START,headerStart);
+			removeAll->setData(ADR_HEADER_END,headerEnd);
 			connect(removeAll,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
 			menu->addAction(removeAll,AG_DEFAULT+500);
 		}
@@ -1212,10 +1336,10 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 			Action *removeDate = new Action(menu);
 			QDate date = item->data(HDR_DATEGROUP_DATE).toDate();
 			removeDate->setText(tr("Remove History for %1").arg(item->text()));
-			removeDate->setData(ADR_HEADER_STREAM,streams);
-			removeDate->setData(ADR_HEADER_WITH,contacts);
-			removeDate->setData(ADR_HEADER_START,QDateTime(date));
-			removeDate->setData(ADR_HEADER_END,QDateTime(date).addMonths(1));
+			removeDate->setData(ADR_HEADER_STREAM,headerStream);
+			removeDate->setData(ADR_HEADER_WITH,headerWith);
+			removeDate->setData(ADR_HEADER_START,headerStart);
+			removeDate->setData(ADR_HEADER_END,headerEnd);
 			connect(removeDate,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
 			menu->addAction(removeDate,AG_DEFAULT+500);
 		}
@@ -1223,9 +1347,10 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 		{
 			Action *removeHeader = new Action(menu);
 			removeHeader->setText(tr("Remove this Conversation"));
-			removeHeader->setData(ADR_HEADER_STREAM,streams);
-			removeHeader->setData(ADR_HEADER_WITH,contacts);
-			removeHeader->setData(ADR_HEADER_START,item->data(HDR_HEADER_START));
+			removeHeader->setData(ADR_HEADER_STREAM,headerStream);
+			removeHeader->setData(ADR_HEADER_WITH,headerWith);
+			removeHeader->setData(ADR_HEADER_START,headerStart);
+			removeHeader->setData(ADR_HEADER_END,headerEnd);
 			connect(removeHeader,SIGNAL(triggered()),SLOT(onRemoveCollectionsByAction()));
 			menu->addAction(removeHeader);
 		}
@@ -1234,6 +1359,77 @@ void ArchiveViewWindow::onHeaderContextMenuRequested(const QPoint &APos)
 			menu->popup(ui.trvHeaders->viewport()->mapToGlobal(APos));
 		else
 			delete menu;
+	}
+}
+
+void ArchiveViewWindow::onPrintConversationsByAction()
+{
+	QPrinter printer;
+	
+	QPrintDialog *dialog = new QPrintDialog(&printer, this);
+	dialog->setWindowTitle(tr("Print Conversation History"));
+	
+	if (ui.tbrMessages->textCursor().hasSelection())
+		dialog->addEnabledOption(QAbstractPrintDialog::PrintSelection);
+
+	if (dialog->exec() == QDialog::Accepted)
+		ui.tbrMessages->print(&printer);
+}
+
+void ArchiveViewWindow::onExportConversationsByAction()
+{
+	Action *action = qobject_cast<Action *>(sender());
+	if (action)
+	{
+		bool isHtml = action->data(ADR_EXPORT_AS_HTML).toBool();
+		QString filter = isHtml ? tr("HTML file (*.html)") : tr("Text file (*.txt)");
+		QString fileName = QFileDialog::getSaveFileName(this, tr("Save Conversations to File"),QString::null,filter);
+		if (!fileName.isEmpty())
+		{
+			QFile file(fileName);
+			if (file.open(QFile::WriteOnly|QFile::Truncate))
+			{
+				if (isHtml)
+					file.write(ui.tbrMessages->toHtml().toUtf8());
+				else
+					file.write(ui.tbrMessages->toPlainText().toUtf8());
+				file.close();
+			}
+			else
+			{
+				LOG_ERROR(QString("Failed to export conversation history to file: %1").arg(file.errorString()));
+			}
+		}
+	}
+}
+
+void ArchiveViewWindow::onExportLabelLinkActivated(const QString &ALink)
+{
+	Q_UNUSED(ALink);
+	if (!FSelectedHeaders.isEmpty())
+	{
+		Menu *menu = new Menu(this);
+		menu->setAttribute(Qt::WA_DeleteOnClose,true);
+
+		Action *exportPrinter = new Action(menu);
+		exportPrinter->setText(tr("Print..."));
+		exportPrinter->setData(ADR_EXPORT_AS_HTML, false);
+		connect(exportPrinter,SIGNAL(triggered()),SLOT(onPrintConversationsByAction()));
+		menu->addAction(exportPrinter);
+
+		Action *exportHtml = new Action(menu);
+		exportHtml->setText(tr("Save as HTML"));
+		exportHtml->setData(ADR_EXPORT_AS_HTML, true);
+		connect(exportHtml,SIGNAL(triggered()),SLOT(onExportConversationsByAction()));
+		menu->addAction(exportHtml);
+
+		Action *exportPlain = new Action(menu);
+		exportPlain->setText(tr("Save as Text"));
+		exportPlain->setData(ADR_EXPORT_AS_HTML, false);
+		connect(exportPlain,SIGNAL(triggered()),SLOT(onExportConversationsByAction()));
+		menu->addAction(exportPlain);
+
+		menu->popup(QCursor::pos());
 	}
 }
 
@@ -1287,20 +1483,16 @@ void ArchiveViewWindow::onHeadersLoadMoreLinkClicked()
 
 void ArchiveViewWindow::onCollectionsRequestTimerTimeout()
 {
-	QModelIndex index = FProxyModel->mapToSource(ui.trvHeaders->selectionModel()->currentIndex());
-	if (index.isValid())
+	QList<ArchiveHeader> headers = itemsHeaders(selectedItems());
+	qSort(headers);
+
+	if (FSelectedHeaders != headers)
 	{
-		QList<ArchiveHeader> headers = itemHeaders(FModel->itemFromIndex(index));
-		qSort(headers);
+		clearMessages();
+		FSelectedHeaders = headers;
 
-		if (FSelectedHeaders != headers)
-		{
-			clearMessages();
-			FSelectedHeaders = headers;
-
-			setMessageStatus(RequestStarted);
-			processCollectionsLoad();
-		}
+		setMessageStatus(RequestStarted);
+		processCollectionsLoad();
 	}
 }
 
@@ -1309,10 +1501,10 @@ void ArchiveViewWindow::onCollectionsProcessTimerTimeout()
 	processCollectionsLoad();
 }
 
-void ArchiveViewWindow::onCurrentItemChanged(const QModelIndex &ACurrent, const QModelIndex &ABefore)
+void ArchiveViewWindow::onCurrentSelectionChanged(const QItemSelection &ASelected, const QItemSelection &ADeselected)
 {
-	Q_UNUSED(ABefore);
-	if (ACurrent.isValid())
+	Q_UNUSED(ASelected); Q_UNUSED(ADeselected);
+	if (ui.trvHeaders->selectionModel()->hasSelection())
 		FCollectionsRequestTimer.start(LOAD_COLLECTION_TIMEOUT);
 	else if (!ui.tbrMessages->document()->isEmpty())
 		clearMessages();

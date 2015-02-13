@@ -321,18 +321,6 @@
         <translation>Фраза не найдена</translation>
     </message>
     <message>
-        <source>Do you want to remove conversation history with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
-        <translation>Вы хотите удалить историю разговоров с &lt;b&gt;%1&lt;/b&gt; за &lt;b&gt;%2 %3&lt;/b&gt;?</translation>
-    </message>
-    <message>
-        <source>Do you want to remove conversation with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
-        <translation>Вы хотите удалить разговор с &lt;b&gt;%1&lt;/b&gt; начатый в &lt;b&gt;%2&lt;/b&gt;?</translation>
-    </message>
-    <message>
-        <source>Do you want to remove &lt;b&gt;all&lt;/b&gt; conversation history with &lt;b&gt;%1&lt;/b&gt;?</source>
-        <translation>Вы хотите удалить &lt;b&gt;всю&lt;/b&gt; историю разговоров с &lt;b&gt;%1&lt;/b&gt;?</translation>
-    </message>
-    <message>
         <source>Remove conversation history</source>
         <translation>Удалить историю разговоров</translation>
     </message>
@@ -435,6 +423,66 @@
     <message>
         <source>Shown %1 of %2 conversations...</source>
         <translation>Показано %1 из %2 разговоров...</translation>
+    </message>
+    <message>
+        <source>with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
+        <translation>с &lt;b&gt;%1&lt;/b&gt; за &lt;b&gt;%2 %3&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <source>with &lt;b&gt;%1&lt;/b&gt; started at &lt;b&gt;%2&lt;/b&gt;?</source>
+        <translation>с &lt;b&gt;%1&lt;/b&gt; начатый в &lt;b&gt;%2&lt;/b&gt;?</translation>
+    </message>
+    <message>
+        <source>with &lt;b&gt;%1&lt;/b&gt; for all time?</source>
+        <translation>с &lt;b&gt;%1&lt;/b&gt; за все время?</translation>
+    </message>
+    <message numerus="yes">
+        <source>And %n other conversations</source>
+        <translation>
+            <numerusform>И еще %n разговор</numerusform>
+            <numerusform>И еще %n разговора</numerusform>
+            <numerusform>И еще %n разговоров</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Do you want to remove the following conversations?</source>
+        <translation>Вы хотиде удалить следующие разговоры?</translation>
+    </message>
+    <message>
+        <source>Remove Selected Conversations</source>
+        <translation>Удалить выбранные разговоры</translation>
+    </message>
+    <message>
+        <source>Print Conversation History</source>
+        <translation>Печать истории разговоров</translation>
+    </message>
+    <message>
+        <source>HTML file (*.html)</source>
+        <translation>Файл HTML (*.html)</translation>
+    </message>
+    <message>
+        <source>Text file (*.txt)</source>
+        <translation>Текстовый файл (*.txt)</translation>
+    </message>
+    <message>
+        <source>Save Conversations to File</source>
+        <translation>Сохранить разговоры в файл</translation>
+    </message>
+    <message>
+        <source>Print...</source>
+        <translation>Печать...</translation>
+    </message>
+    <message>
+        <source>Save as HTML</source>
+        <translation>Сохранить как HTML</translation>
+    </message>
+    <message>
+        <source>Save as Text</source>
+        <translation>Сохранить как текст</translation>
+    </message>
+    <message>
+        <source>Export</source>
+        <translation>Экспорт</translation>
     </message>
 </context>
 <context>
