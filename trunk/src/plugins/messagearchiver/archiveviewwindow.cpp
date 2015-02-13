@@ -553,6 +553,8 @@ QList<QStandardItem *> ArchiveViewWindow::findRequestItems(const Jid &AStreamJid
 				checked = false;
 			else if (ARequest.end.isValid() && ARequest.end<item->data(HDR_HEADER_START).toDateTime())
 				checked = false;
+			else if (ARequest.start.isValid() && !ARequest.end.isValid() && ARequest.start!=item->data(HDR_HEADER_START).toDateTime())
+				checked = false;
 			else if (!ARequest.threadId.isEmpty() && ARequest.threadId!=item->data(HDR_HEADER_THREAD).toString())
 				checked = false;
 			if (checked)
