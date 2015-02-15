@@ -33,7 +33,7 @@ class OptionsManager :
 public:
 	OptionsManager();
 	~OptionsManager();
-	//IPlugin
+	// IPlugin
 	virtual QObject *instance() { return this; }
 	virtual QUuid pluginUuid() const { return OPTIONSMANAGER_UUID; }
 	virtual void pluginInfo(IPluginInfo *APluginInfo);
@@ -41,9 +41,9 @@ public:
 	virtual bool initObjects();
 	virtual bool initSettings();
 	virtual bool startPlugin();
-	//IOptionsHolder
+	// IOptionsHolder
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
-	//IOptionsManager
+	// IOptionsManager
 	virtual bool isOpened() const;
 	virtual QList<QString> profiles() const;
 	virtual QString profilePath(const QString &AProfile) const;
@@ -59,6 +59,7 @@ public:
 	virtual bool removeProfile(const QString &AProfile);
 	virtual QDialog *showLoginDialog(QWidget *AParent = NULL);
 	virtual QDialog *showEditProfilesDialog(QWidget *AParent = NULL);
+	// OptionsDialog
 	virtual QList<IOptionsDialogHolder *> optionsDialogHolders() const;
 	virtual void insertOptionsDialogHolder(IOptionsDialogHolder *AHolder);
 	virtual void removeOptionsDialogHolder(IOptionsDialogHolder *AHolder);
@@ -66,15 +67,19 @@ public:
 	virtual IOptionsDialogNode optionsDialogNode(const QString &ANodeId) const;
 	virtual void insertOptionsDialogNode(const IOptionsDialogNode &ANode);
 	virtual void removeOptionsDialogNode(const QString &ANodeId);
-	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, QWidget *AParent = NULL);
+	virtual QDialog *showOptionsDialog(const QString &ANodeId = QString::null, const QString &ARootId = QString::null, QWidget *AParent = NULL);
+	// OptionsDialogWidgets
 	virtual IOptionsDialogWidget *newOptionsDialogHeader(const QString &ACaption, QWidget *AParent) const;
 	virtual IOptionsDialogWidget *newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) const;
+	virtual IOptionsDialogWidget *newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AEditor, QWidget *AParent) const;
 signals:
+	// Profiles
 	void profileAdded(const QString &AProfile);
 	void profileOpened(const QString &AProfile);
 	void profileClosed(const QString &AProfile);
 	void profileRenamed(const QString &AProfile, const QString &ANewName);
 	void profileRemoved(const QString &AProfile);
+	// OptionsDialog
 	void optionsDialogHolderInserted(IOptionsDialogHolder *AHolder);
 	void optionsDialogHolderRemoved(IOptionsDialogHolder *AHolder);
 	void optionsDialogNodeInserted(const IOptionsDialogNode &ANode);
@@ -113,8 +118,8 @@ private:
 	QtLockedFile *FProfileLocker;
 private:
 	QPointer<LoginDialog> FLoginDialog;
-	QPointer<OptionsDialog> FOptionsDialog;
 	QPointer<EditProfilesDialog> FEditProfilesDialog;
+	QMap<QString, QPointer<OptionsDialog> > FOptionDialogs;
 private:
 	Action *FChangeProfileAction;
 	Action *FShowOptionsDialogAction;

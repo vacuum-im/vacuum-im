@@ -133,13 +133,14 @@ QMultiMap<int, IOptionsDialogWidget *> ConnectionManager::optionsDialogWidgets(c
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Parameters")
 	{
-		widgets.insertMulti(OWO_ACCOUNT_CONNECTION, new ConnectionOptionsWidget(this,Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)),AParent));
+		widgets.insertMulti(OHO_ACCOUNTS_PARAMS_CONNECTION,FOptionsManager->newOptionsDialogHeader(tr("Connection"),AParent));
+		widgets.insertMulti(OWO_ACCOUNTS_PARAMS_CONNECTION, new ConnectionOptionsWidget(this,Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)),AParent));
 	}
-	else if (ANodeId == OPN_MISC)
+	else if (ANodeId == OPN_ACCOUNTS)
 	{
-		widgets.insertMulti(OWO_MISC_DEFAULTPROXY, proxySettingsWidget(Options::node(OPV_PROXY_DEFAULT),AParent));
+		widgets.insertMulti(OWO_ACCOUNTS_DEFAULTPROXY, proxySettingsWidget(Options::node(OPV_PROXY_DEFAULT),AParent));
 	}
 	return widgets;
 }

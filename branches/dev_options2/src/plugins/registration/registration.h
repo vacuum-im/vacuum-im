@@ -7,7 +7,6 @@
 #include <interfaces/istanzaprocessor.h>
 #include <interfaces/iservicediscovery.h>
 #include <interfaces/ipresence.h>
-#include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/ixmppuriqueries.h>
@@ -22,11 +21,10 @@ class Registration :
 	public IXmppUriHandler,
 	public IDiscoFeatureHandler,
 	public IXmppFeaturesPlugin,
-	public IOptionsDialogHolder,
 	public IDataLocalizer
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IOptionsDialogHolder IDataLocalizer);
+	Q_INTERFACES(IPlugin IRegistration IStanzaRequestOwner IXmppUriHandler IDiscoFeatureHandler IXmppFeaturesPlugin IDataLocalizer);
 public:
 	Registration();
 	~Registration();
@@ -48,8 +46,6 @@ public:
 	//IXmppFeaturesPlugin
 	virtual QList<QString> xmppFeatures() const;
 	virtual IXmppFeature *newXmppFeature(const QString &AFeatureNS, IXmppStream *AXmppStream);
-	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IDataLocalizer
 	virtual IDataFormLocale dataFormLocale(const QString &AFormType);
 	//IRegistration
@@ -77,7 +73,6 @@ private:
 	IStanzaProcessor *FStanzaProcessor;
 	IServiceDiscovery *FDiscovery;
 	IPresencePlugin *FPresencePlugin;
-	IOptionsManager *FOptionsManager;
 	IAccountManager *FAccountManager;
 	IXmppUriQueries *FXmppUriQueries;
 private:

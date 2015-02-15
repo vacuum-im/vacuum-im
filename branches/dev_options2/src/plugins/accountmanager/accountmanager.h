@@ -7,11 +7,8 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/ixmppstreams.h>
 #include <interfaces/irostersview.h>
-#include "account.h"
-#include "accountoptions.h"
-#include "accountsoptions.h"
 
-class AccountsOptions;
+class AccountsOptionsWidget;
 
 class AccountManager :
 	public QObject,
@@ -50,19 +47,22 @@ signals:
 	void removed(IAccount *AAccount);
 	void changed(IAccount *AAcount, const OptionsNode &ANode);
 	void destroyed(const QUuid &AAccountId);
-public:
-	void showAccountOptionsDialog(const QUuid &AAccountId);
-	void openAccountOptionsNode(const QUuid &AAccountId, const QString &AName);
+protected:
+	void openAccountOptionsNode(const QUuid &AAccountId);
 	void closeAccountOptionsNode(const QUuid &AAccountId);
+	void showAccountOptionsDialog(const QUuid &AAccountId, QWidget *AParent=NULL);
+	QComboBox *newResourceComboBox(const QUuid &AAccountId, QWidget *AParent) const;
 protected slots:
-	void onProfileOpened(const QString &AProfile);
-	void onProfileClosed(const QString &AProfile);
 	void onOptionsOpened();
 	void onOptionsClosed();
+	void onOptionsChanged(const OptionsNode &ANode);
+	void onProfileOpened(const QString &AProfile);
+	void onProfileClosed(const QString &AProfile);
 	void onShowAccountOptions(bool);
 	void onAccountActiveChanged(bool AActive);
 	void onAccountOptionsChanged(const OptionsNode &ANode);
 	void onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu);
+	void onResourceComboBoxEditFinished();
 private:
 	IXmppStreams *FXmppStreams;
 	IOptionsManager *FOptionsManager;

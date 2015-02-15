@@ -2,6 +2,7 @@
 #define OPTIONSWIDGET_H
 
 #include <QLabel>
+#include <QSpinBox>
 #include <QDateEdit>
 #include <QTimeEdit>
 #include <QCheckBox>
@@ -9,6 +10,7 @@
 #include <QComboBox>
 #include <QFontComboBox>
 #include <QDateTimeEdit>
+#include <QDoubleSpinBox>
 #include <QHBoxLayout>
 #include <interfaces/ioptionsmanager.h>
 
@@ -20,7 +22,8 @@ class OptionsDialogWidget :
 	Q_INTERFACES(IOptionsDialogWidget);
 public:
 	OptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent);
-	~OptionsDialogWidget();
+	OptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AControl, QWidget *AParent);
+	virtual ~OptionsDialogWidget();
 	virtual QWidget* instance() { return this; }
 public slots:
 	virtual void apply();
@@ -30,15 +33,21 @@ signals:
 	void childApply();
 	void childReset();
 protected:
-	void insertWithCaption(const QString &ACaption, QWidget *ABuddy, QHBoxLayout *ALayout);
 	bool eventFilter(QObject *AWatched, QEvent *AEvent);
+protected:
+	void insertEditor(const QString &ACaption, QWidget *AEditor, QHBoxLayout *ALayout);
+	void rigisterEditor(const OptionsNode &ANode, const QString &ACaption, QWidget *AEditor);
 private:
-	QLabel *FLabel;
+	QLabel *FCaption;
 	QCheckBox *FCheckBox;
 	QLineEdit *FLineEdit;
 	QComboBox *FComboBox;
-	QFontComboBox *FFontComboBox;
-	QDateTimeEdit *FDateTimeEdit;
+	QFontComboBox *FFontComboBox;       // inherits QComboBox
+	QSpinBox *FSpinBox;
+	QTimeEdit *FTimeEdit;               // inherits QDateTimeEdit
+	QDateEdit *FDateEdit;               // inherits QDateTimeEdit
+	QDateTimeEdit *FDateTimeEdit;       // inherits QSpinBox
+	QDoubleSpinBox *FDoubleSpinBox;     // inherits QSpinBox
 private:
 	QVariant FValue;
 	OptionsNode FNode;

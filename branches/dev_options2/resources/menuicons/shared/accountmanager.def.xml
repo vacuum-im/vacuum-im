@@ -12,9 +12,4 @@
     <key>accountChange</key>
     <object mime="image/png">accountchange.png</object>
   </icon>
-  <!--AutoStatus-->
-  <icon>
-    <key>autostatus</key>
-    <object mime="image/png">autostatus.png</object>
-  </icon>
 </icondef>

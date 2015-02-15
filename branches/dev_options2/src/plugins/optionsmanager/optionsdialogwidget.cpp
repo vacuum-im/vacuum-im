@@ -2,87 +2,79 @@
 
 #include <QKeyEvent>
 #include <QKeySequence>
-#include <QIntValidator>
-#include <QDoubleValidator>
 #include <utils/options.h>
+#include <utils/logger.h>
 
 OptionsDialogWidget::OptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AParent) : QWidget(AParent)
 {
-	FNode = ANode;
-	FValue = FNode.value();
-	QHBoxLayout *FLayout = new QHBoxLayout(this);
-
-	if (FValue.type() == QVariant::Bool)
+	QVariant::Type valueType = ANode.value().type();
+	if (valueType == QVariant::Bool)
 	{
-		FCheckBox = new QCheckBox(ACaption,this);
-		FCheckBox->setChecked(FValue.toBool());
-		connect(FCheckBox,SIGNAL(stateChanged(int)),SIGNAL(modified()));
-		FLayout->addWidget(FCheckBox);
+		QCheckBox *editor = new QCheckBox(ACaption,this);
+		rigisterEditor(ANode,ACaption,editor);
 	}
-	else if (FValue.type()==QVariant::Time || FValue.type()==QVariant::Date || FValue.type()==QVariant::DateTime)
+	else if (valueType==QVariant::Time || valueType==QVariant::Date || valueType==QVariant::DateTime)
 	{
-		if (FValue.type() == QVariant::Time)
-			FDateTimeEdit = new QTimeEdit(FValue.toTime(), this);
-		else if (FValue.type() == QVariant::Date)
-			FDateTimeEdit = new QDateEdit(FValue.toDate(), this);
+		QDateTimeEdit *editor;
+		if (valueType == QVariant::Time)
+			editor = new QTimeEdit(this);
+		else if (valueType == QVariant::Date)
+			editor = new QDateEdit(this);
 		else
-			FDateTimeEdit = new QDateTimeEdit(FValue.toDateTime(),this);
-		FDateTimeEdit->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
-		connect(FDateTimeEdit,SIGNAL(dateTimeChanged(const QDateTime &)),SIGNAL(modified()));
-		insertWithCaption(ACaption,FDateTimeEdit,FLayout);
+			editor = new QDateTimeEdit(this);
+		rigisterEditor(ANode,ACaption,editor);
 	}
-	else if (FValue.type() == QVariant::Color)
+	else if (valueType == QVariant::Color)
 	{
-		FComboBox = new QComboBox(this);
+		QComboBox *editor = new QComboBox(this);
 		foreach(const QString &color, QColor::colorNames())
 		{
-			FComboBox->addItem(color,QColor(color));
-			FComboBox->setItemData(FComboBox->count()-1,QColor(color),Qt::DecorationRole);
+			editor->addItem(color,QColor(color));
+			editor->setItemData(editor->count()-1,QColor(color),Qt::DecorationRole);
 		}
-		FComboBox->setCurrentIndex(FComboBox->findData(FValue));
-		FComboBox->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
-		connect(FComboBox,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
-		insertWithCaption(ACaption,FComboBox,FLayout);
+		rigisterEditor(ANode,ACaption,editor);
 	}
-	else if (FValue.type() == QVariant::Font)
+	else if (valueType == QVariant::Font)
 	{
-		FFontComboBox = new QFontComboBox(this);
-		FFontComboBox->setCurrentFont(FValue.value<QFont>());
-		FFontComboBox->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
-		connect(FFontComboBox,SIGNAL(currentFontChanged(const QFont &)),SIGNAL(modified()));
-		insertWithCaption(ACaption,FFontComboBox,FLayout);
+		QFontComboBox *editor = new QFontComboBox(this);
+		rigisterEditor(ANode,ACaption,editor);
 	}
-	else if (FValue.canConvert(QVariant::String))
+	else if (valueType==QVariant::Int || valueType==QVariant::LongLong)
 	{
-		FLineEdit = new QLineEdit(this);
-		if (FValue.type()==QVariant::Int || FValue.type()==QVariant::LongLong)
-		{
-			QIntValidator *validator = new QIntValidator(FLineEdit);
-			FLineEdit->setValidator(validator);
-		}
-		else if (FValue.type()==QVariant::UInt || FValue.type()==QVariant::ULongLong)
-		{
-			QIntValidator *validator = new QIntValidator(FLineEdit);
-			validator->setBottom(0);
-			FLineEdit->setValidator(validator);
-		}
-		else if (FValue.type() == QVariant::Double)
-		{
-			QDoubleValidator *validator = new QDoubleValidator(FLineEdit);
-			FLineEdit->setValidator(validator);
-		}
-		else if (FValue.type() == QVariant::KeySequence)
-		{
-			FLineEdit->installEventFilter(this);
-		}
-		FLineEdit->setText(FValue.toString());
-		FLineEdit->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
-		connect(FLineEdit,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
-		insertWithCaption(ACaption,FLineEdit,FLayout);
+		QSpinBox *editor = new QSpinBox(this);
+		rigisterEditor(ANode,ACaption,editor);
 	}
+	else if (valueType==QVariant::UInt || valueType==QVariant::ULongLong)
+	{
+		QSpinBox *editor = new QSpinBox(this);
+		editor->setMinimum(0);
+		rigisterEditor(ANode,ACaption,editor);
+	}
+	else if (valueType == QVariant::Double)
+	{
+		QDoubleSpinBox *editor = new QDoubleSpinBox(this);
+		rigisterEditor(ANode,ACaption,editor);
+	}
+	else if (valueType == QVariant::ByteArray)
+	{
+		QLineEdit *editor = new QLineEdit(this);
+		editor->setEchoMode(QLineEdit::Password);
+		rigisterEditor(ANode,ACaption,editor);
+	}
+	else if (valueType==QVariant::String || valueType==QVariant::KeySequence)
+	{
+		QLineEdit *editor = new QLineEdit(this);
+		rigisterEditor(ANode,ACaption,editor);
+	}
+	else
+	{
+		REPORT_ERROR(QString("Unsupported options widget node value type=%1").arg(valueType));
+	}
+}
 
-	setLayout(FLayout);
-	layout()->setMargin(0);
+OptionsDialogWidget::OptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AEditor, QWidget *AParent) : QWidget(AParent)
+{
+	rigisterEditor(ANode,ACaption,AEditor);
 }
 
 OptionsDialogWidget::~OptionsDialogWidget()
@@ -92,87 +84,101 @@ OptionsDialogWidget::~OptionsDialogWidget()
 
 void OptionsDialogWidget::apply()
 {
-	if (FValue.type() == QVariant::Bool)
+	if (FCheckBox != NULL)
 	{
 		FValue = FCheckBox->isChecked();
 	}
-	else if (FValue.type() == QVariant::Time)
+	else if (FLineEdit != NULL)
 	{
-		FValue = FDateTimeEdit->time();
+		if (FLineEdit->echoMode() == QLineEdit::Password)
+			FValue = Options::encrypt(FLineEdit->text());
+		else
+			FValue = FLineEdit->text();
 	}
-	else if (FValue.type() == QVariant::Date)
+	else if (FFontComboBox != NULL)
 	{
-		FValue = FDateTimeEdit->date();
+		FValue = FFontComboBox->currentFont();
 	}
-	else if (FValue.type() == QVariant::DateTime)
-	{
-		FValue = FDateTimeEdit->dateTime();
-	}
-	else if (FValue.type() == QVariant::Color)
+	else if (FComboBox != NULL)
 	{
 		if (FComboBox->currentIndex() >= 0)
 			FValue = FComboBox->itemData(FComboBox->currentIndex());
 	}
-	else if (FValue.type() == QVariant::Font)
+	else if (FTimeEdit != NULL)
 	{
-		FValue = FFontComboBox->currentFont();
+		FValue = FTimeEdit->time();
 	}
-	else if (FValue.canConvert(QVariant::String))
+	else if (FDateEdit != NULL)
 	{
-		QVariant strValue = FLineEdit->text();
-		if (strValue.convert(FValue.type()))
-			FValue = strValue;
+		FValue = FDateEdit->date();
 	}
-	FNode.setValue(FValue);
+	else if (FDateTimeEdit != NULL)
+	{
+		FValue = FDateTimeEdit->dateTime();
+	}
+	else if (FDoubleSpinBox != NULL)
+	{
+		FValue = FDoubleSpinBox->value();
+	}
+	else if (FSpinBox)
+	{
+		if (FValue.type() == QVariant::UInt)
+			FValue = (uint)FSpinBox->value();
+		else if (FValue.type() == QVariant::LongLong)
+			FValue = (qlonglong)FSpinBox->value();
+		else if (FValue.type() == QVariant::ULongLong)
+			FValue = (qulonglong)FSpinBox->value();
+		else
+			FValue = FSpinBox->value();
+	}
 
+	FNode.setValue(FValue);
 	emit childApply();
 }
 
 void OptionsDialogWidget::reset()
 {
-	if (FValue.type() == QVariant::Bool)
+	if (FCheckBox != NULL)
 	{
 		FCheckBox->setChecked(FValue.toBool());
 	}
-	else if (FValue.type() == QVariant::Time)
+	else if (FLineEdit != NULL)
 	{
-		FDateTimeEdit->setTime(FValue.toTime());
+		if (FLineEdit->echoMode() == QLineEdit::Password)
+			FLineEdit->setText(Options::decrypt(FValue.toByteArray()).toString());
+		else
+			FLineEdit->setText(FValue.toString());
 	}
-	else if (FValue.type() == QVariant::Date)
-	{
-		FDateTimeEdit->setDate(FValue.toDate());
-	}
-	else if (FValue.type() == QVariant::DateTime)
-	{
-		FDateTimeEdit->setDateTime(FValue.toDateTime());
-	}
-	else if (FValue.type() == QVariant::Color)
-	{
-		FComboBox->setCurrentIndex(FComboBox->findData(FValue));
-	}
-	else if (FValue.type() == QVariant::Font)
+	else if (FFontComboBox != NULL)
 	{
 		FFontComboBox->setCurrentFont(FValue.value<QFont>());
 	}
-	else if (FValue.canConvert(QVariant::String))
+	else if (FComboBox != NULL)
 	{
-		FLineEdit->setText(FValue.toString());
+		FComboBox->setCurrentIndex(FComboBox->findData(FValue));
 	}
-	emit childReset();
-}
+	else if (FTimeEdit != NULL)
+	{
+		FTimeEdit->setTime(FValue.toTime());
+	}
+	else if (FDateEdit != NULL)
+	{
+		FDateEdit->setDate(FValue.toDate());
+	}
+	else if (FDateTimeEdit != NULL)
+	{
+		FDateTimeEdit->setDateTime(FValue.toDateTime());
+	}
+	else if (FDoubleSpinBox != NULL)
+	{
+		FDoubleSpinBox->setValue(FValue.toDouble());
+	}
+	else if (FSpinBox)
+	{
+		FSpinBox->setValue(FValue.toInt());
+	}
 
-void OptionsDialogWidget::insertWithCaption(const QString &ACaption, QWidget *ABuddy, QHBoxLayout *ALayout)
-{
-	if (!ACaption.isEmpty())
-	{
-		FLabel = new QLabel(this);
-		FLabel->setTextFormat(Qt::PlainText);
-		FLabel->setText(ACaption);
-		FLabel->setBuddy(ABuddy);
-		ALayout->addWidget(FLabel);
-		ALayout->addWidget(ABuddy);
-		ALayout->addStretch();
-	}
+	emit childReset();
 }
 
 bool OptionsDialogWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
@@ -198,4 +204,109 @@ bool OptionsDialogWidget::eventFilter(QObject *AWatched, QEvent *AEvent)
 		return true;
 	}
 	return QWidget::eventFilter(AWatched,AEvent);
+}
+
+void OptionsDialogWidget::insertEditor(const QString &ACaption, QWidget *AEditor, QHBoxLayout *ALayout)
+{
+	if (!ACaption.isEmpty())
+	{
+		FCaption = new QLabel(this);
+		FCaption->setTextFormat(Qt::PlainText);
+		FCaption->setText(ACaption);
+		FCaption->setBuddy(AEditor);
+		ALayout->addWidget(FCaption,0);
+	}
+	ALayout->addWidget(AEditor,1);
+}
+
+void OptionsDialogWidget::rigisterEditor(const OptionsNode &ANode, const QString &ACaption, QWidget *AEditor)
+{
+	FNode = ANode;
+	FValue = ANode.value();
+	QHBoxLayout *hlayout = new QHBoxLayout(this);
+
+	FCaption = NULL;
+
+	FCheckBox = qobject_cast<QCheckBox *>(AEditor);
+	FLineEdit = qobject_cast<QLineEdit *>(AEditor);
+
+	FComboBox = qobject_cast<QComboBox *>(AEditor);
+	FFontComboBox = qobject_cast<QFontComboBox *>(AEditor);
+
+	FSpinBox = qobject_cast<QSpinBox *>(AEditor);
+	FTimeEdit = qobject_cast<QTimeEdit *>(AEditor);
+	FDateEdit = qobject_cast<QDateEdit *>(AEditor);
+	FDateTimeEdit = qobject_cast<QDateTimeEdit *>(AEditor);
+	FDoubleSpinBox = qobject_cast<QDoubleSpinBox *>(AEditor);
+
+	// Order is important
+	if (FCheckBox != NULL)
+	{
+		FCheckBox->setChecked(FValue.toBool());
+		connect(FCheckBox,SIGNAL(stateChanged(int)),SIGNAL(modified()));
+		insertEditor(QString::null,FCheckBox,hlayout);
+	}
+	else if (FLineEdit != NULL)
+	{
+		if (FValue.type() == QVariant::KeySequence)
+			FLineEdit->installEventFilter(this);
+
+		if (FLineEdit->echoMode() == QLineEdit::Password)
+			FLineEdit->setText(Options::decrypt(FValue.toByteArray()).toString());
+		else
+			FLineEdit->setText(FValue.toString());
+
+		connect(FLineEdit,SIGNAL(textChanged(const QString &)),SIGNAL(modified()));
+		insertEditor(ACaption,FLineEdit,hlayout);
+	}
+	else if (FFontComboBox != NULL)
+	{
+		FFontComboBox->setCurrentFont(FValue.value<QFont>());
+		connect(FFontComboBox,SIGNAL(currentFontChanged(const QFont &)),SIGNAL(modified()));
+		insertEditor(ACaption,FFontComboBox,hlayout);
+	}
+	else if (FComboBox != NULL)
+	{
+		FComboBox->setCurrentIndex(FComboBox->findData(FValue));
+		connect(FComboBox,SIGNAL(currentIndexChanged(int)),SIGNAL(modified()));
+		insertEditor(ACaption,FComboBox,hlayout);
+	}
+	else if (FTimeEdit != NULL)
+	{
+		FTimeEdit->setTime(FValue.toTime());
+		connect(FTimeEdit,SIGNAL(dateTimeChanged(const QDateTime &)),SIGNAL(modified()));
+		insertEditor(ACaption,FTimeEdit,hlayout);
+	}
+	else if (FDateEdit != NULL)
+	{
+		FDateEdit->setDate(FValue.toDate());
+		connect(FDateEdit,SIGNAL(dateTimeChanged(const QDateTime &)),SIGNAL(modified()));
+		insertEditor(ACaption,FDateEdit,hlayout);
+	}
+	else if (FDateTimeEdit != NULL)
+	{
+		FDateTimeEdit->setDateTime(FValue.toDateTime());
+		connect(FDateTimeEdit,SIGNAL(dateTimeChanged(const QDateTime &)),SIGNAL(modified()));
+		insertEditor(ACaption,FDateTimeEdit,hlayout);
+	}
+	else if (FDoubleSpinBox != NULL)
+	{
+		FDoubleSpinBox->setValue(FValue.toDouble());
+		connect(FDoubleSpinBox,SIGNAL(valueChanged(double)),SIGNAL(modified()));
+		insertEditor(ACaption,FDoubleSpinBox,hlayout);
+	}
+	else if (FSpinBox)
+	{
+		FSpinBox->setValue(FValue.toInt());
+		connect(FSpinBox,SIGNAL(valueChanged(double)),SIGNAL(modified()));
+		insertEditor(ACaption,FSpinBox,hlayout);
+	}
+	else
+	{
+		insertEditor(ACaption,AEditor,hlayout);
+		REPORT_ERROR(QString("Unsupported options widget editor type=%1").arg(AEditor->objectName()));
+	}
+
+	setLayout(hlayout);
+	layout()->setMargin(0);
 }

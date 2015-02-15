@@ -8,10 +8,14 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FOptions = ANode;
 	FPluginSettings = NULL;
 
+	FPluginLayout = new QVBoxLayout(ui.wdtConnectionSettings);
+	FPluginLayout->setMargin(0);
+
 	foreach(const QString &pluginId, FManager->pluginList())
 		ui.cmbConnections->addItem(FManager->pluginById(pluginId)->pluginName(),pluginId);
-	connect(ui.cmbConnections, SIGNAL(currentIndexChanged(int)),SLOT(onComboConnectionsChanged(int)));
 	ui.wdtSelectConnection->setVisible(ui.cmbConnections->count() > 1);
+
+	connect(ui.cmbConnections, SIGNAL(currentIndexChanged(int)),SLOT(onComboConnectionsChanged(int)));
 
 	reset();
 }
@@ -49,8 +53,6 @@ void ConnectionOptionsWidget::setPluginById(const QString &APluginId)
 	{
 		if (FPluginSettings)
 		{
-			ui.grbOptions->layout()->removeWidget(FPluginSettings->instance());
-			FPluginSettings->instance()->setParent(NULL);
 			delete FPluginSettings->instance();
 			FPluginSettings = NULL;
 			FPluginId = QUuid();
@@ -59,11 +61,11 @@ void ConnectionOptionsWidget::setPluginById(const QString &APluginId)
 		IConnectionPlugin *plugin = FManager->pluginById(APluginId);
 		if (plugin)
 		{
-			FPluginSettings = plugin->connectionSettingsWidget(FOptions.node("connection",APluginId), ui.grbOptions);
+			FPluginId = APluginId;
+			FPluginSettings = plugin->connectionSettingsWidget(FOptions.node("connection",APluginId), ui.wdtConnectionSettings);
 			if (FPluginSettings)
 			{
-				FPluginId = APluginId;
-				ui.grbOptions->layout()->addWidget(FPluginSettings->instance());
+				FPluginLayout->addWidget(FPluginSettings->instance());
 				connect(FPluginSettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
 			}
 		}

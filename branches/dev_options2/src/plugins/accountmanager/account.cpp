@@ -1,5 +1,6 @@
 #include "account.h"
 
+#include <definitions/optionvalues.h>
 #include <utils/logger.h>
 
 Account::Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent) : QObject(AParent)
@@ -18,11 +19,11 @@ Account::~Account()
 
 bool Account::isValid() const
 {
-	Jid sJid = streamJid();
-	bool valid = sJid.isValid();
-	valid = valid && !sJid.node().isEmpty();
-	valid = valid && !sJid.domain().isEmpty();
-	valid = valid && (FXmppStream==FXmppStreams->xmppStream(sJid) || FXmppStreams->xmppStream(sJid)==NULL);
+	Jid jid = streamJid();
+	bool valid = jid.isValid();
+	valid = valid && !jid.node().isEmpty();
+	valid = valid && !jid.domain().isEmpty();
+	valid = valid && (FXmppStream==FXmppStreams->xmppStream(jid) || FXmppStreams->xmppStream(jid)==NULL);
 	return valid;
 }
 
@@ -69,12 +70,24 @@ void Account::setName(const QString &AName)
 
 Jid Account::streamJid() const
 {
-	return FOptionsNode.value("streamJid").toString();
+	Jid jid = FOptionsNode.value("streamJid").toString();
+	jid.setResource(resource());
+	return jid;
 }
 
-void Account::setStreamJid(const Jid &AJid)
+void Account::setStreamJid(const Jid &AStreamJid)
 {
-	FOptionsNode.setValue(AJid.full(),"streamJid");
+	FOptionsNode.setValue(AStreamJid.bare(),"streamJid");
+}
+
+QString Account::resource() const
+{
+	return FOptionsNode.value("resource").toString();
+}
+
+void Account::setResource(const QString &AResource)
+{
+	FOptionsNode.setValue(AResource,"resource");
 }
 
 QString Account::password() const
@@ -114,12 +127,19 @@ void Account::onOptionsChanged(const OptionsNode &ANode)
 		if (FXmppStream && !FXmppStream->isConnected())
 		{
 			if (FOptionsNode.node("streamJid") == ANode)
-				FXmppStream->setStreamJid(ANode.value().toString());
+				FXmppStream->setStreamJid(streamJid());
+			else if (FOptionsNode.node("resource") == ANode)
+				FXmppStream->setStreamJid(streamJid());
 			else if (FOptionsNode.node("password") == ANode)
 				FXmppStream->setPassword(Options::decrypt(ANode.value().toByteArray()).toString());
 			else if (FOptionsNode.node("require-encryption") == ANode)
 				FXmppStream->setEncryptionRequired(ANode.value().toBool());
 		}
 		emit optionsChanged(ANode);
+	}
+	else if (ANode.path() == OPV_ACCOUNT_DEFAULTRESOURCE)
+	{
+		if (FXmppStream && !FXmppStream->isConnected())
+			FXmppStream->setStreamJid(streamJid());
 	}
 }

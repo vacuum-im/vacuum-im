@@ -528,20 +528,21 @@ void OptionsManager::removeOptionsDialogNode(const QString &ANodeId)
 	}
 }
 
-QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, QWidget *AParent)
+QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, const QString &ARootId, QWidget *AParent)
 {
 	if (isOpened())
 	{
-		if (FOptionsDialog.isNull())
+		QPointer<OptionsDialog> &dialog = FOptionDialogs[ARootId];
+		if (dialog.isNull())
 		{
-			FOptionsDialog = new OptionsDialog(this,AParent);
-			connect(FOptionsDialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()),Qt::QueuedConnection);
+			dialog = new OptionsDialog(this,ARootId,AParent);
+			connect(dialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()),Qt::QueuedConnection);
 		}
-		FOptionsDialog->showNode(ANodeId);
-		FOptionsDialog->showNode(ANodeId.isNull() ? Options::node(OPV_MISC_OPTIONS_DIALOG_LASTNODE).value().toString() : ANodeId);
-		WidgetManager::showActivateRaiseWindow(FOptionsDialog);
+		dialog->showNode(ANodeId.isNull() ? Options::fileValue(OPV_MISC_OPTIONS_DIALOG_LASTNODE,ARootId).toString() : ANodeId);
+		WidgetManager::showActivateRaiseWindow(dialog);
+		return dialog;
 	}
-	return FOptionsDialog;
+	return NULL;
 }
 
 IOptionsDialogWidget *OptionsManager::newOptionsDialogHeader(const QString &ACaption, QWidget *AParent) const
@@ -554,6 +555,11 @@ IOptionsDialogWidget *OptionsManager::newOptionsDialogWidget(const OptionsNode &
 	return new OptionsDialogWidget(ANode, ACaption, AParent);
 }
 
+IOptionsDialogWidget *OptionsManager::newOptionsDialogWidget(const OptionsNode &ANode, const QString &ACaption, QWidget *AEditor, QWidget *AParent) const
+{
+	return new OptionsDialogWidget(ANode,ACaption,AEditor,AParent);
+}
+
 void OptionsManager::closeProfile()
 {
 	if (isOpened())
@@ -562,11 +568,7 @@ void OptionsManager::closeProfile()
 		emit profileClosed(currentProfile());
 
 		FAutoSaveTimer.stop();
-		if (!FOptionsDialog.isNull())
-		{
-			FOptionsDialog->reject();
-			delete FOptionsDialog;
-		}
+		qDeleteAll(FOptionDialogs);
 		FShowOptionsDialogAction->setEnabled(false);
 
 		Options::setOptions(QDomDocument(), QString::null, QByteArray());
@@ -753,7 +755,7 @@ void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 #ifdef Q_WS_WIN
 		QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
 		if (ANode.value().toBool())
-			reg.setValue(CLIENT_NAME, QDir::toNativeSeparators(QApplication::applicationFilePath()));
+			reg.setValue(CLIENT_NAME, QApplication::arguments().join(" "));
 		else
 			reg.remove(CLIENT_NAME);
 		//Remove old client name

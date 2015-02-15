@@ -230,6 +230,7 @@ public:
 	//Archive Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const =0;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const =0;
+	virtual bool isArchiveReplicationEnabled(const Jid &AStreamJid) const =0;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const =0;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const =0;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const =0;

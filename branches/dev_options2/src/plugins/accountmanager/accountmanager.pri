@@ -1,13 +1,13 @@
-FORMS = accountoptions.ui \
+FORMS = accountitemwidget.ui \
         accountsoptions.ui
 
-HEADERS = accountoptions.h \
-          accountsoptions.h \
+HEADERS = accountitemwidget.h \
+          accountsoptionswidget.h \
           account.h \
           accountmanager.h
 
-SOURCES = accountoptions.cpp \
-          accountsoptions.cpp \
+SOURCES = accountitemwidget.cpp \
+          accountsoptionswidget.cpp \
           account.cpp \
           accountmanager.cpp
 

@@ -196,6 +196,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 			if (account)
 			{
 				sindex->setData(account->name(),RDR_NAME);
+				sindex->setData(account->optionsNode().value("order").toInt(),RDR_SORT_ORDER);
 				connect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
 			}
 
@@ -709,6 +710,12 @@ void RostersModel::onAccountOptionsChanged(const OptionsNode &ANode)
 		IRosterIndex *sindex = streamIndex(account->xmppStream()->streamJid());
 		if (sindex)
 			sindex->setData(account->name(),RDR_NAME);
+	}
+	else if (account && account->optionsNode().childPath(ANode)=="order")
+	{
+		IRosterIndex *sindex = streamIndex(account->xmppStream()->streamJid());
+		if (sindex)
+			sindex->setData(ANode.value().toInt(),RDR_SORT_ORDER);
 	}
 }
 

@@ -19,6 +19,7 @@
 #include <definitions/statisticsparams.h>
 #include <utils/widgetmanager.h>
 #include <utils/systemmanager.h>
+#include <utils/pluginhelper.h>
 #include <utils/filestorage.h>
 #include <utils/shortcuts.h>
 #include <utils/action.h>
@@ -85,11 +86,14 @@ PluginManager::PluginManager(QApplication *AParent) : QObject(AParent)
 
 	connect(AParent,SIGNAL(aboutToQuit()),SLOT(onApplicationAboutToQuit()));
 	connect(AParent,SIGNAL(commitDataRequest(QSessionManager &)),SLOT(onApplicationCommitDataRequested(QSessionManager &)));
+
+	PluginHelper::setPluginManager(this);
 }
 
 PluginManager::~PluginManager()
 {
 	Logger::closeLog();
+	PluginHelper::setPluginManager(NULL);
 }
 
 QString PluginManager::version() const

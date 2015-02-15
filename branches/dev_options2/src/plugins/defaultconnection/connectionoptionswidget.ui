@@ -47,7 +47,7 @@
      <item>
       <widget class="QLabel" name="lblCertCheckMode">
        <property name="text">
-        <string>Certificate check mode:</string>
+        <string>Certificate check:</string>
        </property>
       </widget>
      </item>

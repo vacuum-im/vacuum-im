@@ -23,9 +23,8 @@
 #include <interfaces/iroster.h>
 #include "chatwindowmenu.h"
 #include "archiveviewwindow.h"
-#include "archivestreamoptions.h"
-#include "archiveenginesoptions.h"
 #include "archivereplicator.h"
+#include "archiveaccountoptionswidget.h"
 
 struct StanzaSession {
 	QString sessionId;
@@ -102,6 +101,7 @@ public:
   //Preferences
 	virtual QString prefsNamespace(const Jid &AStreamJid) const;
 	virtual bool isArchivePrefsEnabled(const Jid &AStreamJid) const;
+	virtual bool isArchiveReplicationEnabled(const Jid &AStreamJid) const;
 	virtual bool isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const;
 	virtual IArchiveStreamPrefs archivePrefs(const Jid &AStreamJid) const;
 	virtual IArchiveItemPrefs archiveItemPrefs(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId = QString::null) const;
@@ -183,6 +183,7 @@ protected:
 	void registerDiscoFeatures();
 	void openHistoryOptionsNode(const Jid &AStreamJid);
 	void closeHistoryOptionsNode(const Jid &AStreamJid);
+	bool isArchiveDuplicationEnabled(const Jid &AStreamJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const;
 	void notifyInChatWindow(const Jid &AStreamJid, const Jid &AContactJid, const QString &AMessage) const;

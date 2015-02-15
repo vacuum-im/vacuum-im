@@ -2,6 +2,7 @@
 #define CONNECTIONOPTIONSWIDGET_H
 
 #include <QWidget>
+#include <QVBoxLayout>
 #include <interfaces/iconnectionmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ioptionsmanager.h>
@@ -38,6 +39,7 @@ private:
 private:
 	QString FPluginId;
 	OptionsNode FOptions;
+	QVBoxLayout *FPluginLayout;
 	IOptionsDialogWidget *FPluginSettings;
 };
 

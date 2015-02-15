@@ -3,10 +3,13 @@
 
 // AccountManager
 #define OPV_ACCOUNT_ROOT                                "accounts"
+#define OPV_ACCOUNT_DEFAULTRESOURCE                     "accounts.default-resource"
 #define OPV_ACCOUNT_ITEM                                "accounts.account"
+#define OPV_ACCOUNT_ORDER                               "accounts.account.order"
 #define OPV_ACCOUNT_NAME                                "accounts.account.name"
 #define OPV_ACCOUNT_ACTIVE                              "accounts.account.active"
 #define OPV_ACCOUNT_STREAMJID                           "accounts.account.streamJid"
+#define OPV_ACCOUNT_RESOURCE                            "accounts.account.resource"
 #define OPV_ACCOUNT_PASSWORD                            "accounts.account.password"
 #define OPV_ACCOUNT_REQUIREENCRYPTION                   "accounts.account.require-encryption"
 // ConnectionManager
@@ -30,6 +33,9 @@
 #define OPV_ACCOUNT_IGNOREAUTOJOIN                      "accounts.account.ignore-autojoin"
 // Compress
 #define OPV_ACCOUNT_STREAMCOMPRESS                      "accounts.account.stream-compress"
+// MessageArchiver
+#define OPV_ACCOUNT_HISTORYREPLICATE                    "accounts.account.history-replicate"
+#define OPV_ACCOUNT_HISTORYDUPLICATE                    "accounts.account.history-duplicate"
 
 // BirthdayReminder
 #define OPV_BIRTHDAYREMINDER_STARTTIME                  "birthdayreminder.start-time"
@@ -128,18 +134,15 @@
 #define OPV_HISTORY_ENGINE_ENABLED                      "history.engine.enabled"
 #define OPV_HISTORY_ENGINE_REPLICATEAPPEND              "history.engine.replicate-append"
 #define OPV_HISTORY_ENGINE_REPLICATEREMOVE              "history.engine.replicate-remove"
-#define OPV_HISTORY_STREAM_ITEM                         "history.stream"
-#define OPV_HISTORY_STREAM_REPLICATE                    "history.stream.replicate"
-#define OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING         "history.stream.force-direct-archiving"
 #define OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE           "history.archiveview.font-point-size"
 // FileMessageArchive
-#define OPV_FILEARCHIVE_HOMEPATH                        "filearchive.home-path"
-#define OPV_FILEARCHIVE_FORCEDATABASESYNC               "filearchive.force-database-sync"
-#define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "filearchive.collection.min-size"
-#define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "filearchive.collection.max-size"
-#define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "filearchive.collection.critical-size"
+#define OPV_FILEARCHIVE_HOMEPATH                        "history.file-archive.home-path"
+#define OPV_FILEARCHIVE_DATABASESYNC                    "history.file-archive.database-sync"
+#define OPV_FILEARCHIVE_COLLECTION_MINSIZE              "history.file-archive.collection.min-size"
+#define OPV_FILEARCHIVE_COLLECTION_MAXSIZE              "history.file-archive.collection.max-size"
+#define OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE         "history.file-archive.collection.critical-size"
 // ServerMessageArchive
-#define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "serverarchive.max-upload-size"
+#define OPV_SERVERARCHIVE_MAXUPLOADSIZE                 "history.server-archive.max-upload-size"
 
 // MessageStyles
 #define OPV_MESSAGESTYLE_ROOT                           "message-styles"

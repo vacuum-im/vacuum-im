@@ -4,9 +4,6 @@
 #include <definitions/xmppfeatureorders.h>
 #include <definitions/xmppfeaturepluginorders.h>
 #include <definitions/discofeaturehandlerorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
 #include <definitions/dataformtypes.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
@@ -30,7 +27,6 @@ Registration::Registration()
 	FStanzaProcessor = NULL;
 	FDiscovery = NULL;
 	FPresencePlugin = NULL;
-	FOptionsManager = NULL;
 	FAccountManager = NULL;
 	FXmppUriQueries = NULL;
 }
@@ -91,12 +87,6 @@ bool Registration::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FXmppStreams = qobject_cast<IXmppStreams *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-	if (plugin)
-	{
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
 	plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
 	if (plugin)
 	{
@@ -135,11 +125,6 @@ bool Registration::initObjects()
 
 bool Registration::initSettings()
 {
-	Options::setDefaultValue(OPV_ACCOUNT_REGISTER,false);
-	if (FOptionsManager)
-	{
-		FOptionsManager->insertOptionsDialogHolder(this);
-	}
 	return true;
 }
 
@@ -311,17 +296,6 @@ IXmppFeature *Registration::newXmppFeature(const QString &AFeatureNS, IXmppStrea
 		}
 	}
 	return NULL;
-}
-
-QMultiMap<int, IOptionsDialogWidget *> Registration::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
-{
-	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
-	{
-		widgets.insertMulti(OWO_ACCOUNT_REGISTER, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1)).node("register-on-server"),tr("Register new account on server"),AParent));
-	}
-	return widgets;
 }
 
 IDataFormLocale Registration::dataFormLocale(const QString &AFormType)

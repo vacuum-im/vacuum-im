@@ -260,9 +260,10 @@ bool MessageArchiver::initSettings()
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_ENABLED,true);
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_REPLICATEAPPEND,true);
 	Options::setDefaultValue(OPV_HISTORY_ENGINE_REPLICATEREMOVE,true);
-	Options::setDefaultValue(OPV_HISTORY_STREAM_REPLICATE,false);
-	Options::setDefaultValue(OPV_HISTORY_STREAM_FORCEDIRECTARCHIVING,false);
 	Options::setDefaultValue(OPV_HISTORY_ARCHIVEVIEW_FONTPOINTSIZE,10);
+
+	Options::setDefaultValue(OPV_ACCOUNT_HISTORYREPLICATE,false);
+	Options::setDefaultValue(OPV_ACCOUNT_HISTORYDUPLICATE,false);
 
 	if (FOptionsManager)
 	{
@@ -422,17 +423,56 @@ QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(con
 {
 	QMultiMap<int, IOptionsDialogWidget *>  widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (nodeTree.count()==2 && nodeTree.at(0)==OPN_HISTORY)
+	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="History")
 	{
 		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
-		if (account && account->isActive() && isReady(account->xmppStream()->streamJid()))
+		if (account && isReady(account->xmppStream()->streamJid()))
 		{
-			widgets.insertMulti(OWO_HISTORY_STREAM, new ArchiveStreamOptions(this,account->xmppStream()->streamJid(),AParent));
+			OptionsNode options = account->optionsNode();
+			
+			widgets.insertMulti(OHO_ACCOUNTS_HISTORY_SERVERSETTINGS, FOptionsManager->newOptionsDialogHeader(tr("Archive preferences"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_HISTORY_SERVERSETTINGS, new ArchiveAccountOptionsWidget(this,account->xmppStream()->streamJid(),AParent));
+
+			int replCount = 0;
+			int manualCount = 0;
+			foreach(IArchiveEngine *engine, archiveEngines())
+			{
+				if (engine->isCapable(account->xmppStream()->streamJid(),IArchiveEngine::ArchiveReplication))
+					replCount++;
+				else if (engine->isCapable(account->xmppStream()->streamJid(),IArchiveEngine::ManualArchiving))
+					manualCount++;
+			}
+
+			if (replCount>0 && replCount+manualCount>1)
+			{
+				widgets.insertMulti(OHO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogHeader(tr("Archive synchronization"),AParent));
+				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-replicate"),tr("Synchronize history between archives"),AParent));
+			}
+
+			if (isArchiveAutoSave(account->xmppStream()->streamJid()))
+			{
+				widgets.insertMulti(OHO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogHeader(tr("Archive synchronization"),AParent));
+				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_DUPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-duplicate"),tr("Duplicate messages in local archive (not recommended)"),AParent));
+			}
 		}
 	}
-	else if(ANodeId == OPN_HISTORY)
+	else if (ANodeId == OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_HISTORY_ENGINES, new ArchiveEnginesOptions(this,AParent));
+		int index = 0;
+		widgets.insertMulti(OHO_MESSAGES_HISORYENGINES, FOptionsManager->newOptionsDialogHeader(tr("History archives"),AParent));
+		foreach(IArchiveEngine *engine, archiveEngines())
+		{
+			OptionsNode node = Options::node(OPV_HISTORY_ENGINE_ITEM,engine->engineId().toString()).node("enabled");
+			widgets.insertMulti(OWO_MESSAGES_HISORYENGINE,FOptionsManager->newOptionsDialogWidget(node,engine->engineName(),AParent));
+
+			IOptionsDialogWidget *engineSettings = engine->engineSettingsWidget(AParent);
+			if (engineSettings)
+			{
+				widgets.insertMulti(OHO_MESSAGES_HISTORYENGINESETTINGS+index*10,FOptionsManager->newOptionsDialogHeader(engine->engineName(),AParent));
+				widgets.insertMulti(OWO_MESSAGES_HISTORYENGINESETTINGS+index,engineSettings);
+				index++;
+			}
+		}
 	}
 	return widgets;
 }
@@ -686,6 +726,12 @@ QString MessageArchiver::prefsNamespace(const Jid &AStreamJid) const
 bool MessageArchiver::isArchivePrefsEnabled(const Jid &AStreamJid) const
 {
 	return isReady(AStreamJid) && (isSupported(AStreamJid,NS_ARCHIVE_PREF) || !isArchiveAutoSave(AStreamJid));
+}
+
+bool MessageArchiver::isArchiveReplicationEnabled(const Jid &AStreamJid) const
+{
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	return account!=NULL ? account->optionsNode().value("history-replicate").toBool() : false;
 }
 
 bool MessageArchiver::isArchivingAllowed(const Jid &AStreamJid, const Jid &AItemJid, const QString &AThreadId) const
@@ -1002,7 +1048,7 @@ QString MessageArchiver::removeArchiveSessionPrefs(const Jid &AStreamJid, const 
 
 bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, const Message &AMessage)
 {
-	if (!isArchiveAutoSave(AStreamJid) || Options::node(OPV_HISTORY_STREAM_ITEM,AStreamJid.pBare()).value("force-direct-archiving").toBool())
+	if (!isArchiveAutoSave(AStreamJid) || isArchiveDuplicationEnabled(AStreamJid))
 	{
 		if (isArchivingAllowed(AStreamJid,AItemJid,AMessage.threadId()))
 		{
@@ -1021,7 +1067,7 @@ bool MessageArchiver::saveMessage(const Jid &AStreamJid, const Jid &AItemJid, co
 
 bool MessageArchiver::saveNote(const Jid &AStreamJid, const Jid &AItemJid, const QString &ANote, const QString &AThreadId)
 {
-	if (!isArchiveAutoSave(AStreamJid) || Options::node(OPV_HISTORY_STREAM_ITEM,AStreamJid.pBare()).value("force-direct-archiving").toBool())
+	if (!isArchiveAutoSave(AStreamJid) || isArchiveDuplicationEnabled(AStreamJid))
 	{
 		if (isArchivingAllowed(AStreamJid,AItemJid,AThreadId))
 		{
@@ -2134,8 +2180,9 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
 	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
 	if (FOptionsManager && account)
 	{
-		IOptionsDialogNode node = { ONO_HISTORY, OPN_HISTORY"." + account->accountId().toString(), MNI_HISTORY, account->name() };
-		FOptionsManager->insertOptionsDialogNode(node);
+		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
+		IOptionsDialogNode historyNode = { ONO_ACCOUNTS_HISTORY, historyNodeId, MNI_HISTORY, tr("History") };
+		FOptionsManager->insertOptionsDialogNode(historyNode);
 	}
 }
 
@@ -2144,8 +2191,15 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
 	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
 	if (FOptionsManager && account)
 	{
-		FOptionsManager->removeOptionsDialogNode(OPN_HISTORY"." + account->accountId().toString());
+		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
+		FOptionsManager->removeOptionsDialogNode(historyNodeId);
 	}
+}
+
+bool MessageArchiver::isArchiveDuplicationEnabled(const Jid &AStreamJid) const
+{
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	return account!=NULL ? account->optionsNode().value("history-duplicate").toBool() : false;
 }
 
 bool MessageArchiver::isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const
@@ -2752,7 +2806,7 @@ void MessageArchiver::onShowHistoryOptionsDialogByAction(bool)
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
 		IAccount *account = FAccountManager->accountByStream(streamJid);
 		if (account)
-			FOptionsManager->showOptionsDialog(OPN_HISTORY"." + account->accountId().toString());
+			FOptionsManager->showOptionsDialog(OPN_HISTORY"." + account->accountId().toString(), OPN_HISTORY);
 	}
 }
 

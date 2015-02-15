@@ -128,7 +128,7 @@ bool FileMessageArchive::initObjects()
 bool FileMessageArchive::initSettings()
 {
 	Options::setDefaultValue(OPV_FILEARCHIVE_HOMEPATH,QString());
-	Options::setDefaultValue(OPV_FILEARCHIVE_FORCEDATABASESYNC,false);
+	Options::setDefaultValue(OPV_FILEARCHIVE_DATABASESYNC,false);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MINSIZE,1*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_MAXSIZE,20*1024);
 	Options::setDefaultValue(OPV_FILEARCHIVE_COLLECTION_CRITICALSIZE,25*1024);
@@ -158,7 +158,7 @@ QString FileMessageArchive::engineDescription() const
 
 IOptionsDialogWidget *FileMessageArchive::engineSettingsWidget(QWidget *AParent)
 {
-	return new FileArchiveOptions(FPluginManager,AParent);
+	return new FileArchiveOptionsWidget(FPluginManager,AParent);
 }
 
 quint32 FileMessageArchive::capabilities(const Jid &AStreamJid) const
@@ -963,7 +963,7 @@ bool FileMessageArchive::startDatabaseSync(const Jid &AStreamJid, bool AForce)
 			FDatabaseSyncWorker->startSync(AStreamJid);
 			return true;
 		}
-		if (Options::node(OPV_FILEARCHIVE_FORCEDATABASESYNC).value().toBool())
+		if (Options::node(OPV_FILEARCHIVE_DATABASESYNC).value().toBool())
 		{
 			LOG_STRM_INFO(AStreamJid,"Database synchronization started");
 			FDatabaseSyncWorker->startSync(AStreamJid);

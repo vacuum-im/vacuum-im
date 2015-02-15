@@ -5,7 +5,7 @@
 OptionsDialogHeader::OptionsDialogHeader(const QString &ACaption, QWidget *AParent) : QLabel(AParent)
 {
 	setTextFormat(Qt::RichText);
-	setText(QString("<h3>%1</h3>").arg(Qt::escape(ACaption)));
+	setText(QString("<h2>%1</h2>").arg(Qt::escape(ACaption)));
 }
 
 OptionsDialogHeader::~OptionsDialogHeader()

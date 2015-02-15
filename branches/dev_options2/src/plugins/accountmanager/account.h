@@ -22,7 +22,9 @@ public:
 	virtual QString name() const;
 	virtual void setName(const QString &AName);
 	virtual Jid streamJid() const;
-	virtual void setStreamJid(const Jid &AJid);
+	virtual void setStreamJid(const Jid &AStreamJid);
+	virtual QString resource() const;
+	virtual void setResource(const QString &AResource);
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
 	virtual OptionsNode optionsNode() const;

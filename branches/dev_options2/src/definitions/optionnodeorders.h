@@ -17,4 +17,9 @@
 #define ONO_DATASTREAMS           850
 #define ONO_MISC                  900
 
-#endif
+// ONO_ACCOUNTS
+#define ONO_ACCOUNTS_PARAMS       100
+#define ONO_ACCOUNTS_HISTORY      200
+#define ONO_ACCOUNTS_ADDITIONAL   300
+
+#endif // DEF_OPTIONNODEORDERS_H

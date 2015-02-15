@@ -11,7 +11,7 @@
 #include "fileworker.h"
 #include "databaseworker.h"
 #include "databasesynchronizer.h"
-#include "filearchiveoptions.h"
+#include "filearchiveoptionswidget.h"
 
 class FileMessageArchive : 
 	public QObject,

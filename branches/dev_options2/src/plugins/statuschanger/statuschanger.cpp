@@ -257,11 +257,11 @@ QMultiMap<int, IOptionsDialogWidget *> StatusChanger::optionsDialogWidgets(const
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-	if (FOptionsManager && nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 	{
-		OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->newOptionsDialogWidget(aoptions.node("auto-connect"),tr("Auto connect on startup"),AParent));
-		widgets.insertMulti(OWO_ACCOUNT_STATUS,FOptionsManager->newOptionsDialogWidget(aoptions.node("auto-reconnect"),tr("Auto reconnect if disconnected"),AParent));
+		OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTOCONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-connect"),tr("Connect to server on startup"),AParent));
+		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTORECONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-reconnect"),tr("Reconnect to server on connection errors"),AParent));
 	}
 	return widgets;
 }

@@ -94,10 +94,10 @@ QMultiMap<int, IOptionsDialogWidget *> CompressPlugin::optionsDialogWidgets(cons
 	if (FOptionsManager)
 	{
 		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
-		if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+		if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
 		{
-			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-			widgets.insertMulti(OWO_ACCOUNT_COMPRESS, FOptionsManager->newOptionsDialogWidget(aoptions.node("stream-compress"),tr("Enable data compression transferred between client and server"),AParent));
+			OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+			widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_STREAMCOMPRESS, FOptionsManager->newOptionsDialogWidget(options.node("stream-compress"),tr("Enable data compression transferred between client and server"),AParent));
 		}
 	}
 	return widgets;

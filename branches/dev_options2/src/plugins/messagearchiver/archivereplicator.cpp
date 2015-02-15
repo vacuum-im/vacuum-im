@@ -228,7 +228,7 @@ void ArchiveReplicator::stopReplication(const QUuid &AEngineId)
 void ArchiveReplicator::onStartReplicateTimerTimeout()
 {
 	FStartReplicateTimer.start(REPLICATE_RESTART_TIMEOUT);
-	if (FWorker==NULL && FArchiver->isReady(FStreamJid) && Options::node(OPV_HISTORY_STREAM_ITEM,FStreamJid.pBare()).node("replicate").value().toBool())
+	if (FWorker==NULL && FArchiver->isReady(FStreamJid) && FArchiver->isArchiveReplicationEnabled(FStreamJid))
 	{
 		int replCount = 0;
 		int manualCount = 0;

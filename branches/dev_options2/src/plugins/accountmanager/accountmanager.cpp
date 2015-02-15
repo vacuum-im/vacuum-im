@@ -1,5 +1,7 @@
 #include "accountmanager.h"
 
+#include <QLineEdit>
+#include <QComboBox>
 #include <definitions/actiongroups.h>
 #include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
@@ -9,8 +11,11 @@
 #include <definitions/rosterindexroles.h>
 #include <definitions/resources.h>
 #include <definitions/menuicons.h>
+#include <definitions/version.h>
 #include <utils/action.h>
 #include <utils/logger.h>
+#include "account.h"
+#include "accountsoptionswidget.h"
 
 #define ADR_ACCOUNT_ID              Action::DR_Parametr1
 
@@ -71,13 +76,20 @@ bool AccountManager::initConnections(IPluginManager *APluginManager, int &AInitO
 
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
+	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
 	return FXmppStreams!=NULL;
 }
 
 bool AccountManager::initSettings()
 {
+	Options::setDefaultValue(OPV_ACCOUNT_DEFAULTRESOURCE, QString(CLIENT_NAME));
+
+	Options::setDefaultValue(OPV_ACCOUNT_STREAMJID, QString());
+	Options::setDefaultValue(OPV_ACCOUNT_RESOURCE, QString(CLIENT_NAME));
+	Options::setDefaultValue(OPV_ACCOUNT_PASSWORD, QByteArray());
 	Options::setDefaultValue(OPV_ACCOUNT_REQUIREENCRYPTION, true);
+
 	if (FOptionsManager)
 	{
 		IOptionsDialogNode accountsNode = { ONO_ACCOUNTS, OPN_ACCOUNTS, MNI_ACCOUNT_LIST, tr("Accounts") };
@@ -95,14 +107,34 @@ QMultiMap<int, IOptionsDialogWidget *> AccountManager::optionsDialogWidgets(cons
 		QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 		if (ANodeId == OPN_ACCOUNTS)
 		{
-			widgets.insertMulti(OWO_ACCOUNT_OPTIONS, new AccountsOptions(this,AParent));
+			widgets.insertMulti(OHO_ACCOUNTS_ACCOUNTS, FOptionsManager->newOptionsDialogHeader(tr("Accounts"),AParent));
+			widgets.insertMulti(OHO_ACCOUNTS_ACCOUNTS+1, FOptionsManager->newOptionsDialogHeader(tr("Accounts"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_ACCOUNTS, new AccountsOptionsWidget(this,AParent));
+
+			widgets.insertMulti(OHO_ACCOUNTS_COMMON, FOptionsManager->newOptionsDialogHeader(tr("Common account settings"),AParent));
+			
+			QComboBox *resourceCombox = newResourceComboBox(QUuid(),AParent);
+			widgets.insertMulti(OWO_ACCOUNTS_DEFAULTRESOURCE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ACCOUNT_DEFAULTRESOURCE),tr("Default connection resource:"),resourceCombox,AParent));
 		}
-		else if (nodeTree.count()==2 && nodeTree.at(0)==OPN_ACCOUNTS)
+		else if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Parameters")
 		{
-			OptionsNode aoptions = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
-			widgets.insertMulti(OWO_ACCOUNT_OPTIONS,new AccountOptions(this,nodeTree.at(1),AParent));
-			widgets.insertMulti(OWO_ACCOUNT_REQUIRE_ENCRYPTION,FOptionsManager->newOptionsDialogWidget(aoptions.node("require-encryption"),tr("Require a secure connection"),AParent));
+			OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+
+			widgets.insertMulti(OHO_ACCOUNTS_PARAMS_ACCOUNT,FOptionsManager->newOptionsDialogHeader(tr("Account"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_PARAMS_NAME,FOptionsManager->newOptionsDialogWidget(options.node("name"),tr("Name:"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_PARAMS_PASSWORD,FOptionsManager->newOptionsDialogWidget(options.node("password"),tr("Password:"),AParent));
+
+			QComboBox *resourceCombox = newResourceComboBox(nodeTree.at(1),AParent);
+			widgets.insertMulti(OWO_ACCOUNTS_PARAMS_RESOURCE,FOptionsManager->newOptionsDialogWidget(options.node("resource"),tr("Resource:"),resourceCombox,AParent));
 		}
+		else if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Additional")
+		{
+			OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
+
+			widgets.insertMulti(OHO_ACCOUNTS_ADDITIONAL_SETTINGS, FOptionsManager->newOptionsDialogHeader(tr("Additional settings"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_REQUIRESECURE,FOptionsManager->newOptionsDialogWidget(options.node("require-encryption"),tr("Require secure connection to server"),AParent));
+		}
+
 	}
 	return widgets;
 }
@@ -139,7 +171,7 @@ IAccount *AccountManager::appendAccount(const QUuid &AAccountId)
 		FAccounts.insert(AAccountId,account);
 
 		LOG_DEBUG(QString("Appending account, id=%1").arg(AAccountId.toString()));
-		openAccountOptionsNode(AAccountId,account->name());
+		openAccountOptionsNode(AAccountId);
 		emit appended(account);
 	}
 	else if (AAccountId.isNull())
@@ -202,19 +234,17 @@ void AccountManager::destroyAccount(const QUuid &AAccountId)
 	}
 }
 
-void AccountManager::showAccountOptionsDialog(const QUuid &AAccountId)
-{
-	if (FOptionsManager)
-		FOptionsManager->showOptionsDialog(OPN_ACCOUNTS "." + AAccountId.toString());
-}
-
-void AccountManager::openAccountOptionsNode(const QUuid &AAccountId, const QString &AName)
+void AccountManager::openAccountOptionsNode(const QUuid &AAccountId)
 {
 	if (FOptionsManager)
 	{
-		QString node = OPN_ACCOUNTS "." + AAccountId.toString();
-		IOptionsDialogNode dnode = { ONO_ACCOUNTS, node, MNI_ACCOUNT, AName };
-		FOptionsManager->insertOptionsDialogNode(dnode);
+		QString paramsNodeId = QString(OPN_ACCOUNTS_PARAMS).replace("[id]", AAccountId.toString());
+		IOptionsDialogNode paramsNode = { ONO_ACCOUNTS_PARAMS, paramsNodeId, MNI_ACCOUNT_CHANGE, tr("Parameters") };
+		FOptionsManager->insertOptionsDialogNode(paramsNode);
+
+		QString additionalNodeId = QString(OPN_ACCOUNTS_ADDITIONAL).replace("[id]", AAccountId.toString());
+		IOptionsDialogNode additionalNode = { ONO_ACCOUNTS_ADDITIONAL, additionalNodeId, MNI_OPTIONS_DIALOG, tr("Additional") };
+		FOptionsManager->insertOptionsDialogNode(additionalNode);
 	}
 }
 
@@ -222,9 +252,73 @@ void AccountManager::closeAccountOptionsNode(const QUuid &AAccountId)
 {
 	if (FOptionsManager)
 	{
-		QString node = OPN_ACCOUNTS "." + AAccountId.toString();
-		FOptionsManager->removeOptionsDialogNode(node);
+		QString paramsNodeId = QString(OPN_ACCOUNTS_PARAMS).replace("[id]", AAccountId.toString());
+		FOptionsManager->removeOptionsDialogNode(paramsNodeId);
+
+		QString additionalNodeId = QString(OPN_ACCOUNTS_ADDITIONAL).replace("[id]", AAccountId.toString());
+		FOptionsManager->removeOptionsDialogNode(additionalNodeId);
 	}
+}
+
+void AccountManager::showAccountOptionsDialog(const QUuid &AAccountId, QWidget *AParent)
+{
+	if (FOptionsManager)
+	{
+		QString rootId = OPN_ACCOUNTS"."+AAccountId.toString();
+		FOptionsManager->showOptionsDialog(QString::null, rootId, AParent);
+	}
+}
+
+QComboBox *AccountManager::newResourceComboBox(const QUuid &AAccountId, QWidget *AParent) const
+{
+	QComboBox *combox = new QComboBox(AParent);
+	combox->addItem(CLIENT_NAME, QString(CLIENT_NAME));
+	combox->addItem(tr("Home"), tr("Home"));
+	combox->addItem(tr("Work"), tr("Work"));
+	combox->addItem(tr("Notebook"), tr("Notebook"));
+	
+	combox->setEditable(true);
+	connect(combox->lineEdit(),SIGNAL(editingFinished()),SLOT(onResourceComboBoxEditFinished()));
+
+	QString defValue = Options::node(OPV_ACCOUNT_DEFAULTRESOURCE).value().toString();
+	int defIndex = combox->findData(defValue);
+	if (defIndex < 0)
+	{
+		combox->addItem(defValue,defValue);
+		defIndex = combox->count()-1;
+	}
+
+	if (!AAccountId.isNull())
+		combox->setItemText(defIndex, combox->itemText(defIndex) + " " + tr("(default)"));
+
+	foreach (IAccount *account, FAccounts)
+	{
+		QString accValue = account->optionsNode().value("resource").toString();
+		if (combox->findData(accValue) < 0)
+		{
+			QString caption = !accValue.isEmpty() ? accValue : tr("<Empty>");
+			combox->addItem(caption,accValue);
+		}
+	}
+
+	return combox;
+}
+
+void AccountManager::onOptionsOpened()
+{
+	onOptionsChanged(Options::node(OPV_ACCOUNT_DEFAULTRESOURCE));
+
+	foreach(const QString &id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
+	{
+		if (appendAccount(id) == NULL)
+			Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",id);
+	}
+}
+
+void AccountManager::onOptionsClosed()
+{
+	foreach(const QUuid &id, FAccounts.keys())
+		removeAccount(id);
 }
 
 void AccountManager::onProfileOpened(const QString &AProfile)
@@ -244,19 +338,10 @@ void AccountManager::onProfileClosed(const QString &AProfile)
 	}
 }
 
-void AccountManager::onOptionsOpened()
+void AccountManager::onOptionsChanged(const OptionsNode &ANode)
 {
-	foreach(const QString &id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
-	{
-		if (appendAccount(id) == NULL)
-			Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",id);
-	}
-}
-
-void AccountManager::onOptionsClosed()
-{
-	foreach(const QUuid &id, FAccounts.keys())
-		removeAccount(id);
+	if (ANode.path() == OPV_ACCOUNT_DEFAULTRESOURCE)
+		Options::setDefaultValue(OPV_ACCOUNT_RESOURCE, ANode.value());
 }
 
 void AccountManager::onShowAccountOptions(bool)
@@ -282,11 +367,7 @@ void AccountManager::onAccountOptionsChanged(const OptionsNode &ANode)
 {
 	Account *account = qobject_cast<Account *>(sender());
 	if (account)
-	{
-		if (account->optionsNode().childPath(ANode) == "name")
-			openAccountOptionsNode(account->accountId(),ANode.value().toString());
 		emit changed(account, ANode);
-	}
 }
 
 void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
@@ -302,6 +383,26 @@ void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &
 			action->setData(ADR_ACCOUNT_ID,account->accountId().toString());
 			connect(action,SIGNAL(triggered(bool)),SLOT(onShowAccountOptions(bool)));
 			AMenu->addAction(action,AG_RVCM_ACCOUNTMANAGER,true);
+		}
+	}
+}
+
+void AccountManager::onResourceComboBoxEditFinished()
+{
+	QLineEdit *editor = qobject_cast<QLineEdit *>(sender());
+	QComboBox *combox = editor!=NULL ? qobject_cast<QComboBox *>(editor->parentWidget()) : NULL;
+	if (combox!=NULL && combox->itemText(combox->currentIndex()) != editor->text())
+	{
+		int valIndex = combox->findData(editor->text());
+		if (valIndex < 0)
+		{
+			QString caption = !editor->text().isEmpty() ? editor->text() : tr("<Empty>");
+			combox->addItem(caption, editor->text());
+			combox->setCurrentIndex(combox->count()-1);
+		}
+		else if (valIndex != combox->currentIndex())
+		{
+			combox->setCurrentIndex(valIndex);
 		}
 	}
 }
