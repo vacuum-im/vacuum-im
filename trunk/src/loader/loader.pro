@@ -23,19 +23,19 @@ isEmpty(SVN_REVISION) {
   SVN_REVISION_INVALID = $$find(SVN_REVISION,Unversioned) $$find(SVN_REVISION,exported)
 }
 win32 {
-  exists(svninfo.h):system(del svninfo.h)
+  exists($${OUT_PWD}\\svninfo.h):system(del $$replace(OUT_PWD, /, \\)\\svninfo.h)
   !isEmpty(SVN_REVISION):count(SVN_REVISION_INVALID,0) {
-    system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> svninfo.h) {
+    system(echo $${LITERAL_HASH}define SVN_REVISION \"$$SVN_REVISION\" >> $${OUT_PWD}\\svninfo.h) {
       DEFINES         += SVNINFO
-      QMAKE_DISTCLEAN += svninfo.h
+      QMAKE_DISTCLEAN += $${OUT_PWD}\\svninfo.h
     }
   }
 } else {
-  exists(svninfo.h):system(rm -f svninfo.h)
+  exists($${OUT_PWD}/svninfo.h):system(rm -f $${OUT_PWD}/svninfo.h)
   !isEmpty(SVN_REVISION)::count(SVN_REVISION_INVALID,0) {
-    system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> svninfo.h) {
+    system(echo \\$${LITERAL_HASH}define SVN_REVISION \\\"$${SVN_REVISION}\\\" >> $${OUT_PWD}/svninfo.h) {
       DEFINES         += SVNINFO
-      QMAKE_DISTCLEAN += svninfo.h
+      QMAKE_DISTCLEAN += $${OUT_PWD}/svninfo.h
     }
   }
 }
