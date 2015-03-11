@@ -539,10 +539,17 @@ IArchiveCollection FileMessageArchive::loadFileCollection(const Jid &AStreamJid,
 			QFile file(filePath);
 			if (file.open(QFile::ReadOnly))
 			{
+				QString xmlError;
 				QDomDocument doc;
-				doc.setContent(&file,true);
-				FArchiver->elementToCollection(AStreamJid,doc.documentElement(),collection);
-				collection.header.engineId = engineId();
+				if (doc.setContent(&file,true,&xmlError))
+				{
+					FArchiver->elementToCollection(AStreamJid,doc.documentElement(),collection);
+					collection.header.engineId = engineId();
+				}
+				else
+				{
+					REPORT_ERROR(QString("Failed to load file collection from file content: %1").arg(xmlError));
+				}
 			}
 			else if (file.exists())
 			{
