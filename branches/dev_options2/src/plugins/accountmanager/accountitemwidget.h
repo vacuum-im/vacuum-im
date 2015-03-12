@@ -19,21 +19,24 @@ public:
 	void setIcon(const QIcon &AIcon);
 	QString name() const;
 	void setName(const QString &AName);
-	Jid streamJid() const;
-	void setStreamJid(const Jid &AStreamJid);
+	Jid accountJid() const;
+	void setAccountJid(const Jid &AAccountJid);
 signals:
 	void modified();
 	void removeClicked(const QUuid &AAccountId);
 	void settingsClicked(const QUuid &AAccountId);
+protected:
+	void enterEvent(QEvent *AEvent);
+	void leaveEvent(QEvent *AEvent);
 protected slots:
 	void onRemoveButtonClicked();
 	void onSettingsLinkActivated();
 private:
 	Ui::AccountItemWidget ui;
 private:
-	QUuid FAccountId;
 	QString FName;
-	Jid FStreamJid;
+	Jid FAccountJid;
+	QUuid FAccountId;
 };
 
 #endif // ACCOUNTITEMWIDGET_H

@@ -1,12 +1,18 @@
 #include "accountitemwidget.h"
 
 #include <QTextDocument>
+#include <definitions/menuicons.h>
+#include <definitions/resources.h>
+#include <utils/iconstorage.h>
 
 AccountItemWidget::AccountItemWidget(const QUuid &AAccountId, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 
 	FAccountId = AAccountId;
+
+	ui.lblMove->setVisible(false);
+	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(ui.lblMove,MNI_ACCOUNT_MOVE,0,0,"pixmap");
 
 	connect(ui.chbActive,SIGNAL(clicked(bool)),SIGNAL(modified()));
 
@@ -55,15 +61,27 @@ void AccountItemWidget::setName(const QString &AName)
 	ui.lblName->setText(QString("<b>%1<b>").arg(Qt::escape(AName)));
 }
 
-Jid AccountItemWidget::streamJid() const
+Jid AccountItemWidget::accountJid() const
 {
-	return FStreamJid;
+	return FAccountJid;
 }
 
-void AccountItemWidget::setStreamJid(const Jid &AStreamJid)
+void AccountItemWidget::setAccountJid(const Jid &AAccountJid)
 {
-	FStreamJid = AStreamJid;
-	ui.lblJid->setText(QString("<%1>").arg(AStreamJid.uBare()));
+	FAccountJid = AAccountJid;
+	ui.lblJid->setText(QString("<%1>").arg(FAccountJid.uBare()));
+}
+
+void AccountItemWidget::enterEvent(QEvent *AEvent)
+{
+	Q_UNUSED(AEvent);
+	ui.lblMove->setVisible(false);
+}
+
+void AccountItemWidget::leaveEvent(QEvent *AEvent)
+{
+	Q_UNUSED(AEvent);
+	ui.lblMove->setVisible(false);
 }
 
 void AccountItemWidget::onRemoveButtonClicked()

@@ -50,12 +50,12 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pbtAdd">
+      <widget class="QLabel" name="lblAddAccount">
        <property name="text">
-        <string>Add Account...</string>
+        <string notr="true">Add Account...</string>
        </property>
-       <property name="flat">
-        <bool>false</bool>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
        </property>
       </widget>
      </item>

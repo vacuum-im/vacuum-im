@@ -46,10 +46,11 @@ protected:
 	void dragEnterEvent(QDragEnterEvent *AEvent);
 	void dragMoveEvent(QDragMoveEvent *AEvent);
 protected slots:
-	void onAddButtonClicked(bool);
+	void onAddAccountLinkActivated();
+	void onHideShowInactiveAccountsLinkActivated();
 	void onRemoveButtonClicked(const QUuid &AAccountId);
 	void onSettingsButtonClicked(const QUuid &AAccountId);
-	void onHideShowInactiveAccountsLinkActivated(const QString &ALink);
+	void onAccountInserted(IAccount *AAccount);
 	void onAccountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode);
 private:
 	Ui::AccountsOptionsClass ui;

@@ -85,6 +85,7 @@ bool AccountManager::initSettings()
 {
 	Options::setDefaultValue(OPV_ACCOUNT_DEFAULTRESOURCE, QString(CLIENT_NAME));
 
+	Options::setDefaultValue(OPV_ACCOUNT_ACTIVE, true);
 	Options::setDefaultValue(OPV_ACCOUNT_STREAMJID, QString());
 	Options::setDefaultValue(OPV_ACCOUNT_RESOURCE, QString(CLIENT_NAME));
 	Options::setDefaultValue(OPV_ACCOUNT_PASSWORD, QByteArray());
@@ -108,13 +109,12 @@ QMultiMap<int, IOptionsDialogWidget *> AccountManager::optionsDialogWidgets(cons
 		if (ANodeId == OPN_ACCOUNTS)
 		{
 			widgets.insertMulti(OHO_ACCOUNTS_ACCOUNTS, FOptionsManager->newOptionsDialogHeader(tr("Accounts"),AParent));
-			widgets.insertMulti(OHO_ACCOUNTS_ACCOUNTS+1, FOptionsManager->newOptionsDialogHeader(tr("Accounts"),AParent));
 			widgets.insertMulti(OWO_ACCOUNTS_ACCOUNTS, new AccountsOptionsWidget(this,AParent));
 
 			widgets.insertMulti(OHO_ACCOUNTS_COMMON, FOptionsManager->newOptionsDialogHeader(tr("Common account settings"),AParent));
 			
 			QComboBox *resourceCombox = newResourceComboBox(QUuid(),AParent);
-			widgets.insertMulti(OWO_ACCOUNTS_DEFAULTRESOURCE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ACCOUNT_DEFAULTRESOURCE),tr("Default connection resource:"),resourceCombox,AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_DEFAULTRESOURCE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ACCOUNT_DEFAULTRESOURCE),tr("Default resource:"),resourceCombox,AParent));
 		}
 		else if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="Parameters")
 		{
@@ -144,77 +144,47 @@ QList<IAccount *> AccountManager::accounts() const
 	return FAccounts.values();
 }
 
-IAccount *AccountManager::accountById(const QUuid &AAcoountId) const
+IAccount *AccountManager::findAccountById(const QUuid &AAcoountId) const
 {
 	return FAccounts.value(AAcoountId);
 }
 
-IAccount *AccountManager::accountByStream(const Jid &AStreamJid) const
+IAccount *AccountManager::findAccountByStream(const Jid &AStreamJid) const
 {
 	foreach(IAccount *account, FAccounts)
 	{
-		if (account->xmppStream() && account->xmppStream()->streamJid()==AStreamJid)
+		if (account->accountJid().pBare() == AStreamJid.pBare())
 			return account;
-		else if (account->streamJid() == AStreamJid)
+		// XMPP stream node may be changed on login
+		if (account->streamJid().pBare() == AStreamJid.pBare())
 			return account;
 	}
 	return NULL;
 }
 
-IAccount *AccountManager::appendAccount(const QUuid &AAccountId)
+IAccount *AccountManager::createAccount(const Jid &AAccountJid, const QString &AName)
 {
-	if (!AAccountId.isNull() && !FAccounts.contains(AAccountId))
+	if (AAccountJid.isValid() && !AAccountJid.node().isEmpty() && findAccountByStream(AAccountJid)==NULL)
 	{
-		Account *account = new Account(FXmppStreams,Options::node(OPV_ACCOUNT_ITEM,AAccountId.toString()),this);
-		connect(account,SIGNAL(activeChanged(bool)),SLOT(onAccountActiveChanged(bool)));
-		connect(account,SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
-		FAccounts.insert(AAccountId,account);
+		QUuid accountId = QUuid::createUuid();
+		LOG_DEBUG(QString("Creating account, stream=%1, id=%2").arg(AAccountJid.pFull(), accountId.toString()));
 
-		LOG_DEBUG(QString("Appending account, id=%1").arg(AAccountId.toString()));
-		openAccountOptionsNode(AAccountId);
-		emit appended(account);
+		OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,accountId.toString());
+		options.setValue(AName,"name");
+		options.setValue(AAccountJid.bare(),"streamJid");
+		options.setValue(AAccountJid.resource(),"resource");
+
+		return insertAccount(options);
 	}
-	else if (AAccountId.isNull())
+	else if (!AAccountJid.isValid() || AAccountJid.node().isEmpty())
 	{
-		REPORT_ERROR("Failed to append account: Invalid params");
-	}
-	return FAccounts.value(AAccountId);
-}
-
-void AccountManager::showAccount(const QUuid &AAccountId)
-{
-	IAccount *account = FAccounts.value(AAccountId);
-	if (account)
-		account->setActive(true);
-	else
-		REPORT_ERROR("Failed to show account: Account not found");
-}
-
-void AccountManager::hideAccount(const QUuid &AAccountId)
-{
-	IAccount *account = FAccounts.value(AAccountId);
-	if (account)
-		account->setActive(false);
-	else
-		REPORT_ERROR("Failed to hide account: Account not found");
-}
-
-void AccountManager::removeAccount(const QUuid &AAccountId)
-{
-	IAccount *account = FAccounts.value(AAccountId);
-	if (account)
-	{
-		LOG_STRM_DEBUG(account->streamJid(),QString("Removing account=%1").arg(account->name()));
-		hideAccount(AAccountId);
-		closeAccountOptionsNode(AAccountId);
-		emit removed(account);
-		FAccounts.remove(AAccountId);
-		delete account->instance();
+		REPORT_ERROR("Failed to create account: Invalid parameters");
 	}
 	else
 	{
-		REPORT_ERROR("Failed to remove account: Account not found");
+		LOG_ERROR(QString("Failed to create account, stream=%1: Account JID already exists").arg(AAccountJid.pFull()));
 	}
+	return NULL;
 }
 
 void AccountManager::destroyAccount(const QUuid &AAccountId)
@@ -222,15 +192,59 @@ void AccountManager::destroyAccount(const QUuid &AAccountId)
 	IAccount *account = FAccounts.value(AAccountId);
 	if (account)
 	{
-		LOG_STRM_DEBUG(account->streamJid(),QString("Destroying account=%1").arg(account->name()));
-		hideAccount(AAccountId);
+		LOG_DEBUG(QString("Destroying account, stream=%1, id=%2").arg(account->accountJid().pFull(),AAccountId.toString()));
+
+		account->setActive(false);
 		removeAccount(AAccountId);
 		Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",AAccountId.toString());
-		emit destroyed(AAccountId);
+		emit accountDestroyed(AAccountId);
 	}
 	else
 	{
 		REPORT_ERROR("Failed to destroy account: Account not found");
+	}
+}
+
+IAccount *AccountManager::insertAccount(const OptionsNode &AOptions)
+{
+	Jid streamJid = AOptions.value("streamJid").toString();
+	if (streamJid.isValid() && !streamJid.node().isEmpty() && findAccountByStream(streamJid)==NULL)
+	{
+		Account *account = new Account(FXmppStreams,AOptions,this);
+		connect(account,SIGNAL(activeChanged(bool)),SLOT(onAccountActiveChanged(bool)));
+		connect(account,SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onAccountOptionsChanged(const OptionsNode &)));
+		FAccounts.insert(account->accountId(),account);
+
+		LOG_DEBUG(QString("Inserting account, stream=%1, id=%2").arg(account->accountJid().pFull(), account->accountId().toString()));
+		openAccountOptionsNode(account->accountId());
+		emit accountInserted(account);
+
+		return account;
+	}
+	else if (!streamJid.isValid() || streamJid.node().isEmpty())
+	{
+		REPORT_ERROR("Failed to insert account: Invalid parameters");
+	}
+	return NULL;
+}
+
+void AccountManager::removeAccount(const QUuid &AAccountId)
+{
+	IAccount *account = FAccounts.value(AAccountId);
+	if (account)
+	{
+		LOG_DEBUG(QString("Removing account, stream=%1, id=%2").arg(account->accountJid().pFull(), AAccountId.toString()));
+
+		account->setActive(false);
+		closeAccountOptionsNode(AAccountId);
+		emit accountRemoved(account);
+
+		FAccounts.remove(AAccountId);
+		delete account->instance();
+	}
+	else if (AAccountId.isNull())
+	{
+		REPORT_ERROR("Failed to remove account: Invalid parameters");
 	}
 }
 
@@ -308,10 +322,14 @@ void AccountManager::onOptionsOpened()
 {
 	onOptionsChanged(Options::node(OPV_ACCOUNT_DEFAULTRESOURCE));
 
-	foreach(const QString &id, Options::node(OPV_ACCOUNT_ROOT).childNSpaces("account"))
+	OptionsNode accountRoot = Options::node(OPV_ACCOUNT_ROOT);
+	foreach(const QString &id, accountRoot.childNSpaces("account"))
 	{
-		if (appendAccount(id) == NULL)
-			Options::node(OPV_ACCOUNT_ROOT).removeChilds("account",id);
+		if (!id.isEmpty())
+		{
+			if(QUuid(id).isNull() || insertAccount(accountRoot.node("account",id))==NULL)
+				accountRoot.removeChilds("account",id);
+		}
 	}
 }
 
@@ -321,27 +339,24 @@ void AccountManager::onOptionsClosed()
 		removeAccount(id);
 }
 
+void AccountManager::onOptionsChanged(const OptionsNode &ANode)
+{
+	if (ANode.path() == OPV_ACCOUNT_DEFAULTRESOURCE)
+		Options::setDefaultValue(OPV_ACCOUNT_RESOURCE, ANode.value());
+}
+
 void AccountManager::onProfileOpened(const QString &AProfile)
 {
 	Q_UNUSED(AProfile);
 	foreach(IAccount *account, FAccounts)
-		account->setActive(Options::node(OPV_ACCOUNT_ITEM,account->accountId()).value("active").toBool());
+		account->setActive(account->optionsNode().value("active").toBool());
 }
 
 void AccountManager::onProfileClosed(const QString &AProfile)
 {
 	Q_UNUSED(AProfile);
 	foreach(IAccount *account, FAccounts)
-	{
-		Options::node(OPV_ACCOUNT_ITEM,account->accountId()).setValue(account->isActive(),"active");
 		account->setActive(false);
-	}
-}
-
-void AccountManager::onOptionsChanged(const OptionsNode &ANode)
-{
-	if (ANode.path() == OPV_ACCOUNT_DEFAULTRESOURCE)
-		Options::setDefaultValue(OPV_ACCOUNT_RESOURCE, ANode.value());
 }
 
 void AccountManager::onShowAccountOptions(bool)
@@ -355,26 +370,21 @@ void AccountManager::onAccountActiveChanged(bool AActive)
 {
 	IAccount *account = qobject_cast<IAccount *>(sender());
 	if (account)
-	{
-		if (AActive)
-			emit shown(account);
-		else
-			emit hidden(account);
-	}
+		emit accountActiveChanged(account,AActive);
 }
 
 void AccountManager::onAccountOptionsChanged(const OptionsNode &ANode)
 {
 	Account *account = qobject_cast<Account *>(sender());
 	if (account)
-		emit changed(account, ANode);
+		emit accountOptionsChanged(account, ANode);
 }
 
 void AccountManager::onRostersViewIndexContextMenu(const QList<IRosterIndex *> &AIndexes, quint32 ALabelId, Menu *AMenu)
 {
 	if (ALabelId==AdvancedDelegateItem::DisplayId && AIndexes.count()==1 && AIndexes.first()->kind()==RIK_STREAM_ROOT)
 	{
-		IAccount *account = accountByStream(AIndexes.first()->data(RDR_STREAM_JID).toString());
+		IAccount *account = findAccountByStream(Jid(AIndexes.first()->data(RDR_STREAM_JID).toString()));
 		if (account)
 		{
 			Action *action = new Action(AMenu);

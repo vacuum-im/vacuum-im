@@ -13,16 +13,14 @@ class Account :
 	Q_INTERFACES(IAccount);
 public:
 	Account(IXmppStreams *AXmppStreams, const OptionsNode &AOptionsNode, QObject *AParent);
-	~Account();
 	virtual QObject *instance() { return this; }
-	virtual bool isValid() const;
 	virtual QUuid accountId() const;
+	virtual Jid accountJid() const;
+	virtual Jid streamJid() const;
 	virtual bool isActive() const;
 	virtual void setActive(bool AActive);
 	virtual QString name() const;
 	virtual void setName(const QString &AName);
-	virtual Jid streamJid() const;
-	virtual void setStreamJid(const Jid &AStreamJid);
 	virtual QString resource() const;
 	virtual void setResource(const QString &AResource);
 	virtual QString password() const;

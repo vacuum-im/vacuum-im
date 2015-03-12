@@ -33,20 +33,19 @@ public:
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAccountManager
 	virtual QList<IAccount *> accounts() const;
-	virtual IAccount *accountById(const QUuid &AAcoountId) const;
-	virtual IAccount *accountByStream(const Jid &AStreamJid) const;
-	virtual IAccount *appendAccount(const QUuid &AAccountId);
-	virtual void showAccount(const QUuid &AAccountId);
-	virtual void hideAccount(const QUuid &AAccountId);
-	virtual void removeAccount(const QUuid &AAccountId);
+	virtual IAccount *findAccountById(const QUuid &AAcoountId) const;
+	virtual IAccount *findAccountByStream(const Jid &AStreamJid) const;
+	virtual IAccount *createAccount(const Jid &AAccountJid, const QString &AName);
 	virtual void destroyAccount(const QUuid &AAccountId);
 signals:
-	void appended(IAccount *AAccount);
-	void shown(IAccount *AAccount);
-	void hidden(IAccount *AAccount);
-	void removed(IAccount *AAccount);
-	void changed(IAccount *AAcount, const OptionsNode &ANode);
-	void destroyed(const QUuid &AAccountId);
+	void accountInserted(IAccount *AAccount);
+	void accountRemoved(IAccount *AAccount);
+	void accountDestroyed(const QUuid &AAccountId);
+	void accountActiveChanged(IAccount *AAccount, bool AActive);
+	void accountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode);
+protected:
+	IAccount *insertAccount(const OptionsNode &AOptions);
+	void removeAccount(const QUuid &AAccountId);
 protected:
 	void openAccountOptionsNode(const QUuid &AAccountId);
 	void closeAccountOptionsNode(const QUuid &AAccountId);

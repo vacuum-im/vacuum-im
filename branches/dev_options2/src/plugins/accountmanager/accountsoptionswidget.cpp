@@ -11,11 +11,14 @@
 #include <utils/pluginhelper.h>
 #include <utils/options.h>
 #include "accountmanager.h"
+#include "createaccountwizard.h"
 
 AccountsOptionsWidget::AccountsOptionsWidget(AccountManager *AManager, QWidget *AParent) : QWidget(AParent)
 {
 	ui.setupUi(this);
 	setAcceptDrops(true);
+	
+	FDragItem = NULL;
 
 	FAccountManager = AManager;
 	FStatusIcons = PluginHelper::pluginInstance<IStatusIcons>();
@@ -24,9 +27,13 @@ AccountsOptionsWidget::AccountsOptionsWidget(AccountManager *AManager, QWidget *
 	FLayout = new QVBoxLayout(ui.wdtAccounts);
 	FLayout->setMargin(0);
 
-	connect(ui.pbtAdd,SIGNAL(clicked(bool)),SLOT(onAddButtonClicked(bool)));
-	connect(ui.lblHideShowInactive,SIGNAL(linkActivated(const QString &)),SLOT(onHideShowInactiveAccountsLinkActivated(const QString &)));
-	connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+	ui.lblAddAccount->setText(QString("<a href='add_account'>%1</a>").arg(tr("Add Account...")));
+	connect(ui.lblAddAccount,SIGNAL(linkActivated(const QString &)),SLOT(onAddAccountLinkActivated()));
+
+	connect(ui.lblHideShowInactive,SIGNAL(linkActivated(const QString &)),SLOT(onHideShowInactiveAccountsLinkActivated()));
+
+	connect(FAccountManager->instance(),SIGNAL(accountInserted(IAccount *)),SLOT(onAccountInserted(IAccount *)));
+	connect(FAccountManager->instance(),SIGNAL(accountOptionsChanged(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 
 	reset();
 }
@@ -41,12 +48,13 @@ void AccountsOptionsWidget::apply()
 	QList<IAccount *> curAccounts;
 	for (QMap<QUuid, AccountItemWidget *>::const_iterator it = FAccountItems.constBegin(); it!=FAccountItems.constEnd(); ++it)
 	{
-		IAccount *account = FAccountManager->accountById(it.key());
+		IAccount *account = FAccountManager->findAccountById(it.key());
 		if (account)
 		{
 			AccountItemWidget *item = it.value();
-			account->setActive(item->isActive());
 			account->optionsNode().setValue(FLayout->indexOf(item),"order");
+			account->optionsNode().setValue(item->isActive(),"active");
+			account->setActive(item->isActive());
 			item->setActive(account->isActive());
 			curAccounts.append(account);
 		}
@@ -66,7 +74,6 @@ void AccountsOptionsWidget::reset()
 	foreach(IAccount *account, FAccountManager->accounts())
 	{
 		AccountItemWidget *item = getAccountItemWidget(account->accountId());
-		item->setActive(account->isActive());
 		updateAccountItemWidget(item,account);
 
 		curAccounts.append(account->accountId());
@@ -132,8 +139,9 @@ AccountItemWidget *AccountsOptionsWidget::getAccountItemWidget(const QUuid &AAcc
 void AccountsOptionsWidget::updateAccountItemWidget(AccountItemWidget *AItem, IAccount *AAccount) const
 {
 	AItem->setName(AAccount->name());
-	AItem->setStreamJid(AAccount->streamJid());
-	AItem->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AItem->streamJid(),IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon());
+	AItem->setAccountJid(AAccount->accountJid());
+	AItem->setActive(AAccount->optionsNode().value("active").toBool());
+	AItem->setIcon(FStatusIcons!=NULL ? FStatusIcons->iconByJidStatus(AItem->accountJid(),IPresence::Online,SUBSCRIPTION_BOTH,false) : QIcon());
 }
 
 void AccountsOptionsWidget::removeAccountItemWidget(const QUuid &AAccountId)
@@ -191,8 +199,15 @@ void AccountsOptionsWidget::dragMoveEvent(QDragMoveEvent *AEvent)
 	}
 }
 
-void AccountsOptionsWidget::onAddButtonClicked(bool)
+void AccountsOptionsWidget::onAddAccountLinkActivated()
 {
+	QWizard *wizard = new CreateAccountWizard(this);
+	wizard->show();
+}
+
+void AccountsOptionsWidget::onHideShowInactiveAccountsLinkActivated()
+{
+	setInactiveAccounsHidden(!isInactiveAccountsHidden());
 }
 
 void AccountsOptionsWidget::onRemoveButtonClicked(const QUuid &AAccountId)
@@ -200,7 +215,7 @@ void AccountsOptionsWidget::onRemoveButtonClicked(const QUuid &AAccountId)
 	AccountItemWidget *item = FAccountItems.value(AAccountId);
 	if (item)
 	{
-		QMessageBox::StandardButton res = QMessageBox::warning(this, tr("Confirm removal of an account"),
+		QMessageBox::StandardButton res = QMessageBox::warning(this, tr("Remove Account"),
 			tr("You are assured that wish to remove an account <b>%1</b>?<br>All settings will be lost.").arg(Qt::escape(item->name())),
 			QMessageBox::Ok | QMessageBox::Cancel);
 		
@@ -218,10 +233,14 @@ void AccountsOptionsWidget::onSettingsButtonClicked(const QUuid &AAccountId)
 	FOptionsManager->showOptionsDialog(QString::null, rootId, window());
 }
 
-void AccountsOptionsWidget::onHideShowInactiveAccountsLinkActivated(const QString &ALink)
+void AccountsOptionsWidget::onAccountInserted(IAccount *AAccount)
 {
-	Q_UNUSED(ALink);
-	setInactiveAccounsHidden(!isInactiveAccountsHidden());
+	if (!FAccountItems.contains(AAccount->accountId()))
+	{
+		AccountItemWidget *item = getAccountItemWidget(AAccount->accountId());
+		updateAccountItemWidget(item,AAccount);
+		FLayout->addWidget(item);
+	}
 }
 
 void AccountsOptionsWidget::onAccountOptionsChanged(IAccount *AAcount, const OptionsNode &ANode)
