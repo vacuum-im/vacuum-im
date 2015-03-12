@@ -538,7 +538,7 @@ void Bookmarks::autoStartBookmarks(const Jid &AStreamJid) const
 	IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
 	if (presence!=NULL && presence->isOpen() && isReady(AStreamJid))
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 		if (account==NULL || !account->optionsNode().value("ignore-autojoin").toBool())
 		{
 			LOG_STRM_INFO(AStreamJid,"Auto joining bookmark conferences");

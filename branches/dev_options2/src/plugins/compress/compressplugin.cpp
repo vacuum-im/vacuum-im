@@ -112,7 +112,7 @@ IXmppFeature *CompressPlugin::newXmppFeature(const QString &AFeatureNS, IXmppStr
 {
 	if (AFeatureNS == NS_FEATURE_COMPRESS)
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AXmppStream->streamJid()) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AXmppStream->streamJid()) : NULL;
 		if (account==NULL || account->optionsNode().value("stream-compress").toBool())
 		{
 			LOG_STRM_INFO(AXmppStream->streamJid(),"Compression XMPP stream feature created");

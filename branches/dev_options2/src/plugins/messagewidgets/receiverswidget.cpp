@@ -400,7 +400,7 @@ QStandardItem *ReceiversWidget::getStreamItem(const Jid &AStreamJid)
 		streamItem->setBackground(ui.trvReceivers->palette().color(QPalette::Active, QPalette::Dark));
 		streamItem->setForeground(ui.trvReceivers->palette().color(QPalette::Active, QPalette::BrightText));
 
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 		streamItem->setText(account!=NULL ? account->name() : AStreamJid.uBare());
 
 		FModel->invisibleRootItem()->appendRow(streamItem);

@@ -20,10 +20,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Auto Select</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>TLSv1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33,6 +29,10 @@
     </message>
     <message>
         <source>SSLv2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -51,67 +51,51 @@
         <translation>Використовувати застаріле SSL-з&apos;єднання</translation>
     </message>
     <message>
-        <source>Certificate check mode:</source>
+        <source>SSL Protocol:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>SSL Protocol:</source>
+        <source>Certificate:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>DefaultConnectionPlugin</name>
-    <message>
-        <source>Allows to set a standard TCP connection to Jabber server</source>
-        <translation>Дозволяє встановити стандартне TCP-з&apos;єднання до серверу</translation>
-    </message>
+    <name>DefaultConnectionEngine</name>
     <message>
         <source>Default Connection</source>
-        <translation>Стандартне з&apos;єднання</translation>
+        <translation type="unfinished">Стандартне з&apos;єднання</translation>
     </message>
     <message>
-        <source>Organization: %1</source>
-        <translation>Організація: %1</translation>
+        <source>Allows to set a standard TCP connection to Jabber server</source>
+        <translation type="unfinished">Дозволяє встановити стандартне TCP-з&apos;єднання до серверу</translation>
     </message>
     <message>
-        <source>Subunit: %1</source>
-        <translation>Підрозділ: %1</translation>
-    </message>
-    <message>
-        <source>Country: %1</source>
-        <translation>Країна: %1</translation>
-    </message>
-    <message>
-        <source>Locality: %1</source>
-        <translation>Місце знаходження: %1</translation>
-    </message>
-    <message>
-        <source>State/Province: %1</source>
-        <translation>Штат/провінція: %1</translation>
-    </message>
-    <message>
-        <source>SSL Authentication Error</source>
-        <translation>Помилка автентифікації SSL</translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation>Відключитися</translation>
-    </message>
-    <message>
-        <source>Connect Once</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect Always</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <source>Host certificate is not in trusted list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Name: %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Organization: %1</source>
+        <translation type="unfinished">Організація: %1</translation>
+    </message>
+    <message>
+        <source>Subunit: %1</source>
+        <translation type="unfinished">Підрозділ: %1</translation>
+    </message>
+    <message>
+        <source>Country: %1</source>
+        <translation type="unfinished">Країна: %1</translation>
+    </message>
+    <message>
+        <source>Locality: %1</source>
+        <translation type="unfinished">Місце знаходження: %1</translation>
+    </message>
+    <message>
+        <source>State/Province: %1</source>
+        <translation type="unfinished">Штат/провінція: %1</translation>
     </message>
     <message>
         <source>Certificate holder:</source>
@@ -138,7 +122,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Host certificate is not in trusted list</source>
+        <source>SSL Authentication Error</source>
+        <translation type="unfinished">Помилка автентифікації SSL</translation>
+    </message>
+    <message>
+        <source>Connection to &lt;b&gt;%1&lt;/b&gt; can not be considered completely safe due to errors in servers certificate check:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished">Відключитися</translation>
+    </message>
+    <message>
+        <source>Connect Once</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect Always</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

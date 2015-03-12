@@ -25,9 +25,10 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 	if (!FReadOnly && FField.type == DATAFIELD_TYPE_BOOLEAN)
 	{
 		FCheckBox = new QCheckBox(this);
-		FCheckBox->setText(label);
+		FCheckBox->setText(label + (FField.required ? QString("*") : QString::null));
 		FCheckBox->setToolTip(desc);
 		FCheckBox->installEventFilter(this);
+		connect(FCheckBox,SIGNAL(stateChanged(int)),SLOT(changed()));
 		layout()->addWidget(FCheckBox);
 	}
 	else if (FField.type == DATAFIELD_TYPE_FIXED)
@@ -48,9 +49,11 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 			FComboBox->setEditable(true);
 			FComboBox->setValidator(FDataForms->dataValidator(FField.validate,FComboBox));
 			FLineEdit = FComboBox->lineEdit();
+			connect(FLineEdit,SIGNAL(editTextChanged(const QString &)),SIGNAL(changed()));
 		}
 		FComboBox->setToolTip(desc);
 		FComboBox->installEventFilter(this);
+		connect(FComboBox,SIGNAL(currentIndexChanged(const QString &)),SIGNAL(changed()));
 		layout()->addWidget(FComboBox);
 	}
 	else if (FField.type == DATAFIELD_TYPE_LISTMULTI)
@@ -67,6 +70,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FListWidget->setWrapping(true);
 		FListWidget->setToolTip(desc);
 		FListWidget->installEventFilter(this);
+		connect(FListWidget,SIGNAL(itemChanged(QListWidgetItem *)),SIGNAL(changed()));
 		layout()->addWidget(FListWidget);
 	}
 	else if (FField.type == DATAFIELD_TYPE_JIDMULTI || FField.type == DATAFIELD_TYPE_TEXTMULTI)
@@ -77,6 +81,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FTextEdit->setReadOnly(FReadOnly);
 		FTextEdit->setAcceptRichText(false);
 		FTextEdit->installEventFilter(this);
+		connect(FTextEdit,SIGNAL(textChanged()),SIGNAL(changed()));
 		layout()->addWidget(FTextEdit);
 	}
 	else if (FField.validate.type == DATAVALIDATE_TYPE_DATE)
@@ -93,6 +98,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FDateEdit->setReadOnly(FReadOnly);
 		FDateEdit->setCalendarPopup(true);
 		FDateEdit->installEventFilter(this);
+		connect(FDateEdit,SIGNAL(dateChanged(const QDate &)),SIGNAL(changed()));
 		layout()->addWidget(FDateEdit);
 	}
 	else if (FField.validate.type == DATAVALIDATE_TYPE_TIME)
@@ -108,6 +114,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FTimeEdit->setToolTip(desc);
 		FTimeEdit->setReadOnly(FReadOnly);
 		FTimeEdit->installEventFilter(this);
+		connect(FTimeEdit,SIGNAL(timeChanged(const QTime &)),SIGNAL(changed()));
 		layout()->addWidget(FTimeEdit);
 	}
 	else if (FField.validate.type == DATAVALIDATE_TYPE_DATETIME)
@@ -130,6 +137,7 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FDateTimeEdit->setReadOnly(FReadOnly);
 		FDateTimeEdit->setCalendarPopup(true);
 		FDateTimeEdit->installEventFilter(this);
+		connect(FDateTimeEdit,SIGNAL(dateTimeChanged(const QDateTime &)),SIGNAL(changed()));
 		layout()->addWidget(FDateTimeEdit);
 	}
 	else //HIDDEN JIDSINGLE TEXTPRIVATE TEXTSINGLE
@@ -142,14 +150,15 @@ DataFieldWidget::DataFieldWidget(IDataForms *ADataForms, const IDataField &AFiel
 		FLineEdit->setReadOnly(FReadOnly);
 		FLineEdit->setValidator(FDataForms->dataValidator(FField.validate,FLineEdit));
 		FLineEdit->installEventFilter(this);
+		connect(FLineEdit,SIGNAL(textChanged(const QString &)),SIGNAL(changed()));
 		layout()->addWidget(FLineEdit);
 	}
 	setValue(FField.value);
 }
 
-DataFieldWidget::~DataFieldWidget()
+bool DataFieldWidget::isReadOnly() const
 {
-
+	return FReadOnly;
 }
 
 IDataField DataFieldWidget::userDataField() const
@@ -157,6 +166,11 @@ IDataField DataFieldWidget::userDataField() const
 	IDataField field = FField;
 	field.value = value();
 	return field;
+}
+
+IDataField DataFieldWidget::dataField() const
+{
+	return FField;
 }
 
 QVariant DataFieldWidget::value() const
@@ -287,6 +301,7 @@ void DataFieldWidget::setValue(const QVariant &AValue)
 	{
 		FLineEdit->setText(AValue.toString());
 	}
+	emit changed();
 }
 
 IDataMediaWidget *DataFieldWidget::mediaWidget() const
@@ -301,7 +316,7 @@ void DataFieldWidget::appendLabel(const QString &AText, QWidget *ABuddy)
 		FLabel = new QLabel(this);
 		FLabel->setWordWrap(true);
 		FLabel->setTextFormat(Qt::PlainText);
-		FLabel->setText(AText);
+		FLabel->setText(AText + (FField.required ? QString("*") : QString::null));
 		FLabel->setBuddy(ABuddy);
 		layout()->addWidget(FLabel);
 	}

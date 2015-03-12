@@ -73,14 +73,6 @@
 <context>
     <name>SetupPluginsDialog</name>
     <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;System&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Country&gt;</source>
-        <translation>&lt;Any Country&gt;</translation>
-    </message>
-    <message>
         <source>Restart Application</source>
         <translation>Restart Application</translation>
     </message>
@@ -98,18 +90,6 @@
     <message>
         <source>Error Message:</source>
         <translation>Error Message:</translation>
-    </message>
-    <message>
-        <source>Common Settings</source>
-        <translation>Common Settings</translation>
-    </message>
-    <message>
-        <source>Language:</source>
-        <translation>Language:</translation>
-    </message>
-    <message>
-        <source>Country:</source>
-        <translation>Country:</translation>
     </message>
     <message>
         <source>Depends</source>

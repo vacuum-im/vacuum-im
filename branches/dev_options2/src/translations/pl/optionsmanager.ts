@@ -171,14 +171,6 @@
         <translation>Zmień profil</translation>
     </message>
     <message>
-        <source>Misc</source>
-        <translation>Ogólne</translation>
-    </message>
-    <message>
-        <source>Auto run on system startup</source>
-        <translation>Uruchom automatycznie podczas startu systemu</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation>Opcje</translation>
     </message>
@@ -189,6 +181,30 @@
     <message>
         <source>Show options dialog</source>
         <translation>Pokaż okno ustawień</translation>
+    </message>
+    <message>
+        <source>Common Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto run application on system startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Localization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;System Language&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

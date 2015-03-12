@@ -193,14 +193,6 @@ You can set status class for additional statuses defined by you.</source>
         <translation>Редагувати статуси</translation>
     </message>
     <message>
-        <source>Auto connect on startup</source>
-        <translation>Авто-підключення при старті</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Автоматично відновлювати з&apos;єднання</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>Далеко від клавіатури</translation>
     </message>
@@ -210,6 +202,14 @@ You can set status class for additional statuses defined by you.</source>
     </message>
     <message>
         <source>Left %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect to server on connection errors</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

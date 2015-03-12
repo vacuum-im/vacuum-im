@@ -193,14 +193,6 @@ Sie können Statusklassen für zusätzlich von ihnen definierte Statusmeldungen 
         <translation>Status bearbeiten</translation>
     </message>
     <message>
-        <source>Auto connect on startup</source>
-        <translation>Beim Start automatisch verbinden</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Automatisch neu verbinden wenn Verbindung getrennt wurde</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>Ich bin nicht an meinem Arbeitsplatz</translation>
     </message>
@@ -210,6 +202,14 @@ Sie können Statusklassen für zusätzlich von ihnen definierte Statusmeldungen 
     </message>
     <message>
         <source>Left %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect to server on connection errors</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

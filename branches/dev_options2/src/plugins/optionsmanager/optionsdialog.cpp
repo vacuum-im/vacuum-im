@@ -33,6 +33,7 @@ OptionsDialog::OptionsDialog(IOptionsManager *AOptionsManager, const QString &AR
 	REPORT_VIEW;
 	ui.setupUi(this);
 	setWindowTitle(tr("Options"));
+	setWindowModality(Qt::WindowModal);
 	setAttribute(Qt::WA_DeleteOnClose,true);
 	IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->insertAutoIcon(this,MNI_OPTIONS_DIALOG,0,0,"windowIcon");
 
@@ -93,27 +94,17 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 	LOG_DEBUG(QString("Creating options dialog widgets for node=%1").arg(ANodeId));
 
 	QWidget *nodeWidget = new QWidget(ui.scaScroll);
-	
-	QVBoxLayout *widgetLayout = new QVBoxLayout(nodeWidget);
-	widgetLayout->setMargin(5);
+	QVBoxLayout *nodeLayout = new QVBoxLayout(nodeWidget);
+	nodeLayout->setMargin(5);
 
 	QMultiMap<int, IOptionsDialogWidget *> orderedWidgets;
 	foreach(IOptionsDialogHolder *optionsHolder, FOptionsManager->optionsDialogHolders())
-	{
-		QMultiMap<int, IOptionsDialogWidget *> widgets = optionsHolder->optionsDialogWidgets(ANodeId,nodeWidget);
-		for (QMultiMap<int, IOptionsDialogWidget *>::const_iterator  it = widgets.constBegin(); it!=widgets.constEnd(); ++it)
-		{
-			orderedWidgets.insertMulti(it.key() ,it.value());
-			connect(this,SIGNAL(applied()),it.value()->instance(),SLOT(apply()));
-			connect(this,SIGNAL(reseted()),it.value()->instance(),SLOT(reset()));
-			connect(it.value()->instance(),SIGNAL(modified()),SLOT(onOptionsWidgetModified()));
-		}
-	}
+		orderedWidgets += optionsHolder->optionsDialogWidgets(ANodeId,nodeWidget);
 
 	if (!orderedWidgets.isEmpty())
 	{
 		QVBoxLayout *headerLayout = NULL;
-		IOptionsDialogWidget *lastHeader = NULL;
+		IOptionsDialogWidget *headerWidget = NULL;
 		foreach(IOptionsDialogWidget *widget, orderedWidgets)
 		{
 			bool isHeader = qobject_cast<OptionsDialogHeader *>(widget->instance()) != NULL;
@@ -123,7 +114,7 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 				{
 					headerLayout = new QVBoxLayout;
 					headerLayout->setContentsMargins(15,0,0,0);
-					widgetLayout->addLayout(headerLayout);
+					nodeLayout->addLayout(headerLayout);
 				}
 				headerLayout->addWidget(widget->instance());
 			}
@@ -131,27 +122,34 @@ QWidget *OptionsDialog::createNodeWidget(const QString &ANodeId)
 			{
 				if (headerLayout != NULL)
 				{
-					widgetLayout->addSpacing(10);
+					nodeLayout->addSpacing(10);
 					headerLayout = NULL;
 				}
-				else if (lastHeader != NULL)
+				else if (headerWidget != NULL)
 				{
-					delete lastHeader->instance();
+					delete headerWidget->instance();
 				}
-				widgetLayout->addWidget(widget->instance());
-				lastHeader = widget;
+				nodeLayout->addWidget(widget->instance());
+				headerWidget = widget;
 			}
+
+			connect(this,SIGNAL(applied()),widget->instance(),SLOT(apply()));
+			connect(this,SIGNAL(reseted()),widget->instance(),SLOT(reset()));
+			connect(widget->instance(),SIGNAL(modified()),SLOT(onOptionsWidgetModified()));
 		}
 
+		if (headerWidget!=NULL && headerLayout==NULL)
+			delete headerWidget->instance();
+
 		if (!canExpandVertically(nodeWidget))
-			widgetLayout->addStretch();
+			nodeLayout->addStretch();
 	}
 	else
 	{
 		QLabel *label = new QLabel(tr("Options are absent"),nodeWidget);
 		label->setAlignment(Qt::AlignCenter);
 		label->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-		widgetLayout->addWidget(label);
+		nodeLayout->addWidget(label);
 	}
 
 	FCleanupHandler.add(nodeWidget);
@@ -241,7 +239,7 @@ void OptionsDialog::onCurrentItemChanged(const QModelIndex &ACurrent, const QMod
 	if (curWidget)
 		ui.scaScroll->setWidget(curWidget);
 
-	Options::setFileValue(nodeId,OPV_MISC_OPTIONS_DIALOG_LASTNODE,FRootNodeId);
+	Options::setFileValue(nodeId,OPV_COMMON_OPTIONS_DIALOG_LASTNODE,FRootNodeId);
 }
 
 void OptionsDialog::onDialogButtonClicked(QAbstractButton *AButton)

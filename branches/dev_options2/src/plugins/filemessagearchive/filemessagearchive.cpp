@@ -100,8 +100,7 @@ bool FileMessageArchive::initConnections(IPluginManager *APluginManager, int &AI
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager)
 		{
-			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
+			connect(FAccountManager->instance(),SIGNAL(accountActiveChanged(IAccount *, bool)),SLOT(onAccountActiveChanged(IAccount *, bool)));
 		}
 	}
 
@@ -1368,10 +1367,10 @@ void FileMessageArchive::onOptionsClosed()
 	FArchiveHomePath = FPluginManager->homePath();
 }
 
-void FileMessageArchive::onAccountShown(IAccount *AAccount)
+void FileMessageArchive::onAccountActiveChanged(IAccount *AAccount, bool AActive)
 {
 	Jid bareStreamJid = AAccount->streamJid().bare();
-	if (!FDatabaseProperties.contains(bareStreamJid))
+	if (AActive && !FDatabaseProperties.contains(bareStreamJid))
 	{
 		DatabaseTaskOpenDatabase *task = new DatabaseTaskOpenDatabase(bareStreamJid,databaseArchiveFile(bareStreamJid));
 		if (FDatabaseWorker->startTask(task))
@@ -1384,15 +1383,11 @@ void FileMessageArchive::onAccountShown(IAccount *AAccount)
 			LOG_STRM_WARNING(AAccount->streamJid(),"Failed to open database: Task not started");
 		}
 	}
-}
-
-void FileMessageArchive::onAccountHidden(IAccount *AAccount)
-{
-	Jid bareStreamJid = AAccount->streamJid().bare();
-	if (FDatabaseProperties.contains(bareStreamJid))
+	else if (!AActive && FDatabaseProperties.contains(bareStreamJid))
 	{
 		emit databaseAboutToClose(bareStreamJid);
 		setDatabaseProperty(bareStreamJid,FADP_DATABASE_NOT_CLOSED,"false");
+
 		DatabaseTaskCloseDatabase *task = new DatabaseTaskCloseDatabase(bareStreamJid);
 		if (FDatabaseWorker->startTask(task))
 		{

@@ -21,12 +21,13 @@
 
 ConnectionManager::ConnectionManager()
 {
-	FEncryptedLabelId = 0;
 	FPluginManager = NULL;
 	FXmppStreams = NULL;
 	FAccountManager = NULL;
 	FRostersViewPlugin = NULL;
 	FOptionsManager = NULL;
+
+	FEncryptedLabelId = 0;
 }
 
 ConnectionManager::~ConnectionManager()
@@ -48,26 +49,14 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 	Q_UNUSED(AInitOrder);
 	FPluginManager = APluginManager;
 
-	QList<IPlugin *> plugins = APluginManager->pluginInterface("IConnectionPlugin");
-	foreach (IPlugin *plugin, plugins)
-	{
-		IConnectionPlugin *cplugin = qobject_cast<IConnectionPlugin *>(plugin->instance());
-		if (cplugin)
-		{
-			FPlugins.insert(cplugin->pluginId(), cplugin);
-			connect(cplugin->instance(),SIGNAL(connectionCreated(IConnection *)),SLOT(onConnectionCreated(IConnection *)));
-			connect(cplugin->instance(),SIGNAL(connectionDestroyed(IConnection *)),SLOT(onConnectionDestroyed(IConnection *)));
-		}
-	}
-
 	IPlugin *plugin = APluginManager->pluginInterface("IAccountManager").value(0,NULL);
 	if (plugin)
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager)
 		{
-			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+			connect(FAccountManager->instance(),SIGNAL(accountActiveChanged(IAccount *, bool)),SLOT(onAccountActiveChanged(IAccount *, bool)));
+			connect(FAccountManager->instance(),SIGNAL(accountOptionsChanged(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 		}
 	}
 
@@ -97,7 +86,7 @@ bool ConnectionManager::initConnections(IPluginManager *APluginManager, int &AIn
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
 
-	return !FPlugins.isEmpty();
+	return true;
 }
 
 bool ConnectionManager::initObjects()
@@ -112,6 +101,11 @@ bool ConnectionManager::initObjects()
 		FEncryptedLabelId = FRostersViewPlugin->rostersView()->registerLabel(label);
 	}
 
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsDialogHolder(this);
+	}
+
 	return true;
 }
 
@@ -122,9 +116,6 @@ bool ConnectionManager::initSettings()
 	Options::setDefaultValue(OPV_PROXY_DEFAULT,QString());
 	Options::setDefaultValue(OPV_PROXY_NAME,tr("New Proxy"));
 	Options::setDefaultValue(OPV_PROXY_TYPE,(int)QNetworkProxy::NoProxy);
-
-	if (FOptionsManager)
-		FOptionsManager->insertOptionsDialogHolder(this);
 
 	return true;
 }
@@ -143,16 +134,6 @@ QMultiMap<int, IOptionsDialogWidget *> ConnectionManager::optionsDialogWidgets(c
 		widgets.insertMulti(OWO_ACCOUNTS_DEFAULTPROXY, proxySettingsWidget(Options::node(OPV_PROXY_DEFAULT),AParent));
 	}
 	return widgets;
-}
-
-QList<QString> ConnectionManager::pluginList() const
-{
-	return FPlugins.keys();
-}
-
-IConnectionPlugin *ConnectionManager::pluginById(const QString &APluginId) const
-{
-	return FPlugins.value(APluginId,NULL);
 }
 
 QList<QUuid> ConnectionManager::proxyList() const
@@ -320,25 +301,46 @@ void ConnectionManager::addTrustedCaCertificate(const QSslCertificate &ACertific
 	}
 }
 
+QList<QString> ConnectionManager::connectionEngines() const
+{
+	return FEngines.keys();
+}
+
+IConnectionEngine *ConnectionManager::findConnectionEngine(const QString &AEngineId) const
+{
+	return FEngines.value(AEngineId);
+}
+
+void ConnectionManager::registerConnectionEngine(IConnectionEngine *AEngine)
+{
+	if (AEngine)
+	{
+		FEngines.insert(AEngine->engineId(), AEngine);
+		connect(AEngine->instance(),SIGNAL(connectionCreated(IConnection *)),SLOT(onConnectionCreated(IConnection *)),Qt::UniqueConnection);
+		connect(AEngine->instance(),SIGNAL(connectionDestroyed(IConnection *)),SLOT(onConnectionDestroyed(IConnection *)),Qt::UniqueConnection);
+		emit connectionEngineRegistered(AEngine);
+	}
+}
+
 void ConnectionManager::updateAccountConnection(IAccount *AAccount) const
 {
 	if (AAccount->isActive())
 	{
 		OptionsNode aoptions = AAccount->optionsNode();
-		QString pluginId = aoptions.value("connection-type").toString();
-		IConnectionPlugin *plugin = FPlugins.contains(pluginId) ? FPlugins.value(pluginId) : FPlugins.values().value(0);
+		QString engineId = aoptions.value("connection-type").toString();
+		IConnectionEngine *engine = FEngines.contains(engineId) ? FEngines.value(engineId) : FEngines.values().value(0);
 		IConnection *connection = AAccount->xmppStream()->connection();
-		if (connection && connection->ownerPlugin()!=plugin)
+		if (connection && connection->engine()!=engine)
 		{
 			LOG_STRM_INFO(AAccount->streamJid(),QString("Removing current stream connection"));
 			AAccount->xmppStream()->setConnection(NULL);
 			delete connection->instance();
 			connection = NULL;
 		}
-		if (plugin!=NULL && connection==NULL)
+		if (engine!=NULL && connection==NULL)
 		{
-			LOG_STRM_INFO(AAccount->streamJid(),QString("Setting new stream connection=%1").arg(plugin->pluginId()));
-			connection = plugin->newConnection(aoptions.node("connection",pluginId),AAccount->xmppStream()->instance());
+			LOG_STRM_INFO(AAccount->streamJid(),QString("Setting new stream connection=%1").arg(engine->engineId()));
+			connection = engine->newConnection(aoptions.node("connection",engineId),AAccount->xmppStream()->instance());
 			AAccount->xmppStream()->setConnection(connection);
 		}
 	}
@@ -346,16 +348,21 @@ void ConnectionManager::updateAccountConnection(IAccount *AAccount) const
 
 void ConnectionManager::updateConnectionSettings(IAccount *AAccount) const
 {
-	QList<IAccount *> accountList = AAccount==NULL ? (FAccountManager!=NULL ? FAccountManager->accounts() : QList<IAccount *>()) : QList<IAccount *>()<<AAccount;
+	QList<IAccount *> accountList;
+	if (AAccount != NULL)
+		accountList.append(AAccount);
+	else if (FAccountManager != NULL)
+		accountList = FAccountManager->accounts();
+		
 	foreach(IAccount *account, accountList)
 	{
-		if (account->isActive() && account->xmppStream()->connection())
+		if (account->isActive() && account->xmppStream()->connection()!=NULL)
 		{
 			const OptionsNode &aoptions = account->optionsNode();
 			const OptionsNode &coptions = aoptions.node("connection",aoptions.value("connection-type").toString());
-			IConnectionPlugin *plugin = pluginById(coptions.nspace());
-			if (plugin)
-				plugin->loadConnectionSettings(account->xmppStream()->connection(), coptions);
+			IConnectionEngine *engine = findConnectionEngine(coptions.nspace());
+			if (engine)
+				engine->loadConnectionSettings(account->xmppStream()->connection(), coptions);
 		}
 	}
 }
@@ -435,9 +442,10 @@ void ConnectionManager::onOptionsChanged(const OptionsNode &ANode)
 	}
 }
 
-void ConnectionManager::onAccountShown(IAccount *AAccount)
+void ConnectionManager::onAccountActiveChanged(IAccount *AAccount, bool AActive)
 {
-	updateAccountConnection(AAccount);
+	if (AActive)
+		updateAccountConnection(AAccount);
 }
 
 void ConnectionManager::onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode)

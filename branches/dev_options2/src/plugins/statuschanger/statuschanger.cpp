@@ -125,7 +125,7 @@ bool StatusChanger::initConnections(IPluginManager *APluginManager, int &AInitOr
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager)
-			connect(FAccountManager->instance(),SIGNAL(changed(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
+			connect(FAccountManager->instance(),SIGNAL(accountOptionsChanged(IAccount *, const OptionsNode &)),SLOT(onAccountOptionsChanged(IAccount *, const OptionsNode &)));
 	}
 
 	plugin = APluginManager->pluginInterface("ITrayManager").value(0,NULL);
@@ -742,7 +742,7 @@ void StatusChanger::createStreamMenu(IPresence *APresence)
 	if (!FStreamMenu.contains(APresence))
 	{
 		Jid streamJid = APresence->streamJid();
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(streamJid) : NULL;
 
 		Menu *sMenu = new Menu(FMainMenu);
 		if (account)
@@ -852,7 +852,7 @@ void StatusChanger::updateTrayToolTip()
 		while (it != FCurrentStatus.constEnd())
 		{
 			IPresence *presence = it.key();
-			IAccount *account = FAccountManager->accountByStream(presence->streamJid());
+			IAccount *account = FAccountManager->findAccountByStream(presence->streamJid());
 			if (!trayToolTip.isEmpty())
 				trayToolTip+="\n";
 			trayToolTip += tr("%1 - %2").arg(account->name()).arg(statusItemName(it.value()));
@@ -903,7 +903,7 @@ void StatusChanger::removeConnectingLabel(IPresence *APresence)
 
 void StatusChanger::autoReconnect(IPresence *APresence)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
 	if (account && account->optionsNode().value("auto-reconnect").toBool())
 	{
 		int statusId = FLastOnlineStatus.value(APresence, STATUS_MAIN_ID);
@@ -970,7 +970,7 @@ void StatusChanger::insertStatusNotification(IPresence *APresence)
 			notify.typeId = NNT_CONNECTION_ERROR;
 			notify.data.insert(NDR_ICON,FStatusIcons!=NULL ? FStatusIcons->iconByStatus(IPresence::Error,QString::null,false) : QIcon());
 			notify.data.insert(NDR_POPUP_CAPTION, tr("Connection error"));
-			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid())->name() : APresence->streamJid().uFull());
+			notify.data.insert(NDR_POPUP_TITLE,FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid())->name() : APresence->streamJid().uFull());
 			notify.data.insert(NDR_STREAM_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_CONTACT_JID,APresence->streamJid().full());
 			notify.data.insert(NDR_POPUP_IMAGE, FNotifications->contactAvatar(APresence->streamJid()));
@@ -1018,7 +1018,7 @@ void StatusChanger::onPresenceAdded(IPresence *APresence)
 	if (FStreamMenu.count() == 1)
 		FStreamMenu.value(FStreamMenu.keys().first())->menuAction()->setVisible(false);
 
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
 	if (account)
 	{
 		if (account->optionsNode().value("status.is-main").toBool())
@@ -1066,7 +1066,7 @@ void StatusChanger::onPresenceChanged(IPresence *APresence, int AShow, const QSt
 
 void StatusChanger::onPresenceRemoved(IPresence *APresence)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(APresence->streamJid()) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(APresence->streamJid()) : NULL;
 	if (account)
 	{
 		bool isMainStatus = FMainStatusStreams.contains(APresence);
@@ -1244,7 +1244,7 @@ void StatusChanger::onProfileOpened(const QString &AProfile)
 	Q_UNUSED(AProfile);
 	foreach(IPresence *presence, FCurrentStatus.keys())
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(presence->streamJid()) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(presence->streamJid()) : NULL;
 		if (account!=NULL && account->optionsNode().value("auto-connect").toBool())
 		{
 			int statusId = !FMainStatusStreams.contains(presence) ? FLastOnlineStatus.value(presence, STATUS_MAIN_ID) : STATUS_MAIN_ID;

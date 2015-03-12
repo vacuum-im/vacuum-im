@@ -252,6 +252,10 @@ bool MessageArchiver::initObjects()
 	{
 		Shortcuts::insertWidgetShortcut(SCT_ROSTERVIEW_SHOWHISTORY,FRostersViewPlugin->rostersView()->instance());
 	}
+	if (FOptionsManager)
+	{
+		FOptionsManager->insertOptionsDialogHolder(this);
+	}
 	return true;
 }
 
@@ -265,12 +269,6 @@ bool MessageArchiver::initSettings()
 	Options::setDefaultValue(OPV_ACCOUNT_HISTORYREPLICATE,false);
 	Options::setDefaultValue(OPV_ACCOUNT_HISTORYDUPLICATE,false);
 
-	if (FOptionsManager)
-	{
-		IOptionsDialogNode dnode = { ONO_HISTORY, OPN_HISTORY, MNI_HISTORY, tr("History") };
-		FOptionsManager->insertOptionsDialogNode(dnode);
-		FOptionsManager->insertOptionsDialogHolder(this);
-	}
 	return true;
 }
 
@@ -425,21 +423,21 @@ QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(con
 	QStringList nodeTree = ANodeId.split(".",QString::SkipEmptyParts);
 	if (nodeTree.count()==3 && nodeTree.at(0)==OPN_ACCOUNTS && nodeTree.at(2)=="History")
 	{
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountById(nodeTree.at(1)) : NULL;
-		if (account && isReady(account->xmppStream()->streamJid()))
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountById(nodeTree.at(1)) : NULL;
+		if (account!=NULL && isReady(account->streamJid()))
 		{
 			OptionsNode options = account->optionsNode();
 			
 			widgets.insertMulti(OHO_ACCOUNTS_HISTORY_SERVERSETTINGS, FOptionsManager->newOptionsDialogHeader(tr("Archive preferences"),AParent));
-			widgets.insertMulti(OWO_ACCOUNTS_HISTORY_SERVERSETTINGS, new ArchiveAccountOptionsWidget(this,account->xmppStream()->streamJid(),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_HISTORY_SERVERSETTINGS, new ArchiveAccountOptionsWidget(this,account->streamJid(),AParent));
 
 			int replCount = 0;
 			int manualCount = 0;
 			foreach(IArchiveEngine *engine, archiveEngines())
 			{
-				if (engine->isCapable(account->xmppStream()->streamJid(),IArchiveEngine::ArchiveReplication))
+				if (engine->isCapable(account->streamJid(),IArchiveEngine::ArchiveReplication))
 					replCount++;
-				else if (engine->isCapable(account->xmppStream()->streamJid(),IArchiveEngine::ManualArchiving))
+				else if (engine->isCapable(account->streamJid(),IArchiveEngine::ManualArchiving))
 					manualCount++;
 			}
 
@@ -449,7 +447,7 @@ QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(con
 				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-replicate"),tr("Synchronize history between archives"),AParent));
 			}
 
-			if (isArchiveAutoSave(account->xmppStream()->streamJid()))
+			if (isArchiveAutoSave(account->streamJid()))
 			{
 				widgets.insertMulti(OHO_ACCOUNTS_HISTORY_REPLICATION,FOptionsManager->newOptionsDialogHeader(tr("Archive synchronization"),AParent));
 				widgets.insertMulti(OWO_ACCOUNTS_HISTORY_DUPLICATION,FOptionsManager->newOptionsDialogWidget(options.node("history-duplicate"),tr("Duplicate messages in local archive (not recommended)"),AParent));
@@ -459,7 +457,7 @@ QMultiMap<int, IOptionsDialogWidget *> MessageArchiver::optionsDialogWidgets(con
 	else if (ANodeId == OPN_MESSAGES)
 	{
 		int index = 0;
-		widgets.insertMulti(OHO_MESSAGES_HISORYENGINES, FOptionsManager->newOptionsDialogHeader(tr("History archives"),AParent));
+		widgets.insertMulti(OHO_MESSAGES_HISORYENGINES, FOptionsManager->newOptionsDialogHeader(tr("Used history archives"),AParent));
 		foreach(IArchiveEngine *engine, archiveEngines())
 		{
 			OptionsNode node = Options::node(OPV_HISTORY_ENGINE_ITEM,engine->engineId().toString()).node("enabled");
@@ -730,7 +728,7 @@ bool MessageArchiver::isArchivePrefsEnabled(const Jid &AStreamJid) const
 
 bool MessageArchiver::isArchiveReplicationEnabled(const Jid &AStreamJid) const
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 	return account!=NULL ? account->optionsNode().value("history-replicate").toBool() : false;
 }
 
@@ -2177,7 +2175,7 @@ void MessageArchiver::registerDiscoFeatures()
 
 void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 	if (FOptionsManager && account)
 	{
 		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
@@ -2188,7 +2186,7 @@ void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
 
 void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 	if (FOptionsManager && account)
 	{
 		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
@@ -2198,7 +2196,7 @@ void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
 
 bool MessageArchiver::isArchiveDuplicationEnabled(const Jid &AStreamJid) const
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 	return account!=NULL ? account->optionsNode().value("history-duplicate").toBool() : false;
 }
 
@@ -2804,9 +2802,13 @@ void MessageArchiver::onShowHistoryOptionsDialogByAction(bool)
 	if (FOptionsManager && FAccountManager && action)
 	{
 		Jid streamJid = action->data(ADR_STREAM_JID).toString();
-		IAccount *account = FAccountManager->accountByStream(streamJid);
+		IAccount *account = FAccountManager->findAccountByStream(streamJid);
 		if (account)
-			FOptionsManager->showOptionsDialog(OPN_HISTORY"." + account->accountId().toString(), OPN_HISTORY);
+		{
+			QString rootId = OPN_ACCOUNTS"."+account->accountId().toString();
+			QString nodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
+			FOptionsManager->showOptionsDialog(nodeId, rootId);
+		}
 	}
 }
 

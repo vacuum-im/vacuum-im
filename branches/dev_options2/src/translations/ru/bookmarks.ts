@@ -16,10 +16,6 @@
         <translation>Редактировать закладку</translation>
     </message>
     <message>
-        <source>Disable autojoin to conferences</source>
-        <translation>Отключить автовход в конференции</translation>
-    </message>
-    <message>
         <source>Automatically show window of conferences connected at startup</source>
         <translation>Показывать окна автоматически подключаемых конференций при старте</translation>
     </message>
@@ -50,6 +46,14 @@
     <message>
         <source>Join to Conference at Startup</source>
         <translation>Входить в конференцию при запуске</translation>
+    </message>
+    <message>
+        <source>Conferences</source>
+        <translation>Конференции</translation>
+    </message>
+    <message>
+        <source>Disable autojoin to conferences on this computer</source>
+        <translation>Отключить автоматический вход в конференции на этом компьютере</translation>
     </message>
 </context>
 <context>

@@ -3,6 +3,7 @@
 
 // ROOT
 #define ONO_ACCOUNTS              100
+#define ONO_COMMON                190
 #define ONO_ROSTER                200
 #define ONO_MESSAGES              300
 #define ONO_CONFERENCES           320
@@ -15,7 +16,6 @@
 #define ONO_STATUSICONS           700
 #define ONO_AUTO_STATUS           800
 #define ONO_DATASTREAMS           850
-#define ONO_MISC                  900
 
 // ONO_ACCOUNTS
 #define ONO_ACCOUNTS_PARAMS       100

@@ -1439,7 +1439,7 @@ void RecentContacts::onRostersViewIndexToolTips(IRosterIndex *AIndex, quint32 AL
 		if (FRostersModel && FRostersModel->streamsLayout()==IRostersModel::LayoutSeparately)
 		{
 			Jid streamJid = AIndex->data(RDR_STREAM_JID).toString();
-			IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
+			IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(streamJid) : NULL;
 			AToolTips.insert(RTTO_ROSTERSVIEW_INFO_ACCOUNT,tr("<b>Account:</b> %1").arg(Qt::escape(account!=NULL ? account->name() : streamJid.uBare())));
 		}
 	}

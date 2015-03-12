@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>670</width>
-    <height>473</height>
+    <width>547</width>
+    <height>369</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -54,12 +54,6 @@
        <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-      <attribute name="horizontalHeaderHighlightSections">
        <bool>false</bool>
       </attribute>
       <column>
@@ -240,65 +234,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="grbCommon">
-     <property name="title">
-      <string>Common Settings</string>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="lblLanguage">
-        <property name="text">
-         <string>Language:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::PlainText</enum>
-        </property>
-        <property name="buddy">
-         <cstring>cmbLanguage</cstring>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cmbLanguage">
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToContents</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblCountry">
-        <property name="text">
-         <string>Country:</string>
-        </property>
-        <property name="textFormat">
-         <enum>Qt::PlainText</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cmbCountry">
-        <property name="sizeAdjustPolicy">
-         <enum>QComboBox::AdjustToContents</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="hsrCommonHSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QDialogButtonBox" name="dbbButtons">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
@@ -310,7 +245,6 @@
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
   <tabstop>twtPlugins</tabstop>
-  <tabstop>cmbLanguage</tabstop>
   <tabstop>dbbButtons</tabstop>
  </tabstops>
  <resources/>

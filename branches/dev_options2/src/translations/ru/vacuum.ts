@@ -73,14 +73,6 @@
 <context>
     <name>SetupPluginsDialog</name>
     <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;Системный&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Country&gt;</source>
-        <translation>&lt;Любая страна&gt;</translation>
-    </message>
-    <message>
         <source>Restart Application</source>
         <translation>Перезапуск приложения</translation>
     </message>
@@ -98,18 +90,6 @@
     <message>
         <source>Error Message:</source>
         <translation>Сообщение об ошибке:</translation>
-    </message>
-    <message>
-        <source>Common Settings</source>
-        <translation>Общие настройки</translation>
-    </message>
-    <message>
-        <source>Language:</source>
-        <translation>Язык:</translation>
-    </message>
-    <message>
-        <source>Country:</source>
-        <translation>Страна:</translation>
     </message>
     <message>
         <source>Depends</source>

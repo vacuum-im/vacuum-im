@@ -12,6 +12,7 @@
 #define OPV_ACCOUNT_RESOURCE                            "accounts.account.resource"
 #define OPV_ACCOUNT_PASSWORD                            "accounts.account.password"
 #define OPV_ACCOUNT_REQUIREENCRYPTION                   "accounts.account.require-encryption"
+#define OPV_ACCOUNT_CREATEWIZARD_CONNECTION             "accounts.create-wizard.connection"
 // ConnectionManager
 #define OPV_ACCOUNT_CONNECTION_ITEM                     "accounts.account.connection"
 #define OPV_ACCOUNT_CONNECTION_TYPE                     "accounts.account.connection-type"
@@ -161,13 +162,16 @@
 #define OPV_MESSAGESTYLE_STYLE_ANIMATIONENABLE          "message-styles.message-type.context.style.animation-enable"
 
 // OptionsManager
-#define OPV_MISC_ROOT                                   "misc"
-#define OPV_MISC_AUTOSTART                              "misc.autostart"
-#define OPV_MISC_SHAREOSVERSION                         "misc.share-os-version"
-#define OPV_MISC_STATISTICTS_ENABLED                    "misc.statistics-enabled"
-#define OPV_MISC_OPTIONS_DIALOG_LASTNODE                "misc.options.dialog.last-node"
+#define OPV_COMMON_ROOT                                 "common"
+#define OPV_COMMON_LANGUAGE                             "common.language"
+#define OPV_COMMON_AUTOSTART                            "common.autostart"
+#define OPV_COMMON_OPTIONS_DIALOG_LASTNODE              "common.options.dialog.last-node"
+// ClintInfo
+#define OPV_COMMON_SHAREOSVERSION                       "common.share-os-version"
+// Statistics
+#define OPV_COMMON_STATISTICTS_ENABLED                  "common.statistics-enabled"
 // VCardPlugin
-#define OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE             "misc.restrict-vcard-images-size"
+#define OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE           "common.restrict-vcard-images-size"
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"

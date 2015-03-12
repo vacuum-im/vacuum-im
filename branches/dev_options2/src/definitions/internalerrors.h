@@ -61,8 +61,8 @@
 #define IERR_HISTORY_MODIFICATIONS_LOAD_ERROR                "history-modifications-load-error"
 
 // Registration
-#define IERR_REGISTER_INVALID_FORM                           "register-invalid-form"
-#define IERR_REGISTER_INVALID_DIALOG                         "register-invalid-dialog"
+#define IERR_REGISTER_UNSUPPORTED                            "register-unsupported"
+#define IERR_REGISTER_INVALID_FIELDS                         "register-invalid-fields"
 #define IERR_REGISTER_REJECTED_BY_USER                       "register-rejected-by-user"
 
 // Roster

@@ -193,14 +193,6 @@ Puedes establecer clases de estados para los estados adicionales definidos por t
         <translation>Editar estados</translation>
     </message>
     <message>
-        <source>Auto connect on startup</source>
-        <translation>Conectar automáticamente al iniciar</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Reconectar automáticamente al desconectarse</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>Estoy ausente de mi escritorio</translation>
     </message>
@@ -211,6 +203,14 @@ Puedes establecer clases de estados para los estados adicionales definidos por t
     <message>
         <source>Left %1</source>
         <translation>Salir de %1</translation>
+    </message>
+    <message>
+        <source>Connect to server on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect to server on connection errors</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -43,7 +43,7 @@ public:
 	virtual QString streamId() const;
 	virtual XmppError error() const;
 	virtual Jid streamJid() const;
-	virtual void setStreamJid(const Jid &AJid);
+	virtual void setStreamJid(const Jid &AStreamJid);
 	virtual QString password() const;
 	virtual void setPassword(const QString &APassword);
 	virtual QString getSessionPassword(bool AAskIfNeed = true);

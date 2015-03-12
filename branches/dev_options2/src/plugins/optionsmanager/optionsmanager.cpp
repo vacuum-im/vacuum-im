@@ -1,5 +1,6 @@
 #include "optionsmanager.h"
 
+#include <QLocale>
 #include <QProcess>
 #include <QSettings>
 #include <QFileInfo>
@@ -129,12 +130,13 @@ bool OptionsManager::initObjects()
 
 bool OptionsManager::initSettings()
 {
-	Options::setDefaultValue(OPV_MISC_AUTOSTART, false);
+	Options::setDefaultValue(OPV_COMMON_AUTOSTART,false);
+	Options::setDefaultValue(OPV_COMMON_LANGUAGE,QString());
 
 	if (profiles().count() == 0)
 		addProfile(DEFAULT_PROFILE, QString::null);
 
-	IOptionsDialogNode dnode = { ONO_MISC, OPN_MISC, MNI_OPTIONS_DIALOG, tr("Misc") };
+	IOptionsDialogNode dnode = { ONO_COMMON, OPN_COMMON, MNI_OPTIONS_DIALOG, tr("Common Settings") };
 	insertOptionsDialogNode(dnode);
 	insertOptionsDialogHolder(this);
 
@@ -159,13 +161,38 @@ bool OptionsManager::startPlugin()
 QMultiMap<int, IOptionsDialogWidget *> OptionsManager::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (ANodeId == OPN_MISC)
+	if (ANodeId == OPN_COMMON)
 	{
+		widgets.insertMulti(OHO_COMMON_SETTINGS, newOptionsDialogHeader(tr("Common settings"),AParent));
 #ifdef Q_WS_WIN
-		widgets.insertMulti(OWO_MISC_AUTOSTART, newOptionsDialogWidget(Options::node(OPV_MISC_AUTOSTART), tr("Auto run on system startup"), AParent));
+		widgets.insertMulti(OWO_COMMON_AUTOSTART, newOptionsDialogWidget(Options::node(OPV_COMMON_AUTOSTART), tr("Auto run application on system startup"), AParent));
 #else
 		Q_UNUSED(AParent);
 #endif
+
+		widgets.insertMulti(OHO_COMMON_LOCALIZATION, newOptionsDialogHeader(tr("Localization"),AParent));
+
+		QDir localeDir(QApplication::applicationDirPath());
+		localeDir.cd(TRANSLATIONS_DIR);
+
+		QComboBox *langCombox = new QComboBox(AParent);
+		langCombox->addItem(tr("<System Language>"),QString());
+		foreach(QString name, localeDir.entryList(QDir::Dirs,QDir::LocaleAware))
+		{
+			QLocale locale(name);
+			if (locale.language() != QLocale::C)
+			{
+				QString langName = locale.nativeLanguageName();
+				QString countryName = locale.nativeCountryName();
+				if (!langName.isEmpty() && !countryName.isEmpty())
+				{
+					langName[0] = langName[0].toUpper();
+					countryName[0] = countryName[0].toUpper();
+					langCombox->addItem(QString("%1 (%2)").arg(langName,countryName),locale.name());
+				}
+			}
+		}
+		widgets.insertMulti(OWO_COMMON_LANGUAGE,newOptionsDialogWidget(Options::node(OPV_COMMON_LANGUAGE),tr("Language:"),langCombox,AParent));
 	}
 	return widgets;
 }
@@ -538,7 +565,7 @@ QDialog *OptionsManager::showOptionsDialog(const QString &ANodeId, const QString
 			dialog = new OptionsDialog(this,ARootId,AParent);
 			connect(dialog,SIGNAL(applied()),SLOT(onOptionsDialogApplied()),Qt::QueuedConnection);
 		}
-		dialog->showNode(ANodeId.isNull() ? Options::fileValue(OPV_MISC_OPTIONS_DIALOG_LASTNODE,ARootId).toString() : ANodeId);
+		dialog->showNode(ANodeId.isNull() ? Options::fileValue(OPV_COMMON_OPTIONS_DIALOG_LASTNODE,ARootId).toString() : ANodeId);
 		WidgetManager::showActivateRaiseWindow(dialog);
 		return dialog;
 	}
@@ -750,7 +777,7 @@ void OptionsManager::updateOptionDefaults(const QMap<QString, QVariant> &AOption
 
 void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_MISC_AUTOSTART)
+	if (ANode.path() == OPV_COMMON_AUTOSTART)
 	{
 #ifdef Q_WS_WIN
 		QSettings reg("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
@@ -758,10 +785,14 @@ void OptionsManager::onOptionsChanged(const OptionsNode &ANode)
 			reg.setValue(CLIENT_NAME, QApplication::arguments().join(" "));
 		else
 			reg.remove(CLIENT_NAME);
-		//Remove old client name
-		reg.remove("Vacuum IM");
 #endif
 	}
+	else if (ANode.path() == OPV_COMMON_LANGUAGE)
+	{
+		QLocale locale(ANode.value().toString());
+		FPluginManager->setLocale(locale.language(),locale.country());
+	}
+
 	LOG_DEBUG(QString("Options node value changed, node=%1, value=%2").arg(ANode.path(),ANode.value().toString()));
 }
 

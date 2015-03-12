@@ -60,16 +60,16 @@
         <translation>Время бездействия</translation>
     </message>
     <message>
-        <source>Share information about OS version</source>
-        <translation>Раскрывать информацию о версии ОС</translation>
-    </message>
-    <message>
         <source>XMPP Ping</source>
         <translation>XMPP Ping</translation>
     </message>
     <message>
         <source>Supports the exchanging of the application-level pings over XML streams</source>
         <translation>Поддерживает обмен ping-ами на уровне приложения через XMPP подключение</translation>
+    </message>
+    <message>
+        <source>Share information about your OS version</source>
+        <translation>Раскрывать информацию о версии вашей ОС</translation>
     </message>
 </context>
 <context>

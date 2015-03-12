@@ -12,4 +12,8 @@
     <key>accountChange</key>
     <object mime="image/png">accountchange.png</object>
   </icon>
+  <icon>
+    <key>accountMove</key>
+    <object mime="image/png">accountmove.png</object>
+  </icon>
 </icondef>

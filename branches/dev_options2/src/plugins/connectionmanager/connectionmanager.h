@@ -35,8 +35,6 @@ public:
 	//IOptionsHolder
 	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IConnectionManager
-	virtual QList<QString> pluginList() const;
-	virtual IConnectionPlugin *pluginById(const QString &APluginId) const;
 	virtual QList<QUuid> proxyList() const;
 	virtual IConnectionProxy proxyById(const QUuid &AProxyId) const;
 	virtual void setProxy(const QUuid &AProxyId, const IConnectionProxy &AProxy);
@@ -49,12 +47,16 @@ public:
 	virtual QUuid loadProxySettings(const OptionsNode &ANode) const;
 	virtual QList<QSslCertificate> trustedCaCertificates(bool AWithUsers=true) const;
 	virtual void addTrustedCaCertificate(const QSslCertificate &ACertificate);
+	virtual QList<QString> connectionEngines() const;
+	virtual IConnectionEngine *findConnectionEngine(const QString &AEngineId) const;
+	virtual void registerConnectionEngine(IConnectionEngine *AEngine);
 signals:
 	void connectionCreated(IConnection *AConnection);
 	void connectionDestroyed(IConnection *AConnection);
 	void proxyChanged(const QUuid &AProxyId, const IConnectionProxy &AProxy);
 	void proxyRemoved(const QUuid &AProxyId);
 	void defaultProxyChanged(const QUuid &AProxyId);
+	void connectionEngineRegistered(IConnectionEngine *AEngine);
 protected:
 	void updateAccountConnection(IAccount *AAccount) const;
 	void updateConnectionSettings(IAccount *AAccount = NULL) const;
@@ -67,7 +69,7 @@ protected slots:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);
-	void onAccountShown(IAccount *AAccount);
+	void onAccountActiveChanged(IAccount *AAccount, bool AActive);
 	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
 	void onRosterIndexToolTips(IRosterIndex *AIndex, quint32 ALabelId, QMap<int,QString> &AToolTips);
 private:
@@ -78,7 +80,7 @@ private:
 	IRostersViewPlugin *FRostersViewPlugin;
 private:
 	quint32 FEncryptedLabelId;
-	QMap<QString, IConnectionPlugin *> FPlugins;
+	QMap<QString, IConnectionEngine *> FEngines;
 };
 
 #endif // CONNECTIONMANAGER_H

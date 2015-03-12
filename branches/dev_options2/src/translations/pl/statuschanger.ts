@@ -193,14 +193,6 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
         <translation>Edytuj statusy</translation>
     </message>
     <message>
-        <source>Auto connect on startup</source>
-        <translation>Połącz zaraz po uruchomieniu programu</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Automatycznie przywracaj połączenie</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>Odszedłem od komputera</translation>
     </message>
@@ -210,6 +202,14 @@ Można zmienić typ statusu tylko dla dodatkowo zdefiniowanych statusów.</trans
     </message>
     <message>
         <source>Left %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to server on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect to server on connection errors</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

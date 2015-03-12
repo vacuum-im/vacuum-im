@@ -193,14 +193,6 @@ You can set status class for additional statuses defined by you.</translation>
         <translation>Edit Statuses</translation>
     </message>
     <message>
-        <source>Auto connect on startup</source>
-        <translation>Auto connect on startup</translation>
-    </message>
-    <message>
-        <source>Auto reconnect if disconnected</source>
-        <translation>Auto reconnect if disconnected</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>I&apos;m away from my desk</translation>
     </message>
@@ -211,6 +203,14 @@ You can set status class for additional statuses defined by you.</translation>
     <message>
         <source>Left %1</source>
         <translation>Left %1</translation>
+    </message>
+    <message>
+        <source>Connect to server on startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reconnect to server on connection errors</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

@@ -6,13 +6,13 @@ ConnectionOptionsWidget::ConnectionOptionsWidget(IConnectionManager *AManager, c
 	FManager = AManager;
 
 	FOptions = ANode;
-	FPluginSettings = NULL;
+	FEngineSettings = NULL;
 
-	FPluginLayout = new QVBoxLayout(ui.wdtConnectionSettings);
-	FPluginLayout->setMargin(0);
+	FEngineLayout = new QVBoxLayout(ui.wdtConnectionSettings);
+	FEngineLayout->setMargin(0);
 
-	foreach(const QString &pluginId, FManager->pluginList())
-		ui.cmbConnections->addItem(FManager->pluginById(pluginId)->pluginName(),pluginId);
+	foreach(const QString &engineId, FManager->connectionEngines())
+		ui.cmbConnections->addItem(FManager->findConnectionEngine(engineId)->engineName(),engineId);
 	ui.wdtSelectConnection->setVisible(ui.cmbConnections->count() > 1);
 
 	connect(ui.cmbConnections, SIGNAL(currentIndexChanged(int)),SLOT(onComboConnectionsChanged(int)));
@@ -27,51 +27,51 @@ ConnectionOptionsWidget::~ConnectionOptionsWidget()
 
 void ConnectionOptionsWidget::apply()
 {
-	IConnectionPlugin *plugin = FManager->pluginById(FPluginId);
-	if (plugin)
+	IConnectionEngine *engine = FManager->findConnectionEngine(FEngineId);
+	if (engine)
 	{
-		FOptions.node("connection-type").setValue(FPluginId);
-		if (FPluginSettings)
-			plugin->saveConnectionSettings(FPluginSettings);
+		FOptions.node("connection-type").setValue(FEngineId);
+		if (FEngineSettings)
+			engine->saveConnectionSettings(FEngineSettings);
 	}
 	emit childApply();
 }
 
 void ConnectionOptionsWidget::reset()
 {
-	QString pluginId = FOptions.value("connection-type").toString();
-	if (!FManager->pluginList().isEmpty())
-		setPluginById(FManager->pluginById(pluginId) ? pluginId : FManager->pluginList().first());
-	if (FPluginSettings)
-		FPluginSettings->reset();
+	QString engineId = FOptions.value("connection-type").toString();
+	if (!FManager->connectionEngines().isEmpty())
+		setEngineById(FManager->findConnectionEngine(engineId) ? engineId : FManager->connectionEngines().first());
+	if (FEngineSettings)
+		FEngineSettings->reset();
 	emit childReset();
 }
 
-void ConnectionOptionsWidget::setPluginById(const QString &APluginId)
+void ConnectionOptionsWidget::setEngineById(const QString &AEngineId)
 {
-	if (FPluginId != APluginId)
+	if (FEngineId != AEngineId)
 	{
-		if (FPluginSettings)
+		if (FEngineSettings)
 		{
-			delete FPluginSettings->instance();
-			FPluginSettings = NULL;
-			FPluginId = QUuid();
+			delete FEngineSettings->instance();
+			FEngineSettings = NULL;
+			FEngineId = QUuid();
 		}
 
-		IConnectionPlugin *plugin = FManager->pluginById(APluginId);
-		if (plugin)
+		IConnectionEngine *engine = FManager->findConnectionEngine(AEngineId);
+		if (engine)
 		{
-			FPluginId = APluginId;
-			FPluginSettings = plugin->connectionSettingsWidget(FOptions.node("connection",APluginId), ui.wdtConnectionSettings);
-			if (FPluginSettings)
+			FEngineId = AEngineId;
+			FEngineSettings = engine->connectionSettingsWidget(FOptions.node("connection",AEngineId), ui.wdtConnectionSettings);
+			if (FEngineSettings)
 			{
-				FPluginLayout->addWidget(FPluginSettings->instance());
-				connect(FPluginSettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
+				FEngineLayout->addWidget(FEngineSettings->instance());
+				connect(FEngineSettings->instance(),SIGNAL(modified()),SIGNAL(modified()));
 			}
 		}
 
-		if (ui.cmbConnections->itemData(ui.cmbConnections->currentIndex()).toString() != APluginId)
-			ui.cmbConnections->setCurrentIndex(ui.cmbConnections->findData(APluginId));
+		if (ui.cmbConnections->itemData(ui.cmbConnections->currentIndex()).toString() != AEngineId)
+			ui.cmbConnections->setCurrentIndex(ui.cmbConnections->findData(AEngineId));
 
 		emit modified();
 	}
@@ -80,7 +80,7 @@ void ConnectionOptionsWidget::setPluginById(const QString &APluginId)
 void ConnectionOptionsWidget::onComboConnectionsChanged(int AIndex)
 {
 	if (AIndex != -1)
-		setPluginById(ui.cmbConnections->itemData(AIndex).toString());
+		setEngineById(ui.cmbConnections->itemData(AIndex).toString());
 	else
-		setPluginById(QUuid());
+		setEngineById(QUuid());
 }

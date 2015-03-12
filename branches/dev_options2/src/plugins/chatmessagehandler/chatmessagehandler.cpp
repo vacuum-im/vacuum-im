@@ -941,7 +941,7 @@ void ChatMessageHandler::onWindowAddressMenuRequested(Menu *AMenu)
 		int streamGroup = AG_MWIWAM_CHATMHANDLER_ADDRESSES-1;
 		foreach(const Jid &streamJid, addresses.keys())
 		{
-			IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(streamJid) : NULL;
+			IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(streamJid) : NULL;
 			QString accountName = account!=NULL ? account->name() : streamJid.uBare();
 
 			streamGroup++;

@@ -19,8 +19,8 @@ XmppStream::XmppStream(IXmppStreams *AXmppStreams, const Jid &AStreamJid) : QObj
 	FNodeChanged = false;
 	FDomainChanged = false;
 	FConnection = NULL;
-	FStreamState = SS_OFFLINE;
 	FPasswordDialog = NULL;
+	FStreamState = SS_OFFLINE;
 
 	FStreamJid = AStreamJid;
 	FOfflineJid = FStreamJid;
@@ -52,7 +52,6 @@ bool XmppStream::xmppStanzaIn(IXmppStream *AXmppStream, Stanza &AStanza, int AOr
 			if (VersionParser(AStanza.element().attribute("version","0.0")) < VersionParser(1,0))
 			{
 				Stanza stanza("stream:features");
-				stanza.addElement("register",NS_FEATURE_REGISTER);
 				stanza.addElement("auth",NS_FEATURE_IQAUTH);
 				xmppStanzaIn(AXmppStream, stanza, AOrder);
 			}
@@ -174,40 +173,47 @@ Jid XmppStream::streamJid() const
 	return FStreamJid;
 }
 
-void XmppStream::setStreamJid(const Jid &AJid)
+void XmppStream::setStreamJid(const Jid &AStreamJid)
 {
-	if (FStreamState==SS_OFFLINE && FStreamJid!=AJid)
+	if (FStreamJid!=AStreamJid && AStreamJid.isValid())
 	{
-		LOG_STRM_INFO(streamJid(),QString("Changing offline XMPP stream JID, from=%1, to=%2").arg(FOfflineJid.full(),AJid.full()));
+		if (FStreamState==SS_OFFLINE || FStreamJid.node().isEmpty())
+		{
+			LOG_STRM_INFO(streamJid(),QString("Changing offline XMPP stream JID, from=%1, to=%2").arg(FOfflineJid.full(),AStreamJid.full()));
 
-		Jid before = FStreamJid;
-		Jid after = AJid;
-		emit jidAboutToBeChanged(after);
+			Jid before = FStreamJid;
+			Jid after = AStreamJid;
+			emit jidAboutToBeChanged(after);
 
-		if (before.pBare() != after.pBare())
-			FSessionPassword.clear();
+			if (before.pBare() != after.pBare())
+				FSessionPassword.clear();
 
-		FOfflineJid = after;
-		FStreamJid = after;
-		emit jidChanged(before);
+			FOfflineJid = after;
+			FStreamJid = after;
+			emit jidChanged(before);
+		}
+		else if (FStreamState == SS_FEATURES)
+		{
+			LOG_STRM_INFO(streamJid(),QString("Changing online XMPP stream JID, from=%1, to=%2").arg(FOnlineJid.full(),AStreamJid.full()));
+
+			Jid before = FStreamJid;
+			Jid after(FStreamJid.node(),FStreamJid.domain(),AStreamJid.resource());
+			emit jidAboutToBeChanged(after);
+
+			FOnlineJid = AStreamJid;
+			FStreamJid = after;
+			FNodeChanged = FOnlineJid.pNode()!=FOfflineJid.pNode();
+			FDomainChanged = FOnlineJid.pDomain()!=FOfflineJid.pDomain();
+			emit jidChanged(before);
+		}
+		else
+		{
+			LOG_STRM_WARNING(streamJid(),QString("Failed to change stream jid to=%1: Wrong stream state").arg(AStreamJid.full()));
+		}
 	}
-	else if (FStreamState==SS_FEATURES && FStreamJid!=AJid)
+	else if (!AStreamJid.isValid())
 	{
-		LOG_STRM_INFO(streamJid(),QString("Changing online XMPP stream JID, from=%1, to=%2").arg(FOnlineJid.full(),AJid.full()));
-		
-		Jid before = FStreamJid;
-		Jid after(FStreamJid.node(),FStreamJid.domain(),AJid.resource());
-		emit jidAboutToBeChanged(after);
-
-		FOnlineJid = AJid;
-		FStreamJid = after;
-		FNodeChanged = FOnlineJid.pNode()!=FOfflineJid.pNode();
-		FDomainChanged = FOnlineJid.pDomain()!=FOfflineJid.pDomain();
-		emit jidChanged(before);
-	}
-	else if (FStreamJid != AJid)
-	{
-		LOG_STRM_WARNING(streamJid(),QString("Failed to change stream jid to=%1: Wrong stream state").arg(AJid.full()));
+		REPORT_ERROR("Failed to change stream jid: Invalid parameters");
 	}
 }
 
@@ -218,15 +224,11 @@ QString XmppStream::password() const
 
 void XmppStream::setPassword(const QString &APassword)
 {
-	if (FStreamState == SS_OFFLINE)
+	if (FPassword != APassword)
 	{
 		if (!APassword.isEmpty())
 			FSessionPassword.clear();
 		FPassword = APassword;
-	}
-	else
-	{
-		LOG_STRM_WARNING(streamJid(),"Failed to change XMPP stream password: Stream is not offline");
 	}
 }
 
@@ -460,7 +462,7 @@ void XmppStream::processFeatures()
 		QDomElement featureElem = FServerFeatures.firstChildElement();
 		while (!featureElem.isNull() && featureElem.namespaceURI()!=featureNS)
 			featureElem = featureElem.nextSiblingElement();
-		started = featureElem.namespaceURI()==featureNS ? startFeature(featureNS, featureElem) : false;
+		started = !featureElem.isNull() ? startFeature(featureNS, featureElem) : false;
 	}
 	if (!started)
 	{

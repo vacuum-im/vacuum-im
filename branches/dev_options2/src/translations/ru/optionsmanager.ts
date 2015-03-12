@@ -171,14 +171,6 @@
         <translation>Сменить профиль</translation>
     </message>
     <message>
-        <source>Misc</source>
-        <translation>Разное</translation>
-    </message>
-    <message>
-        <source>Auto run on system startup</source>
-        <translation>Автоматически запускать при старте системы</translation>
-    </message>
-    <message>
         <source>Options</source>
         <translation>Настройки</translation>
     </message>
@@ -189,6 +181,30 @@
     <message>
         <source>Show options dialog</source>
         <translation>Показать диалог настроек</translation>
+    </message>
+    <message>
+        <source>Common Settings</source>
+        <translation>Общие настройки</translation>
+    </message>
+    <message>
+        <source>Common settings</source>
+        <translation>Общие настройки</translation>
+    </message>
+    <message>
+        <source>Auto run application on system startup</source>
+        <translation>Запускать приложение при включение компьютера</translation>
+    </message>
+    <message>
+        <source>Localization</source>
+        <translation>Локализация</translation>
+    </message>
+    <message>
+        <source>&lt;System Language&gt;</source>
+        <translation>&lt;Системный язык&gt;</translation>
+    </message>
+    <message>
+        <source>Language:</source>
+        <translation>Язык:</translation>
     </message>
 </context>
 </TS>

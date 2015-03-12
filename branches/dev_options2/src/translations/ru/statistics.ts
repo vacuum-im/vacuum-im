@@ -12,8 +12,8 @@
         <translation>Позволяет собирать статистику использования приложения</translation>
     </message>
     <message>
-        <source>Send anonymous statistics information to developer</source>
-        <translation>Отправлять анонимную статистическую информацию разработчику</translation>
+        <source>Send anonymous statistics to developer</source>
+        <translation>Отправлять анонимную статистику разработчикам</translation>
     </message>
 </context>
 </TS>

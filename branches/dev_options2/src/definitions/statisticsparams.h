@@ -17,6 +17,8 @@
 #define SEVP_REGISTRATION_STREAM_BEGIN                       "registration|stream-begin|Registration Stream Begin"
 #define SEVP_REGISTRATION_STREAM_SUCCESS                     "registration|stream-success|Registration Stream Success"
 
+#define SEVP_ACCOUNT_CREATED                                 "account|created|Account Created"
+
 // Hit-Timing
 #define STMP_APPLICATION_START                               "application|start|Application Start"
 #define STMP_APPLICATION_QUIT                                "application|quit|Application Quit"

@@ -5,6 +5,7 @@
 #define MNI_ACCOUNT                     "account"
 #define MNI_ACCOUNT_LIST                "accountList"
 #define MNI_ACCOUNT_CHANGE              "accountChange"
+#define MNI_ACCOUNT_MOVE                "accountMove"
 
 //Annotations
 #define MNI_ANNOTATIONS                 "annotations"

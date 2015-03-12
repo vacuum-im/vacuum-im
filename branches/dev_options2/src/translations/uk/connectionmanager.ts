@@ -71,13 +71,13 @@
         <source>Serial number: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Connection</source>
+        <translation type="unfinished">З&apos;єднання</translation>
+    </message>
 </context>
 <context>
     <name>ConnectionOptionsWidgetClass</name>
-    <message>
-        <source>Connection</source>
-        <translation>З&apos;єднання</translation>
-    </message>
     <message>
         <source>Connection:</source>
         <translation>З&apos;єднання:</translation>

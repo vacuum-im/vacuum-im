@@ -196,7 +196,7 @@ bool ClientInfo::initObjects()
 
 bool ClientInfo::initSettings()
 {
-	Options::setDefaultValue(OPV_MISC_SHAREOSVERSION,true);
+	Options::setDefaultValue(OPV_COMMON_SHAREOSVERSION,true);
 	if (FOptionsManager)
 	{
 		FOptionsManager->insertOptionsDialogHolder(this);
@@ -213,9 +213,9 @@ bool ClientInfo::startPlugin()
 QMultiMap<int, IOptionsDialogWidget *> ClientInfo::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MISC)
+	if (FOptionsManager && ANodeId == OPN_COMMON)
 	{
-		widgets.insertMulti(OWO_MISC_CLIENTINFO, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MISC_SHAREOSVERSION),tr("Share information about OS version"),AParent));
+		widgets.insertMulti(OWO_COMMON_SENDCLIENTINFO, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_COMMON_SHAREOSVERSION),tr("Share information about your OS version"),AParent));
 	}
 	return widgets;
 }
@@ -229,7 +229,7 @@ bool ClientInfo::stanzaReadWrite(int AHandlerId, const Jid &AStreamJid, Stanza &
 		QDomElement elem = result.addElement("query",NS_JABBER_VERSION);
 		elem.appendChild(result.createElement("name")).appendChild(result.createTextNode(CLIENT_NAME));
 		elem.appendChild(result.createElement("version")).appendChild(result.createTextNode(QString("%1.%2 %3").arg(FPluginManager->version()).arg(FPluginManager->revision()).arg(CLIENT_VERSION_SUFIX).trimmed()));
-		if (Options::node(OPV_MISC_SHAREOSVERSION).value().toBool())
+		if (Options::node(OPV_COMMON_SHAREOSVERSION).value().toBool())
 			elem.appendChild(result.createElement("os")).appendChild(result.createTextNode(osVersion()));
 		if (FStanzaProcessor->sendStanzaOut(AStreamJid,result))
 			LOG_STRM_INFO(AStreamJid,QString("Software version sent to=%1").arg(AStanza.from()));
@@ -771,7 +771,7 @@ void ClientInfo::onDiscoInfoReceived(const IDiscoInfo &AInfo)
 
 void ClientInfo::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (FDiscovery && ANode.path()==OPV_MISC_SHAREOSVERSION)
+	if (FDiscovery && ANode.path()==OPV_COMMON_SHAREOSVERSION)
 	{
 		FDiscovery->updateSelfEntityCapabilities();
 	}

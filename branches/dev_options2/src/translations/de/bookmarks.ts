@@ -16,10 +16,6 @@
         <translation type="unfinished">Lesezeichen bearbeiten</translation>
     </message>
     <message>
-        <source>Disable autojoin to conferences</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Automatically show window of conferences connected at startup</source>
         <translation type="unfinished"></translation>
     </message>
@@ -49,6 +45,14 @@
     </message>
     <message>
         <source>Join to Conference at Startup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conferences</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable autojoin to conferences on this computer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

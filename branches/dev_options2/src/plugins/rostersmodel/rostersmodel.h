@@ -84,9 +84,8 @@ protected slots:
 	void onAdvancedItemRemoving(QStandardItem *AItem);
 	void onAdvancedItemDataChanged(QStandardItem *AItem, int ARole);
 protected slots:
-	void onAccountShown(IAccount *AAccount);
-	void onAccountHidden(IAccount *AAccount);
 	void onAccountOptionsChanged(const OptionsNode &ANode);
+	void onAccountActiveChanged(IAccount *AAccount, bool AActive);
 	void onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore);
 	void onRosterStreamJidChanged(IRoster *ARoster, const Jid &ABefore);
 	void onPresenceChanged(IPresence *APresence, int AShow, const QString &AStatus, int APriority);

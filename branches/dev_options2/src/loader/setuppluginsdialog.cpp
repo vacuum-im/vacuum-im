@@ -27,9 +27,6 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 	FPluginManager = APluginManager;
 	FPluginsSetup = APluginsSetup;
 
-	updateLanguage();
-	connect(ui.cmbLanguage,SIGNAL(currentIndexChanged(int)),SLOT(onCurrentLanguageChanged(int)));
-
 	updatePlugins();
 	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_NAME,QHeaderView::Stretch);
 	ui.twtPlugins->horizontalHeader()->setResizeMode(COL_FILE,QHeaderView::ResizeToContents);
@@ -44,22 +41,6 @@ SetupPluginsDialog::SetupPluginsDialog(IPluginManager *APluginManager, QDomDocum
 SetupPluginsDialog::~SetupPluginsDialog()
 {
 	Options::setFileValue(saveGeometry(),"misc.setup-plugins-dialog.geometry");
-}
-
-void SetupPluginsDialog::updateLanguage()
-{
-	ui.cmbLanguage->clear();
-	for (int lang = QLocale::C+1; lang <= QLocale::Chewa; lang++)
-		ui.cmbLanguage->addItem(QLocale::languageToString((QLocale::Language)lang), lang);
-	ui.cmbLanguage->model()->sort(0, Qt::AscendingOrder);
-	ui.cmbLanguage->insertItem(0,tr("<System>"),QLocale::C);
-
-	QLocale locale;
-	if (locale != QLocale::system())
-		ui.cmbLanguage->setCurrentIndex(ui.cmbLanguage->findData((int)locale.language()));
-	else
-		ui.cmbLanguage->setCurrentIndex(0);
-	onCurrentLanguageChanged(ui.cmbLanguage->currentIndex());
 }
 
 void SetupPluginsDialog::updatePlugins()
@@ -110,7 +91,6 @@ void SetupPluginsDialog::saveSettings()
 			pluginElem.setAttribute("enabled","false");
 		++it;
 	}
-	FPluginManager->setLocale((QLocale::Language)ui.cmbLanguage->itemData(ui.cmbLanguage->currentIndex()).toInt(), (QLocale::Country)ui.cmbCountry->itemData(ui.cmbCountry->currentIndex()).toInt());
 }
 
 QDomElement SetupPluginsDialog::getPluginElement(const QUuid &AUuid) const
@@ -119,24 +99,6 @@ QDomElement SetupPluginsDialog::getPluginElement(const QUuid &AUuid) const
 	while (!pluginElem.isNull() && AUuid!=pluginElem.attribute("uuid"))
 		pluginElem = pluginElem.nextSiblingElement();
 	return pluginElem;
-}
-
-void SetupPluginsDialog::onCurrentLanguageChanged(int AIndex)
-{
-	ui.cmbCountry->clear();
-	QLocale::Language lang = (QLocale::Language)ui.cmbLanguage->itemData(AIndex).toInt();
-	foreach (QLocale::Country country, QLocale::countriesForLanguage(lang))
-		ui.cmbCountry->addItem(QLocale::countryToString(country),(int)country);
-	ui.cmbCountry->model()->sort(0, Qt::AscendingOrder);
-
-	if (lang != QLocale::C)
-		ui.cmbCountry->insertItem(0,tr("<Any Country>"), QLocale::AnyCountry);
-
-	QLocale locale;
-	if (locale.language() == lang)
-		ui.cmbCountry->setCurrentIndex(ui.cmbCountry->findData((int)locale.country()));
-	else
-		ui.cmbCountry->setCurrentIndex(0);
 }
 
 void SetupPluginsDialog::onCurrentPluginChanged(QTableWidgetItem *ACurrent, QTableWidgetItem *APrevious)

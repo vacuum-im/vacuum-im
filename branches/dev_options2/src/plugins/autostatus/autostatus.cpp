@@ -233,7 +233,7 @@ void AutoStatus::setActiveRule(const QUuid &ARuleId)
 				{
 					if (account->isActive() && account->xmppStream()->isOpen())
 					{
-						Jid streamJid = account->xmppStream()->streamJid();
+						Jid streamJid = account->streamJid();
 						int status = FStatusChanger->streamStatus(streamJid);
 						int show = FStatusChanger->statusItemShow(status);
 						if (show==IPresence::Online || show==IPresence::Chat)

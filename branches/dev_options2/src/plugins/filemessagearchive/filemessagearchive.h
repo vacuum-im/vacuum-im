@@ -106,8 +106,7 @@ protected slots:
 protected slots:
 	void onOptionsOpened();
 	void onOptionsClosed();
-	void onAccountShown(IAccount *AAccount);
-	void onAccountHidden(IAccount *AAccount);
+	void onAccountActiveChanged(IAccount *AAccount, bool AActive);
 	void onDiscoInfoReceived(const IDiscoInfo &AInfo);
 private:
 	IPluginManager *FPluginManager;

@@ -29,7 +29,7 @@ signals:
 	void childApply();
 	void childReset();
 protected:
-	void setPluginById(const QString &APluginId);
+	void setEngineById(const QString &AEngineId);
 protected slots:
 	void onComboConnectionsChanged(int AIndex);
 private:
@@ -37,10 +37,10 @@ private:
 private:
 	Ui::ConnectionOptionsWidgetClass ui;
 private:
-	QString FPluginId;
+	QString FEngineId;
 	OptionsNode FOptions;
-	QVBoxLayout *FPluginLayout;
-	IOptionsDialogWidget *FPluginSettings;
+	QVBoxLayout *FEngineLayout;
+	IOptionsDialogWidget *FEngineSettings;
 };
 
 #endif // CONNECTIONOPTIONSWIDGET_H

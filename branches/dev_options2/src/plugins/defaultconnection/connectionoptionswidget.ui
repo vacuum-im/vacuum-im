@@ -7,13 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>409</width>
-    <height>94</height>
+    <height>89</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="margin">
     <number>0</number>
    </property>
+   <item>
+    <widget class="QWidget" name="wdtProxy" native="true"/>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
@@ -34,20 +37,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="chbUseLegacySSL">
-       <property name="text">
-        <string>Use legacy SSL connection</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
       <widget class="QLabel" name="lblCertCheckMode">
        <property name="text">
-        <string>Certificate check:</string>
+        <string>Certificate:</string>
        </property>
       </widget>
      </item>
@@ -119,7 +111,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="wdtProxy" native="true"/>
+    <widget class="QCheckBox" name="chbUseLegacySSL">
+     <property name="text">
+      <string>Use legacy SSL connection</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

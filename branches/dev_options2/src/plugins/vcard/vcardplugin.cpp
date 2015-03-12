@@ -221,7 +221,7 @@ bool VCardPlugin::initObjects()
 
 bool VCardPlugin::initSettings()
 {
-	Options::setDefaultValue(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE,true);
+	Options::setDefaultValue(OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE,true);
 
 	return true;
 }
@@ -342,9 +342,9 @@ void VCardPlugin::stanzaRequestResult(const Jid &AStreamJid, const Stanza &AStan
 QMultiMap<int, IOptionsDialogWidget *> VCardPlugin::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId==OPN_MISC)
+	if (FOptionsManager && ANodeId==OPN_COMMON)
 	{
-		widgets.insertMulti(OWO_MISC_VCARD,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE),tr("Restrict maximum vCard images size"),AParent));
+		widgets.insertMulti(OWO_COMMON_VCARDIMAGE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE),tr("Restrict maximum vCard images size"),AParent));
 	}
 	return widgets;
 }
@@ -477,7 +477,7 @@ void VCardPlugin::restrictVCardImagesSize(IVCard *AVCard)
 		{NULL,            NULL           },
 	};
 
-	if (Options::node(OPV_MISC_RESTRICT_VCARD_IMAGES_SIZE).value().toBool())
+	if (Options::node(OPV_COMMON_RESTRICT_VCARD_IMAGES_SIZE).value().toBool())
 	{
 		for (int i=0; imageTags[i].value!=NULL; i++)
 		{

@@ -151,13 +151,13 @@ class IDataTableWidget
 {
 public:
 	virtual QTableWidget *instance() =0;
-	virtual const IDataTable &dataTable() const =0;
+	virtual IDataTable dataTable() const =0;
 	virtual IDataField currentField() const =0;
 	virtual IDataField dataField(int ARow, int AColumn) const =0;
 	virtual IDataField dataField(int ARow, const QString &AVar) const =0;
 protected:
 	virtual void activated(int ARow, int AColumn) =0;
-	virtual void changed(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn) =0;
+	virtual void changed(int ARow, int AColumn, int APrevRow, int APrevColumn) =0;
 };
 
 class IDataMediaWidget
@@ -176,12 +176,13 @@ class IDataFieldWidget
 public:
 	virtual QWidget *instance() =0;
 	virtual bool isReadOnly() const =0;
+	virtual IDataField dataField() const =0;
 	virtual IDataField userDataField() const =0;
-	virtual const IDataField &dataField() const =0;
 	virtual QVariant value() const =0;
 	virtual void setValue(const QVariant &AValue) =0;
 	virtual IDataMediaWidget *mediaWidget() const =0;
 protected:
+	virtual void changed() =0;
 	virtual void focusIn(Qt::FocusReason AReason) =0;
 	virtual void focusOut(Qt::FocusReason AReason) =0;
 };
@@ -198,9 +199,12 @@ public:
 	virtual const IDataForm &dataForm() const =0;
 protected:
 	virtual void cellActivated(int ARow, int AColumn) =0;
-	virtual void cellChanged(int ACurrentRow, int ACurrentColumn, int APreviousRow, int APreviousColumn) =0;
+	virtual void cellChanged(int ARow, int AColumn, int APrevRow, int APrevColumn) =0;
+	virtual void fieldChanged(IDataFieldWidget *AField) =0;
 	virtual void fieldFocusIn(IDataFieldWidget *AField, Qt::FocusReason AReason) =0;
 	virtual void fieldFocusOut(IDataFieldWidget *AField, Qt::FocusReason AReason) =0;
+	virtual void fieldMediaShown(IDataFieldWidget *AField) =0;
+	virtual void fieldMediaError(IDataFieldWidget *AField, const XmppError &AError) =0;
 };
 
 class IDataDialogWidget

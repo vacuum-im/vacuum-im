@@ -80,8 +80,7 @@ bool RostersModel::initConnections(IPluginManager *APluginManager, int &AInitOrd
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
 		if (FAccountManager)
 		{
-			connect(FAccountManager->instance(),SIGNAL(shown(IAccount *)),SLOT(onAccountShown(IAccount *)));
-			connect(FAccountManager->instance(),SIGNAL(hidden(IAccount *)),SLOT(onAccountHidden(IAccount *)));
+			connect(FAccountManager->instance(),SIGNAL(accountActiveChanged(IAccount *, bool)),SLOT(onAccountActiveChanged(IAccount *, bool)));
 		}
 	}
 
@@ -176,7 +175,7 @@ IRosterIndex *RostersModel::addStream(const Jid &AStreamJid)
 	{
 		IRoster *roster = FRosterPlugin!=NULL ? FRosterPlugin->findRoster(AStreamJid) : NULL;
 		IPresence *presence = FPresencePlugin!=NULL ? FPresencePlugin->findPresence(AStreamJid) : NULL;
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 
 		if (roster || presence)
 		{
@@ -237,7 +236,7 @@ void RostersModel::removeStream(const Jid &AStreamJid)
 	{
 		LOG_STRM_INFO(AStreamJid,QString("Removing stream from model"));
 
-		IAccount *account = FAccountManager!=NULL ? FAccountManager->accountByStream(AStreamJid) : NULL;
+		IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
 		if (account)
 			disconnect(account->instance(),SIGNAL(optionsChanged(const OptionsNode &)),this,SLOT(onAccountOptionsChanged(const OptionsNode &)));
 
@@ -690,33 +689,29 @@ void RostersModel::onAdvancedItemDataChanged(QStandardItem *AItem, int ARole)
 		emit indexDataChanged(static_cast<RosterIndex *>(AItem),ARole);
 }
 
-void RostersModel::onAccountShown(IAccount *AAccount)
-{
-	if (AAccount->isActive())
-		addStream(AAccount->xmppStream()->streamJid());
-}
-
-void RostersModel::onAccountHidden(IAccount *AAccount)
-{
-	if (AAccount->isActive())
-		removeStream(AAccount->xmppStream()->streamJid());
-}
-
 void RostersModel::onAccountOptionsChanged(const OptionsNode &ANode)
 {
 	IAccount *account = qobject_cast<IAccount *>(sender());
-	if (account && account->optionsNode().childPath(ANode)=="name")
+	if (account!=NULL && account->optionsNode().childPath(ANode)=="name")
 	{
-		IRosterIndex *sindex = streamIndex(account->xmppStream()->streamJid());
+		IRosterIndex *sindex = streamIndex(account->streamJid());
 		if (sindex)
 			sindex->setData(account->name(),RDR_NAME);
 	}
 	else if (account && account->optionsNode().childPath(ANode)=="order")
 	{
-		IRosterIndex *sindex = streamIndex(account->xmppStream()->streamJid());
+		IRosterIndex *sindex = streamIndex(account->streamJid());
 		if (sindex)
 			sindex->setData(ANode.value().toInt(),RDR_SORT_ORDER);
 	}
+}
+
+void RostersModel::onAccountActiveChanged(IAccount *AAccount, bool AActive)
+{
+	if (AActive)
+		addStream(AAccount->streamJid());
+	else
+		removeStream(AAccount->streamJid());
 }
 
 void RostersModel::onRosterItemReceived(IRoster *ARoster, const IRosterItem &AItem, const IRosterItem &ABefore)

@@ -32,6 +32,15 @@
 #define OHO_ACCOUNTS_ADDITIONAL_CONFERENCES       500
 #  define OWO_ACCOUNTS_ADDITIONAL_DISABLEAUTOJOIN 550
 
+//Node = ON_COMMON
+#define OHO_COMMON_SETTINGS                       100
+#  define OWO_COMMON_AUTOSTART                    110
+#  define OWO_COMMON_SENDSTATISTICS               120
+#  define OWO_COMMON_SENDCLIENTINFO               130
+#  define OWO_COMMON_VCARDIMAGE                   140
+#define OHO_COMMON_LOCALIZATION                   300
+#  define OWO_COMMON_LANGUAGE                     310
+
 //Node = ON_STATUSICONS
 #define OWO_STATUSICONS                           500
 
@@ -53,13 +62,6 @@
 //Node = ON_NOTIFICATIONS
 #define OWO_NOTIFICATIONS_EXTENDED                300
 #define OWO_NOTIFICATIONS_COMMON                  500
-
-//Node = ON_MISC
-#define OWO_MISC_CLIENTINFO                       300
-#define OWO_MISC_AUTOSTART                        500
-#define OWO_MISC_VCARD                            550
-#define OWO_MISC_STATISTICS                       600
-#define OWO_MISC_DEFAULTPROXY                     700
 
 //Node = ON_MESSAGES
 #define OWO_MESSAGES                              300
