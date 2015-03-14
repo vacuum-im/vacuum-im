@@ -77,8 +77,18 @@ public:
 class IRostersView
 {
 public:
-	//--RostersModel
+	enum ViewMode {
+		ViewFull,
+		ViewSimple,
+		ViewCompact
+	};
+	enum SortMode {
+		SortByStatus,
+		SortAlphabetically,
+	};
+public:
 	virtual QTreeView *instance() = 0;
+	//IndexManagment
 	virtual IRostersModel *rostersModel() const =0;
 	virtual void setRostersModel(IRostersModel *AModel) =0;
 	virtual bool repaintRosterIndex(IRosterIndex *AIndex) =0;

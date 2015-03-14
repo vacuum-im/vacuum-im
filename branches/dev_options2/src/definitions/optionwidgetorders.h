@@ -41,14 +41,21 @@
 #define OHO_COMMON_LOCALIZATION                   300
 #  define OWO_COMMON_LANGUAGE                     310
 
+//Node = ON_ROSTER_VIEW
+#define OHO_ROSTER_VIEW                           100
+#define   OWO_ROSTER_SHOWOFFLINE                  110
+#define   OWO_ROSTER_MERGESTREAMS                 120
+#define   OWO_ROSTER_SHOWRESOURCE                 130
+#define   OWO_ROSTER_HIDESCROLLBAR                140
+#define   OWO_ROSTER_VIEWMODE                     150
+#define   OWO_ROSTER_SORTMODE                     160
+#define OHO_ROSTER_MANAGEMENT                     300
+#define   OWO_ROSTER_AUTOSUBSCRIBE                310
+#define   OWO_ROSTER_AUTOUNSUBSCRIBE              320
+#define   OWO_ROSTER_EXCHANGEAUTO                 330
+
 //Node = ON_STATUSICONS
 #define OWO_STATUSICONS                           500
-
-//Node = ON_ROSTER
-#define OWO_ROSTER                                500
-#define OWO_ROSTER_AVATARS                        800
-#define OWO_ROSTER_CHENGER                        900
-#define OWO_ROSTER_EXCHANGE                       1200
 
 //Node = ON_EMOTICANS
 #define OWO_EMOTICONS                             500

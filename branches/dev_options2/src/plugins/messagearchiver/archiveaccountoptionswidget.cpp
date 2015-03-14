@@ -291,7 +291,9 @@ ArchiveAccountOptionsWidget::ArchiveAccountOptionsWidget(IMessageArchiver *AArch
 
 	connect(ui.pbtAdd,SIGNAL(clicked()),SLOT(onAddItemPrefClicked()));
 	connect(ui.pbtRemove,SIGNAL(clicked()),SLOT(onRemoveItemPrefClicked()));
+	connect(FArchiver->instance(),SIGNAL(archivePrefsOpened(const Jid &)),SLOT(onArchivePrefsOpened(const Jid &)));
 	connect(FArchiver->instance(),SIGNAL(archivePrefsChanged(const Jid &)),SLOT(onArchivePrefsChanged(const Jid &)));
+	connect(FArchiver->instance(),SIGNAL(archivePrefsClosed(const Jid &)),SLOT(onArchivePrefsClosed(const Jid &)));
 	connect(FArchiver->instance(),SIGNAL(requestCompleted(const QString &)),SLOT(onArchiveRequestCompleted(const QString &)));
 	connect(FArchiver->instance(),SIGNAL(requestFailed(const QString &, const XmppError &)),SLOT(onArchiveRequestFailed(const QString &, const XmppError &)));
 
@@ -402,6 +404,8 @@ void ArchiveAccountOptionsWidget::updateWidget()
 		ui.lblStatus->setText(tr("Failed to save archive preferences: %1").arg(FLastError.errorMessage()));
 	else
 		ui.lblStatus->clear();
+
+	setEnabled(FArchiver->isReady(FStreamJid));
 }
 
 void ArchiveAccountOptionsWidget::updateColumnsSize()
@@ -530,6 +534,12 @@ void ArchiveAccountOptionsWidget::onExpireIndexChanged(int AIndex)
 		ui.cmbExpireTime->setEditText(QString::number(ui.cmbExpireTime->itemData(AIndex).toInt()/ONE_DAY));
 }
 
+void ArchiveAccountOptionsWidget::onArchivePrefsOpened( const Jid &AStreamJid )
+{
+	if (AStreamJid == FStreamJid)
+		updateWidget();
+}
+
 void ArchiveAccountOptionsWidget::onArchivePrefsChanged(const Jid &AStreamJid)
 {
 	if (AStreamJid == FStreamJid)
@@ -569,6 +579,12 @@ void ArchiveAccountOptionsWidget::onArchivePrefsChanged(const Jid &AStreamJid)
 		updateWidget();
 		updateColumnsSize();
 	}
+}
+
+void ArchiveAccountOptionsWidget::onArchivePrefsClosed( const Jid &AStreamJid )
+{
+	if (AStreamJid == FStreamJid)
+		updateWidget();
 }
 
 void ArchiveAccountOptionsWidget::onArchiveRequestCompleted(const QString &AId)

@@ -22,8 +22,8 @@ protected:
 private:
 	IRostersView *FRostersView;
 private:
+	int FSortMode;
 	bool FShowOffline;
-	bool FSortByStatus;
 };
 
 #endif // SORTFILTERPROXYMODEL_H

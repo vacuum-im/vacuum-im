@@ -178,14 +178,6 @@
         <translation>Umożliwia edycję rostera</translation>
     </message>
     <message>
-        <source>Auto accept subscription requests</source>
-        <translation>Akceptuj automatycznie prośby o autoryzację</translation>
-    </message>
-    <message>
-        <source>Auto unsubscribe contacts</source>
-        <translation>Automatycznie cofaj autoryzację</translation>
-    </message>
-    <message>
         <source>Ins</source>
         <comment>Add contact</comment>
         <translation>Ins</translation>
@@ -335,6 +327,18 @@
     </message>
     <message>
         <source>In this Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contacts list management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically accept all subscription requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove subscription when you was deleted from contacts list</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

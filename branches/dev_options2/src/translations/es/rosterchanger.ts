@@ -178,14 +178,6 @@
         <translation>Permite editar la lista de contactos</translation>
     </message>
     <message>
-        <source>Auto accept subscription requests</source>
-        <translation>Aceptar automáticamente las solicitudes de subscripción</translation>
-    </message>
-    <message>
-        <source>Auto unsubscribe contacts</source>
-        <translation>Eliminar la subscripción de contactos automáticamente</translation>
-    </message>
-    <message>
         <source>Ins</source>
         <comment>Add contact</comment>
         <translation>Ins</translation>
@@ -335,6 +327,18 @@
     <message>
         <source>In this Group</source>
         <translation>En este grupo</translation>
+    </message>
+    <message>
+        <source>Contacts list management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically accept all subscription requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove subscription when you was deleted from contacts list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

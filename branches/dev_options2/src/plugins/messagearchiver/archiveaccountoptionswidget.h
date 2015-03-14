@@ -57,7 +57,9 @@ protected slots:
 	void onAddItemPrefClicked();
 	void onRemoveItemPrefClicked();
 	void onExpireIndexChanged(int AIndex);
+	void onArchivePrefsOpened(const Jid &AStreamJid);
 	void onArchivePrefsChanged(const Jid &AStreamJid);
+	void onArchivePrefsClosed(const Jid &AStreamJid);
 	void onArchiveRequestCompleted(const QString &AId);
 	void onArchiveRequestFailed(const QString &AId, const XmppError &AError);
 private:

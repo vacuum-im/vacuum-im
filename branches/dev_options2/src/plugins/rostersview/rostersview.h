@@ -30,7 +30,7 @@ public:
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
-	//IRostersView
+	//IndexManagment
 	virtual IRostersModel *rostersModel() const;
 	virtual void setRostersModel(IRostersModel *AModel);
 	virtual bool repaintRosterIndex(IRosterIndex *AIndex);

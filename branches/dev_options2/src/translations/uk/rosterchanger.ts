@@ -178,14 +178,6 @@
         <translation>Дозволяє редагувати ростер</translation>
     </message>
     <message>
-        <source>Auto accept subscription requests</source>
-        <translation>Автоматично приймати запроси на авторизацію</translation>
-    </message>
-    <message>
-        <source>Auto unsubscribe contacts</source>
-        <translation>Автоматично видаляти авторизацію</translation>
-    </message>
-    <message>
         <source>Ins</source>
         <comment>Add contact</comment>
         <translation>Ins</translation>
@@ -336,6 +328,18 @@
     <message>
         <source>In this Group</source>
         <translation>В цю групу</translation>
+    </message>
+    <message>
+        <source>Contacts list management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically accept all subscription requests</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove subscription when you was deleted from contacts list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

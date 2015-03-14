@@ -95,7 +95,6 @@ private:
 private:
 	bool FShowStatus;
 	bool FShowResource;
-	bool FShowMergedStreams;
 	Action *FShowOfflineAction;
 	RostersView *FRostersView;
 	QAbstractItemModel *FLastModel;

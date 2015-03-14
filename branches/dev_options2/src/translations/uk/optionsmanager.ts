@@ -183,10 +183,6 @@
         <translation>Показувати діалог опцій</translation>
     </message>
     <message>
-        <source>Common Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Common settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -204,6 +200,10 @@
     </message>
     <message>
         <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

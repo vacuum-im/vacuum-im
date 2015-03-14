@@ -181,8 +181,8 @@ protected:
 	void renegotiateStanzaSessions(const Jid &AStreamJid) const;
 protected:
 	void registerDiscoFeatures();
-	void openHistoryOptionsNode(const Jid &AStreamJid);
-	void closeHistoryOptionsNode(const Jid &AStreamJid);
+	void openHistoryOptionsNode(const QUuid &AAccountId);
+	void closeHistoryOptionsNode(const QUuid &AAccountId);
 	bool isArchiveDuplicationEnabled(const Jid &AStreamJid) const;
 	bool isSelectionAccepted(const QList<IRosterIndex *> &ASelected) const;
 	Menu *createContextMenu(const QStringList &AStreams, const QStringList &AContacts, QWidget *AParent) const;
@@ -197,6 +197,8 @@ protected slots:
 	void onSelfHeadersLoaded(const QString &AId, const QList<IArchiveHeader> &AHeaders);
 	void onSelfCollectionLoaded(const QString &AId, const IArchiveCollection &ACollection);
 protected slots:
+	void onAccountInserted(IAccount *AAccount);
+	void onAccountRemoved(IAccount *AAccount);
 	void onXmppStreamOpened(IXmppStream *AXmppStream);
 	void onXmppStreamClosed(IXmppStream *AXmppStream);
 	void onXmppStreamAboutToClose(IXmppStream *AXmppStream);

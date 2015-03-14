@@ -65,10 +65,6 @@
         <source>When receiving roster modification request</source>
         <translation>When receiving roster modification request</translation>
     </message>
-    <message>
-        <source>Automatically accept roster modifications from gateways and group services</source>
-        <translation>Automatically accept roster modifications from gateways and group services</translation>
-    </message>
     <message numerus="yes">
         <source>Send %n Contact(s)</source>
         <translation>
@@ -101,6 +97,14 @@
             <numerusform>Failed to send %n contact(s)</numerusform>
             <numerusform>Failed to send %n contact(s)</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Contacts list management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow gateways and group services manage your contacts list</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

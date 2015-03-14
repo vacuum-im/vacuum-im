@@ -2,9 +2,9 @@
 #define DEF_OPTIONNODEORDERS_H
 
 // ROOT
-#define ONO_ACCOUNTS              100
-#define ONO_COMMON                190
-#define ONO_ROSTER                200
+#define ONO_COMMON                100
+#define ONO_ACCOUNTS              150
+#define ONO_ROSTER_VIEW           200
 #define ONO_MESSAGES              300
 #define ONO_CONFERENCES           320
 #define ONO_MESSAGE_STYLES        350

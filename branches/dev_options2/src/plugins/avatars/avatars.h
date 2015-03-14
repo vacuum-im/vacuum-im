@@ -10,7 +10,7 @@
 #include <interfaces/ipresence.h>
 #include <interfaces/irostersview.h>
 #include <interfaces/irostersmodel.h>
-#include <interfaces/ioptionsmanager.h>
+#include <utils/options.h>
 
 class Avatars :
 	public QObject,
@@ -19,11 +19,10 @@ class Avatars :
 	public IStanzaHandler,
 	public IStanzaRequestOwner,
 	public IRosterDataHolder,
-	public IRostersLabelHolder,
-	public IOptionsDialogHolder
+	public IRostersLabelHolder
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner IOptionsDialogHolder);
+	Q_INTERFACES(IPlugin IAvatars IStanzaHandler IRosterDataHolder IRostersLabelHolder IStanzaRequestOwner);
 public:
 	Avatars();
 	~Avatars();
@@ -46,8 +45,6 @@ public:
 	//IRostersLabelHolder
 	virtual QList<quint32> rosterLabels(int AOrder, const IRosterIndex *AIndex) const;
 	virtual AdvancedDelegateItem rosterLabel(int AOrder, quint32 ALabelId, const IRosterIndex *AIndex) const;
-	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IAvatars
 	virtual QString avatarHash(const Jid &AContactJid) const;
 	virtual bool hasAvatar(const QString &AHash) const;
@@ -96,7 +93,6 @@ private:
 	IPresencePlugin *FPresencePlugin;
 	IRostersModel *FRostersModel;
 	IRostersViewPlugin *FRostersViewPlugin;
-	IOptionsManager *FOptionsManager;
 private:
 	QMap<Jid, int> FSHIPresenceIn;
 	QMap<Jid, int> FSHIPresenceOut;
@@ -109,17 +105,15 @@ private:
 private:
 	QSize FAvatarSize;
 	bool FAvatarsVisible;
-	bool FShowEmptyAvatars;
-	bool FShowGrayAvatars;
 	QMap<Jid, QString> FCustomPictures;
 private:
 	quint32 FAvatarLabelId;
 	QDir FAvatarsDir;
 	QImage FEmptyAvatar;
-	QImage FGrayEmptyAvatar;
+	QImage FEmptyGrayAvatar;
 	QMap<Jid, QString> FStreamAvatars;
 	mutable QHash<QString, QMap<QSize,QImage> > FAvatarImages;
-	mutable QHash<QString, QMap<QSize,QImage> > FGrayAvatarImages;
+	mutable QHash<QString, QMap<QSize,QImage> > FAvatarGrayImages;
 };
 
 #endif // AVATARS_H

@@ -1,6 +1,7 @@
 #include "rostersviewplugin.h"
 
 #include <QTimer>
+#include <QComboBox>
 #include <QClipboard>
 #include <QScrollBar>
 #include <QApplication>
@@ -45,7 +46,6 @@ RostersViewPlugin::RostersViewPlugin()
 	FShowOfflineAction = NULL;
 	FShowStatus = true;
 	FShowResource = true;
-	FShowMergedStreams = false;
 	FStartRestoreExpandState = false;
 
 	FViewSavedState.sliderPos = 0;
@@ -187,15 +187,14 @@ bool RostersViewPlugin::initSettings()
 {
 	Options::setDefaultValue(OPV_ROSTER_SHOWOFFLINE,true);
 	Options::setDefaultValue(OPV_ROSTER_SHOWRESOURCE,false);
-	Options::setDefaultValue(OPV_ROSTER_SORTBYSTATUS,false);
 	Options::setDefaultValue(OPV_ROSTER_HIDESCROLLBAR,false);
-	Options::setDefaultValue(OPV_ROSTER_SHOWSTATUSTEXT,true);
-	Options::setDefaultValue(OPV_ROSTER_MERGESTREAMS,false);
-	Options::setDefaultValue(OPV_ROSTER_SHOWMERGEDSTREAMS,false);
+	Options::setDefaultValue(OPV_ROSTER_MERGESTREAMS,true);
+	Options::setDefaultValue(OPV_ROSTER_VIEWMODE,IRostersView::ViewFull);
+	Options::setDefaultValue(OPV_ROSTER_SORTMODE,IRostersView::SortByStatus);
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_ROSTER, OPN_ROSTER, MNI_ROSTERVIEW_OPTIONS, tr("Roster") };
+		IOptionsDialogNode dnode = { ONO_ROSTER_VIEW, OPN_ROSTER_VIEW, MNI_ROSTERVIEW_OPTIONS, tr("Contacts List") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
@@ -205,15 +204,24 @@ bool RostersViewPlugin::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> RostersViewPlugin::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_ROSTER)
+	if (FOptionsManager && ANodeId == OPN_ROSTER_VIEW)
 	{
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contact"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource in roster"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SORTBYSTATUS),tr("Sort contacts by status"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_HIDESCROLLBAR),tr("Do not show the scroll bars"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWSTATUSTEXT),tr("Show status message in roster"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MERGESTREAMS),tr("Unite contacts of all accounts"),AParent));
-		widgets.insertMulti(OWO_ROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWMERGEDSTREAMS),tr("Show list of united accounts"),AParent));
+		widgets.insertMulti(OHO_ROSTER_VIEW, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
+		widgets.insertMulti(OWO_ROSTER_SHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contact"),AParent));
+		widgets.insertMulti(OWO_ROSTER_MERGESTREAMS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_MERGESTREAMS),tr("Show contact of all accounts in common list"),AParent));
+		widgets.insertMulti(OWO_ROSTER_SHOWRESOURCE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWRESOURCE),tr("Show contact resource with highest priority"),AParent));
+		widgets.insertMulti(OWO_ROSTER_HIDESCROLLBAR,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_HIDESCROLLBAR),tr("Hide scroll bars in contact list window"),AParent));
+
+		QComboBox *cmbViewMode = new QComboBox(AParent);
+		cmbViewMode->addItem(tr("Full"), IRostersView::ViewFull);
+		cmbViewMode->addItem(tr("Simplified"), IRostersView::ViewSimple);
+		cmbViewMode->addItem(tr("Compact"), IRostersView::ViewCompact);
+		widgets.insertMulti(OWO_ROSTER_VIEWMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_VIEWMODE),tr("Contacts list view:"),cmbViewMode,AParent));
+
+		QComboBox *cmbSortMode = new QComboBox(AParent);
+		cmbSortMode->addItem(tr("by status"), IRostersView::SortByStatus);
+		cmbSortMode->addItem(tr("alphabetically"), IRostersView::SortAlphabetically);
+		widgets.insertMulti(OWO_ROSTER_SORTMODE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SORTMODE),tr("Sort contacts list:"),cmbSortMode,AParent));
 	}
 	return widgets;
 }
@@ -276,14 +284,9 @@ QVariant RostersViewPlugin::rosterData(int AOrder, const IRosterIndex *AIndex, i
 			}
 			return name;
 		}
-		
-		if (AIndex->kind()==RIK_STREAM_ROOT && ARole==RDR_FORCE_VISIBLE && model->streamsLayout()==IRostersModel::LayoutMerged)
+		else if (ARole == RDR_FORCE_VISIBLE)
 		{
-			if (AIndex->data(RDR_SHOW).toInt() == IPresence::Error)
-				return 1;
-			else if (!FShowMergedStreams)
-				return -1;
-			else
+			if (AIndex->kind() == RIK_STREAM_ROOT)
 				return 1;
 		}
 	}
@@ -813,13 +816,12 @@ void RostersViewPlugin::onRestoreExpandState()
 
 void RostersViewPlugin::onOptionsOpened()
 {
+	onOptionsChanged(Options::node(OPV_ROSTER_VIEWMODE));
+	onOptionsChanged(Options::node(OPV_ROSTER_SORTMODE));
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWOFFLINE));
 	onOptionsChanged(Options::node(OPV_ROSTER_SHOWRESOURCE));
-	onOptionsChanged(Options::node(OPV_ROSTER_SORTBYSTATUS));
 	onOptionsChanged(Options::node(OPV_ROSTER_HIDESCROLLBAR));
-	onOptionsChanged(Options::node(OPV_ROSTER_SHOWSTATUSTEXT));
 	onOptionsChanged(Options::node(OPV_ROSTER_MERGESTREAMS));
-	onOptionsChanged(Options::node(OPV_ROSTER_SHOWMERGEDSTREAMS));
 }
 
 void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
@@ -836,7 +838,7 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 		FShowResource = ANode.value().toBool();
 		emit rosterDataChanged(NULL, Qt::DisplayRole);
 	}
-	else if (ANode.path() == OPV_ROSTER_SORTBYSTATUS)
+	else if (ANode.path() == OPV_ROSTER_SORTMODE)
 	{
 		FSortFilterProxyModel->invalidate();
 	}
@@ -845,24 +847,15 @@ void RostersViewPlugin::onOptionsChanged(const OptionsNode &ANode)
 		FRostersView->setVerticalScrollBarPolicy(ANode.value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
 		FRostersView->setHorizontalScrollBarPolicy(ANode.value().toBool() ? Qt::ScrollBarAlwaysOff : Qt::ScrollBarAsNeeded);
 	}
-	else if (ANode.path() == OPV_ROSTER_SHOWSTATUSTEXT)
+	else if (ANode.path() == OPV_ROSTER_VIEWMODE)
 	{
-		FShowStatus = ANode.value().toBool();
+		FShowStatus = ANode.value().toInt() == IRostersView::ViewFull;
 		emit rosterLabelChanged(RLID_ROSTERSVIEW_STATUS);
 	}
 	else if (ANode.path() == OPV_ROSTER_MERGESTREAMS)
 	{
 		if (FRostersView->rostersModel())
 			FRostersView->rostersModel()->setStreamsLayout(ANode.value().toBool() ? IRostersModel::LayoutMerged : IRostersModel::LayoutSeparately);
-	}
-	else if (ANode.path() == OPV_ROSTER_SHOWMERGEDSTREAMS)
-	{
-		FShowMergedStreams = ANode.value().toBool();
-		if (FRostersView->rostersModel())
-		{
-			foreach(const Jid &streamJid, FRostersView->rostersModel()->streams())
-				emit rosterDataChanged(FRostersView->rostersModel()->streamIndex(streamJid),RDR_FORCE_VISIBLE);
-		}
 	}
 }
 

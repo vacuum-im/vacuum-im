@@ -197,26 +197,20 @@
 
 // RostersView
 #define OPV_ROSTER_ROOT                                 "roster"
+#define OPV_ROSTER_VIEWMODE                             "roster.view-mode"
+#define OPV_ROSTER_SORTMODE                             "roster.sort-mode"
 #define OPV_ROSTER_SHOWOFFLINE                          "roster.show-offline"
 #define OPV_ROSTER_SHOWRESOURCE                         "roster.show-resource"
-#define OPV_ROSTER_SORTBYSTATUS                         "roster.sort-by-status"
-#define OPV_ROSTER_HIDESCROLLBAR                        "roster.always-hide-scrollbar"
+#define OPV_ROSTER_HIDESCROLLBAR                        "roster.hide-scrollbar"
 #define OPV_ROSTER_MERGESTREAMS                         "roster.merge-streams"
-#define OPV_ROSTER_SHOWMERGEDSTREAMS                    "roster.show-merged-streams"
 // RosterChanger
 #define OPV_ROSTER_AUTOSUBSCRIBE                        "roster.auto-subscribe"
 #define OPV_ROSTER_AUTOUNSUBSCRIBE                      "roster.auto-unsubscribe"
-// Avatars
-#define OPV_ROSTER_AVATARS_SHOW                         "roster.avatars.show"
-#define OPV_ROSTER_AVATARS_SHOWEMPTY                    "roster.avatars.show-empty"
-#define OPV_ROSTER_AVATARS_SHOWGRAY                     "roster.avatars.show-gray"
 // RosterSearch
 #define OPV_ROSTER_SEARCH_ENABLED                       "roster.search.enabled"
 #define OPV_ROSTER_SEARCH_FIELDEBANLED                  "roster.search.field-enabled"
 // RosterItemExchange
 #define OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED          "roster.exchange.auto-approve-enabled"
-//StatusChanger
-#define OPV_ROSTER_SHOWSTATUSTEXT                       "roster.show-status-text"
 //RecentContact
 #define OPV_ROSTER_RECENT_ALWAYSSHOWOFFLINE             "roster.recent.always-show-offline"
 #define OPV_ROSTER_RECENT_HIDEINACTIVEITEMS             "roster.recent.hide-inactive-items"

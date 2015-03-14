@@ -140,6 +140,11 @@ bool MessageArchiver::initConnections(IPluginManager *APluginManager, int &AInit
 	if (plugin)
 	{
 		FAccountManager = qobject_cast<IAccountManager *>(plugin->instance());
+		if (FAccountManager)
+		{
+			connect(FAccountManager->instance(),SIGNAL(accountInserted(IAccount *)),SLOT(onAccountInserted(IAccount *)));
+			connect(FAccountManager->instance(),SIGNAL(accountRemoved(IAccount *)),SLOT(onAccountRemoved(IAccount *)));
+		}
 	}
 
 	plugin = APluginManager->pluginInterface("IRostersViewPlugin").value(0,NULL);
@@ -1630,9 +1635,7 @@ void MessageArchiver::applyArchivePrefs(const Jid &AStreamJid, const QDomElement
 			if (prefsDisabled)
 				setArchiveAutoSave(AStreamJid,prefs.autoSave);
 
-			openHistoryOptionsNode(AStreamJid);
 			emit archivePrefsOpened(AStreamJid);
-
 			processPendingMessages(AStreamJid);
 		}
 		else
@@ -2173,23 +2176,21 @@ void MessageArchiver::registerDiscoFeatures()
 	FDiscovery->insertDiscoFeature(dfeature);
 }
 
-void MessageArchiver::openHistoryOptionsNode(const Jid &AStreamJid)
+void MessageArchiver::openHistoryOptionsNode(const QUuid &AAccountId)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
-	if (FOptionsManager && account)
+	if (FOptionsManager)
 	{
-		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
+		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",AAccountId.toString());
 		IOptionsDialogNode historyNode = { ONO_ACCOUNTS_HISTORY, historyNodeId, MNI_HISTORY, tr("History") };
 		FOptionsManager->insertOptionsDialogNode(historyNode);
 	}
 }
 
-void MessageArchiver::closeHistoryOptionsNode(const Jid &AStreamJid)
+void MessageArchiver::closeHistoryOptionsNode(const QUuid &AAccountId)
 {
-	IAccount *account = FAccountManager!=NULL ? FAccountManager->findAccountByStream(AStreamJid) : NULL;
-	if (FOptionsManager && account)
+	if (FOptionsManager)
 	{
-		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",account->accountId().toString());
+		QString historyNodeId = QString(OPN_ACCOUNTS_HISTORY).replace("[id]",AAccountId.toString());
 		FOptionsManager->removeOptionsDialogNode(historyNodeId);
 	}
 }
@@ -2513,6 +2514,16 @@ void MessageArchiver::onSelfCollectionLoaded(const QString &AId, const IArchiveC
 	}
 }
 
+void MessageArchiver::onAccountInserted(IAccount *AAccount)
+{
+	openHistoryOptionsNode(AAccount->accountId());
+}
+
+void MessageArchiver::onAccountRemoved(IAccount *AAccount)
+{
+	closeHistoryOptionsNode(AAccount->accountId());
+}
+
 void MessageArchiver::onXmppStreamOpened(IXmppStream *AXmppStream)
 {
 	if (FStanzaProcessor)
@@ -2557,7 +2568,6 @@ void MessageArchiver::onXmppStreamClosed(IXmppStream *AXmppStream)
 	}
 
 	savePendingMessages(AXmppStream->streamJid());
-	closeHistoryOptionsNode(AXmppStream->streamJid());
 
 	FFeatures.remove(AXmppStream->streamJid());
 	FNamespaces.remove(AXmppStream->streamJid());

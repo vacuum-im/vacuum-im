@@ -201,10 +201,11 @@ bool RosterChanger::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> RosterChanger::optionsDialogWidgets(const QString &ANode, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANode == OPN_ROSTER)
+	if (FOptionsManager && ANode == OPN_ROSTER_VIEW)
 	{
-		widgets.insertMulti(OWO_ROSTER_CHENGER, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Auto accept subscription requests"),AParent));
-		widgets.insertMulti(OWO_ROSTER_CHENGER, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Auto unsubscribe contacts"),AParent));
+		widgets.insertMulti(OHO_ROSTER_MANAGEMENT,FOptionsManager->newOptionsDialogHeader(tr("Contacts list management"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AUTOSUBSCRIBE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Automatically accept all subscription requests"),AParent));
+		widgets.insertMulti(OWO_ROSTER_AUTOUNSUBSCRIBE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOUNSUBSCRIBE),tr("Remove subscription when you was deleted from contacts list"),AParent));
 	}
 	return widgets;
 }

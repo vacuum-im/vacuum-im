@@ -6,8 +6,11 @@
 #include <QFileDialog>
 #include <QImageReader>
 #include <QCryptographicHash>
+#include <definitions/resources.h>
+#include <definitions/menuicons.h>
 #include <definitions/namespaces.h>
 #include <definitions/actiongroups.h>
+#include <definitions/optionvalues.h>
 #include <definitions/stanzahandlerorders.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rosterindexkinds.h>
@@ -15,15 +18,9 @@
 #include <definitions/rosterdataholderorders.h>
 #include <definitions/rostertooltiporders.h>
 #include <definitions/rosterlabelholderorders.h>
-#include <definitions/optionvalues.h>
-#include <definitions/optionnodes.h>
-#include <definitions/optionwidgetorders.h>
-#include <definitions/resources.h>
-#include <definitions/menuicons.h>
 #include <definitions/vcardvaluenames.h>
 #include <utils/imagemanager.h>
 #include <utils/iconstorage.h>
-#include <utils/options.h>
 #include <utils/logger.h>
 
 #define DIR_AVATARS               "avatars"
@@ -50,12 +47,9 @@ Avatars::Avatars()
 	FPresencePlugin = NULL;
 	FRostersModel = NULL;
 	FRostersViewPlugin = NULL;
-	FOptionsManager = NULL;
 
 	FAvatarLabelId = 0;
 	FAvatarsVisible = false;
-	FShowEmptyAvatars = true;
-	FShowGrayAvatars = true;
 	FAvatarSize = QSize(32,32);
 }
 
@@ -136,12 +130,6 @@ bool Avatars::initConnections(IPluginManager *APluginManager, int &AInitOrder)
 		}
 	}
 
-	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-	if (plugin)
-	{
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
 	connect(Options::instance(),SIGNAL(optionsOpened()),SLOT(onOptionsOpened()));
 	connect(Options::instance(),SIGNAL(optionsClosed()),SLOT(onOptionsClosed()));
 	connect(Options::instance(),SIGNAL(optionsChanged(const OptionsNode &)),SLOT(onOptionsChanged(const OptionsNode &)));
@@ -179,13 +167,6 @@ bool Avatars::initObjects()
 
 bool Avatars::initSettings()
 {
-	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOW,true);
-	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWEMPTY,true);
-	Options::setDefaultValue(OPV_ROSTER_AVATARS_SHOWGRAY,true);
-
-	if (FOptionsManager)
-		FOptionsManager->insertOptionsDialogHolder(this);
-
 	return true;
 }
 
@@ -354,10 +335,10 @@ QVariant Avatars::rosterData(int AOrder, const IRosterIndex *AIndex, int ARole) 
 		{
 		case RDR_AVATAR_IMAGE:
 			{
-				bool gray = FShowGrayAvatars && (AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error);
+				bool gray = AIndex->data(RDR_SHOW).toInt()==IPresence::Offline || AIndex->data(RDR_SHOW).toInt()==IPresence::Error;
 				QImage avatar = loadAvatarImage(avatarHash(AIndex->data(RDR_FULL_JID).toString()), FAvatarSize, gray);
-				if (avatar.isNull() && FShowEmptyAvatars)
-					avatar = gray ? FGrayEmptyAvatar : FEmptyAvatar;
+				if (avatar.isNull())
+					avatar = gray ? FEmptyGrayAvatar : FEmptyAvatar;
 				return avatar;
 			}
 		case RDR_AVATAR_HASH:
@@ -388,18 +369,6 @@ AdvancedDelegateItem Avatars::rosterLabel(int AOrder, quint32 ALabelId, const IR
 {
 	Q_UNUSED(AOrder); Q_UNUSED(AIndex);
 	return FRostersViewPlugin->rostersView()->registeredLabel(ALabelId);
-}
-
-QMultiMap<int, IOptionsDialogWidget *> Avatars::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
-{
-	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_ROSTER)
-	{
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AVATARS_SHOW),tr("Show avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY),tr("Show empty avatars"),AParent));
-		widgets.insertMulti(OWO_ROSTER_AVATARS, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY),tr("Show grayscaled avatars for offline contacts"),AParent));
-	}
-	return widgets;
 }
 
 QString Avatars::avatarHash(const Jid &AContactJid) const
@@ -513,7 +482,7 @@ QString Avatars::setCustomPictire(const Jid &AContactJid, const QByteArray &ADat
 
 QImage Avatars::emptyAvatarImage(const QSize &AMaxSize, bool AGray) const
 {
-	QImage image = AGray ? FGrayEmptyAvatar : FEmptyAvatar;
+	QImage image = AGray ? FEmptyGrayAvatar : FEmptyAvatar;
 	if (AMaxSize.isValid() && (image.height()>AMaxSize.height() || image.width()>AMaxSize.width()))
 		image = image.scaled(AMaxSize,Qt::KeepAspectRatio,Qt::SmoothTransformation);
 	return image;
@@ -525,7 +494,7 @@ QImage Avatars::loadAvatarImage(const QString &AHash, const QSize &AMaxSize, boo
 	QString fileName = avatarFileName(AHash);
 	if (!fileName.isEmpty() && QFile::exists(fileName))
 	{
-		QMap<QSize,QImage> &images = AGray ? FGrayAvatarImages[AHash] : FAvatarImages[AHash];
+		QMap<QSize,QImage> &images = AGray ? FAvatarGrayImages[AHash] : FAvatarImages[AHash];
 		if (!images.contains(AMaxSize))
 		{
 			if (image.load(fileName))
@@ -915,7 +884,7 @@ void Avatars::onClearAvatarByAction(bool)
 void Avatars::onIconStorageChanged()
 {
 	FEmptyAvatar = QImage(IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->fileFullName(MNI_AVATAR_EMPTY)).scaled(FAvatarSize,Qt::KeepAspectRatio,Qt::FastTransformation);
-	FGrayEmptyAvatar = ImageManager::opacitized(ImageManager::grayscaled(FEmptyAvatar));
+	FEmptyGrayAvatar = ImageManager::opacitized(ImageManager::grayscaled(FEmptyAvatar));
 }
 
 void Avatars::onOptionsOpened()
@@ -932,9 +901,7 @@ void Avatars::onOptionsOpened()
 			++it;
 	}
 
-	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOW));
-	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWEMPTY));
-	onOptionsChanged(Options::node(OPV_ROSTER_AVATARS_SHOWGRAY));
+	onOptionsChanged(Options::node(OPV_ROSTER_VIEWMODE));
 }
 
 void Avatars::onOptionsClosed()
@@ -952,20 +919,10 @@ void Avatars::onOptionsClosed()
 
 void Avatars::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_ROSTER_AVATARS_SHOW)
+	if (ANode.path() == OPV_ROSTER_VIEWMODE)
 	{
-		FAvatarsVisible = ANode.value().toBool();
+		FAvatarsVisible = ANode.value().toInt() == IRostersView::ViewFull;
 		emit rosterLabelChanged(FAvatarLabelId,NULL);
-	}
-	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWEMPTY)
-	{
-		FShowEmptyAvatars = ANode.value().toBool();
-		updateDataHolder();
-	}
-	else if (ANode.path() == OPV_ROSTER_AVATARS_SHOWGRAY)
-	{
-		FShowGrayAvatars = ANode.value().toBool();
-		updateDataHolder();
 	}
 }
 

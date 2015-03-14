@@ -27,14 +27,6 @@
         <translation>Hierarchiczny widok listy kontaktów</translation>
     </message>
     <message>
-        <source>Show contact resource in roster</source>
-        <translation>Pokaż zasoby kontaktów na liście</translation>
-    </message>
-    <message>
-        <source>Sort contacts by status</source>
-        <translation>Sortuj kontakty według statusu</translation>
-    </message>
-    <message>
         <source>Copy contact JID to clipboard</source>
         <translation>Kopiuj JID kontaktu do schowka</translation>
     </message>
@@ -47,15 +39,7 @@
         <translation>Kopiuj status kontaktu do schowka</translation>
     </message>
     <message>
-        <source>Do not show the scroll bars</source>
-        <translation>Nie pokazuj paska przewijania</translation>
-    </message>
-    <message>
         <source>Show/Hide disconnected contacts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show status message in roster</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -91,15 +75,55 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unite contacts of all accounts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show list of united accounts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contacts List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contacts list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show contact of all accounts in common list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show contact resource with highest priority</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide scroll bars in contact list window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simplified</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Compact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Contacts list view:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sort contacts list:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>alphabetically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>by status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Full</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

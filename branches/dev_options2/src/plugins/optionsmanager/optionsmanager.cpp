@@ -136,7 +136,7 @@ bool OptionsManager::initSettings()
 	if (profiles().count() == 0)
 		addProfile(DEFAULT_PROFILE, QString::null);
 
-	IOptionsDialogNode dnode = { ONO_COMMON, OPN_COMMON, MNI_OPTIONS_DIALOG, tr("Common Settings") };
+	IOptionsDialogNode dnode = { ONO_COMMON, OPN_COMMON, MNI_OPTIONS_DIALOG, tr("Common") };
 	insertOptionsDialogNode(dnode);
 	insertOptionsDialogHolder(this);
 

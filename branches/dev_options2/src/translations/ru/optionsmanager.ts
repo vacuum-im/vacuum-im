@@ -183,10 +183,6 @@
         <translation>Показать диалог настроек</translation>
     </message>
     <message>
-        <source>Common Settings</source>
-        <translation>Общие настройки</translation>
-    </message>
-    <message>
         <source>Common settings</source>
         <translation>Общие настройки</translation>
     </message>
@@ -205,6 +201,10 @@
     <message>
         <source>Language:</source>
         <translation>Язык:</translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation>Общие</translation>
     </message>
 </context>
 </TS>
