@@ -400,9 +400,9 @@ bool NormalMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, 
 QMultiMap<int, IOptionsDialogWidget *> NormalMessageHandler::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_UNNOTIFYALLNORMAL,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL),tr("Mark all single messages from user as read when you read the first one"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_UNNOTIFYALLNORMAL,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_UNNOTIFYALLNORMAL),tr("Consider all single contacts messages as read when read the first"),AParent));
 	}
 	return widgets;
 }

@@ -450,16 +450,8 @@ Werte überprüfen und neu probieren</translation>
         <translation>Zeige alle verdeckten Konferenzen</translation>
     </message>
     <message>
-        <source>Show users connections/disconnections</source>
-        <translation>Zeige Benutzer die kommen/gehen</translation>
-    </message>
-    <message>
         <source>Show users status changes</source>
         <translation>Zeige Status Änderungen von Benutzern</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Speichere Status Änderungen in der Historie</translation>
     </message>
     <message>
         <source>Multi-user chat window</source>
@@ -524,10 +516,6 @@ Werte überprüfen und neu probieren</translation>
         <translation>Wenn sie eine neue Nachricht in der Konferenz erhalten</translation>
     </message>
     <message>
-        <source>Add this suffix when referring to the user:</source>
-        <translation>Diesen Suffix beim beziehen auf einen Benutzer anfügen:</translation>
-    </message>
-    <message>
         <source>Leave the conference when window closed</source>
         <translation>Konferenz verlassen wenn Fenster geschlossen wird</translation>
     </message>
@@ -537,14 +525,6 @@ Werte überprüfen und neu probieren</translation>
     </message>
     <message>
         <source>Exit conference</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Rejoin in conference after kick</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select the user to refer without menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -629,6 +609,22 @@ Werte überprüfen und neu probieren</translation>
     </message>
     <message>
         <source>Make this Room CAPTCHA Protected?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show users connections and disconnections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save users status messages in history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically rejoin to conference after kick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a user to refer by enumeration in the input field</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

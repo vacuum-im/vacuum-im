@@ -39,22 +39,6 @@
         <translation>Вікно  з вкладками</translation>
     </message>
     <message>
-        <source>Enable tab windows</source>
-        <translation>Використовувати вікна з вкладками</translation>
-    </message>
-    <message>
-        <source>Show status changes in chat windows</source>
-        <translation>Показувати зміну статусу в вікні чату</translation>
-    </message>
-    <message>
-        <source>Auto resize input field</source>
-        <translation>Автоматично змінювати розмір поля вводу</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Зберігати повідомлення статусу в історії</translation>
-    </message>
-    <message>
         <source>Tab window</source>
         <translation>Вікно вкладки</translation>
     </message>
@@ -209,35 +193,44 @@
         <translation>Об&apos;єднати/Розділити з вікнами повідомлень</translation>
     </message>
     <message>
-        <source>Combine message windows with contact-list</source>
-        <translation>Об&apos;єднати вікна повідомлень з контакт-листом</translation>
-    </message>
-    <message>
-        <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation>Показувати вкладки в режимі об&apos;єднання вікон повідомлень з ростером</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Цитувати виділений текст</translation>
     </message>
-</context>
-<context>
-    <name>MessengerOptionsClass</name>
     <message>
-        <source>Minimum input field lines:</source>
-        <translation>Мінімальне число строк в полі вводу:</translation>
+        <source>Message window view</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clean chat windows after closing in </source>
-        <translation>Очищати вікна чату після закриття за </translation>
+        <source>Load last messages from history</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> minutes</source>
-        <translation> хвилин</translation>
+        <source>Show message windows together with contacts list</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(0 - do not clean)</source>
-        <translation>(0 - не очищати)</translation>
+        <source>Show message windows in tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically resize messages input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum number of lines in messages input field:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message window behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show contacts status changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save contacts status messages in history</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

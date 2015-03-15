@@ -87,13 +87,13 @@
 
 // MessageWidgets
 #define OPV_MESSAGES_ROOT                               "messages"
+#define OPV_MESSAGES_LOADHISTORY                        "messages.load-history"
 #define OPV_MESSAGES_SHOWSTATUS                         "messages.show-status"
 #define OPV_MESSAGES_ARCHIVESTATUS                      "messages.archive-status"
 #define OPV_MESSAGES_EDITORAUTORESIZE                   "messages.editor-auto-resize"
 #define OPV_MESSAGES_EDITORMINIMUMLINES                 "messages.editor-minimum-lines"
 #define OPV_MESSAGES_CLEANCHATTIMEOUT                   "messages.clean-chat-timeout"
 #define OPV_MESSAGES_COMBINEWITHROSTER                  "messages.combine-with-roster"
-#define OPV_MESSAGES_SHOWTABSINCOMBINEDMODE             "messages.show-tabs-in-combined-mode"
 #define OPV_MESSAGES_TABWINDOWS_ROOT                    "messages.tab-windows"
 #define OPV_MESSAGES_TABWINDOWS_ENABLE                  "messages.tab-windows.enable"
 #define OPV_MESSAGES_TABWINDOWS_DEFAULT                 "messages.tab-windows.default"
@@ -101,15 +101,11 @@
 #define OPV_MESSAGES_TABWINDOW_NAME                     "messages.tab-windows.window.name"
 #define OPV_MESSAGES_TABWINDOW_TABSCLOSABLE             "messages.tab-windows.window.tabs-closable"
 #define OPV_MESSAGES_TABWINDOW_TABSBOTTOM               "messages.tab-windows.window.tabs-bottom"
-#define OPV_MESSAGES_TABWINDOW_SHOWINDICES              "messages.tab-windows.window.show-indices"
-#define OPV_MESSAGES_TABWINDOW_REMOVETABSONCLOSE        "messages.tab-windows.window.remove-tabs-on-close"
 // Emoticons
 #define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
 #define OPV_MESSAGES_EMOTICONS_MAXINMESSAGE             "messages.emoticons.max-in-message"
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
-// ChatMessageHandler
-#define OPV_MESSAGES_LOAD_HISTORY                       "messages.load-chat-history"
 // NormalMessageHandler
 #define OPV_MESSAGES_UNNOTIFYALLNORMAL                  "messages.unnotify-all-normal-messages"
 // MessageStyles
@@ -125,7 +121,7 @@
 #define OPV_MUC_GROUPCHAT_ARCHIVESTATUS                 "muc.groupchat.archive-status"
 #define OPV_MUC_GROUPCHAT_REJOINAFTERKICK               "muc.groupchat.rejoin-after-kick"
 #define OPV_MUC_GROUPCHAT_QUITONWINDOWCLOSE             "muc.groupchat.quit-on-window-close"
-#define OPV_MUC_GROUPCHAT_BASHAPPEND                    "muc.groupchat.bash-append"
+#define OPV_MUC_GROUPCHAT_REFERENUMERATION              "muc.groupchat.refer-enumeration"
 #define OPV_MUC_GROUPCHAT_NICKNAMESUFIX                 "muc.groupchat.nickname-sufix"
 // Bookmarks
 #define OPV_MUC_GROUPCHAT_SHOWAUTOJOINED                "muc.groupchat.show-auto-joined"

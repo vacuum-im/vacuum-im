@@ -450,16 +450,8 @@ Check values and try again</source>
         <translation>Показать все скрытые конференции</translation>
     </message>
     <message>
-        <source>Show users connections/disconnections</source>
-        <translation>Показывать подключения/отключения пользователей</translation>
-    </message>
-    <message>
         <source>Show users status changes</source>
         <translation>Показывать изменения статусов пользователей</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Сохранять статусные сообщения в истории</translation>
     </message>
     <message>
         <source>Multi-user chat window</source>
@@ -524,10 +516,6 @@ Check values and try again</source>
         <translation>При получении нового сообщения в конференции</translation>
     </message>
     <message>
-        <source>Add this suffix when referring to the user:</source>
-        <translation>Добавлять этот суффикс при обращении к пользователю:</translation>
-    </message>
-    <message>
         <source>Leave the conference when window closed</source>
         <translation>Выходить из конференции при закрытии окна</translation>
     </message>
@@ -538,14 +526,6 @@ Check values and try again</source>
     <message>
         <source>Exit conference</source>
         <translation>Выйти из конференции</translation>
-    </message>
-    <message>
-        <source>Rejoin in conference after kick</source>
-        <translation>Автоматически перезаходить в конференцию после кика</translation>
-    </message>
-    <message>
-        <source>Select the user to refer without menu</source>
-        <translation>Выбирать пользователя для обращения без меню</translation>
     </message>
     <message>
         <source>Enter</source>
@@ -630,6 +610,22 @@ Check values and try again</source>
     <message>
         <source>Do not Request CAPTCHA for Followed Jabber ID</source>
         <translation>Не показывать CAPTCHA для следующего списка Jabber ID</translation>
+    </message>
+    <message>
+        <source>Show users connections and disconnections</source>
+        <translation>Показывать подключения и отключения пользователей</translation>
+    </message>
+    <message>
+        <source>Save users status messages in history</source>
+        <translation>Сохранять статусные сообщения пользователей в истории</translation>
+    </message>
+    <message>
+        <source>Automatically rejoin to conference after kick</source>
+        <translation>Автоматически переподключаться к конференции после кика</translation>
+    </message>
+    <message>
+        <source>Select a user to refer by enumeration in the input field</source>
+        <translation>Выбирать пользователя для обращения перебором в поле ввода</translation>
     </message>
 </context>
 <context>

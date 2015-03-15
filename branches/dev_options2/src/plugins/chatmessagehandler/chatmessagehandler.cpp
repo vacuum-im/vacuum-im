@@ -8,9 +8,7 @@
 #include <definitions/menuicons.h>
 #include <definitions/soundfiles.h>
 #include <definitions/shortcuts.h>
-#include <definitions/optionnodes.h>
 #include <definitions/optionvalues.h>
-#include <definitions/optionwidgetorders.h>
 #include <definitions/rosterindexkinds.h>
 #include <definitions/rosterindexroles.h>
 #include <definitions/rosterclickhookerorders.h>
@@ -56,7 +54,6 @@ ChatMessageHandler::ChatMessageHandler()
 	FNotifications = NULL;
 	FAccountManager = NULL;
 	FXmppUriQueries = NULL;
-	FOptionsManager = NULL;
 	FRecentContacts = NULL;
 }
 
@@ -204,12 +201,6 @@ bool ChatMessageHandler::initConnections(IPluginManager *APluginManager, int &AI
 		FXmppUriQueries = qobject_cast<IXmppUriQueries *>(plugin->instance());
 	}
 
-	plugin = APluginManager->pluginInterface("IOptionsManager").value(0,NULL);
-	if (plugin)
-	{
-		FOptionsManager = qobject_cast<IOptionsManager *>(plugin->instance());
-	}
-
 	plugin = APluginManager->pluginInterface("IRecentContacts").value(0,NULL);
 	if (plugin)
 	{
@@ -254,10 +245,6 @@ bool ChatMessageHandler::initObjects()
 	{
 		FXmppUriQueries->insertUriHandler(this, XUHO_DEFAULT);
 	}
-	if (FOptionsManager)
-	{
-		FOptionsManager->insertOptionsDialogHolder(this);
-	}
 	if (FMessageWidgets)
 	{
 		FMessageWidgets->insertEditSendHandler(MESHO_CHATMESSAGEHANDLER,this);
@@ -267,7 +254,7 @@ bool ChatMessageHandler::initObjects()
 
 bool ChatMessageHandler::initSettings()
 {
-	Options::setDefaultValue(OPV_MESSAGES_LOAD_HISTORY, true);
+	Options::setDefaultValue(OPV_MESSAGES_LOADHISTORY, true);
 	return true;
 }
 
@@ -428,16 +415,6 @@ bool ChatMessageHandler::messageShowWindow(int AOrder, const Jid &AStreamJid, co
 		}
 	}
 	return false;
-}
-
-QMultiMap<int, IOptionsDialogWidget *> ChatMessageHandler::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
-{
-	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MESSAGES)
-	{
-		widgets.insertMulti(OWO_MESSAGES_LOADHISTORY,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_LOAD_HISTORY),tr("Load messages from history in new chat windows"),AParent));
-	}
-	return widgets;
 }
 
 bool ChatMessageHandler::rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent)
@@ -662,7 +639,7 @@ void ChatMessageHandler::showHistory(IMessageChatWindow *AWindow)
 
 void ChatMessageHandler::requestHistory(IMessageChatWindow *AWindow)
 {
-	if (FMessageArchiver && Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool() && !FHistoryRequests.values().contains(AWindow))
+	if (FMessageArchiver && Options::node(OPV_MESSAGES_LOADHISTORY).value().toBool() && !FHistoryRequests.values().contains(AWindow))
 	{
 		WindowStatus &wstatus = FWindowStatus[AWindow];
 

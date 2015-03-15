@@ -104,13 +104,14 @@ bool MessageStyles::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> MessageStyles::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (ANodeId == OPN_MESSAGE_STYLES && !FStylePlugins.isEmpty())
+	if (ANodeId == OPN_MESSAGE_STYLES)
 	{
-		widgets.insertMulti(OWO_MESSAGE_STYLES, new StyleOptionsWidget(this,AParent));
+		if (!FStylePlugins.isEmpty())
+			widgets.insertMulti(OWO_MESSAGE_STYLES, new StyleOptionsWidget(this,AParent));
 	}
 	else if (ANodeId == OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_SHOWDATESEPARATORS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWDATESEPARATORS),tr("Show date separators in chat window"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_SHOWDATESEPARATORS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWDATESEPARATORS),tr("Show date separators in message window"),AParent));
 	}
 	return widgets;
 }

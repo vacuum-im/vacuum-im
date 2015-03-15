@@ -39,22 +39,6 @@
         <translation>Tab Window</translation>
     </message>
     <message>
-        <source>Enable tab windows</source>
-        <translation>Enable tab windows</translation>
-    </message>
-    <message>
-        <source>Show status changes in chat windows</source>
-        <translation>Show status changes in chat windows</translation>
-    </message>
-    <message>
-        <source>Auto resize input field</source>
-        <translation>Auto resize input field</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Save status messages to history</translation>
-    </message>
-    <message>
         <source>Tab window</source>
         <translation>Tab window</translation>
     </message>
@@ -209,35 +193,44 @@
         <translation>Combine/Split with message windows</translation>
     </message>
     <message>
-        <source>Combine message windows with contact-list</source>
-        <translation>Combine message windows with contact-list</translation>
-    </message>
-    <message>
-        <source>Show tabs in combined message windows with contact-list mode</source>
-        <translation>Show tabs in combined message windows with contact-list mode</translation>
-    </message>
-    <message>
         <source>Quote Selected Text</source>
         <translation>Quote Selected Text</translation>
     </message>
-</context>
-<context>
-    <name>MessengerOptionsClass</name>
     <message>
-        <source>Minimum input field lines:</source>
-        <translation>Minimum input field lines:</translation>
+        <source>Message window view</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clean chat windows after closing in </source>
-        <translation>Clean chat windows after closing in </translation>
+        <source>Load last messages from history</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> minutes</source>
-        <translation> minutes</translation>
+        <source>Show message windows together with contacts list</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>(0 - do not clean)</source>
-        <translation>(0 - do not clean)</translation>
+        <source>Show message windows in tab window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically resize messages input field</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimum number of lines in messages input field:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Message window behavior</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show contacts status changes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save contacts status messages in history</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

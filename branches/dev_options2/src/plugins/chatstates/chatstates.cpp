@@ -223,9 +223,9 @@ bool ChatStates::archiveMessageEdit(int AOrder, const Jid &AStreamJid, Message &
 QMultiMap<int, IOptionsDialogWidget *> ChatStates::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_MESSAGES)
+	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES_CHATSTATES, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send chat state notifications"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_CHATSTATESENABLED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_CHATSTATESENABLED),tr("Send notifications of your chat activity"),AParent));
 	}
 	return widgets;
 }

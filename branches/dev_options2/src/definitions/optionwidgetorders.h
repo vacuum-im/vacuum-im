@@ -54,6 +54,33 @@
 #define   OWO_ROSTER_AUTOUNSUBSCRIBE              320
 #define   OWO_ROSTER_EXCHANGEAUTO                 330
 
+//Node = ON_MESSAGES
+#define OHO_MESSAGES_VIEW                         100
+#define   OWO_MESSAGES_COMBINEWITHROSTER          110
+#define   OWO_MESSAGES_TABWINDOWSENABLE           120
+#define   OWO_MESSAGES_EDITORAUTORESIZE           130
+#define   OWO_MESSAGES_EDITORMINIMUMLINES         140
+#define OHO_MESSAGES_BEHAVIOR                     300
+#define   OWO_MESSAGES_LOADHISTORY                310
+#define   OWO_MESSAGES_SHOWSTATUS                 320
+#define   OWO_MESSAGES_ARCHIVESTATUS              330
+#define   OWO_MESSAGES_SHOWDATESEPARATORS         340
+#define   OWO_MESSAGES_EMITICONSENABLED           350
+#define   OWO_MESSAGES_CHATSTATESENABLED          360
+#define   OWO_MESSAGES_UNNOTIFYALLNORMAL          370
+#define OHO_MESSAGES_CONFERENCES                  500
+#define   OWO_MESSAGES_MUC_SHOWENTERS             510
+#define   OWO_MESSAGES_MUC_SHOWSTATUS             520
+#define   OWO_MESSAGES_MUC_ARCHIVESTATUS          530
+#define   OWO_MESSAGES_MUC_QUITONWINDOWCLOSE      540
+#define   OWO_MESSAGES_MUC_REJOINAFTERKICK        550
+#define   OWO_MESSAGES_MUC_REFERENUMERATION       560
+#define   OWO_MESSAGES_MUC_SHOWAUTOJOINED         570
+#define OHO_MESSAGES_HISORYENGINES                700
+#define   OWO_MESSAGES_HISORYENGINE               710
+#define OHO_MESSAGES_HISTORYENGINESETTINGS        900
+#define   OWO_MESSAGES_HISTORYENGINESETTINGS      910
+
 //Node = ON_STATUSICONS
 #define OWO_STATUSICONS                           500
 
@@ -70,17 +97,6 @@
 #define OWO_NOTIFICATIONS_EXTENDED                300
 #define OWO_NOTIFICATIONS_COMMON                  500
 
-//Node = ON_MESSAGES
-#define OWO_MESSAGES                              300
-#define OWO_MESSAGES_LOADHISTORY                  600
-#define OWO_MESSAGES_SHOWDATESEPARATORS           600
-#define OWO_MESSAGES_CHATSTATES                   800
-#define OWO_MESSAGES_UNNOTIFYALLNORMAL            900
-#define OHO_MESSAGES_HISORYENGINES                1000
-#  define OWO_MESSAGES_HISORYENGINE               1010
-#define OHO_MESSAGES_HISTORYENGINESETTINGS        1100
-#  define OWO_MESSAGES_HISTORYENGINESETTINGS      1110
-
 //Node = ON_MESSAGE_STYLES
 #define OWO_MESSAGE_STYLES                        500
 
@@ -93,10 +109,6 @@
 
 //Node = ON_AUTOSTATUS
 #define OWO_AUTOSTATUS                            500
-
-//Node = ON_CONFERENCES
-#define OWO_CONFERENCES                           500
-#define OWO_CONFERENCES_SHOWAUTOJOINED            700
 
 //Node = ON_SHORTCUTS
 #define OWO_SHORTCUTS                             500

@@ -45,10 +45,6 @@
         <translation>Очистити вікно</translation>
     </message>
     <message>
-        <source>Load messages from history in new chat windows</source>
-        <translation>Завантажувати попередні повідомлення при відкритті вікна чату</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>При отриманні нового повідомлення чату</translation>
     </message>

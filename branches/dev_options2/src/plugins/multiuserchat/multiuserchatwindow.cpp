@@ -1712,7 +1712,7 @@ void MultiUserChatWindow::showPrivateChatMessage(IMessageChatWindow *AWindow, co
 
 void MultiUserChatWindow::requestPrivateChatHistory(IMessageChatWindow *AWindow)
 {
-	if (FMessageArchiver && Options::node(OPV_MESSAGES_LOAD_HISTORY).value().toBool() && !FHistoryRequests.values().contains(AWindow))
+	if (FMessageArchiver && Options::node(OPV_MESSAGES_LOADHISTORY).value().toBool() && !FHistoryRequests.values().contains(AWindow))
 	{
 		WindowStatus &wstatus = FWindowStatus[AWindow->viewWidget()];
 
@@ -2261,7 +2261,7 @@ void MultiUserChatWindow::onMultiChatEditWidgetKeyEvent(QKeyEvent *AKeyEvent, bo
 		QString suffix = cursor.atBlockStart() ? Options::node(OPV_MUC_GROUPCHAT_NICKNAMESUFIX).value().toString() : QString(" ");
 		if (FCompleteNicks.count() > 1)
 		{
-			if (!Options::node(OPV_MUC_GROUPCHAT_BASHAPPEND).value().toBool())
+			if (!Options::node(OPV_MUC_GROUPCHAT_REFERENUMERATION).value().toBool())
 			{
 				Menu *nickMenu = new Menu(this);
 				nickMenu->setAttribute(Qt::WA_DeleteOnClose,true);

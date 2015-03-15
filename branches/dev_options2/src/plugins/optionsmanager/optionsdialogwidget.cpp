@@ -298,7 +298,7 @@ void OptionsDialogWidget::rigisterEditor(const OptionsNode &ANode, const QString
 	else if (FSpinBox)
 	{
 		FSpinBox->setValue(FValue.toInt());
-		connect(FSpinBox,SIGNAL(valueChanged(double)),SIGNAL(modified()));
+		connect(FSpinBox,SIGNAL(valueChanged(int)),SIGNAL(modified()));
 		insertEditor(ACaption,FSpinBox,hlayout);
 	}
 	else

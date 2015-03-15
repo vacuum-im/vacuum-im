@@ -450,16 +450,8 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <translation>Mostrar todas las salas ocultas</translation>
     </message>
     <message>
-        <source>Show users connections/disconnections</source>
-        <translation>Mostrar las conexiones/desconexiones de los usuarios</translation>
-    </message>
-    <message>
         <source>Show users status changes</source>
         <translation>Mostrar los cambios de estado de los usuarios</translation>
-    </message>
-    <message>
-        <source>Save status messages to history</source>
-        <translation>Guardar los mensajes de estado en el historial</translation>
     </message>
     <message>
         <source>Multi-user chat window</source>
@@ -524,10 +516,6 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
         <translation>Al recibir un nuevo mensaje en la sala</translation>
     </message>
     <message>
-        <source>Add this suffix when referring to the user:</source>
-        <translation>Añadir este sufijo al referirse a un usuario:</translation>
-    </message>
-    <message>
         <source>Leave the conference when window closed</source>
         <translation>Abandonar la sala al cerrar la ventana</translation>
     </message>
@@ -538,14 +526,6 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     <message>
         <source>Exit conference</source>
         <translation>Abandonar la sala</translation>
-    </message>
-    <message>
-        <source>Rejoin in conference after kick</source>
-        <translation>Entrar automáticamente a la sala luego de ser expulsado</translation>
-    </message>
-    <message>
-        <source>Select the user to refer without menu</source>
-        <translation>Seleccionar el usuario al cual referirse sin menú</translation>
     </message>
     <message>
         <source>Enter</source>
@@ -629,6 +609,22 @@ Comprueba la configuración y vuelve a intentarlo.</translation>
     </message>
     <message>
         <source>Make this Room CAPTCHA Protected?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show users connections and disconnections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save users status messages in history</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Automatically rejoin to conference after kick</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select a user to refer by enumeration in the input field</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

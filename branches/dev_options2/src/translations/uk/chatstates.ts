@@ -24,16 +24,16 @@
         <translation>Підтримує обмін інформацією про активність користувачів у чаті</translation>
     </message>
     <message>
-        <source>Send chat state notifications</source>
-        <translation>Відправляти інформацію про активність</translation>
-    </message>
-    <message>
         <source>When contact is typing the message for you</source>
         <translation>Коли контакт набирає повідомлення до Вас</translation>
     </message>
     <message>
         <source>Typing a message...</source>
         <translation>Набирає повідомлення...</translation>
+    </message>
+    <message>
+        <source>Send notifications of your chat activity</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

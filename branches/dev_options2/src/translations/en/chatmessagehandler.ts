@@ -45,10 +45,6 @@
         <translation>Clear window</translation>
     </message>
     <message>
-        <source>Load messages from history in new chat windows</source>
-        <translation>Load messages from history in new chat windows</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>When receiving new chat message</translation>
     </message>

@@ -28,10 +28,6 @@
         <translation>Pozwala na stosowanie różnych stylów wyświetlania wiadomości</translation>
     </message>
     <message>
-        <source>Show date separators in chat window</source>
-        <translation>Pokaż separator daty w oknie rozmowy</translation>
-    </message>
-    <message>
         <source>January</source>
         <translation>Stycznia</translation>
     </message>
@@ -118,6 +114,10 @@
     <message>
         <source>%1, %2 dd, yyyy</source>
         <translation>%1, dd %2, yyyy</translation>
+    </message>
+    <message>
+        <source>Show date separators in message window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -37,14 +37,13 @@ struct WindowContent {
 class ChatMessageHandler :
 	public QObject,
 	public IPlugin,
-	public IOptionsDialogHolder,
 	public IXmppUriHandler,
 	public IMessageHandler,
 	public IRostersClickHooker,
 	public IMessageEditSendHandler
 {
 	Q_OBJECT;
-	Q_INTERFACES(IPlugin IOptionsDialogHolder IXmppUriHandler IMessageHandler IRostersClickHooker IMessageEditSendHandler);
+	Q_INTERFACES(IPlugin IXmppUriHandler IMessageHandler IRostersClickHooker IMessageEditSendHandler);
 public:
 	ChatMessageHandler();
 	~ChatMessageHandler();
@@ -65,8 +64,6 @@ public:
 	virtual INotification messageNotify(INotifications *ANotifications, const Message &AMessage, int ADirection);
 	virtual bool messageShowWindow(int AMessageId);
 	virtual bool messageShowWindow(int AOrder, const Jid &AStreamJid, const Jid &AContactJid, Message::MessageType AType, int AShowMode);
-	//IOptionsHolder
-	virtual QMultiMap<int, IOptionsDialogWidget *> optionsDialogWidgets(const QString &ANodeId, QWidget *AParent);
 	//IRostersClickHooker
 	virtual bool rosterIndexSingleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
 	virtual bool rosterIndexDoubleClicked(int AOrder, IRosterIndex *AIndex, const QMouseEvent *AEvent);
@@ -128,7 +125,6 @@ private:
 	INotifications *FNotifications;
 	IAccountManager *FAccountManager;
 	IXmppUriQueries *FXmppUriQueries;
-	IOptionsManager *FOptionsManager;
 	IRecentContacts *FRecentContacts;
 private:
 	QList<IMessageChatWindow *> FWindows;

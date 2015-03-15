@@ -28,10 +28,6 @@
         <translation>Дозволяє використовувати різні стилі для перегляду повідомлень</translation>
     </message>
     <message>
-        <source>Show date separators in chat window</source>
-        <translation>Показувати роздільники дат у вікні чату</translation>
-    </message>
-    <message>
         <source>January</source>
         <translation>Січня</translation>
     </message>
@@ -118,6 +114,10 @@
     <message>
         <source>%1, %2 dd, yyyy</source>
         <translation>%1, dd %2, yyyy</translation>
+    </message>
+    <message>
+        <source>Show date separators in message window</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

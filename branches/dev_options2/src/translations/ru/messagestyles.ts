@@ -28,10 +28,6 @@
         <translation>Позволяет использовать различные стили для отображения сообщений</translation>
     </message>
     <message>
-        <source>Show date separators in chat window</source>
-        <translation>Показывать разделители дат в окне чата</translation>
-    </message>
-    <message>
         <source>January</source>
         <translation>Января</translation>
     </message>
@@ -118,6 +114,10 @@
     <message>
         <source>%1, %2 dd, yyyy</source>
         <translation>%1, dd %2, yyyy</translation>
+    </message>
+    <message>
+        <source>Show date separators in message window</source>
+        <translation>Показывать разделители дат в окнах сообщений</translation>
     </message>
 </context>
 <context>

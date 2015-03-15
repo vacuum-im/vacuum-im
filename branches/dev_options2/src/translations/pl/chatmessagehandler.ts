@@ -45,10 +45,6 @@
         <translation>Wyczyść okno</translation>
     </message>
     <message>
-        <source>Load messages from history in new chat windows</source>
-        <translation>Pobierz wiadomości z historii i wstaw do nowego okienka</translation>
-    </message>
-    <message>
         <source>When receiving new chat message</source>
         <translation>Podczas pobierania nowej wiadomości</translation>
     </message>

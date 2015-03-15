@@ -24,16 +24,16 @@
         <translation>Obsługa informacji na temat aktywności użytkownika w oknie rozmowy</translation>
     </message>
     <message>
-        <source>Send chat state notifications</source>
-        <translation>Wysyłaj powiadomienia o aktywności</translation>
-    </message>
-    <message>
         <source>When contact is typing the message for you</source>
         <translation>Kiedy kontakt pisze wiadomość do Ciebie</translation>
     </message>
     <message>
         <source>Typing a message...</source>
         <translation>Pisze wiadomość...</translation>
+    </message>
+    <message>
+        <source>Send notifications of your chat activity</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

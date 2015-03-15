@@ -206,11 +206,11 @@ QMultiMap<int, IOptionsDialogWidget *> Bookmarks::optionsDialogWidgets(const QSt
 		{
 			OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
 			widgets.insertMulti(OHO_ACCOUNTS_ADDITIONAL_CONFERENCES, FOptionsManager->newOptionsDialogHeader(tr("Conferences"),AParent));
-			widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_DISABLEAUTOJOIN, FOptionsManager->newOptionsDialogWidget(options.node("ignore-autojoin"),tr("Disable autojoin to conferences on this computer"),AParent));
+			widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_DISABLEAUTOJOIN, FOptionsManager->newOptionsDialogWidget(options.node("ignore-autojoin"),tr("Disable auto join to conferences on this computer"),AParent));
 		}
-		else if (ANodeId == OPN_CONFERENCES)
+		else if (ANodeId == OPN_MESSAGES)
 		{
-			widgets.insertMulti(OWO_CONFERENCES_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Automatically show window of conferences connected at startup"),AParent));
+			widgets.insertMulti(OWO_MESSAGES_MUC_SHOWAUTOJOINED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MUC_GROUPCHAT_SHOWAUTOJOINED),tr("Show windows of auto joined conferences at startup"),AParent));
 		}
 	}
 	return widgets;

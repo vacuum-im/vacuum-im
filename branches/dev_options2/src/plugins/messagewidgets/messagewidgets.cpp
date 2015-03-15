@@ -121,19 +121,18 @@ bool MessageWidgets::initObjects()
 
 bool MessageWidgets::initSettings()
 {
-	Options::setDefaultValue(OPV_MESSAGES_SHOWSTATUS,true);
-	Options::setDefaultValue(OPV_MESSAGES_ARCHIVESTATUS,false);
+	Options::setDefaultValue(OPV_MESSAGES_COMBINEWITHROSTER,true);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORAUTORESIZE,true);
 	Options::setDefaultValue(OPV_MESSAGES_EDITORMINIMUMLINES,1);
 	Options::setDefaultValue(OPV_MESSAGES_CLEANCHATTIMEOUT,30);
-	Options::setDefaultValue(OPV_MESSAGES_COMBINEWITHROSTER,false);
-	Options::setDefaultValue(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE,false);
-	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,true);
+
+	Options::setDefaultValue(OPV_MESSAGES_SHOWSTATUS,true);
+	Options::setDefaultValue(OPV_MESSAGES_ARCHIVESTATUS,false);
+
+	Options::setDefaultValue(OPV_MESSAGES_TABWINDOWS_ENABLE,false);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_NAME,tr("Tab Window"));
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSCLOSABLE,true);
 	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_TABSBOTTOM,false);
-	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_SHOWINDICES,false);
-	Options::setDefaultValue(OPV_MESSAGES_TABWINDOW_REMOVETABSONCLOSE,false);
 
 	if (FOptionsManager)
 	{
@@ -150,13 +149,16 @@ QMultiMap<int, IOptionsDialogWidget *> MessageWidgets::optionsDialogWidgets(cons
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId==OPN_MESSAGES)
 	{
-		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Enable tab windows"),AParent));
-		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show status changes in chat windows"),AParent));
-		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_ARCHIVESTATUS),tr("Save status messages to history"),AParent));
-		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Auto resize input field"),AParent));
-		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_COMBINEWITHROSTER),tr("Combine message windows with contact-list"),AParent));
-		widgets.insertMulti(OWO_MESSAGES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE),tr("Show tabs in combined message windows with contact-list mode"),AParent));
-		widgets.insertMulti(OWO_MESSAGES,new MessengerOptions(this,AParent));
+		widgets.insertMulti(OHO_MESSAGES_VIEW,FOptionsManager->newOptionsDialogHeader(tr("Message window view"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_LOADHISTORY,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_LOADHISTORY),tr("Load last messages from history"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_COMBINEWITHROSTER,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_COMBINEWITHROSTER),tr("Show message windows together with contacts list"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_TABWINDOWSENABLE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE),tr("Show message windows in tab window"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_EDITORAUTORESIZE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EDITORAUTORESIZE),tr("Automatically resize messages input field"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_EDITORMINIMUMLINES,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EDITORMINIMUMLINES),tr("Minimum number of lines in messages input field:"),AParent));
+
+		widgets.insertMulti(OHO_MESSAGES_BEHAVIOR,FOptionsManager->newOptionsDialogHeader(tr("Message window behavior"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_SHOWSTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_SHOWSTATUS),tr("Show contacts status changes"),AParent));
+		widgets.insertMulti(OWO_MESSAGES_ARCHIVESTATUS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_ARCHIVESTATUS),tr("Save contacts status messages in history"),AParent));
 	}
 	return widgets;
 }
@@ -729,7 +731,7 @@ void MessageWidgets::onTabWindowPageAdded(IMessageTabPage *APage)
 
 void MessageWidgets::onTabWindowCurrentPageChanged(IMessageTabPage *APage)
 {
-	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool() && !Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE).value().toBool())
+	if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool() && !Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
 	{
 		IMessageTabWindow *window = qobject_cast<IMessageTabWindow *>(sender());
 		if (window && window->windowId()==Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
@@ -776,7 +778,7 @@ void MessageWidgets::onOptionsOpened()
 	stream >> FPageWindows;
 
 	onOptionsChanged(Options::node(OPV_MESSAGES_COMBINEWITHROSTER));
-	onOptionsChanged(Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE));
+	onOptionsChanged(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE));
 }
 
 void MessageWidgets::onOptionsClosed()
@@ -793,7 +795,13 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 {
 	if (ANode.path() == OPV_MESSAGES_TABWINDOWS_ENABLE)
 	{
-		if (ANode.value().toBool())
+		if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+		{
+			IMessageTabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+			if (window)
+				window->setTabBarVisible(ANode.value().toBool());
+		}
+		else if (ANode.value().toBool())
 		{
 			foreach(IMessageTabPage *page, FAssignedPages)
 				assignTabWindowPage(page);
@@ -801,7 +809,7 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 			foreach(IMessageTabWindow *window, tabWindows())
 				window->showWindow();
 		}
-		else if (!Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
+		else
 		{
 			foreach(IMessageTabWindow *window, tabWindows())
 				while(window->currentTabPage())
@@ -813,39 +821,34 @@ void MessageWidgets::onOptionsChanged(const OptionsNode &ANode)
 		foreach(IMessageTabPage *page, FAssignedPages)
 			assignTabWindowPage(page);
 
-		IMessageTabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()); 
-		if (ANode.value().toBool())
+		IMessageTabWindow *window = ANode.value().toBool()
+			? getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString())
+			: findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
+
+		if (window != NULL)
 		{
-			if (!window)
-				window = getTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString()); 
-			window->setTabBarVisible(Options::node(OPV_MESSAGES_SHOWTABSINCOMBINEDMODE).value().toBool());
-			window->setAutoCloseEnabled(false);
-			FMainWindow->mainCentralWidget()->appendCentralPage(window);
-		}
-		else if (window && Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
-		{
-			window->setTabBarVisible(true);
-			window->setAutoCloseEnabled(true);
-			FMainWindow->mainCentralWidget()->removeCentralPage(window);
-			if (window->tabPageCount() > 0)
-				window->showWindow();
+			if (ANode.value().toBool())
+			{
+				window->setTabBarVisible(Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool());
+				window->setAutoCloseEnabled(false);
+				FMainWindow->mainCentralWidget()->appendCentralPage(window);
+			}
+			else if (Options::node(OPV_MESSAGES_TABWINDOWS_ENABLE).value().toBool())
+			{
+				window->setTabBarVisible(true);
+				window->setAutoCloseEnabled(true);
+				FMainWindow->mainCentralWidget()->removeCentralPage(window);
+				if (window->tabPageCount() > 0)
+					window->showWindow();
+				else
+					window->instance()->deleteLater();
+			}
 			else
+			{
+				while(window->currentTabPage())
+					window->detachTabPage(window->currentTabPage());
 				window->instance()->deleteLater();
-		}
-		else if (window)
-		{
-			while(window->currentTabPage())
-				window->detachTabPage(window->currentTabPage());
-			window->instance()->deleteLater();
-		}
-	}
-	else if (ANode.path()==OPV_MESSAGES_SHOWTABSINCOMBINEDMODE)
-	{
-		if (Options::node(OPV_MESSAGES_COMBINEWITHROSTER).value().toBool())
-		{
-			IMessageTabWindow *window = findTabWindow(Options::node(OPV_MESSAGES_TABWINDOWS_DEFAULT).value().toString());
-			if (window)
-				window->setTabBarVisible(ANode.value().toBool());
+			}
 		}
 	}
 }

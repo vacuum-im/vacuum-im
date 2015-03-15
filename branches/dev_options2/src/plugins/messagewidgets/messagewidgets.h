@@ -18,7 +18,6 @@
 #include "normalwindow.h"
 #include "chatwindow.h"
 #include "tabwindow.h"
-#include "messengeroptions.h"
 #include "tabpagenotifier.h"
 
 class MessageWidgets :
