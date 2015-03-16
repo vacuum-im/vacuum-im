@@ -71,7 +71,7 @@
     </message>
     <message>
         <source>Supports the adding of the contact by the username of the legacy system</source>
-        <translation>Respalda la adición de contactos por el nombre de usuario de sistemas antiguos</translation>
+        <translation>Soporta la adición de contactos por el nombre de usuario de sistemas antiguos</translation>
     </message>
     <message>
         <source>Login on transport</source>

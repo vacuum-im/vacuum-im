@@ -88,7 +88,7 @@
     </message>
     <message>
         <source>Supports the running or performing of the special services commands</source>
-        <translation>Respalda la ejecución de comandos especiales de los servicios</translation>
+        <translation>Soporta la ejecución de comandos especiales de los servicios</translation>
     </message>
 </context>
 </TS>

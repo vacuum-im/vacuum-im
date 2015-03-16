@@ -98,8 +98,8 @@
     <message numerus="yes">
         <source>Failed to send %n contact(s)</source>
         <translation>
-            <numerusform>Ha ocurrido un error al enviar el contacto</numerusform>
-            <numerusform>Ha ocurrido un error al enviar los %n contactos</numerusform>
+            <numerusform>Error al enviar el contacto</numerusform>
+            <numerusform>Error al enviar los %n contactos</numerusform>
         </translation>
     </message>
 </context>

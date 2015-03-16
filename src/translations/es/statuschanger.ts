@@ -210,7 +210,7 @@ Puedes establecer clases de estados para los estados adicionales definidos por t
     </message>
     <message>
         <source>Left %1</source>
-        <translation>Salir de %1</translation>
+        <translation>Quedan %1</translation>
     </message>
 </context>
 </TS>

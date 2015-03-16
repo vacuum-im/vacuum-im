@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>Auto status &apos;Away&apos; due to inactivity for more than #(m) minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>Авто-статус &apos;Відійшов&apos; внаслідок бездіяльності більше #(m) хвилин.</translation>
     </message>
 </context>
 <context>
@@ -160,11 +160,11 @@
     </message>
     <message>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>Пріоритет</translation>
     </message>
     <message>
         <source>Auto status</source>
-        <translation type="unfinished">Авто-статус</translation>
+        <translation>Авто-статус</translation>
     </message>
 </context>
 <context>

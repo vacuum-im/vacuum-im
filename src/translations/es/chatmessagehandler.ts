@@ -21,7 +21,7 @@
     </message>
     <message>
         <source>%1 changed status to [%2] %3</source>
-        <translation>%1 ha cambiado su estado a [%2]%3</translation>
+        <translation>%1 ha cambiado su estado a [%2] %3</translation>
     </message>
     <message>
         <source>Allows to exchange chat messages</source>
@@ -58,7 +58,7 @@
     </message>
     <message>
         <source>Failed to load history: %1</source>
-        <translation>Fallo al cargar el historial: %1</translation>
+        <translation>Error al cargar el historial: %1</translation>
     </message>
     <message>
         <source>Contact resource</source>
@@ -70,7 +70,7 @@
     </message>
     <message>
         <source>When receiving new chat message in current chat window</source>
-        <translation type="unfinished"></translation>
+        <translation>Al recibir un nuevo mensaje en la ventana de chat activa.</translation>
     </message>
 </context>
 </TS>

@@ -42,10 +42,13 @@
     <message numerus="yes">
         <source>Birthday in %n day(s),
  %1</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>День народження через %n день,
+%1</numerusform>
+            <numerusform>День народження через %n дні,
+%1</numerusform>
+            <numerusform>День народження через %n днів,
+%1</numerusform>
         </translation>
     </message>
 </context>

@@ -268,3 +268,7 @@ source_lang = ru
 [vacuum-im.recentcontactsts]
 file_filter = <lang>/recentcontacts.ts
 source_lang = ru
+
+[vacuum-im.metacontactsts]
+file_filter = <lang>/metacontacts.ts
+source_lang = ru

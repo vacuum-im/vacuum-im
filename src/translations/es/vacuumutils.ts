@@ -16,47 +16,47 @@
     <name>XmppSaslError</name>
     <message>
         <source>Authorization aborted</source>
-        <translation type="unfinished"></translation>
+        <translation>Autenticación abortada</translation>
     </message>
     <message>
         <source>Account disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Cuenta inhabilitada</translation>
     </message>
     <message>
         <source>Credentials expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Credenciales expiradas</translation>
     </message>
     <message>
         <source>Encryption required</source>
-        <translation type="unfinished"></translation>
+        <translation>Requiere cifrado</translation>
     </message>
     <message>
         <source>Incorrect encoding</source>
-        <translation type="unfinished"></translation>
+        <translation>Codificación inválida</translation>
     </message>
     <message>
         <source>Invalid authorization id</source>
-        <translation type="unfinished"></translation>
+        <translation>ID de inicio de sesión inválido</translation>
     </message>
     <message>
         <source>Invalid mechanism</source>
-        <translation type="unfinished"></translation>
+        <translation>Mecanismo inválido</translation>
     </message>
     <message>
         <source>Malformed request</source>
-        <translation type="unfinished"></translation>
+        <translation>Solicitud inválida</translation>
     </message>
     <message>
         <source>Mechanism is too weak</source>
-        <translation type="unfinished"></translation>
+        <translation>El mecanismo es muy débil</translation>
     </message>
     <message>
         <source>Not authorized</source>
-        <translation type="unfinished">Sin autorización</translation>
+        <translation>Sin autorización</translation>
     </message>
     <message>
         <source>Temporary authentication failure</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo temporal de autenticación</translation>
     </message>
 </context>
 <context>

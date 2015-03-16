@@ -1032,15 +1032,15 @@ Check values and try again</source>
     </message>
     <message>
         <source>This room is non-anonymous</source>
-        <translation type="unfinished"></translation>
+        <translation>Ця кімната не анонімна</translation>
     </message>
     <message>
         <source>You entered into the room</source>
-        <translation type="unfinished"></translation>
+        <translation>Ви ввійшли до кімнати </translation>
     </message>
     <message>
         <source>You left the room</source>
-        <translation type="unfinished"></translation>
+        <translation>Ви залишили кімнату</translation>
     </message>
     <message>
         <source>Room now shows unavailable members</source>

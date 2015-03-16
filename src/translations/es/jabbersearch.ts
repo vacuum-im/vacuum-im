@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Supports the searching of the information</source>
-        <translation>Respalda la búsqueda de información</translation>
+        <translation>Soporta la búsqueda de información</translation>
     </message>
 </context>
 <context>

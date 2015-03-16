@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Use native popup notifications if available</source>
-        <translation type="unfinished"></translation>
+        <translation>Використовувати системні спливаючі сповіщення, якщо доступні </translation>
     </message>
 </context>
 <context>
