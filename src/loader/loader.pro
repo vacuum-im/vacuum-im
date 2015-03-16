@@ -26,7 +26,7 @@ win32 {
   WIN_OUT_PWD = $$replace(OUT_PWD, /, \\)
   exists($${WIN_OUT_PWD}\\svninfo.h):system(del $${WIN_OUT_PWD}\\svninfo.h)
   !isEmpty(SVN_REVISION):count(SVN_REVISION_INVALID,0) {
-    system(mkdir $${WIN_OUT_PWD} && echo $${LITERAL_HASH}define SVN_REVISION \"$${SVN_REVISION}\" >> $${WIN_OUT_PWD}\\svninfo.h) {
+    system(mkdir $${WIN_OUT_PWD} & echo $${LITERAL_HASH}define SVN_REVISION \"$${SVN_REVISION}\" >> $${WIN_OUT_PWD}\\svninfo.h) {
       DEFINES         += SVNINFO
       QMAKE_DISTCLEAN += $${OUT_PWD}/svninfo.h
     }
