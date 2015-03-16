@@ -53,7 +53,7 @@
     </message>
     <message>
         <source>Use native popup notifications if available</source>
-        <translation type="unfinished"></translation>
+        <translation>Notificación de ventanas emergentes cuando esté disponible</translation>
     </message>
 </context>
 <context>

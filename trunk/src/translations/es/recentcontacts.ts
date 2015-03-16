@@ -5,7 +5,7 @@
     <name>RecentContacts</name>
     <message>
         <source>Recent Contacts</source>
-        <translation>Contactos recientse</translation>
+        <translation>Contactos recientes</translation>
     </message>
     <message>
         <source>Displays a recently used contacts</source>
@@ -13,11 +13,11 @@
     </message>
     <message>
         <source>Add contact to favorites</source>
-        <translation>Añadir contactos a favoritos</translation>
+        <translation>Añadir contacto a favoritos</translation>
     </message>
     <message>
         <source>Remove contact from favorites</source>
-        <translation>Borrar contactos de favoritos</translation>
+        <translation>Borrar contacto de favoritos</translation>
     </message>
     <message>
         <source>Always Show Offline Contacts</source>
@@ -57,7 +57,7 @@
     </message>
     <message>
         <source>&lt;b&gt;Account:&lt;/b&gt; %1</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Cuenta:&lt;/b&gt; %1</translation>
     </message>
 </context>
 </TS>

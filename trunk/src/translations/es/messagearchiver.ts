@@ -291,7 +291,7 @@
     </message>
     <message>
         <source>Failed to load conversation headers: %1</source>
-        <translation>No se pueden cargar los titulares de conversación: %1</translation>
+        <translation>Error al cargar los titulares de conversación: %1</translation>
     </message>
     <message>
         <source>Loading conversations...</source>
@@ -342,81 +342,81 @@
     </message>
     <message>
         <source>Conversation History</source>
-        <translation type="unfinished"></translation>
+        <translation>Historial de conversación</translation>
     </message>
     <message>
         <source>Conversations are not found</source>
-        <translation type="unfinished"></translation>
+        <translation>No se han encontrado las conversaciones</translation>
     </message>
     <message>
         <source>Conversation is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation>No se ha seleccionado la conversación</translation>
     </message>
     <message>
         <source>Search is not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>La búsqueda no está soportada</translation>
     </message>
     <message>
         <source>Load more conversations</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargar más conversaciones</translation>
     </message>
     <message>
         <source>All conversations loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Se han cargado todas las conversaciones</translation>
     </message>
     <message>
         <source>Conversation headers are not found</source>
-        <translation type="unfinished"></translation>
+        <translation>No se encuentran las cabeceras de conversaciones</translation>
     </message>
     <message>
         <source>Retry</source>
-        <translation type="unfinished"></translation>
+        <translation>Reintentar</translation>
     </message>
     <message>
         <source>Show Contact History</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar el historial del contacto</translation>
     </message>
     <message>
         <source>Remove all History with %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar todo el historial con %1</translation>
     </message>
     <message>
         <source>Remove History for %1</source>
-        <translation type="unfinished">Borrar el historial para %1</translation>
+        <translation>Eliminar el historial con %1</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
-        <translation type="unfinished"></translation>
+        <translation>b&gt;%1&lt;/b&gt; con %2 en %3</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; in %2</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; en %2</translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;%1&lt;/b&gt; con %2</translation>
     </message>
     <message numerus="yes">
         <source>%n conversation header(s) found</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Se han encontrado %n cabecera de conversación</numerusform>
+            <numerusform>Se han encontrado %n cabeceras de conversación</numerusform>
         </translation>
     </message>
     <message>
         <source>Select conversation to show</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecciona la conversación a mostrar</translation>
     </message>
     <message numerus="yes">
         <source>%n conversation(s) shown</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n conversación mostrada</numerusform>
+            <numerusform>%n conversaciones mostradas</numerusform>
         </translation>
     </message>
     <message>
         <source>Shown %1 of %2 conversations...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostradas %1 de %2 conversaciones...</translation>
     </message>
     <message>
         <source>with &lt;b&gt;%1&lt;/b&gt; for &lt;b&gt;%2 %3&lt;/b&gt;?</source>
@@ -443,39 +443,39 @@
     </message>
     <message>
         <source>Remove Selected Conversations</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitar las conversaciones seleccionadas</translation>
     </message>
     <message>
         <source>Print Conversation History</source>
-        <translation type="unfinished"></translation>
+        <translation>Imprimir el historial de conversaciones</translation>
     </message>
     <message>
         <source>HTML file (*.html)</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo HTML (*.html)</translation>
     </message>
     <message>
         <source>Text file (*.txt)</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivo de texto (*.txt)</translation>
     </message>
     <message>
         <source>Save Conversations to File</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardas las conversaciones a un archivo</translation>
     </message>
     <message>
         <source>Print...</source>
-        <translation type="unfinished"></translation>
+        <translation>Imprimir...</translation>
     </message>
     <message>
         <source>Save as HTML</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar como HTML</translation>
     </message>
     <message>
         <source>Save as Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Guardar como texto</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar</translation>
     </message>
 </context>
 <context>
@@ -572,7 +572,7 @@
     </message>
     <message>
         <source>Supports the archiving of the messages</source>
-        <translation>Respalda el archivado de mensajes</translation>
+        <translation>Soporta el archivado de mensajes</translation>
     </message>
     <message>
         <source>Automatic Messages Archiving</source>
@@ -580,7 +580,7 @@
     </message>
     <message>
         <source>Supports the automatic archiving of the messages</source>
-        <translation>Respalda el archivado automático de mensajes</translation>
+        <translation>Soporta el archivado automático de mensajes</translation>
     </message>
     <message>
         <source>Managing Archived Messages</source>
@@ -588,7 +588,7 @@
     </message>
     <message>
         <source>Supports the managing of the archived messages</source>
-        <translation>Respalda la administración de mensajes archivados</translation>
+        <translation>Soporta la administración de mensajes archivados</translation>
     </message>
     <message>
         <source>Manual Messages Archiving</source>
@@ -596,11 +596,11 @@
     </message>
     <message>
         <source>Supports the manual archiving of the messages</source>
-        <translation>Soporte del archivado manual de los mensajes</translation>
+        <translation>Soporta el archivado manual de mensajes</translation>
     </message>
     <message>
         <source>Supports the storing of the archive preferences</source>
-        <translation>Soporte del almacenamiento de configuraciones de archivado de mensajes</translation>
+        <translation>Soport el almacenamiento de configuraciones de archivado de mensajes</translation>
     </message>
     <message>
         <source>Messages Archive Preferences</source>

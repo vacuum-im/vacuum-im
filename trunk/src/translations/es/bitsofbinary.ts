@@ -21,11 +21,11 @@
     </message>
     <message>
         <source>Failed to load data</source>
-        <translation>Fallo al cargar los datos</translation>
+        <translation>Error al cargar los datos</translation>
     </message>
     <message>
         <source>Failed to save data</source>
-        <translation>Fallo al guardar los datos</translation>
+        <translation>Error al guardar los datos</translation>
     </message>
 </context>
 </TS>

@@ -68,19 +68,19 @@
     </message>
     <message>
         <source>Failed to publish your profile: %1</source>
-        <translation>Ha ocurrido un error al publicar tu perfil: %1</translation>
+        <translation>Error al publicar tu perfil: %1</translation>
     </message>
     <message>
         <source>Failed to publish your profile.</source>
-        <translation>Ha ocurrido un error al publicar tu perfil.</translation>
+        <translation>Error al publicar tu perfil.</translation>
     </message>
     <message>
         <source>Failed to load profile.</source>
-        <translation>Ha ocurrido un error al cargar el perfil.</translation>
+        <translation>Error al cargar el perfil.</translation>
     </message>
     <message>
         <source>Failed to load profile: %1</source>
-        <translation>Ha ocurrido un error al cargar el perfil: %1</translation>
+        <translation>Error al cargar el perfil: %1</translation>
     </message>
 </context>
 <context>

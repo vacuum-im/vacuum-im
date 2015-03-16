@@ -271,7 +271,7 @@
     </message>
     <message>
         <source>Duplicate messages in local archive (not recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>Дублювати повідомлення в локальному архіві (не рекомендується)</translation>
     </message>
     <message>
         <source>Replication Preferences</source>
@@ -386,7 +386,7 @@
     </message>
     <message>
         <source>Remove History for %1</source>
-        <translation type="unfinished">Видалити історію за %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&lt;b&gt;%1&lt;/b&gt; with %2 in %3</source>
