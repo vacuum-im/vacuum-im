@@ -88,8 +88,9 @@ bool Emoticons::initObjects()
 
 bool Emoticons::initSettings()
 {
+	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS_CONVERT,true);
 	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS_MAXINMESSAGE,20);
-	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS,QStringList() << DEFAULT_ICONSET);
+	Options::setDefaultValue(OPV_MESSAGES_EMOTICONS_ICONSET,QStringList() << DEFAULT_ICONSET);
 
 	if (FOptionsManager)
 	{
@@ -103,21 +104,25 @@ bool Emoticons::initSettings()
 void Emoticons::writeTextToMessage(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
 	Q_UNUSED(AMessage); Q_UNUSED(ALang);
-	if (AOrder == MWO_EMOTICONS)
+	if (AOrder==MWO_EMOTICONS && Options::node(OPV_MESSAGES_EMOTICONS_CONVERT).value().toBool())
 		replaceImageToText(ADocument);
 }
 
 void Emoticons::writeMessageToText(int AOrder, Message &AMessage, QTextDocument *ADocument, const QString &ALang)
 {
 	Q_UNUSED(AMessage); Q_UNUSED(ALang);
-	if (AOrder == MWO_EMOTICONS)
+	if (AOrder==MWO_EMOTICONS && Options::node(OPV_MESSAGES_EMOTICONS_CONVERT).value().toBool())
 		replaceTextToImage(ADocument);
 }
 
 QMultiMap<int, IOptionsDialogWidget *> Emoticons::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (ANodeId == OPN_EMOTICONS)
+	if (ANodeId == OPN_MESSAGES)
+	{
+		widgets.insertMulti(OWO_MESSAGES_EMOTICONSENABLED, FOptionsManager->newOptionsDialogWidget(Options::node(OPV_MESSAGES_EMOTICONS_CONVERT),tr("Convert text emoticons to images"),AParent));
+	}
+	else if (ANodeId == OPN_EMOTICONS)
 	{
 		widgets.insertMulti(OWO_EMOTICONS, new EmoticonsOptions(this,AParent));
 	}
@@ -182,7 +187,7 @@ bool Emoticons::messageEditContentsChanged(int AOrder, IMessageEditWidget *AWidg
 
 QList<QString> Emoticons::activeIconsets() const
 {
-	QList<QString> iconsets = Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList();
+	QList<QString> iconsets = Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).value().toStringList();
 	for (QList<QString>::iterator it = iconsets.begin(); it != iconsets.end(); )
 	{
 		if (!FStorages.contains(*it))
@@ -277,7 +282,7 @@ void Emoticons::createIconsetUrls()
 	FKeyByUrl.clear();
 	clearTreeItem(&FRootTreeItem);
 
-	foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
+	foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).value().toStringList())
 	{
 		IconStorage *storage = FStorages.value(substorage);
 		if (storage)
@@ -411,7 +416,7 @@ int Emoticons::replaceImageToText(QTextDocument *ADocument, int AStartPos, int A
 SelectIconMenu *Emoticons::createSelectIconMenu(const QString &ASubStorage, QWidget *AParent)
 {
 	SelectIconMenu *menu = new SelectIconMenu(ASubStorage, AParent);
-	connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)), SLOT(onIconSelected(const QString &, const QString &)));
+	connect(menu->instance(),SIGNAL(iconSelected(const QString &, const QString &)), SLOT(onSelectIconMenuSelected(const QString &, const QString &)));
 	connect(menu->instance(),SIGNAL(destroyed(QObject *)),SLOT(onSelectIconMenuDestroyed(QObject *)));
 	return menu;
 }
@@ -489,7 +494,7 @@ void Emoticons::onToolBarWidgetDestroyed(QObject *AObject)
 	}
 }
 
-void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconKey)
+void Emoticons::onSelectIconMenuSelected(const QString &ASubStorage, const QString &AIconKey)
 {
 	Q_UNUSED(ASubStorage);
 	SelectIconMenu *menu = qobject_cast<SelectIconMenu *>(sender());
@@ -513,7 +518,7 @@ void Emoticons::onIconSelected(const QString &ASubStorage, const QString &AIconK
 						cursor.insertText(" ");
 				}
 				
-				if (widget->isRichTextEnabled())
+				if (widget->isRichTextEnabled() && Options::node(OPV_MESSAGES_EMOTICONS_CONVERT).value().toBool())
 				{
 					if (!editor->document()->resource(QTextDocument::ImageResource,url).isValid())
 						editor->document()->addResource(QTextDocument::ImageResource,url,QImage(url.toLocalFile()));
@@ -548,18 +553,18 @@ void Emoticons::onSelectIconMenuDestroyed(QObject *AObject)
 
 void Emoticons::onOptionsOpened()
 {
-	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS));
+	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS_ICONSET));
 	onOptionsChanged(Options::node(OPV_MESSAGES_EMOTICONS_MAXINMESSAGE));
 }
 
 void Emoticons::onOptionsChanged(const OptionsNode &ANode)
 {
-	if (ANode.path() == OPV_MESSAGES_EMOTICONS)
+	if (ANode.path() == OPV_MESSAGES_EMOTICONS_ICONSET)
 	{
 		QList<QString> oldStorages = FStorages.keys();
 		QList<QString> availStorages = IconStorage::availSubStorages(RSR_STORAGE_EMOTICONS);
 
-		foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList())
+		foreach(const QString &substorage, Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).value().toStringList())
 		{
 			if (availStorages.contains(substorage))
 			{

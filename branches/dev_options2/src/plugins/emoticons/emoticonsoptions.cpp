@@ -35,7 +35,7 @@ void EmoticonsOptions::apply()
 		if (ui.lwtEmoticons->item(i)->checkState() == Qt::Checked)
 			iconsets.append(ui.lwtEmoticons->item(i)->data(IDR_STORAGE_SUBDIR).toString());
 
-	Options::node(OPV_MESSAGES_EMOTICONS).setValue(iconsets);
+	Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).setValue(iconsets);
 
 	emit childApply();
 }
@@ -43,7 +43,7 @@ void EmoticonsOptions::apply()
 void EmoticonsOptions::reset()
 {
 	ui.lwtEmoticons->clear();
-	QStringList storages = Options::node(OPV_MESSAGES_EMOTICONS).value().toStringList();
+	QStringList storages = Options::node(OPV_MESSAGES_EMOTICONS_ICONSET).value().toStringList();
 	for (int i = 0; i < storages.count(); i++)
 	{
 		QListWidgetItem *item = new QListWidgetItem(RSR_STORAGE_EMOTICONS"/"+storages.at(i),ui.lwtEmoticons);

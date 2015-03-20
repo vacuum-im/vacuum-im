@@ -11,5 +11,9 @@
         <source>Allows to use your smiley images in messages</source>
         <translation>Allows to use your smiley images in messages</translation>
     </message>
+    <message>
+        <source>Convert text emoticons to images</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 </TS>

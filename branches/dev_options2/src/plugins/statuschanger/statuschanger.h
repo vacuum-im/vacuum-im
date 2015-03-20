@@ -17,7 +17,6 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/istatusicons.h>
 #include <interfaces/inotifications.h>
-#include "editstatusdialog.h"
 #include "modifystatusdialog.h"
 
 struct StatusItem {
@@ -120,7 +119,6 @@ protected slots:
 	void onProfileOpened(const QString &AProfile);
 	void onApplicationShutdownStarted();
 	void onReconnectTimer();
-	void onEditStatusAction(bool);
 	void onModifyStatusAction(bool);
 	void onAccountOptionsChanged(IAccount *AAccount, const OptionsNode &ANode);
 	void onNotificationActivated(int ANotifyId);
@@ -154,7 +152,6 @@ private:
 	QMap<IPresence *, int> FTempStatus;
 	QMap<IPresence *, int> FNotifyId;
 	QMap<IPresence *, QPair<QDateTime,int> > FPendingReconnect;
-	QPointer<EditStatusDialog> FEditStatusDialog;
 	QPointer<ModifyStatusDialog> FModifyStatusDialog;
 };
 

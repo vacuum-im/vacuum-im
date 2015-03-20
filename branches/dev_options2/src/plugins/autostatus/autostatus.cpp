@@ -1,9 +1,8 @@
 #include "autostatus.h"
 
 #include <QCursor>
-#include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
-#include <definitions/optionnodeorders.h>
+#include <definitions/optionvalues.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/menuicons.h>
 #include <utils/systemmanager.h>
@@ -76,17 +75,16 @@ bool AutoStatus::initObjects()
 bool AutoStatus::initSettings()
 {
 	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_ENABLED,false);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,10*60);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_SHOW,IPresence::Away);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_PRIORITY,20);
-	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,tr("Auto status 'Away' due to inactivity for more than #(m) minutes"));
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TIME,0);
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_SHOW,IPresence::Offline);
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_PRIORITY,0);
+	Options::setDefaultValue(OPV_AUTOSTARTUS_RULE_TEXT,QString());
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_AUTO_STATUS, OPN_AUTO_STATUS, MNI_AUTOSTATUS, tr("Auto status") };
-		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
+
 	return true;
 }
 
@@ -100,9 +98,10 @@ bool AutoStatus::startPlugin()
 QMultiMap<int, IOptionsDialogWidget *> AutoStatus::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (ANodeId == OPN_AUTO_STATUS)
+	if (ANodeId == OPN_STATUSITEMS)
 	{
-		widgets.insertMulti(OWO_AUTOSTATUS, new StatusOptionsWidget(this,FStatusChanger,AParent));
+		widgets.insertMulti(OHO_AUTOSTATUS, FOptionsManager->newOptionsDialogHeader(tr("Automatic change of status"),AParent));
+		widgets.insertMulti(OWO_AUTOSTATUS, new AutoStatusOptionsWidget(this,FStatusChanger,AParent));
 	}
 	return widgets;
 }
@@ -162,7 +161,6 @@ QUuid AutoStatus::insertRule(const IAutoStatusRule &ARule)
 {
 	QUuid ruleId = QUuid::createUuid();
 	OptionsNode ruleNode = Options::node(OPV_AUTOSTARTUS_RULE_ITEM,ruleId.toString());
-	ruleNode.setValue(true,"enabled");
 	ruleNode.setValue(ARule.time,"time");
 	ruleNode.setValue(ARule.show,"show");
 	ruleNode.setValue(ARule.text,"text");
@@ -298,7 +296,25 @@ void AutoStatus::onSystemIdleChanged(int ASeconds)
 void AutoStatus::onOptionsOpened()
 {
 	if (Options::node(OPV_AUTOSTARTUS_ROOT).childNSpaces("rule").isEmpty())
-		Options::node(OPV_AUTOSTARTUS_RULE_ITEM,QUuid::createUuid().toString()).setValue(true,"enabled");
+	{
+		IAutoStatusRule awayRule;
+		awayRule.time = 10*60;
+		awayRule.show = IPresence::Away;
+		awayRule.priority = 20;
+		awayRule.text = tr("Auto status due to inactivity for more than #(m) minutes");
+		QUuid awayId = insertRule(awayRule);
+		Options::node(OPV_AUTOSTARTUS_AWAYRULE).setValue(awayId.toString());
+
+		IAutoStatusRule offlineRule;
+		offlineRule.time = 2*60*60;
+		offlineRule.show = IPresence::Offline;
+		offlineRule.priority = 0;
+		offlineRule.text = tr("Disconnected due to inactivity for more than #(m) minutes");
+		QUuid offlineId = insertRule(offlineRule);
+		Options::node(OPV_AUTOSTARTUS_OFFLINERULE).setValue(offlineId.toString());
+
+		setRuleEnabled(awayId,true);
+	}
 }
 
 void AutoStatus::onProfileClosed(const QString &AName)

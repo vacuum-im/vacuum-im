@@ -9,7 +9,7 @@
 #include <interfaces/ioptionsmanager.h>
 #include <interfaces/iaccountmanager.h>
 #include <interfaces/ipresence.h>
-#include "statusoptionswidget.h"
+#include "autostatusoptionswidget.h"
 
 class AutoStatus :
 	public QObject,

@@ -5,6 +5,7 @@
 #include <definitions/actiongroups.h>
 #include <definitions/optionvalues.h>
 #include <definitions/optionnodes.h>
+#include <definitions/optionnodeorders.h>
 #include <definitions/optionwidgetorders.h>
 #include <definitions/rosterlabels.h>
 #include <definitions/rosterindexkinds.h>
@@ -18,6 +19,7 @@
 #include <definitions/version.h>
 #include <utils/options.h>
 #include <utils/logger.h>
+#include "statusoptionswidget.h"
 
 #define MAX_TEMP_STATUS_ID                  -10
 
@@ -48,8 +50,6 @@ StatusChanger::StatusChanger()
 
 StatusChanger::~StatusChanger()
 {
-	if (!FEditStatusDialog.isNull())
-		FEditStatusDialog->reject();
 	if (!FModifyStatusDialog.isNull())
 		FModifyStatusDialog->reject();
 	delete FMainMenu;
@@ -176,12 +176,6 @@ bool StatusChanger::initObjects()
 	FMainMenu->addAction(FModifyStatus,AG_SCSM_STATUSCHANGER_ACTIONS,false);
 	connect(FModifyStatus,SIGNAL(triggered(bool)),SLOT(onModifyStatusAction(bool)));
 
-	Action *editStatus = new Action(FMainMenu);
-	editStatus->setText(tr("Edit Statuses"));
-	editStatus->setIcon(RSR_STORAGE_MENUICONS,MNI_SCHANGER_EDIT_STATUSES);
-	connect(editStatus,SIGNAL(triggered(bool)), SLOT(onEditStatusAction(bool)));
-	FMainMenu->addAction(editStatus,AG_SCSM_STATUSCHANGER_ACTIONS,false);
-
 	createDefaultStatus();
 	setMainStatusId(STATUS_OFFLINE);
 	updateMainMenu();
@@ -241,6 +235,8 @@ bool StatusChanger::initSettings()
 
 	if (FOptionsManager)
 	{
+		IOptionsDialogNode statusNode = { ONO_STATUSITEMS, OPN_STATUSITEMS, MNI_SCHANGER_EDIT_STATUSES, tr("Status") };
+		FOptionsManager->insertOptionsDialogNode(statusNode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
 
@@ -262,6 +258,11 @@ QMultiMap<int, IOptionsDialogWidget *> StatusChanger::optionsDialogWidgets(const
 		OptionsNode options = Options::node(OPV_ACCOUNT_ITEM,nodeTree.at(1));
 		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTOCONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-connect"),tr("Connect to server on startup"),AParent));
 		widgets.insertMulti(OWO_ACCOUNTS_ADDITIONAL_AUTORECONNECT,FOptionsManager->newOptionsDialogWidget(options.node("auto-reconnect"),tr("Reconnect to server on connection errors"),AParent));
+	}
+	else if (ANodeId == OPN_STATUSITEMS)
+	{
+		widgets.insertMulti(OHO_STATUS_ITEMS, FOptionsManager->newOptionsDialogHeader(tr("Standard and users statuses"), AParent));
+		widgets.insertMulti(OWO_STATUS_ITEMS, new StatusOptionsWidget(this,AParent));
 	}
 	return widgets;
 }
@@ -1204,7 +1205,6 @@ void StatusChanger::onOptionsOpened()
 
 void StatusChanger::onOptionsClosed()
 {
-	delete FEditStatusDialog;
 	delete FModifyStatusDialog;
 
 	QList<QString> oldNS = Options::node(OPV_STATUSES_ROOT).childNSpaces("status");
@@ -1289,19 +1289,6 @@ void StatusChanger::onReconnectTimer()
 		{
 			++it;
 		}
-	}
-}
-
-void StatusChanger::onEditStatusAction(bool)
-{
-	if (FEditStatusDialog.isNull())
-	{
-		FEditStatusDialog = new EditStatusDialog(this);
-		FEditStatusDialog->show();
-	}
-	else
-	{
-		FEditStatusDialog->show();
 	}
 }
 

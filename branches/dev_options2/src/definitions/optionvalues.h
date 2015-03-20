@@ -102,7 +102,8 @@
 #define OPV_MESSAGES_TABWINDOW_TABSCLOSABLE             "messages.tab-windows.window.tabs-closable"
 #define OPV_MESSAGES_TABWINDOW_TABSBOTTOM               "messages.tab-windows.window.tabs-bottom"
 // Emoticons
-#define OPV_MESSAGES_EMOTICONS                          "messages.emoticons"
+#define OPV_MESSAGES_EMOTICONS_CONVERT                  "messages.emoticons.convert"
+#define OPV_MESSAGES_EMOTICONS_ICONSET                  "messages.emoticons.iconset"
 #define OPV_MESSAGES_EMOTICONS_MAXINMESSAGE             "messages.emoticons.max-in-message"
 // ChatStates
 #define OPV_MESSAGES_CHATSTATESENABLED                  "messages.chatstates-enabled"
@@ -230,6 +231,8 @@
 #define OPV_STATUS_PRIORITY                             "statuses.status.priority"
 // AutoStatus
 #define OPV_AUTOSTARTUS_ROOT                            "statuses.autostatus"
+#define OPV_AUTOSTARTUS_AWAYRULE                        "statuses.autostatus.away-rule"
+#define OPV_AUTOSTARTUS_OFFLINERULE                     "statuses.autostatus.offline-rule"
 #define OPV_AUTOSTARTUS_RULE_ITEM                       "statuses.autostatus.rule"
 #define OPV_AUTOSTARTUS_RULE_ENABLED                    "statuses.autostatus.rule.enabled"
 #define OPV_AUTOSTARTUS_RULE_TIME                       "statuses.autostatus.rule.time"

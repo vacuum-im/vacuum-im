@@ -41,7 +41,7 @@
 #define OHO_COMMON_LOCALIZATION                   300
 #  define OWO_COMMON_LANGUAGE                     310
 
-//Node = ON_ROSTER_VIEW
+//Node = ON_ROSTERVIEW
 #define OHO_ROSTER_VIEW                           100
 #define   OWO_ROSTER_SHOWOFFLINE                  110
 #define   OWO_ROSTER_MERGESTREAMS                 120
@@ -65,7 +65,7 @@
 #define   OWO_MESSAGES_SHOWSTATUS                 320
 #define   OWO_MESSAGES_ARCHIVESTATUS              330
 #define   OWO_MESSAGES_SHOWDATESEPARATORS         340
-#define   OWO_MESSAGES_EMITICONSENABLED           350
+#define   OWO_MESSAGES_EMOTICONSENABLED           350
 #define   OWO_MESSAGES_CHATSTATESENABLED          360
 #define   OWO_MESSAGES_UNNOTIFYALLNORMAL          370
 #define OHO_MESSAGES_CONFERENCES                  500
@@ -80,6 +80,12 @@
 #define   OWO_MESSAGES_HISORYENGINE               710
 #define OHO_MESSAGES_HISTORYENGINESETTINGS        900
 #define   OWO_MESSAGES_HISTORYENGINESETTINGS      910
+
+//Node = ON_STATUSITEMS
+#define OHO_AUTOSTATUS                            100
+#define   OWO_AUTOSTATUS                          150
+#define OHO_STATUS_ITEMS                          300
+#define   OWO_STATUS_ITEMS                        350
 
 //Node = ON_STATUSICONS
 #define OWO_STATUSICONS                           500
@@ -106,9 +112,6 @@
 //Node = ON_FILETRANSFER
 #define OWO_FILESTREAMSMANAGER                    500
 #define OWO_FILETRANSFER                          600
-
-//Node = ON_AUTOSTATUS
-#define OWO_AUTOSTATUS                            500
 
 //Node = ON_SHORTCUTS
 #define OWO_SHORTCUTS                             500

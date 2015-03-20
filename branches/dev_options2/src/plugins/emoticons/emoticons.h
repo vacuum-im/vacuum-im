@@ -67,7 +67,7 @@ protected slots:
 	void onToolBarWindowLayoutChanged();
 	void onToolBarWidgetCreated(IMessageToolBarWidget *AWidget);
 	void onToolBarWidgetDestroyed(QObject *AObject);
-	void onIconSelected(const QString &ASubStorage, const QString &AIconKey);
+	void onSelectIconMenuSelected(const QString &ASubStorage, const QString &AIconKey);
 	void onSelectIconMenuDestroyed(QObject *AObject);
 	void onOptionsOpened();
 	void onOptionsChanged(const OptionsNode &ANode);

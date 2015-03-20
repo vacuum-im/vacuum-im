@@ -201,7 +201,7 @@ bool RosterChanger::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> RosterChanger::optionsDialogWidgets(const QString &ANode, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANode == OPN_ROSTER_VIEW)
+	if (FOptionsManager && ANode == OPN_ROSTERVIEW)
 	{
 		widgets.insertMulti(OHO_ROSTER_MANAGEMENT,FOptionsManager->newOptionsDialogHeader(tr("Contacts list management"),AParent));
 		widgets.insertMulti(OWO_ROSTER_AUTOSUBSCRIBE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_AUTOSUBSCRIBE),tr("Automatically accept all subscription requests"),AParent));

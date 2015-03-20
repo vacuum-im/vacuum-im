@@ -194,7 +194,7 @@ bool RostersViewPlugin::initSettings()
 
 	if (FOptionsManager)
 	{
-		IOptionsDialogNode dnode = { ONO_ROSTER_VIEW, OPN_ROSTER_VIEW, MNI_ROSTERVIEW_OPTIONS, tr("Contacts List") };
+		IOptionsDialogNode dnode = { ONO_ROSTERVIEW, OPN_ROSTERVIEW, MNI_ROSTERVIEW_OPTIONS, tr("Contacts List") };
 		FOptionsManager->insertOptionsDialogNode(dnode);
 		FOptionsManager->insertOptionsDialogHolder(this);
 	}
@@ -204,7 +204,7 @@ bool RostersViewPlugin::initSettings()
 QMultiMap<int, IOptionsDialogWidget *> RostersViewPlugin::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (FOptionsManager && ANodeId == OPN_ROSTER_VIEW)
+	if (FOptionsManager && ANodeId == OPN_ROSTERVIEW)
 	{
 		widgets.insertMulti(OHO_ROSTER_VIEW, FOptionsManager->newOptionsDialogHeader(tr("Contacts list"),AParent));
 		widgets.insertMulti(OWO_ROSTER_SHOWOFFLINE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_SHOWOFFLINE),tr("Show disconnected contact"),AParent));

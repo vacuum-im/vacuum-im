@@ -285,7 +285,7 @@ void RosterItemExchange::stanzaRequestResult(const Jid &AStreamJid, const Stanza
 QMultiMap<int, IOptionsDialogWidget *> RosterItemExchange::optionsDialogWidgets(const QString &ANodeId, QWidget *AParent)
 {
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
-	if (ANodeId == OPN_ROSTER_VIEW)
+	if (ANodeId == OPN_ROSTERVIEW)
 	{
 		widgets.insertMulti(OHO_ROSTER_MANAGEMENT,FOptionsManager->newOptionsDialogHeader(tr("Contacts list management"),AParent));
 		widgets.insertMulti(OWO_ROSTER_EXCHANGEAUTO,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_ROSTER_EXCHANGE_AUTOAPPROVEENABLED),tr("Allow gateways and group services manage your contacts list"),AParent));

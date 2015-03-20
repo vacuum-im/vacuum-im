@@ -11,5 +11,9 @@
         <source>Allows to use your smiley images in messages</source>
         <translation>Позволяет использовать изображения смайликов в сообщениях</translation>
     </message>
+    <message>
+        <source>Convert text emoticons to images</source>
+        <translation>Конвертировать текстовые смайлы в графические</translation>
+    </message>
 </context>
 </TS>

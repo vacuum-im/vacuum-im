@@ -2,96 +2,6 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="en" sourcelanguage="en">
 <context>
-    <name>EditStatusDialog</name>
-    <message>
-        <source>Enter status name</source>
-        <translation>Enter status name</translation>
-    </message>
-    <message>
-        <source>Status name:</source>
-        <translation>Status name:</translation>
-    </message>
-    <message>
-        <source>Wrong status name</source>
-        <translation>Wrong status name</translation>
-    </message>
-    <message>
-        <source>Can&apos;t delete status</source>
-        <translation>Can&apos;t delete status</translation>
-    </message>
-    <message>
-        <source>You can not delete standard statuses.</source>
-        <translation>You can not delete standard statuses.</translation>
-    </message>
-    <message>
-        <source>You can not delete active statuses.</source>
-        <translation>You can not delete active statuses.</translation>
-    </message>
-    <message>
-        <source>Delete status</source>
-        <translation>Delete status</translation>
-    </message>
-    <message>
-        <source>You are assured that wish to remove a status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</source>
-        <translation>You are assured that wish to remove a status &apos;&lt;b&gt;%1&lt;/b&gt;&apos;?</translation>
-    </message>
-    <message>
-        <source>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; already exists</source>
-        <translation>Status with name &apos;&lt;b&gt;%1&lt;/b&gt;&apos; already exists</translation>
-    </message>
-</context>
-<context>
-    <name>EditStatusDialogClass</name>
-    <message>
-        <source>Add</source>
-        <translation>Add</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation>Delete</translation>
-    </message>
-    <message>
-        <source>Edit statuses</source>
-        <translation>Edit statuses</translation>
-    </message>
-    <message>
-        <source>Name</source>
-        <translation>Name</translation>
-    </message>
-    <message>
-        <source>Status name displayed in status change menu</source>
-        <translation>Status name displayed in status change menu</translation>
-    </message>
-    <message>
-        <source>Message</source>
-        <translation>Message</translation>
-    </message>
-    <message>
-        <source>Status message</source>
-        <translation>Status message</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation>Priority</translation>
-    </message>
-    <message>
-        <source>Status priority</source>
-        <translation>Status priority</translation>
-    </message>
-    <message>
-        <source>Status type&lt;br&gt;
-Types for standard statuses are grayed out.
-You can set status class for additional statuses defined by you.</source>
-        <translation>Status type&lt;br&gt;
-Types for standard statuses are grayed out.
-You can set status class for additional statuses defined by you.</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation>Type</translation>
-    </message>
-</context>
-<context>
     <name>ModifyStatusDialogClass</name>
     <message>
         <source>Modify Status</source>
@@ -189,10 +99,6 @@ You can set status class for additional statuses defined by you.</translation>
         <translation>Modify Status</translation>
     </message>
     <message>
-        <source>Edit Statuses</source>
-        <translation>Edit Statuses</translation>
-    </message>
-    <message>
         <source>I&apos;m away from my desk</source>
         <translation>I&apos;m away from my desk</translation>
     </message>
@@ -211,6 +117,49 @@ You can set status class for additional statuses defined by you.</translation>
     <message>
         <source>Reconnect to server on connection errors</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Standard and users statuses</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>StatusOptionsWidget</name>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">Add</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">Delete</translation>
+    </message>
+    <message>
+        <source>Status</source>
+        <translation type="unfinished">Status</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished">Name</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation type="unfinished">Message</translation>
+    </message>
+    <message>
+        <source>Priority</source>
+        <translation type="unfinished">Priority</translation>
+    </message>
+    <message>
+        <source>Can&apos;t delete status</source>
+        <translation type="unfinished">Can&apos;t delete status</translation>
+    </message>
+    <message>
+        <source>You can not delete standard statuses.</source>
+        <translation type="unfinished">You can not delete standard statuses.</translation>
+    </message>
+    <message>
+        <source>You can not delete active statuses.</source>
+        <translation type="unfinished">You can not delete active statuses.</translation>
     </message>
 </context>
 </TS>

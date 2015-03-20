@@ -10,9 +10,6 @@
 //Annotations
 #define MNI_ANNOTATIONS                 "annotations"
 
-//Autostatus
-#define MNI_AUTOSTATUS                  "autostatus"
-
 //Avatars
 #define MNI_AVATAR_SET                  "avatarSet"
 #define MNI_AVATAR_REMOVE               "avatarRemove"
