@@ -64,9 +64,5 @@
         <source>&lt;Absent&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>When receiving new chat message in current chat window</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 </TS>

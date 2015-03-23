@@ -64,9 +64,5 @@
         <source>&lt;Absent&gt;</source>
         <translation>&lt;Отсутствует&gt;</translation>
     </message>
-    <message>
-        <source>When receiving new chat message in current chat window</source>
-        <translation>При получении нового сообщения в активное окно чата</translation>
-    </message>
 </context>
 </TS>

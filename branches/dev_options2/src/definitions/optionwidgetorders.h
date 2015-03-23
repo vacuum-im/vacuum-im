@@ -1,6 +1,15 @@
 #ifndef DEF_OPTIONWIDGETORDERS_H
 #define DEF_OPTIONWIDGETORDERS_H
 
+//Node = ON_COMMON
+#define OHO_COMMON_SETTINGS                       100
+#  define OWO_COMMON_AUTOSTART                    110
+#  define OWO_COMMON_SENDSTATISTICS               120
+#  define OWO_COMMON_SENDCLIENTINFO               130
+#  define OWO_COMMON_VCARDIMAGE                   140
+#define OHO_COMMON_LOCALIZATION                   300
+#  define OWO_COMMON_LANGUAGE                     310
+
 //Node = ON_ACCOUNTS
 #define OHO_ACCOUNTS_ACCOUNTS                     100
 #  define OWO_ACCOUNTS_ACCOUNTS                   110
@@ -31,15 +40,6 @@
 #  define OWO_ACCOUNTS_ADDITIONAL_STREAMCOMPRESS  180
 #define OHO_ACCOUNTS_ADDITIONAL_CONFERENCES       500
 #  define OWO_ACCOUNTS_ADDITIONAL_DISABLEAUTOJOIN 550
-
-//Node = ON_COMMON
-#define OHO_COMMON_SETTINGS                       100
-#  define OWO_COMMON_AUTOSTART                    110
-#  define OWO_COMMON_SENDSTATISTICS               120
-#  define OWO_COMMON_SENDCLIENTINFO               130
-#  define OWO_COMMON_VCARDIMAGE                   140
-#define OHO_COMMON_LOCALIZATION                   300
-#  define OWO_COMMON_LANGUAGE                     310
 
 //Node = ON_ROSTERVIEW
 #define OHO_ROSTER_VIEW                           100
@@ -87,6 +87,21 @@
 #define OHO_STATUS_ITEMS                          300
 #define   OWO_STATUS_ITEMS                        350
 
+//Node = ON_NOTIFICATIONS
+#define OHO_NOTIFICATIONS                         100
+#define   OWO_NOTIFICATIONS_DISABLEIFAWAY         110
+#define   OWO_NOTIFICATIONS_DISABLEIFDND          120
+#define   OWO_NOTIFICATIONS_NATIVEPOPUPS          130
+#define   OWO_NOTIFICATIONS_FORCESOUND            140
+#define   OWO_NOTIFICATIONS_HIDEMESSAGE           150
+#define   OWO_NOTIFICATIONS_EXPANDGROUPS          160
+#define   OWO_NOTIFICATIONS_SOUNDCOMMAND          170
+#define   OWO_NOTIFICATIONS_POPUPTIMEOUT          180
+#define OHO_NOTIFICATIONS_KINDS                   500
+#define   OWO_NOTIFICATIONS_ALERTWINDOW           510
+#define   OWO_NOTIFICATIONS_KINDS                 590
+
+
 //Node = ON_STATUSICONS
 #define OWO_STATUSICONS                           500
 
@@ -98,10 +113,6 @@
 
 //Node = ON_HISTORY::<AccountId>
 #define OWO_HISTORY_STREAM                        500
-
-//Node = ON_NOTIFICATIONS
-#define OWO_NOTIFICATIONS_EXTENDED                300
-#define OWO_NOTIFICATIONS_COMMON                  500
 
 //Node = ON_MESSAGE_STYLES
 #define OWO_MESSAGE_STYLES                        500

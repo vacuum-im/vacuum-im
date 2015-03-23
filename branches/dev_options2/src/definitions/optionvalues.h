@@ -172,14 +172,16 @@
 
 // Notifications
 #define OPV_NOTIFICATIONS_ROOT                          "notifications"
-#define OPV_NOTIFICATIONS_EXPANDGROUP                   "notifications.expand-groups"
-#define OPV_NOTIFICATIONS_NOSOUNDIFDND                  "notifications.no-sound-if-dnd"
-#define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
+#define OPV_NOTIFICATIONS_SILENTIFDND                   "notifications.silent-if-dnd"
+#define OPV_NOTIFICATIONS_SILENTIFAWAY                  "notifications.silent-if-away"
+#define OPV_NOTIFICATIONS_NATIVEPOPUPS                  "notifications.native-popups"
+#define OPV_NOTIFICATIONS_FORCESOUND                    "notifications.force-sound"
+#define OPV_NOTIFICATIONS_HIDEMESSAGE                   "notifications.hide-message"
+#define OPV_NOTIFICATIONS_EXPANDGROUPS                  "notifications.expand-groups"
 #define OPV_NOTIFICATIONS_SOUNDCOMMAND                  "notifications.sound-command"
+#define OPV_NOTIFICATIONS_POPUPTIMEOUT                  "notifications.popup-timeout"
 #define OPV_NOTIFICATIONS_TYPEKINDS_ITEM                "notifications.type-kinds.type"
 #define OPV_NOTIFICATIONS_KINDENABLED_ITEM              "notifications.kind-enabled.kind"
-#define OPV_NOTIFICATIONS_ANIMATIONENABLE               "notifications.animation-enable"
-#define OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS             "notifications.try-native-popups"
 
 // ConnectionManager
 #define OPV_PROXY_ROOT                                  "proxy"

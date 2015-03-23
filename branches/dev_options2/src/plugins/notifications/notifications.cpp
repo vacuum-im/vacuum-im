@@ -1,8 +1,8 @@
 #include "notifications.h"
 
+#include <QSpinBox>
 #include <QProcess>
 #include <QSystemTrayIcon>
-#include <QVBoxLayout>
 #include <definitions/notificationdataroles.h>
 #include <definitions/actiongroups.h>
 #include <definitions/toolbargroups.h>
@@ -19,6 +19,7 @@
 #include <utils/options.h>
 #include <utils/action.h>
 #include <utils/logger.h>
+#include "notifykindoptionswidget.h"
 
 #define FIRST_KIND         0x0001
 #define LAST_KIND          0x8000
@@ -200,14 +201,16 @@ bool Notifications::initObjects()
 
 bool Notifications::initSettings()
 {
-	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUP,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_NOSOUNDIFDND,false);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_EXPANDGROUPS,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_SILENTIFAWAY,false);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_SILENTIFDND,true);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_NATIVEPOPUPS,false);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_FORCESOUND,false);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_HIDEMESSAGE,false);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_POPUPTIMEOUT,8);
+	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUNDCOMMAND,QString("aplay"));
 	Options::setDefaultValue(OPV_NOTIFICATIONS_TYPEKINDS_ITEM,0);
 	Options::setDefaultValue(OPV_NOTIFICATIONS_KINDENABLED_ITEM,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_SOUNDCOMMAND,QString("aplay"));
-	Options::setDefaultValue(OPV_NOTIFICATIONS_ANIMATIONENABLE,true);
-	Options::setDefaultValue(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS,false);
 
 	if (FOptionsManager)
 	{
@@ -232,11 +235,26 @@ QMultiMap<int, IOptionsDialogWidget *> Notifications::optionsDialogWidgets(const
 	QMultiMap<int, IOptionsDialogWidget *> widgets;
 	if (FOptionsManager && ANodeId == OPN_NOTIFICATIONS)
 	{
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUP),tr("Expand contact groups in roster"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND),tr("Disable sounds when status is 'Do not disturb'"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_ANIMATIONENABLE),tr("Enable animation in notification pop-up"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_EXTENDED,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS),tr("Use native popup notifications if available"),AParent));
-		widgets.insertMulti(OWO_NOTIFICATIONS_COMMON, new NotifyOptionsWidget(this,AParent));
+		widgets.insertMulti(OHO_NOTIFICATIONS,FOptionsManager->newOptionsDialogHeader(tr("Notifications"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_DISABLEIFAWAY,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_SILENTIFAWAY),tr("Disable sounds and popup windows if status is 'Away'"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_DISABLEIFDND,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_SILENTIFDND),tr("Disable sounds and popup windows if status is 'Do not disturb'"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_NATIVEPOPUPS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_NATIVEPOPUPS),tr("Use native popup notifications if available"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_FORCESOUND,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_FORCESOUND),tr("Play notification sound when received a message in the active window"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_HIDEMESSAGE,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE),tr("Do not show the message body in the popup window"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_EXPANDGROUPS,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_EXPANDGROUPS),tr("Expand contact groups in roster"),AParent));
+		
+		QSpinBox *spbPopupTimeout = new QSpinBox(AParent);
+		spbPopupTimeout->setRange(0,120);
+		spbPopupTimeout->setSuffix(tr(" seconds"));
+		widgets.insertMulti(OWO_NOTIFICATIONS_POPUPTIMEOUT,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT),tr("Time to display a pop-up window (0 - always visible):"),spbPopupTimeout,AParent));
+
+#if defined Q_WS_X11 && 0 
+		widgets.insertMulti(OWO_NOTIFICATIONS_SOUNDCOMMAND,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_SOUNDCOMMAND),tr("System command to play sound:"),AParent));
+#endif
+
+		widgets.insertMulti(OHO_NOTIFICATIONS_KINDS,FOptionsManager->newOptionsDialogHeader(tr("Notification kinds"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_ALERTWINDOW,FOptionsManager->newOptionsDialogWidget(Options::node(OPV_NOTIFICATIONS_KINDENABLED_ITEM,QString::number(INotification::AlertWidget)),tr("Highlight the corresponding window in the taskbar"),AParent));
+		widgets.insertMulti(OWO_NOTIFICATIONS_KINDS, new NotifyKindOptionsWidget(this,AParent));
 	}
 	return widgets;
 }
@@ -260,8 +278,10 @@ int Notifications::appendNotification(const INotification &ANotification)
 	record.notification = ANotification;
 	emit notificationAppend(notifyId, record.notification);
 
+	bool isAway = FStatusChanger!=NULL ? FStatusChanger->statusItemShow(STATUS_MAIN_ID)==IPresence::Away : false;
 	bool isDND = FStatusChanger!=NULL ? FStatusChanger->statusItemShow(STATUS_MAIN_ID)==IPresence::DoNotDisturb : false;
-	bool diableSound = isDND && Options::node(OPV_NOTIFICATIONS_NOSOUNDIFDND).value().toBool();
+	bool isSilent = isDND && Options::node(OPV_NOTIFICATIONS_SILENTIFDND).value().toBool();
+	isSilent = isSilent || (isAway && Options::node(OPV_NOTIFICATIONS_SILENTIFAWAY).value().toBool());
 
 	QIcon icon = qvariant_cast<QIcon>(record.notification.data.value(NDR_ICON));
 	QString toolTip = record.notification.data.value(NDR_TOOLTIP).toString();
@@ -293,7 +313,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 				rnotify.icon = icon;
 				rnotify.order = record.notification.data.value(NDR_ROSTER_ORDER).toInt();
 				rnotify.flags = record.notification.data.value(NDR_ROSTER_FLAGS).toInt();
-				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUP).value().toBool())
+				if (Options::node(OPV_NOTIFICATIONS_EXPANDGROUPS).value().toBool())
 					rnotify.flags |= IRostersNotify::ExpandParents;
 				rnotify.timeout = record.notification.data.value(NDR_ROSTER_TIMEOUT).toInt();
 				rnotify.footer = record.notification.data.value(NDR_ROSTER_FOOTER).toString();
@@ -303,17 +323,17 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if ((record.notification.kinds & INotification::PopupWindow)>0)
+	if (!isSilent && (record.notification.kinds & INotification::PopupWindow)>0)
 	{
 		if (!showNotifyByHandler(INotification::PopupWindow,notifyId,record.notification))
 		{
-			if (Options::node(OPV_NOTIFICATIONS_TRY_NATIVE_POPUPS).value().toBool() && FTrayManager && FTrayManager->isMessagesSupported())
+			if (Options::node(OPV_NOTIFICATIONS_NATIVEPOPUPS).value().toBool() && FTrayManager && FTrayManager->isMessagesSupported())
 			{
 				QString title = record.notification.data.value(NDR_POPUP_TITLE).toString();
 				QString caption = record.notification.data.value(NDR_POPUP_CAPTION).toString();
 				QString text = record.notification.data.value(NDR_POPUP_TEXT).toString();
 				int timeout = Options::node(OPV_NOTIFICATIONS_POPUPTIMEOUT).value().toInt()*1000;
-				FTrayManager->showMessage(title+" - "+caption,text,QSystemTrayIcon::Information,timeout);
+				FTrayManager->showMessage(QString("%1 - %2").arg(title,caption),text,QSystemTrayIcon::Information,timeout);
 			}
 			else
 			{
@@ -354,7 +374,7 @@ int Notifications::appendNotification(const INotification &ANotification)
 		}
 	}
 
-	if (!diableSound && (record.notification.kinds & INotification::SoundPlay)>0)
+	if (!isSilent && (record.notification.kinds & INotification::SoundPlay)>0)
 	{
 		if (!showNotifyByHandler(INotification::SoundPlay,notifyId,record.notification))
 		{

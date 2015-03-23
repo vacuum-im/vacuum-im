@@ -18,7 +18,6 @@
 #include <interfaces/imessagewidgets.h>
 #include <interfaces/iurlprocessor.h>
 #include "notifywidget.h"
-#include "notifyoptionswidget.h"
 
 struct NotifyRecord {
 	NotifyRecord() {

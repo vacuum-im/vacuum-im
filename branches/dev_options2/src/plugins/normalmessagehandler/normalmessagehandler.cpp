@@ -328,13 +328,16 @@ INotification NormalMessageHandler::messageNotify(INotifications *ANotifications
 				notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)window->instance());
 
-				if (FMessageProcessor)
+				if (!Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
 				{
-					QTextDocument doc;
-					FMessageProcessor->messageToText(&doc,AMessage);
-					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+					if (FMessageProcessor)
+					{
+						QTextDocument doc;
+						FMessageProcessor->messageToText(&doc,AMessage);
+						notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+					}
+					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 				}
-				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 
 				FNotifiedMessages.insertMulti(window,AMessage.data(MDR_MESSAGE_ID).toInt());
 			}

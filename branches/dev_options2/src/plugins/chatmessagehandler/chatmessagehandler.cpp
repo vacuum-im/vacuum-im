@@ -226,11 +226,6 @@ bool ChatMessageHandler::initObjects()
 		notifyType.kindMask = INotification::RosterNotify|INotification::PopupWindow|INotification::TrayNotify|INotification::TrayAction|INotification::SoundPlay|INotification::AlertWidget|INotification::TabPageNotify|INotification::ShowMinimized|INotification::AutoActivate;
 		notifyType.kindDefs = notifyType.kindMask & ~(INotification::AutoActivate);
 		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE,notifyType);
-
-		notifyType.kindDefs = 0;
-		notifyType.kindMask = INotification::PopupWindow|INotification::SoundPlay;
-		notifyType.title = tr("When receiving new chat message in current chat window");
-		FNotifications->registerNotificationType(NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW,notifyType);
 	}
 	if (FRostersView)
 	{
@@ -333,8 +328,12 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 		IMessageChatWindow *window = findWindow(AMessage.to(),AMessage.from());
 		if (window)
 		{
-			QString typeId = window->isActiveTabPage() ? NNT_CHAT_MESSAGE_IN_CURRENT_WINDOW : NNT_CHAT_MESSAGE;
+			QString typeId = NNT_CHAT_MESSAGE;
+
 			notify.kinds = ANotifications->enabledTypeNotificationKinds(typeId);
+			if (window->isActiveTabPage())
+				notify.kinds &= Options::node(OPV_NOTIFICATIONS_FORCESOUND).value().toBool() ? INotification::SoundPlay : 0;
+
 			if (notify.kinds > 0)
 			{
 				QIcon icon = IconStorage::staticStorage(RSR_STORAGE_MENUICONS)->getIcon(MNI_CHATMHANDLER_MESSAGE);
@@ -349,7 +348,7 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 				notify.data.insert(NDR_ROSTER_FLAGS,IRostersNotify::Blink|IRostersNotify::AllwaysVisible|IRostersNotify::HookClicks);
 				notify.data.insert(NDR_ROSTER_CREATE_INDEX,true);
 				notify.data.insert(NDR_POPUP_IMAGE,ANotifications->contactAvatar(AMessage.from()));
-				notify.data.insert(NDR_POPUP_CAPTION, tr("Message received"));
+				notify.data.insert(NDR_POPUP_CAPTION,tr("Message received"));
 				notify.data.insert(NDR_POPUP_TITLE,name);
 				notify.data.insert(NDR_SOUND_FILE,SDF_CHAT_MHANDLER_MESSAGE);
 
@@ -359,13 +358,16 @@ INotification ChatMessageHandler::messageNotify(INotifications *ANotifications, 
 				notify.data.insert(NDR_TABPAGE_ICONBLINK,true);
 				notify.data.insert(NDR_SHOWMINIMIZED_WIDGET,(qint64)window->instance());
 
-				if (FMessageProcessor)
+				if (!Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
 				{
-					QTextDocument doc;
-					FMessageProcessor->messageToText(&doc,AMessage);
-					notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+					if (FMessageProcessor)
+					{
+						QTextDocument doc;
+						FMessageProcessor->messageToText(&doc,AMessage);
+						notify.data.insert(NDR_POPUP_HTML,TextManager::getDocumentBody(doc));
+					}
+					notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 				}
-				notify.data.insert(NDR_POPUP_TEXT,AMessage.body());
 
 				FNotifiedMessages.insertMulti(window, AMessage.data(MDR_MESSAGE_ID).toInt());
 			}

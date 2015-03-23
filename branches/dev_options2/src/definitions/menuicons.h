@@ -148,10 +148,13 @@
 
 //Notifications
 #define MNI_NOTIFICATIONS               "notifications"
-#define MNI_NOTIFICATIONS_ACTIVATE_ALL  "notificationsActivateAll"
-#define MNI_NOTIFICATIONS_REMOVE_ALL    "notificationsRemoveAll"
 #define MNI_NOTIFICATIONS_SOUND_ON      "notificationsSoundOn"
 #define MNI_NOTIFICATIONS_SOUND_OFF     "notificationsSoundOff"
+#define MNI_NOTIFICATIONS_REMOVE_ALL    "notificationsRemoveAll"
+#define MNI_NOTIFICATIONS_ACTIVATE_ALL  "notificationsActivateAll"
+#define MNI_NOTIFICATIONS_SOUNDPLAY     "notificationsSoundPlay"
+#define MNI_NOTIFICATIONS_PUPUPWINDOW   "notificationsPopupWindow"
+#define MNI_NOTIFICATIONS_SHOWMINIMIZED "notificationsShowMinimized"
 
 //OptionsManager
 #define MNI_OPTIONS_DIALOG              "optionsDialog"

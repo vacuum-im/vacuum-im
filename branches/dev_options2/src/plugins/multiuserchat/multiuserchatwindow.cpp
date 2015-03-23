@@ -433,7 +433,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 			IMessageTabPage *page = NULL;
 			if (AMessage.type() == Message::GroupChat)
 			{
-				if (!AMessage.body().isEmpty() && !isActiveTabPage() && !AMessage.isDelayed())
+				if (!AMessage.body().isEmpty() && !AMessage.isDelayed())
 				{
 					page = this;
 					if (isMentionMessage(AMessage))
@@ -458,13 +458,16 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(userJid.resource()).arg(userJid.uNode()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_MESSAGE);
 
-					FActiveMessages.append(messageId);
+					if (!isActiveTabPage())
+						FActiveMessages.append(messageId);
+					else
+						notify.kinds &= Options::node(OPV_NOTIFICATIONS_FORCESOUND).value().toBool() ? INotification::SoundPlay : 0;
 				}
 			}
 			else if (!AMessage.body().isEmpty())
 			{
 				IMessageChatWindow *window = getPrivateChatWindow(userJid);
-				if (window && !window->isActiveTabPage())
+				if (window)
 				{
 					page = window;
 					notify.kinds = ANotifications->enabledTypeNotificationKinds(NNT_MUC_MESSAGE_PRIVATE);
@@ -479,10 +482,17 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 					notify.data.insert(NDR_POPUP_TITLE,tr("[%1] in conference %2").arg(userJid.resource()).arg(userJid.uNode()));
 					notify.data.insert(NDR_SOUND_FILE,SDF_MUC_PRIVATE_MESSAGE);
 
-					if (FDestroyTimers.contains(window))
-						delete FDestroyTimers.take(window);
-					FActiveChatMessages.insertMulti(window, messageId);
-					updateListItem(userJid);
+					if (!window->isActiveTabPage())
+					{
+						if (FDestroyTimers.contains(window))
+							delete FDestroyTimers.take(window);
+						FActiveChatMessages.insertMulti(window,messageId);
+						updateListItem(userJid);
+					}
+					else
+					{
+						notify.kinds &= Options::node(OPV_NOTIFICATIONS_FORCESOUND).value().toBool() ? INotification::SoundPlay : 0;
+					}
 				}
 			}
 			if (notify.kinds & INotification::RosterNotify)
@@ -493,7 +503,7 @@ INotification MultiUserChatWindow::messageNotify(INotifications *ANotifications,
 				searchData.insert(QString::number(RDR_PREP_BARE_JID),userJid.pBare());
 				notify.data.insert(NDR_ROSTER_SEARCH_DATA,searchData);
 			}
-			if (notify.kinds & INotification::PopupWindow)
+			if ((notify.kinds & INotification::PopupWindow)>0 && !Options::node(OPV_NOTIFICATIONS_HIDEMESSAGE).value().toBool())
 			{
 				if (FMessageProcessor)
 				{

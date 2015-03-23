@@ -36,10 +36,6 @@
         <translation>Expand contact groups in roster</translation>
     </message>
     <message>
-        <source>Disable sounds when status is &apos;Do not disturb&apos;</source>
-        <translation>Disable sounds when status is &apos;Do not disturb&apos;</translation>
-    </message>
-    <message>
         <source>Activate notification</source>
         <translation>Activate notification</translation>
     </message>
@@ -48,70 +44,70 @@
         <translation>Activate Notification</translation>
     </message>
     <message>
-        <source>Enable animation in notification pop-up</source>
-        <translation>Enable animation in notification pop-up</translation>
-    </message>
-    <message>
         <source>Use native popup notifications if available</source>
         <translation>Use native popup notifications if available</translation>
     </message>
-</context>
-<context>
-    <name>NotifyOptionsWidget</name>
     <message>
-        <source>Display a notification in your roster</source>
-        <translation>Display a notification in your roster</translation>
+        <source>Disable sounds and popup windows if status is &apos;Away&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display a notification in popup window</source>
-        <translation>Display a notification in popup window</translation>
+        <source>Disable sounds and popup windows if status is &apos;Do not disturb&apos;</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display a notification in tray</source>
-        <translation>Display a notification in tray</translation>
+        <source>Play notification sound when received a message in the active window</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Display a notification in tray context menu</source>
-        <translation>Display a notification in tray context menu</translation>
-    </message>
-    <message>
-        <source>Play sound at the notification</source>
-        <translation>Play sound at the notification</translation>
-    </message>
-    <message>
-        <source>Highlight the corresponding window in the taskbar</source>
-        <translation>Highlight the corresponding window in the taskbar</translation>
-    </message>
-    <message>
-        <source>Display a notification in tab</source>
-        <translation>Display a notification in tab</translation>
-    </message>
-    <message>
-        <source>Show the corresponding window minimized in the taskbar</source>
-        <translation>Show the corresponding window minimized in the taskbar</translation>
-    </message>
-    <message>
-        <source>Immediately activate the notification</source>
-        <translation>Immediately activate the notification</translation>
-    </message>
-    <message>
-        <source>Allowed types of notifications</source>
-        <translation>Allowed types of notifications</translation>
-    </message>
-</context>
-<context>
-    <name>NotifyOptionsWidgetClass</name>
-    <message>
-        <source>Time to display a pop-up window (0 - always visible):</source>
-        <translation>Time to display a pop-up window (0 - always visible):</translation>
+        <source>Do not show the message body in the popup window</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source> seconds</source>
-        <translation> seconds</translation>
+        <translation type="unfinished"> seconds</translation>
     </message>
     <message>
-        <source>Restore Defaults</source>
-        <translation>Restore Defaults</translation>
+        <source>Time to display a pop-up window (0 - always visible):</source>
+        <translation type="unfinished">Time to display a pop-up window (0 - always visible):</translation>
+    </message>
+    <message>
+        <source>System command to play sound:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notification kinds</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Highlight the corresponding window in the taskbar</source>
+        <translation type="unfinished">Highlight the corresponding window in the taskbar</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyKindOptionsWidget</name>
+    <message>
+        <source>Event</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play sound at the notification</source>
+        <translation type="unfinished">Play sound at the notification</translation>
+    </message>
+    <message>
+        <source>Display a notification in popup window</source>
+        <translation type="unfinished">Display a notification in popup window</translation>
+    </message>
+    <message>
+        <source>Show the corresponding window minimized in the taskbar</source>
+        <translation type="unfinished">Show the corresponding window minimized in the taskbar</translation>
+    </message>
+</context>
+<context>
+    <name>NotifyWidget</name>
+    <message>
+        <source>Message is empty or hidden</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
